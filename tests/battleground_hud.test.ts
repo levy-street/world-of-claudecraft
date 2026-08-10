@@ -37,11 +37,14 @@ const baseInfo = (over: Partial<BgInfo> = {}): BgInfo => ({
   rating: 1500,
   wins: 0,
   losses: 0,
+  draws: 0,
   captures: 0,
   queued: false,
   queueSize: 0,
   queuedParty: 1,
   firstWinBonusReady: false,
+  proposal: null,
+  requeueIn: 0,
   match: null,
   ladder: [],
   ...over,
@@ -113,6 +116,7 @@ const BG_WIRE_KEYS = new Set<string>([
     'rating',
     'wins',
     'losses',
+    'draws',
     'captures',
     'queued',
     'queueSize',
@@ -121,7 +125,7 @@ const BG_WIRE_KEYS = new Set<string>([
     'match',
     'ladder',
   ].map((k) => `.${k}`),
-  ...['pid', 'name', 'cls', 'rating', 'wins', 'losses'].map((k) => `ladder[].${k}`),
+  ...['pid', 'name', 'cls', 'rating', 'wins', 'losses', 'draws'].map((k) => `ladder[].${k}`),
   ...[
     'state',
     'myTeam',
@@ -322,7 +326,9 @@ describe('battleground window view (pure core)', () => {
       match: baseMatch(),
       // Non-empty so the live-ladder rows are really walked by the proxy: an
       // empty array would let a misnamed row field pass unnoticed.
-      ladder: [{ pid: 7, name: 'Ravven', cls: 'warrior', rating: 1616, wins: 4, losses: 1 }],
+      ladder: [
+        { pid: 7, name: 'Ravven', cls: 'warrior', rating: 1616, wins: 4, losses: 1, draws: 0 },
+      ],
     }) as BgInfo & Record<string, unknown>;
     // Sim-side baggage the wire cannot carry, on the object AND on its prototype.
     live.simOnlyUndefined = undefined;
@@ -363,8 +369,8 @@ describe('battleground window view (pure core)', () => {
     const v = buildBgWindowView({
       info: baseInfo({
         ladder: [
-          { pid: 4, name: 'Top', cls: 'mage', rating: 1800, wins: 12, losses: 3 },
-          { pid: 9, name: 'Me', cls: 'warrior', rating: 1520, wins: 3, losses: 2 },
+          { pid: 4, name: 'Top', cls: 'mage', rating: 1800, wins: 12, losses: 3, draws: 0 },
+          { pid: 9, name: 'Me', cls: 'warrior', rating: 1520, wins: 3, losses: 2, draws: 0 },
           {
             pid: 5,
             name: 'Odd',
@@ -372,6 +378,7 @@ describe('battleground window view (pure core)', () => {
             rating: 1400,
             wins: 0,
             losses: 5,
+            draws: 0,
           },
         ],
       }),
@@ -393,7 +400,9 @@ describe('battleground window view (pure core)', () => {
     // A ladder move re-renders: the signature carries the raw rows.
     const moved = buildBgWindowView({
       info: baseInfo({
-        ladder: [{ pid: 9, name: 'Me', cls: 'warrior', rating: 1520, wins: 3, losses: 2 }],
+        ladder: [
+          { pid: 9, name: 'Me', cls: 'warrior', rating: 1520, wins: 3, losses: 2, draws: 0 },
+        ],
       }),
       playerName: 'Top',
       playerLevel: 20,
@@ -530,6 +539,88 @@ describe('battleground kill feed (pure core)', () => {
     expect(pruned).toHaveLength(1);
     expect(pruned[0].killerName).toBe('K1');
     expect(pruneBgKillLines(pruned, 104 + BG_KILL_FEED_TTL)).toHaveLength(0);
+  });
+
+  it('holds a line up for the tuned nine seconds', () => {
+    // The one place the dwell length itself is pinned to a literal: every other
+    // assertion in this block derives its expiry from the constant, so without
+    // this a retune of the TTL would slip through the whole suite unnoticed.
+    expect(BG_KILL_FEED_TTL).toBe(9);
+    expect(pushBgKillLine([], kill(0), 100)[0].expiresAt).toBe(109);
+  });
+});
+
+describe('battleground kill feed (stylesheet contract)', () => {
+  const CSS = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
+
+  // Slice ONE rule body out of the sheet by exact selector, so a lookup of
+  // `.bgkf-name` can never pick up `.bgkf-name.crimson` instead.
+  const ruleBody = (selector: string): string => {
+    const re = new RegExp(`(?:^|[\\s,])${selector.replace(/[.#]/g, '\\$&')}\\s*\\{`, 'm');
+    const m = re.exec(CSS);
+    if (!m) throw new Error(`${selector} should exist in components.css`);
+    const start = m.index + m[0].length;
+    const end = CSS.indexOf('}', start);
+    expect(end, `${selector} should close`).toBeGreaterThan(start);
+    return CSS.slice(start, end);
+  };
+
+  const px = (body: string, prop: string): number => {
+    const m = new RegExp(`(?:^|;)\\s*${prop}\\s*:\\s*(-?[\\d.]+)px`, 'm').exec(body);
+    if (!m) throw new Error(`${prop} should be declared in px`);
+    return Number(m[1]);
+  };
+
+  // padding shorthand, CSS box order: top right bottom left (with the usual
+  // 1/2/3-value fill-ins).
+  const padding = (body: string): { top: number; right: number; bottom: number; left: number } => {
+    const m = /(?:^|;)\s*padding\s*:\s*([^;]+);/m.exec(body);
+    if (!m) throw new Error('padding should be declared');
+    const v = m[1]
+      .trim()
+      .split(/\s+/)
+      .map((s) => Number.parseFloat(s));
+    const [top, right = top, bottom = top, left = right] = v;
+    return { top, right, bottom, left };
+  };
+
+  it('puts the ellipsis on the NAME, never on the flex line container', () => {
+    const line = ruleBody('.bgkf-line');
+    expect(line).toContain('display: flex');
+    // text-overflow on a flex container does nothing: it used to sit here and
+    // long names were hard-sheared with no ellipsis at all.
+    expect(line).not.toContain('text-overflow');
+    const name = ruleBody('.bgkf-name');
+    expect(name).toContain('text-overflow: ellipsis');
+    expect(name).toContain('overflow: hidden');
+    expect(name).toContain('min-width: 0'); // the half that lets the item shrink
+  });
+
+  it('keeps the last glyph well clear of the team-colored stripe', () => {
+    const line = ruleBody('.bgkf-line');
+    const pad = padding(line);
+    // At the old 14px right pad against a 5px stripe the gap read as 9px and a
+    // name sat right on the colored edge; 12px of clearance is the floor now.
+    expect(pad.right - px(line, 'border-right-width')).toBeGreaterThanOrEqual(12);
+    expect(pad.right).toBeGreaterThan(pad.left);
+  });
+
+  it('lets the names absorb the squeeze, never the mark or the verb', () => {
+    expect(ruleBody('.bgkf-mark')).toContain('flex: none');
+    expect(ruleBody('.bgkf-verb')).toContain('flex: none');
+  });
+
+  it('holds the trimmed type scale and the responsive width ceiling', () => {
+    const line = ruleBody('.bgkf-line');
+    expect(px(line, 'font-size')).toBe(16);
+    expect(px(ruleBody('.bgkf-name'), 'font-size')).toBe(17);
+    expect(px(ruleBody('.bgkf-verb'), 'font-size')).toBe(13);
+    expect(padding(line).top).toBe(5);
+    const feed = ruleBody('#bg-killfeed');
+    expect(px(feed, 'width')).toBe(420);
+    // no mobile arm exists for this surface: the cap is what keeps a narrow
+    // phone from pushing the stack off the left edge.
+    expect(feed).toContain('max-width: calc(100% - 24px)');
   });
 });
 
@@ -1147,5 +1238,63 @@ describe('the scoreboard opens itself over the frozen result screen', () => {
     painter.update(view('ended'));
     painter.update(view('ended'));
     expect(writes(), 'an unchanged state touches nothing').toBe(atMount + 1);
+  });
+});
+
+describe('an old server that has never heard of draws (battleground half)', () => {
+  // The rolling-deploy property, pinned on the side that had no pin. Every
+  // other fixture in this file supplies `draws: 0` explicitly, so none of them
+  // is the pre-upgrade shape and all three `?? 0` guards in
+  // battleground_window_view.ts could be deleted with the suite still green.
+  // These build the shape a server predating the field actually sends.
+  const noDraws = <T extends object>(o: T): T => {
+    const { draws: _drop, ...rest } = o as T & { draws?: number };
+    return rest as T;
+  };
+
+  it('reads a missing standing, ladder and all-time draws as zero, never NaN', () => {
+    const info = noDraws(
+      baseInfo({
+        rating: 1620,
+        wins: 4,
+        losses: 2,
+        ladder: [
+          noDraws({
+            pid: 1,
+            name: 'Me',
+            cls: 'warrior',
+            rating: 1620,
+            wins: 4,
+            losses: 2,
+            draws: 0,
+          }),
+        ],
+      }),
+    );
+    const view = buildBgWindowView({
+      info,
+      playerName: 'Me',
+      playerLevel: 20,
+      party: null,
+      playerId: 1,
+      allTime: [
+        noDraws({
+          name: 'Old',
+          class: 'mage',
+          level: 20,
+          rating: 1700,
+          wins: 9,
+          losses: 1,
+          draws: 0,
+        }),
+      ],
+    });
+    if (view.kind !== 'live') throw new Error('expected a live view');
+
+    expect('draws' in info, 'the fixture really is the old shape').toBe(false);
+    expect(view.draws, 'the standing defaults').toBe(0);
+    for (const row of view.ladder) expect(row.draws, `ladder row ${row.name}`).toBe(0);
+    for (const row of view.allTime ?? []) expect(row.draws, `all-time row ${row.name}`).toBe(0);
+    expect(Number.isNaN(view.draws)).toBe(false);
   });
 });

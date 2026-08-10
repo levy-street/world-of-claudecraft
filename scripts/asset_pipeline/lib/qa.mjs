@@ -14,6 +14,12 @@ const pass = (name, detail) => ({ name, status: 'pass', detail });
 const warn = (name, detail) => ({ name, status: 'warn', detail });
 const fail = (name, detail) => ({ name, status: 'fail', detail });
 
+export function qaVerdict(checks, cost) {
+  if (checks.some((c) => c.status === 'fail')) return 'FAIL';
+  if (checks.some((c) => c.status === 'warn') || cost.unpriced > 0) return 'WARN';
+  return 'PASS';
+}
+
 function foldValidation(checks, v, label) {
   for (const e of v.errors) checks.push(fail(label, e));
   for (const w of v.warnings) checks.push(warn(label, w));
@@ -127,11 +133,7 @@ export async function runJobQa(job) {
   // Real cost from the recorded task ids + stored gpt-image-2 usage.
   const cost = await jobCost(state);
 
-  const verdict = checks.some((c) => c.status === 'fail')
-    ? 'FAIL'
-    : checks.some((c) => c.status === 'warn')
-      ? 'WARN'
-      : 'PASS';
+  const verdict = qaVerdict(checks, cost);
   const result = { job: job.id, kind, name, verdict, checks, cost };
   writeFileSync(job.path('qa.json'), `${JSON.stringify(result, null, 2)}\n`);
   return result;

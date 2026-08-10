@@ -130,6 +130,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests (full suite, PR tier)
+        # The one place the balance harnesses' FULL sweep runs (docs/qa-gate.md,
+        # "The balance-harness diet"): the PR-tier long-sims lanes run the diet
+        # configuration (fewer seeds, band scenarios only, shorter windows), and
+        # this flag restores the full five-seed, all-scenario, 120-second
+        # depth nightly. Set nowhere else by design.
+        env:
+          WOC_FULL_BALANCE_SWEEP: '1'
         run: npm test -- --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
 
   # The serialized checks, mirroring the release-checks job in ci.yml (same
@@ -178,20 +185,15 @@ jobs:
       - name: Malicious-code gate
         run: npm run security:gate
 
-      - name: Typecheck
-        run: npm run check:types
-
-      - name: Build headless environment
-        run: npm run build:env
-
-      - name: Build server
-        run: npm run build:server
-
-      - name: Build Discord bot
-        run: npm run build:bot
+      # Same turbo multi-task run gate.mjs uses for wall-clock overlap across
+      # these four independent pure steps (scripts/lib/gate_steps.mjs), mirrored
+      # from ci.yml's release-checks job (tests/nightly_workflow.test.ts pins
+      # the two run-line sequences equal).
+      - name: Typecheck + env/server/bot builds
+        run: npx turbo run check:types build:env build:server build:bot --ui=stream
 
       - name: Build client
-        run: npm run build
+        run: npm run wiki:content && npm run build:bundle
 
   # The Chromium browser regressions, mirroring the browser-gate job in ci.yml.
   browser:
@@ -229,12 +231,16 @@ jobs:
         run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright Chromium browsers
+        # No restore-keys: a version-prefix fallback can only ever restore a
+        # stale Chromium build. npx playwright install then throws it away
+        # (playwright's own browser GC deletes any revision the resolved
+        # version does not claim), so all the fallback buys is a wasted
+        # restore and extract on every version bump. Matches ci.yml's
+        # browser-gate job, which dropped the same fallback in #3178.
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
-          restore-keys: |
-            playwright-chromium-${{ runner.os }}-
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium

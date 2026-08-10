@@ -33,6 +33,7 @@ import {
 } from './eastbrook_town_visibility_core';
 import { indexExactVertexTuples } from './exact_index_geometry';
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
@@ -339,10 +340,13 @@ function townMaterial(
     // only the town's atlas-normal material ever carries this scale.
     shared.normalScale.setScalar(EASTBROOK_SURFACE_NORMAL_SCALE);
   }
-  const material = independent ? shared.clone() : shared;
+  // Hook-preserving clone: a bare clone dropped the zone-haze hook and split
+  // the program cache key, so each independent building material linked a new
+  // program at first sight (the town's share of the first-contact burst).
+  const material = independent ? cloneMaterialWithHooks(shared) : shared;
   // Conservative triplanar detail OVER the baked atlas (the baked cells are
   // stretched per-face and judged too flat alone); applied after the clone
-  // decision because Material.clone drops onBeforeCompile hooks.
+  // decision so the clone records its own detail spec.
   return emissive
     ? modulateEmissiveByVertexColor(material)
     : applyEastbrookTownSurfaceDetail(material);

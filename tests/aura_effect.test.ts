@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { type AuraEffectInput, auraEffectDescriptor } from '../src/ui/aura_effect';
+import {
+  type AuraEffectInput,
+  auraEffectDescriptor,
+  auraEffectMaximumFractionDigits,
+} from '../src/ui/aura_effect';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 const desc = (a: AuraEffectInput) => auraEffectDescriptor(a);
 
@@ -32,6 +37,71 @@ describe('auraEffectDescriptor', () => {
     expect(d?.school).toBeUndefined();
   });
 
+  it('describes Mending Current as a whole pool and its relative party-frame size', () => {
+    expect(desc({ id: 'shaman_mending_current', kind: 'hot', value: 300 })).toEqual({
+      key: 'hudChrome.auraEffect.mendingCurrent',
+      nums: { value: 300 },
+    });
+    expect(desc({ id: 'shaman_mending_current', kind: 'hot', value: 300, poolPct: 30 })).toEqual({
+      key: 'hudChrome.auraEffect.mendingCurrentPercent',
+      nums: { pct: 30 },
+    });
+  });
+
+  it('shows the current Pack Ferocity stack and total pet damage bonus', () => {
+    expect(desc({ kind: 'hunter_ferocity', value: 2, stacks: 2 })).toEqual({
+      key: 'hudChrome.auraEffect.hunterFerocity',
+      nums: { stacks: 2, pct: 20 },
+    });
+  });
+
+  it('describes both spell choices offered by Radiant Resonance', () => {
+    expect(desc({ kind: 'paladin_radiant_resonance', value: 0.5 })).toEqual({
+      key: 'hudChrome.auraEffect.radiantResonance',
+      nums: { pct: 50, castTime: 1.5 },
+    });
+    expect(hudChromeStrings.auraEffect.radiantResonance).toBe(
+      "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
+    );
+    expect(auraEffectMaximumFractionDigits(50)).toBe(0);
+    expect(auraEffectMaximumFractionDigits(1.5)).toBe(1);
+  });
+
+  it('describes all three choices offered by Solar Reprisal', () => {
+    expect(desc({ kind: 'paladin_solar_reprisal', value: 0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.solarReprisal',
+      nums: { pct: 20 },
+    });
+    expect(hudChromeStrings.auraEffect.solarReprisal).toBe(
+      'Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant',
+    );
+  });
+
+  it("describes Dawn's Wrath as a stored empowered Hammer cast", () => {
+    expect(desc({ kind: 'paladin_dawns_wrath', value: 0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.dawnsWrath',
+      nums: { pct: 20 },
+    });
+    expect(hudChromeStrings.auraEffect.dawnsWrath).toBe(
+      'HoW: all HP · +1 use · CD 0 · +{pct}% DMG',
+    );
+  });
+
+  it('teaches every visible Druid engine bank and its live stage', () => {
+    expect(desc({ id: 'moontide', kind: 'moontide', value: 0, stacks: 2 })).toEqual({
+      key: 'hudChrome.auraEffect.moontide',
+      nums: { stacks: 2, max: 3 },
+    });
+    expect(desc({ id: 'old_blood', kind: 'old_blood', value: 0, stacks: 3 })).toEqual({
+      key: 'hudChrome.auraEffect.oldBlood',
+      nums: { stacks: 3, max: 3 },
+    });
+    expect(desc({ id: 'verdance', kind: 'verdance', value: 0, stacks: 5 })).toEqual({
+      key: 'hudChrome.auraEffect.verdance',
+      nums: { stacks: 5, max: 5 },
+    });
+  });
+
   it('reports a movement slow as a percent reduction from the multiplier', () => {
     expect(desc({ kind: 'slow', value: 0.5 })).toEqual({
       key: 'hudChrome.auraEffect.slow',
@@ -51,6 +121,17 @@ describe('auraEffectDescriptor', () => {
       key: 'hudChrome.auraEffect.formFireball',
       nums: { pct: 40 },
     });
+  });
+
+  it('describes both Moonwing Form bonuses', () => {
+    expect(desc({ kind: 'form_moonkin', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.formMoonkin',
+      nums: { pct: 20, armorPct: 50 },
+    });
+  });
+
+  it('safely omits an effect line for a future wire aura kind', () => {
+    expect(desc({ kind: 'future_aura', value: 1 } as unknown as AuraEffectInput)).toBeNull();
   });
 
   it('distinguishes attack-speed slow from haste by the multiplier', () => {
@@ -184,18 +265,125 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
-  it('describes an imbue range when judgement min/max are present', () => {
-    expect(desc({ kind: 'imbue', value: 0, value2: 10, value3: 20 })).toEqual({
-      key: 'hudChrome.auraEffect.imbueRange',
-      nums: { min: 10, max: 20 },
-    });
+  it('describes an active weapon imbue', () => {
     expect(desc({ kind: 'imbue', value: 0 })?.key).toBe('hudChrome.auraEffect.imbue');
   });
 
-  it('returns null for a kind with no meaningful one-line effect', () => {
-    expect(desc({ kind: 'righteous_fury', value: 0 })).not.toBeNull();
-    // A purely cosmetic / structural kind not handled falls back to null.
+  it('teaches the Galeheart Weapon echo mechanic instead of the generic imbue line', () => {
+    expect(desc({ id: 'galeheart_weapon', kind: 'imbue', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.galeheartWeapon',
+      nums: { steps: 3, count: 2, pct: 50 },
+    });
+  });
+
+  it('describes both halves of Elemental Trance (damage reduction and mana return)', () => {
+    expect(desc({ id: 'elemental_trance', kind: 'buff_dr', value: 0.3 })).toEqual({
+      key: 'hudChrome.auraEffect.elementalTrance',
+      nums: { pct: 30, mana: 20 },
+    });
+  });
+
+  it('describes structural states instead of falling back to a blank effect line', () => {
+    expect(desc({ kind: 'righteous_fury', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.righteousFury',
+    });
     expect(desc({ kind: 'lockout', value: 0 })).toEqual({ key: 'hudChrome.auraEffect.lockout' });
+  });
+
+  it('surfaces the exact Necromancy and Dominion state carried by visible auras', () => {
+    expect(desc({ kind: 'soul_fragments', value: 3, stacks: 3 })).toEqual({
+      key: 'hudChrome.auraEffect.resourceCount',
+      nums: { value: 3, max: 5 },
+    });
+    expect(desc({ kind: 'necromancy_ossuary_mark', value: 0.2, value2: 0.5, value3: 6 })).toEqual({
+      key: 'hudChrome.auraEffect.necromancyOssuaryMark',
+      nums: { storedPct: 20, lancePct: 50, radius: 6 },
+    });
+    expect(desc({ kind: 'form_lich', value: 1 })).toEqual({
+      key: 'hudChrome.auraEffect.formLich',
+      nums: { targets: 2, pct: 50 },
+    });
+    expect(desc({ kind: 'pet_spellhaste', value: 0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.petHaste',
+      nums: { pct: 20 },
+    });
+  });
+
+  it('surfaces Affliction and Destruction resources, marks, and offensive windows', () => {
+    expect(desc({ kind: 'affliction_doom', value: 64, stacks: 64 })).toEqual({
+      key: 'hudChrome.auraEffect.resourceCount',
+      nums: { value: 64, max: 100 },
+    });
+    expect(desc({ kind: 'affliction_judgment', value: 20 })).toEqual({
+      key: 'hudChrome.auraEffect.afflictionJudgment',
+      nums: { eyePct: 100, sentencePct: 20, refund: 20 },
+    });
+    expect(desc({ kind: 'desolation', value: 2, stacks: 2 })).toEqual({
+      key: 'hudChrome.auraEffect.desolation',
+      nums: { charges: 2, castPct: 30 },
+    });
+    expect(desc({ kind: 'pyre_guardian', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.pyreGuardian',
+      nums: { ruin: 1, ruinInterval: 1, damage: 84, damageInterval: 2, radius: 8 },
+    });
+  });
+
+  it('describes every formerly blank aura family', () => {
+    const inputs: AuraEffectInput[] = [
+      { kind: 'stasis', value: 1 },
+      { kind: 'pet_damage_pct', value: 100 },
+      { kind: 'buff_spellcrit', value: 0.05 },
+      { kind: 'buff_spelldmg', value: 0.2 },
+      { kind: 'buff_spellhaste', value: 0.2 },
+      { kind: 'sated', value: 0 },
+      { kind: 'cauterize_fatigue', value: 0 },
+      { kind: 'cast_shield', value: 1 },
+      { kind: 'form_moonkin', value: 0 },
+      { kind: 'form_shadow', value: 15 },
+      { kind: 'affliction_eye', value: 1, tickInterval: 2.5 },
+      { kind: 'affliction_eye_secondary', value: 0.5 },
+      { kind: 'affliction_accomplice', value: 3 },
+      { kind: 'affliction_violence', value: 4, value2: 22, charges: 3 },
+      { kind: 'affliction_vicarious', value: 15 },
+      { kind: 'affliction_possession', value: 1 },
+      { kind: 'affliction_litany', value: 30, value2: 8, value3: 4 },
+      { kind: 'affliction_fate_threads', value: 3, stacks: 3 },
+      { kind: 'affliction_consume_threads', value: 3, stacks: 3 },
+      { kind: 'necromancy_harvest_mark', value: 1 },
+      { kind: 'necromancy_death_echo', value: 0, value2: 0 },
+      { kind: 'warlock_anchor', value: 0, value2: 0, value3: 0 },
+      { kind: 'form_metamorph', value: 1 },
+      { kind: 'buff_energyregen', value: 1 },
+      { kind: 'overpower_charge', value: 0.2, stacks: 2 },
+      { kind: 'sweeping_strikes', value: 1 },
+      { kind: 'fingers_of_frost', value: 0, stacks: 2 },
+      { kind: 'brain_freeze', value: 0 },
+      { kind: 'winters_chill', value: 0, charges: 2 },
+      { kind: 'icicles', value: 5, stacks: 5 },
+      { kind: 'destruction_ruin', value: 4, stacks: 4 },
+      { kind: 'ruinous_brand', value: 0.5, stacks: 3 },
+      { kind: 'duskfire_claim', value: 1 },
+      { kind: 'perfect_moment', value: 0 },
+      { kind: 'bleed_vuln', value: 0.4 },
+      { kind: 'vuln_source', value: 0.2 },
+      { kind: 'next_execute_free', value: 0 },
+      { kind: 'resource_sap', value: 20 },
+      { kind: 'next_attack_crit', value: 1 },
+      { kind: 'heal_echo', value: 60, value2: 0.35 },
+      { kind: 'enrage', value: 0.07 },
+      { kind: 'sudden_death', value: 1 },
+      { kind: 'aoe_echo', value: 0, charges: 2 },
+      { kind: 'sure_crit', value: 1, charges: 3 },
+      { kind: 'internal_cd', value: 0 },
+      { kind: 'temporal_echo', value: 0.35 },
+      { kind: 'arcane_charge', value: 4, stacks: 4 },
+      { kind: 'buff_dr', value: 0.2 },
+      { kind: 'buff_dr_phys', value: 0.5 },
+    ];
+
+    for (const input of inputs) {
+      expect(desc(input)?.key, input.kind).toMatch(/^hudChrome\.auraEffect\./);
+    }
   });
 
   it('is a pure function: same input gives the same output', () => {

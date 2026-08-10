@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
-import { abilityIconRecipe, hasExplicitAbilityIcon } from '../src/ui/icons';
+import { abilityIconRecipe, hasExplicitAbilityIcon, hasExplicitAuraIcon } from '../src/ui/icons';
 
 // Every class ability must have a deliberate, visually distinct icon.
 // The procedural fallback (school + name keywords) collides for many ids
@@ -109,14 +109,27 @@ describe('ability icons', () => {
     expect(collisions, `colliding icon groups:\n${report}`).toEqual([]);
   });
 
+  it('has explicit buff-bar icons for every Warlock specialization resource and guardian window', () => {
+    for (const id of [
+      'aura_soul_fragments',
+      'aura_affliction_doom',
+      'aura_destruction_ruin',
+      'aura_desolation',
+      'aura_duskfire_claim',
+      'aura_pyre_guardian',
+    ]) {
+      expect(hasExplicitAuraIcon(id), id).toBe(true);
+    }
+  });
+
   it('pins every ABILITY_RECIPES key and payload by stable content identity', () => {
     const ids = abilityRecipeIds();
     expect(ids).toEqual([...new Set(ids)].sort((left, right) => left.localeCompare(right)));
-    expect(ids).toHaveLength(323);
+    expect(ids).toHaveLength(435);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('abb6938d2aba7fffd606c8e181d3f740a9758896ab8e20719f3b1028c099be35');
+    expect(hash).toBe('caf4c2352503f7d1fc316e7f42b8191db1ca5631538a4c5643acb7706fe66caf');
   });
 });

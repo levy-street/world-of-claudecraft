@@ -29,6 +29,7 @@ function stubInfo(over: Partial<NonNullable<ArenaInfo['match']>['yumi']> = {}): 
     rating: 1500,
     wins: 0,
     losses: 0,
+    draws: 0,
     standings: {} as ArenaInfo['standings'],
     format: 'yumi3',
     queued: false,

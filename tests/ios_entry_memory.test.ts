@@ -63,13 +63,31 @@ describe('entry-crash recovery arms tight memory', () => {
 });
 
 describe('tight-memory residency diet', () => {
-  it('skips the two secondary-context preview prewarms on the tight profile', () => {
-    const gateAt = mainSource.indexOf('if (!GFX.tightMemory) {');
-    const characterPrewarmAt = mainSource.indexOf('await hud.prewarmCharacterPreview();');
-    const armoryPrewarmAt = mainSource.indexOf('await hud.prewarmArmoryPreview();');
+  it('skips the secondary-context preview prewarm schedule on the tight profile', () => {
+    const startAt = mainSource.indexOf('if (!GFX.tightMemory) hud.startPostEntryPreviewPrewarm();');
+    expect(startAt).toBeGreaterThan(-1);
+    // The schedule runs BEHIND the live frame (post-reveal), so the secondary
+    // preview contexts never add to the curtained entry allocation spike; the
+    // tight profile skips them entirely and keeps the lazy first-open path.
+    const revealAt = mainSource.indexOf('const revealWorld = (): void => {');
+    expect(revealAt).toBeGreaterThan(-1);
+    expect(startAt).toBeGreaterThan(revealAt);
+  });
+
+  it('keeps the curtain-side paperdoll shell build inside the tight-memory gate', () => {
+    const callAt = mainSource.indexOf('hud.prewarmCharPreviewShell();');
+    expect(callAt).toBeGreaterThan(-1);
+    // Anchor on the NEAREST preceding gate, not the first one in the file: a
+    // plain indexOf-ordering check (gate index before call index) would still
+    // pass if some unrelated earlier "!GFX.tightMemory" text existed anywhere
+    // above the call.
+    const gateAt = mainSource.lastIndexOf('if (!GFX.tightMemory) {', callAt);
     expect(gateAt).toBeGreaterThan(-1);
-    expect(characterPrewarmAt).toBeGreaterThan(gateAt);
-    expect(armoryPrewarmAt).toBeGreaterThan(characterPrewarmAt);
+    // The gate's own closing brace must not appear between the gate and the
+    // call: that would mean the block already ended and the call runs
+    // unconditionally, even though the ordering check above would still hold.
+    const between = mainSource.slice(gateAt, callAt);
+    expect(between).not.toMatch(/\n {2}\}/);
   });
 });
 

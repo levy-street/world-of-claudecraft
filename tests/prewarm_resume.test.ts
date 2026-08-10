@@ -1,11 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { CONSTRAINED_PREWARM_KEEP } from '../src/render/prewarm_policy';
+import { CONSTRAINED_PREWARM_KEEP, skyAssetInlineWaitMs } from '../src/render/prewarm_policy';
 import {
   buildPrewarmCompileUnits,
   type PrewarmResumeEntry,
   resumeDroppedPrewarmEntries,
   settlePrewarmBeforePublish,
+  trackPrefetch,
+  waitForPrefetch,
 } from '../src/render/prewarm_resume';
 
 function entry(id: string, unitIds: readonly string[]): PrewarmResumeEntry {
@@ -143,6 +145,90 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compiled).toEqual(['player', 'mob']);
   });
 
+  it('skips a root whose every dedupe key was already covered', async () => {
+    // Hundreds of material-bearing leaves share programs (surfaceMat dedupes
+    // materials): a root contributing no unseen key links nothing new, so it
+    // must not cost a unit (each awaited compileAsync has a 10 ms poll floor).
+    const first = { id: 'a', mats: ['stone'] };
+    const duplicate = { id: 'b', mats: ['stone'] };
+    const fresh = { id: 'c', mats: ['stone', 'moss'] };
+    const compiled: string[] = [];
+    const units = buildPrewarmCompileUnits(
+      [{ id: 'scene', roots: [first, duplicate, fresh] }],
+      async (root) => {
+        compiled.push(root.id);
+      },
+      { dedupeKeys: (root) => root.mats },
+    );
+    expect(units.map((unit) => unit.id)).toEqual(['scene:0', 'scene:1']);
+    for (const unit of units) await unit.run();
+    expect(compiled).toEqual(['a', 'c']);
+  });
+
+  it('dedupes across calls through a caller-owned shared store', async () => {
+    // One logical compile pass split over several submissions (the early
+    // manifest entry, the compile entry's live-scene RE-collection, the
+    // resume lane) must not resubmit a root or signature an earlier call
+    // already covered; per-call stores made the re-collection pay every
+    // early root a second time.
+    const sharedDedupe = { seen: new Set<{ id: string; mats: string[] }>(), seenKeys: new Set() };
+    const early = { id: 'a', mats: ['stone'] };
+    const settleAddition = { id: 'b', mats: ['moss'] };
+    const compiled: string[] = [];
+    const compile = async (root: { id: string }): Promise<void> => {
+      compiled.push(root.id);
+    };
+    const firstCall = buildPrewarmCompileUnits([{ id: 'scene', roots: [early] }], compile, {
+      dedupeKeys: (root) => root.mats,
+      sharedDedupe,
+    });
+    const secondCall = buildPrewarmCompileUnits(
+      [{ id: 'scene', roots: [early, settleAddition] }],
+      compile,
+      { dedupeKeys: (root) => root.mats, sharedDedupe },
+    );
+    for (const unit of [...firstCall, ...secondCall]) await unit.run();
+    expect(compiled).toEqual(['a', 'b']);
+  });
+
+  it('batches roots into one unit that awaits its compiles together', async () => {
+    // r165 compileAsync resolves after N x 10 ms of setTimeout polling: awaited
+    // one by one, the floors stack; awaited together, they overlap. The batch
+    // still resolves only when every compile settles.
+    const roots = ['a', 'b', 'c'].map((id) => ({ id }));
+    const started: string[] = [];
+    const release: Array<() => void> = [];
+    const units = buildPrewarmCompileUnits(
+      [{ id: 'scene', roots }],
+      (root) =>
+        new Promise<void>((resolve) => {
+          started.push(root.id);
+          release.push(resolve);
+        }),
+      { batchSize: 2 },
+    );
+    expect(units.map((unit) => unit.id)).toEqual(['scene:0', 'scene:1']);
+
+    let firstDone = false;
+    const firstRun = units[0].run();
+    void Promise.resolve(firstRun).then(() => {
+      firstDone = true;
+    });
+    await Promise.resolve();
+    // Both compiles of the batch started before either resolved.
+    expect(started).toEqual(['a', 'b']);
+    release.shift()?.();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(firstDone).toBe(false);
+    release.shift()?.();
+    await firstRun;
+    expect(firstDone).toBe(true);
+
+    await Promise.all([units[1].run(), Promise.resolve().then(() => release.shift()?.())]);
+    expect(started).toEqual(['a', 'b', 'c']);
+  });
+
   it('never overlaps a compile that outlives its idle slot', async () => {
     let active = 0;
     let maxActive = 0;
@@ -210,6 +296,9 @@ describe('resumeDroppedPrewarmEntries', () => {
 
   it('wires the production compile resume lane to bounded units', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const unitsStart = source.indexOf('const compileEntryUnits =');
+    const unitsEnd = source.indexOf('const runEntry =', unitsStart);
+    const unitsSlice = source.slice(unitsStart, unitsEnd);
     const compileEntryStart = source.indexOf("id: 'programs.compile'");
     const compileEntryEnd = source.indexOf("id: 'sky.current-zone'", compileEntryStart);
     const compileEntry = source.slice(compileEntryStart, compileEntryEnd);
@@ -221,15 +310,48 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compileEntryEnd).toBeGreaterThan(compileEntryStart);
     expect(resumeStart).toBeGreaterThan(-1);
     expect(runStart).toBeGreaterThan(resumeStart);
-    expect(resumeSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
-    expect(resumeSlice).toContain('roots: group.children');
-    expect(resumeSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
-    expect(resumeSlice).toContain('await this.compileSkinnedShadowPrograms(root)');
-    expect(resumeSlice).not.toContain('compileAsync(this.scene');
+    expect(unitsSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
+    // The resume lane must exclude groups whose units were already submitted
+    // off-thread (resuming them would double-submit every unit).
+    expect(resumeSlice).toContain(
+      'compileEntryUnits((groupId) => !submittedCompileGroups.has(groupId))',
+    );
+    expect(unitsStart).toBeGreaterThan(-1);
+    expect(unitsEnd).toBeGreaterThan(unitsStart);
+    expect(unitsSlice).toContain('if (visibleOnly) root.traverseVisible(collect)');
+    expect(unitsSlice).toContain('else root.traverse(collect)');
+    expect(unitsSlice).toContain('roots: compileRoots(group.children, false)');
+    // The mass-submission callback compiles against the lights-only proxy
+    // scene (identical program keys, ~10-node prologue walk instead of the
+    // whole world per call; the live gates keep the live-scene default).
+    expect(unitsSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
+    expect(unitsSlice).toContain('await this.compileShadowPrograms(root)');
+    expect(compileEntry).not.toContain('compileAsync(this.scene');
+    // The resume lane specifically must never race a scene-wide compileAsync
+    // call away (the old bug this pin guards): resuming already-submitted
+    // units would double-submit their in-flight compileAsync, so resumeUnits
+    // stays a plain bounded-unit selection, never a race.
     expect(resumeSlice).not.toContain('Promise.race');
+    // run() DOES race now: a bounded await-all against its own reserved
+    // deadline (prewarmCompileAwaitDeadline, see prewarm_policy.test.ts), so
+    // an unbounded await can never push world.initial-frame's start past the
+    // hard deadline. It races only its own reserved cap, never the separate
+    // gpuSubmitDeadline the trailing exempt entries (programs.budget-variants
+    // etc, outside this slice) bound themselves against.
+    const runEnd = compileEntry.indexOf('progress: () =>', runStart);
+    expect(runEnd).toBeGreaterThan(runStart);
+    const runSlice = compileEntry.slice(runStart, runEnd);
+    expect(runSlice).toContain('Promise.race([');
+    expect(runSlice).not.toContain('performance.now() >= gpuSubmitDeadline');
     expect(source).toContain('void settlePrewarmBeforePublish(');
     expect(source).toContain('resumeDroppedPrewarmEntries(resume, {');
-    expect(source).toContain('this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME)');
+    // releaseTail: a resume unit's wall time is its off-thread links; without
+    // the tail release each unit occupied the whole serial queue for seconds
+    // and live compile gates could not start (the travel-hitch amplifier).
+    expect(source).toContain(
+      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id, {',
+    );
+    expect(source).toContain('releaseTail: true,');
     expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
     expect(resumeSlice).toContain('deferPoolPublication =');
@@ -237,6 +359,46 @@ describe('resumeDroppedPrewarmEntries', () => {
       'cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication })',
     );
     expect(source).toContain('cleanupPrewarmArtifacts({ clearVfx: false, publishPools: true })');
+  });
+
+  it('publishes the retained pools even when the compile resume remainder is empty', () => {
+    // Regression for the stranded-pool review finding: the compile entry's
+    // resumeUnits callback can set deferPoolPublication while its OWN
+    // remainder is empty (the shared compile dedupe store already covered
+    // every root through the early 'programs.compile-submit' entry). Gating
+    // the settle-then-publish scheduling on droppedEntries.length alone then
+    // never runs it when nothing else was dropped either, so the withheld
+    // entity/npc pools are silently discarded and the early-submitted units
+    // are never awaited. The gate must also fire on deferPoolPublication alone.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const finallyMarker =
+      'cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication });';
+    const blockStart = source.indexOf(finallyMarker);
+    const blockEnd = source.indexOf('// Sky uploads deferred behind a slow prefetch', blockStart);
+    expect(blockStart).toBeGreaterThan(-1);
+    expect(blockEnd).toBeGreaterThan(blockStart);
+    const block = source.slice(blockStart, blockEnd);
+
+    // The settle-then-publish scheduling must run whenever EITHER a real
+    // entry was dropped OR pool publication was withheld, never
+    // droppedEntries.length alone.
+    expect(block).toContain('if (droppedEntries.length > 0 || deferPoolPublication) {');
+    // resumeDroppedPrewarmEntries stays unconditional on `resume` (it is
+    // itself a no-op over an empty array, per resumeDroppedPrewarmEntries'
+    // own 'does nothing for empty entries' contract): gating THIS call on
+    // resume.length instead of widening the outer guard would skip the
+    // Promise.allSettled await of submittedCompileUnits whenever the resume
+    // list is empty, so the in-flight early-submitted units would still
+    // never be awaited for the empty-remainder case.
+    expect(block).toContain('return resumeDroppedPrewarmEntries(resume, {');
+    expect(block).toContain(
+      'await Promise.allSettled(submittedCompileUnits.map((unit) => unit.done));',
+    );
+    // Exactly one publish call backs this whole block: no duplicate
+    // publication path was added alongside the widened guard.
+    expect(
+      block.match(/cleanupPrewarmArtifacts\(\{ clearVfx: false, publishPools: true \}\)/g),
+    ).toHaveLength(1);
   });
 
   it('retains dropped texture uploads as one explicit idle unit per unique texture', () => {
@@ -294,5 +456,151 @@ describe('resumeDroppedPrewarmEntries', () => {
 
   it('leaves the weapon-skin warm off the constrained keep-list', () => {
     expect(CONSTRAINED_PREWARM_KEEP).not.toContain('vfx.weapon-skins');
+  });
+});
+
+describe('trackPrefetch', () => {
+  it('observes resolution synchronously after settlement', async () => {
+    let resolveTask: () => void = () => {};
+    const prefetch = trackPrefetch(
+      new Promise<void>((resolve) => {
+        resolveTask = resolve;
+      }),
+    );
+    expect(prefetch.isSettled()).toBe(false);
+    expect(prefetch.rejection()).toBeNull();
+    resolveTask();
+    await prefetch.task;
+    expect(prefetch.isSettled()).toBe(true);
+    expect(prefetch.rejection()).toBeNull();
+  });
+
+  it('records a rejection without leaking an unhandled rejection', async () => {
+    const failure = new Error('fetch failed');
+    const prefetch = trackPrefetch(Promise.reject(failure));
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(prefetch.isSettled()).toBe(true);
+    expect(prefetch.rejection()).toBe(failure);
+    // The raw task still rejects for callers that await it deliberately.
+    await expect(prefetch.task).rejects.toBe(failure);
+  });
+});
+
+describe('waitForPrefetch: a stalled fetch can never starve the compute budget', () => {
+  it('returns pending after exactly the budgeted wait when the fetch stalls', async () => {
+    // Fake-clock harness: the fetch NEVER resolves (a black-holed network),
+    // the sleeper is the only thing that can end the wait, and it records the
+    // budget it was given.
+    const sleeps: number[] = [];
+    let releaseSleep: () => void = () => {};
+    const sleeper = (ms: number): Promise<void> => {
+      sleeps.push(ms);
+      return new Promise((resolve) => {
+        releaseSleep = resolve;
+      });
+    };
+    const prefetch = trackPrefetch(new Promise<void>(() => {}));
+    const wait = waitForPrefetch(prefetch, 9_000, sleeper);
+    await Promise.resolve();
+    expect(sleeps).toEqual([9_000]);
+    releaseSleep();
+    // The stalled fetch loses the race: the caller gets 'pending' and moves on
+    // to the budget-hungry stages instead of blocking on the network. This is
+    // the ordering fix: the pre-fix shape awaited the fetch unconditionally
+    // and was measured eating 11.5s of the 12s boot budget.
+    expect(await wait).toBe('pending');
+    expect(prefetch.isSettled()).toBe(false);
+  });
+
+  it('budget composition: entry start plus wait always precedes deadline minus reserve', async () => {
+    // The wait the renderer passes comes from skyAssetInlineWaitMs, so with a
+    // stalled fetch the sky entry consumes AT MOST deadline - reserve - now.
+    // Simulate the schedule with a virtual clock advanced only by sleeps.
+    let clock = 1_000; // sky entry start
+    const deadline = 13_000;
+    const reserve = 3_000;
+    const waitMs = skyAssetInlineWaitMs({
+      nowMs: clock,
+      deadlineMs: deadline,
+      reserveMs: reserve,
+      finishFullManifestBeforeReveal: false,
+    });
+    const sleeper = (ms: number): Promise<void> => {
+      clock += ms;
+      return Promise.resolve();
+    };
+    const outcome = await waitForPrefetch(
+      trackPrefetch(new Promise<void>(() => {})),
+      waitMs,
+      sleeper,
+    );
+    expect(outcome).toBe('pending');
+    // The compute/tail stages still start before the manifest deadline, with
+    // the full reserve intact.
+    expect(clock).toBeLessThanOrEqual(deadline - reserve);
+  });
+
+  it('returns ready without sleeping when the prefetch already settled', async () => {
+    const prefetch = trackPrefetch(Promise.resolve());
+    await prefetch.task;
+    let slept = false;
+    const outcome = await waitForPrefetch(prefetch, 5_000, () => {
+      slept = true;
+      return Promise.resolve();
+    });
+    expect(outcome).toBe('ready');
+    expect(slept).toBe(false);
+  });
+
+  it('returns ready when the fetch wins the race', async () => {
+    let resolveTask: () => void = () => {};
+    const prefetch = trackPrefetch(
+      new Promise<void>((resolve) => {
+        resolveTask = resolve;
+      }),
+    );
+    const wait = waitForPrefetch(prefetch, 5_000, () => new Promise<void>(() => {}));
+    resolveTask();
+    expect(await wait).toBe('ready');
+  });
+
+  it('treats a settled rejection as ready so the caller surfaces the failure itself', async () => {
+    const prefetch = trackPrefetch(Promise.reject(new Error('down')));
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(await waitForPrefetch(prefetch, 5_000)).toBe('ready');
+  });
+
+  it('a zero or negative budget never waits at all', async () => {
+    let slept = false;
+    const sleeper = (): Promise<void> => {
+      slept = true;
+      return Promise.resolve();
+    };
+    const prefetch = trackPrefetch(new Promise<void>(() => {}));
+    expect(await waitForPrefetch(prefetch, 0, sleeper)).toBe('pending');
+    expect(await waitForPrefetch(prefetch, -100, sleeper)).toBe('pending');
+    expect(slept).toBe(false);
+  });
+
+  it('an Infinity budget awaits settlement outright (the finish-full-manifest arm)', async () => {
+    let resolveTask: () => void = () => {};
+    const prefetch = trackPrefetch(
+      new Promise<void>((resolve) => {
+        resolveTask = resolve;
+      }),
+    );
+    let settled = false;
+    const wait = waitForPrefetch(prefetch, Number.POSITIVE_INFINITY, () => {
+      throw new Error('the unbounded arm must not consult the sleeper');
+    }).then((outcome) => {
+      settled = true;
+      return outcome;
+    });
+    await Promise.resolve();
+    expect(settled).toBe(false);
+    resolveTask();
+    expect(await wait).toBe('ready');
   });
 });

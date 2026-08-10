@@ -579,6 +579,311 @@
     align-items: center;
     justify-content: center;
   }
+  .warlock-doom-frame {
+    position: relative;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px;
+    margin-bottom: 3px;
+    pointer-events: none;
+  }
+  .warlock-doom-frame.doom-detached {
+    position: absolute;
+    z-index: 21;
+    width: 300px;
+    height: 48px;
+    margin: 0;
+  }
+  /* #ui > * enables interaction for ordinary HUD children. A locked detached
+     resource meter must remain click-through except for its explicit move button. */
+  #ui > .warlock-doom-frame:not(.tf-unlocked) {
+    pointer-events: none;
+  }
+  .warlock-doom {
+    position: relative;
+    width: min(300px, 72vw);
+    height: 18px;
+    overflow: hidden;
+    border: 2px solid #5d3b78;
+    border-radius: 5px;
+    background:
+      linear-gradient(180deg, rgba(9, 4, 14, 0.96), rgba(25, 9, 34, 0.98)),
+      repeating-linear-gradient(90deg, transparent 0 23px, rgba(216, 174, 255, 0.08) 24px 25px);
+    box-shadow:
+      inset 0 0 7px rgba(0, 0, 0, 0.88),
+      0 0 7px rgba(128, 62, 174, 0.42);
+  }
+  .warlock-doom::before,
+  .warlock-doom::after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    border: 1px solid #b790ce;
+    background: #21102d;
+    transform: translateY(-50%) rotate(45deg);
+  }
+  .warlock-doom::before {
+    left: 4px;
+  }
+  .warlock-doom::after {
+    right: 4px;
+  }
+  .warlock-doom-fill {
+    --doom-scale: 0;
+    position: absolute;
+    inset: 2px;
+    transform: scaleX(var(--doom-scale));
+    transform-origin: left center;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #351047 0%, #7f25a5 52%, #d27cff 100%);
+    box-shadow:
+      inset 0 1px rgba(255, 255, 255, 0.28),
+      0 0 10px rgba(197, 83, 255, 0.68);
+    transition: transform 120ms linear;
+  }
+  .warlock-doom-label {
+    position: absolute;
+    z-index: 4;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #f6e8ff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-shadow: 0 1px 2px #000;
+  }
+  .warlock-doom.warning {
+    border-color: #d24767;
+    animation: warlock-doom-warning 0.7s ease-in-out infinite alternate;
+  }
+  .warlock-doom.ready {
+    border-color: #e7b7ff;
+    box-shadow:
+      inset 0 0 7px rgba(0, 0, 0, 0.88),
+      0 0 14px rgba(211, 112, 255, 0.88);
+  }
+  .warlock-fate-threads {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    width: 184px;
+    height: 24px;
+    margin-top: -1px;
+    isolation: isolate;
+  }
+  .warlock-fate-threads::before,
+  .warlock-fate-threads::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+  .warlock-fate-threads::before {
+    z-index: -2;
+    inset: -8px -28px -5px;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse,
+      rgba(132, 57, 184, 0.22) 0,
+      rgba(52, 17, 76, 0.12) 42%,
+      transparent 72%
+    );
+    opacity: 0.62;
+  }
+  .warlock-fate-threads::after {
+    z-index: -1;
+    inset: -12px -36px -8px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 28% 48%, rgba(154, 225, 255, 0.72) 0 1px, transparent 4px),
+      radial-gradient(circle at 50% 20%, rgba(232, 182, 255, 0.86) 0 2px, transparent 5px),
+      radial-gradient(circle at 72% 48%, rgba(255, 125, 196, 0.72) 0 1px, transparent 4px),
+      radial-gradient(ellipse, rgba(184, 83, 255, 0.32), transparent 68%);
+    opacity: 0;
+  }
+  .warlock-fate-threads.ready::after {
+    opacity: 1;
+    animation: warlock-fate-ready-aura 1.35s ease-in-out infinite;
+  }
+  .warlock-fate-thread-rail {
+    position: absolute;
+    z-index: 0;
+    left: 14px;
+    right: 14px;
+    top: 4px;
+    height: 15px;
+    border-bottom: 2px solid rgba(126, 75, 159, 0.76);
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 92%, rgba(198, 126, 255, 0.16), transparent 68%);
+    box-shadow:
+      0 2px 4px rgba(8, 2, 12, 0.9),
+      inset 0 -1px rgba(226, 182, 255, 0.28);
+  }
+  .warlock-fate-thread-eye {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 49%;
+    width: 39px;
+    height: 17px;
+    border: 1px solid rgba(164, 103, 204, 0.72);
+    border-radius: 72% 18% 72% 18%;
+    background: radial-gradient(
+      circle,
+      rgba(180, 92, 222, 0.28) 0 22%,
+      rgba(34, 11, 47, 0.92) 25% 58%,
+      transparent 61%
+    );
+    box-shadow: 0 0 7px rgba(122, 44, 166, 0.48);
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  .warlock-fate-thread-eye::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border: 1px solid rgba(236, 200, 255, 0.76);
+    border-radius: 50%;
+    background: #3b174e;
+    box-shadow: 0 0 5px rgba(210, 124, 255, 0.58);
+    transform: translate(-50%, -50%);
+  }
+  .warlock-fate-thread {
+    position: relative;
+    z-index: 3;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #644377;
+    border-radius: 3px 8px 3px 8px;
+    background: linear-gradient(145deg, #211128, #0d0711);
+    box-shadow:
+      0 2px 3px rgba(0, 0, 0, 0.82),
+      inset 2px 2px rgba(235, 204, 255, 0.05);
+    opacity: 0.72;
+    transform: rotate(45deg) scale(0.86);
+    transition:
+      opacity 160ms ease,
+      transform 200ms ease,
+      filter 200ms ease;
+  }
+  .warlock-fate-thread::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50% 10% 50% 10%;
+    background: #35203d;
+    transform: rotate(-45deg);
+  }
+  .warlock-fate-thread.on {
+    border-color: #d4a2ef;
+    background: radial-gradient(circle at 32% 24%, #f7e7ff, #b65ce0 38%, #592071 78%);
+    box-shadow:
+      0 0 9px rgba(205, 104, 255, 0.92),
+      0 0 17px rgba(113, 45, 157, 0.58),
+      inset 2px 2px rgba(255, 255, 255, 0.42);
+    opacity: 1;
+    filter: saturate(1.15);
+    transform: rotate(45deg) scale(1);
+  }
+  .warlock-fate-thread.on::after {
+    background: #fff1ff;
+    box-shadow: 0 0 5px #f4c7ff;
+  }
+  .warlock-fate-threads.ready .warlock-fate-thread.on {
+    animation: warlock-fate-thread-beat 1.35s ease-in-out infinite;
+  }
+  .warlock-fate-threads.ready .fate-2 {
+    animation-delay: 90ms;
+  }
+  .warlock-fate-threads.ready .fate-3 {
+    animation-delay: 180ms;
+  }
+  @keyframes warlock-doom-warning {
+    from {
+      filter: brightness(0.85);
+    }
+    to {
+      filter: brightness(1.35);
+    }
+  }
+  @keyframes warlock-fate-thread-beat {
+    0%,
+    100% {
+      filter: brightness(0.94) saturate(1.1);
+    }
+    50% {
+      filter: brightness(1.5) saturate(1.35);
+    }
+  }
+  @keyframes warlock-fate-ready-aura {
+    0%,
+    100% {
+      opacity: 0.48;
+      transform: scale(0.96);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.04);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .warlock-doom.warning {
+      animation: none;
+    }
+    .warlock-doom-fill {
+      transition: none;
+    }
+    .warlock-fate-thread,
+    .warlock-fate-threads.ready::after,
+    .warlock-fate-threads.ready .warlock-fate-thread.on {
+      animation: none;
+      transition: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .warlock-doom {
+      border-color: CanvasText;
+      background: Canvas;
+      box-shadow: none;
+      forced-color-adjust: none;
+    }
+    .warlock-doom-fill {
+      background: Highlight;
+      box-shadow: none;
+    }
+    .warlock-doom-label {
+      color: CanvasText;
+      text-shadow: none;
+    }
+    .warlock-doom.warning,
+    .warlock-doom.ready {
+      border-color: Highlight;
+      box-shadow: none;
+    }
+    .warlock-fate-thread-rail,
+    .warlock-fate-thread-eye,
+    .warlock-fate-thread {
+      border-color: GrayText;
+      background: Canvas;
+      box-shadow: none;
+    }
+    .warlock-fate-thread.on {
+      border-color: Highlight;
+      background: Highlight;
+      outline: 1px solid CanvasText;
+      outline-offset: 1px;
+    }
+  }
   /* Player Frame Scale (--player-frame-scale, playerFrameScale setting): zoom
      like the global --ui-scale, so portrait, bars, and pips shrink or grow
      together, docked or detached. Applied to the frame's CHILDREN, never the
@@ -766,7 +1071,8 @@
      corner like the rest badge, so it never overlaps the portrait or bars. The
      glyph is a mask: move arrows while LOCKED (press to move), a padlock while
      UNLOCKED (press to fix). Desktop only (hidden on mobile-touch). */
-  .unitframe .tf-move-btn {
+  .unitframe .tf-move-btn,
+  .warlock-doom-frame > .tf-move-btn {
     position: absolute;
     top: -10px;
     right: -10px;
@@ -787,7 +1093,13 @@
       border-color 0.12s ease,
       color 0.12s ease;
   }
-  .unitframe .tf-move-btn::before {
+  .warlock-doom-frame > .tf-move-btn {
+    top: -8px;
+    right: calc(50% - 160px);
+    pointer-events: auto;
+  }
+  .unitframe .tf-move-btn::before,
+  .warlock-doom-frame > .tf-move-btn::before {
     content: "";
     position: absolute;
     inset: 5px;
@@ -799,23 +1111,27 @@
       url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%201.5%208.5%205H11v6H5V8.5L1.5%2012%205%2015.5V13h6v6H8.5L12%2022.5%2015.5%2019H13v-6h6v2.5L22.5%2012%2019%208.5V11h-6V5h2.5z'/%3E%3C/svg%3E")
       center / contain no-repeat;
   }
-  .unitframe .tf-move-btn:hover {
+  .unitframe .tf-move-btn:hover,
+  .warlock-doom-frame > .tf-move-btn:hover {
     opacity: 1;
     border-color: var(--gold);
     color: var(--gold);
   }
-  .unitframe .tf-move-btn:focus-visible {
+  .unitframe .tf-move-btn:focus-visible,
+  .warlock-doom-frame > .tf-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
     opacity: 1;
   }
   /* Unlocked (move mode): highlight the button gold and swap to the padlock glyph. */
-  .unitframe .tf-move-btn.active {
+  .unitframe .tf-move-btn.active,
+  .warlock-doom-frame > .tf-move-btn.active {
     opacity: 1;
     border-color: var(--gold);
     color: var(--gold);
   }
-  .unitframe .tf-move-btn.active::before {
+  .unitframe .tf-move-btn.active::before,
+  .warlock-doom-frame > .tf-move-btn.active::before {
     -webkit-mask:
       url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7%2010V7a5%205%200%200%201%2010%200v3h1.2A1.8%201.8%200%200%201%2020%2011.8v7.4A1.8%201.8%200%200%201%2018.2%2021H5.8A1.8%201.8%200%200%201%204%2019.2v-7.4A1.8%201.8%200%200%201%205.8%2010H7zm2%200h6V7a3%203%200%200%200-6%200v3z'/%3E%3C/svg%3E")
       center / contain no-repeat;
@@ -824,19 +1140,26 @@
       center / contain no-repeat;
   }
   /* The frame while unlocked: a dashed gold hint and a move cursor over the body. */
-  .unitframe.tf-unlocked {
+  .unitframe.tf-unlocked,
+  .warlock-doom-frame.tf-unlocked {
     cursor: move;
     outline: 1px dashed var(--gold);
     outline-offset: 2px;
     touch-action: none;
   }
+  .warlock-doom-frame.tf-unlocked {
+    pointer-events: auto;
+  }
   body.target-frame-dragging,
   body.target-frame-dragging *,
   body.player-frame-dragging,
-  body.player-frame-dragging * {
+  body.player-frame-dragging *,
+  body.warlock-doom-frame-dragging,
+  body.warlock-doom-frame-dragging * {
     user-select: none;
   }
-  body.mobile-touch .unitframe .tf-move-btn {
+  body.mobile-touch .unitframe .tf-move-btn,
+  body.mobile-touch .warlock-doom-frame > .tf-move-btn {
     display: none;
   }
   .portrait-wrap {
@@ -885,7 +1208,7 @@
     text-shadow: 1px 1px 1px #000;
     z-index: 3;
   }
-  /* crossed-swords combat indicator on the player portrait (classic style) */
+  /* painted combat-status crest on the player portrait (classic style) */
   .combat-flash {
     position: absolute;
     top: -4px;
@@ -895,14 +1218,17 @@
     display: none;
     align-items: center;
     justify-content: center;
-    color: #ff5040;
-    font-size: 15px;
-    line-height: 1;
     z-index: 4;
     pointer-events: none;
-    text-shadow:
-      0 0 4px #000,
-      0 0 6px #ff5040;
+  }
+  .combat-flash img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--color-hostile);
+    border-radius: 5px;
+    object-fit: cover;
+    box-shadow: var(--art-shadow-sm);
   }
   #player-frame.combat .combat-flash {
     display: flex;
@@ -1054,6 +1380,9 @@
   .energy .bar-fill {
     background-color: var(--color-energy);
   }
+  .focus .bar-fill {
+    background-color: var(--color-focus);
+  }
   /* Damage-absorb shield overlay (Power Word: Shield, Ice Barrier, …): a hatched
      translucent segment laid over the health bar, extending past current health. */
   .bar-absorb {
@@ -1097,6 +1426,11 @@
       0 0 5px 1px rgba(255, 225, 110, var(--lr-opacity)),
       inset 0 0 4px rgba(255, 245, 200, 0.9);
   }
+  .bar.focus.low .bar-fill {
+    box-shadow:
+      0 0 5px 1px rgba(255, 180, 70, var(--lr-opacity)),
+      inset 0 0 4px rgba(255, 235, 195, 0.9);
+  }
   .low-resource-label {
     display: none;
     position: absolute;
@@ -1116,6 +1450,9 @@
   }
   .bar.energy.low .low-resource-label {
     color: #fff3c2;
+  }
+  .bar.focus.low .low-resource-label {
+    color: #ffe0a0;
   }
   @keyframes low-resource-pulse {
     0%,
@@ -1155,6 +1492,301 @@
     /* Glow: decorative outer glow scales with --fx-shadow (0 at low). */
     box-shadow: 0 0 calc(5px * var(--fx-shadow, 1)) #ff5533aa;
     border-color: #ffad99;
+  }
+  .paladin-devotion-frame {
+    position: fixed;
+    left: 50%;
+    top: 72%;
+    z-index: 24;
+    display: none;
+    width: 96px;
+    height: 96px;
+    align-items: center;
+    justify-content: center;
+    translate: -50% -50%;
+    cursor: grab;
+    touch-action: none;
+  }
+  .paladin-devotion-frame.dragging {
+    cursor: grabbing;
+  }
+  .paladin-devotion {
+    --devotion-scale: 0;
+    position: relative;
+    z-index: 3;
+    display: flex;
+    width: 96px;
+    height: 96px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    pointer-events: none;
+    isolation: isolate;
+    filter: drop-shadow(0 2px 2px #000b);
+  }
+  .paladin-devotion::before,
+  .paladin-devotion::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+  .paladin-devotion::before {
+    inset: 0;
+    z-index: 0;
+    clip-path: polygon(
+      50% 0,
+      59% 20%,
+      76% 8%,
+      79% 31%,
+      100% 50%,
+      79% 59%,
+      92% 76%,
+      69% 79%,
+      50% 100%,
+      41% 79%,
+      24% 92%,
+      21% 69%,
+      0 50%,
+      21% 41%,
+      8% 24%,
+      31% 21%
+    );
+    background:
+      radial-gradient(circle, transparent 0 35%, #f8db79 37% 41%, transparent 43%),
+      conic-gradient(
+        from 22.5deg,
+        #d9ad45,
+        #5d7084 8%,
+        #d9ad45 13%,
+        #6a4419 20%,
+        #f1ca64 26%,
+        #65788d 34%,
+        #c08a31 42%,
+        #4c3218 50%,
+        #e7bd55 60%,
+        #61758b 70%,
+        #d0a13d 82%,
+        #5d3d1b 92%,
+        #d9ad45
+      );
+    filter: drop-shadow(0 0 calc(4px * var(--fx-shadow, 1)) #f5bd3d88);
+  }
+  .paladin-devotion::after {
+    inset: 12px;
+    z-index: 2;
+    border: 4px ridge #c99b3c;
+    border-radius: 50%;
+    box-shadow:
+      inset 0 0 0 2px #33200c,
+      inset 0 0 8px #000c,
+      0 0 0 1px #1c1208;
+  }
+  .paladin-devotion-fill {
+    position: absolute;
+    inset: 17px;
+    z-index: 1;
+    overflow: hidden;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 72%, #765316 0, #2b1a08 58%, #100a04 100%);
+    box-shadow:
+      inset 0 0 10px #000,
+      0 0 calc(4px * var(--fx-shadow, 1)) #ffc62f88;
+  }
+  .paladin-devotion-fill::before,
+  .paladin-devotion-fill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .paladin-devotion-fill::before {
+    transform: scaleY(var(--devotion-scale));
+    transform-origin: center bottom;
+    background:
+      radial-gradient(circle at 24% 28%, #fff4aa 0 4%, transparent 6%),
+      radial-gradient(circle at 68% 58%, #ffe06a 0 5%, transparent 8%),
+      radial-gradient(circle at 44% 82%, #fff2a0 0 3%, transparent 5%),
+      linear-gradient(to top, #d88700 0%, #f6b915 48%, #ffe46a 86%, #fff7bd 100%);
+    box-shadow:
+      inset 0 5px 5px -4px #fff8c9,
+      inset 0 0 9px #ffdf55,
+      0 -2px 6px #ffd84b;
+    transition: transform 240ms cubic-bezier(0.22, 0.72, 0.2, 1);
+    will-change: transform;
+  }
+  .paladin-devotion-fill::after {
+    z-index: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse at 34% 22%, #fff9d699 0 8%, transparent 26%),
+      radial-gradient(circle at 50% 105%, #ffc12455 0 38%, transparent 68%),
+      linear-gradient(115deg, transparent 42%, #fff3a433 48%, transparent 56%);
+    opacity: 0.62;
+  }
+  .paladin-devotion-label {
+    position: absolute;
+    bottom: -2px;
+    right: -10px;
+    z-index: 4;
+    min-width: 48px;
+    padding: 2px 6px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    background: var(--color-bg-dark);
+    text-align: center;
+    color: var(--color-text-overlay);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+    text-shadow: 0 1px var(--text-outline-color);
+  }
+  .paladin-devotion.ready {
+    animation: devotion-ready-pulse 1.2s ease-in-out infinite;
+  }
+  .paladin-devotion.ready .paladin-devotion-fill {
+    background: radial-gradient(circle at 50% 50%, #ffd732 0, #a85b00 62%, #291306 100%);
+    box-shadow:
+      inset 0 0 8px #fff4a8,
+      0 0 calc(16px * var(--fx-shadow, 1)) #ffd21c;
+  }
+  .paladin-devotion.ready .paladin-devotion-fill::before {
+    background:
+      radial-gradient(circle at 26% 23%, #fff 0 4%, transparent 7%),
+      radial-gradient(circle at 70% 62%, #fff6b8 0 7%, transparent 10%),
+      linear-gradient(to top, #f19000, #ffd020 48%, #fff079 82%, #fffbd5);
+  }
+  .paladin-devotion.ready .paladin-devotion-fill::after {
+    background:
+      conic-gradient(
+        from 25deg,
+        transparent 0 7%,
+        #fff7b099 10%,
+        transparent 18% 34%,
+        #ffdd4d99 40%,
+        transparent 49% 68%,
+        #fff2a088 73%,
+        transparent 82% 100%
+      ),
+      radial-gradient(circle, #fffbd8cc 0 6%, #ffd62b66 32%, transparent 68%);
+    opacity: 0.9;
+    animation: devotion-full-flare 1.6s linear infinite;
+  }
+  .paladin-devotion.ascended .paladin-devotion-fill {
+    box-shadow:
+      inset 0 0 8px #fff0a0,
+      0 0 calc(10px * var(--fx-shadow, 1)) var(--color-ascension);
+  }
+  .paladin-ascension-charges {
+    position: absolute;
+    top: -6px;
+    left: 14px;
+    z-index: 5;
+    display: none;
+    width: 68px;
+    height: 14px;
+    gap: 2px;
+  }
+  .paladin-devotion.ascended .paladin-ascension-charges {
+    display: flex;
+  }
+  .paladin-ascension-charges span {
+    position: relative;
+    flex: 0 0 auto;
+    width: 11px;
+    height: 11px;
+    transform: rotate(45deg);
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-dark);
+  }
+  .paladin-ascension-charges span.on {
+    border-color: var(--color-text-light);
+    background: var(--color-ascension);
+    box-shadow: 0 0 calc(7px * var(--fx-shadow, 1)) var(--color-ascension);
+  }
+  .paladin-devotion.last-charge .paladin-ascension-charges span.on,
+  .paladin-devotion.last-charge .paladin-devotion-label {
+    animation: devotion-last-charge 0.7s ease-in-out infinite;
+  }
+  @keyframes devotion-ready-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 2px 2px #000b) brightness(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 calc(12px * var(--fx-shadow, 1)) #ffd42a) brightness(1.35);
+    }
+  }
+  @keyframes devotion-full-flare {
+    from {
+      transform: rotate(0deg) scale(0.94);
+    }
+    50% {
+      opacity: 1;
+      transform: rotate(180deg) scale(1.08);
+    }
+    to {
+      transform: rotate(360deg) scale(0.94);
+    }
+  }
+  @keyframes devotion-last-charge {
+    50% {
+      border-color: var(--color-ascension);
+      box-shadow: 0 0 calc(12px * var(--fx-shadow, 1)) var(--color-ascension);
+      filter: brightness(1.5);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .paladin-devotion.ready,
+    .paladin-devotion.ready .paladin-devotion-fill::after,
+    .paladin-devotion.last-charge .paladin-ascension-charges span.on,
+    .paladin-devotion.last-charge .paladin-devotion-label {
+      animation: none;
+    }
+    .paladin-devotion-fill::before {
+      transition: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .paladin-devotion::before {
+      forced-color-adjust: none;
+      background: Highlight;
+    }
+    .paladin-devotion::after {
+      forced-color-adjust: none;
+      border-color: CanvasText;
+      box-shadow: none;
+    }
+    .paladin-devotion-fill {
+      forced-color-adjust: none;
+      background: Canvas;
+      box-shadow: inset 0 0 0 1px CanvasText;
+    }
+    .paladin-devotion-fill::before {
+      background: Highlight;
+    }
+    .paladin-devotion-fill::after {
+      display: none;
+    }
+    .paladin-ascension-charges span {
+      forced-color-adjust: none;
+      border: 1px solid CanvasText;
+      background: Canvas;
+      box-shadow: none;
+    }
+    .paladin-ascension-charges span.on {
+      border: 3px double CanvasText;
+      outline: 1px solid Highlight;
+      background: Highlight;
+    }
+  }
+  @media (forced-colors: active) {
+    .action-btn.unusable {
+      border-style: dashed;
+    }
+    .action-btn.proc {
+      border: 3px double Highlight;
+      animation: none;
+    }
   }
 
   /* ---------- buff bar ---------- */
@@ -1606,11 +2238,32 @@
       0 0 6px #ffd10033;
   }
   .pet-btn.autocast {
-    border-color: #ffe77a;
+    border-color: var(--gold);
     box-shadow:
-      inset 0 0 0 1px #ffe77aaa,
-      0 0 10px #ffe77a66,
-      0 0 18px #ffd10033;
+      inset 0 0 0 1px color-mix(in srgb, var(--gold) 67%, transparent),
+      0 0 10px color-mix(in srgb, var(--gold) 40%, transparent),
+      0 0 18px color-mix(in srgb, var(--gold) 20%, transparent);
+  }
+  @media (forced-colors: active) {
+    /* The normal gold glow is flattened by the system palette. Keep autocast
+       readable with both a thicker outline and a persistent non-colour glyph. */
+    .pet-btn.autocast {
+      outline: 3px double Highlight;
+      outline-offset: -5px;
+    }
+    .pet-btn.autocast::after {
+      content: "↻";
+      position: absolute;
+      right: 1px;
+      bottom: 0;
+      z-index: 3;
+      color: Highlight;
+      background: Canvas;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1;
+      pointer-events: none;
+    }
   }
   .pet-btn.cooldown,
   .pet-btn.disabled {
@@ -1649,8 +2302,8 @@
     font-weight: bold;
     pointer-events: none;
   }
-  /* Warrior stance bar: a small in-flow row of stance toggles above the action
-     bars, only for warriors (JS flips display to flex; hidden by default). */
+  /* Stance-style choice bar: warrior stances and paladin auras share this exact
+     in-flow row above the action bars (JS flips it to flex when applicable). */
   #stancebar {
     display: none;
     margin: 2px 0 0 0;
@@ -1883,8 +2536,8 @@
       0 0 9px #ffd100cc,
       inset 0 1px 0 #ffffff18;
   }
-  /* Free-cost proc glow (Battle Trance): the classic pulsing gold rim on the
-     covered abilities. Actionable info: never gated by a graphics tier; the
+  /* Proc glow (Battle Trance and similar): the classic pulsing
+     gold rim on the covered abilities. Actionable info: never gated by a graphics tier; the
      pulse (motion only) stops under reduced motion, the steady glow stays. */
   .action-btn.proc {
     border-color: #ffd97a;
@@ -1892,6 +2545,14 @@
       0 0 12px #ffcf40e6,
       inset 0 0 6px #ffcf4066;
     animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
+  }
+  @media (forced-colors: active) {
+    .action-btn.proc {
+      forced-color-adjust: none;
+      border: 3px double Highlight;
+      outline: 1px solid CanvasText;
+      box-shadow: none;
+    }
   }
   @keyframes abtn-proc-pulse {
     from {
@@ -1913,6 +2574,62 @@
       inset 0 1px 0 #ffffff28;
     animation: action-empowered-pulse 1.15s ease-in-out infinite;
   }
+  .action-btn.ascension-spender::after {
+    content: attr(data-ascension-cost);
+    position: absolute;
+    left: 2px;
+    bottom: 2px;
+    z-index: 7;
+    min-width: 14px;
+    height: 12px;
+    padding: 0 2px;
+    border: 1px solid var(--color-ascension);
+    border-radius: 6px;
+    background: var(--color-bg-dark);
+    color: var(--color-ascension);
+    font-family: var(--ui-font);
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 10px;
+    text-align: center;
+    text-shadow: 0 1px var(--text-outline-color);
+    box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) var(--color-primary-glow-heavy);
+  }
+  @media (forced-colors: active) {
+    button.ascension-spender::after {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Canvas;
+      color: Highlight;
+      box-shadow: none;
+    }
+  }
+  body:has(.paladin-devotion.last-charge) .action-btn.empowered {
+    animation-duration: 0.55s;
+    filter: brightness(1.18);
+  }
+  .action-btn.fate-consume-ready,
+  .mobile-action-slot.fate-consume-ready {
+    border-color: #76e1cf;
+    outline: 1px solid #a77cff;
+    outline-offset: 1px;
+    box-shadow:
+      0 0 10px rgba(93, 229, 208, 0.9),
+      0 0 20px rgba(129, 73, 218, 0.72),
+      inset 0 0 7px rgba(113, 238, 219, 0.48);
+    animation: fate-consume-button-pulse 1.05s ease-in-out infinite alternate;
+  }
+  .action-btn.fate-sentence-ready,
+  .mobile-action-slot.fate-sentence-ready {
+    border-color: #ff789d;
+    outline: 1px solid #d99cff;
+    outline-offset: 1px;
+    box-shadow:
+      0 0 10px rgba(255, 84, 137, 0.92),
+      0 0 20px rgba(159, 64, 220, 0.76),
+      inset 0 0 7px rgba(255, 102, 153, 0.52);
+    animation: fate-sentence-button-pulse 0.92s ease-in-out infinite alternate;
+  }
   @keyframes action-empowered-pulse {
     0%,
     100% {
@@ -1928,10 +2645,41 @@
         inset 0 1px 0 #ffffff34;
     }
   }
+  @keyframes fate-consume-button-pulse {
+    from {
+      filter: brightness(0.94) saturate(1.05);
+    }
+    to {
+      filter: brightness(1.22) saturate(1.28);
+    }
+  }
+  @keyframes fate-sentence-button-pulse {
+    from {
+      filter: brightness(0.94) saturate(1.05);
+    }
+    to {
+      filter: brightness(1.3) saturate(1.35);
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .action-btn.proc,
-    .action-btn.empowered {
+    .action-btn.empowered,
+    .action-btn.fate-consume-ready,
+    .action-btn.fate-sentence-ready,
+    .mobile-action-slot.fate-consume-ready,
+    .mobile-action-slot.fate-sentence-ready {
       animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .action-btn.fate-consume-ready,
+    .action-btn.fate-sentence-ready,
+    .mobile-action-slot.fate-consume-ready,
+    .mobile-action-slot.fate-sentence-ready {
+      border-color: Highlight;
+      outline: 2px double Highlight;
+      outline-offset: 2px;
+      box-shadow: none;
     }
   }
   .action-btn:not(.empty)[draggable="true"] {
@@ -7411,6 +8159,548 @@ body.reduce-motion #proc-overlay.chrono .chrono-left,
 body.reduce-motion #proc-overlay.chrono .chrono-right,
 body.reduce-motion #proc-overlay.chrono .chrono-bird::before,
 body.reduce-motion #proc-overlay.chrono .chrono-bird::after {
+  animation: none !important;
+}
+
+/* ---- Destruction variant: the Ruin ritual bank ------------------------- */
+/* Five forged seals rise in a shallow crown around a broken ritual ring. The
+   bank remains readable at zero and ignites one rune for each held Ruin. */
+#proc-overlay .ruin-ritual {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 270px;
+  height: 112px;
+  translate: -50% -50%;
+  user-select: none;
+}
+#proc-overlay.destruction {
+  opacity: 0.76;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+#proc-overlay.destruction.r1 {
+  opacity: 0.94;
+}
+#proc-overlay.destruction.r5 {
+  opacity: 1;
+}
+#proc-overlay.destruction .fire-bird,
+#proc-overlay.destruction .chrono-bird,
+#proc-overlay.destruction .frost-bird,
+#proc-overlay.destruction .necromancy-bank {
+  display: none;
+}
+#proc-overlay.destruction .ruin-ritual {
+  display: block;
+}
+#proc-overlay.destruction .ruin-ritual,
+#proc-overlay.destruction .ruin-mark {
+  pointer-events: auto;
+  cursor: grab;
+}
+#proc-overlay.destruction.dragging .ruin-ritual,
+#proc-overlay.destruction.dragging .ruin-mark {
+  cursor: grabbing;
+}
+#proc-overlay.destruction .ruin-ritual::before,
+#proc-overlay.destruction .ruin-ritual::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+#proc-overlay.destruction .ruin-ritual::before {
+  inset: 22px -6px 0;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    var(--color-ruin-ritual-aura) 0,
+    var(--color-ruin-ritual-shadow) 36%,
+    transparent 72%
+  );
+  filter: blur(8px);
+}
+#proc-overlay.destruction .ruin-ritual::after {
+  inset: -20px -28px;
+  z-index: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 14% 58%, var(--color-ruin-full-flare) 0 2px, transparent 5px),
+    radial-gradient(circle at 32% 18%, var(--color-ruin-glow) 0 2px, transparent 6px),
+    radial-gradient(circle at 50% 5%, var(--color-ruin-full-flare) 0 3px, transparent 7px),
+    radial-gradient(circle at 68% 18%, var(--color-ruin-glow) 0 2px, transparent 6px),
+    radial-gradient(circle at 86% 58%, var(--color-ruin-full-flare) 0 2px, transparent 5px),
+    radial-gradient(ellipse, var(--color-ruin-ritual-aura) 0, transparent 68%);
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+#proc-overlay.destruction.r5 .ruin-ritual::after {
+  opacity: 1;
+  animation: ruin-bank-full-flare 1.65s ease-in-out infinite;
+}
+#proc-overlay.destruction .ruin-ring {
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  top: 33px;
+  z-index: 2;
+  height: 70px;
+  border-top: 3px solid var(--color-ruin-empty-border);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 4%, var(--color-ruin-ring-highlight), transparent 68%);
+  box-shadow:
+    inset 0 3px var(--color-ruin-ritual-shadow),
+    0 -1px var(--color-ruin-inner-shine);
+  opacity: 0.76;
+  pointer-events: auto;
+  cursor: grab;
+}
+#proc-overlay.destruction.r5 .ruin-ring {
+  border-top-color: var(--color-ruin-lit-border);
+  filter: drop-shadow(0 0 8px var(--color-ruin-glow));
+}
+#proc-overlay.destruction .ruin-mark {
+  --ruin-mark-angle: 0deg;
+  position: absolute;
+  z-index: 3;
+  width: 43px;
+  height: 50px;
+  translate: -50% -50%;
+  rotate: var(--ruin-mark-angle);
+  scale: 0.86;
+  clip-path: polygon(50% 0, 91% 19%, 100% 67%, 72% 100%, 28% 100%, 0 67%, 9% 19%);
+  background: var(--color-ruin-empty-border);
+  filter: drop-shadow(0 3px 3px var(--color-ruin-ritual-shadow));
+  opacity: 0.7;
+  transition:
+    opacity 0.18s ease,
+    scale 0.22s ease,
+    filter 0.22s ease;
+}
+#proc-overlay.destruction .ruin-mark::before,
+#proc-overlay.destruction .ruin-mark::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+#proc-overlay.destruction .ruin-mark::before {
+  inset: 3px;
+  clip-path: inherit;
+  background: linear-gradient(145deg, var(--color-ruin-empty-start), var(--color-ruin-empty-end));
+  box-shadow: inset 4px 3px 6px var(--color-ruin-ritual-shadow);
+}
+#proc-overlay.destruction .ruin-mark::after {
+  inset: 10px 12px 9px;
+  clip-path: polygon(50% 0, 78% 30%, 62% 46%, 88% 100%, 50% 72%, 12% 100%, 38% 46%, 22% 30%);
+  background: var(--color-ruin-rune-dim);
+  filter: drop-shadow(0 0 2px var(--color-ruin-empty-border));
+}
+#proc-overlay.destruction .ruin-mark-1 {
+  --ruin-mark-angle: -11deg;
+  left: 10%;
+  top: 66%;
+}
+#proc-overlay.destruction .ruin-mark-2 {
+  --ruin-mark-angle: -5deg;
+  left: 30%;
+  top: 45%;
+}
+#proc-overlay.destruction .ruin-mark-3 {
+  left: 50%;
+  top: 35%;
+}
+#proc-overlay.destruction .ruin-mark-4 {
+  --ruin-mark-angle: 5deg;
+  left: 70%;
+  top: 45%;
+}
+#proc-overlay.destruction .ruin-mark-5 {
+  --ruin-mark-angle: 11deg;
+  left: 90%;
+  top: 66%;
+}
+#proc-overlay.destruction.r1 .ruin-mark-1,
+#proc-overlay.destruction.r2 .ruin-mark-2,
+#proc-overlay.destruction.r3 .ruin-mark-3,
+#proc-overlay.destruction.r4 .ruin-mark-4,
+#proc-overlay.destruction.r5 .ruin-mark-5 {
+  scale: 1;
+  opacity: 1;
+  background: var(--color-ruin-lit-border);
+  filter: drop-shadow(0 3px 3px var(--color-ruin-ritual-shadow))
+    drop-shadow(0 0 9px var(--color-ruin-glow));
+  animation: ruin-mark-ignite 0.28s ease-out;
+}
+#proc-overlay.destruction.r1 .ruin-mark-1::before,
+#proc-overlay.destruction.r2 .ruin-mark-2::before,
+#proc-overlay.destruction.r3 .ruin-mark-3::before,
+#proc-overlay.destruction.r4 .ruin-mark-4::before,
+#proc-overlay.destruction.r5 .ruin-mark-5::before {
+  background: radial-gradient(
+    circle at 42% 30%,
+    var(--color-ruin-lit-core),
+    var(--color-ruin-lit-mid) 42%,
+    var(--color-ruin-lit-edge) 82%
+  );
+  box-shadow: inset 0 0 7px var(--color-ruin-inner-shine);
+}
+#proc-overlay.destruction.r1 .ruin-mark-1::after,
+#proc-overlay.destruction.r2 .ruin-mark-2::after,
+#proc-overlay.destruction.r3 .ruin-mark-3::after,
+#proc-overlay.destruction.r4 .ruin-mark-4::after,
+#proc-overlay.destruction.r5 .ruin-mark-5::after {
+  background: var(--color-ruin-lit-core);
+  filter: drop-shadow(0 0 4px var(--color-ruin-lit-core));
+}
+@keyframes ruin-mark-ignite {
+  0% {
+    scale: 0.72;
+    filter: brightness(2.2) drop-shadow(0 0 18px var(--color-ruin-lit-core));
+  }
+  100% {
+    scale: 1;
+  }
+}
+@keyframes ruin-bank-full-flare {
+  0%,
+  100% {
+    opacity: 0.5;
+    scale: 0.96;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.04;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #proc-overlay.destruction,
+  #proc-overlay.destruction .ruin-ring,
+  #proc-overlay.destruction .ruin-mark,
+  #proc-overlay.destruction.r5 .ruin-ritual::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+body.reduce-motion #proc-overlay.destruction,
+body.reduce-motion #proc-overlay.destruction .ruin-ring,
+body.reduce-motion #proc-overlay.destruction .ruin-mark,
+body.reduce-motion #proc-overlay.destruction.r5 .ruin-ritual::after {
+  animation: none !important;
+  transition: none !important;
+}
+@media (forced-colors: active) {
+  #proc-overlay.destruction .ruin-ring {
+    border-top-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+    filter: none;
+  }
+  #proc-overlay.destruction .ruin-mark {
+    background: GrayText;
+    filter: none;
+  }
+  #proc-overlay.destruction .ruin-mark::before {
+    background: Canvas;
+    box-shadow: none;
+  }
+  #proc-overlay.destruction.r1 .ruin-mark-1,
+  #proc-overlay.destruction.r2 .ruin-mark-2,
+  #proc-overlay.destruction.r3 .ruin-mark-3,
+  #proc-overlay.destruction.r4 .ruin-mark-4,
+  #proc-overlay.destruction.r5 .ruin-mark-5 {
+    background: Highlight;
+    filter: none;
+  }
+  #proc-overlay.destruction.r1 .ruin-mark-1::before,
+  #proc-overlay.destruction.r2 .ruin-mark-2::before,
+  #proc-overlay.destruction.r3 .ruin-mark-3::before,
+  #proc-overlay.destruction.r4 .ruin-mark-4::before,
+  #proc-overlay.destruction.r5 .ruin-mark-5::before {
+    background: Highlight;
+  }
+}
+
+/* ---- Necromancy variant: the Soul Fragment bank ------------------------ */
+/* Five jagged soul shards sit on a horizontal runed rail. The empty bank stays
+   visible so Necromancers always see and can place their primary resource. */
+#proc-overlay .necromancy-bank {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 250px;
+  height: 86px;
+  translate: -50% -50%;
+  user-select: none;
+}
+#proc-overlay.necromancy {
+  opacity: 0.72;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+#proc-overlay.necromancy.n1 {
+  opacity: 0.96;
+}
+#proc-overlay.necromancy.n5 {
+  opacity: 1;
+}
+#proc-overlay.necromancy .fire-bird,
+#proc-overlay.necromancy .chrono-bird,
+#proc-overlay.necromancy .frost-bird {
+  display: none;
+}
+#proc-overlay.necromancy .necromancy-bank {
+  display: block;
+}
+#proc-overlay.necromancy .necromancy-bank::before,
+#proc-overlay.necromancy .necromancy-bank::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+#proc-overlay.necromancy .necromancy-bank::before {
+  inset: 13px -8px 8px;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    rgba(76, 29, 149, 0.3) 0,
+    rgba(46, 16, 101, 0.16) 38%,
+    transparent 72%
+  );
+  filter: blur(7px);
+}
+#proc-overlay.necromancy .necromancy-bank::after {
+  inset: -26px -20px;
+  z-index: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 10% 54%, rgba(216, 180, 254, 0.72) 0 2px, transparent 4px),
+    radial-gradient(circle at 28% 22%, rgba(168, 85, 247, 0.58) 0 2px, transparent 5px),
+    radial-gradient(circle at 50% 70%, rgba(233, 213, 255, 0.68) 0 2px, transparent 5px),
+    radial-gradient(circle at 72% 18%, rgba(168, 85, 247, 0.62) 0 2px, transparent 5px),
+    radial-gradient(circle at 90% 57%, rgba(216, 180, 254, 0.72) 0 2px, transparent 4px),
+    radial-gradient(ellipse, rgba(147, 51, 234, 0.45) 0, transparent 66%);
+  mix-blend-mode: screen;
+  filter: blur(1px);
+  opacity: 0;
+}
+#proc-overlay.necromancy.n5 .necromancy-bank::after {
+  opacity: 0.9;
+  animation: soul-bank-full-flare 1.8s ease-in-out infinite;
+}
+#proc-overlay.necromancy .soul-rail,
+#proc-overlay.necromancy .soul-crystal {
+  pointer-events: auto;
+  cursor: grab;
+}
+#proc-overlay.necromancy.dragging .soul-rail,
+#proc-overlay.necromancy.dragging .soul-crystal {
+  cursor: grabbing;
+}
+#proc-overlay.necromancy .soul-rail {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 50%;
+  z-index: 2;
+  height: 25px;
+  translate: 0 -50%;
+  border-top: 1px solid rgba(192, 132, 252, 0.54);
+  border-bottom: 1px solid rgba(46, 16, 101, 0.9);
+  clip-path: polygon(0 50%, 6% 4%, 94% 4%, 100% 50%, 94% 96%, 6% 96%);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 17px,
+      rgba(192, 132, 252, 0.22) 18px 20px,
+      transparent 21px 38px
+    ),
+    linear-gradient(rgba(46, 16, 101, 0.88), rgba(17, 7, 38, 0.96) 48%, rgba(3, 1, 9, 0.98));
+  box-shadow:
+    inset 0 1px rgba(233, 213, 255, 0.2),
+    inset 0 -5px 8px rgba(0, 0, 0, 0.72);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.82)) drop-shadow(0 0 5px rgba(88, 28, 135, 0.5));
+  opacity: 0.86;
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
+}
+#proc-overlay.necromancy.n5 .soul-rail {
+  border-top-color: rgba(233, 213, 255, 0.9);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.82)) drop-shadow(0 0 12px rgba(147, 51, 234, 0.92));
+}
+#proc-overlay.necromancy .soul-crystal {
+  --soul-crystal-angle: 0deg;
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 34px;
+  height: 58px;
+  translate: -50% -50%;
+  rotate: var(--soul-crystal-angle);
+  scale: 0.82;
+  opacity: 0.46;
+  clip-path: polygon(
+    48% 0,
+    82% 13%,
+    96% 39%,
+    76% 68%,
+    61% 100%,
+    43% 84%,
+    22% 98%,
+    28% 67%,
+    4% 41%,
+    19% 15%
+  );
+  background:
+    linear-gradient(146deg, rgba(216, 180, 254, 0.36) 0 16%, transparent 17% 100%),
+    linear-gradient(34deg, transparent 0 46%, rgba(192, 132, 252, 0.26) 48% 51%, transparent 53%),
+    linear-gradient(
+      112deg,
+      rgba(76, 29, 149, 0.96) 0 21%,
+      rgba(107, 33, 168, 0.9) 38%,
+      rgba(46, 16, 101, 0.96) 69%,
+      rgba(9, 3, 22, 0.98) 100%
+    );
+  box-shadow:
+    inset 5px 0 10px rgba(216, 180, 254, 0.18),
+    inset -5px -5px 10px rgba(9, 3, 22, 0.72);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84)) drop-shadow(0 0 4px rgba(88, 28, 135, 0.72));
+  transition:
+    opacity 0.18s ease,
+    scale 0.2s ease,
+    filter 0.2s ease;
+}
+#proc-overlay.necromancy .soul-crystal::before {
+  content: "";
+  position: absolute;
+  inset: 7px 8px 9px 10px;
+  clip-path: polygon(50% 0, 100% 30%, 64% 48%, 90% 100%, 42% 72%, 0 100%, 22% 43%, 0 25%);
+  background:
+    linear-gradient(64deg, transparent 0 45%, rgba(243, 232, 255, 0.72) 48% 52%, transparent 55%),
+    linear-gradient(rgba(216, 180, 254, 0.62), transparent 72%);
+  opacity: 0.28;
+}
+#proc-overlay.necromancy .soul-crystal::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 22px;
+  height: 38px;
+  translate: -50% -50%;
+  border-radius: 52% 48% 44% 56%;
+  background: radial-gradient(
+    ellipse,
+    rgba(255, 255, 255, 0.98) 0,
+    rgba(233, 213, 255, 0.9) 18%,
+    rgba(168, 85, 247, 0.5) 46%,
+    transparent 74%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  filter: blur(1px);
+}
+#proc-overlay.necromancy .soul-crystal-1 {
+  --soul-crystal-angle: -5deg;
+  left: 12%;
+  top: 50%;
+}
+#proc-overlay.necromancy .soul-crystal-2 {
+  --soul-crystal-angle: 3deg;
+  left: 31%;
+  top: 50%;
+}
+#proc-overlay.necromancy .soul-crystal-3 {
+  --soul-crystal-angle: -2deg;
+  left: 50%;
+  top: 50%;
+}
+#proc-overlay.necromancy .soul-crystal-4 {
+  --soul-crystal-angle: 4deg;
+  left: 69%;
+  top: 50%;
+}
+#proc-overlay.necromancy .soul-crystal-5 {
+  --soul-crystal-angle: -3deg;
+  left: 88%;
+  top: 50%;
+}
+#proc-overlay.necromancy.n1 .soul-crystal-1,
+#proc-overlay.necromancy.n2 .soul-crystal-2,
+#proc-overlay.necromancy.n3 .soul-crystal-3,
+#proc-overlay.necromancy.n4 .soul-crystal-4,
+#proc-overlay.necromancy.n5 .soul-crystal-5 {
+  opacity: 1;
+  scale: 1;
+  background:
+    linear-gradient(146deg, rgba(255, 255, 255, 0.92) 0 15%, transparent 17% 100%),
+    linear-gradient(34deg, transparent 0 46%, rgba(243, 232, 255, 0.82) 48% 51%, transparent 53%),
+    linear-gradient(
+      112deg,
+      rgba(243, 232, 255, 0.98) 0 14%,
+      rgba(192, 132, 252, 0.98) 32%,
+      rgba(126, 34, 206, 0.98) 66%,
+      rgba(46, 16, 101, 1) 100%
+    );
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84)) drop-shadow(0 0 6px rgba(233, 213, 255, 0.94))
+    drop-shadow(0 0 15px rgba(147, 51, 234, 0.9));
+  animation: soul-crystal-ignite 0.34s ease-out 1;
+}
+#proc-overlay.necromancy.n1 .soul-crystal-1::after,
+#proc-overlay.necromancy.n2 .soul-crystal-2::after,
+#proc-overlay.necromancy.n3 .soul-crystal-3::after,
+#proc-overlay.necromancy.n4 .soul-crystal-4::after,
+#proc-overlay.necromancy.n5 .soul-crystal-5::after {
+  opacity: 0.9;
+}
+#proc-overlay.necromancy.n5 .soul-crystal {
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84)) drop-shadow(0 0 9px rgba(255, 255, 255, 0.98))
+    drop-shadow(0 0 22px rgba(168, 85, 247, 1));
+}
+@keyframes soul-crystal-ignite {
+  0% {
+    opacity: 0.28;
+    scale: 0.62;
+  }
+  62% {
+    opacity: 1;
+    scale: 1.14;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+#proc-overlay.necromancy.n5 .soul-crystal::after {
+  opacity: 1;
+  filter: blur(0);
+}
+@keyframes soul-bank-full-flare {
+  0% {
+    opacity: 0.55;
+    scale: 0.94;
+  }
+  50% {
+    opacity: 0.9;
+    scale: 1.04;
+  }
+  100% {
+    opacity: 0.55;
+    scale: 0.94;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #proc-overlay.necromancy .soul-crystal,
+  #proc-overlay.necromancy .necromancy-bank::after {
+    animation: none !important;
+  }
+}
+body.reduce-motion #proc-overlay.necromancy .soul-crystal,
+body.reduce-motion #proc-overlay.necromancy .necromancy-bank::after {
   animation: none !important;
 }
 

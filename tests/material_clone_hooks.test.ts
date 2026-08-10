@@ -8,6 +8,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { attachBiomeHaze } from '../src/render/biome_haze_field';
 import { addRimGlow, gfxInternalsForTest, hasRimGlow } from '../src/render/gfx';
 import {
   cloneMaterialWithHooks,
@@ -100,6 +101,80 @@ describe('reattachClonedMaterialHooks', () => {
     expect(hasRimGlow(clone)).toBe(false);
     expect(clone.customProgramCacheKey()).toBe(source.customProgramCacheKey());
     expect(clone.customProgramCacheKey()).toContain('surface-detail|stone');
+  });
+});
+
+describe('biome-haze layer survival across the program-preserving clone', () => {
+  // The stoneSlab shape (castle_features): a surfaceMat-style source carrying
+  // the zone-haze hook plus the worn-stone detail layer.
+  function hazedSlabMaterial(): THREE.MeshStandardMaterial {
+    const mat = new THREE.MeshStandardMaterial({ color: 0x8a7568 });
+    mat.name = 'castle_slab';
+    attachBiomeHaze(mat);
+    applySurfaceDetail(mat, 'stone', { strength: 0.4 });
+    return mat;
+  }
+
+  it('documents the lying wocZoneHaze marker a bare clone carries', () => {
+    const source = hazedSlabMaterial();
+    const bare = source.clone();
+    // clone() copies userData, so the marker claims the hook is attached on a
+    // clone whose hook was silently dropped; a naive attachBiomeHaze(bare)
+    // no-ops on that flag and the key stays split.
+    expect((bare.userData as { wocZoneHaze?: boolean }).wocZoneHaze).toBe(true);
+    attachBiomeHaze(bare);
+    expect(bare.customProgramCacheKey()).not.toBe(source.customProgramCacheKey());
+  });
+
+  it('restores the haze layer and the exact program cache key on the clone', () => {
+    const source = hazedSlabMaterial();
+    const clone = cloneMaterialWithHooks(source);
+    expect(clone.customProgramCacheKey()).toBe(source.customProgramCacheKey());
+    // The detail layer chains the previous hook's source text into its key,
+    // so the haze layer's presence shows as its shader identifier.
+    expect(clone.customProgramCacheKey()).toContain('wocHazeVXZ');
+  });
+
+  it('never grants haze to a clone of an un-hazed source', () => {
+    const source = new THREE.MeshStandardMaterial({ color: 0x97826f });
+    applySurfaceDetail(source, 'stone', { strength: 0.4 });
+    const clone = cloneMaterialWithHooks(source);
+    expect((clone.userData as { wocZoneHaze?: boolean }).wocZoneHaze ?? false).toBe(false);
+    expect(clone.customProgramCacheKey()).toBe(source.customProgramCacheKey());
+  });
+});
+
+describe('the castle stone slabs use the program-preserving clone', () => {
+  it('clones the surfaceMat slab sources through material_clone_hooks', () => {
+    const castle = readFileSync(
+      new URL('../src/render/castle_features.ts', import.meta.url),
+      'utf8',
+    );
+    const start = castle.indexOf('const stoneSlab = (');
+    expect(start).toBeGreaterThan(-1);
+    const slice = castle.slice(start, castle.indexOf('const slab = (', start));
+    expect(slice).toContain('cloneMaterialWithHooks(surfaceMat({ color, roughness }))');
+    expect(slice).toContain('cloneMaterialWithHooks(stoneSlab(');
+    expect(slice).not.toContain('.clone()');
+  });
+});
+
+describe('the town ghost and independent-building clones preserve programs', () => {
+  it('routes the three kit clone sites through material_clone_hooks', () => {
+    // A bare clone at any of these sites drops the zone-haze hook, splits the
+    // program cache key, and links a program per kit material the first time
+    // a crowd arrival whips the camera across town (the measured
+    // first-contact burst: village/khex/fenbridge materials linking inside
+    // one frame).
+    const sites = [
+      ['props.ts', 'const ghostSrc = cloneMaterialWithHooks(src)'],
+      ['fenbridge_town.ts', 'independent ? cloneMaterialWithHooks(shared) : shared'],
+      ['eastbrook_town.ts', 'independent ? cloneMaterialWithHooks(shared) : shared'],
+    ];
+    for (const [file, needle] of sites) {
+      const source = readFileSync(new URL(`../src/render/${file}`, import.meta.url), 'utf8');
+      expect(source, `${file} lost its hook-preserving clone`).toContain(needle);
+    }
   });
 });
 

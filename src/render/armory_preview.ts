@@ -39,7 +39,7 @@ export interface ArmoryPreviewHandle {
   setSkin(skinId: string | null): void;
   setMode(mode: ArmoryPreviewMode): void;
   setScene(scene: ArmorySceneKey): void;
-  prewarm(skinIds: readonly string[]): Promise<void>;
+  prewarm(skinIds: readonly string[], modes?: readonly ArmoryPreviewMode[]): Promise<void>;
   dispose(): void;
 }
 
@@ -196,6 +196,11 @@ export function createArmoryPreview(
   let skinId: string | null = null;
   let active = false;
   let prewarming = false;
+  // The latest setActive request that arrived while prewarm() owned the
+  // renderer/composer buffer and the rAF loop; applied by prewarm's finally
+  // instead of the wasActive snapshot it captured at entry, so a window
+  // opened or closed mid-warmup is never clobbered back to a stale value.
+  let pendingActive: boolean | null = null;
   let disposed = false;
   let renderWidth = Math.max(1, container.clientWidth);
   let renderHeight = Math.max(1, container.clientHeight);
@@ -377,7 +382,14 @@ export function createArmoryPreview(
 
   return {
     setActive(next: boolean): void {
-      if (disposed || next === active) return;
+      if (disposed) return;
+      if (prewarming) {
+        // prewarm() owns the rAF loop and the render buffer until it
+        // finishes; record the request and let its finally apply it.
+        pendingActive = next;
+        return;
+      }
+      if (next === active) return;
       active = next;
       if (!active) {
         if (raf !== null) cancelAnimationFrame(raf);
@@ -415,10 +427,16 @@ export function createArmoryPreview(
       sceneKey = next;
       applyScene();
     },
-    async prewarm(skinIds: readonly string[]): Promise<void> {
+    async prewarm(
+      skinIds: readonly string[],
+      // The post-entry lane warms one mode per paced unit (a whole-skin unit
+      // measured 170 to 225 ms of main-thread block in live play; one mode
+      // roughly halves it). Curtained callers keep the both-modes default.
+      modes: readonly ArmoryPreviewMode[] = ['character', 'weapon'],
+    ): Promise<void> {
       if (disposed || prewarming) return;
       const unique = [...new Set(skinIds)].filter((id) => WEAPON_SKINS[id]);
-      if (unique.length === 0) return;
+      if (unique.length === 0 || modes.length === 0) return;
       const previousSize = new THREE.Vector2();
       renderer.getSize(previousSize);
       const previousPixelRatio = renderer.getPixelRatio();
@@ -433,6 +451,7 @@ export function createArmoryPreview(
       active = false;
       clock.stop();
       prewarming = true;
+      pendingActive = null;
       try {
         renderer.setPixelRatio(1);
         renderer.setSize(480, 380, false);
@@ -449,16 +468,20 @@ export function createArmoryPreview(
           activeWeaponRig?.vfx?.setPixelScale(pixelHeight());
 
           // Compile and draw the exact character-mode light/material graph.
-          mode = 'character';
-          applyMode();
-          await renderer.compileAsync(scene, camera);
-          composer.render();
+          if (modes.includes('character')) {
+            mode = 'character';
+            applyMode();
+            await renderer.compileAsync(scene, camera);
+            composer.render();
+          }
 
           // Then the exact weapon-only graph (ground pool + showcase VFX).
-          mode = 'weapon';
-          applyMode();
-          await renderer.compileAsync(scene, camera);
-          composer.render();
+          if (modes.includes('weapon')) {
+            mode = 'weapon';
+            applyMode();
+            await renderer.compileAsync(scene, camera);
+            composer.render();
+          }
 
           // Keep the loading overlay responsive and avoid turning 29 bounded
           // warmups into one giant main-thread task on browsers whose shader
@@ -484,7 +507,12 @@ export function createArmoryPreview(
         // had already been warmed above.
         composer.render();
         prewarming = false;
-        active = wasActive;
+        // setActive may have arrived mid-prewarm (the store window opened or
+        // closed while this buffer was repurposed for warmup); apply that
+        // request instead of the wasActive snapshot captured at entry.
+        const requestedActive = pendingActive;
+        pendingActive = null;
+        active = requestedActive ?? wasActive;
         if (active && !disposed) {
           resize();
           clock.start();

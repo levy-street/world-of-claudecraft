@@ -335,7 +335,12 @@ For off-box safety, sync the directory to S3 occasionally:
   percent) while the Wildheart ids drop at ordinary heroic rates, the party
   need/greed path is already guarded at the base, and the frozen id set
   (reins exceptions plus the Wildheart additions) is pinned by the
-  deploy-window test's snapshot. Rift-run loot is a second release-content arm on
+  deploy-window test's snapshot. The v0.36.0 class-overhauls integration
+  admits one more id on the same recorded arm (owner decision 2026-08-08):
+  heroic_duskwhisper, the generated heroic variant of the rogue re-band's
+  Duskwhisper dagger on the Fanglord Beastmaster's heroic table, at an
+  ordinary heroic drop rate; a stale bundle renders it through the
+  unknown-item fallback exactly like the Wildheart six. Rift-run loot is a second release-content arm on
   the same window (the run builders push the rift catalog onto boss corpse
   lists at runtime, outside every content-table sweep); it requires the
   stale tab to get inside a rift at all, and whether the old bundle's

@@ -217,8 +217,10 @@ function rendererPrewarmSummary(
     compileTimedOut: prewarm.compileTimedOut,
     manifestPlanned: prewarm.manifestPlanned,
     manifestCompleted: prewarm.manifestCompleted,
+    manifestPartial: prewarm.manifestPartial,
     manifestTimedOut: prewarm.manifestTimedOut,
     manifestFailed: prewarm.manifestFailed,
+    partialEntryIds: prewarm.partialEntryIds,
     timedOutEntryIds: prewarm.timedOutEntryIds,
     failedEntryIds: prewarm.failedEntryIds,
     entries: prewarm.manifestEntries.map((entry) => ({
@@ -230,7 +232,58 @@ function rendererPrewarmSummary(
       remainingMsAfter: entry.remainingMsAfter,
       programDelta: entry.programDelta,
       textureDelta: entry.textureDelta,
+      workDone: entry.workDone,
+      workPlanned: entry.workPlanned,
       detail: entry.detail,
+    })),
+  };
+}
+
+type RendererGpuQueueSnapshot = NonNullable<PerfSnapshot['renderer']>['gpuQueue'];
+
+// The GPU queue is serial, so one unit that never settles blocks every later
+// unit in every lane while contributing nothing to the completed-unit ring.
+// The running unit and the recorded stalls ride the beacon beside the slowest
+// completed units, so a wedge is a fleet signal instead of local console noise
+// (issue #3167). Bounded like every other raw-summary block; atMs is dropped
+// because a page-relative timestamp carries no fleet meaning.
+const GPU_QUEUE_REPORT_STALLS = 6;
+const GPU_QUEUE_REPORT_SLOWEST = 5;
+// The queue's own tail cap keeps this list tiny; the slice only pins the
+// beacon size against a future cap raise, mirroring the two lists above.
+const GPU_QUEUE_REPORT_TAILS = 4;
+
+function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<string, unknown> {
+  return {
+    units: gpuQueue.units,
+    totalSyncMs: gpuQueue.totalSyncMs,
+    worstSyncMs: gpuQueue.worstSyncMs,
+    pending: gpuQueue.pending,
+    stallCount: gpuQueue.stallCount,
+    active: gpuQueue.active
+      ? {
+          label: gpuQueue.active.label,
+          priority: gpuQueue.active.priority,
+          ageMs: gpuQueue.active.ageMs,
+        }
+      : null,
+    // Released compile-gate tails settling off-thread.
+    waitingTails: gpuQueue.waitingTails.slice(0, GPU_QUEUE_REPORT_TAILS).map((tail) => ({
+      label: tail.label,
+      priority: tail.priority,
+      ageMs: tail.ageMs,
+    })),
+    stalls: gpuQueue.stalls.slice(-GPU_QUEUE_REPORT_STALLS).map((stall) => ({
+      label: stall.label,
+      priority: stall.priority,
+      ageMs: stall.ageMs,
+      settled: stall.settled,
+    })),
+    slowest: gpuQueue.slowest.slice(0, GPU_QUEUE_REPORT_SLOWEST).map((unit) => ({
+      label: unit.label,
+      priority: unit.priority,
+      syncMs: unit.syncMs,
+      wallMs: unit.wallMs,
     })),
   };
 }
@@ -327,6 +380,7 @@ function payloadFromSnapshot(
       rendererDiagnostics: renderer.renderDiagnostics,
       rendererPrewarmSummary: rendererPrewarmSummary(renderer.prewarm),
       rendererPrewarm: renderer.prewarm,
+      rendererGpuQueue: rendererGpuQueueSummary(renderer.gpuQueue),
       assets: {
         preload: snapshot.assets.preload,
         byType: snapshot.assets.byType,

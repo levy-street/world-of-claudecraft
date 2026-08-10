@@ -97,6 +97,7 @@ function harness() {
   let statuses: LootRollGroupStatus[] = [];
   const submitLootRoll = vi.fn();
   const assignMasterLoot = vi.fn();
+  const hideTooltip = vi.fn();
   const writerCounts = { writes: 0, skips: 0 };
   // Retained so a test can read back the elided style props the painter wrote
   // (the timer fraction is only ever a CSS custom property).
@@ -133,6 +134,7 @@ function harness() {
     itemIcon: () => '<img class="test-item-icon">',
     itemTooltip: () => 'tooltip',
     attachTooltip: () => {},
+    hideTooltip,
     writers,
   });
   return {
@@ -140,6 +142,7 @@ function harness() {
     root,
     submitLootRoll,
     assignMasterLoot,
+    hideTooltip,
     setOpen: (next: LootRollPrompt[]) => {
       open = next;
     },
@@ -531,6 +534,23 @@ describe('LootRollController', () => {
     test.advance(1_000);
     test.controller.update(test.now());
     expect(test.writerCounts).toEqual({ writes: 2, skips: 2 });
+  });
+
+  // #3027: if the looter is hovering an item when its roll entry disappears (the
+  // window closes, or the roll finishes), the shared tooltip must be dismissed
+  // at that moment instead of lingering until the next mousemove.
+  it('dismisses the shared tooltip whenever a repaint would remove the hovered row', () => {
+    const test = harness();
+    test.setOpen([prompt()]);
+    test.controller.update(test.now());
+    expect(test.hideTooltip).toHaveBeenCalled();
+    test.hideTooltip.mockClear();
+
+    test.setOpen([]);
+    test.controller.update(test.now());
+
+    expect(test.hideTooltip).toHaveBeenCalled();
+    expect(test.root.style.display).toBe('none');
   });
 
   it('a render throw is contained, never retried on identical data, and heals on the next change', () => {

@@ -23,6 +23,7 @@ import {
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { PROP_ASSET_DEFS } from './props';
 import { applyWornStone } from './worn_stone';
 
@@ -190,21 +191,23 @@ export function buildCastleFeatures(): CastleFeaturesView {
   // the other stone structures) so the big flat caps read as laid masonry
   // instead of painted plastic. The surfaceMat result is CLONED first:
   // surfaceMat dedupes by (color|maps|flags) across modules, and the layer
-  // must not leak onto an unrelated consumer of the same key.
+  // must not leak onto an unrelated consumer of the same key. The clone goes
+  // through material_clone_hooks so it keeps surfaceMat's zone-haze layer and
+  // its program-cache-key identity (a bare clone dropped both: un-hazed slabs
+  // plus a fresh program link on the first frame the castle streamed in).
   const stoneSlab = (color: number, roughness: number): THREE.Material => {
     if (!GFX.standardMaterials) return surfaceMat({ color, roughness });
-    const mat = surfaceMat({ color, roughness }).clone();
+    const mat = cloneMaterialWithHooks(surfaceMat({ color, roughness }));
     applyWornStone(mat as THREE.MeshStandardMaterial);
     return mat;
   };
   const slabMat = stoneSlab(0x8a7568, 0.95);
   // the solid wedge masses (the wall flights and the ward's stair cuts) are
-  // hand-wound triangle soups, so they draw both faces. clone() copies
-  // neither the onBeforeCompile hook nor the program cache key, so the wedge
-  // re-attaches the worn layer explicitly (and never shares the lambert
-  // tier's deduped instance, which must not go DoubleSide for everyone).
-  const wedgeMat = stoneSlab(0x8a7568, 0.95).clone();
-  applyWornStone(wedgeMat as THREE.MeshStandardMaterial);
+  // hand-wound triangle soups, so they draw both faces. The hook-preserving
+  // clone re-attaches haze and the worn layer itself (and never shares the
+  // lambert tier's deduped instance, which must not go DoubleSide for
+  // everyone).
+  const wedgeMat = cloneMaterialWithHooks(stoneSlab(0x8a7568, 0.95));
   wedgeMat.side = THREE.DoubleSide;
   const capMat = stoneSlab(0x97826f, 0.9);
   const slab = (

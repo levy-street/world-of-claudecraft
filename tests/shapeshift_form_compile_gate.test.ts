@@ -55,23 +55,28 @@ describe('shapeshift-form compile gate (#2571)', () => {
 
   it('consults the pending token, keyed per form root, in the per-frame visibility recompute', () => {
     const source = renderer();
-    const blockStart = source.indexOf('// Gated per form root: the per-frame recompute below');
+    const blockStart = source.indexOf(
+      '// Gated per form root: the resolved visibility AND the compile-pending',
+    );
     const blockEnd = source.indexOf('// rideable mount under the player', blockStart);
     expect(blockStart).toBeGreaterThan(-1);
     expect(blockEnd).toBeGreaterThan(blockStart);
     const block = source.slice(blockStart, blockEnd);
 
     expect(block).toContain(
-      'v.sheepVisual.root.visible = polyed && v.formCompilePending !== v.sheepVisual.root;',
+      'v.sheepVisual?.setActive(formVisibility.sheep && v.formCompilePending !== v.sheepVisual.root);',
     );
     expect(block).toContain(
-      'v.bearVisual.root.visible = bear && v.formCompilePending !== v.bearVisual.root;',
+      'v.bearVisual?.setActive(formVisibility.bear && v.formCompilePending !== v.bearVisual.root);',
     );
     expect(block).toContain(
-      'v.catVisual.root.visible = cat && v.formCompilePending !== v.catVisual.root;',
+      'v.catVisual?.setActive(formVisibility.cat && v.formCompilePending !== v.catVisual.root);',
     );
     expect(block).toContain(
-      'v.travelVisual.root.visible = travel && v.formCompilePending !== v.travelVisual.root;',
+      'formVisibility.travel && v.formCompilePending !== v.travelVisual.root,',
+    );
+    expect(block).toContain(
+      'formVisibility.metamorph && v.formCompilePending !== v.metamorphVisual.root,',
     );
   });
 

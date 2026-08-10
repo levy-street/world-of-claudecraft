@@ -84,6 +84,13 @@ export class CharacterPreview {
   // ResizeObserver owns this flag: a preview moved below a display:none window
   // keeps one cheap rAF subscription but performs no animation or WebGL work.
   private renderActive = false;
+  // Set while prewarm() owns the renderer's buffer size for a warmup pass.
+  private prewarming = false;
+  // The latest activation request (from setContainer/the resize observer,
+  // via syncSize) that arrived while prewarming; applied by prewarm's finally
+  // instead of the renderActive it captured at entry, so a window opened or
+  // closed mid-warmup is never clobbered back to a stale snapshot.
+  private pendingActive: boolean | null = null;
   private destroyed = false;
 
   // Drag controls
@@ -333,6 +340,13 @@ export class CharacterPreview {
   /** Force the renderer to match the current visible container size. */
   syncSize(): void {
     if (this.destroyed) return;
+    if (this.prewarming) {
+      // prewarm() owns the renderer's buffer size until it finishes; record
+      // the request instead of resizing out from under it, and let prewarm's
+      // finally apply it once the buffer is the live preview's own again.
+      this.pendingActive = this.container.clientWidth > 0 && this.container.clientHeight > 0;
+      return;
+    }
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
     this.renderActive = width > 0 && height > 0;
@@ -356,6 +370,8 @@ export class CharacterPreview {
     const previousSkin = this.currentSkin;
     const wasActive = this.renderActive;
     this.renderActive = false;
+    this.prewarming = true;
+    this.pendingActive = null;
     try {
       this.renderer.setPixelRatio(1);
       this.renderer.setSize(320, 400, false);
@@ -377,7 +393,16 @@ export class CharacterPreview {
       this.renderer.setSize(Math.max(1, previousSize.x), Math.max(1, previousSize.y), false);
       this.camera.aspect = previousAspect;
       this.camera.updateProjectionMatrix();
-      this.renderActive = wasActive;
+      this.prewarming = false;
+      // setContainer/the resize observer may have arrived mid-prewarm (the
+      // window opened or closed while this buffer was repurposed for
+      // warmup); apply that request instead of the wasActive snapshot
+      // captured at entry, and resync to the real container size rather than
+      // the stale pre-warmup size just restored above.
+      const requestedActive = this.pendingActive;
+      this.pendingActive = null;
+      this.renderActive = requestedActive ?? wasActive;
+      if (requestedActive !== null) this.syncSize();
       this.clock.getDelta();
     }
   }

@@ -28,6 +28,8 @@ export type FctSpawnSource =
       readonly ability: boolean;
       readonly crit: boolean;
       readonly isPlayerSource: boolean;
+      /** Whether a temporary guardian owned by the player caused the event. */
+      readonly isPlayerOwnedSource?: boolean;
       readonly isPlayerTarget: boolean;
       /**
        * The whole hit landed inside an absorb shield: zero damage got through, and
@@ -101,7 +103,7 @@ export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
       // (isPlayerTarget)` with no else). A shield block takes the SAME role split (it is
       // still a landed hit, just reduced by blockValue) but its own -block kind, so it
       // reads with its own colour/word instead of a plain hit's.
-      if (src.isPlayerSource && !src.isPlayerTarget)
+      if ((src.isPlayerSource || src.isPlayerOwnedSource) && !src.isPlayerTarget)
         return {
           kind:
             src.damageKind === 'block'

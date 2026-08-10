@@ -14,6 +14,7 @@ import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   assetsReady,
+  beginBackgroundPreloads,
   beginDeferredPreloads,
   preloadInternalsForTest,
   registerDeferredPreload,
@@ -109,6 +110,76 @@ describe('deferred preload lane', () => {
   });
 });
 
+// The background lane: a SECOND priority a 'background'-tagged deferred thunk can
+// take. Unlike the critical lane above, assetsReady() must never observe it (that
+// is the entire point: boot no longer blocks on content most sessions never load),
+// and it only starts once main.ts opens it after the first frame is on screen.
+describe('background preload lane', () => {
+  it('does not start a background fetch until the background lane opens', () => {
+    let started = 0;
+    registerDeferredPreload(() => {
+      started++;
+      return Promise.resolve();
+    }, 'background');
+    registerDeferredPreload(() => {
+      started++;
+      return Promise.resolve();
+    }, 'background');
+    expect(started).toBe(0);
+    expect(preloadInternalsForTest.pendingBackground()).toBe(2);
+    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(0);
+
+    expect(beginBackgroundPreloads()).toBe(2);
+    expect(started).toBe(2);
+    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(2);
+    expect(preloadInternalsForTest.pendingBackground()).toBe(0);
+  });
+
+  it('is idempotent, so a second call starts nothing again', () => {
+    registerDeferredPreload(() => Promise.resolve(), 'background');
+    expect(beginBackgroundPreloads()).toBe(1);
+    expect(beginBackgroundPreloads()).toBe(0);
+    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(1);
+  });
+
+  it('starts a late background registration immediately once its lane is open', () => {
+    beginBackgroundPreloads();
+    let started = false;
+    registerDeferredPreload(() => {
+      started = true;
+      return Promise.resolve();
+    }, 'background');
+    expect(started).toBe(true);
+    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(1);
+  });
+
+  it('never lands a background task in the critical tasks list assetsReady() awaits', () => {
+    registerDeferredPreload(() => Promise.resolve(), 'background');
+    beginBackgroundPreloads();
+    expect(preloadInternalsForTest.tasks()).toHaveLength(0);
+    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(1);
+  });
+
+  it('lets assetsReady() resolve without ever waiting on a background task, even one that never settles', async () => {
+    // A background task that NEVER resolves. If assetsReady() awaited it (a
+    // regression back to one flat lane), this test would hang until Vitest's
+    // timeout; it settling is the decisive proof the boot gate genuinely
+    // excludes 'background' work rather than merely reordering it.
+    registerDeferredPreload(() => new Promise(() => {}), 'background');
+    registerPreload(Promise.resolve());
+    beginBackgroundPreloads();
+    await expect(assetsReady()).resolves.toBeUndefined();
+  });
+
+  it('surfaces a synchronously-throwing background thunk without an unhandled rejection', () => {
+    registerDeferredPreload(() => {
+      throw new Error('background exporter blew up');
+    }, 'background');
+    expect(() => beginBackgroundPreloads()).not.toThrow();
+    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(1);
+  });
+});
+
 describe('startGame wiring', () => {
   it('opens the lane BEFORE the assetsReady that gates the Renderer', () => {
     const beginAt = mainSource.indexOf('beginDeferredPreloads()');
@@ -129,6 +200,49 @@ describe('startGame wiring', () => {
     const localeAwaitAt = mainSource.indexOf('await Promise.all([ensureLocaleLoaded(');
     expect(beginAt).toBeGreaterThan(-1);
     expect(localeAwaitAt).toBeGreaterThan(beginAt);
+  });
+
+  // The background lane must open strictly later than everything above: it is
+  // only safe once the boot gate has already resolved and a real frame has
+  // painted, or a 'background' thunk could still stall world entry.
+  it('opens the background lane only once the first frame is on screen', () => {
+    const beginCriticalAt = mainSource.indexOf('beginDeferredPreloads()');
+    const awaitAssetsAt = mainSource.indexOf('await assetsReady(');
+    const firstPaintAt = mainSource.indexOf("checkpoint('first-paint')");
+    const beginBackgroundAt = mainSource.indexOf('beginBackgroundPreloads()');
+    expect(beginCriticalAt).toBeGreaterThan(-1);
+    expect(awaitAssetsAt).toBeGreaterThan(-1);
+    expect(firstPaintAt).toBeGreaterThan(-1);
+    expect(beginBackgroundAt).toBeGreaterThan(-1);
+    expect(beginBackgroundAt).toBeGreaterThan(beginCriticalAt);
+    expect(beginBackgroundAt).toBeGreaterThan(awaitAssetsAt);
+    expect(beginBackgroundAt).toBeGreaterThan(firstPaintAt);
+  });
+});
+
+describe('background-tier retag: only a build path that tolerates late assets', () => {
+  it('tags Thornhollow Fields art background: buildBattleground streams its own pieces in on demand', () => {
+    const src = readFileSync(new URL('../src/render/battleground.ts', import.meta.url), 'utf8');
+    expect(src).toMatch(
+      /registerDeferredPreload\(\(\) => ensureBattlegroundAssets\(\),\s*'background'\)/,
+    );
+  });
+
+  // dungeon.ts's kit/bits GLBs and vale_cup_stadium.ts's kit pieces are both read
+  // SYNCHRONOUSLY from the module-local cache by a build step that still runs
+  // BEFORE the first frame: dungeon's interior-shader prewarm entry in
+  // renderer.ts re-awaits ensureDungeonAssets() itself (so tagging it
+  // 'background' would buy nothing, since that await forces the fetch back
+  // before first frame anyway, just serialized after other boot work instead
+  // of overlapped with it), and vale_cup_stadium's buildValeCupStadium() runs
+  // unconditionally in the Renderer constructor and throws "vale cup kit piece
+  // not preloaded" the instant its cache is still empty. Both must stay on the
+  // default critical lane.
+  it('keeps dungeon.ts and vale_cup_stadium.ts on the critical lane', () => {
+    for (const file of ['../src/render/dungeon.ts', '../src/render/vale_cup_stadium.ts']) {
+      const src = readFileSync(new URL(file, import.meta.url), 'utf8');
+      expect(src, file).not.toMatch(/registerDeferredPreload\([^;]*'background'/);
+    }
   });
 });
 

@@ -7,6 +7,7 @@ import type { Aura, AuraKind } from '../src/sim/types';
 // the contract so a silent edit to the source set fails loudly.
 const HARMFUL: AuraKind[] = [
   'dot',
+  'forced_move',
   'slow',
   'root',
   'stun',
@@ -29,6 +30,7 @@ const HARMFUL: AuraKind[] = [
   'cost_tax',
   'heal_absorb',
   'critvuln',
+  'affliction_fate_threads',
 ];
 
 const HELPFUL: AuraKind[] = [
@@ -99,5 +101,16 @@ describe('isDispellableAura', () => {
     } as Pick<Aura, 'kind' | 'value' | 'school'> & { unbreakableControl: true };
 
     expect(isDispellableAura(aura, false)).toBe(false);
+  });
+
+  it('does not let dispel or Spellsteal detach the Divine Ascension HUD aura from its state', () => {
+    const ascension = {
+      id: 'divine_ascension',
+      kind: 'internal_cd' as const,
+      value: 0,
+      school: 'holy' as const,
+    };
+    expect(isDispellableAura(ascension, true)).toBe(false);
+    expect(isDispellableAura(ascension, false)).toBe(false);
   });
 });

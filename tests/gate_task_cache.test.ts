@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { buildFullGateSteps, I18N_ARTIFACTS } from '../scripts/lib/gate_steps.mjs';
 import {
@@ -6,8 +7,13 @@ import {
   GATE_CACHEABLE_TASKS,
   GATE_NON_CACHEABLE_TASKS,
   isTurboGateStep,
+  resolveTurboBin,
   turboRunArgs,
 } from '../scripts/lib/gate_task_cache.mjs';
+
+// buildFullGateSteps(workers) with no explicit opts.repoRoot falls back to
+// process.cwd(), which vitest always runs from the repo root.
+const EXPECTED_TURBO_BIN = resolveTurboBin(process.cwd());
 
 const turboJson = JSON.parse(readFileSync(new URL('../turbo.json', import.meta.url), 'utf8')) as {
   cacheDir?: string;
@@ -23,10 +29,9 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 };
 
 describe('turboRunArgs', () => {
-  it('builds npx-ready turbo run argv with stream UI', () => {
-    expect(turboRunArgs(['i18n:gen'])).toEqual(['turbo', 'run', 'i18n:gen', '--ui=stream']);
+  it('builds argv for the resolved turbo binary with stream UI, no leading "turbo" token', () => {
+    expect(turboRunArgs(['i18n:gen'])).toEqual(['run', 'i18n:gen', '--ui=stream']);
     expect(turboRunArgs(['check:types', 'build:env', 'build:server'])).toEqual([
-      'turbo',
       'run',
       'check:types',
       'build:env',
@@ -38,6 +43,15 @@ describe('turboRunArgs', () => {
   it('rejects empty or invalid task lists', () => {
     expect(() => turboRunArgs([])).toThrow(/at least one/);
     expect(() => turboRunArgs([''])).toThrow(/invalid task/);
+  });
+});
+
+describe('resolveTurboBin', () => {
+  it('resolves the pnpm-hoisted binary under the given repoRoot with a platform-appropriate suffix', () => {
+    const suffix = process.platform === 'win32' ? '.cmd' : '';
+    expect(resolveTurboBin('/repo')).toBe(
+      path.join('/repo', 'node_modules', '.bin', `turbo${suffix}`),
+    );
   });
 });
 
@@ -116,8 +130,9 @@ describe('buildFullGateSteps orchestration', () => {
 
     const artifacts = byName['i18n + wiki + sfx artifacts'];
     expect(isTurboGateStep(artifacts.cmd, artifacts.args)).toBe(true);
+    expect(artifacts.cmd).toBe(EXPECTED_TURBO_BIN);
     expect(artifacts.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'i18n:gen', 'wiki:content', 'sfx:check']),
+      expect.arrayContaining(['run', 'i18n:gen', 'wiki:content', 'sfx:check']),
     );
     expect(byName['i18n freshness'].cmd).toBe('git');
     expect(byName['i18n freshness'].args).toEqual(
@@ -133,16 +148,9 @@ describe('buildFullGateSteps orchestration', () => {
     expect(byName['browser regressions'].cmd).toBe('npm');
 
     const typesBuilds = byName['typecheck + env/server/bot builds'];
-    expect(typesBuilds.cmd).toBe('npx');
+    expect(typesBuilds.cmd).toBe(EXPECTED_TURBO_BIN);
     expect(typesBuilds.args).toEqual(
-      expect.arrayContaining([
-        'turbo',
-        'run',
-        'check:types',
-        'build:env',
-        'build:server',
-        'build:bot',
-      ]),
+      expect.arrayContaining(['run', 'check:types', 'build:env', 'build:server', 'build:bot']),
     );
     expect(isTurboGateStep(byName['client build'].cmd, byName['client build'].args)).toBe(true);
     expect(byName['client build'].args).toContain('build:bundle');
@@ -202,5 +210,12 @@ describe('gate.mjs wiring pins', () => {
     expect(pkg.scripts.build).toContain('i18n:gen');
     expect(pkg.scripts.build).toContain('wiki:content');
     expect(pkg.scripts['build:bundle']).not.toContain('i18n:gen');
+  });
+
+  it('resolves its own repoRoot and threads it into buildFullGateSteps', () => {
+    // Same fileURLToPath pattern gate_select.mjs already used, not process.cwd():
+    // correct regardless of the invoking process's working directory.
+    expect(gateSrc).toContain('fileURLToPath(import.meta.url)');
+    expect(gateSrc).toContain('buildFullGateSteps(workers, { releaseTier, repoRoot })');
   });
 });

@@ -14,7 +14,7 @@
 // contract): the present/hidden gate (a unit may be absent), the absorb-shield
 // overlay via the shared absorbBarView core (so player/target/party never
 // re-derive it), and the resource-type DISCRIMINATOR (which also folds the player
-// block's `rage : energy : mana` ternary and adds the `none` case a target frame
+// block's live rage, energy, focus, or mana state and adds the `none` case a target frame
 // with no resource bar needs). Health/resource fractions and the hp/resource TEXT
 // are preformatted at the call site (allocation-light: no raw entity references,
 // no per-element garbage), exactly as the inline player block computed them; the
@@ -45,17 +45,17 @@ const ABSORB_TEXT_OPTS: Intl.NumberFormatOptions = { maximumFractionDigits: 0, u
 
 /**
  * The resource-bar discriminator the painter routes to a class on the resource
- * container. The three power types are mutually exclusive; `none` is the
- * no-resource-bar case a target frame needs (it has no rage/energy/mana bar). The
- * player is always one of the three power types, never `none`.
+ * container. The four power types are mutually exclusive; `none` is the
+ * no-resource-bar case a target frame needs. The player always uses a live power
+ * type and never `none`.
  */
-export type UnitResourceClass = 'rage' | 'energy' | 'mana' | 'none';
+export type UnitResourceClass = 'rage' | 'energy' | 'focus' | 'mana' | 'none';
 
 /**
  * The resource input the descriptor carries. `none` marks a unit with no resource
  * bar (target). `ResourceType | null` is the live power: the player's resourceType
  * is `ResourceType | null` (null is the mana default), and the core maps it to a
- * UnitResourceClass exactly as the old inline `rage : energy : mana` ternary did.
+ * UnitResourceClass.
  */
 export type UnitResourceKind = ResourceType | 'none' | null;
 
@@ -182,13 +182,14 @@ const NO_ABSORB = {
 
 /**
  * Map the descriptor's resource kind to the painter's class discriminator. This
- * IS the old inline player ternary (`rage : energy : mana`, where null falls
- * through to mana) plus the `none` case a target frame needs. Pure and exhaustive.
+ * Maps every live power type, with null falling through to mana, plus the `none`
+ * case a target frame needs. Pure and exhaustive.
  */
 export function unitResourceClass(kind: UnitResourceKind): UnitResourceClass {
   if (kind === 'none') return 'none';
   if (kind === 'rage') return 'rage';
   if (kind === 'energy') return 'energy';
+  if (kind === 'focus') return 'focus';
   // 'mana' or null: the player's default branch, byte-identical to the old ternary.
   return 'mana';
 }

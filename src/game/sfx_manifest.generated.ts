@@ -19,8 +19,8 @@ export interface SfxEntry {
   hash: string;
   variants: readonly SfxVariant[];
 }
-export const SFX_CATALOG_HASH = '963571394edee9cd53dd38a2344f61014028e85ab24b4d96044134eded4ddacd';
-export const SFX_FIXED_CATALOG_KEYS = ["amb_birds","amb_campfire","amb_dungeon","amb_forge","amb_rain","amb_snow","amb_water","amb_wind_marsh","amb_wind_peaks","amb_wind_vale","ambush","arcane_blast","backstab","blind","blink","blizzard","buff_apply","cast_arcane","cast_chain_heal","cast_fire","cast_frost","cast_holy","cast_lightning_bolt","cast_nature","cast_shadow","cheap_shot","cloak_of_shadows","combat_block","combat_crit","combat_dodge","combat_parry","debuff_apply","entangling_roots","eviscerate","fear","fear_shout","flamestrike","foot_dirt","foot_grass","foot_snow","foot_stone","foot_water","foot_wood","frost_nova","frozen_orb","garrote","glacial_spike","hammer_of_justice","heal_impact","ice_block","impact_arcane","impact_bone","impact_fire","impact_flesh","impact_frost","impact_holy","impact_leather","impact_metal","impact_nature","impact_shadow","lockpick_advanced_1","lockpick_advanced_2","lockpick_advanced_3","lockpick_advanced_4","lockpick_begin","lockpick_bind","lockpick_bonus","lockpick_end","lockpick_fail","lockpick_page_cleared","lockpick_retry","lockpick_slip","lockpick_success","lockpick_trap","melee_bow","melee_swing_blade","melee_swing_heavy","melee_swing_light","melee_unarmed","mob_beast_aggro","mob_beast_attack","mob_beast_death","mob_beast_hurt","mob_beast_idle","mob_boar_aggro","mob_boar_attack","mob_boar_death","mob_boar_hurt","mob_boar_idle","mob_burrower_aggro","mob_burrower_attack","mob_burrower_death","mob_burrower_hurt","mob_burrower_idle","mob_demon_aggro","mob_demon_attack","mob_demon_death","mob_demon_hurt","mob_demon_idle","mob_dragonkin_aggro","mob_dragonkin_attack","mob_dragonkin_death","mob_dragonkin_hurt","mob_dragonkin_idle","mob_elemental_aggro","mob_elemental_attack","mob_elemental_death","mob_elemental_hurt","mob_elemental_idle","mob_humanoid_aggro","mob_humanoid_attack","mob_humanoid_death","mob_humanoid_hurt","mob_humanoid_idle","mob_mudfin_aggro","mob_mudfin_attack","mob_mudfin_death","mob_mudfin_hurt","mob_mudfin_idle","mob_ogre_aggro","mob_ogre_attack","mob_ogre_death","mob_ogre_hurt","mob_ogre_idle","mob_reptile_aggro","mob_reptile_attack","mob_reptile_death","mob_reptile_hurt","mob_reptile_idle","mob_spider_aggro","mob_spider_attack","mob_spider_death","mob_spider_hurt","mob_spider_idle","mob_troll_aggro","mob_troll_attack","mob_troll_death","mob_troll_hurt","mob_troll_idle","mob_undead_aggro","mob_undead_attack","mob_undead_death","mob_undead_hurt","mob_undead_idle","mount_run_aether_hover_cycle","mount_run_drakemaw_raptor","mount_run_grag_bear","mount_run_shadowjump_toad","mount_run_stalkglider_snail","mount_run_stormfeather_griffin","mount_run_terrorspark_groundshaker","mount_run_thunderstrut_gobbler","mount_run_valorsteed","move_jump","move_land","move_splash","move_swim","player_death","player_drink_potion","player_drink_water","player_eat_food","player_hurt","proj_arcane","proj_fire","proj_frost","proj_holy","proj_nature","proj_shadow","pyroblast","quest_accept","quest_complete","quest_ready","sap","scorch","shadowstep","sinister_strike","spell_nova","stealth","temporal_clock","ui_achievement","ui_arena_loss","ui_bag_close","ui_bag_open","ui_card_play","ui_card_reveal","ui_card_round_push","ui_card_shuffle","ui_click","ui_coin","ui_cosmetic_unlock","ui_craft_alchemy","ui_craft_armorcrafting","ui_craft_cast","ui_craft_cooking","ui_craft_disenchant","ui_craft_enchanting","ui_craft_engineering","ui_craft_inscription","ui_craft_jewelcrafting","ui_craft_leatherworking","ui_craft_salvage","ui_craft_tailoring","ui_craft_weaponcrafting","ui_death","ui_duel_challenge","ui_duel_countdown","ui_duel_end","ui_duel_start","ui_error","ui_fiesta_augment","ui_fiesta_down","ui_fiesta_revive","ui_fiesta_score_mine","ui_fiesta_score_other","ui_fiesta_wave","ui_fiesta_word_0","ui_fiesta_word_1","ui_fiesta_word_2","ui_fiesta_word_3","ui_fish_bite","ui_fish_cast","ui_fish_reel","ui_gather_cast","ui_gather_cast_herb","ui_gather_cast_ore","ui_gather_cast_wood","ui_gather_epic","ui_gather_herb","ui_gather_legendary","ui_gather_ore","ui_gather_rare","ui_gather_wood","ui_level_up","ui_loot_item","ui_masterwork","ui_quest_done","ui_ready_check","ui_sheep","ui_vcup_kickoff","ui_weapon_sheathe","ui_weapon_unsheathe","ui_whisper","vanish","wand_arcane","wand_holy","wand_shadow"] as const;
+export const SFX_CATALOG_HASH = '3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1';
+export const SFX_FIXED_CATALOG_KEYS = ["amb_birds","amb_campfire","amb_dungeon","amb_forge","amb_rain","amb_snow","amb_water","amb_wind_marsh","amb_wind_peaks","amb_wind_vale","ambush","arcane_blast","backstab","battle_shout","blind","blink","blizzard","buff_apply","cast_arcane","cast_chain_heal","cast_fire","cast_frost","cast_holy","cast_lightning_bolt","cast_nature","cast_shadow","cheap_shot","cloak_of_shadows","combat_block","combat_crit","combat_dodge","combat_parry","debuff_apply","defiant_bellow","demoralizing_shout","emboldening_roar","entangling_roots","eviscerate","fear","fear_shout","flamestrike","foot_dirt","foot_grass","foot_snow","foot_stone","foot_water","foot_wood","frost_nova","frozen_orb","garrote","glacial_spike","hammer_of_justice","heal_impact","ice_block","impact_arcane","impact_bone","impact_fire","impact_flesh","impact_frost","impact_holy","impact_leather","impact_metal","impact_nature","impact_shadow","intimidating_shout","lockpick_advanced_1","lockpick_advanced_2","lockpick_advanced_3","lockpick_advanced_4","lockpick_begin","lockpick_bind","lockpick_bonus","lockpick_end","lockpick_fail","lockpick_page_cleared","lockpick_retry","lockpick_slip","lockpick_success","lockpick_trap","melee_bow","melee_swing_blade","melee_swing_heavy","melee_swing_light","melee_unarmed","meteor","mob_beast_aggro","mob_beast_attack","mob_beast_death","mob_beast_hurt","mob_beast_idle","mob_boar_aggro","mob_boar_attack","mob_boar_death","mob_boar_hurt","mob_boar_idle","mob_burrower_aggro","mob_burrower_attack","mob_burrower_death","mob_burrower_hurt","mob_burrower_idle","mob_demon_aggro","mob_demon_attack","mob_demon_death","mob_demon_hurt","mob_demon_idle","mob_dragonkin_aggro","mob_dragonkin_attack","mob_dragonkin_death","mob_dragonkin_hurt","mob_dragonkin_idle","mob_elemental_aggro","mob_elemental_attack","mob_elemental_death","mob_elemental_hurt","mob_elemental_idle","mob_humanoid_aggro","mob_humanoid_attack","mob_humanoid_death","mob_humanoid_hurt","mob_humanoid_idle","mob_mudfin_aggro","mob_mudfin_attack","mob_mudfin_death","mob_mudfin_hurt","mob_mudfin_idle","mob_ogre_aggro","mob_ogre_attack","mob_ogre_death","mob_ogre_hurt","mob_ogre_idle","mob_reptile_aggro","mob_reptile_attack","mob_reptile_death","mob_reptile_hurt","mob_reptile_idle","mob_spider_aggro","mob_spider_attack","mob_spider_death","mob_spider_hurt","mob_spider_idle","mob_troll_aggro","mob_troll_attack","mob_troll_death","mob_troll_hurt","mob_troll_idle","mob_undead_aggro","mob_undead_attack","mob_undead_death","mob_undead_hurt","mob_undead_idle","mount_run_aether_hover_cycle","mount_run_drakemaw_raptor","mount_run_grag_bear","mount_run_shadowjump_toad","mount_run_stalkglider_snail","mount_run_stormfeather_griffin","mount_run_terrorspark_groundshaker","mount_run_terrorspark_groundshaker_start","mount_run_terrorspark_groundshaker_stop","mount_run_thunderstrut_gobbler","mount_run_valorsteed","move_jump","move_land","move_splash","move_swim","player_death","player_drink_potion","player_drink_water","player_eat_food","player_hurt","proj_arcane","proj_fire","proj_frost","proj_holy","proj_nature","proj_shadow","pyroblast","quest_accept","quest_complete","quest_ready","rallying_cry","rift_boulder_impact","rift_boulder_roll","rift_gate_grind","rift_ice_glide","rift_ice_start","rift_ice_stop","rift_lava_tick","rift_portal_drone","rift_portal_enter","rift_portal_spawn","sap","scorch","shadowstep","sinister_strike","spell_nova","stealth","temporal_clock","ui_achievement","ui_arena_loss","ui_bag_close","ui_bag_open","ui_card_play","ui_card_reveal","ui_card_round_push","ui_card_shuffle","ui_click","ui_coin","ui_cosmetic_unlock","ui_craft_alchemy","ui_craft_armorcrafting","ui_craft_cast","ui_craft_cooking","ui_craft_disenchant","ui_craft_enchanting","ui_craft_engineering","ui_craft_inscription","ui_craft_jewelcrafting","ui_craft_leatherworking","ui_craft_salvage","ui_craft_tailoring","ui_craft_weaponcrafting","ui_death","ui_duel_challenge","ui_duel_countdown","ui_duel_end","ui_duel_start","ui_error","ui_fiesta_augment","ui_fiesta_down","ui_fiesta_revive","ui_fiesta_score_mine","ui_fiesta_score_other","ui_fiesta_wave","ui_fiesta_word_0","ui_fiesta_word_1","ui_fiesta_word_2","ui_fiesta_word_3","ui_fish_bite","ui_fish_cast","ui_fish_reel","ui_gather_cast","ui_gather_cast_herb","ui_gather_cast_ore","ui_gather_cast_wood","ui_gather_epic","ui_gather_herb","ui_gather_legendary","ui_gather_ore","ui_gather_rare","ui_gather_wood","ui_level_up","ui_loot_item","ui_masterwork","ui_quest_done","ui_ready_check","ui_sheep","ui_vcup_kickoff","ui_weapon_sheathe","ui_weapon_unsheathe","ui_whisper","vanish","wand_arcane","wand_holy","wand_shadow"] as const;
 export const SFX_MOB_EXTENSION_FAMILIES = ["beast","boar","burrower","demon","dragonkin","elemental","humanoid","mudfin","ogre","reptile","spider","troll","undead"] as const;
 export const SFX_MOB_EXTENSION_KEY_SOURCE = "^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt|idle)$";
 export const SFX_RUNTIME_PACK_URL = '/audio/sfx/runtime-pack.json';
@@ -28,7 +28,7 @@ export const SFX_MAX_TRACKS_PER_KEY = 8;
 export const SFX_MAX_TRACK_BYTES = 4194304;
 export const SFX_MAX_TOTAL_AUDIO_BYTES = 134217728;
 export const SFX_MAX_RUNTIME_PACK_BYTES = 524288;
-export const SFX_GAIN_LIMITS = {"amb_birds":1,"amb_campfire":1,"amb_dungeon":1,"amb_forge":1.778279,"amb_rain":1,"amb_snow":1,"amb_water":1,"amb_wind_marsh":1,"amb_wind_peaks":1,"amb_wind_vale":1,"ambush":1.798871,"arcane_blast":1.995262,"backstab":1.819701,"blind":2.018366,"blink":2.041738,"blizzard":1.949845,"buff_apply":2.483133,"cast_arcane":1,"cast_chain_heal":1.678804,"cast_fire":1,"cast_frost":1,"cast_holy":1,"cast_lightning_bolt":1.778279,"cast_nature":1,"cast_shadow":1,"cheap_shot":1.840772,"cloak_of_shadows":2.041738,"combat_block":1.717908,"combat_crit":3.273407,"combat_dodge":1.840772,"combat_parry":1.819701,"debuff_apply":2.018366,"entangling_roots":1.883649,"eviscerate":1.798871,"fear":2.238721,"fear_shout":2.06538,"flamestrike":2.041738,"foot_dirt":1.819701,"foot_grass":1.798871,"foot_snow":1.819701,"foot_stone":1.819701,"foot_water":1.819701,"foot_wood":1.819701,"frost_nova":2.041738,"frozen_orb":2.018366,"garrote":1.862087,"glacial_spike":1.972423,"hammer_of_justice":2.06538,"heal_impact":2.018366,"ice_block":2.06538,"impact_arcane":2.06538,"impact_bone":2.018366,"impact_fire":2.041738,"impact_flesh":1.995262,"impact_frost":1.949845,"impact_holy":2.113489,"impact_leather":2.06538,"impact_metal":1.927525,"impact_nature":2.06538,"impact_shadow":2.018366,"lockpick_advanced_1":1.698244,"lockpick_advanced_2":1.717908,"lockpick_advanced_3":1.678804,"lockpick_advanced_4":1.717908,"lockpick_begin":1.798871,"lockpick_bind":1.698244,"lockpick_bonus":1.698244,"lockpick_end":1.778279,"lockpick_fail":1.678804,"lockpick_page_cleared":1.778279,"lockpick_retry":1.757924,"lockpick_slip":1.698244,"lockpick_success":1.757924,"lockpick_trap":1.737801,"melee_bow":1.819701,"melee_swing_blade":1.819701,"melee_swing_heavy":1.819701,"melee_swing_light":1.798871,"melee_unarmed":1.819701,"mob_beast_aggro":1.840772,"mob_beast_attack":1.840772,"mob_beast_death":2.06538,"mob_beast_hurt":1.840772,"mob_beast_idle":2.985383,"mob_beast_wolf_aggro":1,"mob_beast_wolf_attack":1,"mob_beast_wolf_death":1,"mob_beast_wolf_hurt":1,"mob_beast_wolf_idle":1,"mob_boar_aggro":1.905461,"mob_boar_attack":1.840772,"mob_boar_death":2.041738,"mob_boar_hurt":2.137962,"mob_boar_idle":1.819701,"mob_burrower_aggro":1.819701,"mob_burrower_attack":1.819701,"mob_burrower_death":1.840772,"mob_burrower_hurt":1.819701,"mob_burrower_idle":1.840772,"mob_demon_aggro":2.317395,"mob_demon_attack":2.317395,"mob_demon_death":2.317395,"mob_demon_hurt":2.317395,"mob_demon_idle":2.041738,"mob_dragonkin_aggro":2.041738,"mob_dragonkin_attack":1.819701,"mob_dragonkin_death":2.041738,"mob_dragonkin_hurt":2.041738,"mob_dragonkin_idle":2.290868,"mob_elemental_aggro":1.819701,"mob_elemental_attack":1.840772,"mob_elemental_death":2.041738,"mob_elemental_hurt":2.041738,"mob_elemental_idle":1.840772,"mob_humanoid_aggro":1.883649,"mob_humanoid_attack":1.972423,"mob_humanoid_death":2.041738,"mob_humanoid_hurt":2.041738,"mob_humanoid_idle":1.819701,"mob_mudfin_aggro":1.840772,"mob_mudfin_attack":1.819701,"mob_mudfin_death":1.819701,"mob_mudfin_hurt":1.840772,"mob_mudfin_idle":1.819701,"mob_ogre_aggro":1.883649,"mob_ogre_attack":1.819701,"mob_ogre_death":2.06538,"mob_ogre_hurt":2.238721,"mob_ogre_idle":1.840772,"mob_reptile_aggro":1.717908,"mob_reptile_attack":1.819701,"mob_reptile_death":2.041738,"mob_reptile_hurt":1.905461,"mob_reptile_idle":2.60016,"mob_spider_aggro":1.819701,"mob_spider_attack":1.819701,"mob_spider_death":1.819701,"mob_spider_hurt":1.840772,"mob_spider_idle":2.317395,"mob_troll_aggro":1.819701,"mob_troll_attack":1.840772,"mob_troll_death":2.041738,"mob_troll_hurt":2.041738,"mob_troll_idle":2.290868,"mob_undead_aggro":1.698244,"mob_undead_attack":1.840772,"mob_undead_death":2.041738,"mob_undead_hurt":2.187762,"mob_undead_idle":2.187762,"mob_undead_skeleton_aggro":1,"mob_undead_skeleton_attack":1,"mob_undead_skeleton_death":1,"mob_undead_skeleton_hurt":1,"mob_undead_skeleton_idle":1,"mount_run_aether_hover_cycle":1.819701,"mount_run_drakemaw_raptor":1.819701,"mount_run_grag_bear":1.840772,"mount_run_shadowjump_toad":1.840772,"mount_run_stalkglider_snail":1.840772,"mount_run_stormfeather_griffin":1.819701,"mount_run_terrorspark_groundshaker":1.840772,"mount_run_thunderstrut_gobbler":1.819701,"mount_run_valorsteed":1.819701,"move_jump":1.698244,"move_land":1.717908,"move_splash":1.995262,"move_swim":2.018366,"player_death":2.06538,"player_drink_potion":2.851018,"player_drink_water":2.06538,"player_eat_food":2.06538,"player_hurt":1.819701,"proj_arcane":2.018366,"proj_fire":2.041738,"proj_frost":1.972423,"proj_holy":1.905461,"proj_nature":2.018366,"proj_shadow":1.949845,"pyroblast":2.041738,"quest_accept":2.238721,"quest_complete":2.06538,"quest_ready":4.570882,"sap":1.927525,"scorch":1.840772,"shadowstep":1.840772,"sinister_strike":2.660725,"spell_nova":2.113489,"stealth":2.162719,"temporal_clock":1.757924,"ui_achievement":1.757924,"ui_arena_loss":2.344229,"ui_bag_close":1.798871,"ui_bag_open":1.778279,"ui_card_play":1.778279,"ui_card_reveal":1.737801,"ui_card_round_push":1.778279,"ui_card_shuffle":1.778279,"ui_click":1.778279,"ui_coin":1.927525,"ui_cosmetic_unlock":1.949845,"ui_craft_alchemy":1.778279,"ui_craft_armorcrafting":1.778279,"ui_craft_cast":1,"ui_craft_cooking":1.798871,"ui_craft_disenchant":2.089296,"ui_craft_enchanting":1.757924,"ui_craft_engineering":1.757924,"ui_craft_inscription":1.778279,"ui_craft_jewelcrafting":1.778279,"ui_craft_leatherworking":1.778279,"ui_craft_salvage":1.819701,"ui_craft_tailoring":1.757924,"ui_craft_weaponcrafting":1.778279,"ui_death":1,"ui_duel_challenge":1.840772,"ui_duel_countdown":1.778279,"ui_duel_end":1.717908,"ui_duel_start":1.717908,"ui_error":1.778279,"ui_fiesta_augment":1,"ui_fiesta_down":1,"ui_fiesta_revive":1,"ui_fiesta_score_mine":1,"ui_fiesta_score_other":1,"ui_fiesta_wave":1,"ui_fiesta_word_0":1,"ui_fiesta_word_1":1,"ui_fiesta_word_2":1,"ui_fiesta_word_3":1,"ui_fish_bite":1.819701,"ui_fish_cast":1.840772,"ui_fish_reel":1.840772,"ui_gather_cast":1,"ui_gather_cast_herb":1.840772,"ui_gather_cast_ore":1.819701,"ui_gather_cast_wood":1.819701,"ui_gather_epic":2.660725,"ui_gather_herb":1.905461,"ui_gather_legendary":2.041738,"ui_gather_ore":1.819701,"ui_gather_rare":1.883649,"ui_gather_wood":1.840772,"ui_level_up":1.798871,"ui_loot_item":1.778279,"ui_masterwork":1.737801,"ui_quest_done":1,"ui_ready_check":1.717908,"ui_sheep":1.798871,"ui_vcup_kickoff":1,"ui_weapon_sheathe":1.778279,"ui_weapon_unsheathe":1.798871,"ui_whisper":1.717908,"vanish":2.06538,"wand_arcane":2.398833,"wand_holy":2.851018,"wand_shadow":2.187762} as const satisfies Record<string, number>;
+export const SFX_GAIN_LIMITS = {"amb_birds":1,"amb_campfire":1,"amb_dungeon":1,"amb_forge":1.778279,"amb_rain":1,"amb_snow":1,"amb_water":1,"amb_wind_marsh":1,"amb_wind_peaks":1,"amb_wind_vale":1,"ambush":1.798871,"arcane_blast":1.995262,"backstab":1.819701,"battle_shout":2.041738,"blind":2.018366,"blink":2.041738,"blizzard":1.949845,"buff_apply":2.483133,"cast_arcane":1,"cast_chain_heal":1.678804,"cast_fire":1,"cast_frost":1,"cast_holy":1,"cast_lightning_bolt":1.778279,"cast_nature":1,"cast_shadow":1,"cheap_shot":1.840772,"cloak_of_shadows":2.041738,"combat_block":1.717908,"combat_crit":3.273407,"combat_dodge":1.840772,"combat_parry":1.819701,"debuff_apply":2.018366,"defiant_bellow":1.819701,"demoralizing_shout":1.819701,"emboldening_roar":2.041738,"entangling_roots":1.883649,"eviscerate":1.798871,"fear":2.238721,"fear_shout":2.06538,"flamestrike":2.041738,"foot_dirt":1.819701,"foot_grass":1.798871,"foot_snow":1.819701,"foot_stone":1.819701,"foot_water":1.819701,"foot_wood":1.819701,"frost_nova":2.041738,"frozen_orb":2.018366,"garrote":1.862087,"glacial_spike":1.972423,"hammer_of_justice":2.06538,"heal_impact":2.018366,"ice_block":2.06538,"impact_arcane":2.06538,"impact_bone":2.018366,"impact_fire":2.041738,"impact_flesh":1.995262,"impact_frost":1.949845,"impact_holy":2.113489,"impact_leather":2.06538,"impact_metal":1.927525,"impact_nature":2.06538,"impact_shadow":2.018366,"intimidating_shout":2.041738,"lockpick_advanced_1":1.698244,"lockpick_advanced_2":1.717908,"lockpick_advanced_3":1.678804,"lockpick_advanced_4":1.717908,"lockpick_begin":1.798871,"lockpick_bind":1.698244,"lockpick_bonus":1.698244,"lockpick_end":1.778279,"lockpick_fail":1.678804,"lockpick_page_cleared":1.778279,"lockpick_retry":1.757924,"lockpick_slip":1.698244,"lockpick_success":1.757924,"lockpick_trap":1.737801,"melee_bow":1.819701,"melee_swing_blade":1.819701,"melee_swing_heavy":1.819701,"melee_swing_light":1.798871,"melee_unarmed":1.819701,"meteor":2.041738,"mob_beast_aggro":1.840772,"mob_beast_attack":1.840772,"mob_beast_death":2.06538,"mob_beast_hurt":1.840772,"mob_beast_idle":2.985383,"mob_beast_wolf_aggro":1,"mob_beast_wolf_attack":1,"mob_beast_wolf_death":1,"mob_beast_wolf_hurt":1,"mob_beast_wolf_idle":1,"mob_boar_aggro":1.905461,"mob_boar_attack":1.840772,"mob_boar_death":2.041738,"mob_boar_hurt":2.137962,"mob_boar_idle":1.819701,"mob_burrower_aggro":1.819701,"mob_burrower_attack":1.819701,"mob_burrower_death":1.840772,"mob_burrower_hurt":1.819701,"mob_burrower_idle":1.840772,"mob_demon_aggro":2.317395,"mob_demon_attack":2.317395,"mob_demon_death":2.317395,"mob_demon_hurt":2.317395,"mob_demon_idle":2.041738,"mob_dragonkin_aggro":2.041738,"mob_dragonkin_attack":1.819701,"mob_dragonkin_death":2.041738,"mob_dragonkin_hurt":2.041738,"mob_dragonkin_idle":2.290868,"mob_elemental_aggro":1.819701,"mob_elemental_attack":1.840772,"mob_elemental_death":2.041738,"mob_elemental_hurt":2.041738,"mob_elemental_idle":1.840772,"mob_humanoid_aggro":1.883649,"mob_humanoid_attack":1.972423,"mob_humanoid_death":2.041738,"mob_humanoid_hurt":2.041738,"mob_humanoid_idle":1.819701,"mob_mudfin_aggro":1.840772,"mob_mudfin_attack":1.819701,"mob_mudfin_death":1.819701,"mob_mudfin_hurt":1.840772,"mob_mudfin_idle":1.819701,"mob_ogre_aggro":1.883649,"mob_ogre_attack":1.819701,"mob_ogre_death":2.06538,"mob_ogre_hurt":2.238721,"mob_ogre_idle":1.840772,"mob_reptile_aggro":1.717908,"mob_reptile_attack":1.819701,"mob_reptile_death":2.041738,"mob_reptile_hurt":1.905461,"mob_reptile_idle":2.60016,"mob_spider_aggro":1.819701,"mob_spider_attack":1.819701,"mob_spider_death":1.819701,"mob_spider_hurt":1.840772,"mob_spider_idle":2.317395,"mob_troll_aggro":1.819701,"mob_troll_attack":1.840772,"mob_troll_death":2.041738,"mob_troll_hurt":2.041738,"mob_troll_idle":2.290868,"mob_undead_aggro":1.698244,"mob_undead_attack":1.840772,"mob_undead_death":2.041738,"mob_undead_hurt":2.187762,"mob_undead_idle":2.187762,"mob_undead_skeleton_aggro":1,"mob_undead_skeleton_attack":1,"mob_undead_skeleton_death":1,"mob_undead_skeleton_hurt":1,"mob_undead_skeleton_idle":1,"mount_run_aether_hover_cycle":1.819701,"mount_run_drakemaw_raptor":1.819701,"mount_run_grag_bear":1.840772,"mount_run_shadowjump_toad":1.840772,"mount_run_stalkglider_snail":1.840772,"mount_run_stormfeather_griffin":1.819701,"mount_run_terrorspark_groundshaker":2.041738,"mount_run_terrorspark_groundshaker_start":1.840772,"mount_run_terrorspark_groundshaker_stop":1.840772,"mount_run_thunderstrut_gobbler":1.819701,"mount_run_valorsteed":1.819701,"move_jump":1.698244,"move_land":1.717908,"move_splash":1.995262,"move_swim":2.018366,"player_death":2.06538,"player_drink_potion":2.851018,"player_drink_water":2.06538,"player_eat_food":2.06538,"player_hurt":1.819701,"proj_arcane":2.018366,"proj_fire":2.041738,"proj_frost":1.972423,"proj_holy":1.905461,"proj_nature":2.018366,"proj_shadow":1.949845,"pyroblast":2.041738,"quest_accept":2.238721,"quest_complete":2.06538,"quest_ready":4.570882,"rallying_cry":1.840772,"rift_boulder_impact":1.778279,"rift_boulder_roll":1.698244,"rift_gate_grind":2.041738,"rift_ice_glide":2.041738,"rift_ice_start":1.819701,"rift_ice_stop":1.840772,"rift_lava_tick":2.42661,"rift_portal_drone":8.317638,"rift_portal_enter":2.660725,"rift_portal_spawn":3.935501,"sap":1.927525,"scorch":1.840772,"shadowstep":1.840772,"sinister_strike":2.660725,"spell_nova":2.113489,"stealth":2.162719,"temporal_clock":1.757924,"ui_achievement":1.757924,"ui_arena_loss":2.344229,"ui_bag_close":1.798871,"ui_bag_open":1.778279,"ui_card_play":1.778279,"ui_card_reveal":1.737801,"ui_card_round_push":1.778279,"ui_card_shuffle":1.778279,"ui_click":1.778279,"ui_coin":1.927525,"ui_cosmetic_unlock":1.949845,"ui_craft_alchemy":1.778279,"ui_craft_armorcrafting":1.778279,"ui_craft_cast":1,"ui_craft_cooking":1.798871,"ui_craft_disenchant":2.089296,"ui_craft_enchanting":1.757924,"ui_craft_engineering":1.757924,"ui_craft_inscription":1.778279,"ui_craft_jewelcrafting":1.778279,"ui_craft_leatherworking":1.778279,"ui_craft_salvage":1.819701,"ui_craft_tailoring":1.757924,"ui_craft_weaponcrafting":1.778279,"ui_death":1,"ui_duel_challenge":1.840772,"ui_duel_countdown":1.778279,"ui_duel_end":1.717908,"ui_duel_start":1.717908,"ui_error":1.778279,"ui_fiesta_augment":1,"ui_fiesta_down":1,"ui_fiesta_revive":1,"ui_fiesta_score_mine":1,"ui_fiesta_score_other":1,"ui_fiesta_wave":1,"ui_fiesta_word_0":1,"ui_fiesta_word_1":1,"ui_fiesta_word_2":1,"ui_fiesta_word_3":1,"ui_fish_bite":1.819701,"ui_fish_cast":1.840772,"ui_fish_reel":1.840772,"ui_gather_cast":1,"ui_gather_cast_herb":1.840772,"ui_gather_cast_ore":1.819701,"ui_gather_cast_wood":1.819701,"ui_gather_epic":2.660725,"ui_gather_herb":1.905461,"ui_gather_legendary":2.041738,"ui_gather_ore":1.819701,"ui_gather_rare":1.883649,"ui_gather_wood":1.840772,"ui_level_up":1.798871,"ui_loot_item":1.778279,"ui_masterwork":1.737801,"ui_quest_done":1,"ui_ready_check":1.717908,"ui_sheep":1.798871,"ui_vcup_kickoff":1,"ui_weapon_sheathe":1.778279,"ui_weapon_unsheathe":1.798871,"ui_whisper":1.717908,"vanish":2.06538,"wand_arcane":2.398833,"wand_holy":2.851018,"wand_shadow":2.187762} as const satisfies Record<string, number>;
 export const SFX_CLIPS =
 {
   "amb_birds": {
@@ -275,6 +275,25 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/backstab.mp3?v=65fa47a9f8b3",
         "bytes": 13835,
         "sha256": "65fa47a9f8b3fba703085eb4541e5f42c00803192daf8eec65dc9fc252a599ca"
+      }
+    ]
+  },
+  "battle_shout": {
+    "url": "/audio/sfx/battle_shout.mp3?v=9b2f045520dd",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.041738,
+    "playbackRate": 1,
+    "bytes": 25747,
+    "hash": "9b2f045520dd",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/battle_shout.mp3?v=9b2f045520dd",
+        "bytes": 25747,
+        "sha256": "9b2f045520dd32b74e062572bd2d1ee3462109dfab62620bf00b05714db8696e"
       }
     ]
   },
@@ -687,6 +706,63 @@ export const SFX_CLIPS =
       }
     ]
   },
+  "defiant_bellow": {
+    "url": "/audio/sfx/defiant_bellow.mp3?v=83d7fd434600",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.819701,
+    "playbackRate": 1,
+    "bytes": 20732,
+    "hash": "83d7fd434600",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/defiant_bellow.mp3?v=83d7fd434600",
+        "bytes": 20732,
+        "sha256": "83d7fd43460042ec5fc86b2b9c082c568cb17ff7dc694e6be467f8fba9aa6402"
+      }
+    ]
+  },
+  "demoralizing_shout": {
+    "url": "/audio/sfx/demoralizing_shout.mp3?v=c95247f56488",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.819701,
+    "playbackRate": 1,
+    "bytes": 19478,
+    "hash": "c95247f56488",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/demoralizing_shout.mp3?v=c95247f56488",
+        "bytes": 19478,
+        "sha256": "c95247f5648823b24eca4db5b715fa14eb630ddd0212b6d9a62e50996e0a995e"
+      }
+    ]
+  },
+  "emboldening_roar": {
+    "url": "/audio/sfx/emboldening_roar.mp3?v=0a77c601779e",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.041738,
+    "playbackRate": 1,
+    "bytes": 27628,
+    "hash": "0a77c601779e",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/emboldening_roar.mp3?v=0a77c601779e",
+        "bytes": 27628,
+        "sha256": "0a77c601779e7ec0ff4553b7a16eb8a1d19e265eb9f169e9876de1e27c0633e2"
+      }
+    ]
+  },
   "entangling_roots": {
     "url": "/audio/sfx/entangling_roots.mp3?v=111433444b16",
     "loop": false,
@@ -764,21 +840,21 @@ export const SFX_CLIPS =
     ]
   },
   "flamestrike": {
-    "url": "/audio/sfx/flamestrike.mp3?v=d57a0627c1bf",
+    "url": "/audio/sfx/flamestrike.mp3?v=bd4257d3567b",
     "loop": false,
     "category": "other",
     "preload": "lazy",
     "spatial": true,
     "gain": 2.041738,
     "playbackRate": 1,
-    "bytes": 60229,
-    "hash": "d57a0627c1bf",
+    "bytes": 49571,
+    "hash": "bd4257d3567b",
     "variants": [
       {
         "id": "main",
-        "url": "/audio/sfx/flamestrike.mp3?v=d57a0627c1bf",
-        "bytes": 60229,
-        "sha256": "d57a0627c1bfe6daacd67706c2359347af522be0c89ba13466dcb58d94b77416"
+        "url": "/audio/sfx/flamestrike.mp3?v=bd4257d3567b",
+        "bytes": 49571,
+        "sha256": "bd4257d3567b43f5228066cba5f1dff5c31b205c9314bfb4c7f0d6cbfebcdf15"
       }
     ]
   },
@@ -1435,6 +1511,25 @@ export const SFX_CLIPS =
       }
     ]
   },
+  "intimidating_shout": {
+    "url": "/audio/sfx/intimidating_shout.mp3?v=02a6acedbbdd",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.041738,
+    "playbackRate": 1,
+    "bytes": 28882,
+    "hash": "02a6acedbbdd",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/intimidating_shout.mp3?v=02a6acedbbdd",
+        "bytes": 28882,
+        "sha256": "02a6acedbbdd73ac83889144576b52dd97c9e936f954b0b191860998425d4adb"
+      }
+    ]
+  },
   "lockpick_advanced_1": {
     "url": "/audio/sfx/lockpick_advanced_1.mp3?v=c435a3561b4b",
     "loop": false,
@@ -1961,6 +2056,25 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/melee_unarmed_7.mp3?v=093248a09f9d",
         "bytes": 11328,
         "sha256": "093248a09f9dbb06b8fa0aa7d94901bb598166bb0b488a172ca3cb5b2bf794fc"
+      }
+    ]
+  },
+  "meteor": {
+    "url": "/audio/sfx/meteor.mp3?v=d57a0627c1bf",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.041738,
+    "playbackRate": 1,
+    "bytes": 60229,
+    "hash": "d57a0627c1bf",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/meteor.mp3?v=d57a0627c1bf",
+        "bytes": 60229,
+        "sha256": "d57a0627c1bfe6daacd67706c2359347af522be0c89ba13466dcb58d94b77416"
       }
     ]
   },
@@ -4002,21 +4116,59 @@ export const SFX_CLIPS =
     ]
   },
   "mount_run_terrorspark_groundshaker": {
-    "url": "/audio/sfx/mount_run_terrorspark_groundshaker.mp3?v=7508c4a5ad92",
+    "url": "/audio/sfx/mount_run_terrorspark_groundshaker.mp3?v=0a736f1befdb",
+    "loop": true,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.041738,
+    "playbackRate": 1,
+    "bytes": 167435,
+    "hash": "0a736f1befdb",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_run_terrorspark_groundshaker.mp3?v=0a736f1befdb",
+        "bytes": 167435,
+        "sha256": "0a736f1befdb490135fd93ffff0bb9593c59b96308bc4e974a0e1e3e5668ed09"
+      }
+    ]
+  },
+  "mount_run_terrorspark_groundshaker_start": {
+    "url": "/audio/sfx/mount_run_terrorspark_groundshaker_start.mp3?v=475c5288cbe9",
     "loop": false,
     "category": "other",
     "preload": "lazy",
     "spatial": true,
-    "gain": 1,
+    "gain": 1.840772,
     "playbackRate": 1,
-    "bytes": 15716,
-    "hash": "7508c4a5ad92",
+    "bytes": 21985,
+    "hash": "475c5288cbe9",
     "variants": [
       {
         "id": "main",
-        "url": "/audio/sfx/mount_run_terrorspark_groundshaker.mp3?v=7508c4a5ad92",
-        "bytes": 15716,
-        "sha256": "7508c4a5ad925cbf152c3143b23215c1e1a653ea0f30b9b9d7a89044d9849b06"
+        "url": "/audio/sfx/mount_run_terrorspark_groundshaker_start.mp3?v=475c5288cbe9",
+        "bytes": 21985,
+        "sha256": "475c5288cbe9b2968876bd88102b358288bfb75bf74609bec2cee3a37d698db4"
+      }
+    ]
+  },
+  "mount_run_terrorspark_groundshaker_stop": {
+    "url": "/audio/sfx/mount_run_terrorspark_groundshaker_stop.mp3?v=35c7dc124cf4",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.840772,
+    "playbackRate": 1,
+    "bytes": 18224,
+    "hash": "35c7dc124cf4",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_run_terrorspark_groundshaker_stop.mp3?v=35c7dc124cf4",
+        "bytes": 18224,
+        "sha256": "35c7dc124cf494ae69f19f65cd2a9e5019a6e8251d0ca18d27f25767f9eb04c5"
       }
     ]
   },
@@ -4530,6 +4682,215 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/quest_ready_1.mp3?v=e6573acbb5cf",
         "bytes": 46436,
         "sha256": "e6573acbb5cf939de1e5f038c7109dca9ce5f4e4d5eb906008288194555d8f20"
+      }
+    ]
+  },
+  "rallying_cry": {
+    "url": "/audio/sfx/rallying_cry.mp3?v=080a3ef53486",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.840772,
+    "playbackRate": 1,
+    "bytes": 24493,
+    "hash": "080a3ef53486",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rallying_cry.mp3?v=080a3ef53486",
+        "bytes": 24493,
+        "sha256": "080a3ef5348688828a51f1569db18f1aceabc27c923551a8cb1f76b3cf453582"
+      }
+    ]
+  },
+  "rift_boulder_impact": {
+    "url": "/audio/sfx/rift_boulder_impact.mp3?v=64b1dd3e337b",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.778279,
+    "playbackRate": 1,
+    "bytes": 16343,
+    "hash": "64b1dd3e337b",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rift_boulder_impact.mp3?v=64b1dd3e337b",
+        "bytes": 16343,
+        "sha256": "64b1dd3e337b62387ad7e5b023307bf0b91941cf8d96f5cb0be369b57b64d374"
+      }
+    ]
+  },
+  "rift_boulder_roll": {
+    "url": "/audio/sfx/rift_boulder_roll.mp3?v=a7b2d2fc337e",
+    "loop": true,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.698244,
+    "playbackRate": 1,
+    "bytes": 241414,
+    "hash": "a7b2d2fc337e",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rift_boulder_roll.mp3?v=a7b2d2fc337e",
+        "bytes": 241414,
+        "sha256": "a7b2d2fc337e666468ca4d225e2abf5cafa342d37ea3e0808eb8a6e4f9a2c765"
+      }
+    ]
+  },
+  "rift_gate_grind": {
+    "url": "/audio/sfx/rift_gate_grind.mp3?v=6a36868e3eca",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.041738,
+    "playbackRate": 1,
+    "bytes": 43301,
+    "hash": "6a36868e3eca",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rift_gate_grind.mp3?v=6a36868e3eca",
+        "bytes": 43301,
+        "sha256": "6a36868e3eca24d39ba708d254d45edd27139e49e160a11198038e0ef4f3a22c"
+      }
+    ]
+  },
+  "rift_ice_glide": {
+    "url": "/audio/sfx/rift_ice_glide.mp3?v=4a4c99640deb",
+    "loop": true,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.041738,
+    "playbackRate": 1,
+    "bytes": 145492,
+    "hash": "4a4c99640deb",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rift_ice_glide.mp3?v=4a4c99640deb",
+        "bytes": 145492,
+        "sha256": "4a4c99640deb2447054e870691ca11b0d2bb7999a08f1b78180d1272c079d42b"
+      }
+    ]
+  },
+  "rift_ice_start": {
+    "url": "/audio/sfx/rift_ice_start.mp3?v=3e5fce7f7458",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.819701,
+    "playbackRate": 1,
+    "bytes": 19478,
+    "hash": "3e5fce7f7458",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rift_ice_start.mp3?v=3e5fce7f7458",
+        "bytes": 19478,
+        "sha256": "3e5fce7f74589e555492853c4024342495687fef65412908d3447d4891e6c5e1"
+      }
+    ]
+  },
+  "rift_ice_stop": {
+    "url": "/audio/sfx/rift_ice_stop.mp3?v=04ae7317e561",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.840772,
+    "playbackRate": 1,
+    "bytes": 23866,
+    "hash": "04ae7317e561",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rift_ice_stop.mp3?v=04ae7317e561",
+        "bytes": 23866,
+        "sha256": "04ae7317e561d24f80e0b6b54d3a3ddff4a209354ff63db263229692466e1e5c"
+      }
+    ]
+  },
+  "rift_lava_tick": {
+    "url": "/audio/sfx/rift_lava_tick.mp3?v=4ce302e4ad0c",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.42661,
+    "playbackRate": 1,
+    "bytes": 29509,
+    "hash": "4ce302e4ad0c",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rift_lava_tick.mp3?v=4ce302e4ad0c",
+        "bytes": 29509,
+        "sha256": "4ce302e4ad0c6e6cbd2935697e699beb177554541c9f1c4895cd7749ae715ca5"
+      }
+    ]
+  },
+  "rift_portal_drone": {
+    "url": "/audio/sfx/rift_portal_drone.mp3?v=6dd24da97ebf",
+    "loop": true,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 8.317638,
+    "playbackRate": 1,
+    "bytes": 151762,
+    "hash": "6dd24da97ebf",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rift_portal_drone.mp3?v=6dd24da97ebf",
+        "bytes": 151762,
+        "sha256": "6dd24da97ebffde407638f54c00fe1085e24fe715a81eb6b00ca7e85c96d18e9"
+      }
+    ]
+  },
+  "rift_portal_enter": {
+    "url": "/audio/sfx/rift_portal_enter.mp3?v=12ba8db620a7",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.660725,
+    "playbackRate": 1,
+    "bytes": 28882,
+    "hash": "12ba8db620a7",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rift_portal_enter.mp3?v=12ba8db620a7",
+        "bytes": 28882,
+        "sha256": "12ba8db620a70f16ecc702f20efee1c9ad9e5e2459140faa55632dfe6bd3e7eb"
+      }
+    ]
+  },
+  "rift_portal_spawn": {
+    "url": "/audio/sfx/rift_portal_spawn.mp3?v=4d8687575c96",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 3.935501,
+    "playbackRate": 1,
+    "bytes": 85306,
+    "hash": "4d8687575c96",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/rift_portal_spawn.mp3?v=4d8687575c96",
+        "bytes": 85306,
+        "sha256": "4d8687575c9654794ea017dfcc421f217bb19b215f488a37db338cb64cca4ac7"
       }
     ]
   },

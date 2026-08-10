@@ -114,6 +114,10 @@ describe('weapon type classification', () => {
   it('stays in lockstep with the render variant family for mapped items', () => {
     const familyOf = (variant: string): string | null => {
       if (/^(adv_)?sword/.test(variant)) return 'sword';
+      // The bespoke dagger skins carry thematic names; assets.ts tags each of
+      // these variants VAR_DAGGER, which is the render-side family authority.
+      if (/^(ice_fang|redskull_dagger|purple_dagger|whittler_s_knife)$/.test(variant))
+        return 'dagger';
       if (/^(adv_)?dagger/.test(variant)) return 'dagger';
       if (/^(adv_)?(druid_)?staff|^adv_druid_staff/.test(variant)) return 'staff';
       if (/^hammer/.test(variant)) return 'mace';
@@ -430,6 +434,21 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // which own the rig outright (the zero-weight rules in this directory).
     expect(fn).toContain('!this.currentIsOneShot');
     expect(fn).toContain('!this.deadLock');
+  });
+
+  it('the full re-attach returns non-mirrored offhand payloads for the compile gate', () => {
+    // A weapon swap or skin change re-attaches BOTH hands, but the
+    // non-mirrored offhand (a shield, a held offhand) used to be dropped from
+    // the returned payload list, so the caller's compile gate never saw it
+    // and its first draw linked synchronously. It must ride the RETURN while
+    // staying out of the skin material/VFX set (pixel-untouched).
+    const src = readFileSync(join(ROOT, 'src/render/characters/visual.ts'), 'utf8');
+    const fn = src.slice(
+      src.indexOf('private reattachHeldWeapon('),
+      src.indexOf('private finishWeaponAttach('),
+    );
+    expect(fn).toContain('this.finishWeaponAttach(payloads)');
+    expect(fn).toContain('return [...payloads, ...offPayloads]');
   });
 
   it('a drawn bow holds its draw while CASTING, instead of the caster gesture', async () => {

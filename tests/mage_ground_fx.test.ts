@@ -83,7 +83,14 @@ describe('Mage meteor visual', () => {
     const scene = new THREE.Scene();
     const landed = vi.fn();
     const fx = new MageGroundFx(scene, () => 3, landed);
-    fx.spawnMeteor({ x: 4, z: 7, radius: 8, duration: 2 });
+    fx.spawnMeteor({
+      x: 4,
+      z: 7,
+      radius: 8,
+      duration: 2,
+      sourceId: 42,
+      ability: 'summon_infernal',
+    });
 
     const root = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
     const boundary = root.getObjectByName('mage-meteor-telegraph-boundary') as THREE.LineLoop;
@@ -117,7 +124,18 @@ describe('Mage meteor visual', () => {
     expect(landed).not.toHaveBeenCalled();
 
     fx.update(0.4);
-    expect(landed).toHaveBeenCalledWith(4, 7);
+    expect(landed).toHaveBeenCalledWith(
+      4,
+      7,
+      expect.objectContaining({
+        x: 4,
+        z: 7,
+        radius: 8,
+        duration: 2,
+        sourceId: 42,
+        ability: 'summon_infernal',
+      }),
+    );
     expect(scene.getObjectByName('mage-meteor-fx')).toBe(root);
     expect(material.opacity).toBe(0);
     const impactFireOpacity = (

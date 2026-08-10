@@ -184,6 +184,20 @@ export function attachBiomeHaze(mat: THREE.Material): void {
     `woc-zone-haze:${hasBiomeHazeField() ? 1 : 0}|${prevKey ? prevKey() : prevSrc}`;
 }
 
+/**
+ * Re-attach the zone-haze layer to a Material.clone() of a hazed source.
+ * clone() copies userData, so the wocZoneHaze marker arrives TRUE on a clone
+ * whose hook was silently dropped, and a bare attachBiomeHaze() no-ops on
+ * that lying flag. Clear it first, then attach, restoring both the visual
+ * layer and the program-cache-key identity with the source. No-op for clones
+ * of un-hazed sources.
+ */
+export function reattachBiomeHazeToClone(source: THREE.Material, clone: THREE.Material): void {
+  if (!(source.userData as { wocZoneHaze?: boolean }).wocZoneHaze) return;
+  (clone.userData as { wocZoneHaze?: boolean }).wocZoneHaze = false;
+  attachBiomeHaze(clone);
+}
+
 /** Fragment-stage declarations. Splice into the fragment `<common>` patch. */
 export const BIOME_HAZE_DECLARATIONS = `
 uniform sampler2D uHazeField;

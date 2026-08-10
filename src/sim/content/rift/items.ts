@@ -21,6 +21,7 @@ export const RIFT_EPIC_ITEM_IDS = [
   'stormsunder_hood',
   'voidweave_mantle',
   'abysswrought_band',
+  'rimefang',
 ] as const;
 /** The S-rank chase items. Each rolls its OWN independent chance in
  *  addRiftClearGearLoot rather than being picked from this pool, so a clear that
@@ -66,6 +67,38 @@ const RIFT_JEWELRY_RATING = 25; // 25 rating, matches heroic quartermaster jewel
 /** Static shells. The non-fungible payload carries each drop's source, power,
  * upgrades, enchantment, sockets, gems, and rolled bonus stats. */
 export const RIFT_ITEMS: Record<string, ItemDef> = {
+  // Rogue dagger (Rift epic, B+ clear). A frost-bolt on-hit gives the fast
+  // dagger a proc that actually helps a DPS rogue: an attack-speed chill would
+  // not (it slows the target's swing, useless to a rogue; A/B-confirmed).
+  rimefang: {
+    id: 'rimefang',
+    name: 'Rimefang',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    weapon: { min: 19, max: 31, speed: 1.6, dagger: true },
+    // ilvl-31 mainhand budget (22), on the same ~12:7 agi:sta identity the
+    // dungeon daggers carry.
+    stats: { agi: 14, sta: 8 },
+    // The clear-time allowance (one rating per ilvl-31 piece, see the constants
+    // above): an agility dagger takes crit per the agi-to-crit pattern the
+    // rating ladder pins, at the same 40-rating floor the armor pieces mirror.
+    critRating: RIFT_ARMOR_RATING,
+    sellValue: 9000,
+    requiredClass: ['rogue', 'hunter'],
+    requiredLevel: 20,
+    weaponProcs: [
+      {
+        id: 'rimefang_frostbite',
+        name: 'Frostbite',
+        trigger: 'weaponHit',
+        chance: 0.08,
+        effects: [
+          { kind: 'chainArc', school: 'frost', damage: 20, jumps: 0, falloff: 0.6, radius: 8 },
+        ],
+      },
+    ],
+  },
   rift_essence: {
     id: 'rift_essence',
     name: 'Rift Essence',

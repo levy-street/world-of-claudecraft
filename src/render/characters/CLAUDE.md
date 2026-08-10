@@ -216,10 +216,31 @@ per part.
   or its plate silently stops responding to skins.
 - A look change is a GEOMETRY change: callers rebuild the visual (as
   `CharacterPreview.setVisualKey` does) rather than mutating one in place.
-- **Only the local player composes.** The appearance is presentation state with
-  no wire format, so `setModularLookProvider` claims that one entity and every
-  other warrior keeps the fixed `player_warrior` rig. The far-LOD bake in
-  `prepareVisual` likewise measures `DEFAULT_LOOK`, not the entity's.
+- **Every player composes.** The look rides the `app` identity wire field (the
+  character's own DB column, stamped at join), so `setModularLookProvider`
+  claims every player entity and composes peers from server truth; a character
+  with no authored look still keeps the fixed `player_<class>` rig. Three
+  consequences the code used to assume away:
+  - The unmerged morph parts (head, eyes, ears, lashes, brows, body regions) are
+    now a per-CROWD draw cost, not a one-character one. The far LOD is what
+    bounds it, and the band pulls in as the crowd grows (`crowd_lod.ts`).
+  - `prepareVisual`'s far bake measures `DEFAULT_LOOK`, so it is wrong for a
+    composed body. Composed bodies bake their own (`modularFarBake`), keyed by
+    part set and minted on the first crossing into the far band; the colours are
+    resolved per character from their own materials. Face/body sliders are not
+    in that silhouette, deliberately.
+    The bake hands back geometry GROUPS and each character resolves group N
+    against its own captured `userData.farMaterials[N]`, so the two walks have to
+    be one list: both go through `composedFarMeshes`, which drops held props for
+    the reason the key gives (a part set says nothing about what anyone is
+    holding, and a prop lands mid-traversal, between the unmerged parts and the
+    merged body). The fixed-rig bake keeps its props: it reads its materials back
+    out of the same walk, so it is self-consistent whatever it collects.
+  - `modularVariantCache` is keyed by LOOK, so what mints entries is now the
+    population of a zone. It is refcounted (retained in `assembleModular`,
+    released in `CharacterVisual.dispose`) and evicts idle entries over a cap;
+    an entry a live character is drawn from is never dropped, because clones
+    share its geometry.
 - Part names are the contract; `tests/modular_character.test.ts` gates the tables
   against the shipped GLB, because a renamed node fails SILENTLY (the body just
   loses a limb). Authoring scripts live in `tmp/modular/`; the body's radius
@@ -283,8 +304,11 @@ painted with a generated RGBA map.
   of non-skinned node names to KEEP; omit it for creatures (keeps everything).
 - Bone names are sanitized by GLTFLoader (`handslot.r` to `handslotr`); `attach`
   resolution tries both. A missing bone ships the model without the prop.
-- Geometries/materials are **shared per-asset caches and never disposed**;
-  `dispose()` only releases this clone's mixer + Skeletons. YOU MUST call it on
-  despawn (online interest churn strands GPU bone textures otherwise).
+- Geometries are **shared per-asset caches and never disposed**. Shared tinted
+  materials are claim-counted (`tinted_material_cache_core.ts`): `dispose()`
+  releases this clone's mixer + Skeletons + its tinted-material claims, and the
+  bounded cache disposes a clone only once no visual mounts it. YOU MUST call
+  `dispose()` on despawn (online interest churn strands GPU bone textures and
+  pins tinted materials otherwise).
 - Never `Math.random` in *sim*, but here it's fine, this is presentation
   (bob phase, hit-clip pick). Never reach past `IWorld` into a concrete world.

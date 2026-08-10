@@ -150,7 +150,7 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         category: 'world',
         priority: 50,
         required: true,
-        status: 'completed',
+        status: 'partial',
         elapsedMs: 120,
         remainingMsAfter: 4200,
         passes: 0,
@@ -160,13 +160,17 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         texturesBefore: 40,
         texturesAfter: 52,
         textureDelta: 12,
+        workDone: 12,
+        workPlanned: 20,
         detail: 'uploaded=12',
       },
     ],
     manifestCompleted: 12,
+    manifestPartial: 1,
     manifestSkipped: 0,
     manifestTimedOut: 0,
     manifestFailed: 0,
+    partialEntryIds: ['textures.scene'],
     timedOutEntryIds: [],
     failedEntryIds: [],
     diagnosticsBaseline: null,
@@ -201,6 +205,7 @@ function snapshot(): PerfSnapshot {
     seconds: 80,
     frames: 4800,
     fps: 60,
+    hitchForensics: [],
     frameMs: { avg: 16.6, p50: 16, p95: 19, p99: 28, max: 52, long50: 1 },
     windows: {
       last10s: {
@@ -222,6 +227,21 @@ function snapshot(): PerfSnapshot {
       graphicsConfigVersion: 16,
       tier: 'high',
       qualityBuckets: qualityBuckets(),
+      gpuQueue: {
+        units: 2,
+        totalSyncMs: 18.4,
+        worstSyncMs: 12.1,
+        slowest: [
+          { label: 'live-view-compile', priority: 30, syncMs: 12.1, wallMs: 40.2, atMs: 5000 },
+          { label: 'texture-chunk', priority: 10, syncMs: 6.3, wallMs: 6.3, atMs: 5200 },
+        ],
+        pending: 0,
+        active: null,
+        waitingTails: [],
+        stallCount: 0,
+        stalls: [],
+      },
+      nightAmount: 0,
       autoGovernor: true,
       budget: {
         targetFps: 60,
@@ -393,10 +413,30 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererPrewarmSummary?: { manifestPlanned?: number } })
         .rendererPrewarmSummary?.manifestPlanned,
     ).toBe(14);
+    // The honest partial signal must survive into the report: a deadline or
+    // prefetch-trimmed entry is 'partial' with its counts, never 'completed'.
     expect(
-      (body.rawSummary as { rendererPrewarmSummary?: { entries?: unknown[] } })
-        .rendererPrewarmSummary?.entries,
-    ).toHaveLength(2);
+      (body.rawSummary as { rendererPrewarmSummary?: { manifestPartial?: number } })
+        .rendererPrewarmSummary?.manifestPartial,
+    ).toBe(1);
+    expect(
+      (body.rawSummary as { rendererPrewarmSummary?: { partialEntryIds?: string[] } })
+        .rendererPrewarmSummary?.partialEntryIds,
+    ).toEqual(['textures.scene']);
+    const summaryEntries = (
+      body.rawSummary as {
+        rendererPrewarmSummary?: {
+          entries?: { id?: string; status?: string; workDone?: number; workPlanned?: number }[];
+        };
+      }
+    ).rendererPrewarmSummary?.entries;
+    expect(summaryEntries).toHaveLength(2);
+    expect(summaryEntries?.[1]).toMatchObject({
+      id: 'textures.scene',
+      status: 'partial',
+      workDone: 12,
+      workPlanned: 20,
+    });
     expect(
       (body.rawSummary as { rendererPrewarm?: { manifestEntries?: unknown[] } }).rendererPrewarm
         ?.manifestEntries,
@@ -425,6 +465,66 @@ describe('perf reporter payload', () => {
     expect(
       (body.rawSummary as { browser?: { longTasks?: Record<string, number> } }).browser?.longTasks,
     ).toEqual({ totalMs: 120, avg: 60, max: 80, lastAge: 1000 });
+  });
+
+  it('carries the GPU queue block, active unit included, into raw summary (#3167)', () => {
+    // A settled queue: only completed units, no running one. This is the arm
+    // that used to be the ONLY arm, since a never-settling unit records nothing.
+    const settings = new Settings();
+    const settled = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+    const settledQueue = (settled.rawSummary as { rendererGpuQueue?: Record<string, unknown> })
+      .rendererGpuQueue;
+    expect(settledQueue).toMatchObject({
+      units: 2,
+      totalSyncMs: 18.4,
+      worstSyncMs: 12.1,
+      pending: 0,
+      stallCount: 0,
+      active: null,
+      stalls: [],
+    });
+    expect(settledQueue?.slowest).toEqual([
+      { label: 'live-view-compile', priority: 30, syncMs: 12.1, wallMs: 40.2 },
+      { label: 'texture-chunk', priority: 10, syncMs: 6.3, wallMs: 6.3 },
+    ]);
+
+    const snap = snapshot();
+    snap.renderer!.gpuQueue = {
+      units: 2,
+      totalSyncMs: 18.4,
+      worstSyncMs: 12.1,
+      slowest: [],
+      pending: 7,
+      active: { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000 },
+      waitingTails: [{ label: 'released-gate', priority: 30, ageMs: 5000, atMs: 11_000 }],
+      stallCount: 1,
+      stalls: [
+        { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000, settled: false },
+      ],
+    };
+    const wedged = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+    const wedgedQueue = (wedged.rawSummary as { rendererGpuQueue?: Record<string, unknown> })
+      .rendererGpuQueue;
+    // The wedge is the whole point: units stayed at 2, so only the active unit
+    // and the stall say the queue has been blocked for a minute and a half.
+    expect(wedgedQueue).toMatchObject({
+      units: 2,
+      pending: 7,
+      stallCount: 1,
+      active: { label: 'wedged-compile', priority: 40, ageMs: 91_000 },
+      stalls: [{ label: 'wedged-compile', priority: 40, ageMs: 91_000, settled: false }],
+    });
+    // A released tail rides beside the active unit. Exact equality on purpose:
+    // toMatchObject's subset semantics would pass even if atMs leaked through,
+    // and dropping atMs (page-relative, fleet-meaningless) is the claim.
+    expect((wedgedQueue as { waitingTails?: unknown[] }).waitingTails).toEqual([
+      { label: 'released-gate', priority: 30, ageMs: 5000 },
+    ]);
   });
 
   it('carries the always-on net pipeline and heap sawtooth blocks into raw summary', () => {

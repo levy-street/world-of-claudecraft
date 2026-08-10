@@ -77,6 +77,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     '防御的クールダウン。8秒間、受けるダメージが30%減少し、攻撃を回避する確率が大幅に上昇します。',
   'entities.abilities.die_by_sword.name': '剣に死す',
+  'entities.abilities.intervene.name': '援護',
+  'entities.abilities.intervene.description':
+    '味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。',
   'entities.abilities.emboldening_roar.description':
     '奮い立たせる咆哮を上げ、40yd以内の自分と味方プレイヤーを鼓舞します。次の3回のアビリティが必ずクリティカルになります。（狂怒）',
   'entities.abilities.emboldening_roar.name': '奮起の咆哮',
@@ -159,9 +162,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '戦の太鼓',
   'entities.abilities.chain_lightning.name': '枝分かれの稲妻',
   'entities.abilities.chaos_bolt.name': '破滅の矢',
-  'entities.abilities.cleansing_verdict.name': '浄化の裁定',
-  'entities.abilities.cleansing_verdict.description':
-    '味方1体の有害な魔法効果を解除し、{damage}の体力を回復する。',
   'entities.abilities.cloak_of_shadows.name': '影まとい',
   'entities.abilities.cone_of_cold.name': '霜払い',
   'entities.abilities.curse_of_exhaustion.name': '鉛の呪い',
@@ -169,7 +169,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': '死霜',
   'entities.abilities.desperate_prayer.name': '最後の祈り',
   'entities.abilities.deterrence.name': '針毛の守り',
-  'entities.abilities.divine_shield.name': '光の護り',
   'entities.abilities.earthbind.name': '大地の縛り',
   'entities.abilities.evocation.name': 'エーテルの井戸',
   'entities.abilities.frenzied_regeneration.name': '野生の癒し',
@@ -177,7 +176,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': '亡霊の一撃',
   'entities.abilities.hammer_of_wrath.name': '鐘鳴りの槌',
   'entities.abilities.healing_stream.name': '湧き水',
-  'entities.abilities.holy_wrath.name': '聖者の怒り',
   'entities.abilities.howl_of_terror.name': '恐怖の遠吠え',
   'entities.abilities.ice_block.name': '冷たき棺',
   'entities.abilities.inner_focus.name': '静まる心',
@@ -896,7 +894,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ソーンピークの影が落ちる、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を三度持ち帰った側が戦場を制する。',
   'hudChrome.bg.modeTag': '5v5キャプチャー・ザ・フラッグ',
   'hudChrome.bg.offlineNote': 'ソーンホロウ平原は同期中です。レルムの応答後にキューが開きます。',
-  'hudChrome.bg.ratingSummary': 'レーティング。{wins}勝 / {losses}敗',
+  'hudChrome.bg.ratingSummary': 'レーティング。{wins}勝 / {losses}敗 / {draws}分',
   'hudChrome.bg.careerCaptures': '通算キャプチャー:{count}',
   'hudChrome.bg.enterQueue': 'キューに参加',
   'hudChrome.bg.enterQueueParty': 'キューに参加({count}人パーティ)',
@@ -1222,6 +1220,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.browserSupport.getDesktopApp': 'デスクトップアプリを入手',
   'hudChrome.landing.browserSupport.continueInBrowser': 'ブラウザで続ける',
   'hudChrome.landing.browserSupport.dismissAria': 'サポート対象外ブラウザの通知を閉じる',
+  'hudChrome.talents.newBuildWithGear': '新規ビルド（装備も保存）',
+  'hudChrome.talents.gearNotHeld': 'このビルドが保存した装備{n}点をもう所持していません。',
+  'hudChrome.talents.gearCopyGone': '装備{n}点は、このビルドが指定した個体ではありません。',
+  'hudChrome.talents.gearTakenByOtherSlot': '装備{n}点には、所持していない別の個体が必要です。',
+  'hudChrome.talents.gearRestored': 'このビルドから装備{n}点を復元しました。',
   'hudChrome.talents.defaultBuildName': 'ビルド {n}',
   'hudChrome.tips.joinChannels':
     'ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。',
@@ -1782,6 +1785,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このキャラクターを別のセッションから切断し、こちらに移します。続けますか？',
   'character.renameRequired': '名前変更が必要',
   'character.delete': '削除',
+  'character.redesign': '再デザイン',
+  'character.redesignHint':
+    'このキャラクターは新しいキャラクターエディター以前に作成されました。無料の再デザインが1回できます。保存すると消費されます。',
+  'character.redesignTitle': '{name}を再デザイン',
+  'character.redesignSave': '新しい外見を保存',
+  'character.redesignCancel': '現在の外見を保持',
   'character.rename': '名前変更',
   'character.newNamePlaceholder': '新しいキャラクター名',
   'character.tabCharacters': 'キャラクター',
@@ -2041,6 +2050,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.meters.close': 'メーターを閉じる',
   'hud.chat.rightClickName': '{name}を右クリック',
   'hud.chat.templates.party': '[パーティ] {name}: {message}',
+  'hud.chat.templates.battleground': '[戦場] {name}: {message}',
   'hud.chat.templates.yell': '{name}の叫び: {message}',
   'hud.chat.templates.whisper': '{name}のささやき: {message}',
   'hud.chat.templates.toWhisper': '{name}へ: {message}',
@@ -2132,6 +2142,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapAbility': '死亡しました。{ability}によって死亡しました。',
   'hud.system.deathRecapFalling': '死亡しました。転落死しました。',
   'hud.system.deathRecapDrowned': '死亡しました。溺死しました。',
+  'hud.system.deathRecapCauterized': '死亡しました。焼灼の炎に飲み込まれました。',
   'hud.system.respawn': '再び休まり、完全な状態になりました。',
   'hud.system.ignoringChat': '{name}のチャットを無視します。',
   'hud.system.noLongerIgnoring': '{name}の無視を解除しました。',
@@ -2175,6 +2186,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': '射程外です。',
   'hud.errors.noTarget': '対象がいません。',
   'hud.errors.tooClose': '近すぎます！',
+  'hud.errors.mustTargetAlly': '味方を対象にしてください。',
   'hud.errors.facing': '対象の方を向いている必要があります。',
   'hud.errors.targetHealthBelow': 'その能力は対象の体力が{percent}%未満でなければ使えません。',
   'hud.errors.dagger': '短剣を装備する必要があります。',
@@ -2371,7 +2383,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'オンライン中で最も近いレートの挑戦者と組み合わされ、砂地へ転送されます。勝てば上昇し、先に降参した側（体力1）が負けます。キューに入った場所へ正確に戻ります。',
   'hud.arena.ladderAllTime': 'ランキング - 全期間',
   'hud.arena.ladderOnline': 'ランキング - オンライン',
-  'hud.arena.ratingSummary': 'レート - {wins}勝 / {losses}敗',
+  'hud.arena.ratingSummary': 'レート - {wins}勝 / {losses}敗 / {draws}分',
   'hud.arena.statusCountdown': '身構えてください...',
   'hud.arena.statusReturning': '世界へ戻っています... {seconds}',
   'hud.arena.statusFight': '降参まで戦え！',
@@ -2933,8 +2945,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blessing_of_might.description':
     '味方対象に祝福を与え、5分間、攻撃力を{buff}増加させます。',
   'entities.abilities.divine_protection.name': '信仰の守り',
-  'entities.abilities.divine_protection.description':
-    '守りの結界が10秒間{damage}ダメージを吸収します。',
+  'entities.abilities.divine_protection.description': '神聖なる結界が最大HPの{damage}%を{duration}秒間吸収する。不朽の加護が結界を強化する。',
   'entities.abilities.hammer_of_justice.name': '断裂の裁き槌',
   'entities.abilities.hammer_of_justice.description': '対象を{duration}秒間スタンさせます。',
   'entities.abilities.lay_on_hands.name': '最後の秘跡',
@@ -2956,8 +2967,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     '30分間、あなたの神聖ダメージが生成する脅威が60%増加します。タンク役パラディンの要です。',
   'entities.abilities.retribution_aura.name': '報復のオーラ',
-  'entities.abilities.retribution_aura.description':
-    '30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。',
+  'entities.abilities.retribution_aura.description': '死亡するか置き換えられるまで、自身とパーティを神聖なる力で包む。影響下の味方を近接攻撃した敵は{buff}の神聖ダメージを受け、影響下の味方の通常攻撃は{buff}の神聖ダメージを追加で与える。自身の砦の献身と置き換わる。他のパラディンが報復のオーラを唱えた場合、重複せず更新される。',
   'entities.abilities.tame_beast.name': '野生の絆',
   'entities.abilities.tame_beast.description':
     '獣を仲間にするための調教を始めます。獣はあなたのレベル以下で、エリートであってはなりません。ペットはあなたに従い、敵を攻撃し、独自の脅威を保ちます。同時に連れられるペットは1体だけです。',
@@ -2993,7 +3003,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     '慎重に引き絞った射撃で {damage} のダメージを与えます。',
   'entities.abilities.rapid_fire.name': '熱狂の速射',
-  'entities.abilities.rapid_fire.description': '15秒間、攻撃速度が40%増加します。',
+  'entities.abilities.rapid_fire.description': '移動しながら2.4秒間に6発の射撃を行う。1発ごとに{damage}の物理ダメージを与え、遠隔攻撃力で上昇する。',
   'entities.abilities.smite.name': 'スマイト',
   'entities.abilities.smite.description': '敵に {damage} の神聖ダメージを与えます。',
   'entities.abilities.lesser_heal.name': '囁きの祈り',
@@ -3029,8 +3039,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.name': '癒しの水流',
   'entities.abilities.healing_wave.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.chain_heal.name': 'チェインヒール',
-  'entities.abilities.chain_heal.description':
-    '味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）',
+  'entities.abilities.chain_heal.description': '味方1体を{damage}回復し、12ヤード以内の最大2体の味方へ連鎖する。連鎖ごとに回復量は前の対象の50%になる。連鎖した味方は残っている治癒の奔流を消費し、消費量の125%を即座に回復する。初回の回復量はスペルパワーで上昇する。（回復スペシャライゼーション）',
   'entities.abilities.earth_shock.name': '大地の衝撃',
   'entities.abilities.earth_shock.description':
     '衝撃の力で対象を即座に打ち、{damage} の自然ダメージを与えます。',
@@ -3221,8 +3230,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_shock.description':
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
   'entities.abilities.holy_shield.name': 'ホーリーシールド',
-  'entities.abilities.holy_shield.description':
-    '10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）',
+  'entities.abilities.holy_shield.description': 'ブロック率が30%上昇し、最大HPの{damage}%を吸収するシールドを{duration}秒間獲得、ヘイトの波動を放つ。神聖なる昇天がこの防御を強化・延長する。',
   'entities.abilities.bestial_wrath.name': '野獣の怒り',
   'entities.abilities.bestial_wrath.description':
     '野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）',
@@ -3640,12 +3648,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.varkas_boneguard.name': 'ヴァーカスの骨衛兵',
   'entities.mobs.emberkin.name': 'エンバーキン',
   'entities.mobs.gloomshade.name': 'ダスクマーク',
-  'entities.mobs.duskborn.name': 'ダスクボーン',
   'entities.mobs.grix_the_tunnelking.name': 'トンネルキングのグリックス',
-  'entities.mobs.spellhound.name': 'スペルハウンド',
-  'entities.mobs.warfiend.name': 'ウォーフィーンド',
   'entities.mobs.pyre_colossus.name': 'パイアコロッサス',
-  'entities.mobs.wraithborn.name': 'レイスボーン',
   'entities.mobs.choirmother_selthe.name': '聖歌母セルセ',
   'entities.mobs.drowned_templeguard.name': '溺れし神殿守',
   'entities.mobs.drowned_votary.name': '溺れし信徒',
@@ -5436,6 +5440,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.names.lfg': '仲間募集',
   'hud.core.chatChannels.names.officer': 'オフィサー',
   'hud.core.chatChannels.names.party': 'パーティ',
+  'hud.core.chatChannels.names.battleground': '戦場',
   'hud.core.chatChannels.names.say': '発言',
   'hud.core.chatChannels.names.world': 'ワールド',
   'hud.core.chatChannels.names.yell': '叫び',
@@ -6324,6 +6329,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.resourceName.rage': 'レイジ',
   'guide.resourceName.mana': 'マナ',
   'guide.resourceName.energy': 'エナジー',
+  'guide.resourceName.focus': 'フォーカス',
   'guide.classPage.back': 'すべてのクラス',
   'guide.classPage.roleLabel': 'ロール',
   'guide.classPage.resourceLabel': 'リソース',
@@ -6617,14 +6623,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'アリーナとPvP',
   'guide.nav.talents': 'タレント',
   'guide.nav.wishIKnew': '知っておきたかったこと',
-  'guide.petHook.wraithborn': '遠くから重いシャドウを降らせるエリートのキャスターです。',
-  'guide.petHook.warfiend':
-    '頑丈な近接のブルーザーで、召喚できるようになればオールラウンドにこなせます。',
-  'guide.petHook.spellhound': '敵のキャスターに食らいつくシャドウのスカーミッシャーです。',
   'guide.petHook.emberkin': '安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。',
   'guide.petHook.pyre_colossus':
     '強力な近接を持つ巨大なジャガーノートで、純粋な力を求めて召喚します。',
-  'guide.petHook.duskborn': '素早い近接のデーモンで、大きなダメージを与えますが打たれ弱いです。',
   'guide.petHook.gloomshade':
     '挑発して攻撃を受け止める頑丈なデーモンで、安心して詠唱できるようにします。',
   'guide.related': '関連項目',
@@ -6939,6 +6940,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': 'パーティ募集。',
   'guide.social.chanLfgBody':
     'ダンジョンを回る仲間を探すための、任意参加のレルム全体チャンネル。タブを開いて参加しましょう。',
+  'guide.social.chanBattleground': '戦場。',
+  'guide.social.chanBattlegroundBody':
+    '戦場にいるすべての戦士と、敵味方を問わず話せます。試合中のみ利用できます。',
   'guide.social.chanParty': 'パーティ。',
   'guide.social.chanPartyBody': 'どれだけ離れていても、グループの全員に話しかけられます。',
   'guide.social.chanSay': 'セイ。',
@@ -7827,6 +7831,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
   'gpuNotice.bodyWeb':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。',
+  'gpuNotice.hybridBodyWindows':
+    'このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、設定 > システム > ディスプレイ > グラフィックス でブラウザを「高パフォーマンス」に設定してから再起動してください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。',
+  'gpuNotice.hybridBodyLinux':
+    'このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやグラフィックスドライバに独自のGPU選択設定があるか、お使いのディストリビューションにGPU切り替えツール（PRIMEやoptimus-managerなど）が用意されている場合があります。デスクトップアプリでは自動的にディスクリートGPUが選択されます。',
+  'gpuNotice.hybridBodyOther':
+    'このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやオペレーティングシステムのグラフィックス設定を確認して有効にしてください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。',
   'gpuNotice.dismiss': '閉じる',
   'perfNudge.integratedGpu':
     'ゲームは内蔵（省電力）GPUで動作しています。このパソコンにゲーミングGPUも搭載されている場合は、Windowsの 設定 > システム > ディスプレイ > グラフィック でブラウザーを「高パフォーマンス」に設定し、ブラウザーを再起動してください。デスクトップ版は自動的にゲーミングGPUを選択します。',
@@ -8499,6 +8509,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.character.already_in_world': 'キャラクターは既に世界にいます。',
   'apiError.character.taken_over': 'あなたのキャラクターは別のセッションに引き継がれました。',
   'apiError.character.rename_required': 'このキャラクターは世界に入る前に名前変更が必要です。',
+  'apiError.character.invalid_appearance':
+    'この外見は保存できませんでした。デザインを調整してもう一度お試しください。',
+  'apiError.character.reroll_unavailable': 'このキャラクターには無料の再デザインがありません。',
   'apiError.moderation.suspended_until': 'このアカウントは {date} まで停止されています。',
   'apiError.moderation.suspended': 'このアカウントは停止されています。',
   'apiError.moderation.banned': 'このアカウントは利用停止されています。',
@@ -9354,6 +9367,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalTitle': 'グループ成立：{name}',
   'hudChrome.finder.proposalRole': 'あなたのロール：{role}',
   'hudChrome.finder.accepted': '{accepted}/{size} 人が承認',
+  'hudChrome.bgOffer.title': 'ソーンホロウ平原の準備が整いました',
+  'hudChrome.bgOffer.backfillTitle': 'ソーンホロウ平原が戦士を求めています',
+  'hudChrome.bgOffer.backfillBody': 'この戦いはすでに進行中です。人数の足りない側に加わります。この試合はレーティングに影響しません。',
+  'hudChrome.bgOffer.accepted': '{size} 人中 {accepted} 人が承認',
+  'hudChrome.bgOffer.remaining': '残り {seconds} 秒',
+  'hudChrome.bgOffer.accept': '承認',
+  'hudChrome.bgOffer.decline': '辞退',
+  'hudChrome.bgOffer.acceptedWait': '他の参加者を待っています...',
   'hudChrome.finder.remaining': '残り {seconds} 秒',
   'hudChrome.finder.accept': '承認',
   'hudChrome.finder.decline': '辞退',
@@ -9715,9 +9736,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': '時の残響',
   'entities.abilities.temporal_echo.description':
     'より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。',
-  'entities.abilities.aura_surge.name': '曙光の跳弾',
-  'entities.abilities.aura_surge.description':
-    '曙光で鍛えた盾を投げて{damage}の聖属性ダメージを与え、最初の対象を2秒間沈黙させる。その後、10ヤード以内の追加の敵最大2体へ跳ね返り、1回ごとに75%のダメージを与える。（パラディンのタレント）',
   'entities.abilities.aspect_of_the_wild.description':
     '30ヤード以内の味方を野生の力で鼓舞し、攻撃力を45、攻撃速度を5%上昇させる。効果時間5分。（ハンターのタレント）',
   'entities.abilities.avenging_wrath.description':
@@ -9740,12 +9758,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に{damage}の闇属性ダメージを与え、その後3秒間恐怖状態にする。（ウォーロックのタレント）',
   'entities.abilities.deep_freeze.description':
     '対象を深く凍らせ、{damage} の冷気ダメージを与えて 4 秒間気絶させる。（メイジタレント）',
-  'entities.abilities.desperate_prayer.description':
-    '自分の体力を即座に{damage}回復する。（プリーストのタレント）',
+  'entities.abilities.desperate_prayer.description': '最大HPの30%を即座に回復する。',
   'entities.abilities.deterrence.description':
     '回避率を50パーセントポイント上昇させる。効果時間10秒。（ハンターのタレント）',
-  'entities.abilities.divine_shield.description':
-    '聖なる力で身を守り、8秒間に900のダメージを吸収する。（パラディンのタレント）',
   'entities.abilities.earthbind.description':
     '周囲の敵を大地に縛り、2秒間移動不能にする。（シャーマンのタレント）',
   'entities.abilities.evocation.description': 'マナを急速に回復する。（メイジタレント）',
@@ -9759,8 +9774,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '傷ついた敵に聖なるハンマーを投げ、{damage}の聖属性ダメージを与える。体力が20%未満の対象にのみ使用可能。（パラディンのタレント）',
   'entities.abilities.healing_stream.description':
     '味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）',
-  'entities.abilities.holy_wrath.description':
-    '聖なる力を解き放ち、周囲の敵に{damage}のダメージを与える。（パラディンのタレント）',
   'entities.abilities.howl_of_terror.description':
     '周囲の敵を最大3秒間恐怖状態にする。ダメージを受けると解除されることがある。（ウォーロックのタレント）',
   'entities.abilities.ice_block.description':
@@ -10490,6 +10503,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeFull': '{effect}はすでに完全に充填されている。',
   'hudChrome.professions.toolEffectRechargeMaterials':
     '{effect}の再充填には{material}x{count}が必要だ。',
+  'hudChrome.professions.craftingProgress': '製作中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.disenchantingProgress': '分解中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.enchantingProgress': '付与中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.salvagingProgress': '解体中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    '道具の効果を再充填中：残り{remaining}秒（全{total}秒）。',
   'hudChrome.professions.toolEffectSpent': '使い切りました。再充填が必要です',
   'hudChrome.professions.toolEffectDepleted': '道具の効果を使い切りました',
   'hudChrome.professions.toolEffectRechargePrice': '再充填: {material} x{count}',
@@ -11556,6 +11575,432 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': '水面の波紋（航跡）',
   'hudChrome.breath.label': '息',
   'hudChrome.breath.drowning': '溺れています！',
+  'abilityUi.resources.devotion': '献身',
+  'abilityUi.resources.focus': '集中値',
+  'abilityUi.tooltip.requiresStealthSkulduggery':
+    'ステルスが必要（薄闇の蓄えが3段階のとき、またはヴェールストライク中は不要）',
+  'abilityUi.tooltip.ruinCost': '破滅 {cost}',
+  'classDetails.resources.focus': '集中値',
+  'devCommand.actions.biskit.description':
+    '指定したスペック向けの最高のエピック装備を全部位に装備します。装備品のみです。',
+  'devCommand.actions.biskit.label': 'BIS-20キットを装備',
+  'entities.abilities.abyssal_rift.description':
+    '選択した地点に裂け目を開き、8ヤード以内の敵を中心へ引き寄せて{damage}の影ダメージを与え、2秒間スタンさせます。ボスはダメージを受けますが、引き寄せとスタンには抵抗します。',
+  'entities.abilities.abyssal_rift.name': '深淵の裂け目',
+  'entities.abilities.aegis_first_dawn.description':
+    '5秒間詠唱し、半径10メートルの聖なるドームを作る。内部の味方は毎秒回復し、受けるダメージが50%減少する。詠唱を完了すると最後の回復を放ち、4秒間、移動速度を30%増加させる。',
+  'entities.abilities.aegis_first_dawn.name': '始暁の大盾',
+  'entities.abilities.ambush.specNote_subtlety':
+    'ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで、どの角度からでも使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始し、2倍のダメージを与える。',
+  'entities.abilities.ancestor_return.description':
+    'グループまたはレイドの倒れたメンバー全員を遺体の場所で蘇生し、体力とマナを30%回復させる。戦闘中は使用できない。（霊癒）',
+  'entities.abilities.ancestor_return.name': '祖霊の帰還',
+  'entities.abilities.army_of_the_dead.description':
+    '墓所の門を開き、選んだドミニオンの従者に加えて、スケルタル・ウォリアー、ボーン・メイジ、グレイヴウィングを20秒間召喚する。',
+  'entities.abilities.army_of_the_dead.name': '亡者の軍勢',
+  'entities.abilities.aura_mastery.description':
+    '8秒間、グループ内で有効なすべての献身と報復のオーラを強化する。砦の献身はダメージを15%減少させ、報復は15の神聖ダメージを与える。複数回使用しても重複せず、持続時間が更新される。',
+  'entities.abilities.aura_mastery.name': '聖なる調和',
+  'entities.abilities.backstab.specNote_assassination':
+    '攻撃ごとに毒の儀式を1段階進め（最大6）、エナジーを15回復する。毒の儀式が6段階のとき、永の眠りは毒裂きに変化する（出血の残りダメージを一度にすべて与える）。',
+  'entities.abilities.bastion_rite.description':
+    '6秒間、受ける物理ダメージを20%減少させ、ブロック率を20%増加させる。昇天中は持続時間が10秒になる。',
+  'entities.abilities.bastion_rite.name': '砦の儀式',
+  'entities.abilities.bastion_sweep.description':
+    '装備中の盾で前方180度の敵を薙ぎ払い、{damage}の神聖ダメージと高い脅威を与え、献身を1生成する。昇天中はダメージが30%増加し、半径が8メートルになる。',
+  'entities.abilities.bastion_sweep.name': '砦の薙ぎ払い',
+  'entities.abilities.beacon_of_light.description':
+    'グループメンバー1人を光の標に指定する。60メートル以内にいる別のグループメンバーへの有効な直接回復の50%が、光の標も回復する。範囲回復と継続回復は転送されない。どちらかが死亡するまで持続する。',
+  'entities.abilities.beacon_of_light.name': '光の標',
+  'entities.abilities.bloodhook.description':
+    '8から25ヤード離れた敵へ突進して主傷口を開き、12秒間で24の出血ダメージを与えます。（野戦術のシグネチャ）',
+  'entities.abilities.bloodhook.name': '血鉤',
+  'entities.abilities.bloodtrail_assault.description':
+    '12秒間、血鉤、裂傷、榴散弾装薬、そしてペットの追撃を強化します。',
+  'entities.abilities.bloodtrail_assault.name': '血跡強襲',
+  'entities.abilities.body_blow.description':
+    '武器ダメージの130%に10を加えた重い一撃。コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。（コンバット）',
+  'entities.abilities.body_blow.name': 'ヘイメーカー',
+  'entities.abilities.bone_armor.description':
+    '骨で身を包み、最大体力の20%に相当するダメージを吸収する。',
+  'entities.abilities.bone_armor.name': '骨の鎧',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    'ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始する。',
+  'entities.abilities.choir_of_deliverance.description':
+    '6秒間チャネルし、30ヤード以内のパーティメンバーを2秒ごとに{damage}回復します。回復量はスペルパワーで増加します。',
+  'entities.abilities.choir_of_deliverance.name': '救済の聖歌隊',
+  'entities.abilities.cinderhide.description':
+    '皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。',
+  'entities.abilities.cinderhide.name': '燼皮',
+  'entities.abilities.claw.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
+  'entities.abilities.cold_focus.description':
+    '12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）',
+  'entities.abilities.cold_focus.name': '冷徹集中',
+  'entities.abilities.corpse_explosion.description':
+    'まずボーン・メイジ、次にスケルタル・ウォリアーを生贄にし、グレイヴウィングは最後の手段としてのみ選ぶ。同系統が複数いる場合は残り時間が最も短いもの、次に最も弱いものを選び、指定地点の敵に{damage}のシャドウダメージを与える。',
+  'entities.abilities.corpse_explosion.name': '骸の爆裂',
+  'entities.abilities.coven.description':
+    '周囲の敵最大4体に15秒間持続する副次的な邪眼を作ります。断罪の共有量へ50%の効率で加算し、宣告の35%分の反響ダメージを受けます。',
+  'entities.abilities.coven.name': '魔女盟約',
+  'entities.abilities.cruel_pact.description':
+    '最大体力の12%を捧げて断罪を20生成します。体力が15%以下では使用できません。',
+  'entities.abilities.cruel_pact.name': '残酷な契約',
+  'entities.abilities.cursed_accomplice.description':
+    '味方プレイヤーを選択していない場合は呪眼と結び、その凝視で断罪を2生成します。味方と結ぶと、その味方が邪眼対象へ与えるダメージで3生成します。発動は2秒に1回までです。',
+  'entities.abilities.cursed_accomplice.name': '呪われた共犯者',
+  'entities.abilities.dark_pact.description':
+    '現在の体力の10%を捧げ、8秒間、最大体力の30%に相当するダメージを吸収します。',
+  'entities.abilities.dark_pact.name': '血の盟約',
+  'entities.abilities.dawn_devotion.description':
+    '30分間、自身とパーティメンバーの攻撃力を40増加させる。自身の光輝または恩寵の献身を置き換えるが、他のパラディンの献身やウォリアーの雄叫びとは共存する。',
+  'entities.abilities.dawn_devotion.name': '暁の献身',
+  'entities.abilities.dawnfall.description':
+    '周囲の敵に{damage}の神聖ダメージを与え、献身を1生成する。1体以上に命中すると、最後の勅令の残りクールダウンが2秒短縮される。昇天中はダメージと範囲が増加する。',
+  'entities.abilities.dawnfall.name': '暁落とし',
+  'entities.abilities.dawns_embrace.description':
+    '強力な回復を与え、献身を1生成する。光輝の共鳴により、マナ消費が50%減少し、詠唱時間が1.5秒になる。昇天中は即時発動になり、回復量が35%増加する。',
+  'entities.abilities.dawns_embrace.name': '暁の抱擁',
+  'entities.abilities.devotion_ward.description':
+    '自身とパーティメンバーが受けるダメージを、死亡または置き換えられるまで5%減少させる。このオーラと報復のオーラだけが互いに置き換わり、光輝、暁、恩寵の献身とは共存する。',
+  'entities.abilities.devotion_ward.name': '砦の献身',
+  'entities.abilities.divine_ascension.description':
+    '献身を20消費し、最大45秒間持続する昇天のチャージを5獲得する。対象となる能力はチャージを1消費し、追加効果を得る。',
+  'entities.abilities.divine_ascension.name': '神聖なる昇天',
+  'entities.abilities.elemental_trance.description':
+      '15秒間エレメンタルトランス状態に入り、受けるダメージを30%軽減し、与えた全ダメージの20%をマナに変換する。（ウォースピリット固有能力）',
+  'entities.abilities.elemental_trance.name': 'エレメンタルトランス',
+  'entities.abilities.evil_eye.description':
+    '敵一体を呪いの焦点として指定します。邪眼を移しても断罪は維持されますが、20秒の有効時間は更新されません。',
+  'entities.abilities.evil_eye.name': '邪眼',
+  'entities.abilities.eviscerate.specNote_assassination':
+    '毒の儀式が6段階のとき、このボタンは毒裂きに変化する：出血効果が与えるはずだった残りダメージを即座にすべて与え、新しい毒の傷を刻み、エナジーを20回復する一撃。',
+  'entities.abilities.eviscerate.specNote_combat':
+    'コンボポイント4以上で命中させると8秒間のレッドラインが始まる：邪悪な斬撃はヘイメーカーに、このボタンは消灯に変化する（45にコンボポイントごとに35を加えたダメージ、蓄えたレッドラインのピップごとに25%強化、エナジーを25回復）。レッドラインが終わる前に使うこと。',
+  'entities.abilities.faithforged_guard.description':
+    '8秒間、次に受ける敵の攻撃に報いる。最大{buff}のダメージを打ち消し、同量を神聖ダメージとして攻撃者に返し、信仰を1得る。報いるのは1撃のみ。昇天は報いられる量を50%増加させる。',
+  'entities.abilities.faithforged_guard.name': '聖光の負債',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：91にコンボポイントごとに55を加えたダメージの噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを30回復する。',
+  'entities.abilities.fieldcraft_reentry.description':
+    'パッシブ：離脱跳躍は狩猟の勢いを更新し、12秒以内の次の腹裂きの一撃または血鉤を強化します。腹裂きの一撃は1スタックごとに15%の追加ダメージを与えます。血鉤は18から24の追加物理ダメージを与え、1スタックごとに15%増加し、遠隔攻撃力でも増加します。3スタック時はいずれの攻撃も狩猟の勢いを消費します。（野戦術）',
+  'entities.abilities.fieldcraft_reentry.name': '再突入準備',
+  'entities.abilities.final_edict.description':
+    '強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に神聖な爆発も放つ。',
+  'entities.abilities.final_edict.name': '最後の勅令',
+  'entities.abilities.flurry_of_knives.description':
+    '投げナイフで6ヤード以内のすべての敵を切り裂き、{damage}の物理ダメージを与え、コンボポイントを2獲得する。（ローグのタレント）',
+  'entities.abilities.flurry_of_knives.name': '短剣乱舞',
+  'entities.abilities.frostjaw_trap.description':
+    '選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。',
+  'entities.abilities.frostjaw_trap.name': '霜顎の罠',
+  'entities.abilities.funeral_harvest.description':
+    '自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。',
+  'entities.abilities.funeral_harvest.name': '葬送の収穫',
+  'entities.abilities.galeheart_weapon.description':
+    '武器に疾風を宿します。3回目の命中ごとに武器攻撃が2度反響し、ストームキャストを発動します。',
+  'entities.abilities.galeheart_weapon.name': '疾風の武器',
+  'entities.abilities.garrote.specNote_subtlety':
+    'ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始する。',
+  'entities.abilities.grace_devotion.description':
+    '30分間、自身とパーティメンバーは5秒ごとにマナを15回復し、マナ消費が3%減少する。自身の光輝または暁の献身を置き換えるが、他のパラディンの献身とは共存する。',
+  'entities.abilities.grace_devotion.name': '恩寵の献身',
+  'entities.abilities.guardian_covenant.description':
+    '味方1人と自身を守り、8秒間、受けるダメージを20%減少させる。味方を選択していない場合は自身に使用する。',
+  'entities.abilities.guardian_covenant.name': '守護の契約',
+  'entities.abilities.hammer_of_grace.description':
+    '20メートル以内の敵に聖なる槌を即座に投げ、{damage}ダメージを与える。マナを70回復し、与えたダメージの50%だけ自身を回復して、命中時に献身を1生成する。太陽の報復により、恩寵の槌はクールダウンを無視し、与えたダメージの100%だけ自身を回復する。',
+  'entities.abilities.hammer_of_grace.name': '恩寵の槌',
+  'entities.abilities.hex_of_violence.description':
+    '敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、22の影ダメージで反撃します。',
+  'entities.abilities.hex_of_violence.name': '暴虐の呪い',
+  'entities.abilities.hour_of_judgment.description':
+    '主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。',
+  'entities.abilities.hour_of_judgment.name': '審判の刻',
+  'entities.abilities.hunting_momentum.description':
+    'パッシブ：腹裂きの一撃で狩猟の勢いを1スタック獲得します。8秒間持続し、最大3スタックです。3スタック時、反撃の牙の打撃ダメージが45%増加し、全スタックを消費します。（野戦術）',
+  'entities.abilities.hunting_momentum.name': '狩猟の勢い',
+  'entities.abilities.hushbrand.description':
+    '呪文の詠唱を中断し、同系統の呪文を4秒間使用不能にする。',
+  'entities.abilities.hushbrand.name': '静寂の烙印',
+  'entities.abilities.knockout_blow.description':
+    'ノックアウトでレッドラインを締めくくる：45にコンボポイントごとに35を加えたダメージを与え、蓄えたレッドラインのピップごとに25%強化され、エナジーを25回復する。レッドラインが終わる前に使わなければノックアウトは失われる。（コンバット）',
+  'entities.abilities.knockout_blow.name': '消灯',
+  'entities.abilities.life_covenant.description':
+    '味方1人が受けるダメージを6秒間40%減少させる。昇天中はチャージを消費せず、さらに120ポイントの盾を付与する。',
+  'entities.abilities.life_covenant.name': '生命の契約',
+  'entities.abilities.lifespring_weapon.description':
+    '武器に生命の水を宿し、癒しの水流への蓄積量を20%増加させます。',
+  'entities.abilities.lifespring_weapon.name': '命泉の武器',
+  'entities.abilities.litany_of_guilt.description':
+    '主要な邪眼を8秒間呪います。断罪を獲得するたびに波動を放ち、8ヤード以内にいる他の敵最大4体にダメージを与えます。発動は1秒に1回までです。',
+  'entities.abilities.litany_of_guilt.name': '罪責の連祷',
+  'entities.abilities.maledict_gaze.description':
+    '呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。',
+  'entities.abilities.maledict_gaze.name': '呪眼の凝視',
+  'entities.abilities.marrowbreak.description':
+    '古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を8秒間得て、怒りを15回復する。',
+  'entities.abilities.marrowbreak.name': '骨髄砕き',
+  'entities.abilities.martyrs_aegis.description': '味方1体が受けるダメージを8秒間40%軽減する。',
+  'entities.abilities.martyrs_aegis.name': '殉教者の盾',
+  'entities.abilities.maul.specNote_feral':
+    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：78から96のダメージを与える高脅威の一撃。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を得て、怒りを15回復する。',
+  'entities.abilities.measured_shot.description':
+    '慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。',
+  'entities.abilities.measured_shot.name': '精密射撃',
+  'entities.abilities.mercy_lance.description':
+    '敵1体に{damage}の神聖ダメージを与え、命中時に献身を1生成する。昇天中はチャージを1消費し、必ずクリティカルヒットになる。',
+  'entities.abilities.mercy_lance.name': '慈悲の槍',
+  'entities.abilities.moonfire.specNote_balance': '燃やし続けること：月の種が効果を6秒延長する。',
+  'entities.abilities.moonlash.description':
+    '月潮を3消費し、{damage}の秘術ダメージの強撃を放つ、ダメージ重視の選択肢。陽醒も同じ月潮3を消費するため、どちらか一方を選ぶこと。',
+  'entities.abilities.moonlash.name': 'ムーンサージ',
+  'entities.abilities.moonseed.description':
+    '月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め（最大3）、月の嵐を6秒延長する（1回の付与につき最大6秒）。月潮が3段階のとき、このボタンはムーンサージに変化する：3段階すべてを消費し、240から285の秘術ダメージを与える即時攻撃。',
+  'entities.abilities.moonseed.name': '月の種',
+  'entities.abilities.needle_of_fate.description':
+    '敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を5生成し、邪眼がなければ先に対象を指定します。',
+  'entities.abilities.needle_of_fate.name': '運命の針',
+  'entities.abilities.oath_chain.description':
+    '遠くの敵を聖なる鎖で即座に縛る。敵は秒速18メートルで自身へ引き寄せられ、3メートルまで近づくと4秒間、移動速度が50%低下する。昇天中は周囲の敵をもう1体縛る。',
+  'entities.abilities.oath_chain.name': '誓いの鎖',
+  'entities.abilities.ossuary_mark.description':
+    '敵に12秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。',
+  'entities.abilities.ossuary_mark.name': '納骨の印',
+  'entities.abilities.overbloom.description':
+    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の60%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。',
+  'entities.abilities.overbloom.name': '満開',
+  'entities.abilities.pack_command.description':
+    '生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。',
+  'entities.abilities.pack_command.name': '群れの指令',
+  'entities.abilities.pack_rally.description':
+    '駿馬の相をまとい、周囲の味方を鼓舞します。10秒間、移動速度を30%、攻撃速度と詠唱速度を10%上昇させます。',
+  'entities.abilities.pack_rally.name': '群れの結集',
+  'entities.abilities.possess_evil_eye.description':
+    '呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えます。遅延反響は60%のダメージを与え、レベル17から20にかけて30%まで低下します。',
+  'entities.abilities.possess_evil_eye.name': '邪眼憑依',
+  'entities.abilities.primal_exaltation.description':
+    '専門分野の力を12秒間解放し、通常のローテーションを強化します。（シャーマンのタレント）',
+  'entities.abilities.primal_exaltation.name': '原初の高揚',
+  'entities.abilities.radiant_chorus.description':
+    '周囲の味方を{damage}回復し、献身を1生成する。2人以上の味方を有効に回復すると光輝の共鳴を得る。次の癒やしの光が即時発動になるか、次の暁の抱擁のマナ消費が50%減少し、詠唱時間が1.5秒になる。昇天中は光輝の合唱の回復量と範囲が増加する。',
+  'entities.abilities.radiant_chorus.name': '光輝の合唱',
+  'entities.abilities.radiant_devotion.description':
+    '30分間、自身とパーティメンバーの呪文威力を20増加させる。自身の暁または恩寵の献身を置き換えるが、他のパラディンの献身とは共存する。',
+  'entities.abilities.radiant_devotion.name': '光輝の献身',
+  'entities.abilities.raise_bone_mage.description':
+    '魂の欠片を2個消費し、永続する遠隔型の骨魔導士を2枠のドミニオンに加える。同時に従えるのは1体まで。攻撃は6秒間受ける魔法ダメージを5%増加させ、リーピング・コマンドでは8%に強化する。',
+  'entities.abilities.raise_bone_mage.name': '骨魔導士の召喚',
+  'entities.abilities.raise_graveguard.description':
+    '永続する防御型の相棒を呼び起こす。墓守は自動で挑発し、墓所の支配であなたへのダメージの20%を肩代わりする。リーピング・コマンドでは挑発し、4秒間受けるダメージが30%減少する。',
+  'entities.abilities.raise_graveguard.name': '墓守の召喚',
+  'entities.abilities.raise_gravewing.description':
+    '魂の欠片を2個消費し、永続する墓翼を2枠のドミニオンに加える。同時に従えるのは1体まで。5秒ごとに周囲へ65%の薙ぎ払いダメージを与え、リーピング・コマンドでは命中した全敵の受けるダメージを5秒間8%増加させる。',
+  'entities.abilities.raise_gravewing.name': '墓翼の召喚',
+  'entities.abilities.raise_skeletal_warrior.description':
+    '魂の欠片を1個消費し、永続する骸骨戦士を2枠のドミニオンに加える。同時に従えるのは1体まで。6秒ごとに周囲へ45%の薙ぎ払いダメージを与え、リーピング・コマンドでは対象を4秒間40%減速させる。',
+  'entities.abilities.raise_skeletal_warrior.name': '骸骨戦士の召喚',
+  'entities.abilities.rake.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
+  'entities.abilities.reaping_command.description':
+    '魂の欠片を2個消費し、すべてのアンデッドの従者に一斉攻撃させる。墓守は挑発して身を固め、骸骨戦士は足止めし、骨魔導士は魔法防御を暴き、墓翼は命中した全敵を引き裂く。',
+  'entities.abilities.reaping_command.name': '刈り取りの号令',
+  'entities.abilities.recall_the_fallen.description':
+    '死亡したグループメンバーを、体力とマナが35%の状態で蘇生する。',
+  'entities.abilities.recall_the_fallen.name': '倒れし者の呼び戻し',
+  'entities.abilities.redharvest.description':
+    '古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを30回復する。コンボポイントが0でも使用できる。',
+  'entities.abilities.redharvest.name': '血の収穫',
+  'entities.abilities.regrowth.specNote_restoration':
+    '新しい花を植えると翠成が1段階進む（最大5）。',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    '新しい花を植えると翠成が1段階進む（最大5）。翠成が5段階のとき、スウィフトメンドは満開に変化する。',
+  'entities.abilities.rip.specNote_feral': '命中した一撃が古き血を1蓄える（最大3）。',
+  'entities.abilities.ruinous_brand.description':
+    '敵に15秒間の烙印を刻みます。次の3回の直接呪文は、烙印のついた敵に対して25%のダメージで反響し、別の対象に使用した場合はその敵へ50%のダメージを複製します。',
+  'entities.abilities.ruinous_brand.name': '破滅の烙印',
+  'entities.abilities.sacred_challenge.description':
+    '敵1体に自身を攻撃させる。昇天中はチャージを消費せず、さらに4秒間、受けるすべてのダメージを15%減少させる。',
+  'entities.abilities.sacred_challenge.name': '聖なる挑発',
+  'entities.abilities.sacred_form.description':
+    '死亡するまで聖なる状態となり、回復量が10%、呪文のクリティカル率が5%増加し、生成する脅威が50%減少する。サンメンダー専用。',
+  'entities.abilities.sacred_form.name': '聖なる姿',
+  'entities.abilities.sacrifice_undead.description':
+    'ドミニオンの従者を1体破壊し、最大体力の25%を回復する。',
+  'entities.abilities.sacrifice_undead.name': '亡者の生贄',
+  'entities.abilities.sacrilegious_march.description':
+    '移動速度が35%上昇しますが、毎秒、最大体力の2%を失います。もう一度使用すると解除されます。体力が20%になると自動的に切れます。',
+  'entities.abilities.sacrilegious_march.name': '冒涜の行軍',
+  'entities.abilities.scouring_mercy.description':
+    '敵を聖なる力で浄化するか、味方1体を即座に癒す。ドクトリン固有能力。',
+  'entities.abilities.scouring_mercy.name': '浄罪の慈悲',
+  'entities.abilities.sentence.description':
+    '断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。',
+  'entities.abilities.sentence.name': '宣告',
+  'entities.abilities.seraphic_vigil.description':
+    '味方1体に見守りの祝福を与え、危機に陥った時に体力を回復する。ベネディクション固有能力。',
+  'entities.abilities.seraphic_vigil.name': '熾天使の見守り',
+  'entities.abilities.shellskin.description':
+    '8秒間、受けるダメージを60%軽減しますが、効果中は攻撃できません。',
+  'entities.abilities.shellskin.name': '甲殻の皮膚',
+  'entities.abilities.shrapnel_charge.description':
+    '対象と周囲の敵を榴散弾で吹き飛ばし、主対象から短時間の出血を広げます。',
+  'entities.abilities.shrapnel_charge.name': '榴散弾装薬',
+  'entities.abilities.sinister_strike.specNote_assassination': '毒の儀式を1段階進める（最大6）。',
+  'entities.abilities.sinister_strike.specNote_combat':
+    'レッドライン中、このボタンはヘイメーカーに変化する：武器ダメージの130%に10を加えたダメージを与え、コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。',
+  'entities.abilities.solar_invocation.description':
+    '味方1人の体力を即座に{damage}回復するか、敵1体に中程度の神聖ダメージを与える。どちらも献身を1生成する。昇天中に回復として使用すると、対象から10メートル以内の味方プレイヤーも半分の量だけ回復する。',
+  'entities.abilities.solar_invocation.name': '太陽の祈願',
+  'entities.abilities.solar_step.description': '2秒間、移動速度を150%増加させる。',
+  'entities.abilities.solar_step.name': '陽光の歩み',
+  'entities.abilities.soul_harvest.description':
+    '敵の魂を切り裂いて{damage}のシャドウダメージを与え、魂の欠片を1個生成する。最大5個。',
+  'entities.abilities.soul_harvest.name': '霊魂刈り',
+  'entities.abilities.soul_lance.description':
+    '幽体の槍を投げ、{damage}のシャドウダメージを与える。納骨の印がついた対象には、そのダメージの50%が印へ蓄積される。',
+  'entities.abilities.soul_lance.name': '魂の槍',
+  'entities.abilities.soulwell.description':
+    '魂の泉を3分間召喚します。戦闘外であれば、グループメンバーは魂の石を3個まで補充できます。魂の石は最大体力の25%を回復し、ポーションとクールダウンを共有します。',
+  'entities.abilities.soulwell.name': '魂の泉',
+  'entities.abilities.stampede.description':
+    '獣を3体、12秒間召喚する。各獣は2秒ごとに攻撃し、{damage}の物理ダメージを与える。表示ダメージには遠隔攻撃力の8%が含まれるが、ペットダメージボーナスは含まれない。獣は召喚時の群れの獰猛さを記録し、1スタックごとにダメージが10%増加する。獣群突撃がクールダウン中、群れの指令の命中は20%の確率でクールダウンをリセットし、5回連続で失敗すると必ず発動する。獣が活動中はリセットされない。（群れの王）',
+  'entities.abilities.stampede.name': '獣群突撃',
+  'entities.abilities.starfire.specNote_balance':
+    '月翼形態では、詠唱を完了するたびに月潮が1段階進む（最大3）。月潮が3段階のとき、このボタンは陽醒に変化する：160から190の自然ダメージに加え、9秒かけて75の炎上ダメージを与え、マナを35回復し、3段階すべてを消費する即時攻撃。',
+  'entities.abilities.stealth.specNote_subtlety':
+    'ダスクヴェールから使う先制技ごとに薄闇の蓄えが1段階進む（最大3）。',
+  'entities.abilities.stoneward.description':
+    '味方1体を6チャージで60秒間守ります。ダメージを受けると1チャージを消費し、3秒に1回、最大体力の5%を回復します。（シャーマンのタレント）',
+  'entities.abilities.stoneward.name': '石の守り',
+  'entities.abilities.stormsurge.description':
+    'パッシブ：アンセストラルストライクのクールダウン中にストームキャストを消費すると、25%の確率でクールダウンをリセットする。4回失敗すると次は必ず発動する。（ウォースピリット）',
+  'entities.abilities.stormsurge.name': 'ストームサージ',
+  'entities.abilities.summon_tithefiend.description':
+    'グルームタイスを消費し、あなたのエフィジーを狙う一時的なタイスフィーンドを呼び出す。ヴェスパー固有能力。',
+  'entities.abilities.summon_tithefiend.name': 'タイスフィーンド招来',
+  'entities.abilities.sun_gods_verdict.description':
+    '敵1体に30秒間、太陽神の裁決を下す。最後の勅令と暁落としが命中するたび、刻印が1つ付与される。3つ目の刻印を付与した能力が刑を決める。最後の勅令は罪人に壊滅的なダメージを与え、暁落としは裁決を爆発させて周囲の敵にダメージを与え、1.5秒間スタンさせる。',
+  'entities.abilities.sun_gods_verdict.name': '太陽神の裁決',
+  'entities.abilities.sunlance.description':
+    '月潮を3消費し、{damage}の自然ダメージと、9秒かけて{overTime}の炎上ダメージを与え、マナを35回復する、マナ重視の選択肢。ムーンサージも同じ月潮3を消費するため、どちらか一方を選ぶこと。',
+  'entities.abilities.sunlance.name': '陽醒',
+  'entities.abilities.sunward_disc.description':
+    '盾が必要。輝く円盤を投げ、命中後に周囲の敵へ跳ね返らせる。ダメージを与えるたびに献身を1生成する。太陽の報復により、陽光の円盤はマナを消費せず、クールダウンを無視し、ダメージが20%増加する。昇天中は5回跳ね返る。',
+  'entities.abilities.sunward_disc.name': '陽光の円盤',
+  'entities.abilities.swipe.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
+  'entities.abilities.thieves_chorus.description':
+    '口笛の合図でグループを鼓舞し、10秒間、攻撃・詠唱・チャネリング速度を10%上昇させる。最近グループ速度上昇を受けた味方は疲労しており、効果を受けられない。（ローグのタレント）',
+  'entities.abilities.thieves_chorus.name': '盗賊の合唱',
+  'entities.abilities.thunder_reservoir.description':
+    'パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）',
+  'entities.abilities.thunder_reservoir.name': '雷鳴の貯蔵',
+  'entities.abilities.tidecall.description':
+    '味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。',
+  'entities.abilities.tidecall.name': '潮呼び',
+  'entities.abilities.trailbreak.description':
+    '専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。',
+  'entities.abilities.trailbreak.name': '離脱跳躍',
+  'entities.abilities.umbral_anchor.description':
+    '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。',
+  'entities.abilities.umbral_anchor.name': '影の錨',
+  'entities.abilities.unholy_command.description':
+    '魂の欠片を3個消費してすべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。',
+  'entities.abilities.unholy_command.name': '不浄の号令',
+  'entities.abilities.unleash_beast.description':
+    '最大まで高まった群れの獰猛さを解放し、主対象を強打して周囲も叩きます。その後、ペットを短時間の範囲攻撃狂乱に駆り立てます。',
+  'entities.abilities.unleash_beast.name': '獣の解放',
+  'entities.abilities.unleash_weapon.description':
+    '有効な武器付与を解放する。火焔烙印は54から64の火炎ダメージを与え、魔力の30%が加算され、雷鳴を2得る。疾風は武器で攻撃し、戦霊の律動を進め、6秒間攻撃速度を20%上昇させる。石縛は武器ダメージの75%を与え、対象を強制的に自分へ攻撃させ、4秒間受けるダメージを20%軽減する。命泉は癒しの水流を消費し、残りの回復量の125%を即時に回復し、8秒以内の次の一撃を実際の回復量の50%分軽減する。',
+  'entities.abilities.unleash_weapon.name': '武器解放',
+  'entities.abilities.valkyrs_calling.description':
+    '空へ昇り、敵へ飛行する間はダメージを受けなくなる。2秒後、対象地点へ降下して{damage}の神聖ダメージを与え、献身を1生成する。昇天中は着地ダメージが50%増加し、チャージを1消費する。',
+  'entities.abilities.valkyrs_calling.name': 'ヴァルキュリアの召命',
+  'entities.abilities.veilbound_march.description':
+    '4秒間、霊体となって移動速度が40%、防御力が30%増加し、移動不能、減速、強制移動を無効化する。すり抜けた敵には6秒間、帳の印が付与され、毎秒神聖ダメージを受け、自身へのダメージが20%減少し、自身に対する脅威が増加する。最初の印は献身を1生成する。行進終了時、周囲の印を付けた敵に最後の爆発を与える。昇天中は爆発のダメージが50%増加し、敵をわずかに引き寄せる。',
+  'entities.abilities.veilbound_march.name': '帳縛りの行進',
+  'entities.abilities.veilbound_mark.description':
+    '毎秒神聖ダメージを受け、印を付けたパラディンへのダメージが20%減少し、そのパラディンに対する脅威が増加する。',
+  'entities.abilities.veilbound_mark.name': '帳の刻印',
+  'entities.abilities.veilstep.description': '向いている方向へ帷をすり抜ける。',
+  'entities.abilities.veilstep.name': 'ヴェイルステップ',
+  'entities.abilities.veilstrike.description':
+    '6秒間：ダスクヴェールの先制技がステルスなしでどの角度からでも使用でき、与ダメージが10%増加し、効果中最初の潜伏者の一撃は2倍のダメージを与える。（スカルダガリー）',
+  'entities.abilities.veilstrike.name': 'ヴェールストライク',
+  'entities.abilities.venom_dart.description':
+    '毒針を弾き飛ばし、{damage}の自然ダメージを与える。コンボポイントを1獲得する。',
+  'entities.abilities.venom_dart.name': '毒針',
+  'entities.abilities.venom_dart.specNote_assassination':
+    '毒の儀式を1段階進め、毒の傷を6秒延長する（傷の残り時間は20秒を超えない）。',
+  'entities.abilities.venomrend.description':
+    '毒の儀式を6段階消費する：100にコンボポイントごとに55を加えたダメージを与え、出血効果が与えるはずだった残りダメージを即座にすべて与え、その後新しい毒の傷を与える（20秒かけて120ダメージ）。エナジーを20回復する。（ナイフワーク）',
+  'entities.abilities.venomrend.name': '毒裂き',
+  'entities.abilities.vicarious_suffering.description':
+    '8秒間苦痛を結び、敵の攻撃から最大15の断罪を生成します。自分に使うと受けるダメージが20%減少します。味方に使うと、そのダメージの最大20%を自分へ移しますが、体力が15%未満になることはありません。',
+  'entities.abilities.vicarious_suffering.name': '苦痛の肩代わり',
+  'entities.abilities.vowkeeper_strike.description':
+    '高い脅威を与える一撃を放ち、献身を1生成する。命中時に20%の確率で8秒間、太陽の報復を得る。ブロック成功時にも25%の確率で得る。太陽の報復は次の陽光の円盤、恩寵の槌、癒やしの光のいずれかを強化する。昇天中は小さな吸収盾も付与する。',
+  'entities.abilities.vowkeeper_strike.name': '誓守の一撃',
+  'entities.abilities.warspirit_cadence.description':
+    'パッシブ：武器攻撃が3回命中するたび、50%の自然ダメージを与えるゲイルハートエコーが2回発動し、12秒間ストームキャストを得る。ストームキャストは次のアークボルト、ジョルト、またはメンディングウォーターを即時発動かつ消費マナ半減にする。アンセストラルストライクは2回分として数える。（ウォースピリット）',
+  'entities.abilities.warspirit_cadence.name': '戦霊の律動',
+  'entities.abilities.wildheart.description': '最大体力の30%を即座に回復します。',
+  'entities.abilities.wildheart.name': '野生の心',
+  'entities.abilities.wrath.specNote_balance':
+    '月翼形態では、詠唱を完了するたびに月潮が1段階進む（最大3）。月潮が3段階のとき、月の種はムーンサージに、天墜は陽醒に変化する。',
+  'entities.items.boneglass_shiv.name': '骨硝子の小刀',
+  'entities.items.duskwhisper.name': '夕闇の囁き',
+  'entities.items.marrowpoint.name': '髄穿ち',
+  'entities.items.rimefang.name': '霜牙',
+  'entities.items.soul_stone.name': '魂の石',
+  'entities.mobs.graveguard.name': '墓守',
+  'entities.mobs.necromancy_bone_mage.name': '骨魔導士',
+  'entities.mobs.necromancy_gravewing.name': '墓翼',
+  'entities.mobs.necromancy_skeletal_warrior.name': '骸骨戦士',
+  'entities.quests.q_divine_tome.completion':
+    '礼拝堂の庭は静かになった。{playerName}、あなたは言葉を学ぶ準備ができている。しかし呼び戻しの儀式は、暖かな礼拝堂で唱えるものではない。生と死の帳が薄くなった場所で歌わねばならない。私は聖典を北のミアフェン湿地へ運ぶ。そこで合流し、最後までやり遂げよう。',
+  'entities.quests.q_divine_tome.objectives.0.label': '安らかにしたさまよう骸骨',
+  'entities.quests.q_divine_tome.text':
+    '光はあなたの中で静かに眠ってはいない、{playerName}。あなたが死者を安らかに眠らせる姿を見てきた。今こそ、ほとんどのパラディンが学ぶことのない秘儀を授けよう。倒れた魂を現世へ呼び戻す、呼び戻しの儀式だ。その言葉は、私が預かる暁縛りの聖典に記されている。だが、この地を彷徨う死者がいる限り、本は祝福とはならない。さまよう骸骨をあと6体、土へ還しなさい。そうすれば教えを始めよう。',
+  'entities.quests.q_divine_tome.title': '暁縛りの聖典',
+  'entities.quests.q_rite_of_redemption.completion':
+    'ひざまずき、{playerName}、言葉を声に出して読みなさい。そうだ。感じるか？ あなたの手の光は、もはや生者を癒やすだけではない。彼岸へ渡った者を呼び戻すこともできる。賢明に使いなさい。絶望的な戦いへ魂を呼び戻すことは、慈悲ではなく残酷だ。立ちなさい、救済者よ。',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': '安らかにした水没した死者',
+  'entities.quests.q_rite_of_redemption.text':
+    '沼地までついてきたか、{playerName}。よろしい。暁縛りの聖典はここにある。この水没した地こそ、その言葉にふさわしい。死者が埋葬されたままでいられない場所ほど、生と死の帳が薄い場所はない。だが水没した死者は、詠唱の途中であなたの声を沈めようとするだろう。儀式にふさわしい場所を確保しなさい。水没した死者を8体眠らせ、共に聖別しよう。',
+  'entities.quests.q_rite_of_redemption.title': '呼び戻しの儀式',
+  'game.hud.lowFocus': '集中値低下',
+  'guide.abilityHook.ancestor_return':
+    '戦闘外で長く詠唱し、倒れたパーティーまたはレイドの全員を蘇生します。',
+  'guide.abilityHook.avenging_wrath': '献身を10獲得し、15秒間、能力による献身の生成量を2倍にする。',
+  'guide.abilityHook.bastion_sweep': '盾で敵集団を薙ぎ払い、脅威を掌握して献身を蓄える。',
+  'guide.abilityHook.chain_lightning':
+    '1体を攻撃して近くの敵2体へ跳び、1回の発動全体で雷鳴を1つ蓄えます。',
+  'guide.abilityHook.consecration': '周囲の地を聖別し、持続的な神聖ダメージと脅威を与える。',
+  'guide.abilityHook.evil_eye': '敵を一体指定し、その行動と苦痛から断罪を蓄積します。',
+  'guide.abilityHook.galeheart_weapon': '二刀に嵐の風を宿し、安定した攻撃リズムを力に変えます。',
+  'guide.abilityHook.hammer_of_justice': '短時間の確実なスタンで敵1体を止める。',
+  'guide.abilityHook.hammer_of_wrath':
+    '遠距離から瀕死の敵を処刑する。翼が発動中なら、どの敵にも使用できる。',
+  'guide.abilityHook.holy_shield':
+    '献身を消費し、一定時間のブロック、吸収効果、脅威の波動を発動する。',
+  'guide.abilityHook.lay_on_hands': '味方が倒れかけたとき、その体力を大幅に回復する。',
+  'guide.abilityHook.lifespring_weapon': '武器に癒やしの水を宿し、継続する回復の流れを強めます。',
+  'guide.abilityHook.measured_shot': '慎重に狙う遠距離射撃で、強力な攻撃に使う集中値を回復します。',
+  'guide.abilityHook.moonseed': '月翼形態中、月潮を1段階進め、月の嵐の効果時間を延長します。',
+  'guide.abilityHook.oath_chain': '遠くの敵を集団へ引き寄せ、逃走を遅らせる。',
+  'guide.abilityHook.pack_command': '相棒に攻撃を命じ、獣の解放に必要な獰猛さを蓄えます。',
+  'guide.abilityHook.primal_exaltation': '専門分野に応じた元素の力を短時間解き放ちます。',
+  'guide.abilityHook.stampede':
+    '3体の獣を12秒間呼び出して攻撃させます。群れの獰猛さが最大の時に使うと、召喚中ずっと最大のダメージ上昇を保ちます。',
+  'guide.abilityHook.stoneward': '力を蓄えた石の盾を掲げ、受けたダメージを回復に変えます。',
+  'guide.abilityHook.stormsurge':
+    'ストームキャストを消費すると、祖霊の一撃が早く戻ることがあります。',
+  'guide.abilityHook.thunder_reservoir':
+    '雷を蓄え、大地の衝撃か断層の目覚めで最大威力を解放します。',
+  'guide.abilityHook.tidecall': '味方1体を即時に回復し、癒しの水流を最大まで蓄えます。',
+  'guide.abilityHook.veilbound_march':
+    '敵集団をすり抜けて印を刻み、自身へのダメージを弱め、脅威を固定する。',
+  'guide.abilityHook.warspirit_cadence':
+    '安定した武器のリズムを疾風の残響と即時呪文の機会に変えます。',
   'guide.arenaPage.honorBody': '名誉は、他のプレイヤーと戦うための通貨です。灰の闘技場で、そしてソーンホロウ平原の野で稼ぎます。コインとは別に管理され、両者が混ざることは決してありません。今どれだけ抱えているかはキャラクターシートに表示されます。使い道はただ一つ、ウォーフェア装備だけです。',
   'guide.arenaPage.honorFinalNote': '名誉での購入は取り消せません。コインでの買い物なら商人の買い戻し一覧からやり直せますが、名誉での購入がそこに並ぶことは決してなく、ウォーフェア装備は買った瞬間に魂縛されるため、取引にも郵送にも売り戻しにも二度と回せません。商店がわざわざ確認を求めるのはそのためです。押す前に、その一点をよく読みましょう。',
   'guide.arenaPage.honorHeading': '名誉',
@@ -11837,15 +12282,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framePartyBody': 'パーティメンバーは、画面左側のターゲットフレームの下に、1人1行ずつ積み重なります。距離が離れたメンバーの行は暗くなり、対処すべき効果が表示され、そのメンバーのペットを横に並べることもできます。体力の文字をどこまで出すかはあなた次第です。表示なし、パーセント、数値、その両方から選べます。',
   'guide.interfacePage.framePartyTitle': 'パーティ',
   'guide.interfacePage.framePetBody': 'ハンターやウォーロックをはじめ、ペットを出している人には、自分のフレームの脇にペット用の小さなフレームが付き、名前、レベル、体力が表示されます。そのフレームをクリックするとペットをターゲットでき、キーボードならCtrl+6でも同じことができます。',
-  'guide.interfacePage.framesBody': 'ユニットフレームは、ポートレートとその脇に並ぶバーで成り立っています。体力バーは必ずあり、リソースを持つ対象にはリソースバーが、さらに名前とレベルのチップが付きます。ダメージシールドは体力バーの上に重なる明るい区画として描かれるので、体力が減り始める前にシールドが削れていく様子を見守れます。',
   'guide.interfacePage.frameSelfBody': '画面下の中央、アクションバーの隣にあります。ポートレート、レベル、体力、そしてリソースが並び、戦闘中は戦闘の印が、休息中は休息の印が付き、コンボポイントを溜めるクラスにはその列も表示されます。フレームをクリックすると自分をターゲットします。',
   'guide.interfacePage.frameSelfTitle': '自分のフレーム',
-  'guide.interfacePage.framesMoveBody': '自分のフレーム、ターゲットフレーム、パーティフレームは、いずれも移動できます。どれも隅に小さな移動ボタンを備えているので、固定を外し、好きな位置へドラッグし、もう一度固定すれば、うっかりクリックしてもずれません。置き場所を悔やむことになったら、オプションの「フレーム位置をリセット」で、すべて元の場所へ戻せます。',
-  'guide.interfacePage.framesTitle': 'ユニットフレーム',
   'guide.interfacePage.frameTargetBody': '画面の左上にあり、何かをターゲットした瞬間に現れ、外すとまた消えます。同じポートレートとバーに加えて、手強い敵には「エリート」のタグが、ターゲットの詠唱を映すキャストバーが、そして付いている効果の帯が並びます。',
   'guide.interfacePage.frameTargetTitle': 'ターゲット',
   'guide.interfacePage.frameTotBody': 'ターゲットフレームの脇に出る小さなフレームで、あなたのターゲットが今誰を狙っているかを示します。敵がタンクと戦っているのか、それともあなたに向かってくるのかを見分ける、いちばん早い方法です。オプションで有効にするまでは表示されません。',
   'guide.interfacePage.frameTotTitle': 'ターゲットのターゲット',
+  'guide.interfacePage.framesBody': 'ユニットフレームは、ポートレートとその脇に並ぶバーで成り立っています。体力バーは必ずあり、リソースを持つ対象にはリソースバーが、さらに名前とレベルのチップが付きます。ダメージシールドは体力バーの上に重なる明るい区画として描かれるので、体力が減り始める前にシールドが削れていく様子を見守れます。',
+  'guide.interfacePage.framesMoveBody': '自分のフレーム、ターゲットフレーム、パーティフレームは、いずれも移動できます。どれも隅に小さな移動ボタンを備えているので、固定を外し、好きな位置へドラッグし、もう一度固定すれば、うっかりクリックしてもずれません。置き場所を悔やむことになったら、オプションの「フレーム位置をリセット」で、すべて元の場所へ戻せます。',
+  'guide.interfacePage.framesTitle': 'ユニットフレーム',
   'guide.interfacePage.glanceBody': 'インターフェースは画面の縁に沿って並び、中央はワールドのために空けてあります。自分のフレーム、アクションバー、経験値バーは下辺に。ターゲットとパーティは左上に。ミニマップとゾーン名は右上にあり、その下、右端に沿ってトラッカーが縦に流れます。チャットボックスは左下の隅、小さな四角いボタンのレールは右下です。\n\nそれ以外はすべて、自分で開いたり閉じたりするウィンドウです。ほとんどのウィンドウには専用のキーがあり、多くは右下のレールにもボタンがあります。どれも同じキーをもう一度押すか、Escで閉じられます。',
   'guide.interfacePage.glanceTitle': 'ひと目で見る画面',
   'guide.interfacePage.intro': '画面の見取り図です。インターフェースのフレーム、バー、ボタンがそれぞれ何をするのか、そしてどのキーがどのウィンドウを開くのかをまとめます。',
@@ -11920,10 +12365,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.nav.interface': 'インターフェースとHUD',
   'guide.nav.mounts': 'マウントと騎乗',
   'guide.nav.rifts': 'リフト',
-  'guide.professions.focusBodyTiers': 'どの拠点の町にも、訪れる採り手のための「町のフォーカス」パネルがある。町の中に立ってミニマップの脇から開き、10ポイントのフォーカスの持ち分を、気にかける素材の種類へ振り分けよう。素材にフォーカスを5ポイント置くごとに採取ティアが1段階上がり（上がるのは最大2段階まで）、1ポイントごとに産出が10パーセント増える。フォーカスしていない素材が悪くなることは決してない。\n\n割り振りはどこを歩いてもキャラクターに付いてまわり、後の町での滞在中なら、好きな速さでいつでも狙いを変えられる。時間をかけるなら無料で、動かした1ポイントにつき1分かかる。少し払えば速まり、1ポイントにつき15秒、費用は1ポイントごとに5銅と鈴音の粉塵1個。全額払えば即座に終わり、1ポイントごとに25銅と鈴音の粉塵5個だ。数えられるのは実際に動かしたポイントだけなので、1ポイントだけ動かすなら安く済むし、開いて何も変えずに閉じたパネルは、どの段階でも一切かからない。',
-  'guide.professions.harvestBodyFamilies': '採集はノードで終わらない。倒した獣の多くは、通常の戦利品と並んで、死体から直接素材を採取できる：毛皮、牙、爪、大牙、絹糸、毒、布、そして肉。各死体は早い者勝ちで一度だけ採取でき、ひと押しで戦利品と採取の両方が開く。加工できる素材をふたつ以上持つ獣なら、選択はあなたのものだ：その獣が差し出せるすべてを取るか、より少ない素材に集中して、実際に取る分だけはっきりと上のグレードで受け取るか。\n\n標本を宿す系統の獣でレア以上の採取を引き当てると、通常の産出に加えて署名入りの完璧な標本（極上の獣皮、極上の蜘蛛の糸、極上の毒腺、極上の爪、極上の肉のいずれか）も手に入り、功績の書に「申し分なき標本」が刻まれる。採取はどのキャラクターにもでき、訓練も要らない。手持ちの採集道具はどの職のものであれ、このレア以上の判定を後押しする。',
-  'guide.professions.toolEffectsBody': '採集道具にはスロットがひとつあり、そこへ収まるのがエンチャンターの護符です。「採集者の貯蔵袋」は採取の産出を1つ増やし、「職人の眼」は採れるものの等級を1段上げます。イーストブルックの工房の主、からくり師ギッゼルが、エンチャントのスキルが25に届いたエンチャンターに両方を教えてくれます。どちらも彼の工房で作ります。\\n\\n装着したての護符は、コモンの道具なら20回の充填を備え、レア度が1段上がるごとに10回ずつ増えるので、同じ護符をエピックのつるはしに装着すれば50回から始まります。充填が減るのは護符が実際に結果を変えたときだけで、改善しなかった採取では決して減りません。スロットは使うたびに確認する設定にもできるので、あなたが「充填を使う」と言うまで護符は待ってくれます。新しい護符を装着すると、そのとき持っている道具に合わせてスロットが鋳直されるため、以前の最高記録ではなく、その道具が保てる回数まで満たされます。まったく何も変わらない装着し直しは、護符を食べてしまう前に断られます。\\n\\n充填を使い切っても護符が壊れることはありません。道具の持ち主がスロットを再充填します。秘術素材1個につき10回分で、求められる素材は、持ち歩いている道具と、そのスロットがこれまでに満たされた最上の道具の、より良いほうに従います。コモンかアンコモンの道具なら鈴音の粉塵、レアなら鈴音の精髄、エピックなら鈴音のかけらです。良い道具を銀行に置いてきても、安い再充填が買えるわけではなく、同じ値段で少ない充填になるだけです。安い段へ下りる正直な道は、劣る道具を持った状態で新しい護符を装着し、そこでスロットを鋳直すことです。スロットの上限が今の道具で満たせる量を超えている場合、再充填はその道具の限界で止まり、より良いほうを持ってくるように告げます。護符に署名したエンチャンター本人なら再充填の素材は半分で済み、エンチャントに特化していればさらに少なくなります。それ以外の人は全額です。再充填はこの職のほかの作業と同じく、短い詠唱です。',
-  'guide.professions.toolEffectsHeading': '道具効果',
   'guide.profPages.econ.commissionsBoardNote': '受注に至る道は二つあります。上の掲示板に出す依頼で職人のもとへ仕事を運ぶ道と、職人がただあなたのために一品を作ろうと決める道です。どちらも同じ絆に行き着きます。',
   'guide.profPages.econ.orderBoardBody': 'チャットで職人を探し回る必要はありません。製作ウィンドウを開けば、そのヘッダーからワンクリックで依頼ボードへ行けます。誰でもそこに依頼を出せます。作ってほしいレシピを指定し、どの職人でも引き受けられる公開のままにするか、特定の職人ひとりに宛てるかを選びます。宛てた場合、引き受けられるのはその人だけです。ボードを眺めていた職人が依頼を承諾し、承諾がその人を縛るので、一つの仕事を同時に進めるのは常に一人だけです。\n\n出すときに預けるものは何もありません。依頼はお金も素材も確保しないので、値段と誰が材料を用意するかは二人の間の話であり、受注が昔からそうであるように取り決めます。まだ公開中の自分の依頼は取り消せますし、誰にも引き受けられなかった依頼は一日で自然に期限切れになります。職人が承諾したあとは、受け渡しが依頼を締めくくります。\n\n受け渡しは対面です。職人がその品を受注品として作り、あなたのところへ来て手渡すので、受け取るためのバッグの空きを一つ残しておきましょう。届いた品は下記の通常の受注のきまりに従い、作り手の絆によってあなたにバインドされます。',
   'guide.profPages.econ.orderBoardHeading': '依頼ボード',
@@ -11936,6 +12377,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q9': '誰かに何かを作ってもらうにはどうすればいいですか？',
   'guide.profPages.findingNodesNote': '目で探し回る必要はありません。ゾーンの中のノードは、地図がその土地を映しているならすべてゾーンマップに描かれ、そばを通ればミニマップにも現れるので、採集の周回路は出発前に地図の画面で組み立てられます。まだ道具が届かないノードは、隠されるのではなく印が付きます。取り消し線の入った暗い印としてその場所を保つので、これから目指す土地を見て取れます。デスクトップでは、ワールドの鉱脈、立木、群生地にカーソルを合わせると名前と必要な道具が分かり、一度採取したあとは自分の再生時間を秒単位で数えてくれます。タッチではカーソルを合わせられないので、ミニマップの印が同じことを教えてくれます。',
   'guide.profPages.specimenBodyFamilies': '採集に出るときは、バッグに少し空きを残しておきましょう。署名入りの掘り出し物は、自分のための空きか、署名の一致するスタックがないと収まりません。何も収まらなければ産出そのものは届きますが、署名は失われます。死体の採集にも独自の大当たりがあり、採取した素材のおよそ{pct}%がレア以上を引き当てます。完璧な標本を差し出す系統（毛皮、絹糸、毒、爪、肉）は、通常の産出を無印のまま残し、その脇に署名入りの標本を打ち出します。残る三つ、牙、布、大牙は、産出そのものに署名が入ります。',
+  'guide.professions.focusBodyTiers': 'どの拠点の町にも、訪れる採り手のための「町のフォーカス」パネルがある。町の中に立ってミニマップの脇から開き、10ポイントのフォーカスの持ち分を、気にかける素材の種類へ振り分けよう。素材にフォーカスを5ポイント置くごとに採取ティアが1段階上がり（上がるのは最大2段階まで）、1ポイントごとに産出が10パーセント増える。フォーカスしていない素材が悪くなることは決してない。\n\n割り振りはどこを歩いてもキャラクターに付いてまわり、後の町での滞在中なら、好きな速さでいつでも狙いを変えられる。時間をかけるなら無料で、動かした1ポイントにつき1分かかる。少し払えば速まり、1ポイントにつき15秒、費用は1ポイントごとに5銅と鈴音の粉塵1個。全額払えば即座に終わり、1ポイントごとに25銅と鈴音の粉塵5個だ。数えられるのは実際に動かしたポイントだけなので、1ポイントだけ動かすなら安く済むし、開いて何も変えずに閉じたパネルは、どの段階でも一切かからない。',
+  'guide.professions.harvestBodyFamilies': '採集はノードで終わらない。倒した獣の多くは、通常の戦利品と並んで、死体から直接素材を採取できる：毛皮、牙、爪、大牙、絹糸、毒、布、そして肉。各死体は早い者勝ちで一度だけ採取でき、ひと押しで戦利品と採取の両方が開く。加工できる素材をふたつ以上持つ獣なら、選択はあなたのものだ：その獣が差し出せるすべてを取るか、より少ない素材に集中して、実際に取る分だけはっきりと上のグレードで受け取るか。\n\n標本を宿す系統の獣でレア以上の採取を引き当てると、通常の産出に加えて署名入りの完璧な標本（極上の獣皮、極上の蜘蛛の糸、極上の毒腺、極上の爪、極上の肉のいずれか）も手に入り、功績の書に「申し分なき標本」が刻まれる。採取はどのキャラクターにもでき、訓練も要らない。手持ちの採集道具はどの職のものであれ、このレア以上の判定を後押しする。',
+  'guide.professions.toolEffectsBody': '採集道具にはスロットがひとつあり、そこへ収まるのがエンチャンターの護符です。「採集者の貯蔵袋」は採取の産出を1つ増やし、「職人の眼」は採れるものの等級を1段上げます。イーストブルックの工房の主、からくり師ギッゼルが、エンチャントのスキルが25に届いたエンチャンターに両方を教えてくれます。どちらも彼の工房で作ります。\\n\\n装着したての護符は、コモンの道具なら20回の充填を備え、レア度が1段上がるごとに10回ずつ増えるので、同じ護符をエピックのつるはしに装着すれば50回から始まります。充填が減るのは護符が実際に結果を変えたときだけで、改善しなかった採取では決して減りません。スロットは使うたびに確認する設定にもできるので、あなたが「充填を使う」と言うまで護符は待ってくれます。新しい護符を装着すると、そのとき持っている道具に合わせてスロットが鋳直されるため、以前の最高記録ではなく、その道具が保てる回数まで満たされます。まったく何も変わらない装着し直しは、護符を食べてしまう前に断られます。\\n\\n充填を使い切っても護符が壊れることはありません。道具の持ち主がスロットを再充填します。秘術素材1個につき10回分で、求められる素材は、持ち歩いている道具と、そのスロットがこれまでに満たされた最上の道具の、より良いほうに従います。コモンかアンコモンの道具なら鈴音の粉塵、レアなら鈴音の精髄、エピックなら鈴音のかけらです。良い道具を銀行に置いてきても、安い再充填が買えるわけではなく、同じ値段で少ない充填になるだけです。安い段へ下りる正直な道は、劣る道具を持った状態で新しい護符を装着し、そこでスロットを鋳直すことです。スロットの上限が今の道具で満たせる量を超えている場合、再充填はその道具の限界で止まり、より良いほうを持ってくるように告げます。護符に署名したエンチャンター本人なら再充填の素材は半分で済み、エンチャントに特化していればさらに少なくなります。それ以外の人は全額です。再充填はこの職のほかの作業と同じく、短い詠唱です。',
+  'guide.professions.toolEffectsHeading': '道具効果',
   'guide.progression.ridingBody': '登りの果てに待っているもののひとつが騎乗です。レベル{level}になれば、厩舎長がかなりの金貨と引き換えにこの技を教えてくれ、訓練コースでの稽古が最初の手綱をもたらします。マウントは力を何ひとつ与えませんが、世界を小さくしてくれます。北への長い徒歩のあとでは、それもまた立派なご褒美です。',
   'guide.progression.ridingTitle': '騎乗を習う',
   'guide.questsPage.availableBody': 'クエストは連なりになっています。多くは前のクエストを報告して初めて提示され、最低レベルを求めるものも少なくありません。ですから今日はあなたに用のないNPCも、数レベル上げたあとや、今抱えているクエストを片づけたあとには、たくさんの仕事を用意しているかもしれません。乗馬の稽古のように独自の条件を持つものもあり、これは騎乗のスキルを買ったあとにだけ開きます。グループ向けのクエストは、何人で挑むことを勧めるかを明記して、最初から知らせてくれます。繰り返し受けられる仕事もあります。しばらく待てばまた受注でき、依頼主の頭上のマーカーが、また巡ってきたことを教えてくれます。',
@@ -12067,6 +12512,161 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.riftTitle': 'リフトのポータル',
   'guide.worldPage.travelBody': 'レルムのどの道も、歩くか馬で行くものです。飛行路も、辻馬車も、テレポートの網もありません。地図は一続きの陸地で、どのつながりも自分の足で立てる場所です。尾根が一つのレルムを次のレルムから隔てており、二つのレルムが尾根を分け合うところでは、道が峠を越えて登っていきます。とはいえ、すべての境がそうなっているわけではありません。北では長い土手道が、ヴェールの幽谷から水の上を渡ってその先の雪国へ道を運びます。南へ戻れば、Ferrywalkと呼ばれる細い自然の砂州が渓谷の海岸から東へ延び、陸の境をまったく持たない遠つ岸の島の船着き場へつながっています。そして地上世界には、ただ一つだけ本物の扉があります。ソーンピークの高みに掛かる黄昏の帳で、その先はヴェールの幽谷です。幽谷の南の尾根は封じられ、越える峠がないので、あの帳こそが最初に中へ入る道であり、帰りにはあなたの背後で閉じます。\n\nどこで倒れても、戻り道は短いものです。どのゾーンにも墓地が少なくとも一つあり、墓石の上には霊魂の癒し手が漂っています。解き放たれた魂は、最も近い墓地で起き上がります。\n\n地図は見えない壁で終わったりはしません。陸は浜辺と岬になり、やがて外海へと溶けていきます。世界があなたに泳いで渡らせるつもりの水路、つまりレルムとレルムのあいだの海峡や湖沼は穏やかで、安全に渡れます。しかし外海へ乗り出せば、距離そのものがあなたを押し返します。警告が出て、もう一度警告が出て、それでも泳ぎ続ければ、海はあなたを削り、ついには命を奪います。潜ることにも独自の限りがあり、水面の下では息が続きません。水がそう告げてきたら、息継ぎに浮上して引き返しましょう。',
   'guide.worldPage.travelTitle': '移動について',
+  'hud.errors.notEnoughDevotion': '献身が足りない！',
+  'hud.pet.abyssalChain': '深淵の鎖',
+  'hud.pet.abyssalChainDesc':
+    'ダスクマークに、8ヤードより遠く20ヤードまでの通常の敵を自分の元へ引き寄せるよう命令します。ボスは引き寄せられません。クールダウン15秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。',
+  'hud.pet.abyssalChainTitle': '深淵の鎖',
+  'hud.pet.autocastOff':
+    '自動発動オフ。右クリック、タッチ長押し、またはShift+Enterでオンにします。',
+  'hud.pet.autocastOn': '自動発動オン。右クリック、タッチ長押し、またはShift+Enterでオフにします。',
+  'hud.pet.felbolt': 'フェルボルト',
+  'hud.pet.felboltDesc':
+    'エンバーキンに、対象へ追加の邪悪な弾を放つよう命令します。クールダウン8秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。',
+  'hud.pet.felboltTitle': 'フェルボルト',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    '対象となるダメージが断罪を{value}生成する。{interval}秒に1回まで',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'ドレイン・ライフが運命の糸{stacks}を消費し、各ティックで断罪を{doom}追加生成する',
+  'hudChrome.auraEffect.afflictionEye':
+    'マレディクト・ゲイズが{interval}秒ごとに攻撃し、この邪眼での効果は断罪を{pct}%生成する',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'この邪眼での効果は断罪を{doomPct}%生成し、センテンスがここへ{echoPct}%のダメージで反響する',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '運命の糸{stacks}：センテンスのダメージが{sentencePct}%増加、またはドレイン・ライフの各ティックが断罪を{doom}追加生成する',
+  'hudChrome.auraEffect.afflictionJudgment':
+    '主邪眼の断罪生成が{eyePct}%増加し、センテンスのダメージが{sentencePct}%増加、最初の1回は断罪を{refund}返還する',
+  'hudChrome.auraEffect.afflictionLitany':
+    '断罪獲得時、{radius}ヤード内の最大{targets}体に{damage}の影ダメージを与える。1秒に1回まで',
+  'hudChrome.auraEffect.afflictionPossession':
+    'ニードル・オブ・フェイト、ドレイン・ライフ、マレディクト・ゲイズ、センテンスを強化する',
+  'hudChrome.auraEffect.afflictionVicarious':
+    '受けるダメージの{pct}%を転送または軽減し、断罪を最大{max}生成する',
+  'hudChrome.auraEffect.afflictionViolence':
+    '報復は残り{charges}回。敵の攻撃で断罪を{doom}生成し、{damage}の影ダメージを返す',
+  'hudChrome.auraEffect.aoeEcho':
+    '残り{charges}回：単体アビリティが近くの最大{targets}体にも{pct}%のダメージを与える',
+  'hudChrome.auraEffect.arcaneCharge':
+    '秘術チャージ{stacks}：エーテル・サージのダメージが{damagePct}%増加、詠唱が{castPct}%短縮、マナ消費が{costMult}倍になる',
+  'hudChrome.auraEffect.bleedVuln': '受ける出血ダメージが{pct}%増加する',
+  'hudChrome.auraEffect.brainFreeze': '次のフラーリィが即時発動し、クールダウンを無視する',
+  'hudChrome.auraEffect.castShield': 'ダメージで詠唱が中断または遅延しない',
+  'hudChrome.auraEffect.cauterizeFatigue': 'コーテライズは次の致死ダメージを防げない',
+  'hudChrome.auraEffect.cooldownCap': 'この時間枠でクールダウン短縮を{used}/{cap}秒使用済み',
+  'hudChrome.auraEffect.dawnsWrath': '制裁の鎚: HP不問 · +1回 · CD0 · ダメージ+{pct}%',
+  'hudChrome.auraEffect.desolation':
+    '残り{charges}チャージ：次のカオス・ボルトの詠唱が{castPct}%短縮、または次のレイン・オブ・ファイアが即着弾する',
+  'hudChrome.auraEffect.duskEconomy': 'アビリティの消費エナジーが{pct}%減少する',
+  'hudChrome.auraEffect.duskfireClaim': '対象の死亡時にルインを{value}得る',
+  'hudChrome.auraEffect.elementalTrance':
+      '受けるダメージが{pct}%軽減される。与えた全ダメージの{mana}%がマナに変換される',
+  'hudChrome.auraEffect.energyRegen': 'エネルギー回復速度が{pct}%上昇する',
+  'hudChrome.auraEffect.enrage':
+    '与えるダメージが{damagePct}%、攻撃速度が{hastePct}%、移動速度が{movePct}%上昇する',
+  'hudChrome.auraEffect.fingersOfFrost':
+    '残り{charges}チャージ：アイス・ランスは対象を凍結扱いにし、凍結時ダメージ{pct}%を与える',
+  'hudChrome.auraEffect.forbiddenReflectionLock':
+    'フォービドゥン・リフレクションはまだ再準備できない',
+  'hudChrome.auraEffect.forbiddenReflectionReady':
+    '次の対象となるウォーロックのクールダウンを再使用できる',
+  'hudChrome.auraEffect.formLich':
+    'ソウル・ランスが近くの最大{targets}体にも{pct}%のダメージを与える',
+  'hudChrome.auraEffect.formMetamorph':
+    '悪魔形態：体格が{pct}%大きくなる。ほかのボーナスは別のバフで表示される',
+  'hudChrome.auraEffect.formMoonkin':
+    'ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する',
+  'hudChrome.auraEffect.formShadow': 'グロームヴェイル形態：影ダメージが{pct}%増加する',
+  'hudChrome.auraEffect.freeExecute': '次の対象となる処刑アビリティはコストを消費しない',
+  'hudChrome.auraEffect.funeralHarvestLock':
+    'フューネラル・ハーベストはまだ次の魂の欠片を生成できない',
+  'hudChrome.auraEffect.galeheartWeapon':
+      'ウォースピリットの{steps}連撃サイクルを完了すると、その一撃が{count}回反響し、それぞれダメージの{pct}%の自然ダメージを与える',
+  'hudChrome.auraEffect.gloam':
+    '薄闇の蓄え:{stacks}/{max}段階。ダスクヴェールから使った先制技ごとに1段階進む。{max}段階で先制技がステルスなしで使用可能になり、次の1回はコストなしで3段階すべてを消費し、ヴェールストライクが始まる',
+  'hudChrome.auraEffect.healEcho': '体力が{threshold}%未満になると体力を{value}回復する',
+  'hudChrome.auraEffect.hunterFerocity':
+    '群れの獰猛さ{stacks}スタック：ペットの与えるダメージが{pct}%上昇',
+  'hudChrome.auraEffect.icicles':
+    'アイシクル{value}/{max}。{max}でグレイシャル・スパイクを使用できる',
+  'hudChrome.auraEffect.internalCooldown': 'タイマー終了までこの効果は再発動しない',
+  'hudChrome.auraEffect.leadenHexLock': 'レドン・ヘックスはまだこの対象を再び移動不能にできない',
+  'hudChrome.auraEffect.mendingCurrent':
+    '{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する',
+  'hudChrome.auraEffect.mendingCurrentPercent': '最大体力の{pct}%分の回復量を流転の癒し用に蓄える',
+  'hudChrome.auraEffect.moontide':
+    '月潮：{stacks}/{max}段階。月翼形態での野生の稲妻・天墜・月の種の詠唱ごとに1段階進む。{max}段階で月の種はムーンサージに、天墜は陽醒に変化し、どちらを使っても3段階すべてを消費する',
+  'hudChrome.auraEffect.necromancyDeathEcho':
+    '旧仕様のデス・エコー。現在これを消費するアビリティはない',
+  'hudChrome.auraEffect.necromancyHarvestMark': '死亡時に魂の欠片を1個生成することがある',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    'あなたとアンデッドのダメージの{storedPct}%、ソウル・ランスはさらに{lancePct}%を蓄積する。再使用で爆発。死亡時は{radius}ヤード内で爆発し魂の欠片を1個生成する',
+  'hudChrome.auraEffect.nextAttackCrit': '次の攻撃が必ずクリティカルになる',
+  'hudChrome.auraEffect.oldBlood':
+    '古き血：{stacks}/{max}段階。裂き爪・皮剥ぎ・血の亀裂・血噛み・薙ぎ払う爪・骨砕きの命中ごとに1段階蓄える。{max}段階で、ウルフフォームでは血噛みが血の収穫に、ブルーインフォームでは骨砕きが骨髄砕きに変化する',
+  'hudChrome.auraEffect.overpowerCharge':
+    'チャージ{stacks}：次のメイミング・ストライクのダメージが{pct}%増加する',
+  'hudChrome.auraEffect.perfectMoment': 'エーテル・ダーツが秘術チャージを消費しない',
+  'hudChrome.auraEffect.petDamage': 'ペットのダメージが{pct}%増加する',
+  'hudChrome.auraEffect.petHaste': 'ペットの行動速度が{pct}%上昇する',
+  'hudChrome.auraEffect.physicalReduction': '受ける物理ダメージが{pct}%減少する',
+  'hudChrome.auraEffect.pyreGuardian':
+    '{ruinInterval}秒ごとにルインを{ruin}生成し、{damageInterval}秒ごとに{radius}ヤード内へ{damage}の火ダメージを与える',
+  'hudChrome.auraEffect.radiantResonance':
+    '次の癒やしの光が即時発動になる。または次の暁の抱擁のマナ消費が{pct}%減少し、詠唱時間が{castTime}秒になる',
+  'hudChrome.auraEffect.redline':
+    'レッドライン:{stacks}/{max}ピップ。「ヘイメーカー」ごとにピップが1増える。「消灯」はピップごとに{pct}%強化され、レッドラインを終了させる。先に時間切れになるとノックアウトは失われる',
+  'hudChrome.auraEffect.resourceCount': '{value}/{max}',
+  'hudChrome.auraEffect.resourceSap': '{interval}秒ごとに現在のリソースを{value}回復する',
+  'hudChrome.auraEffect.ruinousBrand':
+    '残り{charges}回：直接呪文がここへ{otherPct}%のダメージを複製し、ここが主対象なら{selfPct}%を複製する',
+  'hudChrome.auraEffect.sated': '別のグループ加速効果を受けられない',
+  'hudChrome.auraEffect.solarReprisal':
+    '次の陽光の円盤はマナを消費せず、クールダウンを無視してダメージが{pct}%増加する。恩寵の槌はクールダウンを無視し、与えたダメージの100%を回復する。または癒やしの光が即時発動になる',
+  'hudChrome.auraEffect.sourceVuln': 'この効果を付与した術者から受けるダメージが{pct}%増加する',
+  'hudChrome.auraEffect.spellDamage': '呪文ダメージが{pct}%増加する',
+  'hudChrome.auraEffect.spellHaste': '呪文の詠唱速度が{pct}%上昇する',
+  'hudChrome.auraEffect.stasis': '無敵になるが行動できない',
+  'hudChrome.auraEffect.suddenDeath': '次のエグゼキュートは怒気を消費せず、体力条件を無視する',
+  'hudChrome.auraEffect.sureCrit': '次のダメージアビリティ{charges}回が必ずクリティカルになる',
+  'hudChrome.auraEffect.sweepingStrikes':
+    '単体攻撃が近くの敵{targets}体にも{pct}%のダメージを与える',
+  'hudChrome.auraEffect.temporalEcho':
+    '術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる',
+  'hudChrome.auraEffect.veiledEdge': '次に放つ「潜伏者の一撃」は2倍のダメージを与える',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    '影に包まれている:ダスクヴェール専用の先制技をどの角度からでも使用でき、与ダメージが{pct}%増加する',
+  'hudChrome.auraEffect.venomRitual':
+    '毒の儀式:{stacks}/{max}段階。「卑劣な突き」「邪悪な斬撃」「毒針」で1段階ずつ進む。{max}段階で「永の眠り」が「毒裂き」に変化する',
+  'hudChrome.auraEffect.verdance':
+    '翠成：{stacks}/{max}段階。新しく植えた野生の芽吹きまたは二度目の開花ごとに1段階進む。{max}段階でスウィフトメンドが満開に変化する',
+  'hudChrome.auraEffect.warlockAnchor':
+    '{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する',
+  'hudChrome.auraEffect.wintersChill':
+    '残り{charges}チャージ：対象となる呪文はこの敵を凍結扱いにする',
+  'hudChrome.paladin.ascensionLastAnnouncement': '昇天の最後のチャージ',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'アクションスロット {slot}: {ability}。昇天のチャージを1消費する。',
+  'hudChrome.paladin.devotion': '献身',
+  'hudChrome.paladin.devotionAscensionCharges':
+    '献身 {value} / {max}。昇天のチャージ数: {charges}。',
+  'hudChrome.paladin.devotionAscensionLast': '献身 {value} / {max}。昇天の最後のチャージ。',
+  'hudChrome.paladin.devotionValue': '献身 {value} / {max}',
+  'hudChrome.procOverlay.ruinMeter': '破滅',
+  'hudChrome.procOverlay.ruinStatus': '破滅 {value}/{max}',
+  'hudChrome.procOverlay.soulFragmentsMeter': '魂の欠片',
+  'hudChrome.statInfo.effects.manaRegenCombat': '戦闘中、5秒ごとにマナが約{value}回復',
+  'hudChrome.warlock.doomEmptyStatus': '断罪 {value}/{max}。',
+  'hudChrome.warlock.doomLabel': '断罪',
+  'hudChrome.warlock.doomMeterLock': '苦痛リソースバーを固定',
+  'hudChrome.warlock.doomMeterUnlock': '苦痛リソースバーを移動',
+  'hudChrome.warlock.doomStatus': '断罪 {value}/{max}、残り {remaining}。',
+  'hudChrome.warlock.fateThreadsConsumeReady': '運命の糸が3本: 喰らうで追加の断罪へ紡げます。',
+  'hudChrome.warlock.fateThreadsLabel': '運命の糸',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    '運命の糸が3本: 宣告で消費するとダメージが18%増加します。',
+  'hudChrome.warlock.fateThreadsStatus': '運命の糸 {value}/{max}。',
+  'itemUi.tooltip.useHealingPotionPct':
+    '使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン2分。',
   'guide.controls.clickMoveNote': 'クリック移動は、自分で有効にするまではオフのままです。ゲームメニューからキー設定パネルを開き、「クリック移動」をオンにして、そのすぐ下にある「クリック移動ボタン」の行で、どのマウスボタンで歩くかを選びましょう（初期設定は「左クリック」、「右クリック」も選べます）。オンにすると、地面のどこかをクリックすればそこへ歩いていき、目指している場所には地面にマーカーが表示されます。クリーチャーや他のプレイヤーをクリックすると、その相手のもとまで歩いていって射程に入ったところで止まり、そのクリックはターゲットや対話といったいつもの役目もきちんと果たします。クリックしたものにもう手が届く距離にいるなら、そのまま動かずに対話するだけです。移動キーを押せばすぐに操作が手元へ戻って移動は終わり、マウスボタンを押したまま見回した場合も同じです。ジャンプでは終わらないので、跳んでいる間も移動は続きます。ゲームメニューを開いても移動は一時停止するだけで、メニューを閉じれば続きから再開します。',
   'guide.deedsPage.platformBody': 'デスクトップ版アプリからSteamまたはEpic Gamesのアカウントを連携すると、獲得した功績が、そのアカウントの実績として外側にも映し出されます。あくまでゲーム世界が本体です。功績はここで獲得され、あなたのキャラクターに記録され、実績はそのあとについてきます。すべての功績に対応する実績があるわけではありませんし、すぐに届かなかった場合も、次にログインしたときに追いつきます。連携はどこまでも連携であって、サインインの手段になることは決してありません。',
   'guide.deedsPage.platformHeading': 'SteamとEpicの実績',
@@ -12090,4 +12690,134 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatBody': '敵はそれぞれ、誰に最も苛立たされたかという密かな帳簿をつけています。ダメージはそこに加算され、回復も同じです。回復は、癒した相手とすでに戦っている敵たちに、分け合う形で脅威を乗せるので、最も安全な回復はタンクがすでに捕まえている相手への回復です。タンクは自分の生み出す脅威をすべて増幅する防御スタンスや守りの姿に切り替え、逆にドルイドのウルフフォームは脅威を削ぎ落とします。挑発は使った者を帳簿の一番上まで押し上げ、数秒のあいだ敵をその場に縛りつけます。敵は誰かがタンクを追い越した瞬間に矛先を変えるわけではありません。引き剥がすにははっきりとした差が必要で、近接よりも遠距離のほうが大きな差を求められます。ですから仕掛けの最初にほんの少し我慢するだけで、戦いはあるべき場所に留まります。',
   'guide.classPage.formLine.form_bear': 'タンクの姿です。分厚い毛皮をまとい、マナの代わりにレイジを使い、追加の脅威で敵の矛先を自分に引きつけ続けます。',
   'guide.riftsPage.floorsBody': 'リフトはいくつかのフロアで構成され、そのどれもがその場で新しく組み上げられます。下への道は、そのフロアがあなたを解放するまで開きません。フロアに居座るものを片づけ、行く手をふさぐ仕掛けを解いてはじめて、下りの道が裂け開きます。最後のフロアはボスで終わります。フロアごとに固有の性格があるので、ひとつの挑戦の中で霜の世界から燃え殻の世界へ移ることもあり、到着するたびにチャットがそのフロアの名を告げます。今回のリフトが何フロアあるのかは、画面のトラッカーでわかります。なお、一部のリフトは生成された下降のかわりに、手作りの舞台を開きます。こちらは決まった長さで進みます。',
+  // Performance diagnostics panel chrome. Technical report prose remains English.
+  'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft パフォーマンス診断',
+  'hudChrome.perf.diagnostics.title': 'ClaudeCraft パフォーマンス診断',
+  'hudChrome.perf.diagnostics.subtitle': 'ゲーム固有のスキャンで、根拠とコードレベルの修正案を提示します。',
+  'hudChrome.perf.diagnostics.aria.liveMeasurements': 'リアルタイムのパフォーマンス測定',
+  'hudChrome.perf.diagnostics.aria.scanProgress': '診断スキャンの進行状況',
+  'hudChrome.perf.diagnostics.aria.findings': '優先度順の診断結果',
+  'hudChrome.perf.diagnostics.controls.minimize': '最小化',
+  'hudChrome.perf.diagnostics.controls.expand': '展開',
+  'hudChrome.perf.diagnostics.controls.start': '15 秒スキャンを開始',
+  'hudChrome.perf.diagnostics.controls.refreshCensus': 'シーン集計を更新',
+  'hudChrome.perf.diagnostics.controls.copyReport': '明確なレポートをコピー',
+  'hudChrome.perf.diagnostics.controls.downloadReport': 'レポートをダウンロード',
+  'hudChrome.perf.diagnostics.controls.scanning': 'スキャン中...',
+  'hudChrome.perf.diagnostics.controls.scanAnother': '別のエリアをスキャン',
+  'hudChrome.perf.diagnostics.controls.reportLogged': 'レポートをコンソールに記録しました',
+  'hudChrome.perf.diagnostics.controls.copied': 'コピーしました',
+  'hudChrome.perf.diagnostics.controls.copyBlocked': 'コピーできません：レポートを記録しました',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics': '低画質で再テスト',
+  'hudChrome.perf.diagnostics.instruction': '最も正確な結果を得るには、オフラインプレイに入り、重い場所を移動してカメラを回し、スキャン中にカクつく効果を発生させてください。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart': 'このタブが非表示のためスキャンを一時停止しました。戻ると再開します。',
+  'hudChrome.perf.diagnostics.status.restoredRestart': 'タブが復帰しました。15 秒間のアクティブなゲームプレイ収集を最初からやり直します。',
+  'hudChrome.perf.diagnostics.status.worldLoaded': 'ワールドを読み込みました。操作可能な最初のフレームを待っています。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue': 'このタブが非表示のためスキャンを一時停止しました。続けるにはゲームに戻ってください。',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one': 'アクティブなゲームプレイを収集中：残り {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other': 'アクティブなゲームプレイを収集中：残り {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.waitingFrames': '代表的なゲームプレイフレームを待機中：{current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.collectingNow': 'アクティブなゲームプレイを収集中：問題のあるエリアを今すぐ移動してください。',
+  'hudChrome.perf.diagnostics.status.ready': 'スキャンの準備ができました。開始を押して遅延を再現してください。',
+  'hudChrome.perf.diagnostics.status.waitingWorld': 'ゲームワールドを待っています。オフラインプレイを選ぶか、オンラインキャラクターで入ってください。',
+  'hudChrome.perf.diagnostics.metrics.waitingRenderer': 'レンダラー：待機中',
+  'hudChrome.perf.diagnostics.metrics.waitingCensus': 'シーン集計：待機中',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch': 'カクつきの原因判定：ワールド進入時に有効',
+  'hudChrome.perf.diagnostics.metrics.recent': '直近  {fps} FPS | p95 {p95} ミリ秒 | 50 ミリ秒超 {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render': '描画  送信 {submit} ミリ秒 | ワールド {world} ミリ秒 | エンティティ {entities} ミリ秒',
+  'hudChrome.perf.diagnostics.metrics.scene': 'シーン   {calls} 呼び出し | {triangles} 三角形 | {views} ビュー',
+  'hudChrome.perf.diagnostics.metrics.hitches': 'カクつき {hitches} | シェーダー {shaders} | アップロード {uploads} | ビュー {views}',
+  'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
+  'hudChrome.perf.diagnostics.metrics.waitingValue': '待機中',
+  'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
+  'hudChrome.perf.diagnostics.healthyNoFindings': '対処可能なしきい値は検出されませんでした。短いカクつきが気になる場合は、発生する正確な移動経路でもう一度スキャンしてください。',
+  'hudChrome.perf.diagnostics.findingMeta': '{severity} | 信頼度 {confidence}',
+  'hudChrome.perf.diagnostics.sections.evidence': '根拠',
+  'hudChrome.perf.diagnostics.sections.tryNow': '今すぐ試す',
+  'hudChrome.perf.diagnostics.sections.codeFix': 'コード修正',
+  'hudChrome.perf.diagnostics.sections.source': '関連ソース',
+  'hudChrome.perf.diagnostics.severity.critical': '重大',
+  'hudChrome.perf.diagnostics.severity.warning': '警告',
+  'hudChrome.perf.diagnostics.severity.info': '情報',
+  'hudChrome.perf.diagnostics.confidence.high': '高',
+  'hudChrome.perf.diagnostics.confidence.medium': '中',
+  'hudChrome.perf.diagnostics.confidence.low': '低',
+  'hudChrome.perf.diagnostics.diagnosis.noProblemTitle': '重大なパフォーマンス問題は検出されませんでした',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.one': '直近 10 秒は {fps} FPS、フレーム p95 は {p95} で、対処可能な問題が {findings} 件ありました。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.other': '直近 10 秒は {fps} FPS、フレーム p95 は {p95} で、対処可能な問題が {findings} 件ありました。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.healthy': '直近 10 秒は {fps} FPS、フレーム p95 は {p95} でした。ゲーム、ブラウザー、GPU、メモリ、アセット、ネットワークのしきい値は検出されませんでした。',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration': 'ソフトウェアレンダリングが有効です',
+  'hudChrome.perf.diagnostics.diagnosis.titles.integratedGpu': 'ゲームは内蔵 GPU を使用しています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.highDpi': '高解像度レンダリングの負荷が高くなっています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics': '高画質の強制指定で性能が低下しています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.lowMemory': 'デバイスの使用可能メモリが少なくなっています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.browserStalls': 'ブラウザーまたは拡張機能の停止を検出しました',
+  'hudChrome.perf.diagnostics.diagnosis.titles.heapPressure': 'ブラウザーのメモリ圧迫を検出しました',
+  'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss': 'グラフィックスコンテキストがリセットされました',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit': 'GPU 送信がフレームの主なボトルネックです',
+  'hudChrome.perf.diagnostics.diagnosis.titles.sceneDraw': 'シーン描画コストが現在の画質予算を超えています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shadowPass': 'シャドウパスが描画呼び出しの多くを使用しています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererWorld': 'ワールド描画の更新が CPU に制限されています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererEntities': 'エンティティ表示の更新が CPU に制限されています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererNameplates': 'ネームプレート描画の負荷が高くなっています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.simCpu': 'シミュレーションがフレーム時間を消費しています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hudCpu': 'HUD 更新がフレーム時間を消費しています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': 'イベント処理がフレーム時間を消費しています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': 'ゲーム中にシェーダーがコンパイルされています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': 'テクスチャのアップロードでカクつきが発生しています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': 'エンティティ表示の作成でカクつきが発生しています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '原因不明の長いフレームが残っています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': 'アセット処理でゲーム開始が遅れています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': 'ブラウザーの長いタスクがフレームを妨げています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.networkLatency': 'ネットワーク配信で表示応答が遅れています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.snapshotApply': 'スナップショット処理がクライアントを妨げています',
+  'hudChrome.perf.diagnostics.diagnosis.titles.generic': 'パフォーマンスルール {rule} に対処が必要です',
+  'hudChrome.perf.diagnostics.diagnosis.causes.environment': '検出されたブラウザー、GPU、メモリ、またはデバイスの設定が、ゲーム描画前から性能を制限する可能性があります。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.graphics': 'この計測のグラフィックス処理が、現在のフレームまたはシーン予算を超えています。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.cpu': '計測された CPU フェーズが、フレーム予算を超えるほどメインスレッド時間を使用しています。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.loading': 'リソース準備または初回使用の処理が、表示中のゲームや起動経路で実行されました。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.network': 'ネットワーク配信またはクライアントのスナップショット処理で、最新の操作可能状態が遅れています。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.environment': '環境ルール {rule} がこのデバイスとブラウザーに一致しました。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.gpuSubmit': 'WebGL 送信 p95 は {submit} で、レンダラー p95 の {share} です。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.frame': '直近の計測は {fps} FPS、フレーム p95 は {p95} です。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCalls': 'シーンの描画呼び出しは {calls} 回で、目標は {target} 回です。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneTriangles': 'シーンの三角形は {triangles} 個で、目標は {target} 個です。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCategory': 'シーン分類 {category} は {calls} 回の呼び出しと {triangles} 個の三角形を占めます。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.censusNeeded': '主要な描画分類を確認するため、シーン集計を更新してください。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.shadow': 'シャドウパスは {calls} 回、基準の {share}、{triangles} 個の三角形を送信します。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.cpuPhase': '計測フェーズ {phase} の p95 は {p95} です。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.hitch': '記録された {total} 回のカクつきのうち {count} 回が原因 {cause} に一致しました。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.assets': 'プリロードゲートは登録済み {tasks} タスクを {wait} 待機しました。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.failedAssets': '失敗したアセットグループ：{groups}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.longTasks': '長いタスクは {count} 件、p95 は {p95}、最大は {max} でした。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.network': 'スナップショット間隔は {interval}、最新経過時間は {age}、入力応答 p95 は {echo} です。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.snapshot': 'スナップショット解析と適用の p95 は {work}、ネットワーク間隔 p95 は {gap} です。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.generic': '診断ルール {rule} がこの計測に一致しました。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.environment': '検出された環境設定を修正して再起動し、同じスキャンを繰り返してください。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.graphics': '同じカメラ経路を低画質で再テストし、グラフィックス負荷を確認してください。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.cpu': '静止時と移動時にスキャンを繰り返し、CPU フェーズを切り分けてください。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.loading': '同じ経路または初回操作を繰り返し、カクつくタイミングを確認してください。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.network': '同じ移動とカメラ経路をオフラインプレイと比較してください。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.environment': '検出された代替経路を共有グラフィックスおよびメモリ予算内に収めてください。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.graphics': '既存の描画予算、インスタンス化、マテリアル共有、LOD、非表示処理の省略を使用してください。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.cpu': '指定フェーズを計測し、重複処理と割り当てを除き、ゲーム動作を維持してください。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.loading': '既存の起動とストリーミング予算で、初回処理を事前読込、プール、または分散してください。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.network': '権威サーバーモデルを弱めずに、配信またはスナップショット処理コストを減らしてください。',
+  'hudChrome.perf.diagnostics.report.title': 'World of ClaudeCraft パフォーマンス診断',
+  'hudChrome.perf.diagnostics.report.statusLine': '状態：{status}（{score}/100）',
+  'hudChrome.perf.diagnostics.report.capturedLine': '計測日時：{captured}',
+  'hudChrome.perf.diagnostics.report.topFindingLine': '最重要項目：{finding}',
+  'hudChrome.perf.diagnostics.report.summaryLine': '概要：{summary}',
+  'hudChrome.perf.diagnostics.report.gpuLine': 'GPU：{gpu}',
+  'hudChrome.perf.diagnostics.report.graphicsLine': '画質：{tier}、描画倍率 {scale}',
+  'hudChrome.perf.diagnostics.report.recentLine': '直近：{fps} FPS、p95 {p95}、50 ミリ秒超 {longFrames} フレーム、計測 {frames} フレーム',
+  'hudChrome.perf.diagnostics.report.resultHeading': '結果',
+  'hudChrome.perf.diagnostics.report.noThreshold': 'この計測では対処可能なしきい値は検出されませんでした。',
+  'hudChrome.perf.diagnostics.report.findingHeading': '{index}. {title}',
+  'hudChrome.perf.diagnostics.report.findingMeta': '重大度：{severity}。信頼度：{confidence}。',
+  'hudChrome.perf.diagnostics.report.rawSnapshotHeading': '生のスナップショット',
+  'hudChrome.perf.diagnostics.report.notAvailable': '利用不可',
+  'hudChrome.perf.diagnostics.report.status.critical': '重大',
+  'hudChrome.perf.diagnostics.report.status.needsAttention': '要確認',
+  'hudChrome.perf.diagnostics.report.status.healthy': '正常',
 };

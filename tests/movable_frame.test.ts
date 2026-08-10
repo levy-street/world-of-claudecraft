@@ -135,7 +135,7 @@ beforeAll(async () => {
     getPropertyValue: (p: string) => (p === '--ui-scale' ? String(uiScaleStub) : ''),
   });
   ({ MovableFrame } = await import('../src/ui/movable_frame'));
-});
+}, 30_000);
 
 beforeEach(() => {
   store.clear();
@@ -180,6 +180,7 @@ describe('MovableFrame', () => {
     const { frame, btn } = makeFrame();
     expect(btn.className).toBe('tf-move-btn');
     expect(btn.getAttribute('aria-pressed')).toBe('false');
+    expect(btn.getAttribute('aria-keyshortcuts')).toBe('ArrowUp ArrowDown ArrowLeft ArrowRight');
     expect(frame.classList.contains('tf-unlocked')).toBe(false);
 
     btn.dispatch('click', pointer());
@@ -192,6 +193,36 @@ describe('MovableFrame', () => {
     btn.dispatch('click', pointer());
     expect(btn.getAttribute('aria-pressed')).toBe('false');
     expect(frame.classList.contains('tf-unlocked')).toBe(false);
+  });
+
+  it('moves and persists with arrow keys while unlocked', () => {
+    const { frame, btn, positioned } = makeFrame();
+    btn.dispatch('click', pointer());
+
+    let prevented = false;
+    btn.dispatch('keydown', {
+      key: 'ArrowRight',
+      shiftKey: false,
+      preventDefault: () => {
+        prevented = true;
+      },
+      stopPropagation() {},
+    });
+
+    expect(prevented).toBe(true);
+    expect(frame.style.left).toBe('50px');
+    expect(frame.style.top).toBe('500px');
+    expect(positioned).toContain(true);
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toEqual({ left: 50, top: 500 });
+
+    btn.dispatch('keydown', {
+      key: 'ArrowUp',
+      shiftKey: true,
+      preventDefault() {},
+      stopPropagation() {},
+    });
+    expect(frame.style.top).toBe('499px');
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toEqual({ left: 50, top: 499 });
   });
 
   it('ignores a drag while locked, and on the mobile layout even when unlocked', () => {

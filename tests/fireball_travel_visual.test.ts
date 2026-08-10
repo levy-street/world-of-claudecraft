@@ -77,9 +77,12 @@ describe('Fireball travel visual', () => {
     const rendererPath = fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url));
     const renderer = readFileSync(rendererPath, 'utf8');
 
-    expect(renderer).toContain("if (a.kind === 'form_fireball') hasFireballForm = true");
+    expect(renderer).toContain('formMask |= characterFormMaskForAura(a)');
+    expect(renderer).toContain("const fireballForm = requestedForm === 'fireball'");
     expect(renderer).toContain('v.fireballTravelVisual = syncFireballTravelVisual(');
     expect(renderer).toContain('v.fireballTravelVisual?.dispose()');
-    expect(renderer).toContain('v.visual.root.visible = active === v.visual && !fireballForm');
+    expect(renderer).toContain(
+      'v.visual.setActive(formVisibility.base && !v.visualCompilePending)',
+    );
   });
 });

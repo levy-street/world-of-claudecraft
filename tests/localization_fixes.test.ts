@@ -8,6 +8,7 @@ import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
 import {
@@ -555,6 +556,30 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('resolves every player-visible Warlock resource, ability, and row aura name', () => {
+    setLanguage('zh_CN');
+    for (const name of [
+      'Condemnation',
+      'Soul Fragments',
+      'Umbral Anchor',
+      'Fate Threads',
+      'Possess the Evil Eye',
+      'Hour of Judgment',
+      'Coven',
+      'Sacrilegious March',
+      'Sanguine Covenant',
+      'Leaden Hex',
+      'Shadow Credit',
+      'Hexstorm',
+      'Forbidden Reflection',
+    ]) {
+      expect(localizeSimAuraName(name), `no Warlock aura matcher row for '${name}'`).not.toBeNull();
+    }
+    expect(localizeSimAuraName('Shadow Credit')).not.toBe('Shadow Credit');
+    expect(auraDisplayNameForHud('Fate Threads', '命运之针')).toBe('命运丝线');
+    setLanguage('en');
+  });
+
   it('every delve mob aura-emitting proc name resolves through the aura matcher', () => {
     // These five template fields all push a named, player-visible aura (a channel
     // line, a player debuff, or a target-frame buff). A name with no matcher row
@@ -601,6 +626,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       'You have no living pet.',
       'You have no living demon.',
       'Pets are not allowed inside the delves.',
+      'Your Umbral Anchor is out of range.',
     ]) {
       expect(localizeSimText(emitted), `no sim matcher row for '${emitted}'`).not.toBe(emitted);
     }
@@ -949,6 +975,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // "<name> returns to your side." line Revive Pet uses, so it is matched by
     // the existing rule; scanning keeps any future literal here under the guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_match_return.ts'), 'utf8'),
+    // The shared pet round trip both that match path and the owner-resurrection
+    // path (src/sim/pet/pet_owner_revive.ts, which emits nothing of its own) call:
+    // the two "<name> returns to your side." arms now live here.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_return.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/dungeons.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/heroic_vendor.ts'), 'utf8'),
     // Overworld portal transitions (the Veiled Hollow cave). The live flavor
@@ -1358,8 +1388,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'arena.ts',
       'away.ts',
       'battleground.ts',
+      'battleground_backfill.ts',
       'battleground_outcomes.ts',
       'battleground_party.ts',
+      'battleground_proposal.ts',
       'card_duel.ts',
       'card_duel_queue.ts',
       'chat.ts',

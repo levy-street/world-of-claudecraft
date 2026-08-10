@@ -26,9 +26,10 @@ import type { ArenaMatch } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import * as arena from '../src/sim/social/arena';
 import * as fiesta from '../src/sim/social/fiesta';
+import { RL_TEST_WORLD } from './sim_shared';
 
 function world(): Sim {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: RL_TEST_WORLD });
 }
 
 function liveArena(): { sim: Sim; a: number; b: number; match: ArenaMatch } {
@@ -293,7 +294,7 @@ describe('Fiesta honor', () => {
     );
     expect(sameTeam.sim.meta(allyKiller)!.honor).toBe(0);
 
-    const practice = new Sim({ seed: 7, playerClass: 'warrior' });
+    const practice = new Sim({ seed: 7, playerClass: 'warrior', world: RL_TEST_WORLD });
     expect(practice.startFiestaPractice()).toBe(true);
     let match: ArenaMatch | null = null;
     for (let i = 0; i < 20 * 8; i++) {
@@ -448,7 +449,13 @@ describe('WARFARE damage', () => {
     target.stats.pvpDefense = 0.2;
     target.maxHp = target.hp = 1_000;
     friendly.maxHp = friendly.hp = 1_000;
-    sim.duels.set(sourcePid, { a: sourcePid, b: targetPid, state: 'active', timer: 0 });
+    sim.duels.set(sourcePid, {
+      a: sourcePid,
+      b: targetPid,
+      state: 'active',
+      timer: 0,
+      controlled: new Map(),
+    });
     sim.duels.set(targetPid, sim.duels.get(sourcePid)!);
 
     (sim as any).dealDamage(source, target, 100, false, 'arcane', null, 'hit');
@@ -476,7 +483,13 @@ describe('WARFARE damage', () => {
     source.stats.pvpOffense = 9;
     target.stats.pvpDefense = 9;
     target.maxHp = target.hp = 1_000;
-    sim.duels.set(sourcePid, { a: sourcePid, b: targetPid, state: 'active', timer: 0 });
+    sim.duels.set(sourcePid, {
+      a: sourcePid,
+      b: targetPid,
+      state: 'active',
+      timer: 0,
+      controlled: new Map(),
+    });
     sim.duels.set(targetPid, sim.duels.get(sourcePid)!);
 
     (sim as any).dealDamage(source, target, 100, false, 'arcane', null, 'hit');

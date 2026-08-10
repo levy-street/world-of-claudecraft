@@ -113,4 +113,14 @@ describe('class emblem art', () => {
     const main = readFileSync(path.join(repoRoot, 'src/main.ts'), 'utf8');
     expect(main).toContain('img.src = classIconUrl(cls)');
   });
+
+  it('keeps the class-art converter directly callable without invalidating package fingerprints', () => {
+    const converter = path.join(repoRoot, 'scripts/convert_class_icons_webp.mjs');
+    expect(existsSync(converter)).toBe(true);
+    expect(readFileSync(converter, 'utf8')).toContain('node scripts/convert_class_icons_webp.mjs');
+    const pkg = JSON.parse(readFileSync(path.join(repoRoot, 'package.json'), 'utf8')) as {
+      scripts?: Record<string, string>;
+    };
+    expect(pkg.scripts?.['assets:classes']).toBeUndefined();
+  });
 });

@@ -19,6 +19,8 @@
 //   SHOTS_DIR   output directory for PNGs (default pr-shots)
 //   DIFF_FILE   unified diff; required for capture (no diff -> nothing is visual -> skip)
 //   BROWSER_PATH  Chrome/Edge/Chromium binary (see browser_path.mjs)
+//   NAV_TIMEOUT_MS / ENTRY_SELECTOR_TIMEOUT_MS  raise the page-load and
+//     class-card waits on a contended host (see the constants below)
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { enterOfflineGame } from './enter_offline_game.mjs';
@@ -30,6 +32,12 @@ const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 // cold Vite module graph); NAV_TIMEOUT_MS raises the ceiling without touching
 // the default CI behavior.
 const NAV_TIMEOUT = Number(process.env.NAV_TIMEOUT_MS ?? 60000);
+// The class cards only get their box once the procedural icons have rendered,
+// which on the same contended host outlasts enterOfflineGame's 15s default and
+// fails every target at once with "Waiting for selector ... mini-class" (the
+// helper documents this exact case). Same escape hatch as NAV_TIMEOUT_MS: the
+// default is unchanged, so CI behavior does not move.
+const ENTRY_SELECTOR_TIMEOUT = Number(process.env.ENTRY_SELECTOR_TIMEOUT_MS ?? 15000);
 const OUT = process.env.SHOTS_DIR ?? 'pr-shots';
 const DIFF_FILE = process.env.DIFF_FILE;
 fs.mkdirSync(OUT, { recursive: true });

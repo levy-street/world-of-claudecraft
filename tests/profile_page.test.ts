@@ -56,6 +56,36 @@ async function renderProfile(state: Record<string, unknown>): Promise<string> {
   return body;
 }
 
+describe('profile page arena record', () => {
+  // The public profile is the fourth surface carrying an arena record, after
+  // the arena window, the leaderboard and the character sheet. It printed only
+  // W/L, so a drawn match vanished here while reading correctly in game: the
+  // same data loss this change exists to remove, one surface further out.
+  it('prints the draw as the third figure of the record', async () => {
+    const html = await renderProfile({
+      level: 20,
+      arena1v1Rating: 1712,
+      arena1v1Wins: 10,
+      arena1v1Losses: 4,
+      arena1v1Draws: 2,
+    });
+    expect(html).toContain('10W / 4L / 2D');
+  });
+
+  it('reads a legacy save with no draws key as zero, not as a missing figure', async () => {
+    // Decisive against rendering `undefined` or dropping the leg entirely for
+    // every character who was saved before the field existed.
+    const html = await renderProfile({
+      level: 20,
+      arena1v1Rating: 1600,
+      arena1v1Wins: 7,
+      arena1v1Losses: 3,
+    });
+    expect(html).toContain('7W / 3L / 0D');
+    expect(html).not.toContain('undefined');
+  });
+});
+
 describe('profile page Book of Deeds title line', () => {
   it('renders the English title under the name for an earned selection', async () => {
     const html = await renderProfile({

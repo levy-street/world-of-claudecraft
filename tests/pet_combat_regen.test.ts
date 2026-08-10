@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { summonPyreColossus } from '../src/sim/combat/destruction';
 import { MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { dist2d } from '../src/sim/types';
@@ -12,13 +13,13 @@ import { dist2d } from '../src/sim/types';
 
 function makeWarlock(seed = 7) {
   const sim = new Sim({ seed, playerClass: 'warlock' as any, autoEquip: true });
+  sim.setPlayerLevel(20);
   const p: any = sim.player;
-  p.level = 20;
   return { sim, p };
 }
 
 function summonInfernal(sim: Sim, p: any) {
-  (sim as any).createDemonPet(p, 'pyre_colossus', false);
+  summonPyreColossus(sim.ctx, p, 1_000);
   for (const e of sim.entities.values()) if ((e as any).ownerId === p.id) return e as any;
   throw new Error('pet not created');
 }

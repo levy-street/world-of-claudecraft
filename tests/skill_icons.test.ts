@@ -4,7 +4,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
+import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
+import { PALADIN_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
+import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { ABILITY_IMAGE_IDS, abilityImageUrl } from '../src/ui/icons';
+import { PALADIN_TALENT_IMAGE_IDS } from '../src/ui/talent_icons';
 
 // Gate for the committed WebP class ability icons. The art under
 // public/ui/skills/<class>/<id>.webp is the source of truth (WebP only, no PNG/JPG in the
@@ -56,8 +61,107 @@ function isValidWebp(file: string): boolean {
   }
 }
 
+// Dimensions straight out of the WebP header (lossy VP8, lossless VP8L, or extended VP8X),
+// mirroring the dependency-free item-icon gate.
+function webpSize(file: string): { width: number; height: number } {
+  const fd = openSync(file, 'r');
+  try {
+    const buf = Buffer.alloc(32);
+    readSync(fd, buf, 0, 32, 0);
+    const tag = buf.toString('ascii', 12, 16);
+    if (tag === 'VP8 ')
+      return { width: buf.readUInt16LE(26) & 0x3fff, height: buf.readUInt16LE(28) & 0x3fff };
+    if (tag === 'VP8L') {
+      const bits = buf.readUInt32LE(21);
+      return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
+    }
+    if (tag === 'VP8X') {
+      return {
+        width: (buf.readUIntLE(24, 3) & 0xffffff) + 1,
+        height: (buf.readUIntLE(27, 3) & 0xffffff) + 1,
+      };
+    }
+    throw new Error(`unknown webp chunk "${tag}" in ${file}`);
+  } finally {
+    closeSync(fd);
+  }
+}
+
 const webpFiles = (): string[] =>
   walk(skillsDir).filter((p) => path.extname(p).toLowerCase() === '.webp');
+
+// The 12 rework ids whose art was superseded by the accepted release art in the
+// v0.34.0 missing-painted-icons wave (bestial_wrath, counter_shot, volley,
+// holy_nova, prayer_of_healing, psychic_scream, shadowform, bloodlust,
+// chain_heal, chain_lightning, earthquake, elemental_mastery) are pinned by the
+// generated-additions test below instead of this PR-provenance fixture.
+const PR_2218_OWNED_CLASS_ICON_IDS = {
+  hunter: [
+    'bloodhook',
+    'bloodtrail_assault',
+    'cold_focus',
+    'fieldcraft_reentry',
+    'frostjaw_trap',
+    'hunting_momentum',
+    'measured_shot',
+    'pack_command',
+    'pack_rally',
+    'shellskin',
+    'shrapnel_charge',
+    'stampede',
+    'trailbreak',
+    'unleash_beast',
+    'wildheart',
+  ],
+  shaman: [
+    'ancestor_return',
+    'galeheart_weapon',
+    'lifespring_weapon',
+    'primal_exaltation',
+    'stoneward',
+    'stormsurge',
+    'thunder_reservoir',
+    'tidecall',
+    'unleash_weapon',
+    'warspirit_cadence',
+  ],
+  priest: [
+    'choir_of_deliverance',
+    'martyrs_aegis',
+    'scouring_mercy',
+    'seraphic_vigil',
+    'summon_tithefiend',
+    'veilstep',
+  ],
+} as const;
+
+const OWNED_CLASS_SPECS = {
+  hunter: ['beast_mastery', 'marksmanship', 'survival'],
+  shaman: ['elemental', 'enhancement', 'restoration'],
+  priest: ['discipline', 'holy', 'shadow'],
+} as const;
+
+const paladinWebpFiles = (): string[] =>
+  webpFiles().filter((file) => path.basename(path.dirname(file)) === 'paladin');
+
+type PaladinMapping = {
+  license: string;
+  generatedSource: string;
+  iconSize: number;
+  abilities: Array<{ abilityId: string; output: string }>;
+  talents: Array<{
+    talentId: string;
+    name: string;
+    sourceFile: string;
+    output: string;
+    confidence: string;
+  }>;
+};
+
+const paladinMapping = (): PaladinMapping =>
+  JSON.parse(
+    readFileSync(path.join(skillsDir, 'paladin', 'mapping.json'), 'utf8'),
+  ) as PaladinMapping;
 
 interface MissingWaveAbilityPin {
   kind: string;
@@ -83,6 +187,16 @@ describe('class ability webp icons', () => {
     expect(ABILITY_IMAGE_IDS.size).toBeGreaterThan(0);
   });
 
+  it('gives every paladin ability painted artwork', () => {
+    const missing = Object.values(ABILITIES)
+      .filter((ability) => ability.class === 'paladin')
+      .map((ability) => ability.id)
+      .filter((id) => !ABILITY_IMAGE_IDS.has(id))
+      .sort();
+
+    expect(missing).toEqual([]);
+  });
+
   it('uses the owner-provided Fireball Form and Counterspell artwork', () => {
     expect(abilityImageUrl('fireball_form')).toBe('/ui/skills/mage/fireball_form.webp');
     expect(abilityImageUrl('counterspell')).toBe('/ui/skills/mage/counterspell.webp');
@@ -90,7 +204,11 @@ describe('class ability webp icons', () => {
     const mapping = JSON.parse(
       readFileSync(path.join(skillsDir, 'mage', 'mapping.json'), 'utf8'),
     ) as {
-      abilities: Array<{ abilityId: string; sourceFile: string; output: string }>;
+      abilities: Array<{
+        abilityId: string;
+        sourceFile: string;
+        output: string;
+      }>;
     };
     const requested = new Map(
       mapping.abilities
@@ -112,6 +230,94 @@ describe('class ability webp icons', () => {
   it('uses the owner-provided painted icons for both Chronomancy abilities', () => {
     expect(abilityImageUrl('collective_reversal')).toBe('/ui/skills/mage/collective_reversal.webp');
     expect(abilityImageUrl('temporal_hourglass')).toBe('/ui/skills/mage/temporal_hourglass.webp');
+  });
+
+  it('image-backs every owned-class icon delivered by PR #2218 with recorded provenance', () => {
+    for (const [cls, ids] of Object.entries(PR_2218_OWNED_CLASS_ICON_IDS)) {
+      const mapping = JSON.parse(
+        readFileSync(path.join(skillsDir, cls, 'mapping.json'), 'utf8'),
+      ) as {
+        abilities: Array<{ abilityId: string; sourcePack?: string; output: string }>;
+      };
+      const entries = new Map(mapping.abilities.map((entry) => [entry.abilityId, entry]));
+
+      for (const id of ids) {
+        expect(abilityImageUrl(id)).toBe(`/ui/skills/${cls}/${id}.webp`);
+        expect(entries.get(id)).toMatchObject({
+          abilityId: id,
+          sourcePack: 'OpenAI image generation through Codex',
+          output: `${id}.webp`,
+        });
+      }
+    }
+  });
+
+  it('image-backs every level-20 Hunter, Shaman, and Priest spellbook entry', () => {
+    const missing: string[] = [];
+    for (const cls of Object.keys(OWNED_CLASS_SPECS) as Array<keyof typeof OWNED_CLASS_SPECS>) {
+      const specs = OWNED_CLASS_SPECS[cls];
+      for (const spec of specs) {
+        const mods = computeTalentModifiers(cls, { ...emptyAllocation(), spec }, 20);
+        for (const { def } of abilitiesKnownAt(cls, 20, mods)) {
+          if (!abilityImageUrl(def.id)) missing.push(`${cls}/${spec}/${def.id}`);
+        }
+      }
+    }
+    expect(missing).toEqual([]);
+  });
+
+  it('backs every Warlock spell and choice talent with distinct painted art', () => {
+    const spellIds = Object.values(ABILITIES)
+      .filter(({ class: owner }) => owner === 'warlock')
+      .map(({ id }) => id);
+    const talentOptions = CHOICE_ROWS.warlock.rows.flatMap(({ options }) => options);
+    const talentIconIds = talentOptions.map(({ icon }) => icon);
+    const resolvedTalentIconIds = talentIconIds.filter((id): id is string => Boolean(id));
+
+    expect(spellIds.filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([]);
+    expect(talentIconIds).toEqual(talentOptions.map(({ id }) => id));
+    expect(new Set(talentIconIds).size).toBe(talentOptions.length);
+    expect(resolvedTalentIconIds).toHaveLength(talentOptions.length);
+    expect(resolvedTalentIconIds.filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([]);
+    expect([...spellIds, ...resolvedTalentIconIds].map((id) => abilityImageUrl(id))).not.toContain(
+      null,
+    );
+  });
+
+  it('pins generated Warlock provenance, dimensions, decoding, and unique bytes', async () => {
+    const warlockDir = path.join(skillsDir, 'warlock');
+    const mapping = JSON.parse(readFileSync(path.join(warlockDir, 'mapping.json'), 'utf8')) as {
+      iconSize: number;
+      abilities: Array<{ abilityId: string }>;
+      generatedBatches: Array<{ abilityIds?: string[]; talentIds?: string[] }>;
+    };
+    const generatedIds = mapping.generatedBatches.flatMap(
+      ({ abilityIds, talentIds }) => abilityIds ?? talentIds ?? [],
+    );
+    const mappedIds = [...mapping.abilities.map(({ abilityId }) => abilityId), ...generatedIds];
+    const committedIds = readdirSync(warlockDir)
+      .filter((name) => name.endsWith('.webp'))
+      .map((name) => path.basename(name, '.webp'));
+
+    expect(new Set(mappedIds).size).toBe(mappedIds.length);
+    expect(new Set(mappedIds)).toEqual(new Set(committedIds));
+
+    const hashes = new Set<string>();
+    for (const id of generatedIds) {
+      const file = path.join(warlockDir, `${id}.webp`);
+      const bytes = readFileSync(file);
+      const metadata = await sharp(bytes).metadata();
+      expect(metadata).toMatchObject({
+        format: 'webp',
+        width: mapping.iconSize,
+        height: mapping.iconSize,
+      });
+      hashes.add(createHash('sha256').update(bytes).digest('hex'));
+    }
+    expect(hashes.size).toBe(generatedIds.length);
+    expect(readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8')).toContain(
+      'Generated Warlock spell and talent icons',
+    );
   });
 
   it('A) every image-backed ability id resolves to a committed, valid .webp', () => {
@@ -144,10 +350,20 @@ describe('class ability webp icons', () => {
     ).toEqual([]);
   });
 
-  it('C) every committed webp is a wired ability icon in its own class folder (no orphans)', () => {
+  it('C) every committed webp is a wired ability or Paladin talent icon (no orphans)', () => {
     const orphans: string[] = [];
     for (const file of webpFiles()) {
       const id = path.basename(file, '.webp');
+      if (PALADIN_TALENT_IMAGE_IDS.has(id)) {
+        const expected = `/ui/skills/paladin/${id}.webp`;
+        const actual = `/${path.relative(publicDir, file).split(path.sep).join('/')}`;
+        if (actual !== expected) {
+          orphans.push(
+            `${path.relative(repoRoot, file)} (talent served as ${actual}, expected ${expected})`,
+          );
+        }
+        continue;
+      }
       if (!ABILITY_IMAGE_IDS.has(id)) {
         orphans.push(`${path.relative(repoRoot, file)} (id "${id}" not in ABILITY_IMAGE_IDS)`);
         continue;
@@ -164,9 +380,88 @@ describe('class ability webp icons', () => {
     ).toEqual([]);
   });
 
+  it('keeps every PR #2218 ability icon at the canonical 128px square size', async () => {
+    const wrongSize: string[] = [];
+    for (const [cls, ids] of Object.entries(PR_2218_OWNED_CLASS_ICON_IDS)) {
+      for (const id of ids) {
+        const file = path.join(skillsDir, cls, `${id}.webp`);
+        const metadata = await sharp(file).metadata();
+        if (metadata.width !== 128 || metadata.height !== 128) {
+          wrongSize.push(`${path.relative(repoRoot, file)} (${metadata.width}x${metadata.height})`);
+        }
+      }
+    }
+    expect(wrongSize).toEqual([]);
+  });
+
+  it('keeps every Paladin icon and provenance row in a one-to-one mapping', () => {
+    const files = paladinWebpFiles().map((file) => path.basename(file));
+    const mapping = paladinMapping();
+    const entries = [
+      ...mapping.abilities.map(({ abilityId: id, output }) => ({ id, output })),
+      ...mapping.talents.map(({ talentId: id, output }) => ({ id, output })),
+    ];
+    const outputs = entries.map(({ output }) => output);
+
+    expect(new Set(outputs).size, 'mapping.json contains duplicate output filenames').toBe(
+      outputs.length,
+    );
+    expect(
+      files.filter((file) => !outputs.includes(file)),
+      'Paladin artwork without provenance in mapping.json',
+    ).toEqual([]);
+    expect(
+      outputs.filter((file) => !files.includes(file)),
+      'mapping.json lists missing Paladin artwork',
+    ).toEqual([]);
+    expect(
+      entries.filter(({ id, output }) => output !== `${id}.webp`),
+      'Paladin provenance rows must map each ability or talent id to its canonical filename',
+    ).toEqual([]);
+  });
+
+  it('keeps choice rows, painted talent ids, files, and provenance in exact parity', () => {
+    const mapping = paladinMapping();
+    const choices = PALADIN_CHOICE_ROWS.rows.flatMap((row) => row.options);
+    const choiceIds = choices.map(({ id }) => id).sort();
+    const paintedIds = [...PALADIN_TALENT_IMAGE_IDS].sort();
+    const mappedIds = mapping.talents.map(({ talentId }) => talentId).sort();
+    const fileIds = paladinWebpFiles()
+      .map((file) => path.basename(file, '.webp'))
+      .filter((id) => id.startsWith('pal_r'))
+      .sort();
+
+    expect(paintedIds).toEqual(choiceIds);
+    expect(mappedIds).toEqual(choiceIds);
+    expect(fileIds).toEqual(choiceIds);
+    expect(mapping.generatedSource).toBe('OpenAI image generation, original project artwork');
+    expect(mapping.license).toContain('project-owned original art');
+
+    const choiceNames = new Map(choices.map(({ id, name }) => [id, name]));
+    for (const entry of mapping.talents) {
+      expect(entry.name, entry.talentId).toBe(choiceNames.get(entry.talentId));
+      expect(entry.sourceFile, entry.talentId).toBe(mapping.generatedSource);
+      expect(entry.confidence, entry.talentId).toBe('high');
+    }
+  });
+
+  it('keeps every Paladin icon at the declared 128px square', () => {
+    const { iconSize } = paladinMapping();
+    expect(iconSize).toBe(128);
+    const wrong = paladinWebpFiles()
+      .map((file) => ({ file, ...webpSize(file) }))
+      .filter(({ width, height }) => width !== iconSize || height !== iconSize)
+      .map(({ file, width, height }) => `${path.basename(file)} (${width}x${height})`);
+
+    expect(
+      wrong,
+      'resize Paladin source art to 128px square before running `npm run assets:skills`',
+    ).toEqual([]);
+  });
+
   it('D) the 90 generated additions decode as unique, opaque, exact 128px reviewed art', async () => {
     const pins = missingWaveAbilityPins();
-    expect(pins).toHaveLength(90);
+    expect(pins).toHaveLength(100);
     const hashes = new Set<string>();
     const mapped = new Set<string>();
     for (const className of [
@@ -227,6 +522,6 @@ describe('class ability webp icons', () => {
       }
       expect(opaque, `${pin.id} must keep its full-square opaque background`).toBe(true);
     }
-    expect(hashes.size).toBe(90);
+    expect(hashes.size).toBe(100);
   });
 });

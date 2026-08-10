@@ -276,7 +276,10 @@ describe('Aether Surge free-cast proc', () => {
     sim.targetEntity(mob.id);
     sim.castAbility('arcane_surge');
     collect(sim, 2.3);
-    expect(before - p.resource).toBe(0); // charged cost waived
+    // Cost waived: the free cast pays nothing, so mana never dropped below `before`.
+    // (A mana user now passively regenerates Spirit mana in combat, so the window can
+    // even leave resource slightly higher; what matters is the cast itself spent 0.)
+    expect(p.resource).toBeGreaterThanOrEqual(before);
     expect(aetherSurgeStacks(p)).toBe(3); // still banked a charge
 
     // Single-use: strip any fresh proc the free cast may have rolled, then the

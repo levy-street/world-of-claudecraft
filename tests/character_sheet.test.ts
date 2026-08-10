@@ -26,6 +26,7 @@ function makeState(over: Partial<CharacterState> = {}): CharacterState {
     arena1v1Rating: 1600,
     arena1v1Wins: 10,
     arena1v1Losses: 4,
+    arena1v1Draws: 2,
     ...over,
   } as CharacterState;
 }
@@ -79,7 +80,7 @@ describe('characterSheet: shared fields', () => {
     expect(sheet.rank).toEqual({ scope: 'realm', rank: 27, total: 4012 });
     expect(sheet.avatarUrl).toBe('https://worldofclaudecraft.com/avatar/shaman/0.png');
     expect(sheet.profileUrl).toBe('https://worldofclaudecraft.com/c/Thrallish');
-    expect(sheet.arena['1v1']).toEqual({ rating: 1600, wins: 10, losses: 4 });
+    expect(sheet.arena['1v1']).toEqual({ rating: 1600, wins: 10, losses: 4, draws: 2 });
   });
 
   it('backfills virtualLevel from level when lifetimeXp is absent', () => {

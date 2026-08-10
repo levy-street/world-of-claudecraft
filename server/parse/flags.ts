@@ -9,10 +9,29 @@ const ALL_SURFACES: readonly Surface[] = ['arena', 'raid', 'dungeon', 'rift', 'b
 const ENV_LABELS = new Set<ParseEnv>(['prod', 'qa', 'pbe', 'dev']);
 
 /**
+ * RFC1918 IPv4 literal (10/8, 172.16/12, 192.168/16): the VPC-internal case.
+ * Only IP literals qualify: a DNS name cannot be classified at boot without a
+ * resolve, so a "private-looking" hostname is still rejected for http.
+ */
+function isPrivateIpv4Literal(hostname: string): boolean {
+  const match = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(hostname);
+  if (match === null) return false;
+  const octets = match.slice(1).map((part) => Number.parseInt(part, 10));
+  if (octets.some((octet) => octet > 255)) return false;
+  const [a, b] = octets;
+  if (a === 10) return true;
+  if (a === 172 && b >= 16 && b <= 31) return true;
+  return a === 192 && b === 168;
+}
+
+/**
  * The shipper attaches the shared secret to every request, so the transport
- * must be TLS: plain http is allowed only toward loopback (local dev). A
- * non-loopback http URL is rejected at boot rather than silently leaking the
- * token in the clear.
+ * must not cross the open internet in the clear: https always passes; plain
+ * http passes only toward loopback (local dev) or an RFC1918 private IP
+ * literal (the production topology: game hosts push to the parse service over
+ * the VPC private network, bearer-gated and security-group-gated, per the
+ * parse plan's transport decision). Anything else is rejected at boot rather
+ * than silently leaking the token in the clear.
  */
 function validatedIngestUrl(raw: string | null): string | null {
   if (raw === null) return null;
@@ -23,9 +42,9 @@ function validatedIngestUrl(raw: string | null): string | null {
     // compare against '[::1]', never a bare '::1'.
     const loopback =
       url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '[::1]';
-    if (url.protocol === 'http:' && loopback) return raw;
+    if (url.protocol === 'http:' && (loopback || isPrivateIpv4Literal(url.hostname))) return raw;
     console.error(
-      `[parse] PARSE_INGEST_URL must be https (or http to loopback), got ${url.protocol}//${url.hostname}: capture stays off`,
+      `[parse] PARSE_INGEST_URL must be https (or http to loopback or a private IP), got ${url.protocol}//${url.hostname}: capture stays off`,
     );
     return null;
   } catch {

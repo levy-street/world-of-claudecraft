@@ -83,8 +83,8 @@ transforms under `node_modules/.experimental-vitest-cache` (clear with
 `npx vitest --clearCache` if a warm run looks wrong). The same store is persisted
 across CI runs since Phase 4 of the CI/CD performance packet: the pr-gate and
 release-gate shard jobs carry an `actions/cache` step for it, keyed per shard, and the
-long-sims lane job carries the same step keyed per lane (Phase 6, the recorded Phase 4
-rider), all over the node_modules-layout inputs (lockfile, vite config, `.npmrc`,
+two long-sims lane jobs carry the same step keyed per lane half (Phase 6, the recorded
+Phase 4 rider), all over the node_modules-layout inputs (lockfile, vite config, `.npmrc`,
 `package.json`), with the design constraints written on the pr-gate copy of the step in
 `.github/workflows/ci.yml` and pinned by `tests/ci_workflow.test.ts`. The nightly gate deliberately stays cold: it is the
 uncached full replay. Most DOM-environment unit
@@ -104,8 +104,10 @@ bounds Vitest workers to avoid load flakes on shared machines. It resolves FFmpe
 falling back to PATH, and refuses to run when neither source yields a working binary.
 
 **Task cache (Turborepo):** pure artifact steps (`i18n:gen`, `wiki:content`, `sfx:check`,
-`check:types`, `build:env`, `build:server`, `build:bot`, `build:bundle`) run through `npx turbo run`
-with inputs/outputs in root `turbo.json`. A warm second gate on an unchanged tree
+`check:types`, `build:env`, `build:server`, `build:bot`, `build:bundle`) run through the
+resolved `node_modules/.bin/turbo` binary directly (`resolveTurboBin` in
+`scripts/lib/gate_task_cache.mjs`, skipping `npx`'s own dispatch overhead) with
+inputs/outputs in root `turbo.json`. A warm second gate on an unchanged tree
 replays those steps from `.turbo/` (often under a second). Full vitest, browser tests,
 malware, changed-file Biome, and the i18n freshness `git diff` always run (they are not
 cached as "passed"). Catalog edits under `src/ui/i18n.catalog/**` invalidate `i18n:gen`.
@@ -197,28 +199,49 @@ API-fetched file listing that decides `code` (`scripts/lib/ci_test_select.mjs`),
 the long-sims lane files (below); in selective mode, the always-run floor plus
 `vitest related` over the changed sources, both sharded.
 
-**The long-sims lane** (Phase 4). The `CI_LONG_SUITES` files
-(`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90 seconds inside a full-mode
-shard, the chronomancy balance sweep among them) run in the dedicated
-`PR gate (long sims)` job (`node scripts/ci_shard_test.mjs --lane=long-sims`), and every
-shard leg excludes them, so a single multi-minute file no longer sets the slowest shard's
-wall clock. Completeness is a pinned invariant, not an intention: the lane fails closed to
-its whole file list on exactly the inputs that make a shard fail closed to full, the
-shard legs exclude exactly the files the lane owns, and in selective mode the lane runs
-just the lane files the floor or the PR's diff would have carried (the related legs stay
+**The long-sims lanes** (Phase 4; split in two by the lane-diet PR). The
+`CI_LONG_SUITES` files (`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90
+seconds inside a full-mode shard, the chronomancy balance sweep among them) run in the
+dedicated `PR gate (long sims A)` / `PR gate (long sims B)` job pair
+(`node scripts/ci_shard_test.mjs --lane=long-sims-a` / `--lane=long-sims-b`, one
+`CI_LONG_SUITE_HALVES` half each), and every shard leg excludes the whole union, so a
+single multi-minute file no longer sets the slowest shard's wall clock and the lane's
+own wall clock is the slower HALF, not the whole list. Completeness is a pinned
+invariant, not an intention: each lane fails closed to its whole half on exactly the
+inputs that make a shard fail closed to full, the shard legs exclude exactly the files
+the two lanes own between them, and in selective mode each lane runs just its half's
+lane files the floor or the PR's diff would have carried (the related legs stay
 unfiltered, so a reached lane file re-runs there: duplicate work, never a gap). Mode for
-mode, the nine PR-tier test jobs together therefore run exactly what the pre-lane
+mode, the ten PR-tier test jobs together therefore run exactly what the pre-lane
 8-shard layout would have run (`tests/ci_shard_plan.test.ts` pins the partition;
 selective mode still skips the outside-floor remainder by design, exactly as before the
-lane). The latency win is concentrated in FULL mode: three of the four lane files are
+lane). The latency win is concentrated in FULL mode: most lane files are
 graph-visible, so on a sim-heavy selective PR the `related` legs pull them back into a
-shard exactly as they did before the lane, and only the blind member (plus any lane
-test the PR itself changed) rides the lane.
-The lane reproduces locally with
-`node scripts/ci_shard_test.mjs --lane=long-sims --plan-only`, printing the same
-`[ci-shard]` audit lines as the shards. `release-gate` is deliberately not lane-split:
-`release/**` pushes keep the full suite in their 8 shards; a push to `main` or `dev-*`
-runs the PR tier, so it gets the shards-plus-lane layout.
+shard exactly as they did before the lane, and only the blind members (plus any lane
+test the PR itself changed) ride the lanes.
+The lanes reproduce locally with
+`node scripts/ci_shard_test.mjs --lane=long-sims-a --plan-only` (and `-b`), printing the
+same `[ci-shard]` audit lines as the shards. `release-gate` is deliberately not
+lane-split: `release/**` pushes keep the full suite in their 8 shards; a push to `main`
+or `dev-*` runs the PR tier, so it gets the shards-plus-lanes layout.
+
+**The balance-harness diet.** The heavy balance suites in the lane are regression
+tripwires, not measurements (the authoritative instrument is the offline Monte Carlo
+sweep), so at PR time they run a reduced configuration: fewer fixed seeds, the
+band-carrying scenarios only, and shorter windows where a coefficient change still
+shows inside the first minute. `WOC_FULL_BALANCE_SWEEP=1`, set only by the nightly
+workflow's test job, restores the full five-seed, all-scenario, 120-second
+configuration nightly. That scoping is deliberate and complete: `release/**` push
+runs, merge-queue runs, and the local `npm run gate` all run the diet configuration
+too (they run every test FILE, at diet depth), and the nightly is the ONE surface
+that runs the full sweep. `tests/ci_workflow.test.ts` pins the flag OUT of ci.yml
+and `tests/ci_shard_plan.test.ts` pins exactly which suites read it, so neither a
+new diet nor a stray full-sweep can land silently. Every band is pinned to a measurement at its own configuration
+(the diet bands were re-derived with the same relative margins as the full bands they
+mirror; the lane-diet PR body carries the measurement table). When you change balance
+and a band moves, re-pin BOTH configurations from their own printed actuals; never
+carry one configuration's band under the other, and never shorten a window that guards
+long-fight behavior (mana sustain, time-to-OOM).
 
 The CI floor is a superset of the local one: every blind/partial test (recomputed in the
 PR's own tree via the shared `collectSuiteVisibility`), PLUS the invariant guard suites by

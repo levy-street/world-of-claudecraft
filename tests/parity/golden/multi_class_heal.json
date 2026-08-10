@@ -34,8 +34,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "fb421ea8",
-      "events": "1c600254",
+      "state": "6e0d41d1",
+      "events": "9261b860",
       "rng": {
         "draws": 6,
         "digest": "8b798846"
@@ -120,6 +120,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -130,7 +131,8 @@
           "entityId": 964,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -373,6 +375,8 @@
         {
           "aiState": "idle",
           "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -380,16 +384,18 @@
           "dodgeChance": 0.0585,
           "fallStartY": 2.412139,
           "fiveSecondRule": 99,
-          "hp": 95,
+          "hp": 105,
           "id": 964,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 95,
+          "maxHp": 105,
           "maxResource": 93,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 3,
@@ -407,10 +413,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 99,
+            "armor": 133,
             "int": 13,
             "spi": 14,
-            "sta": 22,
+            "sta": 23,
             "str": 22
           },
           "templateId": "paladin",
@@ -685,7 +691,7 @@
           "threat": [
             [
               963,
-              115.666667
+              117.333333
             ],
             [
               964,
@@ -745,7 +751,7 @@
           "threat": [
             [
               963,
-              115.666667
+              117.333333
             ],
             [
               964,
@@ -805,7 +811,7 @@
           "threat": [
             [
               963,
-              115.666667
+              117.333333
             ],
             [
               964,
@@ -832,7 +838,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "f089a96b",
+      "state": "11ed4014",
       "events": "68d0140d",
       "rng": {
         "draws": 6,
@@ -918,6 +924,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -928,7 +935,8 @@
           "entityId": 964,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1176,6 +1184,8 @@
         {
           "aiState": "idle",
           "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -1183,16 +1193,18 @@
           "dodgeChance": 0.0585,
           "fallStartY": 2.412139,
           "fiveSecondRule": 99,
-          "hp": 95,
+          "hp": 105,
           "id": 964,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 95,
+          "maxHp": 105,
           "maxResource": 93,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 3,
@@ -1210,10 +1222,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 99,
+            "armor": 133,
             "int": 13,
             "spi": 14,
-            "sta": 22,
+            "sta": 23,
             "str": 22
           },
           "templateId": "paladin",
@@ -1506,7 +1518,7 @@
           "threat": [
             [
               963,
-              115.666667
+              117.333333
             ],
             [
               964,
@@ -1566,7 +1578,7 @@
           "threat": [
             [
               963,
-              115.666667
+              117.333333
             ],
             [
               964,
@@ -1626,7 +1638,7 @@
           "threat": [
             [
               963,
-              115.666667
+              117.333333
             ],
             [
               964,
@@ -1653,7 +1665,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 972,
-      "state": "a6574872",
+      "state": "cd83464e",
       "events": "63d2697d",
       "rng": {
         "draws": 10,
@@ -1664,7 +1676,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 972,
-      "state": "6f81931b",
+      "state": "647579aa",
       "events": "63d2697d",
       "rng": {
         "draws": 10,
@@ -1750,6 +1762,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -1760,7 +1773,8 @@
           "entityId": 964,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -2008,6 +2022,8 @@
         {
           "aiState": "idle",
           "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99.4,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -2015,16 +2031,20 @@
           "dodgeChance": 0.0585,
           "fallStartY": 2.412139,
           "fiveSecondRule": 99.4,
-          "hp": 95,
+          "hp": 105,
           "id": 964,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 95,
+          "maxHp": 105,
           "maxResource": 93,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 0.4
+          },
           "petMode": "defensive",
           "pos": {
             "x": 3,
@@ -2042,10 +2062,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 99,
+            "armor": 133,
             "int": 13,
             "spi": 14,
-            "sta": 22,
+            "sta": 23,
             "str": 22
           },
           "templateId": "paladin",
@@ -2355,7 +2375,7 @@
           "threat": [
             [
               963,
-              115.666667
+              117.333333
             ],
             [
               964,
@@ -2416,7 +2436,7 @@
           "threat": [
             [
               963,
-              115.666667
+              117.333333
             ],
             [
               964,
@@ -2483,7 +2503,7 @@
           "threat": [
             [
               963,
-              115.666667
+              117.333333
             ],
             [
               964,

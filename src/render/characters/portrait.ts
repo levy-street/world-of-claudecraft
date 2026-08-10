@@ -70,6 +70,23 @@ void assetsReady()
        keep falling back to the class crest. */
   });
 
+// The x-center of a visual's BODY meshes (userData.bodyMesh, tagged in
+// assembleModel), ignoring held props. Null when the visual carries no tagged
+// body mesh, so callers fall back to the full-box center.
+const bodyScratchBox = new THREE.Box3();
+const bodyMeshBox = new THREE.Box3();
+function bodyCenterXOf(root: THREE.Object3D): number | null {
+  bodyScratchBox.makeEmpty();
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh || !o.userData.bodyMesh) return;
+    bodyMeshBox.setFromObject(mesh);
+    if (!bodyMeshBox.isEmpty()) bodyScratchBox.union(bodyMeshBox);
+  });
+  if (bodyScratchBox.isEmpty()) return null;
+  return (bodyScratchBox.min.x + bodyScratchBox.max.x) / 2;
+}
+
 function ensureRig(): void {
   if (renderer) return;
   const canvas = document.createElement('canvas');
@@ -214,7 +231,9 @@ function capture(
     visual.update(0.4, PORTRAIT_ANIM_STATE, true);
 
     // Frame the model from its own bounds so every class (tall or short,
-    // helmeted or bare) lands the same in the circle/card.
+    // helmeted or bare) lands the same in the circle/card. This box drives the
+    // zoom (height, feet, depth) and MUST stay the full root: shrinking it
+    // would pull the camera in and change every class's portrait scale.
     scratchBox.setFromObject(visual.root);
     scratchBox.getCenter(scratchCenter);
     scratchBox.getSize(scratchSize);
@@ -240,13 +259,20 @@ function capture(
       scratchBox.getSize(scratchSize);
     }
     const h = scratchSize.y || 1.8;
+    // Horizontal aim only: a single held weapon (the paladin's axe) sits off to
+    // one side and skews the full box's x-center, pushing the character left in
+    // the frame. Aim at the BODY's x-center instead (body meshes carry
+    // userData.bodyMesh, set in assembleModel; held props do not). Zoom and
+    // vertical framing still come from the full box above, so portrait SCALE is
+    // unchanged for every class; only the sideways aim is corrected.
+    const bodyCenterX = bodyCenterXOf(visual.root) ?? scratchCenter.x;
     const { fov, targetYFromFeetFrac, extentFrac } = portraitFrameParams(framing);
     camera!.fov = fov;
     const targetY = scratchBox.min.y + targetYFromFeetFrac * h;
     const extent = extentFrac * h;
     const dist = extent / 2 / Math.tan((fov * Math.PI) / 180 / 2);
-    camera!.position.set(scratchCenter.x + 0.04 * h, targetY + 0.02 * h, scratchBox.max.z + dist);
-    camera!.lookAt(scratchCenter.x, targetY, scratchCenter.z);
+    camera!.position.set(bodyCenterX + 0.04 * h, targetY + 0.02 * h, scratchBox.max.z + dist);
+    camera!.lookAt(bodyCenterX, targetY, scratchCenter.z);
     camera!.updateProjectionMatrix();
 
     renderer!.render(scene!, camera!);

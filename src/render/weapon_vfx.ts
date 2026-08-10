@@ -27,6 +27,10 @@
 import * as THREE from 'three';
 import { isSharedTexture, markSharedTexture } from './shared_resource';
 import {
+  WEAPON_EMISSIVE_IDLE_CACHE_MAX,
+  WeaponEmissiveDerivationCache,
+} from './weapon_vfx_emissive_cache_core';
+import {
   deriveEmissiveTexels,
   type WeaponEmissiveTint,
   weaponEmissiveCacheKey,
@@ -2151,6 +2155,9 @@ interface EmissiveEntry {
   prev: EmissiveRestore;
   tex: THREE.CanvasTexture | null;
   albedoTex: THREE.CanvasTexture | null;
+  /** The derivation-cache key this entry holds a reference on, or null on the
+   *  flat-tint fallback path (nothing cached, nothing to release). */
+  cacheKey: string | null;
 }
 
 interface DerivedEmissiveTextures {
@@ -2165,9 +2172,26 @@ interface DerivedEmissiveTextures {
 // readbacks, a per-texel HSL walk (262144 iterations at 512x512) and two fresh
 // texture uploads, all inside the frame a skinned player came into view. The
 // entries are marked shared, so an individual rig tearing down never disposes
-// the textures the next wearer is still drawing with; the ONE release path is
+// the textures the next wearer is still drawing with.
+//
+// BOUNDED, not renderer-lifetime: each rig holds a reference for as long as it
+// lives (deriveEmissive acquires, the rig's dispose releases), and the cache
+// evicts only IDLE derivations (every wearer gone) past
+// WEAPON_EMISSIVE_IDLE_CACHE_MAX, least-recently-released first, disposing
+// both textures. The boot prewarm never populates this cache (its host
+// material has no albedo map), so without the bound every cosmetic that ever
+// walked past retained a two-canvas, two-texture pair until teardown (the C2
+// memory ratchet). Eviction is invisible on screen: a live wearer's entry is
+// pinned by its reference count, and an evicted key re-derives byte-identically
+// (pure function of the key). The terminal release path remains
 // disposeWeaponEmissiveCache below, which the renderer calls at teardown.
-const derivedEmissiveCache = new Map<string, DerivedEmissiveTextures>();
+const derivedEmissiveCache = new WeaponEmissiveDerivationCache<DerivedEmissiveTextures>(
+  WEAPON_EMISSIVE_IDLE_CACHE_MAX,
+  ({ tex, albedoTex }) => {
+    tex.dispose();
+    albedoTex.dispose();
+  },
+);
 
 /**
  * Release every memoized derivation (one megabyte-class texture pair per skin).
@@ -2178,11 +2202,10 @@ const derivedEmissiveCache = new Map<string, DerivedEmissiveTextures>();
  * disposed textures.
  */
 export function disposeWeaponEmissiveCache(): void {
-  for (const { tex, albedoTex } of derivedEmissiveCache.values()) {
+  for (const { tex, albedoTex } of derivedEmissiveCache.drain()) {
     tex.dispose();
     albedoTex.dispose();
   }
-  derivedEmissiveCache.clear();
 }
 
 /** Test seam: drop the page-lifetime sprite/sky texture memo so a suite can
@@ -2193,17 +2216,16 @@ export function clearWeaponVfxTextureCacheForTest(): void {
   texCache.clear();
 }
 
-/** Derive (or reuse) the emissive + de-baked albedo pair for one source map.
- *  The canvas plumbing lives here; the per-texel math is the pure core. */
-function derivedEmissiveTextures(
+/** Cold-build the emissive + de-baked albedo pair for one source map: the
+ *  canvas plumbing around the pure per-texel core. Callers go through the
+ *  bounded derivedEmissiveCache (deriveEmissive acquires), never call this
+ *  directly, so one build serves every wearer. */
+function buildDerivedEmissiveTextures(
   source: THREE.Texture,
   img: HTMLImageElement | HTMLCanvasElement | ImageBitmap,
   e: WeaponVfxEmissiveSpec,
   tint: WeaponEmissiveTint,
 ): DerivedEmissiveTextures {
-  const key = weaponEmissiveCacheKey(source.uuid, e);
-  const cached = derivedEmissiveCache.get(key);
-  if (cached) return cached;
   const w = img.width;
   const h = img.height;
   const cv = document.createElement('canvas');
@@ -2233,9 +2255,7 @@ function derivedEmissiveTextures(
     t.wrapT = source.wrapT;
     return markSharedTexture(t);
   };
-  const derived: DerivedEmissiveTextures = { tex: mkTex(cv), albedoTex: mkTex(av) };
-  derivedEmissiveCache.set(key, derived);
-  return derived;
+  return { tex: mkTex(cv), albedoTex: mkTex(av) };
 }
 
 function deriveEmissive(mat: THREE.MeshStandardMaterial, e: WeaponVfxEmissiveSpec): EmissiveEntry {
@@ -2272,20 +2292,19 @@ function deriveEmissive(mat: THREE.MeshStandardMaterial, e: WeaponVfxEmissiveSpe
   if (!img?.width || !drawable) {
     mat.emissive = new THREE.Color(e.tint);
     mat.emissiveIntensity = 0.3;
-    return { prev, tex: null, albedoTex: null };
+    return { prev, tex: null, albedoTex: null, cacheKey: null };
   }
-  const { tex, albedoTex } = derivedEmissiveTextures(
-    mat.map as THREE.Texture,
-    img,
-    e,
-    new THREE.Color(e.tint),
+  const source = mat.map as THREE.Texture;
+  const cacheKey = weaponEmissiveCacheKey(source.uuid, e);
+  const { tex, albedoTex } = derivedEmissiveCache.acquire(cacheKey, () =>
+    buildDerivedEmissiveTextures(source, img, e, new THREE.Color(e.tint)),
   );
   mat.emissiveMap = tex;
   mat.emissive = new THREE.Color(0xffffff);
   mat.emissiveIntensity = e.intensity;
   mat.map = albedoTex;
   mat.needsUpdate = true;
-  return { prev, tex, albedoTex };
+  return { prev, tex, albedoTex, cacheKey };
 }
 
 // ---------------------------------------------------------------------------
@@ -2699,6 +2718,12 @@ function makeShell(root: THREE.Object3D, shellSpec: WeaponVfxShellSpec): VfxPart
     shell.scale.setScalar(1.015);
     shell.frustumCulled = false;
     shell.userData.__vfx = true;
+    // The shell parents to the host weapon mesh, not the rig group visual.ts
+    // tags, and userData is per object, never inherited. Without its own skip
+    // tag applyMaterials re-owns the shell with a ShaderMaterial clone, so the
+    // rig's per-frame uTime and shed uStr uniform writes land on a material
+    // nothing renders anymore.
+    shell.userData.weaponVfxMesh = true;
     shells.push({ host, shell });
   });
   for (const { host, shell } of shells) host.add(shell);
@@ -2870,18 +2895,56 @@ export function createWeaponVfx(
   const emissives: EmissiveEntry[] = [];
   let time = 0;
 
+  // The single owner of the emissive unwind: restore every derived material to
+  // its captured state FIRST (after which no material of this rig references
+  // the shared pair), then drop this rig's cache reference, so a
+  // release-triggered eviction can never dispose a texture a material still
+  // points at. The derived pair is memoized and shared with every other wearer
+  // of this skin: dropping the reference leaves eviction to the bounded cache,
+  // which never touches an entry another wearer still pins (a disposed texture
+  // would leave that weapon unglowing). The unmarked-texture guard keeps a
+  // future rig-OWNED (non-shared) texture releasable. Clearing the array makes
+  // a second run a no-op.
+  const restoreAndReleaseEmissives = () => {
+    for (const { prev, tex, albedoTex, cacheKey } of emissives) {
+      prev.mat.emissiveMap = prev.emissiveMap;
+      prev.mat.map = prev.map;
+      prev.mat.metalness = prev.metalness;
+      prev.mat.roughness = prev.roughness;
+      prev.mat.metalnessMap = prev.metalnessMap;
+      prev.mat.roughnessMap = prev.roughnessMap;
+      prev.mat.envMapIntensity = prev.envMapIntensity;
+      if (prev.emissive) prev.mat.emissive.copy(prev.emissive);
+      prev.mat.emissiveIntensity = prev.emissiveIntensity;
+      prev.mat.needsUpdate = true;
+      if (cacheKey !== null) derivedEmissiveCache.release(cacheKey);
+      if (tex && !isSharedTexture(tex)) tex.dispose();
+      if (albedoTex && !isSharedTexture(albedoTex)) albedoTex.dispose();
+    }
+    emissives.length = 0;
+  };
+
   // 1. Emissive core derived from the painted texture (per unique material).
   const eSpec: WeaponVfxEmissiveSpec = { ...tier.emissive, ...(spec.emissive ?? {}) };
   const seen = new Set<THREE.Material>();
-  weaponRoot.traverse((o) => {
-    const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh || !mesh.material || mesh.userData.__vfx) return;
-    for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
-      if (seen.has(m)) continue;
-      seen.add(m);
-      emissives.push(deriveEmissive(m as THREE.MeshStandardMaterial, eSpec));
-    }
-  });
+  try {
+    weaponRoot.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh || !mesh.material || mesh.userData.__vfx) return;
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        if (seen.has(m)) continue;
+        seen.add(m);
+        emissives.push(deriveEmissive(m as THREE.MeshStandardMaterial, eSpec));
+      }
+    });
+  } catch (error) {
+    // A derivation that throws mid-traverse (a detached ImageBitmap, a tainted
+    // or context-less canvas) must not leave the earlier materials' cache
+    // references pinned forever: a leaked reference silently reverts that skin
+    // to the unbounded ratchet. Unwind what was acquired and rethrow.
+    restoreAndReleaseEmissives();
+    throw error;
+  }
 
   // 2. Fresnel rim shell (the "living magic" silhouette glow).
   const shellSpec: WeaponVfxShellSpec = { ...tier.shell, ...(spec.shell ?? {}) };
@@ -2968,6 +3031,11 @@ export function createWeaponVfx(
     }
   };
 
+  // dispose() releases this rig's reference on each shared derivation, so it
+  // must run at most once: a second call would strip a reference another live
+  // wearer of the same skin still depends on.
+  let rigDisposed = false;
+
   return {
     group,
     sceneExtras,
@@ -3010,6 +3078,8 @@ export function createWeaponVfx(
       light.intensity = lightSpec.intensity * flick * tuning.light;
     },
     dispose() {
+      if (rigDisposed) return;
+      rigDisposed = true;
       weaponRoot.remove(group);
       sceneExtras.parent?.remove(sceneExtras);
       for (const p of parts) {
@@ -3021,26 +3091,7 @@ export function createWeaponVfx(
         }
       }
       for (const m of allMats) m.dispose();
-      for (const { prev, tex, albedoTex } of emissives) {
-        // The derived pair is memoized and shared with every other wearer of
-        // this skin, so tearing this rig down must not release it (a disposed
-        // texture would leave the next wearer's weapon unglowing, with no
-        // path back short of a page reload). The cache's own release path is
-        // disposeWeaponEmissiveCache at renderer teardown; the guard here
-        // keeps a future rig-OWNED (unmarked) texture releasable.
-        if (tex && !isSharedTexture(tex)) tex.dispose();
-        if (albedoTex && !isSharedTexture(albedoTex)) albedoTex.dispose();
-        prev.mat.emissiveMap = prev.emissiveMap;
-        prev.mat.map = prev.map;
-        prev.mat.metalness = prev.metalness;
-        prev.mat.roughness = prev.roughness;
-        prev.mat.metalnessMap = prev.metalnessMap;
-        prev.mat.roughnessMap = prev.roughnessMap;
-        prev.mat.envMapIntensity = prev.envMapIntensity;
-        if (prev.emissive) prev.mat.emissive.copy(prev.emissive);
-        prev.mat.emissiveIntensity = prev.emissiveIntensity;
-        prev.mat.needsUpdate = true;
-      }
+      restoreAndReleaseEmissives();
     },
   };
 }
@@ -3059,54 +3110,6 @@ export function createWeaponVfx(
 // builds one any more.
 // ---------------------------------------------------------------------------
 
-/** Every component family in one rig, with the smallest counts that still
- *  produce a real draw. The authored values are irrelevant to the program
- *  keys; covering the KINDS is the whole point. */
-const PREWARM_SPEC: WeaponVfxSpec = {
-  tier: 'legendary',
-  name: 'prewarm',
-  type: 'prewarm',
-  lore: '',
-  fx: [
-    { kind: 'coreSprite', at: { yF: 0.6 }, size: 0.2, color: 0xffffff },
-    {
-      kind: 'motes',
-      at: { yF: 0.5 },
-      radius: [0.12, 0.2],
-      count: 2,
-      size: [0.02, 0.03],
-      speed: [0.6, 0.9],
-      tilt: 0.2,
-      colorA: 0xffffff,
-      colorB: 0xffffff,
-    },
-    {
-      kind: 'drift',
-      line: [{ yF: 0.1 }, { yF: 0.9 }],
-      count: 2,
-      vel: [0, 0.1, 0],
-      spread: [0.02, 0.02, 0.02],
-      life: [1, 2],
-      size: [0.02, 0.03],
-      colorA: 0xffffff,
-      colorB: 0xffffff,
-    },
-    {
-      kind: 'twinkles',
-      surface: { count: 2 },
-      size: [0.02, 0.03],
-      rate: [0.5, 1],
-      color: 0xffffff,
-      star: true,
-    },
-    {
-      kind: 'aurora',
-      helix: { from: { yF: 0.1 }, to: { yF: 0.9 }, radius: 0.1, turns: 1 },
-      width: 0.06,
-    },
-  ],
-};
-
 /** The shared sprite textures every weapon-VFX rig samples, created on first
  *  ask and cached for the page. Uploading them at boot keeps the first sighting
  *  of a skin off the synchronous texture-upload path. */
@@ -3115,31 +3118,38 @@ export function weaponVfxPrewarmTextures(): THREE.Texture[] {
 }
 
 /**
- * One hidden rig exercising every weapon-VFX component family, for the boot
- * prewarm scene. Off-screen (y = -1000) and frustum-culling-exempt like the
- * other prewarm groups; the caller adds it to the scene, lets the compile
- * entry link it, then removes it (never disposes: disposing a material
- * releases its linked program, which is the thing being warmed).
+ * One hidden rig per REAL catalog spec, for the boot prewarm scene, built
+ * through the exact worn-skin path (grounded: false) so every program cache
+ * key a live arrival can ask for is linked at boot. A single synthetic spec
+ * exercising each component FAMILY was not enough: the first skin sighted in
+ * the world still linked ~108 programs inside one frame (the measured
+ * geared-arrival freeze). Off-screen (y = -1000) and frustum-culling-exempt
+ * like the other prewarm groups; the caller adds it to the scene, lets the
+ * compile entry link it, then removes it (never disposes: disposing a
+ * material releases its linked program, which is the thing being warmed).
  */
 export function buildWeaponVfxPrewarmGroup(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'weapon-vfx-program-prewarm';
   group.position.set(0, -1000, 0); // off-screen; compile ignores position
-  const host = new THREE.Mesh(
-    new THREE.BoxGeometry(0.1, 1, 0.1),
-    new THREE.MeshStandardMaterial({ color: 0xffffff }),
-  );
-  host.frustumCulled = false;
-  const handle = createWeaponVfx(host, PREWARM_SPEC, { grounded: true, backdrop: false });
-  // A visible light would change the scene's light counts, and those counts
-  // are part of every program cache key: one extra point light here and the
-  // whole boot compile warms keys no live frame ever asks for.
-  handle.light.visible = false;
-  // The boot prewarm group is census-tagged 'prewarm' as a whole; keep this
-  // synthetic rig inside that bucket rather than reporting as a live skin.
-  handle.group.userData.renderCategory = 'prewarm';
-  handle.sceneExtras.userData.renderCategory = 'prewarm';
-  group.add(host);
-  group.add(handle.sceneExtras);
+  for (const [key, spec] of Object.entries(WEAPON_VFX)) {
+    const host = new THREE.Mesh(
+      new THREE.BoxGeometry(0.1, 1, 0.1),
+      new THREE.MeshStandardMaterial({ color: 0xffffff }),
+    );
+    host.name = `prewarm-skin-host:${key}`;
+    host.frustumCulled = false;
+    const handle = createWeaponVfx(host, spec, { grounded: false });
+    // A visible light would change the scene's light counts, and those counts
+    // are part of every program cache key: one extra point light here and the
+    // whole boot compile warms keys no live frame ever asks for.
+    handle.light.visible = false;
+    // The boot prewarm group is census-tagged 'prewarm' as a whole; keep the
+    // rigs inside that bucket rather than reporting as live skins.
+    handle.group.userData.renderCategory = 'prewarm';
+    handle.sceneExtras.userData.renderCategory = 'prewarm';
+    group.add(host);
+    group.add(handle.sceneExtras);
+  }
   return group;
 }

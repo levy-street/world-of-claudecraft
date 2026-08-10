@@ -3364,6 +3364,12 @@
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-delete-btn {
       justify-self: end;
     }
+    /* One-shot redesign: a quiet gold accent so the limited, spend-once offer
+       reads as special without out-shouting Enter World above it. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .reroll-char-btn {
+      color: var(--gold-dim);
+      border-color: var(--gold-dim);
+    }
     /* The class summary's base type is sized for the small pre-game card
        (10px to 12px); on the full-screen stage it reads too small. Scale the
        whole details sheet up one step in every cs-wow panel. */
@@ -4681,6 +4687,39 @@
     -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
   }
 
+  /* One-shot appearance redesign: the customizer docked in the news panel's
+     slot. The customizer body scrolls inside the fixed panel height; the
+     Save / Keep actions stay pinned below it. */
+  .cs-reroll-panel #charselect-reroll-host {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .cs-reroll-actions {
+    flex: none;
+    display: flex;
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+  }
+  .cs-reroll-actions .btn {
+    flex: 1 1 0;
+  }
+  /* The shared .auth-error rule below (written for the char-create input
+     tooltips) positions errors absolutely below their anchor. That anchor
+     assumption breaks here: the reroll panel docks as position:absolute on
+     desktop, so an absolute error paints over the 3D stage instead of
+     flowing under the Save/Keep actions. Reset it to a normal flow child.
+     Double-id selector so it wins over the shared rule regardless of the
+     two rules' relative source order (equal id+class specificity otherwise). */
+  #charselect-reroll #charselect-reroll-error {
+    position: static;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: auto;
+    margin-top: var(--spacing-sm);
+  }
+
   .class-details-content {
     transition:
       opacity 0.15s ease-in-out,
@@ -5207,7 +5246,10 @@
     margin: 0;
     overflow: visible;
   }
-  body.mobile-touch #charselect-panel #charselect-news {
+  /* Both docked panels, by CLASS rather than by #charselect-news: the redesign
+     editor sits in the same slot with the same chrome, and an id-keyed override
+     left it on the desktop 520px height with none of these fixes. */
+  body.mobile-touch #charselect-panel .cs-news-panel {
     flex: none;
     width: 100%;
     height: auto;
@@ -5216,8 +5258,11 @@
     margin-bottom: 0;
   }
   /* The page is the scroller on mobile: the feed renders at natural height
-     (no nested scroll region, no bottom fade hiding the tail mid-read). */
-  body.mobile-touch #charselect-panel .cs-news-feed {
+     (no nested scroll region, no bottom fade hiding the tail mid-read). The
+     customizer follows the same rule, or it scrolls inside a panel that is
+     itself scrolling. */
+  body.mobile-touch #charselect-panel .cs-news-feed,
+  body.mobile-touch #charselect-panel .cs-reroll-panel #charselect-reroll-host {
     flex: none;
     min-height: 0;
     overflow: visible;
@@ -5243,7 +5288,9 @@
   }
   body.mobile-touch .char-row .char-actions {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr;
+    grid-auto-flow: column;
+    grid-auto-columns: auto;
     gap: 7px;
     width: 100%;
   }
@@ -6342,7 +6389,9 @@
   body.mobile-touch #char-list .char-row .char-actions {
     grid-area: actions;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr;
+    grid-auto-flow: column;
+    grid-auto-columns: auto;
     gap: 7px;
     width: 100%;
   }
@@ -6577,7 +6626,9 @@
     }
     body.mobile-touch #char-list .char-row .char-actions {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr;
+      grid-auto-flow: column;
+      grid-auto-columns: auto;
       gap: 6px;
       width: 100%;
     }
@@ -6600,7 +6651,7 @@
       min-height: 110px;
       min-width: 0;
     }
-    body.mobile-touch #charselect-panel #charselect-news {
+    body.mobile-touch #charselect-panel .cs-news-panel {
       grid-column: 1 / -1;
       box-sizing: border-box;
       width: auto;

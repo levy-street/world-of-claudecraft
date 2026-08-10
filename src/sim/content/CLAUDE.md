@@ -114,7 +114,13 @@ inside the Vale Cup pitch.
   `PlayerClass[]`; the `WAR`/`MAG`/`ROG` constants in `items.ts` are the ready-made
   archetype-group lists (`REWARD_ARCHETYPE` in `data.ts` shares rewards across the
   group, so lock the whole group, not one class). Every non-heroic item also needs
-  its English name in the i18n catalog (see below), or CI fails.
+  its English name in the i18n catalog (see below), or CI fails. It also needs one
+  exactly named `public/ui/items/<item-id>.webp` and one current provenance owner in
+  `public/ui/items/mapping.json`, following the canonical
+  `docs/design/item-icon-art-style.md` (`woc-item-icon-v1`) intake and review contract.
+  Read the item's live name, quest/recipe relationship, set, and tier data before
+  approving art; old icon subject matter is not authoritative when it contradicts
+  content. Generated Heroic variants intentionally inherit their base item's painting.
 - **Gather node:** add a `GatherNodeDef` (typed in `../types.ts`) to
   `gather_nodes.ts`; `level` is a one-time snapshot of the zone's `levelRange`
   midpoint, not a live lookup. Yield/respawn per node TYPE lives in

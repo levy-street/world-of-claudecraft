@@ -1,5 +1,5 @@
 // Headless preview renderer: turntable views, per-clip pose frames, and the
-// HUD-style weapon icon. Self-bundles preview_entry.js with programmatic
+// legacy weapon-model preview. Self-bundles preview_entry.js with programmatic
 // esbuild (the render_model_stills.mjs pattern, no manual prebundle step) and
 // drives headless system Chrome on the swiftshader path (no dev server; GLB
 // bytes travel as base64). Frames are deterministic per machine but not across
@@ -7,17 +7,29 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { findBrowserPath } from '../../browser_path_resolve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 let pagePromise = null;
 
+export function moduleImportUrl(path) {
+  // An absolute Windows path must form a proper drive URL even when this tool
+  // runs on POSIX: pathToFileURL there treats "C:\\repo\\..." as relative and
+  // resolves it against cwd with percent-encoded backslashes.
+  if (/^[A-Za-z]:[\\/]/.test(path)) {
+    return new URL(`file:///${path.replaceAll('\\', '/')}`).href;
+  }
+  return pathToFileURL(path).href;
+}
+
 async function launchPage() {
   const esbuild = await import('esbuild');
   const puppeteer = (await import('puppeteer-core')).default;
-  const { BROWSER_PATH } = await import(resolve(__dirname, '../../browser_path.mjs'));
+  const { BROWSER_PATH } = await import(
+    moduleImportUrl(resolve(__dirname, '../../browser_path.mjs'))
+  );
 
   const bundlePath = join(tmpdir(), `asset_pipeline_preview_${process.pid}.js`);
   await esbuild.build({
@@ -215,7 +227,7 @@ export async function renderHeldAcross(weaponGlbPath, outDir, { lift, maxHeight 
   return files;
 }
 
-/** Render the 128px HUD bag icon for a weapon GLB. */
+/** Render the 128px model-preview JPG for a weapon GLB. */
 export async function renderWeaponIcon(glbPath, dest) {
   const sharp = (await import('sharp')).default;
   const b64 = readFileSync(glbPath).toString('base64');

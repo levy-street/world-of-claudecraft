@@ -3,12 +3,11 @@
 // effects are intentionally separate from mastery and choice rows so class
 // owners can rebalance and redesign each spec without deleting the hotfix floor.
 //
-// Warrior and Mage are deliberately excluded. The floor exists to close the gap
-// for the classes weakened by the Talents 2.0 transition; warrior and mage are
-// already the two strongest classes, so restoring their pre-v0.27 passives would
-// widen the gap this hotfix is meant to close. Their masteries, signatures, and
-// ability kits are untouched, only the restored baseline is withheld. Mage also
-// has no Chronomancy baseline (new healer kit, no former baseline to restore).
+// Paladin, Warrior, and Mage are deliberately excluded. Paladin now owns a
+// complete class-specific kit and mastery layer, so retaining its legacy floor
+// would double-apply specialization power. Warrior and Mage remain excluded for
+// the original hotfix balance reasons. Mage also has no Chronomancy baseline
+// (new healer kit, no former baseline to restore).
 
 import type { PlayerClass } from '../types';
 import type { TalentEffect } from './talents';
@@ -16,38 +15,11 @@ import type { TalentEffect } from './talents';
 export type SpecBaselineTable = Partial<Record<PlayerClass, Record<string, TalentEffect>>>;
 
 export const SPEC_BASELINES: SpecBaselineTable = {
-  paladin: {
-    holy: {
-      // v0.28.x stat-identity pass: healer scales on Int, not Str.
-      stats: { int: 6 },
-      global: { healPct: 0.06 },
-      ability: [
-        { ability: 'seal_of_righteousness', costPct: -0.16 },
-        { ability: 'judgement', costPct: -0.16 },
-        { ability: 'holy_light', dmgPct: 0.24 },
-        { ability: 'flash_of_light', costPct: -0.16, castPct: -0.2 },
-      ],
-    },
-    protection: {
-      // staPct 0.35 (2026-07 tank parity): armor was already best-in-class,
-      // but with no stamina multiplier the paladin sat at 76% of the prot
-      // warrior's effective HP. This lands him at rough parity while the
-      // warrior keeps parry/block/stance as the pure-tank identity.
-      stats: { str: 6, dodge: 0.02, armorPct: 0.29, staPct: 0.35 },
-      global: { threatPct: 0.2 },
-      ability: [
-        { ability: 'devotion_aura', buffPct: 0.4 },
-        { ability: 'righteous_fury', costPct: -0.5 },
-      ],
-    },
-    retribution: {
-      stats: { str: 6 },
-      ability: [
-        { ability: 'seal_of_righteousness', dmgPct: 0.2, costPct: -0.4 },
-        { ability: 'judgement', dmgPct: 0.2, costPct: -0.4, cooldownPct: -0.3 },
-      ],
-    },
-  },
+  // Paladin is absent by design, alongside Warrior and Mage: an overhauled class
+  // carries its passive floor on its spec mastery, not here. Faithwarden's
+  // Oathward owns the 2026-07 tank-parity stamina multiplier (see
+  // talents_classic.ts); the threat and armor the old baseline granted are
+  // already covered, and larger, by that mastery plus Burning Oath.
   hunter: {
     beast_mastery: {
       // v0.28.x stat-identity pass: de-overloaded. Was Sta +9, AP +32, Armor
@@ -61,31 +33,48 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ability: [
         { ability: 'arcane_shot', dmgPct: 0.24, costPct: -0.16, cooldownPct: -0.1 },
         { ability: 'serpent_sting', costPct: -0.16 },
-        { ability: 'aimed_shot', dmgPct: 0.16, castPct: -0.2 },
+        { ability: 'aimed_shot', dmgPct: 0.5, castPct: -0.2 },
         { ability: 'concussive_shot', cooldownPct: -0.1 },
       ],
     },
     survival: {
-      stats: { agi: 3, crit: 0.03, dodge: 0.12 },
-      global: { meleeDmgPct: 0.06 },
+      // 2026-08 120s band round: the raise rides apPct, not agiPct, on
+      // purpose. apPct feeds only the two Attack Power lines (melee and
+      // hunter ranged); agiPct would also lift the Agility-derived armor,
+      // dodge, and crit on the spec that already dodges the most. The
+      // deep-equal pin in spec_baselines.test.ts guards the damage-only
+      // shape. Both arms are relatively level-invariant, an accepted
+      // remainder for the hunter kit-item pass alongside Marksmanship.
+      stats: { agi: 3, crit: 0.03, dodge: 0.12, apPct: 0.15 },
+      global: { meleeDmgPct: 0.3 },
     },
   },
+  // v0.34 rogue base re-band: with the Thronebane hand fix removing the legendary
+  // the rogue kit was tuned around, all three specs collapsed to the bottom of the
+  // zero-legendary balance table (Combat 132, Assassination 139, Subtlety 147 at
+  // 60s, the class 45 DPS below the median: nythraxis-class-balance-monte-carlo.md).
+  // This lifts the BiS-epic (no-legendary) floor of each spec to ~200 DPS. The kit
+  // is auto-attack heavy (54 to 73% of damage on the competent rotation), so the
+  // lift leans on Attack Power (apPct) and crit, which scale the white swings the
+  // per-ability and meleeDmgPct rows never touch; meleeDmgPct tops up the builder
+  // and finisher share. The legendary itself is not touched here (separate PR).
   rogue: {
     assassination: {
-      stats: { crit: 0.03 },
-      global: { meleeDmgPct: 0.08 },
+      stats: { crit: 0.12, apPct: 0.36 },
+      global: { meleeDmgPct: 0.22 },
       ability: [
         { ability: 'sinister_strike', costPct: -0.16 },
         { ability: 'eviscerate', dmgPct: 0.32 },
       ],
     },
     combat: {
-      stats: { ap: 24, crit: 0.03 },
-      global: { meleeDmgPct: 0.08 },
+      stats: { ap: 24, crit: 0.14, apPct: 0.55 },
+      global: { meleeDmgPct: 0.36 },
       ability: [{ ability: 'sinister_strike', dmgPct: 0.2, costPct: -0.16 }],
     },
     subtlety: {
-      stats: { agi: 7, crit: 0.03, dodge: 0.05 },
+      stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.12 },
+      global: { meleeDmgPct: 0.08 },
       ability: [
         { ability: 'stealth', cooldownPct: -0.7 },
         { ability: 'backstab', dmgPct: 0.16 },
@@ -108,18 +97,24 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       global: { healPct: 0.08 },
       ability: [
         { ability: 'lesser_heal', dmgPct: 0.18, costPct: -0.16 },
-        { ability: 'heal', dmgPct: 0.18, costPct: -0.16, castPct: -0.2 },
+        { ability: 'heal', dmgPct: 0.18, costPct: -0.3, castPct: -0.2 },
         { ability: 'flash_heal', costPct: -0.16 },
+        { ability: 'prayer_of_healing', costPct: -0.15 },
         { ability: 'smite', castPct: -0.1 },
       ],
     },
     shadow: {
       // v0.28.x stat-identity pass: shadow is a DPS caster, so its flat stat is
       // Int (spell power), not the combat-dead Spirit it inherited.
+      // 2026-08-09 120s band round: the three ability rows step down again
+      // (0.3/0.34/0.4 to 0.2/0.2/0.15, with the vespers.ts multipliers) so the
+      // 120s BiS Monte Carlo lands inside the 150-200 band instead of 215.
       stats: { int: 6 },
+      global: { spellDmgPct: 0.15 },
       ability: [
-        { ability: 'shadow_word_pain', dmgPct: 0.24, costPct: -0.1 },
-        { ability: 'mind_blast', dmgPct: 0.18, costPct: -0.1 },
+        { ability: 'shadow_word_pain', dmgPct: 0.2, costPct: -0.1 },
+        { ability: 'mind_blast', dmgPct: 0.2, costPct: -0.1 },
+        { ability: 'mind_flay', dmgPct: 0.15 },
       ],
     },
   },
@@ -137,12 +132,13 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     enhancement: {
       // v0.28.x stat-identity pass: Enhancement primary is Strength, so its Int
       // stays below Elemental's; melee AP is retained.
-      stats: { int: 2, ap: 24 },
+      stats: { int: 2, ap: 24, apPct: 0.22 },
       ability: [
-        { ability: 'lightning_bolt', costPct: -0.1 },
-        { ability: 'earth_shock', costPct: -0.1 },
+        { ability: 'lightning_bolt', costPct: -0.2 },
+        { ability: 'earth_shock', costPct: -0.2 },
+        { ability: 'flame_shock', costPct: -0.2 },
         { ability: 'rockbiter_weapon', dmgPct: 0.4 },
-        { ability: 'stormstrike', dmgPct: 0.25 },
+        { ability: 'stormstrike', dmgPct: 0.8 },
       ],
     },
     restoration: {
@@ -152,13 +148,10 @@ export const SPEC_BASELINES: SpecBaselineTable = {
   },
   warlock: {
     affliction: {
-      // v0.28.x stat-identity pass: +2% was the lowest baseline on the table and
-      // it carried no flat stat. Lift to peer level and add the primary (Int).
       stats: { int: 6 },
-      global: { spellDmgPct: 0.06 },
       ability: [
-        { ability: 'corruption', dmgPct: 0.16, costPct: -0.15, castPct: -0.7 },
-        { ability: 'curse_of_agony', dmgPct: 0.09, costPct: -0.15 },
+        { ability: 'needle_of_fate', dmgPct: 0.08, costPct: -0.08 },
+        { ability: 'drain_life', costPct: -0.08 },
       ],
     },
     demonology: {
@@ -168,9 +161,8 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // damage), so that direction would be a separate feature, not this pass.
       stats: { sta: 8, armorPct: 0.06, int: 6 },
       ability: [
-        { ability: 'shadow_bolt', costPct: -0.08 },
-        { ability: 'immolate', costPct: -0.08 },
-        { ability: 'demon_skin', dmgPct: 0.3 },
+        { ability: 'soul_harvest', costPct: -0.08, dmgPct: 0.08 },
+        { ability: 'bone_armor', costPct: -0.08 },
       ],
     },
     destruction: {

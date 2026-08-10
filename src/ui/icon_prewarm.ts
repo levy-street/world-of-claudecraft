@@ -7,10 +7,82 @@
 // finds the shared urlCache already hot. Purely a cache warmer: rendering is
 // visually identical with or without it, and it never blocks a frame.
 import { ABILITIES, ITEMS } from '../sim/data';
-import { type IconKind, needsIconDataUrlWarm, storePrewarmedIconDataUrl } from './icons';
+import {
+  AURA_RECIPE_IDS,
+  type IconKind,
+  needsIconDataUrlWarm,
+  needsProceduralIconDataUrlWarm,
+  storePrewarmedIconDataUrl,
+  storePrewarmedProceduralIconDataUrl,
+} from './icons';
 
-export type IconPrewarmEntry = { kind: IconKind; id: string; size?: number };
+export type IconPrewarmMode = 'default' | 'procedural';
+export type IconPrewarmEntry = {
+  kind: IconKind;
+  id: string;
+  size?: number;
+  mode?: IconPrewarmMode;
+};
 export type IconPrewarmPlan = { entries: IconPrewarmEntry[]; priorityCount: number };
+
+export interface ContextualIconPrewarmSources {
+  equipmentItemIds: readonly (string | null | undefined)[];
+  classIds: readonly string[];
+  inventoryItemIds: readonly (string | null | undefined)[];
+  bagItemIds: readonly (string | null | undefined)[];
+  knownAbilityIds: readonly string[];
+  classAbilityIds: readonly string[];
+  talentIconRefs: readonly IconPrewarmEntry[];
+  recipeResultItemIds: readonly (string | null | undefined)[];
+  finderLootItemIds: readonly (string | null | undefined)[];
+  questRewardItemIds: readonly (string | null | undefined)[];
+  heroicVendorItemIds: readonly (string | null | undefined)[];
+  marketListingItemIds: readonly (string | null | undefined)[];
+  marketCollectionItemIds: readonly (string | null | undefined)[];
+  marketHouseItemIds: readonly (string | null | undefined)[];
+  vendorItemIds: readonly (string | null | undefined)[];
+}
+
+/** Translate every player/session-specific first-open source into cache entries.
+ *  Keeping the routing in this pure seam makes the priority contract exhaustive
+ *  and testable without booting the renderer or a full World instance. */
+export function contextualIconPrewarmEntries(
+  sources: ContextualIconPrewarmSources,
+): IconPrewarmEntry[] {
+  const entries: IconPrewarmEntry[] = [];
+  const prioritizeItem = (id: string | null | undefined): void => {
+    if (id) entries.push({ kind: 'item', id });
+  };
+  const prioritizeAbility = (id: string): void => {
+    entries.push({ kind: 'ability', id });
+    entries.push({ kind: 'aura', id, mode: 'procedural' });
+  };
+
+  for (const id of sources.equipmentItemIds) prioritizeItem(id);
+  for (const cls of sources.classIds) {
+    entries.push({ kind: 'crest', id: `class_${cls}`, size: 20, mode: 'procedural' });
+    entries.push({ kind: 'crest', id: `class_${cls}`, size: 96, mode: 'procedural' });
+  }
+  for (const id of sources.inventoryItemIds) prioritizeItem(id);
+  for (const id of sources.bagItemIds) prioritizeItem(id);
+  for (const id of sources.knownAbilityIds) prioritizeAbility(id);
+  for (const id of sources.classAbilityIds) prioritizeAbility(id);
+  for (const ref of sources.talentIconRefs) {
+    entries.push(ref);
+    if (ref.kind === 'ability') {
+      entries.push({ kind: 'aura', id: ref.id, mode: 'procedural' });
+    }
+  }
+  for (const id of sources.recipeResultItemIds) prioritizeItem(id);
+  for (const id of sources.finderLootItemIds) prioritizeItem(id);
+  for (const id of sources.questRewardItemIds) prioritizeItem(id);
+  for (const id of sources.heroicVendorItemIds) prioritizeItem(id);
+  for (const id of sources.marketListingItemIds) prioritizeItem(id);
+  for (const id of sources.marketCollectionItemIds) prioritizeItem(id);
+  for (const id of sources.marketHouseItemIds) prioritizeItem(id);
+  for (const id of sources.vendorItemIds) prioritizeItem(id);
+  return entries;
+}
 
 // Procedural chrome icons are not content-table entries, so a catalog walk
 // would never reach them. They are common first-open paths (action bar, bags,
@@ -103,22 +175,48 @@ function blobDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-function prewarmIconDataUrl(
+export interface IconPrewarmWorkerBridge {
+  requestIcon(kind: IconKind, id: string, size: number): Promise<Blob> | null;
+  toDataUrl(blob: Blob): Promise<string>;
+}
+
+const DEFAULT_WORKER_BRIDGE: IconPrewarmWorkerBridge = {
+  requestIcon: requestWorkerIcon,
+  toDataUrl: blobDataUrl,
+};
+
+/** Render and publish one procedural icon through the production worker path.
+ *  The bridge is injectable so tests can exercise the cache-routing contract
+ *  without requiring browser Worker globals. */
+export function prewarmIconDataUrl(
   kind: IconKind,
   id: string,
   size = DEFAULT_ICON_SIZE,
+  mode: IconPrewarmMode = 'default',
+  bridge: IconPrewarmWorkerBridge = DEFAULT_WORKER_BRIDGE,
 ): void | Promise<void> {
-  if (!needsIconDataUrlWarm(kind, id, size)) return;
-  const key = `${kind}|${id}|${size}`;
+  const procedural = mode === 'procedural';
+  if (
+    procedural
+      ? !needsProceduralIconDataUrlWarm(kind, id, size)
+      : !needsIconDataUrlWarm(kind, id, size)
+  ) {
+    return;
+  }
+  const key = `${mode}|${kind}|${id}|${size}`;
   const existing = pendingUrlWarms.get(key);
   if (existing) return existing;
-  const blob = requestWorkerIcon(kind, id, size);
+  const blob = bridge.requestIcon(kind, id, size);
   // Unsupported browsers keep the normal synchronous demand path. Crucially,
   // they do not run a known 50-100ms PNG encoder during active gameplay.
   if (!blob) return;
   const pending = blob
-    .then(blobDataUrl)
-    .then((url) => storePrewarmedIconDataUrl(kind, id, size, url))
+    .then(bridge.toDataUrl)
+    .then((url) =>
+      procedural
+        ? storePrewarmedProceduralIconDataUrl(kind, id, size, url)
+        : storePrewarmedIconDataUrl(kind, id, size, url),
+    )
     .finally(() => pendingUrlWarms.delete(key));
   pendingUrlWarms.set(key, pending);
   return pending;
@@ -134,7 +232,7 @@ export function defaultIconPrewarmPlan(
   const entries: IconPrewarmEntry[] = [];
   const seen = new Set<string>();
   const push = (entry: IconPrewarmEntry): void => {
-    const key = `${entry.kind}|${entry.id}|${entry.size ?? DEFAULT_ICON_SIZE}`;
+    const key = `${entry.mode ?? 'default'}|${entry.kind}|${entry.id}|${entry.size ?? DEFAULT_ICON_SIZE}`;
     if (seen.has(key)) return;
     seen.add(key);
     entries.push(entry);
@@ -143,7 +241,13 @@ export function defaultIconPrewarmPlan(
   for (const entry of CORE_UI_ICON_ENTRIES) push(entry);
   const priorityCount = entries.length;
   for (const id of Object.keys(ITEMS)) push({ kind: 'item', id });
+  // Painted abilities already have a static WebP plus the committed combat
+  // safety layer. Their identity-specific procedural layer is useful only for
+  // the current class/known/talent set, which the contextual priority prefix
+  // covers above. Warming every other class here retained hundreds of base64
+  // PNGs and spent seconds of worker time for art this session cannot use.
   for (const id of Object.keys(ABILITIES)) push({ kind: 'ability', id });
+  for (const id of AURA_RECIPE_IDS) push({ kind: 'aura', id, mode: 'procedural' });
   return { entries, priorityCount };
 }
 
@@ -168,7 +272,12 @@ type IdleWindow = typeof window & {
 export function prewarmIconCache(
   entries: IconPrewarmEntry[],
   opts: {
-    warm?: (kind: IconKind, id: string, size: number) => void | Promise<void>;
+    warm?: (
+      kind: IconKind,
+      id: string,
+      size: number,
+      mode: IconPrewarmMode,
+    ) => void | Promise<void>;
     now?: () => number;
     /** Leading entries to dispatch without waiting for an idle deadline. This is
      *  intended for the small, player-specific prefix while loading is visible;
@@ -194,7 +303,12 @@ export function prewarmIconCache(
       if (deadline !== undefined && deadline.timeRemaining() <= 3) break;
       const entry = entries[next++];
       try {
-        const result = warm(entry.kind, entry.id, entry.size ?? DEFAULT_ICON_SIZE);
+        const result = warm(
+          entry.kind,
+          entry.id,
+          entry.size ?? DEFAULT_ICON_SIZE,
+          entry.mode ?? 'default',
+        );
         if (result) {
           // Keep only one worker encode in flight instead of queueing hundreds
           // of procedural icons at once.

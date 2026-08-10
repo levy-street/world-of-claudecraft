@@ -5,7 +5,7 @@
 // live through src/ui/talent_i18n.ts. No balance numbers or instanced spoilers here.
 
 export type GuideRole = 'tank' | 'healer' | 'dps';
-export type GuideResource = 'rage' | 'mana' | 'energy';
+export type GuideResource = 'rage' | 'mana' | 'energy' | 'focus';
 
 export interface GuideAbilityRef { id: string; name: string; }
 export interface GuideClassSpec { id: string; name: string; role: GuideRole; signature: string; }
@@ -526,69 +526,27 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "holy",
-        "name": "Sacrament",
+        "name": "Sunmender",
         "role": "healer",
-        "signature": "holy_shock"
+        "signature": "mercy_lance"
       },
       {
         "id": "protection",
-        "name": "Vigil",
+        "name": "Faithwarden",
         "role": "tank",
-        "signature": "holy_shield"
+        "signature": "sunward_disc"
       },
       {
         "id": "retribution",
-        "name": "Requital",
+        "name": "Dawnreaver",
         "role": "dps",
-        "signature": "crusader_strike"
+        "signature": "final_edict"
       }
     ],
     "signatureAbilities": [
       {
-        "id": "seal_of_righteousness",
-        "name": "Oathbrand"
-      },
-      {
         "id": "holy_light",
         "name": "Mending Light"
-      },
-      {
-        "id": "devotion_aura",
-        "name": "Steadfast Aura"
-      },
-      {
-        "id": "judgement",
-        "name": "Verdict"
-      },
-      {
-        "id": "blessing_of_might",
-        "name": "Oath of Iron"
-      },
-      {
-        "id": "divine_protection",
-        "name": "Ward of Faith"
-      }
-    ],
-    "abilities": [
-      {
-        "id": "seal_of_righteousness",
-        "name": "Oathbrand"
-      },
-      {
-        "id": "holy_light",
-        "name": "Mending Light"
-      },
-      {
-        "id": "devotion_aura",
-        "name": "Steadfast Aura"
-      },
-      {
-        "id": "judgement",
-        "name": "Verdict"
-      },
-      {
-        "id": "blessing_of_might",
-        "name": "Oath of Iron"
       },
       {
         "id": "divine_protection",
@@ -603,16 +561,30 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Last Rite"
       },
       {
-        "id": "holy_taunt",
-        "name": "Sacred Goad"
+        "id": "consecration",
+        "name": "Holy Ground"
       },
       {
-        "id": "flash_of_light",
-        "name": "Lightmend"
+        "id": "holy_shield",
+        "name": "Hallowed Wall"
+      }
+    ],
+    "abilities": [
+      {
+        "id": "holy_light",
+        "name": "Mending Light"
       },
       {
-        "id": "exorcism",
-        "name": "Rite of Expulsion"
+        "id": "divine_protection",
+        "name": "Ward of Faith"
+      },
+      {
+        "id": "hammer_of_justice",
+        "name": "Sundering Gavel"
+      },
+      {
+        "id": "lay_on_hands",
+        "name": "Last Rite"
       },
       {
         "id": "consecration",
@@ -623,16 +595,140 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Burning Oath"
       },
       {
+        "id": "holy_shield",
+        "name": "Hallowed Wall"
+      },
+      {
+        "id": "divine_ascension",
+        "name": "Divine Ascension"
+      },
+      {
+        "id": "devotion_ward",
+        "name": "Bastion Devotion"
+      },
+      {
+        "id": "radiant_devotion",
+        "name": "Radiant Devotion"
+      },
+      {
+        "id": "dawn_devotion",
+        "name": "Dawn Devotion"
+      },
+      {
+        "id": "grace_devotion",
+        "name": "Grace Devotion"
+      },
+      {
         "id": "retribution_aura",
         "name": "Requital Aura"
       },
       {
-        "id": "rebuke",
-        "name": "Reproach"
+        "id": "hammer_of_grace",
+        "name": "Hammer of Grace"
       },
       {
-        "id": "sacred_bulwark",
-        "name": "Sacred Bulwark"
+        "id": "hushbrand",
+        "name": "Hushbrand"
+      },
+      {
+        "id": "solar_step",
+        "name": "Solar Step"
+      },
+      {
+        "id": "solar_invocation",
+        "name": "Solar Invocation"
+      },
+      {
+        "id": "recall_the_fallen",
+        "name": "Recall the Fallen"
+      },
+      {
+        "id": "beacon_of_light",
+        "name": "Beacon of Light"
+      },
+      {
+        "id": "final_edict",
+        "name": "Final Edict"
+      },
+      {
+        "id": "dawnfall",
+        "name": "Dawnfall"
+      },
+      {
+        "id": "faithforged_guard",
+        "name": "Debt of Light"
+      },
+      {
+        "id": "hammer_of_wrath",
+        "name": "Tolling Hammer"
+      },
+      {
+        "id": "guardian_covenant",
+        "name": "Guardian Covenant"
+      },
+      {
+        "id": "avenging_wrath",
+        "name": "Zealwing"
+      },
+      {
+        "id": "sun_gods_verdict",
+        "name": "Verdict of the Sun God"
+      },
+      {
+        "id": "valkyrs_calling",
+        "name": "Valkyr's Calling"
+      },
+      {
+        "id": "mercy_lance",
+        "name": "Mercy Lance"
+      },
+      {
+        "id": "sacred_form",
+        "name": "Sacred Form"
+      },
+      {
+        "id": "dawns_embrace",
+        "name": "Dawn's Embrace"
+      },
+      {
+        "id": "radiant_chorus",
+        "name": "Radiant Chorus"
+      },
+      {
+        "id": "life_covenant",
+        "name": "Life Covenant"
+      },
+      {
+        "id": "aegis_first_dawn",
+        "name": "Aegis of the First Dawn"
+      },
+      {
+        "id": "vowkeeper_strike",
+        "name": "Vowkeeper Strike"
+      },
+      {
+        "id": "bastion_rite",
+        "name": "Bastion Rite"
+      },
+      {
+        "id": "sunward_disc",
+        "name": "Sunward Disc"
+      },
+      {
+        "id": "sacred_challenge",
+        "name": "Sacred Goad"
+      },
+      {
+        "id": "bastion_sweep",
+        "name": "Bastion Sweep"
+      },
+      {
+        "id": "oath_chain",
+        "name": "Oath Chain"
+      },
+      {
+        "id": "veilbound_march",
+        "name": "Veilbound March"
       }
     ],
     "model": "player_paladin",
@@ -641,7 +737,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
   {
     "id": "hunter",
     "color": "#a6d84f",
-    "resource": "mana",
+    "resource": "focus",
     "roles": [
       "dps"
     ],
@@ -656,13 +752,13 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "marksmanship",
         "name": "Coldsight",
         "role": "dps",
-        "signature": "trueshot_aura"
+        "signature": "cold_focus"
       },
       {
         "id": "survival",
         "name": "Fieldcraft",
         "role": "dps",
-        "signature": "wyvern_sting"
+        "signature": "bloodhook"
       }
     ],
     "signatureAbilities": [
@@ -671,24 +767,24 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Gutting Strike"
       },
       {
+        "id": "pack_command",
+        "name": "Pack Command"
+      },
+      {
+        "id": "stampede",
+        "name": "Stampede"
+      },
+      {
+        "id": "measured_shot",
+        "name": "Measured Shot"
+      },
+      {
         "id": "aspect_of_the_hawk",
         "name": "Harrier's Guise"
       },
       {
         "id": "serpent_sting",
         "name": "Venom Barb"
-      },
-      {
-        "id": "arcane_shot",
-        "name": "Fell Shot"
-      },
-      {
-        "id": "concussive_shot",
-        "name": "Rattling Shot"
-      },
-      {
-        "id": "mongoose_bite",
-        "name": "Counterfang"
       }
     ],
     "abilities": [
@@ -697,6 +793,18 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Gutting Strike"
       },
       {
+        "id": "pack_command",
+        "name": "Pack Command"
+      },
+      {
+        "id": "stampede",
+        "name": "Stampede"
+      },
+      {
+        "id": "measured_shot",
+        "name": "Measured Shot"
+      },
+      {
         "id": "aspect_of_the_hawk",
         "name": "Harrier's Guise"
       },
@@ -714,11 +822,35 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "mongoose_bite",
-        "name": "Counterfang"
+        "name": "Woundrend"
+      },
+      {
+        "id": "hunting_momentum",
+        "name": "Hunting Momentum"
+      },
+      {
+        "id": "fieldcraft_reentry",
+        "name": "Armed Re-entry"
       },
       {
         "id": "wing_clip",
         "name": "Fettering Slash"
+      },
+      {
+        "id": "trailbreak",
+        "name": "Trailbreak"
+      },
+      {
+        "id": "wildheart",
+        "name": "Wildheart"
+      },
+      {
+        "id": "shellskin",
+        "name": "Shellskin"
+      },
+      {
+        "id": "frostjaw_trap",
+        "name": "Frostjaw Trap"
       },
       {
         "id": "tame_beast",
@@ -747,6 +879,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "rapid_fire",
         "name": "Fevered Draw"
+      },
+      {
+        "id": "shrapnel_charge",
+        "name": "Shrapnel Charge"
+      },
+      {
+        "id": "bloodtrail_assault",
+        "name": "Bloodtrail Assault"
       },
       {
         "id": "volley",
@@ -901,6 +1041,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "kick",
         "name": "Boot"
+      },
+      {
+        "id": "venom_dart",
+        "name": "Venom Dart"
       }
     ],
     "model": "player_rogue",
@@ -919,25 +1063,25 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "discipline",
         "name": "Doctrine",
         "role": "healer",
-        "signature": "power_infusion"
+        "signature": "scouring_mercy"
       },
       {
         "id": "holy",
         "name": "Benison",
         "role": "healer",
-        "signature": "holy_nova"
+        "signature": "seraphic_vigil"
       },
       {
         "id": "shadow",
         "name": "Vespers",
         "role": "dps",
-        "signature": "shadowform"
+        "signature": "summon_tithefiend"
       }
     ],
     "signatureAbilities": [
       {
         "id": "smite",
-        "name": "Smite"
+        "name": "Scouring Hymn"
       },
       {
         "id": "lesser_heal",
@@ -963,7 +1107,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "abilities": [
       {
         "id": "smite",
-        "name": "Smite"
+        "name": "Scouring Hymn"
       },
       {
         "id": "lesser_heal",
@@ -1000,6 +1144,38 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "flash_heal",
         "name": "Urgent Prayer"
+      },
+      {
+        "id": "veilstep",
+        "name": "Veilstep"
+      },
+      {
+        "id": "psychic_scream",
+        "name": "Terror Canticle"
+      },
+      {
+        "id": "scouring_mercy",
+        "name": "Scouring Mercy"
+      },
+      {
+        "id": "prayer_of_healing",
+        "name": "Choirmend"
+      },
+      {
+        "id": "holy_nova",
+        "name": "Sunburst Canticle"
+      },
+      {
+        "id": "seraphic_vigil",
+        "name": "Seraphic Vigil"
+      },
+      {
+        "id": "shadowform",
+        "name": "Gloamveil"
+      },
+      {
+        "id": "summon_tithefiend",
+        "name": "Call Tithefiend"
       }
     ],
     "model": "player_priest",
@@ -1041,24 +1217,24 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Arc Bolt"
       },
       {
+        "id": "thunder_reservoir",
+        "name": "Thunder Reservoir"
+      },
+      {
+        "id": "chain_lightning",
+        "name": "Skybranch"
+      },
+      {
         "id": "rockbiter_weapon",
         "name": "Stonebound Weapon"
       },
       {
-        "id": "healing_wave",
-        "name": "Mending Waters"
+        "id": "galeheart_weapon",
+        "name": "Galeheart Weapon"
       },
       {
-        "id": "earth_shock",
-        "name": "Earthen Jolt"
-      },
-      {
-        "id": "lightning_shield",
-        "name": "Thunder Ward"
-      },
-      {
-        "id": "flame_shock",
-        "name": "Cinder Jolt"
+        "id": "warspirit_cadence",
+        "name": "Warspirit Cadence"
       }
     ],
     "abilities": [
@@ -1067,12 +1243,52 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Arc Bolt"
       },
       {
+        "id": "thunder_reservoir",
+        "name": "Thunder Reservoir"
+      },
+      {
+        "id": "chain_lightning",
+        "name": "Skybranch"
+      },
+      {
         "id": "rockbiter_weapon",
         "name": "Stonebound Weapon"
       },
       {
+        "id": "galeheart_weapon",
+        "name": "Galeheart Weapon"
+      },
+      {
+        "id": "warspirit_cadence",
+        "name": "Warspirit Cadence"
+      },
+      {
+        "id": "stormsurge",
+        "name": "Stormsurge"
+      },
+      {
+        "id": "lifespring_weapon",
+        "name": "Lifespring Weapon"
+      },
+      {
+        "id": "unleash_weapon",
+        "name": "Unleash Weapon"
+      },
+      {
+        "id": "elemental_trance",
+        "name": "Elemental Trance"
+      },
+      {
         "id": "healing_wave",
         "name": "Mending Waters"
+      },
+      {
+        "id": "tidecall",
+        "name": "Tidecall"
+      },
+      {
+        "id": "ancestor_return",
+        "name": "Ancestors' Return"
       },
       {
         "id": "earth_shock",
@@ -1095,16 +1311,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Rime Jolt"
       },
       {
-        "id": "frostbrand_weapon",
-        "name": "Rimebound Weapon"
-      },
-      {
         "id": "ghost_wolf",
         "name": "Shadewolf"
       },
       {
         "id": "earthquake",
-        "name": "Earthquake"
+        "name": "Faultwake"
+      },
+      {
+        "id": "bloodlust",
+        "name": "Storm Chorus"
       }
     ],
     "model": "player_shaman",
@@ -1367,11 +1583,11 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "affliction",
         "name": "Hexcraft",
         "role": "dps",
-        "signature": "siphon_life"
+        "signature": "evil_eye"
       },
       {
         "id": "demonology",
-        "name": "Pactbound",
+        "name": "Necromancy",
         "role": "dps",
         "signature": "metamorphosis"
       },
@@ -1404,8 +1620,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Blackrot"
       },
       {
-        "id": "life_tap",
-        "name": "Hard Bargain"
+        "id": "evil_eye",
+        "name": "Evil Eye"
       }
     ],
     "abilities": [
@@ -1430,8 +1646,28 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Blackrot"
       },
       {
+        "id": "evil_eye",
+        "name": "Evil Eye"
+      },
+      {
+        "id": "maledict_gaze",
+        "name": "Maledict Gaze"
+      },
+      {
+        "id": "needle_of_fate",
+        "name": "Needle of Fate"
+      },
+      {
+        "id": "sentence",
+        "name": "Sentence"
+      },
+      {
         "id": "life_tap",
         "name": "Hard Bargain"
+      },
+      {
+        "id": "cursed_accomplice",
+        "name": "Cursed Accomplice"
       },
       {
         "id": "summon_voidwalker",
@@ -1446,36 +1682,64 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Consume"
       },
       {
+        "id": "searing_pain",
+        "name": "Sear"
+      },
+      {
+        "id": "soul_lance",
+        "name": "Soul Lance"
+      },
+      {
+        "id": "litany_of_guilt",
+        "name": "Litany of Guilt"
+      },
+      {
+        "id": "umbral_anchor",
+        "name": "Umbral Anchor"
+      },
+      {
+        "id": "soulwell",
+        "name": "Soulwell"
+      },
+      {
+        "id": "chaos_bolt",
+        "name": "Ruinbolt"
+      },
+      {
+        "id": "hex_of_violence",
+        "name": "Hex of Violence"
+      },
+      {
+        "id": "ossuary_mark",
+        "name": "Ossuary Mark"
+      },
+      {
         "id": "fear",
         "name": "Harrow"
       },
       {
-        "id": "searing_pain",
-        "name": "Sear"
+        "id": "cruel_pact",
+        "name": "Cruel Pact"
       },
       {
         "id": "shadowburn",
         "name": "Duskfire"
       },
       {
-        "id": "summon_succubus",
-        "name": "Summon Duskborn"
+        "id": "ruinous_brand",
+        "name": "Ruinous Brand"
       },
       {
-        "id": "summon_felhunter",
-        "name": "Summon Spellhound"
+        "id": "cinderhide",
+        "name": "Cinderhide"
       },
       {
-        "id": "summon_felguard",
-        "name": "Summon Warfiend"
+        "id": "vicarious_suffering",
+        "name": "Vicarious Suffering"
       },
       {
         "id": "summon_infernal",
         "name": "Summon Pyre Colossus"
-      },
-      {
-        "id": "summon_doomguard",
-        "name": "Summon Wraithborn"
       },
       {
         "id": "rain_of_fire",
@@ -1483,7 +1747,67 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "spell_lock",
-        "name": "Gag Order"
+        "name": "Abyssal Gag"
+      },
+      {
+        "id": "possess_evil_eye",
+        "name": "Possess the Evil Eye"
+      },
+      {
+        "id": "hour_of_judgment",
+        "name": "Hour of Judgment"
+      },
+      {
+        "id": "coven",
+        "name": "Coven"
+      },
+      {
+        "id": "soul_harvest",
+        "name": "Essence Reap"
+      },
+      {
+        "id": "raise_graveguard",
+        "name": "Raise Graveguard"
+      },
+      {
+        "id": "raise_skeletal_warrior",
+        "name": "Raise Skeletal Warrior"
+      },
+      {
+        "id": "raise_bone_mage",
+        "name": "Raise Bone Mage"
+      },
+      {
+        "id": "bone_armor",
+        "name": "Bone Armor"
+      },
+      {
+        "id": "corpse_explosion",
+        "name": "Corpse Explosion"
+      },
+      {
+        "id": "funeral_harvest",
+        "name": "Funeral Harvest"
+      },
+      {
+        "id": "unholy_command",
+        "name": "Unholy Command"
+      },
+      {
+        "id": "reaping_command",
+        "name": "Reaping Command"
+      },
+      {
+        "id": "sacrifice_undead",
+        "name": "Sacrifice Undead"
+      },
+      {
+        "id": "raise_gravewing",
+        "name": "Raise Gravewing"
+      },
+      {
+        "id": "army_of_the_dead",
+        "name": "Army of the Dead"
       }
     ],
     "model": "player_warlock",
@@ -1538,12 +1862,12 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Lunar Tempest"
       },
       {
-        "id": "rejuvenation",
-        "name": "Wildbloom"
+        "id": "moonseed",
+        "name": "Moonseed"
       },
       {
-        "id": "thorns",
-        "name": "Briarguard"
+        "id": "rejuvenation",
+        "name": "Wildbloom"
       }
     ],
     "abilities": [
@@ -1562,6 +1886,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "moonfire",
         "name": "Lunar Tempest"
+      },
+      {
+        "id": "moonseed",
+        "name": "Moonseed"
       },
       {
         "id": "rejuvenation",
@@ -1609,7 +1937,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "claw",
-        "name": "Claw"
+        "name": "Rendclaw"
       },
       {
         "id": "regrowth",
@@ -1669,7 +1997,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "rip",
-        "name": "Rip"
+        "name": "Bloodrift"
       },
       {
         "id": "hurricane",
@@ -2088,58 +2416,20 @@ export const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = [
   {
     "id": "emberkin",
     "name": "Emberkin",
-    "model": "mob_demon",
-    "tint": "#ff7a2a",
-    "tintStrength": 0.5,
-    "still": "/guide-stills/mob_demon__ff7a2a__s50.webp"
+    "model": "mob_emberkin",
+    "still": "/guide-stills/mob_emberkin.webp"
   },
   {
     "id": "gloomshade",
     "name": "Duskmurk",
-    "model": "mob_demon",
-    "tint": "#3a3a6e",
-    "tintStrength": 0.5,
-    "still": "/guide-stills/mob_demon__3a3a6e__s50.webp"
-  },
-  {
-    "id": "duskborn",
-    "name": "Duskborn",
-    "model": "mob_demon",
-    "tint": "#c6469b",
-    "tintStrength": 0.5,
-    "still": "/guide-stills/mob_demon__c6469b__s50.webp"
-  },
-  {
-    "id": "spellhound",
-    "name": "Spellhound",
-    "model": "mob_demonalt",
-    "tint": "#4a7d4a",
-    "tintStrength": 0.35,
-    "still": "/guide-stills/mob_demonalt__4a7d4a__s35.webp"
-  },
-  {
-    "id": "warfiend",
-    "name": "Warfiend",
-    "model": "mob_demonalt",
-    "tint": "#6e5a2a",
-    "tintStrength": 0.35,
-    "still": "/guide-stills/mob_demonalt__6e5a2a__s35.webp"
+    "model": "mob_gloomshade",
+    "still": "/guide-stills/mob_gloomshade.webp"
   },
   {
     "id": "pyre_colossus",
     "name": "Pyre Colossus",
-    "model": "mob_demonalt",
-    "tint": "#d24a2a",
-    "tintStrength": 0.35,
-    "still": "/guide-stills/mob_demonalt__d24a2a__s35.webp"
-  },
-  {
-    "id": "wraithborn",
-    "name": "Wraithborn",
-    "model": "mob_demonalt",
-    "tint": "#7a3a8e",
-    "tintStrength": 0.35,
-    "still": "/guide-stills/mob_demonalt__7a3a8e__s35.webp"
+    "model": "mob_pyre_colossus",
+    "still": "/guide-stills/mob_pyre_colossus.webp"
   }
 ];
 
@@ -4887,14 +5177,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Banner in Hand",
     "category": "pvp",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_bg_first_capture.webp"
   },
   {
     "id": "pvp_bg_first_win",
     "name": "The Hollow Holds",
     "category": "pvp",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_bg_first_win.webp"
   },
   {
     "id": "pvp_bg_wins_25",
@@ -4902,14 +5194,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Flagbearer"
+    "rewardTitle": "Flagbearer",
+    "crest": "/ui/deeds/pvp_bg_wins_25.webp"
   },
   {
     "id": "pvp_bg_captures_100",
     "name": "A Hundred Banners",
     "category": "pvp",
     "renown": 50,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_bg_captures_100.webp"
   },
   {
     "id": "chr_willowfen_gatherer",
@@ -4964,161 +5258,184 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Clutch Breaker",
     "category": "chronicle",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_drakemaw_broodlord.webp"
   },
   {
     "id": "chr_maw_matriarch",
     "name": "The Sky Goes Quiet",
     "category": "chronicle",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_maw_matriarch.webp"
   },
   {
     "id": "dgn_rift",
     "name": "Riftwalker",
     "category": "dungeon",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_rift.webp"
   },
   {
     "id": "dgn_rift_s_rank",
     "name": "Rift Sovereign",
     "category": "dungeon",
     "renown": 25,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_rift_s_rank.webp"
   },
   {
     "id": "prog_engineering_rare",
     "name": "Precision Engineering",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_engineering_rare.webp"
   },
   {
     "id": "prog_alchemy_rare",
     "name": "A Rare Vintage",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_alchemy_rare.webp"
   },
   {
     "id": "prog_cooking_rare",
     "name": "A Dish to Remember",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_cooking_rare.webp"
   },
   {
     "id": "prog_leatherworking_rare",
     "name": "Fine Tanning",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_leatherworking_rare.webp"
   },
   {
     "id": "prog_tailoring_rare",
     "name": "A Master's Stitch",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_tailoring_rare.webp"
   },
   {
     "id": "prog_weaponcrafting_rare",
     "name": "Tempered to a Shine",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_weaponcrafting_rare.webp"
   },
   {
     "id": "prog_armorcrafting_rare",
     "name": "Plated to Perfection",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_armorcrafting_rare.webp"
   },
   {
     "id": "chr_frostveil_gatherer",
     "name": "Terraced Harvest",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_frostveil_gatherer.webp"
   },
   {
     "id": "chr_frostveil_first_cast",
     "name": "First Ice on the Tarn",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_frostveil_first_cast.webp"
   },
   {
     "id": "chr_amberfall_gatherer",
     "name": "The Amberfall Harvest",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_amberfall_gatherer.webp"
   },
   {
     "id": "chr_amberfall_first_cast",
     "name": "A Catch from the Great Mere",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_amberfall_first_cast.webp"
   },
   {
     "id": "chr_nightbloom_gatherer",
     "name": "The Dreaming Harvest",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_nightbloom_gatherer.webp"
   },
   {
     "id": "chr_nightbloom_first_cast",
     "name": "A Ripple on the Moonspring",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_nightbloom_first_cast.webp"
   },
   {
     "id": "chr_wraithwood_gatherer",
     "name": "Harvest Under the Canopy",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_wraithwood_gatherer.webp"
   },
   {
     "id": "chr_wraithwood_first_cast",
     "name": "A Cast in the Looking-Glass",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_wraithwood_first_cast.webp"
   },
   {
     "id": "chr_palmreach_gatherer",
     "name": "Harvest on the Palmstrand",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_palmreach_gatherer.webp"
   },
   {
     "id": "chr_palmreach_first_cast",
     "name": "Casting the Sapphire Lagoon",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_palmreach_first_cast.webp"
   },
   {
     "id": "chr_evergarden_gatherer",
     "name": "The Parterre's Bounty",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_evergarden_gatherer.webp"
   },
   {
     "id": "chr_evergarden_first_cast",
     "name": "A Cast on the Petal Pond",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_evergarden_first_cast.webp"
   },
   {
     "id": "pvp_honor_sergeant",
@@ -5126,7 +5443,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 10,
     "feat": false,
-    "rewardTitle": "Linebreaker"
+    "rewardTitle": "Linebreaker",
+    "crest": "/ui/deeds/pvp_honor_sergeant.webp"
   },
   {
     "id": "pvp_honor_knight_lieutenant",
@@ -5134,7 +5452,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Fieldreaver"
+    "rewardTitle": "Fieldreaver",
+    "crest": "/ui/deeds/pvp_honor_knight_lieutenant.webp"
   },
   {
     "id": "pvp_honor_field_marshal",
@@ -5142,7 +5461,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 50,
     "feat": false,
-    "rewardTitle": "Warcrowned"
+    "rewardTitle": "Warcrowned",
+    "crest": "/ui/deeds/pvp_honor_field_marshal.webp"
   }
 ];
 
@@ -10496,17 +10816,23 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 2.3
   },
-  "mob_demon": {
-    "url": "models/creatures/demonalt.glb",
-    "idle": "Idle",
-    "height": 1.8,
-    "tintStrength": 0.5
-  },
-  "mob_demonalt": {
-    "url": "models/creatures/demonalt.glb",
+  "mob_emberkin": {
+    "url": "models/creatures/emberkin.glb",
     "idle": "Idle",
     "height": 2.1,
-    "tintStrength": 0.35
+    "yaw": -1.5707963267948966
+  },
+  "mob_gloomshade": {
+    "url": "models/creatures/gloomshade_abyssal_guardian.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "yaw": -1.5707963267948966
+  },
+  "mob_pyre_colossus": {
+    "url": "models/creatures/pyre_colossus.glb",
+    "idle": "Idle",
+    "height": 2.5,
+    "yaw": -1.5707963267948966
   },
   "mob_wolf": {
     "url": "models/creatures/wolf_basic.glb",
@@ -10737,5 +11063,11 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ]
+  },
+  "mob_demonalt": {
+    "url": "models/creatures/demonalt.glb",
+    "idle": "Idle",
+    "height": 2.1,
+    "tintStrength": 0.35
   }
 };

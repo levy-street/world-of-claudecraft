@@ -34,6 +34,7 @@ describe('character-select class details parity', () => {
           const ability = ABILITIES[id];
           expect(ability, `ability "${id}" does not exist`).toBeTruthy();
           expect(ability.class, `"${id}" belongs to ${ability?.class}, not ${cls}`).toBe(cls);
+          expect(ability.hiddenFromPlayer, `"${id}" is hidden from players`).not.toBe(true);
           expect(
             CLASSES[cls].abilities,
             `"${id}" is not in ${cls}'s learnable ability list`,
@@ -77,6 +78,10 @@ describe('specialization card metadata', () => {
           expect(ability.class, `"${abilityId}" belongs to ${ability?.class}, not ${cls}`).toBe(
             cls,
           );
+          expect(
+            ability.hiddenFromPlayer,
+            `"${abilityId}" is hidden from players (${cls}:${spec.id})`,
+          ).not.toBe(true);
           expect(
             ability.specs === undefined || ability.specs.includes(spec.id),
             `ability "${abilityId}" is not offered by ${cls}:${spec.id}`,

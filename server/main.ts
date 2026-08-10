@@ -6,7 +6,6 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { WebSocketServer } from 'ws';
 import { DEEDS } from '../src/sim/content/deeds';
-import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -91,12 +90,15 @@ import {
   pruneBugReportsBatch,
 } from './bug_report_db';
 import { createCachedRead } from './cached_read';
+import { bustAllLifetimeXpRankCache } from './character_rank_cache';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   buildCharacterList,
   configureCharactersRuntime,
+  parseCreationCosmetics,
   purgeDeletedCharacterWorldState,
   rekeyReclaimedCharacterWorldState,
+  withCreationHelm,
 } from './characters';
 import { pruneChatViolationsBatch } from './chat_filter_db';
 import {
@@ -277,7 +279,9 @@ import {
   createSuspiciousRegistrationReport,
   prunePlayerReportsBatch,
   setOnAccountModerated,
+  setOnModerationQueueChanged,
 } from './moderation_db';
+import { bustModerationQueueCache } from './moderation_queue_cache';
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
@@ -438,9 +442,9 @@ const BLOCKED_IP_REFRESH_MS = 60_000;
 const WS_MAX_PAYLOAD_BYTES = 16 * 1024;
 // Boot DB-readiness retry: Postgres may still be starting under docker, so poll
 // SELECT 1 up to DB_BOOT_MAX_ATTEMPTS times, DB_BOOT_RETRY_MS apart, before giving
-// up (~1 minute total at 30 attempts x 2s).
-const DB_BOOT_MAX_ATTEMPTS = 30; // attempts (count)
-const DB_BOOT_RETRY_MS = 2_000;
+// up (~1 minute total at 120 attempts x 500ms).
+const DB_BOOT_MAX_ATTEMPTS = 120; // attempts (count)
+const DB_BOOT_RETRY_MS = 500;
 // Low-frequency background prune (OAuth grants/states, pending logins) runs once
 // a day; the retention-table prunes run in the nightly retention sweep instead.
 const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
@@ -813,6 +817,12 @@ function bustBoardCaches(): void {
   bgLeaderboardCache = null;
   deedsBoardCache = null;
   bustDailyRewardBoardCache();
+  // Not a board, but the same delisting-must-be-immediate reasoning: the
+  // per-character lifetime-XP rank cache (server/character_rank_cache.ts).
+  // A ban/unban changes every OTHER eligible character's ahead/total counts
+  // too, so the whole cache is dropped rather than just the moderated
+  // account's own key.
+  bustAllLifetimeXpRankCache();
   // Not a board: the Discord winner-announcement snapshot. The daily-reward ban
   // and IP-ban writes fire this same hook, and they feed the
   // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
@@ -827,6 +837,11 @@ function bustBoardCaches(): void {
   bustDailyRewardWinnersCache();
 }
 setOnAccountModerated(bustBoardCaches);
+// The admin moderation queue's cached base read (server/moderation_queue_cache.ts):
+// busted the same immediate way as the boards above, so a ban/mute/ignored
+// report never lingers in the queue for up to a TTL cycle after the write that
+// resolved it.
+setOnModerationQueueChanged(bustModerationQueueCache);
 
 // Deed rarity cache. Same compute-once/serve-from-memory shape as the boards
 // above, one entry (the aggregate is global/cross-realm by design). 5 minutes:
@@ -1596,13 +1611,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           0,
           Math.min(7, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
         );
+        // Same cosmetic rules as the migrated arm, through the SAME parser, so
+        // a dispatch rollback cannot create characters without their authored
+        // look or wearing a helmet they never chose.
+        const cosmetics = parseCreationCosmetics(body);
+        if (cosmetics === 'invalid')
+          return json(res, 400, {
+            error: 'invalid appearance',
+            code: 'character.invalid_appearance',
+          });
         const create = () =>
           createCharacterCapped(
             accountId,
             name,
             body.class,
             10,
-            initialCharacterState(body.class, name, skin),
+            withCreationHelm(initialCharacterState(body.class, name, skin), cosmetics.helmHidden),
+            cosmetics.appearance,
           );
         const created = (c: NonNullable<Awaited<ReturnType<typeof createCharacterCapped>>>) =>
           json(res, 200, {
@@ -2652,6 +2677,10 @@ configureCharactersRuntime({
     liveGame().takeOverCharacter(accountId, characterId),
   rekeyMarketSeller: (characterId, oldName, newName) =>
     liveGame().rekeyMarketSeller(characterId, oldName, newName),
+  setHelmHiddenForCharacter: (characterId, hidden) =>
+    liveGame().setHelmHiddenForCharacter(characterId, hidden),
+  applyAppearanceForCharacter: (characterId, appearance) =>
+    liveGame().applyAppearanceForCharacter(characterId, appearance),
   saveMarket: () => liveGame().saveMarket(),
   purgeMarketSeller: (characterId, name) => liveGame().purgeMarketSeller(characterId, name),
   rekeyMailOwner: (characterId, oldName, newName) =>
@@ -2957,7 +2986,7 @@ export function routeHttpRequest(req: http.IncomingMessage, res: http.ServerResp
 
 export async function startServer(): Promise<http.Server> {
   // Load + validate the whole environment ONCE, before anything else (before the
-  // 30x2s DB retry loop), so a garbage flag or a missing required value fails fast
+  // 120x500ms DB retry loop), so a garbage flag or a missing required value fails fast
   // with a clear message rather than after a minute of connection retries. This
   // primes activeConfig() for the request path (a request-time read returns this
   // same memoized Config).

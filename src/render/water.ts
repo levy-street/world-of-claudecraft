@@ -37,6 +37,8 @@ import {
 } from './water_core';
 import {
   coveredByOtherSheet,
+  gapDryFraction,
+  gapSheetWorthBuilding,
   gapsAdjacentTo,
   type WaterSheetRect,
   waterCoverageGaps,
@@ -76,11 +78,13 @@ const SEGMENTS_PER_ZONE = 180; // ~2u vertex spacing, enough for the foam band
 // The zone rects do not tile the world's bounding box, and every un-zoned cell
 // used to be left to the horizon apron, whose cells are ~48 x 57 yards. That is
 // fine over open ocean and wrong anywhere there is a coastline: interpolating
-// depth, seabed slope, foam and alpha across a 48 yard triangle is exactly the
-// hard wedges and diagonal colour steps reported along the southwest shore
-// (x -540..-180 by z -180..180, the one un-zoned cell carrying real coast: the
-// vale's west headland stands 15 yards over its own beach there). Gap cells get
-// the SAME fine sheet a zone does; see water_coverage_core.ts.
+// depth, seabed slope, foam and alpha across a 48 yard triangle draws hard
+// wedges and diagonal colour steps. So a cell with a real coastline gets the
+// SAME fine sheet a zone does. But an un-zoned cell that is almost all open sea
+// (the southwest corner, x -540..-180 by z -180..180, is a ~1% dry sliver at the
+// vale headland's west flank in a 360x360yd rect) is worse off with a fine sheet
+// than without: it bands over the apron. Which gaps actually build is decided by
+// builtGapRects() from a terrain scan; see it and water_coverage_core.ts.
 const WATER_ZONE_RECTS = zoneSheetRects(ZONES, STRIP_MIN_X, STRIP_MAX_X);
 const WATER_GAP_RECTS = waterCoverageGaps(
   ZONES,
@@ -88,8 +92,6 @@ const WATER_GAP_RECTS = waterCoverageGaps(
   STRIP_MIN_X,
   STRIP_MAX_X,
 );
-// Chop-feather abutment and gap adjacency both read the whole sheet set.
-const WATER_SHEET_RECTS: readonly WaterSheetRect[] = [...WATER_ZONE_RECTS, ...WATER_GAP_RECTS];
 // terrainHeight is deliberately rich and sampling all 32k water vertices in
 // one timer was a measured 170-260ms live-play freeze. Background zone loads
 // fill a handful of rows per idle callback instead; four rows stay around the
@@ -1224,6 +1226,31 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     return { wet, dry };
   };
   /**
+   * Which gap rects actually get a fine sheet. A gap sheet exists to resolve a
+   * COASTLINE no zone owns, but a rect that is almost all open sea (the un-zoned
+   * southwest corner is a ~1% dry sliver at the vale headland's west flank in a
+   * 360x360yd rect) has no meaningful shore: a fine sheet there interpolates its
+   * shore attribute across the open water and bands over the apron (the reported
+   * Eastbrook "duplicated water layer"). Keep only gaps whose dry-land fraction
+   * clears the threshold (gapSheetWorthBuilding, pure + tested in the core).
+   *
+   * This is the ONE decision point, so it drives BOTH which gap sheets are built
+   * AND the chop-feather abutment set: a skipped gap then reads as apron across
+   * an edge, and its neighbour zone feathers its chop to meet the apron there,
+   * the way it did before gap sheets existed. Memoized: the coarse terrain scan
+   * is paid once during the async zone load, not at module import (a full-res
+   * scan of the gaps measured ~75ms) and not per build. The lattice and the
+   * threshold both live in the core, so the guard measures what this decides.
+   */
+  let builtGapRectsMemo: WaterSheetRect[] | null = null;
+  const builtGapRects = (): WaterSheetRect[] => {
+    if (builtGapRectsMemo) return builtGapRectsMemo;
+    builtGapRectsMemo = WATER_GAP_RECTS.filter((rect) =>
+      gapSheetWorthBuilding(gapDryFraction(rect, (x, z) => shoreDepthAt(x, z, seed) <= 0)),
+    );
+    return builtGapRectsMemo;
+  };
+  /**
    * Build one fine water sheet over `rect`. Zone planes and gap sheets are the
    * same thing: the builder only ever needed the rectangle and an id, so both
    * kinds share every downstream contract (2 yard grid, baked shore attributes,
@@ -1244,6 +1271,9 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     const x1 = rect.xMax;
     const scan = await scanRect(rect, idlePace);
     if (!scan.wet) return null;
+    // A gap with ZERO dry ground is open water end to end; the apron owns it.
+    // (Gaps that ARE dry but too open-sea-dominated to be worth a fine sheet are
+    // already filtered out of builtGapRects before we get here; see there.)
     if (requireShore && !scan.dry) return null;
     const geo = new THREE.PlaneGeometry(
       x1 - x0,
@@ -1267,8 +1297,12 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     // sheets count here exactly like zone planes, or the new seam between a
     // zone and its gap neighbour grows that same stripe. Static per-vertex
     // geometry: bakes once.
+    // Abutment set = zone planes + the gap sheets that actually build. A gap
+    // whose sheet is skipped must NOT count here, or this zone would treat the
+    // apron across that edge as a fine neighbour and skip the chop feather.
+    const sheetRects = [...WATER_ZONE_RECTS, ...builtGapRects()];
     const otherSheetCovers = (px: number, pz: number): boolean =>
-      coveredByOtherSheet(WATER_SHEET_RECTS, rect.id, px, pz);
+      coveredByOtherSheet(sheetRects, rect.id, px, pz);
     const swellW = new Float32Array(pos.count);
     const probe = 0.5;
     for (let i = 0; i < pos.count; i++) {
@@ -1400,7 +1434,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
           // 32k-vertex terrain bake (~5 terrainHeight samples per vertex) in
           // front of first paint. Sliced and detached, it lands a moment later
           // over water the player has not reached yet.
-          for (const gap of gapsAdjacentTo(WATER_GAP_RECTS, zoneRect)) {
+          for (const gap of gapsAdjacentTo(builtGapRects(), zoneRect)) {
             if (loadedZones.has(gap.id)) continue;
             loadedZones.add(gap.id);
             void buildSheet(gap, { slice: true, visible: true, requireShore: true });

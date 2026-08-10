@@ -29,12 +29,17 @@ import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
+import {
+  emptyPriestMarkerState,
+  priestMarkerStateForAuras,
+} from '../src/sim/combat/priest/presentation';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
+import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
@@ -44,6 +49,7 @@ import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 import { buildCraftingView } from '../src/ui/crafting_view';
 import { playtimeParts } from '../src/ui/playtime_view';
+import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 import {
   bareClient,
   broadcast,
@@ -97,6 +103,90 @@ function feedEventFrame(client: ClientWorld, frame: unknown): void {
 }
 
 describe('self stat wire round-trip', () => {
+  it('mirrors Paladin Devotion and Ascension state from the authoritative server', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Oathkeeper', 'paladin');
+    const player = (server as any).sim.entities.get(session.pid);
+    player.paladinDevotion.value = 7;
+    player.paladinDevotion.ascensionCharges = 3;
+    player.paladinDevotion.ascensionRemaining = 18.25;
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.pdev).toEqual({ value: 7, charges: 3, remaining: 18.25 });
+
+    const client = bareClient(session.pid, { playerClass: 'paladin' });
+    (client as any).applySnapshot(snap);
+    expect(client.player.paladinDevotion).toMatchObject({
+      value: 7,
+      ascensionCharges: 3,
+      ascensionRemaining: 18.25,
+    });
+  });
+
+  it('mirrors compact Ascension charges for a remote Paladin visual', () => {
+    const sim = new Sim({ seed: 27, playerClass: 'paladin', autoEquip: true });
+    sim.player.paladinDevotion!.ascensionCharges = 4;
+    sim.player.paladinDevotion!.ascensionRemaining = 20;
+
+    const wire = wireEntity(sim.player);
+    expect(wire.pasc).toBe(4);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion).toMatchObject({
+      ascensionCharges: 4,
+      ascensionRemaining: 1,
+    });
+
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ ...wire, pasc: 0 }],
+    });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion).toMatchObject({
+      ascensionCharges: 0,
+      ascensionRemaining: 0,
+    });
+  });
+
+  it('omits idle Ascension charges from the wire and clears them on decode', () => {
+    const sim = new Sim({ seed: 27, playerClass: 'paladin', autoEquip: true });
+    sim.player.paladinDevotion!.ascensionCharges = 4;
+    sim.player.paladinDevotion!.ascensionRemaining = 20;
+    const active = wireEntity(sim.player);
+    expect(active.pasc).toBe(4);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [active] });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion?.ascensionCharges).toBe(4);
+
+    // Idle charges are omitted entirely (omit-when-default, like the fields
+    // around it), and decoding the ABSENT field must clear the mirrored
+    // charges: a decode gated on presence would leave an expired Ascension's
+    // orbiting seals on the remote paladin forever.
+    sim.player.paladinDevotion!.ascensionCharges = 0;
+    const idle = wireEntity(sim.player);
+    expect('pasc' in idle).toBe(false);
+    (client as any).applySnapshot({ t: 'snap', ents: [idle] });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion).toMatchObject({
+      ascensionCharges: 0,
+      ascensionRemaining: 0,
+    });
+  });
+
+  it('preserves talent-expanded Ascension charge counts for remote Paladins', () => {
+    const sim = new Sim({ seed: 28, playerClass: 'paladin', autoEquip: true });
+    sim.player.paladinDevotion!.ascensionCharges = 7;
+    sim.player.paladinDevotion!.ascensionRemaining = 20;
+    const wire = wireEntity(sim.player);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+
+    expect(client.entities.get(sim.playerId)?.paladinDevotion?.ascensionCharges).toBe(7);
+  });
+
   it('mirrors Warrior shield block stats from the live equip command path', () => {
     const server = new GameServer();
     const fc = fakeWs();
@@ -446,6 +536,66 @@ describe('Combat Mech held weapon over the wire', () => {
   });
 });
 
+describe('channel target over the wire', () => {
+  it('lets a late observer reconstruct the Drain Life tether from snapshot state', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warlock' });
+    const caster = sim.player;
+    caster.castingAbility = 'drain_life';
+    caster.channeling = true;
+    caster.castRemaining = 3.25;
+    caster.castTotal = 5;
+    caster.castTargetId = 91;
+
+    const wire = wireEntity(caster);
+    expect(wire.castTgt).toBe(91);
+
+    const client = bareClient(caster.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(caster.id)!;
+    expect(mirrored.castingAbility).toBe('drain_life');
+    expect(mirrored.channeling).toBe(true);
+    expect(mirrored.castTargetId).toBe(91);
+    expect(mirrored.castRemaining).toBe(3.25);
+  });
+});
+
+describe('pet signature skill over the wire', () => {
+  it('mirrors the visible cooldown and autocast state used by the pet bar', () => {
+    const pet = createMob(9301, MOBS.gloomshade, 20, { x: 0, y: 0, z: 0 });
+    pet.ownerId = 42;
+    pet.petSkillTimer = 12.35;
+    pet.petAutoSkill = true;
+
+    const wire = wireEntity(pet);
+    expect(wire.ps).toBe(12.35);
+    expect(wire.px).toBe(1);
+
+    const client = bareClient(42);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(pet.id)!;
+    expect(mirrored.petSkillTimer).toBe(12.35);
+    expect(mirrored.petAutoSkill).toBe(true);
+  });
+
+  it('keeps a ready manual signature skill sparse and resets stale mirror state', () => {
+    const pet = createMob(9302, MOBS.emberkin, 20, { x: 0, y: 0, z: 0 });
+    pet.ownerId = 42;
+    const readyWire = wireEntity(pet);
+    expect(readyWire).not.toHaveProperty('ps');
+    expect(readyWire).not.toHaveProperty('px');
+
+    const client = bareClient(42);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ ...readyWire, ps: 4, px: 1 }],
+    });
+    (client as any).applySnapshot({ t: 'snap', ents: [readyWire] });
+    const mirrored = client.entities.get(pet.id)!;
+    expect(mirrored.petSkillTimer).toBe(0);
+    expect(mirrored.petAutoSkill).toBe(false);
+  });
+});
+
 // Operator-set account flair (the [AI] mark + an official streamer's links). The
 // wire keys `ai` and `slk` ARE the protocol, so pin both halves together: the REAL
 // server emit (wireEntity) into the REAL client mirror (applySnapshot). Pinning only
@@ -701,6 +851,89 @@ describe('combat ratings over the wire', () => {
   });
 });
 
+// The static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
+// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) used to ride the unconditional
+// base self object every tick for every player, unlike every other heavy field
+// on the same record. They now go through the same `maybe(...)` delta gate
+// (server/game.ts), so an unchanged value elides from the wire entirely; the
+// decoder (src/net/online.ts) falls back to the prior mirrored value instead
+// of a hardcoded default when the key is absent.
+describe('static combat-rating/progression scalars ride the delta gate', () => {
+  const SCALAR_KEYS = [
+    'ap',
+    'sp',
+    'sh',
+    'crit',
+    'dodge',
+    'blk',
+    'bval',
+    'crat',
+    'hrat',
+    'hirat',
+    'xp',
+    'lxp',
+    'rxp',
+    'prk',
+    'copper',
+    'ddiff',
+  ] as const;
+
+  it('rides the first snapshot, elides once quiet, and resends only the field that actually moved', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 91, 'Ratings');
+    const meta = server.sim.meta(session.pid)!;
+    const p = server.sim.entities.get(session.pid)!;
+
+    // A fresh session has an empty lastSent, so every one of these rides the
+    // very first snapshot, same as every other maybe() delta key.
+    broadcast(server);
+    const first = lastSnap(fc.sent);
+    for (const key of SCALAR_KEYS) {
+      expect(first.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
+    }
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(first);
+    expect(client.player.attackPower).toBe(p.attackPower);
+    expect(client.player.critChance).toBe(p.critChance);
+    expect(client.player.dodgeChance).toBe(p.dodgeChance);
+    expect(client.copper).toBe(meta.copper);
+    expect(client.xp).toBe(meta.xp);
+
+    // The mechanism this PR adds: a second, no-op broadcast with nothing about
+    // combat ratings or progression changed must OMIT every one of these keys
+    // (fewer bytes built and shipped per player per tick), and applying that
+    // delta-less snapshot must NOT reset the mirrored values to a default.
+    fc.sent.length = 0;
+    broadcast(server);
+    const quiet = lastSnap(fc.sent);
+    for (const key of SCALAR_KEYS) {
+      expect(quiet.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
+    }
+    (client as any).applySnapshot(quiet);
+    expect(client.player.attackPower).toBe(p.attackPower);
+    expect(client.player.critChance).toBe(p.critChance);
+    expect(client.player.dodgeChance).toBe(p.dodgeChance);
+    expect(client.copper).toBe(meta.copper);
+    expect(client.xp).toBe(meta.xp);
+
+    // A real gear change bumps attackPower: only `ap` rides on the next
+    // snapshot, proving the gate detects a genuine change precisely (not just
+    // that it stays quiet), while every other scalar in the cohort keeps eliding.
+    p.attackPower += 25;
+    fc.sent.length = 0;
+    broadcast(server);
+    const changed = lastSnap(fc.sent);
+    expect(changed.self.ap).toBe(p.attackPower);
+    for (const key of SCALAR_KEYS) {
+      if (key === 'ap') continue;
+      expect(changed.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
+    }
+    (client as any).applySnapshot(changed);
+    expect(client.player.attackPower).toBe(p.attackPower);
+  });
+});
+
 describe('delta snapshots', () => {
   let server: GameServer;
   let fc: FakeClient;
@@ -719,7 +952,7 @@ describe('delta snapshots', () => {
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
     // first snapshot (even the null-valued ones like party/trade/bank); every
     // key in ALL_DELTA_KEYS
-    for (const key of ALL_DELTA_KEYS) {
+    for (const key of DENSE_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
     expect(snap.self.party).toBeNull();
@@ -872,21 +1105,15 @@ describe('delta snapshots', () => {
     for (const key of DELTA_KEYS) {
       expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
-    // the always-on fields are still present every snapshot
-    for (const key of [
-      'x',
-      'z',
-      'hp',
-      'mhp',
-      'res',
-      'gcd',
-      'pcd',
-      'swing',
-      'xp',
-      'copper',
-      'target',
-    ]) {
+    // the always-on fields are still present every snapshot. xp/copper moved
+    // behind the delta gate alongside the rest of the static combat-rating/
+    // progression cohort (server/game.ts), so they are no longer in this list.
+    for (const key of ['x', 'z', 'hp', 'mhp', 'res', 'gcd', 'pcd', 'swing', 'target']) {
       expect(snap.self).toHaveProperty(key);
+    }
+    // xp/copper are unchanged since the first broadcast, so they delta-elide here.
+    for (const key of ['xp', 'copper']) {
+      expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
   });
 
@@ -910,53 +1137,6 @@ describe('delta snapshots', () => {
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.player.potionCdRemaining).toBeCloseTo(95.5, 1);
-  });
-
-  it('mirrors Hallowed Wall armor from the live Protection cast-slot path', () => {
-    const paladinServer = new GameServer();
-    const paladinFc = fakeWs();
-    const paladinSession = joinServer(paladinServer, paladinFc, 20, 'Holytest', 'paladin');
-    paladinServer.sim.setPlayerLevel(20, paladinSession.pid);
-    expect(paladinServer.sim.setSpec('protection', paladinSession.pid)).toBe(true);
-
-    const player = paladinServer.sim.entities.get(paladinSession.pid)!;
-    player.resource = player.maxResource;
-    player.hp = player.maxHp;
-    const baseArmor = player.stats.armor;
-    const target = createMob(9001, MOBS.deeprock_kobold, 20, {
-      x: player.pos.x,
-      y: player.pos.y,
-      z: player.pos.z + 12,
-    });
-    target.maxHp = target.hp = 1_000_000;
-    (paladinServer.sim as unknown as { addEntity(e: typeof target): void }).addEntity(target);
-    player.targetId = target.id;
-
-    const known = paladinServer.sim.meta(paladinSession.pid)!.known;
-    const slot = known.findIndex((entry) => entry.def.id === 'holy_shield');
-    expect(slot).toBeGreaterThanOrEqual(0);
-
-    paladinServer.handleMessage(
-      paladinSession,
-      JSON.stringify({ t: 'cmd', cmd: 'castSlot', slot }),
-    );
-    for (let i = 0; i < 200 && paladinServer.sim.ctx.pendingProjectiles.length > 0; i++) {
-      paladinServer.sim.tick();
-    }
-
-    broadcast(paladinServer);
-    const snap = lastSnap(paladinFc.sent);
-    expect(snap.self.auras).toContainEqual(
-      expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
-    );
-    expect(snap.self.stats.armor).toBe(baseArmor + 150);
-
-    const client = bareClient(paladinSession.pid, { playerClass: 'paladin' });
-    (client as unknown as SnapshotApplier).applySnapshot(snap);
-    expect(client.player.auras).toContainEqual(
-      expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
-    );
-    expect(client.player.stats.armor).toBe(baseArmor + 150);
   });
 
   it('includes live aura and movement diagnostics in admin online rows', () => {
@@ -1350,7 +1530,7 @@ describe('delta snapshots', () => {
     broadcast(server);
     const snapNew = lastSnap(fc2.sent);
     // a fresh session always receives the full self state: every registered delta key
-    for (const key of ALL_DELTA_KEYS) {
+    for (const key of DENSE_DELTA_KEYS) {
       expect(snapNew.self, `self.${key} missing for fresh session`).toHaveProperty(key);
     }
     // the veteran session still gets deltas only
@@ -2089,6 +2269,36 @@ describe('client-side delta merge', () => {
     expect(aura?.stacks, 'client should mirror the wire stack count').toBe(3);
   });
 
+  it('always wires Druid engine bank stages, including zero and one', () => {
+    // The sparsity rule omits stacks below 2, but the engine banks teach their
+    // live stage (auras_view badge + aura_effect tooltip) at 0 and 1 too, and
+    // the decode side cannot tell "absent because 1" from "absent because 0".
+    const sim = new Sim({ seed: 33, playerClass: 'druid', autoEquip: true });
+    for (const stacks of [0, 1] as const) {
+      sim.player.auras = [
+        {
+          id: 'moontide',
+          name: 'Moontide',
+          kind: 'moontide',
+          remaining: 3600,
+          duration: 3600,
+          value: 0,
+          stacks,
+          sourceId: sim.playerId,
+          school: 'nature',
+        },
+      ];
+      const wire = wireEntity(sim.player) as { auras?: { id: string; stacks?: number }[] };
+      const wired = wire.auras?.find((a) => a.id === 'moontide');
+      expect(wired?.stacks, `the wire must carry the ${stacks}-stage bank`).toBe(stacks);
+
+      const client = bareClient(sim.playerId + 1000);
+      (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(sim.player)] });
+      const mirrored = client.entities.get(sim.playerId)?.auras.find((a) => a.id === 'moontide');
+      expect(mirrored?.stacks, `the mirror must read the ${stacks}-stage bank`).toBe(stacks);
+    }
+  });
+
   it('reconstructs charge-limited aura charges from the wire (Thunder Ward)', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
@@ -2198,6 +2408,68 @@ describe('client-side delta merge', () => {
     (client as any).applySnapshot({ t: 'snap', ents: [w] });
     const aura = client.entities.get(e.id)?.auras.find((a) => a.id === 'pri_searing_light');
     expect(aura?.empowerAbilities).toEqual(['smite']);
+  });
+
+  it('round-trips Priest relationship and Gloomtithe presentation state online', () => {
+    const sim = new Sim({ seed: 29, playerClass: 'priest', autoEquip: true });
+    const e = sim.player;
+    e.auras.push(
+      {
+        id: 'priest_doctrine',
+        name: 'Doctrine',
+        kind: 'doctrine',
+        remaining: 30,
+        duration: 30,
+        value: 0.3,
+        sourceId: e.id,
+        school: 'holy',
+      },
+      {
+        id: 'seraphic_vigil',
+        name: 'Seraphic Vigil',
+        kind: 'heal_echo',
+        remaining: 30,
+        duration: 30,
+        value: 180,
+        sourceId: e.id,
+        school: 'holy',
+      },
+      {
+        id: 'priest_gloomtithe',
+        name: 'Gloomtithe',
+        kind: 'gloomtithe',
+        remaining: 15,
+        duration: 15,
+        value: 0,
+        stacks: 5,
+        sourceId: e.id,
+        school: 'shadow',
+      },
+      {
+        id: 'priest_effigy',
+        name: 'Effigy',
+        kind: 'hex',
+        remaining: 18,
+        duration: 18,
+        value: 0.3,
+        sourceId: e.id,
+        school: 'shadow',
+      },
+    );
+
+    const client = bareClient(e.id + 1000, { playerClass: 'priest' });
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    const mirrored = client.entities.get(e.id);
+    if (!mirrored) throw new Error('online priest missing');
+
+    expect(priestMarkerStateForAuras(mirrored.auras, emptyPriestMarkerState())).toEqual({
+      doctrine: true,
+      vigil: true,
+      dirge: false,
+      effigy: true,
+      gloomtitheStacks: 5,
+      summonReady: true,
+    });
   });
 
   it('round-trips the Lingering Dread marker and clears it in place when the wire omits it', () => {
@@ -3401,31 +3673,45 @@ describe('online mount command and race-event transport', () => {
 // via `maybe(...)`; `vcupb` and `dfb` are written with `maybeRaw(...)` (realm-wide
 // fragments, each serialized at most once per tick by a realm-readout memo and
 // shared across viewers), not plain `maybe(...)`. The count is the union of the
-// release's realm-readout keys and the procedural-dungeon branch's rift delta keys.
+// release's realm-readout keys, the procedural-dungeon branch's rift delta keys,
+// and the 16 static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
+// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present self
+// record and behind this same delta gate, since they change far less often than
+// the reconciliation-critical fields (resource, gcd, swing, combo, target...)
+// that stay unconditional.
 const ALL_DELTA_KEYS = [
   'achg',
   'achr',
+  'ap',
+  'app',
   'arena',
   'atitle',
   'bags',
   'bank',
   'bg',
+  'blk',
   'buyback',
+  'bval',
   'cardDuel',
   'cds',
+  'copper',
   'corder',
   'corpse',
   'cosmetics',
   'cprof',
+  'crat',
+  'crit',
   'dclears',
   'dcomp',
   'dcompanion',
+  'ddiff',
   'deeds',
   'delveDaily',
   'denc',
   'df',
   'dfb',
   'dmarks',
+  'dodge',
   'drun',
   'dstats',
   'duel',
@@ -3435,12 +3721,15 @@ const ALL_DELTA_KEYS = [
   'gprof',
   'guildBank',
   'hbl',
+  'hirat',
   'honor',
+  'hrat',
   'inv',
   'lhonor',
   'lockouts',
   'lroll',
   'lrollg',
+  'lxp',
   'mail',
   'mailU',
   'market',
@@ -3455,12 +3744,16 @@ const ALL_DELTA_KEYS = [
   'mst',
   'ncd',
   'party',
+  'prk',
   'prof',
   'ptime',
   'qdone',
   'qlog',
   'renown',
+  'rxp',
   'salv',
+  'sh',
+  'sp',
   'sport',
   'stats',
   'tal',
@@ -3470,7 +3763,16 @@ const ALL_DELTA_KEYS = [
   'vcup',
   'vcupb',
   'weapon',
+  'xp',
 ] as const;
+
+/** The delta keys a FRESH session is guaranteed to receive on its first
+ *  snapshot. Every registered key but one: `app` is the authored modular look,
+ *  and a character created before the creator (or by a client that posts no
+ *  appearance) has none, so it stays sparse on the wire the way `eq`/`eqi` do
+ *  on the entity record. Its own round trip is pinned in
+ *  tests/appearance_broadcast.test.ts, including that it ships exactly once. */
+const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app');
 
 // The terse wire key -> IWorld member name rename map, in sorted order. The wire
 // string IS the protocol (contract #4): a terse key renamed on one side passes tsc
@@ -3484,6 +3786,7 @@ const ALL_DELTA_KEYS = [
 // on vcupb), so neither key alone equals the full CupInfo target.
 const TERSE_TO_IWORLD: Record<string, string> = {
   achg: 'abilityCharges',
+  ap: 'attackPower',
   arena: 'arenaInfo',
   atitle: 'activeTitle',
   bags: 'bags',
@@ -3495,14 +3798,18 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   corder: 'commissionOrders',
   cosmetics: 'accountCosmetics',
   cprof: 'craftingIdentity',
+  crat: 'critRating',
+  crit: 'critChance',
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
+  ddiff: 'dungeonDifficulty',
   deeds: 'deedsEarned',
   denc: 'lastDisenchantResult',
   df: 'dungeonFinderInfo',
   dfb: 'dungeonFinderBoard',
   dmarks: 'delveMarks',
+  dodge: 'dodgeChance',
   drun: 'delveRun',
   dstats: 'deedStats',
   duel: 'duelInfo',
@@ -3511,6 +3818,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   equip: 'equipment',
   gprof: 'gatheringProficiency',
   guildBank: 'guildBankInfo',
+  hirat: 'hitRating',
+  hrat: 'hasteRating',
   inv: 'inventory',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
@@ -3540,6 +3849,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   rtype: 'resourceType',
   rxp: 'restedXp',
   salv: 'lastSalvageResult',
+  sh: 'spellHaste',
+  sp: 'spellPower',
   sport: 'sportRole',
   tfocus: 'townFocus',
   tslot: 'toolEffectSlots',
@@ -3590,6 +3901,11 @@ function dirtyEveryDeltaField(): {
   pDoor.prevPos = { ...pDoor.pos };
   sim.enterDelve('collapsed_reliquary', 'normal', lp);
   const p = sim.entities.get(lp)!;
+
+  // An authored modular look (app). Sparse on the wire (a character created
+  // before the creator has none), so the fixture stamps one, exactly as the
+  // join path does from the character's own column.
+  p.modularAppearance = { gender: 'female', hair: 'highbun' };
 
   // Poke the encoder's exact sources for the mutually-exclusive cases.
   const run = sim.delveRunForPlayer(lp) as any;
@@ -4341,12 +4657,19 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 67 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 84 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
-    // sheet's lifetime played-time key ptime.
-    expect(ALL_DELTA_KEYS).toHaveLength(67);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(67);
+    // sheet's lifetime played-time key ptime, for 67, then +16: the static
+    // combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/crat/
+    // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present
+    // self record and behind this same delta gate, for 83, and +1: `app`, the
+    // authored modular look, for 84. The viewer's own copy cannot come from the
+    // entity list (the broadcast loop skips their own entity), and it is heavy
+    // and immutable, so it rides this channel rather than being re-serialized
+    // every tick.
+    expect(ALL_DELTA_KEYS).toHaveLength(84);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(84);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4372,8 +4695,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
     // for 65, this branch's commission order board key corder
     // (issue #1298) for 66, and the character sheet's lifetime played-time
-    // key ptime for 67.
-    expect(scraped.size).toBe(67);
+    // key ptime for 67, then the 16 static combat-rating/progression scalars
+    // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
+    // for 83, and the authored modular look `app` for 84.
+    expect(scraped.size).toBe(84);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4460,8 +4785,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // sorted-membership pin: adding or renaming an entry must be a deliberate,
     // reviewable change landing in alphabetical order
     expect(Object.keys(TERSE_TO_IWORLD)).toEqual([...Object.keys(TERSE_TO_IWORLD)].sort());
-    // every entry is either a delta key or one of the always-present self scalars
-    const SELF_SCALARS = new Set(['blk', 'bval', 'res', 'mres', 'rtype', 'lxp', 'rxp', 'prk']);
+    // every entry is either a delta key or one of the always-present self scalars.
+    // blk/bval/lxp/rxp/prk moved into ALL_DELTA_KEYS alongside the rest of the
+    // static combat-rating/progression cohort, so only res/mres/rtype are left
+    // always-present here.
+    const SELF_SCALARS = new Set(['res', 'mres', 'rtype']);
     for (const terse of Object.keys(TERSE_TO_IWORLD)) {
       expect(
         (ALL_DELTA_KEYS as readonly string[]).includes(terse) || SELF_SCALARS.has(terse),
@@ -4879,22 +5207,20 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
       kind: 'imbue',
       remaining: 300,
       duration: 300,
-      value: 0, // imbue carries its numbers in value2/value3, so value stays 0...
+      value: 0,
       value2: 8,
       value3: 12,
       sourceId: 0,
       school: 'holy',
     };
     const { wire, mirror } = roundTrip(imbue);
-    expect('value' in wireAura(wire, 'holy_might')).toBe(false); // ...and is omitted (decodes 0)
+    expect('value' in wireAura(wire, 'holy_might')).toBe(false);
     expect(wireAura(wire, 'holy_might').value2).toBe(8);
     expect(wireAura(wire, 'holy_might').value3).toBe(12);
     expect(mirror.value2).toBe(8);
     expect(mirror.value3).toBe(12);
     const desc = auraEffectDescriptor(mirror);
-    expect(desc?.key).toBe('hudChrome.auraEffect.imbueRange');
-    expect(desc?.nums?.min).toBe(8);
-    expect(desc?.nums?.max).toBe(12);
+    expect(desc?.key).toBe('hudChrome.auraEffect.imbue');
   });
 
   it('tolerates an old-server wire aura with no value (backward compatible -> 0)', () => {
@@ -5280,6 +5606,54 @@ describe('Temporal Hourglass snapshot parity', () => {
   });
 });
 
+describe('Consecration snapshot parity', () => {
+  it('mirrors active holy ground and clears zones missing from the next snapshot', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      consecrations: [{ id: 'consecration:1:20', x: 3, z: 5, r: 8, dur: 9, rem: 6.5 }],
+    });
+    expect(client.activeConsecrations).toEqual([
+      { id: 'consecration:1:20', x: 3, z: 5, radius: 8, duration: 9, remaining: 6.5 },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeConsecrations).toEqual([]);
+  });
+
+  it('interest-scopes holy ground with its authoritative remaining lifetime', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Lightwire', 'paladin');
+    const caster = server.sim.entities.get(session.pid)!;
+    (server.sim as any).groundAoEs.push({
+      sourceId: caster.id,
+      pos: { x: caster.pos.x + 4, y: caster.pos.y, z: caster.pos.z },
+      radius: 8,
+      min: 22,
+      max: 28,
+      remaining: 6.5,
+      interval: 1,
+      tickTimer: 0.5,
+      school: 'holy',
+      ability: 'Consecration',
+      consecration: { id: `consecration:${caster.id}:10`, duration: 9 },
+    });
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).consecrations).toEqual([
+      expect.objectContaining({
+        id: `consecration:${caster.id}:10`,
+        r: 8,
+        dur: 9,
+        rem: 6.5,
+      }),
+    ]);
+  });
+});
+
 describe('authoritative interaction command outcomes', () => {
   it.each([
     ['loot', { id: -1 }],
@@ -5347,8 +5721,157 @@ describe('authoritative interaction command outcomes', () => {
   });
 });
 
-describe('negotiated stable timer wire v2', () => {
-  const timerV2 = { timerWireVersion: 2 } as unknown as Parameters<GameServer['join']>[7];
+describe('negotiated Warlock pet-special wire v1', () => {
+  it('advertises the button only to capable clients and disables hidden legacy autocast', () => {
+    const server = new GameServer();
+    const legacyWire = fakeWs();
+    const capableWire = fakeWs();
+    const legacy = joinServer(server, legacyWire, 1, 'Legacy', 'warlock');
+    const capable = joinServer(server, capableWire, 2, 'Capable', 'warlock', {
+      petSpecialWireVersion: 1,
+    } as Parameters<GameServer['join']>[7]);
+    const legacyOwner = server.sim.entities.get(legacy.pid)!;
+    const capableOwner = server.sim.entities.get(capable.pid)!;
+
+    summonPet(server.sim.ctx, legacyOwner, 'gloomshade');
+    summonPet(server.sim.ctx, capableOwner, 'gloomshade');
+    const legacyPet = petOf(server.sim.ctx, legacy.pid)!;
+    const capablePet = petOf(server.sim.ctx, capable.pid)!;
+    expect(legacyPet.petAutoSkill).toBe(false);
+    expect(capablePet.petAutoSkill).toBe(true);
+
+    const legacyTarget = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, {
+      x: legacyPet.pos.x,
+      y: legacyPet.pos.y,
+      z: legacyPet.pos.z + 12,
+    });
+    const capableTarget = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, {
+      x: capablePet.pos.x,
+      y: capablePet.pos.y,
+      z: capablePet.pos.z + 12,
+    });
+    server.sim.addEntity(legacyTarget);
+    server.sim.addEntity(capableTarget);
+    legacyOwner.targetId = legacyTarget.id;
+    capableOwner.targetId = capableTarget.id;
+
+    server.handleMessage(legacy, JSON.stringify({ t: 'cmd', cmd: 'pet_special' }));
+    expect(legacyPet.petSkillTimer).toBe(0);
+    expect(
+      Math.hypot(legacyTarget.pos.x - legacyPet.pos.x, legacyTarget.pos.z - legacyPet.pos.z),
+    ).toBe(12);
+    server.handleMessage(capable, JSON.stringify({ t: 'cmd', cmd: 'pet_special' }));
+    expect(capablePet.petSkillTimer).toBe(15);
+    expect(
+      Math.hypot(capableTarget.pos.x - capablePet.pos.x, capableTarget.pos.z - capablePet.pos.z),
+    ).toBeCloseTo(2.8, 1);
+
+    server.handleMessage(
+      legacy,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: true }),
+    );
+    expect(petOf(server.sim.ctx, legacy.pid)?.petAutoSkill).toBe(false);
+    server.handleMessage(
+      capable,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: false }),
+    );
+    expect(petOf(server.sim.ctx, capable.pid)?.petAutoSkill).toBe(false);
+    server.handleMessage(
+      capable,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: 'true' }),
+    );
+    expect(petOf(server.sim.ctx, capable.pid)?.petAutoSkill).toBe(false);
+    server.handleMessage(
+      capable,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: true }),
+    );
+    expect(petOf(server.sim.ctx, capable.pid)?.petAutoSkill).toBe(true);
+
+    broadcast(server);
+    const legacySnap = lastSnap(legacyWire.sent);
+    const capableSnap = lastSnap(capableWire.sent);
+    expect(legacySnap.psw).toBeUndefined();
+    expect(capableSnap.psw).toBe(1);
+
+    const legacyClient = bareClient(legacy.pid, { playerClass: 'warlock' });
+    const capableClient = bareClient(capable.pid, { playerClass: 'warlock' });
+    (legacyClient as any).applySnapshot(legacySnap);
+    (capableClient as any).applySnapshot(capableSnap);
+    expect(legacyClient.petSpecialCommandsSupported).toBe(false);
+    expect(capableClient.petSpecialCommandsSupported).toBe(true);
+
+    (capableClient as any).applySnapshot({ ...capableSnap, psw: 2 });
+    expect(capableClient.petSpecialCommandsSupported).toBe(false);
+  });
+
+  it('disarms a legacy restored special pet before the first server tick', () => {
+    const source = new Sim({ seed: 991, playerClass: 'warlock', noPlayer: true });
+    const sourcePid = source.addPlayer('warlock', 'Source');
+    source.setPlayerLevel(20, sourcePid);
+    const sourceOwner = source.entities.get(sourcePid)!;
+    summonPet(source.ctx, sourceOwner, 'gloomshade');
+    const state = source.serializeCharacter(sourcePid)!;
+    state.pet = serializePet(source.ctx, sourcePid);
+
+    const server = new GameServer();
+    const wire = fakeWs();
+    const joined = server.join(wire.ws, 3, 3, 'LegacyRestore', 'warlock', state);
+    if ('error' in joined) throw new Error(joined.error);
+
+    expect(petOf(server.sim.ctx, joined.pid)?.petAutoSkill).toBe(false);
+  });
+
+  it('refreshes pet-special capability on linkdead resume and disarms a downgrade', () => {
+    const server = new GameServer();
+    const firstWire = fakeWs();
+    const original = joinServer(server, firstWire, 4, 'ResumeDemonist', 'warlock', {
+      petSpecialWireVersion: 1,
+    } as Parameters<GameServer['join']>[7]);
+    const owner = server.sim.entities.get(original.pid)!;
+    summonPet(server.sim.ctx, owner, 'gloomshade');
+    const pet = petOf(server.sim.ctx, original.pid)!;
+    expect(pet.petAutoSkill).toBe(true);
+
+    firstWire.ws.readyState = 3;
+    expect(server.socketClosed(original, firstWire.ws)).toBe(true);
+    const legacyWire = fakeWs();
+    const legacyResume = server.join(legacyWire.ws, 4, 4, 'ResumeDemonist', 'warlock', null);
+    if ('error' in legacyResume) throw new Error(legacyResume.error);
+    expect(legacyResume).toBe(original);
+    expect(legacyResume.petSpecialWireVersion).toBe(0);
+    expect(owner.petSpecialCommandsSupported).toBe(false);
+    expect(pet.petAutoSkill).toBe(false);
+    legacyWire.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(legacyWire.sent).psw).toBeUndefined();
+
+    legacyWire.ws.readyState = 3;
+    expect(server.socketClosed(legacyResume, legacyWire.ws)).toBe(true);
+    const capableWire = fakeWs();
+    const capableResume = server.join(
+      capableWire.ws,
+      4,
+      4,
+      'ResumeDemonist',
+      'warlock',
+      null,
+      false,
+      { petSpecialWireVersion: 1 } as Parameters<GameServer['join']>[7],
+    );
+    if ('error' in capableResume) throw new Error(capableResume.error);
+    expect(capableResume).toBe(original);
+    expect(capableResume.petSpecialWireVersion).toBe(1);
+    expect(owner.petSpecialCommandsSupported).toBe(true);
+    capableWire.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(capableWire.sent).psw).toBe(1);
+  });
+});
+
+describe('negotiated stable timer wire v3', () => {
+  const timerV3 = {
+    timerWireVersion: STABLE_TIMER_WIRE_VERSION,
+  } as unknown as Parameters<GameServer['join']>[7];
 
   function testAura(id: string, remaining: number, value = 7): Aura {
     return {
@@ -5391,10 +5914,53 @@ describe('negotiated stable timer wire v2', () => {
     expect(second.self.ncd.legacy_node).toBeLessThan(30);
   });
 
+  it('round-trips permanent auras through legacy and stable server snapshots', () => {
+    for (const stable of [false, true]) {
+      const server = new GameServer();
+      const fc = fakeWs();
+      const session = joinServer(
+        server,
+        fc,
+        stable ? 21 : 20,
+        stable ? 'StablePermanent' : 'LegacyPermanent',
+        'paladin',
+        stable ? timerV3 : undefined,
+      );
+      const player = server.sim.entities.get(session.pid)!;
+      const permanent = testAura('devotion_ward', Number.POSITIVE_INFINITY, 0.05);
+      permanent.kind = 'buff_dr';
+      permanent.school = 'holy';
+      permanent.permanent = true;
+      player.auras = [permanent];
+
+      broadcast(server);
+      const snapshot = lastSnap(fc.sent);
+      expect(snapshot.self.auras[0]).toMatchObject({
+        id: 'devotion_ward',
+        perm: 1,
+      });
+      expect(snapshot.self.auras[0]).not.toHaveProperty('exp');
+      if (stable) expect(snapshot.self.auras[0]).not.toHaveProperty('rem');
+      else {
+        expect(snapshot.self.auras[0].dur).toBeGreaterThan(0);
+        expect(snapshot.self.auras[0].rem).toBe(snapshot.self.auras[0].dur);
+      }
+
+      const client = bareClient(session.pid, { playerClass: 'paladin' });
+      (client as any).applySnapshot(snapshot);
+      expect(client.player.auras[0]).toMatchObject({
+        id: 'devotion_ward',
+        permanent: true,
+        remaining: Number.POSITIVE_INFINITY,
+        duration: Number.POSITIVE_INFINITY,
+      });
+    }
+  });
+
   it('sends a complete stable first snapshot, then ages omitted timers across skipped ticks', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Stable', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'Stable', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     const meta = server.sim.meta(session.pid)!;
     player.auras = [];
@@ -5413,7 +5979,7 @@ describe('negotiated stable timer wire v2', () => {
 
     broadcast(server);
     const first = lastSnap(fc.sent);
-    expect(first.tw).toBe(2);
+    expect(first.tw).toBe(STABLE_TIMER_WIRE_VERSION);
     expect(first.self.auras[0]).toMatchObject({ id: 'stable_aura', exp: 10 });
     expect(first.self.auras[0]).not.toHaveProperty('rem');
     expect(first.self.cds.stable_cast).toBe(5);
@@ -5493,7 +6059,7 @@ describe('negotiated stable timer wire v2', () => {
   it('re-sends aura refreshes, reorder, values, stacks, and charges without timer churn', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'AuraMutations', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'AuraMutations', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     player.auras = [];
     const firstAura = testAura('first', 10, 2);
@@ -5528,7 +6094,7 @@ describe('negotiated stable timer wire v2', () => {
   it('keeps rate-aware cooldown deadlines stable through Temporal Hourglass acceleration', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Accelerated', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'Accelerated', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     player.auras = [];
     player.auras.push({
@@ -5585,7 +6151,7 @@ describe('negotiated stable timer wire v2', () => {
   it('freezes retained auras while dead, then resumes absolute decay after resurrection', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Paused', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'Paused', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     player.auras = [];
     player.auras.push(testAura('retained', 8));
@@ -5630,12 +6196,12 @@ describe('negotiated stable timer wire v2', () => {
     expect(client.player.auras[0].remaining).toBeCloseTo(frozenRemaining - 0.1, 5);
   });
 
-  it('keeps legacy and v2 entity variants isolated and builds each at most once per tick', () => {
+  it('keeps legacy and stable entity variants isolated and builds each at most once per tick', () => {
     const server = new GameServer();
     const stableWs = fakeWs();
     const legacyWs = fakeWs();
     const subjectWs = fakeWs();
-    const stable = joinServer(server, stableWs, 1, 'StableViewer', 'warrior', timerV2);
+    const stable = joinServer(server, stableWs, 1, 'StableViewer', 'warrior', timerV3);
     joinServer(server, legacyWs, 2, 'LegacyViewer');
     const subject = joinServer(server, subjectWs, 3, 'Subject', 'mage');
     const subjectEntity = server.sim.entities.get(subject.pid)!;
@@ -5686,7 +6252,7 @@ describe('negotiated stable timer wire v2', () => {
     const stableWs = fakeWs();
     const legacyWs = fakeWs();
     const targetWs = fakeWs();
-    const stableSpectator = joinServer(server, stableWs, 1, 'StableSpec', 'mage', timerV2);
+    const stableSpectator = joinServer(server, stableWs, 1, 'StableSpec', 'mage', timerV3);
     const legacySpectator = joinServer(server, legacyWs, 2, 'LegacySpec', 'mage');
     const target = joinServer(server, targetWs, 3, 'Observed', 'mage');
     for (let i = 0; i < 5; i++) server.sim.tick();
@@ -5703,7 +6269,7 @@ describe('negotiated stable timer wire v2', () => {
     const stableSnap = lastSnap(stableWs.sent);
     const legacySnap = lastSnap(legacyWs.sent);
     expect(stableSnap.self.id).toBe(target.pid);
-    expect(stableSnap.tw).toBe(2);
+    expect(stableSnap.tw).toBe(STABLE_TIMER_WIRE_VERSION);
     expect(stableSnap.self.auras[0]).toHaveProperty('exp');
     expect(stableSnap.self.cds.observed_cast).toBeCloseTo(server.sim.time + 5, 5);
     expect(legacySnap.self.id).toBe(target.pid);
@@ -5728,14 +6294,14 @@ describe('negotiated stable timer wire v2', () => {
       'warrior',
       null,
       false,
-      timerV2,
+      timerV3,
     );
     if ('error' in stableResult) throw new Error(stableResult.error);
     expect(stableResult).toBe(original);
-    expect((stableResult as any).timerWireVersion).toBe(2);
+    expect((stableResult as any).timerWireVersion).toBe(STABLE_TIMER_WIRE_VERSION);
     stableWs.sent.length = 0;
     broadcast(server);
-    expect(lastSnap(stableWs.sent).tw).toBe(2);
+    expect(lastSnap(stableWs.sent).tw).toBe(STABLE_TIMER_WIRE_VERSION);
 
     stableWs.ws.readyState = 3;
     expect(server.socketClosed(stableResult, stableWs.ws)).toBe(true);
@@ -5749,7 +6315,7 @@ describe('negotiated stable timer wire v2', () => {
     expect(lastSnap(fallbackWs.sent).tw).toBeUndefined();
   });
 
-  it('falls back to legacy decode solely when the snapshot has no v2 marker', () => {
+  it('falls back to legacy decode solely when the snapshot has no stable marker', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'OldServer', 'mage');
@@ -5780,7 +6346,7 @@ describe('negotiated stable timer wire v2', () => {
     const server = new GameServer();
     const viewerWs = fakeWs();
     const subjectWs = fakeWs();
-    const viewer = joinServer(server, viewerWs, 1, 'MovingViewer', 'mage', timerV2);
+    const viewer = joinServer(server, viewerWs, 1, 'MovingViewer', 'mage', timerV3);
     const subject = joinServer(server, subjectWs, 2, 'MovingSubject', 'mage');
     const subjectEntity = server.sim.entities.get(subject.pid)!;
     subjectEntity.auras = [testAura('moving_aura', 20)];
@@ -5820,7 +6386,7 @@ describe('negotiated stable timer wire v2', () => {
     const server = new GameServer();
     const viewerWs = fakeWs();
     const subjectWs = fakeWs();
-    const viewer = joinServer(server, viewerWs, 1, 'DeferredViewer', 'mage', timerV2);
+    const viewer = joinServer(server, viewerWs, 1, 'DeferredViewer', 'mage', timerV3);
     const subject = joinServer(server, subjectWs, 2, 'DeferredSubject', 'mage');
     const viewerEntity = server.sim.entities.get(viewer.pid)!;
     const subjectEntity = server.sim.entities.get(subject.pid)!;

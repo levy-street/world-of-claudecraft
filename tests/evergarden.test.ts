@@ -14,8 +14,10 @@ import {
   EVERGARDEN_ROADS,
   EVERGARDEN_ZONE,
 } from '../src/sim/content/evergarden';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
+import type { WorldContent } from '../src/sim/types';
 import {
   crossesGardenHedge,
   GARDEN_MAZE_GRID,
@@ -33,6 +35,21 @@ import {
 } from '../src/sim/world';
 
 const SEED = 1337; // matches the fixed client seed in src/main.ts
+
+// The one Sim construction in this file only ever looks at hedge_knight
+// entities (see "the maze patrol" below), so trim the ambient world down to
+// just their camps: every other camp, every npc, and every ground object in
+// the full built-in world (all 11 zones) is dead weight for a 30 second tick
+// loop. Terrain and maze-collision geometry (terrainHeight, inGardenMazeWall,
+// crossesGardenHedge, resolveMovement) all read the untouched module-global
+// world content, never this fixture, so trimming spawns cannot change the
+// maze itself, only how many entities the sim ticks.
+const HEDGE_KNIGHT_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === 'hedge_knight'),
+  npcs: {},
+  groundObjects: [],
+};
 
 // Cell (col, row) center in world coordinates. Row 0 is the NORTH row.
 function cellCenter(c: number, r: number): { x: number; z: number } {
@@ -355,7 +372,12 @@ describe('the maze patrol', () => {
     // the live sim: the knights idle-wander their dead ends for 30 seconds
     // and must never stand inside a wall piece (moveToward consults
     // crossesGardenHedge, the same barrier players hit)
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: HEDGE_KNIGHT_TEST_WORLD,
+    });
     const entities = (
       sim as unknown as {
         entities: Map<number, { templateId?: string; pos: { x: number; z: number } }>;

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Write Game Tooltips"
+  short_description: "Write clear English tooltips from implemented mechanics"
+  default_prompt: "Use $woc-write-game-tooltips to write or review clear English World of ClaudeCraft tooltips that match the implemented mechanics and scaling."
+policy:
+  allow_implicit_invocation: true

@@ -24,6 +24,7 @@
 
 import { bagCapacity, bagsFullError, fitsAll } from '../bags';
 import { ITEMS } from '../data';
+import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { itemFromRaid } from '../item_level';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -32,8 +33,6 @@ import {
   beginEnchantFamilyCast,
   clearEnchantCastSession,
   consumePreferredDisenchantVictim,
-  consumeSelectedInventorySlot,
-  disenchantVictimPin,
 } from './enchanting';
 import { SUNDERED_ESSENCE_ITEM_ID } from './masterwrought_materials';
 
@@ -109,7 +108,7 @@ export function extractEssence(
     // re-check below is what stops a mid-cast bag splice from redirecting the
     // destroy onto a different copy of the same item id. An unpinned sunder
     // re-resolves its preferred victim fresh and needs no pin.
-    targetPin: slotIndex === undefined ? '' : disenchantVictimPin(meta.inventory[slotIndex]),
+    targetPin: slotIndex === undefined ? '' : itemCopyPin(meta.inventory[slotIndex]),
   });
 }
 
@@ -123,10 +122,7 @@ export function completeSunderCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   // The phase 03 QA amendment's re-check: re-resolve the selected copy at
   // completion and refuse if it moved or merged (inv_sort's consolidation
   // splice shifts indices exactly when it empties a donor stack).
-  if (
-    slotIndex !== undefined &&
-    disenchantVictimPin(meta.inventory[slotIndex]) !== session.targetPin
-  ) {
+  if (slotIndex !== undefined && itemCopyPin(meta.inventory[slotIndex]) !== session.targetPin) {
     ctx.error(meta.entityId, 'The item moved; sundering canceled.');
     return;
   }

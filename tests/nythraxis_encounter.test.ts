@@ -11,6 +11,7 @@ import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -31,7 +32,12 @@ function teleport(sim: AnySim, e: AnyEntity, x: number, z: number, y?: number): 
 // are opt-in so the default keeps every pre-heroic assertion byte-identical.
 function setup(opts: { difficulty?: 'normal' | 'heroic'; dpsCount?: number } = {}) {
   const { difficulty = 'normal', dpsCount = 4 } = opts;
-  const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true }) as AnySim;
+  const sim = new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: EMPTY_TEST_WORLD,
+  }) as AnySim;
   const tankPid = sim.addPlayer('warrior', 'Tank') as number;
   sim.players.get(tankPid)!.questsDone.add('q_nythraxis_bound_guardian');
   const dpsPids: number[] = [];

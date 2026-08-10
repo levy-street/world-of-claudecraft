@@ -58,7 +58,11 @@ describe('phase 03 naming-audit display literals stay renamed', () => {
   it('pins the renamed ability display names', () => {
     expect(ABILITIES.crusader_strike.name).toBe('Oathstrike');
     expect(ABILITIES.heroic_leap.name).toBe('Vaulting Charge');
-    expect(ABILITIES.holy_nova.name).toBe('Hallowburst');
+    // The v0.36.0 priest-rework merge supersedes the phase's Hallowburst with
+    // the release's own re-cut, Sunburst Canticle (the Fieldreaver rule: a
+    // maintainer-merged release rename of the same collision wins); the
+    // NAME-MAP chain row arms Hallowburst so neither old name can return.
+    expect(ABILITIES.holy_nova.name).toBe('Sunburst Canticle');
     expect(ABILITIES.icy_veins.name).toBe('Coldsurge');
     expect(ABILITIES.victory_rush.name).toBe("Victor's Surge");
     expect(ABILITIES.wyvern_sting.name).toBe('Drakesting');

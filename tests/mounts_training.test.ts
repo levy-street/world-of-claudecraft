@@ -13,15 +13,28 @@ import {
   MOUNT_RACE_START_PLATFORM,
   STABLE_PADDOCK,
 } from '../src/sim/content/mounts';
-import { QUESTS } from '../src/sim/data';
+import { BUILTIN_WORLD, NPCS, QUESTS } from '../src/sim/data';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { MOUNT_TRAIN_FEE_COPPER } from '../src/sim/mounts_training';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
+// This file drives only the mount-training tutorial/quest mechanic (see the file
+// header) through marlaOf(), which looks up exactly one live NPC entity,
+// stablemaster_marla. Nothing here spawns, targets, or picks up a camp mob or a
+// ground object, so this world keeps zero of each instead of the full
+// BUILTIN_WORLD every bare `new Sim(...)` used to construct.
+const MOUNTS_TRAINING_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: { stablemaster_marla: NPCS.stablemaster_marla },
+  groundObjects: [],
+};
+
 const RIDING_LESSONS_QUEST_ID = 'q_riding_lessons';
-const makeSim = (seed = 1) => new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+const makeSim = (seed = 1) =>
+  new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: MOUNTS_TRAINING_TEST_WORLD });
 
 function marlaOf(sim: Sim) {
   const marla = [...sim.entities.values()].find(
@@ -318,6 +331,7 @@ describe('riding lesson, abandon paths', () => {
       playerClass: 'warrior',
       autoEquip: true,
       noPlayer: true,
+      world: MOUNTS_TRAINING_TEST_WORLD,
     });
     const restoredPid = restored.addPlayer('warrior', 'Rider', { state: state! });
     restored.tick();
@@ -408,7 +422,13 @@ describe('riding lesson, abandon paths', () => {
   });
 
   it('leaving mid-session abandons it (removePlayer teardown)', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+      world: MOUNTS_TRAINING_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Rider');
     const meta = sim.players.get(pid)!;
     const e = sim.entities.get(pid)!;

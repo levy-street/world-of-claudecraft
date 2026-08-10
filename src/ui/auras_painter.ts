@@ -66,13 +66,23 @@ const DUP_KEY_SEP = '#';
 // appended the badge only when stacks > 1).
 const STACKS_SHOWN = '';
 const STACKS_HIDDEN = 'none';
+const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
+  'divine_ascension',
+  'shaman_thunder_charges',
+  'shaman_warspirit_cadence',
+  'moontide',
+  'old_blood',
+  'verdance',
+]);
 
 /** What the pool needs from the Hud: the icon-URL resolver, the tooltip renderer, and
  *  the tooltip-attach helper. All injected so a Node test drives the pool without the
  *  icon/i18n runtime. */
 export interface AurasPainterDeps {
-  /** Resolve an icon key to a CSS background-image value (host: `url(${iconDataUrl(
-   *  'aura', iconKey)})`). Called only when an aura's icon key changes. */
+  /** Resolve an icon key to a CSS background-image value. The HUD layers a
+   *  worker-cached procedural or painted safety fallback beneath static ability
+   *  art without composing on this frame path. Called only when an aura's icon
+   *  key changes. */
   resolveIconUrl(iconKey: string): string;
   /** Render the tooltip HTML from the LIVE aura name + remaining (host: the
    *  tt-title/tt-sub markup with esc + tPlural). Called lazily on hover, reading the
@@ -182,11 +192,14 @@ export class AurasPainter {
     let rendered = 0;
     for (let i = 0; i < count; i++) {
       const s = slots[i];
-      // ...and never an ACTIONABLE buff either (`alwaysRender`, auras_view
-      // NEVER_SHED_IDS). The budget rests on buffs being cosmetic; an aura whose
-      // icon IS the affordance is not, and the carried-flag buff is applied at
-      // the pickup so it sorts LAST and a flat first-N cap would shed it first.
-      if (!s.isDebuff && !s.alwaysRender && rendered >= cap) continue;
+      // Never a debuff, never an id on the always-visible list (Divine Ascension
+      // joined it from #2428), and never an ACTIONABLE buff (`alwaysRender`,
+      // auras_view NEVER_SHED_IDS): the budget rests on buffs being cosmetic; an
+      // aura whose icon IS the affordance is not, and the carried-flag buff is
+      // applied at the pickup so it sorts LAST and a flat first-N cap would shed
+      // it first.
+      if (!s.isDebuff && !s.alwaysRender && rendered >= cap && !ALWAYS_VISIBLE_AURA_IDS.has(s.key))
+        continue;
       rendered++;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the
       // base key directly. If the base key is already claimed THIS frame, this is a

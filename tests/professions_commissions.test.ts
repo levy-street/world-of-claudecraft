@@ -61,6 +61,7 @@ import type {
   SimEvent,
 } from '../src/sim/types';
 import { completeCraftCast } from './helpers/enchant_family_cast';
+import { VENDOR_TEST_WORLD } from './sim_shared';
 
 function craftItemComplete(
   sim: import('../src/sim/sim').Sim,
@@ -98,7 +99,7 @@ function grantReagents(sim: Sim, recipeId: string, pid: number, crafts = 1): voi
 }
 
 function makeSim(seed = 7) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: VENDOR_TEST_WORLD });
 }
 
 function entityOf(sim: Sim, pid: number): Entity {
@@ -156,7 +157,13 @@ function pointOf(pos: { x: number; z: number } | undefined): { x: number; z: num
 }
 
 function makeTradeSim(seed = 42) {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false, noPlayer: true });
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: false,
+    noPlayer: true,
+    world: VENDOR_TEST_WORLD,
+  });
   const a = sim.addPlayer('warrior', 'Ayla');
   const b = sim.addPlayer('warrior', 'Borin');
   const ea = entityOf(sim, a);
@@ -818,7 +825,12 @@ describe('persistence: commission payloads survive save/load', () => {
 // ---------------------------------------------------------------------------
 describe('mail/market: a commissioned equipment instance never mails or lists', () => {
   it('mailSend refuses armed AND bound sword copies (fungible-only escrow), payload intact', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const sender = sim.addPlayer('warrior', 'Sender');
     sim.addPlayer('mage', 'Rex');
     const box = entityOf(sim, sim.postOffice.mailboxIds[0]);
@@ -842,7 +854,12 @@ describe('mail/market: a commissioned equipment instance never mails or lists', 
   });
 
   it('marketList refuses armed AND bound copies with no escrow', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Lister');
     let merchant: Entity | null = null;
     for (const e of sim.entities.values()) {

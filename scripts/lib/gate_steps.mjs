@@ -3,7 +3,7 @@
 // never-cache vitest semantics in one place so profile timings match the real
 // merge bar.
 import { gateVitestSkipPretestEnv } from './gate_artifact_skip.mjs';
-import { turboRunArgs } from './gate_task_cache.mjs';
+import { resolveTurboBin, turboRunArgs } from './gate_task_cache.mjs';
 
 // The suites whose ASSERTIONS change under I18N_RELEASE_TIER=1 (they read the flag
 // and tighten from "key is registered" to "every locale is filled"). They are the
@@ -43,7 +43,8 @@ export const I18N_ARTIFACTS = Object.freeze([
 /**
  * Full local gate steps (after dep-sync and ffmpeg preflights in gate.mjs).
  *
- * Cacheable pure artifacts go through `npx turbo run ...` (inputs/outputs in
+ * Cacheable pure artifacts go through the resolved turbo binary directly
+ * (`resolveTurboBin`, no `npx` dispatch overhead; inputs/outputs in
  * turbo.json). Malware, biome, and tests always run via npm (no "passed"
  * cache). i18n:gen, wiki:content, and sfx:check are independent leaf tasks in
  * turbo.json (none dependsOn another), so they share one turbo multi-task step
@@ -57,6 +58,7 @@ export const I18N_ARTIFACTS = Object.freeze([
  *   skipBuilds?: boolean,
  *   skipVitest?: boolean,
  *   skipTypes?: boolean,
+ *   repoRoot?: string,
  * }} [opts]
  * @returns {Array<{
  *   name: string,
@@ -67,11 +69,17 @@ export const I18N_ARTIFACTS = Object.freeze([
  * }>}
  */
 export function buildFullGateSteps(workers, opts = {}) {
+  // Callers that already resolve their own repoRoot from the module's own
+  // location (gate.mjs, gate_select.mjs; see resolveTurboBin) pass it through
+  // rather than relying on process.cwd(), which is only correct when the gate
+  // is invoked FROM the repo root.
+  const repoRoot = opts.repoRoot ?? process.cwd();
+  const turboBin = resolveTurboBin(repoRoot);
   /** @type {Array<{ name: string, cmd: string, args: string[], hint?: string, env?: Record<string, string> }>} */
   const steps = [
     {
       name: 'i18n + wiki + sfx artifacts',
-      cmd: 'npx',
+      cmd: turboBin,
       args: turboRunArgs(['i18n:gen', 'wiki:content', 'sfx:check']),
     },
     {
@@ -128,19 +136,19 @@ export function buildFullGateSteps(workers, opts = {}) {
   if (!opts.skipTypes && !opts.skipBuilds) {
     steps.push({
       name: 'typecheck + env/server/bot builds',
-      cmd: 'npx',
+      cmd: turboBin,
       args: turboRunArgs(['check:types', 'build:env', 'build:server', 'build:bot']),
     });
     steps.push({
       name: 'client build',
-      cmd: 'npx',
+      cmd: turboBin,
       args: turboRunArgs(['build:bundle']),
     });
   } else {
     if (!opts.skipTypes) {
       steps.push({
         name: 'typecheck',
-        cmd: 'npx',
+        cmd: turboBin,
         args: turboRunArgs(['check:types']),
       });
     }
@@ -148,22 +156,22 @@ export function buildFullGateSteps(workers, opts = {}) {
       steps.push(
         {
           name: 'env build',
-          cmd: 'npx',
+          cmd: turboBin,
           args: turboRunArgs(['build:env']),
         },
         {
           name: 'server build',
-          cmd: 'npx',
+          cmd: turboBin,
           args: turboRunArgs(['build:server']),
         },
         {
           name: 'bot build',
-          cmd: 'npx',
+          cmd: turboBin,
           args: turboRunArgs(['build:bot']),
         },
         {
           name: 'client build',
-          cmd: 'npx',
+          cmd: turboBin,
           args: turboRunArgs(['build:bundle']),
         },
       );

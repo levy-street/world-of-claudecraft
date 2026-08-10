@@ -13,15 +13,25 @@
 // The zone rects do NOT tile the world's bounding box. The grid is a set of
 // per-realm rectangles, and where no realm claims a cell (today: the southwest
 // corner, x -540..-180 by z -180..180, plus the northern bay) the only sheet
-// over that water is the apron. The southwest corner carries a real coastline
-// (the vale's west headland stands 15 yards over its own beach), which is
-// exactly where the wedges were reported.
+// over that water is the apron.
 //
-// So: the apron is only ever CORRECT where there is no coastline to resolve.
-// Anywhere the world rect has a shore, a fine sheet has to own it. This module
-// computes the un-zoned rectangles from the zone list, so the rule holds for
-// any future grid (and for a custom map) instead of being tuned to today's.
-// Registered in RENDER_PURE_CORES (tests/architecture.test.ts).
+// So: the apron is only ever CORRECT where there is no MEANINGFUL coastline to
+// resolve. This module computes the un-zoned rectangles from the zone list, so
+// the rule holds for any future grid (and for a custom map) instead of being
+// tuned to today's.
+//
+// One refinement the first cut missed: a fine sheet only helps when its
+// coastline is a real share of its rect. The southwest cell is a 360x360yd
+// rectangle whose ONLY dry ground is a ~1% sliver at the vale headland's west
+// flank, off the play strip (x <= STRIP_MIN_X). A fine sheet stretched over
+// that rect still has to interpolate its per-vertex shore attribute across the
+// whole open-sea expanse, and THAT draws a hard-edged band over the open water
+// (the reported Eastbrook "duplicated water layer") worse than the apron did.
+// So a gap sheet is worth building only when its dry-land fraction clears
+// WATER_GAP_MIN_SHORE_FRACTION; below it the apron is the correct surface and
+// the fine sheet is skipped (gapSheetWorthBuilding). The dry fraction is
+// measured render-side against live terrain; this core owns the threshold and
+// the decision. Registered in RENDER_PURE_CORES (tests/architecture.test.ts).
 
 /** A rectangle a fine water sheet covers. Zone planes carry their zone id. */
 export interface WaterSheetRect {
@@ -30,6 +40,61 @@ export interface WaterSheetRect {
   readonly xMax: number;
   readonly zMin: number;
   readonly zMax: number;
+}
+
+/**
+ * Minimum share of a gap rect that must scan as dry land for a fine water sheet
+ * over it to be worth building. Below this the rect is effectively open sea and
+ * the horizon apron is the correct surface: a fine sheet only interpolates its
+ * shore attribute across the open water and bands over the apron. The un-zoned
+ * southwest corner is ~1% dry (a single headland-flank sliver in a 360x360yd
+ * rect), so it skips; set well above that but low enough to keep any gap a real
+ * coastline runs through. Zone planes never gate on this (they always build).
+ */
+export const WATER_GAP_MIN_SHORE_FRACTION = 0.03;
+
+/**
+ * Whether a gap rect's coastline earns a fine sheet, given the share of the rect
+ * that scans as dry ground. A gap sheet exists to resolve a COASTLINE no zone
+ * owns; a rect that is almost all open sea has no meaningful shore to resolve,
+ * and a fine sheet there is a net negative (it bands over the apron). Pure and
+ * Three-free so the decision is unit-tested without the renderer; the dry
+ * fraction itself is measured render-side against live terrain and passed in.
+ */
+export function gapSheetWorthBuilding(dryFrac: number): boolean {
+  return dryFrac >= WATER_GAP_MIN_SHORE_FRACTION;
+}
+
+/**
+ * Stride the dry-land scan samples a gap rect at. Coarse on purpose: it only has
+ * to separate a ~1% sliver from a real coast, and terrainHeight is deliberately
+ * rich (a full-res scan of the gaps measured ~75ms). It lives here, next to the
+ * threshold it is compared against, so the renderer and the guard measure the
+ * SAME lattice: the southwest fraction is only a dozen sampled points wide over
+ * a 360x360yd rect, so a scan on some other stride reports a different number
+ * than the one the decision is actually made on.
+ */
+export const WATER_GAP_SCAN_STRIDE_YARDS = 12;
+
+/**
+ * Share of `rect` that scans as dry land, on the pinned stride. The caller
+ * supplies the dry test (render-side: `shoreDepthAt(x, z, seed) <= 0`), so this
+ * module owns the lattice while the height sampling stays with the caller and
+ * this core stays pure and Three-free.
+ */
+export function gapDryFraction(
+  rect: WaterSheetRect,
+  isDryAt: (x: number, z: number) => boolean,
+): number {
+  let dry = 0;
+  let total = 0;
+  for (let z = rect.zMin; z <= rect.zMax; z += WATER_GAP_SCAN_STRIDE_YARDS) {
+    for (let x = rect.xMin; x <= rect.xMax; x += WATER_GAP_SCAN_STRIDE_YARDS) {
+      total++;
+      if (isDryAt(x, z)) dry++;
+    }
+  }
+  return total > 0 ? dry / total : 0;
 }
 
 /** The zone fields this module needs; ZoneDef satisfies it structurally. */

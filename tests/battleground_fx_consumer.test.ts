@@ -30,10 +30,13 @@ function bgInfo(flags: [BgFlagInfo, BgFlagInfo]): BgInfo {
     rating: 1500,
     wins: 0,
     losses: 0,
+    draws: 0,
     captures: 0,
     queued: false,
     queueSize: 0,
     firstWinBonusReady: true,
+    proposal: null,
+    requeueIn: 0,
     queuedParty: 0,
     ladder: [],
     match: {

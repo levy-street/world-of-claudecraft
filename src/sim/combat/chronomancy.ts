@@ -136,7 +136,9 @@ export function placeTemporalEcho(
     kind: 'temporal_echo',
     remaining: duration,
     duration,
-    value: 1,
+    // Mirror the live single-target conversion coefficient in the generic value
+    // field so online aura tooltips can show the exact rate without a bespoke wire.
+    value: ECHO_CONVERT_SINGLE,
     sourceId: caster.id,
     school: 'arcane',
     echoGroup: false,
@@ -262,7 +264,9 @@ export function placeGroupEcho(
     kind: 'temporal_echo',
     remaining: duration,
     duration,
-    value: 1,
+    // See placeTemporalEcho: value is player-facing wire state; the combat reader
+    // still uses echoConvertRate/echoGroup as its authoritative coefficients.
+    value: ECHO_GROUP_CONVERT_SINGLE,
     sourceId: caster.id,
     school: 'arcane',
     echoGroup: true,

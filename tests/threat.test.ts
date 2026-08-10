@@ -1,6 +1,7 @@
 // Classic threat mechanics + the class kit that drives them (stances/forms,
 // stealth, pets).
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { computeTalentModifiers } from '../src/sim/content/talents';
 import { abilitiesKnownAt, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
@@ -180,29 +181,38 @@ describe('threat from damage', () => {
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * BEAR_FORM_THREAT_MULT + 1, 5);
   });
 
-  it('righteous fury multiplies HOLY threat by 1.6 and leaves physical alone', () => {
+  it('Burning Oath passively multiplies Protection Holy-damage threat by 1.6', () => {
     const sim = makeSim('paladin');
     sim.setPlayerLevel(16);
-    sim.castAbility('righteous_fury');
+    expect(sim.setSpec('protection')).toBe(true);
     sim.tick();
+    expect(sim.resolvedAbility('righteous_fury')?.def.passive).toBe(true);
+    expect(sim.player.auras.some((a) => a.kind === 'righteous_fury')).toBe(false);
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     hit(sim, sim.player, wolf, 100, 'holy');
-    expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * RIGHTEOUS_FURY_THREAT_MULT + 1, 5);
+    const protectionMasteryThreat = 1.4;
+    expect(wolf.threat.get(sim.playerId)).toBeCloseTo(
+      100 * protectionMasteryThreat * RIGHTEOUS_FURY_THREAT_MULT + 1,
+      5,
+    );
     hit(sim, sim.player, wolf, 100, 'physical');
-    expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * RIGHTEOUS_FURY_THREAT_MULT + 101, 5);
+    expect(wolf.threat.get(sim.playerId)).toBeCloseTo(
+      100 * protectionMasteryThreat * RIGHTEOUS_FURY_THREAT_MULT +
+        100 * protectionMasteryThreat +
+        1,
+      5,
+    );
   });
 
-  it('consecration burns the ground every 2 seconds from 0s to 8s and generates holy threat each pulse', () => {
+  it('consecration burns the ground every second from 0s to 8s and generates high holy threat each pulse', () => {
     const sim = makeSim('paladin');
     sim.setPlayerLevel(20);
+    expect(sim.setSpec('protection')).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     teleport(sim, sim.player, wolf.pos.x, wolf.pos.z + 2);
     sim.player.resource = sim.player.maxResource;
-    sim.castAbility('righteous_fury');
-    sim.tick();
-    sim.player.gcdRemaining = 0;
     sim.castAbility('consecration');
 
     const damageEvents: number[] = [];
@@ -219,9 +229,9 @@ describe('threat from damage', () => {
       }
     }
 
-    expect(damageEvents).toHaveLength(5);
-    expect(damageEvents.reduce((sum, amount) => sum + amount, 0)).toBeGreaterThanOrEqual(28 * 5);
-    expect(wolf.threat.get(sim.playerId) ?? 0).toBeGreaterThan(28 * 5 * RIGHTEOUS_FURY_THREAT_MULT);
+    expect(damageEvents).toHaveLength(9);
+    expect(damageEvents.reduce((sum, amount) => sum + amount, 0)).toBeGreaterThanOrEqual(22 * 9);
+    expect(wolf.threat.get(sim.playerId) ?? 0).toBeGreaterThan(22 * 9 * RIGHTEOUS_FURY_THREAT_MULT);
   });
 
   it('classic flat threat values resolve per rank (heroic strike 20/39)', () => {
@@ -562,12 +572,20 @@ describe('taunt and growl', () => {
   });
 
   it('level 10 paladins know Sacred Goad and taunt at 30 yards', () => {
-    expect(abilitiesKnownAt('paladin', 10).some((a) => a.def.id === 'holy_taunt')).toBe(true);
+    const protection = computeTalentModifiers(
+      'paladin',
+      { spec: 'protection', ranks: {}, choices: {} },
+      10,
+    );
+    expect(
+      abilitiesKnownAt('paladin', 10, protection).some((a) => a.def.id === 'sacred_challenge'),
+    ).toBe(true);
 
     const sim = new Sim({ seed: 42, playerClass: 'paladin', noPlayer: true });
     const tank = expectDefined(sim.entities.get(sim.addPlayer('paladin', 'Tank')));
     const dps = expectDefined(sim.entities.get(sim.addPlayer('mage', 'Dps')));
     sim.setPlayerLevel(10, tank.id);
+    expect(sim.setSpec('protection', tank.id)).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf', tank);
     teleport(sim, tank, wolf.pos.x + 25, wolf.pos.z);
     teleport(sim, dps, wolf.pos.x - 2, wolf.pos.z);
@@ -578,7 +596,7 @@ describe('taunt and growl', () => {
     sim.targetEntity(wolf.id, tank.id);
     tank.facing = Math.atan2(wolf.pos.x - tank.pos.x, wolf.pos.z - tank.pos.z);
 
-    sim.castAbility('holy_taunt', tank.id);
+    sim.castAbility('sacred_challenge', tank.id);
     for (let i = 0; i < 25; i++) sim.tick();
 
     expect(wolf.threat.get(tank.id)).toBe(1000);
@@ -600,6 +618,7 @@ describe('taunt and growl', () => {
     const tank = expectDefined(sim.entities.get(sim.addPlayer('paladin', 'Tank')));
     const dps = expectDefined(sim.entities.get(sim.addPlayer('mage', 'Dps')));
     sim.setPlayerLevel(10, tank.id);
+    expect(sim.setSpec('protection', tank.id)).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf', tank);
     wolf.level = tank.level + 3;
     // Range has its own 30-yard contract above. Keep this authority test near
@@ -615,7 +634,7 @@ describe('taunt and growl', () => {
 
     const realChance = sim.rng.chance.bind(sim.rng);
     sim.rng.chance = () => false;
-    sim.castAbility('holy_taunt', tank.id);
+    sim.castAbility('sacred_challenge', tank.id);
     let resisted = false;
     try {
       for (let i = 0; i < 25; i++) {
@@ -982,6 +1001,22 @@ describe('hunter pets', () => {
     expect(rogue.hp).toBeLessThan(stealthedHp);
   });
 
+  it('limits pet damage detection for stealthed enemy players to close range', () => {
+    const { sim, pet, rogue } = activePetDuel();
+    teleport(sim, pet, 0, 0);
+    sim.castAbility('stealth', rogue.id);
+    expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
+
+    teleport(sim, rogue, 12, 0);
+    const outsideHp = rogue.hp;
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBe(outsideHp);
+
+    teleport(sim, rogue, 4, 0);
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBeLessThan(outsideHp);
+  });
+
   it('friendly target spells can affect controlled pets', () => {
     const { sim, wolf: pet } = tamedSetup();
     const druidId = sim.addPlayer('druid', 'Druid');
@@ -1008,17 +1043,17 @@ describe('hunter pets', () => {
 
     const paladinId = sim.addPlayer('paladin', 'Paladin');
     const paladin = expectDefined(sim.entities.get(paladinId));
-    sim.setPlayerLevel(4, paladinId);
+    sim.setPlayerLevel(10, paladinId);
     teleport(sim, paladin, pet.pos.x + 7, pet.pos.z);
     paladin.resource = paladin.maxResource;
-    // Blessing of Might is now a percent attack-power raid buff. Give the pet a base
-    // AP so the percent has something to scale (tamed pets otherwise deal template
-    // damage with 0 attack power, leaving a percent buff inert).
-    pet.attackPower = 50;
-    const attackPowerBefore = asHarness(sim).effectiveAttackPower(pet);
+    sim.partyInvite(paladinId, sim.playerId);
+    sim.partyAccept(paladinId);
+    pet.hp = pet.maxHp - 40;
+    const hpBeforeMendingLight = pet.hp;
     sim.targetEntity(pet.id, paladinId);
-    sim.castAbility('blessing_of_might', paladinId);
-    expect(asHarness(sim).effectiveAttackPower(pet)).toBeGreaterThan(attackPowerBefore);
+    sim.castAbility('holy_light', paladinId);
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(pet.hp).toBeGreaterThan(hpBeforeMendingLight);
 
     pet.hp = pet.maxHp - 40;
     const damagedHp = pet.hp;
@@ -1554,7 +1589,7 @@ describe('druid forms', () => {
     expect(wolf.threat.get(sim.playerId)).toBeGreaterThan(0);
   });
 
-  it('wolf form gains agility/AP and supports prowl into rake bleed opener', () => {
+  it('wolf form gains agility/AP and can build with Flense outside stealth', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(12);
     expect(sim.known.map((k) => k.def.id)).toEqual(
@@ -1570,21 +1605,11 @@ describe('druid forms', () => {
 
     for (let i = 0; i < 32; i++) sim.tick();
     sim.player.resource = 100;
-    sim.castAbility('rake');
-    const events = sim.tick();
-    expect(events.some((e) => e.type === 'error' && /stealthed/.test(e.text))).toBe(true);
-    for (let i = 0; i < 32; i++) sim.tick();
-    sim.castAbility('prowl');
-    sim.tick();
-    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
-
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     teleport(sim, sim.player, wolf.pos.x + 2, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
-    for (let i = 0; i < 32; i++) sim.tick();
-    sim.player.resource = 100;
     // pin the opener's rolls: the wolf can dodge the direct component
     // (rng-stream dependent), which applies the bleed but skips the combo
     // award; a mid-range draw is always a clean non-crit hit
@@ -1593,7 +1618,6 @@ describe('druid forms', () => {
     sim.castAbility('rake');
     sim.tick();
     sim.rng.next = realNext;
-    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(false);
     expect(wolf.auras.some((a) => a.id === 'rake' && a.kind === 'dot')).toBe(true);
     expect(sim.player.comboPoints).toBeGreaterThanOrEqual(1);
   });
@@ -1733,22 +1757,24 @@ describe('caster wand auto-attack (#94)', () => {
   });
 });
 
-describe('on-next-swing cooldowns (#56)', () => {
-  it('Gutting Strike applies its 6s cooldown when the queued swing resolves', () => {
+describe('hunter melee generator', () => {
+  it('Gutting Strike resolves immediately and generates Focus instead of queueing', () => {
     const sim = makeSim('hunter');
     sim.setPlayerLevel(10);
+    expect(sim.setSpec('survival')).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf');
     teleport(sim, sim.player, wolf.pos.x + 2, wolf.pos.z); // inside melee range
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
-    sim.player.resource = sim.player.maxResource;
+    sim.player.resource = 0;
+    const startHp = wolf.hp;
 
-    sim.castAbility('raptor_strike'); // queues on next swing; cooldown not yet set
-    // tick until the auto-attack swing lands and consumes the queued ability
-    for (let i = 0; i < 20 * 4 && sim.player.queuedOnSwing !== null; i++) sim.tick();
+    sim.castAbility('raptor_strike');
 
-    expect(sim.player.queuedOnSwing).toBe(null); // the swing resolved
-    expect(sim.player.cooldowns.get('raptor_strike') ?? 0).toBeGreaterThan(0); // cooldown now ticking
+    expect(sim.player.queuedOnSwing).toBe(null);
+    expect(sim.player.cooldowns.get('raptor_strike') ?? 0).toBe(0);
+    expect(sim.player.resource).toBe(15);
+    expect(wolf.hp).toBeLessThan(startHp);
   });
 });
 

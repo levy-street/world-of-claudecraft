@@ -12,6 +12,7 @@ import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { MAGE_PET_MOBS } from '../src/sim/content/mage_pets';
+import { NECROMANCY_MOBS } from '../src/sim/content/necromancy';
 import {
   CRAFT_RING,
   GATHERING_PROFESSION_IDS,
@@ -623,6 +624,10 @@ describe('retro fallback proof sets stay anchored to the real tables', () => {
     const neverCreditable = new Set([
       ...Object.keys(WARLOCK_PET_MOBS),
       ...Object.keys(MAGE_PET_MOBS),
+      // Necromancer pets sync to owner level like the warlock/mage tables
+      // (createUndead, combat/necromancy.ts) and die inside the same owned-pet
+      // no-credit early return.
+      ...Object.keys(NECROMANCY_MOBS),
       YUMI_TEMPLATE_ID,
     ]);
     const dynamicallyLevelCapped = new Set(Object.keys(RIFT_MOBS));

@@ -84,13 +84,45 @@ interface AttributionTargetFixture {
 // Re-minted for the iOS WebKit memory-profile fix (renderer.ts's
 // nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
 // per-frame cost work already on this release branch. No capture was retaken.
-// Re-minted for the merge of release/v0.36.0 into feature/masterwrought: both
-// sides re-minted since the common base (the release's VFX and iOS memory
-// work, this branch's phase 03 naming re-mint), moving renderer.ts, the prop
-// GLBs, and the lockfile leaves, so the merged tree mints a value matching
-// neither parent. No capture was retaken on either side.
+// Re-minted for the merge of release/v0.36.0 (PR 3161) into the three
+// compileAsync patch branch: the release side moved the rendererIntegration
+// and townRuntime leaves while this branch's lockfile patch moved the GLB and
+// source-fingerprint leaves, so the merged tree mints a value matching
+// neither parent. No capture was retaken.
+// Re-minted on PR 3150's v0.36.0 base merge: the branch's renderer.ts prewarm
+// changes and the PR 3165 reseal converged here. No capture was retaken.
+// Re-minted for the bounded-prewarm point-light pin (renderer.ts edit only).
+// No capture was retaken.
+// Re-minted for the entry-prewarm compile dedupe/batch + initial-frame reserve
+// (renderer.ts + prewarm_policy.ts edits). No capture was retaken.
+// Re-minted for the prewarm coverage completion (settle-state entry, program
+// content keys, widened depth arm). No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 into the render caches branch:
+// the release-side prewarm compile and point-light reseals converge with this
+// branch's bounded character-visual pool wiring on the rendererIntegration
+// leaf, so the merged tree mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3220/3221) into the KTX2
+// mip-release branch: both parents move renderer.ts, so the rendererIntegration
+// leaf mints a value matching neither parent. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3222) into the prewarm
+// sky-unstarve branch: both parents move renderer.ts (this branch also moves
+// prewarm_policy.ts; sky.ts moved too but is not a provenance input), so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the review fixes on the prewarm sky-unstarve PR (deadlineExempt
+// sky entry, unified view-cap trim rule, deferred-lane gate and priority
+// threading; renderer.ts edits only). No capture was retaken.
+// Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
+// archetype and scene-texture counts; renderer.ts edits only). No capture
+// was retaken.
+// Re-minted for the phase 04 QA merge of release/v0.36.0 into
+// feature/masterwrought: both sides re-minted since the common base, moving
+// renderer.ts, prewarm_policy.ts, the prop GLBs, and the lockfile leaves, so
+// the merged tree mints a value matching neither parent. No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'df1c9b32af7f0e1bcfe6c1a8b61e7f4ed7d3194f6196c1b156635f9ed42163de';
+  '93b3fe57d57fdf4179ab96d09b168a9e838e6e663c0cf5555dfec157b22f1e0b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -43,6 +43,7 @@ import type {
 } from './sim';
 import type { BgMatch, BgQueueGroup } from './social/battleground';
 import type { BgOutcomeRecord } from './social/battleground_outcomes';
+import type { BgProposal } from './social/battleground_proposal';
 import type { CardDuelMatch } from './social/card_duel';
 import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
@@ -73,6 +74,10 @@ import type {
   StationDef,
   Vec3,
 } from './types';
+
+export interface DamageResolution {
+  landedHpLoss: number;
+}
 
 // Live primitive views onto the running Sim. These are GETTERS, not snapshots:
 // `time`/`tickCount` advance every tick, and the `rng`/`entities` identities are
@@ -214,6 +219,12 @@ export interface SimContextPrimitives {
   // (social/battleground_outcomes.ts). Observability only: no gameplay branch
   // reads it and nothing here draws rng. Live view; the array stays on Sim.
   readonly bgOutcomes: BgOutcomeRecord[];
+  // Live queue-pop offers awaiting answers (social/battleground_proposal.ts),
+  // the per-pid requeue lockouts a failed offer books, and the offer-id
+  // counter. Live views; the backing collections stay on Sim.
+  readonly bgProposals: BgProposal[];
+  readonly bgProposalLockouts: Map<number, number>;
+  nextBgProposalId: number;
   // Escort quest runs keyed by EscortDef id (src/sim/escort.ts owns every
   // mutation; the backing map stays on Sim). Live view.
   readonly escortRuns: Map<string, EscortRunState>;
@@ -403,6 +414,12 @@ export interface SimContextCallbacks {
     // the Chronomancy Temporal Echo conversion; area Arcane damage heals the
     // marked ally at a reduced rate. Defaults false.
     aoe?: boolean,
+    // Optional out-parameter for consumers that must copy the exact landed HP
+    // loss before reactive healing runs later in the damage pipeline.
+    resolution?: DamageResolution,
+    // The amount is already an exact landed-HP-loss copy. Preserve immunities
+    // and lethal handling, but do not apply target modifiers, absorbs, or redirects again.
+    resolvedHpLoss?: boolean,
   ): number;
   handleDeath(entity: Entity, killer: Entity | null, killerAbility?: string | null): void;
   cancelCast(entity: Entity): void;
@@ -462,7 +479,7 @@ export interface SimContextCallbacks {
     ability: string | null,
     kind: DamageEventKind,
     attackAnimationStarted?: boolean,
-  ): void;
+  ): number;
   cleanupYumiMatch(match: ArenaMatch): void;
   rollLoot(
     mob: Entity,
@@ -485,6 +502,10 @@ export interface SimContextCallbacks {
     abilityId?: string | null,
     canCrit?: boolean,
     canTriggerWeaponProcs?: boolean,
+    beaconTransferEligible?: boolean,
+    alreadyResolved?: boolean,
+    // Out-param, last so the two boolean flags above keep their positions.
+    resolution?: { resolved: number },
   ): number;
   // Spell crit chance from intellect. STAYS on Sim (shared: the casting/ability
   // paths read it too); exposed here so the extracted heal core can draw its crit.
@@ -860,12 +881,14 @@ export interface SimContextCallbacks {
     abilityName: string | null,
     opts: {
       cannotBeDodged?: boolean;
+      normalizedInstant?: boolean;
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;
       forceCrit?: boolean;
       critBonus?: number;
       onDealt?: (amount: number) => void;
+      onEffectiveDamage?: (amount: number) => void;
       abilityId?: string | null;
     },
   ): boolean;
@@ -1248,6 +1271,18 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get bgBusySlots() {
       return host.bgBusySlots;
+    },
+    get bgProposals() {
+      return host.bgProposals;
+    },
+    get bgProposalLockouts() {
+      return host.bgProposalLockouts;
+    },
+    get nextBgProposalId() {
+      return host.nextBgProposalId;
+    },
+    set nextBgProposalId(v) {
+      host.nextBgProposalId = v;
     },
     get bgOutcomes() {
       return host.bgOutcomes;

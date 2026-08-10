@@ -96,6 +96,7 @@ describe('vite dev-server watch ignore list', () => {
         '**/.codex/**',
         '**/.agents/**',
         '**/.worktrees/**',
+        '**/.wt/**',
         '**/.venv/**',
         '**/tmp/**',
       ]),

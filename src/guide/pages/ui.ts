@@ -4,6 +4,7 @@
 // names, ability names, entity names) are passed as raw text to the *Text variants.
 // All interpolation goes through esc().
 
+import { crestImageFallbackAttributes } from '../../ui/crest_image_fallback';
 import { esc } from '../../ui/esc';
 import { type TranslationKey, t } from '../../ui/i18n';
 
@@ -59,8 +60,15 @@ export function reveal(summaryKey: TranslationKey, innerHtml: string): string {
 
 // -------------------------------------------------------------------- images
 /** A decorative procedural icon/crest. alt defaults to empty (the label is adjacent). */
-export function crestImg(src: string, size: number, cls: string, alt = ''): string {
-  return `<img class="${esc(cls)}" src="${esc(src)}" alt="${esc(alt)}" width="${size}" height="${size}" loading="lazy" decoding="async" />`;
+export function crestImg(
+  src: string,
+  size: number,
+  cls: string,
+  alt = '',
+  fallbackCrestId?: string,
+): string {
+  const fallback = fallbackCrestId ? ` ${crestImageFallbackAttributes(fallbackCrestId, size)}` : '';
+  return `<img class="${esc(cls)}" src="${esc(src)}"${fallback} alt="${esc(alt)}" width="${size}" height="${size}" loading="lazy" decoding="async" />`;
 }
 
 // ------------------------------------------------------------- badges + tags

@@ -30,8 +30,15 @@ export function warriorMeleeDefense(defender: Entity, attacker: Entity): Warrior
   const inFront =
     Math.abs(normAngle(angleTo(defender.pos, attacker.pos) - defender.facing)) < WARRIOR_FRONT_ARC;
   if (!inFront) return { parryChance: 0, blockChance: 0 };
+  const blockBonus = defender.auras.reduce(
+    (total, aura) => total + (aura.kind === 'buff_block' ? aura.value : 0),
+    0,
+  );
   return {
     parryChance: defender.templateId === 'warrior' ? warriorParryChance(defender.stats.str) : 0,
-    blockChance: defender.blockValue > 0 && defender.blockChance > 0 ? defender.blockChance : 0,
+    blockChance:
+      defender.blockValue > 0 && defender.blockChance + blockBonus > 0
+        ? Math.min(1, defender.blockChance + blockBonus)
+        : 0,
   };
 }

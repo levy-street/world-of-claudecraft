@@ -31,6 +31,9 @@ export type Setup = {
   cls: PlayerClass;
   spec: string | null;
   form?: 'bear_form';
+  // Warspirit weapon posture, cast after the spec is applied (the shaman
+  // commitment is the Stonebound POSTURE, not the spec alone).
+  imbue?: 'rockbiter_weapon' | 'galeheart_weapon';
 };
 
 // One identical fight per case: same seed, same mob, same window; only the
@@ -52,6 +55,12 @@ export function critsTaken(setup: Setup): { hits: number; crits: number } {
     sim.castAbility(setup.form, pid);
     sim.tick();
     expect(p.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+  }
+  if (setup.imbue) {
+    p.resource = p.maxResource;
+    sim.castAbility(setup.imbue, pid);
+    sim.tick();
+    expect(p.auras.some((a) => a.id === setup.imbue)).toBe(true);
   }
   p.maxHp = 1e9;
   p.hp = p.maxHp;

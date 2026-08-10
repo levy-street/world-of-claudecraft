@@ -20,6 +20,10 @@
 // unchanged. `playerMods` and `fiestaMatchInfo` STAY on Sim (read by ~13 recalc
 // sites / the presentation surface); this module consumes playerMods via ctx.
 
+import { cleanupPaladinAegis } from '../combat/paladin_aegis';
+import { stripSunGodVerdicts } from '../combat/paladin_sun_verdict';
+import { stripPaladinDevotionsFromSource } from '../combat/paladin_support';
+import { emitRainOfFireStop } from '../combat/warlock_meteor_events';
 import {
   AUGMENTS_BY_ID,
   type AugmentDef,
@@ -108,6 +112,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
   const m: TalentModifiers = {
     spec: base.spec,
     role: base.role,
+    selected: { ...base.selected },
     stats: { ...base.stats },
     global: { ...base.global },
     abilities: {},
@@ -162,6 +167,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
           buffPct: 0,
           castWhileMoving: false,
           damagePushbackImmune: false,
+          ignoreStealthRequirement: false,
           bonusCharges: 0,
           addEffects: [],
         };
@@ -294,10 +300,14 @@ export function fiestaRespawnTime(deaths: number, elapsed: number): number {
 export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | null): void {
   e.dead = true;
   e.hp = 0;
+  cleanupPaladinAegis(ctx, e.id);
+  stripSunGodVerdicts(ctx, e.id);
+  stripPaladinDevotionsFromSource(ctx, e.id);
   // Fiesta is a clean-slate minigame with its own timed revive: it intentionally strips
   // ALL auras (including The Keeper's Toll), unlike the overworld/delve death paths.
   e.auras = [];
   e.ccDr.clear();
+  emitRainOfFireStop(ctx, e);
   e.castingAbility = null;
   e.castRemaining = 0;
   e.castTargetId = null;

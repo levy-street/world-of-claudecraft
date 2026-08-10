@@ -10,7 +10,7 @@ describe('character visual pool residency policy', () => {
     expect(shouldRetainPooledCharacterVisual(7, 6)).toBe(false);
   });
 
-  it('preserves the desktop unbounded-pool behavior', () => {
+  it('supports an unbounded cap (the ground-object pool desktop configuration)', () => {
     expect(shouldRetainPooledCharacterVisual(10_000, Number.POSITIVE_INFINITY)).toBe(true);
   });
 
@@ -19,7 +19,7 @@ describe('character visual pool residency policy', () => {
     expect(shouldRetainPooledCharacterVisual(0, Number.NaN)).toBe(false);
   });
 
-  it('is enforced by the renderer pool take and store paths', () => {
+  it('is enforced by the renderer pool take, store, and teardown paths', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const takeStart = renderer.indexOf('private takePooledVisual(');
     const storeStart = renderer.indexOf('private storePooledVisual(', takeStart);
@@ -29,14 +29,19 @@ describe('character visual pool residency policy', () => {
 
     expect(takeStart).toBeGreaterThan(-1);
     expect(storeStart).toBeGreaterThan(takeStart);
-    expect(store).toContain(
-      'shouldRetainPooledCharacterVisual(this.pooledVisualCount, GFX.maxPooledCharacterVisuals)',
+    // The character pool routes every release through the bounded LRU store
+    // (which evicts + disposes least-recently-released overflow under the
+    // live GFX cap; see tests/character_visual_pool.test.ts for its unit
+    // behavior), and every acquire through the pool take.
+    expect(store).toContain('this.visualPool.store(key, visual, GFX.maxPooledCharacterVisuals)');
+    expect(take).toContain('this.visualPool.take(key)');
+    // Terminal teardown drains the pool and really disposes every visual.
+    expect(renderer).toContain(
+      'for (const visual of this.visualPool.drain()) bestEffort(() => visual.dispose());',
     );
-    expect(take).toContain('this.pooledVisualCount = Math.max(0, this.pooledVisualCount - 1)');
-    expect(store).toContain('visual.dispose();');
-    expect(store).toContain('this.pooledVisualCount++;');
-    expect(store.indexOf('visual.dispose();')).toBeLessThan(
-      store.indexOf('this.pooledVisualCount++;'),
+    // The ground-object pool still gates retention on this policy predicate.
+    expect(renderer).toContain(
+      'shouldRetainPooledCharacterVisual(this.pooledObjectCount, GFX.maxPooledObjects)',
     );
   });
 });

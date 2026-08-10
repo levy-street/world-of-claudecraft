@@ -16,6 +16,7 @@ const CHANNELS = [
   ['guide.social.chanYell', 'guide.social.chanYellBody'],
   ['guide.social.chanWhisper', 'guide.social.chanWhisperBody'],
   ['guide.social.chanParty', 'guide.social.chanPartyBody'],
+  ['guide.social.chanBattleground', 'guide.social.chanBattlegroundBody'],
   ['guide.social.chanGeneral', 'guide.social.chanGeneralBody'],
   ['guide.social.chanWorld', 'guide.social.chanWorldBody'],
   ['guide.social.chanLfg', 'guide.social.chanLfgBody'],

@@ -95,7 +95,7 @@ describe('ability VFX steady-state frame cost', () => {
         fx.orbit(id, 'runes', 0x00ff00);
         fx.holdShell(id, 0x0000ff);
         fx.holdGroundAura(id, 0, 0x00ffff, true);
-        fx.holdStunStars(id, 3);
+        fx.holdCcBand(id, 'stun', 3);
       }
     };
     holdHeldFamilies();

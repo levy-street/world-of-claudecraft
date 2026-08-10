@@ -497,6 +497,19 @@ export class ChatWindowController {
       : this.activeChatTab;
   }
 
+  /**
+   * Drop a battleground send-stickiness when the match that justified it ends.
+   *
+   * The server clears its own `session.rememberedChat` on `bgEnd`, but that is a
+   * different piece of state: the HUD composes a plain line through THIS sticky
+   * before anything is sent, so without this the first plain line after every
+   * match is still composed as `/bg ...` and comes back refused. Scoped to the
+   * battleground target so a `say` or `whisper` sticky is untouched.
+   */
+  clearBattlegroundSticky(): void {
+    if (this.stickyTarget === 'battleground') this.stickyTarget = 'say';
+  }
+
   private sendChannel(): ChatTabChannel | null {
     const tab = this.filterTab();
     return tab !== null && isChatTabChannel(tab) ? tab : null;

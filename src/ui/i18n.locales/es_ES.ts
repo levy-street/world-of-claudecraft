@@ -365,4 +365,118 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.guildRenamed':
     'Tu hermandad ha sido renombrada a {name} por el equipo de moderación.',
   'hudChrome.options.hideUnusedActionSlots': 'Ocultar casillas de acción sin usar',
+  'abilityUi.tooltip.requiresStealthSkulduggery':
+    'Requiere sigilo (no hace falta con 3 de Penumbra ni durante el velo de sombras)',
+  'entities.abilities.abyssal_rift.description':
+    'Abre una grieta en el lugar seleccionado, atrayendo hacia su centro a los enemigos en 8 m, infligiendo {damage} de daño de las Sombras y aturdiéndolos durante 2 s. Los jefes reciben el daño, pero resisten la atracción y el aturdimiento.',
+  'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
+  'entities.abilities.ambush.specNote_subtlety':
+    'Usado desde el Velo Crepuscular, esto añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarlo SIN sigilo y desde cualquier ángulo: ese uso no cuesta nada, gasta los 3 de Penumbra, inicia el velo de sombras de 6 s, y golpea por el doble.',
+  'entities.abilities.backstab.specNote_assassination':
+    'Cada golpe añade 1 de Ritual de Veneno (máx. 6) y restaura 15 de energía. Con 6 de Ritual de Veneno, Descanso Eterno se convierte en Desgarraveneno (inflige al instante todo tu daño de sangrado restante).',
+  'entities.abilities.blade_flurry.description':
+    'Desata una ráfaga de hojas, aumentando la velocidad de ataque un 20% durante 12 s. (motor de Thuggery)',
+  'entities.abilities.cheap_shot.description':
+    'Golpea al objetivo por {damage} de daño, aturdiéndolo durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo.',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    'Usado desde el Velo Crepuscular, esto añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarlo SIN sigilo: ese uso no cuesta nada, gasta los 3 de Penumbra e inicia el velo de sombras de 6 s.',
+  'entities.abilities.claw.description':
+    'Zarpea al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.',
+  'entities.abilities.claw.specNote_feral':
+    'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
+  'entities.abilities.cold_blood.description':
+    'Concentra tu instinto asesino para que tu próximo ataque sea un golpe crítico. (motor de Knifework)',
+  'entities.abilities.dark_pact.description':
+    'Sacrifica un 10% de tu salud actual para absorber una cantidad de daño equivalente al 30% de tu salud máxima durante 8 s.',
+  'entities.abilities.dark_pact.name': 'Sanguine Covenant',
+  'entities.abilities.elemental_trance.description':
+    'Entra en un trance elemental durante 15 s, reduciendo el daño recibido un 30% y convirtiendo el 20% de todo el daño que infliges en maná. (habilidad distintiva de Espíritu Guerrero)',
+  'entities.abilities.elemental_trance.name': 'Elemental Trance',
+  'entities.abilities.eviscerate.description': 'Movimiento de remate que inflige {damage}.',
+  'entities.abilities.eviscerate.specNote_assassination':
+    'Con 6 de Ritual de Veneno, este botón se convierte en Desgarraveneno: un golpe que inflige al instante todo el daño que tus sangrados aún habrían infligido, planta una herida nueva de Desgarro venenoso y restaura 20 de energía.',
+  'entities.abilities.eviscerate.specNote_combat':
+    'Conectar esto con 4 o más puntos de combo inicia la Redline durante 8 s: Tajo Perverso se convierte en Golpe al cuerpo y este botón se convierte en Golpe de nocaut (45 más 35 por punto de combo, un 25% más fuerte por cada nivel de la Redline, restaura 25 de energía). Gástalo antes de que termine la Redline.',
+  'entities.abilities.expose_armor.description':
+    'Movimiento de remate que expone al objetivo durante 30 s: cada punto de combo gastado reduce su armadura un 2% (5 puntos de combo: {damage}%).',
+  'entities.abilities.ferocious_bite.description':
+    'Movimiento de remate que inflige {damage}. Solo en Forma de lobo.',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja: un mordisco de 70 más 43 por punto de combo que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura 30 de energía.',
+  'entities.abilities.garrote.description':
+    'Enrolla un alambre alrededor de la garganta del enemigo, infligiendo {damage} de daño al instante y {overTime} de sangrado a lo largo de 18 s. Debes estar en sigilo. Otorga 1 punto de combo.',
+  'entities.abilities.garrote.specNote_subtlety':
+    'Usado desde el Velo Crepuscular, esto añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarlo SIN sigilo: ese uso no cuesta nada, gasta los 3 de Penumbra e inicia el velo de sombras de 6 s.',
+  'entities.abilities.hemorrhage.description':
+    'Golpea al enemigo por daño de arma más {damage}, causa daño de sangrado durante 12 s y aumenta el daño de sangrado recibido un 40%. Otorga 1 punto de combo. Cada segundo uso añade 1 de Penumbra (máx. 3). (motor de Skulduggery)',
+  'entities.abilities.kidney_shot.description':
+    'Movimiento de remate que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s).',
+  'entities.abilities.maul.description':
+    'Un ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y causa una gran cantidad de amenaza. Se activa en tu siguiente golpe. Solo en forma de Bruin.',
+  'entities.abilities.maul.specNote_feral':
+    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te protege con un escudo equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
+  'entities.abilities.ossuary_mark.description':
+    'Marca a un enemigo durante 12 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 m y crea 1 Fragmento de alma.',
+  'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
+  'entities.abilities.rake.specNote_feral':
+    'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
+  'entities.abilities.regrowth.description':
+    'Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 21 s.',
+  'entities.abilities.regrowth.specNote_restoration':
+    'Plantar una NUEVA floración añade 1 de Verdor (máx. 5).',
+  'entities.abilities.rejuvenation.description': 'Sana al objetivo por {damage} durante 12 s.',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    'Plantar una NUEVA floración añade 1 de Verdor (máx. 5). Con 5 de Verdor, Alivio presto se convierte en Sobrefloración.',
+  'entities.abilities.rip.description':
+    'Movimiento de remate que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.',
+  'entities.abilities.ruinous_brand.description':
+    'Marca a un enemigo durante 15 s. Tus próximos 3 hechizos directos hacen eco por un 25% de daño contra el enemigo marcado, o copian un 50% de daño hacia él cuando se lanzan contra otro objetivo.',
+  'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
+  'entities.abilities.rupture.description':
+    'Movimiento de remate que hiere al objetivo: sangra cada 2 s, durante 6 s más 2 s por punto de combo (5 puntos de combo: 16 s y {damage} de daño total).',
+  'entities.abilities.sacrilegious_march.description':
+    'Aumenta la velocidad de movimiento un 35%, pero sacrifica un 2% de tu salud máxima cada segundo. Vuelve a lanzarlo para cancelarlo. Se desactiva al llegar al 20% de salud.',
+  'entities.abilities.sacrilegious_march.name': 'Sacrilegious March',
+  'entities.abilities.sinister_strike.specNote_combat':
+    'Mientras la Redline está activa, este botón se convierte en Golpe al cuerpo: 130% de daño de arma más 10, otorga 2 puntos de combo y añade 1 de Redline (máx. 4).',
+  'entities.abilities.slice_and_dice.description':
+    'Movimiento de remate que aumenta la velocidad de ataque cuerpo a cuerpo un 30% durante 12 s más 4 s por punto de combo (5 puntos de combo: 32 s).',
+  'entities.abilities.soul_lance.description':
+    'Lanza una lanza espectral que inflige {damage} de daño de las Sombras. Contra tu Ossuary Mark, el 50% de su daño se añade a la marca.',
+  'entities.abilities.soul_lance.name': 'Soul Lance',
+  'entities.abilities.soulwell.description':
+    'Invoca un Soulwell durante 3 min. Mientras estén fuera de combate, los miembros del grupo pueden recargar sus Piedras de alma hasta 3. Una Piedra de alma restaura el 25% de la salud máxima y comparte el tiempo de reutilización de las pociones.',
+  'entities.abilities.soulwell.name': 'Soulwell',
+  'entities.abilities.starfire.description':
+    'Hace caer un rayo de fuego estelar que causa {damage} de daño Arcano.',
+  'entities.abilities.starfire.specNote_balance':
+    'En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe instantáneo de 80 a 100 de daño de Naturaleza más una quemadura de 45 a lo largo de 9 s, que restaura 35 de maná y gasta los 3.',
+  'entities.abilities.stealth.description':
+    'Te oculta entre las sombras: los enemigos apenas te perciben, pero te mueves un 50% más lento. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarlo para salir de él.',
+  'entities.abilities.swiftmend.description':
+    'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Las plantaciones de Floración Silvestre y Segundo Florecer añaden Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por el 60% de su sanación restante. (habilidad distintiva de Restauración)',
+  'entities.abilities.swipe.description':
+    'Barre con tus garras a los enemigos cercanos infligiendo {damage} de daño. Causa amenaza adicional. Solo en forma de Bruin.',
+  'entities.abilities.swipe.specNote_feral':
+    'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
+  'entities.abilities.venom_dart.specNote_assassination':
+    'Añade 1 de Ritual de Veneno y prolonga tu herida de Desgarro venenoso 6 s (nunca supera los 20 s).',
+  'entities.items.soul_stone.name': 'Piedra de alma',
+  'hud.pet.abyssalChainDesc':
+    'Ordena a tu Duskmurk que arrastre a un enemigo normal de más de 8 m y hasta 20 m de vuelta hacia sí. Los jefes no pueden ser arrastrados. Tiempo de reutilización: 15 segundos. Haz clic con el botón derecho, mantén la pulsación táctil, o pulsa Mayús+Intro para alternar el lanzamiento automático.',
+  'hud.pet.autocastOff':
+    'Lanzamiento automático desactivado. Haz clic con el botón derecho, mantén la pulsación táctil, o pulsa Mayús+Intro para activarlo.',
+  'hud.pet.autocastOn':
+    'Lanzamiento automático activado. Haz clic con el botón derecho, mantén la pulsación táctil, o pulsa Mayús+Intro para desactivarlo.',
+  'hud.pet.felbolt': 'Descarga de Ceniza',
+  'hud.pet.felboltDesc':
+    'Ordena a tu Emberkin que lance un proyectil de ceniza extra a tu objetivo. Tiempo de reutilización: 8 segundos. Haz clic con el botón derecho, mantén la pulsación táctil, o pulsa Mayús+Intro para alternar el lanzamiento automático.',
+  'hud.pet.felboltTitle': 'Descarga de Ceniza',
+  'hudChrome.auraEffect.elementalTrance':
+    'Reduce el daño recibido un {pct}%. El {mana}% de todo el daño que infliges se convierte en maná',
+  'hudChrome.auraEffect.galeheartWeapon':
+    'Completar la cadencia del Espíritu Guerrero de {steps} golpes hace eco del golpe {count} veces, infligiendo un {pct}% de su daño como daño de Naturaleza',
+  'hudChrome.warlock.doomMeterLock': 'Bloquear la barra de recurso de Aflicción',
+  'hudChrome.warlock.doomMeterUnlock': 'Mover la barra de recurso de Aflicción',
+  'hudChrome.warlock.fateThreadsStatus': '{value} de {max} Hilos del destino.',
 };

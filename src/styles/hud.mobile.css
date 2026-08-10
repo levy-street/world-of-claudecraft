@@ -64,9 +64,17 @@
   body.mobile-touch #proc-overlay {
     scale: 0.2;
   }
+  /* The Soul Fragment bank is a persistent resource readout, not a transient
+     proc silhouette. Keep its crystals legible and draggable on touch screens. */
+  body.mobile-touch #proc-overlay.necromancy {
+    scale: 0.55;
+  }
   body.mobile-touch .aura-overlay-arc {
     top: 14px;
     height: 156px;
+  }
+  body.mobile-touch #proc-overlay.destruction {
+    scale: 0.6;
   }
   /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
@@ -928,12 +936,65 @@
       0 0 12px #ffd100aa,
       inset 0 0 0 1px #ffd10077;
   }
+  body.mobile-touch #mobile-action-ring button.proc {
+    border-color: #ffd97a;
+    box-shadow:
+      0 0 12px #ffcf40e6,
+      inset 0 0 6px #ffcf4066;
+    animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
+  }
   body.mobile-touch #mobile-action-ring button.empowered {
     border-color: var(--gold);
     box-shadow:
       0 0 14px #ffd100dd,
       inset 0 0 0 1px #fff0a6aa;
     animation: action-empowered-pulse 1.15s ease-in-out infinite;
+  }
+  body.mobile-touch #mobile-action-ring button.ascension-spender::after {
+    content: attr(data-ascension-cost);
+    position: absolute;
+    left: 2px;
+    bottom: 2px;
+    z-index: 7;
+    min-width: 16px;
+    height: 14px;
+    padding: 0 2px;
+    border: 1px solid var(--color-ascension);
+    border-radius: 7px;
+    background: var(--color-bg-dark);
+    color: var(--color-ascension);
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 12px;
+    text-align: center;
+    text-shadow: 0 1px var(--text-outline-color);
+    box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) var(--color-primary-glow-heavy);
+  }
+  body.mobile-touch:has(.paladin-devotion.last-charge) #mobile-action-ring button.empowered {
+    animation-duration: 0.55s;
+    filter: brightness(1.18);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-action-ring button.proc,
+    body.mobile-touch #mobile-action-ring button.empowered {
+      animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch #mobile-action-ring button.proc {
+      forced-color-adjust: none;
+      border: 3px double Highlight;
+      outline: 1px solid CanvasText;
+      box-shadow: none;
+    }
+    body.mobile-touch #mobile-action-ring button.ascension-spender::after {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Canvas;
+      color: Highlight;
+      box-shadow: none;
+    }
   }
   body.mobile-touch #mobile-action-ring button.used {
     border-color: var(--gold);
@@ -1823,6 +1884,28 @@
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: center bottom;
   }
+  body.mobile-touch .warlock-doom-frame {
+    position: fixed;
+    z-index: 21;
+    left: 50%;
+    bottom: calc(66px + env(safe-area-inset-bottom));
+    width: min(246px, 62vw);
+    height: 40px;
+    margin: 0;
+    transform: translateX(-50%);
+  }
+  body.mobile-touch .warlock-doom {
+    width: 100%;
+    height: 14px;
+  }
+  body.mobile-touch .warlock-doom-label {
+    font-size: 10px;
+  }
+  body.mobile-touch .warlock-fate-threads {
+    width: 170px;
+    height: 21px;
+    gap: 17px;
+  }
   /* Pet frame on mobile: the desktop rule keeps it in the #actionbar-stack flow,
      which does not exist here (the player frame is lifted out to position:fixed),
      so re-seat it into the same reserved bottom-centre column, stacked ABOVE the
@@ -1859,6 +1942,31 @@
   }
   body.mobile-touch #player-frame .portrait-wrap {
     z-index: 3;
+  }
+  /* Independent Devotion medallion: compact enough for the phone battlefield,
+     but no longer attached to or covering the player portrait. */
+  body.mobile-touch .paladin-devotion-frame {
+    width: 72px;
+    height: 72px;
+  }
+  body.mobile-touch .paladin-devotion {
+    width: 72px;
+    height: 72px;
+  }
+  body.mobile-touch .paladin-ascension-charges {
+    top: -4px;
+    left: 8px;
+    width: 56px;
+  }
+  body.mobile-touch .paladin-ascension-charges span {
+    width: 9px;
+    height: 9px;
+  }
+  body.mobile-touch .paladin-devotion-label {
+    right: -10px;
+    bottom: -4px;
+    min-width: 40px;
+    font-size: 9px;
   }
   body.mobile-touch #player-frame .uf-bars {
     position: relative;
@@ -2673,18 +2781,22 @@
   body.mobile-touch #daily-rewards-window {
     z-index: 95;
   }
-  /* Issue 1577 round 2 (5): the Daily Rewards window's entries (intro, the daily
-     summary, the spin section, the Verify Wallet card, tasks, leaderboard) used
-     to stack in a single tall column, wasting the wide landscape viewport and
-     forcing a long scroll. Flow them into 2 balanced columns; break-inside:avoid
-     keeps each card whole across the column break. */
-  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
-    column-count: 2;
-    column-gap: 12px;
+  /* Keep Daily Rewards in one vertical flow on touch. The rewards-only window
+     is width-capped for readability, while its body scrolls vertically and
+     suppresses horizontal overflow so no content is stranded off-screen. */
+  body.mobile-touch #daily-rewards-window:not(.store-active) {
+    width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
   }
-  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body > * {
-    break-inside: avoid;
-    margin-bottom: 10px;
+  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
+    columns: initial;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  /* The spin overlay is appended directly to body. Keep it above the raised
+    mobile #ui window layer and the mobile window backdrop. */
+  body.mobile-touch .dr-spin-overlay {
+    z-index: 101;
   }
   body.mobile-touch #daily-rewards-window {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
@@ -2694,6 +2806,28 @@
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
     padding: 10px;
   }
+  body.mobile-touch .dr-spin-stage {
+    width: min(360px, calc(var(--app-vw, 100vw) - 24px), calc(var(--app-vh, 100dvh) - 24px));
+  }
+  body.mobile-touch .dr-spin-wheel-big {
+    width: 300px;
+    max-width: 84%;
+  }
+  body.mobile-touch .dr-spin-wheel-big span {
+    transform: rotate(calc(var(--i) * 45deg + 22.5deg)) translateY(-106px)
+      rotate(calc(var(--i) * -45deg - 22.5deg));
+  }
+  body.mobile-touch .dr-spin-result {
+    width: 120px;
+    height: 120px;
+    font-size: 18px;
+  }
+  body.mobile-touch .dr-spin-pointer {
+    border-left-width: 13px;
+    border-right-width: 13px;
+    border-top-width: 24px;
+  }
+  /* Mobile touch store */
   body.mobile-touch .woc-store-tabs button {
     min-width: 112px;
     min-height: 44px;
@@ -5868,6 +6002,10 @@
   body.mobile-touch #dungeon-finder-window .btn,
   body.mobile-touch #dungeon-finder-window select,
   body.mobile-touch #dfinder-proposal-popup .btn {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #bg-proposal-popup .btn {
     min-height: 40px;
     box-sizing: border-box;
   }

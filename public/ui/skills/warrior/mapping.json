@@ -822,6 +822,12 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Sudden Death (sudden_death)\nCanonical mechanic: Passive Arms trait: each connected auto-attack has a 10% chance to grant a 10 sec aura making Early Grave free and usable at any target health.\nSubject: A skull over a broken health ring, bisected by an execution slash and zero-cost spark.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "intervene",
+      "sourcePack": "woc_openai_gpt_image_2_intervene_2026_08_07",
+      "sourceFile": "gpt-image-2 /images/edits, style-referenced from die_by_sword.webp, victory_rush.webp, bloodthirst.webp, charge.webp",
+      "output": "intervene.webp"
     }
   ],
   "deferredStayProcedural": {},

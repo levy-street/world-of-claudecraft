@@ -99,7 +99,12 @@ describe('new release item ids stay out of loot containers (deploy window)', () 
     // exactly four reins into heroic boss loot on deployed-base encounters,
     // and the v0.34.0 merge deliberately admitted the six Wildheart Basin
     // epics beside them (the audited union; the decision is recorded in the
-    // banner and DEPLOY.md). The whole table's id set is frozen for the
+    // banner and DEPLOY.md). The v0.36.0 class-overhauls integration admits
+    // ONE more id the same way (owner decision 2026-08-08, recorded in
+    // DEPLOY.md): heroic_duskwhisper, the generated heroic variant of the
+    // rogue re-band's Duskwhisper on the Fanglord Beastmaster. A stale
+    // bundle renders the drop through the unknown-item fallback, the same
+    // throw arm the Wildheart six rode. The whole table's id set is frozen for the
     // window, not just the reins_ slice: a fifth mount, a rift id, a packet
     // id, or ANY new id entering HEROIC_BOSS_LOOT while stale bundles live
     // is a new deployed-bundle throw arm and must be a deliberate decision

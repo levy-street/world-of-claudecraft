@@ -138,7 +138,7 @@ describe('#1608: potionHp/potionMana ladder', () => {
   // (no-gear) pool at that resource, per the design comment above
   // minor_healing_potion in content/items.ts: priest for hp, hunter for mana.
   function basePoolAt(
-    cls: 'priest' | 'hunter',
+    cls: 'priest' | 'paladin',
     level: number,
   ): { maxHp: number; maxResource: number } {
     const sim = new Sim({ seed: 1, playerClass: cls, autoEquip: false, noPlayer: true });
@@ -184,9 +184,11 @@ describe('#1608: potionHp/potionMana ladder', () => {
   );
 
   it.each(MANA_TIERS)(
-    "%s restores a meaningful, documented fraction (0.55-0.85) of a hunter's base mana pool at its bracket top",
+    // Hunters run on focus on this line (the hunter overhaul), so the potion
+    // floor's subject is the smallest MANA pool: the paladin.
+    "%s restores a meaningful, documented fraction (0.55-0.85) of a paladin's base mana pool at its bracket top",
     (itemId, topLevel) => {
-      const { maxResource } = basePoolAt('hunter', topLevel);
+      const { maxResource } = basePoolAt('paladin', topLevel);
       const fraction = potionMana(itemId) / maxResource;
       expect(fraction).toBeGreaterThanOrEqual(0.55);
       expect(fraction).toBeLessThanOrEqual(0.85);

@@ -161,11 +161,6 @@ export function autoJoinEnabled(cfg: DiscordConfig): boolean {
   return cfg.botToken !== '' && isDiscordSnowflake(cfg.guildId);
 }
 
-/** Whether the feature is configured. Read by the route table + client UI gate. */
-export function discordEnabled(): boolean {
-  return discordConfig() !== null;
-}
-
 export function discordInviteUrl(): string {
   return process.env.DISCORD_GUILD_INVITE || DEFAULT_INVITE;
 }

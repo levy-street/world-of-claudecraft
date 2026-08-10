@@ -82,11 +82,28 @@ export type EntityTranslationField =
   | ItemSetBonusField
   | 'sender'
   | 'subject'
-  | 'body';
+  | 'body'
+  | AbilitySpecNoteField;
+
+/** Per-spec tooltip note fields (spec-aware ability tooltips): rendered only
+ *  for the player's current specialization. One literal per spec that carries
+ *  notes today, so a typo'd spec id fails the type check. */
+export type AbilitySpecNoteField =
+  | 'specNote_assassination'
+  | 'specNote_combat'
+  | 'specNote_subtlety'
+  | 'specNote_balance'
+  | 'specNote_feral'
+  | 'specNote_restoration';
 
 export type EntityTranslationRequest =
   | { kind: 'class'; id: PlayerClass; field: 'name' | 'description'; values?: InterpolationValues }
-  | { kind: 'ability'; id: string; field: 'name' | 'description'; values?: InterpolationValues }
+  | {
+      kind: 'ability';
+      id: string;
+      field: 'name' | 'description' | AbilitySpecNoteField;
+      values?: InterpolationValues;
+    }
   | { kind: 'item'; id: string; field: 'name'; values?: InterpolationValues }
   | {
       kind: 'itemSet';
@@ -367,6 +384,42 @@ export function entityTranslationKey(request: EntityTranslationRequest): string 
   }
 }
 
+// tEntity sits on per-frame paths (nameplates, aura names, HUD frames), and
+// entityTranslationKey allocates a template literal plus runs the
+// entityPathSegment regex on EVERY call for ids that never change
+// (hitch-elimination B3). The nested memo serves a stable (kind, id, field)
+// triple with three Map reads and zero allocation. Keys derive only from
+// static content ids, never from the locale, so the memo never invalidates
+// (the localized TEXT memo lives in i18n.ts behind the resolution revision).
+// The compound kinds (questObjective, zonePoi) carry an index and stay on the
+// direct builder: their surfaces (quest log, map POIs) are cold.
+// No eviction on purpose: the ids that arrive at runtime (loot and mail entity
+// ids, wire snapshots) all name entities shipped in src/sim/content, so the
+// memo stays bounded by the static content catalog.
+const entityKeyMemo = new Map<EntityTranslationKind, Map<string, Map<string, string>>>();
+
+function cachedEntityTranslationKey(request: EntityTranslationRequest): string {
+  if (request.kind === 'questObjective' || request.kind === 'zonePoi') {
+    return entityTranslationKey(request);
+  }
+  let byId = entityKeyMemo.get(request.kind);
+  if (!byId) {
+    byId = new Map();
+    entityKeyMemo.set(request.kind, byId);
+  }
+  let byField = byId.get(request.id);
+  if (!byField) {
+    byField = new Map();
+    byId.set(request.id, byField);
+  }
+  let key = byField.get(request.field);
+  if (key === undefined) {
+    key = entityTranslationKey(request);
+    byField.set(request.field, key);
+  }
+  return key;
+}
+
 function requestManifestEntry(request: EntityTranslationRequest): EntityTranslationManifestEntry {
   const id =
     request.kind === 'questObjective'
@@ -399,7 +452,7 @@ function recordFallback(request: EntityTranslationRequest, value: string): void 
 }
 
 export function tEntity(request: EntityTranslationRequest): string {
-  const key = entityTranslationKey(request);
+  const key = cachedEntityTranslationKey(request);
   const translated = tOptional(key, request.values);
   if (translated !== null) return translated;
   const fallback = interpolateSource(canonicalEntityText(request), request.values);
@@ -495,6 +548,21 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
         entityTranslationKey({ kind: 'ability', id: ability.id, field: 'description' }),
       ),
     );
+    for (const [spec, note] of Object.entries(ability.specNotes ?? {}).sort(([a], [b]) =>
+      a.localeCompare(b),
+    )) {
+      const field = `specNote_${spec}` as AbilitySpecNoteField;
+      entries.push(
+        entry(
+          'ability',
+          ability.id,
+          field,
+          note,
+          'classAbility',
+          entityTranslationKey({ kind: 'ability', id: ability.id, field }),
+        ),
+      );
+    }
   }
   for (const item of Object.values(ITEMS).sort(compareById)) {
     // Heroic upgraded variants carry no name key: they share the base item's name

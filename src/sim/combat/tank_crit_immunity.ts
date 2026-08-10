@@ -33,5 +33,13 @@ export function isCritImmuneTank(target: Entity, meta: TankCritImmunityMeta | un
   if (meta.cls === 'druid' && spec === 'feral') {
     return target.auras.some((a) => a.kind === 'form_bear');
   }
+  if (meta.cls === 'shaman' && spec === 'enhancement') {
+    // The Warspirit commitment is the Stonebound POSTURE, not the spec: the
+    // imbue that grants the armor, damage reduction, doubled threat and jolt
+    // taunt (combat/shaman_warspirit.ts STONEBOUND_WEAPON_ID; the id literal
+    // is cross-pinned by tests/tank_crit_immunity_shaman_pair.test.ts so this
+    // leaf stays import-free). A Galeheart shaman remains crittable.
+    return target.auras.some((a) => a.id === 'rockbiter_weapon');
+  }
   return false;
 }

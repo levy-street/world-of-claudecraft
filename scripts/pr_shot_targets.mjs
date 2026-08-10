@@ -196,6 +196,10 @@ export const TARGETS = [
       { key: 'carry-scoreboard', scene: 'carry' },
       { key: 'scoreboard-mobile', scene: 'carry', mobile: true },
       { key: 'match-board', scene: 'board' },
+      // The kill feed carries PLAYER NAMES, which run to 24 characters, so the
+      // shot deliberately uses long ones: the shearing this scene exists to
+      // witness only shows up once a name is wider than the banner.
+      { key: 'kill-feed', scene: 'killfeed' },
       { key: 'field-map', scene: 'map' },
       // last on purpose: it kills the player, which would pollute later scenes
       { key: 'graveyard', scene: 'graveyard' },
@@ -220,7 +224,7 @@ export const TARGETS = [
       const staged = await page.evaluate(() => {
         const game = window.__game;
         const sim = game?.sim;
-        if (!sim || !sim.player) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
         if (!sim.bgMatchFor(sim.player.id)) {
           const classes = [
             'warrior',
@@ -307,6 +311,34 @@ export const TARGETS = [
           window.__game.input.camPitch = 0.4;
         });
         await wait(800);
+      }
+      if (scene === 'killfeed') {
+        // Push straight at the feed rather than staging real deaths: the banner
+        // is the subject, and real kills give no control over the NAME LENGTHS
+        // that decide whether it shears.
+        await page.evaluate(() => {
+          const feed = window.__game.hud.bgKillFeed;
+          const now = performance.now() / 1000;
+          feed.push(
+            { killerName: 'MYTxMeykolZ', victimName: 'PEEKOMAXIMUS', killerTeam: 1, victimTeam: 0 },
+            now,
+          );
+          feed.push(
+            { killerName: 'Nine', victimName: 'NUNCHUCKS', killerTeam: 0, victimTeam: 1 },
+            now,
+          );
+          feed.push(
+            {
+              killerName: 'Bramblethornwick',
+              victimName: 'Stormhammerfel',
+              killerTeam: 1,
+              victimTeam: 0,
+            },
+            now,
+          );
+        });
+        await wait(400);
+        return { clip: '#bg-killfeed' };
       }
       if (scene === 'board') {
         // pin the hover-expanded match board open and shoot just the strip
@@ -424,9 +456,7 @@ export const TARGETS = [
           document.querySelector('.gpu-notice-dismiss')?.click();
           const el = document.querySelector('#banner');
           return (
-            el !== null &&
-            el.classList.contains('banner-skill') &&
-            Number(getComputedStyle(el).opacity) > 0.95
+            el?.classList.contains('banner-skill') && Number(getComputedStyle(el).opacity) > 0.95
           );
         });
         if (visible) break;
@@ -531,24 +561,93 @@ export const TARGETS = [
     },
   },
   {
-    key: 'stun-stars',
-    label: 'Persistent stunned-star band over a stunned mob, past the cast moment',
-    // One token, and it covers the whole shipping surface: the band lives in
+    key: 'cc-bands',
+    label: 'Held crowd-control bands (stun, root, fear) worn past the cast moment',
+    // How long to wait for the cast to land its aura. Generous on purpose:
+    // the offline sim advances on the client's own frame loop, which under
+    // headless SwiftShader runs in stalled bursts, so a 1.5s cast has taken
+    // anywhere from 3s to past 12s of wall clock on a loaded host. Expiring
+    // early reports "aura never applied", which reads as bad target data
+    // rather than a slow machine.
+    ccAuraPollBudgetMs: 25000,
+    // One token, and it covers the whole shipping surface: the bands live in
     // 'render/ability_vfx_core.ts' plus 'render/ability_vfx/{fx,painter,
     // sequencer}.ts', all of which this prefix matches. (An earlier
     // 'stun_stars' token named no shipping module at all, so it only ever
     // matched the test file.)
     when: ['render/ability_vfx'],
     variants: [
-      // Sundering Gavel rank 2 (4s stun) rather than Thunderhurl (3s): the
-      // capture pipeline spends ~0.7s between the aura poll and the shutter,
-      // and the star alpha fades over the stun's final second, so the longer
-      // stun is what keeps the shot inside the full-alpha read.
+      // One variant per band type, each staged on a class that actually owns
+      // the ability. `level` is the ability's own learn level (the rank the
+      // duration below refers to), `auraKind`/`auraId` are exactly what the
+      // band rule keys off, and `settleMs` is how long past the aura landing
+      // the shutter waits.
+      //
+      // settleMs is set per variant against ONE constraint: land inside the
+      // band's full-alpha read (the alpha fades over the aura's final second)
+      // while clearing the sequencer's cast-moment burst (~1.8s). The capture
+      // pipeline spends another ~0.7s between the aura poll and the shutter.
       {
+        // Sundering Gavel rank 2 (4s stun) rather than Storm Bolt (3s): the
+        // longer stun is what keeps the shot inside the full-alpha read.
         key: 'sundering-gavel-desktop',
         charClass: 'paladin',
         charName: 'Aurelius',
         abilityId: 'hammer_of_justice',
+        level: 16,
+        auraKind: 'stun',
+        settleMs: 1900,
+      },
+      {
+        // Icebind (frost_nova): 8s, instant, and self-centred, so the nearby
+        // victim is rooted with no cast to stall on. Chosen over Gripping
+        // Roots deliberately. Every player root ability has an authored vfx
+        // spec, so all of them ALREADY wear a spec-coloured worn-debuff
+        // ground band, and shot against the nature-green Gripping Roots the
+        // new band is green on green and proves nothing. Icebind's spec is
+        // frost BLUE, so the green ankle shards this change adds are
+        // unmistakably the new read. (The genuinely uncovered root sources
+        // are the unspec'd ones, above all the mob ensnare affix, but those
+        // land on an rng chance during a mob swing and cannot be staged
+        // deterministically in a screenshot.)
+        // Staged wider off-axis and a yard further out than the head-space
+        // variants: a first capture put the victim's feet behind the
+        // player's own rig.
+        key: 'icebind-desktop',
+        charClass: 'mage',
+        charName: 'Frosthollow',
+        abilityId: 'frost_nova',
+        level: 5,
+        auraKind: 'root',
+        offsetAngle: 1,
+        distance: 5.5,
+        settleMs: 1900,
+      },
+      {
+        // Harrow: 8s. A feared mob RUNS, and that is the one framing problem
+        // in this family: a first capture at 1.1s found the victim already
+        // across the square and illegible. So this variant shoots as soon as
+        // the aura lands rather than settling past the cast-moment burst,
+        // which is safe precisely because of the handoff this change adds:
+        // the held band stands the cast stars down the frame it wins a slot,
+        // so what is on screen is already the violet band, not yellow stars.
+        // (On the BEFORE side of the pair that same moment shows the yellow
+        // stun stars this archetype flashed for every control ability alike,
+        // which is exactly the misread the band replaces.)
+        key: 'harrow-desktop',
+        charClass: 'warlock',
+        charName: 'Vexmoor',
+        abilityId: 'fear',
+        level: 14,
+        auraKind: 'incapacitate',
+        auraId: 'fear_incap',
+        // Left on the default off-axis placement. Swinging it to the player's
+        // other side to clear the town NPCs from the flee path stopped the
+        // cast landing at all (two runs, "aura never applied"), so the
+        // occasional frame where the victim ends up behind a guard is the
+        // better trade against a variant that does not capture.
+        pollMs: 150,
+        settleMs: 0,
       },
     ],
     async capture(page, variant) {
@@ -569,11 +668,11 @@ export const TARGETS = [
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
-      // Stage: level to the Gavel rank 2 learn level, stand a durable mob in
+      // Stage: level to the ability's learn level, stand a durable mob in
       // front of the player (pumped hp so stray aggro damage cannot kill it:
-      // the shot needs the mob ALIVE and stunned), and arm the ability on
-      // slot 1. The stun itself is applied by the real cast click below,
-      // never injected.
+      // the shot needs the mob ALIVE and controlled), and arm the ability on
+      // slot 1. The control aura itself is applied by the real cast click
+      // below, never injected.
       const staged = await page.evaluate((shot) => {
         // The entry overlays can race the shared dismissal on a cold profile;
         // clear them here too (the bags-target idiom) so they cannot sit over
@@ -584,7 +683,7 @@ export const TARGETS = [
         const sim = game?.sim;
         const player = sim?.player;
         if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
-        sim.setPlayerLevel?.(16, player.id);
+        sim.setPlayerLevel?.(shot.level, player.id);
         player.resource = player.maxResource;
         let mob = null;
         let best = Infinity;
@@ -623,9 +722,10 @@ export const TARGETS = [
       await wait(5200);
 
       // Exercise the same click a player uses; poll the MOB's auras for the
-      // worn stun (kind, not id: exactly what the star band keys off).
-      let stunApplied = false;
-      for (let attempt = 0; attempt < 2 && !stunApplied; attempt++) {
+      // worn control aura (the kind, plus the shared fear id where the kind
+      // alone does not say fear: exactly what the band rule keys off).
+      let ccApplied = false;
+      for (let attempt = 0; attempt < 2 && !ccApplied; attempt++) {
         const clicked = await page.evaluate(
           (shot) => {
             document.querySelector('.camera-prompt-confirm')?.click();
@@ -639,10 +739,16 @@ export const TARGETS = [
             // The banner wait gave the mob seconds to drift: re-place it just
             // before the click, at melee-cast range and nudged off the facing
             // axis so the player's own rig cannot occlude it, and pull the
-            // chase camera in so the star band reads at PR-screenshot size.
+            // chase camera in so the band reads at PR-screenshot size. Melee
+            // range suits the ranged casts here too (Gripping Roots is 30 yd,
+            // Harrow 20 yd). The ROOT variant swings further off-axis than the
+            // others because its band rides the ANKLES, the one screen region
+            // the player's own body reliably covers at this camera distance.
             game.input.camDist = 6;
-            mob.pos.x = player.pos.x + Math.sin(player.facing + 0.5) * 4.5;
-            mob.pos.z = player.pos.z + Math.cos(player.facing + 0.5) * 4.5;
+            const offAxis = shot.offsetAngle ?? 0.5;
+            const range = shot.distance ?? 4.5;
+            mob.pos.x = player.pos.x + Math.sin(player.facing + offAxis) * range;
+            mob.pos.z = player.pos.z + Math.cos(player.facing + offAxis) * range;
             mob.pos.y = player.pos.y;
             if (mob.prevPos) {
               mob.prevPos.x = mob.pos.x;
@@ -660,22 +766,41 @@ export const TARGETS = [
           { ...variant, mobId: staged.mobId },
         );
         if (!clicked) throw new Error('primary action slot 1 is unavailable');
-        for (let poll = 0; poll < 24 && !stunApplied; poll++) {
-          await wait(200);
-          stunApplied = await page.evaluate(
-            (mobId) =>
-              !!window.__game?.sim?.entities?.get(mobId)?.auras.some((a) => a.kind === 'stun'),
-            staged.mobId,
+        // ~12s of polling, not the 4.8s an instant stun needed. Harrow has a
+        // 1.5s cast, and the offline sim advances on the client's own frame
+        // loop, which under headless SwiftShader runs in stalled bursts: a
+        // measured 1.5s cast took over 4s of wall clock to spend its first
+        // 1.1s of cast time. The old window expired mid-cast and reported
+        // "aura never applied", which reads as a target-data bug rather than
+        // a slow host.
+        //
+        // The poll INTERVAL is the shutter latency for a victim that moves,
+        // so the fear variant tightens it: a feared mob starts running the
+        // moment the aura lands, and at a 200ms interval how far it got by
+        // the shot was pure luck (one capture framed it, the next lost it
+        // across the square). Everything else holds still and keeps the
+        // cheaper interval.
+        const pollMs = variant.pollMs ?? 200;
+        const budgetMs = this.ccAuraPollBudgetMs;
+        for (let poll = 0; poll < Math.ceil(budgetMs / pollMs) && !ccApplied; poll++) {
+          await wait(pollMs);
+          ccApplied = await page.evaluate(
+            (shot) =>
+              !!window.__game?.sim?.entities
+                ?.get(shot.mobId)
+                ?.auras.some(
+                  (a) => a.kind === shot.auraKind && (!shot.auraId || a.id === shot.auraId),
+                ),
+            { ...variant, mobId: staged.mobId },
           );
         }
       }
-      if (!stunApplied) throw new Error('stun aura never applied to the mob');
+      if (!ccApplied) throw new Error(`${variant.auraKind} aura never applied to the mob`);
 
-      // Shoot PAST the sequencer's cast-moment stars (~1.8s): with the
-      // runner's own shot overhead (~0.7s) the shutter lands around 2.5s in,
-      // where what remains on screen is exactly the held, aura-driven band
-      // this change adds, and the before side of the pair shows nothing.
-      await wait(1900);
+      // Settle past the sequencer's cast-moment burst (see settleMs on each
+      // variant): what remains on screen is the held, aura-driven band this
+      // change adds.
+      await wait(variant.settleMs);
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
@@ -1090,15 +1215,22 @@ export const TARGETS = [
   },
   {
     key: 'tank-defensive-cds',
-    label: 'Tank defensive cooldowns',
-    when: ['tests/tank_defensive_cds.test.ts'],
+    // Widened past the tank when Dawnreaver grew a defensive of its own: the recipe
+    // is the same (learn it, arm it, shoot the spellbook row plus the armed slot),
+    // so the spec rides in as a variant rather than a copy of the capture body.
+    label: 'Defensive cooldowns',
+    when: ['tests/tank_defensive_cds.test.ts', 'combat/paladin_debt_of_light'],
     variants: [
       {
         key: 'paladin-desktop',
         charClass: 'paladin',
         charName: 'Dawnward',
-        abilityId: 'sacred_bulwark',
-        nearbyAbilityId: 'divine_protection',
+        // Faithwarden's authored defensives. Sacred Bulwark is retired kit
+        // (PALADIN_LEGACY_ABILITY_IDS), and the replacements are spec-gated, so
+        // the recipe specializes before it resolves them.
+        spec: 'protection',
+        abilityId: 'holy_shield',
+        nearbyAbilityId: 'bastion_rite',
       },
       {
         key: 'druid-desktop',
@@ -1111,9 +1243,19 @@ export const TARGETS = [
         key: 'paladin-mobile',
         charClass: 'paladin',
         charName: 'Sunward',
-        abilityId: 'sacred_bulwark',
-        nearbyAbilityId: 'divine_protection',
+        spec: 'protection',
+        abilityId: 'holy_shield',
+        nearbyAbilityId: 'bastion_rite',
         mobile: true,
+      },
+      {
+        // Dawnreaver's Debt of Light: armed before the blow, answers one hit.
+        key: 'paladin-retribution-desktop',
+        charClass: 'paladin',
+        charName: 'Dawnreaver',
+        spec: 'retribution',
+        abilityId: 'faithforged_guard',
+        nearbyAbilityId: 'final_edict',
       },
     ],
     async capture(page, variant) {
@@ -1130,6 +1272,7 @@ export const TARGETS = [
         const player = sim?.player;
         if (!sim || !player) return { known: false };
         sim.setPlayerLevel?.(20, player.id);
+        if (shot.spec) sim.setSpec?.(shot.spec);
         player.gm = true;
         player.resource = player.maxResource;
         const resolved = sim.resolvedAbility?.(shot.abilityId);
@@ -1464,8 +1607,8 @@ export const TARGETS = [
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
           return (
-            (bg && bg.includes('tidewrought_fishing_rod')) ||
-            (img && img.getAttribute('src')?.includes('tidewrought_fishing_rod'))
+            bg?.includes('tidewrought_fishing_rod') ||
+            img?.getAttribute('src')?.includes('tidewrought_fishing_rod')
           );
         });
         if (!el) return;
@@ -1522,8 +1665,8 @@ export const TARGETS = [
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
           return (
-            (bg && bg.includes('silverleaf_healing_draught')) ||
-            (img && img.getAttribute('src')?.includes('silverleaf_healing_draught'))
+            bg?.includes('silverleaf_healing_draught') ||
+            img?.getAttribute('src')?.includes('silverleaf_healing_draught')
           );
         });
         if (!el) return;
@@ -1599,10 +1742,7 @@ export const TARGETS = [
         const el = cells.find((c) => {
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
-          return (
-            (bg && bg.includes('rough_hide')) ||
-            (img && img.getAttribute('src')?.includes('rough_hide'))
-          );
+          return bg?.includes('rough_hide') || img?.getAttribute('src')?.includes('rough_hide');
         });
         if (!el) return;
         const r = el.getBoundingClientRect();
@@ -1662,8 +1802,8 @@ export const TARGETS = [
           const img = c.querySelector?.('img');
           const aria = c.getAttribute?.('aria-label') ?? '';
           return (
-            (bg && bg.includes('elixir_of_the_boar')) ||
-            (img && img.getAttribute('src')?.includes('elixir_of_the_boar')) ||
+            bg?.includes('elixir_of_the_boar') ||
+            img?.getAttribute('src')?.includes('elixir_of_the_boar') ||
             aria.startsWith('Elixir of the Boar')
           );
         });

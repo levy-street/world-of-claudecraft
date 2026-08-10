@@ -196,9 +196,16 @@ export const NEUTRAL_FACE: FaceShape = {
  *  to a `body_<key>_up` / `body_<key>_dn` shape-key pair baked by
  *  tmp/modular/bodykeys.py onto the body parts. They are silhouette bulges,
  *  never bone moves, the hand grows about the wrist, the hips widen in
- *  place, so weapon grips and the walk cycle are untouched. Parts carrying
- *  morphs stay out of mergeSkinnedParts, and only the LOCAL player composes
- *  a modular body, so the extra draws never multiply across a crowd. */
+ *  place, so weapon grips and the walk cycle are untouched.
+ *
+ *  Parts carrying morphs stay out of mergeSkinnedParts, so a composed body
+ *  costs a few draws more than a merged one. That used to be paid by exactly
+ *  one character (the local player); EVERY player composes now, so it does
+ *  multiply across a crowd. What bounds it is the LOD policy rather than the
+ *  merge: past the static band a composed body collapses to ONE baked draw like
+ *  any other, and that band pulls IN as the crowd grows (crowd_lod.ts). The far
+ *  bake is keyed by part set (assets.ts modularFarBake), so a throng costs one
+ *  baked mesh per distinct look rather than one per player. */
 export type BodySlider = 'shoulders' | 'chest' | 'hips' | 'hands' | 'elbows' | 'knees' | 'feet';
 export const BODY_SLIDERS: readonly BodySlider[] = [
   'shoulders',

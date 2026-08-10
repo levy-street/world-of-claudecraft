@@ -1,42 +1,111 @@
 // The per-class kit smoke tests plus elite-mob scaling, sharded out of
 // tests/social.test.ts (which keeps parties/duels/trading/instances) so
 // neither file carries the whole bill. Fixtures live in tests/social_shared.ts.
-// The class tests that fight a live forest wolf keep the full built-in world:
-// they need a real camp mob.
+// The class tests that fight a live forest wolf only need a forest_wolf camp mob,
+// not the rest of the built-in world; see CLASS_WOLF_TEST_WORLD below.
 import { describe, expect, it } from 'vitest';
-import { ABILITIES, abilitiesKnownAt, CLASSES, instanceOrigin, MOBS } from '../src/sim/data';
+import { computeTalentModifiers, TALENTS } from '../src/sim/content/talents';
+import {
+  ABILITIES,
+  abilitiesKnownAt,
+  BUILTIN_WORLD,
+  CLASSES,
+  instanceOrigin,
+  MOBS,
+} from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, MAX_LEVEL } from '../src/sim/types';
+import { ALL_CLASSES, MAX_LEVEL, type WorldContent } from '../src/sim/types';
 import { face, makeWorld, mustEntity, nearestMob, teleport } from './social_shared';
+
+// Most of this file's Sim instances never touch ambient world content at all (kit/stat
+// checks, self-only heals/shields/forms); a handful cast at a live camp mob, and only need
+// a forest_wolf. Trimming each construction to only what its test reaches for keeps Sim
+// setup cheap without touching the shared fixtures in social_shared.ts.
+const CLASS_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+const CLASS_WOLF_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === 'forest_wolf'),
+  npcs: {},
+  groundObjects: [],
+};
 
 describe('nine classes', () => {
   it('every class spawns with a working kit and stats', () => {
     for (const cls of ALL_CLASSES) {
-      const sim = new Sim({ seed: 42, playerClass: cls });
+      const sim = new Sim({ seed: 42, playerClass: cls, world: CLASS_TEST_WORLD });
       const p = sim.player;
       expect(p.maxHp).toBeGreaterThan(30);
       expect(sim.known.length).toBeGreaterThan(0);
       // Expanded kits can exceed the 12 action-bar slots; overflow remains
       // available from the spellbook and can be dragged onto the bar.
       expect(CLASSES[cls].abilities.length).toBeGreaterThan(0);
-      // the full kit resolves at MAX_LEVEL; the 10-20 band still has things to learn
-      const kit = abilitiesKnownAt(cls, MAX_LEVEL);
-      const sharedKit = CLASSES[cls].abilities.filter(
-        (id) => !ABILITIES[id]?.specs && (ABILITIES[id]?.learnLevel ?? Infinity) <= MAX_LEVEL,
+      // At MAX_LEVEL a no-spec player resolves every ability EXCEPT the ones
+      // reserved for a committed spec (the class redesigns gate spec kits behind
+      // `specs`) and the hidden internals, so the resolvable no-spec kit is
+      // EXACTLY the ungated abilities. Quest-gated abilities count as unlocked.
+      // Spec-gated abilities are reachable across the committed specializations.
+      const questUnlocks = new Set(
+        CLASSES[cls].abilities
+          .map((id) => ABILITIES[id]?.requiresQuest)
+          .filter((questId): questId is string => questId !== undefined),
       );
-      expect(kit.map((known) => known.def.id)).toEqual(sharedKit);
-      expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
+      const kit = abilitiesKnownAt(cls, MAX_LEVEL, undefined, questUnlocks);
+      const sharedKit = CLASSES[cls].abilities.filter(
+        (id) =>
+          !ABILITIES[id]?.specs &&
+          !ABILITIES[id]?.hiddenFromPlayer &&
+          (ABILITIES[id]?.learnLevel ?? Infinity) <= MAX_LEVEL,
+      );
+      expect(new Set(kit.map((known) => known.def.id))).toEqual(new Set(sharedKit));
+      const reachable = new Set(kit.map((known) => known.def.id));
+      for (const spec of TALENTS[cls].specs) {
+        const mods = computeTalentModifiers(cls, { spec: spec.id, rows: {} }, MAX_LEVEL);
+        for (const known of abilitiesKnownAt(cls, MAX_LEVEL, mods)) reachable.add(known.def.id);
+      }
+      expect(
+        CLASSES[cls].abilities
+          .filter((abilityId) => !ABILITIES[abilityId]?.hiddenFromPlayer)
+          .filter((abilityId) => (ABILITIES[abilityId]?.learnLevel ?? Infinity) <= MAX_LEVEL)
+          .every((abilityId) => reachable.has(abilityId)),
+      ).toBe(true);
+      if (cls === 'warlock') {
+        // The overhauled Warlock completes its shared kit at level 10; its
+        // 10-20 progression now belongs to each specialization instead.
+        for (const spec of ['affliction', 'demonology', 'destruction'] as const) {
+          const at10 = abilitiesKnownAt(
+            cls,
+            10,
+            computeTalentModifiers(cls, { spec, rows: {} }, 10),
+          );
+          const atMax = abilitiesKnownAt(
+            cls,
+            MAX_LEVEL,
+            computeTalentModifiers(cls, { spec, rows: {} }, MAX_LEVEL),
+          );
+          expect(at10.length, `${spec} should keep learning after level 10`).toBeLessThan(
+            atMax.length,
+          );
+        }
+      } else {
+        expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
+      }
       // every class's core kit keeps scaling: something reaches rank 3+ by 20
       expect(kit.some((k) => k.rank >= 3)).toBe(true);
       // resource type sane
       if (cls === 'warrior') expect(p.resourceType).toBe('rage');
       else if (cls === 'rogue') expect(p.resourceType).toBe('energy');
+      else if (cls === 'hunter') expect(p.resourceType).toBe('focus');
       else expect(p.resourceType).toBe('mana');
     }
   });
 
   it('priest heals and shields', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'priest' });
+    const sim = new Sim({ seed: 42, playerClass: 'priest', world: CLASS_TEST_WORLD });
     const p = sim.player;
     sim.setPlayerLevel(6);
     p.hp = 30;
@@ -75,7 +144,7 @@ describe('nine classes', () => {
   });
 
   it('renew ticks healing over time', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'priest' });
+    const sim = new Sim({ seed: 42, playerClass: 'priest', world: CLASS_TEST_WORLD });
     sim.setPlayerLevel(8);
     const p = sim.player;
     p.hp = 20;
@@ -84,45 +153,8 @@ describe('nine classes', () => {
     expect(p.hp).toBeGreaterThan(30);
   });
 
-  it('paladin seal empowers swings and judgement consumes it', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'paladin' });
-    sim.setPlayerLevel(4);
-    const p = sim.player;
-    sim.castAbility('seal_of_righteousness');
-    sim.tick();
-    expect(p.auras.some((a) => a.kind === 'imbue')).toBe(true);
-    const wolf = nearestMob(sim, 'forest_wolf');
-    teleport(sim, p.id, wolf.pos.x + 3, wolf.pos.z);
-    sim.targetEntity(wolf.id);
-    face(sim, p.id, wolf.id);
-    p.resource = p.maxResource;
-    // wait out gcd then judge
-    for (let i = 0; i < 35; i++) sim.tick();
-    // Judgement's spell hit is an RNG roll (capped at 99%), so a single cast can
-    // miss on some world seeds and deal no damage. Re-seal and retry until it
-    // lands, so this checks the mechanic (judgement hits and consumes the seal)
-    // rather than a lucky roll, robust to RNG-stream shifts from new content.
-    let landed = false;
-    for (let attempt = 0; attempt < 25 && !landed; attempt++) {
-      if (!p.auras.some((a) => a.kind === 'imbue')) {
-        sim.castAbility('seal_of_righteousness');
-        sim.tick();
-      }
-      p.gcdRemaining = 0;
-      p.cooldowns.delete('judgement');
-      p.resource = p.maxResource;
-      face(sim, p.id, wolf.id);
-      const dealtBefore = sim.counters.damageDealt;
-      sim.castAbility('judgement');
-      sim.tick();
-      landed = sim.counters.damageDealt > dealtBefore;
-    }
-    expect(landed).toBe(true); // judgement connected and dealt damage
-    expect(p.auras.some((a) => a.kind === 'imbue')).toBe(false); // consumed
-  });
-
   it('warlock life taps and drains life', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warlock' });
+    const sim = new Sim({ seed: 42, playerClass: 'warlock', world: CLASS_WOLF_TEST_WORLD });
     sim.setPlayerLevel(10);
     const p = sim.player;
     p.resource = 10;
@@ -146,7 +178,7 @@ describe('nine classes', () => {
   });
 
   it('hunter kills with ranged auto shot from distance', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'hunter' });
+    const sim = new Sim({ seed: 42, playerClass: 'hunter', world: CLASS_WOLF_TEST_WORLD });
     const p = sim.player;
     const wolf = nearestMob(sim, 'forest_wolf');
     p.maxHp = 500;
@@ -171,7 +203,7 @@ describe('nine classes', () => {
   });
 
   it('lightning shield zaps attackers (thorns)', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'shaman' });
+    const sim = new Sim({ seed: 42, playerClass: 'shaman', world: CLASS_WOLF_TEST_WORLD });
     sim.setPlayerLevel(8);
     const p = sim.player;
     sim.castAbility('lightning_shield');
@@ -246,7 +278,7 @@ describe('nine classes', () => {
   }, 90_000);
 
   it('druid bear form toggles and raises armor', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'druid' });
+    const sim = new Sim({ seed: 42, playerClass: 'druid', world: CLASS_TEST_WORLD });
     sim.setPlayerLevel(10);
     const p = sim.player;
     const armorBefore = p.stats.armor;

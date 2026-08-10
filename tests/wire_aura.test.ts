@@ -130,7 +130,7 @@ describe('wireEntity aura serialization', () => {
   it('includes value2/value3/tickInterval/charges when defined as exactly 0', () => {
     // These fields are gated on `!== undefined`, not truthiness (unlike value/sourceId,
     // which are gated on truthiness and legitimately omit 0). A defined 0 must still ride
-    // the wire, or a judgement min-range of 0 or a Lightning Shield down to 0 charges would
+    // the wire, or a Lightning Shield down to 0 charges would
     // silently vanish and decode back to "absent" on the client.
     const sim = new Sim({ seed: 1, playerClass: 'warrior' });
     const e = sim.player;

@@ -79,78 +79,76 @@ describe('availableAuraProcDefs', () => {
     expect(availableAuraProcDefs('warrior', known('hot_streak'))).toEqual([]);
   });
 
+  // The v0.31 class overhauls rewrote the Hunter, Shaman, Priest, Rogue, Paladin,
+  // Druid, and Warlock choice rows, so the ids these three tests name are the
+  // CURRENT ones. Any class whose rewritten rows carry no proc-with-aura option
+  // contributes nothing but its known-ability procs, which is asserted rather than
+  // skipped: an overhaul that adds a talent proc must land here too.
   it('shows Hunter, Shaman, and Druid reactive states from the active build only', () => {
+    // Hunter and Shaman rows carry no proc auras after the overhauls; the base
+    // known-ability procs are the whole set, and an unselected row adds nothing.
     expect(
-      availableAuraProcDefs(
-        'hunter',
-        known('mongoose_bite'),
-        talents({ 11: 'hun_r11_survival_instincts', 20: 'hun_r20_rapid_killing' }),
-      ).map((proc) => proc.id),
-    ).toEqual(['counterfang_window', 'hun_deathless_will']);
+      availableAuraProcDefs('hunter', known('mongoose_bite'), talents({})).map((proc) => proc.id),
+    ).toEqual(['counterfang_window']);
 
     expect(
-      availableAuraProcDefs(
-        'shaman',
-        known('elemental_mastery'),
-        talents({
-          5: 'sha_r5_concussion',
-          11: 'sha_r11_ancestral_guidance',
-          20: 'sha_r20_elemental_fury',
-        }),
-      ).map((proc) => proc.id),
-    ).toEqual(['elemental_mastery', 'sha_fault_line', 'sha_guiding_spirits', 'sha_storm_recall']);
+      availableAuraProcDefs('shaman', known('elemental_mastery'), talents({})).map(
+        (proc) => proc.id,
+      ),
+    ).toEqual(['elemental_mastery']);
 
+    // Druid does still generate talent procs, and only for the SELECTED options:
+    // Wrath and Moonfire contribute no base proc, so every id here is talent-derived.
     expect(
       availableAuraProcDefs(
         'druid',
         known('wrath', 'moonfire'),
-        talents({
-          5: 'dru_r5_improved_wrath',
-          11: 'dru_r11_furor',
-          17: 'dru_r17_survival_of_the_fittest',
-        }),
+        talents({ 8: 'dru_r8_improved_roots', 11: 'dru_r11_furor' }),
       ).map((proc) => proc.id),
-    ).toEqual(['dru_improved_wildbolt', 'dru_wildsurge', 'dru_survival_of_the_fittest']);
+    ).toEqual(['dru_ironhide_reflex', 'dru_gripping_ambush']);
+
+    // The active build only: swap the row-8 pick and its proc drops out.
+    expect(
+      availableAuraProcDefs(
+        'druid',
+        known('wrath', 'moonfire'),
+        talents({ 11: 'dru_r11_furor' }),
+      ).map((proc) => proc.id),
+    ).toEqual(['dru_gripping_ambush']);
   });
 
   it('derives actionable talent auras for every remaining class', () => {
+    // Paladin's rewritten rows carry no proc aura at all: the derivation must
+    // return an empty list, not throw or leak another class's procs.
     expect(
-      availableAuraProcDefs('paladin', known(), talents({ 11: 'pal_r11_divine_wisdom' })).map(
-        (proc) => proc.id,
-      ),
-    ).toEqual(['pal_divine_wisdom']);
+      availableAuraProcDefs('paladin', known(), talents({ 11: 'pal_r11_fist_of_justice' })),
+    ).toEqual([]);
     expect(
       availableAuraProcDefs(
         'rogue',
         known('cold_blood'),
-        talents({ 5: 'rog_r5_improved_backstab', 8: 'rog_r8_improved_gouge' }),
+        talents({ 5: 'rog_r5_slipstream', 17: 'rog_r17_ghostfoot_gambit' }),
       ).map((proc) => proc.id),
-    ).toEqual(['cold_blood', 'rog_improved_backstab', 'rog_blindside_opening']);
+    ).toEqual(['cold_blood', 'rog_slipstream', 'rog_improved_evasion']);
     expect(
       availableAuraProcDefs(
         'priest',
         known('inner_focus'),
-        talents({ 5: 'pri_r5_searing_light', 17: 'pri_r17_inner_fire' }),
+        talents({ 8: 'pri_r17_inner_fire', 14: 'pri_r11_meditation' }),
       ).map((proc) => proc.id),
-    ).toEqual(['inner_focus', 'pri_searing_light', 'pri_inner_fire']);
+    ).toEqual(['inner_focus', 'pri_inner_fire', 'pri_measured_faith']);
     expect(
-      availableAuraProcDefs(
-        'warlock',
-        known(),
-        talents({ 5: 'wlk_r5_bane', 20: 'wlk_r20_curse_mastery' }),
-      ).map((proc) => proc.id),
-    ).toEqual(['wlk_grave_rhythm', 'wlk_curse_mastery']);
+      availableAuraProcDefs('warlock', known(), talents({ 17: 'wlk_r17_demonic_resilience' })).map(
+        (proc) => proc.id,
+      ),
+    ).toEqual(['wlk_curse_mastery']);
   });
 
   it('pins generated talent proc aura ids, kinds, icons, and localized choice labels', () => {
     const defs = availableAuraProcDefs(
-      'shaman',
+      'druid',
       known(),
-      talents({
-        5: 'sha_r5_concussion',
-        11: 'sha_r11_ancestral_guidance',
-        20: 'sha_r20_tidal_waves',
-      }),
+      talents({ 8: 'dru_r8_improved_roots', 11: 'dru_r11_furor' }),
     );
     expect(
       defs.map(({ id, auraKind, auraId, iconAbilityId, talentChoice }) => ({
@@ -162,25 +160,20 @@ describe('availableAuraProcDefs', () => {
       })),
     ).toEqual([
       {
-        id: 'sha_fault_line',
-        auraKind: 'next_cast_free',
-        auraId: 'sha_fault_line',
-        iconAbilityId: 'lightning_bolt',
-        talentChoiceId: 'sha_r5_concussion',
+        id: 'dru_ironhide_reflex',
+        auraKind: 'absorb',
+        auraId: 'dru_ironhide_reflex',
+        // The choice's own `icon` wins over the proc id, so the overlay shows the
+        // ability the talent modifies rather than an icon-less proc key.
+        iconAbilityId: 'bear_form',
+        talentChoiceId: 'dru_r8_improved_roots',
       },
       {
-        id: 'sha_guiding_spirits',
+        id: 'dru_gripping_ambush',
         auraKind: 'next_cast_instant',
-        auraId: 'sha_guiding_spirits',
-        iconAbilityId: 'healing_wave',
-        talentChoiceId: 'sha_r11_ancestral_guidance',
-      },
-      {
-        id: 'sha_undertow_promise',
-        auraKind: 'heal_echo',
-        auraId: 'sha_undertow_promise',
-        iconAbilityId: 'healing_wave',
-        talentChoiceId: 'sha_r20_tidal_waves',
+        auraId: 'dru_gripping_ambush',
+        iconAbilityId: 'entangling_roots',
+        talentChoiceId: 'dru_r11_furor',
       },
     ]);
   });
@@ -239,12 +232,26 @@ describe('availableAuraProcDefs', () => {
     expect(missing).toEqual([]);
   });
 
-  it('routes Hellglass Ward to the canonical Felhunter painting', () => {
+  it('routes generated talent procs to their canonical ability icons', () => {
+    // The Hellglass Ward -> Felhunter special case retired with the warlock
+    // three-spec overhaul; the surviving contract is the generic one: each
+    // drawable talent proc surfaces exactly when its row is selected and
+    // carries a real ability id for its icon.
     expect(
-      availableAuraProcDefs('warlock', known(), talents({ 20: 'wlk_r20_grimoire_of_haste' })).map(
+      availableAuraProcDefs('warlock', known(), talents({ 17: 'wlk_r17_demonic_resilience' })).map(
         ({ id, iconAbilityId }) => ({ id, iconAbilityId }),
       ),
-    ).toEqual([{ id: 'wlk_grimoire_of_carnage', iconAbilityId: 'summon_felhunter' }]);
+    ).toEqual([{ id: 'wlk_curse_mastery', iconAbilityId: 'wlk_r17_demonic_resilience' }]);
+    expect(
+      availableAuraProcDefs(
+        'druid',
+        known(),
+        talents({ 8: 'dru_r8_improved_roots', 11: 'dru_r11_furor' }),
+      ).map(({ id, iconAbilityId }) => ({ id, iconAbilityId })),
+    ).toEqual([
+      { id: 'dru_ironhide_reflex', iconAbilityId: 'bear_form' },
+      { id: 'dru_gripping_ambush', iconAbilityId: 'entangling_roots' },
+    ]);
   });
 
   it('covers the actionable Fire, Frost, and Arcane Mage states', () => {

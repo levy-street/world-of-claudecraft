@@ -127,6 +127,10 @@ export const vi_VN: EnTranslations = {
         "label": "Trang bị bộ đồ cấp 20 mới",
         "description": "Mặc bộ trang bị mẫu cấp 20 trước Thánh Đường cho một hệ phái, ưu tiên vào túi đồ. Chỉ trang bị."
       },
+      "biskit": {
+        "label": "Trang bị bộ đồ BIS cấp 20",
+        "description": "Mặc bộ trang bị sử thi tốt nhất cho một hệ phái ở mọi ô. Chỉ trang bị."
+      },
       "gold": {
         "label": "Thêm vàng",
         "description": "Thêm vàng vào túi tiền hiện tại."
@@ -240,7 +244,8 @@ export const vi_VN: EnTranslations = {
     },
     "hud": {
       "lowMana": "Cạn Mana",
-      "lowEnergy": "Cạn Năng Lượng"
+      "lowEnergy": "Cạn Năng Lượng",
+      "lowFocus": "Tập trung thấp"
     },
     "talents": {
       "title": "Thiên phú",
@@ -316,6 +321,25 @@ export const vi_VN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Kết Án",
+      "fateThreadsLabel": "Sợi Định Mệnh",
+      "doomMeterUnlock": "Di chuyển thanh tài nguyên Affliction",
+      "doomMeterLock": "Khóa thanh tài nguyên Affliction",
+      "doomEmptyStatus": "{value} trên {max} Kết Án.",
+      "doomStatus": "{value} trên {max} Kết Án; {remaining}.",
+      "fateThreadsStatus": "{value} trên {max} Sợi Định Mệnh.",
+      "fateThreadsConsumeReady": "Ba Sợi Định Mệnh: Nuốt Chửng có thể dệt chúng thành Kết Án bổ sung.",
+      "fateThreadsSentenceReady": "Ba Sợi Định Mệnh: Phán Quyết có thể tiêu thụ chúng để tăng 18% sát thương."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Mảnh Linh Hồn",
+      "ruinMeter": "Wrack",
+      "ruinStatus": "{value} trên {max} Wrack"
+    },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Đang xem {name}"
     },
@@ -788,6 +812,14 @@ export const vi_VN: EnTranslations = {
     "rest": {
       "resting": "Đang Nghỉ Ngơi"
     },
+    "paladin": {
+      "devotion": "Sùng Tín",
+      "devotionValue": "Sùng Tín {value} trên {max}",
+      "devotionAscensionCharges": "Sùng Tín {value} trên {max}. Thăng Thiên: {charges} lượt.",
+      "devotionAscensionLast": "Sùng Tín {value} trên {max}. Thăng Thiên: lượt cuối.",
+      "ascensionLastAnnouncement": "Thăng Thiên: lượt cuối",
+      "ascensionSpenderAria": "Ô hành động {slot}: {ability}. Tiêu tốn một lượt Thăng Thiên."
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -1054,7 +1086,7 @@ export const vi_VN: EnTranslations = {
       "blurb": "Hai pháo đài đổ nát đối mặt nhau qua một thung lũng có tường bao dưới bóng Đỉnh Gai: Đỏ Thẫm ở phía nam, Xanh Lam ở phía bắc, và Sân Phế Tích cổ xưa hơn nằm giữa chúng mà chưa bên nào từng chiếm được. Năm người mỗi bên, mỗi bên một lá cờ, và bên đầu tiên mang được ba lá cờ của đối phương về nhà sẽ giành lấy chiến trường.",
       "modeTag": "5 đấu 5 Cướp Cờ",
       "offlineNote": "Cánh Đồng Trũng Gai đang đồng bộ. Hàng chờ sẽ mở khi thế giới phản hồi.",
-      "ratingSummary": "Thứ hạng. {wins} thắng / {losses} thua",
+      "ratingSummary": "Thứ hạng. {wins} thắng / {losses} thua / {draws} hòa",
       "careerCaptures": "Số lần chiếm cờ trong sự nghiệp: {count}",
       "enterQueue": "Vào Hàng Chờ",
       "enterQueueParty": "Vào Hàng Chờ (nhóm {count} người)",
@@ -1454,6 +1486,173 @@ export const vi_VN: EnTranslations = {
       "badges": {
         "backgrounded": "Chạy Nền",
         "offline": "Ngoại Tuyến"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft performance diagnostics",
+        "title": "ClaudeCraft Performance Doctor",
+        "subtitle": "A game-specific scan with evidence and code-level fixes.",
+        "aria": {
+          "liveMeasurements": "Live performance measurements",
+          "scanProgress": "Diagnostic scan progress",
+          "findings": "Ranked diagnostic findings"
+        },
+        "controls": {
+          "minimize": "Minimize",
+          "expand": "Expand",
+          "start": "Start 15-second scan",
+          "refreshCensus": "Refresh scene census",
+          "copyReport": "Copy clear report",
+          "downloadReport": "Download report",
+          "scanning": "Scanning...",
+          "scanAnother": "Scan another area",
+          "reportLogged": "Report logged to console",
+          "copied": "Copied",
+          "copyBlocked": "Copy blocked: report logged",
+          "retestLowGraphics": "Retest on Low graphics"
+        },
+        "instruction": "For the best signal, enter Play Offline, move through the slow area, rotate the camera, and trigger the effect that stutters while the scan is running.",
+        "status": {
+          "pausedHiddenRestart": "Scan paused while this tab is hidden. It will restart when you return.",
+          "restoredRestart": "Tab restored. Restarting a clean 15-second active-gameplay capture.",
+          "worldLoaded": "World loaded. Waiting for the first playable frame.",
+          "pausedHiddenContinue": "Scan paused while this tab is hidden. Return to the game to continue.",
+          "collectingRemaining": {
+            "one": "Collecting active gameplay: {seconds} second remaining",
+            "other": "Collecting active gameplay: {seconds} seconds remaining"
+          },
+          "waitingFrames": "Waiting for representative gameplay frames: {current}/{minimum}",
+          "collectingNow": "Collecting active gameplay: move through the problem area now.",
+          "ready": "Ready to scan. Press Start and reproduce the slowdown.",
+          "waitingWorld": "Waiting for the game world. Choose Play Offline or enter an online character."
+        },
+        "metrics": {
+          "waitingRenderer": "renderer: waiting",
+          "waitingCensus": "scene census: waiting",
+          "waitingHitch": "hitch attribution: armed on world entry",
+          "recent": "recent  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}",
+          "render": "render  submit {submit} ms | world {world} ms | entities {entities} ms",
+          "scene": "scene   {calls} calls | {triangles} tris | {views} views",
+          "hitches": "hitches {hitches} | shaders {shaders} | uploads {uploads} | views {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "waiting"
+        },
+        "scoreHeadline": "{score}/100: {headline}",
+        "healthyNoFindings": "No actionable threshold fired. If a short hitch still bothers you, rerun the scan along the exact movement path that triggers it.",
+        "findingMeta": "{severity} | {confidence} confidence",
+        "sections": {
+          "evidence": "Evidence",
+          "tryNow": "Try now",
+          "codeFix": "Code fix",
+          "source": "Relevant source"
+        },
+        "severity": {
+          "critical": "CRITICAL",
+          "warning": "WARNING",
+          "info": "INFO"
+        },
+        "confidence": {
+          "high": "high",
+          "medium": "medium",
+          "low": "low"
+        },
+        "diagnosis": {
+          "noProblemTitle": "No material performance problem detected",
+          "summary": {
+            "findings": {
+              "one": "{findings} actionable finding from the last 10 seconds at {fps} FPS and {p95} frame p95.",
+              "other": "{findings} actionable findings from the last 10 seconds at {fps} FPS and {p95} frame p95."
+            },
+            "healthy": "The last 10 seconds held {fps} FPS with a {p95} frame p95. No game, browser, GPU, memory, asset, or network threshold fired."
+          },
+          "titles": {
+            "hardwareAcceleration": "Software rendering is active",
+            "integratedGpu": "The game is using the integrated GPU",
+            "highDpi": "High resolution rendering is expensive here",
+            "forcedHighGraphics": "Forced high graphics is reducing performance",
+            "lowMemory": "Available device memory is low",
+            "browserStalls": "Browser or extension stalls were detected",
+            "heapPressure": "Browser memory pressure was detected",
+            "contextLoss": "The graphics context was reset",
+            "gpuSubmit": "GPU submission is the main frame bottleneck",
+            "sceneDraw": "Scene draw cost exceeds the active graphics budget",
+            "shadowPass": "The shadow pass uses a large share of draw calls",
+            "rendererWorld": "World renderer updates are CPU-bound",
+            "rendererEntities": "Entity view updates are CPU-bound",
+            "rendererNameplates": "Nameplate painting is expensive",
+            "simCpu": "Simulation work is consuming the frame",
+            "hudCpu": "HUD updates are consuming the frame",
+            "eventCpu": "Event processing is consuming the frame",
+            "shaderCompile": "Shaders are compiling during gameplay",
+            "textureUpload": "Texture uploads are causing gameplay hitches",
+            "viewCreate": "Entity view creation is causing hitches",
+            "otherHitch": "Unattributed long frames remain",
+            "assetStartup": "Game startup is delayed by asset work",
+            "longTasks": "Long browser tasks are blocking frames",
+            "networkLatency": "Network delivery is delaying visible response",
+            "snapshotApply": "Snapshot processing is blocking the client",
+            "generic": "Performance rule {rule} needs attention"
+          },
+          "causes": {
+            "environment": "A detected browser, GPU, memory, or device setting can limit performance before the game renders a frame.",
+            "graphics": "Measured graphics work is above the active frame or scene budget for this capture.",
+            "cpu": "A measured CPU phase is taking enough main-thread time to miss the frame budget.",
+            "loading": "Resource preparation or first-use work happened on a visible gameplay or startup path.",
+            "network": "Network delivery or client snapshot processing is delaying the latest playable state."
+          },
+          "evidence": {
+            "environment": "The environment rule {rule} matched this device and browser.",
+            "gpuSubmit": "WebGL submission p95 is {submit}, or {share} of renderer p95.",
+            "frame": "The recent window measured {fps} FPS with a {p95} frame p95.",
+            "sceneCalls": "The scene uses {calls} draw calls against a target of {target}.",
+            "sceneTriangles": "The scene submits {triangles} triangles against a target of {target}.",
+            "sceneCategory": "Scene category {category} contributes {calls} calls and {triangles} measured triangles.",
+            "censusNeeded": "Refresh the scene census to identify the leading render category.",
+            "shadow": "The shadow pass submits {calls} calls, {share} of the baseline, and {triangles} triangles.",
+            "cpuPhase": "Measured phase {phase} has a p95 of {p95}.",
+            "hitch": "{count} of {total} recorded hitches matched cause {cause}.",
+            "assets": "The preload gate waited {wait} for {tasks} registered tasks.",
+            "failedAssets": "Failed asset groups: {groups}.",
+            "longTasks": "{count} long tasks were measured, with p95 {p95} and maximum {max}.",
+            "network": "Snapshot interval is {interval}, latest age is {age}, and input echo p95 is {echo}.",
+            "snapshot": "Snapshot parse and apply p95 is {work}; network gap p95 is {gap}.",
+            "generic": "Diagnostic rule {rule} matched this capture."
+          },
+          "tryNow": {
+            "environment": "Correct the detected environment setting, restart, and repeat the same scan.",
+            "graphics": "Retest the same camera path on Low graphics to confirm graphics pressure.",
+            "cpu": "Repeat the scan while idle and while moving to isolate the CPU phase.",
+            "loading": "Repeat the same route or first-use action to confirm when the hitch occurs.",
+            "network": "Compare Play Offline with the same movement and camera path."
+          },
+          "codeFix": {
+            "environment": "Keep the detected fallback path within the shared graphics and memory budgets.",
+            "graphics": "Use the existing render budget, instancing, material sharing, LOD, and hidden-work skips.",
+            "cpu": "Profile the named phase, remove repeated work and allocations, and preserve gameplay behavior.",
+            "loading": "Preload, pool, or spread the identified first-use work through the existing startup and streaming budgets.",
+            "network": "Reduce delivery or snapshot processing cost without weakening the authoritative server model."
+          }
+        },
+        "report": {
+          "title": "World of ClaudeCraft performance diagnosis",
+          "statusLine": "Status: {status} ({score}/100)",
+          "capturedLine": "Captured: {captured}",
+          "topFindingLine": "Top finding: {finding}",
+          "summaryLine": "Summary: {summary}",
+          "gpuLine": "GPU: {gpu}",
+          "graphicsLine": "Graphics: {tier}, render scale {scale}",
+          "recentLine": "Recent: {fps} FPS, p95 {p95}, {longFrames} frames over 50 ms, {frames} measured frames",
+          "resultHeading": "Result",
+          "noThreshold": "No actionable threshold fired in this capture.",
+          "findingHeading": "{index}. {title}",
+          "findingMeta": "Severity: {severity}. Confidence: {confidence}.",
+          "rawSnapshotHeading": "Raw snapshot",
+          "notAvailable": "not available",
+          "status": {
+            "critical": "critical",
+            "needsAttention": "needs attention",
+            "healthy": "healthy"
+          }
+        }
       }
     },
     "auraOverlay": {
@@ -1600,6 +1799,7 @@ export const vi_VN: EnTranslations = {
         "spellCritPct": "+{value}% Chí Mạng Phép",
         "healthRegen": "Khoảng {value} máu mỗi 5 giây khi nghỉ ngơi",
         "manaRegen": "Khoảng {value} mana mỗi 5 giây khi nghỉ ngơi",
+        "manaRegenCombat": "Khoảng {value} mana mỗi 5 giây trong chiến đấu",
         "damageReduction": "Giảm sát thương trước kẻ tấn công cấp {level}: {value}%",
         "dpsFromAp": "Thêm {value} sát thương mỗi giây cho các đòn tấn công của bạn"
       },
@@ -1619,7 +1819,12 @@ export const vi_VN: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Cấu Hình {n}"
+      "defaultBuildName": "Cấu Hình {n}",
+      "newBuildWithGear": "New Build (save gear too)",
+      "gearRestored": "Restored {n} gear pieces from this build.",
+      "gearNotHeld": "You no longer have {n} of this build's saved pieces.",
+      "gearCopyGone": "{n} saved pieces were not the copy this build pinned.",
+      "gearTakenByOtherSlot": "{n} saved pieces need another copy you do not have."
     },
     "tips": {
       "joinChannels": "Mẹo: gõ /join world hoặc /join lfg để trò chuyện với người chơi khắp thế giới."
@@ -1980,18 +2185,36 @@ export const vi_VN: EnTranslations = {
     "auraEffect": {
       "dot": "Gây {value} sát thương {school} mỗi {interval} giây",
       "hot": "Hồi {value} máu mỗi {interval} giây",
+      "mendingCurrent": "Tích {value} hồi máu, giải phóng dần theo thời gian hoặc bị Vá Tầng Tầng tiêu thụ",
+      "mendingCurrentPercent": "Tích lượng hồi máu bằng {pct}% máu tối đa cho Vá Tầng Tầng",
       "absorb": "Hấp thụ {value} sát thương",
       "healAbsorb": "Hấp thụ {value} hồi máu nhận vào",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
+      "stasis": "Miễn nhiễm và không thể hành động",
       "slow": "Reduce la velocidad de movimiento un {pct}%",
       "speed": "Aumenta la velocidad de movimiento un {pct}%",
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
+      "imbueRange": "Vũ khí được phù chú: {min} đến {max} sát thương thêm khi dùng Verdict.",
+      "petDamage": "Tăng sát thương thú nuôi thêm {pct}%",
+      "petHaste": "Tăng tốc độ hành động của thú nuôi thêm {pct}%",
+      "spellDamage": "Tăng sát thương phép thêm {pct}%",
+      "spellHaste": "Tăng tốc độ thi triển phép thêm {pct}%",
+      "sated": "Không thể hưởng thêm hiệu ứng tăng tốc nhóm khác",
+      "cauterizeFatigue": "Thiêu Đốt không thể ngăn một đòn chí mạng khác",
+      "castShield": "Việc niệm chú không thể bị ngắt quãng hoặc làm chậm bởi sát thương",
       "dmgDone": "Tăng sát thương gây ra lên {pct}%",
       "dmgDoneReduce": "Giảm sát thương gây ra đi {pct}%",
       "heatingUp": "Cú chí mạng tiếp theo của kỹ năng xây dựng Lửa liên tiếp sẽ ban Hot Streak; cú không chí mạng sẽ xóa Đang Nóng Dần",
       "elementalConvergencePrimed": "Phép tiếp theo của bạn từ trường nguyên tố khác sẽ ban Hội Tụ Nguyên Tố",
+      "hunterFerocity": "{stacks} Hung Tính Bầy Đàn: thú nuôi của bạn gây thêm {pct}% sát thương",
+      "cooldownCap": "{used} trên {cap} giây giảm thời gian hồi chiêu đã dùng trong khung này",
+      "funeralHarvestLock": "Thu Hoạch Tang Lễ chưa thể tạo thêm Mảnh Linh Hồn",
+      "leadenHexLock": "Bùa Trì Trệ chưa thể trói mục tiêu này lại",
+      "forbiddenReflectionReady": "Kỹ năng hồi chiêu Thuật Sĩ Hắc Ám hợp lệ tiếp theo của bạn có thể được thi triển lại",
+      "forbiddenReflectionLock": "Phản Chiếu Cấm Kỵ chưa thể chuẩn bị lại",
+      "internalCooldown": "Hiệu ứng này chưa thể kích hoạt lại cho đến khi hết thời gian chờ",
       "carriedFlag": "Bạn đang mang cờ địch. Hủy hiệu ứng này để thả nó xuống.",
       "battleStance": "Thế Công: tạo nộ khí nhiều hơn 10%",
       "berserkerStance": "Thế Cuồng Chiến: chí mạng thường xuyên hơn 3% và mạnh hơn 3%",
@@ -2006,6 +2229,13 @@ export const vi_VN: EnTranslations = {
       "revengeFree": "Phục Thù tiếp theo của bạn không tốn nộ khí",
       "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Tăng máu tối đa thêm {pct}%",
+      "enrage": "Sát thương gây ra tăng {damagePct}%, tốc độ đánh tăng {hastePct}%, và tốc độ di chuyển tăng {movePct}%",
+      "suddenDeath": "Nấm Mồ Sớm tiếp theo của bạn không tốn Nộ Khí và bỏ qua yêu cầu về lượng máu",
+      "aoeEcho": "Còn lại {charges} lần vọng: kỹ năng đơn mục tiêu gây {pct}% sát thương cho tối đa {targets} kẻ địch gần đó",
+      "sureCrit": "Còn lại {charges} lần thi triển kỹ năng gây sát thương chắc chắn chí mạng",
+      "temporalEcho": "Sát thương Bí Thuật của người thi triển hồi máu cho bạn bằng {singlePct}% sát thương đơn mục tiêu hoặc {areaPct}% sát thương diện rộng",
+      "arcaneCharge": "{stacks} Điện Tích Bí Thuật: Sức Mạnh Bí Thuật gây thêm {damagePct}% sát thương, thi triển nhanh hơn {castPct}%, và tốn gấp {costMult} lần mana",
+      "physicalReduction": "Giảm sát thương Vật Lý phải chịu đi {pct}%",
       "temporalHourglass": "Miễn nhiễm và không thể hành động; hồi phục máu và tăng tốc phục hồi thời gian hồi chiêu. Nhấp chuột phải để hủy bỏ.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Các phép Lửa của bạn luôn chí mạng",
@@ -2015,6 +2245,22 @@ export const vi_VN: EnTranslations = {
       "freeCast": "Lần thi triển tiếp theo của bạn không tốn mana",
       "instantCast": "Phép tiếp theo của bạn có thời gian thi triển sẽ lập tức",
       "cheapCast": "Phép tiếp theo của bạn tốn ít hơn {pct}%",
+      "radiantResonance": "Thánh Quang Chữa Lành kế tiếp của bạn thành tức thời, hoặc Vòng Tay Bình Minh kế tiếp tốn ít hơn {pct}% mana và niệm trong {castTime} giây",
+      "solarReprisal": "Đĩa Nhật Quang kế tiếp của bạn không tốn mana, bỏ qua hồi chiêu và gây thêm {pct}% sát thương; Búa Ân Điển bỏ qua hồi chiêu và hồi cho bạn 100% sát thương đã gây; hoặc Thánh Quang Chữa Lành thành tức thời",
+      "dawnsWrath": "BTN: mọi mức máu · +1 lượt dùng · Hồi chiêu 0 · +{pct}% sát thương",
+      "venomRitual": "Nghi Lễ Độc: giai đoạn {stacks} trên {max}. Các đòn tích lũy thêm giai đoạn; ở {max}, Giấc Ngủ Vùi Đất trở thành Xé Độc",
+      "gloam": "Nhá Nhem: giai đoạn {stacks} trên {max}. Ở {max}, các đòn mở màn Màn Hoàng Hôn mở khóa ngoài trống trải, và đòn ném kế tiếp là MIỄN PHÍ và kích nổ kho tích thành màn bóng tối",
+      "redline": "Vạch Đỏ: khấc {stacks} trên {max}. Đòn Thân thêm khấc; Đòn Kết Liễu đánh mạnh hơn {pct}% mỗi khấc và đóng cửa sổ. Hết hạn trước thì mất",
+      "veilstrikeWindow": "Màn Bóng Tối: các đòn mở màn Màn Hoàng Hôn của bạn dùng được ngoài trống trải từ mọi góc, và sát thương gây ra tăng {pct}%",
+      "veiledEdge": "Đòn Rình Rập kế tiếp của bạn đánh mạnh gấp đôi",
+      "duskEconomy": "Kỹ năng tốn ít hơn {pct}% năng lượng",
+      "moontide": "Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó",
+      "oldBlood": "Huyết Cổ: tầng {stacks} trên {max}. Các đòn đánh trúng ở Hình Sói và Hình Bruin dùng chung bể này; ở {max}, Cắn Xé Máu hoặc Nghiền Xương biến đổi",
+      "verdance": "Sắc Xanh: tầng {stacks} trên {max}. Các lần thi triển hoàn tất của Hoa Nở Hoang Dã và Nở Hoa Lần Hai tích nó; ở {max}, Hồi Phục Nhanh trở thành Mãn Khai",
+      "freeExecute": "Kỹ năng kết liễu hợp lệ tiếp theo của bạn không tốn gì",
+      "resourceSap": "Hồi {value} tài nguyên hiện tại của bạn mỗi {interval} giây",
+      "nextAttackCrit": "Đòn tấn công tiếp theo của bạn chắc chắn chí mạng",
+      "healEcho": "Máu giảm xuống dưới {threshold}% sẽ hồi {value} máu",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Tăng sức mạnh phép thuật lên {value}",
@@ -2053,6 +2299,8 @@ export const vi_VN: EnTranslations = {
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
+      "bleedVuln": "Tăng sát thương chảy máu phải nhận thêm {pct}%",
+      "sourceVuln": "Nhận thêm {pct}% sát thương từ người đã gây hiệu ứng này",
       "spellVuln": "Aumenta el daño mágico recibido un {pct}%",
       "critVuln": "Aumenta la probabilidad de recibir golpes críticos un {pct}%",
       "costTax": "Aumenta los costes de habilidades un {pct}%",
@@ -2066,14 +2314,46 @@ export const vi_VN: EnTranslations = {
       "disarm": "Desarmado: no puede usar ataques con arma",
       "lockout": "Escuela de hechizos bloqueada",
       "imbue": "Arma imbuida con efectos adicionales",
-      "imbueRange": "Vũ khí được phù chú: {min} đến {max} sát thương thêm khi dùng Verdict.",
+      "galeheartWeapon": "Hoàn tất chuỗi {steps} đòn của Nhịp Chiến Hồn sẽ vọng lại đòn đánh {count} lần với {pct}% sát thương dưới dạng sát thương Thiên Nhiên",
+      "elementalTrance": "Sát thương phải nhận giảm {pct}%. {mana}% toàn bộ sát thương bạn gây ra được chuyển thành mana",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Bruin Form: tăng máu và giáp.",
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Fleet Form: tốc độ di chuyển tăng {pct}%.",
       "formFireball": "Ember Form: tốc độ di chuyển tăng {pct}%; tấn công và thi triển phép bị vô hiệu hóa",
+      "formMoonkin": "Dạng Cú Mặt Trăng: sát thương phép tăng {pct}% và giáp tăng {armorPct}%",
+      "formShadow": "Hình Gloamveil: sát thương Bóng Tối tăng {pct}%",
+      "resourceCount": "{value} trên {max}",
+      "formLich": "Thương Linh Hồn cũng đánh trúng thêm tối đa {targets} kẻ địch gần đó với {pct}% sát thương",
+      "afflictionEye": "Ánh Nhìn Nguyền tấn công mỗi {interval} giây; hiệu ứng tại Mắt Nguyền này tạo ra {pct}% Kết Án",
+      "afflictionEyeSecondary": "Hiệu ứng tại Mắt Nguyền này tạo ra {doomPct}% Kết Án; Phán Quyết vọng lại đây với {echoPct}% sát thương",
+      "afflictionAccomplice": "Sát thương đủ điều kiện cấp {value} Kết Án, tối đa một lần mỗi {interval} giây",
+      "afflictionViolence": "Còn lại {charges} lần báo thù; một đòn tấn công của địch cấp {doom} Kết Án và phản lại {damage} sát thương Bóng Tối",
+      "afflictionVicarious": "Chuyển hướng hoặc giảm {pct}% sát thương phải nhận và có thể tạo ra tối đa {max} Kết Án",
+      "afflictionPossession": "Tăng cường Kim Định Mệnh, Nuốt Chửng, Ánh Nhìn Nguyền, và Phán Quyết",
+      "afflictionJudgment": "Mắt Nguyền chính tạo thêm {eyePct}% Kết Án; Phán Quyết gây thêm {sentencePct}% sát thương và lần đầu tiên hoàn lại {refund} Kết Án",
+      "afflictionLitany": "Mỗi lần nhận Kết Án gây {damage} sát thương Bóng Tối cho tối đa {targets} kẻ địch trong bán kính {radius} thước, một lần mỗi giây",
+      "afflictionFateThreads": "{stacks} Sợi Định Mệnh: Phán Quyết gây thêm {sentencePct}% sát thương, hoặc Nuốt Chửng nhận thêm {doom} Kết Án mỗi nhịp",
+      "afflictionConsumeThreads": "Nuốt Chửng đang tiêu thụ {stacks} Sợi Định Mệnh để nhận thêm {doom} Kết Án mỗi nhịp",
+      "necromancyHarvestMark": "Cái chết có thể tạo 1 Mảnh Linh Hồn",
+      "necromancyOssuaryMark": "Lưu trữ {storedPct}% sát thương của bạn và thuộc hạ Bất Tử của bạn, cộng thêm {lancePct}% sát thương của Thương Linh Hồn; thi triển lại để kích nổ. Khi chết sẽ nổ trong bán kính {radius} thước và tạo 1 Mảnh Linh Hồn",
+      "necromancyDeathEcho": "Vọng Âm Tử Thần cũ; hiện không có kỹ năng nào tiêu thụ nó",
+      "warlockAnchor": "Thi triển lại trong bán kính {range} thước để quay về đây và tiêu hao neo",
+      "formMetamorph": "Dạng quỷ: kích thước cơ thể tăng {pct}%; các phần thưởng khác đi kèm hiệu ứng riêng",
+      "energyRegen": "Tăng hồi Năng Lượng thêm {pct}%",
       "defensiveStance": "Thế Thủ: giảm sát thương phải chịu, tăng đe dọa.",
       "righteousFury": "Lời Thề Rực Cháy: tăng mạnh đe dọa từ sát thương Thánh.",
+      "overpowerCharge": "{stacks} tầng: Đòn Tàn Phế tiếp theo của bạn gây thêm {pct}% sát thương",
+      "sweepingStrikes": "Đòn đánh đơn mục tiêu cũng trúng thêm {targets} kẻ địch gần đó với {pct}% sát thương",
+      "fingersOfFrost": "{charges} tầng: Thương Băng xem mục tiêu của nó như đang bị đóng băng và gây thêm {pct}% sát thương đóng băng",
+      "brainFreeze": "Roi Mùa Đông tiếp theo của bạn tức thời và bỏ qua thời gian hồi chiêu",
+      "wintersChill": "{charges} tầng Giá Lạnh Mùa Đông: các phép tương thích xem mục tiêu này như đang bị đóng băng",
+      "icicles": "{value} trên {max} Băng Nhọn; ở {max}, có thể thi triển Chông Băng Hà",
+      "desolation": "{charges} tầng: Tia Hủy Diệt tiếp theo của bạn thi triển nhanh hơn {castPct}%, hoặc Mưa Lửa tiếp theo của bạn đổ xuống ngay lập tức",
+      "ruinousBrand": "Còn lại {charges} bản sao: phép trực tiếp sao chép {otherPct}% sát thương vào đây, hoặc {selfPct}% khi đây là mục tiêu của chúng",
+      "duskfireClaim": "Cái chết cấp {value} Wrack",
+      "pyreGuardian": "Tạo ra {ruin} Wrack mỗi {ruinInterval} giây và gây {damage} sát thương Lửa trong bán kính {radius} thước mỗi {damageInterval} giây",
+      "perfectMoment": "Phi Tiêu Ê-te không tiêu hao Điện Tích Bí Thuật",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -2838,6 +3118,11 @@ export const vi_VN: EnTranslations = {
       "toolEffectRechargeFull": "{effect} đã được nạp đầy rồi.",
       "toolEffectRechargeToolCapped": "Hãy mang công cụ {profession} tốt hơn để nạp thêm cho {effect}.",
       "toolEffectRechargeMaterials": "Nạp lại {effect} cần {material} x{count}.",
+      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
+      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
+      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
+      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
+      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
       "tierPipAria": "Cấp {tier}",
       "nextUnlockTier": "{points} chỉ ra cấp độ tiếp theo: tỷ lệ thành công được cải thiện",
       "nextUnlockSpecialized": "{points} chỉ vào Chuyên ngành: giảm chi phí nguyên vật liệu",
@@ -3140,6 +3425,16 @@ export const vi_VN: EnTranslations = {
       "denyOutOfRange": "Bạn phải ở gần người yêu cầu để giao đồ ủy thác.",
       "denyNoSpace": "Người yêu cầu không còn chỗ trống trong túi đồ."
     },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
+    },
     "finder": {
       "title": "Tìm Hầm Ngục",
       "close": "Đóng",
@@ -3381,7 +3676,9 @@ export const vi_VN: EnTranslations = {
       "delete_confirm": "Nhập tên nhân vật để xác nhận xóa.",
       "already_in_world": "Nhân vật đã ở trong thế giới.",
       "taken_over": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
-      "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới."
+      "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Tài khoản này bị đình chỉ đến {date}.",
@@ -4228,7 +4525,8 @@ export const vi_VN: EnTranslations = {
     "resourceName": {
       "rage": "Cuồng Nộ",
       "mana": "Mana",
-      "energy": "Năng Lượng"
+      "energy": "Năng Lượng",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Tất cả lớp nhân vật",
@@ -4297,6 +4595,7 @@ export const vi_VN: EnTranslations = {
       "none": "Không có lớp nào khớp mọi bộ lọc. Xóa bớt một cái để thấy thêm."
     },
     "abilityHook": {
+      "evil_eye": "Chỉ định kẻ địch mà hành động và sự thống khổ của nó sẽ nuôi dưỡng Kết Án của bạn.",
       "heroic_strike": "Đặt sẵn một cú vung nặng tay tiêu nộ khí vào đòn đánh kế tiếp của bạn.",
       "revenge": "Quét trúng kẻ địch phía trước và có thể không tốn tài nguyên sau khi né hoặc đỡ đòn.",
       "hamstring": "Cản trở di chuyển của kẻ địch để chúng không thể chạy thoát.",
@@ -4307,9 +4606,21 @@ export const vi_VN: EnTranslations = {
       "holy_light": "Một đòn trị liệu vững chãi, đáng kể để hồi đầy cho đồng đội hoặc bản thân.",
       "devotion_aura": "Một buff bản thân lâu dài giúp tăng giáp để đòn đánh giảm uy lực.",
       "judgement": "Tiêu Ấn Chú đang kích hoạt để giáng đòn lên kẻ địch từ cự ly gần.",
+      "hammer_of_wrath": "Kết liễu một kẻ địch bị thương từ xa, hoặc bất kỳ kẻ địch nào khi đôi cánh của bạn còn hoạt động.",
+      "avenging_wrath": "Ban 10 Sùng Tín, rồi nhân đôi lượng Sùng Tín do kỹ năng tạo ra trong mười lăm giây.",
+      "bastion_sweep": "Quét khiên xuyên qua một nhóm để giành lấy mức đe dọa và tích Sùng Tín.",
+      "oath_chain": "Kéo một kẻ địch ở xa vào giữa bầy của bạn và ghìm đường tháo chạy của nó.",
+      "veilbound_march": "Đi xuyên qua một nhóm để đánh dấu chúng, làm cùn sát thương của chúng lên bạn và ghim chặt mức đe dọa.",
+      "holy_shield": "Dùng Sùng Tín để mở cửa sổ đỡ đòn chủ động, hấp thụ và một nhịp đe dọa.",
+      "consecration": "Chiếm lấy mặt đất quanh bạn bằng sát thương Thánh và mức đe dọa kéo dài.",
+      "hammer_of_justice": "Chặn một kẻ địch bằng đòn choáng ngắn và đáng tin cậy.",
+      "lay_on_hands": "Hồi một lượng máu lớn khi đồng minh sắp gục ngã.",
       "blessing_of_might": "Tăng sức tấn công cho mục tiêu thân thiện, nên niệm trước khi vào trận.",
       "divine_protection": "Một tấm bùa hộ mệnh nhanh gọn để hứng sát thương khi tình thế ngặt nghèo.",
       "raptor_strike": "Một cú vung cận chiến mạnh tay cho khi có kẻ áp sát bạn.",
+      "pack_command": "Ra lệnh cho bạn đồng hành tấn công và tích Hung Tính Bầy Đàn. Mỗi lớp khiến thú nuôi của bạn gây thêm 10% sát thương, tối đa 30%, trước khi Thả Thú Dữ tiêu hết các lớp.",
+      "stampede": "Gọi ba con thú tấn công trong 12 giây. Hãy dùng khi Hung Tính Bầy Đàn đầy để chúng giữ trọn thưởng sát thương tối đa suốt lần triệu.",
+      "measured_shot": "Một phát bắn tầm xa có chủ đích, hồi tập trung cho các đòn nặng hơn của bạn.",
       "aspect_of_the_hawk": "Một trạng thái bạn duy trì để gia tăng sức tấn công tầm xa.",
       "serpent_sting": "Tiêm vào một liều nọc độc gây sát thương tự nhiên theo thời gian.",
       "arcane_shot": "Một phát bắn tức thời từ xa cho lượng sát thương phụ nhanh gọn.",
@@ -4328,11 +4639,21 @@ export const vi_VN: EnTranslations = {
       "power_word_shield": "Bao bọc đồng đội trong một tấm khiên hứng đòn trước khi chúng giáng xuống.",
       "renew": "Một đòn trị liệu hồi theo thời gian, hữu dụng để niệm rồi tiếp tục di chuyển.",
       "lightning_bolt": "Một đòn niệm sát thương Tự Nhiên tầm xa, lựa chọn quen thuộc của bạn từ xa.",
+      "chain_lightning": "Đánh trúng một mục tiêu rồi nhảy sang hai kẻ địch gần đó, tích một Sấm cho cả lần niệm.",
+      "thunder_reservoir": "Tích sét cho đến khi Địa Giật hoặc Động Đất có thể tung ra phần thưởng đầy sức mạnh.",
       "rockbiter_weapon": "Phù chú vũ khí của bạn để mỗi cú vung cận chiến giáng nặng hơn.",
       "healing_wave": "Đòn trị liệu chủ lực của bạn, một liều hồi trực tiếp cho bản thân hoặc đồng đội.",
       "earth_shock": "Một cú chấn động tức thời cho sát thương Tự Nhiên nhanh khi bạn cần ngay.",
       "lightning_shield": "Tích điện cho bạn để kẻ tấn công nhận sát thương Tự Nhiên khi đánh trúng bạn.",
       "flame_shock": "Một đòn thiêu đốt tức thời giáng trực diện và tiếp tục sém cháy theo thời gian.",
+      "galeheart_weapon": "Truyền gió bão vào cả hai vũ khí và tưởng thưởng nhịp tấn công đều đặn.",
+      "warspirit_cadence": "Biến nhịp vũ khí đều đặn thành Tiếng Vọng Tâm Phong và một cơ hội niệm phép tức thời.",
+      "stormsurge": "Đôi khi đưa Đòn Tổ Tiên trở lại sớm sau khi bạn dùng một cơ hội Điềm Bão.",
+      "lifespring_weapon": "Truyền nước hồi phục vào vũ khí và tăng cường dòng chữa lành liên tục.",
+      "tidecall": "Triệu gọi thủy triều để cường hóa chuỗi phép hồi phục kế tiếp.",
+      "ancestor_return": "Đưa mọi thành viên nhóm hoặc đội đã ngã xuống trở lại sự sống sau một lần niệm dài ngoài chiến đấu.",
+      "stoneward": "Dựng khiên đá tích năng, chuyển sát thương phải chịu thành hồi phục.",
+      "primal_exaltation": "Giải phóng sức mạnh nguyên tố theo chuyên môn trong thời gian ngắn.",
       "fireball": "Đòn hỏa thuật chủ lực của bạn, vừa giáng một đòn vừa khiến mục tiêu cháy âm ỉ.",
       "fireball_form": "Trở thành tia lửa sống để vượt qua địa hình trống với tốc độ cao.",
       "frost_armor": "Một buff bản thân lâu dài giúp tôi luyện giáp của bạn trước trận đấu.",
@@ -4358,17 +4679,14 @@ export const vi_VN: EnTranslations = {
       "healing_touch": "Một đòn trị liệu đơn mục tiêu lớn với thời gian niệm dài, dùng để hồi đầy cho ai đó.",
       "mark_of_the_wild": "Một phúc lành lâu dài bạn ban cho bản thân hoặc đồng đội trước trận đấu.",
       "moonfire": "Giáng đòn tức thời và khiến mục tiêu cháy âm ỉ, hữu dụng khi đang di chuyển.",
+      "moonseed": "Thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt khi bạn ở Dạng Cú Mặt Trăng.",
       "rejuvenation": "Niệm tức thời và hồi máu cho đồng đội theo thời gian, để bạn cứ tiếp tục hành động.",
       "thorns": "Bảo hộ đồng đội để kẻ tấn công cận chiến tự làm mình bị thương khi ra đòn."
     },
     "petHook": {
       "emberkin": "Một con quỷ bắn cầu lửa từ xa, gặm dần kẻ địch từ khoảng cách an toàn.",
       "gloomshade": "Một con quỷ vững chãi biết khiêu khích và hứng đòn để bạn có thể niệm phép yên ổn.",
-      "duskborn": "Một con quỷ cận chiến nhanh nhẹn, đánh rất mạnh nhưng dễ gục khi bị áp lực.",
-      "spellhound": "Một kẻ tập kích bóng tối chuyên săn lùng các pháp sư của kẻ địch.",
-      "warfiend": "Một chiến binh cận chiến bền bỉ, lựa chọn toàn diện một khi bạn có thể triệu hồi nó.",
-      "pyre_colossus": "Một cỗ máy hủy diệt đồ sộ với đòn cận chiến nghiền nát, được triệu hồi vì sức mạnh thuần túy.",
-      "wraithborn": "Một pháp sư tinh nhuệ trút bóng tối nặng nề từ xa."
+      "pyre_colossus": "Một cỗ máy hủy diệt đồ sộ với đòn cận chiến nghiền nát, được triệu hồi vì sức mạnh thuần túy."
     },
     "bestiary": {
       "heading": "Thú Lục",
@@ -5328,6 +5646,8 @@ export const vi_VN: EnTranslations = {
       "chanWhisperBody": "Một tin nhắn riêng đến một người chơi theo tên, dù họ ở đâu. Dùng nó cho một lời nhỏ nhẹ.",
       "chanParty": "Tổ Đội.",
       "chanPartyBody": "Trò chuyện với mọi người trong nhóm của bạn, dù các bạn ở cách xa nhau đến đâu.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Chung.",
       "chanGeneralBody": "Một kênh phủ toàn vương quốc luôn bật, đến với mọi người đang trực tuyến, tiện để hỏi một câu hoặc trò chuyện chung. Khác với World và Looking for Group, bạn không bao giờ phải tự đăng ký tham gia.",
       "chanWorld": "Thế Giới.",
@@ -6187,7 +6507,7 @@ export const vi_VN: EnTranslations = {
     "browSoft": "Mềm",
     "browThick": "Dày",
     "browAngled": "Xếch",
-    "earrings": "Khuyên Tai",
+    "earrings": "Khuyên",
     "jewelMaterial": "Chất Liệu Trang Sức",
     "jewelDefault": "Nguyên Bản",
     "jewelGold": "Vàng",
@@ -7238,6 +7558,9 @@ export const vi_VN: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.",
     "bodyWeb": "Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy bật tăng tốc phần cứng trong cài đặt trình duyệt, cập nhật trình điều khiển đồ họa, sau đó khởi động lại trình duyệt.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Bỏ Qua"
   },
   "perfNudge": {
@@ -7293,7 +7616,12 @@ export const vi_VN: EnTranslations = {
     "sortLevel": "Cấp",
     "sortName": "Tên",
     "sortRecent": "Chơi Gần Đây",
-    "sortPlaytime": "Thời Gian Chơi"
+    "sortPlaytime": "Thời Gian Chơi",
+    "redesign": "Thiết Kế Lại",
+    "redesignHint": "Nhân vật này có trước trình tạo nhân vật mới. Bạn có một lần thiết kế lại miễn phí; nó được dùng khi bạn lưu.",
+    "redesignTitle": "Thiết Kế Lại {name}",
+    "redesignSave": "Lưu Diện Mạo Mới",
+    "redesignCancel": "Giữ Diện Mạo Hiện Tại"
   },
   "deleteCharacter": {
     "title": "Xóa Nhân Vật",
@@ -7321,7 +7649,8 @@ export const vi_VN: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Năng Lượng",
-      "rage": "Nộ Khí"
+      "rage": "Nộ Khí",
+      "focus": "Tập Trung"
     },
     "roles": {
       "warrior": "Đỡ Đòn / DPS Cận Chiến",
@@ -7424,6 +7753,7 @@ export const vi_VN: EnTranslations = {
           "say": "Nói",
           "yell": "Hét",
           "party": "Tổ Đội",
+          "battleground": "Battleground",
           "general": "Chung",
           "world": "Thế Giới",
           "lfg": "Tìm Đội",
@@ -7585,6 +7915,7 @@ export const vi_VN: EnTranslations = {
     "chat": {
       "rightClickName": "Nhấp chuột phải {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Tổ Đội] {name}: {message}",
         "yell": "{name} hét: {message}",
         "whisper": "{name} nhắn riêng: {message}",
@@ -7699,6 +8030,7 @@ export const vi_VN: EnTranslations = {
       "deathRecapAbility": "Bạn đã chết. Bị hạ gục bởi {ability}.",
       "deathRecapFalling": "Bạn đã chết. Bạn đã ngã tử vong.",
       "deathRecapDrowned": "Bạn đã chết. Bạn đã chết đuối.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Bạn cảm thấy đã được nghỉ ngơi và hồi phục hoàn toàn.",
       "ignoringChat": "Đang bỏ qua tin nhắn từ {name}.",
       "noLongerIgnoring": "Không còn bỏ qua {name} nữa.",
@@ -7727,6 +8059,7 @@ export const vi_VN: EnTranslations = {
       "notEnoughRage": "Không đủ nộ khí!",
       "notEnoughEnergy": "Không đủ năng lượng!",
       "notEnoughMana": "Không đủ mana!",
+      "notEnoughDevotion": "Không đủ Sùng Tín!",
       "notEnoughResource": "Không đủ {resource}!",
       "notEnoughHealth": "Không đủ sinh lực.",
       "targetMustDodge": "Mục tiêu của bạn phải né được trước đã.",
@@ -7742,6 +8075,7 @@ export const vi_VN: EnTranslations = {
       "outOfRange": "Ngoài tầm.",
       "noTarget": "Bạn không có mục tiêu.",
       "tooClose": "Quá gần!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Bạn phải đối mặt với mục tiêu.",
       "targetHealthBelow": "Kỹ năng đó cần mục tiêu có sinh lực dưới {percent}%.",
       "dagger": "Bạn phải trang bị một con dao găm.",
@@ -7854,6 +8188,10 @@ export const vi_VN: EnTranslations = {
     "pet": {
       "attack": "Tấn Công",
       "waterJet": "Phun Nước",
+      "felbolt": "Tiễn Tro",
+      "abyssalChain": "Xích Vực Sâu",
+      "autocastOn": "Tự động thi triển đang bật. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để tắt.",
+      "autocastOff": "Tự động thi triển đang tắt. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để bật.",
       "taunt": "Khiêu Khích",
       "healDemon": "Trị Liệu Quỷ",
       "healPet": "Trị Liệu Thú",
@@ -7864,6 +8202,10 @@ export const vi_VN: EnTranslations = {
       "petAttackDesc": "Ra lệnh cho thú tấn công mục tiêu thù địch hiện tại của bạn.",
       "waterJetTitle": "Phun Nước",
       "waterJetDesc": "Ra lệnh cho Nguyên Tố Nước của bạn dồn dập một luồng nước làm chậm trong 3 giây. Thời gian hồi chiêu 8 giây. Nhấp chuột phải để tự động tung chiêu mỗi khi hết thời gian hồi chiêu.",
+      "felboltTitle": "Tiễn Tro",
+      "felboltDesc": "Ra lệnh cho Emberkin phóng thêm một Tiễn Tro vào mục tiêu của bạn. Thời gian hồi chiêu 8 giây. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để bật/tắt tự động thi triển.",
+      "abyssalChainTitle": "Xích Vực Sâu",
+      "abyssalChainDesc": "Ra lệnh cho Duskmurk kéo một kẻ địch thường ở cách hơn 8 và tối đa 20 thước về phía mình. Không thể kéo trùm. Thời gian hồi chiêu 15 giây. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để bật/tắt tự động thi triển.",
       "petTauntTitle": "Thú Khiêu Khích",
       "petTauntDesc": "Ra lệnh cho thú lao vào và Gầm Gừ khi trong tầm. Hồi chiêu 10 giây.",
       "healDemonDesc": "Tiêu hao mana để truyền trị liệu cho quỷ của bạn trong 5 giây.",
@@ -7984,7 +8326,7 @@ export const vi_VN: EnTranslations = {
       "queueNote": "Bạn sẽ được ghép cặp với đối thủ trực tuyến có thứ hạng gần nhất, rồi được dịch chuyển đến đấu trường. Thắng để leo hạng; ai chịu thua trước (còn 1 máu) sẽ bại. Bạn sẽ trở về đúng nơi đã vào hàng chờ.",
       "ladderAllTime": "Bảng Xếp Hạng - Mọi Thời Đại",
       "ladderOnline": "Bảng Xếp Hạng - Trực Tuyến",
-      "ratingSummary": "Thứ hạng - {wins} thắng / {losses} thua",
+      "ratingSummary": "Thứ hạng - {wins} thắng / {losses} thua / {draws} hòa",
       "statusCountdown": "Sẵn sàng nào...",
       "statusReturning": "Đang trở về thế giới... {seconds}",
       "statusFight": "Chiến đến khi có kẻ chịu thua!",
@@ -8019,6 +8361,7 @@ export const vi_VN: EnTranslations = {
     "tooltip": {
       "rank": "Cấp {rank}",
       "cost": "{cost} {resource}",
+      "ruinCost": "{cost} Wrack",
       "range": "Tầm {range} thước",
       "rangeWithMin": "Tầm {min}-{max} thước",
       "instant": "Tức thời",
@@ -8030,6 +8373,7 @@ export const vi_VN: EnTranslations = {
       "requiresLevel": "Yêu cầu cấp {level}",
       "requiresForm": "Yêu cầu Hình {form}",
       "requiresStealth": "Yêu cầu ẩn thân",
+      "requiresStealthSkulduggery": "Yêu cầu ẩn thân (không cần khi đạt 3 U Ám hoặc trong Màn Bóng Tối)",
       "requiresCombo": "Tiêu hao điểm combo",
       "requiresTargetHealthBelow": "Yêu cầu mục tiêu dưới {percent}% máu",
       "requiresDodge": "Chỉ dùng được sau khi mục tiêu né đòn",
@@ -8045,7 +8389,9 @@ export const vi_VN: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Nộ Khí",
-      "energy": "Năng Lượng"
+      "energy": "Năng Lượng",
+      "focus": "tập trung",
+      "devotion": "Sùng Tín"
     },
     "forms": {
       "bear": "Gấu",
@@ -8248,6 +8594,7 @@ export const vi_VN: EnTranslations = {
       "clickDestroy": "Nhấp để hủy bỏ",
       "useFishing": "Dùng: Câu cá ở vùng nước gần đó.",
       "useHealingPotion": "Dùng: Hồi tức thời {amount} sinh lực. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
+      "useHealingPotionPct": "Dùng: Hồi tức thời {percent}% sinh lực tối đa. Dùng được trong chiến đấu. Hồi chiêu 2 phút.",
       "useManaPotion": "Dùng: Hồi tức thời {amount} mana. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
@@ -8485,6 +8832,58 @@ export const vi_VN: EnTranslations = {
         "name": "Loạt Tên",
         "description": "Trút mưa tên xuống khu vực mục tiêu trong 3 giây, gây {damage} sát thương mỗi 0.5 giây cho kẻ địch bên trong."
       },
+      "pack_command": {
+        "name": "Lệnh Bầy Đàn",
+        "description": "Ra lệnh cho thú nuôi còn sống của bạn đánh gây 36 đến 48 sát thương Vật Lý. Sát thương tăng theo sức tấn công của thú nuôi. Một đòn trúng hồi 20 tập trung và ban 1 Hung Tính Bầy Đàn trong 30 giây, tối đa 3. Mỗi lớp tăng 10% toàn bộ sát thương thú nuôi của bạn gây ra. Đòn này dùng số lớp bạn có trước khi trúng."
+      },
+      "stampede": {
+        "name": "Bầy Xéo",
+        "description": "Triệu 3 con thú trong 12 giây. Mỗi con tấn công mỗi 2 giây gây {damage} sát thương Vật Lý. Sát thương hiển thị bao gồm 8% sức tấn công tầm xa của bạn trước các thưởng sát thương thú nuôi. Các con thú khóa Hung Tính Bầy Đàn khi được triệu, nhận thêm 10% sát thương mỗi lớp. Khi Bầy Xéo đang hồi chiêu, các Lệnh Bầy Đàn thành công có 20% cơ hội đặt lại, chắc chắn sau 5 lần thất bại. Nó không thể đặt lại khi các con thú còn hoạt động. (Chúa Tể Bầy Đàn)"
+      },
+      "unleash_beast": {
+        "name": "Thả Thú Dữ",
+        "description": "Tiêu 3 Hung Tính Bầy Đàn sau khi thú nuôi của bạn đánh gây 83 đến 105 sát thương Vật Lý và chấn động mọi kẻ địch trong 6 mét gây 26 đến 34. Đòn đánh và chấn động dùng trọn thưởng sát thương thú nuôi 30% của Hung Tính Bầy Đàn và tăng theo sức tấn công của thú nuôi. Trong 8 giây sau đó, thú nuôi gây thêm 25% sát thương, tấn công nhanh hơn 35% và khiến Bắn Tà Ác chém lan tới 2 kẻ địch gần đó."
+      },
+      "measured_shot": {
+        "name": "Phát Bắn Điềm Tĩnh",
+        "description": "Bắn mục tiêu gây {damage} sát thương Vật Lý. Một phát trúng hồi 20 tập trung. Sát thương tăng theo sức tấn công tầm xa."
+      },
+      "cold_focus": {
+        "name": "Tập Trung Lạnh",
+        "description": "Trong 12 giây, Phát Bắn Điềm Tĩnh hồi thêm 50% tập trung, còn Kéo Dài tốn ít hơn 25% và niệm nhanh hơn 30%. (Dấu ấn Nhãn Băng)"
+      },
+      "bloodhook": {
+        "name": "Móc Máu",
+        "description": "Lao tới kẻ địch và gây Vết Thương Móc Máu, gây 34 sát thương Vật Lý cơ bản cộng 26% sức tấn công tầm xa của bạn trong 12 giây qua 4 nhịp. (Dấu ấn Dã Chiến)"
+      },
+      "shrapnel_charge": {
+        "name": "Đạn Mảnh",
+        "description": "Đánh trúng mục tiêu gây 24 đến 30 sát thương Vật Lý và tối đa 4 kẻ địch khác trong 6 mét gây 13 đến 17. Các mục tiêu khác cũng chảy máu 12 sát thương trong 6 giây. Nếu mục tiêu chính mang Vết Thương Móc Máu của bạn, gây ngay 1 nhịp vết thương. Sát thương trực tiếp tăng theo sức tấn công tầm xa."
+      },
+      "bloodtrail_assault": {
+        "name": "Đột Kích Vệt Máu",
+        "description": "Trong 12 giây, Móc Máu lan một vết thương ở 60% sức mạnh sang tối đa 2 kẻ địch gần đó, Xé Thương ra lệnh cho thú nuôi tấn công gây 18 sát thương, và Đạn Mảnh tăng 2 mét, gây thêm 25% sát thương cơ bản lên mục tiêu chính và kích hoạt thêm 50% sát thương vết thương."
+      },
+      "trailbreak": {
+        "name": "Cắt Dấu",
+        "description": "Nhảy lùi 12 mét. Nếu bạn có Đà Săn, nó được làm mới và nạp sẵn Tái Nhập trong 12 giây."
+      },
+      "wildheart": {
+        "name": "Tim Hoang Dã",
+        "description": "Tức thời hồi 30% máu tối đa của bạn."
+      },
+      "shellskin": {
+        "name": "Da Mai",
+        "description": "Giảm 60% sát thương phải chịu trong 8 giây, nhưng ngăn bạn tấn công khi còn hiệu lực."
+      },
+      "frostjaw_trap": {
+        "name": "Bẫy Hàm Băng",
+        "description": "Đặt bẫy tại kẻ địch được chọn hoặc dưới chân bạn. Bẫy kích hoạt sau 0,75 giây và tồn tại 30 giây. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây."
+      },
+      "pack_rally": {
+        "name": "Tập Hợp Bầy Đàn",
+        "description": "Khoác Dáng Tuấn Mã và tập hợp đồng minh gần đó với 30% tốc chạy cùng 10% tốc đánh và tốc niệm trong 10 giây."
+      },
       "hurricane": {
         "name": "Cuồng Phong",
         "description": "Triệu hồi cuồng phong xuống khu vực mục tiêu trong 6 giây, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên mỗi giây."
@@ -8699,15 +9098,20 @@ export const vi_VN: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Nhát Chém Gian Tà",
-        "description": "Một đòn đánh tức thì gây sát thương vũ khí cộng thêm {damage}. Tích 1 điểm liên hoàn."
+        "description": "Một đòn đánh tức thời gây sát thương vũ khí cộng thêm {damage}. Nhận 1 điểm liên hoàn.",
+        "specNote_assassination": "Thêm 1 Nghi Thức Độc (tối đa 6).",
+        "specNote_combat": "Khi Redline đang hoạt động, nút này trở thành Đòn Trời Giáng: 130% sát thương vũ khí cộng 10, nhận 2 điểm liên hoàn, và thêm 1 Redline (tối đa 4)."
       },
       "eviscerate": {
         "name": "Giấc Ngủ Vùi Đất",
-        "description": "Đòn kết liễu gây {damage}."
+        "description": "Chiêu kết liễu gây {damage} sát thương.",
+        "specNote_assassination": "Ở 6 Nghi Thức Độc, nút này trở thành Xé Độc: một đòn đánh lập tức gây toàn bộ sát thương chảy máu còn lại của bạn, gieo một vết thương độc mới, và hồi 20 năng lượng.",
+        "specNote_combat": "Đánh trúng đòn này với 4 điểm liên hoàn trở lên sẽ kích hoạt Redline trong 8 giây: Nhát Chém Gian Tà trở thành Đòn Trời Giáng và nút này trở thành Tắt Lịm (45 cộng 35 mỗi điểm liên hoàn, đánh mạnh hơn 25% cho mỗi nấc Redline tích được, hồi 25 năng lượng). Hãy dùng nó trước khi Redline kết thúc."
       },
       "backstab": {
         "name": "Đòn Đâm Hèn Hạ",
-        "description": "Đâm lén mục tiêu gây 150% sát thương vũ khí cộng thêm {damage}. Phải ở phía sau mục tiêu. Yêu cầu một thanh dao găm. Thưởng 1 điểm liên hoàn."
+        "description": "Đâm dao găm vào lưng mục tiêu gây 150% sát thương vũ khí cộng thêm {damage}. Phải đứng sau lưng mục tiêu. Yêu cầu dao găm. Nhận 1 điểm liên hoàn.",
+        "specNote_assassination": "Mỗi đòn đánh trúng thêm 1 Nghi Thức Độc (tối đa 6) và hoàn lại 15 năng lượng. Ở 6 Nghi Thức Độc, Giấc Ngủ Vùi Đất trở thành Xé Độc (gây toàn bộ sát thương chảy máu còn lại của bạn cùng lúc)."
       },
       "gouge": {
         "name": "Thọc Mắt",
@@ -8719,7 +9123,7 @@ export const vi_VN: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Nhịp Cắt Cổ",
-        "description": "Đòn kết liễu tăng 30% tốc độ đánh cận chiến. Kéo dài hơn theo mỗi điểm liên hoàn."
+        "description": "Chiêu kết liễu tăng 30% tốc độ đánh cận chiến trong 12 giây cộng thêm 4 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 32 giây)."
       },
       "sprint": {
         "name": "Gót Chân Nhanh",
@@ -8727,15 +9131,17 @@ export const vi_VN: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Đòn Chơi Xấu",
-        "description": "Đòn kết liễu làm choáng mục tiêu. Kéo dài thêm 1 giây cho mỗi điểm liên hoàn."
+        "description": "Chiêu kết liễu làm choáng mục tiêu trong 1 giây cộng thêm 1 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 6 giây)."
       },
       "ambush": {
         "name": "Đòn Kẻ Rình Rập",
-        "description": "Mai phục mục tiêu gây 250% sát thương vũ khí cộng thêm {damage}. Phải đang ẩn thân và ở phía sau mục tiêu. Yêu cầu một thanh dao găm. Thưởng 1 điểm liên hoàn."
+        "description": "Xuất chiêu từ trong bóng tối gây 250% sát thương vũ khí cộng thêm {damage}. Phải đang ẩn thân và đứng sau lưng mục tiêu. Yêu cầu dao găm. Nhận 1 điểm liên hoàn.",
+        "specNote_subtlety": "Dùng từ Màn Chạng Vạng sẽ thêm 1 U Ám (tối đa 3). Ở 3 U Ám, bạn có thể dùng đòn này MÀ KHÔNG CẦN ẩn thân và từ mọi góc: lần dùng đó không tốn gì, tiêu hết 3 U Ám, kích hoạt Màn Bóng Tối 6 giây, và gây sát thương gấp đôi."
       },
       "stealth": {
         "name": "Màn Chạng Vạng",
-        "description": "Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Duskveil. Niệm lại để bước ra."
+        "description": "Ẩn giấu bạn trong bóng tối: kẻ địch hầu như không nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Màn Chạng Vạng. Thi triển lại để bước ra.",
+        "specNote_subtlety": "Mỗi đòn mở màn bạn dùng từ Màn Chạng Vạng thêm 1 U Ám (tối đa 3)."
       },
       "adrenaline_rush": {
         "name": "Huyết Tăng Tốc",
@@ -8743,11 +9149,13 @@ export const vi_VN: EnTranslations = {
       },
       "garrote": {
         "name": "Dây Siết Cổ",
-        "description": "Siết cổ kẻ địch, gây {damage} sát thương ngay lập tức và khiến nó chảy máu {overTime} trong 18 giây. Phải đang ẩn thân. Tặng 1 điểm liên hoàn."
+        "description": "Siết dây quanh cổ kẻ địch, gây ngay {damage} sát thương và khiến nó chảy máu {overTime} sát thương trong 18 giây. Phải đang ẩn thân. Nhận 1 điểm liên hoàn.",
+        "specNote_subtlety": "Dùng từ Màn Chạng Vạng sẽ thêm 1 U Ám (tối đa 3). Ở 3 U Ám, bạn có thể dùng đòn này MÀ KHÔNG CẦN ẩn thân: lần dùng đó không tốn gì, tiêu hết 3 U Ám, và kích hoạt Màn Bóng Tối 6 giây."
       },
       "cheap_shot": {
         "name": "Thụi Bụng",
-        "description": "Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Phải đang ẩn thân. Thưởng 2 điểm liên hoàn."
+        "description": "Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Phải đang ẩn thân. Nhận 2 điểm liên hoàn.",
+        "specNote_subtlety": "Dùng từ Màn Chạng Vạng sẽ thêm 1 U Ám (tối đa 3). Ở 3 U Ám, bạn có thể dùng đòn này MÀ KHÔNG CẦN ẩn thân: lần dùng đó không tốn gì, tiêu hết 3 U Ám, và kích hoạt Màn Bóng Tối 6 giây."
       },
       "sap": {
         "name": "Đánh Lén Mê",
@@ -8759,11 +9167,11 @@ export const vi_VN: EnTranslations = {
       },
       "expose_armor": {
         "name": "Xuyên Phá Giáp",
-        "description": "Đòn kết liễu phơi bày mục tiêu, giảm giáp của chúng đi {damage} trong 30 giây."
+        "description": "Chiêu kết liễu phơi bày mục tiêu trong 30 giây: mỗi điểm liên hoàn tiêu hao giảm giáp của nó 2% (5 điểm liên hoàn: {damage}%)."
       },
       "rupture": {
         "name": "Rỉ Máu Chí Tử",
-        "description": "Đòn kết liễu gây vết thương cho mục tiêu, khiến nó chảy máu nhận {damage} trong 16 giây."
+        "description": "Chiêu kết liễu gây thương tích cho mục tiêu: nó chảy máu mỗi 2 giây, trong 6 giây cộng thêm 2 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 16 giây và tổng {damage} sát thương)."
       },
       "vanish": {
         "name": "Smokefade",
@@ -8785,17 +9193,129 @@ export const vi_VN: EnTranslations = {
         "name": "Ấn Khắc Lời Thề",
         "description": "Tràn đầy sức mạnh Thánh trong 30 giây, khiến mỗi cú vung cận chiến của bạn gây thêm {damage} sát thương Thánh. Giải phóng bằng Verdict."
       },
+      "judgement": {
+        "name": "Phán Quyết",
+        "description": "Giải phóng Ấn đang kích hoạt của bạn lên kẻ địch, tiêu hao nó để gây lượng sát thương Thánh tích trữ trong đó."
+      },
       "holy_light": {
         "name": "Thánh Quang Chữa Lành",
         "description": "Trị liệu cho đồng minh {damage} máu."
       },
+      "divine_ascension": {
+        "name": "Thăng Thiên Thần Thánh",
+        "description": "Tiêu 20 Sùng Tín để nhận 5 lượt Thăng Thiên trong tối đa 45 giây. Các kỹ năng được đánh dấu tiêu một lượt và nhận thêm một hiệu ứng."
+      },
+      "aura_mastery": {
+        "name": "Hòa Hợp Thánh Thiện",
+        "description": "Trong 8 giây, tăng cường mọi Sùng Tín và Hào Quang Báo Thù đang hoạt động trong nhóm bạn. Sùng Tín Thành Lũy giảm 15% sát thương; Báo Thù gây 15 sát thương Thánh. Dùng nhiều lần sẽ làm mới thay vì cộng dồn."
+      },
+      "devotion_ward": {
+        "name": "Sùng Tín Thành Lũy",
+        "description": "Giảm 5% sát thương mà bạn và các thành viên nhóm phải chịu cho đến khi chết hoặc bị thay thế. Chỉ hào quang này và Hào Quang Báo Thù thay thế lẫn nhau; Sùng Tín Rực Rỡ, Bình Minh và Ân Điển cùng tồn tại."
+      },
+      "hammer_of_grace": {
+        "name": "Búa Ân Điển",
+        "description": "Tức thời ném một chiếc búa thánh vào kẻ địch trong 20 m gây {damage}, hồi 70 mana, hồi cho bạn 50% sát thương đã gây và tạo 1 Sùng Tín khi gây sát thương. Báo Thù Nhật Quang cho phép Búa Ân Điển bỏ qua hồi chiêu và hồi cho bạn 100% sát thương đã gây."
+      },
+      "hushbrand": {
+        "name": "Dấu Tịch Lặng",
+        "description": "Ngắt việc niệm chú và ngăn các phép thuộc trường phái đó trong 4 giây."
+      },
+      "guardian_covenant": {
+        "name": "Giao Ước Hộ Vệ",
+        "description": "Bảo vệ một mục tiêu đồng minh và chính bạn, giảm 20% sát thương phải chịu trong 8 giây. Mặc định chọn bạn khi không có mục tiêu đồng minh nào được chọn."
+      },
+      "solar_step": {
+        "name": "Bước Nhật Quang",
+        "description": "Tăng 150% tốc độ di chuyển của bạn trong 2 giây."
+      },
+      "solar_invocation": {
+        "name": "Triệu Nhật",
+        "description": "Tức thời hồi {damage} máu cho một đồng minh hoặc gây sát thương Thánh vừa phải lên kẻ địch. Cả hai cách dùng đều tạo 1 Sùng Tín. Trong Thăng Thiên, một lần niệm hồi máu cũng hồi một nửa cho các người chơi đồng minh trong 10 m quanh mục tiêu."
+      },
+      "radiant_devotion": {
+        "name": "Sùng Tín Rực Rỡ",
+        "description": "Tăng 20 sức mạnh phép thuật cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Bình Minh hoặc Ân Điển của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác."
+      },
+      "dawn_devotion": {
+        "name": "Sùng Tín Bình Minh",
+        "description": "Tăng 40 sức tấn công cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Rực Rỡ hoặc Ân Điển của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác và với tiếng hô của chiến binh."
+      },
+      "grace_devotion": {
+        "name": "Sùng Tín Ân Điển",
+        "description": "Bạn và các thành viên nhóm hồi 15 mana mỗi 5 giây và tốn ít hơn 3% mana trong 30 phút. Thay thế Sùng Tín Rực Rỡ hoặc Bình Minh của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác."
+      },
+      "recall_the_fallen": {
+        "name": "Gọi Người Ngã Xuống",
+        "description": "Đưa một thành viên nhóm đã chết trở lại sự sống với 35% máu và mana. Người Chữa Lành Mặt Trời cấp 16 trở lên sẽ thay vào đó gọi về mọi thành viên đã ngã xuống của nhóm."
+      },
+      "beacon_of_light": {
+        "name": "Ngọn Hải Đăng Ánh Sáng",
+        "description": "Đánh dấu một thành viên nhóm làm Ngọn Hải Đăng Ánh Sáng của bạn. 50% lượng hồi máu trực tiếp hiệu quả của bạn lên một thành viên khác trong 60 m cũng hồi cho Ngọn Hải Đăng. Hồi máu diện rộng và theo chu kỳ không được truyền. Kéo dài đến khi một trong hai chết."
+      },
+      "final_edict": {
+        "name": "Sắc Lệnh Cuối",
+        "description": "Tung một đòn vũ khí nghiền nát và tạo 1 Sùng Tín khi gây sát thương. Một đòn trúng thành công giảm 2 giây hồi chiêu còn lại của Bình Minh Rơi. Các đòn đánh thường trúng và các đòn Sắc Lệnh Cuối có 15% cơ hội ban Cơn Thịnh Nộ Bình Minh trong 8 giây. Thăng Thiên còn giải phóng một vụ nổ Thánh quanh bạn."
+      },
+      "dawnfall": {
+        "name": "Bình Minh Rơi",
+        "description": "Gây {damage} sát thương Thánh lên kẻ địch gần đó và tạo 1 Sùng Tín. Đánh trúng ít nhất một kẻ địch sẽ giảm 2 giây hồi chiêu còn lại của Sắc Lệnh Cuối. Thăng Thiên tăng sát thương và bán kính."
+      },
+      "sun_gods_verdict": {
+        "name": "Phán Quyết Thần Mặt Trời",
+        "description": "Phán xử một kẻ địch dưới Phán Quyết Thần Mặt Trời trong 30 giây. Sắc Lệnh Cuối và Bình Minh Rơi khắc một dấu khi đánh trúng. Kỹ năng đặt dấu thứ ba sẽ định đoạt bản án: Sắc Lệnh Cuối giáng sát thương tàn khốc lên kẻ bị kết tội; Bình Minh Rơi kích nổ phán quyết, gây sát thương và làm choáng kẻ địch gần đó trong 1,5 giây."
+      },
+      "valkyrs_calling": {
+        "name": "Tiếng Gọi Valkyrie",
+        "description": "Bay lên không trung, miễn nhiễm sát thương khi bạn lao về phía kẻ địch. Sau 2 giây, bạn giáng xuống khu vực mục tiêu gây {damage} sát thương Thánh và tạo 1 Sùng Tín. Thăng Thiên tăng 50% sát thương va chạm và tiêu 1 lượt."
+      },
+      "faithforged_guard": {
+        "name": "Món Nợ Ánh Sáng",
+        "description": "Trong 8 giây, đòn đánh tiếp theo của kẻ địch nhắm vào bạn sẽ được đáp trả: tối đa {buff} sát thương bị chặn và trả lại kẻ tấn công dưới dạng sát thương Thánh, và bạn nhận 1 Sùng Tín. Chỉ một đòn được đáp trả. Thăng Thiên nâng lượng có thể đáp trả thêm 50%."
+      },
+      "mercy_lance": {
+        "name": "Thương Từ Bi",
+        "description": "Gây {damage} sát thương Thánh lên kẻ địch và tạo 1 Sùng Tín khi gây sát thương. Trong Thăng Thiên, nó tiêu 1 lượt để bảo đảm một đòn chí mạng."
+      },
+      "sacred_form": {
+        "name": "Thánh Hình",
+        "description": "Bước vào trạng thái thánh cho đến khi chết, tăng 10% lượng hồi máu và 5% tỉ lệ chí mạng phép, đồng thời giảm 50% mức đe dọa tạo ra. Chỉ dành cho Người Chữa Lành Mặt Trời."
+      },
+      "dawns_embrace": {
+        "name": "Vòng Tay Bình Minh",
+        "description": "Tung ra một đòn hồi máu mạnh và tạo 1 Sùng Tín. Cộng Hưởng Rực Rỡ giảm 50% chi phí mana và thời gian niệm còn 1,5 giây. Thăng Thiên khiến nó tức thời và tăng 35% lượng hồi máu."
+      },
+      "radiant_chorus": {
+        "name": "Hợp Xướng Rực Rỡ",
+        "description": "Hồi {damage} máu cho đồng minh gần đó và tạo 1 Sùng Tín. Hồi máu hiệu quả cho ít nhất 2 đồng minh sẽ ban Cộng Hưởng Rực Rỡ: Thánh Quang Chữa Lành kế tiếp thành tức thời, hoặc Vòng Tay Bình Minh kế tiếp tốn ít hơn 50% mana và niệm trong 1,5 giây. Thăng Thiên tăng lượng hồi máu và bán kính của Hợp Xướng Rực Rỡ."
+      },
+      "life_covenant": {
+        "name": "Giao Ước Sinh Mệnh",
+        "description": "Giảm 40% sát thương một đồng minh phải chịu trong 6 giây. Trong Thăng Thiên còn ban một lá chắn 120 điểm mà không tiêu lượt."
+      },
+      "aegis_first_dawn": {
+        "name": "Khiên Bình Minh Đầu Tiên",
+        "description": "Niệm trong 5 giây, tạo mái vòm thánh rộng 10 mét. Đồng minh bên trong được hồi máu mỗi giây và nhận ít hơn 50% sát thương. Hoàn tất việc niệm sẽ giải phóng một đợt hồi máu cuối và ban 30% tốc chạy trong 4 giây."
+      },
+      "vowkeeper_strike": {
+        "name": "Đòn Giữ Thệ",
+        "description": "Đánh với mức đe dọa cao và tạo 1 Sùng Tín. Một đòn thành công có 20% cơ hội ban Báo Thù Nhật Quang trong 8 giây; mỗi lần đỡ thành công có 25%. Báo Thù Nhật Quang tăng cường Đĩa Nhật Quang, Búa Ân Điển hoặc Thánh Quang Chữa Lành kế tiếp của bạn. Thăng Thiên còn ban một lá chắn hấp thụ nhỏ."
+      },
+      "bastion_rite": {
+        "name": "Nghi Thức Thành Lũy",
+        "description": "Giảm 20% sát thương vật lý phải chịu và tăng 20% tỉ lệ đỡ trong 6 giây. Thăng Thiên kéo dài thời gian lên 10 giây."
+      },
+      "sunward_disc": {
+        "name": "Đĩa Nhật Quang",
+        "description": "Cần một chiếc khiên. Ném một chiếc đĩa rực rỡ đánh trúng rồi nảy giữa các kẻ địch gần đó. Mỗi cú va chạm gây sát thương tạo 1 Sùng Tín. Báo Thù Nhật Quang khiến Đĩa Nhật Quang không tốn mana, bỏ qua hồi chiêu và gây thêm 20% sát thương. Thăng Thiên tăng cường 5 lần nảy."
+      },
+      "sacred_challenge": {
+        "name": "Thúc Giục Thiêng",
+        "description": "Buộc một kẻ địch tấn công bạn. Trong Thăng Thiên còn giảm 15% mọi sát thương phải chịu trong 4 giây mà không tiêu lượt."
+      },
       "devotion_aura": {
         "name": "Hào Quang Kiên Định",
         "description": "Tăng giáp của bạn thêm {buff} trong 30 phút."
-      },
-      "judgement": {
-        "name": "Phán Quyết",
-        "description": "Giải phóng Ấn đang kích hoạt của bạn lên kẻ địch, tiêu hao nó để gây lượng sát thương Thánh tích trữ trong đó."
       },
       "blessing_of_might": {
         "name": "Lời Thề Sắt Thép",
@@ -8803,7 +9323,7 @@ export const vi_VN: EnTranslations = {
       },
       "divine_protection": {
         "name": "Bùa Hộ Đức Tin",
-        "description": "Một tấm bùa hộ mệnh hấp thụ {damage} sát thương trong 10 giây."
+        "description": "Một lá chắn thánh hấp thụ {damage}% máu tối đa của bạn trong {duration} giây."
       },
       "hammer_of_justice": {
         "name": "Búa Phán Nứt Vỡ",
@@ -8811,7 +9331,7 @@ export const vi_VN: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Nghi Thức Cuối Cùng",
-        "description": "Một luồng trị liệu khổng lồ: hồi phục {damage} máu. Hồi chiêu 10 phút."
+        "description": "Một luồng trị liệu khổng lồ hồi phục {damage}% máu tối đa của bạn. Hồi chiêu 10 phút."
       },
       "holy_taunt": {
         "name": "Khiêu Khích Thánh",
@@ -8827,7 +9347,23 @@ export const vi_VN: EnTranslations = {
       },
       "consecration": {
         "name": "Thánh Địa",
-        "description": "Thánh hóa mặt đất bên dưới ngươi, thiêu đốt kẻ địch lân cận gây {damage} sát thương Thần Thánh mỗi 2 giây trong 10 giây."
+        "description": "Thánh hóa mặt đất trong 9 giây và gây {damage} sát thương Thần Thánh mỗi giây. Hộ Vệ Đức Tin chịu ít hơn 10% sát thương khi đứng bên trong."
+      },
+      "bastion_sweep": {
+        "name": "Quét Thành Lũy",
+        "description": "Quét khiên đang trang bị xuyên qua kẻ địch trong cung phía trước 180 độ, gây {damage} sát thương Thánh với mức đe dọa cao và tạo 1 Sùng Tín. Thăng Thiên tăng 30% sát thương và bán kính lên 8 m."
+      },
+      "oath_chain": {
+        "name": "Xích Thề Nguyện",
+        "description": "Tức thời trói một kẻ địch ở xa bằng xích thánh. Kẻ địch di chuyển về phía bạn với tốc độ 18 m mỗi giây cho đến khi còn 3 m, rồi bị làm chậm 50% trong 4 giây. Trong Thăng Thiên, nó trói thêm một kẻ địch gần đó."
+      },
+      "veilbound_march": {
+        "name": "Cuộc Hành Quân Màn Che",
+        "description": "Trở nên phi thực thể trong 4 giây, nhận 40% tốc chạy và 30% giáp, đồng thời miễn nhiễm trói chân, làm chậm và dịch chuyển. Kẻ địch bạn đi xuyên qua sẽ nhận Dấu Màn Che trong 6 giây: chúng chịu sát thương Thánh mỗi giây, gây ít hơn 20% sát thương lên bạn và tạo thêm mức đe dọa. Dấu đầu tiên ban 1 Sùng Tín. Khi cuộc hành quân kết thúc, kẻ địch bị đánh dấu ở gần chịu một đợt bùng nổ cuối. Thăng Thiên tăng 50% đợt bùng nổ và kéo nhẹ chúng về phía bạn."
+      },
+      "veilbound_mark": {
+        "name": "Dấu Màn Che",
+        "description": "Chịu sát thương Thánh mỗi giây, gây ít hơn 20% sát thương lên thánh kỵ sĩ đã đặt dấu, và tạo thêm mức đe dọa hướng về thánh kỵ sĩ đó."
       },
       "righteous_fury": {
         "name": "Lời Thề Rực Cháy",
@@ -8835,7 +9371,7 @@ export const vi_VN: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Hào Quang Báo Đền",
-        "description": "Bao bọc bạn trong năng lượng thánh thiện trong 30 phút, gây 5 sát thương Thánh cho bất kỳ kẻ địch nào đánh cận chiến bạn."
+        "description": "Bao bọc bạn và nhóm của bạn trong năng lượng thánh cho đến khi chết hoặc bị thay thế. Kẻ địch đánh cận chiến một đồng minh chịu ảnh hưởng sẽ nhận {buff} sát thương Thánh, và đồng minh chịu ảnh hưởng gây thêm {buff} sát thương Thánh bằng đòn đánh tự động."
       },
       "tame_beast": {
         "name": "Kết Giao Hoang Dã",
@@ -8869,6 +9405,14 @@ export const vi_VN: EnTranslations = {
         "name": "Phản Nanh",
         "description": "Phản công sau khi mục tiêu né đòn, gây sát thương vũ khí cộng thêm {damage}. Không thể bị né."
       },
+      "hunting_momentum": {
+        "name": "Đà Săn",
+        "description": "Bị động: Đòn Mổ Bụng ban 1 Đà Săn trong 8 giây, tối đa 3. Ở 3 lớp, Xé Thương gây thêm 45% sát thương đòn đánh và tiêu hết các lớp. (Dã Chiến)"
+      },
+      "fieldcraft_reentry": {
+        "name": "Tái Nhập Vũ Trang",
+        "description": "Bị động: Cắt Dấu làm mới Đà Săn và nạp sẵn Đòn Mổ Bụng hoặc Móc Máu kế tiếp trong 12 giây. Đòn Mổ Bụng gây thêm 15% sát thương mỗi lớp. Móc Máu gây thêm 18 đến 24 sát thương Vật Lý, tăng 15% mỗi lớp và theo sức tấn công tầm xa của bạn. Ở 3 lớp, một trong hai đòn sẽ tiêu Đà Săn. (Dã Chiến)"
+      },
       "wing_clip": {
         "name": "Nhát Chém Xiềng Xích",
         "description": "Gây một vết thương với {damage} sát thương, làm chậm kẻ địch 40% trong 10 giây."
@@ -8887,7 +9431,7 @@ export const vi_VN: EnTranslations = {
       },
       "rapid_fire": {
         "name": "Giương Cung Cuồng Loạn",
-        "description": "Tăng tốc độ tấn công của bạn thêm 40% trong 15 giây."
+        "description": "Vừa di chuyển vừa bắn nhanh sáu phát trong 2,4 giây. Mỗi phát gây {damage} sát thương vật lý."
       },
       "smite": {
         "name": "Trừng Phạt",
@@ -8932,6 +9476,10 @@ export const vi_VN: EnTranslations = {
       "lightning_bolt": {
         "name": "Tia Hồ Quang",
         "description": "Phóng ra một tia sét gây {damage} sát thương Tự Nhiên."
+      },
+      "thunder_reservoir": {
+        "name": "Bể Sấm",
+        "description": "Bị động: Tia Hồ Quang và Sét Rẽ Nhánh ban Sấm, tối đa 5. Ở 5 Sấm, Địa Giật gây thêm 125% sát thương hoặc Động Đất gây thêm 100%, rồi tiêu hết Sấm. (Gọi Sấm)"
       },
       "rockbiter_weapon": {
         "name": "Vũ Khí Khắc Đá",
@@ -8989,9 +9537,29 @@ export const vi_VN: EnTranslations = {
         "name": "Hắc Hủ",
         "description": "Hủ hóa mục tiêu, gây {damage} sát thương Bóng Tối trong 18 giây."
       },
+      "evil_eye": {
+        "name": "Ác Nhãn",
+        "description": "Đánh dấu một kẻ địch làm tâm điểm của những lời nguyền của bạn. Di chuyển Ác Nhãn sẽ giữ nguyên Kết Án nhưng không làm mới thời hạn 20 giây của nó."
+      },
+      "maledict_gaze": {
+        "name": "Ánh Nhìn Nguyền",
+        "description": "Mắt Nguyền của bạn tấn công Ác Nhãn chính đã chọn mỗi 2,5 giây bằng sát thương Bóng Tối. Chiếm Hữu Ác Nhãn nhân đôi tốc độ tấn công của nó."
+      },
+      "needle_of_fate": {
+        "name": "Kim Định Mệnh",
+        "description": "Xuyên qua kẻ địch gây {damage} sát thương Bóng Tối và tạo ra 5 Kết Án nếu nó mang Ác Nhãn của bạn. Mỗi đòn trúng vào Ác Nhãn chính của bạn thêm 1 Sợi Định Mệnh trong 12 giây, tối đa 3. Nếu không có Ác Nhãn nào tồn tại, Kim sẽ đánh dấu mục tiêu của nó trước."
+      },
+      "sentence": {
+        "name": "Phán Quyết",
+        "description": "Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Mỗi Sợi tăng 6% sát thương. Các hiệu ứng bổ sung leo thang ở 20, 50, 80, và 100 Kết Án. Mức tăng sát thương của nó chững lại sau cấp 16."
+      },
       "life_tap": {
         "name": "Mặc Cả Nghiệt Ngã",
         "description": "Chuyển hóa {damage} máu thành {damage} mana."
+      },
+      "cursed_accomplice": {
+        "name": "Đồng Lõa Bị Nguyền",
+        "description": "Liên kết với Mắt Nguyền của bạn khi không có đồng minh nào được chọn, khiến Ánh Nhìn của nó tạo ra 2 Kết Án. Liên kết với một thành viên tổ đội đã chọn khiến chỉ sát thương của người đó lên Ác Nhãn của bạn mới tạo ra 3 thay vào đó. Một liên kết mới sẽ thay thế liên kết trước đó và chỉ có thể kích hoạt một lần mỗi 2 giây."
       },
       "curse_of_agony": {
         "name": "Tà Chú Thống Khổ",
@@ -9000,6 +9568,46 @@ export const vi_VN: EnTranslations = {
       "drain_life": {
         "name": "Nuốt Chửng",
         "description": "Hút sinh lực của mục tiêu, chuyển {damage} máu sang cho bạn mỗi giây trong 5 giây."
+      },
+      "litany_of_guilt": {
+        "name": "Kinh Cầu Tội Lỗi",
+        "description": "Nguyền rủa Ác Nhãn chính của bạn trong 6 giây. Mỗi lần nhận Kết Án sẽ giải phóng một đợt sóng gây sát thương cho tối đa 2 kẻ địch khác trong bán kính 8 thước, tối đa một lần mỗi giây. Cấp 2 kéo dài hiệu ứng này lên 8 giây và 4 kẻ địch."
+      },
+      "cinderhide": {
+        "name": "Da Than Hồng",
+        "description": "Làm cứng da bạn thành xỉ nguội trong 10 giây, giảm 25% toàn bộ sát thương phải nhận."
+      },
+      "umbral_anchor": {
+        "name": "Neo Bóng Tối",
+        "description": "Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó, tiêu hao neo và bắt đầu thời gian hồi chiêu 45 giây."
+      },
+      "soulwell": {
+        "name": "Giếng Linh Hồn",
+        "description": "Triệu hồi một Giếng Linh Hồn trong 3 phút. Khi ngoài chiến đấu, thành viên tổ đội có thể nạp lại Đá Linh Hồn của họ tối đa 3 lần. Một Đá Linh Hồn hồi 25% máu tối đa và dùng chung thời gian hồi chiêu với thuốc."
+      },
+      "hex_of_violence": {
+        "name": "Lời Nguyền Bạo Lực",
+        "description": "Bỏ bùa kẻ địch trong 8 giây. 3 hành động gây sát thương tiếp theo của nó sẽ mỗi lần tạo ra 7 Kết Án và quất nó 16 sát thương Bóng Tối."
+      },
+      "cruel_pact": {
+        "name": "Khế Ước Tàn Nhẫn",
+        "description": "Hy sinh 12% máu tối đa của bạn để hồi 1,5% mana tối đa và tạo ra 20 Kết Án. Không thể dùng khi máu ở mức 20% hoặc thấp hơn."
+      },
+      "vicarious_suffering": {
+        "name": "Thống Khổ Sẻ Chia",
+        "description": "Liên kết nỗi đau khổ của bạn trong 8 giây và tạo ra tối đa 15 Kết Án từ các đòn tấn công thù địch. Lên chính bạn, giảm 20% sát thương phải nhận. Lên một đồng minh, chuyển hướng tối đa 20% sát thương về bạn mà không đưa máu bạn xuống dưới 15%."
+      },
+      "possess_evil_eye": {
+        "name": "Chiếm Hữu Ác Nhãn",
+        "description": "Kẻ Nguyền Rủa chiếm hữu Ác Nhãn chính của bạn trong 15 giây và tạo ra 35 Kết Án. Kim Định Mệnh thi triển trong 1 giây và tạo thêm 2 Kết Án, Nuốt Chửng có thể được dẫn phép khi đang di chuyển, và Phán Quyết gây thêm 25% sát thương và giải phóng một tiếng vọng trễ với 60% sát thương, giảm dần xuống 30% qua các cấp 17-20."
+      },
+      "hour_of_judgment": {
+        "name": "Giờ Phán Xét",
+        "description": "Giáng sự phán xét lên Ác Nhãn chính của bạn trong 15 giây, cấp 40 Kết Án và 3 Sợi Định Mệnh, kích hoạt Chiếm Hữu, nhân đôi Kết Án tạo ra qua Mắt Nguyền chính, và tăng 20% sát thương của Phán Quyết. Phán Quyết đầu tiên hoàn lại 50 Kết Án."
+      },
+      "coven": {
+        "name": "Hội Phù Thủy",
+        "description": "Tạo các Ác Nhãn phụ trên tối đa 4 kẻ địch gần đó trong 15 giây. Chúng nạp vào bể Kết Án chung ở mức 50%, và Phán Quyết vọng đến chúng với 35% sát thương."
       },
       "fear": {
         "name": "Giày Vò",
@@ -9013,9 +9621,14 @@ export const vi_VN: EnTranslations = {
         "name": "Lửa Chạng Vạng",
         "description": "Tức thì thiêu đốt mục tiêu bằng bóng tối nung cháy gây {damage} sát thương Bóng Tối."
       },
+      "ruinous_brand": {
+        "name": "Dấu Ấn Diệt Vong",
+        "description": "Đóng dấu một kẻ địch trong 15 giây. 3 phép trực tiếp tiếp theo của bạn sẽ vọng lại 25% sát thương lên kẻ địch bị đóng dấu, hoặc sao chép 50% sát thương vào nó khi thi triển lên mục tiêu khác."
+      },
       "wrath": {
         "name": "Tia Hoang Dã",
-        "description": "Phóng một tia năng lượng tự nhiên gây {damage} sát thương Tự Nhiên."
+        "description": "Phóng một tia năng lượng tự nhiên gây {damage} sát thương Thiên Nhiên.",
+        "specNote_balance": "Ở Dạng Cú Mặt Trăng, mỗi lần thi triển hoàn tất thêm 1 Triều Nguyệt (tối đa 3). Ở 3 Triều Nguyệt, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương."
       },
       "healing_touch": {
         "name": "Hàn Gắn Hoang Dã",
@@ -9027,11 +9640,17 @@ export const vi_VN: EnTranslations = {
       },
       "moonfire": {
         "name": "Bão Tố Nguyệt",
-        "description": "Thiêu đốt kẻ địch bằng nguyệt hỏa gây {damage} sát thương Bí Thuật cùng sát thương theo thời gian."
+        "description": "Thiêu đốt kẻ địch bằng lửa trăng gây {damage} sát thương Bí Thuật cộng thêm sát thương theo thời gian.",
+        "specNote_balance": "Giữ nó tiếp tục cháy: Nguyệt Chủng kéo dài thêm 6 giây."
+      },
+      "moonseed": {
+        "name": "Nguyệt Chủng",
+        "description": "Chỉ trong Dạng Cú Mặt Trăng. Đánh gây {damage} sát thương Bí Thuật, thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt của bạn 6 giây, tối đa 6 giây mỗi lần. Khi Triều Nguyệt đầy, Nguyệt Chủng trở thành Nguyệt Trào."
       },
       "rejuvenation": {
         "name": "Hoa Nở Hoang Dã",
-        "description": "Trị liệu cho mục tiêu {damage} máu trong 12 giây."
+        "description": "Hồi máu cho mục tiêu {damage} trong 12 giây.",
+        "specNote_restoration": "Gieo một chồi hoa MỚI sẽ thêm 1 Sắc Xanh (tối đa 5). Ở 5 Sắc Xanh, Hồi Phục Nhanh trở thành Mãn Khai."
       },
       "thorns": {
         "name": "Bụi Gai Hộ Thân",
@@ -9047,7 +9666,8 @@ export const vi_VN: EnTranslations = {
       },
       "maul": {
         "name": "Nghiền Xương",
-        "description": "Một đòn vồ tăng sát thương cận chiến thêm {damage} và gây ra lượng đe dọa lớn. Kích hoạt ở đòn đánh tiếp theo của bạn. Chỉ dùng được ở Bruin Form."
+        "description": "Một đòn tấn công nghiền nát làm tăng sát thương cận chiến thêm {damage} và gây lượng thù hận lớn. Kích hoạt ở đòn đánh kế tiếp của bạn. Chỉ dùng được ở Hình Bruin.",
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh gây 78 đến 96 sát thương với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó khiên cho bạn 18% máu tối đa và hoàn lại 15 nộ khí."
       },
       "growl": {
         "name": "Hăm Dọa",
@@ -9059,19 +9679,23 @@ export const vi_VN: EnTranslations = {
       },
       "claw": {
         "name": "Vuốt Cào",
-        "description": "Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Thưởng 1 điểm liên hoàn. Chỉ khi ở Hình Sói."
+        "description": "Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Nhận 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.",
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
-        "description": "Đòn kết liễu gây {damage}. Chỉ dùng được ở Hình Sói."
+        "description": "Chiêu kết liễu gây {damage} sát thương. Chỉ dùng được ở Hình Sói.",
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ: một cú cắn gây 70 cộng 43 mỗi điểm liên hoàn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi 30 năng lượng."
       },
       "swipe": {
         "name": "Vuốt Quét Ngang",
-        "description": "Quật quét các kẻ địch lân cận gây {damage} sát thương. Tạo thêm đe dọa. Chỉ dùng được ở Bruin Form."
+        "description": "Quét vuốt qua kẻ địch gần đó gây {damage} sát thương. Gây thêm thù hận. Chỉ dùng được ở Hình Bruin.",
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "regrowth": {
         "name": "Nở Hoa Lần Hai",
-        "description": "Trị liệu cho đồng minh {damage} máu cùng một lượng bổ sung trong 21 giây."
+        "description": "Hồi máu cho mục tiêu đồng minh {damage} và thêm một lượng hồi máu nữa trong 21 giây.",
+        "specNote_restoration": "Gieo một chồi hoa MỚI sẽ thêm 1 Sắc Xanh (tối đa 5)."
       },
       "barkskin": {
         "name": "Da Sồi",
@@ -9087,7 +9711,8 @@ export const vi_VN: EnTranslations = {
       },
       "starfire": {
         "name": "Thiên Giáng",
-        "description": "Gọi xuống một tia lửa tinh tú, gây {damage} sát thương Bí Thuật."
+        "description": "Triệu gọi một tia lửa sao, gây {damage} sát thương Bí Thuật.",
+        "specNote_balance": "Ở Dạng Cú Mặt Trăng, mỗi lần thi triển hoàn tất thêm 1 Triều Nguyệt (tối đa 3). Ở 3 Triều Nguyệt, nút này trở thành Vệt Dương: một đòn đánh tức thời gây 80 đến 100 sát thương Thiên Nhiên cộng thêm 45 sát thương thiêu đốt trong 9 giây, hồi 35 mana và tiêu hết cả 3."
       },
       "travel_form": {
         "name": "Hình Thần Tốc",
@@ -9103,7 +9728,7 @@ export const vi_VN: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Ánh Ma Trơi",
-        "description": "Giảm giáp của mục tiêu đi {damage}% trong 40 giây. Không cộng dồn với Xẻ Giáp."
+        "description": "Giảm giáp của mục tiêu {damage}% trong 40 giây."
       },
       "hibernate": {
         "name": "Giấc Ngủ Sâu",
@@ -9127,7 +9752,8 @@ export const vi_VN: EnTranslations = {
       },
       "rip": {
         "name": "Xé Rách",
-        "description": "Đòn kết liễu gây {damage} sát thương Chảy Máu trong 12 giây. Tiêu hao điểm liên hoàn. Chỉ dùng được ở Hình Sói."
+        "description": "Chiêu kết liễu khiến mục tiêu chảy máu mỗi 2 giây trong 24 giây: 36 sát thương cộng thêm 24 mỗi điểm liên hoàn tiêu hao (5 điểm liên hoàn: tổng {damage}). Chỉ dùng được ở Hình Sói.",
+        "specNote_feral": "Đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "mortal_strike": {
         "name": "Đòn Tàn Phế",
@@ -9155,7 +9781,99 @@ export const vi_VN: EnTranslations = {
       },
       "chain_heal": {
         "name": "Hồi Máu Liên Hoàn",
-        "description": "Hồi phục một lượng lớn máu cho một mục tiêu đồng minh, sau đó lan sang tối đa 2 đồng minh ở gần; lượng hồi phục giảm 50% sau mỗi lần lan. (Kỹ năng chủ lực của Hồi Phục)"
+        "description": "Hồi máu cho một mục tiêu đồng minh {damage}, sau đó nhảy sang tối đa 2 đồng minh trong phạm vi 12 mét. Mỗi lần nhảy hồi 50% so với mục tiêu trước. Mỗi đồng minh được chạm tới tiêu Dòng Chữa Lành còn lại của bạn và lập tức hồi 125% lượng đã tiêu. Lượng hồi ban đầu tăng theo sức mạnh phép thuật. (đặc trưng của Phục Hồi)"
+      },
+      "galeheart_weapon": {
+        "name": "Vũ Khí Tâm Phong",
+        "description": "Phù phép cả hai vũ khí trong 30 phút, kích hoạt Nhịp Chiến Hồn."
+      },
+      "warspirit_cadence": {
+        "name": "Nhịp Chiến Hồn",
+        "description": "Bị động: cứ mỗi đòn vũ khí trúng thứ 3 sẽ kích hoạt 2 Tiếng Vọng Tâm Phong gây 50% sát thương Tự Nhiên và ban Điềm Bão trong 12 giây. Điềm Bão khiến Tia Hồ Quang, Địa Chấn hoặc Nước Chữa Lành kế tiếp của bạn thành tức thời và giảm 50% chi phí mana. Đòn Tổ Tiên tính là 2 đòn tấn công. (Chiến Hồn)"
+      },
+      "stormsurge": {
+        "name": "Sóng Bão",
+        "description": "Bị động: khi Đòn Tổ Tiên đang hồi chiêu, việc tiêu một Điềm Bão có 25% cơ hội đặt lại nó. Nếu 3 cơ hội đầu thất bại, lần thứ 4 luôn đặt lại. (Chiến Hồn)"
+      },
+      "lifespring_weapon": {
+        "name": "Vũ Khí Suối Sinh",
+        "description": "Phù phép vũ khí của bạn trong 30 phút. Nước Chữa Lành và Gọi Thủy Triều thêm 20% lượng hồi máu vào Dòng Chữa Lành."
+      },
+      "unleash_weapon": {
+        "name": "Thả Vũ Khí",
+        "description": "Giải phóng phù phép đang hoạt động trên vũ khí của bạn. Dấu Hỏa gây 54 đến 64 sát thương Lửa, nhận 30% sức mạnh phép thuật và ban 2 Sấm. Tâm Phong đánh bằng vũ khí của bạn, đẩy Nhịp Chiến Hồn tiến lên và ban 20% tốc đánh trong 6 giây. Thạch Phọc đánh gây 75% sát thương vũ khí, buộc mục tiêu tấn công bạn và giảm 20% sát thương phải chịu trong 4 giây. Suối Sinh tiêu Dòng Chữa Lành của bạn, hồi 125% lượng hồi còn lại và giảm đòn đánh kế tiếp trong 8 giây đi 50% lượng máu đã hồi."
+      },
+      "elemental_trance": {
+        "name": "Xuất Thần Nguyên Tố",
+        "description": "Bước vào trạng thái xuất thần nguyên tố trong 15 giây, giảm 30% sát thương phải nhận và chuyển hóa 20% toàn bộ sát thương bạn gây ra thành mana. (động cơ Warspirit)"
+      },
+      "primal_exaltation": {
+        "name": "Tôn Vinh Nguyên Thủy",
+        "description": "Trong 12 giây, Tia Hồ Quang và Sét Rẽ Nhánh của Gọi Sấm niệm nhanh hơn 50%, và Tia Hồ Quang ban 2 Sấm; Chiến Hồn kích hoạt nhịp của nó mỗi 2 đòn vũ khí trúng; Vá Hồn thêm 50% lượng hồi máu vào Dòng Chữa Lành. (Tài năng pháp sư)"
+      },
+      "stoneward": {
+        "name": "Thạch Vệ",
+        "description": "Bảo vệ một đồng minh trong 60 giây với 6 lượt. Sát thương tiêu một lượt để hồi 5% máu tối đa, mỗi 3 giây một lần. (Tài năng pháp sư)"
+      },
+      "tidecall": {
+        "name": "Gọi Thủy Triều",
+        "description": "Hồi máu cho một mục tiêu đồng minh {damage}. Lượng hồi tăng theo sức mạnh phép thuật. Cộng toàn bộ lượng hồi trước phần hồi thừa vào Dòng Chữa Lành, tối đa 30% lượng máu tối đa của mục tiêu."
+      },
+      "soul_harvest": {
+        "name": "Gặt Tinh Chất",
+        "description": "Xé rách linh hồn kẻ địch gây {damage} sát thương Bóng Tối và tạo 1 Mảnh Linh Hồn, tối đa 5."
+      },
+      "soul_lance": {
+        "name": "Thương Linh Hồn",
+        "description": "Phóng một ngọn giáo ma quái gây {damage} sát thương Bóng Tối. Khi nhắm vào Dấu Ấn Cốt Táng của bạn, 50% sát thương của nó được cộng thêm vào dấu ấn."
+      },
+      "raise_graveguard": {
+        "name": "Triệu Hồi Vệ Mộ",
+        "description": "Triệu hồi một người bạn đồng hành phòng thủ vĩnh viễn. Vệ Mộ tự động khiêu khích, chặn 20% sát thương của bạn qua Quân Đoàn Mộ Địa, và Mệnh Lệnh Gặt Hái khiến nó khiêu khích và nhận ít hơn 30% sát thương trong 4 giây."
+      },
+      "raise_skeletal_warrior": {
+        "name": "Triệu Hồi Chiến Binh Xương",
+        "description": "Tiêu hao 1 Mảnh Linh Hồn để thêm một Chiến Binh Xương thường trực vào Quân Đoàn 2 chỗ của bạn. Chỉ một con có thể phục vụ bạn. Nó chém lan sang kẻ địch gần đó gây 45% sát thương mỗi 6 giây, và Mệnh Lệnh Gặt Hái ghim mục tiêu của nó bằng hiệu ứng làm chậm 40% trong 4 giây."
+      },
+      "raise_bone_mage": {
+        "name": "Triệu Hồi Pháp Sư Xương",
+        "description": "Tiêu hao 2 Mảnh Linh Hồn để thêm một Pháp Sư Xương tầm xa thường trực vào Quân Đoàn 2 chỗ của bạn. Chỉ một con có thể phục vụ bạn. Các đòn tấn công của nó khiến mục tiêu nhận thêm 5% sát thương phép trong 6 giây, và Mệnh Lệnh Gặt Hái nâng điểm yếu đó lên 8%."
+      },
+      "bone_armor": {
+        "name": "Giáp Xương",
+        "description": "Bọc quanh bạn một lớp xương, hấp thụ sát thương bằng 20% máu tối đa của bạn."
+      },
+      "corpse_explosion": {
+        "name": "Nổ Xác",
+        "description": "Hy sinh một Pháp Sư Xương trước tiên, sau đó đến một Chiến Binh Xương, và chỉ hy sinh một Cánh Mộ như phương án cuối cùng. Trong số các bản trùng lặp, nó chọn con có thời lượng còn lại thấp nhất, rồi đến con yếu nhất, để gây {damage} sát thương Bóng Tối tại vị trí đã chọn."
+      },
+      "funeral_harvest": {
+        "name": "Thu Hoạch Tang Lễ",
+        "description": "Khi một kẻ địch vừa bị bạn hoặc thuộc hạ Bất Tử của bạn gây sát thương chết đi, bạn nhận 1 Mảnh Linh Hồn. Điều này có thể xảy ra một lần mỗi 3 giây."
+      },
+      "ossuary_mark": {
+        "name": "Dấu Ấn Cốt Táng",
+        "description": "Đánh dấu một kẻ địch trong 12 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn."
+      },
+      "unholy_command": {
+        "name": "Mệnh Lệnh Tà Ác",
+        "description": "Tiêu hao 3 Mảnh Linh Hồn để ra lệnh cho toàn bộ thuộc hạ Bất Tử của bạn gây thêm 25% sát thương và hành động nhanh hơn 20% trong 12 giây."
+      },
+      "reaping_command": {
+        "name": "Mệnh Lệnh Gặt Hái",
+        "description": "Tiêu hao 2 Mảnh Linh Hồn để ra lệnh cho mọi thuộc hạ Bất Tử đồng loạt tấn công. Vệ Mộ khiêu khích và gồng mình, Chiến Binh ghim chặt, Pháp Sư Xương phơi bày phòng ngự phép, và Cánh Mộ xé toạc mọi kẻ địch bị đánh trúng."
+      },
+      "sacrifice_undead": {
+        "name": "Hiến Tế Bất Tử",
+        "description": "Hủy diệt một thuộc hạ trong Quân Đoàn để hồi 25% máu tối đa của bạn."
+      },
+      "raise_gravewing": {
+        "name": "Triệu Hồi Cánh Mộ",
+        "description": "Tiêu hao 2 Mảnh Linh Hồn để thêm một Cánh Mộ thường trực vào Quân Đoàn 2 chỗ của bạn. Chỉ một con có thể phục vụ bạn. Nó chém lan sang kẻ địch gần đó gây 65% sát thương mỗi 5 giây, và Mệnh Lệnh Gặt Hái khiến mọi kẻ địch bị đánh trúng nhận thêm 8% sát thương trong 5 giây."
+      },
+      "army_of_the_dead": {
+        "name": "Binh Đoàn Tử Thần",
+        "description": "Xé mở một cổng mộ để triệu hồi tạm thời một Chiến Binh Xương, một Pháp Sư Xương, và một Cánh Mộ trong 20 giây, lấp đầy những vị trí trống trong Quân Đoàn thường trực của bạn."
       },
       "metamorphosis": {
         "name": "Biến Hình",
@@ -9165,13 +9883,9 @@ export const vi_VN: EnTranslations = {
         "name": "Lightjolt",
         "description": "Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)"
       },
-      "aura_surge": {
-        "name": "Khiên Dội Bình Minh",
-        "description": "Ném một tấm khiên rèn từ bình minh gây {damage} sát thương Thánh, khiến mục tiêu chính câm lặng trong 2 giây, rồi dội sang tối đa 2 kẻ địch khác trong phạm vi 10 mét, gây 75% sát thương mỗi lần dội. (thiên phú Paladin)"
-      },
       "holy_shield": {
         "name": "Khiên Thánh",
-        "description": "Bảo vệ bạn bằng sức mạnh Thánh trong 10 giây, tăng giáp thêm 90 và đánh kẻ tấn công cận chiến gây 12 sát thương Thánh. (dấu ấn Bảo Hộ)"
+        "description": "Tăng chặn đòn 30% và tạo lá chắn bằng {damage}% máu tối đa trong {duration} giây. Thăng Thiên tăng cường phòng thủ."
       },
       "bestial_wrath": {
         "name": "Cơn Thịnh Nộ Dã Thú",
@@ -9199,22 +9913,22 @@ export const vi_VN: EnTranslations = {
       },
       "cold_blood": {
         "name": "Máu Lạnh",
-        "description": "Tập trung sát ý để đòn tấn công tiếp theo của bạn là một cú chí mạng. (dấu ấn Ám Sát)"
+        "description": "Tập trung sát ý để đòn tấn công tiếp theo của bạn chắc chắn chí mạng. (động cơ Knifework)"
       },
       "blade_flurry": {
         "name": "Loạn Đao",
-        "description": "Tung ra một loạt lưỡi dao, tăng tốc độ tấn công thêm 20% trong 12 giây. (dấu ấn Chiến Đấu)"
+        "description": "Tung ra một loạt đao, tăng tốc độ đánh 20% trong 12 giây. (động cơ Thuggery)"
       },
       "hemorrhage": {
         "name": "Xuất Huyết",
-        "description": "Đánh kẻ địch gây sát thương vũ khí cộng {damage} và gây sát thương chảy máu trong 12 giây. Nhận 1 điểm combo. (dấu ấn Tinh Tế)"
+        "description": "Đánh kẻ địch gây sát thương vũ khí cộng thêm {damage}, gây sát thương chảy máu trong 12 giây, và tăng 40% sát thương chảy máu mà nó phải nhận. Nhận 1 điểm liên hoàn. Cứ sau 2 lần dùng thì thêm 1 U Ám (tối đa 3). (động cơ Skulduggery)"
       },
       "power_infusion": {
         "name": "Truyền Sức Mạnh",
         "description": "Truyền sức mạnh cho một mục tiêu đồng minh, tăng sức mạnh phép thêm 28 trong 15 giây. (dấu ấn Kỷ Luật)"
       },
       "holy_nova": {
-        "name": "Hallowburst",
+        "name": "Sunburst Canticle",
         "description": "Gây một vụ nổ ánh sáng Thánh, hồi cho đồng minh gần đó {damage} và gây sát thương cho kẻ địch gần đó. (dấu ấn Thánh)"
       },
       "shadowform": {
@@ -9242,8 +9956,28 @@ export const vi_VN: EnTranslations = {
         "description": "Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)"
       },
       "swiftmend": {
-        "name": "Fleetmend",
-        "description": "Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage}. (dấu ấn Phục Hồi)"
+        "name": "Hồi Phục Nhanh",
+        "description": "Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage} máu. Gieo Hoa Nở Hoang Dã và Nở Hoa Lần Hai sẽ thêm Sắc Xanh; ở 5 Sắc Xanh, nút này trở thành Mãn Khai, hồi máu tức thời cho mọi đồng minh đang mang hiệu ứng hồi máu theo thời gian của bạn bằng 60% lượng còn lại của các hiệu ứng đó. (động cơ Groveheart)"
+      },
+      "moonlash": {
+        "name": "Nguyệt Trào",
+        "description": "Tiêu 3 Triều Nguyệt của bạn cho một đòn đánh nặng gây {damage} sát thương Bí Thuật: lựa chọn sát thương. Vệt Dương cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một."
+      },
+      "sunlance": {
+        "name": "Vệt Dương",
+        "description": "Tiêu 3 Triều Nguyệt của bạn cho một đòn gây {damage} sát thương Tự Nhiên cộng thêm {overTime} thiêu đốt trong 9 giây, và hồi 35 mana: lựa chọn mana. Nguyệt Trào cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một."
+      },
+      "redharvest": {
+        "name": "Thu Hoạch Đỏ",
+        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi 30 năng lượng. Dùng được cả khi không có điểm liên hoàn."
+      },
+      "marrowbreak": {
+        "name": "Đoạn Tủy",
+        "description": "Tiêu 3 Huyết Cổ của bạn cho một đòn đánh nặng, uy hiếp cao gây {damage} sát thương. Dưới nửa máu, thay vào đó tạo lá chắn bằng 18% máu tối đa của bạn trong 8 giây và hoàn lại 15 nộ."
+      },
+      "overbloom": {
+        "name": "Mãn Khai",
+        "description": "Tiêu 5 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với 60% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Hoa Nở Hoang Dã mới lên mục tiêu."
       },
       "summon_imp": {
         "name": "Triệu Hồi Emberkin",
@@ -9267,7 +10001,7 @@ export const vi_VN: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Triệu Hồi Pyre Colossus",
-        "description": "Ràng buộc một Pyre Colossus theo ý chí của bạn, một cỗ máy hủy diệt đồ sộ với đòn cận chiến nghiền nát cùng lượng máu và giáp sâu nhất trong các loại quỷ. Thời gian hồi chiêu dài kìm hãm sức mạnh thô của nó. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."
+        "description": "Gọi một Pyre Colossus rơi xuống khu vực mục tiêu, gây 58-72 sát thương Lửa khi tiếp đất. Nó chiến đấu trong 30 giây mà không thay thế quỷ của bạn, thiêu đốt kẻ địch gần đó mỗi 2 giây và tạo 1 Wrack mỗi giây."
       },
       "summon_doomguard": {
         "name": "Triệu Hồi Wraithborn",
@@ -9361,6 +10095,10 @@ export const vi_VN: EnTranslations = {
         "name": "Sống Chết Cùng Kiếm",
         "description": "Kỹ năng phòng thủ hồi chiêu dài: trong 8 giây bạn nhận ít hơn 30% sát thương và né được nhiều đòn tấn công hơn hẳn."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
+      },
       "recklessness": {
         "name": "Liều Lĩnh",
         "description": "Cuồng Hóa: lượng nộ khí bạn tạo ra tăng 50% và tỉ lệ chí mạng tăng 20% trong 12 giây."
@@ -9421,13 +10159,17 @@ export const vi_VN: EnTranslations = {
         "name": "Sét Rẽ Nhánh",
         "description": "Phóng sét vào khu vực mục tiêu, gây {damage} sát thương lên kẻ địch ở gần. (thiên phú Shaman)"
       },
+      "abyssal_rift": {
+        "name": "Vết Nứt Vực Thẳm",
+        "description": "Xé toạc một vết nứt tại vị trí đã chọn, kéo kẻ địch trong bán kính 8 thước về tâm của nó, gây {damage} sát thương Bóng Tối, và làm choáng chúng trong 2 giây. Trùm vẫn nhận sát thương nhưng kháng lại lực kéo và hiệu ứng choáng."
+      },
       "chaos_bolt": {
         "name": "Tia Hủy Diệt",
         "description": "Phóng một luồng lửa hỗn loạn gây {damage} sát thương Lửa. (thiên phú Warlock)"
       },
-      "cleansing_verdict": {
-        "name": "Phán Quyết Thanh Tẩy",
-        "description": "Xóa một hiệu ứng phép thuật có hại khỏi mục tiêu đồng minh và hồi cho họ {damage} máu bằng phép Thánh."
+      "dark_pact": {
+        "name": "Giao Ước Huyết Sắc",
+        "description": "Hy sinh 10% máu hiện tại của bạn để hấp thụ sát thương bằng 30% máu tối đa trong 8 giây."
       },
       "cloak_of_shadows": {
         "name": "Áo Choàng Bóng",
@@ -9455,15 +10197,11 @@ export const vi_VN: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Lời Cầu Cuối",
-        "description": "Hồi ngay {damage} máu cho bạn. (thiên phú Tu sĩ)"
+        "description": "Lập tức hồi cho bạn 30% lượng máu tối đa."
       },
       "deterrence": {
         "name": "Hộ Vệ Gai",
         "description": "Tăng 50 điểm phần trăm khả năng né tránh của bạn trong 10 giây. (thiên phú Thợ săn)"
-      },
-      "divine_shield": {
-        "name": "Hộ Vệ Ánh Sáng",
-        "description": "Bảo vệ bạn bằng sức mạnh thần thánh, hấp thụ 900 sát thương trong 8 giây. (thiên phú Paladin)"
       },
       "earthbind": {
         "name": "Đất Níu Giữ",
@@ -9472,6 +10210,10 @@ export const vi_VN: EnTranslations = {
       "evocation": {
         "name": "Giếng Ête",
         "description": "Restaura mana rápidamente. (thiên phú pháp sư)"
+      },
+      "flurry_of_knives": {
+        "name": "Loạt Dao Xoáy",
+        "description": "Quất tất cả kẻ địch trong vòng 6 m bằng dao phóng, gây {damage} sát thương vật lý và nhận 2 điểm liên hoàn. (thiên phú Đạo tặc)"
       },
       "frenzied_regeneration": {
         "name": "Hồi Phục Hoang Dã",
@@ -9483,7 +10225,7 @@ export const vi_VN: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Đòn Ma Ảnh",
-        "description": "Đánh kẻ địch gây sát thương vũ khí cộng {damage}, tăng né tránh trong thời gian ngắn và cho 1 điểm liên kích. (thiên phú Đạo tặc)"
+        "description": "Đánh kẻ địch gây sát thương vũ khí cộng thêm {damage} và tăng 15% tỉ lệ né đòn của bạn trong 7 giây. Nhận 1 điểm liên hoàn. (thiên phú Đạo Tặc)"
       },
       "hammer_of_wrath": {
         "name": "Búa Ngân Chuông",
@@ -9492,10 +10234,6 @@ export const vi_VN: EnTranslations = {
       "healing_stream": {
         "name": "Giếng Suối",
         "description": "Hồi 120 máu cho một mục tiêu đồng minh trong 12 giây. (thiên phú Shaman)"
-      },
-      "holy_wrath": {
-        "name": "Cơn Giận Thánh",
-        "description": "Giải phóng sức mạnh thần thánh, gây {damage} sát thương lên kẻ địch ở gần. (thiên phú Paladin)"
       },
       "howl_of_terror": {
         "name": "Tiếng Hú Kinh Hoàng",
@@ -9552,6 +10290,10 @@ export const vi_VN: EnTranslations = {
       "collective_reversal": {
         "name": "Đảo ngược tập thể",
         "description": "Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, hồi sinh họ bên cạnh thi thể với 30% máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)"
+      },
+      "ancestor_return": {
+        "name": "Tổ Tiên Hồi Quy",
+        "description": "Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn trở lại sự sống ngay tại thi thể với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Vá Hồn)"
       },
       "temporal_rewind": {
         "name": "Quay Ngược",
@@ -9617,6 +10359,10 @@ export const vi_VN: EnTranslations = {
         "name": "Màn Khói",
         "description": "Bạn biến mất trong đám khói, tăng 30% khả năng né tránh trong 8 giây."
       },
+      "sacrilegious_march": {
+        "name": "Cuộc Hành Quân Phạm Thượng",
+        "description": "Tăng 35% tốc độ di chuyển, nhưng hy sinh 2% máu tối đa của bạn mỗi giây. Thi triển lại để hủy. Tự động tắt khi máu ở mức 20%."
+      },
       "spellsteal": {
         "name": "Spellplunder",
         "description": "Đánh cắp một hiệu ứng phép thuật có lợi từ kẻ địch và chuyển nó sang bạn."
@@ -9633,9 +10379,34 @@ export const vi_VN: EnTranslations = {
         "name": "Khóa Phép",
         "description": "Làm câm lặng mục tiêu đang niệm phép và ngăn mục tiêu thi triển phép thuộc hệ đó trong 5 giây."
       },
+      "thieves_chorus": {
+        "name": "Hợp Xướng Đạo Tặc",
+        "description": "Tiếng huýt sáo hiệu lệnh thúc giục cả nhóm: tốc độ đánh, niệm chú và duy trì tăng 10% trong 10 giây. Đồng minh vừa nhận hiệu ứng tăng tốc nhóm quá kiệt sức để hưởng lợi. (thiên phú Đạo tặc)"
+      },
       "tranquility": {
         "name": "Khúc Ca Rừng Thưa",
         "description": "Niệm năng lượng hồi phục trong 4 giây, hồi 42 đến 52 máu mỗi giây cho đồng minh trong phạm vi 30 m. (thiên phú Druid)"
+      },
+      "venom_dart": {
+        "name": "Phi Tiêu Độc",
+        "description": "Búng một phi tiêu tẩm độc gây {damage} sát thương tự nhiên. Cho 1 điểm liên hoàn. Knifework: kéo dài vết thương Xé Độc của bạn thêm 6 giây, tối đa 20 giây.",
+        "specNote_assassination": "Thêm 1 Nghi Thức Độc và kéo dài vết thương độc của bạn thêm 6 giây (vết thương không bao giờ vượt quá 20 giây)."
+      },
+      "body_blow": {
+        "name": "Đòn Thân",
+        "description": "Một đòn nặng gây 130% sát thương vũ khí cộng 10, cho 2 điểm liên hoàn và làm sâu thêm Redline một nấc. (động cơ Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Đòn Nốc Ao",
+        "description": "Kết thúc Redline bằng cú nốc ao: đánh 45 cộng 35 mỗi điểm liên hoàn, mạnh hơn 25% mỗi nấc Redline, và hồi 25 năng lượng. (động cơ Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Đòn Màn Che",
+        "description": "Nuốt trọn kho U Ám để phủ bóng tối lên người trong 6 giây: các đòn mở màn ẩn thân dùng được giữa chốn đông người và bạn gây thêm 25% sát thương. (động cơ Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Xé Độc",
+        "description": "Nuốt trọn Nghi Thức Độc: đánh 22 cộng 26 mỗi điểm liên hoàn, kích nổ sát thương còn lại của các vết chảy máu và hồi 25 năng lượng. (động cơ Knifework)"
       },
       "typhoon": {
         "name": "Cuồng Phong",
@@ -9644,6 +10415,30 @@ export const vi_VN: EnTranslations = {
       "voidfeast": {
         "name": "Yến Tiệc Hư Không",
         "description": "Nuốt một hiệu ứng phép thuật (hiệu ứng có lợi từ kẻ địch hoặc có hại từ đồng minh) và hồi cho bạn 6% máu tối đa."
+      },
+      "veilstep": {
+        "name": "Bước Màn Che",
+        "description": "Bước xuyên qua màn che theo hướng bạn đang nhìn."
+      },
+      "scouring_mercy": {
+        "name": "Từ Bi Thanh Tẩy",
+        "description": "Gây 72 đến 84 sát thương Thánh lên kẻ địch hoặc hồi 130 đến 155 máu cho mục tiêu đồng minh. Cả hai đều tăng theo sức mạnh phép thuật. Sát thương cũng hồi 30% cho mỗi đồng minh liên kết bằng Giáo Lý, hoặc 15% cho thành viên nhóm có ít máu nhất nếu không ai được liên kết. (Dấu ấn Giáo Lý)"
+      },
+      "seraphic_vigil": {
+        "name": "Canh Thức Thiên Sứ",
+        "description": "Bảo vệ một đồng minh trong 30 giây. Đòn đánh đầu tiên khiến họ xuống dưới 35% máu sẽ tiêu Canh Thức và hồi cho họ 180. (Dấu ấn Phúc Lành)"
+      },
+      "summon_tithefiend": {
+        "name": "Triệu Quỷ Thập Phân",
+        "description": "Tiêu toàn bộ Thập Phân U Ám để triệu một Quỷ Thập Phân trong 6, 8, 10, 12 hoặc 15 giây ở 1 đến 5 lớp. Nó tấn công mỗi 2 giây gây 20 đến 24 sát thương Bóng Tối, cộng 8 cho mỗi lớp thêm. Ở năm lớp nó lớn hơn và sát thương tăng 25%. Sát thương của nó tăng theo sức mạnh phép thuật của bạn. Nó ưu tiên Hình Nộm của bạn. Mỗi đòn trúng hồi 1% mana tối đa và vọng 15% sát thương sang tối đa 3 kẻ địch khác mang Khúc Bi Ai Mục Rữa của bạn. (Dấu ấn Kinh Chiều)"
+      },
+      "martyrs_aegis": {
+        "name": "Khiên Tuẫn Đạo",
+        "description": "Giảm 40% sát thương một đồng minh phải chịu trong 8 giây."
+      },
+      "choir_of_deliverance": {
+        "name": "Hợp Xướng Giải Thoát",
+        "description": "Vận phép trong 6 giây, hồi máu cho các thành viên trong nhóm trong phạm vi 30 mét {damage} mỗi 2 giây. Lượng hồi tăng theo sức mạnh phép thuật."
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",
@@ -9659,7 +10454,8 @@ export const vi_VN: EnTranslations = {
       },
       "rake": {
         "name": "Lóc Xé",
-        "description": "Một đòn mở màn từ trạng thái ẩn thân cào xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 9 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói."
+        "description": "Lóc xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 18 giây. Nhận 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.",
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "revive_pet": {
         "name": "Băng Bó",
@@ -11176,6 +11972,18 @@ export const vi_VN: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Dây Cương Cuồng Long Drakemaw"
       },
+      "rimefang": {
+        "name": "Nanh Băng Giá"
+      },
+      "marrowpoint": {
+        "name": "Mũi Tủy Xương"
+      },
+      "duskwhisper": {
+        "name": "Thì Thầm Chạng Vạng"
+      },
+      "boneglass_shiv": {
+        "name": "Dao Nhọn Xương Kính"
+      },
       "moggers_hide_quiver": {
         "name": "Ống Tên Da Của Mogger"
       },
@@ -11202,6 +12010,9 @@ export const vi_VN: EnTranslations = {
       },
       "conjured_bread4": {
         "name": "Bánh Đại Tiệc Được Tạo Phép"
+      },
+      "soul_stone": {
+        "name": "Đá Linh Hồn"
       },
       "bristleback_maul": {
         "name": "Búa Gallowglass"
@@ -12597,9 +13408,6 @@ export const vi_VN: EnTranslations = {
       "gloomshade": {
         "name": "Duskmurk"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix Vua Đường Hầm"
       },
@@ -12621,17 +13429,8 @@ export const vi_VN: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Kẻ Buộc Oan Hồn Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Mẫu Ca Selthe"
@@ -12671,6 +13470,18 @@ export const vi_VN: EnTranslations = {
       },
       "water_elemental": {
         "name": "Nguyên Tố Nước"
+      },
+      "graveguard": {
+        "name": "Vệ Mộ"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "Chiến Binh Xương"
+      },
+      "necromancy_bone_mage": {
+        "name": "Pháp Sư Xương"
+      },
+      "necromancy_gravewing": {
+        "name": "Cánh Mộ"
       }
     },
     "npcs": {
@@ -13297,6 +14108,16 @@ export const vi_VN: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "Cuốn Sách Buộc Bình Minh",
+        "text": "Ánh Sáng không lặng lẽ ngơi nghỉ trong ngươi, {playerName}. Ta đã thấy ngươi đưa người chết về bình an, và ta tin ngươi đã sẵn sàng cho điều mà rất ít thánh kỵ sĩ từng được dạy: Nghi Thức Triệu Hồi, nhờ đó một linh hồn đã ngã xuống được gọi trở lại với người sống. Lời của nó được giữ trong Cuốn Sách Buộc Bình Minh, ở đây dưới sự trông coi của ta, nhưng một cuốn sách chẳng phải phúc lành chừng nào những người chết bất an còn bước trên mảnh đất này. Hãy trả thêm 6 Xương Bất An về với đất, rồi ta sẽ bắt đầu dạy ngươi.",
+        "completion": "Sân nhà nguyện lặng đi. Ngươi đã sẵn sàng cho những lời ấy, {playerName}, nhưng Nghi Thức Triệu Hồi không thể được đọc trong một nhà nguyện ấm áp. Nó phải được hát nơi màn che giữa sự sống và cái chết mỏng đi. Ta định mang Cuốn Sách lên phía bắc, tới Đầm Mirefen. Hãy theo ta tới đó, và chúng ta sẽ hoàn tất việc này.",
+        "objectives": {
+          "0": {
+            "label": "Xương Bất An đã được an nghỉ"
+          }
+        }
+      },
       "q_bandits": {
         "title": "Lũ Cướp Thung Lũng",
         "text": "Một bầy sát nhân đã dựng trại trên những ngọn đồi tây nam. Chúng đã cướp ba cỗ xe trong tuần này. Hãy đuổi chúng đi, tiêu diệt 10 tên Cướp Thung Lũng.",
@@ -13450,6 +14271,16 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Đã đưa Kẻ Chết Chìm về an nghỉ"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "Nghi Thức Triệu Hồi",
+        "text": "Vậy là ngươi đã theo ta vào bùn lầy, {playerName}. Tốt. Ta có Cuốn Sách Buộc Bình Minh ở đây, và mảnh đất ngập nước này chính là nơi lời của nó thuộc về: không đâu màn che giữa sự sống và cái chết mỏng hơn nơi người chết không chịu nằm yên dưới mộ. Nhưng những kẻ chết đuối sẽ kéo giọng ngươi xuống giữa câu. Hãy dọn một khoảng xứng với nghi thức: đưa 8 Người Chết Đuối về an nghỉ, rồi chúng ta sẽ cùng hiến thánh nơi này.",
+        "completion": "Hãy quỳ xuống, {playerName}, và đọc to những lời ấy. Đó. Ngươi có cảm nhận được không? Ánh Sáng trong tay ngươi không còn chỉ hàn gắn người sống, nó có thể gọi về những kẻ đã sang bên kia. Hãy dùng nó khôn ngoan. Một linh hồn bị gọi về một trận chiến vô vọng là sự tàn nhẫn, không phải lòng thương. Hãy đứng lên, Đấng Cứu Chuộc.",
+        "objectives": {
+          "0": {
+            "label": "Người Chết Đuối đã được an nghỉ"
           }
         }
       },

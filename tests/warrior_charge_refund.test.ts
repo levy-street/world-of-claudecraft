@@ -10,11 +10,17 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type TestSim = Sim & { nextId: number; addEntity(entity: Entity): void };
 
 function makeFuryWarrior(seed = 7): { sim: TestSim; p: Entity; mob: Entity } {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true }) as TestSim;
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: EMPTY_TEST_WORLD,
+  }) as TestSim;
   sim.setPlayerLevel(20);
   expect(sim.setSpec('fury')).toBe(true);
   const p = sim.player;

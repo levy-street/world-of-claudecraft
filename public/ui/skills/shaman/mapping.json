@@ -77,54 +77,64 @@
       "output": "stormstrike.webp"
     },
     {
-      "abilityId": "bloodlust",
-      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
-      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/bloodlust.png",
-      "output": "bloodlust.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "Group silhouettes beneath a thunder drum and lightning chorus with a faded exhaustion rune.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/ghost_wolf.webp",
-          "role": "subject reference",
-          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-          "license": "CraftPix premium royalty-free commercial license, non-transferable"
-        },
-        {
-          "path": "public/ui/skills/shaman/lightning_bolt.webp",
-          "role": "style reference",
-          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-          "license": "CraftPix premium royalty-free commercial license, non-transferable"
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Storm Chorus (bloodlust)\nCanonical mechanic: Storm Chorus grants the caster's group or raid within 30 yd 30% attack, casting, and channel speed for 15 sec, applies shared exhaustion with Temporal Acceleration, and has a 300 sec cooldown.\nSubject: Group silhouettes beneath a thunder drum and lightning chorus with a faded exhaustion rune.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+      "abilityId": "galeheart_weapon",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "galeheart_weapon.webp"
     },
     {
-      "abilityId": "chain_heal",
-      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
-      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/chain_heal.png",
-      "output": "chain_heal.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "A blue-green healing arc linking three hearts, visibly dimmer at each hop.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/healing_wave.webp",
-          "role": "subject reference",
-          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-          "license": "CraftPix premium royalty-free commercial license, non-transferable"
-        },
-        {
-          "path": "public/ui/skills/shaman/lightning_bolt.webp",
-          "role": "composition reference",
-          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-          "license": "CraftPix premium royalty-free commercial license, non-transferable"
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Chain Heal (chain_heal)\nCanonical mechanic: Chain Heal casts in 2.5 sec, heals the first target for 120 to 145, then jumps to 2 nearby allies within 12 yd with 50% less healing each hop.\nSubject: A blue-green healing arc linking three hearts, visibly dimmer at each hop.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+      "abilityId": "thunder_reservoir",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "thunder_reservoir.webp"
+    },
+    {
+      "abilityId": "warspirit_cadence",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "warspirit_cadence.webp"
+    },
+    {
+      "abilityId": "stormsurge",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "stormsurge.webp"
+    },
+    {
+      "abilityId": "lifespring_weapon",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "lifespring_weapon.webp"
+    },
+    {
+      "abilityId": "unleash_weapon",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "unleash_weapon.webp"
+    },
+    {
+      "abilityId": "tidecall",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "tidecall.webp"
+    },
+    {
+      "abilityId": "stoneward",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "stoneward.webp"
+    },
+    {
+      "abilityId": "primal_exaltation",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "primal_exaltation.webp"
+    },
+    {
+      "abilityId": "ancestor_return",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "ancestor_return.webp"
     },
     {
       "abilityId": "chain_lightning",
@@ -152,31 +162,6 @@
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Skybranch (chain_lightning)\nCanonical mechanic: Skybranch is a 2.5 sec ground-targeted cast dealing 70 to 86 Nature damage within 8 yd; 6 sec cooldown.\nSubject: Forked lightning branching into several points inside a target circle.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     },
     {
-      "abilityId": "earthbind",
-      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
-      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/earthbind.png",
-      "output": "earthbind.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "Stone hands and roots closing around multiple ankles in a cracked ring.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/earth_shock.webp",
-          "role": "subject reference",
-          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-          "license": "CraftPix premium royalty-free commercial license, non-transferable"
-        },
-        {
-          "path": "public/ui/skills/shaman/ghost_wolf.webp",
-          "role": "composition reference",
-          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-          "license": "CraftPix premium royalty-free commercial license, non-transferable"
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Gripping Earth (earthbind)\nCanonical mechanic: Gripping Earth roots enemies within 8 yd for 2 sec; 30 sec cooldown.\nSubject: Stone hands and roots closing around multiple ankles in a cracked ring.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
-    },
-    {
       "abilityId": "earthquake",
       "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
       "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/earthquake.png",
@@ -202,6 +187,31 @@
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Earthquake (earthquake)\nCanonical mechanic: Earthquake creates an 8 yd ground zone for 6 sec, dealing 13 to 17 Nature damage every 1.5 sec; 12 sec cooldown.\nSubject: A cracked earth circle buckling upward in four timed concentric shocks.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     },
     {
+      "abilityId": "bloodlust",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/bloodlust.png",
+      "output": "bloodlust.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Group silhouettes beneath a thunder drum and lightning chorus with a faded exhaustion rune.",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/ghost_wolf.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/shaman/lightning_bolt.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Storm Chorus (bloodlust)\nCanonical mechanic: Storm Chorus grants the caster's group or raid within 30 yd 30% attack, casting, and channel speed for 15 sec, applies shared exhaustion with Temporal Acceleration, and has a 300 sec cooldown.\nSubject: Group silhouettes beneath a thunder drum and lightning chorus with a faded exhaustion rune.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
       "abilityId": "elemental_mastery",
       "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
       "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/elemental_mastery.png",
@@ -225,6 +235,81 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Primal Mastery (elemental_mastery)\nCanonical mechanic: Primal Mastery makes the next spell instant; the armed effect lasts up to 60 sec and has a 120 sec cooldown.\nSubject: Earth, flame, frost, and lightning motes converging into a rune that shatters an hourglass.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "elemental_trance",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/elemental_trance.png",
+      "output": "elemental_trance.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A meditating silhouette ringed by orbiting motes of flame, water, and stone.",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/lightning_bolt.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/shaman/rockbiter_weapon.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Elemental Trance (elemental_trance)\nCanonical mechanic: Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of damage dealt into mana.\nSubject: A meditating silhouette ringed by orbiting motes of flame, water, and stone.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "chain_heal",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/chain_heal.png",
+      "output": "chain_heal.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A blue-green healing arc linking three hearts, visibly dimmer at each hop.",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/healing_wave.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/shaman/lightning_bolt.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Chain Heal (chain_heal)\nCanonical mechanic: Chain Heal casts in 2.5 sec, heals the first target for 120 to 145, then jumps to 2 nearby allies within 12 yd with 50% less healing each hop.\nSubject: A blue-green healing arc linking three hearts, visibly dimmer at each hop.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "earthbind",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/earthbind.png",
+      "output": "earthbind.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Stone hands and roots closing around multiple ankles in a cracked ring.",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/earth_shock.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/shaman/ghost_wolf.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Gripping Earth (earthbind)\nCanonical mechanic: Gripping Earth roots enemies within 8 yd for 2 sec; 30 sec cooldown.\nSubject: Stone hands and roots closing around multiple ankles in a cracked ring.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     },
     {
       "abilityId": "healing_stream",
@@ -253,5 +338,10 @@
     }
   ],
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it.",
+  "generatedArt": {
+    "source": "OpenAI image generation through Codex",
+    "generatedOn": "2026-07-25",
+    "purpose": "Original project art for the v0.29 Shaman class rework"
+  }
 }

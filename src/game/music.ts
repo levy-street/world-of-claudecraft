@@ -11,6 +11,8 @@
 
 import type { BiomeId } from '../sim/types';
 import { resumeWhenAllowed } from './audio_unlock';
+import type { MusicMixState } from './music_mix_policy';
+import { isMusicMixAudible, musicMixMasterTarget } from './music_mix_policy';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
 import { COMBAT_STREAM_URLS, pickCombatTrackIndex, ZONE_STREAM_URLS } from './music_tracks';
 
@@ -4825,12 +4827,23 @@ export class MusicDirector {
     return this._enabled;
   }
 
+  // Maps this director's private mix-relevant fields into the shared, pure
+  // MusicMixState shape so masterTarget()/streamsAudible() can delegate to
+  // music_mix_policy.ts.
+  private mixState(): MusicMixState {
+    return {
+      enabled: this._enabled,
+      menuPaused: this._menuPaused,
+      bossActive: this.bossActive,
+      sowfieldActive: this.sowfieldTrack !== null,
+      vol: this._vol,
+    };
+  }
+
   // master gain target given the enabled flag and volume (base STREAM_LEVEL).
   // The dedicated Nythraxis track owns the mix while active.
   private masterTarget(): number {
-    if (!this._enabled || this._menuPaused || this.bossActive || this.sowfieldTrack !== null)
-      return 0;
-    return STREAM_LEVEL * this._vol;
+    return musicMixMasterTarget(this.mixState(), STREAM_LEVEL);
   }
 
   /** Engage/disengage the dedicated boss-fight loop. Idempotent; called every
@@ -5117,13 +5130,7 @@ export class MusicDirector {
   // Sowfield file tracks (which own the mix while active). While inaudible,
   // streams pause instead of decoding silence.
   private streamsAudible(): boolean {
-    return (
-      this._enabled &&
-      !this._menuPaused &&
-      this._vol > 0 &&
-      !this.bossActive &&
-      this.sowfieldTrack === null
-    );
+    return isMusicMixAudible(this.mixState());
   }
 
   private setStreamTarget(stream: StreamTrack, target: number, fadeSeconds: number): void {

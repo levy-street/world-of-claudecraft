@@ -46,8 +46,12 @@ import {
 import { ClientWorld } from '../src/net/online';
 import { BG_FLAG_Z, BG_PLAY_HALF_X, BG_PLAY_HALF_Z } from '../src/sim/battleground_layout';
 import { battlegroundOrigin, bgOriginAt } from '../src/sim/data';
-import type { PlayerClass } from '../src/sim/types';
+import type { PlayerClass, SimEvent } from '../src/sim/types';
 import { bareClient, type FakeClient, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
+
+interface EventRouter {
+  routeEvents(events: SimEvent[]): void;
+}
 
 /** The shared joinServer plus the queue's level floor: wire tests stage
  *  eligible champions unless a case is exercising the floor itself. */
@@ -70,6 +74,14 @@ function cmd(server: GameServer, session: ClientSession, payload: Record<string,
 
 function snapIds(sent: any[]): number[] {
   return (lastSnap(sent).ents as { id: number }[]).map((row) => row.id);
+}
+
+function eventList(sent: Array<{ t?: unknown; list?: unknown }>): SimEvent[] {
+  return sent.flatMap((msg) => (msg.t === 'events' && Array.isArray(msg.list) ? msg.list : []));
+}
+
+function routeTick(server: GameServer): void {
+  (server as unknown as EventRouter).routeEvents(server.sim.tick());
 }
 
 // Move an entity and re-bucket it, the way the sim does at end of tick, so the
@@ -147,6 +159,39 @@ describe('bg_queue / bg_leave dispatch', () => {
   });
 });
 
+describe('battleground chat over the wire', () => {
+  it('accepts /bg from a live match fighter and delivers only to that match', () => {
+    withDevCommands(() => {
+      const server = new GameServer();
+      const bg = start2v2(server);
+      const bystanderWs = fakeWs();
+      joinBgServer(server, bystanderWs, 75, 'Bystander');
+      for (let i = 0; i < 20 * 9; i++) routeTick(server);
+      expect(bg.match.state).toBe('active');
+
+      cmd(server, bg.allyA, { cmd: 'chat', text: '/bg alpha-cross-team-3098' });
+      routeTick(server);
+
+      for (const ws of [bg.wsA, bg.wsB, bg.wsC, bg.wsD]) {
+        expect(eventList(ws.sent)).toContainEqual(
+          expect.objectContaining({
+            type: 'chat',
+            channel: 'battleground',
+            fromPid: bg.allyA.pid,
+            text: 'alpha-cross-team-3098',
+          }),
+        );
+      }
+      expect(eventList(bg.wsA.sent)).not.toContainEqual(
+        expect.objectContaining({ type: 'error', text: 'You are not in a battleground.' }),
+      );
+      expect(eventList(bystanderWs.sent)).not.toContainEqual(
+        expect.objectContaining({ type: 'chat', channel: 'battleground' }),
+      );
+    });
+  });
+});
+
 describe('the bg self key over the wire', () => {
   it('rides the snapshot with the base rating and mirrors into ClientWorld.bgInfo', () => {
     const server = new GameServer();
@@ -186,6 +231,7 @@ describe('the bg self key over the wire', () => {
       rating: 1700,
       wins: 3,
       losses: 0,
+      draws: 0,
     });
     // Realm-wide, so the other viewer receives the identical rows (this is what
     // makes the read viewer-identical, and therefore worth memoizing).

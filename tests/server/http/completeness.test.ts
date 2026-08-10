@@ -111,6 +111,7 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/rarity',
   '/api/deeds/broadcasts',
   '/api/characters/:id/deeds-recent',
+  '/api/characters/:id/appearance-reroll',
   '/api/steam/link',
   '/api/steam/status',
   '/api/battleground/leaderboard',
@@ -236,6 +237,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // Registry-only (born after the migration, the new-route rule): the
     // owner's newest-first deed unlock ids for the Book's recent strip.
     { method: 'GET', path: '/api/characters/:id/deeds-recent' },
+    { method: 'POST', path: '/api/characters/:id/appearance-reroll' },
     { method: 'POST', path: '/api/characters/:id/rename' },
     { method: 'POST', path: '/api/characters/:id/takeover' },
     { method: 'DELETE', path: '/api/characters/:id' },

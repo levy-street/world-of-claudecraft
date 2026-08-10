@@ -55,7 +55,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'auth.earSeptum': 'Nasenring',
   'auth.earStud': 'Stecker',
   'auth.earWarden': 'Wärtereisen',
-  'auth.earrings': 'Ohrringe',
+  'auth.earrings': 'Piercings',
   'auth.eyeshadow': 'Lidschatten',
   'auth.hairAfro': 'Runder Afro',
   'auth.hairAsymbob': 'Asymmetrischer Bob',
@@ -336,7 +336,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Zwei Teams zu fünft. Stehlt das gegnerische Banner und bringt es zu Eurer Festung. Wer zuerst 3 Eroberungen erreicht, gewinnt. Gruppiert Euch zu bis zu 5 und reiht Euch gemeinsam ein; schnappt Euch Sprint-Runen und nutzt die Deckung, um Eure Verfolger abzuschütteln.',
   'hudChrome.bg.queuedParty': 'Gruppe von {count}.',
-  'hudChrome.bg.ratingSummary': 'Wertung. {wins} Siege / {losses} Niederlagen',
+  'hudChrome.bg.ratingSummary':
+    'Wertung. {wins} Siege / {losses} Niederlagen / {draws} Unentschieden',
   'hudChrome.bg.respawnIn': 'Nächste Welle: Wiederbelebung in {seconds}',
   'hudChrome.bg.resultDefeat': 'Niederlage',
   'hudChrome.bg.resultDraw': 'Unentschieden',
@@ -1727,6 +1728,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} Spieler',
   'hudChrome.plurals.finderPartySize.one': '{count} Spieler',
   'hudChrome.plurals.finderPartySize.other': '{count} Spieler',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Etwa {value} Mana alle 5 Sek. im Kampf',
   'hudChrome.statInfo.desc.hitRating':
     'Trefferwertung aus deiner Ausrustung und Setboni, die verringert, wie oft deine Angriffe verfehlen und deine Zauber widerstanden werden, besonders gegen hoher stufige Feinde. Etwa 10 Wertung verleihen 1% Treffer.',
   'hudChrome.statInfo.names.hitRating': 'Trefferwertung',
@@ -1851,7 +1853,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Totenfrost',
   'entities.abilities.desperate_prayer.name': 'Letztes Gebet',
   'entities.abilities.deterrence.name': 'Borstenwacht',
-  'entities.abilities.divine_shield.name': 'Lichtwacht',
   'entities.abilities.earthbind.name': 'Greifende Erde',
   'entities.abilities.evocation.name': 'Ätherbrunnen',
   'entities.abilities.frenzied_regeneration.name': 'Wilde Heilung',
@@ -1859,7 +1860,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Geisterschlag',
   'entities.abilities.hammer_of_wrath.name': 'Läutender Hammer',
   'entities.abilities.healing_stream.name': 'Quellbrunnen',
-  'entities.abilities.holy_wrath.name': 'Heiligenzorn',
   'entities.abilities.howl_of_terror.name': 'Schreckensheulen',
   'entities.abilities.ice_block.name': 'Kalter Sarg',
   'entities.abilities.inner_focus.name': 'Stiller Geist',
@@ -1874,9 +1874,27 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Schattengleiten',
   'entities.abilities.silence.name': 'Stille',
   'entities.abilities.tranquility.name': 'Hainlied',
-  'entities.abilities.cleansing_verdict.name': 'Läuterndes Urteil',
-  'entities.abilities.cleansing_verdict.description':
-    'Entfernt einen schädlichen magischen Effekt von einem verbündeten Ziel und heilt es mit heiliger Magie um {damage}.',
+  'entities.abilities.flurry_of_knives.name': 'Messerhagel',
+  'entities.abilities.flurry_of_knives.description':
+    'Peitscht alle Gegner im Umkreis von 6 m mit Wurfmessern, verursacht {damage} körperlichen Schaden und gewährt 2 Combopunkte. (Schurkentalent)',
+  'entities.abilities.thieves_chorus.name': 'Chor der Diebe',
+  'entities.abilities.thieves_chorus.description':
+    'Ein gepfiffenes Signal spornt eure Gruppe an: Angriffs-, Zauber- und Kanalisierungstempo für 10 Sek. um 10% erhöht. Verbündete, die kürzlich einen Gruppentempo-Schub erhielten, sind zu erschöpft, um zu profitieren. (Schurkentalent)',
+  'entities.abilities.venomrend.name': 'Giftriss',
+  'entities.abilities.venomrend.description':
+    'Verzehrt das Giftritual: trifft für 22 plus 26 pro Combopunkt, bringt den Restschaden eurer Blutungen zur Detonation und stellt 25 Energie wieder her. (Knifework-Engine)',
+  'entities.abilities.veilstrike.name': 'Schleierstoß',
+  'entities.abilities.veilstrike.description':
+    'Verzehrt den Düstervorrat und hüllt euch 6 Sek. lang in Schatten: eure Schleichangriffe funktionieren im Offenen und ihr verursacht 25% mehr Schaden. (Skulduggery-Engine)',
+  'entities.abilities.body_blow.name': 'Körpertreffer',
+  'entities.abilities.body_blow.description':
+    'Ein wuchtiger Treffer für 130% Waffenschaden plus 10, der 2 Combopunkte gewährt und die Redline um eine Stufe vertieft. (Thuggery-Engine)',
+  'entities.abilities.knockout_blow.name': 'K.o.-Schlag',
+  'entities.abilities.knockout_blow.description':
+    'Beendet die Redline mit einem K.o.: trifft für 45 plus 35 pro Combopunkt, pro Redline-Stufe 25% härter, und stellt 25 Energie wieder her. (Thuggery-Engine)',
+  'entities.abilities.venom_dart.name': 'Giftpfeil',
+  'entities.abilities.venom_dart.description':
+    'Schnippt einen vergifteten Pfeil für {damage} Naturschaden. Gewährt 1 Combopunkt. Knifework: verlängert eure Giftriss-Wunde um 6 Sek., bis zu 20 Sek.',
   'entities.abilities.smoke_screen.name': 'Rauchvorhang',
   'entities.abilities.smoke_screen.description':
     'Ihr verschwindet in einer Rauchwolke, wodurch sich Eure Ausweichchance 8 Sek. lang um 30 % erhöht.',
@@ -3815,6 +3833,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': 'in der Welt',
   'character.renameRequired': 'Umbenennung erforderlich',
   'character.delete': 'Löschen',
+  'character.redesign': 'Umgestalten',
+  'character.redesignHint':
+    'Diese Figur stammt aus der Zeit vor dem neuen Charaktereditor. Ihr habt eine kostenlose Umgestaltung; sie wird beim Speichern verbraucht.',
+  'character.redesignTitle': '{name} umgestalten',
+  'character.redesignSave': 'Neues Aussehen speichern',
+  'character.redesignCancel': 'Aktuelles Aussehen behalten',
   'character.rename': 'Umbenennen',
   'character.newNamePlaceholder': 'Neuer Charaktername',
   'character.tabCharacters': 'Charaktere',
@@ -4387,7 +4411,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ihr werdet mit dem online nächstbewerteten Herausforderer gepaart und in den Sand teleportiert. Gewinnt, um aufzusteigen; wer zuerst aufgibt (1 Gesundheit), verliert. Ihr kehrt genau an den Ort zurück, an dem Ihr Euch eingereiht habt.',
   'hud.arena.ladderAllTime': 'Rangliste - gesamt',
   'hud.arena.ladderOnline': 'Rangliste - online',
-  'hud.arena.ratingSummary': 'Wertung - {wins} Siege / {losses} Niederlagen',
+  'hud.arena.ratingSummary':
+    'Wertung - {wins} Siege / {losses} Niederlagen / {draws} Unentschieden',
   'hud.arena.statusCountdown': 'Macht Euch bereit...',
   'hud.arena.statusReturning': 'Rückkehr in die Welt... {seconds}',
   'hud.arena.statusFight': 'Kämpft bis zur Aufgabe!',
@@ -4424,7 +4449,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.unavailable': 'Nicht verfügbar',
   'abilityUi.tooltip.requiresLevel': 'Benötigt Stufe {level}',
   'abilityUi.tooltip.requiresForm': 'Benötigt {form}form',
-  'abilityUi.tooltip.requiresStealth': 'Benötigt Verstohlenheit',
   'abilityUi.tooltip.requiresCombo': 'Verbraucht Combopunkte',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Benötigt ein Ziel unter {percent}% Gesundheit',
   'abilityUi.tooltip.requiresDodge': 'Nur nutzbar, nachdem das Ziel ausgewichen ist',
@@ -4839,41 +4863,24 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Schützt euch mit Eis und absorbiert 60 Sek. lang {damage} Schaden.',
   'entities.abilities.sinister_strike.name': 'Boshafter Hieb',
-  'entities.abilities.sinister_strike.description':
-    'Sofortiger Hieb für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.',
   'entities.abilities.eviscerate.name': 'Grabesschlaf',
-  'entities.abilities.eviscerate.description': 'Finishing-Move, der {damage} verursacht.',
   'entities.abilities.backstab.name': 'Feiger Stoß',
-  'entities.abilities.backstab.description':
-    'Meuchelt das Ziel für 150% Waffenschaden plus {damage}. Ihr müsst hinter dem Ziel stehen. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
   'entities.abilities.gouge.name': 'Augenstich',
   'entities.abilities.gouge.description':
     'Trifft das Ziel für {damage} Schaden und macht es 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. Gewährt 1 Combopunkt.',
   'entities.abilities.evasion.name': 'Geisterfuß',
   'entities.abilities.evasion.description': 'Erhöht eure Ausweichchance 15 Sek. lang um 50%.',
   'entities.abilities.slice_and_dice.name': 'Mörderisches Tempo',
-  'entities.abilities.slice_and_dice.description':
-    'Finishing-Move, der das Nahkampfangriffstempo um 30% erhöht. Hält pro Combopunkt länger an.',
   'entities.abilities.sprint.name': 'Flinke Fersen',
   'entities.abilities.sprint.description': 'Erhöht euer Bewegungstempo 15 Sek. lang um 70%.',
   'entities.abilities.kidney_shot.name': 'Tiefschlag',
-  'entities.abilities.kidney_shot.description':
-    'Finishing-Move, der das Ziel betäubt. Hält pro Combopunkt 1 Sek. länger an.',
   'entities.abilities.ambush.name': 'Lauererstoß',
-  'entities.abilities.ambush.description':
-    'Überfällt das Ziel für 250% Waffenschaden plus {damage}. Ihr müsst verstohlen und hinter dem Ziel sein. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
   'entities.abilities.stealth.name': 'Dämmerschleier',
-  'entities.abilities.stealth.description':
-    'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um hervorzutreten.',
   'entities.abilities.adrenaline_rush.name': 'Beschleunigtes Blut',
   'entities.abilities.adrenaline_rush.description':
     'Euer Blut kocht und stellt sofort 60 Energie wieder her.',
   'entities.abilities.garrote.name': 'Kehldraht',
-  'entities.abilities.garrote.description':
-    'Erwürgt den Gegner, verursacht sofort {damage} Schaden und lässt ihn über 18 Sek. für {overTime} bluten. Erfordert Verstohlenheit. Gewährt 1 Combopunkt.',
   'entities.abilities.cheap_shot.name': 'Magenhieb',
-  'entities.abilities.cheap_shot.description':
-    'Trifft das Ziel für {damage} Schaden und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte.',
   'entities.abilities.sap.name': 'Kopfnuss',
   'entities.abilities.sap.description':
     'Macht das Ziel 8 Sek. lang handlungsunfähig. Erfordert Verstohlenheit und außerhalb des Kampfes zu sein. Jeder Schaden bricht den Effekt.',
@@ -4881,11 +4888,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.description':
     'Trifft das Ziel mit einem bleiernen Gift, verursacht {damage} Naturschaden und verlangsamt sein Bewegungstempo 12 Sek. lang um 50%.',
   'entities.abilities.expose_armor.name': 'Rüstungsbruch',
-  'entities.abilities.expose_armor.description':
-    'Finishing-Move, der das Ziel entblößt und seine Rüstung 30 Sek. lang um {damage} verringert.',
   'entities.abilities.rupture.name': 'Ausbluten',
-  'entities.abilities.rupture.description':
-    'Finishing-Move, der das Ziel verwundet und es 16 Sek. lang um {damage} bluten lässt.',
   'entities.abilities.vanish.description':
     'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Duskveil. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
   'entities.abilities.instant_poison.name': 'Natternbiss',
@@ -4912,12 +4915,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Belegt ein freundliches Ziel mit einem Segen und erhöht seine Angriffskraft 5 Min. lang um {buff}.',
   'entities.abilities.divine_protection.name': 'Bannschild des Glaubens',
   'entities.abilities.divine_protection.description':
-    'Ein schützender Bannschild absorbiert 10 Sek. lang {damage} Schaden.',
+    'Ein heiliger Schild absorbiert {damage}% Eurer maximalen Gesundheit für {duration} Sek.',
   'entities.abilities.hammer_of_justice.name': 'Spaltender Richthammer',
   'entities.abilities.hammer_of_justice.description': 'Betäubt das Ziel {duration} Sek. lang.',
   'entities.abilities.lay_on_hands.name': 'Letzte Ölung',
   'entities.abilities.lay_on_hands.description':
-    'Ein gewaltiger Heilungsstoß: Stellt {damage} Gesundheit wieder her. 10 Min. Abklingzeit.',
+    'Ein gewaltiger Heilungsstoß stellt {damage}% Eurer maximalen Gesundheit wieder her. 10 Min. Abklingzeit.',
   'entities.abilities.flash_of_light.name': 'Lichtheilung',
   'entities.abilities.flash_of_light.description':
     'Ein schneller, effizienter Lichtstoß, der ein freundliches Ziel um {damage} heilt.',
@@ -4926,13 +4929,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Bannt das Böse mit Heiligem Zorn und verursacht {damage} Heiligschaden.',
   'entities.abilities.consecration.name': 'Heiliger Boden',
   'entities.abilities.consecration.description':
-    'Weiht den Boden unter euch und versengt nahe Gegner 10 Sek. lang alle 2 Sek. für {damage} Heiligschaden.',
+    'Weiht den Boden 9 Sek. lang und verursacht jede Sekunde {damage} Heiligschaden. Glaubenswächter erleiden darin 10% weniger Schaden.',
   'entities.abilities.righteous_fury.name': 'Brennender Eid',
   'entities.abilities.righteous_fury.description':
     'Erhöht die durch euren Heiligschaden erzeugte Bedrohung 30 Min. lang um 60%. Der Grundpfeiler des Tank-Paladins.',
   'entities.abilities.retribution_aura.name': 'Aura der Vergeltung',
   'entities.abilities.retribution_aura.description':
-    'Umgibt Euch 30 Min. lang mit heiliger Energie und fügt jedem Gegner, der Euch im Nahkampf trifft, 5 Heiligschaden zu.',
+    'Umgibt Euch und Eure Gruppe mit heiliger Energie bis zum Tod oder zur Ersetzung. Gegner, die einen betroffenen Verbündeten im Nahkampf treffen, erleiden {buff} Heiligschaden, und betroffene Verbündete verursachen mit Autoangriffen {buff} zusätzlichen Heiligschaden.',
   'entities.abilities.tame_beast.name': 'Wildband',
   'entities.abilities.tame_beast.description':
     'Beginnt, ein Wildtier als Begleiter zu zähmen. Es muss eure Stufe oder niedriger haben und darf kein Elitegegner sein. Euer Begleiter folgt euch, greift eure Gegner an und hält eigene Bedrohung. Ihr könnt nur einen Begleiter zugleich haben.',
@@ -4969,7 +4972,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Ein sorgfältig gespannter Schuss, der {damage} Schaden verursacht.',
   'entities.abilities.rapid_fire.name': 'Fieberhafter Zug',
-  'entities.abilities.rapid_fire.description': 'Erhöht euer Angriffstempo 15 Sek. lang um 40%.',
+  'entities.abilities.rapid_fire.description':
+    'Kanalisiert während der Bewegung über 2,4 Sek. sechs schnelle Schüsse, die jeweils {damage} körperlichen Schaden verursachen.',
   'entities.abilities.smite.name': 'Göttliche Pein',
   'entities.abilities.smite.description': 'Peinigt den Gegner für {damage} Heiligschaden.',
   'entities.abilities.lesser_heal.name': 'Geflüstertes Gebet',
@@ -5059,18 +5063,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.description':
     'Trifft das Ziel sofort mit sengendem Schatten für {damage} Schattenschaden.',
   'entities.abilities.wrath.name': 'Wildblitz',
-  'entities.abilities.wrath.description':
-    'Schleudert einen Blitz Naturenergie für {damage} Naturschaden.',
   'entities.abilities.healing_touch.name': 'Wildheilung',
   'entities.abilities.healing_touch.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Wildwacht',
   'entities.abilities.mark_of_the_wild.description':
     'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.moonfire.name': 'Mondsturm',
-  'entities.abilities.moonfire.description':
-    'Verbrennt den Gegner mit Mondfeuer für {damage} Arkanschaden plus Schaden über Zeit.',
   'entities.abilities.rejuvenation.name': 'Wildblüte',
-  'entities.abilities.rejuvenation.description': 'Heilt das Ziel über 12 Sek. um {damage}.',
   'entities.abilities.thorns.name': 'Dornenwacht',
   'entities.abilities.thorns.description':
     'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden {buff} Naturschaden.',
@@ -5081,8 +5080,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_form.description':
     'Verwandelt euch in einen Bären: Rüstung +130%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.maul.name': 'Knochenmalmer',
-  'entities.abilities.maul.description':
-    'Ein zerfleischender Angriff, der den Nahkampfschaden um {damage} erhöht und viel Bedrohung verursacht. Wird bei eurem nächsten Schwung ausgelöst. Nur in Bruin Form.',
   'entities.abilities.growl.name': 'Bedrohen',
   'entities.abilities.growl.description':
     'Knurrt das Ziel an: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen. Nur in Bruin Form.',
@@ -5090,23 +5087,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cat_form.description':
     'Verwandelt euch in einen Wolf: Angriffskraft steigt mit eurer Stufe, eure Angriffe nutzen Energie und Combopunkte, und ihr erzeugt 29% weniger Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.claw.name': 'Klaue',
-  'entities.abilities.claw.description':
-    'Kratzt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
   'entities.abilities.ferocious_bite.name': 'Blutbiss',
-  'entities.abilities.ferocious_bite.description':
-    'Finishing-Move, der {damage} verursacht. Nur in Wolfsgestalt.',
   'entities.abilities.swipe.name': 'Fegende Klauen',
-  'entities.abilities.swipe.description':
-    'Fegt nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin Form.',
   'entities.abilities.regrowth.name': 'Zweite Blüte',
-  'entities.abilities.regrowth.description':
-    'Heilt ein freundliches Ziel um {damage} und zusätzlich über 21 Sek.',
   'entities.abilities.barkskin.name': 'Eichenhaut',
   'entities.abilities.barkskin.description':
     'Eure Haut härtet wie Rinde und erhöht die Rüstung 15 Sek. lang um 150.',
   'entities.abilities.starfire.name': 'Himmelssturz',
-  'entities.abilities.starfire.description':
-    'Ruft einen Bolzen aus Sternenfeuer herab, der {damage} Arkanschaden verursacht.',
   'entities.abilities.travel_form.name': 'Fleet-Gestalt',
   'entities.abilities.travel_form.description':
     'Nehmt augenblicklich eine flinke Fleet Form an, was das Lauftempo um 40% erhöht. In dieser Gestalt könnt ihr keine anderen Fähigkeiten einsetzen, aber ihr könnt im Kampf hinein- und herauswechseln. Ideal zur Flucht.',
@@ -5115,8 +5102,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': 'Erschüttern',
   'entities.abilities.bash.description': 'Betäubt das Ziel 2 Sek. lang. Nur in Bruin Form.',
   'entities.abilities.faerie_fire.name': 'Hexenlicht',
-  'entities.abilities.faerie_fire.description':
-    'Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%. Nicht mit Rüstungsspalter kumulierbar.',
   'entities.abilities.hibernate.name': 'Schlummer',
   'entities.abilities.hibernate.description':
     'Versetzt das Ziel bis zu 8 Sek. in tiefen Schlaf. Jeglicher Schaden weckt es auf.',
@@ -5133,8 +5118,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.description':
     'Erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Wolfsgestalt.',
   'entities.abilities.rip.name': 'Zerfetzen',
-  'entities.abilities.rip.description':
-    'Finishing-Move, der über 12 Sek. {damage} Blutungsschaden verursacht. Verbraucht Combopunkte. Nur in Wolfsgestalt.',
   'entities.abilities.mortal_strike.name': 'Verstümmelnder Hieb',
   'entities.abilities.mortal_strike.description':
     'Ein bösartiger Schlag, der Waffenschaden plus {damage} verursacht. (Waffen-Signatur)',
@@ -5167,7 +5150,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Beschwört einen Warfiend unter dem Befehl des Hexenmeisters. Der Warfiend ist ein widerstandsfähiger Nahkampfdämon, der sich in die Schlacht wirft und sich behauptet. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
   'entities.abilities.summon_infernal.name': 'Pyre Colossus beschwören',
   'entities.abilities.summon_infernal.description':
-    'Bindet einen Pyre Colossus an Euren Willen, einen wuchtigen Koloss mit zermalmendem Nahkampf und den höchsten Lebens- und Rüstungswerten aller Dämonen. Eine lange Abklingzeit zügelt seine rohe Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
+    'Ruft einen Pyre Colossus im Zielbereich herab, der beim Aufprall 58-72 Feuerschaden verursacht. Er kämpft 30 Sek. lang, ohne Euren Dämon zu ersetzen, verbrennt alle 2 Sek. Gegner in der Nähe und erzeugt jede Sekunde 1 Ruin.',
   'entities.abilities.summon_doomguard.name': 'Wraithborn beschwören',
   'entities.abilities.summon_doomguard.description':
     'Bindet einen Wraithborn an Euren Willen, einen Elitedämon, der aus der Ferne schweren Schattenschaden niederregnen lässt. Eine lange Abklingzeit zügelt seine verheerende Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
@@ -5181,8 +5164,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description':
     'Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 50% langsamer. Im Kampf nicht einsetzbar.',
   'entities.abilities.rake.name': 'Schinden',
-  'entities.abilities.rake.description':
-    'Ein Schleicheröffner, der den Gegner für Waffenschaden plus {damage} aufreißt und über 9 Sek. Blutungsschaden verursacht. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
   'entities.abilities.revive_pet.name': 'Zusammenflicken',
   'entities.abilities.revive_pet.description':
     'Flickt deinen Begleiter zusammen und stellt ihm, solange er lebt, im Verlauf von 12 Sek. alle 3 Sek. insgesamt {overTime} Gesundheit wieder her. Ist er tot, wird er mit 35 % Gesundheit wiederbelebt.',
@@ -5190,7 +5171,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)',
   'entities.abilities.holy_shield.name': 'Heiliger Schild',
   'entities.abilities.holy_shield.description':
-    'Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)',
+    'Erhöht die Blockchance um 30% und gewährt für {duration} Sek. einen Schild in Höhe von {damage}% Eurer maximalen Gesundheit. Aufstieg verstärkt die Verteidigung.',
   'entities.abilities.bestial_wrath.name': 'Zorn des Wildtiers',
   'entities.abilities.bestial_wrath.description':
     'Versetzt Euch in einen bestialischen Zorn und erhöht die Angriffskraft 15 Sek. lang um 55. (Tierherrschafts-Signatur)',
@@ -5208,14 +5189,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)',
   'entities.abilities.cold_blood.name': 'Kaltblütigkeit',
-  'entities.abilities.cold_blood.description':
-    'Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)',
   'entities.abilities.blade_flurry.name': 'Klingenwirbel',
-  'entities.abilities.blade_flurry.description':
-    'Entfesselt einen Klingenwirbel und erhöht das Angriffstempo 12 Sek. lang um 20%. (Kampf-Signatur)',
   'entities.abilities.hemorrhage.name': 'Blutsturz',
-  'entities.abilities.hemorrhage.description':
-    'Trifft den Gegner für Waffenschaden plus {damage} und verursacht 12 Sek. lang Blutungsschaden. Gewährt 1 Combopunkt. (Täuschungs-Signatur)',
   'entities.abilities.power_infusion.name': 'Machtinfusion',
   'entities.abilities.power_infusion.description':
     'Erfüllt ein freundliches Ziel mit Macht und erhöht seine Zaubermacht 15 Sek. lang um 28. (Disziplin-Signatur)',
@@ -5239,8 +5214,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.name': 'Wilde Attacke',
   'entities.abilities.feral_charge.description':
     'Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)',
-  'entities.abilities.swiftmend.description':
-    'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)',
+  'entities.abilities.swiftmend.name': 'Rasche Heilung',
   'entities.abilities.crusader_strike.description':
     'Trifft das Ziel für Waffenschaden plus {damage} Heiligschaden. (Paladin-Talent)',
   'entities.abilities.metamorphosis.name': 'Metamorphose',
@@ -5573,12 +5547,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.varkas_boneguard.name': "Varkas' Knochenwache",
   'entities.mobs.emberkin.name': 'Emberkin',
   'entities.mobs.gloomshade.name': 'Duskmurk',
-  'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.grix_the_tunnelking.name': 'Grix der Tunnelkönig',
-  'entities.mobs.spellhound.name': 'Spellhound',
-  'entities.mobs.warfiend.name': 'Warfiend',
   'entities.mobs.pyre_colossus.name': 'Pyre Colossus',
-  'entities.mobs.wraithborn.name': 'Wraithborn',
   'entities.mobs.choirmother_selthe.name': 'Chormutter Selthe',
   'entities.mobs.drowned_templeguard.name': 'Ertränkte Tempelwache',
   'entities.mobs.drowned_votary.name': 'Ertränkter Andächtiger',
@@ -7187,6 +7157,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Dein wichtigster Feuerzauber, landet einen Treffer und lässt das Ziel brennen.',
   'guide.abilityHook.flame_shock':
     'Ein sofortiger Brand, der zu Beginn trifft und mit der Zeit weiter versengt.',
+  'guide.abilityHook.galeheart_weapon':
+    'Erfüllt beide Waffen mit Sturmwind und belohnt einen gleichmäßigen Angriffsrhythmus.',
+  'guide.abilityHook.lifespring_weapon':
+    'Erfüllt deine Waffe mit heilendem Wasser und verstärkt deinen anhaltenden Heilfluss.',
+  'guide.abilityHook.tidecall':
+    'Ruft die Gezeiten und verstärkt die nächste Folge von Heilzaubern.',
+  'guide.abilityHook.stoneward':
+    'Errichtet einen geladenen Steinschild, der erlittenen Schaden in Heilung verwandelt.',
+  'guide.abilityHook.primal_exaltation':
+    'Entfesselt kurzzeitig die Elementarkraft deiner Spezialisierung.',
   'guide.abilityHook.frost_armor':
     'Eine anhaltende Selbststärkung, die deine Rüstung vor einem Kampf härtet.',
   'guide.abilityHook.frostbolt':
@@ -7326,17 +7306,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arena und PvP',
   'guide.nav.talents': 'Talente',
   'guide.nav.wishIKnew': 'Was ich gern früher gewusst hätte',
-  'guide.petHook.wraithborn':
-    'Ein Elite-Zauberwirker, der aus der Ferne schweren Schatten regnen lässt.',
-  'guide.petHook.warfiend':
-    'Ein robuster Nahkampfschläger, der Allrounder, sobald du ihn beschwören kannst.',
-  'guide.petHook.spellhound': 'Ein Schattenplänkler, der gegnerischen Zauberwirkern zusetzt.',
   'guide.petHook.emberkin':
     'Ein Feuerblitz-Dämon für die Distanz, der Gegner aus sicherer Entfernung abträgt.',
   'guide.petHook.pyre_colossus':
     'Ein massiger Koloss mit zermalmendem Nahkampf, beschworen für rohe Kraft.',
-  'guide.petHook.duskborn':
-    'Ein schneller Nahkampfdämon, der hart zuschlägt, aber unter Druck einknickt.',
   'guide.petHook.gloomshade':
     'Ein robuster Dämon, der verspottet und Treffer absorbiert, sodass du in Ruhe zaubern kannst.',
   'guide.related': 'Verwandtes',
@@ -9089,9 +9062,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Hoch auf dem Thornpeak nimmt der Sturm über Stormcrag zuweilen Gestalt an. Thunzharr, der Erwachende Gipfel erhebt sich dort in stetigem Rhythmus, ein Elementar von Schlachtzugsstärke, in der offenen Welt von allen bekämpft, die dem Ruf folgen, und er wird umso mächtiger, je mehr Herausforderer sich ihm entgegenstellen. Jeder, der sich dem Kampf anschließt, verdient seinen eigenen Wurf auf seine Beute, nach den Regeln der Schlachtzugssperre gewährt, und sein Fall währt lange genug, dass die Gefallenen zurücklaufen und ihr Recht einfordern können. Sammle mehr Schwerter, als du zu brauchen glaubst.',
   'guide.worldPage.worldBossTitle': 'Wenn der Gipfel erwacht: der Weltboss',
-  'entities.abilities.chain_heal.description':
-    'Heilt ein verbündetes Ziel um einen großen Betrag und springt dann auf bis zu 2 weitere Verbündete in der Nähe über. Die Heilung verringert sich mit jedem Sprung um 50%. (Wiederherstellungs-Signatur)',
   'entities.abilities.chain_heal.name': 'Kettenheilung',
+  'entities.abilities.chain_heal.description':
+    'Heilt ein verbündetes Ziel um {damage} und springt dann auf bis zu 2 Verbündete im Umkreis von 12 Metern über. Jeder Sprung heilt um 50% des vorherigen Ziels. Jeder erreichte Verbündete verbraucht Eure verbleibende Flickströmung und heilt sofort um 125% der verbrauchten Menge. Die anfängliche Heilung steigt mit Zaubermacht. (Wiederherstellungs-Signatur)',
+  'entities.abilities.desperate_prayer.description':
+    'Heilt Euch sofort um 30% der maximalen Gesundheit.',
   'entities.abilities.counter_shot.description':
     'Ein schneller Schuss, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken.',
   'entities.abilities.counter_shot.name': 'Schweigeschuss',
@@ -9443,9 +9418,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Entscheidungen',
   'game.talents.rowUnlockToast': 'Neue Talentwahl verfügbar!',
   'game.talents.rowUnlocks': 'Wird auf Stufe {level} freigeschaltet',
-  'entities.abilities.aura_surge.name': 'Dämmerprall',
-  'entities.abilities.aura_surge.description':
-    'Schleudert einen dämmergeschmiedeten Schild für {damage} Heiligschaden, bringt das Primärziel 2 Sek. zum Schweigen und springt dann auf bis zu 2 weitere Gegner innerhalb von 10 Metern über, wobei jeder Sprung 75% Schaden verursacht. (Paladintalent)',
   'entities.abilities.aspect_of_the_wild.description':
     'Inspiriert Verbündete im Umkreis von 30 m mit wilder Kraft und erhöht ihre Angriffskraft 5 Min. lang um 45 und ihr Angriffstempo um 5 %. (Jägertalent)',
   'entities.abilities.avatar.name': 'Avatar',
@@ -9476,12 +9448,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Trifft den Gegner für {damage} Schattenschaden und versetzt ihn anschließend 3 Sek. lang in Entsetzen. (Hexenmeistertalent)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a Ziel, inflige {damage} de daño de Frost y lo aturde durante 4 Sek.. (Magier-Talent)',
-  'entities.abilities.desperate_prayer.description':
-    'Heilt Euch sofort um {damage}. (Priestertalent)',
   'entities.abilities.deterrence.description':
     'Erhöht Eure Ausweichchance 10 Sek. lang um 50 Prozentpunkte. (Jägertalent)',
-  'entities.abilities.divine_shield.description':
-    'Schützt Euch mit heiliger Macht, die 8 Sek. lang 900 Schaden absorbiert. (Paladintalent)',
   'entities.abilities.earthbind.description':
     'Bindet Gegner in der Nähe an die Erde und macht sie 2 Sek. lang bewegungsunfähig. (Schamanentalent)',
   'entities.abilities.evocation.description': 'Restaura Mana rápidamente. (Magier-Talent)',
@@ -9489,14 +9457,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Stellt im Verlauf von 10 Sek. 180 Gesundheit wieder her. Nur in Bärengestalt. (Druidentalent)',
   'entities.abilities.frost_trap.description':
     'Friert Gegner im Zielgebiet 3 Sek. lang ein, sodass sie sich weder bewegen noch handeln können. (Jägertalent)',
-  'entities.abilities.ghostly_strike.description':
-    'Trifft den Gegner für Waffenschaden plus {damage}, erhöht kurzzeitig die Ausweichchance und gewährt 1 Combopunkt. (Schurkentalent)',
   'entities.abilities.hammer_of_wrath.description':
     'Schleudert einen heiligen Hammer auf einen verwundeten Gegner und verursacht {damage} Heiligschaden. Nur unter 20 % Gesundheit einsetzbar. (Paladintalent)',
   'entities.abilities.healing_stream.description':
     'Stellt bei einem verbündeten Ziel im Verlauf von 12 Sek. 120 Gesundheit wieder her. (Schamanentalent)',
-  'entities.abilities.holy_wrath.description':
-    'Entfesselt heilige Macht und fügt Gegnern in der Nähe {damage} Schaden zu. (Paladintalent)',
   'entities.abilities.howl_of_terror.description':
     'Versetzt Gegner in der Nähe bis zu 3 Sek. lang in Furcht. Schaden kann den Effekt aufheben. (Hexenmeistertalent)',
   'entities.abilities.ice_block.description':
@@ -10273,6 +10237,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Die Vor-Heiligtum-Voreinstellung für Stufe 20 einer Spezialisierung anlegen, zuerst die Taschen. Nur Ausrüstung.',
+  'devCommand.actions.biskit.label': 'BIS-20-Set anlegen',
+  'devCommand.actions.biskit.description':
+    'Das beste Epos-Set einer Spezialisierung in jedem Platz anlegen. Nur Ausrüstung.',
   'devCommand.actions.kit.label': 'Frisch-20-Set anlegen',
   'devCommand.fields.spec': 'Spezialisierung',
   'devCommand.itemChosen': 'Ausgewählt: {name}',
@@ -10335,6 +10302,281 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Ersetzt {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Dieser Gegenstand hat diese Verzauberung bereits.',
   'hudChrome.enchanting.sameEnchantTag': 'Bereits angewendet',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'abilityUi.resources.devotion': 'Hingabe',
+  'abilityUi.resources.focus': 'Fokus',
+  'classDetails.resources.focus': 'Fokus',
+  'game.hud.lowFocus': 'Wenig Fokus',
+  'hud.errors.notEnoughDevotion': 'Nicht genug Hingabe!',
+  'hudChrome.paladin.devotion': 'Hingabe',
+  'hudChrome.paladin.devotionValue': 'Hingabe {value} von {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Hingabe {value} von {max}. Aufstieg: {charges} Aufladungen.',
+  'hudChrome.paladin.devotionAscensionLast':
+    'Hingabe {value} von {max}. Aufstieg: letzte Aufladung.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Aufstieg: letzte Aufladung',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Aktionsplatz {slot}: {ability}. Verbraucht eine Aufstiegsaufladung.',
+  'hudChrome.auraEffect.dawnsWrath':
+    'HdZ: jede Gesundheit · +1 Einsatz · Abklingzeit 0 · +{pct}% Schaden',
+  'hudChrome.auraEffect.duskEconomy': 'Fähigkeiten kosten {pct}% weniger Energie',
+  'hudChrome.auraEffect.hunterFerocity':
+    '{stacks} Rudelwildheit: Euer Begleiter verursacht {pct}% mehr Schaden',
+  'hudChrome.auraEffect.veiledEdge': 'Euer nächster Lauererschlag trifft doppelt so hart',
+  'hudChrome.auraEffect.gloam':
+    'Dämmer: Stufe {stacks} von {max}. Bei {max} lassen sich Eure Dämmerschleier-Eröffnungen im Offenen einsetzen, und die nächste geworfene ist KOSTENLOS und zündet den Vorrat zum Schattenschleier',
+  'hudChrome.auraEffect.mendingCurrent':
+    'Speichert {value} Heilung, mit der Zeit freigesetzt oder von Kaskadenflickung verbraucht',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Speichert Heilung in Höhe von {pct}% der maximalen Gesundheit für Kaskadenflickung',
+  'hudChrome.auraEffect.radiantResonance':
+    'Euer nächstes Heilendes Licht wird sofort gewirkt, oder Eure nächste Umarmung der Morgenröte kostet {pct}% weniger Mana und wird in {castTime} Sek. gewirkt',
+  'hudChrome.auraEffect.redline':
+    'Rote Linie: Kerbe {stacks} von {max}. Körpertreffer fügen Kerben hinzu; der K.-o.-Schlag trifft pro Kerbe {pct}% härter und schließt das Fenster. Läuft es vorher ab, verfällt es',
+  'hudChrome.auraEffect.solarReprisal':
+    'Eure nächste Sonnenscheibe kostet kein Mana, ignoriert ihre Abklingzeit und verursacht {pct}% mehr Schaden; der Hammer der Gnade ignoriert seine Abklingzeit und heilt Euch um 100% des verursachten Schadens; oder Heilendes Licht wird sofort gewirkt',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    'Schattenschleier: Eure Dämmerschleier-Eröffnungen sind im Offenen aus jedem Winkel einsetzbar, und der verursachte Schaden steigt um {pct}%',
+  'hudChrome.auraEffect.venomRitual':
+    'Giftritual: Stufe {stacks} von {max}. Aufbauschläge fügen Stufen hinzu; bei {max} wird Grabesschlaf zu Giftriss',
+  'entities.abilities.aegis_first_dawn.name': 'Ägide der Ersten Morgenröte',
+  'entities.abilities.aura_mastery.name': 'Heilige Eintracht',
+  'entities.abilities.bastion_rite.name': 'Ritus der Bastion',
+  'entities.abilities.bastion_sweep.name': 'Bastionsschwung',
+  'entities.abilities.beacon_of_light.name': 'Leuchtfeuer des Lichts',
+  'entities.abilities.dawn_devotion.name': 'Hingabe der Morgenröte',
+  'entities.abilities.dawnfall.name': 'Morgensturz',
+  'entities.abilities.dawns_embrace.name': 'Umarmung der Morgenröte',
+  'entities.abilities.devotion_ward.name': 'Hingabe der Bastion',
+  'entities.abilities.divine_ascension.name': 'Göttlicher Aufstieg',
+  'entities.abilities.faithforged_guard.name': 'Schuld des Lichts',
+  'entities.abilities.final_edict.name': 'Letztes Edikt',
+  'entities.abilities.grace_devotion.name': 'Hingabe der Gnade',
+  'entities.abilities.guardian_covenant.name': 'Bund des Wächters',
+  'entities.abilities.hammer_of_grace.name': 'Hammer der Gnade',
+  'entities.abilities.hushbrand.name': 'Schweigemal',
+  'entities.abilities.life_covenant.name': 'Bund des Lebens',
+  'entities.abilities.martyrs_aegis.name': 'Ägide des Märtyrers',
+  'entities.abilities.mercy_lance.name': 'Lanze der Gnade',
+  'entities.abilities.oath_chain.name': 'Eidkette',
+  'entities.abilities.radiant_chorus.name': 'Strahlender Chor',
+  'entities.abilities.radiant_devotion.name': 'Strahlende Hingabe',
+  'entities.abilities.recall_the_fallen.name': 'Ruf der Gefallenen',
+  'entities.abilities.sacred_challenge.name': 'Heiliger Ansporn',
+  'entities.abilities.sacred_form.name': 'Heilige Gestalt',
+  'entities.abilities.seraphic_vigil.name': 'Seraphische Wacht',
+  'entities.abilities.solar_invocation.name': 'Sonnenanrufung',
+  'entities.abilities.solar_step.name': 'Sonnenschritt',
+  'entities.abilities.sun_gods_verdict.name': 'Urteil des Sonnengottes',
+  'entities.abilities.sunward_disc.name': 'Sonnenscheibe',
+  'entities.abilities.valkyrs_calling.name': 'Ruf der Walküre',
+  'entities.abilities.veilbound_march.name': 'Schleiermarsch',
+  'entities.abilities.veilbound_mark.name': 'Schleiermal',
+  'entities.abilities.vowkeeper_strike.name': 'Schwurwahrerschlag',
+  'entities.abilities.choir_of_deliverance.name': 'Chor der Erlösung',
+  'entities.abilities.scouring_mercy.name': 'Läuternde Gnade',
+  'entities.abilities.aegis_first_dawn.description':
+    'Kanalisiert 5 Sek. lang und erschafft eine heilige Kuppel von 10 Metern. Verbündete darin werden jede Sekunde geheilt und erleiden 50% weniger Schaden. Der Abschluss der Kanalisierung setzt eine letzte Heilung frei und gewährt 4 Sek. lang 30% Tempo.',
+  'entities.abilities.aura_mastery.description':
+    'Verstärkt 8 Sek. lang jede aktive Hingabe und Vergeltungsaura in Eurer Gruppe. Die Hingabe der Bastion verringert Schaden um 15%; Vergeltung verursacht 15 Heiligschaden. Mehrfache Anwendungen erneuern sich, statt sich zu stapeln.',
+  'entities.abilities.bastion_rite.description':
+    'Verringert erlittenen physischen Schaden um 20% und erhöht die Blockchance 6 Sek. lang um 20%. Der Aufstieg verlängert die Dauer auf 10 Sek.',
+  'entities.abilities.bastion_sweep.description':
+    'Fegt mit Eurem angelegten Schild in einem frontalen 180-Grad-Bogen durch Gegner und verursacht {damage} Heiligschaden mit hoher Bedrohung und erzeugt 1 Hingabe. Der Aufstieg erhöht den Schaden um 30% und den Radius auf 8 m.',
+  'entities.abilities.beacon_of_light.description':
+    'Markiert ein Gruppenmitglied als Euer Leuchtfeuer des Lichts. 50% Eurer effektiven direkten Heilung an einem anderen Gruppenmitglied innerhalb von 60 m heilen auch das Leuchtfeuer. Flächen- und periodische Heilung werden nicht übertragen. Hält an, bis einer von Euch stirbt.',
+  'entities.abilities.dawn_devotion.description':
+    'Erhöht die Angriffskraft von Euch und Euren Gruppenmitgliedern 30 Min. lang um 40. Ersetzt Eure eigene Strahlende Hingabe oder Hingabe der Gnade, besteht aber neben den Hingaben anderer Paladine und neben Kriegerrufen.',
+  'entities.abilities.dawnfall.description':
+    'Verursacht {damage} Heiligschaden an nahen Gegnern und erzeugt 1 Hingabe. Mindestens einen Gegner zu treffen verringert die verbleibende Abklingzeit des Letzten Edikts um 2 Sek. Der Aufstieg erhöht Schaden und Radius.',
+  'entities.abilities.dawns_embrace.description':
+    'Wirkt eine mächtige Heilung und erzeugt 1 Hingabe. Strahlende Resonanz senkt die Manakosten um 50% und die Zauberzeit auf 1,5 Sek. Der Aufstieg macht sie sofort wirkbar und erhöht ihre Heilung um 35%.',
+  'entities.abilities.devotion_ward.description':
+    'Verringert den von Euch und Euren Gruppenmitgliedern erlittenen Schaden bis zum Tod oder zur Ersetzung um 5%. Nur diese Aura und die Vergeltungsaura ersetzen einander; Strahlende Hingabe, Hingabe der Morgenröte und Hingabe der Gnade bestehen nebeneinander.',
+  'entities.abilities.divine_ascension.description':
+    'Verbraucht 20 Hingabe, um bis zu 45 Sek. lang 5 Aufstiegsaufladungen zu erhalten. Markierte Fähigkeiten verbrauchen eine Aufladung und erhalten einen zusätzlichen Effekt.',
+  'entities.abilities.faithforged_guard.description':
+    '8 Sek. lang wird der nächste gegnerische Treffer gegen Euch beantwortet: Bis zu {buff} Schaden wird verwehrt und dem Angreifer als Heiligschaden zurückgegeben, und Ihr erhaltet 1 Hingabe. Nur ein Schlag wird beantwortet. Der Aufstieg erhöht die beantwortbare Menge um 50%.',
+  'entities.abilities.final_edict.description':
+    'Führt einen zermalmenden Waffenschlag aus und erzeugt 1 Hingabe, wenn er Schaden verursacht. Ein erfolgreicher Treffer verringert die verbleibende Abklingzeit des Morgensturzes um 2 Sek. Erfolgreiche Autoangriffe und Treffer des Letzten Edikts haben eine Chance von 15%, 8 Sek. lang Zorn der Morgenröte zu gewähren. Der Aufstieg löst zusätzlich eine heilige Explosion um Euch aus.',
+  'entities.abilities.grace_devotion.description':
+    'Ihr und Eure Gruppenmitglieder stellt alle 5 Sek. 15 Mana wieder her und zahlt 30 Min. lang 3% weniger Mana. Ersetzt Eure eigene Strahlende Hingabe oder Hingabe der Morgenröte, besteht aber neben den Hingaben anderer Paladine.',
+  'entities.abilities.guardian_covenant.description':
+    'Schützt ein freundliches Ziel und Euch selbst und verringert den erlittenen Schaden 8 Sek. lang um 20%. Wählt standardmäßig Euch, wenn kein freundliches Ziel ausgewählt ist.',
+  'entities.abilities.hammer_of_grace.description':
+    'Schleudert sofort einen heiligen Hammer auf einen Gegner innerhalb von 20 m für {damage}, stellt 70 Mana wieder her, heilt Euch um 50% des verursachten Schadens und erzeugt 1 Hingabe, wenn er Schaden verursacht. Sonnenvergeltung lässt den Hammer der Gnade seine Abklingzeit ignorieren und heilt Euch um 100% des verursachten Schadens.',
+  'entities.abilities.hushbrand.description':
+    'Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule.',
+  'entities.abilities.life_covenant.description':
+    'Verringert den von einem Verbündeten erlittenen Schaden 6 Sek. lang um 40%. Während des Aufstiegs gewährt er zusätzlich einen Schild von 120 Punkten, ohne eine Aufladung zu verbrauchen.',
+  'entities.abilities.martyrs_aegis.description':
+    'Verringert den von einem Verbündeten erlittenen Schaden 8 Sek. lang um 40%.',
+  'entities.abilities.mercy_lance.description':
+    'Verursacht {damage} Heiligschaden an einem Gegner und erzeugt 1 Hingabe, wenn sie Schaden verursacht. Während des Aufstiegs verbraucht sie 1 Aufladung, um einen kritischen Treffer zu garantieren.',
+  'entities.abilities.oath_chain.description':
+    'Bindet sofort einen entfernten Gegner mit einer heiligen Kette. Der Gegner bewegt sich mit 18 m pro Sekunde auf Euch zu, bis er 3 m erreicht, und wird dann 4 Sek. lang um 50% verlangsamt. Während des Aufstiegs bindet sie einen zweiten nahen Gegner.',
+  'entities.abilities.radiant_chorus.description':
+    'Heilt nahe Verbündete um {damage} und erzeugt 1 Hingabe. Mindestens 2 Verbündete wirksam zu heilen gewährt Strahlende Resonanz: Euer nächstes Heilendes Licht wird sofort gewirkt, oder Eure nächste Umarmung der Morgenröte kostet 50% weniger Mana und wird in 1,5 Sek. gewirkt. Der Aufstieg erhöht Heilung und Radius des Strahlenden Chors.',
+  'entities.abilities.radiant_devotion.description':
+    'Erhöht die Zaubermacht von Euch und Euren Gruppenmitgliedern 30 Min. lang um 20. Ersetzt Eure eigene Hingabe der Morgenröte oder Hingabe der Gnade, besteht aber neben den Hingaben anderer Paladine.',
+  'entities.abilities.recall_the_fallen.description':
+    'Erweckt ein totes Gruppenmitglied mit 35% Gesundheit und Mana wieder zum Leben. Ein Sonnenheiler der Stufe 16 oder höher ruft stattdessen alle gefallenen Mitglieder der Gruppe zurück.',
+  'entities.abilities.sacred_challenge.description':
+    'Zwingt einen Gegner, Euch anzugreifen. Während des Aufstiegs verringert er zusätzlich 4 Sek. lang allen erlittenen Schaden um 15%, ohne eine Aufladung zu verbrauchen.',
+  'entities.abilities.sacred_form.description':
+    'Versetzt Euch bis zum Tod in einen heiligen Zustand, erhöht Heilung um 10% und kritische Zauberchance um 5% und verringert erzeugte Bedrohung um 50%. Nur für Sonnenheiler.',
+  'entities.abilities.seraphic_vigil.description':
+    'Schützt einen Verbündeten 30 Sek. lang. Der erste Treffer, der ihn unter 35% Gesundheit bringt, verbraucht die Wacht und heilt ihn um 180. (Segensspruch-Signatur)',
+  'entities.abilities.scouring_mercy.description':
+    'Verursacht 72 bis 84 Heiligschaden an einem Gegner oder heilt ein freundliches Ziel um 130 bis 155. Beide Werte steigen mit der Zaubermacht. Der Schaden heilt außerdem jeden über die Doktrin verbundenen Verbündeten um 30% oder, wenn kein Verbündeter verbunden ist, das Gruppenmitglied mit der geringsten Gesundheit um 15%. (Doktrin-Signatur)',
+  'entities.abilities.solar_invocation.description':
+    'Heilt einen Verbündeten sofort um {damage} oder verursacht mäßigen Heiligschaden an einem Gegner. Beide Anwendungen erzeugen 1 Hingabe. Während des Aufstiegs heilt ein Heilzauber zusätzlich verbündete Spieler innerhalb von 10 m um die Hälfte.',
+  'entities.abilities.solar_step.description': 'Erhöht Euer Tempo 2 Sek. lang um 150%.',
+  'entities.abilities.sun_gods_verdict.description':
+    'Richtet einen Gegner 30 Sek. lang unter dem Urteil des Sonnengottes. Das Letzte Edikt und der Morgensturz schreiben bei einem erfolgreichen Treffer je eine Aufladung ein. Die Fähigkeit, die die dritte Aufladung setzt, bestimmt das Urteil: Das Letzte Edikt entfesselt verheerenden Schaden am Verurteilten; der Morgensturz zündet das Urteil und verletzt und betäubt nahe Gegner 1,5 Sek. lang.',
+  'entities.abilities.sunward_disc.description':
+    'Erfordert einen Schild. Schleudert eine strahlende Scheibe, die trifft und dann zwischen nahen Gegnern abprallt. Jeder schädigende Einschlag erzeugt 1 Hingabe. Sonnenvergeltung lässt die Sonnenscheibe kein Mana kosten, ihre Abklingzeit ignorieren und 20% mehr Schaden verursachen. Der Aufstieg verstärkt 5 Abpraller.',
+  'entities.abilities.valkyrs_calling.description':
+    'Steigt in die Lüfte auf und werdet immun gegen Schaden, während Ihr auf den Gegner zufliegt. Nach 2 Sek. stürzt Ihr auf das Zielgebiet herab und verursacht {damage} Heiligschaden und erzeugt 1 Hingabe. Der Aufstieg erhöht den Einschlagsschaden um 50% und verbraucht 1 Aufladung.',
+  'entities.abilities.veilbound_march.description':
+    'Werdet 4 Sek. lang ätherisch, erhaltet 40% Tempo und 30% Rüstung und werdet immun gegen Wurzeln, Verlangsamungen und Verschiebungen. Gegner, die Ihr durchquert, erhalten 6 Sek. lang das Schleiermal: Sie erleiden jede Sekunde Heiligschaden, verursachen 20% weniger Schaden an Euch und erzeugen zusätzliche Bedrohung. Das erste Mal gewährt 1 Hingabe. Endet der Marsch, erleiden nahe markierte Gegner einen letzten Ausbruch. Der Aufstieg erhöht den Ausbruch um 50% und zieht sie leicht zu Euch.',
+  'entities.abilities.veilbound_mark.description':
+    'Erleidet jede Sekunde Heiligschaden, verursacht 20% weniger Schaden an dem Paladin, der das Mal gesetzt hat, und erzeugt zusätzliche Bedrohung gegenüber diesem Paladin.',
+  'entities.abilities.vowkeeper_strike.description':
+    'Schlägt mit hoher Bedrohung zu und erzeugt 1 Hingabe. Ein erfolgreicher Schlag hat eine Chance von 20%, 8 Sek. lang Sonnenvergeltung zu gewähren; jeder erfolgreiche Block eine von 25%. Sonnenvergeltung verstärkt Eure nächste Sonnenscheibe, Euren nächsten Hammer der Gnade oder Euer nächstes Heilendes Licht. Der Aufstieg gewährt zusätzlich einen kleinen Absorptionsschild.',
+  'entities.abilities.choir_of_deliverance.description':
+    'Kanalisiert 6 Sek. lang und heilt Gruppenmitglieder im Umkreis von 30 Metern alle 2 Sek. um {damage}. Die Heilung steigt mit Zaubermacht.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.bloodhook.name': 'Bluthaken',
+  'entities.abilities.bloodtrail_assault.name': 'Blutspurangriff',
+  'entities.abilities.cold_focus.name': 'Kalter Fokus',
+  'entities.abilities.fieldcraft_reentry.name': 'Bewaffneter Wiedereintritt',
+  'entities.abilities.frostjaw_trap.name': 'Frostkieferfalle',
+  'entities.abilities.hunting_momentum.name': 'Jagdschwung',
+  'entities.abilities.measured_shot.name': 'Bedachter Schuss',
+  'entities.abilities.pack_command.name': 'Rudelbefehl',
+  'entities.abilities.pack_rally.name': 'Rudelsammlung',
+  'entities.abilities.shellskin.name': 'Panzerhaut',
+  'entities.abilities.shrapnel_charge.name': 'Splitterladung',
+  'entities.abilities.stampede.name': 'Stampede',
+  'entities.abilities.trailbreak.name': 'Pfadbruch',
+  'entities.abilities.unleash_beast.name': 'Bestie entfesseln',
+  'entities.abilities.wildheart.name': 'Wildherz',
+  'entities.abilities.bloodhook.description':
+    'Stürmt auf einen Gegner zu und wendet die Bluthakenwunde an, die über 12 Sek. in 4 Ticks 34 physischen Grundschaden plus 26% Eurer Distanzangriffskraft verursacht. (Feldkunst-Signatur)',
+  'entities.abilities.bloodtrail_assault.description':
+    '12 Sek. lang verbreitet der Bluthaken eine Wunde mit 60% Stärke auf bis zu 2 nahe Gegner, Wundriss befiehlt einen Begleiterangriff mit 18 Schaden, und die Splitterladung gewinnt 2 Meter, verursacht 25% mehr Grundschaden an ihrem Hauptziel und löst 50% mehr Wundschaden aus.',
+  'entities.abilities.cold_focus.description':
+    '12 Sek. lang stellt der Bedachte Schuss 50% mehr Fokus wieder her, und der Lange Zug kostet 25% weniger und wird 30% schneller gewirkt. (Kaltsicht-Signatur)',
+  'entities.abilities.fieldcraft_reentry.description':
+    'Passiv: Pfadbruch erneuert den Jagdschwung und bereitet 12 Sek. lang Euren nächsten Weidschlag oder Bluthaken vor. Der Weidschlag verursacht pro Stapel 15% mehr Schaden. Der Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% pro Stapel und durch Eure Distanzangriffskraft. Bei 3 Stapeln verbraucht einer der beiden Angriffe den Jagdschwung. (Feldkunst)',
+  'entities.abilities.frostjaw_trap.description':
+    'Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt.',
+  'entities.abilities.hunting_momentum.description':
+    'Passiv: Der Weidschlag gewährt 8 Sek. lang 1 Jagdschwung, bis zu 3. Bei 3 Stapeln verursacht Wundriss 45% mehr Schlagschaden und verbraucht die Stapel. (Feldkunst)',
+  'entities.abilities.measured_shot.description':
+    'Beschießt das Ziel für {damage} physischen Schaden. Ein Treffer stellt 20 Fokus wieder her. Der Schaden steigt mit der Distanzangriffskraft.',
+  'entities.abilities.pack_command.description':
+    'Befiehlt Eurem lebenden Begleiter, für 36 bis 48 physischen Schaden zuzuschlagen. Der Schaden steigt mit der Angriffskraft des Begleiters. Ein Treffer stellt 20 Fokus wieder her und gewährt 30 Sek. lang 1 Rudelwildheit, bis zu 3. Jeder Stapel erhöht allen von Eurem Begleiter verursachten Schaden um 10%. Dieser Schlag nutzt die Stapel, die Ihr vor dem Treffer hattet.',
+  'entities.abilities.pack_rally.description':
+    'Nehmt die Gestalt des Zelters an und sammelt nahe Verbündete 10 Sek. lang mit 30% Tempo und 10% Angriffs- und Zaubertempo.',
+  'entities.abilities.shellskin.description':
+    'Verringert erlittenen Schaden 8 Sek. lang um 60%, verhindert aber Angriffe, solange sie aktiv ist.',
+  'entities.abilities.shrapnel_charge.description':
+    'Trifft das Ziel für 24 bis 30 physischen Schaden und bis zu 4 weitere Gegner innerhalb von 6 Metern für 13 bis 17. Die anderen Ziele bluten außerdem über 6 Sek. für 12 Schaden. Trägt das Hauptziel Eure Bluthakenwunde, wird sofort 1 Wundtick verursacht. Der direkte Schaden steigt mit der Distanzangriffskraft.',
+  'entities.abilities.stampede.description':
+    'Beschwört 12 Sek. lang 3 Bestien. Jede greift alle 2 Sek. für {damage} physischen Schaden an. Der angezeigte Schaden enthält 8% Eurer Distanzangriffskraft vor Begleiterschadensboni. Die Bestien fixieren beim Beschwören die Rudelwildheit und gewinnen 10% Schaden pro Stapel. Während die Stampede abklingt, haben erfolgreiche Rudelbefehle eine Chance von 20%, sie zurückzusetzen, garantiert nach 5 fehlgeschlagenen Chancen. Sie kann sich nicht zurücksetzen, solange die Bestien aktiv sind. (Rudelfürst)',
+  'entities.abilities.trailbreak.description':
+    'Springt 12 Meter rückwärts. Habt Ihr Jagdschwung, wird er erneuert und bereitet 12 Sek. lang den Wiedereintritt vor.',
+  'entities.abilities.unleash_beast.description':
+    'Verbraucht 3 Rudelwildheit, nachdem Euer Begleiter für 83 bis 105 physischen Schaden zugeschlagen und alle Gegner innerhalb von 6 Metern für 26 bis 34 erschüttert hat. Schlag und Erschütterung nutzen den vollen Begleiterschadensbonus von 30% der Rudelwildheit und steigen mit der Angriffskraft des Begleiters. In den folgenden 8 Sek. verursacht der Begleiter 25% mehr Schaden, greift 35% schneller an und lässt den Finsteren Schuss bis zu 2 nahe Gegner treffen.',
+  'entities.abilities.wildheart.description':
+    'Stellt sofort 30% Eurer maximalen Gesundheit wieder her.',
+  'entities.abilities.ancestor_return.name': 'Rückkehr der Ahnen',
+  'entities.abilities.galeheart_weapon.name': 'Sturmherzwaffe',
+  'entities.abilities.lifespring_weapon.name': 'Lebensquellwaffe',
+  'entities.abilities.primal_exaltation.name': 'Urtümliche Erhebung',
+  'entities.abilities.stoneward.name': 'Steinwacht',
+  'entities.abilities.stormsurge.name': 'Sturmflut',
+  'entities.abilities.thunder_reservoir.name': 'Donnerspeicher',
+  'entities.abilities.tidecall.name': 'Gezeitenruf',
+  'entities.abilities.unleash_weapon.name': 'Waffe entfesseln',
+  'entities.abilities.warspirit_cadence.name': 'Kriegsgeistkadenz',
+  'entities.abilities.ancestor_return.description':
+    'Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs an seinem Körper mit 30% Gesundheit und Mana ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Geistflickung)',
+  'entities.abilities.galeheart_weapon.description':
+    'Verzaubert beide Waffen 30 Min. lang und ermöglicht die Kriegsgeistkadenz.',
+  'entities.abilities.lifespring_weapon.description':
+    'Verzaubert Eure Waffe 30 Min. lang. Heilende Wasser und der Gezeitenruf fügen der Flickströmung 20% mehr Heilung hinzu.',
+  'entities.abilities.primal_exaltation.description':
+    '12 Sek. lang werden der Lichtbogenblitz und der Gabelblitz des Donnerrufs 50% schneller gewirkt, und der Lichtbogenblitz gewährt 2 Donner; der Kriegsgeist löst seine Kadenz alle 2 Waffentreffer aus; die Geistflickung fügt der Flickströmung 50% mehr Heilung hinzu. (Schamanentalent)',
+  'entities.abilities.stoneward.description':
+    'Schützt einen Verbündeten 60 Sek. lang mit 6 Aufladungen. Schaden verbraucht eine Aufladung, um 5% der maximalen Gesundheit zu heilen, einmal alle 3 Sek. (Schamanentalent)',
+  'entities.abilities.stormsurge.description':
+    'Passiv: Während der Ahnenschlag abklingt, hat das Verbrauchen eines Sturmzeichens eine Chance von 25%, ihn zurückzusetzen. Schlagen die ersten 3 Chancen fehl, setzt ihn die 4. immer zurück. (Kriegsgeist)',
+  'entities.abilities.thunder_reservoir.description':
+    'Passiv: Der Lichtbogenblitz und der Gabelblitz gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)',
+  'entities.abilities.tidecall.description':
+    'Heilt ein verbündetes Ziel um {damage}. Die Heilung steigt mit Zaubermacht. Fügt die volle Heilung vor Überheilung der Flickströmung hinzu, bis zu 30% der maximalen Gesundheit des Ziels.',
+  'entities.abilities.unleash_weapon.description':
+    'Entfesselt Eure aktive Waffenverzauberung. Das Flammenmal verursacht 54 bis 64 Feuerschaden, gewinnt 30% der Zaubermacht und gewährt 2 Donner. Das Sturmherz schlägt mit Eurer Waffe zu, treibt die Kriegsgeistkadenz voran und gewährt 6 Sek. lang 20% Angriffstempo. Das Steingebundene schlägt für 75% Waffenschaden zu, zwingt das Ziel, Euch anzugreifen, und verringert erlittenen Schaden 4 Sek. lang um 20%. Die Lebensquelle verbraucht Eure Flickströmung, heilt um 125% ihrer verbleibenden Heilung und verringert den nächsten Treffer innerhalb von 8 Sek. um 50% der wiederhergestellten Gesundheit.',
+  'entities.abilities.warspirit_cadence.description':
+    'Passiv: Jeder 3. gelandete Waffenangriff löst 2 Sturmherzechos für 50% Naturschaden aus und gewährt 12 Sek. lang ein Sturmzeichen. Das Sturmzeichen macht Euren nächsten Lichtbogenblitz, Erdstoß oder Eure nächsten Heilenden Wasser sofort wirkbar und senkt deren Manakosten um 50%. Der Ahnenschlag zählt als 2 Angriffe. (Kriegsgeist)',
+  'entities.abilities.summon_tithefiend.name': 'Zehntteufel rufen',
+  'entities.abilities.summon_tithefiend.description':
+    'Verbraucht allen Düsterzehnt, um bei 1 bis 5 Stapeln einen Zehntteufel für 6, 8, 10, 12 oder 15 Sek. zu beschwören. Er greift alle 2 Sek. für 20 bis 24 Schattenschaden an, plus 8 pro zusätzlichem Stapel. Bei fünf Stapeln wird er größer und sein Schaden steigt um 25%. Sein Schaden steigt mit Eurer Zaubermacht. Er bevorzugt Euer Abbild. Jeder Treffer stellt 1% des maximalen Manas wieder her und überträgt 15% des Schadens auf bis zu 3 weitere Gegner mit Eurem Klagelied des Verfalls. (Vesper-Signatur)',
+  'entities.abilities.veilstep.name': 'Schleierschritt',
+  'entities.abilities.veilstep.description': 'Schreitet in Blickrichtung durch den Schleier.',
+  'entities.quests.q_divine_tome.title': 'Der Morgengebundene Foliant',
+  'entities.quests.q_divine_tome.objectives.0.label': 'Ruhelose Gebeine zur Ruhe gebettet',
+  'entities.quests.q_divine_tome.text':
+    'Das Licht ruht nicht still in Euch, {playerName}. Ich habe gesehen, wie Ihr die Toten zur Ruhe gebettet habt, und ich glaube, Ihr seid bereit für das, was nur wenigen Paladinen je gelehrt wird: den Ritus der Rückrufung, mit dem eine gefallene Seele zu den Lebenden zurückgerufen wird. Seine Worte werden im Morgengebundenen Folianten bewahrt, hier in meiner Obhut, doch ein Buch ist kein Segen, solange die ruhelosen Toten noch über diesen Boden wandeln. Bettet 6 weitere Ruhelose Gebeine zur Erde, und ich beginne, Euch zu unterweisen.',
+  'entities.quests.q_divine_tome.completion':
+    'Der Kapellenhof wird still. Ihr seid bereit für die Worte, {playerName}, doch der Ritus der Rückrufung kann nicht in einer warmen Kapelle gesprochen werden. Er muss dort gesungen werden, wo der Schleier zwischen Leben und Tod dünn wird. Ich gedenke, den Folianten nordwärts in das Moorfenn-Marschland zu tragen. Folgt mir dorthin, und wir bringen dies zu Ende.',
+  'entities.quests.q_rite_of_redemption.title': 'Der Ritus der Rückrufung',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': 'Ertrunkene Tote zur Ruhe gebettet',
+  'entities.quests.q_rite_of_redemption.text':
+    'Ihr seid mir also in den Morast gefolgt, {playerName}. Gut. Ich habe den Morgengebundenen Folianten hier, und dieser ertrunkene Boden ist der Ort, an den seine Worte gehören: Nirgends ist der Schleier zwischen Leben und Tod dünner als dort, wo die Toten nicht begraben bleiben wollen. Doch die Ertrunkenen würden Eure Stimme mitten im Vers hinabziehen. Schafft einen Raum, der des Ritus würdig ist: Bettet 8 der Ertrunkenen Toten zur Ruhe, und wir weihen ihn gemeinsam.',
+  'entities.quests.q_rite_of_redemption.completion':
+    'Kniet nieder, {playerName}, und lest die Worte laut. Da. Spürt Ihr es? Das Licht heilt in Euren Händen nicht länger nur die Lebenden, es kann jene zurückrufen, die hinübergegangen sind. Nutzt es weise. Eine Seele, die in einen aussichtslosen Kampf zurückgerufen wird, ist eine Grausamkeit, keine Gnade. Erhebt Euch, Erlöser.',
+  'guide.abilityHook.hammer_of_justice':
+    'Hält einen Gegner mit einer kurzen, verlässlichen Betäubung auf.',
+  'guide.abilityHook.oath_chain':
+    'Zerrt einen entfernten Gegner in Euer Rudel und bremst seine Flucht.',
+  'guide.abilityHook.ancestor_return':
+    'Erweckt nach einem langen Zauber außerhalb des Kampfes jedes gefallene Gruppen- oder Schlachtzugsmitglied wieder zum Leben.',
+  'guide.abilityHook.avenging_wrath':
+    'Gewährt 10 Hingabe und verdoppelt dann fünfzehn Sekunden lang die von Fähigkeiten erzeugte Hingabe.',
+  'guide.abilityHook.bastion_sweep':
+    'Fegt mit Eurem Schild durch eine Gruppe, um Bedrohung an Euch zu reißen und Hingabe aufzubauen.',
+  'guide.abilityHook.chain_lightning':
+    'Trifft ein Ziel und springt auf zwei nahe Gegner über und baut für den gesamten Zauber einen Donner auf.',
+  'guide.abilityHook.consecration':
+    'Beansprucht den Boden um Euch mit anhaltendem Heiligschaden und anhaltender Bedrohung.',
+  'guide.abilityHook.hammer_of_wrath':
+    'Richtet einen verwundeten Gegner aus der Distanz hin, oder jeden Gegner, solange Eure Schwingen aktiv sind.',
+  'guide.abilityHook.holy_shield':
+    'Gibt Hingabe für ein aktives Blockfenster, Absorption und einen Bedrohungsimpuls aus.',
+  'guide.abilityHook.lay_on_hands':
+    'Stellt eine große Menge Gesundheit wieder her, wenn ein Verbündeter kurz vor dem Fall steht.',
+  'guide.abilityHook.measured_shot':
+    'Ein bedachter Distanzschuss, der Fokus für Eure schwereren Angriffe wiederherstellt.',
+  'guide.abilityHook.pack_command':
+    'Befiehlt Eurem Gefährten zuzuschlagen und Rudelwildheit aufzubauen. Jeder Stapel lässt Euren Begleiter 10% mehr Schaden verursachen, bis zu 30%, bevor Bestie entfesseln die Stapel ausgibt.',
+  'guide.abilityHook.stampede':
+    'Ruft drei Bestien, die 12 Sekunden lang angreifen. Setzt sie bei voller Rudelwildheit ein, damit sie den maximalen Schadensbonus für die gesamte Beschwörung behalten.',
+  'guide.abilityHook.stormsurge':
+    'Bringt den Ahnenschlag manchmal früher zurück, nachdem Ihr eine Sturmzeichen-Gelegenheit ausgegeben habt.',
+  'guide.abilityHook.thunder_reservoir':
+    'Speichert Blitze, bis der Erdstoß oder das Erdbeben eine Auszahlung mit voller Kraft freisetzen kann.',
+  'guide.abilityHook.veilbound_march':
+    'Durchquert eine Gruppe, um sie zu markieren, ihren Schaden gegen Euch abzustumpfen und Bedrohung zu sichern.',
+  'guide.abilityHook.warspirit_cadence':
+    'Verwandelt einen stetigen Waffenrhythmus in Sturmherzechos und eine Gelegenheit für einen Sofortzauber.',
   'hudChrome.crafting.craftedToastQty': 'Hergestellt: {name} x{qty}',
   'hudChrome.enchanting.disenchantedYield': 'Du entzauberst {item} zu {material}.',
   'hudChrome.enchanting.disenchantedYieldQty': 'Du entzauberst {item} zu {material} x{qty}.',
@@ -10347,6 +10589,34 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Zeichen des Herstellers',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Meisterwerkbonus',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Auftragsbindung',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Markbrecher',
+  'entities.abilities.marrowbreak.description':
+    'Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit für 8 Sek. und erstattet 15 Wut zurück.',
+  'entities.abilities.moonlash.name': 'Mondwoge',
+  'entities.abilities.moonlash.description':
+    'Verbraucht 3 Mondflut für einen schweren Schlag mit {damage} Arkanschaden: die Schadenswahl. Sonnenspur verbraucht dieselben 3 Mondflut, also wählt eine.',
+  'entities.abilities.moonseed.name': 'Mondsaat',
+  'entities.abilities.moonseed.description':
+    'Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu 6 Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge.',
+  'entities.abilities.overbloom.name': 'Überblüte',
+  'entities.abilities.overbloom.description':
+    'Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für 60% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel.',
+  'entities.abilities.redharvest.name': 'Rote Ernte',
+  'entities.abilities.redharvest.description':
+    'Verbraucht 3 Altes Blut: ein Schlag für {damage}, der sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, beide Blutungen entfernt und 30 Energie wiederherstellt. Funktioniert auch ohne Combopunkte.',
+  'entities.abilities.sunlance.name': 'Sonnenspur',
+  'entities.abilities.sunlance.description':
+    'Verbraucht 3 Mondflut für einen Schlag mit {damage} Naturschaden plus einem Brand von {overTime} über 9 Sek. und stellt 35 Mana wieder her: die Manawahl. Mondwoge verbraucht dieselben 3 Mondflut, also wählt eine.',
+  'guide.abilityHook.moonseed':
+    'Fügt eine Mondflut-Stufe hinzu und verlängert Mondsturm, solange Ihr in Mondkingestalt seid.',
+  'hudChrome.auraEffect.moontide':
+    'Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr',
+  'hudChrome.auraEffect.oldBlood':
+    'Altes Blut: Stufe {stacks} von {max}. Gelandete Wolfs- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer',
+  'hudChrome.auraEffect.verdance':
+    'Grünkraft: Stufe {stacks} von {max}. Abgeschlossene Wildblüte- und Zweite-Blüte-Zauber füllen sie; bei {max} wird Rasche Heilung zu Überblüte',
   'abilityUi.cast.rift_arcane_execution': 'Leerenriss',
   'abilityUi.cast.rift_arcane_strike': 'Arkane Auslöschung',
   'abilityUi.cast.rift_brute_execution': 'Erdspalter',
@@ -11799,4 +12069,326 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': 'Wasserwellen (Kielwasser)',
   'hudChrome.breath.label': 'Atem',
   'hudChrome.breath.drowning': 'Ertrinken!',
+
+  // Release fill (docs/i18n-scaling/worklist/de_DE.json): v0.31 class-overhaul
+  // rogue/warlock/druid/necromancy content (211 rows: 84 autoFillable + 127
+  // humanRequired), inserted sorted by key.
+  'abilityUi.tooltip.requiresStealth': 'Benötigt Verstohlenheit',
+  'abilityUi.tooltip.requiresStealthSkulduggery':
+    'Benötigt Verstohlenheit (nicht nötig bei 3 Dämmer oder während des Schattenschleiers)',
+  'abilityUi.tooltip.ruinCost': '{cost} Verderben',
+  'entities.abilities.abyssal_rift.description':
+    'Reißt am gewählten Ort einen Riss auf, der Gegner im Umkreis von 8 m zu seinem Zentrum zieht, {damage} Schattenschaden verursacht und sie 2 Sek. lang betäubt. Bosse erleiden den Schaden, widerstehen aber dem Sog und der Betäubung.',
+  'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
+  'entities.abilities.ambush.description':
+    'Schlagt aus dem Schatten zu für 250% Waffenschaden plus {damage}. Erfordert Verstohlenheit und Position hinter dem Ziel. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
+  'entities.abilities.ambush.specNote_subtlety':
+    'Aus Duskveil eingesetzt fügt dies 1 Dämmer hinzu (max. 3). Bei 3 Dämmer könnt Ihr es OHNE Verstohlenheit und aus jedem Winkel einsetzen: Dieser Einsatz kostet nichts, verbraucht alle 3 Dämmer, startet den 6 Sek. langen Schattenschleier und trifft doppelt.',
+  'entities.abilities.army_of_the_dead.description':
+    'Reißt ein Grabportal auf, das für 20 Sek. einen zeitweiligen Skeletal Warrior, Bone Mage und Gravewing erweckt und damit die Lücken füllt, die Eure ständigen Domänendiener offen lassen.',
+  'entities.abilities.army_of_the_dead.name': 'Army of the Dead',
+  'entities.abilities.backstab.description':
+    'Rammt Euren Dolch in den Rücken des Ziels für 150% Waffenschaden plus {damage}. Erfordert Position hinter dem Ziel. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
+  'entities.abilities.backstab.specNote_assassination':
+    'Jeder Treffer fügt 1 Giftritual hinzu (max. 6) und erstattet 15 Energie zurück. Bei 6 Giftritual wird Grabesschlaf zu Giftriss (er verursacht sofort Euren gesamten verbleibenden Blutungsschaden).',
+  'entities.abilities.blade_flurry.description':
+    'Entfesselt einen Klingenwirbel, der das Angriffstempo 12 Sek. lang um 20% erhöht. (Thuggery-Engine)',
+  'entities.abilities.bone_armor.description':
+    'Umhüllt Euch mit Knochen und absorbiert Schaden in Höhe von 20% Eurer maximalen Gesundheit.',
+  'entities.abilities.bone_armor.name': 'Bone Armor',
+  'entities.abilities.cheap_shot.description':
+    'Trefft das Ziel für {damage} Schaden und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte.',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    'Aus Duskveil eingesetzt fügt dies 1 Dämmer hinzu (max. 3). Bei 3 Dämmer könnt Ihr es OHNE Verstohlenheit einsetzen: Dieser Einsatz kostet nichts, verbraucht alle 3 Dämmer und startet den 6 Sek. langen Schattenschleier.',
+  'entities.abilities.cinderhide.description':
+    'Härtet Eure Haut 10 Sek. lang zu erkaltender Schlacke und verringert allen erlittenen Schaden um 25%.',
+  'entities.abilities.cinderhide.name': 'Cinderhide',
+  'entities.abilities.claw.description':
+    'Krallt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
+  'entities.abilities.claw.specNote_feral': 'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3).',
+  'entities.abilities.cold_blood.description':
+    'Bündelt Euren Tötungswillen, sodass Euer nächster Angriff kritisch trifft. (Knifework-Engine)',
+  'entities.abilities.corpse_explosion.description':
+    'Opfert zuerst einen Bone Mage, dann einen Skeletal Warrior, und einen Gravewing nur als letzten Ausweg. Bei Duplikaten wählt es jenen mit der geringsten verbleibenden Dauer, dann den schwächsten, um {damage} Schattenschaden am gewählten Ort zu verursachen.',
+  'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
+  'entities.abilities.coven.description':
+    'Erschafft für 15 Sek. sekundäre Evil Eyes auf bis zu 4 nahen Gegnern. Sie speisen den gemeinsamen Verdammnis-Vorrat mit 50%, und Sentence hallt zu ihnen für 35% Schaden wider.',
+  'entities.abilities.coven.name': 'Coven',
+  'entities.abilities.cruel_pact.description':
+    'Opfert 12% Eurer maximalen Gesundheit, um 1,5% Eures maximalen Manas wiederherzustellen und 20 Verdammnis zu erzeugen. Nicht nutzbar bei 20% Gesundheit oder darunter.',
+  'entities.abilities.cruel_pact.name': 'Cruel Pact',
+  'entities.abilities.cursed_accomplice.description':
+    'Verbindet Euer Maledict Eye, wenn kein Verbündeter ausgewählt ist, sodass dessen Gaze 2 Verdammnis erzeugt. Die Verbindung mit einem ausgewählten Gruppenmitglied lässt stattdessen nur dessen Schaden an Eurem Evil Eye 3 erzeugen. Eine neue Verbindung ersetzt die vorherige und kann höchstens alle 2 Sek. auslösen.',
+  'entities.abilities.cursed_accomplice.name': 'Cursed Accomplice',
+  'entities.abilities.dark_pact.description':
+    'Opfert 10% Eurer aktuellen Gesundheit, um für 8 Sek. Schaden in Höhe von 30% Eurer maximalen Gesundheit zu absorbieren.',
+  'entities.abilities.dark_pact.name': 'Sanguine Covenant',
+  'entities.abilities.elemental_trance.description':
+    'Versetzt Euch 15 Sek. lang in eine elementare Trance, verringert erlittenen Schaden um 30% und wandelt 20% des von Euch verursachten Schadens in Mana um. (Kriegsgeist-Signatur)',
+  'entities.abilities.elemental_trance.name': 'Elemental Trance',
+  'entities.abilities.evil_eye.description':
+    'Markiert einen Gegner als Fokus Eurer Flüche. Das Verschieben des Eye bewahrt die Verdammnis, erneuert aber nicht dessen 20-Sek.-Ablauf.',
+  'entities.abilities.evil_eye.name': 'Evil Eye',
+  'entities.abilities.eviscerate.description': 'Finishing-Move, der {damage} verursacht.',
+  'entities.abilities.eviscerate.specNote_assassination':
+    'Bei 6 Giftritual wird diese Taste zu Giftriss: ein Schlag, der sofort allen Schaden verursacht, den Eure Blutungen noch verursacht hätten, eine frische Giftwunde setzt und 20 Energie wiederherstellt.',
+  'entities.abilities.eviscerate.specNote_combat':
+    'Landet dies mit 4 oder mehr Combopunkten, startet die Redline für 8 Sek.: Boshafter Hieb wird zu Körpertreffer, und diese Taste wird zu K.o.-Schlag (45 plus 35 pro Combopunkt, pro aufgebauter Redline-Stufe 25% härter, stellt 25 Energie wieder her). Setzt ihn ein, bevor die Redline endet.',
+  'entities.abilities.expose_armor.description':
+    'Finishing-Move, der das Ziel 30 Sek. lang entblößt: jeder eingesetzte Combopunkt verringert seine Rüstung um 2% (5 Combopunkte: {damage}%).',
+  'entities.abilities.faerie_fire.description':
+    'Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%.',
+  'entities.abilities.ferocious_bite.description': 'Finishing-Move, der {damage} verursacht. Nur in Wolfsgestalt.',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Rote Ernte: ein Biss für 70 plus 43 pro Combopunkt, der außerdem sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, und 30 Energie wiederherstellt.',
+  'entities.abilities.funeral_harvest.description':
+    'Stirbt ein Gegner, der kürzlich von Euch oder Euren Untoten Schaden erlitten hat, erhaltet Ihr 1 Seelenfragment. Dies kann höchstens alle 3 Sek. eintreten.',
+  'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
+  'entities.abilities.garrote.description':
+    'Schlingt einen Draht um den Hals des Gegners, verursacht sofort {damage} Schaden und lässt ihn über 18 Sek. um {overTime} ausbluten. Erfordert Verstohlenheit. Gewährt 1 Combopunkt.',
+  'entities.abilities.garrote.specNote_subtlety':
+    'Aus Duskveil eingesetzt fügt dies 1 Dämmer hinzu (max. 3). Bei 3 Dämmer könnt Ihr es OHNE Verstohlenheit einsetzen: Dieser Einsatz kostet nichts, verbraucht alle 3 Dämmer und startet den 6 Sek. langen Schattenschleier.',
+  'entities.abilities.ghostly_strike.description':
+    'Trifft den Gegner für Waffenschaden plus {damage} und erhöht Eure Ausweichchance 7 Sek. lang um 15%. Gewährt 1 Combopunkt. (Schurkentalent)',
+  'entities.abilities.hemorrhage.description':
+    'Trifft den Gegner für Waffenschaden plus {damage}, verursacht Blutungsschaden über 12 Sek. und erhöht erlittenen Blutungsschaden um 40%. Gewährt 1 Combopunkt. Jeder 2. Einsatz fügt 1 Dämmer hinzu (max. 3). (Skulduggery-Engine)',
+  'entities.abilities.hex_of_violence.description':
+    'Belegt den Gegner 8 Sek. lang mit einem Hex. Dessen nächste 3 Schadenshandlungen erzeugen je 7 Verdammnis und peitschen ihn für 16 Schattenschaden.',
+  'entities.abilities.hex_of_violence.name': 'Hex of Violence',
+  'entities.abilities.hour_of_judgment.description':
+    'Ruft 15 Sek. lang Urteil über Euer primäres Evil Eye herab, gewährt 40 Verdammnis und 3 Schicksalsfäden, aktiviert Possession, verdoppelt die durch das primäre Eye erzeugte Verdammnis und erhöht den Schaden von Sentence um 20%. Das erste Sentence erstattet 50 Verdammnis.',
+  'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
+  'entities.abilities.kidney_shot.description':
+    'Finishing-Move, der das Ziel 1 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 6 Sek.).',
+  'entities.abilities.litany_of_guilt.description':
+    'Verflucht Euer primäres Evil Eye 6 Sek. lang. Verdammnisgewinne lösen eine Welle aus, die bis zu 2 weitere Gegner im Umkreis von 8 m schädigt, höchstens einmal pro Sekunde. Rang 2 verlängert dies auf 8 Sek. und 4 Gegner.',
+  'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
+  'entities.abilities.maledict_gaze.description':
+    'Euer Maledict Eye attackiert Euer gewähltes primäres Evil Eye alle 2,5 Sek. mit Schattenschaden. Possess the Evil Eye verdoppelt sein Angriffstempo.',
+  'entities.abilities.maledict_gaze.name': 'Maledict Gaze',
+  'entities.abilities.maul.description':
+    'Ein malmender Angriff, der den Nahkampfschaden um {damage} erhöht und hohe Bedrohung verursacht. Aktiviert sich bei Eurem nächsten Schwung. Nur in Bruin-Gestalt.',
+  'entities.abilities.maul.specNote_feral':
+    'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein Schlag für 78 bis 96 Schaden bei hoher Bedrohung; unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück.',
+  'entities.abilities.moonfire.description':
+    'Versengt den Gegner mit Mondfeuer für {damage} Arkanschaden plus Schaden über Zeit.',
+  'entities.abilities.moonfire.specNote_balance': 'Haltet es brennend: Mondsaat verlängert es um 6 Sek.',
+  'entities.abilities.needle_of_fate.description':
+    'Durchbohrt den Gegner für {damage} Schattenschaden und erzeugt 5 Verdammnis, wenn er Euer Evil Eye trägt. Jeder Treffer auf Euer primäres Evil Eye fügt für 12 Sek. einen Schicksalsfaden hinzu, bis zu 3. Existiert kein Evil Eye, markiert die Needle zuerst ihr Ziel.',
+  'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+  'entities.abilities.ossuary_mark.description':
+    'Markiert einen Gegner 12 Sek. lang und speichert 20% des von Euch und Euren Untoten verursachten Schadens. Erneutes Wirken lässt es detonieren. Stirbt der markierte Gegner, explodiert es im Umkreis von 6 m und erschafft 1 Seelenfragment.',
+  'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
+  'entities.abilities.possess_evil_eye.description':
+    'Der Maledictor besetzt Euer primäres Evil Eye 15 Sek. lang und erzeugt 35 Verdammnis. Needle of Fate wirkt in 1 Sek. und erzeugt 2 zusätzliche Verdammnis, Verzehren kann während der Bewegung kanalisiert werden, und Sentence verursacht 25% mehr Schaden und löst ein verzögertes Echo für 60% Schaden aus, das über die Stufen 17-20 auf 30% abnimmt.',
+  'entities.abilities.possess_evil_eye.name': 'Possess the Evil Eye',
+  'entities.abilities.raise_bone_mage.description':
+    'Verbraucht 2 Seelenfragmente, um Eurer Domäne mit 2 Plätzen einen dauerhaften Fernkampf-Bone Mage hinzuzufügen. Nur einer kann Euch dienen. Seine Angriffe legen das Ziel 6 Sek. lang für 5% mehr Magieschaden offen, und Reaping Command erhöht diese Schwäche auf 8%.',
+  'entities.abilities.raise_bone_mage.name': 'Raise Bone Mage',
+  'entities.abilities.raise_graveguard.description':
+    'Erweckt einen dauerhaften defensiven Begleiter. Graveguard verspottet automatisch, fängt durch die Grabdomäne 20% Eures Schadens ab, und Reaping Command lässt es verspotten und 4 Sek. lang 30% weniger Schaden erleiden.',
+  'entities.abilities.raise_graveguard.name': 'Raise Graveguard',
+  'entities.abilities.raise_gravewing.description':
+    'Verbraucht 2 Seelenfragmente, um Eurer Domäne mit 2 Plätzen einen dauerhaften Gravewing hinzuzufügen. Nur einer kann Euch dienen. Es spaltet alle 5 Sek. nahe Gegner für 65% Schaden, und Reaping Command lässt jeden getroffenen Gegner 5 Sek. lang 8% mehr Schaden erleiden.',
+  'entities.abilities.raise_gravewing.name': 'Raise Gravewing',
+  'entities.abilities.raise_skeletal_warrior.description':
+    'Verbraucht 1 Seelenfragment, um Eurer Domäne mit 2 Plätzen einen dauerhaften Skeletal Warrior hinzuzufügen. Nur einer kann Euch dienen. Er spaltet alle 6 Sek. nahe Gegner für 45% Schaden, und Reaping Command fesselt sein Ziel 4 Sek. lang mit 40% Verlangsamung.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
+  'entities.abilities.rake.description':
+    'Schindet den Gegner für Waffenschaden plus {damage} und verursacht Blutungsschaden über 18 Sek. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
+  'entities.abilities.rake.specNote_feral': 'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3).',
+  'entities.abilities.reaping_command.description':
+    'Verbraucht 2 Seelenfragmente, um jedem untoten Diener zu befehlen, gemeinsam zuzuschlagen. Graveguards verspotten und wappnen sich, Warriors fesseln, Bone Mages legen magische Abwehr offen, und Gravewing zerreißt alle getroffenen Gegner.',
+  'entities.abilities.reaping_command.name': 'Reaping Command',
+  'entities.abilities.regrowth.description':
+    'Heilt ein freundliches Ziel um {damage} und einen zusätzlichen Betrag über 21 Sek.',
+  'entities.abilities.regrowth.specNote_restoration':
+    'Das Pflanzen einer NEUEN Blüte fügt 1 Grünkraft hinzu (max. 5).',
+  'entities.abilities.rejuvenation.description': 'Heilt das Ziel über 12 Sek. um {damage}.',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    'Das Pflanzen einer NEUEN Blüte fügt 1 Grünkraft hinzu (max. 5). Bei 5 Grünkraft wird Rasche Heilung zu Überblüte.',
+  'entities.abilities.rip.description':
+    'Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt: 36 Schaden plus 24 pro eingesetztem Combopunkt (5 Combopunkte: {damage} insgesamt). Nur in Wolfsgestalt.',
+  'entities.abilities.rip.specNote_feral': 'Der gelandete Treffer fügt 1 Altes Blut hinzu (max. 3).',
+  'entities.abilities.ruinous_brand.description':
+    'Brandmarkt einen Gegner 15 Sek. lang. Eure nächsten 3 direkten Zauber hallen gegen den gebrandmarkten Gegner für 25% Schaden wider, oder kopieren 50% Schaden auf ihn, wenn sie gegen ein anderes Ziel gewirkt werden.',
+  'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
+  'entities.abilities.rupture.description':
+    'Finishing-Move, der das Ziel verwundet: es blutet alle 2 Sek., für 6 Sek. plus 2 Sek. pro Combopunkt (5 Combopunkte: 16 Sek. und {damage} Gesamtschaden).',
+  'entities.abilities.sacrifice_undead.description':
+    'Zerstört einen Domänendiener, um 25% Eurer maximalen Gesundheit wiederherzustellen.',
+  'entities.abilities.sacrifice_undead.name': 'Sacrifice Undead',
+  'entities.abilities.sacrilegious_march.description':
+    'Erhöht das Bewegungstempo um 35%, opfert aber jede Sekunde 2% Eurer maximalen Gesundheit. Erneut wirken, um abzubrechen. Schaltet sich bei 20% Gesundheit automatisch ab.',
+  'entities.abilities.sacrilegious_march.name': 'Sacrilegious March',
+  'entities.abilities.sentence.description':
+    'Verbraucht alle Verdammnis und Schicksalsfäden, um über den Gegner das Urteil zu fällen. Jeder Faden erhöht den Schaden um 6%. Zusätzliche Effekte eskalieren bei 20, 50, 80 und 100 Verdammnis. Seine Schadensskalierung flacht nach Stufe 16 ab.',
+  'entities.abilities.sentence.name': 'Sentence',
+  'entities.abilities.sinister_strike.description': 'Ein sofortiger Schlag für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.',
+  'entities.abilities.sinister_strike.specNote_assassination': 'Fügt 1 Giftritual hinzu (max. 6).',
+  'entities.abilities.sinister_strike.specNote_combat':
+    'Solange die Redline aktiv ist, wird diese Taste zu Körpertreffer: 130% Waffenschaden plus 10, gewährt 2 Combopunkte und fügt 1 Redline hinzu (max. 4).',
+  'entities.abilities.slice_and_dice.description':
+    'Finishing-Move, der das Nahkampf-Angriffstempo 12 Sek. plus 4 Sek. pro Combopunkt lang um 30% erhöht (5 Combopunkte: 32 Sek.).',
+  'entities.abilities.soul_harvest.description':
+    'Reißt an der Seele des Gegners für {damage} Schattenschaden und erschafft 1 Seelenfragment, bis zu 5.',
+  'entities.abilities.soul_harvest.name': 'Essence Reap',
+  'entities.abilities.soul_lance.description':
+    'Schleudert eine gespenstische Lanze für {damage} Schattenschaden. Gegen Euer Ossuary Mark werden 50% ihres Schadens dem Mal hinzugefügt.',
+  'entities.abilities.soul_lance.name': 'Soul Lance',
+  'entities.abilities.soulwell.description':
+    'Beschwört 3 Min. lang einen Soulwell. Außerhalb des Kampfes können Gruppenmitglieder ihre Seelensteine auf bis zu 3 auffüllen. Ein Seelenstein stellt 25% der maximalen Gesundheit wieder her und teilt sich die Abklingzeit mit Tränken.',
+  'entities.abilities.soulwell.name': 'Soulwell',
+  'entities.abilities.starfire.description':
+    'Ruft einen Blitz aus Sternenfeuer herab, der {damage} Arkanschaden verursacht.',
+  'entities.abilities.starfire.specNote_balance':
+    'In Mondkingestalt fügt jeder abgeschlossene Zauber 1 Mondflut hinzu (max. 3). Bei 3 Mondflut wird diese Taste zu Sonnenspur: ein sofortiger Schlag für 80 bis 100 Naturschaden plus 45 Brand über 9 Sek., der 35 Mana wiederherstellt und alle 3 verbraucht.',
+  'entities.abilities.stealth.description':
+    'Verbirgt Euch im Schatten: Gegner bemerken Euch kaum, doch Ihr bewegt Euch 50% langsamer. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um herauszutreten.',
+  'entities.abilities.stealth.specNote_subtlety':
+    'Jede Eröffnung, die Ihr aus Duskveil einsetzt, fügt 1 Dämmer hinzu (max. 3).',
+  'entities.abilities.swiftmend.description':
+    'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Das Pflanzen von Wildblüte und Zweite Blüte fügt Grünkraft hinzu; bei 5 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Hainherz-Signatur)',
+  'entities.abilities.swipe.description':
+    'Fegt mit Euren Klauen durch nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin-Gestalt.',
+  'entities.abilities.swipe.specNote_feral': 'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3).',
+  'entities.abilities.umbral_anchor.description':
+    'Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück, verbraucht den Anker und startet eine 45-sekündige Abklingzeit.',
+  'entities.abilities.umbral_anchor.name': 'Umbral Anchor',
+  'entities.abilities.unholy_command.description':
+    'Verbraucht 3 Seelenfragmente, um all Euren Untoten 12 Sek. lang zu befehlen, 25% mehr Schaden zu verursachen und 20% schneller zu handeln.',
+  'entities.abilities.unholy_command.name': 'Unholy Command',
+  'entities.abilities.venom_dart.specNote_assassination':
+    'Fügt 1 Giftritual hinzu und verlängert Eure Giftwunde um 6 Sek. (die Wunde übersteigt nie 20 Sek.).',
+  'entities.abilities.vicarious_suffering.description':
+    'Verbindet Euer Leiden 8 Sek. lang und erzeugt bis zu 15 Verdammnis durch feindliche Treffer. Auf Euch selbst verringert es erlittenen Schaden um 20%. Auf einen Verbündeten leitet es bis zu 20% auf Euch um, ohne Euch unter 15% Gesundheit zu bringen.',
+  'entities.abilities.vicarious_suffering.name': 'Vicarious Suffering',
+  'entities.abilities.wrath.description': 'Schleudert einen Blitz aus Naturenergie für {damage} Naturschaden.',
+  'entities.abilities.wrath.specNote_balance':
+    'In Mondkingestalt fügt jeder abgeschlossene Zauber 1 Mondflut hinzu (max. 3). Bei 3 Mondflut wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur.',
+  'entities.items.boneglass_shiv.name': 'Knochenglas-Messer',
+  'entities.items.duskwhisper.name': 'Dämmerflüstern',
+  'entities.items.marrowpoint.name': 'Markspitze',
+  'entities.items.rimefang.name': 'Reiffang',
+  'entities.items.soul_stone.name': 'Seelenstein',
+  'entities.mobs.graveguard.name': 'Graveguard',
+  'entities.mobs.necromancy_bone_mage.name': 'Bone Mage',
+  'entities.mobs.necromancy_gravewing.name': 'Gravewing',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Skeletal Warrior',
+  'guide.abilityHook.evil_eye': 'Bestimmt den Gegner, dessen Taten und Leiden deine Verdammnis nähren.',
+  'hud.pet.abyssalChain': 'Abyssal Chain',
+  'hud.pet.abyssalChainDesc':
+    'Befiehlt Duskmurk, einen normalen Gegner aus mehr als 8 bis zu 20 m Entfernung zu sich zurückzuziehen. Bosse können nicht herangezogen werden. 15 Sek. Abklingzeit. Rechtsklick, gedrückt halten oder Umschalt+Eingabetaste drücken, um die Automatik umzuschalten.',
+  'hud.pet.abyssalChainTitle': 'Abyssal Chain',
+  'hud.pet.autocastOff':
+    'Automatik inaktiv. Rechtsklick, gedrückt halten oder Umschalt+Eingabetaste drücken, um sie zu aktivieren.',
+  'hud.pet.autocastOn':
+    'Automatik aktiv. Rechtsklick, gedrückt halten oder Umschalt+Eingabetaste drücken, um sie zu deaktivieren.',
+  'hud.pet.felbolt': 'Verderbnisblitz',
+  'hud.pet.felboltDesc':
+    'Befiehlt Emberkin, ein zusätzliches Verderbnisgeschoss auf Euer Ziel abzufeuern. 8 Sek. Abklingzeit. Rechtsklick, gedrückt halten oder Umschalt+Eingabetaste drücken, um die Automatik umzuschalten.',
+  'hud.pet.felboltTitle': 'Verderbnisblitz',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    'Qualifizierender Schaden gewährt {value} Verdammnis, höchstens einmal alle {interval} Sek.',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'Verzehren verbraucht {stacks} Schicksalsfäden für {doom} zusätzliche Verdammnis pro Tick',
+  'hudChrome.auraEffect.afflictionEye':
+    'Maledict Gaze greift alle {interval} Sek. an; Effekte an diesem Eye erzeugen {pct}% Verdammnis',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'Effekte an diesem Eye erzeugen {doomPct}% Verdammnis; Sentence hallt hier für {echoPct}% Schaden wider',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} Schicksalsfäden: Sentence verursacht {sentencePct}% mehr Schaden, oder Verzehren gewinnt {doom} zusätzliche Verdammnis pro Tick',
+  'hudChrome.auraEffect.afflictionJudgment':
+    'Primäres Eye erzeugt {eyePct}% mehr Verdammnis; Sentence verursacht {sentencePct}% mehr Schaden, und das erste erstattet {refund} Verdammnis',
+  'hudChrome.auraEffect.afflictionLitany':
+    'Verdammnisgewinne verursachen {damage} Schattenschaden an bis zu {targets} Gegnern im Umkreis von {radius} m, einmal pro Sek.',
+  'hudChrome.auraEffect.afflictionPossession': 'Verstärkt Needle of Fate, Verzehren, Maledict Gaze und Sentence',
+  'hudChrome.auraEffect.afflictionVicarious':
+    'Leitet {pct}% des erlittenen Schadens um oder verringert ihn und kann bis zu {max} Verdammnis erzeugen',
+  'hudChrome.auraEffect.afflictionViolence':
+    '{charges} Vergeltungen verbleiben; ein feindlicher Angriff gewährt {doom} Verdammnis und verursacht {damage} Schattenschaden zurück',
+  'hudChrome.auraEffect.aoeEcho':
+    '{charges} Echos verbleiben: Fähigkeiten mit einem Ziel verursachen {pct}% Schaden an bis zu {targets} nahen Gegnern',
+  'hudChrome.auraEffect.arcaneCharge':
+    '{stacks} Arkane Ladungen: Ätherschwall verursacht {damagePct}% mehr Schaden, wirkt {castPct}% schneller und kostet {costMult}x Mana',
+  'hudChrome.auraEffect.bleedVuln': 'Erhöht erlittenen Blutungsschaden um {pct}%',
+  'hudChrome.auraEffect.brainFreeze': 'Eure nächste Winterpeitsche ist sofort wirkbar und ignoriert ihre Abklingzeit',
+  'hudChrome.auraEffect.castShield': 'Der Zauber kann nicht durch Schaden unterbrochen oder verzögert werden',
+  'hudChrome.auraEffect.cauterizeFatigue': 'Kauterisieren kann keinen weiteren tödlichen Treffer verhindern',
+  'hudChrome.auraEffect.cooldownCap':
+    '{used} von {cap} Sek. Abklingzeit-Verkürzung in diesem Fenster verbraucht',
+  'hudChrome.auraEffect.desolation':
+    '{charges} Aufladungen: Euer nächster Verderbensblitz wirkt {castPct}% schneller, oder Euer nächster Feuerregen trifft sofort',
+  'hudChrome.auraEffect.duskfireClaim': 'Tod gewährt {value} Verderben',
+  'hudChrome.auraEffect.elementalTrance':
+    'Erlittener Schaden verringert um {pct}%. {mana}% des von Euch verursachten Schadens wird in Mana umgewandelt',
+  'hudChrome.auraEffect.energyRegen': 'Erhöht Energieregeneration um {pct}%',
+  'hudChrome.auraEffect.enrage':
+    'Verursachter Schaden erhöht um {damagePct}%, Angriffstempo um {hastePct}%, und Bewegungstempo um {movePct}%',
+  'hudChrome.auraEffect.fingersOfFrost':
+    '{charges} Aufladungen: Eislanze behandelt ihr Ziel als eingefroren und verursacht {pct}% Frostschaden',
+  'hudChrome.auraEffect.forbiddenReflectionLock': 'Forbidden Reflection kann noch nicht erneut vorbereitet werden',
+  'hudChrome.auraEffect.forbiddenReflectionReady':
+    'Eure nächste berechtigte Hexenmeister-Fähigkeit mit Abklingzeit kann erneut gewirkt werden',
+  'hudChrome.auraEffect.formLich': 'Soul Lance trifft zusätzlich bis zu {targets} nahe Gegner für {pct}% Schaden',
+  'hudChrome.auraEffect.formMetamorph':
+    'Dämonenform: Körpergröße um {pct}% erhöht; weitere Boni laufen über separate Effekte',
+  'hudChrome.auraEffect.formMoonkin': 'Mondkingestalt: Zauberschaden um {pct}% und Rüstung um {armorPct}% erhöht',
+  'hudChrome.auraEffect.formShadow': 'Schattenform: Schattenschaden um {pct}% erhöht',
+  'hudChrome.auraEffect.freeExecute': 'Eure nächste berechtigte Hinrichtungsfähigkeit kostet nichts',
+  'hudChrome.auraEffect.funeralHarvestLock': 'Funeral Harvest kann noch kein weiteres Seelenfragment erschaffen',
+  'hudChrome.auraEffect.galeheartWeapon':
+    'Der Abschluss der {steps}-Treffer-Kriegsgeistkadenz lässt den Schlag {count}-mal für {pct}% seines Schadens als Naturschaden widerhallen',
+  'hudChrome.auraEffect.healEcho': 'Das Unterschreiten von {threshold}% Gesundheit stellt {value} Gesundheit wieder her',
+  'hudChrome.auraEffect.icicles': '{value} von {max} Eiszapfen; bei {max} kann Gletscherstachel gewirkt werden',
+  'hudChrome.auraEffect.internalCooldown': 'Dieser Effekt kann erst erneut auslösen, wenn der Timer abgelaufen ist',
+  'hudChrome.auraEffect.leadenHexLock': 'Bleierner Fluch kann dieses Ziel noch nicht erneut verwurzeln',
+  'hudChrome.auraEffect.necromancyDeathEcho': 'Veraltetes Todesecho; keine aktuelle Fähigkeit verbraucht es',
+  'hudChrome.auraEffect.necromancyHarvestMark': 'Tod kann 1 Seelenfragment erschaffen',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    'Speichert {storedPct}% Eures und des Schadens Eurer Untoten, plus {lancePct}% des Soul-Lance-Schadens; erneut wirken, um es zu detonieren. Tod lässt es im Umkreis von {radius} m explodieren und erschafft 1 Seelenfragment',
+  'hudChrome.auraEffect.nextAttackCrit': 'Euer nächster Angriff trifft garantiert kritisch',
+  'hudChrome.auraEffect.overpowerCharge':
+    '{stacks} Aufladungen: Euer nächster Verstümmelnder Hieb verursacht {pct}% mehr Schaden',
+  'hudChrome.auraEffect.perfectMoment': 'Aether-Pfeile verbraucht keine Arkanen Ladungen',
+  'hudChrome.auraEffect.petDamage': 'Erhöht Begleiterschaden um {pct}%',
+  'hudChrome.auraEffect.petHaste': 'Erhöht Aktionstempo des Begleiters um {pct}%',
+  'hudChrome.auraEffect.physicalReduction': 'Verringert erlittenen physischen Schaden um {pct}%',
+  'hudChrome.auraEffect.pyreGuardian':
+    'Erzeugt alle {ruinInterval} Sek. {ruin} Verderben und verursacht alle {damageInterval} Sek. {damage} Feuerschaden im Umkreis von {radius} m',
+  'hudChrome.auraEffect.resourceCount': '{value} von {max}',
+  'hudChrome.auraEffect.resourceSap': 'Stellt alle {interval} Sek. {value} Eurer aktuellen Ressource wieder her',
+  'hudChrome.auraEffect.ruinousBrand':
+    '{charges} Kopien verbleiben: direkte Zauber kopieren {otherPct}% Schaden hierher, oder {selfPct}%, wenn dies ihr Ziel ist',
+  'hudChrome.auraEffect.sated': 'Kann nicht von einem weiteren Gruppen-Tempo-Effekt profitieren',
+  'hudChrome.auraEffect.sourceVuln': 'Erleidet {pct}% mehr Schaden vom Wirker, der diesen Effekt angewendet hat',
+  'hudChrome.auraEffect.spellDamage': 'Erhöht Zauberschaden um {pct}%',
+  'hudChrome.auraEffect.spellHaste': 'Erhöht Zaubertempo um {pct}%',
+  'hudChrome.auraEffect.stasis': 'Immun und handlungsunfähig',
+  'hudChrome.auraEffect.suddenDeath':
+    'Euer nächstes Frühes Grab kostet keine Wut und ignoriert seine Gesundheitsvoraussetzung',
+  'hudChrome.auraEffect.sureCrit': '{charges} schadensverursachende Fähigkeitseinsätze sind garantiert kritische Treffer',
+  'hudChrome.auraEffect.sweepingStrikes':
+    'Einzelzielschläge treffen zusätzlich {targets} nahen Gegner für {pct}% Schaden',
+  'hudChrome.auraEffect.temporalEcho':
+    'Der Arkanschaden des Wirkers heilt Euch um {singlePct}% bei Einzelziel- oder {areaPct}% bei Flächenschaden',
+  'hudChrome.auraEffect.warlockAnchor':
+    'Innerhalb von {range} m erneut wirken, um hierher zurückzukehren und den Anker zu verbrauchen',
+  'hudChrome.auraEffect.wintersChill': '{charges} Aufladungen: kompatible Zauber behandeln dieses Ziel als eingefroren',
+  'hudChrome.procOverlay.ruinMeter': 'Verderben',
+  'hudChrome.procOverlay.ruinStatus': '{value} von {max} Verderben',
+  'hudChrome.procOverlay.soulFragmentsMeter': 'Seelenfragmente',
+  'hudChrome.warlock.doomEmptyStatus': '{value} von {max} Verdammnis.',
+  'hudChrome.warlock.doomLabel': 'Verdammnis',
+  'hudChrome.warlock.doomMeterLock': 'Verdammnis-Leiste sperren',
+  'hudChrome.warlock.doomMeterUnlock': 'Verdammnis-Leiste verschieben',
+  'hudChrome.warlock.doomStatus': '{value} von {max} Verdammnis; {remaining}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    'Drei Schicksalsfäden: Verzehren kann sie zu zusätzlicher Verdammnis verweben.',
+  'hudChrome.warlock.fateThreadsLabel': 'Schicksalsfäden',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    'Drei Schicksalsfäden: Sentence kann sie für 18% erhöhten Schaden verbrauchen.',
+  'hudChrome.warlock.fateThreadsStatus': '{value} von {max} Schicksalsfäden.',
+  'itemUi.tooltip.useHealingPotionPct':
+    'Benutzen: Stellt sofort {percent}% der maximalen Gesundheit wieder her. Im Kampf nutzbar. 2 Min. Abklingzeit.',
 };

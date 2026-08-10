@@ -169,6 +169,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'cragmaw_prowlboots', chance: 0.3 },
       { itemId: 'cragward_pauldrons', chance: 0.25 },
       { itemId: 'cragthorn_greatstaff', chance: 0.2 },
+      { itemId: 'boneglass_shiv', chance: 0.2 },
       // Independent roll like every other piece on this table, so the quiver
       // costs the existing drops nothing.
       { itemId: 'cragmaw_huntquiver', chance: 0.25 },
@@ -2316,6 +2317,37 @@ export const ZONE3_OBJECTS: GroundObjectDef[] = [
 // ---------------------------------------------------------------------------
 
 export const ZONE3_ITEMS: Record<string, ItemDef> = {
+  // Rogue dagger (Basin rare): fills the Lv17-19 pre-cap gap. A minor bleed
+  // proc so a leveling rogue gets a taste of an interesting dagger before cap.
+  boneglass_shiv: {
+    id: 'boneglass_shiv',
+    name: 'Boneglass Shiv',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'rare',
+    weapon: { min: 17, max: 27, speed: 1.7, dagger: true },
+    stats: { agi: 7, sta: 3 },
+    sellValue: 3000,
+    requiredClass: ['rogue', 'hunter'],
+    weaponProcs: [
+      {
+        id: 'boneglass_cut',
+        name: 'Boneglass Cut',
+        trigger: 'weaponHit',
+        chance: 0.06,
+        effects: [
+          {
+            kind: 'dot',
+            name: 'Boneglass Cut',
+            school: 'physical',
+            perTick: 4,
+            interval: 2,
+            duration: 6,
+          },
+        ],
+      },
+    ],
+  },
   // --- quest items ---
   highwatch_summons: {
     id: 'highwatch_summons',

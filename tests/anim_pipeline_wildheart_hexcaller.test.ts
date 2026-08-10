@@ -62,11 +62,11 @@ describe('Sunbone Hexcaller bespoke attack/cast (issue #2889 round 2)', () => {
     expect(rigConstBlock).toContain("attack: ['Attack']");
     expect(rigConstBlock).toContain("cast: 'Cast'");
 
-    // Every other VisualDef still pointing at the shared constant is untouched: exactly 3
-    // remaining direct `clips: TRIPO_BIPED_FULL_RIG,` usages (5 originally, minus the one
-    // migrated to WILDHEART_HEXCALLER above and the one migrated to WILDHEART_STALKER by
-    // issue #2889 round 2's parallel Vineclaw Stalker change).
+    // Every other VisualDef still pointing at the shared constant is untouched: exactly 1
+    // remaining direct `clips: TRIPO_BIPED_FULL_RIG,` usage (mob_wildheart_beastmaster; 5
+    // originally, minus the ones migrated to WILDHEART_HEXCALLER above, WILDHEART_STALKER,
+    // WILDHEART_RAVAGER, and WILDHEART_HIGH_PRIEST, issue #2889 round 2).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: TRIPO_BIPED_FULL_RIG,/g)].length;
-    expect(remaining).toBe(3);
+    expect(remaining).toBe(1);
   });
 });

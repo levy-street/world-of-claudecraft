@@ -10,6 +10,7 @@ function trackerFor(series: (number | null)[]) {
       const next = reads.shift();
       return next === null || next === undefined ? null : next * MB;
     },
+    recordFloorSeries: () => true,
   });
 }
 
@@ -40,6 +41,27 @@ describe('heap sawtooth tracker', () => {
     expect(s.avgDropMb).toBe(20);
     // rises of 30 and 5 over 4 s
     expect(s.allocRateMbPerSec).toBe(8.75);
+  });
+
+  it('exposes a copied GC-floor valley series for the dev hitch referee', () => {
+    const heap = trackerFor([100, 130, 105, 150, 120]);
+    for (let i = 0; i <= 4; i++) heap.sample(i * 1000);
+
+    const valleys = heap.floorSeries();
+    expect(valleys).toEqual([
+      { atMs: 0, floorMb: 100 },
+      { atMs: 2000, floorMb: 105 },
+      { atMs: 4000, floorMb: 120 },
+    ]);
+    expect(heap.floorTrend()).toEqual({
+      startMb: 100,
+      endMb: 120,
+      growthMb: 20,
+      floorSamples: 3,
+    });
+
+    (valleys as { atMs: number; floorMb: number }[])[0].floorMb = 999;
+    expect(heap.floorSeries()[0]).toEqual({ atMs: 0, floorMb: 100 });
   });
 
   it('ignores sub-floor dips as quantization noise and nets them out of the alloc rate', () => {
@@ -99,5 +121,7 @@ describe('heap sawtooth tracker', () => {
     expect(heap.summary()).not.toBeNull();
     heap.reset();
     expect(heap.summary()).toBeNull();
+    expect(heap.floorTrend()).toBeNull();
+    expect(heap.floorSeries()).toEqual([]);
   });
 });

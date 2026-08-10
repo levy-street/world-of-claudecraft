@@ -97,6 +97,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.playerFrameMover.relocalize|',
   'this.partyFrameMover.relocalize|',
   'this.targetAurasWindow.relocalize|',
+  'this.doomMeter.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',
   "this.renderBags|$('#bags').style.display !== 'none'",
   // The four service windows (copper vendor, heroic quartermaster, train,
@@ -119,6 +120,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.arenaWindow.relocalize|',
   'this.dungeonFinderWindow.relocalize|',
   'this.dungeonFinderProposalPopup.relocalize|',
+  'this.bgProposalPopup.relocalize|',
   'this.valeCupWindow.relocalize|',
   'this.vcupBetting.relocalize|',
   'this.vcupIndicator.relocalize|',
@@ -245,6 +247,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastRemainingText', 'lastSig'],
     answer: 'this.dungeonFinderProposalPopup.relocalize',
     why: 'the proposal id and roles, plus a countdown string latch',
+  },
+  {
+    file: 'hud/battleground/battleground_proposal_popup.ts',
+    memos: ['lastRemainingText', 'lastSig'],
+    answer: 'this.bgProposalPopup.relocalize',
+    why: 'the offer id, my response and the accept tally, plus a countdown string latch',
   },
   {
     file: 'dungeon_finder_window.ts',

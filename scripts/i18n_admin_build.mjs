@@ -26,10 +26,10 @@
 //   node scripts/i18n_admin_build.mjs
 //   I18N_OUT_DIR=... node scripts/i18n_admin_build.mjs   emit into a custom directory
 
-import { mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { pseudoLocalize } from './i18n_pseudo.mjs';
+import { writeModuleDir } from './lib/write_module_dir.mjs';
 
 const root = process.cwd();
 // The generated output is a DIRECTORY of per-locale modules, not a single file.
@@ -221,31 +221,9 @@ function computePending(enKeys, locales) {
   return pending;
 }
 
-// Write a { filename -> contents } map into `dir` ATOMICALLY (per-file temp + rename)
-// and prune orphan *.ts. Mirrors scripts/i18n_build.mjs writeModuleDir: an atomic
-// same-dir replace keeps every slice path continuously present, so a concurrent reader
-// resolving './en_XA' through the barrel never sees it missing (a bare rmSync(dir)
-// would create that gap), and a removed locale leaves no orphan. The sweep also
-// removes any stale *.ts.tmp left by a crashed run (it never ends in plain ".ts"),
-// so a crash leftover cannot be committed. Returns total bytes.
-function writeModuleDir(dir, modules) {
-  mkdirSync(dir, { recursive: true });
-  let totalBytes = 0;
-  for (const [name, text] of Object.entries(modules)) {
-    const dest = path.join(dir, name);
-    const tmp = `${dest}.tmp`;
-    writeFileSync(tmp, text);
-    renameSync(tmp, dest);
-    totalBytes += Buffer.byteLength(text, 'utf8');
-  }
-  const keep = new Set(Object.keys(modules));
-  for (const entry of readdirSync(dir)) {
-    if ((entry.endsWith('.ts') || entry.endsWith('.ts.tmp')) && !keep.has(entry)) {
-      rmSync(path.join(dir, entry), { force: true });
-    }
-  }
-  return totalBytes;
-}
+// writeModuleDir (atomic per-file temp + rename, byte-identical skip, orphan sweep)
+// is shared with scripts/i18n_build.mjs: see scripts/lib/write_module_dir.mjs for
+// the full contract.
 
 async function main() {
   const locales = await loadLocales();
@@ -292,11 +270,11 @@ async function main() {
   modules['loaders.ts'] = emitLoadersModule(LOCALES);
   modules['index.ts'] = emitBarrel(LOCALES);
 
-  const totalBytes = writeModuleDir(OUT_DIR, modules);
+  const { totalBytes, rewritten, total } = writeModuleDir(OUT_DIR, modules);
   const pendingTotal = Object.values(pending).reduce((n, ks) => n + ks.length, 0);
   console.log(
     `generated ${path.relative(root, OUT_DIR)}/ (${LOCALES.length} locales + en_XA pseudo + barrel + loaders + pending, ` +
-      `${enKeys.length} keys, pending=${pendingTotal}, ${totalBytes} bytes)`,
+      `${enKeys.length} keys, pending=${pendingTotal}, ${totalBytes} bytes, ${rewritten}/${total} rewritten)`,
   );
 }
 

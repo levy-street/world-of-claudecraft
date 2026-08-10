@@ -116,6 +116,7 @@ describe('UnitFramePainter: the player instance routes every write through the e
       { m: 'toggleClass', args: [ABSORB, 'overshield', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'rage', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'energy', false] },
+      { m: 'toggleClass', args: [RES_CONTAINER, 'focus', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'mana', true] },
       { m: 'setTransform', args: [RES_FILL, 'scaleX(0.8)'] },
       { m: 'setText', args: [RES_TEXT, '80 / 100'] },
@@ -129,12 +130,15 @@ describe('UnitFramePainter: the player instance routes every write through the e
     expect(calls.some((c) => c.args[1] === 'dead' || c.args[1] === 'oor')).toBe(false);
   });
 
-  it('drives the rage/energy discriminator exclusively (folds the className swap)', () => {
+  it('drives the rage, energy, and focus discriminator exclusively', () => {
     const rage = paint(playerDescriptor({ resourceKind: 'rage' }));
     expect(rage).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'rage', true] });
     expect(rage).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'mana', false] });
     const energy = paint(playerDescriptor({ resourceKind: 'energy' }));
     expect(energy).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'energy', true] });
+    const focus = paint(playerDescriptor({ resourceKind: 'focus' }));
+    expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'focus', true] });
+    expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'mana', false] });
   });
 
   it('folds the absorb overshield toggle onto the elided writers', () => {

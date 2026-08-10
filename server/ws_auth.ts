@@ -19,8 +19,10 @@ import {
   type BankBonusSource,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
+  PET_SPECIAL_WIRE_VERSION,
   STABLE_TIMER_WIRE_VERSION,
 } from '../src/world_api';
+import { sanitizeAppearance } from '../src/world_api/appearance';
 import type {
   AccountChatMuteStatus,
   AccountCosmetics,
@@ -275,6 +277,8 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     // strings, booleans, and unknown future versions stay on the legacy wire.
     const timerWireVersion: 1 | typeof STABLE_TIMER_WIRE_VERSION =
       msg.timerWire === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
+    const petSpecialWireVersion: 0 | typeof PET_SPECIAL_WIRE_VERSION =
+      msg.petSpecialWire === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
     const account = await accountAndScopeForToken(token);
     if (account === null || account.scope !== 'full' || !Number.isFinite(characterId)) {
       rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
@@ -328,9 +332,22 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       adminPermissions,
       clientSeed,
       timerWireVersion,
+      petSpecialWireVersion,
       // The character's stored action-bar layout, sent once to the owning client
       // so it restores at login on any device (game.join re-validates it).
       hotbarLayout: character.hotbar_layout ?? null,
+      // The authored modular look (own column). Rides the join so the world
+      // entity carries it and every client in view composes this character's
+      // real body (identity wire key `app`).
+      //
+      // Re-validated HERE as well as at write, the same belt-and-braces the
+      // hotbar layout gets (game.join re-validates that one too): this column is
+      // JSONB the server re-broadcasts to every player in view, and a row could
+      // predate the current bounds, or have been written by an older build, a
+      // migration, or a direct database edit. Sanitizing on the way out means
+      // the only shape that can reach the wire is one today's rules admit,
+      // whatever is actually in the column.
+      appearance: sanitizeAppearance(character.appearance),
     };
     // Two genuinely concurrent handshakes for one character would race to stamp
     // the lease nonce; admit only the first and refuse the rest (never queue).

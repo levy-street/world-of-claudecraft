@@ -130,7 +130,7 @@ for (const lv of [2, 4, 14, 18])
     castSeq('paladin', lv, 1.0, 5, { hasSeal: true }),
   );
 console.log(
-  '   (L2: just melee+seal · L4: +judgement · L14: +exorcism · L18: +consecration - each gated to its learn level)',
+  '   (L2: just melee+seal · L4: +hammer_of_grace · L14: +exorcism · L18: +consecration - each gated to its learn level)',
 );
 
 console.log('\n=== shaman rotation grows per level (in range, full mana) ===');

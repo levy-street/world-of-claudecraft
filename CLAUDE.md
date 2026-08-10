@@ -158,6 +158,9 @@ the deeper check when you want the whole suite locally.
     in the SAME change. The S3 guard (`tests/localization_fixes.test.ts`) enforces it.
   - Full model (catalog layout, matcher rules, formatters, exceptions): `src/ui/CLAUDE.md` and
     `docs/i18n-scaling/translation-workflow.md`.
+- **Every player tooltip follows `docs/design/tooltip-writing.md`.** Write from the live mechanic,
+  use resolved values for scaling effects, state important triggers and limits, and change the
+  English source first. Use the `write-game-tooltips` skill for any tooltip authoring or audit.
 - **Never set `ALLOW_DEV_COMMANDS=1` in production** (it enables the full `/dev` cheat set:
   level/teleport/item cheats, mob spawns, instance teleports, and the dev command GUI).
 - **Never commit `.env` or secrets.**

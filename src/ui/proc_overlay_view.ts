@@ -43,3 +43,15 @@ export function frostOverlayCharges(auras: ReadonlyArray<{ id: string; stacks?: 
   }
   return 0;
 }
+
+// Necromancy uses the shared overlay as a five-crystal Soul Fragment bank.
+// Like Icicles, a present single-stack aura may omit `stacks` on the wire.
+export function necromancyOverlayCharges(
+  auras: ReadonlyArray<{ id: string; stacks?: number }>,
+): number {
+  for (const aura of auras) {
+    if (aura.id !== 'soul_fragments') continue;
+    return Math.max(0, Math.min(5, Math.round(aura.stacks ?? 1)));
+  }
+  return 0;
+}

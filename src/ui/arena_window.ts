@@ -44,6 +44,7 @@ import {
   buildBgWindowView,
 } from './hud/battleground';
 import { formatNumber, t } from './i18n';
+import { formatPvpRecord } from './pvp_record_core';
 import { buildPvpTabs, type PvpTabId, type PvpTabsModel } from './pvp_tabs_view';
 import { svgIcon } from './ui_icons';
 
@@ -350,7 +351,11 @@ export class ArenaWindow {
     const rank =
       `<div class="bg-rank"><span class="rating">${esc(num(view.rating))}</span>` +
       `<span class="wl">${esc(
-        t('hudChrome.bg.ratingSummary', { wins: num(view.wins), losses: num(view.losses) }),
+        t('hudChrome.bg.ratingSummary', {
+          wins: num(view.wins),
+          losses: num(view.losses),
+          draws: num(view.draws),
+        }),
       )}</span></div>` +
       `<div class="bg-captures">${esc(t('hudChrome.bg.careerCaptures', { count: num(view.captures) }))}</div>`;
     // The LIVE online ladder sits above the all-time board, the same order the
@@ -452,7 +457,7 @@ export class ArenaWindow {
             t('hudChrome.bg.playerClassTitle', { name: r.name, className: cls }),
           )}">${esc(r.name)}</span>` +
           `<span class="lr-rating">${esc(num(r.rating))}</span>` +
-          `<span class="lr-wl">${esc(num(r.wins))}-${esc(num(r.losses))}</span></div>`
+          `<span class="lr-wl">${esc(formatPvpRecord(r))}</span></div>`
         );
       })
       .join('');
@@ -473,7 +478,7 @@ export class ArenaWindow {
             }),
           )}">${esc(r.name)}</span>` +
           `<span class="lr-rating">${esc(num(r.rating))}</span>` +
-          `<span class="lr-wl">${esc(num(r.wins))}-${esc(num(r.losses))}</span></div>`
+          `<span class="lr-wl">${esc(formatPvpRecord(r))}</span></div>`
         );
       })
       .join('');
@@ -486,6 +491,7 @@ export class ArenaWindow {
         t('hud.arena.ratingSummary', {
           wins: num(view.standing.wins),
           losses: num(view.standing.losses),
+          draws: num(view.standing.draws),
         }),
       )}</span></div>`;
     const allTimeSection =
@@ -562,7 +568,7 @@ export class ArenaWindow {
           `<div class="ladder-row${r.me ? ' me' : ''}"><span class="rank">${esc(num(r.rank))}</span>` +
           `<span class="lr-name" title="${esc(t('hud.arena.playerClassTitle', { name: r.name, className: cls }))}">${esc(r.name)}</span>` +
           `<span class="lr-rating">${esc(num(r.rating))}</span>` +
-          `<span class="lr-wl">${esc(num(r.wins))}-${esc(num(r.losses))}</span></div>`
+          `<span class="lr-wl">${esc(formatPvpRecord(r))}</span></div>`
         );
       })
       .join('');
@@ -583,7 +589,7 @@ export class ArenaWindow {
             }),
           )}">${esc(r.name)}</span>` +
           `<span class="lr-rating">${esc(num(r.rating))}</span>` +
-          `<span class="lr-wl">${esc(num(r.wins))}-${esc(num(r.losses))}</span></div>`
+          `<span class="lr-wl">${esc(formatPvpRecord(r))}</span></div>`
         );
       })
       .join('');

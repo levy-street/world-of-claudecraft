@@ -613,6 +613,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'q_sexton',
       'q_hollow',
       'q_gravecallers_trail',
+      'q_divine_tome',
       'q_fenbridge_muster',
     ],
     greeting: 'The Light keep you. Even the dead find no rest here of late.',
@@ -1097,6 +1098,33 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     itemRewards: {},
     requiresQuest: 'q_hollow',
   },
+  // --- Paladin-only Dawnbound Tome chain (learn Recall the Fallen). Step 1 with Brother
+  // Aldric in the Vale opens the rite and sends you after him; the rite itself is
+  // completed with Aldric in Mirefen Marsh (q_rite_of_redemption, zone2), which
+  // grants the resurrection on turn-in. ---
+  q_divine_tome: {
+    id: 'q_divine_tome',
+    name: 'The Dawnbound Tome',
+    giverNpcId: 'brother_aldric',
+    turnInNpcId: 'brother_aldric',
+    text: 'The Light does not rest in you quietly, $N. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.',
+    completionText:
+      'The chapel yard grows quiet. You are ready for the words, $N, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.',
+    objectives: [
+      {
+        type: 'kill',
+        targetMobId: 'restless_bones',
+        count: 6,
+        label: 'Restless Bones laid to rest',
+      },
+    ],
+    xpReward: 650,
+    copperReward: 200,
+    itemRewards: {},
+    requiredClass: ['paladin'],
+    requiresQuest: 'q_bones',
+    minLevel: 6,
+  },
   q_bandits: {
     id: 'q_bandits',
     name: 'Bandits of the Vale',
@@ -1460,6 +1488,7 @@ export const ZONE1_QUEST_ORDER = [
   'q_sexton',
   'q_hollow',
   'q_gravecallers_trail',
+  'q_divine_tome',
   'q_mogger',
   'q_prof_attune_smith',
   'q_prof_attune_outfitter',

@@ -143,9 +143,12 @@ const RETIRED_KEYS: string[] = [
   'guide.classHook.shaman',
   'guide.classHook.warlock',
   'guide.classHook.warrior',
-  // guide.abilityHook.<abilityId>: rendered by class_view.ts for the abilities in a class's
-  // GENERATED signature kit (plus 'thorns', which src/ui/talent_i18n.ts resolves). These
-  // nine are mage abilities that are no longer in that kit, so no page asks for them.
+  // guide.abilityHook.<abilityId>: rendered by class_view.ts for the first six hook-carrying
+  // abilities in a class's GENERATED signature kit (scripts/wiki/build_content.mjs takes
+  // kit-with-hook then slice(0, 6)). A key lands here when no class page asks for it any
+  // more. ('thorns' also resolves through src/ui/talent_i18n.ts, so it sits in
+  // LIVE_OFF_SWEEP_KEYS below instead.)
+  // These nine are mage abilities an earlier kit refresh already dropped from that slice.
   'guide.abilityHook.blizzard',
   'guide.abilityHook.brain_freeze',
   'guide.abilityHook.conjure_food',
@@ -155,6 +158,36 @@ const RETIRED_KEYS: string[] = [
   'guide.abilityHook.frozen_orb',
   'guide.abilityHook.ice_lance',
   'guide.abilityHook.shatter',
+  // The v0.31 class overhauls rebuilt every kit. 'judgement' no longer exists as an ability
+  // at all, and the next three are hiddenFromPlayer PALADIN_LEGACY ids kept only for the
+  // persisted action-bar contract, so the class page can never list any of them.
+  'guide.abilityHook.judgement',
+  'guide.abilityHook.blessing_of_might',
+  'guide.abilityHook.devotion_aura',
+  'guide.abilityHook.seal_of_righteousness',
+  // The rest are live abilities whose hooks fell out of the six signature slots when the
+  // overhauls reordered kits and spec-gated abilities ('primal_exaltation' and 'stoneward'
+  // left the kits entirely). The hook prose stays reviewed in every locale; a kit reorder
+  // that surfaces one again simply removes it from this list.
+  'guide.abilityHook.ancestor_return',
+  'guide.abilityHook.arcane_shot',
+  'guide.abilityHook.avenging_wrath',
+  'guide.abilityHook.bastion_sweep',
+  'guide.abilityHook.concussive_shot',
+  'guide.abilityHook.earth_shock',
+  'guide.abilityHook.flame_shock',
+  'guide.abilityHook.hammer_of_wrath',
+  'guide.abilityHook.healing_wave',
+  'guide.abilityHook.life_tap',
+  'guide.abilityHook.lifespring_weapon',
+  'guide.abilityHook.lightning_shield',
+  'guide.abilityHook.mongoose_bite',
+  'guide.abilityHook.oath_chain',
+  'guide.abilityHook.primal_exaltation',
+  'guide.abilityHook.stoneward',
+  'guide.abilityHook.stormsurge',
+  'guide.abilityHook.tidecall',
+  'guide.abilityHook.veilbound_march',
 ];
 
 /**
@@ -188,6 +221,12 @@ const LIVE_OFF_SWEEP_KEYS: string[] = [
   // (src/guide/pages/professions_gathering.ts).
   'guide.profPages.toolCrafted',
   'guide.profPages.toolUnavailable',
+
+  // Resolved by the game HUD, not the guide SPA: src/ui/talent_i18n.ts renders a talent
+  // tooltip's Thorns retaliation line through this key. The druid overhaul pushed 'thorns'
+  // out of the class page's six signature slots, so the guide sweep no longer reaches it,
+  // but the tooltip reference is live.
+  'guide.abilityHook.thorns',
 ];
 
 /** Flatten the catalog to the dotted guide.* leaf paths a reader could be shown. */
@@ -232,12 +271,27 @@ function sourceFiles(): string[] {
  * unguarded scan would report every placeholder migration as still live. Comment lines are
  * skipped because several retirements are documented by name in the source they left.
  */
+const fileContents = new Map<string, string>();
+
+function contentOf(file: string): string {
+  let content = fileContents.get(file);
+  if (content === undefined) {
+    content = fs.readFileSync(file, 'utf8');
+    fileContents.set(file, content);
+  }
+  return content;
+}
+
 function liveReferences(key: string, files: string[]): string[] {
   const re = new RegExp(`${key.replace(/\./g, '\\.')}(?![A-Za-z0-9_])`);
   const hits: string[] = [];
   for (const file of files) {
-    const lines = fs.readFileSync(file, 'utf8').split('\n');
-    lines.forEach((line, i) => {
+    // Content is cached and cheaply prefiltered whole-file first: this scan runs once per
+    // allowlisted key, and re-reading the tree each time stopped scaling when the class
+    // overhauls grew RETIRED_KEYS past fifty entries.
+    const content = contentOf(file);
+    if (!re.test(content)) continue;
+    content.split('\n').forEach((line, i) => {
       const trimmed = line.trim();
       if (trimmed.startsWith('//') || trimmed.startsWith('*')) return;
       if (re.test(line)) hits.push(`${path.relative(SRC, file)}:${i + 1}`);

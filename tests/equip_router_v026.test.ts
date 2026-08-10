@@ -10,14 +10,14 @@ function addWithoutAutoEquip(sim: Sim, itemId: string, count = 1): void {
 }
 
 describe('v0.26 canonical right-click equip routing', () => {
-  it('keeps ordinary one-hand routing in the mainhand for a non-dual-wielder', () => {
+  it('keeps ordinary one-hand routing in the mainhand and preserves a shield', () => {
     const sim = new Sim({ seed: 2610, playerClass: 'paladin', autoEquip: true });
     addWithoutAutoEquip(sim, 'redbrook_blade');
 
     sim.equipItem('redbrook_blade');
 
     expect(sim.equipment.mainhand).toBe('redbrook_blade');
-    expect(sim.equipment.offhand).toBeUndefined();
+    expect(sim.equipment.offhand).toBe('eastbrook_buckler');
   });
 
   it('delegates Rogue one-hand routing to the canonical dual-wield rule', () => {

@@ -32,12 +32,19 @@ export interface RiftFloorView {
 
 /** A live lethal boss death zone on the current rift boss floor. Players inside
  * the radius when `remaining` reaches zero take flat lethal damage. The renderer
- * draws a pulsing red decal ring at (x, z). */
+ * draws a pulsing red decal ring at (x, z). `total` is the full fuse the zone
+ * spawned with, so the visual can show elapsed progress (`1 - remaining / total`)
+ * as a closing timer sweep, not just an undated countdown. Accepted host
+ * asymmetry: offline the first observable `remaining` is already one tick
+ * (DT) below `total` (the fuse ticks in the same sim step that placed it),
+ * while online it starts at exactly `total` when the spawn event lands; the
+ * sweep consumer clamps, so the ~1% skew is invisible. */
 export interface RiftBossDeathZoneView {
   x: number;
   z: number;
   radius: number;
   remaining: number;
+  total: number;
 }
 
 export interface IWorldDungeons {

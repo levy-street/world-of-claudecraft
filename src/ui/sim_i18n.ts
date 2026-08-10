@@ -24,6 +24,7 @@ import {
   t,
 } from './i18n';
 import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
+import { localizeTalentTitle } from './talent_i18n';
 
 const baseEnTable = {
   'log.deathwardSaves': 'A deathward saves you!',
@@ -127,6 +128,7 @@ const baseEnTable = {
     'You leave the paddock and the lesson ends. Come back to Marla to try again.',
   'error.invalidBuild': 'Invalid talent build.',
   'error.unknownSpec': 'Unknown specialization.',
+  'error.unknownAbility': 'You do not know that ability.',
   'error.maxLoadouts': 'You can save at most {count} loadouts.',
   'error.emptyLoadoutName': 'Loadout name cannot be empty.',
   'error.noLoadout': 'No such loadout.',
@@ -168,6 +170,8 @@ const baseEnTable = {
   'error.nothingToConsume': 'Nothing to consume.',
   'error.nothingToDevour': 'Nothing to devour.',
   'error.recentKillRequired': 'You need a recent kill.',
+  'error.burningPactRequired': 'Conflagrate requires Burning Pact on the target.',
+  'error.notEnoughRuin': 'Not enough Wrack!',
   'error.merchantUnavailable': 'That merchant is not available.',
   'error.notForSale': 'That item is not for sale.',
   'error.noMerchant': 'There is no merchant nearby.',
@@ -188,6 +192,8 @@ const baseEnTable = {
   'error.noItem': "You don't have that item.",
   'error.cantWhileDead': "You can't do that while dead.",
   'error.cantWhileSwimming': "You can't do that while swimming.",
+  'error.shellskinPreventsAttacks': 'Shellskin prevents attacks.',
+  'error.tithefiendNeedsDirge': 'Your Tithefiend needs an enemy affected by Dirge of Decay.',
   'error.alreadyEating': 'You are already eating.',
   'error.alreadyDrinking': 'You are already drinking.',
   'error.tameThat': 'You cannot tame that.',
@@ -381,6 +387,7 @@ const baseEnTable = {
   'log.deletedBuild': 'Deleted build “{name}”.',
   'log.dismissPet': 'You dismiss {name}.',
   'log.summonDemon': 'You summon {name}.',
+  'log.pyreCrashes': '{name} crashes into the battle.',
   'log.tamedPet': '{name} is now your loyal companion.',
   'log.entityDies': '{name} dies.',
   'log.prestiged': 'You have prestiged! Prestige Rank {rank}.',
@@ -538,6 +545,9 @@ const baseEnTable = {
   'aura.colossus': 'Colossus',
   // 4-piece set-bonus proc buffs (src/sim/content/item_sets.ts SetProc names).
   'aura.clearcasting': 'Clearcasting',
+  'aura.effigy': 'Effigy',
+  'aura.gloomtithe': 'Gloomtithe',
+  'aura.tithefiend': 'Tithefiend',
   // Talent-proc buff/ward names (choice_rows_classic.ts ProcDef names).
   'aura.searingLight': 'Searing Light',
   'aura.lingeringGraceWard': 'Lingering Grace',
@@ -587,6 +597,10 @@ const baseEnTable = {
   'aura.improvedImmolate': 'Improved Immolate',
   'aura.demonArmor': 'Demon Armor',
   'aura.desolation': 'Desolation',
+  'aura.destructionRuin': 'Ruin',
+  'aura.ruinousBrand': 'Ruinous Brand',
+  'aura.duskfireClaim': 'Duskfire Claim',
+  'aura.pyreGuardian': 'Pyre Guardian',
   'aura.umbralMastery': 'Umbral Mastery',
   'aura.improvedFear': 'Improved Fear',
   'aura.unyieldingPact': 'Unyielding Pact',
@@ -629,6 +643,14 @@ const baseEnTable = {
   'aura.wintersChill': "Winter's Chill",
   'aura.icicles': 'Icicles',
   'aura.perfectMoment': 'Perfect Moment',
+  'aura.radiantResonance': 'Radiant Resonance',
+  'aura.solarReprisal': 'Solar Reprisal',
+  'aura.dawnsWrath': "Dawn's Wrath",
+  'aura.moontide': 'Moontide',
+  'aura.oldBlood': 'Old Blood',
+  'aura.verdance': 'Verdance',
+  'aura.lopingStride': 'Loping Stride',
+  'aura.marrowbreak': 'Marrowbreak',
   // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
   'log.cardDuelQueued': 'You queue for a Card Duel.',
   'log.cardDuelLeftQueue': 'You leave the Card Duel queue.',
@@ -801,6 +823,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noItem': "You don't have that item.",
     'error.cantWhileDead': "You can't do that while dead.",
     'error.cantWhileSwimming': "You can't do that while swimming.",
+    'error.shellskinPreventsAttacks': 'Shellskin prevents attacks.',
+    'error.tithefiendNeedsDirge': 'Your Tithefiend needs an enemy affected by Dirge of Decay.',
     'error.alreadyEating': 'You are already eating.',
     'error.alreadyDrinking': 'You are already drinking.',
     'error.tameThat': 'You cannot tame that.',
@@ -943,6 +967,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.unstuckSickness': 'Unstuck Sickness',
   },
   es: {
+    'error.unknownAbility': 'No conoces esa habilidad.',
+    'error.notEnoughRuin': '¡No hay suficiente Ruina!',
+    'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
+    'error.shellskinPreventsAttacks': 'Piel de Caparazón impide atacar.',
+    'error.tithefiendNeedsDirge':
+      'Tu Diezmademonio necesita un enemigo afectado por Endecha de Descomposición.',
     'error.guildBankNoGuild': 'Debes estar en una hermandad para usar el banco de la hermandad.',
     'error.guildBankRank':
       'Solo los oficiales de la hermandad pueden usar el banco de la hermandad.',
@@ -1393,6 +1423,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
   },
   es_ES: {
+    'error.unknownAbility': 'No conoces esa habilidad.',
+    'error.notEnoughRuin': '¡No hay suficiente Ruina!',
+    'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
+    'error.shellskinPreventsAttacks': 'Piel de Caparazón impide atacar.',
+    'error.tithefiendNeedsDirge':
+      'Tu Diezmademonio necesita un enemigo afectado por Endecha de Descomposición.',
     'error.guildBankNoGuild': 'Debes estar en una hermandad para usar el banco de la hermandad.',
     'error.guildBankRank':
       'Solo los oficiales de la hermandad pueden usar el banco de la hermandad.',
@@ -1844,6 +1880,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
   },
   fr_FR: {
+    'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
+    'error.notEnoughRuin': 'Pas assez de Ruine !',
+    'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
+    'error.shellskinPreventsAttacks': "Peau de carapace empêche d'attaquer.",
+    'error.tithefiendNeedsDirge':
+      "Votre Démon de dîme a besoin d'un ennemi affecté par Chant funèbre de pourriture.",
     'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
     'error.guildBankRank': 'Seuls les officiers de la guilde peuvent utiliser la banque de guilde.',
     'error.guildBankFull': 'La banque de guilde est pleine.',
@@ -2304,6 +2346,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
   },
   fr_CA: {
+    'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
+    'error.notEnoughRuin': 'Pas assez de Ruine !',
+    'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
+    'error.shellskinPreventsAttacks': "Peau de carapace empêche d'attaquer.",
+    'error.tithefiendNeedsDirge':
+      "Votre Démon de dîme a besoin d'un ennemi affecté par Chant funèbre de pourriture.",
     'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
     'error.guildBankRank': 'Seuls les officiers de la guilde peuvent utiliser la banque de guilde.',
     'error.guildBankFull': 'La banque de guilde est pleine.',
@@ -2957,6 +3005,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Might of the Serpent',
   },
   it_IT: {
+    'error.unknownAbility': 'Non conosci questa abilità.',
+    'error.notEnoughRuin': 'Rovina insufficiente!',
+    'error.burningPactRequired': 'Conflagrazione richiede Patto Ardente sul bersaglio.',
+    'error.shellskinPreventsAttacks': 'Pelle di Corazza impedisce di attaccare.',
+    'error.tithefiendNeedsDirge':
+      'Il tuo Demone della Decima richiede un nemico affetto da Canto Funebre della Putrefazione.',
     'error.guildBankNoGuild': 'Devi essere in una gilda per usare la banca della gilda.',
     'error.guildBankRank': 'Solo gli ufficiali della gilda possono usare la banca della gilda.',
     'error.guildBankFull': 'La banca della gilda è piena.',
@@ -3409,6 +3463,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
   },
   de_DE: {
+    'error.unknownAbility': 'Ihr beherrscht diese Fähigkeit nicht.',
+    'error.notEnoughRuin': 'Nicht genug Verderben!',
+    'error.burningPactRequired': 'Feuersbrunst erfordert Brennender Pakt auf dem Ziel.',
+    'error.shellskinPreventsAttacks': 'Panzerhaut verhindert Angriffe.',
+    'error.tithefiendNeedsDirge':
+      'Euer Zehntteufel benötigt einen Gegner mit Klagelied des Verfalls.',
     'error.guildBankNoGuild': 'Ihr müsst in einer Gilde sein, um die Gildenbank zu benutzen.',
     'error.guildBankRank': 'Nur Gildenoffiziere dürfen die Gildenbank benutzen.',
     'error.guildBankFull': 'Die Gildenbank ist voll.',
@@ -3865,6 +3925,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
   },
   zh_CN: {
+    'error.unknownAbility': '你尚未学会该技能。',
+    'error.notEnoughRuin': '毁灭不足！',
+    'error.burningPactRequired': '燃尽需要目标身上有燃烧契约。',
+    'error.shellskinPreventsAttacks': '甲壳之肤阻止攻击。',
+    'error.tithefiendNeedsDirge': '你的什一魔需要一个受腐朽挽歌影响的敌人。',
     'error.guildBankNoGuild': '你必须加入公会才能使用公会银行。',
     'error.guildBankRank': '只有公会官员才能使用公会银行。',
     'error.guildBankFull': '公会银行已满。',
@@ -3955,6 +4020,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '死亡护符救了你！',
     'error.heroicMarksNeeded': '购买{name}需要{marks}个英雄徽记。',
     'aura.clearcasting': '清晰施法',
+    'aura.effigy': '巫蛊像',
+    'aura.gloomtithe': '幽暗什一',
+    'aura.tithefiend': '什一魔',
     'aura.searingLight': '灼热圣光',
     'aura.lingeringGraceWard': '萦绕恩泽',
     'aura.nocturns': '冥想',
@@ -4302,6 +4370,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '你的专注重置已完成。',
   },
   zh_TW: {
+    'error.unknownAbility': '你尚未學會該技能。',
+    'error.notEnoughRuin': '毀滅不足！',
+    'error.burningPactRequired': '燃盡需要目標身上有燃燒契約。',
+    'error.shellskinPreventsAttacks': '甲殼之膚阻止攻擊。',
+    'error.tithefiendNeedsDirge': '你的什一魔需要一個受腐朽輓歌影響的敵人。',
     'error.guildBankNoGuild': '你必須加入公會才能使用公會銀行。',
     'error.guildBankRank': '只有公會幹部才能使用公會銀行。',
     'error.guildBankFull': '公會銀行已滿。',
@@ -4392,6 +4465,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '死亡護符救了你！',
     'error.heroicMarksNeeded': '購買{name}需要{marks}個英雄徽記。',
     'aura.clearcasting': '清晰施法',
+    'aura.effigy': '巫毒塑像',
+    'aura.gloomtithe': '幽暗什一',
+    'aura.tithefiend': '什一魔',
     'aura.searingLight': '灼熱聖光',
     'aura.lingeringGraceWard': '綿延恩典',
     'aura.nocturns': '冥想',
@@ -4739,6 +4815,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '你的專注重置已完成。',
   },
   ko_KR: {
+    'error.unknownAbility': '아직 배우지 않은 기술입니다.',
+    'error.notEnoughRuin': '파멸이 부족합니다!',
+    'error.burningPactRequired': '점화하려면 대상에게 불타는 계약이 있어야 합니다.',
+    'error.shellskinPreventsAttacks': '갑각 피부 상태에서는 공격할 수 없습니다.',
+    'error.tithefiendNeedsDirge': '십일조 악마에게는 부패의 만가에 걸린 적이 필요합니다.',
     'error.guildBankNoGuild': '길드 은행을 사용하려면 길드에 소속되어 있어야 합니다.',
     'error.guildBankRank': '길드 임원만 길드 은행을 사용할 수 있습니다.',
     'error.guildBankFull': '길드 은행이 가득 찼습니다.',
@@ -4830,6 +4911,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '죽음의 수호가 당신을 구했습니다!',
     'error.heroicMarksNeeded': '{name}을(를) 구매하려면 영웅의 징표 {marks}개가 필요합니다.',
     'aura.clearcasting': '선명한 시전',
+    'aura.effigy': '제물 인형',
+    'aura.gloomtithe': '암흑 십일조',
+    'aura.tithefiend': '십일조 악마',
     'aura.searingLight': '타오르는 빛',
     'aura.lingeringGraceWard': '지속되는 은총',
     'aura.nocturns': '명상',
@@ -5185,6 +5269,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
   },
   ja_JP: {
+    'error.unknownAbility': 'そのアビリティをまだ習得していません。',
+    'error.notEnoughRuin': '破滅が足りません！',
+    'error.burningPactRequired': 'コンフラグレートには対象に灼熱の契約が必要です。',
+    'error.shellskinPreventsAttacks': '甲殻の皮膚により攻撃できません。',
+    'error.tithefiendNeedsDirge': 'タイスフィーンドには腐朽の葬送歌を受けた敵が必要です。',
     'error.guildBankNoGuild': 'ギルド銀行を利用するにはギルドに加入している必要があります。',
     'error.guildBankRank': 'ギルド銀行を利用できるのはギルド幹部のみです。',
     'error.guildBankFull': 'ギルド銀行がいっぱいです。',
@@ -5280,6 +5369,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '死の加護があなたを救った！',
     'error.heroicMarksNeeded': '{name}を購入するには英雄の証が{marks}個必要です。',
     'aura.clearcasting': 'クリアキャスティング',
+    'aura.effigy': '呪いの人形',
+    'aura.gloomtithe': '闇の献納',
+    'aura.tithefiend': 'タイスフィーンド',
     'aura.searingLight': '灼熱の光',
     'aura.lingeringGraceWard': '留まる恩寵',
     'aura.nocturns': '瞑想',
@@ -5640,6 +5732,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
   },
   pt_BR: {
+    'error.unknownAbility': 'Você não conhece essa habilidade.',
+    'error.notEnoughRuin': 'Ruína insuficiente!',
+    'error.burningPactRequired': 'Conflagrar exige Pacto Ardente no alvo.',
+    'error.shellskinPreventsAttacks': 'Pele de Casco impede ataques.',
+    'error.tithefiendNeedsDirge':
+      'Seu Demônio do Dízimo precisa de um inimigo afetado por Réquiem da Ruína.',
     'error.guildBankNoGuild': 'Você precisa estar em uma guilda para usar o banco da guilda.',
     'error.guildBankRank': 'Somente oficiais da guilda podem usar o banco da guilda.',
     'error.guildBankFull': 'O banco da guilda está cheio.',
@@ -6088,6 +6186,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
   },
   ru_RU: {
+    'error.unknownAbility': 'Вы не знаете эту способность.',
+    'error.notEnoughRuin': 'Недостаточно Погибели!',
+    'error.burningPactRequired': 'Для Поджигания на цели должен быть Пылающий договор.',
+    'error.shellskinPreventsAttacks': 'Панцирная кожа не позволяет атаковать.',
+    'error.tithefiendNeedsDirge':
+      'Вашему демону десятины нужен противник под действием Панихиды распада.',
     'error.guildBankNoGuild': 'Чтобы пользоваться банком гильдии, нужно состоять в гильдии.',
     'error.guildBankRank': 'Пользоваться банком гильдии могут только офицеры гильдии.',
     'error.guildBankFull': 'Банк гильдии полон.',
@@ -6180,6 +6284,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': 'Оберег от смерти спасает вас!',
     'error.heroicMarksNeeded': 'Вам нужно {marks} Героических знаков, чтобы купить {name}.',
     'aura.clearcasting': 'Ясность',
+    'aura.effigy': 'Изваяние',
+    'aura.gloomtithe': 'Мрачная десятина',
+    'aura.tithefiend': 'Демон десятины',
     'aura.searingLight': 'Жгучий свет',
     'aura.lingeringGraceWard': 'Длящаяся благодать',
     'aura.nocturns': 'Медитация',
@@ -6568,6 +6675,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.emptyLoadoutName': 'Název sestavy nesmí být prázdný.',
     'error.sellBound': 'Tento předmět je vázaný a nelze ho prodat.',
     ...BASE_NEW.cs_CZ,
+    'error.unknownAbility': 'Tuto schopnost neznáš.',
+    'error.notEnoughRuin': 'Nedostatek Zkázy!',
+    'error.burningPactRequired': 'Vzplanutí vyžaduje Hořící pakt na cíli.',
+    'error.shellskinPreventsAttacks': 'Krunýřová kůže brání útokům.',
+    'error.tithefiendNeedsDirge': 'Tvůj desátkový běs potřebuje nepřítele pod Žalozpěvem rozkladu.',
     'error.toolEffectSlotFromWindow': 'Zasaď to v okně Profese.',
     'error.mountTrainInProgress': 'Jezdecká lekce už probíhá.',
     'error.mountTrainDismountFirst': 'Nejdřív sesedni.',
@@ -6707,6 +6819,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.emptyLoadoutName': 'De naam van een build mag niet leeg zijn.',
     'error.sellBound': 'Dat voorwerp is gebonden en kan niet worden verkocht.',
     ...BASE_NEW.nl_NL,
+    'error.unknownAbility': 'Je kent die vaardigheid niet.',
+    'error.notEnoughRuin': 'Niet genoeg Ruïne!',
+    'error.burningPactRequired': 'Ontvlamming vereist Brandpact op het doelwit.',
+    'error.shellskinPreventsAttacks': 'Schildhuid verhindert aanvallen.',
+    'error.tithefiendNeedsDirge':
+      'Je Tiendduivel heeft een vijand nodig die onder Klaaglied van Verval lijdt.',
     'error.toolEffectSlotFromWindow': 'Open Beroepen om dit aan te brengen.',
     'error.mountTrainInProgress': 'Er is al een rijles bezig.',
     'error.mountTrainDismountFirst': 'Stijg eerst af.',
@@ -6846,6 +6964,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.emptyLoadoutName': 'Nazwa buildu nie może być pusta.',
     'error.sellBound': 'Ten przedmiot jest przywiązany i nie można go sprzedać.',
     ...BASE_NEW.pl_PL,
+    'error.unknownAbility': 'Nie znasz tej zdolności.',
+    'error.notEnoughRuin': 'Za mało Ruiny!',
+    'error.burningPactRequired': 'Pożoga wymaga Płonącego paktu na celu.',
+    'error.shellskinPreventsAttacks': 'Pancerna Skóra uniemożliwia ataki.',
+    'error.tithefiendNeedsDirge': 'Twój Dziesięcinnik potrzebuje wroga objętego Pieśnią rozkładu.',
     'error.toolEffectSlotFromWindow': 'Otwórz Zawody, aby to osadzić.',
     'error.mountTrainInProgress': 'Lekcja jazdy konnej już trwa.',
     'error.mountTrainDismountFirst': 'Najpierw zsiądź.',
@@ -6987,6 +7110,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.emptyLoadoutName': 'Nama bangun tidak boleh kosong.',
     'error.sellBound': 'Barang itu terikat dan tidak dapat dijual.',
     ...BASE_NEW.id_ID,
+    'error.unknownAbility': 'Kamu belum mengetahui kemampuan itu.',
+    'error.notEnoughRuin': 'Ruin tidak cukup!',
+    'error.burningPactRequired': 'Kobaran Api membutuhkan Pakta Membara pada target.',
+    'error.shellskinPreventsAttacks': 'Kulit Cangkang mencegah serangan.',
+    'error.tithefiendNeedsDirge':
+      'Iblis Persepuluhan-mu membutuhkan musuh yang terkena Ratapan Pembusukan.',
     'error.toolEffectSlotFromWindow': 'Buka Profesi untuk memasangnya.',
     'error.mountTrainInProgress': 'Sudah ada pelajaran menunggang yang sedang berlangsung.',
     'error.mountTrainDismountFirst': 'Turun dulu.',
@@ -7126,6 +7255,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.emptyLoadoutName': 'Derleme adı boş olamaz.',
     'error.sellBound': 'O eşya bağlı ve satılamaz.',
     ...BASE_NEW.tr_TR,
+    'error.unknownAbility': 'Bu yeteneği bilmiyorsun.',
+    'error.notEnoughRuin': 'Yeterli Harabiyet yok!',
+    'error.burningPactRequired': 'Tutuşturma için hedefte Yanan Ahit olmalı.',
+    'error.shellskinPreventsAttacks': 'Kabuk Deri saldırıları engelliyor.',
+    'error.tithefiendNeedsDirge':
+      'Öşür İfritin, Çürüme Ağıdı etkisindeki bir düşmana ihtiyaç duyar.',
     'error.toolEffectSlotFromWindow': 'Bunu takmak için Meslekler penceresini aç.',
     'error.mountTrainInProgress': 'Zaten devam eden bir binicilik dersi var.',
     'error.mountTrainDismountFirst': 'Önce in.',
@@ -7265,6 +7400,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.emptyLoadoutName': 'Byggets namn får inte vara tomt.',
     'error.sellBound': 'Det föremålet är bundet och kan inte säljas.',
     ...BASE_NEW.sv_SE,
+    'error.unknownAbility': 'Du kan inte den förmågan.',
+    'error.notEnoughRuin': 'Inte tillräckligt med Ruin!',
+    'error.burningPactRequired': 'Storbrand kräver Brinnande pakt på målet.',
+    'error.shellskinPreventsAttacks': 'Skalhud förhindrar attacker.',
+    'error.tithefiendNeedsDirge':
+      'Din tiondedemon behöver en fiende som påverkas av Förruttnelsens klagosång.',
     'error.toolEffectSlotFromWindow': 'Öppna Yrken för att sätta in den.',
     'error.mountTrainInProgress': 'En ridlektion pågår redan.',
     'error.mountTrainDismountFirst': 'Stig av först.',
@@ -7404,6 +7545,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.emptyLoadoutName': 'Tên build không được để trống.',
     'error.sellBound': 'Vật phẩm đó đã bị ràng buộc và không thể bán.',
     ...BASE_NEW.vi_VN,
+    'error.unknownAbility': 'Bạn chưa học kỹ năng đó.',
+    'error.notEnoughRuin': 'Không đủ Ruin!',
+    'error.burningPactRequired': 'Bùng Cháy cần mục tiêu đang chịu Khế Ước Rực Cháy.',
+    'error.shellskinPreventsAttacks': 'Da Mai ngăn không cho tấn công.',
+    'error.tithefiendNeedsDirge': 'Quỷ Thập Phân của bạn cần một kẻ địch đang chịu Ai Ca Mục Rữa.',
     'error.toolEffectSlotFromWindow': 'Mở Nghề nghiệp để khảm nó.',
     'error.mountTrainInProgress': 'Đã có một bài học cưỡi ngựa đang diễn ra.',
     'error.mountTrainDismountFirst': 'Xuống thú cưỡi trước đã.',
@@ -7541,6 +7687,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.emptyLoadoutName': 'Navnet på et build må ikke være tomt.',
     'error.sellBound': 'Den genstand er bundet og kan ikke sælges.',
     ...BASE_NEW.da_DK,
+    'error.unknownAbility': 'Du kender ikke den evne.',
+    'error.notEnoughRuin': 'Ikke nok Ruin!',
+    'error.burningPactRequired': 'Antændelse kræver Brændende Pagt på målet.',
+    'error.shellskinPreventsAttacks': 'Skalhud forhindrer angreb.',
+    'error.tithefiendNeedsDirge':
+      'Din Tiendedæmon skal bruge en fjende, der er ramt af Forfaldets Klagesang.',
     'error.toolEffectSlotFromWindow': 'Åbn Erhverv for at sætte den i.',
     'error.mountTrainInProgress': 'Der er allerede en ridelektion i gang.',
     'error.mountTrainDismountFirst': 'Stig af først.',
@@ -8212,6 +8364,7 @@ const mobNameToId = new Map<string, string>();
 for (const [id, m] of Object.entries(MOBS)) mobNameToId.set(m.name, id);
 const abilityNameToId = new Map<string, string>();
 for (const [id, a] of Object.entries(ABILITIES)) abilityNameToId.set(a.name, id);
+abilityNameToId.set('Veil Mark', 'veilbound_mark');
 const delveNameToId = new Map<string, string>();
 for (const [id, d] of Object.entries(DELVES)) delveNameToId.set(d.name, id);
 // Module display names are also the delveUi.moduleName.* source values; reverse
@@ -8269,6 +8422,11 @@ function locPetGrowlAutoState(state: string): string {
 // player (stun/incapacitate/absorb aura) and as the boss "unleashes" combat-log line, so
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
+  Moontide: 'aura.moontide',
+  'Old Blood': 'aura.oldBlood',
+  Verdance: 'aura.verdance',
+  'Loping Stride': 'aura.lopingStride',
+  Marrowbreak: 'aura.marrowbreak',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
   // src/sim/content/classes.ts); shown on the buff bar and combat log.
   'Bladed Echo': 'aura.bladedEcho',
@@ -8388,6 +8546,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Colossus: 'aura.colossus',
   // 4-piece set-bonus proc buffs (item_sets.ts): shown in the buff frame.
   Clearcasting: 'aura.clearcasting',
+  Effigy: 'aura.effigy',
+  Gloomtithe: 'aura.gloomtithe',
+  Tithefiend: 'aura.tithefiend',
   Gravemight: 'aura.gravemight',
   Fangrush: 'aura.fangrush',
   Bonesplinter: 'aura.bonesplinter',
@@ -8406,6 +8567,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   "Winter's Chill": 'aura.wintersChill',
   Icicles: 'aura.icicles',
   'Perfect Moment': 'aura.perfectMoment',
+  'Radiant Resonance': 'aura.radiantResonance',
+  'Solar Reprisal': 'aura.solarReprisal',
+  "Dawn's Wrath": 'aura.dawnsWrath',
   // Talent-proc buff/ward names (choice rows).
   'Searing Light': 'aura.searingLight',
   'Lingering Grace': 'aura.lingeringGraceWard',
@@ -8455,15 +8619,44 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Improved Immolate': 'aura.improvedImmolate',
   'Demon Armor': 'aura.demonArmor',
   Desolation: 'aura.desolation',
+  Ruin: 'aura.destructionRuin',
+  'Ruinous Brand': 'aura.ruinousBrand',
+  'Duskfire Claim': 'aura.duskfireClaim',
+  'Pyre Guardian': 'aura.pyreGuardian',
   'Umbral Mastery': 'aura.umbralMastery',
   'Improved Fear': 'aura.improvedFear',
   'Unyielding Pact': 'aura.unyieldingPact',
   'Grimoire of Carnage': 'aura.grimoireOfCarnage',
   'Curse Mastery': 'aura.curseMastery',
 };
+
+const WARLOCK_ABILITY_AURA_IDS: Readonly<Record<string, string>> = {
+  'Umbral Anchor': 'umbral_anchor',
+  'Possess the Evil Eye': 'possess_evil_eye',
+  'Hour of Judgment': 'hour_of_judgment',
+  Coven: 'coven',
+  'Sacrilegious March': 'sacrilegious_march',
+  'Sanguine Covenant': 'dark_pact',
+};
+
+const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
+  'Blacktide',
+  'Leaden Hex',
+  'Shadow Credit',
+  'Hexstorm',
+  'Forbidden Reflection',
+]);
+
 export function localizeSimAuraName(name: string): string | null {
   const key = AURA_NAME_KEY[name];
-  return key ? tSim(key) : null;
+  if (key) return tSim(key);
+  if (name === 'Condemnation') return t('hudChrome.warlock.doomLabel');
+  if (name === 'Fate Threads') return t('hudChrome.warlock.fateThreadsLabel');
+  if (name === 'Soul Fragments') return t('hudChrome.procOverlay.soulFragmentsMeter');
+  const abilityId = WARLOCK_ABILITY_AURA_IDS[name];
+  if (abilityId) return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+  if (WARLOCK_TALENT_AURA_NAMES.has(name)) return localizeTalentTitle(name);
+  return null;
 }
 
 // A boss/mob "mechanic" name spliced into "{mob} unleashes {mechanic}!". Reuses the shared
@@ -8742,29 +8935,59 @@ type BgExtraKey =
   | 'leaveQueue'
   | 'battleBegins'
   | 'fightFor'
+  // The backfill pair (a queued solo seated into a match already under way):
+  // the joiner's own line, which must say the match is off the ladder, and the
+  // one their new teammates see.
+  | 'backfillJoin'
+  | 'backfillArrived'
   | 'seizeRune'
   | 'seizeBattleRune'
   | 'seizeWardRune'
   | 'teamCrimson'
   | 'teamAzure'
   | 'errInBattleground'
+  | 'errNotInBattleground'
   | 'errQueueDead'
   | 'errQueueInMatch'
   | 'errMemberQueued'
+  | 'errMemberRequeueLocked'
   | 'errNoFlag'
   | 'errPartyTooLarge'
   | 'errPartyLeaderOnly'
   | 'errDelveDuringBg'
-  | 'errTalentsDuringBg'
   | 'errLevelTooLow'
   | 'errMemberLevelTooLow'
   | 'heldAtGate'
   // The whole-match mount ban (src/sim/mounts.ts). It lives in THIS table, not
   // the mount rows in baseEnTable, because the rule and its wording belong to
   // the battleground: every locale reuses the mode's own glossary for it.
-  | 'errMountInBg';
+  | 'errMountInBg'
+  // The queue-pop OFFER (social/battleground_proposal.ts): the prompt, the
+  // two ways it ends, and the three refusals guarding it.
+  | 'offerReady'
+  | 'offerKeptPlace'
+  | 'groupLeaveQueue'
+  | 'errNoOffer'
+  | 'errOfferWaiting'
+  | 'errRequeueLocked'
+  | 'offerBackfill'
+  | 'offerBackfillGone'
+  | 'offerBackfillDeclined';
 
 const BG_EXTRA_EN: Record<BgExtraKey, string> = {
+  errMemberRequeueLocked: 'A party member must wait before queueing for Thornhollow Fields again.',
+  offerReady: 'Thornhollow Fields is ready. Accept to join the battle.',
+  offerBackfill:
+    'A Thornhollow Fields battle already under way needs a fighter. Accept to join; this match will not change your rating.',
+  offerBackfillGone:
+    'That battle no longer needs a fighter. You keep your place in the Thornhollow Fields queue.',
+  offerBackfillDeclined:
+    'You decline the battle already under way, and keep your place in the Thornhollow Fields queue.',
+  offerKeptPlace: 'The battle did not fill. You keep your place in the Thornhollow Fields queue.',
+  groupLeaveQueue: 'Your group leaves the Thornhollow Fields queue.',
+  errNoOffer: 'You have no Thornhollow Fields invitation to answer.',
+  errOfferWaiting: 'You have a Thornhollow Fields invitation waiting. Answer it first.',
+  errRequeueLocked: 'You must wait {seconds} seconds before queueing for Thornhollow Fields again.',
   joinQueue: 'You join the Thornhollow Fields queue. Need {count} champions to start a match.',
   partyJoinQueue: 'Your party of {count} joins the Thornhollow Fields queue.',
   leaveQueue: 'You leave the Thornhollow Fields queue.',
@@ -8773,9 +8996,13 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
   seizeRune: 'You seize a Sprint Rune!',
   seizeBattleRune: 'You seize a Battle Rune!',
   seizeWardRune: 'You seize a Ward Rune!',
+  backfillJoin:
+    'Thornhollow Fields: you join a battle already under way for the {team}. This match will not change your rating.',
+  backfillArrived: 'A fresh fighter joins the {team}.',
   teamCrimson: 'Crimson',
   teamAzure: 'Azure',
   errInBattleground: 'You are already in a battleground.',
+  errNotInBattleground: 'You are not in a battleground.',
   errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
   errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
   errMemberQueued: 'A party member is already queued or in a match.',
@@ -8783,7 +9010,6 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
   errPartyTooLarge: 'Your party is too large for Thornhollow Fields. It queues parties of up to 5.',
   errPartyLeaderOnly: 'Only the party leader may queue your team for Thornhollow Fields.',
   errDelveDuringBg: 'You cannot enter a delve during a battleground.',
-  errTalentsDuringBg: 'You cannot change talents during a battleground.',
   errLevelTooLow: 'Thornhollow Fields requires level {level}.',
   errMemberLevelTooLow: 'Every party member must be level {level} to queue for Thornhollow Fields.',
   heldAtGate: 'The gates open when the battle begins.',
@@ -8793,15 +9019,29 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
 export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
   en: BG_EXTRA_EN,
   zh_CN: {
+    errMemberRequeueLocked: '有队伍成员需要等待后才能再次排队进入荆谷原野。',
+    offerReady: '荆谷原野已准备就绪。接受邀请即可加入战斗。',
+    offerBackfill:
+      '一场正在进行的荆谷原野战斗需要一名战士。接受即可加入；本场对战不会改变你的评分。',
+    offerBackfillGone: '那场战斗不再需要战士了。你保留在荆谷原野队列中的位置。',
+    offerBackfillDeclined: '你拒绝了这场已经开始的战斗，并保留在荆谷原野队列中的位置。',
+    offerKeptPlace: '战斗未能成行。你保留了荆谷原野队列中的位置。',
+    groupLeaveQueue: '你的队伍离开了荆谷原野队列。',
+    errNoOffer: '你没有可以回应的荆谷原野邀请。',
+    errOfferWaiting: '你有一个荆谷原野邀请待回应。请先回应它。',
+    errRequeueLocked: '你必须等待 {seconds} 秒才能再次排队进入荆谷原野。',
     joinQueue: '你加入了荆谷原野队列。需要{count}名勇士才能开始比赛。',
     partyJoinQueue: '你的{count}人小队加入了荆谷原野队列。',
     leaveQueue: '你离开了荆谷原野队列。',
     battleBegins: '荆谷原野之战开始了:夺取他们的旗帜!',
     fightFor: '荆谷原野:你为{team}而战。先夺得{caps}次旗帜者获胜。',
     seizeRune: '你夺得了疾行符文!',
+    backfillJoin: '荆谷原野:你加入了{team}正在进行的战斗。本场比赛不会改变你的评分。',
+    backfillArrived: '一名新的战士加入了{team}。',
     teamCrimson: '赤红队',
     teamAzure: '蔚蓝队',
     errInBattleground: '你已经在战场中了。',
+    errNotInBattleground: '你不在战场中。',
     errQueueDead: '死亡状态下无法排队进入荆谷原野。',
     errQueueInMatch: '比赛进行中无法排队进入荆谷原野。',
     errMemberQueued: '有队友已在队列或比赛中。',
@@ -8809,7 +9049,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyTooLarge: '你的队伍人数超出荆谷原野上限。最多5人小队可排队。',
     errPartyLeaderOnly: '只有队长才能让小队排入荆谷原野队列。',
     errDelveDuringBg: '战场进行中无法进入探秘。',
-    errTalentsDuringBg: '战场进行中无法更改天赋。',
     errLevelTooLow: '荆谷原野需要等级{level}。',
     errMemberLevelTooLow: '所有小队成员必须达到等级{level}才能加入荆谷原野队列。',
     seizeBattleRune: '你夺得了战斗符文!',
@@ -8818,15 +9057,29 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: '战场中无法骑乘坐骑。',
   },
   zh_TW: {
+    errMemberRequeueLocked: '有隊伍成員需要等待後才能再次排隊進入荊谷原野。',
+    offerReady: '荊谷原野已準備就緒。接受邀請即可加入戰鬥。',
+    offerBackfill:
+      '一場正在進行的荊谷原野戰鬥需要一名戰士。接受即可加入；本場對戰不會改變你的評分。',
+    offerBackfillGone: '那場戰鬥不再需要戰士了。你保留在荊谷原野隊列中的位置。',
+    offerBackfillDeclined: '你拒絕了這場已經開始的戰鬥，並保留在荊谷原野隊列中的位置。',
+    offerKeptPlace: '戰鬥未能成行。你保留了荊谷原野佇列中的位置。',
+    groupLeaveQueue: '你的隊伍離開了荊谷原野佇列。',
+    errNoOffer: '你沒有可以回應的荊谷原野邀請。',
+    errOfferWaiting: '你有一個荊谷原野邀請待回應。請先回應它。',
+    errRequeueLocked: '你必須等待 {seconds} 秒才能再次排隊進入荊谷原野。',
     joinQueue: '你加入了荊谷原野佇列。需要{count}名勇士才能開始比賽。',
     partyJoinQueue: '你的{count}人隊伍加入了荊谷原野佇列。',
     leaveQueue: '你離開了荊谷原野佇列。',
     battleBegins: '荊谷原野之戰開始了:奪取他們的旗幟!',
     fightFor: '荊谷原野:你為{team}而戰。先奪得{caps}次旗幟者獲勝。',
     seizeRune: '你奪得了疾行符文!',
+    backfillJoin: '荊谷原野:你加入了{team}正在進行的戰鬥。本場比賽不會改變你的評分。',
+    backfillArrived: '一名新的戰士加入了{team}。',
     teamCrimson: '赤紅隊',
     teamAzure: '蔚藍隊',
     errInBattleground: '你已經在戰場中了。',
+    errNotInBattleground: '你不在戰場中。',
     errQueueDead: '死亡狀態下無法排隊進入荊谷原野。',
     errQueueInMatch: '比賽進行中無法排隊進入荊谷原野。',
     errMemberQueued: '有隊友已在佇列或比賽中。',
@@ -8834,7 +9087,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyTooLarge: '你的隊伍人數超出荊谷原野上限。最多5人隊伍可排隊。',
     errPartyLeaderOnly: '只有隊長才能讓隊伍排入荊谷原野佇列。',
     errDelveDuringBg: '戰場進行中無法進入探祕。',
-    errTalentsDuringBg: '戰場進行中無法更改天賦。',
     errLevelTooLow: '荊谷原野需要等級{level}。',
     errMemberLevelTooLow: '所有隊伍成員必須達到等級{level}才能加入荊谷原野佇列。',
     seizeBattleRune: '你奪得了戰鬥符文!',
@@ -8843,6 +9095,20 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: '戰場中無法騎乘坐騎。',
   },
   ja_JP: {
+    errMemberRequeueLocked:
+      'パーティーメンバーがソーンホロウ平原に再び参加できるようになるまで待つ必要があります。',
+    offerReady: 'ソーンホロウ平原の準備が整いました。参加するには承諾してください。',
+    offerBackfill:
+      '進行中のソーンホロウ平原の戦いに戦士が必要です。承諾すると参加できます。この試合はレーティングに影響しません。',
+    offerBackfillGone:
+      'その戦いはもう戦士を必要としていません。ソーンホロウ平原の待機列での順番は保持されます。',
+    offerBackfillDeclined:
+      '進行中の戦いを辞退しました。ソーンホロウ平原の待機列での順番は保持されます。',
+    offerKeptPlace: '戦闘は成立しませんでした。ソーンホロウ平原のキューでの順番は保持されます。',
+    groupLeaveQueue: 'あなたのパーティーはソーンホロウ平原のキューから離脱しました。',
+    errNoOffer: '応答できるソーンホロウ平原の招待がありません。',
+    errOfferWaiting: 'ソーンホロウ平原の招待が届いています。先に応答してください。',
+    errRequeueLocked: '再びソーンホロウ平原のキューに参加するには{seconds}秒待つ必要があります。',
     joinQueue: 'ソーンホロウ平原のキューに参加しました。試合開始には{count}人の勇者が必要です。',
     partyJoinQueue: '{count}人のパーティがソーンホロウ平原のキューに参加しました。',
     leaveQueue: 'ソーンホロウ平原のキューから離脱しました。',
@@ -8850,9 +9116,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     fightFor:
       'ソーンホロウ平原:あなたは{team}として戦います。先に{caps}回旗を奪取したチームの勝利です。',
     seizeRune: 'スプリントルーンを手に入れた!',
+    backfillJoin:
+      'ソーンホロウ平原:進行中の戦いに{team}として参加します。この試合でレーティングは変動しません。',
+    backfillArrived: '新たな戦士が{team}に加わりました。',
     teamCrimson: 'クリムゾン',
     teamAzure: 'アズール',
     errInBattleground: 'すでに戦場にいます。',
+    errNotInBattleground: '戦場にいません。',
     errQueueDead: '死亡中はソーンホロウ平原のキューに参加できません。',
     errQueueInMatch: '別の試合中はソーンホロウ平原のキューに参加できません。',
     errMemberQueued: 'パーティメンバーがすでにキューまたは試合に参加しています。',
@@ -8862,7 +9132,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'ソーンホロウ平原のキューにパーティを登録できるのはパーティリーダーだけです。',
     errDelveDuringBg: '戦場の最中はディレルヴに入れません。',
-    errTalentsDuringBg: '戦場の最中はタレントを変更できません。',
     errLevelTooLow: 'ソーンホロウ平原にはレベル{level}が必要です。',
     errMemberLevelTooLow:
       'ソーンホロウ平原のキューに参加するには、パーティ全員がレベル{level}である必要があります。',
@@ -8872,6 +9141,19 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeWardRune: 'ウォードルーンを手に入れた!',
   },
   ko_KR: {
+    errMemberRequeueLocked: '파티원이 쏜할로우 평원 대기열에 다시 참가하려면 기다려야 합니다.',
+    offerReady: '쏜할로우 평원이 준비되었습니다. 수락하여 전투에 참여하세요.',
+    offerBackfill:
+      '이미 진행 중인 쏜할로우 평원 전투에 전사가 필요합니다. 수락하면 참여합니다. 이 전투는 평점에 영향을 주지 않습니다.',
+    offerBackfillGone:
+      '그 전투는 더 이상 전사가 필요하지 않습니다. 쏜할로우 평원 대기열에서의 순서는 유지됩니다.',
+    offerBackfillDeclined:
+      '이미 진행 중인 전투를 거절했습니다. 쏜할로우 평원 대기열에서의 순서는 유지됩니다.',
+    offerKeptPlace: '전투가 성사되지 않았습니다. 쏜할로우 평원 대기열의 순번은 유지됩니다.',
+    groupLeaveQueue: '당신의 파티가 쏜할로우 평원 대기열에서 나왔습니다.',
+    errNoOffer: '응답할 쏜할로우 평원 초대가 없습니다.',
+    errOfferWaiting: '쏜할로우 평원 초대가 대기 중입니다. 먼저 응답하세요.',
+    errRequeueLocked: '쏜할로우 평원 대기열에 다시 참가하려면 {seconds}초를 기다려야 합니다.',
     joinQueue:
       '쏜할로우 평원 대기열에 참가했습니다. 경기를 시작하려면 {count}명의 용사가 필요합니다.',
     partyJoinQueue: '{count}명의 파티가 쏜할로우 평원 대기열에 참가했습니다.',
@@ -8880,9 +9162,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     fightFor:
       '쏜할로우 평원: 당신은 {team} 소속으로 싸웁니다. 먼저 {caps}회 깃발을 탈취한 팀이 승리합니다.',
     seizeRune: '질주 룬을 차지했습니다!',
+    backfillJoin:
+      '쏜할로우 평원: 진행 중인 전투에 {team}으로 참가합니다. 이 경기는 평점에 반영되지 않습니다.',
+    backfillArrived: '새로운 전사가 {team}에 합류했습니다.',
     teamCrimson: '진홍팀',
     teamAzure: '청람팀',
     errInBattleground: '이미 전장에 있습니다.',
+    errNotInBattleground: '전장에 있지 않습니다.',
     errQueueDead: '죽은 상태로는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
     errQueueInMatch: '다른 경기 중에는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
     errMemberQueued: '파티원이 이미 대기열이나 경기에 참가 중입니다.',
@@ -8891,7 +9177,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       '파티 인원이 쏜할로우 평원 제한을 초과합니다. 최대 5인 파티만 참가할 수 있습니다.',
     errPartyLeaderOnly: '쏜할로우 평원 대기열에는 파티장만 파티를 등록할 수 있습니다.',
     errDelveDuringBg: '전장 중에는 탐사에 들어갈 수 없습니다.',
-    errTalentsDuringBg: '전장 중에는 특성을 변경할 수 없습니다.',
     errLevelTooLow: '쏜할로우 평원은 레벨 {level}부터 참가할 수 있습니다.',
     errMemberLevelTooLow:
       '쏜할로우 평원 대기열에 참가하려면 모든 파티원이 레벨 {level} 이상이어야 합니다.',
@@ -8901,6 +9186,21 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeWardRune: '수호 룬을 차지했습니다!',
   },
   ru_RU: {
+    errMemberRequeueLocked:
+      'Участнику группы нужно подождать, прежде чем снова встать в очередь Терновой Лощины.',
+    offerReady: 'Терновая Лощина готова. Примите приглашение, чтобы вступить в бой.',
+    offerBackfill:
+      'Уже идущему бою в Терновой Лощине нужен боец. Примите, чтобы вступить; этот бой не изменит ваш рейтинг.',
+    offerBackfillGone:
+      'Тому бою больше не нужен боец. Ваше место в очереди Терновой Лощины сохранено.',
+    offerBackfillDeclined:
+      'Вы отказались от уже идущего боя и сохранили место в очереди Терновой Лощины.',
+    offerKeptPlace: 'Бой не состоялся. Ваше место в очереди Терновой Лощины сохранено.',
+    groupLeaveQueue: 'Ваша группа покинула очередь Терновой Лощины.',
+    errNoOffer: 'У вас нет приглашения в Терновую Лощину, на которое можно ответить.',
+    errOfferWaiting: 'Вас ждёт приглашение в Терновую Лощину. Сначала ответьте на него.',
+    errRequeueLocked:
+      'Нужно подождать {seconds} сек., прежде чем снова встать в очередь Терновой Лощины.',
     joinQueue: 'Вы встали в очередь Терновой Лощины. Для начала матча нужно {count} бойцов.',
     partyJoinQueue: 'Ваша группа из {count} бойцов встала в очередь Терновой Лощины.',
     leaveQueue: 'Вы покинули очередь Терновой Лощины.',
@@ -8908,9 +9208,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     fightFor:
       'Терновая Лощина: вы сражаетесь за {team}. Побеждает команда, первой захватившая флаг {caps} раз.',
     seizeRune: 'Вы подобрали руну спринта!',
+    backfillJoin:
+      'Терновая Лощина: вы вступаете в уже идущий бой за {team}. Этот матч не изменит ваш рейтинг.',
+    backfillArrived: 'Новый боец присоединяется к отряду {team}.',
     teamCrimson: 'Багровых',
     teamAzure: 'Лазурных',
     errInBattleground: 'Вы уже находитесь на поле боя.',
+    errNotInBattleground: 'Вы не находитесь на поле боя.',
     errQueueDead: 'Нельзя встать в очередь Терновой Лощины, будучи мертвым.',
     errQueueInMatch: 'Нельзя встать в очередь Терновой Лощины во время другого матча.',
     errMemberQueued: 'Кто-то из группы уже в очереди или в матче.',
@@ -8919,7 +9223,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Ваша группа слишком велика для Терновой Лощины. В очередь встают группы до 5 бойцов.',
     errPartyLeaderOnly: 'Записать группу в очередь Терновой Лощины может только лидер группы.',
     errDelveDuringBg: 'Нельзя войти в вылазку во время боя на поле боя.',
-    errTalentsDuringBg: 'Нельзя менять таланты во время боя на поле боя.',
     errLevelTooLow: 'Для Терновой Лощины требуется уровень {level}.',
     errMemberLevelTooLow:
       'Чтобы встать в очередь Терновой Лощины, каждый в группе должен иметь уровень {level}.',
@@ -8929,6 +9232,21 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeWardRune: 'Вы подобрали руну защиты!',
   },
   en_CA: {
+    errMemberRequeueLocked:
+      'A party member must wait before queueing for Thornhollow Fields again.',
+    offerReady: 'Thornhollow Fields is ready. Accept to join the battle.',
+    offerBackfill:
+      'A Thornhollow Fields battle already under way needs a fighter. Accept to join; this match will not change your rating.',
+    offerBackfillGone:
+      'That battle no longer needs a fighter. You keep your place in the Thornhollow Fields queue.',
+    offerBackfillDeclined:
+      'You decline the battle already under way, and keep your place in the Thornhollow Fields queue.',
+    offerKeptPlace: 'The battle did not fill. You keep your place in the Thornhollow Fields queue.',
+    groupLeaveQueue: 'Your group leaves the Thornhollow Fields queue.',
+    errNoOffer: 'You have no Thornhollow Fields invitation to answer.',
+    errOfferWaiting: 'You have a Thornhollow Fields invitation waiting. Answer it first.',
+    errRequeueLocked:
+      'You must wait {seconds} seconds before queueing for Thornhollow Fields again.',
     joinQueue: 'You join the Thornhollow Fields queue. Need {count} champions to start a match.',
     partyJoinQueue: 'Your party of {count} joins the Thornhollow Fields queue.',
     leaveQueue: 'You leave the Thornhollow Fields queue.',
@@ -8937,9 +9255,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'You seize a Sprint Rune!',
     seizeBattleRune: 'You seize a Battle Rune!',
     seizeWardRune: 'You seize a Ward Rune!',
+    backfillJoin:
+      'Thornhollow Fields: you join a battle already under way for the {team}. This match will not change your rating.',
+    backfillArrived: 'A fresh fighter joins the {team}.',
     teamCrimson: 'Crimson',
     teamAzure: 'Azure',
     errInBattleground: 'You are already in a battleground.',
+    errNotInBattleground: 'You are not in a battleground.',
     errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
     errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
     errMemberQueued: 'A party member is already queued or in a match.',
@@ -8948,7 +9270,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Your party is too large for Thornhollow Fields. It queues parties of up to 5.',
     errPartyLeaderOnly: 'Only the party leader may queue your team for Thornhollow Fields.',
     errDelveDuringBg: 'You cannot enter a delve during a battleground.',
-    errTalentsDuringBg: 'You cannot change talents during a battleground.',
     errLevelTooLow: 'Thornhollow Fields requires level {level}.',
     errMemberLevelTooLow:
       'Every party member must be level {level} to queue for Thornhollow Fields.',
@@ -8956,6 +9277,23 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: "You can't ride in a battleground.",
   },
   es: {
+    errMemberRequeueLocked:
+      'Un miembro del grupo debe esperar antes de volver a entrar en la cola de los Campos de Thornhollow.',
+    offerReady: 'Los Campos de Thornhollow están listos. Acepta para unirte a la batalla.',
+    offerBackfill:
+      'Una batalla en curso en los Campos de Thornhollow necesita un luchador. Acepta para unirte; este combate no cambiará tu clasificación.',
+    offerBackfillGone:
+      'Esa batalla ya no necesita un luchador. Conservas tu lugar en la cola de los Campos de Thornhollow.',
+    offerBackfillDeclined:
+      'Rechazas la batalla ya en curso y conservas tu lugar en la cola de los Campos de Thornhollow.',
+    offerKeptPlace:
+      'La batalla no se completó. Conservas tu lugar en la cola de los Campos de Thornhollow.',
+    groupLeaveQueue: 'Tu grupo sale de la cola de los Campos de Thornhollow.',
+    errNoOffer: 'No tienes ninguna invitación a los Campos de Thornhollow que responder.',
+    errOfferWaiting:
+      'Tienes una invitación a los Campos de Thornhollow pendiente. Respóndela primero.',
+    errRequeueLocked:
+      'Debes esperar {seconds} segundos antes de volver a entrar en la cola de los Campos de Thornhollow.',
     joinQueue:
       'Te unes a la cola de los Campos de Thornhollow. Se necesitan {count} campeones para iniciar el combate.',
     partyJoinQueue: 'Tu grupo de {count} se une a la cola de los Campos de Thornhollow.',
@@ -8966,9 +9304,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: '¡Te apoderas de una Runa de Velocidad!',
     seizeBattleRune: '¡Te apoderas de una Runa de Batalla!',
     seizeWardRune: '¡Te apoderas de una Runa de Protección!',
+    backfillJoin:
+      'Te unes a una batalla ya en curso con {team} en los Campos de Thornhollow. Este combate no cambiará tu clasificación.',
+    backfillArrived: 'Un nuevo combatiente entra en combate con {team}.',
     teamCrimson: 'Carmesí',
     teamAzure: 'Azur',
     errInBattleground: 'Ya estás en un campo de batalla.',
+    errNotInBattleground: 'No estás en un campo de batalla.',
     errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
     errQueueInMatch:
       'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
@@ -8979,7 +9321,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Solo el líder del grupo puede meter al grupo en la cola de los Campos de Thornhollow.',
     errDelveDuringBg: 'No puedes entrar en una expedición durante un campo de batalla.',
-    errTalentsDuringBg: 'No puedes cambiar de talentos durante un campo de batalla.',
     errLevelTooLow: 'Los Campos de Thornhollow requieren el nivel {level}.',
     errMemberLevelTooLow:
       'Todos los miembros del grupo deben ser de nivel {level} para entrar en la cola de los Campos de Thornhollow.',
@@ -8987,6 +9328,23 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'No puedes montar en un campo de batalla.',
   },
   es_ES: {
+    errMemberRequeueLocked:
+      'Un miembro del grupo debe esperar antes de volver a entrar en la cola de los Campos de Thornhollow.',
+    offerReady: 'Los Campos de Thornhollow están listos. Acepta para unirte a la batalla.',
+    offerBackfill:
+      'Una batalla en curso en los Campos de Thornhollow necesita un luchador. Acepta para unirte; este combate no cambiará tu clasificación.',
+    offerBackfillGone:
+      'Esa batalla ya no necesita un luchador. Conservas tu lugar en la cola de los Campos de Thornhollow.',
+    offerBackfillDeclined:
+      'Rechazas la batalla ya en curso y conservas tu lugar en la cola de los Campos de Thornhollow.',
+    offerKeptPlace:
+      'La batalla no se completó. Conservas tu lugar en la cola de los Campos de Thornhollow.',
+    groupLeaveQueue: 'Tu grupo sale de la cola de los Campos de Thornhollow.',
+    errNoOffer: 'No tienes ninguna invitación a los Campos de Thornhollow que responder.',
+    errOfferWaiting:
+      'Tienes una invitación a los Campos de Thornhollow pendiente. Respóndela primero.',
+    errRequeueLocked:
+      'Debes esperar {seconds} segundos antes de volver a entrar en la cola de los Campos de Thornhollow.',
     joinQueue:
       'Te unes a la cola de los Campos de Thornhollow. Se necesitan {count} campeones para iniciar el combate.',
     partyJoinQueue: 'Tu grupo de {count} se une a la cola de los Campos de Thornhollow.',
@@ -8997,9 +9355,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: '¡Te apoderas de una Runa de Velocidad!',
     seizeBattleRune: '¡Te apoderas de una Runa de Batalla!',
     seizeWardRune: '¡Te apoderas de una Runa de Protección!',
+    backfillJoin:
+      'Te unes a una batalla ya en curso con {team} en los Campos de Thornhollow. Este combate no cambiará tu clasificación.',
+    backfillArrived: 'Un nuevo combatiente entra en combate con {team}.',
     teamCrimson: 'Carmesí',
     teamAzure: 'Azur',
     errInBattleground: 'Ya estás en un campo de batalla.',
+    errNotInBattleground: 'No estás en un campo de batalla.',
     errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
     errQueueInMatch:
       'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
@@ -9010,7 +9372,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Solo el líder del grupo puede meter al grupo en la cola de los Campos de Thornhollow.',
     errDelveDuringBg: 'No puedes entrar en una expedición durante un campo de batalla.',
-    errTalentsDuringBg: 'No puedes cambiar de talentos durante un campo de batalla.',
     errLevelTooLow: 'Los Campos de Thornhollow requieren el nivel {level}.',
     errMemberLevelTooLow:
       'Todos los miembros del grupo deben ser de nivel {level} para entrar en la cola de los Campos de Thornhollow.',
@@ -9018,6 +9379,22 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'No puedes montar en un campo de batalla.',
   },
   fr_FR: {
+    errMemberRequeueLocked:
+      'Un membre du groupe doit attendre avant de rejoindre à nouveau la file des Champs de Thornhollow.',
+    offerReady: 'Les Champs de Thornhollow sont prêts. Acceptez pour rejoindre la bataille.',
+    offerBackfill:
+      'Une bataille en cours aux Champs de Thornhollow a besoin d’un combattant. Acceptez pour la rejoindre ; ce match ne modifiera pas votre cote.',
+    offerBackfillGone:
+      'Cette bataille n’a plus besoin de combattant. Vous gardez votre place dans la file des Champs de Thornhollow.',
+    offerBackfillDeclined:
+      'Vous refusez la bataille déjà en cours et gardez votre place dans la file des Champs de Thornhollow.',
+    offerKeptPlace:
+      'La bataille ne s’est pas formée. Vous conservez votre place dans la file des Champs de Thornhollow.',
+    groupLeaveQueue: 'Votre groupe quitte la file des Champs de Thornhollow.',
+    errNoOffer: 'Vous n’avez aucune invitation aux Champs de Thornhollow à laquelle répondre.',
+    errOfferWaiting: 'Une invitation aux Champs de Thornhollow vous attend. Répondez-y d’abord.',
+    errRequeueLocked:
+      'Vous devez attendre {seconds} secondes avant de rejoindre à nouveau la file des Champs de Thornhollow.',
     joinQueue:
       'Vous rejoignez la file des Champs de Thornhollow. Il faut {count} champions pour lancer un combat.',
     partyJoinQueue: 'Votre groupe de {count} rejoint la file des Champs de Thornhollow.',
@@ -9028,9 +9405,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Vous vous emparez d’une Rune de course !',
     seizeBattleRune: 'Vous vous emparez d’une Rune de bataille !',
     seizeWardRune: 'Vous vous emparez d’une Rune de protection !',
+    backfillJoin:
+      'Vous rejoignez une bataille déjà engagée avec {team} dans les Champs de Thornhollow. Ce match ne modifiera pas votre classement.',
+    backfillArrived: 'Un nouveau combattant rejoint {team}.',
     teamCrimson: 'les Cramoisis',
     teamAzure: 'les Azurs',
     errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errNotInBattleground: "Vous n'êtes pas sur un champ de bataille.",
     errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
     errQueueInMatch:
       'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
@@ -9041,7 +9422,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Seul le chef de groupe peut inscrire le groupe dans la file des Champs de Thornhollow.',
     errDelveDuringBg: 'Vous ne pouvez pas entrer dans une plongée pendant un champ de bataille.',
-    errTalentsDuringBg: 'Vous ne pouvez pas changer de talents pendant un champ de bataille.',
     errLevelTooLow: 'Les Champs de Thornhollow requièrent le niveau {level}.',
     errMemberLevelTooLow:
       'Chaque membre du groupe doit être de niveau {level} pour rejoindre la file des Champs de Thornhollow.',
@@ -9049,6 +9429,22 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Vous ne pouvez pas monter en selle sur un champ de bataille.',
   },
   fr_CA: {
+    errMemberRequeueLocked:
+      'Un membre du groupe doit attendre avant de rejoindre à nouveau la file des Champs de Thornhollow.',
+    offerReady: 'Les Champs de Thornhollow sont prêts. Acceptez pour rejoindre la bataille.',
+    offerBackfill:
+      'Une bataille en cours aux Champs de Thornhollow a besoin d’un combattant. Acceptez pour la rejoindre ; ce match ne modifiera pas votre cote.',
+    offerBackfillGone:
+      'Cette bataille n’a plus besoin de combattant. Vous gardez votre place dans la file des Champs de Thornhollow.',
+    offerBackfillDeclined:
+      'Vous refusez la bataille déjà en cours et gardez votre place dans la file des Champs de Thornhollow.',
+    offerKeptPlace:
+      'La bataille ne s’est pas formée. Vous conservez votre place dans la file des Champs de Thornhollow.',
+    groupLeaveQueue: 'Votre groupe quitte la file des Champs de Thornhollow.',
+    errNoOffer: 'Vous n’avez aucune invitation aux Champs de Thornhollow à laquelle répondre.',
+    errOfferWaiting: 'Une invitation aux Champs de Thornhollow vous attend. Répondez-y d’abord.',
+    errRequeueLocked:
+      'Vous devez attendre {seconds} secondes avant de rejoindre à nouveau la file des Champs de Thornhollow.',
     joinQueue:
       'Vous rejoignez la file des Champs de Thornhollow. Il faut {count} champions pour lancer un combat.',
     partyJoinQueue: 'Votre groupe de {count} rejoint la file des Champs de Thornhollow.',
@@ -9059,9 +9455,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Vous vous emparez d’une Rune de course !',
     seizeBattleRune: 'Vous vous emparez d’une Rune de bataille !',
     seizeWardRune: 'Vous vous emparez d’une Rune de protection !',
+    backfillJoin:
+      'Vous rejoignez une bataille déjà engagée avec {team} dans les Champs de Thornhollow. Ce match ne modifiera pas votre classement.',
+    backfillArrived: 'Un nouveau combattant rejoint {team}.',
     teamCrimson: 'les Cramoisis',
     teamAzure: 'les Azurs',
     errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errNotInBattleground: "Vous n'êtes pas sur un champ de bataille.",
     errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
     errQueueInMatch:
       'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
@@ -9072,7 +9472,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Seul le chef de groupe peut inscrire le groupe dans la file des Champs de Thornhollow.',
     errDelveDuringBg: 'Vous ne pouvez pas entrer dans une plongée pendant un champ de bataille.',
-    errTalentsDuringBg: 'Vous ne pouvez pas changer de talents pendant un champ de bataille.',
     errLevelTooLow: 'Les Champs de Thornhollow requièrent le niveau {level}.',
     errMemberLevelTooLow:
       'Chaque membre du groupe doit être de niveau {level} pour rejoindre la file des Champs de Thornhollow.',
@@ -9080,6 +9479,22 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Vous ne pouvez pas monter en selle sur un champ de bataille.',
   },
   it_IT: {
+    errMemberRequeueLocked:
+      'Un membro del gruppo deve attendere prima di rientrare in coda per i Campi di Thornhollow.',
+    offerReady: 'I Campi di Thornhollow sono pronti. Accetta per unirti alla battaglia.',
+    offerBackfill:
+      'Una battaglia già in corso nei Campi di Thornhollow ha bisogno di un combattente. Accetta per unirti; questo scontro non cambierà il tuo punteggio.',
+    offerBackfillGone:
+      'Quella battaglia non ha più bisogno di un combattente. Mantieni il tuo posto nella coda dei Campi di Thornhollow.',
+    offerBackfillDeclined:
+      'Rifiuti la battaglia già in corso e mantieni il tuo posto nella coda dei Campi di Thornhollow.',
+    offerKeptPlace:
+      'La battaglia non si è formata. Mantieni il tuo posto nella coda dei Campi di Thornhollow.',
+    groupLeaveQueue: 'Il tuo gruppo esce dalla coda dei Campi di Thornhollow.',
+    errNoOffer: 'Non hai alcun invito ai Campi di Thornhollow a cui rispondere.',
+    errOfferWaiting: 'Hai un invito ai Campi di Thornhollow in attesa. Rispondi prima a quello.',
+    errRequeueLocked:
+      'Devi attendere {seconds} secondi prima di rientrare in coda per i Campi di Thornhollow.',
     joinQueue:
       'Ti unisci alla coda dei Campi di Thornhollow. Servono {count} campioni per iniziare una partita.',
     partyJoinQueue: 'Il tuo gruppo di {count} si unisce alla coda dei Campi di Thornhollow.',
@@ -9090,9 +9505,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Ti impossessi di una Runa di Scatto!',
     seizeBattleRune: 'Ti impossessi di una Runa di Battaglia!',
     seizeWardRune: 'Ti impossessi di una Runa di Protezione!',
+    backfillJoin:
+      'Ti unisci a una battaglia già in corso con {team} nei Campi di Thornhollow. Questa partita non modificherà il tuo punteggio.',
+    backfillArrived: 'Un nuovo combattente entra in campo con {team}.',
     teamCrimson: 'i Cremisi',
     teamAzure: 'gli Azzurri',
     errInBattleground: 'Sei già in un campo di battaglia.',
+    errNotInBattleground: 'Non sei in un campo di battaglia.',
     errQueueDead: 'Non puoi entrare in coda per i Campi di Thornhollow da morto.',
     errQueueInMatch:
       'Non puoi entrare in coda per i Campi di Thornhollow mentre sei in un’altra partita.',
@@ -9103,7 +9522,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Solo il capogruppo può mettere il gruppo in coda per i Campi di Thornhollow.',
     errDelveDuringBg: 'Non puoi entrare in un’incursione durante un campo di battaglia.',
-    errTalentsDuringBg: 'Non puoi cambiare talenti durante un campo di battaglia.',
     errLevelTooLow: 'I Campi di Thornhollow richiedono il livello {level}.',
     errMemberLevelTooLow:
       'Ogni membro del gruppo deve essere di livello {level} per entrare in coda per i Campi di Thornhollow.',
@@ -9111,6 +9529,23 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Non puoi cavalcare in un campo di battaglia.',
   },
   de_DE: {
+    errMemberRequeueLocked:
+      'Ein Gruppenmitglied muss warten, bevor es sich erneut für die Thornhollow-Felder anmelden kann.',
+    offerReady: 'Die Thornhollow-Felder sind bereit. Nimm an, um dich der Schlacht anzuschließen.',
+    offerBackfill:
+      'Eine laufende Schlacht auf den Thornhollow-Feldern braucht einen Kämpfer. Nimm an, um beizutreten; dieses Spiel ändert deine Wertung nicht.',
+    offerBackfillGone:
+      'Diese Schlacht braucht keinen Kämpfer mehr. Du behältst deinen Platz in der Warteschlange der Thornhollow-Felder.',
+    offerBackfillDeclined:
+      'Du lehnst die laufende Schlacht ab und behältst deinen Platz in der Warteschlange der Thornhollow-Felder.',
+    offerKeptPlace:
+      'Die Schlacht kam nicht zustande. Du behältst deinen Platz in der Warteschlange der Thornhollow-Felder.',
+    groupLeaveQueue: 'Deine Gruppe verlässt die Warteschlange der Thornhollow-Felder.',
+    errNoOffer: 'Du hast keine Einladung zu den Thornhollow-Feldern, die du beantworten könntest.',
+    errOfferWaiting:
+      'Eine Einladung zu den Thornhollow-Feldern wartet auf dich. Beantworte sie zuerst.',
+    errRequeueLocked:
+      'Du musst {seconds} Sekunden warten, bevor du dich erneut für die Thornhollow-Felder anmelden kannst.',
     joinQueue:
       'Du reihst dich in die Warteschlange der Thornhollow-Felder ein. Für ein Match werden {count} Recken benötigt.',
     partyJoinQueue:
@@ -9122,9 +9557,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Du schnappst dir eine Sprintrune!',
     seizeBattleRune: 'Du schnappst dir eine Kampfrune!',
     seizeWardRune: 'Du schnappst dir eine Schutzrune!',
+    backfillJoin:
+      'Du steigst auf den Thornhollow-Feldern in eine bereits laufende Schlacht ein und kämpfst für {team}. Dieses Match ändert deine Wertung nicht.',
+    backfillArrived: 'Ein neuer Kämpfer kämpft nun für {team}.',
     teamCrimson: 'die Karmesinroten',
     teamAzure: 'die Azurblauen',
     errInBattleground: 'Du bist bereits auf einem Schlachtfeld.',
+    errNotInBattleground: 'Du bist auf keinem Schlachtfeld.',
     errQueueDead: 'Du kannst dich nicht für die Thornhollow-Felder anmelden, solange du tot bist.',
     errQueueInMatch:
       'Du kannst dich nicht für die Thornhollow-Felder anmelden, während du in einem anderen Match bist.',
@@ -9135,7 +9574,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Nur der Gruppenleiter darf die Gruppe für die Thornhollow-Felder anmelden.',
     errDelveDuringBg: 'Du kannst während eines Schlachtfelds keinen Tiefgang betreten.',
-    errTalentsDuringBg: 'Du kannst während eines Schlachtfelds keine Talente ändern.',
     errLevelTooLow: 'Die Thornhollow-Felder erfordern Stufe {level}.',
     errMemberLevelTooLow:
       'Jedes Gruppenmitglied muss Stufe {level} sein, um sich für die Thornhollow-Felder anzumelden.',
@@ -9143,6 +9581,23 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Auf einem Schlachtfeld kannst du nicht reiten.',
   },
   pt_BR: {
+    errMemberRequeueLocked:
+      'Um membro do grupo precisa esperar antes de entrar na fila dos Campos de Thornhollow de novo.',
+    offerReady: 'Os Campos de Thornhollow estão prontos. Aceite para entrar na batalha.',
+    offerBackfill:
+      'Uma batalha em andamento nos Campos de Thornhollow precisa de um lutador. Aceite para entrar; esta partida não mudará sua classificação.',
+    offerBackfillGone:
+      'Aquela batalha não precisa mais de um lutador. Você mantém seu lugar na fila dos Campos de Thornhollow.',
+    offerBackfillDeclined:
+      'Você recusa a batalha em andamento e mantém seu lugar na fila dos Campos de Thornhollow.',
+    offerKeptPlace:
+      'A batalha não se formou. Você mantém seu lugar na fila dos Campos de Thornhollow.',
+    groupLeaveQueue: 'Seu grupo sai da fila dos Campos de Thornhollow.',
+    errNoOffer: 'Você não tem nenhum convite para os Campos de Thornhollow para responder.',
+    errOfferWaiting:
+      'Há um convite para os Campos de Thornhollow aguardando. Responda a ele primeiro.',
+    errRequeueLocked:
+      'Você precisa esperar {seconds} segundos antes de entrar na fila dos Campos de Thornhollow de novo.',
     joinQueue:
       'Você entra na fila dos Campos de Thornhollow. São necessários {count} campeões para iniciar a partida.',
     partyJoinQueue: 'Seu grupo de {count} entra na fila dos Campos de Thornhollow.',
@@ -9153,9 +9608,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Você toma uma Runa de Corrida!',
     seizeBattleRune: 'Você toma uma Runa de Batalha!',
     seizeWardRune: 'Você toma uma Runa de Proteção!',
+    backfillJoin:
+      'Você entra em uma batalha em andamento pelos {team} nos Campos de Thornhollow. Esta partida não alterará sua classificação.',
+    backfillArrived: 'Um novo combatente entra em campo pelos {team}.',
     teamCrimson: 'Carmesins',
     teamAzure: 'Azuis',
     errInBattleground: 'Você já está em um campo de batalha.',
+    errNotInBattleground: 'Você não está em um campo de batalha.',
     errQueueDead: 'Você não pode entrar na fila dos Campos de Thornhollow enquanto estiver morto.',
     errQueueInMatch:
       'Você não pode entrar na fila dos Campos de Thornhollow durante outra partida.',
@@ -9166,7 +9625,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Apenas o líder do grupo pode inscrever o grupo na fila dos Campos de Thornhollow.',
     errDelveDuringBg: 'Você não pode entrar em uma incursão durante um campo de batalha.',
-    errTalentsDuringBg: 'Você não pode mudar talentos durante um campo de batalha.',
     errLevelTooLow: 'Os Campos de Thornhollow exigem nível {level}.',
     errMemberLevelTooLow:
       'Todos os membros do grupo precisam ser nível {level} para entrar na fila dos Campos de Thornhollow.',
@@ -9174,6 +9632,22 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Você não pode montar em um campo de batalha.',
   },
   cs_CZ: {
+    errMemberRequeueLocked:
+      'Člen skupiny musí počkat, než se znovu zařadí do fronty na Thornhollowská pole.',
+    offerReady: 'Thornhollowská pole jsou připravena. Přijmi pozvání a zapoj se do bitvy.',
+    offerBackfill:
+      'Probíhající bitva na Trnitých polích potřebuje bojovníka. Přijmi a připoj se; tento zápas nezmění tvé hodnocení.',
+    offerBackfillGone:
+      'Ta bitva už bojovníka nepotřebuje. Své místo ve frontě na Trnitá pole si ponecháváš.',
+    offerBackfillDeclined:
+      'Odmítáš probíhající bitvu a ponecháváš si své místo ve frontě na Trnitá pole.',
+    offerKeptPlace:
+      'Bitva se nenaplnila. Své místo ve frontě na Thornhollowská pole si ponecháváš.',
+    groupLeaveQueue: 'Tvoje skupina opouští frontu na Thornhollowská pole.',
+    errNoOffer: 'Nemáš žádné pozvání na Thornhollowská pole, na které bys mohl(a) odpovědět.',
+    errOfferWaiting: 'Čeká na tebe pozvání na Thornhollowská pole. Nejprve na něj odpověz.',
+    errRequeueLocked:
+      'Než se znovu zařadíš do fronty na Thornhollowská pole, musíš počkat {seconds} s.',
     joinQueue:
       'Zařadil(a) ses do fronty na Thornhollowská pole. K zahájení zápasu je potřeba {count} šampionů.',
     partyJoinQueue: 'Tvá skupina o {count} hráčích se zařadila do fronty na Thornhollowská pole.',
@@ -9184,9 +9658,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Zmocnil(a) ses Runy sprintu!',
     seizeBattleRune: 'Zmocnil(a) ses Runy boje!',
     seizeWardRune: 'Zmocnil(a) ses Runy ochrany!',
+    backfillJoin:
+      'Připojuješ se k již probíhající bitvě za {team} na Thornhollowských polích. Tento zápas neovlivní tvůj rating.',
+    backfillArrived: 'Do boje za {team} se zapojuje nový bojovník.',
     teamCrimson: 'Rudé',
     teamAzure: 'Azurové',
     errInBattleground: 'Už jsi na bojišti.',
+    errNotInBattleground: 'Nejsi na bojišti.',
     errQueueDead: 'Do fronty na Thornhollowská pole se nemůžeš zařadit mrtvý.',
     errQueueInMatch: 'Do fronty na Thornhollowská pole se nemůžeš zařadit během jiného zápasu.',
     errMemberQueued: 'Někdo ze skupiny už je ve frontě nebo v zápase.',
@@ -9195,7 +9673,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Tvá skupina je na Thornhollowská pole příliš velká. Do fronty se řadí skupiny až po 5 hráčích.',
     errPartyLeaderOnly: 'Do fronty na Thornhollowská pole může skupinu zařadit jen vůdce skupiny.',
     errDelveDuringBg: 'Během bojiště nemůžeš vstoupit do výpravy.',
-    errTalentsDuringBg: 'Během bojiště nemůžeš měnit talenty.',
     errLevelTooLow: 'Thornhollowská pole vyžadují úroveň {level}.',
     errMemberLevelTooLow:
       'Každý ve skupině musí mít úroveň {level}, aby se mohl zařadit do fronty na Thornhollowská pole.',
@@ -9203,6 +9680,22 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Na bojišti nemůžeš používat jezdecké zvíře.',
   },
   nl_NL: {
+    errMemberRequeueLocked:
+      'Een groepslid moet wachten voordat het zich opnieuw kan aanmelden voor de Doornholte-Velden.',
+    offerReady: 'De Doornholte-Velden zijn gereed. Accepteer om aan de strijd deel te nemen.',
+    offerBackfill:
+      'Een lopend gevecht op de Thornhollow-velden heeft een strijder nodig. Accepteer om mee te doen; deze wedstrijd verandert je waardering niet.',
+    offerBackfillGone:
+      'Dat gevecht heeft geen strijder meer nodig. Je behoudt je plek in de wachtrij voor de Thornhollow-velden.',
+    offerBackfillDeclined:
+      'Je wijst het lopende gevecht af en behoudt je plek in de wachtrij voor de Thornhollow-velden.',
+    offerKeptPlace:
+      'De strijd kwam niet rond. Je behoudt je plaats in de wachtrij van de Doornholte-Velden.',
+    groupLeaveQueue: 'Je groep verlaat de wachtrij van de Doornholte-Velden.',
+    errNoOffer: 'Je hebt geen uitnodiging voor de Doornholte-Velden om te beantwoorden.',
+    errOfferWaiting: 'Er wacht een uitnodiging voor de Doornholte-Velden. Beantwoord die eerst.',
+    errRequeueLocked:
+      'Je moet {seconds} seconden wachten voordat je je opnieuw kunt aanmelden voor de Doornholte-Velden.',
     joinQueue:
       'Je sluit je aan bij de wachtrij van de Doornholte-Velden. Er zijn {count} kampioenen nodig om een wedstrijd te starten.',
     partyJoinQueue: 'Je groep van {count} sluit zich aan bij de wachtrij van de Doornholte-Velden.',
@@ -9213,9 +9706,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Je bemachtigt een Sprintrune!',
     seizeBattleRune: 'Je bemachtigt een Strijdrune!',
     seizeWardRune: 'Je bemachtigt een Wachtrune!',
+    backfillJoin:
+      'Je sluit je aan bij een al begonnen strijd voor {team} op de Doornholte-Velden. Deze wedstrijd verandert je rating niet.',
+    backfillArrived: 'Een nieuwe strijder vecht nu voor {team}.',
     teamCrimson: 'de Karmozijnen',
     teamAzure: 'de Azuren',
     errInBattleground: 'Je bent al op een slagveld.',
+    errNotInBattleground: 'Je bent niet op een slagveld.',
     errQueueDead: 'Je kunt je niet aanmelden voor de Doornholte-Velden terwijl je dood bent.',
     errQueueInMatch:
       'Je kunt je niet aanmelden voor de Doornholte-Velden tijdens een andere wedstrijd.',
@@ -9226,7 +9723,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Alleen de groepsleider mag de groep in de wachtrij zetten voor de Doornholte-Velden.',
     errDelveDuringBg: 'Je kunt tijdens een slagveld geen delve betreden.',
-    errTalentsDuringBg: 'Je kunt tijdens een slagveld geen talenten wijzigen.',
     errLevelTooLow: 'De Doornholte-Velden vereisen niveau {level}.',
     errMemberLevelTooLow:
       'Elk groepslid moet niveau {level} zijn om zich aan te melden voor de Doornholte-Velden.',
@@ -9234,6 +9730,23 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Je kunt niet rijden op een slagveld.',
   },
   pl_PL: {
+    errMemberRequeueLocked:
+      'Członek drużyny musi odczekać, zanim ponownie dołączy do kolejki na Pola Ciernistej Kotliny.',
+    offerReady: 'Pola Ciernistej Kotliny są gotowe. Zaakceptuj, aby dołączyć do bitwy.',
+    offerBackfill:
+      'Trwająca bitwa na Polach Thornhollow potrzebuje wojownika. Zaakceptuj, aby dołączyć; ten mecz nie zmieni twojego rankingu.',
+    offerBackfillGone:
+      'Ta bitwa nie potrzebuje już wojownika. Zachowujesz swoje miejsce w kolejce na Pola Thornhollow.',
+    offerBackfillDeclined:
+      'Odrzucasz trwającą bitwę i zachowujesz swoje miejsce w kolejce na Pola Thornhollow.',
+    offerKeptPlace:
+      'Bitwa nie doszła do skutku. Zachowujesz swoje miejsce w kolejce na Pola Ciernistej Kotliny.',
+    groupLeaveQueue: 'Twoja drużyna opuszcza kolejkę na Pola Ciernistej Kotliny.',
+    errNoOffer: 'Nie masz zaproszenia na Pola Ciernistej Kotliny, na które mógłbyś odpowiedzieć.',
+    errOfferWaiting:
+      'Czeka na ciebie zaproszenie na Pola Ciernistej Kotliny. Najpierw na nie odpowiedz.',
+    errRequeueLocked:
+      'Musisz odczekać {seconds} s, zanim ponownie dołączysz do kolejki na Pola Ciernistej Kotliny.',
     joinQueue:
       'Dołączasz do kolejki na Pola Ciernistej Kotliny. Do rozpoczęcia meczu potrzeba {count} mistrzów.',
     partyJoinQueue: 'Twoja {count}-osobowa drużyna dołącza do kolejki na Pola Ciernistej Kotliny.',
@@ -9244,9 +9757,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Zdobywasz Runę Sprintu!',
     seizeBattleRune: 'Zdobywasz Runę Bitwy!',
     seizeWardRune: 'Zdobywasz Runę Ochrony!',
+    backfillJoin:
+      'Dołączasz do trwającej już bitwy po stronie {team} na Polach Ciernistej Kotliny. Ten mecz nie zmieni twojego rankingu.',
+    backfillArrived: 'Nowy wojownik dołącza do {team}.',
     teamCrimson: 'Szkarłatnych',
     teamAzure: 'Lazurowych',
     errInBattleground: 'Jesteś już na polu bitwy.',
+    errNotInBattleground: 'Nie jesteś na polu bitwy.',
     errQueueDead: 'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny, będąc martwym.',
     errQueueInMatch:
       'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny w trakcie innego meczu.',
@@ -9256,7 +9773,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Twoja drużyna jest za duża na Pola Ciernistej Kotliny. Do kolejki wchodzą drużyny do 5 osób.',
     errPartyLeaderOnly: 'Tylko przywódca drużyny może zapisać drużynę na Pola Ciernistej Kotliny.',
     errDelveDuringBg: 'Nie możesz wejść do wyprawy w trakcie pola bitwy.',
-    errTalentsDuringBg: 'Nie możesz zmieniać talentów w trakcie pola bitwy.',
     errLevelTooLow: 'Pola Ciernistej Kotliny wymagają poziomu {level}.',
     errMemberLevelTooLow:
       'Każdy członek drużyny musi mieć poziom {level}, aby dołączyć do kolejki na Pola Ciernistej Kotliny.',
@@ -9264,6 +9780,22 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Na polu bitwy nie możesz dosiadać wierzchowca.',
   },
   id_ID: {
+    errMemberRequeueLocked:
+      'Anggota kelompok harus menunggu sebelum mengantre Padang Thornhollow lagi.',
+    offerReady: 'Padang Thornhollow sudah siap. Terima untuk bergabung ke pertempuran.',
+    offerBackfill:
+      'Pertempuran yang sedang berlangsung di Padang Thornhollow membutuhkan seorang petarung. Terima untuk bergabung; pertandingan ini tidak akan mengubah peringkatmu.',
+    offerBackfillGone:
+      'Pertempuran itu tidak lagi membutuhkan petarung. Kamu tetap memegang tempatmu di antrean Padang Thornhollow.',
+    offerBackfillDeclined:
+      'Kamu menolak pertempuran yang sedang berlangsung dan tetap memegang tempatmu di antrean Padang Thornhollow.',
+    offerKeptPlace:
+      'Pertempuran tidak terisi penuh. Posisimu di antrean Padang Thornhollow tetap terjaga.',
+    groupLeaveQueue: 'Kelompokmu keluar dari antrean Padang Thornhollow.',
+    errNoOffer: 'Kamu tidak punya undangan Padang Thornhollow untuk dijawab.',
+    errOfferWaiting: 'Ada undangan Padang Thornhollow yang menunggu. Jawab dulu undangan itu.',
+    errRequeueLocked:
+      'Kamu harus menunggu {seconds} detik sebelum mengantre Padang Thornhollow lagi.',
     joinQueue:
       'Kamu masuk antrean Padang Thornhollow. Butuh {count} juara untuk memulai pertandingan.',
     partyJoinQueue: 'Kelompokmu yang berisi {count} orang masuk antrean Padang Thornhollow.',
@@ -9274,9 +9806,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Kamu merebut Rune Lari Cepat!',
     seizeBattleRune: 'Kamu merebut Rune Pertempuran!',
     seizeWardRune: 'Kamu merebut Rune Pelindung!',
+    backfillJoin:
+      'Kamu bergabung dengan pertempuran yang sedang berlangsung untuk {team} di Padang Thornhollow. Pertandingan ini tidak akan mengubah peringkatmu.',
+    backfillArrived: 'Seorang petarung baru bergabung dengan {team}.',
     teamCrimson: 'Merah Tua',
     teamAzure: 'Biru Langit',
     errInBattleground: 'Kamu sudah berada di medan perang.',
+    errNotInBattleground: 'Kamu tidak berada di medan perang.',
     errQueueDead: 'Kamu tidak bisa mengantre Padang Thornhollow saat tewas.',
     errQueueInMatch:
       'Kamu tidak bisa mengantre Padang Thornhollow saat sedang dalam pertandingan lain.',
@@ -9287,7 +9823,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Hanya pemimpin kelompok yang boleh mendaftarkan kelompok ke antrean Padang Thornhollow.',
     errDelveDuringBg: 'Kamu tidak bisa memasuki delve selama medan perang berlangsung.',
-    errTalentsDuringBg: 'Kamu tidak bisa mengubah talenta selama medan perang berlangsung.',
     errLevelTooLow: 'Padang Thornhollow membutuhkan level {level}.',
     errMemberLevelTooLow:
       'Setiap anggota kelompok harus level {level} untuk mengantre Padang Thornhollow.',
@@ -9295,6 +9830,21 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Kamu tidak bisa menunggang tunggangan di medan perang.',
   },
   tr_TR: {
+    errMemberRequeueLocked:
+      'Bir grup üyesinin Dikenvadi Ovaları sırasına yeniden girmek için beklemesi gerekiyor.',
+    offerReady: 'Dikenvadi Ovaları hazır. Savaşa katılmak için kabul et.',
+    offerBackfill:
+      'Devam eden bir Thornhollow Ovaları savasinin bir savasciya ihtiyaci var. Katilmak icin kabul et; bu mac derecelendirmeni degistirmeyecek.',
+    offerBackfillGone:
+      'O savasin artik bir savasciya ihtiyaci yok. Thornhollow Ovalari sirandaki yerini koruyorsun.',
+    offerBackfillDeclined:
+      'Devam eden savasi reddediyorsun ve Thornhollow Ovalari sirandaki yerini koruyorsun.',
+    offerKeptPlace: 'Savaş dolmadı. Dikenvadi Ovaları sırasındaki yerini koruyorsun.',
+    groupLeaveQueue: 'Grubun Dikenvadi Ovaları sırasından ayrıldı.',
+    errNoOffer: 'Yanıtlayabileceğin bir Dikenvadi Ovaları daveti yok.',
+    errOfferWaiting: 'Bekleyen bir Dikenvadi Ovaları davetin var. Önce onu yanıtla.',
+    errRequeueLocked:
+      'Dikenvadi Ovaları sırasına yeniden girmek için {seconds} saniye beklemelisin.',
     joinQueue:
       'Dikenvadi Ovaları sırasına katıldın. Maçın başlaması için {count} şampiyon gerekiyor.',
     partyJoinQueue: '{count} kişilik grubun Dikenvadi Ovaları sırasına katıldı.',
@@ -9304,9 +9854,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Bir Koşu Rünü ele geçirdin!',
     seizeBattleRune: 'Bir Savaş Rünü ele geçirdin!',
     seizeWardRune: 'Bir Koruma Rünü ele geçirdin!',
+    backfillJoin:
+      'Dikenvadi Ovalarında süregelen bir savaşa {team} safında katılıyorsun. Bu maç puanını değiştirmeyecek.',
+    backfillArrived: 'Yeni bir savaşçı {team} safına katıldı.',
     teamCrimson: 'Kızıllar',
     teamAzure: 'Gökmaviler',
     errInBattleground: 'Zaten bir savaş alanındasın.',
+    errNotInBattleground: 'Bir savaş alanında değilsin.',
     errQueueDead: 'Ölüyken Dikenvadi Ovaları sırasına giremezsin.',
     errQueueInMatch: 'Başka bir maçtayken Dikenvadi Ovaları sırasına giremezsin.',
     errMemberQueued: 'Grup üyelerinden biri zaten sırada ya da bir maçta.',
@@ -9315,7 +9869,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Grubun Dikenvadi Ovaları için fazla kalabalık. Sıraya en fazla 5 kişilik gruplar girebilir.',
     errPartyLeaderOnly: 'Grubu Dikenvadi Ovaları sırasına yalnızca grup lideri sokabilir.',
     errDelveDuringBg: 'Savaş alanı sürerken Mağara Seferine giremezsin.',
-    errTalentsDuringBg: 'Savaş alanı sürerken yetenek değiştiremezsin.',
     errLevelTooLow: 'Dikenvadi Ovaları için {level}. seviye gerekir.',
     errMemberLevelTooLow:
       'Dikenvadi Ovaları sırasına girmek için grubun her üyesi {level}. seviye olmalı.',
@@ -9323,6 +9876,19 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Savaş alanında binek kullanamazsın.',
   },
   sv_SE: {
+    errMemberRequeueLocked: 'En gruppmedlem måste vänta innan ni köar till Törnhålefälten igen.',
+    offerReady: 'Törnhålefälten är redo. Acceptera för att gå med i striden.',
+    offerBackfill:
+      'En pågående strid på Thornhollow-fälten behöver en kämpe. Acceptera för att gå med; den här matchen ändrar inte din rankning.',
+    offerBackfillGone:
+      'Den striden behöver inte längre en kämpe. Du behåller din plats i kön till Thornhollow-fälten.',
+    offerBackfillDeclined:
+      'Du tackar nej till den pågående striden och behåller din plats i kön till Thornhollow-fälten.',
+    offerKeptPlace: 'Striden blev inte fulltalig. Du behåller din plats i kön till Törnhålefälten.',
+    groupLeaveQueue: 'Din grupp lämnar kön till Törnhålefälten.',
+    errNoOffer: 'Du har ingen inbjudan till Törnhålefälten att svara på.',
+    errOfferWaiting: 'En inbjudan till Törnhålefälten väntar. Svara på den först.',
+    errRequeueLocked: 'Du måste vänta {seconds} sekunder innan du köar till Törnhålefälten igen.',
     joinQueue:
       'Du ställer dig i kön till Törnhålefälten. Det behövs {count} mästare för att starta en match.',
     partyJoinQueue: 'Din grupp på {count} ställer sig i kön till Törnhålefälten.',
@@ -9332,9 +9898,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Du lägger beslag på en Spurtruna!',
     seizeBattleRune: 'Du lägger beslag på en Stridsruna!',
     seizeWardRune: 'Du lägger beslag på en Skyddsruna!',
+    backfillJoin:
+      'Du ansluter till en redan pågående strid för {team} på Törnhålefälten. Den här matchen påverkar inte din rankning.',
+    backfillArrived: 'En ny kämpe strider nu för {team}.',
     teamCrimson: 'de Karmosinröda',
     teamAzure: 'de Azurblå',
     errInBattleground: 'Du är redan på ett slagfält.',
+    errNotInBattleground: 'Du är inte på ett slagfält.',
     errQueueDead: 'Du kan inte köa till Törnhålefälten medan du är död.',
     errQueueInMatch: 'Du kan inte köa till Törnhålefälten under en annan match.',
     errMemberQueued: 'En gruppmedlem står redan i kö eller är i en match.',
@@ -9342,7 +9912,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyTooLarge: 'Din grupp är för stor för Törnhålefälten. Kön tar grupper på upp till 5.',
     errPartyLeaderOnly: 'Endast gruppledaren får ställa gruppen i kö till Törnhålefälten.',
     errDelveDuringBg: 'Du kan inte gå in i en delve under ett slagfält.',
-    errTalentsDuringBg: 'Du kan inte byta talanger under ett slagfält.',
     errLevelTooLow: 'Törnhålefälten kräver nivå {level}.',
     errMemberLevelTooLow:
       'Varje gruppmedlem måste vara nivå {level} för att köa till Törnhålefälten.',
@@ -9350,6 +9919,20 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Du kan inte rida på ett slagfält.',
   },
   vi_VN: {
+    errMemberRequeueLocked:
+      'Một thành viên trong nhóm phải đợi trước khi vào lại hàng chờ Cánh Đồng Thung Gai.',
+    offerReady: 'Cánh Đồng Thung Gai đã sẵn sàng. Chấp nhận để tham gia trận chiến.',
+    offerBackfill:
+      'Một trận chiến đang diễn ra ở Cánh Đồng Thornhollow cần một chiến binh. Chấp nhận để tham gia; trận này sẽ không thay đổi thứ hạng của bạn.',
+    offerBackfillGone:
+      'Trận chiến đó không còn cần chiến binh nữa. Bạn vẫn giữ chỗ của mình trong hàng chờ Cánh Đồng Thornhollow.',
+    offerBackfillDeclined:
+      'Bạn từ chối trận chiến đang diễn ra và vẫn giữ chỗ của mình trong hàng chờ Cánh Đồng Thornhollow.',
+    offerKeptPlace: 'Trận đấu không đủ người. Bạn vẫn giữ chỗ trong hàng chờ Cánh Đồng Thung Gai.',
+    groupLeaveQueue: 'Nhóm của bạn rời hàng chờ Cánh Đồng Thung Gai.',
+    errNoOffer: 'Bạn không có lời mời Cánh Đồng Thung Gai nào để trả lời.',
+    errOfferWaiting: 'Bạn có một lời mời Cánh Đồng Thung Gai đang chờ. Hãy trả lời trước.',
+    errRequeueLocked: 'Bạn phải đợi {seconds} giây trước khi vào lại hàng chờ Cánh Đồng Thung Gai.',
     joinQueue: 'Bạn vào hàng chờ Cánh Đồng Thung Gai. Cần {count} nhà vô địch để bắt đầu trận đấu.',
     partyJoinQueue: 'Tổ đội {count} người của bạn vào hàng chờ Cánh Đồng Thung Gai.',
     leaveQueue: 'Bạn rời hàng chờ Cánh Đồng Thung Gai.',
@@ -9359,9 +9942,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Bạn giành được Rune Nước Rút!',
     seizeBattleRune: 'Bạn giành được Rune Chiến Trận!',
     seizeWardRune: 'Bạn giành được Rune Hộ Vệ!',
+    backfillJoin:
+      'Bạn tham gia một trận đấu đang diễn ra cho {team} tại Cánh Đồng Thung Gai. Trận này sẽ không thay đổi thứ hạng của bạn.',
+    backfillArrived: 'Một chiến binh mới gia nhập {team}.',
     teamCrimson: 'phe Đỏ Thẫm',
     teamAzure: 'phe Xanh Biếc',
     errInBattleground: 'Bạn đã ở trong một chiến trường rồi.',
+    errNotInBattleground: 'Bạn không ở trong chiến trường.',
     errQueueDead: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đã chết.',
     errQueueInMatch: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đang ở trận đấu khác.',
     errMemberQueued: 'Một thành viên tổ đội đã ở trong hàng chờ hoặc đang thi đấu.',
@@ -9370,7 +9957,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Tổ đội của bạn quá đông cho Cánh Đồng Thung Gai. Hàng chờ chỉ nhận tổ đội tối đa 5 người.',
     errPartyLeaderOnly: 'Chỉ nhóm trưởng mới có thể đưa tổ đội vào hàng chờ Cánh Đồng Thung Gai.',
     errDelveDuringBg: 'Bạn không thể vào Hang Sâu trong lúc đang ở chiến trường.',
-    errTalentsDuringBg: 'Bạn không thể đổi thiên phú trong lúc đang ở chiến trường.',
     errLevelTooLow: 'Cánh Đồng Thung Gai yêu cầu cấp {level}.',
     errMemberLevelTooLow:
       'Mọi thành viên tổ đội phải đạt cấp {level} để vào hàng chờ Cánh Đồng Thung Gai.',
@@ -9378,6 +9964,21 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Bạn không thể cưỡi thú cưỡi ở chiến trường.',
   },
   da_DK: {
+    errMemberRequeueLocked:
+      'Et gruppemedlem skal vente, før I kan stille jer i kø til Tornehule Sletter igen.',
+    offerReady: 'Tornehule Sletter er klar. Accepter for at deltage i kampen.',
+    offerBackfill:
+      'En igangværende kamp på Thornhollow-sletterne mangler en kæmper. Accepter for at deltage; denne kamp ændrer ikke din rangering.',
+    offerBackfillGone:
+      'Den kamp mangler ikke længere en kæmper. Du beholder din plads i køen til Thornhollow-sletterne.',
+    offerBackfillDeclined:
+      'Du afviser den igangværende kamp og beholder din plads i køen til Thornhollow-sletterne.',
+    offerKeptPlace: 'Kampen blev ikke fyldt. Du beholder din plads i køen til Tornehule Sletter.',
+    groupLeaveQueue: 'Din gruppe forlader køen til Tornehule Sletter.',
+    errNoOffer: 'Du har ingen invitation til Tornehule Sletter at svare på.',
+    errOfferWaiting: 'Der venter en invitation til Tornehule Sletter. Svar på den først.',
+    errRequeueLocked:
+      'Du skal vente {seconds} sekunder, før du kan stille dig i kø til Tornehule Sletter igen.',
     joinQueue:
       'Du stiller dig i køen til Tornehule Sletter. Der mangler {count} mestre for at starte en kamp.',
     partyJoinQueue: 'Din gruppe på {count} stiller sig i køen til Tornehule Sletter.',
@@ -9388,9 +9989,13 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Du snupper en Spurtrune!',
     seizeBattleRune: 'Du snupper en Kamprune!',
     seizeWardRune: 'Du snupper en Værnerune!',
+    backfillJoin:
+      'Du slutter dig til en kamp der allerede er i gang for {team} på Tornehule Sletter. Denne kamp ændrer ikke din rating.',
+    backfillArrived: 'En ny kriger kæmper nu for {team}.',
     teamCrimson: 'de Karmosinrøde',
     teamAzure: 'de Azurblå',
     errInBattleground: 'Du er allerede på en slagmark.',
+    errNotInBattleground: 'Du er ikke på en slagmark.',
     errQueueDead: 'Du kan ikke stille dig i kø til Tornehule Sletter, mens du er død.',
     errQueueInMatch: 'Du kan ikke stille dig i kø til Tornehule Sletter under en anden kamp.',
     errMemberQueued: 'Et gruppemedlem står allerede i kø eller er i en kamp.',
@@ -9399,7 +10004,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Din gruppe er for stor til Tornehule Sletter. Køen tager grupper på op til 5.',
     errPartyLeaderOnly: 'Kun gruppelederen kan stille gruppen i kø til Tornehule Sletter.',
     errDelveDuringBg: 'Du kan ikke gå ind i en delve under en slagmark.',
-    errTalentsDuringBg: 'Du kan ikke skifte talenter under en slagmark.',
     errLevelTooLow: 'Tornehule Sletter kræver niveau {level}.',
     errMemberLevelTooLow:
       'Hvert gruppemedlem skal være niveau {level} for at stille sig i kø til Tornehule Sletter.',
@@ -9411,6 +10015,15 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
 function tBg(key: BgExtraKey, params?: InterpolationValues): string {
   const table = BG_EXTRA[getLanguage()] ?? BG_EXTRA.en;
   return interpolate(table[key] ?? BG_EXTRA_EN[key], params);
+}
+
+/** The localized team word for a captured English BG_TEAM_NAMES value. Shared by
+ *  the three rules that interpolate a side into their line; an unrecognized
+ *  capture passes through verbatim rather than resolving to an empty string. */
+function bgTeamWord(captured: string): string {
+  if (captured === 'Crimson') return tBg('teamCrimson');
+  if (captured === 'Azure') return tBg('teamAzure');
+  return captured;
 }
 
 type QuestExtraKey =
@@ -10225,10 +10838,40 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  {
+    re: /^Your Umbral Anchor is out of range\.$/,
+    build: () =>
+      `${tEntity({ kind: 'ability', id: 'umbral_anchor', field: 'name' })}: ${t('hud.errors.outOfRange')}`,
+  },
   // #1144: timed town-focus re-spec queued (Sim.setTownFocus).
   {
     re: /^Your focus re-spec will complete in (\d+)s\.$/,
     build: (m) => tSim('log.townFocusRespecQueued', { seconds: m[1] }),
+  },
+  // Profession-service in-progress countdowns (social/chat_readouts.ts
+  // castingReadout): craft/disenchant/enchant/salvage/tool-recharge each hold
+  // their own remaining/total countdown line.
+  {
+    re: /^You are crafting: (.+)s of (.+)s remaining\.$/,
+    build: (m) => t('hudChrome.professions.craftingProgress', { remaining: m[1], total: m[2] }),
+  },
+  {
+    re: /^You are disenchanting: (.+)s of (.+)s remaining\.$/,
+    build: (m) =>
+      t('hudChrome.professions.disenchantingProgress', { remaining: m[1], total: m[2] }),
+  },
+  {
+    re: /^You are enchanting: (.+)s of (.+)s remaining\.$/,
+    build: (m) => t('hudChrome.professions.enchantingProgress', { remaining: m[1], total: m[2] }),
+  },
+  {
+    re: /^You are salvaging: (.+)s of (.+)s remaining\.$/,
+    build: (m) => t('hudChrome.professions.salvagingProgress', { remaining: m[1], total: m[2] }),
+  },
+  {
+    re: /^You are recharging a tool effect: (.+)s of (.+)s remaining\.$/,
+    build: (m) =>
+      t('hudChrome.professions.rechargingToolEffectProgress', { remaining: m[1], total: m[2] }),
   },
   // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
   {
@@ -10349,6 +10992,10 @@ const RULES: Rule[] = [
   { re: /^Deleted build "(.+)"\.$/, build: (m) => tSim('log.deletedBuild', { name: m[1] }) },
   { re: /^You dismiss (.+)\.$/, build: (m) => tSim('log.dismissPet', { name: locMob(m[1]) }) },
   { re: /^You summon (.+)\.$/, build: (m) => tSim('log.summonDemon', { name: locMob(m[1]) }) },
+  {
+    re: /^(.+) crashes into the battle\.$/,
+    build: (m) => tSim('log.pyreCrashes', { name: locMob(m[1]) }),
+  },
   {
     re: /^(.+) fades back into the void\.$/,
     build: (m) => tSim('log.petFadesVoid', { name: locMob(m[1]) }),
@@ -10636,21 +11283,68 @@ const RULES: Rule[] = [
   },
   { re: /^You leave the Thornhollow Fields queue\.$/, build: () => tBg('leaveQueue') },
   {
+    re: /^A party member must wait before queueing for Thornhollow Fields again\.$/,
+    build: () => tBg('errMemberRequeueLocked'),
+  },
+  // The queue-pop offer (social/battleground_proposal.ts). The requeue lockout
+  // is the only one carrying a value, so it is the only one that captures.
+  {
+    re: /^Thornhollow Fields is ready\. Accept to join the battle\.$/,
+    build: () => tBg('offerReady'),
+  },
+  {
+    re: /^A Thornhollow Fields battle already under way needs a fighter\. Accept to join; this match will not change your rating\.$/,
+    build: () => tBg('offerBackfill'),
+  },
+  {
+    re: /^That battle no longer needs a fighter\. You keep your place in the Thornhollow Fields queue\.$/,
+    build: () => tBg('offerBackfillGone'),
+  },
+  {
+    re: /^You decline the battle already under way, and keep your place in the Thornhollow Fields queue\.$/,
+    build: () => tBg('offerBackfillDeclined'),
+  },
+  {
+    re: /^The battle did not fill\. You keep your place in the Thornhollow Fields queue\.$/,
+    build: () => tBg('offerKeptPlace'),
+  },
+  {
+    re: /^Your group leaves the Thornhollow Fields queue\.$/,
+    build: () => tBg('groupLeaveQueue'),
+  },
+  {
+    re: /^You have no Thornhollow Fields invitation to answer\.$/,
+    build: () => tBg('errNoOffer'),
+  },
+  {
+    re: /^You have a Thornhollow Fields invitation waiting\. Answer it first\.$/,
+    build: () => tBg('errOfferWaiting'),
+  },
+  {
+    re: /^You must wait (\d+) seconds before queueing for Thornhollow Fields again\.$/,
+    build: (m) => tBg('errRequeueLocked', { seconds: Number(m[1]) }),
+  },
+  {
     re: /^The Thornhollow Fields battle begins: take their flag!$/,
     build: () => tBg('battleBegins'),
   },
   {
     re: /^Thornhollow Fields: you fight for the (.+?)\. First to (.+?) captures wins\.$/,
-    build: (m) =>
-      tBg('fightFor', {
-        team: m[1] === 'Crimson' ? tBg('teamCrimson') : m[1] === 'Azure' ? tBg('teamAzure') : m[1],
-        caps: m[2],
-      }),
+    build: (m) => tBg('fightFor', { team: bgTeamWord(m[1]), caps: m[2] }),
+  },
+  {
+    re: /^Thornhollow Fields: you join a battle already under way for the (.+?)\. This match will not change your rating\.$/,
+    build: (m) => tBg('backfillJoin', { team: bgTeamWord(m[1]) }),
+  },
+  {
+    re: /^A fresh fighter joins the (.+?)\.$/,
+    build: (m) => tBg('backfillArrived', { team: bgTeamWord(m[1]) }),
   },
   { re: /^You seize a Sprint Rune!$/, build: () => tBg('seizeRune') },
   { re: /^You seize a Battle Rune!$/, build: () => tBg('seizeBattleRune') },
   { re: /^You seize a Ward Rune!$/, build: () => tBg('seizeWardRune') },
   { re: /^You are already in a battleground\.$/, build: () => tBg('errInBattleground') },
+  { re: /^You are not in a battleground\.$/, build: () => tBg('errNotInBattleground') },
   {
     re: /^You cannot queue for Thornhollow Fields while dead\.$/,
     build: () => tBg('errQueueDead'),
@@ -10678,10 +11372,6 @@ const RULES: Rule[] = [
   {
     re: /^You cannot enter a delve during a battleground\.$/,
     build: () => tBg('errDelveDuringBg'),
-  },
-  {
-    re: /^You cannot change talents during a battleground\.$/,
-    build: () => tBg('errTalentsDuringBg'),
   },
   {
     re: /^Thornhollow Fields requires level (\d+)\.$/,

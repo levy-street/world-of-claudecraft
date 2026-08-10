@@ -32,7 +32,21 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { clearAfflictionState } from '../combat/affliction';
 import { stripTemporalEchoes } from '../combat/chronomancy';
+import { clearDestructionState } from '../combat/destruction';
+import { cleanDruidEngineState } from '../combat/druid_engines';
+import { clearFieldcraftState } from '../combat/hunter_fieldcraft';
+import { clearPacklordState } from '../combat/hunter_packlord';
+import { clearHunterTalentState } from '../combat/hunter_shared';
+import { clearDeathEchoes, clearOssuaryMarks } from '../combat/necromancy';
+import { cleanupPriestState } from '../combat/priest/lifecycle';
+import { cleanRogueEngineState } from '../combat/rogue_engines';
+import { clearSpiritmendState } from '../combat/shaman_spiritmend';
+import { clearShamanTalentState } from '../combat/shaman_talents';
+import { clearThundercallState } from '../combat/shaman_thundercall';
+import { clearWarspiritState } from '../combat/shaman_warspirit';
+import { reconcileWarlockTalentState } from '../combat/warlock_talents';
 import { abilitiesKnownAt } from '../content/classes';
 import {
   cloneAllocation,
@@ -51,12 +65,15 @@ import {
   talentsFor,
   validateAllocation,
 } from '../content/talents';
-import { ABILITIES } from '../data';
+import { ABILITIES, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
+import { itemCopyPin } from '../item_copy_ref';
+import { equipItem as equipItemImpl } from '../items';
+import { buildGearSet, planGearSwap, type SavedGearSet, wornAsBagSlot } from '../loadout_gear';
 import { despawnPersistentPet, petOf } from '../pet/pet_commands';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type Entity, isFormAuraKind } from '../types';
+import { ALL_EQUIP_SLOTS, type Entity, type EquipSlot, isFormAuraKind } from '../types';
 
 function cleanRemovedProcState(
   ctx: SimContext,
@@ -68,9 +85,14 @@ function cleanRemovedProcState(
   const removedIds = new Set(
     previous.procs.map((proc) => proc.id).filter((procId) => !nextIds.has(procId)),
   );
+  const removedPaladinZeal = previous.global.paladinZeal > 0 && next.global.paladinZeal <= 0;
+  const removedPaladinDawnEcho =
+    previous.global.paladinDawnEcho > 0 && next.global.paladinDawnEcho <= 0;
   if (
     removedIds.size === 0 &&
-    !(previous.global.cheatDeathIcd > 0 && next.global.cheatDeathIcd <= 0)
+    !(previous.global.cheatDeathIcd > 0 && next.global.cheatDeathIcd <= 0) &&
+    !removedPaladinZeal &&
+    !removedPaladinDawnEcho
   )
     return;
 
@@ -82,6 +104,8 @@ function cleanRemovedProcState(
     if (previous.global.cheatDeathIcd > 0 && next.global.cheatDeathIcd <= 0) {
       delete player.procState.icds.cheat_death;
     }
+    if (removedPaladinZeal) delete player.procState.counters.paladin_zeal;
+    if (removedPaladinDawnEcho) delete player.procState.counters.paladin_dawn_echo;
   }
 
   for (const entity of ctx.entities.values()) {
@@ -187,8 +211,11 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   ctx.refreshKnownAbilities(meta, true);
   if (e) {
     cleanRemovedProcState(ctx, e, previousMods, meta.talentMods);
+    cleanRogueEngineState(ctx, e, previousMods.spec, meta.talentMods.spec);
+    cleanDruidEngineState(ctx, e, previousMods.spec, meta.talentMods.spec);
     normalizeAbilityCharges(e, meta, previousChargeCaps);
     stripOrphanedFormAuras(ctx, meta, e);
+    reconcileWarlockTalentState(ctx, e, meta);
   }
   // The heavy talent snapshot is wireRev-gated. Every live allocation change
   // reaches this one choke point, while character load uses the silent path in
@@ -220,10 +247,14 @@ function stripOrphanedFormAuras(ctx: SimContext, meta: PlayerMeta, e: Entity | u
   }
 }
 
+// Combat is the line, not the venue. A battleground is deliberately absent: a
+// queue pop can catch a player in a farming build, the match is rated, and gear
+// was always swappable in there (equipItem carries no match gate), so blocking
+// the talent half left a fighter with no way to fix a build the queue chose for
+// them. The arena stays locked; its matches are short and start on a prep hold.
 function talentLockReason(ctx: SimContext, p: Entity): string | null {
   if (p.inCombat) return 'You cannot change talents in combat.';
   if (ctx.arenaMatches.has(p.id)) return 'You cannot change talents during an arena match.';
-  if (ctx.bgMatches.has(p.id)) return 'You cannot change talents during a battleground.';
   return null;
 }
 
@@ -248,6 +279,18 @@ function markTalentSnapshotDirty(meta: PlayerMeta, revisionBeforeMutation: numbe
   if (meta.wireRev === revisionBeforeMutation) meta.wireRev++;
 }
 
+function cancelPendingProjectilesFrom(ctx: SimContext, sourceId: number): void {
+  const retained: typeof ctx.pendingProjectiles = [];
+  for (const projectile of ctx.pendingProjectiles) {
+    if (projectile.sourceId !== sourceId) {
+      retained.push(projectile);
+      continue;
+    }
+    projectile.fizzle?.();
+  }
+  ctx.pendingProjectiles = retained;
+}
+
 function commitTalentAllocation(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -269,21 +312,53 @@ function commitTalentAllocation(
   if (allocationsEqual(meta.talents, sanitized)) return true;
 
   const previousSpec = meta.talents.spec;
+  if (meta.cls === 'shaman') {
+    clearShamanTalentState(ctx, player, new Set(Object.values(sanitized.rows)));
+  }
+  if (previousSpec !== sanitized.spec) {
+    cancelPendingProjectilesFrom(ctx, player.id);
+    // Remove old spec auras before the single stat recomputation below. In
+    // particular, Stonebound's armor must not be baked into the new spec.
+    clearThundercallState(ctx, player);
+    clearWarspiritState(ctx, player);
+    clearSpiritmendState(ctx, player);
+  }
   meta.talents = sanitized;
   recomputeTalents(ctx, meta);
-  if (previousSpec !== sanitized.spec) ctx.revalidateOffhandForSpec(player.id);
+  if (previousSpec === 'destruction' && sanitized.spec !== 'destruction') {
+    clearDestructionState(ctx, player);
+  }
+  if (previousSpec !== sanitized.spec) {
+    ctx.revalidateOffhandForSpec(player.id);
+  }
+  if (meta.cls === 'priest') cleanupPriestState(ctx, player.id);
   // A spec-locked pet outlives its spec otherwise (owner report: the frost
   // Water Elemental kept fighting for a fire mage): if the ability that
   // summons the ACTIVE pet is no longer in the new build's known list, the
   // companion returns home. Tamed hunter pets are never spec-gated, so they
   // are untouched; deterministic, no rng.
   dismissSpecLockedPet(ctx, player, meta);
+  if (meta.cls === 'hunter') {
+    clearHunterTalentState(ctx, player);
+    if (sanitized.spec !== 'beast_mastery') clearPacklordState(ctx, player);
+    if (sanitized.spec !== 'survival') clearFieldcraftState(ctx, player);
+    if (sanitized.spec !== 'marksmanship') {
+      player.auras = player.auras.filter((aura) => aura.kind !== 'hunter_cold_focus');
+    }
+  }
   // Chronomancy: leaving the healer spec (the new build no longer knows Temporal
   // Echo) clears any Temporal Echo marks this mage placed, so a fire/frost mage
   // never keeps feeding a stale echo. Keyed by sourceId; marks the mage carries
   // from another chronomancer are untouched. No-op for every non-mage build.
   if (!meta.known.some((known) => known.def.id === 'temporal_echo')) {
     stripTemporalEchoes(ctx, player.id);
+  }
+  if (previousSpec === 'affliction' && sanitized.spec !== 'affliction') {
+    clearAfflictionState(ctx, player.id);
+  }
+  if (previousSpec === 'demonology' && sanitized.spec !== 'demonology') {
+    clearOssuaryMarks(ctx, player.id);
+    clearDeathEchoes(ctx, player);
   }
   if (successText) ctx.emit({ type: 'log', pid: player.id, text: successText, color: '#ffd100' });
   return true;
@@ -306,33 +381,49 @@ export function applyTalentAllocation(
 // summon->pet link is data-driven: any known summonDemon ability whose mobId
 // matches the live pet keeps it; no match, no pet.
 function dismissSpecLockedPet(ctx: SimContext, e: Entity, meta: PlayerMeta): void {
-  const pet = petOf(ctx, e.id);
-  if (!pet) return;
-  const summons = (def: (typeof ABILITIES)[string]) =>
+  const primaryPet = petOf(ctx, e.id, true);
+  const known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
+  const summons = (def: (typeof ABILITIES)[string], pet: Entity) =>
     def.effects.some(
       (eff) =>
         (eff.type === 'summonDemon' && eff.mobId === pet.templateId) ||
-        (eff.type === 'summonPet' && eff.templateId === pet.templateId),
+        (eff.type === 'summonPet' && eff.templateId === pet.templateId) ||
+        (eff.type === 'summonUndead' && eff.templateId === pet.templateId),
     );
-  // A pet no class summon creates (a tamed hunter beast) is never spec-bound.
-  const summonable = Object.values(ABILITIES).some((d) => d.class === meta.cls && summons(d));
-  if (!summonable) return;
-  const known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
-  if (known.some((k) => summons(k.def))) return;
-  despawnPersistentPet(ctx, pet);
-  // The registered despawn line (log.petFadesVoid, localized for every locale
-  // in sim_i18n), the same farewell a warlock demon gives.
-  ctx.emit({
-    type: 'log',
-    pid: e.id,
-    text: `${pet.name} fades back into the void.`,
-    color: '#b894ff',
-  });
+  for (const pet of [...ctx.entities.values()]) {
+    if (pet.kind !== 'mob' || pet.ownerId !== e.id) continue;
+    // A pet no class summon creates (a tamed hunter beast) is never spec-bound.
+    const summonable = Object.values(ABILITIES).some(
+      (def) => def.class === meta.cls && summons(def, pet),
+    );
+    if (!summonable || known.some((ability) => summons(ability.def, pet))) continue;
+    if (MOBS[pet.templateId]?.family === 'demon') ctx.despawnPet(pet);
+    else if (primaryPet?.id === pet.id) despawnPersistentPet(ctx, pet);
+    else ctx.despawnPet(pet);
+    ctx.emit({
+      type: 'log',
+      pid: e.id,
+      text: `${pet.name} fades back into the void.`,
+      color: '#b894ff',
+    });
+  }
+
+  const knowsNecromancy = known.some((ability) =>
+    ability.def.effects.some((effect) => effect.type === 'summonUndead'),
+  );
+  if (!knowsNecromancy) {
+    for (let i = e.auras.length - 1; i >= 0; i--) {
+      const aura = e.auras[i];
+      if (aura.kind !== 'soul_fragments' && aura.kind !== 'necromancy_death_echo') continue;
+      e.auras.splice(i, 1);
+      ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
+    }
+  }
 }
 
 // Legacy incremental API retained for old scripts. The node system is gone, so
 // this no longer changes state.
-export function spendTalentPoint(ctx: SimContext, nodeId: string, pid?: number): boolean {
+export function spendTalentPoint(ctx: SimContext, _nodeId: string, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   ctx.error(r.e.id, 'Invalid talent build.');
@@ -399,6 +490,7 @@ export function saveTalentLoadout(
   bar: (string | null)[],
   pidOrAlloc?: number | TalentAllocation,
   allocMaybe?: TalentAllocation,
+  captureGear = false,
 ): number {
   const pid = typeof pidOrAlloc === 'number' ? pidOrAlloc : undefined;
   const alloc = typeof pidOrAlloc === 'object' ? pidOrAlloc : allocMaybe;
@@ -415,6 +507,20 @@ export function saveTalentLoadout(
     ? bar.slice(0, SAVED_LOADOUT_BAR_SLOTS).map((b) => (typeof b === 'string' ? b : null))
     : [];
   const lo: SavedLoadout = { name: clean, alloc: cloneAllocation(r.meta.talents), bar: safeBar };
+  // Opt-in: the `gear` KEY is absent unless the player asked for it, which keeps the
+  // persisted and wire shapes unchanged for every talent-only loadout.
+  if (captureGear) {
+    const captured = buildGearSet(r.meta.equipment, r.meta.equipmentInstance);
+    if (Object.keys(captured).length > 0) lo.gear = captured;
+  } else {
+    // Preserve a gear set the loadout already had. An overwrite rebuilds the whole
+    // record, so a plain "Save Build" over an existing gear-carrying loadout used
+    // to delete its pinned set silently: tweak one talent on a PvP build, hit Save,
+    // and the gear was gone with no warning. Not asking to CHANGE the gear is not
+    // the same as asking to remove it.
+    const existingGear = r.meta.loadouts.find((l) => l.name === clean)?.gear;
+    if (existingGear) lo.gear = existingGear;
+  }
   const existing = r.meta.loadouts.findIndex((l) => l.name === clean);
   if (existing >= 0) {
     r.meta.loadouts = r.meta.loadouts.map((saved, index) => (index === existing ? lo : saved));
@@ -434,6 +540,100 @@ export function saveTalentLoadout(
   return r.meta.activeLoadout;
 }
 
+/**
+ * Apply a saved gear set: plan against the CURRENT bags, then equip each resolved
+ * copy into its saved slot.
+ *
+ * Calls the equip impl directly rather than `ctx.equipItem`, deliberately. The seam
+ * signature is `(itemId, pid?)` and the `Sim` facade overloads its second parameter
+ * for IWorld callers, so a bag index passed positionally through either would land
+ * in the wrong argument. Going straight to the impl lets both the target equip slot
+ * and the bag index be named explicitly, which is the whole point: the index is what
+ * makes this equip the copy the player SAVED rather than the newest match.
+ *
+ * Never fails the switch. Talents have already committed by the time this runs, and
+ * callers rely on that, so a missing piece is reported and the rest still equip.
+ */
+function applySavedGear(ctx: SimContext, meta: PlayerMeta, set: SavedGearSet): void {
+  // RE-PLAN PER SLOT, against the live bags, immediately before each equip.
+  //
+  // Resolving every index up front and then equipping in sequence is wrong: each
+  // equip splices its consumed stack out of the inventory, shifting every higher
+  // index down one, and the loop does not run in index order. The second piece
+  // then consumed whatever slid into its recorded index, which reintroduces the
+  // exact wrong-copy defect this feature exists to prevent.
+  //
+  // Re-planning also replaces the planner's cross-slot claim set for free: once a
+  // stack is consumed it is simply not there for the next slot to find, so two ring
+  // slots sharing one held copy resolve correctly without bookkeeping.
+  let equipped = 0;
+  let alreadyWorn = 0;
+  const reasons = { notHeld: 0, copyGone: 0, takenByOtherSlot: 0 };
+  // Re-derived here, not taken from the plan. Each per-slot re-plan starts a fresh
+  // claim set, so the planner's own takenByOtherSlot is unreachable from this loop
+  // and one held ring saved into both ring slots reported notHeld: the player was
+  // told they no longer own a copy they are wearing one slot over. Tracking the
+  // pins THIS apply has already consumed restores the distinction.
+  const consumedPins = new Set<string>();
+
+  // Canonical equipment order, matching planGearSwap.
+  const wanted = new Set(Object.keys(set) as EquipSlot[]);
+  for (const slot of ALL_EQUIP_SLOTS.filter((s2) => wanted.has(s2))) {
+    const want = set[slot];
+    if (!want) continue;
+    const plan = planGearSwap(
+      { [slot]: want } as SavedGearSet,
+      meta.inventory,
+      meta.equipment,
+      meta.equipmentInstance,
+    );
+    if (plan.alreadyWorn.length > 0) {
+      alreadyWorn++;
+      continue;
+    }
+    const step = plan.equips[0];
+    if (!step) {
+      let reason = plan.unavailable[0]?.reason ?? 'notHeld';
+      // An earlier slot in this same apply already took the copy this slot wants.
+      if (reason === 'notHeld' && consumedPins.has(want.pin)) reason = 'takenByOtherSlot';
+      reasons[reason]++;
+      continue;
+    }
+    // Count the real transition, not the intent. equipItem has refusal arms the
+    // planner does not model (level requirement, unique-equipped, a full bag on a
+    // displaced piece), so reporting the plan told players pieces were restored
+    // that were not.
+    // Pin the PAYLOAD on both sides, through the same normalization the planner
+    // uses. Pinning a bare {itemId, count} made the pin comparison identical to an
+    // id comparison, so the feature's flagship case (a plain copy worn, the saved
+    // ENCHANTED copy restored over it) counted as a failure and told the player
+    // "not the copy this build pinned" about the swap that had just succeeded.
+    const pinAt = (): string => {
+      const worn = meta.equipment[slot];
+      return worn === undefined
+        ? ''
+        : itemCopyPin(wornAsBagSlot(worn, meta.equipmentInstance?.[slot]));
+    };
+    const beforePin = pinAt();
+    equipItemImpl(ctx, step.itemId, meta.entityId, step.slot, step.bagIndex);
+    const afterPin = pinAt();
+    if (meta.equipment[slot] !== undefined && afterPin !== beforePin) {
+      equipped++;
+      consumedPins.add(afterPin);
+    } else reasons.copyGone++;
+  }
+
+  ctx.emit({
+    type: 'loadoutGearResult',
+    pid: meta.entityId,
+    equipped,
+    alreadyWorn,
+    notHeld: reasons.notHeld,
+    copyGone: reasons.copyGone,
+    takenByOtherSlot: reasons.takenByOtherSlot,
+  });
+}
+
 // Apply a saved loadout's talents (out of combat). The action bar is restored
 // client-side from the loadout's stored slot map. Re-validated server-side.
 export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number): boolean {
@@ -447,6 +647,11 @@ export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number
   }
   const revisionBeforeMutation = r.meta.wireRev;
   if (!commitTalentAllocation(ctx, r.meta, r.e, lo.alloc, null)) return false;
+  // Gear AFTER talents, and only if this loadout captured a set. Talents committing
+  // is the contract callers already rely on, so a gear problem must never be able to
+  // fail the talent swap: every unavailable piece is reported and the rest still
+  // equip, rather than the whole switch refusing.
+  if (lo.gear) applySavedGear(ctx, r.meta, lo.gear);
   r.meta.activeLoadout = index;
   markTalentSnapshotDirty(r.meta, revisionBeforeMutation);
   ctx.emit({

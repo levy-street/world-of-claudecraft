@@ -1112,7 +1112,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // Restore less than sitting to eat/drink, the price you pay for not sitting (#103).
   //
   // Target fraction (#1608): each tier is sized against the LEAST tanky class for
-  // its resource (priest for potionHp, hunter for potionMana; see
+  // its resource (priest for potionHp, paladin for potionMana on this line; see
   // tests/consumables.test.ts) at BASE stats (no gear) at the TOP level of its
   // intended zone bracket (ZONE1/2/3_ZONE.levelRange[1] in content/zone{1,2,3}.ts:
   // 7/13/20), the hardest point in the bracket for the tier to still feel worth
@@ -1150,7 +1150,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Elixir of the Bear',
     kind: 'elixir',
     quality: 'uncommon',
-    elixir: { aura: 'Might of the Bear', kind: 'buff_sta', value: 12, duration: 900 },
+    elixir: {
+      aura: 'Might of the Bear',
+      kind: 'buff_sta',
+      value: 12,
+      duration: 900,
+    },
     sellValue: 20,
     buyValue: 100,
   },
@@ -1258,6 +1263,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     foodHp: 980,
     sellValue: 0,
+  },
+  soul_stone: {
+    id: 'soul_stone',
+    name: 'Soul Stone',
+    kind: 'potion',
+    quality: 'uncommon',
+    potionHpPctMax: 0.25,
+    stackSize: 3,
+    sellValue: 0,
+    soulbound: true,
+    noVendorSell: true,
+    noMarketList: true,
   },
   // --- Smith Haldren's stock (common/white, levels 3-7) ---
   eastbrook_arming_sword: {
@@ -1859,7 +1876,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 4,
   },
-  amber_hide: { id: 'amber_hide', name: 'Amber Hide', kind: 'junk', quality: 'poor', sellValue: 9 },
+  amber_hide: {
+    id: 'amber_hide',
+    name: 'Amber Hide',
+    kind: 'junk',
+    quality: 'poor',
+    sellValue: 9,
+  },
   stag_antler: {
     id: 'stag_antler',
     name: 'Branching Antler',

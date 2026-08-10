@@ -108,10 +108,12 @@ describe('Wildheart Basin dungeon content', () => {
     expect(boss.aoePulse?.name).toBe('Wildheart Pulse');
     expect(boss.knockback?.name).toBe('Jaguar Roar');
     expect(boss.enrage?.belowHpPct).toBe(0.3);
-    // Filtered by quality, not Object.keys: the Tier-2 loot pass added the rare
-    // beastspear and the guaranteed uncommon trio alongside the three epics.
+    // Scoped to Zulgar's own loot table: the Tier-2 loot pass added the rare
+    // beastspear and the uncommon trio, and the rogue re-band gave the Fanglord
+    // Beastmaster its own epic (duskwhisper), which is not a Zulgar drop.
+    const zulgarLootIds = new Set((boss.loot ?? []).map((drop) => drop.itemId));
     const epicIds = Object.keys(WILDHEART_ITEMS)
-      .filter((id) => WILDHEART_ITEMS[id].quality === 'epic')
+      .filter((id) => WILDHEART_ITEMS[id].quality === 'epic' && zulgarLootIds.has(id))
       .sort();
     expect(epicIds).toEqual([
       'wildheart_fangknife',

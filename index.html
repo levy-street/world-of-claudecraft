@@ -344,6 +344,17 @@
       <div id="rift-tracker"></div>
     </div>
 
+    <div class="paladin-devotion-frame" id="paladin-devotion-frame" role="group" tabindex="0" data-i18n-aria="hudChrome.paladin.devotion" aria-label="Devotion">
+      <div class="paladin-devotion" id="paladin-devotion" role="progressbar" data-i18n-aria="hudChrome.paladin.devotion" aria-label="Devotion" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0">
+        <div class="paladin-devotion-fill" id="paladin-devotion-fill"></div>
+        <div class="paladin-devotion-label" id="paladin-devotion-label"></div>
+        <div class="paladin-ascension-charges" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <span class="visually-hidden" id="paladin-ascension-status" role="status" aria-live="polite"></span>
+    </div>
+
     <div id="bottom-bar">
       <div id="actionbar-row">
         <div id="actionbar-stack">
@@ -364,12 +375,12 @@
             <div class="portrait-wrap">
               <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
               <div class="level-chip" id="pf-level">1</div>
-              <div class="combat-flash" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat">⚔</div>
+              <div class="combat-flash" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat"><img src="/ui/crests/status/combat.webp" data-crest-fallback-id="status_combat" data-crest-fallback-size="32" alt="" aria-hidden="true" /></div>
               <div class="rest-indicator" id="pf-rest" role="status" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
             </div>
             <div class="uf-bars">
               <div class="uf-name" id="pf-name"></div>
-              <div class="combo-row" id="combo-row"></div>
+              <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
               <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
               <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
             </div>
@@ -506,6 +517,7 @@
     <div id="arena-window" class="window panel"></div>
     <div id="dungeon-finder-window" class="window panel"></div>
     <div id="dfinder-proposal-popup" class="panel"></div>
+    <div id="bg-proposal-popup" class="panel"></div>
     <div id="valecup-window" class="window panel"></div>
     <div id="leaderboard-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel"></div>
@@ -1163,6 +1175,18 @@
                 <div class="news-loading" data-i18n="news.loading">Loading the latest updates...</div>
               </div>
             </div>
+            <!-- One-shot appearance redesign for pre-creator characters. Docks
+                 where the news panel sits (same class) and replaces it while
+                 open; the 3D stage previews the new look live. -->
+            <div id="charselect-reroll" class="cs-news-panel cs-reroll-panel" role="region" aria-labelledby="charselect-reroll-title" hidden>
+              <div class="cs-news-title" id="charselect-reroll-title"></div>
+              <div id="charselect-reroll-host"></div>
+              <div class="cs-reroll-actions">
+                <button type="button" class="btn btn-primary" id="btn-reroll-save" data-i18n="character.redesignSave">Save New Look</button>
+                <button type="button" class="btn btn-secondary" id="btn-reroll-cancel" data-i18n="character.redesignCancel">Keep Current Look</button>
+              </div>
+              <div id="charselect-reroll-error" class="auth-error" aria-live="polite"></div>
+            </div>
           </div>
         </div>
 
@@ -1290,19 +1314,19 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.35.1-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.36.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.35.1-win-x64.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.36.0-win-x64.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.35.1-linux-x86_64.AppImage"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.36.0-linux-x86_64.AppImage"
               data-i18n="download.linuxCta"
             >Download for Linux</a>
           </div>
@@ -1511,7 +1535,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.35.1</div>
+      <div id="game-version">v0.36.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper">Whitepaper</a>

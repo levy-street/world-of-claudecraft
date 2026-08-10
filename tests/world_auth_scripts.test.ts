@@ -27,6 +27,10 @@ const AUTHENTICATED_NODE_CLIENTS = [
     authSend: 'this.send(worldAuthMessage(token, characterId));',
   },
   {
+    path: 'scripts/catalog_program_census.mjs',
+    authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)))',
+  },
+  {
     path: 'scripts/chat_e2e.mjs',
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(token, characterId)))',
   },
@@ -45,6 +49,14 @@ const AUTHENTICATED_NODE_CLIENTS = [
   {
     path: 'scripts/crypt_raid.mjs',
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)));',
+  },
+  {
+    path: 'scripts/geared_arrival_bench.mjs',
+    authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)))',
+  },
+  {
+    path: 'scripts/lib/perf_hitch_scenarios.mjs',
+    authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)))',
   },
   {
     path: 'scripts/load_players.mjs',
@@ -135,9 +147,9 @@ function nodeWebSocketSources(dir = SCRIPTS_ROOT): Array<[string, string]> {
 
 describe('standalone world WebSocket auth', () => {
   it('keeps the Node discriminator fresh with the authoritative world layout epoch', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(5);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(6);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(SCRIPT_WORLD_AUTH_TYPE).toBe('auth-world-5');
+    expect(SCRIPT_WORLD_AUTH_TYPE).toBe('auth-world-6');
     expect(SCRIPT_WORLD_AUTH_TYPE).toBe(ONLINE_WORLD_AUTH_TYPE);
     expect(readFileSync(join(ROOT, 'scripts/lib/world_auth.d.mts'), 'utf8')).toContain(
       `export const ONLINE_WORLD_AUTH_TYPE: '${ONLINE_WORLD_AUTH_TYPE}';`,
@@ -159,7 +171,7 @@ describe('standalone world WebSocket auth', () => {
 
   it('pins every Node WebSocket client and the explicit non-auth security probe', () => {
     const nodeWsScripts = nodeWebSocketSources()
-      .map(([path]) => path)
+      .map(([path]) => path.replaceAll('\\', '/'))
       .sort();
 
     expect(nodeWsScripts).toEqual(
@@ -178,7 +190,9 @@ describe('standalone world WebSocket auth', () => {
       const source = readFileSync(join(ROOT, path), 'utf8');
       const helperPath = path.startsWith('scripts/profiler/')
         ? '../lib/world_auth.mjs'
-        : './lib/world_auth.mjs';
+        : path.startsWith('scripts/lib/')
+          ? './world_auth.mjs'
+          : './lib/world_auth.mjs';
       const normalizedSource = source.replace(/\s+/g, ' ');
 
       expect(source).toContain(`import { worldAuthMessage } from '${helperPath}';`);

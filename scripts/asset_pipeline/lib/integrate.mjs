@@ -79,8 +79,9 @@ export function insertIntoBlock(source, anchor, line) {
 // Weapon registration (--apply capable; gated by tests/held_weapon_models.test.ts)
 // ---------------------------------------------------------------------------
 
-/** Copy the built GLB + icon into public/ and register the variant key in both
- *  code registries. `itemIds` map existing (or new) item ids to the key. */
+/** Copy the built GLB + legacy model-preview JPG into public/ and register the variant key.
+ *  `itemIds` map existing (or new) item ids to the held-model key; each authored item also needs
+ *  bespoke painted inventory art at public/ui/items/<item-id>.webp before the item gate passes. */
 export function registerWeapon({ key, gripFamily, glbPath, iconPath, itemIds = [] }) {
   if (!/^[a-z0-9_]+$/.test(key)) throw new Error(`weapon key must be snake_case: ${key}`);
   for (const itemId of itemIds) {
@@ -400,6 +401,10 @@ export function registerClassSkin({ cls, model, texturePath, suffix }) {
 
 /** Append an attribution row (the "Project asset" style used for generated art).
  *  Idempotent on the asset cell text. */
+export function formatCreditsRow({ assets, source }) {
+  return `| ${assets} | World of ClaudeCraft | ${source} | Project asset | With the project only |\n`;
+}
+
 export function appendCreditsRow({ assets, source }) {
   let credits = read(FILES.credits);
   if (credits.includes(assets)) return [`CREDITS.md already lists "${assets}" (skipped)`];
@@ -407,7 +412,7 @@ export function appendCreditsRow({ assets, source }) {
   if (!rows.length) throw new Error('CREDITS.md table not found');
   const last = rows[rows.length - 1];
   const insertAt = last.index + last[0].length + 1;
-  const row = `| ${assets} | World of ClaudeCraft | ${source} | Project asset | With the project only |\n`;
+  const row = formatCreditsRow({ assets, source });
   credits = credits.slice(0, insertAt) + row + credits.slice(insertAt);
   write(FILES.credits, credits);
   return ['appended CREDITS.md row'];

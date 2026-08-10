@@ -125,7 +125,7 @@ const results = [];
   await page.close();
 }
 
-// Scene 4: Metamorphosis visual (bigger, dark fel demon).
+// Scene 4: Necromancy Lich Form visual.
 {
   const page = await enterGame('warlock', 'Fellord');
   const cast = await page.evaluate(() => {
@@ -136,7 +136,7 @@ const results = [];
     me.gcdRemaining = 0;
     sim.castAbility('metamorphosis');
     return {
-      inForm: me.auras.some((a) => a.kind === 'form_metamorph'),
+      inForm: me.auras.some((a) => a.kind === 'form_lich'),
       scale: Math.round((me.scale ?? 1) * 100) / 100,
     };
   });

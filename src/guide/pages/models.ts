@@ -2,6 +2,7 @@
 // class, creature, and warlock demon. A single lazy viewer is reused as the reader picks,
 // so the page costs nothing until it mounts and only ever holds one WebGL context.
 
+import { crestImageFallbackAttributes } from '../../ui/crest_image_fallback';
 import { esc } from '../../ui/esc';
 import { type TranslationKey, t } from '../../ui/i18n';
 import { iconDataUrl } from '../../ui/icons';
@@ -26,6 +27,8 @@ interface ModelOption {
   color?: string;
   /** Optional small 2D crest (fallback when no still). */
   poster?: string;
+  /** Crest identity behind poster when no prerendered still exists. */
+  posterCrestId?: string;
   /** Pre-rendered still of this figure, preferred over the crest for the option icon. */
   still?: string;
 }
@@ -50,6 +53,7 @@ function classOptions(): ModelOption[] {
     tint: c.tint,
     color: c.color,
     poster: classCrest(c.id, 64),
+    posterCrestId: `class_${c.id}`,
     still: c.still,
   }));
 }
@@ -63,6 +67,7 @@ function creatureOptions(): ModelOption[] {
         name: c.name,
         tint: c.tint,
         poster: familyCrest(f.family),
+        posterCrestId: `family_${f.family}`,
         still: c.still,
       });
     }
@@ -101,8 +106,10 @@ function optionHtml(o: ModelOption): string {
   const style = o.color ? ` style="--opt-color:${esc(o.color)}"` : '';
   const tint = o.tint ? ` data-tint="${esc(o.tint)}"` : '';
   const icon = o.still ?? o.poster;
+  const fallback =
+    !o.still && o.posterCrestId ? ` ${crestImageFallbackAttributes(o.posterCrestId, 64)}` : '';
   const img = icon
-    ? `<img src="${esc(icon)}" alt="" width="28" height="28" loading="lazy" decoding="async" />`
+    ? `<img src="${esc(icon)}"${fallback} alt="" width="28" height="28" loading="lazy" decoding="async" />`
     : '';
   // A toggle button (aria-pressed): one is active at a time and it loads that model.
   // data-still carries the baked still so the stage can show it while the live model loads

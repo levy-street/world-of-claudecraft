@@ -202,6 +202,24 @@ function splitGameUiTemplate(): { templateHtml: string; liveHtml: string } {
 }
 
 describe('client HTML shell', () => {
+  it('uses the painted combat-status crest in both game entries', () => {
+    for (const entry of [html, playHtml]) {
+      const combat = entry.match(/<div class="combat-flash"[^>]*>[\s\S]*?<\/div>/)?.[0];
+      expect(combat).toBeDefined();
+      expect(combat).toContain('id="pf-combat"');
+      expect(combat).toContain('role="status"');
+      expect(combat).toContain('src="/ui/crests/status/combat.webp"');
+      expect(combat).toContain('data-crest-fallback-id="status_combat"');
+      expect(combat).toContain('data-crest-fallback-size="32"');
+      expect(combat).not.toContain(String.fromCodePoint(0x2694));
+      expect(entry).toContain('id="pf-rest" role="status"');
+    }
+    expect(existsSync(new URL('../public/ui/crests/status/combat.webp', import.meta.url))).toBe(
+      true,
+    );
+    expect(hudCss).toContain('.combat-flash img');
+  });
+
   it('keeps game HUD controls out of the live startup DOM', () => {
     const { liveHtml, templateHtml } = splitGameUiTemplate();
 
@@ -951,13 +969,29 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('hud.prewarmStaticUiAssets();');
     expect(hudTs).toContain('prewarmStaticUiAssets(): void {');
     expect(hudTs).toContain('raidMarkerDataUrl(marker);');
-    const crestWarm = mainTs.slice(
-      mainTs.indexOf('for (const cls of ALL_CLASSES)'),
-      mainTs.indexOf('for (const slot of world.inventory)'),
+    const priorityCall = mainTs.slice(
+      mainTs.indexOf('contextualIconPrewarmEntries({'),
+      mainTs.indexOf('const iconPrewarm = defaultIconPrewarmPlan'),
     );
-    expect(crestWarm).toContain("kind: 'crest'");
-    expect(crestWarm).toContain('size: 20');
-    expect(crestWarm).toContain('size: 96');
+    for (const source of [
+      'equipmentItemIds',
+      'classIds',
+      'inventoryItemIds',
+      'bagItemIds',
+      'knownAbilityIds',
+      'classAbilityIds',
+      'talentIconRefs',
+      'recipeResultItemIds',
+      'finderLootItemIds',
+      'questRewardItemIds',
+      'heroicVendorItemIds',
+      'marketListingItemIds',
+      'marketCollectionItemIds',
+      'marketHouseItemIds',
+      'vendorItemIds',
+    ]) {
+      expect(priorityCall, source).toContain(`${source}:`);
+    }
   });
 
   it('keeps the desktop character roster readable inside a centered cinematic stage', () => {
@@ -1530,15 +1564,19 @@ describe('client HTML shell', () => {
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel #char-list::-webkit-scrollbar {\n      width: 8px;',
     );
+    // By CLASS, not by id: the redesign editor is a second panel in the same
+    // docked slot, and an id-keyed override left it unstyled on mobile.
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-news {\n      grid-column: 1 / -1;',
+      'body.mobile-touch #charselect-panel .cs-news-panel {\n      grid-column: 1 / -1;',
     );
     expect(shellCss).toContain('scrollbar-gutter: stable;\n      scrollbar-width: auto;');
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel {\n      height: auto;\n      overflow: visible;',
     );
+    // The feed shares this rule with the redesign editor's customizer host:
+    // both render at natural height and let the PAGE scroll.
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel .cs-news-feed {\n    flex: none;\n    min-height: 0;\n    overflow: visible;',
+      'body.mobile-touch #charselect-panel .cs-news-feed,\n  body.mobile-touch #charselect-panel .cs-reroll-panel #charselect-reroll-host {\n    flex: none;\n    min-height: 0;\n    overflow: visible;',
     );
     // charselect's columns stay overflow:hidden (their #char-list and
     // .cs-news-feed CHILDREN scroll); charcreate's columns hold a
@@ -1649,10 +1687,22 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('stacks the character-select news panel on mobile', () => {
+  it('stacks BOTH docked character-select panels on mobile', () => {
+    // The news feed and the one-shot redesign editor share the slot and the
+    // `cs-news-panel` chrome. The override is keyed on that class rather than on
+    // `#charselect-news`, because an id-keyed one left the redesign panel at the
+    // desktop fixed height with none of the mobile fixes while its button
+    // rendered on every device.
     expect(html).toContain('id="charselect-news"');
+    expect(html).toContain('id="charselect-reroll"');
+    expect(html).toContain('class="cs-news-panel cs-reroll-panel"');
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-news {\n    flex: none;\n    width: 100%;',
+      'body.mobile-touch #charselect-panel .cs-news-panel {\n    flex: none;\n    width: 100%;',
+    );
+    // ...and the customizer follows the feed's "the page is the scroller" rule,
+    // rather than scrolling inside a panel that is itself scrolling.
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-reroll-panel #charselect-reroll-host {',
     );
   });
 

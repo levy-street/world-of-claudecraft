@@ -120,13 +120,26 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'mount_run_terrorspark_groundshaker_start',
+    custom: true,
+  },
+  {
+    // The sustain take of the windup/loop/winddown set: driven through
+    // Sfx.loop() at runtime (see mountEngine in src/game/sfx.ts), not
+    // playAt, so the manifest's own `loop` flag must say so too, even
+    // though nothing reads it at runtime today.
     key: 'mount_run_terrorspark_groundshaker',
     custom: true,
+    loop: true,
   },
   {
     // The Drakemaw Raptor's sprint: the gobbler's two-legged gallop donor,
     // pitched down in sfx_speed_map.json so the heavier raptor reads deeper.
     key: 'mount_run_drakemaw_raptor',
+    custom: true,
+  },
+  {
+    key: 'mount_run_terrorspark_groundshaker_stop',
     custom: true,
   },
   {
@@ -427,6 +440,30 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'intimidating_shout',
+    custom: true,
+  },
+  {
+    key: 'battle_shout',
+    custom: true,
+  },
+  {
+    key: 'demoralizing_shout',
+    custom: true,
+  },
+  {
+    key: 'emboldening_roar',
+    custom: true,
+  },
+  {
+    key: 'defiant_bellow',
+    custom: true,
+  },
+  {
+    key: 'rallying_cry',
+    custom: true,
+  },
+  {
     key: 'ice_block',
     custom: true,
   },
@@ -456,6 +493,10 @@ export const SFX = [
   },
   {
     key: 'pyroblast',
+    custom: true,
+  },
+  {
+    key: 'meteor',
     custom: true,
   },
   {
@@ -951,6 +992,21 @@ export const SFX = [
   // break-any-item-for-generic-materials action (src/sim/professions/
   // salvage.ts), separate from disenchant's rare+ arcane-materials path.
   { key: 'ui_craft_salvage', custom: true },
+
+  // --- Rift mechanics (custom recordings, src/sim/rift/) --------------------
+  // World-anchored one-shots and point-source loops for the procedural Rift
+  // dungeon's headline floor mechanics (src/sim/rift/runs.ts, portals.ts),
+  // played via the spellfxAt world event's optional sfxKey override.
+  { key: 'rift_portal_spawn', custom: true }, // a natural rift portal opening in the world
+  { key: 'rift_portal_enter', custom: true }, // stepping through into the instance
+  { key: 'rift_portal_drone', custom: true, loop: true }, // point-source loop near an open, unentered portal
+  { key: 'rift_gate_grind', custom: true }, // the rift gate mechanic's portcullis grinding open
+  { key: 'rift_boulder_impact', custom: true }, // the rolling-lane hazard bowling over a player
+  { key: 'rift_boulder_roll', custom: true, loop: true }, // point-source loop near an active rolling-lane hazard
+  { key: 'rift_ice_start', custom: true }, // launching onto the ice-slide zone
+  { key: 'rift_ice_glide', custom: true, loop: true }, // point-source loop for a player currently gliding
+  { key: 'rift_ice_stop', custom: true }, // skidding to a halt off the ice
+  { key: 'rift_lava_tick', custom: true }, // the 1 Hz lava/blackwater hazard burn tick
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

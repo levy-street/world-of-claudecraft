@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { BUILTIN_WORLD } from '../src/sim/data';
+import { applyRuinousBrand } from '../src/sim/combat/destruction';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -237,6 +239,52 @@ describe('duel: PvP combat affordances', () => {
 
     expect(warrior.hp).toBeLessThan(warriorHpBeforeDrain);
     expect(warlock.hp).toBeGreaterThan(warlockHpBeforeDrain);
+  });
+
+  it('copies the terminal duel health loss through Ruinous Brand', () => {
+    const { sim, a, b } = startedDuel('warlock', 'warrior');
+    sim.setPlayerLevel(20, a);
+    sim.setPlayerLevel(20, b);
+    expect(sim.setSpec('destruction', a)).toBe(true);
+    sim.tick();
+    const warlock = sim.entities.get(a)!;
+    const opponent = sim.entities.get(b)!;
+    const branded = createMob(99_901, MOBS.training_dummy, 20, {
+      x: warlock.pos.x + 2,
+      y: warlock.pos.y,
+      z: warlock.pos.z + 5,
+    });
+    branded.hostile = true;
+    branded.maxHp = branded.hp = 10_000;
+    (sim as unknown as { addEntity(entity: Entity): void }).addEntity(branded);
+    applyRuinousBrand(sim.ctx, warlock, branded, 18, 3);
+
+    opponent.hp = 10;
+    opponent.inCombat = true;
+    opponent.combatTimer = 0;
+    warlock.resource = warlock.maxResource;
+    warlock.gcdRemaining = 0;
+    warlock.auras.push({
+      id: 'destruction_ruin',
+      name: 'Ruin',
+      kind: 'destruction_ruin',
+      remaining: 3600,
+      duration: 3600,
+      value: 1,
+      stacks: 1,
+      sourceId: warlock.id,
+      school: 'fire',
+    });
+    sim.targetEntity(opponent.id, a);
+    warlock.facing = Math.atan2(opponent.pos.x - warlock.pos.x, opponent.pos.z - warlock.pos.z);
+    const brandedBefore = branded.hp;
+
+    sim.castAbility('shadowburn', a);
+    for (let i = 0; i < 20 && opponent.hp > 1; i++) sim.tick();
+
+    expect(opponent.hp).toBe(1);
+    expect(brandedBefore - branded.hp).toBe(5);
+    expect(branded.auras.find((aura) => aura.id === 'ruinous_brand')?.stacks).toBe(2);
   });
 });
 

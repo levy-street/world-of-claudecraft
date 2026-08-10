@@ -3,17 +3,12 @@ import {
   type AbilityVfxBuffSpec,
   type AbilityVfxFullSpec,
   abilityHexColor,
-  insertStunBandPick,
-  MAX_STUN_STAR_BANDS,
-  STUN_STAR_ALPHA_FLOOR,
-  STUN_STAR_BRIGHTNESS,
-  STUN_STAR_COLOR,
-  STUN_STAR_COUNT,
-  STUN_STAR_LIFT,
-  STUN_STAR_RADIUS,
-  STUN_STAR_RATE,
-  STUN_STAR_SIZE,
-  stunBandRankKey,
+  CC_BAND_SPECS,
+  type CcBandSpec,
+  type CcBandType,
+  ccBandRankKey,
+  insertCcBandPick,
+  MAX_CC_BANDS,
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { type DecalStyle, GroundDecals } from './decals';
@@ -26,7 +21,7 @@ import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './rib
 import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SeqPoint, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
-import { isCrescendoArchetype, SPECTACLE } from './spectacle';
+import { SPECTACLE, usesCrescendoScale } from './spectacle';
 import {
   asSpiritPath,
   SpiritApparitions,
@@ -92,7 +87,7 @@ const ORBIT_STYLE_SET = new Set<string>([
   'leaves',
 ]);
 
-// Resolve an authored buff-orbit name ('none', unknown, or absent → null).
+// Resolve an authored buff-orbit name ('none', unknown, or absent ? null).
 export function asOrbitStyle(v: string | null | undefined): OrbitStyle | null {
   return v != null && ORBIT_STYLE_SET.has(v) ? (v as OrbitStyle) : null;
 }
@@ -114,7 +109,7 @@ const MAX_WINDUPS = 24;
 const WINDUP_LEAN_RAD = 0.085;
 
 // Cap on the one-shot buff-application glow pulse (fx.glowPulse): applied rig
-// emissive peaks at min(0.85, 0.9 * 0.38) ≈ 0.34 and fast-decays to nothing in
+// emissive peaks at min(0.85, 0.9 * 0.38) ? 0.34 and fast-decays to nothing in
 // ~0.4s. Sustained body tint is reserved for cast windups and the morph/
 // ultimate rims the painter grants explicitly.
 const BUFF_APPLICATION_PULSE_MAX = 0.9;
@@ -129,7 +124,7 @@ function wantsScreenFx(spec: AbilityVfxFullSpec, tier: number): boolean {
   if (tier !== 0 || spec.screenFx === false) return false;
   if (spec.screenFx === true) return true;
   return (
-    isCrescendoArchetype(spec.archetype) ||
+    usesCrescendoScale(spec) ||
     spec.finisher === true ||
     (spec.archetype === 'nova' && (spec.nova?.radius ?? 5) >= 7)
   );
@@ -138,7 +133,7 @@ function wantsScreenFx(spec: AbilityVfxFullSpec, tier: number): boolean {
 // Ripple+flash strength for a sequence's landing: crescendo impacts ride the
 // spectacle constants (gallery-scale), everything else keeps the gentle ask.
 function screenFxStrengthOf(spec: AbilityVfxFullSpec): number {
-  if (!isCrescendoArchetype(spec.archetype)) return spec.finisher ? 1 : 0.8;
+  if (!usesCrescendoScale(spec)) return spec.finisher ? 1 : 0.8;
   return spec.finisher ? SPECTACLE.screenFxFinisher : SPECTACLE.screenFx;
 }
 
@@ -157,13 +152,22 @@ interface OrbitBand {
   stamp: number;
 }
 
-export type WindupStyle = 'none' | 'orb' | 'runes' | 'vortex' | 'ascend' | 'stance' | 'weapon';
+export type WindupStyle =
+  | 'none'
+  | 'orb'
+  | 'runes'
+  | 'vortex'
+  | 'compression'
+  | 'ascend'
+  | 'stance'
+  | 'weapon';
 
 const WINDUP_STYLE_SET = new Set<string>([
   'none',
   'orb',
   'runes',
   'vortex',
+  'compression',
   'ascend',
   'stance',
   'weapon',
@@ -171,8 +175,10 @@ const WINDUP_STYLE_SET = new Set<string>([
 
 interface WindupState {
   colorHex: number;
+  accentHex: number;
   progress: number;
   style: WindupStyle;
+  streams: number;
   stamp: number;
 }
 
@@ -279,8 +285,8 @@ const ORBIT_DNA: Record<
   },
 };
 
-// Gallery ORBIT_TEX names mapped onto the overlay atlas's four cells (chip →
-// spark is the closest fragment read; rays → star; paw → rune glyph).
+// Gallery ORBIT_TEX names mapped onto the overlay atlas's four cells (chip ?
+// spark is the closest fragment read; rays ? star; paw ? rune glyph).
 const ORBIT_TEX_CELL: Record<string, number | undefined> = {
   star: OVERLAY_CELL.star,
   glow: OVERLAY_CELL.glow,
@@ -318,20 +324,23 @@ export class AbilityVfxFx implements SequencerHost {
   private windups = new Map<number, WindupState>();
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
-  // Persistent stunned-star bands (holdStunStars), one entry per stunned
+  // Persistent crowd-control bands (holdCcBand), one entry per controlled
   // entity, frame-stamp swept exactly like windups/orbits. Drawn for at most
-  // the MAX_STUN_STAR_BANDS best-ranked entities per frame (the fixed pick
-  // arrays are the selection scratch, reused every frame). hx/hy/hz cache the
-  // frame's resolved head anchor so the ranking pass and the draw share one
-  // resolve instead of asking the anchor delegate twice.
-  private stunStars = new Map<
+  // the MAX_CC_BANDS best-ranked entities per frame across ALL band types (the
+  // fixed pick arrays are the selection scratch, reused every frame). hx/hy/hz
+  // cache the frame's resolved body anchor so the draw never re-resolves it
+  // (the renderer's anchor delegate allocates a Vector3 per call); which end of
+  // the body that anchor is comes from the band spec's anchorFrac, so the root
+  // band rides the ankles while the stun and fear bands ride the head.
+  private ccBands = new Map<
     number,
-    { remaining: number; stamp: number; hx: number; hy: number; hz: number }
+    { type: CcBandType; remaining: number; stamp: number; hx: number; hy: number; hz: number }
   >();
-  private stunPickIds: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
-  private stunPickKeys: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
-  private stunPickCount = 0;
+  private ccPickIds: number[] = new Array(MAX_CC_BANDS).fill(0);
+  private ccPickKeys: number[] = new Array(MAX_CC_BANDS).fill(0);
+  private ccPickCount = 0;
   private time = 0;
+  private reducedMotionActive = false;
   private frame = 0;
   private qualityLevel = 1;
   // Camera-right on the ground plane, refreshed once per update: entities
@@ -646,6 +655,24 @@ export class AbilityVfxFx implements SequencerHost {
       true,
     );
     const screen = wantsScreenFx(spec, tier);
+    const onTerminate = slot
+      ? (x: number, y: number, z: number) => {
+          this.sequencer.cancel(slot);
+          if (tier < 2) {
+            this.particleBurst?.(x, y, z, colorHex, tier === 0 ? 6 : 3, 0.35, 'smoke');
+            if (tier === 0)
+              this.particleBurst?.(
+                x,
+                y,
+                z,
+                abilityHexColor(spec.rim ?? '#d8ff58'),
+                4,
+                0.3,
+                'embers',
+              );
+          }
+        }
+      : null;
     const b = spec.bolt;
     if (!b) {
       this.ribbons.spawnTrail(
@@ -659,6 +686,7 @@ export class AbilityVfxFx implements SequencerHost {
               if (screen) this.screenFxAt(x, y, z, screenFxStrengthOf(spec));
             }
           : null,
+        onTerminate,
       );
       return;
     }
@@ -677,6 +705,8 @@ export class AbilityVfxFx implements SequencerHost {
         speed,
         style,
         headSize: hs,
+        coreHex: b.core ? abilityHexColor(b.core) : undefined,
+        accentHex: b.accent ? abilityHexColor(b.accent) : undefined,
         coils: fullTier && b.coils === true,
         jagTrail: fullTier && b.jagged === true,
         forkEvery: fullTier ? (b.forkEvery ?? 0) : 0,
@@ -692,6 +722,7 @@ export class AbilityVfxFx implements SequencerHost {
         if (slot) this.sequencer.triggerImpact(this, slot, x, y, z);
         if (screen) this.screenFxAt(x, y, z, screenFxStrengthOf(spec));
       },
+      onTerminate,
     );
     // staggered barrage riding behind the lead projectile (gallery volley):
     // followers keep the style head and trail, shed the garnish, land with a
@@ -707,6 +738,8 @@ export class AbilityVfxFx implements SequencerHost {
           speed,
           style,
           headSize: hs * 0.75,
+          coreHex: b.core ? abilityHexColor(b.core) : undefined,
+          accentHex: b.accent ? abilityHexColor(b.accent) : undefined,
           coils: false,
           jagTrail: false,
           forkEvery: 0,
@@ -761,6 +794,24 @@ export class AbilityVfxFx implements SequencerHost {
       },
     );
     const screen = wantsScreenFx(spec, tier);
+    const onTerminate = slot
+      ? (ax: number, ay: number, az: number) => {
+          this.sequencer.cancel(slot);
+          if (tier < 2) {
+            this.particleBurst?.(ax, ay, az, colorHex, tier === 0 ? 6 : 3, 0.35, 'smoke');
+            if (tier === 0)
+              this.particleBurst?.(
+                ax,
+                ay,
+                az,
+                abilityHexColor(spec.rim ?? '#d8ff58'),
+                4,
+                0.3,
+                'embers',
+              );
+          }
+        }
+      : null;
     const b = spec.bolt;
     const style: BoltTrailStyle = b?.style ?? PROJ_STYLE_BY_PALETTE[spec.palette] ?? 'comet';
     const speed = b?.speed ?? 26;
@@ -793,6 +844,7 @@ export class AbilityVfxFx implements SequencerHost {
         if (slot) this.sequencer.triggerImpact(this, slot, ax, ay, az);
         if (screen) this.screenFxAt(ax, ay, az, screenFxStrengthOf(spec));
       },
+      onTerminate,
     );
     // the fan: followers aim at spread points around the landing so the
     // volley reads as a scatter of shots blanketing the aimed area
@@ -884,18 +936,21 @@ export class AbilityVfxFx implements SequencerHost {
     return out;
   }
 
-  // True when the aura-driven stunned-star band actually WON a draw slot in
+  // True when an aura-driven CC band of ANY type actually WON a draw slot in
   // the latest frame, which is what the sequencer's cast-moment ccStars stand
-  // down for. Membership in the pick set, deliberately not "was fed": the
-  // band count is capped, and answering on fed-ness suppressed the
-  // cast-moment band for a capped-out victim whose held band was never drawn,
-  // leaving it with no overhead read at all (worse than before this feature
-  // existed). The pick set is rebuilt at the top of every update(), before
-  // sequencer.update() consults it, so the sequencer always reads the set for
-  // the frame it is drawing.
-  heldStunStars(targetId: number): boolean {
-    for (let i = 0; i < this.stunPickCount; i++) {
-      if (this.stunPickIds[i] === targetId) return true;
+  // down for. Any type, not just stun: the 'cc' archetype flashes the same
+  // yellow stars for a root or a fear cast, so a victim now wearing its own
+  // green ankle shards or violet wisps must claim the read away from a burst
+  // that would name the wrong control. Membership in the pick set,
+  // deliberately not "was fed": the band count is capped, and answering on
+  // fed-ness suppressed the cast-moment band for a capped-out victim whose
+  // held band was never drawn, leaving it with no overhead read at all (worse
+  // than before this feature existed). The pick set is rebuilt at the top of
+  // every update(), before sequencer.update() consults it, so the sequencer
+  // always reads the set for the frame it is drawing.
+  heldCcBand(targetId: number): boolean {
+    for (let i = 0; i < this.ccPickCount; i++) {
+      if (this.ccPickIds[i] === targetId) return true;
     }
     return false;
   }
@@ -977,7 +1032,7 @@ export class AbilityVfxFx implements SequencerHost {
   // in the painter, while scarce render pools are released immediately so an
   // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
   sleepEntity(entityId: number): void {
-    this.stunStars.delete(entityId);
+    this.ccBands.delete(entityId);
     this.windups.delete(entityId);
     const bands = this.orbits.get(entityId);
     if (bands) {
@@ -1094,7 +1149,7 @@ export class AbilityVfxFx implements SequencerHost {
     // easeInOutSine ramp); the visual's spring recoils it forward on release
     const p = Math.min(1, Math.max(0, progress));
     this.bodyLeanCb?.(entityId, WINDUP_LEAN_RAD * (0.5 - 0.5 * Math.cos(Math.PI * p)));
-    this.drawWindup(entityId, s, colorHex, progress);
+    this.drawWindup(entityId, s, colorHex, progress, 1, colorHex, this.reducedMotionActive);
   }
 
   quality(): number {
@@ -1343,6 +1398,8 @@ export class AbilityVfxFx implements SequencerHost {
     progress: number,
     style: WindupStyle = 'orb',
     priority = false,
+    streams = 1,
+    accentHex = colorHex,
   ): boolean {
     if (style === 'none') return false;
     let w = this.windups.get(entityId);
@@ -1355,13 +1412,15 @@ export class AbilityVfxFx implements SequencerHost {
         if (oldest.done) return false;
         this.windups.delete(oldest.value);
       }
-      w = { colorHex, progress, style, stamp: this.frame };
+      w = { colorHex, accentHex, progress, style, streams, stamp: this.frame };
       this.windups.set(entityId, w);
       started = true;
     }
     w.colorHex = colorHex;
+    w.accentHex = accentHex;
     w.progress = progress;
     w.style = style;
+    w.streams = Math.min(3, Math.max(1, Math.round(streams)));
     w.stamp = this.frame;
     return started;
   }
@@ -1401,49 +1460,67 @@ export class AbilityVfxFx implements SequencerHost {
     return true;
   }
 
-  // Holds the persistent stunned-star band over the entity's head while a
-  // worn `kind: 'stun'` aura lives: the painter re-feeds it every frame from
-  // its aura scan, and the update sweep drops it the frame the feed stops
-  // (aura faded, entity left interest), so there is no teardown bookkeeping.
-  // remaining drives the fade toward the alpha floor over the stun's final
-  // second; the color is always STUN_STAR_COLOR (one uniform tell).
-  holdStunStars(entityId: number, remaining: number): void {
-    let s = this.stunStars.get(entityId);
+  // Holds the persistent CC band on the entity while a worn hard-CC aura
+  // lives: the painter re-feeds it every frame from its aura scan, and the
+  // update sweep drops it the frame the feed stops (aura faded, entity left
+  // interest), so there is no teardown bookkeeping. remaining drives the fade
+  // toward the alpha floor over the aura's final second; `type` picks the
+  // whole visual (color, cell, geometry, which end of the body it rides) from
+  // CC_BAND_SPECS, so a victim whose control changes kind mid-life (a stun
+  // landing on a rooted target) swaps to the more severe band in place.
+  holdCcBand(entityId: number, type: CcBandType, remaining: number): void {
+    let s = this.ccBands.get(entityId);
     if (!s) {
-      s = { remaining, stamp: this.frame, hx: 0, hy: 0, hz: 0 };
-      this.stunStars.set(entityId, s);
+      s = { type, remaining, stamp: this.frame, hx: 0, hy: 0, hz: 0 };
+      this.ccBands.set(entityId, s);
       return;
     }
+    s.type = type;
     s.remaining = remaining;
     s.stamp = this.frame;
   }
 
-  // One held star band (the drawOrbit sibling): STUN_STAR_COUNT sprites
-  // orbiting the head anchor the pick loop already resolved. Alpha reads the
-  // stun's remaining time but never falls below the floor while the aura
+  // One held band (the drawOrbit sibling): the spec's sprite count riding a
+  // ring around the anchor the pick loop already resolved. Alpha reads the
+  // aura's remaining time but never falls below the spec's floor while it
   // lives: the fade above the floor is the duration read, the floor is the
-  // fairness rule (an active stun tell must stay readable to the last tick).
-  private drawStunStars(s: { remaining: number; hx: number; hy: number; hz: number }): void {
-    const alpha = Math.max(STUN_STAR_ALPHA_FLOOR, Math.min(1, s.remaining));
-    for (let k = 0; k < STUN_STAR_COUNT; k++) {
-      const a = this.time * STUN_STAR_RATE + (k / STUN_STAR_COUNT) * Math.PI * 2;
+  // fairness rule (an active CC tell must stay readable to the last tick).
+  // A spec with a wobble bobs each sprite on its own phase, which is the
+  // fear band's motion signature (see CC_BAND_SPECS: color alone must not be
+  // the only thing separating the three).
+  private drawCcBand(s: {
+    type: CcBandType;
+    remaining: number;
+    hx: number;
+    hy: number;
+    hz: number;
+  }): void {
+    const spec: CcBandSpec = CC_BAND_SPECS[s.type];
+    const alpha = Math.max(spec.alphaFloor, Math.min(1, s.remaining));
+    const cell = OVERLAY_CELL[spec.cell];
+    for (let k = 0; k < spec.count; k++) {
+      const phase = (k / spec.count) * Math.PI * 2;
+      const a = this.time * spec.rate + phase;
+      const bob =
+        spec.wobble === 0 ? 0 : Math.sin(this.time * spec.rate * 1.7 + phase) * spec.wobble;
       this.overlay.push(
-        s.hx + Math.cos(a) * STUN_STAR_RADIUS,
-        s.hy + STUN_STAR_LIFT,
-        s.hz + Math.sin(a) * STUN_STAR_RADIUS,
-        STUN_STAR_COLOR,
-        STUN_STAR_SIZE,
-        OVERLAY_CELL.star,
+        s.hx + Math.cos(a) * spec.radius,
+        s.hy + spec.lift + bob,
+        s.hz + Math.sin(a) * spec.radius,
+        spec.color,
+        spec.size,
+        cell,
         alpha,
-        STUN_STAR_BRIGHTNESS,
+        spec.brightness,
       );
     }
   }
 
   // ---- frame advance ------------------------------------------------------
 
-  update(dt: number): void {
+  update(dt: number, reducedMotion = false): void {
     this.time += dt;
+    this.reducedMotionActive = reducedMotion;
     this.shakeRecent = Math.max(0, this.shakeRecent - dt * 0.8);
     this.camera.getWorldPosition(camPosScratch);
     camRightScratch.set(1, 0, 0).applyQuaternion(this.camera.quaternion);
@@ -1468,7 +1545,7 @@ export class AbilityVfxFx implements SequencerHost {
     // anything spawns into it. The shock rings deliberately do NOT thin: their
     // footprints are too wide for an interpolated drape to stay honest.
     this.decals.setCameraPosition(camPosScratch.x, camPosScratch.z);
-    this.ribbons.update(dt, camPosScratch);
+    this.ribbons.update(dt, camPosScratch, reducedMotion);
     this.rings.update(dt, this.camera.quaternion);
     this.flipbooks.update(dt, this.camera.quaternion);
     this.decals.update(dt);
@@ -1485,56 +1562,51 @@ export class AbilityVfxFx implements SequencerHost {
     );
     this.spirits.update(dt);
     this.overlay.beginFrame();
-    // The stunned-star bands draw FIRST in the frame's overlay batch: the
-    // stun tell is actionable information, so capacity contention with the
-    // decorative sprites that follow must never be able to drop it. The band
-    // count is itself bounded (MAX_STUN_STAR_BANDS), so a raid-wide mass stun
-    // cannot starve the windup telegraphs and worn-debuff bands drawn after
-    // it, and the slots go to bands IN FRONT of the camera before any behind
-    // it (stunBandRankKey owns why that is a fairness rule, not polish).
-    // The sequencer's cast-moment ccStars stand down only for the bands that
-    // actually win a slot here, so the two are one continuous read for a
-    // drawn band, and a band the cap drops still reads through the burst.
-    let stunPicks = 0;
-    for (const [id, s] of this.stunStars) {
+    // The CC bands draw FIRST in the frame's overlay batch: a hard-CC tell is
+    // actionable information, so capacity contention with the decorative
+    // sprites that follow must never be able to drop it. The band count is
+    // itself bounded (MAX_CC_BANDS, ONE budget across all three types), so a
+    // raid-wide mass CC cannot starve the windup telegraphs and worn-debuff
+    // bands drawn after it. Slots go by severity first and then to bands IN
+    // FRONT of the camera before any behind it (ccBandRankKey owns why both
+    // are fairness rules, not polish). The sequencer's cast-moment ccStars
+    // stand down only for the bands that actually win a slot here, so the two
+    // are one continuous read for a drawn band, and a band the cap drops still
+    // reads through the burst.
+    let ccPicks = 0;
+    for (const [id, s] of this.ccBands) {
       if (s.stamp !== this.frame) {
-        this.stunStars.delete(id);
+        this.ccBands.delete(id);
         continue;
       }
-      const head = this.anchorOf(id, 1.0, anchorScratchA);
-      if (!head) continue;
-      s.hx = head.x;
-      s.hy = head.y;
-      s.hz = head.z;
-      const dx = head.x - camPosScratch.x;
-      const dy = head.y - camPosScratch.y;
-      const dz = head.z - camPosScratch.z;
+      const spec = CC_BAND_SPECS[s.type];
+      const at = this.anchorOf(id, spec.anchorFrac, anchorScratchA);
+      if (!at) continue;
+      s.hx = at.x;
+      s.hy = at.y;
+      s.hz = at.z;
+      const dx = at.x - camPosScratch.x;
+      const dy = at.y - camPosScratch.y;
+      const dz = at.z - camPosScratch.z;
       const inFront = dx * camFwdScratch.x + dy * camFwdScratch.y + dz * camFwdScratch.z > 0;
-      const key = stunBandRankKey(dx * dx + dy * dy + dz * dz, inFront);
-      stunPicks = insertStunBandPick(
-        this.stunPickIds,
-        this.stunPickKeys,
-        stunPicks,
-        id,
-        key,
-        MAX_STUN_STAR_BANDS,
-      );
+      const key = ccBandRankKey(spec.severity, dx * dx + dy * dy + dz * dz, inFront);
+      ccPicks = insertCcBandPick(this.ccPickIds, this.ccPickKeys, ccPicks, id, key, MAX_CC_BANDS);
     }
-    // Published BEFORE sequencer.update below, which asks heldStunStars.
-    this.stunPickCount = stunPicks;
-    for (let i = 0; i < stunPicks; i++) {
-      const s = this.stunStars.get(this.stunPickIds[i]);
-      if (s) this.drawStunStars(s);
+    // Published BEFORE sequencer.update below, which asks heldCcBand.
+    this.ccPickCount = ccPicks;
+    for (let i = 0; i < ccPicks; i++) {
+      const s = this.ccBands.get(this.ccPickIds[i]);
+      if (s) this.drawCcBand(s);
     }
     // styled bolt heads ride this frame's overlay batch (positions were just
     // advanced by ribbons.update above)
-    this.ribbons.drawHeads(this.time, this.headSink);
+    this.ribbons.drawHeads(this.time, this.headSink, reducedMotion);
     for (const [id, w] of this.windups) {
       if (w.stamp !== this.frame) {
         this.windups.delete(id);
         continue;
       }
-      this.drawWindup(id, w.style, w.colorHex, w.progress);
+      this.drawWindup(id, w.style, w.colorHex, w.progress, w.streams, w.accentHex, reducedMotion);
     }
     for (const [id, bands] of this.orbits) {
       for (let i = bands.length - 1; i >= 0; i--) {
@@ -1592,8 +1664,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.windups.clear();
     this.orbits.clear();
     this.orbitBandCount = 0;
-    this.stunStars.clear();
-    this.stunPickCount = 0;
+    this.ccBands.clear();
+    this.ccPickCount = 0;
     for (const s of this.screenFxQueue) s.active = false;
   }
 
@@ -1606,6 +1678,7 @@ export class AbilityVfxFx implements SequencerHost {
   //   orb     a glow converging and swelling between the hands (the default)
   //   runes   a rotating rune circle at the feet, tightening as the cast fills
   //   vortex  wide sparks pulled inward, the drain-cast read
+  //   compression compact paired wisps collapsing into a sharp hand point
   //   ascend  a rising mote column crowned by a star near completion
   //   stance  low dust drifting at the feet (warrior stances)
   //   weapon  a hand-height star building along the weapon
@@ -1614,10 +1687,13 @@ export class AbilityVfxFx implements SequencerHost {
     style: WindupStyle,
     colorHex: number,
     progress: number,
+    streams = 1,
+    accentHex = colorHex,
+    reducedMotion = false,
   ): void {
     const p = Math.min(1, Math.max(0, progress));
     const q = 0.75 + 0.25 * this.qualityLevel;
-    const pulse = 1 + 0.07 * Math.sin(this.time * 14);
+    const pulse = reducedMotion ? 1 : 1 + 0.07 * Math.sin(this.time * 14);
     if (style === 'runes') {
       const feet = this.anchor(entityId, 0.04, anchorScratchA);
       if (!feet) return;
@@ -1725,6 +1801,46 @@ export class AbilityVfxFx implements SequencerHost {
       );
       return;
     }
+    if (style === 'compression') {
+      const at = this.anchor(entityId, 0.58);
+      if (!at) return;
+      const reach = 0.18 + 1.05 * (1 - p);
+      const coreSize = (0.14 + 0.22 * p) * pulse * q;
+      for (let stream = 0; stream < streams; stream++) {
+        const baseAngle =
+          (reducedMotion ? 0 : this.time * (3.6 + stream * 0.25)) +
+          (stream * Math.PI * 2) / streams +
+          entityId * 0.37;
+        const streamColor = stream % 2 === 0 ? colorHex : accentHex;
+        for (let node = 0; node < 3; node++) {
+          const along = (node + 1) / 3;
+          const radius = reach * along;
+          const angle = baseAngle - along * (1.8 + 0.65 * p);
+          this.overlay.push(
+            at.x + Math.cos(angle) * radius,
+            at.y + 0.1 + (stream - (streams - 1) * 0.5) * 0.08 * (1 - p),
+            at.z + Math.sin(angle) * radius,
+            streamColor,
+            (0.065 + 0.025 * along) * q,
+            OVERLAY_CELL.spark,
+            0.5 + 0.38 * p,
+            1.8 + 0.45 * p,
+          );
+        }
+      }
+      this.overlay.push(at.x, at.y + 0.1, at.z, colorHex, coreSize, OVERLAY_CELL.glow, 0.75, 1.25);
+      this.overlay.push(
+        at.x,
+        at.y + 0.1,
+        at.z,
+        accentHex,
+        coreSize * 0.42,
+        OVERLAY_CELL.spark,
+        0.55 + 0.4 * p,
+        2.8,
+      );
+      return;
+    }
     // orb (default) and vortex share the hand orb; vortex pulls from wider out
     const at = this.anchor(entityId, 0.58, anchorScratchA);
     if (!at) return;
@@ -1740,7 +1856,32 @@ export class AbilityVfxFx implements SequencerHost {
       0.5 + 0.5 * p,
       2.6,
     );
-    if (this.qualityLevel >= 0.5) {
+    if (style === 'vortex' && streams > 1) {
+      const streamReach = 0.22 + 1.85 * (1 - p);
+      for (let stream = 0; stream < streams; stream++) {
+        const baseAngle =
+          this.time * (2.8 + stream * 0.2) + (stream * Math.PI * 2) / streams + entityId * 0.37;
+        const streamColor = stream % 2 === 0 ? colorHex : accentHex;
+        for (let node = 0; node < 3; node++) {
+          const along = (node + 1) / 3;
+          const radius = streamReach * along;
+          const angle = baseAngle - along * (1.4 + 0.8 * p);
+          this.overlay.push(
+            at.x + Math.cos(angle) * radius,
+            at.y +
+              0.12 +
+              (stream - (streams - 1) * 0.5) * 0.16 * (1 - p) +
+              Math.sin(this.time * 6 + stream + node) * 0.05,
+            at.z + Math.sin(angle) * radius,
+            streamColor,
+            (0.12 + 0.055 * along) * q,
+            node === 2 ? OVERLAY_CELL.star : OVERLAY_CELL.spark,
+            0.62 + 0.3 * p,
+            2.2 + 0.45 * p,
+          );
+        }
+      }
+    } else if (this.qualityLevel >= 0.5) {
       const motes = style === 'vortex' ? 4 : 2;
       const reach = style === 'vortex' ? 1.9 : 0.9;
       for (let k = 0; k < motes; k++) {

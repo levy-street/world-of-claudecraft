@@ -18,6 +18,7 @@ import { bagCapacity, canAddItem, consumeOneScratch } from '../bags';
 import { ENCHANT_FAMILY_CAST_DURATION_SEC } from '../content/professions';
 import { RIFT_ESSENCE_ITEM_ID } from '../content/rift/items';
 import { ITEMS } from '../data';
+import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { requiredLevelFor } from '../item_level_req';
 import { removePreferFungible } from '../items';
 import { forceDismount } from '../mounts';
@@ -25,7 +26,13 @@ import { riftSalvageYield } from '../rift/progression';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type Entity, type ItemDef, isConsuming, SALVAGE_CAST_ID } from '../types';
+import {
+  type Entity,
+  type ItemDef,
+  type ItemInstancePayload,
+  isConsuming,
+  SALVAGE_CAST_ID,
+} from '../types';
 
 const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'poor',
@@ -109,7 +116,12 @@ export interface SalvageResult {
  * consumes exactly one copy of the item and grants the rolled material yield.
  * Craft Cast System Phase 4: no shared action throttle; the cast paces.
  */
-export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): SalvageResult {
+export function resolveSalvage(
+  ctx: SimContext,
+  pid: number,
+  itemId: string,
+  slotIndex?: number,
+): SalvageResult {
   const def = ITEMS[itemId];
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isSalvageable(def)) return { ok: false, itemId, reason: 'not_salvageable' };
@@ -127,7 +139,16 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   // arm above.
   if (meta) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
-    const victim = consumeOneScratch(scratch, itemId);
+    // The predicted victim must be the copy this call will ACTUALLY consume, or
+    // the capacity gate pre-fits the wrong payout (a rift copy pays essence, a
+    // plain one pays the quality material). With a selection that is the named
+    // slot; without one it stays the legacy preferred-victim walk.
+    const selectedVictim = consumeSelectedInventorySlot(scratch, itemId, slotIndex);
+    if (selectedVictim === null) return { ok: false, itemId, reason: 'not_held' };
+    const victim =
+      selectedVictim === undefined
+        ? consumeOneScratch(scratch, itemId)
+        : (selectedVictim.instance ?? undefined);
     const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
     const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
     if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {
@@ -138,7 +159,18 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   // instance is never salvaged while an interchangeable shell exists. When only
   // instanced copies remain, removePreferFungible consumes one and returns the
   // payload it ACTUALLY consumed: a rift-upgraded copy pays out rift essence.
-  const [consumedInstance] = removePreferFungible(ctx, itemId, 1, pid);
+  // A named slot consumes exactly that copy; an id-only call keeps the legacy
+  // prefer-plain walk untouched (the parity goldens drive that arm).
+  let consumedInstance: ItemInstancePayload | undefined;
+  if (slotIndex === undefined) {
+    [consumedInstance] = removePreferFungible(ctx, itemId, 1, pid);
+  } else {
+    const owner = ctx.players.get(pid);
+    const taken = owner ? consumeSelectedInventorySlot(owner.inventory, itemId, slotIndex) : null;
+    if (!owner || !taken) return { ok: false, itemId, reason: 'not_held' };
+    consumedInstance = taken.instance;
+    ctx.onInventoryChangedForQuests?.(owner);
+  }
   const riftInstance = consumedInstance?.rift ? consumedInstance : null;
   if (riftInstance) {
     const count = riftSalvageYield(riftInstance);
@@ -177,6 +209,7 @@ export function evaluateSalvageAdmission(
   ctx: SimContext,
   pid: number,
   itemId: string,
+  slotIndex?: number,
 ): SalvageResult | null {
   const def = ITEMS[itemId];
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
@@ -186,7 +219,12 @@ export function evaluateSalvageAdmission(
   if (!meta) return null;
   const materialItemId = SALVAGE_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'bone_fragments';
   const scratch = meta.inventory.map((s) => ({ ...s }));
-  const victim = consumeOneScratch(scratch, itemId);
+  // Predict the SELECTED victim, not the legacy one. A rift copy pays essence and a
+  // plain copy pays material, so modelling the wrong victim let a cast start that
+  // could only refuse at completion (the two payouts fit differently).
+  const selected = consumeSelectedInventorySlot(scratch, itemId, slotIndex);
+  if (selected === null) return { ok: false, itemId, reason: 'not_held' };
+  const victim = selected === undefined ? consumeOneScratch(scratch, itemId) : selected.instance;
   const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
   const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
   if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {
@@ -195,7 +233,13 @@ export function evaluateSalvageAdmission(
   return null;
 }
 
-function beginSalvageCast(ctx: SimContext, p: Entity, itemId: string): void {
+function beginSalvageCast(
+  ctx: SimContext,
+  p: Entity,
+  itemId: string,
+  slotIndex: number | undefined,
+  meta: PlayerMeta,
+): void {
   if (p.sitting) ctx.standUp(p);
   if (p.mountKey !== '') forceDismount(ctx, p);
   if (p.mountCastKey !== '') {
@@ -211,11 +255,14 @@ function beginSalvageCast(ctx: SimContext, p: Entity, itemId: string): void {
   p.castTargetId = null;
   p.channeling = false;
   p.enchantCastItemId = itemId;
-  p.enchantCastBagSlot = 0;
+  // Stored 1-based (slotIndex + 1, 0 = not pin-selected), mirroring the enchant
+  // family verbatim: the resting value must be 0 so the parity sampler's
+  // default-omission drops it. A -1 rest value re-hashes every golden.
+  p.enchantCastBagSlot = slotIndex === undefined ? 0 : slotIndex + 1;
   p.enchantCastEnchantId = '';
   p.enchantCastEquipSlot = '';
   p.enchantCastConfirmReplace = false;
-  p.enchantCastTargetPin = '';
+  p.enchantCastTargetPin = slotIndex === undefined ? '' : itemCopyPin(meta.inventory[slotIndex]);
   ctx.emit({
     type: 'castStart',
     entityId: p.id,
@@ -226,16 +273,21 @@ function beginSalvageCast(ctx: SimContext, p: Entity, itemId: string): void {
 
 /** Command entry point (issue #1300): validates and STARTS a SALVAGE_CAST_ID
  *  cast. Materials resolve only on completeSalvageCast. */
-export function salvageItem(ctx: SimContext, itemId: string, pid?: number): SalvageResult {
+export function salvageItem(
+  ctx: SimContext,
+  itemId: string,
+  pid?: number,
+  slotIndex?: number,
+): SalvageResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, reason: 'unknown_item' };
   const { meta, e: p } = r;
   if (p.castingAbility || isConsuming(p)) {
     return { ok: false, itemId, reason: 'busy' };
   }
-  const denial = evaluateSalvageAdmission(ctx, meta.entityId, itemId);
+  const denial = evaluateSalvageAdmission(ctx, meta.entityId, itemId, slotIndex);
   if (denial) return denial;
-  beginSalvageCast(ctx, p, itemId);
+  beginSalvageCast(ctx, p, itemId, slotIndex, meta);
   return { ok: true, itemId, casting: true };
 }
 
@@ -248,6 +300,8 @@ export function completeSalvageCast(ctx: SimContext, p: Entity, meta: PlayerMeta
   // direct-assigned castingAbility (the parity-harness drive style) must
   // write the session fields too or the empty-session guard below no-ops.
   const itemId = p.enchantCastItemId;
+  const sessionBagSlot = p.enchantCastBagSlot;
+  const sessionPin = p.enchantCastTargetPin;
   p.enchantCastItemId = '';
   p.enchantCastBagSlot = 0;
   p.enchantCastEnchantId = '';
@@ -256,7 +310,27 @@ export function completeSalvageCast(ctx: SimContext, p: Entity, meta: PlayerMeta
   p.enchantCastTargetPin = '';
   // Empty session: silent no-op (completeRechargeCast precedent).
   if (itemId === '') return;
-  const result = resolveSalvage(ctx, meta.entityId, itemId);
+  const slotIndex = sessionBagSlot <= 0 ? undefined : sessionBagSlot - 1;
+  // Pin re-check, mirroring the enchant family: the bag can move during the
+  // cast (a loot, a sort, a stack merge), and an index alone would then point at
+  // whatever slid into that slot. Refusing is the only safe answer, because the
+  // player aimed at a specific copy and silently hitting a different one is
+  // worse than the old guess.
+  if (slotIndex !== undefined && itemCopyPin(meta.inventory[slotIndex]) !== sessionPin) {
+    const moved: SalvageResult = { ok: false, itemId, reason: 'not_held' };
+    meta.lastSalvageResult = moved;
+    ctx.emit({
+      type: 'salvageResult',
+      ok: false,
+      itemId,
+      materialItemId: moved.materialItemId,
+      count: moved.count,
+      reason: moved.reason,
+      pid: meta.entityId,
+    });
+    return;
+  }
+  const result = resolveSalvage(ctx, meta.entityId, itemId, slotIndex);
   meta.lastSalvageResult = result;
   ctx.emit({
     type: 'salvageResult',

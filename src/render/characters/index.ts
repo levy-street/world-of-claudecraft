@@ -16,9 +16,15 @@ export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 
 // A composed (modular) body is opt-in per entity: the app installs a provider
 // that maps an entity to its authored look, and anything it does not claim
-// keeps the fixed class rig it has always used. Kept as a seam rather than a
-// sim/network field because the appearance is presentation-only and the wire
-// format has no place for it yet, only the LOCAL player is composed today.
+// keeps the fixed class rig it has always used.
+//
+// EVERY player composes now, not just the local one: the look rides the `app`
+// identity wire field (set at join from the character's own column), so the
+// provider answers for peers from server truth. A character authored before the
+// creator carries no look and keeps its class rig, which is what the provider
+// returning null still means. The seam stays a seam because the RULE for what a
+// given entity wears is app-level (see src/render/characters/player_look_core.ts),
+// while this module only needs the answer.
 let modularLookProvider: ((e: Entity) => ModularLook | null) | null = null;
 
 /** Install (or clear, with null) the entity-to-look mapping. */
@@ -56,9 +62,9 @@ export function createMountVisual(visualKey: string): CharacterVisual {
  *  training dummy freeze). */
 export function createCharacterVisual(
   e: Entity,
-  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel',
+  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
 ): CharacterVisual | null {
-  // forms (sheep/bear/cat/travel) are their own models — skins and held weapons
+  // Forms are their own models. Skins and held weapons
   // only apply to the base body
   // Shapeshift forms are their own model and never compose, and neither does a
   // Combat Mech wearer: the mech is a whole replacement body, so the cosmetic

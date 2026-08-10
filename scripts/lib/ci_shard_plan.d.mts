@@ -1,11 +1,13 @@
 export const CI_GUARD_SUITES: readonly string[];
 export const CI_GUARD_PREFIXES: readonly string[];
 export const CI_LONG_SUITES: readonly string[];
+export const CI_LONG_SUITE_HALVES: { readonly a: readonly string[]; readonly b: readonly string[] };
 export const FLOOR_SANITY_MIN: number;
 
 export function collectedLaneFiles(opts: {
   testFiles: string[];
   exists: (p: string) => boolean;
+  suites?: readonly string[];
 }): string[];
 
 export function parseShardArg(argv: string[]): { index: number; total: number } | null;
@@ -15,6 +17,8 @@ export function buildFloor(opts: {
   testFiles: string[];
   changedTestFiles: string[];
 }): { floor: string[]; missingGuards: string[] };
+
+export function resolveLocalBin(name: string): string;
 
 export interface ShardLeg {
   name: string;
@@ -48,6 +52,7 @@ export function buildLanePlan(opts: {
   testFiles: string[];
   workers: number;
   exists: (p: string) => boolean;
+  half: 'a' | 'b';
 }): {
   mode: 'full' | 'selective';
   reason: string;

@@ -80,6 +80,9 @@
     --color-mana: #2b7bd4;
     --color-rage: #c0392b;
     --color-energy: #e4c531;
+    --color-focus: #d79a2b;
+    --color-devotion: #e7b943;
+    --color-ascension: #fff1a3;
     --color-hostile: #ff6b5e;
     --color-friendly: #9fdc7f;
     --color-buff: #3a6ea8;
@@ -91,6 +94,20 @@
     /* Per-school debuff border tints (WoW-style poison/magic/curse reads); physical
        keeps the base --color-debuff red. Driven by the aura node's data-school. */
     --color-debuff-fire: #e8722a;
+    --color-ruin-empty-border: #6b2b12;
+    --color-ruin-empty-start: #27100b;
+    --color-ruin-empty-end: #120706;
+    --color-ruin-lit-border: #ffd073;
+    --color-ruin-lit-core: #fff0a0;
+    --color-ruin-lit-mid: #ff6a1f;
+    --color-ruin-lit-edge: #8d1d08;
+    --color-ruin-glow: #ff5a1fcc;
+    --color-ruin-inner-shine: #fff4;
+    --color-ruin-ritual-shadow: #080201e8;
+    --color-ruin-ritual-aura: #ff4c213d;
+    --color-ruin-ring-highlight: #e982365c;
+    --color-ruin-rune-dim: #8d3b1f99;
+    --color-ruin-full-flare: #ffcf737a;
     --color-debuff-frost: #4aa3df;
     --color-debuff-arcane: #3f8cff;
     --color-debuff-shadow: #9b59d0;

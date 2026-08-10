@@ -8,7 +8,12 @@ const outDir = resolve('mediawiki/seed');
 const tmpDir = resolve('tmp/mediawiki-seed');
 const sourcePath = resolve(tmpDir, 'seed-source.ts');
 const bundlePath = resolve(tmpDir, 'seed-source.mjs');
-const outputPath = resolve(outDir, 'pages.xml');
+// MEDIAWIKI_SEED_OUT lets a caller build the seed somewhere else (the visibility
+// test rebuilds into a temp dir so it can check the GENERATOR without requiring
+// the committed deploy artifact to be regenerated in every content PR).
+const outputPath = process.env.MEDIAWIKI_SEED_OUT
+  ? resolve(process.env.MEDIAWIKI_SEED_OUT)
+  : resolve(outDir, 'pages.xml');
 const execFileAsync = promisify(execFile);
 
 await mkdir(tmpDir, { recursive: true });
@@ -84,9 +89,10 @@ function unique(base, used) {
 }
 
 const usedTitles = new Set();
+const visibleAbilities = Object.entries(ABILITIES).filter(([, ability]) => ability.hiddenFromPlayer !== true);
 
 for (const [id, cls] of Object.entries(CLASSES)) titleBy.class.set(id, unique(cls.name, usedTitles));
-for (const [id, ability] of Object.entries(ABILITIES)) titleBy.ability.set(id, unique(ability.name + ' (Ability)', usedTitles));
+for (const [id, ability] of visibleAbilities) titleBy.ability.set(id, unique(ability.name + ' (Ability)', usedTitles));
 for (const zone of ZONES) titleBy.zone.set(zone.id, unique(zone.name, usedTitles));
 for (const dungeon of DUNGEON_LIST) titleBy.dungeon.set(dungeon.id, unique(dungeon.name, usedTitles));
 for (const [id, npc] of Object.entries(NPCS)) titleBy.npc.set(id, unique(npc.name + ' (NPC)', usedTitles));
@@ -206,7 +212,7 @@ const portals = [
   ['Quests', QUEST_ORDER.map((id) => titleBy.quest.get(id)).filter(Boolean)],
   ['Mobs', Object.keys(MOBS).map((id) => titleBy.mob.get(id))],
   ['Items', Object.keys(ITEMS).map((id) => titleBy.item.get(id))],
-  ['Abilities', Object.keys(ABILITIES).map((id) => titleBy.ability.get(id))],
+  ['Abilities', visibleAbilities.map(([id]) => titleBy.ability.get(id))],
 ];
 
 for (const [portal, titles] of portals) {
@@ -222,7 +228,10 @@ for (const zone of ZONES) {
 }
 
 for (const [id, cls] of Object.entries(CLASSES)) {
-  add(titleBy.class.get(id), section('Overview', cls.name + ' starts with ' + (ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + ' and uses ' + cls.resourceType + '.') + section('Stats', table(Object.entries(cls.baseStats).map(([k, v]) => [k.toUpperCase(), String(v)]))) + section('Abilities', bullets(cls.abilities.map((abilityId) => link(titleBy.ability.get(abilityId), ABILITIES[abilityId]?.name ?? abilityId)))), ['Classes']);
+  const abilities = cls.abilities
+    .filter((abilityId) => titleBy.ability.has(abilityId))
+    .map((abilityId) => link(titleBy.ability.get(abilityId), ABILITIES[abilityId]?.name ?? abilityId));
+  add(titleBy.class.get(id), section('Overview', cls.name + ' starts with ' + (ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + ' and uses ' + cls.resourceType + '.') + section('Stats', table(Object.entries(cls.baseStats).map(([k, v]) => [k.toUpperCase(), String(v)]))) + section('Abilities', bullets(abilities)), ['Classes']);
 }
 
 for (const dungeon of DUNGEON_LIST) {
@@ -260,7 +269,7 @@ for (const [id, item] of Object.entries(ITEMS)) {
   ])) + (item.weapon ? section('Weapon', table([['Damage', item.weapon.min + '-' + item.weapon.max], ['Speed', String(item.weapon.speed)], ['Dagger', item.weapon.dagger ? 'Yes' : 'No']])) : '') + (item.stats ? section('Stats', table(Object.entries(item.stats).map(([k, v]) => [k.toUpperCase(), String(v)]))) : '') + (item.foodHp || item.drinkMana ? section('Consumable', table([['Health restored', String(item.foodHp ?? 0)], ['Mana restored', String(item.drinkMana ?? 0)]])) : ''), ['Items', item.kind, item.quality ?? 'common']);
 }
 
-for (const [id, ability] of Object.entries(ABILITIES)) {
+for (const [id, ability] of visibleAbilities) {
   add(titleBy.ability.get(id), section('Description', ability.description) + section('Facts', table([
     ['Class', link(titleBy.class.get(ability.class), CLASSES[ability.class]?.name ?? ability.class)], ['Learn level', String(ability.learnLevel)], ['Cost', String(ability.cost)], ['Cooldown', ability.cooldown + 's'], ['Range', ability.range ? ability.range + ' yd' : 'Melee/self'], ['School', ability.school],
   ])) + section('Base effects', bullets(ability.effects.map((effect) => effect.type))) + (ability.ranks?.length ? section('Ranks', table(ability.ranks.map((rank) => ['Rank ' + rank.rank, 'Level ' + rank.level + ', cost ' + rank.cost]))) : ''), ['Abilities', CLASSES[ability.class]?.name ?? ability.class]);

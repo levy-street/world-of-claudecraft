@@ -152,12 +152,15 @@ describe('buildWarfareVendorView: sectioning', () => {
   });
 
   it('lists named families in the authored order, unnamed families after', () => {
+    // Authored heaviest-to-lightest by armor class: the two mail sets, then the
+    // two leather, then cloth. Thornhide is leather and used to sit last, below
+    // cloth, which read as an ordering mistake to anyone scanning the shop.
     expect(WARFARE_SHOP_SET_ORDER).toEqual([
       'warfare_furyforged',
       'warfare_stormbound',
       'warfare_ashstalker',
-      'warfare_cinderweave',
       'warfare_thornhide',
+      'warfare_cinderweave',
     ]);
     // Stock deliberately lists the UNNAMED family first and the two named ones
     // out of authored order, so first-seen order and authored order disagree:

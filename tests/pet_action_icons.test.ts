@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { ABILITIES } from '../src/sim/data';
+import { ABILITIES, MOBS } from '../src/sim/data';
 import { hasExplicitAbilityIcon } from '../src/ui/icons';
-import { PET_ACTION_ICONS, petFeedButtonState } from '../src/ui/pet_action_icons';
+import {
+  PET_ACTION_ICONS,
+  petFeedButtonState,
+  petSpecialButtonState,
+} from '../src/ui/pet_action_icons';
 
 // Regression guard for "Repeated icons on hunter class": the pet action bar used to pass
 // class ability ids to the icon resolver, so pet buttons borrowed other classes' spell
@@ -27,6 +31,36 @@ describe('pet action bar icons', () => {
 
   it('uses a distinct icon id per pet action', () => {
     expect(new Set(iconIds).size).toBe(iconIds.length);
+  });
+
+  it('gives each Warlock pet signature button explicit art', () => {
+    expect(hasExplicitAbilityIcon('emberkin_felbolt')).toBe(true);
+    expect(hasExplicitAbilityIcon('gloomshade_abyssal_chain')).toBe(true);
+  });
+});
+
+describe('petSpecialButtonState', () => {
+  it('projects Duskmurk and Emberkin skills with visible cooldown and autocast state', () => {
+    expect(petSpecialButtonState(MOBS.gloomshade, 14.2, true)).toEqual({
+      iconId: 'gloomshade_abyssal_chain',
+      labelKey: 'hud.pet.abyssalChain',
+      titleKey: 'hud.pet.abyssalChainTitle',
+      descKey: 'hud.pet.abyssalChainDesc',
+      cooldown: 15,
+      autocast: true,
+    });
+    expect(petSpecialButtonState(MOBS.emberkin, 0, false)).toEqual({
+      iconId: 'emberkin_felbolt',
+      labelKey: 'hud.pet.felbolt',
+      titleKey: 'hud.pet.felboltTitle',
+      descKey: 'hud.pet.felboltDesc',
+      cooldown: 0,
+      autocast: false,
+    });
+  });
+
+  it('does not invent a signature button for a pet without authored skill data', () => {
+    expect(petSpecialButtonState(MOBS.forest_wolf, 0, false)).toBeNull();
   });
 });
 

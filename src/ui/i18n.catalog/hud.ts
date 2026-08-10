@@ -47,6 +47,7 @@ const hudStringsEn = {
           say: 'Say',
           yell: 'Yell',
           party: 'Party',
+          battleground: 'Battleground',
           general: 'General',
           world: 'World',
           lfg: 'LFG',
@@ -208,6 +209,7 @@ const hudStringsEn = {
     chat: {
       rightClickName: 'Right-click {name}',
       templates: {
+        battleground: '[Battleground] {name}: {message}',
         party: '[Party] {name}: {message}',
         yell: '{name} yells: {message}',
         whisper: '{name} whispers: {message}',
@@ -328,6 +330,10 @@ const hudStringsEn = {
       // death_recap_feedback.ts).
       deathRecapFalling: 'You have died. You fell to your death.',
       deathRecapDrowned: 'You have died. You drowned.',
+      // Cauterize's self-inflicted burn (aura id 'cauterizing', display name
+      // 'Cauterized') is another unattributed cause: it must not read as
+      // "Slain by Cauterized", which sounds like an enemy landed the kill.
+      deathRecapCauterized: "You have died. Cauterize's burn overwhelmed you.",
       respawn: 'You feel rested and whole again.',
       ignoringChat: 'Ignoring chat from {name}.',
       noLongerIgnoring: 'No longer ignoring {name}.',
@@ -356,6 +362,7 @@ const hudStringsEn = {
       notEnoughRage: 'Not enough rage!',
       notEnoughEnergy: 'Not enough energy!',
       notEnoughMana: 'Not enough mana!',
+      notEnoughDevotion: 'Not enough Devotion!',
       notEnoughResource: 'Not enough {resource}!',
       notEnoughHealth: 'Not enough health.',
       targetMustDodge: 'Your target must dodge first.',
@@ -371,6 +378,7 @@ const hudStringsEn = {
       outOfRange: 'Out of range.',
       noTarget: 'You have no target.',
       tooClose: 'Too close!',
+      mustTargetAlly: 'You must target an ally.',
       facing: 'You must be facing your target.',
       targetHealthBelow: 'That ability requires the target below {percent}% health.',
       dagger: 'You must wield a dagger.',

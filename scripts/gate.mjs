@@ -21,10 +21,18 @@
 // changed-file biome are never treated as cacheable "green forever".
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import { runGatePreflights } from './lib/gate_preflight.mjs';
 import { buildFullGateSteps } from './lib/gate_steps.mjs';
 import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
+
+// Same fileURLToPath-based resolution gate_select.mjs already uses: correct
+// regardless of the invoking process's cwd, unlike process.cwd(). Threaded
+// into buildFullGateSteps so its turbo steps resolve node_modules/.bin/turbo
+// directly instead of paying npx's dispatch overhead on every cacheable step.
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 // Halving the core count only protects a gate run from ITSELF; it does nothing when a
 // second `npm run gate` (or any other heavy vitest run) is happening in a sibling
@@ -63,7 +71,7 @@ const shell = process.platform === 'win32';
 // side effect of an empty PATH also making `npm` itself unspawnable.
 // Both preflights now live in lib/gate_preflight.mjs so gate:select shares them
 // rather than silently losing the early, clear failure they exist to produce.
-runGatePreflights({ label: 'gate', shell });
+await runGatePreflights({ label: 'gate', shell });
 
 const branch =
   spawnSync('git', ['branch', '--show-current'], { encoding: 'utf8', shell }).stdout?.trim() ?? '';
@@ -78,7 +86,7 @@ const baseEnv = { ...process.env };
 // Shared step list (Phase 2 generate-once + Phase 8 turbo cacheable pure steps).
 // The bot build rides inside buildFullGateSteps (scripts/lib/gate_steps.mjs), so
 // the packet's R7 step stays in every consumer of the shared list.
-const steps = buildFullGateSteps(workers, { releaseTier });
+const steps = buildFullGateSteps(workers, { releaseTier, repoRoot });
 
 if (releaseTier) {
   console.log(

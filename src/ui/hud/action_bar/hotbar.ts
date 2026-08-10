@@ -46,9 +46,14 @@ export function attackDragDisposition(
 
 /** One rule for every action-bar entry point: passive abilities are informational only. */
 export function isAbilityActionBarEligible(
-  ability: Pick<AbilityDef, 'passive'> | null | undefined,
+  ability: Pick<AbilityDef, 'passive' | 'hiddenFromPlayer'> | null | undefined,
 ): boolean {
-  return ability !== null && ability !== undefined && ability.passive !== true;
+  return (
+    ability !== null &&
+    ability !== undefined &&
+    ability.passive !== true &&
+    ability.hiddenFromPlayer !== true
+  );
 }
 
 export function sanitizeHotbarAction(

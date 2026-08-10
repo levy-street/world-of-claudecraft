@@ -79,7 +79,7 @@
 | frost_nova | 1 | 10 | 35 | inst, 22cd | aoeRoot 8s r10, 6–7 |
 | | **2** | **16** | 50 | inst, 22cd | aoeRoot 8s r10, **12–14** |
 
-**NEW:**
+**NEW (shared / non-Destruction):**
 
 | Ability | Learn | Cost | Cast/CD | Effects |
 |---|---|---|---|---|
@@ -125,15 +125,20 @@
 
 ## PALADIN
 
+The Paladin tables in this section preserve the pre-v0.30 rank plan as decision history. They
+are not the current player kit. Current learn levels are authored in `src/sim/content/` and
+pinned by `tests/paladin_progression.test.ts`; the current design is
+`docs/design/paladin-devotion-core.md`.
+
 | Ability | Rank | Learn | Cost | Cast | Effect values |
 |---|---|---|---|---|---|
-| seal_of_righteousness | 1 | 1 | 25 | inst | imbue +4/swing, judge 10–18 |
-| | **2** | **10** | 35 | inst | imbue **+7**, judge **18–28** |
-| | **3** | **16** | 50 | inst | imbue **+11**, judge **30–44** |
-| holy_light | 1 | 1 | 35 | 2.5 | heal 42–51 |
-| | **2** | **8** | 60 | 2.5 | heal **76–90** |
-| | **3** | **14** | 95 | 2.5 | heal **122–144** |
-| | **4** | **20** | 140 | 2.5 | heal **190–222** |
+| seal_of_righteousness | 1 | 1 | 25 | inst | imbue +4/swing |
+| | **2** | **10** | 35 | inst | imbue **+7** |
+| | **3** | **16** | 50 | inst | imbue **+11** |
+| holy_light | 1 | 1 | 25 | 1.5 | heal 42-51 |
+| | **2** | **8** | 35 | 1.5 | heal **76-90** |
+| | **3** | **14** | 50 | 1.5 | heal **122-144** |
+| | **4** | **20** | 65 | 1.5 | heal **190-222** |
 | devotion_aura | 1 | 1 | 0 | inst | buff_armor 40 |
 | | **2** | **12** | 0 | inst | buff_armor **75** |
 | | **3** | **18** | 0 | inst | buff_armor **110** |
@@ -146,7 +151,6 @@
 | | **2** | **16** | 45 | inst, 60cd | stun **4s** |
 | lay_on_hands | 1 | 10 | 0 | inst, 600cd | heal 250 |
 | | **2** | **18** | 0 | inst, 600cd | heal **600** (~75% of L20 pala hp) |
-| judgement | 1 | 4 | 30 | — | no ranks (scales via Seal ranks) |
 
 **NEW:**
 
@@ -156,7 +160,7 @@
 | `exorcism` | 14 | 55 | inst, 15cd, 30yd | directDamage 46–56 (holy nuke; undead-only restriction omitted — no such flag) |
 | `consecration` | 18 | 60 | inst, 8cd | aoeDamage 28–34, radius 8 (caster-centered) |
 
-**Sanity** — L14: swing ~26 + Seal R2 (+7) ≈ 33, + Judgement R2 (~23/10s) + Exorcism (~51/15s) → 292 hp ≈ 9–10 swings, ~20s ✓ (hybrid pace). L20: swing ~42 w/ Seal R3, judge ~37 → 400 hp ≈ 8 swings ✓.
+**Sanity**: recalculate against the current specialization kits; the removed Verdict payload no longer contributes damage from the Seal.
 
 ---
 
@@ -274,13 +278,13 @@
 
 | Ability | Rank | Learn | Cost | Cast | Effect values |
 |---|---|---|---|---|---|
-| shadow_bolt | 1 | 1 | 25 | 1.7 | 13–18 |
-| | **2** | **8** | 38 | **2.2** | **24–31** |
-| | **3** | **14** | 55 | **2.7** | **42–53** |
-| | **4** | **20** | 80 | **3.0** | **68–84** |
-| immolate | 1 | 1 | 25 | 2.0 | 11 + dot 20/15s |
-| | **2** | **10** | 40 | 2.0 | **22** + dot **35/15s** (5×7) |
-| | **3** | **16** | 60 | 2.0 | **38** + dot **60/15s** (5×12) |
+| shadow_bolt | 1 | 1 | 25 | 1.7 | 36-50 |
+| | **2** | **8** | 38 | **2.2** | **67-87** |
+| | **3** | **14** | 55 | **2.7** | **118-148** |
+| | **4** | **20** | 80 | **3.0** | **190-235** |
+| immolate | 1 | 1 | 25 | 2.0 | 31 + dot 56/15s |
+| | **2** | **10** | 40 | 2.0 | **62** + dot **98/15s** |
+| | **3** | **16** | 60 | 2.0 | **106** + dot **168/15s** |
 | corruption | 1 | 4 | 35 | 2.0 | dot 40/18s |
 | | **2** | **12** | 55 | 2.0 | dot **72/18s** (6×12) |
 | | **3** | **18** | 75 | 2.0 | dot **108/18s** (6×18) |
@@ -303,11 +307,49 @@
 |---|---|---|---|---|
 | `fear` | 14 | 40 | 1.5s, 20yd | incapacitate 8s (breaks on damage; reuses incapacitate — target cowers in place, no flee AI needed) |
 | `searing_pain` | 16 | 35 | 1.5s | directDamage 30–38 |
-| `shadowburn` | 20 | 70 | inst, 15cd | directDamage 56–66 |
 
-**Sanity** — L14: Corruption R2 (72) + CoA R2 (72) + 3× SB R3 (~143) ≈ 287 + Drain ✓ (~6 GCDs, dot-and-drain pace). L20: Corruption R3 + CoA R3 (220 over time) + 2–3 SB R4 (~152–228) ≥ 400 ✓.
+Committed Destruction excludes `corruption`, `curse_of_agony`, `searing_pain`,
+and `summon_doomguard`. Its reworked spell ladder overlays the shared Warlock
+ranks above:
+
+| Ability | Learn | Mana / Ruin | Cast/CD | Effects |
+|---|---|---|---|---|
+| `conflagrate` | 5 | 40 / +1 | inst, 2 charges, 12s recharge | requires own Burning Pact; advances one 3s DoT tick; 151-179 direct; +1 Desolation |
+| `chaos_bolt` (Ruinbolt) | 10 | 65 / 3 | 2.5s, no CD | 358-437 direct; Desolation makes the cast 30% faster |
+| `shadowburn` (Duskfire) | 14 | 35 / 1 | inst, 12cd | execute below 20%; 72-84 direct; Ruin refund if the claimed target dies within 5s |
+| `ruinous_brand` | 16 | 35 / none | inst, 20cd | marks for 15s; next 3 direct casts into another target copy 50% resolved damage |
+| `rain_of_fire` | 18 | 60 / 3 | inst, no CD | ground AoE 8-11 each second for 6s; Desolation makes the first wave immediate |
+| `summon_infernal` (Pyre Colossus) | 20 | 100 / +1/sec | 2.0s aimed, 180cd | impact AoE 58-72 in 6yd; 30s guardian; 84 Fire every 2s to enemies within 8yd |
+
+**Siege tuning:** the committed Destruction ladder is deliberately much heavier
+than the legacy shared Warlock values. The matched Nythraxis benchmark measures
+156.8 active DPS at level 20 in pre-raid gear.
 
 ---
+
+### Necromancy overlay
+
+Committed Necromancy replaces the shared damage ladder with its own soul and
+undead kit. Its non-summon additions are:
+
+| Ability | Rank | Learn | Cost | Cast/CD | Effects |
+|---|---:|---:|---:|---|---|
+| `soul_lance` | 1 | 9 | 35 | 1.6s, 8cd | 30-36 Shadow; adds another 50% of landed damage to Ossuary Mark |
+| | 2 | 14 | 50 | 1.6s, 8cd | 50-60 Shadow; same rider |
+| | 3 | 20 | 65 | 1.6s, 8cd | 74-88 Shadow; same rider |
+| `ossuary_mark` | 1 | 12 | 30 | instant, 20cd | 12s mark; stores 20% owner and undead damage; recast detonates; marked death bursts in 6 yards and creates 1 Soul Fragment |
+| `unholy_command` | 1 | 13 | 40 / 3 fragments | instant, 45cd | All owned undead deal 25% more damage and act 20% faster for 12s |
+
+The summon ladder uses two persistent Dominion slots. Only one servant of each
+archetype may serve at a time, and blocked summons spend no mana or Soul Fragments.
+
+| Ability | Learn | Mana / Fragments | Cast/CD | Dominion role |
+|---|---:|---:|---|---|
+| `raise_graveguard` | 1 | 0 / 0 | 2.5s, 3cd | Permanent defensive companion; auto-taunts, intercepts 20% owner damage, and Reaping grants 30% damage reduction for 4s |
+| `raise_skeletal_warrior` | 5 | 20 / 1 | instant | Persistent melee choice; cleaves for 45% every 6s and Reaping slows by 40% for 4s |
+| `raise_bone_mage` | 8 | 35 / 2 | instant | Persistent ranged choice; attacks apply 5% magic vulnerability for 6s and Reaping raises it to 8% |
+| `raise_gravewing` | 17 | 45 / 2 | instant | Persistent area choice; cleaves for 65% every 5s and Reaping applies 8% general vulnerability for 5s |
+| `army_of_the_dead` | 16 | 100 / 0 | 1.5s, 120cd | Adds one temporary Warrior, Bone Mage, and Gravewing for 20s; chosen servants persist afterward |
 
 ## DRUID
 
@@ -372,14 +414,14 @@
 | Warrior | execute@14, slam@16, cleave@18 | wire existing `requiresTargetHpBelow` |
 | Mage | personal barrier@5 (R2@12, R3@18), arcane_explosion@14, scorch@16, pyroblast@20 | none |
 | Rogue | kidney_shot@14, ambush@16, adrenaline_rush@20 | **finisherStun effect (the only new effect type)** |
-| Paladin | flash_of_light@12, exorcism@14, consecration@18 | none |
+| Paladin | Superseded by the v0.30 progression in `paladin-devotion-core.md` | n/a |
 | Hunter | aspect_of_the_cheetah@14, aimed_shot@16, rapid_fire@20 | none |
 | Priest | heal@14 (R2@20), mind_flay@16, flash_heal@20 | none (drainTick healFrac 0) |
 | Shaman | frost_shock@14, ghost_wolf@16, stormstrike@20, frostbrand_weapon@12 (R2@20) | none (imbue reuse) |
-| Warlock | fear@14, searing_pain@16, shadowburn@20 | none (incapacitate reuse) |
+| Warlock | fear@14, Duskfire@14, Ruinous Brand@16, Rain of Fire@18, Pyre Colossus@20 | Ruin, Desolation, Brand echo, temporary guardian |
 | Druid | regrowth@14, barkskin@16, starfire@18 | none |
 
-Files to touch when implementing: `src/sim/data.ts` (ABILITIES ranks + new entries, CLASSES.abilities arrays, 2 conjured-water items), `src/sim/types.ts` (one new AbilityEffect variant `finisherStun`, XP_TABLE/MAX_LEVEL extension per the brief).
+Files to touch when implementing: `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/data.ts` (ABILITIES ranks + new entries, CLASSES.abilities arrays, 2 conjured-water items), `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/types.ts` (one new AbilityEffect variant `finisherStun`, XP_TABLE/MAX_LEVEL extension per the brief).
 
 ---
 

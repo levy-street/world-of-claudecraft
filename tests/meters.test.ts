@@ -239,6 +239,25 @@ describe('combat meters', () => {
     ]);
   });
 
+  it('credits temporary guardian damage to its player owner', () => {
+    const w = fakeWorld();
+    (w.entities as Map<number, any>).set(4, {
+      id: 4,
+      kind: 'mob',
+      name: 'Tithefiend',
+      templateId: 'guardian_tithefiend',
+      ownerId: 2,
+    });
+    const party = new Set([1, 2, 4]);
+    const m = new MeterData(0);
+
+    m.onEvent(dmg(4, 50, 22), w, party, 1000);
+
+    expect(m.current).not.toBeNull();
+    expect(m.current!.tallies.get(2)).toMatchObject({ name: 'Pal', cls: 'priest', dmg: 22 });
+    expect(m.current!.tallies.has(4)).toBe(false);
+  });
+
   it('merges a reconnecting party member into one row instead of duplicating them under their new pid', () => {
     const w = fakeWorld();
     const party = new Set([1, 2]);

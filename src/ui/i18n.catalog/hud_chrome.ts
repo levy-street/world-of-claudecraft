@@ -10,6 +10,33 @@
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 
 export const hudChromeStrings = {
+  warlock: {
+    doomLabel: 'Condemnation',
+    fateThreadsLabel: 'Fate Threads',
+    doomMeterUnlock: 'Move Affliction resource bar',
+    doomMeterLock: 'Lock Affliction resource bar',
+    doomEmptyStatus: '{value} of {max} Condemnation.',
+    doomStatus: '{value} of {max} Condemnation; {remaining}.',
+    fateThreadsStatus: '{value} of {max} Fate Threads.',
+    fateThreadsConsumeReady:
+      'Three Fate Threads: Consume can weave them into additional Condemnation.',
+    fateThreadsSentenceReady:
+      'Three Fate Threads: Sentence can consume them for 18% increased damage.',
+  },
+  procOverlay: {
+    soulFragmentsMeter: 'Soul Fragments',
+    ruinMeter: 'Wrack',
+    ruinStatus: '{value} of {max} Wrack',
+  },
+  // Combo Points meter (#combo-row): the 0-5 pip row next to the player frame
+  // for the energy-resource classes. Kept NON-WORDY (no run of four-plus
+  // lowercase after stripping {tokens}) so an English-filled non-Latin locale
+  // does not trip the M16 untranslated-leak guard, the same convention as
+  // unitFrame below. The live "N of max" valuetext reuses the generic
+  // auraEffect.resourceCount status pattern rather than a second wordy key.
+  comboMeter: {
+    label: 'CP',
+  },
   spectate: {
     banner: 'Spectating {name}',
   },
@@ -384,6 +411,14 @@ export const hudChromeStrings = {
   },
   rest: {
     resting: 'Resting',
+  },
+  paladin: {
+    devotion: 'Devotion',
+    devotionValue: 'Devotion {value} of {max}',
+    devotionAscensionCharges: 'Devotion {value} of {max}. Ascension {charges} charges.',
+    devotionAscensionLast: 'Devotion {value} of {max}. Ascension final charge.',
+    ascensionLastAnnouncement: 'Ascension final charge',
+    ascensionSpenderAria: 'Action slot {slot}: {ability}. Consumes one Ascension charge.',
   },
   // The Spell Power / Attack Power contribution appended to an ability tooltip's
   // base damage, e.g. "66 to 74 (+29)". Punctuation + a formatted number only (no
@@ -909,7 +944,7 @@ export const hudChromeStrings = {
       'Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.',
     modeTag: '5v5 Capture the Flag',
     offlineNote: 'Thornhollow Fields is syncing. The queue opens once the realm answers.',
-    ratingSummary: 'Rating. {wins} wins / {losses} losses',
+    ratingSummary: 'Rating. {wins} wins / {losses} losses / {draws} draws',
     careerCaptures: 'Career captures: {count}',
     enterQueue: 'Enter the Queue',
     enterQueueParty: 'Enter the Queue (party of {count})',
@@ -1415,7 +1450,8 @@ export const hudChromeStrings = {
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in
   // the overlay run through formatNumber and these unit strings. Distinct from
-  // the dev `?perf` diagnostic, which stays English like console.*.
+  // the older dev `?perf` trace output, which stays English like console.*. The real-DOM
+  // `?diagnostics=1` panel below is localized because its chrome is user-visible.
   perf: {
     title: 'Performance Overlay',
     enable: 'Show Performance Overlay',
@@ -1492,6 +1528,193 @@ export const hudChromeStrings = {
     badges: {
       backgrounded: 'Backgrounded',
       offline: 'Offline',
+    },
+    diagnostics: {
+      panelAria: 'World of ClaudeCraft performance diagnostics',
+      title: 'ClaudeCraft Performance Doctor',
+      subtitle: 'A game-specific scan with evidence and code-level fixes.',
+      aria: {
+        liveMeasurements: 'Live performance measurements',
+        scanProgress: 'Diagnostic scan progress',
+        findings: 'Ranked diagnostic findings',
+      },
+      controls: {
+        minimize: 'Minimize',
+        expand: 'Expand',
+        start: 'Start 15-second scan',
+        refreshCensus: 'Refresh scene census',
+        copyReport: 'Copy clear report',
+        downloadReport: 'Download report',
+        scanning: 'Scanning...',
+        scanAnother: 'Scan another area',
+        reportLogged: 'Report logged to console',
+        copied: 'Copied',
+        copyBlocked: 'Copy blocked: report logged',
+        retestLowGraphics: 'Retest on Low graphics',
+      },
+      instruction:
+        'For the best signal, enter Play Offline, move through the slow area, rotate the camera, and trigger the effect that stutters while the scan is running.',
+      status: {
+        pausedHiddenRestart:
+          'Scan paused while this tab is hidden. It will restart when you return.',
+        restoredRestart: 'Tab restored. Restarting a clean 15-second active-gameplay capture.',
+        worldLoaded: 'World loaded. Waiting for the first playable frame.',
+        pausedHiddenContinue:
+          'Scan paused while this tab is hidden. Return to the game to continue.',
+        collectingRemaining: {
+          one: 'Collecting active gameplay: {seconds} second remaining',
+          other: 'Collecting active gameplay: {seconds} seconds remaining',
+        },
+        waitingFrames: 'Waiting for representative gameplay frames: {current}/{minimum}',
+        collectingNow: 'Collecting active gameplay: move through the problem area now.',
+        ready: 'Ready to scan. Press Start and reproduce the slowdown.',
+        waitingWorld:
+          'Waiting for the game world. Choose Play Offline or enter an online character.',
+      },
+      metrics: {
+        waitingRenderer: 'renderer: waiting',
+        waitingCensus: 'scene census: waiting',
+        waitingHitch: 'hitch attribution: armed on world entry',
+        recent: 'recent  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}',
+        render: 'render  submit {submit} ms | world {world} ms | entities {entities} ms',
+        scene: 'scene   {calls} calls | {triangles} tris | {views} views',
+        hitches: 'hitches {hitches} | shaders {shaders} | uploads {uploads} | views {views}',
+        gpu: 'GPU     {renderer}',
+        waitingValue: 'waiting',
+      },
+      scoreHeadline: '{score}/100: {headline}',
+      healthyNoFindings:
+        'No actionable threshold fired. If a short hitch still bothers you, rerun the scan along the exact movement path that triggers it.',
+      findingMeta: '{severity} | {confidence} confidence',
+      sections: {
+        evidence: 'Evidence',
+        tryNow: 'Try now',
+        codeFix: 'Code fix',
+        source: 'Relevant source',
+      },
+      severity: {
+        critical: 'CRITICAL',
+        warning: 'WARNING',
+        info: 'INFO',
+      },
+      confidence: {
+        high: 'high',
+        medium: 'medium',
+        low: 'low',
+      },
+      diagnosis: {
+        noProblemTitle: 'No material performance problem detected',
+        summary: {
+          findings: {
+            one: '{findings} actionable finding from the last 10 seconds at {fps} FPS and {p95} frame p95.',
+            other:
+              '{findings} actionable findings from the last 10 seconds at {fps} FPS and {p95} frame p95.',
+          },
+          healthy:
+            'The last 10 seconds held {fps} FPS with a {p95} frame p95. No game, browser, GPU, memory, asset, or network threshold fired.',
+        },
+        titles: {
+          hardwareAcceleration: 'Software rendering is active',
+          integratedGpu: 'The game is using the integrated GPU',
+          highDpi: 'High resolution rendering is expensive here',
+          forcedHighGraphics: 'Forced high graphics is reducing performance',
+          lowMemory: 'Available device memory is low',
+          browserStalls: 'Browser or extension stalls were detected',
+          heapPressure: 'Browser memory pressure was detected',
+          contextLoss: 'The graphics context was reset',
+          gpuSubmit: 'GPU submission is the main frame bottleneck',
+          sceneDraw: 'Scene draw cost exceeds the active graphics budget',
+          shadowPass: 'The shadow pass uses a large share of draw calls',
+          rendererWorld: 'World renderer updates are CPU-bound',
+          rendererEntities: 'Entity view updates are CPU-bound',
+          rendererNameplates: 'Nameplate painting is expensive',
+          simCpu: 'Simulation work is consuming the frame',
+          hudCpu: 'HUD updates are consuming the frame',
+          eventCpu: 'Event processing is consuming the frame',
+          shaderCompile: 'Shaders are compiling during gameplay',
+          textureUpload: 'Texture uploads are causing gameplay hitches',
+          viewCreate: 'Entity view creation is causing hitches',
+          otherHitch: 'Unattributed long frames remain',
+          assetStartup: 'Game startup is delayed by asset work',
+          longTasks: 'Long browser tasks are blocking frames',
+          networkLatency: 'Network delivery is delaying visible response',
+          snapshotApply: 'Snapshot processing is blocking the client',
+          generic: 'Performance rule {rule} needs attention',
+        },
+        causes: {
+          environment:
+            'A detected browser, GPU, memory, or device setting can limit performance before the game renders a frame.',
+          graphics:
+            'Measured graphics work is above the active frame or scene budget for this capture.',
+          cpu: 'A measured CPU phase is taking enough main-thread time to miss the frame budget.',
+          loading:
+            'Resource preparation or first-use work happened on a visible gameplay or startup path.',
+          network:
+            'Network delivery or client snapshot processing is delaying the latest playable state.',
+        },
+        evidence: {
+          environment: 'The environment rule {rule} matched this device and browser.',
+          gpuSubmit: 'WebGL submission p95 is {submit}, or {share} of renderer p95.',
+          frame: 'The recent window measured {fps} FPS with a {p95} frame p95.',
+          sceneCalls: 'The scene uses {calls} draw calls against a target of {target}.',
+          sceneTriangles: 'The scene submits {triangles} triangles against a target of {target}.',
+          sceneCategory:
+            'Scene category {category} contributes {calls} calls and {triangles} measured triangles.',
+          censusNeeded: 'Refresh the scene census to identify the leading render category.',
+          shadow:
+            'The shadow pass submits {calls} calls, {share} of the baseline, and {triangles} triangles.',
+          cpuPhase: 'Measured phase {phase} has a p95 of {p95}.',
+          hitch: '{count} of {total} recorded hitches matched cause {cause}.',
+          assets: 'The preload gate waited {wait} for {tasks} registered tasks.',
+          failedAssets: 'Failed asset groups: {groups}.',
+          longTasks: '{count} long tasks were measured, with p95 {p95} and maximum {max}.',
+          network:
+            'Snapshot interval is {interval}, latest age is {age}, and input echo p95 is {echo}.',
+          snapshot: 'Snapshot parse and apply p95 is {work}; network gap p95 is {gap}.',
+          generic: 'Diagnostic rule {rule} matched this capture.',
+        },
+        tryNow: {
+          environment:
+            'Correct the detected environment setting, restart, and repeat the same scan.',
+          graphics: 'Retest the same camera path on Low graphics to confirm graphics pressure.',
+          cpu: 'Repeat the scan while idle and while moving to isolate the CPU phase.',
+          loading: 'Repeat the same route or first-use action to confirm when the hitch occurs.',
+          network: 'Compare Play Offline with the same movement and camera path.',
+        },
+        codeFix: {
+          environment:
+            'Keep the detected fallback path within the shared graphics and memory budgets.',
+          graphics:
+            'Use the existing render budget, instancing, material sharing, LOD, and hidden-work skips.',
+          cpu: 'Profile the named phase, remove repeated work and allocations, and preserve gameplay behavior.',
+          loading:
+            'Preload, pool, or spread the identified first-use work through the existing startup and streaming budgets.',
+          network:
+            'Reduce delivery or snapshot processing cost without weakening the authoritative server model.',
+        },
+      },
+      report: {
+        title: 'World of ClaudeCraft performance diagnosis',
+        statusLine: 'Status: {status} ({score}/100)',
+        capturedLine: 'Captured: {captured}',
+        topFindingLine: 'Top finding: {finding}',
+        summaryLine: 'Summary: {summary}',
+        gpuLine: 'GPU: {gpu}',
+        graphicsLine: 'Graphics: {tier}, render scale {scale}',
+        recentLine:
+          'Recent: {fps} FPS, p95 {p95}, {longFrames} frames over 50 ms, {frames} measured frames',
+        resultHeading: 'Result',
+        noThreshold: 'No actionable threshold fired in this capture.',
+        findingHeading: '{index}. {title}',
+        findingMeta: 'Severity: {severity}. Confidence: {confidence}.',
+        rawSnapshotHeading: 'Raw snapshot',
+        notAvailable: 'not available',
+        status: {
+          critical: 'critical',
+          needsAttention: 'needs attention',
+          healthy: 'healthy',
+        },
+      },
     },
   },
   auraOverlay: {
@@ -1661,7 +1884,7 @@ export const hudChromeStrings = {
       agi: 'Sharpens your reflexes and aim, improving several of your combat stats.',
       sta: 'Toughens your body, raising your maximum health and how quickly you recover health while resting.',
       int: "Expands a spellcaster's mana pool and improves their chance to land a spell critical strike.",
-      spi: "Quickens how fast a spellcaster's mana returns while resting, out of combat.",
+      spi: "Quickens how fast a spellcaster's mana returns. Most of it flows while resting, out of combat, and a portion keeps returning even in combat.",
       armor:
         'Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.',
       attackPower: 'Powers your weapon attacks. Every 14 attack power adds 1 damage per second.',
@@ -1693,6 +1916,7 @@ export const hudChromeStrings = {
       spellCritPct: '+{value}% Spell Critical Strike',
       healthRegen: 'About {value} health every 5 sec while resting',
       manaRegen: 'About {value} mana every 5 sec while resting',
+      manaRegenCombat: 'About {value} mana every 5 sec in combat',
       damageReduction: 'Damage reduction against a level {level} attacker: {value}%',
       dpsFromAp: 'Adds {value} damage per second to your attacks',
     },
@@ -1719,6 +1943,14 @@ export const hudChromeStrings = {
   // Default name pre-filled into the Save-Build-As dialog, e.g. "Build 3".
   talents: {
     defaultBuildName: 'Build {n}',
+    // The gear-capturing save entry, beside the plain one in the loadout menu.
+    newBuildWithGear: 'New Build (save gear too)',
+    // Applying a loadout that captured gear. Counts come from the text-free
+    // loadoutGearResult event, so the sim carries none of this copy.
+    gearRestored: 'Restored {n} gear pieces from this build.',
+    gearNotHeld: "You no longer have {n} of this build's saved pieces.",
+    gearCopyGone: '{n} saved pieces were not the copy this build pinned.',
+    gearTakenByOtherSlot: '{n} saved pieces need another copy you do not have.',
   },
   // One-off chat-log tips shown at HUD bootstrap. The /join command tokens stay
   // literal (they are commands); the surrounding prose localizes.
@@ -2263,14 +2495,25 @@ export const hudChromeStrings = {
   auraEffect: {
     dot: 'Deals {value} {school} damage every {interval} sec',
     hot: 'Restores {value} health every {interval} sec',
+    mendingCurrent: 'Stores {value} healing, released over time or consumed by Cascading Mend',
+    mendingCurrentPercent: 'Stores healing equal to {pct}% of maximum health for Cascading Mend',
     absorb: 'Absorbs {value} damage',
     healAbsorb: 'Absorbs {value} incoming healing',
     thorns: 'Deals {value} {school} damage to attackers',
+    stasis: 'Immune and unable to act',
     slow: 'Reduces movement speed by {pct}%',
     speed: 'Increases movement speed by {pct}%',
     attackSpeedSlow: 'Slows attack speed by {pct}%',
     attackSpeedFast: 'Increases attack speed by {pct}%',
     haste: 'Increases attack and casting speed by {pct}%',
+    imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
+    petDamage: 'Increases pet damage by {pct}%',
+    petHaste: 'Increases pet action speed by {pct}%',
+    spellDamage: 'Increases spell damage by {pct}%',
+    spellHaste: 'Increases spell casting speed by {pct}%',
+    sated: 'Cannot benefit from another group haste effect',
+    cauterizeFatigue: 'Cauterize cannot prevent another lethal hit',
+    castShield: 'Casting cannot be interrupted or delayed by damage',
     // wordy (M16): filled in the five non-Latin locales in this change.
     dmgDone: 'Increases damage dealt by {pct}%',
     dmgDoneReduce: 'Reduces damage dealt by {pct}%',
@@ -2278,6 +2521,13 @@ export const hudChromeStrings = {
       'Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up',
     elementalConvergencePrimed:
       'Your next spell from the other elemental school grants Elemental Convergence',
+    hunterFerocity: '{stacks} Pack Ferocity: your pet deals {pct}% more damage',
+    cooldownCap: '{used} of {cap} sec of cooldown reduction used in this window',
+    funeralHarvestLock: 'Funeral Harvest cannot create another Soul Fragment yet',
+    leadenHexLock: 'Leaden Hex cannot root this target again yet',
+    forbiddenReflectionReady: 'Your next eligible Warlock cooldown can be cast again',
+    forbiddenReflectionLock: 'Forbidden Reflection cannot be prepared again yet',
+    internalCooldown: 'This effect cannot trigger again until the timer expires',
     // The carried-flag buff's tooltip: the ONLY place the voluntary-drop
     // affordance is spelled out, so the player can find it without folklore.
     carriedFlag: 'You are carrying the enemy flag. Cancel this buff to drop it.',
@@ -2296,6 +2546,17 @@ export const hudChromeStrings = {
     revengeFree: 'Your next Revenge costs no Rage',
     victoryRush: "Victor's Surge is ready",
     maxHpPct: 'Increases maximum health by {pct}%',
+    enrage:
+      'Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%',
+    suddenDeath: 'Your next Execute costs no Rage and ignores its health requirement',
+    aoeEcho:
+      '{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies',
+    sureCrit: '{charges} damaging ability casts are guaranteed critical strikes',
+    temporalEcho:
+      "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+    arcaneCharge:
+      '{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana',
+    physicalReduction: 'Reduces Physical damage taken by {pct}%',
     temporalHourglass:
       'Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.',
     tongues: 'Increases casting time by {pct}%',
@@ -2306,6 +2567,33 @@ export const hudChromeStrings = {
     freeCast: 'Your next cast costs nothing',
     instantCast: 'Your next spell with a cast time is instant',
     cheapCast: 'Your next spell costs {pct}% less',
+    radiantResonance:
+      "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
+    solarReprisal:
+      'Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant',
+    dawnsWrath: 'HoW: all HP · +1 use · CD 0 · +{pct}% DMG',
+    // Rogue spec-engine states; wordy (M16): filled in the five non-Latin
+    // locales in this change.
+    venomRitual:
+      'Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend',
+    gloam:
+      'Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil',
+    redline:
+      'Redline {stacks}/{max}. Each Haymaker adds 1. Lights Out hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost',
+    veilstrikeWindow:
+      'Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%',
+    veiledEdge: "Your next Lurker's Strike strikes for double",
+    duskEconomy: 'Abilities cost {pct}% less energy',
+    moontide:
+      'Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3',
+    oldBlood:
+      'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form',
+    verdance:
+      'Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom',
+    freeExecute: 'Your next eligible execute ability costs nothing',
+    resourceSap: 'Restores {value} of your current resource every {interval} sec',
+    nextAttackCrit: 'Your next attack is guaranteed to critically strike',
+    healEcho: 'Falling below {threshold}% health restores {value} health',
     increase: {
       ap: 'Increases attack power by {value}',
       sp: 'Increases spell power by {value}',
@@ -2347,6 +2635,8 @@ export const hudChromeStrings = {
     mortalWound: 'Reduces healing received by {pct}%',
     vulnerability: 'Increases damage taken by {pct}%',
     physVuln: 'Increases physical damage taken by {pct}%',
+    bleedVuln: 'Increases bleed damage taken by {pct}%',
+    sourceVuln: 'Takes {pct}% more damage from the caster who applied this effect',
     spellVuln: 'Increases magic damage taken by {pct}%',
     critVuln: 'Increases chance to be critically hit by {pct}%',
     costTax: 'Increases ability costs by {pct}%',
@@ -2360,14 +2650,63 @@ export const hudChromeStrings = {
     disarm: 'Disarmed: cannot use weapon attacks',
     lockout: 'Spell school locked out',
     imbue: 'Weapon imbued with bonus effects',
-    imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
+    galeheartWeapon:
+      'Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage',
+    elementalTrance:
+      'Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana',
     stealth: 'Concealed; movement speed reduced by {pct}%',
     formBear: 'Bruin Form: increased health and armor',
     formCat: 'Wolf Form: melee damage and energy',
     formTravel: 'Fleet Form: movement speed increased by {pct}%',
     formFireball: 'Ember Form: movement speed increased by {pct}%; attacks and spells are disabled',
+    formMoonkin:
+      'Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%',
+    formShadow: 'Gloamveil Form: Shadow damage increased by {pct}%',
+    resourceCount: '{value} of {max}',
+    formLich: 'Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage',
+    afflictionEye:
+      'Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation',
+    afflictionEyeSecondary:
+      'Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage',
+    afflictionAccomplice:
+      'Qualifying damage grants {value} Condemnation, at most once every {interval} sec',
+    afflictionViolence:
+      '{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back',
+    afflictionVicarious:
+      'Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation',
+    afflictionPossession: 'Empowers Needle of Fate, Consume, Maledict Gaze, and Sentence',
+    afflictionJudgment:
+      'Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation',
+    afflictionLitany:
+      'Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec',
+    afflictionFateThreads:
+      '{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Consume gains {doom} extra Condemnation per tick',
+    afflictionConsumeThreads:
+      'Consume is devouring {stacks} Fate Threads for {doom} extra Condemnation per tick',
+    necromancyHarvestMark: 'Death can create 1 Soul Fragment',
+    necromancyOssuaryMark:
+      'Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment',
+    necromancyDeathEcho: 'Legacy Death Echo; no current ability consumes it',
+    warlockAnchor: 'Recast within {range} yd to return here and consume the anchor',
+    formMetamorph: 'Demon form: body size increased by {pct}%; other bonuses ride separate buffs',
+    energyRegen: 'Increases Energy regeneration by {pct}%',
     defensiveStance: 'Guarded Stance: reduced damage taken, more threat',
     righteousFury: 'Burning Oath: greatly increased threat from Holy damage',
+    overpowerCharge: '{stacks} charges: your next Maiming Strike deals {pct}% more damage',
+    sweepingStrikes: 'Single-target strikes also hit {targets} nearby enemy for {pct}% damage',
+    fingersOfFrost:
+      '{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage',
+    brainFreeze: 'Your next Flurry is instant and ignores its cooldown',
+    wintersChill: '{charges} charges: compatible spells treat this target as frozen',
+    icicles: '{value} of {max} Icicles; at {max}, Rimeneedle can be cast',
+    desolation:
+      '{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately',
+    ruinousBrand:
+      '{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target',
+    duskfireClaim: 'Death grants {value} Wrack',
+    pyreGuardian:
+      'Generates {ruin} Wrack every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec',
+    perfectMoment: 'Aether Darts does not consume Arcane Charges',
     scale: 'Size increased by {pct}%',
     jump: 'Jump height increased by {pct}%',
     // Localized damage-school names spliced into {school} above.
@@ -3514,6 +3853,15 @@ export const hudChromeStrings = {
     // rather than claiming the slot is full.
     toolEffectRechargeToolCapped: 'Carry a better {profession} tool to charge {effect} further.',
     toolEffectRechargeMaterials: 'Recharging {effect} needs {material} x{count}.',
+    // In-progress readouts for the four crafting/gathering-service actions plus
+    // tool-effect recharging (social/chat_readouts.ts describeActiveAction):
+    // countdown chat lines shown while the action channels.
+    craftingProgress: 'You are crafting: {remaining}s of {total}s remaining.',
+    disenchantingProgress: 'You are disenchanting: {remaining}s of {total}s remaining.',
+    enchantingProgress: 'You are enchanting: {remaining}s of {total}s remaining.',
+    salvagingProgress: 'You are salvaging: {remaining}s of {total}s remaining.',
+    rechargingToolEffectProgress:
+      'You are recharging a tool effect: {remaining}s of {total}s remaining.',
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',
@@ -4064,6 +4412,20 @@ export const hudChromeStrings = {
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
   // never through these keys.
+  // The Thornhollow Fields queue-pop prompt (src/ui/hud/battleground/
+  // battleground_proposal_popup.ts). Counts only, never names: the ten have not
+  // been introduced and a decline must not leak who was opposite.
+  bgOffer: {
+    title: 'Thornhollow Fields is ready',
+    backfillTitle: 'Thornhollow Fields needs a fighter',
+    backfillBody:
+      'This battle is already under way. You will join the side that is short, and this match will not change your rating.',
+    accepted: '{accepted} of {size} ready',
+    remaining: '{seconds}s to answer',
+    accept: 'Accept',
+    decline: 'Decline',
+    acceptedWait: 'Waiting for the others...',
+  },
   finder: {
     title: 'Dungeon Finder',
     close: 'Close',

@@ -179,12 +179,12 @@ export class ArmoryInspect {
     this.hideOverlay(true);
   }
 
-  /** Build every skin's exact character + showcase GPU graph while the game
-   *  loading screen is still opaque. The resulting renderer and cached rigs
-   *  remain parked and dormant until the store is actually opened. */
-  async prewarm(skinIds: readonly string[]): Promise<void> {
+  /** Build skins' exact character + showcase GPU graphs (one mode per call on
+   *  the paced post-entry lane; both by default). The resulting renderer and
+   *  cached rigs remain parked and dormant until the store is actually opened. */
+  async prewarm(skinIds: readonly string[], modes?: readonly ArmoryPreviewMode[]): Promise<void> {
     this.ensureStage();
-    await this.preview?.prewarm(skinIds);
+    await this.preview?.prewarm(skinIds, modes);
   }
 
   /** Explicit page-lifecycle teardown. Normal window close intentionally keeps

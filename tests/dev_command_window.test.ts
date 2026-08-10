@@ -3,11 +3,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DevCommandWindow, type DevCommandWindowDeps } from '../src/ui/dev_command_window';
 
-function makeWindow(available = true) {
+function makeWindow(available = true, accountAdmin = true) {
   const chat = vi.fn();
   const deps: DevCommandWindowDeps = {
     available: () => available,
-    world: () => ({ chat }) as never,
+    world: () => ({ chat, accountAdmin }) as never,
     closeOthers: vi.fn(),
     captureFocus: () => document.activeElement as HTMLElement | null,
     restoreFocus: vi.fn(),
@@ -24,6 +24,21 @@ describe('developer command window', () => {
     const { window } = makeWindow(false);
     expect(window.toggle()).toBe(false);
     expect(document.querySelector('#dev-command-window')).toBeNull();
+  });
+
+  it('offers the Spawns tab to admins and hides it from everyone else', () => {
+    const { window } = makeWindow(true, true);
+    window.toggle();
+    expect(document.querySelector('[data-dev-category="spawns"]')).not.toBeNull();
+    window.close();
+
+    document.body.innerHTML = '<main id="ui"></main>';
+    const { window: nonAdmin } = makeWindow(true, false);
+    nonAdmin.toggle();
+    expect(nonAdmin.isOpen).toBe(true);
+    expect(document.querySelector('[data-dev-category="spawns"]')).toBeNull();
+    // The other tabs are untouched, and clicking one still works.
+    expect(document.querySelector('[data-dev-category="inventory"]')).not.toBeNull();
   });
 
   it('routes actions through world chat and preserves keyboard focus after repaint', () => {

@@ -83,7 +83,7 @@ describe('canonical Talents V2 row registry', () => {
       warrior
         .find((row) => row.level === 11)
         ?.options.find((o) => o.id === 'war_row_lingering_dread')?.effect.global,
-    ).toEqual({ fearBreakPct: 0.2 });
+    ).toEqual({ fearBreakPct: 0.1 });
     expect(
       warrior
         .find((row) => row.level === 14)

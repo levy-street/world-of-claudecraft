@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { lineOfSightClear, resolveMovement } from '../src/sim/colliders';
+import { AFFLICTION_EYE_DEATH_GAIN, doomValue } from '../src/sim/combat/affliction';
 import {
   ARENA_SLOT_COUNT,
   ARENA_X_MIN,
@@ -20,7 +21,7 @@ import {
 } from '../src/sim/dungeon_layout';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { eloDelta, Sim } from '../src/sim/sim';
-import { ARENA_MIN_LEVEL } from '../src/sim/social/arena';
+import { ARENA_MIN_LEVEL, addArenaResult, arenaStanding } from '../src/sim/social/arena';
 import type { PlayerClass, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -474,6 +475,44 @@ describe('arena: a full bout', () => {
     expect(eb.dead).toBe(false);
   });
 
+  it('pays an Affliction Eye death through ranked-arena elimination', () => {
+    const { sim, a, b } = queueDuo('warlock', 'warrior', (world, warlockId) => {
+      world.setPlayerLevel(20, warlockId);
+      expect(world.setSpec('affliction', warlockId)).toBe(true);
+    });
+    startBout(sim);
+    const warlock = sim.entities.get(a)!;
+    const target = sim.entities.get(b)!;
+    target.auras.push({
+      id: 'evil_eye',
+      name: 'Evil Eye',
+      kind: 'affliction_eye',
+      remaining: 3600,
+      duration: 3600,
+      value: 1,
+      sourceId: a,
+      school: 'shadow',
+    });
+    sim.drainEvents();
+
+    (sim as any).dealDamage(warlock, target, 99999, false, 'shadow', 'Test', 'hit');
+    const events = sim.drainEvents();
+
+    expect(target.dead).toBe(true);
+    // objectContaining: the aura gain event also carries the parse-fidelity
+    // attribution fields (sourceId/abilityId/stacks) since v0.35.0.
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'aura',
+        targetId: a,
+        name: 'Condemnation',
+        gained: true,
+      }),
+    );
+    expect(AFFLICTION_EYE_DEATH_GAIN).toBe(10);
+    expect(doomValue(warlock)).toBe(0);
+  });
+
   it('a slot frees up after the bout so the arena can host again', () => {
     const { sim, a, b } = queueDuo();
     startBout(sim);
@@ -888,7 +927,15 @@ describe('arena: class ability target filters', () => {
         expect(sim.setSpec('arcane', pid)).toBe(true);
       },
     },
-    { cls: 'paladin', ability: 'consecration', level: 20 },
+    {
+      cls: 'paladin',
+      ability: 'consecration',
+      level: 20,
+      beforeQueue: (sim, pid) => {
+        sim.setPlayerLevel(20, pid);
+        expect(sim.setSpec('protection', pid)).toBe(true);
+      },
+    },
     {
       cls: 'druid',
       ability: 'swipe',
@@ -1096,5 +1143,46 @@ describe('arena: enclosing walls', () => {
     const startHp = target.hp;
     for (let i = 0; i < 20 * 3; i++) sim.tick();
     expect(target.hp).toBe(startHp);
+  });
+});
+
+describe('arena: a drawn bout is recorded as a draw', () => {
+  // addArenaResult took `won: boolean | null` and did nothing on null, so a
+  // drawn bout moved the rating and then vanished from the record. The same
+  // gap the battleground had; both are now the D of W-L-D.
+  const meta = (sim: Sim, pid: number) => sim.ctx.players.get(pid)!;
+
+  it('counts a draw in the bracket it was played in, and only there', () => {
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Drawer');
+    const m = meta(sim, pid);
+
+    addArenaResult(m, '1v1', 0, null);
+    expect(m.arenaDraws).toBe(1);
+    expect(m.arenaWins).toBe(0);
+    expect(m.arenaLosses).toBe(0);
+    // The 2v2 bracket is fully independent and must not have moved.
+    expect(m.arena2v2Draws).toBe(0);
+
+    addArenaResult(m, '2v2', 0, null);
+    expect(m.arena2v2Draws).toBe(1);
+    expect(m.arenaDraws).toBe(1);
+  });
+
+  it('still counts wins and losses the way it always did', () => {
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', noPlayer: true });
+    const m = meta(sim, sim.addPlayer('warrior', 'Mixed'));
+    addArenaResult(m, '1v1', 10, true);
+    addArenaResult(m, '1v1', -10, false);
+    addArenaResult(m, '1v1', 0, null);
+    expect([m.arenaWins, m.arenaLosses, m.arenaDraws]).toEqual([1, 1, 1]);
+  });
+
+  it('reports the draw through arenaStanding, which the record renders from', () => {
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', noPlayer: true });
+    const m = meta(sim, sim.addPlayer('warrior', 'Standing'));
+    addArenaResult(m, '1v1', 0, null);
+    expect(arenaStanding(m, '1v1').draws).toBe(1);
+    expect(arenaStanding(m, '2v2').draws).toBe(0);
   });
 });

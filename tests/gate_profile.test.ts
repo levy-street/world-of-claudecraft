@@ -11,8 +11,13 @@ import {
   parseGateProfileArgs,
   rankSlowestFiles,
 } from '../scripts/lib/gate_profile.mjs';
+import { resolveTurboBin } from '../scripts/lib/gate_task_cache.mjs';
 
 const GIB = 1024 * 1024 * 1024;
+// buildGateProfileSteps(workers) with no explicit opts.repoRoot falls back to
+// process.cwd() (gate_steps.mjs's buildFullGateSteps), which vitest always
+// runs from the repo root.
+const EXPECTED_TURBO_BIN = resolveTurboBin(process.cwd());
 
 describe('classifyMachineTier', () => {
   it('labels high when both CPU and RAM clear the high bar', () => {
@@ -250,13 +255,13 @@ describe('buildGateProfileSteps', () => {
     // Generate-once: skip pretest after i18n + wiki; client build is turbo build:bundle.
     expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
     const i18n = steps.find((s) => s.name === 'i18n + wiki + sfx artifacts');
-    expect(i18n?.cmd).toBe('npx');
+    expect(i18n?.cmd).toBe(EXPECTED_TURBO_BIN);
     expect(i18n?.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'i18n:gen', 'wiki:content', 'sfx:check']),
+      expect.arrayContaining(['run', 'i18n:gen', 'wiki:content', 'sfx:check']),
     );
     const client = steps.find((s) => s.name === 'client build');
-    expect(client?.cmd).toBe('npx');
-    expect(client?.args).toEqual(expect.arrayContaining(['turbo', 'run', 'build:bundle']));
+    expect(client?.cmd).toBe(EXPECTED_TURBO_BIN);
+    expect(client?.args).toEqual(expect.arrayContaining(['run', 'build:bundle']));
   });
 
   it('honors skip flags without dropping unskipped steps', () => {

@@ -1,10 +1,11 @@
 {
   "class": "warlock",
-  "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+  "license": "Mixed: CraftPix premium for legacy entries; project-owned OpenAI-generated art for generatedBatches",
   "iconSize": 128,
   "sourcePacks": [
     "tmp/asset_src/warlock-skill-icons",
-    "tmp/asset_src/demon-skill-icons (summons + life_tap/searing_pain)"
+    "tmp/asset_src/demon-skill-icons (summons + life_tap/searing_pain)",
+    "OpenAI image generation (Warlock spell and talent completion, 2026-08-01)"
   ],
   "runtimeDir": "public/ui/skills/warlock",
   "abilities": [
@@ -363,5 +364,86 @@
     }
   ],
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it.",
+  "generatedBatches": [
+    {
+      "name": "warlock-spell-completion",
+      "generator": "OpenAI image generation",
+      "artDirection": "Compact low-poly fantasy MMORPG icons with faceted KayKit-inspired materials, unique silhouettes, no text or UI frames",
+      "abilityIds": [
+        "evil_eye",
+        "maledict_gaze",
+        "needle_of_fate",
+        "sentence",
+        "cursed_accomplice",
+        "hex_of_violence",
+        "cruel_pact",
+        "vicarious_suffering",
+        "possess_evil_eye",
+        "coven",
+        "soul_lance",
+        "litany_of_guilt",
+        "umbral_anchor",
+        "ruinous_brand",
+        "soul_harvest",
+        "raise_graveguard",
+        "raise_skeletal_warrior",
+        "raise_bone_mage",
+        "bone_armor",
+        "corpse_explosion",
+        "funeral_harvest",
+        "ossuary_mark",
+        "unholy_command",
+        "reaping_command",
+        "sacrifice_undead",
+        "army_of_the_dead",
+        "sacrilegious_march",
+        "dark_pact",
+        "abyssal_rift"
+      ]
+    },
+    {
+      "name": "warlock-choice-talent-icons",
+      "generator": "OpenAI image generation",
+      "artDirection": "Unique low-poly talent emblems that do not reuse the associated spell composition",
+      "talentIds": [
+        "wlk_r5_bane",
+        "wlk_r5_improved_corruption",
+        "wlk_r5_improved_immolate",
+        "wlk_r8_voidfeast",
+        "wlk_r8_howl_of_terror",
+        "wlk_r8_curse_of_exhaustion",
+        "wlk_r11_improved_life_tap",
+        "wlk_r11_fel_concentration",
+        "wlk_r11_demon_armor",
+        "wlk_r14_amplify_curse",
+        "wlk_r14_ruin",
+        "wlk_r14_shadow_mastery",
+        "wlk_r17_death_coil",
+        "wlk_r17_improved_fear",
+        "wlk_r17_demonic_resilience",
+        "wlk_r20_chaos_bolt",
+        "wlk_r20_grimoire_of_haste",
+        "wlk_r20_curse_mastery"
+      ]
+    },
+    {
+      "name": "warlock-soulwell",
+      "generator": "OpenAI built-in image generation",
+      "artDirection": "Original low-poly fantasy MMORPG Soulwell with dark faceted stone, green basin energy, violet soul wisps, and three orbiting stones; no text, border, logo, or copied franchise design",
+      "abilityIds": [
+        "soulwell"
+      ]
+    },
+    {
+      "name": "warlock-final-kit-completion",
+      "generator": "OpenAI built-in image generation",
+      "artDirection": "Original painted dark-fantasy MMORPG icons with high-contrast Warlock silhouettes, no text, border, logo, or copied franchise design",
+      "abilityIds": [
+        "hour_of_judgment",
+        "cinderhide",
+        "raise_gravewing"
+      ]
+    }
+  ]
 }

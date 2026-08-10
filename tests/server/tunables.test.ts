@@ -869,9 +869,10 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   it('the retention floor stays strictly above the admin activity window', () => {
     // The fold must never delete a session an admin activity chart still
     // counts. Extract both literals from source so a widened admin window
-    // (server/admin.ts) that overtakes the floor reddens this pin.
-    const adminModuleSrc = read('server/admin.ts');
-    const windowMatch = adminModuleSrc.match(/const ACTIVITY_WINDOW_DAYS = (\d+);/);
+    // (server/admin_activity_cache.ts, the shared TTL memo behind the four
+    // admin.ts activity reads) that overtakes the floor reddens this pin.
+    const adminActivityCacheSrc = read('server/admin_activity_cache.ts');
+    const windowMatch = adminActivityCacheSrc.match(/export const ACTIVITY_WINDOW_DAYS = (\d+);/);
     const floorMatch = retentionSrc.match(
       /export const PLAY_SESSION_RETENTION_FLOOR_DAYS = (\d+);/,
     );

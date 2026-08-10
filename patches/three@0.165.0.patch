@@ -1,0 +1,17 @@
+diff --git a/build/three.module.js b/build/three.module.js
+index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..d863e413f00db97725049c2909271dd36c1c1228 100644
+--- a/build/three.module.js
++++ b/build/three.module.js
+@@ -29308,7 +29308,11 @@ class WebGLRenderer {
+ 						const materialProperties = properties.get( material );
+ 						const program = materialProperties.currentProgram;
+ 
+-						if ( program.isReady() ) {
++						// World of ClaudeCraft: three r165 compileAsync disposal race.
++						// If churn releases renderer properties during this timer poll,
++						// no program remains to wait for. Removing the material avoids the
++						// isReady TypeError and lets the promise settle. Recheck on upgrade.
++						if ( program === undefined || program.isReady() ) {
+ 
+ 							// remove any programs that report they're ready to use from the list
+ 							materials.delete( material );

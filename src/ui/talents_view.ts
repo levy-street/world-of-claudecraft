@@ -93,7 +93,7 @@ export function buildTalentsView(
   });
 
   return {
-    hasRows: true,
+    hasRows: rows.length > 0,
     specs: talents.specs.map((spec) => {
       const selected = allocation.spec === spec.id;
       return { spec, selected, action: selected ? 'navigate' : 'commit' };

@@ -6,7 +6,18 @@ import {
   type HitchSummary,
   type SceneCensusReport,
 } from '../render/scene_census_core';
-import { createHeapSawtooth, type HeapSawtoothSummary } from './heap_sawtooth';
+import {
+  createHeapSawtooth,
+  type HeapFloorTrend,
+  type HeapFloorValley,
+  type HeapSawtoothSummary,
+} from './heap_sawtooth';
+import {
+  createHitchForensics,
+  type HitchForensicsRecord,
+  type HitchForensicsState,
+} from './hitch_forensics';
+import type { PerfDiagnosticsPanel } from './perf_diagnostics_panel';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
 import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 
@@ -34,6 +45,11 @@ export interface PerfSnapshot {
   netPipeline: NetPipelineSummary | null;
   // Always-on 1 Hz heap sawtooth (ruling R10); null off Chromium.
   heapSawtooth: HeapSawtoothSummary | null;
+  // Always-on hitch forensics (same ruling family as R10): every ~5 s the
+  // monitor snapshots a compact state vector, and an interval whose worst
+  // frame crossed the hitch threshold stores the DIFF between its two
+  // bracketing snapshots, so a production hitch carries its own diagnosis.
+  hitchForensics: HitchForensicsRecord[];
   input: {
     intents: number;
     lastKind: string;
@@ -76,6 +92,12 @@ export interface PerfSnapshot {
   census?: SceneCensusReport;
   /** Overlay-gated hitch correlation from the renderer; absent when the overlay is off. */
   hitches?: HitchSummary;
+}
+
+export interface HitchPerfReport {
+  heapSawtooth: HeapSawtoothSummary | null;
+  heapFloor: HeapFloorTrend | null;
+  heapFloorSeries: readonly HeapFloorValley[];
 }
 
 export type PerfInputDebugState = Record<string, unknown>;
@@ -383,7 +405,10 @@ export class PerfMonitor {
   private netPipelineSource: { summary(): NetPipelineSummary } | null = null;
   private heapSawtooth = createHeapSawtooth({
     readUsedHeapBytes: () => this.memorySnapshot()?.usedJSHeapSize ?? null,
+    recordFloorSeries: () => this.enabled,
   });
+  private hitchForensics = createHitchForensics();
+  private lastForensicsAt = 0;
   private worstWindow = createWorstWindow();
   private inputIntents = 0;
   private lastInputAt = 0;
@@ -400,21 +425,46 @@ export class PerfMonitor {
   private lastLongTaskAt = 0;
   private longTaskObserver: PerformanceObserver | null = null;
   private readonly traceEnabled: boolean;
+  private readonly diagnosticsEnabled: boolean;
+  private diagnosticsPlayable = false;
   private inputDebugProvider: (() => PerfInputDebugState | null) | null = null;
   private devTraceFrames: DevPerfTraceFrame[] = [];
   private devTraceSpans: DevPerfTraceSpan[] = [];
   private devLongTasks: DevLongTaskRecord[] = [];
+  private diagnosticsPanel: PerfDiagnosticsPanel | null = null;
 
   constructor(
     private renderer: Renderer | null,
     private hud: { perfStats(): PerfSnapshot['hud'] } | null = null,
+    private readonly desktopShell = false,
   ) {
     const params = new URLSearchParams(location.search);
     this.traceEnabled = localDevPerfTraceEnabled();
+    this.diagnosticsEnabled = params.has('diagnostics');
     this.enabled =
-      this.traceEnabled || params.has('perf') || localStorage.getItem('woc_perf') === '1';
+      this.traceEnabled ||
+      this.diagnosticsEnabled ||
+      params.has('perf') ||
+      localStorage.getItem('woc_perf') === '1';
     if (this.enabled) {
       this.mountOverlay();
+    }
+    if (this.diagnosticsEnabled) {
+      void import('./perf_diagnostics_panel')
+        .then(({ PerfDiagnosticsPanel }) => {
+          const panel = new PerfDiagnosticsPanel({
+            startMeasurement: () => this.reset(),
+            snapshot: () => this.report(),
+            runSceneCensus: () => this.runSceneCensus(),
+            desktopShell: this.desktopShell,
+          });
+          this.diagnosticsPanel = panel;
+          panel.setReady(Boolean(this.renderer));
+          if (this.diagnosticsPlayable) panel.onMonitorReset();
+        })
+        .catch((err: unknown) => {
+          console.warn('Performance diagnostics panel failed to load', err);
+        });
     }
     this.renderer?.setHitchLogEnabled(this.enabled);
     this.observeLongTasks();
@@ -423,6 +473,7 @@ export class PerfMonitor {
   setRenderer(renderer: Renderer | null): void {
     this.renderer = renderer;
     renderer?.setHitchLogEnabled(this.enabled);
+    this.diagnosticsPanel?.setReady(Boolean(renderer));
   }
 
   setHud(hud: { perfStats(): PerfSnapshot['hud'] }): void {
@@ -628,6 +679,51 @@ export class PerfMonitor {
     }
   }
 
+  /**
+   * The compact state vector the hitch forensics diffs. Scalars only; every
+   * field here is a candidate diagnosis dimension (a views/programs jump reads
+   * as a crowd arrival compiling gear, textures/geometries without programs as
+   * an asset parse/upload, an empty diff as GC/driver/tab contention).
+   */
+  private forensicsState(): HitchForensicsState {
+    const memory = this.memorySnapshot();
+    const state: HitchForensicsState = {
+      heapUsedMb: memory ? Math.round(memory.usedMB) : -1,
+      longTasks: this.longTaskMs.length,
+      longTaskTotalMs: Math.round(this.longTaskTotalMs),
+    };
+    const r = this.renderer?.perfStats() ?? null;
+    if (r) {
+      state.programs = r.programs;
+      state.textures = r.textures;
+      state.geometries = r.geometries;
+      state.calls = r.calls;
+      state.triangles = r.triangles;
+      state.views = r.views;
+      state.gpuQueueUnits = r.gpuQueue.units;
+      state.gpuQueueSyncMs = Math.round(r.gpuQueue.totalSyncMs);
+      // Monotonic on purpose: a unit that never settles moves neither of the
+      // two above, so a hitch bracketing a new stall reads as the queue
+      // wedging rather than as an empty diff.
+      state.gpuQueueStalls = r.gpuQueue.stallCount;
+      state.effectiveRenderScale = r.effectiveRenderScale;
+      state.budgetMode = r.renderBudget.mode;
+      // Day/night dimension: a hitch cluster that only appears with
+      // nightAmount high (streetlamps lit, more active point lights) reads
+      // differently from the same cluster at noon.
+      state.nightAmount = r.nightAmount;
+      state.activePointLights = r.qualityBuckets.features.activePointLights;
+      const frame = r.lastFrame;
+      if (frame) {
+        state.biome = frame.biome;
+        state.px = Math.round(frame.playerPosition.x);
+        state.pz = Math.round(frame.playerPosition.z);
+        state.activeViews = frame.activeViews;
+      }
+    }
+    return state;
+  }
+
   private memorySnapshot(): PerfSnapshot['browser']['memory'] {
     const memory = (
       performance as Performance & {
@@ -811,6 +907,15 @@ export class PerfMonitor {
       this.frameWindow.entries().map((entry) => ({ at: entry.at, ms: entry.value })),
       now,
     );
+    // Hitch forensics: one compact state snapshot every ~5 s, ungated like the
+    // two trackers above. The state vector is assembled at 0.2 Hz only, so the
+    // no-overlay tick stays as cheap as ruling R9 asked.
+    if (now - this.lastForensicsAt >= 5000) {
+      const sinceBaseline = this.frameWindow.snapshotSince(this.lastForensicsAt);
+      const worstFrameMs = sinceBaseline.values.length ? Math.max(...sinceBaseline.values) : 0;
+      this.hitchForensics.sample(now, worstFrameMs, this.forensicsState());
+      this.lastForensicsAt = now;
+    }
     // Production telemetry reports on its own 75 s / 5 min cadence. Without a
     // visible diagnostic overlay there is nothing to ASSEMBLE every second:
     // doing so sorted every history and copied renderer stats for no consumer.
@@ -819,6 +924,7 @@ export class PerfMonitor {
     if (!this.enabled) return;
     this.lastSnapshot = this.snapshot(now);
     this.renderOverlay(this.lastSnapshot);
+    this.diagnosticsPanel?.update(this.lastSnapshot);
   }
 
   snapshot(now = performance.now()): PerfSnapshot {
@@ -860,6 +966,7 @@ export class PerfMonitor {
       network: this.network,
       netPipeline: this.netPipelineSource?.summary() ?? null,
       heapSawtooth: this.heapSawtooth.summary(),
+      hitchForensics: this.hitchForensics.records(),
       input: {
         intents: this.inputIntents,
         lastKind: this.lastInputKind,
@@ -936,6 +1043,16 @@ export class PerfMonitor {
     return this.lastSnapshot;
   }
 
+  /** Read-only heap evidence for local `?perf` hitch runs, never fleet telemetry. */
+  hitchReport(): HitchPerfReport | null {
+    if (!this.enabled) return null;
+    return {
+      heapSawtooth: this.heapSawtooth.summary(),
+      heapFloor: this.heapSawtooth.floorTrend(),
+      heapFloorSeries: this.heapSawtooth.floorSeries(),
+    };
+  }
+
   copyReport(): void {
     const text = JSON.stringify(this.report(), null, 2);
     void navigator.clipboard?.writeText(text).catch(() => {
@@ -955,6 +1072,8 @@ export class PerfMonitor {
     this.lastSnapshot = null;
     this.netPipelineSource = null;
     this.heapSawtooth.reset();
+    this.hitchForensics.reset();
+    this.lastForensicsAt = 0;
     this.worstWindow.drain();
     this.inputIntents = 0;
     this.lastInputAt = 0;
@@ -974,6 +1093,11 @@ export class PerfMonitor {
     this.devTraceFrames = [];
     this.devTraceSpans = [];
     this.devLongTasks = [];
+    if (this.diagnosticsEnabled) {
+      this.diagnosticsPlayable = true;
+      this.renderer?.resetDiagnosticSamples();
+      this.diagnosticsPanel?.onMonitorReset();
+    }
   }
 
   private mountOverlay(): void {
@@ -1051,6 +1175,6 @@ export class PerfMonitor {
   }
 }
 
-export function createPerfMonitor(renderer: Renderer | null): PerfMonitor {
-  return new PerfMonitor(renderer);
+export function createPerfMonitor(renderer: Renderer | null, desktopShell = false): PerfMonitor {
+  return new PerfMonitor(renderer, null, desktopShell);
 }

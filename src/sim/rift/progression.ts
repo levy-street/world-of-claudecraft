@@ -10,6 +10,7 @@ import {
 } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
+import { selectedInventorySlot } from '../item_copy_ref';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload, PlayerClass, RiftTier } from '../types';
@@ -364,7 +365,19 @@ export function addRiftProgressionLoot(
   boss.lootable = true;
 }
 
-function riftInventorySlot(meta: PlayerMeta, itemId: string) {
+/** The forge's target copy. One choke point for all three actions (upgrade,
+ *  enchant, socket), so the selection is threaded once here.
+ *
+ *  A named slot must still BE a rift piece: the index says which copy, never
+ *  what it is, so a selection pointing at a plain copy refuses like any other
+ *  ineligible target rather than sliding onto a different one. Without a
+ *  selection this stays the legacy newest-rift-copy walk. */
+function riftInventorySlot(meta: PlayerMeta, itemId: string, slotIndex?: number) {
+  if (slotIndex !== undefined) {
+    const named = selectedInventorySlot(meta.inventory, itemId, slotIndex);
+    if (!named?.instance?.rift) return null;
+    return named;
+  }
   for (let i = meta.inventory.length - 1; i >= 0; i--) {
     const slot = meta.inventory[i];
     if (slot.itemId === itemId && slot.instance?.rift) return slot;
@@ -392,13 +405,18 @@ function emitResult(ctx: SimContext, pid: number, result: RiftForgeResult): Rift
   return result;
 }
 
-export function upgradeRiftItem(ctx: SimContext, itemId: string, pid?: number): RiftForgeResult {
+export function upgradeRiftItem(
+  ctx: SimContext,
+  itemId: string,
+  pid?: number,
+  slotIndex?: number,
+): RiftForgeResult {
   // Dead gate, matching the profession-action family (dead_gate.ts): the
   // refusal emits no riftForgeResult, only the shared error line.
   if (refusedWhileDead(ctx, pid)) return { ok: false, action: 'upgrade', itemId, reason: 'dead' };
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, action: 'upgrade', itemId, reason: 'not_found' };
-  const slot = riftInventorySlot(r.meta, itemId);
+  const slot = riftInventorySlot(r.meta, itemId, slotIndex);
   if (!slot?.instance?.rift) {
     return emitResult(ctx, r.meta.entityId, {
       ok: false,
@@ -443,12 +461,13 @@ export function enchantRiftItem(
   itemId: string,
   stat: string,
   pid?: number,
+  slotIndex?: number,
 ): RiftForgeResult {
   // Same dead gate as upgradeRiftItem, for the same single-surface reason.
   if (refusedWhileDead(ctx, pid)) return { ok: false, action: 'enchant', itemId, reason: 'dead' };
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, action: 'enchant', itemId, reason: 'not_found' };
-  const slot = riftInventorySlot(r.meta, itemId);
+  const slot = riftInventorySlot(r.meta, itemId, slotIndex);
   if (!slot?.instance?.rift) {
     return emitResult(ctx, r.meta.entityId, {
       ok: false,
@@ -494,12 +513,13 @@ export function socketRiftGem(
   itemId: string,
   gemId: string,
   pid?: number,
+  slotIndex?: number,
 ): RiftForgeResult {
   // Same dead gate as upgradeRiftItem, for the same single-surface reason.
   if (refusedWhileDead(ctx, pid)) return { ok: false, action: 'socket', itemId, reason: 'dead' };
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, action: 'socket', itemId, reason: 'not_found' };
-  const slot = riftInventorySlot(r.meta, itemId);
+  const slot = riftInventorySlot(r.meta, itemId, slotIndex);
   if (!slot?.instance?.rift) {
     return emitResult(ctx, r.meta.entityId, {
       ok: false,

@@ -1,8 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { PALADIN_SYNTHESIZED_CLIP_SOURCES } from '../src/render/characters/assets';
 import {
   type ClipMap,
+  modularVisualKey,
   VISUALS,
   type VisualDef,
   visualAssetUrlForGraphics,
@@ -58,13 +60,22 @@ function animationNamesOf(url: string): string[] {
  * body GLB through visualAssetUrlForGraphics (LOW_URL_ALIAS), so a clip present
  * only on the standard-materials body would T-pose the low tier alone.
  */
-function loadedClipNames(def: VisualDef, standardMaterials: boolean): Set<string> {
+function loadedClipNames(def: VisualDef, standardMaterials: boolean, key?: string): Set<string> {
   const urls = [
     visualAssetUrlForGraphics(def.url, standardMaterials),
     ...(def.animUrls ?? []).map((url) => visualAssetUrlForGraphics(url, standardMaterials)),
   ];
   const names = new Set<string>();
   for (const url of urls) for (const name of animationNamesOf(url)) names.add(name);
+  // The two paladin attack clips are synthesized at prepare time from a GLB
+  // source clip (assets.ts's PALADIN_SYNTHESIZED_CLIP_SOURCES), for the classic
+  // and modular keys alike: a synthesized name resolves exactly when its source
+  // does, so a trimmed-away source still fails this gate.
+  if (key === 'player_paladin' || key === modularVisualKey('paladin')) {
+    for (const [synthesized, source] of Object.entries(PALADIN_SYNTHESIZED_CLIP_SOURCES)) {
+      if (names.has(source)) names.add(synthesized);
+    }
+  }
   return names;
 }
 
@@ -123,6 +134,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'attack',
   'hit',
   'attackByAbility',
+  'attackTimeScaleByAbility',
   'attackByHand',
   'emote',
 ]);
@@ -193,7 +205,7 @@ describe('character ClipMaps match the shipped GLBs', () => {
     it(`resolves every named clip out of the GLB on ${tierName}`, () => {
       const missing: string[] = [];
       for (const [key, def] of rigs) {
-        const loaded = loadedClipNames(def, standardMaterials);
+        const loaded = loadedClipNames(def, standardMaterials, key);
         for (const name of new Set(requiredClipNames(def.clips))) {
           if (name === SENTINEL_CLIP_NAME) continue;
           if (!loaded.has(name)) missing.push(`${key}: ${name}`);

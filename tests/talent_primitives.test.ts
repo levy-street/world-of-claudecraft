@@ -494,6 +494,7 @@ describe('talent primitive P2: cast while moving', () => {
       buffPct: 0,
       castWhileMoving: true,
       damagePushbackImmune: false,
+      ignoreStealthRequirement: false,
       bonusCharges: 0,
       addEffects: [],
     };
@@ -573,6 +574,7 @@ describe('talent primitives P4/P5', () => {
       buffPct: 0,
       castWhileMoving: false,
       damagePushbackImmune: false,
+      ignoreStealthRequirement: false,
       bonusCharges: 0,
       addEffects: [added],
     };

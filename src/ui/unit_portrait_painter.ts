@@ -17,6 +17,7 @@ import {
   visualPortraitDataUrl,
 } from '../render/characters/portrait';
 import type { PlayerClass } from '../sim/types';
+import { crestIconUrl } from './crest_icon_art';
 import { iconCanvas } from './icons';
 import {
   CREST_OVERSCAN,
@@ -30,11 +31,11 @@ function defaultDpr(): number {
   return typeof devicePixelRatio !== 'undefined' ? devicePixelRatio : 1;
 }
 
-const HEADSHOT_CACHE_MAX = 32;
+const PORTRAIT_IMAGE_CACHE_MAX = 32;
 
 /**
  * Owns painting for the unit-frame portrait canvases. One instance is shared by
- * the player and target frames; it caches decoded headshot images by URL.
+ * the player and target frames; it caches decoded portrait images by URL.
  */
 export class UnitPortraitPainter {
   private readonly imgCache = new Map<string, HTMLImageElement>();
@@ -51,7 +52,7 @@ export class UnitPortraitPainter {
 
   private rememberImage(url: string, img: HTMLImageElement): void {
     this.imgCache.set(url, img);
-    if (this.imgCache.size <= HEADSHOT_CACHE_MAX) return;
+    if (this.imgCache.size <= PORTRAIT_IMAGE_CACHE_MAX) return;
     const oldest = this.imgCache.keys().next().value;
     if (oldest !== undefined) this.imgCache.delete(oldest);
   }
@@ -73,25 +74,40 @@ export class UnitPortraitPainter {
     return { ctx, size };
   }
 
-  /** Paint a procedural crest, overscanned so the emblem fills the circle.
-   *  Also clears any pending headshot decode for this canvas (a late `load`
-   *  checks `dataset.portrait` and bails) so it can't repaint over the crest. */
+  /** Paint an immediate procedural fallback, then replace it with the matching
+   *  static crest after decode. The dataset guard prevents an older request
+   *  from repainting a canvas whose framed unit changed in the meantime. */
   drawCrest(canvas: HTMLCanvasElement, crestId: string): void {
     canvas.dataset.portrait = '';
     const { ctx, size } = this.begin(canvas);
     const { dx, dy, dw, dh } = overscanRect(size, CREST_OVERSCAN);
     ctx.drawImage(iconCanvas('crest', crestId, size), dx, dy, dw, dh);
+    const url = crestIconUrl(crestId);
+    if (url) this.drawDecodedImage(canvas, url, CREST_OVERSCAN);
   }
 
   /** Paint a 3D-headshot data URL. The decode is async even for a data URL, so
    *  tag the canvas with the desired URL and only draw if it still matches on
    *  load (the framed unit may have changed mid-decode). */
   drawHeadshot(canvas: HTMLCanvasElement, url: string, onError?: () => void): void {
+    this.drawDecodedImage(canvas, url, 1, onError);
+  }
+
+  /** Decode and paint one portrait image at its subject-specific scale. Static
+   *  crests use the same overscan as their procedural fallback; headshots stay
+   *  at 1:1 so their intentionally framed faces are not cropped. */
+  private drawDecodedImage(
+    canvas: HTMLCanvasElement,
+    url: string,
+    overscan: number,
+    onError?: () => void,
+  ): void {
     canvas.dataset.portrait = url;
     const draw = (img: HTMLImageElement) => {
       if (canvas.dataset.portrait !== url) return; // unit changed mid-decode
       const { ctx, size } = this.begin(canvas);
-      ctx.drawImage(img, 0, 0, size, size);
+      const { dx, dy, dw, dh } = overscanRect(size, overscan);
+      ctx.drawImage(img, dx, dy, dw, dh);
     };
     const fail = () => {
       if (canvas.dataset.portrait !== url) return; // unit changed mid-decode

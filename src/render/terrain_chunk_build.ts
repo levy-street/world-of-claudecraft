@@ -35,6 +35,7 @@ import {
 import { fbm2 } from '../sim/rng';
 import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { impactCraterTerrainBlend } from './impact_terrain';
+import { clamp01 } from './num_clamp';
 import { meshTerrainHeight } from './terrain_mesh_height';
 import { BIOME_PALETTE, ROCK_SLOPE_START, TERRAIN_TONES } from './terrain_palette';
 
@@ -45,8 +46,6 @@ const SKIRT_DROP = 0.3;
 const INDEX_TILE_QUADS = 3;
 // Ground palette + rock slope thresholds live in terrain_palette.ts (plain
 // data, no Three) so the far-vista mesh colors from the same source.
-
-const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
 interface VertexSample {
   height: number;

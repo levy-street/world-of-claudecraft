@@ -131,9 +131,17 @@ describe('generated chunk geometry is stable', () => {
     // in the same commit): the whole ten-node placement fix moves 146 of
     // its 140639 points, 0.1 percent, all inside the moved nodes' pad
     // footprints.
-    expect(digestOf(inRect)).toBe('5a5e1a89378552ec5e52321c657d923b');
+    // Re-minted again for the northwest coast spit carve in applyValeCoast
+    // (src/sim/world.ts): the low beach shelf that aproned the grey cliff foot
+    // is submerged so the bay water meets the cliff, an intended, looked-at
+    // visual change. The carve only ever lowers and stays local: sampled on a
+    // 0.5yd lattice over the vale and its gap cells it moves 8704 of 1589721
+    // points, 0.5 percent, every one inside x -211.5..-132.5, z 116.5..145.5,
+    // and nothing rises anywhere. Both digests move because that window
+    // straddles the rect edge at x = -180.
+    expect(digestOf(inRect)).toBe('39afe77d61ac348961d01e890aaddb00');
     // The gap super-chunks take the same re-mint.
-    expect(digestOf(gapFill)).toBe('0a6da9382c9bc0a9d6c7adcc752fb27b');
+    expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
 
     terrain.cancelStreaming();
   });

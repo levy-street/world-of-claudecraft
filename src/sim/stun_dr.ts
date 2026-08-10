@@ -19,6 +19,7 @@ const CONTROLLED_STUNS = new Set([
   'charge',
   'bear_charge',
   'faultline',
+  'sun_gods_verdict',
 ]);
 
 export function stunDrCategory(abilityId: string): CrowdControlDrCategory {

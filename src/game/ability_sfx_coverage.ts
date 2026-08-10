@@ -63,15 +63,46 @@ export const FEAR_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
 /** Plain (non-fear) cc abilities whose landed moment now has a dedicated
  *  recording (fx:'ccImpact'): Sundering Gavel/hammer_of_justice (stun),
  *  Gripping Roots/entangling_roots (root), Dirt Toss/blind (incapacitate),
- *  Gut Punch/cheap_shot (stun, the stealth opener). All four are archetype
- *  'cc' (normally uncovered). */
+ *  Gut Punch/cheap_shot (stun, the stealth opener), Low Blow/kidney_shot
+ *  (stun, reuses cheap_shot's recording), and sap (incapacitate). All six
+ *  are archetype 'cc' (normally uncovered), except kidney_shot, whose real
+ *  VFX archetype is 'strike' (already covered by RECORDED_IMPACT_ARCHETYPES),
+ *  so its membership here is harmless, consistent bookkeeping rather than
+ *  load-bearing. */
 export const CC_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
   'hammer_of_justice',
   'entangling_roots',
   'blind',
   'cheap_shot',
+  'kidney_shot',
   'sap',
 ]);
+
+/** The five caster-buff/utility warrior shouts whose one cast moment now has
+ *  a dedicated recording (fx:'shout', combat_sfx.ts's SHOUT_ABILITY_CUES):
+ *  Iron Bellow/battle_shout, Direhowl/demoralizing_shout, Emboldening
+ *  Roar/emboldening_roar, Defiant Bellow/defiant_bellow, Valor Roar/
+ *  rallying_cry. All five are archetype 'shout', deal no damage, and land no
+ *  separate impact, so the one recording covers both the launch and the
+ *  landed instant: unlike FEAR_IMPACT_ABILITIES/CC_IMPACT_ABILITIES (which
+ *  override 'impact' only, because those abilities' recordings play at the
+ *  landed moment while a distinct procedural release still carries the cast),
+ *  these override BOTH 'release' and 'impact'. Intimidating Shout is
+ *  deliberately absent: it already resolves through FEAR_IMPACT_ABILITIES
+ *  above. */
+export const SHOUT_CAST_ABILITIES: ReadonlySet<string> = new Set([
+  'battle_shout',
+  'demoralizing_shout',
+  'emboldening_roar',
+  'defiant_bellow',
+  'rallying_cry',
+]);
+
+/** Ground-zone abilities (groundAoE, effect_dispatch.ts) whose pulse now has a
+ *  dedicated recording (fx:'tick', combat_sfx.ts's GROUND_TICK_ABILITY_CUES):
+ *  Meteor's single delayed hit. Every other zone (Consecration, Blizzard's
+ *  damage pulse) has no recording and keeps the procedural 'pulse' voice. */
+export const PULSE_IMPACT_ABILITIES: ReadonlySet<string> = new Set(['meteor']);
 
 /** The six schools with a recorded launch whoosh (combat_sfx.ts SCHOOL_CUES
  *  .projectile: proj_fire, proj_frost, proj_arcane, proj_shadow, proj_holy,
@@ -119,6 +150,9 @@ export function isAbilityMomentRecorded(
     // same instant and position the sequencer asks for its release whoosh.
     // No projectile event means no recording, hence the opt-out check.
     case 'release':
+      // SHOUT_CAST_ABILITIES' one recording covers the whole cast, launch
+      // included, so it wins ahead of the projectile-school check below.
+      if (ctx.abilityId && SHOUT_CAST_ABILITIES.has(ctx.abilityId)) return true;
       return (
         ctx.isProjectile !== false && !!ctx.school && RECORDED_PROJECTILE_SCHOOLS.has(ctx.school)
       );
@@ -126,9 +160,11 @@ export function isAbilityMomentRecorded(
       // The per-ability overrides win regardless of archetype: Harrow's is
       // 'cc', the fear shouts' is 'shout', the plain cc trio's is 'cc' too
       // (all normally uncovered), and all now have a real recording for
-      // this moment (see FEAR_IMPACT_ABILITIES / CC_IMPACT_ABILITIES).
+      // this moment (see FEAR_IMPACT_ABILITIES / CC_IMPACT_ABILITIES /
+      // SHOUT_CAST_ABILITIES).
       if (ctx.abilityId && FEAR_IMPACT_ABILITIES.has(ctx.abilityId)) return true;
       if (ctx.abilityId && CC_IMPACT_ABILITIES.has(ctx.abilityId)) return true;
+      if (ctx.abilityId && SHOUT_CAST_ABILITIES.has(ctx.abilityId)) return true;
       return !!ctx.archetype && RECORDED_IMPACT_ARCHETYPES.has(ctx.archetype);
     // combat_crit is a recording and plays on every crit against a non-boss.
     // A boss is exempt by design (a crit sting is the wrong beat mid-boss
@@ -136,9 +172,13 @@ export function isAbilityMomentRecorded(
     // that intent instead of sneaking a synthetic sting back in.
     case 'crit':
       return true;
-    // No recording covers a cast-windup bed, a zone re-hit pulse, a creature
-    // apparition call, or set-piece motif foley: these are what the ability
-    // VFX work actually adds, so they keep their procedural voice.
+    // Meteor's one delayed zone hit now has a dedicated recording (see
+    // PULSE_IMPACT_ABILITIES); every other zone re-hit pulse has none.
+    case 'pulse':
+      return !!ctx.abilityId && PULSE_IMPACT_ABILITIES.has(ctx.abilityId);
+    // No recording covers a cast-windup bed, a creature apparition call, or
+    // set-piece motif foley: these are what the ability VFX work actually
+    // adds, so they keep their procedural voice.
     default:
       return false;
   }

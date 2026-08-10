@@ -117,6 +117,8 @@ const W8_TAGS: Readonly<Record<string, string>> = {
   pet_water_jet: 'IWorldPet',
   pet_taunt: 'IWorldPet',
   pet_auto_taunt: 'IWorldPet',
+  pet_special: 'IWorldPet',
+  pet_auto_special: 'IWorldPet',
   pet_feed: 'IWorldPet',
   pet_heal: 'IWorldPet',
   pet_mode: 'IWorldPet',

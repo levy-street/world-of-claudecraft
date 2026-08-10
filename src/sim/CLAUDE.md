@@ -70,6 +70,14 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `combat/auto_attack.ts` | start/stop/update auto-attack, `meleeSwing`, `rangedSwing` |
 | `combat/equip_procs.ts` + `combat/set_procs.ts` | legendary weapon on-action procs; item-set bonus procs |
 | `combat/empower_next.ts` + `combat/thorns_charge.ts` | next-cast empower/free aura consumption; charge-limited thorns |
+| `combat/paladin_veilbound_march.ts` + `combat/paladin_veilbound_state.ts` | Veilbound March activation, traversal marks, final wave, and its pure active-state predicate |
+| `combat/paladin_valkyrs_calling.ts` + `combat/paladin_valkyrs_calling_state.ts` | Valkyr's Calling ascent, approach flight, descent, immunity window, and landing impact |
+| `combat/paladin_sun_verdict.ts` | Verdict of the Sun God mark ownership, charge progression, detonation, and cleanup |
+| `combat/paladin_radiant_resonance.ts` | Radiant Chorus effective-target gate and the shared Mending Light or Dawn's Embrace proc |
+| `combat/paladin_solar_reprisal.ts` | Protection block/Vowkeeper proc rolls and the shared Sunward Disc, Hammer of Grace, or Mending Light override |
+| `combat/paladin_dawns_wrath.ts` | Retribution auto-attack/Final Edict proc and the stored extra Hammer of Wrath cast |
+| `combat/paladin_sunward_disc.ts` | Sunward Disc local ricochet selection, arrival-time damage, and per-impact Devotion |
+| `combat/warlock_talents.ts` | shared Warlock class-talent state: Leaden Hex, Shadow Credit, Ashen Focus, Unbroken Ritual, Forbidden Reflection, and Sacrilegious March |
 | `projectile_travel.ts` | in-flight homing projectiles: `pendingProjectiles` + the prologue `advancePendingProjectiles` phase |
 | `progression/xp.ts` | `prestige`, rested-XP, `isResting` |
 | `progression/talents.ts` | `applyTalents`/`spendTalent`/`setSpec`/`respec`/loadouts/`recomputeTalents` |
@@ -82,10 +90,12 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `mob/social_aggro.ts` + `mob/yells.ts` | flee-for-help rally pull; boss bark broadcast (`MobTemplate.yells`) |
 | `encounters/nythraxis.ts` | the whole Nythraxis raid encounter (per-tick driver, reset/wipe/init, dialogue scheduler, adds + boss mechanics, the Aldric transition + wardstones, the relic/grave-vision quest chain, the encounter CC-immunity predicates) |
 | `world_boss.ts` | hourly world bosses: spawn/scale/announce, contributor tracking, personal loot (`rollWorldBossLoot`), per-boss loot lockouts |
-| `spirit.ts` | death/release/resurrection: graveyards + spirit healers, the ghost run, `releasePlayerSpirit`/`resurrectAtCorpse`/`resurrectAtSpiritHealer`, plus the two `/unstuck` outcomes `moveToGraveyardForUnstuck`/`reviveAtGraveyardForUnstuck` (sickness rules live in the `resurrection.ts` leaf) |
+| `spirit.ts` | death/release/resurrection: graveyards + spirit healers, the ghost run, `releasePlayerSpirit`/`resurrectAtCorpse`/`resurrectAtSpiritHealer`, plus the two `/unstuck` outcomes `moveToGraveyardForUnstuck`/`reviveAtGraveyardForUnstuck` (sickness rules live in the `resurrection.ts` leaf). Every resurrection runs through the one shared `reviveAt`, which is also where the pet the death took is handed back (`pet/pet_owner_revive.ts`) |
 | `pet/pet_ai.ts` | `updatePet`, follow, ranged attack, target pick |
 | `pet/pet_commands.ts` | the pet command surface + `petOf`/`summonPet`/tame/despawn/`syncPetLevel`/`serializePet`/`restorePet` and the delve pet-park round-trip (`stowPetForDelve`/`restorePetFromDelveStash`) |
-| `pet/pet_match_return.ts` | the arena-shaped-match pet round trip (`snapshotMatchPet` at match formation, `noteMatchPetUnravelled` at the corpse-decay unravel in `mob/locomotion.ts`, `restoreMatchPet` at the end of `returnFromArena`): a pet that walks in alive walks back out alive, at the hp it carried. Two arms because a corpse means different things per class: a hunter beast / mage elemental keeps its corpse and is revived IN PLACE by entity id, a warlock demon unravels (`corpseTimer` 3) and is REBUILT from the payload. The rebuild keys on the UNRAVEL, never on the death, because `abandonPet` drops a dead pet's entity too; plus "owner has no pet now", so a deliberate part or a re-summon is never overwritten. The pools half of the same doctrine (issue #1600) is `ArenaReturnPools`; draws NO rng |
+| `pet/pet_return.ts` | THE shared pet round trip both callers below use: `PetReturnSnapshot`, `snapshotPetReturn` (living pets only, so nothing is ever owed a pet it did not lose), `notePetReturnUnravelled`, and the two-armed `restorePetReturn`. Two arms because a corpse means different things per class: a hunter beast / mage elemental keeps its corpse and is revived IN PLACE by entity id, a warlock demon unravels (`corpseTimer` 3) and is REBUILT from the payload. The rebuild keys on the UNRAVEL, never on the death, because `abandonPet` drops a dead pet's entity too; plus "owner has no pet now", so a deliberate dismissal or a re-summon is never overwritten. Return hp is the carried hp, or a FRACTION of the pool it returns to when the death has since unwound the pool it left. Draws NO rng |
+| `pet/pet_match_return.ts` | the MATCH half of that round trip for an arena-shaped match (`snapshotMatchPet` at match formation, `noteMatchPetUnravelled` at the corpse-decay unravel in `mob/locomotion.ts`, `restoreMatchPet` at the end of `returnFromArena`): a pet that walks in alive walks back out alive, at the hp it carried. Snapshot lives on the `ArenaMatch` beside `preMatchPools`, the pools half of the same doctrine (issue #1600); draws NO rng |
+| `pet/pet_owner_revive.ts` | the OWNER half of that round trip: a player's death takes their pet down with them (the `handleDeath` owner arm), so every resurrection hands it back. `snapshotPetOnOwnerDeath` in that owner arm (before the pet is killed; rewritten on EVERY death so no stale record outlives its pet), `notePetUnravelledOnOwnerDeath` at the same unravel site, `restorePetOnOwnerRevive` at the end of `spirit.ts` `reviveAt`, the one body every revive path funnels through. Snapshot lives on `PlayerMeta.deathPet`, session-only. The pet returns at `PET_REVIVE_HP_FRACTION`, the Revive Pet command's own share, since that cast is the work being done for free; draws NO rng |
 | `items.ts` | equip/use/discard + vendor buy/sell/buyback command bodies (W2 move out of `sim.ts`) |
 | `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate, the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
 | `interaction.ts` | `lootCorpse`/`pickUpObject`/`interact` + corpse harvest and party auto-loot (W3) |
@@ -153,7 +163,9 @@ because `bgEnd` is a personal event),
 oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
 `runMobAttackMechanics` drivers),
 `lockpick.ts` (the minigame core behind `delves/lockpick_controller.ts`), `map_doc.ts`
-(the custom-map document/validator), `geometry2d.ts`, `market_query.ts`,
+(the custom-map document/validator), `mana_regen.ts` (the Spirit mana-regen formula, full
+out of combat and the "mp5" combat share, shared by the tick, the readout, and the sheet),
+`geometry2d.ts`, `market_query.ts`,
 `market_listing_ids.ts` (the World Market's id allocator: the reserved house band plus
 the load-time reissue that keeps one row per id),
 `vendor_stack.ts`, `vendor_buy_stack.ts` (vendor purchase quantity math: the bulk verb,

@@ -42,15 +42,19 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (the activity log's on-demand READ request; its answer comes back on its own
 // one-shot 'gbanklog' frame, not the snapshot), the battleground surface
 // (bg_queue/bg_leave/bg_flag sends plus the dev-only bg_queue force start),
-// and stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358).
-// This branch adds set_helm as a send + dispatch pair (the paperdoll
-// helmet-visibility eye; helmHidden persists per character like weaponStowed),
-// and inv_sort as a send + dispatch pair (the one-shot bag clean-up; no
-// payload, the sim re-derives the whole arrangement deterministically).
-// Masterwrought phase 04 adds the extract_essence command (client-sent, so
-// both counts move together).
-const EXPECTED_SEND_COUNT = 193;
-const EXPECTED_DISPATCH_COUNT = 206;
+// stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358),
+// the controlled Warlock pet's signature-skill command and autocast toggle
+// (+2 send/dispatch from the class-overhauls integration), set_helm as a
+// send + dispatch pair (the paperdoll helmet-visibility eye; helmHidden
+// persists per character like weaponStowed), and inv_sort as a send +
+// dispatch pair (the one-shot bag clean-up; no payload, the sim re-derives
+// the whole arrangement
+// deterministically), and bg_respond as a send + dispatch pair (the
+// release's battleground queue-pop confirmation). Masterwrought phase 04
+// adds the extract_essence command (client-sent, so both counts move
+// together).
+const EXPECTED_SEND_COUNT = 196;
+const EXPECTED_DISPATCH_COUNT = 209;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

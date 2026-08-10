@@ -102,9 +102,11 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
   `hudChrome.death.spiritHealerAlive`), and `desktop_shell_strings.ts` (whole module
   of `t()`-rendered strings pushed to the Electron main process). The **static**
   mobile button labels (move/camera/attack/jump...) live in `index.html` via
-  `data-i18n`, not here; the perf overlay/doctor/reporter
-  (`perf.ts`/`perf_doctor.ts`/`perf_reporter.ts`) stays English, a `?perf`/`woc_perf`-gated
-  dev diagnostic like `console.*`.
+  `data-i18n`, not here. The `?perf` overlay plus `perf_doctor.ts` and
+  `perf_reporter.ts` stay English as developer diagnostics like `console.*`. The
+  production-addressable `?diagnostics=1` panel and its copied report are a separate
+  user-facing surface: all presentation copy and numbers must use `t()` and the active
+  locale, even though its analyzer rules remain stable developer-facing identifiers.
 
 ## Adding things (module-first)
 A NEW behavior lands as its own pure, unit-tested sibling module with a

@@ -202,6 +202,8 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/paladin_devotion_view.ts',
+  'src/ui/aura_icon_view.ts',
   'src/ui/aura_overlay_view.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
@@ -230,11 +232,14 @@ const UI_PURE_CORES = [
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
+  'src/ui/hud/pet_bar_core.ts',
+  'src/ui/hud/warlock/doom_meter_view.ts',
   'src/ui/hud/quest/master_craft_core.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/battleground/battleground_map_view.ts',
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
+  'src/ui/hud/battleground/battleground_proposal_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/playtime_view.ts',
   'src/ui/stat_tooltip_view.ts',
@@ -247,6 +252,7 @@ const UI_PURE_CORES = [
   'src/ui/threat_subject_core.ts',
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
+  'src/ui/preview_prewarm_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
   'src/ui/tab_strip_view.ts',
@@ -320,6 +326,7 @@ const UI_PURE_CORES = [
   'src/ui/map_open_sea_edge_core.ts',
   'src/ui/map_quest_list_view.ts',
   'src/ui/arena_window_view.ts',
+  'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
@@ -353,6 +360,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/action_bar_bind_core.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
+  'src/ui/hud/warlock/destruction_resource_view.ts',
   'src/ui/mobile_hud_layout.ts',
   'src/ui/mobile_fullscreen_window_core.ts',
   'src/ui/auras_view.ts',
@@ -385,6 +393,7 @@ const UI_PURE_CORES = [
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
   'src/game/graphics_rebuild_core.ts',
+  'src/game/perf_diagnosis_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
@@ -416,7 +425,9 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/affliction_familiar_core.ts',
   'src/render/ability_vfx_core.ts',
+  'src/render/characters/player_look_core.ts',
   'src/render/ability_vfx_longbuff_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/biome_haze_field_core.ts',
@@ -438,10 +449,16 @@ const RENDER_PURE_CORES = [
   'src/render/dashed_ring_core.ts',
   'src/render/detail_horizon_core.ts',
   'src/render/drape_lod_core.ts',
+  'src/render/weapon_vfx_emissive_cache_core.ts',
   'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
+  'src/render/evil_eye_marker_core.ts',
+  'src/render/lich_audio_state_core.ts',
+  'src/render/needle_of_fate_vfx_core.ts',
+  'src/render/sentence_vfx_core.ts',
+  'src/render/umbral_anchor_vfx_core.ts',
   'src/render/foliage_shader_core.ts',
   'src/render/foliage_shadow_core.ts',
   'src/render/frost_ice_fields_core.ts',
@@ -451,9 +468,11 @@ const RENDER_PURE_CORES = [
   'src/render/ground_aim_reticle_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
+  'src/render/drain_channel_visual_core.ts',
   'src/render/env_prefilter_core.ts',
   'src/render/environment_transition_core.ts',
   'src/render/ground_tilt_core.ts',
+  'src/render/grass_build_slicer_core.ts',
   'src/render/grass_cap_collapse_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
@@ -465,6 +484,9 @@ const RENDER_PURE_CORES = [
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
+  'src/render/paladin_ascension_core.ts',
+  'src/render/paladin_sun_verdict_core.ts',
+  'src/render/prewarm_policy.ts',
   'src/render/camp_brazier_placement_core.ts',
   'src/render/night_accents_core.ts',
   'src/render/night_light_field_core.ts',
@@ -474,6 +496,7 @@ const RENDER_PURE_CORES = [
   'src/render/prop_cell_core.ts',
   'src/render/race_line_core.ts',
   'src/render/renderer_frame_telemetry_core.ts',
+  'src/render/rift_death_zone_core.ts',
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
   'src/render/shadow_pass_gate_core.ts',
@@ -502,10 +525,14 @@ const RENDER_PURE_CORES = [
   'src/render/resident_scenery_core.ts',
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
+  'src/render/characters/form_visual_selection_core.ts',
+  'src/render/characters/metamorph_wing_motion_core.ts',
+  'src/render/warlock_meteor_fx_core.ts',
   'src/render/weapon_vfx_apply_queue_core.ts',
   'src/render/weapon_vfx_emissive_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/characters/skeleton_update_core.ts',
+  'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -1094,7 +1121,7 @@ function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[
     ...new Set(
       [...uiCores, ...renderCores]
         .filter((f) => !viewOrCoreRe.test(f))
-        .map((f) => relative(repoRoot, f)),
+        .map((f) => posixRel(relative(repoRoot, f))),
     ),
   ].sort();
 }
@@ -1192,7 +1219,9 @@ describe('curated bare-named pure cores (cross-check)', () => {
     // but forgotten here would escape both onDiskCores() (bare name) and the loop above
     // (not listed), reopening the gap; this equality makes that omission fail.
     const derivedBare = deriveBareNamedCores(UI_PURE_CORES, RENDER_PURE_CORES);
-    const bareNamedRel = [...new Set(BARE_NAMED.map((f) => relative(repoRoot, f)))].sort();
+    const bareNamedRel = [
+      ...new Set(BARE_NAMED.map((f) => posixRel(relative(repoRoot, f)))),
+    ].sort();
     expect(
       derivedBare,
       'BARE_NAMED must equal the registered cores whose name is bare (not _view/_core)',
@@ -1223,7 +1252,7 @@ describe('curated bare-named pure cores (cross-check)', () => {
 
     const derivedBare = deriveBareNamedCores(mutatedUiCores, RENDER_PURE_CORES);
     const mutatedBareNamedRel = [
-      ...new Set(mutatedBareNamed.map((f) => relative(repoRoot, f))),
+      ...new Set(mutatedBareNamed.map((f) => posixRel(relative(repoRoot, f)))),
     ].sort();
     // The OLD derived check: still green after the synchronized delete (the gap).
     expect(derivedBare).toEqual(mutatedBareNamedRel);
@@ -1492,6 +1521,7 @@ const UI_DOM_MODULES = [
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',
   'src/ui/charselect_news.ts',
+  'src/ui/charselect_redesign.ts',
   'src/ui/chat_command_menu.ts',
   'src/ui/claudium_window.ts',
   'src/ui/continent_art.ts',

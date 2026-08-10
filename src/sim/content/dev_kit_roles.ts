@@ -74,11 +74,9 @@ export const DEV_KIT_ROLES: Readonly<Record<PlayerClass, readonly DevKitRole[]>>
   ],
   shaman: [
     { spec: 'elemental', weights: CASTER, melee: false },
-    // Enhancement is the melee shaman, agility-led unlike its two caster siblings.
-    // NOT dual-wield: canDualWield (equipment_rules.ts) grants that to rogues and
-    // fury warriors ONLY, so claiming it here would ask for an offhand weapon the
-    // equip rules refuse and leave the slot empty instead of taking a held offhand.
-    { spec: 'enhancement', weights: PHYS_AGI, melee: true },
+    // Enhancement is the agility-led melee shaman and its shared cadence advances
+    // from both hands, so the test kit must exercise its real dual-wield rotation.
+    { spec: 'enhancement', weights: PHYS_AGI, melee: true, hands: 'dualWield' },
     { spec: 'restoration', weights: HEALER, melee: false, hands: 'shield' },
   ],
   mage: [

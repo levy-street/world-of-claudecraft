@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
 import { BIND_ACTIONS } from '../src/game/keybinds';
@@ -61,7 +62,7 @@ import {
   TIER2_TOOL_GATE_PROFICIENCY,
   TIER3_TOOL_GATE_PROFICIENCY,
 } from '../src/sim/content/vendor_row_gates';
-import { CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { ABILITIES, CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
   WORK_ORDER_CADENCE_TICKS,
@@ -275,11 +276,23 @@ describe('Guide generated class content', () => {
     expect(GUIDE_CLASSES).toHaveLength(9);
     for (const c of GUIDE_CLASSES) {
       expect(c.color).toMatch(/^#[0-9a-f]{6}$/);
-      expect(['rage', 'mana', 'energy']).toContain(c.resource);
+      expect(['rage', 'mana', 'energy', 'focus']).toContain(c.resource);
       expect(c.roles.length).toBeGreaterThan(0);
       expect(c.specs.length).toBeGreaterThan(0);
       expect(c.signatureAbilities.length).toBeGreaterThan(0);
       expect(c.abilities.length).toBeGreaterThanOrEqual(c.signatureAbilities.length);
+      for (const ability of c.abilities) {
+        expect(
+          ABILITIES[ability.id]?.hiddenFromPlayer,
+          `${c.id}.${ability.id} is hidden from players`,
+        ).not.toBe(true);
+      }
+      for (const ability of c.signatureAbilities) {
+        expect(
+          ABILITIES[ability.id]?.hiddenFromPlayer,
+          `${c.id}.${ability.id} signature is hidden from players`,
+        ).not.toBe(true);
+      }
       for (const s of c.specs) {
         expect(['tank', 'healer', 'dps']).toContain(s.role);
         expect(s.signature.length).toBeGreaterThan(0);
@@ -1258,6 +1271,23 @@ describe('Guide model stills', () => {
         `missing still on disk: "${url}" (run \`npm run wiki:stills\`)`,
       ).toBe(true);
     }
+  });
+
+  it('ships a visible 320px WebP for the dedicated Duskmurk still', async () => {
+    const gloomshade = GUIDE_WARLOCK_PETS.find((pet) => pet.id === 'gloomshade');
+    expect(gloomshade?.model).toBe('mob_gloomshade');
+    expect(gloomshade?.still).toBe('/guide-stills/mob_gloomshade.webp');
+    const bytes = readFileSync(publicPath(gloomshade?.still ?? ''));
+    expect(bytes.byteLength).toBeGreaterThan(2048);
+    expect(bytes.toString('ascii', 0, 4)).toBe('RIFF');
+    expect(bytes.toString('ascii', 8, 12)).toBe('WEBP');
+    const decoded = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    expect(decoded.info).toMatchObject({ width: 320, height: 320, channels: 4 });
+    let visiblePixels = 0;
+    for (let offset = 3; offset < decoded.data.length; offset += 4) {
+      if (decoded.data[offset] > 0) visiblePixels++;
+    }
+    expect(visiblePixels).toBeGreaterThan(1000);
   });
 
   it('has no orphan WebP (every committed still is referenced by a figure)', () => {

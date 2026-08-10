@@ -20,6 +20,7 @@
 // fiestaStandardize / updateFiestaActive / fiestaRestoreChar / clearFiestaAugments
 // are consumed here via SimContext callbacks (points-at Sim until A3 flips them).
 
+import { emitRainOfFireStop } from '../combat/warlock_meteor_events';
 import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import * as deedsMod from '../deeds';
 import { arenaMapForSlot } from '../dungeon_layout';
@@ -526,8 +527,18 @@ export function arenaAllPids(match: ArenaMatch): number[] {
 
 export function arenaStanding(meta: PlayerMeta, format: ArenaFormat): ArenaStanding {
   return format === '2v2'
-    ? { rating: meta.arena2v2Rating, wins: meta.arena2v2Wins, losses: meta.arena2v2Losses }
-    : { rating: meta.arenaRating, wins: meta.arenaWins, losses: meta.arenaLosses };
+    ? {
+        rating: meta.arena2v2Rating,
+        wins: meta.arena2v2Wins,
+        losses: meta.arena2v2Losses,
+        draws: meta.arena2v2Draws,
+      }
+    : {
+        rating: meta.arenaRating,
+        wins: meta.arenaWins,
+        losses: meta.arenaLosses,
+        draws: meta.arenaDraws,
+      };
 }
 
 export function arenaRatingForPid(ctx: SimContext, pid: number, format: ArenaFormat): number {
@@ -547,10 +558,12 @@ export function addArenaResult(
     meta.arena2v2Rating = after;
     if (won === true) meta.arena2v2Wins++;
     else if (won === false) meta.arena2v2Losses++;
+    else meta.arena2v2Draws++;
   } else {
     meta.arenaRating = after;
     if (won === true) meta.arenaWins++;
     else if (won === false) meta.arenaLosses++;
+    else meta.arenaDraws++;
   }
   return { before, after };
 }
@@ -1074,7 +1087,12 @@ export function readyArenaFighter(
   if (meta)
     recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   e.hp = e.maxHp;
-  e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
+  e.resource =
+    e.resourceType === 'mana'
+      ? e.maxResource
+      : e.resourceType === 'energy' || e.resourceType === 'focus'
+        ? 100
+        : 0;
   // Target retention is a separate concern from clearPrep (clean slate vs
   // fight-start top-off): only the countdown-end call site passes
   // keepValidTargetPids, so a selection made during prep survives the gates
@@ -1095,6 +1113,7 @@ export function readyArenaFighter(
   delete e.queuedOnSwingCostMultiplier;
   e.queuedCastAbility = null;
   e.queuedCastAim = null;
+  emitRainOfFireStop(ctx, e);
   e.castingAbility = null;
   e.castRemaining = 0;
   e.castTargetId = null;

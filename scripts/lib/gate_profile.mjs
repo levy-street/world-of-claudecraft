@@ -229,6 +229,7 @@ export function parseGateProfileArgs(argv) {
  *   skipBuilds?: boolean,
  *   skipVitest?: boolean,
  *   skipTypes?: boolean,
+ *   repoRoot?: string,
  * }} [opts]
  * @returns {Array<{ name: string, cmd: string, args: string[], env?: Record<string, string> }>}
  */

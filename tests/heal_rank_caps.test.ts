@@ -106,11 +106,15 @@ const EXPECTED: Record<string, Row[]> = {
     { level: 20, cost: 72, effects: 'heal 75-90 + hot 71/21' }, // NEW cap rank
   ],
   // ---- paladin
+  // The paladin overhaul owns Mending Light's mana curve: it tuned the rank costs
+  // down (35/50/65) against its own Devotion economy and left the cap rank's
+  // throughput at 190-222, so the release's 50/70/117 + 275-322 retune does not
+  // apply to this class any more.
   holy_light: [
     { level: 1, cost: 25, effects: 'heal 42-51' },
-    { level: 8, cost: 50, effects: 'heal 76-90' },
-    { level: 14, cost: 70, effects: 'heal 122-144' },
-    { level: 20, cost: 117, effects: 'heal 275-322' }, // revalued cap (was 190-222)
+    { level: 8, cost: 35, effects: 'heal 76-90' },
+    { level: 14, cost: 50, effects: 'heal 122-144' },
+    { level: 20, cost: 65, effects: 'heal 190-222' },
   ],
   flash_of_light: [
     { level: 12, cost: 35, effects: 'heal 62-76' },

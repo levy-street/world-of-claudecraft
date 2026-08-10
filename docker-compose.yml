@@ -11,11 +11,21 @@ services:
       - "127.0.0.1:5433:5432"
     volumes:
       - eastbrook_pgdata:/var/lib/postgresql/data
+    # pg_isready is a trivial ping, so polling it often costs nothing, but a permanent
+    # 1Hz steady-state probe is unwanted overhead on the production stack this file also
+    # deploys (see DEPLOY.md). start_period + start_interval give the fast 1s cadence
+    # ONLY during a cold boot (failures inside start_period don't spend the retry
+    # budget at all), while interval/timeout/retries return to the same steady-state
+    # values used before this change, keeping the ~50s outer ceiling for a genuinely
+    # cold initdb intact. -h pins the probe to the TCP listener so it cannot read
+    # healthy off initdb's transient unix-socket-only bootstrap server.
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U eastbrook -d eastbrook"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U eastbrook -d eastbrook"]
       interval: 5s
       timeout: 3s
       retries: 10
+      start_period: 60s
+      start_interval: 1s
 
   # The full game server (client + API + world). `docker compose up -d`
   # then open http://localhost:8787 — or put a TLS reverse proxy in front

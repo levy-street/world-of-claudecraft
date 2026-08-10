@@ -5,6 +5,7 @@
 // per-option effects and numbers are build-guide territory our guide does not ship. The spec
 // cards reuse the shared class_view component.
 
+import { crestImageFallbackAttributes } from '../../ui/crest_image_fallback';
 import { esc } from '../../ui/esc';
 import { t } from '../../ui/i18n';
 import { classCrest, className, specCardHtml } from '../class_view';
@@ -17,7 +18,7 @@ function classBlock(c: GuideClassInfo): string {
   return `
     <section class="guide-talents-class">
       <h3 class="guide-talents-class-h">
-        <img class="guide-talents-crest" src="${esc(classCrest(c.id, 96))}" alt="" width="40" height="40" loading="lazy" decoding="async" />
+        <img class="guide-talents-crest" src="${esc(classCrest(c.id, 96))}" ${crestImageFallbackAttributes(`class_${c.id}`, 96)} alt="" width="40" height="40" loading="lazy" decoding="async" />
         <a href="${esc(hrefFor(`classes/${c.id}`))}">${esc(className(c.id))}</a>
       </h3>
       <ul class="guide-spec-list">${c.specs.map((sp) => specCardHtml(c.id, sp)).join('')}</ul>

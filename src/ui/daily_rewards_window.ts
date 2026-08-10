@@ -1,3 +1,4 @@
+import type { ArmoryPreviewMode } from '../render/armory_preview';
 import { WEAPON_SKIN_LIST } from '../sim/content/weapon_skins';
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
@@ -160,10 +161,24 @@ export class DailyRewardsWindow {
     void this.renderCurrent('open');
   }
 
-  /** Prebuild the store's persistent Armory context while loading hides it. */
+  /** Prebuild the store's persistent Armory context while a curtain hides it. */
   async prewarmArmoryPreview(): Promise<void> {
-    if (!this.storeEnabled()) return;
-    await this.ensureArmoryInspect().prewarm(WEAPON_SKIN_LIST.map((skin) => skin.id));
+    await this.prewarmArmoryPreviewSkins(this.armoryPrewarmSkinIds());
+  }
+
+  /** The full catalog the post-entry prewarm schedule walks, one id per unit. */
+  armoryPrewarmSkinIds(): string[] {
+    if (!this.storeEnabled()) return [];
+    return WEAPON_SKIN_LIST.map((skin) => skin.id);
+  }
+
+  /** Warm one bounded slice of the Armory catalog (post-entry paced units). */
+  async prewarmArmoryPreviewSkins(
+    skinIds: readonly string[],
+    modes?: readonly ArmoryPreviewMode[],
+  ): Promise<void> {
+    if (!this.storeEnabled() || skinIds.length === 0) return;
+    await this.ensureArmoryInspect().prewarm(skinIds, modes);
   }
 
   /** Dispose the profile-bound Armory context; the next open rebuilds it lazily. */
