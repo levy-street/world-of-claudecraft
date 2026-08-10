@@ -806,6 +806,34 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   this merge at the last sync base and the phase 03 audit did not flag it;
   recorded here so a future auditor sees it was seen, re-raise only with the
   audit's evidence bar.
+- Phase 04 QA sync gate fallout (2026-08-10; gate_select GREEN all 8 steps at
+  the closing tip after two fix rounds). The full suite surfaced seven
+  release-side inventory gates the merge had left unreconciled, all applied:
+  extract_essence joined the release's NEW tests/item_copy_addressing_guard.ts
+  ADDRESSED_COMMANDS registry (every item command must name its copy or carry
+  a written exemption; future item commands owe a row); the Spiritcall rename
+  was re-applied to the canonical ability prose (the catalog-side sweep alone
+  trips tests/owned_class_tooltip_clarity.ts, which diffs catalog against
+  def copy); the paladin skills mapping dropped the release's pre-rename
+  duplicate rows and re-synced generated entries from the accepted-art
+  manifest (the manifest merged coherent: our names plus the release's new
+  references; it is the authority both missing-painted arms compare against);
+  the items mapping re-synced three manifest-owned direction texts the
+  release's generatedBatches restructure had reverted to pre-rename copy.
+  STANDING OBLIGATION MINTED BY THE RELEASE'S ITEM-ART WAVE: every live item
+  id must appear in the item-art audit catalog with OPAQUE 128px art and an
+  owner-reviewed verdict row; the three material placeholders were flattened
+  onto the opaque house ground (they carried alpha corners), reviewed, and
+  admitted (counts 822 to 825 / live 837 to 840, verdict + evidence digests +
+  test pins re-cut per the class-overhaul-additions precedent) so EVERY
+  FUTURE PHASE THAT SHIPS AN ITEM ID owes the same admission in-change. The
+  mob portrait source manifest fingerprints the sim+render browser bundle,
+  so ANY branch content change stales it: re-minted through its own receipt
+  flow (all 230 portraits re-rendered byte-identical; only the fingerprint
+  moved) and the placeholder-art ledger's digest pin moved with it; expect
+  this re-mint at EVERY future release sync. Also: two release-side
+  useOptionalChain lint errors and two merge-produced format drifts cleared
+  the changed-files biome floor; the warrior_intervene fix is behavior-equal.
 - Gate + review round 1 (2026-08-08). The full-suite gate caught the silent-loot
   registry (#2430/#2458) reaching the new professions modules (the heroic-marks
   precedent lives in instances/, OUTSIDE that sweep, so the phase plan never named
