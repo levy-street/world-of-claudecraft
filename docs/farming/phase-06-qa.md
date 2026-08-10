@@ -22,10 +22,13 @@ STEP 0 - PRE-FLIGHT
   command with git -C ~/Documents/woc-farming-plan; git status must be clean.
 - [AMENDED per D22, the Phase 1 QA precedent: no PR exists. The phase landed as
   local commits merged --no-ff into feature/farming-plan; audit the merge commit
-  (progress.md records it) and its phase-side parent chain. The phase diff is the
-  four phase commits AFTER the tenth release absorb 6b04c188ff (which was
+  (progress.md records it) and its phase-side parent chain. The phase diff is
+  the commits AFTER the tenth release absorb 6b04c188ff (which was
   release-merge-audited separately): feat(cooking) ae814834f3, feat(alchemy)
-  f570a39002, test(economy) f76fb4e41e, fix(ui) 544a291f98, plus the docs commit.]
+  f570a39002, test(economy) f76fb4e41e, fix(ui) 544a291f98, fix(review)
+  0a692e8896, fix(test) 5215f712d7 (the three release art-program collision
+  heals, deviations (ak)/(al)), test(economy) 22ee3a3857 (the QA-round pins),
+  plus the docs commits.]
 - If the diff cannot be identified cleanly, stop and surface.
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus
   mutation-checks-commit-first, i18n-semantic-regressions-gate-trap,

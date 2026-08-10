@@ -16,7 +16,7 @@
 | Phase 4 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
 | Phase 5 (crops and tools) | done | 2026-08-09 | 2026-08-09 |
 | Phase 5 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-09 | 2026-08-09 |
-| Phase 6 (economy hooks) | not started | | |
+| Phase 6 (economy hooks) | done | 2026-08-09 | 2026-08-09 |
 | Phase 6 QA | not started | | |
 | Phase 7 (render and juice) | not started | | |
 | Phase 7 QA | not started | | |
@@ -1001,8 +1001,84 @@ wield concern resolved by the (ab) ledger: teaching ceilings clear every
 wield gate, now pinned; its ratchet-scan concern resolved against the node
 precedent, recorded).
 
-### Phase 6
-(not started)
+### Phase 6 (economy hooks, 2026-08-09, local-only per D22)
+
+Acceptance checklist (phase file STEP 5):
+- [x] one or two plain dishes per crop tier exist, consuming farm produce, foodHp
+      only with no buff machinery, recipe rows with laddered skillReq beside the
+      cooking ladder budget conventions; values proposed and maintainer-flagged
+      (eight dishes, two per tier, rungs 0/0/25/25/50/50/50/50; every
+      foodHp/sellValue pair reuses a shipped curve point; the exact key-set pin
+      closes the plain-food def shape until Phase 11 re-pins it)
+- [x] the alchemy growth_tonic recipe exists with herb inputs per D7 and conforms
+      to the alchemy budget conventions (silverleaf x2 + glass_vial x1, skillReq 0,
+      output 6 under input 20)
+- [x] the consumer rule is closed: every Phase 5 produce and the withered husks
+      have at least one recipe or command consumer, verified and pinned; the
+      Phase 6 consumer notes in the rollout arms are replaced by the real
+      consumers (the closure arm now derives recipe consumers from merged
+      ALL_RECIPES; the five-twin deferred literal is deleted and each twin pinned
+      to its named dish)
+- [x] no new recipe is craftable from vendor goods alone: every one has at least
+      one reagent with no vendor faucet, verified and pinned (both directions:
+      no-stock and no-buyValue, plus the symmetric no-NPC-stocks-a-dish arm)
+- [x] English recipe and item-name i18n rows exist for every new dish and the
+      tonic recipe; tests/localization_fixes.test.ts is green (eight item-name
+      rows plus materialHint.growthTonic, each with the five non-Latin fills;
+      recipes have no name keys by design: a recipe displays its result item's
+      name)
+- [x] tests/recipe_economy.test.ts and the training/ladder suites are green
+- [x] the recipe economy invariant holds: nothing vendors above its cheapest
+      achievable inputs
+- [x] the wiki regenerated and tests/guide.test.ts freshness is green
+- [x] the STEP 3 validation list is green and node scripts/gate_select.mjs passes
+      apart from the standing armory browser exception (gate record below)
+- [x] docs/farming/progress.md and docs/farming/state.md ledgers are updated
+
+Notes (the would-be PR body, D22):
+- Content: FARM_RECIPES, a nine-row trainer-taught sibling list beside
+  HOE_RECIPES (the ladder is closed and count-pinned): vale_hearth_loaf 90/6,
+  eastbrook_root_pottage 117/12, fenbridge_rice_bowl 243/25, fenbridge_beet_braise
+  432/40, highwatch_barley_bannock 552/60, highwatch_gourd_soup 552/75,
+  evergarden_sunmelon_tart 980/150, evergarden_harvest_platter 980/150, plus
+  recipe_growth_tonic (alchemy). All values maintainer-flagged at their rows.
+- MAINTAINER FLAGS gathered here: the eight foodHp/sellValue assignments (each
+  reuses a shipped curve point, 980 ceiling respected); dish reagent counts; the
+  tonic at skillReq 0 with silverleaf x2 (rationale at the row); deviation (aj)
+  trainability before go-live (free at rung 0 per the settled R8 curve); the
+  tier-3 dishes being strictly dominated at rung 50 by the tier-4 pair (three
+  rungs for four tiers; the QA review asks for an explicit balance ruling);
+  whether fine_marsh_rice / fine_highland_barley should also gain dish consumers
+  (hoe-reagent-only today; the Phase 5 deferred literal named exactly five
+  twins); and the deviation (al) guard extensions (the item-art audit's
+  ITEM_ART_PENDING exemption and the portrait manifest's fingerprint-only
+  refresh path), which relax two release art-program seals in a bounded,
+  both-directions-policed way and deserve their own sign-off.
+- Deviations this phase: (ai) tonic craftable from wild herbs pre-go-live (D7
+  wins over the phase file's blanket dormancy note), (aj) all nine rows
+  trainable pre-go-live, (ak) the crafted-tooltip partition's one pinned
+  exception for the junk tonic, (al) the two release art-program collisions
+  healed in-branch with an absorb-checklist addition. All swept into state.md,
+  the phase file, and the QA twin.
+- Reviews: architecture-reviewer 0 BLOCKING 1 SHOULD-FIX (trainability, ruled
+  and pinned as (aj)); frontend-seam-reviewer 0 BLOCKING 2 SHOULD-FIX (zh
+  fullwidth commas fixed, the A4c pairwise prim-list pin added);
+  qa-checklist READY with 1 BLOCKING (the key-set absence pin, landed) and its
+  should-fixes landed (craft-through arm, literal count pin, dish-stock arm,
+  curve-point live backing). Release-merge-audit on the tenth absorb: 4 lanes
+  CLEAN.
+- Known repo-wide noise, not this phase: tests/crafting_window_tabs.test.ts
+  prints ~100 ECONNREFUSED stacks to stderr WHILE PASSING (happy-dom fetching
+  icon urls; none are dish ids since pending-art ids resolve procedurally).
+- QA-session pointers: the farming castingReadout arm ('You are planting.') has
+  no pin (pre-existing, surfaced by the absorb audit); the ru Eastbrook stem
+  split and the five-locale "frost gourd" qualifier on Highwatch Gourd Soup are
+  release-time locale-pass notes; A4's structural hole (pending-vs-committed
+  icon collisions are unswept) predates this phase; weaponIconUrl now resolves
+  ANY ITEM_WEAPON_VARIANTS key ahead of the pending-art guard (release change),
+  so a hoe gaining a held model must not join weapon_variants without art.
+
+Gate record: see the log line appended after the final run below.
 
 ### Phase 7
 (not started)
