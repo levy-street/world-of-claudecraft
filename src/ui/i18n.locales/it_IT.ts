@@ -330,7 +330,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Due squadre da cinque. Ruba la bandiera nemica e portala di corsa alla tua rocca. Vince chi arriva per primo a 3 catture. Formate un gruppo fino a 5 e mettetevi in coda insieme; prendete le Rune di Scatto e sfruttate i ripari per seminare gli inseguitori.',
   'hudChrome.bg.queuedParty': 'Gruppo di {count}.',
-  'hudChrome.bg.ratingSummary': 'Indice. {wins} vittorie / {losses} sconfitte',
+  'hudChrome.bg.ratingSummary': 'Indice. {wins} vittorie / {losses} sconfitte / {draws} pareggi',
   'hudChrome.bg.respawnIn': 'Prossima ondata: rientro tra {seconds}',
   'hudChrome.bg.resultDefeat': 'Sconfitta',
   'hudChrome.bg.resultDraw': 'Pareggio',
@@ -4390,7 +4390,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Verrai abbinato al contendente online con indice più vicino e teletrasportato nell'arena. Vinci per salire; il primo a cedere (1 salute) perde. Torni esattamente dove ti sei messo in coda.",
   'hud.arena.ladderAllTime': 'Classifica - storica',
   'hud.arena.ladderOnline': 'Classifica - online',
-  'hud.arena.ratingSummary': 'Indice - {wins} vittorie / {losses} sconfitte',
+  'hud.arena.ratingSummary': 'Indice - {wins} vittorie / {losses} sconfitte / {draws} pareggi',
   'hud.arena.statusCountdown': 'Preparati...',
   'hud.arena.statusReturning': 'Ritorno al mondo... {seconds}',
   'hud.arena.statusFight': 'Combatti fino alla resa!',

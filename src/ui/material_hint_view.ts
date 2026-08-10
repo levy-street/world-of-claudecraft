@@ -45,6 +45,12 @@ export const MATERIAL_HINT_KEYS: Readonly<Record<string, TranslationKey>> = {
   fine_silverleaf_herb: 'hudChrome.materialHint.fineGrade',
   fine_goldleaf_herb: 'hudChrome.materialHint.fineGrade',
   fine_sunpetal_herb: 'hudChrome.materialHint.fineGrade',
+  // The growth tonic joined when it became a crafted output (the Phase 6
+  // alchemy recipe): a recipe output must state its purpose in its tooltip
+  // (tests/crafted_item_tooltip_coverage.test.ts), and the tonic is kind
+  // 'junk' with no def-level use because plant_crop consumes it as the
+  // plant-time yield knob, so the purpose line is the one place that says so.
+  growth_tonic: 'hudChrome.materialHint.growthTonic',
 };
 
 /** The hint key for one item id, or undefined for every other item. */

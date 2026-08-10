@@ -515,18 +515,22 @@ describe('perf report ingestion', () => {
             maxMs: 5000,
             manifestPlanned: 14,
             manifestCompleted: 11,
+            manifestPartial: 1,
             manifestTimedOut: 1,
+            partialEntryIds: ['entities.player-archetypes'],
             timedOutEntryIds: ['diagnostics.baseline'],
             entries: [
               {
                 id: 'textures.scene',
                 category: 'world',
                 required: true,
-                status: 'completed',
+                status: 'partial',
                 elapsedMs: 120,
                 remainingMsAfter: 4200,
                 programDelta: 0,
                 textureDelta: 12,
+                workDone: 12,
+                workPlanned: 20,
                 detail: 'uploaded=12',
               },
             ],
@@ -546,16 +550,76 @@ describe('perf report ingestion', () => {
           rendererPrewarmSummary: expect.objectContaining({
             elapsedMs: 3200,
             manifestPlanned: 14,
+            manifestPartial: 1,
             manifestTimedOut: 1,
+            partialEntryIds: ['entities.player-archetypes'],
             entries: [
               expect.objectContaining({
                 id: 'textures.scene',
+                status: 'partial',
                 textureDelta: 12,
+                workDone: 12,
+                workPlanned: 20,
               }),
             ],
           }),
         }),
       }),
+    );
+  });
+
+  it('bounds the client-supplied prewarm entry-id lists instead of copying them verbatim', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'public-hostile-entry-ids',
+        rawSummary: {
+          seconds: 30,
+          rendererPrewarmSummary: {
+            manifestPartial: 25,
+            // Oversized: capped at the same 24-entry bound the entries block uses.
+            partialEntryIds: Array.from({ length: 30 }, (_, i) => `partial-${i}`),
+            // Overlong strings truncate to 80; non-string elements drop.
+            timedOutEntryIds: ['y'.repeat(500), 42, { nested: true }, 'diagnostics.baseline'],
+            // A non-array value is dropped outright, never stored.
+            failedEntryIds: 'not-an-array',
+            entries: [],
+          },
+          oversized: 'x'.repeat(40_000),
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSummary: expect.objectContaining({
+          truncated: true,
+          rendererPrewarmSummary: expect.objectContaining({
+            manifestPartial: 25,
+            partialEntryIds: Array.from({ length: 24 }, (_, i) => `partial-${i}`),
+            timedOutEntryIds: ['y'.repeat(80), 'diagnostics.baseline'],
+          }),
+        }),
+      }),
+    );
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const prewarm = (stored.rawSummary as Record<string, unknown>).rendererPrewarmSummary as Record<
+      string,
+      unknown
+    >;
+    expect(prewarm.failedEntryIds).toBeUndefined();
+    // Documented contract (see the id-list sanitizer comment in
+    // server/perf_report.ts compactPrewarmSummary): the scalar counts stay
+    // authoritative and uncapped while the id lists are bounded SAMPLES, so
+    // manifestPartial: 25 stored beside a 24-element partialEntryIds is the
+    // intended shape of the signal, not a contradiction to normalize away.
+    expect(prewarm.manifestPartial).toBe(25);
+    expect((prewarm.partialEntryIds as string[]).length).toBe(24);
+    expect((prewarm.partialEntryIds as string[]).length).toBeLessThan(
+      prewarm.manifestPartial as number,
     );
   });
 

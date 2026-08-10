@@ -1,7 +1,9 @@
 // Purpose hints: the hint table is keyed on exactly the eight arcane/resonant
-// enchanting ids plus the nine fine gathered grades and nothing else, every row
-// resolves to real English, and the rendered line is the muted description
-// style the tooltip's other def-driven use lines share.
+// enchanting ids, the nine fine gathered grades, and the crafted farm supply
+// (growth_tonic, the Phase 6 re-pin: a recipe output must state its purpose,
+// and the tonic's junk kind carries no def-level use to say it) and nothing
+// else, every row resolves to real English, and the rendered line is the muted
+// description style the tooltip's other def-driven use lines share.
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
@@ -34,7 +36,11 @@ const ENCHANTING_IDS = [
 // Derived from the live grade table rather than restated, so a tenth gathered
 // material cannot ship with a tooltip that says nothing about its grade.
 const FINE_IDS = Object.values(MATERIAL_GRADES).map((row) => row.fineItemId);
-const EXPECTED_IDS = [...ENCHANTING_IDS, ...FINE_IDS].sort();
+// The crafted farm supply joined in Phase 6 when the alchemy recipe made it a
+// recipe output (crafted_item_tooltip_coverage demands purpose text and its
+// junk kind has no def-level use line to provide it).
+const FARM_SUPPLY_HINT_IDS = ['growth_tonic'];
+const EXPECTED_IDS = [...ENCHANTING_IDS, ...FINE_IDS, ...FARM_SUPPLY_HINT_IDS].sort();
 
 describe('material_hint_view', () => {
   it('covers exactly the enchanting materials and the fine grades, no more and no less', () => {

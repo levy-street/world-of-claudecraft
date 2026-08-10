@@ -134,6 +134,9 @@ significant-contributor name glow lives there too. Narrow helpers:
 rules, all CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.
+- **Never `dispose()` a shared GLB-cache texture that may still be drawn.** With the
+  KTX2 mip release (`assets/ktx2_mip_release.ts`) its CPU data is full-shape stubs and
+  its restore source drops on dispose, so a later re-upload renders black.
 - **`preload.ts` is the boot gate, and it has TWO lanes.** `startGame` awaits
   `assetsReady()` either way, so `build*()` still reads resolved assets
   synchronously; the lanes differ only in WHEN the fetch starts. A new module-load
@@ -201,7 +204,10 @@ collision/movement.
   here patch the pinned release's shader chunks via `onBeforeCompile`, so any
   bump means re-verifying every patched chunk. A bump also touches KTX2:
   `assets/ktx2_support.ts` hand-builds a `workerConfig` on its no-context
-  fallback arm (a shape KTX2Loader owns and can change between releases), and
+  fallback arm (a shape KTX2Loader owns and can change between releases), wraps
+  the private `_createTexture` hook to capture restore sources for
+  `assets/ktx2_mip_release.ts` (fails soft to resident mips if the hook moves,
+  see `tests/ktx2_support.test.ts`), and
   the shipped `public/basis/` transcoder must be regenerated from the new three
   via `node scripts/patch_basis_transcoder.mjs` (never a raw copy: the shipped
   JS carries an eval-free embind patch so the KTX2 blob worker survives the

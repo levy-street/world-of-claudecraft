@@ -4887,14 +4887,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Banner in Hand",
     "category": "pvp",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_bg_first_capture.webp"
   },
   {
     "id": "pvp_bg_first_win",
     "name": "The Hollow Holds",
     "category": "pvp",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_bg_first_win.webp"
   },
   {
     "id": "pvp_bg_wins_25",
@@ -4902,14 +4904,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Flagbearer"
+    "rewardTitle": "Flagbearer",
+    "crest": "/ui/deeds/pvp_bg_wins_25.webp"
   },
   {
     "id": "pvp_bg_captures_100",
     "name": "A Hundred Banners",
     "category": "pvp",
     "renown": 50,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_bg_captures_100.webp"
   },
   {
     "id": "chr_willowfen_gatherer",
@@ -4964,161 +4968,184 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Clutch Breaker",
     "category": "chronicle",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_drakemaw_broodlord.webp"
   },
   {
     "id": "chr_maw_matriarch",
     "name": "The Sky Goes Quiet",
     "category": "chronicle",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_maw_matriarch.webp"
   },
   {
     "id": "dgn_rift",
     "name": "Riftwalker",
     "category": "dungeon",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_rift.webp"
   },
   {
     "id": "dgn_rift_s_rank",
     "name": "Rift Sovereign",
     "category": "dungeon",
     "renown": 25,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_rift_s_rank.webp"
   },
   {
     "id": "prog_engineering_rare",
     "name": "Precision Engineering",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_engineering_rare.webp"
   },
   {
     "id": "prog_alchemy_rare",
     "name": "A Rare Vintage",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_alchemy_rare.webp"
   },
   {
     "id": "prog_cooking_rare",
     "name": "A Dish to Remember",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_cooking_rare.webp"
   },
   {
     "id": "prog_leatherworking_rare",
     "name": "Fine Tanning",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_leatherworking_rare.webp"
   },
   {
     "id": "prog_tailoring_rare",
     "name": "A Master's Stitch",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_tailoring_rare.webp"
   },
   {
     "id": "prog_weaponcrafting_rare",
     "name": "Tempered to a Shine",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_weaponcrafting_rare.webp"
   },
   {
     "id": "prog_armorcrafting_rare",
     "name": "Plated to Perfection",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_armorcrafting_rare.webp"
   },
   {
     "id": "chr_frostveil_gatherer",
     "name": "Terraced Harvest",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_frostveil_gatherer.webp"
   },
   {
     "id": "chr_frostveil_first_cast",
     "name": "First Ice on the Tarn",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_frostveil_first_cast.webp"
   },
   {
     "id": "chr_amberfall_gatherer",
     "name": "The Amberfall Harvest",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_amberfall_gatherer.webp"
   },
   {
     "id": "chr_amberfall_first_cast",
     "name": "A Catch from the Great Mere",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_amberfall_first_cast.webp"
   },
   {
     "id": "chr_nightbloom_gatherer",
     "name": "The Dreaming Harvest",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_nightbloom_gatherer.webp"
   },
   {
     "id": "chr_nightbloom_first_cast",
     "name": "A Ripple on the Moonwell",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_nightbloom_first_cast.webp"
   },
   {
     "id": "chr_wraithwood_gatherer",
     "name": "Harvest Under the Canopy",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_wraithwood_gatherer.webp"
   },
   {
     "id": "chr_wraithwood_first_cast",
     "name": "A Cast in the Looking-Glass",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_wraithwood_first_cast.webp"
   },
   {
     "id": "chr_palmreach_gatherer",
     "name": "Harvest on the Palmstrand",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_palmreach_gatherer.webp"
   },
   {
     "id": "chr_palmreach_first_cast",
     "name": "Casting the Sapphire Lagoon",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_palmreach_first_cast.webp"
   },
   {
     "id": "chr_evergarden_gatherer",
     "name": "The Parterre's Bounty",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_evergarden_gatherer.webp"
   },
   {
     "id": "chr_evergarden_first_cast",
     "name": "A Cast on the Petal Pond",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_evergarden_first_cast.webp"
   },
   {
     "id": "pvp_honor_sergeant",
@@ -5126,7 +5153,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 10,
     "feat": false,
-    "rewardTitle": "Linebreaker"
+    "rewardTitle": "Linebreaker",
+    "crest": "/ui/deeds/pvp_honor_sergeant.webp"
   },
   {
     "id": "pvp_honor_knight_lieutenant",
@@ -5134,7 +5162,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Fieldreaver"
+    "rewardTitle": "Fieldreaver",
+    "crest": "/ui/deeds/pvp_honor_knight_lieutenant.webp"
   },
   {
     "id": "pvp_honor_field_marshal",
@@ -5142,7 +5171,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 50,
     "feat": false,
-    "rewardTitle": "Warcrowned"
+    "rewardTitle": "Warcrowned",
+    "crest": "/ui/deeds/pvp_honor_field_marshal.webp"
   }
 ];
 
@@ -6044,6 +6074,36 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 100,
           "zeroAt": 125
         }
+      },
+      {
+        "id": "recipe_growth_tonic",
+        "name": "Growth Tonic",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sheenleaf Herb",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Growth Tonic",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
       }
     ]
   },
@@ -6391,6 +6451,262 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         ],
         "output": {
           "name": "Marlow's Grand Roast",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_vale_hearth_loaf",
+        "name": "Vale Hearth Loaf",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Vale Wheat",
+            "count": 3
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Vale Hearth Loaf",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_eastbrook_root_pottage",
+        "name": "Eastbrook Root Pottage",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Brook Carrot",
+            "count": 2
+          },
+          {
+            "name": "Fine Brook Carrot",
+            "count": 1
+          },
+          {
+            "name": "Vale Wheat",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Eastbrook Root Pottage",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_fenbridge_rice_bowl",
+        "name": "Fenbridge Rice Bowl",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Marsh Rice",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Rice Bowl",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_fenbridge_beet_braise",
+        "name": "Fenbridge Beet Braise",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Bog Beet",
+            "count": 3
+          },
+          {
+            "name": "Fine Bog Beet",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Beet Braise",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_highwatch_barley_bannock",
+        "name": "Highwatch Barley Bannock",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Highland Barley",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Highwatch Barley Bannock",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_highwatch_gourd_soup",
+        "name": "Highwatch Gourd Soup",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Frost Gourd",
+            "count": 3
+          },
+          {
+            "name": "Fine Frost Gourd",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Highwatch Gourd Soup",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_evergarden_sunmelon_tart",
+        "name": "Evergarden Sunmelon Tart",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Gilded Sunmelon",
+            "count": 3
+          },
+          {
+            "name": "Fine Gilded Sunmelon",
+            "count": 1
+          },
+          {
+            "name": "Vale Wheat",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Evergarden Sunmelon Tart",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_evergarden_harvest_platter",
+        "name": "Evergarden Harvest Platter",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Evergarden Greens",
+            "count": 3
+          },
+          {
+            "name": "Fine Evergarden Greens",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Evergarden Harvest Platter",
           "count": 1,
           "quality": "rare"
         },

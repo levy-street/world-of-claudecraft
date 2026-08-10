@@ -21,6 +21,8 @@ describe('portrait chip deferred source', () => {
     const html = portraitChipHtml({ cls: 'mage', name: 'Mage' });
     expect(html).toContain(portraitUrl);
     expect(html).not.toContain('data-portrait-pending');
+    const portraitTag = html.match(/<img class="portrait-img"[^>]+>/)?.[0] ?? '';
+    expect(portraitTag).not.toContain('data-crest-fallback');
   });
 
   it('omits a large cached data URL from dense repeated markup', () => {

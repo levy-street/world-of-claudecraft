@@ -526,8 +526,18 @@ export function arenaAllPids(match: ArenaMatch): number[] {
 
 export function arenaStanding(meta: PlayerMeta, format: ArenaFormat): ArenaStanding {
   return format === '2v2'
-    ? { rating: meta.arena2v2Rating, wins: meta.arena2v2Wins, losses: meta.arena2v2Losses }
-    : { rating: meta.arenaRating, wins: meta.arenaWins, losses: meta.arenaLosses };
+    ? {
+        rating: meta.arena2v2Rating,
+        wins: meta.arena2v2Wins,
+        losses: meta.arena2v2Losses,
+        draws: meta.arena2v2Draws,
+      }
+    : {
+        rating: meta.arenaRating,
+        wins: meta.arenaWins,
+        losses: meta.arenaLosses,
+        draws: meta.arenaDraws,
+      };
 }
 
 export function arenaRatingForPid(ctx: SimContext, pid: number, format: ArenaFormat): number {
@@ -547,10 +557,12 @@ export function addArenaResult(
     meta.arena2v2Rating = after;
     if (won === true) meta.arena2v2Wins++;
     else if (won === false) meta.arena2v2Losses++;
+    else meta.arena2v2Draws++;
   } else {
     meta.arenaRating = after;
     if (won === true) meta.arenaWins++;
     else if (won === false) meta.arenaLosses++;
+    else meta.arenaDraws++;
   }
   return { before, after };
 }

@@ -1,6 +1,7 @@
 import type { SpecDef, TalentEffect, TalentRowOption } from '../sim/content/talents';
 import { ABILITIES } from '../sim/data';
-import { type IconKind, iconDataUrl } from './icons';
+import { hasAbilityIconIdentity, type IconKind, iconDataUrl } from './icons';
+import { specIconUrl } from './spec_icon_art';
 
 export interface TalentIconRef {
   kind: Extract<IconKind, 'ability' | 'crest'>;
@@ -8,7 +9,7 @@ export interface TalentIconRef {
 }
 
 export type TalentSpecIconRef =
-  | { kind: 'image'; url: string }
+  | { kind: 'image'; url: string; fallback: TalentIconRef }
   | TalentIconRef
   | { kind: 'text'; text: string };
 
@@ -28,9 +29,6 @@ const TALENT_STAT_CREST: Record<string, string> = {
   sta: 'talent_health',
   haste: 'talent_haste',
 };
-
-const WARRIOR_SPEC_ART = new Set(['arms', 'fury', 'prot']);
-const MAGE_SPEC_ART = new Set(['arcane', 'fire', 'frost']);
 
 export function talentEffectIconRef(effect: TalentEffect | undefined): TalentIconRef {
   const chargeMod = effect?.ability?.find((mod) => mod.ability === 'charge');
@@ -84,18 +82,37 @@ export function talentEffectIconRef(effect: TalentEffect | undefined): TalentIco
 }
 
 export function talentRowOptionIconRef(option: TalentRowOption): TalentIconRef {
+  // Classic choice rows carry an authored presentation icon. It is the source
+  // of truth whenever painted art exists; effect-shape inference remains the
+  // fallback for older rows (notably Warrior) that omit the field.
+  if (option.icon && hasAbilityIconIdentity(option.icon)) {
+    return { kind: 'ability', id: option.icon };
+  }
   return talentEffectIconRef(option.effect);
 }
 
 export function talentSpecIconRef(spec: SpecDef): TalentSpecIconRef {
-  if (spec.class === 'warrior' && WARRIOR_SPEC_ART.has(spec.id)) {
-    return { kind: 'image', url: `/ui/specs/warrior/${spec.id}.webp` };
-  }
-  if (spec.class === 'mage' && MAGE_SPEC_ART.has(spec.id)) {
-    return { kind: 'image', url: `/ui/specs/mage/${spec.id}.png` };
+  const art = specIconUrl(spec);
+  if (art) {
+    return {
+      kind: 'image',
+      url: art,
+      fallback: ABILITIES[spec.signature]
+        ? { kind: 'ability', id: spec.signature }
+        : { kind: 'crest', id: 'talent_choice' },
+    };
   }
   if (ABILITIES[spec.signature]) return { kind: 'ability', id: spec.signature };
   return { kind: 'text', text: spec.icon };
+}
+
+/** CSS image stack with painted spec art above its configured signature fallback. */
+export function talentSpecIconCssBackground(ref: TalentSpecIconRef): string | null {
+  if (ref.kind === 'text') return null;
+  if (ref.kind === 'image') {
+    return `url(${ref.url}),url(${talentIconDataUrl(ref.fallback)})`;
+  }
+  return `url(${talentIconDataUrl(ref)})`;
 }
 
 export function talentIconDataUrl(ref: TalentIconRef): string {

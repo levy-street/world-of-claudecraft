@@ -2458,6 +2458,14 @@ const ITEM_ENTITY_IDS = [
   'bronze_hoe',
   'skysilver_hoe',
   'osmium_hoe',
+  'vale_hearth_loaf',
+  'eastbrook_root_pottage',
+  'fenbridge_rice_bowl',
+  'fenbridge_beet_braise',
+  'highwatch_barley_bannock',
+  'highwatch_gourd_soup',
+  'evergarden_sunmelon_tart',
+  'evergarden_harvest_platter',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2632,6 +2640,20 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   bronze_hoe: 'Bronze Hoe',
   skysilver_hoe: 'Skysilver Hoe',
   osmium_hoe: 'Osmium Hoe',
+  // The economy-hooks phase's eight farm dishes (FARM_RECIPES), listed in
+  // tier order, same English-appended treatment and the same stay-in-step
+  // rule against the ItemDef `name` fields in
+  // src/sim/content/profession_items.ts. IP-safe per D17: real cooking words
+  // (loaf, pottage, braise, bannock, tart, platter) plus this game's own
+  // settlement and zone flavor, coining nothing from another game.
+  vale_hearth_loaf: 'Vale Hearth Loaf',
+  eastbrook_root_pottage: 'Eastbrook Root Pottage',
+  fenbridge_rice_bowl: 'Fenbridge Rice Bowl',
+  fenbridge_beet_braise: 'Fenbridge Beet Braise',
+  highwatch_barley_bannock: 'Highwatch Barley Bannock',
+  highwatch_gourd_soup: 'Highwatch Gourd Soup',
+  evergarden_sunmelon_tart: 'Evergarden Sunmelon Tart',
+  evergarden_harvest_platter: 'Evergarden Harvest Platter',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

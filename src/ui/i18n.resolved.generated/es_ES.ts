@@ -1054,7 +1054,7 @@ export const es_ES: EnTranslations = {
       "blurb": "Dos fortalezas en ruinas se enfrentan a través de una hondonada amurallada a la sombra de Thornpeak: los Carmesí al sur, los Azur al norte, y entre ellos el antiguo Patio en Ruinas que ninguno ha controlado jamás. Cinco por bando, una bandera cada uno, y el primero en llevar tres de las suyas a casa se queda con el campo.",
       "modeTag": "5c5 Captura la Bandera",
       "offlineNote": "Campos Espinosos se está sincronizando. La cola se abrirá en cuanto el reino responda.",
-      "ratingSummary": "Índice. {wins} victorias / {losses} derrotas",
+      "ratingSummary": "Índice. {wins} victorias / {losses} derrotas / {draws} empates",
       "careerCaptures": "Capturas de tu carrera: {count}",
       "enterQueue": "Entrar en la cola",
       "enterQueueParty": "Entrar en la cola (grupo de {count})",
@@ -2362,7 +2362,8 @@ export const es_ES: EnTranslations = {
       "resonantHide": "Reactivo de encantamiento. Se obtiene desencantando armadura de cuero rara o mejor.",
       "resonantLinks": "Reactivo de encantamiento. Se obtiene desencantando armadura de malla rara o mejor.",
       "resonantSteel": "Reactivo de encantamiento. Se obtiene desencantando armas de cuerpo a cuerpo raras o mejores.",
-      "resonantTimber": "Reactivo de encantamiento. Se obtiene desencantando bastones, varitas, arcos y ballestas raros o mejores."
+      "resonantTimber": "Reactivo de encantamiento. Se obtiene desencantando bastones, varitas, arcos y ballestas raros o mejores.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const es_ES: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -8206,7 +8209,7 @@ export const es_ES: EnTranslations = {
       "queueNote": "Te emparejarán con el retador en línea de índice más cercano y te teletransportarán a la arena. Gana para subir; el primero en ceder (1 de salud) pierde. Vuelves exactamente donde entraste en cola.",
       "ladderAllTime": "Clasificación - histórica",
       "ladderOnline": "Clasificación - en línea",
-      "ratingSummary": "Índice - {wins} victorias / {losses} derrotas",
+      "ratingSummary": "Índice - {wins} victorias / {losses} derrotas / {draws} empates",
       "statusCountdown": "Prepárate...",
       "statusReturning": "Volviendo al mundo... {seconds}",
       "statusFight": "¡Lucha hasta la rendición!",
@@ -11514,6 +11517,30 @@ export const es_ES: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"

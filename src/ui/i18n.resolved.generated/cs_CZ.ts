@@ -1054,7 +1054,7 @@ export const cs_CZ: EnTranslations = {
       "blurb": "Dvě zbořené tvrze si hledí přes ohrazenou kotlinu ve stínu Thornpeaku: Karmínová na jihu, Blankytná na severu, a mezi nimi starší Zpustlé nádvoří, které nikdy žádná z nich neovládla. Pět na každé straně, jedna vlajka na tým, a kdo první donese domů tři z těch svých, ovládne bojiště.",
       "modeTag": "5v5, Zajetí vlajky",
       "offlineNote": "Thornhollowská pole se synchronizují. Fronta se otevře, jakmile realm odpoví.",
-      "ratingSummary": "Hodnocení. {wins} výher / {losses} proher",
+      "ratingSummary": "Hodnocení. {wins} výher / {losses} proher / {draws} remíz",
       "careerCaptures": "Zajetí za kariéru: {count}",
       "enterQueue": "Vstoupit do fronty",
       "enterQueueParty": "Vstoupit do fronty (skupina: {count})",
@@ -2362,7 +2362,8 @@ export const cs_CZ: EnTranslations = {
       "resonantHide": "Reagencie k okouzlení. Získává se rozzačarováním koženého brnění vzácné kvality a lepšího.",
       "resonantLinks": "Reagencie k okouzlení. Získává se rozzačarováním kroužkového brnění vzácné kvality a lepšího.",
       "resonantSteel": "Reagencie k okouzlení. Získává se rozzačarováním zbraní na blízko vzácné kvality a lepších.",
-      "resonantTimber": "Reagencie k okouzlení. Získává se rozzačarováním holí, hůlek, luků a kuší vzácné kvality a lepších."
+      "resonantTimber": "Reagencie k okouzlení. Získává se rozzačarováním holí, hůlek, luků a kuší vzácné kvality a lepších.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const cs_CZ: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -8206,7 +8209,7 @@ export const cs_CZ: EnTranslations = {
       "queueNote": "Budeš spárován(a) s online vyzyvatelem s nejbližším hodnocením a teleportován(a) do písku. Vyhraj a stoupni; kdo první povolí (1 zdraví), prohrává. Vrátíš se přesně tam, kde ses zařadil(a) do fronty.",
       "ladderAllTime": "Žebříček - celkový",
       "ladderOnline": "Žebříček - online",
-      "ratingSummary": "Hodnocení - {wins} výher / {losses} proher",
+      "ratingSummary": "Hodnocení - {wins} výher / {losses} proher / {draws} remíz",
       "statusCountdown": "Zocel se...",
       "statusReturning": "Návrat do světa... {seconds}",
       "statusFight": "Bojuj až do povolení!",
@@ -11514,6 +11517,30 @@ export const cs_CZ: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

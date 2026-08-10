@@ -1054,7 +1054,7 @@ export const nl_NL: EnTranslations = {
       "blurb": "Twee vervallen burchten staan tegenover elkaar in een ommuurde holte in de schaduw van Doorntop: Karmozijn in het zuiden, Azuur in het noorden, en daartussen het oudere Ruïnehof dat geen van beide ooit heeft gehouden. Vijf tegen vijf, elk een eigen vaandel, en wie als eerste drie van de hunne naar huis draagt, wint het veld.",
       "modeTag": "5v5 Vlagverovering",
       "offlineNote": "Doornholte-Velden synchroniseert. De wachtrij gaat open zodra het rijk antwoordt.",
-      "ratingSummary": "Rating. {wins} overwinningen / {losses} nederlagen",
+      "ratingSummary": "Rating. {wins} overwinningen / {losses} nederlagen / {draws} gelijk",
       "careerCaptures": "Veroveringen in je carrière: {count}",
       "enterQueue": "Sluit je aan bij de wachtrij",
       "enterQueueParty": "Sluit je aan bij de wachtrij (groep van {count})",
@@ -2362,7 +2362,8 @@ export const nl_NL: EnTranslations = {
       "resonantHide": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere leerwapenrusting.",
       "resonantLinks": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere maliënwapenrusting.",
       "resonantSteel": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere meleewapens.",
-      "resonantTimber": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere staven, stokken, bogen en kruisbogen."
+      "resonantTimber": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere staven, stokken, bogen en kruisbogen.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const nl_NL: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -8206,7 +8209,7 @@ export const nl_NL: EnTranslations = {
       "queueNote": "Je wordt gekoppeld aan de dichtstbijzijnde uitdager met vergelijkbare rang die online is en vervolgens naar het zand geteleporteerd. Win om te stijgen; wie als eerste opgeeft (1 levenspunt) verliest. Je keert exact terug waar je je in de wachtrij aansloot.",
       "ladderAllTime": "Ranglijst - Aller Tijden",
       "ladderOnline": "Ranglijst - Online",
-      "ratingSummary": "Waardering - {wins} winsten / {losses} verliezen",
+      "ratingSummary": "Waardering - {wins} winsten / {losses} verliezen / {draws} gelijk",
       "statusCountdown": "Maak je klaar...",
       "statusReturning": "Terugkeren naar de wereld... {seconds}",
       "statusFight": "Vecht tot de overgave!",
@@ -11514,6 +11517,30 @@ export const nl_NL: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

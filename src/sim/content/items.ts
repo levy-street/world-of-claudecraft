@@ -913,12 +913,15 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   //
   // VALUES ARE PROVISIONAL and flagged for the maintainer. The crop-ladder
   // phase authors the other seven crops against this row's pricing and may
-  // re-tune it; the dishes phase prices produce against what it cooks into.
+  // re-tune it; the farm dishes are priced against what this produce cooks
+  // into.
   //
-  // CONSUMERS ARE DELIBERATELY DEFERRED, the packet's one sanctioned
-  // same-phase-consumer exception: husks feed the convert command in the knobs
-  // phase, produce feeds the dishes phase. Everything here is market-listable
-  // and vendor-sellable in the meantime, so nothing is a dead row.
+  // CONSUMERS ARE ALL LIVE NOW: husks feed convert_husks, and vale_wheat is
+  // the grain of recipe_vale_hearth_loaf, the thickener in
+  // recipe_eastbrook_root_pottage, and the crust of
+  // recipe_evergarden_sunmelon_tart (the deferral this block used to carry
+  // closed in the economy-hooks phase). Everything here stays
+  // market-listable and vendor-sellable on top.
   //
   // Husks carry NO buyValue on purpose: a vendor row without one renders and
   // then refuses, and they are not meant to be vendor-obtainable. Tier 1 and
@@ -949,8 +952,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // MATERIAL_GRADES row (that table is the nine node yields and its suites pin
   // it to exactly those); farming mints this through its own harvest roll.
   // Farming fine twins get NO downward grade substitution: materialGradeIds
-  // walks MATERIAL_GRADES only, so a recipe asking for base produce (a Phase 6
-  // dish included) is NOT satisfied by the fine twin.
+  // walks MATERIAL_GRADES only, so a recipe asking for base produce (the farm
+  // dishes included) is NOT satisfied by the fine twin. Consumed by
+  // recipe_bronze_hoe, the tier-1 slot of the hoe ladder.
   fine_vale_wheat: {
     id: 'fine_vale_wheat',
     name: 'Fine Vale Wheat',
@@ -982,10 +986,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // farmer NPCs in the go-live phase) at the four-times-sell convention, and
   // sits at twice a husk's value so the husk conversion (2 husks to 1
   // compost) is value-neutral at the vendor. The growth tonic is NEVER
-  // vendor-stocked (alchemy-crafted from herbs in the economy-hooks phase,
-  // the cross-profession trade), so it carries sellValue only: a buyValue
-  // here would be the dead-row trap's opposite, a price for a faucet that
-  // must not exist.
+  // vendor-stocked: its one faucet is recipe_growth_tonic, brewed by an
+  // ALCHEMIST out of wild Sheenleaf (D7, the cross-profession trade), so it
+  // carries sellValue only. A buyValue here would be the dead-row trap's
+  // opposite, a price for a faucet that must not exist.
   compost: {
     id: 'compost',
     name: 'Compost',
@@ -1018,9 +1022,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // twin. The no-downward-substitution rule on the fine_vale_wheat comment
   // above covers every fine twin in this block too.
   //
-  // CONSUMERS (the wolf_fang rule): every seed is consumed by plant_crop at
-  // plant time, a live consumer today; per-row comments carry each produce
-  // and fine twin's explicit Phase 6 consumer note.
+  // CONSUMERS (the wolf_fang rule), and the loop is CLOSED as of the
+  // economy-hooks phase: every row here has a live consumer today, through
+  // commands (plant_crop spends every seed, the watch fee sinks produce) or
+  // through recipes (the hoe ladder's HOE_RECIPES and the farm dishes in
+  // FARM_RECIPES, both in content/recipes.ts). The per-row comments below name
+  // each produce and fine twin's REAL consumers; nothing here is deferred.
+  // The closure itself is pinned by the consumer-closure arm in
+  // tests/professions_zone_rollout.test.ts, which sweeps every farming
+  // material against the merged ALL_RECIPES reagent set plus the command
+  // sinks, so a row that loses its last consumer reds there.
   brook_carrot_seed: {
     id: 'brook_carrot_seed',
     name: 'Brook Carrot Seed',
@@ -1031,8 +1042,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // The D9 fee vegetable, the one produce row with a buyValue: priced at the
   // 4x-sell convention so the watch fee is payable from vendor stock before
-  // a player's first harvest. Consumed by the watch fee today; Phase 6
-  // consumer note: a cooking-dish ingredient in the dishes phase.
+  // a player's first harvest. Consumed by the watch fee AND by
+  // recipe_eastbrook_root_pottage, which takes it as the pottage's body.
   brook_carrot: {
     id: 'brook_carrot',
     name: 'Brook Carrot',
@@ -1041,11 +1052,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 4,
     buyValue: 16,
   },
-  // Phase 6 consumer note: the fine cooking-grade twin the skill-scaled
-  // harvest roll upgrades a pick into (the dishes phase decides its recipe
-  // role). Not a hoe reagent: the shipped HOE_RECIPES draft ONE fine twin
-  // per tier from tiers 1 to 3 (each rung consumes the twin one tier below
-  // it, deviation (ad)), and the tier-1 slot went to fine_vale_wheat.
+  // The fine cooking-grade twin the skill-scaled harvest roll upgrades a pick
+  // into. Consumed by recipe_eastbrook_root_pottage, which takes one whole for
+  // its sweetness: the dish set's tier-1 fine-twin slot. Not a hoe reagent:
+  // the shipped HOE_RECIPES draft ONE fine twin per tier from tiers 1 to 3
+  // (each rung consumes the twin one tier below it, deviation (ad)), and the
+  // tier-1 slot went to fine_vale_wheat.
   fine_brook_carrot: {
     id: 'fine_brook_carrot',
     name: 'Fine Brook Carrot',
@@ -1062,9 +1074,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 2,
     buyValue: 8,
   },
-  // Watch-fee sink plus vendor sell today; Phase 6 consumer note: a
-  // cooking-dish recipe consumes marsh rice in the dishes phase. No
-  // buyValue (the brook_carrot D9 exception does not apply here).
+  // Watch-fee sink plus vendor sell, and the bulk of
+  // recipe_fenbridge_rice_bowl (4 per bowl, the heaviest single-reagent count
+  // in the dish set). No buyValue (the brook_carrot D9 exception does not
+  // apply here).
   marsh_rice: {
     id: 'marsh_rice',
     name: 'Marsh Rice',
@@ -1072,9 +1085,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 8,
   },
-  // Phase 6 consumer note: cooking dishes. ALSO a live hoe reagent already:
-  // recipe_skysilver_hoe consumes it (the rung one tier above its crop,
-  // deviation (ad); pinned in tests/professions_hoe_recipes.test.ts).
+  // A hoe reagent, and ONLY that: recipe_skysilver_hoe consumes it (the rung
+  // one tier above its crop, deviation (ad); pinned in
+  // tests/professions_hoe_recipes.test.ts). It gained NO dish in the
+  // economy-hooks phase, deliberately: the eight dishes took the five twins
+  // the hoe ladder had left unconsumed, and this one was already accounted.
   fine_marsh_rice: {
     id: 'fine_marsh_rice',
     name: 'Fine Marsh Rice',
@@ -1091,8 +1106,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 2,
     buyValue: 8,
   },
-  // Watch-fee sink today; Phase 6 consumer note: a marsh-root dish reagent
-  // when cooking lands. No buyValue per the produce rule.
+  // Watch-fee sink, and the base of recipe_fenbridge_beet_braise (3 braised
+  // down per plate). No buyValue per the produce rule.
   bog_beet: {
     id: 'bog_beet',
     name: 'Bog Beet',
@@ -1100,8 +1115,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 8,
   },
-  // Phase 6 consumer note: cooking-grade reagent. Not a hoe reagent: the
-  // hoe ladder's tier-2 slot went to its sibling fine_marsh_rice.
+  // Consumed by recipe_fenbridge_beet_braise, which takes one whole for the
+  // colour: the dish set's tier-2 fine-twin slot. Not a hoe reagent: the hoe
+  // ladder's tier-2 slot went to its sibling fine_marsh_rice.
   fine_bog_beet: {
     id: 'fine_bog_beet',
     name: 'Fine Bog Beet',
@@ -1117,8 +1133,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 4,
   },
-  // Watch-fee sink today; Phase 6 consumer note: a tier-3 cooking-dish
-  // reagent lands in the dishes phase.
+  // Watch-fee sink, and the grain of recipe_highwatch_barley_bannock: the one
+  // dish with no fine twin in it, so the base tier-3 grain carries a demand of
+  // its own (4 per bannock).
   highland_barley: {
     id: 'highland_barley',
     name: 'Highland Barley',
@@ -1126,9 +1143,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 15,
   },
-  // Phase 6 consumer note: cooking-grade reagent. ALSO a live hoe reagent
-  // already: recipe_osmium_hoe consumes it (deviation (ad); pinned in
-  // tests/professions_hoe_recipes.test.ts).
+  // A hoe reagent, and ONLY that: recipe_osmium_hoe consumes it (deviation
+  // (ad); pinned in tests/professions_hoe_recipes.test.ts). Like
+  // fine_marsh_rice it gained NO dish in the economy-hooks phase, for the
+  // same reason: the dishes closed the twins the hoe ladder had left over.
   fine_highland_barley: {
     id: 'fine_highland_barley',
     name: 'Fine Highland Barley',
@@ -1144,8 +1162,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 4,
   },
-  // Watch-fee sink today; Phase 6 consumer note: a tier-3 vegetable input
-  // for the dishes phase.
+  // Watch-fee sink, and the body of recipe_highwatch_gourd_soup (3 simmered
+  // down per pot).
   frost_gourd: {
     id: 'frost_gourd',
     name: 'Frost Gourd',
@@ -1153,7 +1171,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 15,
   },
-  // Phase 6 consumer note: fine-ingredient input for the dishes phase. Not
+  // Consumed by recipe_highwatch_gourd_soup, which takes one for the
+  // sweetness the base gourds lack: the dish set's tier-3 fine-twin slot. Not
   // a hoe reagent: the hoe ladder's tier-3 slot went to its sibling
   // fine_highland_barley.
   fine_frost_gourd: {
@@ -1171,8 +1190,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 8,
   },
-  // Watch-fee sink today; Phase 6 consumer note: a cooking-dish reagent in
-  // the dishes phase (the tier-4 dish line).
+  // Watch-fee sink, and the fruit of recipe_evergarden_sunmelon_tart, the
+  // tier-4 dish line (3 per tart).
   gilded_sunmelon: {
     id: 'gilded_sunmelon',
     name: 'Gilded Sunmelon',
@@ -1180,9 +1199,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 40,
   },
-  // Phase 6 consumer note: a Phase 6 reagent. STRUCTURALLY never a hoe
-  // reagent: each rung consumes the twin one tier below it (deviation (ad)),
-  // so a tier-4 twin would need a tier-5 hoe, and the ladder tops at 4.
+  // Consumed by recipe_evergarden_sunmelon_tart: the dish set's tier-4
+  // fine-twin slot. STRUCTURALLY never a hoe reagent: each rung consumes the
+  // twin one tier below it (deviation (ad)), so a tier-4 twin would need a
+  // tier-5 hoe, and the ladder tops at 4.
   fine_gilded_sunmelon: {
     id: 'fine_gilded_sunmelon',
     name: 'Fine Gilded Sunmelon',
@@ -1198,9 +1218,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 8,
   },
-  // Watch-fee sink today; Phase 6 consumer note: the flagship tier-4
-  // cooking reagent (the top-band feast and entree recipes) when cooking
-  // lands.
+  // Watch-fee sink, and the greens dressed into
+  // recipe_evergarden_harvest_platter, the capstone plate of the dish set
+  // (3 per platter).
   evergarden_greens: {
     id: 'evergarden_greens',
     name: 'Evergarden Greens',
@@ -1208,9 +1228,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 40,
   },
-  // Phase 6 consumer note: reserved as a premium cooking reagent.
-  // STRUCTURALLY never a hoe reagent, like its sunmelon sibling above: a
-  // tier-4 twin would need a tier-5 hoe under deviation (ad)'s invariant.
+  // Consumed by recipe_evergarden_harvest_platter: the last of the five
+  // fine-twin dish slots, the one that closed the crop-ladder phase's
+  // deferral. STRUCTURALLY never a hoe reagent, like its sunmelon sibling
+  // above: a tier-4 twin would need a tier-5 hoe under deviation (ad)'s
+  // invariant.
   fine_evergarden_greens: {
     id: 'fine_evergarden_greens',
     name: 'Fine Evergarden Greens',

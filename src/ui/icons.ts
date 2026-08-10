@@ -10,6 +10,7 @@
 
 import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
+import { crestIconUrl } from './crest_icon_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
@@ -2961,8 +2962,9 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['sparkle'],
   ),
-  // Collectible mount reins ship rendered 3D face icons (WebP) via ITEM_IMAGE_IDS +
-  // scripts/render_mount_icons.mjs, so they need no procedural recipe here.
+  // Collectible mount reins ship opaque painted item icons under woc-item-icon-v1 via
+  // ITEM_IMAGE_IDS, so they need no procedural recipe here. The former GLB renderer is
+  // historical tooling only; new or revised reins follow docs/design/item-icon-art-style.md.
   worn_sword: r('steel', 'steel', ['sword']),
   gnarled_staff: r('wood', 'earthBrown', [{ p: 'staff', pal: 'earthBrown' }]),
   rusty_dagger: r('steel', 'earthBrown', [{ p: 'dagger', pal: 'earthBrown' }]),
@@ -3159,8 +3161,7 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   yumis_keepsake_locket: r('storm', 'sky', ['gem'], ['sparkle', 'glow']),
   zense_meridian: r('arcane', 'arcanePink', ['moon', 'gem'], ['glow']),
   medallion_of_endless_profit: r('treasure', 'gold', ['coin', 'sunburst'], ['sparkle']),
-  // Nythraxis raid offhand epics (the two 2H weapons ship rendered thumbnails
-  // via ITEM_WEAPON_VARIANTS like every other weapon).
+  // Nythraxis raid offhand epics. Two-handed weapons use the painted-weapon lane below.
   bonewrought_bulwark: r('steel', 'bone', ['shield', { p: 'skull', ...TR }], ['glow', 'sparkle']),
   wraithfire_orb: r('shadow', 'shadowPurple', ['gem'], ['glow', 'sparkle']),
   // Farming (growth-engine phase). Explicit recipes because the trinket
@@ -3249,6 +3250,71 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['glow'],
   ),
+  // The economy-hooks phase's eight farm dishes (FARM_RECIPES), the same
+  // ART_PENDING drawn stand-in treatment and the same A4 pairwise-distinctness
+  // demand as the crop families above. Two rules hold the family together and
+  // keep it tellable:
+  //   - EVERY dish sits on the 'food' radial, which no other farming icon
+  //     uses, so a cooked dish never reads as raw produce at 32px.
+  //   - Each dish takes a DIFFERENT primary glyph (bread, waterskin, sack,
+  //     droplet, moon, snowflake, sunburst, leaf), so the frost_gourd_seed
+  //     lesson cannot repeat here: no pair is separated by palette alone.
+  // NO sparkle on any dish: sparkle is the fine-grade marker on the produce
+  // rows, and a dish is not a grade.
+  vale_hearth_loaf: r('food', 'gold', [{ p: 'bread', pal: 'gold' }]),
+  eastbrook_root_pottage: r(
+    'food',
+    'ember',
+    [
+      { p: 'waterskin', pal: 'ember' },
+      { p: 'fang', pal: 'ember', ...TR },
+    ],
+    ['drips'],
+  ),
+  fenbridge_rice_bowl: r(
+    'food',
+    'bone',
+    [
+      { p: 'sack', pal: 'bone' },
+      { p: 'droplet', pal: 'sky', ...TR },
+    ],
+    ['motion'],
+  ),
+  fenbridge_beet_braise: r(
+    'food',
+    'blood',
+    [
+      { p: 'droplet', pal: 'blood' },
+      { p: 'leaf', pal: 'leafGreen', ...TR },
+    ],
+    ['drips'],
+  ),
+  highwatch_barley_bannock: r('food', 'gold', [
+    { p: 'moon', pal: 'gold' },
+    { p: 'leaf', pal: 'gold', ...TR },
+  ]),
+  highwatch_gourd_soup: r(
+    'food',
+    'ice',
+    [
+      { p: 'snowflake', pal: 'ice' },
+      { p: 'waterskin', pal: 'ice', ...TR },
+    ],
+    ['motion'],
+  ),
+  evergarden_sunmelon_tart: r(
+    'food',
+    'gold',
+    [
+      { p: 'sunburst', pal: 'gold' },
+      { p: 'bread', pal: 'earthBrown', ...TR },
+    ],
+    ['glow'],
+  ),
+  evergarden_harvest_platter: r('food', 'leafGreen', [
+    { p: 'leaf', pal: 'leafGreen' },
+    { p: 'droplet', pal: 'gold', ...TR },
+  ]),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -3267,6 +3333,7 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_tongues: r('shadow', 'shadowPurple', ['skull'], ['motion']),
   aura_buff_sta: r('blood', 'blood', ['heart']),
   aura_buff_ap: r('fury', 'gold', ['fist']),
+  aura_buff_ap_pct: r('fury', 'gold', ['fist', { p: 'sunburst', ...TR }], ['glow']),
   aura_buff_armor: r('steel', 'steel', ['shield']),
   aura_buff_int: r('arcane', 'arcanePink', ['eye']),
   aura_buff_dodge: r('storm', 'sky', ['shield'], ['motion']),
@@ -3323,12 +3390,68 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // red_banner ability's staff-plus-sunburst language) on the objective gold, so
   // it reads as the flag itself and not as another rune.
   bg_carried_flag: r('fury', 'gold', ['staff', { p: 'sunburst', ...TR, pal: 'gold' }], ['motion']),
+  // Painted talent/modifier identities are not ABILITIES records, but their
+  // runtime timers still need a meaningful synchronous layer while the WebP
+  // decodes (and if it ever fails to load).
+  battle_rhythm: r('fury', 'gold', ['fist', { p: 'sunburst', ...TR }], ['motion']),
+  bloodbath: r('blood', 'blood', ['sword'], ['drips', 'glow']),
+  colossal_might: r('steel', 'gold', ['fist'], ['glow']),
+  elemental_convergence: r('storm', 'arcanePink', ['lightning', { p: 'gem', ...TR }], ['glow']),
+  overflowing_power: r('arcane', 'arcanePink', ['gem', { p: 'sunburst', ...TR }], ['glow']),
+  pursuit: r('fury', 'gold', ['boot', { p: 'sword', ...TR }], ['motion']),
 };
+
+/** Closed explicit recipe inventory used by the worker-backed aura fallback warmer. */
+export const AURA_RECIPE_IDS: ReadonlySet<string> = new Set(Object.keys(AURA_RECIPES));
+
+const GENERIC_AURA_FALLBACKS = {
+  control: r('shadow', 'shadowPurple', ['eye'], ['glow']),
+  defense: r('steel', 'steel', ['shield'], ['glow']),
+  healing: r('nature', 'leafGreen', ['heart'], ['sparkle']),
+  magic: r('arcane', 'arcanePink', ['gem'], ['glow']),
+  movement: r('storm', 'sky', ['boot'], ['motion']),
+  nature: r('nature', 'leafGreen', ['paw', { p: 'leaf', ...TR }]),
+  offense: r('fury', 'gold', ['sword', { p: 'sunburst', ...TR }], ['glow']),
+  penalty: r('shadow', 'bone', ['skull'], ['drips']),
+  utility: r('parchment', 'gold', ['sunburst']),
+} satisfies Record<string, IconRecipe>;
+
+/** Semantic last resort for a known aura kind. This keeps future generic
+ *  `aura_<kind>` identities readable without reviving the unknown M-rune. */
+function genericAuraFallback(id: string): IconRecipe | null {
+  if (!id.startsWith('aura_')) return null;
+  const kind = id.slice('aura_'.length);
+  if (/(sickness|fatigue|mortal|corrode|wither|siphon|vulnerability|critvuln)/.test(kind)) {
+    return GENERIC_AURA_FALLBACKS.penalty;
+  }
+  if (/(heal|hot|sanguine|victory|temporal_echo)/.test(kind)) {
+    return GENERIC_AURA_FALLBACKS.healing;
+  }
+  if (/(stun|incap|silence|blind|disarm|lockout|hex|tongues|fear)/.test(kind)) {
+    return GENERIC_AURA_FALLBACKS.control;
+  }
+  if (/(armor|shield|absorb|defensive|guardian|stasis|buff_dr)/.test(kind)) {
+    return GENERIC_AURA_FALLBACKS.defense;
+  }
+  if (/(speed|haste|dodge|travel|jump)/.test(kind)) {
+    return GENERIC_AURA_FALLBACKS.movement;
+  }
+  if (/(spell|int|spi|mana|arcane|cast|charge|overload|power_echo)/.test(kind)) {
+    return GENERIC_AURA_FALLBACKS.magic;
+  }
+  if (/(pet|form|feral|bear|cat|thorns|energy|resource_sap)/.test(kind)) {
+    return GENERIC_AURA_FALLBACKS.nature;
+  }
+  if (/(ap|crit|dmg|rage|attack|combat|enrage|blood|reckless|avatar|scale|execute)/.test(kind)) {
+    return GENERIC_AURA_FALLBACKS.offense;
+  }
+  return GENERIC_AURA_FALLBACKS.utility;
+}
 
 /** True when `id` has a dedicated aura recipe (the hud iconId resolver lets
  *  such ids through instead of collapsing them to the aura_<kind> generic). */
 export function hasAuraRecipe(id: string): boolean {
-  return id in AURA_RECIPES;
+  return Object.hasOwn(AURA_RECIPES, id);
 }
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive
@@ -3350,7 +3473,7 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   ),
   class_priest: r('holy', 'silverWhite', ['cross'], ['glow', 'sparkle']),
   class_shaman: r('storm', 'sky', ['lightning'], ['glow']),
-  class_mage: r('arcane', 'arcanePink', ['sigil_rune'], ['sparkle', 'glow']),
+  class_mage: r('arcane', 'arcanePink', ['staff', { p: 'gem', ...TR }], ['sparkle', 'glow']),
   class_warlock: r('shadow', 'shadowPurple', ['skull'], ['glow']),
   class_druid: r('nature', 'leafGreen', ['paw'], ['sparkle']),
   // mob families
@@ -3365,9 +3488,10 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   family_elemental: r('storm', 'sky', ['lightning'], ['glow']),
   family_dragonkin: r('fire', 'ember', ['claw_slash'], ['glow']),
   family_reptile: r('earth', 'leafGreen', ['fang']),
+  family_demon: r('shadow', 'blood', ['skull', { p: 'flame', ...TR }], ['glow']),
   family_sheep: r('nature', 'silverWhite', ['sheep_head']),
   // status / interaction markers
-  status_npc: r('parchment', 'gold', ['sigil_rune']),
+  status_npc: r('parchment', 'gold', ['hand', { p: 'candle', ...TR }], ['glow']),
   status_boss: r('shadow', 'bone', ['skull'], ['glow']),
   status_dead: r('junk', 'bone', ['skull']),
   status_combat: r('fury', 'blood', ['sword']),
@@ -3506,7 +3630,7 @@ function abilityPrimitive(name: string, effectsJson: string): PrimitiveName {
 }
 
 function abilityFallback(id: string): IconRecipe | null {
-  const a = ABILITIES[id];
+  const a = Object.hasOwn(ABILITIES, id) ? ABILITIES[id] : undefined;
   if (!a) return null;
   const style = SCHOOL_STYLE[a.school] ?? SCHOOL_STYLE.physical;
   const prim = abilityPrimitive(a.name.toLowerCase(), JSON.stringify(a.effects ?? []));
@@ -3785,40 +3909,31 @@ export const QUALITY_COLOR: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// Photographic weapon icons
+// Painted weapon inventory icons
 //
-// Obtainable weapons (loot / vendor / quest drops) use a rendered thumbnail of
-// the KayKit weapon model instead of a procedural recipe — see
-// scripts/render_weapon_icons.mjs, which writes public/ui/weapons/<model>.jpg.
-// Several items intentionally share a model (the pack has fewer meshes than we
-// have weapons); the flashier meshes are reserved for rare/epic items. The
-// model is purely cosmetic — rarity colour still comes from item.quality (the
-// CSS .q-* border), exactly like the procedural icons.
+// Each authored weapon ships bespoke painted art under /ui/items/<id>.webp.
+// ITEM_WEAPON_VARIANTS remains the independent held-model registry; its KayKit
+// JPG renders stay available to Armory/tooling surfaces but no longer define a
+// weapon's inventory identity. Generated Heroic copies intentionally reuse the
+// matching base painting, just as they inherit the base held model.
 // ---------------------------------------------------------------------------
 
-const WEAPON_ICON_DIR = '/ui/weapons';
+const WEAPON_ICON_DIR = '/ui/items';
 
-// Item id -> weapon variant key. Shared with the 3D held model so the bag icon
-// and the in-hand weapon always match (src/ui/weapon_variants.ts).
-const ITEM_ICON_IMAGES = ITEM_WEAPON_VARIANTS;
+export const WEAPON_IMAGE_IDS: ReadonlySet<string> = new Set(Object.keys(ITEM_WEAPON_VARIANTS));
 
-/** Static URL of a weapon's rendered thumbnail, or null if it uses a recipe. */
+/** Static URL of a weapon's painted inventory art, or null for a non-weapon. */
 export function weaponIconUrl(id: string): string | null {
-  // Own-property gate (the resolveRecipe item-arm rule): ITEM_ICON_IMAGES is
-  // a prototype-bearing object literal, so a raw server id like
-  // 'constructor' would otherwise stringify a prototype member into a
-  // garbage /ui/weapons/ URL instead of falling through to the fallback.
-  const directModel = Object.hasOwn(ITEM_ICON_IMAGES, id) ? ITEM_ICON_IMAGES[id] : undefined;
-  if (directModel) return `${WEAPON_ICON_DIR}/${directModel}.jpg`;
+  // Own-property gates keep prototype keys and stale server IDs from becoming
+  // arbitrary asset paths.
+  if (Object.hasOwn(ITEM_WEAPON_VARIANTS, id)) return `${WEAPON_ICON_DIR}/${id}.webp`;
 
-  // Generated Heroic weapons intentionally reuse their base weapon's GLB-rendered
-  // portrait. Keep ITEM_WEAPON_VARIANTS base-oriented and mirror the held-model
-  // resolver without trusting prototype-chain or stale server ids at either lookup.
+  // Keep ITEM_WEAPON_VARIANTS base-oriented and mirror held-model inheritance.
   const item = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;
   const baseId = item?.heroicOf;
-  const model =
-    baseId && Object.hasOwn(ITEM_ICON_IMAGES, baseId) ? ITEM_ICON_IMAGES[baseId] : undefined;
-  return model ? `${WEAPON_ICON_DIR}/${model}.jpg` : null;
+  return baseId && Object.hasOwn(ITEM_WEAPON_VARIANTS, baseId)
+    ? `${WEAPON_ICON_DIR}/${baseId}.webp`
+    : null;
 }
 
 // Hand-picked image icons for class abilities, committed as 128px WebP under
@@ -4233,14 +4348,19 @@ export function abilityImageUrl(id: string): string | null {
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 
+/** True when an aura identity can reuse known ability or modifier artwork. */
+export function hasAbilityIconIdentity(id: string): boolean {
+  return Object.hasOwn(ABILITIES, id) || ABILITY_IMAGE_IDS.has(id);
+}
+
 // Item ids with committed painted art under /ui/items/<id>.webp (curated from the CraftPix
 // resource/consumable and armor/equipment packs, the project-owned profession materials, and
 // the generated icon rebrand batches; provenance + license in public/ui/items/mapping.json).
 // Served for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). Every real non-weapon
 // item must ship a WebP: the derive loop below adds every non-weapon ITEMS id, so a new item
-// without art reds the gate instead of regressing to the procedural compositor. Weapons keep
-// their rendered-model thumbnails via WEAPON_ICON_DIR; procedural item recipes remain available
-// only for UI fallbacks and development-time unknown ids.
+// without art reds the gate instead of regressing to the procedural compositor. Weapons use
+// the separate WEAPON_IMAGE_IDS registry above; procedural item recipes remain available only
+// for UI fallbacks and development-time unknown ids.
 // For armor the icon is purely cosmetic (rarity colour still comes from item.quality), and the
 // flashier icons are reserved for higher-rarity pieces. WebP only, like the skill icons. Add
 // art via `npm run assets:items`, then list the item id here. Guarded by tests/item_icons.test.ts.
@@ -4355,8 +4475,8 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'steel_orange_armor_plate',
   'vanguard_azure_armor_plate',
   // equipment (CraftPix premium armor/helmet/boot/glove/greave/belt/jewelry + equipment packs;
-  // curated per slot with rarity allocated by icon richness). Weapons are excluded: they keep
-  // their rendered-model thumbnails via WEAPON_ICON_DIR.
+  // curated per slot with rarity allocated by icon richness). Weapons are excluded from this
+  // historical literal because WEAPON_IMAGE_IDS owns their painted item art separately.
   // armor - chest
   'apprentice_robe',
   'bogiron_hauberk',
@@ -4565,9 +4685,9 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'ogre_war_totem',
   'sanctum_key_shard',
   'unknown_alien_weaponry',
-  // mount (rideable) reins: 3D face/front icons rendered from the mount GLBs via
-  // scripts/render_mount_icons.mjs (a headless-Chrome front three-quarter head close-up),
-  // committed as transparent WebP. These win over the procedural recipe in iconDataUrl.
+  // Mount (rideable) reins use opaque woc-item-icon-v1 paintings. Their identities may
+  // still be informed by the corresponding mount GLBs, but their shipping inventory art
+  // follows docs/design/item-icon-art-style.md and wins over iconDataUrl's procedural recipe.
   'reins_valorsteed',
   'reins_grag_bear',
   'reins_stalkglider_snail',
@@ -4656,6 +4776,18 @@ export const ITEM_ART_PENDING = new Set<string>([
   'garden_hoe',
   'osmium_hoe',
   'skysilver_hoe',
+  // The economy-hooks phase's eight farm dishes. Same dormant-online reasoning
+  // as everything above (they are cooked from produce no live faucet mints
+  // yet) and the same scheduled art phase; committed art is the site norm and
+  // these have none, so they ride the pending set as honest, enumerated debt.
+  'eastbrook_root_pottage',
+  'evergarden_harvest_platter',
+  'evergarden_sunmelon_tart',
+  'fenbridge_beet_braise',
+  'fenbridge_rice_bowl',
+  'highwatch_barley_bannock',
+  'highwatch_gourd_soup',
+  'vale_hearth_loaf',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
@@ -4667,9 +4799,9 @@ export function itemImageUrl(id: string): string | null {
 // Book of Deeds crest ids are shaped `deed_<deedId>` (deeds_view.ts deedCrestId). Those whose
 // deed ships committed painted art (public/ui/deeds/<deedId>.webp, listed in DEED_IMAGE_IDS)
 // resolve to that static WebP. Mirrors itemImageUrl. The `deed_cat_<category>` base crests and
-// every non-deed crest id (class crests, talent crests) prefix-strip to something not in the set,
-// so they return null and fall through to their procedural recipe: a missing image never breaks
-// a consumer.
+// every non-deed crest id prefix-strips to something not in the set. Class, family, and status
+// paintings are resolved independently by crestIconUrl; a missing image still falls through to
+// the procedural recipe without breaking a consumer.
 const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
 
@@ -4682,55 +4814,10 @@ const DEED_CREST_PREFIX = 'deed_';
 // tests/deed_icons.test.ts holds the line from both sides: a stale entry once art lands, and
 // unenumerated debt. Do not add an id here merely to silence that failure; commission the art and
 // file it in docs/achievements/icon-brief.md.
-export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
-  // Catalog order (the art tests compare in DEED_ORDER order).
-  // Thornhollow Fields battleground deeds: all four are 'pvp', so they fall
-  // back to the deed_cat_pvp crest until their commissioned art lands
-  // (docs/achievements/icon-brief.md).
-  'pvp_bg_first_capture',
-  'pvp_bg_first_win',
-  'pvp_bg_wins_25',
-  'pvp_bg_captures_100',
-  // The Drakelands dragonkin brood rework (v0.35): both are 'chronicle', so both fall back to
-  // the deed_cat_chronicle crest until their commissioned art lands.
-  'chr_drakemaw_broodlord',
-  'chr_maw_matriarch',
-  // Rift coverage (procedural infinite-dungeon system, v0.35): both are 'dungeon', so both
-  // fall back to the deed_cat_dungeon crest until their commissioned art lands.
-  'dgn_rift',
-  'dgn_rift_s_rank',
-  // Per-craft rare-tier profession deeds (#2762): all seven are 'progression', so they fall
-  // back to the deed_cat_progression crest until their commissioned art lands
-  // (docs/achievements/icon-brief.md).
-  'prog_engineering_rare',
-  'prog_alchemy_rare',
-  'prog_cooking_rare',
-  'prog_leatherworking_rare',
-  'prog_tailoring_rare',
-  'prog_weaponcrafting_rare',
-  'prog_armorcrafting_rare',
-  // The remaining starter-tier zone chronicle pairs (frostveil, amberfall, nightbloom,
-  // wraithwood, palmreach, evergarden): all 'chronicle', so all fall back to the
-  // deed_cat_chronicle crest until their commissioned art lands.
-  'chr_frostveil_gatherer',
-  'chr_frostveil_first_cast',
-  'chr_amberfall_gatherer',
-  'chr_amberfall_first_cast',
-  'chr_nightbloom_gatherer',
-  'chr_nightbloom_first_cast',
-  'chr_wraithwood_gatherer',
-  'chr_wraithwood_first_cast',
-  'chr_palmreach_gatherer',
-  'chr_palmreach_first_cast',
-  'chr_evergarden_gatherer',
-  'chr_evergarden_first_cast',
-  // The WARFARE lifetime-honor rank titles (warfare tier refactor, phase 3): all three are
-  // 'pvp', so all three fall back to the deed_cat_pvp crest until their commissioned art
-  // lands (docs/achievements/icon-brief.md).
-  'pvp_honor_sergeant',
-  'pvp_honor_knight_lieutenant',
-  'pvp_honor_field_marshal',
-]);
+// Empty after the 2026-08-09 completion wave painted every live deed. Keep the mechanism so a
+// future deed can land safely before its commissioned crest, but do not add debt merely to make
+// the gate green.
+export const DEED_ART_PENDING: ReadonlySet<string> = new Set();
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
   if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;
@@ -4742,16 +4829,19 @@ export function deedImageUrl(crestId: string): string | null {
  *  generic fallback + dev-only console.warn. Lets a test walk every family a
  *  MobFamily-shaped id can produce and assert none of them silently fall back. */
 export function hasCrestRecipe(id: string): boolean {
-  return id in CREST_RECIPES;
+  return Object.hasOwn(CREST_RECIPES, id);
 }
 
 const urlCache = new Map<string, string>();
 const warnedIds = new Set<string>();
+const proceduralIconCacheKey = (kind: IconKind, id: string, size: number): string =>
+  `procedural|${kind}|${id}|${size}`;
 
 function resolveRecipe(kind: IconKind, id: string): IconRecipe {
   let recipe: IconRecipe | null = null;
   if (kind === 'ability') {
-    recipe = ABILITY_RECIPES[id] ?? abilityFallback(id);
+    recipe =
+      (Object.hasOwn(ABILITY_RECIPES, id) ? ABILITY_RECIPES[id] : null) ?? abilityFallback(id);
   } else if (kind === 'item') {
     // Own-property gate: a prototype key like '__proto__' would otherwise
     // resolve Object.prototype as a truthy "recipe". Item ids are the kind
@@ -4761,10 +4851,14 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
     // fixed here: no realistic server mints a prototype-key ability id).
     recipe = (Object.hasOwn(ITEM_RECIPES, id) ? ITEM_RECIPES[id] : null) ?? itemFallback(id);
   } else if (kind === 'crest') {
-    recipe = CREST_RECIPES[id] ?? null;
+    recipe = Object.hasOwn(CREST_RECIPES, id) ? CREST_RECIPES[id] : null;
   } else {
     // auras carry the ability id that applied them, or a generic aura_<kind>
-    recipe = AURA_RECIPES[id] ?? ABILITY_RECIPES[id] ?? abilityFallback(id);
+    recipe =
+      (Object.hasOwn(AURA_RECIPES, id) ? AURA_RECIPES[id] : null) ??
+      (Object.hasOwn(ABILITY_RECIPES, id) ? ABILITY_RECIPES[id] : null) ??
+      abilityFallback(id) ??
+      genericAuraFallback(id);
   }
   if (!recipe) {
     if (import.meta.env?.DEV && !warnedIds.has(id)) {
@@ -4788,11 +4882,14 @@ export function abilityIconRecipe(id: string): IconRecipe {
 export function itemIconRecipe(id: string): IconRecipe {
   return resolveRecipe('item', id);
 }
+export function auraIconRecipe(id: string): IconRecipe {
+  return resolveRecipe('aura', id);
+}
 export function isUnknownIconRecipe(recipe: IconRecipe): boolean {
   return recipe === UNKNOWN_RECIPE;
 }
 export function hasExplicitAbilityIcon(id: string): boolean {
-  return id in ABILITY_RECIPES;
+  return Object.hasOwn(ABILITY_RECIPES, id);
 }
 
 const DEFAULT_ICON_SIZE = 96; // crisp at 46px buttons on 2x displays
@@ -4814,6 +4911,30 @@ export function iconCanvas(
   return canvas;
 }
 
+/** Cached procedural data URL even when committed static art exists for the id.
+ *  Aura CSS uses this as its immediate/error layer below a painted WebP. */
+export function proceduralIconDataUrl(
+  kind: IconKind,
+  id: string,
+  size: number = DEFAULT_ICON_SIZE,
+): string {
+  const key = proceduralIconCacheKey(kind, id, size);
+  const cached = urlCache.get(key);
+  if (cached) return cached;
+  const url = iconCanvas(kind, id, size).toDataURL();
+  urlCache.set(key, url);
+  return url;
+}
+
+/** Read an already-warmed procedural layer without composing on the caller's frame. */
+export function cachedProceduralIconDataUrl(
+  kind: IconKind,
+  id: string,
+  size: number = DEFAULT_ICON_SIZE,
+): string | null {
+  return urlCache.get(proceduralIconCacheKey(kind, id, size)) ?? null;
+}
+
 function staticIconUrl(kind: IconKind, id: string): string | null {
   if (kind === 'item') {
     const weapon = weaponIconUrl(id);
@@ -4828,13 +4949,10 @@ function staticIconUrl(kind: IconKind, id: string): string | null {
     const img = abilityImageUrl(id);
     if (img) return img;
   }
-  // Deed crests with committed painted art short-circuit to the static WebP. A URL-only path is
-  // sufficient: deed crests are only ever drawn into the Book of Deeds window <img> tags (cards
-  // and the recent strip) through this function, never through the synchronous iconCanvas path
-  // (that is class-crest portraits only, unit_portrait_painter.ts), so no canvas is needed. Every
-  // other crest id (class/talent crests, the deed_cat_* bases, bespoke procedural recipes) returns
-  // null here and falls through to the composited canvas below.
-  if (kind === 'crest') return deedImageUrl(id);
+  // Committed deed, class, family, and status paintings short-circuit to a
+  // static WebP. Unit portraits still paint the procedural recipe immediately,
+  // then replace it after this same crest art decodes.
+  if (kind === 'crest') return deedImageUrl(id) ?? crestIconUrl(id);
   return null;
 }
 
@@ -4847,6 +4965,15 @@ export function needsIconDataUrlWarm(
   return staticIconUrl(kind, id) === null && !urlCache.has(`${kind}|${id}|${size}`);
 }
 
+/** Internal bridge for worker-warming the procedural layer beneath static art. */
+export function needsProceduralIconDataUrlWarm(
+  kind: IconKind,
+  id: string,
+  size: number = DEFAULT_ICON_SIZE,
+): boolean {
+  return !urlCache.has(proceduralIconCacheKey(kind, id, size));
+}
+
 /** Internal bridge for the worker-backed idle warmer. */
 export function storePrewarmedIconDataUrl(
   kind: IconKind,
@@ -4857,6 +4984,17 @@ export function storePrewarmedIconDataUrl(
   const key = `${kind}|${id}|${size}`;
   // A foreground request may have populated the cache while the worker was
   // encoding. Its synchronous result remains authoritative.
+  if (!urlCache.has(key)) urlCache.set(key, url);
+}
+
+/** Internal bridge paired with needsProceduralIconDataUrlWarm. */
+export function storePrewarmedProceduralIconDataUrl(
+  kind: IconKind,
+  id: string,
+  size: number,
+  url: string,
+): void {
+  const key = proceduralIconCacheKey(kind, id, size);
   if (!urlCache.has(key)) urlCache.set(key, url);
 }
 
@@ -4875,9 +5013,9 @@ export function renderProceduralIconPng(
   return canvas.convertToBlob({ type: 'image/png' });
 }
 
-// Returns the icon URL for an ability/item/aura/crest id - a static image URL
-// for weapons that have a rendered thumbnail, otherwise a cached procedural PNG
-// data URL. Both forms work as an <img src> or CSS background-image.
+// Returns the icon URL for an ability/item/aura/crest id: committed painted art when registered,
+// otherwise a cached procedural PNG data URL. Both forms work as an <img src> or CSS
+// background-image.
 export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_ICON_SIZE): string {
   const staticUrl = staticIconUrl(kind, id);
   if (staticUrl) return staticUrl;

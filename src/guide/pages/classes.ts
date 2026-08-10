@@ -134,7 +134,7 @@ function classCard(c: GuideClassInfo): string {
     ? `<div class="guide-class-card-portrait">
         <img class="guide-class-card-still" src="${esc(c.still)}" alt="" width="88" height="88" loading="lazy" decoding="async" />
       </div>`
-    : crestImg(classCrest(c.id, 128), 64, 'guide-class-crest');
+    : crestImg(classCrest(c.id, 128), 64, 'guide-class-crest', '', `class_${c.id}`);
   return `
     <a class="guide-class-card" href="${esc(hrefFor(`classes/${c.id}`))}" style="--class-color:${esc(c.color)}"${data}>
       ${figure}
@@ -389,7 +389,7 @@ function detailHtml(id: string): string {
       <p class="guide-section-more"><a href="${esc(hrefFor('classes'))}">${esc(t('guide.classPage.back'))}</a></p>
       <header class="guide-class-hero">
         <div class="guide-class-portrait">
-          ${modelViewerEmbed({ modelKey: c.model, tint: c.tint, name: className(c.id), still: c.still, poster: classCrest(c.id, 192), posterSize: 160, variant: 'feature', autoplay: true })}
+          ${modelViewerEmbed({ modelKey: c.model, tint: c.tint, name: className(c.id), still: c.still, poster: classCrest(c.id, 192), posterCrestId: `class_${c.id}`, posterSize: 160, variant: 'feature', autoplay: true })}
         </div>
         <div class="guide-class-hero-text">
           <h1 class="guide-class-hero-name">${esc(className(c.id))}</h1>

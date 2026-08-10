@@ -1054,7 +1054,7 @@ export const tr_TR: EnTranslations = {
       "blurb": "İki yıkık kale, Dikenzirve'nin gölgesindeki surlu bir vadide karşı karşıyadır: güneyde Kızıl, kuzeyde Gök Mavisi, ikisinin arasında ise hiçbirinin hiç ele geçiremediği daha eski Yıkık Avlu bulunur. Her tarafta beş kişi, birer sancak; kendi sancaklarından üçünü eve ilk taşıyan sahayı kazanır.",
       "modeTag": "5v5 Sancağı Kap",
       "offlineNote": "Dikenvadi Ovası senkronize ediliyor. Diyar yanıt verdiğinde sıra açılır.",
-      "ratingSummary": "Puan. {wins} galibiyet / {losses} mağlubiyet",
+      "ratingSummary": "Puan. {wins} galibiyet / {losses} mağlubiyet / {draws} beraberlik",
       "careerCaptures": "Kariyer boyunca ele geçirme: {count}",
       "enterQueue": "Sıraya Gir",
       "enterQueueParty": "Sıraya Gir ({count} kişilik grup)",
@@ -2362,7 +2362,8 @@ export const tr_TR: EnTranslations = {
       "resonantHide": "Nadir ve üstü deri zırhlardan büyü bozularak elde edilen büyü malzemesi.",
       "resonantLinks": "Nadir ve üstü zincir zırhlardan büyü bozularak elde edilen büyü malzemesi.",
       "resonantSteel": "Nadir ve üstü yakın dövüş silahlarından büyü bozularak elde edilen büyü malzemesi.",
-      "resonantTimber": "Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi."
+      "resonantTimber": "Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const tr_TR: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -8206,7 +8209,7 @@ export const tr_TR: EnTranslations = {
       "queueNote": "Çevrimiçi olan en yakın puanlı meydan okuyanla eşleştirilip kumlara ışınlanacaksın. Yükselmek için kazan; ilk teslim olan (1 can) kaybeder. Tam olarak sıraya girdiğin yere dönersin.",
       "ladderAllTime": "Sıralama - Tüm Zamanlar",
       "ladderOnline": "Sıralama - Çevrimiçi",
-      "ratingSummary": "Puan - {wins} galibiyet / {losses} mağlubiyet",
+      "ratingSummary": "Puan - {wins} galibiyet / {losses} mağlubiyet / {draws} beraberlik",
       "statusCountdown": "Kendini hazırla...",
       "statusReturning": "Dünyaya dönülüyor... {seconds}",
       "statusFight": "Teslimiyete kadar savaş!",
@@ -11514,6 +11517,30 @@ export const tr_TR: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

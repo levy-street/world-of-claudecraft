@@ -333,7 +333,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     "Deux équipes de cinq. Volez la bannière ennemie et ramenez-la à votre donjon. Le premier à 3 captures gagne. Groupez-vous jusqu'à 5 et entrez en file ensemble ; attrapez des Runes de sprint et zigzaguez à couvert pour semer vos poursuivants.",
   'hudChrome.bg.queuedParty': 'Groupe de {count}.',
-  'hudChrome.bg.ratingSummary': 'Cote. {wins} victoires / {losses} défaites',
+  'hudChrome.bg.ratingSummary': 'Cote. {wins} victoires / {losses} défaites / {draws} nuls',
   'hudChrome.bg.respawnIn': 'Prochaine vague : réapparition dans {seconds}',
   'hudChrome.bg.resultDefeat': 'Défaite',
   'hudChrome.bg.resultDraw': 'Match nul',
@@ -4844,7 +4844,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Vous serez opposé au prétendant en ligne au classement le plus proche, puis téléporté dans l'arène. Gagnez pour monter; le premier à céder (1 point de vie) perd. Vous revenez exactement où vous étiez en file.",
   'hud.arena.ladderAllTime': 'Classement - historique',
   'hud.arena.ladderOnline': 'Classement - en ligne',
-  'hud.arena.ratingSummary': 'Cote - {wins} victoires / {losses} défaites',
+  'hud.arena.ratingSummary': 'Cote - {wins} victoires / {losses} défaites / {draws} nuls',
   'hud.arena.statusCountdown': 'Préparez-vous...',
   'hud.arena.statusReturning': 'Retour au monde... {seconds}',
   'hud.arena.statusFight': "Combattez jusqu'à la reddition !",

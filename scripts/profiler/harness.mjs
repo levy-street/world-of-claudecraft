@@ -265,6 +265,40 @@ function onlineEntrySurface() {
   return document.body.dataset.startPanel ?? '';
 }
 
+export function profilerBrowserLaunchOptions({
+  browserPath,
+  userDataDir,
+  headless,
+  width,
+  height,
+  extraArgs = [],
+}) {
+  return {
+    executablePath: browserPath,
+    ...(userDataDir ? { userDataDir } : {}),
+    headless: headless ? 'new' : false,
+    protocolTimeout: 180000,
+    args: headless
+      ? [
+          `--window-size=${width},${height + 120}`,
+          '--use-angle=swiftshader',
+          '--enable-unsafe-swiftshader',
+          '--autoplay-policy=no-user-gesture-required',
+          ...extraArgs,
+        ]
+      : [
+          `--window-size=${width},${height + 120}`,
+          '--ignore-gpu-blocklist',
+          '--enable-gpu',
+          '--disable-gpu-vsync',
+          '--disable-frame-rate-limit',
+          '--autoplay-policy=no-user-gesture-required',
+          ...(process.env.WAYLAND_DISPLAY && process.env.DISPLAY ? ['--ozone-platform=x11'] : []),
+          ...extraArgs,
+        ],
+  };
+}
+
 /**
  * Enter the profiler character from every supported post-login surface.
  * Repeated tier runs reuse one account and character, so later loads can show
@@ -382,8 +416,10 @@ export class Profiler {
     this.dpr = opts.dpr ?? 1;
     this.targetFps = opts.targetFps ?? 60;
     this.browserPath = opts.browserPath ?? process.env.BROWSER_PATH ?? BROWSER_PATH;
+    this.userDataDir = opts.userDataDir ?? undefined;
     this.shotDir = opts.shotDir ?? process.env.PROF_SHOT ?? null; // screenshot each sample (overlay visible)
     this.extraArgs = opts.extraArgs ?? []; // extra Chromium switches (e.g. occlusion opt-outs)
+    this.launchBrowser = opts.launchBrowser ?? ((options) => puppeteer.launch(options));
     // Headless SwiftShader mode: correct pixels with no window at all, immune to
     // window occlusion (an occluded headed window stops producing frames and
     // wedges Page.captureScreenshot). Software raster: never use it for perf
@@ -403,32 +439,16 @@ export class Profiler {
   }
 
   async launch() {
-    this.browser = await puppeteer.launch({
-      executablePath: this.browserPath,
-      headless: this.headless ? 'new' : false,
-      protocolTimeout: 180000,
-      args: this.headless
-        ? [
-            `--window-size=${this.width},${this.height + 120}`,
-            '--use-angle=swiftshader',
-            '--enable-unsafe-swiftshader',
-            '--autoplay-policy=no-user-gesture-required',
-            ...this.extraArgs,
-          ]
-        : [
-            `--window-size=${this.width},${this.height + 120}`,
-            '--ignore-gpu-blocklist',
-            '--enable-gpu',
-            '--disable-gpu-vsync',
-            '--disable-frame-rate-limit',
-            '--autoplay-policy=no-user-gesture-required',
-            // Chrome-for-Testing's default Wayland ozone can hang window creation on
-            // nvidia desktops (e.g. after a suspend/resume); XWayland is reliable and
-            // renders on the same GPU. Only where XWayland actually exists.
-            ...(process.env.WAYLAND_DISPLAY && process.env.DISPLAY ? ['--ozone-platform=x11'] : []),
-            ...this.extraArgs,
-          ],
-    });
+    this.browser = await this.launchBrowser(
+      profilerBrowserLaunchOptions({
+        browserPath: this.browserPath,
+        userDataDir: this.userDataDir,
+        headless: this.headless,
+        width: this.width,
+        height: this.height,
+        extraArgs: this.extraArgs,
+      }),
+    );
     this.page = await this.browser.newPage();
     await this.page.setViewport({
       width: this.width,
@@ -451,6 +471,7 @@ export class Profiler {
     selectorTimeoutMs,
     gameBootTimeoutMs,
     extraQuery = '',
+    onlineFixture = null,
   } = {}) {
     this.mode = mode;
     const page = this.page;
@@ -472,35 +493,51 @@ export class Profiler {
       });
     } else {
       await requireOnlineProfilerCapability(this.server);
-      const u = `prof_cam_${this.uniq}`;
-      await api(
-        this.server,
-        '/api/register',
-        { username: u, password: 'hunter22', email: `${u}@example.com` },
-        undefined,
-        '172.31.0.1',
-      );
+      if (onlineFixture) {
+        const { username, token, characterName } = onlineFixture;
+        if (![username, token, characterName].every((value) => typeof value === 'string')) {
+          throw new Error('online profiler fixture is incomplete');
+        }
+        await page.evaluateOnNewDocument((session) => {
+          localStorage.setItem(
+            'woc_session',
+            JSON.stringify({ token: session.token, username: session.username }),
+          );
+        }, onlineFixture);
+      }
       await page.goto(`${this.gameUrl}/?perf${this.gfxQs(tier)}${extraQuery}`, {
         waitUntil: 'domcontentloaded',
         timeout: 60000,
       });
-      await page.waitForFunction(
-        () =>
-          document.querySelector('#btn-online') &&
-          document.querySelector('#login-user') &&
-          document.querySelector('#btn-login'),
-        { timeout: 25000, polling: 200 },
-      );
-      await page.evaluate((u) => {
-        document.querySelector('#btn-online').click();
-        document.querySelector('#login-user').value = u;
-        document.querySelector('#login-pass').value = 'hunter22';
-        document.querySelector('#btn-login').click();
-      }, u);
-      // Character names accept letters only; the profiler uniqueness token is
-      // timestamp-derived and normally contains digits. Map those digits to
-      // stable letters so the real client validation reaches createCharacter.
-      const nm = `Pcam${characterNameToken(this.uniq)}`;
+      await page.waitForSelector('#btn-online', { timeout: 25000 });
+      let nm;
+      if (onlineFixture) {
+        nm = onlineFixture.characterName;
+        await page.evaluate(() => document.querySelector('#btn-online').click());
+      } else {
+        const u = `prof_cam_${this.uniq}`;
+        await api(
+          this.server,
+          '/api/register',
+          { username: u, password: 'hunter22', email: `${u}@example.com` },
+          undefined,
+          '172.31.0.1',
+        );
+        await page.waitForFunction(
+          () => document.querySelector('#login-user') && document.querySelector('#btn-login'),
+          { timeout: 25000, polling: 200 },
+        );
+        await page.evaluate((username) => {
+          document.querySelector('#btn-online').click();
+          document.querySelector('#login-user').value = username;
+          document.querySelector('#login-pass').value = 'hunter22';
+          document.querySelector('#btn-login').click();
+        }, u);
+        // Character names accept letters only; the profiler uniqueness token is
+        // timestamp-derived and normally contains digits. Map those digits to
+        // stable letters so the real client validation reaches createCharacter.
+        nm = `Pcam${characterNameToken(this.uniq)}`;
+      }
       const entryAction = await enterOnlineProfilerCharacter(page, { name: nm, cls });
       if (entryAction !== 'resumed') this.onlineInvulnerabilityArmed = false;
       // The post-login Welcome Screen gates world entry (index.html only): click

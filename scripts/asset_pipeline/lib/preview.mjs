@@ -1,5 +1,5 @@
 // Headless preview renderer: turntable views, per-clip pose frames, and the
-// HUD-style weapon icon. Self-bundles preview_entry.js with programmatic
+// legacy weapon-model preview. Self-bundles preview_entry.js with programmatic
 // esbuild (the render_model_stills.mjs pattern, no manual prebundle step) and
 // drives headless system Chrome on the swiftshader path (no dev server; GLB
 // bytes travel as base64). Frames are deterministic per machine but not across
@@ -215,7 +215,7 @@ export async function renderHeldAcross(weaponGlbPath, outDir, { lift, maxHeight 
   return files;
 }
 
-/** Render the 128px HUD bag icon for a weapon GLB. */
+/** Render the 128px model-preview JPG for a weapon GLB. */
 export async function renderWeaponIcon(glbPath, dest) {
   const sharp = (await import('sharp')).default;
   const b64 = readFileSync(glbPath).toString('base64');

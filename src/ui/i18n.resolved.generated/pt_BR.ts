@@ -1054,7 +1054,7 @@ export const pt_BR: EnTranslations = {
       "blurb": "Dois redutos em ruínas se encaram através de um vale cercado por muralhas à sombra de Thornpeak: os Carmesim ao sul, os Azul ao norte, e o mais antigo Pátio das Ruínas entre eles, que nenhum dos dois jamais conquistou. Cinco de cada lado, uma bandeira cada, e a primeira equipe a levar três das deles para casa domina o campo.",
       "modeTag": "5v5 Captura de Bandeira",
       "offlineNote": "Campos de Thornhollow está sincronizando. A fila abre assim que o reino responder.",
-      "ratingSummary": "Ranque. {wins} vitórias / {losses} derrotas",
+      "ratingSummary": "Ranque. {wins} vitórias / {losses} derrotas / {draws} empates",
       "careerCaptures": "Capturas na carreira: {count}",
       "enterQueue": "Entrar na Fila",
       "enterQueueParty": "Entrar na Fila (grupo de {count})",
@@ -2362,7 +2362,8 @@ export const pt_BR: EnTranslations = {
       "resonantHide": "Reagente de encantamento. Desencantado de armadura de couro rara ou melhor.",
       "resonantLinks": "Reagente de encantamento. Desencantado de armadura de malha rara ou melhor.",
       "resonantSteel": "Reagente de encantamento. Desencantado de armas corpo a corpo raras ou melhores.",
-      "resonantTimber": "Reagente de encantamento. Desencantado de cajados, varinhas, arcos e bestas raros ou melhores."
+      "resonantTimber": "Reagente de encantamento. Desencantado de cajados, varinhas, arcos e bestas raros ou melhores.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const pt_BR: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -8206,7 +8209,7 @@ export const pt_BR: EnTranslations = {
       "queueNote": "Você será pareado com o desafiante online de ranque mais próximo e teleportado para a arena. Vença para subir; o primeiro a ceder (1 de vida) perde. Você retorna exatamente ao local onde entrou na fila.",
       "ladderAllTime": "Classificação - histórica",
       "ladderOnline": "Classificação - online",
-      "ratingSummary": "Ranque - {wins} vitórias / {losses} derrotas",
+      "ratingSummary": "Ranque - {wins} vitórias / {losses} derrotas / {draws} empates",
       "statusCountdown": "Prepare-se...",
       "statusReturning": "Voltando ao mundo... {seconds}",
       "statusFight": "Lute até a rendição!",
@@ -11514,6 +11517,30 @@ export const pt_BR: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

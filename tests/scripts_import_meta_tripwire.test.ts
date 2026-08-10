@@ -30,5 +30,16 @@ describe('esbuild IIFE bundle scripts guard both import.meta failure shapes', ()
         'the empty-object rewrite arm (var import_meta = {} / import_meta.env.X)',
       ).toContain('/\\bimport_meta\\b/.test(bundleJs)');
     });
+
+    it(`${rel} defines the test-mode field read by the shared loader graph`, () => {
+      const src = readFileSync(join(repoRoot, rel), 'utf8');
+      if (rel === 'scripts/render_finder_portraits.mjs') {
+        expect(src).toContain('PORTRAIT_RENDER_DEFINES');
+        const shared = readFileSync(join(repoRoot, 'scripts/lib/mob_portrait_jobs.mjs'), 'utf8');
+        expect(shared).toContain("'import.meta.env.TEST': 'false'");
+      } else {
+        expect(src).toContain("'import.meta.env.TEST': 'false'");
+      }
+    });
   }
 });

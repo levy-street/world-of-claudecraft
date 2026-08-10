@@ -1054,7 +1054,7 @@ export const fr_CA: EnTranslations = {
       "blurb": "Deux donjons en ruine se font face de part et d'autre d'un creux fortifié à l'ombre de Thornpeak : Carmin au sud, Azur au nord, et entre eux, la plus ancienne Cour en ruine, qu'aucun des deux camps n'a jamais tenue. Cinq contre cinq, une bannière chacun, et le premier à en ramener trois chez lui remporte le combat.",
       "modeTag": "5v5 Capture du drapeau",
       "offlineNote": "Les Champs de Thornhollow se synchronisent. La file s'ouvre dès que le royaume répond.",
-      "ratingSummary": "Cote. {wins} victoires / {losses} défaites",
+      "ratingSummary": "Cote. {wins} victoires / {losses} défaites / {draws} nuls",
       "careerCaptures": "Captures en carrière : {count}",
       "enterQueue": "Rejoindre la file",
       "enterQueueParty": "Rejoindre la file (groupe de {count})",
@@ -2362,7 +2362,8 @@ export const fr_CA: EnTranslations = {
       "resonantHide": "Réactif d'enchantement. Obtenu en désenchantant de l'armure en cuir rare ou mieux.",
       "resonantLinks": "Réactif d'enchantement. Obtenu en désenchantant de l'armure de mailles rare ou mieux.",
       "resonantSteel": "Réactif d'enchantement. Obtenu en désenchantant des armes de mêlée rares ou mieux.",
-      "resonantTimber": "Réactif d'enchantement obtenu de bâtons, baguettes, arcs et arbalètes rares ou mieux."
+      "resonantTimber": "Réactif d'enchantement obtenu de bâtons, baguettes, arcs et arbalètes rares ou mieux.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const fr_CA: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -8206,7 +8209,7 @@ export const fr_CA: EnTranslations = {
       "queueNote": "Vous serez opposé au prétendant en ligne au classement le plus proche, puis téléporté dans l'arène. Gagnez pour monter; le premier à céder (1 point de vie) perd. Vous revenez exactement où vous étiez en file.",
       "ladderAllTime": "Classement - historique",
       "ladderOnline": "Classement - en ligne",
-      "ratingSummary": "Cote - {wins} victoires / {losses} défaites",
+      "ratingSummary": "Cote - {wins} victoires / {losses} défaites / {draws} nuls",
       "statusCountdown": "Préparez-vous...",
       "statusReturning": "Retour au monde... {seconds}",
       "statusFight": "Combattez jusqu'à la reddition !",
@@ -11514,6 +11517,30 @@ export const fr_CA: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"

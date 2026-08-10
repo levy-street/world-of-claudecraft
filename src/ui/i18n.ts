@@ -23,6 +23,7 @@ import { en } from './i18n.resolved.generated/en';
 import { en_XA } from './i18n.resolved.generated/en_XA';
 import { LOCALE_LOADERS, SUPPORTED_LANGUAGES } from './i18n.resolved.generated/loaders';
 import { pending } from './i18n.resolved.generated/pending';
+import { type InterpolationMemoEntry, interpolateWithMemo } from './i18n_interpolation';
 
 // Re-export the dense per-locale objects so const-importers of './i18n' keep an unchanged
 // surface: the S3 guard (tests/localization_fixes.test.ts) and the byte-equivalence
@@ -271,6 +272,10 @@ if (typeof window !== 'undefined') {
   prefetchLocale();
 }
 
+// Legacy single-pass interpolation, kept for the cold explicit-locale arm of
+// tOptional/translationValue only (a read of a NON-current locale, e.g. the
+// entity-translation manifest sweep). The current-language read paths go
+// through the memoized resolvedEntry pipeline below instead.
 function interpolate(template: string, values?: InterpolationValues): string {
   if (!values) return template;
   return template.replace(/\{([A-Za-z0-9_]+)\}/g, (match, name: string) => {
@@ -346,28 +351,31 @@ function tableFor(lang: SupportedLanguage): EnTranslations {
   return resident[lang] ?? resident.en!;
 }
 
-export function t(key: TranslationKey, values?: InterpolationValues): string {
-  const parts = key.split('.');
-  let current: unknown = tableFor(currentLanguage);
-  for (const part of parts) {
-    if (current && typeof current === 'object' && part in current) {
-      current = (current as Record<string, unknown>)[part];
-    } else {
-      return onUntrackedKey(key);
-    }
-  }
-  if (typeof current !== 'string') return onUntrackedKey(key);
-  if (PENDING_TOTAL > 0 && PENDING_SETS[currentLanguage]?.has(key) && isReleaseBuild()) {
-    throw new Error(
-      `i18n: key "${key}" is untranslated (pending) for locale "${currentLanguage}" on a release build; English must never ship to a translated player`,
-    );
-  }
-  return interpolate(current, values);
-}
+// --- the resolved-string memo (hitch-elimination B3) -----------------------
+//
+// Hot HUD/aura/nameplate paths call t()/tOptional with the SAME key (and often
+// the same params) every frame; re-splitting the dotted key, re-walking the
+// nested table, and re-running the {slot} regex per call was pure per-frame
+// garbage. resolvedEntry caches, per key, the leaf template PLUS the compiled
+// interpolation plan and a last-params memo (i18n_interpolation.ts), all for
+// the CURRENT resolution only. Invalidation is the existing resolution
+// revision: setLanguage bumps it on any language/pseudo change and
+// ensureLocaleLoaded bumps it when the active locale's chunk lands, so the
+// whole cache drops atomically and the next read re-resolves through the same
+// t() pipeline (never a bypass; a locale change invalidates everything).
+// Misses cache as null: a miss is stable for a revision, and the per-call
+// onUntrackedKey policy (dev throw / release raw-key degrade) stays live
+// because it runs on every call, cached or not. The release-build pending
+// hard-fail likewise runs per call in t(), never from the cache.
+// No eviction within a revision on purpose: misses cache as null, so the memo
+// stays bounded by the shipped catalog plus any unknown wire ids, the same
+// growth class as entity_i18n's fallbackLog.
+const resolvedMemo = new Map<string, InterpolationMemoEntry | null>();
+let resolvedMemoRevision = -1;
 
-function translationValue(key: string, lang: SupportedLanguage): string | null {
+function leafValue(key: string, table: EnTranslations): string | null {
   const parts = key.split('.');
-  let current: unknown = tableFor(lang);
+  let current: unknown = table;
   for (const part of parts) {
     if (current && typeof current === 'object' && part in current) {
       current = (current as Record<string, unknown>)[part];
@@ -376,6 +384,39 @@ function translationValue(key: string, lang: SupportedLanguage): string | null {
     }
   }
   return typeof current === 'string' ? current : null;
+}
+
+function resolvedEntry(key: string): InterpolationMemoEntry | null {
+  if (resolvedMemoRevision !== resolutionRevision) {
+    resolvedMemo.clear();
+    resolvedMemoRevision = resolutionRevision;
+  }
+  const cached = resolvedMemo.get(key);
+  if (cached !== undefined) return cached;
+  const template = leafValue(key, tableFor(currentLanguage));
+  const entry = template === null ? null : { template };
+  resolvedMemo.set(key, entry);
+  return entry;
+}
+
+export function t(key: TranslationKey, values?: InterpolationValues): string {
+  const entry = resolvedEntry(key);
+  if (entry === null) return onUntrackedKey(key);
+  if (PENDING_TOTAL > 0 && PENDING_SETS[currentLanguage]?.has(key) && isReleaseBuild()) {
+    throw new Error(
+      `i18n: key "${key}" is untranslated (pending) for locale "${currentLanguage}" on a release build; English must never ship to a translated player`,
+    );
+  }
+  if (!values) return entry.template;
+  return interpolateWithMemo(entry, values);
+}
+
+function translationValue(key: string, lang: SupportedLanguage): string | null {
+  if (lang === currentLanguage) {
+    const entry = resolvedEntry(key);
+    return entry === null ? null : entry.template;
+  }
+  return leafValue(key, tableFor(lang));
 }
 
 export function hasTranslation(key: string, lang: SupportedLanguage = currentLanguage): boolean {
@@ -387,7 +428,13 @@ export function tOptional(
   values?: InterpolationValues,
   lang: SupportedLanguage = currentLanguage,
 ): string | null {
-  const value = translationValue(key, lang);
+  if (lang === currentLanguage) {
+    const entry = resolvedEntry(key);
+    if (entry === null) return null;
+    if (!values) return entry.template;
+    return interpolateWithMemo(entry, values);
+  }
+  const value = leafValue(key, tableFor(lang));
   return value === null ? null : interpolate(value, values);
 }
 

@@ -1054,7 +1054,7 @@ export const en: EnTranslations = {
       "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
       "modeTag": "5v5 Capture the Flag",
       "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
-      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses / {draws} draws",
       "careerCaptures": "Career captures: {count}",
       "enterQueue": "Enter the Queue",
       "enterQueueParty": "Enter the Queue (party of {count})",
@@ -2362,7 +2362,8 @@ export const en: EnTranslations = {
       "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
       "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
       "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
-      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const en: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -8206,7 +8209,7 @@ export const en: EnTranslations = {
       "queueNote": "You will be matched with the nearest-rated challenger online, then teleported to the sands. Win to climb; first to yield (1 health) loses. You return exactly where you queued.",
       "ladderAllTime": "Ladder - All-Time",
       "ladderOnline": "Ladder - Online",
-      "ratingSummary": "Rating - {wins} wins / {losses} losses",
+      "ratingSummary": "Rating - {wins} wins / {losses} losses / {draws} draws",
       "statusCountdown": "Steel yourself...",
       "statusReturning": "Returning to the world... {seconds}",
       "statusFight": "Fight to the yield!",
@@ -11514,6 +11517,30 @@ export const en: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"

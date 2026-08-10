@@ -16,7 +16,7 @@ Commands: `weapon`, `prop`, `creature`, `skin`, `skinset`, `skinmodel`, `rig-man
 `qa`, `validate`, `preview`, `preview-held`, `status`, `balance`, `inspect`, `inplace-check`.
 
 **`qa --job <id>` is the mandatory last step for every generated asset.** It re-verifies
-the finished job structurally (lane-aware: rig + required clips, grip convention + HUD icon
+the finished job structurally (lane-aware: rig + required clips, grip convention + model preview
 + held-on-all-7-characters renders for weapons, handslots + KayKit clip vocabulary for
 skinmodels, preview coverage) and prices it for REAL: every recorded Tripo task id is
 queried for its actual `credits_consumed` (1 credit = $0.01) and stored gpt-image-2 usage
@@ -47,13 +47,15 @@ node scripts/asset_pipeline/pipeline.mjs weapon --name emberfang_sword \
   [--flip] [--model hifi] [--face-limit n] [--apply] [--job id]
 ```
 Produces a normalized GLB (origin AT the grip, blade/head along +Y, family height and
-gripFrac from `lib/families.mjs`, WebP 512 textures, meshopt) plus a 128px HUD icon jpg.
+gripFrac from `lib/families.mjs`, WebP 512 textures, meshopt) plus a 128px model-preview JPG.
 The key MUST contain a family token: sword, dagger, staff, hammer, axe, halberd, spear,
 scythe, or wand (`tests/held_weapon_models.test.ts` contract), or pass `--family`.
-`--apply` copies the GLB to `public/models/weapons/` and the icon to `public/ui/weapons/`,
-registers the key in `KAYKIT_WEAPON_ACCESSORY` (`src/render/characters/assets.ts`), maps any
-`--items` ids in `ITEM_WEAPON_VARIANTS` (`src/ui/weapon_variants.ts`), and appends the
-CREDITS.md row. The ItemDef snippet is printed for the agent to place by hand (real
+`--apply` copies the GLB to `public/models/weapons/` and the legacy preview to
+`public/ui/weapons/`, registers the key in `KAYKIT_WEAPON_ACCESSORY`
+(`src/render/characters/assets.ts`), maps any `--items` ids in `ITEM_WEAPON_VARIANTS`
+(`src/ui/weapon_variants.ts`), and appends the CREDITS.md row. Every mapped item must also gain
+bespoke painted inventory art at `public/ui/items/<item-id>.webp`; the item and weapon-art gates
+fail until it does. The ItemDef snippet is printed for the agent to place by hand (real
 vanilla-style stats are a gameplay judgment). After `--apply` run:
 `npx vitest run tests/held_weapon_models.test.ts`.
 

@@ -3,6 +3,7 @@
 // the reader activates it (wired by mount.ts). No three.js import here, so this stays in
 // the main Guide bundle while the renderer/loader cost is deferred to the lazy chunk.
 
+import { crestImageFallbackAttributes } from '../../ui/crest_image_fallback';
 import { esc } from '../../ui/esc';
 import { t } from '../../ui/i18n';
 
@@ -16,6 +17,8 @@ export interface ModelEmbedOptions {
   /** 2D poster shown before load and as the no-WebGL fallback (a procedural crest/icon).
    *  Omit for figures with no 2D art (e.g. warlock demons); the stage shows the button. */
   poster?: string;
+  /** Crest id behind `poster`, used only when no pre-rendered still is present. */
+  posterCrestId?: string;
   /** Pre-rendered transparent still of THIS exact figure (the default poster when present):
    *  a real, crawlable image of the creature/class, so the reader sees the subject without
    *  any WebGL. Falls back to `poster` (the 2D crest) when absent. */
@@ -44,8 +47,12 @@ export function modelViewerEmbed(opts: ModelEmbedOptions): string {
   // the crest stays alt="" decoration.
   const posterSrc = opts.still ?? opts.poster;
   const posterAlt = opts.still ? t('guide.viewer.posterAlt', { name: opts.name }) : '';
+  const posterFallback =
+    !opts.still && opts.posterCrestId
+      ? ` ${crestImageFallbackAttributes(opts.posterCrestId, size)}`
+      : '';
   const poster = posterSrc
-    ? `<img class="guide-viewer-poster${opts.still ? ' guide-viewer-poster-still' : ''}" src="${esc(posterSrc)}" alt="${esc(posterAlt)}" width="${size}" height="${size}" loading="lazy" decoding="async" />`
+    ? `<img class="guide-viewer-poster${opts.still ? ' guide-viewer-poster-still' : ''}" src="${esc(posterSrc)}"${posterFallback} alt="${esc(posterAlt)}" width="${size}" height="${size}" loading="lazy" decoding="async" />`
     : '';
   // The status line is an empty ARIA live region. mount.ts writes guide.viewer.loading /
   // guide.viewer.error into it on each state transition, because aria-live announces a text

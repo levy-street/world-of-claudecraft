@@ -1054,7 +1054,7 @@ export const vi_VN: EnTranslations = {
       "blurb": "Hai pháo đài đổ nát đối mặt nhau qua một thung lũng có tường bao dưới bóng Đỉnh Gai: Đỏ Thẫm ở phía nam, Xanh Lam ở phía bắc, và Sân Phế Tích cổ xưa hơn nằm giữa chúng mà chưa bên nào từng chiếm được. Năm người mỗi bên, mỗi bên một lá cờ, và bên đầu tiên mang được ba lá cờ của đối phương về nhà sẽ giành lấy chiến trường.",
       "modeTag": "5 đấu 5 Cướp Cờ",
       "offlineNote": "Cánh Đồng Trũng Gai đang đồng bộ. Hàng chờ sẽ mở khi thế giới phản hồi.",
-      "ratingSummary": "Thứ hạng. {wins} thắng / {losses} thua",
+      "ratingSummary": "Thứ hạng. {wins} thắng / {losses} thua / {draws} hòa",
       "careerCaptures": "Số lần chiếm cờ trong sự nghiệp: {count}",
       "enterQueue": "Vào Hàng Chờ",
       "enterQueueParty": "Vào Hàng Chờ (nhóm {count} người)",
@@ -2362,7 +2362,8 @@ export const vi_VN: EnTranslations = {
       "resonantHide": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp da hiếm trở lên.",
       "resonantLinks": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp lưới hiếm trở lên.",
       "resonantSteel": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc vũ khí cận chiến hiếm trở lên.",
-      "resonantTimber": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trượng, đũa phép, cung, và nỏ hiếm trở lên."
+      "resonantTimber": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trượng, đũa phép, cung, và nỏ hiếm trở lên.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const vi_VN: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -8206,7 +8209,7 @@ export const vi_VN: EnTranslations = {
       "queueNote": "Bạn sẽ được ghép cặp với đối thủ trực tuyến có thứ hạng gần nhất, rồi được dịch chuyển đến đấu trường. Thắng để leo hạng; ai chịu thua trước (còn 1 máu) sẽ bại. Bạn sẽ trở về đúng nơi đã vào hàng chờ.",
       "ladderAllTime": "Bảng Xếp Hạng - Mọi Thời Đại",
       "ladderOnline": "Bảng Xếp Hạng - Trực Tuyến",
-      "ratingSummary": "Thứ hạng - {wins} thắng / {losses} thua",
+      "ratingSummary": "Thứ hạng - {wins} thắng / {losses} thua / {draws} hòa",
       "statusCountdown": "Sẵn sàng nào...",
       "statusReturning": "Đang trở về thế giới... {seconds}",
       "statusFight": "Chiến đến khi có kẻ chịu thua!",
@@ -11514,6 +11517,30 @@ export const vi_VN: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

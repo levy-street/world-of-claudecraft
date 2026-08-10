@@ -1054,7 +1054,7 @@ export const ja_JP: EnTranslations = {
       "blurb": "ソーンピークの影が落ちる、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を三度持ち帰った側が戦場を制する。",
       "modeTag": "5v5キャプチャー・ザ・フラッグ",
       "offlineNote": "ソーンホロウ平原は同期中です。レルムの応答後にキューが開きます。",
-      "ratingSummary": "レーティング。{wins}勝 / {losses}敗",
+      "ratingSummary": "レーティング。{wins}勝 / {losses}敗 / {draws}分",
       "careerCaptures": "通算キャプチャー:{count}",
       "enterQueue": "キューに参加",
       "enterQueueParty": "キューに参加({count}人パーティ)",
@@ -2362,7 +2362,8 @@ export const ja_JP: EnTranslations = {
       "resonantHide": "エンチャントの材料。レア以上の革防具を魔力分解して得られる。",
       "resonantLinks": "エンチャントの材料。レア以上の鎖防具を魔力分解して得られる。",
       "resonantSteel": "エンチャントの材料。レア以上の近接武器を魔力分解して得られる。",
-      "resonantTimber": "エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。"
+      "resonantTimber": "エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。",
+      "growthTonic": "農業用品。植え付け時に使うと、収穫が大きくなることがあります。"
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const ja_JP: EnTranslations = {
     },
     "bgOffer": {
       "title": "ソーンホロウ平原の準備が整いました",
+      "backfillTitle": "ソーンホロウ平原が戦士を求めています",
+      "backfillBody": "この戦いはすでに進行中です。人数の足りない側に加わります。この試合はレーティングに影響しません。",
       "accepted": "{size} 人中 {accepted} 人が承認",
       "remaining": "残り {seconds} 秒",
       "accept": "承認",
@@ -8206,7 +8209,7 @@ export const ja_JP: EnTranslations = {
       "queueNote": "オンライン中で最も近いレートの挑戦者と組み合わされ、砂地へ転送されます。勝てば上昇し、先に降参した側（体力1）が負けます。キューに入った場所へ正確に戻ります。",
       "ladderAllTime": "ランキング - 全期間",
       "ladderOnline": "ランキング - オンライン",
-      "ratingSummary": "レート - {wins}勝 / {losses}敗",
+      "ratingSummary": "レート - {wins}勝 / {losses}敗 / {draws}分",
       "statusCountdown": "身構えてください...",
       "statusReturning": "世界へ戻っています... {seconds}",
       "statusFight": "降参まで戦え！",
@@ -11514,6 +11517,30 @@ export const ja_JP: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "オスミウムの鍬"
+      },
+      "vale_hearth_loaf": {
+        "name": "渓谷の炉焼きパン"
+      },
+      "eastbrook_root_pottage": {
+        "name": "イーストブルックの根菜ポタージュ"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "フェンブリッジの炊き込みご飯"
+      },
+      "fenbridge_beet_braise": {
+        "name": "フェンブリッジのビート煮込み"
+      },
+      "highwatch_barley_bannock": {
+        "name": "ハイウォッチの大麦平焼きパン"
+      },
+      "highwatch_gourd_soup": {
+        "name": "ハイウォッチの霜瓜スープ"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "エバーガーデンの太陽メロンタルト"
+      },
+      "evergarden_harvest_platter": {
+        "name": "エバーガーデンの収穫プレート"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

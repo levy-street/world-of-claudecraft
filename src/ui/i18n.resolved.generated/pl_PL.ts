@@ -1054,7 +1054,7 @@ export const pl_PL: EnTranslations = {
       "blurb": "Dwie zrujnowane twierdze stają naprzeciw siebie za otoczoną murem kotliną w cieniu Ciernistego Szczytu: Karmazyn na południu, Lazur na północy, a między nimi starszy Zrujnowany Dziedziniec, którego żadna z nich nigdy nie zdobyła. Po pięciu graczy z każdej strony, po jednym sztandarze, a pierwsza drużyna, która zaniesie do domu trzy z nich, zdobywa pole.",
       "modeTag": "Przechwycenie flagi 5v5",
       "offlineNote": "Pola Ciernistej Kotliny synchronizują się. Kolejka otworzy się, gdy odpowie królestwo.",
-      "ratingSummary": "Ranking. {wins} zwycięstw / {losses} porażek",
+      "ratingSummary": "Ranking. {wins} zwycięstw / {losses} porażek / {draws} remisów",
       "careerCaptures": "Przechwycenia w karierze: {count}",
       "enterQueue": "Dołącz do kolejki",
       "enterQueueParty": "Dołącz do kolejki (grupa {count} os.)",
@@ -2362,7 +2362,8 @@ export const pl_PL: EnTranslations = {
       "resonantHide": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiej i lepszej zbroi skórzanej.",
       "resonantLinks": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiej i lepszej kolczugi.",
       "resonantSteel": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiej i lepszej broni do walki wręcz.",
-      "resonantTimber": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkich i lepszych kosturów, różdżek, łuków i kusz."
+      "resonantTimber": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkich i lepszych kosturów, różdżek, łuków i kusz.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const pl_PL: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -8206,7 +8209,7 @@ export const pl_PL: EnTranslations = {
       "queueNote": "Zostaniesz dobrany do najbliższego rankingowo przeciwnika online, a potem przeniesiony na piaski. Wygraj, aby się wspiąć; kto pierwszy się podda (1 punkt zdrowia), przegrywa. Wracasz dokładnie tam, gdzie wszedłeś do kolejki.",
       "ladderAllTime": "Drabinka - wszech czasów",
       "ladderOnline": "Drabinka - online",
-      "ratingSummary": "Ranking - {wins} zwycięstw / {losses} porażek",
+      "ratingSummary": "Ranking - {wins} zwycięstw / {losses} porażek / {draws} remisów",
       "statusCountdown": "Przygotuj się...",
       "statusReturning": "Powrót do świata... {seconds}",
       "statusFight": "Walcz aż do poddania!",
@@ -11514,6 +11517,30 @@ export const pl_PL: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

@@ -144,15 +144,56 @@ const FALLBACK_FONT_PX = 12;
 const SPRITE_ALIGN = 'center';
 const SPRITE_BASELINE = 'alphabetic';
 
+/** One cached sprite plus its recency-list links and the text-level bucket
+ *  that owns it, so a hit can move to the list tail and an eviction can unhook
+ *  itself from its own bucket without rebuilding any key. */
+interface SpriteEntry {
+  sprite: TextSprite;
+  text: string;
+  owner: SpriteBucket;
+  prev: SpriteEntry | null;
+  next: SpriteEntry | null;
+}
+
+// The cache key, STRUCTURAL rather than a joined string: one map level per
+// style field, font -> fill -> stroke -> drawn outline width -> text. The old
+// scheme built a key array plus a joined string of a couple hundred bytes on
+// every draw and measure call, HITS INCLUDED, which at tens of nameplates per
+// frame was the client's dominant allocation treadmill; walking the levels
+// with the caller's existing strings allocates nothing. Collision safety is
+// structural: there is no delimiter to inject (a player name carrying any
+// separator is just a longer key at the text level), adjacent fields can never
+// fuse (fill 'ab' + stroke 'c' and fill 'a' + stroke 'bc' part ways at the
+// fill level), and a fill-only label can never alias an outlined one whose
+// stroke token has not resolved yet (undefined and '' are distinct stroke
+// keys). The width level keys outlineWidth, the width actually drawn, so it
+// stays in lockstep with the padding rule below.
+type SpriteBucket = Map<string, SpriteEntry>;
+type WidthLevel = Map<number, SpriteBucket>;
+type StrokeLevel = Map<string | undefined, WidthLevel>;
+type FillLevel = Map<string, StrokeLevel>;
+type FontLevel = Map<string, FillLevel>;
+
 /**
  * A bounded per-(font, fill, outline, text) cache of rasterized labels. One
  * instance per painter; the painter calls `beginRedraw` once per redraw and
  * `draw` per label.
  */
 export class TextSpriteCache {
-  // Insertion order IS the LRU order: a cache hit re-inserts, so the oldest
-  // live key is always the front of the iteration.
-  private readonly sprites = new Map<string, TextSprite>();
+  // The structural key tree plus an intrusive doubly-linked recency list
+  // threaded through the entries. The list keeps EXACT least-recently-used
+  // order with the same bound and hit behavior as the insertion-ordered Map it
+  // replaced (head = oldest, a hit moves its entry to the tail, eviction pops
+  // the head), but a hit is a handful of pointer swaps instead of a per-hit
+  // map delete plus re-insert, so the steady-state hot path does no map churn
+  // and allocates nothing. Emptied text buckets stay in the tree: every fill
+  // and stroke a painter passes is a resolved theme token or a fixed style
+  // constant, so the tree's own footprint is bounded by that closed palette,
+  // never by player-supplied text, and clear() drops it wholesale.
+  private readonly fonts: FontLevel = new Map();
+  private lruHead: SpriteEntry | null = null;
+  private lruTail: SpriteEntry | null = null;
+  private spriteCount = 0;
   private pixelRatio = 1;
   private cachedBytes = 0;
   private readonly spriteLimit: number;
@@ -167,7 +208,7 @@ export class TextSpriteCache {
 
   /** Live sprite count. */
   get size(): number {
-    return this.sprites.size;
+    return this.spriteCount;
   }
 
   /** RGBA backing-store bytes retained by live sprites. */
@@ -179,7 +220,10 @@ export class TextSpriteCache {
    *  a language switch, where every label re-resolves to a new string and the old
    *  rasters would otherwise sit in the budget until LRU worked them out. */
   clear(): void {
-    this.sprites.clear();
+    this.fonts.clear();
+    this.lruHead = null;
+    this.lruTail = null;
+    this.spriteCount = 0;
     this.cachedBytes = 0;
   }
 
@@ -196,10 +240,7 @@ export class TextSpriteCache {
    *  redraw's draws so a label-heavy redraw can overshoot rather than thrash
    *  (see the header). */
   beginRedraw(): void {
-    for (const key of this.sprites.keys()) {
-      if (this.sprites.size <= this.spriteLimit) return;
-      this.deleteSprite(key);
-    }
+    while (this.spriteCount > this.spriteLimit && this.lruHead) this.evictOldest(this.lruHead);
   }
 
   /**
@@ -250,13 +291,10 @@ export class TextSpriteCache {
   }
 
   private sprite(text: string, style: TextSpriteStyle): TextSprite | null {
-    const key = spriteKey(text, style);
-    const cached = this.sprites.get(key);
+    const cached = this.lookup(text, style);
     if (cached) {
-      // Re-insert so the iteration order stays least-recently-used first.
-      this.sprites.delete(key);
-      this.sprites.set(key, cached);
-      return cached;
+      this.touch(cached);
+      return cached.sprite;
     }
     const sprite = rasterize(text, style, this.pixelRatio);
     // A transient 2D-context failure must not be cached: freezing a blank canvas
@@ -269,25 +307,93 @@ export class TextSpriteCache {
     // this redraw (exactly what the inline fillText did on that frame) but never
     // cache it.
     if (style.fill !== '' && style.stroke !== '') {
-      this.sprites.set(key, sprite);
+      const owner = this.bucketFor(style);
+      const entry: SpriteEntry = { sprite, text, owner, prev: this.lruTail, next: null };
+      owner.set(text, entry);
+      if (this.lruTail) this.lruTail.next = entry;
+      else this.lruHead = entry;
+      this.lruTail = entry;
+      this.spriteCount++;
       this.cachedBytes += sprite.bytes;
       if (Number.isFinite(this.hardByteLimit)) this.trimHardBudget();
     }
     return sprite;
   }
 
-  private trimHardBudget(): void {
-    for (const key of this.sprites.keys()) {
-      if (this.sprites.size <= this.spriteLimit && this.cachedBytes <= this.hardByteLimit) return;
-      this.deleteSprite(key);
-    }
+  /** The hit path. Allocation-free ON PURPOSE: this runs per label per frame
+   *  (nameplate names, levels, guilds and their measure calls all land here),
+   *  so it walks the key levels with the caller's existing strings and builds
+   *  nothing. Keep it that way. */
+  private lookup(text: string, style: TextSpriteStyle): SpriteEntry | undefined {
+    const fills = this.fonts.get(style.font);
+    if (!fills) return undefined;
+    const strokes = fills.get(style.fill);
+    if (!strokes) return undefined;
+    const widths = strokes.get(style.stroke);
+    if (!widths) return undefined;
+    return widths.get(outlineWidth(style))?.get(text);
   }
 
-  private deleteSprite(key: string): void {
-    const sprite = this.sprites.get(key);
-    if (!sprite) return;
-    this.cachedBytes -= sprite.bytes;
-    this.sprites.delete(key);
+  /** Resolve (creating on demand) the text bucket for a style. Miss path only:
+   *  a level created here is retained until clear(). */
+  private bucketFor(style: TextSpriteStyle): SpriteBucket {
+    let fills = this.fonts.get(style.font);
+    if (!fills) {
+      fills = new Map();
+      this.fonts.set(style.font, fills);
+    }
+    let strokes = fills.get(style.fill);
+    if (!strokes) {
+      strokes = new Map();
+      fills.set(style.fill, strokes);
+    }
+    let widths = strokes.get(style.stroke);
+    if (!widths) {
+      widths = new Map();
+      strokes.set(style.stroke, widths);
+    }
+    const width = outlineWidth(style);
+    let bucket = widths.get(width);
+    if (!bucket) {
+      bucket = new Map();
+      widths.set(width, bucket);
+    }
+    return bucket;
+  }
+
+  /** Move a hit to the most-recently-used end of the recency list. */
+  private touch(entry: SpriteEntry): void {
+    const tail = this.lruTail;
+    if (entry === tail || !tail) return;
+    if (entry.prev) entry.prev.next = entry.next;
+    else this.lruHead = entry.next;
+    if (entry.next) entry.next.prev = entry.prev;
+    entry.prev = tail;
+    entry.next = null;
+    tail.next = entry;
+    this.lruTail = entry;
+  }
+
+  /** Unhook the least-recently-used entry from the list and its bucket. */
+  private evictOldest(entry: SpriteEntry): void {
+    this.lruHead = entry.next;
+    if (entry.next) entry.next.prev = null;
+    else this.lruTail = null;
+    // Null the dead entry's links so any future stale touch no-ops rather than corrupting the list.
+    entry.prev = null;
+    entry.next = null;
+    entry.owner.delete(entry.text);
+    this.spriteCount--;
+    this.cachedBytes -= entry.sprite.bytes;
+  }
+
+  private trimHardBudget(): void {
+    while (
+      (this.spriteCount > this.spriteLimit || this.cachedBytes > this.hardByteLimit) &&
+      this.lruHead
+    ) {
+      this.evictOldest(this.lruHead);
+    }
   }
 }
 
@@ -297,17 +403,6 @@ export class TextSpriteCache {
 // width strokes at 1px and has to be padded and keyed for 1px, not for 0.
 function outlineWidth(style: TextSpriteStyle): number {
   return style.stroke === undefined ? 0 : (style.lineWidth ?? 1);
-}
-
-// The cache key. `text` goes LAST so no separator collision is possible whatever
-// the label says, and the separator is a newline because neither a font
-// shorthand nor a resolved CSS color can contain one (a space could:
-// `rgb(255 209 0)`). The outlined flag is its own field so a fill-only label can
-// never alias one whose outline token has not resolved yet ('').
-function spriteKey(text: string, style: TextSpriteStyle): string {
-  const outlined = style.stroke === undefined ? 'flat' : 'outlined';
-  const stroke = style.stroke ?? '';
-  return [style.font, style.fill, outlined, stroke, outlineWidth(style), text].join('\n');
 }
 
 // Rasterize one label into its own canvas, or null when the 2D context fails.

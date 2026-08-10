@@ -1,12 +1,15 @@
 // What building a weapon-skin VFX rig is allowed to COST, driven against the
 // real createWeaponVfx over a stubbed 2d canvas (the module is otherwise plain
-// Three + math). Two regressions are pinned here:
+// Three + math). Three regressions are pinned here:
 //   1. the world path (grounded: false) must build no sky backdrop: its
 //      sceneExtras group is never added to any scene, so the 1024x1024 canvas
 //      of gradients and hundreds of stars was pure waste inside the frame a
 //      skinned player came into view;
 //   2. the memoized emissive derivation is SHARED, so the first wearer's rig
-//      tearing down must not dispose the textures the next wearer draws with.
+//      tearing down must not dispose the textures the next wearer draws with;
+//   3. the memo is BOUNDED (the C2 memory ratchet): idle derivations past the
+//      idle cap evict and dispose, live wearers pin theirs, and an evicted
+//      derivation rebuilds byte-identically on its next wearer.
 import * as THREE from 'three';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { isSharedTexture } from '../src/render/shared_resource';
@@ -19,6 +22,7 @@ import {
   WEAPON_VFX,
   type WeaponVfxSpec,
 } from '../src/render/weapon_vfx';
+import { WEAPON_EMISSIVE_IDLE_CACHE_MAX } from '../src/render/weapon_vfx_emissive_cache_core';
 
 interface StubCanvas {
   width: number;
@@ -27,8 +31,36 @@ interface StubCanvas {
 }
 
 const canvases: StubCanvas[] = [];
+const putImageDataWrites: Uint8ClampedArray[] = [];
 let getImageDataCalls = 0;
+/** When set, the Nth getImageData call throws (a tainted/detached source), for
+ *  the aborted-build reference-release pin. */
+let failGetImageDataAtCall: number | null = null;
 let priorDocument: unknown;
+
+// Deterministic 2d-context pixels: the derivation reads real bytes here, so
+// the bounded-cache suite below can compare a rebuilt derivation byte for
+// byte against the original. The palette cycles the texel classes the
+// emissive core distinguishes (in-window azure, out-of-window red, near-white
+// residual, dull reject), so a derivation writes real nonzero grades.
+const STUB_TEXELS = [
+  [51, 187, 255],
+  [255, 51, 51],
+  [250, 250, 250],
+  [110, 120, 128],
+] as const;
+
+function stubImageData(w: number, h: number) {
+  const data = new Uint8ClampedArray(w * h * 4);
+  for (let i = 0; i < w * h; i++) {
+    const [r, g, b] = STUB_TEXELS[i % STUB_TEXELS.length];
+    data[i * 4] = r;
+    data[i * 4 + 1] = g;
+    data[i * 4 + 2] = b;
+    data[i * 4 + 3] = 255;
+  }
+  return { data, width: w, height: h };
+}
 
 function stubContext() {
   const gradient = { addColorStop: () => {} };
@@ -52,9 +84,14 @@ function stubContext() {
     }),
     getImageData: (_x: number, _y: number, w: number, h: number) => {
       getImageDataCalls++;
-      return { data: new Uint8ClampedArray(w * h * 4), width: w, height: h };
+      if (getImageDataCalls === failGetImageDataAtCall) {
+        throw new Error('stub getImageData failure');
+      }
+      return stubImageData(w, h);
     },
-    putImageData: () => {},
+    putImageData: (image: { data: Uint8ClampedArray }) => {
+      putImageDataWrites.push(Uint8ClampedArray.from(image.data));
+    },
   };
 }
 
@@ -77,7 +114,9 @@ afterAll(() => {
 
 beforeEach(() => {
   canvases.length = 0;
+  putImageDataWrites.length = 0;
   getImageDataCalls = 0;
+  failGetImageDataAtCall = null;
   // Both module-level memos are reset per case, so no assertion here depends on
   // what an earlier case (or a shuffled run order) already cached.
   clearWeaponVfxTextureCacheForTest();
@@ -105,6 +144,14 @@ function weaponRoot(map: THREE.Texture | null = null): THREE.Mesh {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.1), material);
   mesh.userData.weaponMesh = true;
   return mesh;
+}
+
+/** A drawable source albedo, as a skin GLB's webp map arrives. Each call mints
+ *  a distinct texture uuid, i.e. a distinct skin as the cache sees it. */
+function sourceMap(): THREE.Texture {
+  const texture = new THREE.Texture();
+  texture.image = { width: 4, height: 4 };
+  return texture;
 }
 
 // Order-independent by construction: beforeEach drops the module-level
@@ -156,13 +203,6 @@ describe('createWeaponVfx backdrop construction', () => {
 });
 
 describe('weapon-skin emissive derivation sharing', () => {
-  /** A drawable source albedo, as a skin GLB's webp map arrives. */
-  function sourceMap(): THREE.Texture {
-    const texture = new THREE.Texture();
-    texture.image = { width: 4, height: 4 };
-    return texture;
-  }
-
   it('derives once per (source map, spec) and hands the same textures to every wearer', () => {
     const map = sourceMap();
     const first = weaponRoot(map);
@@ -267,6 +307,190 @@ describe('weapon-skin emissive derivation sharing', () => {
     createWeaponVfx(next, EPIC_SPEC, { grounded: false });
     expect(getImageDataCalls).toBe(4);
     expect((next.material as THREE.MeshStandardMaterial).emissiveMap).not.toBe(shared);
+  });
+});
+
+describe('bounded emissive derivation cache (the C2 ratchet fix)', () => {
+  /** Build a rig on a fresh wearer of `map` and immediately tear it down,
+   *  leaving the derivation idle in the cache. Returns the derived pair the
+   *  wearer drew with. */
+  function wearAndLeave(map: THREE.Texture) {
+    const root = weaponRoot(map);
+    const rig = createWeaponVfx(root, EPIC_SPEC, { grounded: false });
+    const material = root.material as THREE.MeshStandardMaterial;
+    const pair = {
+      tex: material.emissiveMap as THREE.CanvasTexture,
+      albedo: material.map as THREE.CanvasTexture,
+    };
+    rig.dispose();
+    return pair;
+  }
+
+  it('keeps an idle derivation warm for the next wearer of the same skin', () => {
+    const map = sourceMap();
+    wearAndLeave(map);
+    expect(getImageDataCalls).toBe(2);
+
+    // Every wearer left, but the derivation is within the idle bound: the
+    // next wearer pays no readback and no per-texel walk.
+    const rig = createWeaponVfx(weaponRoot(map), EPIC_SPEC, { grounded: false });
+    expect(getImageDataCalls).toBe(2);
+    rig.dispose();
+  });
+
+  it('bounds idle retention: past the cap the least-recently-released pairs are disposed', () => {
+    const maps = Array.from({ length: WEAPON_EMISSIVE_IDLE_CACHE_MAX + 2 }, () => sourceMap());
+    const disposals: number[] = maps.map(() => 0);
+    for (const [i, map] of maps.entries()) {
+      const { tex, albedo } = wearAndLeave(map);
+      tex.addEventListener('dispose', () => {
+        disposals[i]++;
+      });
+      albedo.addEventListener('dispose', () => {
+        disposals[i]++;
+      });
+    }
+
+    // Exactly the two oldest-released derivations fell out, both textures of
+    // each disposed exactly once; every resident survivor is untouched.
+    expect(disposals[0]).toBe(2);
+    expect(disposals[1]).toBe(2);
+    for (let i = 2; i < maps.length; i++) {
+      expect(disposals[i], `map ${i} must stay resident`).toBe(0);
+    }
+
+    // A survivor is served warm; an evicted skin re-derives cold.
+    const before = getImageDataCalls;
+    wearAndLeave(maps[maps.length - 1]);
+    expect(getImageDataCalls).toBe(before);
+    wearAndLeave(maps[0]);
+    expect(getImageDataCalls).toBe(before + 2);
+  });
+
+  it('never disposes a pair a live rig still draws with while idle churn evicts around it', () => {
+    const liveMap = sourceMap();
+    const liveRoot = weaponRoot(liveMap);
+    const liveRig = createWeaponVfx(liveRoot, EPIC_SPEC, { grounded: false });
+    const material = liveRoot.material as THREE.MeshStandardMaterial;
+    const liveTex = material.emissiveMap as THREE.Texture;
+    const liveAlbedo = material.map as THREE.Texture;
+    let disposals = 0;
+    const count = () => {
+      disposals++;
+    };
+    liveTex.addEventListener('dispose', count);
+    liveAlbedo.addEventListener('dispose', count);
+
+    for (let i = 0; i < WEAPON_EMISSIVE_IDLE_CACHE_MAX + 3; i++) wearAndLeave(sourceMap());
+
+    // Idle churn ran the cache well past its bound; the live wearer's pair
+    // was pinned through all of it, so nothing on screen changed.
+    expect(disposals).toBe(0);
+    expect(material.emissiveMap).toBe(liveTex);
+    expect(material.map).toBe(liveAlbedo);
+
+    // Once released it is the most recently released idle entry: still warm.
+    liveRig.dispose();
+    const before = getImageDataCalls;
+    wearAndLeave(liveMap);
+    expect(getImageDataCalls).toBe(before);
+    expect(disposals).toBe(0);
+  });
+
+  it('a double-disposed rig releases its pin only once (the other wearer stays pinned)', () => {
+    const map = sourceMap();
+    const rigA = createWeaponVfx(weaponRoot(map), EPIC_SPEC, { grounded: false });
+    const rootB = weaponRoot(map);
+    const rigB = createWeaponVfx(rootB, EPIC_SPEC, { grounded: false });
+    const material = rootB.material as THREE.MeshStandardMaterial;
+    const tex = material.emissiveMap as THREE.Texture;
+    let disposals = 0;
+    tex.addEventListener('dispose', () => {
+      disposals++;
+    });
+
+    rigA.dispose();
+    rigA.dispose(); // must not strip rigB's reference
+    for (let i = 0; i < WEAPON_EMISSIVE_IDLE_CACHE_MAX + 2; i++) wearAndLeave(sourceMap());
+
+    expect(disposals).toBe(0);
+    expect(material.emissiveMap).toBe(tex);
+    rigB.dispose();
+  });
+
+  it('an aborted build releases the references it already acquired', () => {
+    // Two meshes with two distinct maps: the first derives cleanly, the
+    // second derivation throws (a tainted/detached source mid-traverse).
+    const okMap = sourceMap();
+    const badMap = sourceMap();
+    const root = weaponRoot(okMap);
+    const second = weaponRoot(badMap);
+    root.add(second);
+
+    failGetImageDataAtCall = 3; // okMap reads twice; badMap's first read throws
+    expect(() => createWeaponVfx(root, EPIC_SPEC, { grounded: false })).toThrow(
+      'stub getImageData failure',
+    );
+
+    // The aborted build restored the first material ...
+    const material = root.material as THREE.MeshStandardMaterial;
+    expect(material.map).toBe(okMap);
+    expect(material.emissiveMap).toBeNull();
+
+    // ... and dropped its cache reference: the derivation is idle, so idle
+    // churn can evict it. A leaked reference would pin it forever, silently
+    // reverting this skin to the unbounded ratchet.
+    const pair = wearAndLeave(okMap);
+    let disposals = 0;
+    const count = () => {
+      disposals++;
+    };
+    pair.tex.addEventListener('dispose', count);
+    pair.albedo.addEventListener('dispose', count);
+    for (let i = 0; i < WEAPON_EMISSIVE_IDLE_CACHE_MAX + 1; i++) wearAndLeave(sourceMap());
+    expect(disposals).toBe(2);
+  });
+
+  it('rebuilds an evicted derivation byte-identically with identical texture parameters', () => {
+    const map = sourceMap();
+    const first = wearAndLeave(map);
+    const firstWrites = putImageDataWrites.slice(-2);
+    // Non-vacuous: the deterministic stub pattern includes in-window azure
+    // texels, so both derivation writes carry real color (alpha excluded).
+    expect(firstWrites[0].some((byte, i) => i % 4 !== 3 && byte > 0)).toBe(true);
+    expect(firstWrites[1].some((byte, i) => i % 4 !== 3 && byte > 0)).toBe(true);
+
+    // Flood the idle set until the pair is evicted.
+    for (let i = 0; i < WEAPON_EMISSIVE_IDLE_CACHE_MAX + 1; i++) wearAndLeave(sourceMap());
+
+    const before = getImageDataCalls;
+    const root = weaponRoot(map);
+    const rig = createWeaponVfx(root, EPIC_SPEC, { grounded: false });
+    // Truly re-derived, not served stale from a disposed entry.
+    expect(getImageDataCalls).toBe(before + 2);
+    const material = root.material as THREE.MeshStandardMaterial;
+    const rebuiltTex = material.emissiveMap as THREE.CanvasTexture;
+    const rebuiltAlbedo = material.map as THREE.CanvasTexture;
+    expect(rebuiltTex).not.toBe(first.tex);
+
+    // The rebuilt pair writes pixel-for-pixel the first derivation again ...
+    const rebuiltWrites = putImageDataWrites.slice(-2);
+    expect(rebuiltWrites[0]).toEqual(firstWrites[0]);
+    expect(rebuiltWrites[1]).toEqual(firstWrites[1]);
+    // ... under the same texture parameters, so an evicted-then-rebuilt
+    // derivation is indistinguishable on screen.
+    const pairs = [
+      [rebuiltTex, first.tex],
+      [rebuiltAlbedo, first.albedo],
+    ] as const;
+    for (const [rebuilt, original] of pairs) {
+      expect(rebuilt.flipY).toBe(original.flipY);
+      expect(rebuilt.colorSpace).toBe(original.colorSpace);
+      expect(rebuilt.wrapS).toBe(original.wrapS);
+      expect(rebuilt.wrapT).toBe(original.wrapT);
+      expect(isSharedTexture(rebuilt)).toBe(true);
+    }
+    rig.dispose();
   });
 });
 

@@ -1,0 +1,382 @@
+{
+  "renderer": {
+    "trackedScript": "scripts/render_finder_portraits.mjs",
+    "trackedScriptInitialResult": "failed before output because import.meta.env.TEST was not defined",
+    "trackedScriptCurrentResult": "12/230 selected jobs rendered after a concurrent owner added import.meta.env.TEST: false",
+    "ignoredRunner": "tmp/portrait-rerender/runner.mjs",
+    "ignoredRunnerChanges": [
+      "point two relative imports back to scripts/",
+      "add import.meta.env.TEST: false to the esbuild define map"
+    ],
+    "only": [
+      "bogtoad",
+      "drowsy_croaker",
+      "mere_lurker",
+      "the_meredark",
+      "breach_wretch",
+      "fen_sprite",
+      "harvest_sprite",
+      "hedge_gnome",
+      "willow_sprite",
+      "downs_bandit",
+      "wreck_thief",
+      "training_dummy"
+    ],
+    "runs": 3,
+    "resultPerRun": "12/230 selected jobs rendered, 0 failed, 0 page errors",
+    "byteStableAcrossRuns": true,
+    "finderOutputsWritten": []
+  },
+  "escortRerender": {
+    "trackedScript": "scripts/render_finder_portraits.mjs",
+    "trackedScriptSha256": "d33305853e13545e8c1822bc1076299d63ace4a6494e040fc6a52c5b3cebb6d2",
+    "command": "ONLY=gravedigger_mosley,castaway_navigator,fisher_bram node scripts/render_finder_portraits.mjs",
+    "only": ["gravedigger_mosley", "castaway_navigator", "fisher_bram"],
+    "runs": 2,
+    "resultPerRun": "3/230 selected jobs rendered, 0 failed, 0 page errors",
+    "byteStableAcrossRuns": true,
+    "finderOutputsWritten": [],
+    "renderBackend": "SwiftShader (REAL_GPU unset)",
+    "outputPx": 128,
+    "webp": {
+      "quality": 88,
+      "alphaQuality": 100,
+      "effort": 6
+    },
+    "resolvedSpec": {
+      "visualKey": "npc_villager",
+      "model": "models/chars/players/rogue.glb",
+      "modelSha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d",
+      "modelBytes": 477976,
+      "idle": "Idle",
+      "height": 2.6,
+      "show": [],
+      "tintSource": "entity",
+      "tintStrength": 0.35
+    }
+  },
+  "wrongModelRerender": {
+    "trackedScript": "scripts/render_finder_portraits.mjs",
+    "trackedScriptSha256": "d33305853e13545e8c1822bc1076299d63ace4a6494e040fc6a52c5b3cebb6d2",
+    "command": "ONLY=cindraleth_maw_matriarch,grubjaw,the_wreck_warden node scripts/render_finder_portraits.mjs",
+    "only": ["cindraleth_maw_matriarch", "grubjaw", "the_wreck_warden"],
+    "runs": 2,
+    "resultPerRun": "3/230 selected jobs rendered, 0 failed, 0 page errors",
+    "byteStableAcrossRuns": true,
+    "finderOutputsWritten": [],
+    "renderBackend": "SwiftShader (REAL_GPU unset)",
+    "outputPx": 128,
+    "webp": {
+      "quality": 88,
+      "alphaQuality": 100,
+      "effort": 6
+    },
+    "resolvedInputs": [
+      {
+        "id": "cindraleth_maw_matriarch",
+        "visualKey": "mob_dragonkin_matriarch",
+        "model": "models/creatures/dragonkin_elite.glb",
+        "modelSha256": "891ec258859085f07dba354f538ad2cfcaeec777d3e01257c9041bb0fec0b9df",
+        "modelBytes": 455856,
+        "idle": "Idle",
+        "height": 2.6,
+        "tintSource": "entity",
+        "tint": "#f0b040",
+        "tintStrength": 0.12
+      },
+      {
+        "id": "grubjaw",
+        "visualKey": "mob_grubjaw",
+        "model": "models/creatures/grubjaw.glb",
+        "modelSha256": "6d109e187a9938231950a2997924bf66f095ed060d8a6eea77fc9cd871a06bd9",
+        "modelBytes": 318432,
+        "idle": "Idle",
+        "height": 2.9,
+        "tintSource": "entity",
+        "tint": "#145a32",
+        "tintStrength": 0.04
+      },
+      {
+        "id": "the_wreck_warden",
+        "visualKey": "mob_bruiser",
+        "model": "models/chars/players/barbarian.glb",
+        "modelSha256": "2fb8d32c29d2b5c4b9b4b54ec502c3778f3d4d0da0e55cd1d4ed2b7c1e8d0abb",
+        "modelBytes": 444244,
+        "idle": "Idle",
+        "height": 2.6,
+        "show": ["Barbarian_BearHat"],
+        "attach": {
+          "model": "models/weapons/axe_2handed.glb",
+          "modelSha256": "8a68d165fa09dfe96b4e2473344161b910ddea10a916333cbdaacdcd17493af6",
+          "modelBytes": 35248,
+          "bone": "handslot.r"
+        },
+        "tintSource": "entity",
+        "tint": "#7a8a86",
+        "tintStrength": 0.3
+      }
+    ]
+  },
+  "contactSheets": {
+    "before": "tmp/portrait-rerender/before-contact-sheet.png",
+    "after": "tmp/portrait-rerender/after-contact-sheet.png",
+    "escortBefore": "tmp/portrait-rerender/escort-before-contact-sheet.png",
+    "escortAfter": "tmp/portrait-rerender/escort-after-contact-sheet.png",
+    "escortTintReview": "tmp/portrait-rerender/escort-after-tint-review.png",
+    "wrongModelBefore": "tmp/portrait-rerender/late-stale-before-tint-review.png",
+    "wrongModelAfter": "tmp/portrait-rerender/late-stale-after-tint-review.png"
+  },
+  "portraits": [
+    {
+      "id": "bogtoad",
+      "family": "mudfin",
+      "visualKey": "mob_murloc",
+      "model": "models/creatures/frog.glb",
+      "tint": "#7aa848",
+      "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
+      "beforeBytes": 2196,
+      "afterSha256": "1e23b41efff2235f42ab7dfc5cc467c782f4e6e9bbcf5f691019d5aa84618b0b",
+      "afterBytes": 1844
+    },
+    {
+      "id": "drowsy_croaker",
+      "family": "mudfin",
+      "visualKey": "mob_murloc",
+      "model": "models/creatures/frog.glb",
+      "tint": "#5a9858",
+      "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
+      "beforeBytes": 2196,
+      "afterSha256": "d58d617071ead1f8211ea4584cb199ba653022a50c303eeeaad59676976cf1ae",
+      "afterBytes": 1812
+    },
+    {
+      "id": "mere_lurker",
+      "family": "mudfin",
+      "visualKey": "mob_murloc",
+      "model": "models/creatures/frog.glb",
+      "tint": "#a8b048",
+      "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
+      "beforeBytes": 2196,
+      "afterSha256": "79a58134dc658f8e31749495107d5c2738909ba848b5cb878efe79d86bedef0a",
+      "afterBytes": 1916
+    },
+    {
+      "id": "the_meredark",
+      "family": "mudfin",
+      "visualKey": "mob_murloc",
+      "model": "models/creatures/frog.glb",
+      "tint": "#5a7038",
+      "beforeSha256": "2ccd6e4f35d6a9950850553b2f377b02e15a987f422dbb4663612698d267ac4e",
+      "beforeBytes": 2260,
+      "afterSha256": "571ca5b7ce1dfbea6989c8d3897a2e2a8f68c2f886e918895a136592d507b07c",
+      "afterBytes": 1822
+    },
+    {
+      "id": "breach_wretch",
+      "family": "burrower",
+      "visualKey": "mob_kobold",
+      "model": "models/creatures/goblin.glb",
+      "tint": "#5a4a78",
+      "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
+      "beforeBytes": 2196,
+      "afterSha256": "afb4783c5f98e72096ff055c57bf9f1cca69287e73e649e302aab9507ac8c40f",
+      "afterBytes": 1696
+    },
+    {
+      "id": "fen_sprite",
+      "family": "burrower",
+      "visualKey": "mob_kobold",
+      "model": "models/creatures/goblin.glb",
+      "tint": "#cfe0ea",
+      "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
+      "beforeBytes": 2196,
+      "afterSha256": "9452fb7216c7a3237744d2ad6ab3fe4e28a77e96a49bf83853f784517456a6c0",
+      "afterBytes": 1722
+    },
+    {
+      "id": "harvest_sprite",
+      "family": "burrower",
+      "visualKey": "mob_kobold",
+      "model": "models/creatures/goblin.glb",
+      "tint": "#e8c878",
+      "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
+      "beforeBytes": 2196,
+      "afterSha256": "451a9e94af9b7b9396262e6ba2067f8601eb6919fd7d2ebcb252bde569cb8e2b",
+      "afterBytes": 1728
+    },
+    {
+      "id": "hedge_gnome",
+      "family": "burrower",
+      "visualKey": "mob_kobold",
+      "model": "models/creatures/goblin.glb",
+      "tint": "#5a8a46",
+      "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
+      "beforeBytes": 2196,
+      "afterSha256": "63d0b8b7ec80b2d8e49c599dbdab667022bc3b8635876a1db45033c370c541df",
+      "afterBytes": 1702
+    },
+    {
+      "id": "willow_sprite",
+      "family": "burrower",
+      "visualKey": "mob_kobold",
+      "model": "models/creatures/goblin.glb",
+      "tint": "#c8e0b8",
+      "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
+      "beforeBytes": 2196,
+      "afterSha256": "5f7819fadaed90ff89a31b5f6b8e09b376e807c81f8101e5a94378d89e86f8b1",
+      "afterBytes": 1692
+    },
+    {
+      "id": "downs_bandit",
+      "family": "burrower",
+      "visualKey": "mob_kobold",
+      "model": "models/creatures/goblin.glb",
+      "tint": "#5a8a46",
+      "beforeSha256": "2ccd6e4f35d6a9950850553b2f377b02e15a987f422dbb4663612698d267ac4e",
+      "beforeBytes": 2260,
+      "afterSha256": "63d0b8b7ec80b2d8e49c599dbdab667022bc3b8635876a1db45033c370c541df",
+      "afterBytes": 1702
+    },
+    {
+      "id": "wreck_thief",
+      "family": "burrower",
+      "visualKey": "mob_kobold",
+      "model": "models/creatures/goblin.glb",
+      "tint": "#5a8a46",
+      "beforeSha256": "2ccd6e4f35d6a9950850553b2f377b02e15a987f422dbb4663612698d267ac4e",
+      "beforeBytes": 2260,
+      "afterSha256": "63d0b8b7ec80b2d8e49c599dbdab667022bc3b8635876a1db45033c370c541df",
+      "afterBytes": 1702
+    },
+    {
+      "id": "training_dummy",
+      "family": "humanoid",
+      "visualKey": "mob_training_dummy",
+      "model": "models/creatures/training_dummy.glb",
+      "tint": "#b8924a",
+      "beforeSha256": "c8921f88cad3b6073808d26f4afa99571ff24fc3082b4dbbe3444b177d1eb918",
+      "beforeBytes": 2234,
+      "afterSha256": "2f3e963f5346db997e4dd990ed65bf83f9915d10a5ecbe29260b28d9ac247d0e",
+      "afterBytes": 1788
+    },
+    {
+      "id": "gravedigger_mosley",
+      "family": "humanoid",
+      "visualKey": "npc_villager",
+      "model": "models/chars/players/rogue.glb",
+      "tint": "#8a7a5a",
+      "tintStrength": 0.35,
+      "beforeSha256": "60fa7cfaaff1d159e1812581fee47cfea50ec2effbf919e6670d49345f068548",
+      "beforeBytes": 2206,
+      "afterSha256": "699b404cd0e3b1b231b82b3d02357e94c6b3bed37bbf9f46bc6585a9ece0ba36",
+      "afterBytes": 2720
+    },
+    {
+      "id": "castaway_navigator",
+      "family": "humanoid",
+      "visualKey": "npc_villager",
+      "model": "models/chars/players/rogue.glb",
+      "tint": "#4a7a9c",
+      "tintStrength": 0.35,
+      "beforeSha256": "60fa7cfaaff1d159e1812581fee47cfea50ec2effbf919e6670d49345f068548",
+      "beforeBytes": 2206,
+      "afterSha256": "caa41418ae0cf05ea788967c7df5e05ec61a7bf10c2e46da7041b63302839457",
+      "afterBytes": 2632
+    },
+    {
+      "id": "fisher_bram",
+      "family": "humanoid",
+      "visualKey": "npc_villager",
+      "model": "models/chars/players/rogue.glb",
+      "tint": "#4a6a8a",
+      "tintStrength": 0.35,
+      "beforeSha256": "60fa7cfaaff1d159e1812581fee47cfea50ec2effbf919e6670d49345f068548",
+      "beforeBytes": 2206,
+      "afterSha256": "9a553c04903f0326a369e12e32ab46088ac16b8df85216bd84442349cbb35d95",
+      "afterBytes": 2618
+    },
+    {
+      "id": "cindraleth_maw_matriarch",
+      "family": "dragonkin",
+      "visualKey": "mob_dragonkin_matriarch",
+      "model": "models/creatures/dragonkin_elite.glb",
+      "tint": "#f0b040",
+      "tintStrength": 0.12,
+      "beforeSha256": "3ced9276b8bab34729ed74367f0ee96fdfbcb1ee8b3886a5f367388844169573",
+      "beforeBytes": 2292,
+      "afterSha256": "5dd3432a2363096ff0d4bd831a36ed7419e8230248529987de2f71362c979fec",
+      "afterBytes": 2478
+    },
+    {
+      "id": "grubjaw",
+      "family": "troll",
+      "visualKey": "mob_grubjaw",
+      "model": "models/creatures/grubjaw.glb",
+      "tint": "#145a32",
+      "tintStrength": 0.04,
+      "beforeSha256": "b7b435b2ffe4ec5ae9fea107f714897b20f52252acf60dde972e72be6649d06a",
+      "beforeBytes": 2062,
+      "afterSha256": "3ddba949b8d523e38f54154957b3dcd354db8bdf78f1ee9129627a38f3d7e56c",
+      "afterBytes": 2174
+    },
+    {
+      "id": "the_wreck_warden",
+      "family": "undead",
+      "visualKey": "mob_bruiser",
+      "model": "models/chars/players/barbarian.glb",
+      "tint": "#7a8a86",
+      "tintStrength": 0.3,
+      "beforeSha256": "9915b2ff188edd161fbb1b94f61d6122b9e4e58f9910f35d8f5cd100738cbc9b",
+      "beforeBytes": 2828,
+      "afterSha256": "9142ba953bf15b818fb6163bd477439d8f652b94c61de67e51f25efc63429bb0",
+      "afterBytes": 2586
+    }
+  ],
+  "commonOutputContract": {
+    "dimensions": "128x128",
+    "colorspace": "sRGB",
+    "depth": 8,
+    "opaque": true
+  },
+  "visualInspection": {
+    "correctModelCorrespondence": true,
+    "centeredHeadOrBust": true,
+    "opaqueFamilyBackdrop": true,
+    "blankPortraits": [],
+    "croppedPortraits": [],
+    "escortTintReview": {
+      "order": ["gravedigger_mosley", "castaway_navigator", "fisher_bram"],
+      "expectedTintSwatches": ["#8a7a5a", "#4a7a9c", "#4a6a8a"],
+      "observed": ["olive-brown wash", "lighter blue-teal wash", "deeper slate-blue wash"],
+      "pairwiseNormalizedRmse": {
+        "gravedigger_mosley:castaway_navigator": 0.0115524,
+        "gravedigger_mosley:fisher_bram": 0.0111748,
+        "castaway_navigator:fisher_bram": 0.00790673
+      },
+      "distinctOutputHashes": true
+    },
+    "wrongModelReview": {
+      "order": ["cindraleth_maw_matriarch", "grubjaw", "the_wreck_warden"],
+      "before": [
+        "floating generic dragon stand-in",
+        "generic troll stand-in",
+        "armored skeleton stand-in"
+      ],
+      "after": [
+        "grounded horned dragonkin matriarch body",
+        "dedicated hulking Grubjaw sculpt",
+        "bearded barbarian bruiser with bear hat and axe"
+      ],
+      "observedTint": [
+        "warm gold highlights on dark dragonkin",
+        "dark olive-green wash",
+        "cool gray-green wash"
+      ],
+      "distinctOutputHashes": true
+    }
+  },
+  "test": {
+    "command": "npx vitest run tests/target_portrait_view.test.ts",
+    "result": "1 file passed, 5 tests passed"
+  }
+}

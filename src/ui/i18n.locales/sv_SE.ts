@@ -308,7 +308,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Två lag om fem. Stjäl fiendens banér och spring det till er fästning. Först till 3 erövringar vinner. Gå ihop upp till 5 och köa tillsammans; hämta Fartrunor och väv genom skyddet för att bli av med förföljare.',
   'hudChrome.bg.queuedParty': 'Grupp om {count}.',
-  'hudChrome.bg.ratingSummary': 'Rankning. {wins} vinster / {losses} förluster',
+  'hudChrome.bg.ratingSummary': 'Rankning. {wins} vinster / {losses} förluster / {draws} oavgjorda',
   'hudChrome.bg.respawnIn': 'Nästa våg: återuppstår om {seconds}',
   'hudChrome.bg.resultDefeat': 'Nederlag',
   'hudChrome.bg.resultDraw': 'Oavgjort',
@@ -6406,7 +6406,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.arena.playerLevelClassTitle': '{name} - Nivå {level} {className}',
   'hud.arena.queueNote':
     'Du matchas med den närmast rankade utmanaren som är uppkopplad och teleporteras sedan till sanden. Vinn för att klättra; först att ge upp (1 hälsa) förlorar. Du återvänder exakt dit du ställde dig i kö.',
-  'hud.arena.ratingSummary': 'Rankning - {wins} vinster / {losses} förluster',
+  'hud.arena.ratingSummary': 'Rankning - {wins} vinster / {losses} förluster / {draws} oavgjorda',
   'hud.arena.searching': 'Söker efter en motståndare... ({count} i kön)',
   'hud.arena.statusCountdown': 'Stålsätt dig...',
   'hud.arena.statusFight': 'Strid till underkastelse!',

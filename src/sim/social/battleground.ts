@@ -41,14 +41,21 @@ import type { ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, DT, type Entity, type Vec3 } from '../types';
 import { eloDelta, snapshotArenaReturnPools } from './arena';
+import { bgBackfillSeat, pickBgBackfillGroup } from './battleground_backfill';
 import { recordBgOutcome } from './battleground_outcomes';
-import { formBgTeamParty, unwindBgAutoPartyFor, unwindBgTeamParties } from './battleground_party';
+import {
+  formBgTeamParty,
+  joinBgTeamParty,
+  unwindBgAutoPartyFor,
+  unwindBgTeamParties,
+} from './battleground_party';
 import {
   type BgProposal,
   bgProposalFor,
   bgProposalRemaining,
   bgProposalRespond,
   bgRequeueLockedUntil,
+  openBgBackfillProposal,
   openBgProposal,
   sweepBgProposals,
 } from './battleground_proposal';
@@ -230,6 +237,17 @@ export interface BgMatch {
     }
   >;
   ratingAvg: [number, number]; // team average rating at start, for Elo
+  // Fighters seated by backfillBgMatches after the match began. They play for
+  // honor, objectives, and the scoreboard, but the ladder does not move for
+  // them: they inherit a scoreline they had no hand in, and `ratingAvg` was
+  // averaged over the ORIGINAL ten, so an arrival is outside the Elo the match
+  // is being scored against either way. Their absence from the rating math is
+  // what keeps the seat worth accepting.
+  backfilled: Set<number>;
+  // Candidates who were offered a seat in THIS match and said no. A decline
+  // costs them nothing (see declineBgBackfill), so without this the still-open
+  // seat would offer them the same match again on the very next tick, forever.
+  backfillDeclined: Set<number>;
   // Per team: pids auto-added to the team party at start (never the surviving
   // base premade), unwound at match end or on desertion (battleground_party.ts).
   autoPartyPids: [number[], number[]];
@@ -465,6 +483,10 @@ export function updateBattleground(ctx: SimContext): void {
   // returning groups are back in play on the same tick they are released rather
   // than sitting out until the next one.
   sweepBgProposals(ctx);
+  // BEFORE matchmaking, deliberately: repairing a live 4v5 beats starting a
+  // fresh match with the same queued player. Draws no rng, so it appends to the
+  // battleground phase without moving any existing draw.
+  backfillBgMatches(ctx);
   matchmakeBg(ctx);
   const seen = new Set<BgMatch>();
   for (const match of ctx.bgMatches.values()) {
@@ -587,6 +609,123 @@ function tickCountdown(ctx: SimContext, match: BgMatch): void {
   }
 }
 
+/**
+ * Seat queued solos into live matches that a desertion left short. At most one
+ * seat per match per tick: the next tick fills the next one, which keeps this a
+ * flat pass over the matches rather than a loop that can drain the whole queue
+ * into one battleground.
+ *
+ * A backfilled fighter plays the match UNRATED (see BgMatch.backfilled): they
+ * inherit a scoreline they had no part in, and on a rated ladder that is the
+ * difference between a seat worth taking and one every player learns to dodge.
+ */
+function backfillBgMatches(ctx: SimContext): void {
+  if (ctx.bgQueue.length === 0) return;
+  const seen = new Set<BgMatch>();
+  for (const match of ctx.bgMatches.values()) {
+    if (seen.has(match)) continue;
+    seen.add(match);
+    const team = bgBackfillSeat({
+      state: match.state,
+      secondsLeft: BG_MAX_DURATION - match.timer,
+      scores: match.scores,
+      teamSizes: [match.teams[0].length, match.teams[1].length],
+      teamSize: BG_TEAM_SIZE,
+      capsToWin: BG_CAPS_TO_WIN,
+    });
+    if (team === null) continue;
+    // One offer per match at a time. The seat stays OPEN while a candidate is
+    // deciding, so without this the next tick would read the same short side
+    // and offer it to somebody else, and the tick after that to a third, until
+    // the queue was drained into a pile of competing invitations for one chair.
+    if (ctx.bgProposals.some((p) => p.backfill?.match === match)) continue;
+    // Liveness is folded into SELECTION, not applied after it. Picking the
+    // oldest solo first and only then testing them meant a single temporarily
+    // ineligible candidate blocked every backfill behind them: the loop moved
+    // on to the next MATCH, so a live 4v5 stayed unfilled while eligible solos
+    // waited. A failing candidate is still left queued, so matchmakeBg remains
+    // the ONE site that unqueues and tells the player why.
+    //
+    // The rule mirrors matchmakeBg's hygiene, which is now three causes: gone
+    // offline, already seated, or committed to an arena match. Dying and
+    // standing in a dungeon deliberately no longer disqualify anyone (the seat
+    // revives and detaches them), so a corpse in the queue is a valid backfill.
+    const eligible: { index: number; size: number; waited: number }[] = [];
+    ctx.bgQueue.forEach((g, i) => {
+      const cand = g.pids[0];
+      if (!ctx.entities.get(cand) || ctx.bgMatches.has(cand) || ctx.arenaMatches.has(cand)) return;
+      // ...and never double-offer: a solo already holding a queue-pop offer, or
+      // sitting out the lockout from one they just failed, is not available.
+      if (bgProposalFor(ctx, cand) || bgRequeueLockedUntil(ctx, cand) > 0) return;
+      if (match.backfillDeclined.has(cand)) return;
+      eligible.push({ index: i, size: g.pids.length, waited: g.waited });
+    });
+    const pickedAt = pickBgBackfillGroup(eligible.map((c) => ({ size: c.size, waited: c.waited })));
+    if (pickedAt < 0) return; // no eligible solo waiting: no later match can do better
+    const index = eligible[pickedAt].index;
+    const [group] = ctx.bgQueue.splice(index, 1);
+    // ASK, never seat. The seat is a teleport into a live rated 5v5 that also
+    // detaches the player from any dungeon they are standing in, scrubbing
+    // their threat off the whole claim; doing that to someone who is not at the
+    // keyboard is the exact failure the queue-pop prompt was built to stop, and
+    // it lands harder here: a filled side is never offered a backfill again,
+    // and a body that never disconnects never deserts, so the seat it consumed
+    // cannot reopen. Declining or lapsing frees it for the next candidate.
+    openBgBackfillProposal(ctx, match, team, group);
+  }
+}
+
+/** Put one queued solo into an open seat on a match already under way. */
+function seatBackfill(ctx: SimContext, match: BgMatch, team: BgTeam, pid: number): void {
+  const e = ctx.entities.get(pid);
+  if (!e) return;
+  // Snapshot the same per-fighter state startBgMatch takes, so the release path
+  // sends them home and hands their pools back exactly like a start-of-match
+  // fighter. Skipping either would strand them on the field at match end.
+  //
+  // detachFromDungeon FIRST, for the same reason startBgMatch does it: the queue
+  // hygiene deliberately holds a spot through a dungeon pull, so a candidate can
+  // be standing inside an instance. Storing the interior position would send
+  // them back to a claim that may be gone by match end, and would leave the
+  // instance holding their aggro for the whole match.
+  const door = detachFromDungeon(ctx, e);
+  match.returns.set(pid, { x: door?.x ?? e.pos.x, z: door?.z ?? e.pos.z, facing: e.facing });
+  match.preMatchPools.set(pid, snapshotArenaReturnPools(e));
+  match.stats.set(pid, { kills: 0, deaths: 0, captures: 0, assists: 0 });
+  match.backfilled.add(pid);
+  const index = match.teams[team].length;
+  match.teams[team].push(pid);
+  ctx.bgMatches.set(pid, match);
+  placeInBg(ctx, match, pid, team, index);
+  // The auto-added list is what marks which members this system put in the
+  // party, and so which of them the join may sweep out; see joinBgTeamParty.
+  if (joinBgTeamParty(ctx, match.teams[team], pid, { autoAdded: match.autoPartyPids[team] })) {
+    match.autoPartyPids[team].push(pid);
+  }
+  // honorTeamKeys is deliberately NOT recomputed: it is the anti-farm identity
+  // of the side that STARTED the match, and letting a substitution mint a fresh
+  // key would hand a farming pair a way to reset their own diminishing returns.
+  ctx.emit({ type: 'bgFound', team, pid });
+  if (match.state === 'countdown') {
+    ctx.emit({ type: 'bgCountdown', seconds: Math.max(0, Math.ceil(match.timer)), pid });
+  }
+  ctx.emit({
+    type: 'log',
+    text: `Thornhollow Fields: you join a battle already under way for the ${BG_TEAM_NAMES[team]}. This match will not change your rating.`,
+    color: '#7fd4ff',
+    pid,
+  });
+  bgEmitAll(ctx, match, (mp) => {
+    if (mp === pid) return;
+    ctx.emit({
+      type: 'log',
+      text: `A fresh fighter joins the ${BG_TEAM_NAMES[team]}.`,
+      color: '#7fd4ff',
+      pid: mp,
+    });
+  });
+}
+
 function matchmakeBg(ctx: SimContext): void {
   // Waiting in line survives whatever the player does with the wait: dying and
   // walking into a dungeon USED to drop them here, which is how players lost a
@@ -654,7 +793,55 @@ function seatBgProposal(ctx: SimContext, proposal: BgProposal): void {
 /** Answer a live queue-pop proposal; a full house seats the match immediately. */
 export function bgRespond(ctx: SimContext, accept: boolean, pid?: number): void {
   const ready = bgProposalRespond(ctx, accept, pid);
-  if (ready) seatBgProposal(ctx, ready);
+  if (!ready) return;
+  if (ready.backfill) {
+    // A backfill offer holds no slot of its own, so it is simply dropped and
+    // the one accepted fighter takes the seat that was held open for them.
+    ctx.bgProposals.splice(ctx.bgProposals.indexOf(ready), 1);
+    const { match, team } = ready.backfill;
+    const joiner = ready.teams[team][0];
+    // Re-resolve the seat at ACCEPT time. Everything the offer was based on is
+    // up to thirty seconds old by now, and two of those staleness windows are
+    // real damage rather than cosmetic:
+    //
+    //  - the match can have ENDED underneath the offer (a collapsing team is
+    //    what opens a seat in the first place, so the forfeit case is the
+    //    likely one). Teardown is once-only, so seating into a released match
+    //    put the joiner in bgMatches with nothing left to take them out: they
+    //    could neither play nor queue again, and the freed slot meant a fresh
+    //    match could start on the field they were standing in.
+    //  - the two cutoffs the seat rule enforces, a match not nearly over and a
+    //    side not one capture from losing, exist so nobody is dropped into
+    //    someone else's ending. Checked only at offer time, accepting at second
+    //    29 walks straight past both.
+    //
+    // Re-running the same rule answers all of it, and a seat that is no longer
+    // there costs the player nothing: they keep the place they were holding.
+    const gone =
+      match.fightersReleased ||
+      match.resultRecorded ||
+      bgBackfillSeat({
+        state: match.state,
+        secondsLeft: BG_MAX_DURATION - match.timer,
+        scores: match.scores,
+        teamSizes: [match.teams[0].length, match.teams[1].length],
+        teamSize: BG_TEAM_SIZE,
+        capsToWin: BG_CAPS_TO_WIN,
+      }) !== team;
+    if (gone) {
+      ctx.bgQueue.push(...ready.groups);
+      ctx.emit({
+        type: 'log',
+        text: 'That battle no longer needs a fighter. You keep your place in the Thornhollow Fields queue.',
+        color: '#7fd4ff',
+        pid: joiner,
+      });
+      return;
+    }
+    seatBackfill(ctx, match, team, joiner);
+    return;
+  }
+  seatBgProposal(ctx, ready);
 }
 
 /** One candidate pairing, plus the numbers the fairness rules read off it. */
@@ -866,6 +1053,8 @@ export function startBgMatch(
     // says nothing gets the honest default of "no grouped queue".
     grouped: opts?.grouped === true,
     ratingAvg: [bgTeamAvg(ctx, teamA), bgTeamAvg(ctx, teamB)],
+    backfilled: new Set(),
+    backfillDeclined: new Set(),
     autoPartyPids: [[], []],
     resultRecorded: false,
     fightersReleased: false,
@@ -1572,7 +1761,10 @@ export function bgResolveDesertion(ctx: SimContext, pid: number): void {
   }
   const team = bgTeamOf(match, pid);
   const deserter = ctx.players.get(pid);
-  if (deserter && match.rated && !match.resultRecorded) {
+  // A backfilled fighter who leaves owes nothing either: they were never on the
+  // ladder for this match, so charging a desertion loss here would be the one
+  // way an unrated seat could still cost rating.
+  if (deserter && match.rated && !match.resultRecorded && !match.backfilled.has(pid)) {
     const other = team === 0 ? 1 : 0;
     // The loss delta at score 0 from the deserter's side; no honor (forfeit rule).
     const delta = eloDelta(match.ratingAvg[team], match.ratingAvg[other], 0);
@@ -1712,9 +1904,17 @@ function resolveBgResult(
       const meta = ctx.players.get(pid);
       if (!meta) continue;
       const before = meta.bgRating;
-      meta.bgRating = Math.max(BG_MIN_RATING, before + delta);
-      if (match.rated && winnerTeam !== null) {
-        if (won) meta.bgWins++;
+      // A backfilled fighter is scored on everything EXCEPT the ladder: honor,
+      // deeds, and the bgEnd scoreboard below all still pay, but the rating and
+      // the W/L/D stay where they were (see BgMatch.backfilled).
+      const laddered = !match.backfilled.has(pid);
+      if (laddered) meta.bgRating = Math.max(BG_MIN_RATING, before + delta);
+      if (laddered && match.rated) {
+        // A drawn battleground moved the ladder (eloDelta at score 0.5) but was
+        // recorded nowhere, so the match vanished from the player's record. It
+        // is now the third figure of W-L-D.
+        if (winnerTeam === null) meta.bgDraws++;
+        else if (won) meta.bgWins++;
         else meta.bgLosses++;
       }
       let firstWinBonus = 0;
@@ -1829,6 +2029,7 @@ export function bgLadder(ctx: SimContext): import('../../world_api').BgLadderEnt
       rating: meta.bgRating,
       wins: meta.bgWins,
       losses: meta.bgLosses,
+      draws: meta.bgDraws,
     });
   }
   rows.sort((x, y) => y.rating - x.rating || y.wins - x.wins);
@@ -1867,6 +2068,7 @@ export function bgInfoFor(
     rating: meta.bgRating,
     wins: meta.bgWins,
     losses: meta.bgLosses,
+    draws: meta.bgDraws,
     captures: meta.bgCaptures,
     queued: group !== null,
     queueSize: bgQueueSize(ctx),
@@ -1876,6 +2078,7 @@ export function bgInfoFor(
     proposal: proposal
       ? {
           id: proposal.id,
+          kind: proposal.backfill ? ('backfill' as const) : ('match' as const),
           size: proposal.teams[0].length + proposal.teams[1].length,
           accepted: proposal.accepted.size,
           myResponse: proposal.accepted.has(pid) ? ('accepted' as const) : ('pending' as const),

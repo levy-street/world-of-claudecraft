@@ -1,5 +1,5 @@
 // Painted class emblems, one 256px WebP per class under public/ui/classes/<id>.webp,
-// normalized by scripts/convert_class_icons_webp.mjs (`npm run assets:classes`).
+// normalized with `node scripts/convert_class_icons_webp.mjs`.
 //
 // These are the "pick a class" marks: the crossed sword and axe, the totem, the antlered
 // crescent. They read at a glance in a rail of nine, which is what the class picker on the
@@ -7,12 +7,9 @@
 // turntable standing right above it, so the rail said "pick a face" rather than "pick a
 // class".
 //
-// Deliberately NOT the same thing as the procedural class CREST (icons.ts
-// CREST_RECIPES.class_<id>). The crest is a tiny generated badge, drawn onto a canvas
-// synchronously by unit_portrait_painter.ts for unit-frame portraits and used at ~16px as
-// the corner badge on a portrait chip; it stays procedural precisely because that path
-// cannot wait on an image decode. This art is for the surfaces that draw an <img> and can
-// afford the bytes.
+// The same paintings also back `class_<id>` crest identities. Unit portraits draw their
+// procedural recipe synchronously, then replace it after the WebP decodes, so callers keep
+// an immediate fallback without maintaining a second visual identity for each class.
 //
 // The id set is CLOSED, it is exactly PlayerClass, so this is a plain literal Set with no
 // fs at runtime, mirroring chrome_icon_art.ts. tests/class_icons.test.ts gates it against

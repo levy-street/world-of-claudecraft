@@ -283,8 +283,11 @@ painted with a generated RGBA map.
   of non-skinned node names to KEEP; omit it for creatures (keeps everything).
 - Bone names are sanitized by GLTFLoader (`handslot.r` to `handslotr`); `attach`
   resolution tries both. A missing bone ships the model without the prop.
-- Geometries/materials are **shared per-asset caches and never disposed**;
-  `dispose()` only releases this clone's mixer + Skeletons. YOU MUST call it on
-  despawn (online interest churn strands GPU bone textures otherwise).
+- Geometries are **shared per-asset caches and never disposed**. Shared tinted
+  materials are claim-counted (`tinted_material_cache_core.ts`): `dispose()`
+  releases this clone's mixer + Skeletons + its tinted-material claims, and the
+  bounded cache disposes a clone only once no visual mounts it. YOU MUST call
+  `dispose()` on despawn (online interest churn strands GPU bone textures and
+  pins tinted materials otherwise).
 - Never `Math.random` in *sim*, but here it's fine, this is presentation
   (bob phase, hit-clip pick). Never reach past `IWorld` into a concrete world.

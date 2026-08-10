@@ -18,6 +18,65 @@ export interface PrewarmResumeGroup<T> {
   roots: readonly T[];
 }
 
+/**
+ * A prefetch started ahead of its manifest entry (the sky HDRI fetch + worker
+ * decode), with synchronous settlement observation so the entry can decide
+ * inline-vs-defer without awaiting the network.
+ */
+export interface TrackedPrefetch {
+  task: Promise<void>;
+  isSettled(): boolean;
+  /** The rejection reason once the task has failed, else null. */
+  rejection(): unknown | null;
+}
+
+/** Wraps an in-flight prefetch so settlement is observable synchronously. */
+export function trackPrefetch(task: Promise<void>): TrackedPrefetch {
+  let settled = false;
+  let rejection: unknown = null;
+  task.then(
+    () => {
+      settled = true;
+    },
+    (error: unknown) => {
+      settled = true;
+      rejection = error ?? new Error('prewarm prefetch failed');
+    },
+  );
+  return {
+    task,
+    isSettled: () => settled,
+    rejection: () => rejection,
+  };
+}
+
+/**
+ * Bounded inline wait for a tracked prefetch: 'ready' when it settles within
+ * waitMs, 'pending' otherwise. The budget-hungry manifest entries after the
+ * caller keep their budget because the wait can never exceed waitMs; an
+ * Infinity budget awaits settlement outright (the finish-full-manifest arm).
+ * The sleeper is injectable so tests drive the clock deterministically.
+ */
+export async function waitForPrefetch(
+  prefetch: TrackedPrefetch,
+  waitMs: number,
+  sleeper: (ms: number) => Promise<void> = (ms) =>
+    new Promise((resolve) => setTimeout(resolve, ms)),
+): Promise<'ready' | 'pending'> {
+  if (prefetch.isSettled()) return 'ready';
+  if (waitMs <= 0) return 'pending';
+  const settledTask = prefetch.task.then(
+    () => undefined,
+    () => undefined,
+  );
+  if (!Number.isFinite(waitMs)) {
+    await settledTask;
+    return 'ready';
+  }
+  await Promise.race([settledTask, sleeper(waitMs)]);
+  return prefetch.isSettled() ? 'ready' : 'pending';
+}
+
 export interface PrewarmResumeHooks<T extends PrewarmResumeEntry> {
   idleSlot: () => Promise<unknown>;
   runUnit?: (unit: PrewarmResumeUnit) => void | Promise<void>;

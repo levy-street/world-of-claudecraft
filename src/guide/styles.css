@@ -2031,6 +2031,20 @@ h2.guide-related-h {
   border-radius: var(--g-radius-sm);
   border: 1px solid var(--g-border);
 }
+.guide-spec-icon-art {
+  display: block;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.guide-spec-icon-fallback {
+  display: grid;
+  place-items: center;
+  background: var(--g-bg);
+  color: var(--g-gold);
+  font-family: var(--g-font-display);
+  font-weight: 700;
+}
 .guide-spec-body {
   min-width: 0;
 }
@@ -3484,4 +3498,9 @@ a.guide-poi:hover {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--g-text-muted);
+}
+img.crest-image-fallback {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }

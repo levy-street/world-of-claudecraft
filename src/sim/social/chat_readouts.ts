@@ -132,16 +132,24 @@ export function zonesReadout(currentX: number, currentZ: number): string {
   return `Zones (${zones.length}): ${parts.join(', ')}.`;
 }
 // Self-only readout of a character's Ashen Coliseum standing. Reads only the
-// persisted PlayerMeta arena fields (no new state). Draws count as neither a
-// win nor a loss (see resolveArena), so "matches played" is wins + losses.
+// persisted PlayerMeta arena fields (no new state). A draw IS a match played:
+// it moves the rating and it is the third figure of the record every other
+// arena surface shows, so counting it only in the denominator here would leave
+// /arena saying "no matches played yet" to someone the ladder already lists.
 export function arenaReadout(meta: PlayerMeta): string {
-  const part = (label: ArenaFormat, rating: number, wins: number, losses: number): string => {
-    const played = wins + losses;
+  const part = (
+    label: ArenaFormat,
+    rating: number,
+    wins: number,
+    losses: number,
+    draws: number,
+  ): string => {
+    const played = wins + losses + draws;
     if (played <= 0) return `${label} Rating ${rating} - no matches played yet`;
     const pct = Math.round((wins / played) * 100);
-    return `${label} Rating ${rating} - ${wins} wins, ${losses} losses (${pct}% win rate)`;
+    return `${label} Rating ${rating} - ${wins} wins, ${losses} losses, ${draws} draws (${pct}% win rate)`;
   };
-  return `Arena: ${part('1v1', meta.arenaRating, meta.arenaWins, meta.arenaLosses)}. ${part('2v2', meta.arena2v2Rating, meta.arena2v2Wins, meta.arena2v2Losses)}.`;
+  return `Arena: ${part('1v1', meta.arenaRating, meta.arenaWins, meta.arenaLosses, meta.arenaDraws)}. ${part('2v2', meta.arena2v2Rating, meta.arena2v2Wins, meta.arena2v2Losses, meta.arena2v2Draws)}.`;
 }
 export function buybackReadout(meta: PlayerMeta): string {
   const slots = meta.vendorBuyback.filter((s) => ITEMS[s.itemId] && s.count > 0);

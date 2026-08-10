@@ -333,7 +333,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Dos equipos de cinco. Roba la bandera enemiga y llévala a tu fortaleza. El primero en llegar a 3 capturas gana. Reúne un grupo de hasta 5 y entra en cola junto a ellos; consigue Runas de Velocidad y esquiva por la cobertura para perder a tus perseguidores.',
   'hudChrome.bg.queuedParty': 'Grupo de {count}.',
-  'hudChrome.bg.ratingSummary': 'Índice. {wins} victorias / {losses} derrotas',
+  'hudChrome.bg.ratingSummary': 'Índice. {wins} victorias / {losses} derrotas / {draws} empates',
   'hudChrome.bg.respawnIn': 'Próxima oleada: reapareces en {seconds}',
   'hudChrome.bg.resultDefeat': 'Derrota',
   'hudChrome.bg.resultDraw': 'Empate',
@@ -4262,7 +4262,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Te emparejarán con el retador en línea de índice más cercano y te teletransportarán a la arena. Gana para subir; el primero en ceder (1 de salud) pierde. Vuelves exactamente donde entraste en cola.',
   'hud.arena.ladderAllTime': 'Clasificación - histórica',
   'hud.arena.ladderOnline': 'Clasificación - en línea',
-  'hud.arena.ratingSummary': 'Índice - {wins} victorias / {losses} derrotas',
+  'hud.arena.ratingSummary': 'Índice - {wins} victorias / {losses} derrotas / {draws} empates',
   'hud.arena.statusCountdown': 'Prepárate...',
   'hud.arena.statusReturning': 'Volviendo al mundo... {seconds}',
   'hud.arena.statusFight': '¡Lucha hasta la rendición!',

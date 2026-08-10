@@ -10,6 +10,12 @@ Live-surface note (binding): Dormant. The new recipes are visible in the craftin
 every one has at least one reagent unobtainable until go-live (farm produce or husks
 nobody can grow yet). The phase verifies explicitly that no new recipe is craftable
 from vendor goods alone.
+[AMENDED by deviation (ai), state.md wins: the blanket "unobtainable until go-live"
+claim holds for the DISHES only. The tonic recipe is craftable from wild herbs
+before go-live because D7 locks its inputs to herbs; the enforced pins are the
+vendor-goods-alone pair (unstocked reagent + no-buyValue reagent per row), and the
+tonic's pre-go-live dormancy is economic (its only sink is the plant knob, seeds
+have no faucet until Phase 9, and crafting it is a strict gold loss).]
 
 ### Starter Prompt
 

@@ -69,10 +69,11 @@ export interface PainterHostPresentation {
  * Canvas painter touches the context directly and uses these writers only for the
  * DOM bits it owns (e.g. a `#zone-label` text node).
  *
- * setText/setDisplay/setTransform/setWidth are SINGLE-SLOT (one cached string per
- * element, since each owns one DOM facet). setStyleProp/toggleClass/setAttr are
- * MULTI-SLOT (keyed per (element, prop) / (element, class) / (element, attr)), since
- * one element holds many custom properties, toggled classes, and attributes.
+ * setText/setDisplay/setTransform/setWidth are SINGLE-SLOT (one cached
+ * (kind, value) entry per element, since each owns one DOM facet).
+ * setStyleProp/toggleClass/setAttr are MULTI-SLOT (keyed per (element, prop) /
+ * (element, class) / (element, attr)), since one element holds many custom
+ * properties, toggled classes, and attributes.
  */
 export interface PainterHostWriters {
   /** Set `el.textContent`, eliding a repeat of the same text. */
@@ -105,33 +106,81 @@ export interface PainterHostWriters {
 }
 
 /**
+ * Which of the four single-slot DOM facets last wrote an element. Compared as a
+ * component beside the raw value, so the elision check never composes a key
+ * string.
+ */
+export type SingleSlotKind = 'text' | 'display' | 'transform' | 'width';
+
+/**
+ * One single-slot cache entry: the writer kind plus the raw value it last
+ * wrote. A value change MUTATES the entry in place (this cache is a deliberate
+ * mutable hot-path structure), so after an element's first routed write both
+ * the skip path and the repeat-write path allocate nothing.
+ */
+export interface SingleSlotEntry {
+  kind: SingleSlotKind;
+  value: string;
+}
+
+/** The shared single-slot elision cache (Hud's private `hotWriteCache` field). */
+export type SingleSlotCache = Map<HTMLElement, SingleSlotEntry>;
+
+/**
+ * The single-slot elision decision, shared VERBATIM by Hud's private writers and
+ * the facet below over the SAME cache, so the two can never disagree on an
+ * element. Returns true when the caller must perform the DOM write (the cache is
+ * already updated), false when the write elides. Allocation-free after an
+ * element's first routed write BY CONTRACT: it compares the (kind, value)
+ * components directly and never composes a `display:` + value style key, which
+ * the old shape built BEFORE the skip check, allocating a discarded string on
+ * every ELIDED call. tests/painter_host.test.ts pins both the decision table and
+ * the allocation-free skip path.
+ */
+export function shouldWriteSingleSlot(
+  cache: SingleSlotCache,
+  el: HTMLElement,
+  kind: SingleSlotKind,
+  value: string,
+): boolean {
+  const entry = cache.get(el);
+  if (entry === undefined) {
+    cache.set(el, { kind, value });
+    return true;
+  }
+  if (entry.kind === kind && entry.value === value) return false;
+  entry.kind = kind;
+  entry.value = value;
+  return true;
+}
+
+/**
  * Build the write-elision facet over the supplied caches. The four single-slot
- * writers share `cache` (one string per element); setStyleProp/toggleClass/setAttr
- * use the multi-slot `stylePropCache` / `classCache` / `attrCache` (a per-element
- * inner map keyed by prop / class / attr). Every closure reports each real write via
- * `onWrite` and each elided write via `onSkip`, so a host that builds the facet from
- * its own caches + counters keeps a single skip-rate across its direct writes and
- * the painter writes. The key scheme matches Hud's private writers exactly (raw text
- * for setText; `display:`/`transform:`/`width:` prefixes for the style writers; the
- * raw value for setStyleProp; `on`/`off` for toggleClass; the raw value for setAttr)
- * so the two never disagree on the same element.
+ * writers share `cache` (one (kind, value) entry per element, decided by
+ * `shouldWriteSingleSlot` above, the same helper Hud's private writers call);
+ * setStyleProp/toggleClass/setAttr use the multi-slot `stylePropCache` /
+ * `classCache` / `attrCache` (a per-element inner map keyed by prop / class /
+ * attr, compared against the raw value). Every closure reports each real write
+ * via `onWrite` and each elided write via `onSkip`, so a host that builds the
+ * facet from its own caches + counters keeps a single skip-rate across its
+ * direct writes and the painter writes. No writer composes a key string on any
+ * path: an elided frame allocates nothing.
  */
 export function makeWriterFacet(
-  cache: Map<HTMLElement, string>,
+  cache: SingleSlotCache,
   stylePropCache: Map<HTMLElement, Map<string, string>>,
   classCache: Map<HTMLElement, Map<string, string>>,
   attrCache: Map<HTMLElement, Map<string, string>>,
   onWrite: () => void,
   onSkip: () => void,
 ): PainterHostWriters {
-  const shouldWrite = (el: HTMLElement, key: string): boolean => {
-    if (cache.get(el) === key) {
-      onSkip();
-      return false;
+  const shouldWrite = (el: HTMLElement, kind: SingleSlotKind, value: string): boolean => {
+    if (shouldWriteSingleSlot(cache, el, kind, value)) {
+      onWrite();
+      return true;
     }
-    cache.set(el, key);
-    onWrite();
-    return true;
+    onSkip();
+    return false;
   };
   // Multi-slot variant: resolves (or lazily creates) the per-element inner map and
   // elides per (element, slot). Used by setStyleProp/toggleClass so one element can
@@ -157,16 +206,16 @@ export function makeWriterFacet(
   };
   return {
     setText: (el, text) => {
-      if (shouldWrite(el, text)) el.textContent = text;
+      if (shouldWrite(el, 'text', text)) el.textContent = text;
     },
     setDisplay: (el, display) => {
-      if (shouldWrite(el, `display:${display}`)) el.style.display = display;
+      if (shouldWrite(el, 'display', display)) el.style.display = display;
     },
     setTransform: (el, transform) => {
-      if (shouldWrite(el, `transform:${transform}`)) el.style.transform = transform;
+      if (shouldWrite(el, 'transform', transform)) el.style.transform = transform;
     },
     setWidth: (el, width) => {
-      if (shouldWrite(el, `width:${width}`)) el.style.width = width;
+      if (shouldWrite(el, 'width', width)) el.style.width = width;
     },
     setStyleProp: (el, prop, value) => {
       if (shouldWriteSlot(stylePropCache, el, prop, value)) el.style.setProperty(prop, value);

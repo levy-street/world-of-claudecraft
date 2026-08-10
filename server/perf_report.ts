@@ -347,13 +347,28 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
     'compileTimedOut',
     'manifestPlanned',
     'manifestCompleted',
+    'manifestPartial',
     'manifestTimedOut',
     'manifestFailed',
-    'timedOutEntryIds',
-    'failedEntryIds',
   ];
   for (const key of scalarKeys) {
     if (value[key] !== undefined) out[key] = value[key];
+  }
+  // The three entry-id lists are client-supplied arrays and must never be
+  // copied verbatim like the scalars above (bounded only by the body cap):
+  // same bounds as the entries block below, non-arrays dropped outright.
+  // Deliberate asymmetry with the scalar copy: the manifestPartial /
+  // manifestTimedOut / manifestFailed COUNTS stay authoritative and uncapped
+  // (clamping one would misreport the true count), while these id lists are
+  // bounded SAMPLES. A stored count larger than its list length is therefore
+  // the documented shape of this signal, not self-contradiction.
+  for (const key of ['partialEntryIds', 'timedOutEntryIds', 'failedEntryIds']) {
+    const ids = value[key];
+    if (!Array.isArray(ids)) continue;
+    out[key] = ids
+      .slice(0, 24)
+      .filter((id): id is string => typeof id === 'string')
+      .map((id) => textIn(id, 80));
   }
   const entries = Array.isArray(value.entries)
     ? value.entries
@@ -372,6 +387,8 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
       remainingMsAfter: nullableNumberIn(entry.remainingMsAfter, 0, 60_000),
       programDelta: nullableNumberIn(entry.programDelta, -10_000, 10_000),
       textureDelta: nullableNumberIn(entry.textureDelta, -10_000, 10_000),
+      workDone: nullableNumberIn(entry.workDone, 0, 100_000),
+      workPlanned: nullableNumberIn(entry.workPlanned, 0, 100_000),
       detail: textIn(entry.detail, 160),
     }));
   return out;

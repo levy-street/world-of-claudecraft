@@ -1054,7 +1054,7 @@ export const sv_SE: EnTranslations = {
       "blurb": "Två förfallna fästningar möter varandra över en murad sänka i skuggan av Törntoppen: Karmosinröd i söder, Azurblå i norr, och den äldre Ruingården mitt emellan som ingen av dem någonsin har hållit. Fem mot fem, ett banér var, och den som först för hem tre av deras vinner slaget.",
       "modeTag": "5 mot 5, erövra flaggan",
       "offlineNote": "Törnhålefälten synkroniseras. Kön öppnas när riket svarar.",
-      "ratingSummary": "Rankning. {wins} vinster / {losses} förluster",
+      "ratingSummary": "Rankning. {wins} vinster / {losses} förluster / {draws} oavgjorda",
       "careerCaptures": "Erövringar totalt: {count}",
       "enterQueue": "Ställ dig i kön",
       "enterQueueParty": "Ställ dig i kön (grupp om {count})",
@@ -2362,7 +2362,8 @@ export const sv_SE: EnTranslations = {
       "resonantHide": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre läderrustning.",
       "resonantLinks": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre ringbrynja.",
       "resonantSteel": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre närstridsvapen.",
-      "resonantTimber": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre stavar, trollstavar, bågar och armborst."
+      "resonantTimber": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre stavar, trollstavar, bågar och armborst.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const sv_SE: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -8206,7 +8209,7 @@ export const sv_SE: EnTranslations = {
       "queueNote": "Du matchas med den närmast rankade utmanaren som är uppkopplad och teleporteras sedan till sanden. Vinn för att klättra; först att ge upp (1 hälsa) förlorar. Du återvänder exakt dit du ställde dig i kö.",
       "ladderAllTime": "Stege - Genom tiderna",
       "ladderOnline": "Stege - Uppkopplade",
-      "ratingSummary": "Rankning - {wins} vinster / {losses} förluster",
+      "ratingSummary": "Rankning - {wins} vinster / {losses} förluster / {draws} oavgjorda",
       "statusCountdown": "Stålsätt dig...",
       "statusReturning": "Återvänder till världen... {seconds}",
       "statusFight": "Strid till underkastelse!",
@@ -11514,6 +11517,30 @@ export const sv_SE: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

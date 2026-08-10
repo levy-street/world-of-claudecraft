@@ -212,6 +212,7 @@ function arenaInfoWith(match: ArenaInfo['match']): ArenaInfo {
     rating: 0,
     wins: 0,
     losses: 0,
+    draws: 0,
     standings: {} as ArenaInfo['standings'],
     format: null,
     queued: false,

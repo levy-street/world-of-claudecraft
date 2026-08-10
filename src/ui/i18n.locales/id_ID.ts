@@ -313,7 +313,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Dua tim beranggota lima. Curi bendera musuh dan bawa ke bentengmu. Tim pertama yang mencapai 3 rebutan menang. Berkelompoklah hingga 5 orang dan masuk antrean bersama; ambil Rune Kecepatan dan manfaatkan perlindungan medan untuk melepaskan diri dari pengejar.',
   'hudChrome.bg.queuedParty': 'Party beranggota {count}.',
-  'hudChrome.bg.ratingSummary': 'Rating. {wins} menang / {losses} kalah',
+  'hudChrome.bg.ratingSummary': 'Rating. {wins} menang / {losses} kalah / {draws} seri',
   'hudChrome.bg.respawnIn': 'Gelombang berikutnya: muncul kembali dalam {seconds}',
   'hudChrome.bg.resultDefeat': 'Kekalahan',
   'hudChrome.bg.resultDraw': 'Seri',
@@ -7216,7 +7216,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.arena.playerLevelClassTitle': '{name} - Lv {level} {className}',
   'hud.arena.queueNote':
     'Kamu akan dipasangkan dengan penantang daring berperingkat terdekat, lalu diteleportasi ke pasir arena. Menang untuk naik; yang pertama menyerah (1 nyawa) kalah. Kamu kembali persis ke tempat kamu mengantre.',
-  'hud.arena.ratingSummary': 'Peringkat - {wins} menang / {losses} kalah',
+  'hud.arena.ratingSummary': 'Peringkat - {wins} menang / {losses} kalah / {draws} seri',
   'hud.arena.searching': 'Mencari lawan... ({count} dalam antrean)',
   'hud.arena.statusCountdown': 'Bersiaplah...',
   'hud.arena.statusFight': 'Bertarung sampai menyerah!',

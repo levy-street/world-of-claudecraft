@@ -32,6 +32,7 @@ import {
   type TalentSpecIconRef,
   talentIconDataUrl,
   talentRowOptionIconRef,
+  talentSpecIconCssBackground,
   talentSpecIconRef,
 } from './talent_icons';
 import { buildTalentsView, type TalentSpecVM, type TalentsView } from './talents_view';
@@ -108,13 +109,11 @@ function signatureName(abilityId: string): string {
 }
 
 function specIconHtml(ref: TalentSpecIconRef): string {
-  if (ref.kind === 'image') {
-    return `<span class="ts-icon ts-icon-art" style="background-image:url(${esc(ref.url)})" aria-hidden="true"></span>`;
+  if (ref.kind === 'text') {
+    return `<span class="ts-icon" aria-hidden="true">${esc(ref.text)}</span>`;
   }
-  if (ref.kind !== 'text') {
-    return `<span class="ts-icon ts-icon-art" style="background-image:url(${iconDataUrl(ref.kind, ref.id)})" aria-hidden="true"></span>`;
-  }
-  return `<span class="ts-icon" aria-hidden="true">${esc(ref.text)}</span>`;
+  const background = talentSpecIconCssBackground(ref);
+  return `<span class="ts-icon ts-icon-art" style="background-image:${esc(background ?? '')}" aria-hidden="true"></span>`;
 }
 
 export class TalentsWindow {

@@ -1613,7 +1613,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Ancestral Mending',
           description:
             'Taking a hit for at least 15% of your maximum health instantly heals you for 12% of your maximum health. 20 sec internal cooldown.',
-          icon: 'lightning_shield',
+          icon: 'healing_wave',
           effect: {
             proc: {
               id: 'sha_elemental_warding',
@@ -1829,7 +1829,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r14_ruin',
           name: 'Ashen Focus',
           description: 'Sear deals 25% more damage and costs 25% less.',
-          icon: 'shadowburn',
+          icon: 'searing_pain',
           effect: { ability: [{ ability: 'searing_pain', dmgPct: 0.25, costPct: -0.25 }] },
         },
         {
@@ -1886,7 +1886,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r17_demonic_resilience',
           name: 'Deep Hunger',
           description: 'Consume deals 50% more damage.',
-          icon: 'demon_skin',
+          icon: 'drain_life',
           effect: { ability: [{ ability: 'drain_life', dmgPct: 0.5 }] },
         },
       ],

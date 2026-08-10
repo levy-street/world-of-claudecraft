@@ -168,6 +168,35 @@ describe('nameplate canvas surface', () => {
     expect(traces[0].drawImage).toHaveBeenCalledTimes(2);
   });
 
+  it('draws the byte-identical prebuilt guild wrapper, redrawn only on change', () => {
+    const parent = document.createElement('div');
+    const surface = new NameplateCanvasSurface(parent);
+    const state = createNameplateCanvasState();
+    state.initialized = true;
+    state.name = 'Guilded Hero';
+    // resolveContent prebuilds the label alongside guild (its only writer);
+    // drawBase consumes it without allocating.
+    state.guild = 'The Testers';
+    state.guildLabel = '<The Testers>';
+
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+
+    const drawnText = (): string[] =>
+      traces.flatMap((trace) => trace.fillText.mock.calls.map(([value]) => value as string));
+    // Same content as the old per-frame template build: the exact `<...>` form
+    // rasterized ONCE, then re-blitted from the sprite cache on later frames.
+    expect(drawnText().filter((text) => text === '<The Testers>')).toHaveLength(1);
+
+    state.guild = 'New Banner';
+    state.guildLabel = '<New Banner>';
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    expect(drawnText()).toContain('<New Banner>');
+  });
+
   it('rasterizes text at capped high DPR and blits it at logical dimensions', () => {
     const parent = document.createElement('div');
     const surface = new NameplateCanvasSurface(parent);
@@ -413,6 +442,7 @@ describe('nameplate canvas surface', () => {
       name: 'Canvas Boss',
       level: '63+',
       guild: 'The Testers',
+      guildLabel: '<The Testers>',
       title: 'Gate Keeper',
       marker: '!',
       markerTone: 'active',
@@ -481,6 +511,7 @@ describe('nameplate canvas surface', () => {
         initialized: true,
         name: 'High Contrast Hero',
         guild: 'Readers',
+        guildLabel: '<Readers>',
         title: 'Visible',
         marker: '!',
         hpVisible: true,

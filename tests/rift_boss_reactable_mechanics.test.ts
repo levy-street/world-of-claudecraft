@@ -379,6 +379,75 @@ describe('on-hit control procs respect escape windows', () => {
     }
     expect(moved).toBe(true);
   });
+
+  // The suppression is INSTANCE-wide, not swinger-scoped: a dais guard's root
+  // or stun during the boss's death-zone fuse eats the escape window exactly
+  // like the boss's own procs would (the fuse math assumes an unimpaired
+  // runner and samples impairment only at spawn), which is how an S-rank
+  // Venom Pool stayed a coin toss after the boss's own kit was suppressed
+  // (v0.36.0 player feedback: "adding stuns, slows, ensnares into the mix").
+  function riftGuardOnBossFloor(): { sim: Sim; boss: Entity; guard: Entity } {
+    const { sim, mob: boss } = enterRiftWithBoss('rift_boss_venom');
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    const guard = createMob(920500, MOBS.rift_venom_weaver, 22, { ...sim.player.pos });
+    guard.spawnPos = { ...sim.player.pos };
+    guard.aiState = 'attack';
+    guard.aggroTargetId = sim.playerId;
+    guard.inCombat = true;
+    addThreat(guard, sim.playerId, 1000);
+    (sim as any).addEntity(guard);
+    inst.mobIds.push(guard.id);
+    return { sim, boss, guard };
+  }
+
+  it("a dais guard's web root skips while the BOSS's telegraph is in flight", () => {
+    const { sim, boss, guard } = riftGuardOnBossFloor();
+    boss.escapeWindowUntil = 1e9;
+    for (let i = 0; i < 80; i++) {
+      sim.player.hp = sim.player.maxHp;
+      (sim as any).mobSwing(guard, sim.player);
+    }
+    expect(
+      sim.player.auras.find((a) => a.id === 'ensnare_rift_venom_weaver'),
+      'guard root suppressed by the boss window',
+    ).toBeUndefined();
+  });
+
+  it("the guard's web root still lands with no boss telegraph in flight (same seed control)", () => {
+    const { sim, guard } = riftGuardOnBossFloor();
+    let rooted = false;
+    for (let i = 0; i < 80 && !rooted; i++) {
+      sim.player.hp = sim.player.maxHp;
+      (sim as any).mobSwing(guard, sim.player);
+      rooted = sim.player.auras.some((a) => a.id === 'ensnare_rift_venom_weaver');
+    }
+    expect(rooted, 'no window means the guard kit plays normally').toBe(true);
+  });
+
+  it('an open-world mob with the same kit is never suppressed by rift state', () => {
+    // The predicate must key on the swinger's INSTANCE, not on any rift boss
+    // anywhere in the world: an overworld spider keeps its web while some
+    // unrelated rift party is dodging a zone.
+    const { sim, boss } = riftGuardOnBossFloor();
+    boss.escapeWindowUntil = 1e9;
+    const outside = createMob(920600, MOBS.rift_venom_weaver, 22, {
+      x: sim.player.pos.x,
+      y: sim.player.pos.y,
+      z: sim.player.pos.z,
+    });
+    outside.aiState = 'attack';
+    outside.aggroTargetId = sim.playerId;
+    outside.inCombat = true;
+    addThreat(outside, sim.playerId, 1000);
+    (sim as any).addEntity(outside); // deliberately NOT joined to inst.mobIds
+    let rooted = false;
+    for (let i = 0; i < 80 && !rooted; i++) {
+      sim.player.hp = sim.player.maxHp;
+      (sim as any).mobSwing(outside, sim.player);
+      rooted = sim.player.auras.some((a) => a.id === 'ensnare_rift_venom_weaver');
+    }
+    expect(rooted, 'a mob outside the instance is untouched').toBe(true);
+  });
 });
 
 describe('rift boss cleave is a frontal arc', () => {

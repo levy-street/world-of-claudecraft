@@ -7,6 +7,7 @@ import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { GFX } from '../gfx';
 import { resampleHdrRgba } from '../hdr_resample';
+import { classifyGltfKtx2Textures, dismissKtx2Source } from './ktx2_mip_release';
 import { ktx2Loader } from './ktx2_support';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
 import { assetUrl } from './media';
@@ -185,6 +186,11 @@ export function loadGltf(url: string): Promise<GLTF> {
     }).then(
       (gltf) => {
         polishGltfTextures(gltf);
+        // Classify every KTX2 texture for post-upload mip release (world-only
+        // categories) or source dismissal (everything a preview/portrait/armory
+        // renderer can also upload). Runs here, in the parse's own resolve
+        // chain, so classification always precedes the first GPU upload.
+        classifyGltfKtx2Textures(gltf, resolved);
         recordAssetLoad('gltf', resolved, startedAt);
         return gltf;
       },
@@ -462,6 +468,10 @@ export function loadKtx2Texture(url: string): Promise<THREE.CompressedTexture> {
       );
     }).then(
       (tex) => {
+        // Standalone KTX2 atlases (character skins) draw in the character
+        // preview, portrait and armory renderers too, so their CPU mip chains
+        // must stay resident: dismiss the stashed restore source, never arm.
+        dismissKtx2Source(tex);
         recordAssetLoad('texture', resolved, startedAt);
         return tex;
       },

@@ -63,15 +63,26 @@ export const FEAR_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
 /** Plain (non-fear) cc abilities whose landed moment now has a dedicated
  *  recording (fx:'ccImpact'): Sundering Gavel/hammer_of_justice (stun),
  *  Gripping Roots/entangling_roots (root), Dirt Toss/blind (incapacitate),
- *  Gut Punch/cheap_shot (stun, the stealth opener). All four are archetype
- *  'cc' (normally uncovered). */
+ *  Gut Punch/cheap_shot (stun, the stealth opener), Low Blow/kidney_shot
+ *  (stun, reuses cheap_shot's recording), and sap (incapacitate). All six
+ *  are archetype 'cc' (normally uncovered), except kidney_shot, whose real
+ *  VFX archetype is 'strike' (already covered by RECORDED_IMPACT_ARCHETYPES),
+ *  so its membership here is harmless, consistent bookkeeping rather than
+ *  load-bearing. */
 export const CC_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
   'hammer_of_justice',
   'entangling_roots',
   'blind',
   'cheap_shot',
+  'kidney_shot',
   'sap',
 ]);
+
+/** Ground-zone abilities (groundAoE, effect_dispatch.ts) whose pulse now has a
+ *  dedicated recording (fx:'tick', combat_sfx.ts's GROUND_TICK_ABILITY_CUES):
+ *  Meteor's single delayed hit. Every other zone (Consecration, Blizzard's
+ *  damage pulse) has no recording and keeps the procedural 'pulse' voice. */
+export const PULSE_IMPACT_ABILITIES: ReadonlySet<string> = new Set(['meteor']);
 
 /** The six schools with a recorded launch whoosh (combat_sfx.ts SCHOOL_CUES
  *  .projectile: proj_fire, proj_frost, proj_arcane, proj_shadow, proj_holy,
@@ -136,9 +147,13 @@ export function isAbilityMomentRecorded(
     // that intent instead of sneaking a synthetic sting back in.
     case 'crit':
       return true;
-    // No recording covers a cast-windup bed, a zone re-hit pulse, a creature
-    // apparition call, or set-piece motif foley: these are what the ability
-    // VFX work actually adds, so they keep their procedural voice.
+    // Meteor's one delayed zone hit now has a dedicated recording (see
+    // PULSE_IMPACT_ABILITIES); every other zone re-hit pulse has none.
+    case 'pulse':
+      return !!ctx.abilityId && PULSE_IMPACT_ABILITIES.has(ctx.abilityId);
+    // No recording covers a cast-windup bed, a creature apparition call, or
+    // set-piece motif foley: these are what the ability VFX work actually
+    // adds, so they keep their procedural voice.
     default:
       return false;
   }

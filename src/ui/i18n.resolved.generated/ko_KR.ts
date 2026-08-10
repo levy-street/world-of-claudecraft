@@ -1054,7 +1054,7 @@ export const ko_KR: EnTranslations = {
       "blurb": "가시봉 그늘에 성벽으로 둘러싸인 분지를 사이에 두고 두 폐허가 된 요새가 마주 본다. 남쪽은 크림슨, 북쪽은 애저, 그 사이의 오래된 폐허 안뜰은 아직 누구도 차지하지 못했다. 5대 5, 깃발은 하나씩. 상대의 깃발을 먼저 세 번 가져오는 쪽이 전장을 차지한다.",
       "modeTag": "5v5 깃발 뺏기",
       "offlineNote": "쏜할로우 평원 동기화 중입니다. 서버 응답 후 대기열이 열립니다.",
-      "ratingSummary": "레이팅. {wins}승 / {losses}패",
+      "ratingSummary": "레이팅. {wins}승 / {losses}패 / {draws}무",
       "careerCaptures": "통산 탈취: {count}",
       "enterQueue": "대기열 참가",
       "enterQueueParty": "대기열 참가({count}인 파티)",
@@ -2362,7 +2362,8 @@ export const ko_KR: EnTranslations = {
       "resonantHide": "마법부여 재료. 희귀 이상 가죽 방어구의 마력을 추출해 얻습니다.",
       "resonantLinks": "마법부여 재료. 희귀 이상 사슬 방어구의 마력을 추출해 얻습니다.",
       "resonantSteel": "마법부여 재료. 희귀 이상 근접 무기의 마력을 추출해 얻습니다.",
-      "resonantTimber": "마법부여 재료. 희귀 이상 지팡이, 마법봉, 활, 석궁의 마력을 추출해 얻습니다."
+      "resonantTimber": "마법부여 재료. 희귀 이상 지팡이, 마법봉, 활, 석궁의 마력을 추출해 얻습니다.",
+      "growthTonic": "농사 용품. 심을 때 사용하면 수확이 늘어날 수 있습니다."
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const ko_KR: EnTranslations = {
     },
     "bgOffer": {
       "title": "쏜할로우 평원이 준비되었습니다",
+      "backfillTitle": "쏜할로우 평원에 전사가 필요합니다",
+      "backfillBody": "이 전투는 이미 진행 중입니다. 인원이 부족한 쪽에 합류하며, 이 전투는 평점에 영향을 주지 않습니다.",
       "accepted": "{size}명 중 {accepted}명 수락",
       "remaining": "응답까지 {seconds}초",
       "accept": "수락",
@@ -8206,7 +8209,7 @@ export const ko_KR: EnTranslations = {
       "queueNote": "온라인 중인 가장 가까운 평점의 도전자와 매칭된 뒤 모래장으로 순간이동합니다. 승리하면 순위가 오르고, 먼저 항복한 쪽(생명력 1)이 패배합니다. 대기열에 들어간 바로 그 자리로 돌아옵니다.",
       "ladderAllTime": "순위표 - 전체",
       "ladderOnline": "순위표 - 온라인",
-      "ratingSummary": "평점 - {wins}승 / {losses}패",
+      "ratingSummary": "평점 - {wins}승 / {losses}패 / {draws}무",
       "statusCountdown": "마음을 다잡으세요...",
       "statusReturning": "세계로 돌아가는 중... {seconds}",
       "statusFight": "항복할 때까지 싸우세요!",
@@ -11514,6 +11517,30 @@ export const ko_KR: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "오스뮴 괭이"
+      },
+      "vale_hearth_loaf": {
+        "name": "골짜기 화덕빵"
+      },
+      "eastbrook_root_pottage": {
+        "name": "이스트브룩 뿌리채소 스튜"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "펜브리지 쌀밥"
+      },
+      "fenbridge_beet_braise": {
+        "name": "펜브리지 비트 조림"
+      },
+      "highwatch_barley_bannock": {
+        "name": "하이워치 보리 납작빵"
+      },
+      "highwatch_gourd_soup": {
+        "name": "하이워치 서리 박 수프"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "상록 정원 태양멜론 타르트"
+      },
+      "evergarden_harvest_platter": {
+        "name": "상록 정원 수확 접시"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

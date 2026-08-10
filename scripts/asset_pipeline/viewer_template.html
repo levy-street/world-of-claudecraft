@@ -354,7 +354,7 @@ function inspectorHtml(a) {
   if (a.category === 'weapons') {
     h += `<tr><td>grip family</td><td>${r.gripFamily ? `<span class="pill gold">${esc(r.gripFamily)}</span>` : '<span class="pill amber">not in KAYKIT_WEAPON_ACCESSORY</span>'}</td></tr>`;
     h += `<tr><td>item ids</td><td>${pills(r.itemIds, 'green')}</td></tr>`;
-    h += `<tr><td>HUD icon</td><td>${r.icon ? `<img src="${esc(pubUrl(r.icon))}" width="40" style="vertical-align:middle;border-radius:4px" alt="icon" /> ${esc(r.icon)}` : '<span class="pill amber">missing</span>'}</td></tr>`;
+    h += `<tr><td>Model preview</td><td>${r.icon ? `<img src="${esc(pubUrl(r.icon))}" width="40" style="vertical-align:middle;border-radius:4px" alt="model preview" /> ${esc(r.icon)}` : '<span class="pill amber">missing</span>'}</td></tr>`;
     if (r.visualKeys?.length) h += `<tr><td>visual attach</td><td>${pills(r.visualKeys, 'blue')}</td></tr>`;
   } else if (a.kind === 'skin' && a.category === 'skins') {
     h += `<tr><td>model</td><td>${esc(a.model)}.glb (classes: ${esc((a.classes ?? []).join(', '))})</td></tr>`;

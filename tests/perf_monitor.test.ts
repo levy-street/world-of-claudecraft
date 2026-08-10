@@ -127,6 +127,35 @@ describe('perf monitor heap sawtooth sampling', () => {
     perf.tick(3000);
     expect(perf.snapshot(3000).heapSawtooth).toBeNull();
   });
+
+  it('exposes the heap floor trend only through the enabled dev hitch report', () => {
+    (performance as any).memory = {
+      usedJSHeapSize: 100 * MB,
+      totalJSHeapSize: 200 * MB,
+      jsHeapSizeLimit: 4096 * MB,
+    };
+    const disabled = new PerfMonitor(null);
+    expect(disabled.hitchReport()).toBeNull();
+
+    location.search = '?perf';
+    const enabled = new PerfMonitor(null);
+    enabled.tick(1000);
+    (performance as any).memory.usedJSHeapSize = 130 * MB;
+    enabled.tick(2000);
+    (performance as any).memory.usedJSHeapSize = 105 * MB;
+    enabled.tick(3000);
+    expect(enabled.hitchReport()).toEqual({
+      heapSawtooth: expect.objectContaining({
+        gcDropCount: 1,
+        allocRateMbPerSec: 15,
+      }),
+      heapFloor: { startMb: 100, endMb: 105, growthMb: 5, floorSamples: 2 },
+      heapFloorSeries: [
+        { atMs: 1000, floorMb: 100 },
+        { atMs: 3000, floorMb: 105 },
+      ],
+    });
+  });
 });
 
 describe('perf monitor external dev-trace spans', () => {

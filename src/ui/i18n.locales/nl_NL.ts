@@ -319,7 +319,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Twee teams van vijf. Steel het vaandel van de vijand en breng het naar je eigen burcht. Eerste tot 3 veroveringen wint. Vorm een groep tot 5 en meld je samen aan; grijp Sprintrunen en gebruik de dekking om je achtervolgers kwijt te raken.',
   'hudChrome.bg.queuedParty': 'Groep van {count}.',
-  'hudChrome.bg.ratingSummary': 'Rating. {wins} overwinningen / {losses} nederlagen',
+  'hudChrome.bg.ratingSummary':
+    'Rating. {wins} overwinningen / {losses} nederlagen / {draws} gelijk',
   'hudChrome.bg.respawnIn': 'Volgende golf: respawnt over {seconds}',
   'hudChrome.bg.resultDefeat': 'Nederlaag',
   'hudChrome.bg.resultDraw': 'Gelijkspel',
@@ -6610,7 +6611,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.arena.playerLevelClassTitle': '{name} - Nv {level} {className}',
   'hud.arena.queueNote':
     'Je wordt gekoppeld aan de dichtstbijzijnde uitdager met vergelijkbare rang die online is en vervolgens naar het zand geteleporteerd. Win om te stijgen; wie als eerste opgeeft (1 levenspunt) verliest. Je keert exact terug waar je je in de wachtrij aansloot.',
-  'hud.arena.ratingSummary': 'Waardering - {wins} winsten / {losses} verliezen',
+  'hud.arena.ratingSummary': 'Waardering - {wins} winsten / {losses} verliezen / {draws} gelijk',
   'hud.arena.searching': 'Op zoek naar een tegenstander... ({count} in wachtrij)',
   'hud.arena.statusCountdown': 'Maak je klaar...',
   'hud.arena.statusFight': 'Vecht tot de overgave!',

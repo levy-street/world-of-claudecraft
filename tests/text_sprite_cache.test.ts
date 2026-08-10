@@ -353,21 +353,104 @@ describe('text_sprite_cache: cache identity', () => {
     expect(cache.size).toBe(6);
   });
 
+  it('serves a fill-only label from the cache on the second draw', () => {
+    const trace = newTrace();
+    installDocument(trace);
+    const cache = new TextSpriteCache();
+    const ctx = targetContext(trace);
+
+    // The map window's quest-badge digits are exactly this shape: { font, fill },
+    // no stroke. lookup and bucketFor must derive the SAME width key on the
+    // stroke-undefined arm (outlineWidth, 0 here): a bucketFor keyed on
+    // lineWidth ?? 1 instead would insert under 1 while lookup reads 0, so every
+    // draw of every badge digit would silently re-mint its sprite.
+    const style = { font: 'bold 12px Georgia', fill: 'gold' };
+    cache.draw(ctx, '7', 0, 0, style);
+    cache.draw(ctx, '7', 0, 0, style);
+
+    expect(trace.sprites).toHaveLength(1);
+    expect(cache.size).toBe(1);
+    expect(trace.blits).toHaveLength(2);
+    expect(trace.blits[1].sprite).toBe(trace.sprites[0]);
+  });
+
+  it('keys structurally, so a naive fused-field key cannot collide two labels', () => {
+    const trace = newTrace();
+    installDocument(trace);
+    const cache = new TextSpriteCache();
+    const ctx = targetContext(trace);
+
+    // Each neighbouring pair concatenates to the same character run; only the
+    // field split differs. A key built by fusing the fields (or hashing that
+    // fusion) serves the later draw of a pair from the earlier one's sprite.
+    cache.draw(ctx, 'X', 0, 0, { font: 'ab', fill: 'c', stroke: 'd', lineWidth: 2 });
+    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'bc', stroke: 'd', lineWidth: 2 });
+    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'b', stroke: 'cd', lineWidth: 2 });
+    cache.draw(ctx, 'oX', 0, 0, { font: 'a', fill: 'b', stroke: 'cd', lineWidth: 2 });
+    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'b', stroke: 'cdo', lineWidth: 2 });
+    expect(trace.sprites).toHaveLength(5);
+
+    // And each resolves back to its OWN sprite: the second pass mints nothing
+    // and blits the same five sprites in the order the first pass made them.
+    cache.draw(ctx, 'X', 0, 0, { font: 'ab', fill: 'c', stroke: 'd', lineWidth: 2 });
+    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'bc', stroke: 'd', lineWidth: 2 });
+    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'b', stroke: 'cd', lineWidth: 2 });
+    cache.draw(ctx, 'oX', 0, 0, { font: 'a', fill: 'b', stroke: 'cd', lineWidth: 2 });
+    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'b', stroke: 'cdo', lineWidth: 2 });
+    expect(trace.sprites).toHaveLength(5);
+    expect(cache.size).toBe(5);
+    expect(trace.blits).toHaveLength(10);
+    for (const [index, blit] of trace.blits.slice(5).entries()) {
+      expect(blit.sprite).toBe(trace.sprites[index]);
+    }
+  });
+
   it('never aliases a fill-only label onto one whose outline token is unresolved', () => {
     const trace = newTrace();
     installDocument(trace);
     const cache = new TextSpriteCache();
     const ctx = targetContext(trace);
 
-    // The two styles differ ONLY in stroke being absent vs present-but-unresolved:
-    // same font, same fill, and both default to lineWidth 0, so the key's
-    // dedicated outlined field is the only thing separating them.
+    // The two styles differ in stroke being absent vs present-but-unresolved:
+    // same font, same fill. They do NOT share a width key (stroke undefined keys
+    // width 0 while stroke '' strokes, and so keys, at the lineWidth ?? 1
+    // default), so the stroke level parts them before width gets a say; the
+    // width-key collision case is pinned on its own below.
     cache.draw(ctx, '7', 0, 0, { font: 'bold 12px Georgia', fill: 'gold' });
     cache.draw(ctx, '7', 0, 0, { font: 'bold 12px Georgia', fill: 'gold', stroke: '' });
 
     expect(trace.sprites).toHaveLength(2);
     expect(trace.sprites[0].ink.map((i) => i.op)).toEqual(['fill']);
     expect(trace.sprites[1].ink.map((i) => i.op)).toEqual(['stroke', 'fill']);
+  });
+
+  it('keys the stroke level itself: distinct sprites even when the width keys collide', () => {
+    const trace = newTrace();
+    installDocument(trace);
+    const cache = new TextSpriteCache();
+    const ctx = targetContext(trace);
+
+    // outlineWidth gives 0 for BOTH styles here (stroke undefined keys 0; an
+    // explicit lineWidth 0 passes through lineWidth ?? 1 as 0), so font, fill
+    // and width levels all agree and ONLY the dedicated stroke level separates
+    // the pair. A stroke of '' cannot pin this: the unresolved-token guard
+    // refuses to cache it, and '' keys width at lineWidth ?? 1 = 1 anyway.
+    const fillOnly = { font: 'bold 12px Georgia', fill: 'gold' };
+    const outlined = { font: 'bold 12px Georgia', fill: 'gold', stroke: '#000', lineWidth: 0 };
+    cache.draw(ctx, '7', 0, 0, fillOnly);
+    cache.draw(ctx, '7', 0, 0, outlined);
+
+    expect(trace.sprites).toHaveLength(2);
+    expect(cache.size).toBe(2);
+    expect(trace.sprites[0].ink.map((i) => i.op)).toEqual(['fill']);
+    expect(trace.sprites[1].ink.map((i) => i.op)).toEqual(['stroke', 'fill']);
+
+    // And each resolves back to its OWN sprite rather than the other's.
+    cache.draw(ctx, '7', 0, 0, fillOnly);
+    cache.draw(ctx, '7', 0, 0, outlined);
+    expect(trace.sprites).toHaveLength(2);
+    expect(trace.blits[2].sprite).toBe(trace.sprites[0]);
+    expect(trace.blits[3].sprite).toBe(trace.sprites[1]);
   });
 
   it('does not cache a sprite whose 2D context failed', () => {
@@ -436,6 +519,52 @@ describe('text_sprite_cache: cache identity', () => {
   });
 });
 
+describe('text_sprite_cache: the hit path allocates nothing', () => {
+  // The mechanism the old key scheme paid PER CALL, hits included: a key array
+  // plus a joined string per draw/measure, then a Map delete + re-insert per
+  // hit for recency. Spying the three primitives pins that the steady state
+  // (every visible label already cached, the per-frame nameplate case) builds
+  // no key and churns no map; the join spy is the observable half of the
+  // string build, since the key string WAS the join's return value.
+  it('serves hits without building a key or churning any map', () => {
+    const trace = newTrace();
+    installDocument(trace);
+    const cache = new TextSpriteCache();
+    const ctx = targetContext(trace);
+    cache.beginRedraw();
+    cache.draw(ctx, 'Aldous Veyne', 10, 10, OUTLINED); // the miss may allocate
+    cache.measureAdvance('Aldous Veyne', OUTLINED);
+
+    const mapSet = vi.spyOn(Map.prototype, 'set');
+    const mapDelete = vi.spyOn(Map.prototype, 'delete');
+    const arrayJoin = vi.spyOn(Array.prototype, 'join');
+    let sets: number;
+    let deletes: number;
+    let joins: number;
+    try {
+      cache.beginRedraw();
+      for (let frame = 0; frame < 3; frame++) {
+        cache.draw(ctx, 'Aldous Veyne', 10 + frame, 10, OUTLINED);
+        cache.measureAdvance('Aldous Veyne', OUTLINED);
+      }
+      // Counts captured before any assertion machinery runs, so a matcher that
+      // itself touches a Map cannot pollute the verdict.
+      sets = mapSet.mock.calls.length;
+      deletes = mapDelete.mock.calls.length;
+      joins = arrayJoin.mock.calls.length;
+    } finally {
+      mapSet.mockRestore();
+      mapDelete.mockRestore();
+      arrayJoin.mockRestore();
+    }
+    expect(sets).toBe(0);
+    expect(deletes).toBe(0);
+    expect(joins).toBe(0);
+    expect(trace.sprites).toHaveLength(1);
+    expect(trace.blits).toHaveLength(4);
+  });
+});
+
 describe('text_sprite_cache: the bound and its eviction', () => {
   it('ships the budget it documents', () => {
     // Pinned to the literal: every other assertion here is parameterized on the
@@ -493,16 +622,17 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     ).toBeGreaterThanOrEqual(worstCase);
   });
 
-  it('keys a label containing the key separator apart from its prefix', () => {
+  it('keys player-supplied text at its own structural level, immune to injection', () => {
     const trace = newTrace();
     installDocument(trace);
     const cache = new TextSpriteCache();
     const ctx = targetContext(trace);
 
-    // Ally names are player-supplied, so a label can carry whatever the key uses
-    // as a separator. Text is the LAST key field for exactly this reason: a
-    // newline in a label appends to the key rather than shifting the fields that
-    // would have followed it.
+    // Ally names are player-supplied, so a label can carry anything, including a
+    // run that spells out another style field. The key is STRUCTURAL (one map
+    // level per field, text last), so there is no separator to inject: a newline
+    // plus a font string is just a longer key at the text level, never a shifted
+    // field boundary.
     cache.draw(ctx, 'A', 0, 0, OUTLINED);
     cache.draw(ctx, 'A\nbold 12px Georgia', 0, 0, OUTLINED);
     cache.draw(ctx, 'A\nbold 12px Georgia', 0, 0, OUTLINED);
@@ -510,10 +640,10 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     expect(trace.sprites).toHaveLength(2);
     expect(trace.blits).toHaveLength(3);
 
-    // And the separator has to actually be there. Text is keyed immediately after
-    // the outline width, so these two differ only in where that boundary falls:
-    // a key built by plain concatenation reads both as ...312 and serves the
-    // second label from the first one's sprite.
+    // Adjacent levels can never fuse either. Width 3 + text '12' and width 31 +
+    // text '2' concatenate to the same character run (the pair a joined-string
+    // key would read as ...312 and collide), but the width level is its own
+    // numeric map key, so the two part ways before text is even consulted.
     cache.draw(ctx, '12', 0, 0, { ...OUTLINED, lineWidth: 3 });
     cache.draw(ctx, '2', 0, 0, { ...OUTLINED, lineWidth: 31 });
     expect(trace.sprites).toHaveLength(4);
@@ -531,6 +661,7 @@ describe('text_sprite_cache: the bound and its eviction', () => {
 
     cache.clear();
     expect(cache.size).toBe(0);
+    expect(cache.bytes).toBe(0);
     // And the next draw genuinely re-rasterizes rather than serving a stale hit.
     cache.draw(ctx, 'Eastbrook Vale', 0, 0, OUTLINED);
     expect(trace.sprites).toHaveLength(3);
@@ -628,6 +759,38 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     cache.draw(ctx, 'B', 0, 0, OUTLINED);
     expect(trace.sprites).toHaveLength(4);
     expect(cache.bytes).toBeLessThanOrEqual(byteBudget);
+  });
+
+  it('evicts to empty when the byte budget is below one sprite, and stays coherent', () => {
+    const trace = newTrace();
+    installDocument(trace);
+    // 'AB' rasterizes 40x47 at DPR 1 (7520 bytes of backing store, see the
+    // geometry pin above), so a 1000-byte budget cannot retain even one sprite.
+    const cache = new TextSpriteCache(10, 1000);
+    const ctx = targetContext(trace);
+
+    cache.draw(ctx, 'AB', 0, 0, OUTLINED);
+    // Drawn this redraw, but too large to keep: the cache empties completely.
+    expect(trace.blits).toHaveLength(1);
+    expect(cache.size).toBe(0);
+    expect(cache.bytes).toBe(0);
+
+    // Guards the lruTail reset in evictOldest: a stale tail would make the next
+    // insert hook onto the dead entry with the head left null, so eviction goes
+    // blind and the "empty" cache silently retains the new sprite over budget.
+    cache.draw(ctx, 'CD', 0, 0, OUTLINED);
+    expect(trace.blits).toHaveLength(2);
+    expect(cache.size).toBe(0);
+    expect(cache.bytes).toBe(0);
+
+    cache.beginRedraw();
+    expect(cache.size).toBe(0);
+    expect(cache.bytes).toBe(0);
+    // And the cycle keeps working: a later draw re-rasterizes and blits again.
+    cache.draw(ctx, 'AB', 0, 0, OUTLINED);
+    expect(trace.blits).toHaveLength(3);
+    expect(cache.size).toBe(0);
+    expect(cache.bytes).toBe(0);
   });
 });
 

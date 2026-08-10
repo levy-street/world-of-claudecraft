@@ -276,7 +276,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.playerLevelClassTitle': '{name}. Cấp {level} {className}',
   'hudChrome.bg.queueNote': 'Hai đội năm người. Cướp lấy cờ địch và mang nó về pháo đài của bạn. Đội đầu tiên đạt 3 lần chiếm cờ sẽ thắng. Lập nhóm tối đa 5 người và xếp hàng cùng nhau; nhặt Phù Văn Tăng Tốc và luồn lách qua chỗ ẩn nấp để thoát khỏi kẻ truy đuổi.',
   'hudChrome.bg.queuedParty': 'Nhóm {count} người.',
-  'hudChrome.bg.ratingSummary': 'Thứ hạng. {wins} thắng / {losses} thua',
+  'hudChrome.bg.ratingSummary': 'Thứ hạng. {wins} thắng / {losses} thua / {draws} hòa',
   'hudChrome.bg.respawnIn': 'Đợt tiếp theo: hồi sinh sau {seconds}',
   'hudChrome.bg.resultDefeat': 'Thất Bại',
   'hudChrome.bg.resultDraw': 'Hòa',
@@ -7122,7 +7122,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.arena.playerLevelClassTitle': '{name} - Cấp {level} {className}',
   'hud.arena.queueNote':
     'Bạn sẽ được ghép cặp với đối thủ trực tuyến có thứ hạng gần nhất, rồi được dịch chuyển đến đấu trường. Thắng để leo hạng; ai chịu thua trước (còn 1 máu) sẽ bại. Bạn sẽ trở về đúng nơi đã vào hàng chờ.',
-  'hud.arena.ratingSummary': 'Thứ hạng - {wins} thắng / {losses} thua',
+  'hud.arena.ratingSummary': 'Thứ hạng - {wins} thắng / {losses} thua / {draws} hòa',
   'hud.arena.searching': 'Đang tìm đối thủ... ({count} người trong hàng chờ)',
   'hud.arena.statusCountdown': 'Sẵn sàng nào...',
   'hud.arena.statusFight': 'Chiến đến khi có kẻ chịu thua!',

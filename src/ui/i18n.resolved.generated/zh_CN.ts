@@ -1054,7 +1054,7 @@ export const zh_CN: EnTranslations = {
       "blurb": "两座废弃的要塞隔着棘峰阴影下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方三次者赢得战场。",
       "modeTag": "5v5夺旗战",
       "offlineNote": "荆谷原野正在同步。待王国响应后即可排队。",
-      "ratingSummary": "评分。{wins}胜 / {losses}负",
+      "ratingSummary": "评分。{wins}胜 / {losses}负 / {draws} 平",
       "careerCaptures": "生涯夺旗:{count}",
       "enterQueue": "加入队列",
       "enterQueueParty": "加入队列({count}人小队)",
@@ -2362,7 +2362,8 @@ export const zh_CN: EnTranslations = {
       "resonantHide": "附魔材料。分解精良及以上品质的皮甲可得。",
       "resonantLinks": "附魔材料。分解精良及以上品质的锁甲可得。",
       "resonantSteel": "附魔材料。分解精良及以上品质的近战武器可得。",
-      "resonantTimber": "附魔材料。分解精良及以上品质的法杖、魔杖、弓和弩可得。"
+      "resonantTimber": "附魔材料。分解精良及以上品质的法杖、魔杖、弓和弩可得。",
+      "growthTonic": "农用品。种植时使用，有机会获得更多收成。"
     },
     "discord": {
       "title": "Discord",
@@ -3348,6 +3349,8 @@ export const zh_CN: EnTranslations = {
     },
     "bgOffer": {
       "title": "荆谷原野已准备就绪",
+      "backfillTitle": "荆谷原野需要一名战士",
+      "backfillBody": "这场战斗已经开始。你将加入人数不足的一方，本场对战不会改变你的评分。",
       "accepted": "已确认 {accepted}/{size}",
       "remaining": "剩余 {seconds} 秒确认",
       "accept": "接受",
@@ -8206,7 +8209,7 @@ export const zh_CN: EnTranslations = {
       "queueNote": "你会与在线且评级最接近的挑战者匹配，然后传送到沙场。获胜即可攀升；先认输者（1 点生命值）落败。结束后会回到你排队的位置。",
       "ladderAllTime": "排名 - 历史",
       "ladderOnline": "排名 - 在线",
-      "ratingSummary": "评级 - {wins} 胜 / {losses} 负",
+      "ratingSummary": "评级 - {wins} 胜 / {losses} 负 / {draws} 平",
       "statusCountdown": "做好准备...",
       "statusReturning": "正在返回世界... {seconds}",
       "statusFight": "战斗到认输！",
@@ -11514,6 +11517,30 @@ export const zh_CN: EnTranslations = {
       },
       "osmium_hoe": {
         "name": "锇金锄"
+      },
+      "vale_hearth_loaf": {
+        "name": "谷地炉烤面包"
+      },
+      "eastbrook_root_pottage": {
+        "name": "东溪根菜浓汤"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "芬桥稻米碗"
+      },
+      "fenbridge_beet_braise": {
+        "name": "芬桥焖甜菜"
+      },
+      "highwatch_barley_bannock": {
+        "name": "高望大麦烙饼"
+      },
+      "highwatch_gourd_soup": {
+        "name": "高望霜瓜汤"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "常青园太阳瓜挞"
+      },
+      "evergarden_harvest_platter": {
+        "name": "常青园丰收拼盘"
       },
       "conjured_water4": {
         "name": "魔法泉水"
