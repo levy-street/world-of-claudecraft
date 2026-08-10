@@ -135,14 +135,17 @@ export function completeSunderCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     slotIndex !== undefined
       ? consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex)
       : consumePreferredDisenchantVictim(meta.inventory, itemId);
+  // Fire the quest hook right after the consume returns, ABOVE the bail (the
+  // resolveDisenchant shape): the helpers bail pre-mutation today so the
+  // no-consume paths are no-ops, but a future helper that mutates before
+  // returning empty would otherwise skip the resync here exactly as the
+  // enchanting.ts comment warns. The grant's addItem fires its own call for
+  // the add half; the hook is change-detecting, so the pair never double-emits.
+  ctx.onInventoryChangedForQuests(meta);
   if (consumed === null || consumed === undefined) {
     ctx.error(meta.entityId, 'You are not holding that item.');
     return;
   }
-  // The consume mutated the bags on its own (the grant's addItem fires the
-  // quest hook for its half, but the destroy half must not lean on that
-  // coupling): the resolveDisenchant siblings fire it after each consume.
-  ctx.onInventoryChangedForQuests(meta);
   const def = ITEMS[itemId];
   // silent + callerLogs: the sunder line below owns BOTH halves of the grant
   // feedback (the #2458 rule: a grant that stands its hub line down stands

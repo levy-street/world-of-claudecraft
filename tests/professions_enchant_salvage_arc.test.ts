@@ -702,7 +702,9 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     };
     client.extractEssence('crownforged_dreadhelm', { slotIndex: 3 });
     client.extractEssence('crownforged_dreadhelm');
-    expect(frames).toEqual([
+    // toStrictEqual: toEqual treats an absent key and slot: undefined as
+    // equal, so only the strict compare pins the omission arm.
+    expect(frames).toStrictEqual([
       { cmd: 'extract_essence', item: 'crownforged_dreadhelm', slot: 3 },
       { cmd: 'extract_essence', item: 'crownforged_dreadhelm' },
     ]);

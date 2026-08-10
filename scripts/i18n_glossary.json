@@ -94,7 +94,7 @@
       "keyPatterns": ["hudChrome.itemMasterwrought"]
     },
     "masterwork": {
-      "note": "The masterwork craft-proc term, ONE form per locale on every surface: zh_CN 杰作, zh_TW 傑作, ja 傑作, ko 걸작, ru шедевр. The 2026-08-07 QA aligned the Reliquary gallery to the crafting surfaces' form (ja had coined 名作, ko 명작); never re-coin a per-surface variant. One surface these patterns cannot police: the Reliquary PAGE NAMES live in src/ui/reliquary_i18n.locales/ (not the catalog), so the gallery title must be kept aligned by hand (its overlay comments point back here).",
+      "note": "The masterwork craft-proc term, ONE form per locale on every surface, cited here as the LEMMA (dictionary form; ru renders the standalone seal tag capitalized as Шедевр per its positional casing, see the masterwroughtSystem note's closing rule): zh_CN 杰作, zh_TW 傑作, ja 傑作, ko 걸작, ru шедевр. The 2026-08-07 QA aligned the Reliquary gallery to the crafting surfaces' form (ja had coined 名作, ko 명작); never re-coin a per-surface variant. One surface these patterns cannot police: the Reliquary PAGE NAMES live in src/ui/reliquary_i18n.locales/ (not the catalog), so the gallery title must be kept aligned by hand (its overlay comments point back here).",
       "keyPatterns": [
         "hudChrome.crafting.masterworkSeal",
         "hudChrome.crafting.masterworkToast",
