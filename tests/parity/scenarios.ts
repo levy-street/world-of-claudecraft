@@ -3191,6 +3191,12 @@ function nythraxisFullPull(): Scenario {
     build: () => new Sim({ seed: 1031, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
       const sim = rec.sim;
+      // A live realm calendar (the delve_progression precedent): with resetDay
+      // set, the boss kill stamps the wyrmfall daily gate AND grants the
+      // weekly Maker's Ember, so the golden pins the ember week anchor and
+      // the material grants cross-host, not just the draw position.
+      sim.resetDay = '2099-06-25';
+      sim.utcDay = '2099-06-25';
       const tankPid = sim.addPlayer('warrior', 'NyxTank') as number;
       sim.setPlayerLevel(MAX_LEVEL, tankPid);
       // Exercise the winning tank identity explicitly. A level-cap raid tank
