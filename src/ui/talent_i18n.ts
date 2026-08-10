@@ -332,7 +332,7 @@ const localeTextByBase = {
   fr_FR: {
     masteryDescriptions: {
       destruction:
-        'Conflagration confère Désolation, qui raccourcit considérablement l\'incantation de votre prochain Trait de ruine ou fait tomber immédiatement la première vague de Pluie de feu.',
+        "Conflagration confère Désolation, qui raccourcit considérablement l'incantation de votre prochain Trait de ruine ou fait tomber immédiatement la première vague de Pluie de feu.",
       arms: 'Lorsque vous maniez une arme à deux mains, tous les dégâts que vous infligez sont augmentés de 10 %.',
     },
     statLabels: {

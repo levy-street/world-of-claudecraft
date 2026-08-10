@@ -451,7 +451,12 @@ describe('Talents V2 stasis and resource-sap primitives', () => {
     // v0.29 druid tree moved the Lifesap unlock to the row 17 pick.
     const sapGain = (control: boolean): number => {
       const run = (withSap: boolean): number => {
-        const sim = new Sim({ seed: 10, playerClass: 'druid', autoEquip: true, world: EMPTY_TEST_WORLD });
+        const sim = new Sim({
+          seed: 10,
+          playerClass: 'druid',
+          autoEquip: true,
+          world: EMPTY_TEST_WORLD,
+        });
         sim.setPlayerLevel(20);
         expect(
           sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } }),
