@@ -87,12 +87,6 @@ if (arguments_.help) {
 const repoRoot = process.cwd();
 await readFile(path.join(repoRoot, 'package.json'));
 const { items, pendingArtIds } = await loadItems(repoRoot);
-if (pendingArtIds.size !== 39) {
-  throw new Error(
-    `ITEM_ART_PENDING moved (${pendingArtIds.size} ids, expected 39): update the ` +
-      'liveItemCount literal below deliberately, beside the exact-set pin in tests/item_icons.test.ts',
-  );
-}
 const mapping = JSON.parse(
   await readFile(path.join(repoRoot, 'public/ui/items/mapping.json'), 'utf8'),
 );
@@ -106,13 +100,12 @@ const build = await buildItemArtAudit({
   pendingArtIds: [...pendingArtIds].sort(),
   expected: {
     catalogCount: 817,
-    // 831 live defs reviewed by the 2026-08-09 audit, plus the 39 ids of
-    // declared procedural-art debt (ITEM_ART_PENDING, exact-set-pinned in
-    // tests/item_icons.test.ts). BOTH terms are literals on purpose: a
-    // pending-set change must edit this line and that pin together, keeping
-    // the hard-literal property the release pin had. The guard below makes
-    // the drift loud instead of an opaque count mismatch.
-    liveItemCount: 831 + 39,
+    // The ART-SUBJECT count: live defs minus the declared procedural-art
+    // debt (ITEM_ART_PENDING, exact-set-pinned in tests/item_icons.test.ts).
+    // 831 is the 2026-08-09 reviewed universe and stays a hard literal: a
+    // new item ships art (joining this count) or joins the pending pin, and
+    // either move is a visible, deliberate edit.
+    liveItemCount: 831,
     generatedHeroicDefinitions: 63,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 15,

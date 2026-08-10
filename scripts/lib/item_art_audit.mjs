@@ -554,7 +554,7 @@ export async function buildItemArtAudit(options) {
     'Unexpected item-art catalog count',
   );
   assertExpected(
-    Object.keys(options.items).length,
+    Object.keys(options.items).length - pendingArtIds.size,
     options.expected?.liveItemCount,
     'Unexpected live item definition count',
   );
@@ -620,7 +620,11 @@ export async function buildItemArtAudit(options) {
       rendererFingerprint: ITEM_ART_AUDIT_RENDERER_FINGERPRINT,
     },
     catalogCount: records.length,
-    liveItemCount: Object.keys(options.items).length,
+    // The ART-SUBJECT universe: every live def minus the declared
+    // procedural-art debt (pendingArtIds). The reviewed evidence counts stay
+    // stable while debt items exist, and each id rejoins this count the day
+    // its art lands and it leaves the pending set.
+    liveItemCount: Object.keys(options.items).length - pendingArtIds.size,
     generatedHeroicDefinitions: generatedHeroicDefinitions.length,
     heroicDefinitionsWithOwnWebp: heroicDefinitionsWithOwnWebp.length,
     heroicWeaponArtAliases: records.reduce((sum, record) => sum + record.aliases.length, 0),

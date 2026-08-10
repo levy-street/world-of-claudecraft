@@ -770,7 +770,9 @@ describe('item-art audit builder', () => {
       'Live item definitions without dedicated art: gamma_root',
     );
     const build = await buildItemArtAudit({ ...base, pendingArtIds: ['gamma_root'] });
-    expect(build.catalog.liveItemCount).toBe(2);
+    // liveItemCount is the ART-SUBJECT universe: two live defs minus the one
+    // declared debt id.
+    expect(build.catalog.liveItemCount).toBe(1);
     expect(build.catalog.catalogCount).toBe(1);
     await expect(buildItemArtAudit({ ...base, pendingArtIds: ['ghost_id'] })).rejects.toThrow(
       'pending-art id ghost_id is not a live item definition',
@@ -799,16 +801,17 @@ describe('item-art audit builder', () => {
     ) as Record<string, unknown>;
     // Re-minted for the farming branch (deviation (al)): the audit gained the
     // ITEM_ART_PENDING exemption (39 farming ids ship procedural icons as
-    // declared debt), which moves liveItemCount to 831 + 39, the catalog sha
-    // with it, and the renderer fingerprint with the lib edit. The 817
-    // reviewed art files and their shipping catalog sha are untouched.
+    // declared debt), liveItemCount now counts the ART-SUBJECT universe
+    // (live defs minus declared debt, so the reviewed 831 stands), and the
+    // catalog sha moves only through the lib's self-hash fingerprint. The
+    // 817 reviewed art files and their shipping catalog sha are untouched.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '67061ebc5587b8b056629e579d4cadad3c179883f149c2288e0b67aa86c32dae',
+      catalogSha256: '2030e8d4e96fd76c5e126f3852bbd49de419e614813301e64d69a842d5a1ea4e',
       catalogBytes: 448700,
-      rendererFingerprint: '6c2f5a8cf90262474645149998c27943e40ab2e0094dd47daf2cf771236d60aa',
+      rendererFingerprint: 'f748b74efa1531dde1339b4f33e2c0ec981ec856cfe8d4adbbcbbc511004cd68',
       catalogCount: 817,
-      liveItemCount: 870,
+      liveItemCount: 831,
       generatedHeroicDefinitions: 63,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 15,

@@ -332,9 +332,11 @@ describe('item-art consistency accepted-art provenance', () => {
         acceptedBytes: 294_428,
       },
       {
+        // Re-minted by the farming branch's --refresh-verdict run (deviation
+        // (al) in docs/farming/state.md).
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '9e2fbd243f2a40f9cdf6c6bd49fc16634ebc4cb2498880ff2e8063adff627b9f',
-        acceptedBytes: 106_998,
+        acceptedSha256: '99e07acb5055dc3a82e2fe7d60a5a03022d605be0f0069f3b98309407b4244ef',
+        acceptedBytes: 106_999,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -449,9 +451,9 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(106_998);
+    expect(verdictBytes.length).toBe(106_999);
     expect(sha256(verdictBytes)).toBe(
-      '9e2fbd243f2a40f9cdf6c6bd49fc16634ebc4cb2498880ff2e8063adff627b9f',
+      '99e07acb5055dc3a82e2fe7d60a5a03022d605be0f0069f3b98309407b4244ef',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -560,13 +562,17 @@ describe('item-art consistency accepted-art provenance', () => {
       expect(sha256(bytes), `${pin.id} resolved audit hash`).toBe(pin.sha256);
     }
 
+    // Re-minted with the farming branch's ITEM_ART_PENDING exemption
+    // (deviation (al) in docs/farming/state.md): the catalog sha follows the
+    // audit lib's self-hash fingerprint; the reviewed 817-file evidence and
+    // the shipping catalog sha are untouched.
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '5a4e46556d459f83462570b66a56e1ec11b015dbd5c7594ffe4112bbda51cfbb',
+      sha256: '2030e8d4e96fd76c5e126f3852bbd49de419e614813301e64d69a842d5a1ea4e',
       bytes: 448_700,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
-      'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
+      'f748b74efa1531dde1339b4f33e2c0ec981ec856cfe8d4adbbcbbc511004cd68',
     );
     expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
     expect(verdict.evidence.sheetCount).toBe(208);
@@ -615,8 +621,11 @@ describe('item-art consistency accepted-art provenance', () => {
       expect(sheet.format).toBe('png');
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
+    // Re-minted by the farming branch's --refresh-verdict run (deviation
+    // (al)): contact sheets re-rendered locally, so the set digest is this
+    // environment's; the per-sheet consistency arm below keeps it honest.
     expect(verdict.evidence.sheetSetSha256).toBe(
-      '506d52c032c1e702bba35e313463bb46e55a3ce7e6e3944d12d618df17b89385',
+      'fb24dbc87e14dff3082a3978e7e03c84df2b8be4779f132556f4e09a0b9a1cea',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 

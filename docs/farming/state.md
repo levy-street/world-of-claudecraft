@@ -898,6 +898,19 @@ question does not arise (farming has no station).
   --verify-only, and expect a one-field conflict in the portrait manifest
   whenever the release also re-minted it: resolve by re-running the CLI on
   the merged tree, never by hand-picking a side.
+  SECOND-ORDER EVIDENCE RE-MINTS the first (al) pass missed (the full gate
+  caught them; only the full suite can see this class): liveItemCount is now
+  the ART-SUBJECT universe (live defs minus the pending set), so every 831
+  release literal stands and the catalog sha moves only through the audit
+  lib's self-hash; the committed final-item-art-audit-verdict.json was
+  refreshed through the sanctioned --refresh-verdict CLI (which re-renders
+  the 208 contact sheets locally, so the per-sheet digests and
+  sheetSetSha256 are THIS environment's, internally consistency-checked by
+  the suite; the maintainer's canonical environment should re-mint them at
+  feature review); and the two accepted-art.json registries had their
+  verdict-file and portrait-manifest rows re-pointed. The absorb-checklist
+  rule extends to these: on conflict re-run node scripts/item_art_audit.mjs
+  --refresh-verdict on the merged tree.
   Two review-round residuals ledgered, not fixed: the closure arm derives
   recipe consumers from the whole merged ALL_RECIPES, so an unrelated future
   recipe could keep a farming material green after its farm-side demand
