@@ -1078,7 +1078,19 @@ Notes (the would-be PR body, D22):
   ANY ITEM_WEAPON_VARIANTS key ahead of the pending-art guard (release change),
   so a hoe gaining a held model must not join weapon_variants without art.
 
-Gate record: see the log line appended after the final run below.
+Gate record: three runs. Run 1 (mid-review tree) FAILED at the full-suite
+fallback with the three release art-program collisions (crafted-tooltip
+partition, item-art audit missing-art sweep, portrait manifest staleness),
+healed as deviations (ak)/(al). Run 2 overlapped the QA-round edits and
+FAILED on the mid-edit artifacts plus the two second-order evidence pins
+(item_art_consistency verdict digests, placeholder_art_completion manifest
+row), healed in c6ce5c4d0b. Run 3 on the frozen tree at c6ce5c4d0b:
+"[gate:select] PASS: all 8 steps green (vitest workers: 12)", full-suite
+fallback 33892 passed / 0 failed / 2 expected-fail / 107 skipped, browser
+step green (no armory exception tripped this run), farming_session golden
+md5 bf00c277b89e142446550f00c1035696 unchanged, tree clean. Lesson
+re-recorded: never edit the tree while a gate runs; the log markers are the
+only verdict (run 2's shell exit was 0 while the log said FAIL).
 
 ### Phase 7
 (not started)
