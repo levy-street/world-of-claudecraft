@@ -9,7 +9,7 @@
 | 03 | IP naming sweep | complete | 2026-08-07 | 2026-08-07 |
 | 03 QA | verify | complete | 2026-08-08 | 2026-08-08 |
 | 04 | Materials backbone | complete | 2026-08-08 | 2026-08-08 |
-| 04 QA | verify | sync done, audit pending | 2026-08-10 | |
+| 04 QA | verify | complete | 2026-08-10 | 2026-08-10 |
 | 05 | Jewelcrafting base catalog | pending | | |
 | 05 QA | verify | pending | | |
 | 06 | Inscription base catalog | pending | | |
@@ -149,6 +149,31 @@ never future-PR items, per the delivery contract in `state.md`).
   wiki-refresh's Gallowmere reintroduction (en + 3 transliterations, guard armed).
   All decisions, numbers, obligations, and the review record in the state.md
   Phase 04 ledger.
+- Phase 04 QA (verify): PASS-WITH-FOLLOWUPS. Release/v0.36.0 synced AGAIN first
+  (merge f14b6a4e0a: the Reliquary packet had landed, 246 commits incl. the
+  10970-row locale fill; 87 conflicts hunk-level, IWorld pin 320, command
+  schema 197/210 after catching a genuine silent off-by-one both sides
+  auto-merged, 65 goldens re-minted with only nythraxis moving rng digests,
+  portrait manifest re-blessed byte-identical, the fill's Gallowmere
+  reintroduction caught by overlay_ip_scrub and fixed; 4-agent merge audit
+  CLEAN). QA fan-out: ten auditors total (correctness, gate-abuse,
+  migration-safety on the load clamp, test-coverage-auditor on the fix-round
+  pins, architecture-reviewer, cross-platform-sync, then qa-checklist,
+  a fresh fix-round reviewer, and privacy-security-review): ZERO blocking
+  anywhere. Fix round: the rift ember decoupled from the core table onto
+  EMBER_ELIGIBLE_RIFT_TIERS with the widen-and-restore probe, meta.leaving
+  filters, the dev-portal local guard + end-to-end pin, single-pass anchor
+  normalization (year pad + range bail), the date load cap, the sunder
+  empty-session guard + quest hook, and fifteen-plus new decisive pins
+  (faucet literals over self-comparisons, present-only ember, completion-
+  not-gate, the client frame shape covering the vacuous addressing-guard
+  row, the destroy-race fourth command, vendor buy path, blob-growth
+  survival rows, hostile-slot shapes). The nythraxis parity scenario gained
+  a live calendar so the golden pins the ember cross-host. Follow-ups are
+  recorded in the state.md QA bullets (one ruling wanted on sunder scope:
+  heroic-raid epics are NOT sunderable today; the movement:true obligation
+  for phase 12; release-owned upstream items), none blocking. Full ledger
+  in state.md.
 - Phase 03 QA (verify): PASS-WITH-FOLLOWUPS. Release/v0.36.0 synced first (merge
   ed51716964, 30 conflicts; the release's own honor-title re-cut supersedes the
   phase's ladder verdicts: Linebreaker / Fieldreaver / Warcrowned adopted, docs

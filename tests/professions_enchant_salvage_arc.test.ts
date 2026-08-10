@@ -710,11 +710,14 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     ]);
   });
 
-  it('a malformed slot on extract_essence degrades to the unpinned victim order', () => {
-    // The server coerces a non-integer slot to undefined (the untrusted-slot
-    // rule): the sunder then re-resolves its preferred victim fresh, so the
-    // PLAIN copy dies and the signed copy survives. A hand-crafted frame can
-    // therefore never aim the destroy at an index the pin did not cover.
+  it('a malformed slot on extract_essence degrades or refuses, never aims the destroy', () => {
+    // Three hostile shapes, two defenses: a NON-integer slot is coerced to
+    // undefined at the dispatch boundary (the untrusted-slot rule) and the
+    // sunder re-resolves its preferred victim fresh, so the PLAIN copy dies
+    // and the signed copy survives; an integer that PASSES Number.isInteger
+    // (-1, out-of-range) reaches the sim, whose own bound refuses it before
+    // any state is written. Together a hand-crafted frame can never aim the
+    // destroy at an index the pin did not cover.
     const server = new GameServer();
     const fc = fakeWs();
     const st = joinServer(server, fc, 717, 'QaBadSlot');
@@ -722,6 +725,19 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     const RAID_EPIC = 'crownforged_dreadhelm';
     server.sim.ctx.addItemInstance(RAID_EPIC, { signer: 'KeepMe' }, st.pid);
     server.sim.addItem(RAID_EPIC, 1, st.pid);
+
+    // The integer-but-invalid shapes first: refused whole, nothing consumed.
+    cmd(server, st, { cmd: 'extract_essence', item: RAID_EPIC, slot: -1 });
+    cmd(server, st, { cmd: 'extract_essence', item: RAID_EPIC, slot: 4096 });
+    flushEnchantFamilyCast(server, st.pid);
+    expect(serverInv(server, st.pid).filter((s) => s.itemId === RAID_EPIC)).toHaveLength(2);
+    expect(serverInv(server, st.pid).filter((s) => s.itemId === 'sundered_essence')).toHaveLength(
+      0,
+    );
+    const refusals = eventsFor(fc.sent, 'error').filter(
+      (e: any) => e.text === 'You are not holding that item.',
+    );
+    expect(refusals.length).toBeGreaterThanOrEqual(2);
 
     cmd(server, st, { cmd: 'extract_essence', item: RAID_EPIC, slot: 1.5 });
     flushEnchantFamilyCast(server, st.pid);

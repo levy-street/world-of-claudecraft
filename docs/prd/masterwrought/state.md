@@ -1,6 +1,6 @@
 # Masterwrought: cross-phase state
 
-Current phase: 04 COMPLETE (materials backbone, 2026-08-08; the three chase materials, faucets, gates, extraction, persistence, see the Phase 04 ledger); next is phase 04 QA (phase-04-qa.md). The QA session's release sync is DONE (v0.36.0 re-merge f75f5611c9 incl. the release-merge audit, 2026-08-10, see the sync ledger below); the QA audit itself has NOT started. Packet authored 2026-08-07.
+Current phase: 04 QA COMPLETE (2026-08-10, verdict PASS-WITH-FOLLOWUPS, see the Phase 04 QA ledger bullet: second v0.36.0 sync incl. the Reliquary packet, ten-auditor fan-out, zero blocking anywhere, fix round + fresh review + security round all applied); next is Phase 05 (jewelcrafting base catalog, phase-05-jewelcrafting-base.md), which starts with its own release sync per the delivery contract. Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.36.0`.
 
 ## Delivery contract (non-negotiable)
@@ -651,9 +651,11 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
 - PlayerMeta/persistence: wyrmfallDaily { date, sources: Set } + emberWeekAnchor
   string; CharacterState optional twins (sources as array), zero-default omission
   on write (the honor idiom) so untouched saves stay byte-equal, defaults on load.
-  The parity sampler sees both (the delveDaily/heroicDaily precedent; Set contents
-  canonicalize empty like heroicDaily.marked, divergence surfaces via sampled
-  inventory).
+  The parity sampler sees both DIRECTLY (QA correction: canonical() in
+  tests/parity/trace.ts EXPANDS Set contents into a sorted array, only an empty
+  set drops; the nythraxis golden records the stamped source tokens verbatim, so
+  the golden gate discriminates which sources are stamped, stronger than the
+  original "divergence surfaces via sampled inventory" claim).
 - New i18n: sim DICT rows error.sunderTarget/sunderHeld/sunderMoved (EXACT) +
   log.sunderResult (RULES, {item} via locItem) filled in ALL 20 non-en blocks
   across BOTH dict tables (the busy refusal deliberately has NO sim row: the
@@ -673,7 +675,9 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   characterized: 59/60 goldens changed only in sampled state shape; exactly
   nythraxis_full_pull moved rng digests (the appended raid-kill count draw) and its
   golden records wyrmfall_core in the discovery ledger.
-- New tests: tests/masterwrought_materials.test.ts (26 cases: week math incl.
+- New tests: tests/masterwrought_materials.test.ts (26 cases at phase close;
+  the review rounds and the QA fix round grew it, the suite itself is the
+  count of record: week math incl.
   month/year edges, boss faucet shared count + seed determinism + daily gate flip +
   mail arm + zero-draw refusal arms with a one-draw positive control, rift A/S/B on
   a REAL raced event via spawnNaturalRiftPortal with the event tier pinned,
@@ -834,6 +838,161 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   this re-mint at EVERY future release sync. Also: two release-side
   useOptionalChain lint errors and two merge-produced format drifts cleared
   the changed-files biome floor; the warrior_intervene fix is behavior-equal.
+- Phase 04 QA (2026-08-10, the phase-04-qa.md session; verdict recorded in the
+  progress.md row). SECOND RELEASE SYNC FIRST: v0.36.0 had moved 246 commits
+  (the Reliquary packet, PR 2976, incl. its 10970-row locale fill); merge
+  f14b6a4e0a resolved 87 conflicts hunk-level. Sync outcomes: IWorld pin
+  composed to 320, command schema to 197/210 (a REAL silent off-by-one: both
+  sides read 196/209 pre-merge and git auto-merged the identical constants;
+  the release's own NOTE in tests/command_schema.test.ts warns of exactly
+  this, suite runs confirmed both pins); 65 parity goldens re-minted (51
+  state-shape only, 13 more moved per-frame events hashes each matching
+  exactly one parent, only nythraxis_full_pull moved rng digests: the
+  branch's appended wyrmfall draw); portrait manifest re-blessed via its
+  receipt flow (230/230 byte-identical) with the accepted-art digest pin
+  moved; the release fill reintroduced Gallowmere verbatim in ten Latin
+  hauntBlurb rows, caught by tests/overlay_ip_scrub.test.ts and swapped to
+  Gibbetmere in place. Release-merge audit (4 cluster agents): CLEAN, zero
+  dropped behavior (sim cluster byte-identical to the clean three-way; the
+  release's movement:true addItem flag is a no-op for every branch grant
+  today since no masterwrought id is a catalogued relic; the release-authored
+  db-mock factories are structurally partial but complete for their paths,
+  the established pattern). QA FAN-OUT: six auditors (correctness,
+  gate-abuse, migration-safety on the F1 clamp, test-coverage-auditor on the
+  fix-round pins, architecture-reviewer, cross-platform-sync): ZERO blocking
+  anywhere; ~12 should-fix + ~14 nits + ~15 records, ALL applied or recorded.
+  Fix round (621ad83a36, b9c58930f7, b68b601af6, 9794ece007, reviewed by a
+  fresh agent per the standing rule): the winning rift arm's ember now gates
+  on EMBER_ELIGIBLE_RIFT_TIERS instead of riding the core table's early
+  return (the two-rulings independence was prose before; the widen-and-
+  restore probe pins it); both rift arms filter meta.leaving (the boss-
+  faucet roster rule; a disconnect in the persistence window silently ate a
+  clear); grantRiftClearEmbers takes the instance eventId and refuses null
+  locally (the dev-portal no-pay guarantee no longer rests on another
+  module's return shape, and the dev portal is pinned end to end on BOTH
+  arms); the week-anchor renderer pads the year and bails out of range
+  (renderWeekAnchor), making anchor normalization SINGLE-PASS: before, a
+  year-below-1000 anchor normalized to an unparseable value that stalled
+  the weekly grant for a session before the next load healed it (measured:
+  the stall was one session, not permanent; the fix removes it entirely);
+  wyrmfallDaily.date gained the 64-char load cap its tokens had (a corrupt
+  date re-saved verbatim forever); completeSunderCast gained its sibling's
+  empty-session guard and fires onInventoryChangedForQuests after the
+  consume (latent: the grant's addItem fired it, but the destroy half must
+  not lean on that coupling); items.ts dropped the unused
+  equipCandidateIndex import. New decisive pins (each proven against the
+  trap catalog): the recorded faucet numbers as literals (1-3 roll, 1:1
+  yield, the core def row: the boss range and yield were pure constant-
+  self-comparisons, a silent retune passed 268 tests); ember-rides-
+  completion (anchor-rewind probe with the core gate closed); present-only
+  ember (the raven absentee banks the week); rank re-roll no-top-up; the
+  deliberate normal+heroic two-source day on one character; the sunder
+  eligibility boundary (raid LEGENDARIES refuse via the quality clause,
+  which was deletable with all tests green); the isConsuming busy arm; the
+  client extract_essence FRAME SHAPE (slot rides targeted, absent
+  untargeted: the ADDRESSED_COMMANDS registry row was proven VACUOUS, its
+  220-char sender window bleeds into the next method's comment, so the
+  behavior pin is what protects the online path; the guard's client-half
+  window is a RELEASE-owned hardening follow-up); a malformed wire slot
+  degrades to the unpinned victim order; sundering joined
+  tests/professions_destroy_trade_races.test.ts as the fourth destroy
+  command (three orders, conservation); the quartermaster material row buy
+  path; the two meta fields joined the blob-growth armed fixture + survival
+  floor; the nythraxis parity scenario gained a live calendar (resetDay
+  set), so the golden now pins the ember anchor and material grants
+  cross-host (the sampler saw them in principle but no scenario reached an
+  eligible completion; the re-mint moved ZERO rng digests, 78 state digests
+  plus one events digest, and minted col_first_epic for all ten raiders:
+  the ember is the first epic-quality item to enter bags in that scenario).
+  Fix-round review (fresh agent, 0 blocking, 2 should-fix + 3 nits, ALL
+  applied): the glossary ru edit was a REGRESSION and was reverted (the
+  masterwroughtSystem note cites the SHIPPED masterworkSeal renderings
+  verbatim and ru ships the standalone Шедевр; the release's masterwork
+  category note now says it cites the lemma), the golden characterization
+  corrected as above, the frame pin tightened to toStrictEqual (toEqual
+  cannot see slot: undefined), the sunder quest hook moved above the
+  consume bail to the resolveDisenchant shape. The qa-checklist phase gate
+  (READY, 0 blocking) caught that the phase plan's own trigger owed a
+  privacy-security-review dispatch (server/game.ts changed): dispatched,
+  verdict CLEAN (0 blocking, 0 should-fix; server authority, IDOR,
+  event scoping, secrets, SQL, dev gating, logging all pass; the
+  wyrmfallDaily/emberWeekAnchor server-private claim re-verified, zero
+  occurrences under server/); its one nit applied (the malformed-slot
+  wire test now also sends slot -1 and 4096, the integer shapes that
+  pass Number.isInteger and rely on the sim's own bound). RECORDED,
+  accepted (do not re-raise): the bagSlot -1 sentinel collision is
+  unreachable (admission refuses negative slots before any cast starts)
+  and precedent-identical to disenchantItem; the ordering
+  half of the death-hub invariant is pinned by the parity golden, not the
+  disjointness suite (moving the call above rollLoot reddens parity_g); the
+  wyrmfall draw is taken BEFORE the per-recipient gate check, so divergent
+  or empty resetDay can change grants but never desync the rng stream (the
+  load-bearing determinism property); the rift participants fallback
+  ([...inst.memberIds] when the floor region finds nobody) can pay members
+  not present, the creditRiftClearDeeds convention; the FINAL_BOSS precheck
+  is a perf guard with no behavioral signature (Check 6 exemption); the
+  completion-side sunderAdmitted re-check is behaviorally equal in every
+  reachable state (probed); sundering ignores instance.boundTo (the
+  disenchant precedent); the ITEMS[itemId] lookup is unguarded like its
+  siblings (not exploitable); normalRaidFinal's !== 'heroic' arm routes a
+  future third difficulty to the normal arm (closed union today);
+  itemSourceLevel('wyrmfall_core') = 20 from the vendor bump, inert twice
+  over (junk is never equippable, tooltip gates on gear kinds), pinned
+  inert in heroic_vendor; EMBER_ACCRUAL_GRANT_CAP can take two slots on a
+  partial stack (comment corrected in round 3's spirit, accepted); mail is
+  the SECOND never-expiring reward-parcel source (mailHeroicMarks shape,
+  ~7 letters/day ceiling); dying mid-sunder is code-verified safe (damage
+  teardown clears the session); the mid-cast pin protects cast-start to
+  completion, not menu-click to confirm-OK (family-wide, release-owned);
+  bags_window forwards a raw -1 stale index where the destroy sibling
+  falls back to undefined (family-wide, wrong toast only); itemCopyPin
+  does not cover count (unreachable: all 14 eligible ids are stack 1;
+  becomes real if a stackable sunderable ships); the capped-backlog
+  branch can blank the anchor and re-arm the first-grant only when
+  resetDay itself is year 9999 with a 21-plus-week-behind anchor
+  (effectively unreachable, the range bail's own edge, on record); a
+  leaving-but-entered character's mail-arm gate stamp lands after the
+  leave snapshot so that source can re-pay on relog (byte-identical to
+  the release's mailHeroicMarks + lockToHeroicClaim exposure, inherited
+  and accepted, not a phase regression).
+- Phase 04 QA open items and obligations MINTED (append to the working set):
+  (1) RULING WANTED before phase 12 prices Perfecting: heroic-raid epics
+  are NOT sunderable today (item_level.ts registers both heroic arms
+  raid: false, so itemFromRaid admits only the 14 normal-mode ilvl-29
+  epics; the best-geared character has the fewest sunderable items; the
+  boundary is now pinned in tests/masterwrought_materials.test.ts, flip
+  the pin WITH the ruling if the scope widens). (2) The Perfecting/apex
+  re-mint arm (phase 12) MUST pass movement: true on its re-mint addItem
+  (the release's obtain-tally doctrine; no branch precedent shows the
+  flag, the doctrine lives in the Sim.addItem header and reliquary.ts).
+  (3) The present/absent wyrmfall delivery straddles the movement
+  boundary (mail rides grantCopies movement:true, present is a direct
+  grant): inert until a masterwrought id becomes a catalogued relic;
+  re-check if a Masterwrought reliquary shelf lands. (4) Maker's Ember
+  must NEVER become tradable (soulbound is what keeps the uncapped R4
+  accrual from becoming a supply vector; standing constraint, stated at
+  the def). (5) The core faucet is per-account-unbounded through alts
+  (up to eight sources per character per day, tradable output): phase 15
+  power-verification input, on record. (6) Release-owned upstream
+  follow-ups, do not fix here: the addressing guard's client-half sender
+  window is comment-bleed-prone (bound it at the next method like the
+  server half); the orphaned sortedJson JSDoc above beginEnchantFamilyCast
+  (the item_copy_ref extraction left it); the release-authored reliquary
+  db-mock factories are partial (8/12 keys of 26; a future phase making
+  join/snapshot call a new db export surfaces there first); the zh locales
+  have no armed transliteration patterns in overlay_ip_scrub (they
+  translate semantically today, no live gap). (7) The masterwrought
+  suites still predate the EMPTY_TEST_WORLD gate-perf trim (carried
+  forward). (7b) Epic-and-up MATERIALS trip the first-quality collection
+  deeds (makers_ember minted col_first_epic for all ten raiders in the
+  parity golden; cosmetic, renown 0): phases 12/13 mint more epic and
+  legendary materials and col_first_legendary has the identical shape, so
+  decide per material whether a token counting as the character's first
+  epic or legendary is intended, and characterize the deed in any golden
+  it moves. (8) tests/professions_silent_loot.test.ts reads the
+  professions DIRECTORY off disk: vitest-related can never select it, the
+  full gate stays the only floor for disk-scan guards (carried forward,
+  bit again this session as the M5 mutation-probe noise).
 - Gate + review round 1 (2026-08-08). The full-suite gate caught the silent-loot
   registry (#2430/#2458) reaching the new professions modules (the heroic-marks
   precedent lives in instances/, OUTSIDE that sweep, so the phase plan never named
@@ -856,6 +1015,8 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   accepted; the leave/shutdown flush is transactional). Deploy note for the PR:
   a rollback to a pre-materials binary drops both keys on load and erases them at
   its next save; roll-forward then reopens the daily gate (bounded duplicate
-  income: at most nine sources, 1-3 cores each) and restarts the ember anchor
+  income: at most eight sources (six heroic keys incl. the heroic raid, the
+  normal raid, the rift token; the original "nine" over-counted), 1-3 cores
+  each) and restarts the ember anchor
   (exactly one extra ember, no retroactive accrual); granted items survive both
   legs (unknown-id stacks stay dormant recoverable data).
