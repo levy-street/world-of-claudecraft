@@ -6074,6 +6074,36 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 100,
           "zeroAt": 125
         }
+      },
+      {
+        "id": "recipe_growth_tonic",
+        "name": "Growth Tonic",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sheenleaf Herb",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Growth Tonic",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
       }
     ]
   },
@@ -6421,6 +6451,262 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         ],
         "output": {
           "name": "Marlow's Grand Roast",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_vale_hearth_loaf",
+        "name": "Vale Hearth Loaf",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Vale Wheat",
+            "count": 3
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Vale Hearth Loaf",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_eastbrook_root_pottage",
+        "name": "Eastbrook Root Pottage",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Brook Carrot",
+            "count": 2
+          },
+          {
+            "name": "Fine Brook Carrot",
+            "count": 1
+          },
+          {
+            "name": "Vale Wheat",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Eastbrook Root Pottage",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_fenbridge_rice_bowl",
+        "name": "Fenbridge Rice Bowl",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Marsh Rice",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Rice Bowl",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_fenbridge_beet_braise",
+        "name": "Fenbridge Beet Braise",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Bog Beet",
+            "count": 3
+          },
+          {
+            "name": "Fine Bog Beet",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Beet Braise",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_highwatch_barley_bannock",
+        "name": "Highwatch Barley Bannock",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Highland Barley",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Highwatch Barley Bannock",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_highwatch_gourd_soup",
+        "name": "Highwatch Gourd Soup",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Frost Gourd",
+            "count": 3
+          },
+          {
+            "name": "Fine Frost Gourd",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Highwatch Gourd Soup",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_evergarden_sunmelon_tart",
+        "name": "Evergarden Sunmelon Tart",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Gilded Sunmelon",
+            "count": 3
+          },
+          {
+            "name": "Fine Gilded Sunmelon",
+            "count": 1
+          },
+          {
+            "name": "Vale Wheat",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Evergarden Sunmelon Tart",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_evergarden_harvest_platter",
+        "name": "Evergarden Harvest Platter",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Evergarden Greens",
+            "count": 3
+          },
+          {
+            "name": "Fine Evergarden Greens",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Evergarden Harvest Platter",
           "count": 1,
           "quality": "rare"
         },

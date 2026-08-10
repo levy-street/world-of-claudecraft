@@ -30,7 +30,7 @@ import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { GATHERING_PROFESSIONS, STATIONS } from '../src/sim/content/professions';
-import { ALL_RECIPES, HOE_RECIPES } from '../src/sim/content/recipes';
+import { ALL_RECIPES, FARM_RECIPES, HOE_RECIPES } from '../src/sim/content/recipes';
 import { ZONE1_NPCS } from '../src/sim/content/zone1';
 import { ZONE2_NPCS } from '../src/sim/content/zone2';
 import { ZONE3_NPCS } from '../src/sim/content/zone3';
@@ -928,50 +928,94 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     });
   });
 
-  it('every farming material is consumed by a live path or carries the documented Phase 6 note', () => {
-    // The live consumers, derived from the live tables: plant_crop spends
-    // every seed, the watch fee is a produce sink, convert_husks eats husks,
-    // the plant-time knobs consume the two supplies, and HOE_RECIPES consumes
-    // the fine twin one tier below each crafted rung (fine_vale_wheat,
-    // fine_marsh_rice, fine_highland_barley).
+  it('every farming material is consumed by a live path: the Phase 6 closure', () => {
+    // THE LOOP IS CLOSED. Two halves of live demand together account for every
+    // farming material, with no deferred-note escape hatch left anywhere.
+    // COMMANDS: plant_crop spends every seed, the watch fee is a produce sink,
+    // convert_husks eats husks, and the plant-time knobs consume the two
+    // supplies. RECIPES: the whole MERGED ALL_RECIPES reagent set, which
+    // subsumes HOE_RECIPES (the three hoe fine twins) and the Phase 6
+    // FARM_RECIPES (the eight dishes' produce plus the five remaining fine
+    // twins). The recipe term is deliberately filtered to NO subset: a
+    // farming material earns its keep through demand wherever the demand
+    // lives, so a future craft outside cooking counts the same.
+    //
+    // The exact-set pin on FARM_MATERIAL_ITEM_IDS in
+    // tests/material_taxonomy.test.ts is still the smuggle guard: it is what
+    // stops a material being quietly dropped from the taxonomy to make this
+    // arm green, so the two suites have to be edited together to fake a pass.
+    const recipeConsumed = new Set<string>(
+      ALL_RECIPES.flatMap((recipe) => recipe.reagents.map((reagent) => reagent.itemId)),
+    );
     const liveConsumed = new Set<string>([
       ...Object.values(FARM_CROPS).flatMap((c) => [c.seedItemId, c.produceItemId]),
       FARM_WITHERED_HUSK_ITEM_ID,
       ...FARM_SUPPLY_ITEM_IDS,
-      ...HOE_RECIPES.flatMap((recipe) => recipe.reagents.map((reagent) => reagent.itemId)),
+      ...recipeConsumed,
     ]);
-    // The five fine twins no live path consumes yet, as LITERALS (the
-    // comment-scraping alternative is brittle): each row carries its explicit
-    // Phase 6 consumer note in src/sim/content/items.ts (the dishes phase),
-    // per the wolf_fang rule. Phase 6 shrinks this list; nothing may ever
-    // grow it silently, which the partition below enforces in both
-    // directions.
-    const PHASE6_NOTED = [
-      'fine_bog_beet',
-      'fine_brook_carrot',
-      'fine_evergarden_greens',
-      'fine_frost_gourd',
-      'fine_gilded_sunmelon',
-    ];
-    for (const itemId of PHASE6_NOTED) {
+    const unaccounted = FARM_MATERIAL_ITEM_IDS.filter((itemId) => !liveConsumed.has(itemId));
+    expect(unaccounted, 'every farming material needs a live consumer').toEqual([]);
+    // Non-vacuity, both terms: the taxonomy really carries all 27 materials
+    // and each one is covered, and the RECIPE half alone is non-empty, so a
+    // broken import or an emptied FARM_RECIPES cannot leave the command terms
+    // silently carrying the whole arm.
+    expect(FARM_MATERIAL_ITEM_IDS.length).toBe(27);
+    expect(FARM_MATERIAL_ITEM_IDS.every((itemId) => liveConsumed.has(itemId))).toBe(true);
+    expect(
+      FARM_MATERIAL_ITEM_IDS.filter((itemId) => recipeConsumed.has(itemId)).length,
+      'the recipe-derived term must consume farming materials on its own',
+    ).toBeGreaterThan(0);
+    // THE CLOSURE DIRECTION, as LITERALS: these five fine twins are exactly
+    // the Phase 5 deferral (the ladder took three twins and left five with no
+    // consumer, noted then as "the dishes phase"), and Phase 6 closed it with
+    // one dedicated dish slot each. A literal twin -> recipe map, never a
+    // derivation: the deferral closed against these five NAMED recipes, so a
+    // dish that quietly drops its twin, or a swap of which dish carries which
+    // twin, reds here instead of passing on a count.
+    const CLOSED_PHASE5_DEFERRALS: Readonly<Record<string, string>> = {
+      fine_bog_beet: 'recipe_fenbridge_beet_braise',
+      fine_brook_carrot: 'recipe_eastbrook_root_pottage',
+      fine_evergarden_greens: 'recipe_evergarden_harvest_platter',
+      fine_frost_gourd: 'recipe_highwatch_gourd_soup',
+      fine_gilded_sunmelon: 'recipe_evergarden_sunmelon_tart',
+    };
+    for (const [twin, recipeId] of Object.entries(CLOSED_PHASE5_DEFERRALS)) {
+      const consumers = ALL_RECIPES.filter((recipe) =>
+        recipe.reagents.some((reagent) => reagent.itemId === twin),
+      ).map((recipe) => recipe.id);
       expect(
-        liveConsumed.has(itemId),
-        `${itemId} gained a live consumer; strike it from the noted list`,
-      ).toBe(false);
+        consumers.length,
+        `${twin} lost its live recipe consumer; the Phase 5 deferral reopened`,
+      ).toBeGreaterThanOrEqual(1);
+      expect(consumers, `${twin} must be consumed by ${recipeId}`).toContain(recipeId);
       expect(
-        FARM_MATERIAL_ITEM_IDS.includes(itemId),
-        `${itemId} is noted but is not a farming material`,
+        FARM_MATERIAL_ITEM_IDS.includes(twin),
+        `${twin} is mapped here but is not a farming material`,
       ).toBe(true);
     }
-    const unaccounted = FARM_MATERIAL_ITEM_IDS.filter(
-      (itemId) => !liveConsumed.has(itemId) && !PHASE6_NOTED.includes(itemId),
-    );
-    expect(unaccounted, 'every farming material needs a consumer or the documented note').toEqual(
-      [],
-    );
-    // Non-vacuity: the partition really covered a live set and a noted set.
-    expect(FARM_MATERIAL_ITEM_IDS.length).toBe(27);
-    expect(liveConsumed.size).toBeGreaterThan(PHASE6_NOTED.length);
+    // The OTHER twin family stays disjointly accounted, so neither family is
+    // standing in for the other's coverage: the three hoe twins keep their
+    // HOE_RECIPES consumers (deviation (ad), each crafted rung consuming the
+    // twin one tier below it). These three gained no dish in Phase 6 and were
+    // never part of the deferral.
+    const HOE_TWIN_CONSUMERS: Readonly<Record<string, string>> = {
+      fine_highland_barley: 'recipe_osmium_hoe',
+      fine_marsh_rice: 'recipe_skysilver_hoe',
+      fine_vale_wheat: 'recipe_bronze_hoe',
+    };
+    for (const [twin, recipeId] of Object.entries(HOE_TWIN_CONSUMERS)) {
+      expect(
+        HOE_RECIPES.some(
+          (recipe) =>
+            recipe.id === recipeId && recipe.reagents.some((reagent) => reagent.itemId === twin),
+        ),
+        `${twin} must keep its ${recipeId} hoe-recipe consumer`,
+      ).toBe(true);
+      expect(
+        Object.keys(CLOSED_PHASE5_DEFERRALS).includes(twin),
+        `${twin} is a hoe twin and must never join the dish deferral map`,
+      ).toBe(false);
+    }
   });
 
   it('no NPC vendors any farming item: stocking is dormant by choice until Phase 9', () => {
@@ -1000,5 +1044,52 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // non-farming vendor row exists somewhere), so the absence above is a
     // real sweep rather than an empty loop.
     expect(vendorRowsSeen).toBeGreaterThan(0);
+  });
+
+  it('no Phase 6 farm recipe is craftable from vendor stock alone before the Phase 9 go-live', () => {
+    // THE DORMANCY NEGATIVE the arm above implies but does not cover. Dormant
+    // STOCKING is only half the go-live guarantee: a farm recipe whose WHOLE
+    // reagent list can be bought off a counter would be live today, farm or no
+    // farm, and would mint its output (and its cooking skill-ups) years before
+    // the patches open. So every FARM_RECIPES row must keep at least one
+    // reagent no live NPC stocks. For the eight dishes that reagent is farm
+    // produce, which nobody can grow before the go-live phase; for the tonic it
+    // is silverleaf_herb, wild-gathered and priceless by doctrine.
+    //
+    // DELIBERATE and ledgered as deviation (ai): the tonic IS craftable
+    // pre-go-live by a player who gathers the herbs. That is exactly D7's
+    // cross-profession trade, whose faucet is the herb line rather than the
+    // farm, so this arm asserts unstocked-ness, never uncraftability.
+    const stockedItemIds = new Set<string>();
+    for (const npc of Object.values(NPCS)) {
+      for (const itemId of npc.vendorItems ?? []) stockedItemIds.add(itemId);
+    }
+    // Same non-vacuity as the arm above: the world really has counters, so an
+    // "unstocked" verdict below is a real absence rather than an empty walk.
+    expect(stockedItemIds.size).toBeGreaterThan(0);
+    // The whole Phase 6 set really swept: eight dishes plus the tonic.
+    expect(FARM_RECIPES).toHaveLength(9);
+    for (const recipe of FARM_RECIPES) {
+      expect(recipe.reagents.length, `${recipe.id} needs reagents to sweep`).toBeGreaterThan(0);
+      const unstocked = recipe.reagents
+        .map((reagent) => reagent.itemId)
+        .filter((itemId) => !stockedItemIds.has(itemId));
+      expect(
+        unstocked.length,
+        `${recipe.id} is craftable from vendor stock alone: every reagent sits on a counter`,
+      ).toBeGreaterThan(0);
+      // The stronger PRICE-BASIS arm, pinned here at the source: a row whose
+      // reagents ALL carry a copper buyValue joins the vendor-fed
+      // counterfactual in tests/recipe_economy.test.ts (a sorted literal pin
+      // plus a discounted-input bound), so a farm row drifting into that shape
+      // is both a dormancy break and a cross-suite break.
+      const priceless = recipe.reagents
+        .map((reagent) => reagent.itemId)
+        .filter((itemId) => ITEMS[itemId]?.buyValue === undefined);
+      expect(
+        priceless.length,
+        `${recipe.id} needs at least one reagent with no vendor buy price`,
+      ).toBeGreaterThan(0);
+    }
   });
 });
