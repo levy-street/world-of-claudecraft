@@ -199,6 +199,12 @@ export async function buildPortraitRendererContract(repoRoot, browserBundleBytes
   if (!bundleBytes) {
     const built = await esbuild.build({
       entryPoints: [path.join(repoRoot, PORTRAIT_BROWSER_ENTRY)],
+      // Build from the repo root regardless of the process working directory. esbuild records each
+      // bundled module path relative to its working directory, so the same sources built inside a
+      // linked worktree under .wt/ gain ../../ prefixes: different bytes, different sha256. That
+      // hash is pinned by tests/placeholder_art_completion.test.ts, so a manifest regenerated in a
+      // worktree is then rejected at the root, and the repair that re-pins it is rejected in turn.
+      absWorkingDir: repoRoot,
       bundle: true,
       format: 'iife',
       platform: 'browser',
