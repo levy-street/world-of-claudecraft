@@ -38,6 +38,11 @@ const SERVER = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8
 const ADDRESSED_COMMANDS: ReadonlyArray<{ cmd: string; field: string; why?: string }> = [
   { cmd: 'salvage_item', field: 'slot' },
   { cmd: 'disenchant_item', field: 'slot', why: 'the original precise surface' },
+  {
+    cmd: 'extract_essence',
+    field: 'slot',
+    why: 'the Masterwrought sunder rides the enchant-family selected-slot discipline and pins the copy mid-cast with itemCopyPin',
+  },
   { cmd: 'discard', field: 'slot' },
   { cmd: 'sell', field: 'slot' },
   { cmd: 'use', field: 'slot' },

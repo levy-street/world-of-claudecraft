@@ -1468,7 +1468,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r17_earthbind',
           name: 'Primal Exaltation',
           description:
-            'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. 120 sec cooldown.',
+            'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritcall adds 50% more healing to Mending Current. 120 sec cooldown.',
           icon: 'elemental_mastery',
           effect: { grant: { ability: 'primal_exaltation' } },
         },

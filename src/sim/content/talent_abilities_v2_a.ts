@@ -515,7 +515,7 @@ export const TALENT_ABILITIES_V2_A = {
     requiresTarget: false,
     effects: [],
     description:
-      'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)',
+      'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritcall adds 50% more healing to Mending Current. (Shaman talent)',
   },
   bloodlust: {
     id: 'bloodlust',
