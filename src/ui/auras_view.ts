@@ -171,7 +171,7 @@ export interface AurasEntityInput {
  *  with effectHtmlCacheVersion reuses effect HTML until that locale version changes. */
 export interface AurasDeps {
   /** The icon identity the painter resolves to a background-image URL (host:
-   *  `ABILITIES[id] ? id : 'aura_' + kind`). */
+   *  the cached generated-aura resolver in hud.ts). */
   iconId(aura: AuraInput): string;
   /** The localized aura display name, for the tooltip (host: `ABILITIES[id] ?
    *  abilityDisplayName(...) : auraDisplayNameFromSource(name)`). */

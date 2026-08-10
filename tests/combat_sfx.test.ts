@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { SFX_CLIPS, SFX_MOB_EXTENSION_FAMILIES } from '../src/game/sfx_manifest.generated';
+import { ABILITIES } from '../src/sim/content/classes';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import {
   auraApplyCue,
   castCueForAbility,
   consumeHealCue,
+  groundTickAbilityCue,
   impactCueForDamage,
   MOB_VOICE_CUES,
   mobVoiceActionForDamage,
@@ -318,6 +320,18 @@ describe('combat SFX policy', () => {
         }),
       ).toEqual({ key: ability, anchorId: 20 });
     }
+    // Low Blow (kidney_shot) reuses Gut Punch's (cheap_shot) recording, not
+    // its own key, same reuse mechanism as Eviscerate/Rupture.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'ccImpact',
+        ability: 'kidney_shot',
+      }),
+    ).toEqual({ key: 'cheap_shot', anchorId: 20 });
     // No ability id, or an ability not in the covered set: no cue at all
     // (the sim only ever emits ccImpact for this set, but the client
     // resolver stays defensive regardless).
@@ -356,6 +370,15 @@ describe('combat SFX policy', () => {
         ability: 'flamestrike',
       }),
     ).toEqual({ key: 'flamestrike', anchorId: 10 });
+  });
+
+  it('gives Meteor its own ground-tick cue instead of staying silent', () => {
+    expect(groundTickAbilityCue('meteor')).toBe('meteor');
+    // Every other groundAoE zone (Consecration, Blizzard's damage pulse, ...)
+    // has no dedicated recording and stays silent here (procedural VFX synth
+    // carries it, see ability_sfx_coverage.ts's PULSE_IMPACT_ABILITIES).
+    expect(groundTickAbilityCue('consecration')).toBeNull();
+    expect(groundTickAbilityCue(undefined)).toBeNull();
   });
 
   it('gives Scorch and Pyroblast their own impact instead of the shared impact_fire', () => {
@@ -687,6 +710,24 @@ describe('combat SFX policy', () => {
     const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
     expect(auraApplyCue(gained, { ...aura('stealth'), id: 'vanish' })).toBe('vanish');
     expect(auraApplyCue(gained, { ...aura('stealth'), id: 'stealth' })).toBe('stealth');
+  });
+
+  it('reuses the Stealth recording for Greater Invisibility, Prowl, and Shadowform', () => {
+    // Pin these ids to real content: if any got renamed in classes.ts, this
+    // fails loudly instead of silently reverting to the buff_apply fallback.
+    for (const id of ['greater_invisibility', 'prowl', 'shadowform']) {
+      expect(ABILITIES[id]?.id).toBe(id);
+    }
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'greater_invisibility' })).toBe(
+      'stealth',
+    );
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'prowl' })).toBe('stealth');
+    // Shadowform is kind:'form_shadow', not 'stealth': the override is keyed
+    // off Aura.id, not Aura.kind, so it still resolves regardless of the
+    // aura's real kind. Not a debuff (form_shadow is absent from
+    // DEBUFF_AURA_KINDS), so it reaches the buff-apply table at all.
+    expect(auraApplyCue(gained, { ...aura('form_shadow'), id: 'shadowform' })).toBe('stealth');
   });
 
   it('uses unarmed swings in both druid combat forms', () => {

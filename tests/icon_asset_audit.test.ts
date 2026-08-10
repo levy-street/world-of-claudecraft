@@ -861,15 +861,69 @@ describe('icon asset audit', () => {
         kind: Kind;
         id: string;
         runtimeUrl: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
         source?: Record<string, unknown>;
       }>;
       [key: string]: unknown;
     };
     validateAcceptedArtManifest(value);
 
+    // The checked-in manifest remains immutable history. Resolve only replacements whose new
+    // ledger proves the complete old-pin to new-pin chain before exercising the live audit.
+    const itemConsistencyPath = path.join(
+      REPO_ROOT,
+      'docs/achievements/item-art-consistency-2026-08-09/accepted-art.json',
+    );
+    const itemConsistency = JSON.parse(readFileSync(itemConsistencyPath, 'utf8')) as {
+      assets: Array<{
+        id: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
+        generationReport: string;
+      }>;
+      supersedes: Array<{
+        itemId: string;
+        historicalAcceptedArt?: { path: string; assetKey: string };
+        previous: { shipping: { sha256: string; bytes: number } };
+        replacement: {
+          batchId: string;
+          acceptedSha256: string;
+          acceptedBytes: number;
+          generationReport: string;
+        };
+      }>;
+    };
+    let resolvedSupersessions = 0;
+    for (const asset of value.assets) {
+      if (asset.kind !== 'item') continue;
+      const supersession = itemConsistency.supersedes.find(({ itemId }) => itemId === asset.id);
+      if (!supersession) continue;
+      resolvedSupersessions += 1;
+      expect(supersession.historicalAcceptedArt, `${asset.id} historical link`).toEqual({
+        path: 'docs/achievements/missing-painted-icons-accepted-art.json',
+        assetKey: `item:${asset.id}`,
+      });
+      expect(supersession.previous.shipping, `${asset.id} historical pin`).toMatchObject({
+        sha256: asset.acceptedSha256,
+        bytes: asset.acceptedBytes,
+      });
+      const replacement = itemConsistency.assets.find(({ id }) => id === asset.id);
+      expect(replacement, `${asset.id} replacement asset`).toBeDefined();
+      expect(supersession.replacement, `${asset.id} replacement pin`).toEqual({
+        batchId: 'item-art-consistency-2026-08-09',
+        acceptedSha256: replacement?.acceptedSha256,
+        acceptedBytes: replacement?.acceptedBytes,
+        generationReport: replacement?.generationReport,
+      });
+      asset.acceptedSha256 = supersession.replacement.acceptedSha256;
+      asset.acceptedBytes = supersession.replacement.acceptedBytes;
+    }
+    expect(resolvedSupersessions).toBe(6);
+
     // The 512px human-review sheets normally use ignored generation sources. This CI fixture
-    // changes only those review paths to the committed shipping WebPs, keeping every accepted
-    // identity and contract pin from the checked-in manifest intact.
+    // changes those review paths to committed shipping WebPs while preserving every accepted
+    // identity and contract from the checked-in manifest.
     const deedShippingSources: string[] = [];
     for (const asset of value.assets) {
       if (asset.kind !== 'deed') continue;

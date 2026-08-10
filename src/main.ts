@@ -213,6 +213,11 @@ import {
   resetGraphicsProfileDerivedCaches,
 } from './render/assets/graphics_profile';
 import {
+  enableKtx2MipRelease,
+  ktx2MipsOnContextLost,
+  ktx2MipsRestored,
+} from './render/assets/ktx2_mip_release';
+import {
   assetsReady,
   beginBackgroundPreloads,
   beginDeferredPreloads,
@@ -385,7 +390,11 @@ import {
   t,
   tPlural,
 } from './ui/i18n';
-import { defaultIconPrewarmPlan, type IconPrewarmEntry, prewarmIconCache } from './ui/icon_prewarm';
+import {
+  contextualIconPrewarmEntries,
+  defaultIconPrewarmPlan,
+  prewarmIconCache,
+} from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
 import {
   noteLoadingProgress,
@@ -467,6 +476,18 @@ if (DESKTOP_APP) initDesktopShellIntegration();
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
 installWebGLContextRelease();
+// World-only GLB textures (props, dungeon, biome, ...) drop their CPU-side
+// transcoded mip chains after GPU upload. Only the GAME entry opts in: here,
+// every renderer that can draw those categories is the world renderer, whose
+// context loss and recycle paths route through the re-transcode hook below.
+// The editor and guide entries never call this, so their extra renderers
+// (asset thumbnails, wiki viewer) keep resident mips. Runs at module
+// evaluation so no deferred-preload GLB can classify before the switch is on.
+// The probe reads the LIVE GFX binding (initGfxTier and graphics rebuilds
+// reassign it): constrained-memory profiles (the whole iOS WebKit ladder plus
+// phone-class browsers) keep resident mips, because their semi-routine
+// in-place context loss has no curtain for the restore's re-transcode window.
+enableKtx2MipRelease(() => GFX.constrainedMemory);
 let pendingDeleteCharacter: CharacterSummary | null = null;
 // The desktop roster shows one shared "Enter World" button (in .cs-list-actions)
 // instead of a per-row one; it acts on whichever character is selected. Mobile
@@ -1347,6 +1368,11 @@ async function startGame(
   const autoLoot = new AutoLoot();
   const perf = createPerfMonitor(null, DESKTOP_APP);
   canvas.addEventListener('webglcontextlost', () => {
+    // Start re-transcoding released KTX2 mip chains NOW: the restored (or
+    // recycled) context re-uploads from texture.mipmaps, and the sooner the
+    // worker starts the shorter any stub-black window. Fires for in-place GPU
+    // loss AND the graphics-rebuild recycle (both dispatch on this canvas).
+    ktx2MipsOnContextLost();
     entryDiagnostics.checkpoint('webgl-context-lost', {
       ...renderEntryDiagnostics(),
       contextLost: rendererReady ? renderer.perfStats().contextLost + 1 : 1,
@@ -1423,46 +1449,40 @@ async function startGame(
     // rest of the catalog stays in the idle lane. This removes synchronous PNG
     // encoding from the first bags/character/spellbook/vendor open without
     // moving that work onto the main thread.
-    const iconPriorities: IconPrewarmEntry[] = [];
-    const prioritizeItem = (id: string | null | undefined): void => {
-      if (id) iconPriorities.push({ kind: 'item', id });
-    };
-    for (const id of Object.values(world.equipment)) prioritizeItem(id);
     // Party frames render compact 20px crests, while profile/Inspect chips use
     // 96px badges. Cache keys include size, so warm both exact consumer
     // dimensions; otherwise the first inspected player synchronously encodes a
     // procedural crest even though its 3D portrait is already cached.
-    for (const cls of ALL_CLASSES) {
-      iconPriorities.push({ kind: 'crest', id: `class_${cls}`, size: 20 });
-      iconPriorities.push({ kind: 'crest', id: `class_${cls}`, size: 96 });
-    }
-    for (const slot of world.inventory) prioritizeItem(slot.itemId);
-    for (const id of world.bags) prioritizeItem(id);
-    for (const ability of world.known) iconPriorities.push({ kind: 'ability', id: ability.def.id });
-    // Spellbook paints the whole class kit, including not-yet-learned rows.
-    for (const id of CLASSES[world.cfg.playerClass].abilities)
-      iconPriorities.push({ kind: 'ability', id });
     // Talent row options also use procedural crest ids that are absent from
     // ABILITIES, plus granted abilities not guaranteed to be in the base kit.
-    for (const row of rowTreeFor(world.cfg.playerClass) ?? []) {
-      for (const option of row.options) iconPriorities.push(talentRowOptionIconRef(option));
-    }
-    for (const recipe of world.recipeList) prioritizeItem(recipe.resultItemId);
-    for (const id of finderLootItemIds()) prioritizeItem(id);
     // Gossip/quest-log reward rows and the heroic marks shop can be opened from
     // navigation chrome before the all-items idle sweep reaches their ids.
-    for (const entity of world.entities.values()) {
-      for (const questId of entity.questIds) {
-        const quest = QUESTS[questId];
-        if (quest) prioritizeItem(questRewardItem(quest, world.cfg.playerClass));
-      }
-    }
-    for (const offer of HEROIC_VENDOR_STOCK) prioritizeItem(offer.itemId);
-    for (const listing of world.marketInfo?.listings ?? []) prioritizeItem(listing.itemId);
-    for (const slot of world.marketInfo?.collectionItems ?? []) prioritizeItem(slot.itemId);
-    for (const listing of MARKET_HOUSE_STOCK) prioritizeItem(listing.itemId);
-    for (const entity of world.entities.values())
-      for (const id of entity.vendorItems) prioritizeItem(id);
+    const worldEntities = [...world.entities.values()];
+    const iconPriorities = contextualIconPrewarmEntries({
+      equipmentItemIds: Object.values(world.equipment),
+      classIds: ALL_CLASSES,
+      inventoryItemIds: world.inventory.map((slot) => slot.itemId),
+      bagItemIds: world.bags,
+      knownAbilityIds: world.known.map((ability) => ability.def.id),
+      // Spellbook paints the whole class kit, including not-yet-learned rows.
+      classAbilityIds: CLASSES[world.cfg.playerClass].abilities,
+      talentIconRefs: (rowTreeFor(world.cfg.playerClass) ?? []).flatMap((row) =>
+        row.options.map(talentRowOptionIconRef),
+      ),
+      recipeResultItemIds: world.recipeList.map((recipe) => recipe.resultItemId),
+      finderLootItemIds: finderLootItemIds(),
+      questRewardItemIds: worldEntities.flatMap((entity) =>
+        entity.questIds.flatMap((questId) => {
+          const quest = QUESTS[questId];
+          return quest ? [questRewardItem(quest, world.cfg.playerClass)] : [];
+        }),
+      ),
+      heroicVendorItemIds: HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
+      marketListingItemIds: (world.marketInfo?.listings ?? []).map((listing) => listing.itemId),
+      marketCollectionItemIds: (world.marketInfo?.collectionItems ?? []).map((slot) => slot.itemId),
+      marketHouseItemIds: MARKET_HOUSE_STOCK.map((listing) => listing.itemId),
+      vendorItemIds: worldEntities.flatMap((entity) => entity.vendorItems),
+    });
     const iconPrewarm = defaultIconPrewarmPlan(iconPriorities);
     prewarmIconCache(iconPrewarm.entries, { eagerCount: iconPrewarm.priorityCount });
     entryDiagnostics.checkpoint('hud-built');
@@ -2755,6 +2775,10 @@ async function startGame(
       // eagerly behind this opaque curtain; hold (bounded) so the commit
       // reveals a finished horizon instead of easing the fog out on screen.
       await next.farVistaReady();
+      // Released KTX2 mip chains re-transcode after the recycle's context
+      // loss; hold the curtain until they are back so the reveal never shows
+      // stub-black world textures (settles on failure too, never hangs).
+      await ktx2MipsRestored();
     },
     validateRenderer: (next) => {
       next.sync(1, 0, null, 0, null);

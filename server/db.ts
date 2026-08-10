@@ -3631,6 +3631,7 @@ export interface ArenaLeaderRow {
   rating: number;
   wins: number;
   losses: number;
+  draws: number;
 }
 
 export async function topArenaRatings(
@@ -3650,16 +3651,23 @@ export async function topArenaRatings(
     fmt === '2v2'
       ? "COALESCE((state->>'arena2v2Losses')::int, 0)"
       : "COALESCE((state->>'arena1v1Losses')::int, (state->>'arenaLosses')::int, 0)";
+  // No legacy alias: draws were never persisted before the W-L-D change, so an
+  // untouched row correctly reads 0 rather than borrowing another field.
+  const drawsExpr =
+    fmt === '2v2'
+      ? "COALESCE((state->>'arena2v2Draws')::int, 0)"
+      : "COALESCE((state->>'arena1v1Draws')::int, 0)";
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(
       `SELECT name, class, level,
             ${ratingExpr} AS rating,
             ${winsExpr} AS wins,
-            ${lossesExpr} AS losses
+            ${lossesExpr} AS losses,
+            ${drawsExpr} AS draws
        FROM characters
       WHERE realm = $1
         AND state IS NOT NULL
-        AND ${winsExpr} + ${lossesExpr} > 0
+        AND ${winsExpr} + ${lossesExpr} + ${drawsExpr} > 0
         AND EXISTS (SELECT 1 FROM accounts a
                      WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
       ORDER BY rating DESC, wins DESC, name ASC
@@ -3674,6 +3682,7 @@ export async function topArenaRatings(
     rating: Number(r.rating),
     wins: Number(r.wins),
     losses: Number(r.losses),
+    draws: Number(r.draws),
   }));
 }
 
@@ -3691,6 +3700,7 @@ export interface BgLeaderRow {
   rating: number;
   wins: number;
   losses: number;
+  draws: number;
 }
 
 // ACCEPTED COST (the arena twin's trade, doubled): predicating and ordering on
@@ -3707,16 +3717,18 @@ export async function topBgRatings(limit = 20): Promise<BgLeaderRow[]> {
   const ratingExpr = "COALESCE((state->>'bgRating')::int, 1500)";
   const winsExpr = "COALESCE((state->>'bgWins')::int, 0)";
   const lossesExpr = "COALESCE((state->>'bgLosses')::int, 0)";
+  const drawsExpr = "COALESCE((state->>'bgDraws')::int, 0)";
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(
       `SELECT name, class, level,
             ${ratingExpr} AS rating,
             ${winsExpr} AS wins,
-            ${lossesExpr} AS losses
+            ${lossesExpr} AS losses,
+            ${drawsExpr} AS draws
        FROM characters
       WHERE realm = $1
         AND state IS NOT NULL
-        AND ${winsExpr} + ${lossesExpr} > 0
+        AND ${winsExpr} + ${lossesExpr} + ${drawsExpr} > 0
         AND EXISTS (SELECT 1 FROM accounts a
                      WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
       ORDER BY rating DESC, wins DESC, name ASC
@@ -3731,6 +3743,7 @@ export async function topBgRatings(limit = 20): Promise<BgLeaderRow[]> {
     rating: Number(r.rating),
     wins: Number(r.wins),
     losses: Number(r.losses),
+    draws: Number(r.draws),
   }));
 }
 

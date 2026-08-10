@@ -36,6 +36,9 @@ export interface ArenaAllTimeEntry {
   rating: number;
   wins: number;
   losses: number;
+  /** Absent on a board served by a realm that predates the W-L-D
+   *  change, so the consumer defaults it rather than rendering NaN. */
+  draws?: number;
 }
 
 /** A live-ladder row: rank + the raw class id (painter localizes when known). */
@@ -49,6 +52,8 @@ export interface ArenaLadderRow {
   rating: number;
   wins: number;
   losses: number;
+  /** Matches that ended level, the third figure of the W-L-D record. */
+  draws: number;
 }
 
 /** An all-time ladder row: a ladder row plus the player level the title shows. */
@@ -135,7 +140,13 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
   // (pvp_tabs_view.ts) owns tab pinning and locking, fed by the same snapshot.
   const bracket = a.match?.format ?? queuedFmt ?? selectedBracket;
   const canSwitchBracket = !a.queued && !inMatch;
-  const standing = a.standings[bracket];
+  // Defaulted HERE rather than at each reader: `standings` is mirrored straight
+  // off the server snapshot, so a client talking to a server that predates the
+  // draws field would otherwise render NaN in the rating-summary line. Every
+  // other draws consumer in this file already defaults; this is the one that
+  // reaches painters through `view.standing`, so one site covers them all.
+  const rawStanding = a.standings[bracket];
+  const standing = { ...rawStanding, draws: rawStanding.draws ?? 0 };
   const ladderRows = a.ladders[bracket];
   const partySize = party?.members.length ?? 1;
   const isLeader = !party || party.leader === myPid;
@@ -151,6 +162,10 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     rating: r.rating,
     wins: r.wins,
     losses: r.losses,
+    // `?? 0` for the rolling-deploy reason the map guard below records: a
+    // snapshot from a server predating this field carries no draws, and an
+    // undefined would render as NaN in the W-L-D record.
+    draws: r.draws ?? 0,
   }));
 
   let partySection: ArenaPartySection = { kind: 'none' };
@@ -215,6 +230,7 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
         rating: r.rating,
         wins: r.wins,
         losses: r.losses,
+        draws: r.draws ?? 0,
         level: r.level,
       }))
     : null;

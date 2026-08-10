@@ -1395,6 +1395,47 @@ function applyGardenCoast(x: number, z: number, h: number): number {
     smoothstep(GARDEN_ZMIN - 8, GARDEN_ZMIN + 8, z) *
     (1 - smoothstep(GARDEN_ZMAX - 8, GARDEN_ZMAX + 8, z));
   if (zSeam <= 0) return h;
+  // The east world edge at the Moonmere's cap. The mere's east-cap lobe
+  // (GARDEN_LAND_LOBES {522,726}) carried dry lawn all the way to the world
+  // bound (x = WORLD_MAX_X): the near terrain mesh ended on dry ground, so a dry
+  // tongue of lawn jutted ~17yd past the edge and cliffed to the seabed, and
+  // simply capping the exterior left a wide shallow shelf just under the surface
+  // (player reports near 538,726). Ease the shore to a gentle beach and sink it,
+  // plus the whole exterior band the far mesh samples (out to WORLD_MAX_X + 90),
+  // to the open seabed along a noise-wandered line, so the map ends in deep water
+  // like every other coast. This runs BEFORE the x>566 interior cutoff because
+  // the far apron (render/far_terrain_core.ts) reads terrainHeight past the
+  // bound; it is bounded to the world-edge vicinity so it never reaches the
+  // instance space at x ~99400. Kept in the mere-cap z-band and clear of the Old
+  // Mill headland (x ~504); pinned by tests/world_edge_coast.test.ts.
+  const edgeIn = WORLD_MAX_X - x; // >0 inland of the bound, <0 past it
+  if (edgeIn > -100 && edgeIn < 60) {
+    const gardenEdgeZ = smoothstep(696, 712, z) * (1 - smoothstep(752, 772, z));
+    if (gardenEdgeZ > 0) {
+      // wander the shoreline so it never reads as a ruled band
+      const e = edgeIn + (fbm2(z * 0.05, 517, 9361, 2) - 0.5) * 6;
+      // a gentle bank easing the shore down to the beach; it RELEASES by
+      // edgeIn ~19 so the seaward windmill of the Old Mill (x ~516, footprint to
+      // x ~520) and the mill lawn keep flat, dry footing instead of hanging over
+      // the drop (player report: the mill floated once the shore came in).
+      const capW = (1 - smoothstep(11, 19, e)) * gardenEdgeZ;
+      if (capW > 0) {
+        const cap = WATER_LEVEL + 0.6 + 0.34 * Math.max(0, e - 7);
+        if (h > cap) h = h + (cap - h) * capW;
+      }
+      // ...then drop the shallows and the whole exterior to the open seabed, so
+      // the far apron reads deep water instead of a murky near-surface shelf
+      const seaT = (1 - smoothstep(2, 7, e)) * gardenEdgeZ;
+      if (seaT > 0) {
+        const floor = WATER_LEVEL - 6;
+        if (h > floor) h = h + (floor - h) * seaT;
+      }
+      // Past the world bound is the far mesh's sample region: return the deep
+      // sink directly so the interior coast recipe below (which lifts sea back
+      // up to its near-shore shelf) never re-raises it into a shallow slab.
+      if (edgeIn < 0) return h;
+    }
+  }
   // the east column: cross-fade toward the strip at the border
   if (x > 566) return h; // nothing east of the world (instance space far beyond)
   const seam = smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x);

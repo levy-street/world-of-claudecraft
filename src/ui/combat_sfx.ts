@@ -35,7 +35,10 @@ const WAND_CUES: Partial<Record<MagicSchool, SfxId>> = {
 // instead, keyed off the casting ability id the event already carries: the
 // three AoE fear shouts (priest Psychic Scream, warlock Howl of Terror,
 // warrior Intimidating Shout, all archetype aoeFear), Frost Nova, and
-// Flamestrike (also archetype 'nova': a ground-targeted fire burst).
+// Flamestrike (also archetype 'nova': a ground-targeted fire burst). Not to
+// be confused with Meteor (GROUND_TICK_ABILITY_CUES below): the two are
+// separate abilities, each with its own recording, once mixed up during
+// authoring and since corrected.
 const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   psychic_scream: 'fear_shout',
   howl_of_terror: 'fear_shout',
@@ -46,13 +49,27 @@ const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
 
 // Shared by both nova-shaped events: the caster-anchored fx:'spellfx' nova
 // (self-centered/entity-anchored bursts) AND the world-anchored
-// fx:'spellfxAt' nova (ground-targeted bursts like Flamestrike, which always
-// takes the castAim branch and never the entity-anchored one). Exported so
-// hud.ts's spellfxAt handler can resolve the same override instead of
-// hardcoding 'spell_nova' regardless of ability (review finding, PR #2861:
-// the Flamestrike entry above could never fire on a real cast without this).
+// fx:'spellfxAt' nova (ground-targeted bursts). Exported so hud.ts's
+// spellfxAt handler can resolve the same override instead of hardcoding
+// 'spell_nova' regardless of ability (review finding, PR #2861).
 export function novaAbilityCue(ability: string | undefined): SfxId {
   return (ability && NOVA_ABILITY_CUES[ability]) || 'spell_nova';
+}
+
+// A ground-zone 'tick' fx event (pulseGroundAoE, effect_dispatch.ts's
+// groundAoE case) normally has no dedicated recording (see 'pulse' in
+// ability_sfx_coverage.ts's isAbilityMomentRecorded, which defaults to
+// false): the procedural VFX-synth layer carries every zone pulse. Meteor's
+// single delayed pulse now has a real recording instead, keyed off the
+// abilityId the tick event carries (effect.abilityId, pulseGroundAoE,
+// sim.ts). ability_sfx_coverage.ts's PULSE_IMPACT_ABILITIES set must list
+// the same id or the synth layer doubles it.
+const GROUND_TICK_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  meteor: 'meteor',
+};
+
+export function groundTickAbilityCue(ability: string | undefined): SfxId | null {
+  return (ability && GROUND_TICK_ABILITY_CUES[ability]) || null;
 }
 
 // A damage-landing archetype (bolt/burst/strike/nova/beam/dot) always
@@ -88,15 +105,17 @@ const DOT_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
 
 // A landed cc (stun/root/incapacitate) has no recording by default (see
 // ability_sfx_coverage.ts's RECORDED_IMPACT_ARCHETYPES, which deliberately
-// excludes 'cc'); these four now have one, keyed off the casting ability
+// excludes 'cc'); these now have one, keyed off the casting ability
 // id the fx:'ccImpact' event carries (effect_dispatch.ts gates the emit to
 // exactly this set, so no other stun/root/incapacitate fires the event at
-// all).
+// all). Low Blow (kidney_shot) reuses Gut Punch's (cheap_shot) recording,
+// same reuse mechanism as Eviscerate/Rupture.
 const CC_IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   hammer_of_justice: 'hammer_of_justice',
   entangling_roots: 'entangling_roots',
   blind: 'blind',
   cheap_shot: 'cheap_shot',
+  kidney_shot: 'cheap_shot',
   sap: 'sap',
 };
 
@@ -294,12 +313,23 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
 // it). Ice Block (Cold Coffin), Cloak of Shadows (Shadecloak, an absorb
 // aura, same apply path), Vanish (Smokestep, a toggle stealth selfBuff, same
 // apply path too), and Stealth (Duskveil, the opening rogue stealth toggle,
-// identical selfBuff shape) get their own distinct cue instead.
+// identical selfBuff shape) get their own distinct cue instead. Greater
+// Invisibility (mage, kind:'stealth' too, effect_dispatch.ts's
+// greaterInvisibility case) and Prowl (druid Cat Form stealth, id 'prowl',
+// display name Stalk, also kind:'stealth') reuse the rogue Stealth recording
+// rather than getting their own: same read, same table key. Shadowform
+// (Gloamveil, priest, kind:'form_shadow', a different aura kind entirely)
+// also reuses it for its apply moment by explicit request, even though it
+// isn't mechanically a stealth aura: BUFF_APPLY_ABILITY_CUES keys off
+// Aura.id, not Aura.kind, so this is a normal override regardless.
 const BUFF_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   ice_block: 'ice_block',
   cloak_of_shadows: 'cloak_of_shadows',
   vanish: 'vanish',
   stealth: 'stealth',
+  greater_invisibility: 'stealth',
+  prowl: 'stealth',
+  shadowform: 'stealth',
 };
 
 export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null {

@@ -116,8 +116,18 @@ export class BgProposalPopup {
           `<button type="button" class="btn bgp-accept" data-bgp="accept">${svgIcon('check')}${esc(t('hudChrome.bgOffer.accept'))}</button>` +
           `<button type="button" class="btn bgp-decline" data-bgp="decline">${svgIcon('close')}${esc(t('hudChrome.bgOffer.decline'))}</button></div>`
         : `<div class="bgp-waiting">${esc(t('hudChrome.bgOffer.acceptedWait'))}</div>`;
+    // A backfill is a materially different offer: a live match, a scoreline the
+    // joiner had no part in, and no rating either way. The chat line says so
+    // too, but that is the surface that scrolls away mid-fight, so consent has
+    // to be answerable from the prompt itself.
+    const isBackfill = view.kind === 'backfill';
+    const title = t(isBackfill ? 'hudChrome.bgOffer.backfillTitle' : 'hudChrome.bgOffer.title');
+    const body = isBackfill
+      ? `<div class="bgp-body">${esc(t('hudChrome.bgOffer.backfillBody'))}</div>`
+      : '';
     return (
-      `<div class="bgp-head">${svgIcon('battleground')}<span class="bgp-title">${esc(t('hudChrome.bgOffer.title'))}</span></div>` +
+      `<div class="bgp-head">${svgIcon('battleground')}<span class="bgp-title">${esc(title)}</span></div>` +
+      body +
       `<div class="bgp-tally${view.full ? ' full' : ''}" aria-label="${esc(tally)}">${esc(tally)}</div>` +
       `<div class="bgp-remaining" data-bgp-clock role="timer"></div>` +
       actions

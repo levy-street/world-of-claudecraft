@@ -333,3 +333,26 @@ describe('buildArenaView: match map fact (slot-parity arena maps)', () => {
     ).toBeNull();
   });
 });
+
+describe('an old server that has never heard of draws', () => {
+  // The rolling-deploy property this whole change rests on, and the one thing
+  // nothing here asserted: every fixture in this file already omits `draws`,
+  // which IS the pre-upgrade snapshot shape, so deleting any of the `?? 0`
+  // guards in arena_window_view.ts left the suite green while every record on
+  // screen rendered NaN-NaN-NaN.
+  it('reads a missing standing draws as zero, never NaN', () => {
+    const view = live(buildArenaView(input()));
+    expect('draws' in STANDINGS['1v1'], 'the fixture really is the old shape').toBe(false);
+    expect(view.standing.draws).toBe(0);
+    expect(Number.isNaN(view.standing.draws)).toBe(false);
+  });
+
+  it('reads a missing ladder-row draws as zero, never NaN', () => {
+    const view = live(buildArenaView(input()));
+    expect(view.ladder.length).toBeGreaterThan(0);
+    for (const row of view.ladder) {
+      expect(row.draws, `row ${row.name} defaults rather than carrying undefined`).toBe(0);
+      expect(Number.isNaN(row.draws)).toBe(false);
+    }
+  });
+});

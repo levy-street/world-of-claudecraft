@@ -311,7 +311,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Beşer kişilik iki takım. Düşman sancağını çal ve kendi kalene taşı. 3 ele geçirmeye ilk ulaşan kazanır. 5 kişiye kadar grup kurup birlikte sıraya girin; Koşu Rünlerini kapın ve takipçilerinizi atlatmak için örtüden yararlanın.',
   'hudChrome.bg.queuedParty': '{count} kişilik grup.',
-  'hudChrome.bg.ratingSummary': 'Puan. {wins} galibiyet / {losses} mağlubiyet',
+  'hudChrome.bg.ratingSummary': 'Puan. {wins} galibiyet / {losses} mağlubiyet / {draws} beraberlik',
   'hudChrome.bg.respawnIn': 'Sıradaki dalga: {seconds} içinde diriliş',
   'hudChrome.bg.resultDefeat': 'Yenilgi',
   'hudChrome.bg.resultDraw': 'Berabere',
@@ -7138,7 +7138,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.arena.playerLevelClassTitle': '{name} - Sv {level} {className}',
   'hud.arena.queueNote':
     'Çevrimiçi olan en yakın puanlı meydan okuyanla eşleştirilip kumlara ışınlanacaksın. Yükselmek için kazan; ilk teslim olan (1 can) kaybeder. Tam olarak sıraya girdiğin yere dönersin.',
-  'hud.arena.ratingSummary': 'Puan - {wins} galibiyet / {losses} mağlubiyet',
+  'hud.arena.ratingSummary': 'Puan - {wins} galibiyet / {losses} mağlubiyet / {draws} beraberlik',
   'hud.arena.searching': 'Bir rakip aranıyor... (sırada {count})',
   'hud.arena.statusCountdown': 'Kendini hazırla...',
   'hud.arena.statusFight': 'Teslimiyete kadar savaş!',

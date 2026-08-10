@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "batchId": "item-art-consistency-2026-08-09",
+  "chunk": "H",
+  "generatedAt": "2026-08-09",
+  "scope": "Two global-catalog review additions outside the original 272-item audit.",
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "execution": {
+    "generationMode": "built-in image_gen only",
+    "distinctCalls": 2,
+    "retries": 0,
+    "rejections": 0,
+    "cliGenerationFallbackUsed": false
+  },
+  "records": [
+    {
+      "id": "starfall_shard",
+      "name": "Starfall Shard",
+      "kind": "quest",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Starfall Shard (starfall_shard) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nSubject and identity: one substantial jagged meteoric crystal shard, long but broad enough to read clearly at 22px, made from deep midnight-blue and indigo star-glass with a rough charcoal meteor-stone spine, a few restrained silver-blue internal star flecks, sharp chipped facets, and a tangible mineral weight. Preserve the dark celestial shard identity from input image 1, but correct its undersized thin silhouette. Do not turn it into a wand, blade, feather, or generic floating rune.\nComposition: one complete shard on a confident lower-left to upper-right diagonal, visually centered, uncropped, with the mineral occupying about 72 percent of the square and generous even safe margins. Its widest facets and chipped tip must remain readable in a 28px square and 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and midnight-navy painted vignette with subtle cool haze and a grounded contact shadow; no transparent exterior and no flat black void.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile crystalline and stone materials; crisp focal facets, softer peripheral brushwork, warm subdued top-left key light plus a restrained cold celestial rim and cool deep shadow. Match the value range, material finish, dark painted ground, and small-icon clarity of inputs 2-4.\nFraming: square, borderless, centered complete silhouette, about 68 to 76 percent subject fill; no crop.\nInput roles: image 1 controls only Starfall Shard identity and palette. Image 2 controls crystalline shard readability and scale. Image 3 controls magical material separation and luminous value hierarchy. Image 4 controls the World of ClaudeCraft painted ground, top-left lighting, and tactile finish. Do not copy unrelated shapes from style references.\nConstraints: exactly one inventory icon; opaque background; no text, letters, numbers, pseudo-writing, label, glyph, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, hand, character, mannequin, or cropped tip.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/items/starfall_shard.webp",
+          "role": "superseded subject identity and palette reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/inert_storm_shard.webp",
+          "role": "crystalline shard readability and scale reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/deepfen_pearl.webp",
+          "role": "magical material and luminous value hierarchy reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "house painted ground, lighting, and tactile finish reference"
+        }
+      ],
+      "generation": {
+        "tool": "built-in image_gen",
+        "acceptedAttempt": 1,
+        "attemptCount": 1,
+        "retryNotes": [],
+        "rejectionNotes": [],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-1db54ca9-e1cf-4df4-a158-7072cbf697a3.png",
+          "sha256": "3818f17517f1a292161612fd149dabd4471fbd052e2fc4f2d599e04947199471",
+          "bytes": 1676219,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorspace": "sRGB",
+          "channels": 3,
+          "depth": "uchar",
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-h/generated/starfall_shard.png",
+          "sha256": "3818f17517f1a292161612fd149dabd4471fbd052e2fc4f2d599e04947199471",
+          "bytes": 1676219,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorspace": "sRGB",
+          "channels": 3,
+          "depth": "uchar",
+          "opaque": true,
+          "byteIdenticalToSourceGeneration": true
+        }
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-h/masters/starfall_shard.png",
+        "sha256": "09e2f85591a84ffe99a419243447fbb758a7122952465747db09e4f767900424",
+        "bytes": 482563,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorspace": "sRGB",
+        "channels": 3,
+        "depth": "uchar",
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/starfall_shard.webp",
+        "sha256": "5e06f04044891021f7726196dbf9b3b65a4a9bcc325a899d7eb1de15371456ba",
+        "bytes": 2314,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorspace": "sRGB",
+        "channels": 3,
+        "depth": "uchar",
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true
+      },
+      "replacementReason": "The prior shard was undersized, very thin, and too dark to retain its identity at 22 to 28 pixels or in a circular crop.",
+      "qa": {
+        "masterReviewed": true,
+        "contact128Reviewed": true,
+        "contact40Reviewed": true,
+        "contact28Reviewed": true,
+        "contact22Reviewed": true,
+        "grayscaleReviewed": true,
+        "circularCropReviewed": true,
+        "verdict": "pass"
+      }
+    },
+    {
+      "id": "hollow_vigil_staff",
+      "name": "Staff of the Hollow Vigil",
+      "kind": "weapon",
+      "slot": "mainhand",
+      "quality": "rare",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG weapon inventory icon\nPrimary request: repaint Staff of the Hollow Vigil (hollow_vigil_staff) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nSubject and identity: one complete rare vigil staff built from aged near-black ironwood with visible grain and restrained silver-steel bands. Its identity-bearing head is a substantial hollow gothic lantern cage surrounding one small cold-blue watchlight, with three readable prongs and a modest pointed finial; the shaft has a brighter metal foot and enough reflected edge light to remain visible. Preserve the somber blue-black vigil-lantern identity from input image 1, but increase the physical width, value separation, and silhouette clarity. Do not turn it into a spear, mace, torch, wand, or ornate royal scepter.\nComposition: full long two-handed staff on a strong lower-left to upper-right diagonal, visually centered, uncropped. The lantern head is broad and distinct, the shaft is deliberately thicker and lighter than the old painting, and both tip and foot retain clear margin. The complete staff fills about 74 percent of the square and must remain identifiable at 22px, 28px, 40px, and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal, umber, and midnight-navy painted vignette with subtle cold mist and grounded shadow; no transparent exterior and no flat black void.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile ironwood and metal; crisp focal edges on the lantern cage, softer peripheral brushwork, restrained blue magic, warm top-left key light and cool deep shadow. Match the brighter long-object readability, safe tip padding, and painted ground of inputs 2-4.\nFraming: square, borderless, one complete centered staff; no crop.\nInput roles: image 1 controls only the named staff's identity, materials, lantern-cage motif, and palette. Image 2 controls staff thickness and readable natural material. Image 3 controls full long-weapon diagonal, edge-light separation, and safe margins. Image 4 controls the World of ClaudeCraft painted ground and tactile lighting. Do not copy unrelated objects from style references.\nConstraints: exactly one inventory icon; opaque background; no text, letters, numbers, pseudo-writing, labels, runes, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, hand, character, mannequin, floating fragments, or cropped tip/pommel.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/items/hollow_vigil_staff.webp",
+          "role": "superseded staff identity, lantern-cage motif, and palette reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/craghorn_staff.webp",
+          "role": "staff thickness and readable natural-material reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/kingsbane_last_oath.webp",
+          "role": "long-object diagonal, edge separation, and safe-margin reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "house painted ground and tactile lighting reference"
+        }
+      ],
+      "generation": {
+        "tool": "built-in image_gen",
+        "acceptedAttempt": 1,
+        "attemptCount": 1,
+        "retryNotes": [],
+        "rejectionNotes": [],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-d9a7ae05-2116-4795-9059-a42f9b14ec21.png",
+          "sha256": "f92931192725b8dc0a2bbca5a94d8c605731418ce0e650a7e92ce4e4c7b079b8",
+          "bytes": 2072529,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorspace": "sRGB",
+          "channels": 3,
+          "depth": "uchar",
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-h/generated/hollow_vigil_staff.png",
+          "sha256": "f92931192725b8dc0a2bbca5a94d8c605731418ce0e650a7e92ce4e4c7b079b8",
+          "bytes": 2072529,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorspace": "sRGB",
+          "channels": 3,
+          "depth": "uchar",
+          "opaque": true,
+          "byteIdenticalToSourceGeneration": true
+        }
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-h/masters/hollow_vigil_staff.png",
+        "sha256": "8651cca044d8cec52081de5cd46de93a899bbc04a0ee4cdcee3c3eb463a7f47b",
+        "bytes": 442144,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorspace": "sRGB",
+        "channels": 3,
+        "depth": "uchar",
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/hollow_vigil_staff.webp",
+        "sha256": "47c5cb03c9dbb811fa35551870f008ee558f4f493866a0690b80eb2f351e7b03",
+        "bytes": 1738,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorspace": "sRGB",
+        "channels": 3,
+        "depth": "uchar",
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true
+      },
+      "replacementReason": "The prior staff had a thin near-black shaft and head that lost visual mass beside peer staves at 28 pixels and in circular crops.",
+      "qa": {
+        "masterReviewed": true,
+        "contact128Reviewed": true,
+        "contact40Reviewed": true,
+        "contact28Reviewed": true,
+        "contact22Reviewed": true,
+        "grayscaleReviewed": true,
+        "circularCropReviewed": true,
+        "verdict": "pass"
+      }
+    }
+  ],
+  "previews": [
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/starfall_shard-128.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/starfall_shard-40.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/starfall_shard-28.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/starfall_shard-22.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/starfall_shard-64.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/starfall_shard-28-gray.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/hollow_vigil_staff-128.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/hollow_vigil_staff-40.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/hollow_vigil_staff-28.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/hollow_vigil_staff-22.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/hollow_vigil_staff-64.png",
+    "tmp/imagegen/item-art-consistency/chunk-h/previews/hollow_vigil_staff-28-gray.png"
+  ],
+  "summary": {
+    "records": 2,
+    "generationAttempts": 2,
+    "retries": 0,
+    "failures": 0,
+    "masters512OpaqueSrgb": true,
+    "shipping128OpaqueSrgbWebp": true,
+    "shippingMaximumBytes": 2314,
+    "allUnderMaximumBytes": true,
+    "retainedResultsByteExact": true,
+    "uniqueShippingHashes": 2,
+    "deterministicQuality82ParityPassed": true,
+    "allPassed": true
+  }
+}

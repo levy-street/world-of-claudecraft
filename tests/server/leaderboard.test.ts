@@ -105,7 +105,7 @@ function deedsRow(rank: number): DeedsLeaderboardEntry {
 }
 
 function arenaRow(name: string): ArenaLeaderRow {
-  return { name, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5 };
+  return { name, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5, draws: 0 };
 }
 
 function characterRow(id: number, name: string): CharacterRow {

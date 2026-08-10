@@ -20,7 +20,7 @@ import {
 } from '../src/sim/dungeon_layout';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { eloDelta, Sim } from '../src/sim/sim';
-import { ARENA_MIN_LEVEL } from '../src/sim/social/arena';
+import { ARENA_MIN_LEVEL, addArenaResult, arenaStanding } from '../src/sim/social/arena';
 import type { PlayerClass, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -1096,5 +1096,46 @@ describe('arena: enclosing walls', () => {
     const startHp = target.hp;
     for (let i = 0; i < 20 * 3; i++) sim.tick();
     expect(target.hp).toBe(startHp);
+  });
+});
+
+describe('arena: a drawn bout is recorded as a draw', () => {
+  // addArenaResult took `won: boolean | null` and did nothing on null, so a
+  // drawn bout moved the rating and then vanished from the record. The same
+  // gap the battleground had; both are now the D of W-L-D.
+  const meta = (sim: Sim, pid: number) => sim.ctx.players.get(pid)!;
+
+  it('counts a draw in the bracket it was played in, and only there', () => {
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Drawer');
+    const m = meta(sim, pid);
+
+    addArenaResult(m, '1v1', 0, null);
+    expect(m.arenaDraws).toBe(1);
+    expect(m.arenaWins).toBe(0);
+    expect(m.arenaLosses).toBe(0);
+    // The 2v2 bracket is fully independent and must not have moved.
+    expect(m.arena2v2Draws).toBe(0);
+
+    addArenaResult(m, '2v2', 0, null);
+    expect(m.arena2v2Draws).toBe(1);
+    expect(m.arenaDraws).toBe(1);
+  });
+
+  it('still counts wins and losses the way it always did', () => {
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', noPlayer: true });
+    const m = meta(sim, sim.addPlayer('warrior', 'Mixed'));
+    addArenaResult(m, '1v1', 10, true);
+    addArenaResult(m, '1v1', -10, false);
+    addArenaResult(m, '1v1', 0, null);
+    expect([m.arenaWins, m.arenaLosses, m.arenaDraws]).toEqual([1, 1, 1]);
+  });
+
+  it('reports the draw through arenaStanding, which the record renders from', () => {
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', noPlayer: true });
+    const m = meta(sim, sim.addPlayer('warrior', 'Standing'));
+    addArenaResult(m, '1v1', 0, null);
+    expect(arenaStanding(m, '1v1').draws).toBe(1);
+    expect(arenaStanding(m, '2v2').draws).toBe(0);
   });
 });

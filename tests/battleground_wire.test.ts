@@ -186,6 +186,7 @@ describe('the bg self key over the wire', () => {
       rating: 1700,
       wins: 3,
       losses: 0,
+      draws: 0,
     });
     // Realm-wide, so the other viewer receives the identical rows (this is what
     // makes the read viewer-identical, and therefore worth memoizing).

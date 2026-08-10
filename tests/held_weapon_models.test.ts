@@ -42,12 +42,11 @@ function withTemporaryOwnProperty(
   }
 }
 
-// The per-item held weapon models: each weapon item maps (via the shared
-// ITEM_WEAPON_VARIANTS table) to a variant key that must have BOTH a 3D model GLB
-// (held in-hand) and a 2D icon JPG (bag), so the held weapon always matches its
-// inventory icon.
+// Held-model mappings and painted inventory art are deliberately independent.
+// ITEM_WEAPON_VARIANTS selects the in-world GLB and retains its legacy preview
+// JPG, while weaponIconUrl selects bespoke per-item WebP artwork.
 describe('held weapon models', () => {
-  it('every weapon variant has a model GLB and an icon JPG on disk', () => {
+  it('every weapon variant has a model GLB and legacy preview JPG on disk', () => {
     const keys = [...new Set(Object.values(ITEM_WEAPON_VARIANTS))];
     expect(keys.length).toBeGreaterThan(0);
     for (const key of keys) {
@@ -56,7 +55,7 @@ describe('held weapon models', () => {
     }
   });
 
-  it('every live heroic weapon inherits one base variant across bag and held art', () => {
+  it('every live heroic weapon inherits its base painted icon and held model', () => {
     const heroicWeapons = Object.values(ITEMS)
       .filter((item) => item.kind === 'weapon' && item.heroicOf !== undefined)
       .sort((a, b) => a.id.localeCompare(b.id));
@@ -98,7 +97,7 @@ describe('held weapon models', () => {
       );
       expect(existsSync(`public/ui/weapons/${variant}.jpg`), `${variant}.jpg missing`).toBe(true);
       expect(iconDataUrl('item', heroic.id), `${heroic.id} bag icon`).toBe(
-        `/ui/weapons/${variant}.jpg`,
+        `/ui/items/${baseId}.webp`,
       );
       expect(itemWeaponModelUrl(heroic.id), `${heroic.id} held model`).toBe(
         `models/weapons/${variant}.glb`,
@@ -108,7 +107,7 @@ describe('held weapon models', () => {
       );
     }
 
-    expect(weaponIconUrl('worn_sword')).toBe('/ui/weapons/sword_a.jpg');
+    expect(weaponIconUrl('worn_sword')).toBe('/ui/items/worn_sword.webp');
     for (const hostile of ['__proto__', 'constructor', 'toString', 'hasOwnProperty']) {
       expect(weaponIconUrl(hostile), hostile).toBeNull();
       expect(itemWeaponModelUrl(hostile), `${hostile} mainhand`).toBeNull();
@@ -119,7 +118,7 @@ describe('held weapon models', () => {
     expect(itemOffhandModelUrl('stale_server_weapon_id')).toBeNull();
   });
 
-  it('prefers a direct weapon variant over heroic inheritance for bag and held art', () => {
+  it('prefers direct painted and held identities over heroic inheritance', () => {
     const heroicId = 'heroic_wyrmfang_greatblade';
     const heroic = ITEMS[heroicId];
     const originalBaseId = heroic.heroicOf;
@@ -128,8 +127,8 @@ describe('held weapon models', () => {
 
     withTemporaryOwnProperty(heroic, 'heroicOf', 'worn_sword', () => {
       withTemporaryOwnProperty(ITEM_WEAPON_VARIANTS, heroicId, 'dagger_a', () => {
-        expect(weaponIconUrl(heroicId)).toBe('/ui/weapons/dagger_a.jpg');
-        expect(iconDataUrl('item', heroicId)).toBe('/ui/weapons/dagger_a.jpg');
+        expect(weaponIconUrl(heroicId)).toBe(`/ui/items/${heroicId}.webp`);
+        expect(iconDataUrl('item', heroicId)).toBe(`/ui/items/${heroicId}.webp`);
         expect(itemWeaponModelUrl(heroicId)).toBe('models/weapons/dagger_a.glb');
         expect(itemOffhandModelUrl(heroicId)).toBe('models/weapons/dagger_a.glb');
       });

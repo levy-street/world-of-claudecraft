@@ -29,8 +29,9 @@
 // battleground collection; this module holds only functions. It draws NO rng: it
 // decides who is seated, never anything about the match itself.
 
+import type { BgTeam } from '../battleground_layout';
 import type { SimContext } from '../sim_context';
-import type { BgQueueGroup } from './battleground';
+import type { BgMatch, BgQueueGroup } from './battleground';
 
 /** Seconds a fighter has to answer before silence is read as a decline. */
 export const BG_PROPOSAL_SECONDS = 30;
@@ -57,6 +58,19 @@ export interface BgProposal {
   accepted: Set<number>;
   /** Sim time at which silence becomes a decline. */
   expiresAt: number;
+  /**
+   * Set when this offer is for ONE seat in a match already under way, rather
+   * than a fresh ten. The seat asks the same question for the same reason: an
+   * away-but-connected player teleported into a live 5v5 is exactly who the
+   * prompt exists to catch, and a backfill is WORSE than a fresh pop for them,
+   * because a filled side is never offered again and a body that never
+   * disconnects never deserts, so the seat cannot reopen.
+   *
+   * It carries no slot of its own: the match already owns one, which is why
+   * both the reserve and the release below are skipped for this arm. Freeing
+   * it on teardown would hand a live match's field to the matchmaker.
+   */
+  backfill?: { match: BgMatch; team: BgTeam };
 }
 
 export function bgProposalPids(proposal: BgProposal): number[] {
@@ -126,10 +140,49 @@ export function openBgProposal(
   return proposal;
 }
 
+/**
+ * Offer ONE queued solo a seat in a match already under way.
+ *
+ * Same window and same silence-is-a-decline rule as a queue pop, and the same
+ * teardown: declining or lapsing costs the requeue lockout and leaves the seat
+ * open, so the next tick offers it to the next eligible candidate instead of
+ * burning it on someone who is not at the keyboard.
+ */
+export function openBgBackfillProposal(
+  ctx: SimContext,
+  match: BgMatch,
+  team: BgTeam,
+  group: BgQueueGroup,
+): BgProposal {
+  const pid = group.pids[0];
+  const proposal: BgProposal = {
+    id: ctx.nextBgProposalId++,
+    teams: team === 0 ? [[pid], []] : [[], [pid]],
+    groups: [group],
+    grouped: false,
+    slot: match.slot,
+    accepted: new Set(),
+    expiresAt: ctx.time + BG_PROPOSAL_SECONDS,
+    backfill: { match, team },
+  };
+  ctx.bgProposals.push(proposal);
+  ctx.emit({ type: 'bgProposed', seconds: BG_PROPOSAL_SECONDS, pid });
+  ctx.emit({
+    type: 'log',
+    text: 'A Thornhollow Fields battle already under way needs a fighter. Accept to join; this match will not change your rating.',
+    color: '#7fd4ff',
+    pid,
+  });
+  return proposal;
+}
+
 function removeBgProposal(ctx: SimContext, proposal: BgProposal): void {
   const idx = ctx.bgProposals.indexOf(proposal);
   if (idx >= 0) ctx.bgProposals.splice(idx, 1);
-  ctx.bgBusySlots.delete(proposal.slot);
+  // A backfill offer never reserved a slot, because the match it fills is
+  // already standing on one. Deleting it here would release a LIVE match's
+  // field back to the matchmaker.
+  if (!proposal.backfill) ctx.bgBusySlots.delete(proposal.slot);
 }
 
 /**
@@ -178,6 +231,32 @@ export function failBgProposal(
 }
 
 /**
+ * Refuse a backfill seat, which costs the player nothing.
+ *
+ * A queue pop charges a decline the lockout because the fighter is refusing the
+ * very thing they queued for. A backfill is NOT that thing: it is a live match,
+ * unrated, carrying a scoreline they had no part in. Charging their whole wait
+ * for saying no to a different offer than the one they lined up for is the kind
+ * of rule that teaches people to stop answering prompts, and silence is already
+ * the worse outcome for the team.
+ *
+ * Silence still costs the lockout (see sweepBgProposals), because that IS the
+ * away player this feature exists to catch. The match remembers the refusal so
+ * the still-open seat does not ask the same person again next tick.
+ */
+function declineBgBackfill(ctx: SimContext, proposal: BgProposal, pid: number): void {
+  removeBgProposal(ctx, proposal);
+  proposal.backfill?.match.backfillDeclined.add(pid);
+  for (const group of proposal.groups) ctx.bgQueue.push(group);
+  ctx.emit({
+    type: 'log',
+    text: 'You decline the battle already under way, and keep your place in the Thornhollow Fields queue.',
+    color: '#7fd4ff',
+    pid,
+  });
+}
+
+/**
  * Answer a live proposal. Returns the proposal when THIS response completed it
  * (every fighter has accepted), so the caller seats it; null otherwise. The
  * caller owns seating rather than this module, which keeps the dependency
@@ -197,7 +276,8 @@ export function bgProposalRespond(
     return null;
   }
   if (!accept) {
-    failBgProposal(ctx, proposal, new Set([id]));
+    if (proposal.backfill) declineBgBackfill(ctx, proposal, id);
+    else failBgProposal(ctx, proposal, new Set([id]));
     return null;
   }
   if (proposal.accepted.has(id)) return null;

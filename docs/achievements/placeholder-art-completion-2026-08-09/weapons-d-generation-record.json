@@ -1,0 +1,1193 @@
+{
+  "schemaVersion": 1,
+  "batchId": "placeholder-art-completion-weapons-d",
+  "createdDate": "2026-08-09",
+  "worktree": "/Users/fernando/Documents/wocc-placeholder-art-v036",
+  "ownership": "Sorted Object.keys(ITEM_WEAPON_VARIANTS) indices 100 through 118 inclusive.",
+  "generation": {
+    "skill": "imagegen",
+    "toolMode": "built-in image_gen",
+    "requestShape": "one distinct call per asset, plus two targeted edit calls",
+    "masterFormat": "1254x1254 opaque PNG",
+    "styleContract": "Classic dark-fantasy MMORPG painted inventory art; tactile material rendering; opaque dark painted ground; top-left key light; centered complete subject; no text, glyphs, crop, frame or watermark."
+  },
+  "processing": {
+    "implementation": "sharp",
+    "resize": {
+      "width": 128,
+      "height": 128,
+      "fit": "fill",
+      "kernel": "lanczos3"
+    },
+    "webp": {
+      "quality": 82,
+      "alphaQuality": 100,
+      "smartSubsample": true,
+      "effort": 6
+    },
+    "sizeCapBytes": 15360,
+    "fallbackQuality": 75,
+    "fallbackUsed": false
+  },
+  "generationCalls": [
+    {
+      "sequence": 1,
+      "callId": "tradesman_hatchet",
+      "intendedAssetId": "tradesman_hatchet",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-5304db75-f4ca-4245-b657-6d8b025d3635.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/copper_bearded_axe.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_axe_1handed.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the uncommon one-handed weapon \"Tradesman's Hatchet\" (asset id tradesman_hatchet), a reliable travelling craftsperson's tool sold by the Crossroads Outfitters.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted axe reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition or make this hatchet look identical to another weapon.\nScene/backdrop: opaque dark smoky painted ground, near-black umber fading into muted slate blue, no literal room or landscape\nSubject: one practical compact bearded hatchet with a slightly broad steel head, a squared hammer poll, a well-used ashwood haft, dark leather grip wrap, and a small brass collar; subtle nicks and polish show an honest working tool that can serve as a weapon\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile forged steel and wood, rich painterly brushwork, not product photography, not a 3D render\nComposition/framing: single complete hatchet centered on a strong lower-left to upper-right diagonal; subject fills about 70 percent of the square; full blade edge, poll, haft and pommel comfortably inside the canvas with even breathing room; bold silhouette for tiny UI display\nLighting/mood: decisive warm top-left key light, cool deep shadows, restrained steel edge gleam, sturdy and road-worn\nColor palette: weathered steel, warm ash wood, tobacco-brown leather, small antique brass accents, dark blue-umber ground\nConstraints: opaque square image; no text, letters, numerals, runes, glyphs, maker marks, UI border, frame, logos, watermark, hands, characters, extra tools, cast shadow, crop, or cut-off weapon\nAvoid: generic fantasy battleaxe, ornate royal decoration, neon magic, oversized blade, flat vector icon, photorealism, low-poly render, black void product shot, blurry edges"
+    },
+    {
+      "sequence": 2,
+      "callId": "training_mace",
+      "intendedAssetId": "training_mace",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-337b662d-2b0f-4a6e-9830-997984e17368.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/bronzework_mace.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_a.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the common one-handed starter weapon \"Training Mace\" (asset id training_mace), plain safe equipment issued to a novice rather than a prized battle relic.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted plain mace reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark smoky painted ground, charcoal blue with a restrained warm umber patch, no literal room or landscape\nSubject: one short, solid training mace with a simple blunt six-lobed dark iron head whose striking corners are visibly rounded, a straight ashwood handle, modest brown leather grip, and one plain iron pommel; scuffs and worn edges communicate repeated drill-yard use\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile forged iron, wood and leather, rich painterly brushwork, not product photography, not a 3D render\nComposition/framing: single complete mace centered on a lower-left to upper-right diagonal; subject fills about 68 percent of the square; entire head, handle and pommel comfortably inside the canvas with even breathing room; strong simple silhouette for tiny UI display\nLighting/mood: warm top-left key light, cool deep shadows, restrained metal highlights, humble and dependable\nColor palette: charcoal iron, warm ash wood, worn brown leather, subdued blue-umber ground\nConstraints: opaque square image; clearly common starter gear; no spikes, sharp blade, magic, text, letters, numerals, runes, glyphs, maker marks, UI border, frame, logos, watermark, hands, characters, extra weapons, crop, or cut-off weapon\nAvoid: ornate warhammer, royal decoration, neon glow, huge head, flat vector icon, photorealism, low-poly render, black void product shot, blurry edges"
+    },
+    {
+      "sequence": 3,
+      "callId": "tunnelkings_spade",
+      "intendedAssetId": "tunnelkings_spade",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-b92016af-ce51-4ea8-8190-13e9115af50b.png",
+      "disposition": {
+        "status": "rejected",
+        "reason": "First forward blade read as a conventional axe; a targeted edit introduced squared spade shoulders and a shovel ridge."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/drogmars_skullcleaver.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_axe_2handed.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the uncommon two-handed weapon \"Tunnelking's Spade\" (asset id tunnelkings_spade), a brutal subterranean digging implement claimed from the burrowers and wielded like a heavy war axe.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted heavy axe reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark smoky painted ground with coal-black, mineral brown and a restrained ochre cave glow, no literal tunnel scene\nSubject: one long-handled war spade with a broad asymmetrical sharpened shovel blade shaped like a squat executioner's axe, a thick worn iron socket, compact rear pick, dark oak haft reinforced by two rough iron bands, and packed pale clay in a few creases; tangible mining-tool construction, formidable but not ornate\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile battered steel, aged wood and mineral dust, rich painterly brushwork, not product photography, not a 3D render\nComposition/framing: single complete two-handed spade centered on a lower-left to upper-right diagonal; subject fills about 72 percent of the square; full blade, pick and pommel comfortably inside the canvas with breathing room; powerful readable silhouette\nLighting/mood: warm top-left lantern light, cool black shadows, hard steel glints, weighty and subterranean\nColor palette: blackened iron, ochre clay, dark oak, muted brass, coal-blue shadows\nConstraints: opaque square image; unmistakably a spade-axe hybrid; no text, letters, numerals, runes, glyphs, UI border, frame, logos, watermark, hands, characters, extra tools, crop, or cut-off weapon\nAvoid: ordinary garden shovel, generic double axe, fantasy crystal, neon magic, comically oversized head, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 4,
+      "callId": "vaels_mist_staff",
+      "intendedAssetId": "vaels_mist_staff",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-f32087a8-e384-4b8c-a2d7-d0a78258648e.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-b/masters/hollow_vigil_staff.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_staff.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the rare two-handed caster weapon \"Vael's Mist-Staff\" (asset id vaels_mist_staff), trophy of Vael the Fogbinder from the drowned Sunken Bastion in Mirefen Marsh.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted rare staff reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark atmospheric painted ground of deep marsh teal, drowned-stone blue and charcoal, with controlled coils of pale mist confined behind the weapon\nSubject: one elegant long bogwood staff capped by a weathered silver cage holding a large cloudy moonstone orb; three thin drowned-silver prongs curve around the orb like fog-bound reeds, with one small dark teal ribbon and corroded bronze bands along the shaft; cold mist curls tightly around the crown without hiding its silhouette\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile wet wood, corroded silver, clouded stone and vapor, richly painterly rather than product photography or 3D\nComposition/framing: single complete staff centered on a lower-left to upper-right diagonal; subject fills about 72 percent of the square; crown, shaft and foot remain fully inside with generous breathing room; orb and forked crown read clearly when tiny\nLighting/mood: cold top-left moonlit key light with a dim green-blue inner glow, solemn, drowned and commanding\nColor palette: fog-white, desaturated teal, midnight blue, tarnished silver, dark bogwood\nConstraints: opaque square image; rare but not legendary; no people, faces, skulls, text, letters, numerals, readable runes, glyphs, UI border, frame, logos, watermark, extra weapons, crop, or cut-off staff\nAvoid: generic wizard staff, bright green ball, neon bloom, elaborate angelic ornament, flat vector icon, photorealism, low-poly render, black void product shot, blurry silhouette"
+    },
+    {
+      "sequence": 5,
+      "callId": "vale_carving_knife",
+      "intendedAssetId": "vale_carving_knife",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-4a98ed36-2217-4931-bace-ac284d31fbc1.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-c/masters/rusty_dagger.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/dagger_a.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the common one-handed vendor weapon \"Vale Carving Knife\" (asset id vale_carving_knife), an Eastbrook craft knife sturdy enough for field use.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted humble dagger reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark smoky painted ground of midnight slate and warm workshop umber, no literal table, room or landscape\nSubject: one compact broad-backed carving knife with a short satin-steel blade, gently clipped point, a shallow finger choil, plain walnut scales fixed by two small brass pins, and a dark leather thong loop at the pommel; practical, well maintained, and visibly common rather than magical\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile steel, walnut and leather, richly painterly rather than product photography or 3D\nComposition/framing: single complete knife centered on a lower-left to upper-right diagonal; subject fills about 66 percent of the square; tip, spine, guardless handle and thong remain comfortably inside with generous breathing room; bold simple silhouette\nLighting/mood: warm top-left workshop light, cool blue shadow, quiet and useful\nColor palette: clean gray steel, walnut brown, tiny antique brass points, muted blue-umber ground\nConstraints: opaque square image; clearly a humble carving knife, no serration, no blood, no magic, no text, letters, numerals, runes, glyphs, UI border, frame, logos, watermark, hands, characters, food, extra tools, crop, or cut-off knife\nAvoid: assassin dagger, ornate guard, oversized blade, neon glow, flat vector icon, photorealism, low-poly render, black void product shot, blurry edges"
+    },
+    {
+      "sequence": 6,
+      "callId": "valeborn_spellblade",
+      "intendedAssetId": "valeborn_spellblade",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-b4a403b8-54f5-40a8-a113-3c9a73b0b04a.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-b/masters/hoarfrost_edge.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/sword_g.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the rare one-handed caster weapon \"Valeborn Spellblade\" (asset id valeborn_spellblade), a refined crystalline sword from the Vale that channels intellect and spirit.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted rare sword reference for family-level brushwork only. Image 3 is the current crystalline held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark atmospheric painted ground of midnight blue, charcoal and a restrained cold violet haze, no literal room or landscape\nSubject: one slender silver spellblade with a subtly leaf-shaped polished blade, an open crescent guard of pale Vale silver, a faceted icy-blue crystal set into the ricasso, dark indigo leather grip, and a small crystal pommel; the crystal casts a controlled cool reflection across the steel without becoming a beam or aura\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile forged silver, wrapped leather and faceted mineral, rich painterly brushwork, not product photography, not a 3D render\nComposition/framing: single complete one-handed sword centered on a lower-left to upper-right diagonal; subject fills about 72 percent of the square; entire tip, guard and pommel comfortably inside with even breathing room; elegant readable silhouette\nLighting/mood: decisive cool top-left light with a restrained warm rim on the guard, arcane, poised and rare\nColor palette: silver steel, icy blue crystal, midnight indigo, restrained violet, tiny antique-gold reflection\nConstraints: opaque square image; rare caster identity; no text, letters, numerals, readable runes, glyphs, UI border, frame, logos, watermark, hands, characters, extra weapons, crop, or cut-off sword\nAvoid: generic medieval sword, lightsaber, neon blade, excessive crystal growths, royal crown motifs, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 7,
+      "callId": "veilsteel_blade",
+      "intendedAssetId": "veilsteel_blade",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-affc7e1a-f099-4c1b-9c6c-ec552e087d8e.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-b/masters/hoarfrost_edge.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/sword_b.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the uncommon one-handed weapon \"Veilsteel Blade\" (asset id veilsteel_blade), a reward from calming the corrupted sporelings of the luminous Gleaming Deep beyond the thinned Veil.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted sword reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark atmospheric painted ground of deep indigo and forest-black with a restrained pearly mushroom-blue haze, no literal cavern or landscape\nSubject: one disciplined arming sword forged from smoke-gray Veilsteel, its clean broad blade carrying an opalescent blue-green sheen along the fuller; a modest dark-silver guard curves toward the blade, the grip is wrapped in deep moss leather, and a small milky spore-pearl sits in the pommel; subtle pearlescent motes remain behind the blade\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile forged steel, worn leather and nacre, rich painterly brushwork, not product photography, not a 3D render\nComposition/framing: single complete one-handed sword centered on a lower-left to upper-right diagonal; subject fills about 71 percent of the square; tip, guard and pommel comfortably inside with even breathing room; clear martial silhouette\nLighting/mood: cool top-left Veil light with a restrained warm rim, calm, otherworldly and sturdy\nColor palette: smoke steel, opalescent cyan-green, deep moss, indigo, restrained pearl white\nConstraints: opaque square image; uncommon rather than legendary; no text, letters, numerals, readable runes, glyphs, UI border, frame, logos, watermark, hands, characters, mushrooms growing on the weapon, extra weapons, crop, or cut-off sword\nAvoid: neon blade, lightsaber, excessive crystals, generic holy sword, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 8,
+      "callId": "verlans_oathblade",
+      "intendedAssetId": "verlans_oathblade",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-39cfaf65-e5a1-4f58-8121-8e0763fba5de.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-b/masters/highwatch_greatsword.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_sword_2handed.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the rare two-handed weapon \"Verlan's Oathblade\" (asset id verlans_oathblade), the surviving greatsword of Captain Verlan, an undead champion risen among the old Vale ruins.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted greatsword reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark smoky painted ground of crypt slate, weathered blue and charcoal with a restrained cold grave haze, no literal ruins or corpse\nSubject: one long knightly greatsword with a broad time-darkened steel blade, old nicks along the edge, a simple rain-guard, a weathered crossguard shaped like downturned oath-wings, faded navy leather grip, and a heavy octagonal iron pommel; a narrow band of pale cold light follows one edge as the last echo of its oath\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile aged steel and rotten leather, richly painterly rather than product photography or 3D\nComposition/framing: single complete two-handed greatsword centered on a lower-left to upper-right diagonal; subject fills about 73 percent of the square; entire tip, guard and pommel remain comfortably inside with breathing room; solemn bold silhouette\nLighting/mood: cold top-left moonlight with one muted amber reflection, honorable, mournful and dangerous\nColor palette: aged steel, crypt slate, faded navy, blackened iron, restrained ghost-pale blue\nConstraints: opaque square image; rare undead captain trophy; no skull face, bones, blood, text, letters, numerals, readable runes, glyphs, UI border, frame, logos, watermark, hands, characters, extra weapons, crop, or cut-off sword\nAvoid: flashy necromancer sword, neon ghost fire, ornate royal crown, generic clean greatsword, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 9,
+      "callId": "voidsong_dirk",
+      "intendedAssetId": "voidsong_dirk",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-de420f22-2287-4c62-ad9d-837cc0cbc478.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-c/masters/nhalias_dirgeblade.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_dagger.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, singular icon for the legendary caster weapon \"Voidsong, Dirk of the Sundered Veil\" (asset id voidsong_dirk), the supreme S-rank Rift chase piece: a spell focus shaped as a dagger, elegant and cosmically dangerous rather than a melee brute.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted dark dagger reference for family-level brushwork only. Image 3 is the current advanced dagger silhouette reference only. Create a one-off legendary identity and do not copy any composition.\nScene/backdrop: opaque deep midnight painted ground split by a narrow torn-Veil fissure of royal violet and cold starlight, with all energy kept close behind the weapon\nSubject: one slender ceremonial dirk with a long black mirror-steel blade whose center appears like a thin window into starless violet depth; the blade edges are bright pale silver, the swept asymmetric guard resembles two broken crescents, the grip is wrapped in midnight leather with a single faceted void-amethyst at the pommel; one controlled ribbon of shadow peels from the blade and dissolves behind it\nStyle/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, exceptional forged metal, faceted mineral and painterly void energy, richly tactile, never a flat logo or 3D render\nComposition/framing: single complete dagger centered on a dynamic lower-left to upper-right diagonal; subject fills about 72 percent of the square; full tip, guard, grip and pommel remain comfortably inside with generous breathing room; blade and broken-crescent guard remain unmistakable at tiny size\nLighting/mood: decisive cold top-left starlight, deep violet core glow, a restrained old-gold rim, quiet, sovereign and uncanny\nColor palette: black mirror steel, royal violet, pale silver, midnight indigo, one restrained antique-gold reflection\nConstraints: opaque square image; unmistakably legendary through materials and finish, not through text; no letters, numerals, readable runes, glyphs, eyes, faces, skulls, hands, characters, UI border, frame, logos, watermark, extra weapons, crop, or cut-off dagger\nAvoid: lightsaber, glowing purple stick, generic assassin knife, excessive energy explosion, galaxy photograph, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 10,
+      "callId": "voss_sanctified_mace",
+      "intendedAssetId": "voss_sanctified_mace",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-0a3eda2b-8b42-4e90-9de9-63ead6770b73.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/bogiron_mace.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_c.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the uncommon one-handed caster weapon \"Voss's Sanctified Mace\" (asset id voss_sanctified_mace), taken from Deacon Voss, whose Gravecaller rites consecrated a drowned chapel to grave-ash rather than incense.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted mace reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark smoky painted ground of drowned-stone blue, charcoal and muted plum, with one restrained grave-ash haze behind the head\nSubject: one short ceremonial mace with a compact silvered iron head formed from six chapel-censer flanges, each face worn smooth and darkened by ash; a small sealed ivory ember glows faintly through narrow vents at the crown, while the shaft uses black bogwood, tarnished bronze collars and a wine-dark leather grip\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile ash-stained metal, wet wood and leather, rich painterly brushwork, not product photography, not a 3D render\nComposition/framing: single complete mace centered on a lower-left to upper-right diagonal; subject fills about 69 percent of the square; whole head, shaft and pommel comfortably inside with breathing room; censer-like head remains clear at tiny size\nLighting/mood: cold top-left marsh light with a dim ivory ember and restrained violet shadow, solemn and corrupted rather than explosive\nColor palette: tarnished silver, grave-ash gray, wine-dark leather, muted plum, drowned blue\nConstraints: opaque square image; uncommon caster trophy; no cross, religious logo, letters, numerals, readable runes, glyphs, skull face, people, hands, UI border, frame, watermark, extra weapons, crop, or cut-off mace\nAvoid: glowing holy hammer, modern church symbol, giant flame, neon purple, ornate legendary weapon, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 11,
+      "callId": "whetted_iron_dirk",
+      "intendedAssetId": "whetted_iron_dirk",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-9c919469-12f2-4a78-9d5d-cf20ef93ed3c.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-c/masters/rusty_dagger.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/dagger_b.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the uncommon crafted weapon \"Whetted Iron Dirk\" (asset id whetted_iron_dirk), a weaponcrafter's clean, serviceable improvement over a rusty starter dagger.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted plain dagger reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark smoky painted ground of forge charcoal, midnight blue and restrained warm orange reflection, no literal forge or workbench\nSubject: one narrow double-edged iron dirk freshly sharpened to a bright keen edge, with a subtle central ridge, simple straight steel quillons, a tightly wound russet leather grip, and a squat round iron pommel; faint hammer texture remains on the blade flats while the edge is clean\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile hand-forged iron and leather, richly painterly rather than product photography or 3D\nComposition/framing: single complete dirk centered on a lower-left to upper-right diagonal; subject fills about 67 percent of the square; tip, quillons, grip and pommel remain comfortably inside with even breathing room; crisp simple silhouette\nLighting/mood: warm top-left forge light, cool deep shadows, one disciplined edge glint, practical and newly made\nColor palette: iron gray, russet leather, charcoal, midnight blue, restrained forge orange\nConstraints: opaque square image; uncommon crafted quality without ornament or magic; no blood, text, letters, numerals, runes, glyphs, maker marks, UI border, frame, logos, watermark, hands, characters, extra tools, crop, or cut-off dagger\nAvoid: assassin fantasy dagger, curved blade, jeweled hilt, neon glow, perfectly modern machining, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 12,
+      "callId": "widowfang_dirk",
+      "intendedAssetId": "widowfang_dirk",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-98bc1d17-3a33-493c-a283-7c0653be9b41.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/fang_of_korzul.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/dagger_c.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the rare weapon \"Widowfang Dirk\" (asset id widowfang_dirk), a Hollow Crypt reward with a predatory spider-fang identity and grave-dark finish.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted fang dagger reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark atmospheric painted ground of crypt black, muted burgundy and cold slate, with a restrained thread of pale web haze entirely behind the weapon\nSubject: one slender dark-steel dirk whose slightly recurved blade tapers like a widow spider's fang; a narrow crimson fuller catches a dim reflection, the low swept guard resembles two angular chitin hooks without becoming a literal spider, the grip is wrapped in black leather, and a single smoky garnet caps the pommel; one tiny controlled venom bead sits at the tip\nStyle/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile blackened steel, chitin-like guard and leather, rich painterly brushwork, not product photography, not a 3D render\nComposition/framing: single complete dagger centered on a lower-left to upper-right diagonal; subject fills about 68 percent of the square; tip, hooked guard, grip and pommel remain comfortably inside with even breathing room; fang silhouette remains readable at tiny size\nLighting/mood: cold top-left crypt light with restrained burgundy underlight, patient and lethal\nColor palette: blackened steel, cold silver edge, muted garnet, deep burgundy, crypt slate\nConstraints: opaque square image; rare but not epic; no literal spider body, spider face, blood, text, letters, numerals, readable runes, glyphs, UI border, frame, logos, watermark, hands, characters, extra weapons, crop, or cut-off dagger\nAvoid: green poison splash, neon red, cartoon spider motif, generic assassin dagger, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 13,
+      "callId": "wildheart_fangknife",
+      "intendedAssetId": "wildheart_fangknife",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-7f777262-8c7a-4def-8cee-cfb27b3541d7.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/fang_of_korzul.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/dgn_wildheart_basin.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_dagger.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the epic weapon \"Fangknife of Zulgar\" (asset id wildheart_fangknife), a rare trophy from the flooded jungle caldera and colossal jaguar shrine of Wildheart Basin.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted fang dagger reference for family-level brushwork only. Image 3 is the Wildheart Basin palette and cultural-motif reference only. Image 4 is the current advanced dagger silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark atmospheric painted ground of jungle black, deep jade and wet umber with a restrained warm shrine glow, no literal landscape\nSubject: one wickedly elegant short fangknife built around a long ivory saber fang sharpened along a dark obsidian-steel edge; a compact antique-gold collar grips the fang, the low guard uses two small jade-inlaid claw hooks, and the grip is wrapped in dark green leather with a single red-brown seed bead at the pommel; one rain-bright leaf reflection crosses the blade\nStyle/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile ivory, obsidian steel, jade, aged gold and wet leather, richly painterly rather than product photography or 3D\nComposition/framing: single complete dagger centered on a lower-left to upper-right diagonal; subject fills about 69 percent of the square; full fang tip, guard, grip and pommel remain comfortably inside with breathing room; bold hooked-fang silhouette\nLighting/mood: warm top-left jungle-shrine key light with cool jade shadow, predatory, ceremonial and epic\nColor palette: bone ivory, deep jade, black obsidian, antique gold, restrained ember-red accent\nConstraints: opaque square image; unmistakably epic through materials and craftsmanship; no literal jaguar face, animal head, blood, text, letters, numerals, readable runes, glyphs, UI border, frame, logos, watermark, hands, characters, extra weapons, crop, or cut-off dagger\nAvoid: generic curved knife, green poison splash, neon magic, cartoon tribal design, excessive feathers, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 14,
+      "callId": "wildheart_hexwood_staff",
+      "intendedAssetId": "wildheart_hexwood_staff",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-630f7e5e-7614-4460-99e0-3adc697c9763.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/deathless_heartwood.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/dgn_wildheart_basin_heroic.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_druid_staff.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the epic caster weapon \"Hexwood Staff of the Basin\" (asset id wildheart_hexwood_staff), grown and carved for the ritual terrace beneath Wildheart Basin's colossal jaguar shrine.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted living-wood staff reference for family-level brushwork only. Image 3 is the Wildheart Basin palette and cultural-motif reference only. Image 4 is the current druid-staff silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark atmospheric painted ground of flooded-jungle black, deep emerald and warm ochre, with restrained mist and leaf-shadow behind the staff\nSubject: one tall crooked staff of nearly black living hexwood, its crown splitting into three claw-like branches that cradle a large rough turquoise-green basin stone; old-gold bands and ochre cord bind the crown, two small pale seed-and-bone charms hang close to the shaft, and one fresh green shoot proves the wood still lives\nStyle/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile wet bark, rough stone, aged metal and cord, richly painterly rather than product photography or 3D\nComposition/framing: single complete staff centered on a lower-left to upper-right diagonal; subject fills about 72 percent of the square; all crown branches, charms, shaft and foot remain fully inside with generous breathing room; clawed crown and green stone read clearly when tiny\nLighting/mood: warm top-left canopy light with cool jade inner reflection, ancient, potent and epic\nColor palette: black hexwood, deep emerald, turquoise stone, ochre cord, bone ivory, antique gold\nConstraints: opaque square image; epic jungle ritual identity; no letters, numerals, readable runes, glyphs, skull faces, literal jaguar face, people, hands, UI border, frame, logos, watermark, extra weapons, crop, or cut-off staff\nAvoid: generic green-orb wizard staff, neon glow, giant antlers, over-busy charm cluster, cartoon tribal design, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 15,
+      "callId": "wildheart_tuskblade",
+      "intendedAssetId": "wildheart_tuskblade",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-2e84517e-674e-4b99-ba0c-f8a5b9006780.png",
+      "disposition": {
+        "status": "rejected",
+        "reason": "Grip read as one-handed; a targeted edit extended it to two-handed proportions."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-b/masters/greatfang_of_the_basin.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/dgn_wildheart_basin.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_sword_2handed_color.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the epic two-handed weapon \"Wildheart Tuskblade\" (asset id wildheart_tuskblade), a martial prize from the flooded jungle caldera and ritual jaguar shrine of Wildheart Basin.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted Basin greatblade reference for family-level brushwork only. Image 3 is the Wildheart Basin palette and cultural-motif reference only. Image 4 is the current greatblade silhouette reference only. Create a distinct base weapon and do not copy any composition.\nScene/backdrop: opaque dark atmospheric painted ground of jungle-black, deep jade and ember-ochre with restrained rain haze, no literal landscape\nSubject: one massive two-handed tuskblade whose forward-curving pale ivory blade is reinforced along its cutting edge and spine by blackened steel; an angular antique-gold guard grips the tusk with two small jade settings, the long haft is wrapped in oxblood and dark green leather, and a heavy obsidian pommel balances the blade; shallow natural tooth striations remain visible\nStyle/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile ivory, black steel, jade, aged gold and leather, richly painterly rather than product photography or 3D\nComposition/framing: single complete two-handed weapon centered on a lower-left to upper-right diagonal; subject fills about 73 percent of the square; entire curved tip, guard, grip and pommel remain comfortably inside with breathing room; massive tusk silhouette stays clear at tiny size\nLighting/mood: decisive warm top-left shrine light with cool jungle rim, proud, ferocious and epic\nColor palette: tusk ivory, obsidian black, deep jade, antique gold, restrained oxblood\nConstraints: opaque square image; epic through materials and silhouette; no literal animal head, jaguar face, blood, text, letters, numerals, readable runes, glyphs, UI border, frame, logos, watermark, people, hands, extra weapons, crop, or cut-off blade\nAvoid: ordinary steel greatsword, generic scimitar, neon green magic, excessive spikes, cartoon tribal design, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 16,
+      "callId": "wildheart_tuskblade_retry_handle",
+      "intendedAssetId": "wildheart_tuskblade",
+      "intent": "edit",
+      "mode": "built-in image_gen",
+      "taxonomy": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-8ed55166-e346-4286-a891-7c95b3d9c880.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Final Wildheart Tuskblade master."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-d/masters/wildheart_tuskblade.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_sword_2handed_color.jpg"
+      ],
+      "exactPrompt": "Use case: precise-object-edit\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG\nInput images: Image 1 is the edit target and must remain the visual anchor. Image 2 is only a rough current held-model silhouette reference for the required two-handed proportions.\nPrimary request: Change only the handle proportions of the Wildheart Tuskblade so it unmistakably reads as a two-handed greatblade. Extend the leather-wrapped grip between the guard and pommel to roughly one third of the full weapon length, with room for two hands, and slightly reduce/reposition the complete weapon as needed so every part remains comfortably within the square.\nConstraints: preserve the exact successful pale curved tusk blade, blackened steel reinforcement, three jade settings, antique-gold guard, dark green and oxblood leather, obsidian pommel design, dark jungle background, top-left shrine lighting, painterly finish, and lower-left to upper-right diagonal; keep the entire tip, guard, long grip and pommel visible with generous padding; maintain an opaque square image and tiny-size readability\nAvoid: redesigning the blade; adding a second blade, animal face, text, letters, numerals, runes, glyphs, people, hands, border, frame, watermark, neon effects, crop, or cut-off weapon"
+    },
+    {
+      "sequence": 17,
+      "callId": "wildsoul_maul",
+      "intendedAssetId": "wildsoul_maul",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-64ea9560-ae44-49bf-94d5-fd34f5260cef.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-b/masters/gravewyrm_thornmaul.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_d.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the epic two-handed feral weapon \"Wildsoul Maul\" (asset id wildsoul_maul), a heroic trophy from Korzul's gravewyrm sanctum that still carries stubborn living-wild power.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted gravewyrm maul reference for family-level brushwork only. Image 3 is the current heavy-maul silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark atmospheric painted ground of sanctum charcoal, cold grave-blue and subdued forest green, with restrained thorn-shadow behind the weapon\nSubject: one enormous two-handed maul with a broad irregular head of dark petrified heartwood locked between two pale gravewyrm-bone striking plates; living root ridges curl around the head and one tiny green shoot emerges from a crack, while the long haft is black ironwood wrapped for two hands in weathered forest leather and capped by a heavy bone-and-steel pommel\nStyle/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile petrified wood, aged bone, root, leather and blackened steel, richly painterly rather than product photography or 3D\nComposition/framing: single complete two-handed maul centered on a lower-left to upper-right diagonal; subject fills about 72 percent of the square; broad head, long two-hand grip and pommel remain fully inside with generous breathing room; massive head silhouette reads clearly when tiny\nLighting/mood: cold top-left sanctum light with a restrained warm-green living reflection, primal, heavy and epic\nColor palette: petrified umber, bone ivory, black iron, deep forest green, grave-blue shadow\nConstraints: opaque square image; unmistakably two-handed and epic; no literal animal face, skull face, blood, text, letters, numerals, readable runes, glyphs, UI border, frame, logos, watermark, people, hands, extra weapons, crop, or cut-off maul\nAvoid: ordinary sledgehammer, glowing green crystal, neon nature magic, excessive vines, cartoon druid weapon, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 18,
+      "callId": "worn_sword",
+      "intendedAssetId": "worn_sword",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-08c6fa32-5861-4a15-91b7-1a1b60735a74.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/eastbrook_arming_sword.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/sword_a.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the common starter weapon \"Pitted Shortsword\" (asset id worn_sword), old levyman's steel that has survived years of neglect but remains barely serviceable.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted simple sword reference for family-level brushwork only. Image 3 is the current starter-sword silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark smoky painted ground of midnight slate and dull workshop umber, no literal room or landscape\nSubject: one short straight iron sword with a broad plain blade, shallow corrosion pits across the flats, several small edge nicks, a simple slightly bent crossguard, cracked brown leather grip and worn round iron pommel; one narrow freshly rubbed edge shows it can still cut\nStyle/medium: premium hand-painted classic MMORPG inventory art, tactile corroded iron and cracked leather, richly painterly rather than product photography or 3D\nComposition/framing: single complete shortsword centered on a lower-left to upper-right diagonal; subject fills about 67 percent of the square; full tip, guard, grip and pommel remain comfortably inside with even breathing room; humble strong silhouette\nLighting/mood: restrained warm top-left light, cool deep shadows, weary but dependable\nColor palette: dull iron gray, rust brown, cracked leather, slate blue, muted umber\nConstraints: opaque square image; unmistakably common worn starter gear; no magic, gems, ornate guard, blood, text, letters, numerals, runes, glyphs, maker marks, UI border, frame, logos, watermark, people, hands, extra weapons, crop, or cut-off sword\nAvoid: pristine heroic sword, giant rust flakes, broken blade, neon glow, fantasy spikes, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 19,
+      "callId": "wyrmfang_greatblade",
+      "intendedAssetId": "wyrmfang_greatblade",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-d65c186c-9298-4339-b9d5-efe7c37211a0.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/direfang_greatblade.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_sword_2handed_color.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the epic two-handed weapon \"Wyrmfang Greatblade\" (asset id wyrmfang_greatblade), one of Korzul's three prized drops from the gravewyrm sanctum.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted epic greatblade reference for family-level brushwork only. Image 3 is the current ornate greatblade silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark atmospheric painted ground of grave-black, cold teal and muted violet with restrained sanctum haze, no literal dungeon or dragon\nSubject: one formidable two-handed greatblade of blackened steel with a long pale gravewyrm-ivory ridge inset down the center like a single colossal fang; the double cutting edges flare slightly near a clipped predatory point, two curved bone quillons sweep toward the blade, the long grip is wrapped in charcoal leather for two hands, and a heavy dark-silver pommel bears one small cloudy teal stone\nStyle/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile black steel, aged wyrm ivory, leather and stone, richly painterly rather than product photography or 3D\nComposition/framing: single complete two-handed greatblade centered on a lower-left to upper-right diagonal; subject fills about 73 percent of the square; entire point, quillons, long grip and pommel remain comfortably inside with breathing room; fang-ridged silhouette reads clearly when tiny\nLighting/mood: cold top-left sanctum light with restrained violet underlight, ancient, predatory and epic\nColor palette: blackened steel, bone ivory, cold teal, charcoal leather, muted violet\nConstraints: opaque square image; unmistakably two-handed and epic; no literal dragon head, skull face, blood, text, letters, numerals, readable runes, glyphs, UI border, frame, logos, watermark, people, hands, extra weapons, crop, or cut-off greatblade\nAvoid: ordinary silver greatsword, neon frost, excessive spikes, glowing blue blade, cartoon dragon motif, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 20,
+      "callId": "zealotsbane_blade",
+      "intendedAssetId": "zealotsbane_blade",
+      "intent": "generate",
+      "mode": "built-in image_gen",
+      "taxonomy": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-c2986882-8f75-4f43-8905-a5c79cb4bc65.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Accepted first generation."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/cultist_flayer.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/sword_e.jpg"
+      ],
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG, authored as a high-resolution master and designed to remain readable at 28 to 40 pixels\nPrimary request: Paint a fresh, unique icon for the uncommon one-handed weapon \"Zealotsbane Blade\" (asset id zealotsbane_blade), awarded after silencing Threnos and the Wyrmcult choir below the Gravewyrm Sanctum.\nInput images: Image 1 is the exact painted item-art finish and lighting reference. Image 2 is a related painted mountain-cult weapon reference for family-level brushwork only. Image 3 is the current held-model silhouette reference only. Do not copy any composition.\nScene/backdrop: opaque dark smoky painted ground of mountain slate, charcoal and muted cult violet, cut by one restrained pale dawn reflection, no literal camp or battlefield\nSubject: one sturdy single-edged war blade with a slightly forward-weighted smoke-steel profile, clean bright edge, angular dark-silver guard and plain black leather grip; a short strand of snapped, unreadable dark prayer beads is wound once beneath the guard as a defeated trophy, with two loose beads hanging close to the hilt; the blade itself remains disciplined and practical\nStyle/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile forged steel, worn leather and polished stone beads, richly painterly rather than product photography or 3D\nComposition/framing: single complete one-handed blade centered on a lower-left to upper-right diagonal; subject fills about 70 percent of the square; full tip, guard, grip, pommel and close-hanging beads remain comfortably inside with even breathing room; strong simple silhouette\nLighting/mood: cool top-left mountain light with restrained warm edge reflection, resolute and quiet after the chanting stops\nColor palette: smoke steel, charcoal, black leather, muted violet, pale silver, tiny worn-bronze accents\nConstraints: opaque square image; uncommon martial identity; no writing on beads or blade, letters, numerals, readable runes, glyphs, religious logo, blood, skull face, people, hands, UI border, frame, logos, watermark, extra weapons, crop, or cut-off blade\nAvoid: glowing holy sword, ornate legendary weapon, neon violet, giant chain, text-like bead pattern, flat vector icon, photorealism, low-poly render, black void product shot"
+    },
+    {
+      "sequence": 21,
+      "callId": "tunnelkings_spade_retry_outline",
+      "intendedAssetId": "tunnelkings_spade",
+      "intent": "edit",
+      "mode": "built-in image_gen",
+      "taxonomy": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe713-f0e1-7370-88e9-2f09cdcfa924/exec-7cfae112-aec1-4365-9542-815e9e3f65e9.png",
+      "disposition": {
+        "status": "accepted",
+        "reason": "Final Tunnelking's Spade master."
+      },
+      "referencePaths": [
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-d/masters/tunnelkings_spade.png",
+        "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_axe_2handed.jpg"
+      ],
+      "exactPrompt": "Use case: precise-object-edit\nAsset type: opaque square inventory weapon icon for a classic dark-fantasy MMORPG\nInput images: Image 1 is the edit target and must remain the visual anchor. Image 2 is only the current held-model reference for the overall heavy two-handed proportions.\nPrimary request: Change only the outline of the large forward blade on the Tunnelking's Spade so it unmistakably reads as a brutal sharpened mining spade rather than an ordinary battleaxe. Give the blade broad squared shoulders where it meets the socket, a slightly convex but nearly flat digging edge, and a subtle central shovel ridge. Preserve the compact rear pick, riveted socket, packed clay, long banded oak haft, spike pommel, dark ochre cave background, top-left lantern light, complete diagonal framing, and premium painterly finish.\nConstraints: retain a heavy weaponized spade-axe hybrid, not a garden tool; keep the entire blade, pick, haft and pommel fully inside the opaque square with breathing room; no text, letters, numerals, runes, glyphs, people, hands, extra tools, border, watermark, crop, or cut-off weapon\nAvoid: a crescent axe edge, double axe, modern shovel, flat vector icon, photorealism, low-poly render, neon magic"
+    }
+  ],
+  "finalAssets": [
+    {
+      "sortedWeaponIndex": 100,
+      "id": "tradesman_hatchet",
+      "name": "Tradesman's Hatchet",
+      "quality": "uncommon",
+      "heldModelKey": "adv_axe_1handed",
+      "acceptedCallId": "tradesman_hatchet",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/tradesman_hatchet.png",
+        "sha256": "51e2abdc33fd5c8ae6322fec7a837b392ab70676a10681a919e27d0039f4439e",
+        "bytes": 2117879,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/tradesman_hatchet.webp",
+        "sha256": "5eb451e3c85691e1697a3187ac521b3afd79762197cddd0fda613036c7c79e95",
+        "bytes": 1958,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Compact work-hatchet silhouette, battered steel and ash handle remain distinct at 28 px."
+      }
+    },
+    {
+      "sortedWeaponIndex": 101,
+      "id": "training_mace",
+      "name": "Training Mace",
+      "quality": "common",
+      "heldModelKey": "hammer_a",
+      "acceptedCallId": "training_mace",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/training_mace.png",
+        "sha256": "efa9c0a4f22847c4145d2fc559f13710e9fdc8722b9fac5a291d78a30ad3450a",
+        "bytes": 2034742,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/training_mace.webp",
+        "sha256": "94c348b6447fdf94d893f04e9f228949ecab52ebd9e9c86067273a7aaf5b9706",
+        "bytes": 1508,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Rounded drill-yard head reads as deliberately blunt common starter gear."
+      }
+    },
+    {
+      "sortedWeaponIndex": 102,
+      "id": "tunnelkings_spade",
+      "name": "Tunnelking's Spade",
+      "quality": "uncommon",
+      "heldModelKey": "adv_axe_2handed",
+      "acceptedCallId": "tunnelkings_spade_retry_outline",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/tunnelkings_spade.png",
+        "sha256": "25ae112dec9c1e5c693f227c297427a347a0ae5ee014cda195df0f1cd71d0eac",
+        "bytes": 2110878,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/tunnelkings_spade.webp",
+        "sha256": "c2090f1d15370089f71a0d950dd4bbf4f0205210dd4c9ad51b6a393548ea167c",
+        "bytes": 2702,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Accepted targeted revision: squared, ridged digging blade now reads as a weaponized spade while retaining the rear pick."
+      }
+    },
+    {
+      "sortedWeaponIndex": 103,
+      "id": "vaels_mist_staff",
+      "name": "Vael's Mist-Staff",
+      "quality": "rare",
+      "heldModelKey": "adv_staff",
+      "acceptedCallId": "vaels_mist_staff",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/vaels_mist_staff.png",
+        "sha256": "703a0d4a4f94fdaf6f04db869a8da5db64ab9bb90e58f12b326566c792c28869",
+        "bytes": 2031947,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/vaels_mist_staff.webp",
+        "sha256": "4cf3f96809c3f5a01b9451709a90a7b0f0f51a69468baa23243b4a86d12bb434",
+        "bytes": 1998,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Fog-caged moonstone crown and full shaft remain legible without cropping."
+      }
+    },
+    {
+      "sortedWeaponIndex": 104,
+      "id": "vale_carving_knife",
+      "name": "Vale Carving Knife",
+      "quality": "common",
+      "heldModelKey": "dagger_a",
+      "acceptedCallId": "vale_carving_knife",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/vale_carving_knife.png",
+        "sha256": "264886510bcd8a59328bcb4b6283b637044ad0aafb715b69671df79f1b19bdeb",
+        "bytes": 1927494,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/vale_carving_knife.webp",
+        "sha256": "91b61d7095529a8638f87b264d28ffa5804459a69cdbf5b07127493112b08942",
+        "bytes": 1516,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Plain broad-backed carving knife is materially and compositionally distinct from assassin daggers."
+      }
+    },
+    {
+      "sortedWeaponIndex": 105,
+      "id": "valeborn_spellblade",
+      "name": "Valeborn Spellblade",
+      "quality": "rare",
+      "heldModelKey": "sword_g",
+      "acceptedCallId": "valeborn_spellblade",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/valeborn_spellblade.png",
+        "sha256": "36a7b074bf5fda4782dcd68fe03afaff8262a689e9e423c6c968d45fb38db724",
+        "bytes": 2147396,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/valeborn_spellblade.webp",
+        "sha256": "d32488f0c154fdf559eefd93368e909a48bd59e4ba1da55ce2d94fa176883c27",
+        "bytes": 2528,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Silver crescent guard and crystal ricasso read as rare caster steel, with no text-like markings."
+      }
+    },
+    {
+      "sortedWeaponIndex": 106,
+      "id": "veilsteel_blade",
+      "name": "Veilsteel Blade",
+      "quality": "uncommon",
+      "heldModelKey": "sword_b",
+      "acceptedCallId": "veilsteel_blade",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/veilsteel_blade.png",
+        "sha256": "666ecb1b1dfaae5542ecd4d620c247922744c75954d61082375f52173147cb80",
+        "bytes": 1964737,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/veilsteel_blade.webp",
+        "sha256": "373cd3fdb24b678b1c4940fd5d44777cbe98562e5599588eb0a051e9bb4934db",
+        "bytes": 1906,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Opalescent teal fuller identifies the Gleaming Deep origin without overpowering uncommon rarity."
+      }
+    },
+    {
+      "sortedWeaponIndex": 107,
+      "id": "verlans_oathblade",
+      "name": "Verlan's Oathblade",
+      "quality": "rare",
+      "heldModelKey": "adv_sword_2handed",
+      "acceptedCallId": "verlans_oathblade",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/verlans_oathblade.png",
+        "sha256": "c5ba9bc622614231a48161eb6ad8481e3201372a134896f6129089ac9b1aa1c3",
+        "bytes": 2252784,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/verlans_oathblade.webp",
+        "sha256": "6f4ded2c631df543b4e32312f87310363fb4b37a954b3f6fd84025f4e5608f20",
+        "bytes": 2122,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Time-darkened knightly greatsword reads as a mournful undead-captain trophy."
+      }
+    },
+    {
+      "sortedWeaponIndex": 108,
+      "id": "voidsong_dirk",
+      "name": "Voidsong, Dirk of the Sundered Veil",
+      "quality": "legendary",
+      "heldModelKey": "adv_dagger",
+      "acceptedCallId": "voidsong_dirk",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/voidsong_dirk.png",
+        "sha256": "2b1c6589a145b7bfc8964d962977fb1b35902fc881213d827e032a228e05ccad",
+        "bytes": 1992429,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/voidsong_dirk.webp",
+        "sha256": "bb6673c7e4ca41f254079b1ecb0aa3100a0882fe3032401cac57d2d4a8330e0e",
+        "bytes": 2044,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Broken-crescent guard and black-violet blade make the legendary S-rank focus unique at tiny size."
+      }
+    },
+    {
+      "sortedWeaponIndex": 109,
+      "id": "voss_sanctified_mace",
+      "name": "Voss's Sanctified Mace",
+      "quality": "uncommon",
+      "heldModelKey": "hammer_c",
+      "acceptedCallId": "voss_sanctified_mace",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/voss_sanctified_mace.png",
+        "sha256": "bc46b4ca8357b03e2b65fc17eedf441d5915dcde8009c3627c0b758d6db8ae43",
+        "bytes": 2258727,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/voss_sanctified_mace.webp",
+        "sha256": "0fd3aa18c904ed52c6058dd0da5d63c29606f50497e1f551d1f4c77edf72feb5",
+        "bytes": 1718,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Ash-dark censer flanges distinguish the corrupted chapel caster mace."
+      }
+    },
+    {
+      "sortedWeaponIndex": 110,
+      "id": "whetted_iron_dirk",
+      "name": "Whetted Iron Dirk",
+      "quality": "uncommon",
+      "heldModelKey": "dagger_b",
+      "acceptedCallId": "whetted_iron_dirk",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/whetted_iron_dirk.png",
+        "sha256": "3d7a25b068407dbd66a295f9f2f8bb96fd63d25fc8dbdac7148a8290f1523cf7",
+        "bytes": 1851194,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/whetted_iron_dirk.webp",
+        "sha256": "1a291b12805dc222e6b7d49a526748e01c158b383abe64a84ea6644384985198",
+        "bytes": 1740,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Clean forged ridge and simple quillons communicate a crafted uncommon upgrade."
+      }
+    },
+    {
+      "sortedWeaponIndex": 111,
+      "id": "widowfang_dirk",
+      "name": "Widowfang Dirk",
+      "quality": "rare",
+      "heldModelKey": "dagger_c",
+      "acceptedCallId": "widowfang_dirk",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/widowfang_dirk.png",
+        "sha256": "b76b33b6fa4fa0d53e0d30527c277515d3e06d2fbad3cbe6b7adf14927ee29c0",
+        "bytes": 2134697,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/widowfang_dirk.webp",
+        "sha256": "41cce928e73b63a7caadac0da0c89d9867392b56638d74ecfd97d16f897626df",
+        "bytes": 1818,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Recurved fang blade, chitin hooks and restrained garnet palette remain clear at 28 px."
+      }
+    },
+    {
+      "sortedWeaponIndex": 112,
+      "id": "wildheart_fangknife",
+      "name": "Fangknife of Zulgar",
+      "quality": "epic",
+      "heldModelKey": "adv_dagger",
+      "acceptedCallId": "wildheart_fangknife",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/wildheart_fangknife.png",
+        "sha256": "471bb0ac9f934f59b3a768c279da014b6c734b41e6f589d0a6be55016a7fa99d",
+        "bytes": 1841398,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/wildheart_fangknife.webp",
+        "sha256": "37951a6ba9c6f117ff6faa8f76d730db6e2658b22dca2140c20d9a6d61ef57f3",
+        "bytes": 2854,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Ivory fang, obsidian edge and jade hooks produce a compact Wildheart epic silhouette."
+      }
+    },
+    {
+      "sortedWeaponIndex": 113,
+      "id": "wildheart_hexwood_staff",
+      "name": "Hexwood Staff of the Basin",
+      "quality": "epic",
+      "heldModelKey": "adv_druid_staff",
+      "acceptedCallId": "wildheart_hexwood_staff",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/wildheart_hexwood_staff.png",
+        "sha256": "d416c7a95dcb3eb2e8759b9d9dca6ff59d02db291ce5c85885cf98104e9d44aa",
+        "bytes": 2058821,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/wildheart_hexwood_staff.webp",
+        "sha256": "f541230051cfe7b0c6af1ac80342412b229453aec97fcb28c58622f349d9e1f8",
+        "bytes": 2380,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Living hexwood crown and turquoise Basin stone remain centered and readable."
+      }
+    },
+    {
+      "sortedWeaponIndex": 114,
+      "id": "wildheart_tuskblade",
+      "name": "Wildheart Tuskblade",
+      "quality": "epic",
+      "heldModelKey": "adv_sword_2handed_color",
+      "acceptedCallId": "wildheart_tuskblade_retry_handle",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/wildheart_tuskblade.png",
+        "sha256": "d03d586604cc446e134cdf8b2d034f1ddd218f530aaf6086721d8cd845c308a0",
+        "bytes": 2237647,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/wildheart_tuskblade.webp",
+        "sha256": "17369ea620095b9945caa54b101bd708618a2176d15c67467d09b29eaecbf75f",
+        "bytes": 2350,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Accepted targeted revision: extended two-hand grip fixes the original one-handed read while preserving the tusk identity."
+      }
+    },
+    {
+      "sortedWeaponIndex": 115,
+      "id": "wildsoul_maul",
+      "name": "Wildsoul Maul",
+      "quality": "epic",
+      "heldModelKey": "hammer_d",
+      "acceptedCallId": "wildsoul_maul",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/wildsoul_maul.png",
+        "sha256": "0c8563f67a5cc2ec2aed01b6c9f54b3318c1296067f137c949aa73f2148bb7e6",
+        "bytes": 2266665,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/wildsoul_maul.webp",
+        "sha256": "57d1c57bc30de16e944c1bb4d0da0bd5c5fe76026089a72cf9a613ba9582bf67",
+        "bytes": 2274,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Petrified-heartwood and gravewyrm-bone head stays bold despite its layered epic materials."
+      }
+    },
+    {
+      "sortedWeaponIndex": 116,
+      "id": "worn_sword",
+      "name": "Pitted Shortsword",
+      "quality": "common",
+      "heldModelKey": "sword_a",
+      "acceptedCallId": "worn_sword",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/worn_sword.png",
+        "sha256": "938dc4bcae2a47fc5b5ca914a24f7f28a541f3b875f37e5e9a5380fb63fb6619",
+        "bytes": 2335202,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/worn_sword.webp",
+        "sha256": "454ab5dc2397a656405408b8c0a2411be40d97b3712bbc076696c20c3dd3be90",
+        "bytes": 1810,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Pitted flats, edge nicks and cracked grip clearly communicate common worn starter steel."
+      }
+    },
+    {
+      "sortedWeaponIndex": 117,
+      "id": "wyrmfang_greatblade",
+      "name": "Wyrmfang Greatblade",
+      "quality": "epic",
+      "heldModelKey": "adv_sword_2handed_color",
+      "acceptedCallId": "wyrmfang_greatblade",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/wyrmfang_greatblade.png",
+        "sha256": "74ba7bfee4386feb57fb73783c619c4260d69f9fdec4b10238a1eb4849934e6c",
+        "bytes": 2165999,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/wyrmfang_greatblade.webp",
+        "sha256": "404c39452f25c8713fc05ecd84e70000fe7c83f9a62ae2299b57342e83ce7838",
+        "bytes": 1992,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Ivory fang ridge and black steel outline read as a two-handed gravewyrm epic."
+      }
+    },
+    {
+      "sortedWeaponIndex": 118,
+      "id": "zealotsbane_blade",
+      "name": "Zealotsbane Blade",
+      "quality": "uncommon",
+      "heldModelKey": "sword_e",
+      "acceptedCallId": "zealotsbane_blade",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/weapons-d/masters/zealotsbane_blade.png",
+        "sha256": "1b5b4ab95771096bb393580a1ee971a782a1212812fc65232e6a6055e2a1ed31",
+        "bytes": 2181065,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "shipping": {
+        "path": "public/ui/items/zealotsbane_blade.webp",
+        "sha256": "60158ec1e0f00c04b03386861a1f6fde26775472d1d92384f88551d8e2823db0",
+        "bytes": 2264,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "channels": 3,
+        "hasAlpha": false,
+        "space": "srgb"
+      },
+      "visualQa": {
+        "nativeMasterReviewed": true,
+        "shipping128Reviewed": true,
+        "readability40Reviewed": true,
+        "readability28Reviewed": true,
+        "centered": true,
+        "completeUncroppedSilhouette": true,
+        "note": "Snapped prayer beads stay close to the guard and distinguish the restrained anti-cult blade."
+      }
+    }
+  ],
+  "qa": {
+    "count": 19,
+    "allMasters1254Opaque": true,
+    "allShipping128Opaque": true,
+    "allShippingWithin15KiB": true,
+    "exactShippingHashesUnique": true,
+    "largestShippingBytes": 2854,
+    "masterContact": "tmp/imagegen/placeholder-art-completion/weapons-d/previews/master-contact-512.png",
+    "shippingContact": "tmp/imagegen/placeholder-art-completion/weapons-d/previews/shipping-128.png",
+    "readability40Contact": "tmp/imagegen/placeholder-art-completion/weapons-d/previews/readability-40-4x.png",
+    "readability28Contact": "tmp/imagegen/placeholder-art-completion/weapons-d/previews/readability-28-6x.png",
+    "rejectedSources": [
+      "tmp/imagegen/placeholder-art-completion/weapons-d/rejected/wildheart_tuskblade_short_grip.png",
+      "tmp/imagegen/placeholder-art-completion/weapons-d/rejected/tunnelkings_spade_axe_outline.png"
+    ]
+  }
+}

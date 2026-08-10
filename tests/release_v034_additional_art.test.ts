@@ -542,7 +542,7 @@ describe('release v0.34 additional painted art', () => {
       expect(commissionedDeedRow).not.toContain(id);
       expect(provenance, `${id} provenance`).toContain(id);
     }
-    expect(commissionedDeedRow).toContain('excluding the fourteen generated additions');
+    expect(commissionedDeedRow).toContain('excluding the project-generated additions');
     expect(provenance).toContain(GENERATED_SOURCE);
     expect(provenance).toContain('docs/achievements/release-v034-additional-art.json');
     expect(credits).toContain('CraftPix Premium');

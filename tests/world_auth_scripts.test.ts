@@ -55,6 +55,10 @@ const AUTHENTICATED_NODE_CLIENTS = [
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)))',
   },
   {
+    path: 'scripts/lib/perf_hitch_scenarios.mjs',
+    authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)))',
+  },
+  {
     path: 'scripts/load_players.mjs',
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)));',
   },
@@ -186,7 +190,9 @@ describe('standalone world WebSocket auth', () => {
       const source = readFileSync(join(ROOT, path), 'utf8');
       const helperPath = path.startsWith('scripts/profiler/')
         ? '../lib/world_auth.mjs'
-        : './lib/world_auth.mjs';
+        : path.startsWith('scripts/lib/')
+          ? './world_auth.mjs'
+          : './lib/world_auth.mjs';
       const normalizedSource = source.replace(/\s+/g, ' ');
 
       expect(source).toContain(`import { worldAuthMessage } from '${helperPath}';`);

@@ -33,7 +33,8 @@ section 14).
 
 ## Env flags
 `PARSE_CAPTURE=1` master (default off), `PARSE_INGEST_URL` (https, or http to
-loopback only), `PARSE_INGEST_TOKEN`,
+loopback or an RFC1918 private IP literal: the VPC-internal push path),
+`PARSE_INGEST_TOKEN`,
 `PARSE_CAPTURE_SURFACES=arena,battleground,raid,dungeon,rift`,
 `PARSE_SPOOL_DIR`, `PARSE_SPOOL_MAX_MB`, `PARSE_ENV_LABEL=prod|qa|pbe|dev`,
 `PARSE_CENSUS=0` (census opt-out), `PARSE_CENSUS_HOUR` (UTC hour of the daily

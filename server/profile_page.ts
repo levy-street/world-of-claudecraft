@@ -137,7 +137,7 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
   const gameName = escapeHtml(GAME_NAME);
   const arena1 = sheet.arena['1v1'];
   const arenaLine = arena1
-    ? `<li>Arena 1v1: <strong>${arena1.rating}</strong> (${arena1.wins}W / ${arena1.losses}L)</li>`
+    ? `<li>Arena 1v1: <strong>${arena1.rating}</strong> (${arena1.wins}W / ${arena1.losses}L / ${arena1.draws}D)</li>`
     : '';
   const rankLine = sheet.rank
     ? `<li>Realm rank: <strong>#${sheet.rank.rank}</strong> of ${sheet.rank.total}</li>`

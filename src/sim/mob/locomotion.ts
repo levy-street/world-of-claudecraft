@@ -47,7 +47,7 @@ import {
   riftMechanicSuppressed,
   riftRankForBaseLevel,
 } from '../rift/ranks';
-import { instancePlayerIds } from '../rift/runs';
+import { clearRiftBossDeathZones, instancePlayerIds } from '../rift/runs';
 // Type only: the idle sub-stream is threaded through the wander step as a local.
 // The helper that CONSTRUCTS one lives in mob/idle_rng.ts.
 import type { Rng } from '../rng';
@@ -1066,6 +1066,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
             z: anchorE.pos.z,
             radius: def.radius,
             remaining: anchorFuse,
+            total: anchorFuse,
           });
           // Notify online clients so they can mirror the zone countdown locally.
           // Interest-scoped by world position, so only instance players receive it.
@@ -1422,11 +1423,12 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   }
   mob.yelledEngage = false;
   // A boss evade ends the pull: clear any pending lethal death zones so stale
-  // zones from the previous pull do not linger into the next.
+  // zones from the previous pull do not linger into the next (and notify
+  // online mirrors, which otherwise run the phantom fuse to detonation).
   if (deathZoneCastDef || deathZoneStrikeDef) {
     for (const inst of ctx.riftInstances) {
       if (inst.partyKey !== null && inst.bossId === mob.id) {
-        inst.bossDeathZones = [];
+        clearRiftBossDeathZones(ctx, inst);
         break;
       }
     }

@@ -351,7 +351,7 @@ export interface RiftInstance {
    * deathZoneStrike mechanics). Each zone starts with a `remaining` fuse equal
    * to the boss's cast time; at zero it detonates (lethal to anyone inside `radius`).
    * Cleared on boss death or floor reset. */
-  bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number }>;
+  bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number; total: number }>;
   /** Recently-exited-mid-combat memory (issue #2653): a player who left this run
    * through the beacon/exit while a mob was actively fighting them has their
    * dropped threat snapshotted here for a short window. Re-entering before it

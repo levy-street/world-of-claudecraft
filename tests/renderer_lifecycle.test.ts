@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
+import { CharacterVisualPool } from '../src/render/characters/visual_pool';
 import { Renderer } from '../src/render/renderer';
 
 const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
@@ -64,7 +65,9 @@ describe('Renderer lifecycle wiring', () => {
     expect(disposal).toContain('this.post?.dispose()');
     expect(disposal).toContain('this.chatBubbles.clear()');
     expect(disposal).toContain('this.removeView(id, true)');
-    expect(disposal).toContain('for (const visual of pool) bestEffort(() => visual.dispose())');
+    expect(disposal).toContain(
+      'for (const visual of this.visualPool.drain()) bestEffort(() => visual.dispose())',
+    );
     expect(disposal).toContain('this.objectPool.clear()');
     expect(disposal).toContain('this.nameplatePainter?.dispose()');
     expect(disposal).toContain('this.nameplateLayer.replaceChildren()');
@@ -127,7 +130,9 @@ describe('Renderer lifecycle wiring', () => {
       events.push('view:dispose');
       throw new Error('injected view disposal failure');
     };
-    renderer.visualPool = new Map([['player', [{ dispose: () => events.push('pool:dispose') }]]]);
+    const visualPool = new CharacterVisualPool<{ dispose: () => void }>();
+    visualPool.store('player', { dispose: () => events.push('pool:dispose') }, 10);
+    renderer.visualPool = visualPool;
     renderer.objectPool = new Map();
     // The deferred weapon-skin apply queue is a teardown participant too: a
     // pending application must never survive into the next context.

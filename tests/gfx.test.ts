@@ -534,7 +534,10 @@ describe('graphics tier resolution', () => {
     });
 
     expect(desktop.constrainedMemory).toBe(false);
-    expect(desktop.maxPooledCharacterVisuals).toBe(Number.POSITIVE_INFINITY);
+    // The character pool is bounded on EVERY profile since the C1 memory-ratchet
+    // fix (128 on desktop, LRU-evicted; see tests/character_visual_pool.test.ts);
+    // only the ground-object pool keeps the historical desktop Infinity.
+    expect(desktop.maxPooledCharacterVisuals).toBe(128);
     expect(desktop.maxPooledObjects).toBe(Number.POSITIVE_INFINITY);
 
     for (const constrained of [androidBrowser, androidNative]) {

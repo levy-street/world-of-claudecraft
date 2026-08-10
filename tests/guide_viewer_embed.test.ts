@@ -27,9 +27,15 @@ describe('modelViewerEmbed', () => {
   });
 
   it('falls back to the 2D crest as a DECORATIVE image (alt="") when there is no still', () => {
-    const html = modelViewerEmbed({ modelKey: 'mage', name: 'Mage', poster: 'data:crest' });
-    expect(html).toContain('src="data:crest"');
+    const html = modelViewerEmbed({
+      modelKey: 'mage',
+      name: 'Mage',
+      poster: '/ui/classes/mage.webp',
+      posterCrestId: 'class_mage',
+    });
+    expect(html).toContain('src="/ui/classes/mage.webp"');
     expect(html).not.toContain('guide-viewer-poster-still');
+    expect(html).toContain('data-crest-fallback-id="class_mage"');
     const alt = html.match(/class="guide-viewer-poster[^"]*"[^>]*\salt="([^"]*)"/)?.[1] ?? null;
     expect(alt).toBe(''); // decorative crest, not announced
   });

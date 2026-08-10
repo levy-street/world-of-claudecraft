@@ -186,6 +186,77 @@ export interface PrewarmPolicy {
   finishFullManifestBeforeReveal: boolean;
 }
 
+/**
+ * What a manifest entry actually got done before a deadline (or a pending
+ * asset prefetch) stopped it. `trimmed` is the load-bearing bit: it means the
+ * entry deliberately stopped or deferred with planned work remaining, so the
+ * summary must never call it completed. The counts are informational context
+ * for the perf report; entries whose remaining work is unknowable (a scan cut
+ * short mid-iteration) may report done without planned.
+ */
+export interface PrewarmEntryProgress {
+  done?: number;
+  planned?: number;
+  trimmed: boolean;
+}
+
+/**
+ * The honest status for an entry whose run() returned without throwing. A
+ * deadline-trimmed or prefetch-deferred entry is 'partial', never 'completed':
+ * the historical bug was entities.player-archetypes hitting its build deadline
+ * having built ZERO visuals and still reporting completed, which made the boot
+ * starvation invisible in every prewarm summary.
+ */
+export function resolvePrewarmEntryStatus(
+  progress: PrewarmEntryProgress | null | undefined,
+): 'completed' | 'partial' {
+  return progress?.trimmed ? 'partial' : 'completed';
+}
+
+/**
+ * How long the sky manifest entry may wait inline for the decoupled HDRI
+ * prefetch (fetch + worker decode, started at prewarm begin) before deferring
+ * the remaining uploads to the background lane. The tail entries
+ * (world.initial-frame, programs.compile) are deadlineExempt on the async
+ * desktop arm and start regardless; what the reserve actually buys is compile
+ * RUN time before prewarmCompileUnitDeadline stops the unit loop: a slow
+ * network must never starve that window the way the old inline await did
+ * (measured 11.5s of a 12s boot budget).
+ * finishFullManifestBeforeReveal (desktop Insane) waits without bound: that
+ * profile's contract is a complete manifest behind the loading cover, and its
+ * runEntry ignores the soft deadline anyway.
+ */
+export function skyAssetInlineWaitMs(input: {
+  nowMs: number;
+  deadlineMs: number;
+  reserveMs: number;
+  finishFullManifestBeforeReveal: boolean;
+}): number {
+  if (input.finishFullManifestBeforeReveal) return Number.POSITIVE_INFINITY;
+  return Math.max(0, input.deadlineMs - Math.max(0, input.reserveMs) - input.nowMs);
+}
+
+export interface SkyBiomePartition<T> {
+  /** Biomes whose decoded assets are already resident and can upload inline. */
+  resident: T[];
+  /** Biomes still in flight; their uploads join the background lane on arrival. */
+  missing: T[];
+}
+
+/** Split the initial sky biomes by decoded-asset residency at entry time. */
+export function partitionResidentSkyBiomes<T>(
+  biomes: readonly T[],
+  isResident: (biome: T) => boolean,
+): SkyBiomePartition<T> {
+  const resident: T[] = [];
+  const missing: T[] = [];
+  for (const biome of biomes) {
+    if (isResident(biome)) resident.push(biome);
+    else missing.push(biome);
+  }
+  return { resident, missing };
+}
+
 /** True when a soft-deadline manifest entry should resume after world reveal. */
 export function prewarmEntryShouldDefer(
   entryStartedMs: number,

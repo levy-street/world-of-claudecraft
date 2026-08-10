@@ -75,6 +75,7 @@ import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { buildStubbleDecal, headNodeName } from './stubble';
+import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
@@ -980,8 +981,10 @@ function modularVariant(url: string, names: readonly string[]): THREE.Object3D {
 
 // Bounded, because a colour WHEEL is a continuous input: dragging it emits a
 // new hex every pointermove, and each distinct hex would otherwise strand a
-// material here forever (and a second one in tintedMaterial's cache, which is
-// keyed off this material's uuid). An LRU keeps a drag's worth of shades warm,
+// material here forever. (Its downstream twin in tintedMaterial's cache, keyed
+// off this material's uuid, becomes a dead-source entry when the LRU evicts
+// here; the tinted cache reclaims those through its own idle bound, see
+// tinted_material_cache_core.ts.) An LRU keeps a drag's worth of shades warm,
 // re-picking a recent colour is still free, and disposes what falls out.
 const RECOLOR_CACHE_MAX = 48;
 const recolorCache = new Map<string, THREE.Material>();
@@ -1611,10 +1614,17 @@ export function setWeaponsStowed(
 }
 
 // ---------------------------------------------------------------------------
-// Tinted material cache (shared across all instances; never disposed)
+// Tinted material cache (shared across all instances; claim-counted and
+// bounded, see tinted_material_cache_core.ts). Two visuals asking for the
+// same (source, tint, tier, atlases, role) still share one clone; a clone is
+// disposed only once nothing claims it (idle LRU overflow, or a profile
+// reset's retire-on-last-release), so eviction can never touch a material a
+// live mesh still mounts.
 // ---------------------------------------------------------------------------
 
-const matCache = new Map<string, THREE.Material>();
+const matCache = new TintedMaterialCache<THREE.Material>(TINTED_MATERIAL_IDLE_CACHE_MAX, (mat) =>
+  mat.dispose(),
+);
 const sourceMaterials = new WeakMap<THREE.Mesh, THREE.Material | THREE.Material[]>();
 const tintScratch = new THREE.Color();
 const lowReadabilityWhite = new THREE.Color(0xffffff);
@@ -1667,6 +1677,27 @@ function applyWeaponMaterialPolish(
   }
 }
 
+/**
+ * A lease of shared tinted-material cache keys. A material sweep passes its
+ * visual's lease so every cache entry it mounts stays claimed (pinned against
+ * eviction) until the visual releases the lease via releaseTintedMaterials
+ * (on the next full re-apply sweep, and at dispose). The set also makes
+ * claims idempotent per lease: a sweep meeting the same source material on
+ * several meshes claims its key once.
+ *
+ * A caller that passes NO lease (tests, tools) still shares the memoized
+ * clone, but its entry stays evictable: never mount a leaseless result on a
+ * long-lived mesh.
+ */
+export type TintedMaterialClaims = Set<string>;
+
+/** Release one lease's claims (see TintedMaterialClaims). Keys the cache no
+ *  longer tracks are a refused no-op, so a double release cannot underflow
+ *  another visual's pin. */
+export function releaseTintedMaterials(claims: Iterable<string>): void {
+  for (const key of claims) matCache.release(key);
+}
+
 export function tintedMaterial(
   src: THREE.Material,
   tint: number | null,
@@ -1674,19 +1705,48 @@ export function tintedMaterial(
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
   role: MaterialRole = 'body',
+  claims: TintedMaterialClaims | null = null,
 ): THREE.Material {
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}`;
-  const cached = matCache.get(key);
-  if (cached) return cached;
-
   // A source with no color property (the weapon-skin fresnel shell's
   // ShaderMaterial) has nothing this factory can tint, lift, or polish.
   // Return it unchanged: cloning would detach the rig's live uniform handles
   // (its per-frame uTime/uStr writes would land on a material nothing
   // renders), and caching that clone would strand it forever.
   if (!(src as THREE.MeshStandardMaterial).color) return src;
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}`;
+  const build = () =>
+    buildTintedClone(src as THREE.MeshStandardMaterial, tint, strength, skinTex, emisTex, role);
+  if (claims) {
+    if (claims.has(key)) {
+      // This lease already claimed the key (the same source material on an
+      // earlier mesh of the sweep): serve the held clone without a second
+      // claim, keeping claims and releases exactly paired per lease.
+      const held = matCache.peek(key);
+      if (held) return held;
+    }
+    claims.add(key);
+    return matCache.claim(key, build);
+  }
+  // Leaseless: share the memo and stay warm, but hold no claim (claim then
+  // release parks the entry at the idle tail). Every production mount path
+  // leases; see TintedMaterialClaims.
+  const mat = matCache.claim(key, build);
+  matCache.release(key);
+  return mat;
+}
 
-  const s = src as THREE.MeshStandardMaterial;
+/** The tinted-clone derivation: a pure function of its arguments plus the
+ *  static graphics tier, which is why an evicted cache entry rebuilds
+ *  identically on the next request (see tinted_material_cache_core.ts). */
+function buildTintedClone(
+  s: THREE.MeshStandardMaterial,
+  tint: number | null,
+  strength: number,
+  skinTex: THREE.Texture | null,
+  emisTex: THREE.Texture | null,
+  role: MaterialRole,
+): THREE.Material {
+  const src: THREE.Material = s;
   let mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial;
   if (GFX.standardMaterials) {
     mat = s.clone();
@@ -1714,7 +1774,7 @@ export function tintedMaterial(
     if ((src as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
       mat = (src as THREE.MeshBasicMaterial).clone();
     } else {
-      // low tier: Lambert with the same texture map — no PBR, no rim
+      // low tier: Lambert with the same texture map (no PBR, no rim)
       mat = new THREE.MeshLambertMaterial({
         map: s.map ?? null,
         color: s.color ? s.color.clone() : new THREE.Color(0xffffff),
@@ -1735,7 +1795,7 @@ export function tintedMaterial(
     }
   }
   if (tint !== null) {
-    // subtle pull toward the template color — hard multiplies turn the
+    // subtle pull toward the template color: hard multiplies turn the
     // hand-painted textures muddy
     mat.color.lerp(tintScratch.set(tint), strength);
   }
@@ -1760,7 +1820,6 @@ export function tintedMaterial(
     std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
   }
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role);
-  matCache.set(key, mat);
   return mat;
 }
 
@@ -1770,13 +1829,17 @@ function tintFor(def: VisualDef, entityColor: number): number | null {
 }
 
 /** Swap every mesh material in an assembled clone for the shared tinted
- *  (and tier-appropriate) variant. Returns nothing — mutates the clone. */
+ *  (and tier-appropriate) variant. Returns nothing, mutates the clone. Pass
+ *  the owning visual's `claims` lease so every mounted cache entry stays
+ *  pinned against eviction until the visual releases it (see
+ *  TintedMaterialClaims). */
 export function applyMaterials(
   root: THREE.Object3D,
   def: VisualDef,
   entityColor: number,
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
+  claims: TintedMaterialClaims | null = null,
 ): void {
   const tint = tintFor(def, entityColor);
   const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
@@ -1804,9 +1867,11 @@ export function applyMaterials(
     const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
     const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
     if (Array.isArray(source)) {
-      mesh.material = source.map((m) => tintedMaterial(m, materialTint, strength, sk, em, role));
+      mesh.material = source.map((m) =>
+        tintedMaterial(m, materialTint, strength, sk, em, role, claims),
+      );
     } else {
-      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role);
+      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role, claims);
     }
   });
 }
@@ -1824,11 +1889,20 @@ export function tintedFarMaterials(
   isBody: boolean[],
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
+  claims: TintedMaterialClaims | null = null,
 ): THREE.Material[] {
   const tint = tintFor(def, entityColor);
   const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
   return srcMats.map((m, i) =>
-    tintedMaterial(m, tint, strength, isBody[i] ? skinTex : null, isBody[i] ? emisTex : null),
+    tintedMaterial(
+      m,
+      tint,
+      strength,
+      isBody[i] ? skinTex : null,
+      isBody[i] ? emisTex : null,
+      'body',
+      claims,
+    ),
   );
 }
 
@@ -1860,12 +1934,24 @@ export interface PreparedVisual {
 
 const prepared = new Map<string, PreparedVisual>();
 
-/** Drop profile-derived character templates/materials while retaining loaded source assets. */
+/** Drop profile-derived character templates/materials while retaining loaded
+ *  source assets. The tinted-material cache resets rather than clears: idle
+ *  clones dispose now, and any clone a not-yet-torn-down visual still mounts
+ *  is retired to dispose on that visual's release instead of leaking (see
+ *  tinted_material_cache_core.ts). In the graphics-rebuild flow every visual
+ *  is already disposed before this runs, so normally everything disposes
+ *  here. */
 export function resetCharacterProfileCaches(): void {
   optimizedSceneCache.clear();
-  matCache.clear();
+  matCache.reset();
   prepared.clear();
 }
+
+/** Test-only observation window into the shared tinted-material cache. */
+export const tintedMaterialInternalsForTest = {
+  cacheSize: (): number => matCache.size,
+  cacheIdleSize: (): number => matCache.idleSize,
+};
 
 export function prepareVisual(key: string): PreparedVisual {
   const hit = prepared.get(key);

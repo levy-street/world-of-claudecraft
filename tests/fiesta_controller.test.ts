@@ -1,6 +1,24 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const crestIconMocks = vi.hoisted(() => ({
+  cached: vi.fn<(kind: string, id: string, size: number) => string | null>(() => null),
+  procedural: vi.fn(
+    (_kind: string, id: string, size: number) => `data:image/png;base64,${id}-${size}`,
+  ),
+}));
+
+// Happy DOM reports an unrequested image as complete with zero natural width. Keep the
+// real crest hydration seam under test, but replace its canvas-backed last-resort
+// renderer with a deterministic data URL so this controller test does not need a 2D
+// canvas implementation.
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
+  cachedProceduralIconDataUrl: crestIconMocks.cached,
+  proceduralIconDataUrl: crestIconMocks.procedural,
+}));
+
 import { FiestaController } from '../src/ui/hud/fiesta/fiesta_controller';
 import { t } from '../src/ui/i18n';
 import type { FiestaMatchInfo, IWorld } from '../src/world_api';
@@ -88,6 +106,9 @@ function harness() {
 describe('FiestaController', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
+    crestIconMocks.cached.mockReset();
+    crestIconMocks.cached.mockReturnValue(null);
+    crestIconMocks.procedural.mockClear();
   });
 
   it('paints the active authoritative score without firing a synthetic score cue', () => {
@@ -97,6 +118,21 @@ describe('FiestaController', () => {
 
     expect(test.controller.isActive()).toBe(true);
     expect(test.score.innerHTML).toContain('fs-core');
+    const faces = test.score.querySelectorAll<HTMLImageElement>('.fp-face');
+    expect(faces).toHaveLength(2);
+    expect(
+      Array.from(faces, (face) => [
+        face.getAttribute('data-crest-fallback-id'),
+        face.getAttribute('data-crest-fallback-size'),
+      ]),
+    ).toEqual([
+      ['class_warrior', '96'],
+      ['class_mage', '96'],
+    ]);
+    expect(crestIconMocks.procedural.mock.calls.map((call) => call.slice(1))).toEqual([
+      ['class_warrior', 96],
+      ['class_mage', 96],
+    ]);
     expect(test.audio.scorePing).not.toHaveBeenCalled();
   });
 

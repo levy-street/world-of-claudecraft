@@ -202,6 +202,24 @@ function splitGameUiTemplate(): { templateHtml: string; liveHtml: string } {
 }
 
 describe('client HTML shell', () => {
+  it('uses the painted combat-status crest in both game entries', () => {
+    for (const entry of [html, playHtml]) {
+      const combat = entry.match(/<div class="combat-flash"[^>]*>[\s\S]*?<\/div>/)?.[0];
+      expect(combat).toBeDefined();
+      expect(combat).toContain('id="pf-combat"');
+      expect(combat).toContain('role="status"');
+      expect(combat).toContain('src="/ui/crests/status/combat.webp"');
+      expect(combat).toContain('data-crest-fallback-id="status_combat"');
+      expect(combat).toContain('data-crest-fallback-size="32"');
+      expect(combat).not.toContain(String.fromCodePoint(0x2694));
+      expect(entry).toContain('id="pf-rest" role="status"');
+    }
+    expect(existsSync(new URL('../public/ui/crests/status/combat.webp', import.meta.url))).toBe(
+      true,
+    );
+    expect(hudCss).toContain('.combat-flash img');
+  });
+
   it('keeps game HUD controls out of the live startup DOM', () => {
     const { liveHtml, templateHtml } = splitGameUiTemplate();
 
@@ -951,13 +969,29 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('hud.prewarmStaticUiAssets();');
     expect(hudTs).toContain('prewarmStaticUiAssets(): void {');
     expect(hudTs).toContain('raidMarkerDataUrl(marker);');
-    const crestWarm = mainTs.slice(
-      mainTs.indexOf('for (const cls of ALL_CLASSES)'),
-      mainTs.indexOf('for (const slot of world.inventory)'),
+    const priorityCall = mainTs.slice(
+      mainTs.indexOf('contextualIconPrewarmEntries({'),
+      mainTs.indexOf('const iconPrewarm = defaultIconPrewarmPlan'),
     );
-    expect(crestWarm).toContain("kind: 'crest'");
-    expect(crestWarm).toContain('size: 20');
-    expect(crestWarm).toContain('size: 96');
+    for (const source of [
+      'equipmentItemIds',
+      'classIds',
+      'inventoryItemIds',
+      'bagItemIds',
+      'knownAbilityIds',
+      'classAbilityIds',
+      'talentIconRefs',
+      'recipeResultItemIds',
+      'finderLootItemIds',
+      'questRewardItemIds',
+      'heroicVendorItemIds',
+      'marketListingItemIds',
+      'marketCollectionItemIds',
+      'marketHouseItemIds',
+      'vendorItemIds',
+    ]) {
+      expect(priorityCall, source).toContain(`${source}:`);
+    }
   });
 
   it('keeps the desktop character roster readable inside a centered cinematic stage', () => {

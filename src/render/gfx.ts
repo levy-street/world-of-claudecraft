@@ -1072,24 +1072,30 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     constrainedMemory,
     iosMemoryProfile,
     tightMemory: tightMemoryProfile,
-    // Every OTHER budget in this function falls back through constrainedMemory (the
-    // cross-platform touch/coarse-pointer/narrow-viewport/deviceMemory detector, see
-    // maxPointLights above) before reaching its desktop default; this one used to jump
-    // straight from the two narrow iOS profiles to POSITIVE_INFINITY, so any Android
-    // browser or native shell, and any iOS session that never stamped tightMemory, kept
-    // every despawned mob/NPC CharacterVisual (and its per-instance Skeleton + GPU
-    // bone-matrix DataTexture) forever: visualPool is keyed per template+color+scale, so
-    // roaming through a zone with any per-mob variance mints new keys continuously and
-    // never reuses, never shrinks. Bounded to a working set a bit above the crowd_lod
-    // "soft" articulated-rig band (CROWD_LOD_SOFT_RIGS) so ordinary reuse still avoids the
-    // GPU skeleton re-upload hitch pooling exists for, without growing without bound.
+    // Bounded on EVERY profile, desktop included. A pooled visual retains its
+    // per-instance Skeleton and GPU bone-matrix DataTexture so a re-entering
+    // mob/NPC skips the skeleton re-upload hitch pooling exists for, and the
+    // pool evicts least-recently-released first (characters/visual_pool.ts),
+    // so a finite cap trims the cold tail, never the hot working set: an
+    // evicted key transparently rebuilds on its next request. Desktop 128: the
+    // hitch referee's crowd/churn/soak calibration peaked at 57 to 72
+    // simultaneously pooled visuals (docs/perf/hitch), production crowds run
+    // larger, and pool keys are per template (per-instance rift color/scale
+    // jitter is applied at acquire time, no longer minting dead
+    // never-matching keys), so roughly 2x the observed peak keeps ordinary
+    // reuse intact while capping worst-case retention. The historical desktop
+    // POSITIVE_INFINITY retained every despawned character visual until
+    // profile reset, the C1 memory ratchet in crowded sessions. The
+    // constrained ladder sheds reuse for memory headroom: 24 on
+    // constrained-memory browsers, then 6/4 on the two iOS WebKit residency
+    // profiles, mirroring maxPooledObjects below.
     maxPooledCharacterVisuals: tightMemoryProfile
       ? 4
       : iosMemoryProfile
         ? 6
         : constrainedMemory
           ? 24
-          : Number.POSITIVE_INFINITY,
+          : 128,
     // The ground-object reuse pool (harvest nodes, loot piles, quest pickups) had NO cap at
     // all on any platform, not even the two narrow iOS memory profiles: every distinct item
     // template a player interacted with stayed retained (Group/Object3D graph, never GPU

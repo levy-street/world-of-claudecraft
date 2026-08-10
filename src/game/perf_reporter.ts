@@ -217,8 +217,10 @@ function rendererPrewarmSummary(
     compileTimedOut: prewarm.compileTimedOut,
     manifestPlanned: prewarm.manifestPlanned,
     manifestCompleted: prewarm.manifestCompleted,
+    manifestPartial: prewarm.manifestPartial,
     manifestTimedOut: prewarm.manifestTimedOut,
     manifestFailed: prewarm.manifestFailed,
+    partialEntryIds: prewarm.partialEntryIds,
     timedOutEntryIds: prewarm.timedOutEntryIds,
     failedEntryIds: prewarm.failedEntryIds,
     entries: prewarm.manifestEntries.map((entry) => ({
@@ -230,6 +232,8 @@ function rendererPrewarmSummary(
       remainingMsAfter: entry.remainingMsAfter,
       programDelta: entry.programDelta,
       textureDelta: entry.textureDelta,
+      workDone: entry.workDone,
+      workPlanned: entry.workPlanned,
       detail: entry.detail,
     })),
   };

@@ -1396,15 +1396,18 @@ export interface PlayerMeta {
   arenaRating: number;
   arenaWins: number;
   arenaLosses: number;
+  arenaDraws: number;
   arena2v2Rating: number;
   arena2v2Wins: number;
   arena2v2Losses: number;
+  arena2v2Draws: number;
   // Thornhollow Fields 5v5 battleground standing (rated, not matched); bgCaptures is
   // the career flag-capture count feeding the Book of Deeds meters. All
   // persisted in CharacterState, absent until the first result.
   bgRating: number;
   bgWins: number;
   bgLosses: number;
+  bgDraws: number;
   bgCaptures: number;
   // The Vale Cup (docs/prd/vale-cup.md). `sportRole` is the temporary sport-kit
   // role while seated in a Sowfield match: SESSION-ONLY, never serialized
@@ -1681,15 +1684,18 @@ export interface CharacterState {
   arena1v1Rating?: number;
   arena1v1Wins?: number;
   arena1v1Losses?: number;
+  arena1v1Draws?: number;
   arena2v2Rating?: number;
   arena2v2Wins?: number;
   arena2v2Losses?: number;
+  arena2v2Draws?: number;
   // Thornhollow Fields battleground standing (JSONB; optional and written only once a
   // result or capture exists, so pre-Thornhollow Fields saves load cleanly and
   // unchanged saves stay byte-equal).
   bgRating?: number;
   bgWins?: number;
   bgLosses?: number;
+  bgDraws?: number;
   bgCaptures?: number;
   // The Vale Cup standing (JSONB; optional and written only once a result
   // exists, so pre-cup saves load cleanly and unchanged saves stay byte-equal).
@@ -2807,11 +2813,15 @@ export class Sim {
       rating: savedState?.arena1v1Rating ?? savedState?.arenaRating ?? arenaMod.ARENA_BASE_RATING,
       wins: savedState?.arena1v1Wins ?? savedState?.arenaWins ?? 0,
       losses: savedState?.arena1v1Losses ?? savedState?.arenaLosses ?? 0,
+      // No legacy alias: draws were never counted before this field existed,
+      // so an old save has nothing to fall back to and correctly reads 0.
+      draws: savedState?.arena1v1Draws ?? 0,
     };
     const savedArena2v2: ArenaStanding = {
       rating: savedState?.arena2v2Rating ?? arenaMod.ARENA_BASE_RATING,
       wins: savedState?.arena2v2Wins ?? 0,
       losses: savedState?.arena2v2Losses ?? 0,
+      draws: savedState?.arena2v2Draws ?? 0,
     };
     const player = createPlayer(this.nextId++, cls, startPos, name);
     this.addEntity(player);
@@ -2874,9 +2884,11 @@ export class Sim {
       arenaRating: savedArena1v1.rating,
       arenaWins: savedArena1v1.wins,
       arenaLosses: savedArena1v1.losses,
+      arenaDraws: savedArena1v1.draws,
       arena2v2Rating: savedArena2v2.rating,
       arena2v2Wins: savedArena2v2.wins,
       arena2v2Losses: savedArena2v2.losses,
+      arena2v2Draws: savedArena2v2.draws,
       // Finite-clamped like the arena standings above: bgRating feeds Elo
       // math, so a corrupt row must never flow NaN through a match result.
       bgRating: Number.isFinite(savedState?.bgRating)
@@ -2885,6 +2897,9 @@ export class Sim {
       bgWins: Number.isFinite(savedState?.bgWins) ? Math.max(0, savedState?.bgWins as number) : 0,
       bgLosses: Number.isFinite(savedState?.bgLosses)
         ? Math.max(0, savedState?.bgLosses as number)
+        : 0,
+      bgDraws: Number.isFinite(savedState?.bgDraws)
+        ? Math.max(0, savedState?.bgDraws as number)
         : 0,
       bgCaptures: Number.isFinite(savedState?.bgCaptures)
         ? Math.max(0, savedState?.bgCaptures as number)
@@ -4039,14 +4054,24 @@ export class Sim {
       arena2v2Rating: meta.arena2v2Rating,
       arena2v2Wins: meta.arena2v2Wins,
       arena2v2Losses: meta.arena2v2Losses,
+      // Absent until a draw actually happens, so saves for every character
+      // who has never drawn stay byte-equal (the parity-stable rule the
+      // battleground and Vale Cup blocks below already follow).
+      ...(meta.arenaDraws ? { arena1v1Draws: meta.arenaDraws } : {}),
+      ...(meta.arena2v2Draws ? { arena2v2Draws: meta.arena2v2Draws } : {}),
       // Absent until the first Thornhollow Fields result or capture moves something
       // (back-compat + parity-stable saves).
-      ...(meta.bgWins || meta.bgLosses || meta.bgCaptures || meta.bgRating !== bgMod.BG_BASE_RATING
+      ...(meta.bgWins ||
+      meta.bgLosses ||
+      meta.bgDraws ||
+      meta.bgCaptures ||
+      meta.bgRating !== bgMod.BG_BASE_RATING
         ? {
             bgRating: meta.bgRating,
             bgWins: meta.bgWins,
             bgLosses: meta.bgLosses,
             bgCaptures: meta.bgCaptures,
+            ...(meta.bgDraws ? { bgDraws: meta.bgDraws } : {}),
           }
         : {}),
       // Absent until sheathed (back-compat + parity-stable saves).
@@ -10635,6 +10660,7 @@ export class Sim {
         rating: standing.rating,
         wins: standing.wins,
         losses: standing.losses,
+        draws: standing.draws,
       });
     }
     rows.sort((x, y) => y.rating - x.rating || y.wins - x.wins);
@@ -10713,6 +10739,7 @@ export class Sim {
       rating: standing.rating,
       wins: standing.wins,
       losses: standing.losses,
+      draws: standing.draws,
       standings,
       format,
       queued: queuedFmt !== null,

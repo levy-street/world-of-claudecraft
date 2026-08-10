@@ -34,6 +34,7 @@ import { createMob } from '../../src/sim/entity';
 import type { DelayedEvent } from '../../src/sim/entity_roster';
 import { solveLockActions } from '../../src/sim/lockpick';
 import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
+import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
 import type { PlotState } from '../../src/sim/professions/farm_projection';
 import {
   convertHusks,
@@ -5351,6 +5352,109 @@ function professionsFarmingSession(seed = 1): Scenario {
   };
 }
 
+// Rift boss floor: a real S-rank rift instance with a hand-placed, stamped
+// death-zone boss and a control-proc dais guard (the enterRiftWithBoss fixture
+// from tests/rift_boss_reactable_mechanics.test.ts). Before this scenario the
+// gate had NO rift coverage at all: the death-zone driver's rng anchor draw,
+// the S tempo, the impairment-stretched fuse, the escape window, and the
+// instance-wide proc suppression were all invisible to a green parity run
+// (the v0.36.0 retune shipped against that blindness). Pins: the anchor draw
+// + spacing lock at cast start, the stretched fuse (S tempo x the hand-applied
+// 50% slow, riftDeathZoneSpawn durationSecs), the fuse tick to detonation, the
+// guard's suppressed-but-drawn control rolls inside the window, and the
+// boss-death zone clear (riftDeathZoneClear) plus the floor claim it triggers.
+function riftBossFloor(): Scenario {
+  return {
+    name: 'rift_boss_floor',
+    coverage: [
+      'runDeathZoneDriver: anchor draw, S tempo, impairment-stretched fuse (~locomotion 1044/1062)',
+      'tickRiftBossDeathZones: fuse tick to detonation',
+      'riftControlSuppressed: guard rolls drawn, effects skipped inside the window',
+      'clearRiftBossDeathZones on boss death (riftDeathZoneClear emit + floor claim)',
+    ],
+    sampleEvery: 5,
+    build: () => new Sim({ seed: 1021, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      sim.setPlayerLevel(20);
+      const p = sim.player as AnyEntity;
+      beef(p);
+      p.gm = true; // survive swings + the lethal detonation; auras still apply
+      sim.enterRift(3, 28, sim.playerId); // baseLevel 28 = S rank (zone tempo live)
+      const inst = sim.riftInstances.find((i) => i.partyKey !== null);
+      if (!inst) {
+        rec.tick(2);
+        return;
+      }
+      // Clear the generated floor so only the hand-placed pair drives combat.
+      for (const id of inst.mobIds) {
+        const e = sim.entities.get(id);
+        if (e) {
+          e.hp = 0;
+          e.dead = true;
+        }
+      }
+      const boss = spawnMob(sim, 'rift_boss_venom', 22, p.pos.x, p.pos.y, p.pos.z);
+      boss.spawnPos = { ...p.pos };
+      boss.riftMechanicSpacing = RIFT_MECHANIC_SPACING_SEC;
+      aggroOnto(boss, p);
+      boss.inCombat = true;
+      addThreat(boss, sim.playerId, 1000);
+      // Park every governed sibling so the death zone under test owns the lock.
+      boss.pulseTimer = 999;
+      boss.bigCastTimer = 999;
+      boss.stompTimer = 999;
+      boss.terrifyTimer = 999;
+      boss.aoeSlowTimer = 999; // the slow under test is hand-applied below
+      boss.deathZoneStrikeTimer = 999;
+      boss.deathZoneCastTimer = 1;
+      inst.mobIds.push(boss.id);
+      inst.bossId = boss.id; // the boss-death sweep + zone clear key on this
+      const guard = spawnMob(sim, 'rift_venom_weaver', 22, p.pos.x, p.pos.y, p.pos.z);
+      guard.spawnPos = { ...p.pos };
+      aggroOnto(guard, p);
+      guard.inCombat = true;
+      addThreat(guard, sim.playerId, 1000);
+      inst.mobIds.push(guard.id);
+      rec.track(boss.id, guard.id);
+      // A 50% slow on the anchor BEFORE the cast: the per-anchor fuse stretch
+      // arm (impairedZoneFuseMult, capped) must run on top of the S tempo.
+      p.auras.push({
+        id: 'test_slow',
+        name: 'Test Slow',
+        kind: 'slow',
+        remaining: 30,
+        duration: 30,
+        value: 0.5,
+        sourceId: boss.id,
+        school: 'nature',
+      } as Aura);
+      rec.tick(25); // engage warm-up; the cast starts (anchor draw + spacing lock)
+      rec.snapshot('cast-armed');
+      // Probe mid-fuse: the window is open over the whole instance and the
+      // guard's web rolls are drawn but never land (riftControlSuppressed).
+      rec.tick(40);
+      rec.notes.windowOpenDuringGuardFight = (boss.escapeWindowUntil ?? 0) > (sim as AnySim).time;
+      rec.notes.playerRootedInWindow = p.auras.some((a) => a.id === 'ensnare_rift_venom_weaver');
+      rec.tick(85); // fuse (4.5 * 0.7 tempo * 2 stretch = 6.3s) runs out: detonation
+      rec.snapshot('detonated');
+      // A second zone goes up, then the boss dies mid-fuse: the sweep clears
+      // the pending zone and tells online mirrors (riftDeathZoneClear), and
+      // the floor claim + reward flow runs. The first cast's spacing lock
+      // (RIFT_MECHANIC_SPACING_SEC + the 6.3s fuse) would otherwise hold the
+      // due zone past the probe, so clear it the way a real fight's clock
+      // would have.
+      boss.mechanicLockTimer = 0;
+      boss.deathZoneCastTimer = 0.05;
+      rec.tick(8);
+      boss.hp = 0;
+      boss.dead = true;
+      rec.tick(8);
+      rec.snapshot('boss-dead-clear');
+    },
+  };
+}
+
 // Production distance-culling contract: the 100-yard host throttle changes
 // passive idle rolls from the historical shared stream to deterministic per-mob
 // lanes. Track one mob on each side of the boundary so the golden records both
@@ -5472,4 +5576,5 @@ export const SCENARIOS: Scenario[] = [
   professionsToolEffectSlot(),
   idleMobDistanceCulling(),
   professionsFarmingSession(),
+  riftBossFloor(),
 ];

@@ -428,6 +428,20 @@ function dropObjects(ctx: SimContext, ids: number[]): void {
   }
 }
 
+/** Cancel every pending lethal death zone and tell online mirrors to drop
+ * theirs too. The sim-side clears (boss death, boss evade, floor teardown)
+ * are otherwise invisible to ClientWorld, which counts zones down locally
+ * from riftDeathZoneSpawn and would keep strobing a phantom "about to
+ * detonate" telegraph for the rest of the fuse. Personal events per instance
+ * member so delivery never depends on interest radius; draws no rng. */
+export function clearRiftBossDeathZones(ctx: SimContext, inst: RiftInstance): void {
+  if (inst.bossDeathZones.length === 0) return;
+  inst.bossDeathZones = [];
+  for (const pid of instancePlayerIds(ctx, inst)) {
+    ctx.emit({ type: 'riftDeathZoneClear', pid });
+  }
+}
+
 function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   for (const id of inst.mobIds) {
     if (!ctx.entities.has(id)) continue;
@@ -467,7 +481,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.minibossId = null;
   inst.orbId = null;
   inst.orbActive = false;
-  inst.bossDeathZones = [];
+  clearRiftBossDeathZones(ctx, inst);
   // A floor's mobs are torn down here (descendRift, or a full teardown below):
   // any remembered mid-combat exit still holding their ids can never resolve
   // again once IDs are freed, but the map is inert only because `nextId` is
@@ -1654,7 +1668,7 @@ export function liftRiftEntities(ctx: SimContext): void {
 export function tickRiftBossDeathZones(ctx: SimContext): void {
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null || inst.bossDeathZones.length === 0) continue;
-    const live: Array<{ x: number; z: number; radius: number; remaining: number }> = [];
+    const live: typeof inst.bossDeathZones = [];
     for (const zone of inst.bossDeathZones) {
       zone.remaining -= DT;
       if (zone.remaining > 0) {
@@ -1708,7 +1722,7 @@ export function updateRiftInstances(ctx: SimContext): void {
       // Clear any pending lethal death zones so a zone placed just before the
       // killing blow cannot execute the winning party. Symmetric with the evade
       // clear in locomotion.ts.
-      inst.bossDeathZones = [];
+      clearRiftBossDeathZones(ctx, inst);
     }
   }
   if (ctx.tickCount % 20 !== 0) return; // once a second

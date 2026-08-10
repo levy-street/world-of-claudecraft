@@ -21,8 +21,8 @@
 import type { PartyMemberAura } from '../world_api';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AuraInput, type AurasDeps, createAurasView } from './auras_view';
+import { setCrestImageWithFallback } from './crest_image_fallback';
 import { t } from './i18n';
-import { iconDataUrl } from './icons';
 import type { PainterHostWriters } from './painter_host';
 import { type PartyFrameMember, partyFrameAuraIsRelevant } from './party_frames';
 import { svgIcon } from './ui_icons';
@@ -345,7 +345,7 @@ export function createPartyRow(
       // The crest is the party "portrait": repainted only when the class key changes,
       // reading the LIVE slot so a recycled row gets the new member's crest.
       repaintPortrait: () => {
-        crest.src = iconDataUrl('crest', `class_${slot.member.cls}`, CREST_ICON_SIZE);
+        setCrestImageWithFallback(crest, `class_${slot.member.cls}`, CREST_ICON_SIZE);
       },
     },
   );

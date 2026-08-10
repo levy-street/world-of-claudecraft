@@ -150,7 +150,7 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         category: 'world',
         priority: 50,
         required: true,
-        status: 'completed',
+        status: 'partial',
         elapsedMs: 120,
         remainingMsAfter: 4200,
         passes: 0,
@@ -160,13 +160,17 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         texturesBefore: 40,
         texturesAfter: 52,
         textureDelta: 12,
+        workDone: 12,
+        workPlanned: 20,
         detail: 'uploaded=12',
       },
     ],
     manifestCompleted: 12,
+    manifestPartial: 1,
     manifestSkipped: 0,
     manifestTimedOut: 0,
     manifestFailed: 0,
+    partialEntryIds: ['textures.scene'],
     timedOutEntryIds: [],
     failedEntryIds: [],
     diagnosticsBaseline: null,
@@ -409,10 +413,30 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererPrewarmSummary?: { manifestPlanned?: number } })
         .rendererPrewarmSummary?.manifestPlanned,
     ).toBe(14);
+    // The honest partial signal must survive into the report: a deadline or
+    // prefetch-trimmed entry is 'partial' with its counts, never 'completed'.
     expect(
-      (body.rawSummary as { rendererPrewarmSummary?: { entries?: unknown[] } })
-        .rendererPrewarmSummary?.entries,
-    ).toHaveLength(2);
+      (body.rawSummary as { rendererPrewarmSummary?: { manifestPartial?: number } })
+        .rendererPrewarmSummary?.manifestPartial,
+    ).toBe(1);
+    expect(
+      (body.rawSummary as { rendererPrewarmSummary?: { partialEntryIds?: string[] } })
+        .rendererPrewarmSummary?.partialEntryIds,
+    ).toEqual(['textures.scene']);
+    const summaryEntries = (
+      body.rawSummary as {
+        rendererPrewarmSummary?: {
+          entries?: { id?: string; status?: string; workDone?: number; workPlanned?: number }[];
+        };
+      }
+    ).rendererPrewarmSummary?.entries;
+    expect(summaryEntries).toHaveLength(2);
+    expect(summaryEntries?.[1]).toMatchObject({
+      id: 'textures.scene',
+      status: 'partial',
+      workDone: 12,
+      workPlanned: 20,
+    });
     expect(
       (body.rawSummary as { rendererPrewarm?: { manifestEntries?: unknown[] } }).rendererPrewarm
         ?.manifestEntries,

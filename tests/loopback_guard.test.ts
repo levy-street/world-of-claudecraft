@@ -153,6 +153,7 @@ const GUARDED_SCRIPTS = [
   'scripts/admin_professions_shot.mjs',
   'scripts/catalog_program_census.mjs',
   'scripts/geared_arrival_bench.mjs',
+  'scripts/lib/perf_hitch_scenarios.mjs',
   'scripts/load_players.mjs',
   'scripts/load_professions.mjs',
   'scripts/mob_stall_repro.mjs',
@@ -186,7 +187,11 @@ function scriptSources(dir: string): string[] {
 describe('loopback guard call sites', () => {
   it.each(GUARDED_SCRIPTS)('%s imports the shared guard and calls BOTH arms', (relPath) => {
     const code = codeWithoutLineComments(relPath);
-    expect(code).toContain("from './lib/loopback_guard.mjs'");
+    expect(code).toContain(
+      relPath.startsWith('scripts/lib/')
+        ? "from './loopback_guard.mjs'"
+        : "from './lib/loopback_guard.mjs'",
+    );
     // The two call literals are distinct substrings (the import line carries
     // neither, because it has no open paren), so each proves its own arm.
     expect(code).toContain('assertLoopbackUrl(');

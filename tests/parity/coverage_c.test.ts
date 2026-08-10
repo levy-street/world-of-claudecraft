@@ -10,8 +10,10 @@
 // entities helpers live in run_scenarios.ts.
 
 import { describe, expect, it } from 'vitest';
-import { ITEMS } from '../../src/sim/data';
+import { ITEMS, MOBS } from '../../src/sim/data';
+import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
 import { resolveFarmHarvest } from '../../src/sim/professions/farming';
+import { RIFT_S_ZONE_TEMPO } from '../../src/sim/rift/ranks';
 import { record } from './record';
 import { type Ev, entities, run } from './run_scenarios';
 import { FARM_TONIC_WINNER_YIELD_SEED, SCENARIOS } from './scenarios';
@@ -727,6 +729,33 @@ describe('coverage: each scenario fires its subsystem', () => {
     // before the drive's proficiency write of 75), then the barley harvest's
     // 0.02 at 75 (tier 3 teaches past 75) lands on the tail ticks.
     expect(meta.gatheringProficiency.farming).toBeCloseTo(75.02, 10);
+  });
+
+  it('rift_boss_floor: stretched S fuse spawns, detonates, and boss death clears the pending zone', () => {
+    const rec = run('rift_boss_floor');
+    const ev = rec.allEvents as Ev[];
+    const n = rec.notes as Record<string, unknown>;
+    // The driver fired twice: the driven fuse plus the pre-death zone.
+    const spawns = ev.filter((e) => e.type === 'riftDeathZoneSpawn');
+    expect(spawns.length).toBeGreaterThanOrEqual(2);
+    // The first fuse carries the S tempo (0.7) times the capped 50%-slow
+    // stretch (2x) over Venom Pool's authored castTime: both arms really ran.
+    expect((spawns[0] as { durationSecs?: number }).durationSecs).toBeCloseTo(
+      MOBS.rift_boss_venom.deathZoneCast!.castTime * RIFT_S_ZONE_TEMPO * RIFT_IMPAIRED_FUSE_CAP,
+      5,
+    );
+    // The fuse ran out: the detonation telegraph line fired.
+    expect(
+      ev.some(
+        (e) => e.type === 'log' && typeof e.text === 'string' && e.text.includes('Venom Pool'),
+      ),
+    ).toBe(true);
+    // Boss death cancelled the pending zone and told online mirrors.
+    expect(ev.some((e) => e.type === 'riftDeathZoneClear')).toBe(true);
+    // The escape window was genuinely open while the guard fought, and the
+    // guard's web never landed inside it (riftControlSuppressed fired).
+    expect(n.windowOpenDuringGuardFight).toBe(true);
+    expect(n.playerRootedInWindow).toBe(false);
   });
 
   it('idle_mob_distance_culling: advances the near mob, freezes the far mob, and keeps passive rolls off the shared stream', () => {

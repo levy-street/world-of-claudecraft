@@ -30,14 +30,7 @@ describe('mob family presentation (tooltip label + crest)', () => {
     expect(label.startsWith('guide.family.')).toBe(false);
   });
 
-  // demon is a documented pre-existing exception (see hud_chrome.ts:1540): it has
-  // no guide.family.* entry OR crest recipe today and falls back on both, by
-  // design, not a regression this suite should chase. Every other family in use
-  // must have a real crest.
-  it.each(familiesInUse.filter((family) => family !== 'demon'))(
-    'has a real crest recipe for family "%s"',
-    (family) => {
-      expect(hasCrestRecipe(crestIdForEntity('mob', family))).toBe(true);
-    },
-  );
+  it.each(familiesInUse)('has a real crest recipe for family "%s"', (family) => {
+    expect(hasCrestRecipe(crestIdForEntity('mob', family))).toBe(true);
+  });
 });

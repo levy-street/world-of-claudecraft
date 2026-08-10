@@ -316,7 +316,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Dwie drużyny po pięciu. Ukradnij wrogi sztandar i zanieś go do swojej twierdzy. Pierwsza drużyna z 3 przechwyceniami wygrywa. Zbierz się w grupę do 5 osób i dołączcie do kolejki razem; łap Runy Pędu i lawiruj wśród osłon, by zgubić pościg.',
   'hudChrome.bg.queuedParty': 'Grupa {count} os.',
-  'hudChrome.bg.ratingSummary': 'Ranking. {wins} zwycięstw / {losses} porażek',
+  'hudChrome.bg.ratingSummary': 'Ranking. {wins} zwycięstw / {losses} porażek / {draws} remisów',
   'hudChrome.bg.respawnIn': 'Następna fala: odrodzenie za {seconds}',
   'hudChrome.bg.resultDefeat': 'Porażka',
   'hudChrome.bg.resultDraw': 'Remis',
@@ -6549,7 +6549,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.arena.playerLevelClassTitle': '{name} - poz. {level} {className}',
   'hud.arena.queueNote':
     'Zostaniesz dobrany do najbliższego rankingowo przeciwnika online, a potem przeniesiony na piaski. Wygraj, aby się wspiąć; kto pierwszy się podda (1 punkt zdrowia), przegrywa. Wracasz dokładnie tam, gdzie wszedłeś do kolejki.',
-  'hud.arena.ratingSummary': 'Ranking - {wins} zwycięstw / {losses} porażek',
+  'hud.arena.ratingSummary': 'Ranking - {wins} zwycięstw / {losses} porażek / {draws} remisów',
   'hud.arena.searching': 'Szukanie przeciwnika... ({count} w kolejce)',
   'hud.arena.statusCountdown': 'Przygotuj się...',
   'hud.arena.statusFight': 'Walcz aż do poddania!',

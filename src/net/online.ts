@@ -1597,6 +1597,7 @@ export class ClientWorld implements IWorld {
     z: number;
     radius: number;
     expiresAtMs: number;
+    totalSecs: number;
   }> = [];
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
@@ -2449,6 +2450,7 @@ export class ClientWorld implements IWorld {
         this.applyCraftResultEvent(ev as SimEvent);
         this.applyRiftStateEvent(ev as SimEvent);
         this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
+        this.applyRiftDeathZoneClearEvent(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
         this.applyDisenchantResultEvent(ev as SimEvent);
         this.applyEnchantResultEvent(ev as SimEvent);
@@ -5035,7 +5037,9 @@ export class ClientWorld implements IWorld {
     const out: import('../world_api/dungeons').RiftBossDeathZoneView[] = [];
     for (const z of this.activeBossDeathZones) {
       const remaining = (z.expiresAtMs - now) / 1000;
-      if (remaining > 0) out.push({ x: z.x, z: z.z, radius: z.radius, remaining });
+      if (remaining > 0) {
+        out.push({ x: z.x, z: z.z, radius: z.radius, remaining, total: z.totalSecs });
+      }
     }
     return out;
   }
@@ -5122,8 +5126,10 @@ export class ClientWorld implements IWorld {
         }
       : null;
     this.riftEventExpiresAtMs = ev.active ? ev.expiresAtMs : null;
-    // Clear death zones on rift exit / floor change so stale rings from a
-    // previous run never bleed into a new floor.
+    // Clear death zones on rift exit so stale rings from a previous run never
+    // bleed into a new one. Mid-run cancellations (boss death, evade, floor
+    // descent) arrive as riftDeathZoneClear events instead: descent keeps
+    // riftState active, so this arm never sees them.
     if (!ev.active) this.activeBossDeathZones = [];
   }
 
@@ -5143,7 +5149,17 @@ export class ClientWorld implements IWorld {
       z: ev.z,
       radius: ev.radius,
       expiresAtMs: now + ev.durationSecs * 1000,
+      totalSecs: ev.durationSecs,
     });
+  }
+
+  // The sim cancelled every pending death zone before its fuse ran out (boss
+  // death, boss evade, or floor teardown). Drop the local mirrors immediately:
+  // they count down on wall-clock, so without this the telegraph would keep
+  // strobing toward a detonation that is never coming.
+  private applyRiftDeathZoneClearEvent(ev: SimEvent): void {
+    if (ev.type !== 'riftDeathZoneClear') return;
+    this.activeBossDeathZones = [];
   }
 
   private applyCraftResultEvent(ev: SimEvent): void {

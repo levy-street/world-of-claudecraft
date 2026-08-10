@@ -26,14 +26,25 @@ import puppeteer from 'puppeteer-core';
 import sharp from 'sharp';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { mobPortraitBackgroundSvg } from './lib/mob_portrait_background.mjs';
+import {
+  buildMobPortraitJobs,
+  buildPortraitRendererContract,
+  PORTRAIT_RENDER_DEFINES,
+  portraitRendererFingerprint,
+  sha256,
+} from './lib/mob_portrait_jobs.mjs';
 
 const root = process.cwd();
 const publicDir = path.join(root, 'public');
 const outDir = path.join(publicDir, 'ui', 'dungeons');
 const mobOutDir = path.join(publicDir, 'ui', 'mobs');
 const OUT_PX = Number(process.env.PORTRAIT_PX || 128); // shipped size; the window shows 64px
+const receiptPath = process.env.PORTRAIT_RECEIPT
+  ? path.resolve(root, process.env.PORTRAIT_RECEIPT)
+  : null;
 mkdirSync(outDir, { recursive: true });
 mkdirSync(mobOutDir, { recursive: true });
+if (receiptPath) rmSync(receiptPath, { force: true });
 
 // 1) Bundle the shared browser render entry (see render_model_stills.mjs for the
 //    import.meta.env define rationale).
@@ -51,20 +62,7 @@ const bundled = await esbuild.build({
   // This is the union of both sides of the merge: the release added the five
   // runtime/client-origin fields, and this branch's art-pipeline unblock added
   // BASE_URL plus the discord/reown/turnstile/wallet fields the same graph reads.
-  define: {
-    'import.meta.env.DEV': 'true',
-    'import.meta.env.PROD': 'false',
-    'import.meta.env.BASE_URL': '"/"',
-    'import.meta.env.VITE_API_ORIGIN': '""',
-    'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',
-    'import.meta.env.VITE_DESKTOP_APP': '""',
-    'import.meta.env.VITE_DESKTOP_RELATIVE_API': '""',
-    'import.meta.env.VITE_DISCORD_DISABLED': '""',
-    'import.meta.env.VITE_NATIVE_APP': '""',
-    'import.meta.env.VITE_REOWN_PROJECT_ID': '""',
-    'import.meta.env.VITE_TURNSTILE_SITEKEY': '""',
-    'import.meta.env.VITE_WALLET_DISABLED': '""',
-  },
+  define: PORTRAIT_RENDER_DEFINES,
   write: false,
   logLevel: 'silent',
 });
@@ -81,62 +79,10 @@ if (bundleJs.includes('import.meta') || /\bimport_meta\b/.test(bundleJs)) {
   );
 }
 
-// 2) Load the finder catalogue + mob templates + the renderer's visual manifest
-//    via the data-URL bundling trick (never import raw .ts directly).
-const dataEntry = `
-  export { FINDER_ACTIVITIES } from './src/sim/content/dungeon_finder.ts';
-  export { MOBS } from './src/sim/data.ts';
-  export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
-`;
-const dataBuilt = await esbuild.build({
-  stdin: { contents: dataEntry, resolveDir: root, sourcefile: 'portraits-data.ts', loader: 'ts' },
-  bundle: true,
-  platform: 'node',
-  format: 'esm',
-  write: false,
-  logLevel: 'silent',
-});
-const dataUrl = `data:text/javascript;base64,${Buffer.from(dataBuilt.outputFiles[0].text).toString('base64')}`;
-const { FINDER_ACTIVITIES, MOBS, VISUALS, visualKeyFor } = await import(dataUrl);
-
-// One job per distinct encounter mob id or mob template, resolved through the
-// same visual manifest the game renderer uses (model spec + entity/fixed tint).
-function specFor(visualKey) {
-  const def = VISUALS[visualKey];
-  if (!def) return null;
-  const spec = { url: def.url, idle: def.clips?.idle ?? null, height: def.height };
-  if (def.yaw) spec.yaw = def.yaw;
-  if (def.hover) spec.hover = def.hover;
-  if (def.show) spec.show = def.show;
-  if (def.attach) spec.attach = def.attach;
-  if (def.weaponFix) spec.weaponFix = def.weaponFix;
-  if (def.tint !== undefined) spec.tintStrength = def.tintStrength ?? 0.4;
-  return spec;
-}
-
-const jobs = new Map();
-function addJob(mobId, finder) {
-  const existing = jobs.get(mobId);
-  if (existing) {
-    existing.finder ||= finder;
-    return;
-  }
-  const mob = MOBS[mobId];
-  if (!mob) throw new Error(`portrait job references unknown mob ${mobId}`);
-  const vk = visualKeyFor({ kind: 'mob', templateId: mobId, family: mob.family });
-  const spec = specFor(vk);
-  if (!spec) throw new Error(`no visual for portrait mob ${mobId} (visual key ${vk})`);
-  const def = VISUALS[vk];
-  const tint =
-    def.tint === undefined ? null : def.tint === 'entity' ? (mob.color ?? null) : def.tint;
-  jobs.set(mobId, { mobId, spec, tint, family: mob.family, finder });
-}
-for (const activity of FINDER_ACTIVITIES) {
-  for (const enc of activity.encounters) {
-    addJob(enc.mobId, true);
-  }
-}
-for (const mobId of Object.keys(MOBS)) addJob(mobId, false);
+// 2) Build the exact live render jobs through the shared source-contract seam.
+//    The acceptance manifest imports this same builder, so its fingerprints
+//    cannot drift away from the jobs the renderer actually executes.
+const jobs = await buildMobPortraitJobs(root);
 
 // 3) Serve public/ + the harness, same-origin (mirrors render_model_stills.mjs).
 const HARNESS = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:transparent}</style></head><body><script src="/__portraits_bundle.js"></script></body></html>`;
@@ -206,13 +152,20 @@ page.on('console', (m) => {
 });
 
 const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;
+if (only) {
+  const knownIds = new Set(jobs.map((job) => job.mobId));
+  const unknownIds = [...only].filter((id) => !knownIds.has(id));
+  if (unknownIds.length > 0)
+    throw new Error(`unknown ONLY portrait id(s): ${unknownIds.join(', ')}`);
+}
 
 await page.goto(`${origin}/__portraits.html`, { waitUntil: 'load', timeout: 30000 });
 await page.waitForFunction('window.__ready === true', { timeout: 20000 });
 
 let ok = 0;
 let failed = 0;
-for (const job of jobs.values()) {
+const renderedPortraits = [];
+for (const job of jobs) {
   if (only && !only.has(job.mobId)) continue;
   const tintNum =
     job.tint === null || job.tint === undefined
@@ -258,6 +211,11 @@ for (const job of jobs.values()) {
       .webp({ quality: 88, alphaQuality: 100, effort: 6 })
       .toBuffer();
     writeFileSync(path.join(mobOutDir, `${job.mobId}.webp`), mobWebp);
+    renderedPortraits.push({
+      id: job.mobId,
+      sourceFingerprint: job.sourceFingerprint,
+      output: { bytes: mobWebp.length, sha256: sha256(mobWebp) },
+    });
     ok++;
     console.log(`ok ${job.mobId}.webp (${(webp.length / 1024).toFixed(1)} KB)`);
   } catch (e) {
@@ -271,6 +229,21 @@ for (const job of jobs.values()) {
 await browser.close();
 server.close();
 console.log(
-  `\nrendered ${ok}/${jobs.size} portrait jobs (${OUT_PX}px, ${failed} failed, pageErrors=${pageErr})`,
+  `\nrendered ${ok}/${jobs.length} portrait jobs (${OUT_PX}px, ${failed} failed, pageErrors=${pageErr})`,
 );
 if (failed > 0 || pageErr > 0) process.exit(1);
+if (receiptPath) {
+  if (OUT_PX !== 128) {
+    throw new Error('PORTRAIT_RECEIPT is only valid for the shipping 128px render contract');
+  }
+  const renderer = await buildPortraitRendererContract(root, bundled.outputFiles[0].contents);
+  const receipt = {
+    schemaVersion: 1,
+    generatedBy: 'scripts/render_finder_portraits.mjs',
+    rendererFingerprint: portraitRendererFingerprint(renderer),
+    portraits: renderedPortraits.sort((left, right) => left.id.localeCompare(right.id)),
+  };
+  mkdirSync(path.dirname(receiptPath), { recursive: true });
+  writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+  console.log(`wrote renderer receipt ${path.relative(root, receiptPath)}`);
+}

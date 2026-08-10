@@ -71,8 +71,10 @@ const STACKS_HIDDEN = 'none';
  *  the tooltip-attach helper. All injected so a Node test drives the pool without the
  *  icon/i18n runtime. */
 export interface AurasPainterDeps {
-  /** Resolve an icon key to a CSS background-image value (host: `url(${iconDataUrl(
-   *  'aura', iconKey)})`). Called only when an aura's icon key changes. */
+  /** Resolve an icon key to a CSS background-image value. The HUD layers a
+   *  worker-cached procedural or painted safety fallback beneath static ability
+   *  art without composing on this frame path. Called only when an aura's icon
+   *  key changes. */
   resolveIconUrl(iconKey: string): string;
   /** Render the tooltip HTML from the LIVE aura name + remaining (host: the
    *  tt-title/tt-sub markup with esc + tPlural). Called lazily on hover, reading the

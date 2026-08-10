@@ -79,8 +79,9 @@ export function insertIntoBlock(source, anchor, line) {
 // Weapon registration (--apply capable; gated by tests/held_weapon_models.test.ts)
 // ---------------------------------------------------------------------------
 
-/** Copy the built GLB + icon into public/ and register the variant key in both
- *  code registries. `itemIds` map existing (or new) item ids to the key. */
+/** Copy the built GLB + legacy model-preview JPG into public/ and register the variant key.
+ *  `itemIds` map existing (or new) item ids to the held-model key; each authored item also needs
+ *  bespoke painted inventory art at public/ui/items/<item-id>.webp before the item gate passes. */
 export function registerWeapon({ key, gripFamily, glbPath, iconPath, itemIds = [] }) {
   if (!/^[a-z0-9_]+$/.test(key)) throw new Error(`weapon key must be snake_case: ${key}`);
   for (const itemId of itemIds) {

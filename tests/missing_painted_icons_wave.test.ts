@@ -24,6 +24,10 @@ const manifestPath = path.join(
   repoRoot,
   'docs/achievements/missing-painted-icons-accepted-art.json',
 );
+const itemConsistencyManifestPath = path.join(
+  repoRoot,
+  'docs/achievements/item-art-consistency-2026-08-09/accepted-art.json',
+);
 
 interface ReferenceRecord {
   path: string;
@@ -126,6 +130,30 @@ interface AcceptedArtManifest {
   assets: RasterAsset[];
 }
 
+interface ItemConsistencyManifest {
+  assets: Array<{
+    kind: 'item';
+    id: string;
+    acceptedSha256: string;
+    acceptedBytes: number;
+    generationReport: string;
+  }>;
+  supersedes: Array<{
+    itemId: string;
+    historicalAcceptedArt?: { path: string; assetKey: string };
+    previous: {
+      shipping: { sha256: string; bytes: number };
+      owner: { batchId?: string };
+    };
+    replacement: {
+      batchId: string;
+      acceptedSha256: string;
+      acceptedBytes: number;
+      generationReport: string;
+    };
+  }>;
+}
+
 interface AbilityMappingEntry {
   abilityId: string;
   sourcePack: string;
@@ -140,6 +168,40 @@ interface AbilityMappingEntry {
 
 function manifest(): AcceptedArtManifest {
   return JSON.parse(readFileSync(manifestPath, 'utf8')) as AcceptedArtManifest;
+}
+
+function itemConsistencyManifest(): ItemConsistencyManifest {
+  return JSON.parse(readFileSync(itemConsistencyManifestPath, 'utf8')) as ItemConsistencyManifest;
+}
+
+function resolvedShippingPin(asset: RasterAsset): {
+  acceptedSha256: string;
+  acceptedBytes: number;
+} {
+  if (asset.kind !== 'item') return asset;
+  const replacementManifest = itemConsistencyManifest();
+  const supersession = replacementManifest.supersedes.find(({ itemId }) => itemId === asset.id);
+  if (!supersession) return asset;
+
+  expect(supersession.historicalAcceptedArt, `${asset.id} historical manifest link`).toEqual({
+    path: 'docs/achievements/missing-painted-icons-accepted-art.json',
+    assetKey: `item:${asset.id}`,
+  });
+  expect(supersession.previous.shipping, `${asset.id} immutable historical pin`).toMatchObject({
+    sha256: asset.acceptedSha256,
+    bytes: asset.acceptedBytes,
+  });
+  expect(asset.batch, `${asset.id} historical accepted-art batch`).toBeTruthy();
+  expect(supersession.previous.owner.batchId, `${asset.id} historical owner`).toBe(asset.batch);
+  const replacement = replacementManifest.assets.find(({ id }) => id === asset.id);
+  expect(replacement, `${asset.id} replacement asset`).toBeDefined();
+  expect(supersession.replacement, `${asset.id} current replacement pin`).toEqual({
+    batchId: 'item-art-consistency-2026-08-09',
+    acceptedSha256: replacement?.acceptedSha256,
+    acceptedBytes: replacement?.acceptedBytes,
+    generationReport: replacement?.generationReport,
+  });
+  return supersession.replacement;
 }
 
 function sorted(values: Iterable<string>): string[] {
@@ -302,10 +364,11 @@ describe('missing painted icon accepted-art manifest', () => {
       const file = path.join(repoRoot, expectedLocation.shippingPath);
       expect(file).toBe(publicFile(asset.runtimeUrl));
       const bytes = readFileSync(file);
-      expect(bytes.length, `${asset.id} accepted byte pin`).toBe(asset.acceptedBytes);
+      const currentPin = resolvedShippingPin(asset);
+      expect(bytes.length, `${asset.id} accepted byte pin`).toBe(currentPin.acceptedBytes);
       expect(bytes.length, `${asset.id} weight ceiling`).toBeLessThanOrEqual(15 * 1024);
       expect(createHash('sha256').update(bytes).digest('hex'), `${asset.id} hash pin`).toBe(
-        asset.acceptedSha256,
+        currentPin.acceptedSha256,
       );
       const decoded = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
       expect(decoded.info.width, `${asset.id} width`).toBe(128);
@@ -488,6 +551,7 @@ describe('missing painted item integration', () => {
         commonPrompt: string;
         itemDirections?: Record<string, { generationPrompt: string }>;
         itemIds: string[];
+        provenanceRecord?: string;
       }>;
     };
     const targets = new Set(accepted.targetSets.items);
@@ -503,8 +567,18 @@ describe('missing painted item integration', () => {
       expect(owner.styleReference).toBeTruthy();
       expect(owner.commonPrompt).toBeTruthy();
       expect(owner.itemIds).toEqual(sorted(new Set(owner.itemIds)));
-      expect(owner.styleReferencesByItem?.[id]).toEqual(asset?.generation.references);
-      expect(owner.itemDirections?.[id]?.generationPrompt).toBe(asset?.generation.prompt);
+      const supersession = itemConsistencyManifest().supersedes.find(({ itemId }) => itemId === id);
+      if (supersession) {
+        expect(owner.batchId).toBe('item-art-consistency-2026-08-09');
+        expect(owner.provenanceRecord).toBe('docs/achievements/item-art-consistency-2026-08-09/');
+        expect(supersession.previous.shipping).toMatchObject({
+          sha256: asset?.acceptedSha256,
+          bytes: asset?.acceptedBytes,
+        });
+      } else {
+        expect(owner.styleReferencesByItem?.[id]).toEqual(asset?.generation.references);
+        expect(owner.itemDirections?.[id]?.generationPrompt).toBe(asset?.generation.prompt);
+      }
     }
   });
 });
@@ -517,16 +591,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'dgn_wildheart_basin_heroic',
       'pvp_card_duel_first_win',
     ]);
-    // The Drakelands brood merge, the Rift coverage pair, the seven per-craft rare-tier
-    // profession deeds (issue #2055), and the remaining starter-zone chronicle pairs all
-    // appended deeds after this wave, so the live catalog is 259 and the wave's own claim
-    // is unchanged: every deed that existed when it landed is painted. The only
-    // artless ids are those appended later, which ride the category-crest fallback the
-    // Icons authoring rule in docs/design/deeds.md sanctions, until their 512px sources
-    // are commissioned (flagged in docs/achievements/icon-brief.md). Read from
-    // DEED_ART_PENDING, the one enumeration of that debt (src/ui/icons.ts), so this file
-    // cannot end up naming a different pending set than the other two art suites.
-    // Exhaustive: a further artless deed still reds here.
+    // Later releases appended more deeds after this historical wave. The completion wave now
+    // paints those too, so the shared pending set is empty; a future unenumerated artless deed
+    // still fails this exhaustive comparison.
     expect(DEED_ORDER).toHaveLength(262);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
@@ -541,7 +608,7 @@ describe('missing painted deed and Heroic weapon integration', () => {
     const generatedRow = creditRows.find((line) =>
       line.startsWith('| Generated Book of Deeds additions'),
     );
-    expect(commissionedRow).toContain('excluding the fourteen generated additions listed next');
+    expect(commissionedRow).toContain('excluding the project-generated additions credited below');
     expect(generatedRow).toContain('World of ClaudeCraft');
     expect(generatedRow).toContain('OpenAI built-in image generation');
     for (const id of accepted.targetSets.deeds) {
@@ -582,7 +649,7 @@ describe('missing painted deed and Heroic weapon integration', () => {
     }
   });
 
-  it('pins every live Heroic weapon to its base GLB-rendered portrait with no duplicate mapping', () => {
+  it('keeps the historical Heroic resolver record while serving its base painting today', () => {
     const accepted = manifest();
     const live = Object.values(ITEMS)
       .filter((item) => item.kind === 'weapon' && item.heroicOf)
@@ -603,8 +670,11 @@ describe('missing painted deed and Heroic weapon integration', () => {
       expect(target.heldModelPath).toBe(`public/models/weapons/${target.variant}.glb`);
       expect(existsSync(path.join(repoRoot, target.portraitPath))).toBe(true);
       expect(existsSync(path.join(repoRoot, target.heldModelPath))).toBe(true);
-      expect(weaponIconUrl(target.id)).toBe(target.bagIconUrl);
-      expect(iconDataUrl('item', target.id)).toBe(target.bagIconUrl);
+      // The accepted-art manifest is immutable historical evidence of the old JPG lane. The
+      // current runtime intentionally supersedes only its bag/portrait URL with base-id art;
+      // the held model and legacy preview remain available to rendering/tooling.
+      expect(weaponIconUrl(target.id)).toBe(`/ui/items/${target.baseId}.webp`);
+      expect(iconDataUrl('item', target.id)).toBe(`/ui/items/${target.baseId}.webp`);
       expect(itemWeaponModelUrl(target.id)).toBe(`models/weapons/${target.variant}.glb`);
       expect(iconDataUrl('item', target.id)).toBe(iconDataUrl('item', target.baseId));
     }

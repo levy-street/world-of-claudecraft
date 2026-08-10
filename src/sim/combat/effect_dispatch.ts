@@ -644,6 +644,20 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        // Low Blow (kidney_shot) reuses the Gut Punch (cheap_shot) recording:
+        // Jamie's explicit call when the cheap_shot take was made ("it can be
+        // used for both cheapshot and kidney shot"), same reuse mechanism as
+        // Eviscerate/Rupture above.
+        if (ability.id === 'kidney_shot') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'ccImpact',
+            ability: ability.id,
+          });
+        }
         ctx.enterCombat(p, target);
         break;
       }

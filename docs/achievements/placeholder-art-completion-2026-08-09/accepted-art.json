@@ -1,0 +1,2259 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "placeholder-art-completion-2026-08-09",
+    "acceptedDate": "2026-08-09",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "auditedPaintings": 153,
+    "weaponPaintings": 119,
+    "deedPaintings": 30,
+    "cleanupItemPaintings": 4,
+    "generatedSpecializationPaintings": 21,
+    "convertedSpecializationPaintings": 3,
+    "preexistingSpecializationPaintings": 3,
+    "generatedFamilyCrests": 13,
+    "generatedStatusCrests": 4,
+    "reusedClassCrests": 9,
+    "deterministicPortraitRerenders": 18
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    },
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject",
+      "geometry": {
+        "alphaThreshold": 8,
+        "minPadding": 7,
+        "maxCenterOffset": 2,
+        "coverageMin": 0.35,
+        "coverageMax": 0.6
+      }
+    }
+  },
+  "targetSets": {
+    "deeds": [
+      "chr_amberfall_first_cast",
+      "chr_amberfall_gatherer",
+      "chr_drakemaw_broodlord",
+      "chr_evergarden_first_cast",
+      "chr_evergarden_gatherer",
+      "chr_frostveil_first_cast",
+      "chr_frostveil_gatherer",
+      "chr_maw_matriarch",
+      "chr_nightbloom_first_cast",
+      "chr_nightbloom_gatherer",
+      "chr_palmreach_first_cast",
+      "chr_palmreach_gatherer",
+      "chr_wraithwood_first_cast",
+      "chr_wraithwood_gatherer",
+      "dgn_rift",
+      "dgn_rift_s_rank",
+      "prog_alchemy_rare",
+      "prog_armorcrafting_rare",
+      "prog_cooking_rare",
+      "prog_engineering_rare",
+      "prog_leatherworking_rare",
+      "prog_tailoring_rare",
+      "prog_weaponcrafting_rare",
+      "pvp_bg_captures_100",
+      "pvp_bg_first_capture",
+      "pvp_bg_first_win",
+      "pvp_bg_wins_25",
+      "pvp_honor_field_marshal",
+      "pvp_honor_knight_lieutenant",
+      "pvp_honor_sergeant"
+    ],
+    "weaponItems": [
+      "apprentice_staff",
+      "arcanite_war_axe",
+      "bogiron_mace",
+      "bonewrought_greatsword",
+      "briarroot_staff",
+      "bristleback_maul",
+      "bronzework_mace",
+      "brutoks_maul",
+      "caravan_warden_dirk",
+      "copper_bearded_axe",
+      "copper_flanged_mace",
+      "corpse_candle_focus",
+      "crag_warden_cudgel",
+      "craghorn_staff",
+      "cragthorn_greatstaff",
+      "crossroads_saber",
+      "cultist_flayer",
+      "deacons_cleaver",
+      "deathless_greatblade",
+      "deathless_heartwood",
+      "direfang_greatblade",
+      "drogmars_skullcleaver",
+      "drovers_staff",
+      "drowned_choir_fang",
+      "drowned_tide_scepter",
+      "drownedmoon_kris",
+      "drownedmoon_maul",
+      "drownedmoon_scepter",
+      "duskfang_dirk",
+      "eastbrook_arming_sword",
+      "eastbrook_greatsword",
+      "elderwood_battle_staff",
+      "emberfang_warblade",
+      "emberglass_warstaff",
+      "emberwood_staff",
+      "fang_of_korzul",
+      "fanglords_beastspear",
+      "fen_reaver_glaive",
+      "fenreed_staff",
+      "fenshadow_maul",
+      "final_argument_greatblade",
+      "first_blood_razor",
+      "gleamwood_stave",
+      "gnarled_staff",
+      "gorraks_cleaver",
+      "gorraks_cruel_chopper",
+      "gravecaller_blade",
+      "gravecaller_staff",
+      "gravewardens_shiv",
+      "gravewyrm_cleaver",
+      "gravewyrm_thornmaul",
+      "greatfang_of_the_basin",
+      "gutripper_shiv",
+      "hickory_shortstaff",
+      "highwatch_greatsword",
+      "highwatch_warblade",
+      "hoarfrost_edge",
+      "hollow_vigil_staff",
+      "icevein_dirk",
+      "ironbark_boar_spear",
+      "ironedge_longsword",
+      "ironshod_maul",
+      "ironvein_lantern_staff",
+      "ironvein_pickblade",
+      "keen_dirk",
+      "kingsbane_last_oath",
+      "lunar_tide_greatstaff",
+      "maldrecs_soulbinder",
+      "maul_of_the_scourged_wilds",
+      "mirefen_skinner",
+      "mirejaw_biteblade",
+      "mirejaw_fang_knife",
+      "mirejaw_oracle_staff",
+      "mistbinder_kris",
+      "mistcallers_edge",
+      "mistcallers_fang",
+      "moggers_copper_cudgel",
+      "moggers_shiv",
+      "moonscale_saber",
+      "nhalias_bell_maul",
+      "nhalias_dirgeblade",
+      "nhalias_litany_rod",
+      "nightfangs_greatstaff",
+      "ogre_bonecharm_staff",
+      "palecoil_rod",
+      "pitlords_cleaver",
+      "redbrook_blade",
+      "riptide_dirk",
+      "rusty_dagger",
+      "rusty_hatchet",
+      "scepter_of_the_deathless_court",
+      "skullsplitter_dirk",
+      "sloomtooth_tidefang",
+      "staff_of_drowned_prayers",
+      "staff_of_the_gravewyrm",
+      "staff_of_velkhar",
+      "stormcallers_focus",
+      "thorium_warblade",
+      "tideglass_dirk",
+      "tidereaver_gaff",
+      "tradesman_hatchet",
+      "training_mace",
+      "tunnelkings_spade",
+      "vaels_mist_staff",
+      "vale_carving_knife",
+      "valeborn_spellblade",
+      "veilsteel_blade",
+      "verlans_oathblade",
+      "voidsong_dirk",
+      "voss_sanctified_mace",
+      "whetted_iron_dirk",
+      "widowfang_dirk",
+      "wildheart_fangknife",
+      "wildheart_hexwood_staff",
+      "wildheart_tuskblade",
+      "wildsoul_maul",
+      "worn_sword",
+      "wyrmfang_greatblade",
+      "zealotsbane_blade"
+    ],
+    "itemCleanup": [
+      "curved_tusk",
+      "firebottle",
+      "pristine_claw",
+      "sharp_claw"
+    ],
+    "generatedSpecializations": [
+      "druid/balance",
+      "druid/feral",
+      "druid/restoration",
+      "hunter/beast_mastery",
+      "hunter/marksmanship",
+      "hunter/survival",
+      "paladin/holy",
+      "paladin/protection",
+      "paladin/retribution",
+      "priest/discipline",
+      "priest/holy",
+      "priest/shadow",
+      "rogue/assassination",
+      "rogue/combat",
+      "rogue/subtlety",
+      "shaman/elemental",
+      "shaman/enhancement",
+      "shaman/restoration",
+      "warlock/affliction",
+      "warlock/demonology",
+      "warlock/destruction"
+    ],
+    "convertedSpecializations": [
+      "mage/arcane",
+      "mage/fire",
+      "mage/frost"
+    ],
+    "preexistingSpecializations": [
+      "warrior/arms",
+      "warrior/fury",
+      "warrior/prot"
+    ],
+    "generatedFamilyCrests": [
+      "beast",
+      "burrower",
+      "demon",
+      "dragonkin",
+      "elemental",
+      "humanoid",
+      "mudfin",
+      "ogre",
+      "reptile",
+      "sheep",
+      "spider",
+      "troll",
+      "undead"
+    ],
+    "generatedStatusCrests": [
+      "boss",
+      "combat",
+      "dead",
+      "npc"
+    ],
+    "reusedClassCrests": [
+      "class_druid",
+      "class_hunter",
+      "class_mage",
+      "class_paladin",
+      "class_priest",
+      "class_rogue",
+      "class_shaman",
+      "class_warlock",
+      "class_warrior"
+    ],
+    "rerenderedMobPortraits": [
+      "bogtoad",
+      "breach_wretch",
+      "castaway_navigator",
+      "cindraleth_maw_matriarch",
+      "downs_bandit",
+      "drowsy_croaker",
+      "fen_sprite",
+      "fisher_bram",
+      "gravedigger_mosley",
+      "grubjaw",
+      "harvest_sprite",
+      "hedge_gnome",
+      "mere_lurker",
+      "the_meredark",
+      "the_wreck_warden",
+      "training_dummy",
+      "willow_sprite",
+      "wreck_thief"
+    ]
+  },
+  "promptDocuments": {
+    "deeds": [
+      "docs/achievements/placeholder-art-completion-2026-08-09/deeds-a-generation-report.md",
+      "docs/achievements/placeholder-art-completion-2026-08-09/deeds-b-generation-record.json"
+    ],
+    "weaponItems": [
+      "docs/achievements/placeholder-art-completion-2026-08-09/weapons-a-generation-record.json",
+      "docs/achievements/placeholder-art-completion-2026-08-09/weapons-b-generation-record.json",
+      "docs/achievements/placeholder-art-completion-2026-08-09/weapons-c-generation-record.md",
+      "docs/achievements/placeholder-art-completion-2026-08-09/weapons-d-generation-record.json"
+    ],
+    "itemCleanup": [
+      "docs/achievements/placeholder-art-completion-2026-08-09/item-cleanup-manifest.json"
+    ],
+    "generatedSpecializations": [
+      "docs/achievements/placeholder-art-completion-2026-08-09/specialization-generation-record.md"
+    ],
+    "generatedCrests": [
+      "docs/achievements/placeholder-art-completion-2026-08-09/crest-generation-record.md"
+    ],
+    "rerenderedMobPortraits": [
+      "docs/achievements/placeholder-art-completion-2026-08-09/portrait-rerender-evidence.json"
+    ]
+  },
+  "evidenceDocuments": [
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/crest-generation-record.md",
+      "acceptedSha256": "237897ba9d11c0fa357d4e1dcb7b19a65040aada0bd956e5c5df30da491d3fd0",
+      "acceptedBytes": 25379
+    },
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/deeds-a-generation-report.md",
+      "acceptedSha256": "fad0fd1be44f8da299baf9c89763dde81c59ed90462faa205706294928eef22f",
+      "acceptedBytes": 29843
+    },
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/deeds-b-generation-record.json",
+      "acceptedSha256": "b429ec60f64fbdca0b63d1ff76d31fca02495b85fcfba1c3af812d6525ea666a",
+      "acceptedBytes": 112383
+    },
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/item-cleanup-manifest.json",
+      "acceptedSha256": "b0c6aac0c609ee9bbb6ea765729a69fc8f4484b88e254a39505d0ce1330b8520",
+      "acceptedBytes": 12494
+    },
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/portrait-rerender-evidence.json",
+      "acceptedSha256": "53c3bae430bf059198521ec3c1fcb5cc0239ace61acaf1ed9a8975c2de26969c",
+      "acceptedBytes": 13832
+    },
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/specialization-generation-record.md",
+      "acceptedSha256": "74110befa5e37ca676a926f9a40a48069cdfa89a68748ac2683f5ecd44f74f8d",
+      "acceptedBytes": 60580
+    },
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/weapons-a-generation-record.json",
+      "acceptedSha256": "e82181f94274f810a00642370d313e355a0ee1a332702482f34a818c3b53131e",
+      "acceptedBytes": 194298
+    },
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/weapons-b-generation-record.json",
+      "acceptedSha256": "cb28e17a06be0057535f525d6a7fd24aee625314f2fc3a43e720dec3898def61",
+      "acceptedBytes": 130006
+    },
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/weapons-c-generation-record.md",
+      "acceptedSha256": "a9792443c95224ee522fb766e2464e0b66d99acad487031a98e3b0e70daf767b",
+      "acceptedBytes": 19671
+    },
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/weapons-d-generation-record.json",
+      "acceptedSha256": "5a2b4acc74147ed966887e550f75037a808c6396cbe77b4422eee3d2f6534351",
+      "acceptedBytes": 91007
+    }
+  ],
+  "sourceManifests": [
+    {
+      "path": "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
+      "acceptedSha256": "0c698711300ef483825c18e9bf857cd6cd629700b3a9b92af80bfd30c8fb14cf",
+      "acceptedBytes": 264231
+    }
+  ],
+  "assets": [
+    {
+      "kind": "item",
+      "id": "apprentice_staff",
+      "runtimeUrl": "/ui/items/apprentice_staff.webp",
+      "acceptedSha256": "a23bedf5792e84c9b8485a08cfa69b6a59375baac09f9cb210fd67afc97a4625",
+      "acceptedBytes": 1190,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "arcanite_war_axe",
+      "runtimeUrl": "/ui/items/arcanite_war_axe.webp",
+      "acceptedSha256": "51b9c7e35e039d65d836be5e20fad79310f79f980b1cfacb010b3d09761f50e7",
+      "acceptedBytes": 2118,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "bogiron_mace",
+      "runtimeUrl": "/ui/items/bogiron_mace.webp",
+      "acceptedSha256": "0d60d9ceb8aee659e56c2bd898912ca6054dacf93d6d80e96c0fab848dcfd780",
+      "acceptedBytes": 1702,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "bonewrought_greatsword",
+      "runtimeUrl": "/ui/items/bonewrought_greatsword.webp",
+      "acceptedSha256": "cb8fa827ad4c59ff203d3b347334b3f3a99d8a85fcb635891151765b5cf72ca0",
+      "acceptedBytes": 1952,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "briarroot_staff",
+      "runtimeUrl": "/ui/items/briarroot_staff.webp",
+      "acceptedSha256": "4a0d5aa519f04c688b0c8122eeb69bc05b5ad9eb5f9f418e8f20a0db1559cfff",
+      "acceptedBytes": 1514,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "bristleback_maul",
+      "runtimeUrl": "/ui/items/bristleback_maul.webp",
+      "acceptedSha256": "da70452f8f731d3eea36d26738ecd41f39dbdb0a2715075b2f602f1f0911d0c7",
+      "acceptedBytes": 1344,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "bronzework_mace",
+      "runtimeUrl": "/ui/items/bronzework_mace.webp",
+      "acceptedSha256": "4d632bd69866727dd8577912ad58bbe773714d39b49c6b29918ad0e2894f4ae7",
+      "acceptedBytes": 1698,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "brutoks_maul",
+      "runtimeUrl": "/ui/items/brutoks_maul.webp",
+      "acceptedSha256": "5f7135b9e7ddc0079ef62895e1413ad648800c6b29f60b0bba38162ee0766b87",
+      "acceptedBytes": 1872,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "caravan_warden_dirk",
+      "runtimeUrl": "/ui/items/caravan_warden_dirk.webp",
+      "acceptedSha256": "7b28d2614320796015c7c85f56cf108f9051eb4ed7a4d29f0d2c9befb7240dca",
+      "acceptedBytes": 2486,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "copper_bearded_axe",
+      "runtimeUrl": "/ui/items/copper_bearded_axe.webp",
+      "acceptedSha256": "c649d54efc2619d077e475e6203aeb58fd009ed21acd14932ef8f7d67218f9e6",
+      "acceptedBytes": 2218,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "copper_flanged_mace",
+      "runtimeUrl": "/ui/items/copper_flanged_mace.webp",
+      "acceptedSha256": "8e81b01dfad17543cbe3e22a1e4491bd6ca989be4b3a7855838049c4e216e8c5",
+      "acceptedBytes": 2154,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "corpse_candle_focus",
+      "runtimeUrl": "/ui/items/corpse_candle_focus.webp",
+      "acceptedSha256": "3ddc66d021556bc3f1eb9574b9f1518c7ecb1af7e71ef19e6a11e7ac3e2a543f",
+      "acceptedBytes": 1822,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "crag_warden_cudgel",
+      "runtimeUrl": "/ui/items/crag_warden_cudgel.webp",
+      "acceptedSha256": "8918ace69e298396a6220be18596225b7984aa03949b98a5c3d78f242308d959",
+      "acceptedBytes": 2554,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "craghorn_staff",
+      "runtimeUrl": "/ui/items/craghorn_staff.webp",
+      "acceptedSha256": "f26fa850b2df435f44c8bffa804ffae04f3ca25101c16ad92f1b910b4a447e71",
+      "acceptedBytes": 1952,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "cragthorn_greatstaff",
+      "runtimeUrl": "/ui/items/cragthorn_greatstaff.webp",
+      "acceptedSha256": "f269d9998292bbbfb033aa2628d4b61e2987490c778460062c8954d98b5d8469",
+      "acceptedBytes": 2892,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "crossroads_saber",
+      "runtimeUrl": "/ui/items/crossroads_saber.webp",
+      "acceptedSha256": "18df6d98177e1a7fd6d9f7a888c0b7e9db4e99d266f8e45abb28f028e652be06",
+      "acceptedBytes": 2010,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "cultist_flayer",
+      "runtimeUrl": "/ui/items/cultist_flayer.webp",
+      "acceptedSha256": "6ffc2febd7361f741a213180448cf546beabe92c98737581df17bad5276a40bb",
+      "acceptedBytes": 1630,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "deacons_cleaver",
+      "runtimeUrl": "/ui/items/deacons_cleaver.webp",
+      "acceptedSha256": "494b85be3c5a9d89600a31e23778c5ebfafb22e1982065929b84a2aee565dd26",
+      "acceptedBytes": 2200,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "deathless_greatblade",
+      "runtimeUrl": "/ui/items/deathless_greatblade.webp",
+      "acceptedSha256": "f6c77bb844eb16410c10b63679eed9679d361a33dc7bbe909e790cd032437eee",
+      "acceptedBytes": 2078,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "deathless_heartwood",
+      "runtimeUrl": "/ui/items/deathless_heartwood.webp",
+      "acceptedSha256": "995c4c68e715d72e6fcdcdbdfa3df216fd115e67bf72157c2f2bfe08683ab691",
+      "acceptedBytes": 2570,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "direfang_greatblade",
+      "runtimeUrl": "/ui/items/direfang_greatblade.webp",
+      "acceptedSha256": "917bc551a442af012d125972d5f35f89a271d0591ceea1ed13becded1647c612",
+      "acceptedBytes": 1986,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "drogmars_skullcleaver",
+      "runtimeUrl": "/ui/items/drogmars_skullcleaver.webp",
+      "acceptedSha256": "f6502411eef539924947dc0f1f9bb4d187ce3d597cff285018e2910b1e841383",
+      "acceptedBytes": 2676,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "drovers_staff",
+      "runtimeUrl": "/ui/items/drovers_staff.webp",
+      "acceptedSha256": "eba988ce37711516a467ed645d2c19826adcdb8724d105ecf2d11e2da3da7339",
+      "acceptedBytes": 2514,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "drowned_choir_fang",
+      "runtimeUrl": "/ui/items/drowned_choir_fang.webp",
+      "acceptedSha256": "e4d285b7d510277c9e6a385aa5190288fc41e88338053c89eceb404b823ed58e",
+      "acceptedBytes": 2474,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "drowned_tide_scepter",
+      "runtimeUrl": "/ui/items/drowned_tide_scepter.webp",
+      "acceptedSha256": "d8e22760de7c16624d7781d4107618b186a3ad57f5a641bde59aec1ffebc625e",
+      "acceptedBytes": 2164,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "drownedmoon_kris",
+      "runtimeUrl": "/ui/items/drownedmoon_kris.webp",
+      "acceptedSha256": "069117be0c79371698bd3c9c0d1fa157e3d0359b1f9297cefe6eb2ed1bac89c0",
+      "acceptedBytes": 2056,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "drownedmoon_maul",
+      "runtimeUrl": "/ui/items/drownedmoon_maul.webp",
+      "acceptedSha256": "01db97b3a5b3d860ef3752a34b6637a9dd4f96b68d76b49515485d6f5620560b",
+      "acceptedBytes": 2640,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "drownedmoon_scepter",
+      "runtimeUrl": "/ui/items/drownedmoon_scepter.webp",
+      "acceptedSha256": "ee442d3a1c4a8166d7bc8b63c023caf8c7662732a9525209432edf18d5df6248",
+      "acceptedBytes": 1720,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "duskfang_dirk",
+      "runtimeUrl": "/ui/items/duskfang_dirk.webp",
+      "acceptedSha256": "bf38195e73b8802afe94cf89bfefcff993123a1321e5bdef288a253f2b6c7ac6",
+      "acceptedBytes": 1670,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "eastbrook_arming_sword",
+      "runtimeUrl": "/ui/items/eastbrook_arming_sword.webp",
+      "acceptedSha256": "714ecf17349282e1333b3d04227454984698818bc7ba0c4a187334f08035e8e3",
+      "acceptedBytes": 1714,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "eastbrook_greatsword",
+      "runtimeUrl": "/ui/items/eastbrook_greatsword.webp",
+      "acceptedSha256": "7b4aebb75ac4b07e7402828f15475f953c59530a92e935663ac812612b80e64c",
+      "acceptedBytes": 1790,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "elderwood_battle_staff",
+      "runtimeUrl": "/ui/items/elderwood_battle_staff.webp",
+      "acceptedSha256": "19f52c7454014c828a7be76d7da3afa1dea496ec8400354898578875bc1b0f05",
+      "acceptedBytes": 2090,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "emberfang_warblade",
+      "runtimeUrl": "/ui/items/emberfang_warblade.webp",
+      "acceptedSha256": "9dd07216ecefd4f77b0edd463d39781c749a038cc5434f2b68e39029f12811ff",
+      "acceptedBytes": 2270,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "emberglass_warstaff",
+      "runtimeUrl": "/ui/items/emberglass_warstaff.webp",
+      "acceptedSha256": "8b3daec05242f542315e47af1a0b7a83dd24152961d4028c1e8e89511e50c4cd",
+      "acceptedBytes": 2070,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "emberwood_staff",
+      "runtimeUrl": "/ui/items/emberwood_staff.webp",
+      "acceptedSha256": "86aa19ea9654afa295c0a184ad1056459d61d63aa9a69c9c33520d450be5040f",
+      "acceptedBytes": 1942,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "fang_of_korzul",
+      "runtimeUrl": "/ui/items/fang_of_korzul.webp",
+      "acceptedSha256": "99f528e500c42a6b8f37425e66ffb12265a15ff402fe13f52bc81087819d0ae4",
+      "acceptedBytes": 2348,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "fanglords_beastspear",
+      "runtimeUrl": "/ui/items/fanglords_beastspear.webp",
+      "acceptedSha256": "e517326a7f294d34301fde23e4c549a5d2f8c66cdc01eae65cdd6dc6f9f62d07",
+      "acceptedBytes": 1918,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "fen_reaver_glaive",
+      "runtimeUrl": "/ui/items/fen_reaver_glaive.webp",
+      "acceptedSha256": "ec468ffcba65d4eed1c9ea404c63794fc431ec4fc175ce5f39cf02561eab4592",
+      "acceptedBytes": 1854,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "fenreed_staff",
+      "runtimeUrl": "/ui/items/fenreed_staff.webp",
+      "acceptedSha256": "05cde89a06af1489a8f92546f0ec0ee401457fa6cf998d5a78f5b9ced6a0294b",
+      "acceptedBytes": 1352,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "fenshadow_maul",
+      "runtimeUrl": "/ui/items/fenshadow_maul.webp",
+      "acceptedSha256": "a82a1910d50c4f090d64c927b0e728bd3456e88dc344e13cddfa97027db30a41",
+      "acceptedBytes": 1748,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "final_argument_greatblade",
+      "runtimeUrl": "/ui/items/final_argument_greatblade.webp",
+      "acceptedSha256": "3a879ffd862dc29efd39a80c3d94ef9de5b80745c57554c0cb303bfa845cc53e",
+      "acceptedBytes": 2136,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "first_blood_razor",
+      "runtimeUrl": "/ui/items/first_blood_razor.webp",
+      "acceptedSha256": "cea382144af9951d9f9062896fdcd65d32f633f8509dc357c5d4b2b834e05645",
+      "acceptedBytes": 1852,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "gleamwood_stave",
+      "runtimeUrl": "/ui/items/gleamwood_stave.webp",
+      "acceptedSha256": "45ac775801b30be97a4bb5b47fdc1ed866b50e9183160b2001a07a2b42d584f8",
+      "acceptedBytes": 1818,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "gnarled_staff",
+      "runtimeUrl": "/ui/items/gnarled_staff.webp",
+      "acceptedSha256": "4a6a99a1686ef5baefba4d73d706d408d9a91466c581918894d178c99023dab9",
+      "acceptedBytes": 1748,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "gorraks_cleaver",
+      "runtimeUrl": "/ui/items/gorraks_cleaver.webp",
+      "acceptedSha256": "eb29ed555c0b43b0b11bb2cf87312fcea89995ab2996eeb0588543c904b4dcf0",
+      "acceptedBytes": 1966,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "gorraks_cruel_chopper",
+      "runtimeUrl": "/ui/items/gorraks_cruel_chopper.webp",
+      "acceptedSha256": "12940ff5700f63b7561591caaae0e65dcb989242554e3ea55914a48052e88b1f",
+      "acceptedBytes": 1744,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "gravecaller_blade",
+      "runtimeUrl": "/ui/items/gravecaller_blade.webp",
+      "acceptedSha256": "fcd40ef5081be2433de041ec8837326672beda1896f6bcdffdee800621167f76",
+      "acceptedBytes": 2052,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "gravecaller_staff",
+      "runtimeUrl": "/ui/items/gravecaller_staff.webp",
+      "acceptedSha256": "e488c8418d7dd4d87171556347e126a3f2e13f6b0484414d7ace2016ee523cfb",
+      "acceptedBytes": 1644,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "gravewardens_shiv",
+      "runtimeUrl": "/ui/items/gravewardens_shiv.webp",
+      "acceptedSha256": "070694e424bed74e66aa80d927b7aeab90dfbfc04d920ba503731a3917d07225",
+      "acceptedBytes": 1832,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "gravewyrm_cleaver",
+      "runtimeUrl": "/ui/items/gravewyrm_cleaver.webp",
+      "acceptedSha256": "189ced5a9fac121229476e988c950305c541c39432b1f4a546c29294b84e53fa",
+      "acceptedBytes": 2592,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "gravewyrm_thornmaul",
+      "runtimeUrl": "/ui/items/gravewyrm_thornmaul.webp",
+      "acceptedSha256": "4416d847066b4c593faac6b7afbdb34f9a9dce7907ce5822e53474fc8f074844",
+      "acceptedBytes": 2010,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "greatfang_of_the_basin",
+      "runtimeUrl": "/ui/items/greatfang_of_the_basin.webp",
+      "acceptedSha256": "d28e13d8d3ac60a5152f443bdc95a0f8cdedd17435bdaceabd9e9a6ea5ac33f0",
+      "acceptedBytes": 2786,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "gutripper_shiv",
+      "runtimeUrl": "/ui/items/gutripper_shiv.webp",
+      "acceptedSha256": "a93f41168747510395bbbf9c6de88401941dd61701e824e3e859e724e9eaf3dc",
+      "acceptedBytes": 1776,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "hickory_shortstaff",
+      "runtimeUrl": "/ui/items/hickory_shortstaff.webp",
+      "acceptedSha256": "6d021652a2f89e6d54f7c7335c10ba1d942736f00e2243ca13714ae981e1ee54",
+      "acceptedBytes": 1872,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "highwatch_greatsword",
+      "runtimeUrl": "/ui/items/highwatch_greatsword.webp",
+      "acceptedSha256": "62235a30df0779be6772b2427b73db26dcdc7f0010b75b488ff2c79330e4eb4a",
+      "acceptedBytes": 1746,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "highwatch_warblade",
+      "runtimeUrl": "/ui/items/highwatch_warblade.webp",
+      "acceptedSha256": "aebddb6406ce5e76abde2f7d433c9b8b7e4a4ee7f665007fd88655394542b907",
+      "acceptedBytes": 1832,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "hoarfrost_edge",
+      "runtimeUrl": "/ui/items/hoarfrost_edge.webp",
+      "acceptedSha256": "3078f3bf3c0c84bfe76f8a6ff1499414b483b0f42d69dc235dc245d5caa9ef6f",
+      "acceptedBytes": 2452,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "hollow_vigil_staff",
+      "runtimeUrl": "/ui/items/hollow_vigil_staff.webp",
+      "acceptedSha256": "7cda767b28a8ad5727d1aec5d53ca16fd6b12b4f9fcc82ad43e041c1cb513c64",
+      "acceptedBytes": 1166,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "icevein_dirk",
+      "runtimeUrl": "/ui/items/icevein_dirk.webp",
+      "acceptedSha256": "543ac42123c25cffab134b9780d10fa17e580e3a09d3ee0f964ee8bc31320f84",
+      "acceptedBytes": 1732,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "ironbark_boar_spear",
+      "runtimeUrl": "/ui/items/ironbark_boar_spear.webp",
+      "acceptedSha256": "be80b1376d8382ed936575a95217e28c1792b375f3e1f8013ed9776f227914e4",
+      "acceptedBytes": 1456,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "ironedge_longsword",
+      "runtimeUrl": "/ui/items/ironedge_longsword.webp",
+      "acceptedSha256": "04fd95bd8f17c67da98df21728bc9f03aa1f2e139cd2345c2a93d443d73620f0",
+      "acceptedBytes": 1466,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "ironshod_maul",
+      "runtimeUrl": "/ui/items/ironshod_maul.webp",
+      "acceptedSha256": "d278be7e442c76527f2a0c866aa9d79ef89f100315e39813ad7ca099102929be",
+      "acceptedBytes": 2044,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "ironvein_lantern_staff",
+      "runtimeUrl": "/ui/items/ironvein_lantern_staff.webp",
+      "acceptedSha256": "c3754f941175764d98cc78e01f55890452331fed221b92f056749ad3d4f025ea",
+      "acceptedBytes": 2056,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "ironvein_pickblade",
+      "runtimeUrl": "/ui/items/ironvein_pickblade.webp",
+      "acceptedSha256": "8403db0886b1683c7036e4181cdc179ca6dc7ec8afba1c29e5cc185afc416aeb",
+      "acceptedBytes": 2524,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "keen_dirk",
+      "runtimeUrl": "/ui/items/keen_dirk.webp",
+      "acceptedSha256": "5cceb30db9ae3691862ef4980e8e87160089d38df95e5909a71047bb72bbee9c",
+      "acceptedBytes": 1632,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "kingsbane_last_oath",
+      "runtimeUrl": "/ui/items/kingsbane_last_oath.webp",
+      "acceptedSha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30",
+      "acceptedBytes": 2436,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "lunar_tide_greatstaff",
+      "runtimeUrl": "/ui/items/lunar_tide_greatstaff.webp",
+      "acceptedSha256": "026653e3c0cdb8760a2c1791d8235072a00d76144c66f13c5de913d59c433fe5",
+      "acceptedBytes": 2220,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "maldrecs_soulbinder",
+      "runtimeUrl": "/ui/items/maldrecs_soulbinder.webp",
+      "acceptedSha256": "a352c2e029e30270e2a3c93c7b6368c5830967e795781cbbe8b1f94e6bfb348d",
+      "acceptedBytes": 1836,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "maul_of_the_scourged_wilds",
+      "runtimeUrl": "/ui/items/maul_of_the_scourged_wilds.webp",
+      "acceptedSha256": "e296e8e653cb2e5e89400f740b6fa70749eb645b259d1dd42e1438baa5e23c15",
+      "acceptedBytes": 2934,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "mirefen_skinner",
+      "runtimeUrl": "/ui/items/mirefen_skinner.webp",
+      "acceptedSha256": "9cbc6ce747dafcc05fe408050e6c1803ce4c684e533d5bdd238de41e953e4d4e",
+      "acceptedBytes": 1782,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "mirejaw_biteblade",
+      "runtimeUrl": "/ui/items/mirejaw_biteblade.webp",
+      "acceptedSha256": "0016e11af641982045f134cc8b5fcf6f088ecdb33ca8b34ebc555574f60e6c97",
+      "acceptedBytes": 2434,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "mirejaw_fang_knife",
+      "runtimeUrl": "/ui/items/mirejaw_fang_knife.webp",
+      "acceptedSha256": "17cc0d626724753395eb88a79d2efa529881d26ea9e0acfc8144a0a4d7cae4f0",
+      "acceptedBytes": 2052,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "mirejaw_oracle_staff",
+      "runtimeUrl": "/ui/items/mirejaw_oracle_staff.webp",
+      "acceptedSha256": "54a6fadc8ce8233aa137809b023adc74b7446dc2cc69e6bef6b66604e89d1e60",
+      "acceptedBytes": 2128,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "mistbinder_kris",
+      "runtimeUrl": "/ui/items/mistbinder_kris.webp",
+      "acceptedSha256": "edaf476bd5bb5f96275366dae902bba3f7951bf205983641c48843f141a66362",
+      "acceptedBytes": 1904,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "mistcallers_edge",
+      "runtimeUrl": "/ui/items/mistcallers_edge.webp",
+      "acceptedSha256": "5235b2e638d26c8cbd62de2c985c58720a3729973b726d4aaefc0feb8e1624e7",
+      "acceptedBytes": 1882,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "mistcallers_fang",
+      "runtimeUrl": "/ui/items/mistcallers_fang.webp",
+      "acceptedSha256": "47e10d8bcbba33d131e3be495ed590b9c35be9c59592046045c950b6e219b8ce",
+      "acceptedBytes": 2246,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "moggers_copper_cudgel",
+      "runtimeUrl": "/ui/items/moggers_copper_cudgel.webp",
+      "acceptedSha256": "43ca2182154489a3e6fc77f01d94d4eb4b2abee57fcad5377309be9ff6a18d24",
+      "acceptedBytes": 2714,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "moggers_shiv",
+      "runtimeUrl": "/ui/items/moggers_shiv.webp",
+      "acceptedSha256": "8fe7466dc3f12847fc6dddd879b2907aab635f6876807cac9c26524863dc7a23",
+      "acceptedBytes": 2158,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "moonscale_saber",
+      "runtimeUrl": "/ui/items/moonscale_saber.webp",
+      "acceptedSha256": "f8f4550c2fd950ce2a27568396ae2754dbb0a09ca20e8433996cf54b6f0ace96",
+      "acceptedBytes": 2190,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "nhalias_bell_maul",
+      "runtimeUrl": "/ui/items/nhalias_bell_maul.webp",
+      "acceptedSha256": "4af05893f1223d135fbea01102fde7d1ce105c5fcc193ad4590817c66c32d387",
+      "acceptedBytes": 1790,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "nhalias_dirgeblade",
+      "runtimeUrl": "/ui/items/nhalias_dirgeblade.webp",
+      "acceptedSha256": "c11a35fdda0b563aec3e52f9be932c0fc45e421852cf734ebf8b65fe08c6e0cc",
+      "acceptedBytes": 1364,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "nhalias_litany_rod",
+      "runtimeUrl": "/ui/items/nhalias_litany_rod.webp",
+      "acceptedSha256": "a970b641b3e21bb6fe857e22a6d01a4c9bcdfb1ea721f11194783b4489733d47",
+      "acceptedBytes": 1638,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "nightfangs_greatstaff",
+      "runtimeUrl": "/ui/items/nightfangs_greatstaff.webp",
+      "acceptedSha256": "53d5c42581265b53eb464d4b40febc8b98261ca31d085d383729a4e09c61525b",
+      "acceptedBytes": 1640,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "ogre_bonecharm_staff",
+      "runtimeUrl": "/ui/items/ogre_bonecharm_staff.webp",
+      "acceptedSha256": "68bb9877529e86c7bf369e699639c7688d36b293d3888d28e3fdff217d43fb3f",
+      "acceptedBytes": 2038,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "palecoil_rod",
+      "runtimeUrl": "/ui/items/palecoil_rod.webp",
+      "acceptedSha256": "e892f27f1039ba0a00ff6ab8afa789e7faa19ae9dc30fa8ad213154ff0407505",
+      "acceptedBytes": 1416,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "pitlords_cleaver",
+      "runtimeUrl": "/ui/items/pitlords_cleaver.webp",
+      "acceptedSha256": "91eb763568e8a8bfd04338014bed733ea7397179d7ff884e8cefd9c4e8ef2f2c",
+      "acceptedBytes": 1952,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "redbrook_blade",
+      "runtimeUrl": "/ui/items/redbrook_blade.webp",
+      "acceptedSha256": "99a1792f98311e7a2379c8feddd95e1a6db388b999388aca95941499992d0638",
+      "acceptedBytes": 1374,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "riptide_dirk",
+      "runtimeUrl": "/ui/items/riptide_dirk.webp",
+      "acceptedSha256": "a779d5a7c4fad86bbdc34a78189e6209921214f1fabf2ff0cbeb8aef1bc989c2",
+      "acceptedBytes": 1764,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "rusty_dagger",
+      "runtimeUrl": "/ui/items/rusty_dagger.webp",
+      "acceptedSha256": "336a4912cf943b0e0771234a900ceda64bbc6bd407dad42b801b551b6cff19d8",
+      "acceptedBytes": 1302,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "rusty_hatchet",
+      "runtimeUrl": "/ui/items/rusty_hatchet.webp",
+      "acceptedSha256": "bc5bea1893a853baaeb2cc7f2e3a042d3eb7ee8050794bebaca366cd354e2a3e",
+      "acceptedBytes": 1512,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "scepter_of_the_deathless_court",
+      "runtimeUrl": "/ui/items/scepter_of_the_deathless_court.webp",
+      "acceptedSha256": "4a60f65998b63def4cf358b5b1c41caa33d8eb2290834150e2cc15a8491e00fa",
+      "acceptedBytes": 1896,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "skullsplitter_dirk",
+      "runtimeUrl": "/ui/items/skullsplitter_dirk.webp",
+      "acceptedSha256": "821d83d475f9b0dbc38103c6ef5c3cd57b4b0da23df6a536f80440a683f437a6",
+      "acceptedBytes": 1708,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "sloomtooth_tidefang",
+      "runtimeUrl": "/ui/items/sloomtooth_tidefang.webp",
+      "acceptedSha256": "78a4a8e8e73bec4f3f301f8996248b89f9daae00190735def5c94954a3014d3c",
+      "acceptedBytes": 1758,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "staff_of_drowned_prayers",
+      "runtimeUrl": "/ui/items/staff_of_drowned_prayers.webp",
+      "acceptedSha256": "cd11f806e95e4bda499592fbbd077a68814fd680ee6d196c5c40eb8874dd7f8e",
+      "acceptedBytes": 1226,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "staff_of_the_gravewyrm",
+      "runtimeUrl": "/ui/items/staff_of_the_gravewyrm.webp",
+      "acceptedSha256": "cb67dc16deece88da7257239d353a13f1563c20ad28d0692b4d2b47195dc2768",
+      "acceptedBytes": 1716,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "staff_of_velkhar",
+      "runtimeUrl": "/ui/items/staff_of_velkhar.webp",
+      "acceptedSha256": "bc3c2f81af75c73135c6ef09376293f53d3a54ec4a18ed0a1aebee64751ece61",
+      "acceptedBytes": 1200,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "stormcallers_focus",
+      "runtimeUrl": "/ui/items/stormcallers_focus.webp",
+      "acceptedSha256": "3ec152777c8ca72e1142096e512211064c2bdbd77a4511f66c2428b53431602e",
+      "acceptedBytes": 2766,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "thorium_warblade",
+      "runtimeUrl": "/ui/items/thorium_warblade.webp",
+      "acceptedSha256": "93d59c4942099622ccee55b3b622eebcfb6a473d955e336410bda33fe3fcab99",
+      "acceptedBytes": 1608,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "tideglass_dirk",
+      "runtimeUrl": "/ui/items/tideglass_dirk.webp",
+      "acceptedSha256": "ffea9f9406d1b0dcba05056e474d809b5aff1a3dc7bb6cf0c30762e975971262",
+      "acceptedBytes": 1544,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "tidereaver_gaff",
+      "runtimeUrl": "/ui/items/tidereaver_gaff.webp",
+      "acceptedSha256": "9903ceaf1e3224b86040c84667abe3beb5f7aaf486e0a1e5513aacb5ef2687fa",
+      "acceptedBytes": 1294,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "tradesman_hatchet",
+      "runtimeUrl": "/ui/items/tradesman_hatchet.webp",
+      "acceptedSha256": "5eb451e3c85691e1697a3187ac521b3afd79762197cddd0fda613036c7c79e95",
+      "acceptedBytes": 1958,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "training_mace",
+      "runtimeUrl": "/ui/items/training_mace.webp",
+      "acceptedSha256": "94c348b6447fdf94d893f04e9f228949ecab52ebd9e9c86067273a7aaf5b9706",
+      "acceptedBytes": 1508,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "tunnelkings_spade",
+      "runtimeUrl": "/ui/items/tunnelkings_spade.webp",
+      "acceptedSha256": "c2090f1d15370089f71a0d950dd4bbf4f0205210dd4c9ad51b6a393548ea167c",
+      "acceptedBytes": 2702,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "vaels_mist_staff",
+      "runtimeUrl": "/ui/items/vaels_mist_staff.webp",
+      "acceptedSha256": "4cf3f96809c3f5a01b9451709a90a7b0f0f51a69468baa23243b4a86d12bb434",
+      "acceptedBytes": 1998,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "vale_carving_knife",
+      "runtimeUrl": "/ui/items/vale_carving_knife.webp",
+      "acceptedSha256": "91b61d7095529a8638f87b264d28ffa5804459a69cdbf5b07127493112b08942",
+      "acceptedBytes": 1516,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "valeborn_spellblade",
+      "runtimeUrl": "/ui/items/valeborn_spellblade.webp",
+      "acceptedSha256": "d32488f0c154fdf559eefd93368e909a48bd59e4ba1da55ce2d94fa176883c27",
+      "acceptedBytes": 2528,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "veilsteel_blade",
+      "runtimeUrl": "/ui/items/veilsteel_blade.webp",
+      "acceptedSha256": "373cd3fdb24b678b1c4940fd5d44777cbe98562e5599588eb0a051e9bb4934db",
+      "acceptedBytes": 1906,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "verlans_oathblade",
+      "runtimeUrl": "/ui/items/verlans_oathblade.webp",
+      "acceptedSha256": "6f4ded2c631df543b4e32312f87310363fb4b37a954b3f6fd84025f4e5608f20",
+      "acceptedBytes": 2122,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "voidsong_dirk",
+      "runtimeUrl": "/ui/items/voidsong_dirk.webp",
+      "acceptedSha256": "bb6673c7e4ca41f254079b1ecb0aa3100a0882fe3032401cac57d2d4a8330e0e",
+      "acceptedBytes": 2044,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "voss_sanctified_mace",
+      "runtimeUrl": "/ui/items/voss_sanctified_mace.webp",
+      "acceptedSha256": "0fd3aa18c904ed52c6058dd0da5d63c29606f50497e1f551d1f4c77edf72feb5",
+      "acceptedBytes": 1718,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "whetted_iron_dirk",
+      "runtimeUrl": "/ui/items/whetted_iron_dirk.webp",
+      "acceptedSha256": "1a291b12805dc222e6b7d49a526748e01c158b383abe64a84ea6644384985198",
+      "acceptedBytes": 1740,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "widowfang_dirk",
+      "runtimeUrl": "/ui/items/widowfang_dirk.webp",
+      "acceptedSha256": "41cce928e73b63a7caadac0da0c89d9867392b56638d74ecfd97d16f897626df",
+      "acceptedBytes": 1818,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "wildheart_fangknife",
+      "runtimeUrl": "/ui/items/wildheart_fangknife.webp",
+      "acceptedSha256": "37951a6ba9c6f117ff6faa8f76d730db6e2658b22dca2140c20d9a6d61ef57f3",
+      "acceptedBytes": 2854,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "wildheart_hexwood_staff",
+      "runtimeUrl": "/ui/items/wildheart_hexwood_staff.webp",
+      "acceptedSha256": "f541230051cfe7b0c6af1ac80342412b229453aec97fcb28c58622f349d9e1f8",
+      "acceptedBytes": 2380,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "wildheart_tuskblade",
+      "runtimeUrl": "/ui/items/wildheart_tuskblade.webp",
+      "acceptedSha256": "17369ea620095b9945caa54b101bd708618a2176d15c67467d09b29eaecbf75f",
+      "acceptedBytes": 2350,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "wildsoul_maul",
+      "runtimeUrl": "/ui/items/wildsoul_maul.webp",
+      "acceptedSha256": "57d1c57bc30de16e944c1bb4d0da0bd5c5fe76026089a72cf9a613ba9582bf67",
+      "acceptedBytes": 2274,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "worn_sword",
+      "runtimeUrl": "/ui/items/worn_sword.webp",
+      "acceptedSha256": "454ab5dc2397a656405408b8c0a2411be40d97b3712bbc076696c20c3dd3be90",
+      "acceptedBytes": 1810,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "wyrmfang_greatblade",
+      "runtimeUrl": "/ui/items/wyrmfang_greatblade.webp",
+      "acceptedSha256": "404c39452f25c8713fc05ecd84e70000fe7c83f9a62ae2299b57342e83ce7838",
+      "acceptedBytes": 1992,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "zealotsbane_blade",
+      "runtimeUrl": "/ui/items/zealotsbane_blade.webp",
+      "acceptedSha256": "60158ec1e0f00c04b03386861a1f6fde26775472d1d92384f88551d8e2823db0",
+      "acceptedBytes": 2264,
+      "batch": "weapons"
+    },
+    {
+      "kind": "item",
+      "id": "curved_tusk",
+      "runtimeUrl": "/ui/items/curved_tusk.webp",
+      "acceptedSha256": "59b331638302cccd5abaa3a71d87593df93e510d7adc33651d8c02e714f641be",
+      "acceptedBytes": 2270,
+      "batch": "item-cleanup"
+    },
+    {
+      "kind": "item",
+      "id": "firebottle",
+      "runtimeUrl": "/ui/items/firebottle.webp",
+      "acceptedSha256": "c3965ddb8daa75ba1b8eb5adb75845ac3220e2eb2af0f5db3ad8d28cebd7b122",
+      "acceptedBytes": 2636,
+      "batch": "item-cleanup"
+    },
+    {
+      "kind": "item",
+      "id": "pristine_claw",
+      "runtimeUrl": "/ui/items/pristine_claw.webp",
+      "acceptedSha256": "9e960f2ffe8de1dcc3a267e261c24810d039c69c53e5bbff975c85ff0dd5c805",
+      "acceptedBytes": 2174,
+      "batch": "item-cleanup"
+    },
+    {
+      "kind": "item",
+      "id": "sharp_claw",
+      "runtimeUrl": "/ui/items/sharp_claw.webp",
+      "acceptedSha256": "44f29bf14ba13a7b03ea25f3b2ae0edb57b4f4a041a694d28a711ed3c880be36",
+      "acceptedBytes": 2276,
+      "batch": "item-cleanup"
+    },
+    {
+      "kind": "deed",
+      "id": "chr_amberfall_first_cast",
+      "runtimeUrl": "/ui/deeds/chr_amberfall_first_cast.webp",
+      "acceptedSha256": "1fef3b4211a7a72d1412bd50b36cab5a0bfcc960688f33a53e4b109f47a93b8b",
+      "acceptedBytes": 5438,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_amberfall_first_cast.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_amberfall_gatherer",
+      "runtimeUrl": "/ui/deeds/chr_amberfall_gatherer.webp",
+      "acceptedSha256": "643fcf881d301ecdcb295395578a76096b71966fa8461aeb2080123e3c0467e7",
+      "acceptedBytes": 5324,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_amberfall_gatherer.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_drakemaw_broodlord",
+      "runtimeUrl": "/ui/deeds/chr_drakemaw_broodlord.webp",
+      "acceptedSha256": "6abe3f06924651f4e2a384d7041cb51374926a431f72c96f9f1f0a54bdde41d4",
+      "acceptedBytes": 4908,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_drakemaw_broodlord.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_evergarden_first_cast",
+      "runtimeUrl": "/ui/deeds/chr_evergarden_first_cast.webp",
+      "acceptedSha256": "05abf50162fd7888823436bafec65185cddbffe5b39520feb931ec71b549da9c",
+      "acceptedBytes": 5886,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_evergarden_first_cast.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_evergarden_gatherer",
+      "runtimeUrl": "/ui/deeds/chr_evergarden_gatherer.webp",
+      "acceptedSha256": "c9387b0c4e393ae82f667e8594c9da8c35accc776add3c21d5a29593c427d7f7",
+      "acceptedBytes": 6148,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_evergarden_gatherer.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_frostveil_first_cast",
+      "runtimeUrl": "/ui/deeds/chr_frostveil_first_cast.webp",
+      "acceptedSha256": "b4887114c0bbaef8eb217cb3964787f3fb5e63162a5387fe417c716702e27aee",
+      "acceptedBytes": 6152,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_frostveil_first_cast.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_frostveil_gatherer",
+      "runtimeUrl": "/ui/deeds/chr_frostveil_gatherer.webp",
+      "acceptedSha256": "1da143d88643ff9ca5245259212168b5fc45a28183e0b8fef5a430ea12b10d4c",
+      "acceptedBytes": 5758,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_frostveil_gatherer.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_maw_matriarch",
+      "runtimeUrl": "/ui/deeds/chr_maw_matriarch.webp",
+      "acceptedSha256": "d6a6e08b24a3f4dd1f2ccf3c416e14bf04da4fd1400cc6c745366d099356e44c",
+      "acceptedBytes": 4612,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_maw_matriarch.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_nightbloom_first_cast",
+      "runtimeUrl": "/ui/deeds/chr_nightbloom_first_cast.webp",
+      "acceptedSha256": "aff7fd0bec8a3245aeb9263883c183a753d7d726ab54222070a950c7ee59ef7c",
+      "acceptedBytes": 7130,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_nightbloom_first_cast.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_nightbloom_gatherer",
+      "runtimeUrl": "/ui/deeds/chr_nightbloom_gatherer.webp",
+      "acceptedSha256": "ad8aa4f2f25c2752cc9f293e8171d8adee88b5b236502d122b01b190d7db95ba",
+      "acceptedBytes": 7820,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_nightbloom_gatherer.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_palmreach_first_cast",
+      "runtimeUrl": "/ui/deeds/chr_palmreach_first_cast.webp",
+      "acceptedSha256": "2588cab4857013e274ff44764432ec9908db5a802d86fc24d7f37bce3c5be79b",
+      "acceptedBytes": 6022,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_palmreach_first_cast.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_palmreach_gatherer",
+      "runtimeUrl": "/ui/deeds/chr_palmreach_gatherer.webp",
+      "acceptedSha256": "db730e16fef9ffbe9dca75c2f2d56f72032355c629845ecd7b57ad237f0b1e09",
+      "acceptedBytes": 6174,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_palmreach_gatherer.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_wraithwood_first_cast",
+      "runtimeUrl": "/ui/deeds/chr_wraithwood_first_cast.webp",
+      "acceptedSha256": "986d476495cc5ffb17e7a001d012e9fed16e0c36f9cce9dea076ffeaa5d6a209",
+      "acceptedBytes": 5220,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_wraithwood_first_cast.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "chr_wraithwood_gatherer",
+      "runtimeUrl": "/ui/deeds/chr_wraithwood_gatherer.webp",
+      "acceptedSha256": "8a29f6099b6d015e23640aa48bacbef09ccfd14058c4187e7d49cc04e6bae462",
+      "acceptedBytes": 5524,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/chr_wraithwood_gatherer.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_rift",
+      "runtimeUrl": "/ui/deeds/dgn_rift.webp",
+      "acceptedSha256": "556576dd8adb6d925d40a97bd0b4fca3cf16c22623532fb6d377a3d90efaa9be",
+      "acceptedBytes": 4832,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/dgn_rift.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_rift_s_rank",
+      "runtimeUrl": "/ui/deeds/dgn_rift_s_rank.webp",
+      "acceptedSha256": "e165f1c8111ff9d7388613d4ee9c3855072aeac84803f1b0f0623f9c7b51a88b",
+      "acceptedBytes": 5510,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/dgn_rift_s_rank.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_alchemy_rare",
+      "runtimeUrl": "/ui/deeds/prog_alchemy_rare.webp",
+      "acceptedSha256": "0659c89f67c2cdf3d284819a27df3b63560c5fd5d9fbe8b70133172e2f2bf206",
+      "acceptedBytes": 4760,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/prog_alchemy_rare.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_armorcrafting_rare",
+      "runtimeUrl": "/ui/deeds/prog_armorcrafting_rare.webp",
+      "acceptedSha256": "c9c93ab7acc9052db60a7efc3d253f9b540c5a25ae07cea687002efa81fd42cd",
+      "acceptedBytes": 5016,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/prog_armorcrafting_rare.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_cooking_rare",
+      "runtimeUrl": "/ui/deeds/prog_cooking_rare.webp",
+      "acceptedSha256": "f73e805af5d2ba9bbe647506d6ea76047dc1328d3e667596af26bafdaf3afa15",
+      "acceptedBytes": 5166,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/prog_cooking_rare.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_engineering_rare",
+      "runtimeUrl": "/ui/deeds/prog_engineering_rare.webp",
+      "acceptedSha256": "3dcb72be4f790fad01a74fb47bc68e42dc74af250f4632a526f0486cc6f1c43c",
+      "acceptedBytes": 5420,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/prog_engineering_rare.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_leatherworking_rare",
+      "runtimeUrl": "/ui/deeds/prog_leatherworking_rare.webp",
+      "acceptedSha256": "f146664c58200e650ee2133ab3107fe0a2cdb1a5fc996d91869d6e048d330ef8",
+      "acceptedBytes": 4934,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/prog_leatherworking_rare.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_tailoring_rare",
+      "runtimeUrl": "/ui/deeds/prog_tailoring_rare.webp",
+      "acceptedSha256": "e8380bb9000be25d8337136f7bbe29cb55bd875cc1f69b40e47e91c7bec35fc4",
+      "acceptedBytes": 4794,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/prog_tailoring_rare.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_weaponcrafting_rare",
+      "runtimeUrl": "/ui/deeds/prog_weaponcrafting_rare.webp",
+      "acceptedSha256": "d35ff61718d711c69c64fae67df9a26c18b6b9a6921a4e9ff91fc3d6c93a71d8",
+      "acceptedBytes": 5212,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/prog_weaponcrafting_rare.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "pvp_bg_captures_100",
+      "runtimeUrl": "/ui/deeds/pvp_bg_captures_100.webp",
+      "acceptedSha256": "1750927f7e0aadd6563d999e52a3b7a566819b504fac397ae0b46ceb73dc9443",
+      "acceptedBytes": 5136,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/pvp_bg_captures_100.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "pvp_bg_first_capture",
+      "runtimeUrl": "/ui/deeds/pvp_bg_first_capture.webp",
+      "acceptedSha256": "20acfae447687abac5dec2164607feb84de6f5b58703bbdc1ab62ab31af98dd9",
+      "acceptedBytes": 4908,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/pvp_bg_first_capture.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "pvp_bg_first_win",
+      "runtimeUrl": "/ui/deeds/pvp_bg_first_win.webp",
+      "acceptedSha256": "5574a47a9111cce9d5ab3ec65400f5420766d45fda9d3aad0a88ecf41fb141c3",
+      "acceptedBytes": 4504,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/pvp_bg_first_win.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "pvp_bg_wins_25",
+      "runtimeUrl": "/ui/deeds/pvp_bg_wins_25.webp",
+      "acceptedSha256": "c25de03319438b3cdc7276ea46d9b92ccbe184fd4ff0d42c4b20f36f903ea335",
+      "acceptedBytes": 4818,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/pvp_bg_wins_25.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "pvp_honor_field_marshal",
+      "runtimeUrl": "/ui/deeds/pvp_honor_field_marshal.webp",
+      "acceptedSha256": "884dcb839aab8b0e30a0ad301cdabecda7d79d79ce3294a3c5e1fd14ec5db62f",
+      "acceptedBytes": 5488,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/pvp_honor_field_marshal.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "pvp_honor_knight_lieutenant",
+      "runtimeUrl": "/ui/deeds/pvp_honor_knight_lieutenant.webp",
+      "acceptedSha256": "0f75726fd2801e22f9d25524a2c115fa28738b174cc06c7e274715e288ef3955",
+      "acceptedBytes": 5542,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/pvp_honor_knight_lieutenant.webp"
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "pvp_honor_sergeant",
+      "runtimeUrl": "/ui/deeds/pvp_honor_sergeant.webp",
+      "acceptedSha256": "9adc17030f8f446a20ea28ebabafbdf6f9f9b3f2a203a6b9222f85b7163bef7f",
+      "acceptedBytes": 5236,
+      "batch": "deeds",
+      "source": {
+        "path": "public/ui/deeds/pvp_honor_sergeant.webp"
+      }
+    }
+  ],
+  "supplementalAssets": [
+    {
+      "kind": "specialization",
+      "id": "druid/balance",
+      "runtimeUrl": "/ui/specs/druid/balance.webp",
+      "acceptedSha256": "36f871c43006f213f32b66f2e7d80f05a0c562297ae0eeb3d060d28db654b27b",
+      "acceptedBytes": 6636,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "druid/feral",
+      "runtimeUrl": "/ui/specs/druid/feral.webp",
+      "acceptedSha256": "bd02f57340f3edbb066539dda8958f52aeb5ed29ad29a20fa675870a6fac378a",
+      "acceptedBytes": 7762,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "druid/restoration",
+      "runtimeUrl": "/ui/specs/druid/restoration.webp",
+      "acceptedSha256": "81c509f00701f290de195c827c579f06b07696587bd85d3c98b1410e7266b2c7",
+      "acceptedBytes": 7862,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "hunter/beast_mastery",
+      "runtimeUrl": "/ui/specs/hunter/beast_mastery.webp",
+      "acceptedSha256": "283e56c390feb0445fc6b94f4c9cf24c85109de615cf684375b5a334cac8fd5b",
+      "acceptedBytes": 7320,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "hunter/marksmanship",
+      "runtimeUrl": "/ui/specs/hunter/marksmanship.webp",
+      "acceptedSha256": "06fab5c69f464075d2b097965c85fe62f0cc477560957fd118f12ad278aab487",
+      "acceptedBytes": 6766,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "hunter/survival",
+      "runtimeUrl": "/ui/specs/hunter/survival.webp",
+      "acceptedSha256": "8a353710a836e498aa3fd5a01d144fe55e50c83f9a3ecb04a1c4e17acab13459",
+      "acceptedBytes": 7588,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "mage/arcane",
+      "runtimeUrl": "/ui/specs/mage/arcane.webp",
+      "acceptedSha256": "b4aa1ced0424adca0841849f0357d9e788627c0577b3177f40636821a5f4f41e",
+      "acceptedBytes": 10832,
+      "origin": "converted-existing"
+    },
+    {
+      "kind": "specialization",
+      "id": "mage/fire",
+      "runtimeUrl": "/ui/specs/mage/fire.webp",
+      "acceptedSha256": "b2e2e0de7fcd0e217959e525f7b1b466172f96303e43d6dd0ce654fd16f872f5",
+      "acceptedBytes": 11498,
+      "origin": "converted-existing"
+    },
+    {
+      "kind": "specialization",
+      "id": "mage/frost",
+      "runtimeUrl": "/ui/specs/mage/frost.webp",
+      "acceptedSha256": "2242af258180f373f5a5df0e40c1672fb763839c9bb57246aab8e2268784d3ea",
+      "acceptedBytes": 10660,
+      "origin": "converted-existing"
+    },
+    {
+      "kind": "specialization",
+      "id": "paladin/holy",
+      "runtimeUrl": "/ui/specs/paladin/holy.webp",
+      "acceptedSha256": "bb9c67ee192a6d1e6919826e022e0245f40d084bc8ed28e0c6353f52a94d5fcb",
+      "acceptedBytes": 7112,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "paladin/protection",
+      "runtimeUrl": "/ui/specs/paladin/protection.webp",
+      "acceptedSha256": "ecc0f143c6b38869d21dc8f27ee954ad2a4a0b4d654b649b7a8d5cb0ee9017c1",
+      "acceptedBytes": 7338,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "paladin/retribution",
+      "runtimeUrl": "/ui/specs/paladin/retribution.webp",
+      "acceptedSha256": "6f249197236ba6397085b9ea46e9fa85689f64e0603d345941204df481f408bf",
+      "acceptedBytes": 8188,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "priest/discipline",
+      "runtimeUrl": "/ui/specs/priest/discipline.webp",
+      "acceptedSha256": "2065257b369a1f15e2dd0af880cc918a80b25fffa8d22dc85af25504eb4bf39b",
+      "acceptedBytes": 6950,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "priest/holy",
+      "runtimeUrl": "/ui/specs/priest/holy.webp",
+      "acceptedSha256": "7967e2663cbb00f5a9dd3e54b79534570145eba74985a8e399c0e99ee4007954",
+      "acceptedBytes": 6606,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "priest/shadow",
+      "runtimeUrl": "/ui/specs/priest/shadow.webp",
+      "acceptedSha256": "389361419318d2e42141422b779b24a964b593bfb09f862529ce0ecbd6820d8d",
+      "acceptedBytes": 5306,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "rogue/assassination",
+      "runtimeUrl": "/ui/specs/rogue/assassination.webp",
+      "acceptedSha256": "300649367e8f6ba22b3bca2180e76bc26a9af5e7421b60a85a40601d49b0d3e0",
+      "acceptedBytes": 4682,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "rogue/combat",
+      "runtimeUrl": "/ui/specs/rogue/combat.webp",
+      "acceptedSha256": "3f9ae447a13b8bb432498d679aa260cf1fd372bd5e19620f6b47ad63984df68b",
+      "acceptedBytes": 6716,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "rogue/subtlety",
+      "runtimeUrl": "/ui/specs/rogue/subtlety.webp",
+      "acceptedSha256": "af1ab30a2e6f3d57bda90c5d19c6a0be86af271409e9d2f8616c3d4765b69594",
+      "acceptedBytes": 5266,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "shaman/elemental",
+      "runtimeUrl": "/ui/specs/shaman/elemental.webp",
+      "acceptedSha256": "39e07f23809628e13b0d94bdaf957d09c2d2d32378b0058d5d8db57844f9ae0f",
+      "acceptedBytes": 8026,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "shaman/enhancement",
+      "runtimeUrl": "/ui/specs/shaman/enhancement.webp",
+      "acceptedSha256": "b85d64cf5658124840e4d23ed0f0426f9cad5c8ee086ce9eb33065c16b78cf2f",
+      "acceptedBytes": 8426,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "shaman/restoration",
+      "runtimeUrl": "/ui/specs/shaman/restoration.webp",
+      "acceptedSha256": "dad4139055a8a6349afd0beabe0708cc20a28980775b88f7fab4881c85d8a592",
+      "acceptedBytes": 7918,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "warlock/affliction",
+      "runtimeUrl": "/ui/specs/warlock/affliction.webp",
+      "acceptedSha256": "e6cc4e18f40de996718200a32e0d2cc5d092508d01b494d79dd2346239de5dbf",
+      "acceptedBytes": 6684,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "warlock/demonology",
+      "runtimeUrl": "/ui/specs/warlock/demonology.webp",
+      "acceptedSha256": "10e83ca9beb2e1412f49af171b856237d875923b17fd387cfbb58f406b3dc280",
+      "acceptedBytes": 6862,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "warlock/destruction",
+      "runtimeUrl": "/ui/specs/warlock/destruction.webp",
+      "acceptedSha256": "4564ddf7b4a1c5dab685285379419d5d9e3ebb2e492fce14c6000c40dac5023a",
+      "acceptedBytes": 7408,
+      "origin": "generated"
+    },
+    {
+      "kind": "specialization",
+      "id": "warrior/arms",
+      "runtimeUrl": "/ui/specs/warrior/arms.webp",
+      "acceptedSha256": "10e6a24558dfa0707e18320a9f684af28c9d3b1d0fe287dde5dfa4515e6c1c53",
+      "acceptedBytes": 6288,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "specialization",
+      "id": "warrior/fury",
+      "runtimeUrl": "/ui/specs/warrior/fury.webp",
+      "acceptedSha256": "00444a2922ba40ed15605f404034c3bba9772bf7c37e35b57d7524e3fa2ab08e",
+      "acceptedBytes": 7918,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "specialization",
+      "id": "warrior/prot",
+      "runtimeUrl": "/ui/specs/warrior/prot.webp",
+      "acceptedSha256": "7ece5966408590460eb28a2e12f08c80dc81d11ad6b1f0b0ed75c102be07b60b",
+      "acceptedBytes": 6244,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "beast",
+      "runtimeUrl": "/ui/crests/families/beast.webp",
+      "acceptedSha256": "7e44de6c92073b67eceafef9fc5c4d8a7d86195a02aa0490d5a2ccb779a2bafd",
+      "acceptedBytes": 15984,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "burrower",
+      "runtimeUrl": "/ui/crests/families/burrower.webp",
+      "acceptedSha256": "79a7a50f1faadafe2e4b5b5b7b95391d84551555b8c07c689c1c815bb98bda6c",
+      "acceptedBytes": 14096,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "demon",
+      "runtimeUrl": "/ui/crests/families/demon.webp",
+      "acceptedSha256": "dff82df1f188898085361c9d18b963f9604ba71114cefdfb5ad9955051c56a64",
+      "acceptedBytes": 12704,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "dragonkin",
+      "runtimeUrl": "/ui/crests/families/dragonkin.webp",
+      "acceptedSha256": "5c383a41d17f9c3046f9d01954df0bb7cd7752a8c80fbaf2006ae160027a3d72",
+      "acceptedBytes": 14924,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "elemental",
+      "runtimeUrl": "/ui/crests/families/elemental.webp",
+      "acceptedSha256": "7b3a681c850728f58332c8569fcc8a3698c9130fe86874ef9a6301330ef2c3f0",
+      "acceptedBytes": 17494,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "humanoid",
+      "runtimeUrl": "/ui/crests/families/humanoid.webp",
+      "acceptedSha256": "54183bee485e22864b6d5c043005624506c88c4cce312f7bdb92c9755f517e45",
+      "acceptedBytes": 10758,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "mudfin",
+      "runtimeUrl": "/ui/crests/families/mudfin.webp",
+      "acceptedSha256": "0e20963e39588da9e1edad4ff76abe041b01f04cc08626cd7f4d6b26c9eaf260",
+      "acceptedBytes": 14550,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "ogre",
+      "runtimeUrl": "/ui/crests/families/ogre.webp",
+      "acceptedSha256": "0e26658b8a2e1ad06eeb0a3383fd3b95ab1e6f3f9c2c5e79df5c46b55ddc6334",
+      "acceptedBytes": 12990,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "reptile",
+      "runtimeUrl": "/ui/crests/families/reptile.webp",
+      "acceptedSha256": "68e66f31aded138d159066a446557a14faf3d68e1a539a7fce44f83b0fe8b2ab",
+      "acceptedBytes": 12544,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "sheep",
+      "runtimeUrl": "/ui/crests/families/sheep.webp",
+      "acceptedSha256": "c37514c6cb2dfae77291371b0905471d65555b124ff882a3b71fb28e47056a6b",
+      "acceptedBytes": 18714,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "spider",
+      "runtimeUrl": "/ui/crests/families/spider.webp",
+      "acceptedSha256": "f1a1e4f36141b220ff84497083d22cb7e331090bbe052cc98c532c54da7667a4",
+      "acceptedBytes": 15204,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "troll",
+      "runtimeUrl": "/ui/crests/families/troll.webp",
+      "acceptedSha256": "cd65f66de9a0f950d16a8abb10649a0da047d01443cc2b289df4e57f641209e9",
+      "acceptedBytes": 17032,
+      "origin": "generated"
+    },
+    {
+      "kind": "familyCrest",
+      "id": "undead",
+      "runtimeUrl": "/ui/crests/families/undead.webp",
+      "acceptedSha256": "0370dfb13ce6aff2d8094bee6ff2aac408ca245e892d44cb320ed300e3b8657c",
+      "acceptedBytes": 10282,
+      "origin": "generated"
+    },
+    {
+      "kind": "statusCrest",
+      "id": "boss",
+      "runtimeUrl": "/ui/crests/status/boss.webp",
+      "acceptedSha256": "1c954bbc38fe0c647fd570d563b793f02f1ae6a70b0ce3be32ef256da39d4514",
+      "acceptedBytes": 14370,
+      "origin": "generated"
+    },
+    {
+      "kind": "statusCrest",
+      "id": "combat",
+      "runtimeUrl": "/ui/crests/status/combat.webp",
+      "acceptedSha256": "3073dc91ad25e9370d37bec85853dc104f0bc880e05f24f1142afad2bbf0ea0c",
+      "acceptedBytes": 16212,
+      "origin": "generated"
+    },
+    {
+      "kind": "statusCrest",
+      "id": "dead",
+      "runtimeUrl": "/ui/crests/status/dead.webp",
+      "acceptedSha256": "0cd472550d28417713f8822a91fb91f33a1982abf93dd6335d6b5cb8b51a23d5",
+      "acceptedBytes": 10444,
+      "origin": "generated"
+    },
+    {
+      "kind": "statusCrest",
+      "id": "npc",
+      "runtimeUrl": "/ui/crests/status/npc.webp",
+      "acceptedSha256": "9248c9526a7d8ca2a8c60e80b40c78ce08ee78b3b2270ab5acf71980039d0f77",
+      "acceptedBytes": 9756,
+      "origin": "generated"
+    },
+    {
+      "kind": "classCrest",
+      "id": "class_druid",
+      "runtimeUrl": "/ui/classes/druid.webp",
+      "acceptedSha256": "697a5a9fa7db5567cbd611b98803df1c0439cce6baa37c16ea303f87e256fe45",
+      "acceptedBytes": 12724,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "classCrest",
+      "id": "class_hunter",
+      "runtimeUrl": "/ui/classes/hunter.webp",
+      "acceptedSha256": "ed50eb8aa261fa5f0392c348f26ae38560d913be57071048e75389d045a44dec",
+      "acceptedBytes": 13816,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "classCrest",
+      "id": "class_mage",
+      "runtimeUrl": "/ui/classes/mage.webp",
+      "acceptedSha256": "74f73e9fc3a9d127ec411b74b4f74f8d3ff2ac9598254b094248b8cac73bfc5d",
+      "acceptedBytes": 16152,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "classCrest",
+      "id": "class_paladin",
+      "runtimeUrl": "/ui/classes/paladin.webp",
+      "acceptedSha256": "3c6786606c75c9495a01e8b0a9372160a24f5433397f82f6c485ed1b44f30532",
+      "acceptedBytes": 14398,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "classCrest",
+      "id": "class_priest",
+      "runtimeUrl": "/ui/classes/priest.webp",
+      "acceptedSha256": "392aa753910dfc8e292cc46063d88654979d83d03ebd01e85b0e4f57360ceedd",
+      "acceptedBytes": 12956,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "classCrest",
+      "id": "class_rogue",
+      "runtimeUrl": "/ui/classes/rogue.webp",
+      "acceptedSha256": "99fe5a9ed11218cc6917ca5c9956dd72edd7e36b8e1286344ac801b9bcf2167e",
+      "acceptedBytes": 10688,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "classCrest",
+      "id": "class_shaman",
+      "runtimeUrl": "/ui/classes/shaman.webp",
+      "acceptedSha256": "e6011f825540b7dbbc4b563cb1c5ce7c68032acd3c18bf6281dab99a55b36d8f",
+      "acceptedBytes": 20440,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "classCrest",
+      "id": "class_warlock",
+      "runtimeUrl": "/ui/classes/warlock.webp",
+      "acceptedSha256": "1412534ed702497cf805ee578122a1678f9055590d04fd26e6a4de0f1b5b922f",
+      "acceptedBytes": 11128,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "classCrest",
+      "id": "class_warrior",
+      "runtimeUrl": "/ui/classes/warrior.webp",
+      "acceptedSha256": "7fc8893ee7633d73ad3ae06368ffa741be3f22e1ccf6a437f54dd51ca9330cbc",
+      "acceptedBytes": 14160,
+      "origin": "reused-existing"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "bogtoad",
+      "runtimeUrl": "/ui/mobs/bogtoad.webp",
+      "acceptedSha256": "1e23b41efff2235f42ab7dfc5cc467c782f4e6e9bbcf5f691019d5aa84618b0b",
+      "acceptedBytes": 1844,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "breach_wretch",
+      "runtimeUrl": "/ui/mobs/breach_wretch.webp",
+      "acceptedSha256": "afb4783c5f98e72096ff055c57bf9f1cca69287e73e649e302aab9507ac8c40f",
+      "acceptedBytes": 1696,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "castaway_navigator",
+      "runtimeUrl": "/ui/mobs/castaway_navigator.webp",
+      "acceptedSha256": "caa41418ae0cf05ea788967c7df5e05ec61a7bf10c2e46da7041b63302839457",
+      "acceptedBytes": 2632,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "cindraleth_maw_matriarch",
+      "runtimeUrl": "/ui/mobs/cindraleth_maw_matriarch.webp",
+      "acceptedSha256": "5dd3432a2363096ff0d4bd831a36ed7419e8230248529987de2f71362c979fec",
+      "acceptedBytes": 2478,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "downs_bandit",
+      "runtimeUrl": "/ui/mobs/downs_bandit.webp",
+      "acceptedSha256": "63d0b8b7ec80b2d8e49c599dbdab667022bc3b8635876a1db45033c370c541df",
+      "acceptedBytes": 1702,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "drowsy_croaker",
+      "runtimeUrl": "/ui/mobs/drowsy_croaker.webp",
+      "acceptedSha256": "d58d617071ead1f8211ea4584cb199ba653022a50c303eeeaad59676976cf1ae",
+      "acceptedBytes": 1812,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "fen_sprite",
+      "runtimeUrl": "/ui/mobs/fen_sprite.webp",
+      "acceptedSha256": "9452fb7216c7a3237744d2ad6ab3fe4e28a77e96a49bf83853f784517456a6c0",
+      "acceptedBytes": 1722,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "fisher_bram",
+      "runtimeUrl": "/ui/mobs/fisher_bram.webp",
+      "acceptedSha256": "9a553c04903f0326a369e12e32ab46088ac16b8df85216bd84442349cbb35d95",
+      "acceptedBytes": 2618,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "gravedigger_mosley",
+      "runtimeUrl": "/ui/mobs/gravedigger_mosley.webp",
+      "acceptedSha256": "699b404cd0e3b1b231b82b3d02357e94c6b3bed37bbf9f46bc6585a9ece0ba36",
+      "acceptedBytes": 2720,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "grubjaw",
+      "runtimeUrl": "/ui/mobs/grubjaw.webp",
+      "acceptedSha256": "3ddba949b8d523e38f54154957b3dcd354db8bdf78f1ee9129627a38f3d7e56c",
+      "acceptedBytes": 2174,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "harvest_sprite",
+      "runtimeUrl": "/ui/mobs/harvest_sprite.webp",
+      "acceptedSha256": "451a9e94af9b7b9396262e6ba2067f8601eb6919fd7d2ebcb252bde569cb8e2b",
+      "acceptedBytes": 1728,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "hedge_gnome",
+      "runtimeUrl": "/ui/mobs/hedge_gnome.webp",
+      "acceptedSha256": "63d0b8b7ec80b2d8e49c599dbdab667022bc3b8635876a1db45033c370c541df",
+      "acceptedBytes": 1702,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "mere_lurker",
+      "runtimeUrl": "/ui/mobs/mere_lurker.webp",
+      "acceptedSha256": "79a58134dc658f8e31749495107d5c2738909ba848b5cb878efe79d86bedef0a",
+      "acceptedBytes": 1916,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "the_meredark",
+      "runtimeUrl": "/ui/mobs/the_meredark.webp",
+      "acceptedSha256": "571ca5b7ce1dfbea6989c8d3897a2e2a8f68c2f886e918895a136592d507b07c",
+      "acceptedBytes": 1822,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "the_wreck_warden",
+      "runtimeUrl": "/ui/mobs/the_wreck_warden.webp",
+      "acceptedSha256": "9142ba953bf15b818fb6163bd477439d8f652b94c61de67e51f25efc63429bb0",
+      "acceptedBytes": 2586,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "training_dummy",
+      "runtimeUrl": "/ui/mobs/training_dummy.webp",
+      "acceptedSha256": "2f3e963f5346db997e4dd990ed65bf83f9915d10a5ecbe29260b28d9ac247d0e",
+      "acceptedBytes": 1788,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "willow_sprite",
+      "runtimeUrl": "/ui/mobs/willow_sprite.webp",
+      "acceptedSha256": "5f7819fadaed90ff89a31b5f6b8e09b376e807c81f8101e5a94378d89e86f8b1",
+      "acceptedBytes": 1692,
+      "origin": "deterministic-rerender"
+    },
+    {
+      "kind": "mobPortrait",
+      "id": "wreck_thief",
+      "runtimeUrl": "/ui/mobs/wreck_thief.webp",
+      "acceptedSha256": "63d0b8b7ec80b2d8e49c599dbdab667022bc3b8635876a1db45033c370c541df",
+      "acceptedBytes": 1702,
+      "origin": "deterministic-rerender"
+    }
+  ]
+}

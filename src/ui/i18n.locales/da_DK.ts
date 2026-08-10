@@ -311,7 +311,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'To hold på fem. Stjæl fjendens banner, og løb det til din borg. Først til 3 erobringer vinder. Gå sammen op til 5 og gå i kø sammen; grib Spurtruner, og slalom gennem dækningen for at ryste dine forfølgere af.',
   'hudChrome.bg.queuedParty': 'Gruppe på {count}.',
-  'hudChrome.bg.ratingSummary': 'Rating. {wins} sejre / {losses} nederlag',
+  'hudChrome.bg.ratingSummary': 'Rating. {wins} sejre / {losses} nederlag / {draws} uafgjorte',
   'hudChrome.bg.respawnIn': 'Næste bølge: genopstår om {seconds}',
   'hudChrome.bg.resultDefeat': 'Nederlag',
   'hudChrome.bg.resultDraw': 'Uafgjort',
@@ -6360,7 +6360,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.arena.playerLevelClassTitle': '{name} - Niv {level} {className}',
   'hud.arena.queueNote':
     'Du bliver matchet med den nærmeste rangerede udfordrer online og derefter teleporteret til sandet. Vind for at kravle op; den første, der overgiver sig (1 helbred), taber. Du vender tilbage præcis hvor du stillede dig i kø.',
-  'hud.arena.ratingSummary': 'Rating - {wins} sejre / {losses} nederlag',
+  'hud.arena.ratingSummary': 'Rating - {wins} sejre / {losses} nederlag / {draws} uafgjorte',
   'hud.arena.searching': 'Søger efter en modstander... ({count} i kø)',
   'hud.arena.statusCountdown': 'Tag dig sammen...',
   'hud.arena.statusFight': 'Kæmp til overgivelse!',

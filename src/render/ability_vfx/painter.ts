@@ -881,7 +881,16 @@ export class AbilityVfx {
       // 6s earthquake must not starve its caster's next cast.
       if (this.budget.admitAccent(nowSec)) {
         const tier = this.biasFor(casterId, this.budget.peek(casterId, nowSec));
-        this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, planCast(spec, this.quality, tier), tier);
+        this.zoneRehit(
+          ev.x,
+          gy,
+          ev.z,
+          ev.radius,
+          spec,
+          planCast(spec, this.quality, tier),
+          tier,
+          ev.ability,
+        );
       }
       this.recordStat(ev.ability, true);
       return true;
@@ -910,7 +919,7 @@ export class AbilityVfx {
     }
     if (repeat) {
       if (this.budget.admitAccent(nowSec)) {
-        this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, plan, tier);
+        this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, plan, tier, ev.ability);
       }
     } else if (tier < 2 && full) {
       // A bolt-archetype aimed cast FLIES its authored volley: Splitshot's fan
@@ -983,12 +992,16 @@ export class AbilityVfx {
     spec: AbilityVfxSpec,
     plan: AbilityVfxPlan,
     tier: number,
+    abilityId: string,
   ): void {
     if (tier >= 2) return;
     const fx = this.deps.fx;
     const r = Math.min(6, Math.max(1.6, (radius ?? 4) * 0.85));
-    // soft per-pulse thud AT the zone (never the full impact identity)
-    this.deps.abilityAudio?.('pulse', spec.p ?? 'arcane', spec.pw ?? 1, x, gy, z);
+    // soft per-pulse thud AT the zone (never the full impact identity); the
+    // abilityId lets isAbilityMomentRecorded silence this for Meteor, whose
+    // one delayed hit now has a dedicated recording (combat_sfx.ts's
+    // GROUND_TICK_ABILITY_CUES).
+    this.deps.abilityAudio?.('pulse', spec.p ?? 'arcane', spec.pw ?? 1, x, gy, z, { abilityId });
     fx.ringAt(x, gy + 0.15, z, r, 0.5, plan.color, 1.1, false);
     fx.burstAt(
       x,

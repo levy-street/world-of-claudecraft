@@ -314,7 +314,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Dva pětičlenné týmy. Ukradni nepřátelskou vlajku a dones ji do své tvrze. První, kdo dosáhne 3 zajetí, vyhrává. Spoj se do skupiny až 5 hráčů a jděte do fronty společně; seber Runy zrychlení a proplétej se krytím, abys setřásl(a) pronásledovatele.',
   'hudChrome.bg.queuedParty': 'Skupina: {count}.',
-  'hudChrome.bg.ratingSummary': 'Hodnocení. {wins} výher / {losses} proher',
+  'hudChrome.bg.ratingSummary': 'Hodnocení. {wins} výher / {losses} proher / {draws} remíz',
   'hudChrome.bg.respawnIn': 'Další vlna: obnovení za {seconds}',
   'hudChrome.bg.resultDefeat': 'Porážka',
   'hudChrome.bg.resultDraw': 'Remíza',
@@ -3787,7 +3787,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.arena.playerLevelClassTitle': '{name} - úr. {level} {className}',
   'hud.arena.queueNote':
     'Budeš spárován(a) s online vyzyvatelem s nejbližším hodnocením a teleportován(a) do písku. Vyhraj a stoupni; kdo první povolí (1 zdraví), prohrává. Vrátíš se přesně tam, kde ses zařadil(a) do fronty.',
-  'hud.arena.ratingSummary': 'Hodnocení - {wins} výher / {losses} proher',
+  'hud.arena.ratingSummary': 'Hodnocení - {wins} výher / {losses} proher / {draws} remíz',
   'hud.arena.searching': 'Hledá se protivník... ({count} ve frontě)',
   'hud.arena.statusCountdown': 'Zocel se...',
   'hud.arena.statusFight': 'Bojuj až do povolení!',

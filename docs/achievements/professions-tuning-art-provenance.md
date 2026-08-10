@@ -8,7 +8,9 @@ ClaudeCraft. Most references are project-owned or project-generated. Three
 CraftPix Premium item icons were also supplied as licensed references:
 `simple_fishing_pole` for the two rods, `grubjaw_tusk` for
 `chr_marsh_rares_ii`, and `old_cragmaws_pelt` for `chr_peaks_rares_ii`. The
-CraftPix source-pack lineage remains recorded in `public/ui/items/mapping.json`.
+CraftPix source-pack lineage remains recorded in the historical owner and reference records under
+`docs/achievements/item-art-consistency-2026-08-09/`; the three live icons now belong to that
+replacement batch in `public/ui/items/mapping.json`.
 No unlicensed external or proprietary-game art was used.
 
 The shipping item WebPs and their batch prompts are recorded in

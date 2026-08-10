@@ -374,6 +374,9 @@ describe('i18n Localization Key Coverage', () => {
     cut: 5,
     delta: '+13',
     dps: '7.4',
+    // The third leg of a W-L-D record (hud.arena.ratingSummary), beside
+    // `wins` and `losses` below.
+    draws: 2,
     duration: '15s',
     // The per-unit ask beside a stack's total (itemUi.market.buyConfirmBodyStack);
     // a money string like `money` above, not a bare number.

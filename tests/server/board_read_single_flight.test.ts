@@ -134,7 +134,9 @@ function guildRows(tag: string): GuildLeaderRow[] {
 }
 
 function arenaRows(tag: string): ArenaLeaderRow[] {
-  return [{ name: `${tag}-champ`, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5 }];
+  return [
+    { name: `${tag}-champ`, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5, draws: 0 },
+  ];
 }
 
 function rarityAggregate(): DeedRarityAggregate {

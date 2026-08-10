@@ -909,7 +909,7 @@ export const hudChromeStrings = {
       'Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.',
     modeTag: '5v5 Capture the Flag',
     offlineNote: 'Thornhollow Fields is syncing. The queue opens once the realm answers.',
-    ratingSummary: 'Rating. {wins} wins / {losses} losses',
+    ratingSummary: 'Rating. {wins} wins / {losses} losses / {draws} draws',
     careerCaptures: 'Career captures: {count}',
     enterQueue: 'Enter the Queue',
     enterQueueParty: 'Enter the Queue (party of {count})',
@@ -4350,6 +4350,9 @@ export const hudChromeStrings = {
   // been introduced and a decline must not leak who was opposite.
   bgOffer: {
     title: 'Thornhollow Fields is ready',
+    backfillTitle: 'Thornhollow Fields needs a fighter',
+    backfillBody:
+      'This battle is already under way. You will join the side that is short, and this match will not change your rating.',
     accepted: '{accepted} of {size} ready',
     remaining: '{seconds}s to answer',
     accept: 'Accept',

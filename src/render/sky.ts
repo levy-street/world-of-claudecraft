@@ -451,6 +451,18 @@ export function hasBackdropAssets(biomes: readonly SkyKey[] = ['vale', 'marsh', 
   return biomes.every((biome) => Boolean(backdropStore[biome]));
 }
 
+// Decoded-asset residency for one biome, read directly off BOTH stores.
+// envTexture cannot probe env residency: it falls back to the dome HDR when
+// the env store misses, so a dome-only biome would read non-null there and a
+// caller would PMREM the full-size dome (4x the CubeUV working-target size
+// and blur cost, see envHdriStore above) and cache that wrong prefilter for
+// the session. ensureSkyBiomeAssets starts the dome and env fetches together
+// on every profile that fetches at all, but they settle independently, so
+// residency is both stores non-null.
+function skyBiomeAssetsResident(biome: SkyKey): boolean {
+  return Boolean(hdriStore[biome]) && Boolean(envHdriStore[biome]);
+}
+
 export interface SkyView {
   dome: THREE.Mesh;
   /** cross-fades the HDRI pair toward the biome band the camera is over */
@@ -470,6 +482,9 @@ export interface SkyView {
   envTexture(biome: SkyKey): THREE.DataTexture | null;
   /** Dome-sampled equirect (the visible sky), for prepare-lane GPU upload. */
   domeTexture(biome: SkyKey): THREE.Texture | null;
+  /** Both decoded HDR stores hold this biome (dome + env PMREM source).
+   *  envTexture's dome fallback means it cannot probe env residency. */
+  skyBiomeAssetsResident(biome: SkyKey): boolean;
   /** scene.environmentRotation.y that aligns the IBL sun with the dome's */
   envRotationY(biome: SkyKey): number;
   /** biome cross-fade state at a given camera z (from -> to by t in [0,1]) */
@@ -831,6 +846,7 @@ export function buildSky(
       setStars: () => {},
       envTexture: () => null,
       domeTexture: () => null,
+      skyBiomeAssetsResident,
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
       currentBiomeBlend: () => current,
@@ -939,6 +955,7 @@ export function buildSky(
     domeTexture(biome: SkyKey): THREE.Texture | null {
       return hdriStore[biome] ?? null;
     },
+    skyBiomeAssetsResident,
     envRotationY(biome: SkyKey): number {
       // dome samples at u + off. three r165 negates environmentRotation
       // before building the PMREM lookup matrix ("accommodate left-handed

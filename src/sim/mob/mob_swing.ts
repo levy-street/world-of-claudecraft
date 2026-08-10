@@ -35,7 +35,7 @@ import {
   normAngle,
 } from '../types';
 import { applyBroodBurn } from './dragonkin_brood';
-import { RIFT_CLEAVE_HALF_ARC, riftEscapeWindowActive } from './rift_escape_window';
+import { RIFT_CLEAVE_HALF_ARC, riftControlSuppressed } from './rift_escape_window';
 
 // A "Devour Magic"-strippable beneficial enhancement: a positive buff_* stat
 // buff, a heal-over-time, an absorb shield, or a weapon imbue. Stances, forms,
@@ -510,7 +510,7 @@ export function runMobSwingAffixes(
     target.kind === 'player' &&
     !target.dead &&
     ctx.rng.chance(ensnare.chance) &&
-    !riftEscapeWindowActive(ctx, mob)
+    !riftControlSuppressed(ctx, mob)
   ) {
     ctx.applyRootAura(
       mob,
@@ -533,7 +533,7 @@ export function runMobSwingAffixes(
     !target.dead &&
     ctx.rng.chance(stunOnHit.chance) &&
     // escape window: roll drawn, control effect skipped (see ensnare above)
-    !riftEscapeWindowActive(ctx, mob)
+    !riftControlSuppressed(ctx, mob)
   ) {
     ctx.applyAura(target, {
       id: `stun_${mob.templateId}`,
@@ -559,7 +559,7 @@ export function runMobSwingAffixes(
     !target.dead &&
     ctx.rng.chance(knockback.chance) &&
     // escape window: roll drawn, shove skipped (see ensnare above)
-    !riftEscapeWindowActive(ctx, mob)
+    !riftControlSuppressed(ctx, mob)
   ) {
     // Keep the chance draw unconditional for parity draw-order stability.
     // applyKnockback applies target.knockbackResistance itself, so pass raw distance.
@@ -782,7 +782,7 @@ export function runMobSwingAffixes(
     !mob.dead &&
     !target.dead &&
     ctx.rng.chance(chill.chance) &&
-    !riftEscapeWindowActive(ctx, mob)
+    !riftControlSuppressed(ctx, mob)
   ) {
     ctx.applyAura(target, {
       id: `${mob.templateId}_chill`,
@@ -831,7 +831,7 @@ export function runMobSwingAffixes(
       // (the flee heading), so the escape-window check sits after BOTH draws:
       // a suppressed fear must consume exactly the rng a landed one would.
       const heading = ctx.rng.range(-Math.PI, Math.PI);
-      if (!riftEscapeWindowActive(ctx, mob)) {
+      if (!riftControlSuppressed(ctx, mob)) {
         ctx.applyAura(target, {
           id: 'fear_incap',
           name: dread.name,
@@ -863,7 +863,7 @@ export function runMobSwingAffixes(
     !target.dead &&
     ctx.rng.chance(hex.chance) &&
     // escape window: roll drawn, incap skipped (see ensnare above)
-    !riftEscapeWindowActive(ctx, mob)
+    !riftControlSuppressed(ctx, mob)
   ) {
     const remaining = ctx.diminishedCrowdControlDuration(mob, target, 'polymorph', hex.duration);
     if (remaining !== null) {
@@ -893,7 +893,7 @@ export function runMobSwingAffixes(
     !target.dead &&
     ctx.rng.chance(concuss.chance) &&
     // escape window: roll drawn, stun skipped (see ensnare above)
-    !riftEscapeWindowActive(ctx, mob)
+    !riftControlSuppressed(ctx, mob)
   ) {
     ctx.applyAura(target, {
       id: `concuss_${mob.templateId}`,

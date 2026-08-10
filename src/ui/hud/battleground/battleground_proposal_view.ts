@@ -11,6 +11,8 @@
 import type { BgInfo } from '../../../world_api';
 
 export interface BgProposalPopupView {
+  /** A fresh match, or one seat in a battle already under way (unrated). */
+  kind: 'match' | 'backfill';
   /** Fighters who have accepted, and how many the offer needs. */
   accepted: number;
   size: number;
@@ -31,6 +33,7 @@ export function buildBgProposalPopupView(info: BgInfo | null): BgProposalPopupVi
   const accepted = Math.max(0, Math.min(p.size, p.accepted));
   return {
     accepted,
+    kind: p.kind,
     size: p.size,
     full: accepted >= p.size,
     myResponse: p.myResponse,
@@ -38,6 +41,6 @@ export function buildBgProposalPopupView(info: BgInfo | null): BgProposalPopupVi
     // The countdown is deliberately ABSENT from the signature: it changes every
     // second and would rebuild the whole prompt (and drop a half-pressed button)
     // once per tick if it were part of the structure.
-    sig: JSON.stringify([p.id, p.myResponse, accepted, p.size]),
+    sig: JSON.stringify([p.id, p.kind, p.myResponse, accepted, p.size]),
   };
 }

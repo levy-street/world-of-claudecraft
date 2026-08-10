@@ -14,6 +14,8 @@ export interface ArenaLadderEntry {
   rating: number;
   wins: number;
   losses: number;
+  /** Matches that ended level, the third figure of the W-L-D record. */
+  draws: number;
 }
 
 // Live 2v2 Fiesta state for the local player, polled by the HUD each frame.
@@ -113,6 +115,7 @@ export interface ArenaInfo {
   rating: number;
   wins: number;
   losses: number;
+  draws: number;
   standings: Record<ArenaFormat, ArenaStanding>;
   format: ArenaFormat | null;
   queued: boolean;

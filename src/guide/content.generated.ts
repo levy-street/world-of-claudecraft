@@ -4887,14 +4887,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Banner in Hand",
     "category": "pvp",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_bg_first_capture.webp"
   },
   {
     "id": "pvp_bg_first_win",
     "name": "The Hollow Holds",
     "category": "pvp",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_bg_first_win.webp"
   },
   {
     "id": "pvp_bg_wins_25",
@@ -4902,14 +4904,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Flagbearer"
+    "rewardTitle": "Flagbearer",
+    "crest": "/ui/deeds/pvp_bg_wins_25.webp"
   },
   {
     "id": "pvp_bg_captures_100",
     "name": "A Hundred Banners",
     "category": "pvp",
     "renown": 50,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_bg_captures_100.webp"
   },
   {
     "id": "chr_willowfen_gatherer",
@@ -4964,161 +4968,184 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Clutch Breaker",
     "category": "chronicle",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_drakemaw_broodlord.webp"
   },
   {
     "id": "chr_maw_matriarch",
     "name": "The Sky Goes Quiet",
     "category": "chronicle",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_maw_matriarch.webp"
   },
   {
     "id": "dgn_rift",
     "name": "Riftwalker",
     "category": "dungeon",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_rift.webp"
   },
   {
     "id": "dgn_rift_s_rank",
     "name": "Rift Sovereign",
     "category": "dungeon",
     "renown": 25,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_rift_s_rank.webp"
   },
   {
     "id": "prog_engineering_rare",
     "name": "Precision Engineering",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_engineering_rare.webp"
   },
   {
     "id": "prog_alchemy_rare",
     "name": "A Rare Vintage",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_alchemy_rare.webp"
   },
   {
     "id": "prog_cooking_rare",
     "name": "A Dish to Remember",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_cooking_rare.webp"
   },
   {
     "id": "prog_leatherworking_rare",
     "name": "Fine Tanning",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_leatherworking_rare.webp"
   },
   {
     "id": "prog_tailoring_rare",
     "name": "A Master's Stitch",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_tailoring_rare.webp"
   },
   {
     "id": "prog_weaponcrafting_rare",
     "name": "Tempered to a Shine",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_weaponcrafting_rare.webp"
   },
   {
     "id": "prog_armorcrafting_rare",
     "name": "Plated to Perfection",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_armorcrafting_rare.webp"
   },
   {
     "id": "chr_frostveil_gatherer",
     "name": "Terraced Harvest",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_frostveil_gatherer.webp"
   },
   {
     "id": "chr_frostveil_first_cast",
     "name": "First Ice on the Tarn",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_frostveil_first_cast.webp"
   },
   {
     "id": "chr_amberfall_gatherer",
     "name": "The Amberfall Harvest",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_amberfall_gatherer.webp"
   },
   {
     "id": "chr_amberfall_first_cast",
     "name": "A Catch from the Great Mere",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_amberfall_first_cast.webp"
   },
   {
     "id": "chr_nightbloom_gatherer",
     "name": "The Dreaming Harvest",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_nightbloom_gatherer.webp"
   },
   {
     "id": "chr_nightbloom_first_cast",
     "name": "A Ripple on the Moonwell",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_nightbloom_first_cast.webp"
   },
   {
     "id": "chr_wraithwood_gatherer",
     "name": "Harvest Under the Canopy",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_wraithwood_gatherer.webp"
   },
   {
     "id": "chr_wraithwood_first_cast",
     "name": "A Cast in the Looking-Glass",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_wraithwood_first_cast.webp"
   },
   {
     "id": "chr_palmreach_gatherer",
     "name": "Harvest on the Palmstrand",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_palmreach_gatherer.webp"
   },
   {
     "id": "chr_palmreach_first_cast",
     "name": "Casting the Sapphire Lagoon",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_palmreach_first_cast.webp"
   },
   {
     "id": "chr_evergarden_gatherer",
     "name": "The Parterre's Bounty",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_evergarden_gatherer.webp"
   },
   {
     "id": "chr_evergarden_first_cast",
     "name": "A Cast on the Petal Pond",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_evergarden_first_cast.webp"
   },
   {
     "id": "pvp_honor_sergeant",
@@ -5126,7 +5153,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 10,
     "feat": false,
-    "rewardTitle": "Linebreaker"
+    "rewardTitle": "Linebreaker",
+    "crest": "/ui/deeds/pvp_honor_sergeant.webp"
   },
   {
     "id": "pvp_honor_knight_lieutenant",
@@ -5134,7 +5162,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Fieldreaver"
+    "rewardTitle": "Fieldreaver",
+    "crest": "/ui/deeds/pvp_honor_knight_lieutenant.webp"
   },
   {
     "id": "pvp_honor_field_marshal",
@@ -5142,7 +5171,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "pvp",
     "renown": 50,
     "feat": false,
-    "rewardTitle": "Warcrowned"
+    "rewardTitle": "Warcrowned",
+    "crest": "/ui/deeds/pvp_honor_field_marshal.webp"
   }
 ];
 

@@ -336,7 +336,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Zwei Teams zu fünft. Stehlt das gegnerische Banner und bringt es zu Eurer Festung. Wer zuerst 3 Eroberungen erreicht, gewinnt. Gruppiert Euch zu bis zu 5 und reiht Euch gemeinsam ein; schnappt Euch Sprint-Runen und nutzt die Deckung, um Eure Verfolger abzuschütteln.',
   'hudChrome.bg.queuedParty': 'Gruppe von {count}.',
-  'hudChrome.bg.ratingSummary': 'Wertung. {wins} Siege / {losses} Niederlagen',
+  'hudChrome.bg.ratingSummary':
+    'Wertung. {wins} Siege / {losses} Niederlagen / {draws} Unentschieden',
   'hudChrome.bg.respawnIn': 'Nächste Welle: Wiederbelebung in {seconds}',
   'hudChrome.bg.resultDefeat': 'Niederlage',
   'hudChrome.bg.resultDraw': 'Unentschieden',
@@ -4423,7 +4424,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ihr werdet mit dem online nächstbewerteten Herausforderer gepaart und in den Sand teleportiert. Gewinnt, um aufzusteigen; wer zuerst aufgibt (1 Gesundheit), verliert. Ihr kehrt genau an den Ort zurück, an dem Ihr Euch eingereiht habt.',
   'hud.arena.ladderAllTime': 'Rangliste - gesamt',
   'hud.arena.ladderOnline': 'Rangliste - online',
-  'hud.arena.ratingSummary': 'Wertung - {wins} Siege / {losses} Niederlagen',
+  'hud.arena.ratingSummary':
+    'Wertung - {wins} Siege / {losses} Niederlagen / {draws} Unentschieden',
   'hud.arena.statusCountdown': 'Macht Euch bereit...',
   'hud.arena.statusReturning': 'Rückkehr in die Welt... {seconds}',
   'hud.arena.statusFight': 'Kämpft bis zur Aufgabe!',

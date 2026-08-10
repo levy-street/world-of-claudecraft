@@ -327,7 +327,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.queueNote':
     'Duas equipes de cinco. Roube a bandeira inimiga e leve-a até o seu reduto. A primeira equipe a conquistar 3 capturas vence. Junte-se em grupos de até 5 e entre na fila juntos; pegue Runas de Corrida e use a cobertura do terreno para despistar seus perseguidores.',
   'hudChrome.bg.queuedParty': 'Grupo de {count}.',
-  'hudChrome.bg.ratingSummary': 'Ranque. {wins} vitórias / {losses} derrotas',
+  'hudChrome.bg.ratingSummary': 'Ranque. {wins} vitórias / {losses} derrotas / {draws} empates',
   'hudChrome.bg.respawnIn': 'Próxima onda: reaparecendo em {seconds}',
   'hudChrome.bg.resultDefeat': 'Derrota',
   'hudChrome.bg.resultDraw': 'Empate',
@@ -4345,7 +4345,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Você será pareado com o desafiante online de ranque mais próximo e teleportado para a arena. Vença para subir; o primeiro a ceder (1 de vida) perde. Você retorna exatamente ao local onde entrou na fila.',
   'hud.arena.ladderAllTime': 'Classificação - histórica',
   'hud.arena.ladderOnline': 'Classificação - online',
-  'hud.arena.ratingSummary': 'Ranque - {wins} vitórias / {losses} derrotas',
+  'hud.arena.ratingSummary': 'Ranque - {wins} vitórias / {losses} derrotas / {draws} empates',
   'hud.arena.statusCountdown': 'Prepare-se...',
   'hud.arena.statusReturning': 'Voltando ao mundo... {seconds}',
   'hud.arena.statusFight': 'Lute até a rendição!',

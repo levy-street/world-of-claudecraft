@@ -248,6 +248,9 @@ export interface ArenaStanding {
   rating: number;
   wins: number;
   losses: number;
+  /** Matches that ended level. Counted since the W-L-D record change; a
+   *  character who drew before it always reads 0, never a wrong number. */
+  draws: number;
 }
 
 export interface ArenaCombatant {
@@ -5642,6 +5645,12 @@ export type SimEvent = { pid?: number } & (
       radius: number;
       durationSecs: number;
     }
+  // The sim cancelled every pending death zone before its fuse ran out (boss
+  // death, boss evade, or floor teardown). Online mirrors count zones down
+  // locally from riftDeathZoneSpawn, so without this they would keep drawing a
+  // phantom "about to detonate" telegraph for the rest of the fuse. Personal
+  // (pid = each instance member) so delivery never depends on interest radius.
+  | { type: 'riftDeathZoneClear'; pid: number }
   // Trend nudge (Professions 2.0): a soft, at-most-once-per-window
   // reminder that an unattuned crafter's skills are leaning toward an adjacent
   // pair (professions/prof_nudges.ts). Personal (pid = the crafter) and

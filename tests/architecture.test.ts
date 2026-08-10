@@ -202,6 +202,7 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/aura_icon_view.ts',
   'src/ui/aura_overlay_view.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
@@ -321,6 +322,7 @@ const UI_PURE_CORES = [
   'src/ui/map_open_sea_edge_core.ts',
   'src/ui/map_quest_list_view.ts',
   'src/ui/arena_window_view.ts',
+  'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
@@ -440,6 +442,7 @@ const RENDER_PURE_CORES = [
   'src/render/dashed_ring_core.ts',
   'src/render/detail_horizon_core.ts',
   'src/render/drape_lod_core.ts',
+  'src/render/weapon_vfx_emissive_cache_core.ts',
   'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
@@ -456,6 +459,7 @@ const RENDER_PURE_CORES = [
   'src/render/env_prefilter_core.ts',
   'src/render/environment_transition_core.ts',
   'src/render/ground_tilt_core.ts',
+  'src/render/grass_build_slicer_core.ts',
   'src/render/grass_cap_collapse_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
@@ -476,6 +480,7 @@ const RENDER_PURE_CORES = [
   'src/render/prop_cell_core.ts',
   'src/render/race_line_core.ts',
   'src/render/renderer_frame_telemetry_core.ts',
+  'src/render/rift_death_zone_core.ts',
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
   'src/render/shadow_pass_gate_core.ts',
@@ -508,6 +513,7 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_emissive_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/characters/skeleton_update_core.ts',
+  'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
