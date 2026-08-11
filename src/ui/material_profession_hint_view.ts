@@ -25,35 +25,54 @@ import { craftIdsForMaterialItem } from '../sim/material_profession_affinity';
 import { MATERIAL_ITEM_IDS } from '../sim/material_taxonomy';
 import { cookingCatchHintKey } from './cooking_catch_hint_view';
 import { craftNameKey } from './craft_name_view';
-import { formatList, t } from './i18n';
+import { type TranslationKey, formatList, t } from './i18n';
 import { materialHintKey } from './material_hint_view';
+
+/**
+ * The material-hint keys whose lead sentence NAMES a craft ("Enchanting
+ * reagent. ..."), so the sentence can fully answer "what profession is this
+ * for" on its own while that craft is the sole consumer. An EXPLICIT
+ * allowlist, not an exclusion: the craft-free leads (fineGrade's grade
+ * sentence, and the craft-neutral "Crafting reagent." that arcaneDust and
+ * arcaneEssence adopted with the jewelcrafting base catalog) must never
+ * supersede the Used-by line, even for a hypothetical single-craft consumer
+ * set, or the tooltip would name no craft at all. Rewording a hint's lead
+ * changes membership HERE in the same change; an unlisted key defaults to
+ * never-supersedes, the safe side. Key literals are type-safe against the
+ * generated TranslationKey union, so a renamed key is a tsc error.
+ */
+const CRAFT_NAMING_HINT_KEYS: ReadonlySet<TranslationKey> = new Set<TranslationKey>([
+  'hudChrome.materialHint.arcaneShard',
+  'hudChrome.materialHint.resonantThread',
+  'hudChrome.materialHint.resonantHide',
+  'hudChrome.materialHint.resonantLinks',
+  'hudChrome.materialHint.resonantSteel',
+  'hudChrome.materialHint.resonantTimber',
+]);
 
 /**
  * Whether this material already has a more specific purpose sentence that
  * fully answers "what profession is this for", so the generic Used-by line
- * would only repeat it.
+ * would only repeat it. Exported for the decisiveness pin (the latent
+ * single-craft cases never occur in live content while dust and essence feed
+ * two crafts, so only a direct call can hold them).
  */
-function hasSupersedingPurposeHint(itemId: string, craftIds: readonly string[]): boolean {
+export function hasSupersedingPurposeHint(
+  itemId: string,
+  craftIds: readonly string[],
+): boolean {
   // Raw cooking catch: "Cooking ingredient. Must be cooked before eating."
   // covers the single-craft cooking case. Multi-craft catches still need
   // Used-by so Engineering (etc.) is not invisible beside the cooking line.
   if (cookingCatchHintKey(itemId) !== undefined) {
     return craftIds.length === 1 && craftIds[0] === 'cooking';
   }
-  // The arcane/resonant materials lead with an enchanting-reagent sentence.
-  // That sentence answers the whole question only while enchanting is the
-  // SOLE consumer, which is what the single-craft test below decides: once a
-  // second craft consumes one (arcane_dust and arcane_essence now feed the
-  // jewelcrafting base catalog as well), the lead line covers half the answer
-  // and the Used-by line has to render so the other craft is not hidden.
-  // MATERIAL_HINT_KEYS also holds the nine fine
-  // grades sharing the fineGrade key, but that sentence names NO craft, so a
-  // fine grade never supersedes: even a hypothetical enchanting-only fine
-  // grade still needs its Used-by line. The key literal below is type-safe,
-  // not stringly: TranslationKey is the generated catalog union, so a renamed
-  // fineGrade key turns this comparison into a tsc no-overlap error.
+  // A material hint supersedes only when its lead sentence names the craft
+  // AND that craft is the sole consumer (CRAFT_NAMING_HINT_KEYS above). Once
+  // a second craft consumes one, the lead covers half the answer and the
+  // Used-by line has to render so the other craft is not hidden.
   const hintKey = materialHintKey(itemId);
-  if (hintKey !== undefined && hintKey !== 'hudChrome.materialHint.fineGrade') {
+  if (hintKey !== undefined && CRAFT_NAMING_HINT_KEYS.has(hintKey)) {
     return craftIds.length === 1 && craftIds[0] === 'enchanting';
   }
   return false;

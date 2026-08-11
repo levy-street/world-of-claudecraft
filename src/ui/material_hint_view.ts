@@ -1,4 +1,5 @@
-// Purpose hints for the enchanting materials (a data-driven tooltip line).
+// Purpose hints for the arcane/resonant crafting materials (a data-driven
+// tooltip line).
 // The eight arcane/resonant materials are kind 'junk' with no def-level use,
 // so their tooltips said nothing about what they are for or where they come
 // from: a player holding Resonant Timber had no in-game way to learn it is an
@@ -20,6 +21,11 @@
 // DISENCHANT_MATERIAL_BY_QUALITY (src/sim/professions/enchanting.ts) for the
 // three arcane tiers, and ARMOR_SECONDARY_BY_TYPE / TIMBER_WEAPON_TYPES
 // (src/sim/professions/disenchant_reagents.ts) for the five resonants.
+// Since the jewelcrafting base catalog, arcane_dust and arcane_essence feed
+// TWO crafts, so their leads read craft-neutral ("Crafting reagent."); the
+// craft list itself is material_profession_hint_view's Used-by line, and a
+// craft-free lead never supersedes that line (see the explicit craft-naming
+// set there).
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 

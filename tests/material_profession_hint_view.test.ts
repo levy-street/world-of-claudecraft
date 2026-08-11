@@ -15,7 +15,10 @@ import { baseMaterialFor } from '../src/sim/professions/material_grades';
 import { Hud } from '../src/ui/hud';
 import { setLanguage } from '../src/ui/i18n';
 import { itemKindLabel } from '../src/ui/item_kind_label';
-import { materialProfessionHintText } from '../src/ui/material_profession_hint_view';
+import {
+  hasSupersedingPurposeHint,
+  materialProfessionHintText,
+} from '../src/ui/material_profession_hint_view';
 
 function tooltipHtml(itemId: string): string {
   const h = Object.create(Hud.prototype) as unknown as {
@@ -99,6 +102,24 @@ describe('materialProfessionHintText', () => {
     // counterpart pin for the === 'enchanting' comparison in
     // hasSupersedingPurposeHint: dropping it would silently blank this line.
     expect(materialProfessionHintText('fine_ironbark_log')).toBe('Used by Weaponcrafting.');
+  });
+
+  it('a craft-free hint lead never supersedes, even for a single-craft consumer set', () => {
+    // Direct-predicate pins for the LATENT single-craft cases live content
+    // cannot reach while dust and essence feed two crafts: if either ever
+    // drops back to an enchanting-only consumer set, its craft-neutral
+    // "Crafting reagent." lead names no craft, so the Used-by line must still
+    // render (the fineGrade doctrine). Under the old exclusion-shaped check
+    // both rows below returned true and blanked the tooltip's craft name.
+    expect(hasSupersedingPurposeHint('arcane_dust', ['enchanting'])).toBe(false);
+    expect(hasSupersedingPurposeHint('arcane_essence', ['enchanting'])).toBe(false);
+    expect(hasSupersedingPurposeHint('fine_copper_ore', ['enchanting'])).toBe(false);
+    // Positive controls prove the supersede arm itself is live: a craft-NAMING
+    // lead ("Enchanting reagent.") with a sole enchanting consumer supersedes,
+    // and the same lead with a second consumer does not.
+    expect(hasSupersedingPurposeHint('arcane_shard', ['enchanting'])).toBe(true);
+    expect(hasSupersedingPurposeHint('resonant_timber', ['enchanting'])).toBe(true);
+    expect(hasSupersedingPurposeHint('arcane_shard', ['enchanting', 'jewelcrafting'])).toBe(false);
   });
 
   it('fine grades name every craft beside the Fine grade purpose line, in ring order', () => {
