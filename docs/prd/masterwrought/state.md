@@ -1591,3 +1591,18 @@ Grandmaster-craft family, generic by construction.
   release fill must treat it as such, not as the four wave 3 keys only. RECORDED, no
   change: defaultHobbyForPair's contentSet stays a prose-guarded test-only parameter (a
   type-system-enforced seam would be an API redesign out of fix-round scope).
+- PHASE 06 GATE CLOSE (2026-08-11): gate_select TURBO_FORCE=1 PASS, all 8 steps green at
+  tip 3c732e20d6 via the full-suite fallback (2659 files / 36697 passed, browser suite,
+  tsc, all builds), tree clean. Two tip-level catches on the way: the portrait source
+  manifest went stale AGAIN at the phase tip (content commits move the stills bundle
+  graph; a content phase re-mints at its FINAL tip, not only at the sync; rerender was
+  byte-identical, fingerprint rows only), and guide.professions.comingSoon joined
+  LIVE_OFF_SWEEP_KEYS (no live surface renders it with every seat content-bearing; the
+  synthetic-seat arm keeps it exercised). HANDOFF for Phase 06 QA
+  (phase-06-qa.md, fresh session): sync the release first per the delivery contract;
+  the queued rulings are (1) scroll cost parity vs the pristine_venom_gland sink,
+  (2) tome GLBs vs the model-less debt, (3) prog_ringwright design, plus the recorded
+  correct-by-derivation flips to re-judge (Bombardier hobby, apothecary two-craft train
+  view, dev-kit caster offhand pick) and the deferred bags_view hover-hint family gap;
+  the validation surface is the suite list in this ledger plus the four reviewer
+  reports' verified-clean sections.
