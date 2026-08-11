@@ -363,7 +363,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 341, total: 341 });
+    expect(full).toEqual({ owned: 342, total: 342 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -374,7 +374,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers and the
     // jewelcrafting masterwork mark; marks are character-scoped, so this trails
     // the overview by the 29 account-scoped weapon skins).
-    expect(character).toEqual({ owned: 312, total: 312 });
+    expect(character).toEqual({ owned: 313, total: 313 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -396,7 +396,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(376);
+    ).toBe(377);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, and masterwork:jewelcrafting.
     expect(
@@ -2523,7 +2523,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles.
-  horizons_titles: 40,
+  horizons_titles: 41,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.

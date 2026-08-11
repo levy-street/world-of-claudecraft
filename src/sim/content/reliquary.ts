@@ -424,6 +424,9 @@ export const RELIQUARY_HORIZON_TITLES = [
   'col_reliquary_illum_nythraxis_heroic',
   'col_reliquary_illum_thunzharr',
   'col_reliquary_illum_gravewyrm_heroic',
+  // Grandmaster Jewelcrafting (Masterwrought phase 05 QA ruling): the ninth
+  // per-craft grandmaster title pages here per the locked titles-page rule.
+  'prog_grandmaster_jewelcrafting',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
