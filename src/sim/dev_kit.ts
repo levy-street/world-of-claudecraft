@@ -207,15 +207,35 @@ function isTwoHanded(item: ItemDef): boolean {
   return item.kind === 'weapon' && weaponHand(item) === 'twohand';
 }
 
-// Deterministic argmax: ties break on id so the same spec always yields the same set.
+// Deterministic argmax: ties break on id so the same spec always yields the
+// same set. A tie is judged inside a RELATIVE epsilon band, never by exact
+// equality: roleItemScore sums float products, so two candidates that tie in
+// real arithmetic (the rung-25 str ring vs the rung-50 int loop, both exactly
+// 1.8 for the PHYS camps) can differ by one ulp depending on term order, and
+// an exact compare turns that rounding accident into the winner, silently
+// flipping picks on any rounding-equivalent scorer refactor (phase 05 QA
+// mutation probe). Within the band the id tiebreak decides, which is stable.
+const SCORE_TIE_EPSILON = 1e-9;
+
 function bestBy(items: readonly ItemDef[], score: (item: ItemDef) => number): ItemDef | null {
   let best: ItemDef | null = null;
   let bestScore = Number.NEGATIVE_INFINITY;
   for (const item of items) {
     const value = score(item);
-    if (value > bestScore || (value === bestScore && best !== null && item.id < best.id)) {
+    if (best === null) {
       best = item;
       bestScore = value;
+      continue;
+    }
+    const band = SCORE_TIE_EPSILON * Math.max(1, Math.abs(value), Math.abs(bestScore));
+    if (value > bestScore + band) {
+      best = item;
+      bestScore = value;
+    } else if (value >= bestScore - band && item.id < best.id) {
+      // In-band tie: the smaller id wins; the band stays anchored to the
+      // highest score seen so a chain of near-ties cannot drift it downward.
+      best = item;
+      if (value > bestScore) bestScore = value;
     }
   }
   return best;

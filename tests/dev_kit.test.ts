@@ -215,16 +215,28 @@ describe('kit construction', () => {
     // iron_link_choker (agi 3, sta 1) on stamina alone, so even a pure-intellect
     // caster scoring its agility at zero still takes it.
     const NECK = 'burnished_thorium_amulet';
-    // Strength and agility roles: the rung-50 str ring, then the rung-25 str ring.
-    const PHYSICAL_RINGS = ['weighted_thorium_band', 'riveted_iron_signet'] as const;
+    // Strength-led roles: the rung-50 str ring, then the rung-25 str ring
+    // outright (str 3 at full weight clears the int loop's 3 stamina with no
+    // tie in sight).
+    const STR_RINGS = ['weighted_thorium_band', 'riveted_iron_signet'] as const;
+    // Agility-led roles: the rung-50 str ring first, then a REAL TIE for
+    // ring2. The rung-25 str ring (str 3 x 0.4 + sta 1 x 0.6) and the rung-50
+    // int ring (sta 3 x 0.6) both score exactly 1.8 in real arithmetic; only
+    // IEEE754 product rounding ever separated them, so bestBy's epsilon band
+    // hands the pick to the id tiebreak and gleaming_thorium_loop ('g' < 'r')
+    // is the stable, documented winner. A pick that moves here means either a
+    // weights retune (admit it) or the tie band broke (fix bestBy).
+    const AGI_RINGS = ['weighted_thorium_band', 'gleaming_thorium_loop'] as const;
     // Intellect roles: the rung-50 int ring, then the rung-25 int ring.
     const CASTER_RINGS = ['gleaming_thorium_loop', 'etched_iron_loop'] as const;
-    const PHYSICAL_SPECS = [
+    const STR_SPECS = [
       'warrior/arms',
       'warrior/fury',
       'warrior/prot',
       'paladin/protection',
       'paladin/retribution',
+    ];
+    const AGI_SPECS = [
       'hunter/beast_mastery',
       'hunter/marksmanship',
       'hunter/survival',
@@ -249,15 +261,18 @@ describe('kit construction', () => {
       'druid/balance',
       'druid/restoration',
     ];
-    // druid/feral belongs to neither camp and is not a mistake. It is the one TANK_AGI
-    // role, and stamina leads outright there (sta 1.0), so after the str ring it takes
-    // the rung-50 INT ring for its 3 stamina rather than the rung-25 str ring: 3.0
-    // against 1.9. A tank wearing an intellect ring looks wrong and is the scorer
-    // working as designed.
+    // druid/feral wears the same pair as the agility camp but for a different
+    // reason, and it is not a mistake. It is the one TANK_AGI role, and
+    // stamina leads outright there (sta 1.0), so after the str ring it takes
+    // the rung-50 INT ring for its 3 stamina rather than the rung-25 str
+    // ring: 3.0 against 1.9, a real score gap, not the epsilon tie above. A
+    // tank wearing an intellect ring looks wrong and is the scorer working as
+    // designed.
     const FERAL_RINGS = ['weighted_thorium_band', 'gleaming_thorium_loop'] as const;
 
     const expected = new Map<string, readonly [string, string]>();
-    for (const key of PHYSICAL_SPECS) expected.set(key, PHYSICAL_RINGS);
+    for (const key of STR_SPECS) expected.set(key, STR_RINGS);
+    for (const key of AGI_SPECS) expected.set(key, AGI_RINGS);
     for (const key of CASTER_SPECS) expected.set(key, CASTER_RINGS);
     expected.set('druid/feral', FERAL_RINGS);
     // Cross-check against the role table, so a spec added there without a row here
