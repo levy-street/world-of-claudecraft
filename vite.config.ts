@@ -541,6 +541,16 @@ export default defineConfig({
     // headroom for the current world size; deliberately long walkers keep their
     // own explicit budgets.
     testTimeout: 20000,
+    // Hooks were left on vitest's 10s default when testTimeout was raised, and
+    // hooks scale with content faster than tests do: guide_key_coverage's
+    // beforeAll renders every guide route plus chrome, head, search index, and
+    // nav aids, and after the v0.36.0 guide expansion it runs 9.7-9.9s under
+    // full-suite parallel load - straddling the default. When it tips over,
+    // all of the suite's tests silently skip and the suite fails with a bare
+    // "Hook timed out", which reads as a product regression to any gate
+    // comparing failed-test identities. 60s keeps a genuinely hung hook
+    // bounded while leaving room for the guide to keep growing.
+    hookTimeout: 60000,
     // Phase 4 local-gate-perf: persist Vite module transform cache across runs
     // (Vitest 4.1 experimental.fsModuleCache). Default path is under
     // node_modules/.experimental-vitest-cache (gitignored via node_modules/).
