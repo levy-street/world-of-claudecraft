@@ -893,6 +893,14 @@ export const zh_CN: EnTranslations = {
       "notNow": "暂不",
       "update": "更新"
     },
+    "otaUpdate": {
+      "title": "游戏更新",
+      "downloading": "正在下载更新：{percent}",
+      "applying": "更新已下载。正在重新启动游戏以应用更新。",
+      "incompatible": "需要更新后才能进行游戏。下载完成后将立即应用。",
+      "continueAnyway": "暂不更新，继续游戏",
+      "progressLabel": "更新下载进度"
+    },
     "cameraPrompt": {
       "title": "选择你的镜头",
       "intro": "选择镜头跟随角色的方式。",

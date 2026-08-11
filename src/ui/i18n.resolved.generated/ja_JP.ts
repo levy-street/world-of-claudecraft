@@ -893,6 +893,14 @@ export const ja_JP: EnTranslations = {
       "notNow": "後で",
       "update": "更新"
     },
+    "otaUpdate": {
+      "title": "ゲームアップデート",
+      "downloading": "アップデートをダウンロード中：{percent}",
+      "applying": "アップデートをダウンロードしました。適用のためゲームを再起動しています。",
+      "incompatible": "プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。",
+      "continueAnyway": "更新せずに続行",
+      "progressLabel": "アップデートのダウンロード進行状況"
+    },
     "cameraPrompt": {
       "title": "カメラを選択",
       "intro": "カメラがキャラクターを追う方法を選びましょう。",

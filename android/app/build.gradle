@@ -18,7 +18,7 @@ android {
         applicationId "com.worldofclaudecraft"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 40
+        versionCode 41
         versionName "0.36.0"
         buildConfigField "long", "PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER", "${playIntegrityCloudProjectNumber}L"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -38,6 +38,13 @@ android {
             buildConfigField "String", "SOLANA_MOBILE_DISTRIBUTION", '"solana-dapp-store"'
         }
     }
+    // The heavy web assets (public/media, public/audio) ride in the
+    // install-time asset pack so the Play base module stays under Google
+    // Play's 500 MB compressed-download cap (the relocation task below moves
+    // them per build shape; docs/mobile-store-release.md has the sizing
+    // recipe). Asset packs only exist in AABs; APK builds get the assets
+    // moved back into the base automatically.
+    assetPacks = [":woc_media_pack"]
     buildTypes {
         release {
             minifyEnabled false
@@ -82,3 +89,74 @@ try {
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
+
+// ---------------------------------------------------------------------------
+// Install-time asset pack relocation (Play 500 MB base-module cap).
+//
+// `npx cap sync` always copies the WHOLE dist/ into app/src/main/assets/public
+// (the base module, and the authoritative copy right after a sync), so the
+// split into the woc_media_pack module is re-derived per build:
+// - bundle* builds (the Play AAB): public/media and public/audio MOVE into the
+//   asset pack, keeping the base module far under the cap; Play delivers the
+//   pack with the install and Capacitor reads it through the same AssetManager.
+//   They must NOT remain in the base too, or the base would carry them a second
+//   time and blow the cap.
+// - every other build (debug APKs, the solanaStore release APK): the base is
+//   authoritative. If a prior bundle build moved the dirs out, they are moved
+//   BACK from the pack (asset packs only exist in AABs, so an APK without them
+//   is broken); but if the base already has them (a fresh cap sync), the pack
+//   copy is STALE and is discarded, never moved over the fresh base copy.
+// The moves are same-volume renames (instant), so alternating bundle and
+// assemble builds always converge on the shape the requested build needs.
+// ---------------------------------------------------------------------------
+def heavyAssetDirs = ['media', 'audio']
+def baseAssetsRoot = file('src/main/assets/public')
+def packAssetsRoot = file('../woc_media_pack/src/main/assets/public')
+
+def moveAssetDir = { File from, File to, String label ->
+    project.delete(to)
+    to.parentFile.mkdirs()
+    if (!from.renameTo(to)) {
+        throw new GradleException("asset pack relocation failed: ${from} -> ${to}")
+    }
+    logger.lifecycle("asset pack: moved ${from.name} to ${label}")
+}
+
+tasks.register('relocateHeavyWebAssets') {
+    doLast {
+        def wantsBundle = gradle.startParameter.taskNames.any {
+            it.toLowerCase().contains('bundle')
+        }
+        heavyAssetDirs.each { name ->
+            def base = new File(baseAssetsRoot, name)
+            def pack = new File(packAssetsRoot, name)
+            if (wantsBundle) {
+                // Assets belong in the pack. Base copy wins (freshest after a
+                // sync); if base lacks them a prior bundle build already moved
+                // them, so leave them in the pack.
+                if (base.exists()) {
+                    moveAssetDir(base, pack, 'woc_media_pack')
+                } else if (!pack.exists() && baseAssetsRoot.exists()) {
+                    throw new GradleException(
+                        "asset pack relocation: ${name} missing from both the base assets and the pack; re-run npx cap sync"
+                    )
+                }
+            } else {
+                // Assets belong in the base. If the base already has them
+                // (fresh sync), the pack copy is stale: discard it, never move
+                // it over the fresh base copy. Only restore from the pack when
+                // the base was emptied by a prior bundle build.
+                if (base.exists()) {
+                    project.delete(pack)
+                } else if (pack.exists()) {
+                    moveAssetDir(pack, base, 'base module')
+                } else if (baseAssetsRoot.exists()) {
+                    throw new GradleException(
+                        "asset pack relocation: ${name} missing from both the base assets and the pack; re-run npx cap sync"
+                    )
+                }
+            }
+        }
+    }
+}
+preBuild.dependsOn tasks.named('relocateHeavyWebAssets')

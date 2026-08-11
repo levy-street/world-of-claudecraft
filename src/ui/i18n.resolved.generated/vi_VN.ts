@@ -893,6 +893,14 @@ export const vi_VN: EnTranslations = {
       "notNow": "Không phải bây giờ",
       "update": "Cập Nhật"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Chọn Máy Ảnh Của Bạn",
       "intro": "Chọn cách máy ảnh theo dõi nhân vật của bạn.",

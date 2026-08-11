@@ -893,6 +893,14 @@ export const de_DE: EnTranslations = {
       "notNow": "Jetzt nicht",
       "update": "Aktualisieren"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Kamera wahlen",
       "intro": "Waehle, wie die Kamera deinem Charakter folgt.",

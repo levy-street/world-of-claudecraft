@@ -893,6 +893,14 @@ export const sv_SE: EnTranslations = {
       "notNow": "Inte nu",
       "update": "Uppdatera"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Välj din kamera",
       "intro": "Välj hur kameran följer din karaktär.",

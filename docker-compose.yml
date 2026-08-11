@@ -111,6 +111,7 @@ services:
       # answers "no update" and the native apps keep their current bundle. Must
       # be https, and must share its origin with the bundle URLs inside it.
       OTA_MANIFEST_URL: ${OTA_MANIFEST_URL:-}
+      OTA_DELTA_DISABLED: ${OTA_DELTA_DISABLED:-}
       # Runtime: bearer token that gates GET /metrics (server/http/health.ts).
       # Empty (unset) leaves the endpoint feature-off (404); a non-empty value
       # turns it on behind Authorization: Bearer <token>. Set on the host .env by

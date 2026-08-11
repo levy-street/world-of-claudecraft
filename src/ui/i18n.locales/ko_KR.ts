@@ -7692,6 +7692,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     'World of ClaudeCraft 버전 {version}을(를) 사용할 수 있습니다. 지금 업데이트하여 최신 수정 사항과 개선 사항을 받으세요.',
   'hudChrome.nativeUpdate.notNow': '나중에',
   'hudChrome.nativeUpdate.update': '업데이트',
+  'hudChrome.otaUpdate.title': '게임 업데이트',
+  'hudChrome.otaUpdate.downloading': '업데이트 다운로드 중: {percent}',
+  'hudChrome.otaUpdate.applying': '업데이트를 다운로드했습니다. 적용을 위해 게임을 다시 시작합니다.',
+  'hudChrome.otaUpdate.incompatible':
+    '플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.',
+  'hudChrome.otaUpdate.continueAnyway': '업데이트하지 않고 계속',
+  'hudChrome.otaUpdate.progressLabel': '업데이트 다운로드 진행률',
   'hudChrome.cameraPrompt.title': '카메라 선택',
   'hudChrome.cameraPrompt.intro': '카메라가 캐릭터를 따라가는 방식을 선택하세요.',
   'hudChrome.cameraPrompt.mouseDesc': '버튼을 누르지 않고 마우스를 움직여 시점을 돌립니다.',

@@ -4847,6 +4847,27 @@
     color: #ffe6a8;
   }
 
+  /* OTA update gate (src/ui/ota_update_overlay.ts): the native-update dialog
+     family plus a download progress bar driven by the updater plugin. */
+  .ota-update-progress {
+    margin-top: 12px;
+    height: 12px;
+    border: 1px solid #5a4413;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+  }
+  .ota-update-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+  }
+  @media (pointer: coarse) {
+    .ota-update-dialog .native-update-actions .btn {
+      min-height: 40px;
+    }
+  }
+
   /* ---------- first-run camera mode prompt ---------- */
   .camera-prompt-backdrop {
     position: fixed;

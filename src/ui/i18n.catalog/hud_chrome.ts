@@ -627,6 +627,17 @@ export const hudChromeStrings = {
     notNow: 'Not now',
     update: 'Update',
   },
+  // The visible OTA gate (src/ui/ota_update_overlay.ts + net/ota_update_gate):
+  // in-app bundle downloads, distinct from the store-update prompt above.
+  otaUpdate: {
+    title: 'Game Update',
+    downloading: 'Downloading update: {percent}',
+    applying: 'Update downloaded. Restarting the game to apply it.',
+    incompatible:
+      'An update is required to play. It will be applied as soon as it finishes downloading.',
+    continueAnyway: 'Continue without updating',
+    progressLabel: 'Update download progress',
+  },
   // First-run camera-mode prompt (issue #1727): a one-shot modal on the first world
   // entry in a browser, offering Classic vs Mouse Camera. The mouse option title
   // reuses hud.options.mouseCamera; these are the surrounding strings. The setting

@@ -15,30 +15,60 @@ The plugin itself is MPL-2.0; self-hosting is a documented, supported mode.
 ## How the pieces fit
 
 1. `scripts/ota/publish_bundle.mjs` (`npm run ota:publish`) builds the NATIVE
-   web bundle (`npm run build:native`), zips `dist/`, uploads it to
+   web bundle (`npm run build:native`), zips `dist/`, and uploads THREE kinds
+   of artifact: the zip to
    `s3://$OTA_S3_BUCKET/<prefix>/bundles/wocc-web-<version>.zip` (immutable,
-   never overwritten without `--force`), and re-points
-   `<prefix>/latest.json` at it (version, public zip URL, sha256 checksum,
-   optional `minNativeVersion`).
+   never overwritten without `--force`); one content-addressed blob per unique
+   dist file under `<prefix>/files/<sha256>` (via `aws s3 sync`, so a blob
+   already in the bucket is never re-uploaded and an incremental publish moves
+   only what changed); and the immutable per-file manifest document
+   `<prefix>/manifests/wocc-web-<version>.manifest.json` (one
+   `{ file_name, file_hash, download_url }` entry per dist file). It then
+   re-points `<prefix>/latest.json` at all of it (version, public zip URL,
+   sha256 checksum, `fileManifestUrl`, optional `minNativeVersion`).
 2. `server/ota_updates.ts` (`POST /api/ota/updates`, registry RouteDef) is the
    Capgo self-hosted update-check endpoint. It reads `latest.json` from
    `OTA_MANIFEST_URL` through a 60 s single-flight cache, compares the
    manifest against the device's reported bundle/native versions, and answers
-   either `{ version, url, checksum }` or the plugin's documented no-update
-   body. `OTA_MANIFEST_URL` unset (or not https) keeps the whole feature dark
-   (always "no update"). Manifest validation is strict and fail-closed: the
-   bundle URL must be https AND live on the manifest's own origin (so a write
-   into the manifest alone can never redirect installs to another host), the
-   sha256 checksum is required, and any malformed field disables updates
-   rather than serving an offer with a gate dropped.
+   either an offer or the plugin's documented no-update body. An offer is
+   `{ version, url, checksum }` plus, when `latest.json` advertises a
+   `fileManifestUrl`, the embedded `manifest` entry list (read through its own
+   60 s cached read and serialized once per version, never per request).
+   `OTA_MANIFEST_URL` unset (or not https) keeps the whole feature dark
+   (always "no update"). Validation is strict and fail-closed: the bundle URL
+   and `fileManifestUrl` must be https AND live on the manifest's own origin
+   (so a write into the manifest alone can never redirect installs to another
+   host), the sha256 checksum is required, and any malformed `latest.json`
+   field disables updates rather than serving an offer with a gate dropped.
+   The per-file entry list is all-or-nothing: one malformed entry (a traversal
+   path, a bad hash, an off-origin URL) drops the WHOLE list and the offer
+   degrades to the proven zip, never to a partially validated file list.
 3. `capacitor.config.ts` points the plugin at that endpoint with
    `autoUpdate: true`: the native side checks on launch/foreground (at most
    every 10 minutes), downloads the zip straight from S3/CDN in the
-   background, and applies it on the next backgrounding.
+   background, and applies it on the next backgrounding (unless the visible
+   gate in step 5 pulls the apply forward).
 4. `src/net/native_ota.ts` calls `CapacitorUpdater.notifyAppReady()` once at
    boot (`src/main.ts`). A bundle that never confirms within the plugin's
    ready timeout is rolled back to the previous bundle automatically; that is
-   the crash-safety net, do not remove the call.
+   the crash-safety net, do not remove the call. The same module carries the
+   other two duck-typed plugin calls the gate uses: `watchOtaUpdates`
+   (download progress/complete/failed listeners) and `applyPendingOtaUpdate`
+   (the plugin's `reload()`, an immediate WebView-reload apply).
+5. **The visible update gate.** `src/net/ota_update_gate.ts` (wired in
+   `src/main.ts`, painted by `src/ui/ota_update_overlay.ts`) turns the silent
+   default into a visible flow on the shells. Pre-world, a running download
+   shows a modal with live percent progress and a "continue without
+   updating" escape; when the download completes and the player has neither
+   dismissed the modal nor entered the world, the staged bundle is applied
+   immediately via `reload()` instead of waiting for a backgrounding. When
+   the server rejects a stale bundle's world-layout epoch
+   (`ONLINE_WORLD_INCOMPATIBLE_MESSAGE`) while a download is in flight or
+   staged, the gate replaces the dead-end fatal overlay: progress, then
+   auto-apply, and the resume marker survives so the reload lands back in the
+   world on the new bundle. In-world sessions are never interrupted: the
+   overlay stays hidden and the apply falls back to the plugin's
+   apply-on-background behavior.
 
 Bandwidth economics: the update CHECK is a tiny JSON POST against the game
 server; the heavy zip download is served by the bundle host, so game-server
@@ -46,18 +76,26 @@ bandwidth is untouched and there are no per-GB plugin-vendor fees. The host is
 Cloudflare R2 (zero egress fees), which is load-bearing rather than a
 preference, because of the payload size below.
 
-**Payload size, read this before promising fast fixes.** `webDir` is `dist` and
-nothing trims assets for a native build (`VITE_NATIVE_APP` only flips runtime
-flags), so a bundle is the WHOLE `dist`: about 876 MB on v0.32.1, of which only
-`dist/assets` (~29 MB) is JS and CSS. The rest is media (~296 MB), audio
-(~187 MB), env/HDRIs (~162 MB), and models (~95 MB). Self-hosted mode has no
-differential updates, so every publish pushes the full zip to every device.
-Consequences: on R2 the egress cost is zero (the same traffic on CloudFront
-would run to roughly $680 per publish at 10k installs), but a ~800 MB
-background download over cellular is still a poor deal for players and will
-sometimes not finish. Serving `public/` media from the CDN at runtime so a
-bundle carries only `dist/assets` is the follow-up that makes "a fix in minutes"
-literally true; until then, prefer OTA for genuine fixes, not routine content.
+**Payload size and the differential channel.** `webDir` is `dist` and nothing
+trims assets for a native build (`VITE_NATIVE_APP` only flips runtime flags),
+so a BUNDLE is the whole `dist` (hundreds of MB, of which only `dist/assets`,
+tens of MB, is JS and CSS). What a DEVICE downloads is much smaller: the offer
+embeds the per-file manifest, and the plugin (6.1+ for the manifest flow;
+the shells ship 8.x) assembles the new bundle by reusing every file whose
+sha256 it already has, from the store binary's own embedded assets or its
+local delta cache, and downloads only the rest, each blob straight from
+R2/CDN. A routine code fix therefore transfers roughly the changed JS plus
+touched assets, not the whole bundle. The one heavy payload the GAME SERVER
+now carries is the offer body itself: the embedded manifest runs to ~1.7 MB
+raw on the real dist, so the endpoint prebuilds the body AND its gzip
+(~280 KB) once per version, serves the compressed form to gzip-capable
+callers (every real device), embeds it only for plugins that can consume it,
+and caps manifest-bearing offers per IP (past the budget, and under the
+`OTA_DELTA_DISABLED=1` ops kill switch, the offer degrades to the zip). The
+zip fallback remains full-size and is the reason R2's zero-egress pricing is
+load-bearing rather than a preference. Serving `public/` media from the CDN
+at runtime so a bundle carries only `dist/assets` remains the follow-up that
+also shrinks the STORE binaries; the delta channel only shrinks updates.
 
 ## One-time setup
 
@@ -153,6 +191,20 @@ Rules of the road:
   running: the offer is only made when the published version compares greater,
   and the never-overwrite guard refuses to reuse a version. So a hotfix on top
   of a deployed 0.32.1 publishes as 0.32.2.
+- The delta channel's mechanics: the FIRST manifest-bearing publish uploads
+  every blob once (the full dist, one object per unique sha256); later
+  publishes sync only new hashes. Blobs are content-addressed and shared
+  across versions, so they accumulate in `<prefix>/files/`; old manifests
+  keep working (that is what makes `--rollback` cheap), and pruning
+  unreferenced blobs is a deliberate manual chore, not part of a publish. A
+  `--rollback` target published before the delta channel existed simply gets
+  no `fileManifestUrl` and devices take the zip.
+- `--force` overwrites objects uploaded with an IMMUTABLE cache-control (the
+  zip and the per-file manifest document), so CDNs and the game server's own
+  day-long file-manifest cache can serve the stale copy long after the
+  overwrite. Prefer publishing a new version over forcing; if a force is
+  unavoidable, expect mixed results until caches age out (the server picks up
+  a forced manifest within a day, or immediately on a process restart).
 - If a bundle needs native changes (a new Capacitor plugin, shell config),
   ship the store release FIRST, then publish with
   `--min-native <that store version>` so old shells are never handed a bundle
@@ -233,12 +285,15 @@ feed. Keep it scoped to the one bucket and rotate it on any suspicion.
 
 ## Verifying an update end to end
 
-1. `curl -s $OTA_MANIFEST_URL` shows the new version/url/checksum.
+1. `curl -s $OTA_MANIFEST_URL` shows the new version/url/checksum plus the
+   `fileManifestUrl`, and fetching THAT URL returns the entry list.
 2. `curl -s -X POST https://worldofclaudecraft.com/api/ota/updates \
    -H 'content-type: application/json' \
    -d '{"platform":"ios","version_name":"builtin","version_build":"0.31.0"}'`
-   answers the offer; posting the published version back answers the
-   no-update body.
+   answers the offer, which must carry a `manifest` array (a delta-bearing
+   publish whose offer lacks it means the entry list failed the server's
+   validation and devices are silently taking the full zip); posting the
+   published version back answers the no-update body.
 3. On a device or simulator build: launch, background the app, foreground it;
    the footer version (`appVersionInfo`) shows the new bundle version. A
    deliberate bad bundle (e.g. a zip whose JS throws before boot) must revert
@@ -248,12 +303,21 @@ feed. Keep it scoped to the one bucket and rotate it on any suspicion.
 ## Tests that pin this feature
 
 - `tests/server/ota_updates.test.ts`: the endpoint (offer/no-update/gating,
-  cache single-flight, fail-closed env gate, rate limiting, invalid input).
-- `tests/native_ota.test.ts`: the `notifyAppReady` glue plus source pins on
-  the `src/main.ts` wiring, `capacitor.config.ts` plugin block, and the
-  `package.json` dependency.
+  cache single-flight, fail-closed env gate, rate limiting, invalid input),
+  plus the delta channel: per-entry validation (all-or-nothing), the embedded
+  `manifest` on offers, zip-only degradation, and the serialize-once body.
+- `tests/native_ota.test.ts`: the duck-typed plugin glue (`notifyAppReady`,
+  `watchOtaUpdates`, `applyPendingOtaUpdate`) plus source pins on the
+  `src/main.ts` wiring (boot confirm AND the gate install/disconnect arm),
+  `capacitor.config.ts` plugin block, and the `package.json` dependency.
+- `tests/ota_update_gate.test.ts`: the visible-gate state machine (progress,
+  dismiss, auto-apply, in-world suppression, the incompatible-version
+  takeover and its fatal-mode dead ends).
+- `tests/ota_update_overlay.test.ts`: the overlay painter (mount/update in
+  place, progressbar semantics, continue action, fatal copy).
 - `tests/ota_publish.test.ts`: the publish planner (keys, URLs, manifest
-  shape, validation), CLI flag parsing, and the R2 endpoint override.
+  shape, validation, the per-file entry builder and its unsafe-path guards),
+  CLI flag parsing, and the R2 endpoint override.
 - `tests/deploy_ota_updates.test.ts`: the deploy contract, chiefly that
   `OTA_MANIFEST_URL` is in the compose environment allowlist (without it the
   feature stays dark no matter what the host `.env` says) and that the publish

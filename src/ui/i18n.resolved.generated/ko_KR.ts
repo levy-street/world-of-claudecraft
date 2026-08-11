@@ -893,6 +893,14 @@ export const ko_KR: EnTranslations = {
       "notNow": "나중에",
       "update": "업데이트"
     },
+    "otaUpdate": {
+      "title": "게임 업데이트",
+      "downloading": "업데이트 다운로드 중: {percent}",
+      "applying": "업데이트를 다운로드했습니다. 적용을 위해 게임을 다시 시작합니다.",
+      "incompatible": "플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.",
+      "continueAnyway": "업데이트하지 않고 계속",
+      "progressLabel": "업데이트 다운로드 진행률"
+    },
     "cameraPrompt": {
       "title": "카메라 선택",
       "intro": "카메라가 캐릭터를 따라가는 방식을 선택하세요.",

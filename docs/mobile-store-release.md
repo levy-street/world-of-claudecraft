@@ -421,16 +421,62 @@ A Services ID, website return URL, Sign in with Apple private key, Team ID, and 
 not required for this native-only implementation. Those become necessary if Sign in with
 Apple is later added to the website or another non-native authorization flow.
 
-## Store Updates Only
+## Store releases vs OTA updates
 
-The native apps do not include the Ionic Appflow Capacitor Live Updates SDK and
-must not use Appflow over the air deployments. Every web or native change ships
-in a new App Store and Play Store binary.
+The web layer (JS, CSS, game assets) ships over the air between store releases
+through the self-hosted Capgo pipeline: `docs/ota-updates.md` is the canonical
+runbook, including the visible update gate and the differential (per-file)
+downloads. Third-party update clouds (Ionic Appflow, the Capgo cloud) stay
+unused: the plugin points only at this project's own server and bucket.
+
+A STORE release remains required for anything native: a new or updated
+Capacitor plugin, shell configuration (`capacitor.config.ts` is baked into the
+binary, including the updater's settings), OS target bumps, and the embedded
+web assets a fresh install starts from. After a store release, publish an OTA
+bundle of the same version so the update channel and the store binary agree
+(`docs/ota-updates.md`, "Publishing a bundle").
 
 Always run `npm run native:sync` before creating an archive. This rebuilds the
 native web client and copies the current assets into both platform projects.
 Confirm the version and build shown by the installed app match the intended
 release before submission.
+
+## Keeping the Play build under the size cap
+
+Google Play caps the BASE module's compressed download at 500 MB, and the
+embedded web payload alone passed that (measured: a monolithic v0.36.0 AAB was
+555 MB). The fix is a Play Asset Delivery INSTALL-TIME asset pack,
+`android/woc_media_pack`, which carries `public/media` and `public/audio`
+(the two directories that dwarf everything else). Install-time packs are
+delivered together with the install, count against their own 1 GB allowance
+instead of the base cap, and merge into the app's `AssetManager`, which is
+exactly how Capacitor serves the web tree, so the WebView sees one unchanged
+`public/` tree and no runtime code changes.
+
+The split is derived per build by the `relocateHeavyWebAssets` task in
+`android/app/build.gradle` (hooked on `preBuild`, so it cannot be skipped):
+
+- a `bundle*` build (the Play AAB) MOVES `media` and `audio` into the pack;
+- every other build (debug APKs, the solanaStore release APK) moves them BACK
+  into the base assets, because asset packs only exist in AABs.
+
+The moves are instant same-volume renames and idempotent in both directions,
+so alternating Android Studio bundle and APK builds needs no manual step; a
+directory found in neither location fails the build with a re-sync hint.
+Measured on v0.36.0: base module 68 MB compressed, pack 460 MB compressed.
+
+After a version bump, sanity-check the split before uploading:
+
+```
+cd android && ./gradlew :app:bundlePlayRelease
+unzip -l app/build/outputs/bundle/playRelease/app-play-release.aab | tail -3
+```
+
+and confirm in Play Console's upload screen that the base module stays under
+the cap and the pack under 1 GB (the pack grows with content; when it nears
+1 GB, the runtime-CDN media work is the durable successor). The wiring is
+pinned by `tests/native_assets_pack.test.ts`; there is no Android build in
+CI, so those pins are the guard.
 
 Release QA must cover both a fresh install and an update over an existing store
 installation. For the update test, preserve the existing app data, install the
