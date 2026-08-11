@@ -10,7 +10,7 @@
 | 03 QA | verify | complete | 2026-08-08 | 2026-08-08 |
 | 04 | Materials backbone | complete | 2026-08-08 | 2026-08-08 |
 | 04 QA | verify | complete | 2026-08-10 | 2026-08-10 |
-| 05 | Jewelcrafting base catalog | pending | | |
+| 05 | Jewelcrafting base catalog | complete | 2026-08-10 | 2026-08-10 |
 | 05 QA | verify | pending | | |
 | 06 | Inscription base catalog | pending | | |
 | 06 QA | verify | pending | | |
@@ -149,6 +149,28 @@ never future-PR items, per the delivery contract in `state.md`).
   wiki-refresh's Gallowmere reintroduction (en + 3 transliterations, guard armed).
   All decisions, numbers, obligations, and the review record in the state.md
   Phase 04 ledger.
+- Phase 05 (2026-08-10): jewelcrafting exists. Nine trainer-taught jewelry items
+  across the 0/25/50 rungs (2 rings + 1 necklace per rung, str/int ring + agi neck
+  identities, budgets exactly formula-derived at ilvl 11/16/23: 3/4/8 points, pure
+  primary + stamina, zero ratings per R14), nine JEWELCRAFTING_RECIPES (own array,
+  LADDER_RECIPES untouched) consuming existing ores (copper/iron/thorium), the
+  disenchant ladder standing in for the nonexistent salvage gems (dust/essence,
+  never shard; premise correction in the ledger), and the shared smithing_flux;
+  every recipe stationType 'forge' + acquisition ['trainer'] per the serial station
+  decision (no new station type; Forgemistress Darva teaches by derivation). The
+  rare rung-50 outputs pulled jewelcrafting into the deed rare-tier derivation, so
+  prog_jewelcrafting_rare ("Polished to Brilliance") shipped in-change with its
+  crest art (DEED_ORDER 272). Quality ladder ships uncommon/uncommon/rare, RULING
+  WANTED at QA (common jewelry is statless by formula; doctrine + classic-era both
+  start equip jewelry at uncommon). All nine names web-verified CLEAR (four
+  candidates rejected for collisions, registry updated); rung-50 displays use the
+  Osmium register (ids keep thorium). Full per-id art obligation paid: nine opaque
+  128px WebPs + mapping.json rows + CREDITS + audit admission (825 to 834 / 840 to
+  849); M16 non-Latin fills for all nine names + new guide keys; wiki regenerated
+  (jewelcrafting page goes live), seven falsified guide.professions lines reworded
+  with fills refreshed; portrait manifest re-minted via the receipt flow. New
+  decisive pin suite tests/jewelcrafting_catalog.test.ts; blob ceiling re-minted
+  measured. Full ledger in state.md.
 - Phase 04 QA (verify): PASS-WITH-FOLLOWUPS. Release/v0.36.0 synced AGAIN first
   (merge f14b6a4e0a: the Reliquary packet had landed, 246 commits incl. the
   10970-row locale fill; 87 conflicts hunk-level, IWorld pin 320, command

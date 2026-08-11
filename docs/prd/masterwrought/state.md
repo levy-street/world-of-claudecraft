@@ -95,6 +95,21 @@ lost their subjects. Later phases author against the release names. Wyrmhide Cor
 caveats (Wyrmhide is a D2 armor base and a WoW arena-set family, cross-franchise material
 vocabulary; Sunspun's only use is FFXIV's cash-shop Sunspun Cumulus mount); all other
 registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
+Phase 05 amendments (2026-08-10, all web-verified at authoring time): the nine
+jewelcrafting base-catalog names, all CLEAR: Hammered Copper Band, Polished Copper
+Loop, Coiled Copper Torc, Riveted Iron Signet, Etched Iron Loop, Iron Link Choker,
+Weighted Osmium Band, Gleaming Osmium Loop, Burnished Osmium Amulet (the rung-50
+DISPLAYS use the shipped Osmium register; their frozen ids keep thorium, matching
+thorium_ore whose display is Osmium Ore). The Osmium display forms were verified
+SEPARATELY after review (2026-08-10): zero exact hits for all three; nearest
+neighbors are different full names (BG3 Burnished Necklace and Burnished Ring, WoW
+Refined Gleaming Ore, Cabal Osmium Armorset; the Neko Chan Discord game ships a
+plain "Osmium Amulet", judged shared material vocabulary, not a coined term). All
+three CLEAR. Deed: Polished to Brilliance (prog_jewelcrafting_rare), CLEAR, follows the
+prog_*_rare family pattern. Rejected for collisions: Copper Torc (Dungeons of
+Dredmor), Iron Signet (Pirate101, LOTRO variants), Polished to Perfection (Trove
+achievement, plus our own Plated to Perfection), Heavy Thorium Band (WoW's
+Heavy-material-ring jewelcrafting register, discarded at design time).
 
 ## Validation matrix (per change type)
 - sim-only: `npx tsc --noEmit` + affected `npx vitest run tests/<file>.ts` +
@@ -144,6 +159,10 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
 - Stations: `STATION_TYPE_BY_CRAFT` (`src/sim/content/professions.ts`); enchanting,
   jewelcrafting, inscription have NO station today; their recipes need explicit
   `stationType` or new station content (decide in phases 05/06, record here).
+  PHASE 05 DECISION (jewelcrafting): every jewelcrafting recipe carries an explicit
+  `stationType: 'forge'`; the craft stays OUT of `STATION_TYPE_BY_CRAFT` and no new
+  station type is minted. Full rationale in the Phase 05 ledger. Inscription still
+  records its own decision in phase 06.
 
 ## Per-phase ledger (append as phases complete)
 - New IWorld members: NONE (Phase 01 decision: the client pre-check reuses the existing
@@ -1020,3 +1039,203 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   each) and restarts the ember anchor
   (exactly one extra ember, no retroactive accrual); granted items survive both
   legs (unknown-id stacks stay dormant recoverable data).
+
+## Phase 05 ledger (jewelcrafting base catalog, 2026-08-10)
+- STATION/TRAINING DECISION (the serial decision this phase owed): every jewelcrafting
+  recipe carries an explicit `stationType: 'forge'`; jewelcrafting itself stays OUT of
+  `STATION_TYPE_BY_CRAFT` (no new station type, no new trainer NPC). Rationale: (1) the
+  only shipped recipes of a station-less craft (enchanting's recipe_artisans_eye and
+  recipe_gatherers_cache) chose exactly this shape, foreign-bound to the toolworks, so
+  the seam is proven; (2) training derives entirely from the recipe's station
+  (trainingStationTypeFor in src/sim/professions/training.ts), so Forgemistress Darva's
+  forge teaches the catalog with zero new NPCs, props, layout rows, station i18n, or
+  StationType union widening in a content-only phase; (3) thematically the base catalog
+  is wrought metal (ores plus smithing flux), and the Bladewright archetype pair already
+  couples jewelcrafting to weaponcrafting at the forge; (4) reversible: a later world
+  phase can seat a dedicated jeweler's bench (the GLB exists; its Eastbrook placement is
+  disposition 'removed') and repoint the recipes' stationType without changing the
+  record shape. Cost paid here: the foreign-bound literal pin in
+  tests/professions_crafting_hub.test.ts grows the new jewelcrafting recipe ids; the
+  craft-absent pin (stationTypeForCraft('jewelcrafting') undefined) deliberately stays
+  green; the gossip Crafting-shortcut tie-break reads STATION_TYPE_BY_CRAFT key order,
+  which this decision leaves untouched.
+- VENDOR FLUX DECISION: the catalog reuses the existing `smithing_flux` (buyValue 20,
+  already stocked by Forgemistress Darva at the forge the recipes bind to). The phase
+  file authorized adding a vendor flux row if none existed; one does, sold at the right
+  station, and weaponcrafting/armorcrafting already share it, so no new staple id, art,
+  or vendor row is minted.
+- PREMISE CORRECTION (recorded per the release-merge-audit doctrine, before
+  implementing): the phase file's "gems-from-salvage" input class does not exist in the
+  game. There are NO gem materials, no salvage-gem outputs, and no prospecting:
+  SALVAGE_MATERIAL_BY_QUALITY yields bone_fragments/linen_scrap/spider_leg, and the only
+  gem-flavored junk defs (deepfen_pearl, pale_pearl, inert_storm_shard, bogiron_nugget)
+  are quality 'poor' (sellAllJunk sweeps them, unusable as reagents) and sit in no
+  source table. The salvage-DERIVED material family that does exist is the disenchant
+  ladder (arcane_dust / arcane_essence / arcane_shard). The catalog reads
+  "gems-from-salvage" as that ladder: arcane_dust on the 0 rung, arcane_essence on the
+  25 and 50 rungs, and arcane_shard deliberately NOT consumed (Phase 04 sized epic
+  disenchant 1:1 against the heroic faucet; a leveling catalog must not add a consumer
+  to that scarce faucet, and shards stay reserved for the apex band, phase 09). No new
+  gathered material is invented, so the phase's stopping rule is not tripped. QA
+  re-judges this reading.
+- QUALITY-LADDER DEVIATION, RULING WANTED AT PHASE 05 QA: the phase file's
+  "(common/uncommon/rare)" gloss is unshippable at rung 0 for jewelry: QUALITY_STAT_MULT
+  is 0 for common and jewelry has no armor axis, so a common ring would carry literally
+  nothing, and the recorded content doctrine (profession_items.ts ladder headers) says
+  common-rung pieces are armor-only BECAUSE common quality carries no primary-stat
+  budget. Classic-era jewelcrafting also starts its equip jewelry at uncommon. The
+  catalog therefore ships uncommon(0) / uncommon(25) / rare(50), the two uncommon rungs
+  separated by recipe level (10 vs 15, ring budgets 3 vs 4); rare stays exclusive to
+  rung 50 so the deed rare-tier derivation and the training-fee ladder land exactly like
+  the other crafts. Every budget remains exactly formula-derived; the quality-per-rung
+  pin in recipe_economy covers LADDER_RECIPES only and does not move.
+- EXECUTION RECORD (what shipped): nine items in profession_items.ts (new jewelcrafting
+  section; kind armor, slot ring/neck, no armorType/ratings/buyValue/requiredLevel;
+  budgets 3/4/8 at ilvl 11/16/23, splits 2+1, 3+1, 5+3 with sta the minor stat), nine
+  recipes in the new JEWELCRAFTING_RECIPES array in recipes.ts (id = recipe_ +
+  resultItemId; skillReq/budget/level = 0/10/10, 25/16/15, 50/20/20; all stationType
+  'forge', acquisition ['trainer'], resultCount 1). Reagents: rung 0 copper_ore 4-5 +
+  arcane_dust 2-3 + smithing_flux 1; rung 25 iron_ore 3-5 + arcane_essence 1-2 + flux 1;
+  rung 50 thorium_ore 4 + essence 2-3 + flux 2 + iron_ore 2 (the 4th line was
+  RE-AUTHORED at the coverage review: the original fine_thorium_ore choice violated the
+  material-grades disjointness invariant, a recipe listing a base material AND its fine
+  grade double-counts one bag pool because hasRecipeMaterials checks lines
+  independently, so a player holding only fine ore would craft one reagent short;
+  resonant_steel stays rejected as bind-on-trade, iron ore is the solder line, margins
+  52/70/22). Economy margins 16 to 70 copper, strict, both
+  exception lists still empty, no recipe fully vendor-fed. Item ids: hammered_copper_band,
+  polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop,
+  iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet.
+  Deed prog_jewelcrafting_rare appended at the DEEDS tail (renown 10, visit mark
+  craft_rare:jewelcrafting), crest art committed (DEED_ORDER 271 to 272). i18n:
+  entities.items.<id>.name rows via APPENDED_ITEM_NAMES (never the positional array),
+  all nine names filled in the five non-Latin overlays (M16), guide keys
+  craftIntro.jewelcrafting + craftProse.jewelcrafting x8 added with non-Latin fills,
+  SEVEN falsified guide.professions/craftProse lines reworded (whatBody, ringBody,
+  ringWaveNote, stationsBody, deedsBody, weaponcrafting.identityBody,
+  enchanting.identityBody) with their non-Latin fills refreshed; 13 Latin overlays now
+  carry stale rows for those seven keys (release-fill obligation; ringWaveNote and both
+  identityBody rows are outright FALSE in Latin locales until refilled). Art: nine
+  opaque 128px WebPs (1016 to 1794 bytes) + mapping.json woc_original_svg rows +
+  CREDITS.md lines + audit admission (counts 825 to 834 art / 840 to 849 live, verdict
+  re-cut, script census literals moved in scripts/item_art_audit.mjs). Tests: NEW
+  tests/jewelcrafting_catalog.test.ts (rungs, forge, trainer, flux, quality ladder,
+  formula-exact budgets, no-rating sweep, no-shard, slot split); pins moved in
+  professions_crafting_hub (foreign-bound 2 to 11), recipe_economy (identity sum),
+  deeds_content (272/3155/58, tail order, positive deed shape pin, catalog sha
+  re-baselined), crafting_view (jewelcrafting hints at Darva's forge), deed_i18n
+  (manifest 272*2+42), deed_icons + missing_painted_icons_wave + release_art_audit_v036
+  + deeds_view (271 to 272 family), professions_blob_growth (ceiling re-mint, measured
+  9734, new band 10240), guide.test literals (earnable + content-empty + overview link),
+  material_profession_affinity(+bootstrap) + hint_view (dust/essence two-craft rows),
+  professions_crafting (recipeList surface). Wiki regenerated (jewelcrafting page +
+  sitemap row). Portrait manifest re-minted via the receipt flow at phase close.
+- REVIEW ROUND (2026-08-10, applied in full): frontend-seam-reviewer (0 blocking, 2
+  should-fix, 4 notes), a three-agent stale-claims/art/i18n audit fan-out (30 + 6 + 9
+  findings), and a 16-item comment/docs reword batch. Everything applied: (a) the wiki
+  generator now derives a craft card's station from the unanimous recipe stationType
+  when the craft is absent from STATION_TYPE_BY_CRAFT (enchanting deliberately keeps
+  the null card: its enchant channel is station-free), so the jewelcrafting page names
+  the forge and Forgemistress Darva instead of the false "No station needed"; pinned in
+  tests/guide.test.ts (positive jewelcrafting card + enchanting negative control + the
+  grounding test re-derives the same rule). (b) The seven falsified guide.professions /
+  craftProse keys plus faq.a2 ("eight earnable crafts") were reworded in English where
+  still stale and STRIPPED from the 13 Latin overlays (91 + 13 rows to pending; the
+  five non-Latin overlays' condensed values carried no falsified claim except the five
+  already refreshed). (c) hudChrome.materialHint.arcaneDust/arcaneEssence leads
+  reworded to the craft-neutral "Crafting reagent." with the five non-Latin fills
+  refreshed in-change and the 13 Latin rows stripped (2 x 13); the hint-view pin
+  updated with a not-toContain arm. (d) prog_jewelcrafting_rare deed locale fills
+  authored for the five non-Latin chunks (family-idiom names: 打磨至璀璨 / 磨かれた輝き /
+  광채를 향한 연마 / Отполирован до блеска); the 13 Latin chunks ride the release fill
+  (the deed channel is outside the pending registry, worklist reminder below). (e) Art
+  provenance record docs/achievements/masterwrought-phase05-art/ (crest source SVG
+  committed + accepted sha256/bytes for all ten assets) closing the deed-crest
+  provenance gap; dated amendment appended to the release-art-audit README's 271-line.
+  (f) The derived Trapper-pair hobby flip (cooking+leatherworking now defaults to
+  jewelcrafting over weaponcrafting, CRAFTS_WITH_CONTENT reads ALL_RECIPES) pinned in
+  tests/professions_archetype.test.ts with a skill-preference control. (g) The catalog
+  suite gained an i18n parity arm (nine catalog rows byte-match the defs, Osmium
+  register pinned). (h) Fifteen stale comments/docs reworded (archetype, professions
+  station header, training, heroic_vendor "only jewelry source", deeds block,
+  hint-view rationale, guide pages, three test rationales, professions.md, deeds.md,
+  maintainer-notes, generator comments).
+- COVERAGE REVIEW ROUND 2 (2026-08-10, the fresh-subagent diff review; applied in
+  full): the review recomputed every budget and every economy margin by hand (all
+  exact), verified the deed trigger mechanism end to end (craft_rare derives from
+  professionId at the emit site, cannot drift), and found what the phase missed
+  OUTSIDE its own spec's suite list: (1) REAL DEFECT, fixed: the rung-50 recipes
+  listed thorium_ore AND fine_thorium_ore, whose shared grade pool let a
+  fine-ore-only bag pass the check and craft one reagent short (material_grades
+  disjointness guards were red); re-authored to iron_ore x2 solder, guide materials
+  prose + five non-Latin fills refreshed, wiki regenerated. (2) Stale pins in
+  tests/train_view.test.ts (Darva teaches three crafts; locked rows 14 to 20) and
+  tests/dev_kit.test.ts: buildDevKit derives best-in-slot from the item tables, so
+  the three jewelry slots FILLED THEMSELVES when the catalog landed (neck
+  burnished_thorium_amulet; physical rings weighted_thorium_band +
+  riveted_iron_signet; caster rings gleaming_thorium_loop + etched_iron_loop),
+  consistent with the crafted armor and weapons the kits already wear; judged
+  correct-by-derivation (the Trapper-flip doctrine), zero source change, the pin
+  re-pointed at the picks. An earlier keep-empty call was reversed when its premise
+  (that the slots were still empty) proved false.
+  (3) Jewelcrafting was the only gear-capable craft whose masterwork earned no
+  Reliquary trophy (masterworkByCraft listed five crafts and the guard iterates the
+  list itself, structurally blind to this drift): the jewelcrafting row + markFind
+  i18n + a derivation-based guard added (craftIsGearCapable sweeps CRAFT_RING
+  through masterworkBonusStats over ALL_RECIPES, so a craft turning gear-capable
+  without a slot reds it). DISCOVERY recorded for future mark work: a reliquary
+  mark's display name lives in THREE hand-maintained tables, the client catalog
+  (hudChrome.reliquary.markFind), the server RELIQUARY_MARK_ENGLISH in
+  server/character_sheet.ts (cross-pinned bidirectionally by
+  tests/character_sheet.test.ts), and RELIQUARY_MARK_GUIDE_NAMES in
+  scripts/wiki/build_content.mjs; all three carry Jewelcrafting Masterwork, the
+  masterwork glossary row extended, reliquary pins moved 375 to 376 slots / 29 to
+  30 marks (incl. tests/profile_page.test.ts, a pin the brief never named), and
+  tests/parity stayed green (draw-order neutral). The server/character_sheet.ts
+  touch is one row in an English-by-design table; flagged for the QA reader since
+  the phase was otherwise server-free. (4) A new end-to-end behavior suite
+  tests/jewelcrafting_flow.test.ts (train at Darva's forge with fee assertions,
+  craft at the station, reagent consumption exact, deed grant via the tick,
+  station_required refusal). (5) Pin-quality nits: exact per-rung flux counts,
+  multi-key R14 positive controls, no-buyValue arm, per-rung trainingFeeFor arm.
+  (6) Recorded INTENDED, no change: the rung-0 dust round trip is material-positive
+  (2 to 3 dust in, 3 to 4 back on disenchant) and gold-negative, the classic-era
+  shuttle-craft dust economy exactly (crafting cheap uncommons to disenchant IS the
+  canonical enchanting supply loop; gold is the sink); flagged to phase 15 beside
+  the essence note. (7) The Osmium display forms web-verified post-hoc (registry
+  above). Adversarial leftovers recorded for QA: hubCraftsPerformed now counts a
+  ninth craft's station work (correct, unremarked widening); catalog reachability
+  (rung 50 at 125-cap pacing) is stated in guide prose but unpinned. Two dev-kit
+  scorer facts pinned-with-notes rather than changed: druid/feral (the one TANK_AGI
+  role, sta-led) picks the rung-50 INT ring for its stamina over the rung-25 str
+  ring, the scorer working as designed; and the PHYS_AGI ring2 pick rests on an
+  IEEE754 hair (riveted_iron_signet vs gleaming_thorium_loop tie at exactly 1.8 in
+  real arithmetic, split only by float summation order in roleItemScore), so any
+  reordering of the weight-sum terms silently flips twelve specs' ring2; the pin
+  makes that visible, and an epsilon-aware tiebreak is a cleanup-phase candidate.
+- RULINGS WANTED AT PHASE 05 QA (beyond the quality-ladder one above): (1) the Trapper
+  pair's default hobby flip to jewelcrafting: correct-by-derivation and now pinned,
+  desirability needs the call. (2) prog_jewelcrafting_50 and prog_grandmaster_jewelcrafting:
+  the hold is AUTHORING, not mechanics (a hobby jewelcrafter can reach 50 and slowly
+  climb toward 125; the forge master teaches the whole catalog; enchanting shipped its
+  50/Grandmaster deeds in the same no-pair-quest position), so decide whether to author
+  both deeds now or keep them deferred with the archetype pairs.
+- RELEASE-FILL OBLIGATIONS MINTED THIS PHASE (the pending registry sees the first
+  group; the deed group it structurally cannot see): 18 new keys x 15 Latin locales
+  (item names + guide keys) pending normally; 104 stripped stale Latin rows (7
+  guide.professions/craftProse keys + faq.a2 + 2 materialHint keys, x 13 locales)
+  pending after the strip; prog_jewelcrafting_rare name+desc in the 13 Latin deed
+  chunks (INVISIBLE to pending=0, add to the release worklist by hand).
+- QA FOLLOW-UPS (Phase 05, non-blocking): (1) the rung-50 recipes consume
+  arcane_essence while rare-band disenchants are their only faucet; watch the essence
+  economy when phase 15 verifies power/economy. (2) tests/item_art_audit_builder
+  "fresh-checkout rebuild" test measured 16s isolated against a 20s ceiling under
+  another session's load; contention-borderline, judge by CI per the standing memory.
+  (3) The ru craftProse.jewelcrafting.materialsBody mixes translated and English ore
+  registers inside one paragraph (matches the existing ru weaponcrafting precedent);
+  settle the register in the release locale-fill pass. (4) SESSION INCIDENT, recorded
+  for the QA reader: a mid-phase usage-limit restart silently reset the shell cwd from
+  the worktree to the main checkout; one script ran in the wrong repo (13 locale files
+  contaminated there, restored to HEAD the same hour) and several wrong-repo READS
+  briefly produced false "work missing" conclusions, all voided after re-entering the
+  worktree. No worktree work was lost; re-run EnterWorktree after any session restart.
