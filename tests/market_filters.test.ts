@@ -52,6 +52,9 @@ describe('World Market filters', () => {
     'roasted_boar',
     'minor_healing_potion',
     'elixir_of_the_bear',
+    // The phase 06 buff scroll: kind 'scroll' browses as a consumable beside
+    // the elixirs it alternates with.
+    'silverleaf_scroll',
   ];
 
   it('exposes stable item type and rarity filter options for the browse UI', () => {
@@ -107,6 +110,7 @@ describe('World Market filters', () => {
       'roasted_boar',
       'minor_healing_potion',
       'elixir_of_the_bear',
+      'silverleaf_scroll',
     ]);
   });
 
@@ -308,6 +312,7 @@ describe('World Market filters', () => {
       'bone_fragments',
       'roasted_boar',
       'minor_healing_potion',
+      'silverleaf_scroll',
     ]);
     expect(filterIds(items, { rarity: 'uncommon' })).toEqual([
       'keen_dirk',

@@ -181,7 +181,8 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
       item.kind === 'food' ||
       item.kind === 'drink' ||
       item.kind === 'potion' ||
-      item.kind === 'elixir'
+      item.kind === 'elixir' ||
+      item.kind === 'scroll'
     );
   if (filter === 'bag') return item.kind === 'bag';
   if (filter === 'material')

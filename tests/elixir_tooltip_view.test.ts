@@ -30,11 +30,28 @@ describe('elixirTooltipLines', () => {
     );
   });
 
-  it('every elixir in the game data renders a use line carrying its own numbers', () => {
-    const elixirs = Object.values(ITEMS).filter((def) => def.kind === 'elixir');
-    // bear, boar, venomfire, serpent: all four are recipe outputs (the bear
-    // via the combo recipe, the rest on the alchemy ladder).
-    expect(elixirs.length).toBeGreaterThanOrEqual(4);
+  it('a buff scroll renders the SAME use line as its band elixir (alternative source)', () => {
+    // The inscription scrolls (phase 06) reuse the elixir payload and the
+    // same view arm (it gates on the record, not the kind), so a scroll and
+    // its band elixir promise the identical buff in the identical words.
+    expect(ITEMS.silverleaf_scroll.kind).toBe('scroll');
+    expect(elixirTooltipLines(ITEMS.silverleaf_scroll)).toBe(
+      elixirTooltipLines(ITEMS.elixir_of_the_boar),
+    );
+    expect(elixirTooltipLines(ITEMS.sunpetal_scroll)).toBe(
+      elixirTooltipLines(ITEMS.elixir_of_the_serpent),
+    );
+    // And the line is real, not two empty strings agreeing.
+    expect(elixirTooltipLines(ITEMS.silverleaf_scroll)).toContain('Use:');
+  });
+
+  it('every elixir and scroll in the game data renders a use line carrying its own numbers', () => {
+    const elixirs = Object.values(ITEMS).filter(
+      (def) => def.kind === 'elixir' || def.kind === 'scroll',
+    );
+    // bear, boar, venomfire, serpent plus the three phase 06 scrolls: all
+    // recipe outputs except the bear, which drops and combo-crafts.
+    expect(elixirs.length).toBeGreaterThanOrEqual(7);
     for (const def of elixirs) {
       expect(def.elixir, `${def.id} must carry an elixir effect record`).toBeDefined();
       const html = elixirTooltipLines(def);
