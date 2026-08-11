@@ -94,8 +94,13 @@ describe('material_hint_view', () => {
   it('renders each hint as a muted description line naming its source', () => {
     const dust = materialHintLine('arcane_dust');
     expect(dust).toContain('class="tt-desc"');
-    expect(dust).toContain('Enchanting reagent.');
+    // The dust/essence leads reworded to the craft-neutral form when
+    // jewelcrafting became their second consumer (the appended Used-by line
+    // names the crafts); the single-consumer shard keeps the enchanting lead.
+    expect(dust).toContain('Crafting reagent.');
+    expect(dust).not.toContain('Enchanting reagent.');
     expect(dust).toContain('common and uncommon');
+    expect(materialHintLine('arcane_shard')).toContain('Enchanting reagent.');
     expect(materialHintLine('arcane_essence')).toContain('rare gear');
     expect(materialHintLine('arcane_shard')).toContain('epic and legendary');
     expect(materialHintLine('resonant_thread')).toContain('cloth armor');
