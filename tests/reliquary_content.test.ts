@@ -363,7 +363,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 342, total: 342 });
+    expect(full).toEqual({ owned: 344, total: 344 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -374,7 +374,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers and the
     // jewelcrafting masterwork mark; marks are character-scoped, so this trails
     // the overview by the 29 account-scoped weapon skins).
-    expect(character).toEqual({ owned: 313, total: 313 });
+    expect(character).toEqual({ owned: 315, total: 315 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -396,7 +396,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(377);
+    ).toBe(379);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, and masterwork:jewelcrafting.
     expect(
@@ -411,7 +411,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       ]
         .map(([ns, n]) => `${ns}=${n}`)
         .join(', ')}`,
-    ).toBe(30);
+    ).toBe(31);
   });
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
@@ -1717,6 +1717,7 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       'masterwork:tailoring',
       'masterwork:leatherworking',
       'masterwork:jewelcrafting',
+      'masterwork:inscription',
       'masterwork:engineering',
     ]);
     expect(RELIQUARY_PROFESSION_MARKS.masterworkFirst).toBe('masterwork:first');
@@ -1750,7 +1751,7 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       expect(pendedMarks.has(markId), `${markId} pended iff NOT gear-capable`).toBe(!gearCapable);
     }
     // Liveness: the derivation is worthless if it calls everything ineligible.
-    expect(gearCapableCount).toBe(5);
+    expect(gearCapableCount).toBe(6);
   });
 
   it('every gear-capable craft owns a masterwork slot (derived FROM the recipes)', () => {
@@ -1773,10 +1774,13 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       missing,
       `gear-capable crafts with no Reliquary masterwork slot: ${missing.join(', ')}`,
     ).toEqual([]);
-    // Literal, so the derivation cannot go quietly vacuous: these are the five
-    // crafts whose recipes really produce stats-bearing equipment today.
+    // Literal, so the derivation cannot go quietly vacuous: these are the six
+    // crafts whose recipes really produce stats-bearing equipment today
+    // (inscription joined with the phase 06 tomes; its scrolls are slotless
+    // and cannot masterwork).
     expect(derivedEligible).toEqual([
       'armorcrafting',
+      'inscription',
       'jewelcrafting',
       'leatherworking',
       'tailoring',
@@ -2513,7 +2517,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_set_stormcallers: 2,
   // 6 = activity (masterworkFirst) + the five gear-capable craft professions;
   // masterwork:engineering is pended un-hinted (QA ruling 2026-08-07).
-  professions_masterwork: 6,
+  professions_masterwork: 7,
   professions_field_notes: 4,
   // 7 = corpse_harvest + the four gathering professions with a jackpot slot
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
@@ -2523,7 +2527,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles.
-  horizons_titles: 41,
+  horizons_titles: 42,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.

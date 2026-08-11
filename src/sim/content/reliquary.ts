@@ -427,6 +427,9 @@ export const RELIQUARY_HORIZON_TITLES = [
   // Grandmaster Jewelcrafting (Masterwrought phase 05 QA ruling): the ninth
   // per-craft grandmaster title pages here per the locked titles-page rule.
   'prog_grandmaster_jewelcrafting',
+  // Grandmaster Inscription (Masterwrought phase 06): the tenth per-craft
+  // grandmaster title pages here per the same locked titles-page rule.
+  'prog_grandmaster_inscription',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
@@ -454,16 +457,20 @@ export const RELIQUARY_PROFESSION_MARKS = {
    *  stats-bearing engineering craftable would un-pend it). Jewelcrafting
    *  joined the gear-capable side when its trainer ladder landed: its outputs
    *  are stats-bearing rings and necks, so the proc path writes
-   *  masterwork:jewelcrafting and the gallery owes it a slot. The gear-capable
-   *  set is DERIVED from the live recipes in tests/reliquary_content.test.ts
-   *  (both directions), so neither a craft gaining gear nor a craft losing it
-   *  can drift from this list. */
+   *  masterwork:jewelcrafting and the gallery owes it a slot. Inscription
+   *  followed with the phase 06 catalog: its tomes are stats-bearing held
+   *  offhands, so masterwork:inscription pages here the same way (the
+   *  scrolls, slotless consumables, cannot masterwork by design). The
+   *  gear-capable set is DERIVED from the live recipes in
+   *  tests/reliquary_content.test.ts (both directions), so neither a craft
+   *  gaining gear nor a craft losing it can drift from this list. */
   masterworkByCraft: [
     'masterwork:weaponcrafting',
     'masterwork:armorcrafting',
     'masterwork:tailoring',
     'masterwork:leatherworking',
     'masterwork:jewelcrafting',
+    'masterwork:inscription',
     'masterwork:engineering',
   ],
   /** Rare gather / corpse specimen visit marks already written by professions. */

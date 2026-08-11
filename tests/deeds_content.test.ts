@@ -67,16 +67,18 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 274 deeds worth 3185 total Renown', () => {
+  it('ships exactly 277 deeds worth 3225 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
     // board), plus prog_jewelcrafting_rare (renown 10, the Masterwrought
     // phase 05 jewelcrafting base catalog), plus the phase 05 QA ruling pair
     // prog_jewelcrafting_50 (renown 5) and prog_grandmaster_jewelcrafting
-    // (renown 25) joining their cross-craft families.
-    expect(DEED_ORDER.length).toBe(274);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3185);
+    // (renown 25) joining their cross-craft families, plus the phase 06
+    // inscription base catalog's three (prog_inscription_rare 10,
+    // prog_inscription_50 5, prog_grandmaster_inscription 25).
+    expect(DEED_ORDER.length).toBe(277);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3225);
   });
 
   it('ships the audited per-category counts', () => {
@@ -86,7 +88,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 jewelcrafting rare-tier milestone (Masterwrought phase 05), then
       // +2 for the phase 05 QA ruling pair (the 50-skill and Grandmaster
       // jewelcrafting milestones joining their cross-craft families).
-      progression: 60,
+      progression: 63,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
@@ -232,6 +234,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'prog_jewelcrafting_rare',
       'prog_jewelcrafting_50',
       'prog_grandmaster_jewelcrafting',
+      // Inscription joins all three families with the Masterwrought phase 06
+      // base catalog, the jewelcrafting shape exactly.
+      'prog_inscription_rare',
+      'prog_inscription_50',
+      'prog_grandmaster_inscription',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -488,8 +495,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // rewards, so they are excluded from the derivation the same way the
     // deed's own comment excludes enchanting; jewelcrafting joined the set
     // with the Masterwrought phase 05 base catalog (its rung-50 rare
-    // jewelry), and inscription stays deferred with prog_ringwright (no
-    // live recipes).
+    // jewelry), and inscription with the phase 06 catalog (its rung-50 rare
+    // tome and scroll).
     const rareTierCrafts = [...new Set(ALL_RECIPES.map((r) => r.professionId))]
       .filter((craftId) =>
         ALL_RECIPES.some((r) => {
@@ -506,6 +513,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'armorcrafting',
       'cooking',
       'engineering',
+      'inscription',
       'jewelcrafting',
       'leatherworking',
       'tailoring',
@@ -519,9 +527,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       expect(deed.hidden ?? false, deed.id).toBe(false);
       expect(deed.trigger).toEqual({ kind: 'visit', markId: `craft_rare:${craftId}` });
     }
-    // No deed keys off enchanting or inscription: those crafts stay out of
-    // the per-craft rare-tier set.
-    for (const craftId of ['enchanting', 'inscription']) {
+    // No deed keys off enchanting: that craft stays out of the per-craft
+    // rare-tier set (no item-def output to grade).
+    for (const craftId of ['enchanting']) {
       expect(DEEDS[`prog_${craftId}_rare`], craftId).toBeUndefined();
     }
     // The jewelcrafting counter-pin flipped positive with the phase 05 base
@@ -535,6 +543,16 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       renown: 10,
       trigger: { kind: 'visit', markId: 'craft_rare:jewelcrafting' },
     });
+    // And the inscription counter-pin flipped with the phase 06 catalog, the
+    // same family shape and its own verified name.
+    expect(DEEDS.prog_inscription_rare).toEqual({
+      id: 'prog_inscription_rare',
+      name: 'Written in Fine Ink',
+      desc: 'Craft your first rare-tier item in Inscription.',
+      category: 'progression',
+      renown: 10,
+      trigger: { kind: 'visit', markId: 'craft_rare:inscription' },
+    });
   });
 
   it('ships exactly 43 titles and 4 borders', () => {
@@ -544,11 +562,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // ladder 3 more titles, the Phase 18 Reliquary completion ladder 5 more
     // on top of the release base (31 + 3), and Grandmaster Jewelcrafting
     // (phase 05 QA) completes the per-craft grandmaster title family.
-    expect(titles.length).toBe(43);
+    expect(titles.length).toBe(44);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(43);
+    expect(new Set(titleTexts).size).toBe(44);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -639,7 +657,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // prog_jewelcrafting_50 (renown 5) and prog_grandmaster_jewelcrafting
   // (renown 25, Grandmaster title), completing the craft's milestone family
   // per the 2026-08-10 ruling. No shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = 'f15b690d31b6c70b91f76585b78f32e086fad90147ddc83a8ab83e3d0f1a7531';
+  // Re-baselined for the Masterwrought phase 06 inscription base catalog:
+  // three appended deeds (prog_inscription_rare 10, prog_inscription_50 5,
+  // prog_grandmaster_inscription 25, Grandmaster title), the jewelcrafting
+  // family shapes exactly. No shipped trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '812ee9fcc6b91ff23958583dd3e3d97d34a8a82b2bc122e74ab413b38b261d0d';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -838,9 +860,10 @@ describe('table shape', () => {
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
     // The Masterwrought phase 05 jewelcrafting milestones append after the
-    // Phase 18 Reliquary completion ladder; the QA-ruled Grandmaster deed
-    // closes the tail.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_grandmaster_jewelcrafting');
+    // Phase 18 Reliquary completion ladder, then the phase 06 inscription
+    // milestones append behind them; the inscription Grandmaster deed closes
+    // the tail.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_grandmaster_inscription');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

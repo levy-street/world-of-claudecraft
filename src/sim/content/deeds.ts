@@ -1990,10 +1990,13 @@ export const DEEDS: Record<string, DeedDef> = {
   // within this block only). Craft-skill thresholds reference ONLY resolved
   // caps or below: every CRAFT_RING craft caps at 125 (craftMaxSkillFor),
   // fishing at 200, the other gathering professions at 100
-  // (content/professions.ts maxSkill). Inscription has no live skill-gain
-  // path yet (zero recipes, no enchanting-style action), so its milestone and
-  // Grandmaster deeds stay deferred with prog_ringwright rather than shipping
-  // visible-but-unearnable. Jewelcrafting left that set when its base catalog
+  // (content/professions.ts maxSkill). Inscription gained its live skill-gain
+  // path with the Masterwrought phase 06 base catalog (INSCRIPTION_RECIPES);
+  // its milestone and Grandmaster deeds ship in the appended block at the
+  // table tail. prog_ringwright stays deferred on its OWN account now: the
+  // ring deed has no recorded design (no trigger shape, threshold, name, or
+  // renown anywhere), so it waits on a maintainer ruling, not on an engine
+  // surface. Jewelcrafting left the deferred set when its base catalog
   // landed (JEWELCRAFTING_RECIPES); its rare-tier milestone is
   // prog_jewelcrafting_rare in the appended block below, and the phase 05 QA
   // ruling (2026-08-10) authored its skill-50 and Grandmaster pair behind it
@@ -2490,10 +2493,10 @@ export const DEEDS: Record<string, DeedDef> = {
   // moderate profession-depth milestones (prog_fishing_100). Covers exactly
   // the crafts that ship a rare-or-better recipe (see
   // tests/deeds_content.test.ts for the derivation): the seven below, plus
-  // prog_jewelcrafting_rare appended at the table tail with the Masterwrought
-  // phase 05 base catalog (DEED_ORDER is append-only). Enchanting has no
-  // item-def output to grade, and inscription stays deferred with
-  // prog_ringwright (docs/design/deeds.md, no live recipes yet).
+  // prog_jewelcrafting_rare (Masterwrought phase 05) and
+  // prog_inscription_rare (phase 06), both appended at the table tail
+  // (DEED_ORDER is append-only). Enchanting alone stays out: it has no
+  // item-def output to grade.
   prog_engineering_rare: {
     id: 'prog_engineering_rare',
     name: 'Precision Engineering',
@@ -2869,6 +2872,41 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 25,
     trigger: { kind: 'craftSkill', craftId: 'jewelcrafting', level: 125 },
     reward: { kind: 'title', text: 'Grandmaster Jewelcrafting' },
+  },
+  // Inscription joins all three cross-craft milestone families with the
+  // Masterwrought phase 06 base catalog (INSCRIPTION_RECIPES): the rung-50
+  // outputs are the craft's first rare recipes, so the rare-tier derivation
+  // demands the milestone, and the 50/Grandmaster pair follows the
+  // enchanting-then-jewelcrafting double precedent (author with the catalog,
+  // never visible-but-unearnable: the 125 cap is reachable on the base
+  // catalog alone). Same fields as the family blocks above; appended at the
+  // tail because DEED_ORDER derives from table order and is append-only. The
+  // Grandmaster title deed's Reliquary titles-page slot lands in the same
+  // change (content/reliquary.ts, the locked titles-page rule).
+  prog_inscription_rare: {
+    id: 'prog_inscription_rare',
+    name: 'Written in Fine Ink',
+    desc: 'Craft your first rare-tier item in Inscription.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:inscription' },
+  },
+  prog_inscription_50: {
+    id: 'prog_inscription_50',
+    name: 'Quill and Pigment',
+    desc: 'Reach 50 skill in Inscription.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'inscription', level: 50 },
+  },
+  prog_grandmaster_inscription: {
+    id: 'prog_grandmaster_inscription',
+    name: 'Grandmaster Inscription',
+    desc: 'Reach 125 skill in Inscription, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'inscription', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Inscription' },
   },
 };
 

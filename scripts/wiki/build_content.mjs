@@ -528,6 +528,7 @@ const RELIQUARY_MARK_GUIDE_NAMES = {
   'masterwork:tailoring': 'Tailoring Masterwork',
   'masterwork:leatherworking': 'Leatherworking Masterwork',
   'masterwork:jewelcrafting': 'Jewelcrafting Masterwork',
+  'masterwork:inscription': 'Inscription Masterwork',
   'masterwork:engineering': 'Engineering Masterwork',
   'gather_event:pristine_vein': 'Pristine Vein',
   'gather_event:ancient_heartwood': 'Ancient Heartwood',
