@@ -48,7 +48,7 @@ export interface SortableStack {
 
 // The clean-up ladder. Gear leads (weapons, then armor by paperdoll slot,
 // then held offhands and unequipped bags), consumables next (potions before
-// elixirs before food and drink), then tools, mount reins, and unlearned
+// elixirs before scrolls, then food and drink), then tools, mount reins, and unlearned
 // recipe patterns, then the junk kind (every material lives there; gray
 // vendor trash is hoisted out below), then quest items where they are easy
 // to find, and poor-quality trash dead last so the sell-all-junk sweep reads
@@ -62,15 +62,16 @@ const KIND_RANK: Record<ItemKind, number> = {
   bag: 3,
   potion: 4,
   elixir: 5,
-  food: 6,
-  drink: 7,
-  tool: 8,
-  mount: 9,
-  recipe: 10,
-  junk: 11,
-  quest: 12,
+  scroll: 6,
+  food: 7,
+  drink: 8,
+  tool: 9,
+  mount: 10,
+  recipe: 11,
+  junk: 12,
+  quest: 13,
 };
-const TRASH_RANK = 13; // any poor-quality item, regardless of kind
+const TRASH_RANK = 14; // any poor-quality item, regardless of kind
 // The two defensive tails are DISTINCT ranks on purpose (comparator
 // transitivity): a missing-def stack compares by raw id while a known def
 // compares by the name/quality chain, and if the two populations could tie on

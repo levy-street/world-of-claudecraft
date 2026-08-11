@@ -875,6 +875,7 @@ export type ItemKind =
   | 'tool'
   | 'potion'
   | 'elixir'
+  | 'scroll'
   | 'bag'
   | 'mount'
   | 'recipe';
@@ -1154,8 +1155,24 @@ export interface HeldOffhandItemDef extends BaseItemDef {
 }
 
 export interface OtherItemDef extends BaseItemDef {
-  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'held_offhand' | 'mount' | 'recipe'>;
+  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'held_offhand' | 'mount' | 'recipe' | 'scroll'>;
   armorType?: never;
+}
+
+// A buff SCROLL: the inscription-crafted alternative source of a battle-elixir
+// aura family (docs/prd/masterwrought, R14 corollary). It reuses the SAME
+// `elixir` effect payload and the same use-path arm as kind 'elixir', so the
+// synthesized aura id (`elixir_${kind}`) and applyAura same-id replacement make
+// a scroll and an elixir of one family mutually exclusive in both orders with
+// no new stacking path. Its own kind rather than another 'elixir' row so the
+// tooltip kind line and the use log can say scroll ("You read"), and so the
+// effect payload can never be omitted (the Exclude above).
+export interface ScrollItemDef extends BaseItemDef {
+  kind: 'scroll';
+  elixir: NonNullable<BaseItemDef['elixir']>;
+  armorType?: never;
+  weapon?: never;
+  use?: never;
 }
 
 // A collectible mount item. Owning the item IS owning the mount: while it sits
@@ -1201,7 +1218,8 @@ export type ItemDef =
   | HeldOffhandItemDef
   | OtherItemDef
   | MountItemDef
-  | RecipeItemDef;
+  | RecipeItemDef
+  | ScrollItemDef;
 
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
