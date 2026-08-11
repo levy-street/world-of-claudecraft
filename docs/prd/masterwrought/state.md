@@ -161,7 +161,16 @@ Grandmaster-craft family, generic by construction.
   (`src/sim/professions/commission.ts`); no BoP/BoE concept exists.
 - Item instances: `ItemInstancePayload` (`src/sim/types.ts`), `rolled.stats` is how
   Perfected bonus stats persist; `boundTo`/`charges` never leave the server.
-- Consumable exclusivity: `src/sim/exclusive_aura.ts` (scrolls/flasks share elixir families).
+- Consumable exclusivity: the aura id scheme in `src/sim/items.ts` (the `def.kind ===
+  'elixir'` arm): the aura id is `elixir_${elx.kind}`, keyed on the effect KIND, so every
+  elixir of one stat shares one id and `applyAura` same-id replacement makes them
+  exclusive, last drunk wins. A buff scroll joins an elixir family by emitting the SAME
+  `elixir_${kind}` aura id (alternative source, replaces in both orders, never stacks);
+  the items.ts comment documents the family-component extension (`elixir_battle_...`) if
+  a family ever needs to split within one stat kind. `src/sim/combat/exclusive_aura.ts`
+  + `exclusiveGroup` is the ABILITY self-buff machinery (shouts/aspects/stances), not
+  the consumable path; a flat `src/sim/exclusive_aura.ts` never existed. (AMENDED at the
+  Phase 06 release-merge audit; the row previously misstated both path and mechanism.)
 - Stations: `STATION_TYPE_BY_CRAFT` (`src/sim/content/professions.ts`); enchanting,
   jewelcrafting, inscription have NO station today; their recipes need explicit
   `stationType` or new station content (decide in phases 05/06, record here).

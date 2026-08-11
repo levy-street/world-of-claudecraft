@@ -1,5 +1,18 @@
 # Phase 06: Inscription base catalog
 
+AMENDED at the Phase 06 release-merge audit (pre-existing spec error, both merge
+parents identical): the prompt below names `src/sim/exclusive_aura.ts` as the
+scroll/elixir exclusivity seam. That path never existed and the mechanism is
+different: `src/sim/combat/exclusive_aura.ts` + `exclusiveGroup` serve ABILITY
+self-buffs (shouts/aspects/stances); shipped ELIXIR exclusivity rides the aura id
+scheme in `src/sim/items.ts` (the `def.kind === 'elixir'` arm): the aura id is
+`elixir_${elx.kind}`, and `applyAura` same-id replacement makes same-kind elixirs
+last-drunk-wins. A buff scroll joins an elixir family by emitting the SAME
+`elixir_${kind}` aura id: alternative source, replaces in both orders, never
+stacks, zero contract changes anywhere. Read every exclusivity mention below
+against that real seam; the exclusivity pin asserts same-aura-id replacement in
+both application orders, not `exclusiveAuraConflicts` behavior.
+
 ### Starter Prompt
 ```
 This is Phase 06 of the Masterwrought feature: the inscription base catalog.
