@@ -11133,7 +11133,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.intro': '作り手からよく聞かれる質問への短い答えです。',
   'guide.profPages.faq.q1': '生産職はいくつ覚えられますか？',
   'guide.profPages.faq.a1':
-    'どのキャラクターも八つの修得可能な製作職と四つの採集職をすべて伸ばせます。唯一の選択は生き方だけです。',
+    'どのキャラクターも九つの修得可能な製作職と四つの採集職をすべて伸ばせます。唯一の選択は生き方だけです。',
   'guide.profPages.faq.q2': 'レシピはどこで覚えますか？',
   'guide.profPages.faq.a2':
     '訓練師のレシピは各作業場の常駐の師匠から学び、九つの共通フィールドレシピと道具レシピは全員が最初から知っています。',

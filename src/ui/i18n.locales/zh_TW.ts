@@ -10651,7 +10651,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.intro': '製作者最常問的問題，一併作答。',
   'guide.profPages.faq.q1': '我能學多少專業？',
   'guide.profPages.faq.a1':
-    '每個角色都可以提升全部八種可修煉製作行業和全部四種採集行業；只有命途身分是唯一的選擇。',
+    '每個角色都可以提升全部九種可修煉製作行業和全部四種採集行業；只有命途身分是唯一的選擇。',
   'guide.profPages.faq.q2': '在哪裡學配方？',
   'guide.profPages.faq.a2':
     '訓練師階梯配方由各工位的常駐大師傳授，而九個通用野外配方和工具配方所有人從一開始就會。',

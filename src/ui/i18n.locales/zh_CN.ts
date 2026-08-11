@@ -10649,7 +10649,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.intro': '制作者最常问的问题，一并作答。',
   'guide.profPages.faq.q1': '我能学多少专业？',
   'guide.profPages.faq.a1':
-    '每个角色都可以提升全部八种可修炼制作行业和全部四种采集行业；只有命途身份是唯一的选择。',
+    '每个角色都可以提升全部九种可修炼制作行业和全部四种采集行业；只有命途身份是唯一的选择。',
   'guide.profPages.faq.q2': '在哪里学配方？',
   'guide.profPages.faq.a2':
     '训练师阶梯配方由各工位的常驻大师传授，而九个通用野外配方和工具配方所有人从一开始就会。',

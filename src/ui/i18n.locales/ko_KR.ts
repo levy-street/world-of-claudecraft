@@ -11117,7 +11117,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.intro': '제작자들이 가장 자주 묻는 질문과 짧은 답.',
   'guide.profPages.faq.q1': '전문직을 몇 개나 배울 수 있나요?',
   'guide.profPages.faq.a1':
-    '모든 캐릭터가 여덟 가지 수련 가능한 제작 전문직과 네 가지 채집 전문직을 전부 올릴 수 있다. 하나만 골라야 하는 것은 원형 정체성뿐이다.',
+    '모든 캐릭터가 아홉 가지 수련 가능한 제작 전문직과 네 가지 채집 전문직을 전부 올릴 수 있다. 하나만 골라야 하는 것은 원형 정체성뿐이다.',
   'guide.profPages.faq.q2': '제조법은 어디서 배우나요?',
   'guide.profPages.faq.a2':
     '훈련사 사다리 제조법은 각 작업대의 상주 장인이 가르치고, 아홉 개의 공용 야외 제조법과 도구 제조법은 모두가 처음부터 안다.',
