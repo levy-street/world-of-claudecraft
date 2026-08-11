@@ -355,7 +355,11 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
     // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the jewelcrafting
-    // masterwork mark the trainer ladder made earnable: 341. Catalog growth reverts
+    // masterwork mark the trainer ladder made earnable: 341, plus the
+    // Grandmaster Jewelcrafting title-shelf slot the phase 05 QA ruling
+    // authored: 342, plus the Masterwrought phase 06 inscription pair (the
+    // masterwork:inscription mark and the Grandmaster Inscription title-shelf
+    // slot): 344. Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -371,9 +375,10 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands (same deltas as the overview
-    // pair above, including the three release-merged daggers and the
-    // jewelcrafting masterwork mark; marks are character-scoped, so this trails
-    // the overview by the 29 account-scoped weapon skins).
+    // pair above, including the three release-merged daggers, both craft
+    // masterwork marks, and the two Grandmaster title-shelf slots; marks are
+    // character-scoped, so this trails the overview by the 29 account-scoped
+    // weapon skins).
     expect(character).toEqual({ owned: 315, total: 315 });
   });
 
@@ -384,8 +389,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // catalog by 4, and the measured value wins), and the seven Phase 21
     // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
     // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372, plus the
-    // three daggers the v0.36.0 release merge added to live content (375) and
-    // the jewelcrafting masterwork slot the trainer ladder earned: 376 total.
+    // three daggers the v0.36.0 release merge added to live content (375), the
+    // jewelcrafting masterwork slot the trainer ladder earned (376), the
+    // Grandmaster Jewelcrafting title slot the phase 05 QA ruling authored
+    // (377), and the two Masterwrought phase 06 inscription slots (the
+    // masterwork:inscription mark slot and the Grandmaster Inscription title
+    // slot): 379 total.
     // Slots, not unique relics: the two Spoils set repeats count again here,
     // and the seven excludeFromCompletion slots (four vault, three bands)
     // count here while adding zero to every completion pair, which is why this
@@ -398,7 +407,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
     ).toBe(379);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
-    // proofs of conquerors_rares_of_the_realm, and masterwork:jewelcrafting.
+    // proofs of conquerors_rares_of_the_realm, and the two craft masterwork
+    // marks (masterwork:jewelcrafting, masterwork:inscription).
     expect(
       RELIQUARY_MARK_IDS.size,
       `mark total moved; by namespace: ${[
