@@ -5589,14 +5589,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Written in Fine Ink",
     "category": "progression",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_inscription_rare.webp"
   },
   {
     "id": "prog_inscription_50",
     "name": "Quill and Pigment",
     "category": "progression",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_inscription_50.webp"
   },
   {
     "id": "prog_grandmaster_inscription",
@@ -5604,7 +5606,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "progression",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Grandmaster Inscription"
+    "rewardTitle": "Grandmaster Inscription",
+    "crest": "/ui/deeds/prog_grandmaster_inscription.webp"
   }
 ];
 
