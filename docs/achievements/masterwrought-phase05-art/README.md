@@ -28,6 +28,29 @@ generation service, source pack, or third-party reference was used.
   (gate band 0.35 to 0.6); the 512px source passed every converter source gate
   (transparent corners, 46px padding, 0.4993 coverage).
 
+## Deed crests added at the phase 05 QA (2026-08-10)
+
+The QA ruling authored the craft's remaining milestone pair, each crest an
+in-repo hand-written SVG in its family style, rasterized at 512px RGBA and
+ingested via `npm run assets:deeds` exactly like the rare crest above. Both
+committed sources carry the biome-required title element in the rendered
+bytes (no post-render amendment this time).
+
+- Asset: `public/ui/deeds/prog_jewelcrafting_50.webp` (Facet and Filigree,
+  the 50-skill milestone; the 50-family medallion with a faceted topaz over
+  gold filigree scroll curls)
+  - Accepted sha256: `5edc61e01ce5f20dbf525c1430dc1709a1bc58ff550e0f49bb0a5ca7a4f68d8a`
+  - Accepted bytes: 4928 (128x128 WebP, VP8X, alpha, q82 encode)
+  - Committed source: `prog_jewelcrafting_50.source.svg`, sha256
+    `dd77c9d923cbd1bb632630df625aa9d54d974474f3f055ab611f3eead231a0e1`
+- Asset: `public/ui/deeds/prog_grandmaster_jewelcrafting.webp` (Grandmaster
+  Jewelcrafting, the 125-cap milestone; the grandmaster laurel wreath around
+  a radiant round brilliant)
+  - Accepted sha256: `f3ff906d390920499779101c7d361be8b81d07398ab9c0133778ed5daed8ee49`
+  - Accepted bytes: 5126 (128x128 WebP, VP8X, alpha, q82 encode)
+  - Committed source: `prog_grandmaster_jewelcrafting.source.svg`, sha256
+    `f7a37f152020188bf6f8e820060a18a8a7cae35e265fa127f6dee2faa459a505`
+
 ## Item icons
 
 Nine placeholder originals in the `woc-item-icon-v1` house style (one hero

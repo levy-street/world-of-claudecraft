@@ -952,4 +952,13 @@ export const table: DeedLocaleTable = {
     name: '광채를 향한 연마',
     desc: '보석세공에서 처음으로 희귀 등급 아이템을 제작하십시오.',
   },
+  prog_jewelcrafting_50: {
+    name: '깎은 면과 세공',
+    desc: '보석세공 기술 50을 달성하십시오.',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: '보석세공 대가',
+    desc: '보석세공 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '보석세공 대가',
+  },
 };

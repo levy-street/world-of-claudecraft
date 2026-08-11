@@ -53,13 +53,15 @@ describe('deed_i18n English resolution', () => {
     // pinned by tests/deeds_content.test.ts): the Drakelands brood pair, the
     // four Thornhollow Fields battleground deeds, the Rift coverage pair
     // (dgn_rift, dgn_rift_s_rank), the eight per-craft rare-tier profession
-    // deeds (jewelcrafting joined with the Masterwrought phase 05 catalog),
-    // the twelve remaining starter-zone chronicle pairs, the four
-    // Reliquary Curator rank bridges (3 titles + 1 border; the border has no
-    // title manifest row), the three WARFARE lifetime-honor rank titles, and
-    // the five Phase 18 Reliquary completion-ladder titles.
-    expect(manifest.length).toBe(272 * 2 + 42);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(42);
+    // deeds (jewelcrafting joined with the Masterwrought phase 05 catalog,
+    // then its 50-skill and Grandmaster milestones at the phase 05 QA, the
+    // Grandmaster carrying the 43rd title), the twelve remaining
+    // starter-zone chronicle pairs, the four Reliquary Curator rank bridges
+    // (3 titles + 1 border; the border has no title manifest row), the three
+    // WARFARE lifetime-honor rank titles, and the five Phase 18 Reliquary
+    // completion-ladder titles.
+    expect(manifest.length).toBe(274 * 2 + 43);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(43);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',

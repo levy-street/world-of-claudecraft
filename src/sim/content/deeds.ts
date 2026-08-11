@@ -1995,14 +1995,13 @@ export const DEEDS: Record<string, DeedDef> = {
   // Grandmaster deeds stay deferred with prog_ringwright rather than shipping
   // visible-but-unearnable. Jewelcrafting left that set when its base catalog
   // landed (JEWELCRAFTING_RECIPES); its rare-tier milestone is
-  // prog_jewelcrafting_rare in the appended block below. That milestone is
-  // the ONLY one that shipped with the catalog: the rung-50 outputs put
-  // jewelcrafting inside the rare-teach family's derivation, while its
-  // skill-50 and Grandmaster pages wait for the craft's deeper content. The
-  // base catalog is a first wave whose ladder stops at the rung-50 rare band,
-  // and no attunement quest names either jewelcrafting pair yet
-  // (content/zone1.ts ships four), so the craft is reachable as a hobby but
-  // never as an uncapped major. Both deeds ship when that depth does.
+  // prog_jewelcrafting_rare in the appended block below, and the phase 05 QA
+  // ruling (2026-08-10) authored its skill-50 and Grandmaster pair behind it
+  // (prog_jewelcrafting_50 / prog_grandmaster_jewelcrafting): the 125 cap is
+  // reachable on the base catalog alone (rung-50 recipes keep granting on
+  // the tier taper), so the hold was authoring, not mechanics. No attunement
+  // quest names a jewelcrafting pair yet (content/zone1.ts ships four), so
+  // the craft climbs as a hobby; the deeds are earnable either way.
   prog_guildsworn: {
     id: 'prog_guildsworn',
     name: 'Craftsworn',
@@ -2843,6 +2842,30 @@ export const DEEDS: Record<string, DeedDef> = {
     category: 'progression',
     renown: 10,
     trigger: { kind: 'visit', markId: 'craft_rare:jewelcrafting' },
+  },
+  // The jewelcrafting 50-skill and Grandmaster milestones join their
+  // cross-craft families (phase 05 QA ruling 2026-08-10: author both now
+  // rather than defer with the archetype pairs; enchanting shipped its pair
+  // in the same no-pair-quest position, and the 125 cap is reachable on the
+  // base catalog alone). Same fields as their family blocks above; appended
+  // at the tail because DEED_ORDER derives from table order and is
+  // append-only.
+  prog_jewelcrafting_50: {
+    id: 'prog_jewelcrafting_50',
+    name: 'Facet and Filigree',
+    desc: 'Reach 50 skill in Jewelcrafting.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'jewelcrafting', level: 50 },
+  },
+  prog_grandmaster_jewelcrafting: {
+    id: 'prog_grandmaster_jewelcrafting',
+    name: 'Grandmaster Jewelcrafting',
+    desc: 'Reach 125 skill in Jewelcrafting, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'jewelcrafting', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Jewelcrafting' },
   },
 };
 

@@ -251,6 +251,41 @@ describe('jewelcrafting rung-50 craft at the forge', () => {
     expect(craftResults(events).map((e) => [e.ok, e.itemId])).toEqual([[true, RUNG_50_OUTPUT]]);
   });
 
+  it('lands the 50-skill deed through the LIVE gain path when a craft crosses the threshold', () => {
+    // The catalog climb itself: skill 49, one rung-25 craft, and the gain
+    // arm (CRAFT_SKILL_GAIN through gainCraftSkill) crosses 50, which the
+    // deeds evaluator turns into prog_jewelcrafting_50 at the tick tail (the
+    // phase 05 QA ruling authored the deed; this is the one arm that drives
+    // the real skill-gain path instead of assigning craftSkills directly).
+    const RUNG_25_RECIPE = 'recipe_riveted_iron_signet';
+    const rung25 = JEWELCRAFTING_RECIPES.find((r) => r.id === RUNG_25_RECIPE);
+    if (!rung25) throw new Error(`${RUNG_25_RECIPE} missing from JEWELCRAFTING_RECIPES`);
+    const sim = makeSim();
+    const { meta, pid } = playerOf(sim);
+    sim.tick();
+    teleportToForge(sim);
+    meta.copper = 50_000;
+    meta.craftSkills.jewelcrafting = 49;
+    sim.trainRecipe(RUNG_25_RECIPE, pid);
+    expect(meta.lastTrainResult?.ok, meta.lastTrainResult?.reason).toBe(true);
+    for (const reagent of rung25.reagents) sim.addItem(reagent.itemId, reagent.count, pid);
+    expect(meta.deedsEarned.has('prog_jewelcrafting_50')).toBe(false);
+    sim.drainEvents();
+
+    sim.craftItem(RUNG_25_RECIPE, false, pid, 1);
+    const events = tickUntilCraftResolves(sim);
+
+    expect(meta.lastCraftResult?.ok, meta.lastCraftResult?.reason).toBe(true);
+    // The LIVE gain arm really ran: 49 + CRAFT_SKILL_GAIN = 50, never assigned.
+    expect(meta.craftSkills.jewelcrafting).toBe(50);
+    expect(meta.deedsEarned.has('prog_jewelcrafting_50')).toBe(true);
+    expect(
+      events.some((e) => e.type === 'deedUnlocked' && e.deedId === 'prog_jewelcrafting_50'),
+    ).toBe(true);
+    // The Grandmaster sibling stays unearned at 50: the pair is two gates.
+    expect(meta.deedsEarned.has('prog_grandmaster_jewelcrafting')).toBe(false);
+  });
+
   it('refuses the same craft away from a forge with station_required', () => {
     const sim = makeSim();
     const { p, meta, pid } = playerOf(sim);

@@ -5503,7 +5503,7 @@ export const zh_TW: EnTranslations = {
       "stationsHeading": "工位與大師",
       "stationsBody": "三座主城中共設六座分類工位，常駐大師在此傳授配方並發布工作訂單。",
       "deedsHeading": "銘記旅程的功業",
-      "deedsBody": "功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。九種可修行業中有八種各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜（珠寶設計則以第一件精良首飾記下Polished to Brilliance，其里程碑篇章與命途一同等待）；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。",
+      "deedsBody": "功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。九種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜（珠寶設計還會以第一件稀有品質首飾記下Polished to Brilliance）；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。",
       "startHeading": "從哪裡開始",
       "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東南Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。",
       "colStation": "工位",

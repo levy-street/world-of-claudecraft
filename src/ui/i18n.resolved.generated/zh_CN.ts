@@ -5503,7 +5503,7 @@ export const zh_CN: EnTranslations = {
       "stationsHeading": "工位与大师",
       "stationsBody": "三座主城中共设六座分类工位，常驻大师在此传授配方并发布工作订单。",
       "deedsHeading": "铭记旅程的功业",
-      "deedsBody": "功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。九种可修行业中有八种各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔（珠宝加工则以第一件精良首饰记下Polished to Brilliance，其里程碑篇章与命途一同等待）；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。",
+      "deedsBody": "功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。九种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔（珠宝加工还会以第一件稀有品质首饰记下Polished to Brilliance）；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。",
       "startHeading": "从哪里开始",
       "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。",
       "colStation": "工位",

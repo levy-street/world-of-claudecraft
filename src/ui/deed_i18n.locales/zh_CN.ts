@@ -709,4 +709,13 @@ export const table: DeedLocaleTable = {
     name: '打磨至璀璨',
     desc: '在珠宝加工中制作你的第一件稀有品质物品。',
   },
+  prog_jewelcrafting_50: {
+    name: '琢面与花丝',
+    desc: '珠宝加工技能达到50点。',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: '珠宝加工宗师',
+    desc: '珠宝加工技能达到125点，登顶此门技艺的至高境界。',
+    title: '珠宝加工宗师',
+  },
 };

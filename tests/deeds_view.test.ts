@@ -799,19 +799,20 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 272 deeds - 4 feats - 9 hidden = 259 visible to a fresh character (the
+    // 274 deeds - 4 feats - 9 hidden = 261 visible to a fresh character (the
     // Drakelands brood pair, the four battleground deeds, the Rift coverage
     // pair, the eight per-craft rare-tier profession deeds (jewelcrafting
-    // joined with the Masterwrought phase 05 base catalog), the twelve
-    // remaining starter-zone chronicle pairs, the four Reliquary Curator rank
+    // joined with the Masterwrought phase 05 base catalog, then its 50-skill
+    // and Grandmaster milestones at the phase 05 QA), the twelve remaining
+    // starter-zone chronicle pairs, the four Reliquary Curator rank
     // bridges, the three WARFARE honor ranks, and four of the five Phase 18
     // Reliquary completion-ladder deeds; col_reliquary_complete is the
     // catalog's one off-prefix feat, so it sits outside the completion
     // denominator like the three feat_ deeds).
-    expect(view.summary.visibleTotal).toBe(259);
+    expect(view.summary.visibleTotal).toBe(261);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(263);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(265);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

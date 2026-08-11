@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Grandmaster Jewelcrafting deed crest source (125-skill grandmaster milestone)</title>
+  <defs>
+    <radialGradient id="fieldGrad" cx="0.5" cy="0.42" r="0.65">
+      <stop offset="0" stop-color="#1d3370"/>
+      <stop offset="0.45" stop-color="#122252"/>
+      <stop offset="0.8" stop-color="#081231"/>
+      <stop offset="1" stop-color="#04081c"/>
+    </radialGradient>
+    <radialGradient id="gemGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#bfe0ff" stop-opacity="0.65"/>
+      <stop offset="0.55" stop-color="#6ea2f0" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#6ea2f0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldRim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2d078"/>
+      <stop offset="0.35" stop-color="#c9962e"/>
+      <stop offset="0.7" stop-color="#8a5a1a"/>
+      <stop offset="1" stop-color="#5c3a10"/>
+    </linearGradient>
+    <linearGradient id="goldRimLow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9c6d24"/>
+      <stop offset="1" stop-color="#4a2e0c"/>
+    </linearGradient>
+    <linearGradient id="goldSpike" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eecb70"/>
+      <stop offset="0.5" stop-color="#b98a28"/>
+      <stop offset="1" stop-color="#6e4614"/>
+    </linearGradient>
+    <linearGradient id="leafGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f0cd74"/>
+      <stop offset="0.6" stop-color="#c1922e"/>
+      <stop offset="1" stop-color="#7c4f14"/>
+    </linearGradient>
+    <linearGradient id="diamondBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dcecff"/>
+      <stop offset="0.5" stop-color="#8fb8f0"/>
+      <stop offset="1" stop-color="#3f6ec2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- cardinal spikes -->
+  <g stroke="#2a1a08" stroke-width="4" stroke-linejoin="round">
+    <polygon points="256,48 274,96 256,122 238,96" fill="url(#goldSpike)"/>
+    <polygon points="256,464 238,416 256,390 274,416" fill="url(#goldRimLow)"/>
+    <polygon points="48,256 96,238 122,256 96,274" fill="url(#goldSpike)"/>
+    <polygon points="464,256 416,274 390,256 416,238" fill="url(#goldSpike)"/>
+  </g>
+
+  <!-- medallion rim -->
+  <circle cx="256" cy="256" r="198" fill="#241608"/>
+  <circle cx="256" cy="256" r="192" fill="none" stroke="url(#goldRim)" stroke-width="18"/>
+  <circle cx="256" cy="256" r="201" fill="none" stroke="#1c1206" stroke-width="5"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#3a2410" stroke-width="8"/>
+  <circle cx="256" cy="256" r="172" fill="none" stroke="url(#goldRim)" stroke-width="6"/>
+
+  <!-- rim studs at the diagonals -->
+  <g fill="#e8c264" stroke="#4a2e0c" stroke-width="3">
+    <circle cx="120.2" cy="120.2" r="9"/>
+    <circle cx="391.8" cy="120.2" r="9"/>
+    <circle cx="120.2" cy="391.8" r="9"/>
+    <circle cx="391.8" cy="391.8" r="9"/>
+  </g>
+
+  <!-- inner field -->
+  <circle cx="256" cy="256" r="168" fill="url(#fieldGrad)"/>
+  <circle cx="256" cy="256" r="154" fill="none" stroke="#d9b45c" stroke-opacity="0.22" stroke-width="3"/>
+
+  <!-- grandmaster laurel wreath, two open arcs of leaves -->
+  <g stroke="#3a2408" stroke-width="3" stroke-linejoin="round" fill="url(#leafGold)">
+    <!-- left branch, bottom to top -->
+    <path d="M 176 372 Q 150 352 148 322 Q 170 330 180 352 Z"/>
+    <path d="M 146 316 Q 128 288 134 258 Q 154 272 158 296 Z"/>
+    <path d="M 132 250 Q 126 218 140 192 Q 156 212 152 236 Z"/>
+    <path d="M 144 184 Q 150 154 172 134 Q 180 158 168 180 Z"/>
+    <path d="M 178 128 Q 196 106 224 98 Q 222 124 202 138 Z"/>
+    <!-- right branch, bottom to top -->
+    <path d="M 336 372 Q 362 352 364 322 Q 342 330 332 352 Z"/>
+    <path d="M 366 316 Q 384 288 378 258 Q 358 272 354 296 Z"/>
+    <path d="M 380 250 Q 386 218 372 192 Q 356 212 360 236 Z"/>
+    <path d="M 368 184 Q 362 154 340 134 Q 332 158 344 180 Z"/>
+    <path d="M 334 128 Q 316 106 288 98 Q 290 124 310 138 Z"/>
+  </g>
+  <!-- wreath stems -->
+  <g fill="none" stroke="url(#goldRim)" stroke-width="7" stroke-linecap="round">
+    <path d="M 186 380 Q 138 320 150 232 Q 158 168 216 118"/>
+    <path d="M 326 380 Q 374 320 362 232 Q 354 168 296 118"/>
+  </g>
+  <!-- ribbon tie at the base -->
+  <path fill="url(#leafGold)" stroke="#3a2408" stroke-width="3"
+    d="M 226 384 L 256 370 L 286 384 L 272 402 L 256 392 L 240 402 Z"/>
+
+  <!-- glow behind the gem -->
+  <ellipse cx="256" cy="238" rx="110" ry="100" fill="url(#gemGlow)"/>
+
+  <!-- radiant round brilliant, face on -->
+  <g stroke="#12305c" stroke-width="4" stroke-linejoin="round">
+    <polygon fill="url(#diamondBody)"
+      points="256,148 305,168 325,218 305,268 256,288 207,268 187,218 207,168"/>
+  </g>
+  <g stroke="none">
+    <!-- crown facets -->
+    <polygon fill="#f2f8ff" points="256,148 305,168 279,190 256,182"/>
+    <polygon fill="#a8c8f4" points="305,168 325,218 293,218 279,190"/>
+    <polygon fill="#6f9ade" points="325,218 305,268 279,246 293,218"/>
+    <polygon fill="#8db4ec" points="305,268 256,288 256,254 279,246"/>
+    <polygon fill="#5c88d0" points="256,288 207,268 233,246 256,254"/>
+    <polygon fill="#9cc0f2" points="207,268 187,218 219,218 233,246"/>
+    <polygon fill="#c2daf8" points="187,218 207,168 233,190 219,218"/>
+    <polygon fill="#e6f1ff" points="207,168 256,148 256,182 233,190"/>
+    <!-- table -->
+    <polygon fill="#bcd6f8" points="256,182 279,190 293,218 279,246 256,254 233,246 219,218 233,190"/>
+    <polygon fill="#ffffff" fill-opacity="0.85" points="256,182 279,190 245,238 235,206"/>
+  </g>
+  <!-- facet edge light -->
+  <g fill="none" stroke="#e8f2ff" stroke-opacity="0.6" stroke-width="2">
+    <polygon points="256,182 279,190 293,218 279,246 256,254 233,246 219,218 233,190"/>
+  </g>
+
+  <!-- radiance rays -->
+  <g stroke="#dcecff" stroke-opacity="0.55" stroke-width="4" stroke-linecap="round">
+    <line x1="256" y1="120" x2="256" y2="140"/>
+    <line x1="332" y1="152" x2="318" y2="166"/>
+    <line x1="180" y1="152" x2="194" y2="166"/>
+  </g>
+
+  <!-- sparkles -->
+  <g fill="#ffffff">
+    <path d="M 212 160 L 217 176 L 233 181 L 217 186 L 212 202 L 207 186 L 191 181 L 207 176 Z"/>
+    <path d="M 301 254 L 304 263 L 313 266 L 304 269 L 301 278 L 298 269 L 289 266 L 298 263 Z" fill-opacity="0.9"/>
+    <path d="M 256 316 L 258 323 L 265 325 L 258 327 L 256 334 L 254 327 L 247 325 L 254 323 Z" fill-opacity="0.85"/>
+  </g>
+</svg>

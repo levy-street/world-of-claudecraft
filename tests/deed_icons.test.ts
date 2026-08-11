@@ -363,8 +363,8 @@ describe('Book of Deeds webp icons', () => {
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(DEED_ART_PENDING_IDS, 'release-live deed art debt must stay empty').toEqual([]);
     expect(artless, 'every release-live deed must have painted art').toEqual([]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(272);
-    expect(DEED_IMAGE_IDS.size, 'every live deed is painted').toBe(272);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(274);
+    expect(DEED_IMAGE_IDS.size, 'every live deed is painted').toBe(274);
     for (const id of DEED_ORDER) {
       const crestId = deedCrestId(id, DEEDS[id].category);
       expect(crestId, `${id} must keep its bespoke crest identity`).toBe(`deed_${id}`);

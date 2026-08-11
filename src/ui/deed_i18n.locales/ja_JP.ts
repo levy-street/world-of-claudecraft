@@ -901,4 +901,13 @@ export const table: DeedLocaleTable = {
     name: '磨かれた輝き',
     desc: '宝石細工で初めてのレア級アイテムを作る。',
   },
+  prog_jewelcrafting_50: {
+    name: '刻面と透かし細工',
+    desc: '宝石細工のスキルで50に到達する。',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: '宝石細工の大師',
+    desc: '宝石細工のスキルで125に到達し、その道の極みに立つ。',
+    title: '宝石細工の大師',
+  },
 };

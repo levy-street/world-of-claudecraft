@@ -724,4 +724,13 @@ export const table: DeedLocaleTable = {
     name: '打磨至璀璨',
     desc: '在珠寶設計中製作你的第一件稀有品質物品。',
   },
+  prog_jewelcrafting_50: {
+    name: '琢面與花絲',
+    desc: '珠寶設計技能達到50。',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: '珠寶設計大宗師',
+    desc: '珠寶設計技能達到125，此技藝的頂點。',
+    title: '珠寶設計大宗師',
+  },
 };

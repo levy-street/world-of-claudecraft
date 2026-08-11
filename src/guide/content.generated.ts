@@ -5566,6 +5566,23 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 10,
     "feat": false,
     "crest": "/ui/deeds/prog_jewelcrafting_rare.webp"
+  },
+  {
+    "id": "prog_jewelcrafting_50",
+    "name": "Facet and Filigree",
+    "category": "progression",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/prog_jewelcrafting_50.webp"
+  },
+  {
+    "id": "prog_grandmaster_jewelcrafting",
+    "name": "Grandmaster Jewelcrafting",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Grandmaster Jewelcrafting",
+    "crest": "/ui/deeds/prog_grandmaster_jewelcrafting.webp"
   }
 ];
 
