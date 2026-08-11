@@ -1,6 +1,6 @@
 # Masterwrought: cross-phase state
 
-Current phase: 06 COMPLETE + RE-AUDITED (built and gate-closed 2026-08-11, see the Phase 06 ledger; a same-day second-pass re-audit ran its own v0.37.0 sync and a seven-finder verification sweep, see the Phase 06 re-audit addendum: four should-fix findings confirmed and applied, none blocking); next is Phase 06 QA (phase-06-qa.md), which starts with its own release sync per the delivery contract. Packet authored 2026-08-07.
+Current phase: 06 QA COMPLETE, verdict PASS (2026-08-11, see the Phase 06 QA ledger: all four queued rulings taken by Fernando, scroll re-priced to exact parity, the three tome held models AUTHORED in this PR, ringwright stays reserved, the routeBody register queued to the release fill; zero blocking in the shipped phase, one wiki-mirror blocker in the QA's own fix round found and fixed by the fresh review); next is Phase 07 (phase-07-intermediates.md), which starts with its own release sync per the delivery contract. Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.37.0`.
 
 ## Delivery contract (non-negotiable)
@@ -1704,3 +1704,109 @@ Grandmaster-craft family, generic by construction.
   above. Gate: gate_select PASS all 8 steps at tip 93fc866030 (selective step list,
   malware scan 0 high, conservation coverage, all builds), tree clean; the docs close
   commit rides after the gate tip per the phase 06 precedent.
+
+## Phase 06 QA ledger (2026-08-11, verdict PASS)
+- SYNC: pre-flight found origin/release/v0.37.0 (1bb9a24821) already an ancestor of
+  the tip (the re-audit's merge 76a3b43359 covered it; nothing new landed), so no
+  merge, no merge audit, and no naming-guard or portrait-trio work owed at sync time.
+- AUDIT SHAPE: five-agent ultracode workflow (exclusivity, budget, coverage, cleanup
+  finders plus the isolated-worktree decisiveness skeptic) with adversarial verify,
+  plus FRESH architecture-reviewer and frontend-seam-reviewer over the phase range;
+  then qa-checklist and a fresh fix-round reviewer over the QA session's own commits.
+  ZERO blocking in the shipped phase. All 8 mutation probes RED-as-expected,
+  headline P7: making the scroll arm emit a different aura id than elixir_kind reds
+  BOTH order tests plus the cross-band arm, so the exclusivity pin decisively
+  catches the exact bypass the QA emphasis named. Probe citation corrections for
+  future readers: the tome quality ladder binds in inscription_catalog ONLY
+  (deeds_content stays green under a quality flip), and the rung-50 scroll aura
+  name binds in inscription_scroll_exclusivity ONLY (elixir_tooltip_view stays
+  green under a rename).
+- BUDGETS: recomputed formula-exact with a counterfactual: the shipped 3/5/10 at
+  ilvl 11/16/23 uniquely identify the 0.75 held line (the 0.45 worn line would give
+  2/3/6). WORN-ARM DECISION RECORDED (the audit's one confirmed should-fix: made
+  and pinned in code, unrecorded here until now): the tomes are HELD offhands
+  (occupiesHand deliberately absent), they budget on the 0.75 offhand line, and a
+  two-hander displaces them, which is why they price at 0.75 rather than the 0.45
+  coexisting worn line; pinned by the inscription_catalog held pin.
+- RULINGS, all four taken by Fernando in-session:
+  (1) Scroll cost parity: RE-PRICE. recipe_sunpetal_scroll re-authored to
+  sunpetal_herb 1 / arcane_essence 2 / glass_vial 1 / arcane_dust 1 = EXACT 214
+  input parity with recipe_elixir_of_the_serpent (both resultCount 2), the rung-25
+  precedent; both fix-round reviewers recomputed the parity against the live
+  recipe_economy rule. The materialsBody prose was re-cut (dust returns in the
+  sunpetal scroll; both rung-50 recipes refined; priced even with the serpent
+  elixir) with the five non-Latin rows refreshed in-change, each using its locale's
+  own serpent-elixir name; wiki and resolved bundles regenerated. No new fill rows
+  (all 15 Latin rows were already pending). The rung-0 divergence (26 vs 32) is
+  deliberately outside the ruling's scope.
+  (2) Tome models: AUTHOR IN THIS PR. Three procedural held models
+  (tome_silverleaf / tome_goldleaf / tome_sunpetal: 404/512/584 triangles, 11 to
+  14 KB, vertex-color, texture-free) via the mailbox archetype under
+  scripts/assets/inscription_tomes with a family source fingerprint and the
+  contract test tests/inscription_tome_assets.test.ts; ITEM_OFFHAND_MODELS rows
+  plus VAR_BOOK grips (first members of the family the pipeline reserved);
+  priest/mage/druid gained a real offhandSlot whose base entries are swapOnly and
+  never render (empty hands unchanged, proven by the committed A/B evidence);
+  the WARLOCK deliberately keeps its fixed class spellbook (no offhandSlot; an
+  equipped tome keeps the book visual); paladin/shaman render tomes through their
+  existing slots. Evidence: docs/screenshots/masterwrought-phase06-tomes.
+  (3) prog_ringwright: KEEP RESERVED (cut from this packet); the re-recorded
+  deferral stands as written.
+  (4) Older crafts' routeBody register: QUEUE to the release fill's register pass
+  (a recorded fill obligation, not a future PR).
+- RE-JUDGED correct-by-derivation flips, all APPROVED: the Bombardier hobby
+  re-derivation (release note stands), the apothecary two-craft train view, the
+  dev-kit caster-offhand pick and its 13-count liveness floor, and the uncommon(0)
+  tome quality ladder (the budget finder confirmed the mechanism sound). NEW
+  accepted derivation: a WEAPONLESS priest/mage/druid in the Combat Mech now shows
+  the class staff base where it used to show the mech's sword default (the same
+  layout adoption the shield classes already had; an armed character is
+  unaffected); pinned in held_weapon_models.
+- BAGS_VIEW hover gap JUDGED FIX-NOT-CUT: elixirs and scrolls hint clickUseInstant
+  (an existing key, zero new i18n rows), pinned in bags_view. TRAY CAP DECISION
+  RECORDED: the combat-priority order deliberately sheds food and drink first at
+  the six-slot mobile tray cap (a buff-heavy bag shows no regen consumables in the
+  tray; the bags keep them reachable); pinned by the cap-eviction arm in
+  consumable_bar_view.
+- FIX-ROUND REVIEW (qa-checklist plus a fresh reviewer over the seven QA commits):
+  1 blocking, CONFIRMED and fixed: the wiki generator mirrors VisualDef.attach
+  verbatim and the guide viewer renders every entry unconditionally, so the caster
+  offhand bases would have put the warlock's open spellbook in three class figures
+  while the stills (keyed on model+tint only, blind to attach) kept the old
+  posters. Fix: AttachDef.swapOnly, filtered by the generator; the regenerated
+  artifact is byte-identical, so no stills churn and no viewer change. The
+  shield classes' showcase offhands (the paladin's axe-and-shield still) are
+  deliberately unflagged. Should-fixes applied: VAR_BOOK grip pins
+  (mutation-proven red on a deleted row), the mech staff pin, the tome family in
+  scripts/assets/remint_lockfile_fingerprints.mjs plus the audit-doc scope line,
+  and usedExtensions/scene/camera diagnostic pins on the asset test. The remint
+  registry still has no completeness guard (nothing pins that every fingerprinted
+  family is enumerated); recorded as a tooling note, deliberately not built here.
+- PORTRAIT LEDGER: the tome wiring moved vision_malric_mage's source digest and
+  its webp by 24 encoder-level bytes (visually identical; reproduced byte-identical
+  across two full 230-portrait rerenders, so expected content movement, not env
+  drift); manifest re-minted via the receipt flow and the accepted-art
+  sourceManifests pin advanced the re-bless way.
+- DURABLE LESSONS: a render-manifest commit is a wiki-regen trigger too, not just
+  a content commit (build_content.mjs mirrors VisualDef.attach); the guide stills
+  key (model, tint, tintStrength) is blind to attach changes, so an attach edit
+  can silently split poster from viewer; a swap-slot base entry needs swapOnly or
+  the guide showcases it.
+- GATE: gate_select PASS all 8 steps at the final tip (recorded in progress.md);
+  npx tsc clean; ci:changed clean (warnings only). Validation surface: the three
+  inscription suites, tome assets, held_weapon_models, elixir_tooltip_view,
+  market_filters, bags_view, bag_filter, consumable_bar_view, recipe_economy,
+  itemization_coverage, item_level(+requirements), shipped_item_ids, architecture,
+  localization_fixes, train_view, dev_kit, crafting_view, material_* (grades,
+  affinity+bootstrap, hint views), professions_* (hobby_craft, crafting_hub,
+  crafting, archetype), deeds_* (content, view, i18n, icons), reliquary_content,
+  guide(+key_coverage), i18n_completeness, jewelcrafting_* (catalog, flow),
+  item_kind_line, inventory_sort, release_art_audit_v036_reliquary_deeds,
+  item_art_consistency, item_icons, placeholder_art_completion,
+  mob_portrait_source_manifest, target_portrait_view, native_assets_pack,
+  render_glb_replacement_assets, glb_texture_compression: all green.
+- HANDOFF for Phase 07 (intermediates): the inscription base catalog is audited
+  twice over and QA-closed; the exclusivity seam, budgets, and station wiring are
+  all pinned decisive. Phase 07's Lucent Reagent authoring starts from a clean
+  base; nothing from this QA carries forward except the recorded release-fill
+  obligations and the routeBody register pass queued to the fill.

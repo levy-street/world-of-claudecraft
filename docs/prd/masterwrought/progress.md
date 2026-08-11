@@ -247,6 +247,26 @@ never future-PR items, per the delivery contract in `state.md`).
   formula-exact, exclusivity pins mutation-proven in an isolated worktree, per-id
   obligations complete. Gate PASS all 8 at 93fc866030. Full record in the state.md
   Phase 06 re-audit addendum.
+- Phase 06 QA (2026-08-11): verdict PASS. The release was already synced (the
+  re-audit's v0.37.0 merge covered the tip, nothing new landed). Five-agent
+  ultracode audit (four finders plus an isolated-worktree decisiveness skeptic:
+  all 8 probes red-as-expected, the headline proving the exclusivity pin catches
+  a scroll leaving the shared elixir aura id in BOTH orders) plus fresh
+  architecture and frontend reviewers: zero blocking in the shipped phase, one
+  should-fix (the held-vs-worn tome decision unrecorded; now in the ledger).
+  All four queued rulings taken by Fernando: the rung-50 scroll re-priced to
+  exact 214 parity with the serpent elixir (materialsBody re-cut, five
+  non-Latin refreshes in-change), the three tome held models AUTHORED in this
+  PR (procedural fingerprint-pinned GLBs, VAR_BOOK grips, real offhand slots
+  for priest/mage/druid with swapOnly bases, warlock keeps its class
+  spellbook, in-game A/B evidence committed), prog_ringwright stays reserved,
+  and the older crafts' routeBody register is queued to the release fill. The
+  bags hover gap was judged fix-not-cut (clickUseInstant, zero new i18n rows)
+  and the tray's cap-eviction trade recorded and pinned. The fix round's own
+  fresh review caught one blocker: the wiki generator mirrors attach lists, so
+  the caster offhand bases would have put the warlock's spellbook in three
+  class figures; AttachDef.swapOnly now filters them and the artifact stayed
+  byte-identical. Gate PASS at the final tip. Full ledger in state.md.
 - Phase 03 QA (verify): PASS-WITH-FOLLOWUPS. Release/v0.36.0 synced first (merge
   ed51716964, 30 conflicts; the release's own honor-title re-cut supersedes the
   phase's ladder verdicts: Linebreaker / Fieldreaver / Warcrowned adopted, docs
