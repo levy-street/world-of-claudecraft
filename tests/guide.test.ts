@@ -1643,13 +1643,25 @@ describe('Guide professions generated content accuracy', () => {
     // the branch is driven directly: the empty card carries the coming-soon
     // copy and NO link, and the sibling content card links with no such copy.
     const emptyCard = ringCards([
-      { id: 'inscription', name: 'Inscription', pole: 'Cross-cutting', maxSkill: 125, hasContent: false },
+      {
+        id: 'inscription',
+        name: 'Inscription',
+        pole: 'Cross-cutting',
+        maxSkill: 125,
+        hasContent: false,
+      },
     ]);
     expect(emptyCard).toContain('guide-prof-card-empty');
     expect(emptyCard).toContain(t('guide.professions.comingSoon'));
     expect(emptyCard).not.toContain('href=');
     const contentCard = ringCards([
-      { id: 'inscription', name: 'Inscription', pole: 'Cross-cutting', maxSkill: 125, hasContent: true },
+      {
+        id: 'inscription',
+        name: 'Inscription',
+        pole: 'Cross-cutting',
+        maxSkill: 125,
+        hasContent: true,
+      },
     ]);
     expect(contentCard).toContain('href=');
     expect(contentCard).not.toContain(t('guide.professions.comingSoon'));

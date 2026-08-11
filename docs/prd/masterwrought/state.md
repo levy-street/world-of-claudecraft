@@ -1579,3 +1579,15 @@ Grandmaster-craft family, generic by construction.
   itemUi.tooltip.useElixir/useElixirAura (tooltip-writing.md item 7); the five non-Latin
   refreshes and Latin strips of those two keys plus the faq q1/a1 subject change ride
   the wave 3 locale round, adding those four keys to the release-fill worklist.
+- FRESH-REVIEWER ADDENDA (round two, applied): the dev_kit caster-offhand liveness floor
+  re-pinned at the REAL count (13; paladin contributes zero, shields/none); the crafting
+  signing comment restored to the four single-copy precedents with the platter, serpent
+  elixir, and sunpetal_scroll as the three accepted-cost cases; the exclusivity suite
+  anchors its non-family-aura baseline so the total-count arm cannot degrade. WIDENED
+  RELEASE-FILL NOTE: beyond the four keys wave 3 touched, the WHOLE non-Latin
+  guide.profPages.faq q3-a8 block (12 rows x 5 locales) still translates the pre-rewrite
+  English subjects (zh a3 even claims bare-handed tier 1 gathering, contradicted by the
+  live q7 answer): the recorded old-generation whole-block regen covers q1-a8 and the
+  release fill must treat it as such, not as the four wave 3 keys only. RECORDED, no
+  change: defaultHobbyForPair's contentSet stays a prose-guarded test-only parameter (a
+  type-system-enforced seam would be an API redesign out of fix-round scope).

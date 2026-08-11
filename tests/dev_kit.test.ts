@@ -314,9 +314,12 @@ describe('kit construction', () => {
       expect(off, `${cls}/${spec} held offhand`).toBe(CASTER_TOME);
       pinned += 1;
     }
-    // Liveness: the sweep really reached caster held-offhand picks; a pool
-    // or picker change that empties the slot must be admitted here.
-    expect(pinned).toBeGreaterThanOrEqual(6);
+    // Liveness at the REAL count (the vacuity-floor rule): thirteen specs
+    // carry the pick today (mage x3, priest x3, warlock x3, druid x3,
+    // shaman/elemental; paladin contributes zero, holy and protection take
+    // shields and retribution takes nothing). A pool or picker change that
+    // moves ANY of them must be admitted here.
+    expect(pinned).toBe(13);
   });
 
   it('never puts the same ring in both ring slots', () => {

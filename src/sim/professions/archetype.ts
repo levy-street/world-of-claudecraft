@@ -268,8 +268,8 @@ const CRAFTS_WITH_CONTENT: ReadonlySet<string> = new Set([
 /** Choose the higher retained-skill hobby; among an equal-skill (typically
  * zero-skill) tie, prefer a candidate with real content (the derived
  * CRAFTS_WITH_CONTENT set) over one with none, and only then fall back to
- * ring order as the final
- * stable tie break. This is used for first attunement and old-save backfill.
+ * ring order as the final stable tie break. This is used for first
+ * attunement and old-save backfill.
  * Deliberately NOT applied in hobbyCandidatesForPair: the explicit
  * hobby-switch quest still needs every ring-opposite candidate reachable by
  * player choice, content or not.

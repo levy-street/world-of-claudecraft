@@ -4093,9 +4093,10 @@ function itemFallback(id: string): IconRecipe | null {
   // Every arm above is kind-gated and cannot match a 'recipe'.
   if (it.kind === 'recipe') return r('parchment', 'leather', ['scroll'], fx);
   // Buff scrolls (kind 'scroll', phase 06) take the same parchment fallback
-  // explicitly rather than falling through the flask arm above (kind-gated on
-  // potion|elixir) into the name-matched trinket cascade. Inert while every
-  // shipped scroll carries committed WebP; this is the artless-id backstop.
+  // explicitly: no kind-gated arm above matches them (the flask arm gates on
+  // potion|elixir), so without this row an artless scroll would fall through
+  // to the name-matched trinket cascade. Inert while every shipped scroll
+  // carries committed WebP; this is the artless-id backstop.
   if (it.kind === 'scroll') return r('parchment', 'leather', ['scroll'], fx);
   // Raw fishing catches left kind food for cooking reagents; keep a fish-like
   // procedural recipe so they never fall through to generic junk trinkets when

@@ -710,15 +710,15 @@ export function resolveCraftForRecipe(
   // top of it, and it logs the quality-colored, item-linked crafted line
   // carrying the output count, so the hub's "You receive:" line would be a
   // second (and for a resultCount > 1 recipe a third) line for the one craft
-  // (#2430). Applying the DEF-quality rule to recipe_anglers_feast_platter and
-  // recipe_elixir_of_the_serpent is a deliberate, accepted cost: both are
-  // food/elixir, so useItem's battlefieldExperienceTrickle arm (gated on
-  // def.kind === 'potion') never reaches them, meaning this signs every copy
-  // for zero Battlefield Experience payoff. It still applies, for consistency
-  // with the five existing rare consumable outputs (silvered_carp_supper,
-  // marlows_grand_roast, the two sunpetal draughts, and the phase 06
-  // sunpetal_scroll, whose resultCount 2 signs both copies of a batch): the
-  // signed instance is
+  // (#2430). Applying the DEF-quality rule to recipe_anglers_feast_platter,
+  // recipe_elixir_of_the_serpent, and the phase 06 recipe_sunpetal_scroll
+  // (whose resultCount 2 signs both copies of a batch) is a deliberate,
+  // accepted cost: all three are food/elixir/scroll, so useItem's
+  // battlefieldExperienceTrickle arm (gated on def.kind === 'potion') never
+  // reaches them, meaning this signs every copy for zero Battlefield
+  // Experience payoff. It still applies, for consistency with the four
+  // existing rare single-copy consumables (silvered_carp_supper,
+  // marlows_grand_roast, the two sunpetal draughts): the signed instance is
   // non-fungible, so countFungibleItem/removeFungibleItem (src/sim/market.ts)
   // and post_office.ts see zero fungible copies of either output. Since the
   // instanced exchange pipes landed (#1165,

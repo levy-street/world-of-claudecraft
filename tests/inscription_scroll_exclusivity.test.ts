@@ -69,6 +69,10 @@ describe('scroll and elixir share one exclusive family (both orders)', () => {
       // no-op or applied nothing" (the coverage-audit refusal case).
       for (let i = 0; i < 20 * 5; i++) sim.tick();
       const totalBefore = p.auras.length;
+      // The count assertion below is meaningful only while the fixture holds
+      // a NON-family aura too (the warrior's stance); anchored so a fixture
+      // change cannot quietly degrade it into the family-filter length check.
+      expect(totalBefore, 'the fixture carries a non-family aura').toBeGreaterThanOrEqual(2);
       expect(familyAuras(p)[0].remaining, 'the elixir really ticked down').toBeLessThan(
         (ITEMS[pair.elixir]?.elixir?.duration ?? 0) - 4,
       );
@@ -94,6 +98,7 @@ describe('scroll and elixir share one exclusive family (both orders)', () => {
       expect(familyAuras(p).length, `${pair.scroll} applied`).toBe(1);
       for (let i = 0; i < 20 * 5; i++) sim.tick();
       const totalBefore = p.auras.length;
+      expect(totalBefore, 'the fixture carries a non-family aura').toBeGreaterThanOrEqual(2);
       expect(familyAuras(p)[0].remaining, 'the scroll really ticked down').toBeLessThan(
         (ITEMS[pair.scroll]?.elixir?.duration ?? 0) - 4,
       );

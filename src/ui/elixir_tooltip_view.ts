@@ -26,7 +26,8 @@ const ELIXIR_STAT_KEYS: Partial<Record<AuraKind, TranslationKey>> = {
   buff_ap: 'itemUi.stats.attackPower',
 };
 
-/** The "Use:" line for a battle elixir, or '' for any other item. */
+/** The "Use:" line for a battle elixir or buff scroll (any item carrying the
+ *  elixir effect record), or '' for any other item. */
 export function elixirTooltipLines(item: ItemDef): string {
   const elx = item.elixir;
   if (!elx) return '';
