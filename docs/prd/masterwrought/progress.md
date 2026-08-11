@@ -216,6 +216,37 @@ never future-PR items, per the delivery contract in `state.md`).
   heroic-raid epics are NOT sunderable today; the movement:true obligation
   for phase 12; release-owned upstream items), none blocking. Full ledger
   in state.md.
+- Phase 06 (2026-08-11): inscription exists, power-safe. Six trainer-taught records
+  at Alchemist Verane's apothecary (explicit per-record stationType, no new station
+  type or NPC: the serial decision, four-leg rationale in state.md): three CASTER_ALL
+  held-offhand tomes (budgets 3/5/10 formula-exact at ilvl 11/16/23,
+  uncommon/uncommon/rare extending the phase 05 quality ruling) and three buff
+  scrolls on the NEW ItemKind 'scroll', each an alternative source of its band's
+  stamina elixir aura (same aura id, same display names; applyAura same-id
+  replacement makes either order replace and never stack, with zero changes to
+  combat/exclusive_aura.ts or aura_stacking.ts). Deed trio + the horizons_titles
+  slot + masterwork:inscription in all three mark tables and the glossary; full
+  per-id art/M16/wiki obligations paid and the falsified-claims prose sweep done.
+  New suites: inscription_catalog, inscription_flow, inscription_scroll_exclusivity.
+  Four reviewer reports + a fresh fix-round review applied; gate PASS all 8 at
+  3c732e20d6. Rulings queued for QA: scroll cost parity vs the pristine_venom_gland
+  sole sink, tome GLBs vs the model-less debt, prog_ringwright design. Full ledger
+  in state.md.
+- Phase 06 re-audit (2026-08-11, second pass, same day): operator-requested re-walk
+  of the whole phase spec. Own release sync first (merge 76a3b43359: native OTA +
+  kobold/Grix bodies; the portrait ledger TRIO reconciled after the merge split it,
+  a new lesson recorded in the addendum; local rerender byte-identical 230/230, no
+  env ping-pong this sync), then a seven-finder verification sweep with per-finding
+  adversarial verify and a fresh review of the fix round. Eight should-fix + six
+  nits found and applied across the two rounds (headline: the stale jewelcrafting
+  routeBody deed claim missed by the phase's inscription-focused sweep, the
+  reliquary narrative arithmetic sitting 3 short of every pin, the dropped second
+  ringwright doctrine comment, the 35-vs-91 ledger copy-slip, and this missing
+  progress.md bullet itself); one finding refuted (scroll-kind Latin overlays are a
+  recorded release-fill row). Everything else verified clean: budgets recomputed
+  formula-exact, exclusivity pins mutation-proven in an isolated worktree, per-id
+  obligations complete. Gate PASS all 8 at 93fc866030. Full record in the state.md
+  Phase 06 re-audit addendum.
 - Phase 03 QA (verify): PASS-WITH-FOLLOWUPS. Release/v0.36.0 synced first (merge
   ed51716964, 30 conflicts; the release's own honor-title re-cut supersedes the
   phase's ladder verdicts: Linebreaker / Fieldreaver / Warcrowned adopted, docs

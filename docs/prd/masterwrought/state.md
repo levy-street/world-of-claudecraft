@@ -1697,6 +1697,10 @@ Grandmaster-craft family, generic by construction.
   where jewelcrafting and inscription now name three deeds and say "at 50 skill");
   unifying costs five English rewords x five non-Latin refreshes, a fill-wave-scale
   prose pass, so it is queued rather than done here.
-- STATUS: header line updated to 06 COMPLETE + RE-AUDITED; the Phase 06 QA handoff and
-  its queued rulings are unchanged by this pass apart from the added prose-register
-  item above.
+- STATUS: header line updated to 06 COMPLETE + RE-AUDITED; progress.md gained the
+  Phase 06 prose bullet the close had omitted (every prior phase carries one, a fifth
+  miss this re-audit caught) plus a re-audit bullet; the Phase 06 QA handoff and its
+  queued rulings are unchanged by this pass apart from the added prose-register item
+  above. Gate: gate_select PASS all 8 steps at tip 93fc866030 (selective step list,
+  malware scan 0 high, conservation coverage, all builds), tree clean; the docs close
+  commit rides after the gate tip per the phase 06 precedent.
