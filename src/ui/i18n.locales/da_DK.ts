@@ -875,35 +875,25 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Stil',
   'editor.status.campCapReached':
     'Grænsen for lejre er nået ({max}). Den nye lejr blev ikke tilføjet.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Øger KRIGSFØRELSE-forsvarsvurdering med 40.',
-  'entities.itemSets.warfare_ashstalker.bonus4':
-    'Øger KRIGSFØRELSE-angrebsvurdering med 40, og massekontrol, som fjendtlige spillere lægger på dig, varer 15% kortere.',
-  'entities.itemSets.warfare_ashstalker.bonus7':
-    'Øger KRIGSFØRELSE-angrebs- og forsvarsvurdering med 80. At dræbe en fjendtlig spiller giver Askeskridt og øger bevægelseshastighed med 40% i 6 sek.',
+  'entities.itemSets.warfare_ashstalker.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_ashstalker.bonus4': 'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
+  'entities.itemSets.warfare_ashstalker.bonus7': 'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. At dræbe en fjendtlig spiller giver Askeskridt, hvilket øger bevægelseshastigheden med 40% i 6 sek.',
   'entities.itemSets.warfare_ashstalker.name': 'Askejæger-udstyr',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Øger KRIGSFØRELSE-forsvarsvurdering med 40.',
-  'entities.itemSets.warfare_cinderweave.bonus4':
-    'Øger KRIGSFØRELSE-angrebsvurdering med 40, og massekontrol, som fjendtlige spillere lægger på dig, varer 15% kortere.',
-  'entities.itemSets.warfare_cinderweave.bonus7':
-    'Øger KRIGSFØRELSE-angrebs- og forsvarsvurdering med 80. Dine besværgelser har 15% chance for at give Glødeværn og absorbere 120 skade i 8 sek.',
+  'entities.itemSets.warfare_cinderweave.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_cinderweave.bonus4': 'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
+  'entities.itemSets.warfare_cinderweave.bonus7': 'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. Jeres besværgelser har 15% chance for at give Gløderværn, hvilket absorberer 120 skade i 8 sek.',
   'entities.itemSets.warfare_cinderweave.name': 'Glødvæv-regalier',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Øger KRIGSFØRELSE-forsvarsvurdering med 40.',
-  'entities.itemSets.warfare_furyforged.bonus4':
-    'Øger KRIGSFØRELSE-angrebsvurdering med 40, og massekontrol, som fjendtlige spillere lægger på dig, varer 15% kortere.',
-  'entities.itemSets.warfare_furyforged.bonus7':
-    'Øger KRIGSFØRELSE-angrebs- og forsvarsvurdering med 80. At dræbe en fjendtlig spiller giver Ubrudt Ed og absorberer 200 skade i 10 sek.',
+  'entities.itemSets.warfare_furyforged.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_furyforged.bonus4': 'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
+  'entities.itemSets.warfare_furyforged.bonus7': 'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. At dræbe en fjendtlig spiller giver Ubrudt Ed, hvilket absorberer 200 skade i 10 sek.',
   'entities.itemSets.warfare_furyforged.name': 'Raseresmedet kampudstyr',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Øger KRIGSFØRELSE-forsvarsvurdering med 40.',
-  'entities.itemSets.warfare_stormbound.bonus4':
-    'Øger KRIGSFØRELSE-angrebsvurdering med 40, og massekontrol, som fjendtlige spillere lægger på dig, varer 15% kortere.',
-  'entities.itemSets.warfare_stormbound.bonus7':
-    'Øger KRIGSFØRELSE-angrebs- og forsvarsvurdering med 80. Dine besværgelser har 15% chance for at give Glødeværn og absorbere 120 skade i 8 sek.',
+  'entities.itemSets.warfare_stormbound.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_stormbound.bonus4': 'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
+  'entities.itemSets.warfare_stormbound.bonus7': 'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. Jeres besværgelser har 15% chance for at give Gløderværn, hvilket absorberer 120 skade i 8 sek.',
   'entities.itemSets.warfare_stormbound.name': 'Stormbundne klæder',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Øger KRIGSFØRELSE-forsvarsvurdering med 40.',
-  'entities.itemSets.warfare_thornhide.bonus4':
-    'Øger KRIGSFØRELSE-angrebsvurdering med 40, og massekontrol, som fjendtlige spillere lægger på dig, varer 15% kortere.',
-  'entities.itemSets.warfare_thornhide.bonus7':
-    'Øger KRIGSFØRELSE-angrebs- og forsvarsvurdering med 80. Dine besværgelser har 15% chance for at give Tornskjold og øge undvigelse med 15% i 6 sek.',
+  'entities.itemSets.warfare_thornhide.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_thornhide.bonus4': 'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
+  'entities.itemSets.warfare_thornhide.bonus7': 'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. Jeres besværgelser har 15% chance for at give Torneværn, hvilket øger undvigelse med 15% i 6 sek.',
   'entities.itemSets.warfare_thornhide.name': 'Tornskind-dragt',
   'entities.items.curved_tusk.name': 'Buet Stødtand',
   'entities.items.pristine_claw.name': 'Uberørt Klo',
@@ -943,8 +933,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceSkill25': 'Opskrifter op til færdighed 25: {seconds} sek. kast',
   'guide.profPages.econ.castPaceSkill50': 'Opskrifter op til færdighed 50: {seconds} sek. kast',
   'guide.profPages.econ.castPaceSkill75': 'Opskrifter op til færdighed 75: {seconds} sek. kast',
-  'guide.profPages.fish.earlyReelNote':
-    'Én advarsel til ivrige tommelfingre: trykker du på stangen igen, før noget bider, hiver du en tom line ind og afslutter kastet (et kort øjebliks nåde lige efter kastet tilgiver et utilsigtet dobbelttryk). Tålmodighed er hele spillet: vent på bidet, og slå så til.',
+  'guide.profPages.fish.earlyReelNote': 'En advarsel til ivrige tommelfingre: trykker du på stangen igen, før noget bider, haler du en tom line ind og afslutter kastet. Det første sekund efter linen lander bliver tilgivet, så et utilsigtet dobbelttryk koster dig ingenting; derefter er et for tidligt tryk et spildt kast. Tålmodighed er hele spillet: vent på bidet, og slå så til.',
   'guide.thornhollowPage.carrierBody':
     'En bærer, der holder på fjendens flag for længe, bliver mere og mere sårbar og tager stadig mere skade, indtil flaget bliver erobret, tabt eller returneret. At gemme sig med flaget er en tabt plan; at løbe det hjem er den vindende.',
   'guide.thornhollowPage.carrierHeading': 'At bære flaget',
@@ -957,13 +946,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.heading': 'Tornehulemarkerne',
   'guide.thornhollowPage.intro':
     'En rangeret 5v5 fang-flaget-slagmark udkæmpet i en ommuret hulning i den gamle skov under Tornetop, hvor to ruinerede borge står over for hinanden hen langs en kløft, og en ældre gård ligger imellem dem, som ingen af dem nogensinde har holdt. To hold på fem, to borge, ét mål: stjæl fjendens banner, og løb det hjem, før de løber med dit.',
-  'guide.thornhollowPage.ladderBody':
-    'Hver kamp flytter en vedvarende slagmarks-rating pr. karakter, uanset om du vinder eller taber, og alle tiders-tavlen rangerer rigets mestre. Sejre og hårdt kæmpede nederlag udbetaler også Ære gennem Krigsførelsessystemet.',
+  'guide.thornhollowPage.ladderBody': 'Hver kamp flytter en vedvarende slagmarksrangering knyttet til figuren, sejr eller nederlag, og tavlen gennem alle tider rangordner rigets mestre.',
   'guide.thornhollowPage.ladderHeading': 'Ranglisten',
   'guide.thornhollowPage.pickupNote':
     'At samle et flag op er altid et bevidst tryk på slagmarkens handlingstast: ingen bliver nogensinde bærer ved blot at strejfe det forkerte sted.',
-  'guide.thornhollowPage.queueBody':
-    'Åbn Tornehulemarkerne-panelet, og gå i kø alene, eller tag en gruppe på op til fem med og gå i kø sammen: grupper holdes altid samlet på ét hold, og de resterende pladser fyldes op med mestre, der kommer alene. Når ti står klar, sætter kampen begge hold ved deres borge til en kort opstilling, før flagene går i spil.',
+  'guide.thornhollowPage.queueBody': 'Tornehulemarkerne åbner på niveau 20, og hvert medlem af en gruppe skal nå det, før gruppen kan melde sig til. Åbn knappen PvP og vælg fanebladet Tornehulemarkerne, det faneblad den åbner på, og gå så i kø alene, eller tag en gruppe på op til fem med og meld jer til sammen: grupper holdes altid på samme hold, og de resterende pladser fyldes med enlige mestre. Når ti står klar, placerer kampen begge hold ved deres fæstninger til en kort opstilling, før flagene går i luften. Skulle en gruppe på fire eller fem ellers stå over for lutter enlige tilmeldte, holder sammensætningen kampen tilbage et øjeblik for at se, om en anden gruppe dukker op, så en gruppe af den størrelse venter undertiden nogle øjeblikke længere, før portene åbner. Den ventetid er kort og giver altid efter til sidst, så ingen bliver siddende i køen på grund af den.',
   'guide.thornhollowPage.queueHeading': 'Sådan går du i kø',
   'guide.thornhollowPage.respawnBody':
     'Døden følger den klassiske rite: dit lig ligger, hvor det faldt, indtil DU frigiver din ånd, og ånden rejser sig på den indhegnede kirkegård ved siden af din borg, beskyttet der indtil dit holds næste genopstandelsesbølge. Bølgen genrejser alle ventende ånder samtidig, og de to holds bølger er bevidst forskudt, så kampen aldrig nulstilles helt på én gang. Der er intet ligløb og ingen aftale med åndehelbrederen: frigiv, vent bølgen ud, kæmp.',
@@ -2087,8 +2074,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.ice_lance':
     'En øjeblikkelig skarv til at bruge frostudløsere, den rammer langt hårdere mod et frosset mål.',
   'guide.abilityHook.shatter': 'Dine trolddomme får langt oftere kritisk chance mod frosne mål.',
-  'guide.deedsPage.renownBody':
-    'Hæder er den score, der står bag Bogen. Enhver bedrift du optjener er et bestemt beløb værd, og dit samlede antal stiger kun, så en stille uge koster dig aldrig fodfæste. En håndfuld bedrifter afhænger af held snarere end færdighed, og Bragder er en ære for sig selv, så begge er ikke værd nogen Hæder overhovedet. Bedrifter uden Hæder tæller stadig mod fuldførelse i din Bog; de scorer blot aldrig.',
+  'guide.deedsPage.renownBody': 'Hæder er den score, der ligger bag Bogen. Hver bedrift, du vinder, er en fast mængde værd, og din samlede sum stiger kun, så en stille uge koster dig aldrig terræn. En håndfuld afhænger af held snarere end kunnen, andre samlerbedrifter er deres egen belønning, og Vovestykker er en ære for sig, så ingen af dem er nogen Hæder værd. Bedrifter uden Hæder tæller stadig med til at fuldføre din Bog; de giver blot aldrig point. Vovestykker er den eneste undtagelse, holdt helt uden for optællingen.',
   'guide.deedsPage.standingsNote':
     'Rigerne fører løbende optælling over Hæder på tværs af alle konti: listen rangordner hele konti efter livstids Hæder, tæller hver bedrift én gang på tværs af alle dine karakterer, og den viser kun Hæder, så bedrifter uden Hæder aldrig påvirker stillingen, selvom de tæller i din Bog. For at se, hvem der står hvor, åbner du Resultatlisten i spillet og vender til dens Hæder-fane; stillingerne er der, ikke på wikien.',
   'hudChrome.archetypePair.alchemy+cooking': 'Apoteker',
@@ -2432,8 +2418,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': 'Rasende Heling',
   'entities.abilities.heroic_leap.description':
     'Spring til målområdet og påfør {damage} skade på fjender i nærheden, når du lander.',
-  'entities.abilities.intimidating_shout.description':
-    'Et rædselsvækkende råb, der sender op til 5 fjender inden for 8 m på flugt i frygt i 8 sek. Skade kan bryde effekten.',
+  'entities.abilities.heroic_leap.name': 'Krigsspring',
+  'entities.abilities.intimidating_shout.description': 'Et skrækindjagende råb, der får op til 5 fjender inden for 8 m til at flygte i rædsel i 4 sek. Skade kan bryde effekten.',
   'entities.abilities.intimidating_shout.name': 'Frygtindgydende Råb',
   'entities.abilities.iron_resolve.description':
     'Bid tænderne sammen og ignorér smerten: bruger op til 40 raseri (mindst 20) for at absorbere 4 skade pr. brugt raseripoint i op til 10 sek. (Beskyttelse)',
@@ -2491,6 +2477,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': 'Valg',
   'hudChrome.talentRows.readoutSummary': 'Talenter: {head}, {spent}/{total} rækker valgt.',
   'entities.abilities.aspect_of_the_wild.name': 'Vildtands skikkelse',
+  'entities.abilities.avenging_wrath.name': 'Hævnende Vrede',
   'entities.abilities.berserk.name': 'Rød dis',
   'entities.abilities.bloodlust.name': 'Krigstrommer',
   'entities.abilities.chain_lightning.name': 'Gaffellyn',
@@ -2507,7 +2494,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frenzied_regeneration.name': 'Vild heling',
   'entities.abilities.frost_trap.name': 'Rimfælde',
   'entities.abilities.ghostly_strike.name': 'Genfærdsslag',
-  'entities.abilities.hammer_of_wrath.name': 'Klanghammer',
+  'entities.abilities.hammer_of_wrath.name': 'Vredens Hammer',
   'entities.abilities.healing_stream.name': 'Kildebrønd',
   'entities.abilities.howl_of_terror.name': 'Rædselshyl',
   'entities.abilities.ice_block.name': 'Kold kiste',
@@ -4066,8 +4053,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.adrenaline_rush.description':
     'Dit blod koger, og genopretter øjeblikkeligt 60 energi.',
   'entities.abilities.adrenaline_rush.name': 'Fremskyndet Blod',
-  'entities.abilities.aimed_shot.description':
-    'Et omhyggeligt optrukket skud, der giver {damage} skade.',
+  'entities.abilities.aimed_shot.description': 'Skyder målet for {damage} Fysisk skade. Skaden stiger med angrebsstyrke på afstand.',
   'entities.abilities.aimed_shot.name': 'Langt Optræk',
   'entities.abilities.ambush.name': 'Luskerens Slag',
   'entities.abilities.arcane_explosion.description':
@@ -4078,17 +4064,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_missiles.description':
     'Affyrer Æterpile mod fjenden, der forvolder {damage} Arkan skade hvert sekund i 3 sek.',
   'entities.abilities.arcane_missiles.name': 'Æterpile',
-  'entities.abilities.arcane_shot.description':
-    'Et øjeblikkeligt skud, der giver {damage} Arkan skade.',
+  'entities.abilities.arcane_shot.description': 'Skyder målet for {damage} Arkan skade. Skaden stiger med angrebsstyrke på afstand.',
   'entities.abilities.arcane_shot.name': 'Grumt Skud',
-  'entities.abilities.aspect_of_the_cheetah.description':
-    'Antag gangerens skikkelse, og øg bevægelseshastigheden med 30% i 30 min.',
+  'entities.abilities.aspect_of_the_cheetah.description': 'Antag løberens skikkelse og øg jeres bevægelseshastighed med 30% i 30 min.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Gangerens Skikkelse',
-  'entities.abilities.aspect_of_the_hawk.description':
-    'Antag kærhøgens skikkelse, og øg angrebskraften med {buff} i 30 min.',
+  'entities.abilities.aspect_of_the_hawk.description': 'Antag kærhøgens skikkelse og øg jeres angrebsstyrke med {buff} i 30 min.',
   'entities.abilities.aspect_of_the_hawk.name': 'Kærhøgens Skikkelse',
-  'entities.abilities.aspect_of_the_monkey.description':
-    'Antag mårens skikkelse, og øg din undvigechance med 8% i 30 min.',
+  'entities.abilities.aspect_of_the_monkey.description': 'Antag mårens skikkelse og øg jeres chance for at undvige med 8% i 30 min.',
   'entities.abilities.aspect_of_the_monkey.name': 'Mårens Skikkelse',
   'entities.abilities.backstab.name': 'Fejt Stød',
   'entities.abilities.barkskin.description':
@@ -4119,19 +4101,17 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.description':
     'Angrib øjeblikkeligt i et blodraseri for 60% våbenskade plus {damage}. (Furie-signatur)',
   'entities.abilities.bloodthirst.name': 'Åreladning',
-  'entities.abilities.cat_form.description':
-    'Forvandl dig til en ulv: angrebskraften stiger med dit niveau, dine angreb bruger energi og kombopoint, og du genererer 29% mindre trussel. Kast igen for at vende tilbage til besværgerform.',
+  'entities.abilities.cat_form.description': 'Forvandler jer til en ulv: smidigheden stiger med jeres niveau, angrebsstyrke +8 plus 2 per niveau, jeres angreb bruger energi og kombopoint, og I skaber 29% mindre trussel. Kast den igen for at vende tilbage til besværgerskikkelsen.',
   'entities.abilities.cat_form.name': 'Ulveform',
   'entities.abilities.charge.description':
     'Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. 8-25 m rækkevidde.',
   'entities.abilities.charge.name': 'Fremstorm',
   'entities.abilities.cheap_shot.name': 'Maveslag',
-  'entities.abilities.claw.name': 'Klo',
+  'entities.abilities.claw.name': 'Flængeklo',
   'entities.abilities.cleave.description':
     'Et fejende slag, der rammer alle fjender foran dig for {damage} skade.',
   'entities.abilities.cleave.name': 'Mejende Bue',
-  'entities.abilities.concussive_shot.description':
-    'Lammer målet for {damage} skade og nedsætter bevægelse med 50% i 4 sek.',
+  'entities.abilities.concussive_shot.description': 'Skyder målet for {damage} Fysisk skade og sinker det med 50% i 4 sek. Skaden stiger med angrebsstyrke på afstand.',
   'entities.abilities.concussive_shot.name': 'Rystende Skud',
   'entities.abilities.conjure_food.description':
     'Frembringer 2 portioner brød, der genopretter helbred, når de spises. Højere rang frembringer mere mættende kost.',
@@ -4176,11 +4156,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.divine_protection.description':
     'Et helligt skjold opsuger {damage}% af dit maksimale helbred i {duration} sek.',
   'entities.abilities.divine_protection.name': 'Troens Værn',
-  'entities.abilities.drain_life.description':
-    'Dræner målets liv og overfører {damage} helbred til dig hvert sekund i 5 sek.',
+  'entities.abilities.drain_life.description': 'Fortærer målets livskraft, volder {damage} Skyggeskade hvert sekund og overfører 70% af den som helbred til jer. Plage overfører i stedet det hele. Kanaliseret på jeres primære Evil Eye bruger den alle Skæbnetråde ved begyndelsen, og hver Tråd skaber 1 ekstra Fordømmelse per tik.',
   'entities.abilities.drain_life.name': 'Fortær',
-  'entities.abilities.earth_shock.description':
-    'Chokerer øjeblikkeligt målet med rystende kraft for {damage} naturskade.',
+  'entities.abilities.earth_shock.description': 'Volder {damage} Naturskade. Skaden stiger med Besværgelseskraft. Elementær: ved 5 Torden voldes 125% mere skade, hvorefter al Torden bruges. Stenbundet: tvinger målet til at angribe jer i 3 sek.',
   'entities.abilities.earth_shock.name': 'Jordstød',
   'entities.abilities.enrage.description': 'Skaber 20 raseri øjeblikkeligt. Kun i Bruin-form.',
   'entities.abilities.enrage.name': 'Optænding',
@@ -4208,31 +4186,24 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Slynger en flammende kugle, der volder {damage} ildskade plus yderligere skade over tid.',
   'entities.abilities.fireball.name': 'Glødlyn',
   'entities.abilities.rain_of_fire.name': 'Ildregn',
-  'entities.abilities.rain_of_fire.description':
-    'Nedkalder en ildregn over målområdet i 4 sek og brænder fjender for {damage} Ildskade hvert sekund.',
+  'entities.abilities.rain_of_fire.description': 'Bruger 3 Forødelse på at lade ild regne over målområdet og volde {damage} Ildskade hvert sekund i 4 sek., forlænget til 6 sek. på rang 2. Tilintetgørelse kalder den første bølge ned med det samme.',
   'entities.abilities.volley.name': 'Pileregn',
-  'entities.abilities.volley.description':
-    'Nedkalder en regn af pile over målområdet i 3 sek og påfører {damage} skade hvert 0,5 sek på fjender fanget i det.',
+  'entities.abilities.volley.description': 'Lader pile regne over et område på 8 m i 3 sek. Fjender i området tager {damage} Fysisk skade hvert 0.5 sek. Skaden stiger med angrebsstyrke på afstand.',
   'entities.abilities.hurricane.name': 'Orkan',
   'entities.abilities.hurricane.description':
     'Slipper en orkan løs over målområdet i 6 sek og rammer fjender for {damage} Naturskade hvert sekund.',
-  'entities.abilities.earthquake.name': 'Jordskælv',
-  'entities.abilities.earthquake.description':
-    'Ryster målområdet i 6 sek og rammer fjender for {damage} Naturskade hvert 1,5 sek.',
+  'entities.abilities.earthquake.name': 'Forkastningsvækning',
+  'entities.abilities.earthquake.description': 'Ryster et område på 8 m i 6 sek. og volder {damage} Naturskade hvert 1.5 sek. Skaden stiger med Besværgelseskraft. Elementær: ved 5 Torden voldes 100% mere skade, hvorefter al Torden bruges.',
   'entities.abilities.flamestrike.name': 'Flammeslag',
   'entities.abilities.flamestrike.description':
     'Nedkalder en flammeeksplosion på målområdet, der giver {damage} Ildskade til fjender fanget i eksplosionen.',
-  'entities.abilities.flame_shock.description':
-    'Svider målet med ild for {damage} skade plus {overTime} over 12 sek.',
+  'entities.abilities.flame_shock.description': 'Volder {damage} Ildskade, derefter {overTime} Ildskade over 12 sek. Det første træf stiger med Besværgelseskraft.',
   'entities.abilities.flame_shock.name': 'Glødstød',
-  'entities.abilities.flametongue_weapon.description':
-    'Gennemtrænger dit våben med elementær ild: hvert hug volder {damage} ekstra Ildskade i 5 min.',
+  'entities.abilities.flametongue_weapon.description': 'Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra Ildskade.',
   'entities.abilities.flametongue_weapon.name': 'Bålbrand-Våben',
-  'entities.abilities.flash_heal.description':
-    'En hurtig bøn, der helbreder et venligt mål for {damage}.',
+  'entities.abilities.flash_heal.description': 'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft.',
   'entities.abilities.flash_heal.name': 'Hastende Bøn',
-  'entities.abilities.flash_of_light.description':
-    'Et hurtigt, effektivt udbrud af Lys, der helbreder et venligt mål for {damage}.',
+  'entities.abilities.flash_of_light.description': 'Et hurtigt, effektivt glimt af Lys, der helbreder et venligt mål for {damage}. At genoprette helbred skaber 1 Hengivenhed, selv uden specialisering.',
   'entities.abilities.flash_of_light.name': 'Lyslægning',
   'entities.abilities.frost_armor.description':
     'Indhyller dig i frost og øger rustningen med {buff} i 30 min.',
@@ -4240,8 +4211,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frost_nova.description':
     'Fryser alle nærliggende fjender fast i op til 8 sek og volder {damage} frostskade. Fastfrysningen brydes efter samlet skade svarende til 15 % af målets maksimale helbred, dog mindst 20 og højst 60 skade.',
   'entities.abilities.frost_nova.name': 'Isbinding',
-  'entities.abilities.frost_shock.description':
-    'Chokerer øjeblikkeligt målet med frost for {damage} frostskade og sænker dets bevægelse med 50% i 8 sek.',
+  'entities.abilities.frost_shock.description': 'Volder {damage} Frostskade og sinker målet med 50% i 8 sek. Skaden stiger med Besværgelseskraft.',
   'entities.abilities.frost_shock.name': 'Rimstød',
   'entities.abilities.frostbolt.description':
     'Affyrer et frostlyn, der volder {damage} frostskade og sænker bevægelsen med 40%.',
@@ -4250,8 +4220,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Gennemtrænger dit våben med bidende frost: hvert hug volder {damage} ekstra skade i 5 min.',
   'entities.abilities.frostbrand_weapon.name': 'Rimbundet Våben',
   'entities.abilities.garrote.name': 'Strubetråd',
-  'entities.abilities.ghost_wolf.description':
-    'Forvandler dig til en Shadewolf og øger bevægelseshastigheden med 40% i 10 min.',
+  'entities.abilities.ghost_wolf.description': 'Bliv en Shadewolf og bevæg jer 40% hurtigere. Kast den igen for at vende tilbage til jeres normale skikkelse.',
   'entities.abilities.ghost_wolf.name': 'Skyggeulv',
   'entities.abilities.gouge.description':
     'Rammer målet for {damage} skade og sætter det ud af spillet i 4 sek. Enhver skade bryder effekten. Giver 1 kombopoint.',
@@ -4264,12 +4233,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     'Lemlæster fjenden for {damage} skade og sænker dens bevægelse med 50% i 15 sek.',
   'entities.abilities.hamstring.name': 'Lammende Snit',
-  'entities.abilities.heal.description':
-    'En langsom, men kraftfuld bøn, der helbreder et venligt mål for {damage}.',
+  'entities.abilities.heal.description': 'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft.',
   'entities.abilities.heal.name': 'Højtidelig Bøn',
   'entities.abilities.healing_touch.description': 'Helbreder et venligt mål for {damage}.',
   'entities.abilities.healing_touch.name': 'Vildlægning',
-  'entities.abilities.healing_wave.description': 'Helbreder et venligt mål for {damage}.',
+  'entities.abilities.healing_wave.description': 'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft. Genoprettelse: gemmer 50% af den fulde helbredelse før overhelbredelse som Helbredende Strøm i 12 sek., op til 30% af målets maksimale helbred.',
   'entities.abilities.healing_wave.name': 'Lægende Vande',
   'entities.abilities.heroic_strike.description':
     'Et stærkt angreb, der øger nærkampsskaden med {damage}. Aktiveres ved dit næste hug.',
@@ -4277,7 +4245,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hibernate.description':
     'Tvinger målet ind i en dyb søvn i op til 8 sek. Enhver skade vækker det.',
   'entities.abilities.hibernate.name': 'Slummer',
-  'entities.abilities.holy_light.description': 'Helbreder et venligt mål for {damage}.',
+  'entities.abilities.holy_light.description': 'Helbreder hurtigt et venligt mål for {damage}. At genoprette helbred skaber 1 Hengivenhed, selv uden specialisering. Strålende Resonans eller Solhævn gør den øjeblikkelig.',
   'entities.abilities.holy_light.name': 'Lægende Lys',
   'entities.abilities.ice_barrier.description':
     'Beskytter dig med is og opsuger {damage} skade i 60 sek.',
@@ -4298,27 +4266,24 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.description':
     'En massiv bølge af helbredelse genopretter {damage}% af dit maksimale helbred. 10 min afkøling.',
   'entities.abilities.lay_on_hands.name': 'Sidste Rite',
-  'entities.abilities.lesser_heal.description': 'Helbreder et venligt mål for {damage}.',
+  'entities.abilities.lesser_heal.description': 'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft.',
   'entities.abilities.lesser_heal.name': 'Hvisket Bøn',
   'entities.abilities.life_tap.description': 'Omdanner {damage} helbred til {damage} mana.',
   'entities.abilities.life_tap.name': 'Hård Handel',
-  'entities.abilities.lightning_bolt.description': 'Slynger et lyn for {damage} naturskade.',
+  'entities.abilities.lightning_bolt.description': 'Volder {damage} Naturskade. Skaden stiger med Besværgelseskraft. Elementær: et træf giver 1 Torden.',
   'entities.abilities.lightning_bolt.name': 'Lysbuelyn',
-  'entities.abilities.lightning_shield.description':
-    'Omgiver dig med knitrende lyn: nærkampsangribere tager {buff} Naturskade, op til 3 ladninger og højst én gang hvert 5. sekund.',
+  'entities.abilities.lightning_shield.description': 'Omgiver jer med lyn i 10 min. De næste 3 nærkampsangreb mod jer volder {buff} Naturskade på angriberen, højst én gang hvert 5. sek.',
   'entities.abilities.lightning_shield.name': 'Tordenværn',
   'entities.abilities.mark_of_the_wild.description':
     'Anbringer Wildward på et venligt mål og øger rustningen med {buff} i 30 min.',
   'entities.abilities.mark_of_the_wild.name': 'Vildværn',
   'entities.abilities.maul.name': 'Knogleknus',
-  'entities.abilities.mind_blast.description': 'Sprænger målets sind for {damage} skyggeskade.',
+  'entities.abilities.mind_blast.description': 'Volder {damage} Skyggeskade. Skaden stiger med Besværgelseskraft. Skygge binder et mål med jeres Forfaldets Klagesang som dets Billedstøtte, giver 1 Dysterhedstiende og genlyder 30% af skaden på op til 3 andre fjender, der bærer jeres Klagesang.',
   'entities.abilities.mind_blast.name': 'Sindsbrud',
-  'entities.abilities.mind_flay.description':
-    'Angriber målets sind med skyggeenergi, hvilket volder {damage} skade hvert sekund i 3 sek.',
+  'entities.abilities.mind_flay.description': 'Kanaliserer i 3 sek. og volder {damage} Skyggeskade hvert sekund. Skaden stiger med Besværgelseskraft.',
   'entities.abilities.mind_flay.name': 'Jammerens Litani',
-  'entities.abilities.mongoose_bite.description':
-    'Modangreb efter målet undviger for våbenskade plus {damage}. Kan ikke undviges.',
-  'entities.abilities.mongoose_bite.name': 'Modbid',
+  'entities.abilities.mongoose_bite.description': 'Slår for 45% våbenskade plus {damage}. Bærer målet jeres Blodkrogssår, voldes 1 sårtik med det samme, og såret fornys til 12 sek. Skaden stiger med angrebsstyrke gennem våbenskaden.',
+  'entities.abilities.mongoose_bite.name': 'Sårflænger',
   'entities.abilities.moonfire.name': 'Månestorm',
   'entities.abilities.mortal_strike.description':
     'Et ondskabsfuldt slag, der volder våbenskade plus {damage}. (Arms-signatur)',
@@ -4332,11 +4297,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pounce.description':
     'En snigeåbner der bedøver målet i 2 sek. Giver 1 kombopoint. Kun i Ulveform.',
   'entities.abilities.pounce.name': 'Luskeslag',
-  'entities.abilities.power_word_fortitude.description':
-    'Øger målets Udholdenhed med {buff} i 30 min.',
+  'entities.abilities.power_word_fortitude.description': 'Øger hvert gruppemedlems Udholdenhed med {buff}% i 30 min.',
   'entities.abilities.power_word_fortitude.name': 'Beslutsomhedens Litani',
-  'entities.abilities.power_word_shield.description':
-    'Beskytter målet og opsuger {damage} skade i 30 sek.',
+  'entities.abilities.power_word_shield.description': 'Skjolder et venligt mål og absorberer {damage} skade i 30 sek. Disciplin forbinder desuden målet med jeres Hellige skade i 30 sek.',
   'entities.abilities.power_word_shield.name': 'Værnets Salme',
   'entities.abilities.prowl.description':
     'Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 50 % langsommere. Kan ikke bruges i kamp.',
@@ -4348,12 +4311,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rapid_fire.description':
     'Kanaliser seks hurtige skud over 2,4 sek. mens du bevæger dig. Hvert skud giver {damage} fysisk skade.',
   'entities.abilities.rapid_fire.name': 'Febrilsk Optræk',
-  'entities.abilities.raptor_strike.description':
-    'Et stærkt nærkampsangreb, der øger skaden med {damage}. Aktiveres ved dit næste hug.',
+  'entities.abilities.raptor_strike.description': 'Slår for 10% våbenskade plus {damage}. Et træf genopretter 15 Fokus og giver 1 Jagtfart. Skaden stiger med angrebsstyrke gennem våbenskaden.',
   'entities.abilities.raptor_strike.name': 'Sprættende Slag',
   'entities.abilities.regrowth.name': 'Anden Blomstring',
   'entities.abilities.rejuvenation.name': 'Vildblomst',
-  'entities.abilities.renew.description': 'Helbreder målet for {damage} over 15 sek.',
+  'entities.abilities.renew.description': 'Helbreder målet for {damage} over 15 sek., én gang hvert 3. sek. Helbredelsen stiger med Besværgelseskraft.',
   'entities.abilities.renew.name': 'Dvælende Nåde',
   'entities.abilities.retribution_aura.description':
     'Omgiver dig og din gruppe med hellig energi indtil død eller udskiftning. Fjender, der rammer en påvirket allieret i nærkamp, tager {buff} Hellig skade, og påvirkede allierede giver {buff} ekstra Hellig skade med automatiske angreb.',
@@ -4361,12 +4323,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Lapper dit kæledyr sammen. Hvis det lever, genopretter det i alt {overTime} helbred over 12 sek. med helbredelse hvert 3. sek. Hvis det er dødt, genopliver det med 35 % helbred.',
   'entities.abilities.revive_pet.name': 'Lappe sammen',
-  'entities.abilities.righteous_fury.description':
-    'Øger truslen genereret af din Hellige skade med 60 % i 30 min. Den tankende paladins hjørnesten.',
+  'entities.abilities.righteous_fury.description': 'Øger passivt den trussel, jeres Hellige skade skaber, med 60%. Kun Trosvogter.',
   'entities.abilities.righteous_fury.name': 'Brændende Ed',
-  'entities.abilities.rip.name': 'Sønderriv',
-  'entities.abilities.rockbiter_weapon.description':
-    'Gennemstrømmer dit våben med stenets vrede: hvert hug tilføjer {damage} ekstra skade i 5 min.',
+  'entities.abilities.rip.name': 'Blodrevne',
+  'entities.abilities.rockbiter_weapon.description': 'Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra skade. Forstærkning vinder desuden 30% rustning, tager 10% mindre skade og skaber dobbelt så meget trussel. Jordstød tvinger sit mål til at angribe jer i 3 sek., og Tordenværn giver 10% skadereduktion i 3 sek.',
   'entities.abilities.rockbiter_weapon.name': 'Stenbundet Våben',
   'entities.abilities.rupture.name': 'Forblødning',
   'entities.abilities.sap.description':
@@ -4375,23 +4335,19 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scorch.description':
     'Svider fjenden for {damage} Ild skade. Hurtig at kaste.',
   'entities.abilities.scorch.name': 'Skoldning',
-  'entities.abilities.seal_of_righteousness.description':
-    'Fylder dig med Hellig kraft i 30 sek, så hvert af dine nærkampshug tilføjer {damage} ekstra Hellig skade. Udløs med Dom.',
+  'entities.abilities.seal_of_righteousness.description': 'Fylder jer med Hellig kraft i 30 sek., så hvert af jeres nærkampshug volder {damage} ekstra Hellig skade.',
   'entities.abilities.seal_of_righteousness.name': 'Edsbrand',
   'entities.abilities.searing_pain.description':
     'Brænder fjenden med pinefuld ild for {damage} Ild skade. Hurtig at kaste.',
   'entities.abilities.searing_pain.name': 'Svid',
-  'entities.abilities.serpent_sting.description':
-    'Stikker målet og tilføjer {damage} Natur skade over 15 sek.',
+  'entities.abilities.serpent_sting.description': 'Volder i alt {damage} Naturskade over 15 sek., én gang hvert 3. sek. Skaden stiger med angrebsstyrke på afstand.',
   'entities.abilities.serpent_sting.name': 'Giftbrod',
   'entities.abilities.shadow_bolt.description':
     'Sender et skyggefuldt lyn mod fjenden for {damage} Skygge skade.',
   'entities.abilities.shadow_bolt.name': 'Dysterlyn',
-  'entities.abilities.shadow_word_pain.description':
-    'Et mørkets ord forårsager {damage} Skygge skade over 18 sek.',
+  'entities.abilities.shadow_word_pain.description': 'Volder i alt {damage} Skyggeskade over 18 sek., én gang hvert 3. sek. Skaden stiger med Besværgelseskraft. Skygge: volder 10% mere skade, og hvert tik på jeres Billedstøtte giver 1 Dysterhedstiende.',
   'entities.abilities.shadow_word_pain.name': 'Forfaldets Klagesang',
-  'entities.abilities.shadowburn.description':
-    'Sprænger øjeblikkeligt målet med sviende skygge for {damage} Skygge skade.',
+  'entities.abilities.shadowburn.description': 'Bruger 1 Forødelse på at henrette en fjende under 20% helbred for {damage} Skyggeskade. Betaler sin Forødelse tilbage, hvis det udpegede mål dør inden for 5 sek.',
   'entities.abilities.shadowburn.name': 'Skumringsild',
   'entities.abilities.shield_slam.description':
     'Slå målet med dit skjold for 50% våbenskade plus {damage} og enorm trussel. (Beskyttelses-kendetegn)',
@@ -4400,14 +4356,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.slam.description': 'Drøner modstanderen for våbenskade plus {damage}.',
   'entities.abilities.slam.name': 'Brutalt Sving',
   'entities.abilities.slice_and_dice.name': 'Skånselsløst Tempo',
-  'entities.abilities.smite.description': 'Slår fjenden for {damage} Hellig skade.',
-  'entities.abilities.smite.name': 'Straffeslag',
+  'entities.abilities.smite.description': 'Volder {damage} Hellig skade. Skaden stiger med Besværgelseskraft. Disciplin: helbreder hver forbundet allieret for 30% af skaden. Er ingen allieret forbundet, helbredes det gruppemedlem med lavest helbred for 15%.',
+  'entities.abilities.smite.name': 'Lutrende Hymne',
   'entities.abilities.sprint.description': 'Øger din bevægelseshastighed med 70 % i 15 sek.',
   'entities.abilities.sprint.name': 'Hurtige Hæle',
   'entities.abilities.starfire.name': 'Himmelfald',
   'entities.abilities.stealth.name': 'Skumringsslør',
-  'entities.abilities.stormstrike.description':
-    'Kanaliserer stormen gennem dit våben og rammer øjeblikkeligt for våbenskade plus {damage}.',
+  'entities.abilities.stormstrike.description': 'Slår for våbenskade plus {damage} og fører Krigsåndens Kadence 2 trin frem. Skaden stiger med angrebsstyrke gennem våbenskaden.',
   'entities.abilities.stormstrike.name': 'Forfædrenes Slag',
   'entities.abilities.summon_doomguard.description':
     'Binder en Wraithborn til din vilje, en elitedæmon der regner tung Skygge skade ned på afstand. En lang nedkøling holder dens ødelæggende kraft i skak. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen.',
@@ -4418,8 +4373,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felhunter.description':
     'Tilkalder en Spellhound under Heksemesterens kommando. Spellhounden plager fjender fra afstand med Dysterbid og udmærker sig ved at jage besværgere. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen.',
   'entities.abilities.summon_felhunter.name': 'Tilkald Spellhound',
-  'entities.abilities.summon_imp.description':
-    'Tilkalder en Emberkin under Heksemesterens kommando. Emberkinen slynger Askelyn mod dine fjender fra det fjerne. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen.',
+  'entities.abilities.summon_imp.description': 'Fremmaner en Emberkin under heksemesterens kommando. Emberkin kaster Dæmonlyn mod jeres fjender på afstand. At fremmane en ny dæmon sender jeres nuværende bort. I kan have én dæmon ad gangen.',
   'entities.abilities.summon_imp.name': 'Tilkald Emberkin',
   'entities.abilities.summon_infernal.description':
     'Kalder en Pyre Colossus ned i målområdet og giver 58-72 ildskade ved nedslaget. Den kæmper i 30 sek. uden at erstatte din dæmon, brænder fjender i nærheden hvert 2. sek. og genererer 1 Wrack hvert sekund.',
@@ -4427,9 +4381,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_succubus.description':
     'Tilkalder en Duskborn under Heksemesterens kommando. Duskbornen er en skrøbelig dæmon, der slår hurtigt og rammer hårdt i nærkamp. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen.',
   'entities.abilities.summon_succubus.name': 'Tilkald Duskborn',
-  'entities.abilities.summon_voidwalker.description':
-    'Tilkalder en Duskmurk under Heksemesterens kommando. Duskmurkn er en robust dæmon, der håner dine fjender og opsuger tæsk. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen.',
-  'entities.abilities.summon_voidwalker.name': 'Tilkald Duskmurk',
+  'entities.abilities.summon_voidwalker.description': 'Fremmaner en Gloomshade under heksemesterens kommando. Denne seje dæmon håner fjender og bruger Afgrundskæde til at trække fjerne almindelige fjender tilbage inden for rækkevidde. Bosser kan ikke trækkes. At fremmane en ny dæmon sender jeres nuværende bort. I kan have én dæmon ad gangen.',
+  'entities.abilities.summon_voidwalker.name': 'Tilkald Gloomshade',
   'entities.abilities.sunder_armor.name': 'Rustningsskær',
   'entities.abilities.swipe.name': 'Fejende Kløer',
   'entities.abilities.tame_beast.description':
@@ -4455,8 +4408,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.whirlwind.description':
     'Snur i en dødelig bue og ram alle nærliggende fjender for {damage}. (Raseri-talent)',
   'entities.abilities.whirlwind.name': 'Klingehvirvel',
-  'entities.abilities.wing_clip.description':
-    'Påfører et sår for {damage} skade, der sløver fjenden med 40% i 10 sek.',
+  'entities.abilities.wing_clip.description': 'Flænser målet for {damage} Fysisk skade og sinker det med 40% i 10 sek. Skaden stiger med angrebsstyrke.',
   'entities.abilities.wing_clip.name': 'Lænkende Snit',
   'entities.abilities.wrath.name': 'Vildlyn',
   'entities.abilities.holy_shock.description':
@@ -4465,11 +4417,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_shield.description':
     'Øger blokering med 30% og giver et skjold på {damage}% af dit maksimale helbred i {duration} sek. Ascension styrker forsvaret.',
   'entities.abilities.bestial_wrath.name': 'Bestialsk vrede',
-  'entities.abilities.bestial_wrath.description':
-    'Sender dig i bestialsk raseri, så angrebskraft øges med 55 i 15 sek. (Bæstmestersignatur)',
+  'entities.abilities.bestial_wrath.description': 'Giver 3 Flokvildskab. Jeres næste Slip Bæstet Løs inden for 20 sek. volder 50% mere hug- og labbeskade, og dens raseri varer 12 sek. i stedet for 8. (Kendetegn for Bæstemestring)',
   'entities.abilities.trueshot_aura.name': 'Træfsikkerhedsaura',
-  'entities.abilities.trueshot_aura.description':
-    'Inspirerer nærliggende allierede og øger angrebskraft med 35 i 5 min. (Skytte signatur)',
+  'entities.abilities.trueshot_aura.description': 'Øger angrebsstyrken hos allierede inden for 30 m med 10% i 30 min. (Kendetegn for Præcisionsskydning)',
+  'entities.abilities.wyvern_sting.name': 'Wyvernstik',
   'entities.abilities.wyvern_sting.description':
     'Stikker fjenden på afstand og gør den ukampdygtig i op til 4 sek. Enhver skade bryder effekten. (Overlevelsessignatur)',
   'entities.abilities.arcane_power.name': 'Arkan kraft',
@@ -4484,22 +4435,18 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.name': 'Klingevirvel',
   'entities.abilities.hemorrhage.name': 'Blødning',
   'entities.abilities.power_infusion.name': 'Kraftinfusion',
-  'entities.abilities.power_infusion.description':
-    'Indgyder et venligt mål med kraft og øger besværgelseskraft med 28 i 15 sek. (Disciplin signatur)',
-  'entities.abilities.holy_nova.description':
-    'Udløser en eksplosion af helligt lys, helbreder nærliggende allierede for {damage} og skader nærliggende fjender. (Hellig signatur)',
-  'entities.abilities.shadowform.name': 'Skyggeform',
-  'entities.abilities.shadowform.description':
-    'Antag skyggeform, som styrker skyggemagi, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Skyggesignatur)',
+  'entities.abilities.power_infusion.description': 'Salver et venligt mål og øger skade, helbredelse og besværgelseshastighed med 20% i 15 sek.',
+  'entities.abilities.holy_nova.name': 'Solsang',
+  'entities.abilities.holy_nova.description': 'Helbreder allierede inden for 10 m for {damage} og volder 24 til 30 Hellig skade på fjender i samme område. Begge beløb stiger med Besværgelseskraft. (Grundlag for Hellig)',
+  'entities.abilities.shadowform.name': 'Tusmørkeslør',
+  'entities.abilities.shadowform.description': 'Træd ind i Tusmørkesløret og øg jeres Skyggeskade med 25%. Kast den igen for at forlade Tusmørkesløret. (Kendetegn for Skygge)',
   'entities.abilities.elemental_mastery.name': 'Elementær beherskelse',
-  'entities.abilities.elemental_mastery.description':
-    'Påkalder elementær beherskelse og gør din næste besværgelse øjeblikkelig. (Elementær signatur)',
+  'entities.abilities.elemental_mastery.description': 'I 12 sek. giver Lysbuelyn 2 Torden. Jeres næste Lysbuelyn eller Gaffellyn er øjeblikkelig, og jeres næste fulde Tordenudbetaling volder 25% mere skade. (Kendetegn for Elementær)',
   'entities.abilities.siphon_life.name': 'Sug liv',
   'entities.abilities.siphon_life.description':
     'Suger liv fra fjenden, påfører {damage} skyggeskade over 30 sek og helbreder dig for den skade, der bliver gjort. (Lidelsessignatur)',
   'entities.abilities.conflagrate.name': 'Antændelse',
-  'entities.abilities.conflagrate.description':
-    'Forbruger din Opbrænding på fjenden for at antænde den for {damage} ildskade. (Ødelæggelsessignatur)',
+  'entities.abilities.conflagrate.description': 'Fremrykker et kommende tik af jeres Brændende Pagt og antænder derefter målet for {damage} Ildskade. Skaber 1 Forødelse og 1 Tilintetgørelse. Rummer 2 ladninger. (Kendetegn for Ødelæggelse)',
   'entities.abilities.moonkin_form.name': 'Månekinform',
   'entities.abilities.moonkin_form.description':
     'Antag månekinform, som styrker besværgelser, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Balancesignatur)',
@@ -4509,9 +4456,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.name': 'Hurtig heling',
   'entities.abilities.crusader_strike.description':
     'Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)',
-  'entities.abilities.metamorphosis.name': 'Metamorfose',
-  'entities.abilities.metamorphosis.description':
-    'Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)',
+  'entities.abilities.metamorphosis.name': 'Lichskikkelse',
+  'entities.abilities.metamorphosis.description': 'Bliv en lich i 20 sek., hvilket skaber 3 Sjælesplinter og øger jeres besværgelsesskade og besværgelseshastighed med 20%. Jeres udøde volder 50% mere skade og handler 20% hurtigere, og Soul Lance gennemborer sit mål og rammer op til 2 nærliggende fjender for 50% af sin skade. (Kendetegn for Nekromanti)',
   'entities.delves.collapsed_reliquary.enterText':
     'Du stiger ned i det sammenstyrtede relikvarium.',
   'entities.delves.collapsed_reliquary.leaveText':
@@ -6001,8 +5947,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'En helbredelse der tikker over tid, god at kaste og blive ved med at bevæge sig.',
   'guide.abilityHook.rockbiter_weapon':
     'Gennemtrænger dit våben så hvert sving rammer hårdere i nærkamp.',
-  'guide.abilityHook.seal_of_righteousness':
-    'Gennemtrænger dine sving med Hellig skade, brug den så med Dom.',
+  'guide.abilityHook.seal_of_righteousness': 'Gennemtrænger dine nærkampshug med yderligere Hellig skade.',
   'guide.abilityHook.serpent_sting': 'Lander en gift der bløder naturskade over tid.',
   'guide.abilityHook.shadow_bolt': 'Et lyn af skygge du kaster mod et mål, din foretrukne bombe.',
   'guide.abilityHook.shadow_word_pain':
@@ -6010,14 +5955,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.sinister_strike':
     'Dit pålidelige slag der opbygger kombopoint til at bruge senere.',
   'guide.abilityHook.smite': 'Et helligt lyn til at slide et mål ned på afstand.',
-  'guide.abilityHook.summon_imp':
-    'Tilkalder en Emberkin der slynger ildlyn mod fjender på afstand.',
+  'guide.abilityHook.summon_imp': 'Kalder en Emberkin frem, der kaster Dæmonlyn mod fjender på afstand.',
   'guide.abilityHook.thorns':
     'Beskytter en allieret så nærkampsangribere skader sig selv når de slår.',
   'guide.abilityHook.thunder_clap': 'Rammer alt omkring dig og sløver deres angreb.',
   'guide.abilityHook.wrath': 'Et naturlyn kastet mod et mål på afstand, din foretrukne bombe.',
-  'guide.arenaPage.coliseumBody':
-    'Coliseum er rigets arena, hvor du møder andre spillere i rangerede kampe, en mod en eller to mod to. Hver kategori har sin egen placering, så en sejr løfter dig op ad den rangliste for hele riget at se. Åbn Arena-vinduet for at melde dig til en kategori, alene eller med din makker.',
+  'guide.arenaPage.coliseumBody': 'Kolosseum er rigets arena, hvor du møder andre spillere i rangerede kampe, en mod en eller to mod to. Hver klasse holder sin egen stilling, så en sejr løfter dig på den stige for hele riget at se. Rangeret spil åbner på niveau 15, og det gælder også din makker: er en af jer under det, står køen lukket, indtil I begge kvalificerer jer. Alt spiller mod spiller bor bag én knap, mærket PvP: åbn den og vælg et faneblad, Tornehulemarkerne, en mod en eller to mod to, og meld dig så til alene eller sammen med din makker. Mens du står i kø eller er i en kamp, forbliver de andre faneblade låst, så du kan aldrig stå i to køer på én gang.',
   'guide.arenaPage.coliseumHeading': 'Det Askegrå Colosseum',
   'guide.arenaPage.duelsBody':
     'Udfordr enhver spiller du møder til en venskabelig duel. Intet andet end stolthed står på spil, så det er den nemmeste måde at lære en kamp at kende eller bilægge en venskabelig uenighed.',
@@ -6095,19 +6038,16 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.resourceLabel': 'Ressource',
   'guide.classPage.roleLabel': 'Spiller som',
   'guide.classPage.specsHeading': 'Specialiseringer',
-  'guide.combat.ccBody':
-    'Massekontrol er en særlig slags svækkelse, der begrænser, hvad et mål kan gøre: lammelser, rødder og sløvninger, forstummelser der stopper besværgelser, afvæbninger, frygt og forvandlinger, der gør en fjende harmløs et øjeblik. Mod andre spillere slides kontrollen tynd ved gentagelse: den samme slags påført igen for hurtigt svækkes og svigter så helt, og en lammelse, der åbner fra snigen, tælles for sig, adskilt fra de lammelser der følger efter, så ingen kan lænkes hjælpeløs for evigt. Verdenens skabninger nærer intet sådant nag: kontrol svækkes aldrig ved gentagelse mod dem, selvom mange af de mægtigste fjender, navngivne eliter og de stærkeste bosser blandt dem, slet ikke kan kontrolleres.',
+  'guide.combat.ccBody': 'Kontrol er en særlig slags svækkelse, der begrænser, hvad et mål kan gøre: bedøvelser, rodfæstninger og nedsættelser, forstummelser der stopper besværgelser, afvæbninger, frygt og forvandlinger, der gør en fjende harmløs et øjeblik. Mod andre spillere slides det meste kontrol ned ved gentagelse: frygt, forvandlinger, rodfæstninger og skolespærringer, der lægges igen for hurtigt, bliver kortere og svigter så helt, så ingen kan holdes hjælpeløs for evigt. Bedøvelser er den bevidste undtagelse, for de er allerede korte og hviler på rigtige nedkølingstider, så gentagelse forkorter dem aldrig, selv om udstyr, der skærer kontroltider ned, stadig beskærer dem. Verdens væsener nærer ikke sådan et nag: mod dem svækkes kontrol aldrig ved gentagelse, selv om mange af de mægtigste fjender, navngivne eliter og de stærkeste bosser blandt dem, slet ikke kan kontrolleres.',
   'guide.combat.deathBody':
     'Hvis dit helbred når nul, bliver du slået ned, hvor du står, og dit lig bliver liggende der. Frigiv din ånd, og du rejser dig som et genfærd ved den nærmeste kirkegård: lettere til bens end de levende, uden for dine fjenders rækkevidde, men ude af stand til at kæmpe, samle bytte op eller tale med nogen anden end Den Blege Vogter, der svæver over stenene. Derfra vælger du selv. Løb dit genfærd tilbage til dit lig, og du genopstår på stedet med en del af dit helbred og din mana genoprettet og slet ingen straf. Eller tag imod Den Blege Vogters øjeblikkelige genopstandelse, hvor du står, mod prisen af Vogterens Told: en midlertidig svækkelse af alt, hvad du er, som varer længere, jo mere garvet du er, og som skåner splinternye karakterer helt. Falder du inde i et fangehul, venter din ånd ved kirkegården udenfor; gå dit genfærd tilbage gennem døren, og du genopstår ved indgangen. Delves er undtagelsen: falder du der, bliver du blot sat på benene igen ved delvens indgang, men et andet fald afslutter turen. Uanset vejen mister du hverken erfaring, udstyr eller mønter. Mellem kampe, sæt dig ned for at spise og drikke, så du starter den næste ved fuld styrke.',
   'guide.combat.deathTitle': 'Når du falder',
   'guide.combat.effectsBody':
     'Mange evner påfører en effekt der hænger ved. De gavnlige (forstærkninger) hæver dine egenskaber, skjolder dig eller helbreder dig lidt ad gangen; de skadelige (svækkelser) dræner dit helbred med skade over tid eller svækker dig. Hold øje med de små ikoner i skærmens øverste hjørne, ved siden af minikortet, for at se hvad der er på dig og hvor længe det varer.',
   'guide.combat.effectsTitle': 'Forstærkninger, svækkelser og massekontrol',
-  'guide.combat.growBody':
-    'Hvert niveau gør dig sejere og låser nye evner op, helt op til loftet på niveau {cap}. Quests er den hurtigste vej op; jagt, fangekældre og delves runder det af.',
+  'guide.combat.growBody': 'Hvert niveau gør dig sejere og låser nye evner op, hele vejen til loftet på niveau {cap}. Opgaver er den hurtigste vej opad; jagt, fangekældre, delves og de fag, du udøver undervejs, fylder resten ud.',
   'guide.combat.growTitle': 'Du bliver stærkere for hvert niveau',
-  'guide.combat.hitBody':
-    'Angreb kan ramme ved siden af eller blive undveget, og det kan fjendens også, mens besværgelser kan blive modstået helt. At kæmpe nær dit eget niveau er det, der får dine slag til at ramme; jo større niveauforskellen er, jo mere slår du ud i den tomme luft.',
+  'guide.combat.hitBody': 'Angreb kan ramme forbi, og de kan undviges, og fjendens kan også. To andre svar hører alene spillerne til: en kriger kan afværge et slag med en parade, og en kriger eller paladin med skjold kan dæmpe det til en blokering, begge dele kun mod det, der kommer forfra. Verdens væsener gør ingen af delene, så et hug mod et monster rammer, rammer forbi eller bliver undviget. Besværgelser følger deres egen regel og rammer aldrig forbi: de bliver i stedet modstået. At kæmpe tæt på dit eget niveau er det, der holder dine slag i mål; jo større niveauforskellen er, desto oftere slår du ud i luften.',
   'guide.combat.hitTitle': 'Ikke hvert slag rammer',
   'guide.combat.intro':
     'Kamp følger velkendte klassiske MMO-regler. Du behøver aldrig at studere noget af det for at spille godt, dette er bare formen på hvordan kampe fungerer.',
@@ -6120,7 +6060,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.controls.abilities':
     'Brug handlingsbjælkens evner (talrækken; en anden bjælke sidder på det numeriske tastatur)',
   'guide.controls.actionHeader': 'Handling',
-  'guide.controls.arena': 'Arena',
+  'guide.controls.arena': 'PvP-vinduet (arenaerne og Tornehulemarkerne)',
   'guide.controls.controllerBody':
     "Gamepads virker også, og controllerstyring er slået til som standard. Venstre pind bevæger dig, højre pind sigter kameraet, og knapperne foran og på skuldrene dækker dine evner, hop og interaktion. Åbn et vindue som dine tasker for at få en markør frem på skærmen, og spillets menu navigeres direkte med D-pad'en og knapperne foran. Du kan ombinde knapperne og justere pindens dødzone, kamerahastighed, vibration og omvendt kig fra controllerafsnittet i spillets indstillinger.",
   'guide.controls.controllerHeading': 'På en controller',
@@ -6130,8 +6070,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupCombat': 'Målretning og kamp',
   'guide.controls.groupInterface': 'Brugerflade',
   'guide.controls.groupMovement': 'Bevægelse',
-  'guide.controls.intro':
-    'Standardtaster til computer. Hver tildeling kan ændres i spillets indstillinger, undtagen Esc, der altid åbner spillets menu, og en tildeling kan være en modifikatorkombination som Shift+Z.',
+  'guide.controls.intro': 'Standardtaster til computer. Hver binding her kan ændres fra panelet Tastebindinger i spilmenuen, undtagen Esc, som altid åbner den menu. Hver handling rummer op til to taster, en hovedtast og en alternativ, og en binding kan være en modifikatorkombination som Skift+Z. Den kan også være en museknap: midterknappen er M3, og tommelknapperne er M4 og M5, mens eventuelle flere knapper tælles opad derfra. Venstre- og højreklik er fortsat reserveret til kameraet, klikbevægelse og til at klikke på ting i verden.',
   'guide.controls.keyHeader': 'Tast',
   'guide.controls.leaderboard': 'Resultattavle',
   'guide.controls.mobileBody':
@@ -6160,16 +6099,14 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.delvesPage.lockpickBody':
     'Nogle døre og skjul er forseglede, og at åbne en er en lille prøve på dine nerver snarere end et tjek af dine statistikker: løs låsen rent og roligt, og du tjener en bedre præmie end et forhastet, klodset forsøg. Det er valgfrit, men den omhyggelige delver er den rigeste.',
   'guide.delvesPage.lockpickHeading': 'Låse og hvad de skjuler',
-  'guide.delvesPage.marksBody':
-    'At rydde delves giver Delve-Mærker, en valuta der holdes adskilt fra dine mønter. Brug dem hos vogteren for at styrke din ledsager og samle udstyr op, som du ikke finder nogen andre steder.',
+  'guide.delvesPage.marksBody': 'At rydde delves giver Delve-Mærker, en valuta, der holdes adskilt fra dine penge. Brug dem hos vogteren til at styrke din ledsager og samle udstyr op, som du ikke finder andre steder.\n\nMærker belønner dagens første ture mest. De tre første gennemførelser hver dag betaler fuldt ud, og derefter betaler en delve stadig, blot mindre pålideligt, hvor den sværere grad holder sig bedre end den lettere. Optællingen ruller om hver dag, så der er ingen grund til at køre en delve i bund: kom tilbage i morgen, og den gode takst venter.',
   'guide.delvesPage.marksHeading': 'Delve-Mærker',
   'guide.delvesPage.partyLabel': 'For en eller to',
   'guide.delvesPage.tiersBody':
     'En delve byder på mere end én sværhedsgrad. Den højere gør fjenderne stærkere og ruller en løbsmodifikator ind, og den giver mere til gengæld. Den kræver også, at du har et par niveauer på bagen, før den lukker dig ind.',
   'guide.delvesPage.tiersHeading': 'Sværhedsgrad',
   'guide.delvesPage.tiersLabel': 'Sværhedsgrader',
-  'guide.delvesPage.whatBody':
-    'En delve er et lille instanseret fangehul, der er lavet kun til dig og op til én allieret, en privat kopi, hvor du ikke kan blive forstyrret. Du starter den fra en tavle, der holdes af en delve-vogter ude i verden, hopper ind, kæmper dig ned gennem en håndfuld rum og slutter på en enkelt vægter. Løb er hurtige og ment til at blive gentaget, så en delve er et stabilt stykke fremgang, hver gang den åbne verden tørrer ud.',
+  'guide.delvesPage.whatBody': 'En delve er en lille instanseret fangekælder lavet kun til dig og højst én allieret, en privat kopi, hvor du ikke kan blive forstyrret. Du starter den fra en tavle, som en delve-vogter holder ude i verden, du stiger ned, kæmper dig gennem en håndfuld rum og slutter på en enkelt vogter. Hvad der venter hinsides den vogter, er forskelligt fra delve til delve: den ene forsegler sit bytte bag en lås, den anden kræver en rite af dig. Turene er hurtige og tænkt til at blive gentaget, så en delve er pålidelig fremgang, når som helst den åbne verden tørrer ud.',
   'guide.delvesPage.whatHeading': 'Hvad en delve er',
   'guide.delvesPage.whereBody':
     'Den første delve, Det Sammenstyrtede Relikvarium, åbner ved Relikvariebakken i startdalen Østbæk Dal. Broder Halven holder tavlen der, og han sender dig ned, så snart du er klar. Hans runder ender ikke der: forbi Troll Mounds ved den nordlige rand af Mosekær Sump åbner den samme vogter Det Druknede Litani for delvere, der har fundet fodfæste.',
@@ -6190,8 +6127,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.levelAround': 'Omkring niveau {n}',
   'guide.dungeonsPage.levelBand': 'Niveau {min} til {max}',
   'guide.dungeonsPage.levelExact': 'Niveau {n}',
-  'guide.dungeonsPage.party':
-    'Fangehuller er bygget til et følge på fem. Slutspilsraidet er for ti.',
+  'guide.dungeonsPage.party': 'Fangekældre er bygget til en gruppe på fem. Slutspilsraidet er til ti. Har du ikke fire venner ved hånden, samler Fangekældersfinderen en gruppe til de ture, den sætter i kø. Niveaubåndet på hvert kort nedenfor er det niveau, turen er skrevet til, ikke en lås på døren: intet forhindrer dig i at gå ind tidligt eller komme tilbage senere, selv om Fangekældersfinderen kun sætter dig i en tur, der passer til dit niveau.',
   'guide.dungeonsPage.partySize': '{n} spillere',
   'guide.dungeonsPage.raidBody':
     'Bag en forseglet kongelig dør venter en prøvelse for ti spillere: en kamp i flere faser og en dødløs magt, som hele raidet må lukke ned sammen. Tjen din adgang, og medbring så ni venner.',
@@ -6200,8 +6136,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumBody':
     'Tornetops mørke hjerte, hvor kultens lange arbejde når sit frygtelige højdepunkt.',
   'guide.dungeonsPage.sanctumName': 'Gravormens Helligdom',
-  'guide.dungeonsPage.soloLead':
-    'Hvert fangehul åbner med en startopgave, der kan klares alene, så du altid ved, hvorfor du går derind.',
+  'guide.dungeonsPage.soloLead': 'Spørg dig for i byerne i nærheden, før du går: deres opgavegivere deler kæder ud, der ender i disse sale, og at bære en med ind gør, at turen betaler dobbelt.',
   'guide.dungeonsPage.templeBody':
     'En måneoplyst helligdom sunket under en glødende tjern højt oppe i bjergene, nået gennem en port af koldt lys. En druknet kult synger stadig dernede i sine rådne klædninger, og advarslerne ristet på bredden siger, at noget dybt nede kun sover. Et selvstændigt mysterium, sat til side fra hovedhistorien, for de nysgerrige og de velforberedte.',
   'guide.dungeonsPage.templeLoreBody':
@@ -6223,16 +6158,14 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Købmanden driver Verdensmarkedet, en spillerdrevet børs, hvor du kan købe og sælge med folk, du måske aldrig møder. Tal med Købmanden i Eastbrook, eller med Auktionarius Voss oppe i Highwatch, for at åbne det: begge vogtere betjener det ene fælles marked. Købmanden har også et fast lager af sine egne varer opslået der, så der er altid noget at købe, selv når ingen andre spillere har lagt noget op.',
   'guide.economy.marketBrowse':
     'Gennemse: rul gennem opslagene eller søg efter navn for at finde, hvad der er til salg. Hvert opslag viser varerne, sælgeren og den ønskede pris for hele stakken.',
-  'guide.economy.marketCollect':
-    'Indsamling: når dine varer sælges, venter dit udbytte på dig hos Købmanden. Vend tilbage for at hente mønterne sammen med alt, der kom usolgt retur. Købmanden tager en lille andel af hvert gennemført salg.',
-  'guide.economy.marketPost':
-    'Opslag: vælg en stak fra dine tasker, sæt din pris, og slå den op. Varerne holdes af Købmanden, indtil nogen køber dem. Usolgte opslag kommer tilbage til dig efter et stykke tid, og du kan kræve et tilbage tidligt, hvis du skifter mening.',
+  'guide.economy.marketCollect': 'At hente: når din vare sælges, venter din indtjening hos Købmanden. Kom tilbage og hent mønterne, sammen med alt det, der kom usolgt retur. Købmanden tager en lille del af hvert gennemført salg. Fanebladet Hent specificerer, hvad der venter, en linje per gennemført salg med varen, køberen og hvad du tjente, så du kan se præcis, hvad der blev solgt, før du tager mønterne.',
+  'guide.economy.marketPost': 'At sætte til salg: vælg en stak fra dine tasker, sæt din pris og udbyd den. Varen holdes af Købmanden, indtil nogen køber den. Usolgte udbud kommer tilbage til dig efter et stykke tid, og du kan hente et hjem før tid, hvis du skifter mening. Selve det at sætte til salg er gratis, så en optimistisk pris koster dig ikke andet end tid.',
   'guide.economy.marketPricing':
     'Prissætningen er op til dig. At slå en smule under, hvad andre forlanger, plejer at sælge hurtigere, mens en stejl pris kan blive liggende urørt. Gennemse først for at se, hvad den gængse pris ligger på, før du slår op.',
   'guide.economy.marketTitle': 'Verdensmarkedet',
   'guide.economy.marksBody':
     'Mønter er ikke det eneste, du lægger til side. Delves udbetaler Delve-Mærker, der kun bruges hos delve-vogteren på ledsageropgraderinger og udstyr, du ikke finder andre steder. Heroiske fangehulsløb efterlader Heroiske Mærker på den sidste boss, der bruges hos den heroiske kvartermester i Highwatch på smykker, som intet andet hjørne af riget sælger. Ingen af dem blandes nogensinde med dine mønter.',
-  'guide.economy.marksTitle': 'Mærker: valutaerne ud over mønter',
+  'guide.economy.marksTitle': 'Mærker og Ære: valutaerne hinsides mønt',
   'guide.economy.tradeBody':
     'Du kan handle ansigt til ansigt med enhver, der står nær dig. I lægger begge genstande og mønter i et delt vindue, og byttet sker først, når I begge bekræfter det, så ingen af parterne kan snydes. Det er den enkle måde at give en ven et drop eller afslutte en aftale.',
   'guide.economy.tradeTitle': 'Handel med andre spillere',
@@ -6273,14 +6206,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Dæmoner',
   'guide.faqPage.a1':
     'Ja. Hele spillet er gratis at spille til niveaugrænsen, og kildekoden er åben på GitHub.',
-  'guide.faqPage.a10':
-    'Grænsen er niveau {cap}. Derfra løber du fangehullerne for fem spillere og raidet for ti, tager dem igen i heroisk tilstand for opgraderet bytte, møder verdensbossen når han rejser sig, afprøver dig selv i arenaen, dykker ned i delves med en ledsager ved din side og jager bedrifter i Bedrifternes Bog for at klatre op ad rigets rangliste.',
+  'guide.faqPage.a10': 'Loftet er niveau {cap}. Derfra løber du fangekældrene for fem spillere og raidet for ti, tager dem igen i heroisk tilstand for opgraderet bytte, stiger ned gennem rifterne etage for etage, møder verdensbossen når han rejser sig, prøver dig selv i arenaen eller på slagmarken Tornehulemarkerne, spiller en sæson af Dalpokalen, dykker ned i delves med en ledsager ved din side, fører et fag hele vejen til mesterværkshåndværk, samler ridedyr og jager bedrifter i Bedrifternes Bog for at klatre på ranglisterne.',
   'guide.faqPage.a11':
     'Inviter enhver, du møder, til et følge, spørg i chatten, eller slå jer sammen ved et fangehul. Det meste af verden kan klares alene, så at danne grupper er et valg, ikke et krav.',
   'guide.faqPage.a2':
     'Nej. Spillet kan spilles fuldt ud uden. Det valgfrie fællesskabstoken tilføjer kun kosmetisk pynt og en andel af præmiepuljen for daglige belønninger, og det påvirker aldrig styrke eller fremgang.',
-  'guide.faqPage.a3':
-    'Ja. Spillet kører i en mobilbrowser med berøringsstyring, og der er også en computer-launcher.',
+  'guide.faqPage.a3': 'Ja. Spillet kører i enhver moderne mobilbrowser med berøringsstyring, og der findes også apps: udgaver til iOS og Android, og en computerapp til Windows, macOS og Linux, der holder sig opdateret selv.',
   'guide.faqPage.a4':
     'Ja. Der er en øjeblikkelig offline-tilstand for en enkelt spiller, og onlineverdenen kan klares helt alene bortset fra fangehuller, raidet og verdensbossen.',
   'guide.faqPage.a5':
@@ -6312,14 +6243,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.footer.github': 'Kildekode på GitHub',
   'guide.footer.playNow': 'Spil nu',
   'guide.footer.rights': 'World of ClaudeCraft',
-  'guide.gear.consumablesElixirs':
-    'Eliksirer giver en midlertidig forstærkning, mens du er på eventyr, en lille fordel der hjælper, når du vil skubbe lidt længere.',
+  'guide.gear.consumablesElixirs': 'Eliksirdrikke giver en midlertidig styrkelse, mens du er på eventyr, en lille fordel, der hjælper, når du vil presse lidt længere. De deler ikke eliksirernes nedkølingstid, så du kan drikke en og alligevel holde en helbredende eliksir i reserve. To eliksirdrikke til samme egenskab stakker ikke, og den sidste, du drikker, er den, der bliver.',
   'guide.gear.consumablesFood':
     'Mad og drikke genopretter dig, mens du sidder og hviler mellem kampe. At spise genvinder helbred, at drikke genvinder mana, og at hvile på denne måde er gratis. Sæt dig ned i nogle sekunder efter en hård kamp i stedet for at løbe ind i den næste halvt helbredt.',
   'guide.gear.consumablesIntro':
     'Nogle genstande bruges én gang for en hurtig fordel. De er billig forsikring, så hav nogle få ved hånden.',
-  'guide.gear.consumablesPotions':
-    'Trylledrikke genopretter helbred eller mana i det øjeblik, du bruger dem, selv midt i kampen, hvilket gør dem til en afgørende redning, når et angreb går galt. De deler en kort nedkøling, så planlæg ét godt øjeblik at bruge dem.',
+  'guide.gear.consumablesPotions': 'Eliksirer genopretter helbred eller mana i det øjeblik du bruger dem, selv midt i kamp, hvilket gør dem til en afgørende redning, når et træk går galt. Alle eliksirer deler én nedkølingstid på et par minutter, så du får ét godt øjeblik per kamp i stedet for en kæde af dem. De genopretter også mindre end at sætte sig og spise eller drikke, hvilket er prisen for ikke at sætte sig. Eliksirer kommer i grader skåret til hvert stræk af verden, så bær den grad, der er lavet til dit niveau: en gammel lavgrads eliksir er en splint på en fuldvoksen figur.',
   'guide.gear.consumablesTitle': 'Forbrugsvarer',
   'guide.gear.cosmeticsApply':
     'Vælg dit aktive udseende fra udseenderækken på din karakterskærm, og skift frit mellem alt, du har låst op.',
@@ -6329,8 +6258,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Nogle få af disse kommer fra et mystisk kosmetisk skrin, en forseglet præmie der ruller en af tre kvalitetsgrader, når du åbner det, og giver det matchende udseende. Det er rent til pynt: intet indeni gør dig stærkere, kun finere at se på.',
   'guide.gear.cosmeticsRanks':
     'Kosmetik kommer i sine egne sjældenhedsgrader, og de mere sjældne er en sjov ting at jagte. At optjene en højere grad låser også op for udseenderne under den.',
-  'guide.gear.cosmeticsSkins':
-    'Der er to kosmetiske linjer at samle. De fleste klasser har flere alternative udseender, et nyt blik på klassens stil som kun er dit at bære. Ved siden af dem sidder chromaer: navngivne totonede farveskemaer der maler et udseende helt om, fra sobre metaller til klare kejserlige farver.',
+  'guide.gear.cosmeticsSkins': 'Din figurs udseende kommer i to linjer. De fleste klasser har flere alternative udseender, en frisk læsning af klassens look, som er din at bære. Ved siden af dem står chromaerne: navngivne totonede farveskemaer, der ommaler et look fuldstændigt, fra nøgterne metaller til klare kejserlige farver.',
   'guide.gear.cosmeticsTitle': 'Udseende og kosmetik',
   'guide.gear.fishingBody':
     'Fiskeri er en rolig afveksling. Bær en fiskestang, brug den ved åbent vand, og rul ind hvad der bider. Du fanger mest fisk, der er mad, du kan spise, et og andet stykke skrammel at sælge for et par mønter, og nu og da en eftertragtet sjælden fangst. Hvad du finder, afhænger af det vand, du fisker i.',
@@ -6352,8 +6280,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityRare': 'Sjælden',
   'guide.gear.qualityTitle': 'Kvalitet, med et blik',
   'guide.gear.qualityUncommon': 'Ualmindelig',
-  'guide.gear.setsBody':
-    'Noget rustning kommer i matchede familier, flere stykker skåret til at se ud og kæmpe som ét. Bær nok af en familie på én gang, og sættet vågner og giver bonusser oven i hvert stykkes egne statistikker, og jo flere stykker du bærer, jo stærkere bliver det. Nogle få sådanne familier dukker op som eftertragtet bytte, mens du leveler; de største af dem kommer fra det sejeste gruppeindhold nær niveauloftet, så at jagte et fuldt sæt er et klassisk slutspilsmål.',
+  'guide.gear.setsBody': 'Noget rustning kommer i matchende familier, flere stykker skåret til at se ud og kæmpe som ét. Bær nok stykker af en familie på én gang, og sættet vågner og giver bonusser oven på hvert stykkes egne værdier, og jo flere stykker du bærer, desto stærkere bliver det. Nogle få af den slags familier dukker op som eftertragtet bytte, mens du stiger i niveau, og de største kommer fra det hårdeste gruppeindhold nær niveauloftet, så at jage et fuldt sæt er et klassisk slutspilsmål. Kampen mod andre spillere har sine egne matchende familier, købt et stykke ad gangen med Ære; de vågner ved andre stykkeantal end byttefamilierne, og deres bonusser svarer kun, når fjenden er en anden spiller.',
   'guide.gear.setsTitle': 'Sæt og sætbonusser',
   'guide.gear.slotChest': 'Bryst',
   'guide.gear.slotFeet': 'Fødder',
@@ -6363,11 +6290,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotMainhand': 'Våben',
   'guide.gear.slotShoulder': 'Skuldre',
   'guide.gear.slotWaist': 'Talje',
-  'guide.gear.slotsBody':
-    'Du har en våbenplads, syv rustningspladser og tre smykkepladser: en hals og to fingre. Hver klasse kan kun bruge bestemte våben og bærer rustning op til sin egen vægt, stof, læder eller ringbrynje, så de opgraderinger, der passer dig, er dem, der er lavet til din klasse. Smykker vejer slet ingenting: enhver klasse bærer, hvad den tjener. Inden for det, fyld hver plads med det bedste stykke, du finder.',
+  'guide.gear.slotsBody': 'Du har en plads til hovedvåben, en plads til bihånd, syv rustningspladser og tre smykkepladser: en hals og to fingre. Hver klasse kan kun føre bestemte våben og bærer rustning op til sin egen vægt, stof, læder eller ringbrynje, så de opgraderinger, der passer dig, er dem, der er lavet til din klasse. Smykker har slet ingen vægt: enhver klasse bærer det, den tjener. Inden for det skal du fylde hver plads med det bedste stykke, du finder.',
   'guide.gear.slotsTitle': 'Hvad du kan tage på',
-  'guide.gear.sourcesBody':
-    'De fleste af dine tidlige opgraderinger er opgavebelønninger, så det betaler sig at gøre opgaver færdige frem for at grinde. Fjender taber udstyr, når du besejrer dem, handlende i byen sælger solide basisvarer, håndværkere forvandler indsamlede materialer til bærbare stykker, og spillermarkedet lader dig købe fra andre eventyrere. På toppen af bakken køber to mærkevalutaer udstyr, som ikke findes andre steder: Delve-Mærker hos delve-vogteren og Heroiske Mærker hos den heroiske kvartermester.',
+  'guide.gear.sourcesBody': 'De fleste af dine tidlige opgraderinger er opgavebelønninger, så det betaler sig at fuldføre opgaver frem for at grinde. Fjender taber udstyr, når du besejrer dem, handlende i byen sælger solide grundting, håndværkere gør indsamlede materialer til bærbare stykker, og spillermarkedet lader dig købe af andre eventyrere. Øverst på bakken køber tre optjente valutaer udstyr, der ikke findes andre steder: Delve-Mærker hos delve-vogteren, Heroiske Mærker hos den heroiske kvartermester, og Ære hos ærekvartermestrene.',
   'guide.gear.sourcesTitle': 'Hvor udstyr kommer fra',
   'guide.gear.upgradeBody':
     'At udskifte et gammelt stykke med en frisk opgradering gør mere for dig end at spille perfekt i udstyr, du er vokset fra. Når noget bedre falder, eller en opgave tilbyder det, så tag det. Gem ikke dine gode genstande til senere.',
@@ -6425,8 +6350,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.rareDef':
     'En sjælden navngiven fjende, der vandrer rundt i en zone og giver bedre bytte.',
   'guide.glossary.rareTerm': 'Sjælden',
-  'guide.glossary.specDef':
-    'En specialisering: den retning, du leder din klasse imod, som helbredelse eller skade, efterhånden som du bruger talenter.',
+  'guide.glossary.specDef': 'En specialisering: den vej, du vælger for din klasse på niveau 5, som helbredelse eller skade. Den fastlægger din rolle, giver en kendetegnende evne og en varig mestring, og den bliver hos dig, selv når du nulstiller dine talenter.',
   'guide.glossary.specTerm': 'Spec',
   'guide.glossary.tankDef':
     'Det gruppemedlem, der holder på fjendernes aggro og opsuger skaden, så de andre kan kæmpe sikkert.',
@@ -6482,9 +6406,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.home.what.pillarOpenBody':
     'Gratis at spille til maksniveauet, med hele spillet som open source. Ingen pay to win, nogensinde.',
   'guide.home.what.pillarOpenTitle': 'Gratis og open source',
-  'guide.home.what.pillarPlayBody':
-    'Ingen download, ingen launcher. Lav en karakter, og du er i verden på sekunder, på computer eller telefon.',
-  'guide.home.what.pillarPlayTitle': 'Spil i din browser',
+  'guide.home.what.pillarPlayBody': 'Ingen download, ingen launcher. Lav en figur, og du er i verden på få sekunder, på computeren eller på telefonen. Der findes også indbyggede apps, hvis du vil have en.',
+  'guide.home.what.pillarPlayTitle': 'Åbn siden og spil',
   'guide.home.world.cta': 'Se verden',
   'guide.home.world.heading': 'Udforsk verden',
   'guide.home.world.levels': 'Niveau {min} til {max}',
@@ -6513,8 +6436,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.frostName': 'Frostsløret',
   'guide.howToPlay.basicsHeading': 'Det grundlæggende',
   'guide.howToPlay.controlsLink': 'Se den fulde oversigt over styring',
-  'guide.howToPlay.deathBody':
-    'Hvis du falder, bliver dit lig liggende, hvor det faldt, og du rejser dig som et genfærd ved den nærmeste kirkegård. Løb din ånd tilbage til dit lig for at genopstå på stedet uden nogen straf, eller tag imod Den Blege Vogter ved kirkegården for en øjeblikkelig genopstandelse mod en forbigående svækkelse. Splinternye helte skånes helt for svækkelsen, og intet af det, du ejer eller har tjent, går nogensinde tabt.',
+  'guide.howToPlay.deathBody': 'Hvis du falder, bliver dit lig liggende, hvor det faldt, og du rejser dig som et genfærd ved den nærmeste kirkegård. Løb din ånd tilbage til dit lig for at genopstå på stedet uden nogen straf, eller tag imod Den Blege Vogter ved kirkegården for en øjeblikkelig genopstandelse mod en forbigående svækkelse. Splinternye helte skånes helt for svækkelsen, og intet af det, du ejer eller har tjent, går nogensinde tabt. Spillet fortæller dig også, hvad det var: en linje i din chat nævner det, der gav dødsstødet, hvilket som regel er den hurtigste måde at regne ud, hvad der gik galt.',
   'guide.howToPlay.deathTitle': 'Døden er ikke enden',
   'guide.howToPlay.firstHeading': 'Dine første 15 minutter',
   'guide.howToPlay.groupingBody':
@@ -6528,8 +6450,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.questsBody':
     'Tag imod quests fra folk med en markør over hovedet, fuldfør målet, og aflever dem for erfaring, mønter og udstyr. Sporeren på skærmen holder dine mål synlige.',
   'guide.howToPlay.questsTitle': 'Quests',
-  'guide.howToPlay.reassure':
-    'Talenter låses op på niveau 10 og kan nulstilles når som helst, du er uden for kamp, så dine tidlige valg er aldrig permanente. Eksperimentér frit.',
+  'guide.howToPlay.reassure': 'Talenter begynder på niveau 5, og der er seks rækker i alt, en på hvert af niveauerne 5, 8, 11, 14, 17 og 20. Hver række er ét valg blandt tre, og du kan nulstille når som helst, så længe du er uden for kamp og ikke i en arenakamp, så dine tidlige valg er aldrig permanente. Eksperimentér frit.',
   'guide.howToPlay.resourcesBody':
     'Besværgelser og evner koster en ressource. Krigere opbygger Raseri ved at kæmpe, slyngler bruger Energi, der fylder op af sig selv, og alle andre kaster fra en pulje af Mana.',
   'guide.howToPlay.resourcesTitle': 'Ressourcer',
@@ -6610,11 +6531,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'Den side, du ledte efter, findes ikke eller er måske flyttet.',
   'guide.notFound.home': 'Tilbage til oversigten',
   'guide.notFound.title': 'Vi kunne ikke finde den side',
-  'guide.petHook.emberkin': 'En fjernkamps-ildboltdæmon der pikker på fjender fra sikker afstand.',
+  'guide.petHook.emberkin': 'En dæmon på afstand, hvis kendetegnende Dæmonlyn gnaver af fjenderne fra sikker afstand.',
   'guide.petHook.pyre_colossus':
     'En kæmpemæssig juggernaut med knusende nærkamp, tilkaldt for ren kraft.',
-  'guide.petHook.gloomshade':
-    'En robust dæmon der håner og opsuger slag, så du kan besværge i fred.',
+  'guide.petHook.gloomshade': 'En sej tankdæmon, der håner og bruger Afgrundskæde til at trække flygtende almindelige fjender tilbage inden for rækkevidde; bosser modstår trækket.',
   'guide.placeholder.note': 'Denne del af guiden er på vej.',
   'guide.progression.bandLabel': 'Niveau {min} til {max}',
   'guide.progression.capBody':
@@ -6631,14 +6551,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Der er ingen hast. Verden er der til at nyde i dit eget tempo, så vandr omkring, tag de opdrag der fanger dit blik, og lad din helt vokse undervejs.',
   'guide.progression.prestigeBody':
     'Erfaring tæller stadig, selv efter loftet. Den fodrer et kosmetisk virtuelt niveau, så din erfaringsbjælke bliver ved med at stige, og en langsigtet prestigerang, du kan optjene fra dit karakterark, når du først er der. At passere store milepæle for samlet livstidserfaring optjener også bedrifter i din Bedrifternes Bog, med kosmetiske titler og navneskiltskanter, der vises på dit karakterark. Det hele er rent valgfrit og giver aldrig magt, blot et mærke for den vej, du har vandret.',
-  'guide.progression.restedBody':
-    'Træd ind på en kro og hold dig uden for kamp, så opbygger din karakter udhvilet erfaring, mens du venter. Hver by har en. Næste gang du går ud og kæmper, giver den pulje dine drab et ekstra skub, indtil den løber tør. En pause på kroen er aldrig spildt tid; den fremskynder dit næste stykke opleveling.',
+  'guide.progression.restedBody': 'Træd ind på en kro og hold dig uden for kamp, så opbygger din figur udhvilet erfaring, mens du venter. Hver by har en. Næste gang du går ud og kæmper, giver den pulje dine drab et ekstra skub, indtil den løber tør. En pause på kroen er aldrig spildt tid; den fremskynder din næste strækning af niveauklatring. Puljen har et loft, så en overnatning samler omtrent lige så meget som et meget langt ophold, og når du først har nået niveauloftet, er der ingen niveaulinje tilbage at fylde, så udhvilet erfaring holder op med at samle sig.',
   'guide.progression.restedTitle': 'Udhvilet erfaring',
-  'guide.progression.xpBody':
-    'Du tjener erfaring ved at fuldføre opdrag, ved at besejre fjender og ved at rydde delves. Opdrag giver langt mest, så at følge opdragsstien er den hurtigste vej op. Drab og delve-ture undervejs fylder resten ud.',
+  'guide.progression.xpBody': 'Du tjener erfaring ved at fuldføre opgaver, besejre fjender, rydde delves og udøve et fag: at høste og fremstille betaler figurerfaring oven i den fagfærdighed, de lærer dig, så længe arbejdet stadig lærer dig noget. Opgaver giver langt mest, så at følge opgavesporet er den hurtigste vej opad, mens drab, delves og den indsamling, du laver undervejs, fylder resten ud.',
   'guide.progression.xpTitle': 'Sådan får du erfaring',
-  'guide.questsPage.acceptBody':
-    'Folk med et mærke over hovedet har arbejde til dig. Tal med dem for at acceptere et opdrag. I Eastbrook venter Marskal Redbrook med Ulve ved Døren, et af de første opdrag, du kan tage.',
+  'guide.questsPage.acceptBody': 'Folk med et mærke over hovedet har arbejde til dig, og mærket fortæller hvilken slags. Et gyldent udråbstegn betyder en opgave, du kan tage med det samme, og et gyldent spørgsmålstegn en opgave, du har fuldført og kan aflevere. På et navneskilt ser du også et gråt spørgsmålstegn, som betyder, at du har den opgave, men endnu ikke er færdig. Gentageligt arbejde bruger de samme mærker i blåt: et klarblåt udråbstegn er et hverv, du allerede har udført og kan tage igen, og det samme mærke dæmpet er et, der stadig er inde i sin ventetid. Alle mærker undtagen det grå ses på navneskilte, på minikortet og på verdenskortet, så du kan få øje på arbejde tværs gennem byen. I Eastbrook venter marskal Redbrook med Ulve for døren, en af de første opgaver du kan tage.',
   'guide.questsPage.acceptTitle': 'At finde og acceptere',
   'guide.questsPage.heading': 'Opdrag',
   'guide.questsPage.intro':
@@ -6679,20 +6596,17 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.turninBody':
     'Bring et færdigt opdrag til dets afleveringsmarkør, kortet viser dig hvor, for erfaring, mønter og ofte et stykke udstyr valgt til at passe din klasse. Det er som regel den, der gav dig det, men nogle opdrag sender dig videre til en anden.',
   'guide.questsPage.turninTitle': 'At aflevere',
-  'guide.questsPage.typeGatherBody':
-    'Saml genstande fra verden eller fra hvad fjender taber: urter, malm, en kults dystre reagenser. Nogle stykker falder kun fra en bestemt fjende, så jagten og hjembringningen følges ad.',
+  'guide.questsPage.typeGatherBody': 'Saml genstande fra verden eller fra det, fjender taber: urter, malm, en kults dystre reagenser. Nogle stykker falder kun fra en bestemt fjende, så jagten og høsten hører sammen. Ting på jorden, der hører til en opgave, giver sig kun, mens du rent faktisk har den, og de siger det til dig, hvis du ikke har, eller hvis du allerede har nok. Nogle opgaver rækker dig også et redskab, når du tager dem: hold øje med taskerne, og brug det, som opgaveteksten beskriver. Har en opgave brug for et redskab, som et tidligere trin gav dig, giver det at tage den det tilbage, når du ikke længere har det, så et mistet redskab kan ikke køre kæden i en blindgyde.',
   'guide.questsPage.typeGatherTitle': 'Indsaml',
   'guide.questsPage.typeGroupBody':
     'Hvert kapitel af hovedhistorien ender ved en fangekælderdør. Optakten kan klares solo, men det sidste slag mod et kapitels skurk er ment for en følgesvende-gruppe på fem.',
   'guide.questsPage.typeGroupTitle': 'Gruppefinaler',
-  'guide.questsPage.typeInteractBody':
-    'Brug, rens, eller læs noget fast i verden: en vanhelliget grav, en advarsel hugget i en strandsten, en forseglet kryptdør. Gå hen til mærket og handl på det.',
+  'guide.questsPage.typeInteractBody': 'Brug, rens eller læs noget fast i verden: en skændet grav, en advarsel ridset i en strandklippe, en forseglet gravdør. Gå hen til mærket og handl på det. Når en opgave beder om flere, mener den flere forskellige: hver genstand giver dig kun kredit én gang, så find den næste i stedet for at bruge den samme to gange. Genstanden bliver ikke brugt op, når du handler på den, så alle i din gruppe kan hente deres egen kredit fra den.',
   'guide.questsPage.typeInteractTitle': 'Interager',
   'guide.questsPage.typeMusterBody':
     'Nogle opdrag får dig til at samle en by før et fremstød mod nord: tynd truslen ved portene og saml det, forsvarerne har brug for. Det er drabs- og indsamlingsmål i tjeneste for de folk, hvis historie du er en del af, og de holder dig i bevægelse med dem.',
   'guide.questsPage.typeMusterTitle': 'Mønstr forsvaret',
-  'guide.questsPage.typeSlayBody':
-    'Tynd ud i en flok bæster eller bryd en kults greb ved at besejre et fastsat antal af en mærket fjende. Et af dine første opdrag, at rydde ulve fra Eastbrook-vejen, er et af disse.',
+  'guide.questsPage.typeSlayBody': 'Tynd en flok bæster ud eller bryd en kults greb ved at besejre et bestemt antal af en markeret fjende. En af dine første opgaver, at rydde ulvene fra vejen ved Eastbrook, er en af dem. Nu og da vækker en opgave sine egne mål: noget, der ved dit sidste besøg læste som kulisse, får et navneskilt og bliver til noget, du kan slå på, så snart du bærer den opgave, det angår, så gå tilbage og kig igen.',
   'guide.questsPage.typeSlayTitle': 'Slå ihjel',
   'guide.questsPage.typesBody':
     'De fleste opdrag er en af nogle få velkendte former. Den skærmnære sporing staver præcist ud, hvad hvert enkelt vil have, så du aldrig efterlades i tvivl.',
@@ -6741,22 +6655,17 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanYell': 'Råb.',
   'guide.social.chanYellBody':
     'En højere udgave af Sig der bærer en smule længere, nok til at nå tværs over en lejr.',
-  'guide.social.chatBody':
-    'Chat er delt op i kanaler, hver vist på sin egen fane. Skriv en besked for at sende den på den aktive kanal, eller brug en skråstregskommando for at sende en enkelt linje andetsteds hen. Dette er de kanaler du kan tale på:',
+  'guide.social.chatBody': 'Chatvinduet begynder med to visninger, der altid er der, én samlet log over alt, hvad der siges, og en kamplog. Ud over dem tilføjer du de faneblade, du vil, med plusknappen, et per kanal, og på computeren kan du trække dem i den rækkefølge, du har lyst til (Alt med venstre eller højre piletast flytter det fokuserede faneblad fra tastaturet); højreklik på et faneblad for at lukke det igen, og din opstilling huskes mellem sessioner. At skrive i et kanalfaneblad sender på den kanal, og en skråstregskommando sender én linje et andet sted hen uden at skifte faneblad. Der er også et hviskefaneblad, der samler hver hvisken, du sender og modtager, ét sted, og hvor det at skrive ganske enkelt svarer den, der skrev til dig sidst. Det er de kanaler, du kan tale på:',
   'guide.social.chatHeading': 'Chatkanaler',
-  'guide.social.etiquetteBody':
-    'At danne gruppe er et valg, ikke en pligt. Sig hej når du tilslutter dig, kast Behov kun på udstyr du faktisk vil bruge, og lad gruppen vide besked før du tager afsted. En smule høflighed rækker langt, og de fleste spillere er glade for selskabet. Moderatorer holder freden, og en spiller, der ikke vil lade andre nyde spillet, kan flyttes til en fængselscelle, indtil en moderator lukker vedkommende ud.',
+  'guide.social.etiquetteBody': 'At gruppere sig er et valg, ikke en pligt. Sig hej, når du kommer til, rul Behov kun på udstyr, du rent faktisk vil bruge, og sig til i gruppen, før du drager af sted. Lidt høflighed rækker langt, og de fleste spillere er glade for selskabet.',
   'guide.social.etiquetteHeading': 'Gruppeetikette',
   'guide.social.friendsBody':
     'Tilføj spillere til din venneliste for at se, hvornår de er online og hvor de er, så du kan danne gruppe i samme øjeblik de logger ind.',
-  'guide.social.friendsHeading': 'Venner og ignorering',
-  'guide.social.guildBody':
-    'Et laug er en varig gruppe af spillere du tilhører mellem sessioner. Opret et eller accepter en invitation for at deltage, og du kan være i ét laug ad gangen. Medlemmer har en rang: en leder, officerer og medlemmer.',
-  'guide.social.guildChatBody':
-    'At tilhøre et laug giver dig en privat laugschat-kanal og viser dine laugskammerater på en delt liste, så der altid er kendte ansigter online.',
+  'guide.social.friendsHeading': 'Venner, ignorering og blokering',
+  'guide.social.guildBody': 'Et guild er en varig gruppe spillere, du hører til mellem sessionerne. At grundlægge et koster grundlæggeren et engangsgebyr på 1 guld, eller du kan ganske enkelt tage imod en invitation for at blive medlem, og du kan være i ét guild ad gangen. Medlemmer bærer en rang: en leder, officerer og medlemmer.',
+  'guide.social.guildChatBody': 'At høre til et guild giver dig en privat guildchatkanal og en delt liste over dine guildkammerater. Nyere medlemmer bærer et Rekrut-mærke og mangeårige et Veteran-mærke i stedet for den simple medlemsbetegnelse, mens officerer og guildlederen altid viser deres rang, og du kan skjule de frakoblede navne, når du kun vil se, hvem der er her lige nu. Officerer og guildlederen kan også hæfte en kort opslagsbesked øverst på fanebladet Guild, og den læses op i din chatlog, næste gang du logger ind, hvilket er sådan de fleste guilds bekendtgør ugens planer.',
   'guide.social.guildHeading': 'Laug',
-  'guide.social.ignoreBody':
-    'Hvis nogen generer dig, så føj dem til din ignoreringsliste, og du holder op med at se deres chat.',
+  'guide.social.ignoreBody': 'Hvis nogen snakker mere, end du gider, så føj vedkommende til din ignoreringsliste, og deres offentlige chat holder op med at nå dig. Ignorering er kun en chatindstilling, og den fjerner aldrig nogen fra din venneliste.',
   'guide.social.intro':
     'Det meste af verden kan klares solo, men spillet er bygget til at spilles sammen med andre. Her er, hvordan du taler, slår dig sammen og finder dit selskab.',
   'guide.social.lootBody':
@@ -6816,8 +6725,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.stats.spBody':
     'Besværgelsesstyrke er en besværgers modstykke til angrebsstyrke: den hæver den skade, dine besværgelser volder. Intellekt fodrer den, og besværgerudstyr og forstærkninger lægger mere oven i, så en besværger holder øje med besværgelsesstyrke, sådan som en nærkampskæmper holder øje med angrebsstyrke.',
   'guide.stats.spTitle': 'Besværgelsesstyrke',
-  'guide.stats.spiBody':
-    'Ånd styrer, hvor hurtigt en besværgers mana vender tilbage, når som helst de holder pause i deres besværgelser, hvilket er det meste af tiden mellem kampe. Ligesom Intellekt tjener den manaklasserne og betyder kun lidt for de andre.',
+  'guide.stats.spiBody': 'Ånd styrer, hvor hurtigt en besværgers mana vender tilbage. Den betaler først fuldt ud, når der er gået nogle sekunder uden at der er brugt noget, og en del af den bliver ved med at flyde selv midt i en besværgelse, så Ånd er aldrig død vægt i en kamp, selv om en besværger, der fyrer løs uden pause, alligevel løber tør. At holde en pause er en rigtig manabeslutning, i kamp lige så vel som mellem kampene. Ligesom Intellekt tjener Ånd manaklasserne og betyder lidt for de andre.',
   'guide.stats.spiTitle': 'Ånd',
   'guide.stats.staBody':
     'Udholdenhed er din ihærdighed. Mere Udholdenhed betyder en større sundhedspulje, og den fremskynder den sundhed du genvinder, mens du hviler uden for kamp. Hver klasse vil have noget.',
@@ -6837,21 +6745,17 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'Soloegnet',
   'guide.tagline': 'En klassisk MMO, du spiller gratis i din browser.',
   'guide.talentsPage.heading': 'Talenter og specialiseringer',
-  'guide.talentsPage.howBody':
-    'Talenter låses op på niveau 10, og du bliver ved med at tjene point, mens du klatrer mod grænsen. Du bruger dem i din klasses talentpanel, hvor dybere rækker åbner sig, efterhånden som du investerer og stiger i niveau, og du kan gemme mere end ét opsæt for at skifte mellem builds.',
+  'guide.talentsPage.howBody': 'Talenter åbner sig på niveau 5, samme niveau hvor du vælger din specialisering. Fem rækker mere følger, efterhånden som du stiger, en på hvert af niveauerne 8, 11, 14, 17 og 20, så den sidste lander på niveauloftet. Du træffer dine valg i din klasses talentpanel, på fanebladet Valg ved siden af fanebladet Specialisering.',
   'guide.talentsPage.howHeading': 'Sådan virker de',
   'guide.talentsPage.intro':
     'Talenter er måden, du gør en klasse til din egen. De er valgfrie, tilgivende og nemme at ændre, så du kan eksperimentere uden frygt.',
-  'guide.talentsPage.resetNote':
-    'Du kan nulstille dine talenter når som helst, du er uden for kamp og ikke i en arenakamp, så et tidligt valg er aldrig en fælde. Prøv tingene, se hvad du kan lide, og skift mening frit.',
+  'guide.talentsPage.resetNote': 'Du kan nulstille dine talenter når som helst, så længe du er uden for kamp og ikke i en arenakamp, så et tidligt valg er aldrig en fælde. En nulstilling rydder dine rækkevalg og koster ingenting, og din specialisering bliver, som den er, så en nulstilling tager aldrig din rolle fra dig midt i en tur. Slagmarken er undtagelsen, og dér kan du ændre dit build mellem kampene. Prøv ting, se hvad du kan lide, og skift mening frit.',
   'guide.talentsPage.resetTitle': 'Intet er permanent',
   'guide.talentsPage.shareNote':
     'En færdig build kan kopieres til en kort delbar kode og gives til en ven, der indsætter den direkte i sit eget talentpanel for at indlæse den.',
-  'guide.talentsPage.specsBody':
-    'Hver klasse har en håndfuld specialiseringer, hver med sin egen rolle og sit særkende. At vælge en i talentpanelet giver en signaturevne og et blivende mesterskab af sin egen slags. Her er formen på dem alle. Åbn en klasse for dens fulde udstyr.',
+  'guide.talentsPage.specsBody': 'Hver klasse har en håndfuld specialiseringer, hver med sin egen rolle og et kendetegnende fokus. Du vælger en i talentpanelet på niveau 5. Den giver en kendetegnende evne og en varig mestring, de fleste tilføjer passive bonusser, der passer til rollen, og det er også den rolle, du melder dig som i Fangekældersfinderen. Her er formen på dem alle. Åbn en klasse for dens fulde udstyr.',
   'guide.talentsPage.specsHeading': 'Specialiseringer efter klasse',
-  'guide.talentsPage.whatBody':
-    'Efterhånden som du stiger i niveau, tjener du talentpoint at bruge på små, permanente forbedringer af dine evner og egenskaber. De former, hvordan en klasse føles, og hælder den mod mere skade, sejere forsvar eller stærkere helbredelse.',
+  'guide.talentsPage.whatBody': 'Dine talenter er en kort stige af valg snarere end en bunke point. Hver række, der åbner sig, byder på tre muligheder, og du tager præcis én. De former, hvordan en klasse føles, og hælder den mod mere skade, sejere forsvar eller stærkere helbredelse.',
   'guide.talentsPage.whatHeading': 'Hvad talenter gør',
   'guide.toc.heading': 'På denne side',
   'guide.viewer.canvasLabel': 'Roterbar 3D-model af {name}',
@@ -6870,8 +6774,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.wishPage.i2Body':
     'Når du falder, rejser du dig som et genfærd ved den nærmeste kirkegård. Løb tilbage til dit lig for at genopstå gratis, eller tag Den Blege Vogters øjeblikkelige genopstandelse og bær en kortvarig svækkelse for nemhedens skyld. Ingen erfaring, intet udstyr og ingen mønter går nogensinde tabt, så det er trygt at tage chancer og lære.',
   'guide.wishPage.i2Title': 'Døden koster dig knap nok noget',
-  'guide.wishPage.i3Body':
-    'De låses op på niveau 10 og nulstilles, når du vil, uden for kamp, så dine tidlige valg er aldrig permanente.',
+  'guide.wishPage.i3Body': 'Dit første talent kommer på niveau 5, og hver af de seks rækker er ét valg blandt tre, så et build er en håndfuld beslutninger, du overskuer med et blik. Du kan nulstille, når du er uden for kamp og ikke i en arenakamp, så intet af det, du vælger tidligt, låser dig fast.',
   'guide.wishPage.i3Title': 'Talenter er ikke en fælde',
   'guide.wishPage.i4Body':
     'Quests er den hurtigste vej til at stige i niveau, og de fører dig rundt i verden. Når du er i tvivl om, hvor du skal hen, så find den næste markør.',
@@ -6895,19 +6798,16 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.gladeTitle': 'Et stille hjørne: Brightwood Glade',
   'guide.worldPage.heading': 'Verdenen',
   'guide.worldPage.hub': 'Hjemmebase',
-  'guide.worldPage.intro':
-    'World of ClaudeCraft er ét sammenhængende land, du krydser til fods, tre zoner lagt fra syd til nord. Der er ingen hurtigrejse, så rejsen er en del af eventyret.',
-  'guide.worldPage.mapHeading': 'Vejen mod nord',
-  'guide.worldPage.mapSub':
-    'Tre zoner, fra syd til nord, hver et trin højere i niveau. Følg questsporet, og landet bærer dig fra dalen til tinderne.',
+  'guide.worldPage.intro': 'World of ClaudeCraft er ét sammenhængende land, som du krydser til fods. Den gamle vej løber fra syd mod nord gennem startdalen, sumpen og tinderne, og den bliver ved med at stige forbi dem ind i lavningen bagved og snelandet øverst på kortet. En række højere riger åbner sig fra den vej mod vest og en anden mod øst, og en ø ligger ud for Dalens østkyst. Der er ingen hurtigrejse, ingen flyveruter og ingen vogne: hver færd går til fods eller til hest, så det at komme frem hører med til eventyret.\n\nLandet holder også tiden. En døgncyklus løber på et virkeligt ur, som alle på din verden deler, så himlen skifter fra daggry over middag til skumring og mørke for jer alle på én gang, månen kommer og går gennem sine faser, og lyset på jorden skifter med den. Skiven omkring dit minikort er dér, du aflæser timen.',
+  'guide.worldPage.mapHeading': 'Vejen og rigerne hinsides',
+  'guide.worldPage.mapSub': 'Opgavesporet løber fra syd mod nord ned gennem kortets midte: dal, sump, tinder, og videre forbi dem ind i lavningen og sneen. De andre riger åbner sig langs den vej frem for efter den, gennem porte øst og vest for sumpvejen, mens øen Farshore nås fra Dalens østkyst. Det, der holder dig ude af de fjerne riger, er deres niveaubånd, ikke vandringen: fem af dem deler det øverste bånd, så når du først er klar, kan du tage dem i den rækkefølge, du vil. Farshore er undtagelsen, lavniveauland som du kan besøge tidligt.',
   'guide.worldPage.marshBlurb':
     'Et druknet land af tåge og ruiner. Mudfiner vrimler i lavvandet, og noget ældre rører på sig under vandet, holdt under opsyn fra brobyen Fenbridge.',
   'guide.worldPage.marshGreeter': 'Vægter Fenwick, Fenbridge',
   'guide.worldPage.marshGreeting': 'Hold ved porten. Bag de siv klarer mosen drabet for os.',
   'guide.worldPage.marshPlaceNotes':
     'Fenbridge bevogter den eneste tørre vej. Prowler Reeds og Deepfen Shallows myldrer med mosebæster og mudfiner; Widow Thicket er spundet tæt med spind; Drowned Chapel og Troll Mounds rummer ældre farer, med Det Druknede Litani, mosens egen delve, der åbner lige nord for højene; Gravecaller Encampment er kulten gravet ind, og Den Sunkne Bastion er mosens instans-hjerte.',
-  'guide.worldPage.peaksBlurb':
-    'Vindskurede rygge og gamle minegange, der klatrer mod rigets koldeste og højeste farer, holdt af forposten Highwatch.',
+  'guide.worldPage.peaksBlurb': 'Vindslebne kamme og gamle mineværker, der klatrer op mod de hårdeste farer på startvejen, holdt af forposten Highwatch.',
   'guide.worldPage.peaksGreeter': 'Kaptajn Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'I to hundrede år har denne mur holdt. Den brister ikke på min vagt, men den knager.',
@@ -7976,8 +7876,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Din anslåede våbenskade pr. sekund, der kombinerer dit våbens skade og hastighed med din angrebsstyrke.',
   'hudChrome.statInfo.desc.int':
     'Udvider en troldkasters manapulje og forbedrer deres chance for at lande et kritisk magisk slag.',
-  'hudChrome.statInfo.desc.spi':
-    'Fremskynder hvor hurtigt en troldkasters mana vender tilbage under hvile, uden for kamp.',
+  'hudChrome.statInfo.desc.spi': 'Fremskynder, hvor hurtigt en besværgers mana vender tilbage. Det meste flyder under hvile, uden for kamp, og en del bliver ved med at vende tilbage selv i kamp.',
   'hudChrome.statInfo.desc.sta':
     'Hærder din krop og øger dit maksimale helbred og hvor hurtigt du genvinder helbred under hvile.',
   'hudChrome.statInfo.desc.str': 'Øger din angrebsstyrke, så dine våbenslag rammer hårdere.',
@@ -9221,30 +9120,23 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'download.linuxHint':
     'AppImage: gør det eksekverbart, og kør det derefter. Ingen installation nødvendig.',
   'guide.nav.settings': 'Indstillinger og ydeevne',
-  'guide.settingsPage.advancedBody':
-    'Avanceret starter fra High-niveauet og låser op for fire ekstra vælgere, så du kan bruge dine rammer, hvor du rent faktisk bemærker dem: Terrændetaljer, Løvtæthed, Effekter og belysning og Skyggekvalitet. Ligesom grafikkvalitet gælder de efter en genindlæsning.',
-  'guide.settingsPage.advancedHeading': 'Den avancerede forudindstilling: bland din egen',
-  'guide.settingsPage.advancedMixes':
-    'To yndlingsblandinger: Hold Shadow Quality på High og indstil Effects & Lighting til Low for et sprødt, glødfrit look, der kører let, eller gør det omvendte for at bevare blomstringen og blødgøre skyggerne.',
+  'guide.settingsPage.advancedBody': 'Du behøver ikke vælge Advanced for at se detaljeknapperne. Grafikpanelet viser dem altid, i to kort: Verdensdetaljer rummer Terrændetaljer, Løvtæthed, Overfladedetaljer, Synsafstand, Vandkvalitet og Figurdetaljer, og Belysning og effekter rummer Effekter og belysning, Skyggekvalitet, Omgivelsesoklusion, Bloom, Kantudjævning, Dynamiske lys og Partikeleffekter. Under en fast forudindstilling viser hver knap nogenlunde, hvor den forudindstilling ligger.',
+  'guide.settingsPage.advancedHeading': 'Detaljeknapperne og Advanced-blandingen',
+  'guide.settingsPage.advancedMixes': 'To yndlingsblandinger: hold Skyggekvalitet højt og sæt Effekter og belysning på Low for et skarpt, glødfrit udtryk, der kører let, eller gør det omvendte for at beholde bloomen og bløde skyggerne op. Én ting at vide, før du blander: Omgivelsesoklusion, Bloom og Kantudjævning hænger i samme kæde som Effekter og belysning, så med den knap på Low har de ingenting at køre på.',
   'guide.settingsPage.balancedTagline':
     'Det søde sted for de fleste maskiner og vores standardråd.',
   'guide.settingsPage.balancedTitle': 'Balanceret',
-  'guide.settingsPage.balancedWhy':
-    'Medium bringer ægte skygger og fulde materialer; High tilføjer omgivende okklusion og blomstring. Under Ultra absorberer et indbygget sikkerhedsnet pludselige fald i travle kampe, så Balanced forbliver glat uden at passe baby.',
+  'guide.settingsPage.balancedWhy': 'Medium giver rigtige skygger og fuldstændige materialer, og High lægger omgivelsesoklusion og bloom oveni. Det indbyggede sikkerhedsnet står spændt på alle niveauer, så Balanced rider en travl kamp af uden at du behøver holde øje.',
   'guide.settingsPage.colDoes': 'Hvad den gør',
   'guide.settingsPage.colImpact': 'FPS virkning',
   'guide.settingsPage.colSetting': 'Indstilling',
-  'guide.settingsPage.factDetectBody':
-    'Ved din første lancering læser spillet din enhed og vælger et fornuftigt niveau, fra Low på en beskeden telefon til Ultra på et stærkt skrivebord. Ethvert valg, du selv træffer, vinder altid.',
+  'guide.settingsPage.factDetectBody': 'Ved første start læser spillet din enhed og gemmer et fornuftigt niveau til dig. Enhver telefon og tablet starter på Low, så du kommer direkte ind i verden, og det gør et gammelt eller softwarebaseret grafikkort også. En stærk computer starter på Ultra, eller på High når maskinen virker knap på hukommelse. Det, spillet ikke kan placere, bliver på Medium. Ethvert valg, du selv træffer, vinder altid, og det bliver stående.',
   'guide.settingsPage.factDetectTitle': 'Spillet tuner sig selv først',
-  'guide.settingsPage.factGovernorBody':
-    'På hvert niveau under Ultra tynder spillet stille og roligt græs, effekter og belysning et øjeblik, når en stor kamp spidser til, og genopretter dem derefter. Hvis du vælger Ultra, fortæller det, at du hellere vil beholde alle detaljer.',
+  'guide.settingsPage.factGovernorBody': 'Hvert niveau holder et sikkerhedsnet spændt: når en stor kamp topper, udtynder spillet stille og roligt græs, effekter og belysning et øjeblik og genopretter dem så. Ultra og Insane venter ganske enkelt meget længere, før de gør det, så en premiumindstilling forstyrres aldrig af et enkelt langsomt billede.',
   'guide.settingsPage.factGovernorTitle': 'Et indbygget sikkerhedsnet',
-  'guide.settingsPage.factReloadBody':
-    'Grafikkvalitet og de avancerede vælgere træder i kraft efter en genindlæsning, og panelet tilbyder en Genindlæs nu-knap, når det er nødvendigt. Hver anden mulighed gælder i det øjeblik, du ændrer den.',
+  'guide.settingsPage.factReloadBody': 'Grafikpanelet redigerer et udkast. Skift Grafikkvalitet eller en af detaljeknapperne, tryk så på Anvend, og spillet genopbygger verden dér, hvor du står, uden genindlæsning. Linjen ved siden af knappen fortæller, hvornår det er sket. Alle andre indstillinger, i det panel og alle andre steder, gælder i det øjeblik du ændrer dem, og kun en genopbygning, der slår helt fejl, tilbyder dig en genindlæsningsknap i stedet.',
   'guide.settingsPage.factReloadTitle': 'To slags muligheder',
-  'guide.settingsPage.fairnessBody':
-    'Ingen mulighed her bytter skønhed for magt. Lower indstillinger afgiver kun kosmetisk polering, aldrig information, du kæmper med: dine debuffs, cast bars, partysundhed og skadetal er identiske fra Low til Ultra. At spille på en beskeden maskine er aldrig et handicap.',
+  'guide.settingsPage.fairnessBody': 'Ingen indstilling her bytter skønhed for magt. Lavere indstillinger giver kun afkald på kosmetisk finish, aldrig på oplysninger, du kæmper med: dine svækkelser, besværgelsesbjælker, gruppens helbred og skadetal er ens fra Low til Insane. At spille på en beskeden maskine er aldrig et handicap.',
   'guide.settingsPage.fairnessTitle': 'Fair af design',
   'guide.settingsPage.fpsTagline': 'Til ældre bærbare computere, integreret grafik og batterispil.',
   'guide.settingsPage.fpsTitle': 'Bedste FPS',
@@ -9261,15 +9153,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.loadoutsHeading': 'Tre færdige loadouts',
   'guide.settingsPage.loadoutsIntro':
     'Start fra belastningen, der lyder som din maskine, og juster derefter én mulighed ad gangen, indtil den føles rigtig.',
-  'guide.settingsPage.mobileBody':
-    'Mobile klarer mere for dig: Spillet vælger niveauet, holder opløsningen et tryk lavere for at beskytte batteri og varme og beholder de højeste niveauer kun på skrivebordet. Ovenstående belastninger gælder stadig; telefoner fyldes blot ud ved High.',
+  'guide.settingsPage.mobileBody': 'På en telefon eller tablet starter spillet dig på Low. Enhver berøringsenhed lander dér ved første start, med vilje, så du kan komme ind i verden og spille; hæv den selv fra Grafikpanelet, når du vil. I en Android-browser står hele stigen åben for dig, og dit valg bliver stående. På iPhone og iPad kan du stadig vælge de øverste forudindstillinger, og de tager fat, så snart du trykker på Anvend, men spillet sætter dig tilbage til High næste gang du starter, fordi iOS kan lukke fanen, mens en så stor scene bygges. Den hentede app er endnu strammere: dens liste over forudindstillinger stopper ved High, og de enkelte systemknapper er skjult, fordi appen selv styrer dem.',
   'guide.settingsPage.mobileTitle': 'På telefoner og tablets',
   'guide.settingsPage.recommended': 'Anbefales',
   'guide.settingsPage.rowBrightness': 'Sceneeksponering, mørkere eller lysere. Ren præference.',
   'guide.settingsPage.rowBrowserEffects':
     'Hvor fancy selve grænsefladen får lov at være: glassløring, glød, animerede menuer. Auto matcher din browser; 3D-verdenen er uberørt på begge måder.',
-  'guide.settingsPage.rowEffectsQuality':
-    'Blomstring, omgivende okklusion, og hvor mange fakler og besværgelser, der kaster rigtigt lys. Den største enkeltbesparelse blandt de avancerede vælgere.',
+  'guide.settingsPage.rowEffectsQuality': 'Bloom, omgivelsesoklusion og hvor mange fakler og besværgelser der kaster rigtigt lys. Den største enkeltbesparelse blandt detaljeknapperne, og den kontakt, de øvrige belysningsknapper afhænger af.',
   'guide.settingsPage.rowFieldOfView':
     'Hvor meget af verden passer på skærmen, fra zoomet 55 til fejende 100 grader. Et komfortvalg; bredere visninger trækker lidt mere.',
   'guide.settingsPage.rowFoliageDensity':
@@ -9290,10 +9180,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Rige, blandede jordstrukturer kontra et enklere, hurtigere terrænlook.',
   'guide.settingsPage.rowWeather':
     'Omgivende regn og sne. Kun atmosfære, og at slukke for den sparer lidt under storme.',
-  'guide.settingsPage.tableFoot':
-    'Leder du efter en skyder til trækafstand eller en FPS kasket? Der er ikke noget at jage efter: Visningsafstand er en del af hvert kvalitetsniveau, og frame pacing følger din skærm.',
+  'guide.settingsPage.tableFoot': 'Leder du efter et FPS-loft? Der er ingenting at lede efter: billedtakten følger din skærm. Tegneafstanden er en knap for sig, Synsafstand, i kortet Verdensdetaljer, og hver forudindstilling sætter den for dig, indtil du selv flytter den.',
   'guide.settingsPage.tableHeading': 'Hver grafikmulighed, forklaret',
-  'guide.settingsPage.tagReload': 'efter genindlæsning',
+  'guide.settingsPage.tagReload': 'tryk på Anvend',
   'guide.settingsPage.value100': '100 %',
   'guide.settingsPage.value50to70': '50 til 70 %',
   'guide.settingsPage.value90to100': '90 til 100 %',
@@ -9301,10 +9190,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.valueOnOptional': 'Til (valgfrit)',
   'guide.settingsPage.visualsTagline': 'Skærmbilledetilstand til kraftfulde stationære maskiner.',
   'guide.settingsPage.visualsTitle': 'Bedste Visuals',
-  'guide.settingsPage.visualsWhy':
-    'Ultra gengiver med den højeste opløsning, din skærm tilbyder med den rigeste belysning. Det slukker også for sikkerhedsnettet, og det er kun til desktop: telefoner og appen topper ud ved High.',
-  'guide.settingsPage.wherePath':
-    'Alt på denne side lever i spillet: tryk på Esc for at åbne indstillingerne. Menuen åbner på en Oversigt over fastgjorte essentielle valg, med kategorierne på en skinne ved siden: indstillingerne nedenfor bor under Grafik, Interface og Tilgængelighed i Skærm-gruppen, og Performance Overlay under System. Endnu hurtigere, skriv et navn i søgefeltet øverst og spring direkte hen til det.',
+  'guide.settingsPage.visualsWhy': 'Ultra gengiver i den højeste opløsning, din skærm tilbyder, med den rigeste belysning. Over den ligger Insane, udstillingsvinduet med alt slået til: den skal du vælge i hånden, for spillet vælger den aldrig for dig, uanset hvor stærk din maskine er.',
+  'guide.settingsPage.wherePath': 'Alt på denne side bor i spillet: tryk på Esc for at åbne spilmenuen. Den viser panelerne som knapper: Tastebindinger, Controller, Grafik, Brugerflade, Auraer, Lyd og Ydelsesoverlejring, med Wiki, Kom fri, Log ud og Tilbage til spillet nedenunder, og Meld en fejl kommer til på listen, mens du spiller online. Grafik og Brugerflade rummer næsten alt det, der beskrives her.',
   'guide.settingsPage.whyLabel': 'Hvorfor virker det:',
   'hudChrome.crafting.close': 'Tæt håndværk',
   'hudChrome.crafting.craftedToast': 'Udformet: {name}',
@@ -9478,8 +9365,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.catalogBody':
     'Her står hver eneste bedrift, Bogen kan rumme, ordnet efter kategori. De hemmelige er udeladt med vilje; de venter på, at du finder dem. Åbn Bedrifternes Bog inde i spillet for at se præcis, hvad hver enkelt kræver.',
   'guide.deedsPage.catalogHeading': 'Den fulde fortegnelse over bedrifter',
-  'guide.deedsPage.chroniclesBody':
-    'Hver zone fører sin egen Krønike, en samling bedrifter nedfældet af en lokal krønikeskriver, der har sat sig for at optegne enhver rejsende, som lægger vejen forbi. Saul fra Østbæk Dal er den første af dem. En Krønike er delt i kapitler, og du kan frit arbejde dig igennem dem i den rækkefølge, der passer dig.',
+  'guide.deedsPage.chroniclesBody': 'Hver zone holder sin egen Krønike, en samling bedrifter samlet af en lokal krønikeskriver, der har påtaget sig at nedskrive enhver rejsende, der kommer forbi. Saul fra Eastbrook-dalen er den første af dem, Osric Fenn fører Sumpkrøniken i Fenbridge ude i Mirefen, og Zenzie nedskriver Tindekrøniken oppe i Highwatch. En Krønike er delt i kapitler, og du er fri til at arbejde dig gennem dem i den rækkefølge, der passer dig.',
   'guide.deedsPage.chroniclesHeading': 'Krøniker',
   'guide.deedsPage.colName': 'Bedrift',
   'guide.deedsPage.colRenown': 'Hæder',
@@ -10286,8 +10172,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Du behøver ikke ramme dine tryk præcist på slaget. Tryk på din næste evne i de sidste øjeblikke af den igangværende besværgelse, så sættes den i kø og udløses i samme nu, besværgelsen er færdig, så øvet spil flyder uden huller. Et tryk for tidligt bliver simpelthen afvist, så intet går til spilde. Nogle nærkampsslag virker på samme måde og rider med på dit næste våbensving.',
   'guide.combat.queueTitle': 'Dit næste træk er allerede ladt',
   'guide.controls.arrowKeys': 'Piletaster',
-  'guide.controls.attackMoveNote':
-    'En mere, slået fra som standard: aktivér Angrebsbevægelse i indstillingerne for at reservere en tast (A, mens indstillingen er slået til), der fører dig mod din markør og åbner ild mod fjenden under den, eller den første, du møder undervejs.',
+  'guide.controls.attackMoveNote': 'Angrebsbevægelse er slået fra, indtil du slår den til: åbn panelet Tastebindinger, aktivér den, og rækken A ovenfor begynder at virke. Med markøren over spilverdenen går du mod markøren og åbner ild mod fjenden under den, eller mod den første fjendtlige, du møder undervejs. Så længe indstillingen er slået til, udløser A den angrebsbevægelse i stedet for at dreje til venstre, så drej med venstre piletast, som Drej til venstre også bærer som standard, eller giv Drej til venstre din egen tast.',
   'guide.controls.bothMouse': 'Begge museknapper',
   'guide.controls.calendar': 'Begivenhedskalender',
   'guide.controls.crafting': 'Håndværk',
@@ -10299,12 +10184,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.controls.valeCup': 'Dalpokalen',
   'guide.dungeonsPage.heroicBody':
     'Hver fangekælder for fem spillere, og selve raidet, har en heroisk udgave, der venter hinsides niveauloftet. De samme haller, gjort om til en veludstyret slutspilsgruppe: alt slår hårdere, intet kan løbes fra til fods, og bosserne ryster lammelser og fastholdelser fuldstændig af sig. Voks fra de normale udgaver først; heroisk går ud fra, at du allerede har.',
-  'guide.dungeonsPage.heroicHowBody':
-    'Vælg sværhedsgraden, før din gruppe gør krav på instansen: skriv /dungeon heroic, eller slå Fangekældersværhedsgrad til på gruppemenuen. Valget deles af hele gruppen og låses fast ved døren, så en tur forbliver det, den blev gjort krav på som.',
-  'guide.dungeonsPage.heroicLockoutBody':
-    'Normale fangekældre kan løbes hele dagen. Heroisk kræver tålmodighed: drabet på den sidste boss spærrer alle i turen til én heroisk gennemførelse af den fangekælder om dagen, og raidet holder en daglig spærring for hver sværhedsgrad. En gennemført tur for fem spillere står stadig åben for dens egen gruppe til ligløb og bytte, så ingen bliver låst ude fra det, de har optjent der. Raidet er strengere: når først dets drab spærrer dig, forbliver døren lukket indtil den daglige nulstilling, så saml dit bytte, før du forlader arenaen.',
-  'guide.dungeonsPage.heroicRewardsBody':
-    'Heroiske bosser taber det bytte, du kender, opgraderet og mærket Heroisk i værktøjstippet, og den sidste boss i hver tur føjer episke genstande til, som ikke findes nogen andre steder. Det sidste drab efterlader også Heroiske Mærker til hver deltager: en valuta, du bruger hos Kvartermester Vex i Highwatch, hvis lager af ringe og halskæder er de eneste smykker i riget.',
+  'guide.dungeonsPage.heroicHowBody': 'Vælg sværhedsgraden, før din gruppe gør krav på instansen: skriv /dungeon heroic, eller vælg Indstil fangekælderens sværhedsgrad i menuen for dit eget portræt. Alene sætter du den selv; i en gruppe kan kun lederen, og valget gælder alle og låses ved døren, så en tur bliver ved med at være det, den blev gjort krav på som.',
+  'guide.dungeonsPage.heroicLockoutBody': 'Almindelige fangekældre kan løbes hele dagen. Heroisk kræver tålmodighed: slutbossens fald begrænser alle på turen til én heroisk gennemførelse af den fangekælder om dagen, og raidet holder en daglig spærring for hver sværhedsgrad. På et levende rige falder alle daglige spærringer sammen ved rigets egen natlige nulstillingstime, så en gennemførelse taget lige før den time og en taget lige efter falder på to forskellige dage; spil i stedet offline i din browser, og en spærring udløber ganske enkelt et døgn efter dit eget drab. En allerede gennemført tur for fem spillere står stadig åben for gruppen selv til ligløb og bytte, så ingen bliver låst ude fra det, de tjente derinde. Raidet er strengere: når dets drab først har spærret dig, står døren lukket til nulstillingen, og den eneste vej tilbage ind er et ligløb af en, der faldt netop i den tur, som spærrede dem, så en levende raider, der går ud, er gået ud for dagen. Saml dit bytte, før du forlader arenaen. Hver af disse spærringer tilhører den figur, der tjente den, så en gennemførelse på din hovedfigur lader dine andre figurer være frie.',
+  'guide.dungeonsPage.heroicRewardsBody': 'Heroiske bosser taber det bytte, du kender, opgraderet og mærket Heroisk i værktøjstippet, og hver turs slutboss lægger episke genstande til, som ikke findes andre steder. Det sidste drab efterlader også Heroiske Mærker til hver deltager: en valuta, der bruges hos kvartermester Vex i Highwatch, hvis disk er en hylde med ringe og vedhæng, som intet andet end beviset fra de heroiske dybder kan købe.',
   'guide.dungeonsPage.heroicRewardsTitle': 'Heroiske Mærker og opgraderet bytte',
   'guide.dungeonsPage.heroicTitle': 'Heroisk tilstand',
   'guide.economy.dailyBody':
@@ -10316,8 +10198,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'At hente virker på samme måde omvendt: stil dig ved enhver søjle for at læse dine breve og tage det, de bærer, ind i din pung og dine tasker. Et almindeligt brev falmer bort efter et stykke tid, men et, der stadig bærer mønter eller varer, venter på dig, uanset hvor lang tid du tager. Nogle ting nægter posten helt: sjælebundne genstande, opdragsvarer og unikke kosmetiske tokens rejser med dig eller slet ikke. Og hold øje med søjlen efter en god aflevering; nogle opdragsgivere skriver.',
   'guide.economy.mailTitle': 'Ravneposten',
   'guide.footer.linksLabel': 'Spil- og fællesskabslinks',
-  'guide.gear.bagsBody':
-    'Alt, hvad du samler op, ligger i én fælles taske, og du udvider den ved at udstyre tasker. Dit taskevindue har fire tasketilslutninger: klik på en taske i din pakke for at sætte den i en ledig plads, og hver taske, du bærer, føjer sin egen plads til. Simple tasker er billige handelsvarer, mere rummelige falder fra bæster, og de fineste kommer fra fangekælderbosser, så din bæreplads vokser side om side med dit udstyr.',
+  'guide.gear.bagsBody': 'Alt, hvad du samler op, kører i én fælles rygsæk, og du udvider den ved at udstyre tasker. Dit taskevindue har fire taskepladser: klik på en taske i rygsækken for at slænge den i en ledig plads, og hver taske, du bærer, føjer sin egen plads til. Simple tasker er billige handelsvarer, rummeligere falder fra bæster, og de fineste kommer fra fangekælderbosser, så din bæreplads vokser i takt med dit udstyr. Alt, der stakker, siger i sit værktøjstip, hvor mange én plads rummer, hvilket er sådan, du på forhånd ved, at en ordentlig eliksirtur kommer til at koste dig to.',
   'guide.gear.bagsTitle': 'Tasker og bæreplads',
   'guide.gear.slotFinger': 'Finger',
   'guide.gear.slotNeck': 'Hals',
@@ -10330,8 +10211,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.heroicDef':
     'Den sværere udgave af en fangekælder eller raidet, tilpasset veludstyrede slutspilsgrupper. Heroiske bosser taber opgraderet bytte, og den sidste boss betaler Heroiske Mærker.',
   'guide.glossary.heroicTerm': 'Heroisk',
-  'guide.glossary.loadoutDef':
-    'Et gemt talentopsæt. Behold flere, og skift mellem builds uden at bruge dine point om ét ad gangen.',
+  'guide.glossary.loadoutDef': 'En gemt talentopsætning, op til ti af dem. Hver enkelt husker sine rækkevalg og sin handlingsbjælke og kan også huske det udstyr, du bar, så et skift af build er ét klik i stedet for at lave hver række om.',
   'guide.glossary.loadoutTerm': 'Opsæt',
   'guide.glossary.lockoutDef':
     'Et dagligt loft over de største gentagelige belønninger. Hver heroisk fangekælder udbetaler én gennemførelse om dagen, raidet sporer normal og heroisk hver for sig, og at samle bytte fra en verdensboss starter din. En gennemført tur for fem spillere står stadig åben for dens egen gruppe; den spærrede raiddør åbner ikke igen før nulstillingen.',
@@ -10375,18 +10255,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.professions.harvestTitle': 'At høste selve jagten',
   'guide.search.typeAbility': 'Evne',
   'guide.search.typeDeed': 'Bedrift',
-  'guide.settingsPage.audioBody':
-    'Indstillingsvinduet er ikke kun pixels. En Lyd-kategori rummer særskilte lydstyrkeknapper for effekter, musik og stemme, og Interface-kategorien bærer en sprogvælger, der omlokaliserer hele grænsefladen på stedet, uden genindlæsning, plus en temavælger til vinduets udseende. Sprog er også fæstnet først på Oversigten, så det altid er ét skridt fra at åbne menuen.',
+  'guide.settingsPage.audioBody': 'Indstillingsvinduet er ikke bare pixels. Lyd rummer tre lydstyrkeskydere, til lydeffekter, musik og stemme, plus en kontakt til musik og fire kontakter til de lyde, der hurtigst bliver trættende: NPC-stemmer, fodtrin, brugerfladelyde og klikrespons. Fanebladet Generelt i Brugerfladepanelet bærer en sprogvælger, der lokaliserer hele brugerfladen på stedet uden genindlæsning, og en temavælger til vinduernes udstyr.',
   'guide.settingsPage.audioTitle': 'Lyd og sprog',
-  'guide.settingsPage.autolootBody':
-    'Foretrækker du ikke at klikke på hvert lig? En grænsefladeindstilling, slået fra som standard, samler byttet fra dine egne drab op, mens du går forbi dem.',
-  'guide.settingsPage.factSearchBody':
-    'Er du ikke sikker på, hvor en indstilling bor? Skriv i søgefeltet øverst i menuen. Den forstår også almindelige formuleringer, så fps finder FPS-visningen, og at vælge et resultat springer dig hen til indstillingen og lader den stå fremhævet.',
-  'guide.settingsPage.factSearchTitle': 'Søgningen finder det først',
-  'guide.settingsPage.touchBody':
-    'På en berøringsskærm vokser indstillingerne også deres egen komfortsamling frem: joystickstørrelse og følsomhed, størrelse og gennemsigtighed på skærmknapper, et venstrehåndet spejlvendt layout, en valgfri kamerastik og omvendt berøringskig, så skærmen passer til dine hænder frem for omvendt.',
-  'guide.social.calendarBody':
-    'Tryk på I for at åbne begivenhedskalenderen. Den markerer de dage i riget, der er værd at planlægge efter, fra det ugentlige raidkald til fiesta-aften, og det er her, laug holder deres kalender: lauglederen og officererne kan booke begivenheder på den, og hvert medlem ser dem på samme side.',
+  'guide.settingsPage.autolootBody': 'Foretrækker du ikke at klikke på hvert lig? Automatisk plyndring i forbifarten, på fanebladet Kamp i Brugerfladepanelet og slået fra som standard, skovler byttet fra dine egne drab op, mens du går forbi dem.',
+  'guide.settingsPage.factSearchBody': 'Der er intet søgefelt, så det hjælper at kende menuens form. Grafik er lagt op i kort: Kvalitet, Verdensdetaljer, Belysning og effekter, Kamera, Skærm og System, plus Berøringsstyring på en berøringsskærm. Brugerflade er delt i fire faneblade: Generelt, Vinduer, Chat og Kamp. Ændrer en indstilling, hvordan verden tegnes, ligger den under Grafik, og ændrer den, hvad brugerfladen viser dig, ligger den under Brugerflade.',
+  'guide.settingsPage.factSearchTitle': 'Hvor en indstilling bor',
+  'guide.settingsPage.touchBody': 'På en berøringsskærm får Grafikpanelet sit eget kort Berøringsstyring: joystickets størrelse og dødzone, størrelsen på skærmknapperne, styringens uigennemsigtighed, et valgfrit kamerastyr, et spejlvendt layout til venstrehåndede og omvendt berøringskig, så skærmen former sig efter dine hænder i stedet for omvendt.',
+  'guide.social.calendarBody': 'Tryk på I for at åbne begivenhedskalenderen. Den markerer de rigedage, det er værd at planlægge omkring, det ugentlige Raidkald, Markedsdagen, Arenadysten og Fiskekonkurrencen, plus den månedlige Delve-Dag og Måneportskommunionen, og det er dér, guilds fører deres kalender: guildlederen og officererne kan booke begivenheder på den, og alle medlemmer ser dem på samme side. Rigedagene er en opfordring til at samles, ikke en bonus; intet ved din figur ændrer sig, fordi en dag er markeret.',
   'guide.social.calendarHeading': 'Begivenhedskalenderen',
   'guide.social.communityBody':
     'Start en chatlinje med et udråbstegn for at lave et fællesskabskald: !lfg for at søge en gruppe, !wts og !wtb for at handle, !recruit til dit laug, !event for at annoncere et raid eller møde, og !help for at bede om en hånd. En menu over kaldene dukker op i samme øjeblik, du skriver tegnet. Hvert kald udsendes i verden og gentages på fællesskabets Discord, så det når spillere, der ikke engang er logget ind. Fællesskabskald er en del af onlinespil.',
@@ -10405,8 +10280,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.stats.hasteBody':
     'Hast er en egenskab, der fremskynder alt, hvad du gør: nærkampssving, afstandsskud og besværgelser sætter alle farten op sammen. Den kommer fra udstyr, især bonusser fra rustningssæt, mens nogle få evner giver et kort udbrud af hurtigere sving. Dit karakterark viser den som Hast-rating.',
   'guide.stats.hasteTitle': 'Hast',
-  'guide.talentsPage.choiceNote':
-    'Nogle få point på hvert træ er en korsvej frem for et køb: knuden tilbyder to eller tre muligheder, og du binder dig til en af dem. Din næste nulstilling åbner valget igen, ligesom alt andet på træet.',
+  'guide.talentsPage.choiceNote': 'Hver række er en korsvej: den byder på tre muligheder, og du binder dig til en af dem. Din næste nulstilling åbner hvert eneste af de valg igen.',
   'guide.valeCupPage.bettingBody':
     'Tilskuere ved Somarken kan bakke en side op, mens en kamp danner sig: indsatserne samles i en pulje, og ved slutfløjtet deler vinderne tabernes pulje i forhold til, hvad de satsede. En uafgjort kamp, eller en overraskelse, som ingen bakkede op, refunderer hver mønt. Spillere, der er sat ind i kampen, kan ikke vædde på den, og rækværket fører din livstidsstatistik over sejre, nederlag og nettomønter.',
   'guide.valeCupPage.bettingHeading': 'Et lille væddemål ved rækværket',
@@ -10416,13 +10290,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Højt oppe på Tornetop samler stormen over Stormcrag sig undertiden til en skikkelse. Thunzharr, den Vågnende Tind rejser sig der i en fast rytme, en elementar af raidstyrke, der bekæmpes i den åbne verden af hvem end der svarer på kaldet, og han vokser sig mægtigere, jo flere udfordrere der stiller op mod ham. Alle, der slutter sig til kampen, tjener deres eget kast om hans bytte, hædret på raidspærrings-vilkår, og hans fald varer længe nok til, at de faldne kan løbe tilbage og gøre krav på deres del. Saml flere sværd, end du tror, du har brug for.',
   'guide.worldPage.worldBossTitle': 'Når tinden vågner: verdensbossen',
-  'entities.abilities.chain_heal.name': 'Kædeheling',
+  'entities.abilities.chain_heal.name': 'Kaskadehelbredelse',
   'entities.abilities.chain_heal.description':
     'Helbreder et venligt mål for {damage} og springer derefter videre til op til 2 allierede inden for 12 meter. Hvert spring helbreder for 50% af det forrige mål. Hver allieret der nås, forbruger din resterende Lapningsstrøm og helbreder øjeblikkeligt for 125% af den forbrugte mængde. Den indledende helbredelse øges med besværgelseskraft. (Genoprettelsessignatur)',
   'entities.abilities.desperate_prayer.description':
     'Helbreder dig øjeblikkeligt for 30% af dit maksimale helbred.',
-  'entities.abilities.counter_shot.description':
-    'Et hurtigt skud, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek.',
+  'entities.abilities.counter_shot.description': 'Afbryder målet og forhindrer det i at besværge fra den skole i 4 sek.',
   'entities.abilities.counter_shot.name': 'Dæmpende Skud',
   'entities.abilities.counterspell.description':
     'Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 6 sek.',
@@ -10441,9 +10314,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.skull_bash.description':
     'En fremadstormende skalle, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek.',
   'entities.abilities.skull_bash.name': 'Skalle',
-  'entities.abilities.spell_lock.description':
-    'Gør målet tavst midt i en besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 5 sek.',
-  'entities.abilities.spell_lock.name': 'Mundkurv',
+  'entities.abilities.spell_lock.description': 'Afbryder fjendens besværgelse og forhindrer den i at besværge fra den skole i 4 sek.',
+  'entities.abilities.spell_lock.name': 'Afgrundsknebel',
   'entities.items.ashen_focus_ring.name': 'Askegrå Fokusring',
   'entities.items.ashstalker_cowl.name': 'Askeluskerens Hætte',
   'entities.items.ashstalker_grips.name': 'Askeluskerens Gribehandsker',
@@ -10769,8 +10641,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.name': 'Avatar',
   'entities.abilities.avatar.description':
     'Forvandl dig til en kolos i 20 sek., bryd alle kontroleffekter på dig, og øg din skade med 20%.',
-  'entities.abilities.avenging_wrath.description':
-    'Påkalder hævnende kraft og øger din angrebskraft med 60 og magikraft med 30 i 20 sek. (paladintalent)',
+  'entities.abilities.avenging_wrath.description': 'Folder legemlige vinger af gylden hellig kraft ud, vinder 10 Hengivenhed og fordobler den Hengivenhed, jeres evner skaber, i 15 sek. Øger desuden den skade og helbredelse, I udretter, med 20%. Daggryshøster: muliggør Vredens Hammer mod ethvert mål.',
   'entities.abilities.berserk.description':
     'Øger din angrebskraft med 70 i 15 sek. (druidentalent)',
   'entities.abilities.bladestorm.name': 'Klingestorm',
@@ -10778,12 +10649,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Bliv til en hvirvlende storm af stål, og ram alle fjender inden for 6 meter for {damage} skade hvert sekund i 4 sek.',
   'entities.abilities.blink.description':
     'Teleporterer dig 15 m fremad og bryder forankringseffekter. (magikertalent)',
-  'entities.abilities.bloodlust.description':
-    'Pisker allierede inden for 30 m ind i et raseri og øger deres angrebshastighed med 30 % i 15 sek. (shamantalent)',
-  'entities.abilities.chain_lightning.description':
-    'Kaster lyn mod målområdet og giver {damage} skade til fjender i nærheden. (shamantalent)',
-  'entities.abilities.chaos_bolt.description':
-    'Kaster en kaotisk ildkugle, der giver {damage} Ildskade. (troldmandstalent)',
+  'entities.abilities.bloodlust.description': 'Øger angrebs-, besværgelses- og kanaliseringshastigheden hos gruppe- eller raidallierede inden for 30 m med 30% i 15 sek. Berørte allierede kan ikke drage nytte af Krigstrommer eller Tidsacceleration igen i 10 min. (Shamantalent)',
+  'entities.abilities.chain_lightning.description': 'Rammer op til 3 fjender inden for 10 m for {damage} Naturskade hver. Elementær: et træf giver 1 Torden. Skaden stiger med Besværgelseskraft.',
+  'entities.abilities.chaos_bolt.description': 'Bruger 3 Forødelse på at slynge et tungt lyn af kaotisk ild, der volder {damage} Ildskade. Tilintetgørelse forkorter dens besværgelse med 30%.',
   'entities.abilities.cloak_of_shadows.description':
     'Indhyller dig i skygger og absorberer 420 skade i 5 sek. (slyngeltalent)',
   'entities.abilities.cone_of_cold.description':
@@ -10796,23 +10664,20 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Congela profundamente a målet, inflige {damage} de daño de Frost y lo aturde durante 4 sek. (magikertalent)',
   'entities.abilities.deterrence.description':
     'Øger din undvigelseschance med 50 procentpoint i 10 sek. (jægertalent)',
-  'entities.abilities.earthbind.description':
-    'Binder fjender i nærheden til jorden og forankrer dem i 2 sek. (shamantalent)',
+  'entities.abilities.earthbind.description': 'Rodfæster fjender inden for 4 m fra målpunktet i 2 sek. og sinker dem derefter med 40% i 6 sek. (Shamantalent)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalent)',
   'entities.abilities.frenzied_regeneration.description':
     'Genopretter 180 helbred over 10 sek. Kun i Bjørneform. (druidentalent)',
   'entities.abilities.frost_trap.description':
     'Fryser fjender i målområdet i 3 sek., så de hverken kan bevæge sig eller handle. (jægertalent)',
-  'entities.abilities.hammer_of_wrath.description':
-    'Kaster en hellig hammer mod en såret fjende for {damage} Hellig skade. Kan kun bruges under 20 % helbred. (paladintalent)',
+  'entities.abilities.hammer_of_wrath.description': 'Slynger en hellig hammer for {damage} skade og skaber 1 Hengivenhed. Kan bruges under 20% helbred, eller under Guddommelig Ophøjelse eller Hævnende Vrede. Daggryets Vrede giver en ekstra kastning mod ethvert mål, som ser bort fra dens igangværende nedkølingstid og volder 20% mere skade. Ophøjelse øger dens skade med 30%.',
   'entities.abilities.healing_stream.description':
     'Genopretter 120 helbred hos et allieret mål over 12 sek. (shamantalent)',
   'entities.abilities.howl_of_terror.description':
     'Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (troldmandstalent)',
   'entities.abilities.ice_block.description':
     'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalent)',
-  'entities.abilities.inner_focus.description':
-    'Gør din næste besværgelse gratis. Varer 60 sek. (præstetalent)',
+  'entities.abilities.inner_focus.description': 'Gør jeres næste præstebesværgelse gratis og umulig at afbryde. Varer 60 sek.',
   'entities.abilities.innervate.description':
     'Levende saft vælder op i dig i 10 sek. og genopretter 20 af din aktuelle ressource i bølger: mana, raseri eller energi. Formskifte afbryder den ikke. Søvn, bedøvelse eller stase standser saften. (druidentalent)',
   'entities.abilities.mend_pet.name': 'Lappe sammen',
@@ -10820,23 +10685,22 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Sana a et venligt mål por {damage} durante 15 sek. (jægertalent)',
   'entities.abilities.meteor.description':
     'Nedkalder en meteor på målområdet og giver {damage} Ildskade. Derefter brændes fjender i området for 12 til 18 Ildskade hvert 2. sek. i 6 sek. (magikertalent)',
-  'entities.abilities.mind_sear.description':
-    'Kanaliserer skyggeenergi mod målområdet og giver {damage} skade hvert sekund til fjender i nærheden. (præstetalent)',
+  'entities.abilities.mind_sear.description': 'Kanaliserer i 3 sek. og volder {damage} Skyggeskade hvert sekund på fjender inden for 8 m fra målområdet. Skaden stiger med Besværgelseskraft. (Præstetalent)',
   'entities.abilities.multi_shot.description':
     'Affyrer en salve mod målområdet og giver {damage} Fysisk skade til fjender inden for en radius af 8 m. (jægertalent)',
-  'entities.abilities.prayer_of_healing.description':
-    'Helbreder allierede i nærheden for {damage}. (præstetalent)',
+  'entities.abilities.prayer_of_healing.description': 'Helbreder allierede inden for 30 m for {damage}. Helbredelsen stiger med Besværgelseskraft. (Hellig)',
+  'entities.abilities.preparation.description':
+    'Afslutter nedkølingen på Sprint, Undvigelse og Forsvinden. (slyngeltalent)',
   'entities.abilities.presence_of_mind.description':
     'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalent)',
-  'entities.abilities.psychic_scream.description':
-    'Skræmmer fjender i nærheden i op til 4 sek. Skade kan bryde effekten. (præstetalent)',
+  'entities.abilities.psychic_scream.description': 'Skræmmer fjender inden for 8 m i op til 4 sek. Skade kan bryde effekten.',
   'entities.abilities.shadowstep.description':
     'Træder gennem skyggerne mod dit mål. (slyngeltalent)',
   'entities.abilities.silence.description': 'Bringer målet til tavshed i 4 sek. (præstetalent)',
   'entities.abilities.tranquility.description':
     'Kanaliserer helbredende energi i 4 sek. og helbreder allierede inden for 30 m for 42 til 52 hvert sekund. (druidentalent)',
   'game.talents.readout.rowsSummary': 'Talenter: {head}, {picked}/{unlocked} valgrupper valgt.',
-  'hudChrome.fct.absorbed': '{amount} absorberet',
+  'hudChrome.fct.absorbed': 'Absorberet ({amount})',
   'game.talents.choicesTab': 'Valg',
   'game.talents.rowUnlockToast': 'Et nyt talentvalg er låst op!',
   'game.talents.rowUnlocks': 'Låses op på niveau {level}',
@@ -11104,8 +10968,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.body':
     'Din gruppe klarede den heroiske prøve, mens du kæmpede i bagtroppen eller lå faldet. Din låsning blev også registreret, så din andel af de heroiske mærker blev sendt hertil i stedet for at gå tabt. Brug dem godt.\n\n- Heroisk kvartermester',
   'guide.dungeonsPage.resetTitle': 'Nulstilling af dine instanser',
-  'guide.dungeonsPage.resetBody':
-    'Hvis du skifter sværhedsgrad, mens gruppen stadig har krævede gennemløb, bliver de gamle krav stående et stykke tid. Gruppelederen kan straks opgive dem ved at vælge Nulstil alle instanser i menuen på sit eget portræt eller skrive /dungeon reset. Sværhedsgraden skal faktisk være ændret, ingen levende eller faldne må være indenfor, og der er en kort nedkøling mellem nulstillinger. Ved døren på forkert sværhedsgrad advarer spillet før start. Raidet nulstilles aldrig sådan; dets egne låsningsregler gælder.',
+  'guide.dungeonsPage.resetBody': 'Skift sværhedsgrad, mens din gruppe stadig holder ture, den har gjort krav på, og de gamle krav bliver hængende et stykke tid, før de slipper af sig selv. Gruppelederen kan slippe dem på én gang i stedet: vælg Nulstil alle instanser i menuen for eget portræt, eller skriv /dungeon reset. En nulstilling virker først, efter sværhedsgraden faktisk er ændret, kun så længe ingen, levende eller faldne, er tilbage derinde, kun når hvert lig derinde er plyndret rent, og en kort nedkølingstid adskiller den ene nulstilling fra den næste. Kommer I til døren med den forkerte sværhedsgrad, siger spillet det, før turen begynder. Raidet nulstilles aldrig sådan; dets egne spærreregler står ved magt.',
   'guide.dungeonsPage.wildheartBody':
     'En regnvåd jungle-caldera hvor to hævede jagtstier omkranser en jade-cenote. Kryds bæstenes huler og forfædrenes ruiner, og bestig derefter ritualpyramiden for at se, hvem der venter på toppen.',
   'guide.gear.itemLevelBody':
@@ -13050,4 +12913,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unpinAria': 'Frigør {name}',
   'loading.tips.reliquary':
     'Tip: Relikvariet holder styr på det enestående bytte, du samler, hylde for hylde.',
+  'guide.talentsPage.loadoutGearNote': 'En opsætning kan også bære dit udstyr. Gem den med den post, der tilbyder at beholde udstyret med, så noterer den også, hvad du havde på, og det er dét, der gør et PvP-sæt og et fangekældersæt ét klik fra hinanden i stedet for seksten. Den husker det præcise stykke og ikke bare dets navn, så en fortryllet ring bliver aldrig stille byttet ud med den almindelige tvilling, der ligger ved siden af den i taskerne. Det, den ikke kan finde, når du skifter tilbage, bliver ganske enkelt ladt i fred og meldt, så et sæt, der har mistet et stykke til banken eller markedet, udstyrer alligevel alt det andet.',
+  'guide.thornhollowPage.backfillNote': 'At tage en indhoppplads er med vilje uden risiko: du træder ind i en stilling, du ikke havde nogen andel i, så kampen rører ikke din rangering nogen af vejene, sejr eller nederlag, og at forlade en sådan skylder du ingenting. Tilbuddet holder desuden op med at komme, så snart en kamp er tæt nok på sin afslutning til, at en ankomst ikke ville kunne ændre den, så du bliver aldrig sat ind i en andens afslutning.',
+  'guide.thornhollowPage.leavingBody': 'At forlade en igangværende kamp er at desertere fra den, og en rangeret stige kan ikke belønne den, der trækker stikket ved en tabende stilling: en desertør tager nederlaget og den rangering, der følger med, på stedet, taber flaget hvis det blev båret, og holdet kæmper videre en spiller i undertal. Netop den sidste del er, hvad den tomme plads er til. Så længe en kamp mangler en kæmper, kan køen tilbyde stolen til en, der venter, og det er altid et tilbud, du tager imod eller afslår, ikke en teleportering, der bare rammer dig; at afslå koster dig ingenting og sender det videre til den næste i rækken. Kun de, der stillede sig i kø alene, bliver spurgt, så en gruppe, der meldte sig sammen, bliver aldrig splittet for at fylde et hul.',
+  'guide.thornhollowPage.leavingHeading': 'At gå tidligt, og at fylde en tom plads',
 };

@@ -9,71 +9,73 @@ its own `AnimationMixer` and a clip-driven state machine. **Everything is
 GLB-loaded** (`models/chars`, `models/creatures`, `models/weapons`), there is
 no procedural-rig path here anymore. Reads the world; never mutates the sim.
 
-## Files
+## Load-bearing files (everything else: read its header)
 - `manifest.ts`: pure data + dispatch. `VISUALS: Record<key, VisualDef>`, the
   `ClipMap`s, and `visualKeyFor(e)` (entity to key). No three.js, no loading.
 - `anim_state.ts`: pure, three-free pose math: the `AnimState` (renderer-derived
   input) + `BaseState` types and `desiredBaseState()`/`locomotionTimeScale()` that
   `visual.ts` delegates to.
-- `assets.ts`: module-import preloads `characterPreloadUrls()` via
-  `registerPreload`: the tier-INDEPENDENT union of every graphics tier's URL
-  set (placement resolves URLs against the LIVE tier after import froze the
-  guess; see the P0 comment in `manifest.ts` and
-  `tests/render_asset_preload.test.ts`). `prepareVisual(key)` memoizes
-  normalize transform, resolved clips, click-capsule radius, and a baked
-  idle-pose geo (far-LOD/shadow proxy). `charactersReady()` is a narrower gate
-  than the site-wide `assetsReady()`: only this file's boot GLBs + skin atlases,
-  with its own retry loop (delayed, backed off between outer attempts) so a
-  transient failure anywhere else on the site can never permanently blank the
-  landing character-creation preview (`src/main.ts` awaits it there instead of
-  `assetsReady()`; see `tests/character_preview_boot.test.ts`).
-- `asset_miss_log.ts`: once-per-key dev logging for character-asset failures in
-  per-frame render paths; `createCharacterVisual` returns null on such a
-  failure so callers skip the view for the frame instead of stalling the
-  renderer (`tests/character_visual_fail_soft.test.ts`).
-- `halo.ts`: the class halo (the priest's Light): `buildHalo(color, upOffset,
-  radius)`, driven by `VisualDef.halo` plus the optional
-  `haloUpOffset`/`haloRadius` placement overrides (defaults live here; the
-  priest overrides only the lift, for hat clearance). Texture, per-color
-  materials, and
-  per-radius geometries are shared never-disposed caches; radii must come from
-  static `VisualDef` values so the cache keys stay bounded. `visual.ts` parents
-  the mesh to the head bone and keeps it out of the shadow-caster sweeps
-  (`tests/character_halo.test.ts`).
+- `assets.ts`: eager `registerPreload` of `characterPreloadUrls()`, the
+  tier-INDEPENDENT union of every graphics tier's URL set (the why lives in
+  the Asset loading section of `src/render/CLAUDE.md` and the P0 comment in
+  `manifest.ts`). `prepareVisual(key)` memoizes normalize transform, resolved
+  clips, click-capsule radius, and a baked idle-pose geo (far-LOD/shadow
+  proxy). `charactersReady()` is deliberately NARROWER than the site-wide
+  `assetsReady()`: only this file's boot GLBs + skin atlases, with its own
+  delayed, backed-off retry loop, so a transient failure anywhere else on the
+  site can never permanently blank the landing character-creation preview
+  (`src/main.ts` awaits it there instead of `assetsReady()`;
+  `tests/character_preview_boot.test.ts`).
+- `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/
+  ghost plumbing, one-shot triggers, death/revive edge logic.
+- `halo.ts`: the class halo (`buildHalo`, driven by `VisualDef.halo` +
+  `haloUpOffset`/`haloRadius` overrides). Texture, per-color materials, and
+  per-radius geometries are shared never-disposed caches, so radii MUST come
+  from static `VisualDef` values to keep the cache keys bounded; `visual.ts`
+  parents the mesh to the head bone and keeps it out of the shadow-caster
+  sweeps (`tests/character_halo.test.ts`).
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
-- `skin_gpu_layout.ts`: compacts merged palettes to every matrix the shader
-  fetches, narrows exact joint indices, and crops unused RGBA32F bone-texture
-  rows without changing skin weights, matrix values, draws, or shader math.
-- `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/ghost
-  plumbing, one-shot triggers, death/revive edge logic.
-- `preview.ts`: `CharacterPreview`, the character-creation turntable (own scene/
-  camera/loop), driven from `src/main.ts`; `preview_appearance.ts` resolves a
-  `PreviewAppearance` (class, skin, mech, mainhand, offhand) to its visual key and
-  independent held-item layout.
-- `portrait.ts`: offscreen-WebGL headshot factory: renders a (class/visual-key, skin)
-  PNG at the requested `PortraitFraming` from the real model, caches the data URL.
-- `weapon_grip.ts`: pure, three-free per-weapon grip nudges
-  (`WEAPON_GRIP_OVERRIDES`) layered on the family `VariantGrip`; shared with
-  the asset pipeline's live inspector.
-- `weapon_skin_materials.ts`: tracks and disposes the materials a displayed
-  weapon skin owns (`tests/weapon_skin_materials.test.ts`).
-- `skin_attack.ts`: skin-driven attack-clip substitution (a bow skin swaps
-  the hunter's crossbow shot); pure over the skin catalog
-  (`tests/weapon_skins.test.ts`).
-- `back_grips.ts`: back-carry transforms for sheathed weapons on the chest
-  bone; pure data + math (`tests/back_grips.test.ts`).
-- `stow_transition.ts`: the sheathe-transition state machine (defers the
-  hands-to-back prop swap to the gesture midpoint); pure
-  (`tests/stow_transition.test.ts`).
-- `portrait_framing.ts`: pure camera-framing math per `PortraitFraming`
-  (headshot chip vs 3/4 body, e.g. the Inspect window) for `portrait.ts`
-  (`tests/portrait_framing.test.ts`).
-- `modular.ts`: pure part-selection + colour math for COMPOSED bodies (the
-  warrior test bed). See "Modular bodies" below.
-- `index.ts`: public exports + `createCharacterVisual(e, formKey?)` factory, plus
-  `setModularLookProvider` (the entity-to-composed-look seam).
+- `index.ts`: public exports + `createCharacterVisual(e, formKey?)` factory,
+  plus `setModularLookProvider` (the entity-to-composed-look seam).
+  `createCharacterVisual` returns null fail-soft on an asset miss, with
+  once-per-key dev logging (`asset_miss_log.ts`), so per-frame callers skip
+  the view for the frame instead of stalling the renderer
+  (`tests/character_visual_fail_soft.test.ts`).
+
+Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
+- Preview: `preview.ts` (`CharacterPreview`, the character-creation turntable;
+  constructed from `src/main.ts` AND from `src/ui/hud.ts`, which moves one
+  shared instance between hosts on /play; `src/ui/appearance_customizer.ts`
+  drives it live via `setModular`) with `preview_appearance.ts`,
+  `preview_policy.ts`, `preview_framing.ts`.
+- Portraits: `portrait.ts` (offscreen-WebGL headshot factory, caches data
+  URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`).
+- Weapons/props: `weapon_grip.ts`, `held_item_grips.ts`, `back_grips.ts`,
+  `stow_transition.ts`, `skin_attack.ts`, `weapon_skin_materials.ts`, and
+  `weapon_attack_style_core.ts`, a CROSS-SUBSYSTEM seam
+  (`ability_vfx/painter.ts` imports `attackAbilityId` from it).
+- Perf cores: `skeleton_update_cache.ts`/`skeleton_update_core.ts` (skeleton
+  palette update elision), `skin_gpu_layout.ts` (bone-texture compaction
+  without changing weights, matrices, draws, or shader math),
+  `skinned_sort_spheres.ts` (static sort spheres so three never brute-forces
+  a missing SkinnedMesh bounding sphere), `tinted_material_cache_core.ts`,
+  `visual_pool.ts`/`visual_pool_policy.ts` (own section below).
+- Appearance decals/motion: `stubble.ts` (own section below), `makeup.ts`
+  (blush/eyeshadow on the same decal machinery; lipstick is deliberately a
+  material tint on the mouth PART instead), `hair_sway.ts` (long-hair motion
+  via morph targets, not shaders, so the low-tier Lambert rebuild cannot drop
+  it), `underhair.generated.ts` (regenerated by the Fit Studio server,
+  `scripts/asset_pipeline/lib/fit_studio.mjs`; never hand-edit).
+- Bespoke ability clips: `paladin_bastion_sweep_clip.ts` /
+  `paladin_templars_verdict_clip.ts` (with their `paladin_bastion_sweep_fx.ts` /
+  `paladin_templars_verdict_fx.ts` twins, plus
+  `paladin_templars_verdict_preview.ts`): procedural `AnimationClip`s built in
+  code and registered per ability; the template future ability-animation work
+  follows.
+- Pure selection cores: `modular.ts` (composed bodies, below),
+  `player_look_core.ts`, `form_visual_selection_core.ts`.
 
 ## Keys & dispatch
 Every drawable is a `VisualDef` in `VISUALS` (player classes, creature families,
@@ -94,14 +96,12 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   frame (swimming/sitting derived there, sim is unaware), calls `update(dt, s,
   animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles live
   held items and effects. Don't drive visuals elsewhere.
-- **Crowd scaling / LOD bands:** the renderer consults `src/render/crowd_lod.ts`
-  (pure, unit-tested) for the shadow/anim-cadence ranges as rig counts climb,
-  and for where `setFar` swaps the rig for the baked idle-pose mesh. Between the
-  articulated band and that swap sits the animated far band: the rig keeps its
-  clips at a low cadence (the mixer integrates the skipped time via `pendingDt`,
-  so the clip plays at its real speed, just at fewer pose updates) instead of
-  freezing. The policy is cosmetic-only and exempts anything a player reacts to
-  from BOTH the cadence and the frozen mesh.
+- **Crowd scaling / LOD bands:** the policy (bands, cadences, exemptions) is
+  `src/render/crowd_lod.ts`, documented in `src/render/CLAUDE.md`. The
+  mixer-specific part lives here: in the animated far band the mixer
+  integrates the skipped time via `pendingDt`, so the clip plays at its real
+  speed, just at fewer pose updates, and `setFar` is where the rig swaps for
+  the baked idle-pose mesh.
 - Death/revive are **edge-triggered locally** from `s.dead` (clamped one-shot);
   `flourish` plays on respawn. One-shots clamp on the last frame, see the
   T-pose-pop comment in `playOneShot`.
@@ -112,6 +112,23 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   (crossfade only when the outgoing action still drives the rig, else snap to
   full weight); the per-frame `scanAnimRepair` watchdog (`anim_state.ts`) is the
   backstop that re-drives the base pose after 3 starved frames.
+
+## The visual reuse pool (`visual_pool.ts` + `visual_pool_policy.ts`)
+`renderer.ts` routes non-player character visuals through a bounded,
+release-ordered (LRU) `CharacterVisualPool`: on despawn a poolable visual is
+detached and STORED instead of disposed, and `store` evicts + disposes
+least-recently-released entries past the `GFX.maxPooledCharacterVisuals` cap,
+so visiting new populations cannot grow GPU memory monotonically
+(`tests/character_visual_pool.test.ts`). Contract points:
+- Players deliberately never pool (their visual key varies with cosmetics/mech
+  state): `characterVisualPoolKey` returns null and those visuals are disposed
+  directly as before.
+- The key is TEMPLATE identity only. Per-instance `color`/`scale` stay OUT of
+  the key (rift spawns re-grade both per instance, so a key carrying them can
+  never match again and every despawn minted a dead retained entry: the C1
+  memory ratchet); scale is applied at the view group and color at acquire
+  time. NPC `skin` STAYS in the key: it picks a texture atlas at construction,
+  and the skin set is small and static so keys stay bounded.
 
 ## Adding things (module-first: where NEW work lands, and its test)
 - **New family/key:** a declarative `VisualDef` in `VISUALS` (existing `ClipMap`
@@ -127,16 +144,16 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   `tests/character_clipmaps.test.ts` gates every ClipMap name against the clips
   actually in the shipped GLB (both graphics tiers), `tests/character_anim_state.test.ts`
   the pure pose/watchdog math, `tests/character_tpose_repair.test.ts` the live
-  mixer weights across death, respawn and repeated swings. Fix bugs test-first:
-  reproduce there (or in `tests/rig_merge.test.ts` for merge math), then the
-  smallest change that turns it green.
+  mixer weights across death, respawn and repeated swings,
+  `tests/rig_merge.test.ts` the merge math. Reproduce a bug in the matching
+  test first (workflow: root CLAUDE.md + the `extract-and-test` skill).
 
 ## Modular bodies (`player_warrior_modular`)
 A `VisualDef` with `modular: true` points at a PART LIBRARY, not a finished
 character: `models/chars/modular/warrior_modular.glb` carries both base bodies,
-their underclothing, every hair/brow, and ALL SEVEN class kits cut into equip
-slots, all on the one shared `Rig_Medium`, which is why no cross-file skeleton
-matching is ever needed.
+their underclothing, every hair/brow, and every class kit (`ARMOR_SETS`) cut
+into equip slots, all on the one shared `Rig_Medium`, which is why no
+cross-file skeleton matching is ever needed.
 `assembleModel` routes those defs to `assembleModular`, which prunes the parsed
 scene to the picked node names (`modularPartNames`), runs the SAME
 `mergeSkinnedParts` pass, and caches the result per part set, so a kitted body
@@ -157,18 +174,10 @@ per part.
   instance in `applyMorphs`. Geometry stays shared, so the face must never enter
   `modularGeometryKey`, only the signature. `mergeSkinnedParts` leaves
   morph-carrying parts unmerged by design, which is what makes this work at all.
-- The MOUTH is a part (`M_Mouth_<style>` / `F_Mouth_<style>`), not a morph. It
-  used to be a crease in the head driven by exclusive presets, and measured,
-  neither head had a mouth worth the name: a 15mm dent on the male that faded to
-  nothing by x=0.06, and none at all on the female, what she was showing was
-  the shading of her triangulation, which is why hers looked the cleaner of the
-  two. A 13-vertex band cannot hold a mouth, so it became a projected part like
-  the eyes. That buys lips that stand PROUD of the skin (a dent only goes
-  inward), symmetry by construction (every sample is taken at |x| and
-  reflected), and open styles that are a different MESH, aperture, dark cavity
-  and their own teeth, rather than a deformation of a closed one. Unlike the
-  ears it survives a helm, for the reason the eyes do: every helm is open at the
-  face. The head keeps its `mouth_*` targets even though nothing drives them,
+- The MOUTH is a part (`M_Mouth_<style>` / `F_Mouth_<style>`), not a morph:
+  lips stand PROUD of the skin, and open styles are a different MESH (aperture,
+  dark cavity, own teeth), not a deformation of a closed one. The head keeps
+  its dead `mouth_*` morph targets on purpose: nothing drives them, but
   `stubble.ts` reads them to locate the lips.
 - A part with more than one MATERIAL (only the mouth: lips, mouth line, teeth)
   exports as a multi-primitive glTF mesh, and GLTFLoader expands that into a
@@ -179,26 +188,24 @@ per part.
   head's own surface (`stubble.ts`, material `mod_stubble`, alpha-blended,
   recoloured with the HAIR colour). See the section below. The GLB's old
   `M_Fuzz_buzz` / `M_Stub_stubble` layers are dead and nothing picks them.
-- Eyes, ears, lashes and teeth are their own parts, not islands inside the head
- that is what lets eyes and ears be swapped and scaled at all. They are body
+- Eyes, ears, lashes and teeth are their own parts, not islands inside the head:
+  that is what lets eyes and ears be swapped and scaled at all. They are body
   parts no armour slot hides. Brows/eyes/lashes/stubble are PROJECTED onto the
-  head surface at authoring time (`tmp/modular/features.py`), so they cannot
-  float off it.
-- Every projected face part is per-gender (`M_Eye_almond`, `F_Brow_soft`, …) for
-  the same reason the fuzz caps are: the two heads are separate sculpts, not one
-  scaled copy, and a patch built against the male head lands INSIDE the female
-  one. Shipping a single set left every female character with no eyes at all.
+  head surface at authoring time, so they cannot float off it.
+- Every projected face part is per-gender (`M_Eye_almond`, `F_Brow_soft`, ...):
+  the two heads are separate sculpts, not one scaled copy, and a patch built
+  against the male head lands INSIDE the female one. Shipping a single set left
+  every female character with no eyes at all.
 - ...and every one of them carries the HEAD's own shape-key names (`cheeks_up`,
-  `jaw_dn`, …) alongside its own. Projection glues a part to the face at BUILD
-  time only; the cheeks slider then moves the head surface by up to 27mm at the
-  outer corner of the eye. `applyMorphs` drives targets by name, so a part that
-  ships `cheeks_up` follows the head for free. No-op keys are dropped at
-  authoring time, so what a part carries says which sliders actually reach it.
-- The eyelash is the flick KayKit models into the rogue head, rebuilt per eye
-  shape so it always leaves the corner that eye actually has. It rides
-  `mod_hair` and so has no colour of its own, a lash is hair. `lashes` is a
-  plain on/off in the appearance, defaulting ON so a look saved before it
-  existed does not read as "shaved".
+  `jaw_dn`, ...) alongside its own. Projection glues a part to the face at BUILD
+  time only; the cheeks slider then moves the head surface under it.
+  `applyMorphs` drives targets by name, so a part that ships `cheeks_up`
+  follows the head for free. No-op keys are dropped at authoring time, so what
+  a part carries says which sliders actually reach it.
+- The eyelash is rebuilt per eye shape so it always leaves the corner that eye
+  actually has. It rides `mod_hair` and so has no colour of its own (a lash is
+  hair). `lashes` is a plain on/off in the appearance, defaulting ON so a look
+  saved before it existed does not read as "shaved".
 - The eye material is recoloured per character like skin and hair; teeth
   (`mod_tooth`) and the mouth interior (`mod_mouth`) never are. The mouth line
   is near-black and so is the eye, but it must NOT share `mod_eye`: that goes
@@ -217,10 +224,11 @@ per part.
 - A look change is a GEOMETRY change: callers rebuild the visual (as
   `CharacterPreview.setVisualKey` does) rather than mutating one in place.
 - **Every player composes.** The look rides the `app` identity wire field (the
-  character's own DB column, stamped at join), so `setModularLookProvider`
-  claims every player entity and composes peers from server truth; a character
-  with no authored look still keeps the fixed `player_<class>` rig. Three
-  consequences the code used to assume away:
+  `characters.appearance` DB column, stamped at join; untrusted, so consumers
+  always run it through `normalizeAppearance` before composing), so
+  `setModularLookProvider` claims every player entity and composes peers from
+  server truth; a character with no authored look still keeps the fixed
+  `player_<class>` rig. Three consequences the code used to assume away:
   - The unmerged morph parts (head, eyes, ears, lashes, brows, body regions) are
     now a per-CROWD draw cost, not a one-character one. The far LOD is what
     bounds it, and the band pulls in as the crowd grows (`crowd_lod.ts`).
@@ -243,61 +251,39 @@ per part.
     share its geometry.
 - Part names are the contract; `tests/modular_character.test.ts` gates the tables
   against the shipped GLB, because a renamed node fails SILENTLY (the body just
-  loses a limb). Authoring scripts live in `tmp/modular/`; the body's radius
-  tables are SOLVED against the armour there (`solve_body.py` + `expose.py`),
-  not hand-tuned, and each set is fitted to the frozen body by `classfit.py`.
+  loses a limb). The body's radius tables are SOLVED against the armour at
+  authoring time, and each set is fitted to the frozen body: never hand-tune
+  them.
 
 ## Stubble as a decal (`stubble.ts`)
-Growth too short to have a silhouette is skin you can see THROUGH hair, so it is
-a mask, not a mesh. Modelled as a shell it reads as a helmet; modelled as a
-flat-alpha copy of the head's faces (what shipped before) it reads as a smudge
-with an outline that lands wherever the head's coarse triangles fall. The decal
-is the head's own surface, trimmed, subdivided, lifted 0.4% of head height, and
-painted with a generated RGBA map.
-- Nothing is added to the GLB and nothing is authored: the frame, the unwrap,
-  the mask and the stipple are all derived from the head geometry at runtime and
-  cached per (head, styles). Switching the styles off adds NO object at all, so
-  a bare face is exactly the head.
-- The head frame is the head's own BOUNDING BOX mapped to the unit sphere. Every
-  primitive in the GLB is meshopt-quantized into its own integer range (see
-  `rig_merge.ts`), so the two heads do not even share a coordinate system,
-  normalizing by the box makes one set of angles describe both.
-- The unwrap is AZIMUTHAL EQUIDISTANT about the head centre, which is continuous
-  and injective everywhere but one direction (straight down, which `TRIM_THETA`
-  removes). The obvious lat-long unwrap has a seam down the back of the head and
-  a degenerate crown, and BOTH are inside a buzz cut's footprint.
-- The footprints were measured off the layers that shipped before, and the
-  landmarks they respect were measured off the head's own morph targets:
-  `mouth_*` moves exactly the lip ring, `nose_up` exactly the nose. The tests
-  assert against those targets rather than against the constants.
-- The NOSE OVERHANGS the philtrum, so a directional unwrap sends the nostril
-  underside and the skin below it to the same texel. The overhang is removed
-  from the decal surface (`isNoseUnderside`, applied after subdividing so its
-  edge is fine), that is what lets the beard line be the measured one and still
-  keep the nose clean. The general form of that test ("is anything closer to the
-  head centre along this ray") is WRONG: it carved a rectangle out of the skin
-  under the lower lip, off the mouth crease's inner wall at 0.58 of the chin's
-  radius. (`mouth_seat` has since smoothed that crease away, the mouth is its
-  own part, but the general test is still the wrong shape of test.)
-- The stipple is a jittered lattice over the SPHERE OF DIRECTIONS, with a whole
-  number of columns per ring so it closes on itself (no grain seam at the nape).
-  Dots must be a texel or two across, at 1024 texels over 360 degrees a
-  "realistic" 0.2-degree dot is sub-texel and reads as noise, and the ring
-  above and below has to be tested too, or every dot sits near its ring centre
-  and the field reads as horizontal rows.
+Growth too short to have a silhouette is a mask, not a mesh. The decal is the
+head's own surface, trimmed, subdivided, lifted 0.4% of head height, and
+painted with a generated RGBA map: nothing is added to the GLB and nothing is
+authored (frame, unwrap, mask, and stipple all derive from the head geometry at
+runtime, cached per (head, styles)), so switching the styles off adds NO object
+at all. Invariants:
+- The head frame is the head's own BOUNDING BOX mapped to the unit sphere:
+  every primitive in the GLB is meshopt-quantized into its own integer range
+  (see `rig_merge.ts`), so the two heads do not even share a coordinate
+  system; normalizing by the box makes one set of angles describe both.
+- The unwrap is AZIMUTHAL EQUIDISTANT about the head centre, continuous and
+  injective everywhere but straight down (which `TRIM_THETA` removes). The
+  obvious lat-long unwrap has a seam down the back of the head and a
+  degenerate crown, and BOTH are inside a buzz cut's footprint.
+- The footprint landmarks are measured off the head's own morph targets
+  (`mouth_*` moves exactly the lip ring, `nose_up` exactly the nose); the
+  tests assert against those targets rather than against the constants.
+- Nose-underside removal uses the specific `isNoseUnderside` test, applied
+  after subdividing so its edge is fine. The general form ("is anything closer
+  to the head centre along this ray") is the WRONG shape of test: it carved a
+  rectangle out of the skin under the lower lip.
 - RGB is written in EVERY texel, alpha only where there is growth: three
   multiplies the whole texel into the fragment, so a transparent texel left at
   black bleeds through bilinear filtering and rings every dot with a dark halo.
-- Subdivision is what makes the line clean, and its effect is invisible unless
-  you subtract the lift first: measured against the lifted vertex, going from 2
-  levels to 3 looks like it buys 0.07 degrees; measured against the skin under
-  it, it buys 1.10 -> 0.30. Two levels (~10k triangles, ~50ms, ~1.1MB of morph
-  data) is the shipped trade.
 - A plain `map` and not a shader ON PURPOSE: `tintedMaterial` rebuilds every
   character material as Lambert on the low graphics tier, so an injected shader
-  (the `addRimGlow` hook) silently vanishes there. That path now also carries
-  `depthWrite` / `polygonOffset` across, which it did not before, they are
-  blend state, not shading.
+  (the `addRimGlow` hook) silently vanishes there. That path also carries
+  `depthWrite` / `polygonOffset` across: they are blend state, not shading.
 
 ## Gotchas / never
 - KayKit GLBs ship **every** accessory visible: `VisualDef.show` is an allowlist
@@ -307,8 +293,9 @@ painted with a generated RGBA map.
 - Geometries are **shared per-asset caches and never disposed**. Shared tinted
   materials are claim-counted (`tinted_material_cache_core.ts`): `dispose()`
   releases this clone's mixer + Skeletons + its tinted-material claims, and the
-  bounded cache disposes a clone only once no visual mounts it. YOU MUST call
-  `dispose()` on despawn (online interest churn strands GPU bone textures and
-  pins tinted materials otherwise).
+  bounded cache disposes a clone only once no visual mounts it. On despawn a
+  visual MUST be released into the reuse pool (which disposes on eviction) or
+  disposed directly: online interest churn strands GPU bone textures and pins
+  tinted materials otherwise.
 - Never `Math.random` in *sim*, but here it's fine, this is presentation
   (bob phase, hit-clip pick). Never reach past `IWorld` into a concrete world.

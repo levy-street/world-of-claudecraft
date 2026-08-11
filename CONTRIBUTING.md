@@ -80,7 +80,7 @@ pnpm run server      # build and run the authoritative game server on :8787
 pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
-If you plan to run the full gate below, install the browser it drives once:
+If you plan to run the repository gate below, install the browser it drives once:
 `pnpm exec playwright install chromium`.
 
 The [README](README.md) has the full host, develop, and play guide, and the
@@ -100,10 +100,11 @@ Each worktree only links into that store, so spinning a second (or twentieth)
 worktree is much cheaper than a full per-tree copy.
 
 ```bash
-git worktree add ../wocc-my-task -b feature/my-task origin/release/v0.34.0
+# look up the newest release/vX.Y.Z first (see "Making your change" below)
+git worktree add ../wocc-my-task -b feature/my-task origin/release/vX.Y.Z
 cd ../wocc-my-task
 pnpm install --frozen-lockfile   # links from the shared store
-pnpm run gate:fast               # day-loop; full gate remains the merge bar
+pnpm run gate:fast               # day-loop; node scripts/gate_select.mjs is the merge bar
 ```
 
 Override the store path if needed: `pnpm config set store-dir /path/to/store`
@@ -258,15 +259,25 @@ fix.
 
 ## Before you open a pull request
 
-Run the **full** repository gate locally. It is the same contract CI enforces and
-the only local command that counts as the pre-merge bar:
+Run the selective repository gate locally. It is the pre-merge bar (the decision is
+recorded in [`docs/qa-gate.md`](docs/qa-gate.md), and the
+[pull request template](.github/PULL_REQUEST_TEMPLATE.md) asks for it):
+
+```bash
+node scripts/gate_select.mjs
+```
+
+It runs the same step list as the full gate with one substitution: the full Vitest
+run becomes an always-run set plus `vitest related`, and it falls back to the full
+suite for any change it cannot reason about. When you want the whole suite locally,
+the full gate remains the deeper check:
 
 ```bash
 npm run gate
 ```
 
 While iterating (especially on mid/low-tier machines or in agent day-loops), you can
-use the fast path, which is **not** a substitute for the full gate:
+use the fast path, which is **not** a merge bar:
 
 ```bash
 npm run gate:fast
@@ -320,13 +331,14 @@ short checklist. Please fill it in:
 - Describe **what** changed and **why**.
 - Link any related issue (for example, "Closes #123").
 - Add **screenshots or a clip for UI changes**, on desktop and mobile.
-- Confirm `npm run gate` passes and new player-facing strings follow the English-first
-  contributor policy below.
+- Confirm the gate passes (`node scripts/gate_select.mjs`, or `npm run gate` for the
+  full suite) and new player-facing strings follow the English-first contributor
+  policy below.
 
-On your PR, CI runs formatting and linting over your changed files, the full test
-suite across four parallel shards, a browser regression pass, and the typecheck plus
-the client, server, and headless builds. That matches what `npm run gate` runs
-locally, so a green gate is a good predictor of a green PR.
+On your PR, CI runs formatting and linting over your changed files, the test suite
+fanned across a sharded matrix plus dedicated long-sims lanes, a browser regression
+pass, and the typecheck plus the client, server, and headless builds. That matches
+what the gate runs locally, so a green gate is a good predictor of a green PR.
 
 A green CI run and a complete checklist are what we look for before merging. A
 maintainer may suggest changes. That's a normal, collaborative part of the

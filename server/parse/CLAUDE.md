@@ -3,9 +3,8 @@
 The combat parse recorder: a host-side, read-only observer at the tick drain in
 `server/game.ts` that segments play into fights (arena, battleground, raid,
 dungeon, rift), enriches events with capture-time state joins, and ships gzip
-NDJSON batches to the external woc-parse-service. Architecture spec:
-`PLAN-combat-parse-service.md` beside the repo checkout (decision record in its
-section 14).
+NDJSON batches to the external woc-parse-service (a separate repo; the vendored
+`contract.ts` below is the wire contract between the two).
 
 ## Invariants (keep these)
 - **Read-only observer.** Nothing here may mutate the sim, mutate a drained
@@ -41,13 +40,37 @@ loopback or an RFC1918 private IP literal: the VPC-internal push path),
 export, default 9). All are wired through the compose env passthrough; capture
 stays inert when the URL is unset.
 
-## Files
-`index.ts` (factory + barrel) - `recorder.ts` (per-tick orchestrator, routing,
-budget breaker) - `arena.ts` / `battleground.ts` (match segmenters) -
-`fights.ts` (open-fight bookkeeping, rollup totals, record emission) -
-`shipper.ts` (batch + gzip + POST, ChatLogger discipline) - `spool.ts`
-(bounded disk WAL) - `flags.ts` - `counters.ts` (hot-path counters, prom
-export via collect()) - `contract.ts` (vendored wire contract).
+## Layout (`ls server/parse/` for the live set)
+`recorder.ts` is the per-tick orchestrator (routing, state joins, the budget
+breaker); `index.ts` the factory + barrel. Segmentation is pluggable behind
+the `SegmenterHost` seam in `types.ts` (structural read-only views of the sim,
+so unit tests script a fake and the real `Sim` satisfies them at the hook
+site); a new segmenter implements that seam. The segmenters: `arena.ts` and
+`battleground.ts` (matches), `instances.ts` (dungeons and raids: fights are
+EVENT-opened, the first player-vs-instance-mob damage opens a boss or trash
+fight and per-tick observation only closes them; trash quiets out after
+`TRASH_QUIET_TICKS`, deliberately aligned with the in-game damage meter's
+`ENCOUNTER_END_SECONDS` in `src/ui/meters.ts`), and `rifts.ts` (one fight per
+floor). `boss_casts.ts` synthesizes boss cast timelines from `castingAbility`
+transitions, since mobs never emit cast events. Around them: `fights.ts`
+(open-fight bookkeeping, rollup totals, record emission), `shipper.ts` (batch
++ gzip + POST), `spool.ts` (bounded disk WAL), `flags.ts`, `counters.ts`
+(hot-path counters, prom export via collect()), `build_version.ts` (batch
+header version stamp), `contract.ts` (vendored wire contract), and the census
+exporter below.
+
+## The daily census exporter (`census.ts` / `census_db.ts`)
+A characters/deeds/playtime snapshot of the realm shipped through the SAME
+spool/shipper pipe as fight telemetry. Scheduling: a FIXED UTC hour
+(`PARSE_CENSUS_HOUR`) with a day memory, never anchored to process boot, so a
+restart loop cannot re-run it every boot and a peak-hour deploy cannot pin the
+daily scan to peak; a double run during the export hour is safe because the
+service upserts per (realm, day, characterId). PII-safe by construction: the
+loader selects from characters and play_sessions durations only (never
+`accounts`, never the ip/ua columns), excludes GM characters, reads in
+id-keyset batches, and projects only the state sub-paths it needs, never the
+whole JSONB blob. Rows enqueue in chunks per event-loop turn so a large realm
+never fans a whole snapshot into the shipper on the world-loop thread.
 
 ## Known capture limits (v1, deliberate)
 - Aura attribution: `Sim.applyAura` gained/displaced events carry

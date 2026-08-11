@@ -3,8 +3,9 @@
 //
 // The stall class this reacts to: a runner-side git fetch that trickles at
 // zero throughput for tens of minutes inside a setup step (9.6 to 24.4
-// minutes in the Phase 6 incident sample; three consecutive 20-minute bound
-// kills of "PR gate (long sims A)" on run 31392590628, 2026-08-10). The job
+// minutes in the Phase 6 incident sample; three consecutive bound kills of
+// "PR gate (long sims A)", then bounded at 20 minutes, on run 31392590628,
+// 2026-08-10). The job
 // bounds in ci.yml kill such a job, and docs/merge-queue.md routes the kill
 // to "re-run the failed jobs and re-queue". This module is that triage rule
 // as code, so attempt 1 of the rerun no longer needs a human.

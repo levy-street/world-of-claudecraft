@@ -5,10 +5,10 @@ description: >
   that adds or modifies tests, or whose acceptance criteria claim test coverage (QA gates, phase
   packets, bug fixes). Goes deeper than the qa-checklist coverage category: verifies every
   claimed behavior has a DECISIVE assertion that would actually fail on regression, hunts the
-  constant-self-comparison pin trap, checks load-bearing SQL/keys/wire tokens are pinned to
-  literals, flags tests that only exercise one arm of an "either/all" claim, and requires
-  per-dimension negative cases for multi-field checks. Read-only on source; may run targeted
-  vitest files.
+  constant-self-comparison pin trap and the other known vacuous-pin classes, checks
+  load-bearing SQL/keys/wire tokens are pinned to literals, flags tests that only exercise one
+  arm of an "either/all" claim, and requires per-dimension negative cases for multi-field
+  checks. Read-only on source; may run targeted vitest files.
 tools: Read, Grep, Glob, Bash
 model: opus
 maxTurns: 25
@@ -91,6 +91,35 @@ no-change-needed rather than demanding an impossible test.
 `.only(` / `.skip(` left in changed test files, assertions weakened to pass, a criterion
 asserted only in prose/docs with no test at all, tests deleted or rewritten without an
 equivalent replacement (compare against the pre-change test file in git history).
+
+### Check 8 - Known vacuous-pin classes (BLOCKING when the pin is the only coverage)
+
+Recurring shapes that LOOK like coverage but protect nothing. Flag each occurrence:
+- **Hand-picked argmax winner.** A test of a selection function (best candidate, top row,
+  argmax over catalog data) that asserts a hand-picked literal winner rots when the data
+  changes and hides tie-break behavior (ties resolve by insertion order). The expected winner
+  must be DERIVED in the test by independently applying the selection criterion to the same
+  data. This does not conflict with Check 2: literals pin load-bearing CONSTANTS; data-dependent
+  selection results are pinned by derivation.
+- **Negative pin of a never-present token.** `not.toContain(x)` where `x` never appears in the
+  subject passes vacuously forever. Require an occurrence BOUND (the token appears exactly N
+  times, or only in the sanctioned place) plus a positive control proving the scan/matcher
+  actually sees the token when it is present.
+- **Defense-in-depth arm behind a same-predicate filter.** A guard inside a function whose
+  caller already filters on the SAME predicate is unreachable through the wrapper, so no
+  wrapper-level test can exercise it. The fix is structural: test the inner unit directly where
+  the input is still malformed (or flag that the unit needs splitting so the arm is reachable).
+- **Single-operation ceiling.** A bound derived from ONE guarded operation is falsified by
+  REPEATING the operation when the guard's comparand grows between repetitions. Pin the
+  worst-case ORDERING/sequence, not a single step.
+- **Prototype-spying happy-dom localStorage.** Spying `Storage.prototype` under happy-dom never
+  fires; the spy must target the INSTANCE (`window.localStorage`) and the test must assert the
+  spy was actually CALLED, or the whole test is vacuous.
+- **Comment-gameable source-text pins.** A test that greps source text must strip comments
+  first, or a commented-out occurrence satisfies it.
+- **Unproven mutation runs.** Any "I mutated the code and the test failed" evidence must prove
+  the tests actually RAN against the mutated code (test counts in the output, a deliberate
+  sentinel failure), not just that a command exited nonzero.
 
 ## Running the tests
 

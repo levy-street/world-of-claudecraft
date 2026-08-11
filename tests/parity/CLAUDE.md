@@ -32,11 +32,8 @@ Every new `Entity`/`PlayerMeta` field interacts with this harness; decide once, 
 same change. **Gameplay-affecting** (persisted, sim-read): leave it sampled (the
 default) and regenerate goldens via `UPDATE_PARITY=1` in its own reviewed commit
 (precedent: `enchantCastBagSlot`, stored 1-based so its resting value is the
-omitted 0; `reliquary.counts`, the Phase 17 per-relic obtain tally, whose
-arrival is the whole reason every golden's `reliquary` block gained an empty
-`counts: {}` and every state digest moved in that change; `craftThrottle` was
-the old exemplar until the throttle retired and it moved to `META_EXCLUDE` as
-inert). **Session-only / presentation / derived from sampled
+omitted 0; `craftThrottle` was the old exemplar until the throttle retired and
+it moved to `META_EXCLUDE` as inert). **Session-only / presentation / derived from sampled
 inputs**: add it to `ENTITY_EXCLUDE`/`META_EXCLUDE` in `trace.ts` with a one-line
 justification comment mirroring the existing entries (precedent: `wireRev`,
 `bankBonusSources`, `marketQuery`), or every golden churns for no gameplay reason.
@@ -76,6 +73,14 @@ The coverage shards (`coverage_a..c.test.ts`) assert each scenario's subsystem a
 FIRES (not merely named in a comment). Read those files, never a hand-written list,
 before adding a scenario.
 
+The exemplar for closing a documented gap with a driving scenario:
+`professions_fishing_session` runs the fishing lifecycle through the REAL entry
+points (`startFishing` cast start with its bite-delay draw, the tick-path bite,
+the reel re-press whose `completeFishing` spends the one table draw, then a fresh
+post-completion cast). It exists because the phase-10 reel-arm hoist above the
+in-combat and swim denials was a guard reorder the old cancel-only coverage
+(scenarios hand-assigning `castingAbility`) could not see.
+
 Layout note: the gate is SHARDED for wall-time (`parity_a..g.test.ts` +
 `coverage_a..c.test.ts`, contiguous scenario slices over the shared runner in
 `run_scenarios.ts`); `npx vitest run tests/parity` and `UPDATE_PARITY=1` work
@@ -107,18 +112,6 @@ confirmed each):
   else that must pin an unresolved roll needs the same trick. Extracting one of these should add a scenario that drives it (the
   precedents: `market_round_trip`, `bank_round_trip`, `dungeon_instances`) or sample
   the collection directly.
-- **A fishing SESSION is never driven.** Every fishing reference in this directory
-  hand-assigns `castingAbility = FISHING_CAST_ID` to exercise the `cancelCast` arm;
-  `startFishing` and `completeFishing` are called nowhere here, so no golden covers
-  the bite delay draw, the catch table draw, or the deny arms. Fishing IS
-  stream-visible (its table draws sit in the shared `sim.rng`), so a change to the
-  catch tables or the cast gates moves other subsystems' draw indices while every
-  golden here stays byte-identical. Read a green parity run as saying nothing about
-  fishing, and when you extract or re-tune it, add a scenario that runs a real cast,
-  bite and reel plus one denied cast. The live coverage today is
-  `tests/professions_fishing.test.ts` (literal catch sequences off a fixed seed) and
-  `tests/professions_deeds_playthrough.test.ts` (hunted indices across one shared
-  stream), not this gate.
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim
   ctor, so ctor draws are not in the draw digest; ambient camp mobs are spawned but
   never tracked. A same-draw-count reorder of ctor spawns that changes only
@@ -148,3 +141,14 @@ One scenario ballooning past a few hundred KB means you are tracking too many en
 A red trace means behavior changed. **Fix the extraction, never the harness.** Do
 not widen `round6`, delete sampled fields, or regenerate goldens to "make it pass."
 Regenerate only via `UPDATE_PARITY=1` as a deliberate, separate, reviewed commit.
+
+One sanctioned exception, for pure renames: display names (and sanctioned coined
+ids) flow into the state and event digests, so a rename legitimately moves those
+hashes while every rng fingerprint and frame shape stays byte-identical.
+`rename_state_proof.test.ts` (env-gated on `RENAME_PROOF=1`; baseline golden set
+read from the `RENAME_PROOF_BASE` git ref, default `HEAD`) machine-proves that
+ONLY the renamed tokens moved: it re-records each scenario, reverse-maps every
+string leaf new-to-old, re-digests, and requires the result to equal the baseline
+goldens frame by frame, so any behavioral drift cannot survive the reverse map.
+It is the ONLY sanctioned path for accepting state-hash-only golden deltas
+(`ip-refactor/golden_token_inspector.mjs --allow-state-hashes`).

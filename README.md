@@ -40,10 +40,14 @@ Same seed, same world, everywhere. Much of what you see is still drawn from code
 
 ## Highlights
 
-- **Nine classic classes**, each with a full classic-era-style kit that gains ranks as you level, plus a full **talent system** (three specs per class, 27 specs in all).
-- **Three open-world zones** from level 1 to 20, more than 90 quests, and a single connected storyline about the Gravecaller conspiracy.
-- **Five instanced dungeons**, four of them five-player elite raids and one solo crypt, with elite scaling, AoE boss mechanics, class-archetype loot that collects into tier sets, and a **Heroic difficulty tier** with richer rewards, plus open-world **world bosses** and a ten-player raid finale.
-- **Two scalable delves**, a small-group mode for one or two players plus an AI companion, rebuilt from randomized chambers each run across Normal and Heroic tiers.
+- **Nine classic classes**, each with a full classic-era-style kit that gains ranks as you level, plus a full **talent system** (three specs per class).
+- **An open world with a second act**: the classic climb from Eastbrook Vale through Mirefen Marsh to Thornpeak Heights, the besieged Farshore starter island off the vale's coast, and, through a thinned seal beneath the northern mountains, the Veiled Hollow and the realms beyond it, from the Drakelands dunes to the level-cap frontiers. One connected quest storyline starts with the Gravecaller conspiracy and marches on into the new lands.
+- **Instanced dungeons at every stage of the climb**, from five-player elite runs to a solo crypt, with elite scaling, AoE boss mechanics, class-archetype loot that collects into tier sets, and a **Heroic difficulty tier** with richer rewards, plus open-world **world bosses** and a ten-player raid finale.
+- **Rift portals, the procedural endgame**: ranked portals tear open across the world and lead into seed-generated rift floors, capped by the hand-authored Infernal Citadel set piece, with rare, epic, and **legendary** loot riding on the rank of the clear.
+- **Scalable delves**, a small-group mode for one or two players plus an AI companion, rebuilt from randomized chambers each run across Normal and Heroic tiers.
+- **Rideable mounts** across rarity tiers, from the stablemaster's Valorsteed to heroic-boss reins and a saddle-broken brood raptor, with a show-jumping race course at the stables.
+- **The Reliquary**, a collection journal whose shelves (Conquerors, Professions, Horizons) track the boss trophies, masterwork marks, mounts, skins, and titles you bring home.
+- **Prestige ranks past the level cap**: XP keeps counting at max level and converts into a leaderboard-visible prestige rank.
 - **Ranked PvP** across two arena maps: 1v1 and 2v2 ladders, a livelier 2v2 Fiesta mode, and **Protect Yumi**, a 3v3 and 5v5 objective mode. Ranked play pays Honor, which buys a PvP-only gear set that never out-scales dungeon loot in PvE.
 - **The Vale Cup**, a boarball league played in its own stadium south of Eastbrook, and **Card Duel**, a quick head-to-head card game hosted in town.
 - **A Book of Deeds**: an achievement journal of cosmetic titles, badge borders, and Renown, with per-zone Chronicles kept by in-world Chronicler NPCs and a lifetime leaderboard.
@@ -55,19 +59,17 @@ Same seed, same world, everywhere. Much of what you see is still drawn from code
 - **Native apps on every platform**: signed desktop installers for Windows, Linux, and macOS with automatic updates and optional Steam achievement mirroring, plus iOS and Android builds, all sharing the browser client and the same online world.
 - **Scales to the machine you have**: graphics presets and an automatic frame-rate governor trade visual richness for smoothness, and are held to a fairness rule that keeps them from ever hiding something a player reacts to.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
-- **$WOC utility, fully optional**: link a Solana wallet for holder flair, Daily Rewards, and a discounted payment option in the cosmetic store. The game remains free to play and non-custodial.
-- **Season 1 Armory**: collect cosmetic weapon skins through the WOC Store, using Claudium purchased with fiat, SOL, USDC, or $WOC. Cosmetics never provide combat power.
+- **$WOC utility, fully optional**: wallet linking for holder flair, Daily Rewards, and the cosmetic WOC Store, all non-custodial and never pay-to-win; the details live in [Web3](#web3) below.
 
 ## Screenshots
 
-![The Eastbrook town square, campfire and questgivers](docs/screenshots/party-questing.jpg)
+![A mounted guild muster on the road to the Riftfields](docs/screenshots/guild-muster-mounted.jpg)
 
 | | |
 |:---:|:---:|
-| ![Dusk at the Eastbrook campfire](docs/screenshots/eastbrook-dusk.jpg)<br>*Dusk at the Eastbrook campfire* | ![Elite pulls in the Hollow Crypt](docs/screenshots/hollow-crypt.jpg)<br>*Torch-lit elite pulls in the Hollow Crypt* |
-| ![The restless dead at the ruined chapel](docs/screenshots/restless-dead.jpg)<br>*The restless dead at the ruined chapel* | ![A brawl with Vale Bandits](docs/screenshots/vale-bandits.jpg)<br>*Outnumbered at the bandit camp* |
-| ![Old Greyjaw hunted down on the north road](docs/screenshots/old-greyjaw.jpg)<br>*Old Greyjaw, the rare spawn, run down on the north road* | ![Vendor and bags UI](docs/screenshots/vendor-and-bags.jpg)<br>*Gearing up at Trader Wilkes's, with the vendor and bags open* |
-| ![The moongate on the Glimmermere shore](docs/screenshots/glimmermere-moongate.jpg)<br>*The drowned climb out at the Glimmermere moongate* | ![Ysolei on the altar of the Drowned Temple](docs/screenshots/drowned-temple-altar.jpg)<br>*Lunar Tempest and the altar of the Drowned Temple* |
+| ![Night over a lantern-lit village in Mirefen Marsh](docs/screenshots/mirefen-marsh-night.jpg)<br>*Lantern-light in Mirefen Marsh at night* | ![Spellfire erupts in a torch-lit dungeon hall](docs/screenshots/dungeon-spellfire.jpg)<br>*A dungeon pull goes loud under the green torches* |
+| ![Players crowd together in the snowfall on the live world](docs/screenshots/live-world-crowd.jpg)<br>*A crowded hour on the live world* | ![Riding the Amberfall road under golden trees](docs/screenshots/amberfall-road.jpg)<br>*Every leaf burns gold on the Amberfall road* |
+| ![Rift warnings fill the chat on the night road through the Palmreach](docs/screenshots/palmreach-rift-warnings.jpg)<br>*Rift warnings roll in on the Palmreach road* | ![Rolling into a snowed-in village in the Frostveil Reach](docs/screenshots/frostveil-reach-village.jpg)<br>*Snowbound lamplight in the Frostveil Reach* |
 
 Weather is biome-driven and render-only, so it never touches the deterministic sim:
 
@@ -88,13 +90,14 @@ Create an account, create a character, and enter the live world. To run that sam
 Offline mode is a local single-player world with no account and no server authority, so it ships in development builds only. Run the dev server and it appears in the mode picker:
 
 ```bash
-# once per machine (match package.json packageManager; Corepack not required)
+# once per machine (match package.json packageManager; Corepack not required;
+# full install policy: CONTRIBUTING.md)
 npm install -g pnpm@10.34.5
 pnpm install --frozen-lockfile
 pnpm run dev       # then open http://localhost:5173 and choose Play Offline
 ```
 
-Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by hubs: wolf runs to the north, boar meadows east, the Sableweb woods west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/sim/world_seed.ts`, so it is the same place every visit.
+Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by hubs: wolf runs to the north, boar meadows east, the Sableweb woods west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The road no longer ends there: the Ferrywalk sandbar leads east from the vale to **the Farshore**, a besieged island of rift breaks, and past Thornpeak a thinned seal beneath the mountains opens into **the Veiled Hollow** and the realms beyond, out to the level-cap frontiers. The world seed is fixed in `src/sim/world_seed.ts`, so it is the same place every visit.
 
 ### Desktop apps for Windows, Linux, and macOS
 
@@ -131,8 +134,7 @@ For **remote hosting**, put the compose stack on any VPS, set a real `POSTGRES_P
 ### Develop online with hot reload
 
 ```bash
-npm install -g pnpm@10.34.5   # once per machine; match package.json packageManager
-pnpm install --frozen-lockfile
+# pnpm and dependencies installed as in the Offline section above (policy: CONTRIBUTING.md)
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
 pnpm run db:up       # postgres 16 in docker (port 5433, volume-persisted)
@@ -201,31 +203,33 @@ More on the token at [worldofclaudecraft.com](https://worldofclaudecraft.com/).
 
 ### The nine classes
 
-Every class runs on classic-era MMO mechanics implemented from first principles, and learns ranked spells across levels 1-20, with signature abilities like Low Blow, Early Grave, Skyfall, Urgent Prayer, and Ancestral Strike unlocking across the back half of the climb.
+Every class runs on classic-era MMO mechanics implemented from first principles, and learns ranked spells across the whole climb to the level cap.
 
-- **Warrior**: rage, Iron Bellow, Onrush, Quaking Blow, Maiming Strike, Gaping Wounds (a bleed that rides your strikes), Widening Arc, Hobbling Cut, Blood Toll, Redhand (dodge proc).
-- **Paladin**: Oathbrand unleashed by Verdict, Mending Light, Steadfast Aura, Oath of Iron, Ward of Faith (absorb), Sundering Gavel (stun), Last Rite.
-- **Hunter**: ranged auto-attack (8-35 yd with a classic-style dead zone), Gutting Strike, Harrier's Guise, Venom Barb, Fell Shot, Rattling Shot, Counterfang, Fettering Slash, and a tameable pet from level 10.
-- **Rogue**: energy and combo points, Wicked Slash, Dirt Nap, Craven Thrust (behind, dagger), Eye Jab, Ghostfoot, Cutthroat Tempo, Swift Heels.
-- **Priest**: Smite, Whispered Prayer, Litany of Resolve, Dirge of Decay, Psalm of Warding (absorb), Lingering Grace (HoT), Mindfracture.
-- **Shaman**: Arc Bolt, Stonebound Weapon (imbue), Mending Waters, Earthen Jolt, Thunder Ward (thorns), Cinder Jolt.
-- **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (channeled), Bewitch, Icebind, a summoned water elemental, and Chronomancy, a time-magic healing spec.
-- **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume, and seven summonable demons from Emberkin to Wraithborn.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, and shapeshifting into Wolf Form at 5, Bruin Form at 8, and Moonwing Form at 10.
+- **Warrior**: a rage engine that turns damage taken and dealt into ever bigger swings, bleeds, and shouts.
+- **Paladin**: a holy knight who brands foes with an oath, then spends it on verdicts, wards, and mending light.
+- **Hunter**: ranged auto-attacks with a classic-style dead zone, snares and traps of the wild, and a tameable pet at your side.
+- **Rogue**: energy and combo points, opened from stealth and cashed in on cold-blooded finishers.
+- **Priest**: psalms and litanies that shield allies, mend wounds, and rot an enemy's mind in equal measure.
+- **Shaman**: elemental jolts, mending waters, and weapon imbues that spark on every swing.
+- **Mage**: fire, frost, and arcane answers for every pull, a summoned elemental, and Chronomancy, a time-magic healing spec.
+- **Warlock**: dark pacts and creeping rot, a stable of summonable demons, and a necromancy line that raises graveguard, skeletal warriors, bone mages, and gravewings from the ossuary-marked dead.
+- **Druid**: nature's caster, shapeshifting between wolf, bruin, and moonwing forms as the fight demands.
 
-Heals and buffs land on party members, healing can crit, and absorb shields soak damage before health. Spend points across **three talent specs per class** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart, and so on); allocation is server-validated and exportable as a build string.
+Heals and buffs land on party members, healing can crit, and absorb shields soak damage before health. Spend points across **three talent specs per class**; allocation is server-validated and exportable as a build string. Every spellbook, rank, and talent tree is listed in the [wiki](https://worldofclaudecraft.com/wiki).
 
 ### Dungeons
 
-The Gravecaller storyline runs through three five-player elite instances, a fourth waits behind a moongate with its own drowned lore, and a solo crypt sits off to the side for explorers.
+The Gravecaller storyline runs through five-player elite instances at every stage of the climb, a solo crypt sits off to the side for explorers, and the endgame keeps going past the authored set into procedural rift floors.
 
-- **The Hollow Crypt** (5 players) beneath the Fallen Chapel: paired elite trash, the Sexton Marrow miniboss, and Morthen the Gravecaller and his recurring shadow AoE. The crypt door teleports your party into a private instance copy that resets once it empties out.
-- **The Sunken Bastion** (5 players, around level 13, southeast Mirefen): Vael the Fogbinder summons waves of Drowned Thralls as the fight wears on.
-- **Gravewyrm Sanctum** (5 players, level 20, beneath Thornpeak): three chambers of elite boneguard and scaleguard, Korgath the Bound, Grand Necromancer Velkhar, and Korzul the Gravewyrm, where epic weapons drop.
-- **The Drowned Temple** (5 players) through the Glimmermere moongate: a pale, moon-violet instance leading to Choirmother Selthe and then Ysolei, Avatar of the Drowned Moon, whose lunar tides and summoned Moonspawn punish a stationary group.
-- **The Abandoned Crypt** (solo) in Thornpeak: a quiet keystone-and-diary dive for one whose trail unseals the royal door to **Nythraxis, Scourge of Thornpeak**, a ten-player raid finale fought across three soul wardstones.
+- **The Hollow Crypt** (5 players), beneath the Fallen Chapel: the crypt door teleports your party into a private instance copy on the trail of Morthen the Gravecaller.
+- **The Sunken Bastion** (5 players), southeast Mirefen: a drowned fort where Vael the Fogbinder raises the fallen against you.
+- **Gravewyrm Sanctum** (5 players), beneath Thornpeak: the necromantic heart of the conspiracy, where epic weapons drop.
+- **The Drowned Temple** (5 players), through the Glimmermere moongate: a pale, moon-violet shrine to the Drowned Moon.
+- **The Wildheart Basin** (5 players), hidden behind the Sunken Idol in Palmreach: an open-field hunt through a basin whose cult answers its high priest as one.
+- **The Abandoned Crypt** (solo), in Thornpeak: a quiet keystone-and-diary dive whose trail unseals the royal door to **Nythraxis, Scourge of Thornpeak**, a ten-player raid finale.
+- **The Last Keep**, out in the Drakelands: a cold, silent memorial keep with no fight in it at all, only a keepsake waiting for whoever walks its halls.
 
-Every instance also runs on **Heroic**: higher-level enemies, sharper mechanics, and its own loot and vendor currency. The lead-up quest chains are soloable, so the story is never gated behind finding a group. Our automated five-bot raid (warrior, paladin, priest, mage, hunter with focus-fire and healer AI) clears the Hollow Crypt in about five minutes (`node scripts/crypt_raid.mjs`, needs `ALLOW_DEV_COMMANDS=1`).
+The elite instances and the raid also run on **Heroic**: higher-level enemies, sharper mechanics, and their own loot and vendor currency. Past the authored set, ranked **rift portals** tear open onto seed-generated floors capped by the hand-authored Infernal Citadel, with rare, epic, and legendary loot riding on the rank of the clear. The lead-up quest chains are soloable, so the story is never gated behind finding a group. Boss-by-boss mechanics, loot tables, and the rest of the depth live in the [wiki](https://worldofclaudecraft.com/wiki). Our automated five-bot raid (warrior, paladin, priest, mage, hunter with focus-fire and healer AI) clears the Hollow Crypt in about five minutes (`node scripts/crypt_raid.mjs`, needs `ALLOW_DEV_COMMANDS=1`).
 
 ### Delves
 
@@ -266,8 +270,6 @@ Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside 
 - **Guilds**: charters, rosters, ranks, and guild chat.
 - **The Guide**: a searchable in-site wiki at `/wiki` covering classes, creatures, zones, and deeds, generated straight from live game content so it cannot drift from the world it documents.
 - **The Vale Cup and Card Duel**: boarball at the Sowfield stadium south of Eastbrook, in formats from 1v1 to 5v5, and a quick head-to-head card game hosted by the Card Master in town.
-- **Daily Rewards**: verified $WOC holders can earn leaderboard points from a daily spin and rotating tasks, with automatic payouts from the daily prize pool.
-- **WOC Store and Season 1 Armory**: buy Claudium with fiat, SOL, USDC, or $WOC, then spend it on purely cosmetic weapon skins.
 - **Eating and drinking**: sit to restore, broken by damage or standing, and yes, you can eat and drink at once.
 - **Vendors** that buy food and water and sell honest white gear, with coin shown in gold, silver, and copper.
 - **A personal bank** (the Gilded Strongbox): bursars in each hub town keep a vault per character, from 24 slots up to 96 with coin-bought expansions, plus bonus slots earned online for a verified email, linked accounts, and referrals.
@@ -288,8 +290,8 @@ Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside 
 | `1`-`9`, `0`, `-`, `=` | action bar |
 | `F` | interact (loot a corpse, pick up an object, talk) |
 | `C` `P` `L` `M` `B` `N` `T` | character, spellbook, quest log, world map, bags, talents, crafting |
-| `G` `O` `K` `I` `Y` `Shift+I` `Shift+P` `Shift+Z` | arena, friends and guild, leaderboard, calendar, Vale Cup, Dungeon Finder, professions, deeds |
-| `Z` / `X` | sheath or draw your weapons, emote wheel |
+| `G` `O` `K` `I` `Y` `Shift+I` `Shift+P` `Shift+Z` `Shift+X` | arena, friends and guild, leaderboard, calendar, Vale Cup, Dungeon Finder, professions, deeds, the Reliquary |
+| `Z` / `X` / `` ` `` | sheath or draw your weapons, emote wheel, mount or dismount |
 | `V` / `R` / `Esc` | nameplates, autorun, close the top window (or open the game menu) |
 
 Every binding is remappable in the keybinds panel, and mouse buttons bind like keys: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world. Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
@@ -363,7 +365,8 @@ which does fall back to `PATH`. Some standalone audio generator scripts (for exa
 
 ```bash
 npm test                        # vitest: formulas, combat, AI, quests, all 9 classes, parties, duels, trades, dungeons
-npm run gate                    # complete CI-equivalent contribution gate
+node scripts/gate_select.mjs    # the selective pre-merge gate (the merge bar, per docs/qa-gate.md)
+npm run gate                    # complete CI-equivalent contribution gate (the deeper check)
 npm run build                   # production web build
 npm run sfx:studio              # local SFX authoring, runtime mix, and production export
 node scripts/smoke_browser.mjs  # warrior end-to-end (needs npm run dev)

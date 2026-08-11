@@ -64,6 +64,10 @@ export class OpenFight {
   readonly startedTick: number;
   /** Hostile npc ids seen fighting the participants (for boss-cast tracking). */
   readonly mobIds = new Set<number>();
+  /** Display names for tracked non-participant actors, shipped on close so
+   * the dashboard labels mob entity ids. Bounded by the mobIds tracking cap:
+   * names are only noted for ids admitted into mobIds. */
+  private readonly actorNames = new Map<number, string>();
   /** The encounter's boss entity, for kill/reset classification; null = trash. */
   primaryBossId: number | null = null;
   /** Tick of the last event routed here; drives trash-segment quiet closes. */
@@ -246,9 +250,17 @@ export class OpenFight {
       outcome,
       truncated: this.truncated,
       rollup: { perParticipant },
+      ...(this.actorNames.size > 0
+        ? { actors: [...this.actorNames].map(([id, name]) => ({ id, name })) }
+        : {}),
     });
     this.counters.recordsEmitted++;
     this.counters.fightsClosed++;
+  }
+
+  /** Note a tracked non-participant actor's display name for the close roster. */
+  noteActor(entityId: number, name: string): void {
+    if (!this.actorNames.has(entityId)) this.actorNames.set(entityId, name);
   }
 
   private track(p: FightParticipant): void {

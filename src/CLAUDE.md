@@ -6,10 +6,10 @@
 # src/ - client & shared simulation source
 
 Everything the browser client needs plus the shared game core. Directories with
-their own CLAUDE.md: `sim/` (+ `sim/content/`, `sim/professions/`, `sim/pvp/`),
-`render/` (+ `render/characters/`), `game/`, `ui/` (+ `ui/hud/`), `styles/`,
-`net/`, `admin/`, `guide/` (+ `guide/viewer/`), plus `world_api/` and `editor/`
-(below). Read the local one before working in an area.
+their own CLAUDE.md: `sim/` (+ `sim/content/`, `sim/professions/`, `sim/physics/`,
+`sim/pvp/`), `render/` (+ `render/characters/`), `game/`, `ui/` (+ `ui/hud/`),
+`styles/`, `net/`, `admin/`, `guide/` (+ `guide/viewer/`), plus `world_api/` and
+`editor/` (below). Read the local one before working in an area.
 
 ## Entries (what loads what)
 - `index.html` AND `play.html` both load `src/main.ts`. Guard index-only DOM
@@ -17,6 +17,11 @@ their own CLAUDE.md: `sim/` (+ `sim/content/`, `sim/professions/`, `sim/pvp/`),
   throws there (a bug class that has shipped before).
 - `guide.html` loads `src/guide/main.ts`; `editor.html` loads `src/editor/main.ts`;
   `admin.html` is the standalone Svelte admin SPA (`src/admin/`).
+- `wallet-handoff.html` loads `src/wallet_handoff.ts` (with its `_authorization`/`_focus`
+  siblings): the standalone wallet-link handoff page. Its net glue is split by host:
+  `src/net/wallet_handoff_browser.ts` (browser) vs `src/net/desktop_wallet_handoff.ts`
+  (desktop shell), and the tracked `public/wallet-return.html` closes the loop. Spec:
+  `docs/prd/woc/wallet-link.md`.
 - `music_editor.html` is a dev-only tool that writes `src/game/music_overrides.generated.ts`.
 
 ## Dependency direction: do not violate
@@ -56,7 +61,8 @@ lets the same `sim/` run offline, on the server, and headless.
 - `runtime.ts` / `client_origin.ts` -> desktop/native runtime detection (the
   desktop bridge) and the shared asset/REST origin policy; presentation modules
   use `client_origin.ts` instead of importing `net/`. `site_presence.ts` is the
-  standalone marketing-page heartbeat.
+  standalone marketing-page heartbeat; other small top-level leaves follow the same
+  pattern (e.g. `device_memory_hint.ts`, `discord_login_start.ts`).
 - `admin/` -> standalone (its own `admin.html` entry); independent of the game client.
 
 ## Where a new feature lands (module-first)

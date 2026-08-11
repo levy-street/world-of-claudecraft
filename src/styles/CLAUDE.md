@@ -61,8 +61,8 @@ the throw (#2499, #2502).
   `translateX(-50%)` drags the window half offscreen; `tests/mobile_window_transform.test.ts`).
   Literal mobile layout values are pinned by `tests/mobile_window_layout.test.ts` and
   `tests/fct_mobile_css.test.ts`.
-- **Bug fixes are test-first:** a failing test that reproduces the bug (the guard tests
-  above take new pins), then the smallest change that turns it green.
+- **Bug fixes are test-first** (root `CLAUDE.md` owns the workflow); the guard tests above
+  are where the new pins land.
 
 ## Token system + NO magic values in painters
 - **Tokens, not literals.** Colors, accents, and tunables live as `--color-*` / `--fx-*`

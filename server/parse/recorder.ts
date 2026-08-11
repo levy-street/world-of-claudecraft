@@ -350,6 +350,7 @@ export class ParseRecorder {
     // owner engaged here is a hostile npc.
     if (this.host.resolveParticipant(entityId) !== null) return;
     fight.mobIds.add(entityId);
+    fight.noteActor(entityId, entity.name);
     this.fightsByMob.set(entityId, fight);
   }
 }

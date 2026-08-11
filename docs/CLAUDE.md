@@ -19,7 +19,7 @@ feature spec), or its program's dir; the top level is only for a living runbook.
 |---|---|
 | `design/` | How systems are/should be built (notes below). |
 | `prd/` | Feature specs: requirements + `file:line` hook points + acceptance criteria. |
-| `qa-gate.md` | The QA-gate reference (Stop hook, pre-push floor, `npm run gate`, `/qa`); root CLAUDE.md points here. Living. |
+| `qa-gate.md` | The QA-gate reference (Stop hook, pre-push floor, the `gate_select.mjs` merge bar, `npm run gate`, `/qa`); root CLAUDE.md points here. Living. |
 | `merge-queue.md` | The merge queue + required-check contract on `main` and `release/**` (the ruleset settings are not in git; this is their written contract, and the operator note for queue rejections). Living. |
 | `image-to-glb-asset-workflow.md` | Living runbook for reference-image intake, procedural Three.js authoring, optimized GLB export, renderer integration, performance gates, and in-game visual proof. |
 | `desktop-release.md`, `desktop-ship-notes.md`, `mobile-store-release.md` | Release runbooks (Electron/Steam; iOS/Android). Living. |
@@ -40,7 +40,11 @@ ones worth knowing: `design/master-spec.md` is the big design doc (levels 6 to 2
 expansion: story arc, zones, dungeons, XP math, ids); `design/spell-ranks.md` is the
 classic-era ability-rank reference for sim ability content; `design/deeds.md` is the
 Book of Deeds achievements system plus the authoring contract every new deed (and
-every new piece of conquerable content) follows. `design/design-language/` holds the
+every new piece of conquerable content) follows; `design/reliquary.md` is the same
+kind of living authoring contract for Reliquary pages (new conquerable unique loot
+authors its pages in the SAME change, pinned by `tests/reliquary_content.test.ts`);
+`design/warfare.md` is the shipped PvP honor/rating reference that
+`src/sim/pvp/CLAUDE.md` requires be kept current. `design/design-language/` holds the
 approved desktop reference renders (images only, no local doc) that the repo-root
 `DESIGN.md` design-language spec names as its primary references and links by path,
 so keep the filenames stable. **TRAP:**
@@ -53,6 +57,12 @@ code is the flat `src/ui/icons.ts`, so re-verify against code.
 `prd/frontier-pvp-honor.md` (Frostreach Frontier PvP zone, honor, $WOC stakes layer)
 pairs with `prd/FRONTIER_PHASE1_HANDOFF.md`, a slice-by-slice implementation handoff
 whose slices are specced but NOT yet implemented; read the handoff before starting one.
+**Partially superseded:** the honor layer of that PRD shipped independently as WARFARE
+(`src/sim/pvp/` honor/rating plus battlegrounds); `design/warfare.md` is the live honor
+source of truth, and the PRD remains the plan only for the unbuilt Frostreach zone
+itself. `prd/woc/` holds the $WOC/web3 specs, another shipped-vs-plan mix: for example
+`prd/woc/wallet-link.md` backs the shipped wallet-handoff entry, while other specs
+there are still plans.
 
 ## screenshots/
 JPG/PNG assets embedded by the repo-root `README.md` (title screen, zones, dungeons, UI),

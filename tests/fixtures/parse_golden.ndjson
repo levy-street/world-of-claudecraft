@@ -14,4 +14,4 @@
 {"t":"bosscast","fightId":"golden-1","bossId":500,"tick":203,"ability":"grave_bolt","action":"interrupted"}
 {"t":"ev","fightId":"golden-1","tick":240,"ev":{"type":"damage","sourceId":5,"targetId":500,"amount":4700,"crit":true,"school":"frost","ability":"Ice Lance","kind":"hit"}}
 {"t":"ev","fightId":"golden-1","tick":240,"ev":{"type":"death","entityId":500,"killerId":5}}
-{"t":"fight_close","fightId":"golden-1","endedTick":240,"durationMs":1950,"outcome":"kill","truncated":false,"rollup":{"perParticipant":{"1005":{"damage":5000,"taken":0,"healing":0,"overheal":0,"absorbed":0,"deaths":0,"interrupts":0,"dispels":0,"activeMs":100}}}}
+{"t":"fight_close","fightId":"golden-1","endedTick":240,"durationMs":1950,"outcome":"kill","truncated":false,"rollup":{"perParticipant":{"1005":{"damage":5000,"taken":0,"healing":0,"overheal":0,"absorbed":0,"deaths":0,"interrupts":0,"dispels":0,"activeMs":100}}},"actors":[{"id":500,"name":"Morthen the Gravecaller"}]}

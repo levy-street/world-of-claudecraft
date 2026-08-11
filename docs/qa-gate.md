@@ -20,13 +20,19 @@ Codex have different entry points and share the same deterministic scripts and c
 
 ### Instant copy gate
 
-The Stop gate scans the uncommitted added lines (the unstaged tracked diff plus
-untracked text files) for an em dash, en dash, emoji, focused `.only(` test, or leftover
-`debugger`. It takes milliseconds and never runs TypeScript, Vitest, Biome, browser
-work, or an agent. `.claude/settings.json` and `.codex/hooks.json` share the Claude
-implementation; the Codex adapter (`.codex/hooks/qa-stop.sh`) delegates to it, then
-additionally scans TOML and `.mts`/`.cts` TypeScript module files that the shared
-extension filter omits.
+The Stop gate scans the uncommitted added lines (the tracked diff against HEAD, staged
+and unstaged, plus untracked text files) for an em dash, en dash, emoji, focused
+`.only(` test, leftover `debugger`, or a `Math.random`/`Date.now`/`performance.now`
+call added under `src/sim/` (the determinism invariant's instant tripwire). The locale
+overlays and `docs/i18n/*.ru_RU.md` are excluded, matching the pre-push copy scan. It
+takes milliseconds and never runs TypeScript, Vitest, Biome, browser work, or an agent.
+`.claude/settings.json` and `.codex/hooks.json` share the Claude implementation; the
+Codex adapter (`.codex/hooks/qa-stop.sh`) delegates to it, then re-scans TOML and
+`.mts`/`.cts` module files (the shared filter now covers those itself, so the adapter's
+extra pass is a harmless belt). A companion `PreToolUse` hook
+(`.claude/hooks/deny-generated-edit.sh`) blocks direct agent edits to generated
+artifacts (`*.generated.ts`, the `i18n.resolved.generated/` bundles) at the tool-call
+boundary.
 
 ### Deterministic floor
 
@@ -94,7 +100,8 @@ Phase 5). Default environment remains `node`.
 
 ### Full local gate
 
-`npm run gate` (or `pnpm run gate`) is the **merge and "done" contract**. It mirrors CI:
+`npm run gate` (or `pnpm run gate`) is the **full CI mirror, the deeper check behind the
+selective merge bar** (`gate:select`, below, is the bar itself). It mirrors CI:
 generated i18n freshness, malware scanning, changed-file formatting, the SFX conformance
 check, the full test suite, the browser regression suite (`npm run test:browser`, which
 drives Chromium through Playwright), the typecheck, and env, server, bot, and client
@@ -113,11 +120,11 @@ malware, changed-file Biome, and the i18n freshness `git diff` always run (they 
 cached as "passed"). Catalog edits under `src/ui/i18n.catalog/**` invalidate `i18n:gen`.
 Contributor detail: [`docs/local-gate-perf/task-cache.md`](local-gate-perf/task-cache.md).
 
-Use this command instead of an ad hoc shell pipeline, and always before calling a change
-ready or opening a mergeable PR. Piping a test run can hide its exit status, and
-unconstrained full-suite parallelism can make healthy heavy sim tests flake. Day-loop
-iteration may use `npm run gate:fast`; a green fast path alone is never enough to claim
-done.
+Use this command instead of an ad hoc shell pipeline whenever you want the whole suite
+locally; the pre-merge bar itself is the selective gate (next section). Piping a test
+run can hide its exit status, and unconstrained full-suite parallelism can make healthy
+heavy sim tests flake. Day-loop iteration may use `npm run gate:fast`; a green fast path
+alone is never enough to claim done.
 
 ### Selective gate (`gate:select`)
 
@@ -344,6 +351,11 @@ the nightly, and the local gate carry NO auto-retry: there a teardown-rpc red st
 and the remedy remains a manual rerun of the red shard
 (`gh run rerun <run-id> --failed`).
 
+A separate reactor handles the checkout-stall class (a runner that hangs before tests
+even start): `.github/workflows/ci-stall-rerun.yml` drives `scripts/ci_stall_rerun.mjs`
+to rerun runs killed by that narrow signature, and the driver can be invoked by hand
+for a stalled run. Triage recipes for both classes: the `ci-triage` skill.
+
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
 of those (`Math.random` and the asset deletion) `vitest related` selected **nothing** and
@@ -407,17 +419,27 @@ before reporting readiness.
 | Cross-host parity | `cross-platform-sync` | `woc_cross_platform` |
 | Persistence and migrations | `migration-safety` | `woc_persistence` |
 | Database performance | `database-performance-reviewer` | `woc_database_performance` |
+| Server hot-path performance | `server-hot-path-reviewer` | (not yet mirrored) |
 | Privacy and security | `privacy-security-review` | `woc_security` |
 | Decisive tests | `test-coverage-auditor` | `woc_test_coverage` |
 | Frontend and graphics | `frontend-seam-reviewer` | `woc_frontend` |
 | Release malware | `release-malware-audit` | `woc_release_malware` |
+| Content same-change obligations | `content-obligations-reviewer` | (not yet mirrored) |
+| Gate/CI selection integrity | `gate-integrity-reviewer` | (not yet mirrored) |
 
 These roles encode non-obvious review heuristics. Canonical architecture stays in root
-and local `CLAUDE.md` files. Persistence review owns compatibility, save/load shape, and
-rollback safety. Database-performance review owns query cadence, cardinality, plans,
+and local `CLAUDE.md` files. Content-obligations review owns the same-change authoring
+duties of any `src/sim/content/` diff (deeds, Reliquary pages, wiki regen, item art,
+name fills, referential integrity). Gate-integrity review owns changes to the selection
+pipeline itself (`scripts/gate*.mjs`, `scripts/lib/gate_*.mjs`, `scripts/lib/ci_*.mjs`,
+`scripts/lib/test_visibility.mjs`, the workflows and their pins), where the failure mode
+is silently skipped tests. Persistence review owns
+compatibility, save/load shape, and rollback safety. Database-performance review owns query cadence, cardinality, plans,
 indexes, pool pressure, locks, timeout scope, write amplification, driver/dependency upgrades,
 PostgreSQL engine/resource/configuration/topology changes, and production-scale observability.
-Dispatch both when both sets of risk apply.
+Server-hot-path review owns the non-SQL server budget: tick CPU, broadcast fan-out and
+serialization, cache seams, and retention for anything that grows (the seams in
+`server/CLAUDE.md` "Hot paths"). Dispatch every role whose set of risk applies.
 
 ## Keep the gate current
 

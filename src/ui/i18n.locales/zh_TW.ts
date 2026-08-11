@@ -104,9 +104,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': '狂怒療傷',
   'entities.abilities.heroic_leap.description':
     '躍向目標區域，落地時對附近的敵人造成 {damage} 點傷害。',
-  'entities.abilities.heroic_leap.name': '騰躍衝鋒',
-  'entities.abilities.intimidating_shout.description':
-    '一聲駭人的怒吼，使 8 碼內最多 5 個敵人陷入恐懼而逃竄，持續 8 秒。傷害可能會打破效果。',
+  'entities.abilities.heroic_leap.name': '英勇飛躍',
+  'entities.abilities.intimidating_shout.description': '一聲駭人的怒吼，使 8 公尺內至多 5 名敵人在恐懼中逃竄 4 秒。傷害可能打斷該效果。',
   'entities.abilities.intimidating_shout.name': '破膽怒吼',
   'entities.abilities.iron_resolve.description':
     '咬緊牙關、無視疼痛：消耗最多 40 點怒氣（至少 20 點），每消耗 1 點怒氣可吸收 4 點傷害，持續最多 10 秒。（防護）',
@@ -166,7 +165,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': '抉擇',
   'hudChrome.talentRows.readoutSummary': '天賦：{head}，已選擇 {spent}/{total} 列。',
   'entities.abilities.aspect_of_the_wild.name': '野牙偽裝',
-  'entities.abilities.avenging_wrath.name': '熱誠之翼',
+  'entities.abilities.avenging_wrath.name': '復仇之怒',
   'entities.abilities.berserk.name': '赤紅迷霧',
   'entities.abilities.blink.name': '輕掠步',
   'entities.abilities.bloodlust.name': '戰鼓',
@@ -184,7 +183,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frenzied_regeneration.name': '野性癒合',
   'entities.abilities.frost_trap.name': '霜紋陷阱',
   'entities.abilities.ghostly_strike.name': '幽魂打擊',
-  'entities.abilities.hammer_of_wrath.name': '鳴鐘之錘',
+  'entities.abilities.hammer_of_wrath.name': '憤怒之錘',
   'entities.abilities.healing_stream.name': '泉湧',
   'entities.abilities.howl_of_terror.name': '恐懼嚎叫',
   'entities.abilities.ice_block.name': '寒冰棺',
@@ -949,8 +948,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.intro':
     '一場排位 5v5 奪旗戰場，戰場位於棘峰之下老林中的圍牆山谷：兩座廢棄要塞沿著峽谷兩端遙遙相對，中間是一座更古老的庭院，誰都不曾真正佔據。每方五人，兩座要塞，一個目標：奪走敵方戰旗並趕在對方之前帶回家。',
   'guide.thornhollowPage.queueHeading': '排隊參戰',
-  'guide.thornhollowPage.queueBody':
-    '打開荊谷原野面板即可單人排隊,也可以組一支最多五人的隊伍一同排隊:隊伍總在同一邊,空位由單人勇士補齊。十人就位後,比賽會把雙方安置在各自要塞,短暫列隊後旗幟生效。',
+  'guide.thornhollowPage.queueBody': '荊谷原野在 20 級開啟，且隊伍中每位成員都必須達到該等級，隊伍才能報名。開啟 PvP 按鈕並選擇荊谷原野分頁，也就是它預設開啟的那一頁，然後獨自進入佇列，或者帶上至多五人的隊伍一同報名：隊伍始終會被安排在同一方，其餘席位則由獨自報名的勇士補滿。當十人就緒時，比賽會把雙方安置在各自的堡壘進行短暫集結，隨後旗幟才會啟用。若一支四人或五人的隊伍原本只會遇上清一色的獨行報名者，配對會把這場比賽稍作保留，看看是否會有第二支隊伍出現，因此這種規模的隊伍有時要多等片刻，大門才會開啟。那點等待很短，並且最終總會讓步，所以沒有人會因此卡在佇列裡。',
   'guide.thornhollowPage.fieldHeading': '戰場地形',
   'guide.thornhollowPage.fieldBody':
     '一片有圍牆的露天戰場,被隔成三個區域:兩隊各自的前場,以及夾在中間的廢墟中庭。兩道橫貫全場的隔牆劃出邊界,穿行區域之間必須經過爭奪點:寬闊的正門,或是騎跨在隔牆上的門樓小屋,其錯位的兩扇門逼你繞過伏擊死角。每座要塞除正門外全部封死,奪旗進出只有這一個口;正門前還有一道矮壁壘擋住直衝的路線。中庭裡有空心的中央廢墟與兩枚側翼疾行符文,另外兩枚守在兩旗的接近路上。每個正門的中庭入口處還有一枚戰鬥或守護符文(短時間內提升傷害或減免傷害):兩個符文台開局同面,每次拾取後翻面。',
@@ -966,8 +964,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.carrierBody':
     '扛著敵旗太久的旗手會越來越脆弱,承受的傷害持續增加,直到旗幟被奪回、掉落或歸還。抱旗躲藏是敗招;把旗送回家才是勝途。',
   'guide.thornhollowPage.ladderHeading': '天梯',
-  'guide.thornhollowPage.ladderBody':
-    '每場比賽無論勝負都會移動角色的戰場評分,歷史總榜記錄王國的冠軍。勝利與鏖戰到底的失利也會透過戰爭體系發放榮譽。',
+  'guide.thornhollowPage.ladderBody': '每場比賽都會牽動一份與角色綁定的持久戰場評級，無論勝負，而歷代榜單則為國度的勇士們排定名次。',
   'hudChrome.charSheet.offense': '攻擊',
   'hudChrome.charSheet.defense': '防禦',
   'hudChrome.charSheet.playtimeLabel': '遊戲時長',
@@ -1008,7 +1005,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.desc.sta':
     '強化你的體魄，提高你的最大生命值，並加快你休息時的生命值恢復速度。',
   'hudChrome.statInfo.desc.int': '擴大施法者的法力池，並提升其造成法術暴擊的機率。',
-  'hudChrome.statInfo.desc.spi': '加快施法者在脫離戰鬥休息時的法力恢復速度。',
+  'hudChrome.statInfo.desc.spi': '加快施法者法力回復的速度。大部分在脫離戰鬥休息時流回，還有一部分即使在戰鬥中也會持續回復。',
   'hudChrome.statInfo.desc.armor':
     '減緩受到的物理打擊。對等級較低的攻擊者減免效果更佳，上限為 75%。',
   'hudChrome.statInfo.desc.attackPower': '強化你的武器攻擊。每 14 點攻擊強度可增加 1 點每秒傷害。',
@@ -2706,17 +2703,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     '化身為熾烈火球，移動速度提高 {buff}%。變形期間無法攻擊或施放法術。再次施放可恢復正常形態。',
   'entities.abilities.rain_of_fire.name': '烈火之雨',
-  'entities.abilities.rain_of_fire.description':
-    '在目標區域降下烈火之雨，持續 4 秒，每秒灼燒敵人造成 {damage} 點火焰傷害。',
+  'entities.abilities.rain_of_fire.description': '消耗 3 點摧殘，向目標區域降下火雨，在 4 秒內每秒造成 {damage} 點火焰傷害，2 級時延長至 6 秒。末日浩劫會讓第一波立刻落下。',
   'entities.abilities.volley.name': '亂射',
-  'entities.abilities.volley.description':
-    '向目標區域射出箭雨，持續 3 秒，每 0.5 秒對其中的敵人造成 {damage} 點傷害。',
+  'entities.abilities.volley.description': '向一片 8 公尺的區域降下箭雨，持續 3 秒。區域內的敵人每 0.5 秒受到 {damage} 點物理傷害。傷害隨遠程攻擊強度提升。',
   'entities.abilities.hurricane.name': '颶風',
   'entities.abilities.hurricane.description':
     '在目標區域召喚颶風，持續 6 秒，每秒重擊敵人造成 {damage} 點自然傷害。',
-  'entities.abilities.earthquake.name': '地震',
-  'entities.abilities.earthquake.description':
-    '撼動目標區域，持續 6 秒，每 1.5 秒重擊敵人造成 {damage} 點自然傷害。',
+  'entities.abilities.earthquake.name': '斷層甦醒',
+  'entities.abilities.earthquake.description': '撼動一片 8 公尺的區域，持續 6 秒，每 1.5 秒造成 {damage} 點自然傷害。傷害隨法術強度提升。元素：在 5 點雷霆時，傷害提高 100% 並消耗全部雷霆。',
   'entities.abilities.flamestrike.name': '烈焰風暴',
   'entities.abilities.flamestrike.description':
     '在目標區域召喚一次烈焰爆發，對爆炸範圍內的敵人造成 {damage} 點火焰傷害。',
@@ -2771,13 +2765,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.evasion.name': '鬼影步',
   'entities.abilities.evasion.description': '使你的閃躲機率提高 50%，持續 15 秒。',
   'entities.abilities.slice_and_dice.name': '割喉節奏',
-  'entities.abilities.slice_and_dice.description':
-    '終結技，使近戰攻擊速度提高 30%。每個連擊點都會延長持續時間。',
+  'entities.abilities.slice_and_dice.description': '終結技，將近戰攻擊速度提高 30%，持續 12 秒外加每點連擊點 4 秒（5 點連擊點：32 秒）。',
   'entities.abilities.sprint.name': '疾風之足',
   'entities.abilities.sprint.description': '使你的移動速度提高 70%，持續 15 秒。',
   'entities.abilities.kidney_shot.name': '陰狠一擊',
-  'entities.abilities.kidney_shot.description':
-    '終結技，使目標昏迷。每個連擊點使持續時間延長 1 秒。',
+  'entities.abilities.kidney_shot.description': '終結技，昏迷目標 1 秒外加每點連擊點 1 秒（5 點連擊點：6 秒）。',
   'entities.abilities.ambush.name': '潛伏者一擊',
   'entities.abilities.ambush.description':
     '伏擊目標，造成 250% 武器傷害加 {damage}。必須處於潛行並位於目標背後。需要匕首。獎勵 1 個連擊點。',
@@ -2799,11 +2791,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.description':
     '用沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。',
   'entities.abilities.expose_armor.name': '裂甲',
-  'entities.abilities.expose_armor.description':
-    '終結技，使目標破綻盡露，使其護甲降低 {damage}，持續 30 秒。',
+  'entities.abilities.expose_armor.description': '終結技，破開目標的防護 30 秒：每消耗 1 點連擊點使其護甲降低 2%（5 點連擊點：{damage}%）。',
   'entities.abilities.rupture.name': '血竭',
-  'entities.abilities.rupture.description':
-    '終結技，撕裂目標的傷口，使其在 16 秒內流血損失 {damage} 點生命。',
+  'entities.abilities.rupture.description': '終結技，撕裂目標：其每 2 秒流血一次，持續 6 秒外加每點連擊點 2 秒（5 點連擊點：16 秒，共 {damage} 點傷害）。',
   'entities.abilities.vanish.name': '煙遁步',
   'entities.abilities.vanish.description':
     '從視野中消失，即使在戰鬥中也能進入暮紗狀態。隱身時你的移動速度降低 50%。最多持續 10 秒。',
@@ -2817,10 +2807,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.description':
     '使目標目盲，迷茫地四處遊蕩，持續 8 秒。任何傷害都會破除此效果。',
   'entities.abilities.seal_of_righteousness.name': '誓約烙印',
-  'entities.abilities.seal_of_righteousness.description':
-    '使你充滿神聖能量，持續 30 秒，使每次近戰揮擊造成 {damage} 點額外神聖傷害。可用裁決釋放。',
+  'entities.abilities.seal_of_righteousness.description': '以神聖之力充盈你 30 秒，使你的每一次近戰揮擊額外造成 {damage} 點神聖傷害。',
   'entities.abilities.holy_light.name': '療癒聖光',
-  'entities.abilities.holy_light.description': '為一個友方目標恢復 {damage} 點生命值。',
+  'entities.abilities.holy_light.description': '迅速治療一個友方目標 {damage} 點生命。恢復生命會產生 1 點虔誠，即便沒有專精也是如此。輝光共鳴或烈日回擊會讓它變為瞬發。',
   'entities.abilities.devotion_aura.name': '堅定光環',
   'entities.abilities.devotion_aura.description': '使你的護甲提高 {buff}，持續 30 分鐘。',
   'entities.abilities.judgement.name': '裁決',
@@ -2835,22 +2824,18 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_justice.name': '裂碎法槌',
   'entities.abilities.hammer_of_justice.description': '使目標昏迷 {duration} 秒。',
   'entities.abilities.lay_on_hands.name': '臨終聖禮',
-  'entities.abilities.lay_on_hands.description':
-    '巨大的治療湧流：恢復 {damage} 點生命值。10 分鐘冷卻時間。',
+  'entities.abilities.lay_on_hands.description': '一股磅礡的湧流，恢復你最大生命值的 {damage}%，並在恢復生命時產生 1 點虔誠。冷卻 10 分鐘。',
   'entities.abilities.holy_taunt.name': '神聖挑釁',
   'entities.abilities.holy_taunt.description':
     '嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。',
   'entities.abilities.flash_of_light.name': '光癒術',
-  'entities.abilities.flash_of_light.description':
-    '快速而高效的聖光迸發，為一個友方目標恢復 {damage} 點生命值。',
+  'entities.abilities.flash_of_light.description': '一道迅捷而高效的聖光，治療一個友方目標 {damage} 點生命。恢復生命會產生 1 點虔誠，即便沒有專精也是如此。',
   'entities.abilities.exorcism.name': '驅逐儀式',
   'entities.abilities.exorcism.description': '以神聖怒火驅逐邪惡，造成 {damage} 點神聖傷害。',
   'entities.abilities.consecration.name': '聖化之地',
-  'entities.abilities.consecration.description':
-    '奉獻你腳下的土地，持續 10 秒，每 2 秒灼燒附近敵人造成 {damage} 點神聖傷害。',
+  'entities.abilities.consecration.description': '淨化你腳下的土地，持續 9 秒，每秒造成 {damage} 點神聖傷害並產生高額威脅。首次命中產生 1 點虔誠。信仰守衛站在其中時受到的傷害降低 10%。昇華會提高其傷害。',
   'entities.abilities.righteous_fury.name': '燃燒誓言',
-  'entities.abilities.righteous_fury.description':
-    '使你的神聖傷害產生的威脅值提高 60%，持續 30 分鐘。防護聖騎士的核心技能。',
+  'entities.abilities.righteous_fury.description': '被動地將你的神聖傷害所產生的威脅提高 60%。僅限信仰守衛。',
   'entities.abilities.retribution_aura.name': '報償光環',
   'entities.abilities.retribution_aura.description':
     '以神聖能量環繞你和隊伍成員，直到死亡或被替換。近戰攻擊受影響盟友的敵人將受到{buff}點神聖傷害，受影響的盟友普通攻擊額外造成{buff}點神聖傷害。替換你自己的壁壘堅定。另一名聖騎士施放報償光環時將刷新而非疊加。',
@@ -2860,90 +2845,74 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.name': '釋放同伴',
   'entities.abilities.dismiss_pet.description': '將你的寵物放歸野外。',
   'entities.abilities.raptor_strike.name': '剖膛打擊',
-  'entities.abilities.raptor_strike.description':
-    '一次強力近戰攻擊，使傷害提高 {damage}。在你的下一次揮擊時觸發。',
+  'entities.abilities.raptor_strike.description': '以 10% 武器傷害外加 {damage} 點進行打擊。命中可恢復 15 點集中，並給予 1 層狩獵動能。傷害透過武器傷害隨攻擊強度提升。',
   'entities.abilities.aspect_of_the_hawk.name': '獵鷂之姿',
-  'entities.abilities.aspect_of_the_hawk.description':
-    '化為獵鷂之姿，使攻擊強度提高 {buff}，持續 30 分鐘。',
+  'entities.abilities.aspect_of_the_hawk.description': '化身為鷂的形態，將你的攻擊強度提高 {buff}，持續 30 分鐘。',
   'entities.abilities.serpent_sting.name': '毒液倒刺',
-  'entities.abilities.serpent_sting.description': '釘刺目標，在 15 秒內造成 {damage} 點自然傷害。',
+  'entities.abilities.serpent_sting.description': '在 15 秒內共造成 {damage} 點自然傷害，每 3 秒一次。傷害隨遠程攻擊強度提升。',
   'entities.abilities.arcane_shot.name': '凶厲射擊',
-  'entities.abilities.arcane_shot.description': '瞬發射擊，造成 {damage} 點秘法傷害。',
+  'entities.abilities.arcane_shot.description': '射擊目標，造成 {damage} 點秘法傷害。傷害隨遠程攻擊強度提升。',
   'entities.abilities.concussive_shot.name': '震顫射擊',
-  'entities.abilities.concussive_shot.description':
-    '使目標暈眩遲緩，造成 {damage} 點傷害，並使移動速度降低 50%，持續 4 秒。',
-  'entities.abilities.mongoose_bite.name': '反噬獠牙',
-  'entities.abilities.mongoose_bite.description':
-    '在目標閃躲後反擊，造成武器傷害加 {damage}。無法被閃躲。',
+  'entities.abilities.concussive_shot.description': '射擊目標，造成 {damage} 點物理傷害並使其減速 50%，持續 4 秒。傷害隨遠程攻擊強度提升。',
+  'entities.abilities.mongoose_bite.name': '裂創',
+  'entities.abilities.mongoose_bite.description': '以 45% 武器傷害外加 {damage} 點進行打擊。若目標身上帶有你的血鉤之傷，則立即造成 1 跳傷口傷害，並將該傷口刷新至 12 秒。傷害透過武器傷害隨攻擊強度提升。',
   'entities.abilities.wing_clip.name': '桎梏斬',
-  'entities.abilities.wing_clip.description':
-    '造成傷口，造成 {damage} 點傷害，並使敵人移動速度降低 40%，持續 10 秒。',
+  'entities.abilities.wing_clip.description': '劈砍目標，造成 {damage} 點物理傷害並使其減速 40%，持續 10 秒。傷害隨攻擊強度提升。',
   'entities.abilities.aspect_of_the_monkey.name': '靈貂之姿',
-  'entities.abilities.aspect_of_the_monkey.description':
-    '化為靈貂之姿，使閃躲機率提高 8%，持續 30 分鐘。',
+  'entities.abilities.aspect_of_the_monkey.description': '化身為貂的形態，將你的閃避機率提高 8%，持續 30 分鐘。',
   'entities.abilities.aspect_of_the_cheetah.name': '駿馬之姿',
-  'entities.abilities.aspect_of_the_cheetah.description':
-    '化為駿馬之姿，使移動速度提高 30%，持續 30 分鐘。',
+  'entities.abilities.aspect_of_the_cheetah.description': '化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。',
   'entities.abilities.aimed_shot.name': '長弓引射',
-  'entities.abilities.aimed_shot.description': '一次仔細引弓的射擊，造成 {damage} 點傷害。',
+  'entities.abilities.aimed_shot.description': '射擊目標，造成 {damage} 點物理傷害。傷害隨遠程攻擊強度提升。',
   'entities.abilities.rapid_fire.name': '狂熱連射',
   'entities.abilities.rapid_fire.description':
     '在2.4秒內射出6發箭矢，期間可以移動。每發造成{damage}點物理傷害，並隨遠程攻擊強度提高。',
-  'entities.abilities.smite.name': '懲擊',
-  'entities.abilities.smite.description': '懲擊敵人，造成 {damage} 點神聖傷害。',
+  'entities.abilities.smite.name': '滌淨聖歌',
+  'entities.abilities.smite.description': '造成 {damage} 點神聖傷害。傷害隨法術強度提升。戒律：為每一名相連的盟友治療相當於傷害 30% 的生命。若沒有盟友相連，則為生命最低的隊伍成員治療 15%。',
   'entities.abilities.lesser_heal.name': '低語祈禱',
-  'entities.abilities.lesser_heal.description': '為一個友方目標恢復 {damage} 點生命值。',
+  'entities.abilities.lesser_heal.description': '治療一個友方目標 {damage} 點生命。治療量隨法術強度提升。',
   'entities.abilities.power_word_fortitude.name': '堅毅連禱',
-  'entities.abilities.power_word_fortitude.description': '使目標的耐力提高 {buff}，持續 30 分鐘。',
+  'entities.abilities.power_word_fortitude.description': '將每位隊伍成員的耐力提高 {buff}%，持續 30 分鐘。',
   'entities.abilities.shadow_word_pain.name': '腐朽輓歌',
-  'entities.abilities.shadow_word_pain.description': '黑暗之語在 18 秒內造成 {damage} 點暗影傷害。',
+  'entities.abilities.shadow_word_pain.description': '在 18 秒內共造成 {damage} 點暗影傷害，每 3 秒一次。傷害隨法術強度提升。暗影：傷害提高 10%，且你的塑像上每跳都會給予 1 點幽暗貢賦。',
   'entities.abilities.power_word_shield.name': '守護聖詠',
-  'entities.abilities.power_word_shield.description':
-    '保護目標，吸收 {damage} 點傷害，持續 30 秒。',
+  'entities.abilities.power_word_shield.description': '為一個友方目標護盾，在 30 秒內吸收 {damage} 點傷害。戒律還會將該目標與你的神聖傷害相連，持續 30 秒。',
   'entities.abilities.renew.name': '綿延恩典',
-  'entities.abilities.renew.description': '在 15 秒內為目標恢復 {damage} 點生命值。',
+  'entities.abilities.renew.description': '在 15 秒內治療目標 {damage} 點生命，每 3 秒一次。治療量隨法術強度提升。',
   'entities.abilities.mind_blast.name': '裂心術',
-  'entities.abilities.mind_blast.description': '震擊目標的心靈，造成 {damage} 點暗影傷害。',
+  'entities.abilities.mind_blast.description': '造成 {damage} 點暗影傷害。傷害隨法術強度提升。暗影會以你的腐朽輓歌把一個目標綁定為它的塑像，給予 1 點幽暗貢賦，並將 30% 的傷害迴響至至多 3 名其他帶有你腐朽輓歌的敵人。',
   'entities.abilities.heal.name': '肅穆祈禱',
-  'entities.abilities.heal.description': '緩慢但強大的祈禱，為一個友方目標恢復 {damage} 點生命值。',
+  'entities.abilities.heal.description': '治療一個友方目標 {damage} 點生命。治療量隨法術強度提升。',
   'entities.abilities.mind_flay.name': '哀禍連禱',
-  'entities.abilities.mind_flay.description':
-    '用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 {damage} 點傷害。',
+  'entities.abilities.mind_flay.description': '引導 3 秒，每秒造成 {damage} 點暗影傷害。傷害隨法術強度提升。',
   'entities.abilities.flash_heal.name': '急切祈禱',
-  'entities.abilities.flash_heal.description': '快速祈禱，為一個友方目標恢復 {damage} 點生命值。',
+  'entities.abilities.flash_heal.description': '治療一個友方目標 {damage} 點生命。治療量隨法術強度提升。',
   'entities.abilities.lightning_bolt.name': '電弧箭',
-  'entities.abilities.lightning_bolt.description': '投擲一道閃電，造成 {damage} 點自然傷害。',
+  'entities.abilities.lightning_bolt.description': '造成 {damage} 點自然傷害。傷害隨法術強度提升。元素：命中可給予 1 點雷霆。',
   'entities.abilities.rockbiter_weapon.name': '縛石武器',
-  'entities.abilities.rockbiter_weapon.description':
-    '以大地之怒灌注你的武器：每次揮擊額外造成 {damage} 點傷害，持續 5 分鐘。',
+  'entities.abilities.rockbiter_weapon.description': '為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點傷害。強化還會獲得 30% 護甲，受到的傷害降低 10%，並產生兩倍的威脅。大地震擊迫使其目標攻擊你 3 秒，而雷霆守護則給予 3 秒 10% 的傷害減免。',
   'entities.abilities.healing_wave.name': '療癒之水',
-  'entities.abilities.healing_wave.description': '為一個友方目標恢復 {damage} 點生命值。',
-  'entities.abilities.chain_heal.name': '治療鏈',
+  'entities.abilities.healing_wave.description': '治療一個友方目標 {damage} 點生命。治療量隨法術強度提升。恢復：將完整治療量的 50% 在過量治療之前存為治癒湧流，持續 12 秒，至多為目標最大生命值的 30%。',
+  'entities.abilities.chain_heal.name': '層疊治癒',
   'entities.abilities.chain_heal.description':
     '治療一個友方目標{damage}點，隨後跳躍至多2名12碼內的盟友，每次跳躍治療量為上一目標的50%。每名被跳躍到的盟友會消耗你剩餘的治癒湧流，並立即治療其消耗量的125%。初始治療量隨法術強度提高。（恢復專精招牌）',
   'entities.abilities.earth_shock.name': '大地震擊',
-  'entities.abilities.earth_shock.description':
-    '立即以震盪之力衝擊目標，造成 {damage} 點自然傷害。',
+  'entities.abilities.earth_shock.description': '造成 {damage} 點自然傷害。傷害隨法術強度提升。元素：在 5 點雷霆時，傷害提高 125% 並消耗全部雷霆。磐岩之縛：迫使目標攻擊你 3 秒。',
   'entities.abilities.lightning_shield.name': '雷霆守護',
-  'entities.abilities.lightning_shield.description':
-    '以爆裂閃電環繞自身：近戰攻擊者會受到 {buff} 點自然傷害，最多 3 次充能，且每 5 秒最多觸發一次。',
+  'entities.abilities.lightning_shield.description': '以閃電環繞你 10 分鐘。接下來針對你的 3 次近戰攻擊會對攻擊者造成 {buff} 點自然傷害，最多每 5 秒一次。',
   'entities.abilities.flame_shock.name': '燼焰震擊',
-  'entities.abilities.flame_shock.description':
-    '用火焰灼燒目標，造成 {damage} 點傷害，並在 12 秒內額外造成 {overTime}。',
+  'entities.abilities.flame_shock.description': '造成 {damage} 點火焰傷害，隨後在 12 秒內造成 {overTime} 點火焰傷害。首次命中隨法術強度提升。',
   'entities.abilities.flametongue_weapon.name': '焰烙武器',
-  'entities.abilities.flametongue_weapon.description':
-    '用元素之火灌注你的武器：每次揮擊額外造成 {damage} 點火焰傷害，持續 5 分鐘。',
+  'entities.abilities.flametongue_weapon.description': '為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點火焰傷害。',
   'entities.abilities.frost_shock.name': '凜霜震擊',
-  'entities.abilities.frost_shock.description':
-    '立即以冰霜衝擊目標，造成 {damage} 點冰霜傷害，並使其移動速度降低 50%，持續 8 秒。',
+  'entities.abilities.frost_shock.description': '造成 {damage} 點冰霜傷害並使目標減速 50%，持續 8 秒。傷害隨法術強度提升。',
   'entities.abilities.frostbrand_weapon.name': '凜霜束縛武器',
   'entities.abilities.frostbrand_weapon.description':
     '為你的武器附上刺骨寒霜：每次揮擊額外造成 {damage} 點傷害，持續 5 分鐘。',
   'entities.abilities.ghost_wolf.name': '幽影狼',
-  'entities.abilities.ghost_wolf.description': '化為幽影狼，使移動速度提高 40%，持續 10 分鐘。',
+  'entities.abilities.ghost_wolf.description': '化為影狼，移動速度提高 40%。再次施放即可變回你平常的形態。',
   'entities.abilities.stormstrike.name': '先祖打擊',
-  'entities.abilities.stormstrike.description':
-    '將風暴導入武器，立即攻擊並造成武器傷害加 {damage}。',
+  'entities.abilities.stormstrike.description': '以武器傷害外加 {damage} 點進行打擊，並將戰魂節律推進 2 段。傷害透過武器傷害隨攻擊強度提升。',
   'entities.abilities.shadow_bolt.name': '幽暗箭',
   'entities.abilities.shadow_bolt.description': '向敵人發射暗影箭，造成 {damage} 點暗影傷害。',
   'entities.abilities.demon_skin.name': '邪魔之皮',
@@ -2959,8 +2928,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.curse_of_agony.description':
     '以痛苦詛咒目標：在 24 秒內造成 {damage} 點暗影傷害。',
   'entities.abilities.drain_life.name': '吞噬',
-  'entities.abilities.drain_life.description':
-    '吸取目標的生命，持續 5 秒，每秒向你轉移 {damage} 點生命值。',
+  'entities.abilities.drain_life.description': '吞噬目標的生命力，每秒造成 {damage} 點暗影傷害，並將其中的 70% 轉化為生命傳給你。痛苦則改為全部轉化。當引導在你的主邪眼之上時，它會在開始時消耗全部命運絲線，而每一根絲線都會讓每一跳額外產生 1 點譴罪。',
   'entities.abilities.fear.name': '折魂',
   'entities.abilities.fear.description':
     '使敵人陷入恐懼並畏縮，最多持續 8 秒。任何傷害都會打破效果。',
@@ -2968,7 +2936,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.searing_pain.description':
     '以痛苦烈焰灼燒敵人，造成 {damage} 點火焰傷害。施法迅速。',
   'entities.abilities.shadowburn.name': '暮焰',
-  'entities.abilities.shadowburn.description': '立即以灼燒暗影轟擊目標，造成 {damage} 點暗影傷害。',
+  'entities.abilities.shadowburn.description': '消耗 1 點摧殘，對生命值低於 20% 的敵人施以處決，造成 {damage} 點暗影傷害。若被標記的目標在 5 秒內死亡，則返還其摧殘。',
   'entities.abilities.wrath.name': '狂野奔雷',
   'entities.abilities.wrath.description': '投擲一道自然能量箭，造成 {damage} 點自然傷害。',
   'entities.abilities.healing_touch.name': '荒野癒合',
@@ -2995,9 +2963,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.growl.description':
     '對目標低吼：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。',
   'entities.abilities.cat_form.name': '狼形態',
-  'entities.abilities.cat_form.description':
-    '變形為狼：攻擊強度隨等級提高，攻擊使用能量和連擊點，產生的威脅值降低 29%。再次施放可返回施法者形態。',
-  'entities.abilities.claw.name': '爪擊',
+  'entities.abilities.cat_form.description': '將你化為一頭狼：敏捷隨你的等級提升，攻擊強度 +8 外加每級 2 點，你的攻擊消耗能量與連擊點，並且你產生的威脅降低 29%。再次施放即可變回施法形態。',
+  'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
     '用利爪攻擊敵人，造成武器傷害加 {damage}。獎勵 1 個連擊點。僅限狼形態。',
   'entities.abilities.ferocious_bite.name': '血噬',
@@ -3026,8 +2993,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '震腦擊',
   'entities.abilities.bash.description': '昏迷目標 2 秒。僅限巨熊形態。',
   'entities.abilities.faerie_fire.name': '巫光',
-  'entities.abilities.faerie_fire.description':
-    '使目標的護甲降低 {damage}%，持續 40 秒。無法與削甲疊加。',
+  'entities.abilities.faerie_fire.description': '將目標的護甲降低 {damage}%，持續 40 秒。',
   'entities.abilities.hibernate.name': '沉眠',
   'entities.abilities.hibernate.description':
     '迫使目標陷入深度睡眠，最多持續 8 秒。任何傷害都會將其喚醒。',
@@ -3042,9 +3008,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.name': '狼血之力',
   'entities.abilities.tigers_fury.description':
     '使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。',
-  'entities.abilities.rip.name': '割裂',
-  'entities.abilities.rip.description':
-    '終結技，在 12 秒內造成 {damage} 點流血傷害。消耗連擊點。僅限狼形態。',
+  'entities.abilities.rip.name': '血隙',
+  'entities.abilities.rip.description': '終結技，使目標每 2 秒流血一次，持續 24 秒：36 點傷害外加每消耗 1 點連擊點 24 點（5 點連擊點：共 {damage} 點）。僅限狼形態。',
   'entities.abilities.mortal_strike.name': '致殘打擊',
   'entities.abilities.mortal_strike.description':
     '凶狠打擊，造成武器傷害外加 {damage} 點傷害。（武器專精標誌技能）',
@@ -3060,11 +3025,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserker_rage.name': '沸血狂怒',
   'entities.abilities.berserker_rage.description': '進入沸血狂怒，產生 20 點怒氣。（戰士天賦）',
   'entities.abilities.summon_imp.name': '召喚燼裔',
-  'entities.abilities.summon_imp.description':
-    '召喚一隻聽從術士命令的燼裔。燼裔會從遠處向你的敵人投擲灰燼箭。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
-  'entities.abilities.summon_voidwalker.name': '召喚暮影',
-  'entities.abilities.summon_voidwalker.description':
-    '召喚一隻聽從術士命令的暮影。暮影是一種堅韌的惡魔，會嘲諷你的敵人並承受打擊。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
+  'entities.abilities.summon_imp.description': '召喚一隻聽從術士號令的燼裔。燼裔會從遠處向你的敵人施放邪能箭。召喚新的惡魔會遣散你目前的惡魔。你同一時間只能擁有一隻惡魔。',
+  'entities.abilities.summon_voidwalker.name': '召喚幽蔭',
+  'entities.abilities.summon_voidwalker.description': '召喚一隻聽從術士號令的幽蔭。這隻結實的惡魔會嘲諷敵人，並用深淵鎖鏈把遠處的普通敵人拽回攻擊範圍。首領無法被拉扯。召喚新的惡魔會遣散你目前的惡魔。你同一時間只能擁有一隻惡魔。',
   'entities.abilities.summon_succubus.name': '召喚暮裔',
   'entities.abilities.summon_succubus.description':
     '召喚一隻聽從術士命令的暮裔。暮裔是一種脆弱的惡魔，攻擊迅速且近戰傷害強勁。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
@@ -3075,8 +3038,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felguard.description':
     '召喚一隻聽從術士命令的戰魔。戰魔是一種堅韌的近戰惡魔，會衝入戰鬥並獨當一面。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
   'entities.abilities.summon_infernal.name': '召喚烈焰巨像',
-  'entities.abilities.summon_infernal.description':
-    '將一隻烈焰巨像束縛於你的意志之下，這是一頭巨大的猛獸，擁有毀滅性的近戰攻擊，以及所有惡魔中最雄厚的生命值與護甲。漫長的冷卻時間限制了牠的原始力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
+  'entities.abilities.summon_infernal.description': '將一尊烈焰巨像召至目標區域，落地時造成 58-72 點火焰傷害。它會戰鬥 30 秒且不會取代你的惡魔，每 2 秒灼燒附近的敵人，並每 1 秒產生 1 點摧殘。',
   'entities.abilities.summon_doomguard.name': '召喚怨魂裔',
   'entities.abilities.summon_doomguard.description':
     '將一隻怨魂裔束縛於你的意志之下，這是一種精英惡魔，會從遠處降下沉重的暗影傷害。漫長的冷卻時間限制了牠的毀滅性力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
@@ -3090,8 +3052,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description':
     '在狼形態下進入隱匿狀態，移動速度降低 50%。無法於戰鬥中使用。',
   'entities.abilities.rake.name': '剮擊',
-  'entities.abilities.rake.description':
-    '一招隱匿起手技，以武器傷害外加 {damage} 撕裂敵人，並造成持續 9 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。',
+  'entities.abilities.rake.description': '撕裂敵人，造成武器傷害外加 {damage} 點，並造成持續 18 秒的流血傷害。給予 1 點連擊點。僅限狼形態。',
   'entities.abilities.revive_pet.name': '修補',
   'entities.abilities.revive_pet.description':
     '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。',
@@ -3102,12 +3063,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_shield.description':
     '獲得30%格擋，並獲得一層吸收護盾，吸收量為最大生命值的{damage}%，持續{duration}秒，同時釋放一股威脅脈衝。神聖昇華會強化並延長這層防禦。',
   'entities.abilities.bestial_wrath.name': '狂野怒火',
-  'entities.abilities.bestial_wrath.description':
-    '使你進入野獸怒火狀態，攻擊強度提高55點，持續15秒。（野獸控制專精招牌）',
+  'entities.abilities.bestial_wrath.description': '給予 3 層獸群凶性。你在 20 秒內的下一次釋放野獸，其擊打與拍擊傷害提高 50%，且其狂亂持續 12 秒而非 8 秒。（野獸控制標誌技能）',
   'entities.abilities.trueshot_aura.name': '強擊光環',
-  'entities.abilities.trueshot_aura.description':
-    '鼓舞附近盟友，使攻擊強度提高35點，持續5分鐘。（射擊專精招牌）',
-  'entities.abilities.wyvern_sting.name': '幼龍釘刺',
+  'entities.abilities.trueshot_aura.description': '將 30 公尺內盟友的攻擊強度提高 10%，持續 30 分鐘。（射擊標誌技能）',
+  'entities.abilities.wyvern_sting.name': '翼龍釘刺',
   'entities.abilities.wyvern_sting.description':
     '從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）',
   'entities.abilities.arcane_power.name': '祕法強化',
@@ -3120,47 +3079,37 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     '法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）',
   'entities.abilities.cold_blood.name': '冷血',
-  'entities.abilities.cold_blood.description':
-    '集中你的殺意，使下一次攻擊造成致命一擊。（刺殺專精招牌）',
+  'entities.abilities.cold_blood.description': '凝聚你的殺意，使你的下一次攻擊必定爆擊。（刺殺標誌技能）',
   'entities.abilities.blade_flurry.name': '劍刃亂舞',
-  'entities.abilities.blade_flurry.description':
-    '釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）',
+  'entities.abilities.blade_flurry.description': '掀起一陣刀刃的亂舞，將攻擊速度提高 20%，持續 12 秒。（戰鬥標誌技能）',
   'entities.abilities.hemorrhage.name': '出血',
-  'entities.abilities.hemorrhage.description':
-    '攻擊敵人，造成武器傷害加{damage}點傷害，並在12秒內造成流血傷害。獎勵1個連擊點。（敏銳專精招牌）',
+  'entities.abilities.hemorrhage.description': '以武器傷害外加 {damage} 點擊打敵人，造成持續 12 秒的流血傷害，並使其所受的流血傷害提高 40%。給予 1 點連擊點。每第 2 次使用增加 1 層幽暗（最多 3 層）。（敏銳標誌技能）',
   'entities.abilities.power_infusion.name': '能量灌注',
-  'entities.abilities.power_infusion.description':
-    '向一名友方目標灌注能量，使其法術強度提高28點，持續15秒。（戒律專精招牌）',
-  'entities.abilities.holy_nova.name': '聖輝爆發',
-  'entities.abilities.holy_nova.description':
-    '引發神聖之光爆炸，為附近盟友恢復{damage}點生命值並傷害附近敵人。（神聖專精招牌）',
-  'entities.abilities.shadowform.name': '暗影形態',
-  'entities.abilities.shadowform.description':
-    '進入暗影形態，強化暗影魔法直到你切換回來。再次施放可返回普通形態。（暗影專精招牌）',
+  'entities.abilities.power_infusion.description': '為一個友方目標塗敷聖油，將傷害、治療與施法速度提高 20%，持續 15 秒。',
+  'entities.abilities.holy_nova.name': '旭日聖詠',
+  'entities.abilities.holy_nova.description': '治療 10 公尺內的盟友 {damage} 點生命，並對同一區域內的敵人造成 24 至 30 點神聖傷害。兩者皆隨法術強度提升。（聖光基礎技能）',
+  'entities.abilities.shadowform.name': '暮色帷幕',
+  'entities.abilities.shadowform.description': '進入暮色帷幕，將你的暗影傷害提高 25%。再次施放即可離開暮色帷幕。（暗影標誌技能）',
   'entities.abilities.elemental_mastery.name': '元素精通',
-  'entities.abilities.elemental_mastery.description':
-    '呼喚元素精通，使你的下一個法術變為瞬發。（元素專精招牌）',
+  'entities.abilities.elemental_mastery.description': '在 12 秒內，電弧箭給予 2 點雷霆。你的下一次電弧箭或叉狀閃電為瞬發，而你下一次完整的雷霆兌現傷害提高 25%。（元素標誌技能）',
   'entities.abilities.siphon_life.name': '生命虹吸',
   'entities.abilities.siphon_life.description':
     '虹吸敵人的生命，在30秒內造成{damage}點暗影傷害，並按造成的傷害治療你。（痛苦專精招牌）',
   'entities.abilities.conflagrate.name': '燃盡',
-  'entities.abilities.conflagrate.description':
-    '吞噬敵人身上的獻祭，將其點燃並造成{damage}點火焰傷害。（毀滅專精招牌）',
+  'entities.abilities.conflagrate.description': '將你燃燒契約未來的一跳提前，隨後點燃目標，造成 {damage} 點火焰傷害。產生 1 點摧殘和 1 點末日浩劫。可存 2 層充能。（毀滅標誌技能）',
   'entities.abilities.moonkin_form.name': '梟獸形態',
   'entities.abilities.moonkin_form.description':
     '進入梟獸形態，強化施法直到你切換回來。再次施放可返回普通形態。（平衡專精招牌）',
   'entities.abilities.feral_charge.name': '野性衝鋒',
   'entities.abilities.feral_charge.description':
     '衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）',
-  'entities.abilities.swiftmend.name': '輕捷癒合',
-  'entities.abilities.swiftmend.description':
-    '吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）',
-  'entities.abilities.crusader_strike.name': '誓言打擊',
+  'entities.abilities.swiftmend.name': '迅癒',
+  'entities.abilities.swiftmend.description': '消耗友方目標身上的一個持續治療效果，治療其 {damage} 點生命。野性綻放與再度綻放的播撒會累加青翠；在 5 層青翠時，此按鈕會變為盛放，立即為每一位帶有你持續治療效果的盟友治療這些效果所剩餘量的 60%。（恢復標誌技能）',
+  'entities.abilities.crusader_strike.name': '十字軍聖擊',
   'entities.abilities.crusader_strike.description':
     '打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）',
-  'entities.abilities.metamorphosis.name': '惡魔變形',
-  'entities.abilities.metamorphosis.description':
-    '化為惡魔之力，使護甲和攻擊強度提高 20 秒。（術士天賦）',
+  'entities.abilities.metamorphosis.name': '巫妖形態',
+  'entities.abilities.metamorphosis.description': '化為一具巫妖，持續 20 秒，生成 3 塊靈魂碎片，並將你的法術傷害與施法速度提高 20%。你的不死生物造成的傷害提高 50%，行動速度加快 20%，而靈魂之槍會貫穿其目標，以其傷害的 50% 擊中至多 2 名附近的敵人。（死靈術標誌技能）',
   'entities.items.worn_sword.name': '鏽蝕短劍',
   'entities.items.gnarled_staff.name': '沼櫟法杖',
   'entities.items.rusty_dagger.name': '生鏽匕首',
@@ -5724,8 +5673,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.catalogBody':
     '這裡列出了功績之書所能容納的每一個功績，按類別整理。隱密的功績被特意略去，等待你自己去發現。在遊戲內打開功績之書，即可查看每個功績的具體要求。',
   'guide.deedsPage.catalogHeading': '功績全錄',
-  'guide.deedsPage.chroniclesBody':
-    '每個區域都保有自己的編年史，這是一組由當地記錄者收集的功績，他們自願承擔起記錄每一位過路旅人的責任。東溪谷的Saul是其中的第一位。一部編年史分為若干章節，你可以按任意順序來完成它們。',
+  'guide.deedsPage.chroniclesBody': '每個區域都保有自己的編年史，那是一位本地編年史家彙集的一批功績，他自願擔起記錄每一位途經旅人的職責。東溪谷地的索爾是其中第一位，奧斯里克·芬恩在迷沼深處的芬橋保管沼澤編年史，而岑姿則在高瞭之上記錄山峰編年史。一部編年史分為若干章節，你可以按任何適合自己的順序逐一推進。',
   'guide.deedsPage.chroniclesHeading': '編年史',
   'guide.deedsPage.colRenown': '名望',
   'guide.deedsPage.colReward': '獎勵',
@@ -5737,8 +5685,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': '功績如何運作',
   'guide.deedsPage.intro':
     '功績之書記錄著你在這個世界所做的一切，從走出新手山谷的第一步，到王國所能提供的最艱難的戰鬥。一邊遊玩一邊贏得功績，佩戴它們授予的頭銜，看著你的名望不斷攀升。',
-  'guide.deedsPage.renownBody':
-    '名望是功績之書背後的分數。你贏得的每個功績都價值固定的點數，而你的總分只增不減，因此清閒的一週絕不會讓你失去已有的成績。少數功績取決於運氣而非技巧，而壯舉則自成一份榮譽，因此這兩者都不提供任何名望。不帶名望的功績仍會計入功績之書的完成度，只是從不計分。',
+  'guide.deedsPage.renownBody': '名望是功績之書背後的分數。你所獲得的每一項功績都值一個固定的數額，而你的總數只會上升，因此清閒的一週絕不會讓你失去陣地。其中少數靠的是運氣而非本事，另一些收藏類功績本身即是回報，而壯舉則是另一種榮譽，所以這幾類都不值任何名望。沒有名望的功績仍計入你這本書的完成度；它們只是從不計分。壯舉是唯一的例外，被完全排除在計數之外。',
   'guide.deedsPage.renownHeading': '名望',
   'guide.deedsPage.rewardBorder': '邊框',
   'guide.deedsPage.rewardsBody':
@@ -5767,16 +5714,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.delvesPage.lockpickBody':
     '有些門扉與藏匿處上了鎖，而開啟它們考驗的是膽識而非屬性數值：俐落而沉穩地解開鎖頭，你所得的獎賞會勝過倉促失手時的所得。這並非必要，但謹慎的探索者往往更富有。',
   'guide.delvesPage.lockpickHeading': '鎖以及它們所藏之物',
-  'guide.delvesPage.marksBody':
-    '通關秘探可賺取秘探印記，這是一種與你的錢幣分開存放的貨幣。在看守人處花用它們，以強化你的同伴，並取得在其他任何地方都找不到的裝備。',
+  'guide.delvesPage.marksBody': '清理秘探可獲得秘探印記，這是一種與你的金錢分開保管的貨幣。把它們花在守護者那裡，用以強化你的同伴，並換取別處找不到的裝備。\n\n印記對你一天中最初的幾趟給予最多回報。每天前三次通關全額支付，此後秘探依然給予回報，只是不那麼穩定，其中較難的層級比較容易的層級更能維持。這個計數每天翻新，所以沒必要把一處秘探刷到榨乾：明天再來，好的回報率依舊等著你。',
   'guide.delvesPage.marksHeading': '秘探印記',
   'guide.delvesPage.partyLabel': '供一到兩人',
   'guide.delvesPage.tiersBody':
     '一座秘探提供不只一種難度。較高的難度會讓敵人更強，並擲入一項旅程詞綴，相應地也給予更豐厚的報酬。它同時要求你先累積幾個等級，才會放你進入。',
   'guide.delvesPage.tiersHeading': '難度',
   'guide.delvesPage.tiersLabel': '難度',
-  'guide.delvesPage.whatBody':
-    '秘探是一座小型的副本地城，專為你與至多一名盟友打造，是一份不會受到打擾的獨立複本。你從世界中由秘探看守人看管的看板啟程，下到其中，一路打穿少數幾個房間，並在單一守護者面前作結。旅程短促且設計來反覆挑戰，因此每當開放世界無事可做時，秘探都是一份可靠的進度來源。',
+  'guide.delvesPage.whatBody': '秘探是一處小型的獨立地城，只為你和至多一位盟友而生成，是一份不會被人打擾的私人副本。你從世界中由秘探守護者看管的告示板啟動它，往下潛入，一路打穿幾間屋子，最後終結於唯一一名守衛。那名守衛之後等著什麼，各處秘探並不相同：有的把戰利品封在一把鎖後面，有的則要你完成一場儀式。每趟都很快，而且本就為重複而設，因此每當開放世界枯竭時，秘探都是一份可靠的進展。',
   'guide.delvesPage.whatHeading': '何謂秘探',
   'guide.delvesPage.whereBody':
     '第一座秘探「崩塌的聖物庫」在起始山谷東溪谷的聖物庫山丘開啟。哈爾文修士在那裡看管著看板，待你準備就緒，他便會送你下去。他的巡迴並不止於此：越過泥沼濕地北緣的巨魔墳丘，這位看守人又為已站穩腳跟的秘探者開啟了「溺亡連禱」。',
@@ -5845,9 +5790,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.home.ctaPlay': '立即遊玩',
   'guide.home.ctaLearn': '如何遊玩',
   'guide.home.what.heading': '一款上手即玩的經典MMO',
-  'guide.home.what.pillarPlayTitle': '在瀏覽器中遊玩',
-  'guide.home.what.pillarPlayBody':
-    '無需下載，無需啟動器。建立一名角色，數秒內即可進入世界，不論是電腦還是手機。',
+  'guide.home.what.pillarPlayTitle': '打開網站即可開玩',
+  'guide.home.what.pillarPlayBody': '無需下載，無需啟動器。建立一個角色，幾秒之內你就置身世界之中，無論是在電腦還是手機上。如果你想要，也有原生應用程式可用。',
   'guide.home.what.pillarClassesTitle': '九種職業，三種角色定位',
   'guide.home.what.pillarClassesBody':
     '擔任坦克、治療或輸出。每種職業都依其原型該有的方式運作，並透過天賦打造出你自己的風格。',
@@ -5921,19 +5865,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.questsBody':
     '向頭上有標記的人接取任務，完成目標後回報，即可換取經驗值、金幣與裝備。畫面上的任務追蹤器會讓你隨時掌握目標。',
   'guide.howToPlay.deathTitle': '死亡並非終點',
-  'guide.howToPlay.deathBody':
-    '若你倒下，你的軀體會留在倒下之處，而你會化為鬼魂在最近的墓地甦醒。讓你的靈魂跑回軀體旁，即可當場復活、毫無懲罰；或者接受墓地的靈魂醫者，以一段短暫的虛弱為代價立即復生。全新的英雄可完全免除這份虛弱，而你所擁有或掙得的一切也絕不會失去。',
+  'guide.howToPlay.deathBody': '若你倒下，屍體會留在倒下的地方，而你會在最近的墓地化為幽魂站起。讓靈魂跑回自己的屍體，就能原地復活且毫無懲罰；或者接受墓地的蒼白守護者，立刻復活，代價是一段短暫的虛弱。全新的英雄完全免受這份虛弱，而你擁有或贏得的一切從不會失去。遊戲還會告訴你死於什麼：聊天欄中的一行會點出是誰打出了致命一擊，這通常是釐清哪裡出了問題的最快途徑。',
   'guide.howToPlay.groupingTitle': '同心協力',
   'guide.howToPlay.groupingBody':
     '邀請其他人組成隊伍，即可共享任務進度並挑戰地城。世界大部分內容皆可單人完成，因此組隊是一種選擇，而非負擔。',
   'guide.howToPlay.onlineTitle': '線上或離線',
   'guide.howToPlay.onlineBody':
     '與所有人一同遊玩共享的線上世界，或在瀏覽器中開啟即時的離線世界來熟悉操作。',
-  'guide.howToPlay.reassure':
-    '天賦於10級解鎖，且只要脫離戰鬥便可隨時重置，因此你早期的選擇絕非永久。儘管放手嘗試吧。',
+  'guide.howToPlay.reassure': '天賦從 5 級開始，一共六排，分別在 5、8、11、14、17 和 20 級各開一排。每一排都是三選一，只要脫離戰鬥且不在競技場比賽中，你隨時可以重置，因此早期的選擇絕非永久。儘管放手嘗試吧。',
   'guide.howToPlay.controlsLink': '查看完整操作按鍵說明',
-  'guide.controls.intro':
-    '電腦版的預設按鍵。除了永遠用來開啟遊戲選單的 Esc 之外，每項配置皆可在遊戲選項中變更，而一項配置也可以是像 Shift+Z 這樣的組合鍵。',
+  'guide.controls.intro': '桌面端的預設按鍵。這裡的每一項綁定都可以在遊戲選單的「按鍵設定」面板中修改，只有 Esc 例外，它始終用來開啟該選單。每個操作最多可容納兩個按鍵，一個主鍵和一個備用鍵，綁定也可以是像 Shift+Z 這樣的組合鍵。它還可以是滑鼠按鍵：中鍵是 M3，拇指鍵是 M4 和 M5，更多按鍵依序往上排。左鍵和右鍵仍保留給鏡頭、點擊移動以及點擊世界中的物件。',
   'guide.controls.keyHeader': '按鍵',
   'guide.controls.actionHeader': '動作',
   'guide.controls.groupMovement': '移動',
@@ -5948,7 +5889,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupCamera': '鏡頭',
   'guide.controls.talents': '天賦',
   'guide.controls.professions': '專業',
-  'guide.controls.arena': '競技場',
+  'guide.controls.arena': 'PvP 視窗（競技場與荊谷原野）',
   'guide.controls.leaderboard': '排行榜',
   'guide.controls.deeds': '功績之書',
   'guide.controls.reliquary': '聖物庫',
@@ -5962,37 +5903,32 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.controls.abilities': '使用動作列技能（數字鍵列；第二條動作列位於數字鍵盤上）',
   'guide.controls.groupPet': '寵物指令',
   'guide.controls.petBar': '寵物列：攻擊、停止、嘲諷、防禦、攻擊性（獵人或術士的寵物在場時）',
-  'guide.controls.attackMoveNote':
-    '還有一項預設關閉的功能：在選項中啟用「攻擊移動」後，會保留一個按鍵（選項開啟期間為 A），按下它，你便會朝游標走去，並對游標下的敵人，或沿途遇到的第一個敵人展開攻擊。',
+  'guide.controls.attackMoveNote': '攻擊移動在你開啟之前一直處於關閉狀態：開啟「按鍵設定」面板，把它打開，上方的 A 一行便開始生效。當游標位於遊戲世界上方時，它會讓你朝游標走去，並向游標下的敵人開火，或者向沿途遇到的第一個敵對目標開火。該選項開啟期間，A 執行的是這一攻擊移動而不是向左轉，所以請改用左方向鍵轉向，「向左轉」預設也帶著這個鍵，或者給「向左轉」另外指定一個你自己的按鍵。',
   'guide.controls.mobileHeading': '行動裝置上',
   'guide.controls.mobileBody':
     '在手機與平板上會自動顯示觸控操作：左側為移動搖桿，在其他任意處拖曳即可環顧，用兩指捏合來縮放鏡頭，並有螢幕上的按鈕供你使用技能與選單。左上角的一個小箭頭可以顯示或隱藏選單按鈕，而那裡的「更多」按鈕則收納了你其餘的視窗。',
   'guide.settingsPage.heading': '設定與效能',
   'guide.settingsPage.intro':
     '讓遊戲畫面美到極致，或跑得飛快。三套現成配置，加上每個圖形選項的真正作用。',
-  'guide.settingsPage.wherePath':
-    '本頁介紹的一切都在遊戲裡：按下 Esc 開啟選項。選單會開在釘選要項的「總覽」頁，類別則排列在一旁的軌道上：以下的設定位於「顯示」群組中的「圖形」、「介面」與「無障礙」之下，而「效能監視器」則在「系統」之下。更快的方式，是在頂端的搜尋框輸入名稱，直接跳到它。',
+  'guide.settingsPage.wherePath': '本頁所述的一切都在遊戲裡：按 Esc 開啟遊戲選單。它以按鈕形式列出各個面板：按鍵設定、手把、圖形、介面、光環、音效和效能浮層，下方還有維基、脫困、登出和返回遊戲，連線遊玩時「回報問題」也會加入這份列表。圖形與介面涵蓋了這裡描述的幾乎全部內容。',
   'guide.settingsPage.fairnessTitle': '天生公平',
-  'guide.settingsPage.fairnessBody':
-    '這裡沒有任何選項會用畫面換取優勢。調低設定只會捨去外觀上的修飾，絕不會犧牲作戰所需的資訊：你的減益效果、施法條、隊伍血量與傷害數字，從「低」到「超高」完全相同。用入門機器遊玩絕不吃虧。',
+  'guide.settingsPage.fairnessBody': '這裡沒有任何選項拿美觀去換取實力。較低的設定只會捨棄外觀上的潤飾，絕不會捨棄你賴以戰鬥的資訊：你的減益、施法條、隊伍生命值和傷害數字，從 Low 到 Insane 完全一致。用一台普通的機器遊玩從來不是劣勢。',
   'guide.settingsPage.loadoutsHeading': '三套現成配置',
   'guide.settingsPage.loadoutsIntro':
     '先從聽起來最像你機器的配置開始，再一次調整一個選項，直到感覺對了為止。',
   'guide.settingsPage.recommended': '推薦',
   'guide.settingsPage.whyLabel': '為什麼有效：',
-  'guide.settingsPage.tagReload': '需重新載入',
+  'guide.settingsPage.tagReload': '按「套用」',
   'guide.settingsPage.fpsTitle': '效能優先',
   'guide.settingsPage.fpsTagline': '適合較舊的筆電、內顯，以及使用電池遊玩的時候。',
   'guide.settingsPage.fpsWhy':
     '圖形品質是總開關，渲染品質則是效果最強的滑桿：調到 70% 時，世界只需繪製約一半的像素，介面卻依然完全清晰。',
   'guide.settingsPage.balancedTitle': '平衡',
   'guide.settingsPage.balancedTagline': '大多數機器的甜蜜點，也是我們的預設建議。',
-  'guide.settingsPage.balancedWhy':
-    '「中」就有真實陰影與完整材質，「高」再加上環境光遮蔽與光暈。只要低於「超高」，內建安全網就會在激烈戰鬥中吸收突然的效能下滑，因此「平衡」不必費心照顧也能保持順暢。',
+  'guide.settingsPage.balancedWhy': 'Medium 帶來真實的陰影和完整的材質，High 又在其上加入環境光遮蔽與泛光。內建的安全網在每一檔都保持張開，因此 Balanced 無需你照看便能撐過一場熱鬧的戰鬥。',
   'guide.settingsPage.visualsTitle': '極致畫質',
   'guide.settingsPage.visualsTagline': '給高階桌機的截圖模式。',
-  'guide.settingsPage.visualsWhy':
-    '「超高」會以你螢幕支援的最高解析度繪製，並呈現最豐富的光照。它同時會關閉安全網，而且僅限桌機：手機與 App 版最高到「高」為止。',
+  'guide.settingsPage.visualsWhy': 'Ultra 會以你顯示器所能提供的最高解析度、最豐富的光照進行算繪。其上還有 Insane，那是全部開滿的展示檔：這一檔必須你親手選擇，因為無論你的機器多強，遊戲都不會替你選它。',
   'guide.settingsPage.value50to70': '50% 到 70%',
   'guide.settingsPage.value90to100': '90% 到 100%',
   'guide.settingsPage.value100': '100%',
@@ -6000,19 +5936,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.valueOnOptional': '開啟（可選）',
   'guide.settingsPage.howHeading': '選項的運作方式',
   'guide.settingsPage.factDetectTitle': '遊戲會先自我調校',
-  'guide.settingsPage.factDetectBody':
-    '首次啟動時，遊戲會偵測你的裝置並挑選合適的檔位：入門手機用「低」，高效能桌機用「超高」。而你親自做的選擇永遠優先。',
+  'guide.settingsPage.factDetectBody': '首次啟動時，遊戲會讀取你的裝置並為你存下一個合理的檔位。所有手機和平板都從 Low 起步，好讓你直接進入世界，老舊或軟體算繪的顯示卡同樣如此。強勁的桌上型電腦從 Ultra 起步，若這台機器看起來記憶體吃緊則從 High 起步。遊戲無法判定的一律停在 Medium。你自己做出的任何選擇永遠優先，並且會保留下來。',
   'guide.settingsPage.factReloadTitle': '兩種類型的選項',
-  'guide.settingsPage.factReloadBody':
-    '圖形品質與進階選項需要重新載入後才會生效，必要時面板會出現「立即重新載入」按鈕。其他所有選項則是一改就生效。',
+  'guide.settingsPage.factReloadBody': '圖形面板編輯的是一份草稿。更改「圖形品質」或任意細節旋鈕，然後按「套用」，遊戲就會在你所站之處重建世界，無需重新載入。按鈕旁的那行字會告訴你何時完成。其他所有選項，無論在該面板還是別處，都在你更改的那一刻生效，只有徹底失敗的重建才會轉而向你提供一個重新載入按鈕。',
   'guide.settingsPage.factGovernorTitle': '內建安全網',
-  'guide.settingsPage.factGovernorBody':
-    '在「超高」以下的所有檔位，當大型戰鬥造成瞬間負載時，遊戲會悄悄暫時減少草叢、特效與光照，狀況過去後再恢復原狀。選擇「超高」則代表你寧可保留每一分細節。',
-  'guide.settingsPage.advancedHeading': '「進階」預設：自由調配',
-  'guide.settingsPage.advancedBody':
-    '「進階」以「高」這一檔為起點，並解鎖四個額外選項，讓你把效能花在真正看得出差別的地方：地形細節、植被密度、特效與光照，以及陰影品質。它們和圖形品質一樣，需要重新載入後才會生效。',
-  'guide.settingsPage.advancedMixes':
-    '兩種人氣搭配：把陰影品質維持在「高」、特效與光照調成「低」，畫面清爽俐落、沒有光暈，跑起來也輕鬆；或者反過來，保留光暈，讓陰影柔和一些。',
+  'guide.settingsPage.factGovernorBody': '每一檔都保持安全網張開：當一場大戰陡然升溫時，遊戲會悄悄稀疏草地、特效和光照片刻，隨後再將它們復原。Ultra 與 Insane 只是會等得久得多才這麼做，所以高階預設絕不會因為單獨一格畫面變慢而受到打擾。',
+  'guide.settingsPage.advancedHeading': '細節旋鈕與 Advanced 混搭',
+  'guide.settingsPage.advancedBody': '你不必選擇 Advanced 才能看到細節旋鈕。圖形面板始終以兩張卡片展示它們：世界細節包含地形細節、植被密度、表面細節、視野距離、水面品質和角色細節，光照與特效包含特效與光照、陰影品質、環境光遮蔽、泛光、抗鋸齒、動態光源和粒子效果。在固定預設之下，每個旋鈕都會大致顯示該預設所處的位置。',
+  'guide.settingsPage.advancedMixes': '兩種常用混搭：把陰影品質保持在高，並把特效與光照調到 Low，可得到清爽無光暈、執行輕快的畫面；或者反過來，保留泛光並柔化陰影。混搭之前有一點需要知道：環境光遮蔽、泛光和抗鋸齒與特效與光照掛在同一條鏈上，因此那個旋鈕處於 Low 時，它們便無從運作。',
   'guide.settingsPage.tableHeading': '每個圖形選項，逐一解說',
   'guide.settingsPage.colSetting': '選項',
   'guide.settingsPage.colDoes': '作用',
@@ -6033,8 +5964,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '決定介面本身可以多華麗：玻璃模糊、光暈、選單動畫。「自動」會配合你的瀏覽器；無論怎麼選，3D 世界都不受影響。',
   'guide.settingsPage.rowTerrainDetail': '豐富細膩的混合地面材質，或是較簡單、跑得較快的地形外觀。',
   'guide.settingsPage.rowFoliageDensity': '角色周圍草叢生長的範圍與密度。',
-  'guide.settingsPage.rowEffectsQuality':
-    '光暈、環境光遮蔽，以及有多少火把和法術會投射真實光源。是進階選項中省效能最多的一項。',
+  'guide.settingsPage.rowEffectsQuality': '泛光、環境光遮蔽，以及有多少火把和法術投出真實光照。細節旋鈕中單項節省最大的一個，也是其餘光照旋鈕所依賴的那個開關。',
   'guide.settingsPage.rowShadowQuality': '陰影的銳利程度。「低」仍保留陰影，只是邊緣較柔和。',
   'guide.settingsPage.rowFrostedPanels':
     '視窗背後的霧面玻璃模糊。很漂亮，但也正是較弱的瀏覽器最有感的那種效果；關閉它，就是經典的俐落外觀。',
@@ -6042,21 +5972,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '移除介面動畫，讓視窗立即出現。首先是無障礙選項，順帶帶來少許效能提升。',
   'guide.settingsPage.rowPerfOverlay':
     '在畫面上即時顯示 FPS、影格時間等數據。調整本頁設定時先開著，調完再關掉。',
-  'guide.settingsPage.tableFoot':
-    '想找繪製距離滑桿或 FPS 上限嗎？其實不必找：可視距離已內建在各品質檔位中，影格節奏則交由你的顯示器決定。',
+  'guide.settingsPage.tableFoot': '在找幀數上限？沒什麼可找的：畫面節奏跟隨你的顯示器。繪製距離是一個獨立的旋鈕，即世界細節卡片中的「視野距離」，每個預設都會替你設定它，直到你親自調動為止。',
   'guide.settingsPage.mobileTitle': '在手機與平板上',
-  'guide.settingsPage.mobileBody':
-    '行動裝置上，遊戲會替你打理更多：自動挑選檔位、將解析度稍微壓低以節省電力並抑制發熱，最高的幾個檔位則僅限桌機。上面的配置依然適用，只是手機最高到「高」為止。',
-  'guide.settingsPage.touchBody':
-    '在觸控螢幕上，選項還會多出一組專屬的舒適度設定：搖桿的大小與靈敏度、螢幕按鈕的大小與不透明度、左撇子的鏡像佈局、可選的鏡頭搖桿，以及反轉觸控視角，讓螢幕來配合你的雙手，而不是反過來。',
+  'guide.settingsPage.mobileBody': '在手機或平板上，遊戲會讓你從 Low 起步。所有觸控裝置首次啟動時都會落在這一檔，這是刻意為之，好讓你進入世界開始遊玩；隨時可以在圖形面板中自行調高。在 Android 瀏覽器上整條階梯都向你敞開，你的選擇也會保留。在 iPhone 和 iPad 上你依然可以選擇最高的幾檔預設，按下「套用」後它們會立即生效，但遊戲會在你下次啟動時把你退回 High，因為 iOS 可能在建構這麼大的場景時終止分頁。下載的應用程式更為收緊：它的預設列表止於 High，各項系統旋鈕也被隱藏，因為應用程式會自行管理它們。',
+  'guide.settingsPage.touchBody': '在觸控螢幕上，圖形面板會多出一張專屬的觸控操作卡片：搖桿大小與死區、螢幕按鍵大小、操作控制項的不透明度、可選的鏡頭搖桿、供左手玩家使用的鏡像佈局，以及反轉的觸控視角，好讓螢幕遷就你的雙手，而不是反過來。',
   'guide.settingsPage.audioTitle': '聲音與語言',
-  'guide.settingsPage.audioBody':
-    '選項視窗管的不只是畫面。「音訊」分頁提供音效、音樂與語音各自獨立的音量控制，「介面」區則有一個語言選擇器，能當場重新在地化整個介面，無需重新載入。',
+  'guide.settingsPage.audioBody': '選項視窗並非只有畫面。音效中有三個音量滑桿，分別對應音效、音樂和語音，此外還有一個音樂開關，以及四個針對最容易聽膩的聲音的開關：NPC 語音、腳步聲、介面音效和點擊回饋。介面面板的「一般」分頁帶有語言選擇器，可當場重新在地化整個介面，無需重新載入，還有為視窗裝飾準備的主題選擇器。',
   'guide.combat.intro':
     '戰鬥遵循熟悉的經典MMO規則。你完全不需要研究這些就能玩得很好，這只是讓你了解戰鬥運作的大致樣貌。',
   'guide.combat.hitTitle': '並非每一擊都會命中',
-  'guide.combat.hitBody':
-    '攻擊可能會失手或被閃躲，敵人的攻擊也是如此，而法術則可能直接被抵抗。與和你等級相近的對手作戰，正是讓你的攻擊持續命中的關鍵；等級差距愈大，你就愈常揮空。',
+  'guide.combat.hitBody': '攻擊可能落空，也可能被閃避，敵人的攻擊同樣如此。另有兩種應對只屬於玩家：戰士可以用招架卸開一擊，持盾的戰士或聖騎士可以將其化作格擋，兩者都只對來自正面的攻擊有效。世界中的生物兩者皆不會，所以揮向怪物的一擊要麼命中，要麼落空，要麼被閃避。法術自有其規則，從不落空：它們會被抵抗。與自己等級相近的敵人戰鬥，才是讓你的攻擊落到實處的關鍵；等級差距越大，你揮空的次數就越多。',
   'guide.combat.mitigationTitle': '護甲與生命值讓你屹立不搖',
   'guide.combat.mitigationBody':
     '護甲能減緩物理傷害，因此更好的護甲是你在近戰中續戰力的主要來源。魔法則是另一回事：你靠的是更深厚的生命值池，以及直接抵抗一道法術的機會，而非護甲。重甲職業能承受更多，但沒有任何東西能讓你刀槍不入。',
@@ -6064,8 +5989,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.combat.resourcesBody':
     '戰士在激戰中累積怒氣，盜賊消耗會穩定回復的能量，施法者則管理一池法力。掌握你的資源，等於掌握了玩好職業的一半。',
   'guide.combat.growTitle': '你每升一級都會更強',
-  'guide.combat.growBody':
-    '每一級都會讓你更強韌並解鎖新技能，一路直到 {cap} 級的上限。進行任務是升級最快的途徑；狩獵、地城與秘探則讓過程更完整。',
+  'guide.combat.growBody': '每一級都會讓你更耐打，並解鎖新的技能，一路直到 {cap} 級的上限。任務是向上攀升最快的途徑；狩獵、地城、秘探，以及你一路上經營的專業，則補足其餘。',
   'guide.combat.queueTitle': '你的下一招早已上膛',
   'guide.combat.queueBody':
     '你不必把按鍵時機掐準到每一格。在當前技能仍在施放時按下你的下一個技能，它便會排入佇列，在施法完成的那一瞬間立刻發動，讓熟練的操作流暢無間。有些近戰打擊也以同樣的方式運作，隨著你的下一次武器揮擊一併出手。',
@@ -6099,7 +6023,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a2':
     '不需要。沒有它遊戲也能完整遊玩。選用的社群代幣僅增添外觀裝飾，以及每日獎勵獎池的一份分紅，絕不影響戰力或進度。',
   'guide.faqPage.q3': '我可以在手機上玩嗎？',
-  'guide.faqPage.a3': '可以。遊戲可在行動瀏覽器中以觸控操作運行，另外也提供電腦版啟動器。',
+  'guide.faqPage.a3': '可以。遊戲能在任何現代行動瀏覽器中以觸控操作執行，也有應用程式：iOS 與 Android 版本，以及一款會自行保持更新的 Windows、macOS 和 Linux 桌面應用程式。',
   'guide.faqPage.q4': '我可以離線或單人遊玩嗎？',
   'guide.faqPage.a4':
     '可以。遊戲提供即時的單人離線模式，而線上世界除了地城、團隊副本與世界首領之外，皆可完全單人完成。',
@@ -6175,19 +6099,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.family.reptile.name': '爬行類',
   'guide.family.reptile.desc': '冷血的獵手，帶著獨有的嘶聲與撕咬，與溫血的野獸截然不同。',
   'guide.worldPage.heading': '世界',
-  'guide.worldPage.intro':
-    'World of ClaudeCraft 是一片你需徒步橫越的連綿大地，三大區域由南向北排列。沒有快速旅行，所以旅程本身就是冒險的一部分。',
+  'guide.worldPage.intro': 'World of ClaudeCraft 是一片你要靠雙腳走遍的連續大陸。古道自南向北穿過起始山谷、沼澤和山峰，並越過它們繼續攀升，通向其後的窪地以及地圖頂端的雪境。自那條路向西展開一列更高等級的國度，向東另有一列，谷地東岸外還有一座島嶼。這裡沒有快速旅行，沒有飛行路線，也沒有馬車：每一段路程都靠步行或騎乘完成，所以抵達本身就是冒險的一部分。\n\n這片大地也記錄著時間。晝夜循環依照一只你所在世界人人共享的真實時鐘運轉，因此天空會為你們所有人同時從黎明經正午走向黃昏與夜色，月亮循著盈虧來去，地面上的光影也隨之變化。小地圖周圍的錶盤，就是你讀取時辰的地方。',
   'guide.worldPage.hub': '主據點',
   'guide.worldPage.valeBlurb': '翠綠的起始山谷，新英雄在東溪鎮周圍與群狼和盜匪交手、磨練本領之處。',
   'guide.worldPage.marshBlurb':
     '一片被霧氣與廢墟淹沒的國度。泥鰭成群湧入淺灘，更古老之物在水下蠢動，沼橋鎮的人們從橋上警戒注視著。',
-  'guide.worldPage.peaksBlurb':
-    '被狂風刮蝕的山脊與古老的礦坑，向上攀升至王國中最寒冷、最高處的險境，由高守哨站鎮守。',
+  'guide.worldPage.peaksBlurb': '被風削蝕的山脊和古老的礦場向上攀升，直抵起始之路上最嚴酷的危險，由高瞭前哨據守。',
   'guide.questsPage.heading': '任務',
   'guide.questsPage.intro': '任務是世界的核心，也是升級最快的途徑。以下說明它們的運作方式。',
   'guide.questsPage.acceptTitle': '尋找與接取',
-  'guide.questsPage.acceptBody':
-    '頭頂有標記的人有工作要交給你。與他們交談即可接取任務。在東溪鎮，執法官紅溪正等著你接下「狼臨城下」，這是你最先能接的任務之一。',
+  'guide.questsPage.acceptBody': '頭頂帶有標記的人有活兒要交給你，而標記會告訴你是哪一類。金色驚嘆號表示一個你現在就能接下的任務，金色問號表示一個你已完成、可以繳交的任務。在名牌上你還會看到灰色問號，它表示你正在做那個任務但尚未完成。可重複的活計使用同樣的標記，只是呈藍色：亮藍色驚嘆號是你做過、可以再接的差事，同樣的標記若顯得黯淡，則表示它仍在等待期內。除灰色之外的每一種標記都會顯示在名牌、小地圖和世界地圖上，因此你能隔著半座城發現活兒。在東溪鎮，紅溪元帥正帶著「門前之狼」等著你，那是你最早能接的任務之一。',
   'guide.questsPage.objectivesTitle': '目標',
   'guide.questsPage.objectivesBody':
     '擊殺特定敵人、收集物品，或與世界中的某物互動。畫面上的任務追蹤器會隨著你的進展計算進度。若你改變心意，可以從任務記錄中放棄一項任務，日後再從發布者那裡重新接取。',
@@ -6205,9 +6126,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.heading': '地城與團隊副本',
   'guide.dungeonsPage.intro':
     '當開放世界不夠盡興時，召集一支隊伍踏入副本：一份專為你的隊伍打造的地城私人副本。',
-  'guide.dungeonsPage.party': '地城為五人小隊設計。最終的團隊副本則供十人挑戰。',
-  'guide.dungeonsPage.soloLead':
-    '每座地城都以一個可單人完成的前導任務開場，讓你隨時都清楚自己為何而戰。',
+  'guide.dungeonsPage.party': '地城是為五人隊伍設計的。終局團隊副本則是十人。如果你手邊湊不齊四位朋友，地城搜尋器會為它排隊的那些副本組建隊伍。下方每張卡片上的等級區間，是這段副本所面向的等級，而不是門上的鎖：沒有什麼能阻止你提前進入或稍後再來，只不過地城搜尋器只會把你安排進與你等級相稱的副本。',
+  'guide.dungeonsPage.soloLead': '動身之前先在附近的城鎮打聽打聽：那裡的任務發布者會派發終點就在這些廳堂之中的任務鏈，帶著一條進去，意味著這趟副本收益翻倍。',
   'guide.dungeonsPage.levelAround': '約 {n} 級',
   'guide.dungeonsPage.levelExact': '{n} 級',
   'guide.dungeonsPage.raidSize': '十名玩家，{n} 級',
@@ -6220,8 +6140,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeName': '沉沒神殿',
   'guide.dungeonsPage.templeBody': '沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。',
   'guide.dungeonsPage.sanctumName': '墓龍聖所',
-  'guide.dungeonsPage.resetBody':
-    '在隊伍仍持有已認領副本時切換難度，舊的認領會保留一段時間後自行清除。隊長也可以立即放棄它們：在自己的頭像選單中選擇「重置所有地城副本」，或輸入 /dungeon reset。重置只有在難度確實更改之後才能進行，且副本內不能有任何人（無論生死）留守，兩次重置之間還隔著一段短暫的冷卻。帶著錯誤的難度來到門口，遊戲會在開打之前直接提醒你。團隊副本永遠不會以這種方式重置；它遵循自己的鎖定規則。',
+  'guide.dungeonsPage.resetBody': '在隊伍仍佔用著副本時切換難度，舊的佔用會滯留一陣，然後自行釋放。隊長也可以讓它們一次性釋放：在自己的頭像選單中選擇「重置所有副本」，或輸入 /dungeon reset。重置只有在難度確實更改之後才生效，只有在裡面不再有任何人（無論活著還是倒下）時才生效，只有在裡面每具屍體都被拾取乾淨之後才生效，而且兩次重置之間隔著一段短暫的冷卻。若你們帶著錯誤的難度來到門口，遊戲會在副本開始前告知。團隊副本從不以這種方式重置；適用的是它自己的鎖定規則。',
   'guide.dungeonsPage.resetTitle': '重置你的地城副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。',
   'guide.dungeonsPage.wildheartBody':
@@ -6232,13 +6151,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.heroicTitle': '英雄模式',
   'guide.dungeonsPage.heroicBody':
     '每座五人地城，以及團隊副本本身，都有一個等在等級上限之後的英雄版本。同樣的殿堂，為裝備精良的終局隊伍重新打造：一切都打得更痛，沒有什麼能靠雙腿甩開，首領更是對昏迷與緩速完全免疫。先超越普通版本吧；英雄難度假定你早已做到。',
-  'guide.dungeonsPage.heroicHowBody':
-    '在你的隊伍認領副本之前先選好難度：輸入 /dungeon heroic，或切換隊伍選單上的「地城難度」開關。這個選擇由全隊共享，並在踏入大門時鎖定，因此一趟征程始終保持它被認領時的樣子。',
+  'guide.dungeonsPage.heroicHowBody': '在隊伍佔用副本之前先選好難度：輸入 /dungeon heroic，或在自己的頭像選單中選擇「設定地城難度」。獨自一人時由你自己設定；在隊伍中只有隊長可以設定，而這一選擇對所有人生效並在門口鎖定，因此一段副本會始終保持它被佔用時的樣子。',
   'guide.dungeonsPage.heroicRewardsTitle': '英雄徽記與升級版戰利品',
-  'guide.dungeonsPage.heroicRewardsBody':
-    '英雄首領掉落你所熟悉的戰利品，經過升級並在提示框上標註「英雄」，而每趟征程的最終首領還會追加別處找不到的史詩裝備。那最後一擊也會為每位參與者留下英雄徽記：一種在高望的軍需官維克斯處花用的貨幣，他存貨中的戒指與項鍊是全王國唯一的珠寶。',
-  'guide.dungeonsPage.heroicLockoutBody':
-    '普通地城可以整天連刷。英雄難度則講求耐心：每座地城每天只獎勵一次英雄通關，團隊副本也為每種難度各保有一個每日鎖定。已通關的征程對它自己的隊伍永遠敞開，所以沒有人會被擋在自己掙得的戰利品之外。',
+  'guide.dungeonsPage.heroicRewardsBody': '英雄難度的首領掉落你熟悉的戰利品，只是經過升級並在提示中標註為「英雄」，而每段副本的最終首領還會額外掉落別處找不到的史詩物品。那最後一次擊殺也會為每位參與者留下英雄印記：一種在高瞭的軍需官維克斯處使用的貨幣，他的櫃檯是一排戒指和墜飾，除了來自英雄深處的證明之外，別無他物能夠購得。',
+  'guide.dungeonsPage.heroicLockoutBody': '普通地城可以整天地跑。英雄難度則要求耐心：最終首領的擊殺會把這趟副本中的所有人限制為該地城每天一次英雄通關，而團隊副本對每種難度各保有一份每日鎖定。在連線的國度上，所有每日鎖定都會在該國度自己的夜間重置時刻一併解除，因此在那個時刻之前不久完成的一趟，與剛過之後完成的一趟，會落在兩個不同的日子裡；若改在瀏覽器中離線遊玩，鎖定則只是在你自己擊殺之後一天到期。已經通關的五人副本仍對它自己的隊伍開放，可用於跑屍和拾取，因此沒有人會被擋在自己在那裡掙得的收穫之外。團隊副本更為嚴格：一旦它的擊殺鎖定了你，門便會關閉直到重置，而唯一回到裡面的途徑，是由恰好在那趟鎖定他們的副本中倒下的人跑屍帶入，因此活著走出去的團隊成員，就是這一天都走出去了。離開競技場之前請收齊你的戰利品。這些鎖定各自屬於掙得它的那個角色，因此在主力角色上的一次通關，並不妨礙你其他角色的自由。',
   'guide.abilityHook.arcane_intellect': '提升智力以擴大友方的法力上限，開怪前先施放。',
   'guide.abilityHook.arcane_shot': '從遠處射出的瞬發一擊，迅速造成額外傷害。',
   'guide.abilityHook.aspect_of_the_hawk': '持續維持的姿態，用來強化你的遠程攻擊強度。',
@@ -6282,18 +6198,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.rejuvenation': '瞬發施放，持續為友方回復生命，讓你能繼續行動。',
   'guide.abilityHook.renew': '隨時間持續跳動的治療，適合施放後繼續移動。',
   'guide.abilityHook.rockbiter_weapon': '為武器附魔，讓你近戰每一擊都更沉重。',
-  'guide.abilityHook.seal_of_righteousness': '為你的攻擊附加神聖傷害，再以裁決將其釋放消耗。',
+  'guide.abilityHook.seal_of_righteousness': '為你的近戰揮擊附上額外的神聖傷害。',
   'guide.abilityHook.serpent_sting': '施加毒液，隨時間造成持續的自然傷害。',
   'guide.abilityHook.shadow_bolt': '向目標施放一道暗影箭，是你慣用的核彈。',
   'guide.abilityHook.shadow_word_pain': '在敵人身上貼上一層暗影腐蝕，趁它持續跳動時轉而行動。',
   'guide.abilityHook.sinister_strike': '你可靠的一擊，累積連擊點供日後消耗。',
   'guide.abilityHook.smite': '一道神聖箭矢，從遠處慢慢削弱目標。',
-  'guide.abilityHook.summon_imp': '召喚一隻燼裔，從遠處朝敵人投擲火焰箭。',
+  'guide.abilityHook.summon_imp': '召來一隻燼裔，從遠處向敵人施放邪能箭。',
   'guide.abilityHook.thorns': '守護友方，讓近戰攻擊者每次出手都會傷到自己。',
   'guide.abilityHook.thunder_clap': '打擊你周遭的一切並降低它們的攻擊速度。',
   'guide.abilityHook.wrath': '從遠處朝目標擲出一道自然箭矢，是你慣用的核彈。',
-  'guide.arenaPage.coliseumBody':
-    '灰燼競技場是這個王國的競技場，你會在排名對戰中面對其他玩家，進行一對一或二對二的較量。每個級別都各自保有自己的排名，因此一場勝利能讓你在那道天梯上往上爬，讓整個王國都看得見。開啟競技場視窗即可報名參加某個級別，可以獨自一人，也可以與你的搭檔一同上場。',
+  'guide.arenaPage.coliseumBody': '鬥獸場是國度的競技場，你在那裡與其他玩家進行評級比賽，一對一或二對二。每個組別各自保有自己的排名，因此一場勝利會讓你在那道階梯上攀升，供整個國度觀看。評級玩法在 15 級開啟，這一條對你的隊友同樣適用：只要你們其中一人未達標，佇列就保持關閉，直到你們兩人都符合條件為止。整個玩家對戰玩家都藏在一個標著 PvP 的按鈕之後：開啟它並選一個分頁，荊谷原野、一對一或二對二，然後獨自或與隊友一同報名。你在排隊或比賽期間，其餘分頁都保持鎖定，因此你絕不可能同時身處兩個佇列。',
   'guide.arenaPage.coliseumHeading': '灰燼鬥獸場',
   'guide.arenaPage.duelsBody':
     '向你遇到的任何玩家發起一場友誼決鬥。賭上的只有顏面，所以這是學習對戰組合或解決友好爭論最簡單的方式。',
@@ -6325,8 +6240,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.petsNote': '術士召喚惡魔並肩作戰，每隻各擅長不同的任務。',
   'guide.dungeonsPage.levelBand': '等級 {min} 至 {max}',
   'guide.dungeonsPage.partySize': '{n} 名玩家',
-  'guide.faqPage.a10':
-    '等級上限是 {cap} 級。從那裡開始，你可以挑戰五人地城與十人團隊副本，再以英雄模式重新征服它們以取得升級版戰利品，在世界首領崛起時與他一戰，在競技場中考驗自己，帶著一名同伴深入秘探，並在功績之書中追逐功績，以攀登王國排名。',
+  'guide.faqPage.a10': '上限是 {cap} 級。從那裡開始，你可以跑五人地城和十人團隊副本，以英雄模式再度挑戰以取得升級過的戰利品，沿著裂隙一層層深入，在世界首領現身時與之一戰，在競技場或荊谷原野戰場上檢驗自己，打一個賽季的谷地盃，帶上一名同伴潛入秘探，把一門專業一路做到傑作製作，收集坐騎，並在功績之書中追逐功績以攀升排行榜。',
   'guide.faqPage.a11':
     '邀請你遇到的任何人組隊、在聊天中招募，或在地城前湊隊。世界上大部分內容都能單人完成，所以組隊是一種選擇，而非必要。',
   'guide.faqPage.a9':
@@ -6354,8 +6268,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.heroicDef':
     '地城或團隊副本的更高難度版本，為裝備精良的終局隊伍而調校。英雄首領會掉落升級版戰利品，最終首領還會給予英雄徽記。',
   'guide.glossary.heroicTerm': '英雄',
-  'guide.glossary.loadoutDef':
-    '一套已儲存的天賦分配。保留數套，即可在不同構築之間切換，無需一點一點重新投入天賦點。',
+  'guide.glossary.loadoutDef': '一套已儲存的天賦配置，最多可存十套。每一套都會記住它的各排選擇和它的快捷列，也可以記住你當時穿著的裝備，因此切換構築只需一次點擊，而不必逐排重做。',
   'guide.glossary.loadoutTerm': '配置',
   'guide.glossary.mobDef': '世界中任何由電腦控制的生物，無論友善或敵對。是mobile的簡稱。',
   'guide.glossary.mobTerm': '怪物',
@@ -6371,7 +6284,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.soulboundDef':
     '從你取得的那一刻起便與你的角色綁定的物品。它無法交易、郵寄、賣給商人，也無法在市場上架。',
   'guide.glossary.soulboundTerm': '靈魂綁定',
-  'guide.glossary.specDef': '專精：隨著你投入天賦，讓職業偏向某個方向的路線，例如治療或傷害。',
+  'guide.glossary.specDef': '專精：你在 5 級為自己的職業選定的道路，例如治療或輸出。它確定你的定位，授予一個標誌性技能和一份持久的精通，並且即使你重置天賦，它也會一直留在你身上。',
   'guide.glossary.specTerm': '專精',
   'guide.glossary.spiritHealerDef':
     '盤旋於每座墓地之上的看護者，能以一段短暫的虛弱為代價，讓你的鬼魂當場復生。',
@@ -6384,9 +6297,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': '競技場與PvP',
   'guide.nav.talents': '天賦',
   'guide.nav.wishIKnew': '我希望早點知道的事',
-  'guide.petHook.emberkin': '一隻遠程的火焰箭惡魔，從安全距離外慢慢削弱敵人。',
+  'guide.petHook.emberkin': '一隻遠程惡魔，其標誌性的邪能箭能從安全距離消磨敵人。',
   'guide.petHook.pyre_colossus': '一隻龐大的巨獸，擁有摧枯拉朽的近戰，為純粹的力量而召喚。',
-  'guide.petHook.gloomshade': '一隻堅實的惡魔，會嘲諷並吸收攻擊，讓你能安心施法。',
+  'guide.petHook.gloomshade': '一隻結實的坦克惡魔，會嘲諷，並用深淵鎖鏈把逃跑的普通敵人拽回攻擊範圍；首領會抵抗這一拉扯。',
   'guide.related': '相關內容',
   'guide.search.label': '搜尋',
   'guide.search.noResults': '沒有符合的結果',
@@ -6411,24 +6324,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.tag.ranged': '遠程',
   'guide.tag.simple': '簡單',
   'guide.tag.solo': '適合單人',
-  'guide.talentsPage.choiceNote':
-    '每棵天賦樹上都有少數幾點是十字路口，而非單純的購買：該節點提供兩到三個選項，而你只能認定其中之一。你的下一次重置會重新開啟這個選擇，就像樹上的其他一切一樣。',
+  'guide.talentsPage.choiceNote': '每一排都是一個岔路口：它提供三個選項，而你要在其中擇一而定。你下一次重置會重新打開這些選擇中的每一個。',
   'guide.talentsPage.heading': '天賦與專精',
-  'guide.talentsPage.howBody':
-    '天賦在 10 級開放，隨著你向等級上限攀升，會持續獲得點數。你在職業的天賦面板中分配點數，較深的階層會隨著你的投入與升級而開放，而且你可以儲存多套配置以在不同構築間切換。',
+  'guide.talentsPage.howBody': '天賦在 5 級開啟，正是你選擇專精的那一級。隨著你升級，還會陸續開啟五排，分別在 8、11、14、17 和 20 級各一排，因此最後一排恰好落在等級上限。你在職業的天賦面板中做出選擇，位置在「專精」分頁旁邊的「抉擇」分頁。',
   'guide.talentsPage.howHeading': '運作方式',
   'guide.talentsPage.intro':
     '天賦是你讓職業展現個人風格的方式。它們是選擇性的、寬容的，而且容易更動，所以你可以放心嘗試。',
-  'guide.talentsPage.resetNote':
-    '只要脫離戰鬥且不在競技場對戰中，你隨時都能重置天賦，所以早期的選擇絕不會是陷阱。儘管嘗試，看看自己喜歡什麼，並自由地改變主意。',
+  'guide.talentsPage.resetNote': '只要你脫離戰鬥且不在競技場比賽中，隨時都可以重置天賦，所以早期的選擇絕不會成為陷阱。重置會清空你的各排選擇且分文不取，而你的專精保持原樣，因此重置絕不會在副本進行到一半時奪走你的定位。戰場是例外，在那裡你可以在兩場戰鬥之間更改構築。儘管去嘗試，看看自己喜歡什麼，也儘可放心改變主意。',
   'guide.talentsPage.resetTitle': '沒有什麼是永久的',
   'guide.talentsPage.shareNote':
     '一套完成的天賦配置可以複製成一段可分享的短代碼，交給朋友，對方只要把它直接貼進自己的天賦面板即可載入。',
-  'guide.talentsPage.specsBody':
-    '每個職業都有數種專精，各有自己的角色定位和標誌性的著重方向。在天賦面板中選擇其一，會賦予一項標誌性技能與一份專屬的持久精通。以下是它們全部的輪廓。打開某個職業即可查看其完整技能。',
+  'guide.talentsPage.specsBody': '每個職業都有若干專精，各有各的定位和標誌性側重。你在 5 級於天賦面板中選定其一。它授予一個標誌性技能和一份持久的精通，其中大多數還會加上契合該定位的被動加成，同時它也是你在地城搜尋器中報名的定位。以下是它們全部的概貌。開啟某個職業即可查看其完整技能組。',
   'guide.talentsPage.specsHeading': '各職業的專精',
-  'guide.talentsPage.whatBody':
-    '隨著升級，你會獲得天賦點數，可用於小幅且永久地強化你的技能與屬性。它們塑造職業的手感，使其偏向更高的傷害、更堅固的防禦或更強的治療。',
+  'guide.talentsPage.whatBody': '你的天賦是一段簡短的抉擇階梯，而不是一堆點數。每一排開啟時會提供三個選項，而你恰好取其一。它們塑造一個職業的手感，使其偏向更高的傷害、更堅實的防禦或更強的治療。',
   'guide.talentsPage.whatHeading': '天賦的作用',
   'guide.toc.heading': '本頁內容',
   'guide.wishPage.heading': '我希望早點知道的事',
@@ -6438,8 +6346,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.wishPage.i2Body':
     '當你倒下時，你會化為鬼魂在最近的墓地甦醒。跑回你的軀體旁即可免費復活，或者接受靈魂醫者的當場復生，以一段短暫的虛弱換取這份便利。經驗、裝備與錢幣都絕不會失去，所以放心去冒險、去學習。',
   'guide.wishPage.i2Title': '死亡幾乎不會讓你付出代價',
-  'guide.wishPage.i3Body':
-    '天賦在10級解鎖，而且只要脫離戰鬥，想何時重置都可以，所以你早期的選擇絕不是永久的。',
+  'guide.wishPage.i3Body': '你的第一個天賦在 5 級到來，而六排中的每一排都是三選一，因此一套構築不過是一眼便能盡收的幾個決定。只要你脫離戰鬥且不在競技場比賽中，隨時都可以重置，所以早早做出的選擇不會把你鎖死。',
   'guide.wishPage.i3Title': '天賦不是陷阱',
   'guide.wishPage.i4Body':
     '任務是最快的升級方式，並會帶你走遍整個世界。當你不確定該往哪走，就去找下一個標記。',
@@ -6457,9 +6364,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '進食與飲水能快速回復，施法職業尤其如此。現在花幾秒鐘，能省下之後一次死亡。',
   'guide.wishPage.i8Title': '在戰鬥之間休息',
   'guide.wishPage.intro': '幾句能讓新手少走許多冤枉路的真心話。它們都不是必讀，但每一則都有幫助。',
-  'guide.worldPage.mapHeading': '北行之路',
-  'guide.worldPage.mapSub':
-    '三個地區由南而北，等級層層遞增。跟著任務的軌跡走，這片土地會帶你從谷地一路前往群峰。',
+  'guide.worldPage.mapHeading': '這條路與路那頭的國度',
+  'guide.worldPage.mapSub': '任務路線自南向北縱貫地圖中部：山谷、沼澤、山峰，再越過它們通向窪地與雪境。其餘國度是沿著這條路展開，而非在它之後，經由沼澤路東西兩側的傳送門抵達，遠岸島則從谷地東岸前往。把你擋在遠方國度之外的是它們的等級區間，而不是路途：其中五處共享最高的區間，因此一旦你準備就緒，便可按任意順序逐一挑戰。遠岸島是例外，那是一片你可以早早造訪的低等級土地。',
   'guide.worldPage.places': '著名地點',
   'guide.worldPage.residents': '你將遇見的人物',
   'guide.bestiary.flavor.gravecaller_cultist':
@@ -6473,8 +6379,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.shardlord_kazzix':
     '一具長出了肩膀的風暴元素，行走在風暴岩之上的遠處峭壁間，身上的心核碎片值得人冒著雷電去搶。',
   'guide.bestiary.notedLabel': '值得一提',
-  'guide.combat.ccBody':
-    '控場是一種特殊的減益，會限制目標所能做的事：昏迷、定身與緩速、阻斷施法的沉默、繳械、恐懼，還有能讓敵人短暫變得無害的變形。對上其他玩家時，控制會隨著重複而磨損：同一類控場重複施加得太快便會減弱、繼而完全失效，而一記從潛行中開場的昏迷會與其後的昏迷分開計算，因此沒有人能被永無止盡地連鎖控制。這個世界的生物則沒有這種記性：控場對牠們永遠不會因重複而減弱，不過許多最強大的敵人，包括具名的菁英與其中最強的首領，則完全無法被控制。',
+  'guide.combat.ccBody': '控制是一類特殊的減益，它限制目標能做的事：昏迷、定身和減速、打斷施法的沉默、繳械、恐懼，以及讓對手片刻之間無害的變形。對上其他玩家時，大多數控制會因重複而遞減：恐懼、變形、定身和法術學派封鎖若過快地再次施加，持續時間會縮短，隨後徹底失效，因此沒有人會被永遠壓制。昏迷是刻意的例外，因為它本就短暫且背後有實打實的冷卻，所以重複施加從不會縮短它，儘管縮減控制時長的裝備依然會削減它。世界中的生物並無這般記仇：對它們而言，控制從不會因重複而減弱，不過許多最強大的敵人，其中有名的精英和最強的首領，根本無法被控制。',
   'guide.combat.deathBody':
     '若你的生命值歸零，你便當場倒下，你的軀體會留在原地。釋放你的靈魂，你會化為鬼魂在最近的墓地甦醒：比活人腳程更快、敵人也無法觸及，卻無法戰鬥、拾取，也無法與任何人交談，唯獨盤旋在墓石之上的靈魂醫者例外。接下來由你選擇。讓你的鬼魂跑回軀體旁，你便會當場復活，回復部分生命與法力，毫無任何懲罰。或者接受靈魂醫者的當場復生，代價則是「復活虛弱」：一種對你全身上下的暫時削弱，你的資歷愈深，它持續得愈久，而全新的角色則可完全免除。若你在地城中倒下，你的靈魂會在外頭的墓地等候；讓你的鬼魂走回門前，你便會在入口處復活。秘探則是例外：在那裡倒下，你只會被重新扶起於秘探的入口處，不過第二次倒下便會結束這趟探索。無論哪條路，你都不會損失經驗、裝備或錢幣。戰鬥之間，坐下進食飲水，好讓你以全盛狀態迎接下一場。',
   'guide.combat.deathTitle': '當你倒下時',
@@ -6507,30 +6412,26 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '商人經營著世界市場，那是一個由玩家驅動的交易所，讓你能與或許從未謀面的人買賣。與東溪鎮的商人交談，或找高守哨站上的拍賣師沃斯，即可開啟它：兩位管理者服務於同一個共享市場。商人也會在那裡長期掛售自己的一批貨品，因此即使沒有其他玩家上架，也總有東西可買。',
   'guide.economy.marketBrowse':
     '瀏覽：捲動列表或按名稱搜尋，找出待售的商品。每筆刊登都會顯示貨物、賣家，以及整堆的開價。',
-  'guide.economy.marketCollect':
-    '收取：當你的貨物售出後，所得款項會在商人處等著你。回去領取錢幣，連同任何未售出而退回的物品。每筆完成的交易，商人都會抽取一小筆費用。',
-  'guide.economy.marketPost':
-    '刊登：從背包中選一堆物品，設定你的價格，然後刊登出去。在有人買下之前，貨物會由商人代為保管。未售出的刊登過一陣子會退回給你，若你改變心意，也可以提早取回其中一筆。',
+  'guide.economy.marketCollect': '收取：當你的貨物售出時，收益會在商人處等著你。回去領取金幣，連同任何未售出而退回的東西。商人會從每筆完成的交易中抽取一小部分。「收取」分頁會逐項列出等著你的東西，每筆完成的交易一行，寫明貨物、買家以及你賺到的數目，因此在你取走金幣之前，就能確切看到賣出了什麼。',
+  'guide.economy.marketPost': '上架：從背包中挑出一疊，定下你的價格，然後掛上去。貨物由商人保管，直到有人買下為止。未售出的掛單過一陣會回到你手上，若你改變主意，也可以提前取回其中一件。上架本身是免費的，因此一個樂觀的價格只會花掉你一點時間。',
   'guide.economy.marketPricing':
     '定價由你決定。開價稍低於他人通常賣得更快，而開價過高則可能乏人問津。刊登之前先瀏覽一下，看看目前的行情如何。',
   'guide.economy.marketTitle': '世界市場',
   'guide.economy.marksBody':
     '錢幣並非你唯一能積攢的東西。秘探會給予秘探印記，只能在秘探看守人處花用，用於同伴升級以及在別處找不到的裝備。英雄地城的征程則會在最終首領身上留下英雄徽記，在高望的英雄軍需官處花用，換取王國任何其他角落都不出售的珠寶。兩者都絕不會與你的錢幣混在一起。',
-  'guide.economy.marksTitle': '印記與徽記：錢幣之外的貨幣',
+  'guide.economy.marksTitle': '印記與榮譽：金錢之外的貨幣',
   'guide.economy.tradeBody':
     '你可以與站在你身旁的任何人面對面交易。雙方都把物品與錢幣放進一個共享的視窗，唯有兩人都確認後交換才會成立，因此誰都不會吃虧。這是把掉落物交給朋友或敲定一筆買賣最簡單的方法。',
   'guide.economy.tradeTitle': '與其他玩家交易',
   'guide.economy.vendorsBody':
     '城鎮與哨站裡到處是商人，各有各的生意。補給商備有食物與飲品，武器匠與盔甲匠出售裝備，軍需官則準備實用的旅行用品。走到他們面前，便能看到他們在賣什麼。',
   'guide.economy.vendorsTitle': '商人與他們的存貨',
-  'guide.gear.consumablesElixirs':
-    '藥劑會在你冒險時給予暫時的增益，是一點小小的優勢，在你想再多撐一程時派得上用場。',
+  'guide.gear.consumablesElixirs': '合劑在你冒險途中授予一段臨時的強化，是當你想再往前推進一點時能幫上忙的一點優勢。它們不與藥水共享冷卻，因此你可以喝下一瓶，同時仍留著一瓶治療藥水備用。同一屬性的兩瓶合劑不會疊加，最後喝下的那瓶才是留下的那瓶。',
   'guide.gear.consumablesFood':
     '食物與飲品會在你於戰鬥之間坐下休息時恢復你的狀態。進食回復生命，飲水回復法力，而且這樣的休息是免費的。打完一場硬仗後坐下幾秒鐘，別還沒回滿就衝進下一場。',
   'guide.gear.consumablesIntro':
     '有些物品用一次就能帶來即時的好處。它們是便宜的保險，所以隨身備上幾個吧。',
-  'guide.gear.consumablesPotions':
-    '藥水在你使用的那一刻就能回復生命或法力，即使在戰鬥中也行，這讓它們在一次拉怪出錯時成了關鍵的救命之物。它們共用一段短暫的冷卻時間，所以請挑準一個好時機使用。',
+  'guide.gear.consumablesPotions': '藥水在你使用的那一刻恢復生命或法力，即便身處戰鬥之中也是如此，因此當一次拉怪出了岔子時，它們便是關鍵的救命手段。所有藥水共享同一段長約數分鐘的冷卻，因此每場戰鬥你只有一個好時機，而不是一連串。它們恢復的量也少於坐下進食或飲水，這正是不坐下所付出的代價。藥水按世界的每一段路程分級，所以請帶上為你這個等級打造的那一級：一瓶低級的舊藥水，在長成的角色身上不過是一星半點。',
   'guide.gear.consumablesTitle': '消耗品',
   'guide.gear.cosmeticsApply':
     '在你的角色畫面上的外觀欄位設定當前的造型，並在所有已解鎖的項目間自由切換。',
@@ -6540,8 +6441,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '其中少數來自一個神秘的外觀寶箱，那是一份封存的獎賞，開啟時會隨機擲出三種品質等級之一，並授予相符的外觀。它純粹是為了好看：裡頭沒有任何東西能讓你變強，只會讓你更賞心悅目。',
   'guide.gear.cosmeticsRanks':
     '外觀本身也分稀有度層級，而愈稀有的便愈值得追求。掙得較高的層級，也會一併解鎖其下的各種外觀。',
-  'guide.gear.cosmeticsSkins':
-    '有兩條外觀路線可供收集。大多數職業都有數款替代外觀，那是該職業外貌的全新詮釋，唯你能穿戴。在它們之外還有染色：具名的雙色配色方案，能徹底為一款外觀重新上色，從沉穩的金屬色到鮮明的帝國色調皆有。',
+  'guide.gear.cosmeticsSkins': '你角色的外觀分為兩條線。大多數職業都有數種備選外觀，那是對職業造型的一番全新演繹，供你穿戴。與之並列的是配色：一組組有名有姓的雙色方案，能把一副造型徹底重塗，從沉穩的金屬色直到明亮的帝國色調。',
   'guide.gear.cosmeticsTitle': '外觀與裝飾',
   'guide.gear.fishingBody':
     '釣魚是一種沉靜的調劑。裝備一根釣竿，向開闊的水域拋竿，再把上鉤之物拉上來。你大多會釣到可直接食用的魚，偶爾賣得幾枚銅板的雜物，以及時不時出現的珍貴稀有漁獲。你能釣到什麼，取決於你下竿的水域。',
@@ -6565,8 +6465,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityRare': '稀有',
   'guide.gear.qualityTitle': '品質一覽',
   'guide.gear.qualityUncommon': '優良',
-  'guide.gear.setsBody':
-    '有些護甲以成套的家族出現，數件裝備經過剪裁，使其外觀與戰鬥表現渾然一體。同時穿上足夠多的同家族裝備，套裝便會甦醒，在每件裝備本身的屬性之上額外賦予加成，而你穿得愈多，效果就愈強。少數這樣的家族會在你升級途中作為珍貴的掉落現身；其中最頂尖的則來自接近等級上限的最艱難團隊內容，因此追求一整套裝是經典的終局目標。',
+  'guide.gear.setsBody': '有些護甲成套出現，幾件部件被裁製得看上去與戰鬥起來渾然一體。同時穿上一套中足夠多的部件，套裝便會甦醒，在每件部件自身屬性之上再授予加成，而你穿得越多它就越強。少數這樣的套裝會在你升級途中作為令人垂涎的戰利品出現，而其中最上乘的來自接近等級上限的最艱難的團隊內容，因此湊齊一整套是經典的終局目標。與其他玩家的戰鬥也有自己成套的系列，用榮譽一件一件購得；它們甦醒所需的件數與掉落套裝不同，而且它們的加成只在敵人是另一名玩家時才會響應。',
   'guide.gear.setsTitle': '套裝與套裝效果',
   'guide.gear.slotChest': '胸部',
   'guide.gear.slotFeet': '腳部',
@@ -6578,8 +6477,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotNeck': '頸部',
   'guide.gear.slotShoulder': '肩部',
   'guide.gear.slotWaist': '腰部',
-  'guide.gear.slotsBody':
-    '你有一個武器欄位、七個護甲欄位，以及三個珠寶欄位：一個頸部與兩個手指。每種職業只能使用特定的武器，並穿戴不超過自身重量等級的護甲，無論是布甲、皮甲或鎖甲，因此適合你的升級品，正是為你的職業打造的那些。珠寶則完全不分重量：任何職業都能佩戴自己掙得的一切。在這個範圍內，用你所能找到最好的物件填滿每一個欄位。',
+  'guide.gear.slotsBody': '你有一個主手武器欄位、一個副手欄位、七個護甲欄位和三個飾品欄位：頸部和兩根手指。每個職業只能使用特定的武器，並且只穿到自身重量級別的護甲，布甲、皮甲或鎖甲，因此適合你的升級正是為你的職業打造的那些。飾品全無重量之分：任何職業都能戴上自己掙來的飾品。在此範圍之內，用你能找到的最好的部件填滿每一個欄位。',
   'guide.gear.slotsTitle': '你能裝備什麼',
   'guide.gear.soulboundBody':
     '許多珍貴的裝備是靈魂綁定的，從你取得的那一刻起便與你的角色綁定。靈魂綁定的物品無法交易、無法郵寄、無法賣給商人，也無法在市場上架；它如今是你故事的一部分，沒有其他人能替你佩戴它。',
@@ -6587,8 +6485,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.gear.uniqueBody':
     '傳說物品是裝備唯一的：你的角色同一時間只能穿戴某件傳說物品的一份，其英雄版本也算作同一件物品。第二份可以放在背包、銀行或市場裡，但試圖同時穿戴兩份會被拒絕。物品提示上還帶有金色的「裝備唯一」標籤，讓你在圍繞兩件傳說規劃配裝之前就能看到這條規則。',
   'guide.gear.soulboundTitle': '靈魂綁定：屬於你，也僅屬於你',
-  'guide.gear.sourcesBody':
-    '你早期的升級大多來自任務獎勵，因此完成任務比刷怪更划算。敵人被你擊敗時會掉落裝備，城鎮裡的商人販售扎實的基本款，工匠會把採集來的材料製成可穿戴的裝備，玩家市場則讓你能向其他冒險者購買。而在攀上頂峰之後，兩種印記貨幣能買到別處找不到的裝備：秘探印記在秘探看守人處花用，英雄徽記則在英雄軍需官處花用。',
+  'guide.gear.sourcesBody': '你早期的升級大多來自任務獎勵，所以完成任務比刷怪更划算。敵人被你擊敗時會掉落裝備，城鎮中的商人販售扎實的基礎貨色，工匠把採集來的材料做成可穿戴的部件，而玩家市場讓你能從其他冒險者那裡購買。在山頂之上，有三種靠付出掙來的貨幣能買到別處找不到的裝備：秘探守護者處的秘探印記、英雄軍需官處的英雄印記，以及榮譽軍需官處的榮譽。',
   'guide.gear.sourcesTitle': '裝備從何而來',
   'guide.gear.upgradeBody':
     '用一件全新的升級品換下舊裝備，對你的助益遠勝於穿著早已過時的裝備打得再完美。當有更好的東西掉落，或任務提供升級時，就收下吧。別把你的好物品留到以後。',
@@ -6636,11 +6533,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '不必急。這個世界就在那裡，讓你以自己的步調盡情享受，所以儘管漫遊、接下吸引你目光的任務，讓你的英雄一路成長吧。',
   'guide.progression.prestigeBody':
     '經驗值在抵達上限之後仍會持續計算。它會灌注一個純外觀的虛擬等級，讓你的經驗條繼續攀升，還有一個抵達上限後可從角色資訊面板領取的長期聲望階級。跨越重大的生涯經驗里程碑，還會在你的功績之書中獲得功績，附帶顯示在角色資訊面板上的外觀頭銜與名條邊框。這一切純屬選擇性質，絕不賦予力量，只是你所走過旅途的一個印記。',
-  'guide.progression.restedBody':
-    '走進旅店並保持脫離戰鬥，你的角色便會在等待時累積充分休息經驗。每座城鎮都有一間旅店。下一次你出門戰鬥，那一池經驗會額外加成你的擊殺，直到耗盡為止。在旅店裡稍作停留絕非浪費時間，它能加速你接下來的一段升級。',
+  'guide.progression.restedBody': '走進一家旅店並保持脫離戰鬥，你的角色便會在等待期間累積充分休息的經驗。每座城鎮都有一家。下次你外出作戰時，這份積蓄會為你的擊殺額外加成，直到用盡為止。在旅店中的一段停歇從來不是虛度的光陰；它會加快你下一段升級的路程。這份積蓄有上限，因此過上一夜所積攢的與住上很久大致相當，而一旦你抵達等級上限，便再沒有等級條可填，充分休息的經驗也就不再累積。',
   'guide.progression.restedTitle': '充分休息經驗',
-  'guide.progression.xpBody':
-    '你透過完成任務、擊敗敵人與通關秘探來賺取經驗值。任務給予的經驗值遠遠最多，因此跟隨任務的軌跡是攀升最快的方式。沿途的殺敵與秘探則補足其餘部分。',
+  'guide.progression.xpBody': '你透過完成任務、擊敗敵人、清理秘探以及經營一門專業來獲得經驗：只要這份活計仍在教給你東西，採集與製作就會在它們所傳授的手藝技能之外，另行支付角色經驗。任務給予的遠多於其他一切，因此沿著任務路線走是向上攀升最快的途徑，而一路上的擊殺、秘探和採集則補足其餘。',
   'guide.progression.xpTitle': '你如何獲得經驗值',
   'guide.questsPage.sagaBody':
     '主線故事是一場漫長的追查。一個死亡邪教正對著國度的墳塚動手，你結束的每一個篇章都會指向北方更遠的一座區域。你絕不會一次對抗整場陰謀；你只拉動一條線索，而它會引向下一隻握著它的手。',
@@ -6664,20 +6559,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sideWardenBody':
     '在故事之外，Vale 與沼澤的執法官與守衛還會發布一道長期的懸賞階梯。一個敵人接一個敵人地往上爬，就像在你之前的每一位賞金獵人掙得席位的方式那樣。這是踏實的升級，也是一趟巡覽各區域最惡劣麻煩製造者的旅程。',
   'guide.questsPage.sideWardenTitle': '掙得你的名聲',
-  'guide.questsPage.typeGatherBody':
-    '從世界中或從敵人的掉落物收集物品：草藥、礦石、一個邪教陰森的施法材料。有些物件只會從特定的敵人身上掉落，所以狩獵與收穫相輔相成。',
+  'guide.questsPage.typeGatherBody': '從世界中或敵人掉落之物裡收集物品：草藥、礦石、某個教派陰森的試劑。有些部件只會從特定敵人身上掉落，因此狩獵與收穫是一體的。地上屬於某個任務的東西，只有在你確實接了那個任務時才會交給你；若你沒接，或者你已經夠數了，它們也會如實相告。有些任務在你接取時還會交給你一件工具：留意背包，並按任務文本所述來使用它。若某個任務需要更早一步給過你的工具，那麼在你不再持有時接取它便會重新發給你，因此遺失工具不會讓整條任務鏈走進死胡同。',
   'guide.questsPage.typeGatherTitle': '收集',
   'guide.questsPage.typeGroupBody':
     '主線故事的每一個篇章都終結於一道地城之門。前導部分可單人完成，但對一個篇章反派的最後一擊，是為五人隊伍而設。',
   'guide.questsPage.typeGroupTitle': '組隊終局',
-  'guide.questsPage.typeInteractBody':
-    '使用、淨化或閱讀世界中固定的某物：一座被玷污的墳墓、一句刻在岸邊岩石上的警語、一道封印的地穴之門。走到標記前並對它採取行動。',
+  'guide.questsPage.typeInteractBody': '使用、淨化或閱讀世界中某個固定的東西：一座被褻瀆的墳墓、刻在岸邊岩石上的警告、一扇封死的墓室門。走到標記旁並對它進行操作。當一個任務要求若干個時，它指的是若干個不同的：每個物件只會為你記錄一次，因此請去找下一個，而不要對同一個用兩次。你對物件進行操作時它並不會被消耗，因此你隊伍裡的每個人都能從它那裡各自取得自己的進度。',
   'guide.questsPage.typeInteractTitle': '互動',
   'guide.questsPage.typeMusterBody':
     '有些任務會要你在北征之前召集一座城鎮：削減城門口的威脅，並蒐集守軍所需之物。這些是擊殺與收集目標，為了那些你身在其故事之中的人們而效力，並讓你與他們一同前行。',
   'guide.questsPage.typeMusterTitle': '召集防禦',
-  'guide.questsPage.typeSlayBody':
-    '削減一群野獸，或藉由擊敗指定數量的某種標記敵人來瓦解一個邪教的掌控。你最初的任務之一，清除東溪大道上的群狼，便是這類任務。',
+  'guide.questsPage.typeSlayBody': '透過擊敗指定數量的標記敵人來削減一群野獸，或打破某個教派的掌控。你最早的任務之一，清理東溪鎮道路上的狼群，就屬於這一類。時不時地，某個任務會喚醒它自己的目標：上次經過時看著只是佈景的東西，會在你接下相關任務後長出名牌，成為可以攻擊的對象，所以不妨回頭再看一眼。',
   'guide.questsPage.typeSlayTitle': '擊殺',
   'guide.questsPage.typesBody':
     '大多數任務都屬於幾種熟悉的形式之一。畫面上的追蹤器會明確指出每一個任務的要求，讓你絕不會無所適從。',
@@ -6707,21 +6599,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一個你可選擇性加入、涵蓋全伺服器的頻道。開啟它的分頁即可加入，你便能看見並接觸到每一位在線的人。',
   'guide.social.chanYell': '大喊。',
   'guide.social.chanYellBody': '說話的較大聲版本，能傳得遠一些，足以橫越整座營地。',
-  'guide.social.chatBody':
-    '聊天分為數個頻道，各自顯示於專屬的分頁上。輸入訊息即可在使用中的頻道送出，或用斜線指令將單一一行訊息導向別處。以下是你能交談的頻道：',
+  'guide.social.chatBody': '聊天視窗一開始有兩個始終存在的檢視，一個是彙總所有發言的記錄，另一個是戰鬥記錄。除此之外，你可以用加號按鈕新增自己想要的分頁，每個頻道一個，在電腦上還可以把它們拖成任意順序（用 Alt 加左右方向鍵可以從鍵盤移動目前分頁）；右鍵點擊某個分頁即可再次關閉它，而你的排列會在多次登入之間被記住。在頻道分頁中輸入會發往該頻道，而斜線指令則可以在不切換分頁的情況下把一行發往別處。此外還有一個密語分頁，把你發出和收到的每一條密語彙集在一處，在那裡輸入就等於回覆最後寫給你的那個人。以下是你可以發言的頻道：',
   'guide.social.chatHeading': '聊天頻道',
-  'guide.social.etiquetteBody':
-    '組隊是一種選擇，而非負擔。加入時打聲招呼，只在你真正會用上的裝備上選擇需求，離隊前先讓隊伍知道。一點點禮貌就能帶來很大不同，而大多數玩家也樂於有人作伴。管理員負責維持秩序，而不願讓他人好好享受遊戲的玩家，可能會被關進牢房，直到管理員將他放出來為止。',
+  'guide.social.etiquetteBody': '組隊是一種選擇，而不是苦差。加入時打聲招呼，只對你確實會用的裝備投「需求」，動身離開之前先告知隊伍。一點點禮貌能走得很遠，而大多數玩家也樂於有人作伴。',
   'guide.social.etiquetteHeading': '組隊禮儀',
   'guide.social.friendsBody':
     '把玩家加入你的好友名單，便能看到他們何時上線、人在何處，好讓你在他們登入的那一刻就能組隊。',
-  'guide.social.friendsHeading': '好友與忽略',
-  'guide.social.guildBody':
-    '公會是你在登入之間都歸屬其中的一個長久玩家團體。建立一個，或接受邀請以加入，而你一次只能身處一個公會。成員各持一個階級：一位會長、幹部，以及成員。',
-  'guide.social.guildChatBody':
-    '歸屬於一個公會，能讓你擁有一個私人的公會聊天頻道，並在一份共享的名冊上顯示你的公會夥伴，所以線上總有熟悉的面孔。',
+  'guide.social.friendsHeading': '好友、忽略與封鎖',
+  'guide.social.guildBody': '公會是一個跨越多次登入、你所歸屬的長久玩家群體。建立公會需要建立者一次性支付 1 金的費用，或者你也可以直接接受邀請加入，而你同一時間只能身處一個公會。成員各有職銜：會長、幹部以及成員。',
+  'guide.social.guildChatBody': '身屬一個公會會給你一條私密的公會聊天頻道，以及一份共享的成員名冊。較新的成員會佩戴「新兵」標記，資歷長久的則佩戴「老兵」標記，用以取代樸素的成員標籤，而幹部和會長則始終顯示自己的職銜；當你只想看看此刻誰在線上時，也可以隱藏離線的名字。幹部和會長還可以把一條簡短的公告置頂在公會分頁的頂端，它會在你下次登入時在聊天記錄中唸給你聽，大多數公會正是這樣發布本週的安排。',
   'guide.social.guildHeading': '公會',
-  'guide.social.ignoreBody': '若有人在騷擾你，把他加入你的忽略名單，你便不會再看到他的聊天。',
+  'guide.social.ignoreBody': '如果有人絮叨得超出你的意願，把他加入忽略清單，他的公開發言便不會再傳到你這裡。忽略只是一項聊天設定，它絕不會把任何人從你的好友清單中移除。',
   'guide.social.intro':
     '世界的大部分都可以單人闖蕩，但這款遊戲生來就是要與他人一同遊玩的。以下說明如何交談、組隊，並找到屬於你的同伴。',
   'guide.social.lootBody': '當你組隊時，由隊長設定戰利品如何分配。規則分別涵蓋錢幣與物品：',
@@ -6788,8 +6676,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.stats.spBody':
     '法術強度是施法者對應於攻擊強度的屬性：它會提高你的法術所造成的傷害。智力會增進它，施法者的裝備與增益還會在其上額外疊加，因此施法者關注法術強度，就如同近戰鬥士關注攻擊強度一般。',
   'guide.stats.spTitle': '法術強度',
-  'guide.stats.spiBody':
-    '精神主宰著施法者每當停下施法時，法力回復得有多快，而那多半是戰鬥之間的時候。一如智力，它服務於那些以法力施法的職業，對其他職業而言意義不大。',
+  'guide.stats.spiBody': '精神主宰施法者法力回復的快慢。只有在幾秒鐘未曾消耗之後，它才會足額支付，而其中一部分即使在施法途中也會持續流動，因此精神在戰鬥中從來不是死重，儘管一位全力傾瀉的施法者終究還是會見底。停下來喘口氣是一個真真切切的法力抉擇，戰鬥之中與戰鬥之間同樣如此。與智力一樣，精神服務於用法力的職業，對其餘職業則意義不大。',
   'guide.stats.spiTitle': '精神',
   'guide.stats.staBody':
     '耐力是你的續戰能力。耐力愈高便意味著更大的生命池，並能加速你脫離戰鬥休息時所回復的生命。每種職業都會想要一些。',
@@ -7275,35 +7162,25 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.name': '谷地秘法師法衣',
   'entities.itemSets.vale_arcanist.bonus3': '攻擊速度和施法速度提高 15%。',
   'entities.itemSets.warfare_ashstalker.name': '灰燼追獵者裝備',
-  'entities.itemSets.warfare_ashstalker.bonus2': '戰爭防禦等級提高 40 點。',
-  'entities.itemSets.warfare_ashstalker.bonus4':
-    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
-  'entities.itemSets.warfare_ashstalker.bonus7':
-    '戰爭攻擊等級和防禦等級提高 80 點。擊殺敵對玩家會觸發「灰燼疾行」，使移動速度提高 40%，持續 6 秒。',
+  'entities.itemSets.warfare_ashstalker.bonus2': '戰爭防禦等級提高 40。',
+  'entities.itemSets.warfare_ashstalker.bonus4': '戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_ashstalker.bonus7': '戰爭攻擊與防禦等級提高 80。擊殺敵對玩家可獲得灰燼之步，使移動速度提高 40%，持續 6 秒。',
   'entities.itemSets.warfare_cinderweave.name': '燼織法衣',
-  'entities.itemSets.warfare_cinderweave.bonus2': '戰爭防禦等級提高 40 點。',
-  'entities.itemSets.warfare_cinderweave.bonus4':
-    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
-  'entities.itemSets.warfare_cinderweave.bonus7':
-    '戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「餘燼護壁」，吸收 120 點傷害，持續 8 秒。',
+  'entities.itemSets.warfare_cinderweave.bonus2': '戰爭防禦等級提高 40。',
+  'entities.itemSets.warfare_cinderweave.bonus4': '戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_cinderweave.bonus7': '戰爭攻擊與防禦等級提高 80。你的法術有 15% 的機率給予餘燼守護，在 8 秒內吸收 120 點傷害。',
   'entities.itemSets.warfare_furyforged.name': '怒鑄戰裝',
-  'entities.itemSets.warfare_furyforged.bonus2': '戰爭防禦等級提高 40 點。',
-  'entities.itemSets.warfare_furyforged.bonus4':
-    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
-  'entities.itemSets.warfare_furyforged.bonus7':
-    '戰爭攻擊等級和防禦等級提高 80 點。擊殺敵對玩家會觸發「不破誓約」，吸收 200 點傷害，持續 10 秒。',
+  'entities.itemSets.warfare_furyforged.bonus2': '戰爭防禦等級提高 40。',
+  'entities.itemSets.warfare_furyforged.bonus4': '戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_furyforged.bonus7': '戰爭攻擊與防禦等級提高 80。擊殺敵對玩家可獲得不破之誓，在 10 秒內吸收 200 點傷害。',
   'entities.itemSets.warfare_stormbound.name': '縛雷法衣',
-  'entities.itemSets.warfare_stormbound.bonus2': '戰爭防禦等級提高 40 點。',
-  'entities.itemSets.warfare_stormbound.bonus4':
-    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
-  'entities.itemSets.warfare_stormbound.bonus7':
-    '戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「餘燼護壁」，吸收 120 點傷害，持續 8 秒。',
+  'entities.itemSets.warfare_stormbound.bonus2': '戰爭防禦等級提高 40。',
+  'entities.itemSets.warfare_stormbound.bonus4': '戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_stormbound.bonus7': '戰爭攻擊與防禦等級提高 80。你的法術有 15% 的機率給予餘燼守護，在 8 秒內吸收 120 點傷害。',
   'entities.itemSets.warfare_thornhide.name': '荊棘皮甲',
-  'entities.itemSets.warfare_thornhide.bonus2': '戰爭防禦等級提高 40 點。',
-  'entities.itemSets.warfare_thornhide.bonus4':
-    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
-  'entities.itemSets.warfare_thornhide.bonus7':
-    '戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「棘刺護身」，閃躲機率提高 15%，持續 6 秒。',
+  'entities.itemSets.warfare_thornhide.bonus2': '戰爭防禦等級提高 40。',
+  'entities.itemSets.warfare_thornhide.bonus4': '戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_thornhide.bonus7': '戰爭攻擊與防禦等級提高 80。你的法術有 15% 的機率給予荊棘守護，使閃避提高 15%，持續 6 秒。',
   'entities.itemSets.wyrmshadow.name': '夜牙法衣',
   'entities.itemSets.wyrmshadow.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 點，致命一擊機率提高 2%。',
@@ -9236,13 +9113,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.counterspell.name': '破法',
   'entities.abilities.counterspell.description': '反制目標的施法，並在6秒內封鎖該法術學派。',
   'entities.abilities.counter_shot.name': '靜默射擊',
-  'entities.abilities.counter_shot.description': '一記快射，打斷目標的施法，並在4秒內封鎖該學派。',
+  'entities.abilities.counter_shot.description': '打斷目標，並使其在 4 秒內無法施放該系法術。',
   'entities.abilities.rebuke.name': '譴喝',
   'entities.abilities.rebuke.description': '打斷目標的施法，並在4秒內封鎖該法術學派。',
   'entities.abilities.skull_bash.name': '頭槌',
   'entities.abilities.skull_bash.description': '猛然頭槌，打斷目標的施法，並在4秒內封鎖該學派。',
-  'entities.abilities.spell_lock.name': '封口令',
-  'entities.abilities.spell_lock.description': '在施法中沉默目標，並在5秒內封鎖該法術學派。',
+  'entities.abilities.spell_lock.name': '深淵封口',
+  'entities.abilities.spell_lock.description': '打斷敵人的施法，並使其在 4 秒內無法施放該系法術。',
   'guide.bestiary.flavor.sethrael_palecoil':
     '一條骨白如枯的巨蛇，滑行於微光湖深處的水底陡崖，是牠所據有這片水域的沉默守望者。與牠共享此湖的泅泳者，鮮少能再浮上水面。',
   'guide.combat.metersBody':
@@ -9254,8 +9131,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '畫面上的寶箱按鈕能開啟每日獎勵視窗。每天都會安排幾項任務：完成任務、在灰燼競技場中作戰、贏得一場溪谷盃比賽，並提供一次免費轉動獎輪的機會，這一切都能換取當日排名的點數；而當日累積最多的玩家，會為持有選用社群代幣者共享一份獎池。這一切都不會在遊戲中賦予任何戰力。視窗本身會載明當日規則與參賽資格，顯示排行榜，並保留你的歷史紀錄。',
   'guide.economy.dailyTitle': '每日獎勵',
   'guide.footer.linksLabel': '遊玩與社群連結',
-  'guide.gear.bagsBody':
-    '你拾取的一切都收在同一個共用背包裡，而你可以透過裝備袋子來擴充它。你的背包視窗設有四個袋子欄位：點擊背包中的袋子，即可將它掛入空閒的欄位，而你所裝備的每個袋子都會增添各自的空間。簡易的袋子是廉價的商人貨品，較寬敞的則從野獸身上掉落，最上乘的則出自地城首領，因此你的攜物空間會隨著裝備一同成長。',
+  'guide.gear.bagsBody': '你撿到的一切都裝在同一個背囊裡，而你透過裝備背包來擴充它。你的背包視窗有四個背包欄位：點擊背囊中的一個背包，即可把它塞進空著的欄位，你所背的每個背包都會加上它自己的空間。簡樸的背包是廉價的商人貨，更寬敞的從野獸身上掉落，最精良的則來自地城首領，因此你的負重空間會與裝備同步成長。任何可堆疊之物都會在提示中標明一個欄位能放多少，你正是藉此提前知道，一次像樣的藥水採買將會佔去你兩個欄位。',
   'guide.gear.bagsTitle': '袋子與攜物空間',
   'guide.glossary.lockoutDef':
     '對最豐厚可重複獎勵的每日上限。每座英雄地城每天只給予一次通關獎勵，團隊副本的普通與英雄模式分開計算，而拾取世界首領也會開始你的鎖定。已通關的五人副本仍對其原隊伍開放；而遭鎖定的團隊副本大門，要到重置後才會再度開啟。',
@@ -9282,13 +9158,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeDeed': '功績',
   'guide.search.typeRelic': '聖物',
   'guide.search.typeReliquaryPage': '聖物庫頁面',
-  'guide.settingsPage.autolootBody':
-    '不想逐一點擊每具屍體嗎？有一個介面選項（預設關閉），能在你走過自己擊殺的敵人時，自動拾取牠們身上的戰利品。',
-  'guide.settingsPage.factSearchBody':
-    '不確定某個選項在哪裡？在選單頂端的搜尋框中輸入即可。它也聽得懂常見的說法，因此輸入 fps 就能找到 FPS 讀數，而選擇一項結果會直接跳到該設定並將其標亮。',
-  'guide.settingsPage.factSearchTitle': '搜尋最快找到',
-  'guide.social.calendarBody':
-    '按下 I 即可開啟活動行事曆。它標示出王國中值得預作規劃的日子，從每週的團隊副本召集到嘉年華之夜，而這裡也是公會安排行程之處：公會會長與幹部可以在上頭預定活動，而每位成員都會在同一頁面上看到它們。',
+  'guide.settingsPage.autolootBody': '不想逐個點擊屍體？介面面板「戰鬥」分頁中預設關閉的「路過自動拾取」，會在你從自己擊殺的目標旁走過時把戰利品一併收走。',
+  'guide.settingsPage.factSearchBody': '這裡沒有搜尋框，因此了解選單的結構會很有幫助。圖形以卡片排列：品質、世界細節、光照與特效、鏡頭、顯示和系統，觸控裝置上還有觸控操作。介面則分為四個分頁：一般、視窗、聊天和戰鬥。若某項設定改變的是世界如何繪製，它就在圖形裡；若改變的是介面向你展示什麼，它就在介面裡。',
+  'guide.settingsPage.factSearchTitle': '某項設定的所在之處',
+  'guide.social.calendarBody': '按 I 開啟活動日曆。它標出值得圍繞其安排計畫的國度日程，每週的團隊集結、市集日、競技場對抗和釣魚大賽，以及每月的秘探日和月門共禱，那裡也是公會保管日程的地方：會長和幹部可以在上面登記活動，而每位成員都會在同一頁上看到它們。國度日程是聚在一起的號召，而不是加成；不會因為某一天被標出，你的角色就有任何變化。',
   'guide.social.calendarHeading': '活動行事曆',
   'guide.social.communityBody':
     '以驚嘆號開頭起一行聊天，就能發出社群呼叫：!lfg 用來尋找隊伍，!wts 與 !wtb 用來交易，!recruit 為你的公會招募，!event 用來公告團隊副本或聚會，!help 則用來求助。你一輸入驚嘆號，呼叫選單便會彈出。每則呼叫都會在世界中廣播，並同步轉發到社群 Discord，因此連尚未登入的玩家也能收到。社群呼叫是線上遊玩的一部分。',
@@ -9343,7 +9216,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'game.talents.readout.rowsSummary': '天賦：{head}，已選擇 {picked}/{unlocked} 列選項。',
   'game.talents.rowUnlockToast': '新的天賦抉擇已解鎖！',
   'game.talents.rowUnlocks': '在 {level} 級解鎖',
-  'hudChrome.fct.absorbed': '吸收 {amount}',
+  'hudChrome.fct.absorbed': '已吸收（{amount}）',
   'entities.abilities.temporal_mend.name': '時光縫合',
   'entities.abilities.temporal_mend.description':
     '將盟友向前拉動一瞬，在身體安定於更健康的未來形態時治療{damage}點生命值。(時光術特色技能)',
@@ -9355,16 +9228,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你造成的秘法傷害有一部分會透過迴響轉化為對其的治療。',
   'entities.abilities.aspect_of_the_wild.description':
     '以野性力量激勵30碼內的盟友，使其攻擊強度提高45、攻擊速度提高5%，持續5分鐘。（獵人天賦）',
-  'entities.abilities.avenging_wrath.description':
-    '召喚復仇之力，使你的攻擊強度提高60、法術強度提高30，持續20秒。（聖騎士天賦）',
+  'entities.abilities.avenging_wrath.description': '展開由金色神聖之力凝成的實體羽翼，獲得 10 點虔誠，並在 15 秒內使你的技能所產生的虔誠翻倍。同時將你造成的傷害與治療提高 20%。破曉者：使憤怒之錘可對任何目標使用。',
   'entities.abilities.berserk.description': '使你的攻擊強度提高70，持續15秒。（德魯伊天賦）',
   'entities.abilities.blink.description': '使你向前傳送15碼並解除定身效果。（法師天賦）',
-  'entities.abilities.bloodlust.description':
-    '使30碼內的盟友陷入狂亂，攻擊速度提高30%，持續15秒。（薩滿天賦）',
-  'entities.abilities.chain_lightning.description':
-    '向目標區域投擲閃電，對附近的敵人造成{damage}點傷害。（薩滿天賦）',
-  'entities.abilities.chaos_bolt.description':
-    '投擲一枚混沌火焰彈，造成{damage}點火焰傷害。（術士天賦）',
+  'entities.abilities.bloodlust.description': '將 30 公尺內隊伍或團隊盟友的攻擊、施法與引導速度提高 30%，持續 15 秒。受影響的盟友在 10 分鐘內無法再次從戰鼓或時間加速中獲益。（薩滿天賦）',
+  'entities.abilities.chain_lightning.description': '擊中 10 公尺內至多 3 名敵人，每名造成 {damage} 點自然傷害。元素：命中可給予 1 點雷霆。傷害隨法術強度提升。',
+  'entities.abilities.chaos_bolt.description': '消耗 3 點摧殘，擲出一發沉重的混亂之火，造成 {damage} 點火焰傷害。末日浩劫使其施法時間縮短 30%。',
   'entities.abilities.cloak_of_shadows.description':
     '以暗影包裹你，在5秒內吸收420點傷害。（潛行者天賦）',
   'entities.abilities.curse_of_exhaustion.description':
@@ -9376,24 +9245,21 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.desperate_prayer.description': '立即為自己治療最大生命值的30%。',
   'entities.abilities.deterrence.description':
     '使你的閃躲幾率提高50個百分點，持續10秒。（獵人天賦）',
-  'entities.abilities.earthbind.description': '將附近的敵人束縛於大地，使其定身2秒。（薩滿天賦）',
+  'entities.abilities.earthbind.description': '將目標點 4 公尺內的敵人定身 2 秒，隨後使其減速 40%，持續 6 秒。（薩滿天賦）',
   'entities.abilities.evocation.description': '快速恢復法力。（法師天賦）',
   'entities.abilities.frenzied_regeneration.description':
     '在10秒內恢復180點生命值。只能在熊形態下使用。（德魯伊天賦）',
   'entities.abilities.frost_trap.description':
     '凍結目標區域內的敵人3秒，使其無法移動或行動。（獵人天賦）',
-  'entities.abilities.ghostly_strike.description':
-    '攻擊敵人，造成武器傷害加{damage}點傷害，短暫提高閃躲並獲得1個連擊點。（潛行者天賦）',
-  'entities.abilities.hammer_of_wrath.description':
-    '向受傷的敵人投擲神聖之錘，造成{damage}點神聖傷害。只能對生命值低於20%的目標使用。（聖騎士天賦）',
+  'entities.abilities.ghostly_strike.description': '以武器傷害外加 {damage} 點擊打敵人，並將你的閃避機率提高 15%，持續 7 秒。給予 1 點連擊點。（盜賊天賦）',
+  'entities.abilities.hammer_of_wrath.description': '擲出一柄神聖之錘，造成 {damage} 點傷害並產生 1 點虔誠。可在目標生命值低於 20% 時使用，或在神聖昇華或復仇之怒期間使用。破曉之怒會額外給予一次可對任何目標使用的施放，它無視目前的冷卻，且傷害提高 20%。昇華使其傷害提高 30%。',
   'entities.abilities.healing_stream.description':
     '在12秒內為一個友方目標恢復120點生命值。（薩滿天賦）',
   'entities.abilities.howl_of_terror.description':
     '使附近的敵人恐懼，最多持續3秒。受到傷害可能打破該效果。（術士天賦）',
   'entities.abilities.ice_block.description':
     '將你封入寒冰之中，吸收大量傷害，持續 8 秒。（法師天賦）',
-  'entities.abilities.inner_focus.description':
-    '使你的下一個法術不消耗資源。持續60秒。（牧師天賦）',
+  'entities.abilities.inner_focus.description': '使你的下一個牧師法術免費且無法被打斷。持續 60 秒。',
   'entities.abilities.innervate.description':
     '生命樹液在你體內湧動10秒，分波恢復20點當前資源，可恢復法力、怒氣或能量。變形不會中斷效果。睡眠、昏迷或停滯會使樹液停止湧動。（德魯伊天賦）',
   'entities.abilities.mend_pet.name': '修補',
@@ -9401,17 +9267,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在 15 秒內為友方目標治療 {damage} 點生命值。（獵人天賦）',
   'entities.abilities.meteor.description':
     '在目標區域召喚一顆隕石，造成{damage}點火焰傷害，隨後使區域內的敵人在6秒內每2秒受到12至18點火焰傷害。（法師天賦）',
-  'entities.abilities.mind_sear.description':
-    '在目標區域引導暗影能量，每秒對附近的敵人造成{damage}點傷害。（牧師天賦）',
+  'entities.abilities.mind_sear.description': '引導 3 秒，每秒對目標區域 8 公尺內的敵人造成 {damage} 點暗影傷害。傷害隨法術強度提升。（牧師天賦）',
   'entities.abilities.multi_shot.description':
     '向目標區域射出散射箭，對8碼內的敵人造成{damage}點物理傷害。（獵人天賦）',
-  'entities.abilities.prayer_of_healing.description':
-    '為附近的盟友恢復{damage}點生命值。（牧師天賦）',
-  'entities.abilities.preparation.description': '結束疾跑、閃避和煙遁的冷卻時間。（潛行者天賦）',
+  'entities.abilities.prayer_of_healing.description': '治療 30 公尺內的盟友 {damage} 點生命。治療量隨法術強度提升。（聖光）',
+  'entities.abilities.preparation.description': '結束疾跑、閃避和消失的冷卻時間。（潛行者天賦）',
   'entities.abilities.presence_of_mind.description':
     '使你的下一個有施法時間的法術立即完成。持續 60 秒。（法師天賦）',
-  'entities.abilities.psychic_scream.description':
-    '使附近的敵人恐懼，最多持續4秒。受到傷害可能打破該效果。（牧師天賦）',
+  'entities.abilities.psychic_scream.description': '使 8 公尺內的敵人陷入恐懼，最多持續 4 秒。傷害可能打斷該效果。',
   'entities.abilities.shadowstep.description': '穿過暗影，向你的目標邁進。（潛行者天賦）',
   'entities.abilities.silence.description': '使目標沉默4秒。（牧師天賦）',
   'entities.abilities.tranquility.description':
@@ -10738,8 +10601,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.biteHeading': '咬鉤與收線',
   'guide.profPages.fish.biteBody':
     '拋竿後{min}到{max}秒之間魚會咬鉤（更好的魚竿最多縮短{rod}秒等待），收線視窗持續{reel}秒、魚竿每高一階再加{reelRod}秒，單次垂釣最長{cap}秒。',
-  'guide.profPages.fish.earlyReelNote':
-    '心急的釣手注意：魚咬鉤之前再按魚竿，只會收回空線並結束這次垂釣（拋竿後的短暫寬限會原諒誤觸的連點）。耐心就是釣魚的全部：等咬鉤，再收線。',
+  'guide.profPages.fish.earlyReelNote': '給性急的手指一個提醒：若在有東西咬鉤之前再次按下釣竿，你就會收回一條空線，這一竿也就此結束。釣線落水後的第一秒是被寬宥的，因此不慎按了兩下並不會讓你付出什麼代價；過了這一秒，過早按下便是白白浪費一竿。耐心就是這整個玩法：等到咬鉤，然後提竿。',
   'guide.profPages.fish.scheduleHeading': '熟練度成長',
   'guide.profPages.fish.scheduleNote':
     '釣魚成長按熟練度遵循固定檔位，且從{cutoff}起，釣上雜物不再有任何成長。',

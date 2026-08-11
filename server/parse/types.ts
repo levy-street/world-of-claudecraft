@@ -8,6 +8,9 @@ import type { ParseCounters } from './counters';
 export interface RecorderEntityView {
   id: number;
   templateId: string;
+  /** Display name; feeds the fight_close actor roster so the dashboard can
+   * label mob entity ids. The live Sim entity always carries one. */
+  name: string;
   level: number;
   hp?: number;
   maxHp?: number;

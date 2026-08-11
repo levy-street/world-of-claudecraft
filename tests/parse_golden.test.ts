@@ -69,7 +69,7 @@ function runScenario(): string {
     sim.entities.set(pid, fakePlayer(pid));
     sim.arenaMatches.set(pid, match);
   }
-  sim.entities.set(105, { id: 105, templateId: 'wolf', level: 20, ownerId: 5 });
+  sim.entities.set(105, { id: 105, templateId: 'wolf', name: 'Wolf', level: 20, ownerId: 5 });
   const targetSeven = sim.entities.get(7);
   if (targetSeven !== undefined) {
     (targetSeven as { auras: unknown }).auras = [
@@ -164,6 +164,7 @@ function runScenario(): string {
   sim.entities.set(500, {
     id: 500,
     templateId: 'morthen',
+    name: 'Morthen the Gravecaller',
     level: 20,
     hp: 5000,
     maxHp: 5000,

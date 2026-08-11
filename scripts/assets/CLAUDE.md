@@ -19,10 +19,9 @@ For reference-image reconstruction and procedural GLB authoring, read the living
 
 - **`specs/*.json`** declare *what* to build: `{ items: [{ src, out, type, ... }] }`.
   `src` is usually under `tmp/asset_src` (raw packs, gitignored); `out` is relative
-  to `public/`. Specs: `characters`, `characters_v2`, `skeletons_v2`, `dungeon`,
-  `props`, `textures`, `lookdev`, `asset_bits`, `foliage`, `biome_packs`
-  (`ls specs/` for the live set). A new asset pack is a new spec JSON, never
-  hardcoded paths in the script.
+  to `public/` (`ls specs/` for the live set: character/skeleton packs, dungeon,
+  props, textures, lookdev, foliage, biome packs, and the exporter specs). A new
+  asset pack is a new spec JSON, never hardcoded paths in the script.
 - **`build_assets.mjs`** processes each item with `@gltf-transform` + `meshoptimizer`
   + `sharp`: `resample`, `prune`, `dedup`, `(textureCompress)`, `meshopt`. Types:
   `character`/`static` are geometry-safe (never join/flatten/**simplify**, would
@@ -51,10 +50,11 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   the release pkg with `pkgutil --expand-full`, add its `bin/` to PATH). The one
   sanctioned exception, WEAPON_VFX skin models, is excluded automatically (their
   emissive derivation must drawImage the baseColor; see the test header).
-- **Per-asset procedural exporters** (`banker_chest/`, `eastbrook_town/`,
-  `eastbrook_grand_armoury/`, `eastbrook_mailbox/`, `eastbrook_noticeboard/`) author GLBs
-  from reference images: deterministic `model.js` factory, browser `export_entry.js`,
-  driver `export_<asset>.mjs`, and a spec with `keepExtras: true`. The condensed procedure
+- **Per-asset procedural exporters** author GLBs from reference images. Each is a
+  subdirectory here (`banker_chest/`, the `eastbrook_*` family, `fenbridge_town/`,
+  `terrorspark_groundshaker/`; `ls` for the live set) holding a deterministic factory
+  (`model.js`, or contract tables for a town wave), a browser `export_entry.js`, a driver
+  `export_<asset>.mjs`, and a spec with `keepExtras: true`. The condensed procedure
   is the `image-to-glb` skill (`.claude/skills/image-to-glb/SKILL.md`); a new asset copies
   the mailbox/noticeboard archetype (or the town contract-table archetype for a wave),
   never a bespoke pipeline.
@@ -67,7 +67,26 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   evidence JSONs in the same change. For a lockfile-only leaf rename/swap that must keep
   shipping GLB sizes, prefer the size-preserving in-place remint
   (`scripts/assets/remint_lockfile_fingerprints.mjs`) over a full geometry rebuild, then
-  re-pin seals and run `remint_polish_provenance.mjs` as needed.
+  re-pin seals and run `scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs`
+  as needed (the remint tool prints that follow-up path itself).
+- **`compress_standalone_textures.mjs`** (+ `lib/standalone_texture_compression_core.mjs`)
+  is the KTX2/Basis step for textures that ship OUTSIDE a GLB (default sweep: the player
+  skin/cosmetic atlases under `public/textures/skins/`), the same decode-amplification win
+  as the GLB step. It emits a `.ktx2` SIBLING next to each PNG and never deletes the source:
+  the runtime opts in per directory (`loadSkinTexInto` in `src/render/characters/assets.ts`
+  requests the sibling only for `textures/skins/` atlases), and `base.png` thumbnail sources
+  are skipped. Run it after adding or repainting a standalone atlas.
+- **One-shot and maintenance tools**, each with its recipe in its own header: the zone prop
+  bakes (`build_willowfen_props.mjs` and its `*_props.mjs` siblings: one-shot weld + bounded
+  simplify recipes over maintainer-local source packs; copy the willowfen recipe for a new
+  zone drop), `pack_ground_ao.mjs` (packs the splat ground relief channels into one RGBA so
+  `buildSplatMaterial` stays under the fragment sampler limit), `declare_orm_occlusion.mjs`
+  (declares the packed ORM red channel as `occlusionTexture` on shipped GLBs so three.js
+  builds an aoMap, zero new texture bytes), `foliage_vertex_pipeline.mjs` /
+  `optimize_foliage_vertices.mjs` (deterministic finalization of the shipped foliage GLBs;
+  input/output sha256 tables live in the module), and `ravenrift_blueprint.mjs` (run via
+  `tsx`: renders the battleground blueprint diagram FROM the authoritative layout records,
+  so the docs image cannot drift from what players collide with).
 
 ## Relationship to the rest
 - **Output to `public/`** (the GLB/texture/HDRI tree the game loads at runtime).

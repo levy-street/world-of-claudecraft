@@ -35,7 +35,7 @@ export function fakeSim(): FakeSim {
 }
 
 export function fakePlayer(id: number, templateId = 'mage'): RecorderEntityView {
-  return { id, templateId, level: 20, dead: false };
+  return { id, templateId, name: `Fake${id}`, level: 20, dead: false };
 }
 
 export const FAKE_PARSE_FLAGS: ParseFlags = {

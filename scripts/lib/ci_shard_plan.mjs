@@ -89,7 +89,10 @@ export const CI_LONG_SUITES = Object.freeze([
   'tests/chronomancy_balance.test.ts',
   // The five-class-overhauls balance harnesses (review 3050): the owned-class
   // matrices grew to 8 specs and the raid loop to ~510s, pushing shards 1 and
-  // 4 past the 20-minute job budget; they are exactly what this lane is for.
+  // 4 past the then-20-minute pr-gate shard budget; they are exactly what this
+  // lane is for. Their cost kept growing after that: see the ci.yml bounds,
+  // where the same harnesses later outgrew the release-gate and lane bounds
+  // too and forced both to be re-sized from measured slow-runner ratios.
   'tests/druid_balance_probe.test.ts',
   'tests/eastbrook_gameplay_integration.test.ts',
   'tests/hunter_dps_balance.test.ts',
