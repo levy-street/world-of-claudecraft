@@ -627,10 +627,11 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // release art audit painted those additions too, and the three
     // Masterwrought jewelcrafting deeds (the rare milestone with the base
     // catalog, the 50-skill and Grandmaster pair with the phase 05 QA
-    // ruling) each shipped their crest in the change that added them, so the
+    // ruling) each shipped their crest in the change that added them, as did
+    // the three Masterwrought inscription milestone deeds at phase 06, so the
     // one exhaustive DEED_ART_PENDING ledger is empty and no live deed uses
     // fallback art.
-    expect(DEED_ORDER).toHaveLength(274);
+    expect(DEED_ORDER).toHaveLength(277);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

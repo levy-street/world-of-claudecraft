@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Grandmaster Inscription deed crest source (125-skill grandmaster milestone)</title>
+  <defs>
+    <radialGradient id="fieldGrad" cx="0.5" cy="0.42" r="0.65">
+      <stop offset="0" stop-color="#1d3370"/>
+      <stop offset="0.45" stop-color="#122252"/>
+      <stop offset="0.8" stop-color="#081231"/>
+      <stop offset="1" stop-color="#04081c"/>
+    </radialGradient>
+    <radialGradient id="tomeGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe2a0" stop-opacity="0.6"/>
+      <stop offset="0.55" stop-color="#e8a94c" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#e8a94c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldRim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2d078"/>
+      <stop offset="0.35" stop-color="#c9962e"/>
+      <stop offset="0.7" stop-color="#8a5a1a"/>
+      <stop offset="1" stop-color="#5c3a10"/>
+    </linearGradient>
+    <linearGradient id="goldRimLow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9c6d24"/>
+      <stop offset="1" stop-color="#4a2e0c"/>
+    </linearGradient>
+    <linearGradient id="goldSpike" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eecb70"/>
+      <stop offset="0.5" stop-color="#b98a28"/>
+      <stop offset="1" stop-color="#6e4614"/>
+    </linearGradient>
+    <linearGradient id="leafGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f0cd74"/>
+      <stop offset="0.6" stop-color="#c1922e"/>
+      <stop offset="1" stop-color="#7c4f14"/>
+    </linearGradient>
+    <linearGradient id="tomeCover" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a1c30"/>
+      <stop offset="0.5" stop-color="#5c1020"/>
+      <stop offset="1" stop-color="#320812"/>
+    </linearGradient>
+  </defs>
+
+  <!-- cardinal spikes -->
+  <g stroke="#2a1a08" stroke-width="4" stroke-linejoin="round">
+    <polygon points="256,48 274,96 256,122 238,96" fill="url(#goldSpike)"/>
+    <polygon points="256,464 238,416 256,390 274,416" fill="url(#goldRimLow)"/>
+    <polygon points="48,256 96,238 122,256 96,274" fill="url(#goldSpike)"/>
+    <polygon points="464,256 416,274 390,256 416,238" fill="url(#goldSpike)"/>
+  </g>
+
+  <!-- medallion rim -->
+  <circle cx="256" cy="256" r="198" fill="#241608"/>
+  <circle cx="256" cy="256" r="192" fill="none" stroke="url(#goldRim)" stroke-width="18"/>
+  <circle cx="256" cy="256" r="201" fill="none" stroke="#1c1206" stroke-width="5"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#3a2410" stroke-width="8"/>
+  <circle cx="256" cy="256" r="172" fill="none" stroke="url(#goldRim)" stroke-width="6"/>
+
+  <!-- rim studs at the diagonals -->
+  <g fill="#e8c264" stroke="#4a2e0c" stroke-width="3">
+    <circle cx="120.2" cy="120.2" r="9"/>
+    <circle cx="391.8" cy="120.2" r="9"/>
+    <circle cx="120.2" cy="391.8" r="9"/>
+    <circle cx="391.8" cy="391.8" r="9"/>
+  </g>
+
+  <!-- inner field -->
+  <circle cx="256" cy="256" r="168" fill="url(#fieldGrad)"/>
+  <circle cx="256" cy="256" r="154" fill="none" stroke="#d9b45c" stroke-opacity="0.22" stroke-width="3"/>
+
+  <!-- grandmaster laurel wreath, two open arcs of leaves -->
+  <g stroke="#3a2408" stroke-width="3" stroke-linejoin="round" fill="url(#leafGold)">
+    <!-- left branch, bottom to top -->
+    <path d="M 176 372 Q 150 352 148 322 Q 170 330 180 352 Z"/>
+    <path d="M 146 316 Q 128 288 134 258 Q 154 272 158 296 Z"/>
+    <path d="M 132 250 Q 126 218 140 192 Q 156 212 152 236 Z"/>
+    <path d="M 144 184 Q 150 154 172 134 Q 180 158 168 180 Z"/>
+    <path d="M 178 128 Q 196 106 224 98 Q 222 124 202 138 Z"/>
+    <!-- right branch, bottom to top -->
+    <path d="M 336 372 Q 362 352 364 322 Q 342 330 332 352 Z"/>
+    <path d="M 366 316 Q 384 288 378 258 Q 358 272 354 296 Z"/>
+    <path d="M 380 250 Q 386 218 372 192 Q 356 212 360 236 Z"/>
+    <path d="M 368 184 Q 362 154 340 134 Q 332 158 344 180 Z"/>
+    <path d="M 334 128 Q 316 106 288 98 Q 290 124 310 138 Z"/>
+  </g>
+  <!-- wreath stems -->
+  <g fill="none" stroke="url(#goldRim)" stroke-width="7" stroke-linecap="round">
+    <path d="M 186 380 Q 138 320 150 232 Q 158 168 216 118"/>
+    <path d="M 326 380 Q 374 320 362 232 Q 354 168 296 118"/>
+  </g>
+  <!-- ribbon tie at the base -->
+  <path fill="url(#leafGold)" stroke="#3a2408" stroke-width="3"
+    d="M 226 384 L 256 370 L 286 384 L 272 402 L 256 392 L 240 402 Z"/>
+
+  <!-- glow behind the tome -->
+  <ellipse cx="256" cy="228" rx="110" ry="100" fill="url(#tomeGlow)"/>
+
+  <!-- grand illuminated tome, face on -->
+  <!-- page block behind the cover -->
+  <rect x="192" y="156" width="128" height="146" rx="8" fill="#e8d5a0" stroke="#3a2408" stroke-width="4"/>
+  <!-- cover -->
+  <rect x="198" y="148" width="122" height="146" rx="8" fill="url(#tomeCover)" stroke="#2a0810" stroke-width="4"/>
+  <!-- spine bands on the left edge -->
+  <g fill="none" stroke="url(#goldRim)" stroke-width="5" stroke-linecap="round">
+    <path d="M 204 166 L 214 166"/>
+    <path d="M 204 276 L 214 276"/>
+  </g>
+  <!-- gilded border frame -->
+  <rect x="212" y="162" width="94" height="118" rx="5" fill="none" stroke="url(#goldRim)" stroke-width="5"/>
+  <!-- corner fittings -->
+  <g fill="url(#leafGold)" stroke="#3a2408" stroke-width="3" stroke-linejoin="round">
+    <polygon points="198,148 226,148 198,176"/>
+    <polygon points="320,148 292,148 320,176"/>
+    <polygon points="198,294 226,294 198,266"/>
+    <polygon points="320,294 292,294 320,266"/>
+  </g>
+  <!-- clasp on the right edge -->
+  <path fill="url(#goldRim)" stroke="#3a2408" stroke-width="3" stroke-linejoin="round"
+    d="M 320 210 L 336 210 L 336 234 L 320 234 L 326 222 Z"/>
+  <!-- central illuminated ornament: gold rosette with a sunburst -->
+  <circle cx="259" cy="221" r="26" fill="#f2d078" stroke="#8a5a1a" stroke-width="4"/>
+  <circle cx="259" cy="221" r="12" fill="#a3172c" stroke="#5c0f1c" stroke-width="3"/>
+  <circle cx="255" cy="217" r="4" fill="#ff9aa6" fill-opacity="0.85"/>
+  <g stroke="#8a5a1a" stroke-width="4" stroke-linecap="round">
+    <line x1="259" y1="189" x2="259" y2="199"/>
+    <line x1="259" y1="243" x2="259" y2="253"/>
+    <line x1="227" y1="221" x2="237" y2="221"/>
+    <line x1="281" y1="221" x2="291" y2="221"/>
+    <line x1="238" y1="200" x2="245" y2="207"/>
+    <line x1="280" y1="242" x2="273" y2="235"/>
+    <line x1="238" y1="242" x2="245" y2="235"/>
+    <line x1="280" y1="200" x2="273" y2="207"/>
+  </g>
+  <!-- illuminated flourishes under the rosette -->
+  <path fill="none" stroke="#f2d078" stroke-width="4" stroke-linecap="round"
+    d="M 233 264 C 243 256 251 262 248 268 C 246 272 252 274 259 270 C 266 274 272 272 270 268 C 267 262 275 256 285 264"/>
+
+  <!-- radiance rays -->
+  <g stroke="#ffe2a0" stroke-opacity="0.6" stroke-width="4" stroke-linecap="round">
+    <line x1="256" y1="116" x2="256" y2="136"/>
+    <line x1="326" y1="140" x2="312" y2="154"/>
+    <line x1="186" y1="140" x2="200" y2="154"/>
+  </g>
+
+  <!-- sparkles -->
+  <g fill="#ffffff">
+    <path d="M 208 176 L 213 192 L 229 197 L 213 202 L 208 218 L 203 202 L 187 197 L 203 192 Z"/>
+    <path d="M 305 250 L 308 259 L 317 262 L 308 265 L 305 274 L 302 265 L 293 262 L 302 259 Z" fill-opacity="0.9"/>
+    <path d="M 256 322 L 258 329 L 265 331 L 258 333 L 256 340 L 254 333 L 247 331 L 254 329 Z" fill-opacity="0.85"/>
+  </g>
+</svg>

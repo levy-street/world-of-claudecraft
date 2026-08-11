@@ -6123,6 +6123,30 @@
     "marrowpoint",
     "rimefang"
    ]
+  },
+  {
+   "batchId": "masterwrought-phase06-inscription",
+   "source": "woc_original_svg",
+   "owner": "World of ClaudeCraft",
+   "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+   "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+   },
+   "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
+   "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
+   "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
+   "provenanceRecords": [
+    "docs/achievements/masterwrought-phase06-art/README.md"
+   ],
+   "itemIds": [
+    "goldleaf_folio",
+    "goldleaf_scroll",
+    "silverleaf_primer",
+    "silverleaf_scroll",
+    "sunpetal_grimoire",
+    "sunpetal_scroll"
+   ]
   }
  ]
 }

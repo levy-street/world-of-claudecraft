@@ -190,14 +190,16 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     }
   });
 
-  it('closes the exhaustive live deed debt ledger at 274 painted deeds', () => {
-    // 274: the 271 deeds this audit closed at, plus the Masterwrought
+  it('closes the exhaustive live deed debt ledger at 277 painted deeds', () => {
+    // 277: the 271 deeds this audit closed at, plus the Masterwrought
     // jewelcrafting rare deed (crest shipped in the change that added it),
     // plus the phase 05 QA ruling pair (50-skill and Grandmaster), whose
-    // crests likewise shipped in the change that authored them.
+    // crests likewise shipped in the change that authored them, plus the
+    // phase 06 inscription milestone trio (rare, 50-skill, Grandmaster),
+    // whose crests shipped in the change that authored the deeds.
     expect([...DEED_ART_PENDING]).toEqual([]);
-    expect(DEED_ORDER).toHaveLength(274);
-    expect(DEED_IMAGE_IDS.size).toBe(274);
+    expect(DEED_ORDER).toHaveLength(277);
+    expect(DEED_IMAGE_IDS.size).toBe(277);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(sorted(DEED_ORDER));
 

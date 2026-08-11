@@ -95,13 +95,13 @@ const build = await buildItemArtAudit({
   items,
   mapping,
   expected: {
-    catalogCount: 834,
-    liveItemCount: 849,
+    catalogCount: 840,
+    liveItemCount: 855,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,
-    sheetPageCount: 26,
-    groupCount: 22,
+    sheetPageCount: 27,
+    groupCount: 23,
   },
 });
 assertItemArtAuditPass(build);

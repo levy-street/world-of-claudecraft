@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Sunpetal Scroll item icon source</title>
+  <defs>
+    <radialGradient id="bg" cx="0.42" cy="0.36" r="0.95">
+      <stop offset="0" stop-color="#2e2412"/>
+      <stop offset="0.55" stop-color="#191106"/>
+      <stop offset="1" stop-color="#0a0603"/>
+    </radialGradient>
+    <radialGradient id="key" cx="0.27" cy="0.2" r="0.6">
+      <stop offset="0" stop-color="#ffe9a8" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="parch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4e3b0"/>
+      <stop offset="0.5" stop-color="#dfc389"/>
+      <stop offset="1" stop-color="#a5824a"/>
+    </linearGradient>
+    <linearGradient id="rollEnd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f9edc0"/>
+      <stop offset="1" stop-color="#8f7240"/>
+    </linearGradient>
+    <radialGradient id="waxGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffbf47" stop-opacity="0.5"/>
+      <stop offset="0.6" stop-color="#ff9c2e" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#ff9c2e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="wax" cx="0.4" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#ffcf63"/>
+      <stop offset="0.55" stop-color="#ef8f2b"/>
+      <stop offset="1" stop-color="#9c5312"/>
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#bg)"/>
+  <rect width="128" height="128" fill="url(#key)"/>
+  <ellipse cx="64" cy="105" rx="40" ry="8" fill="#000000" opacity="0.55"/>
+  <g transform="rotate(-6 64 64)">
+    <rect x="22" y="48" width="84" height="28" rx="12" fill="url(#parch)" stroke="#6d5730" stroke-width="1.2"/>
+    <path d="M26 54 C50 51 78 51 102 54" stroke="#fff6d2" stroke-width="2" fill="none" opacity="0.8"/>
+    <path d="M26 71 C50 74 78 74 102 71" stroke="#7a6034" stroke-width="1.6" fill="none" opacity="0.7"/>
+    <ellipse cx="24.5" cy="62" rx="6.6" ry="14" fill="url(#rollEnd)" stroke="#6d5730" stroke-width="1.2"/>
+    <ellipse cx="24.5" cy="62" rx="2.7" ry="6.2" fill="#7b6136"/>
+    <ellipse cx="103.5" cy="62" rx="6.6" ry="14" fill="url(#rollEnd)" stroke="#6d5730" stroke-width="1.2"/>
+    <ellipse cx="103.5" cy="62" rx="2.7" ry="6.2" fill="#7b6136"/>
+    <circle cx="64" cy="62" r="21" fill="url(#waxGlow)"/>
+    <g stroke="#8a4d10" stroke-width="0.8" fill="url(#wax)">
+      <ellipse cx="64" cy="51.5" rx="3.2" ry="6.4"/>
+      <ellipse cx="64" cy="72.5" rx="3.2" ry="6.4"/>
+      <ellipse cx="53.5" cy="62" rx="3.2" ry="6.4" transform="rotate(90 53.5 62)"/>
+      <ellipse cx="74.5" cy="62" rx="3.2" ry="6.4" transform="rotate(90 74.5 62)"/>
+      <ellipse cx="56.6" cy="54.6" rx="3" ry="6" transform="rotate(-45 56.6 54.6)"/>
+      <ellipse cx="71.4" cy="69.4" rx="3" ry="6" transform="rotate(-45 71.4 69.4)"/>
+      <ellipse cx="71.4" cy="54.6" rx="3" ry="6" transform="rotate(45 71.4 54.6)"/>
+      <ellipse cx="56.6" cy="69.4" rx="3" ry="6" transform="rotate(45 56.6 69.4)"/>
+    </g>
+    <circle cx="64" cy="62" r="7.6" fill="url(#wax)" stroke="#7c460e" stroke-width="1.2"/>
+    <circle cx="64" cy="62" r="4.6" fill="none" stroke="#a86a1c" stroke-width="1"/>
+    <circle cx="61.6" cy="59.6" r="1.9" fill="#ffe9ad" opacity="0.9"/>
+  </g>
+</svg>

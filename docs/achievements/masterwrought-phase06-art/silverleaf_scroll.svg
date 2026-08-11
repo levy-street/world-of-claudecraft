@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Sheenleaf Scroll item icon source</title>
+  <defs>
+    <radialGradient id="bg" cx="0.42" cy="0.38" r="0.95">
+      <stop offset="0" stop-color="#262c20"/>
+      <stop offset="0.55" stop-color="#141810"/>
+      <stop offset="1" stop-color="#080906"/>
+    </radialGradient>
+    <radialGradient id="key" cx="0.28" cy="0.22" r="0.6">
+      <stop offset="0" stop-color="#e9f2da" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#e9f2da" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="parch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#efe3bb"/>
+      <stop offset="0.5" stop-color="#d8c69a"/>
+      <stop offset="1" stop-color="#a08a5c"/>
+    </linearGradient>
+    <linearGradient id="rollEnd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f5ecca"/>
+      <stop offset="1" stop-color="#8f7a4c"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#cfe0cd"/>
+      <stop offset="0.5" stop-color="#93b394"/>
+      <stop offset="1" stop-color="#55755c"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#bg)"/>
+  <rect width="128" height="128" fill="url(#key)"/>
+  <ellipse cx="64" cy="104" rx="40" ry="8" fill="#000000" opacity="0.55"/>
+  <g transform="rotate(-14 64 64)">
+    <rect x="22" y="50" width="84" height="27" rx="12" fill="url(#parch)" stroke="#6b5a34" stroke-width="1.2"/>
+    <path d="M26 56 C50 53 78 53 102 56" stroke="#fff7dd" stroke-width="2" fill="none" opacity="0.8"/>
+    <path d="M26 72 C50 75 78 75 102 72" stroke="#77653c" stroke-width="1.6" fill="none" opacity="0.7"/>
+    <ellipse cx="24.5" cy="63.5" rx="6.5" ry="13.5" fill="url(#rollEnd)" stroke="#6b5a34" stroke-width="1.2"/>
+    <ellipse cx="24.5" cy="63.5" rx="2.6" ry="6" fill="#7a6740"/>
+    <ellipse cx="103.5" cy="63.5" rx="6.5" ry="13.5" fill="url(#rollEnd)" stroke="#6b5a34" stroke-width="1.2"/>
+    <ellipse cx="103.5" cy="63.5" rx="2.6" ry="6" fill="#7a6740"/>
+    <path d="M58 48 h13 l1.5 31 h-16 Z" fill="url(#ribbon)" stroke="#3c5545" stroke-width="1.2"/>
+    <path d="M60 48 l4 31" stroke="#e4efe1" stroke-width="1.2" opacity="0.7" fill="none"/>
+    <path d="M64 46 c-6 -3 -10 -1 -12 3 c5 2 10 1 12 -3 Z" fill="url(#ribbon)" stroke="#3c5545" stroke-width="1"/>
+    <path d="M64 46 c6 -3 10 -1 12 3 c-5 2 -10 1 -12 -3 Z" fill="url(#ribbon)" stroke="#3c5545" stroke-width="1"/>
+    <circle cx="64" cy="47" r="2.6" fill="#d9e6d4" stroke="#3c5545" stroke-width="1"/>
+    <path d="M61 79 c-3 6 -2 10 1 13 c2 -4 2 -9 -1 -13 Z" fill="url(#ribbon)" stroke="#3c5545" stroke-width="1"/>
+    <path d="M68 79 c3 5 3 9 1 12 c-3 -3 -3 -8 -1 -12 Z" fill="url(#ribbon)" stroke="#3c5545" stroke-width="1"/>
+  </g>
+</svg>

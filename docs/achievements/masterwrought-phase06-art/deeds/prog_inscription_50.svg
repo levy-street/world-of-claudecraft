@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Quill and Pigment deed crest source (inscription 50-skill milestone)</title>
+  <defs>
+    <radialGradient id="fieldGrad" cx="0.5" cy="0.42" r="0.65">
+      <stop offset="0" stop-color="#1d3370"/>
+      <stop offset="0.45" stop-color="#122252"/>
+      <stop offset="0.8" stop-color="#081231"/>
+      <stop offset="1" stop-color="#04081c"/>
+    </radialGradient>
+    <radialGradient id="warmGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd98f" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#e8a94c" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#e8a94c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldRim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2d078"/>
+      <stop offset="0.35" stop-color="#c9962e"/>
+      <stop offset="0.7" stop-color="#8a5a1a"/>
+      <stop offset="1" stop-color="#5c3a10"/>
+    </linearGradient>
+    <linearGradient id="goldRimLow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9c6d24"/>
+      <stop offset="1" stop-color="#4a2e0c"/>
+    </linearGradient>
+    <linearGradient id="goldSpike" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eecb70"/>
+      <stop offset="0.5" stop-color="#b98a28"/>
+      <stop offset="1" stop-color="#6e4614"/>
+    </linearGradient>
+    <linearGradient id="quillFeather" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6f0dc"/>
+      <stop offset="0.5" stop-color="#dfc98c"/>
+      <stop offset="1" stop-color="#a8863e"/>
+    </linearGradient>
+    <linearGradient id="brushWood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b07a3a"/>
+      <stop offset="0.5" stop-color="#84551f"/>
+      <stop offset="1" stop-color="#573310"/>
+    </linearGradient>
+  </defs>
+
+  <!-- cardinal spikes -->
+  <g stroke="#2a1a08" stroke-width="4" stroke-linejoin="round">
+    <polygon points="256,48 274,96 256,122 238,96" fill="url(#goldSpike)"/>
+    <polygon points="256,464 238,416 256,390 274,416" fill="url(#goldRimLow)"/>
+    <polygon points="48,256 96,238 122,256 96,274" fill="url(#goldSpike)"/>
+    <polygon points="464,256 416,274 390,256 416,238" fill="url(#goldSpike)"/>
+  </g>
+
+  <!-- medallion rim -->
+  <circle cx="256" cy="256" r="198" fill="#241608"/>
+  <circle cx="256" cy="256" r="192" fill="none" stroke="url(#goldRim)" stroke-width="18"/>
+  <circle cx="256" cy="256" r="201" fill="none" stroke="#1c1206" stroke-width="5"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#3a2410" stroke-width="8"/>
+  <circle cx="256" cy="256" r="172" fill="none" stroke="url(#goldRim)" stroke-width="6"/>
+
+  <!-- rim studs at the diagonals -->
+  <g fill="#e8c264" stroke="#4a2e0c" stroke-width="3">
+    <circle cx="120.2" cy="120.2" r="9"/>
+    <circle cx="391.8" cy="120.2" r="9"/>
+    <circle cx="120.2" cy="391.8" r="9"/>
+    <circle cx="391.8" cy="391.8" r="9"/>
+  </g>
+
+  <!-- inner field -->
+  <circle cx="256" cy="256" r="168" fill="url(#fieldGrad)"/>
+  <circle cx="256" cy="256" r="154" fill="none" stroke="#d9b45c" stroke-opacity="0.22" stroke-width="3"/>
+
+  <!-- glow behind the crossing -->
+  <ellipse cx="256" cy="244" rx="122" ry="106" fill="url(#warmGlow)"/>
+
+  <!-- pigment swash beneath the crossing -->
+  <path fill="none" stroke="#a3172c" stroke-width="12" stroke-linecap="round"
+    d="M 190 344 C 224 360 288 360 322 344"/>
+  <path fill="none" stroke="#d94055" stroke-opacity="0.8" stroke-width="5" stroke-linecap="round"
+    d="M 200 342 C 228 354 284 354 312 342"/>
+
+  <!-- pigment brush, bristles at lower right -->
+  <g stroke="#2a1a08" stroke-width="4" stroke-linejoin="round">
+    <path fill="url(#brushWood)"
+      d="M 180 140 L 192 132 L 310 296 L 296 306 Z"/>
+  </g>
+  <!-- ferrule -->
+  <path fill="url(#goldRim)" stroke="#3a2408" stroke-width="3" stroke-linejoin="round"
+    d="M 296 306 L 310 296 L 322 312 L 306 322 Z"/>
+  <!-- bristles with crimson pigment tip -->
+  <path fill="#8a5a1a" stroke="#2a1a08" stroke-width="3" stroke-linejoin="round"
+    d="M 306 322 L 322 312 C 332 322 340 334 344 348 C 332 346 318 336 306 322 Z"/>
+  <path fill="#a3172c" stroke="#5c0f1c" stroke-width="3" stroke-linejoin="round"
+    d="M 330 330 C 336 336 341 342 344 348 C 337 347 330 343 324 337 Z"/>
+  <!-- brush wood highlight -->
+  <path fill="none" stroke="#d9a860" stroke-opacity="0.8" stroke-width="3" stroke-linecap="round"
+    d="M 190 142 L 300 294"/>
+
+  <!-- quill, crossing over the brush, nib at lower left -->
+  <g stroke="#5c3a10" stroke-width="4" stroke-linejoin="round">
+    <path fill="url(#quillFeather)"
+      d="M 190 342 L 240 264 C 254 238 276 202 302 174 C 316 158 332 146 342 142 C 344 154 338 174 328 192 C 310 226 282 262 254 286 L 206 330 Z"/>
+  </g>
+  <!-- quill spine and barb cuts -->
+  <path fill="none" stroke="#8a5a1a" stroke-width="4" stroke-linecap="round"
+    d="M 198 336 C 240 292 292 226 334 150"/>
+  <g fill="none" stroke="#fdf6e0" stroke-opacity="0.75" stroke-width="3" stroke-linecap="round">
+    <path d="M 272 212 L 292 222"/>
+    <path d="M 288 192 L 308 202"/>
+    <path d="M 304 172 L 322 182"/>
+  </g>
+  <!-- nib -->
+  <path fill="#e8c264" stroke="#3a2408" stroke-width="3" stroke-linejoin="round"
+    d="M 190 342 L 206 330 L 200 352 Z"/>
+
+  <!-- sparkles -->
+  <g fill="#ffffff">
+    <path d="M 340 136 L 345 152 L 361 157 L 345 162 L 340 178 L 335 162 L 319 157 L 335 152 Z"/>
+    <path d="M 178 230 L 181 239 L 190 242 L 181 245 L 178 254 L 175 245 L 166 242 L 175 239 Z" fill-opacity="0.9"/>
+    <path d="M 260 316 L 262 323 L 269 325 L 262 327 L 260 334 L 258 327 L 251 325 L 258 323 Z" fill-opacity="0.8"/>
+  </g>
+</svg>

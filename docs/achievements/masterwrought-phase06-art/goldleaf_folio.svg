@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Goldleaf Folio item icon source</title>
+  <defs>
+    <radialGradient id="bg" cx="0.4" cy="0.36" r="0.95">
+      <stop offset="0" stop-color="#2f2817"/>
+      <stop offset="0.55" stop-color="#191408"/>
+      <stop offset="1" stop-color="#0a0704"/>
+    </radialGradient>
+    <radialGradient id="key" cx="0.26" cy="0.2" r="0.6">
+      <stop offset="0" stop-color="#ffe9b0" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#ffe9b0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cover" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8a5c30"/>
+      <stop offset="0.45" stop-color="#63401f"/>
+      <stop offset="1" stop-color="#3a2411"/>
+    </linearGradient>
+    <linearGradient id="gilt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe08a"/>
+      <stop offset="0.5" stop-color="#d9a840"/>
+      <stop offset="1" stop-color="#8a641f"/>
+    </linearGradient>
+    <linearGradient id="giltEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7d879"/>
+      <stop offset="1" stop-color="#a3742a"/>
+    </linearGradient>
+    <linearGradient id="spine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2c1a0b"/>
+      <stop offset="1" stop-color="#7a5127"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#bg)"/>
+  <rect width="128" height="128" fill="url(#key)"/>
+  <ellipse cx="64" cy="108" rx="37" ry="8" fill="#000000" opacity="0.55"/>
+  <g transform="rotate(3 64 64)">
+    <rect x="36" y="28" width="58" height="76" rx="3" fill="url(#giltEdge)"/>
+    <path d="M92 32 L92 102 M90 33 L90 102" stroke="#7c5a1e" stroke-width="1" fill="none" opacity="0.8"/>
+    <rect x="30" y="24" width="59" height="76" rx="4" fill="url(#cover)" stroke="#1d1106" stroke-width="1.6"/>
+    <rect x="30" y="24" width="10" height="76" rx="3" fill="url(#spine)"/>
+    <path d="M43 24 v76 M43 33 h46 M43 91 h46" stroke="#c99b45" stroke-width="2" fill="none" opacity="0.85"/>
+    <path d="M83 24 h6 v7 l-6 -1 Z M83 100 h6 v-7 l-6 1 Z" fill="url(#gilt)" stroke="#5c4114" stroke-width="0.8"/>
+    <path d="M66 42 C80 49 81 62 66 84 C51 62 52 49 66 42 Z" fill="url(#gilt)" stroke="#553b10" stroke-width="1.2"/>
+    <path d="M66 46 L66 79 M66 54 L58 49 M66 54 L74 49 M66 63 L57 57 M66 63 L75 57 M66 72 L59 66 M66 72 L73 66" stroke="#6b4c14" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <path d="M89 56 h7 v14 h-7" fill="url(#gilt)" stroke="#4f3910" stroke-width="1"/>
+    <path d="M35 27 C50 24 74 23 86 26" stroke="#f0c96e" stroke-width="1.6" fill="none" opacity="0.7"/>
+  </g>
+</svg>

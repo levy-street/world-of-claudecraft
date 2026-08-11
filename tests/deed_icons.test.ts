@@ -363,8 +363,8 @@ describe('Book of Deeds webp icons', () => {
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(DEED_ART_PENDING_IDS, 'release-live deed art debt must stay empty').toEqual([]);
     expect(artless, 'every release-live deed must have painted art').toEqual([]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(274);
-    expect(DEED_IMAGE_IDS.size, 'every live deed is painted').toBe(274);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(277);
+    expect(DEED_IMAGE_IDS.size, 'every live deed is painted').toBe(277);
     for (const id of DEED_ORDER) {
       const crestId = deedCrestId(id, DEEDS[id].category);
       expect(crestId, `${id} must keep its bespoke crest identity`).toBe(`deed_${id}`);
@@ -407,14 +407,25 @@ describe('Book of Deeds webp icons', () => {
       prog_grandmaster_jewelcrafting:
         'f3ff906d390920499779101c7d361be8b81d07398ab9c0133778ed5daed8ee49',
     };
-    for (const [id, sha] of Object.entries(ACCEPTED_CREST_SHA256)) {
+    // The phase 06 inscription trio, same contract, recorded in the phase 06
+    // provenance README beside its committed crest SVG sources.
+    const ACCEPTED_PHASE06_CREST_SHA256: Record<string, string> = {
+      prog_inscription_rare: 'a165b790da1fb23e97bf4824df7595383ea14550a4f566e583054d113abe9368',
+      prog_inscription_50: 'a9dc7528e104550baf7bed4f864fee96cb68d90e60fe6a9385bae65f18de9ab4',
+      prog_grandmaster_inscription:
+        'cee13b0815db111d330e11cc29773f6ab6d9c793ba1e5b47b04d56d74057498e',
+    };
+    for (const [id, sha] of Object.entries({
+      ...ACCEPTED_CREST_SHA256,
+      ...ACCEPTED_PHASE06_CREST_SHA256,
+    })) {
       const bytes = readFileSync(path.join(deedsDir, `${id}.webp`));
       expect(
         createHash('sha256').update(bytes).digest('hex'),
         `${id}.webp drifted from its accepted provenance hash`,
       ).toBe(sha);
     }
-    // The provenance README itself records the same hashes (the pin and the
+    // The provenance READMEs record the same hashes (the pin and the
     // record cannot drift apart silently), and CREDITS carries the rows.
     const readme = readFileSync(
       path.join(repoRoot, 'docs/achievements/masterwrought-phase05-art/README.md'),
@@ -422,6 +433,13 @@ describe('Book of Deeds webp icons', () => {
     );
     for (const sha of Object.values(ACCEPTED_CREST_SHA256)) {
       expect(readme, 'provenance README must record the accepted hash').toContain(sha);
+    }
+    const readme06 = readFileSync(
+      path.join(repoRoot, 'docs/achievements/masterwrought-phase06-art/README.md'),
+      'utf8',
+    );
+    for (const sha of Object.values(ACCEPTED_PHASE06_CREST_SHA256)) {
+      expect(readme06, 'phase 06 provenance README must record the accepted hash').toContain(sha);
     }
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     expect(credits).toContain('prog_jewelcrafting_rare');

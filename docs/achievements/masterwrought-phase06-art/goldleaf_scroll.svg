@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Goldleaf Scroll item icon source</title>
+  <defs>
+    <radialGradient id="bg" cx="0.4" cy="0.36" r="0.95">
+      <stop offset="0" stop-color="#2e2716"/>
+      <stop offset="0.55" stop-color="#181307"/>
+      <stop offset="1" stop-color="#0a0703"/>
+    </radialGradient>
+    <radialGradient id="key" cx="0.26" cy="0.2" r="0.6">
+      <stop offset="0" stop-color="#ffedb5" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#ffedb5" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="parch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2e2b4"/>
+      <stop offset="0.5" stop-color="#dcc38c"/>
+      <stop offset="1" stop-color="#a3854e"/>
+    </linearGradient>
+    <linearGradient id="rollEnd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8ecc4"/>
+      <stop offset="1" stop-color="#927747"/>
+    </linearGradient>
+    <radialGradient id="wax" cx="0.4" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#ffdf8d"/>
+      <stop offset="0.55" stop-color="#e0a83e"/>
+      <stop offset="1" stop-color="#93641c"/>
+    </radialGradient>
+    <linearGradient id="cord" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e8c469"/>
+      <stop offset="1" stop-color="#9c742c"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#bg)"/>
+  <rect width="128" height="128" fill="url(#key)"/>
+  <ellipse cx="64" cy="104" rx="40" ry="8" fill="#000000" opacity="0.55"/>
+  <g transform="rotate(10 64 64)">
+    <rect x="23" y="49" width="82" height="28" rx="12" fill="url(#parch)" stroke="#6e5730" stroke-width="1.2"/>
+    <path d="M27 55 C50 52 78 52 101 55" stroke="#fff6d6" stroke-width="2" fill="none" opacity="0.8"/>
+    <path d="M27 72 C50 75 78 75 101 72" stroke="#7a6136" stroke-width="1.6" fill="none" opacity="0.7"/>
+    <ellipse cx="25.5" cy="63" rx="6.8" ry="14" fill="url(#rollEnd)" stroke="#6e5730" stroke-width="1.2"/>
+    <ellipse cx="25.5" cy="63" rx="2.8" ry="6.4" fill="#7d6438"/>
+    <ellipse cx="102.5" cy="63" rx="6.8" ry="14" fill="url(#rollEnd)" stroke="#6e5730" stroke-width="1.2"/>
+    <ellipse cx="102.5" cy="63" rx="2.8" ry="6.4" fill="#7d6438"/>
+    <path d="M60 49 h8 l1 28 h-10 Z" fill="url(#cord)" stroke="#5c4416" stroke-width="1"/>
+    <circle cx="64" cy="63" r="11" fill="url(#wax)" stroke="#5c3f10" stroke-width="1.4"/>
+    <circle cx="64" cy="63" r="7" fill="none" stroke="#8a6220" stroke-width="1.2"/>
+    <path d="M64 57.5 C68 60 68.5 63.5 64 68.5 C59.5 63.5 60 60 64 57.5 Z" fill="#f6dd9a" stroke="#7c5716" stroke-width="1"/>
+    <path d="M64 59.5 L64 66.5" stroke="#7c5716" stroke-width="0.9" fill="none"/>
+    <circle cx="60.5" cy="59.5" r="2" fill="#fff3c9" opacity="0.85"/>
+  </g>
+</svg>

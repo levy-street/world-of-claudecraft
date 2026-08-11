@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Written in Fine Ink deed crest source (inscription rare-tier milestone)</title>
+  <defs>
+    <radialGradient id="fieldGrad" cx="0.5" cy="0.42" r="0.65">
+      <stop offset="0" stop-color="#1d3370"/>
+      <stop offset="0.45" stop-color="#122252"/>
+      <stop offset="0.8" stop-color="#081231"/>
+      <stop offset="1" stop-color="#04081c"/>
+    </radialGradient>
+    <radialGradient id="inkGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#8fc2ff" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#4c86e8" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#4c86e8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldRim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2d078"/>
+      <stop offset="0.35" stop-color="#c9962e"/>
+      <stop offset="0.7" stop-color="#8a5a1a"/>
+      <stop offset="1" stop-color="#5c3a10"/>
+    </linearGradient>
+    <linearGradient id="goldRimLow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9c6d24"/>
+      <stop offset="1" stop-color="#4a2e0c"/>
+    </linearGradient>
+    <linearGradient id="goldSpike" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eecb70"/>
+      <stop offset="0.5" stop-color="#b98a28"/>
+      <stop offset="1" stop-color="#6e4614"/>
+    </linearGradient>
+    <linearGradient id="parchment" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0dfae"/>
+      <stop offset="0.5" stop-color="#d9bd7c"/>
+      <stop offset="1" stop-color="#a6854a"/>
+    </linearGradient>
+    <linearGradient id="parchRoll" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9ac6c"/>
+      <stop offset="0.5" stop-color="#a3823f"/>
+      <stop offset="1" stop-color="#6e5424"/>
+    </linearGradient>
+    <linearGradient id="quillBody" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#dcecff"/>
+      <stop offset="0.5" stop-color="#9cc0f2"/>
+      <stop offset="1" stop-color="#4c86e8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- cardinal spikes -->
+  <g stroke="#2a1a08" stroke-width="4" stroke-linejoin="round">
+    <polygon points="256,48 274,96 256,122 238,96" fill="url(#goldSpike)"/>
+    <polygon points="256,464 238,416 256,390 274,416" fill="url(#goldRimLow)"/>
+    <polygon points="48,256 96,238 122,256 96,274" fill="url(#goldSpike)"/>
+    <polygon points="464,256 416,274 390,256 416,238" fill="url(#goldSpike)"/>
+  </g>
+
+  <!-- medallion rim -->
+  <circle cx="256" cy="256" r="198" fill="#241608"/>
+  <circle cx="256" cy="256" r="192" fill="none" stroke="url(#goldRim)" stroke-width="18"/>
+  <circle cx="256" cy="256" r="201" fill="none" stroke="#1c1206" stroke-width="5"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#3a2410" stroke-width="8"/>
+  <circle cx="256" cy="256" r="172" fill="none" stroke="url(#goldRim)" stroke-width="6"/>
+
+  <!-- rim studs at the diagonals -->
+  <g fill="#e8c264" stroke="#4a2e0c" stroke-width="3">
+    <circle cx="120.2" cy="120.2" r="9"/>
+    <circle cx="391.8" cy="120.2" r="9"/>
+    <circle cx="120.2" cy="391.8" r="9"/>
+    <circle cx="391.8" cy="391.8" r="9"/>
+  </g>
+
+  <!-- inner field: the rare-blue enamel inset -->
+  <circle cx="256" cy="256" r="168" fill="url(#fieldGrad)"/>
+  <circle cx="256" cy="256" r="154" fill="none" stroke="#d9b45c" stroke-opacity="0.22" stroke-width="3"/>
+
+  <!-- glow behind the writing scene -->
+  <ellipse cx="256" cy="240" rx="126" ry="108" fill="url(#inkGlow)"/>
+
+  <!-- open scroll -->
+  <g stroke="#3a2408" stroke-width="5" stroke-linejoin="round">
+    <path fill="url(#parchment)"
+      d="M 172 226 C 208 216 304 216 340 226 L 340 322 C 304 332 208 332 172 322 Z"/>
+    <!-- left roll -->
+    <path fill="url(#parchRoll)"
+      d="M 172 226 C 156 226 148 236 148 250 L 148 298 C 148 312 156 322 172 322 C 182 322 188 314 188 302 L 188 246 C 188 234 182 226 172 226 Z"/>
+    <!-- right roll -->
+    <path fill="url(#parchRoll)"
+      d="M 340 226 C 356 226 364 236 364 250 L 364 298 C 364 312 356 322 340 322 C 330 322 324 314 324 302 L 324 246 C 324 234 330 226 340 226 Z"/>
+  </g>
+  <!-- roll cores -->
+  <g fill="#584018" stroke="#3a2408" stroke-width="3">
+    <ellipse cx="168" cy="274" rx="9" ry="26"/>
+    <ellipse cx="344" cy="274" rx="9" ry="26"/>
+  </g>
+  <!-- parchment top light -->
+  <path fill="none" stroke="#f8ecc4" stroke-opacity="0.8" stroke-width="4" stroke-linecap="round"
+    d="M 196 230 C 224 224 288 224 316 230"/>
+
+  <!-- fine ink script on the scroll -->
+  <g fill="none" stroke="#22409c" stroke-width="5" stroke-linecap="round">
+    <path d="M 208 258 L 276 258"/>
+    <path d="M 208 276 L 300 276"/>
+    <path d="M 208 294 L 262 294"/>
+  </g>
+  <path fill="none" stroke="#2f63c8" stroke-width="5" stroke-linecap="round"
+    d="M 276 296 C 290 288 298 296 292 306 C 288 312 296 316 304 312"/>
+
+  <!-- ink quill over the scroll, nib at lower left -->
+  <g stroke="#12305c" stroke-width="4" stroke-linejoin="round">
+    <path fill="url(#quillBody)"
+      d="M 206 312 L 254 240 C 266 216 288 184 316 158 C 330 145 346 134 356 130 C 358 142 352 162 342 180 C 324 212 296 244 268 264 L 222 302 Z"/>
+  </g>
+  <!-- quill spine and barb cuts -->
+  <path fill="none" stroke="#2b5cb4" stroke-width="4" stroke-linecap="round"
+    d="M 214 306 C 250 268 300 208 348 140"/>
+  <g fill="none" stroke="#e6f1ff" stroke-opacity="0.7" stroke-width="3" stroke-linecap="round">
+    <path d="M 286 200 L 306 210"/>
+    <path d="M 302 180 L 322 190"/>
+    <path d="M 318 160 L 336 170"/>
+  </g>
+  <!-- nib -->
+  <path fill="#e8c264" stroke="#3a2408" stroke-width="3" stroke-linejoin="round"
+    d="M 206 312 L 222 302 L 214 322 Z"/>
+  <!-- ink drop at the nib -->
+  <path fill="#101c44" stroke="#12305c" stroke-width="2"
+    d="M 206 330 C 210 336 210 342 206 346 C 202 342 202 336 206 330 Z"/>
+
+  <!-- sparkles -->
+  <g fill="#ffffff">
+    <path d="M 348 128 L 353 144 L 369 149 L 353 154 L 348 170 L 343 154 L 327 149 L 343 144 Z"/>
+    <path d="M 186 196 L 189 205 L 198 208 L 189 211 L 186 220 L 183 211 L 174 208 L 183 205 Z" fill-opacity="0.9"/>
+    <path d="M 320 344 L 322 351 L 329 353 L 322 355 L 320 362 L 318 355 L 311 353 L 318 351 Z" fill-opacity="0.8"/>
+  </g>
+</svg>
