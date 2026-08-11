@@ -201,6 +201,14 @@ const RETIRED_KEYS: string[] = [
  * this list cannot be used to park a key that has quietly become dead.
  */
 const LIVE_OFF_SWEEP_KEYS: string[] = [
+  // The ring's content-empty card copy: every live seat has content since the
+  // Masterwrought phase 06 inscription catalog, so the branch that renders it
+  // (ringCards in src/guide/pages/professions.ts) is unreachable from the
+  // generated data. Deliberately retained, not retired: a future recipe-less
+  // craft seat renders through it again, and tests/guide.test.ts drives the
+  // branch with a synthetic seat so the copy stays exercised.
+  'guide.professions.comingSoon',
+
   // Event handlers: only reached after a click or keystroke.
   'guide.chooser.results', // class-chooser filter count (src/guide/pages/classes.ts)
   'guide.nav.closeMenu', // mobile menu toggle's open-state label (src/guide/chrome.ts)
