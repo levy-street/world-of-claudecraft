@@ -7821,7 +7821,7 @@ export class Hud {
   // arm (IWorld.useItem, so offline runs the sim directly and online sends the
   // authoritative 'use' command), minus the hotbar-eligibility gate: the bar's
   // ids come pre-filtered from consumable_bar_view, which deliberately INCLUDES
-  // elixirs (usable from bags, just never hotbar-placeable).
+  // elixirs and scrolls (usable from bags, just never hotbar-placeable).
   private useConsumableSlot(i: number): void {
     const id = this.consumableBarIds[i];
     if (!id || this.tradeOpen) return;
