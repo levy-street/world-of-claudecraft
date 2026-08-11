@@ -18,7 +18,11 @@ generation service, source pack, or third-party reference was used.
   cabochon, sparkles), rasterized at 512px RGBA and ingested via
   `npm run assets:deeds` (`scripts/convert_deed_icons_webp.mjs`).
 - Committed source: `prog_jewelcrafting_rare.source.svg` in this directory,
-  sha256 `67875b8d101afd5af416889bb1da68de3ce8c172cf0ea3598db42abc7a5d9182`.
+  sha256 `51dfd91d207fce32376d282d63b227a779fccff44906496a001daf336a3f88ad`. The
+  committed copy adds one metadata title element over the exact bytes that
+  rendered the crest (the biome a11y lint requires an SVG title; the authoring
+  bytes hashed `67875b8d101afd5af416889bb1da68de3ce8c172cf0ea3598db42abc7a5d9182`);
+  the accepted WebP hash above is the authoritative pin.
 - Geometry review evidence: alpha bounds 11..116 on both axes, ink center
   exactly (63.5, 63.5), coverage 0.5073 against the family norm of about 0.45
   (gate band 0.35 to 0.6); the 512px source passed every converter source gate
