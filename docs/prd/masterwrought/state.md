@@ -1459,7 +1459,7 @@ Grandmaster-craft family, generic by construction.
   reserved companions (prog_three_paths, prog_ninefold) are equally unspecced. Decision:
   RE-RECORD the deferral with the new rationale (the hold is now an unwritten design,
   not a missing engine surface) in deeds.md, maintainer-notes.md, and both deeds.ts
-  doctrine comments, keep the tests/deeds_content.test.ts:478 absence pin, and QUEUE a
+  doctrine comments, keep the tests/deeds_content.test.ts absence pin, and QUEUE a
   design ruling for Fernando at Phase 06 QA: trigger shape (craftSkill count-arm?),
   threshold, renown, and whether the three reserved ids ship as a family.
 - PHASE 06 NAMING REGISTRY (R15, web-verified 2026-08-11; AMENDED at the content review
@@ -1501,9 +1501,9 @@ Grandmaster-craft family, generic by construction.
 - NEW TESTS: inscription_catalog (14, the JC catalog template incl. the full reagent
   literal table and both quality ladders), inscription_flow (8, live train/craft/deed at
   the apothecary incl. the resultCount 2 scroll batch and the 49-to-50 live-gain arm),
-  inscription_scroll_exclusivity (7, the headline both-orders pin across all three bands
-  plus cross-band weaker-included, the read and quaff log lines, and the derived-stats
-  liveness),
+  inscription_scroll_exclusivity (7: the band-payload premise pin, the headline
+  both-orders pair, cross-band weaker-included, the read and quaff log lines, and the
+  derived-stats liveness),
   elixir_tooltip_view scroll arm (byte-identical Use line vs the band elixir),
   market_filters scroll rows; plus the absorbed neighbor pins (see the
   test(professions) commit body for the full list).
@@ -1516,8 +1516,8 @@ Grandmaster-craft family, generic by construction.
   prog_inscription_50 name+desc + prog_grandmaster_inscription name+desc+title in the 13
   Latin deed chunks (91 rows: all seven manifest rows per chunk, matching the phase 05
   jewelcrafting trio's arithmetic; the re-audit corrected an earlier 35-row copy-slip,
-  which was the non-Latin count), and the log.read sim DICT row is already filled in all 20
-  blocks (no obligation) but the PRE-EXISTING log.quaff gap in the eight sparse blocks
+  which was the non-Latin count), and the log.read sim DICT row is already filled in every
+  locale block (22 measured at the re-audit) but the PRE-EXISTING log.quaff gap in the eight sparse blocks
   (cs/nl/pl/id/tr/sv/vi/da render English quaff lines) is recorded here as an OLD gap the
   release fill should close alongside log.read consistency;
   (d) the five non-Latin guide.profPages.faq q1-a8 block stays the recorded old-generation
@@ -1649,18 +1649,20 @@ Grandmaster-craft family, generic by construction.
   prog_ringwright deferral mention the ledger decision required in BOTH comments;
   restored with a pointer at the Professions 2.0 block. (2) The (c) release-fill count
   above was a 35-row copy-slip; corrected to 91 (the release-tier deed_i18n arm made the
-  slip harmless at fill time). (3) tests/reliquary_content.test.ts: all three catalog
-  narratives ended 3 short of their pins (the phase 05 QA grandmaster title slot and this
-  phase's +2 were never narrated) and the mark narrative missed masterwork:inscription
-  under the 31 pin; narratives extended to land exactly on 379/344/315/31 (literals were
-  independently recounted correct, comment-only fix). (4) craftProse.jewelcrafting
+  slip harmless at fill time). (3) tests/reliquary_content.test.ts: the two summed
+  catalog narratives ended 3 short of their pins and the character narrative's delta
+  enumeration missed the same three additions (the phase 05 QA grandmaster title slot
+  and this phase's +2 were never narrated), and the mark narrative missed
+  masterwork:inscription under the 31 pin; narratives extended to land exactly on
+  379/344/315/31 (literals were independently recounted correct, comment-only fix).
+  (4) craftProse.jewelcrafting
   .routeBody still claimed the craft's milestone and Grandmaster pages "wait with its
   archetype pairs", falsified by the phase 05 QA deed pair on this same branch and missed
   by the phase 06 sweep (which hunted inscription-falsified claims): English re-cut to
   the inscription routeBody's register (rare deed, 50-skill deed, 125-cap title), five
   non-Latin rows refreshed in-change mirroring EACH locale's own inscription-row register
-  (ru/zh_CN native deed names from the deed chunks, ja/ko/zh_TW English names pending the
-  recorded whole-file register pass), Latin rows already pending so the registry serves
+  (ru/zh_CN native deed names from the deed chunks, ja/ko/zh_TW English names, see the
+  register obligation below), Latin rows already pending so the registry serves
   the new English at fill time. Plus three audit nits applied: ledger exclusivity-suite
   count 6 -> 7 (the quaff else-arm test), consumer-set pins for silverleaf_herb and
   glass_vial gaining inscription (material_profession_affinity), and an ITEMS.arcane_shard
@@ -1669,5 +1671,32 @@ Grandmaster-craft family, generic by construction.
   RECORDED release-fill obligation (row (a) above), and the claimed phase 02 all-overlay
   precedent was factually wrong (hudChrome.pattern.teaches shipped 5 non-Latin only; the
   kind.recipe all-overlay fill was a recorded deliberate deviation).
-- STATUS: header line updated to 06 COMPLETE + RE-AUDITED; Phase 06 QA handoff and its
-  queued rulings are unchanged by this pass.
+- FRESH-REVIEW ROUND over this addendum's own fixes (the fix round is unreviewed code):
+  verdict 0 blocking, 4 should-fix, 6 nits, ALL applied or recorded. Applied: the 344
+  narrative's own head carried two compensating errors (baseline 242 with the 19
+  rare-slain marks dropped from the sum; corrected to 223 + 16 + 19 + 29 + 47 + 3 = 337,
+  measured), the zh routeBody rewrites carried a non-canonical Book of Deeds term
+  (corrected to the hudChrome.deeds.title form used by their inscription siblings), the
+  herb pins widened to all three herbs plus an arcane_essence head-position pin with an
+  accurate two-direction ordering comment (ink lines put inscription FIRST, herbs LAST,
+  vial is membership-only), and the 379 pin's excess sentence now names the real
+  composition (7 excludeFromCompletion slots + 28 duplicate item slots = the 35 gap).
+- RELEASE-FILL REGISTER OBLIGATION (widened here; supersedes the narrower ru craft-name
+  note in the art-digests paragraph above): the guide-prose register pass at the fill
+  covers CRAFT names and DEED names across all nine content crafts and all five
+  non-Latin overlays. Current split: ja/ko/zh_TW print English deed names in the
+  jewelcrafting and inscription routeBody prose while their deed chunks ship native
+  names; ru/zh_CN render those two crafts' deed names natively but the seven older
+  crafts' routeBody rows still print English deed names. Fill-time context: the guide's
+  own deed catalog page prints English deed names in every locale (content.generated is
+  English-only), so native prose names lack a guide-search anchor until the wiki i18n
+  story moves; the register pass should unify prose anyway and accept that split.
+- QA-QUEUED addition (joins the phase 06 QA ruling list): the five older crafts'
+  routeBody closing register diverges from the packet's two (they name two deeds, omit
+  their rare-tier deed although every prog_<craft>_rare ships, and say "at skill 50"
+  where jewelcrafting and inscription now name three deeds and say "at 50 skill");
+  unifying costs five English rewords x five non-Latin refreshes, a fill-wave-scale
+  prose pass, so it is queued rather than done here.
+- STATUS: header line updated to 06 COMPLETE + RE-AUDITED; the Phase 06 QA handoff and
+  its queued rulings are unchanged by this pass apart from the added prose-register
+  item above.

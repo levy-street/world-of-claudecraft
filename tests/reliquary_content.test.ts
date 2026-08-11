@@ -352,7 +352,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // the 29 NEW Spoils uniques (31 slots minus the 2 set members already
     // catalogued; a relic on two pages is one relic), then the 47 Warfare
     // honor pieces and the 3 fishing additions (the koi and both rods):
-    // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
+    // 223 + 16 + 19 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
     // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the jewelcrafting
     // masterwork mark the trainer ladder made earnable: 341, plus the
@@ -395,10 +395,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // (377), and the two Masterwrought phase 06 inscription slots (the
     // masterwork:inscription mark slot and the Grandmaster Inscription title
     // slot): 379 total.
-    // Slots, not unique relics: the two Spoils set repeats count again here,
-    // and the seven excludeFromCompletion slots (four vault, three bands)
-    // count here while adding zero to every completion pair, which is why this
-    // number exceeds the overview total above by more than the mark count.
+    // Slots, not unique relics: the seven excludeFromCompletion slots (four
+    // vault, three bands) count here while adding zero to every completion
+    // pair, and every duplicate ITEM slot counts again here where the overview
+    // counts the relic once (28 such slots, the two Spoils set repeats among
+    // them; most predate Phase 21), which is why this number exceeds the
+    // overview total above by 35.
     const slots = RELIQUARY_PAGES.reduce((n, page) => n + page.relics.length, 0);
     // Diagnostic names the per-page breakdown, so a red here says WHICH page
     // moved instead of only that the sum did.

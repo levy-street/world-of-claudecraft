@@ -39,14 +39,25 @@ describe('craftIdsForMaterialItem', () => {
   });
 
   it('herbs and the vial gained inscription as a consumer (Masterwrought phase 06)', () => {
-    // The inscription catalog (INSCRIPTION_RECIPES) consumes the alchemy herb
-    // ladder plus the glass_vial staple, so these shared-pool reagents list
-    // inscription after their older consumers (ring order).
-    expect(craftIdsForMaterialItem('silverleaf_herb')).toEqual([
-      'alchemy',
-      'cooking',
-      'tailoring',
+    // The inscription catalog (INSCRIPTION_RECIPES) consumes the whole herb
+    // ladder, the glass_vial staple, and the dust/essence ink lines. On the
+    // ink lines ring order puts inscription FIRST (the arcane_dust pin above
+    // and the essence pin below hold that head position); on the herbs it
+    // lands LAST, and the ring sort is what the herb pins discriminate, since
+    // first-seen recipe order would read tailoring or cooking before alchemy.
+    // The vial arm pins membership only; both orders agree there.
+    for (const herb of ['silverleaf_herb', 'goldleaf_herb', 'sunpetal_herb']) {
+      expect(craftIdsForMaterialItem(herb), herb).toEqual([
+        'alchemy',
+        'cooking',
+        'tailoring',
+        'inscription',
+      ]);
+    }
+    expect(craftIdsForMaterialItem('arcane_essence')).toEqual([
       'inscription',
+      'enchanting',
+      'jewelcrafting',
     ]);
     expect(craftIdsForMaterialItem('glass_vial')).toEqual(['alchemy', 'inscription']);
   });
