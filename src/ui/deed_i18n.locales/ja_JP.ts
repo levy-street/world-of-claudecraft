@@ -910,4 +910,17 @@ export const table: DeedLocaleTable = {
     desc: '宝石細工のスキルで125に到達し、その道の極みに立つ。',
     title: '宝石細工の大師',
   },
+  prog_inscription_rare: {
+    name: '見事な墨書',
+    desc: '銘文で初めてのレア級アイテムを作る。',
+  },
+  prog_inscription_50: {
+    name: '羽根ペンと顔料',
+    desc: '銘文のスキルで50に到達する。',
+  },
+  prog_grandmaster_inscription: {
+    name: '銘文の大師',
+    desc: '銘文のスキルで125に到達し、その道の極みに立つ。',
+    title: '銘文の大師',
+  },
 };

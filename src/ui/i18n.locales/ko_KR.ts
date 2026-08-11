@@ -2545,6 +2545,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': '도구',
   'itemUi.kind.potion': '물약',
   'itemUi.kind.elixir': '비약',
+  'itemUi.kind.scroll': '두루마리',
   'itemUi.kind.mount': '탈것',
   'itemUi.stats.armor': '방어도',
   'itemUi.stats.str': '힘',
@@ -10228,6 +10229,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_healing_draught.name': '태양꽃잎 치유 물약',
   'entities.items.sunpetal_mana_draught.name': '태양꽃잎 마나 물약',
   'entities.items.elixir_of_the_serpent.name': '뱀의 비약',
+  'entities.items.silverleaf_primer.name': '윤광잎 입문서',
+  'entities.items.goldleaf_folio.name': '금빛잎 서첩',
+  'entities.items.sunpetal_grimoire.name': '태양꽃잎 마법서',
+  'entities.items.silverleaf_scroll.name': '윤광잎 두루마리',
+  'entities.items.goldleaf_scroll.name': '금빛잎 두루마리',
+  'entities.items.sunpetal_scroll.name': '태양꽃잎 두루마리',
   'entities.mobs.wildheart_stalker.name': '덩굴발톱 추적자',
   'entities.mobs.wildheart_ravager.name': '피갈기 약탈자',
   'entities.mobs.wildheart_hexcaller.name': '태양뼈 사술사',
@@ -10495,6 +10502,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.masterwork_tailoring': '재봉 걸작',
   'hudChrome.reliquary.markFind.masterwork_leatherworking': '가죽세공 걸작',
   'hudChrome.reliquary.markFind.masterwork_jewelcrafting': '보석세공 걸작',
+  'hudChrome.reliquary.markFind.masterwork_inscription': '각인 걸작',
   'hudChrome.reliquary.markFind.masterwork_engineering': '공학 걸작',
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': '완벽한 광맥',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '고대 심재',
@@ -10919,9 +10927,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '제작의 원환',
   'guide.professions.ringBody':
-    '열 가지 제작 전문직이 하나의 원환에 놓여 저마다 기술을 따로 기록한다. 카드를 열면 전체 제조법 표와 수치를 볼 수 있다.',
+    '원환의 모든 제작 기술은 기술 125에서 상한에 닿는다. 무기 제작, 방어구 제작, 보석세공, 각인, 재봉, 가죽세공, 요리, 연금술, 기계공학, 마법부여다. 상한에서도 생업은 계속된다. 채집은 여전히 소출을 내고, 제작은 여전히 완성되며, 걸작도 여전히 나온다. 멈추는 것은 숫자뿐이다. 아래에서 카드를 고르면 그 기술의 전체 제조법 표와 수치를 볼 수 있다.',
   'guide.professions.ringWaveNote':
-    '각인은 지금도 원환 위에 자리를 지키지만 아직 제조법이 없다. 이는 실수가 아니라 의도된 설계로, 그 콘텐츠는 이후의 지역 확장과 함께 온다.',
+    '각인이 깃펜을 든 지금, 원환의 모든 자리가 진짜 제조법을 갖췄다. 원환은 끝난 것이 아니라 비로소 다 갖춰진 것이다. 상한은 앞으로의 지역과 함께 오르니, 오늘 상한에 닿은 기술은 결승선이 아니라 그 확장을 향한 앞선 출발이다.',
   'guide.professions.capFmt': '상한 {cap}',
   'guide.professions.comingSoon': '제조법 없음',
   'guide.professions.gatherHubHeading': '채집',
@@ -10939,7 +10947,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '희귀 이상의 작품에는 제작자의 이름이 새겨지고, 걸작은 품질이 한 단계 오르며, 주문 제작품은 받는 이에게 귀속된다(제작자의 서약).',
   'guide.professions.stationsHeading': '작업대와 장인',
   'guide.professions.stationsBody':
-    '세 곳의 거점 마을에 여섯 개의 분류별 작업대가 있고, 상주 장인이 제조법을 가르치며 작업 주문을 낸다.',
+    '여섯 가지 분류별 작업대가 세 거점 마을에 나뉘어 아홉 가지 작업대 귀속 제작 기술을 맡는다. Eastbrook에는 대장간(무기 제작, 방어구 제작, 보석세공이 함께 쓴다)과 주방, 베틀, 공작소가 있고, Fenbridge는 무두질 작업장을, Highwatch는 약방(연금술과 각인이 그 작업대를 나눠 쓴다)을 지킨다. 작업대마다 곁에 상주 장인이 있어 제조법을 가르치고, 작업 주문을 내걸며, 귀속 해제도 맡아 준다.\n\n작업 반경은 20야드, 대략 작업대의 앞마당이다. 마을 건너편이 아니라 모루 앞에 서서 만든다는 뜻이다. 작업대가 없는 것은 마법부여뿐으로, 설계부터 어디서나 되는 기술이다.',
   'guide.professions.colStation': '작업대',
   'guide.professions.colHub': '거점',
   'guide.professions.colMaster': '장인',
@@ -11120,9 +11128,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q1': '전문직을 몇 개나 배울 수 있나요?',
   'guide.profPages.faq.a1':
     '모든 캐릭터가 여덟 가지 수련 가능한 제작 전문직과 네 가지 채집 전문직을 전부 올릴 수 있다. 하나만 골라야 하는 것은 원형 정체성뿐이다.',
-  'guide.profPages.faq.q2': '제조법은 어디서 배우나요?',
+  'guide.profPages.faq.q2': '공용 제조법으로 기술이 영원히 오르나요?',
   'guide.profPages.faq.a2':
-    '훈련사 사다리 제조법은 각 작업대의 상주 장인이 가르치고, 아홉 개의 공용 야외 제조법과 도구 제조법은 모두가 처음부터 안다.',
+    '아니다. 모든 제조법은 그 기술에서 당신의 현재 단계보다 얼마나 아래에 있는지로 매겨진다. 고전 그대로의 주황, 노랑, 초록, 회색 읽기다. 자기 단계 이상이면 온전한 성장, 한 단계 아래면 절반, 두 단계 아래면 4분의 1, 세 단계 이상 아래면 아무것도 없다. 단계는 기술 25점마다이니, 무료인 기술 0 제조법은 기술 75부터 아무것도 가르쳐 주지 않는다.\n\n상한도 예상할 법한 고전의 300보다 낮다. 기를 수 있는 열 제작 기술은 각각 125가 상한이고, 채광과 벌목과 약초학은 100, 낚시는 길게 200까지 간다. 오른다는 것은 가장 싼 제조법을 갈아 대는 것이 아니라 제 단계의 제조법으로 옮겨 가는 것이다.',
   'guide.profPages.faq.q3': '채집에 도구가 필요한가요?',
   'guide.profPages.faq.a3':
     '1티어 채집물은 맨손이면 된다. 2티어나 3티어 채집물은 그 티어 이상의 맞는 도구가 필요하다.',
@@ -11146,10 +11154,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '검 곁의 생업',
   'guide.professions.whatBody':
-    '전문 기술은 이 세계의 생활이다. 네 가지 채집 기술이 땅에서 원료를 캐내고, 열 가지 제작 기술이 그것을 장비와 음식, 물약, 도구로 바꾼다. 모든 것이 맞물린다. 캐낸 광석은 검이 되고, 검은 마법부여를 받으며, 그 마법부여는 낡은 장비를 분해한 가루를 필요로 한다. 전문 기술 수 제한은 없다. 콘텐츠가 있는 제작 기술은 이제 아홉이고, 그중 여덟과 네 채집 기술을 모두 나란히 올릴 수 있으며(Engineering만 예외로, 제조법이 전부 자유 상한 위에서 시작해 그 사다리는 Bombardier의 맹세를 기다린다), 유일한 배타적 선택은 언젠가 맹세할 원형뿐이며, 일단 맹세하고 나면 그 뒤로 휴면에 든 제작 기술은 더 이상 오르지 않는다. 기술은 절대 내려가지 않고, 배운 것을 빼앗기지도 않는다.',
+    '전문 기술은 이 세계의 생활이다. 네 가지 채집 기술이 땅에서 원료를 곧장 캐내고, 열 가지 제작 기술의 원환이 그것을 장비와 음식, 물약, 도구로 바꾼다. 모든 것이 맞물린다. 캐낸 광석은 검이 되고, 검은 마법부여를 받으며, 그 마법부여는 낡은 장비를 분해한 가루를 필요로 하니, 채집가와 제작자와 땜장이가 모두 한 사슬의 고리다.\n\n전문 기술 수 제한에 애태울 일은 없다. 모든 캐릭터가 열 제작 기술 중 아홉과 네 채집 기술을 모두 나란히 올릴 수 있고(기계공학만 예외로, 제조법이 전부 자유 상한 위에서 시작해 그 사다리는 폭격수의 맹세를 기다린다), 유일한 배타적 선택은 언젠가 맹세할 원형뿐이다. 다만 일단 조율하고 나면 그 뒤에서 휴면에 든 제작 기술은 공용 제조법으로만 오르고, 기술 75를 넘어서는 전혀 오르지 않는다. 기술은 절대 내려가지 않고, 배운 것을 빼앗기지도 않는다.',
   'guide.professions.deedsHeading': '여정을 새기는 업적',
   'guide.professions.deedsBody':
-    '업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 아홉 제작 기술 모두 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고, 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.',
+    '업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 기를 수 있는 열 제작 기술 모두 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고, 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.',
   'guide.professions.startHeading': '어디서 시작할까',
   'guide.professions.startBody':
     'Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남동쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.',
@@ -11206,7 +11214,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     'ironlink 단 이상은 모두 걸작을 굴린다. 방어도뿐인 구리 단 일반품은 발동하지 않는다. 철은 재료 1단계, 문양강철은 2단계. 경로는 정석 세 단, 구리로 25, ironlink로 50, osmiumscale로 75. 75 이후의 행운은 가마비늘 망토다. 3단 제조법이라 99까지 전속, 이후 절반이니 마지막 50점이 150회가 아니라 약 75회로 끝난다. 한 벌에 오스뮴 7개와 Smithing Flux 5개, Thornpeak과 대장간 계산대에서 미리 쟁여 두자. Darva의 주문은 30분마다 구리 광석 8개. 기술 50에 Hammer and Plate, 125에 Grandmaster Armorcrafting이 기다린다.',
   'guide.profPages.craftProse.tailoring.identityHeading': '시전자의 천, 모두의 가방',
   'guide.profPages.craftProse.tailoring.identityBody':
-    "사다리는 homespun 기본에서 도금직조 세트를 거쳐 희귀 단의 Silkbinder's Raiment와 sunweave로 오른다. 두 번째 장사는 만인의 것이다. Silkspun Satchel은 10칸 가방이고, 가방 자리를 마다할 직업도 레벨도 없다. 재봉은 가죽세공과 각인 사이에 있다. 살아 있는 짝은 의복 장인(가죽세공과 재봉)으로 Eastbrook 베틀 곁의 Weaver Ottilie 앞에서 webwood 거미 네 마리를 잡아 실을 바치고 맹세한다. 각인과 이루는 Inkweaver는 각인의 첫 제조법을 기다린다.",
+    "사다리는 homespun 기본에서 도금직조 세트를 거쳐 희귀 단, Silkbinder's Raiment와 sunweave 작품으로 오른다. 두 번째 장사는 만인의 것이다. Silkspun Satchel은 10칸 가방이고, 가방 자리를 마다할 직업도 특성도 레벨도 없다.\n\n원환에서 재봉은 가죽세공과 각인 사이에 있다. 살아 있는 짝은 의복 장인(가죽세공과 재봉)으로, Eastbrook 베틀의 Weaver Ottilie 앞에서 webwood 거미 네 마리를 잡아 실을 바치고 맹세한다. 각인과 이루는 Inkweaver도 원환에 이름을 올렸고, 각인의 기본 목록이 이제 먹으로 쓰인 만큼 남은 것은 저만의 맹세 퀘스트뿐이다.",
   'guide.profPages.craftProse.tailoring.materialsHeading': '실과 비단, 그리고 약초',
   'guide.profPages.craftProse.tailoring.materialsBody':
     "베틀은 사냥의 전리품과 들판의 소출로 돈다. 아마 조각과 홈스펀 천은 인간형에게서, 거미줄은 거미 사체에서 나오고, 희귀 단의 핵심 Silkbinder's Raiment는 Pristine Silk(사체 채집의 서명 표본)를 원한다. 약초학은 어느 장비 기술보다 재봉을 살찌운다. 윤광잎이 신발을 장식하고, goldleaf가 도금직조를 물들이며, sunpetal이 희귀 단 전체를 꿰맨다. Spool of Thread는 Ottilie에게 12동이고, 베틀은 금속을 전혀 요구하지 않으며 Wardweave Cowl 정점품조차 premium herbs, Pristine Silk, 거미줄, 실로 짜인다.",
@@ -11266,7 +11274,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '공구에는 전투 능력치가 없어 걸작이 절대 발동하지 않는다. 특화는 여전히 기술 75다. 재료 20% 절약에, 어떤 채집 여행이든 작업장으로 바꾸는 임시 야외 공작소가 더해진다. 성장은 거의 줄지 않는다. 기술 75 제조법은 100까지 전속에 이후 절반, 기술 150 제조법은 상한 125까지 내내 전속이니 진짜 제약은 재료와 돈이지 회색 제조법이 아니다. 먼저 짝을 정하자. Tinker Gizzel에게서 폭격수 조율을 받는다. 그다음 사다리를 먹인다. 채광, 벌목, 약초학을 직접 올리거나 채집가와 친해지고, 3단계 공구는 상점에서 사며, Gizzel의 주문(Ironbark Log 8개에 16동, 30분마다)은 용돈으로 삼자. 홍보 문구는 저절로 써진다. 교점보다 높은 공구 단계 하나마다 2.5초 채집 시전에서 0.4초를 깎는다(하한 1.5초). 기술 50에 Cogs and Sprockets, 125에 Grandmaster Engineering이다.',
   'guide.profPages.craftProse.enchanting.identityHeading': '장비를 풀고, 힘을 되돌리다',
   'guide.profPages.craftProse.enchanting.identityBody':
-    '작업대도, 스승도, 사야 할 제조법 목록도 없다. 모든 마법부여는 처음부터 알려져 있고, 분해는 누구나 첫날부터 할 수 있으며, 기술은 여느 기술처럼 125가 상한이다. 각인과 보석세공 사이에 있어 짝은 Arcanist와 Gembinder지만, 둘 다 아직 맹세할 수 없다. 각인은 첫 제조법을 기다리고 있고, 보석세공은 이제 대장간에서 제 사다리를 두드리지만 Gembinder에는 아직 맹세 퀘스트가 없다. 그래서 오늘의 마법부여는 모두의 기술이다. 맹세 전엔 자유로이 희귀 단계까지 오르고, 폭격수나 약제사의 취미로도 자연스러운 선택이다. 마법부여사는 채집 세계도 떠받친다. 끼울 수 있는 세 가지 공구 효과가 모두 마법부여사의 작품이고, 원제작자는 제 작품의 재충전을 할인받으며 특화하면 더 깊어진다.',
+    "모든 마법부여는 처음부터 알려져 있고, 분해는 누구나 첫날부터 할 수 있으며, 어느 쪽도 작업대가 필요 없다. 기술은 여느 기술처럼 125가 상한이다. 이 기술에서 배워야 하는 유일한 구석은 두 가지 부적 제조법이다. Tinker Gizzel이 Eastbrook 광장 남서쪽 모퉁이의 공작소에서 Gatherer's Cache와 Artisan's Eye를 마법부여 25부터 통상의 단계 수수료로 가르치고, 부적 자체도 그의 작업대에서 만든다.\n\n원환에서는 각인과 보석세공 사이에 있어 두 짝 정체성은 Arcanist(각인과 마법부여)와 보석결속사(마법부여와 보석세공)다. 둘 다 아직 맹세할 수 없다. 이웃한 두 기술 모두 이제 저마다의 사다리를 돌리지만(각인은 약방에서, 보석세공은 대장간에서), 어느 짝에도 아직 맹세 퀘스트가 없다. 그래서 오늘의 마법부여는 모두의 기술이다. 맹세 전엔 자유로이 희귀 단계까지 오르고, 폭격수나 약제사의 취미로도 자연스러운 선택이다. 마법부여사는 채집 세계도 떠받친다. 끼울 수 있는 두 가지 공구 효과가 모두 마법부여사의 작품이고, 원제작자는 제 효과의 재충전을 할인받으며 특화하면 더 깊어진다.",
   'guide.profPages.craftProse.enchanting.levelingHeading': '마법부여 올리는 법',
   'guide.profPages.craftProse.enchanting.levelingBody':
     '기술을 움직이는 행동은 둘이다. 분해와 마법부여 시전. 성공마다 최대 1점이고, 일의 무게로 환산된다. 일반 분해와 가루만 드는 마법부여는 일반 일, 고급 분해와 정수 마법부여는 고급, 희귀 분해와 모든 Runed나 Greater 마법부여는 희귀, 영웅과 전설 분해는 그보다 높다. 익숙한 숙달 감쇠가 25점 단위로 걸려 일반 일은 기술 75에, 고급 일은 100에, 희귀 일은 정확히 상한 125에 회색이 된다. 마법부여만의 자비도 하나 있다. 천장을 넘는 입력은 0이 아니라 천장으로 내림되니, 맹세 전의 영웅 분해는 아무것도 못 배우는 대신 희귀로 계산된다. 마법부여가 다른 정체성 뒤에서 휴면하면 모든 것이 일반 일로 계산되어 오름세가 75에 멎고, 취미로 두면 희귀 일이 여전히 값을 하되 75 이후 느려질 뿐이다.',
@@ -11287,6 +11295,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.jewelcrafting.routeHeading': '걸작, 그리고 125까지의 길',
   'guide.profPages.craftProse.jewelcrafting.routeBody':
     '이 사다리에는 능력치 없는 단이 없다. 모든 성과물이 진짜 능력치를 달고 나오니, 더 고운 품질이 당신의 단 상한 안에 드는 한 매 제작이 걸작 확률을 굴리고, 철과 오스뮴은 둘 다 1단 재료로 가산된다. 구리 단과 철 단은 취미든 미맹세든 누구라도 희귀 걸작으로 빚을 수 있다. 오스뮴 세 점은 이미 희귀라, 그보다 한 단 높은 걸작은 희귀 위의 상한을 기다리는데, 보석세공의 짝이 열리기 전에는 아무도 그 상한을 갖지 못한다.\n\n오르는 길은 표준 그대로다. 구리로 25, 철 단은 열리는 날 올라 50, 오스뮴으로 75까지. 75 너머는 아직 아무것도 없어 오스뮴 제조법은 절반으로, 다시 4분의 1로 흐려진다. 125 상한까지 대략 150회를 더 잡고, 만든 것은 떳떳하게 팔아 밑천을 대라. 모든 직업이 장신구를 차고, 대부분의 여행자는 반지와 목걸이 칸을 비운 채 성장하니까.\n\n업적의 서는 첫 희귀 장신구에 Polished to Brilliance를 새긴다. 이 기술의 이정표와 Grandmaster 페이지는 그 짝 정체성과 함께 기다린다.',
+  'guide.profPages.craftIntro.inscription':
+    '각인은 Highwatch 약방의 필경대다. 보조 무기 칸의 시전자용 서책과 모두를 위한 체력 두루마리를, 곁의 물약이 쓰는 바로 그 약초를 갈아 만든다. 두루마리는 전투 비약 강화 효과로 들어가는 두 번째 문이니, 책 들 일 없는 전사도 두드릴 이유가 있다.',
+  'guide.profPages.craftProse.inscription.identityHeading': '정신을 위한 잉크, 길 위의 두루마리',
+  'guide.profPages.craftProse.inscription.identityBody':
+    '사다리는 세 단, 단마다 두 점이다. 보조 무기에 드는 시전자용 서책과 누구나 쓰는 체력 두루마리를 먼저 윤광잎으로, 다음은 금빛잎으로, 꼭대기에서는 희귀 태양꽃잎으로 다시 만든다. 서책은 여섯 마나 직업이 손에 드는 능력치 소지품으로 첫 단부터 진짜 지능과 정신을 달고 나오고, 두루마리는 직업 제한 없는 소모품이라 단마다 절반은 온 서버에 팔린다.\n\n제작의 고리에서는 재봉과 마법부여 사이에 있어 두 짝 정체성을 가진다. Inkweaver(재봉과 각인)와 Arcanist(각인과 마법부여)다. 둘 다 아직 맹세 퀘스트가 없으니 오늘의 각인은 모두의 기술이다. 모든 제조법이 미맹세 기술이 일하는 희귀 단 안에 있어, 어떤 맹세보다 먼저 사다리 전체가 열려 있다.',
+  'guide.profPages.craftProse.inscription.materialsHeading': '약초와 잉크, 그리고 담을 유리병',
+  'guide.profPages.craftProse.inscription.materialsBody':
+    '이 필경대는 약초학과 분해대로 돌아간다. 윤광잎은 Eastbrook Vale의 1단 약초밭에서, 금빛잎은 Mirefen Marsh에서, 태양꽃잎은 Thornpeak Heights에서 나오고, 제조법마다 약방 장인에게 12동에 사는 유리병 하나와 함께 갈려 안료가 된다. 잉크의 마법 쪽 절반은 분해대에서 온다. 윤광잎 단은 울림 가루를, 금빛잎 단과 태양꽃잎 단은 울림 정수를 찾으니, 필경사는 마법부여사의 든든한 단골이 되거나 스스로 분해 습관을 들이게 된다.\n\n태양꽃잎 단에는 마무리가 하나 더 있다. 희귀 마법서는 태양꽃잎 외에 금빛잎 두 장을 채색 장식의 크기를 잡는 데 쓴다. 약초도 가루도 상점에서는 팔지 않는다. 세계에서 꺾거나 다른 플레이어에게서 얻고, 돈으로 사는 것은 유리병뿐이다.',
+  'guide.profPages.craftProse.inscription.ladderHeading': '증류기 곁에서 배운다',
+  'guide.profPages.craftProse.inscription.ladderBody':
+    '각인에는 자기 작업대가 없다. 목록 전부가 Highwatch 약방, 연금술이 물약을 빚는 그 작업대에서 만들어지고, Alchemist Verane이 거기서 가르친다. 사다리는 세 단 여섯 개의 훈련사 제조법이다. 윤광잎 단(입문서와 두루마리)은 기술 0에 무료, 금빛잎 단(서첩과 두루마리)은 기술 25에 각 25은, 태양꽃잎 단(마법서와 두루마리)은 기술 50에 각 1금이며, 당신의 단이 제조법의 단에 닿는 순간 배울 수 있다. 50 단의 두루마리는 한 번에 두 장씩 나온다.\n\n야외 제조법도 합작품도 아직 없다. 모든 단이 약방 전용 훈련사 일이라, 이 기술은 연금술사들이 서 있는 자리에서 배우고 거기서 익힌다.',
+  'guide.profPages.craftProse.inscription.routeHeading': '두루마리와 비약, 그리고 125까지의 길',
+  'guide.profPages.craftProse.inscription.routeBody':
+    '두루마리가 이 기술의 서명 규칙이다. 각 단의 두루마리는 제 단계 체력 비약(멧돼지의 비약, 살무사 작열의 비약, 뱀의 비약)과 정확히 같은 강화 효과를 주고, 두 출처는 강화 효과 줄의 한 칸을 나눠 쓴다. 비약 위에 두루마리를 읽으면 비약을 대체하고, 두루마리 위에 비약을 마시면 그것을 대체하며, 언제나 가장 나중 것이 이긴다. 두루마리는 같은 강화로 들어가는 다른 문이지, 그 위에 얹는 두 번째 중첩이 아니다.\n\n서책은 진짜 능력치를 달고 있어, 더 고운 품질이 당신의 단 상한 안에 드는 한 서책 제작마다 걸작 확률을 굴린다. 능력치 없는 소모품인 두루마리는 절대 발동하지 않는다. 오르는 길은 표준 그대로다. 윤광잎으로 25, 금빛잎 단은 열리는 날 올라 50, 태양꽃잎으로 75까지. 75 너머는 아직 아무것도 없어 태양꽃잎 제조법은 절반으로, 다시 4분의 1로 흐려진다. 125 상한까지 대략 150회를 더 잡고, 만든 것은 떳떳하게 팔아 밑천을 대라. 두루마리는 이 게임의 모든 직업에게 팔리니까.\n\n업적의 서는 첫 희귀 작품에 Written in Fine Ink를, 기술 50에 Quill and Pigment를, 상한 125에 Grandmaster Inscription을 새긴다.',
   'hudChrome.corpseHarvest.components.meat': '고기',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (마법부여)',
   'hudChrome.materialHint.cookingCatch': '요리 재료. 먹기 전에 먼저 요리해야 합니다.',

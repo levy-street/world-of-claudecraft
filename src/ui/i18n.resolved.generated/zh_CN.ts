@@ -3632,7 +3632,7 @@ export const zh_CN: EnTranslations = {
         "masterwork_tailoring": "裁缝杰作",
         "masterwork_leatherworking": "制皮杰作",
         "masterwork_jewelcrafting": "珠宝加工杰作",
-        "masterwork_inscription": "Inscription Masterwork",
+        "masterwork_inscription": "铭文杰作",
         "masterwork_engineering": "工程学杰作",
         "gather_event_pristine_vein": "完美矿脉",
         "gather_event_ancient_heartwood": "古木心材",
@@ -5488,10 +5488,10 @@ export const zh_CN: EnTranslations = {
       "archetypeChooseBody": "宣告命途是一个剧情时刻：一个正式接纳你进入该身份的任务。在你宣告之前，每种行业的技能都能提升到稀有层级。一旦你选定一对行业，这两门行业便完全放开；轮盘对侧的一门行业会作为爱好留在你身边，仍能练到稀有层级；而在你保有这一身份期间，其余所有行业都停留在普通层级。",
       "archetypeSwitchBody": "宣告也不会是一纸终身判决。按照规划，在改投新的命途之前，你需要先向旧行业完成一次可重复的赎罪，而每转换一次，下一次赎罪的代价都会更沉，因此这个选择始终有分量，而非毫无代价。与宣告本身一样，它也仍在路上。",
       "whatHeading": "剑之外的一门手艺",
-      "whatBody": "专业是这个世界的营生：四种采集行业从大地中获取原料，十种制作行业把它们变成装备、饭菜、药水与工具。万物环环相扣：你挖出的矿石成为刀剑，刀剑接受附魔，而附魔又需要从旧装备中分解出的粉尘。这里没有专业数量限制：如今九种制作行业已有内容，每个角色都能同时修习其中八种与全部四种采集行业（工程学是唯一的例外：它的配方全部始于自由上限之上，要等爆破师的誓言），唯一的排他选择是你最终宣誓的命途，而一旦宣誓，落入休眠的制作行业便不再上升。技能永不下降，学会的东西也永远不会被夺走。",
+      "whatBody": "专业是这个世界的营生：四种采集行业从大地中直接获取原料，十种制作行业围成一环，把它们变成装备、饭菜、药水与工具。在这里万物环环相扣：你挖出的矿石成为刀剑，刀剑接受附魔，而附魔又需要从旧装备中分解出的粉尘，所以采集者、工匠与巧匠都是同一条链上的环。\n\n这里没有值得纠结的专业数量限制。每个角色都能同时修习十种制作行业中的九种与全部四种采集行业（工程学是唯一的例外：它的配方全部始于自由上限之上，所以它的梯子要等爆破师的誓言）；唯一的排他选择是你最终宣誓的命途，不过一旦调谐，落在它身后休眠的制作行业便只能靠普通配方爬升，过了技能75便再无寸进。技能永不下降，学会的东西也永远不会被夺走。",
       "ringHeading": "制作之轮",
-      "ringBody": "十种制作行业排列在一个轮环上，各自独立记录技能；点开一张卡片即可查看完整的配方表与数值。",
-      "ringWaveNote": "轮环上还有一门手艺，铭文，占着席位却尚未提供任何配方；这是刻意为之而非疏漏：它的内容将随后续的区域扩展一同到来。",
+      "ringBody": "轮环上的每门手艺都以125技能为上限：武器锻造、护甲锻造、珠宝加工、铭文、裁缝、制皮、烹饪、炼金术、工程学与附魔。到了上限手艺照常运转：采集依旧有产出，制作依旧能完成，杰作依旧可能出现，只是数字不再攀升。点开下方的一张卡片，即可查看该手艺完整的配方表与数值。",
+      "ringWaveNote": "随着铭文提起羽笔，轮环上的每个席位如今都有了真正的配方。轮环是齐全了，而非到头了：上限会随未来的区域一同提升，所以今天练满的一门手艺是那次扩展的抢跑，而不是终点线。",
       "capFmt": "上限{cap}",
       "comingSoon": "暂无配方",
       "gatherHubHeading": "采集",
@@ -5504,9 +5504,9 @@ export const zh_CN: EnTranslations = {
       "provenanceHeading": "出处",
       "provenanceBody": "精良及以上的成品带有制作者的名字，杰作会额外提升一个品质层级，而委托制品会绑定给它的收货人（制作者之约）。",
       "stationsHeading": "工位与大师",
-      "stationsBody": "三座主城中共设六座分类工位，常驻大师在此传授配方并发布工作订单。",
+      "stationsBody": "六座分类工位服务着九门绑定工位的手艺，分布在三座主城之间。Eastbrook拥有锻造坊（武器锻造、护甲锻造与珠宝加工共用）、厨房、织机与工坊；Fenbridge守着制革坊，Highwatch守着药坊（炼金术与铭文共用那张工作台）。每座工位旁都有一位常驻大师，传授配方、发布工作订单，并提供解绑服务。\n\n工作半径为20码，大致就是工位自己的院落，所以你是站在铁砧旁制作，而不是隔着半座城。唯有附魔没有工位：它天生随处可施展。",
       "deedsHeading": "铭记旅程的功业",
-      "deedsBody": "功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。九种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。",
+      "deedsBody": "功绩之书伴随这一切的每一步。首次调谐获得“誓艺者”，首次杰作获得“杰作锻师”，均可作为头衔佩戴。十种可修制作行业各在技能50记下一个里程碑功绩，并在各自的上限处加冕宗师头衔；钓鱼则在熟练度100获得“老渔翁”，200获得“垂钓宗师”头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功绩、野外撞见的稀罕发现，以及拾起拆解之路的功绩。这一切皆为装饰，只有头衔与名望。功绩永不赋予力量，它只证明你曾在场。",
       "startHeading": "从哪里开始",
       "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。",
       "colStation": "工位",
@@ -5560,7 +5560,7 @@ export const zh_CN: EnTranslations = {
         "engineering": "工程学在东溪的工坊打造4阶与5阶采集工具，每一件都要消耗低一阶的工具。",
         "enchanting": "附魔将不需要的装备分解成奥术材料，再将其用于永久性的装备附魔，无需任何工位。",
         "jewelcrafting": "珠宝加工是Eastbrook锻造坊里更精细的那张工作台：铜、铁与精良锇金的戒指与项链，每一档都有一枚力量戒指、一枚智力戒指和一条敏捷项链。首饰没有护甲、不限职业，所以它的顾客就是所有长着手指和脖子的人。",
-        "inscription": "Inscription is the writing desk of the Highwatch apothecary: caster tomes for the offhand and stamina scrolls for everyone, milled from the same herbs the draughts beside them use. Its scrolls are the second door into the battle-elixir buffs, so even a fighter who never holds a book has reason to knock."
+        "inscription": "铭文是Highwatch药坊里的那张书案：给施法者副手的典籍，给所有人的耐力卷轴，都用旁边药剂所用的同一批草药研墨而成。它的卷轴是通往战斗药剂增益的第二扇门，所以哪怕从不捧书的战士也有理由来敲门。"
       },
       "craftProse": {
         "weaponcrafting": {
@@ -5585,7 +5585,7 @@ export const zh_CN: EnTranslations = {
         },
         "tailoring": {
           "identityHeading": "施法者的布衣，所有人的背包",
-          "identityBody": "梯子从homespun基础布装经鎏金织套装爬到精良档：Silkbinder's Raiment与sunweave件。第二门生意人人需要：Silkspun Satchel是十格背包，没有哪个职业或等级嫌包多。\n\n裁缝位于制皮与铭文之间。现役命途是制装师（制皮与裁缝），在Eastbrook织机旁的Weaver Ottilie处宣誓，先猎四只webwood蜘蛛取丝；与铭文组成的Inkweaver也标注在制作之轮上，但要等铭文的第一批配方到来方可宣誓。",
+          "identityBody": "梯子从homespun基础布装经鎏金织套装爬到精良档：Silkbinder's Raiment与sunweave件。第二门生意人人需要：Silkspun Satchel是十格背包，没有哪个职业、专精或等级嫌包多。\n\n在制作之轮上裁缝位于制皮与铭文之间。现役命途是制装师（制皮与裁缝），先猎四只webwood蜘蛛取丝，再在Eastbrook织机旁的Weaver Ottilie处宣誓；与铭文组成的织墨师也标注在轮环上，如今铭文的基础配方目录已然落墨，它只差一个属于自己的宣誓任务。",
           "materialsHeading": "线、丝，还有草药",
           "materialsBody": "织机靠猎获与田野运转：亚麻碎布与家纺布来自人形生物，蜘蛛丝从蛛尸上采取，精良档的核心Silkbinder's Raiment要一块Pristine Silk（尸体采集的署名标本）。\n\n草药喂养裁缝胜过任何装备行业：润光叶镶拖鞋，金叶染鎏金织，日瓣草贯穿整个精良档，所以自己采药的裁缝能持续节省材料。Spool of Thread在Ottilie处12铜一轴，织机根本不用金属，连Wardweave Cowl顶阶也是用高级草药、Pristine Silk、蛛丝与线织成。",
           "ladderHeading": "在Ottilie的织机学艺",
@@ -5635,7 +5635,7 @@ export const zh_CN: EnTranslations = {
         },
         "enchanting": {
           "identityHeading": "拆开装备，注回力量",
-          "identityBody": "没有工位、没有训练师、没有要买的配方书：所有附魔初始即会，谁都能从第一天开始分解，技能与各行业一样以125为上限。它位于铭文与珠宝加工之间，两条命途是Arcanist与Gembinder，均暂不可宣誓：铭文仍在等待第一批配方，而珠宝加工虽已在锻造坊锤打自己的梯子，Gembinder却还没有宣誓任务；因此附魔今天是所有人的手艺：宣誓前自由练到精良层，也是爆破师或药剂师天然的爱好选择。附魔师还维系着采集世界：三种可镶嵌的工具效果都是附魔师的作品，原作者为自己的作品充能享有折扣，专精后更深。",
+          "identityBody": "所有附魔初始即会，谁都能从第一天开始分解，而且两者都永远不需要工位；技能与各行业一样以125为上限。这门手艺唯一需要拜师的角落是它的一对护符配方：待你的附魔达到25，Tinker Gizzel便会在Eastbrook广场西南角的工坊以寻常的档位费用传授采集者储囊与匠人之眼，护符本身也在他的工位制作。\n\n在制作之轮上它位于铭文与珠宝加工之间，因此拥有两条命途：秘法师（铭文与附魔）与缚晶师（附魔与珠宝加工）。两者都还不能宣誓：两门相邻手艺如今都在经营自己的梯子（铭文在药坊，珠宝加工在锻造坊），但两条命途都还没有宣誓任务。所以今天附魔是所有人的手艺：宣誓前自由练到精良层，也是爆破师或药剂师天然的爱好选择。附魔师还维系着采集世界：两种可镶嵌的工具效果都是附魔师的作品，原作者为自己的作品充能享有折扣，专精后更深。",
           "levelingHeading": "附魔如何升级",
           "levelingBody": "两种行动推动技能：分解与施加附魔，每次成功最多一点，按工作的分量折算：普通分解与纯粉尘附魔算普通活；优秀分解与精华附魔算优秀活；精良分解与所有Runed或Greater附魔算精良活；史诗与传说分解更高。熟悉的精通衰减按25点层级作用：普通活在技能75变灰，优秀活在100，精良活恰在125上限。附魔另有一份仁慈：高于命途上限的输入向下取整而非归零，宣誓前史诗分解按精良计而非一无所获；若附魔沦为休眠，一切按普通活计，爬升停在75；作为爱好则精良活仍有收益，只是75之后变慢。",
           "marketHeading": "附魔副本、出处与市场",
@@ -5652,14 +5652,14 @@ export const zh_CN: EnTranslations = {
           "routeBody": "这条梯子上没有无属性的档位：每件成品都带真实属性，所以只要更精的品质仍在你的档位上限之内，每次制作都会掷杰作概率，铁与锇金都按一级材料计入加成。铜档与铁档的成品，任何业余或未宣誓的珠宝匠都能做成精良杰作；锇金三件本身已是精良，它们的史诗杰作要等高于精良的上限，而在珠宝加工的命途开放之前没人拥有这个上限。\n\n攀登照标准路线走：铜档到25，铁档开放当天骑到50，再用锇档到75。75之后暂无更高配方，锇档收益先减半再减为四分之一：预算大约再做150件到达125上限，并让它们体面地卖钱，因为每个职业都戴首饰，而多数旅人升级时戒指和项链栏一直空着。\n\n功业之书会为你的第一件精良首饰记下Polished to Brilliance；这门手艺的里程碑与Grandmaster篇章则与它的命途一同等待。"
         },
         "inscription": {
-          "identityHeading": "Ink for the mind, scrolls for the road",
-          "identityBody": "The ladder is three rungs of two: a caster tome for the offhand and a stamina scroll for anyone at all, first in sheenleaf, again in goldleaf, and once more in rare sunpetal at the top. The tomes are held stat sticks for the six mana classes, real Intellect and Spirit from the first rung; the scrolls are consumables with no class lock, so half of every rung sells to the whole realm.\n\nOn the craft ring it sits between Tailoring and Enchanting, giving it two pair identities: the Inkweaver (Tailoring and Inscription) and the Arcanist (Inscription and Enchanting). Neither has an oath quest yet, so today Inscription climbs as everyone's craft: every recipe sits inside the rare tier that undeclared crafts work under, and the whole ladder is open before any oath.",
-          "materialsHeading": "Herbs, ink, and a vial to hold it",
-          "materialsBody": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung and Chime Essence the goldleaf and sunpetal rungs, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung adds one refinement: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations. No counter sells the herbs or the dust: they come out of the world or off another player; only the vial is bought for coin.",
-          "ladderHeading": "Taught beside the alembics",
-          "ladderBody": "Inscription has no station of its own: the whole catalog is worked at the Highwatch apothecary, the same bench Alchemy brews at, and Alchemist Verane teaches it there. The ladder is six trainer recipes in three rungs: the sheenleaf rung (primer and scroll) is free at skill 0, the goldleaf rung (folio and scroll) costs 25 silver a recipe at skill 25, and the sunpetal rung (grimoire and scroll) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own. The rung-50 scroll comes off the desk two at a time.\n\nThere are no field recipes and no combination piece yet: every rung is apothecary-bound trainer work, so this craft is learned, and practiced, standing where the alchemists stand.",
-          "routeHeading": "Scrolls, elixirs, and a working route to 125",
-          "routeBody": "The scrolls are the craft's signature rule: each rung's scroll grants exactly the buff of its band's stamina elixir (the boar, vipersear, and serpent bands), and the two sources share one slot on the buff bar. Reading a scroll over an elixir replaces it, drinking an elixir over a scroll replaces that, and the newest application always wins, so a scroll is an alternative door into the same buff, never a second stack on top of it.\n\nThe tomes carry real stat lines, so every tome craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling; the scrolls, statless consumables, never proc. The climb is the standard ride: sheenleaf to 25, the goldleaf rung the day it opens to 50, then sunpetal to 75. Past 75 nothing higher ships yet, so the sunpetal recipes fade to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since the scrolls sell to every class in the game.\n\nThe Book of Deeds marks Written in Fine Ink for your first rare-tier piece, Quill and Pigment at 50 skill, and Grandmaster Inscription at the 125 cap."
+          "identityHeading": "润心的墨，上路的卷轴",
+          "identityBody": "梯子是三档、每档两件：一部给施法者副手的典籍，一卷谁都用得上的耐力卷轴，先用润光叶，再用金叶，最后在顶端用精良阳瓣再来一遍。典籍是六个法力职业手持的属性件，从第一档起就带着实打实的智力与精神；卷轴是不限职业的消耗品，所以每一档都有一半卖给整个王国。\n\n在制作之轮上它位于裁缝与附魔之间，因此拥有两条命途：织墨师（裁缝与铭文）与秘法师（铭文与附魔）。两者都还没有宣誓任务，所以今天铭文是所有人的手艺：每个配方都在未宣誓行业可用的精良层之内，整条梯子在任何誓言之前就完全敞开。",
+          "materialsHeading": "草药、墨与盛墨的瓶",
+          "materialsBody": "这张书案靠草药学与分解台运转。润光叶出自Eastbrook Vale的一级草丛，金叶出自Mirefen Marsh，阳瓣出自Thornpeak Heights，每个配方都把草药研成颜料，再用一个玻璃瓶来盛（药坊大师处12铜一个）。墨水的魔法那一半来自分解台：润光叶档用铃音之尘，金叶档与阳瓣档要铃音精华，所以铭文师不是附魔师最稳定的顾客，就是自己养成了分解的习惯。\n\n阳瓣档多一道讲究：那部精良魔典除阳瓣外还要两株金叶，掺进去为泥金彩绘打底。草药与尘都无处花钱购买：它们来自世界本身，或来自另一位玩家；只有瓶子用钱能买。",
+          "ladderHeading": "在蒸馏器旁学艺",
+          "ladderBody": "铭文没有自己的工位：整套目录都在Highwatch药坊制作，与炼金术共用同一张工作台，Alchemist Verane也在那里授艺。梯子是三档六个训练师配方：润光叶档（启蒙书与卷轴）技能0免费，金叶档（书册与卷轴）技能25每个25银，阳瓣档（魔典与卷轴）技能50每个1金，你在该行业的档位一达到配方档位便可学习。50档的卷轴每次出两卷。\n\n这里没有野外配方，也还没有组合件：每一档都是绑定药坊的训练师手艺，所以这门手艺就在炼金师们站立的地方学、也在那里练。",
+          "routeHeading": "卷轴、药剂与通往125之路",
+          "routeBody": "卷轴是这门手艺的招牌规则：每一档的卷轴给出的正是同档耐力药剂的增益（野猪、蝰灼与巨蛇三档），且两种来源在增益栏上共用同一个位置。在药剂之上读卷轴会顶替它，在卷轴之上喝药剂也会顶替回来，永远是最新施加的生效，所以卷轴是通往同一增益的另一扇门，绝不会在其上叠出第二层。\n\n典籍带着实打实的属性，所以只要更精的品质仍在你的档位上限之内，每次制作典籍都会掷杰作概率；卷轴是无属性的消耗品，永不触发。攀登照标准路线走：润光叶档到25，金叶档开放当天骑到50，再用阳瓣档到75。75之后暂无更高配方，阳瓣档收益先减半再减为四分之一：预算大约再做150次到达125上限，并让它们体面地卖钱，因为卷轴卖给游戏里的每一个职业。\n\n功绩之书会为你的第一件精良品记下“笔精墨妙”，技能50记下“羽笔与颜料”，125上限处加冕“铭文宗师”。"
         }
       },
       "howHeading": "制作流程",
@@ -5813,7 +5813,7 @@ export const zh_CN: EnTranslations = {
         "q1": "我能学多少专业？",
         "a1": "每个角色都可以提升全部八种可修炼制作行业和全部四种采集行业；只有命途身份是唯一的选择。",
         "q2": "在哪里学配方？",
-        "a2": "训练师阶梯配方由各工位的常驻大师传授，而九个通用野外配方和工具配方所有人从一开始就会。",
+        "a2": "不会。每个配方都按它落在你当前档位之下多远来计分，也就是经典的橙、黄、绿、灰读法：在你档位或以上为全额成长，低一档减半，低两档四分之一，低三档及以上毫无成长。每25点技能为一档，所以免费的技能0配方到了技能75就再也教不了你什么。\n\n各项上限也低于你可能预期的经典300：十种可修制作行业各以125为上限，采矿、伐木与草药学以100为上限，钓鱼则一路放长到200。攀升靠的是换上你自己档位的配方，而不是死磨最便宜的那一个。",
         "q3": "采集需要工具吗？",
         "a3": "1阶节点徒手即可；2阶或3阶节点需要至少同阶级的对应工具。",
         "q4": "为什么技能不再增长？",
@@ -8781,7 +8781,7 @@ export const zh_CN: EnTranslations = {
       "tool": "工具",
       "potion": "药水",
       "elixir": "药剂",
-      "scroll": "Scroll",
+      "scroll": "卷轴",
       "bag": "背包",
       "mount": "坐骑"
     },
@@ -12267,22 +12267,22 @@ export const zh_CN: EnTranslations = {
         "name": "磨光锇金护符"
       },
       "silverleaf_primer": {
-        "name": "Sheenleaf Primer"
+        "name": "润光叶启蒙书"
       },
       "goldleaf_folio": {
-        "name": "Goldleaf Folio"
+        "name": "金叶书册"
       },
       "sunpetal_grimoire": {
-        "name": "Sunpetal Grimoire"
+        "name": "阳瓣魔典"
       },
       "silverleaf_scroll": {
-        "name": "Sheenleaf Scroll"
+        "name": "润光叶卷轴"
       },
       "goldleaf_scroll": {
-        "name": "Goldleaf Scroll"
+        "name": "金叶卷轴"
       },
       "sunpetal_scroll": {
-        "name": "Sunpetal Scroll"
+        "name": "阳瓣卷轴"
       },
       "conjured_water4": {
         "name": "魔法泉水"

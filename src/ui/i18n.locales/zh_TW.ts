@@ -2460,6 +2460,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': '工具',
   'itemUi.kind.potion': '藥水',
   'itemUi.kind.elixir': '藥劑',
+  'itemUi.kind.scroll': '卷軸',
   'itemUi.kind.mount': '坐騎',
   'itemUi.stats.armor': '護甲',
   'itemUi.stats.str': '力量',
@@ -9787,6 +9788,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_healing_draught.name': '陽瓣治療藥水',
   'entities.items.sunpetal_mana_draught.name': '陽瓣法力藥水',
   'entities.items.elixir_of_the_serpent.name': '巨蛇藥劑',
+  'entities.items.silverleaf_primer.name': '潤光葉入門書',
+  'entities.items.silverleaf_scroll.name': '潤光葉卷軸',
+  'entities.items.goldleaf_folio.name': '金葉書冊',
+  'entities.items.goldleaf_scroll.name': '金葉卷軸',
+  'entities.items.sunpetal_grimoire.name': '陽瓣魔典',
+  'entities.items.sunpetal_scroll.name': '陽瓣卷軸',
   'entities.mobs.wildheart_stalker.name': '藤爪潛獵者',
   'entities.mobs.wildheart_ravager.name': '血鬃掠奪者',
   'entities.mobs.wildheart_hexcaller.name': '日骨巫咒師',
@@ -10048,6 +10055,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.masterwork_tailoring': '裁縫傑作',
   'hudChrome.reliquary.markFind.masterwork_leatherworking': '製皮傑作',
   'hudChrome.reliquary.markFind.masterwork_jewelcrafting': '珠寶設計傑作',
+  'hudChrome.reliquary.markFind.masterwork_inscription': '銘文學傑作',
   'hudChrome.reliquary.markFind.masterwork_engineering': '工程學傑作',
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': '完美礦脈',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '古木心材',
@@ -10457,9 +10465,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '製作之輪',
   'guide.professions.ringBody':
-    '十種製作行業排列在一個輪環上，各自獨立記錄技能；點開一張卡片即可查看完整的配方表與數值。',
+    '輪環上的每種製作行業都以125技能為上限：武器鍛造、護甲鍛造、珠寶設計、銘文學、裁縫、製皮、烹飪、鍊金術、工程學與附魔。到達上限後這門行業照常運轉：採集依舊有收穫，製作依舊能完成，傑作依舊可能出現；只是數字不再攀升。點開下方的一張卡片，即可查看該行業完整的配方表與數值。',
   'guide.professions.ringWaveNote':
-    '輪環上還有一門手藝，銘文學，佔著席位卻尚未提供任何配方；這是刻意為之而非疏漏：它的內容將隨後續的區域擴充一同到來。',
+    '隨著銘文學拿起羽筆，輪環上的每個席位如今都有真正的配方問世。輪環是齊全了，卻還不是完結：上限會隨未來的區域一同提升，所以今天封頂的行業是在那次擴充上搶得的先機，而非終點線。',
   'guide.professions.capFmt': '上限{cap}',
   'guide.professions.comingSoon': '暫無配方',
   'guide.professions.gatherHubHeading': '採集',
@@ -10477,7 +10485,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '精良及以上的成品帶有製作者的名字，傑作會額外提升一個品質層級，而委託製品會綁定給它的收貨人（製作者之約）。',
   'guide.professions.stationsHeading': '工位與大師',
   'guide.professions.stationsBody':
-    '三座主城中共設六座分類工位，常駐大師在此傳授配方並發布工作訂單。',
+    '六座分類工位服務九種綁定工位的製作行業，分佈在三座主城之中。Eastbrook設有鍛造坊（武器鍛造、護甲鍛造與珠寶設計共用）、廚房、織布機與工坊；Fenbridge守著製革坊，Highwatch則是藥坊（鍊金術與銘文學共用那張工作檯）。每座工位旁都有一位常駐大師，在此傳授配方、發布工作訂單並提供解綁服務。\n\n工作半徑為20碼，大致就是工位自己的院子，所以你是站在鐵砧旁製作，而不是隔著半座城。只有附魔沒有工位：它被有意設計成隨處可用。',
   'guide.professions.colStation': '工位',
   'guide.professions.colHub': '主城',
   'guide.professions.colMaster': '大師',
@@ -10656,7 +10664,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '每個角色都可以提升全部八種可修煉製作行業和全部四種採集行業；只有命途身分是唯一的選擇。',
   'guide.profPages.faq.q2': '在哪裡學配方？',
   'guide.profPages.faq.a2':
-    '訓練師階梯配方由各工位的常駐大師傳授，而九個通用野外配方和工具配方所有人從一開始就會。',
+    '不會。每個配方都按它落在你當前檔位之下多遠來計算，也就是經典的橙、黃、綠、灰讀法：在你檔位或以上給予全額成長，低一層減半，低兩層為四分之一，低三層及以上毫無成長。每25點技能為一檔，所以技能0的免費配方到技能75就再也教不了你任何東西。\n\n上限也比你可能預期的經典300要低：十種可修製作行業各以125為上限，採礦、伐木與藥草學以100為上限，釣魚則一路放長到200。攀升的意思是換上你自己檔位的配方，而不是死磨最便宜的那一個。',
   'guide.profPages.faq.q3': '採集需要工具嗎？',
   'guide.profPages.faq.a3': '1階節點徒手即可；2階或3階節點需要至少同階級的對應工具。',
   'guide.profPages.faq.q4': '為什麼技能不再增長？',
@@ -10679,10 +10687,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '劍之外的一門手藝',
   'guide.professions.whatBody':
-    '專業是這個世界的營生：四種採集行業從大地中獲取原料，十種製作行業把它們變成裝備、飯菜、藥水與工具。萬物環環相扣：你挖出的礦石成為刀劍，刀劍接受附魔，而附魔又需要從舊裝備中分解出的粉塵。這裡沒有專業數量限制：如今九種製作行業已有內容，每個角色都能同時修習其中八種與全部四種採集行業（工程學是唯一的例外：它的配方全部始於自由上限之上，要等爆破師的誓言），唯一的排他選擇是你最終宣誓的命途，而一旦宣誓，落入休眠的製作行業便不再上升。技能永不下降，學會的東西也永遠不會被奪走。',
+    '專業是這個世界的營生：四種採集行業把原料直接從大地中取出，十種製作行業組成的輪環再把它們變成裝備、飯菜、藥水與工具。在這裡萬物環環相扣：你挖出的礦石成為刀劍，刀劍接受附魔，而附魔又需要從舊裝備中分解出的粉塵，所以採集者、工匠與修補匠同是一條鏈上的環節。\n\n這裡沒有值得為之煩惱的專業數量限制。每個角色都能同時修習十種製作行業中的九種與全部四種採集行業（工程學是唯一的例外：它的配方全部始於自由上限之上，所以它的梯子要等爆破師的誓言）；唯一的排他選擇是你的命途，也就是你最終宣誓的身分；不過一旦調諧，落入休眠的製作行業便只能靠普通配方攀升，過了技能75便再無寸進。技能永不下降，學會的東西也永遠不會被奪走。',
   'guide.professions.deedsHeading': '銘記旅程的功業',
   'guide.professions.deedsBody':
-    '功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。九種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。',
+    '功績之書伴隨這一切的每一步。首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。十種可修行業各在技能50記下一項里程碑功績，並在各自的上限加冕Grandmaster頭銜；釣魚則在100熟練獲得Old Salt，200獲得Master Angler頭銜。\n\n也有一些更安靜的頁面：首次採集與首次製作的功績，野外好運翻出的奇遇功績，以及著手拆解回收的功績。這一切皆為裝飾，只有頭銜與名望。功績永不賦予力量；它只證明你曾親歷其境。',
   'guide.professions.startHeading': '從哪裡開始',
   'guide.professions.startBody':
     '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東南Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。',
@@ -10739,7 +10747,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     'ironlink檔及以上都擲傑作；只有護甲值的銅檔普通件不會觸發。鐵算一級材料，銘鋼算二級。路線照常：銅到25，ironlink到50，osmiumscale到75。75之後的運氣在於Kilnscale Mantle：三層配方，到99全速、之後半速，最後五十點約75次而非150次；每件要七塊鋨礦五份Smithing Flux，先在Thornpeak和鍛造坊櫃檯備貨。Darva的訂單每30分鐘收八塊銅礦。技能50記下Hammer and Plate，125等著Grandmaster Armorcrafting。',
   'guide.profPages.craftProse.tailoring.identityHeading': '施法者的布衣，所有人的背包',
   'guide.profPages.craftProse.tailoring.identityBody':
-    "梯子從homespun基礎布裝經gildenweave套裝爬到精良檔：Silkbinder's Raiment與sunweave件。第二門生意人人需要：Silkspun Satchel是十格背包，沒有哪個職業或等級嫌包多。裁縫位於製皮與銘文學之間；製裝師（製皮與裁縫）在Eastbrook織布機旁的Weaver Ottilie處宣誓（先獵四隻webwood蜘蛛取絲），與銘文學組成的Inkweaver要等銘文學的第一批配方。",
+    "梯子從homespun基礎款經gildenweave套裝爬到精良檔：Silkbinder's Raiment與sunweave件。它的第二門生意人人需要：Silkspun Satchel是十格背包，沒有哪個職業、專精或等級會嫌背包空間多。\n\n在輪環上裁縫位於製皮與銘文學之間。它現行的命途是製裝師，即製皮與裁縫的組合，在Eastbrook織布機旁的Weaver Ottilie處宣誓，須先獵四隻webwood蜘蛛取絲；與銘文學組成的墨織師已標註在輪上，如今銘文學的基礎目錄已然落墨，它只待一個屬於自己的宣誓任務。",
   'guide.profPages.craftProse.tailoring.materialsHeading': '線、絲，還有藥草',
   'guide.profPages.craftProse.tailoring.materialsBody':
     "織布機靠獵獲與田野運轉：亞麻碎布與家紡布來自人形生物，蜘蛛絲從蛛屍上採取，精良檔的核心Silkbinder's Raiment要一塊Pristine Silk（屍體採集的署名標本）。藥草餵養裁縫勝過任何裝備行業：潤光葉鑲拖鞋，金葉染gildenweave，日瓣草貫穿整個精良檔。Spool of Thread在Ottilie處12銅一軸，織布機根本不用金屬，連Wardweave Cowl頂階也是用高級草藥、Pristine Silk、蛛絲與線織成。",
@@ -10799,7 +10807,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '工具沒有戰鬥屬性，永不出傑作。75照常專精：省20%材料，外加把任何採集之旅變成車間的臨時野外工坊。成長幾乎不衰減：75檔配方到100全速、之後半速，150檔配方到125上限一路全速，真正的瓶頸是材料與銅板。先定命途，從Tinker Gizzel處取爆破師調諧；再餵梯子：自練採集或結交採集者，商店買齊3級工具，把Gizzel的訂單（八根Ironbark Log換16銅，每30分鐘一次）當零花錢。賣點不言自明：高於節點的每級工具都從2.5秒採集讀條裡削去0.4秒（下限1.5秒）。技能50記下Cogs and Sprockets，125是Grandmaster Engineering。',
   'guide.profPages.craftProse.enchanting.identityHeading': '拆開裝備，注回力量',
   'guide.profPages.craftProse.enchanting.identityBody':
-    '沒有工位、沒有訓練師、沒有要買的配方書：所有附魔初始即會，誰都能從第一天開始分解，技能與各行業一樣以125為上限。它位於銘文學與珠寶設計之間，兩條命途是Arcanist與Gembinder，均暫不可宣誓：銘文學仍在等待第一批配方，而珠寶設計雖已在鍛造坊錘打自己的梯子，Gembinder卻還沒有宣誓任務；因此附魔今天是所有人的手藝：宣誓前自由練到精良層，也是爆破師或藥劑師天然的愛好選擇。附魔師還維繫著採集世界：三種可鑲嵌的工具效果都是附魔師的作品，原作者為自己的作品充能享有折扣，專精後更深。',
+    '所有附魔初始即會，誰都能從第一天開始分解，兩者都永遠不需要工位；技能與各行業一樣以125為上限。這門手藝唯一要拜師的角落是它的兩張符物配方：Tinker Gizzel在Eastbrook廣場西南角的工坊傳授採集者儲囊與匠人之眼，附魔達到25後按尋常的檔位費用學習，符物本身也在他的工位製作。\n\n在輪環上它位於銘文學與珠寶設計之間，因此兩條命途是秘法師（銘文學與附魔）與縛晶師（附魔與珠寶設計）。兩者都還不能宣誓：兩個相鄰行業如今都有了自己的梯子（銘文學在藥坊，珠寶設計在鍛造坊），但兩對命途都還沒有宣誓任務。所以附魔今天仍是所有人的手藝：宣誓前自由練到精良層，也是爆破師或藥劑師天然的愛好選擇。附魔師還維繫著採集世界：兩種可鑲嵌的工具效果都是附魔師的作品，原作者為自己的作品充能享有折扣，專精後更深。',
   'guide.profPages.craftProse.enchanting.levelingHeading': '附魔如何升級',
   'guide.profPages.craftProse.enchanting.levelingBody':
     '兩種行動推動技能：分解與施加附魔，每次成功最多一點，按工作的分量折算：普通分解與純粉塵附魔算普通活；優秀分解與精華附魔算優秀活；精良分解與所有Runed或Greater附魔算精良活；史詩與傳說分解更高。熟悉的精通衰減按25點層級作用：普通活在技能75變灰，優秀活在100，精良活恰在125上限。附魔另有一份仁慈：高於命途上限的輸入向下取整而非歸零，宣誓前史詩分解按精良計而非一無所獲；若附魔淪為休眠，一切按普通活計，爬升停在75；作為愛好則精良活仍有收益，只是75之後變慢。',
@@ -10820,6 +10828,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.jewelcrafting.routeHeading': '傑作與通往125之路',
   'guide.profPages.craftProse.jewelcrafting.routeBody':
     '這條梯子上沒有無屬性的檔位：每件成品都帶真實屬性，所以只要更精的品質仍在你的檔位上限之內，每次製作都會擲傑作機率，鐵與鋨金都按一級材料計入加成。銅檔與鐵檔的成品，任何業餘或未宣誓的珠寶匠都能做成精良傑作；鋨金三件本身已是精良，它們的史詩傑作要等高於精良的上限，而在珠寶設計的命途開放之前沒人擁有這個上限。\n\n攀登照標準路線走：銅檔到25，鐵檔開放當天騎到50，再用鋨檔到75。75之後暫無更高配方，鋨檔收益先減半再減為四分之一：預算大約再做150件到達125上限，並讓它們體面地賣錢，因為每個職業都戴首飾，而多數旅人升級時戒指和項鍊欄一直空著。\n\n功業之書會為你的第一件精良首飾記下Polished to Brilliance；這門手藝的里程碑與Grandmaster篇章則與它的命途一同等待。',
+  'guide.profPages.craftIntro.inscription':
+    '銘文學是Highwatch藥坊裡的那張書案：施法者的副手典籍與人人可用的耐力卷軸，都由身旁藥劑所用的同一批藥草研磨而成。它的卷軸是通往戰鬥藥劑增益的第二扇門，就連從不捧書的戰士也有理由來敲門。',
+  'guide.profPages.craftProse.inscription.identityHeading': '心智之墨，行路之卷',
+  'guide.profPages.craftProse.inscription.identityBody':
+    '梯子是三檔、每檔兩件：一部施法者的副手典籍與一卷人人可用的耐力卷軸，先用潤光葉，再用金葉，最後在頂端用精良陽瓣再來一遍。典籍是六個法力職業手持的屬性法器，從第一檔起就有實打實的智力與精神；卷軸是不限職業的消耗品，所以每一檔都有一半賣給全境的每一個人。\n\n在製作之輪上它位於裁縫與附魔之間，因此擁有兩條命途：墨織師（裁縫與銘文學）與秘法師（銘文學與附魔）。兩者都還沒有宣誓任務，所以今天銘文學是所有人的手藝：每個配方都在未宣誓行業可用的精良層之內，整條梯子在任何誓言之前就完全敞開。',
+  'guide.profPages.craftProse.inscription.materialsHeading': '藥草、墨水與盛墨的瓶子',
+  'guide.profPages.craftProse.inscription.materialsBody':
+    '這張書案靠藥草學與分解檯運轉。潤光葉出自Eastbrook Vale的一級草叢，金葉出自Mirefen Marsh，陽瓣出自Thornpeak Heights，每個配方都連同一個玻璃瓶（藥坊大師處12銅一個）研磨成顏料。墨水中魔法的那一半來自分解檯：潤光葉檔用鈴音之塵，金葉檔與陽瓣檔要鈴音精華，所以銘文師不是附魔師的穩定顧客，就是自己養成了分解的習慣。\n\n陽瓣檔多一道講究：精良魔典除陽瓣外還要兩株金葉，揉入其中為泥金彩飾定形。藥草與塵都無處花錢購買：它們來自世界本身，或來自另一位玩家；只有瓶子用錢能買。',
+  'guide.profPages.craftProse.inscription.ladderHeading': '在蒸餾器旁學藝',
+  'guide.profPages.craftProse.inscription.ladderBody':
+    '銘文學沒有自己的工位：整套目錄都在Highwatch藥坊製作，與鍊金術共用同一張工作檯，Alchemist Verane也在那裡授藝。梯子是三檔六個訓練師配方：潤光葉檔（入門書與卷軸）技能0免費，金葉檔（書冊與卷軸）技能25每個25銀，陽瓣檔（魔典與卷軸）技能50每個1金，你在該行業的檔位一達到配方檔位便可學習。50檔的卷軸每次出品兩卷。\n\n這裡沒有野外配方，也還沒有組合件：每一檔都是綁定藥坊的訓練師手藝，所以這門手藝就在鍊金師們站立的地方學、也在那裡練。',
+  'guide.profPages.craftProse.inscription.routeHeading': '卷軸、藥劑與通往125之路',
+  'guide.profPages.craftProse.inscription.routeBody':
+    '卷軸是這門手藝的招牌規則：每一檔的卷軸給出的，正是同檔耐力藥劑的增益（依次為野豬藥劑、蝰灼藥劑與巨蛇藥劑三檔），兩種來源在增益列上共用同一個位置。在藥劑之上讀卷軸會替換它，在卷軸之上喝藥劑亦然，永遠是最新施加的生效，所以卷軸是通往同一個增益的另一扇門，絕不是疊在其上的第二層。\n\n典籍帶有真實屬性，所以只要更精的品質仍在你的檔位上限之內，每次製作典籍都會擲傑作機率；卷軸是無屬性的消耗品，永不觸發。攀登照標準路線走：潤光葉檔到25，金葉檔開放當天騎到50，再用陽瓣檔到75。75之後暫無更高配方，陽瓣檔收益先減半再減為四分之一：預算大約再做150次到達125上限，並讓它們體面地賣錢，因為卷軸賣得動遊戲裡的每一個職業。\n\n功績之書會為你的第一件精良品記下Written in Fine Ink，技能50記下Quill and Pigment，125上限則加冕Grandmaster Inscription。',
   'hudChrome.corpseHarvest.components.meat': '獸肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（附魔）',
   'hudChrome.materialHint.cookingCatch': '烹飪材料。必須先烹飪後才能食用。',

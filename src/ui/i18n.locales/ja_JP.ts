@@ -2567,6 +2567,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': '道具',
   'itemUi.kind.potion': 'ポーション',
   'itemUi.kind.elixir': 'エリクサー',
+  'itemUi.kind.scroll': '巻物',
   'itemUi.kind.mount': 'マウント',
   'itemUi.stats.armor': '防御力',
   'itemUi.stats.str': '筋力',
@@ -10243,6 +10244,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_healing_draught.name': 'サンペタルの治癒薬',
   'entities.items.sunpetal_mana_draught.name': 'サンペタルのマナ薬',
   'entities.items.elixir_of_the_serpent.name': '蛇のエリクサー',
+  'entities.items.silverleaf_primer.name': '艶葉の入門書',
+  'entities.items.goldleaf_folio.name': 'ゴールドリーフの書冊',
+  'entities.items.sunpetal_grimoire.name': 'サンペタルの魔導書',
+  'entities.items.silverleaf_scroll.name': '艶葉の巻物',
+  'entities.items.goldleaf_scroll.name': 'ゴールドリーフの巻物',
+  'entities.items.sunpetal_scroll.name': 'サンペタルの巻物',
   'entities.mobs.wildheart_stalker.name': '蔦爪の追跡者',
   'entities.mobs.wildheart_ravager.name': '血鬣の略奪者',
   'entities.mobs.wildheart_hexcaller.name': '陽骨の呪術師',
@@ -10513,6 +10520,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.masterwork_tailoring': '裁縫の傑作',
   'hudChrome.reliquary.markFind.masterwork_leatherworking': '皮革細工の傑作',
   'hudChrome.reliquary.markFind.masterwork_jewelcrafting': '宝石細工の傑作',
+  'hudChrome.reliquary.markFind.masterwork_inscription': '銘文の傑作',
   'hudChrome.reliquary.markFind.masterwork_engineering': '工学の傑作',
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': '無垢の鉱脈',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '古代の心材',
@@ -10935,9 +10943,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '製作の輪',
   'guide.professions.ringBody':
-    '十の製作職がひとつの輪に並び、それぞれが独自のスキルを記録します。カードを開くと完全なレシピ表と数値を確認できます。',
+    '輪の上のどの製作職もスキル上限は125です。武器鍛冶、防具鍛冶、宝石細工、銘文、裁縫、皮革加工、料理、錬金術、工作、エンチャント。上限に達しても商いは続きます。採集は実り、製作は仕上がり、傑作も起こり得ます。登らなくなるのは数字だけです。下のカードを開くと、その職の完全なレシピ表と数値を確認できます。',
   'guide.professions.ringWaveNote':
-    '銘文は現在も輪の上に席を保っていますが、レシピはまだありません。これは見落としではなく意図的な設計で、その内容は今後のゾーン拡張とともに追加されます。',
+    '銘文が羽根ペンを執った今、輪の上のすべての席が本物のレシピを備えました。輪は揃いましたが、終わったわけではありません。上限は今後のゾーンとともに上がっていくので、今日の上限到達はその拡張への先行であって、ゴールではありません。',
   'guide.professions.capFmt': '上限{cap}',
   'guide.professions.comingSoon': 'レシピ未実装',
   'guide.professions.gatherHubHeading': '採集',
@@ -10955,7 +10963,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'レア以上の作品には作り手の名が刻まれ、傑作は品質が1段階上がり、受注品は受け取った相手にバインドされます（作り手の絆）。',
   'guide.professions.stationsHeading': '作業場と師匠',
   'guide.professions.stationsBody':
-    '三つの町の拠点に六つの種類別作業場があり、常駐の師匠がレシピを教え、作業依頼を出しています。',
+    '六つの種類別作業場が、作業場に縛られる九つの製作職を支え、三つの町の拠点に分かれて立っています。Eastbrookには鍛冶場（武器鍛冶、防具鍛冶、宝石細工が共有します）、厨房、織機、工作場があり、Fenbridgeにはなめし場が、Highwatchには薬房（錬金術と銘文がその調合台を共有します）があります。どの作業場のそばにも常駐の師匠がいて、レシピを教え、作業依頼を出し、バインド解除の窓口も務めます。\n\n作業できる半径は20ヤード、おおよそ作業場の敷地の内側です。町の反対側からではなく、金床のそばに立って作るということです。エンチャントだけは作業場を持たず、意図してどこでも働けます。',
   'guide.professions.colStation': '作業場',
   'guide.professions.colHub': '拠点',
   'guide.professions.colMaster': '師匠',
@@ -11136,9 +11144,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q1': '生産職はいくつ覚えられますか？',
   'guide.profPages.faq.a1':
     'どのキャラクターも八つの修得可能な製作職と四つの採集職をすべて伸ばせます。唯一の選択は生き方だけです。',
-  'guide.profPages.faq.q2': 'レシピはどこで覚えますか？',
+  'guide.profPages.faq.q2': 'コモンのレシピはいつまでもスキルを上げてくれますか？',
   'guide.profPages.faq.a2':
-    '訓練師のレシピは各作業場の常駐の師匠から学び、九つの共通フィールドレシピと道具レシピは全員が最初から知っています。',
+    'いいえ。どのレシピも、その職での現在の自分の段階からどれだけ下にあるかで採点されます。読み方は古典どおりのオレンジ、黄色、緑、灰色です。自分の段階以上なら全量、1段下は半分、2段下は四分の一、3段以上下は成長なし。段階はスキル25ごとなので、無料のスキル0レシピはスキル75で何も教えなくなります。\n\n上限も、古典の300を思い浮かべていると低めです。修得できる十の製作職はいずれも125で、採掘、伐採、薬草学は100、釣りだけは200まで続きます。登るとは自分の段階のレシピへ乗り換えていくことで、一番安いレシピを回し続けることではありません。',
   'guide.profPages.faq.q3': '採集に道具は必要ですか？',
   'guide.profPages.faq.a3':
     'ティア1のノードは素手で採れます。ティア2や3のノードには、そのティア以上の対応する道具が必要です。',
@@ -11162,10 +11170,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '剣のかたわらの生業',
   'guide.professions.whatBody':
-    '専門技能はこの世界の暮らしそのものです。四つの採集職が大地から素材を引き出し、十の製作職がそれを装備や食事、薬、道具に変えます。すべてが連鎖します。掘った鉱石は剣になり、剣はエンチャントを受け、そのエンチャントは古い装備を砕いた粉を必要とします。職業数の制限はありません。内容のある製作職は九つになり、そのうち八つと四つの採集職をすべて並行して伸ばせます（Engineeringだけは例外で、レシピが全て自由上限より上から始まるため、その梯子はBombardierの誓いを待ちます）。唯一の排他的な選択は、いずれ誓う生き方だけです。ただし、いったん誓いを立てると、その陰で休眠に入った製作職は伸びが止まります。スキルは決して下がらず、学んだことが失われることもありません。',
+    '専門技能はこの世界の暮らしそのものです。四つの採集職が大地から素材を引き出し、十の製作職がそれを装備や食事、薬、道具に変えます。すべてが連鎖します。掘った鉱石は剣になり、剣はエンチャントを受け、そのエンチャントは古い装備を砕いた粉を必要とするので、採集者も職人もからくり師も、みなひとつの鎖の輪です。\n\n職業数の制限に悩む必要はありません。どのキャラクターも十の製作職のうち九つと、四つの採集職のすべてを並行して伸ばせます（工作だけは例外で、レシピが全て自由上限より上から始まるため、その梯子は爆破師の誓いを待ちます）。唯一の排他的な選択は、いずれ誓う生き方だけです。ただし、いったん調律すると、その陰で休眠に入った製作職はコモンのレシピでしか伸びず、スキル75から先はまったく伸びません。スキルは決して下がらず、学んだことが失われることもありません。',
   'guide.professions.deedsHeading': '旅路を刻む功績',
   'guide.professions.deedsBody':
-    '功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。九つの製作職はいずれもスキル50で節目の功績、上限125でGrandmaster称号を戴き、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。初めての採集や製作、野外の幸運な発見、サルベージにも静かなページがあります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。',
+    '功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。修得できる十の製作職はいずれもスキル50で節目の功績を刻み、上限でGrandmaster称号を戴き、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。\n\n静かなページもあります。初めての採集と初めての製作、野外で運が巡らせてくれる珍しい発見、そしてサルベージを始めたことにも功績があります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。あなたがそこにいた証になるだけです。',
   'guide.professions.startHeading': 'どこから始めるか',
   'guide.professions.startBody':
     'Eastbrookに着いたばかりなら、Foreman Odellを訪ねてA Trade for Every Handを受けましょう。町の南東Copper Digの鉱脈を教えてくれます。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。町ではTキーで製作ウィンドウを開き、誰もが知る初期レシピを作り、鍛冶場、厨房、織機、工作場の師匠たちを訪ね、作業依頼で堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。',
@@ -11222,7 +11230,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ironlink段以上はすべて傑作の抽選があります。防御力しかない銅段コモンは発動しません。鉄は素材段階1、グリフ鋼は段階2。道は定番の三段、銅で25、ironlinkで50、osmiumscaleで75。75以降の幸運は窯鱗のマントです。第3段レシピなので99まで全速、以降半減。最後の50ポイントが150回ではなくおよそ75回で済みます。1着にオスミウム7個とSmithing Flux 5個、Thornpeakと鍛冶場カウンターで買いだめを。Darvaの依頼は30分ごとに銅鉱石8個。スキル50でHammer and Plate、125でGrandmaster Armorcraftingです。',
   'guide.profPages.craftProse.tailoring.identityHeading': '術者の布、皆の鞄',
   'guide.profPages.craftProse.tailoring.identityBody':
-    "梯子はhomespunの基本から鍍金織り一式を経てレア段のSilkbinder's Raimentとsunweaveへ。第二の商売は万人向けです。Silkspun Satchelは10枠の鞄で、鞄を嫌う職業もレベルもありません。環では皮革加工と銘文の間。生きた対は装具師（皮革加工と裁縫）で、Eastbrookの織機のWeaver Ottilieの前で、webwood蜘蛛を四匹狩って絹を捧げて誓います。銘文との対墨織師は銘文最初のレシピ待ちです。",
+    "梯子はhomespunの基本から鍍金織り一式を経てレア段のSilkbinder's Raimentとsunweaveへ。第二の商売は万人向けです。Silkspun Satchelは10枠の鞄で、鞄を嫌う職業もレベルもありません。環では皮革加工と銘文の間。生きた対は装具師（皮革加工と裁縫）で、Eastbrookの織機のWeaver Ottilieの前で、webwood蜘蛛を四匹狩って絹を捧げて誓います。銘文との対墨織師も輪に名を連ねており、銘文の基本カタログに墨が入った今、残るは専用の誓いのクエストだけです。",
   'guide.profPages.craftProse.tailoring.materialsHeading': '糸と絹、それに薬草',
   'guide.profPages.craftProse.tailoring.materialsBody':
     "織機は狩りの戦利品と野の恵みで回ります。リネンの端切れと手織り布は人型の敵から、蜘蛛の糸は蜘蛛の亡骸から。レア段の目玉Silkbinder's RaimentにはPristine Silk（亡骸採集の署名入り標本）が要ります。薬草学はどの装備職よりも裁縫を養います。艶葉草が履物を飾り、goldleafが鍍金織りを染め、sunpetalがレア段全体を縫い上げます。Spool of ThreadはOttilieで12銅。織機は金属を一切求めず、Wardweave Cowlの上級品でさえpremium herbs、Pristine Silk、蜘蛛の糸、糸で織られます。",
@@ -11282,7 +11290,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '道具に戦闘能力値はないため傑作は決して発動しません。特化は例によってスキル75で、素材2割引きに加え、どんな採集行も作業場に変える臨時の野外工作場を得ます。成長はほとんど薄れません。スキル75のレシピは100まで全速で以降半減、スキル150のレシピは上限125まで全速。本当の制約は素材と資金であって、灰色のレシピではありません。まず対を決めること。Tinker Gizzelから爆破師の調律を。あとは梯子に食わせるだけです。採掘、伐採、薬草学を自分で上げるか採集者と親しくなり、段階3の道具は店で揃え、Gizzelの依頼（Ironbark Log8本で16銅、30分ごと）は小遣いに。売り文句はひとりでに書けます。節点より上の道具段階ひとつごとに2.5秒の採集詠唱から0.4秒を削る（下限1.5秒）。スキル50でCogs and Sprockets、125でGrandmaster Engineeringです。',
   'guide.profPages.craftProse.enchanting.identityHeading': '装備を解き、力を戻す',
   'guide.profPages.craftProse.enchanting.identityBody':
-    '作業場も師匠も買うべきレシピ表もありません。すべてのエンチャントは最初から知られ、分解は誰でも初日からでき、スキルは他の職と同じく125が上限です。環では銘文と宝石細工の間に座り、対はArcanist（銘文とエンチャント）とGembinder（エンチャントと宝石細工）ですが、どちらもまだ誓えません。銘文は最初のレシピを待っており、宝石細工は今や鍛冶場で自分の梯子を打っているものの、Gembinderには誓いのクエストがまだないのです。つまり今日のエンチャントは皆の手仕事です。誓い以前は自由にレア段階まで登り、爆破師や薬師の趣味枠としても自然な選択です。エンチャンターは採集の世界も支えています。装着できる三種の道具効果はすべてエンチャンターの作で、原作者は自作の充填を割引で行え、特化すればさらに深くなります。',
+    'すべてのエンチャントは最初から知られ、分解は誰でも初日からでき、どちらも作業場を一切要しません。スキルは他の職と同じく125が上限です。この商いで唯一教わる一角が、対をなす二つの護符レシピです。Tinker GizzelがEastbrook広場南西角の工作場で「採集者の貯蔵袋」と「職人の眼」を教えます。エンチャントが25に達したら通常の段階料金で習え、護符そのものも彼の作業場で作ります。\n\n環では銘文と宝石細工の間に座り、対は秘術師（銘文とエンチャント）と宝石付与師（エンチャントと宝石細工）です。どちらもまだ誓えません。隣り合う二つの職はどちらも自分の梯子を働かせるようになりましたが（銘文は薬房で、宝石細工は鍛冶場で）、どちらの対にも誓いのクエストがまだないのです。つまり今日のエンチャントは皆の手仕事です。誓い以前は自由にレア段階まで登り、爆破師や薬師の趣味枠としても自然な選択です。エンチャンターは採集の世界も支えています。装着できる二種の道具効果はエンチャンターの作で、原作者は自作の充填を割引で行え、特化すればさらに深くなります。',
   'guide.profPages.craftProse.enchanting.levelingHeading': 'エンチャントの上げ方',
   'guide.profPages.craftProse.enchanting.levelingBody':
     'スキルを動かす行動は二つ、分解とエンチャント付与です。成功ごとに最大1ポイント、仕事の重さで換算されます。コモンの分解と粉だけのエンチャントはコモンの仕事、良質の分解とエッセンスのエンチャントは良質、レアの分解とRunedやGreaterのエンチャントはレア、エピックと伝説の分解はさらに上です。お馴染みの熟達の薄れが25ポイント刻みで効き、コモンの仕事はスキル75で、良質は100で、レアの仕事はちょうど上限の125で灰色になります。エンチャントだけの情けもひとつ。天井を超える入力はゼロではなく天井へ丸められるため、誓う前でもエピックの分解はレアとして数えられ、無駄になりません。エンチャントが休眠に落ちればすべてコモン扱いで登りは75で止まり、趣味に据えればレアの仕事はまだ実り、75以降が遅くなるだけです。',
@@ -11303,6 +11311,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.jewelcrafting.routeHeading': '傑作と、125への道のり',
   'guide.profPages.craftProse.jewelcrafting.routeBody':
     'この梯子にステータスなしの段はありません。全品が本物のステータスを備えるので、仕上がりの品質があなたの段の上限に収まる限り、毎回の製作が傑作判定を振り、鉄とオスミウムはどちらもティア1素材として加算されます。銅段と鉄段は、趣味の職人でも未宣誓の職人でもレアの傑作に化けます。オスミウムの三品はもとよりレアなので、そのエピック傑作はレアより上の上限を待ちますが、宝石細工の対が開くまでその上限は誰も持ちません。\n\n登りは標準の道です。銅で25、鉄段は開いた日に乗って50、そしてオスミウムで75へ。75から先はまだ何も出ていないので、オスミウムのレシピは半分、そして四分の一へと減っていきます。125の上限までおよそ150個を見込んでください。どの職業も装身具を着け、大半の旅人は指輪と首の枠を空けたまま育つので、作った分は堂々と売れます。\n\n功績の書は最初のレア品でPolished to Brillianceを記します。この職の節目とGrandmasterのページは、対の生き方とともに待っています。',
+  'guide.profPages.craftIntro.inscription':
+    '銘文はHighwatchの薬房にある書き物机です。副手に持つ術者の書物と、誰にでも効くスタミナの巻物を、隣に並ぶ薬と同じ薬草を挽いて仕立てます。巻物は戦闘エリクサーのバフへ通じる第二の扉なので、書物を一度も手にしない戦士にも、扉を叩く理由があります。',
+  'guide.profPages.craftProse.inscription.identityHeading': '知性の墨、旅路の巻物',
+  'guide.profPages.craftProse.inscription.identityBody':
+    '梯子は二品三段。副手に持つ術者の書物と、誰でも使えるスタミナの巻物を、まず艶葉で、次にゴールドリーフで、最後にレアなサンペタルで仕立てます。書物は、マナを使う六つの職業が手に握るステータスの塊で、最初の段から本物の知力と精神を備えます。巻物は職業制限のない消耗品なので、どの段も半分はレルム全体に売れます。\n\n製作の環では裁縫とエンチャントの間に座り、対の生き方は二つ、墨織師（裁縫と銘文）と秘術師（銘文とエンチャント）。どちらもまだ誓いのクエストがないため、今日の銘文は皆の手仕事です。全レシピが未宣誓の職の働けるレア段の内側にあり、誓いの前から梯子の全部が開いています。',
+  'guide.profPages.craftProse.inscription.materialsHeading': '薬草と墨、それを容れる小瓶',
+  'guide.profPages.craftProse.inscription.materialsBody':
+    'この机は薬草学と分解台で回ります。艶葉草はEastbrook Valeの1層薬草地から、ゴールドリーフ草はMirefen Marshから、サンペタル草はThornpeak Heightsから来て、どのレシピでもガラスの小瓶（薬房の主から12銅）とともに顔料へ挽かれます。墨の魔力の半分は分解台から来ます。艶葉の段は鈴音の粉塵を、ゴールドリーフとサンペタルの段は鈴音の精髄を求めるので、銘文師はエンチャンターの堅実な得意客になるか、自分で分解の習慣を持つことになります。\n\nサンペタルの段にはもう一つの仕上げがあります。レアの魔導書はサンペタルに加えてゴールドリーフ草を二つ、彩飾の下地として使います。薬草も粉塵も店では買えません。世界から採るか、他のプレイヤーから手に入れるかで、コインで買えるのは小瓶だけです。',
+  'guide.profPages.craftProse.inscription.ladderHeading': '蒸留器のそばで学ぶ',
+  'guide.profPages.craftProse.inscription.ladderBody':
+    '銘文には自前の作業場がありません。カタログ全部がHighwatchの薬房、錬金術が醸すあの調合台で仕立てられ、Alchemist Veraneがそこで教えます。梯子は三段六つのトレーナーレシピです。艶葉の段（入門書と巻物）はスキル0で無料、ゴールドリーフの段（書冊と巻物）はスキル25で各25銀、サンペタルの段（魔導書と巻物）はスキル50で各1金。あなたの段がレシピの段に届いた瞬間に教われます。スキル50の段の巻物は、一度の製作で2本仕上がります。\n\n野外レシピも合作の品もまだありません。全段が薬房限定のトレーナー仕事なので、この職は錬金術師たちの立つ場所で学び、そこで鍛えます。',
+  'guide.profPages.craftProse.inscription.routeHeading': '巻物とエリクサーと、125への道のり',
+  'guide.profPages.craftProse.inscription.routeBody':
+    '巻物こそこの職の看板ルールです。各段の巻物は、対応する段のスタミナのエリクサー（猪のエリクサー、蝮灼のエリクサー、蛇のエリクサー）とまったく同じバフを与え、二つの供給源はバフバーのひとつの枠を分け合います。エリクサーの上から巻物を読めば置き換わり、巻物の上からエリクサーを飲めばそちらが置き換わり、常に新しいほうが勝ちます。つまり巻物は同じバフへ通じるもう一つの扉であって、上に重なる二本目ではありません。\n\n書物は本物のステータスを備えるので、仕上がりの品質があなたの段の上限に収まる限り、書物の製作は毎回傑作判定を振ります。ステータスのない消耗品である巻物は決して発動しません。登りは標準の道です。艶葉で25、ゴールドリーフの段は開いた日に乗って50、そしてサンペタルで75へ。75から先はまだ何も出ていないので、サンペタルのレシピは半分、そして四分の一へと減っていきます。125の上限までおよそ150個を見込み、堂々と稼ぎながら登りましょう。巻物はゲーム中のどの職業にも売れるのですから。\n\n功績の書は最初のレア品でWritten in Fine Inkを、スキル50でQuill and Pigmentを、そして125の上限でGrandmaster Inscriptionを記します。',
   'hudChrome.corpseHarvest.components.meat': '肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（エンチャント）',
   'hudChrome.materialHint.cookingCatch': '料理材料。食べる前に調理が必要です。',

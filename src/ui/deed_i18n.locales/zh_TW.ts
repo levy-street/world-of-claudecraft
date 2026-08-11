@@ -733,4 +733,17 @@ export const table: DeedLocaleTable = {
     desc: '珠寶設計技能達到125，此技藝的頂點。',
     title: '珠寶設計大宗師',
   },
+  prog_inscription_rare: {
+    name: '以佳墨寫就',
+    desc: '在銘文學中製作你的第一件稀有品質物品。',
+  },
+  prog_inscription_50: {
+    name: '羽筆與顏料',
+    desc: '銘文學技能達到50。',
+  },
+  prog_grandmaster_inscription: {
+    name: '銘文學大宗師',
+    desc: '銘文學技能達到125，此技藝的頂點。',
+    title: '銘文學大宗師',
+  },
 };

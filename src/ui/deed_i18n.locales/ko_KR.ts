@@ -961,4 +961,17 @@ export const table: DeedLocaleTable = {
     desc: '보석세공 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
     title: '보석세공 대가',
   },
+  prog_inscription_rare: {
+    name: '고운 먹으로 쓰다',
+    desc: '각인에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
+  prog_inscription_50: {
+    name: '깃펜과 안료',
+    desc: '각인 기술 50을 달성하십시오.',
+  },
+  prog_grandmaster_inscription: {
+    name: '각인 대가',
+    desc: '각인 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '각인 대가',
+  },
 };

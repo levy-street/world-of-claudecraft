@@ -718,4 +718,17 @@ export const table: DeedLocaleTable = {
     desc: '珠宝加工技能达到125点，登顶此门技艺的至高境界。',
     title: '珠宝加工宗师',
   },
+  prog_inscription_rare: {
+    name: '笔精墨妙',
+    desc: '在铭文中制作你的第一件稀有品质物品。',
+  },
+  prog_inscription_50: {
+    name: '羽笔与颜料',
+    desc: '铭文技能达到50点。',
+  },
+  prog_grandmaster_inscription: {
+    name: '铭文宗师',
+    desc: '铭文技能达到125点，登顶此门技艺的至高境界。',
+    title: '铭文宗师',
+  },
 };
