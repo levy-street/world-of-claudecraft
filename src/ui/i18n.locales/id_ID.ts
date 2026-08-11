@@ -4533,8 +4533,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_succubus.description':
     'Memanggil Duskborn di bawah perintah Penyihir Iblis. Duskborn adalah iblis rapuh yang menyerang dengan cepat dan memukul keras dalam jarak dekat. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu.',
   'entities.abilities.summon_succubus.name': 'Panggil Duskborn',
-  'entities.abilities.summon_voidwalker.description': 'Memanggil Gloomshade di bawah perintah sang penyihir. Iblis tangguh ini mengejek musuh dan memakai Rantai Jurang untuk menyeret musuh biasa yang jauh kembali ke jangkauan. Bos tidak bisa ditarik. Memanggil iblis baru melepaskan iblismu yang sekarang. Kamu hanya boleh punya satu iblis pada satu waktu.',
-  'entities.abilities.summon_voidwalker.name': 'Panggil Gloomshade',
+  'entities.abilities.summon_voidwalker.description': 'Memanggil Duskmurk di bawah perintah sang penyihir. Iblis tangguh ini mengejek musuh dan memakai Rantai Jurang untuk menyeret musuh biasa yang jauh kembali ke jangkauan. Bos tidak bisa ditarik. Memanggil iblis baru melepaskan iblismu yang sekarang. Kamu hanya boleh punya satu iblis pada satu waktu.',
+  'entities.abilities.summon_voidwalker.name': 'Panggil Duskmurk',
   'entities.abilities.sunder_armor.name': 'Robek Zirah',
   'entities.abilities.swipe.name': 'Cakar Menyapu',
   'entities.abilities.tame_beast.description':

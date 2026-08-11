@@ -4639,8 +4639,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_succubus.description':
     'Roept een Duskborn op onder bevel van de Heksenmeester. De Duskborn is een fragiele demon die snel toeslaat en hard raakt in het melee. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben.',
   'entities.abilities.summon_succubus.name': 'Duskborn Oproepen',
-  'entities.abilities.summon_voidwalker.description': 'Roept een Gloomshade op onder bevel van de heksenmeester. Deze stevige demon spot vijanden en gebruikt Afgrondketting om verre gewone vijanden terug binnen bereik te sleuren. Bazen kunnen niet worden getrokken. Een nieuwe demon oproepen stuurt uw huidige weg. U kunt één demon tegelijk hebben.',
-  'entities.abilities.summon_voidwalker.name': 'Gloomshade Oproepen',
+  'entities.abilities.summon_voidwalker.description': 'Roept een Duskmurk op onder bevel van de heksenmeester. Deze stevige demon spot vijanden en gebruikt Afgrondketting om verre gewone vijanden terug binnen bereik te sleuren. Bazen kunnen niet worden getrokken. Een nieuwe demon oproepen stuurt uw huidige weg. U kunt één demon tegelijk hebben.',
+  'entities.abilities.summon_voidwalker.name': 'Duskmurk Oproepen',
   'entities.abilities.sunder_armor.name': 'Pantserscheur',
   'entities.abilities.swipe.name': 'Vegende Klauwen',
   'entities.abilities.tame_beast.description':

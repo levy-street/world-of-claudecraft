@@ -10203,8 +10203,8 @@ export const sv_SE: EnTranslations = {
         "description": "Frammanar en Emberkin under häxmästarens befäl. Emberkin kastar Felbolt mot era fiender på avstånd. Att frammana en ny demon avskedar er nuvarande. Ni kan ha en demon åt gången."
       },
       "summon_voidwalker": {
-        "name": "Frammana Gloomshade",
-        "description": "Frammanar en Gloomshade under häxmästarens befäl. Den här tåliga demonen hånar fiender och använder Abyssal Chain för att dra tillbaka avlägsna vanliga fiender inom räckhåll. Bossar kan inte dras. Att frammana en ny demon avskedar er nuvarande. Ni kan ha en demon åt gången."
+        "name": "Frammana Duskmurk",
+        "description": "Frammanar en Duskmurk under häxmästarens befäl. Den här tåliga demonen hånar fiender och använder Abyssal Chain för att dra tillbaka avlägsna vanliga fiender inom räckhåll. Bossar kan inte dras. Att frammana en ny demon avskedar er nuvarande. Ni kan ha en demon åt gången."
       },
       "summon_succubus": {
         "name": "Frammana Duskborn",

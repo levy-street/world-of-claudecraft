@@ -10203,8 +10203,8 @@ export const tr_TR: EnTranslations = {
         "description": "Büyücünün emrine bir Emberkin çağırır. Emberkin, düşmanlarına uzaktan Kül Oku savurur. Yeni bir iblis çağırmak mevcut olanı gönderir. Aynı anda tek bir iblisin olabilir."
       },
       "summon_voidwalker": {
-        "name": "Gloomshade Çağırma",
-        "description": "Büyücünün emrine bir Gloomshade çağırır. Bu dayanıklı iblis düşmanlarla alay eder ve uzaktaki sıradan düşmanları menzile geri sürüklemek için Uçurum Zinciri kullanır. Patronlar çekilemez. Yeni bir iblis çağırmak mevcut olanı gönderir. Aynı anda tek bir iblisin olabilir."
+        "name": "Duskmurk Çağırma",
+        "description": "Büyücünün emrine bir Duskmurk çağırır. Bu dayanıklı iblis düşmanlarla alay eder ve uzaktaki sıradan düşmanları menzile geri sürüklemek için Uçurum Zinciri kullanır. Patronlar çekilemez. Yeni bir iblis çağırmak mevcut olanı gönderir. Aynı anda tek bir iblisin olabilir."
       },
       "summon_succubus": {
         "name": "Duskborn Çağırma",

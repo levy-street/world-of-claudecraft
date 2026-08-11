@@ -4380,8 +4380,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_succubus.description':
     'Frammanar en Duskborn under häxmästarens befäl. Duskborn är en bräcklig demon som hugger snabbt och slår hårt i närstrid. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången.',
   'entities.abilities.summon_succubus.name': 'Frammana Duskborn',
-  'entities.abilities.summon_voidwalker.description': 'Frammanar en Gloomshade under häxmästarens befäl. Den här tåliga demonen hånar fiender och använder Abyssal Chain för att dra tillbaka avlägsna vanliga fiender inom räckhåll. Bossar kan inte dras. Att frammana en ny demon avskedar er nuvarande. Ni kan ha en demon åt gången.',
-  'entities.abilities.summon_voidwalker.name': 'Frammana Gloomshade',
+  'entities.abilities.summon_voidwalker.description': 'Frammanar en Duskmurk under häxmästarens befäl. Den här tåliga demonen hånar fiender och använder Abyssal Chain för att dra tillbaka avlägsna vanliga fiender inom räckhåll. Bossar kan inte dras. Att frammana en ny demon avskedar er nuvarande. Ni kan ha en demon åt gången.',
+  'entities.abilities.summon_voidwalker.name': 'Frammana Duskmurk',
   'entities.abilities.sunder_armor.name': 'Rustningsklipp',
   'entities.abilities.swipe.name': 'Svepande klor',
   'entities.abilities.tame_beast.description':
