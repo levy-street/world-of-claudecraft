@@ -709,8 +709,9 @@ const profStations = STATIONS.map((s) => {
   };
 });
 
-// The full ten-craft ring for the overview: honest about the one wave-one
-// content-empty craft (it exists on the ring but ships zero recipes).
+// The full ten-craft ring for the overview. Every seat ships content since
+// the Masterwrought phase 06 inscription catalog; hasContent stays derived
+// so a future content-empty seat renders honestly again.
 const craftHasContent = (id) =>
   id === 'enchanting'
     ? Object.keys(ENCHANTS).length > 0

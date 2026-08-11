@@ -369,6 +369,11 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
       const held = bestBy(
         pool.filter((item) => item.kind === 'held_offhand' && canEquipItem(cls, item)),
         score,
+        // The same identity-then-id tiebreak the caster path passes: before
+        // the inscription tomes this filter never held two candidates, so the
+        // omission was unreachable; with several tomes in the pool an in-band
+        // tie here must not resolve on alphabetical id alone (a28f8e9334).
+        tie,
       );
       if (held) equip.offhand = held.id;
     }

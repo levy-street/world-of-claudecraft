@@ -1599,13 +1599,14 @@ describe('Guide professions generated content accuracy', () => {
     'cooking',
     'leatherworking',
     'tailoring',
+    'inscription',
     'enchanting',
     'jewelcrafting',
     'weaponcrafting',
     'armorcrafting',
   ];
 
-  it('covers the full ring, honest about the one wave-one content-empty craft', () => {
+  it('covers the full ring, every seat content-bearing since the phase 06 catalog', () => {
     expect(GUIDE_PROF_RING.map((c) => c.id)).toEqual(CRAFT_RING.map((c) => c.id));
     for (const c of GUIDE_PROF_RING) {
       const def = CRAFT_RING.find((r) => r.id === c.id);
@@ -1614,7 +1615,9 @@ describe('Guide professions generated content accuracy', () => {
       expect(c.maxSkill).toBe(def?.maxSkill);
       expect(c.maxSkill).toBe(125); // every wave-one craft caps at 125
     }
-    expect(GUIDE_PROF_RING.filter((c) => !c.hasContent).map((c) => c.id)).toEqual(['inscription']);
+    // Empty since the Masterwrought phase 06 inscription catalog: the pin
+    // stays so a future content-empty seat is declared here, never silent.
+    expect(GUIDE_PROF_RING.filter((c) => !c.hasContent).map((c) => c.id)).toEqual([]);
     expect(GUIDE_PROF_CRAFTS.map((c) => c.id)).toEqual(EARNABLE_CRAFT_IDS);
   });
 
@@ -2433,12 +2436,12 @@ describe('Guide professions pages and routes', () => {
         `href="${hrefFor(`professions/${id}`)}"`,
       );
     }
-    // The one content-empty craft appears but does NOT link anywhere;
-    // jewelcrafting gained content (Masterwrought phase 05) and links now,
-    // the positive control the loop above also covers.
+    // Every ring craft links since the Masterwrought phase 06 inscription
+    // catalog (jewelcrafting joined at phase 05, inscription at 06), so the
+    // "coming soon" card copy renders nowhere on the overview.
     expect(html).toContain(`href="${hrefFor('professions/jewelcrafting')}"`);
-    expect(html).not.toContain(`href="${hrefFor('professions/inscription')}"`);
-    expect(html).toContain(t('guide.professions.comingSoon'));
+    expect(html).toContain(`href="${hrefFor('professions/inscription')}"`);
+    expect(html).not.toContain(t('guide.professions.comingSoon'));
     // All ten archetype pair titles render.
     for (const a of GUIDE_PROF_ARCHETYPES) {
       expect(html).toContain(t(`hudChrome.archetypePair.${a.pairId}` as never));

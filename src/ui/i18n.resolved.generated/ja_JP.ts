@@ -3632,6 +3632,7 @@ export const ja_JP: EnTranslations = {
         "masterwork_tailoring": "裁縫の傑作",
         "masterwork_leatherworking": "皮革細工の傑作",
         "masterwork_jewelcrafting": "宝石細工の傑作",
+        "masterwork_inscription": "Inscription Masterwork",
         "masterwork_engineering": "工学の傑作",
         "gather_event_pristine_vein": "無垢の鉱脈",
         "gather_event_ancient_heartwood": "古代の心材",
@@ -5558,7 +5559,8 @@ export const ja_JP: EnTranslations = {
         "alchemy": "錬金術はハイウォッチの薬房で治癒とマナの薬、そしてスタミナの霊薬を調合します。",
         "engineering": "工作はイーストブルックの工作場でティア4と5の採集道具を作り、どれも一段下の道具を材料として消費します。",
         "enchanting": "エンチャントは不要な装備を秘術素材へ分解し、それを永続的な装備エンチャントに注ぎ込みます。作業場は不要です。",
-        "jewelcrafting": "宝石細工はEastbrookの鍛冶場にあるもう一つの、より繊細な作業台です。銅、鉄、レアなオスミウムの指輪と首飾りを扱い、どの段にも力の指輪、知力の指輪、敏捷の首飾りが並びます。装身具には防具値も職業制限もないので、客は指と首を持つ全員です。"
+        "jewelcrafting": "宝石細工はEastbrookの鍛冶場にあるもう一つの、より繊細な作業台です。銅、鉄、レアなオスミウムの指輪と首飾りを扱い、どの段にも力の指輪、知力の指輪、敏捷の首飾りが並びます。装身具には防具値も職業制限もないので、客は指と首を持つ全員です。",
+        "inscription": "Inscription is the writing desk of the Highwatch apothecary: caster tomes for the offhand and stamina scrolls for everyone, milled from the same herbs the draughts beside them use. Its scrolls are the second door into the battle-elixir buffs, so even a fighter who never holds a book has reason to knock."
       },
       "craftProse": {
         "weaponcrafting": {
@@ -5648,6 +5650,16 @@ export const ja_JP: EnTranslations = {
           "ladderBody": "宝石細工には自前の作業場がありません。カタログ全部がEastbrookの鍛冶場、武器鍛冶と防具鍛冶が共有するあの金床で作られ、Forgemistress Darvaがそこで教えます。梯子は三段九つのトレーナーレシピです。銅段（指輪、輪、首輪）はスキル0で無料、鉄段（印章、輪、チョーカー）はスキル25で各25銀、オスミウム段（指輪、輪、アミュレット）はスキル50で各1金。あなたの段がレシピの段に届いた瞬間に教われます。\n\n野外レシピも合作の品もまだありません。全段が鍛冶場限定のトレーナー仕事なので、この職は鍛冶師たちの立つ場所で学び、そこで鍛えます。",
           "routeHeading": "傑作と、125への道のり",
           "routeBody": "この梯子にステータスなしの段はありません。全品が本物のステータスを備えるので、仕上がりの品質があなたの段の上限に収まる限り、毎回の製作が傑作判定を振り、鉄とオスミウムはどちらもティア1素材として加算されます。銅段と鉄段は、趣味の職人でも未宣誓の職人でもレアの傑作に化けます。オスミウムの三品はもとよりレアなので、そのエピック傑作はレアより上の上限を待ちますが、宝石細工の対が開くまでその上限は誰も持ちません。\n\n登りは標準の道です。銅で25、鉄段は開いた日に乗って50、そしてオスミウムで75へ。75から先はまだ何も出ていないので、オスミウムのレシピは半分、そして四分の一へと減っていきます。125の上限までおよそ150個を見込んでください。どの職業も装身具を着け、大半の旅人は指輪と首の枠を空けたまま育つので、作った分は堂々と売れます。\n\n功績の書は最初のレア品でPolished to Brillianceを記します。この職の節目とGrandmasterのページは、対の生き方とともに待っています。"
+        },
+        "inscription": {
+          "identityHeading": "Ink for the mind, scrolls for the road",
+          "identityBody": "The ladder is three rungs of two: a caster tome for the offhand and a stamina scroll for anyone at all, first in sheenleaf, again in goldleaf, and once more in rare sunpetal at the top. The tomes are held stat sticks for the six mana classes, real Intellect and Spirit from the first rung; the scrolls are consumables with no class lock, so half of every rung sells to the whole realm.\n\nOn the craft ring it sits between Tailoring and Enchanting, giving it two pair identities: the Inkweaver (Tailoring and Inscription) and the Arcanist (Inscription and Enchanting). Neither has an oath quest yet, so today Inscription climbs as everyone's craft: every recipe sits inside the rare tier that undeclared crafts work under, and the whole ladder is open before any oath.",
+          "materialsHeading": "Herbs, ink, and a vial to hold it",
+          "materialsBody": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung and Chime Essence the goldleaf and sunpetal rungs, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung adds one refinement: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations. No counter sells the herbs or the dust: they come out of the world or off another player; only the vial is bought for coin.",
+          "ladderHeading": "Taught beside the alembics",
+          "ladderBody": "Inscription has no station of its own: the whole catalog is worked at the Highwatch apothecary, the same bench Alchemy brews at, and Alchemist Verane teaches it there. The ladder is six trainer recipes in three rungs: the sheenleaf rung (primer and scroll) is free at skill 0, the goldleaf rung (folio and scroll) costs 25 silver a recipe at skill 25, and the sunpetal rung (grimoire and scroll) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own. The rung-50 scroll comes off the desk two at a time.\n\nThere are no field recipes and no combination piece yet: every rung is apothecary-bound trainer work, so this craft is learned, and practiced, standing where the alchemists stand.",
+          "routeHeading": "Scrolls, elixirs, and a working route to 125",
+          "routeBody": "The scrolls are the craft's signature rule: each rung's scroll grants exactly the buff of its band's stamina elixir (the boar, vipersear, and serpent bands), and the two sources share one slot on the buff bar. Reading a scroll over an elixir replaces it, drinking an elixir over a scroll replaces that, and the newest application always wins, so a scroll is an alternative door into the same buff, never a second stack on top of it.\n\nThe tomes carry real stat lines, so every tome craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling; the scrolls, statless consumables, never proc. The climb is the standard ride: sheenleaf to 25, the goldleaf rung the day it opens to 50, then sunpetal to 75. Past 75 nothing higher ships yet, so the sunpetal recipes fade to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since the scrolls sell to every class in the game.\n\nThe Book of Deeds marks Written in Fine Ink for your first rare-tier piece, Quill and Pigment at 50 skill, and Grandmaster Inscription at the 125 cap."
         }
       },
       "howHeading": "製作の流れ",

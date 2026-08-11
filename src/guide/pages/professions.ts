@@ -3,8 +3,8 @@
 // route entry, with the craft pages (professions_craft.ts), the gathering
 // pages (professions_gathering.ts), and the economy/FAQ pages
 // (professions_economy.ts / professions_faq.ts) selected by the first param.
-// The overview renders the full ten-craft ring (honest about the one
-// wave-one content-empty craft, inscription), the four gathering
+// The overview renders the full ten-craft ring (every seat ships content
+// since the Masterwrought phase 06 inscription catalog), the four gathering
 // professions, the ten
 // pair-named archetypes, and the shared numbers, all from GUIDE_PROF_*
 // generated data. TRANSPARENCY POLICY: professions

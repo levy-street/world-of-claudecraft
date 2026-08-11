@@ -3632,6 +3632,7 @@ export const ko_KR: EnTranslations = {
         "masterwork_tailoring": "재봉 걸작",
         "masterwork_leatherworking": "가죽세공 걸작",
         "masterwork_jewelcrafting": "보석세공 걸작",
+        "masterwork_inscription": "Inscription Masterwork",
         "masterwork_engineering": "공학 걸작",
         "gather_event_pristine_vein": "완벽한 광맥",
         "gather_event_ancient_heartwood": "고대 심재",
@@ -5558,7 +5559,8 @@ export const ko_KR: EnTranslations = {
         "alchemy": "연금술은 하이워치 약방에서 치유와 마나 물약, 그리고 체력 비약을 빚는다.",
         "engineering": "기계공학은 이스트브룩 공작소에서 4티어와 5티어 채집 도구를 만들며, 각 도구는 한 단계 아래 도구를 재료로 소비한다.",
         "enchanting": "마법부여는 쓸모없는 장비를 비전 재료로 분해하고, 그 재료를 영구적인 장비 마법부여에 쓴다. 작업대는 필요 없다.",
-        "jewelcrafting": "보석세공은 Eastbrook 대장간의 더 섬세한 작업대다. 구리, 철, 희귀 오스뮴으로 반지와 목걸이를 만들고, 단마다 힘 반지, 지능 반지, 민첩 목걸이가 하나씩 놓인다. 장신구는 방어도도 직업 제한도 없으니, 손가락과 목이 있는 모두가 손님이다."
+        "jewelcrafting": "보석세공은 Eastbrook 대장간의 더 섬세한 작업대다. 구리, 철, 희귀 오스뮴으로 반지와 목걸이를 만들고, 단마다 힘 반지, 지능 반지, 민첩 목걸이가 하나씩 놓인다. 장신구는 방어도도 직업 제한도 없으니, 손가락과 목이 있는 모두가 손님이다.",
+        "inscription": "Inscription is the writing desk of the Highwatch apothecary: caster tomes for the offhand and stamina scrolls for everyone, milled from the same herbs the draughts beside them use. Its scrolls are the second door into the battle-elixir buffs, so even a fighter who never holds a book has reason to knock."
       },
       "craftProse": {
         "weaponcrafting": {
@@ -5648,6 +5650,16 @@ export const ko_KR: EnTranslations = {
           "ladderBody": "보석세공에는 자기 작업대가 없다. 목록 전부가 Eastbrook 대장간, 무기 제작과 방어구 제작이 함께 쓰는 그 모루에서 만들어지고, Forgemistress Darva가 거기서 가르친다. 사다리는 세 단 아홉 개의 훈련사 제조법이다. 구리 단(반지, 고리, 목고리)은 기술 0에 무료, 철 단(인장, 고리, 목걸이)은 기술 25에 각 25은, 오스뮴 단(반지, 고리, 목걸이)은 기술 50에 각 1금이며, 당신의 단이 제조법의 단에 닿는 순간 배울 수 있다.\n\n야외 제조법도 합작품도 아직 없다. 모든 단이 대장간 전용 훈련사 일이라, 이 기술은 대장장이들이 서 있는 자리에서 배우고 거기서 익힌다.",
           "routeHeading": "걸작, 그리고 125까지의 길",
           "routeBody": "이 사다리에는 능력치 없는 단이 없다. 모든 성과물이 진짜 능력치를 달고 나오니, 더 고운 품질이 당신의 단 상한 안에 드는 한 매 제작이 걸작 확률을 굴리고, 철과 오스뮴은 둘 다 1단 재료로 가산된다. 구리 단과 철 단은 취미든 미맹세든 누구라도 희귀 걸작으로 빚을 수 있다. 오스뮴 세 점은 이미 희귀라, 그보다 한 단 높은 걸작은 희귀 위의 상한을 기다리는데, 보석세공의 짝이 열리기 전에는 아무도 그 상한을 갖지 못한다.\n\n오르는 길은 표준 그대로다. 구리로 25, 철 단은 열리는 날 올라 50, 오스뮴으로 75까지. 75 너머는 아직 아무것도 없어 오스뮴 제조법은 절반으로, 다시 4분의 1로 흐려진다. 125 상한까지 대략 150회를 더 잡고, 만든 것은 떳떳하게 팔아 밑천을 대라. 모든 직업이 장신구를 차고, 대부분의 여행자는 반지와 목걸이 칸을 비운 채 성장하니까.\n\n업적의 서는 첫 희귀 장신구에 Polished to Brilliance를 새긴다. 이 기술의 이정표와 Grandmaster 페이지는 그 짝 정체성과 함께 기다린다."
+        },
+        "inscription": {
+          "identityHeading": "Ink for the mind, scrolls for the road",
+          "identityBody": "The ladder is three rungs of two: a caster tome for the offhand and a stamina scroll for anyone at all, first in sheenleaf, again in goldleaf, and once more in rare sunpetal at the top. The tomes are held stat sticks for the six mana classes, real Intellect and Spirit from the first rung; the scrolls are consumables with no class lock, so half of every rung sells to the whole realm.\n\nOn the craft ring it sits between Tailoring and Enchanting, giving it two pair identities: the Inkweaver (Tailoring and Inscription) and the Arcanist (Inscription and Enchanting). Neither has an oath quest yet, so today Inscription climbs as everyone's craft: every recipe sits inside the rare tier that undeclared crafts work under, and the whole ladder is open before any oath.",
+          "materialsHeading": "Herbs, ink, and a vial to hold it",
+          "materialsBody": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung and Chime Essence the goldleaf and sunpetal rungs, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung adds one refinement: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations. No counter sells the herbs or the dust: they come out of the world or off another player; only the vial is bought for coin.",
+          "ladderHeading": "Taught beside the alembics",
+          "ladderBody": "Inscription has no station of its own: the whole catalog is worked at the Highwatch apothecary, the same bench Alchemy brews at, and Alchemist Verane teaches it there. The ladder is six trainer recipes in three rungs: the sheenleaf rung (primer and scroll) is free at skill 0, the goldleaf rung (folio and scroll) costs 25 silver a recipe at skill 25, and the sunpetal rung (grimoire and scroll) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own. The rung-50 scroll comes off the desk two at a time.\n\nThere are no field recipes and no combination piece yet: every rung is apothecary-bound trainer work, so this craft is learned, and practiced, standing where the alchemists stand.",
+          "routeHeading": "Scrolls, elixirs, and a working route to 125",
+          "routeBody": "The scrolls are the craft's signature rule: each rung's scroll grants exactly the buff of its band's stamina elixir (the boar, vipersear, and serpent bands), and the two sources share one slot on the buff bar. Reading a scroll over an elixir replaces it, drinking an elixir over a scroll replaces that, and the newest application always wins, so a scroll is an alternative door into the same buff, never a second stack on top of it.\n\nThe tomes carry real stat lines, so every tome craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling; the scrolls, statless consumables, never proc. The climb is the standard ride: sheenleaf to 25, the goldleaf rung the day it opens to 50, then sunpetal to 75. Past 75 nothing higher ships yet, so the sunpetal recipes fade to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since the scrolls sell to every class in the game.\n\nThe Book of Deeds marks Written in Fine Ink for your first rare-tier piece, Quill and Pigment at 50 skill, and Grandmaster Inscription at the 125 cap."
         }
       },
       "howHeading": "제작 방법",

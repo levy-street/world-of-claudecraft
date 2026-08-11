@@ -187,11 +187,15 @@ the root `CLAUDE.md` content rule points here.
   seven server-assisted `feat_*` world/realm firsts): the v1 evaluator is
   strictly per-character and `server/deeds_records.ts` is observer-only; an
   account-level grant lane must exist first.
-- **`prog_ringwright`**: inscription alone has zero recipes today (its depth
-  arrives with the post-level-20 zone expansion, per
-  `docs/design/professions.md`), so the ten-craft ring cannot complete and
-  the deed would be visible yet unearnable. Its per-craft milestone and
-  Grandmaster deeds stay deferred with it. Jewelcrafting is no longer a
+- **`prog_ringwright`**: every ring craft now has a live gain path (the
+  Masterwrought phase 06 inscription catalog closed the last gap, and its
+  milestone and Grandmaster deeds shipped with it), so the old
+  engine-surface blocker is gone. The deed stays deferred on a DIFFERENT
+  ground: no design for it is recorded anywhere (no trigger shape, no
+  threshold, no name text, no renown), and its reserved companions
+  `prog_three_paths` and `prog_ninefold` are equally unspecced, so shipping
+  it means inventing design numbers. It waits on a maintainer ruling
+  (queued at the phase 06 QA), not on content. Jewelcrafting is no longer a
   blocker and no longer deferred at all: its base catalog shipped the
   rare-tier milestone `prog_jewelcrafting_rare`, and the phase 05 QA ruling
   (2026-08-10) authored its skill-50 and Grandmaster pair, completing the

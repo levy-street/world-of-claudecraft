@@ -5583,6 +5583,28 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Grandmaster Jewelcrafting",
     "crest": "/ui/deeds/prog_grandmaster_jewelcrafting.webp"
+  },
+  {
+    "id": "prog_inscription_rare",
+    "name": "Written in Fine Ink",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_inscription_50",
+    "name": "Quill and Pigment",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_grandmaster_inscription",
+    "name": "Grandmaster Inscription",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Grandmaster Inscription"
   }
 ];
 
@@ -6388,6 +6410,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mark",
+        "name": "Inscription Masterwork"
+      },
+      {
+        "kind": "mark",
         "name": "Engineering Masterwork"
       }
     ]
@@ -6800,6 +6826,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Grandmaster Jewelcrafting"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Inscription"
       }
     ]
   },
@@ -7385,7 +7415,7 @@ export const GUIDE_PROF_RING: GuideProfRingCraft[] = [
     "name": "Inscription",
     "pole": "Cross-cutting",
     "maxSkill": 125,
-    "hasContent": false
+    "hasContent": true
   },
   {
     "id": "enchanting",
@@ -9380,6 +9410,234 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "output": {
           "name": "Sunweave Treads",
           "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      }
+    ]
+  },
+  {
+    "id": "inscription",
+    "name": "Inscription",
+    "pole": "Cross-cutting",
+    "maxSkill": 125,
+    "station": "apothecary",
+    "masters": [
+      {
+        "name": "Alchemist Verane",
+        "title": "Master of the Apothecary",
+        "hub": "Highwatch"
+      }
+    ],
+    "specialization": {
+      "at": 75,
+      "materialDiscountPct": 20
+    },
+    "recipes": [
+      {
+        "id": "recipe_silverleaf_primer",
+        "name": "Sheenleaf Primer",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sheenleaf Herb",
+            "count": 3
+          },
+          {
+            "name": "Chime Dust",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sheenleaf Primer",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_silverleaf_scroll",
+        "name": "Sheenleaf Scroll",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sheenleaf Herb",
+            "count": 2
+          },
+          {
+            "name": "Chime Dust",
+            "count": 1
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sheenleaf Scroll",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_goldleaf_folio",
+        "name": "Goldleaf Folio",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Goldleaf Herb",
+            "count": 2
+          },
+          {
+            "name": "Chime Essence",
+            "count": 1
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Goldleaf Folio",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_goldleaf_scroll",
+        "name": "Goldleaf Scroll",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Goldleaf Herb",
+            "count": 1
+          },
+          {
+            "name": "Chime Essence",
+            "count": 1
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Goldleaf Scroll",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_sunpetal_grimoire",
+        "name": "Sunpetal Grimoire",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          },
+          {
+            "name": "Goldleaf Herb",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Sunpetal Grimoire",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_sunpetal_scroll",
+        "name": "Sunpetal Scroll",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "name": "Chime Essence",
+            "count": 1
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunpetal Scroll",
+          "count": 2,
           "quality": "rare"
         },
         "combo": null,
@@ -12866,6 +13124,7 @@ export const GUIDE_PROF_PAGES: string[] = [
   "cooking",
   "leatherworking",
   "tailoring",
+  "inscription",
   "enchanting",
   "jewelcrafting",
   "weaponcrafting",
