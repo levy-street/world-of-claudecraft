@@ -35,7 +35,7 @@ import { pageFor } from '../src/guide/pages';
 import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
-import { professions as professionsPage } from '../src/guide/pages/professions';
+import { professions as professionsPage, ringCards } from '../src/guide/pages/professions';
 import { reliquaryCatalogSections, reliquary as reliquaryPage } from '../src/guide/pages/reliquary';
 import { world as worldPage } from '../src/guide/pages/world';
 import {
@@ -1619,6 +1619,40 @@ describe('Guide professions generated content accuracy', () => {
     // stays so a future content-empty seat is declared here, never silent.
     expect(GUIDE_PROF_RING.filter((c) => !c.hasContent).map((c) => c.id)).toEqual([]);
     expect(GUIDE_PROF_CRAFTS.map((c) => c.id)).toEqual(EARNABLE_CRAFT_IDS);
+  });
+
+  it('derives every hasContent flag independently from the live sim tables', () => {
+    // With every live seat content-bearing, the empty-list pin above would
+    // ALSO pass if the generator's craftHasContent were broken to answer
+    // true unconditionally; recomputing the predicate here from the same
+    // inputs (ALL_RECIPES, plus enchanting's action arm) reds that world.
+    for (const c of GUIDE_PROF_RING) {
+      const derived =
+        c.id === 'enchanting'
+          ? Object.keys(ENCHANTS).length > 0
+          : ALL_RECIPES.some((r) => r.professionId === c.id);
+      expect(c.hasContent, `${c.id} hasContent`).toBe(derived);
+    }
+    // Liveness for the recompute itself: a craft id outside the ring derives
+    // false through the same expression.
+    expect(ALL_RECIPES.some((r) => r.professionId === 'no_such_craft')).toBe(false);
+  });
+
+  it('still renders the content-empty ring card for a synthetic recipe-less seat', () => {
+    // Unreachable from live data since phase 06 (every seat has content), so
+    // the branch is driven directly: the empty card carries the coming-soon
+    // copy and NO link, and the sibling content card links with no such copy.
+    const emptyCard = ringCards([
+      { id: 'inscription', name: 'Inscription', pole: 'Cross-cutting', maxSkill: 125, hasContent: false },
+    ]);
+    expect(emptyCard).toContain('guide-prof-card-empty');
+    expect(emptyCard).toContain(t('guide.professions.comingSoon'));
+    expect(emptyCard).not.toContain('href=');
+    const contentCard = ringCards([
+      { id: 'inscription', name: 'Inscription', pole: 'Cross-cutting', maxSkill: 125, hasContent: true },
+    ]);
+    expect(contentCard).toContain('href=');
+    expect(contentCard).not.toContain(t('guide.professions.comingSoon'));
   });
 
   it('emits only allowlisted fields on every craft and recipe row (the GUIDE_DEEDS pattern)', () => {

@@ -1221,10 +1221,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Vendido a {buyer}',
   'itemUi.market.saleOlder': 'Más {count} ventas anteriores, incluidas en el total.',
   'itemUi.tooltip.maxStack': 'Máximo por montón: {count}',
-  'itemUi.tooltip.useElixir':
-    'Uso: aumenta tu {stat} en {value} durante {minutes} min. Se puede usar en combate.',
-  'itemUi.tooltip.useElixirAura':
-    'Uso: otorga {aura} durante {minutes} min. Se puede usar en combate.',
   'hud.system.deathRecapAbility': 'Has muerto. Te mató {ability}.',
   'hud.system.deathRecapDrowned': 'Has muerto. Te ahogaste.',
   'hud.system.deathRecapFalling': 'Has muerto. Moriste al caer.',
@@ -1990,9 +1986,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'La economía de artesanía se construye sobre una idea: los jugadores abastecen a los jugadores. Los recolectores alimentan a los artesanos, los artesanos alimentan a los jugadores de misiones y bandas, y los desencantadores alimentan a los encantadores, con vendedores y maestros de estación en los bordes para absorber chatarra y monedas en lugar de competir contigo. Si quieres ganar dinero con un oficio, tu cliente es una persona: aprende lo que otros jugadores consumen, pon precio frente al Mercado Mundial y trata los sistemas de PNJ como un suelo bajo tus precios, no como el mercado en sí.\n\nEl equipo artesanal está ajustado para quedar por debajo del suelo de la banda: incluso una obra maestra siempre está solo un nivel de calidad por encima de su receta, nunca más allá de legendario, y su presupuesto de estadísticas se mantiene por debajo de la banda de botín de la banda. La forja te prepara para el contenido más difícil; no lo reemplaza. Eso mantiene a artesanos, bandas y el mercado en un triángulo estable: el botín de banda sigue siendo aspiracional, y las piezas artesanales siguen siendo el mejor equipo que el dinero puede comprar.',
   'guide.profPages.faq.title': 'Preguntas frecuentes sobre Oficios',
   'guide.profPages.faq.intro': 'Respuestas rápidas a las preguntas que más hacen los artesanos.',
-  'guide.profPages.faq.q1': '¿Por qué mis objetos firmados no se apilan?',
-  'guide.profPages.faq.a1':
-    'Un objeto firmado es un objeto instanciado: lleva su propio pequeño registro (el firmante, cualquier calidad tirada, estadísticas de obra maestra, un encantamiento, un vínculo) en lugar de ser una copia anónima. Dos copias solo se fusionan en una pila cuando esos registros coinciden exactamente.\n\nEn la práctica: el mineral raro que recolectaste tú mismo se apila con más mineral raro que recolectaste tú mismo, porque ambos dicen Recolectado por ti y nada más difiere. El mismo material firmado por un amigo ocupa su propia ranura, y una copia corriente sin firmar nunca se fusiona en una pila firmada. Bolsas, banco e intercambio siguen esta única regla.',
   'guide.profPages.faq.q2': '¿Las recetas comunes suben mi habilidad para siempre?',
   'guide.profPages.faq.q3': '¿Cuál es la diferencia entre saquear y recolectar un cadáver?',
   'guide.profPages.faq.a3':

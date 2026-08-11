@@ -1225,9 +1225,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Verkauft an {buyer}',
   'itemUi.market.saleOlder': 'Zuzüglich {count} früherer Verkäufe, in der Summe enthalten.',
   'itemUi.tooltip.maxStack': 'Max. Stapel: {count}',
-  'itemUi.tooltip.useElixir':
-    'Benutzen: Erhöht Euer {stat} {minutes} Min. lang um {value}. Im Kampf nutzbar.',
-  'itemUi.tooltip.useElixirAura': 'Benutzen: Gewährt {minutes} Min. lang {aura}. Im Kampf nutzbar.',
   'hud.system.deathRecapAbility': 'Ihr seid gestorben. Erschlagen durch {ability}.',
   'hud.system.deathRecapDrowned': 'Ihr seid gestorben. Ihr seid ertrunken.',
   'hud.system.deathRecapFalling': 'Ihr seid gestorben. Ihr seid in den Tod gestürzt.',
@@ -1900,9 +1897,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.title': 'Berufe FAQ',
   'guide.profPages.faq.intro':
     'Schnelle Antworten auf die Fragen, die Handwerker am häufigsten stellen.',
-  'guide.profPages.faq.q1': 'Warum stapeln sich meine signierten Gegenstände nicht?',
-  'guide.profPages.faq.a1':
-    'Ein signierter Gegenstand ist ein instanziierter Gegenstand: Er trägt seinen eigenen kleinen Datensatz (den Unterzeichner, eine gewürfelte Qualität, Meisterwerkattribute, eine Verzauberung, eine Bindung) statt eine anonyme Kopie zu sein. Zwei Kopien verschmelzen nur zu einem Stapel, wenn diese Datensätze genau übereinstimmen.\n\nIn der Praxis: Seltenes Erz, das du selbst gesammelt hast, stapelt sich mit weiterem seltenem Erz, das du selbst gesammelt hast, weil beide sagen Gesammelt von dir und sich sonst nichts unterscheidet. Dasselbe Material, von einem Freund signiert, liegt in einem eigenen Platz, und eine schlichte unsignierte Kopie verschmilzt nie in einem signierten Stapel. Beutel, Bank und Handel folgen alle dieser einen Regel.',
   'guide.profPages.faq.q2': 'Steigern Standardrezepte meine Fertigkeit für immer?',
   'guide.profPages.faq.q3': 'Was ist der Unterschied zwischen Plündern und Ernten einer Leiche?',
   'guide.profPages.faq.a3':

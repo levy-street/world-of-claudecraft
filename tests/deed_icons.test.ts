@@ -445,5 +445,11 @@ describe('Book of Deeds webp icons', () => {
     expect(credits).toContain('prog_jewelcrafting_rare');
     expect(credits).toContain('prog_jewelcrafting_50');
     expect(credits).toContain('prog_grandmaster_jewelcrafting');
+    // The phase 06 crests are excluded from the blanket deed-art row (it
+    // carves out "the project-generated additions credited below"), so each
+    // id must appear in its own CREDITS row or it is credited nowhere.
+    expect(credits).toContain('prog_inscription_rare');
+    expect(credits).toContain('prog_inscription_50');
+    expect(credits).toContain('prog_grandmaster_inscription');
   });
 });

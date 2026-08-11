@@ -43,6 +43,13 @@ const ITEMS: Record<string, ItemDef> = {
   pouch: { id: 'pouch', name: 'Linen Pouch', kind: 'bag', bagSlots: 6, quality: 'common' },
   potion: { id: 'potion', name: 'Minor Healing Potion', kind: 'potion', quality: 'common' },
   elixir: { id: 'elixir', name: 'Elixir of Vigor', kind: 'elixir', quality: 'common' },
+  scroll: {
+    id: 'scroll',
+    name: 'Scroll of Vigor',
+    kind: 'scroll',
+    quality: 'common',
+    elixir: { aura: 'Vigor', kind: 'buff_sta', value: 1, duration: 60 },
+  },
   bread: { id: 'bread', name: 'Crusty Bread', kind: 'food', quality: 'common' },
   water: { id: 'water', name: 'Spring Water', kind: 'drink', quality: 'common' },
   pick: { id: 'pick', name: 'Miner Pick', kind: 'tool', quality: 'common' },
@@ -133,6 +140,7 @@ describe('compareBagStacks: the clean-up ladder', () => {
       slot('pick'),
       slot('water', 2),
       slot('bread', 2),
+      slot('scroll', 2),
       slot('elixir', 2),
       slot('potion', 3),
       slot('pouch'),
@@ -147,6 +155,9 @@ describe('compareBagStacks: the clean-up ladder', () => {
       'pouch',
       'potion',
       'elixir',
+      // The phase 06 kind slots between the elixirs it alternates with and
+      // the picnic food (KIND_RANK's consumable run).
+      'scroll',
       'bread',
       'water',
       'pick',

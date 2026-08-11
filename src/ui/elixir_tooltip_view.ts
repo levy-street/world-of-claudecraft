@@ -1,6 +1,8 @@
-// Battle-elixir item tooltip line: what quaffing the elixir actually grants
-// (the temporary stat-buff aura src/sim/items.ts useItem applies), as a pure
-// string-builder composed inside Hud.itemTooltip beside the potion use lines
+// Battle-elixir AND buff-scroll item tooltip line: what using either source
+// actually grants (the shared temporary stat-buff aura src/sim/items.ts
+// useItem applies; the view gates on the effect record, not the kind, so a
+// phase 06 scroll renders the byte-identical line of its band elixir), as a
+// pure string-builder composed inside Hud.itemTooltip beside the potion use lines
 // (the gather_tool_tooltip.ts pattern: t() + esc here, no DOM, no Hud state,
 // so tests/elixir_tooltip_view.test.ts drives it directly). The numbers come
 // straight from the def's own elixir record, never re-typed copy. A buff kind

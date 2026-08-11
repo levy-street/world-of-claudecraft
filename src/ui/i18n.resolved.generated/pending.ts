@@ -85,7 +85,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -106,7 +108,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_inscription",
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "es_ES": [
     "abilityUi.cast.sundering",
@@ -184,7 +188,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -205,7 +211,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_inscription",
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "fr_FR": [
     "abilityUi.cast.sundering",
@@ -296,7 +304,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -319,7 +329,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.ice_fang_sword.lore",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "fr_CA": [
     "abilityUi.cast.sundering",
@@ -410,7 +422,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -433,7 +447,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.ice_fang_sword.lore",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "en_CA": [],
   "it_IT": [
@@ -531,7 +547,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.weaponcrafting.identityBody",
     "guide.profPages.craftProse.weaponcrafting.materialsBody",
     "guide.profPages.craftProse.weaponcrafting.routeBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -553,7 +571,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.ice_fang_sword.lore",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "de_DE": [
     "abilityUi.cast.sundering",
@@ -655,7 +675,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.profPages.gatherIntro.herbalism",
     "guide.profPages.gatherIntro.mining",
     "guide.professions.deedsBody",
@@ -680,7 +702,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.ice_fang_sword.lore",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -778,7 +802,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -800,7 +826,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.ice_fang_sword.lore",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -899,7 +927,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -927,7 +957,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.ice_fang_sword.lore",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "nl_NL": [
     "abilityUi.cast.sundering",
@@ -1027,7 +1059,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1054,7 +1088,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_inscription",
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "pl_PL": [
     "abilityUi.cast.sundering",
@@ -1146,7 +1182,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.weaponcrafting.identityBody",
     "guide.profPages.craftProse.weaponcrafting.materialsBody",
     "guide.profPages.craftProse.weaponcrafting.routeBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1168,7 +1206,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.ice_fang_sword.lore",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "id_ID": [
     "abilityUi.cast.sundering",
@@ -1250,7 +1290,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
     "guide.profPages.craftProse.weaponcrafting.materialsBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1269,7 +1311,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pattern.teaches",
     "hudChrome.reliquary.markFind.masterwork_inscription",
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "tr_TR": [
     "abilityUi.cast.sundering",
@@ -1359,7 +1403,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1381,7 +1427,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.ice_fang_sword.lore",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "sv_SE": [
     "abilityUi.cast.sundering",
@@ -1480,7 +1528,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1506,7 +1556,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_inscription",
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "vi_VN": [
     "abilityUi.cast.sundering",
@@ -1593,7 +1645,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.jewelcrafting.routeHeading",
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1613,7 +1667,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_inscription",
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "da_DK": [
     "abilityUi.cast.sundering",
@@ -1720,7 +1776,9 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.craftProse.tailoring.identityBody",
     "guide.profPages.craftProse.weaponcrafting.identityBody",
     "guide.profPages.craftProse.weaponcrafting.materialsBody",
+    "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
+    "guide.profPages.faq.q1",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1747,6 +1805,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.markFind.masterwork_inscription",
     "hudChrome.reliquary.markFind.masterwork_jewelcrafting",
     "hudChrome.wocStore.skins.winterbite.name",
-    "itemUi.kind.scroll"
+    "itemUi.kind.scroll",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ]
 };

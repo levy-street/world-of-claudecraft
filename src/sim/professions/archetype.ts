@@ -265,28 +265,33 @@ const CRAFTS_WITH_CONTENT: ReadonlySet<string> = new Set([
   'enchanting',
 ]);
 
-function craftHasContent(craftId: string): boolean {
-  return CRAFTS_WITH_CONTENT.has(craftId);
-}
-
 /** Choose the higher retained-skill hobby; among an equal-skill (typically
- * zero-skill) tie, prefer a candidate with real content (craftHasContent)
- * over one with none, and only then fall back to ring order as the final
+ * zero-skill) tie, prefer a candidate with real content (the derived
+ * CRAFTS_WITH_CONTENT set) over one with none, and only then fall back to
+ * ring order as the final
  * stable tie break. This is used for first attunement and old-save backfill.
  * Deliberately NOT applied in hobbyCandidatesForPair: the explicit
  * hobby-switch quest still needs every ring-opposite candidate reachable by
- * player choice, content or not. */
+ * player choice, content or not.
+ *
+ * `contentSet` exists for TESTS ONLY and defaults to the live derived set:
+ * since the phase 06 inscription catalog every ring craft has content, so no
+ * live pair can exercise the content arm, and without an injection seam the
+ * arm would be untestable dead-looking code (it stays because a future craft
+ * seat with no recipes reopens the soft-lock it guards against). Production
+ * call sites never pass it. */
 export function defaultHobbyForPair(
   activeArchetype: string,
   pairedMajor: string,
   skills: CraftSkills = {},
+  contentSet: ReadonlySet<string> = CRAFTS_WITH_CONTENT,
 ): string | null {
   const candidates = hobbyCandidatesForPair(activeArchetype, pairedMajor);
   if (candidates.length === 0) return null;
   return [...candidates].sort((a, b) => {
     const skillDelta = (skills[b] ?? 0) - (skills[a] ?? 0);
     if (skillDelta !== 0) return skillDelta;
-    const contentDelta = Number(craftHasContent(b)) - Number(craftHasContent(a));
+    const contentDelta = Number(contentSet.has(b)) - Number(contentSet.has(a));
     if (contentDelta !== 0) return contentDelta;
     return (
       CRAFT_RING.findIndex((craft) => craft.id === a) -

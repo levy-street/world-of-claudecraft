@@ -87,7 +87,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       // +1 jewelcrafting rare-tier milestone (Masterwrought phase 05), then
       // +2 for the phase 05 QA ruling pair (the 50-skill and Grandmaster
-      // jewelcrafting milestones joining their cross-craft families).
+      // jewelcrafting milestones joining their cross-craft families), then
+      // +3 for the phase 06 inscription trio (rare-tier, 50-skill, and
+      // Grandmaster) landing the same three families at the table tail.
       progression: 63,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
@@ -367,14 +369,15 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
     expect(DEEDS.prog_master_angler.reward).toEqual({ kind: 'title', text: 'Master Angler' });
     // Per-craft milestones for the crafts whose milestone pair has shipped:
-    // the seven Professions 2.0 recipe-homed crafts plus enchanting, and
-    // jewelcrafting since the phase 05 QA ruling authored its pair (the base
-    // catalog gave it a live skill-gain path to the 125 cap, so the hold was
-    // authoring, not mechanics). Inscription stays deferred with
-    // prog_ringwright. The shipped pair is rare-teach tier 50 at renown 5,
-    // the resolved cap 125 at renown 25 with a Grandmaster title. EVERY craft
-    // threshold in the catalog equals a resolved cap or sits below it, and no
-    // deed references the classic 300 scale anywhere.
+    // the seven Professions 2.0 recipe-homed crafts plus enchanting,
+    // jewelcrafting since the phase 05 QA ruling authored its pair, and
+    // inscription since the phase 06 base catalog shipped its trio in the
+    // same change (each base catalog gave its craft a live skill-gain path
+    // to the 125 cap, so the hold was authoring, not mechanics). The shipped
+    // pair is rare-teach tier 50 at renown 5, the resolved cap 125 at renown
+    // 25 with a Grandmaster title. EVERY craft threshold in the catalog
+    // equals a resolved cap or sits below it, and no deed references the
+    // classic 300 scale anywhere.
     const earnableCrafts = [
       'engineering',
       'alchemy',
@@ -385,6 +388,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'weaponcrafting',
       'armorcrafting',
       'jewelcrafting',
+      'inscription',
     ];
     for (const craftId of earnableCrafts) {
       const cap = CRAFT_RING.find((c) => c.id === craftId)?.maxSkill;
@@ -555,13 +559,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
   });
 
-  it('ships exactly 43 titles and 4 borders', () => {
+  it('ships exactly 44 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
     // ladder 3 more titles, the Phase 18 Reliquary completion ladder 5 more
-    // on top of the release base (31 + 3), and Grandmaster Jewelcrafting
-    // (phase 05 QA) completes the per-craft grandmaster title family.
+    // on top of the release base (31 + 3), Grandmaster Jewelcrafting (phase
+    // 05 QA) the ninth per-craft grandmaster, and Grandmaster Inscription
+    // (phase 06) the tenth, closing the family across the whole ring.
     expect(titles.length).toBe(44);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).

@@ -1208,10 +1208,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Verkocht aan {buyer}',
   'itemUi.market.saleOlder': 'Plus {count} eerdere verkopen, inbegrepen in het totaal.',
   'itemUi.tooltip.maxStack': 'Max. stapel: {count}',
-  'itemUi.tooltip.useElixir':
-    'Gebruik: Verhoogt je {stat} met {value} gedurende {minutes} min. Bruikbaar in gevecht.',
-  'itemUi.tooltip.useElixirAura':
-    'Gebruik: Verleent {aura} gedurende {minutes} min. Bruikbaar in gevecht.',
   'hud.system.deathRecapAbility': 'Je bent gestorven. Gedood door {ability}.',
   'hud.system.deathRecapDrowned': 'Je bent gestorven. Je bent verdronken.',
   'hud.system.deathRecapFalling': 'Je bent gestorven. Je bent te pletter gevallen.',
@@ -1891,9 +1887,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.title': 'Ambachten FAQ',
   'guide.profPages.faq.intro':
     'Snelle antwoorden op de vragen die ambachtslieden het vaakst stellen.',
-  'guide.profPages.faq.q1': 'Waarom stapelen mijn ondertekende voorwerpen niet?',
-  'guide.profPages.faq.a1':
-    'Een ondertekend voorwerp is een instantie-voorwerp: het draagt zijn eigen kleine registratie (de ondertekenaar, eventuele gerolde kwaliteit, meesterwerkstatistieken, een betovering, een band) in plaats van een anonieme kopie te zijn. Twee kopieën smelten pas samen tot één stapel wanneer die registraties exact overeenkomen.\n\nIn de praktijk: zeldzaam erts dat je zelf hebt verzameld, stapelt met meer zeldzaam erts dat je zelf hebt verzameld, want beide zeggen Verzameld door jou en niets anders verschilt. Hetzelfde materiaal ondertekend door een vriend zit in zijn eigen slot, en een gewone onondertekende kopie smeldt nooit in een ondertekende stapel. Tassen, bank en ruil volgen allemaal deze ene regel.',
   'guide.profPages.faq.q2': 'Verhogen gewone recepten mijn vaardigheid voor altijd?',
   'guide.profPages.faq.q3': 'Wat is het verschil tussen een lijk looten en oogsten?',
   'guide.profPages.faq.a3':

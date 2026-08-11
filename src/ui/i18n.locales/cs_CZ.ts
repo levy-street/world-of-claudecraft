@@ -1202,10 +1202,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Prodáno hráči {buyer}',
   'itemUi.market.saleOlder': 'Plus {count} dřívějších prodejů, zahrnuto v součtu.',
   'itemUi.tooltip.maxStack': 'Max. stack: {count}',
-  'itemUi.tooltip.useElixir':
-    'Použití: Zvyšuje {stat} o {value} po dobu {minutes} min. Použitelné v boji.',
-  'itemUi.tooltip.useElixirAura':
-    'Použití: Uděluje efekt {aura} po dobu {minutes} min. Použitelné v boji.',
   'hud.system.deathRecapAbility': 'Tvá postava zemřela. Příčina: {ability}.',
   'hud.system.deathRecapDrowned': 'Tvá postava zemřela. Utopila se.',
   'hud.system.deathRecapFalling': 'Tvá postava zemřela. Spadla k smrti.',
@@ -1873,9 +1869,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Řemeslná ekonomika stojí na jediné myšlence: hráči zásobují hráče. Sběrači živí řemeslníky, řemeslníci živí hráče plnící úkoly a nájezdníky a rozebíratelé živí okouzlovatele, přičemž prodejci a správci stanic stojí na okraji, aby pohlcovali smetí a mince, nikoli aby s tebou soutěžili. Chceš-li vydělávat mince z profese, tvůj zákazník je osoba: zjisti, co ostatní hráči rychle spotřebují, porovnej ceny se Světovým trhem a chovej se k NPC systémům jako k podlaze pod svými cenami, ne jako k trhu samotnému.\n\nVybavení z řemesel je laděno tak, aby zůstávalo pod úrovní nájezdové hranice: i mistrovské dílo je vždy jen o jeden stupeň kvality nad svým receptem, nikdy ne přes legendární, a jeho rozpočet statistik zůstává pod pásmem nájezdové kořisti. Kovárna tě připraví na nejtěžší obsah; nenahrazuje ho. To udržuje řemeslníky, nájezdníky a trh ve stabilním trojúhelníku: nájezdové kusy zůstávají aspiračním cílem a řemeslné kusy nejlepším vybavením, které lze skutečně koupit za mince.',
   'guide.profPages.faq.title': 'Profese: nejčastější dotazy',
   'guide.profPages.faq.intro': 'Rychlé odpovědi na otázky, které řemeslníci kladou nejčastěji.',
-  'guide.profPages.faq.q1': 'Proč se moje podepsané předměty neskládají do stacků?',
-  'guide.profPages.faq.a1':
-    'Podepsaný předmět je instanciovaný předmět: nese svůj vlastní malý záznam (podepisující, jakákoli vylosovaná kvalita, statistiky mistrovského díla, okouzlení, pouto) namísto toho, aby byl anonymní kopií. Dvě kopie se sloučí do jednoho stacku pouze tehdy, když se tyto záznamy přesně shodují.\n\nV praxi: vzácná ruda, kterou jsi sám sesbíral, se slučuje s další vzácnou rudou, kterou jsi sám sesbíral, protože obě říkají Sesbíráno tebou a nic jiného se neliší. Stejný materiál podepsaný přítelem sedí ve vlastním slotu a prostá nepodepsaná kopie se nikdy nesloučí s podepsaným stackem. Brašny, banka i výměna se řídí tímto jediným pravidlem.',
   'guide.profPages.faq.q2': 'Zvyšují běžné recepty moji dovednost donekonečna?',
   'guide.profPages.faq.q3': 'Jaký je rozdíl mezi sběrem kořisti a sklizením z těla?',
   'guide.profPages.faq.a3':

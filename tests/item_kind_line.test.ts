@@ -34,6 +34,9 @@ describe('itemKindLabel and itemQualityLabel, driven directly', () => {
     expect(itemKindLabel('weapon', 'fine_iron_ore')).toBe('Weapon');
     // Recipe pattern items render the classic "Pattern" kind line.
     expect(itemKindLabel('recipe')).toBe('Pattern');
+    // The phase 06 buff scrolls render their own kind line, not Elixir: the
+    // kind exists so the tooltip and use log can say scroll.
+    expect(itemKindLabel('scroll')).toBe('Scroll');
   });
 
   it('quality defaults to common when the def carries none', () => {

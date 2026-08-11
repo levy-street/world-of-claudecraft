@@ -1230,10 +1230,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Vendu à {buyer}',
   'itemUi.market.saleOlder': 'Plus {count} ventes antérieures, incluses dans le total.',
   'itemUi.tooltip.maxStack': 'Pile maximale : {count}',
-  'itemUi.tooltip.useElixir':
-    'Utiliser : augmente votre {stat} de {value} pendant {minutes} min. Utilisable en combat.',
-  'itemUi.tooltip.useElixirAura':
-    'Utiliser : confère {aura} pendant {minutes} min. Utilisable en combat.',
   'hud.system.deathRecapAbility': 'Vous êtes mort. Tué par {ability}.',
   'hud.system.deathRecapDrowned': 'Vous êtes mort. Vous vous êtes noyé.',
   'hud.system.deathRecapFalling': 'Vous êtes mort. Vous avez fait une chute mortelle.',
@@ -1914,9 +1910,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'économie de l'artisanat repose sur une idée : les joueurs approvisionnent les joueurs. Les collecteurs alimentent les artisans, les artisans alimentent les quêteurs et les pillards, et les démanteleurs alimentent les enchanteurs, les marchands et maîtres d'atelier se tenant en périphérie pour absorber les rebuts et les pièces plutôt que vous concurrencer. Si vous voulez gagner de l'argent avec un métier, votre client est une personne : apprenez ce que les autres joueurs consomment, fixez vos prix face au Marché mondial, et traitez les systèmes de PNJ comme un plancher sous vos prix, non comme le marché lui-même.\n\nL'équipement fabriqué est calibré pour se situer en dessous du plancher de raid : même un chef-d'oeuvre n'est jamais qu'un palier de qualité au-dessus de sa recette, jamais au-delà du légendaire, et son budget de caractéristiques reste sous la tranche de butin de raid. La forge vous prépare pour le contenu le plus difficile ; elle ne le remplace pas. Cela maintient les artisans, les pillards et le marché dans un triangle stable : les butins de raid restent aspirationnels, et les pièces fabriquées restent le meilleur équipement qu'on puisse réellement acheter.",
   'guide.profPages.faq.title': 'FAQ Métiers',
   'guide.profPages.faq.intro': 'Réponses rapides aux questions les plus posées par les artisans.',
-  'guide.profPages.faq.q1': 'Pourquoi mes objets signés ne se pilent-ils pas ?',
-  'guide.profPages.faq.a1':
-    "Un objet signé est un objet instancié : il porte son propre petit registre (le signataire, toute qualité tirée, les caractéristiques de chef-d'oeuvre, un enchantement, un lien) au lieu d'être un exemplaire anonyme. Deux exemplaires ne fusionnent en une pile que lorsque ces registres correspondent exactement.\n\nEn pratique : du minerai rare que vous avez collecté vous-même se pile avec plus de minerai rare que vous avez collecté vous-même, car les deux disent Collecté par vous et rien d'autre ne diffère. Le même matériau signé par un ami occupe son propre emplacement, et un exemplaire ordinaire non signé ne fusionne jamais dans une pile signée. Sacs, banque et échange suivent tous cette règle unique.",
   'guide.profPages.faq.q2': 'Les recettes communes améliorent-elles ma compétence indéfiniment ?',
   'guide.profPages.faq.q3': 'Quelle est la différence entre piller et récolter un cadavre ?',
   'guide.profPages.faq.a3':

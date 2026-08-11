@@ -1200,10 +1200,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': '{buyer} kişisine satıldı',
   'itemUi.market.saleOlder': 'Ayrıca {count} önceki satış, toplama dahildir.',
   'itemUi.tooltip.maxStack': 'Azami yığın: {count}',
-  'itemUi.tooltip.useElixir':
-    'Kullanım: {stat} özelliğini {minutes} dakika boyunca {value} artırır. Dövüşte kullanılabilir.',
-  'itemUi.tooltip.useElixirAura':
-    'Kullanım: {minutes} dakika boyunca {aura} bahşeder. Dövüşte kullanılabilir.',
   'hud.system.deathRecapAbility': 'Öldün. {ability} tarafından öldürüldün.',
   'hud.system.deathRecapDrowned': 'Öldün. Boğuldun.',
   'hud.system.deathRecapFalling': 'Öldün. Düşerek can verdin.',
@@ -1873,9 +1869,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Zanaat ekonomisi tek bir fikir üzerine inşa edilmiştir: oyuncular oyunculara tedarik eder. Toplayıcılar ustaları besler, ustalar görev yapan ve baskın düzenleyenleri besler, bozucular büyücüleri besler; satıcılar ve tezgah ustaları ise kenar bölgede çöp ve madeni para emmek için durur, sizinle rekabet etmek için değil. Bir meslekten para kazanmak istiyorsanız, müşteriniz bir insandır: diğer oyuncuların ne tükettiğini öğrenin, Dünya Pazarı'na göre fiyat belirleyin ve NPC sistemlerini fiyatlarınızın tabanı olarak değerlendirin, pazar olarak değil.\n\nZanaatla yapılan teçhizat baskın tabanının altına oturacak şekilde ayarlanmıştır: bir şaheser bile tarifinin yalnızca bir kalite katı üzerindedir, asla efsanevi ötesine geçemez ve istatistik bütçesi baskın ganimet bandının altında kalır. Demirhanesi sizi en zorlu içeriklere hazırlar; onun yerini almaz. Bu, ustalar, baskın düzenleyenler ve pazar arasındaki istikrarlı üçgeni korur: baskın düşen ganimet hep çekici kalır ve zanaatla yapılan parçalar gerçekten parayla satın alınabilecek en iyi teçhizat olur.",
   'guide.profPages.faq.title': 'Meslekler SSS',
   'guide.profPages.faq.intro': 'Ustaların en sık sorduğu sorulara hızlı yanıtlar.',
-  'guide.profPages.faq.q1': 'İmzalı eşyalarım neden yığın oluşturmuyor?',
-  'guide.profPages.faq.a1':
-    'İmzalı eşya, örneklenmiş bir eşyadır: anonim bir kopya olmak yerine kendi küçük kaydını taşır (imzalayan, herhangi bir kalite zar atışı, şaheser istatistikleri, büyü, bağ). İki kopya yalnızca bu kayıtlar tam olarak eşleştiğinde tek yığına birleşir.\n\nPratikte: kendi topladığınız nadir cevher, daha fazla kendi topladığınız nadir cevherle yığın oluşturur, çünkü ikisi de Sizin tarafınızdan toplandı der ve başka hiçbir şey farklılık göstermez. Bir arkadaş tarafından imzalanmış aynı malzeme kendi yuvasında durur ve imzasız düz kopya asla imzalı yığına birleşmez. Çantalar, banka ve ticaret hepsi bu tek kuralı izler.',
   'guide.profPages.faq.q2': 'Sıradan tarifler becerimi sonsuza kadar yükseltir mi?',
   'guide.profPages.faq.q3': 'Bir cesedi yağmalamak ile hasat etmek arasındaki fark nedir?',
   'guide.profPages.faq.a3':

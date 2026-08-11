@@ -1462,12 +1462,16 @@ Grandmaster-craft family, generic by construction.
   doctrine comments, keep the tests/deeds_content.test.ts:478 absence pin, and QUEUE a
   design ruling for Fernando at Phase 06 QA: trigger shape (craftSkill count-arm?),
   threshold, renown, and whether the three reserved ids ship as a family.
-- PHASE 06 NAMING REGISTRY (R15, web-verified 2026-08-11): items 'Silverleaf Primer' /
-  'Goldleaf Folio' / 'Sunpetal Grimoire' (tomes, ids silverleaf_primer / goldleaf_folio /
-  sunpetal_grimoire) and 'Silverleaf Scroll' / 'Goldleaf Scroll' / 'Sunpetal Scroll'
-  (scrolls, ids silverleaf_scroll / goldleaf_scroll / sunpetal_scroll): no full-name hit
-  in any indexed game; the herb components are our own shipped nouns (silverleaf_herb /
-  goldleaf_herb / sunpetal_herb predate the packet and survived the Phase 03 audit).
+- PHASE 06 NAMING REGISTRY (R15, web-verified 2026-08-11; AMENDED at the content review
+  to certify the SHIPPED displays): items 'Sheenleaf Primer' / 'Goldleaf Folio' /
+  'Sunpetal Grimoire' (tomes, ids silverleaf_primer / goldleaf_folio / sunpetal_grimoire)
+  and 'Sheenleaf Scroll' / 'Goldleaf Scroll' / 'Sunpetal Scroll' (scrolls, ids
+  silverleaf_scroll / goldleaf_scroll / sunpetal_scroll). Verification record: the
+  Goldleaf/Sunpetal compounds returned no full-name hit in any indexed game; the
+  'Silverleaf ...' compounds were verified clean too but do NOT ship (the id/display
+  split renders silverleaf ids as 'Sheenleaf', our own Phase 03 coin, and a compound of
+  our own coin plus a generic noun cannot collide with an external full name, the Osmium
+  register's reasoning). The frozen ids keep the verified silverleaf spellings.
   REJECTED for collision: 'Scroll of the Boar' (EverQuest item 35022, allakhazam).
   Deeds: 'Written in Fine Ink' (prog_inscription_rare) CLEAR; 'Quill and Pigment'
   (prog_inscription_50) CLEAR with a recorded neighbor caveat (WoW Dragonflight ships
@@ -1542,3 +1546,36 @@ Grandmaster-craft family, generic by construction.
   a whole-file craft-name register pass belongs to the release fill, recorded here so the
   inconsistency is a known debt, not a phase 06 regression. The zh_CN faq q1-a8 staleness
   beyond a2 re-confirms the recorded old-generation whole-block regen obligation.
+- RULINGS QUEUED FOR PHASE 06 QA (from the content-obligations review; recorded, not
+  changed unilaterally): (1) SCROLL COST PARITY vs the alchemy line it alternates with:
+  recipe_sunpetal_scroll (190 input, resultCount 2) undercuts
+  recipe_elixir_of_the_serpent (214 input, resultCount 2) for the byte-identical buff,
+  and the elixir is pristine_venom_gland's ONLY crafting sink, so the cheaper scroll
+  route competes with that rare specimen's sole consumer; rung 0 is ~19 percent cheaper
+  (26 vs 32) and rung 25 identical (90 vs 90). Options at QA: accept (two doors, the
+  specimen sink keeps its resultCount value), re-price the rung-50 scroll inputs, or
+  give the scroll a pristine-adjacent 4th line. (2) TOME MODELS: the three tomes joined
+  the model-less held_offhand pin (the lantern/orb/quiver precedent renders nothing in
+  hand); decide whether the packet PR owes tome GLBs (the image-to-glb pipeline) or the
+  debt rides until the visible-offhand pass. (3) PROG_RINGWRIGHT design ruling (trigger
+  shape, threshold, renown, the three reserved ids as a family), carried from the
+  re-recorded deferral.
+- PHASE-ORDERING LESSON (recorded): npm run wiki:content derives each deed row's crest
+  url from DEED_IMAGE_IDS, so the wiki regen must run AFTER the deed-art commit; this
+  phase regenerated before the crests landed and needed a follow-up regen commit.
+- REVIEW FIX-ROUND RECORDS (all four reviewer reports applied 2026-08-11): (1) RELEASE
+  NOTE for deploy: a legacy Bombardier save with NO persisted hobbyCraft and equal
+  retained skill in both opposites re-derives its hobby at load and silently moves from
+  enchanting to inscription (normalizeArchetypeState; persisted hobbies and real skill
+  preferences are unaffected). (2) No-test-possible records: the dev_kit dual-wield
+  held-offhand fallback's tie argument is unreachable for shipped content (every
+  dualWield spec resolves a real second weapon first; bestBy is module-private), and
+  the elixir_${kind} id-derivation's per-kind half has no live case (every shipped
+  elixir and scroll is buff_sta, and useItem resolves through the real ITEMS so a
+  synthetic-kind arm has no seam); both recorded rather than force-tested. (3) The bag
+  hover hint (bags_view) has no arm for elixir OR scroll: a pre-existing family gap the
+  scroll inherits, deferred to QA with the mobile-tray fix now making the two consumable
+  surfaces otherwise agree. (4) The tooltip replacement clause landed family-wide on
+  itemUi.tooltip.useElixir/useElixirAura (tooltip-writing.md item 7); the five non-Latin
+  refreshes and Latin strips of those two keys plus the faq q1/a1 subject change ride
+  the wave 3 locale round, adding those four keys to the release-fill worklist.

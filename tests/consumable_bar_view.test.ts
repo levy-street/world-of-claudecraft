@@ -52,7 +52,7 @@ describe('consumableBarItems', () => {
       'water',
     ]);
     // the priority table itself is the load-bearing order; pin it
-    expect(CONSUMABLE_KIND_ORDER).toEqual(['potion', 'elixir', 'food', 'drink']);
+    expect(CONSUMABLE_KIND_ORDER).toEqual(['potion', 'elixir', 'scroll', 'food', 'drink']);
   });
 
   it('collapses multiple stacks of one item into a single slot', () => {

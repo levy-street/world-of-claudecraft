@@ -1219,10 +1219,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Vendido para {buyer}',
   'itemUi.market.saleOlder': 'Mais {count} vendas anteriores, incluídas no total.',
   'itemUi.tooltip.maxStack': 'Pilha máxima: {count}',
-  'itemUi.tooltip.useElixir':
-    'Uso: aumenta seu {stat} em {value} por {minutes} min. Pode ser usado em combate.',
-  'itemUi.tooltip.useElixirAura':
-    'Uso: concede {aura} por {minutes} min. Pode ser usado em combate.',
   'hud.system.deathRecapAbility': 'Você morreu. Morto por {ability}.',
   'hud.system.deathRecapDrowned': 'Você morreu. Você se afogou.',
   'hud.system.deathRecapFalling': 'Você morreu. Você caiu e morreu.',
@@ -1896,9 +1892,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.title': 'Perguntas Frequentes sobre Profissões',
   'guide.profPages.faq.intro':
     'Respostas rápidas para as perguntas que os artesãos fazem com mais frequência.',
-  'guide.profPages.faq.q1': 'Por que meus itens assinados não se empilham?',
-  'guide.profPages.faq.a1':
-    'Um item assinado é um item instanciado: ele carrega seu próprio pequeno registro (o signatário, qualquer qualidade rolada, atributos de obra-prima, um encantamento, um vínculo) em vez de ser uma cópia anônima. Duas cópias só se fundem em uma pilha quando esses registros coincidem exatamente.\n\nNa prática: o minério raro que você mesmo coletou se empilha com mais minério raro que você mesmo coletou, pois ambos dizem Coletado por você e nada mais difere. O mesmo material assinado por um amigo fica em seu próprio encaixe, e uma cópia comum não assinada nunca se funde em uma pilha assinada. Bolsas, banco e negociações seguem esta mesma regra.',
   'guide.profPages.faq.q2': 'As receitas comuns aumentam minha perícia para sempre?',
   'guide.profPages.faq.q3': 'Qual é a diferença entre saquear e colher um cadáver?',
   'guide.profPages.faq.a3':

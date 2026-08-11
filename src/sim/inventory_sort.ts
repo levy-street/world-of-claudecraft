@@ -78,8 +78,8 @@ const TRASH_RANK = 14; // any poor-quality item, regardless of kind
 // category the mixed bucket would order inconsistently (an intransitive
 // comparator makes Array.prototype.sort implementation-defined, a cross-host
 // hazard). Distinct ranks mean the buckets never meet in a tie.
-const UNRANKED_KIND_RANK = 14; // a known def whose kind escaped KIND_RANK (unreachable while the Record is total)
-const MISSING_DEF_RANK = 15; // a def the lookup cannot resolve (defensive; the sim's table is complete)
+const UNRANKED_KIND_RANK = 15; // a known def whose kind escaped KIND_RANK (unreachable while the Record is total)
+const MISSING_DEF_RANK = 16; // a def the lookup cannot resolve (defensive; the sim's table is complete)
 
 // Lower rank sorts first, so the grid reads legendary down to poor. Mirrors
 // the UI's bag_filter.ts ranks. Record<Quality, number> for the same reason

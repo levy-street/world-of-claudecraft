@@ -366,16 +366,29 @@ describe('defaultHobbyForPair skill preference (hobby default)', () => {
     expect(defaultHobbyForPair('engineering', 'alchemy', {})).toBe('inscription');
   });
 
-  it('the content-availability tiebreak never overrides an actual skill preference', () => {
-    // Phase 06 re-point: inscription now carries content, so this case no
-    // longer pits the content tiebreak against a skill preference. It stays
-    // green through the sort's FIRST arm, the retained-skill preference
-    // (inscription 5 vs enchanting 0), not through ring order or the content
-    // arm; the content-vs-skill ordering itself keeps its place in
-    // defaultHobbyForPair, but with every ring craft carrying content there
-    // is no live pair left to exercise the conflict against (a future
-    // contentless craft seat would reopen it).
-    expect(defaultHobbyForPair('engineering', 'alchemy', { inscription: 5 })).toBe('inscription');
+  it('a skill preference overrides the ring-order default for the Bombardier pair', () => {
+    // Decisive against BOTH later sort arms: enchanting (ring index 6) loses
+    // the ring-order tie break and, with every live craft in the content set,
+    // ties the content arm too, so only the retained-skill preference can
+    // pick it here. The zero-skill case above proves the default is
+    // inscription, which is what makes this outcome a real contradiction.
+    expect(defaultHobbyForPair('engineering', 'alchemy', { enchanting: 5 })).toBe('enchanting');
+  });
+
+  it('the content-availability tiebreak still beats ring order (injected contentless set)', () => {
+    // Since phase 06 every live ring craft carries content, so no live pair
+    // can reach the content arm; the injected set exists for exactly this
+    // pin (see the defaultHobbyForPair docblock). With inscription marked
+    // contentless, the Bombardier default must fall PAST ring order (which
+    // prefers inscription, the zero-skill case above) to enchanting, which
+    // is precisely the soft-lock protection the arm encodes; deleting the
+    // contentDelta lines reds this and nothing else.
+    const contentless = new Set(['enchanting']);
+    expect(defaultHobbyForPair('engineering', 'alchemy', {}, contentless)).toBe('enchanting');
+    // And a skill preference still outranks the injected content arm.
+    expect(defaultHobbyForPair('engineering', 'alchemy', { inscription: 5 }, contentless)).toBe(
+      'inscription',
+    );
   });
 
   // Derived flip that landed with the jewelcrafting base catalog (Masterwrought

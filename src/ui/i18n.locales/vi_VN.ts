@@ -1162,8 +1162,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Đã bán cho {buyer}',
   'itemUi.market.saleOlder': 'Cộng thêm {count} lượt bán trước đó, đã được tính vào tổng.',
   'itemUi.tooltip.maxStack': 'Chồng tối đa: {count}',
-  'itemUi.tooltip.useElixir': 'Dùng: Tăng {stat} của bạn thêm {value} trong {minutes} phút. Dùng được trong chiến đấu.',
-  'itemUi.tooltip.useElixirAura': 'Dùng: Ban {aura} trong {minutes} phút. Dùng được trong chiến đấu.',
   'hud.system.deathRecapAbility': 'Bạn đã chết. Bị hạ gục bởi {ability}.',
   'hud.system.deathRecapDrowned': 'Bạn đã chết. Bạn đã chết đuối.',
   'hud.system.deathRecapFalling': 'Bạn đã chết. Bạn đã ngã tử vong.',
@@ -1749,9 +1747,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nền kinh tế chế tác được xây dựng trên một ý tưởng: người chơi cung cấp cho người chơi. Thợ thu hoạch nuôi thợ chế tác, thợ chế tác nuôi người làm nhiệm vụ và raider, còn thợ phá đồ nuôi thợ pháp khắc, với người bán NPC và chủ bàn đứng ở rìa để hấp thụ đồ rác và tiền vàng thay vì cạnh tranh với bạn. Nếu bạn muốn kiếm tiền từ một nghề, khách hàng của bạn là con người: hãy tìm hiểu những gì người chơi khác tiêu hao, định giá so với Chợ Thế Giới, và xem hệ thống NPC là sàn giá dưới mức giá của bạn, không phải là thị trường thực sự.\n\nTrang bị chế tác được cân bằng để nằm dưới ngưỡng raid: ngay cả kiệt tác cũng chỉ một bậc phẩm chất cao hơn công thức của nó, không bao giờ vượt huyền thoại, và ngân sách chỉ số của nó nằm dưới dải loot raid. Lò rèn giúp bạn sẵn sàng cho nội dung khó nhất; nó không thay thế nội dung đó. Điều này giữ thợ chế tác, raider, và thị trường trong tam giác ổn định: đồ rơi raid vẫn là mục tiêu khát khao, và đồ chế tác vẫn là trang bị tốt nhất tiền có thể mua.',
   'guide.profPages.faq.title': 'Câu Hỏi Thường Gặp Về Nghề Nghiệp',
   'guide.profPages.faq.intro': 'Giải đáp nhanh những câu hỏi thợ chế tác hay hỏi nhất.',
-  'guide.profPages.faq.q1': 'Tại sao đồ có dấu thợ của tôi không xếp chồng?',
-  'guide.profPages.faq.a1':
-    'Một vật phẩm có dấu thợ là một vật phẩm duy nhất: nó mang theo bản ghi riêng của mình (người ký, bất kỳ phẩm chất đã lăn, chỉ số kiệt tác, pháp khắc, giao kèo) thay vì là một bản sao vô danh. Hai bản chỉ gộp vào một ngăn xếp khi những bản ghi đó khớp chính xác.\n\nTrên thực tế: quặng hiếm bạn tự thu hoạch xếp chồng với quặng hiếm bạn tự thu hoạch thêm, vì cả hai đều ghi Thu hoạch bởi bạn và không có gì khác nhau. Cùng nguyên liệu đó do một người bạn ký nằm trong ô riêng, và một bản thường không có dấu không bao giờ gộp vào ngăn xếp có dấu. Túi, ngân hàng, và giao dịch đều theo một quy tắc này.',
   'guide.profPages.faq.q2': 'Các công thức phổ thông có tăng kỹ năng mãi mãi không?',
   'guide.profPages.faq.q3': 'Khác biệt giữa nhặt loot và thu hoạch xác là gì?',
   'guide.profPages.faq.a3':

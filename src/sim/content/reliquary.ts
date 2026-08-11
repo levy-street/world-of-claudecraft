@@ -470,6 +470,12 @@ export const RELIQUARY_PROFESSION_MARKS = {
     'masterwork:tailoring',
     'masterwork:leatherworking',
     'masterwork:jewelcrafting',
+    // Deliberately INSERTED before engineering rather than appended: the
+    // earnable marks group ahead of the pended engineering slot on the page.
+    // Safe for a shipped page because marks are id-keyed in the sparse blob
+    // (no persisted state is index-dependent); the page-table append-only
+    // doctrine governs PAGES, and the order pin in
+    // tests/reliquary_content.test.ts moved with this row.
     'masterwork:inscription',
     'masterwork:engineering',
   ],

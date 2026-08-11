@@ -1202,8 +1202,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Solgt til {buyer}',
   'itemUi.market.saleOlder': 'Plus {count} tidligere salg, medregnet i alt.',
   'itemUi.tooltip.maxStack': 'Maks. antal i stak: {count}',
-  'itemUi.tooltip.useElixir': 'Brug: Øger din {stat} med {value} i {minutes} min. Brugbar i kamp.',
-  'itemUi.tooltip.useElixirAura': 'Brug: Giver {aura} i {minutes} min. Brugbar i kamp.',
   'hud.system.deathRecapAbility': 'Du er død. Dræbt af {ability}.',
   'hud.system.deathRecapDrowned': 'Du er død. Du druknede.',
   'hud.system.deathRecapFalling': 'Du er død. Du faldt i døden.',
@@ -1867,9 +1865,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Håndværksøkonomien er bygget på én idé: spillere forsyner spillere. Indsamlere fodrer håndværkere, håndværkere fodrer questere og raiders, og nedbrydere fodrer fortryllere, med handlende og stationsmestre, der står i kanten for at absorbere skrammel og mønt snarere end at konkurrere med dig. Hvis du vil tjene penge på et fag, er din kunde en person: lær hvad andre spillere brænder igennem, prissæt mod Verdensmarkedet, og behandl NPC-systemerne som et gulv under dine priser, ikke som markedet selv.\n\nFremstillet udstyr er afstemt til at ligge under raid-gulvet: selv et mesterværk er kun nogensinde ét kvalitetsniveau over sin opskrift, aldrig forbi legendarisk, og dets statistikbudget holder sig under raid-bytteområdet. Smedjen gør dig klar til det sværeste indhold; den erstatter det ikke. Det holder håndværkere, raiders og markedet i en stabil trekant: raid-bytte forbliver noget at stræbe efter, og fremstillede stykker forbliver det bedste udstyr, penge faktisk kan købe.',
   'guide.profPages.faq.title': 'Professions-FAQ',
   'guide.profPages.faq.intro': 'Hurtige svar på de spørgsmål håndværkere stiller mest.',
-  'guide.profPages.faq.q1': 'Hvorfor stables mine signerede genstande ikke?',
-  'guide.profPages.faq.a1':
-    'Et signeret stykke er et instansieret stykke: det bærer sin egen lille post (underskriveren, enhver rullet kvalitet, mesterværksstatistikker, en fortryllelse, en binding) i stedet for at være et anonymt eksemplar. To eksemplarer smelter kun til én stak, når disse poster matcher præcist.\n\nI praksis: sjælden malm du selv indsamlede, stables med mere sjælden malm du selv indsamlede, fordi begge siger Indsamlet af dig og intet andet er forskelligt. Det samme materiale signeret af en ven sidder i sin egen slot, og et ordinært usigneret eksemplar smelter aldrig ind i en signeret stak. Tasker, bank og handel følger alle denne ene regel.',
   'guide.profPages.faq.q2': 'Øger almindelige opskrifter min færdighed for evigt?',
   'guide.profPages.faq.q3': 'Hvad er forskellen mellem at plyndre og at høste et kadaver?',
   'guide.profPages.faq.a3':

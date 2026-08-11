@@ -1201,10 +1201,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Terjual kepada {buyer}',
   'itemUi.market.saleOlder': 'Ditambah {count} penjualan sebelumnya, termasuk dalam total.',
   'itemUi.tooltip.maxStack': 'Tumpukan maks: {count}',
-  'itemUi.tooltip.useElixir':
-    'Pakai: Meningkatkan {stat} milikmu sebesar {value} selama {minutes} mnt. Bisa dipakai dalam pertempuran.',
-  'itemUi.tooltip.useElixirAura':
-    'Pakai: Memberikan {aura} selama {minutes} mnt. Bisa dipakai dalam pertempuran.',
   'hud.system.deathRecapAbility': 'Kamu telah tewas. Tewas oleh {ability}.',
   'hud.system.deathRecapDrowned': 'Kamu telah tewas. Kamu tenggelam.',
   'hud.system.deathRecapFalling': 'Kamu telah tewas. Kamu jatuh hingga tewas.',
@@ -1874,9 +1870,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.title': 'FAQ Profesi',
   'guide.profPages.faq.intro':
     'Jawaban cepat untuk pertanyaan yang paling sering ditanyakan para pembuat.',
-  'guide.profPages.faq.q1': 'Mengapa item bertanda tangan saya tidak menumpuk?',
-  'guide.profPages.faq.a1':
-    'Item bertanda tangan adalah item yang diinstansiasi: ia membawa catatan kecilnya sendiri (penanda tangan, kualitas yang dihasilkan, stat karya besar, mantra, ikatan) alih-alih menjadi salinan anonim. Dua salinan hanya bergabung menjadi satu tumpukan jika catatan tersebut cocok persis.\n\nDalam praktiknya: bijih langka yang kamu kumpulkan sendiri menumpuk dengan bijih langka lainnya yang kamu kumpulkan sendiri, karena keduanya mengatakan Dikumpulkan oleh kamu dan tidak ada perbedaan lain. Bahan yang sama yang ditandatangani oleh teman berada di slotnya sendiri, dan salinan biasa yang tidak ditandatangani tidak pernah bergabung ke tumpukan bertanda tangan. Tas, bank, dan perdagangan semuanya mengikuti satu aturan ini.',
   'guide.profPages.faq.q2': 'Apakah resep biasa menaikkan keahlian saya selamanya?',
   'guide.profPages.faq.q3': 'Apa perbedaan antara menjarah dan memanen bangkai?',
   'guide.profPages.faq.a3':

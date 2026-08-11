@@ -301,10 +301,11 @@ describe('inscription catalog outputs', () => {
         const expected = def.quality === 'rare' ? 20 : 1;
         expect(requiredLevelFor(def), `${def.id} equip level`).toBe(expected);
       } else {
-        // A scroll is consumed, not equipped: whatever the use-gate rule is,
-        // it must agree with the BAND elixir the scroll alternates with
-        // (derived, so a gate policy change moves both sources together; in
-        // practice the rare band gates at 20 and the leveling bands at 1).
+        // A scroll is consumed, not equipped, and nothing gates USE on this
+        // value (meetsLevelRequirement is consulted only on the equip path):
+        // requiredLevelFor here is metadata the tooltip and sort surfaces
+        // read. It must agree with the BAND elixir the scroll alternates
+        // with (derived, so a policy change moves both sources together).
         const bandElixir = {
           silverleaf_scroll: 'elixir_of_the_boar',
           goldleaf_scroll: 'venomfire_elixir',
@@ -316,6 +317,10 @@ describe('inscription catalog outputs', () => {
         );
       }
     }
+    // Literal anchor so a global requiredLevelFor regression (everything 1,
+    // or 0) cannot satisfy the derived equalities above: the rare band
+    // really carries the level-20 registration.
+    expect(requiredLevelFor(ITEMS.sunpetal_scroll)).toBe(20);
   });
 
   it('stocks no output at a vendor (crafted, never bought)', () => {

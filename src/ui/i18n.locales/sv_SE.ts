@@ -1200,9 +1200,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Sålt till {buyer}',
   'itemUi.market.saleOlder': 'Plus {count} tidigare försäljningar, inräknade i totalen.',
   'itemUi.tooltip.maxStack': 'Maxstapel: {count}',
-  'itemUi.tooltip.useElixir':
-    'Använd: Ökar din {stat} med {value} i {minutes} min. Kan användas i strid.',
-  'itemUi.tooltip.useElixirAura': 'Använd: Ger {aura} i {minutes} min. Kan användas i strid.',
   'hud.system.deathRecapAbility': 'Du har dött. Dräpt av {ability}.',
   'hud.system.deathRecapDrowned': 'Du har dött. Du drunknade.',
   'hud.system.deathRecapFalling': 'Du har dött. Du föll till din död.',
@@ -1875,9 +1872,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Hantverksekonomin är byggd på en idé: spelare försörjer spelare. Samlare matar hantverkare, hantverkare matar korsfarare och raidare, och avbrytare matar förtrollare, med handlare och stationsmästare på kanterna för att ta in skräp och mynt snarare än att konkurrera med dig. Om du vill tjäna pengar på ett yrke är din kund en person: lär dig vad andra spelare bränner igenom, prissätt mot Världsmarknaden, och behandla NPC-systemen som ett golv under dina priser, inte som marknaden själv.\n\nTillverkad utrustning är inställd för att ligga under raidgolvet: även ett mästerverk är alltid bara en kvalitetsnivå över sitt recept, aldrig förbi legendarisk, och dess statbudget stannar under raidlootbandet. Smedjan gör dig redo för det svåraste innehållet; den ersätter det inte. Det håller hantverkare, raidare och marknaden i en stabil triangel: raidfynd förblir aspirationsbaserade, och tillverkade pjäser förblir den bästa utrustning pengar faktiskt kan köpa.',
   'guide.profPages.faq.title': 'Yrkens FAQ',
   'guide.profPages.faq.intro': 'Snabba svar på de frågor hantverkare ställer oftast.',
-  'guide.profPages.faq.q1': 'Varfor staplas inte mina signerade foremal?',
-  'guide.profPages.faq.a1':
-    'Ett signerat föremål är ett instanserat föremål: det bär sin egen lilla post (signatären, eventuell rullad kvalitet, mästverksegenskaper, en förtrollning, ett band) i stället för att vara en anonym kopia. Två kopior sammanslås till en stapel bara när dessa poster matchar exakt.\n\nI praktiken: sällsynt malm du samlade själv staplas med mer sällsynt malm du samlade själv, för båda säger Insamlat av dig och inget annat skiljer sig. Samma material signerat av en vän sitter i sin egen plats, och en vanlig osignerad kopia sammanslås aldrig i en signerad stapel. Väskor, bank och handel följer alla denna regel.',
   'guide.profPages.faq.q2': 'Höjer vanliga recept min skicklighet for evigt?',
   'guide.profPages.faq.q3': 'Vad är skillnaden mellan att plundra och skörda en kropp?',
   'guide.profPages.faq.a3':

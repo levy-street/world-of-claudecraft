@@ -24,9 +24,11 @@ function elixirDef(record: NonNullable<ItemDef['elixir']>): ItemDef {
 describe('elixirTooltipLines', () => {
   afterEach(() => setLanguage('en'));
 
-  it('elixir of the boar states its stamina buff, duration, and combat use', () => {
+  it('elixir of the boar states its stamina buff, duration, replacement rule, and combat use', () => {
+    // The replacement clause is the family exclusivity rule at the point of
+    // use (a scroll and an elixir of one stat share a single buff slot).
     expect(elixirTooltipLines(ITEMS.elixir_of_the_boar)).toBe(
-      '<div class="tt-desc">Use: Increases your Stamina by 6 for 10 min. Usable in combat.</div>',
+      '<div class="tt-desc">Use: Increases your Stamina by 6 for 10 min. Replaces any other elixir or scroll of the same stat. Usable in combat.</div>',
     );
   });
 
@@ -37,6 +39,9 @@ describe('elixirTooltipLines', () => {
     expect(ITEMS.silverleaf_scroll.kind).toBe('scroll');
     expect(elixirTooltipLines(ITEMS.silverleaf_scroll)).toBe(
       elixirTooltipLines(ITEMS.elixir_of_the_boar),
+    );
+    expect(elixirTooltipLines(ITEMS.goldleaf_scroll)).toBe(
+      elixirTooltipLines(ITEMS.venomfire_elixir),
     );
     expect(elixirTooltipLines(ITEMS.sunpetal_scroll)).toBe(
       elixirTooltipLines(ITEMS.elixir_of_the_serpent),
@@ -72,7 +77,7 @@ describe('elixirTooltipLines', () => {
       elixirDef({ aura: 'Probe', kind: 'buff_sta', value: 1234, duration: 450 }),
     );
     expect(html).toBe(
-      '<div class="tt-desc">Use: Increases your Stamina by 1,234 for 7.5 min. Usable in combat.</div>',
+      '<div class="tt-desc">Use: Increases your Stamina by 1,234 for 7.5 min. Replaces any other elixir or scroll of the same stat. Usable in combat.</div>',
     );
   });
 
@@ -104,7 +109,7 @@ describe('elixirTooltipLines', () => {
       duration: 300,
     });
     expect(elixirTooltipLines(def)).toBe(
-      '<div class="tt-desc">Use: Grants Might of the Boar for 5 min. Usable in combat.</div>',
+      '<div class="tt-desc">Use: Grants Might of the Boar for 5 min. Replaces any other elixir or scroll of its kind. Usable in combat.</div>',
     );
   });
 

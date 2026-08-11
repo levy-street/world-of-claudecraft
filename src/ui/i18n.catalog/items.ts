@@ -87,8 +87,13 @@ const itemStringsEn = {
       // Battle elixirs (elixir_tooltip_view.ts): the stat line for a mapped
       // buff kind, and the aura-name fallback so an unmapped kind still says
       // what quaffing grants instead of saying nothing.
-      useElixir: 'Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.',
-      useElixirAura: 'Use: Grants {aura} for {minutes} min. Usable in combat.',
+      // The replacement clause is the family's exclusivity rule at the point
+      // of use (tooltip-writing.md item 7): every elixir and scroll of one
+      // stat shares a single buff slot, newest application wins.
+      useElixir:
+        'Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.',
+      useElixirAura:
+        'Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed

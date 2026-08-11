@@ -1227,10 +1227,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Venduto a {buyer}',
   'itemUi.market.saleOlder': 'Più {count} vendite precedenti, incluse nel totale.',
   'itemUi.tooltip.maxStack': 'Pila massima: {count}',
-  'itemUi.tooltip.useElixir':
-    'Uso: aumenta {stat} di {value} per {minutes} min. Utilizzabile in combattimento.',
-  'itemUi.tooltip.useElixirAura':
-    'Uso: concede {aura} per {minutes} min. Utilizzabile in combattimento.',
   'hud.system.deathRecapAbility': 'Sei morto. Ucciso da {ability}.',
   'hud.system.deathRecapDrowned': 'Sei morto. Sei annegato.',
   'hud.system.deathRecapFalling': 'Sei morto. Sei caduto nel vuoto.',
@@ -1902,9 +1898,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "L'economia artigianale e costruita su un'idea: i giocatori riforniscono i giocatori. I raccoglitori alimentano gli artigiani, gli artigiani alimentano chi fa missioni e chi fa raid, e chi smantella alimenta gli incantatori, con venditori e maestri di stazione ai margini per assorbire robaccia e monete piuttosto che competere con te. Se vuoi guadagnare denaro da una professione, il tuo cliente e una persona: scopri cosa consumano gli altri giocatori, fissa i prezzi in base al Mercato Mondiale, e tratta i sistemi PNG come un pavimento sotto i tuoi prezzi, non come il mercato stesso.\n\nL'equipaggiamento artigianale e calibrato per stare sotto il livello del raid: persino un capolavoro e sempre solo un livello di qualita sopra alla sua ricetta, mai oltre il leggendario, e il suo budget di statistiche rimane sotto la fascia del bottino del raid. La fucina ti prepara per i contenuti piu difficili; non li sostituisce. Questo mantiene artigiani, raider e il mercato in un triangolo stabile: i drop del raid rimangono ambiziosi, e i pezzi artigianali rimangono il miglior equipaggiamento che il denaro possa effettivamente comprare.",
   'guide.profPages.faq.title': 'Domande Frequenti sulle Professioni',
   'guide.profPages.faq.intro': 'Risposte rapide alle domande piu frequenti degli artigiani.',
-  'guide.profPages.faq.q1': 'Perche i miei oggetti firmati non si impilano?',
-  'guide.profPages.faq.a1':
-    "Un oggetto firmato e un oggetto istanziato: porta un proprio piccolo registro (il firmatario, qualsiasi qualita tirata, statistiche di capolavoro, un incanto, un vincolo) invece di essere una copia anonima. Due copie si uniscono in una pila solo quando quei registri corrispondono esattamente.\n\nIn pratica: il minerale raro che hai raccolto tu stesso si impila con altro minerale raro che hai raccolto tu stesso, perche entrambi dicono Raccolto da te e nient'altro differisce. Lo stesso materiale firmato da un amico occupa il proprio slot, e una copia semplice non firmata non si unisce mai a una pila firmata. Borse, banca e scambio seguono tutti questa unica regola.",
   'guide.profPages.faq.q2': "Le ricette comuni aumentano la mia competenza all'infinito?",
   'guide.profPages.faq.q3': 'Qual e la differenza tra saccheggiare e raccogliere una carcassa?',
   'guide.profPages.faq.a3':

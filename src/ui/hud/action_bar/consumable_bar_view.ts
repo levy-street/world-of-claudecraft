@@ -13,14 +13,17 @@ import type { InvSlot, ItemDef } from '../../../sim/types';
 export const CONSUMABLE_BAR_SLOTS = 6;
 
 // Combat-priority order: what a player reaches for mid-fight comes first, so
-// the capped row never buries a potion behind a stack of picnic food.
-export const CONSUMABLE_KIND_ORDER = ['potion', 'elixir', 'food', 'drink'] as const;
+// the capped row never buries a potion behind a stack of picnic food. Scrolls
+// sit with the elixirs they alternate with (phase 06): both are combat-usable
+// buffs, and touch has no drag-to-hotbar, so this bar is a scroll's only
+// mid-fight surface.
+export const CONSUMABLE_KIND_ORDER = ['potion', 'elixir', 'scroll', 'food', 'drink'] as const;
 
 export type ConsumableLookup = (itemId: string) => ItemDef | undefined;
 
 /**
  * Fill `out` with the item ids the quick bar shows, in render order:
- * potions, then elixirs, then food, then drink; id-sorted within a kind so the
+ * potions, then elixirs, then scrolls, then food, then drink; id-sorted within a kind so the
  * row stays visually stable while stacks merge, split, or shuffle bag order.
  * Multiple stacks of one item collapse to a single slot (the shared bar core
  * sums the count across stacks). Mutates and returns `out` (allocation-light:

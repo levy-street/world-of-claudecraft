@@ -291,6 +291,34 @@ describe('kit construction', () => {
     }
   });
 
+  it('gives every one-hand caster the rare tome as its held offhand', () => {
+    // Before the inscription catalog the only class-legal held offhand in
+    // the fresh-20 pool was valefire_lantern (int 1, spi 1), so no caster
+    // pick was ever pinned and a displacement would have reddened nothing
+    // (the phase 06 coverage audit's gap). The rung-50 tome
+    // (int 5, spi 3, sta 2, budget 10 at ilvl 23) outscores the lantern for
+    // every caster role, so the pick is pinned as a literal the way the
+    // neck/ring table above is: a move here means a weights retune (admit
+    // it) or the tome ladder changed. Scope: CASTER_ALL classes only; a
+    // hunter's held offhand is its quiver (tomes are class-locked away), and
+    // dual-wield specs fill the slot with a second weapon first.
+    const CASTER_TOME = 'sunpetal_grimoire';
+    const casterClasses = new Set(['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid']);
+    let pinned = 0;
+    for (const { cls, spec } of everySpec()) {
+      const kit = buildDevKit(cls, spec);
+      const off = kit?.equip.offhand;
+      if (!off) continue;
+      if (ITEMS[off]?.kind !== 'held_offhand') continue;
+      if (!casterClasses.has(cls)) continue;
+      expect(off, `${cls}/${spec} held offhand`).toBe(CASTER_TOME);
+      pinned += 1;
+    }
+    // Liveness: the sweep really reached caster held-offhand picks; a pool
+    // or picker change that empties the slot must be admitted here.
+    expect(pinned).toBeGreaterThanOrEqual(6);
+  });
+
   it('never puts the same ring in both ring slots', () => {
     for (const { cls, spec } of everySpec()) {
       const kit = buildDevKit(cls, spec);

@@ -49,7 +49,7 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 274 deeds x (name + desc) + the 43 shipped title rewards (both counts
+    // 277 deeds x (name + desc) + the 44 shipped title rewards (both counts
     // pinned by tests/deeds_content.test.ts): the Drakelands brood pair, the
     // four Thornhollow Fields battleground deeds, the Rift coverage pair
     // (dgn_rift, dgn_rift_s_rank), the nine per-craft rare-tier profession

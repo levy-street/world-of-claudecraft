@@ -1207,9 +1207,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Kupujący: {buyer}',
   'itemUi.market.saleOlder': 'Plus {count} wcześniejszych sprzedaży, wliczonych w sumę.',
   'itemUi.tooltip.maxStack': 'Maks. stos: {count}',
-  'itemUi.tooltip.useElixir':
-    'Użycie: zwiększa twoje {stat} o {value} na {minutes} min. Można użyć w walce.',
-  'itemUi.tooltip.useElixirAura': 'Użycie: nadaje {aura} na {minutes} min. Można użyć w walce.',
   'hud.system.deathRecapAbility': 'Zginąłeś. Zabity przez {ability}.',
   'hud.system.deathRecapDrowned': 'Zginąłeś. Utonąłeś.',
   'hud.system.deathRecapFalling': 'Zginąłeś. Spadłeś na śmierć.',
@@ -1875,9 +1872,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.title': 'FAQ o Profesjach',
   'guide.profPages.faq.intro':
     'Szybkie odpowiedzi na pytania, które rzemieślnicy zadają najczęściej.',
-  'guide.profPages.faq.q1': 'Dlaczego moje podpisane przedmioty nie układają się w stos?',
-  'guide.profPages.faq.a1':
-    'Podpisany przedmiot to przedmiot egzemplarzowy: niesie własny mały zapis (podpisujący, jakakolwiek wylosowana jakość, statystyki arcydzieła, zaklęcie, więź) zamiast bycia anonimową kopią. Dwie kopie scalają się w jeden stos tylko wtedy, gdy te zapisy pasują dokładnie.\n\nW praktyce: rzadka ruda, którą sam zebrałeś, układa się z kolejną rzadką rudą, którą sam zebrałeś, bo obie mówią Zebrane przez ciebie i nic innego się nie różni. Ten sam materiał podpisany przez przyjaciela leży w swoim własnym slocie, a zwykła niepodpisana kopia nigdy nie scala się w podpisany stos. Torby, bank i wymiana podążają za tą jedną zasadą.',
   'guide.profPages.faq.q2': 'Czy pospolite przepisy zawsze podnoszą moją umiejętność?',
   'guide.profPages.faq.q3': 'Jaka jest różnica między plądrowaniem a zbieraniem tuszy?',
   'guide.profPages.faq.a3':

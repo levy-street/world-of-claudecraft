@@ -2502,8 +2502,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useHealingPotion': '使用：立即恢復 {amount} 點生命值。戰鬥中可用。1 分鐘冷卻。',
   'itemUi.tooltip.useManaPotion': '使用：立即恢復 {amount} 點法力值。戰鬥中可用。1 分鐘冷卻。',
   'itemUi.tooltip.useElixir':
-    '使用：使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。戰鬥中可用。',
-  'itemUi.tooltip.useElixirAura': '使用：獲得{aura}效果，持續 {minutes} 分鐘。戰鬥中可用。',
+    '使用：使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。會取代同屬性的其他藥劑或卷軸。戰鬥中可用。',
+  'itemUi.tooltip.useElixirAura':
+    '使用：獲得{aura}效果，持續 {minutes} 分鐘。會取代同類的其他藥劑或卷軸。戰鬥中可用。',
   'itemUi.tooltip.clickUseInstant': '點擊在戰鬥中立即使用',
   'itemUi.tooltip.clickUse': '點擊使用',
   'itemUi.tooltip.clickBuyback': '點擊買回',
@@ -10659,10 +10660,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '製作裝備的強度始終低於團隊副本的底線，而上述費用會把貨物推向玩家之間的交易，而非商店循環。',
   'guide.profPages.faq.title': '專業常見問題',
   'guide.profPages.faq.intro': '製作者最常問的問題，一併作答。',
-  'guide.profPages.faq.q1': '我能學多少專業？',
+  'guide.profPages.faq.q1': '為什麼我的署名物品無法堆疊？',
   'guide.profPages.faq.a1':
-    '每個角色都可以提升全部八種可修煉製作行業和全部四種採集行業；只有命途身分是唯一的選擇。',
-  'guide.profPages.faq.q2': '在哪裡學配方？',
+    '署名物品是獨立成件的物品：它帶著一份屬於自己的小紀錄（署名者、擲出的品質、傑作屬性、附魔、綁定），而不是一份無名無姓的普通副本。只有當這些紀錄完全一致時，兩個副本才會合併成同一疊。\n\n實際上：你親手採集的精良礦石，能與更多你親手採集的精良礦石堆疊，因為兩者都寫著「採集者：你」，其餘毫無差別。同一種材料若帶著朋友的署名，就會佔據屬於自己的欄位；而未署名的普通副本，永遠不會併入署名的堆疊。背包、銀行、交易、郵件與世界市場全都遵循這同一條規則。',
+  'guide.profPages.faq.q2': '通用配方會永遠提升我的技能嗎？',
   'guide.profPages.faq.a2':
     '不會。每個配方都按它落在你當前檔位之下多遠來計算，也就是經典的橙、黃、綠、灰讀法：在你檔位或以上給予全額成長，低一層減半，低兩層為四分之一，低三層及以上毫無成長。每25點技能為一檔，所以技能0的免費配方到技能75就再也教不了你任何東西。\n\n上限也比你可能預期的經典300要低：十種可修製作行業各以125為上限，採礦、伐木與藥草學以100為上限，釣魚則一路放長到200。攀升的意思是換上你自己檔位的配方，而不是死磨最便宜的那一個。',
   'guide.profPages.faq.q3': '採集需要工具嗎？',

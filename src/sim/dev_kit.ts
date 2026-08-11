@@ -372,7 +372,8 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
         // The same identity-then-id tiebreak the caster path passes: before
         // the inscription tomes this filter never held two candidates, so the
         // omission was unreachable; with several tomes in the pool an in-band
-        // tie here must not resolve on alphabetical id alone (a28f8e9334).
+        // tie here must not resolve on alphabetical id alone (the bestBy
+        // caveat block above owns the tiebreak contract).
         tie,
       );
       if (held) equip.offhand = held.id;
