@@ -14,6 +14,8 @@ const DEFS: Record<string, ItemDef> = Object.fromEntries(
       ['healing_potion', 'potion'],
       ['mana_potion', 'potion'],
       ['bear_elixir', 'elixir'],
+      ['boar_scroll', 'scroll'],
+      ['serpent_scroll', 'scroll'],
       ['bread', 'food'],
       ['boar_meat', 'food'],
       ['water', 'drink'],
@@ -27,19 +29,21 @@ const lookup = (id: string) => DEFS[id];
 const inv = (...ids: string[]) => ids.map((itemId) => ({ itemId, count: 1 }));
 
 describe('consumableBarItems', () => {
-  it('keeps only the four consumable kinds and drops gear/junk/tools/unknowns', () => {
+  it('keeps only the five consumable kinds and drops gear/junk/tools/unknowns', () => {
     const got = consumableBarItems(
-      inv('sword', 'bread', 'pelt', 'healing_potion', 'fishing_rod', 'no_such_item'),
+      inv('sword', 'bread', 'pelt', 'healing_potion', 'boar_scroll', 'fishing_rod', 'no_such_item'),
       lookup,
       [],
     );
-    expect(got).toEqual(['healing_potion', 'bread']);
+    expect(got).toEqual(['healing_potion', 'boar_scroll', 'bread']);
   });
 
-  it('orders by combat priority (potion, elixir, food, drink), id-sorted within a kind', () => {
-    // deliberately scrambled bag order; the row must not follow it
+  it('orders by combat priority (potion, elixir, scroll, food, drink), id-sorted within a kind', () => {
+    // deliberately scrambled bag order; the row must not follow it. The scroll
+    // lands after the elixir and before the food (phase 06: scrolls sit with
+    // the elixirs they alternate with).
     const got = consumableBarItems(
-      inv('water', 'boar_meat', 'mana_potion', 'bear_elixir', 'bread', 'healing_potion'),
+      inv('water', 'boar_meat', 'mana_potion', 'boar_scroll', 'bear_elixir', 'healing_potion'),
       lookup,
       [],
     );
@@ -47,8 +51,8 @@ describe('consumableBarItems', () => {
       'healing_potion',
       'mana_potion',
       'bear_elixir',
+      'boar_scroll',
       'boar_meat',
-      'bread',
       'water',
     ]);
     // the priority table itself is the load-bearing order; pin it
@@ -82,6 +86,37 @@ describe('consumableBarItems', () => {
       2,
     );
     expect(capped).toEqual(['healing_potion', 'mana_potion']);
+  });
+
+  it('a combat-buff-heavy bag evicts food and drink at the cap (the recorded trade)', () => {
+    // Two potions + one elixir + two scrolls + two foods + a drink is eight
+    // distinct consumables for six slots: the tail sheds first (the drink,
+    // then the id-later food), never the combat items at the head. This
+    // is the deliberate consequence of the combat-priority order, recorded in
+    // the Phase 06 QA ledger: mid-fight consumables outrank regen at the cap,
+    // and food/drink stay reachable from the bags.
+    const got = consumableBarItems(
+      inv(
+        'water',
+        'bread',
+        'boar_meat',
+        'bear_elixir',
+        'boar_scroll',
+        'serpent_scroll',
+        'healing_potion',
+        'mana_potion',
+      ),
+      lookup,
+      [],
+    );
+    expect(got).toEqual([
+      'healing_potion',
+      'mana_potion',
+      'bear_elixir',
+      'boar_scroll',
+      'serpent_scroll',
+      'boar_meat',
+    ]);
   });
 
   it('reuses the caller array across calls (allocation-light per-frame contract)', () => {
