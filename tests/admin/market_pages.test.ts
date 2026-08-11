@@ -147,6 +147,8 @@ beforeEach(() => {
   mocks.apiPost.mockResolvedValue({ ok: true });
   mocks.apiGet.mockImplementation(async (path: string) => {
     if (path.startsWith('/admin/api/market/overview')) return overviewData;
+    if (path.startsWith('/admin/api/market/catalog'))
+      return { items: [{ itemId: 'wolf_fang', name: 'Wolf Fang' }] };
     if (path.startsWith('/admin/api/market/flips')) return flipsData;
     if (path.startsWith('/admin/api/market/item')) return itemData;
     if (path.startsWith('/admin/api/market/alerts')) return alertsData;
@@ -230,6 +232,10 @@ describe('Price alerts page', () => {
     expect(screen.getByText(t('market.conditionBelow', { price: '1s 50c' }))).toBeInTheDocument();
     // Ask when fired: 120c -> "1s 20c".
     expect(screen.getByText('1s 20c')).toBeInTheDocument();
+    // The datalist convenience pulls the light catalog, never the overview
+    // aggregates (percentile_cont over the whole sales table).
+    expect(mocks.apiGet).toHaveBeenCalledWith('/admin/api/market/catalog');
+    expect(mocks.apiGet).not.toHaveBeenCalledWith('/admin/api/market/overview');
   });
 
   it('creating an alert posts the form and refreshes the list', async () => {

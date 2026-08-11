@@ -272,6 +272,10 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'failed to add note': 'error.addNoteFailed',
   'chat strikes reset failed': 'error.chatStrikesResetFailed',
   'reactivation failed': 'error.reactivationFailed',
+  'unknown item': 'error.marketUnknownItem',
+  'direction must be below or above': 'error.marketAlertDirection',
+  'thresholdcopper must be a positive copper amount': 'error.marketAlertThreshold',
+  'alert not found': 'error.marketAlertNotFound',
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];

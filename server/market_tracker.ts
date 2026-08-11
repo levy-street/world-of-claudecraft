@@ -25,7 +25,9 @@ import {
   type MarketListingSnapshotRow,
   type MarketSaleRow,
   markMarketAlertTriggered,
-  reconcileMarketSalesCharacterIds,
+  rearmMarketAlerts,
+  reconcileMarketSalesCharacterIdsBatch,
+  reconcileMarketSalesCharacterIdsRecent,
 } from './market_tracker_db';
 import { REALM } from './realm';
 
@@ -93,7 +95,7 @@ function sellerCharacterIdOf(sellerKey: string): number | null {
 // null on either side means the buyer could not be resolved, so nothing can
 // have been bought).
 export function diffMarketBuy(
-  who: { characterId: number; accountId: number },
+  who: { characterId: number },
   capture: MarketBuyCapture,
   buyerCopperAfter: number | null,
 ): MarketSaleRow | null {
@@ -110,7 +112,6 @@ export function diffMarketBuy(
     instanced: listing.instanced,
     craftedRecipeId: listing.craftedRecipeId,
     buyerCharacterId: who.characterId,
-    buyerAccountId: who.accountId,
     sellerCharacterId: listing.house ? null : sellerCharacterIdOf(listing.sellerKey),
   };
 }
@@ -123,7 +124,7 @@ let tail: Promise<void> = Promise.resolve();
 // (never a promise, never awaited by the game loop); the whole body is guarded
 // so it can never throw into the dispatch path.
 export function recordMarketBuy(
-  who: { characterId: number; accountId: number },
+  who: { characterId: number },
   capture: MarketBuyCapture,
   buyerCopperAfter: number | null,
 ): void {
@@ -187,19 +188,26 @@ export function snapshotMarketListings(
 export function evaluateMarketAlerts(
   alerts: readonly ActiveMarketAlert[],
   rows: readonly MarketListingSnapshotRow[],
-): { id: number; valueCopper: number }[] {
+): { fired: { id: number; valueCopper: number }[]; rearmed: number[] } {
   const askByItem = new Map(
     rows.map((row) => [row.itemId, row.lowestAskTotalCopper / row.lowestAskQuantity]),
   );
   const fired: { id: number; valueCopper: number }[] = [];
+  const rearmed: number[] = [];
   for (const alert of alerts) {
     const ask = askByItem.get(alert.itemId);
-    if (ask === undefined) continue;
+    // Unlisted items fire nothing, and an alert that WAS met re-arms when its
+    // item leaves the book: a relist under the threshold is a new crossing.
     const met =
-      alert.direction === 'below' ? ask < alert.thresholdCopper : ask > alert.thresholdCopper;
-    if (met) fired.push({ id: alert.id, valueCopper: ask });
+      ask !== undefined &&
+      (alert.direction === 'below' ? ask < alert.thresholdCopper : ask > alert.thresholdCopper);
+    if (met && !alert.lastMet && ask !== undefined) {
+      fired.push({ id: alert.id, valueCopper: ask });
+    } else if (!met && alert.lastMet) {
+      rearmed.push(alert.id);
+    }
   }
-  return fired;
+  return { fired, rearmed };
 }
 
 // Snapshot the book fire-and-forget (the main.ts interval never awaits it).
@@ -217,9 +225,11 @@ export function recordMarketListingSnapshot(listings: readonly MarketListing[]):
         await insertMarketListingSnapshotRows(pool, rows, capturedAt);
         const alerts = await loadActiveMarketAlerts(pool, REALM);
         if (alerts.length === 0) return;
-        for (const fired of evaluateMarketAlerts(alerts, rows)) {
-          await markMarketAlertTriggered(pool, fired.id, fired.valueCopper);
+        const { fired, rearmed } = evaluateMarketAlerts(alerts, rows);
+        for (const hit of fired) {
+          await markMarketAlertTriggered(pool, hit.id, hit.valueCopper);
         }
+        await rearmMarketAlerts(pool, rearmed);
       })
       .catch((err) => {
         console.error('market_tracker snapshot write failed:', err);
@@ -229,12 +239,24 @@ export function recordMarketListingSnapshot(listings: readonly MarketListing[]):
   }
 }
 
-// Boot/daily anonymize reconcile (see market_tracker_db.ts for the two
-// windows it closes). Awaited by its caller with a .catch, never by the loop.
-// Snapshot retention is NOT here: the nightly retention sweep drives
+// Anonymize reconcile (see market_tracker_db.ts for the two windows and why
+// they differ in shape). Awaited by their callers with a .catch, never by the
+// loop. Snapshot retention is NOT here: the nightly retention sweep drives
 // pruneMarketListingSnapshotsBatch directly (registered in main.ts).
+
+// Recurring boot/daily pass: last-day window only, flat forever.
 export function reconcileMarketTrackerCharacterIds(): Promise<void> {
-  return reconcileMarketSalesCharacterIds(pool);
+  return reconcileMarketSalesCharacterIdsRecent(pool);
+}
+
+// Boot-time full-table backfill for old-build deletions, batched so every
+// statement stays bounded; loops until a batch heals zero rows.
+const RECONCILE_BACKFILL_BATCH = 5000;
+export async function backfillMarketTrackerCharacterIds(): Promise<void> {
+  for (;;) {
+    const healed = await reconcileMarketSalesCharacterIdsBatch(pool, RECONCILE_BACKFILL_BATCH);
+    if (healed === 0) return;
+  }
 }
 
 // The current FIFO tail, for tests and the main.ts shutdown drain.

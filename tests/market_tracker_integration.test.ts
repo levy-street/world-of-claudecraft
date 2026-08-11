@@ -16,7 +16,8 @@ import {
   MARKET_TRACKER_SCHEMA,
   type MarketSaleRow,
   pruneMarketListingSnapshotsBatch,
-  reconcileMarketSalesCharacterIds,
+  reconcileMarketSalesCharacterIdsBatch,
+  reconcileMarketSalesCharacterIdsRecent,
 } from '../server/market_tracker_db';
 
 const DB_URL = process.env.TEST_DATABASE_URL;
@@ -110,7 +111,6 @@ describeDb('market tracker storage (real Postgres)', () => {
       instanced: false,
       craftedRecipeId: null,
       buyerCharacterId: null,
-      buyerAccountId: 8,
       sellerCharacterId: null,
       ...over,
     };
@@ -195,7 +195,9 @@ describeDb('market tracker storage (real Postgres)', () => {
       db.release();
     }
 
-    await reconcileMarketSalesCharacterIds(scopedPool());
+    // The row is fresh (sold_at defaulted to now()), so the windowed
+    // recurring pass sees and heals it.
+    await reconcileMarketSalesCharacterIdsRecent(scopedPool());
 
     const verify = await scopedClient();
     try {
@@ -207,6 +209,9 @@ describeDb('market tracker storage (real Postgres)', () => {
     } finally {
       verify.release();
     }
+
+    // The batched full-table backfill agrees nothing is left to heal.
+    await expect(reconcileMarketSalesCharacterIdsBatch(scopedPool(), 100)).resolves.toBe(0);
   });
 
   it('the retention batch deletes only aged snapshot rows, oldest first', async () => {

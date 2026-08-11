@@ -11,6 +11,10 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -105,6 +109,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "es_ES": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -199,6 +207,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "fr_FR": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -293,6 +305,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "fr_CA": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -388,6 +404,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -482,6 +502,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "de_DE": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -576,6 +600,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "zh_CN": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -670,6 +698,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "zh_TW": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -764,6 +796,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "ko_KR": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -858,6 +894,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "ja_JP": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -952,6 +992,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "pt_BR": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -1046,6 +1090,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "ru_RU": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -1140,6 +1188,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "cs_CZ": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -1234,6 +1286,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "nl_NL": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -1328,6 +1384,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "pl_PL": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -1422,6 +1482,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "id_ID": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -1516,6 +1580,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "tr_TR": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -1610,6 +1678,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "sv_SE": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -1704,6 +1776,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "vi_VN": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",
@@ -1798,6 +1874,10 @@ export const pending: Record<string, readonly string[]> = {
     "nav.marketOverview"
   ],
   "da_DK": [
+    "error.marketAlertDirection",
+    "error.marketAlertNotFound",
+    "error.marketAlertThreshold",
+    "error.marketUnknownItem",
     "market.addToWatchlist",
     "market.alertAbove",
     "market.alertBelow",

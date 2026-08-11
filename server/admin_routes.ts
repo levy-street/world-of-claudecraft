@@ -27,6 +27,7 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/perf/raw', permission: 'analytics.read' },
   // World Market tracker analytics (sale history + listing snapshots).
   { method: 'GET', pattern: '/admin/api/market/overview', permission: 'analytics.read' },
+  { method: 'GET', pattern: '/admin/api/market/catalog', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/market/item', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/market/flips', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/market/movers', permission: 'analytics.read' },

@@ -274,6 +274,7 @@ import {
   mapsPublicListCore,
 } from './maps_routes';
 import {
+  backfillMarketTrackerCharacterIds,
   marketTrackerIdle,
   reconcileMarketTrackerCharacterIds,
   recordMarketListingSnapshot,
@@ -3142,11 +3143,17 @@ export async function startServer(): Promise<http.Server> {
     recordMarketListingSnapshot(game.sim.marketListings);
   }, MARKET_SNAPSHOT_INTERVAL_MS);
   marketSnapshotInterval.unref();
-  // Heal any character id the delete-time anonymize could not reach (a FIFO
-  // flush racing the delete, or a deletion made by a build without the
-  // anonymize call); repeated by the daily sweep below.
+  // Heal any character id the delete-time anonymize could not reach. The
+  // recent pass (FIFO flush racing a delete; repeated by the daily sweep
+  // below) is windowed to the last day; the batched backfill covers deletions
+  // made by a build without the anonymize call and loops bounded statements,
+  // so neither can outgrow the pool's statement_timeout as the keep-forever
+  // table accumulates.
   void reconcileMarketTrackerCharacterIds().catch((err) =>
     console.error('market sales reconcile failed:', err),
+  );
+  void backfillMarketTrackerCharacterIds().catch((err) =>
+    console.error('market sales backfill reconcile failed:', err),
   );
   await game.loadMail();
   // Guild bank books boot-load BEFORE listen() below, so every non-oversized
@@ -3457,6 +3464,7 @@ export async function startServer(): Promise<http.Server> {
         // LIMIT-bounded per account (chatModerationForAccount).
         name: 'chat_violations',
         pruneBatch: (n) => pruneChatViolationsBatch(config.chatViolationRetentionDays, n),
+      },
       // World Market tracker listing snapshots (the sales table is
       // keep-forever by design, see market_tracker_db.ts).
       {

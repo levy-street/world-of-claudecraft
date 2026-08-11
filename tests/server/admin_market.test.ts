@@ -98,6 +98,7 @@ describe('market admin routes: auth gate', () => {
   it('401s db-free without a bearer on every market route', async () => {
     for (const path of [
       '/admin/api/market/overview',
+      '/admin/api/market/catalog',
       '/admin/api/market/item',
       '/admin/api/market/flips',
       '/admin/api/market/movers',
@@ -110,6 +111,24 @@ describe('market admin routes: auth gate', () => {
         error: 'admin authentication required',
       });
     }
+  });
+});
+
+describe('GET /admin/api/market/catalog', () => {
+  it('serves id/name pairs from the registry with zero db reads', async () => {
+    const marketLatestSnapshots = vi.fn(async () => []);
+    authedAdminDb({ marketLatestSnapshots });
+    const r = await runRoute('GET', '/admin/api/market/catalog', '/admin/api/market/catalog', {
+      authorization: BEARER,
+    });
+    expect(r.status).toBe(200);
+    expect(r.body.success).toBe(true);
+    expect(r.body.data.items.length).toBeGreaterThan(0);
+    for (const item of r.body.data.items.slice(0, 5)) {
+      expect(Object.keys(item).sort()).toEqual(['itemId', 'name']);
+    }
+    // Pure in-memory: the datalist convenience must never touch the db.
+    expect(marketLatestSnapshots).not.toHaveBeenCalled();
   });
 });
 

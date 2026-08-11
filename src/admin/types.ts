@@ -793,6 +793,12 @@ export interface MarketOverviewResponse {
   items: MarketOverviewItem[];
 }
 
+// GET /admin/api/market/catalog: id/name pairs only, for datalists and other
+// lookups that must not pull the overview aggregates.
+export interface MarketCatalogResponse {
+  items: { itemId: string; name: string }[];
+}
+
 export interface MarketPriceHistoryPoint {
   bucketStart: string;
   sales: number;

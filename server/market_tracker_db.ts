@@ -54,7 +54,6 @@ CREATE TABLE IF NOT EXISTS market_sales (
   instanced BOOLEAN NOT NULL,
   crafted_recipe_id TEXT,
   buyer_character_id INT,
-  buyer_account_id INT,
   seller_character_id INT,
   sold_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -64,6 +63,10 @@ CREATE INDEX IF NOT EXISTS market_sales_buyer
   ON market_sales(buyer_character_id) WHERE buyer_character_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS market_sales_seller
   ON market_sales(seller_character_id) WHERE seller_character_id IS NOT NULL;
+-- Pre-merge builds of this schema carried a buyer_account_id column that
+-- nothing read and the anonymize path never cleared; drop it wherever it was
+-- applied so a deleted character's purchases cannot stay account-linkable.
+ALTER TABLE market_sales DROP COLUMN IF EXISTS buyer_account_id;
 CREATE TABLE IF NOT EXISTS market_listing_snapshots (
   id BIGSERIAL PRIMARY KEY,
   realm TEXT NOT NULL,
@@ -89,9 +92,11 @@ CREATE TABLE IF NOT EXISTS market_alerts (
   created_by_account_id INT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   last_triggered_at TIMESTAMPTZ,
-  last_value_copper BIGINT
+  last_value_copper BIGINT,
+  last_met BOOLEAN NOT NULL DEFAULT FALSE
 );
 CREATE INDEX IF NOT EXISTS market_alerts_realm_active ON market_alerts(realm, active);
+ALTER TABLE market_alerts ADD COLUMN IF NOT EXISTS last_met BOOLEAN NOT NULL DEFAULT FALSE;
 `;
 
 // One append-only row per completed World Market purchase. quantity is the
@@ -109,7 +114,6 @@ export interface MarketSaleRow {
   instanced: boolean;
   craftedRecipeId: string | null;
   buyerCharacterId: number | null;
-  buyerAccountId: number | null;
   sellerCharacterId: number | null;
 }
 
@@ -122,10 +126,10 @@ export async function insertMarketSaleRow(pool: Pool, row: MarketSaleRow): Promi
   await pool.query(
     `INSERT INTO market_sales
        (realm, listing_id, item_id, quantity, total_price_copper, house,
-        instanced, crafted_recipe_id, buyer_character_id, buyer_account_id,
+        instanced, crafted_recipe_id, buyer_character_id,
         seller_character_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-             (SELECT id FROM characters WHERE id = $11))`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
+             (SELECT id FROM characters WHERE id = $10))`,
     [
       row.realm,
       row.listingId,
@@ -136,31 +140,74 @@ export async function insertMarketSaleRow(pool: Pool, row: MarketSaleRow): Promi
       row.instanced,
       row.craftedRecipeId,
       row.buyerCharacterId,
-      row.buyerAccountId,
       row.sellerCharacterId,
     ],
   );
 }
 
-// Boot/daily reconcile for the two windows the delete-time anonymize cannot
-// cover: a sale row flushed off the FIFO after its seller was anonymized, and
-// a character deleted by a build without the anonymize call (rollback or a
-// mixed fleet on the shared Postgres). Ids are validated against a live
-// characters row at insert time (above), so any id with no characters row here
-// is a deleted character, never a legitimate foreign key. Both UPDATEs ride
-// the partial indexes; idempotent and safe to run concurrently across realm
-// processes, so no advisory lock is needed.
-export async function reconcileMarketSalesCharacterIds(pool: Pool): Promise<void> {
+// The reconcile heals the two windows the delete-time anonymize cannot cover,
+// and they need different shapes because market_sales is keep-forever:
+//
+// (a) A sale row flushed off the FIFO after its character was deleted. That
+//     race is seconds wide, so the RECURRING boot/daily pass below scopes to
+//     the last day of sold_at and rides market_sales_realm_sold_at, staying
+//     flat no matter how large the table grows. An unscoped anti-join here
+//     would eventually exceed the pool's 15s statement_timeout and the heal
+//     would silently stop running, exactly the case it exists for.
+// (b) Rows from a build without the anonymize call (rollback or a mixed fleet
+//     on the shared Postgres). That is a one-off backfill over the whole
+//     table, so it runs as the BATCHED primitive further below (the
+//     pruneMarketListingSnapshotsBatch shape) at boot, keeping every
+//     statement bounded by its LIMIT.
+//
+// Ids are validated against a live characters row at insert time (above), so
+// any id with no characters row here is a deleted character, never a
+// legitimate foreign key. All passes are idempotent and safe to run
+// concurrently across realm processes, so no advisory lock is needed.
+export async function reconcileMarketSalesCharacterIdsRecent(pool: Pool): Promise<void> {
   await pool.query(
     `UPDATE market_sales SET buyer_character_id = NULL
      WHERE buyer_character_id IS NOT NULL
+       AND sold_at > now() - interval '1 day'
        AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = buyer_character_id)`,
   );
   await pool.query(
     `UPDATE market_sales SET seller_character_id = NULL
      WHERE seller_character_id IS NOT NULL
+       AND sold_at > now() - interval '1 day'
        AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = seller_character_id)`,
   );
+}
+
+// One bounded slice of the full-table backfill for window (b) above. Returns
+// the number of rows healed in this batch; the caller loops until it reports
+// zero. Each UPDATE touches at most batchSize rows selected through the
+// partial indexes, so no single statement can approach the pool's
+// statement_timeout regardless of table size.
+export async function reconcileMarketSalesCharacterIdsBatch(
+  pool: Pool,
+  batchSize: number,
+): Promise<number> {
+  const limit = Math.max(1, Math.floor(batchSize));
+  const buyers = await pool.query(
+    `UPDATE market_sales SET buyer_character_id = NULL
+     WHERE id IN (
+       SELECT id FROM market_sales
+        WHERE buyer_character_id IS NOT NULL
+          AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = buyer_character_id)
+        LIMIT $1)`,
+    [limit],
+  );
+  const sellers = await pool.query(
+    `UPDATE market_sales SET seller_character_id = NULL
+     WHERE id IN (
+       SELECT id FROM market_sales
+        WHERE seller_character_id IS NOT NULL
+          AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = seller_character_id)
+        LIMIT $1)`,
+    [limit],
+  );
+  return (buyers.rowCount ?? 0) + (sellers.rowCount ?? 0);
 }
 
 // One row per item with at least one PLAYER listing at capture time (house
@@ -580,6 +627,11 @@ export interface ActiveMarketAlert {
   itemId: string;
   direction: MarketAlertDirection;
   thresholdCopper: number;
+  // Whether the condition held on the PREVIOUS evaluation: the edge detector.
+  // An alert fires only on a false -> true transition, so "Last fired" records
+  // the crossing instead of re-stamping every capture while the condition
+  // holds; it re-arms when a capture sees the condition clear.
+  lastMet: boolean;
 }
 
 export async function loadActiveMarketAlerts(
@@ -587,7 +639,7 @@ export async function loadActiveMarketAlerts(
   realm: string,
 ): Promise<ActiveMarketAlert[]> {
   const res = await pool.query(
-    `SELECT id, item_id, direction, threshold_copper
+    `SELECT id, item_id, direction, threshold_copper, last_met
        FROM market_alerts
       WHERE realm = $1 AND active AND metric = $2`,
     [realm, MARKET_ALERT_METRIC],
@@ -597,6 +649,7 @@ export async function loadActiveMarketAlerts(
     itemId: row.item_id,
     direction: row.direction,
     thresholdCopper: Number(row.threshold_copper),
+    lastMet: Boolean(row.last_met),
   }));
 }
 
@@ -606,7 +659,16 @@ export async function markMarketAlertTriggered(
   valueCopper: number,
 ): Promise<void> {
   await pool.query(
-    'UPDATE market_alerts SET last_triggered_at = now(), last_value_copper = $2 WHERE id = $1',
+    `UPDATE market_alerts
+        SET last_triggered_at = now(), last_value_copper = $2, last_met = TRUE
+      WHERE id = $1`,
     [id, Math.round(valueCopper)],
   );
+}
+
+// Re-arm alerts whose condition a capture saw clear (or whose item left the
+// book entirely): the next time the condition is met counts as a new crossing.
+export async function rearmMarketAlerts(pool: Pool, ids: readonly number[]): Promise<void> {
+  if (ids.length === 0) return;
+  await pool.query('UPDATE market_alerts SET last_met = FALSE WHERE id = ANY($1)', [ids]);
 }

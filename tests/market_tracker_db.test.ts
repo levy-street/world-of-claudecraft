@@ -13,7 +13,9 @@ import {
   type MarketListingSnapshotRow,
   markMarketAlertTriggered,
   pruneMarketListingSnapshotsBatch,
-  reconcileMarketSalesCharacterIds,
+  rearmMarketAlerts,
+  reconcileMarketSalesCharacterIdsBatch,
+  reconcileMarketSalesCharacterIdsRecent,
 } from '../server/market_tracker_db';
 
 const query = vi.fn();
@@ -37,7 +39,7 @@ beforeEach(() => {
 });
 
 describe('insertMarketSaleRow', () => {
-  it('issues one parameterized INSERT with all 11 columns', async () => {
+  it('issues one parameterized INSERT with all 10 columns', async () => {
     await insertMarketSaleRow(pool, {
       realm: 'eastbrook',
       listingId: 5001,
@@ -48,34 +50,25 @@ describe('insertMarketSaleRow', () => {
       instanced: false,
       craftedRecipeId: null,
       buyerCharacterId: 43,
-      buyerAccountId: 8,
       sellerCharacterId: 42,
     });
     expect(query).toHaveBeenCalledTimes(1);
     const [sql, params] = query.mock.calls[0];
     expect(sql).toContain('INSERT INTO market_sales');
     expect(sql).toContain('realm, listing_id, item_id, quantity, total_price_copper, house');
-    expect(sql).toContain('instanced, crafted_recipe_id, buyer_character_id, buyer_account_id');
+    expect(sql).toContain('instanced, crafted_recipe_id, buyer_character_id');
     expect(sql).toContain('seller_character_id');
-    // Eleven bind params, no interpolation: the last placeholder is $11.
-    expect(sql).toContain('$11');
-    expect(sql).not.toContain('$12');
+    // No account-id column: sale rows carry character ids only, and those are
+    // nulled on delete, so nothing on this keep-forever table can stay
+    // account-linkable after the character is gone.
+    expect(sql).not.toContain('buyer_account_id');
+    // Ten bind params, no interpolation: the last placeholder is $10.
+    expect(sql).toContain('$10');
+    expect(sql).not.toContain('$11');
     // The seller candidate is validated against a live characters row so a
     // stale or entity-id sellerKey lands as NULL, never a bogus attribution.
-    expect(sql).toContain('(SELECT id FROM characters WHERE id = $11)');
-    expect(params).toEqual([
-      'eastbrook',
-      5001,
-      'wolf_fang',
-      5,
-      1000,
-      false,
-      false,
-      null,
-      43,
-      8,
-      42,
-    ]);
+    expect(sql).toContain('(SELECT id FROM characters WHERE id = $10)');
+    expect(params).toEqual(['eastbrook', 5001, 'wolf_fang', 5, 1000, false, false, null, 43, 42]);
   });
 });
 
@@ -176,31 +169,53 @@ describe('market alerts SQL', () => {
     await expect(deleteMarketAlert(pool, 'eastbrook', 8)).resolves.toBe(false);
   });
 
-  it('the evaluation load takes only active lowest-ask alerts', async () => {
+  it('the evaluation load takes only active lowest-ask alerts, with edge state', async () => {
     query.mockResolvedValueOnce({
-      rows: [{ id: '7', item_id: 'wolf_fang', direction: 'below', threshold_copper: '150' }],
+      rows: [
+        {
+          id: '7',
+          item_id: 'wolf_fang',
+          direction: 'below',
+          threshold_copper: '150',
+          last_met: true,
+        },
+      ],
       rowCount: 1,
     });
     const alerts = await loadActiveMarketAlerts(pool, 'eastbrook');
     expect(alerts).toEqual([
-      { id: 7, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 150 },
+      { id: 7, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 150, lastMet: true },
     ]);
     const [sql, params] = query.mock.calls[0];
     expect(sql).toContain('WHERE realm = $1 AND active AND metric = $2');
+    expect(sql).toContain('last_met');
     expect(params).toEqual(['eastbrook', 'lowest_ask']);
   });
 
-  it('marking a trigger rounds the carried value', async () => {
+  it('marking a trigger rounds the carried value and latches the edge', async () => {
     await markMarketAlertTriggered(pool, 7, 199.5);
     const [sql, params] = query.mock.calls[0];
-    expect(sql).toContain('SET last_triggered_at = now(), last_value_copper = $2');
+    expect(sql).toContain('SET last_triggered_at = now(), last_value_copper = $2, last_met = TRUE');
     expect(params).toEqual([7, 200]);
+  });
+
+  it('re-arming clears the edge for the given ids in one statement', async () => {
+    await rearmMarketAlerts(pool, [7, 9]);
+    expect(query).toHaveBeenCalledTimes(1);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('SET last_met = FALSE WHERE id = ANY($1)');
+    expect(params).toEqual([[7, 9]]);
+  });
+
+  it('re-arming nothing issues no query', async () => {
+    await rearmMarketAlerts(pool, []);
+    expect(query).not.toHaveBeenCalled();
   });
 });
 
-describe('reconcileMarketSalesCharacterIds', () => {
-  it('nulls ids whose characters row no longer exists, one UPDATE per column', async () => {
-    await reconcileMarketSalesCharacterIds(pool);
+describe('reconcileMarketSalesCharacterIdsRecent', () => {
+  it('nulls orphaned ids inside a one-day sold_at window, one UPDATE per column', async () => {
+    await reconcileMarketSalesCharacterIdsRecent(pool);
     expect(query).toHaveBeenCalledTimes(2);
     const [buyerSql] = query.mock.calls[0];
     const [sellerSql] = query.mock.calls[1];
@@ -210,5 +225,39 @@ describe('reconcileMarketSalesCharacterIds', () => {
     expect(sellerSql).toContain('SET seller_character_id = NULL');
     expect(sellerSql).toContain('NOT EXISTS');
     expect(sellerSql).toContain('seller_character_id IS NOT NULL');
+    // The recurring pass is windowed: an unscoped anti-join over the
+    // keep-forever table would eventually exceed the pool statement_timeout
+    // and the heal would silently stop running.
+    expect(buyerSql).toContain("sold_at > now() - interval '1 day'");
+    expect(sellerSql).toContain("sold_at > now() - interval '1 day'");
+  });
+});
+
+describe('reconcileMarketSalesCharacterIdsBatch', () => {
+  it('heals bounded slices through a LIMIT subquery and reports rows touched', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 3 });
+    query.mockResolvedValueOnce({ rows: [], rowCount: 2 });
+    const healed = await reconcileMarketSalesCharacterIdsBatch(pool, 5000);
+    expect(healed).toBe(5);
+    expect(query).toHaveBeenCalledTimes(2);
+    const [buyerSql, buyerParams] = query.mock.calls[0];
+    const [sellerSql, sellerParams] = query.mock.calls[1];
+    for (const sql of [buyerSql, sellerSql]) {
+      expect(sql).toContain('WHERE id IN');
+      expect(sql).toContain('LIMIT $1');
+      expect(sql).toContain('NOT EXISTS');
+      // The full-table pass never carries the window: it exists to backfill
+      // deletions made by a build without the anonymize call.
+      expect(sql).not.toContain('interval');
+    }
+    expect(buyerParams).toEqual([5000]);
+    expect(sellerParams).toEqual([5000]);
+  });
+
+  it('clamps a nonsense batch size to at least one row', async () => {
+    query.mockResolvedValue({ rows: [], rowCount: 0 });
+    await reconcileMarketSalesCharacterIdsBatch(pool, 0);
+    const [, params] = query.mock.calls[0];
+    expect(params).toEqual([1]);
   });
 });

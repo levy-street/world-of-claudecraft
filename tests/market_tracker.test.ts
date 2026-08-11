@@ -21,9 +21,11 @@ vi.mock('../server/market_tracker_db', () => ({
   insertMarketListingSnapshotRows: vi.fn(async () => {}),
   pruneMarketListingSnapshots: vi.fn(async () => 0),
   anonymizeMarketSalesForCharacter: vi.fn(async () => {}),
-  reconcileMarketSalesCharacterIds: vi.fn(async () => {}),
+  reconcileMarketSalesCharacterIdsRecent: vi.fn(async () => {}),
+  reconcileMarketSalesCharacterIdsBatch: vi.fn(async () => 0),
   loadActiveMarketAlerts: vi.fn(async () => []),
   markMarketAlertTriggered: vi.fn(async () => {}),
+  rearmMarketAlerts: vi.fn(async () => {}),
 }));
 
 import { GameServer } from '../server/game';
@@ -41,6 +43,7 @@ import {
   insertMarketSaleRow,
   loadActiveMarketAlerts,
   markMarketAlertTriggered,
+  rearmMarketAlerts,
 } from '../server/market_tracker_db';
 import { REALM } from '../server/realm';
 import type { MarketListing } from '../src/sim/market';
@@ -127,7 +130,6 @@ describe('diffMarketBuy (pure)', () => {
       instanced: false,
       craftedRecipeId: null,
       buyerCharacterId: 43,
-      buyerAccountId: 8,
       sellerCharacterId: 42,
     });
   });
@@ -217,12 +219,12 @@ describe('evaluateMarketAlerts (pure)', () => {
   ]);
 
   it('fires below/above against the cheapest unit ask, with the value carried', () => {
-    const fired = evaluateMarketAlerts(
+    const { fired, rearmed } = evaluateMarketAlerts(
       [
-        { id: 1, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 250 },
-        { id: 2, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 150 },
-        { id: 3, itemId: 'wolf_fang', direction: 'above', thresholdCopper: 150 },
-        { id: 4, itemId: 'wolf_fang', direction: 'above', thresholdCopper: 250 },
+        { id: 1, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 250, lastMet: false },
+        { id: 2, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 150, lastMet: false },
+        { id: 3, itemId: 'wolf_fang', direction: 'above', thresholdCopper: 150, lastMet: false },
+        { id: 4, itemId: 'wolf_fang', direction: 'above', thresholdCopper: 250, lastMet: false },
       ],
       rows,
     );
@@ -230,24 +232,57 @@ describe('evaluateMarketAlerts (pure)', () => {
       { id: 1, valueCopper: 200 },
       { id: 3, valueCopper: 200 },
     ]);
+    expect(rearmed).toEqual([]);
   });
 
-  it('an item with no listings fires nothing in either direction', () => {
-    const fired = evaluateMarketAlerts(
+  it('a held condition does not re-fire: only the crossing stamps', () => {
+    const { fired, rearmed } = evaluateMarketAlerts(
+      [{ id: 1, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 250, lastMet: true }],
+      rows,
+    );
+    expect(fired).toEqual([]);
+    expect(rearmed).toEqual([]);
+  });
+
+  it('a cleared condition re-arms, and the next crossing fires again', () => {
+    // Ask is 200: a below-150 alert that WAS met has cleared (price rose).
+    const first = evaluateMarketAlerts(
+      [{ id: 2, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 150, lastMet: true }],
+      rows,
+    );
+    expect(first.fired).toEqual([]);
+    expect(first.rearmed).toEqual([2]);
+    // After the re-arm write flips lastMet back, a fresh dip is a new crossing.
+    const second = evaluateMarketAlerts(
+      [{ id: 2, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 250, lastMet: false }],
+      rows,
+    );
+    expect(second.fired).toEqual([{ id: 2, valueCopper: 200 }]);
+  });
+
+  it('an item with no listings fires nothing, and re-arms a met alert', () => {
+    const { fired, rearmed } = evaluateMarketAlerts(
       [
-        { id: 1, itemId: 'spring_water', direction: 'below', thresholdCopper: 999999 },
-        { id: 2, itemId: 'spring_water', direction: 'above', thresholdCopper: 1 },
+        {
+          id: 1,
+          itemId: 'spring_water',
+          direction: 'below',
+          thresholdCopper: 999999,
+          lastMet: false,
+        },
+        { id: 2, itemId: 'spring_water', direction: 'above', thresholdCopper: 1, lastMet: true },
       ],
       rows,
     );
     expect(fired).toEqual([]);
+    expect(rearmed).toEqual([2]);
   });
 
   it('the threshold itself does not fire (strict comparison)', () => {
-    const fired = evaluateMarketAlerts(
+    const { fired } = evaluateMarketAlerts(
       [
-        { id: 1, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 200 },
-        { id: 2, itemId: 'wolf_fang', direction: 'above', thresholdCopper: 200 },
+        { id: 1, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 200, lastMet: false },
+        { id: 2, itemId: 'wolf_fang', direction: 'above', thresholdCopper: 200, lastMet: false },
       ],
       rows,
     );
@@ -328,7 +363,6 @@ describe('market sale dispatch integration', () => {
       instanced: false,
       craftedRecipeId: null,
       buyerCharacterId: 43,
-      buyerAccountId: 8,
       sellerCharacterId: 42,
     });
   });
@@ -355,7 +389,6 @@ describe('market sale dispatch integration', () => {
       house: true,
       sellerCharacterId: null,
       buyerCharacterId: 43,
-      buyerAccountId: 8,
     });
   });
 
@@ -411,17 +444,23 @@ describe('market sale dispatch integration', () => {
     expect(snapshotInsertMock).not.toHaveBeenCalled();
   });
 
-  it('the snapshot tick evaluates alerts after the insert and marks the fired one', async () => {
+  it('the snapshot tick evaluates alerts after the insert, marks crossings, re-arms cleared', async () => {
     const loadAlerts = vi.mocked(loadActiveMarketAlerts);
     const markTriggered = vi.mocked(markMarketAlertTriggered);
+    const rearm = vi.mocked(rearmMarketAlerts);
     loadAlerts.mockResolvedValueOnce([
-      { id: 7, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 250 },
-      { id: 8, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 100 },
+      // Crosses now (ask 200 < 250, was not met): fires.
+      { id: 7, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 250, lastMet: false },
+      // Still unmet (200 > 100): silent.
+      { id: 8, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 100, lastMet: false },
+      // Was met, now cleared (200 < 300 is false for 'above'): re-arms.
+      { id: 9, itemId: 'wolf_fang', direction: 'above', thresholdCopper: 300, lastMet: true },
     ]);
     recordMarketListingSnapshot([listing({ itemId: 'wolf_fang', count: 5, price: 1000 })]);
     await marketTrackerIdle();
     expect(snapshotInsertMock).toHaveBeenCalledTimes(1);
     expect(markTriggered).toHaveBeenCalledTimes(1);
     expect(markTriggered).toHaveBeenCalledWith(expect.anything(), 7, 200);
+    expect(rearm).toHaveBeenCalledWith(expect.anything(), [9]);
   });
 });

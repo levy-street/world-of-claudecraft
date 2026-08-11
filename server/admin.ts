@@ -1,4 +1,5 @@
 import type * as http from 'node:http';
+import { MARKET_CUT } from '../src/sim/market';
 import { verifyLoginTwoFactor } from './account';
 import { parseAdminAccountSort } from './admin_accounts_sort';
 import {
@@ -8,7 +9,6 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_activity_cache';
-import { MARKET_CUT } from '../src/sim/market';
 import {
   accountDetail,
   associationsForIp,
@@ -2400,6 +2400,18 @@ async function marketOverviewHandler(ctx: Ctx): Promise<void> {
   });
 }
 
+/**
+ * GET /admin/api/market/catalog: the item universe as {itemId, name} pairs.
+ * Pure in-memory (marketItemCatalog is a per-process cache over the ITEMS
+ * registry), zero SQL: exists so pages that only need id/name pairs (the
+ * alerts datalist) never pull the overview aggregates.
+ */
+async function marketCatalogHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, {
+    items: marketItemCatalog().map((item) => ({ itemId: item.itemId, name: item.name })),
+  });
+}
+
 /** GET /admin/api/market/item?item=&bucket=&days=: one item's detail page. */
 async function marketItemHandler(ctx: Ctx): Promise<void> {
   const itemId = ctx.url.searchParams.get('item') ?? '';
@@ -3246,6 +3258,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: marketOverviewHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/market/catalog',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketCatalogHandler,
   },
   {
     method: 'GET',

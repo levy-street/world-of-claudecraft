@@ -1795,6 +1795,16 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'GET',
+    path: '/admin/api/market/catalog',
+    handler: 'server/admin.ts marketCatalogHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
     path: '/admin/api/market/item',
     handler: 'server/admin.ts marketItemHandler (registry-only RouteDef)',
     contentType: PROBLEM_JSON,

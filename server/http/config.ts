@@ -425,6 +425,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     chatViolationRetentionDays: numberOr(
       env.CHAT_VIOLATION_RETENTION_DAYS,
       DEFAULT_CHAT_VIOLATION_RETENTION_DAYS,
+    ),
     marketSnapshotRetentionDays: numberOr(
       env.MARKET_SNAPSHOT_RETENTION_DAYS,
       DEFAULT_MARKET_SNAPSHOT_RETENTION_DAYS,

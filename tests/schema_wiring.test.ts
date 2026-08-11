@@ -358,6 +358,12 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_listing_snapshots_captured');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS market_alerts');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_alerts_realm_active');
+    // Idempotent heals for pre-merge builds of this schema: the account-id
+    // column nothing read is dropped, and the alert edge-state column lands.
+    expect(applied).toContain('ALTER TABLE market_sales DROP COLUMN IF EXISTS buyer_account_id');
+    expect(applied).toContain(
+      'ALTER TABLE market_alerts ADD COLUMN IF NOT EXISTS last_met BOOLEAN NOT NULL DEFAULT FALSE',
+    );
   });
 
   it('applies the compact player-metrics schema without a boot backfill', async () => {

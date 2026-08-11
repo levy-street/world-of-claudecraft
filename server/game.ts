@@ -7885,7 +7885,11 @@ export class GameServer {
           // sim's marketBuy returns void and emits no success event, so capture
           // the listing + purse before the call and let recordMarketBuy derive
           // success from the purse debit. Fire-and-forget; never awaited here.
-          const capture = captureMarketBuy(sim.marketListings, msg.id, sim.meta(pid)?.copper ?? null);
+          const capture = captureMarketBuy(
+            sim.marketListings,
+            msg.id,
+            sim.meta(pid)?.copper ?? null,
+          );
           sim.marketBuy(msg.id, pid);
           recordMarketBuy(session, capture, sim.meta(pid)?.copper ?? null);
         }

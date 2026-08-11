@@ -4,9 +4,9 @@
   import MarketItemLink from '../components/MarketItemLink.svelte';
   import Panel from '../components/Panel.svelte';
   import { fmtCopper, fmtRelative } from '../format';
-  import { t } from '../i18n';
+  import { localizeAdminError, t } from '../i18n';
   import { auth } from '../state/auth.svelte';
-  import type { MarketAlertsResponse, MarketOverviewResponse } from '../types';
+  import type { MarketAlertsResponse, MarketCatalogResponse } from '../types';
 
   // Price alerts: standing lowest-ask watches the snapshot tick evaluates
   // every 5 minutes server-side. An alert stays until deleted; Last fired
@@ -37,8 +37,8 @@
 
   async function loadCatalog(): Promise<void> {
     try {
-      const result = await apiGet<MarketOverviewResponse>('/admin/api/market/overview');
-      knownItems = result.items.map((item) => ({ itemId: item.itemId, name: item.name }));
+      const result = await apiGet<MarketCatalogResponse>('/admin/api/market/catalog');
+      knownItems = result.items;
     } catch {
       // The datalist is a convenience; the form still accepts a typed id.
     }
@@ -58,7 +58,8 @@
       await refresh();
     } catch (err) {
       if (!auth.handleAuthFailure(err)) {
-        formError = err instanceof Error ? err.message : t('market.alertCreateFailed');
+        formError =
+          err instanceof Error ? localizeAdminError(err.message) : t('market.alertCreateFailed');
       }
     } finally {
       saving = false;
