@@ -10,6 +10,7 @@
 // restate them.
 import { describe, expect, it } from 'vitest';
 import { HEROIC_VENDOR_ITEMS } from '../src/sim/content/heroic_vendor';
+import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
 import { JEWELCRAFTING_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import {
@@ -19,6 +20,7 @@ import {
   primaryStatSum,
   QUALITY_ILVL_BONUS,
 } from '../src/sim/item_level';
+import { requiredLevelFor } from '../src/sim/item_level_req';
 import { trainingFeeFor } from '../src/sim/professions/training';
 import type { ItemDef } from '../src/sim/types';
 
@@ -43,6 +45,40 @@ const BUDGET_BY_RUNG: Record<number, number> = { 0: 3, 25: 4, 50: 8 };
 // The shipped smithing_flux count per rung: the two leveling rungs take one,
 // the rare rung takes two.
 const FLUX_BY_RUNG: Record<number, number> = { 0: 1, 25: 1, 50: 2 };
+
+// The COMPLETE shipped reagent line per recipe, id and count, pinned as
+// literals. The flux table above pins one line and recipe_economy pins only
+// the gold margin, so before this table a silent re-author of the ore or
+// dust/essence counts passed every sim-side suite and was caught only by the
+// guide-content cross-pin, which a routine wiki regen in the same change
+// satisfies (phase 05 QA mutation probe f). Like FLUX_BY_RUNG, an exact table
+// is what forces a reagent rebalance to be a deliberate edit here.
+const REAGENTS_BY_RECIPE: Record<string, Record<string, number>> = {
+  recipe_hammered_copper_band: { copper_ore: 4, arcane_dust: 2, smithing_flux: 1 },
+  recipe_polished_copper_loop: { copper_ore: 4, arcane_dust: 3, smithing_flux: 1 },
+  recipe_coiled_copper_torc: { copper_ore: 5, arcane_dust: 2, smithing_flux: 1 },
+  recipe_riveted_iron_signet: { iron_ore: 4, arcane_essence: 1, smithing_flux: 1 },
+  recipe_etched_iron_loop: { iron_ore: 3, arcane_essence: 2, smithing_flux: 1 },
+  recipe_iron_link_choker: { iron_ore: 5, arcane_essence: 1, smithing_flux: 1 },
+  recipe_weighted_thorium_band: {
+    thorium_ore: 4,
+    arcane_essence: 2,
+    smithing_flux: 2,
+    iron_ore: 2,
+  },
+  recipe_gleaming_thorium_loop: {
+    thorium_ore: 4,
+    arcane_essence: 3,
+    smithing_flux: 2,
+    iron_ore: 2,
+  },
+  recipe_burnished_thorium_amulet: {
+    thorium_ore: 4,
+    arcane_essence: 2,
+    smithing_flux: 2,
+    iron_ore: 2,
+  },
+};
 
 // The one-time training fee per rung in copper (TRAINING_FEE_BY_TIER tiers
 // 0/1/2, which is where skillReq 0/25/50 land through tierForSkill).
@@ -137,6 +173,19 @@ describe('jewelcrafting catalog shape', () => {
     expect(FEE_BY_RUNG[25]).toBeGreaterThan(FEE_BY_RUNG[0]);
   });
 
+  it('consumes EXACTLY the shipped reagent table, every line of every recipe', () => {
+    expect(Object.keys(REAGENTS_BY_RECIPE)).toHaveLength(9);
+    for (const recipe of JEWELCRAFTING_RECIPES) {
+      const shipped: Record<string, number> = {};
+      for (const reagent of recipe.reagents) shipped[reagent.itemId] = reagent.count;
+      expect(shipped, recipe.id).toStrictEqual(REAGENTS_BY_RECIPE[recipe.id]);
+      // No duplicate reagent lines collapsed into the object above.
+      expect(recipe.reagents.length, `${recipe.id} distinct lines`).toBe(
+        Object.keys(shipped).length,
+      );
+    }
+  });
+
   it('no recipe consumes arcane_shard; the dust/essence ladder is really consumed', () => {
     const consumed = new Set(
       JEWELCRAFTING_RECIPES.flatMap((r) => r.reagents.map((reagent) => reagent.itemId)),
@@ -219,15 +268,42 @@ describe('jewelcrafting catalog outputs', () => {
     expect(HEROIC_VENDOR_ITEMS.seal_of_the_nine_oaths.hitRating).toBeGreaterThan(0);
     expect(HEROIC_VENDOR_ITEMS.sutils_gambit.critRating).toBeGreaterThan(0);
     expect(HEROIC_VENDOR_ITEMS.zyzzs_deathless_signet.hasteRating).toBeGreaterThan(0);
-    // And derived, so the three named exemplars cannot be the only reach: the
-    // live keys really are drawn from RATING_KEYS rather than from names this
-    // test invented.
+    // The pvp pair is proven live against the WARFARE quartermaster stock,
+    // which is where those two ratings actually ship.
+    expect(WARFARE_ITEMS.furyforged_warhelm.pvpOffenseRating).toBeGreaterThan(0);
+    expect(WARFARE_ITEMS.furyforged_warhelm.pvpDefenseRating).toBeGreaterThan(0);
+    // And derived, so the named exemplars cannot be the only reach: the live
+    // keys really are drawn from RATING_KEYS rather than from names this test
+    // invented. spellPower is the one key with NO static content exemplar
+    // (only rolled instance payloads set it); its name-liveness rests on the
+    // type system instead: ItemDef has no index signature, so def[key] on a
+    // renamed field is a tsc error, not a silently-undefined read.
     const liveKeys = new Set(
-      Object.values(HEROIC_VENDOR_ITEMS).flatMap((def) =>
+      [...Object.values(HEROIC_VENDOR_ITEMS), ...Object.values(WARFARE_ITEMS)].flatMap((def) =>
         RATING_KEYS.filter((key) => (def[key] ?? 0) > 0),
       ),
     );
-    expect([...liveKeys].sort()).toEqual(['critRating', 'hasteRating', 'hitRating']);
+    expect([...liveKeys].sort()).toEqual([
+      'critRating',
+      'hasteRating',
+      'hitRating',
+      'pvpDefenseRating',
+      'pvpOffenseRating',
+    ]);
+  });
+
+  it('derives equip level requirements from the recipe registration (rare gate only)', () => {
+    // item_level.buildSourceIndex registers every recipe output at
+    // recipe.level, and requiredLevelFor gates rare-and-up from that source:
+    // the three rung-50 rares therefore require character level 20, while the
+    // six uncommon pieces stay ungated (leveling greens are never gated).
+    // Derived behavior the ledger records as intended; pinned so a recipe
+    // level or quality retune surfaces the equip-gate consequence here.
+    for (const recipe of JEWELCRAFTING_RECIPES) {
+      const def = output(recipe);
+      const expected = def.quality === 'rare' ? 20 : 1;
+      expect(requiredLevelFor(def), `${def.id} equip level`).toBe(expected);
+    }
   });
 
   it('stocks no output at a vendor (the never-bought header claim, buyValue-free)', () => {
