@@ -1406,3 +1406,70 @@ Grandmaster-craft family, generic by construction.
   distinct from dev_kit's identity-then-id (untouched, out of scope, noted for the
   next reader); the state.md build-ledger EXECUTION RECORD keeps its historical
   272/3155/58 and manifest numbers as written (the QA re-cut lives in this ledger).
+
+## Phase 06 ledger (inscription base catalog, 2026-08-11)
+- STATION/TRAINING DECISION (the serial decision this phase owed): every inscription
+  recipe carries an explicit `stationType: 'apothecary'`; inscription stays OUT of
+  `STATION_TYPE_BY_CRAFT` (no new station type, no new trainer NPC, no StationType
+  union widening). Rationale, the four phase 05 legs re-argued for this craft: (1) the
+  foreign-binding seam is proven twice over (enchanting's tool-effect charms at the
+  toolworks, jewelcrafting's nine at the forge); (2) training derives entirely from the
+  recipe's station (trainingStationTypeFor), so Alchemist Verane's Highwatch apothecary
+  teaches the catalog with zero new NPCs, props, layout rows, or station i18n; (3)
+  thematically the catalog is ink and pigment work: the reagent ladder is the SAME
+  herb ladder the apothecary's alchemy draughts consume (silverleaf/goldleaf/sunpetal
+  plus the glass_vial staple already stocked there), and the scroll half of the catalog
+  is literally an alternative source of the elixir aura family alchemy brews at that
+  bench, so the two exclusive sources train at one master; (4) reversible: the
+  decorative inscription_lectern prop already stands in Eastbrook's artisan row
+  (eastbrook_layout.ts), so a later world phase can seat a real scriptorium station and
+  repoint each recipe's stationType without changing any record shape. Cost paid here:
+  the foreign-bound allowlist pin in tests/professions_crafting_hub.test.ts grows the
+  six inscription recipe ids; the craft-absent pin (stationTypeForCraft('inscription')
+  undefined) deliberately stays green; faq.a8's six-station-type list stays TRUE; the
+  gossip Crafting-shortcut tie-break (STATION_TYPE_BY_CRAFT key order) is untouched.
+- TOME QUALITY LADDER: uncommon(0)/uncommon(25)/rare(50), applying the Phase 05 QA
+  APPROVED ruling by its own recorded mechanism: QUALITY_STAT_MULT.common = 0 and
+  HeldOffhandItemDef pins armorType?: never AND weapon?: never, so a common tome
+  carries literally nothing at every ilvl (the jewelry no-armor-axis case exactly).
+  The two uncommon rungs separate by recipe level (10 vs 15); rare stays exclusive to
+  rung 50 so the deed rare-tier derivation and the training-fee ladder land like the
+  other crafts. QA re-judges this extension of the ruling.
+- SCROLL KIND DECISION: scrolls ship as a NEW ItemKind 'scroll' (ScrollItemDef reusing
+  the SAME `elixir` effect field), and the items.ts consumable arm widens from
+  `kind === 'elixir'` to accept both kinds with a per-kind log line ("You read" vs
+  "You quaff"). Rationale: the kind line and use line are player-facing text, and a
+  scroll labelled and logged as an elixir is wrong text under the i18n invariant; the
+  'recipe' kind (phase 02) is the direct precedent with the obligation list already
+  mapped (KIND_RANK compile-forced rank, itemUi.kind row + overlays, kind-sweep
+  suites). The aura application is byte-identical to the elixir arm: same
+  `elixir_${kind}` aura id, same applyAura call, no new stacking path, zero changes to
+  aura_stacking.ts or combat/exclusive_aura.ts.
+- SCROLL FAMILY MEMBERSHIP: all three scrolls join the ONE existing family
+  (elixir_buff_sta) at the family's same-band magnitudes AND the same aura display
+  names, so either source grants the indistinguishable buff and the exclusivity is
+  visible to players: rung 0 common 'Might of the Boar' +6 sta 600s, rung 25 uncommon
+  'Vipersear Vigor' +9 sta 900s, rung 50 rare 'Might of the Serpent' +12 sta 900s.
+  The authored family ceiling (buff_sta <= 12 for <= 900s) is respected at every rung;
+  no new family is minted, so the phase's stopping rule is not tripped and no new
+  sim_i18n aura rows are owed (all three names already have matcher rows).
+- PROG_RINGWRIGHT RE-DECISION: the recorded deferral rationale ("inscription alone has
+  zero recipes") dies with this phase, but the deed itself has NO recorded design
+  anywhere: no trigger shape, no threshold, no name text, no renown value, and its two
+  reserved companions (prog_three_paths, prog_ninefold) are equally unspecced. Decision:
+  RE-RECORD the deferral with the new rationale (the hold is now an unwritten design,
+  not a missing engine surface) in deeds.md, maintainer-notes.md, and both deeds.ts
+  doctrine comments, keep the tests/deeds_content.test.ts:478 absence pin, and QUEUE a
+  design ruling for Fernando at Phase 06 QA: trigger shape (craftSkill count-arm?),
+  threshold, renown, and whether the three reserved ids ship as a family.
+- PHASE 06 NAMING REGISTRY (R15, web-verified 2026-08-11): items 'Silverleaf Primer' /
+  'Goldleaf Folio' / 'Sunpetal Grimoire' (tomes, ids silverleaf_primer / goldleaf_folio /
+  sunpetal_grimoire) and 'Silverleaf Scroll' / 'Goldleaf Scroll' / 'Sunpetal Scroll'
+  (scrolls, ids silverleaf_scroll / goldleaf_scroll / sunpetal_scroll): no full-name hit
+  in any indexed game; the herb components are our own shipped nouns (silverleaf_herb /
+  goldleaf_herb / sunpetal_herb predate the packet and survived the Phase 03 audit).
+  REJECTED for collision: 'Scroll of the Boar' (EverQuest item 35022, allakhazam).
+  Deeds: 'Written in Fine Ink' (prog_inscription_rare) CLEAR; 'Quill and Pigment'
+  (prog_inscription_50) CLEAR with a recorded neighbor caveat (WoW Dragonflight ships
+  the 'Ink and Quill I-IV' achievement family, a different full name);
+  'Grandmaster Inscription' is the formulaic title the earnability arm derives.

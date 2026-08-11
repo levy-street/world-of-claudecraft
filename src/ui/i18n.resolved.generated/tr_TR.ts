@@ -8769,6 +8769,7 @@ export const tr_TR: EnTranslations = {
       "tool": "Alet",
       "potion": "Şifa İksiri",
       "elixir": "İksir",
+      "scroll": "Scroll",
       "bag": "Çanta",
       "mount": "Binek"
     },
@@ -12252,6 +12253,24 @@ export const tr_TR: EnTranslations = {
       },
       "burnished_thorium_amulet": {
         "name": "Burnished Osmium Amulet"
+      },
+      "silverleaf_primer": {
+        "name": "Sheenleaf Primer"
+      },
+      "goldleaf_folio": {
+        "name": "Goldleaf Folio"
+      },
+      "sunpetal_grimoire": {
+        "name": "Sunpetal Grimoire"
+      },
+      "silverleaf_scroll": {
+        "name": "Sheenleaf Scroll"
+      },
+      "goldleaf_scroll": {
+        "name": "Goldleaf Scroll"
+      },
+      "sunpetal_scroll": {
+        "name": "Sunpetal Scroll"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

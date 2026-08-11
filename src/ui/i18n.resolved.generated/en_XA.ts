@@ -8769,6 +8769,7 @@ export const en_XA: EnTranslations = {
       "tool": "[Ţóóļ]",
       "potion": "[Þóţíóñ]",
       "elixir": "[Éļíẋíŕ]",
+      "scroll": "[Šçŕóļļ]",
       "bag": "[Ɓáĝ]",
       "mount": "[Ɱóúñţ]"
     },
@@ -12252,6 +12253,24 @@ export const en_XA: EnTranslations = {
       },
       "burnished_thorium_amulet": {
         "name": "[Ɓúŕñíšĥéð Óšɱíúɱ Áɱúļéţ]"
+      },
+      "silverleaf_primer": {
+        "name": "[Šĥééñļéáƒ Þŕíɱéŕ]"
+      },
+      "goldleaf_folio": {
+        "name": "[Ĝóļðļéáƒ Ƒóļíó]"
+      },
+      "sunpetal_grimoire": {
+        "name": "[Šúñþéţáļ Ĝŕíɱóíŕé]"
+      },
+      "silverleaf_scroll": {
+        "name": "[Šĥééñļéáƒ Šçŕóļļ]"
+      },
+      "goldleaf_scroll": {
+        "name": "[Ĝóļðļéáƒ Šçŕóļļ]"
+      },
+      "sunpetal_scroll": {
+        "name": "[Šúñþéţáļ Šçŕóļļ]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

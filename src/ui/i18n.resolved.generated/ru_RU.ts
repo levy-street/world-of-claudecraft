@@ -8769,6 +8769,7 @@ export const ru_RU: EnTranslations = {
       "tool": "Инструмент",
       "potion": "Зелье",
       "elixir": "Эликсир",
+      "scroll": "Scroll",
       "bag": "Сумка",
       "mount": "Транспорт"
     },
@@ -12252,6 +12253,24 @@ export const ru_RU: EnTranslations = {
       },
       "burnished_thorium_amulet": {
         "name": "Начищенный осмиевый амулет"
+      },
+      "silverleaf_primer": {
+        "name": "Sheenleaf Primer"
+      },
+      "goldleaf_folio": {
+        "name": "Goldleaf Folio"
+      },
+      "sunpetal_grimoire": {
+        "name": "Sunpetal Grimoire"
+      },
+      "silverleaf_scroll": {
+        "name": "Sheenleaf Scroll"
+      },
+      "goldleaf_scroll": {
+        "name": "Goldleaf Scroll"
+      },
+      "sunpetal_scroll": {
+        "name": "Sunpetal Scroll"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

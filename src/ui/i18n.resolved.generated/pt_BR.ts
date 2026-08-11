@@ -8769,6 +8769,7 @@ export const pt_BR: EnTranslations = {
       "tool": "Ferramenta",
       "potion": "Poção",
       "elixir": "Elixir",
+      "scroll": "Scroll",
       "bag": "Bolsa",
       "mount": "Montaria"
     },
@@ -12252,6 +12253,24 @@ export const pt_BR: EnTranslations = {
       },
       "burnished_thorium_amulet": {
         "name": "Burnished Osmium Amulet"
+      },
+      "silverleaf_primer": {
+        "name": "Sheenleaf Primer"
+      },
+      "goldleaf_folio": {
+        "name": "Goldleaf Folio"
+      },
+      "sunpetal_grimoire": {
+        "name": "Sunpetal Grimoire"
+      },
+      "silverleaf_scroll": {
+        "name": "Sheenleaf Scroll"
+      },
+      "goldleaf_scroll": {
+        "name": "Goldleaf Scroll"
+      },
+      "sunpetal_scroll": {
+        "name": "Sunpetal Scroll"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

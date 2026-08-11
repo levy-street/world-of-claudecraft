@@ -8769,6 +8769,7 @@ export const ja_JP: EnTranslations = {
       "tool": "道具",
       "potion": "ポーション",
       "elixir": "エリクサー",
+      "scroll": "Scroll",
       "bag": "バッグ",
       "mount": "マウント"
     },
@@ -12252,6 +12253,24 @@ export const ja_JP: EnTranslations = {
       },
       "burnished_thorium_amulet": {
         "name": "磨き上げたオスミウムのアミュレット"
+      },
+      "silverleaf_primer": {
+        "name": "Sheenleaf Primer"
+      },
+      "goldleaf_folio": {
+        "name": "Goldleaf Folio"
+      },
+      "sunpetal_grimoire": {
+        "name": "Sunpetal Grimoire"
+      },
+      "silverleaf_scroll": {
+        "name": "Sheenleaf Scroll"
+      },
+      "goldleaf_scroll": {
+        "name": "Goldleaf Scroll"
+      },
+      "sunpetal_scroll": {
+        "name": "Sunpetal Scroll"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

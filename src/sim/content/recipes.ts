@@ -1727,6 +1727,143 @@ export const JEWELCRAFTING_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The inscription base catalog (Masterwrought phase 06): three rungs at
+// skillReq 0/25/50, two outputs per rung (one caster tome plus one buff
+// scroll), the crafted ItemDefs in content/profession_items.ts. A separate
+// list from LADDER_RECIPES for the jewelcrafting reason: that array's length
+// and six-craft shape are pinned as the Professions 2.0 ladder, and this
+// catalog carries shapes of its own (tests/inscription_catalog.test.ts).
+//
+// - Every record binds `stationType: 'apothecary'` explicitly: inscription has
+//   no station of its own and deliberately stays OUT of STATION_TYPE_BY_CRAFT
+//   (no new station type, no new trainer NPC). The binding is the recipe's
+//   teaching home (training.ts trainingStationTypeFor), so Alchemist Verane
+//   teaches the catalog, the enchanting-charm/jewelcrafting precedent. The
+//   foreign-bound literal pin in tests/professions_crafting_hub.test.ts names
+//   all six ids.
+// - Reagents are ink and pigment work: the herb ladder carries the volume
+//   (silverleaf on the 0 rung, goldleaf on 25, sunpetal on 50, the SAME herbs
+//   the apothecary's alchemy draughts mill), arcane_dust on the 0 rung and
+//   arcane_essence on 25/50 are the magical ink, and NEVER arcane_shard
+//   (phase 04 sized epic disenchant 1:1 against the heroic faucet; shards
+//   stay reserved for the apex band). glass_vial is the ink vessel, the
+//   apothecary staple the recipes' own station stocks. The rung-50 fourth
+//   line is goldleaf_herb sizing, NEVER a fine_* grade beside its base: a
+//   recipe must never list a base material AND its fine grade (they share one
+//   consumption pool via materialGradeIds; the disjointness invariant in
+//   tests/material_grades.test.ts pins it).
+// - Scaffolding follows the cross-craft convention above (skillReq 0 -> 10/10,
+//   25 -> 16/15, 50 -> 20/20); acquisition is ['trainer'] on every record.
+//   Every reagent list is authored gold-negative under the recipe_economy
+//   rule, and every rung keeps at least one no-buyValue reagent (the
+//   dust/essence ink lines) so no record joins the counterfactually-
+//   vendor-fed set.
+export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_silverleaf_primer',
+    professionId: 'inscription',
+    resultItemId: 'silverleaf_primer',
+    resultCount: 1,
+    // Input 36 vs output 24.
+    reagents: [
+      { itemId: 'silverleaf_herb', count: 3 },
+      { itemId: 'arcane_dust', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_silverleaf_scroll',
+    professionId: 'inscription',
+    resultItemId: 'silverleaf_scroll',
+    resultCount: 1,
+    // Input 26 vs output 10.
+    reagents: [
+      { itemId: 'silverleaf_herb', count: 2 },
+      { itemId: 'arcane_dust', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_goldleaf_folio',
+    professionId: 'inscription',
+    resultItemId: 'goldleaf_folio',
+    resultCount: 1,
+    // Input 150 vs output 100.
+    reagents: [
+      { itemId: 'goldleaf_herb', count: 2 },
+      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_goldleaf_scroll',
+    professionId: 'inscription',
+    resultItemId: 'goldleaf_scroll',
+    resultCount: 1,
+    // Input 90 vs output 15.
+    reagents: [
+      { itemId: 'goldleaf_herb', count: 1 },
+      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_sunpetal_grimoire',
+    professionId: 'inscription',
+    resultItemId: 'sunpetal_grimoire',
+    resultCount: 1,
+    // Input 488 vs output 280. Goldleaf sizing 4th line, no fine grades.
+    reagents: [
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+      { itemId: 'goldleaf_herb', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_sunpetal_scroll',
+    professionId: 'inscription',
+    resultItemId: 'sunpetal_scroll',
+    resultCount: 2,
+    // Input 190 vs output 40 (two scrolls, the serpent-elixir batch shape).
+    reagents: [
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+];
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
@@ -1741,6 +1878,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMBO_RECIPES,
   ...LADDER_RECIPES,
   ...JEWELCRAFTING_RECIPES,
+  ...INSCRIPTION_RECIPES,
 ];
 
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {

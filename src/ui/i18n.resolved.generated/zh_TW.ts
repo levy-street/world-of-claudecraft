@@ -8769,6 +8769,7 @@ export const zh_TW: EnTranslations = {
       "tool": "工具",
       "potion": "藥水",
       "elixir": "藥劑",
+      "scroll": "Scroll",
       "bag": "背包",
       "mount": "坐騎"
     },
@@ -12252,6 +12253,24 @@ export const zh_TW: EnTranslations = {
       },
       "burnished_thorium_amulet": {
         "name": "磨光鋨金護符"
+      },
+      "silverleaf_primer": {
+        "name": "Sheenleaf Primer"
+      },
+      "goldleaf_folio": {
+        "name": "Goldleaf Folio"
+      },
+      "sunpetal_grimoire": {
+        "name": "Sunpetal Grimoire"
+      },
+      "silverleaf_scroll": {
+        "name": "Sheenleaf Scroll"
+      },
+      "goldleaf_scroll": {
+        "name": "Goldleaf Scroll"
+      },
+      "sunpetal_scroll": {
+        "name": "Sunpetal Scroll"
       },
       "conjured_water4": {
         "name": "魔法泉水"

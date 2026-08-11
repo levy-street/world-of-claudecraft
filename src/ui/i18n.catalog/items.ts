@@ -2445,6 +2445,12 @@ const ITEM_ENTITY_IDS = [
   'weighted_thorium_band',
   'gleaming_thorium_loop',
   'burnished_thorium_amulet',
+  'silverleaf_primer',
+  'goldleaf_folio',
+  'sunpetal_grimoire',
+  'silverleaf_scroll',
+  'goldleaf_scroll',
+  'sunpetal_scroll',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2586,6 +2592,16 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   weighted_thorium_band: 'Weighted Osmium Band',
   gleaming_thorium_loop: 'Gleaming Osmium Loop',
   burnished_thorium_amulet: 'Burnished Osmium Amulet',
+  // Inscription base catalog (Masterwrought phase 06): the silverleaf_* ids
+  // display "Sheenleaf" (the Sheenleaf register in content/items.ts, the
+  // originality-sweep id/display split). English-appended like the quivers
+  // above until the release fill folds them into the per-locale arrays.
+  silverleaf_primer: 'Sheenleaf Primer',
+  goldleaf_folio: 'Goldleaf Folio',
+  sunpetal_grimoire: 'Sunpetal Grimoire',
+  silverleaf_scroll: 'Sheenleaf Scroll',
+  goldleaf_scroll: 'Goldleaf Scroll',
+  sunpetal_scroll: 'Sunpetal Scroll',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

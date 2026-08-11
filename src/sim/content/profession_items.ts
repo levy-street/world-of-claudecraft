@@ -8,6 +8,7 @@
 // vendors every quality 'poor' item). Enforced by
 // tests/crafting_materials_quality.test.ts.
 import type { ItemDef } from '../types';
+import { CASTER_ALL } from './items';
 
 export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // --- Corpse-harvest components (HARVEST_COMPONENT_ITEMS) -----------------
@@ -808,5 +809,81 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stats: { agi: 5, sta: 3 },
     sellValue: 310,
+  },
+
+  // --- Crafted inscription ladder (tomes + scrolls) -------------------------
+  // Trainer-taught outputs of INSCRIPTION_RECIPES (content/recipes.ts), three
+  // rungs at skillReq 0/25/50, apothecary-bound at alchemist_verane (the
+  // recipes carry an explicit apothecary stationType; inscription itself has
+  // no station). TOMES are caster held-offhand stat sticks (CASTER_ALL, no
+  // armor axis, no weapon damage); rung qualities are uncommon/uncommon/rare
+  // for the jewelry ladder's reason: common quality carries no primary-stat
+  // budget and held_offhand has no armor axis, so a common tome would carry
+  // literally nothing. Stats sit exactly on the repo budget formula
+  // (src/sim/item_budget.ts, held line 0.75). Zero combat ratings per ruling
+  // R14. SCROLLS are the ALTERNATIVE SOURCE of the battle-elixir stamina
+  // family (R14 corollary): each rung carries the SAME aura name, value, and
+  // duration as its band's elixir, so either source grants the
+  // indistinguishable buff and the shared elixir_buff_sta aura id makes them
+  // mutually exclusive in both orders, never a stack. The authored family
+  // ceiling (buff_sta <= 12 for <= 900s) binds scrolls exactly as it binds
+  // elixirs. Never vendor-stocked (no buyValue); every output's sellValue
+  // clears strictly below its summed reagent value per the economy invariant.
+  // Display names follow the Sheenleaf register (the silverleaf_* ids display
+  // "Sheenleaf", the originality-sweep id/display split); ids keep the
+  // verified silverleaf spellings.
+  silverleaf_primer: {
+    id: 'silverleaf_primer',
+    name: 'Sheenleaf Primer',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'uncommon',
+    stats: { int: 2, spi: 1 },
+    requiredClass: CASTER_ALL,
+    sellValue: 24,
+  },
+  goldleaf_folio: {
+    id: 'goldleaf_folio',
+    name: 'Goldleaf Folio',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'uncommon',
+    stats: { int: 3, spi: 2 },
+    requiredClass: CASTER_ALL,
+    sellValue: 100,
+  },
+  sunpetal_grimoire: {
+    id: 'sunpetal_grimoire',
+    name: 'Sunpetal Grimoire',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'rare',
+    stats: { int: 5, spi: 3, sta: 2 },
+    requiredClass: CASTER_ALL,
+    sellValue: 280,
+  },
+  silverleaf_scroll: {
+    id: 'silverleaf_scroll',
+    name: 'Sheenleaf Scroll',
+    kind: 'scroll',
+    quality: 'common',
+    elixir: { aura: 'Might of the Boar', kind: 'buff_sta', value: 6, duration: 600 },
+    sellValue: 10,
+  },
+  goldleaf_scroll: {
+    id: 'goldleaf_scroll',
+    name: 'Goldleaf Scroll',
+    kind: 'scroll',
+    quality: 'uncommon',
+    elixir: { aura: 'Vipersear Vigor', kind: 'buff_sta', value: 9, duration: 900 },
+    sellValue: 15,
+  },
+  sunpetal_scroll: {
+    id: 'sunpetal_scroll',
+    name: 'Sunpetal Scroll',
+    kind: 'scroll',
+    quality: 'rare',
+    elixir: { aura: 'Might of the Serpent', kind: 'buff_sta', value: 12, duration: 900 },
+    sellValue: 20,
   },
 };

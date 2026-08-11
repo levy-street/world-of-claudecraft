@@ -8769,6 +8769,7 @@ export const ko_KR: EnTranslations = {
       "tool": "도구",
       "potion": "물약",
       "elixir": "비약",
+      "scroll": "Scroll",
       "bag": "가방",
       "mount": "탈것"
     },
@@ -12252,6 +12253,24 @@ export const ko_KR: EnTranslations = {
       },
       "burnished_thorium_amulet": {
         "name": "광낸 오스뮴 목걸이"
+      },
+      "silverleaf_primer": {
+        "name": "Sheenleaf Primer"
+      },
+      "goldleaf_folio": {
+        "name": "Goldleaf Folio"
+      },
+      "sunpetal_grimoire": {
+        "name": "Sunpetal Grimoire"
+      },
+      "silverleaf_scroll": {
+        "name": "Sheenleaf Scroll"
+      },
+      "goldleaf_scroll": {
+        "name": "Goldleaf Scroll"
+      },
+      "sunpetal_scroll": {
+        "name": "Sunpetal Scroll"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
