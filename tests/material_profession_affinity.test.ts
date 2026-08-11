@@ -38,6 +38,19 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('arcane_shard')).toEqual(['enchanting']);
   });
 
+  it('herbs and the vial gained inscription as a consumer (Masterwrought phase 06)', () => {
+    // The inscription catalog (INSCRIPTION_RECIPES) consumes the alchemy herb
+    // ladder plus the glass_vial staple, so these shared-pool reagents list
+    // inscription after their older consumers (ring order).
+    expect(craftIdsForMaterialItem('silverleaf_herb')).toEqual([
+      'alchemy',
+      'cooking',
+      'tailoring',
+      'inscription',
+    ]);
+    expect(craftIdsForMaterialItem('glass_vial')).toEqual(['alchemy', 'inscription']);
+  });
+
   it('a fine grade inherits its base consumers and keeps fine-only crafts', () => {
     // fine_iron_ore is a tool-recipe reagent (engineering) and stands in for
     // iron_ore (jewelcrafting + weaponcrafting + armorcrafting since the

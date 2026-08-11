@@ -188,6 +188,9 @@ describe('inscription catalog shape', () => {
     expect(consumed.has('arcane_dust')).toBe(true);
     expect(consumed.has('arcane_essence')).toBe(true);
     expect(ITEMS.fine_silverleaf_herb, 'fine grades exist to be excluded').toBeDefined();
+    // Token-liveness control for the shard negative: if the shard id ever
+    // renames, the exclusion above must fail here rather than go vacuous.
+    expect(ITEMS.arcane_shard, 'the excluded shard id must stay live').toBeDefined();
   });
 });
 
