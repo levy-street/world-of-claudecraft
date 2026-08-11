@@ -17,8 +17,10 @@ import { describe, expect, it } from 'vitest';
 import { INSCRIPTION_RECIPES } from '../src/sim/content/recipes';
 import { STATIONS } from '../src/sim/data';
 import { craftCastDurationSec } from '../src/sim/professions/craft_cast_duration';
+import { resolveCraft } from '../src/sim/professions/crafting';
 import { stationsOfType } from '../src/sim/professions/stations';
 import { TRAINING_FEE_BY_TIER } from '../src/sim/professions/training';
+import type { Rng } from '../src/sim/rng';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { CRAFT_CAST_ID, type Entity, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -288,6 +290,39 @@ describe('inscription rung-50 craft at the apothecary', () => {
     }
     expect(meta.deedStats.visited.has('craft_rare:inscription')).toBe(true);
     expect(meta.deedsEarned.has('prog_inscription_rare')).toBe(true);
+  });
+
+  it('the batch craft spends exactly one rng draw (the masterwork proc), count-independent', () => {
+    // The determinism contract for a multi-copy recipe: resultCount 2 grants
+    // both copies through the signable-instance arm with ZERO extra draws, so
+    // draw count can never become a function of batch size and fork the three
+    // hosts. Same observer rig as the professions_crafting draw pin, driven
+    // through resolveCraft directly so no other tick system draws inside the
+    // counting window. This is the first multi-copy recipe with a draw pin;
+    // the three prior pins all drive resultCount 1.
+    const sim = makeSim();
+    const { meta, pid } = playerOf(sim);
+    sim.tick();
+    teleportToApothecary(sim);
+    meta.copper = 50_000;
+    meta.craftSkills.inscription = 50;
+    sim.trainRecipe(RUNG_50_SCROLL_RECIPE, pid);
+    expect(meta.lastTrainResult?.ok, meta.lastTrainResult?.reason).toBe(true);
+    grantReagents(sim, pid, recipeById(RUNG_50_SCROLL_RECIPE).reagents, 1);
+
+    let draws = 0;
+    const rng: Rng = (sim as any).ctx.rng;
+    rng.setObserver(() => {
+      draws++;
+    });
+    const result = resolveCraft((sim as any).ctx, pid, RUNG_50_SCROLL_RECIPE);
+    rng.setObserver(null);
+
+    expect(result.ok, result.reason).toBe(true);
+    expect(bagCount(meta, RUNG_50_SCROLL_OUTPUT)).toBe(2);
+    // One draw, the masterwork proc roll: the per-copy signable-instance
+    // grants downstream of it draw nothing, so the second copy costs zero.
+    expect(draws).toBe(1);
   });
 
   it('lands the 50-skill deed through the LIVE gain path when a craft crosses the threshold', () => {
