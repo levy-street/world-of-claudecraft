@@ -1,6 +1,6 @@
 # Masterwrought: cross-phase state
 
-Current phase: 05 QA COMPLETE (2026-08-10, see the Phase 05 QA ledger: v0.37.0 sync + release-merge-audit clean, eight-auditor fan-out with zero blocking anywhere, all four queued rulings taken, fix round incl. the ruled deed pair authored, fresh review applied); next is Phase 06 (inscription base catalog, phase-06-inscription-base.md), which starts with its own release sync per the delivery contract and records its OWN station decision. Packet authored 2026-08-07.
+Current phase: 06 COMPLETE + RE-AUDITED (built and gate-closed 2026-08-11, see the Phase 06 ledger; a same-day second-pass re-audit ran its own v0.37.0 sync and a seven-finder verification sweep, see the Phase 06 re-audit addendum: four should-fix findings confirmed and applied, none blocking); next is Phase 06 QA (phase-06-qa.md), which starts with its own release sync per the delivery contract. Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.37.0`.
 
 ## Delivery contract (non-negotiable)
@@ -1501,8 +1501,9 @@ Grandmaster-craft family, generic by construction.
 - NEW TESTS: inscription_catalog (14, the JC catalog template incl. the full reagent
   literal table and both quality ladders), inscription_flow (8, live train/craft/deed at
   the apothecary incl. the resultCount 2 scroll batch and the 49-to-50 live-gain arm),
-  inscription_scroll_exclusivity (6, the headline both-orders pin across all three bands
-  plus cross-band weaker-included, the read log line, and the derived-stats liveness),
+  inscription_scroll_exclusivity (7, the headline both-orders pin across all three bands
+  plus cross-band weaker-included, the read and quaff log lines, and the derived-stats
+  liveness),
   elixir_tooltip_view scroll arm (byte-identical Use line vs the band elixir),
   market_filters scroll rows; plus the absorbed neighbor pins (see the
   test(professions) commit body for the full list).
@@ -1513,7 +1514,9 @@ Grandmaster-craft family, generic by construction.
   keys whose Latin rows were already pending);
   (c) INVISIBLE to pending=0, add by hand at the fill: prog_inscription_rare name+desc +
   prog_inscription_50 name+desc + prog_grandmaster_inscription name+desc+title in the 13
-  Latin deed chunks (35 rows), and the log.read sim DICT row is already filled in all 20
+  Latin deed chunks (91 rows: all seven manifest rows per chunk, matching the phase 05
+  jewelcrafting trio's arithmetic; the re-audit corrected an earlier 35-row copy-slip,
+  which was the non-Latin count), and the log.read sim DICT row is already filled in all 20
   blocks (no obligation) but the PRE-EXISTING log.quaff gap in the eight sparse blocks
   (cs/nl/pl/id/tr/sv/vi/da render English quaff lines) is recorded here as an OLD gap the
   release fill should close alongside log.read consistency;
@@ -1606,3 +1609,65 @@ Grandmaster-craft family, generic by construction.
   view, dev-kit caster offhand pick) and the deferred bags_view hover-hint family gap;
   the validation surface is the suite list in this ledger plus the four reviewer
   reports' verified-clean sections.
+
+## Phase 06 re-audit addendum (2026-08-11, second pass, same day as the close)
+- WHY: operator-requested belt-and-suspenders re-pass of the whole phase spec (the build
+  session ran long on context). Own release sync first, then a seven-finder ultracode
+  verification sweep over every ledger claim with adversarial verification per finding.
+- RELEASE SYNC: merge 76a3b43359 (v0.37.0 moved 20 commits: native OTA visible updates
+  PR 3317 + kobold/Grix authored bodies PR 3302). pending.ts regenerated (union verified
+  lossless both ways); naming guards clean on the incoming ota overlay rows; parity fully
+  green (the Grix sim sizing touches no golden; goldens did NOT move this sync); the 11
+  delta suites green on the merged tree.
+- PORTRAIT TRIO LESSON (new, sharper than the pair lesson): accepted-art.json pins BOTH
+  the source manifest AND portrait-rerender-evidence.json, so a merge resolution that
+  takes accepted-art.json from one side while git auto-keeps the other side's evidence
+  file splits the trio and reds tests/placeholder_art_completion.test.ts with a CLEAN
+  git status. This sync: took the release's accepted-art + the two new-body portraits,
+  kept the branch's evidence file (its digests match every committed webp), re-minted the
+  manifest via the receipt flow (14a20329d5), then advanced BOTH accepted-art pins the way
+  the release's own re-bless commits do (cfc6200971). The local rerender reproduced all
+  230 portraits byte-identical INCLUDING the new grix/tunnel_rat bodies, so the env
+  ping-pong did NOT recur at this sync (the release-owned follow-up item stays recorded;
+  the two new-body rows moving at the NEXT ledger re-mint would be expected content
+  movement, not drift).
+- RELEASE-OWNED FOLLOW-UPS added by this sync's merge audit (do NOT fix on this branch):
+  (5) .github/workflows/ota-publish.yml's verify step can never pass: its probe body
+  omits plugin_version, pluginSupportsDeltaManifest is fail-safe false for a missing
+  version, so the offer never embeds the delta manifest the step requires and every
+  publish run exits 1 even on success (also masks real entry-list failures); (6) deploy
+  note: server/ota_updates.ts defaultFetchManifest now uses redirect:'error' plus a
+  credentialed-URL ban, so a redirecting OTA_MANIFEST_URL origin (S3 website endpoint,
+  CDN apex) silently converts to OTA-off; check the production origin before relying on
+  an OTA push.
+- RE-AUDIT VERDICT: three finders fully clean (catalog/budgets recomputed formula-exact,
+  exclusivity seam + sim purity + parity pin 321, per-id art/M16/mapping obligations);
+  the isolated-worktree decisiveness skeptic proved the headline pins with live mutation
+  probes (reagent table, both exclusivity orders, resultCount batch). FOUR should-fix
+  confirmed and applied in this addendum's commits, none blocking:
+  (1) deeds.ts second doctrine comment (rare-tier family block) had dropped the
+  prog_ringwright deferral mention the ledger decision required in BOTH comments;
+  restored with a pointer at the Professions 2.0 block. (2) The (c) release-fill count
+  above was a 35-row copy-slip; corrected to 91 (the release-tier deed_i18n arm made the
+  slip harmless at fill time). (3) tests/reliquary_content.test.ts: all three catalog
+  narratives ended 3 short of their pins (the phase 05 QA grandmaster title slot and this
+  phase's +2 were never narrated) and the mark narrative missed masterwork:inscription
+  under the 31 pin; narratives extended to land exactly on 379/344/315/31 (literals were
+  independently recounted correct, comment-only fix). (4) craftProse.jewelcrafting
+  .routeBody still claimed the craft's milestone and Grandmaster pages "wait with its
+  archetype pairs", falsified by the phase 05 QA deed pair on this same branch and missed
+  by the phase 06 sweep (which hunted inscription-falsified claims): English re-cut to
+  the inscription routeBody's register (rare deed, 50-skill deed, 125-cap title), five
+  non-Latin rows refreshed in-change mirroring EACH locale's own inscription-row register
+  (ru/zh_CN native deed names from the deed chunks, ja/ko/zh_TW English names pending the
+  recorded whole-file register pass), Latin rows already pending so the registry serves
+  the new English at fill time. Plus three audit nits applied: ledger exclusivity-suite
+  count 6 -> 7 (the quaff else-arm test), consumer-set pins for silverleaf_herb and
+  glass_vial gaining inscription (material_profession_affinity), and an ITEMS.arcane_shard
+  token-liveness control beside the inscription_catalog negative pin.
+- REFUTED at verification (do not re-raise): itemUi.kind.scroll Latin overlays are a
+  RECORDED release-fill obligation (row (a) above), and the claimed phase 02 all-overlay
+  precedent was factually wrong (hudChrome.pattern.teaches shipped 5 non-Latin only; the
+  kind.recipe all-overlay fill was a recorded deliberate deviation).
+- STATUS: header line updated to 06 COMPLETE + RE-AUDITED; Phase 06 QA handoff and its
+  queued rulings are unchanged by this pass.
