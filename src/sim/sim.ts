@@ -1980,7 +1980,7 @@ export class Sim {
   readonly petSpecialCommandsSupported = true;
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
+  cfg: Required<Omit<SimConfig, 'noPlayer' | 'characterState' | 'world' | 'perfLap' | 'respawnSeconds'>> &
     Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
   /**
    * The authored world this simulation owns. The active registry is a host/render
@@ -2684,7 +2684,10 @@ export class Sim {
     if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
 
     if (!cfg.noPlayer) {
-      this.addPlayer(this.cfg.playerClass, this.cfg.playerName, { autoEquip: this.cfg.autoEquip });
+      this.addPlayer(this.cfg.playerClass, this.cfg.playerName, {
+        autoEquip: this.cfg.autoEquip,
+        state: cfg.characterState,
+      });
     }
 
     // Escort quest NPCs (src/sim/escort.ts). Last on purpose: the spawns draw
