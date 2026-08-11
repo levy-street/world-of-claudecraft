@@ -1348,6 +1348,18 @@ Grandmaster-craft family, generic by construction.
   WebPs live under ui/, outside those groups). Pre-existing, not ours, left alone:
   the icons.ts:5278 console.warn em dash (repo no-dash debt) and the
   cs_CZ.dgn_sanctum_speed.name release-tier deed_i18n red.
+- GATE CLOSE (2026-08-11): node scripts/gate_select.mjs PASS, all 8 steps green at
+  93a2dd16b3 (the content-heavy diff made the planner fall back to the FULL suite,
+  36k tests). The first gate run FAILED on tests/overlay_ip_scrub.test.ts: the
+  v0.36.0 staleness fill the sync merged carried two pre-rename coins inside its
+  rewritten rows, Gloomshade (24 rows: summon_voidwalker name+desc across 12 Latin
+  overlays) and Moonwell (one vi_VN night-notes row), both phase 03 renames
+  (Duskmurk, Moonspring); token-swapped in place keeping the fill's newer mechanics
+  text (93a2dd16b3). THIRD release-fill reintroduction the scrub guard has caught
+  (Gallowmere twice before). SYNC LESSON for every future release-fill merge: after
+  taking a fill's overlay rows, run the three naming guards BEFORE the gate; the
+  per-hunk resolution verified branch keys survived but never re-screened the
+  release text against the rename registry.
 - DEED-AUTHORING OBLIGATION DISCOVERED (durable, for every future TITLE deed): the
   locked titles-page rule means a new non-hidden title deed ALSO owes a
   horizons_titles slot in src/sim/content/reliquary.ts in the same change (the
