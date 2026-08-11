@@ -1,5 +1,5 @@
 // Per-craft reference page (/wiki/professions/<craftId>), one module driven by
-// craft id for all eight earnable crafts, the classes-page parameterized
+// craft id for all nine earnable crafts, the classes-page parameterized
 // precedent. Renders entirely from GUIDE_PROF_* generated data plus guide.*
 // t() keys; item/recipe/NPC names are baked English proper nouns (the
 // GUIDE_DEEDS precedent) and craft/station/slot/stat/quality labels localize

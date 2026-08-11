@@ -1598,11 +1598,12 @@ describe('Guide professions generated content accuracy', () => {
     'leatherworking',
     'tailoring',
     'enchanting',
+    'jewelcrafting',
     'weaponcrafting',
     'armorcrafting',
   ];
 
-  it('covers the full ring, honest about the two wave-one content-empty crafts', () => {
+  it('covers the full ring, honest about the one wave-one content-empty craft', () => {
     expect(GUIDE_PROF_RING.map((c) => c.id)).toEqual(CRAFT_RING.map((c) => c.id));
     for (const c of GUIDE_PROF_RING) {
       const def = CRAFT_RING.find((r) => r.id === c.id);
@@ -1611,10 +1612,7 @@ describe('Guide professions generated content accuracy', () => {
       expect(c.maxSkill).toBe(def?.maxSkill);
       expect(c.maxSkill).toBe(125); // every wave-one craft caps at 125
     }
-    expect(GUIDE_PROF_RING.filter((c) => !c.hasContent).map((c) => c.id)).toEqual([
-      'inscription',
-      'jewelcrafting',
-    ]);
+    expect(GUIDE_PROF_RING.filter((c) => !c.hasContent).map((c) => c.id)).toEqual(['inscription']);
     expect(GUIDE_PROF_CRAFTS.map((c) => c.id)).toEqual(EARNABLE_CRAFT_IDS);
   });
 
@@ -1728,11 +1726,35 @@ describe('Guide professions generated content accuracy', () => {
       );
       expect(c.specialization.materialDiscountPct).toBe(20);
     }
+    // The jewelcrafting card derives its station from its unanimous forge-bound
+    // recipes (the craft is absent from STATION_TYPE_BY_CRAFT by decision), so
+    // the page names the forge and its master instead of "No station needed".
+    const jc = GUIDE_PROF_CRAFTS.find((c) => c.id === 'jewelcrafting');
+    expect(jc?.station).toBe('forge');
+    expect(jc?.masters.map((m) => m.name)).toContain('Forgemistress Darva');
+    // Enchanting keeps the null card by design: its recipe list is a sideline
+    // (two toolworks charms) while enchanting itself needs no station.
+    const ench = GUIDE_PROF_CRAFTS.find((c) => c.id === 'enchanting');
+    expect(ench?.station).toBeNull();
+    expect(ench?.masters).toEqual([]);
   });
 
   it('grounds each craft station and its resident masters in the sim tables', () => {
+    // A craft card's station is its own STATION_TYPE_BY_CRAFT entry, or (for a
+    // craft absent from that table, except enchanting) the unanimous
+    // stationType across its recipes: the generator's stationTypeForCraftCard
+    // rule, re-derived here from the same sim tables.
+    const expectedStation = (id: string): string | null => {
+      const own = STATION_TYPE_BY_CRAFT[id];
+      if (own) return own;
+      if (id === 'enchanting') return null;
+      const recipes = ALL_RECIPES.filter((r) => r.professionId === id);
+      const first = recipes[0]?.stationType ?? null;
+      if (!first) return null;
+      return recipes.every((r) => (r.stationType ?? null) === first) ? first : null;
+    };
     for (const c of GUIDE_PROF_CRAFTS) {
-      expect(c.station).toBe(STATION_TYPE_BY_CRAFT[c.id] ?? null);
+      expect(c.station).toBe(expectedStation(c.id));
       const simMasters = STATIONS.filter((s) => s.type === c.station);
       expect(c.masters.length).toBe(c.station ? simMasters.length : 0);
       for (const m of c.masters) {
@@ -2409,8 +2431,10 @@ describe('Guide professions pages and routes', () => {
         `href="${hrefFor(`professions/${id}`)}"`,
       );
     }
-    // The two content-empty crafts appear but do NOT link anywhere.
-    expect(html).not.toContain(`href="${hrefFor('professions/jewelcrafting')}"`);
+    // The one content-empty craft appears but does NOT link anywhere;
+    // jewelcrafting gained content (Masterwrought phase 05) and links now,
+    // the positive control the loop above also covers.
+    expect(html).toContain(`href="${hrefFor('professions/jewelcrafting')}"`);
     expect(html).not.toContain(`href="${hrefFor('professions/inscription')}"`);
     expect(html).toContain(t('guide.professions.comingSoon'));
     // All ten archetype pair titles render.

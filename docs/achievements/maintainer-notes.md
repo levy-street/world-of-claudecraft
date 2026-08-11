@@ -51,7 +51,9 @@ directory lives in git history before 2026-07-11.
 
 See also the deferred section in `docs/design/deeds.md`.
 
-- `prog_ringwright`: jewelcrafting and inscription have zero recipes.
+- `prog_ringwright`: inscription has zero recipes. Jewelcrafting's base
+  catalog shipped and brought only its rare-tier milestone
+  (`prog_jewelcrafting_rare`); its skill-50 and Grandmaster deeds still wait.
 - `soc_first_salvage` and `soc_salvage_50`: salvage has no player-facing
   wiring on any host; the salvagesPerformed counter ships with the
   transcription; ACH_FIRST_SALVAGE is held unregistered.

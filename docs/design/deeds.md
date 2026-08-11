@@ -187,13 +187,16 @@ the root `CLAUDE.md` content rule points here.
   seven server-assisted `feat_*` world/realm firsts): the v1 evaluator is
   strictly per-character and `server/deeds_records.ts` is observer-only; an
   account-level grant lane must exist first.
-- **`prog_ringwright`**: jewelcrafting and inscription have zero recipes
-  today (their depth arrives with the post-level-20 zone expansion, per
+- **`prog_ringwright`**: inscription alone has zero recipes today (its depth
+  arrives with the post-level-20 zone expansion, per
   `docs/design/professions.md`), so the ten-craft ring cannot complete and
-  the deed would be visible yet unearnable. Their per-craft milestone and
-  Grandmaster deeds stay deferred with it. Enchanting is no longer a
-  blocker: it is player-wired (disenchant, apply-enchant, salvage) and its
-  deeds shipped.
+  the deed would be visible yet unearnable. Its per-craft milestone and
+  Grandmaster deeds stay deferred with it. Jewelcrafting is no longer a
+  blocker: its base catalog shipped and brought the rare-tier milestone
+  `prog_jewelcrafting_rare` with it, though its skill-50 and Grandmaster
+  deeds still wait for the craft's deeper content. Enchanting is not a
+  blocker either: it is player-wired (disenchant, apply-enchant, salvage)
+  and its deeds shipped.
 - **`pvp_vcup_bet_flex`**: cut; no betting-adjacent deeds ship, even at 0
   Renown.
 

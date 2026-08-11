@@ -21,8 +21,10 @@ Ten crafts on a fixed ring (`CRAFT_RING`, `src/sim/content/professions.ts`):
 engineering, alchemy, cooking, leatherworking, tailoring, inscription,
 enchanting, jewelcrafting, weaponcrafting, armorcrafting. Six are deep
 (weapon/armor/tailor/leather/cooking/alchemy), engineering is the toolmaker
-line, enchanting is shallow but reachable, jewelcrafting and inscription are
-placeholders with zero recipes until a future zone expansion. An archetype is
+line, enchanting is shallow but reachable, jewelcrafting ships a 0 to 50 base
+catalog (nine trainer-taught, forge-bound recipes, `JEWELCRAFTING_RECIPES`)
+with its deeper tiers still to come, and inscription is the one remaining
+placeholder with zero recipes until a future zone expansion. An archetype is
 a ring-adjacent PAIR of majors (`ArchetypeState` in
 `src/sim/professions/archetype.ts`: `activeArchetype` + `pairedMajor`,
 uncapped) plus a hobby (the opposite ring craft, capped at rare); every other
@@ -281,7 +283,8 @@ flagged maintainer surface).
 ### Enchanting, disenchant, salvage
 Enchanting is ungated by design (the no-admission-gate ruling is LOCKED:
 never propose an admission gate; depth arrives with the post-level-20 zone
-expansion alongside jewelcrafting and inscription). Disenchant yields the
+expansion, alongside inscription and jewelcrafting's own apex tiers, since
+jewelcrafting's base catalog already ships). Disenchant yields the
 universal ladder (`DISENCHANT_MATERIAL_BY_QUALITY`: Chime Dust / Essence /
 Shard) at every quality, plus a type-keyed secondary at rare+
 (`typedSecondaryFor`, `src/sim/professions/disenchant_reagents.ts`; the five

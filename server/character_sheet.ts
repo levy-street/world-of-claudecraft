@@ -212,6 +212,7 @@ export const RELIQUARY_MARK_ENGLISH: ReadonlyMap<string, string> = new Map([
   ['masterwork:armorcrafting', 'Armorcrafting Masterwork'],
   ['masterwork:tailoring', 'Tailoring Masterwork'],
   ['masterwork:leatherworking', 'Leatherworking Masterwork'],
+  ['masterwork:jewelcrafting', 'Jewelcrafting Masterwork'],
   ['masterwork:engineering', 'Engineering Masterwork'],
   ['gather_event:pristine_vein', 'Pristine Vein'],
   ['gather_event:ancient_heartwood', 'Ancient Heartwood'],

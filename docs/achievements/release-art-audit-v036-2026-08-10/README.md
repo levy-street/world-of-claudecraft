@@ -9,6 +9,8 @@ profession, chrome, mob portrait, and Guide image routes.
 ## Accepted corrections
 
 - Added nine distinct painted Reliquary deed crests. The deed registry is now 271 of 271.
+  (Amendment 2026-08-10: the registry has since grown to 272 of 272 with
+  prog_jewelcrafting_rare, admitted with its own committed crest.)
 - Added painted Emberkin Felbolt and Gloomshade Abyssal Chain pet-action icons.
 - Added a dedicated Vale Cup ball target portrait instead of the unrelated wolf fallback.
 - Normalized 36 oversized Mage and Warrior skill paintings to the 128px shipping contract,

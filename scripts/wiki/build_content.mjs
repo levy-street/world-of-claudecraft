@@ -527,6 +527,7 @@ const RELIQUARY_MARK_GUIDE_NAMES = {
   'masterwork:armorcrafting': 'Armorcrafting Masterwork',
   'masterwork:tailoring': 'Tailoring Masterwork',
   'masterwork:leatherworking': 'Leatherworking Masterwork',
+  'masterwork:jewelcrafting': 'Jewelcrafting Masterwork',
   'masterwork:engineering': 'Engineering Masterwork',
   'gather_event:pristine_vein': 'Pristine Vein',
   'gather_event:ancient_heartwood': 'Ancient Heartwood',
@@ -707,8 +708,8 @@ const profStations = STATIONS.map((s) => {
   };
 });
 
-// The full ten-craft ring for the overview: honest about the two content-empty
-// crafts (they exist on the ring but ship zero recipes in wave one).
+// The full ten-craft ring for the overview: honest about the one wave-one
+// content-empty craft (it exists on the ring but ships zero recipes).
 const craftHasContent = (id) =>
   id === 'enchanting'
     ? Object.keys(ENCHANTS).length > 0
@@ -733,13 +734,30 @@ const profArchetypes = ARCHETYPE_PAIR_TARGETS.map((pairId) => {
 });
 
 // One entry per earnable craft (has shipped content): its recipe table plus
-// station, masters, and specialization facts. Enchanting is earnable with an
-// empty recipe list; its enchant/disenchant content lives in
-// GUIDE_PROF_ENCHANTING below.
+// station, masters, and specialization facts. Enchanting earns its seat through
+// the enchant/disenchant content in GUIDE_PROF_ENCHANTING below; its recipe
+// list carries only the two toolworks charms.
+// Which station a craft card shows: most crafts name their own station in
+// STATION_TYPE_BY_CRAFT. A craft absent from that table has no station of its
+// own, but when every one of its recipes binds to the same foreign station
+// (jewelcrafting's forge-bound catalog), the card reports that station and its
+// masters, because that is where the craft is trained and worked. Enchanting
+// stays station-null by design: its recipes are a sideline while enchanting
+// and disenchanting themselves need no station at all.
+const stationTypeForCraftCard = (id) => {
+  const own = STATION_TYPE_BY_CRAFT[id];
+  if (own) return own;
+  if (id === 'enchanting') return null;
+  const recipes = ALL_RECIPES.filter((r) => r.professionId === id);
+  if (recipes.length === 0) return null;
+  const first = recipes[0].stationType ?? null;
+  if (!first) return null;
+  return recipes.every((r) => (r.stationType ?? null) === first) ? first : null;
+};
 const profCrafts = profRing
   .filter((c) => c.hasContent)
   .map((c) => {
-    const stationType = STATION_TYPE_BY_CRAFT[c.id] ?? null;
+    const stationType = stationTypeForCraftCard(c.id);
     const perk = PERK_THRESHOLDS[c.id];
     return {
       id: c.id,
@@ -1221,7 +1239,7 @@ export interface GuideProfRingCraft {
   name: string;
   pole: string;
   maxSkill: number;
-  /** False for the wave-one content-empty crafts (zero recipes shipped). */
+  /** False for a wave-one content-empty craft (zero recipes shipped). */
   hasContent: boolean;
 }
 
