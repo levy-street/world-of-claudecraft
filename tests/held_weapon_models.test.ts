@@ -1,5 +1,8 @@
 import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { KAYKIT_WEAPON_ACCESSORY, VARIANT_GRIPS } from '../src/render/characters/assets';
+import { BACK_GRIP_FAMILIES } from '../src/render/characters/back_grips';
 
 import {
   KAYKIT_SHIELD_ACCESSORIES,
@@ -237,8 +240,19 @@ describe('held weapon models', () => {
     };
     for (const [itemId, url] of Object.entries(expected)) {
       expect(itemOffhandModelUrl(itemId), itemId).toBe(url);
-      expect(existsSync(`public/${url}`), `${url} missing`).toBe(true);
+      expect(existsSync(path.join(__dirname, '..', 'public', url)), `${url} missing`).toBe(true);
     }
+  });
+
+  it('every tome basename rides the VAR_BOOK grip family, hand and back', () => {
+    // Without an accessory row a model still renders but sits at the raw bone
+    // transform (no lift, no flip, no clamp), which no behavior suite can
+    // see: pin the table rows plus both grip tables the family resolves to.
+    for (const key of ['tome_silverleaf', 'tome_goldleaf', 'tome_sunpetal']) {
+      expect(KAYKIT_WEAPON_ACCESSORY[key], key).toBe('VAR_BOOK');
+    }
+    expect(VARIANT_GRIPS.VAR_BOOK).toBeDefined();
+    expect(BACK_GRIP_FAMILIES.has('VAR_BOOK')).toBe(true);
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {
@@ -402,6 +416,11 @@ describe('held weapon models', () => {
     for (const cls of ['paladin', 'shaman', 'priest', 'mage', 'druid'] as const) {
       expect(mechHeldWeaponOverride(cls)?.offhandSlot, cls).toBe(1);
     }
+    // Accepted side effect, recorded in the Phase 06 QA ledger: a WEAPONLESS
+    // caster in the mech now shows the class staff base where it used to show
+    // the mech's sword default (the same layout adoption the shield classes
+    // already had). An armed character is unaffected (index 0 is a swap slot).
+    expect(mechHeldWeaponOverride('mage')?.attach?.[0]?.url).toBe('models/weapons/staff.glb');
     for (const cls of ['hunter', 'warlock'] as const) {
       expect(mechHeldWeaponOverride(cls), `${cls} should keep the mech default`).toBeNull();
     }

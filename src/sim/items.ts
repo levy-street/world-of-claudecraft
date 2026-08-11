@@ -703,8 +703,9 @@ export function useItem(
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  // All four use branches (food/drink, potion, elixir, scroll) consume one unit,
-  // so the selection is honored here once instead of at each arm. Returns the consumed
+  // Every consumable use branch (food/drink, potion, and the shared
+  // elixir/scroll arm) consumes one unit, so the selection is honored here
+  // once instead of at each arm. Returns the consumed
   // payload because the potion branch reads it (the crafting-provenance trickle).
   //
   // Consumables of one id are interchangeable in effect, so this matters less

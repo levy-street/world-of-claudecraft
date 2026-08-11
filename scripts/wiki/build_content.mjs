@@ -213,13 +213,22 @@ function modelKeyFor(visualKey) {
     if (def.hover) spec.hover = def.hover;
     if (def.show) spec.show = def.show;
     if (def.attach) {
-      spec.attach = def.attach.map((a) => {
-        const o = { url: a.url, bone: a.bone };
-        if (a.position) o.position = a.position;
-        if (a.rotationY) o.rotationY = a.rotationY;
-        if (a.gripRef) o.gripRef = a.gripRef;
-        return o;
-      });
+      // swapOnly entries are pure swap-slot bases the game never renders (an
+      // offhandSlot points at them; empty hands skip the entry), so the guide
+      // figures must not showcase them either: without this filter the
+      // caster classes would wear the warlock's fixed spellbook. The shield
+      // classes' offhand bases are deliberately unflagged and keep their
+      // showcase kit (the paladin still renders axe and shield).
+      const attach = def.attach.filter((a) => !a.swapOnly);
+      if (attach.length > 0) {
+        spec.attach = attach.map((a) => {
+          const o = { url: a.url, bone: a.bone };
+          if (a.position) o.position = a.position;
+          if (a.rotationY) o.rotationY = a.rotationY;
+          if (a.gripRef) o.gripRef = a.gripRef;
+          return o;
+        });
+      }
     }
     if (def.weaponFix) spec.weaponFix = def.weaponFix;
     if (def.tint !== undefined) spec.tintStrength = def.tintStrength ?? 0.4;

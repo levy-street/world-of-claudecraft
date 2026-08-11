@@ -75,6 +75,14 @@ export interface AttachDef {
   rotationY?: number;
   /** Copy grip from a built-in accessory node on the character rig (e.g. Spellbook_open). */
   gripRef?: string;
+  /** A pure swap-slot BASE that never renders anywhere: it exists only so an
+   *  `offhandSlot` can point at it (the game skips the entry whenever the
+   *  offhand is empty or unmapped), so its url and grip are dead data. The
+   *  wiki generator filters these out of GuideModelSpec, which is what keeps
+   *  the class figures from showcasing another class's fixed prop. Never set
+   *  this on an attach that should showcase in the guide (the shield classes'
+   *  offhand bases deliberately stay unflagged). */
+  swapOnly?: boolean;
 }
 
 export interface VisualDef {
@@ -1268,10 +1276,11 @@ export const VISUALS: Record<string, VisualDef> = {
     // (the phase 06 inscription tomes are the first): offhandAttachDef skips
     // the slot entirely when the offhand is empty or unmapped, so the empty
     // hand look is unchanged. The base url never renders and is already in
-    // the preload set via the warlock's fixed spellbook.
+    // the preload set via the warlock's fixed spellbook; swapOnly keeps it
+    // out of the wiki figures too.
     attach: [
       { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
     ],
     weaponSlots: [0],
     offhandSlot: 1,
@@ -1409,7 +1418,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // inscription tomes); empty stays empty. See the priest note.
     attach: [
       { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
     ],
     weaponSlots: [0],
     offhandSlot: 1,
@@ -1510,7 +1519,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // inscription tomes); empty stays empty. See the priest note.
     attach: [
       { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
     ],
     weaponSlots: [0],
     offhandSlot: 1,

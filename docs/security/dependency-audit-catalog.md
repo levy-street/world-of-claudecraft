@@ -117,8 +117,9 @@ reach the defect.
 
 ## The re-mint chore any dependency change triggers
 
-`pnpm-lock.yaml` is a fingerprinted source input of the Eastbrook and Fenbridge
-asset pipelines, so a lockfile-only change invalidates their provenance seals and
+`pnpm-lock.yaml` is a fingerprinted source input of the Eastbrook, Fenbridge,
+Dreadspark Groundshaker, and inscription-tome asset pipelines, so a
+lockfile-only change invalidates their provenance seals and
 reddens the asset suites. Use the size-preserving in-place re-mint
 (`scripts/assets/remint_lockfile_fingerprints.mjs`, then
 `eastbrook_grand_armoury/remint_polish_provenance.mjs`, then

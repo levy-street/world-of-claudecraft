@@ -712,9 +712,9 @@ export function resolveCraftForRecipe(
   // second (and for a resultCount > 1 recipe a third) line for the one craft
   // (#2430). Applying the DEF-quality rule to recipe_anglers_feast_platter,
   // recipe_elixir_of_the_serpent, and the phase 06 recipe_sunpetal_scroll
-  // (all three multi-copy: resultCount 3, 2, and 2, so each batch signs
-  // every copy) is a deliberate,
-  // accepted cost: all three are food/elixir/scroll, so useItem's
+  // (all three multi-copy: resultCount 3, 2, and 2, so each batch signs every
+  // copy) is a deliberate, accepted cost: all three are food/elixir/scroll,
+  // so useItem's
   // battlefieldExperienceTrickle arm (gated on def.kind === 'potion') never
   // reaches them, meaning this signs every copy for zero Battlefield
   // Experience payoff. It still applies, for consistency with the four

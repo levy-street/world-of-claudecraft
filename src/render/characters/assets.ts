@@ -93,7 +93,10 @@ const DEFAULT_TINT_STRENGTH = 0.4;
 // KayKit adventurer standalone weapon glbs ship a left-hand mesh offset on a
 // lone child node. handslot.r/l children in the character glbs carry the
 // authored grip — copy those (or this fallback table) after flattening.
-const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
+// Exported for the grip pins in tests/held_weapon_models.test.ts: a model
+// basename missing here silently falls to the raw bone transform, which no
+// behavior suite can see (the model still renders, just ungripped).
+export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   axe_1handed: '1H_Axe',
   axe_2handed: '2H_Axe',
   crossbow_1handed: '1H_Crossbow',
@@ -217,7 +220,9 @@ interface VariantGrip {
   lift: number;
   maxHeight: number;
 }
-const VARIANT_GRIPS: Record<string, VariantGrip> = {
+// Exported for the same grip pins: an accessory family named in
+// KAYKIT_WEAPON_ACCESSORY without a row here (or a rig node) has no grip.
+export const VARIANT_GRIPS: Record<string, VariantGrip> = {
   VAR_SWORD: { lift: 0.04, maxHeight: 2.0 },
   VAR_DAGGER: { lift: 0.04, maxHeight: 1.4 },
   VAR_STAFF: { lift: 0.18, maxHeight: 2.4 },

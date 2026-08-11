@@ -21,6 +21,7 @@ import { eastbrookTownSourceFingerprint } from './eastbrook_town/source_fingerpr
 import { eastbrookSurfaceAtlasFingerprint } from './eastbrook_town/surface_atlas.mjs';
 import { FENBRIDGE_TOWN_ASSET_IDS, FENBRIDGE_TOWN_CONTRACTS } from './fenbridge_town/model.js';
 import { fenbridgeTownSourceFingerprint } from './fenbridge_town/source_fingerprint.mjs';
+import { inscriptionTomesSourceFingerprint } from './inscription_tomes/source_fingerprint.mjs';
 import { tankSourceFingerprint } from './terrorspark_groundshaker/source_fingerprint.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -51,6 +52,9 @@ const ASSETS = [
   { rel: 'public/models/props/eastbrook_noticeboard.glb', kind: 'notice' },
   { rel: 'public/models/props/mailbox_pillar.glb', kind: 'mailbox' },
   { rel: 'public/models/mounts/terrorspark_groundshaker.glb', kind: 'tank' },
+  { rel: 'public/models/weapons/tome_silverleaf.glb', kind: 'tomes' },
+  { rel: 'public/models/weapons/tome_goldleaf.glb', kind: 'tomes' },
+  { rel: 'public/models/weapons/tome_sunpetal.glb', kind: 'tomes' },
   ...FENBRIDGE_ASSETS,
 ];
 
@@ -84,6 +88,7 @@ const fps = {
   notice: eastbrookNoticeboardSourceFingerprint(ROOT),
   armoury: eastbrookGrandArmourySourceFingerprint(ROOT),
   tank: tankSourceFingerprint(ROOT),
+  tomes: inscriptionTomesSourceFingerprint(ROOT),
   atlas: eastbrookSurfaceAtlasFingerprint(ROOT),
   fenbridge: fenbridgeTownSourceFingerprint(ROOT),
 };

@@ -113,6 +113,14 @@ describe('inscription tome held models', () => {
           .map((extension) => extension.extensionName)
           .sort(),
       ).toEqual(['EXT_meshopt_compression', 'KHR_mesh_quantization']);
+      expect(
+        root
+          .listExtensionsUsed()
+          .map((extension) => extension.extensionName)
+          .sort(),
+      ).toEqual(['EXT_meshopt_compression', 'KHR_mesh_quantization']);
+      expect(root.listScenes()).toHaveLength(1);
+      expect(root.listCameras()).toHaveLength(0);
       expect(root.listTextures()).toHaveLength(0);
       expect(root.listAnimations()).toHaveLength(0);
       expect(root.listSkins()).toHaveLength(0);
