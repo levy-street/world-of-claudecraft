@@ -1064,7 +1064,9 @@ export const sv_SE: EnTranslations = {
       "desc_stormfeather_griffin": "En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.",
       "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.",
       "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.",
-      "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska."
+      "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska.",
+      "name_verdant_valorsteed": "Verdant Valorsteed",
+      "desc_verdant_valorsteed": "A Valorsteed in verdant barding, reserved for recruiters who bring five friends to the vale."
     },
     "mountTraining": {
       "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
@@ -3923,6 +3925,9 @@ export const sv_SE: EnTranslations = {
       "genesis_token_claimed": "Denna Seeker Genesis Token har redan hämtats.",
       "entitlement_required": "Verifierad Seeker-behörighet krävs.",
       "current_ownership_required": "Du måste fortfarande äga din Seeker Genesis Token."
+    },
+    "referrals": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const sv_SE: EnTranslations = {
       "pristine_claw": {
         "name": "Orörd klo"
       },
+      "reins_verdant_valorsteed": {
+        "name": "Reins of the Verdant Valorsteed"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },
@@ -16895,6 +16903,16 @@ export const sv_SE: EnTranslations = {
         "sender": "Fixare Gizzel",
         "subject": "MÄSTERSKAP, kaboom",
         "body": "Ett av dina ämnen nådde mästerskap, absoluta TOPPEN, kaboom, hela stegen, klart. Jag delar inte ut beröm, jag delar ut stubiner, men här, ta båda: du är briljant och lite skrämmande. Gå och få bergen att skaka."
+      },
+      "referral_level10_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your recruit finds their footing",
+        "body": "Word arrives that a friend you brought to the vale has reached their tenth season of growth. The realm grows stronger for every hand you bring to it, and the Ravenpost carries you a small token of thanks.\n\nWings up,\nThe Ravenpost"
+      },
+      "referral_mount_reward": {
+        "sender": "The Ravenpost",
+        "subject": "A steed for the Recruiter",
+        "body": "Five friends you have brought to the vale, and five have made it their home. The stables of Eastbrook have set aside something no coin can buy: a Valorsteed in verdant barding, reserved for those who build the realm itself.\n\nRide well,\nThe Ravenpost"
       }
     },
     "itemSets": {

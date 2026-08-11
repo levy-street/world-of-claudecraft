@@ -135,6 +135,7 @@ export const API_ERROR_KEYS = {
   'seeker.genesis_token_claimed': 'apiError.seeker.genesis_token_claimed',
   'seeker.entitlement_required': 'apiError.seeker.entitlement_required',
   'seeker.current_ownership_required': 'apiError.seeker.current_ownership_required',
+  'referrals.invalid_input': 'apiError.referrals.invalid_input',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */

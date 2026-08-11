@@ -902,6 +902,9 @@ export const hudChromeStrings = {
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
+    name_verdant_valorsteed: 'Verdant Valorsteed',
+    desc_verdant_valorsteed:
+      'A Valorsteed in verdant barding, reserved for recruiters who bring five friends to the vale.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing

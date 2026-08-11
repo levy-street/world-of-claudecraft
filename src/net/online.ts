@@ -1175,6 +1175,22 @@ export class Api {
     }
   }
 
+  // The account's stable refer-a-friend code + share link
+  // (docs/prd/refer-a-friend.md; minted server-side on first eligible fetch).
+  // Best-effort: ineligible-shaped on error so the card modal still renders.
+  async referralCode(): Promise<{ eligible: boolean; code: string | null; url: string | null }> {
+    try {
+      const data = await this.get('/api/referral-code');
+      return {
+        eligible: data.eligible === true,
+        code: typeof data.code === 'string' ? data.code : null,
+        url: typeof data.url === 'string' ? data.url : null,
+      };
+    } catch {
+      return { eligible: false, code: null, url: null };
+    }
+  }
+
   // A character's realm standing by lifetime XP (rank 1 = highest), for the
   // card's "Top N%" flex. Best-effort: null on error so the card still renders.
   async characterStanding(characterId: number): Promise<{ rank: number; total: number } | null> {
@@ -4717,6 +4733,11 @@ export class ClientWorld implements IWorld {
   }
   clearMarker(entityId: number): void {
     this.cmd({ cmd: 'clearMarker', id: entityId });
+  }
+  // Refer-a-friend Summon a Friend: the sim owns every rule; refusals come back
+  // as error events.
+  summonFriend(): void {
+    this.cmd({ cmd: 'summon_friend' });
   }
   // --- IWorldTrade: trade-window command sends (tradeInfo is a snapshot read). ---
   tradeRequest(targetPid: number): void {

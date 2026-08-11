@@ -129,11 +129,19 @@ import {
   setAccountStreamerFlair,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
+  setReferralStatusModerated,
 } from './moderation_db';
 import { readModerationQueue } from './moderation_queue_cache';
 import { providerUsageSnapshot } from './provider_usage';
 import { authThrottled, clearAuthFailures, rateLimited, recordAuthFailure } from './ratelimit';
 import { REALM } from './realm';
+import {
+  referralCodeForAccount,
+  referralForReferee,
+  referralMilestonesForAccount,
+  referralProgramStats,
+  referralsForReferrer,
+} from './referrals_db';
 import {
   adminRolesForAccount,
   listStaff,
@@ -1129,6 +1137,54 @@ export async function handleAdminApi(
       }
     }
 
+    // Refer-a-friend program (docs/prd/refer-a-friend.md): the per-account
+    // chain inspect, the program aggregates, and the void/reinstate pair. The
+    // id on void/reinstate is the REFEREE account id (the referrals PK); the
+    // write is audited in moderation_db.setReferralStatusModerated, and the
+    // live bond stamps recompute immediately so a voided pair loses its XP
+    // bond without waiting for a relog.
+    const accountReferralsMatch = /^\/admin\/api\/accounts\/(\d+)\/referrals$/.exec(path);
+    if (req.method === 'GET' && accountReferralsMatch) {
+      const id = Number(accountReferralsMatch[1]);
+      try {
+        const [asReferrer, asReferee, milestones, code] = await Promise.all([
+          referralsForReferrer(id),
+          referralForReferee(id),
+          referralMilestonesForAccount(id),
+          referralCodeForAccount(id),
+        ]);
+        return ok(res, { asReferrer, asReferee, milestones, code });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'referral inspect failed');
+      }
+    }
+    if (req.method === 'GET' && path === '/admin/api/referrals/stats') {
+      try {
+        return ok(res, await referralProgramStats());
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'referral stats failed');
+      }
+    }
+    const referralModerateMatch = /^\/admin\/api\/referrals\/(\d+)\/(void|reinstate)$/.exec(path);
+    if (req.method === 'POST' && referralModerateMatch) {
+      const refereeAccountId = Number(referralModerateMatch[1]);
+      const action = referralModerateMatch[2] === 'void' ? 'referral_void' : 'referral_reinstate';
+      const body = await readBody(req);
+      try {
+        const changed = await setReferralStatusModerated({
+          refereeAccountId,
+          action,
+          adminAccountId: accountId,
+          reason: body.reason,
+        });
+        if (!changed) return fail(res, 404, 'referral not found');
+        game.refreshReferralBonds(refereeAccountId);
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'referral update failed');
+      }
+    }
+
     // Account flair: the AI-operated mark and an official streamer's links. Both
     // are cosmetic and non-punitive, so (unlike suspend/ban/chat-mute) there is
     // deliberately NO isAdminAccount guard: marking a staff account as a streamer
@@ -1706,6 +1762,9 @@ export type AdminRuntime = Pick<
   // Push an operator's account-flair edit onto the account's live session, so the
   // AI mark / streamer links change without a reconnect.
   | 'applyAccountFlairLive'
+  // Refer-a-friend: recompute bond stamps after a void/reinstate write, so a
+  // voided pair loses its XP bond without waiting for a relog.
+  | 'refreshReferralBonds'
   | 'reloadChatFilter'
   | 'reloadBlockedIps'
   | 'disconnectByIp'
@@ -2798,6 +2857,71 @@ async function resetPasswordHandler(ctx: Ctx): Promise<void> {
 }
 
 /**
+ * GET /admin/api/accounts/:id/referrals: the refer-a-friend chain inspect
+ * (docs/prd/refer-a-friend.md): the account's referrals as referrer, its own
+ * referee row, milestone/grant history, and its stored code. Twin of the
+ * handleAdminApi arm (dual-edit rule).
+ */
+async function accountReferralsHandler(ctx: Ctx): Promise<void> {
+  const targetAccountId = adminTargetId(ctx);
+  try {
+    const [asReferrer, asReferee, milestones, code] = await Promise.all([
+      referralsForReferrer(targetAccountId),
+      referralForReferee(targetAccountId),
+      referralMilestonesForAccount(targetAccountId),
+      referralCodeForAccount(targetAccountId),
+    ]);
+    return ok(ctx.res, { asReferrer, asReferee, milestones, code });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'referral inspect failed');
+  }
+}
+
+/** GET /admin/api/referrals/stats: program-wide aggregates (twin of the ladder arm). */
+async function referralStatsHandler(ctx: Ctx): Promise<void> {
+  try {
+    return ok(ctx.res, await referralProgramStats());
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'referral stats failed');
+  }
+}
+
+/**
+ * POST /admin/api/referrals/:id/void | /reinstate: the audited referral
+ * moderation pair (twin of the handleAdminApi arm). The :id is the REFEREE
+ * account id; the live bond stamps recompute immediately after the write.
+ */
+async function referralModerateCore(
+  ctx: Ctx,
+  action: 'referral_void' | 'referral_reinstate',
+): Promise<void> {
+  const rt = useAdminRuntime();
+  const refereeAccountId = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  try {
+    const changed = await setReferralStatusModerated({
+      refereeAccountId,
+      action,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
+    if (!changed) return fail(ctx.res, 404, 'referral not found');
+    rt.refreshReferralBonds(refereeAccountId);
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'referral update failed');
+  }
+}
+
+function referralVoidHandler(ctx: Ctx): Promise<void> {
+  return referralModerateCore(ctx, 'referral_void');
+}
+
+function referralReinstateHandler(ctx: Ctx): Promise<void> {
+  return referralModerateCore(ctx, 'referral_reinstate');
+}
+
+/**
  * POST /admin/api/accounts/:id/ai: mark the account as AI-operated (or clear it).
  * Cosmetic and non-punitive: no reason is required and, unlike suspend/ban/chat-mute,
  * there is NO isAdminAccount guard (a staff account can legitimately carry flair).
@@ -3228,6 +3352,41 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: resetPasswordHandler,
+  },
+
+  // Refer-a-friend program (docs/prd/refer-a-friend.md): chain inspect,
+  // aggregates, and the audited void/reinstate pair.
+  {
+    method: 'GET',
+    path: '/admin/api/accounts/:id/referrals',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: accountReferralsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/referrals/stats',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: referralStatsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/referrals/:id/void',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: referralVoidHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/referrals/:id/reinstate',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: referralReinstateHandler,
   },
 
   // Account flair: the AI-operated mark and an official streamer's platform links.

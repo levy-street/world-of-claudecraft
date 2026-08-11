@@ -409,6 +409,8 @@ export const fr_CA: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Infractions de clavardage réinitialisées",
   "moderationHistory.actionRestoreItem": "Objet restauré",
   "moderationHistory.actionRestoreSlot": "Emplacement restauré",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "Renommage de guilde",
   "moderationHistory.actionGuildBankPurge": "Purge de la banque de guilde",
   "moderationHistory.actionUnknown": "Autre mesure",

@@ -1064,7 +1064,9 @@ export const zh_CN: EnTranslations = {
       "desc_stormfeather_griffin": "一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。",
       "desc_thunderstrut_gobbler": "一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
-      "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。"
+      "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。",
+      "name_verdant_valorsteed": "翠绿英勇战马",
+      "desc_verdant_valorsteed": "一匹披挂翠绿马铠的英勇战马，专为引荐五位好友来到山谷的招募者保留。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
@@ -3923,6 +3925,9 @@ export const zh_CN: EnTranslations = {
       "genesis_token_claimed": "该 Seeker Genesis Token 已被领取。",
       "entitlement_required": "需要已验证的 Seeker 权益。",
       "current_ownership_required": "需要当前持有 Seeker Genesis Token。"
+    },
+    "referrals": {
+      "invalid_input": "输入无效。"
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const zh_CN: EnTranslations = {
       "pristine_claw": {
         "name": "完美的爪"
       },
+      "reins_verdant_valorsteed": {
+        "name": "翠绿英勇战马的缰绳"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -16895,6 +16903,16 @@ export const zh_CN: EnTranslations = {
         "sender": "吉泽尔修补匠",
         "subject": "大师级，轰",
         "body": "你有一门主修技艺到了大师级，最顶上，轰，整架梯子，爬完了。我不派发夸奖，我派发引线，不过这次两样都给你：你既出色，又有那么点吓人。去让群山紧张紧张吧。"
+      },
+      "referral_level10_reward": {
+        "sender": "渡鸦邮驿",
+        "subject": "你的新兵站稳了脚跟",
+        "body": "有消息传来，你引荐到山谷的朋友已完成第十个成长季。你带来的每一双手都让王国更加强盛，渡鸦邮驿谨呈上一份小小的谢礼。\n\n展翅高飞，\n渡鸦邮驿"
+      },
+      "referral_mount_reward": {
+        "sender": "渡鸦邮驿",
+        "subject": "赠予招募者的骏马",
+        "body": "你已引荐五位朋友来到山谷，五位都在此安了家。东溪镇的马厩为你留下了金钱买不到的珍宝：一匹披挂翠绿马铠的英勇战马，专为建设王国之人保留。\n\n策马扬鞭，\n渡鸦邮驿"
       }
     },
     "itemSets": {

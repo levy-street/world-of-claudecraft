@@ -1596,6 +1596,20 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 12,
     lazyPreload: true,
   },
+  // The refer-a-friend tier-5 reskin (docs/prd/refer-a-friend.md): the same
+  // Valorsteed GLB (one download, one parse) under a verdant tint. Strength
+  // stays below the faint-wash ceiling other shared models use so the barding
+  // reads green without flattening the authored texture.
+  mount_verdant_valorsteed: {
+    url: `${MOUNTS_DIR}/valorsteed.glb`,
+    height: 3.8,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.3,
+    runRef: 12,
+    lazyPreload: true,
+    tint: 0x3f9a5f,
+    tintStrength: 0.35,
+  },
   mount_grag_bear: {
     url: `${MOUNTS_DIR}/grag_bear.glb`,
     height: 4.0,

@@ -409,6 +409,8 @@ export const ru_RU: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Сброс нарушений чата",
   "moderationHistory.actionRestoreItem": "Восстановление предмета",
   "moderationHistory.actionRestoreSlot": "Восстановление слота",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "Переименование гильдии",
   "moderationHistory.actionGuildBankPurge": "Удаление предмета из банка гильдии",
   "moderationHistory.actionUnknown": "Другое действие",

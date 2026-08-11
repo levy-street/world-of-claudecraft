@@ -1064,7 +1064,9 @@ export const nl_NL: EnTranslations = {
       "desc_stormfeather_griffin": "Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.",
       "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
-      "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend."
+      "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend.",
+      "name_verdant_valorsteed": "Verdant Valorsteed",
+      "desc_verdant_valorsteed": "A Valorsteed in verdant barding, reserved for recruiters who bring five friends to the vale."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -3923,6 +3925,9 @@ export const nl_NL: EnTranslations = {
       "genesis_token_claimed": "Dat Seeker Genesis Token is al geclaimd.",
       "entitlement_required": "Geverifieerde Seeker-rechten zijn vereist.",
       "current_ownership_required": "Actueel bezit van het Seeker Genesis Token is vereist."
+    },
+    "referrals": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const nl_NL: EnTranslations = {
       "pristine_claw": {
         "name": "Ongerepte Klauw"
       },
+      "reins_verdant_valorsteed": {
+        "name": "Reins of the Verdant Valorsteed"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -16895,6 +16903,16 @@ export const nl_NL: EnTranslations = {
         "sender": "Knutselaar Gizzel",
         "subject": "MEESTERSCHAP, kaboom",
         "body": "Een van je hoofdvakken heeft meesterschap bereikt, de allerHOOGSTE, kaboom, de hele ladder, klaar. Ik deel geen lof uit, ik deel lonten uit, maar hier, neem allebei: je bent briljant en enigszins angstaanjagend. Ga de bergen zenuwachtig maken."
+      },
+      "referral_level10_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your recruit finds their footing",
+        "body": "Word arrives that a friend you brought to the vale has reached their tenth season of growth. The realm grows stronger for every hand you bring to it, and the Ravenpost carries you a small token of thanks.\n\nWings up,\nThe Ravenpost"
+      },
+      "referral_mount_reward": {
+        "sender": "The Ravenpost",
+        "subject": "A steed for the Recruiter",
+        "body": "Five friends you have brought to the vale, and five have made it their home. The stables of Eastbrook have set aside something no coin can buy: a Valorsteed in verdant barding, reserved for those who build the realm itself.\n\nRide well,\nThe Ravenpost"
       }
     },
     "itemSets": {

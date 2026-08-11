@@ -409,6 +409,8 @@ export const de_DE: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Chat-Verwarnungen zurückgesetzt",
   "moderationHistory.actionRestoreItem": "Gegenstand wiederhergestellt",
   "moderationHistory.actionRestoreSlot": "Platz wiederhergestellt",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "Gilde umbenannt",
   "moderationHistory.actionGuildBankPurge": "Gildenbank-Bereinigung",
   "moderationHistory.actionUnknown": "Andere Aktion",

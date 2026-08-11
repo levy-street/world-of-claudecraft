@@ -1064,7 +1064,9 @@ export const es_ES: EnTranslations = {
       "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.",
       "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta.",
       "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos.",
-      "desc_drakemaw_raptor": "Un raptor de cría domado para la silla, procedente de la Caldera de Drakemaw, puro tendón y arranque, que aún huele ligeramente a ceniza."
+      "desc_drakemaw_raptor": "Un raptor de cría domado para la silla, procedente de la Caldera de Drakemaw, puro tendón y arranque, que aún huele ligeramente a ceniza.",
+      "name_verdant_valorsteed": "Verdant Valorsteed",
+      "desc_verdant_valorsteed": "A Valorsteed in verdant barding, reserved for recruiters who bring five friends to the vale."
     },
     "mountTraining": {
       "mountPrompt": "Pulsa {key} para montar el Corcel del Valor de entrenamiento.",
@@ -3923,6 +3925,9 @@ export const es_ES: EnTranslations = {
       "genesis_token_claimed": "Ese Seeker Genesis Token ya se ha reclamado.",
       "entitlement_required": "Se requiere un derecho de acceso Seeker verificado.",
       "current_ownership_required": "Se requiere ser el propietario actual del Seeker Genesis Token."
+    },
+    "referrals": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const es_ES: EnTranslations = {
       "pristine_claw": {
         "name": "Garra Prístina"
       },
+      "reins_verdant_valorsteed": {
+        "name": "Reins of the Verdant Valorsteed"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"
       },
@@ -16895,6 +16903,16 @@ export const es_ES: EnTranslations = {
         "sender": "Tinker Gizzel",
         "subject": "MAESTRIA, kabum",
         "body": "Uno de tus especializados alcanzó la maestría, la CIMA misma, kabum, toda la escalera, hecho. No reparto elogios, reparto fusibles, pero toma ambos: eres brillante y levemente aterrador. Ve a poner nerviosas a las montañas."
+      },
+      "referral_level10_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your recruit finds their footing",
+        "body": "Word arrives that a friend you brought to the vale has reached their tenth season of growth. The realm grows stronger for every hand you bring to it, and the Ravenpost carries you a small token of thanks.\n\nWings up,\nThe Ravenpost"
+      },
+      "referral_mount_reward": {
+        "sender": "The Ravenpost",
+        "subject": "A steed for the Recruiter",
+        "body": "Five friends you have brought to the vale, and five have made it their home. The stables of Eastbrook have set aside something no coin can buy: a Valorsteed in verdant barding, reserved for those who build the realm itself.\n\nRide well,\nThe Ravenpost"
       }
     },
     "itemSets": {

@@ -1281,6 +1281,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Refer-a-friend program (docs/prd/refer-a-friend.md): the caller's stable
+  // referral code + private program readout, minted on first eligible fetch.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/referral-code',
+    handler: 'server/referrals.ts referralCodeHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // v0.20.0 release merge: the map editor surface. Custom maps (owner CRUD +
   // public browse/read, server/maps_routes.ts cores) and uploaded GLB assets
   // (binary upload + public content-addressed byte read,
@@ -1921,6 +1933,53 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/user-assets\/(\d+)\/(block|unblock)$/,
+  },
+  // Refer-a-friend program (docs/prd/refer-a-friend.md): the per-account chain
+  // inspect, the program aggregates, and the audited void/reinstate pair (the
+  // (void|reinstate) regex arm registers two rows sharing one match source,
+  // the user-assets precedent above; the :id is the REFEREE account id).
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/accounts/:id/referrals',
+    handler: 'accountReferralsMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/accounts\/(\d+)\/referrals$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/referrals/stats',
+    handler: 'handleAdminApi arm: /admin/api/referrals/stats',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/referrals/:id/void',
+    handler: 'referralModerateMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/referrals\/(\d+)\/(void|reinstate)$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/referrals/:id/reinstate',
+    handler: 'referralModerateMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/referrals\/(\d+)\/(void|reinstate)$/,
   },
   {
     dispatcher: DISPATCH.admin,

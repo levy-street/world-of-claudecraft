@@ -20,6 +20,7 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
+  | 'verdant_valorsteed'
   | 'terrorspark_groundshaker';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
@@ -100,6 +101,16 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   drakemaw_raptor: {
     key: 'drakemaw_raptor',
     name: 'Drakemaw Raptor',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // The refer-a-friend tier-5 ladder reward (docs/prd/refer-a-friend.md): the
+  // stablemaster's Valorsteed in verdant barding, a render-tinted reskin. Its
+  // reins arrive only by Ravenpost letter at five completed referrals, never
+  // by vendor or drop, so it cannot feed the market or $WOC.
+  verdant_valorsteed: {
+    key: 'verdant_valorsteed',
+    name: 'Verdant Valorsteed',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

@@ -8461,6 +8461,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'worldContent.mailboxName': '우편함',
   'worldContent.noticeboardName': '게시판',
   'entities.letters.ravenpost_welcome.sender': '레이븐포스트',
+  'entities.letters.referral_level10_reward.sender': '레이븐포스트',
+  'entities.letters.referral_level10_reward.subject': '당신의 신병이 자리를 잡았습니다',
+  'entities.letters.referral_level10_reward.body':
+    '당신이 계곡으로 초대한 친구가 열 번째 성장의 계절을 맞이했다는 소식이 도착했습니다. 당신이 데려오는 손길 하나하나가 왕국을 더 강하게 만듭니다. 레이븐포스트가 작은 감사의 표시를 전해 드립니다.\n\n날개를 펴고,\n레이븐포스트',
+  'entities.letters.referral_mount_reward.sender': '레이븐포스트',
+  'entities.letters.referral_mount_reward.subject': '모병관을 위한 준마',
+  'entities.letters.referral_mount_reward.body':
+    '당신은 다섯 친구를 계곡으로 이끌었고, 다섯 모두 이곳을 고향으로 삼았습니다. 이스트브룩 마구간은 돈으로 살 수 없는 것을 당신을 위해 남겨 두었습니다. 왕국을 세우는 이들만을 위한, 신록의 마갑을 두른 발러스티드입니다.\n\n좋은 여정 되시길,\n레이븐포스트',
+  'entities.items.reins_verdant_valorsteed.name': '신록의 발러스티드 고삐',
+  'hudChrome.mounts.name_verdant_valorsteed': '신록의 발러스티드',
+  'hudChrome.mounts.desc_verdant_valorsteed':
+    '신록의 마갑을 두른 발러스티드. 다섯 친구를 계곡으로 초대한 모병관만을 위해 남겨져 있다.',
+  'apiError.referrals.invalid_input': '입력이 잘못되었습니다.',
   'entities.letters.ravenpost_welcome.subject': '이제 까마귀가 당신을 위해 날아갑니다',
   'entities.letters.ravenpost_welcome.body':
     '여행자님,\n\n레이븐포스트가 골짜기 곳곳에 홰를 열었습니다. 이스트브룩, 펜브리지, 하이워치에서 까마귀 석주를 찾아보세요. 어느 곳에서든 다른 모험가에게 편지와 동전과 물건을 보낼 수 있고, 까마귀가 물어온 것들을 받을 수 있습니다.\n\n첫 우표값으로 쓸 작은 성의를 동봉합니다.\n\n날개를 활짝,\n레이븐포스트',

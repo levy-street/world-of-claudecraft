@@ -49,7 +49,7 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 271 deeds x (name + desc) + the 42 shipped title rewards (both counts
+    // 273 deeds x (name + desc) + the 44 shipped title rewards (both counts
     // pinned by tests/deeds_content.test.ts): the Drakelands brood pair, the
     // four Thornhollow Fields battleground deeds, the Rift coverage pair
     // (dgn_rift, dgn_rift_s_rank), the seven per-craft rare-tier profession
@@ -57,8 +57,10 @@ describe('deed_i18n English resolution', () => {
     // Reliquary Curator rank bridges (3 titles + 1 border; the border has no
     // title manifest row), the three WARFARE lifetime-honor rank titles, and
     // the five Phase 18 Reliquary completion-ladder titles.
-    expect(manifest.length).toBe(271 * 2 + 42);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(42);
+        // Plus the refer-a-friend ladder pair (docs/prd/refer-a-friend.md), both
+    // of which carry title rewards.
+    expect(manifest.length).toBe(273 * 2 + 44);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(44);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',

@@ -1064,7 +1064,9 @@ export const ko_KR: EnTranslations = {
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
       "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
-      "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다."
+      "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
+      "name_verdant_valorsteed": "신록의 발러스티드",
+      "desc_verdant_valorsteed": "신록의 마갑을 두른 발러스티드. 다섯 친구를 계곡으로 초대한 모병관만을 위해 남겨져 있다."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
@@ -3923,6 +3925,9 @@ export const ko_KR: EnTranslations = {
       "genesis_token_claimed": "해당 Seeker Genesis Token은 이미 등록되었습니다.",
       "entitlement_required": "인증된 Seeker 자격이 필요합니다.",
       "current_ownership_required": "현재 Seeker Genesis Token을 보유해야 합니다."
+    },
+    "referrals": {
+      "invalid_input": "입력이 잘못되었습니다."
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const ko_KR: EnTranslations = {
       "pristine_claw": {
         "name": "온전한 발톱"
       },
+      "reins_verdant_valorsteed": {
+        "name": "신록의 발러스티드 고삐"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -16895,6 +16903,16 @@ export const ko_KR: EnTranslations = {
         "sender": "땜장이 기즐",
         "subject": "통달이야, 콰광",
         "body": "네 주 전공 하나가 통달을 찍었어, 바로 그 꼭대기, 콰광, 사다리 통째로, 끝. 나는 칭찬 같은 거 안 나눠 줘, 도화선을 나눠 주지, 그런데 여기, 둘 다 받아. 넌 눈부시고 살짝 무서워. 가서 산들이 조마조마하게 만들어."
+      },
+      "referral_level10_reward": {
+        "sender": "레이븐포스트",
+        "subject": "당신의 신병이 자리를 잡았습니다",
+        "body": "당신이 계곡으로 초대한 친구가 열 번째 성장의 계절을 맞이했다는 소식이 도착했습니다. 당신이 데려오는 손길 하나하나가 왕국을 더 강하게 만듭니다. 레이븐포스트가 작은 감사의 표시를 전해 드립니다.\n\n날개를 펴고,\n레이븐포스트"
+      },
+      "referral_mount_reward": {
+        "sender": "레이븐포스트",
+        "subject": "모병관을 위한 준마",
+        "body": "당신은 다섯 친구를 계곡으로 이끌었고, 다섯 모두 이곳을 고향으로 삼았습니다. 이스트브룩 마구간은 돈으로 살 수 없는 것을 당신을 위해 남겨 두었습니다. 왕국을 세우는 이들만을 위한, 신록의 마갑을 두른 발러스티드입니다.\n\n좋은 여정 되시길,\n레이븐포스트"
       }
     },
     "itemSets": {

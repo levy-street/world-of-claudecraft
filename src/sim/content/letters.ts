@@ -85,6 +85,38 @@ export const MASTERY_RESET_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
+// Refer-a-friend reward letters (docs/prd/refer-a-friend.md): posted to the
+// REFERRER by the milestone service (server/referral_milestones.ts) when their
+// recruited friend hits real progression. Gold only at the first milestone
+// (small, non-repeatable); the tier-5 ladder letter carries the exclusive
+// mount reins as its attachment. Ids append-only like every letter here.
+export const REFERRAL_LEVEL10_LETTER: LetterDef = {
+  letterId: 'referral_level10_reward',
+  senderName: 'The Ravenpost',
+  subject: 'Your recruit finds their footing',
+  body:
+    'Word arrives that a friend you brought to the vale has reached their ' +
+    'tenth season of growth. The realm grows stronger for every hand you ' +
+    'bring to it, and the Ravenpost carries you a small token of thanks.\n\n' +
+    'Wings up,\nThe Ravenpost',
+  copper: 2500,
+  delaySeconds: 0,
+};
+
+export const REFERRAL_MOUNT_LETTER: LetterDef = {
+  letterId: 'referral_mount_reward',
+  senderName: 'The Ravenpost',
+  subject: 'A steed for the Recruiter',
+  body:
+    'Five friends you have brought to the vale, and five have made it their ' +
+    'home. The stables of Eastbrook have set aside something no coin can ' +
+    'buy: a Valorsteed in verdant barding, reserved for those who build the ' +
+    'realm itself.\n\n' +
+    'Ride well,\nThe Ravenpost',
+  items: [{ itemId: 'reins_verdant_valorsteed', count: 1 }],
+  delaySeconds: 0,
+};
+
 // Quest follow-up letters: the questgiver writes to you a little while after
 // the turn-in. Keyed by quest id; quests without an entry send nothing.
 export const QUEST_LETTERS: Record<string, LetterDef> = {

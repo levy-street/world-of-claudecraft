@@ -143,6 +143,13 @@ export const SFX = [
     custom: true,
   },
   {
+    // The Verdant Valorsteed (refer-a-friend tier-5 reskin,
+    // docs/prd/refer-a-friend.md): the same horse under green barding, so its
+    // clip is a byte copy of the valorsteed gallop.
+    key: 'mount_run_verdant_valorsteed',
+    custom: true,
+  },
+  {
     key: 'move_jump',
     custom: true,
     duration: 0.5,

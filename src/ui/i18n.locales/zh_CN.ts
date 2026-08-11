@@ -8119,6 +8119,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'worldContent.mailboxName': '邮箱',
   'worldContent.noticeboardName': '告示板',
   'entities.letters.ravenpost_welcome.sender': '渡鸦邮驿',
+  'entities.letters.referral_level10_reward.sender': '渡鸦邮驿',
+  'entities.letters.referral_level10_reward.subject': '你的新兵站稳了脚跟',
+  'entities.letters.referral_level10_reward.body':
+    '有消息传来，你引荐到山谷的朋友已完成第十个成长季。你带来的每一双手都让王国更加强盛，渡鸦邮驿谨呈上一份小小的谢礼。\n\n展翅高飞，\n渡鸦邮驿',
+  'entities.letters.referral_mount_reward.sender': '渡鸦邮驿',
+  'entities.letters.referral_mount_reward.subject': '赠予招募者的骏马',
+  'entities.letters.referral_mount_reward.body':
+    '你已引荐五位朋友来到山谷，五位都在此安了家。东溪镇的马厩为你留下了金钱买不到的珍宝：一匹披挂翠绿马铠的英勇战马，专为建设王国之人保留。\n\n策马扬鞭，\n渡鸦邮驿',
+  'entities.items.reins_verdant_valorsteed.name': '翠绿英勇战马的缰绳',
+  'hudChrome.mounts.name_verdant_valorsteed': '翠绿英勇战马',
+  'hudChrome.mounts.desc_verdant_valorsteed':
+    '一匹披挂翠绿马铠的英勇战马，专为引荐五位好友来到山谷的招募者保留。',
+  'apiError.referrals.invalid_input': '输入无效。',
   'entities.letters.ravenpost_welcome.subject': '渡鸦如今为你飞翔',
   'entities.letters.ravenpost_welcome.body':
     '旅人：\n\n渡鸦邮驿已在谷地各处设立栖架。请在东溪镇、沼桥镇和高望镇寻找渡鸦石柱：在任意一处，你都可以向其他冒险者寄送信件、钱币和物品，也可以领取渡鸦为你带来的一切。\n\n随信附上一点心意，作为你的第一枚邮票。\n\n展翅高飞，\n渡鸦邮驿',

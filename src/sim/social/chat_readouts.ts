@@ -35,6 +35,7 @@ import { MARKET_MAX_LISTINGS } from '../market';
 import * as petCommands from '../pet/pet_commands';
 import { FALL_SAFE_DISTANCE, type PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { SUMMON_FRIEND_COOLDOWN_ID } from '../summon_friend_cooldown';
 import { threatEntries } from '../threat';
 import {
   type ArenaFormat,
@@ -432,7 +433,7 @@ function auraLabel(a: Aura): string {
 //
 export function cooldownsReadout(e: Entity): string {
   const parts = [...e.cooldowns]
-    .filter(([id]) => id !== UNSTUCK_COOLDOWN_ID)
+    .filter(([id]) => id !== UNSTUCK_COOLDOWN_ID && id !== SUMMON_FRIEND_COOLDOWN_ID)
     .sort((a, b) => a[1] - b[1])
     .map(([id, remaining]) => `${ABILITIES[id]?.name ?? id} (${Math.ceil(remaining)}s)`);
   if (parts.length === 0) return 'No abilities are on cooldown.';

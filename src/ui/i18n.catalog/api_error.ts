@@ -210,4 +210,7 @@ export const apiErrorStrings = {
     entitlement_required: 'Verified Seeker entitlement is required.',
     current_ownership_required: 'Current Seeker Genesis Token ownership is required.',
   },
+  referrals: {
+    invalid_input: 'Invalid input.',
+  },
 };

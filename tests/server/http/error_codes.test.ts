@@ -89,6 +89,7 @@ const EXPECTED_CODES = [
   'epic.account_taken',
   'epic.upstream',
   'ota_updates.invalid_input',
+  'referrals.invalid_input',
 ];
 
 describe('ERROR_CODES catalog', () => {

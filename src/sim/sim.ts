@@ -30,6 +30,8 @@ import {
 } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
+import type { BondBuffStamp } from './bond_buff';
+import * as bondBuffMod from './bond_buff';
 import { campSpawnOffset } from './camp_scatter';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
@@ -549,6 +551,7 @@ import {
   spawnOverworldSpiritHealers,
   UNSTUCK_SICKNESS_ID,
 } from './spirit';
+import { SUMMON_FRIEND_COOLDOWN_ID } from './summon_friend_cooldown';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
   CURRENT_CHARACTER_CONTENT_REVISION,
@@ -1332,6 +1335,14 @@ export interface PlayerMeta {
   // membership or rank change), never sim-mutated, always null offline.
   // Excluded from the parity meta sample (tests/parity/trace.ts).
   guildMembership: GuildMembership | null;
+  // Server-stamped refer-a-friend bond entitlement (docs/prd/refer-a-friend.md):
+  // the bonded partner characters, the XP multiplier, and the summon cooldown,
+  // written only through setPlayerBond (bond_buff.ts). Session-only exactly
+  // like guildMembership: the referral graph lives in the server DB, so this is
+  // never serialized into CharacterState (the server re-stamps at join and on
+  // partner join/leave/level), never sim-mutated, always null offline.
+  // Excluded from the parity meta sample (tests/parity/trace.ts).
+  bondBuff: BondBuffStamp | null;
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
@@ -2912,6 +2923,7 @@ export class Sim {
       bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
       bankBonusSources: [],
       guildMembership: null,
+      bondBuff: null,
       vendorBuyback: [],
       copper: 0,
       equipment: {
@@ -3521,7 +3533,10 @@ export class Sim {
       this.time,
       restoredAbilityCharges,
       legacyChargeCaps,
-      (id) => id === unstuckMod.UNSTUCK_COOLDOWN_ID || ABILITIES[id] !== undefined,
+      (id) =>
+        id === unstuckMod.UNSTUCK_COOLDOWN_ID ||
+        id === SUMMON_FRIEND_COOLDOWN_ID ||
+        ABILITIES[id] !== undefined,
     );
     if (Object.keys(restoredAbilityCharges).length > 0) {
       player.abilityCharges = restoredAbilityCharges;
@@ -4535,6 +4550,39 @@ export class Sim {
    *  Thin delegate into guild_bank.ts. */
   setPlayerGuildMembership(pid: number, membership: GuildMembership | null): void {
     guildBankMod.stampGuildMembership(this.ctx, pid, membership);
+  }
+
+  /** Server-stamped refer-a-friend bond entitlement (docs/prd/refer-a-friend.md):
+   *  the input the XP bond multiplier and Summon a Friend read; contract and
+   *  session-only rationale on PlayerMeta.bondBuff. Called at join and on every
+   *  partner join/leave/bond-end; pass null when the bond ends. Offline and
+   *  headless never call it, so the stamp stays null there. Thin delegate into
+   *  bond_buff.ts. */
+  setPlayerBond(pid: number, stamp: BondBuffStamp | null): void {
+    bondBuffMod.stampBondBuff(this.ctx, pid, stamp);
+  }
+
+  /** Summon a Friend: teleport the bonded, partied partner to this player's
+   *  side (bond_buff.ts owns the rules; overworld only, stamped cooldown). */
+  summonFriend(pid = this.player.id): void {
+    bondBuffMod.summonFriend(this.ctx, pid);
+  }
+
+  /** Refer-a-friend ladder titles (bond_buff.ts applyReferralLadder): grant
+   *  every ladder deed at or below the completed-referral tier the server
+   *  computed from the referral graph. Idempotent; server-only caller
+   *  (server/referral_milestones.ts), so offline the deeds stay locked. */
+  grantReferralLadder(pid: number, tier: number): void {
+    bondBuffMod.applyReferralLadder(this.ctx, pid, tier);
+  }
+
+  /** Post an authored system letter to a live player's mailbox (the Ravenpost
+   *  reward path: server/referral_milestones.ts). Same delivery contract as
+   *  every authored letter: no proximity, no postage, never refuses. */
+  sendSystemLetterTo(pid: number, letter: import('./content/letters').LetterDef): void {
+    const meta = this.ctx.players.get(pid);
+    if (!meta) return;
+    this.postOffice.sendLetter(this.postOffice.mailKeyFor(meta), meta.name, letter, 'system');
   }
 
   /** Cosmetic skin-select event: rolls a rarity rank (once) and emits the

@@ -1528,9 +1528,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         username: account.username,
         ...meta,
       }).catch((err) => logger.error({ err }, 'suspicious registration report failed'));
-      // Capture the referral when this account signed up via a card link
-      // (?ref=<slug>). Best-effort: never block or fail registration on it.
-      void captureReferral(account.id, body.ref).catch((err) =>
+      // Capture the referral when this account signed up via a referral code or
+      // card link (?ref=<token>). Best-effort: never block or fail registration
+      // on it. meta carries the redemption ip + user-agent for the program's
+      // correlation hashes (docs/prd/refer-a-friend.md).
+      void captureReferral(account.id, body.ref, meta).catch((err) =>
         logger.error({ err }, 'referral capture failed'),
       );
       // emailMissing is always false here (email is required above); sent so the

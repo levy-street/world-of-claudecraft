@@ -409,6 +409,8 @@ export const sv_SE: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Chattvarningar nollställda",
   "moderationHistory.actionRestoreItem": "Föremålsåterställning",
   "moderationHistory.actionRestoreSlot": "Platsåterställning",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "Gillesnamn ändrat",
   "moderationHistory.actionGuildBankPurge": "Rensning av gillesbank",
   "moderationHistory.actionUnknown": "Annan åtgärd",

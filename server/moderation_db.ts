@@ -53,6 +53,11 @@ export const MODERATION_ACTIONS = [
   // folded into the stored reason text.
   'restore_item',
   'restore_slot',
+  // Refer-a-friend program (docs/prd/refer-a-friend.md): voiding a referral
+  // strips its bond and future rewards (reversible via reinstate). Recorded
+  // against the REFEREE account; the referrer id is folded into the reason.
+  'referral_void',
+  'referral_reinstate',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
 
@@ -762,6 +767,50 @@ export async function setAccountAiFlag(input: {
       reason,
     });
     await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Void or reinstate a refer-a-friend referral (docs/prd/refer-a-friend.md),
+ * audited like every moderation write. The subject is the REFEREE account (the
+ * referrals table's primary key); reinstate lands the row back on 'pending'
+ * and the next status refresh re-promotes it from the durable character
+ * levels. Returns false when no referral row exists for the account. The
+ * transactional UPDATE-plus-audit shape mirrors setAccountAiFlag above; the
+ * referral graph's read SQL stays in referrals_db.ts, this write lives here
+ * because the audit primitive is module-private by design.
+ */
+export async function setReferralStatusModerated(input: {
+  refereeAccountId: number;
+  action: 'referral_void' | 'referral_reinstate';
+  adminAccountId: number;
+  reason?: unknown;
+}): Promise<boolean> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  const status = input.action === 'referral_void' ? 'voided' : 'pending';
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const res = await client.query(
+      'UPDATE referrals SET status = $2 WHERE referee_account_id = $1',
+      [input.refereeAccountId, status],
+    );
+    if ((res.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return false;
+    }
+    await recordModerationAction(client, input.action, {
+      accountId: input.refereeAccountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+    return true;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;

@@ -1064,7 +1064,9 @@ export const en_CA: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
       "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.",
       "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.",
-      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.",
+      "name_verdant_valorsteed": "Verdant Valorsteed",
+      "desc_verdant_valorsteed": "A Valorsteed in verdant barding, reserved for recruiters who bring five friends to the vale."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
@@ -3923,6 +3925,9 @@ export const en_CA: EnTranslations = {
       "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
       "entitlement_required": "Verified Seeker entitlement is required.",
       "current_ownership_required": "Current Seeker Genesis Token ownership is required."
+    },
+    "referrals": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const en_CA: EnTranslations = {
       "pristine_claw": {
         "name": "Pristine Claw"
       },
+      "reins_verdant_valorsteed": {
+        "name": "Reins of the Verdant Valorsteed"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },
@@ -16895,6 +16903,16 @@ export const en_CA: EnTranslations = {
         "sender": "Tinker Gizzel",
         "subject": "MASTERY, kaboom",
         "body": "A major of yours hit mastery, the very TOP, kaboom, the whole ladder, done. I do not hand out praise, I hand out fuses, but here, take both: you are brilliant and slightly terrifying. Go make the mountains nervous."
+      },
+      "referral_level10_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your recruit finds their footing",
+        "body": "Word arrives that a friend you brought to the vale has reached their tenth season of growth. The realm grows stronger for every hand you bring to it, and the Ravenpost carries you a small token of thanks.\n\nWings up,\nThe Ravenpost"
+      },
+      "referral_mount_reward": {
+        "sender": "The Ravenpost",
+        "subject": "A steed for the Recruiter",
+        "body": "Five friends you have brought to the vale, and five have made it their home. The stables of Eastbrook have set aside something no coin can buy: a Valorsteed in verdant barding, reserved for those who build the realm itself.\n\nRide well,\nThe Ravenpost"
       }
     },
     "itemSets": {

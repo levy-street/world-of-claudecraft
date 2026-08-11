@@ -691,6 +691,17 @@ const baseEnTable = {
   'dfinder.proposalReady': 'A dungeon group is ready. Confirm your slot now.',
   'dfinder.groupChanged': 'Your group changed and left the Dungeon Finder queue.',
   'dfinder.listingFull': 'Your group listing is now full.',
+  // Refer-a-friend bond + Summon a Friend (src/sim/bond_buff.ts,
+  // docs/prd/refer-a-friend.md). The refusal toasts are placeholder-free, so
+  // they register in the EXACT matcher automatically; the summoned notice is
+  // parameterized and matched by a RULE below. The summoner-side arrival line
+  // reuses the existing '{name} answers your summons.' pet rule verbatim.
+  'error.noRecruitBond': 'You have no recruit bond.',
+  'error.summonRecovering': 'Summon a Friend is still recovering.',
+  'error.bondFriendNotInParty': 'Your bonded friend is not in your party.',
+  'error.bondFriendDead': 'Your bonded friend is dead.',
+  'error.summonInstance': 'You cannot summon into or out of an instance.',
+  'log.summonedByFriend': '{name} summons you to their side.',
 } as const;
 
 const petEnTable = {
@@ -10999,6 +11010,13 @@ const RULES: Rule[] = [
   {
     re: /^(.+) answers your summons\.$/,
     build: (m) => tSim('log.petAnswersSummons', { name: locMob(m[1]) }),
+  },
+  // Refer-a-friend Summon a Friend (bond_buff.ts): the partner-side notice.
+  // The name is a player name, spliced verbatim (locMob passes unknown names
+  // through unchanged, matching the pet rule above).
+  {
+    re: /^(.+) summons you to their side\.$/,
+    build: (m) => tSim('log.summonedByFriend', { name: m[1] }),
   },
   {
     re: /^Your pet's Growl is ready\. (Auto-taunt is (?:on|off)\.)$/,

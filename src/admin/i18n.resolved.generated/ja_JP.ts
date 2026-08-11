@@ -409,6 +409,8 @@ export const ja_JP: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "チャット違反回数リセット",
   "moderationHistory.actionRestoreItem": "アイテム復元",
   "moderationHistory.actionRestoreSlot": "スロット復元",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "ギルド名変更",
   "moderationHistory.actionGuildBankPurge": "ギルド銀行アイテムの削除",
   "moderationHistory.actionUnknown": "その他のアクション",

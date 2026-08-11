@@ -608,6 +608,10 @@ export const COMMAND_NAMES = [
   // payload, the sim resolves the previous enemy in the same ordered list Tab
   // walks forward. Appended because wire tokens are never reordered.
   'tabPrev',
+  // Refer-a-friend Summon a Friend (docs/prd/refer-a-friend.md): teleport the
+  // bonded, partied partner to the sender's side (Sim.summonFriend via
+  // src/sim/bond_buff.ts; overworld only, stamped cooldown).
+  'summon_friend',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -781,6 +785,9 @@ export const COMMAND_FACETS = {
   setMarker: 'IWorldParty',
   clearMarker: 'IWorldParty',
   readyrespond: 'IWorldParty',
+  // Refer-a-friend Summon a Friend: party-scoped co-play teleport (the party
+  // requirement doubles as consent), so it belongs to IWorldParty.
+  summon_friend: 'IWorldParty',
   // IWorldTrade: peer-to-peer trade-window commands (tradeInfo is a snapshot read,
   // no send).
   trade_req: 'IWorldTrade',

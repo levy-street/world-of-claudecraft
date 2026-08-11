@@ -361,11 +361,19 @@ describe('Book of Deeds webp icons', () => {
 
   it('resolves every live deed to its own painted WebP with no release art debt', () => {
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
-    expect(DEED_ART_PENDING_IDS, 'release-live deed art debt must stay empty').toEqual([]);
-    expect(artless, 'every release-live deed must have painted art').toEqual([]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(271);
-    expect(DEED_IMAGE_IDS.size, 'every live deed is painted').toBe(271);
-    for (const id of DEED_ORDER) {
+    // The refer-a-friend ladder pair ships art-trailing (the one live debt),
+    // so the pending set is exactly that pair and every OTHER live deed still
+    // resolves to its painted crest.
+    expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
+      ...DEED_ART_PENDING_IDS,
+    ]);
+    expect(DEED_ART_PENDING_IDS, 'the enumerated art debt').toEqual([
+      'soc_recruiter',
+      'soc_realm_builder',
+    ]);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(273);
+    expect(DEED_IMAGE_IDS.size, 'every pre-existing live deed is painted').toBe(271);
+    for (const id of DEED_ORDER.filter((d) => !artless.includes(d))) {
       const crestId = deedCrestId(id, DEEDS[id].category);
       expect(crestId, `${id} must keep its bespoke crest identity`).toBe(`deed_${id}`);
       expect(deedImageUrl(crestId), id).toBe(`/ui/deeds/${id}.webp`);

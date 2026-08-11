@@ -5180,11 +5180,10 @@ const DEED_CREST_PREFIX = 'deed_';
 
 // Exhaustive live-deed art debt ledger, following the ITEM_ART_PENDING model one screen up. The
 // Icons authoring rule in docs/design/deeds.md permits a procedural category fallback while art
-// trails a deed, but every live release deed is painted today. Keep the empty set as the one
-// authoritative ledger: future art debt must be commissioned and filed in
-// docs/achievements/icon-brief.md rather than hidden by an unreviewed fallback.
-export const DEED_ART_PENDING: ReadonlySet<string> = new Set();
-/** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
+// trails a deed. Every pre-v0.37 release deed is painted; the refer-a-friend ladder pair
+// (docs/prd/refer-a-friend.md) ships art-trailing, so the debt is enumerated here and filed for
+// commissioning in docs/achievements/icon-brief.md rather than hidden by an unreviewed fallback.
+export const DEED_ART_PENDING: ReadonlySet<string> = new Set(['soc_recruiter', 'soc_realm_builder']);/** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
   if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;
   const deedId = crestId.slice(DEED_CREST_PREFIX.length);

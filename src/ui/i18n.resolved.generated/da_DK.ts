@@ -1064,7 +1064,9 @@ export const da_DK: EnTranslations = {
       "desc_stormfeather_griffin": "En kongelig stormgrif, der bevæger sig hen over jorden på runebeslåede kløer, med sammenfoldede vinger.",
       "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.",
       "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
-      "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske."
+      "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske.",
+      "name_verdant_valorsteed": "Verdant Valorsteed",
+      "desc_verdant_valorsteed": "A Valorsteed in verdant barding, reserved for recruiters who bring five friends to the vale."
     },
     "mountTraining": {
       "mountPrompt": "Tryk på {key} for at stige op på trænings-Modgangeren.",
@@ -3923,6 +3925,9 @@ export const da_DK: EnTranslations = {
       "genesis_token_claimed": "Det Seeker Genesis Token er allerede indløst.",
       "entitlement_required": "Der kræves en verificeret Seeker-rettighed.",
       "current_ownership_required": "Der kræves aktuelt ejerskab af et Seeker Genesis Token."
+    },
+    "referrals": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const da_DK: EnTranslations = {
       "pristine_claw": {
         "name": "Uberørt Klo"
       },
+      "reins_verdant_valorsteed": {
+        "name": "Reins of the Verdant Valorsteed"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },
@@ -16895,6 +16903,16 @@ export const da_DK: EnTranslations = {
         "sender": "Tinker Gizel",
         "subject": "MESTERSKAB, kaboom",
         "body": "Et af dine hovedfag ramte mesterskab, det absolutte TOP, kaboom, hele stigen, klaret. Jeg uddeler ikke ros, jeg uddeler lunter, men tag begge her: du er strålende og en smule skræmmende. Gå og gør bjergene nervøse."
+      },
+      "referral_level10_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your recruit finds their footing",
+        "body": "Word arrives that a friend you brought to the vale has reached their tenth season of growth. The realm grows stronger for every hand you bring to it, and the Ravenpost carries you a small token of thanks.\n\nWings up,\nThe Ravenpost"
+      },
+      "referral_mount_reward": {
+        "sender": "The Ravenpost",
+        "subject": "A steed for the Recruiter",
+        "body": "Five friends you have brought to the vale, and five have made it their home. The stables of Eastbrook have set aside something no coin can buy: a Valorsteed in verdant barding, reserved for those who build the realm itself.\n\nRide well,\nThe Ravenpost"
       }
     },
     "itemSets": {

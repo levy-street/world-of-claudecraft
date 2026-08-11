@@ -8119,6 +8119,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'worldContent.mailboxName': '郵箱',
   'worldContent.noticeboardName': '告示板',
   'entities.letters.ravenpost_welcome.sender': '渡鴉郵驛',
+  'entities.letters.referral_level10_reward.sender': '渡鴉郵驛',
+  'entities.letters.referral_level10_reward.subject': '你的新兵站穩了腳跟',
+  'entities.letters.referral_level10_reward.body':
+    '有消息傳來，你引薦到山谷的朋友已完成第十個成長季。你帶來的每一雙手都讓王國更加強盛，渡鴉郵驛謹呈上一份小小的謝禮。\n\n展翅高飛，\n渡鴉郵驛',
+  'entities.letters.referral_mount_reward.sender': '渡鴉郵驛',
+  'entities.letters.referral_mount_reward.subject': '贈予招募者的駿馬',
+  'entities.letters.referral_mount_reward.body':
+    '你已引薦五位朋友來到山谷，五位都在此安了家。東溪鎮的馬廄為你留下了金錢買不到的珍寶：一匹披掛翠綠馬鎧的英勇戰馬，專為建設王國之人保留。\n\n策馬揚鞭，\n渡鴉郵驛',
+  'entities.items.reins_verdant_valorsteed.name': '翠綠英勇戰馬的韁繩',
+  'hudChrome.mounts.name_verdant_valorsteed': '翠綠英勇戰馬',
+  'hudChrome.mounts.desc_verdant_valorsteed':
+    '一匹披掛翠綠馬鎧的英勇戰馬，專為引薦五位好友來到山谷的招募者保留。',
+  'apiError.referrals.invalid_input': '輸入無效。',
   'entities.letters.ravenpost_welcome.subject': '渡鴉如今為你飛翔',
   'entities.letters.ravenpost_welcome.body':
     '旅人：\n\n渡鴉郵驛已在谷地各處設立棲架。請在東溪鎮、沼橋鎮和高望鎮尋找渡鴉石柱：在任意一處，你都可以向其他冒險者寄送信件、錢幣和物品，也可以領取渡鴉為你帶來的一切。\n\n隨信附上一點心意，作為你的第一枚郵票。\n\n展翅高飛，\n渡鴉郵驛',

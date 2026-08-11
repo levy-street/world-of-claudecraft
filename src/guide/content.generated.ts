@@ -5558,6 +5558,22 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Light of the Sanctum",
     "crest": "/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp"
+  },
+  {
+    "id": "soc_recruiter",
+    "name": "Recruiter",
+    "category": "social",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Recruiter"
+  },
+  {
+    "id": "soc_realm_builder",
+    "name": "Realm-Builder",
+    "category": "social",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Realm-Builder"
   }
 ];
 

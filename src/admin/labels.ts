@@ -73,6 +73,10 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   // badge variant (the set_ai / note reasoning).
   restore_item: 'moderationHistory.actionRestoreItem',
   restore_slot: 'moderationHistory.actionRestoreSlot',
+  // Refer-a-friend program (docs/prd/refer-a-friend.md): void strips the
+  // referral's bond and future rewards; reinstate reverses it.
+  referral_void: 'moderationHistory.actionReferralVoid',
+  referral_reinstate: 'moderationHistory.actionReferralReinstate',
   // Realm-scoped rather than account-scoped: written by the guild backoffice into
   // guild_moderation_actions, surfaced only by the realm-wide page. The closed
   // set is server/admin_db.ts GUILD_MODERATION_ACTIONS, pinned in
