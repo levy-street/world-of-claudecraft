@@ -1,7 +1,7 @@
 # Masterwrought: cross-phase state
 
-Current phase: 04 QA COMPLETE (2026-08-10, verdict PASS-WITH-FOLLOWUPS, see the Phase 04 QA ledger bullet: second v0.36.0 sync incl. the Reliquary packet, ten-auditor fan-out, zero blocking anywhere, fix round + fresh review + security round all applied); next is Phase 05 (jewelcrafting base catalog, phase-05-jewelcrafting-base.md), which starts with its own release sync per the delivery contract. Packet authored 2026-08-07.
-Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.36.0`.
+Current phase: 05 QA COMPLETE (2026-08-10, see the Phase 05 QA ledger: v0.37.0 sync + release-merge-audit clean, eight-auditor fan-out with zero blocking anywhere, all four queued rulings taken, fix round incl. the ruled deed pair authored, fresh review applied); next is Phase 06 (inscription base catalog, phase-06-inscription-base.md), which starts with its own release sync per the delivery contract and records its OWN station decision. Packet authored 2026-08-07.
+Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.37.0`.
 
 ## Delivery contract (non-negotiable)
 - The ENTIRE system ships in ONE branch and ONE PR from `feature/masterwrought`. There are
@@ -110,6 +110,12 @@ prog_*_rare family pattern. Rejected for collisions: Copper Torc (Dungeons of
 Dredmor), Iron Signet (Pirate101, LOTRO variants), Polished to Perfection (Trove
 achievement, plus our own Plated to Perfection), Heavy Thorium Band (WoW's
 Heavy-material-ring jewelcrafting register, discarded at design time).
+Phase 05 QA amendment (2026-08-10): Facet and Filigree (prog_jewelcrafting_50),
+CLEAR (exact-phrase zero-hit; the words appear only in unrelated single-word uses:
+Binding of Isaac's Filigree Feather, GW2's The Missing Facet, Lost Ark's Facet of
+Another Level; shared jewelry vocabulary, not a coined term). Grandmaster
+Jewelcrafting (prog_grandmaster_jewelcrafting title) follows the shipped mechanical
+Grandmaster-craft family, generic by construction.
 
 ## Validation matrix (per change type)
 - sim-only: `npx tsc --noEmit` + affected `npx vitest run tests/<file>.ts` +
@@ -975,12 +981,16 @@ Heavy-material-ring jewelcrafting register, discarded at design time).
   the release's mailHeroicMarks + lockToHeroicClaim exposure, inherited
   and accepted, not a phase regression).
 - Phase 04 QA open items and obligations MINTED (append to the working set):
-  (1) RULING WANTED before phase 12 prices Perfecting: heroic-raid epics
-  are NOT sunderable today (item_level.ts registers both heroic arms
-  raid: false, so itemFromRaid admits only the 14 normal-mode ilvl-29
-  epics; the best-geared character has the fewest sunderable items; the
-  boundary is now pinned in tests/masterwrought_materials.test.ts, flip
-  the pin WITH the ruling if the scope widens). (2) The Perfecting/apex
+  (1) RULING TAKEN at Phase 05 QA (2026-08-10): heroic-raid epics ARE
+  sunderable, aligning with the settled any-raid-epic-of-the-tier model
+  (the normal-only boundary was an accident of the item_level.ts
+  raid: false registration, not a decision). IMPLEMENTATION LANDS WITH
+  PHASE 12, where Perfecting pricing and the widened faucet are tuned
+  together: phase 12 flips the eligibility (the registration or the
+  isSunderable predicate) AND moves the phase 04 boundary pin in
+  tests/masterwrought_materials.test.ts in the same change. Until then
+  the pinned normal-only behavior stands deliberately (essence has no
+  consumer before Perfecting exists). (2) The Perfecting/apex
   re-mint arm (phase 12) MUST pass movement: true on its re-mint addItem
   (the release's obtain-tally doctrine; no branch precedent shows the
   flag, the doctrine lives in the Sim.addItem header and reliquary.ts).
@@ -1078,7 +1088,8 @@ Heavy-material-ring jewelcrafting register, discarded at design time).
   to that scarce faucet, and shards stay reserved for the apex band, phase 09). No new
   gathered material is invented, so the phase's stopping rule is not tripped. QA
   re-judges this reading.
-- QUALITY-LADDER DEVIATION, RULING WANTED AT PHASE 05 QA: the phase file's
+- QUALITY-LADDER DEVIATION (ruling APPROVED at Phase 05 QA 2026-08-10, see the
+  rulings bullet below): the phase file's
   "(common/uncommon/rare)" gloss is unshippable at rung 0 for jewelry: QUALITY_STAT_MULT
   is 0 for common and jewelry has no armor axis, so a common ring would carry literally
   nothing, and the recorded content doctrine (profession_items.ts ladder headers) says
@@ -1213,19 +1224,35 @@ Heavy-material-ring jewelcrafting register, discarded at design time).
   real arithmetic, split only by float summation order in roleItemScore), so any
   reordering of the weight-sum terms silently flips twelve specs' ring2; the pin
   makes that visible, and an epsilon-aware tiebreak is a cleanup-phase candidate.
-- RULINGS WANTED AT PHASE 05 QA (beyond the quality-ladder one above): (1) the Trapper
-  pair's default hobby flip to jewelcrafting: correct-by-derivation and now pinned,
-  desirability needs the call. (2) prog_jewelcrafting_50 and prog_grandmaster_jewelcrafting:
-  the hold is AUTHORING, not mechanics (a hobby jewelcrafter can reach 50 and slowly
-  climb toward 125; the forge master teaches the whole catalog; enchanting shipped its
-  50/Grandmaster deeds in the same no-pair-quest position), so decide whether to author
-  both deeds now or keep them deferred with the archetype pairs.
+- RULINGS WANTED AT PHASE 05 QA, ALL TAKEN 2026-08-10 (Fernando, via the QA session):
+  (1) the Trapper pair's default hobby flip to jewelcrafting: KEEP (correct-by-derivation
+  stands; the pin already holds it). (2) prog_jewelcrafting_50 and
+  prog_grandmaster_jewelcrafting: AUTHOR BOTH NOW; authored in the QA fix round (Facet
+  and Filigree renown 5 / Grandmaster Jewelcrafting renown 25 + title, DEED_ORDER 273
+  and 274, in-family crests with committed SVG sources, five non-Latin deed-chunk
+  fills, live-gain-path flow arm; deed pins re-cut 274/3185/60 progression/43 titles,
+  catalog sha re-baselined). The quality-ladder deviation above was likewise APPROVED:
+  uncommon(0)/uncommon(25)/rare(50) ships as authored. The phase 04 sunderability
+  carry-over was also taken; see the Phase 04 QA open items bullet (heroic-raid epics
+  sunderable, implementation with phase 12).
 - RELEASE-FILL OBLIGATIONS MINTED THIS PHASE (the pending registry sees the first
-  group; the deed group it structurally cannot see): 18 new keys x 15 Latin locales
-  (item names + guide keys) pending normally; 104 stripped stale Latin rows (7
-  guide.professions/craftProse keys + faq.a2 + 2 materialHint keys, x 13 locales)
-  pending after the strip; prog_jewelcrafting_rare name+desc in the 13 Latin deed
-  chunks (INVISIBLE to pending=0, add to the release worklist by hand).
+  group; the deed group it structurally cannot see). CORRECTED AT QA: the original
+  bullet said 18 keys and 130 total stripped rows were misadded as 104. (a) 19 new
+  keys x 15 Latin locales pending normally: 9 item names + craftIntro.jewelcrafting +
+  8 craftProse.jewelcrafting keys + hudChrome.reliquary.markFind.masterwork_jewelcrafting
+  (the last was added by coverage round 2 and never reconciled into the old count).
+  (b) 130 stripped stale Latin rows (7 guide.professions/craftProse keys + faq.a2 + 2
+  materialHint keys = 10 keys x 13 locales) pending after the strip. (c) The deed
+  chunks, INVISIBLE to pending=0, add to the release worklist by hand:
+  prog_jewelcrafting_rare name+desc in the 13 Latin chunks, PLUS (minted at QA)
+  prog_jewelcrafting_50 name+desc and prog_grandmaster_jewelcrafting name+desc+title
+  in the same 13 chunks (26 + 65 = 91 deed-channel rows total). (d) Minted at QA: the
+  reworded guide.professions.deedsBody rides the existing stripped-pending rows (the
+  13 Latin strips already happened in the phase; the fill translates the NEW English).
+  (e) Minted at QA: the five non-Latin guide.profPages.faq q1-a8 block is an OLD
+  GENERATION answering an earlier English question set (the QA corrected only the
+  falsified craft count inside a1); regenerate the whole block against the current
+  English at the release fill.
 - QA FOLLOW-UPS (Phase 05, non-blocking): (1) the rung-50 recipes consume
   arcane_essence while rare-band disenchants are their only faucet; watch the essence
   economy when phase 15 verifies power/economy. (2) tests/item_art_audit_builder
@@ -1239,3 +1266,122 @@ Heavy-material-ring jewelcrafting register, discarded at design time).
   contaminated there, restored to HEAD the same hour) and several wrong-repo READS
   briefly produced false "work missing" conclusions, all voided after re-entering the
   worktree. No worktree work was lost; re-run EnterWorktree after any session restart.
+
+## Phase 05 QA ledger (2026-08-10)
+- PRE-FLIGHT: release moved to v0.37.0 (20 commits: AI-architecture CLAUDE.md refresh,
+  the v0.36.0 locale staleness fill, CI shard bounds, tests/monolith_budget.test.ts,
+  server/parse actor roster, docker fixes). Merge b70c9f7aeb: 40 conflict files, all
+  resolved deliberately (root CLAUDE.md hand-merged, keeping the branch's
+  naming-originality block inside the release's rewritten content-obligations bullet;
+  18 overlays took the release side per hunk after verifying every conflicted key was a
+  same-key staleness rewrite and all 12 branch-added keys survive; resolved bundles
+  regenerated via i18n:gen, never hand-merged). release-merge-audit CLEAN: four
+  auto-merged doc overlaps read against both parents (README kept the release refresh
+  plus the branch's Vandric rename; both sim CLAUDE.md files kept the branch sections),
+  no migrated arms, no injected-helper rebinds, no new db-mock sites, no lockfile
+  change; merged-tree tsc + the release's new monolith_budget test green; the v0.36.0
+  fill ate ZERO phase 05 pending rows (verified per-key); portrait source manifest
+  --check FRESH both at the merge and after the QA's own deed additions (deeds are
+  outside its bundle graph). Monolith headroom noted for phase 12: sim.ts 85 lines
+  under its ceiling, server/game.ts 185 under.
+- RULINGS: all four taken (see the amended bullets above): quality ladder APPROVED,
+  Trapper flip KEEP, deed pair AUTHOR NOW (done in this QA), heroic-raid epics
+  SUNDERABLE with implementation at phase 12.
+- AUDIT FAN-OUT (eight auditors, ZERO blocking anywhere): five-agent workflow (budget,
+  coverage, progression, test-decisiveness in an ISOLATED worktree for mutation probes,
+  blast-radius) plus content-obligations-reviewer, frontend-seam-reviewer, and
+  qa-checklist (verdict READY). Dispatch rationale recorded: privacy-security-review
+  and architecture-reviewer deliberately skipped (server surface = one English
+  ReadonlyMap row; sim surface = data plus comment-only edits, parity suite green),
+  per the phase spec's dispatch matrix and the qa-checklist's own judgment.
+- FINDINGS APPLIED (6 commits after the merge): (1) three stale authoring comments
+  (the recipes.ts fine_thorium_ore header, found independently by four auditors; the
+  reliquary.ts phantom trinket slot; the icons.ts pendant/sparkle comment). (2) The
+  material_profession_hint_view supersede arm rebuilt as an explicit
+  CRAFT_NAMING_HINT_KEYS allowlist with exported predicate and direct pins (the
+  craft-neutral dust/essence leads made the old exclusion-shaped check latently wrong
+  for single-craft consumer sets). (3) The five non-Latin faq.a1 rows count-swapped
+  eight to nine (the phase falsified a number inside a pre-existing old-generation
+  block; whole-block regen recorded as a release-fill obligation). (4) The catalog
+  suite hardened: full nine-recipe reagent-literal table (mutation probe f proved a
+  silent ore/dust re-author passed every sim-side suite), WARFARE pvp-rating liveness
+  controls, and the derived equip-gate pin (rare rung-50 requires level 20 via the
+  recipe source registration, uncommon ungated). (5) dev_kit bestBy gained a relative
+  epsilon tie band with the id tiebreak owning real ties (probe h proved a
+  rounding-equivalent refactor flipped seven agility-camp ring2 picks on one ulp);
+  gleaming_thorium_loop is now the stable documented agility-camp ring2, the strength
+  camp keeps riveted_iron_signet on a real score gap; dev-only surface. (6) The ruled
+  deed pair authored (see the rulings bullet for the full record).
+- TEST-DECISIVENESS RECORD: 8 mutation probes in the isolated worktree, 7 reddened the
+  exact guarding test with quoted failure names (rating key, budget formula, forge
+  binding, deed mark drift, reliquary derivation guard, golden both directions,
+  IEEE754 tie), probe f exposed the reagent-count gap fixed above. Pins judged
+  decisive across both new suites; no constant-self-comparisons. The crafting-hub
+  foreignBound pin is membership-only BY DESIGN (the catalog suite solely guards the
+  binding TYPE; recorded so nobody deletes its forge literal believing the hub pin
+  covers it).
+- RECORD-ONLY FACTS the auditors verified (no code change): budget derivation runs off
+  recipe.level + QUALITY_ILVL_BONUS through primaryStatBudget (itemLevelBudget feeds
+  ONLY the craft gold-sink fee; the rung-25 16 = derived-ilvl-16 equality is
+  coincidence). Rung-50 recipes are sell-positive on a self-gathered basis under the
+  locked buyValue-else-sellValue economy rule, same shape as the pre-existing forge
+  ladder (recorded for the phase 15 essence watch). tests/itemization_coverage.test.ts
+  is structurally blind to the nine by its own prior-change charter; jewelry coverage
+  lives in tests/jewelcrafting_catalog.test.ts (plus item_level.test.ts's sweeps
+  exclude crafted outputs by sourceLevel filter). The nine ids are NOT yet in
+  tests/shipped_item_ids.golden.json: the re-mint (UPDATE_SHIPPED_ITEMS=1, review as
+  additions-only) is a RELEASE CLOSE-OUT step for this packet, add it to the PR
+  checklist. XP curve verified: 25 full-gain crafts per rung, 50 minimum to rung 50,
+  cap 125 reachable on the nine recipes alone (225 crafts best path), byte-identical
+  scaffolding to the LADDER_RECIPES crafts, R13 untouched; the 50-deed flow arm now
+  drives ONE live gain step (49 + craft = 50). Dust round trip verified gold-negative
+  in every branch with live numbers (40c hard cash out per loop vs at most 24c dust
+  back, expected all-in -47c; vendor branch -36c; material-positive +1 to +2 dust as
+  designed). tests/professions_hobby_craft.test.ts change was comment-only (citation
+  retarget); tests/item_art_consistency.test.ts was a REAL pin move the build ledger
+  never named (the nine-WebP art-audit admission, self-checking digests), recorded
+  here as its justification. The nine jewelry pieces now enter the PBE boost BiS
+  ring/neck pools (outcome unchanged today: 2-to-8-point pieces cannot outscore the
+  epic picks; a future big-stat rung would silently change boost kits through
+  server/pbe_boost.ts bisKitForRole). npm run asset:budget overages (env, textures,
+  models/*) are pre-existing repo-wide debt untouched by this phase (the ten phase
+  WebPs live under ui/, outside those groups). Pre-existing, not ours, left alone:
+  the icons.ts:5278 console.warn em dash (repo no-dash debt) and the
+  cs_CZ.dgn_sanctum_speed.name release-tier deed_i18n red.
+- DEED-AUTHORING OBLIGATION DISCOVERED (durable, for every future TITLE deed): the
+  locked titles-page rule means a new non-hidden title deed ALSO owes a
+  horizons_titles slot in src/sim/content/reliquary.ts in the same change (the
+  Grandmaster Jewelcrafting title reddened the derivation pin in
+  tests/reliquary_content.test.ts exactly as designed; slot appended, totals
+  re-pinned 377 slots / 342 full / 313 character, wiki regenerated). The deed
+  authoring recipe in docs/design/deeds.md does not name this coupling; phase 06+
+  should treat title-deed = deeds.ts + reliquary titles slot as one unit.
+- FIX-ROUND REVIEW (both reviewers reported; every finding applied or judged with the
+  file open): the fresh reviewer found 2 blocking + 6 should-fix + 7 nits; the deed
+  obligations pass found 0 blocking + 1 should-fix + 3 nits. Dispositions: (1) biome
+  red on the hint view, fixed. (2) THE QA'S OWN faq.a1 count swap was WRONG and is
+  REVERTED: that "eight" counts RAISEABLE crafts (nine content crafts minus the
+  Engineering holdout whose ladder waits for the Bombardier oath), so jewelcrafting
+  did not falsify it and the swap contradicted whatBody in the same locales; the
+  original frontend-seam finding's falsified-premise was itself mistaken. The
+  non-Latin profPages.faq q1-a8 block desync stands recorded for the release fill
+  (obligation (e) above, corrected wording). (3) The dev-kit epsilon band initially
+  flipped seven agility-camp ring2 picks to a dead-stat int ring on the id
+  alphabet; re-cut with an IDENTITY-FIRST tiebreak (a tied pick prefers the item
+  carrying the role's weighted stats), which restores every shipped pick while
+  keeping the one-ulp robustness. Net dev-kit behavior change across the whole QA:
+  ZERO. (4) The hint-view allowlist gained its two-way contract pin against the
+  resolved English leads. (5) Deed earnability is now DERIVED in deeds_content:
+  for every craftSkill deed, some shipped rung must grant one point short of the
+  threshold under the craft-as-major ceiling (enchanting via the soft disenchant
+  arm); the cap-only check would have greenlit a gain-path-less deed. (6) The three
+  Masterwrought crest hashes are pinned beside the provenance record and CREDITS
+  (the PR #3295 authored-art lesson). (7) deedsBody's jewelcrafting parenthetical
+  dropped in English + five overlays (eight of nine crafts have a rare-tier deed,
+  so the singling-out misled). (8) Reachability prose gained the attunement caveat
+  in deeds.ts + deeds.md. (9) Comment re-cuts: deed_i18n lead line, dev_kit tie
+  notes (anchor bound, order caveat, NaN seed), "nothing about the picker changed".
+  Recorded, no change: server/pbe_boost.ts bestBySlot keeps a first-wins tie policy
+  distinct from dev_kit's identity-then-id (untouched, out of scope, noted for the
+  next reader); the state.md build-ledger EXECUTION RECORD keeps its historical
+  272/3155/58 and manifest numbers as written (the QA re-cut lives in this ledger).

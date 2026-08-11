@@ -11,7 +11,7 @@
 | 04 | Materials backbone | complete | 2026-08-08 | 2026-08-08 |
 | 04 QA | verify | complete | 2026-08-10 | 2026-08-10 |
 | 05 | Jewelcrafting base catalog | complete | 2026-08-10 | 2026-08-10 |
-| 05 QA | verify | pending | | |
+| 05 QA | verify | complete | 2026-08-10 | 2026-08-10 |
 | 06 | Inscription base catalog | pending | | |
 | 06 QA | verify | pending | | |
 | 07 | Intermediates and the Quickening Catalyst | pending | | |
@@ -149,6 +149,26 @@ never future-PR items, per the delivery contract in `state.md`).
   wiki-refresh's Gallowmere reintroduction (en + 3 transliterations, guard armed).
   All decisions, numbers, obligations, and the review record in the state.md
   Phase 04 ledger.
+- Phase 05 QA (verify): PASS. Release/v0.37.0 synced first (merge b70c9f7aeb, 40
+  conflict files: CLAUDE.md hand-merged keeping the naming-originality block,
+  overlays took the release's v0.36.0 staleness fill per hunk with all branch keys
+  verified surviving, bundles regenerated; release-merge-audit CLEAN, the fill ate
+  zero phase pending rows, portrait manifest fresh). Eight-auditor fan-out (five-agent
+  workflow incl. test-decisiveness in an isolated worktree running 8 mutation probes,
+  plus content-obligations, frontend-seam, qa-checklist): ZERO blocking anywhere; the
+  catalog verified formula-exact, R14-clean, economy-exact, XP-sane (50 crafts to
+  rung 50, cap reachable), station decision code-true. All four queued rulings taken:
+  quality ladder APPROVED, Trapper flip KEEP, deed pair AUTHOR NOW, heroic-raid
+  epics SUNDERABLE (implementation with phase 12). Fix round, six commits: three
+  stale comments, the hint-view supersede arm rebuilt as an explicit craft-naming
+  allowlist with pins, five non-Latin faq.a1 count corrections, the full
+  reagent-literal table + pvp liveness + equip-gate pins (closing the one real
+  coverage gap a mutation probe exposed), the dev-kit epsilon tie band (one-ulp
+  IEEE754 fragility proven and retired), and the ruled deed pair authored in full
+  (Facet and Filigree + Grandmaster Jewelcrafting, crests, fills, 274/3185/43-title
+  pins, falsified deedsBody + deferred-pair prose reworded). Ledger corrections:
+  release-fill counts fixed (19 keys, 130 stripped rows, 91 deed-channel rows).
+  Fresh fix-round review + deed obligations review applied. Full ledger in state.md.
 - Phase 05 (2026-08-10): jewelcrafting exists. Nine trainer-taught jewelry items
   across the 0/25/50 rungs (2 rings + 1 necklace per rung, str/int ring + agi neck
   identities, budgets exactly formula-derived at ilvl 11/16/23: 3/4/8 points, pure
