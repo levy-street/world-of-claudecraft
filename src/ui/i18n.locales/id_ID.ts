@@ -6971,6 +6971,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Gamepad juga berfungsi, dan dukungan kontroler aktif secara bawaan. Tuas kiri untuk bergerak, tuas kanan untuk mengarahkan kamera, dan tombol muka serta bahu menangani kemampuanmu, melompat, dan berinteraksi. Buka sebuah jendela seperti tasmu untuk memunculkan penunjuk di layar, dan menu permainan dinavigasi langsung dengan D-pad dan tombol muka. Kamu bisa memetakan ulang tombol dan menyetel deadzone tuas, kecepatan kamera, getaran, serta arah pandang terbalik dari pengaturan kontroler di opsi.',
   'guide.controls.controllerHeading': 'Di kontroler',
   'guide.controls.cycleFriendly': 'Putar target kawan',
+  'guide.controls.targetPrev': 'Putar target mundur',
   'guide.controls.gameMenu': 'Buka menu permainan dan opsi',
   'guide.controls.groupCamera': 'Kamera',
   'guide.controls.groupCombat': 'Penargetan dan pertarungan',
@@ -8457,6 +8458,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'Roda Emote',
   'hudChrome.keybinds.targetFriendly': 'Bidik Sekutu Terdekat',
   'hudChrome.keybinds.targetFriendlyNext': 'Putar Bidikan Sekutu',
+  'hudChrome.keybinds.targetPrev': 'Putar Bidikan Mundur',
   'hudChrome.keybinds.mount': 'Naiki / Turun',
   'hudChrome.landing.highContrast': 'Kontras Tinggi',
   'hudChrome.landing.highContrastAria':

@@ -6065,6 +6065,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     "Gamepads virker også, og controllerstyring er slået til som standard. Venstre pind bevæger dig, højre pind sigter kameraet, og knapperne foran og på skuldrene dækker dine evner, hop og interaktion. Åbn et vindue som dine tasker for at få en markør frem på skærmen, og spillets menu navigeres direkte med D-pad'en og knapperne foran. Du kan ombinde knapperne og justere pindens dødzone, kamerahastighed, vibration og omvendt kig fra controllerafsnittet i spillets indstillinger.",
   'guide.controls.controllerHeading': 'På en controller',
   'guide.controls.cycleFriendly': 'Skift venligt mål',
+  'guide.controls.targetPrev': 'Skift mål baglæns',
   'guide.controls.gameMenu': 'Åbn spilmenu og indstillinger',
   'guide.controls.groupCamera': 'Kamera',
   'guide.controls.groupCombat': 'Målretning og kamp',
@@ -7681,6 +7682,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'Følelseshjul',
   'hudChrome.keybinds.targetFriendly': 'Sigt mod nærmeste allierede',
   'hudChrome.keybinds.targetFriendlyNext': 'Skift allieret mål',
+  'hudChrome.keybinds.targetPrev': 'Skift mål baglæns',
   'hudChrome.landing.highContrast': 'Høj kontrast',
   'hudChrome.landing.highContrastAria':
     'Slå baggrund med høj kontrast til/fra: deaktiverer den bevægende trailer, så teksten på startskærmen forbliver læselig',

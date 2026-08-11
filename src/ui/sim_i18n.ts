@@ -7885,6 +7885,31 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
 };
 
+const ARENA_QUEUE_AUTO_LEAVE_1V1: Record<SupportedLanguage, string> = {
+  en: 'You leave the Ashen Coliseum queue.',
+  en_CA: 'You leave the Ashen Coliseum queue.',
+  es: 'Sales de la cola del Coliseo Cinéreo.',
+  es_ES: 'Sales de la cola del Coliseo Cinéreo.',
+  fr_FR: 'Vous quittez la file du Colisée cendré.',
+  fr_CA: 'Vous quittez la file du Colisée cendré.',
+  it_IT: 'Esci dalla coda del Colosseo Cinereo.',
+  de_DE: 'Ihr verlasst die Warteschlange des Aschenen Kolosseums.',
+  zh_CN: '你离开了灰烬斗技场队列。',
+  zh_TW: '你離開了灰燼競技場佇列。',
+  ko_KR: '잿빛 원형경기장 대기열에서 나왔습니다.',
+  ja_JP: '灰の闘技場のキューを離れました。',
+  pt_BR: 'Você sai da fila do Coliseu Cinzento.',
+  ru_RU: 'Вы покидаете очередь Пепельного Колизея.',
+  cs_CZ: 'Opouštíš frontu Ashen Coliseum.',
+  nl_NL: 'Je verlaat de wachtrij van het Ashen Coliseum.',
+  pl_PL: 'Opuszczasz kolejkę Ashen Coliseum.',
+  id_ID: 'Kamu keluar dari antrean Ashen Coliseum.',
+  tr_TR: 'Ashen Coliseum sırasından ayrılıyorsun.',
+  sv_SE: 'Du lämnar Ashen Coliseums kö.',
+  vi_VN: 'Bạn rời hàng đợi Ashen Coliseum.',
+  da_DK: 'Du forlader Ashen Coliseum-køen.',
+};
+
 const PET_DICT_EN: Record<PetSimMessageKey, string> = {
   'error.noPet': 'You have no pet.',
   'error.petsNotAllowedInDelves': 'Pets are not allowed inside the delves.',
@@ -8412,7 +8437,12 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
     lang,
-    { ...baseEnTable, ...BASE_DICT[lang], ...PET_DICT[lang] },
+    {
+      ...baseEnTable,
+      ...BASE_DICT[lang],
+      ...PET_DICT[lang],
+      'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
+    },
   ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
 
@@ -9000,6 +9030,37 @@ export const ARENA_EXTRA: Record<SupportedLanguage, Record<ArenaExtraKey, string
 function tArenaExtra(key: ArenaExtraKey, params?: InterpolationValues): string {
   const table = ARENA_EXTRA[getLanguage()] ?? ARENA_EXTRA.en;
   return interpolate(table[key] ?? ARENA_EXTRA.en[key], params);
+}
+
+const ARENA_MIN_LEVEL_QUEUE_ERROR: Record<SupportedLanguage, string> = {
+  en: 'You must be level {level} to queue for the arena.',
+  en_CA: 'You must be level {level} to queue for the arena.',
+  es: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  es_ES: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  fr_FR: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  fr_CA: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  it_IT: "Devi essere di livello {level} per metterti in coda per l'arena.",
+  de_DE: 'Ihr müsst Stufe {level} sein, um Euch für die Arena anzumelden.',
+  zh_CN: '你必须达到 {level} 级才能加入竞技场队列。',
+  zh_TW: '你必須達到 {level} 級才能加入競技場佇列。',
+  ko_KR: '투기장 대기열에 들어가려면 레벨 {level}이어야 합니다.',
+  ja_JP: 'アリーナキューに入るにはレベル {level} が必要です。',
+  pt_BR: 'Você precisa estar no nível {level} para entrar na fila da arena.',
+  ru_RU: 'Чтобы встать в очередь арены, нужен уровень {level}.',
+  cs_CZ: 'Pro vstup do fronty arény musíš mít úroveň {level}.',
+  nl_NL: 'Je moet niveau {level} zijn om in de arena-wachtrij te gaan.',
+  pl_PL: 'Musisz mieć poziom {level}, aby dołączyć do kolejki areny.',
+  id_ID: 'Kamu harus level {level} untuk masuk antrean arena.',
+  tr_TR: 'Arena kuyruğuna girmek için seviye {level} olmalısın.',
+  sv_SE: 'Du måste vara nivå {level} för att gå med i arenakön.',
+  vi_VN: 'Bạn phải đạt cấp {level} để vào hàng đợi đấu trường.',
+  da_DK: 'Du skal være niveau {level} for at gå i arenakø.',
+};
+
+function tArenaMinLevelQueueError(level: string): string {
+  return interpolate(ARENA_MIN_LEVEL_QUEUE_ERROR[getLanguage()] ?? ARENA_MIN_LEVEL_QUEUE_ERROR.en, {
+    level,
+  });
 }
 
 // Thornhollow Fields 5v5 capture-the-flag emit strings (src/sim/social/battleground.ts).
@@ -11050,7 +11111,7 @@ const RULES: Rule[] = [
   },
   {
     re: /^You must be level (\d+) to queue for the arena\.$/,
-    build: (m) => tSim('error.arenaMinLevel', { level: m[1] }),
+    build: (m) => tArenaMinLevelQueueError(m[1]),
   },
   {
     re: /^(.+) must be at least level (\d+) to queue for the arena\.$/,
@@ -11306,6 +11367,7 @@ const RULES: Rule[] = [
     re: /^You join the Ashen Coliseum 2v2 queue\. Stand by for opponents[.…]{1,3}$/,
     build: () => tArenaExtra('join2v2'),
   },
+  { re: /^You leave the Ashen Coliseum queue\.$/, build: () => t('hud.logs.arenaLeave') },
   { re: /^You leave the Ashen Coliseum 2v2 queue\.$/, build: () => tArenaExtra('leave2v2') },
   {
     re: /^Your team leaves the Ashen Coliseum 2v2 queue\.$/,

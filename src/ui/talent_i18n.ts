@@ -11227,7 +11227,12 @@ export function tTalent(request: TalentTranslationRequest): string {
     );
   }
   if (request.kind === 'talentChoice') {
-    if (request.field === 'name') return translateTitle(request.choice.name, lang);
+    if (request.field === 'name') {
+      if (request.choice.id === 'war_row_double_charge') {
+        return RETAINED_ROW_TITLE_OVERRIDES[lang]?.['Double Charge'] ?? request.choice.name;
+      }
+      return translateTitle(request.choice.name, lang);
+    }
     const retainedDescriptions = RETAINED_ROW_DESCRIPTION_OVERRIDES[lang] as
       | Readonly<Record<string, string>>
       | undefined;

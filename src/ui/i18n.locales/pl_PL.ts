@@ -6306,6 +6306,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Pady również działają, a obsługa kontrolera jest domyślnie włączona. Lewa gałka odpowiada za ruch, prawa steruje kamerą, a przyciski akcji i bumpery obsługują twoje umiejętności, skakanie i interakcję. Otwórz okno, na przykład torby, aby przywołać ekranowy wskaźnik, a po menu gry poruszasz się wprost krzyżakiem i przyciskami akcji. W ustawieniach kontrolera w opcjach możesz zmienić przypisania przycisków oraz dostosować martwą strefę gałek, szybkość kamery, wibracje i odwrócone patrzenie.',
   'guide.controls.controllerHeading': 'Na kontrolerze',
   'guide.controls.cycleFriendly': 'Przełączaj przyjazny cel',
+  'guide.controls.targetPrev': 'Przełączaj cel wstecz',
   'guide.controls.gameMenu': 'Otwórz menu gry i opcje',
   'guide.controls.groupCamera': 'Kamera',
   'guide.controls.groupCombat': 'Namierzanie i walka',
@@ -7872,6 +7873,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'Koło emotek',
   'hudChrome.keybinds.targetFriendly': 'Obierz najbliższego sojusznika',
   'hudChrome.keybinds.targetFriendlyNext': 'Przełączaj przyjazny cel',
+  'hudChrome.keybinds.targetPrev': 'Przełączaj cel wstecz',
   'hudChrome.landing.highContrast': 'Wysoki kontrast',
   'hudChrome.landing.highContrastAria':
     'Przełącz tło o wysokim kontraście: wyłącza ruchomy zwiastun, aby tekst ekranu startowego pozostał czytelny',

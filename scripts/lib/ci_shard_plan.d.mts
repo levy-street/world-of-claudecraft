@@ -18,8 +18,6 @@ export function buildFloor(opts: {
   changedTestFiles: string[];
 }): { floor: string[]; missingGuards: string[] };
 
-export function resolveLocalBin(name: string): string;
-
 export interface ShardLeg {
   name: string;
   cmd: string;

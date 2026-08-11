@@ -787,6 +787,11 @@ export const hudChromeStrings = {
     emoteWheel: 'Emote Wheel',
     targetFriendly: 'Target Nearest Friendly',
     targetFriendlyNext: 'Cycle Friendly Target',
+    // The backward half of the Tab cycle (Shift+Tab by default); the forward
+    // half is the `hud` catalog's existing `target` row. Worded as a CYCLE, not
+    // as "previous enemy", so it cannot read as a classic last-target memory:
+    // this bind walks the same ordered list backwards, it remembers nothing.
+    targetPrev: 'Cycle Target Backward',
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
     valecup: 'Vale Cup',

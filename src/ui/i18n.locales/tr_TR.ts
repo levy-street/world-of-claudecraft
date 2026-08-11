@@ -6898,6 +6898,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Oyun kumandaları da çalışır ve kumanda desteği varsayılan olarak açıktır. Sol çubuk hareket ettirir, sağ çubuk kamerayı yöneltir, yüz ve omuz düğmeleri ise yeteneklerinizi, zıplamayı ve etkileşimi karşılar. Çantalarınız gibi bir pencere açtığınızda ekran üstü bir işaretçi belirir ve oyun menüsü doğrudan yön tuşları ve yüz düğmeleriyle gezinir. Düğmeleri yeniden atayabilir ve çubuk ölü bölgesini, kamera hızını, titreşimi ve ters bakışı seçeneklerdeki kumanda ayarlarından düzenleyebilirsiniz.',
   'guide.controls.controllerHeading': 'Oyun kumandasıyla',
   'guide.controls.cycleFriendly': 'Dost hedefler arasında geç',
+  'guide.controls.targetPrev': 'Hedefler arasında geri geç',
   'guide.controls.gameMenu': 'Oyun menüsünü ve seçenekleri aç',
   'guide.controls.groupCamera': 'Kamera',
   'guide.controls.groupCombat': 'Hedefleme ve savaş',
@@ -8372,6 +8373,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'İfade Çarkı',
   'hudChrome.keybinds.targetFriendly': 'En Yakın Dostu Hedefle',
   'hudChrome.keybinds.targetFriendlyNext': 'Dost Hedefler Arasında Geç',
+  'hudChrome.keybinds.targetPrev': 'Hedefler Arasında Geri Geç',
   'hudChrome.keybinds.mount': 'Bin / İn',
   'hudChrome.landing.highContrast': 'Yüksek Kontrast',
   'hudChrome.landing.highContrastAria':

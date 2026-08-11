@@ -46,6 +46,7 @@ import { localizeSimAuraName, localizeSimText, DICT as simDICT } from '../src/ui
 import {
   hasTalentTitleOverride,
   renderTalentManifestEntry,
+  type TalentTranslationManifestEntry,
   talentTranslationManifest,
 } from '../src/ui/talent_i18n';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -59,7 +60,14 @@ beforeAll(async () => {
   await Promise.all(supportedLanguages.map((lang) => ensureLocaleLoaded(lang)));
 });
 
-const locales: Record<string, any> = {
+type LocaleTable = typeof en;
+type LocaleEntityRoot = Record<string, Partial<Record<string, unknown>>>;
+type LocalizedDict = Record<string, Record<string, string>>;
+interface StatusRegistryEntry {
+  locales: Record<string, { state: string }>;
+}
+
+const locales: Record<string, LocaleTable> = {
   en,
   es,
   es_ES,
@@ -104,7 +112,7 @@ if (!fs.existsSync(statusRegistryPath))
     'src/ui/i18n.status.json is missing - run `npm run i18n:gen` (pretest does this for `npm test`).',
   );
 const statusRegistry = JSON.parse(fs.readFileSync(statusRegistryPath, 'utf8')) as {
-  keys: Record<string, any>;
+  keys: Record<string, StatusRegistryEntry>;
   blockedSource: { channel: string; text: string }[];
 };
 const COPIED_ALLOW: ReadonlySet<string> = (() => {
@@ -195,7 +203,9 @@ describe('L3/L4: additional server-message coverage', () => {
 
   it('localizes the (combat) /who status flag', () => {
     setLanguage('es');
-    const out = localizeServerText('Carl - level 12 warrior - Eastbrook Vale (combat)')!;
+    const out = localizeServerText('Carl - level 12 warrior - Eastbrook Vale (combat)');
+    expect(out).not.toBeNull();
+    if (out === null) return;
     expect(out).toContain('Carl');
     expect(out.toLowerCase()).not.toContain('(combat)');
     setLanguage('en');
@@ -264,9 +274,9 @@ describe('H2: game.* values keep required diacritics', () => {
 // --- M1: quest narratives preserve {playerName} ---
 describe('M1: quest narratives preserve {playerName}', () => {
   it('every locale keeps {playerName} wherever English uses it', () => {
-    const enQuests = en.entities.quests as Record<string, any>;
+    const enQuests = en.entities.quests as LocaleEntityRoot;
     for (const lang of supportedLanguages) {
-      const locQuests = locales[lang].entities.quests as Record<string, any>;
+      const locQuests = locales[lang].entities.quests as LocaleEntityRoot;
       for (const qid of Object.keys(enQuests)) {
         for (const field of ['text', 'completion'] as const) {
           const ev = enQuests[qid]?.[field];
@@ -305,12 +315,13 @@ describe('H3: DICT key parity, non-empty values, placeholder integrity', () => {
     }
   }
   it('server_i18n DICT is complete across all locales', () =>
-    checkDict(serverDICT as any, 'server'));
-  it('admin DICT is complete across all locales', () => checkDict(adminDICT as any, 'admin'));
+    checkDict(serverDICT as LocalizedDict, 'server'));
+  it('admin DICT is complete across all locales', () =>
+    checkDict(adminDICT as LocalizedDict, 'admin'));
 
   it('L7: no admin DICT value contains raw HTML markup', () => {
     for (const lang of Object.keys(adminDICT)) {
-      for (const [k, v] of Object.entries((adminDICT as any)[lang])) {
+      for (const [k, v] of Object.entries((adminDICT as LocalizedDict)[lang])) {
         expect(/[<>]/.test(v as string), `admin ${lang}.${k} contains < or >`).toBe(false);
       }
     }
@@ -344,16 +355,18 @@ describe('H3: DICT key parity, non-empty values, placeholder integrity', () => {
   // untranslated key; that becomes a `pending` row and is blocked at the release
   // gate, not flagged on every PR.
   it.runIf(RELEASE_TIER)('H3b: server DICT has no un-allowlisted copied-English', () =>
-    checkNoCopiedEnglish(serverDICT as any, 'server'),
+    checkNoCopiedEnglish(serverDICT as LocalizedDict, 'server'),
   );
   it.runIf(RELEASE_TIER)('H3b: admin DICT has no un-allowlisted copied-English', () =>
-    checkNoCopiedEnglish(adminDICT as any, 'admin'),
+    checkNoCopiedEnglish(adminDICT as LocalizedDict, 'admin'),
   );
 });
 
 // --- H1b: no two talents in the same class tree may render with the same name ---
 describe('H1b: talent names are unique within a class tree', () => {
-  const nameEntries = talentTranslationManifest().filter((e) => e.field === 'name');
+  const nameEntries: TalentTranslationManifestEntry[] = talentTranslationManifest().filter(
+    (e) => e.field === 'name',
+  );
   it('has zero same-tree name collisions in any translated locale', () => {
     for (const lang of supportedLanguages) {
       if (lang === 'en' || lang === 'en_CA') continue;
@@ -361,9 +374,12 @@ describe('H1b: talent names are unique within a class tree', () => {
       const perClass = new Map<string, Map<string, Set<string>>>();
       for (const e of nameEntries) {
         const rendered = renderTalentManifestEntry(e);
-        const cls = (e as any).classId as string;
-        if (!perClass.has(cls)) perClass.set(cls, new Map());
-        const m = perClass.get(cls)!;
+        const cls = e.classId;
+        let m = perClass.get(cls);
+        if (!m) {
+          m = new Map();
+          perClass.set(cls, m);
+        }
         if (!m.has(rendered)) m.set(rendered, new Set());
         m.get(rendered)?.add(e.source);
       }
@@ -416,8 +432,8 @@ describe('M1c: entity strings preserve every placeholder (incl {className})', ()
   const phSet = (s: string) =>
     new Set([...String(s).matchAll(/\{([A-Za-z0-9_]+)\}/g)].map((m) => m[1]));
   function checkFields(
-    enRoot: Record<string, any>,
-    getLoc: (lang: string) => Record<string, any>,
+    enRoot: LocaleEntityRoot,
+    getLoc: (lang: string) => LocaleEntityRoot,
     kind: string,
     fields: string[],
   ) {
@@ -442,15 +458,20 @@ describe('M1c: entity strings preserve every placeholder (incl {className})', ()
     }
   }
   it('quests keep text/completion placeholders', () => {
-    checkFields(en.entities.quests as any, (l) => locales[l].entities.quests as any, 'quest', [
-      'text',
-      'completion',
-    ]);
+    checkFields(
+      en.entities.quests as LocaleEntityRoot,
+      (l) => locales[l].entities.quests as LocaleEntityRoot,
+      'quest',
+      ['text', 'completion'],
+    );
   });
   it('NPC greetings keep {className}/{playerName}', () => {
-    checkFields(en.entities.npcs as any, (l) => locales[l].entities.npcs as any, 'npc', [
-      'greeting',
-    ]);
+    checkFields(
+      en.entities.npcs as LocaleEntityRoot,
+      (l) => locales[l].entities.npcs as LocaleEntityRoot,
+      'npc',
+      ['greeting'],
+    );
   });
 });
 
@@ -640,15 +661,14 @@ describe('S2: sim_i18n DICT is complete across all locales', () => {
     const enKeys = Object.keys(simDICT.en);
     for (const lang of supportedLanguages) {
       expect(Object.hasOwn(simDICT, lang), `sim DICT missing locale ${lang}`).toBe(true);
-      expect(Object.keys((simDICT as any)[lang]).length, `sim ${lang} key count`).toBe(
-        enKeys.length,
-      );
+      const dict = simDICT as LocalizedDict;
+      expect(Object.keys(dict[lang]).length, `sim ${lang} key count`).toBe(enKeys.length);
       for (const k of enKeys) {
-        const v = (simDICT as any)[lang][k];
+        const v = dict[lang][k];
         expect(typeof v === 'string' && v.trim().length > 0, `sim ${lang}.${k} empty/missing`).toBe(
           true,
         );
-        expect(ph(v), `sim ${lang}.${k} placeholders`).toBe(ph((simDICT as any).en[k]));
+        expect(ph(v), `sim ${lang}.${k} placeholders`).toBe(ph(dict.en[k]));
       }
     }
   });

@@ -108,7 +108,7 @@ function nonPlayerAuraHp(aura: Aura): number {
 }
 
 export function applyNonPlayerStatAura(
-  ctx: SimContext,
+  _ctx: SimContext,
   target: Entity,
   aura: Aura,
   direction: 1 | -1,

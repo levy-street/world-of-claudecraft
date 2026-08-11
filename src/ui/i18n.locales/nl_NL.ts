@@ -6314,6 +6314,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Gamepads werken ook, en controllerondersteuning staat standaard aan. De linkerstick beweegt, de rechterstick richt de camera, en de gezichts- en schouderknoppen dekken je vaardigheden, springen en interageren. Open een venster zoals je tassen om een aanwijzer op het scherm op te roepen, en door het spelmenu navigeer je rechtstreeks met de D-pad en de gezichtsknoppen. Je kunt de knoppen opnieuw toewijzen en de stickdeadzone, camerasnelheid, trilling en omgekeerd kijken aanpassen bij de controllerinstellingen in de opties.',
   'guide.controls.controllerHeading': 'Op een controller',
   'guide.controls.cycleFriendly': 'Door bondgenoten bladeren',
+  'guide.controls.targetPrev': 'Achteruit door doelwitten bladeren',
   'guide.controls.gameMenu': 'Spelmenu en opties openen',
   'guide.controls.groupCamera': 'Camera',
   'guide.controls.groupCombat': 'Doelwit kiezen en gevecht',
@@ -7851,6 +7852,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'Emotewiel',
   'hudChrome.keybinds.targetFriendly': 'Dichtstbijzijnde Bondgenoot Aanwijzen',
   'hudChrome.keybinds.targetFriendlyNext': 'Door Bondgenoten Bladeren',
+  'hudChrome.keybinds.targetPrev': 'Achteruit Door Doelwitten Bladeren',
   'hudChrome.landing.highContrast': 'Hoog contrast',
   'hudChrome.landing.highContrastAria':
     'Hoog-contrastachtergrond aan/uit: schakelt de bewegende trailer uit zodat de tekst op het startscherm leesbaar blijft',

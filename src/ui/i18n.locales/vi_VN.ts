@@ -6890,6 +6890,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tay cầm cũng dùng được, và hỗ trợ tay cầm được bật sẵn theo mặc định. Cần trái để di chuyển, cần phải để chỉnh máy quay, còn các nút mặt và nút vai lo phần kỹ năng, nhảy và tương tác của bạn. Mở một cửa sổ như túi đồ để hiện một con trỏ trên màn hình, còn menu trò chơi thì điều hướng trực tiếp bằng phím D-pad và các nút mặt. Bạn có thể đổi lại các nút và chỉnh vùng chết của cần, tốc độ máy quay, rung và đảo chiều nhìn trong phần cài đặt tay cầm ở mục tùy chọn.',
   'guide.controls.controllerHeading': 'Trên tay cầm',
   'guide.controls.cycleFriendly': 'Lần lượt chọn mục tiêu thân thiện',
+  'guide.controls.targetPrev': 'Lần lượt chọn mục tiêu ngược lại',
   'guide.controls.gameMenu': 'Mở menu trò chơi và tùy chọn',
   'guide.controls.groupCamera': 'Máy quay',
   'guide.controls.groupCombat': 'Chọn mục tiêu và chiến đấu',
@@ -8369,6 +8370,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'Vòng Biểu Cảm',
   'hudChrome.keybinds.targetFriendly': 'Chọn Đồng Minh Gần Nhất',
   'hudChrome.keybinds.targetFriendlyNext': 'Luân Phiên Mục Tiêu Đồng Minh',
+  'hudChrome.keybinds.targetPrev': 'Luân Phiên Mục Tiêu Ngược',
   'hudChrome.keybinds.mount': 'Cưỡi Thú / Xuống Thú',
   'hudChrome.landing.highContrast': 'Tương Phản Cao',
   'hudChrome.landing.highContrastAria':

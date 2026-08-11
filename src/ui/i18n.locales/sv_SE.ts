@@ -6178,6 +6178,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Handkontroller fungerar också, och stöd för handkontroll är på som standard. Vänsterspaken förflyttar dig, högerspaken styr kameran, och ansikts- och axelknapparna täcker dina förmågor, hopp och interaktion. Öppna ett fönster som dina väskor för att ta fram en pekare på skärmen, och spelmenyn navigeras direkt med styrkorset och ansiktsknapparna. Du kan binda om knapparna och justera spakens dödzon, kamerahastighet, vibration och inverterat sikte i handkontrollsinställningarna under alternativ.',
   'guide.controls.controllerHeading': 'På handkontroll',
   'guide.controls.cycleFriendly': 'Växla mellan vänliga mål',
+  'guide.controls.targetPrev': 'Växla mål bakåt',
   'guide.controls.gameMenu': 'Öppna spelmeny och alternativ',
   'guide.controls.groupCamera': 'Kamera',
   'guide.controls.groupCombat': 'Målval och strid',
@@ -7658,6 +7659,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'Gesthjul',
   'hudChrome.keybinds.targetFriendly': 'Måltavla närmaste vänlig',
   'hudChrome.keybinds.targetFriendlyNext': 'Växla vänligt mål',
+  'hudChrome.keybinds.targetPrev': 'Växla mål bakåt',
   'hudChrome.landing.highContrast': 'Hög kontrast',
   'hudChrome.landing.highContrastAria':
     'Växla bakgrund med hög kontrast: inaktiverar den rörliga trailern så att texten på startskärmen förblir läsbar',

@@ -12,13 +12,12 @@ export interface FullGateStep {
 export function buildFullGateSteps(
   workers: number,
   opts?: {
+    repoRoot?: string;
     /** Adds the dedicated `vitest (release-tier i18n)` step (see I18N_RELEASE_TIER_SUITES). */
     releaseTier?: boolean;
     skipBrowser?: boolean;
     skipBuilds?: boolean;
     skipVitest?: boolean;
     skipTypes?: boolean;
-    /** Passed to resolveTurboBin for the turbo steps' cmd; defaults to process.cwd(). */
-    repoRoot?: string;
   },
 ): FullGateStep[];

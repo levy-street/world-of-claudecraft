@@ -113,6 +113,38 @@ export interface TabOrder {
   primaryCount: number;
 }
 
+// Direction of one cycle step: +1 is Tab (next target), -1 is Shift+Tab
+// (previous target).
+export type TabStep = 1 | -1;
+
+// The index step a Tab press takes over an ordered candidate list. Both binds
+// share it, so backward mirrors forward WITHIN the near cluster: there, stepping
+// forward and then back lands on the enemy you started from, which is where
+// every ordinary cycle happens. It is deliberately NOT an inverse at the
+// cluster/fallback boundary: forward out of the cluster head wraps to ids[0] and
+// backward out of it wraps to the cluster TAIL, so neither direction can leave
+// the cluster once inside it. That forward wrap is load-bearing (it is what
+// keeps Tab off a distant idle mob) and must not be "repaired" into a symmetric
+// step: doing so changes tabTarget's result and forks the parity draw order.
+// `curIdx` is the current target's index in `order.ids`, or -1 when the player
+// has no (or no longer valid) target; the caller guarantees a non-empty list.
+export function stepTabTarget(order: TabOrder, curIdx: number, step: TabStep): number {
+  const { ids, primaryCount } = order;
+  // No (or no longer valid) target: grab the priority enemy, cluster first, in
+  // either direction.
+  if (curIdx === -1) return ids[0];
+  // Cycling the near fight cluster: wrap back inside it instead of stepping out
+  // to a distant idle enemy still in range.
+  if (curIdx < primaryCount) return ids[(curIdx + step + primaryCount) % primaryCount];
+  // Sitting on a distant fallback target: walk the rest of the fallback, then
+  // wrap back into the near cluster (at its first id going forward, its last
+  // going backward).
+  const next = curIdx + step;
+  if (next >= ids.length) return ids[0];
+  if (next < 0) return ids[ids.length - 1];
+  return ids[next];
+}
+
 // Return candidate ids in the order Tab should cycle them, split into the near
 // fight cluster (the wrapped prefix) and the distant fallback band.
 export function orderTabTargets(

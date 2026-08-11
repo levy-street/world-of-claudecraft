@@ -5885,6 +5885,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'Kruh emotů',
   'hudChrome.keybinds.targetFriendly': 'Zacílit nejbližšího spojence',
   'hudChrome.keybinds.targetFriendlyNext': 'Procházet spojenecké cíle',
+  'hudChrome.keybinds.targetPrev': 'Přepínat cíl zpět',
   'hudChrome.meters.move': 'Tažením přesuneš tento měřič',
   'hudChrome.meters.resize': 'Tažením změníš velikost tohoto měřiče',
   'hudChrome.meters.dock': 'Vrátit tento měřič zpět do okna měřičů',
@@ -8320,6 +8321,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Použít schopnosti na akční liště, číselná řada; druhá lišta je na numpadu',
   'guide.controls.targetFriendly': 'Zacílit nejbližšího spojence',
   'guide.controls.cycleFriendly': 'Přepínat spojenecký cíl',
+  'guide.controls.targetPrev': 'Přepínat cíl zpět',
   'guide.controls.gameMenu': 'Otevřít herní menu a nastavení',
   'guide.controls.mobileHeading': 'Na mobilu',
   'guide.controls.mobileBody':

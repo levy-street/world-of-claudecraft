@@ -349,6 +349,7 @@ export const guideStrings = {
     dungeonFinder: 'Dungeon Finder',
     discord: 'Discord',
     abilities: 'Use action bar abilities (the number row; a second bar sits on the numpad)',
+    targetPrev: 'Cycle target backward',
     targetFriendly: 'Target nearest friendly',
     cycleFriendly: 'Cycle friendly target',
     targetAuras: 'Target buffs and debuffs',

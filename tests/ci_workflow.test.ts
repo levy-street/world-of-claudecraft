@@ -1203,13 +1203,14 @@ describe('CI workflow parity', () => {
       // own comment says the word.
       expect(job).not.toMatch(/\n\s+["']?restore-keys["']?:/);
     }
-    // The store is enabled in the config this cache serves, at the DEFAULT
-    // path the workflow hardcodes. Comment-stripped first (a `//` prefix
-    // must fail the pin, not satisfy it), then anchored to the real config
-    // line shape; and fsModuleCachePath must stay unset or the two would
-    // silently point at different directories.
+    // The store is enabled in ordinary CI/local checkouts at the DEFAULT path
+    // the workflow hardcodes. Comment-stripped first (a `//` prefix must fail
+    // the pin, not satisfy it), then anchored to the guarded config line shape;
+    // and fsModuleCachePath must stay unset or the two would silently point at
+    // different directories.
     const viteConfigCode = viteConfig.replace(/(^|[^:])\/\/.*$/gm, '$1');
-    expect(viteConfigCode).toMatch(/\n\s+fsModuleCache: true,/);
+    expect(viteConfigCode).toMatch(/\n\s+fsModuleCache: !disableVitestFsModuleCache,/);
+    expect(viteConfigCode).toContain('shouldDisableVitestFsModuleCache(root)');
     expect(viteConfigCode).not.toContain('fsModuleCachePath');
     // Exactly the two shard matrices plus the two long-sims lane halves
     // carry the step, counted workflow-wide so a copy added to ANY other job

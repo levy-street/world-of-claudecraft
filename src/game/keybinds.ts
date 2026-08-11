@@ -154,6 +154,16 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['Tab'],
   },
   {
+    // The backward half of the Tab cycle. Edge actions match the FULL chord
+    // (input.ts), so Shift+Tab is a distinct binding from Tab and neither
+    // shadows the other.
+    id: 'targetPrev',
+    label: 'Cycle Target Backward',
+    category: 'Targeting',
+    kind: 'edge',
+    defaults: ['Shift+Tab'],
+  },
+  {
     id: 'targetFriendly',
     label: 'Target Nearest Friendly',
     category: 'Targeting',

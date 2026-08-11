@@ -4976,7 +4976,7 @@ export interface MountRaceSession {
 // coordinates and content-local coordinates at invocation time so operators can
 // group repeated problem spots across separate instance slots. Stable codes only:
 // player-facing prose is assembled by the client i18n catalog.
-export type UnstuckAreaKind = 'overworld' | 'dungeon' | 'delve' | 'rift';
+export type UnstuckAreaKind = 'overworld' | 'dungeon' | 'delve' | 'rift' | 'battleground';
 
 export interface UnstuckArea {
   kind: UnstuckAreaKind;
