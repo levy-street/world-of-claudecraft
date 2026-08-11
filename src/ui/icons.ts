@@ -3563,8 +3563,11 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // Masterwrought crafted jewelry ladder (jewelcrafting): the same coin-base
   // read, the material palette carries the copper/iron/osmium rung and a
   // stat-tinted gem overlay carries the str/int/agi identity (blood, sky,
-  // leafGreen); necklaces widen the coin into a medallion and drop the gem
-  // low as the pendant.
+  // leafGreen); necklaces widen the coin into a medallion and seat the gem
+  // at bottom-right (BR) as the pendant. The sparkle fx is load-bearing
+  // shape information, not decoration: within a rung the two rings differ
+  // only by gem tint, so the int loop's sparkle is what separates them for
+  // a color-blind reader.
   hammered_copper_band: r('earth', 'ember', ['coin', { p: 'gem', ...TR, pal: 'blood' }]),
   polished_copper_loop: r('earth', 'ember', ['coin', { p: 'gem', ...TR, pal: 'sky' }], ['sparkle']),
   coiled_copper_torc: r('earth', 'ember', [

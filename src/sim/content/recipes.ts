@@ -1551,9 +1551,13 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
 //   50 rungs, and NEVER arcane_shard (phase 04 sized epic disenchant 1:1
 //   against the heroic faucet; shards stay reserved for the apex band). Ores
 //   carry the volume (wrought-metal register, the forge binding), fluxed like
-//   the other forge ladders; the rung-50 fourth line is fine_thorium_ore, the
-//   fine mining grade, keeping the whole input list mining-plus-disenchant
-//   rather than crossing into the enchant-exclusive resonant secondaries.
+//   the other forge ladders; the rung-50 fourth line is iron_ore solder,
+//   NEVER fine_thorium_ore: a recipe must never list a base material AND its
+//   fine grade (they share one consumption pool via materialGradeIds, so the
+//   reagent check double-counts a bag; the disjointness invariant in
+//   tests/material_grades.test.ts pins it). The solder keeps the whole input
+//   list mining-plus-disenchant rather than crossing into the
+//   enchant-exclusive resonant secondaries.
 // - Scaffolding follows the cross-craft convention above (skillReq 0 -> 10/10,
 //   25 -> 16/15, 50 -> 20/20); acquisition is ['trainer'] on every record (the
 //   grandfather list is frozen). Every reagent list is authored gold-negative

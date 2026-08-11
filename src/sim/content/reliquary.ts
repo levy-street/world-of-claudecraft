@@ -450,7 +450,7 @@ export const RELIQUARY_PROFESSION_MARKS = {
    *  SOURCE_PENDING_RULING beside the two gap mounts, an owner call; a
    *  stats-bearing engineering craftable would un-pend it). Jewelcrafting
    *  joined the gear-capable side when its trainer ladder landed: its outputs
-   *  are stats-bearing rings, necks and trinkets, so the proc path writes
+   *  are stats-bearing rings and necks, so the proc path writes
    *  masterwork:jewelcrafting and the gallery owes it a slot. The gear-capable
    *  set is DERIVED from the live recipes in tests/reliquary_content.test.ts
    *  (both directions), so neither a craft gaining gear nor a craft losing it
