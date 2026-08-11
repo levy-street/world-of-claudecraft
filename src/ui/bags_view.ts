@@ -386,7 +386,12 @@ export function bagTooltipHintKey(
   )
     return 'itemUi.tooltip.clickEquip';
   if (item.kind === 'food' || item.kind === 'drink') return 'itemUi.tooltip.clickConsume';
-  if (item.kind === 'potion') return 'itemUi.tooltip.clickUseInstant';
+  // Elixirs and scrolls consume instantly on a bag click exactly like a potion
+  // (the widened items.ts consumable arm), so the hover previews the click the
+  // same way. Closes the family gap the phase 06 QA judged fix-not-cut: the
+  // click always worked, only the hint stayed silent.
+  if (item.kind === 'potion' || item.kind === 'elixir' || item.kind === 'scroll')
+    return 'itemUi.tooltip.clickUseInstant';
   // Charms (use.type 'toolEffect') slot from the Professions window, not from
   // a bag click. Mirror the sim refusal copy so the hover never promises a
   // use action the click cannot perform.

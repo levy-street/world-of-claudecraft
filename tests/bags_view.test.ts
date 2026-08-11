@@ -42,6 +42,8 @@ const NO_MODE: BagMode = {
 const ITEMS: Record<string, ItemDef> = {
   sword: { kind: 'weapon', name: 'Sword', quality: 'rare' } as ItemDef,
   potion: { kind: 'potion', name: 'Potion', quality: 'common' } as ItemDef,
+  elixir: { kind: 'elixir', name: 'Elixir', quality: 'common' } as ItemDef,
+  scroll: { kind: 'scroll', name: 'Scroll', quality: 'common' } as ItemDef,
   bread: { kind: 'food', name: 'Bread', quality: 'common' } as ItemDef,
   questItem: { kind: 'quest', name: 'Relic', quality: 'epic' } as ItemDef,
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
@@ -544,6 +546,10 @@ describe('bagTooltipHintKey', () => {
     expect(bagTooltipHintKey(ITEMS.sword, NO_MODE)).toBe('itemUi.tooltip.clickEquip');
     expect(bagTooltipHintKey(ITEMS.bread, NO_MODE)).toBe('itemUi.tooltip.clickConsume');
     expect(bagTooltipHintKey(ITEMS.potion, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
+    // Elixirs and scrolls consume instantly on click like a potion (the
+    // widened items.ts arm), so the hover previews the same instant use.
+    expect(bagTooltipHintKey(ITEMS.elixir, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
+    expect(bagTooltipHintKey(ITEMS.scroll, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
     expect(bagTooltipHintKey(ITEMS.rod, NO_MODE)).toBe('itemUi.tooltip.clickUse');
     // Charms refuse bag use (sim: "Open Professions to slot that."); the hint
     // must not advertise click-to-use for a click that only errors.
