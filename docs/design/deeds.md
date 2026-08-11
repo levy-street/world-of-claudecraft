@@ -195,9 +195,13 @@ the root `CLAUDE.md` content rule points here.
   blocker and no longer deferred at all: its base catalog shipped the
   rare-tier milestone `prog_jewelcrafting_rare`, and the phase 05 QA ruling
   (2026-08-10) authored its skill-50 and Grandmaster pair, completing the
-  craft's milestone family (the 125 cap is reachable on the base catalog
-  alone, so the pair is live). Enchanting is not a blocker either: it is
-  player-wired (disenchant, apply-enchant, salvage) and its deeds shipped.
+  craft's milestone family. The 125 cap is reachable on the base catalog
+  alone for an unattuned character, and post-attunement when jewelcrafting
+  is the pair or the hobby, the same reachability shape as every shipped
+  craft pair (the switchHobby quest keeps it open to everyone); earnability
+  is pinned by derivation in `tests/deeds_content.test.ts`. Enchanting is
+  not a blocker either: it is player-wired (disenchant, apply-enchant,
+  salvage) and its deeds shipped.
 - **`pvp_vcup_bet_flex`**: cut; no betting-adjacent deeds ship, even at 0
   Renown.
 

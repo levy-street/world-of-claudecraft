@@ -1998,10 +1998,13 @@ export const DEEDS: Record<string, DeedDef> = {
   // prog_jewelcrafting_rare in the appended block below, and the phase 05 QA
   // ruling (2026-08-10) authored its skill-50 and Grandmaster pair behind it
   // (prog_jewelcrafting_50 / prog_grandmaster_jewelcrafting): the 125 cap is
-  // reachable on the base catalog alone (rung-50 recipes keep granting on
-  // the tier taper), so the hold was authoring, not mechanics. No attunement
-  // quest names a jewelcrafting pair yet (content/zone1.ts ships four), so
-  // the craft climbs as a hobby; the deeds are earnable either way.
+  // reachable on the base catalog alone for an unattuned character, and
+  // post-attunement whenever jewelcrafting is the pair or the hobby (a
+  // non-hobby crafter stalls at the common ceiling like EVERY craft; the
+  // shipped switchHobby quest keeps the deed reachable for all), so the hold
+  // was authoring, not mechanics. No attunement quest names a jewelcrafting
+  // pair yet (content/zone1.ts ships four), so the craft climbs as a hobby.
+  // Earnability is pinned by derivation in tests/deeds_content.test.ts.
   prog_guildsworn: {
     id: 'prog_guildsworn',
     name: 'Craftsworn',

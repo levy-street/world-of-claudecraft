@@ -10651,7 +10651,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.intro': '製作者最常問的問題，一併作答。',
   'guide.profPages.faq.q1': '我能學多少專業？',
   'guide.profPages.faq.a1':
-    '每個角色都可以提升全部九種可修煉製作行業和全部四種採集行業；只有命途身分是唯一的選擇。',
+    '每個角色都可以提升全部八種可修煉製作行業和全部四種採集行業；只有命途身分是唯一的選擇。',
   'guide.profPages.faq.q2': '在哪裡學配方？',
   'guide.profPages.faq.a2':
     '訓練師階梯配方由各工位的常駐大師傳授，而九個通用野外配方和工具配方所有人從一開始就會。',
@@ -10680,7 +10680,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '專業是這個世界的營生：四種採集行業從大地中獲取原料，十種製作行業把它們變成裝備、飯菜、藥水與工具。萬物環環相扣：你挖出的礦石成為刀劍，刀劍接受附魔，而附魔又需要從舊裝備中分解出的粉塵。這裡沒有專業數量限制：如今九種製作行業已有內容，每個角色都能同時修習其中八種與全部四種採集行業（工程學是唯一的例外：它的配方全部始於自由上限之上，要等爆破師的誓言），唯一的排他選擇是你最終宣誓的命途，而一旦宣誓，落入休眠的製作行業便不再上升。技能永不下降，學會的東西也永遠不會被奪走。',
   'guide.professions.deedsHeading': '銘記旅程的功業',
   'guide.professions.deedsBody':
-    '功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。九種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜（珠寶設計還會以第一件稀有品質首飾記下Polished to Brilliance）；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。',
+    '功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。九種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。',
   'guide.professions.startHeading': '從哪裡開始',
   'guide.professions.startBody':
     '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東南Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。',

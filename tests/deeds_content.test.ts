@@ -42,6 +42,10 @@ import {
   VISITED_MARK_NAMESPACES,
   ZONE_FISH,
 } from '../src/sim/deeds';
+import {
+  craftSkillGainMultiplier,
+  enchantingGainMultiplier,
+} from '../src/sim/professions/archetype';
 import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
@@ -395,6 +399,46 @@ describe('audited launch totals (literals: update deliberately with the catalog)
             ? (CRAFT_RING.find((c) => c.id === t.craftId)?.maxSkill ?? 0)
             : Math.max(...CRAFT_RING.map((c) => c.maxSkill));
         expect(t.level, def.id).toBeLessThanOrEqual(cap);
+        // EARNABILITY, derived from the live gain machinery rather than
+        // asserted in prose: a character ONE skill point short of the
+        // threshold must still gain from SOME shipped recipe rung under the
+        // craft's best-available ceiling, attuned with the craft as a MAJOR
+        // (archetypeCeilingFor returns Infinity for a major; the
+        // hobby/unattuned rare ceiling already suffices for every craft
+        // except engineering, whose ladder waits for its oath, exactly as
+        // the guide's whatBody says). The cap-only check above would
+        // greenlight a deed for a craft with no gain path at all (a
+        // hypothetical prog_inscription_50, which the no-recipes arm reds);
+        // this arm also reds a TIER_SKILL_STEP or four-state-curve re-tune
+        // that silently strands a shipped titled deed as
+        // visible-but-unearnable (design rule 3). Enchanting is the one
+        // recipe-less craft: it gains through the disenchant arm's SOFT
+        // ceiling, which degrades input instead of zeroing, checked with
+        // top-tier input for the same one-point-short character.
+        if (t.craftId !== undefined) {
+          const craftId = t.craftId;
+          const oneShort = { [craftId]: t.level - 1 };
+          if (craftId === 'enchanting') {
+            expect(
+              enchantingGainMultiplier(oneShort, null, null, null, 4),
+              `${def.id}: enchanting gain at ${t.level - 1}`,
+            ).toBeGreaterThan(0);
+          } else {
+            const rungs = ALL_RECIPES.filter((r) => r.professionId === craftId).map(
+              (r) => r.skillReq ?? 0,
+            );
+            expect(rungs.length, `${def.id}: ${craftId} ships no recipes`).toBeGreaterThan(0);
+            const gain = Math.max(
+              ...rungs.map((rung) =>
+                craftSkillGainMultiplier(oneShort, craftId, craftId, craftId, null, rung),
+              ),
+            );
+            expect(
+              gain,
+              `${def.id}: no shipped ${craftId} rung grants at skill ${t.level - 1} as a major`,
+            ).toBeGreaterThan(0);
+          }
+        }
       }
       if (t.kind === 'gathering') {
         const cap =

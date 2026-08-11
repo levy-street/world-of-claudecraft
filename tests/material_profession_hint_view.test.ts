@@ -15,7 +15,9 @@ import { baseMaterialFor } from '../src/sim/professions/material_grades';
 import { Hud } from '../src/ui/hud';
 import { setLanguage } from '../src/ui/i18n';
 import { itemKindLabel } from '../src/ui/item_kind_label';
+import { MATERIAL_HINT_KEYS } from '../src/ui/material_hint_view';
 import {
+  CRAFT_NAMING_HINT_KEYS,
   hasSupersedingPurposeHint,
   materialProfessionHintText,
 } from '../src/ui/material_profession_hint_view';
@@ -102,6 +104,29 @@ describe('materialProfessionHintText', () => {
     // counterpart pin for the === 'enchanting' comparison in
     // hasSupersedingPurposeHint: dropping it would silently blank this line.
     expect(materialProfessionHintText('fine_ironbark_log')).toBe('Used by Weaponcrafting.');
+  });
+
+  it('CRAFT_NAMING_HINT_KEYS equals the set of hint keys whose English lead names the craft', async () => {
+    // The contract pin beside the allowlist: membership is DERIVED from the
+    // resolved English leads and held equal in BOTH directions, so rewording
+    // a hint's lead (the way arcaneDust/arcaneEssence went craft-neutral)
+    // without moving membership fails HERE instead of silently re-opening
+    // the suppressed-craft-name defect the allowlist shape fixed.
+    const { en } = await import('../src/ui/i18n.resolved.generated/en');
+    const hints = (en as unknown as { hudChrome: { materialHint: Record<string, string> } })
+      .hudChrome.materialHint;
+    const distinctHintKeys = new Set(Object.values(MATERIAL_HINT_KEYS));
+    const craftNaming = [...distinctHintKeys].filter((key) => {
+      const leaf = key.replace('hudChrome.materialHint.', '');
+      const value = hints[leaf];
+      expect(value, `resolved English for ${key}`).toBeTruthy();
+      return value.startsWith('Enchanting reagent.');
+    });
+    expect([...craftNaming].sort()).toEqual([...CRAFT_NAMING_HINT_KEYS].sort());
+    // Anti-vacuity: both classes are populated (six craft-naming leads, and
+    // at least the fineGrade plus the two craft-neutral arcane leads outside).
+    expect(craftNaming.length).toBe(6);
+    expect(distinctHintKeys.size - craftNaming.length).toBeGreaterThanOrEqual(3);
   });
 
   it('a craft-free hint lead never supersedes, even for a single-craft consumer set', () => {

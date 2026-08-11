@@ -25,7 +25,7 @@ import { craftIdsForMaterialItem } from '../sim/material_profession_affinity';
 import { MATERIAL_ITEM_IDS } from '../sim/material_taxonomy';
 import { cookingCatchHintKey } from './cooking_catch_hint_view';
 import { craftNameKey } from './craft_name_view';
-import { type TranslationKey, formatList, t } from './i18n';
+import { formatList, type TranslationKey, t } from './i18n';
 import { materialHintKey } from './material_hint_view';
 
 /**
@@ -39,9 +39,12 @@ import { materialHintKey } from './material_hint_view';
  * set, or the tooltip would name no craft at all. Rewording a hint's lead
  * changes membership HERE in the same change; an unlisted key defaults to
  * never-supersedes, the safe side. Key literals are type-safe against the
- * generated TranslationKey union, so a renamed key is a tsc error.
+ * generated TranslationKey union, so a renamed key is a tsc error. Exported
+ * for the contract pin: the test derives the craft-naming set from the
+ * resolved English leads and holds it equal to this list in BOTH directions,
+ * so a reworded lead cannot silently desynchronize membership.
  */
-const CRAFT_NAMING_HINT_KEYS: ReadonlySet<TranslationKey> = new Set<TranslationKey>([
+export const CRAFT_NAMING_HINT_KEYS: ReadonlySet<TranslationKey> = new Set<TranslationKey>([
   'hudChrome.materialHint.arcaneShard',
   'hudChrome.materialHint.resonantThread',
   'hudChrome.materialHint.resonantHide',
@@ -57,10 +60,7 @@ const CRAFT_NAMING_HINT_KEYS: ReadonlySet<TranslationKey> = new Set<TranslationK
  * single-craft cases never occur in live content while dust and essence feed
  * two crafts, so only a direct call can hold them).
  */
-export function hasSupersedingPurposeHint(
-  itemId: string,
-  craftIds: readonly string[],
-): boolean {
+export function hasSupersedingPurposeHint(itemId: string, craftIds: readonly string[]): boolean {
   // Raw cooking catch: "Cooking ingredient. Must be cooked before eating."
   // covers the single-craft cooking case. Multi-craft catches still need
   // Used-by so Engineering (etc.) is not invisible beside the cooking line.

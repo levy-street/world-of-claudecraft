@@ -205,7 +205,10 @@ describe('kit construction', () => {
     // Heroic-badge-vendor stock or source level 22+, so a genuinely fresh 20 could
     // wear none of it. The catalog put nine crafted pieces inside the tier and the
     // slots filled themselves, by the same best-in-slot derivation that already
-    // dresses the kit in crafted armor and weapons. Nothing about the picker changed.
+    // dresses the kit in crafted armor and weapons. The catalog change itself
+    // touched no picker code; the phase 05 QA later hardened bestBy's tie
+    // handling (epsilon band + identity-first tiebreak) WITHOUT moving any
+    // pick, which this table proves by staying put.
     //
     // The ids are pinned as literals rather than recomputed from roleItemScore, so a
     // retune of the role weights has to be admitted here instead of quietly moving
@@ -215,28 +218,27 @@ describe('kit construction', () => {
     // iron_link_choker (agi 3, sta 1) on stamina alone, so even a pure-intellect
     // caster scoring its agility at zero still takes it.
     const NECK = 'burnished_thorium_amulet';
-    // Strength-led roles: the rung-50 str ring, then the rung-25 str ring
-    // outright (str 3 at full weight clears the int loop's 3 stamina with no
-    // tie in sight).
-    const STR_RINGS = ['weighted_thorium_band', 'riveted_iron_signet'] as const;
-    // Agility-led roles: the rung-50 str ring first, then a REAL TIE for
-    // ring2. The rung-25 str ring (str 3 x 0.4 + sta 1 x 0.6) and the rung-50
-    // int ring (sta 3 x 0.6) both score exactly 1.8 in real arithmetic; only
-    // IEEE754 product rounding ever separated them, so bestBy's epsilon band
-    // hands the pick to the id tiebreak and gleaming_thorium_loop ('g' < 'r')
-    // is the stable, documented winner. A pick that moves here means either a
-    // weights retune (admit it) or the tie band broke (fix bestBy).
-    const AGI_RINGS = ['weighted_thorium_band', 'gleaming_thorium_loop'] as const;
+    // Strength and agility roles: the rung-50 str ring, then the rung-25 str
+    // ring. For the STR camps ring2 is an outright win (str 3 at full weight
+    // clears the int loop's 3 stamina). For the AGI camps ring2 is a REAL
+    // TIE: the rung-25 str ring (str 3 x 0.4 + sta 1 x 0.6) and the rung-50
+    // int ring (sta 3 x 0.6) both score exactly 1.8 in real arithmetic, and
+    // only IEEE754 product rounding ever separated them (phase 05 QA probe).
+    // bestBy judges the tie inside an epsilon band and resolves it on the
+    // role IDENTITY sum first (riveted carries str 3 + sta 1 = 4 role stats
+    // against the loop's sta 3), so the signet wins the tie on the stats the
+    // role actually uses, never on the alphabet, and the pick is stable
+    // across any rounding-equivalent scorer refactor. A pick that moves here
+    // means a weights retune (admit it) or the tie machinery broke.
+    const PHYSICAL_RINGS = ['weighted_thorium_band', 'riveted_iron_signet'] as const;
     // Intellect roles: the rung-50 int ring, then the rung-25 int ring.
     const CASTER_RINGS = ['gleaming_thorium_loop', 'etched_iron_loop'] as const;
-    const STR_SPECS = [
+    const PHYSICAL_SPECS = [
       'warrior/arms',
       'warrior/fury',
       'warrior/prot',
       'paladin/protection',
       'paladin/retribution',
-    ];
-    const AGI_SPECS = [
       'hunter/beast_mastery',
       'hunter/marksmanship',
       'hunter/survival',
@@ -271,8 +273,7 @@ describe('kit construction', () => {
     const FERAL_RINGS = ['weighted_thorium_band', 'gleaming_thorium_loop'] as const;
 
     const expected = new Map<string, readonly [string, string]>();
-    for (const key of STR_SPECS) expected.set(key, STR_RINGS);
-    for (const key of AGI_SPECS) expected.set(key, AGI_RINGS);
+    for (const key of PHYSICAL_SPECS) expected.set(key, PHYSICAL_RINGS);
     for (const key of CASTER_SPECS) expected.set(key, CASTER_RINGS);
     expected.set('druid/feral', FERAL_RINGS);
     // Cross-check against the role table, so a spec added there without a row here

@@ -391,4 +391,41 @@ describe('Book of Deeds webp icons', () => {
       ).toBe(false);
     }
   });
+
+  it('the Masterwrought crest provenance record matches the committed bytes', () => {
+    // The contract pinned beside the blob (the PR #3295 authored-art lesson):
+    // docs/achievements/masterwrought-phase05-art/README.md records accepted
+    // sha256 hashes for the three hand-authored jewelcrafting crests, and a
+    // bulk art-normalization pass preferentially hits hand-authored files.
+    // These literals are the same hashes the README records; a re-encode
+    // that moves the bytes reds HERE naming the crest, and the fix is to
+    // re-review and move BOTH the pin and the provenance record, never to
+    // bump the pin alone. CREDITS.md must keep naming both crest rows.
+    const ACCEPTED_CREST_SHA256: Record<string, string> = {
+      prog_jewelcrafting_rare: '057a867ec786493771e9bdd9a1100f38694bb6c7aeffca4de78fb9fd6896f5dd',
+      prog_jewelcrafting_50: '5edc61e01ce5f20dbf525c1430dc1709a1bc58ff550e0f49bb0a5ca7a4f68d8a',
+      prog_grandmaster_jewelcrafting:
+        'f3ff906d390920499779101c7d361be8b81d07398ab9c0133778ed5daed8ee49',
+    };
+    for (const [id, sha] of Object.entries(ACCEPTED_CREST_SHA256)) {
+      const bytes = readFileSync(path.join(deedsDir, `${id}.webp`));
+      expect(
+        createHash('sha256').update(bytes).digest('hex'),
+        `${id}.webp drifted from its accepted provenance hash`,
+      ).toBe(sha);
+    }
+    // The provenance README itself records the same hashes (the pin and the
+    // record cannot drift apart silently), and CREDITS carries the rows.
+    const readme = readFileSync(
+      path.join(repoRoot, 'docs/achievements/masterwrought-phase05-art/README.md'),
+      'utf8',
+    );
+    for (const sha of Object.values(ACCEPTED_CREST_SHA256)) {
+      expect(readme, 'provenance README must record the accepted hash').toContain(sha);
+    }
+    const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
+    expect(credits).toContain('prog_jewelcrafting_rare');
+    expect(credits).toContain('prog_jewelcrafting_50');
+    expect(credits).toContain('prog_grandmaster_jewelcrafting');
+  });
 });

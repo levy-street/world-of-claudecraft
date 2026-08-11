@@ -10649,7 +10649,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.intro': '制作者最常问的问题，一并作答。',
   'guide.profPages.faq.q1': '我能学多少专业？',
   'guide.profPages.faq.a1':
-    '每个角色都可以提升全部九种可修炼制作行业和全部四种采集行业；只有命途身份是唯一的选择。',
+    '每个角色都可以提升全部八种可修炼制作行业和全部四种采集行业；只有命途身份是唯一的选择。',
   'guide.profPages.faq.q2': '在哪里学配方？',
   'guide.profPages.faq.a2':
     '训练师阶梯配方由各工位的常驻大师传授，而九个通用野外配方和工具配方所有人从一开始就会。',
@@ -10678,7 +10678,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '专业是这个世界的营生：四种采集行业从大地中获取原料，十种制作行业把它们变成装备、饭菜、药水与工具。万物环环相扣：你挖出的矿石成为刀剑，刀剑接受附魔，而附魔又需要从旧装备中分解出的粉尘。这里没有专业数量限制：如今九种制作行业已有内容，每个角色都能同时修习其中八种与全部四种采集行业（工程学是唯一的例外：它的配方全部始于自由上限之上，要等爆破师的誓言），唯一的排他选择是你最终宣誓的命途，而一旦宣誓，落入休眠的制作行业便不再上升。技能永不下降，学会的东西也永远不会被夺走。',
   'guide.professions.deedsHeading': '铭记旅程的功业',
   'guide.professions.deedsBody':
-    '功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。九种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔（珠宝加工还会以第一件稀有品质首饰记下Polished to Brilliance）；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。',
+    '功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。九种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。',
   'guide.professions.startHeading': '从哪里开始',
   'guide.professions.startBody':
     '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。',
