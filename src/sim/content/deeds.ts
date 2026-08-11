@@ -2496,7 +2496,9 @@ export const DEEDS: Record<string, DeedDef> = {
   // prog_jewelcrafting_rare (Masterwrought phase 05) and
   // prog_inscription_rare (phase 06), both appended at the table tail
   // (DEED_ORDER is append-only). Enchanting alone stays out: it has no
-  // item-def output to grade.
+  // item-def output to grade. prog_ringwright stays deferred on its own
+  // account (the completed-ring deed has no recorded design; see the
+  // Professions 2.0 block above).
   prog_engineering_rare: {
     id: 'prog_engineering_rare',
     name: 'Precision Engineering',
