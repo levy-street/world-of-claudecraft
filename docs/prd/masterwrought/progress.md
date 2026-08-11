@@ -12,7 +12,7 @@
 | 04 QA | verify | complete | 2026-08-10 | 2026-08-10 |
 | 05 | Jewelcrafting base catalog | complete | 2026-08-10 | 2026-08-10 |
 | 05 QA | verify | complete | 2026-08-10 | 2026-08-10 |
-| 06 | Inscription base catalog | pending | | |
+| 06 | Inscription base catalog | complete | 2026-08-11 | 2026-08-11 |
 | 06 QA | verify | pending | | |
 | 07 | Intermediates and the Quickening Catalyst | pending | | |
 | 07 QA | verify | pending | | |

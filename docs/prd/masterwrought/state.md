@@ -1473,3 +1473,72 @@ Grandmaster-craft family, generic by construction.
   (prog_inscription_50) CLEAR with a recorded neighbor caveat (WoW Dragonflight ships
   the 'Ink and Quill I-IV' achievement family, a different full name);
   'Grandmaster Inscription' is the formulaic title the earnability arm derives.
+- EXECUTION LEDGER (built 2026-08-11): new item ids silverleaf_primer / goldleaf_folio /
+  sunpetal_grimoire (held_offhand tomes, CASTER_ALL, budgets 3/5/10 at ilvl 11/16/23) and
+  silverleaf_scroll / goldleaf_scroll / sunpetal_scroll (NEW ItemKind 'scroll'); recipe ids
+  recipe_<itemId> x6 in INSCRIPTION_RECIPES. Family membership: all three scrolls join
+  elixir_buff_sta at the band payloads (boar 6/600, vipersear 9/900, serpent 12/900), same
+  aura display names as the band elixirs, so no new sim_i18n aura rows. New sim surface:
+  ItemKind 'scroll' + ScrollItemDef (required elixir payload, use barred), the widened
+  items.ts consumable arm with the 'You read {name}.' log line (log.read matcher: flat
+  base + RULES regex + all 20 non-en DICT blocks incl. the eight sparse ones; the quaff
+  row's own sparse-block gap predates the phase and is recorded below). KIND_RANK scroll=6
+  (consumables run), market consumable browse arm + bag consumable chip gained the kind.
+  No new IWorld members, wire fields, SimEvents, or server handlers; the parity pin is
+  untouched at 321.
+- NEW i18n KEYS: entities.items.<sixIds>.name (Sheenleaf display register on the two
+  silverleaf ids), itemUi.kind.scroll, hudChrome.reliquary.markFind.masterwork_inscription,
+  guide.profPages.craftIntro.inscription, guide.profPages.craftProse.inscription.{identity,
+  materials,ladder,route}{Heading,Body}, log.read (sim DICT scope). REWORDED English:
+  whatBody, ringBody, ringWaveNote, stationsBody, deedsBody, faq.a2,
+  craftProse.tailoring.identityBody, craftProse.enchanting.identityBody (the 13-Latin
+  stale rows for tailoring.identityBody stripped to pending; the other seven had no Latin
+  rows; en_CA divergence-only, nothing to update).
+- NEW TESTS: inscription_catalog (14, the JC catalog template incl. the full reagent
+  literal table and both quality ladders), inscription_flow (8, live train/craft/deed at
+  the apothecary incl. the resultCount 2 scroll batch and the 49-to-50 live-gain arm),
+  inscription_scroll_exclusivity (6, the headline both-orders pin across all three bands
+  plus cross-band weaker-included, the read log line, and the derived-stats liveness),
+  elixir_tooltip_view scroll arm (byte-identical Use line vs the band elixir),
+  market_filters scroll rows; plus the absorbed neighbor pins (see the
+  test(professions) commit body for the full list).
+- RELEASE-FILL OBLIGATIONS (phase 06 rows, the pending registry sees the Latin ones):
+  (a) 17 new keys x 15 Latin locales pending normally: 6 item names + itemUi.kind.scroll
+  + craftIntro.inscription + 8 craftProse.inscription keys + markFind.masterwork_inscription;
+  (b) the 8 reworded keys' Latin rows (13 stripped tailoring.identityBody rows + the seven
+  keys whose Latin rows were already pending);
+  (c) INVISIBLE to pending=0, add by hand at the fill: prog_inscription_rare name+desc +
+  prog_inscription_50 name+desc + prog_grandmaster_inscription name+desc+title in the 13
+  Latin deed chunks (35 rows), and the log.read sim DICT row is already filled in all 20
+  blocks (no obligation) but the PRE-EXISTING log.quaff gap in the eight sparse blocks
+  (cs/nl/pl/id/tr/sv/vi/da render English quaff lines) is recorded here as an OLD gap the
+  release fill should close alongside log.read consistency;
+  (d) the five non-Latin guide.profPages.faq q1-a8 block stays the recorded old-generation
+  whole-block regen from the phase 05 QA ledger.
+- RELEASE CLOSE-OUT: the shipped_item_ids golden re-mint (UPDATE_SHIPPED_ITEMS=1,
+  additions-only review) now covers the nine jewelry ids PLUS the six inscription ids.
+- RELEASE-OWNED FOLLOW-UPS surfaced by this phase's merge audit (do NOT fix on this
+  branch): (1) turbo.json build:bundle inputs omit scripts/build_bundle_pregen.mjs (and the
+  gate_task_cache mirror), a warm-cache staleness hazard for pregen-step edits; (2)
+  qa-gate.md/gate_steps/gate_task_cache prose says cacheable steps run through npx while
+  the code spawns node_modules/.bin/turbo directly; (3) gate.mjs/gate_select.mjs lost
+  cwd-independence (fails loud, likely intentional); (4) the mob-portrait render
+  environment ping-pong: the release's CI rerender re-encoded all 230 portraits with byte
+  drift this Mac's renderer does not reproduce, so every sync re-mints; the two
+  environments should converge or the acceptance should carry an env fingerprint.
+- DURABLE LESSONS: a ternary inside an emit's text field would blind the S3 scanner
+  (split into two literal emits); market_filters' All-only reachability sweep is the guard
+  that catches a new ItemKind with no browse category (it caught 'scroll'); the
+  hobby-default flip and the apothecary two-craft train view are correct-by-derivation
+  consequences QA re-judges (the Trapper precedent); usage-credit exhaustion kills
+  workflow agents mid-run and the resume-from-runId flow recovers them with cached
+  results (three rounds this phase).
+- ART DIGESTS + LOCALE NOTES (post-fan-out): item icons + deed crests committed with SVG
+  sources, rasterizer, and accepted hashes under docs/achievements/masterwrought-phase06-art/
+  (item audit 834 to 840, deed art 274 to 277, crest sha pins in tests/deed_icons.test.ts).
+  Locale register note for the release fill: the ru_RU overlay renders craft names
+  INCONSISTENTLY across guide prose (native in ringBody/stationsBody, English inside the
+  identity bodies including the phase 05 jewelcrafting row this phase's fills mirrored);
+  a whole-file craft-name register pass belongs to the release fill, recorded here so the
+  inconsistency is a known debt, not a phase 06 regression. The zh_CN faq q1-a8 staleness
+  beyond a2 re-confirms the recorded old-generation whole-block regen obligation.
