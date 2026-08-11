@@ -156,6 +156,11 @@
     <priority>0.55</priority>
   </url>
   <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/jewelcrafting</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
     <loc>https://worldofclaudecraft.com/wiki/professions/weaponcrafting</loc>
     <changefreq>monthly</changefreq>
     <priority>0.55</priority>

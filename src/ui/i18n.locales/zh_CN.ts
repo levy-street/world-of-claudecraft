@@ -8767,6 +8767,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornhide_leggings.name': '荆棘护腿',
   'entities.items.thornhide_gloves.name': '荆棘护手',
   'entities.items.thornhide_boots.name': '荆棘软靴',
+  'entities.items.hammered_copper_band.name': '锤锻铜指环',
+  'entities.items.polished_copper_loop.name': '抛光铜环',
+  'entities.items.coiled_copper_torc.name': '盘绕铜颈环',
+  'entities.items.riveted_iron_signet.name': '铆接铁徽戒',
+  'entities.items.etched_iron_loop.name': '蚀刻铁环',
+  'entities.items.iron_link_choker.name': '铁链颈圈',
+  'entities.items.weighted_thorium_band.name': '沉重锇金指环',
+  'entities.items.gleaming_thorium_loop.name': '辉光锇金环',
+  'entities.items.burnished_thorium_amulet.name': '磨光锇金护符',
   'entities.items.final_oath_medallion.name': '最终誓约勋章',
   'entities.items.razorwind_torque.name': '剃风颈环',
   'entities.items.cinder_sigil_pendant.name': '烬印坠饰',
@@ -10171,6 +10180,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': '护甲锻造杰作',
   'hudChrome.reliquary.markFind.masterwork_tailoring': '裁缝杰作',
   'hudChrome.reliquary.markFind.masterwork_leatherworking': '制皮杰作',
+  'hudChrome.reliquary.markFind.masterwork_jewelcrafting': '珠宝加工杰作',
   'hudChrome.reliquary.markFind.masterwork_engineering': '工程学杰作',
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': '完美矿脉',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '古木心材',
@@ -10582,7 +10592,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.professions.ringBody':
     '十种制作行业排列在一个轮环上，各自独立记录技能；点开一张卡片即可查看完整的配方表与数值。',
   'guide.professions.ringWaveNote':
-    '珠宝加工与铭文如今已在轮环上，但尚未提供任何配方；它们的内容将随后续的区域扩展一同到来。',
+    '轮环上还有一门手艺，铭文，占着席位却尚未提供任何配方；这是刻意为之而非疏漏：它的内容将随后续的区域扩展一同到来。',
   'guide.professions.capFmt': '上限{cap}',
   'guide.professions.comingSoon': '暂无配方',
   'guide.professions.gatherHubHeading': '采集',
@@ -10803,10 +10813,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '剑之外的一门手艺',
   'guide.professions.whatBody':
-    '专业是这个世界的营生：四种采集行业从大地中获取原料，十种制作行业把它们变成装备、饭菜、药水与工具。万物环环相扣：你挖出的矿石成为刀剑，刀剑接受附魔，而附魔又需要从旧装备中分解出的粉尘。这里没有专业数量限制：每个角色都能同时修习全部八种已有内容的制作行业与全部四种采集行业，唯一的排他选择是你最终宣誓的命途，而一旦宣誓，落入休眠的制作行业便不再上升。技能永不下降，学会的东西也永远不会被夺走。',
+    '专业是这个世界的营生：四种采集行业从大地中获取原料，十种制作行业把它们变成装备、饭菜、药水与工具。万物环环相扣：你挖出的矿石成为刀剑，刀剑接受附魔，而附魔又需要从旧装备中分解出的粉尘。这里没有专业数量限制：如今九种制作行业已有内容，每个角色都能同时修习其中八种与全部四种采集行业（工程学是唯一的例外：它的配方全部始于自由上限之上，要等爆破师的誓言），唯一的排他选择是你最终宣誓的命途，而一旦宣誓，落入休眠的制作行业便不再上升。技能永不下降，学会的东西也永远不会被夺走。',
   'guide.professions.deedsHeading': '铭记旅程的功业',
   'guide.professions.deedsBody':
-    '功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。八种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。',
+    '功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。九种可修行业中有八种各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔（珠宝加工则以第一件精良首饰记下Polished to Brilliance，其里程碑篇章与命途一同等待）；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。',
   'guide.professions.startHeading': '从哪里开始',
   'guide.professions.startBody':
     '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。',
@@ -10839,7 +10849,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '商人看不见出处：署名物品卖给NPC只值普通价，签名的溢价只存在于玩家之间。名家署名的横财矿石、一块Prime Cut、一柄署着已退隐工匠之名的杰作之刃，价格全凭记忆开价。功业之书里的Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen与Glimmer of Hope都是零声望的收藏印记，只为证明那一刻发生在你身上。出处不买属性也不赢战斗，它是这游戏里美好日子的存根。',
   'guide.profPages.craftProse.weaponcrafting.identityHeading': '人人都要买的锋刃',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
-    '精良一档就覆盖三种胃口：力量近战的Osmium Warblade、敏捷战士的Glyphsteel War Axe，以及施法者的智力精神法杖Highpine Battle Staff。\n\n在制作之轮上它位于护甲锻造与珠宝加工之间。现役命途是铁匠（武器锻造与护甲锻造），可在锻造坊的锻造宗师Darva处宣誓，以自己双手挖掘三处矿脉方可；刃匠（与珠宝加工的搭档）也标注在制作之轮上，但要等珠宝加工随未来区域带来第一批配方，方可宣誓。',
+    '精良一档就覆盖三种胃口：力量近战的Osmium Warblade、敏捷战士的Glyphsteel War Axe，以及施法者的智力精神法杖Highpine Battle Staff。\n\n在制作之轮上它位于护甲锻造与珠宝加工之间。现役命途是铁匠（武器锻造与护甲锻造），可在锻造坊的锻造宗师Darva处宣誓，以自己双手挖掘三处矿脉方可；铸刃师（与珠宝加工的搭档）也标注在制作之轮上，如今珠宝加工已在同一座锻造坊里锤打自己的0到50首饰梯子，但这对命途仍要等它的宣誓任务出现方可宣誓。',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': '锻炉吞噬什么',
   'guide.profPages.craftProse.weaponcrafting.materialsBody':
     '采矿是根基。铜矿出自Eastbrook Vale的一级矿脉，铁矿出自Mirefen Marsh，锇矿出自Thornpeak Heights，每一档梯子都如此升级。伐木的重要性超出预期：铁皮木做野猪矛的矛杆，梣木扛起锤柄，一根高松原木成就那根战棍。\n\n其余材料来自猎获与柜台：粗皮直接从狼和野猪尸体上剥取，碎骨来自日常猎杀，锻造梯子要烧Smithing Flux（Darva处20铜一罐）。若自己采矿跟不上，Darva在锻造坊柜台卖锇矿，Tinker Gizzel在工坊备有铭钢锭，价格之高让人觉得还是交几个采矿朋友合算。',
@@ -10923,20 +10933,34 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '工具没有战斗属性，永不出杰作。75照常专精：省20%材料，外加把任何采集之旅变成车间的临时野外工坊。成长几乎不衰减：75档配方到100全速、之后半速，150档配方到125上限一路全速，真正的瓶颈是材料与铜板。先定命途，从Tinker Gizzel处取爆破师调谐；再喂梯子：自练采集或结交采集者，商店买齐3级工具，把Gizzel的订单（八根Ironbark Log换16铜，每30分钟一次）当零花钱。卖点不言自明：高于节点的每级工具都从2.5秒采集读条里削去0.4秒（下限1.5秒）。技能50记下Cogs and Sprockets，125是Grandmaster Engineering。',
   'guide.profPages.craftProse.enchanting.identityHeading': '拆开装备，注回力量',
   'guide.profPages.craftProse.enchanting.identityBody':
-    '没有工位、没有训练师、没有要买的配方书：所有附魔初始即会，谁都能从第一天开始分解，技能与各行业一样以125为上限。它位于铭文与珠宝加工之间，两条命途是Arcanist与Gembinder，均因邻居还没有配方而暂不可宣誓；因此附魔今天是所有人的手艺：宣誓前自由练到精良层，也是爆破师或药剂师天然的爱好选择。附魔师还维系着采集世界：三种可镶嵌的工具效果都是附魔师的作品，原作者为自己的作品充能享有折扣，专精后更深。',
+    '没有工位、没有训练师、没有要买的配方书：所有附魔初始即会，谁都能从第一天开始分解，技能与各行业一样以125为上限。它位于铭文与珠宝加工之间，两条命途是Arcanist与Gembinder，均暂不可宣誓：铭文仍在等待第一批配方，而珠宝加工虽已在锻造坊锤打自己的梯子，Gembinder却还没有宣誓任务；因此附魔今天是所有人的手艺：宣誓前自由练到精良层，也是爆破师或药剂师天然的爱好选择。附魔师还维系着采集世界：三种可镶嵌的工具效果都是附魔师的作品，原作者为自己的作品充能享有折扣，专精后更深。',
   'guide.profPages.craftProse.enchanting.levelingHeading': '附魔如何升级',
   'guide.profPages.craftProse.enchanting.levelingBody':
     '两种行动推动技能：分解与施加附魔，每次成功最多一点，按工作的分量折算：普通分解与纯粉尘附魔算普通活；优秀分解与精华附魔算优秀活；精良分解与所有Runed或Greater附魔算精良活；史诗与传说分解更高。熟悉的精通衰减按25点层级作用：普通活在技能75变灰，优秀活在100，精良活恰在125上限。附魔另有一份仁慈：高于命途上限的输入向下取整而非归零，宣誓前史诗分解按精良计而非一无所获；若附魔沦为休眠，一切按普通活计，爬升停在75；作为爱好则精良活仍有收益，只是75之后变慢。',
   'guide.profPages.craftProse.enchanting.marketHeading': '附魔副本、出处与市场',
   'guide.profPages.craftProse.enchanting.marketBody':
     '施加附魔消耗材料并标记特定的一件副本。用在背包中的副本上，交还一件独立的附魔副本；用在已穿戴的装备上，则就地附魔，无需脱下再穿上。无论哪种，加成都永远跟随。一件一附魔：对附魔副本施加另一个附魔会先要求确认，然后直接替换旧附魔，旧附魔被摧毁且不退还材料；出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。附魔与署名件如今也能上架：每件以单件挂单出售，物品提示会显示附魔与制作者印记，渡鸦邮驿同样可以寄送；材料依旧是稳定的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。',
+  'guide.profPages.craftIntro.jewelcrafting':
+    '珠宝加工是Eastbrook锻造坊里更精细的那张工作台：铜、铁与精良锇金的戒指与项链，每一档都有一枚力量戒指、一枚智力戒指和一条敏捷项链。首饰没有护甲、不限职业，所以它的顾客就是所有长着手指和脖子的人。',
+  'guide.profPages.craftProse.jewelcrafting.identityHeading': '锻造坊里的细活',
+  'guide.profPages.craftProse.jewelcrafting.identityBody':
+    '梯子是三档、每档三件：一枚力量戒指、一枚智力戒指和一条敏捷项链，先用铜，再用铁，最后在顶端用精良锇金再来一遍。首饰没有护甲也不限职业，连铜档也带着实打实的属性，因为一枚没有属性的戒指什么都不是。\n\n在制作之轮上它位于附魔与武器锻造之间，因此拥有两条命途：缚晶师（附魔与珠宝加工）与铸刃师（珠宝加工与武器锻造）。两者都还没有宣誓任务，所以今天珠宝加工是所有人的手艺：每个配方都在未宣誓行业可用的精良层之内，整条梯子在任何誓言之前就完全敞开。',
+  'guide.profPages.craftProse.jewelcrafting.materialsHeading': '矿石、尘与精华',
+  'guide.profPages.craftProse.jewelcrafting.materialsBody':
+    '这张工作台靠采矿与分解运转。铜矿出自Eastbrook Vale的一级矿脉，铁矿出自Mirefen Marsh，锇矿出自Thornpeak Heights，每个配方还要一两罐锻造助熔剂（Darva处20铜一罐）。每件首饰的另一半来自分解台：铜档用铃音之尘，铁档与锇档要铃音精华，所以珠宝匠不是附魔师最稳定的顾客，就是自己养成了分解的习惯。\n\n锇档多一道讲究：每件精良首饰除锇料外还要两块铁矿石，作为焊料嵌入细工底座。矿石与尘都无处花钱购买：它们来自世界本身，或经交易与世界市场来自另一位玩家；只有助熔剂用钱能买。',
+  'guide.profPages.craftProse.jewelcrafting.ladderHeading': '在铁砧旁学艺',
+  'guide.profPages.craftProse.jewelcrafting.ladderBody':
+    '珠宝加工没有自己的工位：整套目录都在Eastbrook锻造坊制作，与武器锻造和护甲锻造共用同一座铁砧，Forgemistress Darva也在那里授艺。梯子是三档九个训练师配方：铜档（指环、环、颈环）技能0免费，铁档（徽戒、环、颈圈）技能25每个25银，锇档（指环、环、护符）技能50每个1金，你在该行业的档位一达到配方档位便可学习。\n\n这里没有野外配方，也还没有组合件：每一档都是绑定锻造坊的训练师手艺，所以这门手艺就在铁匠们站立的地方学、也在那里练。',
+  'guide.profPages.craftProse.jewelcrafting.routeHeading': '杰作与通往125之路',
+  'guide.profPages.craftProse.jewelcrafting.routeBody':
+    '这条梯子上没有无属性的档位：每件成品都带真实属性，所以只要更精的品质仍在你的档位上限之内，每次制作都会掷杰作概率，铁与锇金都按一级材料计入加成。铜档与铁档的成品，任何业余或未宣誓的珠宝匠都能做成精良杰作；锇金三件本身已是精良，它们的史诗杰作要等高于精良的上限，而在珠宝加工的命途开放之前没人拥有这个上限。\n\n攀登照标准路线走：铜档到25，铁档开放当天骑到50，再用锇档到75。75之后暂无更高配方，锇档收益先减半再减为四分之一：预算大约再做150件到达125上限，并让它们体面地卖钱，因为每个职业都戴首饰，而多数旅人升级时戒指和项链栏一直空着。\n\n功业之书会为你的第一件精良首饰记下Polished to Brilliance；这门手艺的里程碑与Grandmaster篇章则与它的命途一同等待。',
   'hudChrome.corpseHarvest.components.meat': '兽肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（附魔）',
   'hudChrome.materialHint.cookingCatch': '烹饪材料。必须先烹饪后才能食用。',
   'hudChrome.materialHint.fineGrade':
     '优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。',
-  'hudChrome.materialHint.arcaneDust': '附魔材料。分解普通和优秀品质的装备可得。',
-  'hudChrome.materialHint.arcaneEssence': '附魔材料。分解精良品质的装备可得。',
+  'hudChrome.materialHint.arcaneDust': '制作材料。分解普通和优秀品质的装备可得。',
+  'hudChrome.materialHint.arcaneEssence': '制作材料。分解精良品质的装备可得。',
   'hudChrome.materialHint.arcaneShard': '附魔材料。分解史诗和传说品质的装备可得。',
   'hudChrome.materialHint.resonantThread': '附魔材料。分解精良及以上品质的布甲可得。',
   'hudChrome.materialHint.resonantHide': '附魔材料。分解精良及以上品质的皮甲可得。',

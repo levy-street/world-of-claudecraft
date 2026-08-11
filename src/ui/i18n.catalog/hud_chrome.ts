@@ -2978,8 +2978,8 @@ export const hudChromeStrings = {
     // line names which craft(s) consume the stack when an item can serve more
     // than one role (WoW Crafting Reagent + multi-profession materials pattern).
     usedBy: 'Used by {crafts}.',
-    arcaneDust: 'Enchanting reagent. Disenchanted from common and uncommon gear.',
-    arcaneEssence: 'Enchanting reagent. Disenchanted from rare gear.',
+    arcaneDust: 'Crafting reagent. Disenchanted from common and uncommon gear.',
+    arcaneEssence: 'Crafting reagent. Disenchanted from rare gear.',
     arcaneShard: 'Enchanting reagent. Disenchanted from epic and legendary gear.',
     resonantThread: 'Enchanting reagent. Disenchanted from rare and better cloth armor.',
     resonantHide: 'Enchanting reagent. Disenchanted from rare and better leather armor.',
@@ -4688,6 +4688,7 @@ export const hudChromeStrings = {
       masterwork_armorcrafting: 'Armorcrafting Masterwork',
       masterwork_tailoring: 'Tailoring Masterwork',
       masterwork_leatherworking: 'Leatherworking Masterwork',
+      masterwork_jewelcrafting: 'Jewelcrafting Masterwork',
       masterwork_engineering: 'Engineering Masterwork',
       gather_event_pristine_vein: 'Pristine Vein',
       gather_event_ancient_heartwood: 'Ancient Heartwood',

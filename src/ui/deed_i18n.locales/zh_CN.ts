@@ -705,4 +705,8 @@ export const table: DeedLocaleTable = {
     name: '锻造至完美',
     desc: '在护甲锻造中制作你的第一件稀有品质物品。',
   },
+  prog_jewelcrafting_rare: {
+    name: '打磨至璀璨',
+    desc: '在珠宝加工中制作你的第一件稀有品质物品。',
+  },
 };

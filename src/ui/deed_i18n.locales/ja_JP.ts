@@ -897,4 +897,8 @@ export const table: DeedLocaleTable = {
     name: '完璧な装甲',
     desc: '防具鍛冶で初めてのレア級アイテムを作る。',
   },
+  prog_jewelcrafting_rare: {
+    name: '磨かれた輝き',
+    desc: '宝石細工で初めてのレア級アイテムを作る。',
+  },
 };

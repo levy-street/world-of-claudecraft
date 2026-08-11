@@ -40,8 +40,13 @@ function hasSupersedingPurposeHint(itemId: string, craftIds: readonly string[]):
   if (cookingCatchHintKey(itemId) !== undefined) {
     return craftIds.length === 1 && craftIds[0] === 'cooking';
   }
-  // The arcane/resonant materials open with "Enchanting reagent. ...", which
-  // already names the one craft. MATERIAL_HINT_KEYS also holds the nine fine
+  // The arcane/resonant materials lead with an enchanting-reagent sentence.
+  // That sentence answers the whole question only while enchanting is the
+  // SOLE consumer, which is what the single-craft test below decides: once a
+  // second craft consumes one (arcane_dust and arcane_essence now feed the
+  // jewelcrafting base catalog as well), the lead line covers half the answer
+  // and the Used-by line has to render so the other craft is not hidden.
+  // MATERIAL_HINT_KEYS also holds the nine fine
   // grades sharing the fineGrade key, but that sentence names NO craft, so a
   // fine grade never supersedes: even a hypothetical enchanting-only fine
   // grade still needs its Used-by line. The key literal below is type-safe,

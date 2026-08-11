@@ -201,6 +201,7 @@ export const DEED_IMAGE_IDS: ReadonlySet<string> = new Set([
   'prog_grandmaster_weaponcrafting',
   'prog_guildsworn',
   'prog_herbalism_100',
+  'prog_jewelcrafting_rare',
   'prog_leatherworking_50',
   'prog_leatherworking_rare',
   'prog_level_cap',

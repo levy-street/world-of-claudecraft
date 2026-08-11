@@ -624,9 +624,11 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'pvp_card_duel_first_win',
     ]);
     // Later releases appended more deeds after this historical wave. The
-    // release art audit painted those additions too, so the one exhaustive
-    // DEED_ART_PENDING ledger is empty and no live deed uses fallback art.
-    expect(DEED_ORDER).toHaveLength(271);
+    // release art audit painted those additions too, and the Masterwrought
+    // jewelcrafting deed shipped its crest in the same change that added it,
+    // so the one exhaustive DEED_ART_PENDING ledger is empty and no live
+    // deed uses fallback art.
+    expect(DEED_ORDER).toHaveLength(272);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="fieldGrad" cx="0.5" cy="0.42" r="0.65">
+      <stop offset="0" stop-color="#1d3370"/>
+      <stop offset="0.45" stop-color="#122252"/>
+      <stop offset="0.8" stop-color="#081231"/>
+      <stop offset="1" stop-color="#04081c"/>
+    </radialGradient>
+    <radialGradient id="gemGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#8fc2ff" stop-opacity="0.6"/>
+      <stop offset="0.55" stop-color="#4c86e8" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#4c86e8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldRim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2d078"/>
+      <stop offset="0.35" stop-color="#c9962e"/>
+      <stop offset="0.7" stop-color="#8a5a1a"/>
+      <stop offset="1" stop-color="#5c3a10"/>
+    </linearGradient>
+    <linearGradient id="goldRimLow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9c6d24"/>
+      <stop offset="1" stop-color="#4a2e0c"/>
+    </linearGradient>
+    <linearGradient id="goldBand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8dc8c"/>
+      <stop offset="0.3" stop-color="#e0b04a"/>
+      <stop offset="0.65" stop-color="#a06c1e"/>
+      <stop offset="1" stop-color="#6a4210"/>
+    </linearGradient>
+    <linearGradient id="goldSpike" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eecb70"/>
+      <stop offset="0.5" stop-color="#b98a28"/>
+      <stop offset="1" stop-color="#6e4614"/>
+    </linearGradient>
+    <linearGradient id="gemBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3f74d6"/>
+      <stop offset="0.5" stop-color="#1c46a4"/>
+      <stop offset="1" stop-color="#0c2668"/>
+    </linearGradient>
+  </defs>
+
+  <!-- cardinal spikes -->
+  <g stroke="#2a1a08" stroke-width="4" stroke-linejoin="round">
+    <polygon points="256,48 274,96 256,122 238,96" fill="url(#goldSpike)"/>
+    <polygon points="256,464 238,416 256,390 274,416" fill="url(#goldRimLow)"/>
+    <polygon points="48,256 96,238 122,256 96,274" fill="url(#goldSpike)"/>
+    <polygon points="464,256 416,274 390,256 416,238" fill="url(#goldSpike)"/>
+  </g>
+
+  <!-- medallion rim -->
+  <circle cx="256" cy="256" r="198" fill="#241608"/>
+  <circle cx="256" cy="256" r="192" fill="none" stroke="url(#goldRim)" stroke-width="18"/>
+  <circle cx="256" cy="256" r="201" fill="none" stroke="#1c1206" stroke-width="5"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#3a2410" stroke-width="8"/>
+  <circle cx="256" cy="256" r="172" fill="none" stroke="url(#goldRim)" stroke-width="6"/>
+
+  <!-- rim studs at the diagonals -->
+  <g fill="#e8c264" stroke="#4a2e0c" stroke-width="3">
+    <circle cx="120.2" cy="120.2" r="9"/>
+    <circle cx="391.8" cy="120.2" r="9"/>
+    <circle cx="120.2" cy="391.8" r="9"/>
+    <circle cx="391.8" cy="391.8" r="9"/>
+  </g>
+
+  <!-- inner field -->
+  <circle cx="256" cy="256" r="168" fill="url(#fieldGrad)"/>
+  <circle cx="256" cy="256" r="154" fill="none" stroke="#d9b45c" stroke-opacity="0.22" stroke-width="3"/>
+
+  <!-- glow behind the gem -->
+  <ellipse cx="256" cy="212" rx="128" ry="112" fill="url(#gemGlow)"/>
+
+  <!-- jeweler's ring band (torus in slight perspective) -->
+  <path fill="url(#goldBand)" fill-rule="evenodd" stroke="#3a2408" stroke-width="5"
+    d="M 256 228 A 106 74 0 1 0 256 376 A 106 74 0 1 0 256 228 Z
+       M 256 258 A 74 46 0 1 1 256 350 A 74 46 0 1 1 256 258 Z"/>
+  <!-- inner-hole upper shadow and lower band highlight -->
+  <path fill="none" stroke="#5c3a10" stroke-width="7" stroke-linecap="round"
+    d="M 192 288 A 74 46 0 0 1 320 288"/>
+  <path fill="none" stroke="#f8e0a0" stroke-opacity="0.8" stroke-width="6" stroke-linecap="round"
+    d="M 172 322 A 100 68 0 0 0 340 322"/>
+
+  <!-- ruby cabochon set in the band front -->
+  <circle cx="256" cy="374" r="13" fill="#a3172c" stroke="#5c3a10" stroke-width="4"/>
+  <circle cx="251" cy="369" r="4" fill="#ff9aa6" fill-opacity="0.85"/>
+
+  <!-- prongs gripping the gem -->
+  <g fill="url(#goldBand)" stroke="#3a2408" stroke-width="4" stroke-linejoin="round">
+    <polygon points="196,214 214,238 190,246"/>
+    <polygon points="316,214 298,238 322,246"/>
+  </g>
+
+  <!-- faceted sapphire -->
+  <g stroke="#08153c" stroke-width="4" stroke-linejoin="round">
+    <polygon fill="url(#gemBody)" points="256,124 302,142 322,196 302,242 256,258 210,242 190,196 210,142"/>
+  </g>
+  <g stroke="none">
+    <!-- crown facets -->
+    <polygon fill="#2f63c8" points="256,124 302,142 278,172 256,162"/>
+    <polygon fill="#163d94" points="302,142 322,196 292,196 278,172"/>
+    <polygon fill="#0d2a74" points="322,196 302,242 278,220 292,196"/>
+    <polygon fill="#1b4aa8" points="302,242 256,258 256,230 278,220"/>
+    <polygon fill="#0a2260" points="256,258 210,242 234,220 256,230"/>
+    <polygon fill="#2456b8" points="210,242 190,196 220,196 234,220"/>
+    <polygon fill="#3a70d4" points="190,196 210,142 234,172 220,196"/>
+    <polygon fill="#5a92ea" points="210,142 256,124 256,162 234,172"/>
+    <!-- table -->
+    <polygon fill="#4f86e4" points="256,162 278,172 292,196 278,220 256,230 234,220 220,196 234,172"/>
+    <polygon fill="#8ab8f4" fill-opacity="0.85" points="256,162 278,172 246,214 234,186"/>
+  </g>
+  <!-- facet edge light -->
+  <g fill="none" stroke="#bcd8ff" stroke-opacity="0.5" stroke-width="2">
+    <polygon points="256,162 278,172 292,196 278,220 256,230 234,220 220,196 234,172"/>
+  </g>
+
+  <!-- sparkles -->
+  <g fill="#ffffff">
+    <path d="M 213 138 L 218 154 L 234 159 L 218 164 L 213 180 L 208 164 L 192 159 L 208 154 Z"/>
+    <path d="M 305 232 L 308 241 L 317 244 L 308 247 L 305 256 L 302 247 L 293 244 L 302 241 Z" fill-opacity="0.9"/>
+    <path d="M 336 330 L 338 337 L 345 339 L 338 341 L 336 348 L 334 341 L 327 339 L 334 337 Z" fill-opacity="0.8"/>
+  </g>
+</svg>

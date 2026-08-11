@@ -2436,6 +2436,15 @@ const ITEM_ENTITY_IDS = [
   'sharp_claw',
   'curved_tusk',
   'pristine_claw',
+  'hammered_copper_band',
+  'polished_copper_loop',
+  'coiled_copper_torc',
+  'riveted_iron_signet',
+  'etched_iron_loop',
+  'iron_link_choker',
+  'weighted_thorium_band',
+  'gleaming_thorium_loop',
+  'burnished_thorium_amulet',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2564,6 +2573,19 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   thornhide_leggings: 'Thornhide Leggings',
   thornhide_gloves: 'Thornhide Gloves',
   thornhide_boots: 'Thornhide Boots',
+  // Jewelcrafting base catalog (Masterwrought phase 05): the thorium_* ids
+  // display "Osmium" (the Osmium register in content/profession_items.ts).
+  // English-appended like the quivers above until the release fill folds them
+  // into the per-locale arrays.
+  hammered_copper_band: 'Hammered Copper Band',
+  polished_copper_loop: 'Polished Copper Loop',
+  coiled_copper_torc: 'Coiled Copper Torc',
+  riveted_iron_signet: 'Riveted Iron Signet',
+  etched_iron_loop: 'Etched Iron Loop',
+  iron_link_choker: 'Iron Link Choker',
+  weighted_thorium_band: 'Weighted Osmium Band',
+  gleaming_thorium_loop: 'Gleaming Osmium Loop',
+  burnished_thorium_amulet: 'Burnished Osmium Amulet',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

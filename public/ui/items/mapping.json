@@ -108,6 +108,22 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
+   "itemId": "burnished_thorium_amulet",
+   "name": "Burnished Osmium Amulet",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "coiled_copper_torc",
+   "name": "Coiled Copper Torc",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
    "itemId": "cooking_salt",
    "name": "Cooking Salt",
    "sourcePack": "woc_professions_art",
@@ -132,6 +148,14 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
+   "itemId": "etched_iron_loop",
+   "name": "Etched Iron Loop",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
    "itemId": "game_meat",
    "name": "Game Meat",
    "sourcePack": "woc_professions_art",
@@ -146,6 +170,14 @@
    "sourceFile": "batch-10/masters/glass_vial.png (accepted v1)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+  },
+  {
+   "itemId": "gleaming_thorium_loop",
+   "name": "Gleaming Osmium Loop",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
   },
   {
    "itemId": "goldleaf_herb",
@@ -164,12 +196,28 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
+   "itemId": "hammered_copper_band",
+   "name": "Hammered Copper Band",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
    "itemId": "homespun_cloth",
    "name": "Homespun Cloth",
    "sourcePack": "woc_professions_art",
    "sourceFile": "batch-8/masters/homespun_cloth.png (accepted v1)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+  },
+  {
+   "itemId": "iron_link_choker",
+   "name": "Iron Link Choker",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
   },
   {
    "itemId": "iron_ore",
@@ -210,6 +258,14 @@
    "sourceFile": "WoC_Bag_07.png",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+  },
+  {
+   "itemId": "polished_copper_loop",
+   "name": "Polished Copper Loop",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
   },
   {
    "itemId": "prime_cut",
@@ -282,6 +338,14 @@
    "sourceFile": "batch-12/masters/resonant_timber.png (accepted v2)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+  },
+  {
+   "itemId": "riveted_iron_signet",
+   "name": "Riveted Iron Signet",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
   },
   {
    "itemId": "rough_hide",
@@ -378,6 +442,14 @@
    "sourceFile": "batch-8/masters/venom_gland.png (accepted v2)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+  },
+  {
+   "itemId": "weighted_thorium_band",
+   "name": "Weighted Osmium Band",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
   },
   {
    "itemId": "wolfhide_satchel",

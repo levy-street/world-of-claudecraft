@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 825,
-    "liveItemDefinitions": 840,
+    "itemArtFilesReviewed": 834,
+    "liveItemDefinitions": 849,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -293,9 +293,9 @@
       "armor-gloves": 40,
       "armor-helmet": 41,
       "armor-legs": 58,
-      "armor-neck": 8,
+      "armor-neck": 11,
       "armor-offhand": 5,
-      "armor-ring": 17,
+      "armor-ring": 23,
       "armor-shoulder": 49,
       "armor-waist": 27,
       "bag": 6,
@@ -328,6 +328,26 @@
           "docs/achievements/missing-painted-icons-accepted-art.json"
         ],
         "note": "The four class-overhaul integration daggers and the soul_stone painting, generated under woc-item-icon-v1 and owner-reviewed pass on 2026-08-10; the 2026-08-09 campaign review of the prior 817 files stands unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-10",
+        "branch": "feature/masterwrought",
+        "reviewer": "owner",
+        "addedIds": [
+          "burnished_thorium_amulet",
+          "coiled_copper_torc",
+          "etched_iron_loop",
+          "gleaming_thorium_loop",
+          "hammered_copper_band",
+          "iron_link_choker",
+          "polished_copper_loop",
+          "riveted_iron_signet",
+          "weighted_thorium_band"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json"
+        ],
+        "note": "The nine Masterwrought jewelcrafting placeholders (six rings and three necklaces across the copper, iron, and osmium rungs), hand-authored as original SVG rasters under woc-item-icon-v1 with woc_original_svg provenance rows in public/ui/items/mapping.json, reviewed pass on 2026-08-10; the prior 825-file review stands unchanged."
       }
     ]
   },
@@ -370,7 +390,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 825,
+    "passCount": 834,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -447,6 +467,7 @@
       "broodmother_silk_robe",
       "brutoks_maul",
       "bulwark_rusted_pauldrons",
+      "burnished_thorium_amulet",
       "canopy_silk_hank",
       "cantors_drowned_sash",
       "captains_crest",
@@ -465,6 +486,7 @@
       "cinderweave_mantle",
       "cinderweave_raiment",
       "cinderweave_slippers",
+      "coiled_copper_torc",
       "conjured_bread",
       "conjured_bread2",
       "conjured_bread3",
@@ -572,6 +594,7 @@
       "emberwing_scale",
       "emberwood_staff",
       "embroidered_mantle",
+      "etched_iron_loop",
       "event_skin_token",
       "evergarden_bloom_clipping",
       "evergarden_statue_rubbing",
@@ -629,6 +652,7 @@
       "glacier_melt",
       "glass_vial",
       "gleaming_antler",
+      "gleaming_thorium_loop",
       "gleamstag_charm",
       "gleamwood_stave",
       "glimmerfin_koi",
@@ -677,6 +701,7 @@
       "guardian_core",
       "gullhaven_watchbell",
       "gutripper_shiv",
+      "hammered_copper_band",
       "handaxe",
       "healing_potion",
       "heart_of_the_rift",
@@ -754,6 +779,7 @@
       "imperial_crimson_armor_plate",
       "imperial_gold_armor_plate",
       "inert_storm_shard",
+      "iron_link_choker",
       "iron_mining_pick",
       "iron_ore",
       "iron_vow_band",
@@ -903,6 +929,7 @@
       "pink_forest_armor_plate",
       "pitlords_cleaver",
       "plump_fen_eel",
+      "polished_copper_loop",
       "priests_sigil",
       "prime_cut",
       "pristine_claw",
@@ -961,6 +988,7 @@
       "riptide_dirk",
       "ritual_phylactery",
       "riveted_copper_girdle",
+      "riveted_iron_signet",
       "roadwardens_helm",
       "roast_mountain_goat",
       "roasted_boar",
@@ -1157,6 +1185,7 @@
       "wayfarers_hood",
       "weathered_ledger_page",
       "webwood_silk",
+      "weighted_thorium_band",
       "whetted_iron_dirk",
       "wickspun_treads",
       "widow_silk_hood",
@@ -1202,7 +1231,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 825 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10."
+    "summary": "All 834 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10."
   },
   "nonVisualContentWatch": [
     {
@@ -1359,8 +1388,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "fdeca1d9f56f720deaa285dc0d2444d83582f21a8eab0cc66963f3079fff237a",
-      "bytes": 452775
+      "sha256": "deb2d8d6025ffbcecf55469c8fe953569c66f4dad2c753c065defbde32544b6f",
+      "bytes": 457561
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1374,7 +1403,7 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "d44e0e987bbbd89913d7b34a4ee6b399c7b866f73e04b6aaaef5e3da50fceac9",
+    "sheetSetSha256": "27e11f9e3cff56f56b7d8646159ca0e2b98d45abeada60e12930a267d8c20b27",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -1762,66 +1791,66 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--128-color.png",
-        "sha256": "09eae60066443c71639fbb3fef92e1adf4629d3acf00257d7ca649824ef2cd8a",
-        "bytes": 284819,
+        "sha256": "6fd460cf5c17c547e50c827afa236f029c4afe0599c4a59038b5a6f7eca8d27c",
+        "bytes": 328887,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--40-color.png",
-        "sha256": "00f467c524587d2057179cddc7b4683c8c28af1f5deb1f276f947f4afabc7755",
-        "bytes": 53159,
+        "sha256": "1a151459e4abc640d177a0dd3f132e475a3adc133f78fa906ba92ab111271be7",
+        "bytes": 65735,
         "width": 1600,
-        "height": 166,
+        "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--28-color.png",
-        "sha256": "5bc27f13626d9ff6a1cc593d269b489f2afec3f6802365cad19f7e94c804ba30",
-        "bytes": 37836,
+        "sha256": "fea3466c610a5c9b7c02161a3955e824e2ca0c38d9057b795529f3c26940d81f",
+        "bytes": 47961,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--22-color.png",
-        "sha256": "80617e1eceaad574a7d072770d55a20e291f73f05cf1eaec102ce63e1d3bf358",
-        "bytes": 30015,
+        "sha256": "0b4d752ddc372f10f56c583d2011197e04ffa7320859060f81492eae6c1b6cd2",
+        "bytes": 38690,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--28-grayscale.png",
-        "sha256": "342ff4d1a567fb78378ca116a9009017045de29c52bec866433ae4c4cf298450",
-        "bytes": 29449,
+        "sha256": "df7f55e2a0ae7ceb4a1c3c351d94764d499c951430aaea469f28ac1a94e5f004",
+        "bytes": 37570,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--64-circle.png",
-        "sha256": "49d01e5fdb88693923f82f89b447be86f61836b7d7bf9e2ae90d274cd37ecc30",
-        "bytes": 91488,
+        "sha256": "80c177c3d6fa7b545e6d0a5f2aec9cba1a190a84b8a97ecc7a84cff389613c29",
+        "bytes": 110906,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--small-multiview.png",
-        "sha256": "97bb16ec4b82b03c5e122fa233f629ed6eb998932bd24c5e54a90ec9a043a8e7",
-        "bytes": 165242,
+        "sha256": "15874331bbc5a24a7aa3f32c6d69288be419d8378719144a479bb430e1df0545",
+        "bytes": 201460,
         "width": 1800,
-        "height": 262,
+        "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--identity.png",
-        "sha256": "aa482aa24bb511452acca50ba909819ed4a0261da61f8b2c98b4692ca79c54f2",
-        "bytes": 296873,
+        "sha256": "cad658e1b4fd82fbaccb0766d6c8b930bee3662fc338b0eb78f264b2f7f24ff4",
+        "bytes": 344676,
         "width": 1800,
-        "height": 248,
+        "height": 452,
         "format": "png"
       },
       {
@@ -1890,66 +1919,66 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--128-color.png",
-        "sha256": "b0e0ad4bb7b04615461b899c676144246817fe5021e86ba604cafbf5b33e969a",
-        "bytes": 568286,
+        "sha256": "a2e4f2103f1e3342a0dd74874b648445d2e897b44341a2a454c663b7975cc66e",
+        "bytes": 660078,
         "width": 1600,
-        "height": 376,
+        "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--40-color.png",
-        "sha256": "648f353259bdfb6b59e8642cbb0050c854cc90e576213818cb8dbac7e54b0680",
-        "bytes": 103726,
+        "sha256": "1c19604dc08e40badea909794376735097fc5c567e2b03c957d91ca80da388ea",
+        "bytes": 129543,
         "width": 1600,
-        "height": 288,
+        "height": 410,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--28-color.png",
-        "sha256": "2657ba3533d516c8cc035ab6195d31d1748194621b13f24cc06d89b041518b1e",
-        "bytes": 71660,
+        "sha256": "a5e980184a4d68cc8811ba707c5a244c2f7cebc2a55e6400ea31fedfff8e7cc2",
+        "bytes": 91737,
         "width": 1600,
-        "height": 376,
+        "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--22-color.png",
-        "sha256": "746ea0b892309cb90d3181f39c9d34989db0a076e9654153f95b8e0bd98db603",
-        "bytes": 56879,
+        "sha256": "a1e7dd4fa53c3dc2e985bc075b334cb7c898c177802557d2d996eb32c92de829",
+        "bytes": 73664,
         "width": 1600,
-        "height": 376,
+        "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--28-grayscale.png",
-        "sha256": "4693ffdbd380d538d6215fe2fa16ae8557c8b4fa92f64d49e9ecc94670daeb73",
-        "bytes": 53857,
+        "sha256": "364b2a6199aa624b6e8566c668db4cf76f3eab55db90a8bc0e34353c5c6e43de",
+        "bytes": 69491,
         "width": 1600,
-        "height": 376,
+        "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--64-circle.png",
-        "sha256": "605cba30adbbe64936782521629be5d2d06e4ec4b786e951d12af474226f66d4",
-        "bytes": 187698,
+        "sha256": "17eecda5e126b65165f5e58ea7c0ab9a9bcc818760ef874acf27e5d81e73a8d8",
+        "bytes": 227792,
         "width": 1600,
-        "height": 376,
+        "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--small-multiview.png",
-        "sha256": "7d09521bd7fcadb2e40f7dd5041dc321d330a3a4f78e864af4ae50ae0adb3fa4",
-        "bytes": 331540,
+        "sha256": "eefe306f68d440b0744e8626604477e90a76c95d1c43fac791b20f360efc15d8",
+        "bytes": 405498,
         "width": 1800,
-        "height": 480,
+        "height": 698,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--identity.png",
-        "sha256": "f1ac060b6c0c0c45a67a9a9e7804b585dbe9e97d87187972573e203febc8a54c",
-        "bytes": 591690,
+        "sha256": "2a729bd4e8fddd3d9a98e792e63e832098711ef6d32ea7d0ca0fb0dd52d731c6",
+        "bytes": 690447,
         "width": 1800,
-        "height": 452,
+        "height": 656,
         "format": "png"
       },
       {
@@ -3041,6 +3070,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "2e4f624a449d136b625146b10e6e33a8890b6cc7df4fc8a11f93a2e02a69eb8e"
+    "shippingCatalogSha256": "0903068be8c62410ca041909df5b9b0feadb5d82195056c853108adb3464522c"
   }
 }

@@ -9165,6 +9165,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornhide_leggings.name': '가시가죽 다리보호대',
   'entities.items.thornhide_gloves.name': '가시가죽 장갑',
   'entities.items.thornhide_boots.name': '가시가죽 발덮개',
+  'entities.items.hammered_copper_band.name': '망치질한 구리 반지',
+  'entities.items.polished_copper_loop.name': '윤낸 구리 고리',
+  'entities.items.coiled_copper_torc.name': '휘감긴 구리 목고리',
+  'entities.items.riveted_iron_signet.name': '리벳 박은 철 인장',
+  'entities.items.etched_iron_loop.name': '무늬 새긴 철 고리',
+  'entities.items.iron_link_choker.name': '무쇠사슬 목걸이',
+  'entities.items.weighted_thorium_band.name': '묵직한 오스뮴 반지',
+  'entities.items.gleaming_thorium_loop.name': '빛나는 오스뮴 고리',
+  'entities.items.burnished_thorium_amulet.name': '광낸 오스뮴 목걸이',
   'entities.items.final_oath_medallion.name': '최후의 맹세 메달',
   'entities.items.razorwind_torque.name': '칼바람 목가리개',
   'entities.items.cinder_sigil_pendant.name': '불씨 인장 목걸이',
@@ -10640,6 +10649,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': '방어구제작 걸작',
   'hudChrome.reliquary.markFind.masterwork_tailoring': '재봉 걸작',
   'hudChrome.reliquary.markFind.masterwork_leatherworking': '가죽세공 걸작',
+  'hudChrome.reliquary.markFind.masterwork_jewelcrafting': '보석세공 걸작',
   'hudChrome.reliquary.markFind.masterwork_engineering': '공학 걸작',
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': '완벽한 광맥',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '고대 심재',
@@ -11066,7 +11076,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.ringBody':
     '열 가지 제작 전문직이 하나의 원환에 놓여 저마다 기술을 따로 기록한다. 카드를 열면 전체 제조법 표와 수치를 볼 수 있다.',
   'guide.professions.ringWaveNote':
-    '보석세공과 각인은 지금도 원환 위에 있지만 아직 제조법이 없다. 그 콘텐츠는 이후의 지역 확장과 함께 온다.',
+    '각인은 지금도 원환 위에 자리를 지키지만 아직 제조법이 없다. 이는 실수가 아니라 의도된 설계로, 그 콘텐츠는 이후의 지역 확장과 함께 온다.',
   'guide.professions.capFmt': '상한 {cap}',
   'guide.professions.comingSoon': '제조법 없음',
   'guide.professions.gatherHubHeading': '채집',
@@ -11292,10 +11302,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '검 곁의 생업',
   'guide.professions.whatBody':
-    '전문 기술은 이 세계의 생활이다. 네 가지 채집 기술이 땅에서 원료를 캐내고, 열 가지 제작 기술이 그것을 장비와 음식, 물약, 도구로 바꾼다. 모든 것이 맞물린다. 캐낸 광석은 검이 되고, 검은 마법부여를 받으며, 그 마법부여는 낡은 장비를 분해한 가루를 필요로 한다. 전문 기술 수 제한은 없다. 콘텐츠가 있는 여덟 제작 기술과 네 채집 기술을 모두 나란히 올릴 수 있고, 유일한 배타적 선택은 언젠가 맹세할 원형뿐이며, 일단 맹세하고 나면 그 뒤로 휴면에 든 제작 기술은 더 이상 오르지 않는다. 기술은 절대 내려가지 않고, 배운 것을 빼앗기지도 않는다.',
+    '전문 기술은 이 세계의 생활이다. 네 가지 채집 기술이 땅에서 원료를 캐내고, 열 가지 제작 기술이 그것을 장비와 음식, 물약, 도구로 바꾼다. 모든 것이 맞물린다. 캐낸 광석은 검이 되고, 검은 마법부여를 받으며, 그 마법부여는 낡은 장비를 분해한 가루를 필요로 한다. 전문 기술 수 제한은 없다. 콘텐츠가 있는 제작 기술은 이제 아홉이고, 그중 여덟과 네 채집 기술을 모두 나란히 올릴 수 있으며(Engineering만 예외로, 제조법이 전부 자유 상한 위에서 시작해 그 사다리는 Bombardier의 맹세를 기다린다), 유일한 배타적 선택은 언젠가 맹세할 원형뿐이며, 일단 맹세하고 나면 그 뒤로 휴면에 든 제작 기술은 더 이상 오르지 않는다. 기술은 절대 내려가지 않고, 배운 것을 빼앗기지도 않는다.',
   'guide.professions.deedsHeading': '여정을 새기는 업적',
   'guide.professions.deedsBody':
-    '업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 여덟 제작 기술은 각각 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고, 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.',
+    '업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 아홉 제작 기술 중 여덟은 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고(보석세공은 대신 첫 희귀 장신구에 Polished to Brilliance를 새기며, 이정표 페이지는 짝과 함께 기다린다), 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.',
   'guide.professions.startHeading': '어디서 시작할까',
   'guide.professions.startBody':
     'Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남동쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.',
@@ -11328,7 +11338,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '상인은 출처를 보지 못한다. 서명된 물건도 NPC에게는 일반품 값에 팔린다. 서명의 웃돈은 플레이어 사이에만 존재하고, 바로 그래서 흥미롭다. 이름난 채집가가 서명한 횡재 광석, Prime Cut 한 점, 은퇴한 장인의 이름이 새겨진 걸작 검. 값은 누군가의 기억이 정한다. 업적의 서도 같은 본능을 좇는다. Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen, Glimmer of Hope는 모두 그 순간이 당신에게 일어났음을 증명하기 위해서만 존재하는 명성 0의 수집 표식이다. 이것은 힘이 아니다. 출처는 능력치를 사지도, 싸움을 이기지도 않는다. 좋은 날들의 영수증일 뿐이다.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading': '모두가 사려는 칼날',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
-    '희귀 단만으로 세 가지 수요를 모두 채운다. 힘 근접용 Osmium Warblade, 민첩 전사용 Glyphsteel War Axe, 그리고 로브 차림을 위한 지능과 정신의 지팡이 Highpine Battle Staff. 제작의 고리에서는 방어구 제작과 보석세공 사이에 있다. 대장장이(무기 제작과 방어구 제작)는 Forgemistress Darva 앞에서 광맥 세 곳을 제 손으로 캐고 맹세할 수 있고, 보석세공과 이루는 Bladewright는 그 제조법이 미래 지역과 함께 올 때까지 맹세할 수 없다.',
+    '희귀 단만으로 세 가지 수요를 모두 채운다. 힘 근접용 Osmium Warblade, 민첩 전사용 Glyphsteel War Axe, 그리고 로브 차림을 위한 지능과 정신의 지팡이 Highpine Battle Staff. 제작의 고리에서는 방어구 제작과 보석세공 사이에 있다. 대장장이(무기 제작과 방어구 제작)는 Forgemistress Darva 앞에서 광맥 세 곳을 제 손으로 캐고 맹세할 수 있고, 보석세공과 이루는 Bladewright도 고리에 이름을 올렸고, 보석세공은 이제 같은 대장간에서 0에서 50까지의 장신구 사다리를 두드리지만, 이 짝은 맹세 퀘스트가 생길 때까지 맹세할 수 없다.',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': '용광로가 삼키는 것',
   'guide.profPages.craftProse.weaponcrafting.materialsBody':
     '채광이 등뼈다. 구리 광석은 Eastbrook Vale, 철 광석은 Mirefen Marsh, 오스뮴은 Thornpeak Heights에서 난다. 벌목도 생각보다 중요하다. ironbark가 멧돼지 창 자루가 되고, ashwood가 망치를 받치며, 고산솔 통나무 하나가 지팡이가 된다. 나머지는 사냥과 상점에서 온다. 거친 가죽은 늑대와 멧돼지 사체에서 벗기고, 뼛조각은 일상 사냥에서 나오며, 사다리 제조법은 Smithing Flux(Darva에게 20동)를 태운다. 채광이 달리면 Darva가 오스뮴 광석을, Tinker Gizzel이 공작소에서 문양강철 주괴를 비싸게 판다.',
@@ -11412,20 +11422,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '공구에는 전투 능력치가 없어 걸작이 절대 발동하지 않는다. 특화는 여전히 기술 75다. 재료 20% 절약에, 어떤 채집 여행이든 작업장으로 바꾸는 임시 야외 공작소가 더해진다. 성장은 거의 줄지 않는다. 기술 75 제조법은 100까지 전속에 이후 절반, 기술 150 제조법은 상한 125까지 내내 전속이니 진짜 제약은 재료와 돈이지 회색 제조법이 아니다. 먼저 짝을 정하자. Tinker Gizzel에게서 폭격수 조율을 받는다. 그다음 사다리를 먹인다. 채광, 벌목, 약초학을 직접 올리거나 채집가와 친해지고, 3단계 공구는 상점에서 사며, Gizzel의 주문(Ironbark Log 8개에 16동, 30분마다)은 용돈으로 삼자. 홍보 문구는 저절로 써진다. 교점보다 높은 공구 단계 하나마다 2.5초 채집 시전에서 0.4초를 깎는다(하한 1.5초). 기술 50에 Cogs and Sprockets, 125에 Grandmaster Engineering이다.',
   'guide.profPages.craftProse.enchanting.identityHeading': '장비를 풀고, 힘을 되돌리다',
   'guide.profPages.craftProse.enchanting.identityBody':
-    '작업대도, 스승도, 사야 할 제조법 목록도 없다. 모든 마법부여는 처음부터 알려져 있고, 분해는 누구나 첫날부터 할 수 있으며, 기술은 여느 기술처럼 125가 상한이다. 각인과 보석세공 사이에 있어 짝은 Arcanist와 Gembinder지만, 두 이웃 모두 제조법이 오기 전이라 아직 맹세할 수 없다. 그래서 오늘의 마법부여는 모두의 기술이다. 맹세 전엔 자유로이 희귀 단계까지 오르고, 폭격수나 약제사의 취미로도 자연스러운 선택이다. 마법부여사는 채집 세계도 떠받친다. 끼울 수 있는 세 가지 공구 효과가 모두 마법부여사의 작품이고, 원제작자는 제 작품의 재충전을 할인받으며 특화하면 더 깊어진다.',
+    '작업대도, 스승도, 사야 할 제조법 목록도 없다. 모든 마법부여는 처음부터 알려져 있고, 분해는 누구나 첫날부터 할 수 있으며, 기술은 여느 기술처럼 125가 상한이다. 각인과 보석세공 사이에 있어 짝은 Arcanist와 Gembinder지만, 둘 다 아직 맹세할 수 없다. 각인은 첫 제조법을 기다리고 있고, 보석세공은 이제 대장간에서 제 사다리를 두드리지만 Gembinder에는 아직 맹세 퀘스트가 없다. 그래서 오늘의 마법부여는 모두의 기술이다. 맹세 전엔 자유로이 희귀 단계까지 오르고, 폭격수나 약제사의 취미로도 자연스러운 선택이다. 마법부여사는 채집 세계도 떠받친다. 끼울 수 있는 세 가지 공구 효과가 모두 마법부여사의 작품이고, 원제작자는 제 작품의 재충전을 할인받으며 특화하면 더 깊어진다.',
   'guide.profPages.craftProse.enchanting.levelingHeading': '마법부여 올리는 법',
   'guide.profPages.craftProse.enchanting.levelingBody':
     '기술을 움직이는 행동은 둘이다. 분해와 마법부여 시전. 성공마다 최대 1점이고, 일의 무게로 환산된다. 일반 분해와 가루만 드는 마법부여는 일반 일, 고급 분해와 정수 마법부여는 고급, 희귀 분해와 모든 Runed나 Greater 마법부여는 희귀, 영웅과 전설 분해는 그보다 높다. 익숙한 숙달 감쇠가 25점 단위로 걸려 일반 일은 기술 75에, 고급 일은 100에, 희귀 일은 정확히 상한 125에 회색이 된다. 마법부여만의 자비도 하나 있다. 천장을 넘는 입력은 0이 아니라 천장으로 내림되니, 맹세 전의 영웅 분해는 아무것도 못 배우는 대신 희귀로 계산된다. 마법부여가 다른 정체성 뒤에서 휴면하면 모든 것이 일반 일로 계산되어 오름세가 75에 멎고, 취미로 두면 희귀 일이 여전히 값을 하되 75 이후 느려질 뿐이다.',
   'guide.profPages.craftProse.enchanting.marketHeading': '부여된 사본, 출처, 시장',
   'guide.profPages.craftProse.enchanting.marketBody':
     '마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 이제 부여품과 서명품도 세계 시장에 올릴 수 있다. 한 점씩 단일 등록으로 팔리고, 툴팁에 부여와 제작자의 서명이 표시되며, 큰까마귀 우편으로도 똑같이 보낼 수 있다. 재료는 여전히 장사의 든든한 절반이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다.',
+  'guide.profPages.craftIntro.jewelcrafting':
+    '보석세공은 Eastbrook 대장간의 더 섬세한 작업대다. 구리, 철, 희귀 오스뮴으로 반지와 목걸이를 만들고, 단마다 힘 반지, 지능 반지, 민첩 목걸이가 하나씩 놓인다. 장신구는 방어도도 직업 제한도 없으니, 손가락과 목이 있는 모두가 손님이다.',
+  'guide.profPages.craftProse.jewelcrafting.identityHeading': '대장간의 섬세한 일',
+  'guide.profPages.craftProse.jewelcrafting.identityBody':
+    '사다리는 세 단, 단마다 세 점이다. 힘 반지, 지능 반지, 민첩 목걸이를 먼저 구리로, 다음은 철로, 꼭대기에서는 희귀 오스뮴으로 다시 만든다. 장신구는 방어도도 직업 제한도 없고, 구리 단조차 진짜 능력치를 달고 나온다. 능력치 없는 반지는 아무것도 아니기 때문이다.\n\n제작의 고리에서는 마법부여와 무기 제작 사이에 있어 두 짝 정체성을 가진다. 보석결속사(마법부여와 보석세공)와 칼날장인(보석세공과 무기 제작)이다. 둘 다 아직 맹세 퀘스트가 없으니 오늘의 보석세공은 모두의 기술이다. 모든 제조법이 미맹세 기술이 일하는 희귀 단 안에 있어, 어떤 맹세보다 먼저 사다리 전체가 열려 있다.',
+  'guide.profPages.craftProse.jewelcrafting.materialsHeading': '광석과 가루와 정수',
+  'guide.profPages.craftProse.jewelcrafting.materialsBody':
+    '이 작업대는 채광과 분해로 돌아간다. 구리 광석은 Eastbrook Vale의 1단 광맥에서, 철 광석은 Mirefen Marsh에서, 오스뮴 광석은 Thornpeak Heights에서 나오고, 제조법마다 제련용 융제 한두 병(Darva에게 20동)이 들어간다. 나머지 절반은 분해대에서 온다. 구리 단은 울림 가루를, 철 단과 오스뮴 단은 울림 정수를 찾으니, 보석세공사는 마법부여사의 가장 든든한 단골이 되거나 스스로 분해 습관을 들이게 된다.\n\n오스뮴 단에는 마무리가 하나 더 있다. 희귀 단 각 점은 오스뮴 외에 철 광석 두 개를 세공 밑판의 땜납으로 쓴다. 광석도 가루도 상점에서는 팔지 않는다. 세계에서 캐거나 거래와 세계 시장으로 다른 플레이어에게서 얻고, 돈으로 사는 것은 융제뿐이다.',
+  'guide.profPages.craftProse.jewelcrafting.ladderHeading': '모루 곁에서 배운다',
+  'guide.profPages.craftProse.jewelcrafting.ladderBody':
+    '보석세공에는 자기 작업대가 없다. 목록 전부가 Eastbrook 대장간, 무기 제작과 방어구 제작이 함께 쓰는 그 모루에서 만들어지고, Forgemistress Darva가 거기서 가르친다. 사다리는 세 단 아홉 개의 훈련사 제조법이다. 구리 단(반지, 고리, 목고리)은 기술 0에 무료, 철 단(인장, 고리, 목걸이)은 기술 25에 각 25은, 오스뮴 단(반지, 고리, 목걸이)은 기술 50에 각 1금이며, 당신의 단이 제조법의 단에 닿는 순간 배울 수 있다.\n\n야외 제조법도 합작품도 아직 없다. 모든 단이 대장간 전용 훈련사 일이라, 이 기술은 대장장이들이 서 있는 자리에서 배우고 거기서 익힌다.',
+  'guide.profPages.craftProse.jewelcrafting.routeHeading': '걸작, 그리고 125까지의 길',
+  'guide.profPages.craftProse.jewelcrafting.routeBody':
+    '이 사다리에는 능력치 없는 단이 없다. 모든 성과물이 진짜 능력치를 달고 나오니, 더 고운 품질이 당신의 단 상한 안에 드는 한 매 제작이 걸작 확률을 굴리고, 철과 오스뮴은 둘 다 1단 재료로 가산된다. 구리 단과 철 단은 취미든 미맹세든 누구라도 희귀 걸작으로 빚을 수 있다. 오스뮴 세 점은 이미 희귀라, 그보다 한 단 높은 걸작은 희귀 위의 상한을 기다리는데, 보석세공의 짝이 열리기 전에는 아무도 그 상한을 갖지 못한다.\n\n오르는 길은 표준 그대로다. 구리로 25, 철 단은 열리는 날 올라 50, 오스뮴으로 75까지. 75 너머는 아직 아무것도 없어 오스뮴 제조법은 절반으로, 다시 4분의 1로 흐려진다. 125 상한까지 대략 150회를 더 잡고, 만든 것은 떳떳하게 팔아 밑천을 대라. 모든 직업이 장신구를 차고, 대부분의 여행자는 반지와 목걸이 칸을 비운 채 성장하니까.\n\n업적의 서는 첫 희귀 장신구에 Polished to Brilliance를 새긴다. 이 기술의 이정표와 Grandmaster 페이지는 그 짝 정체성과 함께 기다린다.',
   'hudChrome.corpseHarvest.components.meat': '고기',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (마법부여)',
   'hudChrome.materialHint.cookingCatch': '요리 재료. 먹기 전에 먼저 요리해야 합니다.',
   'hudChrome.materialHint.fineGrade':
     '상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.',
-  'hudChrome.materialHint.arcaneDust': '마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.',
-  'hudChrome.materialHint.arcaneEssence': '마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.',
+  'hudChrome.materialHint.arcaneDust': '제작 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.',
+  'hudChrome.materialHint.arcaneEssence': '제작 재료. 희귀 장비의 마력을 추출해 얻습니다.',
   'hudChrome.materialHint.arcaneShard': '마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.',
   'hudChrome.materialHint.resonantThread':
     '마법부여 재료. 희귀 이상 천 방어구의 마력을 추출해 얻습니다.',

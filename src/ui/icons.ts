@@ -3560,6 +3560,44 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   yumis_keepsake_locket: r('storm', 'sky', ['gem'], ['sparkle', 'glow']),
   zense_meridian: r('arcane', 'arcanePink', ['moon', 'gem'], ['glow']),
   medallion_of_endless_profit: r('treasure', 'gold', ['coin', 'sunburst'], ['sparkle']),
+  // Masterwrought crafted jewelry ladder (jewelcrafting): the same coin-base
+  // read, the material palette carries the copper/iron/osmium rung and a
+  // stat-tinted gem overlay carries the str/int/agi identity (blood, sky,
+  // leafGreen); necklaces widen the coin into a medallion and drop the gem
+  // low as the pendant.
+  hammered_copper_band: r('earth', 'ember', ['coin', { p: 'gem', ...TR, pal: 'blood' }]),
+  polished_copper_loop: r('earth', 'ember', ['coin', { p: 'gem', ...TR, pal: 'sky' }], ['sparkle']),
+  coiled_copper_torc: r('earth', 'ember', [
+    { p: 'coin', s: 1.1 },
+    { p: 'gem', ...BR, pal: 'leafGreen' },
+  ]),
+  riveted_iron_signet: r('steel', 'steel', ['coin', { p: 'gem', ...TR, pal: 'blood' }]),
+  etched_iron_loop: r('steel', 'steel', ['coin', { p: 'gem', ...TR, pal: 'sky' }], ['sparkle']),
+  iron_link_choker: r('steel', 'steel', [
+    { p: 'coin', s: 1.1 },
+    { p: 'gem', ...BR, pal: 'leafGreen' },
+  ]),
+  weighted_thorium_band: r(
+    'arcane',
+    'silverWhite',
+    ['coin', { p: 'gem', ...TR, pal: 'blood' }],
+    ['glow'],
+  ),
+  gleaming_thorium_loop: r(
+    'arcane',
+    'silverWhite',
+    ['coin', { p: 'gem', ...TR, pal: 'sky' }],
+    ['glow', 'sparkle'],
+  ),
+  burnished_thorium_amulet: r(
+    'arcane',
+    'silverWhite',
+    [
+      { p: 'coin', s: 1.1 },
+      { p: 'gem', ...BR, pal: 'leafGreen' },
+    ],
+    ['glow'],
+  ),
   // Nythraxis raid offhand epics. Two-handed weapons use the painted-weapon lane below.
   bonewrought_bulwark: r('steel', 'bone', ['shield', { p: 'skull', ...TR }], ['glow', 'sparkle']),
   wraithfire_orb: r('shadow', 'shadowPurple', ['gem'], ['glow', 'sparkle']),

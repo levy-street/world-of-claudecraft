@@ -948,4 +948,8 @@ export const table: DeedLocaleTable = {
     name: '완벽을 향한 판금',
     desc: '방어구 제작에서 처음으로 희귀 등급 아이템을 제작하십시오.',
   },
+  prog_jewelcrafting_rare: {
+    name: '광채를 향한 연마',
+    desc: '보석세공에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
 };

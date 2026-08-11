@@ -8767,6 +8767,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornhide_leggings.name': '荊棘護腿',
   'entities.items.thornhide_gloves.name': '荊棘護手',
   'entities.items.thornhide_boots.name': '荊棘軟靴',
+  'entities.items.hammered_copper_band.name': '錘鍛銅指環',
+  'entities.items.polished_copper_loop.name': '拋光銅環',
+  'entities.items.coiled_copper_torc.name': '盤繞銅頸環',
+  'entities.items.riveted_iron_signet.name': '鉚接鐵徽戒',
+  'entities.items.etched_iron_loop.name': '蝕刻鐵環',
+  'entities.items.iron_link_choker.name': '鐵鏈頸圈',
+  'entities.items.weighted_thorium_band.name': '沉重鋨金指環',
+  'entities.items.gleaming_thorium_loop.name': '輝光鋨金環',
+  'entities.items.burnished_thorium_amulet.name': '磨光鋨金護符',
   'entities.items.final_oath_medallion.name': '最終誓約勳章',
   'entities.items.razorwind_torque.name': '剃風頸環',
   'entities.items.cinder_sigil_pendant.name': '燼印墜飾',
@@ -10173,6 +10182,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': '護甲鍛造傑作',
   'hudChrome.reliquary.markFind.masterwork_tailoring': '裁縫傑作',
   'hudChrome.reliquary.markFind.masterwork_leatherworking': '製皮傑作',
+  'hudChrome.reliquary.markFind.masterwork_jewelcrafting': '珠寶設計傑作',
   'hudChrome.reliquary.markFind.masterwork_engineering': '工程學傑作',
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': '完美礦脈',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '古木心材',
@@ -10584,7 +10594,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.professions.ringBody':
     '十種製作行業排列在一個輪環上，各自獨立記錄技能；點開一張卡片即可查看完整的配方表與數值。',
   'guide.professions.ringWaveNote':
-    '珠寶設計與銘文學如今已在輪環上，但尚未提供任何配方；它們的內容將隨後續的區域擴充一同到來。',
+    '輪環上還有一門手藝，銘文學，佔著席位卻尚未提供任何配方；這是刻意為之而非疏漏：它的內容將隨後續的區域擴充一同到來。',
   'guide.professions.capFmt': '上限{cap}',
   'guide.professions.comingSoon': '暫無配方',
   'guide.professions.gatherHubHeading': '採集',
@@ -10805,10 +10815,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '劍之外的一門手藝',
   'guide.professions.whatBody':
-    '專業是這個世界的營生：四種採集行業從大地中獲取原料，十種製作行業把它們變成裝備、飯菜、藥水與工具。萬物環環相扣：你挖出的礦石成為刀劍，刀劍接受附魔，而附魔又需要從舊裝備中分解出的粉塵。這裡沒有專業數量限制：每個角色都能同時修習全部八種已有內容的製作行業與全部四種採集行業，唯一的排他選擇是你最終宣誓的命途，而一旦宣誓，落入休眠的製作行業便不再上升。技能永不下降，學會的東西也永遠不會被奪走。',
+    '專業是這個世界的營生：四種採集行業從大地中獲取原料，十種製作行業把它們變成裝備、飯菜、藥水與工具。萬物環環相扣：你挖出的礦石成為刀劍，刀劍接受附魔，而附魔又需要從舊裝備中分解出的粉塵。這裡沒有專業數量限制：如今九種製作行業已有內容，每個角色都能同時修習其中八種與全部四種採集行業（工程學是唯一的例外：它的配方全部始於自由上限之上，要等爆破師的誓言），唯一的排他選擇是你最終宣誓的命途，而一旦宣誓，落入休眠的製作行業便不再上升。技能永不下降，學會的東西也永遠不會被奪走。',
   'guide.professions.deedsHeading': '銘記旅程的功業',
   'guide.professions.deedsBody':
-    '功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。八種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。',
+    '功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。九種可修行業中有八種各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜（珠寶設計則以第一件精良首飾記下Polished to Brilliance，其里程碑篇章與命途一同等待）；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。',
   'guide.professions.startHeading': '從哪裡開始',
   'guide.professions.startBody':
     '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東南Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。',
@@ -10841,7 +10851,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '商人看不見出處：署名物品賣給NPC只值普通價，簽名的溢價只存在於玩家之間。名家署名的橫財礦石、一塊Prime Cut、一柄署著已退隱工匠之名的傑作之刃，價格全憑記憶開價。功業之書裡的Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen與Glimmer of Hope都是零聲望的收藏印記，只為證明那一刻發生在你身上。出處不買屬性也不贏戰鬥，它是這遊戲裡美好日子的存根。',
   'guide.profPages.craftProse.weaponcrafting.identityHeading': '人人都要買的鋒刃',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
-    '精良一檔就涵蓋三種胃口：力量近戰的Osmium Warblade、敏捷戰士的Glyphsteel War Axe，以及施法者的智力精神法杖Highpine Battle Staff。在製作之輪上它位於護甲鍛造與珠寶設計之間；鐵匠（武器鍛造與護甲鍛造）可在Forgemistress Darva處宣誓，與珠寶設計組成的Bladewright則要等後者的配方隨未來區域到來。',
+    '精良一檔就涵蓋三種胃口：力量近戰的Osmium Warblade、敏捷戰士的Glyphsteel War Axe，以及施法者的智力精神法杖Highpine Battle Staff。在製作之輪上它位於護甲鍛造與珠寶設計之間；鐵匠（武器鍛造與護甲鍛造）可在Forgemistress Darva處宣誓，與珠寶設計組成的鑄刃師也標註在輪上，如今珠寶設計已在同一座鍛造坊錘打自己的0到50首飾梯子，但這對命途仍要等它的宣誓任務出現方可宣誓。',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': '鍛爐吞噬什麼',
   'guide.profPages.craftProse.weaponcrafting.materialsBody':
     '採礦是根基：銅礦出自Eastbrook Vale，鐵礦出自Mirefen Marsh，鋨礦出自Thornpeak Heights。伐木也很重要：鐵皮木做矛桿，梣木做錘柄，一根高松成杖。粗皮從狼和野豬屍體上剝取，碎骨來自日常獵殺，梯子上的配方要燒Smithing Flux（Darva處20銅一罐）。Darva賣鋨礦，Tinker Gizzel在工坊賣銘鋼錠，價格不菲。',
@@ -10925,20 +10935,34 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '工具沒有戰鬥屬性，永不出傑作。75照常專精：省20%材料，外加把任何採集之旅變成車間的臨時野外工坊。成長幾乎不衰減：75檔配方到100全速、之後半速，150檔配方到125上限一路全速，真正的瓶頸是材料與銅板。先定命途，從Tinker Gizzel處取爆破師調諧；再餵梯子：自練採集或結交採集者，商店買齊3級工具，把Gizzel的訂單（八根Ironbark Log換16銅，每30分鐘一次）當零花錢。賣點不言自明：高於節點的每級工具都從2.5秒採集讀條裡削去0.4秒（下限1.5秒）。技能50記下Cogs and Sprockets，125是Grandmaster Engineering。',
   'guide.profPages.craftProse.enchanting.identityHeading': '拆開裝備，注回力量',
   'guide.profPages.craftProse.enchanting.identityBody':
-    '沒有工位、沒有訓練師、沒有要買的配方書：所有附魔初始即會，誰都能從第一天開始分解，技能與各行業一樣以125為上限。它位於銘文學與珠寶設計之間，兩條命途是Arcanist與Gembinder，均因鄰居還沒有配方而暫不可宣誓；因此附魔今天是所有人的手藝：宣誓前自由練到精良層，也是爆破師或藥劑師天然的愛好選擇。附魔師還維繫著採集世界：三種可鑲嵌的工具效果都是附魔師的作品，原作者為自己的作品充能享有折扣，專精後更深。',
+    '沒有工位、沒有訓練師、沒有要買的配方書：所有附魔初始即會，誰都能從第一天開始分解，技能與各行業一樣以125為上限。它位於銘文學與珠寶設計之間，兩條命途是Arcanist與Gembinder，均暫不可宣誓：銘文學仍在等待第一批配方，而珠寶設計雖已在鍛造坊錘打自己的梯子，Gembinder卻還沒有宣誓任務；因此附魔今天是所有人的手藝：宣誓前自由練到精良層，也是爆破師或藥劑師天然的愛好選擇。附魔師還維繫著採集世界：三種可鑲嵌的工具效果都是附魔師的作品，原作者為自己的作品充能享有折扣，專精後更深。',
   'guide.profPages.craftProse.enchanting.levelingHeading': '附魔如何升級',
   'guide.profPages.craftProse.enchanting.levelingBody':
     '兩種行動推動技能：分解與施加附魔，每次成功最多一點，按工作的分量折算：普通分解與純粉塵附魔算普通活；優秀分解與精華附魔算優秀活；精良分解與所有Runed或Greater附魔算精良活；史詩與傳說分解更高。熟悉的精通衰減按25點層級作用：普通活在技能75變灰，優秀活在100，精良活恰在125上限。附魔另有一份仁慈：高於命途上限的輸入向下取整而非歸零，宣誓前史詩分解按精良計而非一無所獲；若附魔淪為休眠，一切按普通活計，爬升停在75；作為愛好則精良活仍有收益，只是75之後變慢。',
   'guide.profPages.craftProse.enchanting.marketHeading': '附魔副本、出處與市場',
   'guide.profPages.craftProse.enchanting.marketBody':
     '施加附魔消耗材料並標記特定的一件副本。用在背包中的副本上，交還一件獨立的附魔副本；用在已穿戴的裝備上，則就地附魔，無需脫下再穿上。無論哪種，加成都永遠跟隨。一件一附魔：對附魔副本施加另一個附魔會先要求確認，然後直接替換舊附魔，舊附魔被摧毀且不退還材料；出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。附魔與署名件如今也能上架：每件以單件掛單出售，物品提示會顯示附魔與製作者印記，渡鴉郵驛同樣可以寄送；材料依舊是穩定的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。',
+  'guide.profPages.craftIntro.jewelcrafting':
+    '珠寶設計是Eastbrook鍛造坊裡更精細的那張工作檯：銅、鐵與精良鋨金的戒指與項鍊，每一檔都有一枚力量戒指、一枚智力戒指和一條敏捷項鍊。首飾沒有護甲、不限職業，所以它的顧客就是所有長著手指和脖子的人。',
+  'guide.profPages.craftProse.jewelcrafting.identityHeading': '鍛造坊裡的細活',
+  'guide.profPages.craftProse.jewelcrafting.identityBody':
+    '梯子是三檔、每檔三件：一枚力量戒指、一枚智力戒指和一條敏捷項鍊，先用銅，再用鐵，最後在頂端用精良鋨金再來一遍。首飾沒有護甲也不限職業，連銅檔也帶著實打實的屬性，因為一枚沒有屬性的戒指什麼都不是。\n\n在製作之輪上它位於附魔與武器鍛造之間，因此擁有兩條命途：縛晶師（附魔與珠寶設計）與鑄刃師（珠寶設計與武器鍛造）。兩者都還沒有宣誓任務，所以今天珠寶設計是所有人的手藝：每個配方都在未宣誓行業可用的精良層之內，整條梯子在任何誓言之前就完全敞開。',
+  'guide.profPages.craftProse.jewelcrafting.materialsHeading': '礦石、塵與精華',
+  'guide.profPages.craftProse.jewelcrafting.materialsBody':
+    '這張工作檯靠採礦與分解運轉。銅礦出自Eastbrook Vale的一級礦脈，鐵礦出自Mirefen Marsh，鋨礦出自Thornpeak Heights，每個配方還要一兩罐鍛造助熔劑（Darva處20銅一罐）。每件首飾的另一半來自分解檯：銅檔用鈴音之塵，鐵檔與鋨檔要鈴音精華，所以珠寶匠不是附魔師最穩定的顧客，就是自己養成了分解的習慣。\n\n鋨檔多一道講究：每件精良首飾除鋨料外還要兩塊鐵礦石，作為焊料嵌入細工底座。礦石與塵都無處花錢購買：它們來自世界本身，或經交易與世界市場來自另一位玩家；只有助熔劑用錢能買。',
+  'guide.profPages.craftProse.jewelcrafting.ladderHeading': '在鐵砧旁學藝',
+  'guide.profPages.craftProse.jewelcrafting.ladderBody':
+    '珠寶設計沒有自己的工位：整套目錄都在Eastbrook鍛造坊製作，與武器鍛造和護甲鍛造共用同一座鐵砧，Forgemistress Darva也在那裡授藝。梯子是三檔九個訓練師配方：銅檔（指環、環、頸環）技能0免費，鐵檔（徽戒、環、頸圈）技能25每個25銀，鋨檔（指環、環、護符）技能50每個1金，你在該行業的檔位一達到配方檔位便可學習。\n\n這裡沒有野外配方，也還沒有組合件：每一檔都是綁定鍛造坊的訓練師手藝，所以這門手藝就在鐵匠們站立的地方學、也在那裡練。',
+  'guide.profPages.craftProse.jewelcrafting.routeHeading': '傑作與通往125之路',
+  'guide.profPages.craftProse.jewelcrafting.routeBody':
+    '這條梯子上沒有無屬性的檔位：每件成品都帶真實屬性，所以只要更精的品質仍在你的檔位上限之內，每次製作都會擲傑作機率，鐵與鋨金都按一級材料計入加成。銅檔與鐵檔的成品，任何業餘或未宣誓的珠寶匠都能做成精良傑作；鋨金三件本身已是精良，它們的史詩傑作要等高於精良的上限，而在珠寶設計的命途開放之前沒人擁有這個上限。\n\n攀登照標準路線走：銅檔到25，鐵檔開放當天騎到50，再用鋨檔到75。75之後暫無更高配方，鋨檔收益先減半再減為四分之一：預算大約再做150件到達125上限，並讓它們體面地賣錢，因為每個職業都戴首飾，而多數旅人升級時戒指和項鍊欄一直空著。\n\n功業之書會為你的第一件精良首飾記下Polished to Brilliance；這門手藝的里程碑與Grandmaster篇章則與它的命途一同等待。',
   'hudChrome.corpseHarvest.components.meat': '獸肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（附魔）',
   'hudChrome.materialHint.cookingCatch': '烹飪材料。必須先烹飪後才能食用。',
   'hudChrome.materialHint.fineGrade':
     '優質品級。以等級高於該材料的工具在滿級礦脈採集所得，在任何需要普通版本的地方均可替代使用。',
-  'hudChrome.materialHint.arcaneDust': '附魔材料。分解普通和優秀品質的裝備可得。',
-  'hudChrome.materialHint.arcaneEssence': '附魔材料。分解精良品質的裝備可得。',
+  'hudChrome.materialHint.arcaneDust': '製作材料。分解普通和優秀品質的裝備可得。',
+  'hudChrome.materialHint.arcaneEssence': '製作材料。分解精良品質的裝備可得。',
   'hudChrome.materialHint.arcaneShard': '附魔材料。分解史詩和傳說品質的裝備可得。',
   'hudChrome.materialHint.resonantThread': '附魔材料。分解精良及以上品質的布甲可得。',
   'hudChrome.materialHint.resonantHide': '附魔材料。分解精良及以上品質的皮甲可得。',

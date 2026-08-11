@@ -9177,6 +9177,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornhide_leggings.name': 'ソーンハイドの脚当て',
   'entities.items.thornhide_gloves.name': 'ソーンハイドの手甲',
   'entities.items.thornhide_boots.name': 'ソーンハイドの足袋',
+  'entities.items.hammered_copper_band.name': '鎚打ちの銅指輪',
+  'entities.items.polished_copper_loop.name': '磨かれた銅の輪',
+  'entities.items.coiled_copper_torc.name': '渦巻き銅の首輪',
+  'entities.items.riveted_iron_signet.name': '鋲留めの鉄印章',
+  'entities.items.etched_iron_loop.name': '彫刻された鉄の輪',
+  'entities.items.iron_link_choker.name': '鉄鎖のチョーカー',
+  'entities.items.weighted_thorium_band.name': '重厚なオスミウム指輪',
+  'entities.items.gleaming_thorium_loop.name': '輝くオスミウムの輪',
+  'entities.items.burnished_thorium_amulet.name': '磨き上げたオスミウムのアミュレット',
   'entities.items.final_oath_medallion.name': '最後の誓いのメダリオン',
   'entities.items.razorwind_torque.name': '刃風の首輪',
   'entities.items.cinder_sigil_pendant.name': '熾火印のペンダント',
@@ -10656,6 +10665,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': '防具製作の傑作',
   'hudChrome.reliquary.markFind.masterwork_tailoring': '裁縫の傑作',
   'hudChrome.reliquary.markFind.masterwork_leatherworking': '皮革細工の傑作',
+  'hudChrome.reliquary.markFind.masterwork_jewelcrafting': '宝石細工の傑作',
   'hudChrome.reliquary.markFind.masterwork_engineering': '工学の傑作',
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': '無垢の鉱脈',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '古代の心材',
@@ -11080,7 +11090,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.professions.ringBody':
     '十の製作職がひとつの輪に並び、それぞれが独自のスキルを記録します。カードを開くと完全なレシピ表と数値を確認できます。',
   'guide.professions.ringWaveNote':
-    '宝石細工と銘文は現在も輪の上にありますが、レシピはまだありません。その内容は今後のゾーン拡張とともに追加されます。',
+    '銘文は現在も輪の上に席を保っていますが、レシピはまだありません。これは見落としではなく意図的な設計で、その内容は今後のゾーン拡張とともに追加されます。',
   'guide.professions.capFmt': '上限{cap}',
   'guide.professions.comingSoon': 'レシピ未実装',
   'guide.professions.gatherHubHeading': '採集',
@@ -11306,10 +11316,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '剣のかたわらの生業',
   'guide.professions.whatBody':
-    '専門技能はこの世界の暮らしそのものです。四つの採集職が大地から素材を引き出し、十の製作職がそれを装備や食事、薬、道具に変えます。すべてが連鎖します。掘った鉱石は剣になり、剣はエンチャントを受け、そのエンチャントは古い装備を砕いた粉を必要とします。職業数の制限はありません。今内容のある八つの製作職と四つの採集職をすべて並行して伸ばせます。唯一の排他的な選択は、いずれ誓う生き方だけです。ただし、いったん誓いを立てると、その陰で休眠に入った製作職は伸びが止まります。スキルは決して下がらず、学んだことが失われることもありません。',
+    '専門技能はこの世界の暮らしそのものです。四つの採集職が大地から素材を引き出し、十の製作職がそれを装備や食事、薬、道具に変えます。すべてが連鎖します。掘った鉱石は剣になり、剣はエンチャントを受け、そのエンチャントは古い装備を砕いた粉を必要とします。職業数の制限はありません。内容のある製作職は九つになり、そのうち八つと四つの採集職をすべて並行して伸ばせます（Engineeringだけは例外で、レシピが全て自由上限より上から始まるため、その梯子はBombardierの誓いを待ちます）。唯一の排他的な選択は、いずれ誓う生き方だけです。ただし、いったん誓いを立てると、その陰で休眠に入った製作職は伸びが止まります。スキルは決して下がらず、学んだことが失われることもありません。',
   'guide.professions.deedsHeading': '旅路を刻む功績',
   'guide.professions.deedsBody':
-    '功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。八つの製作職はそれぞれスキル50で節目の功績、上限125でGrandmaster称号を戴き、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。初めての採集や製作、野外の幸運な発見、サルベージにも静かなページがあります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。',
+    '功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。九つの製作職のうち八つはスキル50で節目の功績、上限125でGrandmaster称号を戴き（宝石細工は代わりに最初のレア品でPolished to Brillianceを記し、節目のページは対とともに待ちます）、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。初めての採集や製作、野外の幸運な発見、サルベージにも静かなページがあります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。',
   'guide.professions.startHeading': 'どこから始めるか',
   'guide.professions.startBody':
     'Eastbrookに着いたばかりなら、Foreman Odellを訪ねてA Trade for Every Handを受けましょう。町の南東Copper Digの鉱脈を教えてくれます。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。町ではTキーで製作ウィンドウを開き、誰もが知る初期レシピを作り、鍛冶場、厨房、織機、工作場の師匠たちを訪ね、作業依頼で堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。',
@@ -11342,7 +11352,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '商人は来歴を見ません。署名入りでもNPCへの売値は無印と同額です。署名の上乗せはプレイヤーの間にだけ存在し、だからこそ面白いのです。名の知れた採集者が署名した幸運の鉱石、Prime Cutの一切れ、引退した職人の名を刻む傑作の剣。値段は誰かの記憶が決めます。功績の書も同じ心を汲みます。Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen、Glimmer of Hopeはいずれも名声ゼロの収集印で、その瞬間があなたに起きた証のためだけにあります。これらは力ではありません。来歴は能力値を買わず、戦いにも勝ちません。良き日々の控えです。',
   'guide.profPages.craftProse.weaponcrafting.identityHeading': '誰もが買い求める刃',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
-    'レア段だけで三つの欲求を満たします。力の近接向けOsmium Warblade、敏捷の戦士向けGlyphsteel War Axe、そして知力と精神の杖Highpine Battle Staff。製作の環では防具鍛冶と宝石細工の間に座り、鍛冶師（武器鍛冶と防具鍛冶）はForgemistress Darvaの前で鉱脈を三つ自らの手で掘って誓えます。宝石細工との対Bladewrightは、宝石細工のレシピが将来の地方で届くまで誓えません。',
+    'レア段だけで三つの欲求を満たします。力の近接向けOsmium Warblade、敏捷の戦士向けGlyphsteel War Axe、そして知力と精神の杖Highpine Battle Staff。製作の環では防具鍛冶と宝石細工の間に座り、鍛冶師（武器鍛冶と防具鍛冶）はForgemistress Darvaの前で鉱脈を三つ自らの手で掘って誓えます。宝石細工との対Bladewrightも輪に名を連ねており、宝石細工は今や同じ鍛冶場で0から50の装身具の梯子を打っていますが、この対は誓いのクエストが来るまで誓えません。',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': '炉が飲み込むもの',
   'guide.profPages.craftProse.weaponcrafting.materialsBody':
     '採掘が背骨です。銅鉱石はEastbrook Vale、鉄鉱石はMirefen Marsh、オスミウムはThornpeak Heightsから。伐採も想像以上に重要で、ironbarkが猪槍の柄になり、ashwoodが槌を支え、highpineの丸太一本が杖になります。残りは狩りと売店から。粗皮は狼や猪の亡骸から剥ぎ、骨片は日々の狩りで出ます。梯子のレシピはSmithing Flux（Darvaで20銅）を焚きます。採掘が追いつかなければ、Darvaがオスミウム鉱石を、Tinker Gizzelが工作場でグリフ鋼の延べ棒を、割高で売ってくれます。',
@@ -11426,21 +11436,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '道具に戦闘能力値はないため傑作は決して発動しません。特化は例によってスキル75で、素材2割引きに加え、どんな採集行も作業場に変える臨時の野外工作場を得ます。成長はほとんど薄れません。スキル75のレシピは100まで全速で以降半減、スキル150のレシピは上限125まで全速。本当の制約は素材と資金であって、灰色のレシピではありません。まず対を決めること。Tinker Gizzelから爆破師の調律を。あとは梯子に食わせるだけです。採掘、伐採、薬草学を自分で上げるか採集者と親しくなり、段階3の道具は店で揃え、Gizzelの依頼（Ironbark Log8本で16銅、30分ごと）は小遣いに。売り文句はひとりでに書けます。節点より上の道具段階ひとつごとに2.5秒の採集詠唱から0.4秒を削る（下限1.5秒）。スキル50でCogs and Sprockets、125でGrandmaster Engineeringです。',
   'guide.profPages.craftProse.enchanting.identityHeading': '装備を解き、力を戻す',
   'guide.profPages.craftProse.enchanting.identityBody':
-    '作業場も師匠も買うべきレシピ表もありません。すべてのエンチャントは最初から知られ、分解は誰でも初日からでき、スキルは他の職と同じく125が上限です。環では銘文と宝石細工の間に座り、対はArcanist（銘文とエンチャント）とGembinder（エンチャントと宝石細工）ですが、両隣ともレシピが届くまで誓えません。つまり今日のエンチャントは皆の手仕事です。誓い以前は自由にレア段階まで登り、爆破師や薬師の趣味枠としても自然な選択です。エンチャンターは採集の世界も支えています。装着できる三種の道具効果はすべてエンチャンターの作で、原作者は自作の充填を割引で行え、特化すればさらに深くなります。',
+    '作業場も師匠も買うべきレシピ表もありません。すべてのエンチャントは最初から知られ、分解は誰でも初日からでき、スキルは他の職と同じく125が上限です。環では銘文と宝石細工の間に座り、対はArcanist（銘文とエンチャント）とGembinder（エンチャントと宝石細工）ですが、どちらもまだ誓えません。銘文は最初のレシピを待っており、宝石細工は今や鍛冶場で自分の梯子を打っているものの、Gembinderには誓いのクエストがまだないのです。つまり今日のエンチャントは皆の手仕事です。誓い以前は自由にレア段階まで登り、爆破師や薬師の趣味枠としても自然な選択です。エンチャンターは採集の世界も支えています。装着できる三種の道具効果はすべてエンチャンターの作で、原作者は自作の充填を割引で行え、特化すればさらに深くなります。',
   'guide.profPages.craftProse.enchanting.levelingHeading': 'エンチャントの上げ方',
   'guide.profPages.craftProse.enchanting.levelingBody':
     'スキルを動かす行動は二つ、分解とエンチャント付与です。成功ごとに最大1ポイント、仕事の重さで換算されます。コモンの分解と粉だけのエンチャントはコモンの仕事、良質の分解とエッセンスのエンチャントは良質、レアの分解とRunedやGreaterのエンチャントはレア、エピックと伝説の分解はさらに上です。お馴染みの熟達の薄れが25ポイント刻みで効き、コモンの仕事はスキル75で、良質は100で、レアの仕事はちょうど上限の125で灰色になります。エンチャントだけの情けもひとつ。天井を超える入力はゼロではなく天井へ丸められるため、誓う前でもエピックの分解はレアとして数えられ、無駄になりません。エンチャントが休眠に落ちればすべてコモン扱いで登りは75で止まり、趣味に据えればレアの仕事はまだ実り、75以降が遅くなるだけです。',
   'guide.profPages.craftProse.enchanting.marketHeading': '付与済みの品と来歴と市場',
   'guide.profPages.craftProse.enchanting.marketBody':
     '付与は素材を消費し、特定の一品に印を付けます。鞄の中の品に使えば別個の付与済みの品が返り、装備中の品に使えばその場で付与され、外して着け直す必要はありません。どちらでも効果は永遠にその品に付き従います。一品にひとつ。付与済みの品に別の付与を使うと確認のうえ古い付与をそのまま置き換え、古い付与は素材の返却なしに破棄されます。売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。付与済みや署名入りの品も世界市場に出せます。一品ずつの単品出品となり、ツールチップには付与と作り手の銘が表示され、ワタリガラス便でも同じように送れます。素材は今も商いの堅実な半分です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。',
+  'guide.profPages.craftIntro.jewelcrafting':
+    '宝石細工はEastbrookの鍛冶場にあるもう一つの、より繊細な作業台です。銅、鉄、レアなオスミウムの指輪と首飾りを扱い、どの段にも力の指輪、知力の指輪、敏捷の首飾りが並びます。装身具には防具値も職業制限もないので、客は指と首を持つ全員です。',
+  'guide.profPages.craftProse.jewelcrafting.identityHeading': '鍛冶場の細工仕事',
+  'guide.profPages.craftProse.jewelcrafting.identityBody':
+    '梯子は三段、各段三品。力の指輪、知力の指輪、敏捷の首飾りを、まず銅で、次に鉄で、最後にレアなオスミウムで作ります。装身具には防具値も職業制限もなく、銅の品ですら本物のステータスを備えています。ステータスのない指輪は何者でもないからです。\n\n製作の環ではエンチャントと武器鍛冶の間に座り、対の生き方は二つ、宝石付与師（エンチャントと宝石細工）と刃鍛冶（宝石細工と武器鍛冶）。どちらもまだ誓いのクエストがないため、今日の宝石細工は皆の手仕事です。全レシピが未宣誓の職の働けるレア段の内側にあり、誓いの前から梯子の全部が開いています。',
+  'guide.profPages.craftProse.jewelcrafting.materialsHeading': '鉱石と粉塵と精髄',
+  'guide.profPages.craftProse.jewelcrafting.materialsBody':
+    'この作業台は採掘と分解で回ります。銅鉱石はEastbrook Valeの1層鉱脈から、鉄鉱石はMirefen Marshから、オスミウム鉱石はThornpeak Heightsから来て、どのレシピにも鍛冶の融剤が一、二個入ります（Darvaで20銅）。もう半分は分解台から来ます。銅段は鈴音の粉塵を、鉄段とオスミウム段は鈴音の精髄を求めるので、宝石細工師はエンチャンターの一番の得意客になるか、自分で分解の習慣を持つことになります。\n\nオスミウム段にはもう一つの仕上げがあります。レアの各品はオスミウムに加えて鉄鉱石を二つ、細工の台座のはんだとして使います。鉱石も粉塵も店では買えません。世界から採るか、取引や世界市場で他のプレイヤーから手に入れるかで、コインで買えるのは融剤だけです。',
+  'guide.profPages.craftProse.jewelcrafting.ladderHeading': '金床のそばで学ぶ',
+  'guide.profPages.craftProse.jewelcrafting.ladderBody':
+    '宝石細工には自前の作業場がありません。カタログ全部がEastbrookの鍛冶場、武器鍛冶と防具鍛冶が共有するあの金床で作られ、Forgemistress Darvaがそこで教えます。梯子は三段九つのトレーナーレシピです。銅段（指輪、輪、首輪）はスキル0で無料、鉄段（印章、輪、チョーカー）はスキル25で各25銀、オスミウム段（指輪、輪、アミュレット）はスキル50で各1金。あなたの段がレシピの段に届いた瞬間に教われます。\n\n野外レシピも合作の品もまだありません。全段が鍛冶場限定のトレーナー仕事なので、この職は鍛冶師たちの立つ場所で学び、そこで鍛えます。',
+  'guide.profPages.craftProse.jewelcrafting.routeHeading': '傑作と、125への道のり',
+  'guide.profPages.craftProse.jewelcrafting.routeBody':
+    'この梯子にステータスなしの段はありません。全品が本物のステータスを備えるので、仕上がりの品質があなたの段の上限に収まる限り、毎回の製作が傑作判定を振り、鉄とオスミウムはどちらもティア1素材として加算されます。銅段と鉄段は、趣味の職人でも未宣誓の職人でもレアの傑作に化けます。オスミウムの三品はもとよりレアなので、そのエピック傑作はレアより上の上限を待ちますが、宝石細工の対が開くまでその上限は誰も持ちません。\n\n登りは標準の道です。銅で25、鉄段は開いた日に乗って50、そしてオスミウムで75へ。75から先はまだ何も出ていないので、オスミウムのレシピは半分、そして四分の一へと減っていきます。125の上限までおよそ150個を見込んでください。どの職業も装身具を着け、大半の旅人は指輪と首の枠を空けたまま育つので、作った分は堂々と売れます。\n\n功績の書は最初のレア品でPolished to Brillianceを記します。この職の節目とGrandmasterのページは、対の生き方とともに待っています。',
   'hudChrome.corpseHarvest.components.meat': '肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（エンチャント）',
   'hudChrome.materialHint.cookingCatch': '料理材料。食べる前に調理が必要です。',
   'hudChrome.materialHint.fineGrade':
     '上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。',
-  'hudChrome.materialHint.arcaneDust':
-    'エンチャントの材料。一般と良質の装備を魔力分解して得られる。',
-  'hudChrome.materialHint.arcaneEssence': 'エンチャントの材料。レアの装備を魔力分解して得られる。',
+  'hudChrome.materialHint.arcaneDust': '生産の材料。一般と良質の装備を魔力分解して得られる。',
+  'hudChrome.materialHint.arcaneEssence': '生産の材料。レアの装備を魔力分解して得られる。',
   'hudChrome.materialHint.arcaneShard':
     'エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。',
   'hudChrome.materialHint.resonantThread':

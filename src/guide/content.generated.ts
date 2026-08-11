@@ -165,7 +165,7 @@ export interface GuideProfRingCraft {
   name: string;
   pole: string;
   maxSkill: number;
-  /** False for the wave-one content-empty crafts (zero recipes shipped). */
+  /** False for a wave-one content-empty craft (zero recipes shipped). */
   hasContent: boolean;
 }
 
@@ -5558,6 +5558,14 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Light of the Sanctum",
     "crest": "/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp"
+  },
+  {
+    "id": "prog_jewelcrafting_rare",
+    "name": "Polished to Brilliance",
+    "category": "progression",
+    "renown": 10,
+    "feat": false,
+    "crest": "/ui/deeds/prog_jewelcrafting_rare.webp"
   }
 ];
 
@@ -6356,6 +6364,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mark",
         "name": "Leatherworking Masterwork"
+      },
+      {
+        "kind": "mark",
+        "name": "Jewelcrafting Masterwork"
       },
       {
         "kind": "mark",
@@ -7366,7 +7378,7 @@ export const GUIDE_PROF_RING: GuideProfRingCraft[] = [
     "name": "Jewelcrafting",
     "pole": "Material",
     "maxSkill": 125,
-    "hasContent": false
+    "hasContent": true
   },
   {
     "id": "weaponcrafting",
@@ -9436,6 +9448,344 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        }
+      }
+    ]
+  },
+  {
+    "id": "jewelcrafting",
+    "name": "Jewelcrafting",
+    "pole": "Material",
+    "maxSkill": 125,
+    "station": "forge",
+    "masters": [
+      {
+        "name": "Forgemistress Darva",
+        "title": "Master of the Forge",
+        "hub": "Eastbrook"
+      }
+    ],
+    "specialization": {
+      "at": 75,
+      "materialDiscountPct": 20
+    },
+    "recipes": [
+      {
+        "id": "recipe_hammered_copper_band",
+        "name": "Hammered Copper Band",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Copper Ore",
+            "count": 4
+          },
+          {
+            "name": "Chime Dust",
+            "count": 2
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Hammered Copper Band",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_polished_copper_loop",
+        "name": "Polished Copper Loop",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Copper Ore",
+            "count": 4
+          },
+          {
+            "name": "Chime Dust",
+            "count": 3
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Polished Copper Loop",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_coiled_copper_torc",
+        "name": "Coiled Copper Torc",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Copper Ore",
+            "count": 5
+          },
+          {
+            "name": "Chime Dust",
+            "count": 2
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Coiled Copper Torc",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_riveted_iron_signet",
+        "name": "Riveted Iron Signet",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Iron Ore",
+            "count": 4
+          },
+          {
+            "name": "Chime Essence",
+            "count": 1
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Riveted Iron Signet",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_etched_iron_loop",
+        "name": "Etched Iron Loop",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Iron Ore",
+            "count": 3
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Etched Iron Loop",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_iron_link_choker",
+        "name": "Iron Link Choker",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Iron Ore",
+            "count": 5
+          },
+          {
+            "name": "Chime Essence",
+            "count": 1
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Iron Link Choker",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_weighted_thorium_band",
+        "name": "Weighted Osmium Band",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 2
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Weighted Osmium Band",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_gleaming_thorium_loop",
+        "name": "Gleaming Osmium Loop",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Chime Essence",
+            "count": 3
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 2
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Gleaming Osmium Loop",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_burnished_thorium_amulet",
+        "name": "Burnished Osmium Amulet",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 2
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Burnished Osmium Amulet",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
         }
       }
     ]
@@ -12496,6 +12846,7 @@ export const GUIDE_PROF_PAGES: string[] = [
   "leatherworking",
   "tailoring",
   "enchanting",
+  "jewelcrafting",
   "weaponcrafting",
   "armorcrafting",
   "mining",
