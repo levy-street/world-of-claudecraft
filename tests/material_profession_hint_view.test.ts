@@ -82,8 +82,15 @@ describe('materialProfessionHintText', () => {
   });
 
   it('skips enchanting-only materials that already say Enchanting reagent', () => {
-    expect(materialProfessionHintText('arcane_dust')).toBe('');
+    expect(materialProfessionHintText('arcane_shard')).toBe('');
     expect(materialProfessionHintText('resonant_hide')).toBe('');
+    // The counterpart arm keeps the skip honest: the dust and essence LEFT
+    // the enchanting-only class with the Masterwrought phase 05 jewelcrafting
+    // catalog, so their line comes back and names both consumers.
+    expect(materialProfessionHintText('arcane_dust')).toBe('Used by Enchanting and Jewelcrafting.');
+    expect(materialProfessionHintText('arcane_essence')).toBe(
+      'Used by Enchanting and Jewelcrafting.',
+    );
   });
 
   it('a fineGrade hint never supersedes: single-craft fine grades keep their line', () => {
@@ -96,7 +103,7 @@ describe('materialProfessionHintText', () => {
 
   it('fine grades name every craft beside the Fine grade purpose line, in ring order', () => {
     expect(materialProfessionHintText('fine_iron_ore')).toBe(
-      'Used by Engineering, Weaponcrafting, and Armorcrafting.',
+      'Used by Engineering, Jewelcrafting, Weaponcrafting, and Armorcrafting.',
     );
   });
 
@@ -144,7 +151,9 @@ describe('itemTooltip integration for profession material tags', () => {
   it('a fine grade shows hint then Used-by then sell price, in that order', () => {
     const html = tooltipHtml('fine_iron_ore');
     const hintAt = html.indexOf('Fine grade.');
-    const usedByAt = html.indexOf('Used by Engineering, Weaponcrafting, and Armorcrafting.');
+    const usedByAt = html.indexOf(
+      'Used by Engineering, Jewelcrafting, Weaponcrafting, and Armorcrafting.',
+    );
     const sellAt = html.indexOf('Sell price');
     expect(hintAt).toBeGreaterThanOrEqual(0);
     expect(usedByAt).toBeGreaterThan(hintAt);
@@ -158,9 +167,18 @@ describe('itemTooltip integration for profession material tags', () => {
   });
 
   it('an enchanting material keeps its source line without Used by Enchanting', () => {
-    const html = tooltipHtml('arcane_dust');
+    // arcane_shard is the surviving enchanting-ONLY exemplar (the dust and
+    // essence gained a jewelcrafting consumer in the Masterwrought phase 05
+    // catalog and legitimately show a two-craft Used-by line now).
+    const html = tooltipHtml('arcane_shard');
     expect(html).toContain('Enchanting reagent');
     expect(html).not.toContain('Used by Enchanting');
+    // The dust lead reworded to the craft-neutral form when jewelcrafting
+    // became its second consumer; the appended Used-by line names the crafts.
+    const dustHtml = tooltipHtml('arcane_dust');
+    expect(dustHtml).toContain('Crafting reagent');
+    expect(dustHtml).not.toContain('Enchanting reagent.');
+    expect(dustHtml).toContain('Used by Enchanting and Jewelcrafting.');
   });
 
   it('true grey junk still says Junk', () => {

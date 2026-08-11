@@ -442,18 +442,25 @@ export const RELIQUARY_HORIZON_TITLES = [
 export const RELIQUARY_PROFESSION_MARKS = {
   /** First lifetime masterwork proc (any craft). */
   masterworkFirst: 'masterwork:first',
-  /** First masterwork per craft on the ring that the gallery catalogs. Only
-   *  the first four are gear-capable today: every engineering recipe produces
-   *  a slotless, statless tool, so masterworkBonusStats returns null and the
-   *  engineering mark can never be written (QA ruling 2026-08-07: the slot
-   *  stays catalogued but un-hinted in SOURCE_PENDING_RULING beside the two
-   *  gap mounts, an owner call; a stats-bearing engineering craftable would
-   *  un-pend it). */
+  /** First masterwork per craft on the ring that the gallery catalogs. Every
+   *  entry but the last is gear-capable today; engineering is the exception,
+   *  because every engineering recipe produces a slotless, statless tool, so
+   *  masterworkBonusStats returns null and the engineering mark can never be
+   *  written (QA ruling 2026-08-07: the slot stays catalogued but un-hinted in
+   *  SOURCE_PENDING_RULING beside the two gap mounts, an owner call; a
+   *  stats-bearing engineering craftable would un-pend it). Jewelcrafting
+   *  joined the gear-capable side when its trainer ladder landed: its outputs
+   *  are stats-bearing rings, necks and trinkets, so the proc path writes
+   *  masterwork:jewelcrafting and the gallery owes it a slot. The gear-capable
+   *  set is DERIVED from the live recipes in tests/reliquary_content.test.ts
+   *  (both directions), so neither a craft gaining gear nor a craft losing it
+   *  can drift from this list. */
   masterworkByCraft: [
     'masterwork:weaponcrafting',
     'masterwork:armorcrafting',
     'masterwork:tailoring',
     'masterwork:leatherworking',
+    'masterwork:jewelcrafting',
     'masterwork:engineering',
   ],
   /** Rare gather / corpse specimen visit marks already written by professions. */
@@ -1218,10 +1225,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     desc: 'Lifetime trophies for first masterworks. Empty until the next proc if a veteran predates the gallery (no invented craft history).',
     clearSource: { kind: 'none' },
     // Each per-craft mark names its craft. masterworkFirst names the ACTIVITY
-    // instead: it fires on the first masterwork from ANY of the five gear
-    // crafts (src/sim/professions/crafting.ts), so no single profession id is
-    // its source, but "land a masterwork proc" is exactly the thing a player
-    // does to earn it.
+    // instead: it fires on the first masterwork from ANY gear-capable craft
+    // (src/sim/professions/crafting.ts), so no single profession id is its
+    // source, but "land a masterwork proc" is exactly the thing a player does
+    // to earn it.
     relics: marks(
       [RELIQUARY_PROFESSION_MARKS.masterworkFirst, fromActivity('masterwork_craft')],
       // masterwork:engineering stays a BARE entry (no hint): no engineering

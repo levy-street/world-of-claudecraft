@@ -1532,6 +1532,197 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The jewelcrafting base catalog (Masterwrought phase 05): three rungs at
+// skillReq 0/25/50, three outputs per rung (two rings plus one neck), the
+// crafted jewelry ItemDefs in content/profession_items.ts. A separate list
+// from LADDER_RECIPES on purpose: that array's length and six-craft shape are
+// pinned as the Professions 2.0 ladder, and this catalog carries two shapes of
+// its own (tests/jewelcrafting_catalog.test.ts).
+//
+// - Every record binds `stationType: 'forge'` explicitly: jewelcrafting has no
+//   station of its own and deliberately stays OUT of STATION_TYPE_BY_CRAFT (no
+//   new station type, no new trainer NPC). The binding is the recipe's
+//   teaching home (training.ts trainingStationTypeFor), so Forgemistress Darva
+//   teaches the catalog, the enchanting charm precedent
+//   (TOOL_EFFECT_RECIPES). The foreign-bound literal pin in
+//   tests/professions_crafting_hub.test.ts names all nine ids.
+// - Reagents read the phase's "gems-from-salvage" input class as the
+//   disenchant ladder: arcane_dust on the 0 rung, arcane_essence on the 25 and
+//   50 rungs, and NEVER arcane_shard (phase 04 sized epic disenchant 1:1
+//   against the heroic faucet; shards stay reserved for the apex band). Ores
+//   carry the volume (wrought-metal register, the forge binding), fluxed like
+//   the other forge ladders; the rung-50 fourth line is fine_thorium_ore, the
+//   fine mining grade, keeping the whole input list mining-plus-disenchant
+//   rather than crossing into the enchant-exclusive resonant secondaries.
+// - Scaffolding follows the cross-craft convention above (skillReq 0 -> 10/10,
+//   25 -> 16/15, 50 -> 20/20); acquisition is ['trainer'] on every record (the
+//   grandfather list is frozen). Every reagent list is authored gold-negative
+//   under the recipe_economy rule, and every rung keeps at least one
+//   no-buyValue reagent (the ores/dust/essence) so no record joins the
+//   counterfactually-vendor-fed set.
+export const JEWELCRAFTING_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_hammered_copper_band',
+    professionId: 'jewelcrafting',
+    resultItemId: 'hammered_copper_band',
+    resultCount: 1,
+    // Input 48 vs output 32.
+    reagents: [
+      { itemId: 'copper_ore', count: 4 },
+      { itemId: 'arcane_dust', count: 2 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_polished_copper_loop',
+    professionId: 'jewelcrafting',
+    resultItemId: 'polished_copper_loop',
+    resultCount: 1,
+    // Input 54 vs output 32.
+    reagents: [
+      { itemId: 'copper_ore', count: 4 },
+      { itemId: 'arcane_dust', count: 3 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_coiled_copper_torc',
+    professionId: 'jewelcrafting',
+    resultItemId: 'coiled_copper_torc',
+    resultCount: 1,
+    // Input 52 vs output 36.
+    reagents: [
+      { itemId: 'copper_ore', count: 5 },
+      { itemId: 'arcane_dust', count: 2 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_riveted_iron_signet',
+    professionId: 'jewelcrafting',
+    resultItemId: 'riveted_iron_signet',
+    resultCount: 1,
+    // Input 70 vs output 46.
+    reagents: [
+      { itemId: 'iron_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_etched_iron_loop',
+    professionId: 'jewelcrafting',
+    resultItemId: 'etched_iron_loop',
+    resultCount: 1,
+    // Input 80 vs output 46.
+    reagents: [
+      { itemId: 'iron_ore', count: 3 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_iron_link_choker',
+    professionId: 'jewelcrafting',
+    resultItemId: 'iron_link_choker',
+    resultCount: 1,
+    // Input 78 vs output 52.
+    reagents: [
+      { itemId: 'iron_ore', count: 5 },
+      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_weighted_thorium_band',
+    professionId: 'jewelcrafting',
+    resultItemId: 'weighted_thorium_band',
+    resultCount: 1,
+    // Input 332 vs output 280 (buyValue basis: osmium ore 60, flux 20). The
+    // 4th line is iron solder, NOT fine_thorium_ore: a recipe must never list
+    // a base material AND its fine grade (they share one consumption pool via
+    // materialGradeIds, so the reagent check double-counts a bag; the
+    // disjointness invariant in tests/material_grades.test.ts pins it).
+    reagents: [
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'smithing_flux', count: 2 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_gleaming_thorium_loop',
+    professionId: 'jewelcrafting',
+    resultItemId: 'gleaming_thorium_loop',
+    resultCount: 1,
+    // Input 350 vs output 280. Iron solder 4th line, same rule as the band.
+    reagents: [
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 3 },
+      { itemId: 'smithing_flux', count: 2 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_burnished_thorium_amulet',
+    professionId: 'jewelcrafting',
+    resultItemId: 'burnished_thorium_amulet',
+    resultCount: 1,
+    // Input 332 vs output 310. Iron solder 4th line, same rule as the band.
+    reagents: [
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'smithing_flux', count: 2 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+];
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
@@ -1545,6 +1736,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...CASTER_HUB_RECIPES,
   ...COMBO_RECIPES,
   ...LADDER_RECIPES,
+  ...JEWELCRAFTING_RECIPES,
 ];
 
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {

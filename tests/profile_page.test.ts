@@ -168,7 +168,7 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // catalogTotal comes from the same catalogCharacterCompletion the page
     // calls, so the pair assertions below would follow a drifted derivation;
     // the literal anchors them. Literal: update when catalog content lands.
-    expect(catalogTotal).toBe(311);
+    expect(catalogTotal).toBe(312);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

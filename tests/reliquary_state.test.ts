@@ -832,10 +832,11 @@ describe('Reliquary profession marks (Phase 7)', () => {
     // The load this regex still carries is the isCataloguedRelicMark gate
     // on the derived visit write, which no behavioral case can reach while
     // every masterwork-capable craft has an authored mark (only equippable
-    // outputs can proc, and all four gear-capable professions sit in
-    // RELIQUARY_PROFESSION_MARKS.masterworkByCraft; its fifth entry,
+    // outputs can proc, and every gear-capable profession sits in
+    // RELIQUARY_PROFESSION_MARKS.masterworkByCraft; its one non-gear entry,
     // engineering, is the pended tool-only craft that can never proc, see
-    // the gear-capability pin in tests/reliquary_content.test.ts).
+    // the gear-capability pin in tests/reliquary_content.test.ts, which
+    // derives that membership from the live recipes in both directions).
     const craftSrc = fs
       .readFileSync(path.join(__dirname, '../src/sim/professions/crafting.ts'), 'utf8')
       .split('\n')

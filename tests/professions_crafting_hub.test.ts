@@ -127,8 +127,9 @@ describe('station content', () => {
         `${type} needs a physical station`,
       ).toBeGreaterThan(0);
     }
-    // The three station-less crafts stay station-less (no station-bound
-    // content exists for them today).
+    // The three station-less crafts stay station-less as CRAFTS: no station
+    // type is named after them. Their individual recipes may still bind to a
+    // foreign station per record (the sanctioned shape, pinned below).
     for (const craftId of ['jewelcrafting', 'inscription', 'enchanting']) {
       expect(stationTypeForCraft(craftId)).toBeUndefined();
     }
@@ -180,8 +181,10 @@ describe('station content', () => {
     // ruled exception class: a craft with no station of its own (enchanting/
     // jewelcrafting/inscription) may bind a recipe to a foreign station, and
     // that binding then IS the recipe's teaching home (training.ts
-    // trainingStationTypeFor). The tool-effect charms are the whole class
-    // today: enchanting home, toolworks binding, pinned literally so a new
+    // trainingStationTypeFor). Two families make up the class today: the
+    // tool-effect charms (enchanting home, toolworks binding) and the
+    // Masterwrought phase 05 jewelcrafting base catalog (jewelcrafting home,
+    // forge binding at forgemistress_darva), pinned literally so a new
     // foreign binding is a deliberate edit here, not a drive-by.
     const foreignBound: string[] = [];
     for (const recipe of ALL_RECIPES) {
@@ -193,7 +196,19 @@ describe('station content', () => {
       }
       expect(recipe.stationType, `${recipe.id} station/craft mismatch`).toBe(ownStation);
     }
-    expect(foreignBound.sort()).toEqual(['recipe_artisans_eye', 'recipe_gatherers_cache']);
+    expect(foreignBound.sort()).toEqual([
+      'recipe_artisans_eye',
+      'recipe_burnished_thorium_amulet',
+      'recipe_coiled_copper_torc',
+      'recipe_etched_iron_loop',
+      'recipe_gatherers_cache',
+      'recipe_gleaming_thorium_loop',
+      'recipe_hammered_copper_band',
+      'recipe_iron_link_choker',
+      'recipe_polished_copper_loop',
+      'recipe_riveted_iron_signet',
+      'recipe_weighted_thorium_band',
+    ]);
   });
 });
 

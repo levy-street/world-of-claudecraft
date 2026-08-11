@@ -26,16 +26,21 @@ describe('craftIdsForMaterialItem', () => {
   it('maps single-craft reagents to one craft', () => {
     expect(craftIdsForMaterialItem('game_meat')).toEqual(['cooking']);
     expect(craftIdsForMaterialItem('venom_gland')).toEqual(['alchemy']);
-    expect(craftIdsForMaterialItem('arcane_dust')).toEqual(['enchanting']);
+    // The dust left this class with the Masterwrought phase 05 jewelcrafting
+    // catalog: jewelcrafting's rung-0 recipes consume it beside enchanting
+    // (ring order puts enchanting first). arcane_shard stays single-craft.
+    expect(craftIdsForMaterialItem('arcane_dust')).toEqual(['enchanting', 'jewelcrafting']);
+    expect(craftIdsForMaterialItem('arcane_shard')).toEqual(['enchanting']);
   });
 
   it('a fine grade inherits its base consumers and keeps fine-only crafts', () => {
     // fine_iron_ore is a tool-recipe reagent (engineering) and stands in for
-    // iron_ore (weaponcrafting + armorcrafting).
+    // iron_ore (jewelcrafting + weaponcrafting + armorcrafting since the
+    // Masterwrought phase 05 catalog's rung-25 recipes).
     const fine = craftIdsForMaterialItem('fine_iron_ore');
     const base = craftIdsForMaterialItem('iron_ore');
-    expect(base).toEqual(['weaponcrafting', 'armorcrafting']);
-    expect(fine).toEqual(['engineering', 'weaponcrafting', 'armorcrafting']);
+    expect(base).toEqual(['jewelcrafting', 'weaponcrafting', 'armorcrafting']);
+    expect(fine).toEqual(['engineering', 'jewelcrafting', 'weaponcrafting', 'armorcrafting']);
     for (const craftId of base) {
       expect(fine, `fine inherits ${craftId}`).toContain(craftId);
     }

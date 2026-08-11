@@ -354,7 +354,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // honor pieces and the 3 fishing additions (the koi and both rods):
     // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
-    // Wildheart Basin, boneglass_shiv on Spoils): 340. Catalog growth reverts
+    // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the jewelcrafting
+    // masterwork mark the trainer ladder made earnable: 341. Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -362,7 +363,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    expect(full).toEqual({ owned: 341, total: 341 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -370,10 +371,10 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands (same deltas as the overview
-    // pair above, including the three release-merged daggers; marks are
-    // character-scoped, so this trails the overview by the 29 account-scoped
-    // weapon skins).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    // pair above, including the three release-merged daggers and the
+    // jewelcrafting masterwork mark; marks are character-scoped, so this trails
+    // the overview by the 29 account-scoped weapon skins).
+    expect(character).toEqual({ owned: 312, total: 312 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -383,7 +384,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // catalog by 4, and the measured value wins), and the seven Phase 21
     // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
     // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372, plus the
-    // three daggers the v0.36.0 release merge added to live content: 375 total.
+    // three daggers the v0.36.0 release merge added to live content (375) and
+    // the jewelcrafting masterwork slot the trainer ladder earned: 376 total.
     // Slots, not unique relics: the two Spoils set repeats count again here,
     // and the seven excludeFromCompletion slots (four vault, three bands)
     // count here while adding zero to every completion pair, which is why this
@@ -394,9 +396,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(375);
-    // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
-    // rare-slain proofs of conquerors_rares_of_the_realm.
+    ).toBe(376);
+    // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
+    // proofs of conquerors_rares_of_the_realm, and masterwork:jewelcrafting.
     expect(
       RELIQUARY_MARK_IDS.size,
       `mark total moved; by namespace: ${[
@@ -409,7 +411,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       ]
         .map(([ns, n]) => `${ns}=${n}`)
         .join(', ')}`,
-    ).toBe(29);
+    ).toBe(30);
   });
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
@@ -1671,6 +1673,29 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
   });
 });
 
+/**
+ * Can this craft ever proc a masterwork? Answered through masterworkBonusStats,
+ * the SAME gate the proc path consults in crafting.ts, over the craft's live
+ * recipes: a craft whose every output is slotless or statless (engineering's
+ * tools) returns null everywhere and can never write its mark. Shared by both
+ * masterwork pins below so the two cannot derive eligibility differently.
+ */
+function craftIsGearCapable(craftId: string): boolean {
+  return ALL_RECIPES.some((recipe) => {
+    if (recipe.professionId !== craftId) return false;
+    const def = ITEMS[recipe.resultItemId];
+    if (!def) return false;
+    return (
+      masterworkBonusStats({
+        level: recipe.level,
+        quality: def.quality,
+        slot: def.slot,
+        stats: def.stats,
+      }) !== null
+    );
+  });
+}
+
 describe('Reliquary Professions shelf (Phase 7)', () => {
   it('authors masterwork, field notes, and specimen pages (not empty stubs)', () => {
     expect(PROFESSION_PAGES.map((p) => p.id).sort()).toEqual(
@@ -1691,6 +1716,7 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       'masterwork:armorcrafting',
       'masterwork:tailoring',
       'masterwork:leatherworking',
+      'masterwork:jewelcrafting',
       'masterwork:engineering',
     ]);
     expect(RELIQUARY_PROFESSION_MARKS.masterworkFirst).toBe('masterwork:first');
@@ -1715,19 +1741,7 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     let gearCapableCount = 0;
     for (const markId of RELIQUARY_PROFESSION_MARKS.masterworkByCraft) {
       const craftId = markId.slice('masterwork:'.length);
-      const gearCapable = ALL_RECIPES.some((recipe) => {
-        if (recipe.professionId !== craftId) return false;
-        const def = ITEMS[recipe.resultItemId];
-        if (!def) return false;
-        return (
-          masterworkBonusStats({
-            level: recipe.level,
-            quality: def.quality,
-            slot: def.slot,
-            stats: def.stats,
-          }) !== null
-        );
-      });
+      const gearCapable = craftIsGearCapable(craftId);
       if (gearCapable) gearCapableCount += 1;
       const relic = page.relics.find((r) => r.kind === 'mark' && r.markId === markId);
       expect(relic, markId).toBeDefined();
@@ -1736,7 +1750,38 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       expect(pendedMarks.has(markId), `${markId} pended iff NOT gear-capable`).toBe(!gearCapable);
     }
     // Liveness: the derivation is worthless if it calls everything ineligible.
-    expect(gearCapableCount).toBe(4);
+    expect(gearCapableCount).toBe(5);
+  });
+
+  it('every gear-capable craft owns a masterwork slot (derived FROM the recipes)', () => {
+    // The blind spot this closes: the pin above walks masterworkByCraft, so it
+    // can only judge crafts the hand list already names. A craft that BECOMES
+    // gear-capable while absent from the list is invisible to it, and that is
+    // exactly what shipped: jewelcrafting's trainer ladder made the craft
+    // masterwork-capable, crafting.ts started writing masterwork:jewelcrafting,
+    // and the gallery discarded every one of those marks because the list had
+    // no row. Sweeping CRAFT_RING and deriving the eligible set from the live
+    // recipes reds on the missing row instead of the missing hint.
+    const derivedEligible = CRAFT_RING.map((craft) => craft.id)
+      .filter((craftId) => craftIsGearCapable(craftId))
+      .sort();
+    const catalogued = RELIQUARY_PROFESSION_MARKS.masterworkByCraft.map((markId) =>
+      markId.slice('masterwork:'.length),
+    );
+    const missing = derivedEligible.filter((craftId) => !catalogued.includes(craftId));
+    expect(
+      missing,
+      `gear-capable crafts with no Reliquary masterwork slot: ${missing.join(', ')}`,
+    ).toEqual([]);
+    // Literal, so the derivation cannot go quietly vacuous: these are the five
+    // crafts whose recipes really produce stats-bearing equipment today.
+    expect(derivedEligible).toEqual([
+      'armorcrafting',
+      'jewelcrafting',
+      'leatherworking',
+      'tailoring',
+      'weaponcrafting',
+    ]);
   });
 
   it('field notes reuse visited gather_event:* namespaces', () => {
@@ -2466,9 +2511,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_set_nighttalon: 2,
   conquerors_set_soulflame: 2,
   conquerors_set_stormcallers: 2,
-  // 5 = activity (masterworkFirst) + the four gear-capable craft professions;
+  // 6 = activity (masterworkFirst) + the five gear-capable craft professions;
   // masterwork:engineering is pended un-hinted (QA ruling 2026-08-07).
-  professions_masterwork: 5,
+  professions_masterwork: 6,
   professions_field_notes: 4,
   // 7 = corpse_harvest + the four gathering professions with a jackpot slot
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
@@ -2879,10 +2924,10 @@ describe('Reliquary source hints resolve against live content', () => {
         .map((h) => h.sourceId)
         .filter((id) => !(id in GATHERING_PROFESSIONS)),
     );
-    // Vacuity floor: the four gear-capable crafts on the masterwork page (the
-    // two crafted Sanctum relics name two of those same four; engineering is
+    // Vacuity floor: the five gear-capable crafts on the masterwork page (the
+    // two crafted Sanctum relics name two of those same five; engineering is
     // pended, see the gear-capability pin).
-    expect(crafts.size).toBeGreaterThanOrEqual(4);
+    expect(crafts.size).toBeGreaterThanOrEqual(5);
     for (const craftId of crafts) {
       expect(() => craftById(craftId), craftId).not.toThrow();
       expect(craftById(craftId).id, craftId).toBe(craftId);

@@ -353,18 +353,34 @@ describe('defaultHobbyForPair skill preference (hobby default)', () => {
   // ignores content availability. The live, shipped Bombardier pair
   // (engineering+alchemy) has ring opposites inscription (ring index 5) and
   // enchanting (ring index 6); ring order picks inscription first, but
-  // inscription has zero recipes and no other skill-gain path
-  // (content/deeds.ts's prog_guildsworn comment: "Jewelcrafting and
-  // Inscription have no live skill-gain path yet"), so a fresh Bombardier
-  // character is defaulted into a hobby slot that can never progress until an
-  // unrelated hobby-switch quest is separately discovered. Enchanting has
-  // real content (disenchanting) and must win the tie instead.
+  // inscription has zero recipes and no other skill-gain path (its milestone
+  // deeds stay deferred with prog_guildsworn for the same reason), so a fresh
+  // Bombardier character is defaulted into a hobby slot that can never
+  // progress until an unrelated hobby-switch quest is separately discovered.
+  // Enchanting has real content (disenchanting) and must win the tie instead.
   it('prefers a candidate with real content over one with none, at equal (zero) skill', () => {
     expect(defaultHobbyForPair('engineering', 'alchemy', {})).toBe('enchanting');
   });
 
   it('the content-availability tiebreak never overrides an actual skill preference', () => {
     expect(defaultHobbyForPair('engineering', 'alchemy', { inscription: 5 })).toBe('inscription');
+  });
+
+  // Derived flip that landed with the jewelcrafting base catalog (Masterwrought
+  // phase 05): CRAFTS_WITH_CONTENT reads ALL_RECIPES, so jewelcrafting joined
+  // the content set. The Trapper pair (cooking+leatherworking) has ring
+  // opposites jewelcrafting and weaponcrafting; both now carry content, so the
+  // ring-order tie break picks jewelcrafting where it previously fell through
+  // to weaponcrafting on the content tiebreak. Pinned as the intended outcome
+  // of the derivation; the Phase 05 ledger flags the desirability for QA.
+  it('the Trapper pair defaults its hobby to jewelcrafting now that the base catalog ships', () => {
+    expect(defaultHobbyForPair('cooking', 'leatherworking', {})).toBe('jewelcrafting');
+  });
+
+  it('the Trapper default still yields to an actual skill preference', () => {
+    expect(defaultHobbyForPair('cooking', 'leatherworking', { weaponcrafting: 5 })).toBe(
+      'weaponcrafting',
+    );
   });
 });
 

@@ -177,12 +177,16 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // v0.33.0 offhand fix retired it, the fixture now instances all twelve
 // live slots (ALL_EQUIP_SLOTS), and the settled ceiling re-measured 8,587
 // bytes. The phase 20 density pass took the node count 120 to 156 and the
-// settled ceiling to a measured 9,451 bytes: the pin HOLDS, but the
-// headroom is now about 277 bytes, under one starter zone of node growth,
-// so the NEXT authored node-count growth of any size re-mints this bound
-// with its measured value (the tests/professions_node_persist.test.ts
-// 2048 -> 4096 -> 8192 precedent) rather than squeezing under it.
-const PROFESSIONS_BYTE_CEILING = 9728;
+// settled ceiling to a measured 9,451 bytes with about 277 bytes of headroom
+// under the then-current 9,728 bound, and recorded that the next authored
+// content growth of any size re-mints the bound with its measured value (the
+// tests/professions_node_persist.test.ts 2048 -> 4096 -> 8192 precedent)
+// rather than squeezing under it. That growth arrived: the Masterwrought
+// phase 05 jewelcrafting base catalog took the recipe count 79 to 88 (nine
+// knownRecipes entries) and the settled ceiling to a measured 9,734 bytes,
+// six over the old bound, so the bound is re-minted here at the next round
+// step (10 KiB, about 506 bytes of headroom).
+const PROFESSIONS_BYTE_CEILING = 10240;
 
 function ceilingSim(): Sim {
   const sim = makeSim();
@@ -429,12 +433,12 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
 
     // The byte bound itself, on the settled state. The lower bound tracks
-    // the measured settled value (9,451 at the phase 20 re-measure) minus a
-    // small band, so the headroom note above cannot rot silently in either
-    // direction: a measurement drifting more than a couple hundred bytes
-    // reds here and forces the note to be re-read.
+    // the measured settled value (9,734 at the phase 05 jewelcrafting
+    // re-measure) minus a small band, so the headroom note above cannot rot
+    // silently in either direction: a measurement drifting more than a
+    // couple hundred bytes reds here and forces the note to be re-read.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(9216);
+    expect(bytes).toBeGreaterThan(9472);
     expect(bytes).toBeLessThanOrEqual(PROFESSIONS_BYTE_CEILING);
   });
 

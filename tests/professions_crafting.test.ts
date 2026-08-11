@@ -4,6 +4,7 @@ import {
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
+  JEWELCRAFTING_RECIPES,
   LADDER_RECIPES,
   ROD_RECIPES,
   recipeById,
@@ -432,6 +433,7 @@ describe('craftItem command (#1127)', () => {
       ...CASTER_HUB_RECIPES,
       ...COMBO_RECIPES,
       ...LADDER_RECIPES,
+      ...JEWELCRAFTING_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -442,7 +444,8 @@ describe('craftItem command (#1127)', () => {
         TOOL_EFFECT_RECIPES.length +
         CASTER_HUB_RECIPES.length +
         COMBO_RECIPES.length +
-        LADDER_RECIPES.length,
+        LADDER_RECIPES.length +
+        JEWELCRAFTING_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });

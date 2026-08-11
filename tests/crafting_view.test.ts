@@ -797,16 +797,28 @@ describe('craftLearnHints (discoverability)', () => {
     expect(craftLearnHints(known, STATIONS).has('weaponcrafting')).toBe(false);
   });
 
-  it('never hints a craft with no physical station, and stays safe for unknown crafts', () => {
-    const hints = craftLearnHints([], []);
-    // Every hinted craft resolves to the station type it was paired with.
+  it('a station-less craft hints through its foreign-bound teaching home, and unknowns stay safe', () => {
+    // With no stations at all nothing is hinted: there is no master to point at.
+    expect(craftLearnHints([], []).size).toBe(0);
+    const hints = craftLearnHints([], STATIONS);
+    // Every hinted craft with a station of its own hints AT that station.
+    // Exactly two station-less crafts hint through a foreign-bound teaching
+    // home (trainingStationTypeFor): enchanting via the toolworks charms, and
+    // jewelcrafting via its forge-bound catalog. Any new station-less hinted
+    // craft must be added here deliberately.
     for (const [craft, hint] of hints) {
-      expect(stationTypeForCraft(craft)).toBe(hint.stationType);
+      const own = stationTypeForCraft(craft);
+      if (own) expect(own, craft).toBe(hint.stationType);
+      else expect(['enchanting', 'jewelcrafting'], craft).toContain(craft);
       expect(hint.masterNpcId).toBeTruthy();
     }
-    // jewelcrafting has no station master, so it is never hinted even unlearned;
-    // a bogus craft id is simply absent (no crash, no entry).
-    expect(hints.has('jewelcrafting')).toBe(false);
+    expect(hints.get('jewelcrafting')).toEqual({
+      stationType: 'forge',
+      masterNpcId: 'forgemistress_darva',
+    });
+    // inscription ships no trainer recipe, and a bogus craft id is unknown:
+    // both are simply absent (no crash, no entry).
+    expect(hints.has('inscription')).toBe(false);
     expect(hints.has('not-a-craft')).toBe(false);
   });
 });

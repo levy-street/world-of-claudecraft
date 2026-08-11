@@ -1990,10 +1990,19 @@ export const DEEDS: Record<string, DeedDef> = {
   // within this block only). Craft-skill thresholds reference ONLY resolved
   // caps or below: every CRAFT_RING craft caps at 125 (craftMaxSkillFor),
   // fishing at 200, the other gathering professions at 100
-  // (content/professions.ts maxSkill). Jewelcrafting and Inscription have no
-  // live skill-gain path yet (zero recipes, no enchanting-style action), so
-  // their milestone and Grandmaster deeds stay deferred with prog_ringwright
-  // rather than shipping visible-but-unearnable.
+  // (content/professions.ts maxSkill). Inscription has no live skill-gain
+  // path yet (zero recipes, no enchanting-style action), so its milestone and
+  // Grandmaster deeds stay deferred with prog_ringwright rather than shipping
+  // visible-but-unearnable. Jewelcrafting left that set when its base catalog
+  // landed (JEWELCRAFTING_RECIPES); its rare-tier milestone is
+  // prog_jewelcrafting_rare in the appended block below. That milestone is
+  // the ONLY one that shipped with the catalog: the rung-50 outputs put
+  // jewelcrafting inside the rare-teach family's derivation, while its
+  // skill-50 and Grandmaster pages wait for the craft's deeper content. The
+  // base catalog is a first wave whose ladder stops at the rung-50 rare band,
+  // and no attunement quest names either jewelcrafting pair yet
+  // (content/zone1.ts ships four), so the craft is reachable as a hobby but
+  // never as an uncapped major. Both deeds ship when that depth does.
   prog_guildsworn: {
     id: 'prog_guildsworn',
     name: 'Craftsworn',
@@ -2477,10 +2486,12 @@ export const DEEDS: Record<string, DeedDef> = {
   // this is never luck-based, only whether the player knows the recipe and
   // holds the reagents: standard renown, no title, same tier as the other
   // moderate profession-depth milestones (prog_fishing_100). Covers exactly
-  // the seven crafts that ship a rare-or-better recipe today (see
-  // tests/deeds_content.test.ts for the derivation): enchanting has no
-  // item-def output to grade, and jewelcrafting/inscription stay deferred
-  // with prog_ringwright (docs/design/deeds.md, no live recipes yet).
+  // the crafts that ship a rare-or-better recipe (see
+  // tests/deeds_content.test.ts for the derivation): the seven below, plus
+  // prog_jewelcrafting_rare appended at the table tail with the Masterwrought
+  // phase 05 base catalog (DEED_ORDER is append-only). Enchanting has no
+  // item-def output to grade, and inscription stays deferred with
+  // prog_ringwright (docs/design/deeds.md, no live recipes yet).
   prog_engineering_rare: {
     id: 'prog_engineering_rare',
     name: 'Precision Engineering',
@@ -2817,6 +2828,21 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 0,
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'Light of the Sanctum' },
+  },
+  // Jewelcrafting joins the per-craft rare-tier milestone family (issue
+  // #2055) with the Masterwrought phase 05 base catalog, whose rung-50
+  // outputs are the craft's first rare recipes. Same fields as the seven
+  // records in the family block above (standard renown, no title, the
+  // craft_rare mark professions/crafting.ts fires for every craft);
+  // appended here, not beside its siblings, because DEED_ORDER derives
+  // from table order and is append-only.
+  prog_jewelcrafting_rare: {
+    id: 'prog_jewelcrafting_rare',
+    name: 'Polished to Brilliance',
+    desc: 'Craft your first rare-tier item in Jewelcrafting.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:jewelcrafting' },
   },
 };
 

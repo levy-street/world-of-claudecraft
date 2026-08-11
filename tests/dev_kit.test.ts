@@ -178,7 +178,8 @@ describe('fresh-20 item pool', () => {
 
 describe('kit construction', () => {
   it('builds a kit for every one of the 27 specs, with no empty armor slot', () => {
-    // neck/ring1/ring2 are deliberately NOT required: see the jewelry-gap test below.
+    // neck/ring1/ring2 are absent from this armor floor on purpose: the jewelry test
+    // below pins them by exact id, which is stricter than a truthiness check here.
     const required = [
       'helmet',
       'shoulder',
@@ -198,20 +199,79 @@ describe('kit construction', () => {
     }
   });
 
-  it('leaves neck and rings empty, because no fresh-20 jewelry exists', () => {
-    // Not a filter bug: every neck/ring in the game is either Heroic-badge-vendor
-    // stock or source level 22+, so a genuinely fresh 20 wears none. Documented as a
-    // test so the day content adds fresh-20 jewelry, this reds and the presets get
-    // revisited rather than silently continuing to ship three empty slots.
-    const jewelry = Object.values(ITEMS).filter(
-      (item) => item.slot === 'neck' || item.slot === 'ring',
-    );
-    expect(jewelry.length).toBeGreaterThan(0);
-    for (const cls of ALL_CLASSES) {
-      expect(
-        jewelry.filter((item) => isFreshTwentyItem(cls, item)),
-        `${cls} has fresh-20 jewelry now: revisit the kit slots`,
-      ).toEqual([]);
+  it('fills neck and both rings from the jewelcrafting catalog, per archetype', () => {
+    // These three slots used to come back empty, and this test used to say so: before
+    // the jewelcrafting base catalog every neck and ring in the game was
+    // Heroic-badge-vendor stock or source level 22+, so a genuinely fresh 20 could
+    // wear none of it. The catalog put nine crafted pieces inside the tier and the
+    // slots filled themselves, by the same best-in-slot derivation that already
+    // dresses the kit in crafted armor and weapons. Nothing about the picker changed.
+    //
+    // The ids are pinned as literals rather than recomputed from roleItemScore, so a
+    // retune of the role weights has to be admitted here instead of quietly moving
+    // what every preset wears.
+    //
+    // Neck is archetype-blind: burnished_thorium_amulet (agi 5, sta 3) outscores
+    // iron_link_choker (agi 3, sta 1) on stamina alone, so even a pure-intellect
+    // caster scoring its agility at zero still takes it.
+    const NECK = 'burnished_thorium_amulet';
+    // Strength and agility roles: the rung-50 str ring, then the rung-25 str ring.
+    const PHYSICAL_RINGS = ['weighted_thorium_band', 'riveted_iron_signet'] as const;
+    // Intellect roles: the rung-50 int ring, then the rung-25 int ring.
+    const CASTER_RINGS = ['gleaming_thorium_loop', 'etched_iron_loop'] as const;
+    const PHYSICAL_SPECS = [
+      'warrior/arms',
+      'warrior/fury',
+      'warrior/prot',
+      'paladin/protection',
+      'paladin/retribution',
+      'hunter/beast_mastery',
+      'hunter/marksmanship',
+      'hunter/survival',
+      'rogue/assassination',
+      'rogue/combat',
+      'rogue/subtlety',
+      'shaman/enhancement',
+    ];
+    const CASTER_SPECS = [
+      'paladin/holy',
+      'priest/discipline',
+      'priest/holy',
+      'priest/shadow',
+      'shaman/elemental',
+      'shaman/restoration',
+      'mage/arcane',
+      'mage/fire',
+      'mage/frost',
+      'warlock/affliction',
+      'warlock/demonology',
+      'warlock/destruction',
+      'druid/balance',
+      'druid/restoration',
+    ];
+    // druid/feral belongs to neither camp and is not a mistake. It is the one TANK_AGI
+    // role, and stamina leads outright there (sta 1.0), so after the str ring it takes
+    // the rung-50 INT ring for its 3 stamina rather than the rung-25 str ring: 3.0
+    // against 1.9. A tank wearing an intellect ring looks wrong and is the scorer
+    // working as designed.
+    const FERAL_RINGS = ['weighted_thorium_band', 'gleaming_thorium_loop'] as const;
+
+    const expected = new Map<string, readonly [string, string]>();
+    for (const key of PHYSICAL_SPECS) expected.set(key, PHYSICAL_RINGS);
+    for (const key of CASTER_SPECS) expected.set(key, CASTER_RINGS);
+    expected.set('druid/feral', FERAL_RINGS);
+    // Cross-check against the role table, so a spec added there without a row here
+    // fails rather than going unpinned.
+    expect(expected.size).toBe(DEV_KIT_ROLE_COUNT);
+
+    for (const { cls, spec } of everySpec()) {
+      const key = `${cls}/${spec}`;
+      const rings = expected.get(key);
+      expect(rings, `${key} is not classified above`).toBeDefined();
+      const kit = buildDevKit(cls, spec);
+      expect(kit?.equip.neck, `${key} neck`).toBe(NECK);
+      expect(kit?.equip.ring1, `${key} ring1`).toBe(rings?.[0]);
+      expect(kit?.equip.ring2, `${key} ring2`).toBe(rings?.[1]);
     }
   });
 
@@ -318,8 +378,10 @@ describe('/dev kit against a real Sim', () => {
     const sim = kitted('warrior', 'prot');
     const meta = sim.players.get(sim.playerId);
     expect(meta?.bags.filter(Boolean)).toHaveLength(4);
-    // 8 armor/weapon slots minimum. Not 11: neck and both rings stay empty because no
-    // fresh-20 jewelry exists (see the jewelry-gap test above).
+    // 8 armor/weapon slots minimum, kept as a floor rather than an exact count: this
+    // test is about the command dressing the character at all. A prot warrior wears
+    // 12 today (the jewelry test above pins neck and both rings by id, so the three
+    // slots this floor used to exclude are covered there).
     const worn = Object.values(meta?.equipment ?? {}).filter(Boolean);
     expect(worn.length).toBeGreaterThanOrEqual(8);
     for (const slot of ['helmet', 'chest', 'legs', 'mainhand'] as const) {

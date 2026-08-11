@@ -70,12 +70,25 @@ describe('buildTrainView', () => {
     expect(view.rows).toEqual([]);
   });
 
-  it('the forge master lists BOTH forge crafts (weaponcrafting + armorcrafting), sorted', () => {
+  it('the forge master lists ALL THREE forge crafts, sorted', () => {
+    // Two of them are the forge's OWN crafts (STATION_TYPE_BY_CRAFT maps
+    // weaponcrafting and armorcrafting to 'forge'). Jewelcrafting has no
+    // station named after it and joins the same window per RECIPE, through the
+    // stationType: 'forge' every record in its base catalog carries:
+    // trainingStationTypeFor prefers a recipe's own stationType over its
+    // craft's default station, so Forgemistress Darva teaches it by
+    // derivation rather than by a new station type. Kept exact so a craft
+    // that silently stops resolving to the forge, or a fourth that starts,
+    // reds here.
     for (const [shape, junk] of SHAPES) {
       const view = buildTrainView('forgemistress_darva', deps(junk));
       expect(view.stationType, shape).toBe('forge');
       const crafts = new Set(view.rows.map((row) => row.professionId));
-      expect([...crafts].sort(), shape).toEqual(['armorcrafting', 'weaponcrafting']);
+      expect([...crafts].sort(), shape).toEqual([
+        'armorcrafting',
+        'jewelcrafting',
+        'weaponcrafting',
+      ]);
       // Sort: craft, then skillReq, then id.
       const keys = view.rows.map((row) => [row.professionId, row.skillReq, row.recipeId] as const);
       const sorted = [...keys].sort((a, b) => {
@@ -128,25 +141,35 @@ describe('buildTrainView', () => {
     // Skill 0 everywhere: every trainer recipe above the free floor locks (the
     // skillReq-0 ladder rungs stay teachable at tier 0), and each
     // locked row names its craft and the flat threshold tier * TIER_SKILL_STEP.
-    // forgemistress_darva serves both forge crafts, so her locked ladder is the
-    // two combo recipes plus the tier-1 (skillReq 25) and tier-2 (skillReq 50)
-    // weaponcrafting/armorcrafting rungs.
+    // forgemistress_darva serves all three forge crafts, so her locked ladder is
+    // the two combo recipes, the tier-1 (skillReq 25) and tier-2 (skillReq 50)
+    // weaponcrafting/armorcrafting rungs, and the six gated jewelcrafting base
+    // recipes (three at skillReq 25, three at 50). Jewelcrafting reaches this
+    // window through its recipes' own stationType: 'forge', not through a
+    // station of its own. Its three skillReq-0 copper rungs are deliberately
+    // absent: like every other free-floor rung they stay teachable at tier 0.
     const view = buildTrainView('forgemistress_darva', deps());
     const locked = view.rows.filter((row) => row.state === 'locked');
     expect(locked.map((row) => row.recipeId).sort()).toEqual([
       'recipe_arcanite_war_axe',
+      'recipe_burnished_thorium_amulet',
       'recipe_elderwood_battle_staff',
+      'recipe_etched_iron_loop',
       'recipe_forgeguard_bulwark_gauntlets',
+      'recipe_gleaming_thorium_loop',
+      'recipe_iron_link_choker',
       'recipe_ironbound_warplate_helm',
       'recipe_ironedge_longsword',
       'recipe_ironlink_hauberk',
       'recipe_ironlink_legguards',
       'recipe_ironlink_spaulders',
       'recipe_ironshod_maul',
+      'recipe_riveted_iron_signet',
       'recipe_thorium_warblade',
       'recipe_thoriumscale_cuirass',
       'recipe_thoriumscale_greathelm',
       'recipe_thoriumscale_leggings',
+      'recipe_weighted_thorium_band',
       'recipe_whetted_iron_dirk',
     ]);
     // LITERAL requirement values per rung (never the production formula: an

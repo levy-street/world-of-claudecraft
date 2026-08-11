@@ -252,12 +252,13 @@ export function hobbyCandidatesForPair(activeArchetype: string, pairedMajor: str
 // action outside the recipe table (only enchanting itself, via disenchanting;
 // see professions/enchanting.ts). Enchanting now also ships recipes in
 // ALL_RECIPES, so its explicit entry is a redundancy that keeps the
-// disenchanting path counted even if those recipes move. Jewelcrafting and
-// Inscription have neither (content/deeds.ts's prog_guildsworn comment: "no
-// live skill-gain path yet, zero recipes, no enchanting-style action"), so
-// defaulting a fresh hobby into either soft-locks the slot: no possible skill
-// gain until an unrelated hobby-switch quest moves it. Read once at module
-// load: ALL_RECIPES is a static content table, never mutated at runtime.
+// disenchanting path counted even if those recipes move. Jewelcrafting counts
+// through the recipe arm too since its forge-bound base catalog landed
+// (JEWELCRAFTING_RECIPES, content/recipes.ts). Inscription alone has neither
+// (zero recipes, no enchanting-style action), so defaulting a fresh hobby into
+// it soft-locks the slot: no possible skill gain until an unrelated
+// hobby-switch quest moves it. Read once at module load: ALL_RECIPES is a
+// static content table, never mutated at runtime.
 const CRAFTS_WITH_CONTENT: ReadonlySet<string> = new Set([
   ...ALL_RECIPES.map((recipe) => recipe.professionId),
   'enchanting',

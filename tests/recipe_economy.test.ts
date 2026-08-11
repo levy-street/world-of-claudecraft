@@ -17,6 +17,7 @@ import {
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
+  JEWELCRAFTING_RECIPES,
   LADDER_RECIPES,
   ROD_RECIPES,
   recipeById,
@@ -277,15 +278,18 @@ describe('REFERENTIAL INTEGRITY', () => {
       }
     }
     // The 54 ladder recipes plus the 3 grandfathered combos all carry
-    // 'trainer', and so do the two crafted rods and the two tool-effect
-    // charms: the pre-training id list is frozen, so anything authored after
-    // that switch has to be learned.
+    // 'trainer', and so do the two crafted rods, the two tool-effect
+    // charms, and the nine jewelcrafting catalog recipes: the pre-training
+    // id list is frozen, so anything authored after that switch has to be
+    // learned.
     expect(trainerRecipes).toBe(
       LADDER_RECIPES.length +
         COMBO_RECIPES.length +
         ROD_RECIPES.length +
-        TOOL_EFFECT_RECIPES.length,
+        TOOL_EFFECT_RECIPES.length +
+        JEWELCRAFTING_RECIPES.length,
     );
+    expect(JEWELCRAFTING_RECIPES).toHaveLength(9);
     expect(ROD_RECIPES).toHaveLength(2);
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
   });

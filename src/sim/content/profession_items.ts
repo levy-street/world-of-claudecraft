@@ -712,4 +712,101 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     elixir: { aura: 'Might of the Serpent', kind: 'buff_sta', value: 12, duration: 900 },
     sellValue: 20,
   },
+
+  // --- Crafted jewelry ladder (jewelcrafting) -------------------------------
+  // Trainer-taught outputs of JEWELCRAFTING_RECIPES (content/recipes.ts), three
+  // rungs at skillReq 0/25/50, forge-bound at forgemistress_darva (the recipes
+  // carry an explicit forge stationType; jewelcrafting itself has no station).
+  // Rung qualities are uncommon/uncommon/rare rather than the other ladders'
+  // common/uncommon/rare: common quality carries no primary-stat budget and
+  // jewelry has no armor axis, so a common ring would carry literally nothing.
+  // No armorType (every class wears jewelry) and no combat rating of any kind:
+  // ratings are jewelry's ENDGAME identity (heroic_vendor.ts), and the base
+  // rungs stay rating-free per ruling R14. Stats sit exactly on the repo
+  // budget formula (src/sim/item_budget.ts). Never vendor-stocked (no
+  // buyValue), and every output's sellValue clears strictly below its summed
+  // reagent value per the economy invariant. Display names follow the Osmium
+  // register (the thorium_* ids display "Osmium", the originality-sweep
+  // id/display split); the ids keep the verified thorium spellings.
+  hammered_copper_band: {
+    id: 'hammered_copper_band',
+    name: 'Hammered Copper Band',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'uncommon',
+    stats: { str: 2, sta: 1 },
+    sellValue: 32,
+  },
+  polished_copper_loop: {
+    id: 'polished_copper_loop',
+    name: 'Polished Copper Loop',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'uncommon',
+    stats: { int: 2, sta: 1 },
+    sellValue: 32,
+  },
+  coiled_copper_torc: {
+    id: 'coiled_copper_torc',
+    name: 'Coiled Copper Torc',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'uncommon',
+    stats: { agi: 2, sta: 1 },
+    sellValue: 36,
+  },
+  riveted_iron_signet: {
+    id: 'riveted_iron_signet',
+    name: 'Riveted Iron Signet',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'uncommon',
+    stats: { str: 3, sta: 1 },
+    sellValue: 46,
+  },
+  etched_iron_loop: {
+    id: 'etched_iron_loop',
+    name: 'Etched Iron Loop',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'uncommon',
+    stats: { int: 3, sta: 1 },
+    sellValue: 46,
+  },
+  iron_link_choker: {
+    id: 'iron_link_choker',
+    name: 'Iron Link Choker',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'uncommon',
+    stats: { agi: 3, sta: 1 },
+    sellValue: 52,
+  },
+  weighted_thorium_band: {
+    id: 'weighted_thorium_band',
+    name: 'Weighted Osmium Band',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'rare',
+    stats: { str: 5, sta: 3 },
+    sellValue: 280,
+  },
+  gleaming_thorium_loop: {
+    id: 'gleaming_thorium_loop',
+    name: 'Gleaming Osmium Loop',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'rare',
+    stats: { int: 5, sta: 3 },
+    sellValue: 280,
+  },
+  burnished_thorium_amulet: {
+    id: 'burnished_thorium_amulet',
+    name: 'Burnished Osmium Amulet',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'rare',
+    stats: { agi: 5, sta: 3 },
+    sellValue: 310,
+  },
 };

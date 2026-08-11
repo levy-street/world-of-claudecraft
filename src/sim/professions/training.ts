@@ -83,10 +83,12 @@ export function teachTierMet(recipe: ProfessionRecipeRecord, craftSkills: CraftS
  * The fallback order matters for the crafts with no physical station
  * (enchanting/jewelcrafting/inscription, stations.ts stationTypeForCraft):
  * their recipes are teachable exactly when they carry an explicit
- * `stationType` (the tool-effect charms bind to the toolworks: the charms
- * are Enchanter work SOLD as tool upgrades, so the tool master teaches
- * them). For every recipe of a stationed craft the two arms agree today
- * (each such recipe's stationType, when present, IS its craft's station),
+ * `stationType`, and two families do today: the tool-effect charms bind to
+ * the toolworks (the charms are Enchanter work SOLD as tool upgrades, so the
+ * tool master teaches them), and the jewelcrafting base catalog
+ * (JEWELCRAFTING_RECIPES) binds to the forge, so the forge master teaches
+ * every rung of it. For every recipe of a stationed craft the two arms agree
+ * today (each such recipe's stationType, when present, IS its craft's station),
  * so this is a widening, not a change, for shipped content.
  */
 export function trainingStationTypeFor(recipe: ProfessionRecipeRecord): StationType | undefined {

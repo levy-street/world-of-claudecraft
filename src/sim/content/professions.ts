@@ -447,8 +447,11 @@ export const CRAFT_BATCH_MAX = 50;
 export const STATION_RADIUS = 20;
 
 // Which station type serves each craft. Crafts absent from this table
-// (jewelcrafting, inscription, enchanting) have no physical station and no
-// station-bound recipes today.
+// (jewelcrafting, inscription, enchanting) have no station of their OWN;
+// their recipes may still bind to a foreign station per record via
+// `stationType` (enchanting's two tool-effect charms at the toolworks,
+// jewelcrafting's nine base-catalog recipes at the forge). Absence here means
+// only that no station type is named after the craft.
 // Key ORDER is load-bearing: professions/stations.ts craftsForStationType
 // returns keys in this order and the gossip Crafting shortcut
 // (src/ui/hud/quest/master_craft_core.ts) takes the first as its tie-break

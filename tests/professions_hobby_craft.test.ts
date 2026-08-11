@@ -51,8 +51,9 @@ describe('IWorld hobbyCraft read surface (#1294)', () => {
     // CRAFT_A is engineering; acceptArchetypeQuest pairs it with its
     // combo-aware default major, alchemy (the Bombardier pair). The two ring
     // opposites are inscription (opposite engineering) and enchanting
-    // (opposite alchemy); inscription has zero recipes and no other
-    // skill-gain path (content/deeds.ts's prog_guildsworn comment), so
+    // (opposite alchemy); inscription is the one craft left with zero recipes
+    // and no other skill-gain path (professions/archetype.ts
+    // CRAFTS_WITH_CONTENT), so
     // defaultHobbyForPair's content-availability tiebreak picks enchanting
     // over the plain ring-order tie break (see tests/professions_archetype.test.ts
     // for the general rule).
@@ -72,9 +73,10 @@ describe('IWorld hobbyCraft read surface (#1294)', () => {
     // CRAFT_B is alchemy: its combo-aware default pair is alchemy+engineering,
     // whose two opposite candidates are enchanting (opposite alchemy) and
     // inscription (opposite engineering). With zero retained skill,
-    // ring order alone would tie-break to inscription, but inscription has
-    // zero recipes and no other skill-gain path (content/deeds.ts's
-    // prog_guildsworn comment), so defaultHobbyForPair's content-availability
+    // ring order alone would tie-break to inscription, but inscription is the
+    // one craft left with zero recipes and no other skill-gain path
+    // (professions/archetype.ts CRAFTS_WITH_CONTENT), so
+    // defaultHobbyForPair's content-availability
     // tiebreak picks enchanting instead (real content via disenchanting).
     // Pinned as literals so a change to the pair-default or hobby-default
     // rule reddens here deliberately (see tests/professions_archetype.test.ts

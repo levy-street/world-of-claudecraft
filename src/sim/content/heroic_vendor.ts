@@ -1,8 +1,11 @@
 import type { ItemDef } from '../types';
 
-// The Heroic Quartermaster's marks-currency stock: the game's only source of
-// neck and ring jewelry. Prices are HEROIC MARKS (the heroic_mark inventory
-// item from ./dungeon_difficulty.ts), debited from the buyer's bags by
+// The Heroic Quartermaster's marks-currency stock: the endgame neck and ring
+// jewelry bought with marks. It is not the game's only jewelry (the WARFARE
+// honor sets, the rift ring abysswrought_band, and the crafted jewelcrafting
+// pieces all ship elsewhere); the item-level and rating notes below describe
+// THIS stock. Prices are HEROIC MARKS (the heroic_mark inventory item from
+// ./dungeon_difficulty.ts), debited from the buyer's bags by
 // buyHeroicVendorItem (src/sim/instances/heroic_vendor.ts).
 //
 // Item level: the source index (src/sim/item_level.ts) treats this stock as
