@@ -198,17 +198,19 @@ describe('held weapon models', () => {
     expect(unmapped.map((item) => item.id)).toEqual([]);
   });
 
-  // The orbs, the lantern, the quivers (each with its generated heroic clone
-  // where the source is heroic-eligible) and the inscription tomes are the
-  // known held model gaps: the shared art set has no orb, lantern, quiver or
-  // tome model to map them to, so they need new art, not a table row. The
-  // quivers are a softer gap than the orbs: the hunter's ranger.glb already
-  // carries a built-in quiver mesh, so an unmapped quiver reads correctly on
-  // the body instead of showing nothing. The three tomes shipped content-only
-  // with the Masterwrought phase 06 inscription base catalog (no GLB yet).
+  // The orbs, the lantern, and the quivers (each with its generated heroic
+  // clone where the source is heroic-eligible) are the remaining held model
+  // gaps: the shared art set has no orb, lantern, or quiver model to map them
+  // to, so they need new art, not a table row. The quivers are a softer gap
+  // than the orbs: the hunter's ranger.glb already carries a built-in quiver
+  // mesh, so an unmapped quiver reads correctly on the body instead of
+  // showing nothing. The three inscription tomes LEFT this pin at the phase
+  // 06 QA: they map to the procedural tome GLBs
+  // (scripts/assets/inscription_tomes, pinned by
+  // tests/inscription_tome_assets.test.ts).
   // Pinning the exact set makes the exception conscious: a future held_offhand
   // item must either map to a model or extend this pin.
-  it('pins the held_offhand items without a model (orbs, lantern, quivers and tomes)', () => {
+  it('pins the held_offhand items without a model (orbs, lantern and quivers)', () => {
     const heldOffhands = Object.values(ITEMS).filter((item) => item.kind === 'held_offhand');
     const unmapped = heldOffhands
       .filter((item) => itemOffhandModelUrl(item.id) === null)
@@ -217,19 +219,26 @@ describe('held weapon models', () => {
     expect(unmapped).toEqual([
       'cragmaw_huntquiver',
       'direfang_quiver',
-      // Masterwrought phase 06: the inscription caster tomes, content-only.
-      'goldleaf_folio',
       'gravewyrm_bone_quiver',
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',
       'moggers_hide_quiver',
-      // Masterwrought phase 06: the inscription caster tomes, content-only.
-      'silverleaf_primer',
-      'sunpetal_grimoire',
       'valefire_lantern',
       'wraithfire_orb',
     ]);
+  });
+
+  it('every inscription tome resolves its own held model GLB on disk', () => {
+    const expected: Record<string, string> = {
+      silverleaf_primer: 'models/weapons/tome_silverleaf.glb',
+      goldleaf_folio: 'models/weapons/tome_goldleaf.glb',
+      sunpetal_grimoire: 'models/weapons/tome_sunpetal.glb',
+    };
+    for (const [itemId, url] of Object.entries(expected)) {
+      expect(itemOffhandModelUrl(itemId), itemId).toBe(url);
+      expect(existsSync(`public/${url}`), `${url} missing`).toBe(true);
+    }
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {
@@ -385,9 +394,15 @@ describe('held weapon models', () => {
     expect(rogue?.weaponSlots).toEqual([0]);
     expect(rogue?.offhandSlot).toBe(1);
     expect(rogue?.attach?.length).toBe(2);
-    expect(mechHeldWeaponOverride('paladin')?.offhandSlot).toBe(1);
-    expect(mechHeldWeaponOverride('shaman')?.offhandSlot).toBe(1);
-    for (const cls of ['hunter', 'priest', 'mage', 'warlock', 'druid'] as const) {
+    // The phase 06 QA gave priest, mage, and druid a real offhand slot (the
+    // inscription tomes), so the mech mirrors it for them exactly as it does
+    // for the shield classes. The warlock keeps its FIXED class spellbook
+    // (deliberately no offhandSlot; an equipped tome keeps the book visual),
+    // and the hunter has no offhand at all.
+    for (const cls of ['paladin', 'shaman', 'priest', 'mage', 'druid'] as const) {
+      expect(mechHeldWeaponOverride(cls)?.offhandSlot, cls).toBe(1);
+    }
+    for (const cls of ['hunter', 'warlock'] as const) {
       expect(mechHeldWeaponOverride(cls), `${cls} should keep the mech default`).toBeNull();
     }
 

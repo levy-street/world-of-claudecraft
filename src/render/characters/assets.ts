@@ -200,6 +200,12 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   // Bow-SLOT skin with crossbow HANDLING (a gun aims, it is not drawn): the
   // grip family follows the handling, like the attach bone below.
   encore_the_second_falling_star: 'VAR_CROSSBOW',
+  // The phase 06 inscription tome offhands (grip-origin closed books from
+  // scripts/assets/inscription_tomes): the VAR_BOOK family the pipeline
+  // reserved gets its first members.
+  tome_silverleaf: 'VAR_BOOK',
+  tome_goldleaf: 'VAR_BOOK',
+  tome_sunpetal: 'VAR_BOOK',
   ...KAYKIT_SHIELD_ACCESSORIES,
 };
 

@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/inscription_tomes/tome_silverleaf-final.glb",
+      "out": "models/weapons/tome_silverleaf.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/inscription_tomes/tome_goldleaf-final.glb",
+      "out": "models/weapons/tome_goldleaf.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/inscription_tomes/tome_sunpetal-final.glb",
+      "out": "models/weapons/tome_sunpetal.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

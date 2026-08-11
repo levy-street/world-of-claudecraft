@@ -714,6 +714,11 @@ const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   highwatch_wallshield: 'shield_square',
   bonewrought_bulwark: 'shield_square',
   pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
+  // The phase 06 inscription tomes: the first held_offhand item models,
+  // procedural GLBs from scripts/assets/inscription_tomes (VAR_BOOK grips).
+  silverleaf_primer: 'tome_silverleaf',
+  goldleaf_folio: 'tome_goldleaf',
+  sunpetal_grimoire: 'tome_sunpetal',
 };
 
 function itemModelKey(
@@ -1259,8 +1264,17 @@ export const VISUALS: Record<string, VisualDef> = {
     // accessory as a SkinnedMesh, and the allowlist filter (assets.ts) only
     // hides non-skinned nodes, so the hat always renders. Sanctioned look.
     show: [],
-    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    // The offhand slot renders ONLY an equipped, model-mapped offhand item
+    // (the phase 06 inscription tomes are the first): offhandAttachDef skips
+    // the slot entirely when the offhand is empty or unmapped, so the empty
+    // hand look is unchanged. The base url never renders and is already in
+    // the preload set via the warlock's fixed spellbook.
+    attach: [
+      { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l' },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
     // Faint warm lift only, to tell this apart from the mage/warlock models it
     // shares mage.glb with. The whole rig is ONE merged material/atlas (skin,
     // hair, and robe together), so this lerp multiplies the entire body, not
@@ -1391,8 +1405,14 @@ export const VISUALS: Record<string, VisualDef> = {
     // (assets.ts) only hides non-skinned nodes. The hatted silhouette is the
     // sanctioned mage look; listing Mage_Cape is inert but kept as intent.
     show: ['Mage_Cape'],
-    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    // Offhand slot: renders only an equipped model-mapped offhand (the
+    // inscription tomes); empty stays empty. See the priest note.
+    attach: [
+      { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l' },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
   }),
   player_warlock: swims({
     url: `${PLAYERS}/mage.glb`,
@@ -1486,8 +1506,14 @@ export const VISUALS: Record<string, VisualDef> = {
     // alongside the hit-variety donor.
     animUrls: [`${PLAYERS}/druid_hit_variety_anims.glb`, `${PLAYERS}/druid_ability_anims.glb`],
     // dedicated druid model (own texture, ships a Backpack mesh)
-    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    // Offhand slot: renders only an equipped model-mapped offhand (the
+    // inscription tomes); empty stays empty. See the priest note.
+    attach: [
+      { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l' },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
   }),
 
   // -- cosmetic body skin (class-agnostic; both the skin preview and a live
