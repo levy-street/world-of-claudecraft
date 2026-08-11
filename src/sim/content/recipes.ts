@@ -1850,11 +1850,18 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'inscription',
     resultItemId: 'sunpetal_scroll',
     resultCount: 2,
-    // Input 190 vs output 40 (two scrolls, the serpent-elixir batch shape).
+    // Input 214 vs output 40 (two scrolls, the serpent-elixir batch shape).
+    // Priced at EXACT parity with recipe_elixir_of_the_serpent (214, also x2)
+    // per the Phase 06 QA ruling: the two routes grant a byte-identical buff,
+    // and a cheaper scroll would compete with pristine_venom_gland's only
+    // crafting sink. The rung-25 pair already ships this parity (90 = 90).
+    // The dust 4th line stays inside the craft's ink register (the rung-0
+    // recipes grind dust) and mirrors the grimoire's own 4-line rung-50 shape.
     reagents: [
       { itemId: 'sunpetal_herb', count: 1 },
-      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'arcane_essence', count: 2 },
       { itemId: 'glass_vial', count: 1 },
+      { itemId: 'arcane_dust', count: 1 },
     ],
     skillReq: 50,
     itemLevelBudget: 20,

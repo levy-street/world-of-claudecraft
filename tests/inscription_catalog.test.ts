@@ -78,7 +78,10 @@ const REAGENTS_BY_RECIPE: Record<string, Record<string, number>> = {
     glass_vial: 1,
     goldleaf_herb: 2,
   },
-  recipe_sunpetal_scroll: { sunpetal_herb: 1, arcane_essence: 1, glass_vial: 1 },
+  // Re-priced at the Phase 06 QA ruling to EXACT input parity with
+  // recipe_elixir_of_the_serpent (214, both resultCount 2): same buff, same
+  // cost, so neither route undercuts the other.
+  recipe_sunpetal_scroll: { sunpetal_herb: 1, arcane_essence: 2, glass_vial: 1, arcane_dust: 1 },
 };
 
 // The one-time training fee per rung in copper (TRAINING_FEE_BY_TIER tiers

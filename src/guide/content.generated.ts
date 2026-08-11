@@ -9631,10 +9631,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           },
           {
             "name": "Chime Essence",
-            "count": 1
+            "count": 2
           },
           {
             "name": "Glass Vial",
+            "count": 1
+          },
+          {
+            "name": "Chime Dust",
             "count": 1
           }
         ],
