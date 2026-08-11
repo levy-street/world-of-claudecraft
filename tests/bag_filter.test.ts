@@ -37,6 +37,10 @@ const ITEMS: Record<string, ItemDef> = {
   helm: { id: 'helm', name: 'Iron Helm', kind: 'armor', slot: 'helmet', quality: 'rare' },
   potion: { id: 'potion', name: 'Minor Healing Potion', kind: 'potion', quality: 'common' },
   bread: { id: 'bread', name: 'Crusty Bread', kind: 'food', quality: 'common' },
+  // A scroll (Masterwrought phase 06 inscription): a timed stamina buff in the
+  // elixir exclusivity family (src/sim/types.ts), so it files under the
+  // consumable chip beside potions and elixirs.
+  scroll: { id: 'scroll', name: 'Scroll of Stamina', kind: 'scroll', quality: 'common' },
   pelt: { id: 'pelt', name: 'Wolf Pelt', kind: 'junk', quality: 'poor' },
   rod: { id: 'rod', name: 'Fishing Rod', kind: 'tool', quality: 'common' },
   // A REAL catalog id: the material chip is honest-taxonomy set membership
@@ -106,9 +110,13 @@ describe('applyBagFilter: category filtering', () => {
     expect(ids(out)).toEqual(['relic', 'helm']);
   });
 
-  it('keeps food, drink, potions and elixirs as consumables', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'consumable', sort: 'recent', search: '' });
-    expect(ids(out)).toEqual(['potion', 'bread']);
+  it('keeps food, drink, potions, elixirs and scrolls as consumables', () => {
+    // Scrolls joined the chip with the Masterwrought phase 06 inscription
+    // catalog: a timed buff a player filters for in a fight, mirroring the
+    // KIND_RANK potion/elixir/scroll run (src/sim/inventory_sort.ts).
+    const inv: InvSlot[] = [...INV, { itemId: 'scroll', count: 2 }];
+    const out = applyBagFilter(inv, lookup, { category: 'consumable', sort: 'recent', search: '' });
+    expect(ids(out)).toEqual(['potion', 'bread', 'scroll']);
   });
 
   it('keeps only honest materials: grey junk and tools no longer match the chip', () => {
@@ -371,6 +379,20 @@ describe('matchesCategory: recipe patterns are ALL-ONLY', () => {
     // test noticing.
     for (const category of BAG_CATEGORIES) {
       expect(matchesCategory(ITEMS.pattern, category), category).toBe(category === 'all');
+    }
+  });
+});
+
+describe('matchesCategory: scrolls are consumables (Masterwrought phase 06)', () => {
+  it('matches "all" and the consumable chip only, driven off the live BAG_CATEGORIES list', () => {
+    // Same census discipline as the recipe block above: driving off the live
+    // BAG_CATEGORIES list means a future chip cannot silently start or stop
+    // claiming scrolls. Landing under 'consumable' is also what keeps the
+    // three phase 06 inscription scrolls out of the All-only census below.
+    for (const category of BAG_CATEGORIES) {
+      expect(matchesCategory(ITEMS.scroll, category), category).toBe(
+        category === 'all' || category === 'consumable',
+      );
     }
   });
 });

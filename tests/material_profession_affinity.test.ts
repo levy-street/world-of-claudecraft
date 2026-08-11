@@ -27,9 +27,14 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('game_meat')).toEqual(['cooking']);
     expect(craftIdsForMaterialItem('venom_gland')).toEqual(['alchemy']);
     // The dust left this class with the Masterwrought phase 05 jewelcrafting
-    // catalog: jewelcrafting's rung-0 recipes consume it beside enchanting
-    // (ring order puts enchanting first). arcane_shard stays single-craft.
-    expect(craftIdsForMaterialItem('arcane_dust')).toEqual(['enchanting', 'jewelcrafting']);
+    // catalog (rung-0 recipes consume it beside enchanting), and inscription
+    // joined at phase 06 (INSCRIPTION_RECIPES). Ring order puts inscription
+    // first, before enchanting. arcane_shard stays single-craft.
+    expect(craftIdsForMaterialItem('arcane_dust')).toEqual([
+      'inscription',
+      'enchanting',
+      'jewelcrafting',
+    ]);
     expect(craftIdsForMaterialItem('arcane_shard')).toEqual(['enchanting']);
   });
 

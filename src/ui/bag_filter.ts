@@ -85,6 +85,12 @@ export type ItemLookup = (itemId: string) => ItemDef | undefined;
 // That makes the case for a dedicated chip arrive SOONER, not later; all-only stands
 // for now purely on chip-count restraint, and is the first thing to revisit if the
 // chip rail ever earns another entry.
+// Scrolls (kind 'scroll', the Masterwrought phase 06 inscription stamina buffs) live
+// under 'consumable' beside the potions and elixirs: a scroll is a timed restorative
+// buff sharing an exclusivity family with elixirs (src/sim/types.ts), and the sim's
+// clean-up ladder already ranks it in the consumable run (KIND_RANK in
+// src/sim/inventory_sort.ts: potion, elixir, scroll), so the chip a player filters
+// for in a fight is exactly where it belongs.
 export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
   switch (category) {
     case 'all':
@@ -98,7 +104,8 @@ export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
         item.kind === 'food' ||
         item.kind === 'drink' ||
         item.kind === 'potion' ||
-        item.kind === 'elixir'
+        item.kind === 'elixir' ||
+        item.kind === 'scroll'
       );
     case 'material':
       return isMaterialItem(item);

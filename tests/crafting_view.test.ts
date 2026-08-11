@@ -802,23 +802,29 @@ describe('craftLearnHints (discoverability)', () => {
     expect(craftLearnHints([], []).size).toBe(0);
     const hints = craftLearnHints([], STATIONS);
     // Every hinted craft with a station of its own hints AT that station.
-    // Exactly two station-less crafts hint through a foreign-bound teaching
-    // home (trainingStationTypeFor): enchanting via the toolworks charms, and
-    // jewelcrafting via its forge-bound catalog. Any new station-less hinted
+    // Exactly three station-less crafts hint through a foreign-bound teaching
+    // home (trainingStationTypeFor): enchanting via the toolworks charms,
+    // jewelcrafting via its forge-bound catalog, and inscription via its
+    // apothecary-bound catalog (phase 06). Any new station-less hinted
     // craft must be added here deliberately.
     for (const [craft, hint] of hints) {
       const own = stationTypeForCraft(craft);
       if (own) expect(own, craft).toBe(hint.stationType);
-      else expect(['enchanting', 'jewelcrafting'], craft).toContain(craft);
+      else expect(['enchanting', 'jewelcrafting', 'inscription'], craft).toContain(craft);
       expect(hint.masterNpcId).toBeTruthy();
     }
     expect(hints.get('jewelcrafting')).toEqual({
       stationType: 'forge',
       masterNpcId: 'forgemistress_darva',
     });
-    // inscription ships no trainer recipe, and a bogus craft id is unknown:
-    // both are simply absent (no crash, no entry).
-    expect(hints.has('inscription')).toBe(false);
+    // Phase 06: the inscription base catalog binds to the apothecary (explicit
+    // foreign stationType, the jewelcrafting-at-the-forge precedent), so
+    // inscription now hints at the apothecary master. A bogus craft id stays
+    // simply absent (no crash, no entry).
+    expect(hints.get('inscription')).toEqual({
+      stationType: 'apothecary',
+      masterNpcId: 'alchemist_verane',
+    });
     expect(hints.has('not-a-craft')).toBe(false);
   });
 });

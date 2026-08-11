@@ -350,19 +350,31 @@ describe('defaultHobbyForPair skill preference (hobby default)', () => {
   });
 
   // Bug (fresh code audit, no existing issue): the ring-order tie break alone
-  // ignores content availability. The live, shipped Bombardier pair
-  // (engineering+alchemy) has ring opposites inscription (ring index 5) and
-  // enchanting (ring index 6); ring order picks inscription first, but
-  // inscription has zero recipes and no other skill-gain path (its milestone
-  // deeds stay deferred with prog_guildsworn for the same reason), so a fresh
-  // Bombardier character is defaulted into a hobby slot that can never
-  // progress until an unrelated hobby-switch quest is separately discovered.
-  // Enchanting has real content (disenchanting) and must win the tie instead.
-  it('prefers a candidate with real content over one with none, at equal (zero) skill', () => {
-    expect(defaultHobbyForPair('engineering', 'alchemy', {})).toBe('enchanting');
+  // ignored content availability. When this pin first landed, inscription had
+  // zero recipes and no other skill-gain path, so ring order defaulted a
+  // fresh Bombardier (engineering+alchemy) into a hobby slot that could
+  // never progress; the content tiebreak picked enchanting (ring index 6,
+  // real content via disenchanting) over inscription (ring index 5) instead.
+  // Derived flip that landed with the inscription base catalog (Masterwrought
+  // phase 06): CRAFTS_WITH_CONTENT reads ALL_RECIPES, so inscription joined
+  // the content set (INSCRIPTION_RECIPES). Both Bombardier candidates now
+  // carry content, the content tiebreak is a wash, and the ring-order tie
+  // break picks inscription (5) over enchanting (6). Pinned as the intended
+  // outcome of the derivation, the phase 05 Trapper-flip precedent below;
+  // the Phase 06 ledger flags the desirability for QA.
+  it('the Bombardier pair defaults its hobby to inscription now that the base catalog ships', () => {
+    expect(defaultHobbyForPair('engineering', 'alchemy', {})).toBe('inscription');
   });
 
   it('the content-availability tiebreak never overrides an actual skill preference', () => {
+    // Phase 06 re-point: inscription now carries content, so this case no
+    // longer pits the content tiebreak against a skill preference. It stays
+    // green through the sort's FIRST arm, the retained-skill preference
+    // (inscription 5 vs enchanting 0), not through ring order or the content
+    // arm; the content-vs-skill ordering itself keeps its place in
+    // defaultHobbyForPair, but with every ring craft carrying content there
+    // is no live pair left to exercise the conflict against (a future
+    // contentless craft seat would reopen it).
     expect(defaultHobbyForPair('engineering', 'alchemy', { inscription: 5 })).toBe('inscription');
   });
 

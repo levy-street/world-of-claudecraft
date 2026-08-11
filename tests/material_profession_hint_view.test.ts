@@ -91,10 +91,13 @@ describe('materialProfessionHintText', () => {
     expect(materialProfessionHintText('resonant_hide')).toBe('');
     // The counterpart arm keeps the skip honest: the dust and essence LEFT
     // the enchanting-only class with the Masterwrought phase 05 jewelcrafting
-    // catalog, so their line comes back and names both consumers.
-    expect(materialProfessionHintText('arcane_dust')).toBe('Used by Enchanting and Jewelcrafting.');
+    // catalog, and inscription joined as a third consumer at phase 06, so
+    // their line comes back and names all three consumers in ring order.
+    expect(materialProfessionHintText('arcane_dust')).toBe(
+      'Used by Inscription, Enchanting, and Jewelcrafting.',
+    );
     expect(materialProfessionHintText('arcane_essence')).toBe(
-      'Used by Enchanting and Jewelcrafting.',
+      'Used by Inscription, Enchanting, and Jewelcrafting.',
     );
   });
 
@@ -131,7 +134,8 @@ describe('materialProfessionHintText', () => {
 
   it('a craft-free hint lead never supersedes, even for a single-craft consumer set', () => {
     // Direct-predicate pins for the LATENT single-craft cases live content
-    // cannot reach while dust and essence feed two crafts: if either ever
+    // cannot reach while dust and essence feed three crafts (inscription
+    // joined at phase 06): if either ever
     // drops back to an enchanting-only consumer set, its craft-neutral
     // "Crafting reagent." lead names no craft, so the Used-by line must still
     // render (the fineGrade doctrine). Under the old exclusion-shaped check
@@ -215,7 +219,8 @@ describe('itemTooltip integration for profession material tags', () => {
   it('an enchanting material keeps its source line without Used by Enchanting', () => {
     // arcane_shard is the surviving enchanting-ONLY exemplar (the dust and
     // essence gained a jewelcrafting consumer in the Masterwrought phase 05
-    // catalog and legitimately show a two-craft Used-by line now).
+    // catalog, then an inscription consumer at phase 06, and legitimately
+    // show a three-craft Used-by line now).
     const html = tooltipHtml('arcane_shard');
     expect(html).toContain('Enchanting reagent');
     expect(html).not.toContain('Used by Enchanting');
@@ -224,7 +229,7 @@ describe('itemTooltip integration for profession material tags', () => {
     const dustHtml = tooltipHtml('arcane_dust');
     expect(dustHtml).toContain('Crafting reagent');
     expect(dustHtml).not.toContain('Enchanting reagent.');
-    expect(dustHtml).toContain('Used by Enchanting and Jewelcrafting.');
+    expect(dustHtml).toContain('Used by Inscription, Enchanting, and Jewelcrafting.');
   });
 
   it('true grey junk still says Junk', () => {

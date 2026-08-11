@@ -333,13 +333,43 @@ describe('buildTrainView', () => {
     ).toBe(true);
   });
 
-  it('the apothecary master lists the alchemy ladder with its combo teachable at tier 1', () => {
+  it('the apothecary master lists BOTH apothecary crafts, with the alchemy combo teachable at tier 1', () => {
+    // Alchemy is the apothecary's OWN craft (STATION_TYPE_BY_CRAFT maps it
+    // there). Inscription has no station named after it and joins the same
+    // window per RECIPE, through the stationType: 'apothecary' every record in
+    // its base catalog carries (the jewelcrafting-at-the-forge precedent):
+    // trainingStationTypeFor prefers a recipe's own stationType over its
+    // craft's default station, so Alchemist Verane teaches it by derivation
+    // rather than by a new station type. Kept exact so a craft that silently
+    // stops resolving to the apothecary, or a third that starts, reds here.
     const view = buildTrainView('alchemist_verane', deps({ craftSkills: { alchemy: 25 } }));
     expect(view.stationType).toBe('apothecary');
     const combo = view.rows.find((row) => row.recipeId === 'recipe_volatile_flux_elixir');
     expect(combo?.state).toBe('teachable');
-    // Every row belongs to the station's craft.
-    for (const row of view.rows) expect(row.professionId, row.recipeId).toBe('alchemy');
+    const crafts = new Set(view.rows.map((row) => row.professionId));
+    expect([...crafts].sort()).toEqual(['alchemy', 'inscription']);
+    // Liveness for the per-recipe binding: all six inscription base recipes
+    // must be PRESENT in this window (not merely allowed), so a record that
+    // silently drops its stationType vanishes loudly instead of quietly.
+    const ids = new Set(view.rows.map((row) => row.recipeId));
+    for (const id of [
+      'recipe_silverleaf_primer',
+      'recipe_silverleaf_scroll',
+      'recipe_goldleaf_folio',
+      'recipe_goldleaf_scroll',
+      'recipe_sunpetal_grimoire',
+      'recipe_sunpetal_scroll',
+    ]) {
+      expect(ids.has(id), id).toBe(true);
+    }
+    // Sort: craft, then skillReq, then id (the same rule the forge arm pins).
+    const keys = view.rows.map((row) => [row.professionId, row.skillReq, row.recipeId] as const);
+    const sorted = [...keys].sort((a, b) => {
+      if (a[0] !== b[0]) return a[0] < b[0] ? -1 : 1;
+      if (a[1] !== b[1]) return a[1] - b[1];
+      return a[2] < b[2] ? -1 : 1;
+    });
+    expect(keys).toEqual(sorted);
   });
 
   it('a pending flight marks ONLY its teachable row (issue #2342)', () => {

@@ -198,15 +198,17 @@ describe('held weapon models', () => {
     expect(unmapped.map((item) => item.id)).toEqual([]);
   });
 
-  // The orbs, the lantern and the quivers (each with its generated heroic clone
-  // where the source is heroic-eligible) are the known held model gaps: the
-  // shared art set has no orb, lantern or quiver model to map them to, so they
-  // need new art, not a table row. The quivers are a softer gap than the orbs:
-  // the hunter's ranger.glb already carries a built-in quiver mesh, so an
-  // unmapped quiver reads correctly on the body instead of showing nothing.
+  // The orbs, the lantern, the quivers (each with its generated heroic clone
+  // where the source is heroic-eligible) and the inscription tomes are the
+  // known held model gaps: the shared art set has no orb, lantern, quiver or
+  // tome model to map them to, so they need new art, not a table row. The
+  // quivers are a softer gap than the orbs: the hunter's ranger.glb already
+  // carries a built-in quiver mesh, so an unmapped quiver reads correctly on
+  // the body instead of showing nothing. The three tomes shipped content-only
+  // with the Masterwrought phase 06 inscription base catalog (no GLB yet).
   // Pinning the exact set makes the exception conscious: a future held_offhand
   // item must either map to a model or extend this pin.
-  it('pins the held_offhand items without a model (orbs, lantern and quivers)', () => {
+  it('pins the held_offhand items without a model (orbs, lantern, quivers and tomes)', () => {
     const heldOffhands = Object.values(ITEMS).filter((item) => item.kind === 'held_offhand');
     const unmapped = heldOffhands
       .filter((item) => itemOffhandModelUrl(item.id) === null)
@@ -215,11 +217,16 @@ describe('held weapon models', () => {
     expect(unmapped).toEqual([
       'cragmaw_huntquiver',
       'direfang_quiver',
+      // Masterwrought phase 06: the inscription caster tomes, content-only.
+      'goldleaf_folio',
       'gravewyrm_bone_quiver',
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',
       'moggers_hide_quiver',
+      // Masterwrought phase 06: the inscription caster tomes, content-only.
+      'silverleaf_primer',
+      'sunpetal_grimoire',
       'valefire_lantern',
       'wraithfire_orb',
     ]);

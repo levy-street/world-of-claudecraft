@@ -184,8 +184,13 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // rather than squeezing under it. That growth arrived: the Masterwrought
 // phase 05 jewelcrafting base catalog took the recipe count 79 to 88 (nine
 // knownRecipes entries) and the settled ceiling to a measured 9,734 bytes,
-// six over the old bound, so the bound is re-minted here at the next round
-// step (10 KiB, about 506 bytes of headroom).
+// six over the old bound, so the bound was re-minted at the next round
+// step (10 KiB). The phase 06 inscription base catalog then took the
+// recipe count 88 to 94 (six knownRecipes entries) and the settled
+// ceiling to a measured 9,889 bytes: the 10 KiB bound HOLDS with about
+// 351 bytes of headroom (under one full zone of node growth), so per the
+// header policy the bound stays put rather than loosening ahead of need,
+// and only the tracking lower band below moves with the re-measure.
 const PROFESSIONS_BYTE_CEILING = 10240;
 
 function ceilingSim(): Sim {
@@ -433,12 +438,12 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
 
     // The byte bound itself, on the settled state. The lower bound tracks
-    // the measured settled value (9,734 at the phase 05 jewelcrafting
+    // the measured settled value (9,889 at the phase 06 inscription
     // re-measure) minus a small band, so the headroom note above cannot rot
-    // silently in either direction: a measurement drifting more than a
-    // couple hundred bytes reds here and forces the note to be re-read.
+    // silently in either direction: a measurement drifting more than about
+    // 160 bytes reds here and forces the note to be re-read.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(9472);
+    expect(bytes).toBeGreaterThan(9728);
     expect(bytes).toBeLessThanOrEqual(PROFESSIONS_BYTE_CEILING);
   });
 

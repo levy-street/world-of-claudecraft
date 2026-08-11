@@ -181,11 +181,13 @@ describe('station content', () => {
     // ruled exception class: a craft with no station of its own (enchanting/
     // jewelcrafting/inscription) may bind a recipe to a foreign station, and
     // that binding then IS the recipe's teaching home (training.ts
-    // trainingStationTypeFor). Two families make up the class today: the
-    // tool-effect charms (enchanting home, toolworks binding) and the
+    // trainingStationTypeFor). Three families make up the class today: the
+    // tool-effect charms (enchanting home, toolworks binding), the
     // Masterwrought phase 05 jewelcrafting base catalog (jewelcrafting home,
-    // forge binding at forgemistress_darva), pinned literally so a new
-    // foreign binding is a deliberate edit here, not a drive-by.
+    // forge binding at forgemistress_darva), and the Masterwrought phase 06
+    // inscription base catalog (inscription home, apothecary binding at
+    // alchemist_verane), pinned literally so a new foreign binding is a
+    // deliberate edit here, not a drive-by.
     const foreignBound: string[] = [];
     for (const recipe of ALL_RECIPES) {
       if (!recipe.stationType) continue;
@@ -203,10 +205,16 @@ describe('station content', () => {
       'recipe_etched_iron_loop',
       'recipe_gatherers_cache',
       'recipe_gleaming_thorium_loop',
+      'recipe_goldleaf_folio',
+      'recipe_goldleaf_scroll',
       'recipe_hammered_copper_band',
       'recipe_iron_link_choker',
       'recipe_polished_copper_loop',
       'recipe_riveted_iron_signet',
+      'recipe_silverleaf_primer',
+      'recipe_silverleaf_scroll',
+      'recipe_sunpetal_grimoire',
+      'recipe_sunpetal_scroll',
       'recipe_weighted_thorium_band',
     ]);
   });

@@ -3842,11 +3842,13 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
     expect(sheet.knownRecipes).toBe(2);
     // The sheet runs the LOADER'S normalizeArchetypeState, so the stored
     // null hobby renders as the default the next login resolves for the
-    // alchemy+engineering pair (enchanting; inscription has no content).
+    // alchemy+engineering pair (inscription: both candidates carry content
+    // since the Masterwrought phase 06 inscription catalog, so ring order
+    // picks inscription, ring index 5, over enchanting, 6).
     expect(sheet.archetype).toEqual({
       activeArchetype: 'alchemy',
       pairedMajor: 'engineering',
-      hobbyCraft: 'enchanting',
+      hobbyCraft: 'inscription',
     });
     expect(sheet.slots).toEqual([
       {

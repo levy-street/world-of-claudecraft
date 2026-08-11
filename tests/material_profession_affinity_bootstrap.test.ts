@@ -29,8 +29,13 @@ describe('material_profession_affinity as the first-evaluated sim module', () =>
       'armorcrafting',
     ]);
     // Jewelcrafting joined the dust consumers with the Masterwrought phase 05
-    // catalog (rung-0 recipes), so the dust is two-craft now.
-    expect(craftIdsForMaterialItem('arcane_dust')).toEqual(['enchanting', 'jewelcrafting']);
+    // catalog (rung-0 recipes), and inscription joined at phase 06
+    // (INSCRIPTION_RECIPES), so the dust is three-craft now, ring-ordered.
+    expect(craftIdsForMaterialItem('arcane_dust')).toEqual([
+      'inscription',
+      'enchanting',
+      'jewelcrafting',
+    ]);
     expect(craftIdsForMaterialItem('not_a_real_item')).toEqual([]);
   });
 

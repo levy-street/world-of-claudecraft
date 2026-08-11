@@ -50,20 +50,22 @@ describe('IWorld hobbyCraft read surface (#1294)', () => {
     sim.acceptArchetypeQuest(CRAFT_A);
     // CRAFT_A is engineering; acceptArchetypeQuest pairs it with its
     // combo-aware default major, alchemy (the Bombardier pair). The two ring
-    // opposites are inscription (opposite engineering) and enchanting
-    // (opposite alchemy); inscription is the one craft left with zero recipes
-    // and no other skill-gain path (professions/archetype.ts
-    // CRAFTS_WITH_CONTENT), so
-    // defaultHobbyForPair's content-availability tiebreak picks enchanting
-    // over the plain ring-order tie break (see tests/professions_archetype.test.ts
-    // for the general rule).
-    expect(sim.hobbyCraft).toBe('enchanting');
+    // opposites are inscription (opposite engineering, ring index 5) and
+    // enchanting (opposite alchemy, ring index 6). Since the inscription
+    // base catalog landed (INSCRIPTION_RECIPES, Masterwrought phase 06),
+    // both candidates carry content (professions/archetype.ts
+    // CRAFTS_WITH_CONTENT), so defaultHobbyForPair's content-availability
+    // tiebreak no longer separates them and the ring-order tie break picks
+    // inscription (5) over enchanting (6): the phase 05 Trapper-flip
+    // precedent (see tests/professions_archetype.test.ts for the general
+    // rule).
+    expect(sim.hobbyCraft).toBe('inscription');
   });
 
   it('c. switching the active archetype re-derives the deterministic default hobby for the new pair', () => {
     const sim = makeSim();
     sim.acceptArchetypeQuest(CRAFT_A);
-    expect(sim.hobbyCraft).toBe('enchanting');
+    expect(sim.hobbyCraft).toBe('inscription'); // the phase 06 Bombardier default (see b)
 
     const required = sim.archetypeAmendsRequired;
     for (let i = 0; i < required; i++) sim.advanceAmendsProgress();
@@ -71,13 +73,13 @@ describe('IWorld hobbyCraft read surface (#1294)', () => {
     expect(switched).toBe(true);
 
     // CRAFT_B is alchemy: its combo-aware default pair is alchemy+engineering,
-    // whose two opposite candidates are enchanting (opposite alchemy) and
-    // inscription (opposite engineering). With zero retained skill,
-    // ring order alone would tie-break to inscription, but inscription is the
-    // one craft left with zero recipes and no other skill-gain path
-    // (professions/archetype.ts CRAFTS_WITH_CONTENT), so
-    // defaultHobbyForPair's content-availability
-    // tiebreak picks enchanting instead (real content via disenchanting).
+    // whose two opposite candidates are enchanting (opposite alchemy, ring
+    // index 6) and inscription (opposite engineering, ring index 5). With
+    // zero retained skill, and with both candidates carrying content since
+    // the inscription base catalog landed (INSCRIPTION_RECIPES, Masterwrought
+    // phase 06; professions/archetype.ts CRAFTS_WITH_CONTENT), the
+    // content-availability tiebreak is a wash and the ring-order tie break
+    // picks inscription (5) over enchanting (6).
     // Pinned as literals so a change to the pair-default or hobby-default
     // rule reddens here deliberately (see tests/professions_archetype.test.ts
     // for the skill-preference and content-availability arms).
@@ -85,7 +87,7 @@ describe('IWorld hobbyCraft read surface (#1294)', () => {
       sim as unknown as { players: Map<number, { archetype: { pairedMajor: string } }> }
     ).players.get(sim.playerId)!;
     expect(meta.archetype.pairedMajor).toBe('engineering');
-    expect(sim.hobbyCraft).toBe('enchanting');
+    expect(sim.hobbyCraft).toBe('inscription');
   });
 
   it('d. per-pid read surface (hobbyCraftFor) matches the primary-player getter', () => {
@@ -104,10 +106,12 @@ describe('IWorld hobbyCraft read surface (#1294)', () => {
       sim as unknown as { players: Map<number, { archetype: { pairedMajor: string } }> }
     ).players.get(sim.playerId)!;
     // The real persisted hobby is passed explicitly as the 4th arg, matching
-    // every production call site (crafting.ts, combo_eligibility.ts): the
-    // 4th param's own default (the legacy single-craft getHobbyCraft
-    // fallback) is deliberately NOT the same value once the content-availability
-    // tiebreak picks a different candidate than oppositeCraft(activeArchetype).
+    // every production call site (crafting.ts, combo_eligibility.ts). Since
+    // the phase 06 inscription catalog this pair's derived default happens
+    // to coincide with the legacy single-craft getHobbyCraft fallback (both
+    // inscription), but the explicit arg stays: production always passes the
+    // persisted hobby, and the two diverge again whenever a tiebreak (e.g. a
+    // retained-skill preference for enchanting) picks the other candidate.
     expect(
       archetypeCeilingFor(
         sim.activeArchetype,
