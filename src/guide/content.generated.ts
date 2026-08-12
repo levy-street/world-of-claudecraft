@@ -7789,6 +7789,40 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 175,
           "zeroAt": 200
         }
+      },
+      {
+        "id": "recipe_precision_chassis",
+        "name": "Precision Chassis",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Ashwood Log",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 2
+          },
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Precision Chassis",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
       }
     ]
   },
@@ -8185,6 +8219,44 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 100,
           "zeroAt": 125
         }
+      },
+      {
+        "id": "recipe_quickening_catalyst",
+        "name": "Quickening Catalyst",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "name": "Goldleaf Herb",
+            "count": 2
+          },
+          {
+            "name": "Venom Gland",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Quickening Catalyst",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
       }
     ]
   },
@@ -8540,6 +8612,44 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_seasoned_stock",
+        "name": "Seasoned Stock",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Prime Cut",
+            "count": 1
+          },
+          {
+            "name": "Game Meat",
+            "count": 3
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          },
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Seasoned Stock",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
         }
       }
     ]
@@ -8981,6 +9091,44 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 100,
           "zeroAt": 125
         }
+      },
+      {
+        "id": "recipe_wyrmhide_cording",
+        "name": "Wyrmhide Cording",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "tannery",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Pristine Hide",
+            "count": 1
+          },
+          {
+            "name": "Rough Hide",
+            "count": 4
+          },
+          {
+            "name": "Spider Silk",
+            "count": 2
+          },
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Wyrmhide Cording",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
       }
     ]
   },
@@ -9421,6 +9569,44 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 100,
           "zeroAt": 125
         }
+      },
+      {
+        "id": "recipe_sunspun_bolt",
+        "name": "Sunspun Bolt",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "name": "Pristine Silk",
+            "count": 1
+          },
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunspun Bolt",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
       }
     ]
   },
@@ -9653,6 +9839,44 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 100,
           "zeroAt": 125
         }
+      },
+      {
+        "id": "recipe_sablewax_vellum",
+        "name": "Sablewax Vellum",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          },
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sablewax Vellum",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
       }
     ]
   },
@@ -9734,6 +9958,40 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_lucent_reagent",
+        "name": "Lucent Reagent",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Chime Essence",
+            "count": 3
+          },
+          {
+            "name": "Chime Dust",
+            "count": 4
+          },
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Lucent Reagent",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
         }
       }
     ]
@@ -10072,6 +10330,40 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_prismglass_setting",
+        "name": "Prismglass Setting",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Osmium Ore",
+            "count": 2
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Prismglass Setting",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
         }
       }
     ]
@@ -10484,6 +10776,40 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_duskforged_billet",
+        "name": "Duskforged Billet",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Osmium Ore",
+            "count": 3
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          },
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Duskforged Billet",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
         }
       }
     ]
@@ -10960,6 +11286,44 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_forgefold_plating",
+        "name": "Forgefold Plating",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Osmium Ore",
+            "count": 3
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          },
+          {
+            "name": "Rough Hide",
+            "count": 2
+          },
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Forgefold Plating",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
         }
       }
     ]

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#2f3336"/>
+<stop offset="0.55" stop-color="#17191c"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="flaskGlass" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#5b6b74"/>
+<stop offset="0.5" stop-color="#39454d"/>
+<stop offset="1" stop-color="#232b31"/>
+</linearGradient>
+<linearGradient id="mercury" x1="0" y1="0" x2="0.5" y2="1">
+<stop offset="0" stop-color="#eef6fb"/>
+<stop offset="0.4" stop-color="#aebfca"/>
+<stop offset="1" stop-color="#5c6b76"/>
+</linearGradient>
+<linearGradient id="corkQ" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#a67f4e"/>
+<stop offset="1" stop-color="#57401f"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="262" cy="408" rx="150" ry="34" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<g>
+  <path d="M238 122 h36 v70 c46 18 78 60 78 112 a96 96 0 0 1 -192 0 c0 -52 32 -94 78 -112 z" fill="url(#flaskGlass)" stroke="#aebdc6" stroke-width="4"/>
+  <path d="M180 290 a76 76 0 0 0 152 0 c0 -34 -20 -64 -50 -78 q-26 22 -52 0 c-30 14 -50 44 -50 78 z" fill="url(#mercury)"/>
+  <path d="M196 268 q30 -26 60 -8 t60 8" stroke="#f4fbff" stroke-width="7" fill="none" opacity="0.85" stroke-linecap="round"/>
+  <path d="M204 306 q40 22 104 -2" stroke="#c9d9e2" stroke-width="5" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <path d="M222 336 q34 14 68 0" stroke="#9fb2bd" stroke-width="4" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <ellipse cx="238" cy="286" rx="14" ry="9" fill="#ffffff" opacity="0.9"/>
+  <ellipse cx="296" cy="322" rx="9" ry="6" fill="#e8f3f9" opacity="0.75"/>
+  <path d="M150 236 q-24 40 -8 88" stroke="#cfe0ea" stroke-width="6" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <path d="M362 236 q24 40 8 88" stroke="#cfe0ea" stroke-width="6" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <path d="M206 160 a96 96 0 0 0 -44 58" stroke="#e9f4fa" stroke-width="6" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <rect x="232" y="96" width="48" height="34" rx="8" fill="url(#corkQ)" stroke="#1d150c" stroke-width="3"/>
+  <rect x="236" y="122" width="40" height="10" fill="#2e3a41" opacity="0.7"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

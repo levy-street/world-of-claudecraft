@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3c342c"/>
+<stop offset="0.55" stop-color="#1d1a17"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="potBody" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#6e7480"/>
+<stop offset="0.5" stop-color="#454a54"/>
+<stop offset="1" stop-color="#26282e"/>
+</linearGradient>
+<linearGradient id="lidTop" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#b3bac6"/>
+<stop offset="0.6" stop-color="#6d7480"/>
+<stop offset="1" stop-color="#3d414b"/>
+</linearGradient>
+<radialGradient id="lidKnob" cx="0.35" cy="0.3" r="0.9">
+<stop offset="0" stop-color="#e6c581"/>
+<stop offset="0.6" stop-color="#a97f3c"/>
+<stop offset="1" stop-color="#5c421a"/>
+</radialGradient>
+<linearGradient id="copperBand" x1="0" y1="0" x2="1" y2="0.6">
+<stop offset="0" stop-color="#d99a58"/>
+<stop offset="0.5" stop-color="#a4642c"/>
+<stop offset="1" stop-color="#5e3514"/>
+</linearGradient>
+<radialGradient id="brothRim" cx="0.4" cy="0.35" r="0.9">
+<stop offset="0" stop-color="#f7c96b"/>
+<stop offset="0.7" stop-color="#b97f2c"/>
+<stop offset="1" stop-color="#6e4712"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="262" cy="408" rx="150" ry="34" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<g>
+  <path d="M300 128 q10 44 -14 74" stroke="#c9cdd4" stroke-width="9" fill="none" opacity="0.4" stroke-linecap="round" filter="url(#soft4)"/>
+  <path d="M252 118 q-16 40 6 78" stroke="#c9cdd4" stroke-width="11" fill="none" opacity="0.5" stroke-linecap="round" filter="url(#soft4)"/>
+  <path d="M206 136 q-6 34 12 60" stroke="#c9cdd4" stroke-width="8" fill="none" opacity="0.35" stroke-linecap="round" filter="url(#soft4)"/>
+  <ellipse cx="258" cy="216" rx="126" ry="30" fill="url(#brothRim)"/>
+  <g transform="rotate(-7 250 204)">
+    <ellipse cx="250" cy="198" rx="118" ry="26" fill="url(#lidTop)" stroke="#101012" stroke-width="4"/>
+    <ellipse cx="250" cy="192" rx="34" ry="12" fill="url(#lidKnob)" stroke="#101012" stroke-width="3"/>
+    <ellipse cx="216" cy="188" rx="30" ry="7" fill="#f0f3f8" opacity="0.5"/>
+  </g>
+  <path d="M132 224 c0 80 30 148 126 148 s126 -68 126 -148 z" fill="url(#potBody)" stroke="#0e0e10" stroke-width="5"/>
+  <path d="M132 244 q126 34 252 0" stroke="url(#copperBand)" stroke-width="14" fill="none"/>
+  <path d="M148 320 q110 26 220 0" stroke="#0c0c0e" stroke-width="5" fill="none" opacity="0.4"/>
+  <path d="M118 226 a22 22 0 0 0 -6 44 l24 4" stroke="url(#copperBand)" stroke-width="13" fill="none" stroke-linecap="round"/>
+  <path d="M394 226 a22 22 0 0 1 6 44 l-24 4" stroke="url(#copperBand)" stroke-width="13" fill="none" stroke-linecap="round"/>
+  <path d="M150 238 q10 66 52 108" stroke="#f3ede2" stroke-width="8" fill="none" opacity="0.35" stroke-linecap="round"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

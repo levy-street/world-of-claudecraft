@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3a332a"/>
+<stop offset="0.55" stop-color="#1c1a17"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="chassisFrame" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#c9a44e"/>
+<stop offset="0.5" stop-color="#8a6c2c"/>
+<stop offset="1" stop-color="#4d3c17"/>
+</linearGradient>
+<linearGradient id="chassisWell" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#2a2925"/>
+<stop offset="1" stop-color="#151412"/>
+</linearGradient>
+<linearGradient id="gearSteel" x1="0" y1="0" x2="0.8" y2="1">
+<stop offset="0" stop-color="#aeb6c2"/>
+<stop offset="0.55" stop-color="#6d7480"/>
+<stop offset="1" stop-color="#3a3e47"/>
+</linearGradient>
+<linearGradient id="gearBrass" x1="0" y1="0" x2="0.8" y2="1">
+<stop offset="0" stop-color="#dcb45e"/>
+<stop offset="0.55" stop-color="#a37f35"/>
+<stop offset="1" stop-color="#5d4718"/>
+</linearGradient>
+<radialGradient id="gearHub" cx="0.35" cy="0.3" r="0.9">
+<stop offset="0" stop-color="#e9edf4"/>
+<stop offset="0.6" stop-color="#8a919e"/>
+<stop offset="1" stop-color="#43464f"/>
+</radialGradient>
+<radialGradient id="rivetB" cx="0.35" cy="0.3" r="0.9">
+<stop offset="0" stop-color="#f4e6b8"/>
+<stop offset="0.6" stop-color="#b08c3f"/>
+<stop offset="1" stop-color="#57431a"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="262" cy="408" rx="150" ry="34" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<g>
+  <rect x="116" y="150" width="280" height="236" rx="20" fill="url(#chassisFrame)" stroke="#0e0d0b" stroke-width="5"/>
+  <rect x="146" y="180" width="220" height="176" rx="12" fill="url(#chassisWell)" stroke="#0e0d0b" stroke-width="4"/>
+  <g fill="url(#gearSteel)" stroke="#0f0f11" stroke-width="3">
+    <g transform="rotate(12 226 262)">
+      <circle cx="226" cy="262" r="52"/>
+      <g>
+        <rect x="218" y="196" width="16" height="24" rx="4"/>
+        <rect x="218" y="304" width="16" height="24" rx="4"/>
+        <rect x="160" y="254" width="24" height="16" rx="4"/>
+        <rect x="268" y="254" width="24" height="16" rx="4"/>
+        <rect x="218" y="196" width="16" height="24" rx="4" transform="rotate(45 226 262)"/>
+        <rect x="218" y="304" width="16" height="24" rx="4" transform="rotate(45 226 262)"/>
+        <rect x="160" y="254" width="24" height="16" rx="4" transform="rotate(45 226 262)"/>
+        <rect x="268" y="254" width="24" height="16" rx="4" transform="rotate(45 226 262)"/>
+      </g>
+    </g>
+  </g>
+  <circle cx="226" cy="262" r="20" fill="url(#gearHub)" stroke="#0f0f11" stroke-width="3"/>
+  <g fill="url(#gearBrass)" stroke="#0f0f11" stroke-width="3">
+    <g transform="rotate(-8 316 312)">
+      <circle cx="316" cy="312" r="34"/>
+      <rect x="310" y="268" width="12" height="18" rx="3"/>
+      <rect x="310" y="338" width="12" height="18" rx="3"/>
+      <rect x="272" y="306" width="18" height="12" rx="3"/>
+      <rect x="342" y="306" width="18" height="12" rx="3"/>
+      <rect x="310" y="268" width="12" height="18" rx="3" transform="rotate(45 316 312)"/>
+      <rect x="310" y="338" width="12" height="18" rx="3" transform="rotate(45 316 312)"/>
+      <rect x="272" y="306" width="18" height="12" rx="3" transform="rotate(45 316 312)"/>
+      <rect x="342" y="306" width="18" height="12" rx="3" transform="rotate(45 316 312)"/>
+    </g>
+  </g>
+  <circle cx="316" cy="312" r="12" fill="url(#gearHub)" stroke="#0f0f11" stroke-width="3"/>
+  <rect x="298" y="192" width="54" height="34" rx="8" fill="url(#gearBrass)" stroke="#0e0d0b" stroke-width="3"/>
+  <rect x="306" y="200" width="24" height="8" rx="4" fill="#f3e3b0" opacity="0.6"/>
+  <rect x="124" y="158" width="140" height="10" rx="5" fill="#f0dfae" opacity="0.4"/>
+  <g fill="url(#rivetB)" stroke="#0e0d0b" stroke-width="2">
+    <circle cx="134" cy="168" r="7"/><circle cx="378" cy="168" r="7"/>
+    <circle cx="134" cy="368" r="7"/><circle cx="378" cy="368" r="7"/>
+  </g>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

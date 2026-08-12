@@ -1871,6 +1871,213 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The Masterwrought intermediates rung (Phase 07, R13): one intermediate
+// material per profession at skill 75, per the Phase 07 pre-fan-out ledger in
+// docs/prd/masterwrought/state.md (the ten-row mapping and the demand math
+// phases 08/09/10 author against). The Quickening Catalyst is alchemy's 75
+// rung and the time gate: `oncePerDay` limits it to one successful craft per
+// character per reset day (professions/types.ts), and every other row
+// consumes exactly one Catalyst, so each apex piece (3 intermediates) costs 3
+// catalyst-days, self-funded or market-bought (the Catalyst and all nine
+// intermediates are ordinary tradable items).
+//
+// - A NEW list rather than a LADDER_RECIPES growth: that array's 54-row
+//   six-craft shape is pinned as the Professions 2.0 ladder
+//   (tests/ladder_crafting.test.ts), the jewelcrafting/inscription precedent.
+// - Scaffolding is the shipped 75-band convention (skillReq 75,
+//   itemLevelBudget 20, level 20: CASTER_HUB_RECIPES, the 75-skill
+//   TOOL_RECIPES, recipe_stormreel_fishing_rod); acquisition ['trainer'] on
+//   every record (the grandfather list is frozen), tier-3 teaches at the
+//   crafts' own stations. The three station-less crafts bind a foreign
+//   station per record, the recipe's teaching home: jewelcrafting 'forge'
+//   (phase 05), inscription 'apothecary' (phase 06), and enchanting
+//   'toolworks' (the Phase 07 serial decision: the two tool-effect charms
+//   already bind there, and enchanting stays OUT of STATION_TYPE_BY_CRAFT).
+//   The foreign-bound literal pin in tests/professions_crafting_hub.test.ts
+//   names the three new ids.
+// - Reagents are EXISTING gathered mats in each craft's own register plus the
+//   Catalyst; the Catalyst row consumes alchemy-register mats only. Every row
+//   keeps at least one no-buyValue reagent (the Catalyst itself for the nine,
+//   venom glands on the Catalyst row), so no record joins the
+//   counterfactually-vendor-fed set; never a base material beside its fine_
+//   grade (material_grades.ts disjointness); and NEVER arcane_shard (reserved
+//   for the apex band per Phase 04).
+export const INTERMEDIATE_RECIPES: ProfessionRecipeRecord[] = [
+  // The rung itself and the gate. Input 304 (sunpetal 160 + goldleaf 2x60 +
+  // venom glands 2x6 + vial 12) vs output 50.
+  {
+    id: 'recipe_quickening_catalyst',
+    professionId: 'alchemy',
+    resultItemId: 'quickening_catalyst',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'goldleaf_herb', count: 2 },
+      { itemId: 'venom_gland', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+    oncePerDay: true,
+  },
+  // The nine consumers, each gold-negative on the buyValue-else-sellValue
+  // basis with the Catalyst priced at its 50 sellValue: billet 246 vs 45,
+  // plating 256 vs 45, cording 105 vs 40, bolt 255 vs 45, setting 206 vs 45,
+  // chassis 290 vs 45, stock 98 vs 30, reagent 128 vs 40, vellum 258 vs 45.
+  {
+    id: 'recipe_duskforged_billet',
+    professionId: 'weaponcrafting',
+    resultItemId: 'duskforged_billet',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'thorium_ore', count: 3 },
+      { itemId: 'iron_ore', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_forgefold_plating',
+    professionId: 'armorcrafting',
+    resultItemId: 'forgefold_plating',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'thorium_ore', count: 3 },
+      { itemId: 'iron_ore', count: 2 },
+      { itemId: 'rough_hide', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_wyrmhide_cording',
+    professionId: 'leatherworking',
+    resultItemId: 'wyrmhide_cording',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'pristine_hide', count: 1 },
+      { itemId: 'rough_hide', count: 4 },
+      { itemId: 'spider_silk', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_sunspun_bolt',
+    professionId: 'tailoring',
+    resultItemId: 'sunspun_bolt',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'pristine_silk', count: 1 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_prismglass_setting',
+    professionId: 'jewelcrafting',
+    resultItemId: 'prismglass_setting',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'thorium_ore', count: 2 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_precision_chassis',
+    professionId: 'engineering',
+    resultItemId: 'precision_chassis',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'ashwood_log', count: 2 },
+      { itemId: 'thorium_ore', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'recipe_seasoned_stock',
+    professionId: 'cooking',
+    resultItemId: 'seasoned_stock',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'prime_cut', count: 1 },
+      { itemId: 'game_meat', count: 3 },
+      { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_lucent_reagent',
+    professionId: 'enchanting',
+    resultItemId: 'lucent_reagent',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'arcane_essence', count: 3 },
+      { itemId: 'arcane_dust', count: 4 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'recipe_sablewax_vellum',
+    professionId: 'inscription',
+    resultItemId: 'sablewax_vellum',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+];
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
@@ -1886,6 +2093,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...LADDER_RECIPES,
   ...JEWELCRAFTING_RECIPES,
   ...INSCRIPTION_RECIPES,
+  ...INTERMEDIATE_RECIPES,
 ];
 
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {

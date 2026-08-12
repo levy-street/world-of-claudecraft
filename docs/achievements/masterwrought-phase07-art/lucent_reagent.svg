@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#28313a"/>
+<stop offset="0.55" stop-color="#141a20"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="vialGlass" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#3f5a60"/>
+<stop offset="0.5" stop-color="#2c4349"/>
+<stop offset="1" stop-color="#1b2c31"/>
+</linearGradient>
+<linearGradient id="lucentA" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#e7fffa"/>
+<stop offset="0.5" stop-color="#7cf0dd"/>
+<stop offset="1" stop-color="#2a9d8c"/>
+</linearGradient>
+<linearGradient id="lucentB" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#b6fff2"/>
+<stop offset="0.55" stop-color="#54cfbc"/>
+<stop offset="1" stop-color="#1f7568"/>
+</linearGradient>
+<linearGradient id="corkL" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#b08a55"/>
+<stop offset="1" stop-color="#5e4522"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="262" cy="408" rx="150" ry="34" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<g>
+  <ellipse cx="256" cy="284" rx="96" ry="120" fill="#57e6d2" opacity="0.16" filter="url(#soft)"/>
+  <path d="M226 152 h60 v56 q34 28 34 88 a64 64 0 0 1 -128 0 q0 -60 34 -88 z" fill="url(#vialGlass)" stroke="#bfe6e2" stroke-width="4"/>
+  <g stroke="#0f2b28" stroke-width="3">
+    <path d="M256 226 l30 52 -30 66 -30 -66 z" fill="url(#lucentA)"/>
+    <path d="M216 268 l22 30 -14 52 -26 -44 z" fill="url(#lucentB)"/>
+    <path d="M296 268 l20 38 -24 46 -14 -50 z" fill="url(#lucentB)"/>
+  </g>
+  <path d="M256 226 l10 52 -10 66" stroke="#eafffb" stroke-width="4" fill="none" opacity="0.8"/>
+  <circle cx="256" cy="276" r="6" fill="#ffffff" opacity="0.95" filter="url(#soft4)"/>
+  <circle cx="222" cy="300" r="4" fill="#d8fff8" opacity="0.8" filter="url(#soft4)"/>
+  <circle cx="298" cy="296" r="4.6" fill="#d8fff8" opacity="0.8" filter="url(#soft4)"/>
+  <path d="M212 208 a64 88 0 0 0 -18 84" stroke="#e9fffb" stroke-width="6" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <rect x="220" y="118" width="72" height="40" rx="9" fill="url(#corkL)" stroke="#161009" stroke-width="3"/>
+  <rect x="228" y="126" width="34" height="8" rx="4" fill="#d9b98a" opacity="0.6"/>
+  <rect x="224" y="152" width="64" height="10" fill="#20444a" opacity="0.7"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

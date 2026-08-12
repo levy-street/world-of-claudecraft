@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3d3833"/>
+<stop offset="0.55" stop-color="#1c1a1d"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="steelTop" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#8d94a1"/>
+<stop offset="0.45" stop-color="#565b66"/>
+<stop offset="1" stop-color="#33363e"/>
+</linearGradient>
+<linearGradient id="steelSide" x1="0" y1="0" x2="0.9" y2="1">
+<stop offset="0" stop-color="#4b4f59"/>
+<stop offset="0.6" stop-color="#2a2c33"/>
+<stop offset="1" stop-color="#191a1f"/>
+</linearGradient>
+<linearGradient id="ember" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#ff7a2a"/>
+<stop offset="0.5" stop-color="#ffc258"/>
+<stop offset="1" stop-color="#e0561f"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="262" cy="408" rx="150" ry="34" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<g transform="rotate(-18 256 268)">
+  <rect x="96" y="238" width="320" height="74" rx="10" fill="url(#steelSide)"/>
+  <rect x="96" y="222" width="320" height="40" rx="10" fill="url(#steelTop)"/>
+  <rect x="102" y="228" width="150" height="10" rx="5" fill="#9aa2ad" opacity="0.55"/>
+  <path d="M132 262 L188 268 L236 262 L292 270 L344 264 L392 270" stroke="url(#ember)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/>
+  <path d="M150 288 L204 294 L258 288 L318 296 L372 290" stroke="url(#ember)" stroke-width="3.4" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <circle cx="188" cy="268" r="7" fill="#ffb347" filter="url(#soft4)"/>
+  <circle cx="292" cy="270" r="8.4" fill="#ff8b2e" filter="url(#soft4)"/>
+  <circle cx="372" cy="290" r="6" fill="#ffcf6a" filter="url(#soft4)"/>
+  <circle cx="150" cy="288" r="4.6" fill="#ff9c45" filter="url(#soft4)"/>
+  <rect x="96" y="222" width="320" height="90" rx="10" fill="none" stroke="#0c0c0f" stroke-width="3" opacity="0.6"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

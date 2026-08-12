@@ -886,4 +886,89 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     elixir: { aura: 'Might of the Serpent', kind: 'buff_sta', value: 12, duration: 900 },
     sellValue: 20,
   },
+
+  // --- Masterwrought intermediates (Phase 07, R13) ---------------------------
+  // The skill-75 rung: one intermediate material per profession, minted by
+  // INTERMEDIATE_RECIPES (content/recipes.ts) per the Phase 07 pre-fan-out
+  // ledger (docs/prd/masterwrought/state.md). The Quickening Catalyst is
+  // alchemy's 75 rung and the bottom-of-chain time gate (one craft per day per
+  // character via oncePerDay on its recipe); each of the other nine consumes
+  // one Catalyst, and the phase 08/09/10 apex rows consume three of their own
+  // profession's intermediate per piece (the recorded demand math). Materials
+  // doctrine: kind 'junk', quality 'common' (a reagent must never fall into
+  // the junk sweep), sellValue only (never vendor-stocked, no buyValue), and
+  // ALL TEN are ordinary tradable items: the Catalyst's tradability is the
+  // market pressure valve by ruling. sellValues sit in the tier-3 material
+  // band (osmium 15 up to arcanite/sunpetal 40, wyrmfall_core 50) and strictly
+  // below each minting recipe's input value per the economy invariant.
+  duskforged_billet: {
+    id: 'duskforged_billet',
+    name: 'Duskforged Billet',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 45,
+  },
+  forgefold_plating: {
+    id: 'forgefold_plating',
+    name: 'Forgefold Plating',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 45,
+  },
+  wyrmhide_cording: {
+    id: 'wyrmhide_cording',
+    name: 'Wyrmhide Cording',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 40,
+  },
+  sunspun_bolt: {
+    id: 'sunspun_bolt',
+    name: 'Sunspun Bolt',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 45,
+  },
+  prismglass_setting: {
+    id: 'prismglass_setting',
+    name: 'Prismglass Setting',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 45,
+  },
+  precision_chassis: {
+    id: 'precision_chassis',
+    name: 'Precision Chassis',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 45,
+  },
+  quickening_catalyst: {
+    id: 'quickening_catalyst',
+    name: 'Quickening Catalyst',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 50,
+  },
+  seasoned_stock: {
+    id: 'seasoned_stock',
+    name: 'Seasoned Stock',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+  },
+  lucent_reagent: {
+    id: 'lucent_reagent',
+    name: 'Lucent Reagent',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 40,
+  },
+  sablewax_vellum: {
+    id: 'sablewax_vellum',
+    name: 'Sablewax Vellum',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 45,
+  },
 };

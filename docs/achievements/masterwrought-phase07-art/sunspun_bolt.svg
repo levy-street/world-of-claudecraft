@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3f382c"/>
+<stop offset="0.55" stop-color="#1e1b16"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="foldA" x1="0" y1="0" x2="0.3" y2="1">
+<stop offset="0" stop-color="#f4c95f"/>
+<stop offset="0.6" stop-color="#c8963c"/>
+<stop offset="1" stop-color="#8a6522"/>
+</linearGradient>
+<linearGradient id="foldB" x1="0" y1="0" x2="0.3" y2="1">
+<stop offset="0" stop-color="#d8a747"/>
+<stop offset="0.6" stop-color="#a87c2e"/>
+<stop offset="1" stop-color="#6e5019"/>
+</linearGradient>
+<linearGradient id="foldC" x1="0" y1="0" x2="0.3" y2="1">
+<stop offset="0" stop-color="#b58a35"/>
+<stop offset="0.6" stop-color="#8a6522"/>
+<stop offset="1" stop-color="#573f12"/>
+</linearGradient>
+<linearGradient id="drape" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#e5b452"/>
+<stop offset="0.6" stop-color="#a87c2e"/>
+<stop offset="1" stop-color="#694816"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="262" cy="408" rx="150" ry="34" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<g transform="rotate(-6 256 270)">
+  <rect x="112" y="286" width="290" height="54" rx="27" fill="url(#foldC)" stroke="#4a350e" stroke-width="4"/>
+  <rect x="120" y="246" width="274" height="54" rx="27" fill="url(#foldB)" stroke="#4a350e" stroke-width="4"/>
+  <rect x="130" y="204" width="254" height="56" rx="28" fill="url(#foldA)" stroke="#4a350e" stroke-width="4"/>
+  <path d="M152 220 q104 -16 212 -2" stroke="#ffedb2" stroke-width="9" opacity="0.65" fill="none" stroke-linecap="round"/>
+  <path d="M136 276 q116 14 246 4" stroke="#5d4315" stroke-width="4" opacity="0.45" fill="none"/>
+  <path d="M128 316 q120 14 262 4" stroke="#523b12" stroke-width="4" opacity="0.45" fill="none"/>
+  <path d="M136 230 q-34 42 -16 100 q10 30 38 36 q-20 -38 -12 -80 q5 -30 22 -48 z" fill="url(#drape)" stroke="#4a350e" stroke-width="3.6"/>
+  <path d="M140 270 q-10 40 8 78" stroke="#6e4f19" stroke-width="4" fill="none" opacity="0.55"/>
+  <path d="M148 240 q-14 20 -16 48" stroke="#ffedb2" stroke-width="5" fill="none" opacity="0.5" stroke-linecap="round"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

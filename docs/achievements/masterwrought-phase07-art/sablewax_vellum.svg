@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#38322b"/>
+<stop offset="0.55" stop-color="#1b1916"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="vellumBody" x1="0" y1="0" x2="0.35" y2="1">
+<stop offset="0" stop-color="#efdfae"/>
+<stop offset="0.55" stop-color="#cdb27a"/>
+<stop offset="1" stop-color="#93743f"/>
+</linearGradient>
+<radialGradient id="vellumEndFace" cx="0.4" cy="0.35" r="1">
+<stop offset="0" stop-color="#f4e7bd"/>
+<stop offset="0.7" stop-color="#c8ab72"/>
+<stop offset="1" stop-color="#8c6d3a"/>
+</radialGradient>
+<radialGradient id="vellumSpiral" cx="0.45" cy="0.4" r="1">
+<stop offset="0" stop-color="#d9bf85"/>
+<stop offset="1" stop-color="#a5854c"/>
+</radialGradient>
+<linearGradient id="vellumFlap" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#d9c28a"/>
+<stop offset="1" stop-color="#7e6234"/>
+</linearGradient>
+<linearGradient id="wrapBand" x1="0" y1="0" x2="0.8" y2="1">
+<stop offset="0" stop-color="#c7a760"/>
+<stop offset="1" stop-color="#77582a"/>
+</linearGradient>
+<radialGradient id="sealWax" cx="0.35" cy="0.3" r="1">
+<stop offset="0" stop-color="#3b3b42"/>
+<stop offset="0.45" stop-color="#1d1d22"/>
+<stop offset="1" stop-color="#050506"/>
+</radialGradient>
+<linearGradient id="sealRelief" x1="0" y1="0" x2="0.8" y2="1">
+<stop offset="0" stop-color="#6f6f7a"/>
+<stop offset="1" stop-color="#26262c"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="262" cy="408" rx="150" ry="34" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<g transform="rotate(-8 256 272)">
+  <path d="M118 300 q-30 28 -22 68 q40 -6 64 -32" fill="url(#vellumFlap)" stroke="#43331c" stroke-width="3.6"/>
+  <rect x="104" y="222" width="296" height="98" rx="49" fill="url(#vellumBody)" stroke="#43331c" stroke-width="4"/>
+  <ellipse cx="386" cy="271" rx="24" ry="45" fill="url(#vellumEndFace)" stroke="#43331c" stroke-width="3.6"/>
+  <path d="M386 236 a22 42 0 0 1 0 72" fill="none" stroke="#a5854c" stroke-width="4" opacity="0.8"/>
+  <path d="M388 250 a12 24 0 0 1 0 44" fill="none" stroke="#8a6f42" stroke-width="4" opacity="0.75"/>
+  <path d="M124 242 h226" stroke="#fff6dd" stroke-width="8" opacity="0.55" stroke-linecap="round"/>
+  <path d="M120 300 q118 16 240 4" stroke="#6b5330" stroke-width="4" fill="none" opacity="0.5"/>
+  <rect x="186" y="212" width="56" height="116" rx="10" fill="url(#wrapBand)" stroke="#241a0d" stroke-width="3"/>
+  <path d="M256 270 Q262.2 289.1 244.3 298.3 Q235.1 316.2 216 310 Q196.9 316.2 187.7 298.3 Q169.8 289.1 176 270 Q169.8 250.9 187.7 241.7 Q196.9 223.8 216 230 Q235.1 223.8 244.3 241.7 Q262.2 250.9 256 270 Z" fill="url(#sealWax)" stroke="#050505" stroke-width="3"/>
+  <circle cx="216" cy="270" r="22" fill="none" stroke="url(#sealRelief)" stroke-width="5"/>
+  <g stroke="url(#sealRelief)" stroke-width="3.6" stroke-linecap="round">
+    <path d="M216 262 L216 254"/>
+    <path d="M221.7 264.3 L227.3 258.7"/>
+    <path d="M224 270 L232 270"/>
+    <path d="M221.7 275.7 L227.3 281.3"/>
+    <path d="M216 278 L216 286"/>
+    <path d="M210.3 275.7 L204.7 281.3"/>
+    <path d="M208 270 L200 270"/>
+    <path d="M210.3 264.3 L204.7 258.7"/>
+  </g>
+  <circle cx="216" cy="270" r="5" fill="url(#sealRelief)"/>
+  <path d="M186 244 a40 40 0 0 1 26 -12" stroke="#83838e" stroke-width="5" fill="none" opacity="0.8" stroke-linecap="round"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

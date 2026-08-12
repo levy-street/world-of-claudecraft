@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3a352a"/>
+<stop offset="0.55" stop-color="#1d1b16"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="hideA" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#a08a52"/>
+<stop offset="0.5" stop-color="#6f5c34"/>
+<stop offset="1" stop-color="#453a22"/>
+</linearGradient>
+<linearGradient id="hideB" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#7c6a3e"/>
+<stop offset="0.55" stop-color="#584a29"/>
+<stop offset="1" stop-color="#37301c"/>
+</linearGradient>
+<linearGradient id="hideC" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#5f5130"/>
+<stop offset="0.6" stop-color="#423920"/>
+<stop offset="1" stop-color="#292416"/>
+</linearGradient>
+<linearGradient id="hideEnd" x1="0" y1="0" x2="1" y2="0.4">
+<stop offset="0" stop-color="#8a744a"/>
+<stop offset="0.6" stop-color="#61502c"/>
+<stop offset="1" stop-color="#3c321d"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="262" cy="408" rx="150" ry="34" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<g>
+  <ellipse cx="256" cy="292" rx="150" ry="66" fill="none" stroke="url(#hideC)" stroke-width="34"/>
+  <ellipse cx="256" cy="258" rx="142" ry="62" fill="none" stroke="url(#hideB)" stroke-width="34"/>
+  <ellipse cx="256" cy="224" rx="134" ry="58" fill="none" stroke="url(#hideA)" stroke-width="34"/>
+  <ellipse cx="256" cy="216" rx="132" ry="55" fill="none" stroke="#d8c491" stroke-width="4" opacity="0.4"/>
+  <g stroke="#241f14" stroke-width="4" fill="none" opacity="0.75" stroke-linecap="round">
+    <path d="M148 190 l16 -14"/><path d="M176 178 l15 -14"/><path d="M206 170 l13 -15"/>
+    <path d="M238 166 l11 -16"/><path d="M270 165 l9 -16"/><path d="M302 169 l7 -17"/>
+    <path d="M332 176 l4 -17"/><path d="M360 188 l1 -17"/>
+  </g>
+  <path d="M136 296 C 190 342 330 348 396 300 C 420 282 430 258 420 240" fill="none" stroke="url(#hideEnd)" stroke-width="26" stroke-linecap="round"/>
+  <path d="M414 244 l22 -18" stroke="#5e4c2c" stroke-width="16" stroke-linecap="round"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

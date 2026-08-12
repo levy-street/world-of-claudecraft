@@ -140,6 +140,14 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
+   "itemId": "duskforged_billet",
+   "name": "Duskforged Billet",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
    "itemId": "elderwood_log",
    "name": "Highpine Log",
    "sourcePack": "woc_professions_art",
@@ -150,6 +158,14 @@
   {
    "itemId": "etched_iron_loop",
    "name": "Etched Iron Loop",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "forgefold_plating",
+   "name": "Forgefold Plating",
    "sourcePack": "woc_original_svg",
    "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
    "confidence": "high",
@@ -244,6 +260,14 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
+   "itemId": "lucent_reagent",
+   "name": "Lucent Reagent",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
    "itemId": "makers_ember",
    "name": "Maker's Ember",
    "sourcePack": "woc_original_svg",
@@ -268,12 +292,28 @@
    "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
   },
   {
+   "itemId": "precision_chassis",
+   "name": "Precision Chassis",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
    "itemId": "prime_cut",
    "name": "Prime Cut",
    "sourcePack": "woc_professions_art",
    "sourceFile": "batch-9/masters/prime_cut.png (accepted v1)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+  },
+  {
+   "itemId": "prismglass_setting",
+   "name": "Prismglass Setting",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
   },
   {
    "itemId": "pristine_hide",
@@ -298,6 +338,14 @@
    "sourceFile": "batch-9/masters/pristine_venom_gland.png (accepted v4)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+  },
+  {
+   "itemId": "quickening_catalyst",
+   "name": "Quickening Catalyst",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
   },
   {
    "itemId": "resonant_hide",
@@ -356,6 +404,22 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
+   "itemId": "sablewax_vellum",
+   "name": "Sablewax Vellum",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "seasoned_stock",
+   "name": "Seasoned Stock",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
    "itemId": "silverleaf_herb",
    "name": "Sheenleaf Herb",
    "sourcePack": "woc_professions_art",
@@ -412,6 +476,14 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
+   "itemId": "sunspun_bolt",
+   "name": "Sunspun Bolt",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
    "itemId": "tanning_agent",
    "name": "Tanning Agent",
    "sourcePack": "woc_professions_art",
@@ -462,6 +534,14 @@
   {
    "itemId": "wyrmfall_core",
    "name": "Wyrmfall Core",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "wyrmhide_cording",
+   "name": "Wyrmhide Cording",
    "sourcePack": "woc_original_svg",
    "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
    "confidence": "high",
