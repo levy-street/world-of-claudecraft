@@ -21,6 +21,7 @@ import {
   craftCastActivitySig,
   craftCastProgressFraction,
   IDLE_CRAFT_CAST_SESSION,
+  maxCraftBatchFit,
   maxCraftsFromReagents,
   recipeDurationSec,
 } from '../src/ui/craft_cast_view';
@@ -141,6 +142,19 @@ describe('batch qty clamp', () => {
     ).toBe(3);
     expect(maxCraftsFromReagents([{ have: 0, required: 1 }])).toBe(0);
     expect(maxCraftsFromReagents([{ have: 10_000, required: 1 }])).toBe(CRAFT_BATCH_UI_MAX);
+  });
+
+  it('maxCraftBatchFit caps a oncePerDay recipe at one whatever the reagent fit', () => {
+    // The N-versus-one overpromise this cap removes would swallow the
+    // daily_limit denial entirely: the sim clamps the batch to one, it
+    // completes, and the batch-stop refusal arm never fires (Phase 07
+    // parity review). Without the flag the fit passes through untouched.
+    const twenty = [{ have: 40, required: 2 }];
+    expect(maxCraftBatchFit(twenty, true)).toBe(1);
+    expect(maxCraftBatchFit(twenty, false)).toBe(20);
+    expect(maxCraftBatchFit(twenty)).toBe(20);
+    // An empty bag stays zero: the cap never manufactures an affordance.
+    expect(maxCraftBatchFit([{ have: 0, required: 1 }], true)).toBe(0);
   });
 
   it('clampCraftQty floors and clamps to 1..min(max, mats-fit)', () => {

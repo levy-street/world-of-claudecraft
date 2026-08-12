@@ -11,9 +11,13 @@
 // the wyrmfallDaily load clamps and zero-default serialize omission.
 
 import { describe, expect, it } from 'vitest';
-import { recipeById } from '../src/sim/content/recipes';
-import { STATIONS } from '../src/sim/data';
-import { evaluateCraftAdmission, maxCraftCountForRecipe } from '../src/sim/professions/crafting';
+import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
+import { ITEMS, STATIONS } from '../src/sim/data';
+import {
+  evaluateCraftAdmission,
+  maxCraftCountForRecipe,
+  requiredReagentCount,
+} from '../src/sim/professions/crafting';
 import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { PlayerMeta } from '../src/sim/sim';
@@ -123,9 +127,42 @@ describe('the daily craft gate (resetDay set)', () => {
     expect(craftResultEvents(sim)).toEqual([{ ok: true, reason: undefined }]);
     expect(sim.countItem(recipe.resultItemId, pid)).toBe(recipe.resultCount);
     for (const reagent of recipe.reagents) {
-      expect(sim.countItem(reagent.itemId, pid)).toBeLessThan(before[reagent.itemId]);
+      // Exact decrement, cross-checked against the sim's own requirement
+      // planner (the self-gathered discount can lower a row below the
+      // authored count, which is why a bare authored-count pin is wrong):
+      // the CONSUME path must spend exactly what the ADMISSION planner
+      // priced, and always at least one unit.
+      const required = requiredReagentCount(
+        meta,
+        reagent,
+        meta.craftSkills,
+        recipe.professionId,
+      ).count;
+      expect(required).toBeGreaterThanOrEqual(1);
+      expect(required).toBeLessThanOrEqual(reagent.count);
+      expect(sim.countItem(reagent.itemId, pid)).toBe(before[reagent.itemId] - required);
     }
     expect(meta.craftDaily).toEqual({ date: DAY_ONE, crafted: new Set([RECIPE_ID]) });
+  });
+
+  it('a stamped recipe refuses daily_limit even away from the station (ladder order)', () => {
+    // The deliberate denial-ladder order (review round): once today's stamp
+    // is set, no other gate's remedy changes the outcome, so the gate sits
+    // FIRST in evaluateCraftAdmission. Without that order this player would
+    // be told station_required, walk to the apothecary, and only then learn
+    // the day is spent.
+    const sim = makeSim();
+    sim.resetDay = DAY_ONE;
+    const pid = rigCrafter(sim, 2);
+    craftOnce(sim, pid);
+    sim.drainEvents();
+
+    const entity = (sim as any).entities.get(pid);
+    entity.pos.x += 500;
+    entity.pos.z += 500;
+    entity.prevPos = { ...entity.pos };
+    sim.craftItem(RECIPE_ID, false, pid, 1);
+    expect(craftResultEvents(sim)).toEqual([{ ok: false, reason: 'daily_limit' }]);
   });
 
   it('a second craft the same day refuses with daily_limit and consumes nothing', () => {
@@ -221,6 +258,48 @@ describe('the one-shot degrade (resetDay empty: headless and replay hosts)', () 
     sim2.craftItem(RECIPE_ID, false, pid2, 1);
     expect(craftResultEvents(sim2)).toEqual([{ ok: false, reason: 'daily_limit' }]);
   });
+
+  it('a calendar-less stamp meeting a live calendar reads as a stale window and opens', () => {
+    // The deliberate crossing choice, pinned so nobody re-litigates it from
+    // the code alone: a save stamped with date '' (minted on a headless or
+    // replay host) loads on a live realm, the '' date disagrees with today,
+    // so the gate OPENS. The reverse crossing (live stamp, calendar-less
+    // host) stays gated, the asymmetry the admission helper's header
+    // documents.
+    const sim = makeSim();
+    const pid = rigCrafter(sim);
+    craftOnce(sim, pid);
+    const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
+    expect(state.craftDaily.date).toBe('');
+
+    const sim2 = makeSim();
+    sim2.resetDay = DAY_ONE;
+    const pid2 = rigCrafter(sim2, 1, state);
+    craftOnce(sim2, pid2);
+    expect(craftResultEvents(sim2)).toEqual([{ ok: true, reason: undefined }]);
+  });
+});
+
+describe('the oncePerDay census (content headroom for the load clamps)', () => {
+  it('exactly the catalyst is daily-gated, inside the 32-entry and 64-char clamp caps', () => {
+    // Two contracts in one sweep. Membership: stamping oncePerDay on any
+    // other row (or dropping it from the catalyst) is a design decision this
+    // pin makes explicit, never a drive-by. Headroom: the load clamp drops
+    // tokens past 32 entries or 64 chars, and an over-cap flagged set would
+    // fail SILENTLY in the player's favor (a dropped stamp re-opens a gate
+    // after relog), so the caps red HERE at authoring time instead.
+    const flagged = ALL_RECIPES.filter((r) => r.oncePerDay);
+    expect(flagged.map((r) => r.id)).toEqual(['recipe_quickening_catalyst']);
+    expect(flagged.length).toBeLessThanOrEqual(32);
+    for (const r of flagged) expect(r.id.length).toBeLessThanOrEqual(64);
+  });
+
+  it('the catalyst item is tradable (no soulbound flag rides the def)', () => {
+    // The ruling says tradable; the def encodes it by OMISSION, so pin the
+    // omission rather than leaving tradability an accident of the default.
+    expect(ITEMS.quickening_catalyst).toBeDefined();
+    expect((ITEMS.quickening_catalyst as { soulbound?: boolean }).soulbound).toBeUndefined();
+  });
 });
 
 describe('persistence hardening (the wyrmfallDaily load-clamp arm)', () => {
@@ -246,19 +325,21 @@ describe('persistence hardening (the wyrmfallDaily load-clamp arm)', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Bad');
     const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
-    // Overlong date, non-string tokens, an overlong token, and an oversize
-    // array (40 entries) in one blob: the clamps type-check, cap tokens at 64
-    // chars, and cap the set at 32 entries, exactly the wyrmfallDaily arm.
+    // Overlong date, non-string tokens, an overlong token, orphan ids, and
+    // an oversize array (40 entries) in one blob: the clamps type-check, cap
+    // tokens at 64 chars, cap the set at 32 entries, and (the node_persist
+    // anti-tamper arm) drop every id that is not a LIVE oncePerDay recipe,
+    // so only the real stamp survives the load.
     const junk = Array.from({ length: 40 }, (_, i) => `recipe_junk_${i}`);
     state.craftDaily = {
       date: 'x'.repeat(65),
-      crafted: [7, null, 'y'.repeat(65), ...junk],
+      crafted: [7, null, 'y'.repeat(65), 'recipe_quickening_catalyst', ...junk],
     };
     const sim2 = makeSim();
     const pid2 = sim2.addPlayer('warrior', 'Bad', { state });
     const meta2 = sim2.players.get(pid2) as PlayerMeta;
     expect(meta2.craftDaily.date).toBe('');
-    expect(meta2.craftDaily.crafted).toEqual(new Set(junk.slice(0, 32)));
+    expect(meta2.craftDaily.crafted).toEqual(new Set(['recipe_quickening_catalyst']));
 
     // A non-array crafted and a non-string date degrade to the defaults.
     state.craftDaily = { date: 7, crafted: 'recipe_quickening_catalyst' };
@@ -278,13 +359,18 @@ describe('determinism', () => {
       const pid = rigCrafter(sim, 2);
       const meta = sim.players.get(pid) as PlayerMeta;
       const log: unknown[] = [];
+      // RAW drained event streams, not the {ok, reason} projection: the
+      // resolve draws rng (the masterwork proc, the Jack variance arm), so a
+      // draw-order regression must move SOMETHING this log keeps
+      // (masterwork/quality fields, any interleaved event), which the lossy
+      // projection would have hidden (review round finding).
       craftOnce(sim, pid);
-      log.push(craftResultEvents(sim));
+      log.push(sim.drainEvents());
       sim.craftItem(RECIPE_ID, false, pid, 1);
-      log.push(craftResultEvents(sim));
+      log.push(sim.drainEvents());
       sim.resetDay = DAY_TWO;
       craftOnce(sim, pid);
-      log.push(craftResultEvents(sim));
+      log.push(sim.drainEvents());
       log.push(sim.countItem(recipe.resultItemId, pid));
       log.push(reagentCounts(sim, pid));
       log.push({ date: meta.craftDaily.date, crafted: [...meta.craftDaily.crafted].sort() });

@@ -377,7 +377,22 @@ function deriveMastery(pool: ProfessionRecipeRecord[], attunement: Attunement): 
   };
 }
 
-const ARMORCRAFTING_RECIPES = ALL_RECIPES.filter((recipe) => recipe.professionId === CRAFT);
+// Daily-gated chains stay OUT of the mastery pool: the model's tie-break
+// counts GATHERED units only, so a crafted daily-gated reagent (the
+// Quickening Catalyst) costs it nothing while being hard-capped at one per
+// character per reset day. Left in, the Phase 07 forgefold row reads as the
+// cheapest skill-75 rung via a path no leveling player can walk (75
+// catalyst-days for the rung's crafts). The pacing alarm keeps measuring
+// the ungated ladder.
+const DAILY_GATED_OUTPUT_IDS = new Set(
+  ALL_RECIPES.filter((r) => r.oncePerDay).map((r) => r.resultItemId),
+);
+const ARMORCRAFTING_RECIPES = ALL_RECIPES.filter(
+  (recipe) =>
+    recipe.professionId === CRAFT &&
+    !recipe.oncePerDay &&
+    !recipe.reagents.some((reagent) => DAILY_GATED_OUTPUT_IDS.has(reagent.itemId)),
+);
 const ATTUNEMENT = attunedArmorcrafter();
 const RUN = deriveMastery(ARMORCRAFTING_RECIPES, ATTUNEMENT);
 

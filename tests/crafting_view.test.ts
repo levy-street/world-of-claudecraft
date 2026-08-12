@@ -61,6 +61,24 @@ describe('buildCraftingView', () => {
     expect(view.recipes[0].reagents[0]).toMatchObject({ required: 2, have: 3, satisfied: true });
   });
 
+  it('mirrors the static oncePerDay marker onto the row and omits it otherwise', () => {
+    // The batch affordances read this field to cap their preview at one
+    // (craft_cast_view.ts maxCraftBatchFit); a row without the marker must
+    // not carry the key at all, matching the sparse recipe record shape.
+    const inventory: InvSlot[] = [{ itemId: 'bone_fragments', count: 6 }];
+    const gated = {
+      ...recipe('recipe_d', [{ itemId: 'bone_fragments', count: 2 }]),
+      oncePerDay: true as const,
+    };
+    const view = buildCraftingView(
+      [gated, recipe('recipe_e', [{ itemId: 'bone_fragments', count: 2 }])],
+      inventory,
+      table(item('bone_fragments'), item('recipe_d_result'), item('recipe_e_result')),
+    );
+    expect(view.recipes[0].oncePerDay).toBe(true);
+    expect('oncePerDay' in view.recipes[1]).toBe(false);
+  });
+
   it('marks a recipe not craftable when any single reagent is short', () => {
     const items = table(item('bone_fragments'), item('linen_scrap'), item('recipe_b_result'));
     const inventory: InvSlot[] = [

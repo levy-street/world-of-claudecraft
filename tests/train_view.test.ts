@@ -185,6 +185,18 @@ describe('buildTrainView', () => {
       expect(skill, `${row.recipeId} rung ${row.skillReq}`).toBeDefined();
       expect(row.requirement).toEqual({ craft: row.professionId, skill });
     }
+    // The phase 07 forge rows get their craft half pinned LITERALLY too:
+    // the loop above compares each row against its own professionId, so it
+    // can never red on a mis-attributed craft (review round).
+    const CRAFT_BY_PHASE07_ROW: Record<string, string> = {
+      recipe_duskforged_billet: 'weaponcrafting',
+      recipe_forgefold_plating: 'armorcrafting',
+      recipe_prismglass_setting: 'jewelcrafting',
+    };
+    for (const [recipeId, craft] of Object.entries(CRAFT_BY_PHASE07_ROW)) {
+      const row = locked.find((entry) => entry.recipeId === recipeId);
+      expect(row?.requirement, recipeId).toEqual({ craft, skill: 75 });
+    }
     // Known rows never carry a requirement.
     for (const row of view.rows.filter((entry) => entry.state === 'known')) {
       expect(row.requirement, row.recipeId).toBeUndefined();

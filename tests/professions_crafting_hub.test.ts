@@ -190,38 +190,41 @@ describe('station content', () => {
     // Masterwrought phase 07 intermediates (Prismglass Setting at the forge,
     // Lucent Reagent at the toolworks per the phase's enchanting station
     // decision, Sablewax Vellum at the apothecary), pinned literally so a
-    // new foreign binding is a deliberate edit here, not a drive-by.
+    // new foreign binding is a deliberate edit here, not a drive-by. The
+    // pin carries id:station PAIRS (review round): a bare id list would
+    // stay green if a station-less craft's recipe silently moved to a
+    // different foreign station.
     const foreignBound: string[] = [];
     for (const recipe of ALL_RECIPES) {
       if (!recipe.stationType) continue;
       const ownStation = stationTypeForCraft(recipe.professionId);
       if (ownStation === undefined) {
-        foreignBound.push(recipe.id);
+        foreignBound.push(`${recipe.id}:${recipe.stationType}`);
         continue;
       }
       expect(recipe.stationType, `${recipe.id} station/craft mismatch`).toBe(ownStation);
     }
     expect(foreignBound.sort()).toEqual([
-      'recipe_artisans_eye',
-      'recipe_burnished_thorium_amulet',
-      'recipe_coiled_copper_torc',
-      'recipe_etched_iron_loop',
-      'recipe_gatherers_cache',
-      'recipe_gleaming_thorium_loop',
-      'recipe_goldleaf_folio',
-      'recipe_goldleaf_scroll',
-      'recipe_hammered_copper_band',
-      'recipe_iron_link_choker',
-      'recipe_lucent_reagent',
-      'recipe_polished_copper_loop',
-      'recipe_prismglass_setting',
-      'recipe_riveted_iron_signet',
-      'recipe_sablewax_vellum',
-      'recipe_silverleaf_primer',
-      'recipe_silverleaf_scroll',
-      'recipe_sunpetal_grimoire',
-      'recipe_sunpetal_scroll',
-      'recipe_weighted_thorium_band',
+      'recipe_artisans_eye:toolworks',
+      'recipe_burnished_thorium_amulet:forge',
+      'recipe_coiled_copper_torc:forge',
+      'recipe_etched_iron_loop:forge',
+      'recipe_gatherers_cache:toolworks',
+      'recipe_gleaming_thorium_loop:forge',
+      'recipe_goldleaf_folio:apothecary',
+      'recipe_goldleaf_scroll:apothecary',
+      'recipe_hammered_copper_band:forge',
+      'recipe_iron_link_choker:forge',
+      'recipe_lucent_reagent:toolworks',
+      'recipe_polished_copper_loop:forge',
+      'recipe_prismglass_setting:forge',
+      'recipe_riveted_iron_signet:forge',
+      'recipe_sablewax_vellum:apothecary',
+      'recipe_silverleaf_primer:apothecary',
+      'recipe_silverleaf_scroll:apothecary',
+      'recipe_sunpetal_grimoire:apothecary',
+      'recipe_sunpetal_scroll:apothecary',
+      'recipe_weighted_thorium_band:forge',
     ]);
   });
 });

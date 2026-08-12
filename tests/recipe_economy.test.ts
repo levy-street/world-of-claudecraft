@@ -301,6 +301,28 @@ describe('REFERENTIAL INTEGRITY', () => {
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
   });
 
+  it('every intermediate row holds the R13 rung shape, and the nine consume exactly one catalyst', () => {
+    // Per-row pins for the Phase 07 ledger contract (review round): the
+    // affinity consumer-set pin only proves catalyst PRESENCE, so a row
+    // asking for five catalysts, or slipping off the 75 rung, would
+    // otherwise stay green.
+    for (const recipe of INTERMEDIATE_RECIPES) {
+      expect(recipe.skillReq, recipe.id).toBe(75);
+      expect(recipe.itemLevelBudget, recipe.id).toBe(20);
+      expect(recipe.level, recipe.id).toBe(20);
+      expect(recipe.resultCount, recipe.id).toBe(1);
+      expect(recipe.acquisition, recipe.id).toEqual(['trainer']);
+      const catalyst = recipe.reagents.filter((r) => r.itemId === 'quickening_catalyst');
+      if (recipe.id === 'recipe_quickening_catalyst') {
+        expect(catalyst, recipe.id).toEqual([]);
+        expect(recipe.oncePerDay, recipe.id).toBe(true);
+      } else {
+        expect(catalyst, recipe.id).toEqual([{ itemId: 'quickening_catalyst', count: 1 }]);
+        expect(recipe.oncePerDay, recipe.id).toBeUndefined();
+      }
+    }
+  });
+
   it('the three station-free combo recipes resolve a home via professionId, not stationType', () => {
     for (const recipe of COMBO_RECIPES) {
       // Combos deliberately carry NO stationType field (field-craftable, pair-gated).

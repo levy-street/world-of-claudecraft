@@ -159,11 +159,12 @@ blockers lived where ip_scrub and originality_renames cannot see.
 
 ## Registry verdicts (the packet's new names)
 
-Confirmed as authored (20 of 23): Masterwrought, Perfecting, Wyrmfall Core,
+Confirmed as authored (21 of 24): Masterwrought, Perfecting, Wyrmfall Core,
 Sundered Essence, Maker's Ember, Apex Patterns, Duskforged Billet, Forgefold
 Plating, Quickening Catalyst, Seasoned Stock, Lucent Reagent, Ridgebreaker,
 Gyrelens Array, Master's Field Forge, Voidbound Grimoire, Grand Cauldron, The
-Laden Hearth, Deed of Making, Lucent Infusion, Precision Chassis.
+Laden Hearth, Deed of Making, Lucent Infusion, Precision Chassis, Sablewax
+Vellum.
 
 - AMENDED: Prismstone Setting becomes **Prismglass Setting** (FFXIV ships a real
   'Prismstone' gatherable crafting material in the same component role, plus
@@ -172,6 +173,17 @@ Laden Hearth, Deed of Making, Lucent Infusion, Precision Chassis.
   armor base AND a WoW arena-set family: cross-franchise material vocabulary,
   full name unused anywhere); **Sunspun Bolt** (Sunspun's only usage is FFXIV's
   cash-shop Sunspun Cumulus mount; transparent compound, full name unused).
+- MINTED AT PHASE 07: **Sablewax Vellum** (inscription's skill-75 intermediate;
+  the registry carried no inscription name). CLEAR, web-verified 2026-08-11:
+  zero exact hits for the compound and for the coin Sablewax (searches
+  decompose to sable the heraldic ink-black tincture plus wax/vellum, generic
+  scribal vocabulary); no registry-coin reuse. Rejected at authoring:
+  Nightquill Vellum (Nightquill is a shipped Oaken Tower item plus DQWiki's
+  "Nightquill's Award", the Copper Torc rejection class) and Scrivener's
+  Vellum (Scrivener and Vellum are both real writing-software products and
+  the phrase names their integration). In-repo neighbors checked: no
+  "vellum" anywhere prior; quill appears only in the deed names Founder's
+  Quill and Quill and Pigment, a different surface.
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 

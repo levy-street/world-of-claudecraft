@@ -38,7 +38,9 @@ interface MonolithRow {
 const MONOLITHS: MonolithRow[] = [
   {
     file: 'src/ui/hud.ts',
-    ceiling: 19600,
+    // Lowered from 19600 at the Phase 07 review round: the craft-denial
+    // key ternary moved out to craft_denial_line_view (the ratchet).
+    ceiling: 19500,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
