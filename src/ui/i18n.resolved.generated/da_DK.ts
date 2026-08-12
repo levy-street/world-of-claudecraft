@@ -3281,7 +3281,7 @@ export const da_DK: EnTranslations = {
       "busy": "Du er optaget.",
       "recipeNotLearned": "Du har ikke lært den opskrift endnu.",
       "noBagSpace": "Du har ikke plads til den fremstillede genstand.",
-      "dailyLimit": "That can only be crafted once per day.",
+      "dailyLimit": "You can only craft that once per day.",
       "skillReqLine": "Kræver {craft} {skill}",
       "difficultyFull": "Fuld færdighedsforøgelse",
       "difficultyReduced": "Reduceret færdighedsforøgelse",

@@ -105,6 +105,23 @@ export function maxCraftsFromReagents(
   return Math.max(0, max);
 }
 
+/** The batch ceiling the affordances may offer for one recipe row: the
+ *  reagent fit, capped at ONE for a oncePerDay recipe. Mirrors the sim's
+ *  resolve-side clamp (professions/crafting.ts maxCraftCountForRecipe) from
+ *  the static half of the gate only: the per-character day stamp is
+ *  server-private, so the residual one-versus-zero after today's craft is
+ *  the documented learns-on-attempt asymmetry, while the N-versus-one
+ *  overpromise this cap removes would otherwise swallow the daily_limit
+ *  denial entirely (the clamped batch completes and the stop arm never
+ *  fires). */
+export function maxCraftBatchFit(
+  reagents: readonly { have: number; required: number }[],
+  oncePerDay?: boolean,
+): number {
+  const fit = maxCraftsFromReagents(reagents);
+  return oncePerDay ? Math.min(fit, 1) : fit;
+}
+
 /** Clamp a qty stepper value to 1..min(CRAFT_BATCH_UI_MAX, mats-fit). When
  *  mats-fit is 0, still returns 1 so the control can show a value while the
  *  craft button stays disabled. */

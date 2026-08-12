@@ -41,6 +41,9 @@ export interface RecipeDefLike {
   // Station-bound recipe (Professions 2.0): craftable only at a
   // station of this type (see src/sim/professions/stations.ts).
   stationType?: StationType;
+  // Daily craft gate marker (Masterwrought Phase 07); mirrored onto the row
+  // so the batch affordances cap their preview at one.
+  oncePerDay?: true;
   // Combo-recipe gate (#1132): present only on a recipe exclusive to one
   // specific adjacent craft pair. See src/sim/professions/types.ts for the
   // authoritative shape and src/sim/professions/crafting.ts for resolution.
@@ -118,6 +121,13 @@ export interface CraftingRecipeRow {
    *  Content table via craftCastDurationSec; actionable info, identical on
    *  every graphics preset (duration chip is never tier-gated). */
   durationSec: number;
+  /** Daily craft gate marker (Masterwrought Phase 07): mirrored from the
+   *  static recipe record so the batch affordances (qty stepper, Create All)
+   *  never offer more than the sim's resolve-side clamp will craft. The
+   *  per-character stamp itself is server-private (no wire field), so after
+   *  today's craft the affordance still offers one and the player learns of
+   *  the gate on attempt, the documented asymmetry. */
+  oncePerDay?: true;
 }
 
 export interface CraftingView {
@@ -289,6 +299,7 @@ export function buildCraftingView(
       resultCount: recipe.resultCount,
       reagents: reagentRows,
       ...(comboRequirement ? { comboRequirement } : {}),
+      ...(recipe.oncePerDay ? { oncePerDay: true as const } : {}),
       skillReq: recipe.skillReq,
       difficulty,
       station,

@@ -3281,7 +3281,7 @@ export const es: EnTranslations = {
       "busy": "Estás ocupado.",
       "recipeNotLearned": "Aún no has aprendido esa receta.",
       "noBagSpace": "No tienes espacio para el objeto elaborado.",
-      "dailyLimit": "That can only be crafted once per day.",
+      "dailyLimit": "You can only craft that once per day.",
       "skillReqLine": "Requiere {craft} {skill}",
       "difficultyFull": "Ganancia total de habilidad",
       "difficultyReduced": "Ganancia de habilidad reducida",

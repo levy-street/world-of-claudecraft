@@ -3510,6 +3510,12 @@ export class Sim {
       // addPlayer or riding back out through the save verbatim. Real recipe
       // ids are short and the oncePerDay set is content-bounded near ten.
       if (s.craftDaily) {
+        // Tokens are additionally filtered to LIVE oncePerDay recipe ids
+        // (the node_persist anti-tamper doctrine: load-side, so a tampered
+        // or orphaned stamp, or one whose recipe lost the flag, drops here
+        // instead of riding the save verbatim forever and pinning the row
+        // non-empty against the zero-default serialize omission).
+        const gatedIds = new Set(ALL_RECIPES.filter((r) => r.oncePerDay).map((r) => r.id));
         meta.craftDaily = {
           date:
             typeof s.craftDaily.date === 'string' && s.craftDaily.date.length <= 64
@@ -3518,7 +3524,7 @@ export class Sim {
           crafted: new Set(
             Array.isArray(s.craftDaily.crafted)
               ? s.craftDaily.crafted
-                  .filter((x) => typeof x === 'string' && x.length <= 64)
+                  .filter((x) => typeof x === 'string' && x.length <= 64 && gatedIds.has(x))
                   .slice(0, 32)
               : [],
           ),

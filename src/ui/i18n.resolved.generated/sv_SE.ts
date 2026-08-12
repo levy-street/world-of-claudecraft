@@ -3281,7 +3281,7 @@ export const sv_SE: EnTranslations = {
       "busy": "Du är upptagen.",
       "recipeNotLearned": "Du har inte lärt dig det receptet än.",
       "noBagSpace": "Du har inte plats för det tillverkade föremålet.",
-      "dailyLimit": "That can only be crafted once per day.",
+      "dailyLimit": "You can only craft that once per day.",
       "skillReqLine": "Kräver {craft} {skill}",
       "difficultyFull": "Full skicklighetsvinst",
       "difficultyReduced": "Minskad färdighetsvinst",

@@ -3281,7 +3281,7 @@ export const cs_CZ: EnTranslations = {
       "busy": "Jsi zaneprázdněn(a).",
       "recipeNotLearned": "Tento recept ses ještě nenaučil.",
       "noBagSpace": "Nemáš místo pro vyrobený předmět.",
-      "dailyLimit": "That can only be crafted once per day.",
+      "dailyLimit": "You can only craft that once per day.",
       "skillReqLine": "Vyžaduje {craft} {skill}",
       "difficultyFull": "Plný zisk dovedností",
       "difficultyReduced": "Snížený zisk dovedností",

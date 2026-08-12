@@ -34,7 +34,7 @@ import {
   craftButtonEnabled,
   craftButtonState,
   IDLE_CRAFT_CAST_SESSION,
-  maxCraftsFromReagents,
+  maxCraftBatchFit,
 } from './craft_cast_view';
 import {
   type CraftDifficulty,
@@ -411,7 +411,7 @@ export function renderCraftingWindow(
       const btnState: CraftButtonState = craftButtonState(row, session);
       const canCraft = craftButtonEnabled(btnState);
       const castingActive = session.active;
-      const matsFit = maxCraftsFromReagents(row.reagents);
+      const matsFit = maxCraftBatchFit(row.reagents, row.oncePerDay === true);
       const qty = clampCraftQty(deps.craftQty(row.recipeId), matsFit);
       const durationText = durationChipText(row.durationSec);
       const craftBtn = document.createElement('button');

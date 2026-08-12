@@ -4118,7 +4118,7 @@ export const hudChromeStrings = {
     noBagSpace: 'You do not have room for the crafted item.',
     // Masterwrought phase 07: a oncePerDay recipe already crafted inside the
     // current reset-day window (the Quickening Catalyst daily gate).
-    dailyLimit: 'That can only be crafted once per day.',
+    dailyLimit: 'You can only craft that once per day.',
     // Professions 2.0: crafting window legibility (skill requirement
     // line, skill-gain difficulty labels, hub-station badge) plus the
     // masterwork and tier-up celebration copy. Masterwork is a proc with

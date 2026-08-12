@@ -432,11 +432,17 @@ export function meetsComboRequirement(
  *  recipe id is already stamped on PlayerMeta.craftDaily for the CURRENT
  *  window. With a live realm calendar (nonempty ctx.resetDay) a stamp counts
  *  only while its recorded date IS today; a host that never sets resetDay
- *  (the headless RL env, replays) reads the stamp alone, the documented
- *  one-shot degrade (the wyrmfallDaily contract in
- *  professions/masterwrought_materials.ts). Deliberately side-effect-free:
- *  a STALE window is left in place here (admission must not mutate), and
- *  resolveCraftForRecipe rolls it at stamp time. Draws no rng. */
+ *  (the headless RL env, replays) reads the stamp alone, the wyrmfallDaily
+ *  calendar-less contract (professions/masterwrought_materials.ts). That
+ *  degrade is asymmetric: a stamp MINTED on such a host carries date '' and
+ *  gates one-shot per save, while a stamp minted under a live calendar and
+ *  then loaded calendar-less gates PERMANENTLY (the window only rolls
+ *  inside a successful resolve, and no resolve can succeed). The reverse
+ *  crossing is safe: any stamp meeting a calendar that disagrees with its
+ *  date reads as a stale window and the gate opens. Deliberately
+ *  side-effect-free: a STALE window is left in place here (admission must
+ *  not mutate), and resolveCraftForRecipe rolls it at stamp time. Draws no
+ *  rng. */
 function craftDailyLimitReached(
   ctx: SimContext,
   meta: PlayerMeta | undefined,
@@ -458,12 +464,23 @@ export function evaluateCraftAdmission(
   commission = false,
 ): CraftResult | null {
   const meta = ctx.players.get(pid);
+  // Masterwrought phase 07 daily gate, FIRST on purpose: once today's stamp
+  // is set, no other gate's remedy changes the outcome (a stamped recipe
+  // stays refused however far the player walks or re-attunes), so telling
+  // them anything else sends them on an errand that ends in this same
+  // refusal at the station. Because this admission is shared by cast start,
+  // the complete-side resolve, and the batch auto-continue, a batch stops
+  // itself here the moment the first craft lands the stamp. Read-only, no
+  // rng, no side effect on denial.
+  if (craftDailyLimitReached(ctx, meta, recipe)) {
+    return { ok: false, recipeId: recipe.id, reason: 'daily_limit' };
+  }
   // Station gate (supersedes #1297's hub gate; the level arm retired
   // with it): a station-bound recipe requires the player to stand at a
   // station of the recipe's type, OR to have their own ACTIVE mobile station
   // (mobile_station.ts) whose craft maps to that type. Checked before every
-  // other gate, no side effect on denial, no rng, same shape as the
-  // combo-requirement check below.
+  // other remedy-able gate, no side effect on denial, no rng, same shape as
+  // the combo-requirement check below.
   if (recipe.stationType) {
     const entity = ctx.entities.get(pid);
     const mobileSatisfies =
@@ -491,14 +508,6 @@ export function evaluateCraftAdmission(
   }
   if (!isRecipeKnown(meta, recipe)) {
     return { ok: false, recipeId: recipe.id, reason: 'recipe_not_learned' };
-  }
-  // Masterwrought phase 07 daily gate: a oncePerDay recipe refuses once its
-  // stamp is set for the current window. Because this admission is shared by
-  // cast start, the complete-side resolve, and the batch auto-continue, a
-  // batch stops itself here the moment the first craft lands the stamp.
-  // Read-only, no rng, no side effect on denial.
-  if (craftDailyLimitReached(ctx, meta, recipe)) {
-    return { ok: false, recipeId: recipe.id, reason: 'daily_limit' };
   }
   if (!hasRecipeMaterials(ctx, recipe, pid)) {
     return { ok: false, recipeId: recipe.id, reason: 'insufficient_materials' };

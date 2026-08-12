@@ -3281,7 +3281,7 @@ export const en_XA: EnTranslations = {
       "busy": "[Ýóú áŕé ƀúšý.]",
       "recipeNotLearned": "[Ýóú ĥáʋé ñóţ ļéáŕñéð ţĥáţ ŕéçíþé ýéţ.]",
       "noBagSpace": "[Ýóú ðó ñóţ ĥáʋé ŕóóɱ ƒóŕ ţĥé çŕáƒţéð íţéɱ.]",
-      "dailyLimit": "[Ţĥáţ çáñ óñļý ƀé çŕáƒţéð óñçé þéŕ ðáý.]",
+      "dailyLimit": "[Ýóú çáñ óñļý çŕáƒţ ţĥáţ óñçé þéŕ ðáý.]",
       "skillReqLine": "[Ŕéɋúíŕéš {craft} {skill}]",
       "difficultyFull": "[Ƒúļļ šķíļļ ĝáíñ]",
       "difficultyReduced": "[Ŕéðúçéð šķíļļ ĝáíñ]",
