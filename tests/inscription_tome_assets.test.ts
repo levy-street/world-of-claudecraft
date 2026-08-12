@@ -19,7 +19,12 @@ import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 // tests/held_weapon_models.test.ts.
 
 const REPO_ROOT = path.join(__dirname, '..');
-const SOURCE_FINGERPRINT = 'a9c395f38615ecc32e54a9cef75a0a5c4b9020c05fe098f8390e455ce23bfac4';
+// Re-pinned for the phase 07 merge of release/v0.37.0: the release bumped the
+// three@0.165.0 patch hash in pnpm-lock.yaml, a pinned input of this family's
+// source fingerprint, so the extras stamps and hashes were re-minted via
+// scripts/assets/remint_lockfile_fingerprints.mjs. Geometry is unchanged
+// (bytes, triangles, and bounds pins did not move).
+const SOURCE_FINGERPRINT = '8939987ba41667b7cf1f4422a16f584d0afb844437f18be297322021c05c2055';
 
 interface TomePin {
   itemId: string;
@@ -35,7 +40,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'silverleaf_primer',
     rootName: 'InscriptionTomeSilverleaf',
     bytes: 11_136,
-    sha256: '66f063c39fd00b9a29d3a571df5e57fdeeb8ec269ff1fd85f93f1f4f14baff63',
+    sha256: 'b9befed5b6c3c6befb646923fde90d91c0a5e39d529a1c168341a586d6bccad8',
     triangles: 404,
     bounds: { min: [-0.1763, -0.1, -0.0555], max: [0.163, 0.3, 0.0622] },
   },
@@ -43,7 +48,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'goldleaf_folio',
     rootName: 'InscriptionTomeGoldleaf',
     bytes: 12_948,
-    sha256: 'c57d9c919c6ca8b07abd9aae64f290d3a4fd03c607d7fb0bdb68d3ea1f2a4ca8',
+    sha256: '704895ef6206c28db77d70962ddcaa8877e770422675061092c9d2ca7b2a3413',
     triangles: 512,
     bounds: { min: [-0.1866, -0.1668, -0.0605], max: [0.1705, 0.33, 0.0672] },
   },
@@ -51,7 +56,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'sunpetal_grimoire',
     rootName: 'InscriptionTomeSunpetal',
     bytes: 13_956,
-    sha256: 'eea72cf154e39a48e76963ef3a41f34f07c0f1f0183dbd852b668a37bfc82071',
+    sha256: '22887639e967bbe187458476ead6ff9e0fb7f6d2ce159414c3a2ad5826b9c946',
     triangles: 584,
     bounds: { min: [-0.2007, -0.1668, -0.068], max: [0.1805, 0.36, 0.0863] },
   },
