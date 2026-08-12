@@ -894,12 +894,12 @@ export const fr_CA: EnTranslations = {
       "update": "Mettre à jour"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Mise à jour du jeu",
+      "downloading": "Téléchargement de la mise à jour : {percent}",
+      "applying": "Mise à jour téléchargée. Le jeu redémarre pour l'appliquer.",
+      "incompatible": "Une mise à jour est nécessaire pour jouer. Elle sera appliquée dès la fin du téléchargement.",
+      "continueAnyway": "Continuer sans mettre à jour",
+      "progressLabel": "Progression du téléchargement de la mise à jour"
     },
     "cameraPrompt": {
       "title": "Choisissez votre caméra",

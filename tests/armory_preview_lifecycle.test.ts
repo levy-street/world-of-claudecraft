@@ -30,16 +30,32 @@ describe('Armory preview lifecycle', () => {
     expect(preview).toContain('if (disposed || !active || prewarming) return;');
     expect(preview).not.toMatch(/applyMode\(\);\s*animate\(\);/);
     expect(preview).toContain('setActive(next: boolean)');
-    expect(preview).toContain('composer.render();\n        prewarming = false;');
+    // The buffer restore (with its prepaid composer target reallocation draw)
+    // runs in restoreWarmupBuffer; the paced keep-buffer path defers it to the
+    // schedule's one finalize unit instead of paying it per unit.
+    expect(preview).toContain(
+      'if (options?.keepWarmupBuffer !== true) restoreWarmupBuffer();\n        prewarming = false;',
+    );
+    const restoreStart = preview.indexOf('function restoreWarmupBuffer(): void {');
+    expect(restoreStart).toBeGreaterThan(-1);
+    const restore = preview.slice(restoreStart, preview.indexOf('\n  }', restoreStart));
+    expect(restore).toContain('composer.render();');
   });
 
   it('walks every armory skin through the post-entry prewarm schedule', () => {
     expect(store).toContain('WEAPON_SKIN_LIST.map((skin) => skin.id)');
     expect(hud).toContain('this.dailyRewardsWindow.armoryPrewarmSkinIds()');
     // One MODE per paced unit (a whole-skin unit was a measured 170 to 225 ms
-    // main-thread block in live play).
+    // main-thread block in live play), keeping the warmup buffer across units
+    // (the per-unit restore cost two composer target reallocations plus a
+    // forced full-size draw EVERY unit) with the one finalize restore at the
+    // end of the schedule.
     expect(hud).toContain(
-      'this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode])',
+      'this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode], {',
+    );
+    expect(hud).toContain('keepWarmupBuffer: true,');
+    expect(hud).toContain(
+      'finishArmoryPrewarm: () => this.dailyRewardsWindow.finishArmoryPreviewPrewarm()',
     );
     // The schedule starts after the reveal (post-entry paced units), no longer
     // holding the loading curtain for the whole catalog.
@@ -67,7 +83,10 @@ describe('Armory preview lifecycle', () => {
     expect(hudStart).toBeGreaterThan(-1);
     const compose = hud.slice(hudStart, hud.indexOf('startPostEntryPreviewPrewarm(', hudStart));
     expect(compose).toContain('buildPostEntryPreviewPrewarmUnits');
-    expect(compose).toContain('playerPortraitDataUrl(portraitClass as PlayerClass, skin, framing)');
+    // The prewarm variant, not the sync playerPortraitDataUrl: uploads prepaid
+    // in bounded slices and the PNG encode off-thread (the sync capture books
+    // 43 to 201 ms per cold portrait); a later sync call is a cache hit.
+    expect(compose).toContain('prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing)');
   });
 
   it('prewarms player-card poses and never resizes the live preview to capture them', () => {
@@ -126,5 +145,15 @@ describe('Armory preview lifecycle', () => {
     expect(finallyBody).toContain('const requestedActive = pendingActive;');
     expect(finallyBody).toContain('active = requestedActive ?? wasActive;');
     expect(finallyBody).not.toContain('active = wasActive;');
+  });
+
+  it('defers every selection setter while prewarming (all four writes present)', () => {
+    // The statement-form rewrite of the (pendingSelection ??= {}).x sites is
+    // otherwise pin-free; a dropped write would silently clobber a card
+    // click landing mid-unit.
+    expect(preview).toContain('pendingSelection.appearance = next;');
+    expect(preview).toContain('pendingSelection.skin = next;');
+    expect(preview).toContain('pendingSelection.mode = next;');
+    expect(preview).toContain('pendingSelection.scene = next;');
   });
 });

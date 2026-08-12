@@ -70,6 +70,7 @@
     "OUT",
     "PERF_TICK_LOG",
     "PROBE",
+    "RIFT_FORGE_ENABLED",
     "SCAN",
     "SHOT_EXPECT_PICKER",
     "SHOT_H",

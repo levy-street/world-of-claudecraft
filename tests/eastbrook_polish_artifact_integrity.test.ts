@@ -694,16 +694,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
-// Re-minted for the phase 04 QA merge of release/v0.36.0 into
-// feature/masterwrought: both sides re-minted since the common base (the
-// release's prewarm and reseal rounds above, this branch's phase 03 naming
-// re-mint), moving renderer.ts, prewarm_policy.ts, the prop GLBs, and the
-// lockfile leaves, so all three literals mint to values matching neither
-// parent. No capture was retaken.
+// Re-minted after the custom-shader dedupe signature fix changed
+// prewarm_policy.ts. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '4c10a2918b5f23932324b6524cb279af63ad502c37667949679203b616818bbd';
+  '302970d4d1fcf82f530ef5c17889195d7dd038794abe59b74f1076c15f9f6eb1';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '93b3fe57d57fdf4179ab96d09b168a9e838e6e663c0cf5555dfec157b22f1e0b';
+  'a40c99bd60b3cd1bea3ddbd2a7e92b1fbd470e435ca04f7a53595cfa39a3a765';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1630,10 +1626,17 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // PR 3204) into the creator-appearance branch: both parents move the
     // rendererIntegration leaf, so the merged tree mints a value matching
     // neither parent. No capture was retaken.
+    // Re-minted for the Three.js audit batch (light budget seam, blob
+    // shadows, sky residency lane, splat colour pack-source fix): the
+    // first-order composite follows renderer.ts, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
+    // Re-minted after the custom-shader dedupe signature fix changed
+    // prewarm_policy.ts. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('c6176391ffd02e0ecb37857e6d83a6a93e860effa4044d9cac6f3d3609cce432');
+    ).toBe('50cbe7fe461695b031c8db870543fbad0db745476a9e8c1219cb0f4aa3a18f75');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

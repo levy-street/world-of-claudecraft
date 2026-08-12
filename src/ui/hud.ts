@@ -31,6 +31,7 @@ import {
   onPortraitsReady,
   onPortraitUpdate,
   playerPortraitDataUrl,
+  prewarmPlayerPortrait,
 } from '../render/characters/portrait';
 import { currentDayNightPhase } from '../render/day_night_clock';
 import { globalDayness, skyTintForDayness } from '../render/day_night_core';
@@ -16644,11 +16645,16 @@ export class Hud {
       },
       prewarmCharSkin: (skin) => this.charPreview?.prewarm([skin]),
       prewarmCardPose: (pose) => this.charPreview?.prewarmCloseupPoses([pose]),
-      renderPortrait: (portraitClass, skin, framing) => {
-        playerPortraitDataUrl(portraitClass as PlayerClass, skin, framing);
-      },
+      // The prewarm variant, not the sync playerPortraitDataUrl: uploads are
+      // prepaid in bounded slices and the PNG encode runs off-thread, so the
+      // paced unit never books the 43 to 201 ms cold-capture block.
+      renderPortrait: (portraitClass, skin, framing) =>
+        prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing),
       prewarmArmorySkin: (skinId, armoryMode) =>
-        this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode]),
+        this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode], {
+          keepWarmupBuffer: true,
+        }),
+      finishArmoryPrewarm: () => this.dailyRewardsWindow.finishArmoryPreviewPrewarm(),
     });
   }
 

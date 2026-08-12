@@ -2,10 +2,16 @@ import * as THREE from 'three';
 import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
+import {
+  collectPrewarmTextures,
+  uploadTexturesInSlices,
+  yieldToMainThread,
+} from '../texture_prewarm';
 import { ensureSkinTexture } from './assets';
 import { VISUALS } from './manifest';
 import { type ModularLook, modularSignature } from './modular';
 import { type PortraitFraming, portraitFrameParams } from './portrait_framing';
+import { runPortraitPrewarm } from './portrait_prewarm_core';
 import { CharacterVisual } from './visual';
 
 export type { PortraitFraming } from './portrait_framing';
@@ -149,29 +155,131 @@ export function visualPortraitDataUrl(
   if (cached) return cached;
   if (!assetsAreReady) return null;
 
-  // Tight-memory iOS hosts defer the boot skin-atlas sweep (assets.ts), so a
-  // non-default skin's atlas may not be resident yet. Do not capture the
-  // embedded default as if it were the requested chroma. Return the normal
-  // fallback and notify mounted consumers once the real atlas arrives.
-  const atlasPending = ensureSkinTexture(visualKey, skin);
-  if (atlasPending) {
-    const atlasKey = `${visualKey}:${skin}`;
-    if (!pendingAtlases.has(atlasKey)) {
-      pendingAtlases.set(atlasKey, atlasPending);
-      void atlasPending.then(
-        () => {
-          pendingAtlases.delete(atlasKey);
-          for (const cb of updateListeners) cb(visualKey, skin);
-        },
-        () => {
-          pendingAtlases.delete(atlasKey);
-        },
-      );
-    }
-    return null;
-  }
+  if (trackSkinAtlasPending(visualKey, skin)) return null;
 
   return capture(key, visualKey, () => new CharacterVisual(visualKey, 0xffffff, skin), framing);
+}
+
+/** Tight-memory iOS hosts defer the boot skin-atlas sweep (assets.ts), so a
+ *  non-default skin's atlas may not be resident yet. Do not capture the
+ *  embedded default as if it were the requested chroma: true means "still
+ *  streaming, use the fallback"; mounted consumers are notified once the real
+ *  atlas arrives. */
+function trackSkinAtlasPending(visualKey: string, skin: number): boolean {
+  const atlasPending = ensureSkinTexture(visualKey, skin);
+  if (!atlasPending) return false;
+  const atlasKey = `${visualKey}:${skin}`;
+  if (!pendingAtlases.has(atlasKey)) {
+    pendingAtlases.set(atlasKey, atlasPending);
+    void atlasPending.then(
+      () => {
+        pendingAtlases.delete(atlasKey);
+        for (const cb of updateListeners) cb(visualKey, skin);
+      },
+      () => {
+        pendingAtlases.delete(atlasKey);
+      },
+    );
+  }
+  return true;
+}
+
+/** Snapshot-encode the portrait canvas to a PNG data URL off the main thread.
+ *  toBlob captures the bitmap AT CALL TIME, so a later render into the shared
+ *  rig cannot bleed into this capture; the encode itself runs async (the sync
+ *  toDataURL path blocks on GPU readback plus PNG encode). Resolves null on an
+ *  encode failure (including a synchronous toBlob throw, which must not become
+ *  an unhandled rejection); the caller falls back to the lazy sync path. */
+function encodePortraitPng(canvas: HTMLCanvasElement): Promise<string | null> {
+  return new Promise((resolve) => {
+    try {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          resolve(null);
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : null);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      }, 'image/png');
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+/**
+ * Warm one (class, skin, framing) portrait cache entry with every heavy step
+ * bounded or off-thread: texture uploads prepaid in budgeted slices, then one
+ * render, then an async PNG encode. The post-entry paced lane calls this so a
+ * later synchronous {@link playerPortraitDataUrl} is a cache hit; live callers
+ * keep the sync path (43 to 201 ms measured per cold portrait in production,
+ * dominated by first-use atlas uploads plus the toDataURL readback/encode).
+ */
+export async function prewarmPlayerPortrait(
+  cls: PlayerClass,
+  skin = 0,
+  framing: PortraitFraming = 'headshot',
+): Promise<void> {
+  const visualKey = `player_${cls}`;
+  const key = `${visualKey}:${skin}:${framing}`;
+  let rigRenderer: THREE.WebGLRenderer | null = null;
+  await runPortraitPrewarm<CharacterVisual>({
+    cached: () => cache.has(key),
+    ready: () => assetsAreReady,
+    atlasPending: () => trackSkinAtlasPending(visualKey, skin),
+    build: () => {
+      ensureRig();
+      rigRenderer = renderer;
+      return new CharacterVisual(visualKey, 0xffffff, skin);
+    },
+    // This offscreen context is separate from the world renderer, so atlases
+    // resident there still upload here on first draw; prepay them in slices.
+    // The visual stays UNMOUNTED for this: initTexture needs no scene, and
+    // the mount is shared with the synchronous capture() path, so a visual
+    // left mounted across an await would bleed into any concurrent live
+    // portrait capture (and that capture's visual into ours).
+    uploadTextures: async (visual) => {
+      const textures = new Set<THREE.Texture>();
+      collectPrewarmTextures(visual.root, textures);
+      await uploadTexturesInSlices(rigRenderer as THREE.WebGLRenderer, textures, {
+        yieldToMain: yieldToMainThread,
+        // A graphics rebuild mid-sweep disposes the rig (renderer goes null).
+        isCancelled: () => renderer !== rigRenderer,
+      });
+    },
+    current: () => renderer === rigRenderer,
+    // Link this context's programs asynchronously before the draw: the
+    // portrait rig never ran a compileAsync, so the first portrait of each
+    // cold program set paid the shader link inside its render call (S9
+    // measured 248 and 150 ms on the first two portrait units). compileAsync
+    // walks the scene SYNCHRONOUSLY at call time, so the visual is mounted
+    // only around that call and unmounted before the link is awaited: no
+    // concurrent sync capture can render it (see the mount-sharing note
+    // above), and the captured material list keeps polling regardless.
+    compile: (visual) => {
+      mount?.add(visual.root);
+      const compiled = (rigRenderer as THREE.WebGLRenderer).compileAsync(scene!, camera!);
+      mount?.remove(visual.root);
+      return compiled.then(() => undefined);
+    },
+    // Fully synchronous window: renderPortraitFrame re-mounts and renders,
+    // and toBlob snapshots the bitmap at call time, so nothing can interleave
+    // between the draw and the capture.
+    renderAndSnapshot: (visual) => {
+      renderPortraitFrame(visual, visualKey, framing);
+      return encodePortraitPng((rigRenderer as THREE.WebGLRenderer).domElement);
+    },
+    release: (visual) => {
+      mount?.remove(visual.root);
+      visual.dispose();
+    },
+    commit: (url) => cache.set(key, url),
+    onError: (err) => {
+      if (import.meta.env?.DEV) console.warn(`[portrait] prewarm failed for ${key}`, err);
+    },
+  });
 }
 
 /**
@@ -212,6 +320,64 @@ export function modularPortraitDataUrl(
   return url;
 }
 
+/** Mount `visual` in the offscreen rig, settle its pose, aim the camera for
+ *  `framing`, and render one frame. The caller owns the readback (synchronous
+ *  toDataURL for the live path, async toBlob for the prewarm path) and the
+ *  visual's unmount/dispose. */
+function renderPortraitFrame(visual: CharacterVisual, visualKey: string, framing: PortraitFraming) {
+  mount!.add(visual.root);
+  mount!.rotation.y = 0;
+  // Settle the rig into a stable idle frame before measuring/capturing.
+  visual.update(0.4, PORTRAIT_ANIM_STATE, true);
+
+  // Frame the model from its own bounds so every class (tall or short,
+  // helmeted or bare) lands the same in the circle/card. This box drives the
+  // zoom (height, feet, depth) and MUST stay the full root: shrinking it
+  // would pull the camera in and change every class's portrait scale.
+  scratchBox.setFromObject(visual.root);
+  scratchBox.getCenter(scratchCenter);
+  scratchBox.getSize(scratchSize);
+  // Box3.setFromObject reads skinned geometry in bind space through the node
+  // matrices, which some rigs (the Quaternius raptor, the floating ghost)
+  // report orders of magnitude off, framing the camera on empty space. The
+  // visual root is already normalized to the manifest height with feet at
+  // the origin, so when the measured box is implausible, frame from that
+  // known height instead.
+  const defH = VISUALS[visualKey]?.height ?? 1.8;
+  const implausible =
+    !Number.isFinite(scratchSize.y) ||
+    scratchSize.y < 0.3 * defH ||
+    scratchSize.y > 3 * defH ||
+    Math.abs(scratchCenter.x) > defH ||
+    Math.abs(scratchCenter.z) > defH;
+  if (implausible) {
+    // Generous footprint: long quadrupeds extend well past a biped's, and an
+    // oversized box only backs the camera off a little.
+    scratchBox.min.set(-0.5 * defH, 0, -0.9 * defH);
+    scratchBox.max.set(0.5 * defH, defH, 0.9 * defH);
+    scratchBox.getCenter(scratchCenter);
+    scratchBox.getSize(scratchSize);
+  }
+  const h = scratchSize.y || 1.8;
+  // Horizontal aim only: a single held weapon (the paladin's axe) sits off to
+  // one side and skews the full box's x-center, pushing the character left in
+  // the frame. Aim at the BODY's x-center instead (body meshes carry
+  // userData.bodyMesh, set in assembleModel; held props do not). Zoom and
+  // vertical framing still come from the full box above, so portrait SCALE is
+  // unchanged for every class; only the sideways aim is corrected.
+  const bodyCenterX = bodyCenterXOf(visual.root) ?? scratchCenter.x;
+  const { fov, targetYFromFeetFrac, extentFrac } = portraitFrameParams(framing);
+  camera!.fov = fov;
+  const targetY = scratchBox.min.y + targetYFromFeetFrac * h;
+  const extent = extentFrac * h;
+  const dist = extent / 2 / Math.tan((fov * Math.PI) / 180 / 2);
+  camera!.position.set(bodyCenterX + 0.04 * h, targetY + 0.02 * h, scratchBox.max.z + dist);
+  camera!.lookAt(bodyCenterX, targetY, scratchCenter.z);
+  camera!.updateProjectionMatrix();
+
+  renderer!.render(scene!, camera!);
+}
+
 /** Render one visual into the offscreen rig and return it as a PNG data URL.
  *  Shared by the class portraits and the composed ones, the only difference
  *  between them is which CharacterVisual gets built. */
@@ -225,57 +391,7 @@ function capture(
   try {
     ensureRig();
     visual = build();
-    mount!.add(visual.root);
-    mount!.rotation.y = 0;
-    // Settle the rig into a stable idle frame before measuring/capturing.
-    visual.update(0.4, PORTRAIT_ANIM_STATE, true);
-
-    // Frame the model from its own bounds so every class (tall or short,
-    // helmeted or bare) lands the same in the circle/card. This box drives the
-    // zoom (height, feet, depth) and MUST stay the full root: shrinking it
-    // would pull the camera in and change every class's portrait scale.
-    scratchBox.setFromObject(visual.root);
-    scratchBox.getCenter(scratchCenter);
-    scratchBox.getSize(scratchSize);
-    // Box3.setFromObject reads skinned geometry in bind space through the node
-    // matrices, which some rigs (the Quaternius raptor, the floating ghost)
-    // report orders of magnitude off, framing the camera on empty space. The
-    // visual root is already normalized to the manifest height with feet at
-    // the origin, so when the measured box is implausible, frame from that
-    // known height instead.
-    const defH = VISUALS[visualKey]?.height ?? 1.8;
-    const implausible =
-      !Number.isFinite(scratchSize.y) ||
-      scratchSize.y < 0.3 * defH ||
-      scratchSize.y > 3 * defH ||
-      Math.abs(scratchCenter.x) > defH ||
-      Math.abs(scratchCenter.z) > defH;
-    if (implausible) {
-      // Generous footprint: long quadrupeds extend well past a biped's, and an
-      // oversized box only backs the camera off a little.
-      scratchBox.min.set(-0.5 * defH, 0, -0.9 * defH);
-      scratchBox.max.set(0.5 * defH, defH, 0.9 * defH);
-      scratchBox.getCenter(scratchCenter);
-      scratchBox.getSize(scratchSize);
-    }
-    const h = scratchSize.y || 1.8;
-    // Horizontal aim only: a single held weapon (the paladin's axe) sits off to
-    // one side and skews the full box's x-center, pushing the character left in
-    // the frame. Aim at the BODY's x-center instead (body meshes carry
-    // userData.bodyMesh, set in assembleModel; held props do not). Zoom and
-    // vertical framing still come from the full box above, so portrait SCALE is
-    // unchanged for every class; only the sideways aim is corrected.
-    const bodyCenterX = bodyCenterXOf(visual.root) ?? scratchCenter.x;
-    const { fov, targetYFromFeetFrac, extentFrac } = portraitFrameParams(framing);
-    camera!.fov = fov;
-    const targetY = scratchBox.min.y + targetYFromFeetFrac * h;
-    const extent = extentFrac * h;
-    const dist = extent / 2 / Math.tan((fov * Math.PI) / 180 / 2);
-    camera!.position.set(bodyCenterX + 0.04 * h, targetY + 0.02 * h, scratchBox.max.z + dist);
-    camera!.lookAt(bodyCenterX, targetY, scratchCenter.z);
-    camera!.updateProjectionMatrix();
-
-    renderer!.render(scene!, camera!);
+    renderPortraitFrame(visual, visualKey, framing);
     const url = renderer!.domElement.toDataURL('image/png');
     cache.set(key, url);
     return url;

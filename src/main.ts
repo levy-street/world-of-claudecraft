@@ -3750,8 +3750,14 @@ async function startGame(
       // procedural math, so gameplay on not-yet-rendered ground stays correct;
       // the chunks under the player stream in first (prepareZoneAt priority),
       // and the fog residency clamp keeps the unbuilt remainder hidden.
+      // A PREPARED zone only reaches here when its sky was evicted: that
+      // sky-only recovery must take prepareZoneSky's idle arm, because there
+      // is no curtain and the fast arm pays a synchronous PMREM plus full
+      // uploads in live play. An unprepared zone keeps the historic
+      // escalating join so the ground under the player still fills fast.
+      const skyOnlyRecovery = renderer.isZonePreparedAt(zoneX, zoneZ);
       zoneWarmup = renderer
-        .prepareZoneAt(zoneX, zoneZ)
+        .prepareZoneAt(zoneX, zoneZ, undefined, skyOnlyRecovery ? { pace: 'idle' } : undefined)
         .then(() => renderer.prewarmZoneAt(zoneX, zoneZ, { background: true }))
         .catch((err) => {
           console.warn('Background zone warmup failed', err);

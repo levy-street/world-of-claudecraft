@@ -894,12 +894,12 @@ export const vi_VN: EnTranslations = {
       "update": "Cập Nhật"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Cập nhật trò chơi",
+      "downloading": "Đang tải bản cập nhật: {percent}",
+      "applying": "Đã tải xong bản cập nhật. Trò chơi đang khởi động lại để áp dụng.",
+      "incompatible": "Cần cập nhật để chơi. Bản cập nhật sẽ được áp dụng ngay khi tải xong.",
+      "continueAnyway": "Tiếp tục mà không cập nhật",
+      "progressLabel": "Tiến trình tải bản cập nhật"
     },
     "cameraPrompt": {
       "title": "Chọn Máy Ảnh Của Bạn",

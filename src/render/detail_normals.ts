@@ -6,13 +6,19 @@
 // shipped terrain rock pack) at a low normalScale, which gives flat-shaded
 // low-poly walls a faint surface grain without breaking the toy-like style.
 //
-// We own a CLONE of the terrain texture: loadTexture dedupes by URL and the
-// terrain splat samples the same file with its own repeat/transform, so
+// We own a CLONE of the terrain texture: the loader dedupes by URL and the
+// terrain splat samples the same pack with its own repeat/transform, so
 // mutating the shared instance's repeat would corrupt the terrain. The clone
-// shares the decoded image (one fetch, one decode) and costs one extra GPU
+// shares the decoded image (one fetch, one transcode) and costs one extra GPU
 // texture, shared by every stone material that opts in.
+//
+// The rock normal is requested as its KTX2 sibling so it stays GPU-compressed
+// instead of decoding to a full 1024x1024 RGBA bitmap; the clone works the
+// same on a CompressedTexture (Texture.clone is constructor + copy, and copy
+// carries source, mipmaps and format across).
 import * as THREE from 'three';
-import { loadTexture } from './assets/loader';
+import { ktx2SiblingUrl } from './assets/ktx2_sibling';
+import { loadKtx2Texture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX, type GfxSettings } from './gfx';
 
@@ -27,7 +33,9 @@ let stoneNormalTask: Promise<void> | null = null;
 export function prepareStoneDetailProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
   if (!target.standardMaterials || stoneNormal) return Promise.resolve();
   if (stoneNormalTask) return stoneNormalTask;
-  stoneNormalTask = loadTexture('/textures/terrain/Rock051_NormalGL.jpg', { repeat: true })
+  stoneNormalTask = loadKtx2Texture(ktx2SiblingUrl('/textures/terrain/Rock051_NormalGL.jpg'), {
+    repeat: true,
+  })
     .then((tex) => {
       const detail = tex.clone();
       detail.wrapS = THREE.RepeatWrapping;

@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "ba3a26a3b95c49f8414db0420f7f2eab7fda2f4eeccc4b76a0cafa56303725f8",
+  "rendererFingerprint": "42be2df90af42d8edf20dd826d39e11642fd60160602106d1902365a47afff95",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 3834695,
-      "sha256": "767ee451689f5cee20877902df84a55ea1a11a33037d457405b4d724ffd1fa2e",
+      "bytes": 3822352,
+      "sha256": "0efaa41031770ad898a365dac2e299a3d2d7b2e8bea52c0f52cf0d21acd965aa",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -7715,18 +7715,6 @@
             "position": null,
             "rotationY": null,
             "gripRef": null
-          },
-          {
-            "asset": {
-              "url": "models/weapons/spellbook_open.glb",
-              "path": "public/models/weapons/spellbook_open.glb",
-              "bytes": 35136,
-              "sha256": "e564abd17649ec4fa471dfbfdfd1d0668987f1844ee925d8bde17b9f2ec1d6e0"
-            },
-            "bone": "handslot.l",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
           }
         ],
         "weaponFix": null,
@@ -7738,11 +7726,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3cc09042c77622a7cbff2253e1039098d7e3911d01e8a7c659bd5d7f7e206554",
+      "sourceFingerprint": "a2d7dd6d84d60194e91c7553ce5b15ce0e0aed43b2367590752fd71c21928357",
       "output": {
         "path": "public/ui/mobs/vision_malric_mage.webp",
-        "bytes": 2308,
-        "sha256": "39a14f2a460e8e3f12df58574e874d9f092a125d80ef67618582730845e6b2de"
+        "bytes": 2284,
+        "sha256": "cc9ede7ddff1c5337fdf2d70c31a7c66238297ffda71efad45c2c26b1089fd18"
       }
     },
     {

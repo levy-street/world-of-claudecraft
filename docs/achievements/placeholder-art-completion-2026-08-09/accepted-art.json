@@ -334,7 +334,7 @@
     },
     {
       "path": "docs/achievements/placeholder-art-completion-2026-08-09/portrait-rerender-evidence.json",
-      "acceptedSha256": "53c3bae430bf059198521ec3c1fcb5cc0239ace61acaf1ed9a8975c2de26969c",
+      "acceptedSha256": "aeba42ce781832fd44bbec3e657b92ba9ef3fbfd56f381a038c8c5c17c938020",
       "acceptedBytes": 13832
     },
     {
@@ -366,8 +366,8 @@
   "sourceManifests": [
     {
       "path": "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
-      "acceptedSha256": "25df71ffbfd5e30a02c4f940f909e161cb8051f836fcb3710fd4d08a58ae2dc5",
-      "acceptedBytes": 265357
+      "acceptedSha256": "a05f30b0f9eb99b69f147e9d89d059c540a6e76c4a72818f5eaccf241bf5d04d",
+      "acceptedBytes": 264926
     }
   ],
   "assets": [

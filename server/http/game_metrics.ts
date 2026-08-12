@@ -115,6 +115,9 @@ export const WOC_CHARACTERS_CREATED_TOTAL = 'woc_characters_created_total';
 /** Total guild-bank incidents on the dupe-sensitive paths, by kind. */
 export const WOC_GUILD_BANK_INCIDENTS_TOTAL = 'woc_guild_bank_incidents_total';
 
+/** Rift forge wire commands refused while the gate is closed (server/rift_forge_gate.ts). */
+export const WOC_RIFT_FORGE_REFUSED_TOTAL = 'woc_rift_forge_refused_total';
+
 /** Guild bank activity log cache readout, labeled by counter name. ONE metric
  *  with a `kind` label rather than six names: the vocabulary is closed and
  *  fixed, and an operator reads them together or not at all. */
@@ -379,6 +382,12 @@ export function registerGameStateMetrics(
     registers: [registry],
   });
 
+  const riftForgeRefusals = new Counter({
+    name: WOC_RIFT_FORGE_REFUSED_TOTAL,
+    help: 'Total rift forge wire commands refused while the gate is closed; the stock client sends none, so a non-zero rate means a modified client is probing.',
+    registers: [registry],
+  });
+
   const chatMessages = new Counter({
     name: WOC_CHAT_MESSAGES_TOTAL,
     help: 'Total player chat messages routed to other players (any channel).',
@@ -571,6 +580,13 @@ export function registerGameStateMetrics(
         inputFramesMissed.inc(missed);
       } catch {
         // Drop the sample rather than propagate into the input path.
+      }
+    },
+    riftForgeRefused(): void {
+      try {
+        riftForgeRefusals.inc();
+      } catch {
+        // Drop the sample rather than propagate into the dispatch path.
       }
     },
     chatMessage(): void {

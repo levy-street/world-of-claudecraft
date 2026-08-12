@@ -894,12 +894,12 @@ export const nl_NL: EnTranslations = {
       "update": "Bijwerken"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Spelupdate",
+      "downloading": "Update downloaden: {percent}",
+      "applying": "Update gedownload. Het spel wordt opnieuw gestart om de update toe te passen.",
+      "incompatible": "Er is een update vereist om te spelen. Deze wordt toegepast zodra het downloaden klaar is.",
+      "continueAnyway": "Doorgaan zonder bijwerken",
+      "progressLabel": "Voortgang van het downloaden van de update"
     },
     "cameraPrompt": {
       "title": "Kies je Camera",

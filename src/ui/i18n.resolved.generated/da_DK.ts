@@ -894,12 +894,12 @@ export const da_DK: EnTranslations = {
       "update": "Opdater"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Spilopdatering",
+      "downloading": "Downloader opdatering: {percent}",
+      "applying": "Opdatering downloadet. Spillet genstarter for at anvende den.",
+      "incompatible": "Der kræves en opdatering for at spille. Den anvendes, så snart den er downloadet.",
+      "continueAnyway": "Fortsæt uden at opdatere",
+      "progressLabel": "Status for download af opdatering"
     },
     "cameraPrompt": {
       "title": "Vælg dit kamera",

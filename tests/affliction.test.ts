@@ -1569,6 +1569,57 @@ describe('Affliction Warlock', () => {
     ]);
   });
 
+  it('never executes a training dummy for its whole remaining health at 100 Condemnation', () => {
+    // Issue: a capped-Condemnation Sentence against the practice dummy (999,999 hp,
+    // "you can never really fell it" per zone3.ts) reported damage equal to whatever
+    // huge remainder of its health pool a long DPS-testing session had ground it down
+    // to, instead of Sentence's normal tuned hit, corrupting the very combat meter the
+    // dummy exists to let players read.
+    const fullSim = makeAffliction(505);
+    const fullDummy = createMob(
+      (fullSim as unknown as { nextId: number }).nextId++,
+      MOBS.training_dummy,
+      20,
+      { x: fullSim.player.pos.x, y: fullSim.player.pos.y, z: fullSim.player.pos.z + 10 },
+    );
+    fullSim.addEntity(fullDummy);
+    finishCast(fullSim, 'evil_eye', fullDummy);
+    gainDoom(ctx(fullSim), fullSim.player, 100);
+    const fullHpBefore = fullDummy.hp;
+    finishCast(fullSim, 'sentence', fullDummy);
+    const normalDealt = fullHpBefore - fullDummy.hp;
+    expect(normalDealt).toBeGreaterThan(0);
+
+    const lowSim = makeAffliction(505);
+    const lowDummy = createMob(
+      (lowSim as unknown as { nextId: number }).nextId++,
+      MOBS.training_dummy,
+      20,
+      { x: lowSim.player.pos.x, y: lowSim.player.pos.y, z: lowSim.player.pos.z + 10 },
+    );
+    lowSim.addEntity(lowDummy);
+    finishCast(lowSim, 'evil_eye', lowDummy);
+    // A real hit (not a hand-set hp) so the dummy stays actively "in combat", the
+    // way a long DPS-testing session actually grinds it under the 20% threshold.
+    ctx(lowSim).dealDamage(
+      lowSim.player,
+      lowDummy,
+      lowDummy.hp - Math.floor(lowDummy.maxHp * 0.19),
+      false,
+      'shadow',
+      'Test Hit',
+      'hit',
+      true,
+    );
+    gainDoom(ctx(lowSim), lowSim.player, 100);
+    const lowHpBefore = lowDummy.hp;
+
+    finishCast(lowSim, 'sentence', lowDummy);
+
+    expect(lowHpBefore - lowDummy.hp).toBe(normalDealt);
+    expect(lowDummy.dead).toBe(false);
+  });
+
   it('keeps the level 5 Sentence below its level 20 damage curve', () => {
     const sim = new Sim({ seed: 55, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(5);

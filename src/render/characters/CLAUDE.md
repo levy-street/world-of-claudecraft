@@ -26,6 +26,11 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   site can never permanently blank the landing character-creation preview
   (`src/main.ts` awaits it there instead of `assetsReady()`;
   `tests/character_preview_boot.test.ts`).
+- `armor_dye.ts`: the outfit-colorway dye shader layer (`attachArmorDye`, plus
+  `reapplyArmorDyeToClone` for the clone path). Its own leaf module because
+  `../material_clone_hooks.ts` must re-attach it on every program-preserving
+  clone and cannot depend on the whole of `assets.ts` to do it; the spec rides
+  `Material.userData.armorDye`, which `clone()` copies while it drops the hook.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/
   ghost plumbing, one-shot triggers, death/revive edge logic.
 - `halo.ts`: the class halo (`buildHalo`, driven by `VisualDef.halo` +

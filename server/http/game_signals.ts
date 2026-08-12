@@ -2,7 +2,7 @@
 // exporter (woc_ws_messages_total, woc_ws_messages_dropped_total,
 // woc_ws_rate_kicks_total, woc_input_frames_missed_total,
 // woc_chat_messages_total, woc_characters_created_total,
-// woc_guild_bank_incidents_total) reach the exporter
+// woc_guild_bank_incidents_total, woc_rift_forge_refused_total) reach the exporter
 // through this one process-wide slot instead of each emission site (game.ts
 // message dispatch and inbound gate/lanes, chat routing, characters.ts create
 // path) threading a sink through its constructors. main.ts
@@ -166,6 +166,14 @@ export interface GameMetricsCounters {
    * server-side loss on its own (soak-packet-3.md carries the scrape guidance).
    */
   wsInputSeqGap(missed: number): void;
+  /**
+   * One Rift forge wire command refused while the gate is closed
+   * (server/rift_forge_gate.ts). The stock client never sends these, so a
+   * non-zero rate means a modified client is probing the closed forge; the
+   * counter is deliberately label-free (nothing per-player, per-account, or
+   * per-token) so a prober cannot drive cardinality.
+   */
+  riftForgeRefused(): void;
   /** One player chat message routed to other players (any channel). */
   chatMessage(): void;
   /** One character successfully created. */
@@ -250,6 +258,7 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   wsMessageDropped() {},
   wsRateKick() {},
   wsInputSeqGap() {},
+  riftForgeRefused() {},
   chatMessage() {},
   characterCreated() {},
   guildBankIncident() {},

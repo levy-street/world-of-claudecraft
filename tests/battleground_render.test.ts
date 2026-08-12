@@ -17,9 +17,14 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
-import { battlegroundPreloadAssetPaths } from '../src/render/battleground';
+import {
+  battlegroundPreloadAssetPaths,
+  buildBgFieldLights,
+  releaseBgFieldLights,
+} from '../src/render/battleground';
 import {
   BG_DRESSING_HALF_X,
   BG_DRESSING_HALF_Z,
@@ -43,6 +48,12 @@ import {
   isBattlegroundOccluderAsset,
   isPrimaryBattlegroundMeshName,
 } from '../src/render/battleground_placements';
+import { GFX } from '../src/render/gfx';
+import {
+  applyPointLightBudget,
+  flickerContributingFireLights,
+  type RankedPointLight,
+} from '../src/render/point_light_budget';
 import { BG_BASES, BG_HALF_X, BG_HALF_Z } from '../src/sim/battleground_layout';
 import {
   TH_HEIGHT_CELL,
@@ -367,6 +378,143 @@ describe('Thornhollow dressing: authored lights and decals', () => {
     const loadLine = src.split('\n').find((l) => l.includes('/decals/'));
     expect(loadLine, 'the field builder no longer loads from the decals folder').toBeTruthy();
     expect(loadLine).toContain('.webp');
+  });
+});
+
+describe('Thornhollow field lights ride the renderer point-light budget', () => {
+  // The field streams in mid-session and its lights go straight into the world.
+  // Three counts a light into numPointLights iff `visible`, and that count is
+  // part of every lit material's program cache key, so lights that appear
+  // outside the renderer's ranked budget relink every lit material in view.
+  const tierBudget = (): number => {
+    const src = readFileSync(`${ROOT}src/render/battleground.ts`, 'utf8');
+    const table = new Map(
+      [...src.matchAll(/^\s+(low|medium|high|ultra):\s*(\d+),/gm)].map(
+        (m) => [m[1], Number(m[2])] as const,
+      ),
+    );
+    expect(table.size, 'the tier budget table moved').toBe(4);
+    return table.get(GFX.tier) ?? 6;
+  };
+
+  const authoredByBrightestReach = (): {
+    x: number;
+    y: number;
+    z: number;
+    color: number;
+    intensity: number;
+    range: number;
+  }[] => [...bgFieldLights()].sort((a, b) => b.intensity * b.range - a.intensity * a.range);
+
+  it('registers every field light into the shared fire-light registry', () => {
+    const budget = tierBudget();
+    expect(budget, 'this suite needs a tier that lights the field').toBeGreaterThan(0);
+    const foreign = new THREE.PointLight(0xffffff, 3, 5, 2);
+    const fireLights: THREE.PointLight[] = [foreign];
+
+    const built = buildBgFieldLights(fireLights);
+
+    expect(built).toHaveLength(Math.min(bgFieldLights().length, budget));
+    expect(fireLights).toHaveLength(built.length + 1);
+    expect(fireLights[0]).toBe(foreign);
+    for (let index = 0; index < built.length; index++) {
+      expect(fireLights[index + 1]).toBe(built[index]);
+    }
+
+    const authored = authoredByBrightestReach();
+    for (let index = 0; index < built.length; index++) {
+      const row = authored[index];
+      const light = built[index];
+      expect(light.position.toArray()).toEqual([row.x, row.y, row.z]);
+      expect(light.distance).toBe(row.range);
+      expect(light.color.getHex()).toBe(new THREE.Color(row.color).getHex());
+      // Cosmetic warmth, dim on purpose: the authored map units are scaled way
+      // down, and the flicker pass is TOLD that level (next case).
+      expect(light.intensity).toBeCloseTo(row.intensity * 0.05, 10);
+      expect(light.userData.baseIntensity).toBe(light.intensity);
+      // A light the rank has never seen must not count in the meantime.
+      expect(light.visible).toBe(false);
+    }
+  });
+
+  it('keeps its dim authored level through a full budget and flicker pass', () => {
+    // Without userData.baseIntensity the flicker helper drives a contributing
+    // fire light at its own bright default (11), which would blow these out.
+    const fireLights: THREE.PointLight[] = [];
+    const built = buildBgFieldLights(fireLights);
+    const scene = new THREE.Scene();
+    for (const light of built) scene.add(light);
+    // The renderer's own fire-light rank shape: externally driven (base null),
+    // static, and carrying the fireIndex the flicker pass keys off.
+    const ranked: RankedPointLight[] = built.map((light, fireIndex) => ({
+      light,
+      d2: 0,
+      worldPos: light.getWorldPosition(new THREE.Vector3()),
+      base: null,
+      dynamic: false,
+      fireIndex,
+    }));
+    const count = built.length;
+    const rangeSq = 1e9;
+
+    const drawn = applyPointLightBudget(ranked, 0, 0, count, count, rangeSq, scene);
+    flickerContributingFireLights(ranked, 1.37, count, count, rangeSq);
+
+    expect(drawn).toBe(count);
+    for (const entry of ranked) {
+      const base = entry.light.userData.baseIntensity as number;
+      expect(base).toBeLessThan(2);
+      expect(entry.light.visible).toBe(true);
+      expect(entry.light.intensity).toBeGreaterThan(base * 0.5);
+      expect(entry.light.intensity).toBeLessThan(base * 1.5);
+    }
+  });
+
+  it('hands its lights back on release, leaving every other owner in place', () => {
+    const foreign = new THREE.PointLight(0xffffff, 3, 5, 2);
+    const fireLights: THREE.PointLight[] = [foreign];
+    const built = buildBgFieldLights(fireLights);
+    expect(built.length).toBeGreaterThan(0);
+
+    releaseBgFieldLights(built, fireLights);
+    expect(fireLights).toHaveLength(1);
+    expect(fireLights[0]).toBe(foreign);
+
+    // Idempotent, and a field built without a registry releases into nothing.
+    releaseBgFieldLights(built, fireLights);
+    expect(fireLights).toHaveLength(1);
+    expect(() => releaseBgFieldLights(buildBgFieldLights(), undefined)).not.toThrow();
+  });
+
+  it('wires the field into the renderer budget and back out on teardown', () => {
+    // Neither half can be reached from Node (the build awaits real GLB loads),
+    // so the wiring is pinned at the source: the renderer must hand over its
+    // registry, the build must not register after a teardown won the race, and
+    // dispose must unregister BEFORE it disposes the lights.
+    const renderer = readFileSync(`${ROOT}src/render/renderer.ts`, 'utf8');
+    const buildStart = renderer.indexOf('buildBattleground(o, this.sim.cfg.seed, {');
+    const buildEnd = renderer.indexOf('this.bgViews.set(i, view);', buildStart);
+    expect(buildStart).toBeGreaterThan(-1);
+    expect(buildEnd).toBeGreaterThan(buildStart);
+    const construction = renderer.slice(buildStart, buildEnd);
+    expect(construction).toContain('fireLights: this.fireLights,');
+    expect(construction).toContain('onFireLightsChanged: () => {');
+    expect(construction).toContain('this.lightRankDirty = true;');
+
+    const field = readFileSync(`${ROOT}src/render/battleground.ts`, 'utf8');
+    const registerIndex = field.indexOf('buildBgFieldLights(opts.fireLights)');
+    const guardIndex = field.lastIndexOf('if (disposed) return;', registerIndex);
+    expect(registerIndex).toBeGreaterThan(-1);
+    expect(guardIndex).toBeGreaterThan(-1);
+    expect(registerIndex - guardIndex).toBeLessThan(400);
+
+    const disposeStart = field.indexOf('    dispose(): void {');
+    expect(disposeStart).toBeGreaterThan(-1);
+    const dispose = field.slice(disposeStart);
+    const releaseIndex = dispose.indexOf('releaseBgFieldLights(lights, opts.fireLights);');
+    const lightDisposeIndex = dispose.indexOf('for (const light of lights) light.dispose();');
+    expect(releaseIndex).toBeGreaterThan(-1);
+    expect(lightDisposeIndex).toBeGreaterThan(releaseIndex);
   });
 });
 

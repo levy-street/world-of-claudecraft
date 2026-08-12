@@ -894,12 +894,12 @@ export const tr_TR: EnTranslations = {
       "update": "Güncelle"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Oyun Güncellemesi",
+      "downloading": "Güncelleme indiriliyor: {percent}",
+      "applying": "Güncelleme indirildi. Uygulamak için oyun yeniden başlatılıyor.",
+      "incompatible": "Oynamak için bir güncelleme gerekiyor. İndirme tamamlanır tamamlanmaz uygulanacak.",
+      "continueAnyway": "Güncelleme yapmadan devam et",
+      "progressLabel": "Güncelleme indirme ilerlemesi"
     },
     "cameraPrompt": {
       "title": "Kamera Modunu Seç",

@@ -424,6 +424,9 @@ function recordingSink() {
     wsInputSeqGap(missed) {
       seqGaps.push(missed);
     },
+    // Not exercised here: the refusal site has its own recording-sink pins in
+    // tests/rift_forge_gate.test.ts.
+    riftForgeRefused() {},
     chatMessage() {
       chats++;
     },

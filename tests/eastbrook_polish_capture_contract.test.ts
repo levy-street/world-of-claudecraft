@@ -116,13 +116,10 @@ interface AttributionTargetFixture {
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
-// Re-minted for the phase 04 QA merge of release/v0.36.0 into
-// feature/masterwrought: both sides re-minted since the common base, moving
-// renderer.ts, prewarm_policy.ts, the prop GLBs, and the lockfile leaves, so
-// the merged tree mints a value matching neither parent. No capture was
-// retaken.
+// Re-minted after the custom-shader dedupe signature fix changed
+// prewarm_policy.ts. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '93b3fe57d57fdf4179ab96d09b168a9e838e6e663c0cf5555dfec157b22f1e0b';
+  'a40c99bd60b3cd1bea3ddbd2a7e92b1fbd470e435ca04f7a53595cfa39a3a765';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

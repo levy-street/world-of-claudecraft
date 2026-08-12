@@ -11228,9 +11228,9 @@ export function tTalent(request: TalentTranslationRequest): string {
   }
   if (request.kind === 'talentChoice') {
     if (request.field === 'name') {
-      if (request.choice.id === 'war_row_double_charge') {
-        return RETAINED_ROW_TITLE_OVERRIDES[lang]?.['Double Charge'] ?? request.choice.name;
-      }
+      // The option id is FROZEN at `war_row_double_charge` so saved picks survive,
+      // but the row was re-cut to Intervene: translate the LIVE English name, never
+      // the retained pre-rename title, or every locale keeps showing "Double Charge".
       return translateTitle(request.choice.name, lang);
     }
     const retainedDescriptions = RETAINED_ROW_DESCRIPTION_OVERRIDES[lang] as

@@ -894,12 +894,12 @@ export const id_ID: EnTranslations = {
       "update": "Perbarui"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Pembaruan Game",
+      "downloading": "Mengunduh pembaruan: {percent}",
+      "applying": "Pembaruan telah diunduh. Game dimulai ulang untuk menerapkannya.",
+      "incompatible": "Pembaruan diperlukan untuk bermain. Pembaruan akan diterapkan segera setelah unduhan selesai.",
+      "continueAnyway": "Lanjutkan tanpa memperbarui",
+      "progressLabel": "Progres unduhan pembaruan"
     },
     "cameraPrompt": {
       "title": "Pilih Kameramu",

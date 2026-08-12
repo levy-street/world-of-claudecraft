@@ -402,19 +402,32 @@ export const TARGETS = [
             'druid',
           ];
           const names = ['Bryn', 'Cael', 'Dax', 'Eira', 'Finn', 'Gust', 'Hale', 'Ivo', 'Jor'];
+          const botPids = [];
           for (let i = 0; i < 9; i++) {
             const pid = sim.addPlayer(classes[i], names[i]);
             const e = sim.entities.get(pid);
             e.level = 20;
             sim.bgQueueJoin(pid);
+            botPids.push(pid);
           }
           sim.player.level = Math.max(20, sim.player.level);
           sim.bgQueueJoin();
+          window.__bgShotBotPids = botPids;
         }
         return { ok: true };
       });
       if (!staged.ok) return { skip: staged.reason };
-      await wait(400); // one tick seats the match
+      await wait(400); // one tick pops the queue and opens the ready-check proposal
+      // The queue pop is a ready-check now, not a direct seat: every one of the
+      // ten has to accept before the match seats, which is also why a capture
+      // that skipped this step shot the Accept/Decline popup instead of the
+      // field. Answer for the player and all nine bots.
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        sim.bgRespond(true);
+        for (const pid of window.__bgShotBotPids ?? []) sim.bgRespond(true, pid);
+      });
+      await wait(400); // one tick seats the accepted proposal
       const live = await page.evaluate(() => {
         const game = window.__game;
         const sim = game.sim;

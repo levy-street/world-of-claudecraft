@@ -9,7 +9,8 @@ import {
 } from '../sim/data';
 import type { ZoneDef } from '../sim/types';
 import { WATER_LEVEL } from '../sim/world';
-import { loadTexture } from './assets/loader';
+import { ktx2SiblingUrl } from './assets/ktx2_sibling';
+import { loadKtx2Texture, loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
   BIOME_HAZE_DECLARATIONS,
@@ -17,6 +18,7 @@ import {
   biomeHazeUniforms,
   hasBiomeHazeField,
 } from './biome_haze_field';
+import { isCanvasDrawableImage } from './canvas_drawable';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
 import {
@@ -109,8 +111,27 @@ function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<vo
   if (TERRAIN_TEX[key]) return Promise.resolve();
   const existing = terrainTexTasks.get(key);
   if (existing) return existing;
-  const task = loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true })
-    .then((tex) => {
+  const url = `/textures/terrain/${file}`;
+  // The ambientCG NORMAL maps ship a KTX2 sibling and are requested
+  // compressed: they stay GPU-compressed instead of decoding to a full
+  // 1024x1024 RGBA bitmap each, and they bind directly as samplers. The
+  // vertical flip is baked into the container at compress time, so `srgb`
+  // here only still selects the anisotropy budget.
+  // The six COLOUR layers deliberately stay raw JPG: buildSplatAlbedoArray
+  // drawImages them into the packed DataArrayTexture (a CompressedTexture's
+  // image is not a CanvasImageSource, and binding one here took the renderer
+  // down at world build), and on every tier that loads them the packed array
+  // is the resident form anyway, so compressing the pack SOURCE bought
+  // nothing. GroundAO_Packed.png is also NOT converted: it is a packed DATA
+  // texture whose measured per-channel statistics are baked into shader
+  // constants (see the "Measured sds" comment below), and a lossy block
+  // encode would shift them.
+  const task = (
+    url.toLowerCase().endsWith('.jpg') && !srgb
+      ? loadKtx2Texture(ktx2SiblingUrl(url), { repeat: true })
+      : loadTexture(url, { srgb, repeat: true })
+  )
+    .then((tex: THREE.Texture) => {
       tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
       TERRAIN_TEX[key] = tex;
     })
@@ -725,6 +746,7 @@ let splatAlbedoCache: SplatAlbedoArray | null = null;
  * that had to fill any placeholder re-packs on the next world build, when
  * the deferred preload has had time to land.
  */
+
 function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArray {
   if (splatAlbedoCache?.complete) return splatAlbedoCache;
   const size = SPLAT_ALBEDO_SIZE;
@@ -736,7 +758,8 @@ function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArr
   let complete = true;
   let grassMean: [number, number, number] | null = null;
   for (let layer = 0; layer < SPLAT_ALBEDO_LAYERS.length; layer++) {
-    const img = t[SPLAT_ALBEDO_LAYERS[layer]]?.image as CanvasImageSource | undefined;
+    const raw = t[SPLAT_ALBEDO_LAYERS[layer]]?.image as unknown;
+    const img = isCanvasDrawableImage(raw) ? raw : undefined;
     const w = (img as { width?: number } | undefined)?.width;
     const dst = data.subarray(layer * size * size * 4, (layer + 1) * size * size * 4);
     if (!ctx || !img || !w) {

@@ -17,10 +17,24 @@
 // unit STARTS: a higher-priority arrival can still wait on a full cap, but
 // that wait is bounded by the shortest in-flight tail instead of the whole
 // serial hold, so it is never longer than the pre-release policy's.
+//
+// The OTHER half of the policy (hitch-hunt P1): boot-debt resume batches keep
+// their tail HELD on purpose. Released tails let every debt batch's links
+// pile into the driver concurrently; with a whole dropped manifest that queue
+// depth made every live first draw block for seconds. One settled batch at a
+// time keeps the driver link queue shallow, at the cost of a live gate
+// waiting up to one debt batch's settle before it starts; the canvas
+// nameplate carries the actionable channel through that wait.
 
 export const GPU_WORK_PRIORITY = {
   BOOT_RESUME: 0,
   BACKGROUND: 10,
+  // Dropped-prewarm LINK/UPLOAD DEBT (prewarmResumeIsDebt in
+  // prewarm_policy.ts): unpaid, it surfaces as first-draw stalls in live
+  // frames, so it outranks the cosmetic BACKGROUND warmers (production
+  // measured the preview lane starving it for minutes) but stays under the
+  // streamed-zone prepare and every live gate.
+  BOOT_DEBT: 15,
   VISIBLE_PREWARM: 20,
   LIVE_VIEW: 30,
   ACTIONABLE_VIEW: 40,

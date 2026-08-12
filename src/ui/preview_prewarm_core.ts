@@ -69,8 +69,13 @@ export interface PreviewPrewarmPlanDeps<Pose> {
   renderCharShell: () => void;
   prewarmCharSkin: (skin: number) => void | Promise<void>;
   prewarmCardPose: (pose: Pose) => void | Promise<void>;
-  renderPortrait: (cls: string, skin: number, framing: 'headshot' | 'body') => void;
+  renderPortrait: (cls: string, skin: number, framing: 'headshot' | 'body') => void | Promise<void>;
   prewarmArmorySkin: (skinId: string, mode: 'character' | 'weapon') => void | Promise<void>;
+  /** Runs once after the last armory unit: the per-unit warmups keep the small
+   *  warmup drawing buffer in place (restoring it per unit cost two composer
+   *  target reallocations plus a forced full-size draw EVERY unit), and this
+   *  restores the live-size buffer once. */
+  finishArmoryPrewarm: () => void | Promise<void>;
 }
 
 /** Build the ordered post-entry preview prewarm plan: the shared paperdoll
@@ -112,9 +117,11 @@ export function buildPostEntryPreviewPrewarmUnits<Pose>(
         units.push({
           family: 'char',
           label: `preview:portrait:${portraitClass}:${skin}:${framing}`,
-          run: () => {
-            deps.renderPortrait(portraitClass, skin, framing);
-          },
+          // Expression body ON PURPOSE: renderPortrait may return a promise
+          // (the async prewarm path), and the paced lane awaits a unit's
+          // return value. A block body would discard it and the schedule
+          // would advance mid-render.
+          run: () => deps.renderPortrait(portraitClass, skin, framing),
         });
       }
     }
@@ -127,6 +134,13 @@ export function buildPostEntryPreviewPrewarmUnits<Pose>(
         run: () => deps.prewarmArmorySkin(skinId, armoryMode),
       });
     }
+  }
+  if (deps.armorySkinIds.length > 0) {
+    units.push({
+      family: 'armory',
+      label: 'preview:armory:finalize',
+      run: () => deps.finishArmoryPrewarm(),
+    });
   }
   return units;
 }

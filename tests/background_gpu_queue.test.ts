@@ -110,13 +110,25 @@ describe('createBackgroundGpuQueue', () => {
     const highTwo = queue.run(async () => {
       events.push('high-two');
     }, GPU_WORK_PRIORITY.LIVE_VIEW);
+    // Behavioral pin for the debt class: enqueued alongside a BACKGROUND
+    // preview unit, the debt unit starts first.
+    const preview = queue.run(async () => {
+      events.push('preview');
+    }, GPU_WORK_PRIORITY.BACKGROUND);
+    const debt = queue.run(async () => {
+      events.push('debt');
+    }, GPU_WORK_PRIORITY.BOOT_DEBT);
 
     releaseActive();
-    await Promise.all([active, low, highOne, medium, highTwo]);
-    expect(events).toEqual(['active', 'high-one', 'high-two', 'medium', 'low']);
+    await Promise.all([active, low, highOne, medium, highTwo, preview, debt]);
+    expect(events).toEqual(['active', 'high-one', 'high-two', 'medium', 'debt', 'preview', 'low']);
     expect(GPU_WORK_PRIORITY.ACTIONABLE_VIEW).toBeGreaterThan(GPU_WORK_PRIORITY.LIVE_VIEW);
     expect(GPU_WORK_PRIORITY.LIVE_VIEW).toBeGreaterThan(GPU_WORK_PRIORITY.VISIBLE_PREWARM);
-    expect(GPU_WORK_PRIORITY.VISIBLE_PREWARM).toBeGreaterThan(GPU_WORK_PRIORITY.BACKGROUND);
+    // Dropped-prewarm link/upload debt outranks the cosmetic BACKGROUND
+    // warmers (the preview lane starved it for minutes in production) but
+    // stays under the streamed-zone prepare and every live gate.
+    expect(GPU_WORK_PRIORITY.VISIBLE_PREWARM).toBeGreaterThan(GPU_WORK_PRIORITY.BOOT_DEBT);
+    expect(GPU_WORK_PRIORITY.BOOT_DEBT).toBeGreaterThan(GPU_WORK_PRIORITY.BACKGROUND);
     expect(GPU_WORK_PRIORITY.BACKGROUND).toBeGreaterThan(GPU_WORK_PRIORITY.BOOT_RESUME);
   });
 
@@ -701,7 +713,14 @@ describe('createBackgroundGpuQueue', () => {
     expect(archetypes).toContain('this.backgroundGpuWork.run(');
     expect(texture).toContain('this.backgroundGpuWork.run(');
     expect(initial).toContain(
-      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id, {',
+      'return this.backgroundGpuWork.run(\n                unit.run,\n                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,\n                unit.id,',
     );
+    // Debt batches hold their tail (serial, settled-before-next) so the
+    // driver link queue stays shallow; only cosmetic resume releases it.
+    expect(initial).toContain('releaseTail: !debt,');
+    // The class decision itself must stay wired to the owning entry: with
+    // `const debt = false` (or the wrong id) every priority claim above
+    // silently degrades to BOOT_RESUME with the suite green (QA finding B1).
+    expect(initial).toContain('const debt = prewarmResumeIsDebt(entry.id);');
   });
 });
