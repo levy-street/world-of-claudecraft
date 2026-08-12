@@ -120,6 +120,21 @@ Binding of Isaac's Filigree Feather, GW2's The Missing Facet, Lost Ark's Facet o
 Another Level; shared jewelry vocabulary, not a coined term). Grandmaster
 Jewelcrafting (prog_grandmaster_jewelcrafting title) follows the shipped mechanical
 Grandmaster-craft family, generic by construction.
+Phase 08 amendments (2026-08-12, all web-verified at authoring by a proposing
+agent plus an adversarial second pass; full verdicts in naming-audit.md): the ten
+apex armor names, all CLEAR: Spiritweld Girdle, Forgefold Legguards, Wardspeaker
+Sabatons, Briarstep Jerkin, Fenbloom Breeches, Barksong Handguards, Sunspun
+Vestments, Sunspun Leggings, Sunspun Handwraps, Sunspun Haversack. New coins:
+Spiritweld, Wardspeaker, Briarstep, Fenbloom, Barksong; Forgefold and Sunspun
+extend their registry families with generic slot nouns (the Sunspun FFXIV-mount
+caveat does not worsen). Rejected at authoring: Galerune Treads (adversarial
+BORDERLINE upheld: this game's own Galecall mail-caster set makes another Gale-
+compound on mail caster gear read as false set membership), Hexlink Girdle (live
+Hexlink coins outside the seven wikis), Anvilmarch Legguards (WoW Anvilmar
+adjacency), Forgefold Waistguard/Treads (CLEAR but a cross-archetype matched-set
+misread), Warhewn Legguards (CLEAR alternate, lost to the zero-coin extension).
+Wardspeaker's considered adjacency: FFXIV's two-word possessive Ward Mage's /
+Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
 
 ## Validation matrix (per change type)
 - sim-only: `npx tsc --noEmit` + affected `npx vitest run tests/<file>.ts` +

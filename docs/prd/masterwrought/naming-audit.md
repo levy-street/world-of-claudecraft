@@ -184,6 +184,52 @@ Vellum.
   the phrase names their integration). In-repo neighbors checked: no
   "vellum" anywhere prior; quill appears only in the deed names Founder's
   Quill and Quill and Pigment, a different surface.
+- MINTED AT PHASE 08 (the ten apex armor names, all web-verified 2026-08-12,
+  each by the proposing agent AND an adversarial second pass, plus in-repo
+  neighbor greps; new coins are Spiritweld, Wardspeaker, Briarstep, Fenbloom,
+  and Barksong):
+  - **Spiritweld Girdle** (int-mail waist) CLEAR: coin Spiritweld zero-hit
+    everywhere (nearest WoW's Reinforced Spiritplate Girdle, a different
+    coin); no weld compound in-repo.
+  - **Forgefold Legguards** (str-mail legs) CLEAR: zero new coins, the
+    sanctioned family extension of the registry-verified Forgefold with a
+    generic slot noun; full pairing zero-hit (nearest WoW Forgehand's /
+    Battleforge Legguards, different names).
+  - **Wardspeaker Sabatons** (int-mail feet) CLEAR: fused coin Wardspeaker
+    zero-hit as any game item (nearest: Pathfinder's two-word Ward Speaker
+    samurai ARCHETYPE, outside the seven wikis and a class not an item);
+    full pairing zero-hit; recorded adjacency considered and passed: FFXIV
+    ships ilvl-1 "Ward Mage's Sabatons" / "Ward Knight's Sabatons",
+    two-word possessive forms sharing only the generic ward and sabaton
+    vocabulary. ADOPTED OVER the proposing agent's Galerune Treads, whose
+    adversarial verdict BORDERLINE was upheld: the web side was clean but
+    this game's own Galecall mail-caster epic set (stormcallers display
+    family) makes another Gale- compound on mail caster gear read as false
+    set membership, the composed-surface confusion class the phase 03 QA
+    minted guards for.
+  - **Briarstep Jerkin** (agi-leather chest) CLEAR both passes: coin
+    Briarstep zero-hit; nearest are WoW's Briarsteel weapons, a different
+    compound.
+  - **Fenbloom Breeches** (int-leather legs) CLEAR both passes: coin
+    Fenbloom zero-hit (fen and bloom are generic marsh vocabulary; GW2's
+    Fen Bloom exists only as two separate words in unrelated contexts).
+  - **Barksong Handguards** (int-leather gloves) CLEAR both passes: coin
+    Barksong zero-hit as a game item token; druidic bark plus song generics.
+  - **Sunspun Vestments / Sunspun Leggings / Sunspun Handwraps / Sunspun
+    Haversack** (cloth pieces plus the apex bag) CLEAR both passes: zero
+    new coins, the family extension of the registry-kept Sunspun (its
+    recorded caveat, FFXIV's cash-shop Sunspun Cumulus MOUNT, is a
+    different role and does not worsen with generic armor/bag nouns); all
+    four full pairings zero-hit.
+  - Rejected at authoring: Hexlink Girdle (BORDERLINE: live Hexlink coins
+    outside the seven wikis, a Web3 company, a Minecraft Hex Casting addon,
+    and the Hex Link mobile game), Anvilmarch Legguards (BORDERLINE:
+    phonetic adjacency to WoW's Anvilmar settlement), Galerune Treads (the
+    in-repo Galecall adjacency above), Forgefold Waistguard and Forgefold
+    Treads (CLEAR but passed over: three Forgefold pieces spanning two stat
+    archetypes would read as one matched set with mismatched stats),
+    Warhewn Legguards (CLEAR standalone alternate, lost to the zero-coin
+    family extension).
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
