@@ -5554,6 +5554,7 @@ export const fr_FR: EnTranslations = {
       "sourceTrainerFee": "Formateur, {fee}",
       "sourceTrainerFree": "Formateur, gratuit",
       "sourceKnown": "Connu dès le départ",
+      "sourceDrop": "From a found pattern",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "Recette",
       "colSkill": "Compétence",

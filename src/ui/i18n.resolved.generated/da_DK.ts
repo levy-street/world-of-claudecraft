@@ -5554,6 +5554,7 @@ export const da_DK: EnTranslations = {
       "sourceTrainerFee": "Træner, {fee}",
       "sourceTrainerFree": "Træner, gratis",
       "sourceKnown": "Kendes fra starten",
+      "sourceDrop": "From a found pattern",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "Opskrift",
       "colSkill": "Færdighed",

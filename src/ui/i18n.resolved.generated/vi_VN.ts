@@ -5554,6 +5554,7 @@ export const vi_VN: EnTranslations = {
       "sourceTrainerFee": "Huấn Luyện Viên, {fee}",
       "sourceTrainerFree": "Huấn Luyện Viên, miễn phí",
       "sourceKnown": "Biết từ đầu",
+      "sourceDrop": "From a found pattern",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "Công thức",
       "colSkill": "Kỹ năng",

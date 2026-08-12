@@ -1723,7 +1723,13 @@ describe('Guide professions generated content accuracy', () => {
         expect(row.skillReq).toBe(def.skillReq);
         expect(row.tier).toBe(tierForSkill(def.skillReq));
         expect(row.station).toBe(def.stationType ?? null);
-        expect(row.acquisition).toBe(def.acquisition?.includes('trainer') ? 'trainer' : 'known');
+        expect(row.acquisition).toBe(
+          def.acquisition?.includes('trainer')
+            ? 'trainer'
+            : def.acquisition?.includes('drop')
+              ? 'drop'
+              : 'known',
+        );
         expect(row.feeCopper).toBe(def.acquisition?.includes('trainer') ? trainingFeeFor(def) : 0);
         expect(row.materials).toEqual(
           def.reagents.map((g) => ({ name: ITEMS[g.itemId].name, count: g.count })),
@@ -1769,6 +1775,14 @@ describe('Guide professions generated content accuracy', () => {
     expect(pick?.acquisition).toBe('known');
     expect(pick?.feeCopper).toBe(0);
     expect(pick?.gain).toEqual({ reducedAt: 100, minimalAt: 125, zeroAt: 150 });
+    // A drop-taught apex row (Masterwrought phase 08, R8): the third
+    // acquisition arm, never 'known' (the row must not claim a pattern-drop
+    // recipe is known from the start), no trainer fee.
+    const ac = GUIDE_PROF_CRAFTS.find((c) => c.id === 'armorcrafting');
+    const apexLegs = ac?.recipes.find((r) => r.id === 'recipe_forgefold_legguards');
+    expect(apexLegs?.acquisition).toBe('drop');
+    expect(apexLegs?.feeCopper).toBe(0);
+    expect(apexLegs?.skillReq).toBe(100);
     // Specialization: skill 75, 20 percent material discount, from content.
     for (const c of GUIDE_PROF_CRAFTS) {
       expect(c.specialization.at).toBe(PERK_THRESHOLDS[c.id].specializedSkillThreshold);

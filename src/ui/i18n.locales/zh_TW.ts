@@ -10538,6 +10538,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.sourceTrainerFee': '訓練師，{fee}',
   'guide.profPages.sourceTrainerFree': '訓練師，免費',
   'guide.profPages.sourceKnown': '初始即會',
+  'guide.profPages.sourceDrop': '習自尋獲的圖樣',
   'guide.profPages.colRecipe': '配方',
   'guide.profPages.colSkill': '技能',
   'guide.profPages.colSource': '來源',

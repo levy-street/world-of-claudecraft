@@ -5554,6 +5554,7 @@ export const cs_CZ: EnTranslations = {
       "sourceTrainerFee": "Trenér, {fee}",
       "sourceTrainerFree": "Trenér, zdarma",
       "sourceKnown": "Známo od začátku",
+      "sourceDrop": "From a found pattern",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "Recept",
       "colSkill": "Dovednost",

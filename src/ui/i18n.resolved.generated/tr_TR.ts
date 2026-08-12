@@ -5554,6 +5554,7 @@ export const tr_TR: EnTranslations = {
       "sourceTrainerFee": "Eğitmen, {fee}",
       "sourceTrainerFree": "Eğitmen, ücretsiz",
       "sourceKnown": "Başlangıçtan bilinir",
+      "sourceDrop": "From a found pattern",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "Tarif",
       "colSkill": "Beceri",

@@ -11020,6 +11020,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.sourceTrainerFee': '訓練師、{fee}',
   'guide.profPages.sourceTrainerFree': '訓練師、無料',
   'guide.profPages.sourceKnown': '最初から習得済み',
+  'guide.profPages.sourceDrop': '見つけた図案から習得',
   'guide.profPages.colRecipe': 'レシピ',
   'guide.profPages.colSkill': 'スキル',
   'guide.profPages.colSource': '入手先',

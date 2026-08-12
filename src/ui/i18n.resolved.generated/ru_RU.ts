@@ -5554,6 +5554,7 @@ export const ru_RU: EnTranslations = {
       "sourceTrainerFee": "Учитель, {fee}",
       "sourceTrainerFree": "Учитель, бесплатно",
       "sourceKnown": "Известен с самого начала",
+      "sourceDrop": "Из найденной схемы",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "Рецепт",
       "colSkill": "Навык",

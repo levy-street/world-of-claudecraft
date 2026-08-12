@@ -5554,6 +5554,7 @@ export const en_XA: EnTranslations = {
       "sourceTrainerFee": "[Ţŕáíñéŕ, {fee}]",
       "sourceTrainerFree": "[Ţŕáíñéŕ, ƒŕéé]",
       "sourceKnown": "[Ķñóŵñ ƒŕóɱ ţĥé šţáŕţ]",
+      "sourceDrop": "[Ƒŕóɱ á ƒóúñð þáţţéŕñ]",
       "gainFmt": "[{reduced} / {minimal} / {zero}]",
       "colRecipe": "[Ŕéçíþé]",
       "colSkill": "[Šķíļļ]",

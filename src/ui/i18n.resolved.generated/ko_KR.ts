@@ -5554,6 +5554,7 @@ export const ko_KR: EnTranslations = {
       "sourceTrainerFee": "훈련사, {fee}",
       "sourceTrainerFree": "훈련사, 무료",
       "sourceKnown": "처음부터 습득",
+      "sourceDrop": "발견한 도안으로 습득",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "제조법",
       "colSkill": "기술",

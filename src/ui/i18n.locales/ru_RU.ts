@@ -11190,6 +11190,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.sourceTrainerFee': 'Учитель, {fee}',
   'guide.profPages.sourceTrainerFree': 'Учитель, бесплатно',
   'guide.profPages.sourceKnown': 'Известен с самого начала',
+  'guide.profPages.sourceDrop': 'Из найденной схемы',
   'guide.profPages.colRecipe': 'Рецепт',
   'guide.profPages.colSkill': 'Навык',
   'guide.profPages.colSource': 'Источник',

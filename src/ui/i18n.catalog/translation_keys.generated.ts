@@ -6046,6 +6046,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.recipesNote'
   | 'guide.profPages.rhythmBody'
   | 'guide.profPages.rhythmHeading'
+  | 'guide.profPages.sourceDrop'
   | 'guide.profPages.sourceKnown'
   | 'guide.profPages.sourceTrainerFee'
   | 'guide.profPages.sourceTrainerFree'

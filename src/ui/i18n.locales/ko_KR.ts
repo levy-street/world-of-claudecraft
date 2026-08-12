@@ -11003,6 +11003,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.sourceTrainerFee': '훈련사, {fee}',
   'guide.profPages.sourceTrainerFree': '훈련사, 무료',
   'guide.profPages.sourceKnown': '처음부터 습득',
+  'guide.profPages.sourceDrop': '발견한 도안으로 습득',
   'guide.profPages.colRecipe': '제조법',
   'guide.profPages.colSkill': '기술',
   'guide.profPages.colSource': '출처',

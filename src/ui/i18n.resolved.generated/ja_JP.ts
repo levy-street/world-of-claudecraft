@@ -5554,6 +5554,7 @@ export const ja_JP: EnTranslations = {
       "sourceTrainerFee": "訓練師、{fee}",
       "sourceTrainerFree": "訓練師、無料",
       "sourceKnown": "最初から習得済み",
+      "sourceDrop": "見つけた図案から習得",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "レシピ",
       "colSkill": "スキル",

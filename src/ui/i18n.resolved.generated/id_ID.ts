@@ -5554,6 +5554,7 @@ export const id_ID: EnTranslations = {
       "sourceTrainerFee": "Pelatih, {fee}",
       "sourceTrainerFree": "Pelatih, gratis",
       "sourceKnown": "Diketahui dari awal",
+      "sourceDrop": "From a found pattern",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "Resep",
       "colSkill": "Keahlian",

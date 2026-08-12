@@ -383,10 +383,24 @@ function deriveMastery(pool: ProfessionRecipeRecord[], attunement: Attunement): 
 // character per reset day. Left in, the Phase 07 forgefold row reads as the
 // cheapest skill-75 rung via a path no leveling player can walk (75
 // catalyst-days for the rung's crafts). The pacing alarm keeps measuring
-// the ungated ladder.
+// the ungated ladder. The gate is TRANSITIVE (phase 08): an output whose
+// recipe consumes a daily-gated output is itself daily-gated (the apex rows
+// consume the intermediates, which consume the catalyst; one apex piece is
+// 3 catalyst-days), so the closure keeps every rung of the chain out, not
+// just the catalyst's direct consumers.
 const DAILY_GATED_OUTPUT_IDS = new Set(
   ALL_RECIPES.filter((r) => r.oncePerDay).map((r) => r.resultItemId),
 );
+for (let grew = true; grew; ) {
+  grew = false;
+  for (const r of ALL_RECIPES) {
+    if (DAILY_GATED_OUTPUT_IDS.has(r.resultItemId)) continue;
+    if (r.reagents.some((reagent) => DAILY_GATED_OUTPUT_IDS.has(reagent.itemId))) {
+      DAILY_GATED_OUTPUT_IDS.add(r.resultItemId);
+      grew = true;
+    }
+  }
+}
 const ARMORCRAFTING_RECIPES = ALL_RECIPES.filter(
   (recipe) =>
     recipe.professionId === CRAFT &&
@@ -402,6 +416,17 @@ describe('the daily-gate exclusion actually excludes (filter liveness)', () => {
     expect(DAILY_GATED_OUTPUT_IDS.has('quickening_catalyst')).toBe(true);
     expect(ARMORCRAFTING_RECIPES.length).toBeGreaterThan(0);
     expect(ARMORCRAFTING_RECIPES.map((r) => r.id)).not.toContain('recipe_forgefold_plating');
+  });
+
+  it('the closure reaches the apex rung: second-hop chain members stay out (phase 08)', () => {
+    // The apex rows never touch the catalyst directly; without the
+    // transitive closure they enter the pool, hijack the cheapest-path model
+    // through reagents the gathered-units metric prices at zero, and the
+    // climb pin above them reds (exactly how this arm was born).
+    expect(DAILY_GATED_OUTPUT_IDS.has('forgefold_plating')).toBe(true);
+    expect(DAILY_GATED_OUTPUT_IDS.has('forgefold_legguards')).toBe(true);
+    expect(ARMORCRAFTING_RECIPES.map((r) => r.id)).not.toContain('recipe_forgefold_legguards');
+    expect(ARMORCRAFTING_RECIPES.map((r) => r.id)).not.toContain('recipe_spiritweld_girdle');
   });
 });
 const ATTUNEMENT = attunedArmorcrafter();

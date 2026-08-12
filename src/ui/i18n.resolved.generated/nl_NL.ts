@@ -5554,6 +5554,7 @@ export const nl_NL: EnTranslations = {
       "sourceTrainerFee": "Trainer, {fee}",
       "sourceTrainerFree": "Trainer, gratis",
       "sourceKnown": "Al bekend vanaf het begin",
+      "sourceDrop": "From a found pattern",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "Recept",
       "colSkill": "Vaardigheid",

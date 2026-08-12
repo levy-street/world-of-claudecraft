@@ -5554,6 +5554,7 @@ export const pt_BR: EnTranslations = {
       "sourceTrainerFee": "Instrutor, {fee}",
       "sourceTrainerFree": "Instrutor, grátis",
       "sourceKnown": "Conhecido desde o início",
+      "sourceDrop": "From a found pattern",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "Receita",
       "colSkill": "Habilidade",

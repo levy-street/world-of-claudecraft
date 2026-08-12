@@ -138,7 +138,7 @@ export interface GuideProfRecipe {
   skillReq: number;
   tier: number;
   station: string | null;
-  acquisition: 'trainer' | 'known';
+  acquisition: 'trainer' | 'drop' | 'known';
   feeCopper: number;
   materials: GuideProfMaterial[];
   output: { name: string; count: number; quality: string };
@@ -9184,7 +9184,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "tannery",
-        "acquisition": "known",
+        "acquisition": "drop",
         "feeCopper": 0,
         "materials": [
           {
@@ -9223,7 +9223,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "tannery",
-        "acquisition": "known",
+        "acquisition": "drop",
         "feeCopper": 0,
         "materials": [
           {
@@ -9262,7 +9262,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "tannery",
-        "acquisition": "known",
+        "acquisition": "drop",
         "feeCopper": 0,
         "materials": [
           {
@@ -9792,7 +9792,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "loom",
-        "acquisition": "known",
+        "acquisition": "drop",
         "feeCopper": 0,
         "materials": [
           {
@@ -9831,7 +9831,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "loom",
-        "acquisition": "known",
+        "acquisition": "drop",
         "feeCopper": 0,
         "materials": [
           {
@@ -9870,7 +9870,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "loom",
-        "acquisition": "known",
+        "acquisition": "drop",
         "feeCopper": 0,
         "materials": [
           {
@@ -9909,7 +9909,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "loom",
-        "acquisition": "known",
+        "acquisition": "drop",
         "feeCopper": 0,
         "materials": [
           {
@@ -11712,7 +11712,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "forge",
-        "acquisition": "known",
+        "acquisition": "drop",
         "feeCopper": 0,
         "materials": [
           {
@@ -11751,7 +11751,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "forge",
-        "acquisition": "known",
+        "acquisition": "drop",
         "feeCopper": 0,
         "materials": [
           {
@@ -11790,7 +11790,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "forge",
-        "acquisition": "known",
+        "acquisition": "drop",
         "feeCopper": 0,
         "materials": [
           {

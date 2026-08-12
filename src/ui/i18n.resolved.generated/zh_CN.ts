@@ -5554,6 +5554,7 @@ export const zh_CN: EnTranslations = {
       "sourceTrainerFee": "训练师，{fee}",
       "sourceTrainerFree": "训练师，免费",
       "sourceKnown": "初始即会",
+      "sourceDrop": "习自寻获的图样",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "配方",
       "colSkill": "技能",

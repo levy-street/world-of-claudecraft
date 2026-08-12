@@ -59,6 +59,9 @@ function sourceCell(r: GuideProfRecipe): string {
       ? esc(t('guide.profPages.sourceTrainerFee', { fee: formatMoney(r.feeCopper) }))
       : esc(t('guide.profPages.sourceTrainerFree'));
   }
+  // Drop-taught (the Masterwrought apex rows, R8): the pattern items land in
+  // phase 11, but the row must never claim the recipe is known from the start.
+  if (r.acquisition === 'drop') return esc(t('guide.profPages.sourceDrop'));
   return esc(t('guide.profPages.sourceKnown'));
 }
 
