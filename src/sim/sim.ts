@@ -3521,24 +3521,27 @@ export class Sim {
         // Tokens are additionally filtered to LIVE oncePerDay recipe ids
         // (the node_persist anti-tamper doctrine: load-side, so a tampered
         // or orphaned stamp, or one whose recipe lost the flag, drops here
-        // instead of riding the save verbatim; the DATE field is not
-        // filtered, so a surviving date alone can still keep the row
-        // serialized until the next successful craft rolls the window).
+        // instead of riding the save verbatim). A date whose stamps ALL
+        // filtered away resets with them: an empty set gates nothing, and a
+        // kept date would re-serialize {date, crafted: []} forever, breaking
+        // the zero-default omission's byte-identity claim below.
+        const craftedStamps = new Set(
+          Array.isArray(s.craftDaily.crafted)
+            ? s.craftDaily.crafted
+                .filter(
+                  (x) => typeof x === 'string' && x.length <= 64 && ONCE_PER_DAY_RECIPE_IDS.has(x),
+                )
+                .slice(0, 32)
+            : [],
+        );
         meta.craftDaily = {
           date:
-            typeof s.craftDaily.date === 'string' && s.craftDaily.date.length <= 64
+            craftedStamps.size > 0 &&
+            typeof s.craftDaily.date === 'string' &&
+            s.craftDaily.date.length <= 64
               ? s.craftDaily.date
               : '',
-          crafted: new Set(
-            Array.isArray(s.craftDaily.crafted)
-              ? s.craftDaily.crafted
-                  .filter(
-                    (x) =>
-                      typeof x === 'string' && x.length <= 64 && ONCE_PER_DAY_RECIPE_IDS.has(x),
-                  )
-                  .slice(0, 32)
-              : [],
-          ),
+          crafted: craftedStamps,
         };
       }
       // Normalized through the anchor parser, not stored verbatim: any

@@ -453,7 +453,7 @@ function craftDailyLimitReached(
   return meta.craftDaily.crafted.has(recipe.id);
 }
 
-/** Pre-consume craft admission gates (station, combo, known, daily limit,
+/** Pre-consume craft admission gates (daily limit, station, combo, known,
  *  materials, bag capacity). No gold fee, no consume, no rng, no throttle.
  *  Shared by craft cast start and the complete/resolve success body so the
  *  two never diverge. Returns a denial CraftResult, or null when admitted. */
