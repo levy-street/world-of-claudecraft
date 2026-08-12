@@ -37,7 +37,12 @@ import {
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import { WARFARE_ITEMS } from '../../src/sim/content/pvp_honor';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../../src/sim/data';
-import { canEquipItem, canEquipItemInSlot, isShieldItem } from '../../src/sim/equipment_rules';
+import {
+  MASTERWROUGHT_EQUIP_CAP,
+  canEquipItem,
+  canEquipItemInSlot,
+  isShieldItem,
+} from '../../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../../src/sim/item_level_req';
 import type { CharacterState } from '../../src/sim/sim';
 import { Sim } from '../../src/sim/sim';
@@ -565,5 +570,51 @@ describe('boostAccountCharacters', () => {
     deps.createCharacter = async () => 'name_taken';
     const count = await boostAccountCharacters(42, deps);
     expect(count).toBe(0);
+  });
+});
+
+describe('Masterwrought equip-cap awareness (phase 08)', () => {
+  // Before enforceMasterwroughtCap, four role kits (warrior/prot,
+  // paladin/holy, paladin/protection, shaman/elemental) picked THREE flagged
+  // apex pieces, and buildBoostedCharacterState hard-throws when the third
+  // equip is refused (the state.md phases 03/08 open item: a flagged-heavy
+  // BiS kit is a boot-time crash, not a quiet miscount). The sweep holds
+  // every role kit of every class at the cap.
+  it('every role kit of every class carries at most the cap in flagged pieces', () => {
+    for (const cls of Object.keys(CLASS_ROLES) as PlayerClass[]) {
+      for (const role of CLASS_ROLES[cls]) {
+        const kit = bisKitForRole(cls, role);
+        const flagged = Object.values(kit).filter((id) => id && ITEMS[id]?.masterwrought);
+        expect(
+          flagged.length,
+          `${cls}/${role.id} kit exceeds the Masterwrought cap: ${flagged.join(', ')}`,
+        ).toBeLessThanOrEqual(MASTERWROUGHT_EQUIP_CAP);
+      }
+    }
+  });
+
+  it('a demoted slot falls back to the best unflagged piece, not to empty', () => {
+    // shaman/elemental was the worst offender pre-fix (waist, legs, and feet
+    // all apex). The kept pair is the two cap-highest scoring flagged picks
+    // (the mail pieces, whose armor credit outscores the leather legs for a
+    // mail wearer); the demoted legs slot must still hold a real, unflagged,
+    // shaman-equippable item.
+    const role = CLASS_ROLES.shaman.find((r) => r.id === 'elemental');
+    expect(role, 'shaman elemental role exists').toBeTruthy();
+    const kit = bisKitForRole('shaman', role as BoostRole);
+    expect(kit.waist).toBe('spiritweld_girdle');
+    expect(kit.feet).toBe('wardspeaker_sabatons');
+    expect(kit.legs, 'legs slot still filled').toBeTruthy();
+    expect(ITEMS[kit.legs as string]?.masterwrought, 'demoted legs pick unflagged').toBeFalsy();
+    expect(canEquipItem('shaman', ITEMS[kit.legs as string])).toBe(true);
+  });
+
+  it('the previously-crashing class builds a boosted character without throwing', () => {
+    const state = buildBoostedCharacterState('shaman', 'Pbetestsham', 2);
+    expect(state.level).toBe(BOOST_LEVEL);
+    const flaggedWorn = Object.values(state.equipment).filter(
+      (id) => id && ITEMS[id]?.masterwrought,
+    );
+    expect(flaggedWorn.length).toBeLessThanOrEqual(MASTERWROUGHT_EQUIP_CAP);
   });
 });

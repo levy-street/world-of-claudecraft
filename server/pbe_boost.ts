@@ -34,6 +34,7 @@ import { randomInt } from 'node:crypto';
 import { BAG_SOCKETS } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import {
+  MASTERWROUGHT_EQUIP_CAP,
   canDualWield,
   canEquipItem,
   canEquipItemInSlot,
@@ -350,6 +351,9 @@ export function bisKitForRole(
   role: BoostRole,
 ): Partial<Record<EquipSlot, string>> {
   const bestBySlot = new Map<string, { id: string; score: number }>();
+  // The best NON-masterwrought pick per slot: the demotion target when the
+  // raw picks exceed the Masterwrought equip cap below.
+  const bestUnflaggedBySlot = new Map<string, { id: string; score: number }>();
   const rings: { id: string; score: number }[] = [];
   const weapons: { id: string; score: number; twoHand: boolean }[] = [];
   const shields: { id: string; score: number }[] = [];
@@ -369,6 +373,12 @@ export function bisKitForRole(
     const slot = item.slot as string;
     const best = bestBySlot.get(slot);
     if (!best || score > best.score) bestBySlot.set(slot, { id: item.id, score });
+    if (!item.masterwrought) {
+      const bestPlain = bestUnflaggedBySlot.get(slot);
+      if (!bestPlain || score > bestPlain.score) {
+        bestUnflaggedBySlot.set(slot, { id: item.id, score });
+      }
+    }
   }
   rings.sort((a, b) => b.score - a.score);
   weapons.sort((a, b) => b.score - a.score);
@@ -384,7 +394,48 @@ export function bisKitForRole(
   fillHands(cls, role, kit, weapons, shields, bestBySlot.get('offhand'));
   if (rings[0]) kit.ring1 = rings[0].id;
   if (rings[1]) kit.ring2 = rings[1].id;
+  enforceMasterwroughtCap(role, kit, bestUnflaggedBySlot, rings);
   return kit;
+}
+
+/** Keep a kit inside the Masterwrought counted equip family: at most
+ *  MASTERWROUGHT_EQUIP_CAP flagged picks. Without this, a role whose
+ *  weakest-covered slots are all apex-crafted picks over the cap and
+ *  buildBoostedCharacterState hard-throws at the third equip (the state.md
+ *  phases 03/08 open item; four role kits really did hit 3 before this).
+ *  The demoted slots fall back to the best unflagged pick for the slot; the
+ *  KEPT picks are the cap-highest scoring flagged ones. Phase 08 flagged
+ *  items are all body armor; if phase 09 ships a flagged weapon or ring it
+ *  lands in the hand/ring arms below (rings refill from the scored ring
+ *  list; a flagged HAND pick has no legality-aware fallback here, so that
+ *  phase must extend fillHands: the sweep in tests/server/pbe_boost.test.ts
+ *  holds every role kit at the cap either way). The legendary sub-cap needs
+ *  no arm until a legendary-flagged def ships. */
+function enforceMasterwroughtCap(
+  role: BoostRole,
+  kit: Partial<Record<EquipSlot, string>>,
+  bestUnflaggedBySlot: ReadonlyMap<string, { id: string; score: number }>,
+  rings: readonly { id: string; score: number }[],
+): void {
+  const flagged = (Object.entries(kit) as [EquipSlot, string][]).filter(
+    ([, id]) => ITEMS[id]?.masterwrought,
+  );
+  if (flagged.length <= MASTERWROUGHT_EQUIP_CAP) return;
+  const scored = flagged
+    .map(([slot, id]) => ({ slot, id, score: roleItemScore(role, ITEMS[id]) }))
+    .sort((a, b) => b.score - a.score);
+  for (const demoted of scored.slice(MASTERWROUGHT_EQUIP_CAP)) {
+    if (demoted.slot === 'ring1' || demoted.slot === 'ring2') {
+      const used = new Set(Object.values(kit));
+      const next = rings.find((r) => !ITEMS[r.id]?.masterwrought && !used.has(r.id));
+      if (next) kit[demoted.slot] = next.id;
+      else delete kit[demoted.slot];
+      continue;
+    }
+    const fallback = bestUnflaggedBySlot.get(demoted.slot as string);
+    if (fallback) kit[demoted.slot] = fallback.id;
+    else delete kit[demoted.slot];
+  }
 }
 
 type ScoredItem = { id: string; score: number };
