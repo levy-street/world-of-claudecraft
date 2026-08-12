@@ -1980,10 +1980,11 @@ Grandmaster-craft family, generic by construction.
   read tier 0 today, inert while no output can masterwork, live the moment apex
   gear consumes them); the crafts_to_mastery pool EXCLUDES daily-gated chains, so
   apex-phase authors must not expect gated rows to enter the pacing model.
-- RELEASE-FILL FLAGS: 235 pending Latin-locale rows from this phase (ten item
-  names, the hint keys, dailyLimit, oncePerDay badge, guide key; the QA session
-  re-counted the phase ledger's "about 195" against the registry, and the wordy
-  values number thirteen, not twelve); the five
+- RELEASE-FILL FLAGS: 235 pending rows from this phase (225 Latin plus the ten
+  non-Latin rows for the two short oncePerDay badge keys; ten item names, the
+  hint keys, dailyLimit, oncePerDay badge, guide key; the QA session re-counted
+  the phase ledger's "about 195" against the registry, and the wordy values
+  number thirteen, not twelve); the five
   non-Latin dailyLimit fills were authored against the pre-reword English and
   re-verified faithful after the second-person reword (the reword-staleness
   registry recorded them translated against the NEW hash without human re-review;
@@ -1996,6 +1997,9 @@ Grandmaster-craft family, generic by construction.
   by the build session (all ten webps opened and judged against the
   woc-item-icon-v1 register before the audit verdict was extended), which the QA
   session should confirm stands for the owner review the verdict prose asserts.
+  BOTH CLOSED at the Phase 07 QA with evidence (the mobile capture at
+  docs/screenshots/masterwrought-phase07/catalyst-usedby-mobile.png and the
+  re-viewed icon set); the closure record is the QA ledger below.
 - ROLLBACK NOTE (operator): rolling the server back past this phase erases every
   character's craftDaily at their first autosave under old code (the pre-phase
   serializer rebuilds the blob), re-opening the catalyst day; same known property
@@ -2069,3 +2073,125 @@ Grandmaster-craft family, generic by construction.
 - The QA prompt's premise "branch tip is 396d4d7971" is superseded by this
   sync; the implementation diff under audit stays e46e5416aa..396d4d7971, and
   this sync's commits (the merge + the extraction) are the Step 0 record.
+
+## Phase 07 QA ledger (2026-08-12, verdict PASS)
+- SCOPE: the implementation diff e46e5416aa..396d4d7971, audited at tip 4d1483e20b
+  (the Step 0 sync above; release unmoved at 94333011cc at audit start). Floor
+  first: the 30-file validation list (791 tests) and the full parity gate green
+  at the tip before any auditor ran.
+- FAN-OUT: a five-dimension ultracode workflow (correctness, gate-abuse,
+  decisiveness in an ISOLATED worktree with ten mutation probes all
+  red-as-expected, consistency, cleanup; twelve agents including the
+  adversarial verify pass) plus architecture-reviewer, migration-safety, and
+  test-coverage-auditor via the Agent tool, then a fresh fix-round reviewer
+  over the QA's own commits (twice) and the qa-checklist completion gate
+  (verdict READY). ZERO blocking findings in the shipped phase; the two
+  blocking finds landed in the QA sync's own extraction test (below).
+- FIX ROUND (commits d87d75f059, 404fdf960f, b115ce5315, e522b94a35,
+  d7af094f7f, 8d66166ecb; every finding applied, none deferred):
+  - The reverse calendar crossing (a live-dated stamp on a calendar-less host
+    gates permanently) had NO pin anywhere while this ledger claimed
+    pinned-in-tests; the decisiveness prober's mutation dropping the resetDay
+    guard clause survived 154 tests. Pinned now (stamp unmutated, second
+    attempt refuses), which is what makes the accepted-asymmetries row above
+    true.
+  - The entity_display_core *FromSource reversal pins were vacuous under en
+    (the known arm and the passthrough are byte-identical; deleting the whole
+    lookup stayed green): now under es with positive controls, plus the
+    localized stack-count channel (x1,234), the sim-authored owned-mob name
+    arm (Bladed Echo), and routing pins for the eight untested exports. The
+    owned-mob arm depends on the es aura fill staying non-English (fails
+    loudly, never silently, if that regresses).
+  - craftDaily load clamp source fix: a date whose stamps all filtered away
+    re-serialized {date, crafted: []} forever; the date now resets with the
+    stamps (pinned both halves), restoring the omission's byte-identity claim.
+    Non-object tamper shapes pinned. The wyrmfallDaily sibling deliberately
+    keeps its date (no live-id filter there; divergence documented at the
+    clamp).
+  - The parity blind spot: every golden sampled craftDaily inert, so the
+    refusal path never touched the draw-order detector. professions_craft
+    gained a daily-gate arm (catalyst at an apothecary under a live calendar:
+    one proc draw on the success, zero on the daily_limit denial, the stamped
+    row in the state digest; coverage pins the four-draw total), golden
+    re-minted scenario-scoped, twice (the second after switching the move to
+    the file's own teleport helper: the hand-rolled copy left pos.y at spawn
+    height and the spatial bucket stale, a latent divergence for any future
+    tick).
+  - Decisiveness hardening: consume pricing snapshotted BEFORE the craft (the
+    planner runs pre-consumption in production); the ten intermediate reagent
+    bills pinned as a literal table (a gathered-count retune previously
+    redded only the wiki freshness mirror); the crafted-junk provenance sweep
+    pins the masterwork signing arm (the slot-less premise was unasserted);
+    the denial table gained a membership assertion over the now-exported
+    Record while its keys stay hand-written literals; the identity-card suite
+    reads every source comment-stripped through one anchored helper (the raw
+    sibling describe and the CSS reads were strippable) with a quote-tolerant
+    stationRequired negative; the blob band note dropped its stale phase 06
+    measurement; the census caps documented as forward-armed; the daily chip
+    gained its stylesheet-reach pin (co-application + a live
+    .crafting-duration-chip rule; the class itself is a semantic/test hook
+    with no rule by design, stated at the mint site).
+- LEDGER CORRECTIONS (commit d7af094f7f + this section): the durable-lesson
+  identity-card sentence was wrong (the pins hold the reason-agnostic hud
+  delegation call shape only; corrected in place); the release-fill count is
+  235 pending rows (225 Latin, 10 non-Latin: the two short oncePerDay badge
+  keys across the five non-Latin locales) and thirteen wordy values.
+- DEFERRED FOLLOW-UPS CLOSED (owner confirmed):
+  - (a) The catalyst tooltip's nine-craft Used-by line verified on MOBILE
+    through the REAL touch path: a long-press peek at a vendor, the one bag
+    context where the peek is reachable (TOUCH_DRAG_HOLD_MS 320 beats
+    TOOLTIP_PEEK_MS 950 and cancels the peek whenever the row is draggable;
+    with a vendor open the drag payload is null). The sentence wraps to three
+    clean lines at 844x390 landscape, lowest preset, nothing clipped;
+    evidence committed at
+    docs/screenshots/masterwrought-phase07/catalyst-usedby-mobile.png.
+  - (b) The ten intermediate icons re-viewed by the QA session as the owner
+    review the audit verdict asserts: the woc-item-icon-v1 register holds
+    (opaque dark grounds, single centered subjects, distinct silhouettes; the
+    two vessels separate by shape, color, and the catalyst's motion strokes;
+    forgefold_plating is the lowest-contrast of the ten but its silhouette
+    reads), all ten mapping.json provenance rows verified. The build
+    session's review STANDS.
+- RECORDED, NO CODE CHANGE (ops/deploy/design notes from the fan-out):
+  - Ops: sim.resetDay is recomputed per tick from the realm clock with no
+    monotonic guard, so a backwards realm calendar (TZ or config regression)
+    silently re-opens the day; recorded like the wyrmfall equivalent, not
+    engineered around.
+  - Replay: a daily_limit refusal skips the resolve's one to two output draws
+    and the gate keys on the HOST calendar, so any future harness replaying a
+    command stream against a seed must capture resetDay beside the seed.
+  - Crash window: a crash after the day's craft but before the autosave can
+    net an extra catalyst if the crafted copy moved off-character first;
+    inherent to crash-rollback semantics, shared with every daily gate.
+  - Persistence wording: the byte-identity claim is per-character until FIRST
+    participation; the first successful craft moves a character permanently
+    onto a bounded 45-to-108-byte craftDaily residue (the date never resets
+    to ''; wyrmfallDaily-identical).
+  - Rollback tightening (verified): the rollback erase is inert under old
+    code (no key sweep, content revision unchanged, no migration re-fires)
+    and exposure is realm-scoped (characters are realm-keyed and writes are
+    lease-fenced, so no mixed-fleet writer pair exists).
+  - Deploy: an OLD client bundle against a new server renders the generic
+    materials line for daily_limit until the bundle updates (the pre-phase
+    ternary's fall-through); wrong-but-not-blank, self-heals on update.
+  - Affordance host note: after today's craft the OFFLINE window previews 0
+    (it reads the live meta) while the ONLINE row still offers one (the
+    server-private stamp, the recorded Phase 04 ruling); a host difference by
+    design, not a defect.
+  - hud.ts toolEffectRecharge reason ternary (shipped 2026-07-29): the
+    pre-existing un-extracted sibling of the extracted denial family,
+    recorded as an extraction candidate (the questlog_window precedent),
+    deliberately not extracted at a QA.
+  - The shipped_item_ids golden's +70 diff lines include sixty pre-existing
+    neighbors' churn; verified additions-only for the ten ids.
+  - Judged not defects: the hand-written denial table (deriving its VALUES
+    from the Record would be the self-comparison trap; membership is now
+    derived, keys stay literal); the census cap asserts (forward-armed for
+    the first second gated recipe, stated in the comment); the pre-phase
+    fixture's delete (kept, after a premise assert).
+- GATE: node scripts/gate_select.mjs PASS (exit 0, unmasked, all 8 steps,
+  vitest workers 5) at the code tip 8d66166ecb; portrait manifest fresh at
+  that tip and re-checked at the docs close.
+- NEXT: Phase 08 (apex armor catalogs) in a fresh session per the cadence,
+  its own release sync first. Phase 08 authors against the demand math above
+  and pays the per-id allowlist removal obligations as each consumer lands.

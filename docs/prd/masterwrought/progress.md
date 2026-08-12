@@ -15,7 +15,7 @@
 | 06 | Inscription base catalog | complete | 2026-08-11 | 2026-08-11 |
 | 06 QA | verify | complete | 2026-08-11 | 2026-08-11 |
 | 07 | Intermediates and the Quickening Catalyst | complete | 2026-08-11 | 2026-08-12 |
-| 07 QA | verify | pending | | |
+| 07 QA | verify | complete | 2026-08-12 | 2026-08-12 |
 | 08 | Apex armor catalogs | pending | | |
 | 08 QA | verify | pending | | |
 | 09 | Apex weapons, jewelry, gadgets | pending | | |
@@ -283,3 +283,25 @@ never future-PR items, per the delivery contract in `state.md`).
   parity + slice-scoped rename proof green). Follow-ups are recorded in the state.md
   QA bullets (upstream items and cleanup-phase notes), none blocking. Full ledger in
   state.md.
+- Phase 07 (2026-08-11 to 12): the ten skill-75 intermediates shipped for all
+  ten professions (junk-kind common materials, 75/20/20 trainer teaches,
+  station-bound with three per-record foreign binds) plus the Quickening
+  Catalyst once-per-day gate: oncePerDay on the recipe record,
+  PlayerMeta.craftDaily on the ctx.resetDay idiom with load clamps and
+  zero-default serialize omission, the typed daily_limit refusal widened at
+  four sites and localized through the craft_denial_line_view pure core, the
+  batch affordances capped at one, the wiki badge, ten SVG-derived icons with
+  provenance, and the demand math recorded as the phases 08/09 contract. Four
+  review rounds during the build; full ledger in state.md.
+- Phase 07 QA (2026-08-12): verdict PASS. Five-dimension ultracode fan-out
+  (decisiveness probes in an isolated worktree; ten mutation probes
+  red-as-expected) plus three domain reviewers, a twice-run fresh fix-round
+  review, and qa-checklist (READY): zero blocking in the shipped phase. The
+  QA's own fix round closed the unpinned reverse calendar crossing, the
+  vacuous en-locale extraction reversal pins, the craftDaily date residue
+  corner (source fix plus pins), the parity draw-digest blind spot (the
+  professions_craft daily-gate arm), and a decisiveness sweep (literal
+  reagent bills, the masterwork signing-arm premise, comment-stripped source
+  pins, the daily chip's stylesheet-reach pin). Both deferred follow-ups
+  closed with evidence (the mobile Used-by capture, the ten-icon owner
+  review). Gate PASS at the final code tip. Full ledger in state.md.
