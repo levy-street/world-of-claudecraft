@@ -123,15 +123,16 @@ describe('the daily craft gate (resetDay set)', () => {
     expect(meta.craftDaily).toEqual({ date: '', crafted: new Set() });
 
     const before = reagentCounts(sim, pid);
-    craftOnce(sim, pid);
-    expect(craftResultEvents(sim)).toEqual([{ ok: true, reason: undefined }]);
-    expect(sim.countItem(recipe.resultItemId, pid)).toBe(recipe.resultCount);
+    // Price the consume BEFORE the craft: production runs the planner
+    // pre-consumption and pre-skill-gain, so pricing after the fact could
+    // silently diverge (a signed reagent copy consumed by the craft, or a
+    // discount rung crossed by the skill gain) and this pin would drift
+    // with it. The self-gathered discount can lower a row below the
+    // authored count, which is why a bare authored-count pin is wrong: the
+    // CONSUME path must spend exactly what the ADMISSION planner priced,
+    // and always at least one unit.
+    const requiredBefore: Record<string, number> = {};
     for (const reagent of recipe.reagents) {
-      // Exact decrement, cross-checked against the sim's own requirement
-      // planner (the self-gathered discount can lower a row below the
-      // authored count, which is why a bare authored-count pin is wrong):
-      // the CONSUME path must spend exactly what the ADMISSION planner
-      // priced, and always at least one unit.
       const required = requiredReagentCount(
         meta,
         reagent,
@@ -140,7 +141,15 @@ describe('the daily craft gate (resetDay set)', () => {
       ).count;
       expect(required).toBeGreaterThanOrEqual(1);
       expect(required).toBeLessThanOrEqual(reagent.count);
-      expect(sim.countItem(reagent.itemId, pid)).toBe(before[reagent.itemId] - required);
+      requiredBefore[reagent.itemId] = required;
+    }
+    craftOnce(sim, pid);
+    expect(craftResultEvents(sim)).toEqual([{ ok: true, reason: undefined }]);
+    expect(sim.countItem(recipe.resultItemId, pid)).toBe(recipe.resultCount);
+    for (const reagent of recipe.reagents) {
+      expect(sim.countItem(reagent.itemId, pid)).toBe(
+        before[reagent.itemId] - requiredBefore[reagent.itemId],
+      );
     }
     expect(meta.craftDaily).toEqual({ date: DAY_ONE, crafted: new Set([RECIPE_ID]) });
   });
@@ -265,7 +274,7 @@ describe('the one-shot degrade (resetDay empty: headless and replay hosts)', () 
     // replay host) loads on a live realm, the '' date disagrees with today,
     // so the gate OPENS. The reverse crossing (live stamp, calendar-less
     // host) stays gated, the asymmetry the admission helper's header
-    // documents.
+    // documents and the case below pins.
     const sim = makeSim();
     const pid = rigCrafter(sim);
     craftOnce(sim, pid);
@@ -278,16 +287,51 @@ describe('the one-shot degrade (resetDay empty: headless and replay hosts)', () 
     craftOnce(sim2, pid2);
     expect(craftResultEvents(sim2)).toEqual([{ ok: true, reason: undefined }]);
   });
+
+  it('a live-dated stamp on a calendar-less host gates permanently (the reverse crossing)', () => {
+    // The other half of the documented asymmetry (the accepted-asymmetries
+    // ledger row): a stamp minted under a live calendar and loaded on a
+    // host that never sets resetDay ('' = no calendar known) can never see
+    // its window roll, so it refuses forever. This pin is what keeps a
+    // later "fix" of craftDailyLimitReached's ''-branch (the
+    // `ctx.resetDay !== ''` clause) from silently flipping the accepted
+    // contract while every other case stays green.
+    const sim = makeSim();
+    sim.resetDay = DAY_ONE;
+    const pid = rigCrafter(sim, 2);
+    craftOnce(sim, pid);
+    const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
+    expect(state.craftDaily).toEqual({ date: DAY_ONE, crafted: [RECIPE_ID] });
+
+    const sim2 = makeSim(); // resetDay stays '': a headless or replay host
+    expect(sim2.resetDay).toBe('');
+    const pid2 = rigCrafter(sim2, 1, state);
+    const meta2 = sim2.players.get(pid2) as PlayerMeta;
+    expect(meta2.craftDaily).toEqual({ date: DAY_ONE, crafted: new Set([RECIPE_ID]) });
+    sim2.drainEvents();
+    sim2.craftItem(RECIPE_ID, false, pid2, 1);
+    expect(craftResultEvents(sim2)).toEqual([{ ok: false, reason: 'daily_limit' }]);
+    // Permanence, not just one refusal: the stamp is unmutated (denial has
+    // no side effect and no window roll can run) and a second attempt
+    // refuses identically.
+    expect(meta2.craftDaily).toEqual({ date: DAY_ONE, crafted: new Set([RECIPE_ID]) });
+    sim2.craftItem(RECIPE_ID, false, pid2, 1);
+    expect(craftResultEvents(sim2)).toEqual([{ ok: false, reason: 'daily_limit' }]);
+  });
 });
 
 describe('the oncePerDay census (content headroom for the load clamps)', () => {
   it('exactly the catalyst is daily-gated, inside the 32-entry and 64-char clamp caps', () => {
     // Two contracts in one sweep. Membership: stamping oncePerDay on any
     // other row (or dropping it from the catalyst) is a design decision this
-    // pin makes explicit, never a drive-by. Headroom: the load clamp drops
-    // tokens past 32 entries or 64 chars, and an over-cap flagged set would
-    // fail SILENTLY in the player's favor (a dropped stamp re-opens a gate
-    // after relog), so the caps red HERE at authoring time instead.
+    // pin makes explicit, never a drive-by. Headroom: while the exact-set
+    // pin above holds, the two cap asserts below cannot fire on their own;
+    // they are FORWARD-ARMED for the edit that grows the set. The load
+    // clamp drops tokens past 32 entries or 64 chars, and an over-cap
+    // flagged set fails SILENTLY in the player's favor (a dropped stamp
+    // re-opens a gate after relog), so growth reds here at authoring time.
+    // The clamp BEHAVIOR is pinned by the corrupt-row case below; the 32/64
+    // literals here hand-mirror the sim.ts load-clamp inline literals.
     const flagged = ALL_RECIPES.filter((r) => r.oncePerDay);
     expect(flagged.map((r) => r.id)).toEqual(['recipe_quickening_catalyst']);
     expect(flagged.length).toBeLessThanOrEqual(32);
@@ -313,8 +357,11 @@ describe('persistence hardening (the wyrmfallDaily load-clamp arm)', () => {
   it('a pre-phase save (no craftDaily) loads at the fresh default', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Old');
+    // An untouched character's save genuinely lacks the field (the omission
+    // pin above), so this IS the pre-phase shape; nothing to delete. The
+    // premise is asserted so the fixture cannot silently stop matching it.
     const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
-    delete state.craftDaily;
+    expect(state.craftDaily).toBeUndefined();
     const sim2 = makeSim();
     const pid2 = sim2.addPlayer('warrior', 'Old', { state });
     const meta2 = sim2.players.get(pid2) as PlayerMeta;
@@ -347,6 +394,39 @@ describe('persistence hardening (the wyrmfallDaily load-clamp arm)', () => {
     const pid3 = sim3.addPlayer('warrior', 'Bad', { state });
     const meta3 = sim3.players.get(pid3) as PlayerMeta;
     expect(meta3.craftDaily).toEqual({ date: '', crafted: new Set() });
+  });
+
+  it('a truthy non-object craftDaily degrades to the default without throwing', () => {
+    // Top-level tampering the object-shaped case above cannot see: a bare
+    // string, number, boolean, or array reaches the property reads as
+    // undefined and must degrade exactly like the malformed object shapes.
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Bad');
+    const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
+    for (const bogus of ['2026-08-11', 7, true, ['recipe_quickening_catalyst']]) {
+      state.craftDaily = bogus;
+      const simN = makeSim();
+      const pidN = simN.addPlayer('warrior', 'Bad', { state });
+      const metaN = simN.players.get(pidN) as PlayerMeta;
+      expect(metaN.craftDaily).toEqual({ date: '', crafted: new Set() });
+    }
+  });
+
+  it('a stamp whose recipe retired its flag drops fully: the date resets with the tokens', () => {
+    // The omission claim's other half: when the live-id filter empties the
+    // crafted set (a retired oncePerDay recipe, or tampering), the date
+    // resets WITH it, so the loaded character re-earns the zero-default
+    // omission instead of re-serializing {date, crafted: []} forever.
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Retired');
+    const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
+    state.craftDaily = { date: DAY_ONE, crafted: ['recipe_retired_once_per_day'] };
+    const sim2 = makeSim();
+    const pid2 = sim2.addPlayer('warrior', 'Retired', { state });
+    const meta2 = sim2.players.get(pid2) as PlayerMeta;
+    expect(meta2.craftDaily).toEqual({ date: '', crafted: new Set() });
+    const resaved = JSON.parse(JSON.stringify(sim2.serializeCharacter(pid2)));
+    expect(resaved.craftDaily).toBeUndefined();
   });
 });
 

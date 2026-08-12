@@ -323,6 +323,76 @@ describe('REFERENTIAL INTEGRITY', () => {
     }
   });
 
+  it('every intermediate row consumes its exact authored reagent bill (the literal table)', () => {
+    // The QA decisiveness probe: retuning a GATHERED reagent count (say the
+    // billet's thorium 3 -> 2) kept every sim-side suite green and redded
+    // only the wiki freshness mirror. The jewelcrafting precedent (phase 05
+    // probe f): a full literal table, so any quantity retune is a deliberate
+    // edit HERE, never a drive-by.
+    const bills: Record<string, { itemId: string; count: number }[]> = {
+      recipe_quickening_catalyst: [
+        { itemId: 'sunpetal_herb', count: 1 },
+        { itemId: 'goldleaf_herb', count: 2 },
+        { itemId: 'venom_gland', count: 2 },
+        { itemId: 'glass_vial', count: 1 },
+      ],
+      recipe_duskforged_billet: [
+        { itemId: 'thorium_ore', count: 3 },
+        { itemId: 'iron_ore', count: 2 },
+        { itemId: 'quickening_catalyst', count: 1 },
+      ],
+      recipe_forgefold_plating: [
+        { itemId: 'thorium_ore', count: 3 },
+        { itemId: 'iron_ore', count: 2 },
+        { itemId: 'rough_hide', count: 2 },
+        { itemId: 'quickening_catalyst', count: 1 },
+      ],
+      recipe_wyrmhide_cording: [
+        { itemId: 'pristine_hide', count: 1 },
+        { itemId: 'rough_hide', count: 4 },
+        { itemId: 'spider_silk', count: 2 },
+        { itemId: 'quickening_catalyst', count: 1 },
+      ],
+      recipe_sunspun_bolt: [
+        { itemId: 'sunpetal_herb', count: 1 },
+        { itemId: 'spider_silk', count: 4 },
+        { itemId: 'pristine_silk', count: 1 },
+        { itemId: 'quickening_catalyst', count: 1 },
+      ],
+      recipe_prismglass_setting: [
+        { itemId: 'thorium_ore', count: 2 },
+        { itemId: 'arcane_essence', count: 2 },
+        { itemId: 'quickening_catalyst', count: 1 },
+      ],
+      recipe_precision_chassis: [
+        { itemId: 'ashwood_log', count: 2 },
+        { itemId: 'thorium_ore', count: 2 },
+        { itemId: 'quickening_catalyst', count: 1 },
+      ],
+      recipe_seasoned_stock: [
+        { itemId: 'prime_cut', count: 1 },
+        { itemId: 'game_meat', count: 3 },
+        { itemId: 'cooking_salt', count: 2 },
+        { itemId: 'quickening_catalyst', count: 1 },
+      ],
+      recipe_lucent_reagent: [
+        { itemId: 'arcane_essence', count: 3 },
+        { itemId: 'arcane_dust', count: 4 },
+        { itemId: 'quickening_catalyst', count: 1 },
+      ],
+      recipe_sablewax_vellum: [
+        { itemId: 'sunpetal_herb', count: 1 },
+        { itemId: 'arcane_essence', count: 2 },
+        { itemId: 'glass_vial', count: 1 },
+        { itemId: 'quickening_catalyst', count: 1 },
+      ],
+    };
+    expect(INTERMEDIATE_RECIPES.map((r) => r.id).sort()).toEqual(Object.keys(bills).sort());
+    for (const recipe of INTERMEDIATE_RECIPES) {
+      expect(recipe.reagents, recipe.id).toEqual(bills[recipe.id]);
+    }
+  });
+
   it('the three station-free combo recipes resolve a home via professionId, not stationType', () => {
     for (const recipe of COMBO_RECIPES) {
       // Combos deliberately carry NO stationType field (field-craftable, pair-gated).
