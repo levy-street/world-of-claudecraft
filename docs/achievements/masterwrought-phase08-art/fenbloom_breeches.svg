@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Fenbloom Breeches</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#333a2c"/>
+<stop offset="0.55" stop-color="#181b14"/>
+<stop offset="1" stop-color="#0f100e"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="leatherL" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#93a468"/>
+<stop offset="0.5" stop-color="#5f7042"/>
+<stop offset="1" stop-color="#39452a"/>
+</linearGradient>
+<linearGradient id="leatherR" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#6f8054"/>
+<stop offset="0.5" stop-color="#485739"/>
+<stop offset="1" stop-color="#273023"/>
+</linearGradient>
+<linearGradient id="waistG" x1="0" y1="0" x2="0.4" y2="1">
+<stop offset="0" stop-color="#9aab72"/>
+<stop offset="0.55" stop-color="#67764a"/>
+<stop offset="1" stop-color="#3e4a2e"/>
+</linearGradient>
+<linearGradient id="tieG" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#a68f5d"/>
+<stop offset="0.55" stop-color="#6f5d3a"/>
+<stop offset="1" stop-color="#463a24"/>
+</linearGradient>
+<linearGradient id="loopG" x1="0" y1="0" x2="0.4" y2="1">
+<stop offset="0" stop-color="#5c6b41"/>
+<stop offset="1" stop-color="#2c351f"/>
+</linearGradient>
+<radialGradient id="petalG" cx="0.35" cy="0.3" r="0.95">
+<stop offset="0" stop-color="#f2d8d3"/>
+<stop offset="0.55" stop-color="#dcaeab"/>
+<stop offset="1" stop-color="#b28489"/>
+</radialGradient>
+<radialGradient id="toolG" cx="0.4" cy="0.35" r="0.9">
+<stop offset="0" stop-color="#57663c"/>
+<stop offset="1" stop-color="#38452a"/>
+</radialGradient>
+<radialGradient id="kneeG" cx="0.4" cy="0.35" r="0.9">
+<stop offset="0" stop-color="#a3b276" stop-opacity="0.5"/>
+<stop offset="1" stop-color="#a3b276" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- marsh atmosphere and grounding -->
+<ellipse cx="250" cy="248" rx="192" ry="152" fill="#3d4832" opacity="0.22" filter="url(#soft)"/>
+<ellipse cx="258" cy="424" rx="152" ry="32" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<g>
+  <!-- soft depth silhouette behind the garment -->
+  <path d="M158 116 h206 v40 c14 96 8 176 -14 250 l-56 6 l-24 -160 l-24 160 l-56 -6 c-24 -76 -32 -156 -32 -250 z" fill="#0e120b" opacity="0.6" filter="url(#soft4)" transform="translate(7 9)"/>
+  <!-- right leg, cool shade side -->
+  <path d="M252 148 c0 28 2 66 4 92 c8 28 16 76 22 96 l6 54 q30 12 60 0 l6 -54 c10 -22 20 -48 22 -86 c2 -34 -6 -68 -14 -102 z" fill="url(#leatherR)" stroke="#171a12" stroke-width="4"/>
+  <!-- left leg, key lit side -->
+  <path d="M154 148 c-8 34 -16 68 -14 102 c2 38 12 64 22 86 l6 54 q30 12 60 0 l6 -54 c6 -20 14 -68 22 -96 c2 -26 4 -64 4 -92 z" fill="url(#leatherL)" stroke="#171a12" stroke-width="4"/>
+  <!-- cool shade wash down the outer right leg -->
+  <path d="M358 148 c8 34 16 68 14 102 c-2 38 -12 64 -22 86 l-6 54 q-14 6 -30 4 c14 -60 26 -140 24 -196 c-1 -18 1 -36 4 -50 z" fill="#101619" opacity="0.32"/>
+  <path d="M252 152 c0 26 2 60 4 86 c-8 2 -14 8 -18 14 c-2 -32 -4 -72 -2 -100 z" fill="#141a10" opacity="0.35"/>
+  <!-- warm key highlight along the outer left thigh -->
+  <path d="M156 166 c-7 34 -12 66 -10 98" stroke="#cdda9c" stroke-width="7" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <path d="M150 274 c4 24 12 44 20 60" stroke="#b9c78c" stroke-width="5" fill="none" opacity="0.35" stroke-linecap="round"/>
+  <path d="M262 158 c26 -2 56 -2 88 2" stroke="#a7b77e" stroke-width="4" fill="none" opacity="0.3" stroke-linecap="round"/>
+  <!-- center rise seam -->
+  <path d="M254 150 c0 30 1 62 2 90" stroke="#202817" stroke-width="3.5" fill="none" opacity="0.65"/>
+  <path d="M256 240 c-8 26 -16 64 -22 96" stroke="#1d2515" stroke-width="3" fill="none" opacity="0.5"/>
+  <path d="M256 240 c8 26 16 64 22 96" stroke="#161c11" stroke-width="3" fill="none" opacity="0.55"/>
+  <!-- outer seam stitching -->
+  <path d="M148 210 c-2 40 4 84 16 122" stroke="#aab77f" stroke-width="2.5" fill="none" opacity="0.35" stroke-dasharray="5 7"/>
+  <path d="M364 210 c2 40 -4 84 -16 122" stroke="#8b9868" stroke-width="2.5" fill="none" opacity="0.28" stroke-dasharray="5 7"/>
+  <!-- knee wear and creases -->
+  <ellipse cx="198" cy="298" rx="30" ry="20" fill="url(#kneeG)"/>
+  <ellipse cx="314" cy="298" rx="28" ry="19" fill="url(#kneeG)" opacity="0.55"/>
+  <path d="M176 306 q22 12 46 4" stroke="#243019" stroke-width="3.5" fill="none" opacity="0.5"/>
+  <path d="M180 322 q20 10 40 3" stroke="#1e2915" stroke-width="3" fill="none" opacity="0.45"/>
+  <path d="M292 306 q22 12 44 4" stroke="#1a2313" stroke-width="3.5" fill="none" opacity="0.55"/>
+  <path d="M296 322 q18 10 38 3" stroke="#161e10" stroke-width="3" fill="none" opacity="0.5"/>
+  <path d="M170 252 q26 14 56 8" stroke="#2a3520" stroke-width="3" fill="none" opacity="0.4"/>
+  <path d="M288 252 q26 14 54 8" stroke="#202a18" stroke-width="3" fill="none" opacity="0.45"/>
+  <!-- leather grain flecks -->
+  <g stroke="#243018" stroke-width="2" fill="none" opacity="0.35" stroke-linecap="round">
+    <path d="M176 206 l10 4"/><path d="M206 226 l9 -3"/><path d="M164 262 l10 3"/>
+    <path d="M214 272 l8 -4"/><path d="M186 342 l9 3"/><path d="M226 216 l7 5"/>
+    <path d="M300 214 l10 3"/><path d="M330 240 l9 -3"/><path d="M296 268 l9 4"/>
+    <path d="M338 286 l8 -4"/><path d="M312 344 l9 3"/><path d="M286 226 l7 5"/>
+  </g>
+  <g stroke="#b8c58d" stroke-width="2" fill="none" opacity="0.28" stroke-linecap="round">
+    <path d="M170 226 l9 3"/><path d="M198 250 l8 -3"/><path d="M182 286 l8 3"/>
+    <path d="M292 236 l8 3"/><path d="M320 262 l8 -3"/>
+  </g>
+  <!-- waistband -->
+  <rect x="150" y="106" width="212" height="46" rx="11" fill="url(#waistG)" stroke="#171a12" stroke-width="4"/>
+  <path d="M160 114 h192" stroke="#d6e1a8" stroke-width="5.5" opacity="0.55" stroke-linecap="round"/>
+  <path d="M158 122 h196" stroke="#2a3320" stroke-width="2" fill="none" opacity="0.55" stroke-dasharray="6 6"/>
+  <path d="M158 142 h196" stroke="#2a3320" stroke-width="2" fill="none" opacity="0.55" stroke-dasharray="6 6"/>
+  <rect x="182" y="102" width="15" height="52" rx="5" fill="url(#loopG)" stroke="#141710" stroke-width="3"/>
+  <rect x="316" y="102" width="15" height="52" rx="5" fill="url(#loopG)" stroke="#141710" stroke-width="3"/>
+  <path d="M184 106 h9" stroke="#a9b87e" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+  <path d="M318 106 h9" stroke="#8d9c68" stroke-width="3" opacity="0.4" stroke-linecap="round"/>
+  <!-- fly placket with drawcord -->
+  <path d="M244 152 v38" stroke="#202816" stroke-width="3" opacity="0.6"/>
+  <path d="M268 152 v38" stroke="#1c2413" stroke-width="3" opacity="0.6"/>
+  <g stroke="#bda76c" stroke-width="4" stroke-linecap="round" opacity="0.85" fill="none">
+    <path d="M247 156 l18 13"/><path d="M265 156 l-18 13"/>
+    <path d="M247 172 l18 13"/><path d="M265 172 l-18 13"/>
+  </g>
+  <path d="M252 186 q-4 12 -1 20" stroke="#a08a56" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+  <path d="M260 186 q5 11 3 20" stroke="#8a7648" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.75"/>
+  <!-- tooled fen-flower motif at the left hip, the one pale pink accent -->
+  <circle cx="197" cy="184" r="31" fill="none" stroke="#232c18" stroke-width="3" opacity="0.65"/>
+  <circle cx="197" cy="184" r="27" fill="url(#toolG)" stroke="#2c3720" stroke-width="2" opacity="0.9"/>
+  <g>
+    <ellipse cx="197" cy="171" rx="7.5" ry="12" fill="url(#petalG)" stroke="#8a6266" stroke-width="1.5"/>
+    <ellipse cx="197" cy="171" rx="7.5" ry="12" fill="url(#petalG)" stroke="#8a6266" stroke-width="1.5" transform="rotate(72 197 184)"/>
+    <ellipse cx="197" cy="171" rx="7.5" ry="12" fill="url(#petalG)" stroke="#8a6266" stroke-width="1.5" transform="rotate(144 197 184)"/>
+    <ellipse cx="197" cy="171" rx="7.5" ry="12" fill="url(#petalG)" stroke="#8a6266" stroke-width="1.5" transform="rotate(216 197 184)"/>
+    <ellipse cx="197" cy="171" rx="7.5" ry="12" fill="url(#petalG)" stroke="#8a6266" stroke-width="1.5" transform="rotate(288 197 184)"/>
+  </g>
+  <circle cx="197" cy="184" r="5.5" fill="#d9bd8b" stroke="#6b5638" stroke-width="1.5"/>
+  <path d="M191 166 q3 -4 8 -4" stroke="#f7e6e0" stroke-width="2.5" fill="none" opacity="0.8" stroke-linecap="round"/>
+  <!-- left shin wraps -->
+  <path d="M158 350 q40 -10 80 2" stroke="url(#tieG)" stroke-width="13" fill="none" stroke-linecap="round"/>
+  <path d="M160 366 q40 12 76 -2" stroke="url(#tieG)" stroke-width="13" fill="none" stroke-linecap="round"/>
+  <path d="M164 384 q36 -10 70 4" stroke="url(#tieG)" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M160 346 q40 -10 78 2" stroke="#d8c493" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+  <path d="M162 372 q38 10 74 -3" stroke="#241f12" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <circle cx="168" cy="366" r="7" fill="url(#tieG)" stroke="#241f12" stroke-width="2.5"/>
+  <path d="M166 372 q-9 14 -5 28" stroke="url(#tieG)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  <path d="M172 372 q3 16 10 26" stroke="#5f4f31" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- right shin wraps -->
+  <path d="M274 352 q40 -12 80 -2" stroke="url(#tieG)" stroke-width="13" fill="none" stroke-linecap="round"/>
+  <path d="M276 364 q38 12 76 2" stroke="url(#tieG)" stroke-width="13" fill="none" stroke-linecap="round"/>
+  <path d="M278 384 q36 -12 70 0" stroke="url(#tieG)" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M276 348 q40 -12 78 -2" stroke="#cbb787" stroke-width="3" fill="none" opacity="0.35" stroke-linecap="round"/>
+  <path d="M278 370 q36 10 72 1" stroke="#1e1a0f" stroke-width="3" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <circle cx="344" cy="368" r="7" fill="url(#tieG)" stroke="#1e1a0f" stroke-width="2.5"/>
+  <path d="M346 374 q8 14 4 28" stroke="#564628" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  <path d="M340 374 q-4 16 -10 26" stroke="#4a3c23" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- cuff shadow under the wraps and a cool reflected rim -->
+  <path d="M170 394 q30 12 56 1" stroke="#141a0f" stroke-width="4" fill="none" opacity="0.5"/>
+  <path d="M286 394 q28 12 56 -1" stroke="#10150c" stroke-width="4" fill="none" opacity="0.55"/>
+  <path d="M346 344 l-5 50" stroke="#6f7f88" stroke-width="3.5" fill="none" opacity="0.28" stroke-linecap="round"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

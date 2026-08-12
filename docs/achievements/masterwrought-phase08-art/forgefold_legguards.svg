@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Forgefold Legguards</title>
+<defs>
+<radialGradient id="lgBg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#343744"/>
+<stop offset="0.55" stop-color="#191b21"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="lgVig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="lgSoft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="lgSoft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="lgSteelA" x1="0" y1="0" x2="0.8" y2="1">
+<stop offset="0" stop-color="#b2bac8"/>
+<stop offset="0.5" stop-color="#6c737f"/>
+<stop offset="1" stop-color="#3a3e48"/>
+</linearGradient>
+<linearGradient id="lgSteelB" x1="0" y1="0" x2="0.8" y2="1">
+<stop offset="0" stop-color="#8a92a0"/>
+<stop offset="0.55" stop-color="#525763"/>
+<stop offset="1" stop-color="#2b2e36"/>
+</linearGradient>
+<linearGradient id="lgSteelC" x1="0" y1="0" x2="0.8" y2="1">
+<stop offset="0" stop-color="#666c78"/>
+<stop offset="0.6" stop-color="#3e424c"/>
+<stop offset="1" stop-color="#212329"/>
+</linearGradient>
+<radialGradient id="lgKneeA" cx="0.35" cy="0.28" r="1.0">
+<stop offset="0" stop-color="#c9d0dc"/>
+<stop offset="0.5" stop-color="#7b8391"/>
+<stop offset="1" stop-color="#383c46"/>
+</radialGradient>
+<radialGradient id="lgKneeB" cx="0.35" cy="0.28" r="1.0">
+<stop offset="0" stop-color="#98a0ae"/>
+<stop offset="0.55" stop-color="#5b626e"/>
+<stop offset="1" stop-color="#26292f"/>
+</radialGradient>
+<radialGradient id="lgRivet" cx="0.35" cy="0.3" r="0.9">
+<stop offset="0" stop-color="#e8edf6"/>
+<stop offset="0.5" stop-color="#8b93a2"/>
+<stop offset="1" stop-color="#3d414b"/>
+</radialGradient>
+<linearGradient id="lgLeather" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#6b4a2c"/>
+<stop offset="0.6" stop-color="#4a3119"/>
+<stop offset="1" stop-color="#2c1d0f"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#lgBg)"/>
+<ellipse cx="256" cy="414" rx="168" ry="34" fill="#000000" opacity="0.55" filter="url(#lgSoft)"/>
+<g transform="rotate(4 316 260)">
+  <rect x="248" y="94" width="122" height="22" rx="9" fill="url(#lgLeather)" stroke="#14100a" stroke-width="3"/>
+  <path d="M250 110 L368 110 L364 148 Q308 162 254 148 Z" fill="url(#lgSteelB)" stroke="#101116" stroke-width="4"/>
+  <path d="M254 144 L364 144 L360 184 Q308 198 258 184 Z" fill="url(#lgSteelC)" stroke="#101116" stroke-width="4"/>
+  <path d="M258 180 L360 180 L356 220 Q308 234 262 220 Z" fill="url(#lgSteelC)" stroke="#101116" stroke-width="4"/>
+  <path d="M258 118 h100" stroke="#c3cad6" stroke-width="5" opacity="0.35" stroke-linecap="round"/>
+  <path d="M262 152 q10 -5 20 0 q10 5 20 0 q10 -5 20 0 q10 5 20 0" stroke="#b8c0cd" stroke-width="3" fill="none" opacity="0.14"/>
+  <path d="M264 190 q10 -5 20 0 q10 5 20 0 q10 -5 20 0 q10 5 20 0" stroke="#14161c" stroke-width="3" fill="none" opacity="0.28"/>
+  <ellipse cx="308" cy="248" rx="50" ry="34" fill="url(#lgKneeB)" stroke="#101116" stroke-width="4"/>
+  <path d="M308 216 q8 32 0 64" stroke="#c3cad6" stroke-width="4" fill="none" opacity="0.3"/>
+  <path d="M266 262 q14 14 30 18" stroke="#d08644" stroke-width="4" fill="none" opacity="0.4" stroke-linecap="round"/>
+  <path d="M266 268 Q308 290 350 268 L344 294 Q308 308 272 294 Z" fill="url(#lgSteelC)" stroke="#101116" stroke-width="4"/>
+  <path d="M276 298 L340 298 L334 396 Q306 410 280 396 Z" fill="url(#lgSteelB)" stroke="#101116" stroke-width="4"/>
+  <path d="M306 302 q6 46 0 92" stroke="#c3cad6" stroke-width="4" fill="none" opacity="0.28"/>
+  <path d="M282 330 q9 -5 18 0 q9 5 18 0 q9 -5 18 0" stroke="#14161c" stroke-width="3" fill="none" opacity="0.26"/>
+  <path d="M284 362 q9 -5 18 0 q9 5 18 0 q9 -5 18 0" stroke="#b8c0cd" stroke-width="3" fill="none" opacity="0.12"/>
+  <path d="M282 394 L336 394 L332 416 Q306 424 286 416 Z" fill="url(#lgSteelC)" stroke="#101116" stroke-width="4"/>
+  <circle cx="262" cy="120" r="6" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="308" cy="122" r="6" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="354" cy="120" r="6" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="270" cy="248" r="6" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="346" cy="248" r="6" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+</g>
+<g transform="rotate(-3 196 250)">
+  <rect x="132" y="82" width="128" height="22" rx="9" fill="url(#lgLeather)" stroke="#14100a" stroke-width="3"/>
+  <path d="M138 92 q28 -10 56 -8" stroke="#8a6238" stroke-width="4" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <path d="M134 98 L258 98 L254 136 Q196 150 138 136 Z" fill="url(#lgSteelA)" stroke="#101116" stroke-width="4"/>
+  <path d="M138 132 L254 132 L250 172 Q196 186 142 172 Z" fill="url(#lgSteelB)" stroke="#101116" stroke-width="4"/>
+  <path d="M142 168 L250 168 L246 208 Q196 222 146 208 Z" fill="url(#lgSteelB)" stroke="#101116" stroke-width="4"/>
+  <path d="M142 106 h104" stroke="#dde3ee" stroke-width="6" opacity="0.6" stroke-linecap="round"/>
+  <path d="M146 140 h92" stroke="#dde3ee" stroke-width="4" opacity="0.4" stroke-linecap="round"/>
+  <path d="M150 176 h84" stroke="#c3cad6" stroke-width="4" opacity="0.3" stroke-linecap="round"/>
+  <path d="M146 118 q11 -6 22 0 q11 6 22 0 q11 -6 22 0 q11 6 22 0" stroke="#e6ebf4" stroke-width="3" fill="none" opacity="0.2"/>
+  <path d="M148 152 q11 -6 22 0 q11 6 22 0 q11 -6 22 0 q11 6 22 0" stroke="#14161c" stroke-width="3" fill="none" opacity="0.3"/>
+  <path d="M152 160 q11 -6 22 0 q11 6 22 0 q11 -6 22 0" stroke="#cfd6e2" stroke-width="2.6" fill="none" opacity="0.16"/>
+  <path d="M152 190 q11 -6 22 0 q11 6 22 0 q11 -6 22 0 q11 6 22 0" stroke="#14161c" stroke-width="3" fill="none" opacity="0.3"/>
+  <path d="M140 134 q17 7 36 9" stroke="#e8944a" stroke-width="4" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <path d="M145 170 q15 6 32 8" stroke="#d97f38" stroke-width="4" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <path d="M149 206 q13 6 28 7" stroke="#c26c2c" stroke-width="3.6" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <path d="M142 104 q10 -4 20 -4" stroke="#f8cf96" stroke-width="3" fill="none" opacity="0.7" stroke-linecap="round"/>
+  <ellipse cx="196" cy="234" rx="54" ry="37" fill="url(#lgKneeA)" stroke="#101116" stroke-width="4"/>
+  <path d="M196 199 q10 35 0 70" stroke="#eef2f9" stroke-width="5" fill="none" opacity="0.5"/>
+  <path d="M158 214 q-8 18 0 38" stroke="#0d0e12" stroke-width="3.6" fill="none" opacity="0.3"/>
+  <path d="M234 214 q8 18 0 38" stroke="#0d0e12" stroke-width="3.6" fill="none" opacity="0.3"/>
+  <path d="M160 210 q10 -12 24 -16" stroke="#f8cf96" stroke-width="4" fill="none" opacity="0.65" stroke-linecap="round"/>
+  <path d="M152 248 q14 16 34 20" stroke="#e8944a" stroke-width="4" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <path d="M154 256 Q196 280 240 256 L234 284 Q196 298 160 284 Z" fill="url(#lgSteelB)" stroke="#101116" stroke-width="4"/>
+  <path d="M162 264 q34 16 68 0" stroke="#dde3ee" stroke-width="4" fill="none" opacity="0.35" stroke-linecap="round"/>
+  <path d="M160 280 q16 8 36 10" stroke="#d97f38" stroke-width="3.6" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <path d="M164 288 L230 288 L224 390 Q196 404 168 390 Z" fill="url(#lgSteelA)" stroke="#101116" stroke-width="4"/>
+  <path d="M196 292 q7 48 0 96" stroke="#eef2f9" stroke-width="5" fill="none" opacity="0.45"/>
+  <path d="M172 316 q10 -5 20 0 q10 5 20 0 q10 -5 20 0" stroke="#14161c" stroke-width="3" fill="none" opacity="0.28"/>
+  <path d="M172 324 q10 -5 20 0 q10 5 20 0 q10 -5 20 0" stroke="#cfd6e2" stroke-width="2.6" fill="none" opacity="0.16"/>
+  <path d="M174 350 q10 -5 20 0 q10 5 20 0 q10 -5 20 0" stroke="#14161c" stroke-width="3" fill="none" opacity="0.28"/>
+  <path d="M174 358 q10 -5 20 0 q10 5 20 0 q10 -5 20 0" stroke="#cfd6e2" stroke-width="2.6" fill="none" opacity="0.14"/>
+  <path d="M168 300 q-3 34 3 62" stroke="#e8944a" stroke-width="4" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <path d="M170 296 q8 -5 18 -5" stroke="#f8cf96" stroke-width="3" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <path d="M226 300 q4 40 -2 78" stroke="#0d0e12" stroke-width="3.6" fill="none" opacity="0.35"/>
+  <path d="M170 386 L226 386 L222 410 Q196 418 174 410 Z" fill="url(#lgSteelB)" stroke="#101116" stroke-width="4"/>
+  <path d="M176 394 h40" stroke="#c3cad6" stroke-width="3.6" opacity="0.3" stroke-linecap="round"/>
+  <path d="M175 404 q12 5 26 5" stroke="#c26c2c" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+  <circle cx="148" cy="108" r="6.5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="196" cy="110" r="6.5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="244" cy="108" r="6.5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="152" cy="144" r="5.5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="240" cy="144" r="5.5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="156" cy="180" r="5.5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="236" cy="180" r="5.5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="155" cy="234" r="6" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="237" cy="234" r="6" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="196" cy="205" r="5.5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="174" cy="296" r="5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="220" cy="296" r="5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="178" cy="394" r="5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="216" cy="394" r="5" fill="url(#lgRivet)" stroke="#0d0e12" stroke-width="2"/>
+</g>
+<rect width="512" height="512" fill="url(#lgVig)"/>
+</svg>

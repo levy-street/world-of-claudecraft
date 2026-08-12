@@ -546,6 +546,86 @@
    "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "spiritweld_girdle",
+   "name": "Spiritweld Girdle",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "forgefold_legguards",
+   "name": "Forgefold Legguards",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "wardspeaker_sabatons",
+   "name": "Wardspeaker Sabatons",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "briarstep_jerkin",
+   "name": "Briarstep Jerkin",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "fenbloom_breeches",
+   "name": "Fenbloom Breeches",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "barksong_handguards",
+   "name": "Barksong Handguards",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "sunspun_vestments",
+   "name": "Sunspun Vestments",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "sunspun_leggings",
+   "name": "Sunspun Leggings",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "sunspun_handwraps",
+   "name": "Sunspun Handwraps",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "sunspun_haversack",
+   "name": "Sunspun Haversack",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
   }
  ],
  "generatedBatches": [

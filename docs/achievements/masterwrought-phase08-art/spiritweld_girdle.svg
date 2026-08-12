@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Spiritweld Girdle</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#2f3742"/>
+<stop offset="0.55" stop-color="#181b21"/>
+<stop offset="1" stop-color="#0f1013"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="lnA" x1="0" y1="0" x2="0.35" y2="1">
+<stop offset="0" stop-color="#d6d6cc"/>
+<stop offset="0.5" stop-color="#78808e"/>
+<stop offset="1" stop-color="#343a45"/>
+</linearGradient>
+<linearGradient id="lnB" x1="0" y1="0" x2="0.35" y2="1">
+<stop offset="0" stop-color="#a6a89f"/>
+<stop offset="0.55" stop-color="#59606d"/>
+<stop offset="1" stop-color="#262b34"/>
+</linearGradient>
+<linearGradient id="capG" x1="0" y1="0" x2="0.4" y2="1">
+<stop offset="0" stop-color="#8b93a2"/>
+<stop offset="0.55" stop-color="#4a505c"/>
+<stop offset="1" stop-color="#23262e"/>
+</linearGradient>
+<linearGradient id="claspG" x1="0" y1="0" x2="0.55" y2="1">
+<stop offset="0" stop-color="#e6e3d8"/>
+<stop offset="0.5" stop-color="#949cab"/>
+<stop offset="1" stop-color="#454c59"/>
+</linearGradient>
+<linearGradient id="backG" x1="0" y1="0" x2="0.3" y2="1">
+<stop offset="0" stop-color="#52463a"/>
+<stop offset="0.55" stop-color="#322b22"/>
+<stop offset="1" stop-color="#1a1611"/>
+</linearGradient>
+<linearGradient id="lthG" x1="0" y1="0" x2="0.5" y2="1">
+<stop offset="0" stop-color="#5a4c3e"/>
+<stop offset="0.55" stop-color="#362d23"/>
+<stop offset="1" stop-color="#191410"/>
+</linearGradient>
+<radialGradient id="rv" cx="0.35" cy="0.3" r="0.9">
+<stop offset="0" stop-color="#e8edf6"/>
+<stop offset="0.5" stop-color="#8b93a2"/>
+<stop offset="1" stop-color="#3d414b"/>
+</radialGradient>
+<radialGradient id="bossG" cx="0.38" cy="0.32" r="0.95">
+<stop offset="0" stop-color="#f0f4f8"/>
+<stop offset="0.55" stop-color="#8d95a4"/>
+<stop offset="1" stop-color="#3a3f4a"/>
+</radialGradient>
+<radialGradient id="spiritG" cx="0.42" cy="0.36" r="0.95">
+<stop offset="0" stop-color="#ffffff"/>
+<stop offset="0.45" stop-color="#a9f4ec"/>
+<stop offset="0.8" stop-color="#37b3a7"/>
+<stop offset="1" stop-color="#17635c"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="256" cy="258" rx="210" ry="130" fill="#2f6b64" opacity="0.1" filter="url(#soft)"/>
+<ellipse cx="260" cy="408" rx="155" ry="32" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<g transform="rotate(-4 256 264)">
+  <!-- leather backing strap -->
+  <path d="M80 214 Q256 240 432 214 L434 296 Q256 330 78 296 Z" fill="url(#backG)" stroke="#0c0a08" stroke-width="4"/>
+  <path d="M86 218 Q256 244 428 218" stroke="#8a744c" stroke-width="3" fill="none" opacity="0.4"/>
+  <path d="M96 250 Q256 274 418 250" stroke="#14100c" stroke-width="3" fill="none" opacity="0.35"/>
+  <path d="M92 274 Q256 300 422 274" stroke="#14100c" stroke-width="3" fill="none" opacity="0.3"/>
+  <path d="M100 292 Q256 318 414 292" stroke="#6b5940" stroke-width="2" fill="none" opacity="0.22"/>
+  <!-- steel end terminals -->
+  <rect x="68" y="208" width="18" height="92" rx="6" fill="url(#capG)" stroke="#0d0e12" stroke-width="3"/>
+  <path d="M72 214 v78" stroke="#c3cad6" stroke-width="2.5" opacity="0.4" stroke-linecap="round"/>
+  <rect x="426" y="208" width="18" height="92" rx="6" fill="url(#capG)" stroke="#0d0e12" stroke-width="3"/>
+  <path d="M431 214 v78" stroke="#c3cad6" stroke-width="2.5" opacity="0.35" stroke-linecap="round"/>
+  <!-- hanging tongue behind clasp -->
+  <path d="M296 300 Q334 336 328 376 Q323 404 300 414 L281 405 Q297 372 286 322 Z" fill="url(#lthG)" stroke="#0d0e10" stroke-width="3.5"/>
+  <path d="M295 318 Q314 356 306 396" stroke="#171209" stroke-width="3" fill="none" opacity="0.5"/>
+  <path d="M291 314 Q306 348 302 382" stroke="#75613f" stroke-width="2" fill="none" opacity="0.35"/>
+  <circle cx="308" cy="382" r="4.5" fill="#15100b" stroke="#060505" stroke-width="1.5"/>
+  <circle cx="312" cy="362" r="4.5" fill="#15100b" stroke="#060505" stroke-width="1.5"/>
+  <path d="M283 340 L332 352 L330 366 L280 354 Z" fill="url(#capG)" stroke="#0d0e12" stroke-width="2.5"/>
+  <path d="M286 344 L326 354" stroke="#c3cad6" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+  <!-- lower link band, tucked under the upper band -->
+  <g transform="rotate(-4 128 274)">
+    <rect x="105" y="249" width="46" height="50" rx="7" fill="url(#lnB)" stroke="#0e1014" stroke-width="3.5"/>
+    <path d="M112 256 h32" stroke="#e0dcc9" stroke-width="3.5" opacity="0.3" stroke-linecap="round"/>
+    <path d="M112 291 h32" stroke="#10131a" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    <circle cx="128" cy="266" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+  </g>
+  <g transform="rotate(-2 175 278)">
+    <rect x="152" y="253" width="46" height="50" rx="7" fill="url(#lnB)" stroke="#0e1014" stroke-width="3.5"/>
+    <path d="M159 260 h32" stroke="#e0dcc9" stroke-width="3.5" opacity="0.3" stroke-linecap="round"/>
+    <path d="M159 295 h32" stroke="#10131a" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    <circle cx="175" cy="270" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+  </g>
+  <g transform="rotate(2 337 278)">
+    <rect x="314" y="253" width="46" height="50" rx="7" fill="url(#lnB)" stroke="#0e1014" stroke-width="3.5"/>
+    <path d="M321 260 h32" stroke="#e0dcc9" stroke-width="3.5" opacity="0.3" stroke-linecap="round"/>
+    <path d="M321 295 h32" stroke="#10131a" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    <circle cx="337" cy="270" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+  </g>
+  <g transform="rotate(4 384 274)">
+    <rect x="361" y="249" width="46" height="50" rx="7" fill="url(#lnB)" stroke="#0e1014" stroke-width="3.5"/>
+    <path d="M368 256 h32" stroke="#e0dcc9" stroke-width="3.5" opacity="0.3" stroke-linecap="round"/>
+    <path d="M368 291 h32" stroke="#10131a" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    <circle cx="384" cy="266" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+  </g>
+  <!-- lower band spirit seams -->
+  <path d="M152 252 L151 296" stroke="#54d6c9" stroke-width="7" opacity="0.45" filter="url(#soft4)"/>
+  <path d="M152 252 L151 296" stroke="#e9fffa" stroke-width="2" opacity="0.85"/>
+  <path d="M361 252 L362 296" stroke="#54d6c9" stroke-width="7" opacity="0.45" filter="url(#soft4)"/>
+  <path d="M361 252 L362 296" stroke="#e9fffa" stroke-width="2" opacity="0.85"/>
+  <!-- band overlap seams, faint -->
+  <path d="M92 254 Q150 262 196 258" stroke="#4ccfc2" stroke-width="5" fill="none" opacity="0.3" filter="url(#soft4)"/>
+  <path d="M92 254 Q150 262 196 258" stroke="#d9fcf6" stroke-width="1.6" fill="none" opacity="0.55"/>
+  <path d="M316 258 Q366 262 420 254" stroke="#4ccfc2" stroke-width="5" fill="none" opacity="0.3" filter="url(#soft4)"/>
+  <path d="M316 258 Q366 262 420 254" stroke="#d9fcf6" stroke-width="1.6" fill="none" opacity="0.55"/>
+  <!-- upper link band -->
+  <g transform="rotate(-5 104 230)">
+    <rect x="81" y="205" width="46" height="50" rx="7" fill="url(#lnA)" stroke="#0e1014" stroke-width="3.5"/>
+    <path d="M88 212 h32" stroke="#eae5d3" stroke-width="4" opacity="0.55" stroke-linecap="round"/>
+    <path d="M88 247 h32" stroke="#12151b" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    <circle cx="92" cy="222" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+    <circle cx="116" cy="222" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+  </g>
+  <g transform="rotate(-3 151 236)">
+    <rect x="128" y="211" width="46" height="50" rx="7" fill="url(#lnA)" stroke="#0e1014" stroke-width="3.5"/>
+    <path d="M135 218 h32" stroke="#eae5d3" stroke-width="4" opacity="0.55" stroke-linecap="round"/>
+    <path d="M135 253 h32" stroke="#12151b" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    <circle cx="139" cy="228" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+    <circle cx="163" cy="228" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+  </g>
+  <g transform="rotate(-1.5 198 240)">
+    <rect x="175" y="215" width="46" height="50" rx="7" fill="url(#lnA)" stroke="#0e1014" stroke-width="3.5"/>
+    <path d="M182 222 h32" stroke="#eae5d3" stroke-width="4" opacity="0.55" stroke-linecap="round"/>
+    <path d="M182 257 h32" stroke="#12151b" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    <circle cx="186" cy="232" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+    <circle cx="210" cy="232" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+  </g>
+  <g transform="rotate(1.5 314 240)">
+    <rect x="291" y="215" width="46" height="50" rx="7" fill="url(#lnA)" stroke="#0e1014" stroke-width="3.5"/>
+    <path d="M298 222 h32" stroke="#eae5d3" stroke-width="4" opacity="0.55" stroke-linecap="round"/>
+    <path d="M298 257 h32" stroke="#12151b" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    <circle cx="302" cy="232" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+    <circle cx="326" cy="232" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+  </g>
+  <g transform="rotate(3 361 236)">
+    <rect x="338" y="211" width="46" height="50" rx="7" fill="url(#lnA)" stroke="#0e1014" stroke-width="3.5"/>
+    <path d="M345 218 h32" stroke="#eae5d3" stroke-width="4" opacity="0.55" stroke-linecap="round"/>
+    <path d="M345 253 h32" stroke="#12151b" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    <circle cx="349" cy="228" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+    <circle cx="373" cy="228" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+  </g>
+  <g transform="rotate(5 408 230)">
+    <rect x="385" y="205" width="46" height="50" rx="7" fill="url(#lnA)" stroke="#0e1014" stroke-width="3.5"/>
+    <path d="M392 212 h32" stroke="#eae5d3" stroke-width="4" opacity="0.55" stroke-linecap="round"/>
+    <path d="M392 247 h32" stroke="#12151b" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    <circle cx="396" cy="222" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+    <circle cx="420" cy="222" r="4" fill="url(#rv)" stroke="#0d0e12" stroke-width="1.5"/>
+  </g>
+  <!-- upper band spirit weld seams -->
+  <path d="M128 210 L126 252" stroke="#54d6c9" stroke-width="7" opacity="0.5" filter="url(#soft4)"/>
+  <path d="M128 210 L126 252" stroke="#e9fffa" stroke-width="2.2" opacity="0.9"/>
+  <circle cx="127" cy="231" r="2.5" fill="#f6fffd" opacity="0.95"/>
+  <path d="M175 216 L173 256" stroke="#54d6c9" stroke-width="7" opacity="0.5" filter="url(#soft4)"/>
+  <path d="M175 216 L173 256" stroke="#e9fffa" stroke-width="2.2" opacity="0.9"/>
+  <circle cx="174" cy="236" r="2.5" fill="#f6fffd" opacity="0.95"/>
+  <path d="M338 216 L340 256" stroke="#54d6c9" stroke-width="7" opacity="0.5" filter="url(#soft4)"/>
+  <path d="M338 216 L340 256" stroke="#e9fffa" stroke-width="2.2" opacity="0.9"/>
+  <circle cx="339" cy="236" r="2.5" fill="#f6fffd" opacity="0.95"/>
+  <path d="M385 210 L387 252" stroke="#54d6c9" stroke-width="7" opacity="0.5" filter="url(#soft4)"/>
+  <path d="M385 210 L387 252" stroke="#e9fffa" stroke-width="2.2" opacity="0.9"/>
+  <circle cx="386" cy="231" r="2.5" fill="#f6fffd" opacity="0.95"/>
+  <!-- heavy central clasp plate -->
+  <rect x="194" y="192" width="124" height="146" rx="16" fill="url(#claspG)" stroke="#0e1015" stroke-width="4"/>
+  <rect x="205" y="203" width="102" height="124" rx="12" fill="none" stroke="#d9e0ec" stroke-width="2.5" opacity="0.4"/>
+  <path d="M307 240 Q307 327 230 327" stroke="#0c0e12" stroke-width="3" fill="none" opacity="0.5"/>
+  <path d="M200 198 L300 198 L240 250 L200 250 Z" fill="#f2e9d4" opacity="0.12" filter="url(#soft4)"/>
+  <path d="M318 260 L318 330 Q318 338 300 338 L260 338 Z" fill="#0d141c" opacity="0.35" filter="url(#soft4)"/>
+  <!-- clasp quadrant weld seams -->
+  <path d="M256 208 L256 322" stroke="#54d6c9" stroke-width="8" opacity="0.5" filter="url(#soft4)"/>
+  <path d="M256 208 L256 322" stroke="#eafffb" stroke-width="2.4" opacity="0.9"/>
+  <path d="M210 265 L302 265" stroke="#54d6c9" stroke-width="8" opacity="0.5" filter="url(#soft4)"/>
+  <path d="M210 265 L302 265" stroke="#eafffb" stroke-width="2.4" opacity="0.9"/>
+  <circle cx="256" cy="214" r="2.5" fill="#f6fffd" opacity="0.9"/>
+  <circle cx="256" cy="316" r="2.5" fill="#f6fffd" opacity="0.9"/>
+  <circle cx="216" cy="265" r="2.5" fill="#f6fffd" opacity="0.9"/>
+  <circle cx="296" cy="265" r="2.5" fill="#f6fffd" opacity="0.9"/>
+  <!-- spirit boss -->
+  <circle cx="256" cy="265" r="30" fill="#3fc9bc" opacity="0.5" filter="url(#soft)"/>
+  <circle cx="256" cy="265" r="21" fill="url(#bossG)" stroke="#0d0f14" stroke-width="3"/>
+  <circle cx="256" cy="265" r="12" fill="url(#spiritG)"/>
+  <circle cx="251" cy="259" r="3" fill="#ffffff" opacity="0.85"/>
+  <!-- clasp rivets -->
+  <circle cx="212" cy="210" r="7" fill="url(#rv)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="300" cy="210" r="7" fill="url(#rv)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="212" cy="320" r="7" fill="url(#rv)" stroke="#0d0e12" stroke-width="2"/>
+  <circle cx="300" cy="320" r="7" fill="url(#rv)" stroke="#0d0e12" stroke-width="2"/>
+  <!-- wear scratches and rim light -->
+  <path d="M222 226 l26 -8" stroke="#e6ecf5" stroke-width="1.5" opacity="0.3" stroke-linecap="round"/>
+  <path d="M270 300 l22 -6" stroke="#e6ecf5" stroke-width="1.5" opacity="0.25" stroke-linecap="round"/>
+  <path d="M228 288 l14 8" stroke="#10141b" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>
+  <path d="M212 330 Q256 340 300 330" stroke="#4ed2c6" stroke-width="3" fill="none" opacity="0.3" filter="url(#soft4)"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

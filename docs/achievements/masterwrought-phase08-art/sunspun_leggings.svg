@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Sunspun Leggings</title>
+<defs>
+<radialGradient id="slBg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#343a54"/>
+<stop offset="0.55" stop-color="#181a26"/>
+<stop offset="1" stop-color="#0f1015"/>
+</radialGradient>
+<radialGradient id="slVig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="slSoft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="slSoft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="slHip" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#55659c"/>
+<stop offset="0.55" stop-color="#33406e"/>
+<stop offset="1" stop-color="#1c2444"/>
+</linearGradient>
+<linearGradient id="slLegL" x1="0" y1="0" x2="0.5" y2="1">
+<stop offset="0" stop-color="#4d5d92"/>
+<stop offset="0.55" stop-color="#2e3a66"/>
+<stop offset="1" stop-color="#182040"/>
+</linearGradient>
+<linearGradient id="slLegR" x1="0" y1="0" x2="0.5" y2="1">
+<stop offset="0" stop-color="#40507f"/>
+<stop offset="0.55" stop-color="#27335b"/>
+<stop offset="1" stop-color="#131a33"/>
+</linearGradient>
+<linearGradient id="slBand" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#5a6aa0"/>
+<stop offset="0.55" stop-color="#333f6d"/>
+<stop offset="1" stop-color="#202950"/>
+</linearGradient>
+<linearGradient id="slCuff" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#2b3560"/>
+<stop offset="1" stop-color="#141b36"/>
+</linearGradient>
+<linearGradient id="slGold" x1="0" y1="0" x2="0.8" y2="1">
+<stop offset="0" stop-color="#f4c95f"/>
+<stop offset="0.6" stop-color="#c8963c"/>
+<stop offset="1" stop-color="#8a6522"/>
+</linearGradient>
+<radialGradient id="slGoldC" cx="0.35" cy="0.3" r="0.9">
+<stop offset="0" stop-color="#ffedb2"/>
+<stop offset="0.5" stop-color="#e5b452"/>
+<stop offset="1" stop-color="#a87c2e"/>
+</radialGradient>
+<clipPath id="slGarb">
+<path d="M150 150 L362 150 C367 192 364 222 354 246 L300 266 L256 256 L212 266 L158 246 C148 222 145 192 150 150 Z"/>
+<path d="M158 238 C146 300 148 360 162 412 C164 419 169 422 177 423 C195 425 219 424 235 419 C240 417 243 413 244 408 C252 352 253 300 249 256 Z"/>
+<path d="M354 238 C366 300 364 360 350 412 C348 419 343 422 335 423 C317 425 293 424 277 419 C272 417 269 413 268 408 C260 352 259 300 263 256 Z"/>
+</clipPath>
+</defs>
+<rect width="512" height="512" fill="url(#slBg)"/>
+<ellipse cx="258" cy="432" rx="150" ry="30" fill="#000000" opacity="0.55" filter="url(#slSoft)"/>
+<g transform="rotate(-3 256 268) translate(256 268) scale(1.03) translate(-256 -268)">
+  <!-- legs first, hip panel overlaps the seam -->
+  <path d="M158 238 C146 300 148 360 162 412 C164 419 169 422 177 423 C195 425 219 424 235 419 C240 417 243 413 244 408 C252 352 253 300 249 256 Z" fill="url(#slLegL)" stroke="#0c1122" stroke-width="4"/>
+  <path d="M354 238 C366 300 364 360 350 412 C348 419 343 422 335 423 C317 425 293 424 277 419 C272 417 269 413 268 408 C260 352 259 300 263 256 Z" fill="url(#slLegR)" stroke="#0c1122" stroke-width="4"/>
+  <path d="M256 260 C256 316 257 370 256 416" stroke="#0a0f20" stroke-width="6" fill="none" opacity="0.7" stroke-linecap="round"/>
+  <path d="M150 150 L362 150 C367 192 364 222 354 246 L300 266 L256 256 L212 266 L158 246 C148 222 145 192 150 150 Z" fill="url(#slHip)" stroke="#0c1122" stroke-width="4"/>
+  <!-- broad light and shade, clipped to the garment -->
+  <g clip-path="url(#slGarb)">
+    <ellipse cx="190" cy="200" rx="110" ry="80" fill="#b9c6ee" opacity="0.2" filter="url(#slSoft)"/>
+    <ellipse cx="175" cy="165" rx="80" ry="50" fill="#d9b36a" opacity="0.12" filter="url(#slSoft)"/>
+    <ellipse cx="350" cy="365" rx="110" ry="110" fill="#060a1c" opacity="0.4" filter="url(#slSoft)"/>
+    <ellipse cx="256" cy="280" rx="60" ry="36" fill="#0a0f24" opacity="0.35" filter="url(#slSoft4)"/>
+    <ellipse cx="185" cy="310" rx="26" ry="100" fill="#8fa2d8" opacity="0.16" filter="url(#slSoft4)"/>
+  </g>
+  <!-- golden thread pinstriping, waist to hem -->
+  <g fill="none">
+    <path d="M180 168 C168 244 166 330 178 404" stroke="#6e5019" stroke-width="4" opacity="0.85"/>
+    <path d="M180 168 C168 244 166 330 178 404" stroke="#eec25a" stroke-width="1.8"/>
+    <path d="M204 168 C197 248 196 334 204 404" stroke="#6e5019" stroke-width="4" opacity="0.85"/>
+    <path d="M204 168 C197 248 196 334 204 404" stroke="#eec25a" stroke-width="1.8"/>
+    <path d="M228 168 C226 252 227 338 230 404" stroke="#6e5019" stroke-width="4" opacity="0.85"/>
+    <path d="M228 168 C226 252 227 338 230 404" stroke="#e5b452" stroke-width="1.8"/>
+    <path d="M332 168 C344 244 346 330 334 404" stroke="#5d4315" stroke-width="4" opacity="0.85"/>
+    <path d="M332 168 C344 244 346 330 334 404" stroke="#c8963c" stroke-width="1.8"/>
+    <path d="M308 168 C315 248 316 334 308 404" stroke="#5d4315" stroke-width="4" opacity="0.85"/>
+    <path d="M308 168 C315 248 316 334 308 404" stroke="#c8963c" stroke-width="1.8"/>
+    <path d="M284 168 C286 252 285 338 282 404" stroke="#5d4315" stroke-width="4" opacity="0.85"/>
+    <path d="M284 168 C286 252 285 338 282 404" stroke="#d8a747" stroke-width="1.8"/>
+    <path d="M181 176 C176 200 174 224 174 246" stroke="#ffedb2" stroke-width="2.5" opacity="0.7" stroke-linecap="round"/>
+    <path d="M205 176 C201 198 200 220 200 240" stroke="#ffedb2" stroke-width="2" opacity="0.55" stroke-linecap="round"/>
+  </g>
+  <!-- cloth folds over the stripes, kept translucent -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M166 252 C158 306 160 358 170 404" stroke="#93a6da" stroke-width="4" opacity="0.5"/>
+    <path d="M240 268 C246 318 244 366 238 408" stroke="#0a0f20" stroke-width="4" opacity="0.5"/>
+    <path d="M172 330 q30 10 62 4" stroke="#0a0f20" stroke-width="4" opacity="0.35"/>
+    <path d="M176 314 q28 -8 56 -4" stroke="#93a6da" stroke-width="3.5" opacity="0.35"/>
+    <path d="M346 252 C354 306 352 358 342 404" stroke="#0a0f20" stroke-width="5" opacity="0.55"/>
+    <path d="M272 262 C266 314 267 362 273 406" stroke="#6f81b5" stroke-width="3" opacity="0.35"/>
+    <path d="M278 334 q32 10 62 2" stroke="#0a0f20" stroke-width="4" opacity="0.4"/>
+    <path d="M212 262 q-14 26 -18 56" stroke="#0a0f20" stroke-width="4" opacity="0.4"/>
+    <path d="M300 262 q14 26 18 56" stroke="#0a0f20" stroke-width="4" opacity="0.45"/>
+    <path d="M164 172 q44 16 92 18" stroke="#9fb1e2" stroke-width="4" opacity="0.4"/>
+    <path d="M348 172 q-30 12 -66 16" stroke="#5e70a6" stroke-width="3" opacity="0.3"/>
+    <path d="M244 256 q12 10 24 0" stroke="#0a0f20" stroke-width="4" opacity="0.5"/>
+  </g>
+  <!-- hem cuffs -->
+  <path d="M160 400 C188 408 216 408 244 402 L241 420 C214 427 188 427 163 420 Z" fill="url(#slCuff)" stroke="#0c1122" stroke-width="3.5"/>
+  <path d="M352 400 C324 408 296 408 268 402 L271 420 C298 427 324 427 349 420 Z" fill="url(#slCuff)" stroke="#0c1122" stroke-width="3.5"/>
+  <path d="M166 408 C190 414 214 414 238 409" stroke="#d8a747" stroke-width="2.5" fill="none" opacity="0.8"/>
+  <path d="M346 408 C322 414 298 414 274 409" stroke="#b08630" stroke-width="2.5" fill="none" opacity="0.8"/>
+  <!-- waistband -->
+  <rect x="148" y="116" width="216" height="46" rx="16" fill="url(#slBand)" stroke="#0c1122" stroke-width="4"/>
+  <path d="M158 124 L354 124" stroke="#b08630" stroke-width="3.5" fill="none" opacity="0.9"/>
+  <path d="M158 124 L354 124" stroke="#f0c355" stroke-width="1.8" fill="none"/>
+  <path d="M160 152 L352 152" stroke="#d8a747" stroke-width="2" fill="none" opacity="0.75" stroke-dasharray="9 7"/>
+  <path d="M156 158 L356 158" stroke="#0c1122" stroke-width="2.5" fill="none" opacity="0.5"/>
+  <path d="M160 131 q50 -4 96 -3" stroke="#aebde6" stroke-width="3.5" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <path d="M156 132 q40 -3 84 -2" stroke="#ffedb2" stroke-width="2" fill="none" opacity="0.4" stroke-linecap="round"/>
+  <!-- woven sun-knot emblem -->
+  <g transform="translate(256 140)">
+    <circle r="22" fill="#131b3c" stroke="#0c1122" stroke-width="3"/>
+    <circle r="19" fill="#f2c355" opacity="0.3" filter="url(#slSoft4)"/>
+    <g fill="none" stroke="url(#slGold)" stroke-width="4.2">
+      <ellipse rx="16.5" ry="6.2"/>
+      <ellipse rx="16.5" ry="6.2" transform="rotate(45)"/>
+      <ellipse rx="16.5" ry="6.2" transform="rotate(90)"/>
+      <ellipse rx="16.5" ry="6.2" transform="rotate(135)"/>
+    </g>
+    <g fill="none" stroke="#7a5a1e" stroke-width="2" opacity="0.7">
+      <path d="M10 -4 q3 4 1 9"/>
+      <path d="M-10 -4 q-3 4 -1 9"/>
+      <path d="M-4 -10 q4 -3 9 -1"/>
+      <path d="M-4 10 q4 3 9 1"/>
+    </g>
+    <circle r="9.5" fill="none" stroke="#f4c95f" stroke-width="2.8" opacity="0.95"/>
+    <circle r="5.5" fill="url(#slGoldC)" stroke="#6e5019" stroke-width="1.5"/>
+    <circle cx="-1.6" cy="-1.8" r="1.6" fill="#fff3c8" opacity="0.9"/>
+    <g stroke="#e5b452" stroke-width="2.4" stroke-linecap="round" opacity="0.8">
+      <path d="M0 -20.5 L0 -26.5"/>
+      <path d="M14.5 -14.5 L18.7 -18.7"/>
+      <path d="M20.5 0 L26.5 0"/>
+      <path d="M14.5 14.5 L18.7 18.7"/>
+      <path d="M0 20.5 L0 26.5"/>
+      <path d="M-14.5 14.5 L-18.7 18.7"/>
+      <path d="M-20.5 0 L-26.5 0"/>
+      <path d="M-14.5 -14.5 L-18.7 -18.7"/>
+    </g>
+  </g>
+</g>
+<rect width="512" height="512" fill="url(#slVig)"/>
+</svg>
