@@ -70,11 +70,9 @@ function normalFromHeight(height, size, slope) {
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const dx =
-        (height[y * size + wrap(x + 1, size)] - height[y * size + wrap(x - 1, size)]) *
-        slope;
+        (height[y * size + wrap(x + 1, size)] - height[y * size + wrap(x - 1, size)]) * slope;
       const dy =
-        (height[wrap(y + 1, size) * size + x] - height[wrap(y - 1, size) * size + x]) *
-        slope;
+        (height[wrap(y + 1, size) * size + x] - height[wrap(y - 1, size) * size + x]) * slope;
       const length = Math.hypot(dx, dy, 1);
       const offset = (y * size + x) * 3;
       rgb[offset] = toByte((-dx / length) * 0.5 + 0.5);
@@ -94,9 +92,7 @@ function ormFromHeight(height, size, { roughness, metalness, wear = null }) {
     const worn = wear ? wear[index] : 0;
     const offset = index * 3;
     rgb[offset] = toByte(1 - cavity * 0.34);
-    rgb[offset + 1] = toByte(
-      ORM_CENTER * (roughness + cavity * 0.22 - crest * 0.1 - worn * 0.08),
-    );
+    rgb[offset + 1] = toByte(ORM_CENTER * (roughness + cavity * 0.22 - crest * 0.1 - worn * 0.08));
     rgb[offset + 2] = toByte(ORM_CENTER * (metalness + worn * 0.18));
   }
   return rgb;
@@ -172,7 +168,10 @@ async function encodeRgb(rgb, size) {
 async function encodeFamily(albedo, height, options) {
   return {
     albedo: await encodeGray(albedo, SLED_MAP_SIZE),
-    normal: await encodeRgb(normalFromHeight(height, SLED_MAP_SIZE, options.normalSlope), SLED_MAP_SIZE),
+    normal: await encodeRgb(
+      normalFromHeight(height, SLED_MAP_SIZE, options.normalSlope),
+      SLED_MAP_SIZE,
+    ),
     orm: await encodeRgb(ormFromHeight(height, SLED_MAP_SIZE, options), SLED_MAP_SIZE),
   };
 }

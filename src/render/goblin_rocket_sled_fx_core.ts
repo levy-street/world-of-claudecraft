@@ -132,7 +132,8 @@ export function stepGoblinRocketSledFx(
   const reverseTarget = reverse ? 1 : 0;
   const directionStep = dt / GOBLIN_ROCKET_SLED_DIRECTION_FADE_SEC;
   state.reverseBlend = clamp01(
-    state.reverseBlend + Math.max(-directionStep, Math.min(directionStep, reverseTarget - state.reverseBlend)),
+    state.reverseBlend +
+      Math.max(-directionStep, Math.min(directionStep, reverseTarget - state.reverseBlend)),
   );
 
   state.ignitionCooldown = Math.max(0, state.ignitionCooldown - dt);
@@ -190,18 +191,20 @@ export function stepGoblinRocketSledFx(
   const landingCompression =
     state.landingAge >= 0 ? Math.sin((state.landingAge / 0.22) * Math.PI) : 0;
   const jetHunt =
-    airborneOverburn * motionScale *
+    airborneOverburn *
+    motionScale *
     (Math.sin(inputs.time * 8.7) * 0.7 + Math.sin(inputs.time * 13.1 + 0.8) * 0.3);
 
   out.visible = intensity >= GOBLIN_ROCKET_SLED_FX_VISIBLE_MIN || stationaryAirborne;
   out.intensity = intensity;
   const forwardLength = 0.22 + intensity * 1.08;
   const reverseLength = 0.3 + intensity * 0.14;
-  const directionLength =
-    forwardLength + (reverseLength - forwardLength) * state.reverseBlend;
+  const directionLength = forwardLength + (reverseLength - forwardLength) * state.reverseBlend;
   const forwardMass = forward ? 0.28 + thrustSpool * 0.72 : 1;
   out.outerLength =
-    directionLength * forwardMass * (1 - ignition * 0.18) *
+    directionLength *
+    forwardMass *
+    (1 - ignition * 0.18) *
     (1 + airborneOverburn * 0.24 - landingCompression * 0.13);
   out.outerWidth =
     (0.1 + intensity * 0.12) * (forward ? 0.55 + thrustSpool * 0.45 : 1) +
@@ -227,10 +230,9 @@ export function stepGoblinRocketSledFx(
   }
   out.flutter = flutter;
   out.particleStrength = out.visible && forward ? intensity * (0.12 + thrustSpool * 0.88) : 0;
-  out.smokeStrength =
-    forward
-      ? clamp01((intensity - 0.68) / 0.32) * clamp01((thrustSpool - 0.78) / 0.22) * 0.32
-      : 0;
+  out.smokeStrength = forward
+    ? clamp01((intensity - 0.68) / 0.32) * clamp01((thrustSpool - 0.78) / 0.22) * 0.32
+    : 0;
   out.reverseBlend = state.reverseBlend;
   out.ignition = ignition;
   out.ignitionAge = state.ignitionAge;

@@ -1,6 +1,6 @@
 // Mount-owned interaction evidence: the real player_warrior GLB posed in its
 // shipped Sit_Floor_Idle clip at the proposed rider socket.
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { NodeIO } from '@gltf-transform/core';
@@ -39,7 +39,13 @@ const html = `<!doctype html><html><body><script>${outputFiles[0].text}</script>
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
-  args: ['--use-angle=swiftshader', '--use-gl=angle', '--ignore-gpu-blocklist', '--no-sandbox', '--enable-webgl'],
+  args: [
+    '--use-angle=swiftshader',
+    '--use-gl=angle',
+    '--ignore-gpu-blocklist',
+    '--no-sandbox',
+    '--enable-webgl',
+  ],
 });
 try {
   const page = await browser.newPage();
@@ -54,8 +60,13 @@ try {
       stage,
       view,
     );
-    writeFileSync(path.join(outputDir, `rider-fit-${view}.png`), Buffer.from(result.dataUrl.split(',')[1], 'base64'));
-    console.log(`${view}: ${JSON.stringify({ riderBounds: result.riderBounds, seatedLandmarks: result.seatedLandmarks, overlaps: result.overlaps })}`);
+    writeFileSync(
+      path.join(outputDir, `rider-fit-${view}.png`),
+      Buffer.from(result.dataUrl.split(',')[1], 'base64'),
+    );
+    console.log(
+      `${view}: ${JSON.stringify({ riderBounds: result.riderBounds, seatedLandmarks: result.seatedLandmarks, overlaps: result.overlaps })}`,
+    );
   }
 } finally {
   await browser.close();

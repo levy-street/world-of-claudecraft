@@ -27,7 +27,13 @@ const html = `<!doctype html><html><body><script>${outputFiles[0].text}</script>
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
-  args: ['--use-angle=swiftshader', '--use-gl=angle', '--ignore-gpu-blocklist', '--no-sandbox', '--enable-webgl'],
+  args: [
+    '--use-angle=swiftshader',
+    '--use-gl=angle',
+    '--ignore-gpu-blocklist',
+    '--no-sandbox',
+    '--enable-webgl',
+  ],
 });
 try {
   const page = await browser.newPage();

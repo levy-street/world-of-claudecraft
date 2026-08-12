@@ -51,7 +51,11 @@ function fitCamera(camera, object, view) {
   } else if (view === 'right') {
     camera.position.set(center.x + distance, center.y + distance * 0.12, center.z);
   } else {
-    camera.position.set(center.x + distance * 0.72, center.y + distance * 0.24, center.z + distance);
+    camera.position.set(
+      center.x + distance * 0.72,
+      center.y + distance * 0.24,
+      center.z + distance,
+    );
   }
   camera.lookAt(center);
 }

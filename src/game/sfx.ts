@@ -983,9 +983,7 @@ class Sfx {
       direction === 'forward' ? `mount_run_${mountKey}` : `mount_run_${mountKey}_reverse`;
     const startKey = `${stem}_start`;
     const resolved =
-      startKey in SFX_CLIPS
-        ? { startKey, loopKey: stem, stopKey: `${stem}_stop` }
-        : null;
+      startKey in SFX_CLIPS ? { startKey, loopKey: stem, stopKey: `${stem}_stop` } : null;
     this.engineClipKeysCache.set(cacheId, resolved);
     return resolved;
   }
@@ -1009,7 +1007,8 @@ class Sfx {
           : 'forward'
         : (priorDirection ?? 'forward')
       : 'forward';
-    const directionChanged = interruptible && moving && priorDirection !== undefined && priorDirection !== direction;
+    const directionChanged =
+      interruptible && moving && priorDirection !== undefined && priorDirection !== direction;
     if (interruptible && moving) this.mountEngineDirections.set(entityId, direction);
     const keys = this.engineClipKeys(mountKey, direction);
     if (!keys) return false;
@@ -1073,11 +1072,7 @@ class Sfx {
         const pitchTarget = authored * (airborne ? 1.08 : 1);
         if (loop.playbackTarget !== pitchTarget) {
           loop.playbackTarget = pitchTarget;
-          loop.src.playbackRate.setTargetAtTime(
-            pitchTarget,
-            now,
-            airborne ? 0.07 : 0.055,
-          );
+          loop.src.playbackRate.setTargetAtTime(pitchTarget, now, airborne ? 0.07 : 0.055);
         }
       }
     }

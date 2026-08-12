@@ -167,7 +167,9 @@ function applyAuthoredSurface(root, stage) {
     }
     const contract = CONTRACT_BY_NAME.get(object.material.name);
     if (!contract) throw new Error(`missing material contract for ${object.material.name}`);
-    const geometry = object.geometry.index ? object.geometry.toNonIndexed() : object.geometry.clone();
+    const geometry = object.geometry.index
+      ? object.geometry.toNonIndexed()
+      : object.geometry.clone();
     if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
     object.geometry = geometry;
     geometry.computeBoundingBox();
@@ -227,11 +229,7 @@ function applyAuthoredSurface(root, stage) {
           green -= soot;
           blue -= soot;
         }
-        if (
-          part.contract.key === 'wood' &&
-          part.object.name.includes('Runner') &&
-          worldY < 0.16
-        ) {
+        if (part.contract.key === 'wood' && part.object.name.includes('Runner') && worldY < 0.16) {
           // Ground-contact streak: darker grime with a slight warm polished
           // lift, localized to the runner underside rather than wallpapered.
           red *= 0.82;
@@ -334,8 +332,7 @@ function assertClosedOutwardGeometry(vertices, indices, label) {
     const cy = vertices[c * 3 + 1];
     const cz = vertices[c * 3 + 2];
     signedVolume +=
-      (ax * (by * cz - bz * cy) + ay * (bz * cx - bx * cz) + az * (bx * cy - by * cx)) /
-      6;
+      (ax * (by * cz - bz * cy) + ay * (bz * cx - bx * cz) + az * (bx * cy - by * cx)) / 6;
     for (const [start, end] of [
       [a, b],
       [b, c],
@@ -347,7 +344,8 @@ function assertClosedOutwardGeometry(vertices, indices, label) {
   }
   if (signedVolume <= 0) throw new Error(`${label} must have outward triangle winding`);
   for (const [edge, count] of edgeUse) {
-    if (count !== 2) throw new Error(`${label} must be watertight; edge ${edge} used ${count} times`);
+    if (count !== 2)
+      throw new Error(`${label} must be watertight; edge ${edge} used ${count} times`);
   }
 }
 
@@ -398,7 +396,11 @@ function addRunners(root, materials) {
   group.name = 'RunnerAssembly';
   for (const side of [-1, 1]) {
     const x = side * 0.88;
-    mesh(group, side < 0 ? 'Runner_L' : 'Runner_R', runnerGeometry(0.18), materials.wood, [x, 0, 0]);
+    mesh(group, side < 0 ? 'Runner_L' : 'Runner_R', runnerGeometry(0.18), materials.wood, [
+      x,
+      0,
+      0,
+    ]);
     roundedBox(
       group,
       side < 0 ? 'RunnerIronStrap_L' : 'RunnerIronStrap_R',
@@ -436,7 +438,14 @@ function addDeck(root, materials) {
     );
   }
   for (const z of [-0.86, 0.86]) {
-    roundedBox(group, `DeckCrossBrace_${z}`, [2.1, 0.12, 0.16], [0, 0.42, z], materials.iron, 0.025);
+    roundedBox(
+      group,
+      `DeckCrossBrace_${z}`,
+      [2.1, 0.12, 0.16],
+      [0, 0.42, z],
+      materials.iron,
+      0.025,
+    );
   }
   root.add(group);
 }
@@ -447,24 +456,101 @@ function addRocket(root, materials, side) {
   group.name = `Rocket_${suffix}`;
   group.position.x = side * 1.02;
   const alongZ = [Math.PI / 2, 0, 0];
-  cylinder(group, `RocketBody_${suffix}`, 0.33, 0.33, 1.78, [0, 0.7, -0.08], materials.red, alongZ, 14);
+  cylinder(
+    group,
+    `RocketBody_${suffix}`,
+    0.33,
+    0.33,
+    1.78,
+    [0, 0.7, -0.08],
+    materials.red,
+    alongZ,
+    14,
+  );
   cylinder(group, `RocketNose_${suffix}`, 0.02, 0.33, 0.38, [0, 0.7, 1], materials.red, alongZ, 14);
   for (const z of [-0.7, -0.18, 0.35, 0.74]) {
-    cylinder(group, `RocketBand_${suffix}_${z}`, 0.365, 0.365, 0.1, [0, 0.7, z], materials.iron, alongZ, 14);
+    cylinder(
+      group,
+      `RocketBand_${suffix}_${z}`,
+      0.365,
+      0.365,
+      0.1,
+      [0, 0.7, z],
+      materials.iron,
+      alongZ,
+      14,
+    );
   }
-  cylinder(group, `NozzleCollar_${suffix}`, 0.41, 0.33, 0.24, [0, 0.7, -1.09], materials.iron, alongZ, 14);
-  cylinder(group, `NozzleThroat_${suffix}`, 0.29, 0.2, 0.24, [0, 0.7, -1.3], materials.iron, alongZ, 14);
-  cylinder(group, `NozzleGlow_${suffix}`, 0.17, 0.13, 0.03, [0, 0.7, -1.43], materials.glow, alongZ, 12);
-  roundedBox(group, `RocketMount_${suffix}`, [0.26, 0.38, 0.62], [-side * 0.18, 0.5, 0.04], materials.iron, 0.035);
+  cylinder(
+    group,
+    `NozzleCollar_${suffix}`,
+    0.41,
+    0.33,
+    0.24,
+    [0, 0.7, -1.09],
+    materials.iron,
+    alongZ,
+    14,
+  );
+  cylinder(
+    group,
+    `NozzleThroat_${suffix}`,
+    0.29,
+    0.2,
+    0.24,
+    [0, 0.7, -1.3],
+    materials.iron,
+    alongZ,
+    14,
+  );
+  cylinder(
+    group,
+    `NozzleGlow_${suffix}`,
+    0.17,
+    0.13,
+    0.03,
+    [0, 0.7, -1.43],
+    materials.glow,
+    alongZ,
+    12,
+  );
+  roundedBox(
+    group,
+    `RocketMount_${suffix}`,
+    [0.26, 0.38, 0.62],
+    [-side * 0.18, 0.5, 0.04],
+    materials.iron,
+    0.035,
+  );
   root.add(group);
 }
 
 function addSeatAndTank(root, materials) {
   const tank = new THREE.Group();
   tank.name = 'FuelTank';
-  cylinder(tank, 'FuelTankBody', 0.39, 0.39, 1.15, [0, 1.16, -0.72], materials.red, [0, 0, Math.PI / 2], 14);
+  cylinder(
+    tank,
+    'FuelTankBody',
+    0.39,
+    0.39,
+    1.15,
+    [0, 1.16, -0.72],
+    materials.red,
+    [0, 0, Math.PI / 2],
+    14,
+  );
   for (const x of [-0.46, 0, 0.46]) {
-    cylinder(tank, `FuelTankBand_${x}`, 0.425, 0.425, 0.1, [x, 1.16, -0.72], materials.iron, [0, 0, Math.PI / 2], 14);
+    cylinder(
+      tank,
+      `FuelTankBand_${x}`,
+      0.425,
+      0.425,
+      0.1,
+      [x, 1.16, -0.72],
+      materials.iron,
+      [0, 0, Math.PI / 2],
+      14,
+    );
   }
   for (const x of [-0.28, 0.28]) {
     cylinder(
@@ -485,23 +571,65 @@ function addSeatAndTank(root, materials) {
   seat.name = 'RiderSeat';
   roundedBox(seat, 'SeatFrame', [1.02, 0.18, 0.86], [0, 0.72, 0.22], materials.iron, 0.045);
   roundedBox(seat, 'SeatCushion', [0.9, 0.2, 0.72], [0, 0.86, 0.24], materials.leather, 0.08);
-  roundedBox(seat, 'SeatBackFrame', [1.02, 0.82, 0.18], [0, 1.15, -0.1], materials.iron, 0.05, [-0.13, 0, 0]);
-  roundedBox(seat, 'SeatBackCushion', [0.88, 0.68, 0.17], [0, 1.16, -0.02], materials.leather, 0.075, [-0.13, 0, 0]);
+  roundedBox(
+    seat,
+    'SeatBackFrame',
+    [1.02, 0.82, 0.18],
+    [0, 1.15, -0.1],
+    materials.iron,
+    0.05,
+    [-0.13, 0, 0],
+  );
+  roundedBox(
+    seat,
+    'SeatBackCushion',
+    [0.88, 0.68, 0.17],
+    [0, 1.16, -0.02],
+    materials.leather,
+    0.075,
+    [-0.13, 0, 0],
+  );
   root.add(seat);
 }
 
 function addProw(root, materials) {
   const group = new THREE.Group();
   group.name = 'GoblinProw';
-  const face = mesh(group, 'GoblinFace', new THREE.IcosahedronGeometry(0.3, 1), materials.bone, [0, 0.63, 1.42]);
+  const face = mesh(
+    group,
+    'GoblinFace',
+    new THREE.IcosahedronGeometry(0.3, 1),
+    materials.bone,
+    [0, 0.63, 1.42],
+  );
   face.scale.set(1, 0.78, 0.38);
   for (const side of [-1, 1]) {
-    const eye = mesh(group, `GoblinEye_${side < 0 ? 'L' : 'R'}`, new THREE.SphereGeometry(0.065, 8, 5), materials.glow, [side * 0.1, 0.68, 1.535]);
+    const eye = mesh(
+      group,
+      `GoblinEye_${side < 0 ? 'L' : 'R'}`,
+      new THREE.SphereGeometry(0.065, 8, 5),
+      materials.glow,
+      [side * 0.1, 0.68, 1.535],
+    );
     eye.scale.z = 0.45;
-    const ear = mesh(group, `GoblinEar_${side < 0 ? 'L' : 'R'}`, new THREE.ConeGeometry(0.11, 0.34, 5), materials.bone, [side * 0.34, 0.68, 1.42], [0, 0, side * -Math.PI / 2]);
+    const ear = mesh(
+      group,
+      `GoblinEar_${side < 0 ? 'L' : 'R'}`,
+      new THREE.ConeGeometry(0.11, 0.34, 5),
+      materials.bone,
+      [side * 0.34, 0.68, 1.42],
+      [0, 0, (side * -Math.PI) / 2],
+    );
     ear.scale.z = 0.55;
   }
-  mesh(group, 'GoblinNose', new THREE.ConeGeometry(0.075, 0.2, 5), materials.bone, [0, 0.6, 1.59], [Math.PI / 2, 0, 0]);
+  mesh(
+    group,
+    'GoblinNose',
+    new THREE.ConeGeometry(0.075, 0.2, 5),
+    materials.bone,
+    [0, 0.6, 1.59],
+    [Math.PI / 2, 0, 0],
+  );
   roundedBox(group, 'ProwMount', [0.54, 0.18, 0.3], [0, 0.54, 1.31], materials.iron, 0.035);
   root.add(group);
 }
@@ -509,20 +637,26 @@ function addProw(root, materials) {
 function finGeometry(thickness = 0.08) {
   const half = thickness / 2;
   const vertices = [
-    -half, 0, -0.3,
-    -half, 0, 0.28,
-    -half, 0.28, -0.2,
-    half, 0, -0.3,
-    half, 0.28, -0.2,
-    half, 0, 0.28,
+    -half,
+    0,
+    -0.3,
+    -half,
+    0,
+    0.28,
+    -half,
+    0.28,
+    -0.2,
+    half,
+    0,
+    -0.3,
+    half,
+    0.28,
+    -0.2,
+    half,
+    0,
+    0.28,
   ];
-  const indices = [
-    0, 1, 2,
-    3, 4, 5,
-    0, 3, 5, 0, 5, 1,
-    1, 5, 4, 1, 4, 2,
-    2, 4, 3, 2, 3, 0,
-  ];
+  const indices = [0, 1, 2, 3, 4, 5, 0, 3, 5, 0, 5, 1, 1, 5, 4, 1, 4, 2, 2, 4, 3, 2, 3, 0];
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
   geometry.setIndex(indices);
@@ -618,10 +752,22 @@ function rocketSurfaceRibbonGeometry(side, centerZ, centerY, length, width, angl
   const acrossZ = -alongY;
   const acrossY = alongZ;
   const points = [
-    [centerZ - alongZ * halfLength - acrossZ * halfWidth, centerY - alongY * halfLength - acrossY * halfWidth],
-    [centerZ + alongZ * halfLength - acrossZ * halfWidth, centerY + alongY * halfLength - acrossY * halfWidth],
-    [centerZ + alongZ * halfLength + acrossZ * halfWidth, centerY + alongY * halfLength + acrossY * halfWidth],
-    [centerZ - alongZ * halfLength + acrossZ * halfWidth, centerY - alongY * halfLength + acrossY * halfWidth],
+    [
+      centerZ - alongZ * halfLength - acrossZ * halfWidth,
+      centerY - alongY * halfLength - acrossY * halfWidth,
+    ],
+    [
+      centerZ + alongZ * halfLength - acrossZ * halfWidth,
+      centerY + alongY * halfLength - acrossY * halfWidth,
+    ],
+    [
+      centerZ + alongZ * halfLength + acrossZ * halfWidth,
+      centerY + alongY * halfLength + acrossY * halfWidth,
+    ],
+    [
+      centerZ - alongZ * halfLength + acrossZ * halfWidth,
+      centerY - alongY * halfLength + acrossY * halfWidth,
+    ],
   ];
   return rocketSurfaceGeometry(side, points, [0, 1, 2, 0, 2, 3], radialLift, 3);
 }
@@ -656,9 +802,27 @@ function addStructuralDetails(root, materials) {
   // Low arm rails frame the cushion but stop below the real rider's elbows;
   // their posts bury into the seat frame and their rails overlap each post.
   for (const side of [-1, 1]) {
-    box(structure, `SeatPostFront_${side}`, [0.09, 0.38, 0.09], [side * 0.49, 1.02, 0.5], materials.iron);
-    box(structure, `SeatPostRear_${side}`, [0.09, 0.42, 0.09], [side * 0.49, 1.04, -0.04], materials.iron);
-    box(structure, `SeatArmRail_${side}`, [0.1, 0.1, 0.64], [side * 0.49, 1.22, 0.23], materials.iron);
+    box(
+      structure,
+      `SeatPostFront_${side}`,
+      [0.09, 0.38, 0.09],
+      [side * 0.49, 1.02, 0.5],
+      materials.iron,
+    );
+    box(
+      structure,
+      `SeatPostRear_${side}`,
+      [0.09, 0.42, 0.09],
+      [side * 0.49, 1.04, -0.04],
+      materials.iron,
+    );
+    box(
+      structure,
+      `SeatArmRail_${side}`,
+      [0.1, 0.1, 0.64],
+      [side * 0.49, 1.22, 0.23],
+      materials.iron,
+    );
   }
 
   for (const side of [-1, 1]) {
@@ -711,8 +875,28 @@ function addStructuralDetails(root, materials) {
   // Paired valves and a bridge clamp give the central tank a supported,
   // serviceable assembly instead of a bare cylinder behind the seat.
   for (const x of [-0.28, 0.28]) {
-    cylinder(structure, `TankValveStem_${x}`, 0.045, 0.045, 0.14, [x, 1.64, -0.72], materials.iron, [0, 0, 0], 6);
-    cylinder(structure, `TankValveWheel_${x}`, 0.11, 0.11, 0.04, [x, 1.73, -0.72], materials.iron, [Math.PI / 2, 0, 0], 8);
+    cylinder(
+      structure,
+      `TankValveStem_${x}`,
+      0.045,
+      0.045,
+      0.14,
+      [x, 1.64, -0.72],
+      materials.iron,
+      [0, 0, 0],
+      6,
+    );
+    cylinder(
+      structure,
+      `TankValveWheel_${x}`,
+      0.11,
+      0.11,
+      0.04,
+      [x, 1.73, -0.72],
+      materials.iron,
+      [Math.PI / 2, 0, 0],
+      8,
+    );
   }
   box(structure, 'TankCradleBridge', [1.42, 0.12, 0.18], [0, 0.78, -0.72], materials.iron);
 
@@ -757,7 +941,7 @@ function addFormDetails(root, materials) {
       new THREE.ConeGeometry(0.055, 0.23, 5),
       materials.bone,
       [side * 0.27, 0.55, 1.53],
-      [0, 0, side * -Math.PI / 2],
+      [0, 0, (side * -Math.PI) / 2],
     );
     cheek.scale.z = 0.7;
   }
@@ -840,15 +1024,7 @@ function addFormDetails(root, materials) {
       mesh(
         rocket,
         `RocketCrossbone_${suffix}_${angle}`,
-        rocketSurfaceRibbonGeometry(
-          side,
-          plaqueZ,
-          0.61 + plaqueLift,
-          0.3,
-          0.035,
-          angle,
-          0.007,
-        ),
+        rocketSurfaceRibbonGeometry(side, plaqueZ, 0.61 + plaqueLift, 0.3, 0.035, angle, 0.007),
         materials.bone,
         [0, 0, 0],
       );

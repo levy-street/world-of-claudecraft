@@ -245,10 +245,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
     // decision and never an accident: when the world boss lands, delete the entry
     // and the rarity-derived rule below takes back over.
-    const NO_SOURCE_YET: readonly string[] = [
-      'reins_drakemaw_raptor',
-      'reins_goblin_rocket_sled',
-    ];
+    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor', 'reins_goblin_rocket_sled'];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],

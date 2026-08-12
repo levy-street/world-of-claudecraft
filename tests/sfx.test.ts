@@ -298,12 +298,11 @@ describe('mount running audio', () => {
   it('ships one non-empty MP3 asset for every mount and no orphan clips', () => {
     const directory = new URL('../public/audio/sfx/', import.meta.url);
     const expected = MOUNT_KEYS.flatMap((mountKey) => [
-        `mount_run_${mountKey}.mp3`,
-        ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
-          (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
-        ),
-      ])
-      .sort();
+      `mount_run_${mountKey}.mp3`,
+      ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
+        (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
+      ),
+    ]).sort();
     const actual = readdirSync(directory)
       .filter((file) => file.startsWith('mount_run_') && file.endsWith('.mp3'))
       .sort();

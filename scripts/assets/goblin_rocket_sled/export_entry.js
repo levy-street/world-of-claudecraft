@@ -19,7 +19,8 @@ function modelStats(root) {
     if (!object.isMesh) return;
     meshes++;
     materials.add(object.material);
-    triangles += (object.geometry.index?.count ?? object.geometry.getAttribute('position').count) / 3;
+    triangles +=
+      (object.geometry.index?.count ?? object.geometry.getAttribute('position').count) / 3;
   });
   const bounds = new THREE.Box3().setFromObject(root);
   return {

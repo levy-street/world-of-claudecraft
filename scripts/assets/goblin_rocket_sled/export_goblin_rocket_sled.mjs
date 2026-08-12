@@ -11,9 +11,9 @@ import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import puppeteer from 'puppeteer-core';
 import { closePreview, renderPreviews } from '../../asset_pipeline/lib/preview.mjs';
 import { BROWSER_PATH } from '../../browser_path.mjs';
+import { ORM_CENTER } from '../terrorspark_groundshaker/surface_shading.mjs';
 import { SLED_MATERIAL_CONTRACT, SLED_STAGES } from './model.js';
 import { buildSledSurfaceMaps, NORMAL_SCALE } from './surface_maps.mjs';
-import { ORM_CENTER } from '../terrorspark_groundshaker/surface_shading.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
@@ -23,7 +23,11 @@ const stage = stageIndex >= 0 ? process.argv[stageIndex + 1] : 'blockout';
 if (!SLED_STAGES.includes(stage)) throw new Error(`unknown sled stage: ${stage}`);
 const noTurntable = process.argv.includes('--no-turntable');
 
-const rawOut = path.join(ROOT, 'tmp/asset_src/goblin_rocket_sled', `goblin_rocket_sled-${stage}.glb`);
+const rawOut = path.join(
+  ROOT,
+  'tmp/asset_src/goblin_rocket_sled',
+  `goblin_rocket_sled-${stage}.glb`,
+);
 const previewDir = path.join(ROOT, 'docs/screenshots/goblin-rocket-sled/authoring', stage);
 
 function assertCondition(condition, message) {
@@ -125,7 +129,13 @@ const html = `<!doctype html><html><body><script>${outputFiles[0].text}</script>
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
-  args: ['--use-angle=swiftshader', '--use-gl=angle', '--ignore-gpu-blocklist', '--no-sandbox', '--enable-webgl'],
+  args: [
+    '--use-angle=swiftshader',
+    '--use-gl=angle',
+    '--ignore-gpu-blocklist',
+    '--no-sandbox',
+    '--enable-webgl',
+  ],
 });
 
 let stats;
@@ -134,7 +144,10 @@ try {
   page.on('pageerror', (error) => console.error('PAGEERR', error.message));
   await page.setContent(html, { waitUntil: 'load' });
   await page.waitForFunction('window.__ready === true', { timeout: 20_000 });
-  const result = await page.evaluate((selectedStage) => window.exportGoblinRocketSled(selectedStage), stage);
+  const result = await page.evaluate(
+    (selectedStage) => window.exportGoblinRocketSled(selectedStage),
+    stage,
+  );
   mkdirSync(path.dirname(rawOut), { recursive: true });
   writeFileSync(rawOut, Buffer.from(result.b64, 'base64'));
   stats = result.stats;

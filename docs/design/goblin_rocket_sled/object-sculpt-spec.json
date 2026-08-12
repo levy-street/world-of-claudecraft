@@ -75,11 +75,7 @@
       "pitch": 0.0,
       "roll": 0.0
     },
-    "positionHint": [
-      0.0,
-      0.0,
-      3.0
-    ],
+    "positionHint": [0.0, 0.0, 3.0],
     "note": "The sheet contains several independently framed concept views, so no single photographic camera solve applies. Match the hero panel with an approximate 38-degree perspective camera and validate the other views independently."
   },
   "suitability": "pass",
@@ -152,11 +148,7 @@
     },
     "specDepthDecision": {
       "requiredDepth": "complex",
-      "minimumComponentLevels": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "minimumComponentLevels": ["macro", "meso", "micro"],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -544,12 +536,7 @@
         "qualityCriteria": [
           "Long parallel runners, compact chassis, low tank, open seat, and side rockets preserve the concept's width, length, and negative spaces."
         ],
-        "evidenceRefs": [
-          "hero",
-          "front",
-          "side",
-          "top"
-        ],
+        "evidenceRefs": ["hero", "front", "side", "top"],
         "failureModes": [
           "reads as a wheeled cart or hover bike",
           "runners are too short or rockets too high"
@@ -562,11 +549,7 @@
         "qualityCriteria": [
           "Mirrored barrels include band rhythm, conical noses, rear nozzle stacks, fins, mounts, and emissive cores."
         ],
-        "evidenceRefs": [
-          "hero",
-          "rocket-detail",
-          "rear"
-        ],
+        "evidenceRefs": ["hero", "rocket-detail", "rear"],
         "failureModes": [
           "rockets read as plain cylinders",
           "nozzles or mounts float from the chassis"
@@ -579,11 +562,7 @@
         "qualityCriteria": [
           "Tufted seat and backrest read clearly while Socket_Rider keeps the live player rig inside the safe zone shown by the top view."
         ],
-        "evidenceRefs": [
-          "hero",
-          "seat-detail",
-          "top"
-        ],
+        "evidenceRefs": ["hero", "seat-detail", "top"],
         "failureModes": [
           "rider clips tank, rockets, or backrest",
           "added controls contradict the concept"
@@ -596,15 +575,8 @@
         "qualityCriteria": [
           "Rivets, brackets, plank seams, pipes, skull markings, and prow ornament form an intentional hierarchy that survives gameplay distance."
         ],
-        "evidenceRefs": [
-          "hero",
-          "detail-closeups",
-          "front"
-        ],
-        "failureModes": [
-          "generic clean sci-fi sled",
-          "unstructured primitive clutter"
-        ]
+        "evidenceRefs": ["hero", "detail-closeups", "front"],
+        "failureModes": ["generic clean sci-fi sled", "unstructured primitive clutter"]
       },
       {
         "id": "surface-and-exhaust",
@@ -613,11 +585,7 @@
         "qualityCriteria": [
           "Independent procedural albedo, normal, and ORM fields preserve material separation; emissive cores and runtime exhaust remain readable without uncontrolled bloom."
         ],
-        "evidenceRefs": [
-          "rocket-detail",
-          "tank-detail",
-          "rear"
-        ],
+        "evidenceRefs": ["rocket-detail", "tank-detail", "rear"],
         "failureModes": [
           "flat plastic surfaces",
           "albedo reused as unrelated PBR channels",
@@ -650,18 +618,9 @@
       "reference-derived PBR material response at or above 0.7 confidence when source pixels are usable",
       "most recognizable local features"
     ],
-    "niceToHave": [
-      "micro scratches, stains, chips, and dirt masks",
-      "secondary lighting match"
-    ],
+    "niceToHave": ["micro scratches, stains, chips, and dirt masks", "secondary lighting match"],
     "fpsTarget": 60,
-    "reviewViewpoints": [
-      "front",
-      "front-three-quarter",
-      "side",
-      "rear",
-      "gameplay-chase-camera"
-    ]
+    "reviewViewpoints": ["front", "front-three-quarter", "side", "rear", "gameplay-chase-camera"]
   },
   "selfCorrectLoop": {
     "enabled": true,
@@ -701,13 +660,7 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": [
-      "continue",
-      "refine-spec",
-      "refine-code",
-      "request-input",
-      "stop"
-    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
     "specRefineTriggers": [
       "missing component",
       "wrong primitive family",
@@ -748,113 +701,51 @@
       "id": "sled-silhouette",
       "name": "Long runners, low chassis, open seat, tank, and twin-rocket silhouette",
       "tier": "critical",
-      "passIds": [
-        "blockout",
-        "form-refinement"
-      ],
+      "passIds": ["blockout", "form-refinement"],
       "minimumScore": 0.82,
       "mustPass": true,
-      "componentRefs": [
-        "root",
-        "chassis-deck",
-        "runner-pair",
-        "twin-rockets",
-        "fuel-tank"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "front",
-        "side",
-        "top"
-      ]
+      "componentRefs": ["root", "chassis-deck", "runner-pair", "twin-rockets", "fuel-tank"],
+      "evidenceRefs": ["hero", "front", "side", "top"]
     },
     {
       "id": "rocket-assemblies",
       "name": "Mirrored rocket barrels, bands, noses, fins, nozzle stacks, and mounts",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "form-refinement"
-      ],
+      "passIds": ["structural-pass", "form-refinement"],
       "minimumScore": 0.82,
       "mustPass": true,
-      "componentRefs": [
-        "twin-rockets",
-        "rocket-mounts",
-        "exhaust-emitters"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "rocket-detail",
-        "rear"
-      ]
+      "componentRefs": ["twin-rockets", "rocket-mounts", "exhaust-emitters"],
+      "evidenceRefs": ["hero", "rocket-detail", "rear"]
     },
     {
       "id": "rider-clearance",
       "name": "Open tufted seat and collision-free rider zone",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "interaction-pass"
-      ],
+      "passIds": ["structural-pass", "interaction-pass"],
       "minimumScore": 0.84,
       "mustPass": true,
-      "componentRefs": [
-        "rider-seat",
-        "seat-frame",
-        "fuel-tank",
-        "twin-rockets"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "seat-detail",
-        "top"
-      ]
+      "componentRefs": ["rider-seat", "seat-frame", "fuel-tank", "twin-rockets"],
+      "evidenceRefs": ["hero", "seat-detail", "top"]
     },
     {
       "id": "goblin-construction",
       "name": "Riveted brackets, plank rhythm, pipes, skull markings, and prow face",
       "tier": "critical",
-      "passIds": [
-        "form-refinement",
-        "surface-pass"
-      ],
+      "passIds": ["form-refinement", "surface-pass"],
       "minimumScore": 0.78,
       "mustPass": true,
-      "componentRefs": [
-        "chassis-deck",
-        "fuel-system",
-        "prow-ornament",
-        "runner-braces"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "detail-closeups",
-        "front"
-      ]
+      "componentRefs": ["chassis-deck", "fuel-system", "prow-ornament", "runner-braces"],
+      "evidenceRefs": ["hero", "detail-closeups", "front"]
     },
     {
       "id": "surface-and-exhaust",
       "name": "Worn material separation, emissive nozzle cores, and runtime exhaust read",
       "tier": "critical",
-      "passIds": [
-        "material-pass",
-        "surface-pass",
-        "interaction-pass"
-      ],
+      "passIds": ["material-pass", "surface-pass", "interaction-pass"],
       "minimumScore": 0.76,
       "mustPass": true,
-      "componentRefs": [
-        "twin-rockets",
-        "fuel-tank",
-        "rider-seat",
-        "exhaust-emitters"
-      ],
-      "evidenceRefs": [
-        "rocket-detail",
-        "tank-detail",
-        "rear"
-      ]
+      "componentRefs": ["twin-rockets", "fuel-tank", "rider-seat", "exhaust-emitters"],
+      "evidenceRefs": ["rocket-detail", "tank-detail", "rear"]
     }
   ],
   "sculptPipeline": {
@@ -899,18 +790,8 @@
       "localOverridesRequired": true,
       "minimumTextureResolution": 256,
       "preferredTextureResolution": 1024,
-      "independentMapChannels": [
-        "albedo",
-        "roughness",
-        "height",
-        "normal",
-        "ambient-occlusion"
-      ],
-      "requiredSurfaceFrequencyBands": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
       "geometryReliefRequiredWhenSilhouetteAffected": true,
       "referencePbrExtraction": {
         "requiredWhenSourceImagePresent": false,
@@ -1049,90 +930,56 @@
       "id": "front",
       "view": "front",
       "path": "reference-metadata.json#admittedViews.front",
-      "observations": [
-        "runner spacing",
-        "rocket symmetry",
-        "goblin ornament width"
-      ],
+      "observations": ["runner spacing", "rocket symmetry", "goblin ornament width"],
       "confidence": 0.96
     },
     {
       "id": "side",
       "view": "left-profile",
       "path": "reference-metadata.json#admittedViews.side",
-      "observations": [
-        "runner curvature",
-        "seat and tank height",
-        "rocket nose-to-nozzle length"
-      ],
+      "observations": ["runner curvature", "seat and tank height", "rocket nose-to-nozzle length"],
       "confidence": 0.96
     },
     {
       "id": "rear",
       "view": "rear",
       "path": "reference-metadata.json#admittedViews.rear",
-      "observations": [
-        "nozzle ring stacks",
-        "exhaust spacing",
-        "rear frame width"
-      ],
+      "observations": ["nozzle ring stacks", "exhaust spacing", "rear frame width"],
       "confidence": 0.96
     },
     {
       "id": "top",
       "view": "top-rider-clearance",
       "path": "reference-metadata.json#admittedViews.top",
-      "observations": [
-        "safe rider zone",
-        "rocket clearance",
-        "tank position"
-      ],
+      "observations": ["safe rider zone", "rocket clearance", "tank position"],
       "confidence": 0.97
     },
     {
       "id": "rocket-detail",
       "view": "detail-closeup",
       "path": "reference-metadata.json#admittedViews.rocketDetail",
-      "observations": [
-        "band and rivet rhythm",
-        "paint wear",
-        "nozzle construction"
-      ],
+      "observations": ["band and rivet rhythm", "paint wear", "nozzle construction"],
       "confidence": 0.98
     },
     {
       "id": "seat-detail",
       "view": "detail-closeup",
       "path": "reference-metadata.json#admittedViews.seatDetail",
-      "observations": [
-        "tufted pads",
-        "frame brackets",
-        "arm clearance"
-      ],
+      "observations": ["tufted pads", "frame brackets", "arm clearance"],
       "confidence": 0.97
     },
     {
       "id": "tank-detail",
       "view": "detail-closeup",
       "path": "reference-metadata.json#admittedViews.tankDetail",
-      "observations": [
-        "banded cylinder",
-        "caps and valves",
-        "skull marking"
-      ],
+      "observations": ["banded cylinder", "caps and valves", "skull marking"],
       "confidence": 0.98
     },
     {
       "id": "detail-closeups",
       "view": "detail-grid",
       "path": "reference-metadata.json#admittedViews.detailCloseups",
-      "observations": [
-        "runner tip",
-        "rocket mount",
-        "seat",
-        "tank",
-        "nozzle"
-      ],
+      "observations": ["runner tip", "rocket mount", "seat", "tank", "nozzle"],
       "confidence": 0.97
     }
   ],
@@ -1153,16 +1000,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -1178,16 +1017,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -1209,21 +1040,9 @@
         "confidence": 0.84
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "dark-iron",
       "materialLayers": [
@@ -1251,13 +1070,7 @@
         "edgeWearPattern": "Metal chips and exposed edges, runner-axis abrasion, wood seam wear, and handled leather crests remain local to their semantic material families.",
         "notes": "Implemented by scripts/assets/goblin_rocket_sled/surface_maps.mjs and the world-space surface bake in model.js; evidence is the 3x3 surface map sheet and grazing-light close-up."
       },
-      "evidenceRefs": [
-        "hero",
-        "front",
-        "side",
-        "rear",
-        "top"
-      ],
+      "evidenceRefs": ["hero", "front", "side", "rear", "top"],
       "fidelityTier": "shipping"
     },
     {
@@ -1273,16 +1086,8 @@
       "parent": "root",
       "attachment": {
         "parentSocket": "Socket_Chassis",
-        "localStart": [
-          0,
-          0.35,
-          0.1
-        ],
-        "localEnd": [
-          0,
-          0.48,
-          0.1
-        ],
+        "localStart": [0, 0.35, 0.1],
+        "localEnd": [0, 0.48, 0.1],
         "contactType": "overlap",
         "embedDepth": 0.08,
         "gapTolerance": 0.01
@@ -1291,16 +1096,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -1316,16 +1113,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -1347,27 +1136,12 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          0.4,
-          0.15
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.4, 0.15],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "aged-wood",
-      "materialLayers": [
-        "aged-wood",
-        "dark-iron"
-      ],
+      "materialLayers": ["aged-wood", "dark-iron"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(90, 59, 36, 1)",
         "secondaryAlbedo": "rgba(48, 47, 43, 1)",
@@ -1379,26 +1153,16 @@
           "id": "plank-seams",
           "type": "seam",
           "geometry": "seven longitudinal planks with recessed gaps",
-          "evidenceRefs": [
-            "hero",
-            "top"
-          ]
+          "evidenceRefs": ["hero", "top"]
         },
         {
           "id": "reinforcement-brackets",
           "type": "ridge",
           "geometry": "overlapping iron angle plates at frame joints",
-          "evidenceRefs": [
-            "hero",
-            "rocket-detail"
-          ]
+          "evidenceRefs": ["hero", "rocket-detail"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "top",
-        "side"
-      ],
+      "evidenceRefs": ["hero", "top", "side"],
       "fidelityTier": "shipping"
     },
     {
@@ -1414,16 +1178,8 @@
       "parent": "root",
       "attachment": {
         "parentSocket": "Socket_RunnerFrame",
-        "localStart": [
-          -0.9,
-          0.12,
-          -0.8
-        ],
-        "localEnd": [
-          -0.9,
-          0.12,
-          1.85
-        ],
+        "localStart": [-0.9, 0.12, -0.8],
+        "localEnd": [-0.9, 0.12, 1.85],
         "contactType": "bracketed",
         "overlap": 0.06,
         "gapTolerance": 0.01
@@ -1432,16 +1188,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -1457,16 +1205,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -1488,27 +1228,12 @@
         "confidence": 0.9
       },
       "transform": {
-        "position": [
-          0,
-          0.14,
-          0.12
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.14, 0.12],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "aged-wood",
-      "materialLayers": [
-        "aged-wood",
-        "dark-iron"
-      ],
+      "materialLayers": ["aged-wood", "dark-iron"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(75, 52, 36, 1)",
         "secondaryAlbedo": "rgba(52, 51, 49, 1)",
@@ -1520,26 +1245,16 @@
           "id": "upturned-tips",
           "type": "bevel",
           "geometry": "shallow curved nose profile with reinforced cap",
-          "evidenceRefs": [
-            "hero",
-            "side"
-          ]
+          "evidenceRefs": ["hero", "side"]
         },
         {
           "id": "edge-rivet-rows",
           "type": "fastener",
           "geometry": "instanced raised rivets along both outer straps",
-          "evidenceRefs": [
-            "hero",
-            "rocket-detail"
-          ]
+          "evidenceRefs": ["hero", "rocket-detail"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "front",
-        "side"
-      ],
+      "evidenceRefs": ["hero", "front", "side"],
       "fidelityTier": "shipping"
     },
     {
@@ -1555,16 +1270,8 @@
       "parent": "root",
       "attachment": {
         "parentSocket": "Socket_RocketMounts",
-        "localStart": [
-          -1.0,
-          0.58,
-          0.15
-        ],
-        "localEnd": [
-          -1.0,
-          0.58,
-          -0.95
-        ],
+        "localStart": [-1.0, 0.58, 0.15],
+        "localEnd": [-1.0, 0.58, -0.95],
         "contactType": "clamped",
         "overlap": 0.08,
         "gapTolerance": 0.01
@@ -1573,16 +1280,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -1598,16 +1297,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -1629,28 +1320,12 @@
         "confidence": 0.91
       },
       "transform": {
-        "position": [
-          0,
-          0.65,
-          0.05
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.65, 0.05],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "red-painted-steel",
-      "materialLayers": [
-        "red-painted-steel",
-        "dark-iron",
-        "rocket-glow"
-      ],
+      "materialLayers": ["red-painted-steel", "dark-iron", "rocket-glow"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(139, 48, 38, 1)",
         "secondaryAlbedo": "rgba(57, 55, 53, 1)",
@@ -1662,36 +1337,22 @@
           "id": "band-rivet-rings",
           "type": "fastener",
           "geometry": "radial instanced rivets on five bands per rocket",
-          "evidenceRefs": [
-            "rocket-detail"
-          ]
+          "evidenceRefs": ["rocket-detail"]
         },
         {
           "id": "nozzle-ring-stack",
           "type": "ridge",
           "geometry": "three stepped concentric nozzle rings around a recessed core",
-          "evidenceRefs": [
-            "rocket-detail",
-            "rear"
-          ]
+          "evidenceRefs": ["rocket-detail", "rear"]
         },
         {
           "id": "tail-fins",
           "type": "contour",
           "geometry": "paired triangular fins per rocket",
-          "evidenceRefs": [
-            "hero",
-            "side",
-            "rear"
-          ]
+          "evidenceRefs": ["hero", "side", "rear"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "side",
-        "rear",
-        "rocket-detail"
-      ],
+      "evidenceRefs": ["hero", "side", "rear", "rocket-detail"],
       "fidelityTier": "shipping"
     },
     {
@@ -1707,16 +1368,8 @@
       "parent": "root",
       "attachment": {
         "parentSocket": "Socket_TankCradle",
-        "localStart": [
-          0,
-          0.86,
-          -0.65
-        ],
-        "localEnd": [
-          0,
-          1.28,
-          -0.65
-        ],
+        "localStart": [0, 0.86, -0.65],
+        "localEnd": [0, 1.28, -0.65],
         "contactType": "cradled",
         "overlap": 0.07,
         "gapTolerance": 0.01
@@ -1725,16 +1378,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -1750,16 +1395,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -1781,27 +1418,12 @@
         "confidence": 0.9
       },
       "transform": {
-        "position": [
-          0,
-          1.08,
-          -0.72
-        ],
-        "rotation": [
-          0,
-          0,
-          1.5708
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 1.08, -0.72],
+        "rotation": [0, 0, 1.5708],
+        "scale": [1, 1, 1]
       },
       "material": "red-painted-steel",
-      "materialLayers": [
-        "red-painted-steel",
-        "dark-iron"
-      ],
+      "materialLayers": ["red-painted-steel", "dark-iron"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(127, 43, 34, 1)",
         "secondaryAlbedo": "rgba(60, 57, 53, 1)",
@@ -1813,25 +1435,16 @@
           "id": "band-and-rivet-system",
           "type": "fastener",
           "geometry": "four wide radial bands with face rivets",
-          "evidenceRefs": [
-            "tank-detail"
-          ]
+          "evidenceRefs": ["tank-detail"]
         },
         {
           "id": "caps-and-valves",
           "type": "ridge",
           "geometry": "two top filler caps and small pressure valve cluster",
-          "evidenceRefs": [
-            "hero",
-            "tank-detail"
-          ]
+          "evidenceRefs": ["hero", "tank-detail"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "rear",
-        "tank-detail"
-      ],
+      "evidenceRefs": ["hero", "rear", "tank-detail"],
       "fidelityTier": "shipping"
     },
     {
@@ -1847,16 +1460,8 @@
       "parent": "root",
       "attachment": {
         "parentSocket": "Socket_SeatFrame",
-        "localStart": [
-          0,
-          0.64,
-          0.15
-        ],
-        "localEnd": [
-          0,
-          1.2,
-          -0.05
-        ],
+        "localStart": [0, 0.64, 0.15],
+        "localEnd": [0, 1.2, -0.05],
         "contactType": "framed",
         "embedDepth": 0.05,
         "gapTolerance": 0.01
@@ -1865,16 +1470,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -1890,16 +1487,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -1921,28 +1510,12 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          0,
-          0.92,
-          0.18
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.92, 0.18],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "brown-leather",
-      "materialLayers": [
-        "brown-leather",
-        "dark-iron",
-        "aged-wood"
-      ],
+      "materialLayers": ["brown-leather", "dark-iron", "aged-wood"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(111, 56, 43, 1)",
         "secondaryAlbedo": "rgba(63, 36, 29, 1)",
@@ -1954,17 +1527,10 @@
           "id": "tufted-panels",
           "type": "seam",
           "geometry": "segmented pads with recessed seams and button dimples",
-          "evidenceRefs": [
-            "hero",
-            "seat-detail"
-          ]
+          "evidenceRefs": ["hero", "seat-detail"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "seat-detail",
-        "top"
-      ],
+      "evidenceRefs": ["hero", "seat-detail", "top"],
       "fidelityTier": "shipping"
     },
     {
@@ -1980,16 +1546,8 @@
       "parent": "root",
       "attachment": {
         "parentSocket": "Socket_FuelPorts",
-        "localStart": [
-          0,
-          1.0,
-          -0.72
-        ],
-        "localEnd": [
-          1.02,
-          0.72,
-          -0.56
-        ],
+        "localStart": [0, 1.0, -0.72],
+        "localEnd": [1.02, 0.72, -0.56],
         "contactType": "socketed",
         "embedDepth": 0.04,
         "gapTolerance": 0.015
@@ -1998,16 +1556,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -2023,16 +1573,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -2054,26 +1596,12 @@
         "confidence": 0.72
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "dark-iron",
-      "materialLayers": [
-        "dark-iron"
-      ],
+      "materialLayers": ["dark-iron"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(52, 49, 45, 1)",
         "secondaryAlbedo": "rgba(92, 58, 40, 1)",
@@ -2085,16 +1613,10 @@
           "id": "pipe-runs",
           "type": "ridge",
           "geometry": "mirrored bent tube runs with elbow collars",
-          "evidenceRefs": [
-            "hero",
-            "rear"
-          ]
+          "evidenceRefs": ["hero", "rear"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "rear"
-      ],
+      "evidenceRefs": ["hero", "rear"],
       "fidelityTier": "shipping"
     },
     {
@@ -2110,16 +1632,8 @@
       "parent": "chassis-deck",
       "attachment": {
         "parentSocket": "Socket_Prow",
-        "localStart": [
-          0,
-          0.42,
-          1.34
-        ],
-        "localEnd": [
-          0,
-          0.58,
-          1.48
-        ],
+        "localStart": [0, 0.42, 1.34],
+        "localEnd": [0, 0.58, 1.48],
         "contactType": "bolted",
         "embedDepth": 0.05,
         "gapTolerance": 0.01
@@ -2128,16 +1642,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -2153,16 +1659,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -2184,28 +1682,12 @@
         "confidence": 0.84
       },
       "transform": {
-        "position": [
-          0,
-          0.58,
-          1.43
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.58, 1.43],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "bone-ornament",
-      "materialLayers": [
-        "bone-ornament",
-        "dark-iron",
-        "rocket-glow"
-      ],
+      "materialLayers": ["bone-ornament", "dark-iron", "rocket-glow"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(106, 107, 53, 1)",
         "secondaryAlbedo": "rgba(44, 41, 35, 1)",
@@ -2217,16 +1699,10 @@
           "id": "goblin-face-and-spikes",
           "type": "contour",
           "geometry": "brow, nose, tusks, ears, red eye insets, and six dark spikes",
-          "evidenceRefs": [
-            "hero",
-            "front"
-          ]
+          "evidenceRefs": ["hero", "front"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "front"
-      ],
+      "evidenceRefs": ["hero", "front"],
       "fidelityTier": "shipping"
     },
     {
@@ -2242,16 +1718,8 @@
       "parent": "chassis-deck",
       "attachment": {
         "parentSocket": "Socket_RocketMounts",
-        "localStart": [
-          -0.92,
-          0.45,
-          0.2
-        ],
-        "localEnd": [
-          -0.92,
-          0.67,
-          0.2
-        ],
+        "localStart": [-0.92, 0.45, 0.2],
+        "localEnd": [-0.92, 0.67, 0.2],
         "contactType": "bolted",
         "overlap": 0.06,
         "gapTolerance": 0.01
@@ -2260,16 +1728,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -2285,16 +1745,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -2316,26 +1768,12 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          0.55,
-          0.05
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.55, 0.05],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "dark-iron",
-      "materialLayers": [
-        "dark-iron"
-      ],
+      "materialLayers": ["dark-iron"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(54, 52, 50, 1)",
         "secondaryAlbedo": "rgba(107, 67, 44, 1)",
@@ -2347,15 +1785,10 @@
           "id": "clamp-plates",
           "type": "ridge",
           "geometry": "paired saddle plates and square cross-brackets",
-          "evidenceRefs": [
-            "rocket-detail"
-          ]
+          "evidenceRefs": ["rocket-detail"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "rocket-detail"
-      ],
+      "evidenceRefs": ["hero", "rocket-detail"],
       "fidelityTier": "shipping"
     },
     {
@@ -2371,16 +1804,8 @@
       "parent": "runner-pair",
       "attachment": {
         "parentSocket": "Socket_RunnerBraces",
-        "localStart": [
-          -0.88,
-          0.2,
-          -0.9
-        ],
-        "localEnd": [
-          0.88,
-          0.2,
-          -0.9
-        ],
+        "localStart": [-0.88, 0.2, -0.9],
+        "localEnd": [0.88, 0.2, -0.9],
         "contactType": "bolted",
         "overlap": 0.05,
         "gapTolerance": 0.01
@@ -2389,16 +1814,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -2414,16 +1831,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -2445,26 +1854,12 @@
         "confidence": 0.78
       },
       "transform": {
-        "position": [
-          0,
-          0.25,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.25, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "dark-iron",
-      "materialLayers": [
-        "dark-iron"
-      ],
+      "materialLayers": ["dark-iron"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(51, 49, 47, 1)",
         "secondaryAlbedo": "rgba(90, 57, 39, 1)",
@@ -2476,17 +1871,10 @@
           "id": "brace-bolt-heads",
           "type": "fastener",
           "geometry": "instanced hex bolts at brace-to-runner contacts",
-          "evidenceRefs": [
-            "hero",
-            "front"
-          ]
+          "evidenceRefs": ["hero", "front"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "front",
-        "rear"
-      ],
+      "evidenceRefs": ["hero", "front", "rear"],
       "fidelityTier": "shipping"
     },
     {
@@ -2502,16 +1890,8 @@
       "parent": "chassis-deck",
       "attachment": {
         "parentSocket": "Socket_SeatFrame",
-        "localStart": [
-          0,
-          0.52,
-          0.08
-        ],
-        "localEnd": [
-          0,
-          1.42,
-          -0.18
-        ],
+        "localStart": [0, 0.52, 0.08],
+        "localEnd": [0, 1.42, -0.18],
         "contactType": "bolted",
         "embedDepth": 0.06,
         "gapTolerance": 0.01
@@ -2520,16 +1900,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -2545,16 +1917,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -2576,27 +1940,12 @@
         "confidence": 0.84
       },
       "transform": {
-        "position": [
-          0,
-          0.96,
-          0.05
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.96, 0.05],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "aged-wood",
-      "materialLayers": [
-        "aged-wood",
-        "dark-iron"
-      ],
+      "materialLayers": ["aged-wood", "dark-iron"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(89, 56, 33, 1)",
         "secondaryAlbedo": "rgba(56, 52, 49, 1)",
@@ -2608,15 +1957,10 @@
           "id": "frame-corner-rivets",
           "type": "fastener",
           "geometry": "raised fasteners on seat corner straps",
-          "evidenceRefs": [
-            "seat-detail"
-          ]
+          "evidenceRefs": ["seat-detail"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "seat-detail"
-      ],
+      "evidenceRefs": ["hero", "seat-detail"],
       "fidelityTier": "shipping"
     },
     {
@@ -2632,16 +1976,8 @@
       "parent": "chassis-deck",
       "attachment": {
         "parentSocket": "Socket_DeckFront",
-        "localStart": [
-          0,
-          0.38,
-          1.15
-        ],
-        "localEnd": [
-          0,
-          0.55,
-          1.35
-        ],
+        "localStart": [0, 0.38, 1.15],
+        "localEnd": [0, 0.55, 1.35],
         "contactType": "overlap",
         "overlap": 0.07,
         "gapTolerance": 0.01
@@ -2650,16 +1986,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -2675,16 +2003,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -2706,27 +2026,12 @@
         "confidence": 0.8
       },
       "transform": {
-        "position": [
-          0,
-          0.48,
-          1.24
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.48, 1.24],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "dark-iron",
-      "materialLayers": [
-        "dark-iron",
-        "aged-wood"
-      ],
+      "materialLayers": ["dark-iron", "aged-wood"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(52, 50, 48, 1)",
         "secondaryAlbedo": "rgba(87, 64, 43, 1)",
@@ -2738,16 +2043,10 @@
           "id": "front-spike-set",
           "type": "contour",
           "geometry": "short triangular spikes flanking the goblin face",
-          "evidenceRefs": [
-            "hero",
-            "front"
-          ]
+          "evidenceRefs": ["hero", "front"]
         }
       ],
-      "evidenceRefs": [
-        "hero",
-        "front"
-      ],
+      "evidenceRefs": ["hero", "front"],
       "fidelityTier": "shipping"
     },
     {
@@ -2763,16 +2062,8 @@
       "parent": "twin-rockets",
       "attachment": {
         "parentSocket": "Socket_Nozzles",
-        "localStart": [
-          -1.0,
-          0.65,
-          -0.92
-        ],
-        "localEnd": [
-          -1.0,
-          0.65,
-          -1.12
-        ],
+        "localStart": [-1.0, 0.65, -0.92],
+        "localEnd": [-1.0, 0.65, -1.12],
         "contactType": "nested",
         "embedDepth": 0.08,
         "gapTolerance": 0.005
@@ -2781,16 +2072,8 @@
         "animationRole": "static-runtime-driven",
         "pivot": {
           "mode": "component-origin",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.85
         },
         "transformChannels": {
@@ -2806,16 +2089,8 @@
         "sockets": [],
         "collider": {
           "type": "box",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
         },
@@ -2837,27 +2112,12 @@
         "confidence": 0.9
       },
       "transform": {
-        "position": [
-          0,
-          0.65,
-          -1.05
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.65, -1.05],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "rocket-glow",
-      "materialLayers": [
-        "rocket-glow",
-        "dark-iron"
-      ],
+      "materialLayers": ["rocket-glow", "dark-iron"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(255, 106, 0, 1)",
         "secondaryAlbedo": "rgba(255, 208, 90, 1)",
@@ -2869,16 +2129,10 @@
           "id": "socket-pair",
           "type": "emissive",
           "geometry": "Socket_Exhaust_L and Socket_Exhaust_R centered inside nozzle throats",
-          "evidenceRefs": [
-            "rear",
-            "rocket-detail"
-          ]
+          "evidenceRefs": ["rear", "rocket-detail"]
         }
       ],
-      "evidenceRefs": [
-        "rear",
-        "rocket-detail"
-      ],
+      "evidenceRefs": ["rear", "rocket-detail"],
       "fidelityTier": "shipping"
     }
   ],
@@ -2897,10 +2151,7 @@
       },
       "albedo": {
         "dominant": "#862D23",
-        "secondary": [
-          "#5E211C",
-          "#A54534"
-        ],
+        "secondary": ["#5E211C", "#A54534"],
         "samplingNotes": "Use painted red body zones, separated from concept lighting."
       },
       "surfaceFrequencyBands": [
@@ -2945,12 +2196,8 @@
       },
       "wear": {
         "edgeWear": 0.18,
-        "scratches": [
-          "directional handling scratches"
-        ],
-        "chips": [
-          "edge chips exposing dark iron"
-        ]
+        "scratches": ["directional handling scratches"],
+        "chips": ["edge chips exposing dark iron"]
       },
       "dirt": {
         "amount": 0.09,
@@ -2963,20 +2210,14 @@
           "region": "rocket and tank bevels",
           "pattern": "dark exposed-metal chips with brighter worn rims",
           "roughness": 0.48,
-          "evidenceRefs": [
-            "rocket-detail",
-            "tank-detail"
-          ]
+          "evidenceRefs": ["rocket-detail", "tank-detail"]
         },
         {
           "id": "skull-markings",
           "region": "outer rocket barrels and tank side",
           "pattern": "project-authored off-white skull-and-bones canvas decals without text",
           "roughness": 0.72,
-          "evidenceRefs": [
-            "hero",
-            "tank-detail"
-          ]
+          "evidenceRefs": ["hero", "tank-detail"]
         }
       ],
       "notes": "Uses metal-family albedo, normal, and ORM maps; KTX2 compressed before shipping."
@@ -2995,10 +2236,7 @@
       },
       "albedo": {
         "dominant": "#393735",
-        "secondary": [
-          "#252422",
-          "#625044"
-        ],
+        "secondary": ["#252422", "#625044"],
         "samplingNotes": "Keep enough value headroom for cavity darkening."
       },
       "surfaceFrequencyBands": [
@@ -3043,9 +2281,7 @@
       },
       "wear": {
         "edgeWear": 0.12,
-        "scratches": [
-          "runner-direction abrasion"
-        ],
+        "scratches": ["runner-direction abrasion"],
         "chips": []
       },
       "dirt": {
@@ -3060,10 +2296,7 @@
           "pattern": "warm rust concentrated in cavities",
           "roughness": 0.84,
           "patinaColor": "#7A3F24",
-          "evidenceRefs": [
-            "rocket-detail",
-            "hero"
-          ]
+          "evidenceRefs": ["rocket-detail", "hero"]
         }
       ],
       "notes": "Shares metal-family maps with painted steel but keeps independent scalar response and vertex colors."
@@ -3082,10 +2315,7 @@
       },
       "albedo": {
         "dominant": "#594028",
-        "secondary": [
-          "#372719",
-          "#79573A"
-        ],
+        "secondary": ["#372719", "#79573A"],
         "samplingNotes": "Long grain follows runner and plank axes."
       },
       "surfaceFrequencyBands": [
@@ -3130,12 +2360,8 @@
       },
       "wear": {
         "edgeWear": 0.15,
-        "scratches": [
-          "runner-axis abrasion"
-        ],
-        "chips": [
-          "small runner-tip nicks"
-        ]
+        "scratches": ["runner-axis abrasion"],
+        "chips": ["small runner-tip nicks"]
       },
       "dirt": {
         "amount": 0.1,
@@ -3148,10 +2374,7 @@
           "region": "runner undersides and front tips",
           "pattern": "lighter polished streaks and dark ground grime",
           "roughness": 0.68,
-          "evidenceRefs": [
-            "side",
-            "hero"
-          ]
+          "evidenceRefs": ["side", "hero"]
         }
       ],
       "notes": "Uses its own directional wood albedo, normal, and ORM maps."
@@ -3170,10 +2393,7 @@
       },
       "albedo": {
         "dominant": "#6D382D",
-        "secondary": [
-          "#47231E",
-          "#8A4A3B"
-        ],
+        "secondary": ["#47231E", "#8A4A3B"],
         "samplingNotes": "Separate cushion pads with darker seams."
       },
       "surfaceFrequencyBands": [
@@ -3232,9 +2452,7 @@
           "region": "seat center and backrest lower third",
           "pattern": "slightly darker compressed zones with smoother handled crests",
           "roughness": 0.66,
-          "evidenceRefs": [
-            "seat-detail"
-          ]
+          "evidenceRefs": ["seat-detail"]
         }
       ],
       "notes": "Uses its own leather albedo, normal, and ORM maps."
@@ -3253,10 +2471,7 @@
       },
       "albedo": {
         "dominant": "#777343",
-        "secondary": [
-          "#4D4D2A",
-          "#A09A62"
-        ],
+        "secondary": ["#4D4D2A", "#A09A62"],
         "samplingNotes": "Muted goblin green bone, not bright neon."
       },
       "surfaceFrequencyBands": [
@@ -3315,10 +2530,7 @@
           "region": "prow eye sockets",
           "pattern": "deep red emissive inserts surrounded by dark cavities",
           "roughness": 0.4,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         }
       ],
       "notes": "No embedded map required; geometry and vertex colors carry the ornament at gameplay distance."
@@ -3337,10 +2549,7 @@
       },
       "albedo": {
         "dominant": "#FF6B05",
-        "secondary": [
-          "#FFB51C",
-          "#7A1B00"
-        ],
+        "secondary": ["#FFB51C", "#7A1B00"],
         "samplingNotes": "Bright center with darker throat rim."
       },
       "surfaceFrequencyBands": [
@@ -3399,10 +2608,7 @@
           "region": "paired nozzle interiors",
           "pattern": "warm emissive core with bounded intensity; runtime flame begins at named socket",
           "roughness": 0.28,
-          "evidenceRefs": [
-            "rear",
-            "rocket-detail"
-          ]
+          "evidenceRefs": ["rear", "rocket-detail"]
         }
       ],
       "notes": "No dynamic point light and no embedded texture. Runtime exhaust uses pooled VFX from mount-owned logic."
@@ -3461,11 +2667,7 @@
     },
     {
       "id": "frame-fastener-system",
-      "componentRefs": [
-        "rocket-mounts",
-        "runner-braces",
-        "seat-frame"
-      ],
+      "componentRefs": ["rocket-mounts", "runner-braces", "seat-frame"],
       "method": "instanced hex bolt heads",
       "countMax": 32,
       "distribution": "only at visible structural contacts",
@@ -3511,13 +2713,7 @@
     {
       "id": "form-refinement",
       "goal": "Refine runner curves, rocket rings, tank bands, cushion forms, and goblin ornament.",
-      "componentRefs": [
-        "runner-pair",
-        "twin-rockets",
-        "fuel-tank",
-        "rider-seat",
-        "prow-ornament"
-      ],
+      "componentRefs": ["runner-pair", "twin-rockets", "fuel-tank", "rider-seat", "prow-ornament"],
       "acceptance": [
         "Identity-critical forms meet feature thresholds from multiple angles.",
         "Each outer side rocket skull emblem has two flat black eye marks that read at gameplay distance without protruding geometry.",
@@ -3531,9 +2727,7 @@
     {
       "id": "material-pass",
       "goal": "Author independent procedural PBR map families and vertex-color zones.",
-      "componentRefs": [
-        "root"
-      ],
+      "componentRefs": ["root"],
       "acceptance": [
         "Metal, wood, leather, bone, and glow remain distinct.",
         "No concept lighting is baked into shipping albedo."
@@ -3542,31 +2736,19 @@
     {
       "id": "surface-pass",
       "goal": "Add chips, scratches, rust, grain, tuft seams, soot, and contact wear.",
-      "componentRefs": [
-        "root"
-      ],
-      "acceptance": [
-        "Grazing-light review proves real surface response without noisy tiling."
-      ]
+      "componentRefs": ["root"],
+      "acceptance": ["Grazing-light review proves real surface response without noisy tiling."]
     },
     {
       "id": "lighting-pass",
       "goal": "Validate under neutral, grazing, and reference-like lighting.",
-      "componentRefs": [
-        "root"
-      ],
-      "acceptance": [
-        "Form remains readable without relying on the concept's painted highlights."
-      ]
+      "componentRefs": ["root"],
+      "acceptance": ["Form remains readable without relying on the concept's painted highlights."]
     },
     {
       "id": "interaction-pass",
       "goal": "Prove rider socket, exhaust sockets, procedural motion, audio loop, and dismount reset.",
-      "componentRefs": [
-        "root",
-        "rider-seat",
-        "exhaust-emitters"
-      ],
+      "componentRefs": ["root", "rider-seat", "exhaust-emitters"],
       "acceptance": [
         "The live rider preview visibly uses a seated pose with the pelvis on the cushion rather than standing on the seat.",
         "No rider clipping.",
@@ -3576,9 +2758,7 @@
     {
       "id": "optimization-pass",
       "goal": "Optimize only after visual acceptance.",
-      "componentRefs": [
-        "root"
-      ],
+      "componentRefs": ["root"],
       "acceptance": [
         "Asset stays within all locked ceilings.",
         "KTX2, meshopt, node names, and exact bytes pass the asset contract."
@@ -4282,9 +3462,7 @@
           "gated": false
         }
       },
-      "failures": [
-        "silhouette IoU 0.623 is below threshold 0.85"
-      ],
+      "failures": ["silhouette IoU 0.623 is below threshold 0.85"],
       "renderHash": "a0baa8b4bc4143fb",
       "passId": "blockout"
     },
@@ -4355,9 +3533,7 @@
           "gated": false
         }
       },
-      "failures": [
-        "silhouette IoU 0.623 is below threshold 0.85"
-      ],
+      "failures": ["silhouette IoU 0.623 is below threshold 0.85"],
       "renderHash": "a0baa8b4bc4143fb",
       "passId": "structural-pass"
     },
@@ -4428,9 +3604,7 @@
           "gated": false
         }
       },
-      "failures": [
-        "silhouette IoU 0.551 is below threshold 0.85"
-      ],
+      "failures": ["silhouette IoU 0.551 is below threshold 0.85"],
       "renderHash": "a0baa8b4bc4143fb",
       "passId": "structural-pass"
     },
@@ -4501,9 +3675,7 @@
           "gated": false
         }
       },
-      "failures": [
-        "silhouette IoU 0.548 is below threshold 0.85"
-      ],
+      "failures": ["silhouette IoU 0.548 is below threshold 0.85"],
       "renderHash": "6b33a1eb80551b26",
       "passId": "structural-pass"
     },
@@ -4574,9 +3746,7 @@
           "gated": false
         }
       },
-      "failures": [
-        "silhouette IoU 0.547 is below threshold 0.85"
-      ],
+      "failures": ["silhouette IoU 0.547 is below threshold 0.85"],
       "renderHash": "93e42fdbf5b2106d",
       "passId": "form-refinement"
     },
