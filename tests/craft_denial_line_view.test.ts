@@ -3,7 +3,7 @@
 // or dropped arm in the mapping fails HERE decisively; the hud.ts caller is
 // pinned as a thin wire in tests/profession_identity_card.test.ts.
 import { describe, expect, it } from 'vitest';
-import { craftDenialLine } from '../src/ui/craft_denial_line_view';
+import { craftDenialLine, DENIAL_KEY_BY_REASON } from '../src/ui/craft_denial_line_view';
 
 describe('craft_denial_line_view', () => {
   it('maps every plain denial reason to its literal key', () => {
@@ -23,6 +23,14 @@ describe('craft_denial_line_view', () => {
       // line: the type is read for the station_required arm alone.
       expect(craftDenialLine(reason, 'forge')).toEqual({ key });
     }
+    // Completeness: the hand-written table above covers the WHOLE reason
+    // union. The KEYS stay literal (independent expectations, never derived
+    // from the Record, which would be a self-comparison); only MEMBERSHIP is
+    // derived, so a tenth reason that satisfies tsc-exhaustiveness with a
+    // copy-pasted key still reds here until the table gains its row.
+    expect(Object.keys(DENIAL_KEY_BY_REASON).sort()).toEqual(
+      [...cases.map(([reason]) => reason), 'station_required'].sort(),
+    );
   });
 
   it('an absent reason reads as the generic materials line (the historical fall-through)', () => {

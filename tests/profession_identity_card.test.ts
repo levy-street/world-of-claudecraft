@@ -9,13 +9,25 @@ import { QUALITY_COLOR } from '../src/ui/icons';
 import { renderProfessionIdentityCard } from '../src/ui/profession_identity_card';
 import { buildProfessionIdentityView } from '../src/ui/profession_identity_view';
 
-const painter = readFileSync(
-  path.resolve(process.cwd(), 'src/ui/profession_identity_card.ts'),
-  'utf8',
+/** Comment-stripped TS source: a pinned token inside a comment must never
+ *  satisfy a pin about live code (review round; hoisted for EVERY source
+ *  read in this file at the phase 07 QA fix round). The block pass is
+ *  anchored to whole lines (the docblock shape this tree uses), so a block
+ *  opener inside a line comment can never open a false block that swallows
+ *  real code to the next real closer (the trap-catalog ordering hazard);
+ *  the line pass keeps protocol tokens like :// intact. */
+const codeOnly = (source: string): string =>
+  source.replace(/^[ \t]*\/\*[\s\S]*?\*\/[ \t]*$/gm, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+/** Comment-stripped CSS: wrapping a rule in a block comment leaves its text
+ *  byte-identical under toContain, so stylesheet pins read live rules only. */
+const cssOnly = (source: string): string => source.replace(/\/\*[\s\S]*?\*\//g, '');
+
+const painter = codeOnly(
+  readFileSync(path.resolve(process.cwd(), 'src/ui/profession_identity_card.ts'), 'utf8'),
 );
-const craftingWindow = readFileSync(
-  path.resolve(process.cwd(), 'src/ui/crafting_window.ts'),
-  'utf8',
+const craftingWindow = codeOnly(
+  readFileSync(path.resolve(process.cwd(), 'src/ui/crafting_window.ts'), 'utf8'),
 );
 
 describe('profession identity card painter contract', () => {
@@ -519,13 +531,11 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
   // The stylesheet is the authority the painter defers to (the no-magic
   // contract above), so the DESIGN.md floors pin against the CSS source the
   // way tests/mobile_window_layout.test.ts pins the vendor 40px floor.
-  const components = readFileSync(
-    path.resolve(process.cwd(), 'src/styles/components.css'),
-    'utf8',
+  const components = cssOnly(
+    readFileSync(path.resolve(process.cwd(), 'src/styles/components.css'), 'utf8'),
   ).replace(/\r\n/g, '\n');
-  const mobileCss = readFileSync(
-    path.resolve(process.cwd(), 'src/styles/hud.mobile.css'),
-    'utf8',
+  const mobileCss = cssOnly(
+    readFileSync(path.resolve(process.cwd(), 'src/styles/hud.mobile.css'), 'utf8'),
   ).replace(/\r\n/g, '\n');
 
   it('the row family the card reuses carries the 13px name line and the tabular-nums value', () => {
@@ -582,7 +592,7 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
   });
 
   it('the focusable capped list carries the shared focus-visible ring', () => {
-    const base = readFileSync(path.resolve(process.cwd(), 'src/styles/base.css'), 'utf8');
+    const base = cssOnly(readFileSync(path.resolve(process.cwd(), 'src/styles/base.css'), 'utf8'));
     expect(base).toMatch(/\.profession-skill-list:focus-visible[^{]*\{[^}]*outline: 2px solid/s);
   });
 
@@ -790,9 +800,8 @@ describe('crafting window pins', () => {
       },
       { difficulty: 'none' as const, token: '--color-craft-none', label: 'No skill gain' },
     ];
-    const componentsCss = readFileSync(
-      path.resolve(process.cwd(), 'src/styles/components.css'),
-      'utf8',
+    const componentsCss = cssOnly(
+      readFileSync(path.resolve(process.cwd(), 'src/styles/components.css'), 'utf8'),
     );
     for (const { difficulty, token, label } of rows) {
       const parent = document.createElement('div');
@@ -969,7 +978,9 @@ describe('crafting difficulty token lockstep (retuned to tokens)', () => {
     // (legendary/uncommon/poor), reduced must reference the house gold BY
     // NAME (var(--gold), the masterwork seal idiom), and --gold itself stays
     // the shipped #ffd100. A retheme that moves any side alone reds here.
-    const tokens = readFileSync(path.resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8');
+    const tokens = cssOnly(
+      readFileSync(path.resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8'),
+    );
     expect(tokens).toContain(`--color-craft-full: ${QUALITY_COLOR.legendary};`);
     expect(tokens).toContain('--color-craft-reduced: var(--gold);');
     expect(tokens).toContain(`--color-craft-minimal: ${QUALITY_COLOR.uncommon};`);
@@ -981,7 +992,10 @@ describe('crafting difficulty token lockstep (retuned to tokens)', () => {
 });
 
 describe('crafting window station-range repaint liveness (source pins)', () => {
-  const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  // Comment-stripped like every other source read here: a commented-out
+  // guard must red these pins, never satisfy them (the phase 07 QA
+  // partial-application catch).
+  const hud = codeOnly(readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'));
 
   it('the slow band repaints an OPEN window only when the live in-range set changes', () => {
     // Walking into/out of a station's range (or the own mobile station
@@ -1017,11 +1031,9 @@ describe('crafting window station-range repaint liveness (source pins)', () => {
 });
 
 describe('craftResult deny toast names the station (source pins)', () => {
-  // Comment-stripped like the painter scans above: a pinned token inside a
+  // Comment-stripped through the shared helper: a pinned token inside a
   // comment must never satisfy a pin about live code (review round).
-  const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8')
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  const hud = codeOnly(readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'));
 
   it('the denial routes through the craft_denial_line_view core with the recipe station type', () => {
     // The reason-to-key mapping moved into the pure core at the Phase 07
@@ -1040,6 +1052,8 @@ describe('craftResult deny toast names the station (source pins)', () => {
     // resolved a type.
     expect(hud).toMatch(/t\(\s*denial\.key,/);
     expect(hud).toContain('station: stationNameText(denial.stationType)');
-    expect(hud).not.toContain("t('hudChrome.crafting.stationRequired'");
+    // Spelling-tolerant negative: either quote style, and whitespace after
+    // t(, so a reintroduction cannot slip past on formatting alone.
+    expect(hud).not.toMatch(/t\(\s*['"]hudChrome\.crafting\.stationRequired['"]/);
   });
 });

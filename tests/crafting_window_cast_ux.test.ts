@@ -8,6 +8,8 @@
 // cold batch label. Announcements ride deps.announce (the static
 // #crafting-live region), never a node inside the rebuilt subtree.
 
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { ItemDef } from '../src/sim/types';
 import { CRAFT_CAST_ID } from '../src/sim/types';
@@ -299,7 +301,20 @@ describe('renderCraftingWindow craft-cast UX', () => {
     );
     const d = deps(1);
     renderCraftingWindow(el, gatedView, d);
-    expect(el.querySelector('.crafting-daily-chip')?.textContent).toBe('Once per day');
+    const chip = el.querySelector('.crafting-daily-chip');
+    expect(chip?.textContent).toBe('Once per day');
+    // Stylesheet reach (the guide-badge lesson): the daily chip's OWN class
+    // has no rule; every visual rides the co-applied duration-chip class.
+    // Class presence alone is blind to selector reach, so pin the
+    // co-application AND that the styled class has a live rule; splitting
+    // the markup or renaming the styled class reds here instead of shipping
+    // an unstyled chip glued to its neighbors.
+    expect(chip?.classList.contains('crafting-duration-chip')).toBe(true);
+    const componentsCss = readFileSync(
+      path.resolve(process.cwd(), 'src/styles/components.css'),
+      'utf8',
+    ).replace(/\/\*[\s\S]*?\*\//g, '');
+    expect(componentsCss).toMatch(/^\s*\.crafting-duration-chip \{/m);
     const aria = el.querySelector('.crafting-recipe-btn')!.getAttribute('aria-label') ?? '';
     expect(aria).toContain('Once per day');
     // Mats fit four crafts; the daily cap holds every affordance at one.

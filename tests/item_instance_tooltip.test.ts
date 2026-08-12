@@ -12,6 +12,7 @@ import {
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { isSignableMaterialRarity, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { masterworkBonusStats } from '../src/sim/professions/masterwork';
 import {
   instanceBadgeLines,
   instanceBindingLines,
@@ -390,6 +391,21 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
         signableQuality(def.quality),
         `${recipe.resultItemId} must stay below signable rarity while kind junk`,
       ).toBe(false);
+      // The OTHER signing channel (the predicate header names both): the
+      // masterwork proc arm signs independently of rarity, gated solely on
+      // masterworkBonusStats answering non-null, which needs a slot AND
+      // stats. Pin the slot-less/stat-less premise against live content so
+      // giving one of the ten a slot cannot mint a signer while every
+      // rarity assert above stays green (the phase 07 QA pin-audit catch).
+      expect(
+        masterworkBonusStats({
+          level: recipe.level,
+          quality: def.quality,
+          slot: def.slot,
+          stats: def.stats,
+        }),
+        `${recipe.resultItemId} must stay outside the masterwork signing arm`,
+      ).toBeNull();
     }
   });
 });

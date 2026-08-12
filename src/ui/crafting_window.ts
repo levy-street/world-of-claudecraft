@@ -407,6 +407,10 @@ export function renderCraftingWindow(
       // duration, a tooltip line, and an aria clause, all one label.
       const dailyLabel = row.oncePerDay ? t('hudChrome.crafting.oncePerDay') : '';
       const dailyAccessible = dailyLabel ? `. ${dailyLabel}` : '';
+      // crafting-daily-chip is a semantic/test hook with NO rule of its own:
+      // every visual rides the co-applied crafting-duration-chip rule
+      // (components.css), and the cast_ux suite pins that co-application
+      // plus the styled class's live rule (the guide-badge lesson).
       const dailyChipHtml = dailyLabel
         ? ` <span class="crafting-duration-chip crafting-daily-chip">${esc(dailyLabel)}</span>`
         : '';

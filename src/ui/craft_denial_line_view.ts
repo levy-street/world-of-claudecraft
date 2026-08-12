@@ -31,7 +31,13 @@ export interface CraftDenialLine {
  *  materials fall-through. station_required's row is the KEYLESS line the
  *  unresolvable-recipe fall-through renders; the resolvable case is handled
  *  above the lookup. */
-const DENIAL_KEY_BY_REASON: Record<NonNullable<CraftDenialReason>, TranslationKey> = {
+// Exported for the membership pin in tests/craft_denial_line_view.test.ts:
+// the table test hand-writes every reason's key (independent expectations),
+// and the exported keys let it assert the hand-written list covers the WHOLE
+// union, so a tenth reason added with a copy-pasted wrong key cannot pass
+// tsc-exhaustiveness while dodging the table (the phase 07 QA pin-audit
+// catch). Runtime callers keep using craftDenialLine below.
+export const DENIAL_KEY_BY_REASON: Record<NonNullable<CraftDenialReason>, TranslationKey> = {
   unknown_recipe: 'hudChrome.crafting.unknownRecipe',
   combo_requirement_unmet: 'hudChrome.crafting.comboRequirementUnmet',
   busy: 'hudChrome.crafting.busy',
