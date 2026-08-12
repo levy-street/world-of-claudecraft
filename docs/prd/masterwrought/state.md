@@ -1,6 +1,10 @@
 # Masterwrought: cross-phase state
 
-Current phase: 06 QA COMPLETE, verdict PASS (2026-08-11, see the Phase 06 QA ledger: all four queued rulings taken by Fernando, scroll re-priced to exact parity, the three tome held models AUTHORED in this PR, ringwright stays reserved, the routeBody register queued to the release fill; zero blocking in the shipped phase, one wiki-mirror blocker in the QA's own fix round found and fixed by the fresh review); next is Phase 07 (phase-07-intermediates.md), which starts with its own release sync per the delivery contract. Packet authored 2026-08-07.
+Current phase: 07 BUILT, gate PASS (2026-08-12, see the Phase 07 ledger: ten R13
+intermediates + the Quickening Catalyst daily gate, four review rounds all applied
+or refuted-with-reason, gate_select PASS all 8 at 9df9d1970c); next is Phase 07 QA
+(fresh session, sync first per the delivery contract), then Phase 08 apex armor.
+Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.37.0`.
 
 ## Delivery contract (non-negotiable)
@@ -1911,3 +1915,93 @@ Grandmaster-craft family, generic by construction.
   carries at least one no-buyValue reagent (keeps the counterfactually-vendor-fed
   six-id pin frozen), never a base material and its fine_ grade together, and no
   arcane_shard (reserved for the apex band per Phase 04).
+
+## Phase 07 ledger (2026-08-12, BUILT, gate PASS)
+- GATE: gate_select PASS all 8 steps at the phase tip 9df9d1970c via the full-suite
+  fallback (2669 test files / 36990 tests, browser suite 117, tsc, all builds) at
+  GATE_MAX_WORKERS=5; ci:changed exit 0; portrait manifest fresh at the tip (three
+  full 230-portrait receipt rerenders this phase, every one byte-identical to the
+  committed webps).
+- SHIPPED: the ten R13 intermediates per the pre-fan-out mapping (item ids as
+  registered; recipe ids recipe_<item id>; INTERMEDIATE_RECIPES spread into
+  ALL_RECIPES), all 75/20/20 trainer-taught station-bound; the Quickening Catalyst
+  daily gate (oncePerDay on the recipe record; PlayerMeta.craftDaily on the
+  wyrmfallDaily ctx.resetDay idiom with the F1 load clamps, a live-gated-id
+  anti-tamper filter, zero-default serialize omission; refusal reason daily_limit
+  widened at the four sites; the stamp in resolveCraftForRecipe after consumption);
+  ten SVG-placeholder icons with provenance under
+  docs/achievements/masterwrought-phase07-art/ and titles in the authoring bytes;
+  English names + hint lines + the five non-Latin fills for twelve wordy values;
+  wiki rows carrying oncePerDay with the Once per day badge (styled) on
+  /wiki/professions; the crafting window states the gate before the attempt (chip,
+  tooltip line, aria clause) and caps every batch affordance at one via
+  maxCraftBatchFit; the craft-denial key map extracted to the
+  craft_denial_line_view pure core (hud ceiling LOWERED to 19500); parity goldens
+  re-minted for the sampled craftDaily field (rng and event digests byte-identical,
+  verified independently three times).
+- COMMITS: 3da891050c sim gate, 584fb07801 content+art, fb1b2b3f6b ui+i18n,
+  9231f83d0e tests+goldens, ffaf0561b5 item-art audit, d2aeb03e2f parity goldens,
+  42a551600f svg titles, c72f7e8a90 + 312177d47f review fix round, 034433a8cb QA
+  fixes + wiki gate field, 4b17d34efa portrait re-bless, 9df9d1970c scoped-review
+  fixes. Sync side: 7bfb608edc v0.37.0 merge, ac46d790c3 + c8e5ab96f4 re-mints,
+  e46e5416aa pre-fan-out ledger.
+- REVIEW ROUNDS (all findings applied unless noted): six domain reviewers, then a
+  fresh fix-round review, then the qa-checklist gate (its own full gate_select run
+  caught three guard suites no reviewer carried: professions_blob_growth
+  classification, the gathered-provenance partition, the taxonomy bootstrap count),
+  then two scoped re-reviews of the QA fixes. The scoped round's two real catches:
+  the provenance pin guarded commission eligibility while signing rides the #1149
+  def-QUALITY rule (the replaced loops were tautologies; the live pin now holds
+  every crafted junk-kind output below signable rarity), and the blob byte bound
+  had rotted to 16 real bytes of headroom behind a one-sided band (re-minted at 12
+  KiB per the file's own step precedent, band now two-sided at 10064..10384 around
+  the measured 10224, craftDaily itself is 76 bytes).
+- REFUTED WITH REASON (do not re-raise): reclassifying the nine intermediates as
+  honest materials now (frontend round) violates the every-material-has-a-consumer
+  doctrine the taxonomy derivation enforces; the wyrmfall_core allowlist road is
+  the shipped precedent, the kind line reads Junk only until Phase 08's consumers
+  flip them mechanically inside this same PR. Extracting the craftDaily load clamp
+  out of sim.ts (QA nit) would split it from its wyrmfallDaily sibling arm;
+  declined for symmetry. The daily-before-not_learned ladder corner needs a
+  DB-tampered row to reach post-clamp; accepted and documented at the ladder.
+- ACCEPTED ASYMMETRIES (documented in code, pinned in tests): gate state is
+  server-private (Phase 04 ruling; the affordance caps on the STATIC half only, so
+  after today's craft the row still offers one and the player learns on attempt;
+  readout remains the Phase 14 UX obligation); the calendar-less crossing (a
+  ''-dated stamp meeting a live calendar opens; a live-dated stamp on a
+  calendar-less host gates permanently); offline stamps are session-scoped
+  (serializeCharacter has server callers only).
+- DEMAND MATH (binding for 08/09): confirmed live-and-exact by the content
+  reviewer: one catalyst per intermediate (nine consumer rows), catalyst tradable
+  and oncePerDay; 3 intermediates per apex piece stays the forward commitment.
+- PHASE 08 OBLIGATIONS MINTED HERE: remove each intermediate from
+  ALLOWED_UNCLASSIFIED_JUNK + the bag_filter ALL_ONLY list as its consumer lands
+  (per-id comments in the tests); author BASE_MATERIAL_TIERS rows for the ten (they
+  read tier 0 today, inert while no output can masterwork, live the moment apex
+  gear consumes them); the crafts_to_mastery pool EXCLUDES daily-gated chains, so
+  apex-phase authors must not expect gated rows to enter the pacing model.
+- RELEASE-FILL FLAGS: about 195 pending Latin-locale rows from this phase (ten item
+  names, the hint keys, dailyLimit, oncePerDay badge, guide key); the five
+  non-Latin dailyLimit fills were authored against the pre-reword English and
+  re-verified faithful after the second-person reword (the reword-staleness
+  registry recorded them translated against the NEW hash without human re-review;
+  maintainer should not assume register match); ko sablewax_vellum chose the
+  common 양피지 over the precise 독피지, ru sunspun_bolt uses the long bolt-of-cloth
+  form; alternatives recorded in the Task D report if the register should change.
+- QA FOLLOW-UPS FOR PHASE 07 QA (deferred with owner, not filed): a mobile look at
+  the catalyst tooltip's nine-craft Used-by line (longest wrapped tooltip sentence;
+  the capture rig lives with the QA session); the ten icons were visually reviewed
+  by the build session (all ten webps opened and judged against the
+  woc-item-icon-v1 register before the audit verdict was extended), which the QA
+  session should confirm stands for the owner review the verdict prose asserts.
+- ROLLBACK NOTE (operator): rolling the server back past this phase erases every
+  character's craftDaily at their first autosave under old code (the pre-phase
+  serializer rebuilds the blob), re-opening the catalyst day; same known property
+  as wyrmfallDaily, recorded, not engineered around.
+- DURABLE LESSONS: a phase that adds a recipe consuming a CRAFTED reagent must
+  check the crafts_to_mastery pool (its gathered-units metric prices crafted
+  reagents at zero and will reroute the model through them); the reason-to-key
+  hud ternary family is pinned by profession_identity_card source regexes, so
+  widening a reason union means touching that file (now retargeted at the
+  extracted core); biome error-gates committed SVG sources on a11y noSvgWithoutTitle,
+  so authored SVGs carry their display-name title from birth.

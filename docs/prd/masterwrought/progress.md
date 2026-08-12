@@ -14,7 +14,7 @@
 | 05 QA | verify | complete | 2026-08-10 | 2026-08-10 |
 | 06 | Inscription base catalog | complete | 2026-08-11 | 2026-08-11 |
 | 06 QA | verify | complete | 2026-08-11 | 2026-08-11 |
-| 07 | Intermediates and the Quickening Catalyst | in progress | 2026-08-11 | |
+| 07 | Intermediates and the Quickening Catalyst | complete | 2026-08-11 | 2026-08-12 |
 | 07 QA | verify | pending | | |
 | 08 | Apex armor catalogs | pending | | |
 | 08 QA | verify | pending | | |
