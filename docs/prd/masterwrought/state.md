@@ -1980,8 +1980,10 @@ Grandmaster-craft family, generic by construction.
   read tier 0 today, inert while no output can masterwork, live the moment apex
   gear consumes them); the crafts_to_mastery pool EXCLUDES daily-gated chains, so
   apex-phase authors must not expect gated rows to enter the pacing model.
-- RELEASE-FILL FLAGS: about 195 pending Latin-locale rows from this phase (ten item
-  names, the hint keys, dailyLimit, oncePerDay badge, guide key); the five
+- RELEASE-FILL FLAGS: 235 pending Latin-locale rows from this phase (ten item
+  names, the hint keys, dailyLimit, oncePerDay badge, guide key; the QA session
+  re-counted the phase ledger's "about 195" against the registry, and the wordy
+  values number thirteen, not twelve); the five
   non-Latin dailyLimit fills were authored against the pre-reword English and
   re-verified faithful after the second-person reword (the reword-staleness
   registry recorded them translated against the NEW hash without human re-review;
@@ -2000,11 +2002,14 @@ Grandmaster-craft family, generic by construction.
   as wyrmfallDaily, recorded, not engineered around.
 - DURABLE LESSONS: a phase that adds a recipe consuming a CRAFTED reagent must
   check the crafts_to_mastery pool (its gathered-units metric prices crafted
-  reagents at zero and will reroute the model through them); the reason-to-key
-  hud ternary family is pinned by profession_identity_card source regexes, so
-  widening a reason union means touching that file (now retargeted at the
-  extracted core); biome error-gates committed SVG sources on a11y noSvgWithoutTitle,
-  so authored SVGs carry their display-name title from birth.
+  reagents at zero and will reroute the model through them); the craft-denial
+  reason-to-key mapping is enforced by the exhaustive Record in
+  craft_denial_line_view.ts (a tsc-only gate: the profession_identity_card
+  source pins hold only the reason-agnostic hud delegation call shape, so
+  widening the reason union reds tsc and the table test's membership
+  assertion, never those pins; corrected at the phase 07 QA, which also added
+  the membership assertion); biome error-gates committed SVG sources on a11y
+  noSvgWithoutTitle, so authored SVGs carry their display-name title from birth.
 
 ## Phase 07 QA release sync (2026-08-12, merge c2ad3b0176, the QA session's Step 0)
 - RELEASE SYNC: origin/release/v0.37.0 moved to 94333011cc (9 commits: account
