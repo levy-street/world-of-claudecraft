@@ -16,7 +16,9 @@ import type { ItemDef } from '../src/sim/types';
 
 describe('material_taxonomy as the first-evaluated sim module', () => {
   it('derives the full set with no import of data.ts ahead of it', () => {
-    expect(MATERIAL_ITEM_IDS.size).toBe(56);
+    // 60 at phase 08: forgefold_plating, wyrmhide_cording, sunspun_bolt, and
+    // wyrmfall_core derived IN with their apex consumers.
+    expect(MATERIAL_ITEM_IDS.size).toBe(60);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     expect(isMaterialItem({ id: 'iron_ore' } as ItemDef)).toBe(true);

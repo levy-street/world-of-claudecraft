@@ -346,8 +346,13 @@ describe('masterwrought apex budget sweep', () => {
       expect(def.bagSlots ?? 0, `${def.id} must stay below the apex bag`).toBeLessThan(16);
     }
     const recipe = APEX_ARMOR_RECIPES.find((r) => r.resultItemId === APEX_BAG_ID);
+    expect(recipe?.id).toBe(`recipe_${APEX_BAG_ID}`);
     expect(recipe?.professionId).toBe('tailoring');
     expect(recipe?.skillReq).toBe(100);
+    expect(recipe?.level).toBe(25);
+    expect(recipe?.itemLevelBudget).toBe(25);
+    expect(recipe?.resultCount).toBe(1);
+    expect(recipe?.stationType).toBe('loom');
     expect(recipe?.acquisition).toEqual(['drop']);
     expect(recipe?.reagents).toEqual(APEX_BILLS.tailoring);
   });

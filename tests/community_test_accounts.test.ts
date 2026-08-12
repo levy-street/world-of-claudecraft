@@ -52,8 +52,11 @@ describe('community test character templates', () => {
       // The worn set is exactly the class's primary BiS kit (a 2H class may
       // legitimately leave the offhand empty).
       expect(Object.keys(state.equipment).sort()).toEqual(Object.keys(bisKit(cls)).sort());
-      expect(state.bags).toEqual(Array(4).fill('mistcallers_duffel'));
-      expect(bagCapacity(state.bags ?? [])).toBe(72);
+      // The apex bag at phase 08 (ruled: a test-account template picks the
+      // true best bag, the bestBoostBag/dev_kit precedent; the packet ships
+      // as one PR with phase 11, so the bag is obtainable at ship time).
+      expect(state.bags).toEqual(Array(4).fill('sunspun_haversack'));
+      expect(bagCapacity(state.bags ?? [])).toBe(80);
 
       for (const itemId of Object.values(state.equipment)) {
         const item = ITEMS[itemId];

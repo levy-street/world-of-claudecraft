@@ -2329,8 +2329,11 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   (closing the phase 08+ open item; rule-level, spoiler-safe, tag coins reused).
   tests/masterwrought_budget.test.ts born (see the sweep paragraph below).
   Shipped-ids golden re-minted, verified additions-only (exactly the ten).
-  Portrait source manifest re-minted at tip (230/230 byte-identical rerender, the
-  phase 06 lesson; accepted-art manifest pin advanced in lockstep).
+  Portrait source manifest re-minted TWICE (230/230 byte-identical rerenders):
+  the first re-mint predated two later source commits and went stale again,
+  which the qa-checklist's full-suite run caught; the second ran at the true
+  final tip. The phase 06 lesson, sharpened: re-mint LAST, after every
+  source-affecting commit, and let the full gate confirm it.
 - THE SLOT AUDIT drove the picks (see the pre-authoring ledger above): mail
   waist/legs/feet and leather legs/gloves sat at band coverage 1, leather chest won
   its 2-tie on the retirement hole + budget; the audit OVERRODE the plan defaults
@@ -2508,3 +2511,21 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   pin's premise across all nine references, the wiki mapping covering the
   whole live acquisition space (86 trainer / 10 drop / 18 grandfathered
   known), and no contradiction with R1/R2/R8/R12/R14.
+
+- QA-CHECKLIST CLOSE (verdict applied): the hand-picked suite matrix missed
+  FOUR catalog-derived pins the full run caught (the market bag-size filter's
+  human-acknowledgement anchor gained '16'; the community test-account
+  template moved to four apex bags at capacity 80, RULED accepted per the
+  bestBoostBag/dev_kit precedent since the one-PR contract makes the bag
+  obtainable at ship; the taxonomy bootstrap count 56 to 60; the portrait
+  manifest re-mint, see the SHIPPED paragraph). The lesson is uniform and
+  mechanical: at a phase close, run the GATE on the committed tip, never a
+  hand-picked matrix; the gate's vitest-related arm traces the import graph
+  and finds these without guessing. S2 recorded: from phase 08 until phase 12
+  an apex epic is the one slotted craft that can never proc masterwork or
+  credit masterworksCrafted / the masterwork marks; structurally safe because
+  the delivery contract ships all sixteen phases in ONE PR (players never see
+  08 without 12), flagged for the maintainer regardless. The apex bag row's
+  recipe pins leveled up to the armor rows' depth. privacy-security-review
+  dispatched over the narrow server/pbe_boost.ts diff (the one owed reviewer
+  row); result recorded below or at the QA phase.

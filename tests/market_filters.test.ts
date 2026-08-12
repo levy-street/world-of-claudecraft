@@ -222,7 +222,8 @@ describe('World Market filters', () => {
     // The SOURCE stays derived (that is the point); this is the line that reddens if a
     // catalog-side bagSlots typo moves the derivation and its mirror in lockstep, and it
     // is deliberately the one place a new bag capacity has to be acknowledged by a human.
-    expect([...MARKET_BAG_SIZE_FILTERS]).toEqual(['all', '6', '8', '10', '12', '14']);
+    // '16' acknowledged at phase 08: the tailoring apex bag (sunspun_haversack).
+    expect([...MARKET_BAG_SIZE_FILTERS]).toEqual(['all', '6', '8', '10', '12', '14', '16']);
   });
 
   it('keeps a zero or missing bagSlots value as its own selectable option, not just under all', () => {
