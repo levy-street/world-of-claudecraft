@@ -12,7 +12,21 @@ import { Sim } from '../src/sim/sim';
 import { type EquipSlot, type ItemDef, isEquipSlot } from '../src/sim/types';
 import { supportedLanguages } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
+import { ja_JP } from '../src/ui/i18n.locales/ja_JP';
+import { ko_KR } from '../src/ui/i18n.locales/ko_KR';
+import { ru_RU } from '../src/ui/i18n.locales/ru_RU';
+import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
+import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
 import { DICT } from '../src/ui/sim_i18n';
+
+// The five non-Latin overlays, keyed for the guide cap-copy sweep below.
+const GUIDE_FILL_BY_LOCALE: Record<string, Partial<Record<string, string>>> = {
+  ru_RU,
+  ja_JP,
+  ko_KR,
+  zh_CN,
+  zh_TW,
+};
 
 // Masterwrought is a COUNTED equip family, not a per-item one: a character may
 // wear at most two flagged pieces, and at most one of those may be legendary by
@@ -173,8 +187,30 @@ describe('masterwrought cap constants', () => {
     expect(DICT.en['error.masterwroughtLegendary']).toBe(LEGENDARY_ERROR);
     // The guide gear page (phase 08) spells the equip cap as prose too, in
     // English and five non-Latin fills: one more copy site the cap retune
-    // sweep above must reach.
-    expect(guideStrings.gear.masterwroughtBody).toContain('at most two Masterwrought');
+    // sweep above must reach. The expected word is DERIVED from the constant
+    // so the retune itself reds here, not only a reword.
+    const CAP_WORDS: Record<number, string> = { 1: 'one', 2: 'two', 3: 'three', 4: 'four' };
+    expect(guideStrings.gear.masterwroughtBody).toContain(
+      `at most ${CAP_WORDS[MASTERWROUGHT_EQUIP_CAP]} Masterwrought`,
+    );
+    // The five non-Latin fills restate the number in their own scripts; each
+    // is pinned by the wording that carries the cap in that locale, so a
+    // stale fill after a cap retune reds per locale instead of hiding behind
+    // the English pin. The table is the cap-2 edition: a retune re-cuts it
+    // beside the copy, which is the point.
+    expect(MASTERWROUGHT_EQUIP_CAP).toBe(2);
+    const CAP_PROSE_BY_LOCALE: Record<string, string> = {
+      ru_RU: 'не более двух',
+      ja_JP: '最大2つまで',
+      ko_KR: '최대 두 개까지만',
+      zh_CN: '最多只能穿戴两件',
+      zh_TW: '最多只能穿戴兩件',
+    };
+    for (const [locale, prose] of Object.entries(CAP_PROSE_BY_LOCALE)) {
+      expect(GUIDE_FILL_BY_LOCALE[locale]?.['guide.gear.masterwroughtBody'], locale).toContain(
+        prose,
+      );
+    }
   });
 
   it('carries a real translation of both refusals in every non-English locale', () => {

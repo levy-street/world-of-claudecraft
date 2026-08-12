@@ -9817,7 +9817,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.sablewax_vellum.name': '玄蜡犊皮纸',
   'entities.items.spiritweld_girdle.name': '灵魂熔接腰带',
   'entities.items.forgefold_legguards.name': '叠锻腿甲',
-  'entities.items.wardspeaker_sabatons.name': '唤守护胫',
+  'entities.items.wardspeaker_sabatons.name': '唤守者护胫',
   'entities.items.briarstep_jerkin.name': '棘行皮甲',
   'entities.items.fenbloom_breeches.name': '沼花马裤',
   'entities.items.barksong_handguards.name': '树歌护手',

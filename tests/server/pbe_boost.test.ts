@@ -658,10 +658,10 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
     expect(kit.ring1).toBe('plain_spare_ring');
     expect(kit.waist).toBe('mw_waist');
     // Empty fallbacks: with no unflagged candidate anywhere, the demoted
-    // slots empty rather than keeping over-cap picks (kept = the two
+    // slot empties rather than keeping an over-cap pick (kept = the two
     // cap-highest: chest 30 and waist 10; the ring at 5 demotes with no
-    // unflagged ring to refill from, and the waistless map exercises the
-    // armor delete arm via a second pass).
+    // unflagged ring to refill from). The armor-slot delete arm is the
+    // third block below.
     const bare: Partial<Record<EquipSlot, string>> = {
       chest: 'mw_chest',
       waist: 'mw_waist',

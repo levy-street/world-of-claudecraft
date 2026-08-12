@@ -15,6 +15,7 @@ import { APEX_ARMOR_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { primaryStatBudget } from '../src/sim/item_budget';
 import { itemLevel, primaryStatSum } from '../src/sim/item_level';
+import { requiredLevelFor } from '../src/sim/item_level_req';
 import {
   ARMOR_SECONDARY_BY_TYPE,
   DISENCHANT_MATERIAL_BY_QUALITY,
@@ -37,7 +38,6 @@ const ALLOWED_ARMOR_KEYS = new Set([
   'armorType',
   'slot',
   'quality',
-  'requiredLevel',
   'stats',
   'hitRating',
   'critRating',
@@ -217,7 +217,10 @@ describe('masterwrought apex budget sweep', () => {
     expect(def.slot).toBe(row.slot);
     expect((def as { armorType?: string }).armorType).toBe(row.armorType);
     expect(def.quality).toBe('epic');
-    expect(def.requiredLevel).toBe(20);
+    // The equip gate is DERIVED (source 25 clamps to MAX_LEVEL), never a
+    // hand-authored field: pin the GATE, and pin that no override crept in.
+    expect(requiredLevelFor(def)).toBe(20);
+    expect(def.requiredLevel).toBeUndefined();
     expect(itemLevel(def)).toBe(31);
     expect(def.masterwrought).toBe(true);
 
@@ -236,6 +239,10 @@ describe('masterwrought apex budget sweep', () => {
     for (const other of RATING_FIELDS) {
       if (other !== field) expect(def[other], `${id} ${other}`).toBeUndefined();
     }
+    // Both halves on purpose, doing different jobs: the literal is the band
+    // LAW pin (a future append must carry 40 even if it invents its own
+    // constant), the ARMOR_RATING tie is the drift pin (a band retune reds
+    // instead of stranding the apex set). Not a self-comparison.
     expect(value).toBe(40);
     expect(value).toBe(ARMOR_RATING);
     expect(def.spellPower).toBeUndefined();
@@ -289,6 +296,13 @@ describe('masterwrought apex budget sweep', () => {
 
   it('R12: apex epics disenchant to the standard arcane shard', () => {
     expect(DISENCHANT_MATERIAL_BY_QUALITY.epic).toBe('arcane_shard');
+    // The weave mapping itself pinned literally, so the routing arm below is
+    // never the same table on both sides of its own expectation.
+    expect(ARMOR_SECONDARY_BY_TYPE).toEqual({
+      cloth: 'resonant_thread',
+      leather: 'resonant_hide',
+      mail: 'resonant_links',
+    });
     // The quality row alone predates this phase, so pin the whole R12
     // surface per def: each apex piece is actually disenchantable (the kind
     // gate) and yields its armor class's standard typed secondary beside

@@ -2472,6 +2472,21 @@ describe('Guide professions pages and routes', () => {
     expect((weapon.match(/class="guide-prof-recipe/g) ?? []).length).toBe(
       GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting')?.recipes.length,
     );
+    // The RENDERED source cell for a drop-taught apex row (phase 08): the
+    // data-level mirror pins 'drop' in the corpus, but only a render pin can
+    // see sourceCell routing the value to the wrong string (the old two-arm
+    // mapping shipped "Known from the start" for every drop row and stayed
+    // green). Row-scoped so a page that renders the string elsewhere cannot
+    // satisfy it; the trainer arm keeps its own row as the contrast.
+    const armor = professionsPage.render(ctx(['armorcrafting']));
+    const armorRowFor = (name: string): string =>
+      armor.match(
+        new RegExp(`<tr[^>]*>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? '';
+    expect(armorRowFor('Forgefold Legguards'), 'apex row renders the drop source string').toContain(
+      t('guide.profPages.sourceDrop'),
+    );
+    expect(armorRowFor('Forgefold Legguards')).not.toContain(t('guide.profPages.sourceKnown'));
     // The enchanting route rides the craft module with its own sections.
     const ench = professionsPage.render(ctx(['enchanting']));
     expect(ench).toContain('Enchant Weapon - Runed Edge');

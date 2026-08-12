@@ -12342,7 +12342,7 @@ export const zh_TW: EnTranslations = {
         "name": "疊鍛腿甲"
       },
       "wardspeaker_sabatons": {
-        "name": "喚守護脛"
+        "name": "喚守者護脛"
       },
       "briarstep_jerkin": {
         "name": "棘行皮甲"

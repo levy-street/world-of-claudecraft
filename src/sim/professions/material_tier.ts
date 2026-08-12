@@ -49,7 +49,11 @@ import type { ProfessionReagent } from './types';
 // intermediate output is slotless junk, so masterworkBonusStats returns
 // null and the crafting.ts effect gate never fires (pinned in
 // tests/professions_masterwork.test.ts). The proc draw is unconditional
-// either way, so no rng draw order moves anywhere.
+// either way, so no rng draw order moves anywhere. wyrmfall_core stays
+// DELIBERATELY untiered: the raid chase material's premium is availability,
+// not refinement, and every apex bill already maxes at tier 2 through its
+// intermediate; revisit only if a future apex row ever lists the core
+// without an intermediate beside it.
 const BASE_MATERIAL_TIERS: Readonly<Record<string, number>> = Object.freeze({
   iron_ore: 1,
   ashwood_log: 1,

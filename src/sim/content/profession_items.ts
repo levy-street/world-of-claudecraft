@@ -980,10 +980,11 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // come from the committed slot coverage audit (state.md Phase 08 ledger):
   // the weakest-covered cells per armor class. Armor values are copied from
   // the same-band same-slot reference piece, never invented. All nine carry
-  // masterwrought: true (the counted equip family) and requiredLevel 20, a
-  // recorded deviation from the ungated crafted-wearable precedent: every
-  // other tradable ilvl-31 epic wearable gates at 20, and these are the first
-  // crafted items in that band (tradable per R2, so the gate is load-bearing).
+  // masterwrought: true (the counted equip family). The level-20 equip gate
+  // is DERIVED, never hand-authored (item_level_req.ts doctrine): source
+  // level 25 from the recipe clamps to MAX_LEVEL, exactly like the phase 05
+  // jewelry; the sweep test pins requiredLevelFor(def) so the gate itself
+  // stays load-bearing (tradable per R2).
   // sellValues sit strictly below each recipe's reagent input value per the
   // economy invariant; vendor value is not power. Pure stats per R14: no
   // procs, no effects, no on-use, anywhere in this block.
@@ -994,7 +995,6 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'epic',
-    requiredLevel: 20,
     // ilvl-31 waist epic budget = 15; int:9+spi:6 = 15. Armor: gravescale_girdle.
     stats: { armor: 224, int: 9, spi: 6 },
     critRating: 40,
@@ -1008,7 +1008,6 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'epic',
-    requiredLevel: 20,
     // ilvl-31 legs epic budget = 20; str:11+sta:9 = 20. Armor: bloodmane_war_legguards.
     stats: { armor: 315, str: 11, sta: 9 },
     critRating: 40,
@@ -1022,7 +1021,6 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'feet',
     quality: 'epic',
-    requiredLevel: 20,
     // ilvl-31 feet epic budget = 14; int:8+spi:6 = 14. Armor: tideworn_warboots.
     stats: { armor: 212, int: 8, spi: 6 },
     hasteRating: 40,
@@ -1036,7 +1034,6 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'chest',
     quality: 'epic',
-    requiredLevel: 20,
     // ilvl-31 chest epic budget = 22; agi:13+sta:9 = 22. Armor: basin_stalkers_tunic.
     stats: { armor: 172, agi: 13, sta: 9 },
     critRating: 40,
@@ -1050,7 +1047,6 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'legs',
     quality: 'epic',
-    requiredLevel: 20,
     // ilvl-31 legs epic budget = 20; int:12+spi:8 = 20. Armor: tidewoven_trousers.
     stats: { armor: 132, int: 12, spi: 8 },
     hasteRating: 40,
@@ -1064,7 +1060,6 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'epic',
-    requiredLevel: 20,
     // ilvl-31 gloves epic budget = 15; int:9+spi:6 = 15. Armor: sanctum_prowlers_grips.
     stats: { armor: 104, int: 9, spi: 6 },
     critRating: 40,
@@ -1078,7 +1073,6 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'epic',
-    requiredLevel: 20,
     // ilvl-31 chest epic budget = 22; int:12+spi:10 = 22. Armor: shroud_of_the_gravewyrm.
     stats: { armor: 90, int: 12, spi: 10 },
     hitRating: 40,
@@ -1092,7 +1086,6 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'legs',
     quality: 'epic',
-    requiredLevel: 20,
     // ilvl-31 legs epic budget = 20; int:12+spi:8 = 20. Armor: lunar_choir_leggings.
     stats: { armor: 72, int: 12, spi: 8 },
     hasteRating: 40,
@@ -1106,7 +1099,6 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'gloves',
     quality: 'epic',
-    requiredLevel: 20,
     // ilvl-31 gloves epic budget = 15; int:9+spi:6 = 15. Armor: shadowpulse_handwraps.
     stats: { armor: 52, int: 9, spi: 6 },
     critRating: 40,

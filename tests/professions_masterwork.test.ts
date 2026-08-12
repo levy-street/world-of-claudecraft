@@ -966,17 +966,24 @@ describe('R1: the masterwork proc never mints a quality bump on an APEX craft', 
     for (const g of recipe.reagents) sim.addItem(g.itemId, g.count, pid);
     // Force the single output-side proc draw: 0 is below every reachable
     // chance (base 0.03 at minimum), so absent the R1 guard the masterwork
-    // effect WOULD fire on this craft.
+    // effect WOULD fire on this craft. The replacement also COUNTS calls,
+    // so the one-draw-per-successful-craft contract stays pinned on the
+    // apex path (the suppression must gate the EFFECT, never the draw).
     const rng: Rng = (sim as any).ctx.rng;
-    (rng as any).next = () => 0;
+    let draws = 0;
+    (rng as any).next = () => {
+      draws += 1;
+      return 0;
+    };
     runCraft(sim, recipe.id, false, pid);
-    return { meta, result: { ...(sim as any).lastCraftResult } };
+    return { meta, result: { ...(sim as any).lastCraftResult }, draws: () => draws };
   };
 
   it('a forced proc on a masterwrought output grants a plain signed copy, never a bump', () => {
     const apex = craftForced('recipe_spiritweld_girdle', 'armorcrafting');
     expect(apex.result.ok).toBe(true);
     expect(apex.result.masterwork).toBeUndefined();
+    expect(apex.draws(), 'exactly one draw on the suppressed apex craft').toBe(1);
     const slot = apex.meta.inventory.find(
       (s: { itemId: string }) => s.itemId === 'spiritweld_girdle',
     );
@@ -991,5 +998,6 @@ describe('R1: the masterwork proc never mints a quality bump on an APEX craft', 
     const control = craftForced('recipe_eastbrook_ritual_vestments', null);
     expect(control.result.ok).toBe(true);
     expect(control.result.masterwork).toBe(true);
+    expect(control.draws(), 'exactly one draw on the proccing control').toBe(1);
   });
 });

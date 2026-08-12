@@ -9,7 +9,7 @@
 
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
-import { canEquipItemInSlot } from '../equipment_rules';
+import { canEquipItemInSlot, MASTERWROUGHT_EQUIP_CAP } from '../equipment_rules';
 import type { SimContext } from '../sim_context';
 import type { EquipSlot, ItemDef } from '../types';
 import { ALL_EQUIP_SLOTS } from '../types';
@@ -42,10 +42,11 @@ export function bestEpicGearFor(
   );
   const picks: Partial<Record<EquipSlot, string>> = {};
   const used = new Set<string>();
-  for (const slot of ALL_EQUIP_SLOTS) {
+  const bestFor = (slot: EquipSlot, extra?: (item: ItemDef) => boolean): ItemDef | undefined => {
     let candidates = epics.filter(
       (item) =>
         !used.has(item.id) &&
+        (!extra || extra(item)) &&
         canEquipItemInSlot(cls as Parameters<typeof canEquipItemInSlot>[0], item, slot, spec),
     );
     // A dagger class fantasy (Craven Thrust and the Duskveil openers require
@@ -65,10 +66,39 @@ export function bestEpicGearFor(
       );
       if (oneHanders.length > 0) candidates = oneHanders;
     }
-    if (candidates.length === 0) continue;
     candidates.sort((a, b) => score(b) - score(a) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-    picks[slot] = candidates[0].id;
-    used.add(candidates[0].id);
+    return candidates[0];
+  };
+  for (const slot of ALL_EQUIP_SLOTS) {
+    const best = bestFor(slot);
+    if (!best) continue;
+    picks[slot] = best.id;
+    used.add(best.id);
+  }
+  // Masterwrought cap arm (phase 08): equipBestInSlotForDev writes equipment
+  // directly and never runs masterwroughtConflictSlot, so without this the
+  // dev outfit could silently exceed the counted-family cap the moment
+  // flagged pieces out-score their references (the pbe_boost twin,
+  // enforceMasterwroughtCap, hit exactly that). Keep the cap-highest scoring
+  // flagged picks and refill each demoted slot with its best unflagged
+  // candidate under the same slot rules.
+  const flagged = (Object.entries(picks) as [EquipSlot, string][]).filter(
+    ([, id]) => ITEMS[id]?.masterwrought,
+  );
+  if (flagged.length > MASTERWROUGHT_EQUIP_CAP) {
+    const scored = flagged
+      .map(([slot, id]) => ({ slot, id, s: score(ITEMS[id]) }))
+      .sort((a, b) => b.s - a.s || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    for (const demoted of scored.slice(MASTERWROUGHT_EQUIP_CAP)) {
+      used.delete(demoted.id);
+      const fallback = bestFor(demoted.slot, (item) => !item.masterwrought);
+      if (fallback) {
+        picks[demoted.slot] = fallback.id;
+        used.add(fallback.id);
+      } else {
+        delete picks[demoted.slot];
+      }
+    }
   }
   return picks;
 }
