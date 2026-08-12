@@ -5,6 +5,8 @@ import {
   MASTER_TIER_LETTERS,
   MASTERY_RESET_LETTER,
   QUEST_LETTERS,
+  REFERRAL_LEVEL10_LETTER,
+  REFERRAL_MOUNT_LETTER,
   WELCOME_LETTER,
 } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
@@ -618,6 +620,10 @@ const LETTER_IDS = [
   'prof_tier_engineering_alchemy_3',
   'prof_tier_engineering_alchemy_4',
   'prof_tier_engineering_alchemy_5',
+  // Refer-a-friend reward letters (docs/prd/refer-a-friend.md,
+  // REFERRAL_LEVEL10_LETTER / REFERRAL_MOUNT_LETTER in src/sim/content/letters.ts).
+  'referral_level10_reward',
+  'referral_mount_reward',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];
@@ -755,6 +761,8 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     [WELCOME_LETTER.letterId]: WELCOME_LETTER,
     [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
     [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
+    [REFERRAL_LEVEL10_LETTER.letterId]: REFERRAL_LEVEL10_LETTER,
+    [REFERRAL_MOUNT_LETTER.letterId]: REFERRAL_MOUNT_LETTER,
   };
   for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
   for (const letter of Object.values(GUILD_TREND_LETTERS)) lettersById[letter.letterId] = letter;

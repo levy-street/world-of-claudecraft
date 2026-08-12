@@ -409,6 +409,8 @@ export const vi_VN: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Đã đặt lại điểm cảnh cáo chat",
   "moderationHistory.actionRestoreItem": "Đã khôi phục vật phẩm",
   "moderationHistory.actionRestoreSlot": "Đã khôi phục ô",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "Đổi tên bang hội",
   "moderationHistory.actionGuildBankPurge": "Xóa ngân hàng bang hội",
   "moderationHistory.actionUnknown": "Hành động khác",

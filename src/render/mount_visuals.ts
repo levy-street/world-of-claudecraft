@@ -81,6 +81,9 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
   drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
+  // Refer-a-friend tier-5 reskin (docs/prd/refer-a-friend.md): the Valorsteed
+  // body under its own tinted manifest entry; seat numbers copied verbatim.
+  verdant_valorsteed: spec('mount_verdant_valorsteed', 2.4, true, undefined, 0.15),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */

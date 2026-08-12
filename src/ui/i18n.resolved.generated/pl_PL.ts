@@ -1064,7 +1064,9 @@ export const pl_PL: EnTranslations = {
       "desc_stormfeather_griffin": "Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.",
       "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
-      "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem."
+      "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem.",
+      "name_verdant_valorsteed": "Verdant Valorsteed",
+      "desc_verdant_valorsteed": "A Valorsteed in verdant barding, reserved for recruiters who bring five friends to the vale."
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
@@ -3923,6 +3925,9 @@ export const pl_PL: EnTranslations = {
       "genesis_token_claimed": "Ten Seeker Genesis Token został już odebrany.",
       "entitlement_required": "Wymagane jest zweryfikowane uprawnienie Seeker.",
       "current_ownership_required": "Musisz obecnie posiadać Seeker Genesis Token."
+    },
+    "referrals": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const pl_PL: EnTranslations = {
       "pristine_claw": {
         "name": "Nieskazitelny Pazur"
       },
+      "reins_verdant_valorsteed": {
+        "name": "Reins of the Verdant Valorsteed"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },
@@ -16895,6 +16903,16 @@ export const pl_PL: EnTranslations = {
         "sender": "Majster Gizzel",
         "subject": "MISTRZOSTWO, kabum",
         "body": "Jedna z twoich specjalizacji osiągnęła mistrzostwo, sam SZCZYT, kabum, cała drabina, gotowe. Nie rozdaję pochwał, rozdaję lonty, ale masz i jedno, i drugie: jesteś genialny i trochę przerażający. Idź sprawić, żeby góry się denerwowały."
+      },
+      "referral_level10_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your recruit finds their footing",
+        "body": "Word arrives that a friend you brought to the vale has reached their tenth season of growth. The realm grows stronger for every hand you bring to it, and the Ravenpost carries you a small token of thanks.\n\nWings up,\nThe Ravenpost"
+      },
+      "referral_mount_reward": {
+        "sender": "The Ravenpost",
+        "subject": "A steed for the Recruiter",
+        "body": "Five friends you have brought to the vale, and five have made it their home. The stables of Eastbrook have set aside something no coin can buy: a Valorsteed in verdant barding, reserved for those who build the realm itself.\n\nRide well,\nThe Ravenpost"
       }
     },
     "itemSets": {

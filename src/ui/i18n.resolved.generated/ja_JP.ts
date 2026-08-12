@@ -1064,7 +1064,9 @@ export const ja_JP: EnTranslations = {
       "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
       "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
-      "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。"
+      "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
+      "name_verdant_valorsteed": "翠緑のヴァロースティード",
+      "desc_verdant_valorsteed": "翠緑の馬鎧をまとったヴァロースティード。五人の友を谷へ招いた募兵官のためだけに取り置かれている。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -3923,6 +3925,9 @@ export const ja_JP: EnTranslations = {
       "genesis_token_claimed": "そのSeeker Genesis Tokenはすでに取得されています。",
       "entitlement_required": "検証済みのSeeker資格が必要です。",
       "current_ownership_required": "現在Seeker Genesis Tokenを所有している必要があります。"
+    },
+    "referrals": {
+      "invalid_input": "入力が無効です。"
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const ja_JP: EnTranslations = {
       "pristine_claw": {
         "name": "無傷の鉤爪"
       },
+      "reins_verdant_valorsteed": {
+        "name": "翠緑のヴァロースティードの手綱"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -16895,6 +16903,16 @@ export const ja_JP: EnTranslations = {
         "sender": "からくり師ギッゼル",
         "subject": "マスター、ドカン",
         "body": "お前の主専攻の一つがマスターに到達した、まさに頂点、ドカン、梯子まるごと、登り切りだ。俺は褒め言葉なんて配らん、配るのは導火線だ、だがほら、両方持っていけ。お前は見事だし、ちょっとばかり恐ろしい。山々を怯えさせてこい。"
+      },
+      "referral_level10_reward": {
+        "sender": "レイヴンポスト",
+        "subject": "あなたの新兵が一人前に",
+        "body": "あなたが谷へ招いた友が、十度目の成長の季節を迎えたとの知らせが届きました。あなたが連れてくる一人ひとりの手が王国を強くします。レイヴンポストより、ささやかな感謝の印をお届けします。\n\n翼を高く、\nレイヴンポスト"
+      },
+      "referral_mount_reward": {
+        "sender": "レイヴンポスト",
+        "subject": "募兵官への駿馬",
+        "body": "あなたは五人の友を谷へ導き、五人ともここを故郷としました。イーストブルックの厩舎は、金では買えないものをあなたのために取り置いています。翠緑の馬鎧をまとったヴァロースティード、王国そのものを築く者だけのための一頭です。\n\n良き騎行を、\nレイヴンポスト"
       }
     },
     "itemSets": {

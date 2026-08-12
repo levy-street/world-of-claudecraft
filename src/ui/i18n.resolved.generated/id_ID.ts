@@ -1064,7 +1064,9 @@ export const id_ID: EnTranslations = {
       "desc_stormfeather_griffin": "Griffin badai yang anggun, melangkah di tanah dengan cakar bersepatu rune, sayap terlipat rapat.",
       "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
-      "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu."
+      "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu.",
+      "name_verdant_valorsteed": "Verdant Valorsteed",
+      "desc_verdant_valorsteed": "A Valorsteed in verdant barding, reserved for recruiters who bring five friends to the vale."
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
@@ -3923,6 +3925,9 @@ export const id_ID: EnTranslations = {
       "genesis_token_claimed": "Seeker Genesis Token itu sudah diklaim.",
       "entitlement_required": "Diperlukan hak akses Seeker yang terverifikasi.",
       "current_ownership_required": "Diperlukan kepemilikan Seeker Genesis Token saat ini."
+    },
+    "referrals": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const id_ID: EnTranslations = {
       "pristine_claw": {
         "name": "Cakar Murni"
       },
+      "reins_verdant_valorsteed": {
+        "name": "Reins of the Verdant Valorsteed"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -16895,6 +16903,16 @@ export const id_ID: EnTranslations = {
         "sender": "Perajin Gizzel",
         "subject": "KEAHLIAN PENUH, kaboom",
         "body": "Salah satu bidang utamamu mencapai keahlian penuh, puncak TERTINGGI, kaboom, seluruh tangga, selesai. Aku tidak membagi-bagikan pujian, aku membagi-bagikan sekering, tetapi ini, terimalah keduanya: kamu luar biasa dan sedikit menakutkan. Pergi buat gunung-gunung itu gugup."
+      },
+      "referral_level10_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your recruit finds their footing",
+        "body": "Word arrives that a friend you brought to the vale has reached their tenth season of growth. The realm grows stronger for every hand you bring to it, and the Ravenpost carries you a small token of thanks.\n\nWings up,\nThe Ravenpost"
+      },
+      "referral_mount_reward": {
+        "sender": "The Ravenpost",
+        "subject": "A steed for the Recruiter",
+        "body": "Five friends you have brought to the vale, and five have made it their home. The stables of Eastbrook have set aside something no coin can buy: a Valorsteed in verdant barding, reserved for those who build the realm itself.\n\nRide well,\nThe Ravenpost"
       }
     },
     "itemSets": {

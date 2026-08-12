@@ -239,6 +239,16 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   // state the stamp gates (Sim.guildBanks, player copper/inventory) is fully
   // sampled, so a gate misfire would surface THERE.
   'guildMembership',
+  // Server-stamped refer-a-friend bond entitlement (partner character ids +
+  // multiplier + summon cooldown); session-only exactly like guildMembership
+  // (never persisted, never sim-mutated, written only through Sim.setPlayerBond,
+  // always null offline), so sampling it would churn goldens for no gameplay
+  // reason. It is a host-injected AUTHORIZATION INPUT, not sim-evolved state:
+  // offline it stays null, so bondXpMultiplier returns 1 and summonFriend
+  // refuses everywhere in these scenarios. No divergence can hide behind the
+  // exclusion: the state the stamp gates (xp, level, positions, cooldowns) is
+  // fully sampled, so a misfiring multiplier or teleport would surface THERE.
+  'bondBuff',
   'known', // derived from class/level/talents
   'talentMods', // derived from talents (recomputed)
   'fiestaMods', // derived from talentMods + augments

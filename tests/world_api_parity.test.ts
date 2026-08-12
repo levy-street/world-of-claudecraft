@@ -224,6 +224,7 @@ export const IWORLD_MEMBERS = [
   { name: 'setMarker', kind: 'method' },
   { name: 'clearMarker', kind: 'method' },
   { name: 'readyCheckRespond', kind: 'method' },
+  { name: 'summonFriend', kind: 'method' },
   { name: 'tradeRequest', kind: 'method' },
   { name: 'tradeAccept', kind: 'method' },
   { name: 'tradeSetOffer', kind: 'method' },
@@ -599,9 +600,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(320);
+    // The refer-a-friend Summon a Friend (docs/prd/refer-a-friend.md) adds
+    // summonFriend (IWorldParty, a method), leaving 321.
+    expect(IWORLD_MEMBERS.length).toBe(321);
     expect(DATA_MEMBERS.length).toBe(85);
-    expect(METHOD_MEMBERS.length).toBe(235);
+    expect(METHOD_MEMBERS.length).toBe(236);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -894,6 +897,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'stationPlacements',
       'stopAutoAttack',
       'submitLootRoll',
+      'summonFriend',
       'switchLoadout',
       'tabTarget',
       'tabTargetPrev',
@@ -1233,6 +1237,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'startAutoAttack',
       'stopAutoAttack',
       'submitLootRoll',
+      'summonFriend',
       'switchLoadout',
       'tabTarget',
       'tabTargetPrev',
@@ -1511,6 +1516,7 @@ const FACET_PARTY = [
   'setMarker',
   'clearMarker',
   'readyCheckRespond',
+  'summonFriend',
 ] as const satisfies readonly (keyof IWorldParty)[];
 type _ExhaustParty = AssertNever<Exclude<keyof IWorldParty, (typeof FACET_PARTY)[number]>>;
 
@@ -1869,8 +1875,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(320);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(320);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(321);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(321);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -23,6 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { bondXpMultiplier } from '../bond_buff';
 import { computeTalentModifiers } from '../content/talents';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
@@ -1743,6 +1744,13 @@ export function grantXp(
 ): void {
   const p = ctx.entities.get(meta.entityId);
   if (!p || amount <= 0) return;
+  // Refer-a-friend bond (bond_buff.ts): multiply the BASE award while the
+  // bonded partner is partied and co-located, before the rested draw-down so
+  // rested tops up the boosted amount (and depletes proportionally faster),
+  // the classic recruit-a-friend stacking. A null stamp (offline, no bond)
+  // returns 1 and this line is a no-op; the check draws no rng.
+  const bondMult = bondXpMultiplier(ctx, meta);
+  if (bondMult > 1) amount = Math.floor(amount * bondMult);
   // Rested XP bonus: the classic-era rule only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.

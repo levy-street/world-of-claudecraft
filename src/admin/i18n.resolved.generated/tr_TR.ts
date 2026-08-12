@@ -409,6 +409,8 @@ export const tr_TR: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Sohbet ihlalleri sıfırlandı",
   "moderationHistory.actionRestoreItem": "Eşya geri yüklendi",
   "moderationHistory.actionRestoreSlot": "Yuva geri yüklendi",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "Lonca yeniden adlandırma",
   "moderationHistory.actionGuildBankPurge": "Lonca bankası eşya kaldırma",
   "moderationHistory.actionUnknown": "Diğer eylem",

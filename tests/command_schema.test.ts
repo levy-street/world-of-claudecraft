@@ -59,8 +59,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // auto-merged identical numbers before while the real total was higher; the
 // merged tree carries BOTH sides' pairs. Only the suite says what they really
 // are, and the numbers below were set from a run, not from this narrative.
-const EXPECTED_SEND_COUNT = 197;
-const EXPECTED_DISPATCH_COUNT = 210;
+// The refer-a-friend program adds summon_friend as a send + dispatch pair
+// (the bond teleport, docs/prd/refer-a-friend.md).
+const EXPECTED_SEND_COUNT = 198;
+const EXPECTED_DISPATCH_COUNT = 211;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

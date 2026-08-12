@@ -1,4 +1,4 @@
-// The Book of Deeds v1 catalog: data-as-code, one DeedDef per deed. No engine
+﻿// The Book of Deeds v1 catalog: data-as-code, one DeedDef per deed. No engine
 // logic lives here; the evaluator is src/sim/deeds.ts. Names, descs, and
 // reward title/border strings are English content re-localized at the client
 // boundary (the sim never emits deed text, only ids).
@@ -2817,6 +2817,34 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 0,
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'Light of the Sanctum' },
+  },
+  // Refer-a-friend (docs/prd/refer-a-friend.md): granted through the sim-side
+  // ladder site in src/sim/bond_buff.ts when the server passes a
+  // completed-referral count at or past the first tier threshold. Manual
+  // trigger by design: the referral graph is a server-side account fact, so
+  // the sim grants on the supplied fact rather than evaluating a trigger of
+  // its own (the same shape as the other server-informed manual grants).
+  soc_recruiter: {
+    id: 'soc_recruiter',
+    name: 'Recruiter',
+    desc: 'Recruit a friend who makes the vale their home, reaching level 20.',
+    category: 'social',
+    renown: 10,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Recruiter' },
+  },
+  // The tier-3 ladder reward: an exclusive title stands in for the PRD's
+  // "exclusive cosmetic" until a bespoke art asset ships (titles are the one
+  // cosmetic this catalog can mint without new art; the PRD records the
+  // decision).
+  soc_realm_builder: {
+    id: 'soc_realm_builder',
+    name: 'Realm-Builder',
+    desc: 'Recruit three friends who make the vale their home, each reaching level 20.',
+    category: 'social',
+    renown: 25,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Realm-Builder' },
   },
 };
 

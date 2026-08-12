@@ -1064,7 +1064,9 @@ export const fr_FR: EnTranslations = {
       "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.",
       "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
-      "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre."
+      "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
+      "name_verdant_valorsteed": "Verdant Valorsteed",
+      "desc_verdant_valorsteed": "A Valorsteed in verdant barding, reserved for recruiters who bring five friends to the vale."
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
@@ -3923,6 +3925,9 @@ export const fr_FR: EnTranslations = {
       "genesis_token_claimed": "Ce Seeker Genesis Token a déjà été réclamé.",
       "entitlement_required": "Des droits Seeker vérifiés sont requis.",
       "current_ownership_required": "La possession actuelle d'un Seeker Genesis Token est requise."
+    },
+    "referrals": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -12213,6 +12218,9 @@ export const fr_FR: EnTranslations = {
       "pristine_claw": {
         "name": "Griffe immaculée"
       },
+      "reins_verdant_valorsteed": {
+        "name": "Reins of the Verdant Valorsteed"
+      },
       "conjured_water4": {
         "name": "Eau de source invoquée"
       },
@@ -16895,6 +16903,16 @@ export const fr_FR: EnTranslations = {
         "sender": "Bricoleur Gizzel",
         "subject": "MAITRISE, kaboom",
         "body": "Une de vos majeures a atteint la maîtrise, tout en HAUT, kaboom, toute l'échelle, terminé. Je ne distribue pas d'éloges, je distribue des mèches, mais tenez, prenez les deux : vous êtes brillant et légèrement terrifiant. Allez rendre les montagnes nerveuses."
+      },
+      "referral_level10_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your recruit finds their footing",
+        "body": "Word arrives that a friend you brought to the vale has reached their tenth season of growth. The realm grows stronger for every hand you bring to it, and the Ravenpost carries you a small token of thanks.\n\nWings up,\nThe Ravenpost"
+      },
+      "referral_mount_reward": {
+        "sender": "The Ravenpost",
+        "subject": "A steed for the Recruiter",
+        "body": "Five friends you have brought to the vale, and five have made it their home. The stables of Eastbrook have set aside something no coin can buy: a Valorsteed in verdant barding, reserved for those who build the realm itself.\n\nRide well,\nThe Ravenpost"
       }
     },
     "itemSets": {

@@ -409,6 +409,8 @@ export const es_ES: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Infracciones de chat reiniciadas",
   "moderationHistory.actionRestoreItem": "Objeto restaurado",
   "moderationHistory.actionRestoreSlot": "Ranura restaurada",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "Cambio de nombre de hermandad",
   "moderationHistory.actionGuildBankPurge": "Purga del banco de la hermandad",
   "moderationHistory.actionUnknown": "Otra acción",

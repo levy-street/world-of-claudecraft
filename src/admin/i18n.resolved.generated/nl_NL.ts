@@ -409,6 +409,8 @@ export const nl_NL: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Chatstrafpunten gereset",
   "moderationHistory.actionRestoreItem": "Voorwerpherstel",
   "moderationHistory.actionRestoreSlot": "Sleufherstel",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "Gilde hernoemd",
   "moderationHistory.actionGuildBankPurge": "Gildebankverwijdering",
   "moderationHistory.actionUnknown": "Andere actie",

@@ -409,6 +409,8 @@ export const pl_PL: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Naruszenia czatu zresetowane",
   "moderationHistory.actionRestoreItem": "Przywrócenie przedmiotu",
   "moderationHistory.actionRestoreSlot": "Przywrócenie slotu",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "Zmiana nazwy gildii",
   "moderationHistory.actionGuildBankPurge": "Usunięcie przedmiotu z banku gildii",
   "moderationHistory.actionUnknown": "Inne działanie",

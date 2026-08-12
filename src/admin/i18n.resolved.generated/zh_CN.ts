@@ -409,6 +409,8 @@ export const zh_CN: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "聊天违规次数重置",
   "moderationHistory.actionRestoreItem": "物品补发",
   "moderationHistory.actionRestoreSlot": "槽位补发",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "公会重命名",
   "moderationHistory.actionGuildBankPurge": "公会银行清除",
   "moderationHistory.actionUnknown": "其他动作",

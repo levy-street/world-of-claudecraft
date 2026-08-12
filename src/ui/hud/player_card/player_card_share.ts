@@ -46,6 +46,15 @@ export interface ReferralInfo {
 }
 export type ReferralProvider = () => Promise<ReferralInfo>;
 
+/** The account's stable refer-a-friend code link (docs/prd/refer-a-friend.md).
+ *  url is shareable before any card is published; null when ineligible. */
+export interface ReferralCodeInfo {
+  eligible: boolean;
+  code: string | null;
+  url: string | null;
+}
+export type ReferralCodeProvider = () => Promise<ReferralCodeInfo>;
+
 /** A character's realm standing by lifetime XP (rank 1 = highest of `total`). */
 export interface CharacterStanding {
   rank: number;
@@ -55,6 +64,7 @@ export type StandingProvider = () => Promise<CharacterStanding | null>;
 
 let uploader: CardUploader | null = null;
 let referralProvider: ReferralProvider | null = null;
+let referralCodeProvider: ReferralCodeProvider | null = null;
 let standingProvider: StandingProvider | null = null;
 
 /** main.ts injects the authenticated uploader on world entry (null to clear). */
@@ -65,6 +75,11 @@ export function setCardUploader(fn: CardUploader | null): void {
 /** main.ts injects a referral-stats fetcher on world entry (null to clear). */
 export function setReferralProvider(fn: ReferralProvider | null): void {
   referralProvider = fn;
+}
+
+/** main.ts injects a referral-code fetcher on world entry (null to clear). */
+export function setReferralCodeProvider(fn: ReferralCodeProvider | null): void {
+  referralCodeProvider = fn;
 }
 
 /** main.ts injects a character-standing fetcher on world entry (null to clear). */
@@ -86,6 +101,11 @@ export function publishCard(png: Blob, meta: PublishedCardMeta): Promise<Publish
 /** Referral stats for the card footer, or null when unavailable (offline). */
 export function fetchReferralInfo(): Promise<ReferralInfo | null> {
   return referralProvider ? referralProvider() : Promise.resolve(null);
+}
+
+/** The account's referral code link, or null when unavailable (offline). */
+export function fetchReferralCode(): Promise<ReferralCodeInfo | null> {
+  return referralCodeProvider ? referralCodeProvider() : Promise.resolve(null);
 }
 
 /** Character standing for the card's "Top N%", or null when unavailable. */

@@ -79,4 +79,9 @@ export interface IWorldParty {
   markerFor(entityId: number): number | null;
   setMarker(entityId: number, markerId: number): void;
   clearMarker(entityId: number): void;
+  // Refer-a-friend Summon a Friend (docs/prd/refer-a-friend.md): teleport the
+  // bonded, partied partner to this player's side. The sim owns every rule
+  // (bond stamp, party membership, overworld only, cooldown); refusals come
+  // back as error events.
+  summonFriend(): void;
 }

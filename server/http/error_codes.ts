@@ -223,6 +223,7 @@ export const ERROR_CODES = deepFreeze({
   'seeker.genesis_token_claimed': { params: [] },
   'seeker.entitlement_required': { params: [] },
   'seeker.current_ownership_required': { params: [] },
+  'referrals.invalid_input': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

@@ -8601,6 +8601,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'worldContent.mailboxName': 'Почтовый ящик',
   'worldContent.noticeboardName': 'Доска объявлений',
   'entities.letters.ravenpost_welcome.sender': 'Вороновая почта',
+  'entities.letters.referral_level10_reward.sender': 'Вороновая почта',
+  'entities.letters.referral_level10_reward.subject': 'Ваш новобранец встал на ноги',
+  'entities.letters.referral_level10_reward.body':
+    'Пришла весть: друг, которого вы привели в долину, прошел десятую пору роста. Каждая пара рук, что вы приводите, делает королевство сильнее, и Вороновая почта передает вам небольшой знак благодарности.\n\nВыше крылья,\nВороновая почта',
+  'entities.letters.referral_mount_reward.sender': 'Вороновая почта',
+  'entities.letters.referral_mount_reward.subject': 'Скакун для вербовщика',
+  'entities.letters.referral_mount_reward.body':
+    'Пятерых друзей вы привели в долину, и все пятеро назвали ее домом. Конюшни Истбрука отложили для вас то, что не купить ни за какие деньги: Валорстида в изумрудном убранстве, предназначенного лишь тем, кто строит само королевство.\n\nДоброй дороги,\nВороновая почта',
+  'entities.items.reins_verdant_valorsteed.name': 'Поводья изумрудного Валорстида',
+  'hudChrome.mounts.name_verdant_valorsteed': 'Изумрудный Валорстид',
+  'hudChrome.mounts.desc_verdant_valorsteed':
+    'Валорстид в изумрудном убранстве, предназначенный для вербовщиков, приведших в долину пятерых друзей.',
+  'apiError.referrals.invalid_input': 'Недопустимый ввод.',
   'entities.letters.ravenpost_welcome.subject': 'Теперь вороны летают и для вас',
   'entities.letters.ravenpost_welcome.body':
     'Путник!\n\nВороновая почта открыла свои насесты по всей долине. Ищите вороньи столбы в Истбруке, Фенбридже и Хайуотче: с любого из них можно отправлять письма, монеты и вещи другим искателям приключений и забирать всё, что приносят вороны.\n\nПрилагаем небольшой подарок на вашу первую марку.\n\nВыше крылья,\nВороновая почта',

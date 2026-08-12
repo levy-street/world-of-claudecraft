@@ -219,6 +219,24 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/user-assets\/(\d+)\/(block|unblock)$/,
     permission: 'content.moderate',
   },
+
+  // Refer-a-friend program (docs/prd/refer-a-friend.md): the per-account chain
+  // inspect rides accounts.read, the program-wide aggregates ride
+  // analytics.read, and void/reinstate are reversible punitive writes so they
+  // sit with the other moderation actions (the account-flair precedent). The
+  // id in the void/reinstate path is the REFEREE account id (the referrals
+  // table's primary key).
+  {
+    method: 'GET',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/referrals$/,
+    permission: 'accounts.read',
+  },
+  { method: 'GET', pattern: '/admin/api/referrals/stats', permission: 'analytics.read' },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/referrals\/(\d+)\/(void|reinstate)$/,
+    permission: 'moderation.act',
+  },
 ];
 
 function matches(pattern: string | RegExp, path: string): boolean {

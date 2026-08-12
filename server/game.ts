@@ -309,6 +309,9 @@ import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
+import { ReferralBondService } from './referral_bond';
+import { ReferralMilestoneService } from './referral_milestones';
+import { referralProgramConfig } from './referral_program';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
@@ -1878,6 +1881,11 @@ export class GameServer {
   // a throw.
   private readonly guildBankDeleteWindows = new Set<number>();
   private readonly moderation: ModerationService<ClientSession>;
+  // Refer-a-friend bond stamping (server/referral_bond.ts): recomputes the
+  // session-only Sim bond stamps from the referral graph on join/leave/level-up.
+  private readonly referralBond: ReferralBondService;
+  // Refer-a-friend milestone rewards (server/referral_milestones.ts).
+  private readonly referralMilestones: ReferralMilestoneService;
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
@@ -2145,6 +2153,33 @@ export class GameServer {
       ban: (input) => moderateAccount({ ...input, action: 'ban' }),
       suspend: (input) => moderateAccount({ ...input, action: 'suspend' }),
       forceRename: (input) => forceCharacterRename(input),
+    });
+    // Refer-a-friend bond stamps (docs/prd/refer-a-friend.md): recomputed on
+    // join/leave/bond-ending level-up via a DB-backed FIFO the loop never awaits.
+    this.referralBond = new ReferralBondService({
+      sessionsForAccount: (accountId) => {
+        const sessions: { pid: number; characterId: number }[] = [];
+        for (const s of this.clients.values()) {
+          if (s.accountId === accountId && !s.left) {
+            sessions.push({ pid: s.pid, characterId: s.characterId });
+          }
+        }
+        return sessions;
+      },
+      setPlayerBond: (pid, stamp) => this.sim.setPlayerBond(pid, stamp),
+    });
+    // Refer-a-friend milestone rewards: referee level-ups fire referrer-side
+    // grants (mail letters, ladder title deeds); the referrer-join reconcile
+    // delivers anything that fired while they were offline.
+    this.referralMilestones = new ReferralMilestoneService({
+      sessionForAccount: (accountId) => {
+        for (const s of this.clients.values()) {
+          if (s.accountId === accountId && !s.left) return { pid: s.pid };
+        }
+        return null;
+      },
+      sendSystemLetterTo: (pid, letter) => this.sim.sendSystemLetterTo(pid, letter),
+      grantReferralLadder: (pid, tier) => this.sim.grantReferralLadder(pid, tier),
     });
     // Combat parse capture (server/parse/): a read-only observer at the tick
     // drain, inert unless PARSE_CAPTURE=1 and an ingest URL is configured.
@@ -3910,6 +3945,11 @@ export class GameServer {
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
     this.clients.set(pid, session);
     this.sessionsByCharacterId.set(characterId, session);
+    // Refer-a-friend: recompute bond stamps for this account and its partners
+    // (fire-and-forget FIFO; also reconciles offline BOND_END_LEVEL dings), and
+    // deliver any referrer-side milestone rewards that fired while offline.
+    this.referralBond.onSessionChange(accountId);
+    this.referralMilestones.onReferrerJoin(accountId);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
     void this.recordOnlineSnapshot();
     // Stamp this character's last world-entry time for the guild-roster "last
@@ -4241,6 +4281,13 @@ export class GameServer {
     return this.leave(session, leaveReason);
   }
 
+  /** Refer-a-friend: recompute bond stamps for an account after an
+   *  out-of-band graph change (the admin void/reinstate write). Fire-and-forget
+   *  FIFO like every other recompute. */
+  refreshReferralBonds(accountId: number): void {
+    this.referralBond.onSessionChange(accountId);
+  }
+
   async leave(session: ClientSession, _reason: string): Promise<void> {
     if (session.left || !this.clients.has(session.pid)) return;
     if (session.spectating) this.exitSpectate(session, false);
@@ -4248,6 +4295,9 @@ export class GameServer {
     this.cancelAndRecordUnstuck(session);
     session.left = true;
     this.clients.delete(session.pid);
+    // Refer-a-friend: this account's sessions changed, so its online partners'
+    // bond stamps must drop this character (fire-and-forget FIFO).
+    this.referralBond.onSessionChange(session.accountId);
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
     this.releaseIpSession(session.ip);
     void this.recordOnlineSnapshot();
@@ -7179,6 +7229,11 @@ export class GameServer {
       case 'unstuck':
         sim.unstuck(pid);
         break;
+      case 'summon_friend':
+        // Refer-a-friend Summon a Friend: the sim owns every rule (bond stamp,
+        // party membership, overworld only, cooldown); no fields to validate.
+        sim.summonFriend(pid);
+        break;
       case 'resurrect_corpse':
         sim.resurrectAtCorpse(pid);
         break;
@@ -9657,6 +9712,19 @@ export class GameServer {
           // carries the old level until the next save, which enqueues again from
           // saveCharacter, so an early drain re-reads once the row catches up.
           enqueueLinkChange({ accountId: session.accountId, kinds: ['flex'] }, now);
+          // Refer-a-friend: a ding at BOND_END_LEVEL ends this referee's bond.
+          // Event-driven completion (the durable characters.level lags this
+          // event by up to one autosave, so the FIFO promotes off the event
+          // itself), then both sides' stamps recompute and drop. Harmless for
+          // a non-referee (the promote matches no rows).
+          if (ev.level >= referralProgramConfig().bondEndLevel) {
+            this.referralBond.onRefereeBondEnd(session.accountId);
+          }
+          // Refer-a-friend milestones: an exact ding on a milestone level
+          // fires the referrer-side reward (no-op for a non-referee). Ordered
+          // AFTER the bond completion enqueue above: both ride FIFOs, and the
+          // completion must land before the ladder reads completed counts.
+          this.referralMilestones.onRefereeLevel(session.accountId, ev.level);
         }
       }
       if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {

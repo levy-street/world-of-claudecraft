@@ -2431,6 +2431,8 @@ const ITEM_ENTITY_IDS = [
   'sharp_claw',
   'curved_tusk',
   'pristine_claw',
+  // Refer-a-friend tier-5 mount reins (docs/prd/refer-a-friend.md).
+  'reins_verdant_valorsteed',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2559,6 +2561,9 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   thornhide_leggings: 'Thornhide Leggings',
   thornhide_gloves: 'Thornhide Gloves',
   thornhide_boots: 'Thornhide Boots',
+  // Refer-a-friend tier-5 mount reins (docs/prd/refer-a-friend.md), same
+  // English-appended treatment until the release fill.
+  reins_verdant_valorsteed: 'Reins of the Verdant Valorsteed',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

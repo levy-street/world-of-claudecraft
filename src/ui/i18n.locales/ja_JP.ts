@@ -8489,6 +8489,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'worldContent.mailboxName': 'メールボックス',
   'worldContent.noticeboardName': '掲示板',
   'entities.letters.ravenpost_welcome.sender': 'レイヴンポスト',
+  'entities.letters.referral_level10_reward.sender': 'レイヴンポスト',
+  'entities.letters.referral_level10_reward.subject': 'あなたの新兵が一人前に',
+  'entities.letters.referral_level10_reward.body':
+    'あなたが谷へ招いた友が、十度目の成長の季節を迎えたとの知らせが届きました。あなたが連れてくる一人ひとりの手が王国を強くします。レイヴンポストより、ささやかな感謝の印をお届けします。\n\n翼を高く、\nレイヴンポスト',
+  'entities.letters.referral_mount_reward.sender': 'レイヴンポスト',
+  'entities.letters.referral_mount_reward.subject': '募兵官への駿馬',
+  'entities.letters.referral_mount_reward.body':
+    'あなたは五人の友を谷へ導き、五人ともここを故郷としました。イーストブルックの厩舎は、金では買えないものをあなたのために取り置いています。翠緑の馬鎧をまとったヴァロースティード、王国そのものを築く者だけのための一頭です。\n\n良き騎行を、\nレイヴンポスト',
+  'entities.items.reins_verdant_valorsteed.name': '翠緑のヴァロースティードの手綱',
+  'hudChrome.mounts.name_verdant_valorsteed': '翠緑のヴァロースティード',
+  'hudChrome.mounts.desc_verdant_valorsteed':
+    '翠緑の馬鎧をまとったヴァロースティード。五人の友を谷へ招いた募兵官のためだけに取り置かれている。',
+  'apiError.referrals.invalid_input': '入力が無効です。',
   'entities.letters.ravenpost_welcome.subject': 'ワタリガラスはあなたのために飛ぶ',
   'entities.letters.ravenpost_welcome.body':
     '旅人へ\n\nレイヴンポストは谷のあちこちに止まり木を設けました。イーストブルック、フェンブリッジ、ハイウォッチでワタリガラスの石柱を探してください。どの止まり木からでも、ほかの冒険者へ手紙やお金や品物を送れますし、ワタリガラスが運んできたものを受け取れます。\n\n最初の切手代として、ささやかな心づけを同封します。\n\n翼を高く、\nレイヴンポスト',

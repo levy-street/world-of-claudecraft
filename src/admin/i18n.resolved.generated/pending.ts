@@ -10,25 +10,85 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "es_ES": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "fr_FR": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "fr_CA": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "de_DE": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "zh_CN": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "zh_TW": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "ko_KR": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "ja_JP": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "pt_BR": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "ru_RU": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "cs_CZ": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "nl_NL": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "pl_PL": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "id_ID": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "tr_TR": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "sv_SE": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "vi_VN": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ],
+  "da_DK": [
+    "moderationHistory.actionReferralReinstate",
+    "moderationHistory.actionReferralVoid"
+  ]
 };

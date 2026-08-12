@@ -17,6 +17,7 @@ import { buildPlayerCardData } from './player_card_data';
 import {
   type CharacterStanding,
   cardHostingAvailable,
+  fetchReferralCode,
   fetchReferralInfo,
   fetchStanding,
   type PublishedCard,
@@ -265,6 +266,21 @@ export class PlayerCardController {
       return published;
     };
 
+    // The refer-a-friend code link (docs/prd/refer-a-friend.md) shares the same
+    // ?ref= channel as the published card page, so it can pre-fill the link row
+    // before any card is published. A published card URL still wins once one
+    // exists (its page unfurls with the card art).
+    let codeUrl: string | null = null;
+    void fetchReferralCode().then((info) => {
+      if (this.modal !== backdrop) return;
+      if (!info?.eligible || !info.url) return;
+      codeUrl = info.url;
+      if (linkRow.hidden && !state.published) {
+        linkInput.value = info.url;
+        linkRow.hidden = false;
+      }
+    });
+
     if (cardHostingAvailable()) {
       const shareX = makeButton(t('playerCard.actionShareX'), 'cd-ok');
       shareX.addEventListener('click', async () => {
@@ -300,8 +316,13 @@ export class PlayerCardController {
         this.deps.click();
         copyLink.disabled = true;
         try {
-          const published = await publishOnce();
-          await navigator.clipboard.writeText(published.url);
+          // Prefer the published card page; fall back to the account's referral
+          // code link so copying works without uploading a card; publish only
+          // when neither exists yet.
+          const url = state.published?.url ?? codeUrl ?? (await publishOnce()).url;
+          await navigator.clipboard.writeText(url);
+          linkInput.value = url;
+          linkRow.hidden = false;
           linkInput.select();
           setStatus(t('playerCard.statusReferralCopied'));
         } catch {

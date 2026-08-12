@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "2074fac9f3d7a778014af595331a137a7c1f44acb53ebe2250d901044d89da52",
-  "catalogHash": "3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1",
+  "bundleId": "01e4f84ebfdde3122f8ca5052973762c423ada61362cef7df9c1c43f030e356f",
+  "catalogHash": "eae20a97f63a651a777e8a5658ad8beef0d069588a1a0ffcc97a3ddc218c8807",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2979,6 +2979,18 @@
         {
           "id": "main",
           "url": "/audio/sfx/mount_run_valorsteed.mp3?v=d4e79277b2cb",
+          "bytes": 10701,
+          "sha256": "d4e79277b2cb1da5d5941c6116136f2ca7104376e12d455c6306919a3e862002"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_verdant_valorsteed": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_verdant_valorsteed.mp3?v=d4e79277b2cb",
           "bytes": 10701,
           "sha256": "d4e79277b2cb1da5d5941c6116136f2ca7104376e12d455c6306919a3e862002"
         }

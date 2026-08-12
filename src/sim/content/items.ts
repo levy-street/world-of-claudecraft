@@ -399,6 +399,22 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Refer-a-friend tier-5 ladder reward (docs/prd/refer-a-friend.md): the
+  // Verdant Valorsteed's reins, delivered only by Ravenpost letter at five
+  // completed referrals (server/referral_milestones.ts). Soulbound by design:
+  // the PRD pins ladder rewards as non-tradeable so the program can never feed
+  // the market or $WOC.
+  reins_verdant_valorsteed: {
+    id: 'reins_verdant_valorsteed',
+    name: 'Reins of the Verdant Valorsteed',
+    kind: 'mount',
+    mount: 'verdant_valorsteed',
+    quality: 'epic',
+    soulbound: true,
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // Developer-only mount. It is intentionally absent from vendors, quests,
   // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
   // /dev give reins_terrorspark_groundshaker while the feature remains under development.

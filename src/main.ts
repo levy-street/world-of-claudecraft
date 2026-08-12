@@ -396,6 +396,7 @@ import { wireSkinPicker } from './ui/hud/cosmetics/skin_picker';
 import {
   absolutePublishedCardUrl,
   setCardUploader,
+  setReferralCodeProvider,
   setReferralProvider,
   setStandingProvider,
 } from './ui/hud/player_card/player_card_share';
@@ -6873,6 +6874,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     return { url: absolutePublishedCardUrl(r.url, api.base, location.origin) };
   });
   setReferralProvider(() => api.referralStats());
+  setReferralCodeProvider(() => api.referralCode());
   setStandingProvider(() => api.characterStanding(c.id));
   // One place to drop the session's card wiring, so the entry-timeout and the
   // disconnect paths can't drift (a lingering provider would hold a stale
@@ -6880,6 +6882,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   const clearCardProviders = () => {
     setCardUploader(null);
     setReferralProvider(null);
+    setReferralCodeProvider(null);
     setStandingProvider(null);
   };
 

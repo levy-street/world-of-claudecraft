@@ -304,22 +304,33 @@ describe('register handler', () => {
 
   it('fires the best-effort suspicious-registration report and referral capture', async () => {
     let suspicious = 0;
-    let referral = 0;
+    const referralCalls: unknown[][] = [];
     installDb({
       createSuspiciousRegistrationReport: async () => {
         suspicious++;
         return { created: false, signals: [] };
       },
-      captureReferral: async () => {
-        referral++;
+      captureReferral: async (...args: unknown[]) => {
+        referralCalls.push(args);
       },
     });
-    const out = await runHandler({ username: 'newhero', password: 'secret123', email: 'a@b.co' });
+    const out = await runHandler({
+      username: 'newhero',
+      password: 'secret123',
+      email: 'a@b.co',
+      ref: 'abcd2345',
+    });
     expect(out.status).toBe(200);
     // The invocations are synchronous (only their promise resolution is deferred),
     // so both fakes are recorded by the time the handler returns.
     expect(suspicious).toBe(1);
-    expect(referral).toBe(1);
+    expect(referralCalls).toHaveLength(1);
+    // The capture receives the new account, the raw ref token, and the request
+    // metadata the redemption shell hashes for its correlation checks
+    // (docs/prd/refer-a-friend.md); the legacy main.ts arm passes the same trio.
+    expect(referralCalls[0][0]).toBe(SUCCESS_ACCOUNT.id);
+    expect(referralCalls[0][1]).toBe('abcd2345');
+    expect(referralCalls[0][2]).toEqual({ ip: '1.2.3.4', userAgent: 'test-agent' });
   });
 });
 

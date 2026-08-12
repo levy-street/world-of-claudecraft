@@ -416,6 +416,8 @@ export const en = {
   'moderationHistory.actionResetChatStrikes': 'Chat strikes reset',
   'moderationHistory.actionRestoreItem': 'Item restore',
   'moderationHistory.actionRestoreSlot': 'Slot restore',
+  'moderationHistory.actionReferralVoid': 'Referral voided',
+  'moderationHistory.actionReferralReinstate': 'Referral reinstated',
   'moderationHistory.actionGuildRename': 'Guild rename',
   'moderationHistory.actionGuildBankPurge': 'Guild bank purge',
   'moderationHistory.actionUnknown': 'Other action',

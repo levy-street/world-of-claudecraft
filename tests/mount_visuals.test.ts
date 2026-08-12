@@ -19,6 +19,13 @@ describe('mount visual specs cover the sim catalog', () => {
   });
 
   it('every spec points at a registered lazyPreload VisualDef', () => {
+    // Render-tinted reskins share the base mount's GLB deliberately (one
+    // download, one parse): the visual key differs (its manifest entry carries
+    // the tint) but the url points at the donor model. Today that is only the
+    // refer-a-friend Verdant Valorsteed (docs/prd/refer-a-friend.md).
+    const RESKIN_DONOR_URL: Record<string, string> = {
+      verdant_valorsteed: 'models/mounts/valorsteed.glb',
+    };
     for (const key of MOUNT_KEYS) {
       const spec = MOUNT_VISUAL_SPECS[key];
       const def = VISUALS[spec.visualKey];
@@ -26,7 +33,7 @@ describe('mount visual specs cover the sim catalog', () => {
       expect(def.lazyPreload, `${spec.visualKey} must be lazyPreload (never boot-swept)`).toBe(
         true,
       );
-      expect(def.url).toBe(`models/mounts/${key}.glb`);
+      expect(def.url).toBe(RESKIN_DONOR_URL[key] ?? `models/mounts/${key}.glb`);
       // The mount never swings: the rider's one-shots carry mounted combat.
       expect(def.clips.attack).toEqual([]);
     }

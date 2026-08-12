@@ -409,6 +409,8 @@ export const ko_KR: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "채팅 경고 초기화",
   "moderationHistory.actionRestoreItem": "아이템 복구",
   "moderationHistory.actionRestoreSlot": "슬롯 복구",
+  "moderationHistory.actionReferralVoid": "Referral voided",
+  "moderationHistory.actionReferralReinstate": "Referral reinstated",
   "moderationHistory.actionGuildRename": "길드 이름 변경",
   "moderationHistory.actionGuildBankPurge": "길드 은행 아이템 삭제",
   "moderationHistory.actionUnknown": "기타 조치",

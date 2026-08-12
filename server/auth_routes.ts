@@ -316,10 +316,12 @@ async function registerHandler(ctx: Ctx): Promise<void> {
       ...meta,
     })
     .catch((err) => logger.error({ err }, 'suspicious registration report failed'));
-  // Capture the referral when this account signed up via a card link (?ref=<slug>).
-  // Best-effort: never block or fail registration on it.
+  // Capture the referral when this account signed up via a referral code or
+  // card link (?ref=<token>). Best-effort: never block or fail registration on
+  // it. meta carries the redemption ip + user-agent for the program's
+  // correlation hashes (docs/prd/refer-a-friend.md).
   void authDb
-    .captureReferral(account.id, body.ref)
+    .captureReferral(account.id, body.ref, meta)
     .catch((err) => logger.error({ err }, 'referral capture failed'));
   // PBE only (PBE_BOOST_ACCOUNTS=1): pre-populate the fresh account with one
   // level-20 character per class in true best-in-slot gear so testers land

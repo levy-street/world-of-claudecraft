@@ -62,6 +62,7 @@ import {
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
+import { REFERRALS_SCHEMA } from './referrals_schema';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
@@ -1271,6 +1272,11 @@ export async function ensureSchema(): Promise<void> {
     // is unaffected: only expired windows match, and a racing UPSERT on a pruned
     // key simply re-inserts a fresh row.
     await client.query(RATELIMIT_PRUNE_SQL);
+    // Refer-a-friend program tables (referral codes, program columns on the
+    // core referrals table, milestone rows). FK-references accounts(id) and
+    // ALTERs referrals, so it runs after SCHEMA. Applied unconditionally
+    // (idempotent), like the other schema modules.
+    await client.query(REFERRALS_SCHEMA);
     // Map editor tables: saved/forked custom maps and uploaded GLB assets.
     // Both FK-reference accounts(id), so they run after SCHEMA. Applied
     // unconditionally (idempotent), like the other schema modules.

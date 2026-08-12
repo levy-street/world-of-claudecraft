@@ -1027,7 +1027,10 @@ describe('captureReferral', () => {
     accountForSlugRows = [{ account_id: 10 }];
     await captureReferral(42, 'sir-test');
     const ins = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO referrals'));
-    expect(ins?.[1]).toEqual([42, 10, 'sir-test']);
+    // The refer-a-friend redemption INSERT (docs/prd/refer-a-friend.md) carries
+    // the redeemed token plus the program columns; with no request metadata the
+    // code, fingerprint, ip hash, and raw-ip correlation params are all null.
+    expect(ins?.[1]).toEqual([42, 10, 'sir-test', null, null, null, null]);
   });
 
   it('ignores a self-referral', async () => {

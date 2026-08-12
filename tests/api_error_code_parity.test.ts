@@ -118,6 +118,7 @@ const KNOWN_CODES = [
   'epic.upstream',
   'wallet.handoff_invalid',
   'ota_updates.invalid_input',
+  'referrals.invalid_input',
 ];
 
 // The parametric contract pins: the matcher

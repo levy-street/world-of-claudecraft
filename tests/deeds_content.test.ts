@@ -63,13 +63,12 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 271 deeds worth 3145 total Renown', () => {
-    // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
-    // four Reliquary Curator rank bridges and the five Phase 18 completion
-    // ladder deeds (all nine renown 0, so the Renown sum is UNCHANGED from
-    // the release base: catalog prestige never scores the board).
-    expect(DEED_ORDER.length).toBe(271);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3145);
+  it('ships exactly 273 deeds worth 3180 total Renown', () => {
+    // v0.37 base (271 / 3145: the Reliquary bridges and completion ladder are
+    // all renown 0) plus the refer-a-friend ladder pair
+    // (docs/prd/refer-a-friend.md), 10 + 25 Renown.
+    expect(DEED_ORDER.length).toBe(273);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3180);
   });
 
   it('ships the audited per-category counts', () => {
@@ -87,7 +86,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       collection: 37,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
-      social: 18,
+      social: 20,
       exploration: 9,
       feat: 3,
       hidden: 9,
@@ -214,6 +213,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_reliquary_illum_nythraxis_heroic',
       'col_reliquary_illum_thunzharr',
       'col_reliquary_illum_gravewyrm_heroic',
+      // Refer-a-friend ladder titles (docs/prd/refer-a-friend.md): manual
+      // triggers granted through the sim-side ladder site off the server's
+      // completed-referral count.
+      'soc_recruiter',
+      'soc_realm_builder',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -461,17 +465,16 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     }
   });
 
-  it('ships exactly 42 titles and 4 borders', () => {
+  it('ships exactly 44 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
-    // ladder 3 more titles, and the Phase 18 Reliquary completion ladder 5
-    // more on top of the release base (31 + 3).
-    expect(titles.length).toBe(42);
+    // v0.37 base (42 titles + 4 borders) plus the refer-a-friend Recruiter and
+    // Realm-Builder titles (docs/prd/refer-a-friend.md).
+    expect(titles.length).toBe(44);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(42);
+    expect(new Set(titleTexts).size).toBe(44);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -555,7 +558,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // dead-end The Whole Book; see the reachability pin below). No other
   // trigger or renown changed (verified by reconstructing the pre-phase
   // catalog, which reproduces the previous literal exactly).
-  const FROZEN_CATALOG_SHA256 = 'e372e3f95f7b6063f461b9f00561eecf97849300f543dc88ddda97e487afe683';
+    // Re-baselined for the refer-a-friend program (docs/prd/refer-a-friend.md):
+  // two appended deeds, soc_recruiter and soc_realm_builder (manual triggers,
+  // the tier-1 and tier-3 ladder titles). No shipped trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '5ca383a5e986b20d74de24921d08f7a19f512397afea312eb9fcd5134260a746';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -753,9 +759,9 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The Phase 18 Reliquary completion ladder appends after the WARFARE
-    // ladder; the Gravewyrm Illumination deed closes the tail.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('col_reliquary_illum_gravewyrm_heroic');
+    // The refer-a-friend ladder pair appends after the Reliquary completion
+    // ladder; soc_realm_builder closes the tail (docs/prd/refer-a-friend.md).
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('soc_realm_builder');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

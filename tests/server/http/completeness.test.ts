@@ -120,6 +120,7 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/epic/status',
   '/api/ota/updates',
   '/api/seeker/entitlement',
+  '/api/referral-code',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -339,6 +340,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // The OTA update check (server/ota_updates.ts): registry-only like the
     // deeds trio, env-gated dark until OTA_MANIFEST_URL is set.
     { method: 'POST', path: '/api/ota/updates' },
+    // Refer-a-friend (server/referrals.ts, docs/prd/refer-a-friend.md):
+    // registry-only, the caller's stable referral code + program readout.
+    { method: 'GET', path: '/api/referral-code' },
     // v0.20.0: the paginated daily leaderboard read (the ops-side sibling is
     // asserted with the internal family below).
     { method: 'GET', path: '/api/daily-rewards/leaderboard' },

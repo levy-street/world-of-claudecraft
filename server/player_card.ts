@@ -12,11 +12,9 @@
 // capture only records the relationship; reward payout is out of scope.
 import type http from 'node:http';
 import {
-  accountForSlug,
   getCharacter,
   getPlayerCardBySlug,
   getPlayerCardMetaBySlug,
-  recordReferral,
   slugAvailable,
   upsertPlayerCard,
 } from './db';
@@ -25,6 +23,7 @@ import { isUniqueViolation, json, parsePngInfo, readBinaryBody } from './http_ut
 import { PLAYERCARD_NEW } from './player_card.newlocales';
 import { recordUsageMetric } from './provider_usage';
 import { REALM_PUBLIC_ORIGIN } from './realm';
+import { type RedemptionMeta, redeemReferral } from './referral_redemption';
 
 // A composited card is ~1200×630 @2× PNG - comfortably under this bound, which
 // is generous enough to never reject a legitimate upload yet caps memory.
@@ -817,13 +816,17 @@ function missingCardHtml(origin: string, locale: PublicCardLocale): string {
 </body></html>`;
 }
 
-// Record a referral when a brand-new account registered via ?ref=<slug>. Safe to
-// call with any untrusted `ref`: invalid slugs, unknown slugs, and self-referrals
-// are silently ignored.
-export async function captureReferral(refereeAccountId: number, ref: unknown): Promise<void> {
-  const slug = typeof ref === 'string' ? ref.trim().toLowerCase() : '';
-  if (!isValidSlug(slug)) return;
-  const referrer = await accountForSlug(slug);
-  if (referrer === null || referrer === refereeAccountId) return;
-  await recordReferral(refereeAccountId, referrer, slug);
+// Record a referral when a brand-new account registered via ?ref=<token>. Safe
+// to call with any untrusted `ref`: invalid tokens, unknown tokens, and
+// self-referrals are silently ignored. Since the refer-a-friend program
+// (docs/prd/refer-a-friend.md) this delegates to the unified redemption shell,
+// which resolves a referral CODE first and falls back to the card SLUG, and
+// captures the correlation hashes when the register handler passes its request
+// metadata.
+export async function captureReferral(
+  refereeAccountId: number,
+  ref: unknown,
+  meta?: RedemptionMeta,
+): Promise<void> {
+  await redeemReferral(refereeAccountId, ref, meta);
 }

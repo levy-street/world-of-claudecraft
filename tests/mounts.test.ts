@@ -102,8 +102,11 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly nine mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(9);
+  it('has exactly ten mounts with the horse first and the developer tank last', () => {
+    // Tenth: the Verdant Valorsteed, the refer-a-friend tier-5 reskin
+    // (docs/prd/refer-a-friend.md), inserted above the developer tank so the
+    // tank stays the pinned tail.
+    expect(MOUNT_KEYS).toHaveLength(10);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -175,9 +178,13 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (key === 'terrorspark_groundshaker') {
+      if (key === 'terrorspark_groundshaker' || key === 'verdant_valorsteed') {
         // The developer-only tank stays soulbound: it has no player acquisition
-        // path, and tradability would turn a dev grant into a leak vector.
+        // path, and tradability would turn a dev grant into a leak vector. The
+        // Verdant Valorsteed (the refer-a-friend tier-5 reward,
+        // docs/prd/refer-a-friend.md) is soulbound by the same logic in
+        // reverse: the PRD pins ladder rewards as non-tradeable so the program
+        // can never feed the market or $WOC.
         expect(item.soulbound).toBe(true);
       } else {
         // Player reins are NOT soulbound: they trade, mail, list, and store in
@@ -243,6 +250,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // decision and never an accident: when the world boss lands, delete the entry
     // and the rarity-derived rule below takes back over.
     const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor'];
+    // Letter-sourced on purpose: the refer-a-friend tier-5 reward arrives ONLY
+    // as a Ravenpost letter attachment (server/referral_milestones.ts), so like
+    // the sourceless raptor it must stay off every drop pool; unlike it, the
+    // letter IS its one sanctioned source (docs/prd/refer-a-friend.md).
+    const LETTER_SOURCED: readonly string[] = ['reins_verdant_valorsteed'];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -272,7 +284,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
         // purpose. Either way it stays out of every heroic table, so the heroic
         // tier's mount supply is unchanged.
         expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
-        if (NO_SOURCE_YET.includes(itemId)) {
+        if (NO_SOURCE_YET.includes(itemId) || LETTER_SOURCED.includes(itemId)) {
           // The mob-table sweep above already proved it drops off nothing. Pin
           // the remaining three pools too, so "no path" means no path: the day
           // its world boss lands, it gets ONE source, not a quiet second one.
