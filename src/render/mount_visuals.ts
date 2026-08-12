@@ -144,3 +144,23 @@ export function stepRocketSledJumpPitch(
   const next = current + (target - current) * (1 - Math.exp(-rate * safeDt));
   return Math.abs(next) < 1e-5 ? 0 : next;
 }
+
+/** Where the rider root sits once the vehicle tips by `pitch` radians.
+ *
+ *  The rider is a SEPARATE root parented alongside the mount, not under it, so
+ *  a nose-up sled would otherwise leave the rider level and floating off the
+ *  cushion. Rotating the rider's own seat offset about the same vehicle origin
+ *  keeps pelvis and cushion locked together through the whole jump arc.
+ *
+ *  Pure 2D rotation of (seatFwd, seatY) about the origin in the YZ plane, kept
+ *  here rather than inline in renderer.ts so it is unit-testable and so the
+ *  coordinator stays a thin consumer (root CLAUDE.md, module-first). */
+export function rocketSledRiderPivot(
+  seatY: number,
+  seatFwd: number,
+  pitch: number,
+): { y: number; z: number } {
+  const cos = Math.cos(pitch);
+  const sin = Math.sin(pitch);
+  return { y: seatY * cos + seatFwd * sin, z: seatFwd * cos - seatY * sin };
+}

@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 822,
-    "liveItemDefinitions": 837,
+    "itemArtFilesReviewed": 823,
+    "liveItemDefinitions": 838,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "food": 21,
       "held_offhand": 9,
       "junk": 81,
-      "mount": 9,
+      "mount": 10,
       "potion": 13,
       "quest": 97,
       "tool": 45,
@@ -328,6 +328,18 @@
           "docs/achievements/missing-painted-icons-accepted-art.json"
         ],
         "note": "The four class-overhaul integration daggers and the soul_stone painting, generated under woc-item-icon-v1 and owner-reviewed pass on 2026-08-10; the 2026-08-09 campaign review of the prior 817 files stands unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-12",
+        "branch": "feature/goblin-rocket-sled",
+        "reviewer": "owner",
+        "addedIds": [
+          "reins_goblin_rocket_sled"
+        ],
+        "provenance": [
+          "docs/design/goblin_rocket_sled/icon-provenance.json"
+        ],
+        "note": "The Goblin Rocket Sled reins icon, owner-supplied master accepted 2026-08-12; the prior 822-file review stands unchanged. Generation prompt/model were not supplied with the master and are recorded as unavailable rather than reconstructed."
       }
     ]
   },
@@ -370,7 +382,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 822,
+    "passCount": 823,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -924,6 +936,7 @@
       "reinforced_pauldrons",
       "reins_aether_hover_cycle",
       "reins_drakemaw_raptor",
+      "reins_goblin_rocket_sled",
       "reins_grag_bear",
       "reins_shadowjump_toad",
       "reins_stalkglider_snail",
@@ -1199,7 +1212,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 822 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10."
+    "summary": "All 823 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Goblin Rocket Sled reins icon owner-reviewed and passed on 2026-08-12."
   },
   "nonVisualContentWatch": [
     {
@@ -3038,6 +3051,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "17fe7b0b1ca629831283710441306ef01c54b04cc8c26d70bec361439e07c2ff"
+    "shippingCatalogSha256": "357634c8fa6a61072345a3d3ed93aca6b89203cce6ed77f5ba5436edba638e17"
   }
 }

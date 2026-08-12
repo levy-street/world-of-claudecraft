@@ -9,6 +9,7 @@ import {
   type GoblinRocketSledFxState,
   stepGoblinRocketSledFx,
 } from './goblin_rocket_sled_fx_core';
+import { rocketSledRiderPivot, stepRocketSledJumpPitch } from './mount_visuals';
 import type { Vfx } from './vfx';
 
 const LEFT_SOCKET = 'Socket_Exhaust_L';
@@ -117,16 +118,8 @@ export class GoblinRocketSledFx {
   // ConeGeometry is centered on its Y axis. Translate its base to Y=0 so the
   // later length scale always grows away from the nozzle instead of opening a
   // gap when the reverse flame contracts.
-  private readonly outerGeometry = new THREE.ConeGeometry(0.5, 1, 8, 1, true).translate(
-    0,
-    0.5,
-    0,
-  );
-  private readonly innerGeometry = new THREE.ConeGeometry(0.42, 1, 8, 1, true).translate(
-    0,
-    0.5,
-    0,
-  );
+  private readonly outerGeometry = new THREE.ConeGeometry(0.5, 1, 8, 1, true).translate(0, 0.5, 0);
+  private readonly innerGeometry = new THREE.ConeGeometry(0.42, 1, 8, 1, true).translate(0, 0.5, 0);
   private readonly outerMaterial = flameMaterial(0xff5a16, 0x70bfff, GFX.composer ? 2.1 : 1);
   private readonly innerMaterial = flameMaterial(0xffd36a, 0xedfbff, GFX.composer ? 2.6 : 1);
   private readonly plumes: readonly [PlumePair, PlumePair];
@@ -141,10 +134,7 @@ export class GoblinRocketSledFx {
     leftSocket: THREE.Object3D,
     rightSocket: THREE.Object3D,
   ) {
-    this.plumes = [
-      this.attachPlume(leftSocket, 0),
-      this.attachPlume(rightSocket, Math.PI * 0.73),
-    ];
+    this.plumes = [this.attachPlume(leftSocket, 0), this.attachPlume(rightSocket, Math.PI * 0.73)];
   }
 
   static create(mountRoot: THREE.Object3D): GoblinRocketSledFx | null {
@@ -224,7 +214,8 @@ export class GoblinRocketSledFx {
           : 0;
       const hunt = this.plan.jetHunt * (index === 0 ? 1 : -1);
       const length =
-        this.plan.outerLength * (1 + independentFlutter * 0.08 + hunt * 0.055) *
+        this.plan.outerLength *
+        (1 + independentFlutter * 0.08 + hunt * 0.055) *
         (1 - plumeIgnition * 0.08);
       const width =
         this.plan.outerWidth * (1 - independentFlutter * 0.04) * (1 + plumeIgnition * 0.12);
@@ -281,4 +272,44 @@ export class GoblinRocketSledFx {
     this.outerMaterial.dispose();
     this.innerMaterial.dispose();
   }
+}
+
+/** The rocket sled's whole per-frame attitude pass: jump pitch, the mount's own
+ *  tilt, and the rider seat carried rigidly around the vehicle origin.
+ *
+ *  Lives here rather than inline in renderer.ts because it is this mount's
+ *  behavior, not coordinator work, and renderer.ts is a named monolith under
+ *  the line-count ratchet (root CLAUDE.md, Modularity). The caller passes the
+ *  two roots and the seat inputs; the pure math stays in mount_visuals.ts.
+ *
+ *  `sledMounted` false still runs, so a non-sled mount relaxes any residual
+ *  pitch to zero through the same damped path instead of snapping. */
+export function applyRocketSledAttitude(
+  view: { rocketSledJumpPitch: number },
+  mountRoot: THREE.Object3D,
+  riderRoot: THREE.Object3D,
+  sledMounted: boolean,
+  airborne: boolean,
+  verticalVelocity: number,
+  dt: number,
+  bob: number,
+  seatLift: number,
+  seatFwd: number,
+): void {
+  view.rocketSledJumpPitch = stepRocketSledJumpPitch(
+    view.rocketSledJumpPitch,
+    sledMounted && airborne,
+    verticalVelocity,
+    dt,
+  );
+  const pitch = sledMounted ? view.rocketSledJumpPitch : 0;
+  const rotationX = -pitch;
+  mountRoot.rotation.x = rotationX;
+  mountRoot.position.y = bob;
+  // Rigidly carry the separately-owned rider root around the same
+  // vehicle-origin pivot, keeping pelvis and cushion locked together.
+  const seat = rocketSledRiderPivot(seatLift, seatFwd, pitch);
+  riderRoot.rotation.x = rotationX;
+  riderRoot.position.y = seat.y;
+  riderRoot.position.z = seat.z;
 }

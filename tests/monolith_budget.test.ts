@@ -43,7 +43,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/renderer.ts',
-    ceiling: 13764,
+    ceiling: 13762,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

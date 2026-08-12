@@ -299,6 +299,7 @@ import {
   urlForcedTier,
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
+import { applyRocketSledAttitude, GoblinRocketSledFx } from './goblin_rocket_sled_fx';
 import { bakeGrassGroundTexture, setGrassGroundBake } from './grass_ground_bake';
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
@@ -337,8 +338,7 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
-import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
-import { mountBobY, mountVisualSpec, stepRocketSledJumpPitch } from './mount_visuals';
+import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -417,6 +417,7 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
+import { disposePrewarmDepthMaterials, prewarmDepthMaterialFor } from './prewarm_depth_material';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -3317,10 +3318,7 @@ export class Renderer {
       bestEffort(() => target.dispose());
     }
     this.envRTs.clear();
-    for (const material of this.prewarmDepthMaterials.values()) {
-      bestEffort(() => material.dispose());
-    }
-    this.prewarmDepthMaterials.clear();
+    disposePrewarmDepthMaterials(this.prewarmDepthMaterials, bestEffort);
     for (const bubble of this.chatBubbles.values()) bestEffort(() => bubble.el.remove());
     this.chatBubbles.clear();
     for (const id of [...this.views.keys()]) bestEffort(() => this.removeView(id, true));
@@ -5578,50 +5576,6 @@ export class Renderer {
     return count;
   }
 
-  private prewarmDepthMaterial(source: THREE.Material): THREE.MeshDepthMaterial {
-    const textured = source as TextureBackedMaterial & {
-      displacementScale?: number;
-      displacementBias?: number;
-      wireframe?: boolean;
-    };
-    const shadowSide =
-      source.shadowSide ??
-      (source.side === THREE.FrontSide
-        ? THREE.BackSide
-        : source.side === THREE.BackSide
-          ? THREE.FrontSide
-          : THREE.DoubleSide);
-    const key = [
-      shadowSide,
-      textured.map ? 1 : 0,
-      textured.alphaMap ? 1 : 0,
-      source.alphaToCoverage || source.alphaTest > 0 ? 1 : 0,
-      textured.displacementMap ? 1 : 0,
-      textured.wireframe ? 1 : 0,
-    ].join('|');
-    let depth = this.prewarmDepthMaterials.get(key);
-    if (depth) return depth;
-    depth = new THREE.MeshDepthMaterial({
-      side: shadowSide,
-      map: textured.map ?? null,
-      alphaMap: textured.alphaMap ?? null,
-      alphaTest: source.alphaToCoverage ? 0.5 : source.alphaTest,
-      displacementMap: textured.displacementMap ?? null,
-      displacementScale: textured.displacementScale ?? 1,
-      displacementBias: textured.displacementBias ?? 0,
-      wireframe: textured.wireframe ?? false,
-      // Match the REAL shadow pass: three's shared shadow depth material uses
-      // RGBADepthPacking and depthPacking sits in the program cache key, so
-      // the default BasicDepthPacking linked a variant the shadow pass never
-      // draws, and every "prewarmed" caster relinked at its first shadow
-      // draw anyway (the residue probe measured all of them).
-      depthPacking: THREE.RGBADepthPacking,
-    });
-    depth.name = `prewarm-depth:${key}`;
-    this.prewarmDepthMaterials.set(key, depth);
-    return depth;
-  }
-
   /**
    * Link a root's exact live colour-program variant before a bounded upload.
    * Three r165 chooses output colour space from the current render target in
@@ -5673,8 +5627,8 @@ export class Renderer {
       const material = mesh.material;
       swaps.push({ mesh, material });
       mesh.material = Array.isArray(material)
-        ? material.map((item) => this.prewarmDepthMaterial(item))
-        : this.prewarmDepthMaterial(material);
+        ? material.map((item) => prewarmDepthMaterialFor(this.prewarmDepthMaterials, item))
+        : prewarmDepthMaterialFor(this.prewarmDepthMaterials, material);
     });
     if (swaps.length === 0) return;
     // Match the real shadow pass's program key exactly. A bare
@@ -11711,14 +11665,14 @@ export class Renderer {
         // jump / land / water-entry edges
         if (airborne && !v.wasAirborne && !visuallyDead) {
           if (!rocketSledMounted) sink.movement('jump', ax, ay, az, isSelf);
-        }
-        else if (!airborne && v.wasAirborne && !visuallyDead) {
+        } else if (!airborne && v.wasAirborne && !visuallyDead) {
           // A flight that ends by catching a ledge is not a fall, and the
           // heavy landing thud on one reads as a bug: you hopped onto a rock
           // mid-arc and the game played a crash. Anything softer than a plain
           // jump's own landing speed gets a footfall instead.
+          // The sled skips both: its turbine pitch and nozzle compression
+          // carry the landing instead.
           if (rocketSledMounted) {
-            // Its turbine pitch and nozzle compression carry the landing.
           } else if (v.fallSpeed >= SOFT_LANDING_SPEED) {
             sink.movement('land', ax, ay, az, isSelf);
           } else {
@@ -12019,24 +11973,18 @@ export class Renderer {
           // the rider floats WITH the procedural bob (the hover cycle's idle
           // float), not just the mount body
           const bob = mountSpec.groundLift + mountBobY(mountSpec, this.time, moving);
-          const rocketSled = e.mountKey === 'goblin_rocket_sled';
-          v.rocketSledJumpPitch = stepRocketSledJumpPitch(
-            v.rocketSledJumpPitch,
-            rocketSled && airborne,
+          applyRocketSledAttitude(
+            v,
+            v.mountVisual.root,
+            v.visual.root,
+            e.mountKey === 'goblin_rocket_sled',
+            airborne,
             dt > 1e-4 ? dyRaw / dt : 0,
             dt,
+            bob,
+            v.mountLift + bob,
+            mountSpec.seatFwd,
           );
-          const pitch = rocketSled ? v.rocketSledJumpPitch : 0;
-          const rotationX = -pitch;
-          v.mountVisual.root.rotation.x = rotationX;
-          const seatY = v.mountLift + bob;
-          const seatZ = mountSpec.seatFwd;
-          // Rigidly carry the separately-owned rider root around the same
-          // vehicle-origin pivot, keeping pelvis and cushion locked together.
-          v.mountVisual.root.position.y = bob;
-          v.visual.root.rotation.x = rotationX;
-          v.visual.root.position.y = seatY * Math.cos(pitch) + seatZ * Math.sin(pitch);
-          v.visual.root.position.z = seatZ * Math.cos(pitch) - seatY * Math.sin(pitch);
           // ambient mount particles: the snail paints its slime path while
           // gliding, the hover cycle streams aether exhaust off its tail
           if (mountSpec.fx === 'slime') {
@@ -12051,20 +11999,17 @@ export class Renderer {
         v.rocketSledJumpPitch = 0;
         v.visual.root.rotation.x = 0;
       }
-      if (v.goblinRocketSledFx) {
-        const rocketFxShown = mountShown && !v.mountCompilePending && runCharacterPresentation;
-        v.goblinRocketSledFx.update(
-          dt,
-          this.time,
-          moving,
-          st.backwards,
-          airborne,
-          st.speed,
-          this.reducedMotion(),
-          rocketFxShown,
-          rocketFxShown ? this.vfx : null,
-        );
-      }
+      v.goblinRocketSledFx?.update(
+        dt,
+        this.time,
+        moving,
+        st.backwards,
+        airborne,
+        st.speed,
+        this.reducedMotion(),
+        mountShown && !v.mountCompilePending && runCharacterPresentation,
+        mountShown && !v.mountCompilePending && runCharacterPresentation ? this.vfx : null,
+      );
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
