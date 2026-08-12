@@ -34,11 +34,11 @@ import { randomInt } from 'node:crypto';
 import { BAG_SOCKETS } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import {
-  MASTERWROUGHT_EQUIP_CAP,
   canDualWield,
   canEquipItem,
   canEquipItemInSlot,
   isShieldItem,
+  MASTERWROUGHT_EQUIP_CAP,
   weaponHand,
 } from '../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../src/sim/item_level_req';

@@ -7,7 +7,7 @@
 // Unlike the phase 07 sibling (which composed its SVGs in-script), this
 // rasterizer READS the committed sources, so authoring and rasterization stay
 // decoupled; the acceptance checks (count, title, size, opacity) are the same.
-import { readdirSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

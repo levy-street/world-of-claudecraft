@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import {
-  CASTER_HUB_RECIPES,
   APEX_ARMOR_RECIPES,
+  CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
   INSCRIPTION_RECIPES,

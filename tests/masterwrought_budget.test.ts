@@ -10,11 +10,11 @@
 // APEX_ARMOR_RECIPES row into this table, so phases 09/10 APPEND rows here
 // in the same change that ships their items.
 import { describe, expect, it } from 'vitest';
+import { APEX_ARMOR_RECIPES } from '../src/sim/content/recipes';
+import { ITEMS } from '../src/sim/data';
 import { primaryStatBudget } from '../src/sim/item_budget';
 import { itemLevel, primaryStatSum } from '../src/sim/item_level';
-import { APEX_ARMOR_RECIPES } from '../src/sim/content/recipes';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/disenchant_reagents';
-import { ITEMS } from '../src/sim/data';
 import type { EquipSlot, ItemDef } from '../src/sim/types';
 
 type RatingField = 'hitRating' | 'critRating' | 'hasteRating';

@@ -38,10 +38,10 @@ import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import { WARFARE_ITEMS } from '../../src/sim/content/pvp_honor';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../../src/sim/data';
 import {
-  MASTERWROUGHT_EQUIP_CAP,
   canEquipItem,
   canEquipItemInSlot,
   isShieldItem,
+  MASTERWROUGHT_EQUIP_CAP,
 } from '../../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../../src/sim/item_level_req';
 import type { CharacterState } from '../../src/sim/sim';
