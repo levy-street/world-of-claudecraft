@@ -29,6 +29,7 @@ import {
   MOBS,
   PROPS,
   QUESTS,
+  STATIONS,
 } from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
 import type { DelayedEvent } from '../../src/sim/entity_roster';
@@ -37,6 +38,7 @@ import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
+import { stationsOfType } from '../../src/sim/professions/stations';
 import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
 import { ARENA_MIN_LEVEL } from '../../src/sim/social/arena';
 import { addThreat } from '../../src/sim/threat';
@@ -4695,6 +4697,8 @@ function professionsCraft(seed = 5): Scenario {
       'masterwork effect: signed instance rolled.masterwork + baked tier-delta stats, masterwork SimEvent, PlayerMeta.lastMasterwork',
       'lastCraftResult mirror fields (quality + masterwork?) on a proc',
       'post-proc plain craft: the draw stream continues (one draw per successful craft)',
+      'daily gate (recipe_quickening_catalyst, oncePerDay): the success stamps craftDaily and draws once',
+      'daily_limit denial: returns before any draw (zero draws), stamp unchanged',
     ],
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: false }),
     drive(rec: Recorder) {
@@ -4749,6 +4753,36 @@ function professionsCraft(seed = 5): Scenario {
       sim.addItem('silverleaf_herb', 2, pid);
       runCraft(sim, 'recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain-2');
+
+      // Step 4b: the phase 07 daily gate rides the draw digest (the QA
+      // audit's coverage gap: every golden sampled craftDaily at its inert
+      // default, so the gate's refusal path never touched the draw-order
+      // detector). With the realm calendar live and the crafter standing at
+      // an apothecary, the oncePerDay catalyst succeeds once (one
+      // masterwork-proc draw, like every success; the junk-kind def gates
+      // the effect off) and stamps craftDaily with real content; the
+      // re-attempt refuses daily_limit BEFORE any draw, so the stream gains
+      // exactly one draw across both calls and a draw slipped into the
+      // refusal path reds the digest here.
+      sim.resetDay = '2099-06-25';
+      meta.craftSkills.alchemy = 75;
+      meta.knownRecipes.add('recipe_quickening_catalyst');
+      {
+        const apothecary = stationsOfType(STATIONS, 'apothecary')[0];
+        const crafter = (sim as unknown as { entities: Map<number, Entity> }).entities.get(pid);
+        if (!apothecary || !crafter) throw new Error('apothecary station or crafter missing');
+        crafter.pos.x = apothecary.pos.x;
+        crafter.pos.z = apothecary.pos.z;
+        crafter.prevPos = { ...crafter.pos };
+      }
+      sim.addItem('sunpetal_herb', 1, pid);
+      sim.addItem('goldleaf_herb', 2, pid);
+      sim.addItem('venom_gland', 2, pid);
+      sim.addItem('glass_vial', 1, pid);
+      runCraft(sim, 'recipe_quickening_catalyst', false, pid);
+      rec.snapshot('craft-daily-stamped');
+      runCraft(sim, 'recipe_quickening_catalyst', false, pid);
+      rec.snapshot('craft-daily-denied');
 
       // Step 5: the ARMED craft-cast frame (Craft Cast System). Start a real
       // batch through Sim.craftItem (the three-arg count form the offline HUD

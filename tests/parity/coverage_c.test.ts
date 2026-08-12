@@ -359,7 +359,23 @@ describe('coverage: each scenario fires its subsystem', () => {
       itemId: 'eastbrook_ritual_vestments',
       crafter: pid,
     });
-    expect(trace.draws).toBe(3);
+
+    // The phase 07 daily-gate arm (step 4b): the catalyst success stamps
+    // craftDaily with real content and draws once like every success; the
+    // daily_limit re-attempt returns BEFORE any draw and leaves the stamp
+    // unmutated, so the scenario's total stays at exactly four draws (three
+    // pre-existing crafts + the catalyst; the two denials contribute zero).
+    expect(
+      crafts.some(
+        (e) => e.ok === true && e.itemId === 'quickening_catalyst' && e.masterwork === undefined,
+      ),
+    ).toBe(true);
+    expect(crafts.some((e) => e.ok === false && e.reason === 'daily_limit')).toBe(true);
+    expect(meta.craftDaily).toEqual({
+      date: '2099-06-25',
+      crafted: new Set(['recipe_quickening_catalyst']),
+    });
+    expect(trace.draws).toBe(4);
   });
 
   it('professions_gather: two draws per harvest, zero-draw denial, zone materials, and the hunted rare event fires', () => {
