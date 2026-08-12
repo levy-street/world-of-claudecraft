@@ -1818,3 +1818,96 @@ Grandmaster-craft family, generic by construction.
   all pinned decisive. Phase 07's Lucent Reagent authoring starts from a clean
   base; nothing from this QA carries forward except the recorded release-fill
   obligations and the routeBody register pass queued to the fill.
+
+## Phase 07 pre-fan-out ledger (2026-08-11, recorded BEFORE any recipe row lands)
+- RELEASE SYNC: origin/release/v0.37.0 (5d038ffb7d, 46 commits) merged as 7bfb608edc.
+  Conflicts confined to provenance artifacts and the generated i18n bundle (regenerated
+  via i18n:gen at the merged tree). Post-merge re-mints: portrait manifest + accepted-art
+  pin + eastbrook literals (ac46d790c3), then the release's lockfile bump (new
+  three@0.165.0 patch hash) invalidated the branch-only inscription-tome source
+  fingerprint, re-minted via scripts/assets/remint_lockfile_fingerprints.mjs with the
+  four test pins advanced and the media manifest regenerated (geometry unchanged; only
+  extras stamps moved). Release-merge-audit (six-agent fan-out): five clusters clean,
+  the tome fingerprint was the single blocking find (fixed), all Phase 07 premises
+  CONFIRMED-INTACT (release touched no profession/recipe/content sim files, no resetDay
+  plumbing, no mail, no market/bank; zero new routes or WS commands; the rift forge gate
+  refuses three pre-existing rift_* wire tokens behind RIFT_FORGE_ENABLED and cannot
+  collide with extract_essence or any craft command; db-mock trap cannot fire, the
+  branch added no server/db exports).
+- THE TEN-ROW MAPPING (R13 rung, one intermediate per craft at skill 75):
+  weaponcrafting -> Duskforged Billet (duskforged_billet), armorcrafting -> Forgefold
+  Plating (forgefold_plating), leatherworking -> Wyrmhide Cording (wyrmhide_cording),
+  tailoring -> Sunspun Bolt (sunspun_bolt), jewelcrafting -> Prismglass Setting
+  (prismglass_setting), engineering -> Precision Chassis (precision_chassis),
+  alchemy -> Quickening Catalyst (quickening_catalyst, the rung itself and the time
+  gate), cooking -> Seasoned Stock (seasoned_stock), enchanting -> Lucent Reagent
+  (lucent_reagent), inscription -> Sablewax Vellum (sablewax_vellum, NEW name below).
+  Recipe ids: recipe_<item id>. All ten are junk-kind common-quality materials per the
+  profession_items.ts doctrine (never vendored by the junk sweep).
+- R15 NAMING VERDICTS (web-verified 2026-08-11): Sablewax Vellum CLEAR (zero exact
+  hits for the compound and for the coin Sablewax; searches decompose to sable the
+  heraldic ink-black tincture plus wax/vellum, generic scribal vocabulary; no reuse of
+  a registry coin). Rejected at authoring: Nightquill Vellum (Nightquill is a shipped
+  item in Oaken Tower affecting start-of-combat effects, plus DQWiki's magic item
+  "Nightquill's Award": same component-noun role, the Copper Torc rejection class) and
+  Scrivener's Vellum (Scrivener and Vellum are both real writing-software products,
+  Literature and Latte's Scrivener exports to the Vellum book formatter, so the phrase
+  names their integration). In-repo neighbors checked: no "vellum" anywhere; quill
+  appears only in deed names (Founder's Quill, Quill and Pigment), different surface.
+- ENCHANTING STATION DECISION (the serial decision this phase owed): Lucent Reagent
+  carries explicit stationType 'toolworks' and enchanting stays OUT of
+  STATION_TYPE_BY_CRAFT, the same per-record pattern as jewelcrafting 'forge' (Phase
+  05) and inscription 'apothecary' (Phase 06). Rationale: the only shipped enchanting
+  recipes (the two tool-effect charms) already bind 'toolworks'; a per-record literal
+  keeps the craft-absent pin green and defers the "home station" identity question to
+  the apex phase where enchanting's three products land; no new station type is minted
+  for one row; the professions_crafting_hub foreign-bound literal pin grows the new
+  recipe ids in the same change.
+- DEMAND MATH (phases 08/09 author against these numbers, not around them): each apex
+  recipe (skill 100, three per profession, thirty total) consumes exactly 3 of its own
+  profession's intermediate plus its gathered mats; each intermediate consumes 1
+  Quickening Catalyst; the Catalyst is 1 craft per day per character, tradable. So one
+  apex piece = 3 catalyst-days self-funded (or market-bought; tradability is the
+  pressure valve), a full personal kit at the Masterwrought (2) equip cap = 6
+  catalyst-days, and a ten-person raid mints at most 10 catalysts per day. Prismglass
+  Setting carries ADDITIONAL demand beyond its apex pieces: 1 per Perfecting attempt
+  (R1), so jewelcrafting's intermediate is deliberately the deepest market. Learning
+  cost: all ten recipes are tier-3 trainer teaches at 4g each (TRAINING_FEE_BY_TIER[3]
+  = 40000c), 40g for a completionist, the other real gate beside the daily catalyst.
+  Sizing rationale: 3 days per piece sits in the classic daily-cooldown band, and the
+  R5 five-percent envelope makes faster acquisition harmless but pointless to chase.
+- PREMISE CORRECTIONS (live code contradicts three phase-doc premises; corrected here
+  per the release-merge-audit discipline, none is a stop):
+  1. The catalyst daily gate rides the wyrmfallDaily ctx.resetDay idiom
+     (masterwrought_materials.ts refreshWyrmfallDaily + the sim.ts F1 load clamps with
+     the 64-char date cap and zero-default serialize omission), NOT node_persist:
+     node_persist stores remaining-time deltas against sim.time and cannot answer "has
+     the calendar day turned". No new DDL either way, so the stopping rule is
+     satisfied without stopping. utcDay stays a calendar stamp only.
+  2. Craft refusal is NOT a sim_i18n emit. crafting.ts's own header forbids a
+     ctx.error toast beside the CraftResult (single-surface doctrine); the refusal is
+     a new typed reason code ('daily_limit') widened at FOUR sites (CraftResult.reason,
+     the craftResult SimEvent union, CraftResultView in src/world_api/professions.ts,
+     and the hud.ts reason-to-key ternary) plus its English hudChrome.crafting.* row.
+     The S3 guard is structurally blind to this path, so coverage comes from a
+     deliberate test, and the localization obligation is the client-side t() key, with
+     the five non-Latin fills if M16 applies. The gate check lands in
+     evaluateCraftAdmission (shared by cast-start, resolve, and batch auto-continue,
+     so a batch stops itself), and the day STAMP lands in resolveCraftForRecipe on
+     successful consumption (the admission fn is contractually side-effect-free).
+  3. The nine non-catalyst intermediates have zero consumers until Phase 08, so they
+     land in ALLOWED_UNCLASSIFIED_JUNK (material_taxonomy) and the bag_filter ALL_ONLY
+     list, the wyrmfall_core precedent, each with a removal obligation minted for the
+     phase that adds its consumer (08/09/10). The Catalyst derives IN automatically
+     (nine in-phase consumers) and instead moves HONEST_MATERIALS plus the
+     craftIdsForMaterialItem consumer-set pins in material_profession_affinity.
+- GATE STATE IS SERVER-PRIVATE (Phase 04 precedent): no new IWorld member or wire
+  field for the catalyst cooldown readout; the player learns of the refusal on
+  attempt, matching the wyrmfall gate; the readout remains the Phase 14 UX obligation.
+- SCAFFOLDING CONVENTION for the ten rows: skillReq 75, itemLevelBudget 20, level 20
+  (the shipped 75-band convention: CASTER_HUB_RECIPES, the 75-skill TOOL_RECIPES, and
+  recipe_stormreel_fishing_rod). New rows go in a NEW exported array spread into
+  ALL_RECIPES; LADDER_RECIPES' 54-row shape is pinned and never grows. Every row
+  carries at least one no-buyValue reagent (keeps the counterfactually-vendor-fed
+  six-id pin frozen), never a base material and its fine_ grade together, and no
+  arcane_shard (reserved for the apex band per Phase 04).
