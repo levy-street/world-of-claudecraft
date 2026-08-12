@@ -38,9 +38,12 @@ interface MonolithRow {
 const MONOLITHS: MonolithRow[] = [
   {
     file: 'src/ui/hud.ts',
-    // Lowered from 19600 at the Phase 07 review round: the craft-denial
-    // key ternary moved out to craft_denial_line_view (the ratchet).
-    ceiling: 19500,
+    // Lowered from 19600 at the Phase 07 review round (craft-denial key
+    // ternary out to craft_denial_line_view), then from 19500 at the Phase 07
+    // QA release sync: the v0.37.0 chat-quota wiring pushed the merged union
+    // 3 lines over, so the display-name resolver family moved out to
+    // entity_display_core (the ratchet: extract, then lower).
+    ceiling: 19490,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

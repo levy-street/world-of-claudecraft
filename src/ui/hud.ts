@@ -45,7 +45,6 @@ import {
 import { resolveActionReplacement } from '../sim/combat/action_replacement';
 import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
-import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
@@ -297,6 +296,24 @@ import {
   disenchantSecondaryLineKey,
   salvageResultToast,
 } from './enchanting_view';
+import {
+  delveDisplayName,
+  delveText,
+  dungeonDisplayNameFromSource,
+  dungeonText,
+  entityDisplayName,
+  itemDisplayNameFromSource,
+  itemStackDisplayName,
+  mobDisplayName,
+  npcDisplayName,
+  npcDisplayTitle,
+  npcGreeting,
+  questNarrative,
+  questObjectiveLabel,
+  questTitle,
+  questTitleFromSource,
+  zoneWelcome,
+} from './entity_display_core';
 import {
   type AbilitySpecNoteField,
   classDisplayName,
@@ -694,7 +711,7 @@ import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimAuraName, localizeSimText } from './sim_i18n';
+import { localizeSimText } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
 import {
   advanceSkillLevelObservation,
@@ -19152,96 +19169,6 @@ function abilityDisplayDescription(
     id: res.def.id,
     field: `specNote_${spec}` as AbilitySpecNoteField,
   })}`;
-}
-
-function itemDisplayNameFromSource(name: string): string {
-  const item = Object.values(ITEMS).find((candidate) => candidate.name === name);
-  return item ? itemDisplayName(item) : name;
-}
-
-function itemStackDisplayName(item: string, stackSuffix?: string): string {
-  const itemName = itemDisplayNameFromSource(item);
-  if (!stackSuffix) return itemName;
-  const count = Number(stackSuffix.trim().slice(1));
-  return `${itemName} ${t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`;
-}
-
-function mobDisplayName(mobId: string): string {
-  return tEntity({ kind: 'mob', id: mobId, field: 'name' });
-}
-
-function npcDisplayName(npcId: string): string {
-  return tEntity({ kind: 'npc', id: npcId, field: 'name' });
-}
-
-function npcDisplayTitle(npcId: string): string {
-  return tEntity({ kind: 'npc', id: npcId, field: 'title' });
-}
-
-function npcGreeting(npcId: string, playerClass: PlayerClass, playerName: string): string {
-  const className = classDisplayName(playerClass);
-  return tEntity({
-    kind: 'npc',
-    id: npcId,
-    field: 'greeting',
-    values: {
-      className,
-      classNameLower: className.toLocaleLowerCase(),
-      playerName,
-    },
-  });
-}
-
-function questTitle(questId: string): string {
-  return tEntity({ kind: 'quest', id: questId, field: 'title' });
-}
-
-function questNarrative(questId: string, field: 'text' | 'completion', playerName: string): string {
-  return tEntity({ kind: 'quest', id: questId, field, values: { playerName } });
-}
-
-function questObjectiveLabel(questId: string, objectiveIndex: number): string {
-  return tEntity({
-    kind: 'questObjective',
-    questId,
-    objectiveIndex,
-    field: 'label',
-  });
-}
-
-function questTitleFromSource(name: string): string {
-  const quest = Object.values(QUESTS).find((candidate) => candidate.name === name);
-  return quest ? questTitle(quest.id) : name;
-}
-
-function zoneWelcome(zoneId: string): string {
-  return tEntity({ kind: 'zone', id: zoneId, field: 'welcome' });
-}
-
-function dungeonText(dungeonId: string, field: 'enterText' | 'leaveText'): string {
-  return tEntity({ kind: 'dungeon', id: dungeonId, field });
-}
-
-function delveText(delveId: string, field: 'enterText' | 'leaveText'): string {
-  return tEntity({ kind: 'delve', id: delveId, field });
-}
-
-function dungeonDisplayNameFromSource(name: string): string {
-  const dungeon = DUNGEON_LIST.find((candidate) => candidate.name === name);
-  return dungeon ? dungeonDisplayName(dungeon.id) : name;
-}
-
-function entityDisplayName(entity: Entity): string {
-  if (entity.kind === 'mob')
-    return entity.ownerId !== null && !isNecromancyUndead(entity)
-      ? (localizeSimAuraName(entity.name) ?? entity.name)
-      : mobDisplayName(entity.templateId);
-  if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
-  return entity.name;
-}
-
-function delveDisplayName(delveId: string): string {
-  return tEntity({ kind: 'delve', id: delveId, field: 'name' });
 }
 
 function combatAbilityName(name: string | null): string {

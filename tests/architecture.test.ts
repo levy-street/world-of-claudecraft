@@ -263,6 +263,7 @@ const UI_PURE_CORES = [
   'src/ui/bag_item_context_menu.ts',
   'src/ui/enchant_apply_view.ts',
   'src/ui/enchanting_view.ts',
+  'src/ui/entity_display_core.ts',
   'src/ui/disenchant_yield_view.ts',
   'src/ui/material_hint_view.ts',
   'src/ui/material_profession_hint_view.ts',
