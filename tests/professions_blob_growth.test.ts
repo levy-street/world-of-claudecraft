@@ -61,6 +61,7 @@ const PROFESSIONS_BLOB_FIELDS = [
   'questedHobbies',
   'profTierTutorialSent',
   'guildLetterSent',
+  'craftDaily',
 ] as const;
 
 // Every CharacterState key this serializer writes that is NOT professions
@@ -230,6 +231,14 @@ function ceilingSim(): Sim {
       craftedBy: longName,
       confirmMode: 'prompt',
     },
+  };
+  // The daily craft gate at content size: every oncePerDay recipe stamped
+  // for a live window (Masterwrought phase 07). Content-scaled like
+  // knownRecipes, and the load clamp filters to live gated ids, so this IS
+  // the field's ceiling.
+  meta.craftDaily = {
+    date: '2026-01-01',
+    crafted: new Set(ALL_RECIPES.filter((r) => r.oncePerDay).map((r) => r.id)),
   };
   // EVERY equip slot carries a crafted, signed, enchanted, stat-rolled
   // instance: the professions-endgame worst case the phase 16 review found
@@ -415,6 +424,11 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.nodeHarvestCooldowns ?? {})).toHaveLength(GATHER_NODES.length);
     expect(s2.knownRecipes ?? []).toHaveLength(new Set(ALL_RECIPES.map((r) => r.id)).size);
     expect(Object.keys(s2.toolEffectSlots ?? {})).toHaveLength(3);
+    // Content-scaled like knownRecipes: at most one stamp per oncePerDay
+    // recipe per day, and the 32-entry load clamp bounds even a tampered row.
+    expect(s2.craftDaily?.crafted ?? []).toHaveLength(
+      ALL_RECIPES.filter((r) => r.oncePerDay).length,
+    );
     expect(Object.keys(s2.questedHobbies ?? {})).toHaveLength(ARCHETYPE_PAIR_TARGETS.length);
     // EXACT, not an upper bound: the fixture attunes every authored pair, so
     // a cap pin that tolerated fewer would pass on a normalizer that

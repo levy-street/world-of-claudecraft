@@ -5543,6 +5543,7 @@ export const vi_VN: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Cần {a} và {b}",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "Huấn Luyện Viên, {fee}",
       "sourceTrainerFree": "Huấn Luyện Viên, miễn phí",
       "sourceKnown": "Biết từ đầu",

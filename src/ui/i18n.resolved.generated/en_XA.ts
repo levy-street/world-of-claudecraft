@@ -5543,6 +5543,7 @@ export const en_XA: EnTranslations = {
       "matFmt": "[{name} ẋ{count}]",
       "outputFmt": "[{name} ẋ{count}]",
       "comboReq": "[Ñééðš {a} áñð {b}]",
+      "oncePerDay": "[Óñçé þéŕ ðáý]",
       "sourceTrainerFee": "[Ţŕáíñéŕ, {fee}]",
       "sourceTrainerFree": "[Ţŕáíñéŕ, ƒŕéé]",
       "sourceKnown": "[Ķñóŵñ ƒŕóɱ ţĥé šţáŕţ]",

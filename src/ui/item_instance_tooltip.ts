@@ -161,14 +161,19 @@ export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
 
 /** Whether a signed copy of this item KIND reads as a gathered material
  *  (Professions 2.0). Every signable gathered item (node materials,
- *  corpse components, Pristine specimens) is kind 'junk', while every crafted
- *  recipe output lands on the equip/consume kinds (weapon, armor, food,
- *  potion, elixir, tool, bag), so the signed universe partitions cleanly on
- *  the kind alone; the partition is pinned in tests/item_instance_tooltip.test.ts.
- *  Recipe patterns (kind 'recipe') sit outside that universe entirely: they are
- *  never signed and no recipe crafts one, so they never reach this line.
- *  Raw fishing catches are also kind 'junk' (cooking reagents) but fishing never
- *  signs a catch, so they never reach the provenance line either. */
+ *  corpse components, Pristine specimens) is kind 'junk', while every
+ *  SIGNABLE crafted output lands on the commission-eligible equipment kinds
+ *  (weapon, armor, held_offhand; professions/commission.ts), so the SIGNED
+ *  universe partitions cleanly on the kind alone; the partition is pinned in
+ *  tests/item_instance_tooltip.test.ts. Crafted junk-kind outputs DO exist
+ *  since the Masterwrought phase 07 intermediates, but commission signing is
+ *  equipment-only, so none of them can carry a signer today; if a future
+ *  phase ever signs an intermediate, this kind-only read would call it
+ *  "Gathered by" and must gain a real crafted-provenance channel first (the
+ *  pinned sweep in the test file is what makes that a red instead of a
+ *  silent mislabel). Recipe patterns (kind 'recipe') sit outside the signed
+ *  universe entirely, and raw fishing catches (also kind 'junk') are never
+ *  signed either, so neither reaches this line. */
 export function isGatheredProvenanceKind(kind: ItemDef['kind'] | undefined): boolean {
   return kind === 'junk';
 }

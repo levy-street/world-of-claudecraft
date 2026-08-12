@@ -5543,6 +5543,7 @@ export const da_DK: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Kræver {a} og {b}",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "Træner, {fee}",
       "sourceTrainerFree": "Træner, gratis",
       "sourceKnown": "Kendes fra starten",

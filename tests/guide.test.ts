@@ -1689,6 +1689,7 @@ describe('Guide professions generated content accuracy', () => {
       'materials',
       'output',
       'combo',
+      'oncePerDay',
       'gain',
     ]);
     for (const c of GUIDE_PROF_CRAFTS) {

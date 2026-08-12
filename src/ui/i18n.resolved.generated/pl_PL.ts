@@ -5543,6 +5543,7 @@ export const pl_PL: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Wymaga {a} i {b}",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "Trener, {fee}",
       "sourceTrainerFree": "Trener, bezpłatnie",
       "sourceKnown": "Znany od początku",

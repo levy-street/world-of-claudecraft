@@ -98,6 +98,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -215,6 +216,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -345,6 +347,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -477,6 +480,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -616,6 +620,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -760,6 +765,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.q1",
     "guide.profPages.gatherIntro.herbalism",
     "guide.profPages.gatherIntro.mining",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -791,15 +797,19 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useElixirAura"
   ],
   "zh_CN": [
+    "guide.profPages.oncePerDay",
     "hudChrome.crafting.oncePerDay"
   ],
   "zh_TW": [
+    "guide.profPages.oncePerDay",
     "hudChrome.crafting.oncePerDay"
   ],
   "ko_KR": [
+    "guide.profPages.oncePerDay",
     "hudChrome.crafting.oncePerDay"
   ],
   "ja_JP": [
+    "guide.profPages.oncePerDay",
     "hudChrome.crafting.oncePerDay"
   ],
   "pt_BR": [
@@ -907,6 +917,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -937,6 +948,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useElixirAura"
   ],
   "ru_RU": [
+    "guide.profPages.oncePerDay",
     "hudChrome.crafting.oncePerDay"
   ],
   "cs_CZ": [
@@ -1048,6 +1060,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1194,6 +1207,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1331,6 +1345,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1453,6 +1468,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1580,6 +1596,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1719,6 +1736,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1850,6 +1868,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",
@@ -1995,6 +2014,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.faq.a1",
     "guide.profPages.faq.a2",
     "guide.profPages.faq.q1",
+    "guide.profPages.oncePerDay",
     "guide.professions.deedsBody",
     "guide.professions.ringBody",
     "guide.professions.ringWaveNote",

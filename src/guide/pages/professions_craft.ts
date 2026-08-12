@@ -71,12 +71,18 @@ function recipeRow(r: GuideProfRecipe): string {
         }),
       )}</span>`
     : '';
+  // The daily craft gate is the defining fact of a gated recipe (the whole
+  // Masterwrought time-gate design hangs off it), so the wiki states it the
+  // way the in-game tooltip does, in the same badge slot the combo gate uses.
+  const daily = r.oncePerDay
+    ? `<span class="guide-prof-combo">${esc(t('guide.profPages.oncePerDay'))}</span>`
+    : '';
   const output =
     r.output.count > 1
       ? t('guide.profPages.outputFmt', { name: r.output.name, count: formatNumber(r.output.count) })
       : r.output.name;
   return `<tr>
-      <td class="guide-prof-recipe q-${esc(r.output.quality)}">${esc(output)}${combo}</td>
+      <td class="guide-prof-recipe q-${esc(r.output.quality)}">${esc(output)}${combo}${daily}</td>
       <td>${esc(formatNumber(r.skillReq))}</td>
       <td>${sourceCell(r)}</td>
       <td>${esc(r.station ? stationLabel(r.station) : t('guide.profPages.stationAnywhere'))}</td>

@@ -701,6 +701,9 @@ const profRecipeRow = (r) => ({
         minTier: r.comboRequirement.minTier,
       }
     : null,
+  // The daily craft gate (Masterwrought phase 07): the defining fact of a
+  // gated recipe, so the wiki states it the way the in-game tooltip does.
+  oncePerDay: r.oncePerDay === true,
   gain: gainBoundaries(r.skillReq),
 });
 
@@ -1228,6 +1231,9 @@ export interface GuideProfRecipe {
   materials: GuideProfMaterial[];
   output: { name: string; count: number; quality: string };
   combo: { crafts: string[]; minTier: number } | null;
+  /** Daily craft gate (Masterwrought phase 07): one craft per character per
+   *  reset day. */
+  oncePerDay: boolean;
   /** Mastery Curve boundaries: skill where gain drops to 0.5 / 0.25 / 0. */
   gain: { reducedAt: number; minimalAt: number; zeroAt: number };
 }

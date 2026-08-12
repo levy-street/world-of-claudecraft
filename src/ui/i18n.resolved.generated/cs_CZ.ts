@@ -5543,6 +5543,7 @@ export const cs_CZ: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Vyžaduje {a} a {b}",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "Trenér, {fee}",
       "sourceTrainerFree": "Trenér, zdarma",
       "sourceKnown": "Známo od začátku",

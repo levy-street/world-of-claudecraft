@@ -5543,6 +5543,7 @@ export const id_ID: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Membutuhkan {a} dan {b}",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "Pelatih, {fee}",
       "sourceTrainerFree": "Pelatih, gratis",
       "sourceKnown": "Diketahui dari awal",

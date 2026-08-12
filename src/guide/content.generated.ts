@@ -143,6 +143,9 @@ export interface GuideProfRecipe {
   materials: GuideProfMaterial[];
   output: { name: string; count: number; quality: string };
   combo: { crafts: string[]; minTier: number } | null;
+  /** Daily craft gate (Masterwrought phase 07): one craft per character per
+   *  reset day. */
+  oncePerDay: boolean;
   /** Mastery Curve boundaries: skill where gain drops to 0.5 / 0.25 / 0. */
   gain: { reducedAt: number; minimalAt: number; zeroAt: number };
 }
@@ -7566,6 +7569,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -7600,6 +7604,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "epic"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 175,
           "minimalAt": 200,
@@ -7630,6 +7635,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -7660,6 +7666,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "epic"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 175,
           "minimalAt": 200,
@@ -7690,6 +7697,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -7720,6 +7728,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "epic"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 175,
           "minimalAt": 200,
@@ -7750,6 +7759,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -7784,6 +7794,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "epic"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 150,
           "minimalAt": 175,
@@ -7818,6 +7829,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -7872,6 +7884,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -7916,6 +7929,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           ],
           "minTier": 1
         },
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -7946,6 +7960,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -7976,6 +7991,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8010,6 +8026,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8044,6 +8061,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8074,6 +8092,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8108,6 +8127,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8142,6 +8162,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8176,6 +8197,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8214,6 +8236,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8252,6 +8275,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": true,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -8298,6 +8322,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8328,6 +8353,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8358,6 +8384,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8392,6 +8419,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8426,6 +8454,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8460,6 +8489,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8494,6 +8524,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8532,6 +8563,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8570,6 +8602,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8608,6 +8641,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8646,6 +8680,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -8700,6 +8735,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8734,6 +8770,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8772,6 +8809,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -8806,6 +8844,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8836,6 +8875,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8870,6 +8910,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8904,6 +8945,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8938,6 +8980,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8972,6 +9015,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9010,6 +9054,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9044,6 +9089,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9086,6 +9132,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9124,6 +9171,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -9174,6 +9222,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9212,6 +9261,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9254,6 +9304,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -9288,6 +9339,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9318,6 +9370,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9352,6 +9405,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9386,6 +9440,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9420,6 +9475,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9454,6 +9510,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9492,6 +9549,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9526,6 +9584,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9564,6 +9623,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9602,6 +9662,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -9656,6 +9717,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9690,6 +9752,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9724,6 +9787,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9758,6 +9822,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9796,6 +9861,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9834,6 +9900,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9872,6 +9939,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -9920,6 +9988,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9954,6 +10023,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9988,6 +10058,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -10042,6 +10113,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10076,6 +10148,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10110,6 +10183,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10144,6 +10218,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10178,6 +10253,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10212,6 +10288,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10250,6 +10327,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10288,6 +10366,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10326,6 +10405,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10360,6 +10440,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -10414,6 +10495,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10454,6 +10536,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           ],
           "minTier": 1
         },
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10488,6 +10571,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10522,6 +10606,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10560,6 +10645,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10594,6 +10680,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10628,6 +10715,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10662,6 +10750,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10696,6 +10785,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10734,6 +10824,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10772,6 +10863,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10806,6 +10898,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -10856,6 +10949,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10890,6 +10984,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10920,6 +11015,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -10964,6 +11060,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           ],
           "minTier": 1
         },
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10998,6 +11095,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -11032,6 +11130,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -11066,6 +11165,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -11100,6 +11200,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -11134,6 +11235,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -11168,6 +11270,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -11206,6 +11309,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -11244,6 +11348,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -11282,6 +11387,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -11320,6 +11426,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,

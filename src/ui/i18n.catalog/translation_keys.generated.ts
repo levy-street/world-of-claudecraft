@@ -6025,6 +6025,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.matFmt'
   | 'guide.profPages.nodesHeading'
   | 'guide.profPages.nodesNote'
+  | 'guide.profPages.oncePerDay'
   | 'guide.profPages.outputFmt'
   | 'guide.profPages.priceNone'
   | 'guide.profPages.rareBody'

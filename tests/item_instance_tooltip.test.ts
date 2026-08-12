@@ -11,6 +11,7 @@ import {
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
+import { isCommissionEligible } from '../src/sim/professions/commission';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
   instanceBadgeLines,
@@ -341,14 +342,42 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     }
   });
 
-  it('every crafted recipe output resolves to a crafted-kind def', () => {
+  it('every SIGNABLE crafted output resolves to a crafted-kind def', () => {
+    // Narrowed at Masterwrought phase 07: the ten intermediates are the
+    // game's first crafted junk-kind outputs, and commission signing is
+    // equipment-only (professions/commission.ts), so the partition claim
+    // covers the SIGNED universe: every output that CAN carry a signer must
+    // read as crafted, and every crafted junk-kind output must stay
+    // commission-ineligible or the "Gathered by" mislabel goes live.
     expect(ALL_RECIPES.length).toBeGreaterThan(0);
-    for (const recipe of ALL_RECIPES) {
+    const signable = ALL_RECIPES.filter((recipe) =>
+      isCommissionEligible(ITEMS[recipe.resultItemId]),
+    );
+    expect(signable.length).toBeGreaterThan(0);
+    for (const recipe of signable) {
       const def = ITEMS[recipe.resultItemId];
       expect(def, recipe.resultItemId).toBeDefined();
       expect(isGatheredProvenanceKind(def.kind), `${recipe.resultItemId} (${def.kind})`).toBe(
         false,
       );
+    }
+    const craftedJunk = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId]?.kind === 'junk');
+    expect(craftedJunk.map((r) => r.resultItemId).sort()).toEqual(
+      [
+        'duskforged_billet',
+        'forgefold_plating',
+        'wyrmhide_cording',
+        'sunspun_bolt',
+        'prismglass_setting',
+        'precision_chassis',
+        'quickening_catalyst',
+        'seasoned_stock',
+        'lucent_reagent',
+        'sablewax_vellum',
+      ].sort(),
+    );
+    for (const recipe of craftedJunk) {
+      expect(isCommissionEligible(ITEMS[recipe.resultItemId]), recipe.resultItemId).toBe(false);
     }
   });
 });

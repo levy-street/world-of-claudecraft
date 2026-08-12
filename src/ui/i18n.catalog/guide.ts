@@ -2636,6 +2636,9 @@ export const guideStrings = {
     matFmt: '{name} x{count}',
     outputFmt: '{name} x{count}',
     comboReq: 'Needs {a} and {b}',
+    // Daily craft gate badge (Masterwrought phase 07). Kept non-wordy (no
+    // 4-plus lowercase run) per M16, matching hudChrome.crafting.oncePerDay.
+    oncePerDay: 'Once per day',
     sourceTrainerFee: 'Trainer, {fee}',
     sourceTrainerFree: 'Trainer, free',
     sourceKnown: 'Known from the start',

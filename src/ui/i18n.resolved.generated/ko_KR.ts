@@ -5543,6 +5543,7 @@ export const ko_KR: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "{a}와 {b} 필요",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "훈련사, {fee}",
       "sourceTrainerFree": "훈련사, 무료",
       "sourceKnown": "처음부터 습득",

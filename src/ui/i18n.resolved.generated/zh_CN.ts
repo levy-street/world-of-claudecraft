@@ -5543,6 +5543,7 @@ export const zh_CN: EnTranslations = {
       "matFmt": "{name}×{count}",
       "outputFmt": "{name}×{count}",
       "comboReq": "需要{a}与{b}",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "训练师，{fee}",
       "sourceTrainerFree": "训练师，免费",
       "sourceKnown": "初始即会",

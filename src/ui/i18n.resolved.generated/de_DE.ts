@@ -5543,6 +5543,7 @@ export const de_DE: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Erfordert {a} und {b}",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "Ausbilder, {fee}",
       "sourceTrainerFree": "Ausbilder, kostenlos",
       "sourceKnown": "Von Anfang an bekannt",

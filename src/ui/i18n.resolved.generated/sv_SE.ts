@@ -5543,6 +5543,7 @@ export const sv_SE: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Kräver {a} och {b}",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "Tränare, {fee}",
       "sourceTrainerFree": "Tränare, gratis",
       "sourceKnown": "Känd från start",

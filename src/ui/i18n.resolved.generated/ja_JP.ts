@@ -5543,6 +5543,7 @@ export const ja_JP: EnTranslations = {
       "matFmt": "{name}×{count}",
       "outputFmt": "{name}×{count}",
       "comboReq": "{a}と{b}が必要",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "訓練師、{fee}",
       "sourceTrainerFree": "訓練師、無料",
       "sourceKnown": "最初から習得済み",

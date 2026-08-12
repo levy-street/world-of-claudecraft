@@ -43,6 +43,7 @@ const PROFESSIONS_BLOB_FIELDS = [
   'questedHobbies',
   'profTierTutorialSent',
   'guildLetterSent',
+  'craftDaily',
 ] as const;
 
 const NODE = GATHER_NODES.find((n) => n.type === 'herb' && n.zoneId === 'eastbrook_vale');
@@ -126,6 +127,10 @@ const populatedSim = (): Sim => {
   meta.questedHobbies.set('alchemy+cooking', 'enchanting');
   meta.profTierTutorialSent = true;
   meta.guildLetterSent = true;
+  // The daily craft gate stamp (Masterwrought phase 07): a live window with
+  // the one shipped oncePerDay recipe stamped. The id must be a LIVE gated
+  // recipe or the load clamp's anti-tamper filter drops it by design.
+  meta.craftDaily = { date: '2026-08-11', crafted: new Set(['recipe_quickening_catalyst']) };
   return sim;
 };
 

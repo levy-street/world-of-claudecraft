@@ -5543,6 +5543,7 @@ export const tr_TR: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "{a} ve {b} gerektirir",
+      "oncePerDay": "Once per day",
       "sourceTrainerFee": "Eğitmen, {fee}",
       "sourceTrainerFree": "Eğitmen, ücretsiz",
       "sourceKnown": "Başlangıçtan bilinir",
