@@ -134,6 +134,10 @@ import {
   resolveCraftForRecipe,
 } from '../src/sim/professions/crafting';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import {
+  MAKERS_EMBER_ITEM_ID,
+  WYRMFALL_CORE_ITEM_ID,
+} from '../src/sim/professions/masterwrought_materials';
 import { teachTierMet } from '../src/sim/professions/training';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { type CraftSkills, emptyCraftSkills, gainCraftSkill } from '../src/sim/professions/wheel';
@@ -454,16 +458,20 @@ describe('the daily-gate exclusion actually excludes (filter liveness)', () => {
     const outputs = ALL_RECIPES.map((r) => r.resultItemId);
     expect(new Set(outputs).size).toBe(outputs.length);
     // Premise 2: oncePerDay is the only cadence gate the closure can SEE,
-    // but the packet ships two more it cannot (wyrmfall_core is once per
-    // character per source per reset day, makers_ember weekly). Both are
-    // consumed only by rows the closure already excludes; the day an
-    // ungated pool recipe consumes either, this tripwire forces the model
-    // to learn the material-level gates.
+    // but the packet ships two more it cannot (wyrmfall_core's income is
+    // per character per source per reset day, beside its ungated marks
+    // vendor channel; makers_ember is weekly). Both are consumed only by
+    // rows the closure already excludes; the day an ungated pool recipe
+    // consumes either, this tripwire forces the model to learn the
+    // material-level gates. The ids come from the OWNING module's
+    // constants, never literals: a rename would silently disarm a negative
+    // assertion (the literal-arm trap).
     for (const recipe of ARMORCRAFTING_RECIPES) {
       for (const reagent of recipe.reagents) {
-        expect(['wyrmfall_core', 'makers_ember'], `${recipe.id} ${reagent.itemId}`).not.toContain(
-          reagent.itemId,
-        );
+        expect(
+          [WYRMFALL_CORE_ITEM_ID, MAKERS_EMBER_ITEM_ID],
+          `${recipe.id} ${reagent.itemId}`,
+        ).not.toContain(reagent.itemId);
       }
     }
   });
