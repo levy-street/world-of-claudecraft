@@ -53,6 +53,17 @@ Agent 2 (quartermaster + valve): heroic five-man patterns sold on the Heroic
 Quartermaster for Heroic Marks (R8: the deterministic channel); prices recorded in
 state.md. Write the drop-rate documentation and the catch-up valve note (the marks
 vendor IS the valve, live from day one) into the state.md ledger.
+PHASE 08 OBLIGATION CARRIED IN: the wiki source column renders every non-trainer
+recipe through guide.profPages.sourceDrop ("From a found pattern"), which is true for
+the drop channel but will MISLABEL any recipe whose pattern this phase sells on the
+quartermaster instead; re-cut the acquisition value or the copy for the vendor channel
+in the same change that wires it (and keep the render-level row pin in tests/guide.test.ts
+honest for both channels). Also from phase 08: heroic_variants' makeHeroicVariant
+spreads ...base, so a masterwrought def entering ANY heroic-eligible loot table would
+mint an upscaled variant still carrying the flag; this phase drops the PATTERN item,
+never the piece. And the guide's masterwork prose (guide.profPages.masterworkBody plus
+the three armor-craft routeBody strings) still describes the proc with no apex clause;
+land the apex-exclusion copy (English-only) here or in phase 12 with the head start.
 Agent 3 (market surfaces): category/search handling so patterns and the new materials
 (Wyrmfall Core, the intermediates) are findable in the market browse ui; extend the
 verified seam from Step 1; if an IWorld facet member changes, implement in BOTH hosts

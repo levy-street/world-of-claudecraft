@@ -50,6 +50,10 @@
 //
 // DELIBERATE SIMPLIFICATIONS, each named with its bias DIRECTION (they do
 // not all point the same way; the per-bullet direction is what a tuner needs)
+// - Daily-gated chains are excluded from the pool outright (the transitive
+//   closure below): biases the hours UP at the margin, since a real player
+//   COULD bank catalyst-day output into skill the model never counts. The
+//   exclusion is the point: the pacing alarm measures the ungated ladder.
 // - Common-rarity yields only: biases the hours UP. Every material row grants
 //   1 unit on a common roll and 2 to 4 on a rarer one, so a real climb needs
 //   fewer casts than this. Assuming the common row is the honest pessimistic
@@ -419,14 +423,49 @@ describe('the daily-gate exclusion actually excludes (filter liveness)', () => {
   });
 
   it('the closure reaches the apex rung: second-hop chain members stay out (phase 08)', () => {
-    // The apex rows never touch the catalyst directly; without the
-    // transitive closure they enter the pool, hijack the cheapest-path model
-    // through reagents the gathered-units metric prices at zero, and the
-    // climb pin above them reds (exactly how this arm was born).
+    // The apex rows never touch the catalyst directly; without the closure
+    // they enter the POOL, and the pool feeds the EXPECTATION side of the
+    // climb pin (the top rung would read 100 while the walk still tops at
+    // 75, since drop-taught rows fail the known-recipe gate and can never be
+    // crafted by the model anyway). The failure lives in the expectation,
+    // not the walk; exactly how this arm was born.
     expect(DAILY_GATED_OUTPUT_IDS.has('forgefold_plating')).toBe(true);
     expect(DAILY_GATED_OUTPUT_IDS.has('forgefold_legguards')).toBe(true);
-    expect(ARMORCRAFTING_RECIPES.map((r) => r.id)).not.toContain('recipe_forgefold_legguards');
-    expect(ARMORCRAFTING_RECIPES.map((r) => r.id)).not.toContain('recipe_spiritweld_girdle');
+    // The EXACT excluded armorcrafting set, so a third apex row (or a lost
+    // exclusion) reds by name rather than hiding behind two spot negatives.
+    const excluded = ALL_RECIPES.filter(
+      (r) => r.professionId === CRAFT && !ARMORCRAFTING_RECIPES.includes(r) && !r.oncePerDay,
+    )
+      .map((r) => r.id)
+      .sort();
+    expect(excluded).toEqual([
+      'recipe_forgefold_legguards',
+      'recipe_forgefold_plating',
+      'recipe_spiritweld_girdle',
+      'recipe_wardspeaker_sabatons',
+    ]);
+  });
+
+  it('the closure premises hold: unique producers, and no cadence gate it cannot see', () => {
+    // Premise 1: the closure marks an ITEM gated when SOME producing recipe
+    // consumes a gated reagent, which is sound only while resultItemId is
+    // one-to-one across the catalog (a second ungated producer of the same
+    // id would be wrongly excluded).
+    const outputs = ALL_RECIPES.map((r) => r.resultItemId);
+    expect(new Set(outputs).size).toBe(outputs.length);
+    // Premise 2: oncePerDay is the only cadence gate the closure can SEE,
+    // but the packet ships two more it cannot (wyrmfall_core is once per
+    // character per source per reset day, makers_ember weekly). Both are
+    // consumed only by rows the closure already excludes; the day an
+    // ungated pool recipe consumes either, this tripwire forces the model
+    // to learn the material-level gates.
+    for (const recipe of ARMORCRAFTING_RECIPES) {
+      for (const reagent of recipe.reagents) {
+        expect(['wyrmfall_core', 'makers_ember'], `${recipe.id} ${reagent.itemId}`).not.toContain(
+          reagent.itemId,
+        );
+      }
+    }
   });
 });
 const ATTUNEMENT = attunedArmorcrafter();

@@ -79,13 +79,13 @@ import {
 } from '../src/sim/data';
 import { RARE_SLAIN_TEMPLATES } from '../src/sim/deeds';
 import type { LootTier } from '../src/sim/lockpick';
+import { craftBonusStatsFor } from '../src/sim/professions/crafting';
 import {
   ARMOR_SECONDARY_BY_TYPE,
   DISENCHANT_MATERIAL_BY_QUALITY,
 } from '../src/sim/professions/disenchant_reagents';
 import { gatherRareEventFlavor } from '../src/sim/professions/gather_events';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
-import { masterworkBonusStats } from '../src/sim/professions/masterwork';
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import {
   catalogCharacterCompletion,
@@ -1686,25 +1686,21 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
 });
 
 /**
- * Can this craft ever proc a masterwork? Answered through masterworkBonusStats,
- * the SAME gate the proc path consults in crafting.ts, over the craft's live
- * recipes: a craft whose every output is slotless or statless (engineering's
- * tools) returns null everywhere and can never write its mark. Shared by both
- * masterwork pins below so the two cannot derive eligibility differently.
+ * Can this craft ever proc a masterwork? Answered through craftBonusStatsFor,
+ * the SAME gate the proc path consults in crafting.ts (the R1 arm included:
+ * a masterwrought output never bakes a bonus, so a craft whose only
+ * stat-bearing output is apex reads masterwork-incapable here exactly as it
+ * is in play), over the craft's live recipes: a craft whose every output is
+ * slotless or statless (engineering's tools) returns null everywhere and can
+ * never write its mark. Shared by both masterwork pins below so the two
+ * cannot derive eligibility differently.
  */
 function craftIsGearCapable(craftId: string): boolean {
   return ALL_RECIPES.some((recipe) => {
     if (recipe.professionId !== craftId) return false;
     const def = ITEMS[recipe.resultItemId];
     if (!def) return false;
-    return (
-      masterworkBonusStats({
-        level: recipe.level,
-        quality: def.quality,
-        slot: def.slot,
-        stats: def.stats,
-      }) !== null
-    );
+    return craftBonusStatsFor(def, recipe) !== null;
   });
 }
 
@@ -1744,9 +1740,9 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
   it('a masterwork craft is hinted iff it is gear-capable (derived, not ring membership)', () => {
     // Ring membership alone let masterwork:engineering ship an unearnable
     // hint: every engineering recipe produces a slotless, statless tool, so
-    // masterworkBonusStats (the SAME gate the proc path consults in
-    // crafting.ts) returns null for all of them and the mark can never be
-    // written. Deriving gear-capability through that gate reds both drifts: a
+    // craftBonusStatsFor (the SAME gate the proc path consults in
+    // crafting.ts, R1 arm included) returns null for all of them and the
+    // mark can never be written. Deriving gear-capability through that gate reds both drifts: a
     // tool-only craft gaining a hint, and a craft becoming gear-capable while
     // its slot still sits pended (QA ruling 2026-08-07).
     const page = RELIQUARY_PAGES_BY_ID.professions_masterwork;

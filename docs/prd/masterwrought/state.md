@@ -2480,3 +2480,31 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   crafts_to_mastery, blob growth, masterwork, cap/tooltip); parity 207 green
   TWICE (post-content and post-guard); portrait trio fresh. Gate at the docs
   tip recorded below.
+- FIX-ROUND REVIEW ADDENDUM (the standing rule's fresh pass over the fix
+  commits, delivered after the docs close; 5 should-fix + 3 nits + 2
+  informational, ALL applied or recorded): the reliquary gear-capable model
+  rebound to the exported craftBonusStatsFor (raw masterworkBonusStats left
+  the drift detector blind to the R1 arm, the exact case phase 09/10 jewelry
+  can create); the mastery-model closure gained its premise pins (unique
+  producers across the catalog, and a tripwire that no pool recipe consumes
+  wyrmfall_core or makers_ember, the two cadence gates oncePerDay cannot
+  see), the EXACT excluded armorcrafting id set, a DELIBERATE SIMPLIFICATIONS
+  bullet, and an honest mechanism comment (the closure fixes the EXPECTATION
+  side of the climb pin; drop-taught rows fail the known-recipe gate and
+  never enter the walk); the sweep's reference pins gained the quality
+  dimension. Recorded for later phases: PHASE 09 makes the admission-side
+  capacity twin load-bearing the moment an apex recipe ships resultCount > 1
+  (today it is defense in depth, indistinguishable from the resolve twin);
+  PHASE 11 owes the vendor-channel source label (R8's second channel would be
+  mislabeled by the drop copy), must drop the PATTERN never the piece
+  (makeHeroicVariant spreads ...base, so a flagged def in a heroic-eligible
+  loot table would mint a flagged heroic variant), and owes the guide
+  masterwork prose its apex clause (with phase 12); PHASE 12's head start
+  must not write an instance quality field without re-visiting the R3
+  legendary sub-cap (effectiveQuality reads rolled.quality ?? def.quality;
+  crafts never write it today). The reviewer verified clean: the closure's
+  termination and non-over-exclusion (all 20 members single-producer with no
+  alternate acquisition), the enforcer call-site equivalence, the complement
+  pin's premise across all nine references, the wiki mapping covering the
+  whole live acquisition space (86 trainer / 10 drop / 18 grandfathered
+  known), and no contradiction with R1/R2/R8/R12/R14.

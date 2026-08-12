@@ -262,6 +262,7 @@ describe('masterwrought apex budget sweep', () => {
     const ref = ITEMS[row.armorRef] as ItemDef & { armorType?: string };
     expect(ref.slot).toBe(row.slot);
     expect(ref.armorType).toBe(row.armorType);
+    expect(ref.quality).toBe('epic');
     expect(itemLevel(ref)).toBe(31);
     expect(armor).toBe(row.armor);
     expect(armor).toBe((ref.stats as Record<string, number>).armor);

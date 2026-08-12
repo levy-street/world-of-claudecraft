@@ -131,7 +131,11 @@ const CRAFT_SKILL_GAIN = 1;
 // wires the head start at the EFFECT GATE (the `masterwork` boolean in
 // resolveCraftForRecipe), where procRoll < procChance is actually known; this
 // helper runs before the draw and cannot see the outcome.
-function craftBonusStatsFor(
+// Exported for tests: the reliquary gear-capable model must consult the SAME
+// gate as the proc path or the drift detector goes blind to the R1 arm (a
+// craft whose only stat-bearing output is apex must read as masterwork-
+// incapable, exactly what phase 09/10 jewelry can create).
+export function craftBonusStatsFor(
   def: ItemDef | undefined,
   recipe: ProfessionRecipeRecord,
 ): ReturnType<typeof masterworkBonusStats> {
