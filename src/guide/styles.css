@@ -3074,6 +3074,18 @@ a.guide-poi:hover {
 .guide-set-name .guide-tags {
   margin-block-start: var(--g-xs);
 }
+/* The recipe-cell gate badges (combo requirement, the phase 07 Once per day
+   daily gate): inline beside the item name, so they need their own
+   separation and a muted register or they render glued to the name (the
+   scoped re-review found "Quickening CatalystOnce per day" on the live
+   page). */
+.guide-prof-combo {
+  display: inline-block;
+  margin-inline-start: var(--g-xs);
+  color: var(--g-text-muted);
+  font-size: 0.85em;
+  white-space: nowrap;
+}
 .guide-set-impact {
   white-space: nowrap;
 }

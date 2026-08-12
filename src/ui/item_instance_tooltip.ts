@@ -161,17 +161,18 @@ export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
 
 /** Whether a signed copy of this item KIND reads as a gathered material
  *  (Professions 2.0). Every signable gathered item (node materials,
- *  corpse components, Pristine specimens) is kind 'junk', while every
- *  SIGNABLE crafted output lands on the commission-eligible equipment kinds
- *  (weapon, armor, held_offhand; professions/commission.ts), so the SIGNED
- *  universe partitions cleanly on the kind alone; the partition is pinned in
- *  tests/item_instance_tooltip.test.ts. Crafted junk-kind outputs DO exist
- *  since the Masterwrought phase 07 intermediates, but commission signing is
- *  equipment-only, so none of them can carry a signer today; if a future
- *  phase ever signs an intermediate, this kind-only read would call it
- *  "Gathered by" and must gain a real crafted-provenance channel first (the
- *  pinned sweep in the test file is what makes that a red instead of a
- *  silent mislabel). Recipe patterns (kind 'recipe') sit outside the signed
+ *  corpse components, Pristine specimens) is kind 'junk', while a CRAFTED
+ *  copy gains its signer only through the #1149 def-QUALITY rule
+ *  (isSignableMaterialRarity: rare and up, professions/crafting.ts) or the
+ *  masterwork proc arm, which needs a slot; commission NEVER adds a signer
+ *  (it mints bindOnTrade only). Crafted junk-kind outputs DO exist since
+ *  the Masterwrought phase 07 intermediates, but all ten are quality
+ *  common and slot-less, so neither signing arm can stamp them today, and
+ *  the pinned sweep in tests/item_instance_tooltip.test.ts holds every
+ *  crafted junk-kind output BELOW signable rarity: the day a retune bumps
+ *  one to rare, that sweep reds instead of this kind-only read silently
+ *  calling a crafted copy "Gathered by" (grow a real crafted-provenance
+ *  channel first). Recipe patterns (kind 'recipe') sit outside the signed
  *  universe entirely, and raw fishing catches (also kind 'junk') are never
  *  signed either, so neither reaches this line. */
 export function isGatheredProvenanceKind(kind: ItemDef['kind'] | undefined): boolean {

@@ -188,11 +188,19 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // six over the old bound, so the bound was re-minted at the next round
 // step (10 KiB). The phase 06 inscription base catalog then took the
 // recipe count 88 to 94 (six knownRecipes entries) and the settled
-// ceiling to a measured 9,889 bytes: the 10 KiB bound HOLDS with about
-// 351 bytes of headroom (under one full zone of node growth), so per the
-// header policy the bound stays put rather than loosening ahead of need,
-// and only the tracking lower band below moves with the re-measure.
-const PROFESSIONS_BYTE_CEILING = 10240;
+// ceiling to a measured 9,889 bytes: the 10 KiB bound HELD with about
+// 351 bytes of headroom, so it stayed put. The Masterwrought phase 07
+// intermediates then took the recipe count 94 to 104 (ten knownRecipes
+// entries, about 259 bytes) and added the craftDaily gate stamp (76
+// bytes), settling at a measured 10,224 bytes: sixteen bytes under the
+// 10 KiB bound, which one more authored recipe would cross, so the bound
+// re-mints at the next round step (12 KiB) per the same precedent. The
+// tracking band below becomes TWO-sided at 160 either side of the
+// measurement (the one-sided band let this note rot 335 bytes upward with
+// no red): the band is the re-measure obligation, forcing the next content
+// growth to update this note with its measured value, while the round-step
+// ceiling stays the structural bound.
+const PROFESSIONS_BYTE_CEILING = 12288;
 
 function ceilingSim(): Sim {
   const sim = makeSim();
@@ -426,9 +434,14 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.toolEffectSlots ?? {})).toHaveLength(3);
     // Content-scaled like knownRecipes: at most one stamp per oncePerDay
     // recipe per day, and the 32-entry load clamp bounds even a tampered row.
-    expect(s2.craftDaily?.crafted ?? []).toHaveLength(
-      ALL_RECIPES.filter((r) => r.oncePerDay).length,
-    );
+    // The floor throw is the file's re-check-the-fixture idiom: at zero
+    // flagged recipes the cap self-vacuates to toHaveLength(0) and the
+    // presence pin above cannot see an empty crafted array either.
+    const gatedRecipeCount = ALL_RECIPES.filter((r) => r.oncePerDay).length;
+    if (gatedRecipeCount === 0) {
+      throw new Error('no oncePerDay recipe in content; re-check the craftDaily fixture');
+    }
+    expect(s2.craftDaily?.crafted ?? []).toHaveLength(gatedRecipeCount);
     expect(Object.keys(s2.questedHobbies ?? {})).toHaveLength(ARCHETYPE_PAIR_TARGETS.length);
     // EXACT, not an upper bound: the fixture attunes every authored pair, so
     // a cap pin that tolerated fewer would pass on a normalizer that
@@ -457,7 +470,10 @@ describe('the professions blob growth bound (phase 16)', () => {
     // silently in either direction: a measurement drifting more than about
     // 160 bytes reds here and forces the note to be re-read.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(9728);
+    // The two-sided tracking band (see the bound's note): a re-measure
+    // obligation, not the structural ceiling below it.
+    expect(bytes).toBeGreaterThan(10064);
+    expect(bytes).toBeLessThan(10384);
     expect(bytes).toBeLessThanOrEqual(PROFESSIONS_BYTE_CEILING);
   });
 

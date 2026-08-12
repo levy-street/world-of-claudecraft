@@ -1,5 +1,7 @@
 // @vitest-environment happy-dom
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { pageFor } from '../src/guide/pages';
 import { GUIDE_ROUTES } from '../src/guide/routes';
@@ -111,6 +113,22 @@ describe('Guide route rendering', () => {
       expect(html?.match(/\bguide\.[a-zA-Z0-9_.]+/g) ?? [], `${label} leaked keys`).toEqual([]);
       expect(html?.match(/\{[a-zA-Z][a-zA-Z0-9_]*\}/g) ?? [], `${label} left a token`).toEqual([]);
     }
+  });
+
+  it('the catalyst recipe row renders the daily-gate badge, and the badge class has a live rule', () => {
+    setLanguage('en');
+    // The alchemy craft page carries recipe_quickening_catalyst, the one
+    // oncePerDay row; its badge must be present AND styled: class presence
+    // alone is blind to selector reach (the badge rendered glued to the item
+    // name while .guide-prof-combo had no rule anywhere), so the stylesheet
+    // half is pinned beside the markup half.
+    const page = pageFor('professions');
+    const html =
+      page?.render({ params: ['alchemy'], sub: 'professions', titleKey: 'guide.nav.classes' }) ??
+      '';
+    expect(html).toMatch(/class="guide-prof-combo"[^>]*>Once per day</);
+    const css = readFileSync(path.resolve(process.cwd(), 'src/guide/styles.css'), 'utf8');
+    expect(css).toMatch(/^\.guide-prof-combo \{/m);
   });
 
   it('keeps class and creature stills until an error swaps in their exact decorative crest', () => {

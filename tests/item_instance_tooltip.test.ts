@@ -11,8 +11,7 @@ import {
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
-import { isCommissionEligible } from '../src/sim/professions/commission';
-import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { isSignableMaterialRarity, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
   instanceBadgeLines,
   instanceBindingLines,
@@ -342,26 +341,35 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     }
   });
 
-  it('every SIGNABLE crafted output resolves to a crafted-kind def', () => {
-    // Narrowed at Masterwrought phase 07: the ten intermediates are the
-    // game's first crafted junk-kind outputs, and commission signing is
-    // equipment-only (professions/commission.ts), so the partition claim
-    // covers the SIGNED universe: every output that CAN carry a signer must
-    // read as crafted, and every crafted junk-kind output must stay
-    // commission-ineligible or the "Gathered by" mislabel goes live.
+  it('every crafted output the #1149 signing rule can stamp is a crafted-kind def', () => {
+    // Narrowed at Masterwrought phase 07, then re-aimed at the REAL axis by
+    // the scoped re-review: a crafted copy gains a signer through the
+    // def-QUALITY rule (isSignableMaterialRarity: rare and up,
+    // professions/crafting.ts) or the masterwork proc arm (needs a slot),
+    // NEVER through commission, which mints bindOnTrade only. So the guard
+    // pins quality: every crafted output at signable rarity must read as
+    // crafted-kind, and every crafted junk-kind output must sit BELOW
+    // signable rarity, or the "Gathered by" mislabel goes live the day a
+    // retune bumps an intermediate to rare.
     expect(ALL_RECIPES.length).toBeGreaterThan(0);
+    for (const recipe of ALL_RECIPES) {
+      expect(ITEMS[recipe.resultItemId], recipe.id).toBeDefined();
+    }
+    // 'poor' is definitionally below signable (MaterialRarity excludes it),
+    // so it short-circuits before the typed predicate.
+    const signableQuality = (q: (typeof ITEMS)[string]['quality']): boolean =>
+      q !== undefined && q !== 'poor' && isSignableMaterialRarity(q);
     const signable = ALL_RECIPES.filter((recipe) =>
-      isCommissionEligible(ITEMS[recipe.resultItemId]),
+      signableQuality(ITEMS[recipe.resultItemId].quality),
     );
     expect(signable.length).toBeGreaterThan(0);
     for (const recipe of signable) {
       const def = ITEMS[recipe.resultItemId];
-      expect(def, recipe.resultItemId).toBeDefined();
       expect(isGatheredProvenanceKind(def.kind), `${recipe.resultItemId} (${def.kind})`).toBe(
         false,
       );
     }
-    const craftedJunk = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId]?.kind === 'junk');
+    const craftedJunk = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId].kind === 'junk');
     expect(craftedJunk.map((r) => r.resultItemId).sort()).toEqual(
       [
         'duskforged_billet',
@@ -377,7 +385,11 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
       ].sort(),
     );
     for (const recipe of craftedJunk) {
-      expect(isCommissionEligible(ITEMS[recipe.resultItemId]), recipe.resultItemId).toBe(false);
+      const def = ITEMS[recipe.resultItemId];
+      expect(
+        signableQuality(def.quality),
+        `${recipe.resultItemId} must stay below signable rarity while kind junk`,
+      ).toBe(false);
     }
   });
 });
