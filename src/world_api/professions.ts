@@ -93,7 +93,11 @@ export interface CraftResultView {
     | 'station_required'
     // #2350: denied because the output (modeled after reagent consumption)
     // cannot fit the pooled bag budget.
-    | 'no_bag_space';
+    | 'no_bag_space'
+    // Masterwrought phase 07: denied because the recipe is oncePerDay and
+    // this character already crafted it inside the current reset-day window
+    // (server-private stamp; the player learns of the gate on attempt).
+    | 'daily_limit';
   // Professions 2.0: true only when the masterwork effect applied to
   // this craft's output. `quality` now reports the output def's static
   // quality (outputs are deterministic; the quality roll is retired).

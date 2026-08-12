@@ -1641,6 +1641,12 @@ export interface PlayerMeta {
   // (professions/masterwrought_materials.ts).
   wyrmfallDaily: { date: string; sources: Set<string> };
   emberWeekAnchor: string;
+  // Masterwrought phase 07: the oncePerDay craft gate's per-character stamp
+  // (professions/crafting.ts): which oncePerDay recipe ids resolved a
+  // successful craft inside the current reset-day window. Rolls on
+  // ctx.resetDay exactly like wyrmfallDaily above ('' = no calendar known,
+  // nothing rolls, so the gate degrades to one-shot per save).
+  craftDaily: { date: string; crafted: Set<string> };
   // Set synchronously when authoritative leave teardown begins, before its
   // first persistence await. Session-only: reward and lockout snapshots ignore
   // the departing player so no post-save mutation is discarded on removal.
@@ -1854,6 +1860,10 @@ export interface CharacterState {
   // serialization while at those defaults so untouched rows stay byte-equal.
   wyrmfallDaily?: { date: string; sources: string[] };
   emberWeekAnchor?: string;
+  // Masterwrought phase 07: the oncePerDay craft stamp. Optional and
+  // zero-default-omitted like wyrmfallDaily above, so saves that never
+  // crafted a daily-gated recipe stay byte-equal.
+  craftDaily?: { date: string; crafted: string[] };
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
@@ -3055,6 +3065,7 @@ export class Sim {
       heroicDaily: { date: '', marked: new Set() },
       wyrmfallDaily: { date: '', sources: new Set() },
       emberWeekAnchor: '',
+      craftDaily: { date: '', crafted: new Set() },
       deedsEarned: new Map(),
       deedStats: freshDeedStats(),
       activeTitle: null,
@@ -3486,6 +3497,27 @@ export class Sim {
           sources: new Set(
             Array.isArray(s.wyrmfallDaily.sources)
               ? s.wyrmfallDaily.sources
+                  .filter((x) => typeof x === 'string' && x.length <= 64)
+                  .slice(0, 32)
+              : [],
+          ),
+        };
+      }
+      // The oncePerDay craft stamp (Masterwrought phase 07): the exact clamps
+      // the wyrmfallDaily arm above applies (64-char cap on the date and on
+      // every token, 32-entry cap, type-checked), for the same reason: a
+      // tampered or corrupt row degrades here instead of throwing in
+      // addPlayer or riding back out through the save verbatim. Real recipe
+      // ids are short and the oncePerDay set is content-bounded near ten.
+      if (s.craftDaily) {
+        meta.craftDaily = {
+          date:
+            typeof s.craftDaily.date === 'string' && s.craftDaily.date.length <= 64
+              ? s.craftDaily.date
+              : '',
+          crafted: new Set(
+            Array.isArray(s.craftDaily.crafted)
+              ? s.craftDaily.crafted
                   .filter((x) => typeof x === 'string' && x.length <= 64)
                   .slice(0, 32)
               : [],
@@ -4296,6 +4328,17 @@ export class Sim {
           }
         : {}),
       ...(meta.emberWeekAnchor !== '' ? { emberWeekAnchor: meta.emberWeekAnchor } : {}),
+      // The oncePerDay craft stamp: zero-default omission like wyrmfallDaily
+      // above, so a character that never crafted a daily-gated recipe
+      // serializes byte-identically to a pre-phase-07 save.
+      ...(meta.craftDaily.date !== '' || meta.craftDaily.crafted.size > 0
+        ? {
+            craftDaily: {
+              date: meta.craftDaily.date,
+              crafted: [...meta.craftDaily.crafted],
+            },
+          }
+        : {}),
       mailWelcomed: meta.mailWelcomed,
       guildLetterSent: meta.guildLetterSent,
       // All three written only when non-empty/true (zero-default

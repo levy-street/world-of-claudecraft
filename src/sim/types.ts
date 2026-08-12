@@ -5935,7 +5935,11 @@ export type SimEvent = { pid?: number } & (
         | 'throttled'
         | 'busy'
         | 'station_required'
-        | 'no_bag_space';
+        | 'no_bag_space'
+        // Masterwrought phase 07: the recipe is oncePerDay and this
+        // character already crafted it inside the current reset-day window
+        // (professions/crafting.ts CraftResult.reason mirror).
+        | 'daily_limit';
     }
   // Enchanting profession outcomes (Professions 2.0): mirror
   // src/sim/professions/enchanting.ts DisenchantResult / ApplyEnchantResult and

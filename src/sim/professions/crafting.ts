@@ -199,6 +199,10 @@ export interface CraftResult {
     | 'throttled'
     | 'station_required'
     | 'no_bag_space'
+    // Masterwrought phase 07: the recipe is oncePerDay and this character
+    // already crafted it inside the current reset-day window (the
+    // PlayerMeta.craftDaily stamp; see craftDailyLimitReached below).
+    | 'daily_limit'
     | 'busy';
 }
 
@@ -424,10 +428,29 @@ export function meetsComboRequirement(
   }).ok;
 }
 
-/** Pre-consume craft admission gates (station, combo, known, materials, bag
- *  capacity). No gold fee, no consume, no rng, no throttle. Shared by craft
- *  cast start and the complete/resolve success body so the two never diverge.
- *  Returns a denial CraftResult, or null when admitted. */
+/** READ-ONLY oncePerDay stamp check (Masterwrought phase 07): whether the
+ *  recipe id is already stamped on PlayerMeta.craftDaily for the CURRENT
+ *  window. With a live realm calendar (nonempty ctx.resetDay) a stamp counts
+ *  only while its recorded date IS today; a host that never sets resetDay
+ *  (the headless RL env, replays) reads the stamp alone, the documented
+ *  one-shot degrade (the wyrmfallDaily contract in
+ *  professions/masterwrought_materials.ts). Deliberately side-effect-free:
+ *  a STALE window is left in place here (admission must not mutate), and
+ *  resolveCraftForRecipe rolls it at stamp time. Draws no rng. */
+function craftDailyLimitReached(
+  ctx: SimContext,
+  meta: PlayerMeta | undefined,
+  recipe: ProfessionRecipeRecord,
+): boolean {
+  if (!recipe.oncePerDay || !meta) return false;
+  if (ctx.resetDay !== '' && meta.craftDaily.date !== ctx.resetDay) return false;
+  return meta.craftDaily.crafted.has(recipe.id);
+}
+
+/** Pre-consume craft admission gates (station, combo, known, daily limit,
+ *  materials, bag capacity). No gold fee, no consume, no rng, no throttle.
+ *  Shared by craft cast start and the complete/resolve success body so the
+ *  two never diverge. Returns a denial CraftResult, or null when admitted. */
 export function evaluateCraftAdmission(
   ctx: SimContext,
   pid: number,
@@ -468,6 +491,14 @@ export function evaluateCraftAdmission(
   }
   if (!isRecipeKnown(meta, recipe)) {
     return { ok: false, recipeId: recipe.id, reason: 'recipe_not_learned' };
+  }
+  // Masterwrought phase 07 daily gate: a oncePerDay recipe refuses once its
+  // stamp is set for the current window. Because this admission is shared by
+  // cast start, the complete-side resolve, and the batch auto-continue, a
+  // batch stops itself here the moment the first craft lands the stamp.
+  // Read-only, no rng, no side effect on denial.
+  if (craftDailyLimitReached(ctx, meta, recipe)) {
+    return { ok: false, recipeId: recipe.id, reason: 'daily_limit' };
   }
   if (!hasRecipeMaterials(ctx, recipe, pid)) {
     return { ok: false, recipeId: recipe.id, reason: 'insufficient_materials' };
@@ -632,6 +663,18 @@ export function resolveCraftForRecipe(
     )) {
       ctx.removeItem(take.itemId, take.count, pid);
     }
+  }
+  // Masterwrought phase 07: the oncePerDay day STAMP, immediately after
+  // successful reagent consumption (the admission above is contractually
+  // side-effect-free, so the stamp lives on the resolve's success path).
+  // Roll the window first when the realm calendar moved since the last
+  // stamp, then record this recipe id; with no calendar ('' resetDay) the
+  // stamp never expires, the documented one-shot degrade. Draws no rng.
+  if (recipe.oncePerDay && meta) {
+    if (ctx.resetDay !== '' && meta.craftDaily.date !== ctx.resetDay) {
+      meta.craftDaily = { date: ctx.resetDay, crafted: new Set() };
+    }
+    meta.craftDaily.crafted.add(recipe.id);
   }
   // Jack of All Trades improviser variance roll (#1296): an ADDITIONAL
   // output-side draw, ONLY for a Jack-attuned crafter, positioned
@@ -864,7 +907,16 @@ export function maxCraftCountForRecipe(
 ): number {
   const meta = ctx.players.get(pid);
   const craftSkills = meta ? meta.craftSkills : {};
-  if (recipe.reagents.length === 0) return CRAFT_BATCH_MAX;
+  // Masterwrought phase 07: never promise a batch the resolve refuses. A
+  // oncePerDay recipe previews at most ONE craft, zero once today's stamp is
+  // set (the same read-only check the admission gate denies on), so the
+  // Create All affordance and the qty clamp can never overpromise.
+  const dailyCap = recipe.oncePerDay
+    ? craftDailyLimitReached(ctx, meta, recipe)
+      ? 0
+      : 1
+    : CRAFT_BATCH_MAX;
+  if (recipe.reagents.length === 0) return dailyCap;
   if (!meta) {
     // No meta resolves no inventory to simulate: keep the one-shot division
     // (no self-signed copy can exist without a meta, so it cannot drift).
@@ -880,7 +932,7 @@ export function maxCraftCountForRecipe(
       const have = countAcrossGrades(reagent.itemId, (id) => ctx.countItem(id, pid));
       max = Math.min(max, Math.floor(have / required));
     }
-    return Math.max(0, max);
+    return Math.min(Math.max(0, max), dailyCap);
   }
   // Simulate the batch craft by craft on a scratch copy, re-deriving each
   // craft's per-reagent requirement from the SCRATCH state: the #1145
@@ -922,7 +974,7 @@ export function maxCraftCountForRecipe(
     for (const take of takes) removeStacked(scratch, take.itemId, take.count);
     crafts++;
   }
-  return crafts;
+  return Math.min(crafts, dailyCap);
 }
 
 /** Clamp a requested batch count: default/invalid -> 1, floor, then
