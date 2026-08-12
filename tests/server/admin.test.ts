@@ -38,11 +38,13 @@ import {
   configureAdminPlayersCap,
   configureAdminRuntime,
   resetAdminDbForTests,
+  resetAdminGeneralChatRateLimitDepsForTests,
   resetAdminGuildBoardCacheBustForTests,
   resetAdminPlayersCapForTests,
   resetAdminRuntimeForTests,
   routes,
   setAdminDbForTests,
+  setAdminGeneralChatRateLimitDepsForTests,
 } from '../../server/admin';
 import { resetAdminGuildListReadsForTests } from '../../server/admin_guilds_read';
 import { characterProfessionsSheet } from '../../server/character_professions';
@@ -134,6 +136,7 @@ function installAdminRuntime(overrides: Partial<Record<keyof AdminRuntime, unkno
     muteAccountChat: vi.fn(),
     liftChatMuteLive: vi.fn(),
     resetChatStrikesLive: vi.fn(),
+    applyGeneralChatRateLimitLive: vi.fn(),
     reloadChatFilter: vi.fn(async () => {}),
     reloadBlockedIps: vi.fn(async () => {}),
     disconnectByIp: vi.fn(),
@@ -228,6 +231,10 @@ beforeEach(() => {
   resetRateLimits();
   resetAuthFailures();
   resetAdminDbForTests();
+  setAdminGeneralChatRateLimitDepsForTests({
+    set: async (input) => ({ before: null, after: input.rateLimit, changed: true }),
+    isAdminAccount: async () => false,
+  });
 });
 
 afterEach(() => {
@@ -235,6 +242,7 @@ afterEach(() => {
   resetAuthFailures();
   resetRateLimitClock();
   resetAdminDbForTests();
+  resetAdminGeneralChatRateLimitDepsForTests();
   resetAdminRuntimeForTests();
   resetAdminGuildBoardCacheBustForTests();
   resetAdminPlayersCapForTests();
@@ -1948,6 +1956,7 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
     const detail = {
       id: 5,
       username: 'bob',
+      generalChatRateLimit: { messages: 5, windowMinutes: 2 },
       lastLoginIp: '1.1.1.1',
       recentSessions: [{ ip: '2.2.2.2' }, { ip: null }],
     };
@@ -1969,7 +1978,10 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
     expect(r.body).toEqual({
       success: true,
       data: {
-        account: { ...detail, online: true },
+        account: {
+          ...detail,
+          online: true,
+        },
         reports: [{ id: 11 }],
         chat: { strikes: 1 },
         blockedIps: ['2.2.2.2'],
@@ -1994,7 +2006,9 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
   });
 
   it('accounts/:id merges the live online flag into the detail', async () => {
-    authedAdminDb({ accountDetail: async () => ({ id: 5, username: 'bob' }) });
+    authedAdminDb({
+      accountDetail: async () => ({ id: 5, username: 'bob', generalChatRateLimit: null }),
+    });
     installAdminRuntime({ liveAccountIds: vi.fn(() => new Set([5])) });
     const r = await runRoute('GET', '/admin/api/accounts/:id', {
       headers: { authorization: BEARER },
@@ -2002,7 +2016,7 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
     });
     expect(r.body).toEqual({
       success: true,
-      data: { id: 5, username: 'bob', online: true },
+      data: { id: 5, username: 'bob', generalChatRateLimit: null, online: true },
       error: null,
     });
   });

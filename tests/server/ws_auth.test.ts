@@ -12,6 +12,7 @@ import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WebSocket, WebSocketServer } from 'ws';
 import type { AccountModerationStatus, CharacterRow } from '../../server/db';
+import { GeneralChatRateLimitLiveState } from '../../server/general_chat_quota';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
@@ -75,6 +76,7 @@ function baseChar(over: Partial<CharacterRow> = {}): CharacterRow {
 function setup() {
   const ws = new FakeWs();
   const session = { pid: 1, tag: 'fake-session' };
+  const generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
   const game = {
     isIpBlocked: vi.fn((_ip: string) => false),
     countIpSessions: vi.fn((_ip: string) => 0),
@@ -85,6 +87,9 @@ function setup() {
     handleMessage: vi.fn(),
     leave: vi.fn(async () => {}),
     socketClosed: vi.fn(() => true),
+    beginGeneralChatRateLimitHydration: vi.fn((accountId: number) =>
+      generalChatRateLimitLiveState.beginHydration(accountId),
+    ),
   };
   const deps: WsAuthDeps = {
     game: game as unknown as WsAuthDeps['game'],
@@ -129,7 +134,7 @@ function setup() {
     maxPlayersPerRealm: 0,
   };
   const req = {} as http.IncomingMessage;
-  return { ws, game, session, deps, req };
+  return { ws, game, session, deps, req, generalChatRateLimitLiveState };
 }
 
 function joinedMeta(game: ReturnType<typeof setup>['game']): Record<string, unknown> {
@@ -843,6 +848,7 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
         mutedUntil: null,
         reason: '',
         chatStrikes: 0,
+        generalChatRateLimit: null,
         accountCosmetics: {
           completedQuestIds: [],
           mechChromaIds: [],
@@ -969,6 +975,69 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
       expect.objectContaining({ mutedUntil: '2099-01-01T00:00:00Z', reason: 'spam' }),
     );
   });
+
+  it('passes the General quota loaded by the existing moderation auth query into join', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.moderationStatusForAccount = vi.fn(async () =>
+      modStatus({ generalChatRateLimit: { messages: 7, windowMinutes: 15 } }),
+    );
+    await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(deps.moderationStatusForAccount).toHaveBeenCalledTimes(1);
+    expect(game.join).toHaveBeenCalledWith(
+      ws,
+      1,
+      7,
+      'Aldric',
+      'warrior',
+      null,
+      false,
+      expect.objectContaining({
+        generalChatRateLimit: { messages: 7, windowMinutes: 15 },
+      }),
+    );
+  });
+
+  it.each([
+    {
+      label: 'set',
+      hydrated: null,
+      committed: { messages: 3, windowMinutes: 8 },
+    },
+    {
+      label: 'clear',
+      hydrated: { messages: 7, windowMinutes: 15 },
+      committed: null,
+    },
+  ])(
+    'uses a committed $label notification that arrives during auth hydration',
+    async ({ hydrated, committed }) => {
+      const current = setup();
+      let resolveCharacter!: (character: CharacterRow | null) => void;
+      current.deps.moderationStatusForAccount = vi.fn(async () =>
+        modStatus({ generalChatRateLimit: hydrated }),
+      );
+      current.deps.getCharacter = vi.fn(
+        () =>
+          new Promise<CharacterRow | null>((resolve) => {
+            resolveCharacter = resolve;
+          }),
+      );
+      const authenticating = createWsAuth(current.deps).authenticateWebSocket(
+        asWs(current.ws),
+        authRaw(),
+        current.req,
+      );
+      await vi.waitFor(() =>
+        expect(current.deps.moderationStatusForAccount).toHaveBeenCalledOnce(),
+      );
+
+      current.generalChatRateLimitLiveState.policyChanged(1, committed);
+      resolveCharacter(baseChar());
+      await authenticating;
+
+      expect(joinedMeta(current.game).generalChatRateLimit).toEqual(committed);
+    },
+  );
 
   it('falls back to the chat-level mute when the account has no mute', async () => {
     const { ws, game, deps, req } = setup();

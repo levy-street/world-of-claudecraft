@@ -801,6 +801,11 @@ export const zh_TW: EnTranslations = {
       "resetAction": "重設",
       "note": "拖曳聊天標籤列可移動視窗，拖曳右下角控點可調整大小。重設可回復到預設位置與大小。"
     },
+    "chatQuota": {
+      "limitReached": "綜合聊天已達到上限。請在 {seconds} 後再試。",
+      "pending": "上一則綜合聊天訊息仍在傳送中。請稍候再試。",
+      "unavailable": "綜合聊天暫時無法使用。請稍後再試。"
+    },
     "swing": {
       "ready": "揮砍",
       "seconds": "{seconds}秒"

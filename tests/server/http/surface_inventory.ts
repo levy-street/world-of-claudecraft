@@ -1622,6 +1622,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/accounts\/(\d+)\/reset-password$/,
   },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/accounts/:id/general-chat-rate-limit',
+    handler: 'generalChatRateLimitMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/accounts\/(\d+)\/general-chat-rate-limit$/,
+  },
   // Account flair: the operator-set AI mark and an official streamer's links.
   {
     dispatcher: DISPATCH.admin,

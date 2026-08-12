@@ -5216,7 +5216,16 @@ export type SimEvent = { pid?: number } & (
       expiresAt: number;
       candidates: { pid: number; name: string }[];
     }
-  | { type: 'error'; text: string; reason?: ErrorReason }
+  | {
+      type: 'error';
+      text: string;
+      reason?: ErrorReason;
+      // Optional stable identity and data for server-authored error events.
+      // `text` remains the compatibility fallback for older or unknown clients.
+      code?: string;
+      channel?: string;
+      retryAfterSeconds?: number;
+    }
   | { type: 'questAccepted'; questId: string }
   | {
       type: 'questProgress';

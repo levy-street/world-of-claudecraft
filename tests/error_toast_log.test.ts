@@ -41,28 +41,35 @@ describe('error_toast_log: shouldMirrorErrorToast', () => {
 // own timing (1600ms fade) is untouched by this change.
 describe('hud.ts showError: mirrors into the chat log', () => {
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+  const showErrorBody = () =>
+    hud.match(/showError\(\s*text: string,[\s\S]*?\n {2}\): void \{[\s\S]*?\n {2}\}/)?.[0] ?? '';
 
   it('imports the pure error_toast_log helpers', () => {
     expect(hud).toContain("from './error_toast_log'");
   });
 
   it('calls log() with the mirrored text, guarded by shouldMirrorErrorToast', () => {
-    const match = hud.match(/showError\(text: string\): void \{[\s\S]*?\n {2}\}/);
-    expect(match, 'showError method not found').toBeTruthy();
-    const body = match?.[0] ?? '';
+    const body = showErrorBody();
+    expect(body, 'showError method not found').not.toBe('');
     expect(body).toContain('shouldMirrorErrorToast(localized, this.lastMirroredErrorText)');
-    expect(body).toContain('this.log(localized, ERROR_LOG_COLOR)');
+    expect(body).toContain(
+      'this.log(localized, ERROR_LOG_COLOR, undefined, logChannel, announceWhenFiltered)',
+    );
   });
 
   it('tracks the last mirrored text so consecutive repeats are suppressed', () => {
-    const match = hud.match(/showError\(text: string\): void \{[\s\S]*?\n {2}\}/);
-    const body = match?.[0] ?? '';
+    const body = showErrorBody();
     expect(body).toContain('this.lastMirroredErrorText = localized');
   });
 
+  it('routes filtered repeated quota feedback to the throttled live announcer', () => {
+    const body = showErrorBody();
+    expect(body).toContain('else if (announceWhenFiltered && localized.trim())');
+    expect(body).toContain('this.chatAnnouncer.push(localized, performance.now())');
+  });
+
   it('keeps the existing 1600ms toast fade timing unchanged', () => {
-    const match = hud.match(/showError\(text: string\): void \{[\s\S]*?\n {2}\}/);
-    const body = match?.[0] ?? '';
+    const body = showErrorBody();
     expect(body).toContain('}, 1600);');
   });
 });

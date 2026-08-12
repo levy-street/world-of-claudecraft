@@ -801,6 +801,11 @@ export const pl_PL: EnTranslations = {
       "resetAction": "Resetuj",
       "note": "Przeciągnij pasek zakładek czatu, aby przesunąć okno, lub uchwyt w rogu, aby zmienić jego rozmiar. Reset przywraca domyślną pozycję i rozmiar."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Zamach",
       "seconds": "{seconds}s"

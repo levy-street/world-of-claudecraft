@@ -5353,6 +5353,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatWindow.resetAction': '重設',
   'hudChrome.chatWindow.note':
     '拖曳聊天標籤列可移動視窗，拖曳右下角控點可調整大小。重設可回復到預設位置與大小。',
+  'hudChrome.chatQuota.limitReached': '綜合聊天已達到上限。請在 {seconds} 後再試。',
+  'hudChrome.chatQuota.pending': '上一則綜合聊天訊息仍在傳送中。請稍候再試。',
+  'hudChrome.chatQuota.unavailable': '綜合聊天暫時無法使用。請稍後再試。',
   'hudChrome.compass.E': '東',
   'hudChrome.compass.N': '北',
   'hudChrome.compass.NE': '東北',

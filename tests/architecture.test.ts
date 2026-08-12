@@ -213,6 +213,7 @@ const UI_PURE_CORES = [
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/equip_drop_core.ts',
+  'src/ui/general_chat_quota_view.ts',
   'src/ui/known_item.ts',
   'src/ui/log_event_route.ts',
   'src/ui/mob_idle_sfx.ts',

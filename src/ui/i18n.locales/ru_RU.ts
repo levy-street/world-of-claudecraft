@@ -5578,6 +5578,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatWindow.resetAction': 'Сбросить',
   'hudChrome.chatWindow.note':
     'Перетащите полосу вкладок чата, чтобы переместить окно, или угловой маркер, чтобы изменить размер. Сброс возвращает окно в положение и размер по умолчанию.',
+  'hudChrome.chatQuota.limitReached':
+    'Достигнут лимит общего чата. Повторите попытку через {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Предыдущее сообщение в общий чат ещё отправляется. Повторите попытку через мгновение.',
+  'hudChrome.chatQuota.unavailable':
+    'Общий чат временно недоступен. Повторите попытку позже.',
   'hudChrome.compass.E': 'В',
   'hudChrome.compass.N': 'С',
   'hudChrome.compass.NE': 'СВ',

@@ -69,6 +69,10 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     // Consumed by the mid-handshake death re-check on a socket that died
     // during the awaits; a live-socket fixture never reaches it.
     socketClosed: vi.fn(() => true),
+    beginGeneralChatRateLimitHydration: vi.fn(() => ({
+      resolve: (policy: unknown) => policy,
+      release: vi.fn(),
+    })),
   };
   const deps: any = {
     game,

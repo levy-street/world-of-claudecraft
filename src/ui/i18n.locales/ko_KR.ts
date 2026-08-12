@@ -5514,6 +5514,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatWindow.resetAction': '초기화',
   'hudChrome.chatWindow.note':
     '채팅 탭 줄을 드래그하면 창을 이동하고, 모서리 손잡이를 드래그하면 크기를 조절할 수 있습니다. 초기화하면 기본 위치와 크기로 돌아갑니다.',
+  'hudChrome.chatQuota.limitReached':
+    '일반 채팅 한도에 도달했습니다. {seconds} 후에 다시 시도하세요.',
+  'hudChrome.chatQuota.pending':
+    '이전 일반 채팅 메시지를 아직 보내는 중입니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.chatQuota.unavailable':
+    '일반 채팅은 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.compass.E': '동',
   'hudChrome.compass.N': '북',
   'hudChrome.compass.NE': '북동',

@@ -209,6 +209,11 @@ import { emailAccountCreated } from './email';
 import { stopEpicMirror } from './epic/mirror';
 import { GameServer } from './game';
 import {
+  closeGeneralChatQuotaPool,
+  createGeneralChatQuotaListener,
+  generalChatQuotaDbPoolState,
+} from './general_chat_quota_db';
+import {
   handleGitHubCallback,
   handleGitHubStart,
   handleGitHubStatus,
@@ -462,6 +467,10 @@ const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 // lazily instead of at module load.
 let gameInstance: GameServer | null = null;
 function liveGame(): GameServer {
+  // LISTEN uses its own dedicated connection and quota consumes use their own
+  // max-two pool. The coordinator cap equals that pool exactly, so it creates
+  // no pg waiters and leaves every shared-pool client to auth/save work. The
+  // constructor default keeps DB-mocked unit worlds independent from config.
   gameInstance ??= new GameServer();
   return gameInstance;
 }
@@ -3093,6 +3102,18 @@ export async function startServer(): Promise<http.Server> {
   await ensureSchema();
   await seedOAuthClients();
   const game = liveGame();
+  const generalChatQuotaListener = createGeneralChatQuotaListener({
+    activeAccountIds: () => [...game.liveAccountIds()],
+    onResync: (accountIds, policies) => game.resyncGeneralChatRateLimits(accountIds, policies),
+    onChange: (accountId, policy) => game.applyGeneralChatRateLimitLive(accountId, policy),
+    onError: (error) => console.error('general chat quota listener failed:', error),
+  });
+  // LISTEN commits before the initial bounded resync, so no policy edit can be
+  // lost between boot state and notifications. A boot failure is non-fatal:
+  // joins still carry fresh policy, and the listener owns its reconnect loop.
+  await generalChatQuotaListener
+    .start()
+    .catch((error) => console.error('general chat quota listener start failed:', error));
   // Inject the game-session methods the ported admin routes (server/admin.ts) call
   // for their live reads + side effects (adminStats/liveSessions/disconnectAccount/
   // muteAccountChat/reloadChatFilter/reloadBlockedIps/disconnectByIp/...), and the
@@ -3261,6 +3282,14 @@ export async function startServer(): Promise<http.Server> {
       total: Number(pool.totalCount) || 0,
       idle: Number(pool.idleCount) || 0,
       waiting: Number(pool.waitingCount) || 0,
+    }),
+    generalChatQuotaInFlight: () => game.generalChatQuotaInFlight(),
+    generalChatQuotaCachedAccounts: () => game.generalChatQuotaCachedAccounts(),
+    generalChatQuotaDbPool: () => generalChatQuotaDbPoolState(),
+    generalChatQuotaListener: () => ({
+      connected: generalChatQuotaListener.connected() ? 1 : 0,
+      reconnects: generalChatQuotaListener.reconnects(),
+      pendingRefreshes: generalChatQuotaListener.pendingRefreshes(),
     }),
     lastTickAt: () => game.lastTickAt(),
     loopStartedAt: () => game.loopStartedAt(),
@@ -3459,6 +3488,7 @@ export async function startServer(): Promise<http.Server> {
     // Same rationale for the retention sweep: an in-flight prune batch must not
     // race the pool close below.
     await retentionSweep.stop();
+    await generalChatQuotaListener.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();
@@ -3504,6 +3534,7 @@ export async function startServer(): Promise<http.Server> {
     );
     await game.parseCapture.stop();
     await game.chatLog.stop();
+    await closeGeneralChatQuotaPool();
     await pool.end();
     process.exit(0);
   };

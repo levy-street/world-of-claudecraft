@@ -5538,6 +5538,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatWindow.resetAction': 'リセット',
   'hudChrome.chatWindow.note':
     'チャットのタブ列をドラッグするとウィンドウを移動でき、右下のグリップをドラッグするとサイズを変更できます。リセットすると既定の位置とサイズに戻ります。',
+  'hudChrome.chatQuota.limitReached':
+    '一般チャットの上限に達しました。{seconds}後にもう一度お試しください。',
+  'hudChrome.chatQuota.pending':
+    '直前の一般チャットのメッセージは送信中です。少し待ってからもう一度お試しください。',
+  'hudChrome.chatQuota.unavailable':
+    '一般チャットは一時的に利用できません。しばらくしてからもう一度お試しください。',
   'hudChrome.compass.E': '東',
   'hudChrome.compass.N': '北',
   'hudChrome.compass.NE': '北東',

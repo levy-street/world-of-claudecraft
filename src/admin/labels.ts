@@ -69,6 +69,7 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   unblock: 'moderationHistory.actionIpUnblock',
   reactivate: 'moderationHistory.actionReactivate',
   chat_strikes_reset: 'moderationHistory.actionResetChatStrikes',
+  general_chat_rate_limit: 'moderationHistory.actionGeneralChatRateLimit',
   // R35 GM restores: audited but not punitive, so they stay on the neutral
   // badge variant (the set_ai / note reasoning).
   restore_item: 'moderationHistory.actionRestoreItem',
