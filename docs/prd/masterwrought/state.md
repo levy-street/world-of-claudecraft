@@ -1792,8 +1792,16 @@ Grandmaster-craft family, generic by construction.
   key (model, tint, tintStrength) is blind to attach changes, so an attach edit
   can silently split poster from viewer; a swap-slot base entry needs swapOnly or
   the guide showcases it.
-- GATE: gate_select PASS all 8 steps at the final tip (recorded in progress.md);
-  npx tsc clean; ci:changed clean (warnings only). Validation surface: the three
+- GATE: gate_select PASS all 8 steps at the final tip dab8d9d579 via the
+  full-suite fallback (36772 passed / 2665 files, browser suite 117, tsc, all
+  builds), tree clean; ci:changed clean (warnings only). Operational note: two
+  prior runs of the same gate on the same tip went red PURELY on timeout flakes
+  (12 heavy balance/world harness files, zero assertion failures, every file
+  solo-green afterward) while the host sat at load average 98 to 110 under a
+  concurrent session and an xrOS simulator; the pass came on the quiet machine
+  with GATE_MAX_WORKERS=5, the worker bound the harness budgets are calibrated
+  against. A loaded-machine gate red made only of harness timeouts is judged by
+  solo re-runs, then re-gated bounded, not chased as a regression. Validation surface: the three
   inscription suites, tome assets, held_weapon_models, elixir_tooltip_view,
   market_filters, bags_view, bag_filter, consumable_bar_view, recipe_economy,
   itemization_coverage, item_level(+requirements), shipped_item_ids, architecture,
