@@ -16,7 +16,7 @@
 | 06 QA | verify | complete | 2026-08-11 | 2026-08-11 |
 | 07 | Intermediates and the Quickening Catalyst | complete | 2026-08-11 | 2026-08-12 |
 | 07 QA | verify | complete | 2026-08-12 | 2026-08-12 |
-| 08 | Apex armor catalogs | pending | | |
+| 08 | Apex armor catalogs | in_progress | 2026-08-12 | |
 | 08 QA | verify | pending | | |
 | 09 | Apex weapons, jewelry, gadgets | pending | | |
 | 09 QA | verify | pending | | |

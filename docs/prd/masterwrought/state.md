@@ -228,7 +228,9 @@ Grandmaster-craft family, generic by construction.
   A SINGLE-LINE ternary IS visible (the `ert` regex); the original "cannot see a
   ternary" wording was wrong.
 - Open items: JC/inscription station decision (phase 05/06); slot coverage audit results
-  (phase 08); web-verified name confirmations (each content phase); tooltip does not yet
+  (phase 08: RECORDED, see the Phase 08 pre-authoring ledger below; picks are
+  mail waist/legs/feet, leather chest/legs/gloves, cloth chest/legs/gloves);
+  web-verified name confirmations (each content phase); tooltip does not yet
   state the legendary sub-cap, add the line when promotion makes it reachable (phase
   13/14); `rolled.quality` is RETIRED for new writes (crafting.ts), so the Perfecting or
   promotion phase must pick the field that carries instance legendary before the craft
@@ -2195,3 +2197,85 @@ Grandmaster-craft family, generic by construction.
 - NEXT: Phase 08 (apex armor catalogs) in a fresh session per the cadence,
   its own release sync first. Phase 08 authors against the demand math above
   and pays the per-id allowlist removal obligations as each consumer lands.
+
+## Phase 08 pre-authoring ledger (slot coverage audit, 2026-08-12, recorded BEFORE any item row)
+- METHOD: deterministic sweep, not greps: an esbuild-bundled script imported the merged
+  `ITEMS` table plus `itemLevel` (src/sim/item_level.ts) and grouped every epic and
+  legendary `kind: 'armor'` def by (armorType, slot), classifying source by membership:
+  HEROIC_ITEMS, RETIRED_HEROIC_ITEMS, the nythraxis raid mob loot list, RIFT_EPIC_ITEM_IDS,
+  HEROIC_VENDOR_ITEMS, WARFARE_ITEMS, heroicOf variants. Coverage band: acquirable PvE
+  epics at item level 29 or higher (raid 29, heroic five-man 31, rift clear 31). Counting
+  rules: a heroic variant counts as its base identity (same drop, upgraded); the four
+  RETIRED_HEROIC_ITEMS count as uncovered (not acquirable); PvP honor gear is excluded
+  (honor currency, pvp-rating stat shape, not the PvE progression the apex band competes
+  in); defs with no derivable item level (sunken_reliquary_hood, siltstep_leggings,
+  blackwater_vanguard_chest) are excluded as unobtainable legacy. The heroic vendor sells
+  jewelry only, so it contributes zero armor coverage (swept, confirmed).
+- COVERAGE COUNTS (acquirable PvE epics, ilvl 29+, per armorType x slot):
+  - mail: helmet 4 (crownforged_dreadhelm, stormcallers_crown, cryptplate_helm,
+    choirmothers_casque), shoulder 4 (crownforged_warspaulders, stormcallers_spaulders,
+    mistforged_pauldrons, choir_blessed_spaulders), chest 3 (emberforged_bulwark,
+    morthens_cryptforged_hauberk, sunbone_ritual_hauberk), gloves 2 (gravewyrm_claws,
+    wyrmchoir_handwraps), WAIST 1 (gravescale_girdle), LEGS 1 (bloodmane_war_legguards),
+    FEET 1 (tideworn_warboots).
+  - leather: helmet 3 (nighttalon_crown, stormsunder_hood, tideguard_faceguard),
+    shoulder 3 (nighttalon_shoulderguards, stormbark_mantle, tidebound_spaulders),
+    CHEST 2 (basin_stalkers_tunic, verdant_heart_vestment; the slot also lost
+    scourgehide_carapace to retirement), waist 2 (bonechill_cord, lunarward_cinch),
+    feet 2 (bonechill_striders, dreamroot_boots), LEGS 1 (tidewoven_trousers),
+    GLOVES 1 (sanctum_prowlers_grips).
+  - cloth: shoulder 3 (soulflame_mantle, sunken_court_mantle, voidweave_mantle),
+    helmet 2 (soulflame_cowl, sunbone_oracles_crown), CHEST 1 (shroud_of_the_gravewyrm),
+    waist 1 (sash_of_the_sunken_court), LEGS 1 (lunar_choir_leggings),
+    GLOVES 1 (shadowpulse_handwraps), feet 1 (shadowpulse_slippers).
+- SLOT PICKS (weakest-covered first; ties broken by exact-31 depth, then retirement
+  holes, then budget impact, then the plan default):
+  - armorcrafting (mail): WAIST, LEGS, FEET (all at 1). OVERRIDES the plan default
+    chest/legs/waist: mail chest is the best-covered mail body slot (3).
+  - leatherworking (leather): LEGS, GLOVES (both at 1), CHEST (third pick: the 2-count
+    tie among chest/waist/feet breaks to chest on the retirement hole and the largest
+    budget, 22 vs 15 vs 14). OVERRIDES the plan default chest/shoulders/feet.
+  - tailoring (cloth): CHEST, LEGS, GLOVES (five slots tie at 1; the three largest
+    budgets are chest 22 and legs 20, then gloves ties waist at 15 and feet at 14 sits
+    below; the plan default settles the gloves-vs-waist tie). CONFIRMS the plan default
+    (robe is `slot: 'chest'`; there is no robe slot).
+- ARCHETYPE GAPS inside the picked slots (the stat-shape steer; band = ilvl 29+):
+  int-mail has ZERO coverage at waist, legs, and feet (shaman casters cannot fill those
+  slots at the band at all); str-mail has exactly 1 in each. Caster-leather (int/spi)
+  has ZERO at legs and gloves; agi-leather has exactly 1 in each. Cloth is single
+  archetype (int). STAT-SHAPE RULE for the authoring slices: each craft covers BOTH
+  wearer archetypes of its armor class; zero-coverage archetype cells are filled first;
+  the largest-budget slot goes to the armor class's majority archetype (deterministic
+  crafted access beside the lone RNG drop). Applied: mail legs str/sta (majority,
+  2 of 3 mail classes), mail waist int, mail feet int; leather chest agi/sta (majority),
+  leather legs int/spi, leather gloves int; cloth all int-based with the spi/sta split
+  and ratings decided per the heroic policy (healer-facing pieces never take Hit).
+- BUDGETS (law, primaryStatBudget at ilvl 31 epic): chest 22, legs 20, waist 15,
+  gloves 15, feet 14. Ratings: the whole 31 band carries exactly ONE rating at 40
+  (heroic_loot.ts ARMOR_RATING, rift RIFT_ARMOR_RATING); every apex piece takes exactly
+  one of hit/crit/haste at 40, pinned literally in the new sweep test. Armor values are
+  copied from the same-band same-slot same-armorType reference piece (every picked cell
+  has an ilvl-31 reference), never invented.
+- SHIELD OBSERVATION (recorded, out of scope): mail offhand has a single raid shield
+  (bonewrought_bulwark); a crafted shield is a real gap but blockValue has no
+  formula-derived budget, so it fails this phase's every-budget-formula-derived bar;
+  left for a future ruling.
+- REAGENT BILLS (quantities recorded per the acceptance criteria; uniform per craft,
+  the binding cost is the 3 catalyst-days per piece from the phase 07 demand math):
+  every apex armor recipe consumes exactly 3 of its own profession's intermediate
+  (demand-math law) plus 2 wyrmfall_core plus the craft's gathered family:
+  armorcrafting = forgefold_plating x3, wyrmfall_core x2, thorium_ore x4, iron_ore x2;
+  leatherworking = wyrmhide_cording x3, wyrmfall_core x2, rough_hide x4,
+  pristine_hide x1; tailoring (3 pieces AND the bag) = sunspun_bolt x3, wyrmfall_core x2,
+  spider_silk x4, pristine_silk x1. Wyrmfall sizing rationale: 2 per piece keeps the
+  core a raid/heroic tie without displacing the catalyst as the pacing gate (a raid
+  mints 1 to 3 per member per clear day plus the 12-mark vendor valve). Recipe fields:
+  level 25, skillReq 100 (R13), itemLevelBudget 25 (gold fee only), acquisition
+  ['drop'] (R8; patterns land phase 11), stationType per craft (forge, tannery, loom,
+  keeping the per-craft wiki station field unanimous), resultCount 1, no oncePerDay.
+  sellValue: strictly below input value per the recipe economy invariant (the
+  jewelcrafting precedent; vendor value is not power).
+- BAG: the tailoring apex bag ships bagSlots 16, one step past the shipped ceiling
+  (mistcallers_duffel, epic, 14) on the established 2-slot quality ladder
+  (6/8/10/12/14), epic quality, tradable, NO masterwrought flag, no item level
+  (kind bag is not item-level eligible).
