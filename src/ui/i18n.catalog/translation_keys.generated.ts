@@ -5361,6 +5361,8 @@ export type TranslationKeyFlat =
   | 'guide.gear.fishingTitle'
   | 'guide.gear.intro'
   | 'guide.gear.itemLevelBody'
+  | 'guide.gear.masterwroughtBody'
+  | 'guide.gear.masterwroughtTitle'
   | 'guide.gear.offhandBody'
   | 'guide.gear.qualityBody'
   | 'guide.gear.qualityCommon'
