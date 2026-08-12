@@ -696,10 +696,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // was retaken.
 // Re-minted after the custom-shader dedupe signature fix changed
 // prewarm_policy.ts. No capture was retaken.
+// Re-minted for the phase 07 merge of release/v0.37.0 into
+// feature/masterwrought: both sides re-minted since the common base (the
+// release's Three.js audit batch moved renderer.ts, prewarm_policy.ts, and
+// the three.js patch; this branch's phase 06 tome wiring moved the prop GLB
+// leaves), so all three literals mint to values matching neither parent.
+// No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '302970d4d1fcf82f530ef5c17889195d7dd038794abe59b74f1076c15f9f6eb1';
+  '6756154834f6bd6a4f17278c2d823f0d9e9ff00b9b9d15cb9cbb58689a6948af';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a40c99bd60b3cd1bea3ddbd2a7e92b1fbd470e435ca04f7a53595cfa39a3a765';
+  '5a0dfcf8a0646203f14f1576f525fd7ad2e47413c8c944b6d83aa8b4accba8bd';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1633,10 +1639,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // retaken.
     // Re-minted after the custom-shader dedupe signature fix changed
     // prewarm_policy.ts. No capture was retaken.
+    // Re-minted for the phase 07 merge of release/v0.37.0 into
+    // feature/masterwrought: both parents moved provenance inputs (the
+    // release's Three.js audit batch, this branch's phase 06 tome GLB
+    // leaves), so the merged tree mints a value matching neither parent.
+    // No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('50cbe7fe461695b031c8db870543fbad0db745476a9e8c1219cb0f4aa3a18f75');
+    ).toBe('e3895eb5ef96cbf36b649d4fb9517eee441cb339d0e65e509a64aeb2d1600466');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

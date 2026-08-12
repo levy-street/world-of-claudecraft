@@ -118,8 +118,13 @@ interface AttributionTargetFixture {
 // was retaken.
 // Re-minted after the custom-shader dedupe signature fix changed
 // prewarm_policy.ts. No capture was retaken.
+// Re-minted for the phase 07 merge of release/v0.37.0 into
+// feature/masterwrought: both sides re-minted since the common base (the
+// release's Three.js audit batch, this branch's phase 06 tome GLB leaves),
+// so the merged tree mints a value matching neither parent. No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a40c99bd60b3cd1bea3ddbd2a7e92b1fbd470e435ca04f7a53595cfa39a3a765';
+  '5a0dfcf8a0646203f14f1576f525fd7ad2e47413c8c944b6d83aa8b4accba8bd';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
