@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "fea3aff0",
+      "state": "9c6184fd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -43,6 +43,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -155,7 +156,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "3e4c26cb",
+      "state": "ebea34e4",
       "events": "2953a226",
       "rng": {
         "draws": 2,
@@ -182,6 +183,7 @@
           "counters": {
             "xpGained": 36
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -335,7 +337,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 964,
-      "state": "fca215da",
+      "state": "6c4c0eb1",
       "events": "4be0fb68",
       "rng": {
         "draws": 4,
@@ -362,6 +364,7 @@
           "counters": {
             "xpGained": 72
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -524,7 +527,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "ab93e911",
+      "state": "bb44f436",
       "events": "6c52f970",
       "rng": {
         "draws": 6,
@@ -551,6 +554,7 @@
           "counters": {
             "xpGained": 108
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -723,7 +727,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "71430ffe",
+      "state": "8f75035d",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -750,6 +754,7 @@
           "counters": {
             "xpGained": 108
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},

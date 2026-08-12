@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "fea3aff0",
+      "state": "9c6184fd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -41,6 +41,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -153,7 +154,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 973,
-      "state": "fc69dcf7",
+      "state": "3e8492a4",
       "events": "8dd68324",
       "rng": {
         "draws": 5,
@@ -164,7 +165,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 973,
-      "state": "829deb80",
+      "state": "b51fb5df",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -175,7 +176,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 973,
-      "state": "58b4eeaf",
+      "state": "0fb200ac",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -186,7 +187,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 973,
-      "state": "e24df252",
+      "state": "aa2b8fa5",
       "events": "cc147418",
       "rng": {
         "draws": 5,
@@ -197,7 +198,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 973,
-      "state": "13ec979e",
+      "state": "19192a61",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -208,7 +209,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 973,
-      "state": "d3b7cc09",
+      "state": "1f557072",
       "events": "53f58c86",
       "rng": {
         "draws": 8,
@@ -219,7 +220,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 973,
-      "state": "5640195d",
+      "state": "e75ea436",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -230,7 +231,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 973,
-      "state": "0c3869d5",
+      "state": "09000a5e",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -241,7 +242,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 973,
-      "state": "0c3869d5",
+      "state": "09000a5e",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -268,6 +269,7 @@
             "companion_tessa": 2
           },
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -488,7 +490,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 973,
-      "state": "9e0bb074",
+      "state": "7c2b08f3",
       "events": "29f9a377",
       "rng": {
         "draws": 16,
@@ -515,6 +517,7 @@
             "companion_tessa": 2
           },
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -736,7 +739,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 973,
-      "state": "51647bb6",
+      "state": "6a0513a9",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -747,7 +750,7 @@
       "tick": 49,
       "time": 2.45,
       "nextId": 973,
-      "state": "086a9f27",
+      "state": "8de7d594",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -774,6 +777,7 @@
             "companion_tessa": 2
           },
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -938,7 +942,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 973,
-      "state": "2b6851c7",
+      "state": "37f97074",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -949,7 +953,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 973,
-      "state": "2f7626a2",
+      "state": "1e3db735",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -976,6 +980,7 @@
             "companion_tessa": 2
           },
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1141,7 +1146,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 973,
-      "state": "2f7626a2",
+      "state": "1e3db735",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1168,6 +1173,7 @@
             "companion_tessa": 2
           },
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},

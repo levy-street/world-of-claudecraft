@@ -34,7 +34,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "9c9312f6",
+      "state": "1299e615",
       "events": "9261b860",
       "rng": {
         "draws": 6,
@@ -58,6 +58,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -118,6 +119,7 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -180,6 +182,7 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -240,6 +243,7 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -300,6 +304,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -858,7 +863,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "93f8ffd1",
+      "state": "79c21a80",
       "events": "68d0140d",
       "rng": {
         "draws": 6,
@@ -882,6 +887,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -942,6 +948,7 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1006,6 +1013,7 @@
           "counters": {
             "damageDealt": 105
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -1069,6 +1077,7 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1129,6 +1138,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1705,7 +1715,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 972,
-      "state": "30104ec3",
+      "state": "0a747c0e",
       "events": "63d2697d",
       "rng": {
         "draws": 10,
@@ -1716,7 +1726,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 972,
-      "state": "4824083f",
+      "state": "180e0a1a",
       "events": "63d2697d",
       "rng": {
         "draws": 10,
@@ -1740,6 +1750,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1800,6 +1811,7 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1864,6 +1876,7 @@
           "counters": {
             "damageDealt": 105
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -1927,6 +1940,7 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1987,6 +2001,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},

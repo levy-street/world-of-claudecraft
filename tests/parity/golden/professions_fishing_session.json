@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "fea3aff0",
+      "state": "9c6184fd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -43,6 +43,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -155,7 +156,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "207d8480",
+      "state": "ffd95287",
       "events": "9988cb27",
       "rng": {
         "draws": 1,
@@ -180,6 +181,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -302,7 +304,7 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 964,
-      "state": "633ab37d",
+      "state": "8b99bec6",
       "events": "affa4108",
       "rng": {
         "draws": 1,
@@ -327,6 +329,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -449,7 +452,7 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 964,
-      "state": "227722e3",
+      "state": "8ba35486",
       "events": "cffa3816",
       "rng": {
         "draws": 2,
@@ -474,6 +477,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -606,7 +610,7 @@
       "tick": 99,
       "time": 4.95,
       "nextId": 964,
-      "state": "f21af68c",
+      "state": "57d2af99",
       "events": "943b953c",
       "rng": {
         "draws": 3,
@@ -631,6 +635,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},

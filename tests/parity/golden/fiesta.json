@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 967,
-      "state": "0cf6c851",
+      "state": "7b5537d7",
       "events": "6a2f178b",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 967,
-      "state": "6816c26e",
+      "state": "596c8a64",
       "events": "224cbfd9",
       "rng": {
         "draws": 66,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 967,
-      "state": "92bfee1c",
+      "state": "e0949e0a",
       "events": "969ec561",
       "rng": {
         "draws": 247,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "8f0b43ed",
+      "state": "c22a1683",
       "events": "507341c9",
       "rng": {
         "draws": 485,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 967,
-      "state": "15e772e6",
+      "state": "5ba77b84",
       "events": "ada54ef3",
       "rng": {
         "draws": 755,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 967,
-      "state": "fff4b85b",
+      "state": "d13ca3d1",
       "events": "741638a5",
       "rng": {
         "draws": 1038,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 967,
-      "state": "c82e5fc8",
+      "state": "d9d516ae",
       "events": "8945b220",
       "rng": {
         "draws": 1176,
@@ -122,6 +122,7 @@
           "counters": {
             "kills": 1
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -197,6 +198,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -273,6 +275,7 @@
           "counters": {
             "deaths": 1
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -346,6 +349,7 @@
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},

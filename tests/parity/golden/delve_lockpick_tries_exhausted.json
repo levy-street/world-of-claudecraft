@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "b86617fe",
+      "state": "a9fe1231",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -41,6 +41,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -148,7 +149,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 978,
-      "state": "eb9db3f2",
+      "state": "adef2ca9",
       "events": "682fd366",
       "rng": {
         "draws": 3,
@@ -159,7 +160,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 978,
-      "state": "7a127ac4",
+      "state": "cf5ba4d7",
       "events": "cc147418",
       "rng": {
         "draws": 3,
@@ -170,7 +171,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 978,
-      "state": "78c2c6ea",
+      "state": "db5c7811",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -181,7 +182,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 978,
-      "state": "23fbb188",
+      "state": "3f8580db",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -192,7 +193,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 978,
-      "state": "68b10892",
+      "state": "ee929009",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -203,7 +204,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 978,
-      "state": "918639b4",
+      "state": "518da347",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -214,7 +215,7 @@
       "tick": 69,
       "time": 3.45,
       "nextId": 979,
-      "state": "91ecb356",
+      "state": "4ab52a9f",
       "events": "af3f35f7",
       "rng": {
         "draws": 5,
@@ -244,6 +245,7 @@
             "kills": 1,
             "xpGained": 898
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -427,7 +429,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 979,
-      "state": "ddb91df8",
+      "state": "4fc807cd",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -438,7 +440,7 @@
       "tick": 71,
       "time": 3.55,
       "nextId": 979,
-      "state": "092b07ce",
+      "state": "4848d567",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -468,6 +470,7 @@
             "kills": 1,
             "xpGained": 898
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {

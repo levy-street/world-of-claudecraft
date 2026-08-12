@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "b86617fe",
+      "state": "a9fe1231",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -40,6 +40,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -147,7 +148,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "a8e3fc94",
+      "state": "e1c24ab3",
       "events": "893cac82",
       "rng": {
         "draws": 12,
@@ -158,7 +159,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "265c429f",
+      "state": "5921e0b4",
       "events": "59b62fa6",
       "rng": {
         "draws": 19,
@@ -169,7 +170,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "2833309c",
+      "state": "8912a851",
       "events": "8c849a9d",
       "rng": {
         "draws": 162,
@@ -180,7 +181,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 965,
-      "state": "483621b4",
+      "state": "584c5fb9",
       "events": "741638a5",
       "rng": {
         "draws": 249,
@@ -208,6 +209,7 @@
             "damageDealt": 104,
             "damageTaken": 8
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {

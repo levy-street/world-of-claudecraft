@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "8d02cbbb",
+      "state": "77205d0e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,6 +60,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -172,7 +173,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "ead7f86a",
+      "state": "cce4b4e9",
       "events": "a005f741",
       "rng": {
         "draws": 0,
@@ -197,6 +198,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -319,7 +321,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "9d1192e6",
+      "state": "d77421f7",
       "events": "f03ad83d",
       "rng": {
         "draws": 0,
@@ -344,6 +346,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -480,7 +483,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "abb7f0dd",
+      "state": "b0205588",
       "events": "67742213",
       "rng": {
         "draws": 0,
@@ -505,6 +508,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -641,7 +645,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "b24d52a9",
+      "state": "7792e8f0",
       "events": "5ae2a56a",
       "rng": {
         "draws": 0,
@@ -666,6 +670,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -805,7 +810,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "0743b579",
+      "state": "ce4230ee",
       "events": "6024a757",
       "rng": {
         "draws": 0,
@@ -830,6 +835,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -982,7 +988,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "525e9ad0",
+      "state": "8eb23957",
       "events": "bf90a36a",
       "rng": {
         "draws": 0,
@@ -1007,6 +1013,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1155,7 +1162,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "b3ec370d",
+      "state": "8f87710c",
       "events": "cb1a432d",
       "rng": {
         "draws": 0,
@@ -1180,6 +1187,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1339,7 +1347,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "72e06894",
+      "state": "727c651f",
       "events": "ff257c49",
       "rng": {
         "draws": 0,
@@ -1364,6 +1372,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1527,7 +1536,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "58a2a31f",
+      "state": "4a5da112",
       "events": "cd1eb7e0",
       "rng": {
         "draws": 0,
@@ -1552,6 +1561,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1720,7 +1730,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "d9ea2984",
+      "state": "9a63b91b",
       "events": "c9308034",
       "rng": {
         "draws": 0,
@@ -1745,6 +1755,7 @@
           "companionUpgrades": {},
           "copper": 714,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1919,7 +1930,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e1635a0f",
+      "state": "d3a862ca",
       "events": "0dc07402",
       "rng": {
         "draws": 0,
@@ -1944,6 +1955,7 @@
           "companionUpgrades": {},
           "copper": 720,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -2123,7 +2135,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "ce1ea93a",
+      "state": "35925e19",
       "events": "54f870b1",
       "rng": {
         "draws": 0,
@@ -2148,6 +2160,7 @@
           "companionUpgrades": {},
           "copper": 716,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -2323,7 +2336,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "ce1ea93a",
+      "state": "35925e19",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2348,6 +2361,7 @@
           "companionUpgrades": {},
           "copper": 716,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},

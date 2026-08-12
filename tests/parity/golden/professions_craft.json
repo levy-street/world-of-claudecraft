@@ -19,7 +19,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "9410fa57",
+      "state": "6cc09a6a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -43,6 +43,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -155,7 +156,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "d32d69a6",
+      "state": "56e1fef1",
       "events": "88c1187c",
       "rng": {
         "draws": 0,
@@ -179,6 +180,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -295,7 +297,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "20bc44f2",
+      "state": "19a5c61f",
       "events": "1c2f4eb7",
       "rng": {
         "draws": 1,
@@ -321,6 +323,7 @@
           "counters": {
             "xpGained": 24
           },
+          "craftDaily": {},
           "craftSkills": {
             "alchemy": 1
           },
@@ -455,7 +458,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "207eece0",
+      "state": "32229f57",
       "events": "247eea32",
       "rng": {
         "draws": 2,
@@ -488,6 +491,7 @@
           "counters": {
             "xpGained": 24
           },
+          "craftDaily": {},
           "craftSkills": {
             "alchemy": 1,
             "tailoring": 200
@@ -679,7 +683,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "aefce3a3",
+      "state": "943f51e8",
       "events": "1c2f4eb7",
       "rng": {
         "draws": 3,
@@ -712,6 +716,7 @@
           "counters": {
             "xpGained": 48
           },
+          "craftDaily": {},
           "craftSkills": {
             "alchemy": 2,
             "tailoring": 200
@@ -901,7 +906,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "f0015761",
+      "state": "b39391b6",
       "events": "cff806af",
       "rng": {
         "draws": 3,
@@ -934,6 +939,7 @@
           "counters": {
             "xpGained": 48
           },
+          "craftDaily": {},
           "craftSkills": {
             "alchemy": 2,
             "tailoring": 200
@@ -1140,7 +1146,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "f0015761",
+      "state": "b39391b6",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -1173,6 +1179,7 @@
           "counters": {
             "xpGained": 48
           },
+          "craftDaily": {},
           "craftSkills": {
             "alchemy": 2,
             "tailoring": 200

@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 966,
-      "state": "81db34d6",
+      "state": "3ef74665",
       "events": "1accf9fb",
       "rng": {
         "draws": 0,
@@ -54,6 +54,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -113,6 +114,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -175,6 +177,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -394,7 +397,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 966,
-      "state": "81db34d6",
+      "state": "3ef74665",
       "events": "ae6e5eed",
       "rng": {
         "draws": 0,
@@ -418,6 +421,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -477,6 +481,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -539,6 +544,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -758,7 +764,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 966,
-      "state": "81db34d6",
+      "state": "3ef74665",
       "events": "ccfd4f44",
       "rng": {
         "draws": 0,
@@ -782,6 +788,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -841,6 +848,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -903,6 +911,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1122,7 +1131,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 966,
-      "state": "81db34d6",
+      "state": "3ef74665",
       "events": "a324a175",
       "rng": {
         "draws": 0,
@@ -1146,6 +1155,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -1205,6 +1215,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -1267,6 +1278,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1486,7 +1498,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 966,
-      "state": "81db34d6",
+      "state": "3ef74665",
       "events": "b7048a7d",
       "rng": {
         "draws": 0,
@@ -1510,6 +1522,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -1569,6 +1582,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -1631,6 +1645,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1850,7 +1865,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 966,
-      "state": "81db34d6",
+      "state": "3ef74665",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1874,6 +1889,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -1933,6 +1949,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -1995,6 +2012,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},

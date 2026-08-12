@@ -21,7 +21,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "fea3aff0",
+      "state": "9c6184fd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -46,6 +46,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -158,7 +159,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "7310e80a",
+      "state": "e059d39b",
       "events": "a9ac9759",
       "rng": {
         "draws": 2,
@@ -185,6 +186,7 @@
           "counters": {
             "xpGained": 21
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -339,7 +341,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 964,
-      "state": "8987b068",
+      "state": "4e87c2c1",
       "events": "8260c3ec",
       "rng": {
         "draws": 4,
@@ -366,6 +368,7 @@
           "counters": {
             "xpGained": 42
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -540,7 +543,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 964,
-      "state": "11b20a77",
+      "state": "dd1aae80",
       "events": "805e7fdd",
       "rng": {
         "draws": 18,
@@ -551,7 +554,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 964,
-      "state": "815753db",
+      "state": "bd141adc",
       "events": "6d19acfd",
       "rng": {
         "draws": 38,
@@ -562,7 +565,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 964,
-      "state": "6fb1fce7",
+      "state": "7085b584",
       "events": "2b55efa2",
       "rng": {
         "draws": 58,
@@ -573,7 +576,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 964,
-      "state": "92a209f2",
+      "state": "177a5eed",
       "events": "8c713a89",
       "rng": {
         "draws": 78,
@@ -584,7 +587,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 964,
-      "state": "7365b267",
+      "state": "efffc7e4",
       "events": "d9ede772",
       "rng": {
         "draws": 96,
@@ -595,7 +598,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 964,
-      "state": "dc73f0f9",
+      "state": "5f64b490",
       "events": "8c713a89",
       "rng": {
         "draws": 116,
@@ -606,7 +609,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 964,
-      "state": "d0787bda",
+      "state": "db323e61",
       "events": "c96919af",
       "rng": {
         "draws": 136,
@@ -617,7 +620,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 964,
-      "state": "ac1b142d",
+      "state": "152dfbe8",
       "events": "f0818e21",
       "rng": {
         "draws": 156,
@@ -628,7 +631,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 964,
-      "state": "87c0bb13",
+      "state": "5da12e1c",
       "events": "37a979b8",
       "rng": {
         "draws": 176,
@@ -639,7 +642,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 964,
-      "state": "8da888c2",
+      "state": "3ae8f5e9",
       "events": "c11dfe26",
       "rng": {
         "draws": 194,
@@ -650,7 +653,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 964,
-      "state": "6758916c",
+      "state": "fd0bdce5",
       "events": "f791a605",
       "rng": {
         "draws": 204,
@@ -678,6 +681,7 @@
             "levelUps": 2,
             "xpGained": 2022
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -882,7 +886,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 964,
-      "state": "01b87b21",
+      "state": "ea2f1c7c",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -910,6 +914,7 @@
             "levelUps": 2,
             "xpGained": 2022
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},

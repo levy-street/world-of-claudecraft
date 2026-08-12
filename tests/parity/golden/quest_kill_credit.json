@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "fea3aff0",
+      "state": "9c6184fd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -41,6 +41,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -153,7 +154,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "c90eb7e5",
+      "state": "2dd2c7a6",
       "events": "65a4cf51",
       "rng": {
         "draws": 0,
@@ -178,6 +179,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -306,7 +308,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 972,
-      "state": "a8d31d55",
+      "state": "7ada23fa",
       "events": "0ce93a3d",
       "rng": {
         "draws": 40,
@@ -335,6 +337,7 @@
             "kills": 8,
             "questProgress": 8
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -490,7 +493,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 972,
-      "state": "ccc493a6",
+      "state": "ac2468a9",
       "events": "d6b1e3df",
       "rng": {
         "draws": 40,
@@ -522,6 +525,7 @@
             "questsCompleted": 1,
             "xpGained": 250
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -666,7 +670,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 972,
-      "state": "86c4a949",
+      "state": "6e9acf62",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -698,6 +702,7 @@
             "questsCompleted": 1,
             "xpGained": 250
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {

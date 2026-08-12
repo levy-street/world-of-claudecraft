@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 966,
-      "state": "c9e35491",
+      "state": "7c3cdb95",
       "events": "3b970d94",
       "rng": {
         "draws": 2,
@@ -52,6 +52,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -118,6 +119,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {

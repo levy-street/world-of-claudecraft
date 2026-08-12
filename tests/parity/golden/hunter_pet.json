@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e61b336d",
+      "state": "6f465150",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -40,6 +40,7 @@
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -138,7 +139,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 967,
-      "state": "73f25b67",
+      "state": "7f01d926",
       "events": "266bb8fa",
       "rng": {
         "draws": 10,
@@ -149,7 +150,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 967,
-      "state": "eccdd992",
+      "state": "990671e7",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -160,7 +161,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 967,
-      "state": "d5a1ddf8",
+      "state": "f932e3e1",
       "events": "9091c704",
       "rng": {
         "draws": 174,
@@ -171,7 +172,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 967,
-      "state": "d6c49bf5",
+      "state": "67829b48",
       "events": "741638a5",
       "rng": {
         "draws": 339,
@@ -182,7 +183,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "203a0252",
+      "state": "63d601b7",
       "events": "d74f9fd6",
       "rng": {
         "draws": 533,
@@ -193,7 +194,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 967,
-      "state": "aa9ad50b",
+      "state": "319bb30a",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -204,7 +205,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 967,
-      "state": "aa9ad50b",
+      "state": "319bb30a",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -232,6 +233,7 @@
             "damageDealt": 48,
             "damageTaken": 51
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
