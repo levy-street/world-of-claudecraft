@@ -2529,3 +2529,25 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   recipe pins leveled up to the armor rows' depth. privacy-security-review
   dispatched over the narrow server/pbe_boost.ts diff (the one owed reviewer
   row); result recorded below or at the QA phase.
+- PRIVACY-SECURITY-REVIEW: CLEAN, zero findings (the narrow formality the
+  matrix predicted). Two INFO notes recorded for phase 09: the cap enforcer
+  has no legendary sub-cap arm and the failure mode when a legendary-flagged
+  def ships is a LOUD throw at boost time (buildBoostedCharacterState's
+  verification loop), never a silent over-equip; and the injectable isFlagged
+  seam is a second definition of "flagged" beside masterwroughtConflictSlot,
+  so a phase that changes what counts as flagged moves both together.
+- GATE: node scripts/gate_select.mjs PASS (exit 0, unmasked, all 8 steps,
+  vitest workers 5, full-suite fallback: 2680 test files, 37204 tests) at the
+  phase tip 0a556194a4 (the portrait re-mint commit); portrait trio fresh at
+  the same tip. Branch still LOCAL, never pushed, per the standing rule.
+- NEXT: Phase 08 QA (docs/prd/masterwrought/phase-08-qa.md) in a fresh session
+  per the cadence, its own release sync first. The QA prompt's suite list
+  should ADD the blast-radius suites this phase moved beyond its matrix:
+  market_filters, community_test_accounts, material_taxonomy_bootstrap,
+  mob_portrait_source_manifest, dev_bis_gear, professions_crafts_to_mastery,
+  reliquary_content, and tests/server/pbe_boost. Deferred to QA with owner:
+  the maintainer visual pass on the ten icons (the audit verdict is a
+  self-review), the in-browser eyeball of the first live Masterwrought
+  tooltip tag + the /wiki gear section + the "From a found pattern" source
+  cell, and the S2 shipping-window note (structurally void under the one-PR
+  contract, recorded for the maintainer regardless).
