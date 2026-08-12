@@ -522,6 +522,26 @@ if (ids.length !== 10) {
   process.exit(1);
 }
 
+// Every committed SVG carries its item's display name as the <title> element
+// (the phase 06 convention, and the biome a11y noSvgWithoutTitle contract).
+// The title is metadata only: it renders no pixels, so the rasterized PNG and
+// the encoded WebP stay byte-identical to the untitled composition.
+const TITLES = {
+  duskforged_billet: 'Duskforged Billet',
+  forgefold_plating: 'Forgefold Plating',
+  wyrmhide_cording: 'Wyrmhide Cording',
+  sunspun_bolt: 'Sunspun Bolt',
+  prismglass_setting: 'Prismglass Setting',
+  precision_chassis: 'Precision Chassis',
+  quickening_catalyst: 'Quickening Catalyst',
+  seasoned_stock: 'Seasoned Stock',
+  lucent_reagent: 'Lucent Reagent',
+  sablewax_vellum: 'Sablewax Vellum',
+};
+for (const id of ids) {
+  icons[id] = icons[id].replace(/^(<svg [^>]*>)/, `$1\n<title>${TITLES[id]}</title>`);
+}
+
 for (const [id, svg] of Object.entries(icons)) {
   const svgPath = path.join(OUT_DIR, `${id}.svg`);
   writeFileSync(svgPath, svg);
