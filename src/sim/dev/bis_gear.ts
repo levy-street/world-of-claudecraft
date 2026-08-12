@@ -81,7 +81,10 @@ export function bestEpicGearFor(
   // flagged pieces out-score their references (the pbe_boost twin,
   // enforceMasterwroughtCap, hit exactly that). Keep the cap-highest scoring
   // flagged picks and refill each demoted slot with its best unflagged
-  // candidate under the same slot rules.
+  // candidate under the same slot rules. Like the twin, the legendary
+  // sub-cap needs no arm until a legendary-flagged def ships; unlike the
+  // twin this sort carries an explicit id tie-break (the twin leans on sort
+  // stability), both deterministic.
   const flagged = (Object.entries(picks) as [EquipSlot, string][]).filter(
     ([, id]) => ITEMS[id]?.masterwrought,
   );

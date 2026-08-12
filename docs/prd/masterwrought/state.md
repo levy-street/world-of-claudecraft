@@ -1,9 +1,10 @@
 # Masterwrought: cross-phase state
 
-Current phase: 07 BUILT, gate PASS (2026-08-12, see the Phase 07 ledger: ten R13
-intermediates + the Quickening Catalyst daily gate, four review rounds all applied
-or refuted-with-reason, gate_select PASS all 8 at 9df9d1970c); next is Phase 07 QA
-(fresh session, sync first per the delivery contract), then Phase 08 apex armor.
+Current phase: 08 BUILT (2026-08-12, see the Phase 08 ledger: nine apex armor
+pieces + the tailoring apex bag off the committed slot coverage audit, the R1
+masterwork suppression, the budget sweep test born, five review reports all
+applied or ruled-with-reason); next is Phase 08 QA (fresh session, sync first
+per the delivery contract), then Phase 09 apex weapons/jewelry/gadgets.
 Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.37.0`.
 
@@ -2263,8 +2264,11 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   the largest-budget slot goes to the armor class's majority archetype (deterministic
   crafted access beside the lone RNG drop). Applied: mail legs str/sta (majority,
   2 of 3 mail classes), mail waist int, mail feet int; leather chest agi/sta (majority),
-  leather legs int/spi, leather gloves int; cloth all int-based with the spi/sta split
-  and ratings decided per the heroic policy (healer-facing pieces never take Hit).
+  leather legs int/spi, leather gloves int; cloth all int-based, the spi-vs-sta
+  split decided per the band's reference rows and ratings per the heroic policy.
+  (OUTCOME, recorded at the build: all three cloth pieces shipped int/spi, since
+  the band ships no int/sta cloth at all; the original "spi/sta split" phrasing
+  named the decision, not a mixed result.)
 - BUDGETS (law, primaryStatBudget at ilvl 31 epic): chest 22, legs 20, waist 15,
   gloves 15, feet 14. Ratings: the whole 31 band carries exactly ONE rating at 40
   (heroic_loot.ts ARMOR_RATING, rift RIFT_ARMOR_RATING); every apex piece takes exactly
@@ -2294,3 +2298,185 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   (mistcallers_duffel, epic, 14) on the established 2-slot quality ladder
   (6/8/10/12/14), epic quality, tradable, NO masterwrought flag, no item level
   (kind bag is not item-level eligible).
+
+## Phase 08 ledger (apex armor catalogs; built + five review reports applied, 2026-08-12)
+- SHIPPED: nine apex epic armor pieces at the audit's slots (mail spiritweld_girdle
+  waist / forgefold_legguards legs / wardspeaker_sabatons feet; leather
+  briarstep_jerkin chest / fenbloom_breeches legs / barksong_handguards gloves;
+  cloth sunspun_vestments chest / sunspun_leggings legs / sunspun_handwraps gloves)
+  plus the tailoring apex bag sunspun_haversack (16 slots, one 2-slot step past the
+  duffel, NO masterwrought flag). Every primary sum EQUALS primaryStatBudget(31,
+  'epic', slot); exactly one rating at the band's 40, each COMPLEMENTING its
+  same-slot reference drop (spread: crit x5, haste x3, hit x1); armor values copied
+  byte-equal from the named ilvl-31 references; equip level DERIVED (source 25
+  clamps to MAX_LEVEL = 20, no hand-authored override; the sweep pins
+  requiredLevelFor AND the override's absence, so a lost recipe source reds at the
+  18 quality fallback instead of hiding); tradable per R2; R14 held by a whole-def
+  key whitelist. APEX_ARMOR_RECIPES (ten rows, spread into ALL_RECIPES): skillReq
+  100, level 25, itemLevelBudget 25 (fee only), acquisition ['drop'] per R8,
+  stationType per craft (forge/tannery/loom, wiki unanimity kept), bills exactly
+  the pre-authoring ledger's (3 own intermediates per the demand-math law +
+  2 wyrmfall_core + the gathered family). Art: ten hand-authored SVG sources +
+  a source-READING rasterizer variant under docs/achievements/masterwrought-
+  phase08-art/ (sha-pinned README), 128px WebPs, woc_original_svg mapping rows,
+  CREDITS row, the item-art audit admission (reviewed 850 to 860, live 865 to
+  875, armor/bag census bumps, shipping digest re-acknowledged, evidence
+  re-minted via --refresh-verdict, CLI/builder/consistency pins advanced; all ten
+  owner-reviewed on the opaque house ground in-session). i18n: ten ITEM_ENTITY_IDS
+  + APPENDED_ITEM_NAMES appends, M16 fills in all five non-Latin overlays for the
+  ten names plus guide.gear.masterwroughtTitle/Body plus
+  guide.profPages.sourceDrop. The /wiki gear page gained its Masterwrought section
+  (closing the phase 08+ open item; rule-level, spoiler-safe, tag coins reused).
+  tests/masterwrought_budget.test.ts born (see the sweep paragraph below).
+  Shipped-ids golden re-minted, verified additions-only (exactly the ten).
+  Portrait source manifest re-minted at tip (230/230 byte-identical rerender, the
+  phase 06 lesson; accepted-art manifest pin advanced in lockstep).
+- THE SLOT AUDIT drove the picks (see the pre-authoring ledger above): mail
+  waist/legs/feet and leather legs/gloves sat at band coverage 1, leather chest won
+  its 2-tie on the retirement hole + budget; the audit OVERRODE the plan defaults
+  for armorcrafting (chest out, feet in) and leatherworking (shoulders/feet out,
+  legs/gloves in) and CONFIRMED tailoring. The audit committed BEFORE the first
+  item row (ab683da04d precedes 1b8bdd80a3), per the acceptance criterion.
+- R1 MASTERWORK SUPPRESSION (the phase's one sim-logic change, arch-reviewed):
+  the nine pieces are the first epic SLOTTED crafted outputs, which made the
+  epic-to-legendary masterwork bump reachable for the first time (measured: a proc
+  minted instances at 85 to 93 percent of a legendary sheet, +11 to +15 primary
+  points, on a tradable piece; exactly the 1.9-mult cliff fork B exists to avoid).
+  R1 already rules the apex proc grants a Perfecting head start INSTEAD OF a
+  quality bump, so the suppression ships now: ONE module-local helper
+  craftBonusStatsFor (crafting.ts) feeds both the admission capacity model and the
+  resolve effect gate (hoisted so the twins cannot drift) and returns null for a
+  masterwrought def. masterwork.ts is untouched (R1 locks the whole file, the
+  reviewer confirmed the alternative seam is forbidden). The proc DRAW stays
+  unconditional: draw order provably unmoved (parity 207 green twice, once after
+  content, once after the guard). Pinned by a forced-roll arm (rng.next forced to
+  0, archetype set so the Infinity ceiling cannot explain the pass, draw count
+  asserted exactly 1) plus a proccing non-apex control, both mutation-proven.
+- PHASE 12 OBLIGATIONS MINTED HERE: (a) the head start replaces this suppression
+  at the EFFECT GATE (the masterwork boolean in resolveCraftForRecipe), where
+  procRoll < procChance is actually known; the helper runs before the draw and
+  cannot see the outcome. (b) The proc outcome on an apex craft is currently
+  DISCARDED, not deferred: ctx.bumpDeedStat('masterworksCrafted'), the
+  masterwork:first mark, and the per-craft masterwork:<craftId> reliquary mark all
+  key off result.masterwork, which the guard forces false. Phase 12 decides what a
+  head-start proc credits. (c) The tier feed stays meaningful THROUGH the
+  suppression: masterworkProcChance still computes (the apex bills all feed 0.02,
+  pinned), so the head-start chance math is already in place.
+- RULINGS TAKEN IN-PHASE (flag for QA / the maintainer):
+  - Five of nine pieces are numerically IDENTICAL to their reference drop except
+    the rating (fresh-review S3): the deliberate outcome of the audit's stat-shape
+    rule (band shapes are canonical; cloth is single-archetype so all three cloth
+    pieces sit on the drop profile; mail legs went to the majority archetype
+    beside an existing str legs drop). Differentiation is deterministic access
+    plus the rating complement, the Wrath crafted-complementarity lever the
+    research memo endorses. The complement is now MECHANICAL (the sweep asserts
+    the reference drop does not carry the apex piece's rating field). Re-split if
+    the maintainer wants distinct silhouettes.
+  - Hit landed on sunspun_vestments, the most spirit-heavy piece: kept, because
+    chest is the ONLY cloth slot whose reference drop does not already carry Hit
+    (lunar_choir and shadowpulse both do), and the shipped catalog demonstrably
+    does not class int/spi cloth as healer-facing for the never-Hit clause. The
+    healer route keeps the crit drop chest.
+  - Deeds: NO deed owed (content-review PASS, recorded as a considered ruling):
+    crafted tradable items are not conquerable content under docs/design/deeds.md;
+    the craft_rare:<craft> milestones already fire on any rare-or-better output
+    and all three exist. The packet's own Masterwrought deeds are phase 13's.
+  - Reliquary: NO page owed (same review): the catalog curates conquerable unique
+    loot and holds zero crafted gear by precedent; a repeatably crafted tradable
+    epic is not that. The phase 11 apex PATTERNS (raid/rift drops) are the rows
+    that will owe pages.
+  - Vendor asymmetry ACCEPTED: apex epics vendor at 1.5 to 3 percent of their
+    same-slot drops (the economy invariant binds sellValue strictly below the
+    265c to 491c bills; vendor value is not power). Raising the intermediates'
+    sellValues would ripple the phase 07 pins for no gameplay gain.
+  - Tier 2 for all ten intermediates (the arcanite_bar refined-reagent precedent;
+    tier 2 is the deliberate ceiling, masterwork.ts constants locked). The
+    catalyst row's side effect on the nine intermediate recipes is recorded AT the
+    table, pinned as chance inputs, and pinned EFFECT-DEAD (slotless junk never
+    bakes a bonus; the arm reds the day an intermediate output gains a slot).
+    wyrmfall_core stays deliberately untiered (availability premium, not
+    refinement; every apex bill already maxes through its intermediate).
+  - The wiki ships a real 'drop' acquisition arm NOW ("From a found pattern",
+    with five non-Latin fills and a render-level row pin) rather than the old
+    two-arm mapping's false "Known from the start"; the copy stays true when
+    phase 11 lands the patterns, and the packet ships as ONE PR so 08 never
+    reaches players without 11.
+  - /dev tooling: pbe_boost gained enforceMasterwroughtCap (four role kits really
+    hit 3 flagged pre-fix, a boot-time hard-throw; exported with injectable reads
+    so the ring-refill and empty-fallback arms phase 09 lands on are executed
+    synthetically today; kept picks = cap-highest by roleItemScore, demotion test
+    derives its winners). /dev bis gained the same cap arm (it writes equipment
+    directly, bypassing masterwroughtConflictSlot; measured zero flagged picks at
+    rest since its score ignores ratings, so the live sweep is labeled a forward
+    net and a synthetic over-cap arm carries the coverage). dev_kit is
+    structurally safe for GEAR (FRESH_TWENTY_QUALITIES excludes epics) and its
+    bag pick now hands the apex bag, KEPT: the prior pick was already the epic
+    duffel, so no fresh-20 quality fiction existed for bags and a dev cheat is
+    deliberately generous. bestBoostBag moves every PBE roster to 4 x 16 slots
+    (covered by the derived pin, recorded here as the side effect).
+  - crafts_to_mastery: the daily-gate exclusion is now TRANSITIVE (the apex rows
+    never touch the catalyst directly but sit on its chain at 3 catalyst-days per
+    piece; without the closure they hijacked the pacing model through reagents
+    the gathered-units metric prices at zero and the climb pin redded, exactly
+    the phase 07 durable lesson). New liveness arm pins the second hop
+    positively before the negatives.
+  - Tailoring carries FOUR apex rows (three pieces plus the bag): the demand
+    math's "three per profession, thirty total" counts the gear-slot apex rows;
+    the bag is the phase file's explicit extra, so the packet recipe total runs
+    31 with it.
+- THE SWEEP TEST (tests/masterwrought_budget.test.ts, grows with 09/10): two
+  completeness arms force every masterwrought-flagged def AND every
+  APEX_ARMOR_RECIPES output into the literal EXPECTED table. Per piece: primary
+  sum vs BOTH the literal and the formula, the single rating (literal 40 as the
+  band-law pin PLUS the ARMOR_RATING tie as the drift pin, deliberately both),
+  the complement rule, armor vs the identity-pinned reference (slot, armorType,
+  ilvl 31), derived equip gate, R2 texture, R14 whole-def whitelist (bag gets its
+  own), the full recipe row with the literal bill, the per-def R12 surface
+  (isDisenchantable + typedSecondaryFor vs the literally-pinned weave mapping),
+  the rating-spread table, the bag capacity ceiling (strictly largest), and an
+  apex-scoped economy arm. Decisiveness: five mutation probes red-as-expected
+  (stat retune, rating swap, flag drop, R1 guard revert, plus the pin-audit's
+  hand-traced synthetic arms). PHASE 09 NOTE: jewelry pins against the
+  heroic-vendor JEWELRY_RATING band (25), not the armor 40; the EXPECTED table
+  shape already carries the rating field per row.
+- DURABLE TRAPS HIT THIS PHASE: (a) the mutation-test-uncommitted-revert trap
+  fired LIVE (a git checkout after a probe wiped the uncommitted R1 guards;
+  caught by grep, re-applied; the trap memory exists and was still stepped on:
+  commit BEFORE probing). (b) A locale overlay insert anchored on a KEY line
+  whose VALUE wraps to the next line breaks the file (five locales at once);
+  anchor only on single-line rows (key and value on one line). (c) biome ci's
+  error-vs-warning attribution is unreadable from the pretty reporter when 1284
+  warnings flood one error; --reporter=github isolates ::error lines. (d) The
+  turbo i18n cache served a stale dict after a catalog append (known memory;
+  TURBO_FORCE=1). (e) The idle-no-report agent nudge was needed THREE times.
+- REVIEW RECORD (five reports, everything applied or ruled-with-reason above):
+  content-obligations (1 critical: the wiki mislabel, fixed same-day; 5 warnings;
+  its verification round independently re-ran 15 suites and confirmed closure);
+  pin-quality audit (1 blocking: the catalyst tier side effect; 8 should-fix; its
+  verification round hand-traced the synthetic arms and confirmed, plus an
+  addendum on the /dev bis arm); fresh whole-diff review (2 blocking, BOTH
+  already addressed by the time of report: the masterwork instance overshoot and
+  the tier comment; 6 should-fix incl. the requiredLevel doctrine catch and the
+  /dev bis gap; 4 nits; plus i18n-quality items: three wording fixes applied
+  (wardspeaker zh agent marker both scripts, ja guide register to the site term,
+  ru full-tag quote), eight register nits recorded for the release-fill review);
+  architecture (0 blocking; 2 should-fix applied: the craftBonusStatsFor hoist
+  and the draw-count pins; seam judgment recorded: bonusStats-null in crafting.ts
+  is correct and editing masterwork.ts is forbidden by R1's own text); the
+  fix-round fresh review ran per the standing rule (its report and any late
+  findings fold in before the QA phase).
+- RELEASE-FILL OBLIGATIONS: thirteen new keys (ten item names, the
+  guide.gear.masterwrought pair, guide.profPages.sourceDrop) pending across the
+  sixteen Latin locales; the five non-Latin fills are machine-anchored for
+  maintainer review with the fresh-review's eight register nits listed in its
+  report (ja slot-noun drift and transliterate-vs-translate split, ru bridzhi
+  register and the missing yo, zh manufacture-vs-craft verb, the calqued
+  family-rule phrase, row placement, line style).
+- VALIDATION: tsc clean; ci:changed exit 0; the phase suite matrix green
+  (progression, recipe_economy, itemization_coverage, item_level,
+  masterwrought_budget, shipped_item_ids, guide) plus the blast-radius set
+  (material_taxonomy, bag_filter, item_icons, art gates x4, i18n gates x5,
+  naming guards x3, professions suites, pbe_boost, dev_kit, dev_bis,
+  crafts_to_mastery, blob growth, masterwork, cap/tooltip); parity 207 green
+  TWICE (post-content and post-guard); portrait trio fresh. Gate at the docs
+  tip recorded below.
