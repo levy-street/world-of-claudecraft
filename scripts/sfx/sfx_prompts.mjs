@@ -120,6 +120,32 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'mount_run_goblin_rocket_sled_start',
+    custom: true,
+  },
+  {
+    key: 'mount_run_goblin_rocket_sled',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'mount_run_goblin_rocket_sled_stop',
+    custom: true,
+  },
+  {
+    key: 'mount_run_goblin_rocket_sled_reverse_start',
+    custom: true,
+  },
+  {
+    key: 'mount_run_goblin_rocket_sled_reverse',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'mount_run_goblin_rocket_sled_reverse_stop',
+    custom: true,
+  },
+  {
     key: 'mount_run_terrorspark_groundshaker_start',
     custom: true,
   },

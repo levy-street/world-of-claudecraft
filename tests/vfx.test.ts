@@ -67,10 +67,75 @@ function installCanvasStub(): void {
 }
 
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 
 describe('pooled VFX cloud', () => {
+  it('emits bounded twin-nozzle rocket particles and resets its nozzle alternation', () => {
+    installCanvasStub();
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const vfx = new Vfx(new THREE.Scene(), () => null);
+    const probe = vfx as unknown as VfxProbe;
+    const left = new THREE.Vector3(-1, 2, 3);
+    const right = new THREE.Vector3(1, 2, 3);
+    const rear = new THREE.Vector3(0, 0, -1);
+
+    vfx.mountRocketExhaust(left, right, rear, 0.1, 1, 0, false);
+    expect(probe.activeCount).toBe(2);
+    expect([...probe.pos.subarray(0, 6)]).toEqual([
+      -1,
+      2,
+      expect.closeTo(2.92, 5),
+      1,
+      2,
+      expect.closeTo(2.92, 5),
+    ]);
+    expect(probe.vel[2]).toBeLessThan(-5);
+    expect(probe.vel[5]).toBeLessThan(-5);
+
+    vfx.mountRocketExhaust(left, right, rear, 1, 0, 1, true);
+    expect(probe.activeCount).toBe(2);
+    vfx.clear();
+    vfx.mountRocketExhaust(left, right, rear, 0.05, 1, 0, false);
+    expect(probe.activeCount).toBe(1);
+    expect(probe.pos[0]).toBe(-1);
+  });
+
+  it('emits one bounded ignition bloom with tiered sparks and smoke', () => {
+    installCanvasStub();
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const low = new Vfx(new THREE.Scene(), () => null) as unknown as VfxProbe;
+    const left = new THREE.Vector3(-1, 2, 3);
+    const right = new THREE.Vector3(1, 2, 3);
+    const rear = new THREE.Vector3(0, 0, -1);
+
+    (low as unknown as Vfx).mountRocketIgnition(left, right, rear, false);
+    expect(low.activeCount).toBe(6);
+    expect(low.vel[2]).toBeLessThan(0);
+    expect(low.vel[5]).toBeLessThan(0);
+
+    const full = new Vfx(new THREE.Scene(), () => null) as unknown as VfxProbe;
+    (full as unknown as Vfx).mountRocketIgnition(left, right, rear, true);
+    expect(full.activeCount).toBe(11);
+  });
+
+  it('emits restrained tiered takeoff and landing rocket pulses', () => {
+    installCanvasStub();
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const vfx = new Vfx(new THREE.Scene(), () => null);
+    const probe = vfx as unknown as VfxProbe;
+    const left = new THREE.Vector3(-1, 2, 3);
+    const right = new THREE.Vector3(1, 2, 3);
+    const rear = new THREE.Vector3(0, 0, -1);
+
+    vfx.mountRocketAirbornePulse(left, right, rear, 'takeoff', false);
+    expect(probe.activeCount).toBe(5);
+    vfx.clear();
+    vfx.mountRocketAirbornePulse(left, right, rear, 'landing', true);
+    expect(probe.activeCount).toBe(5);
+  });
+
   it('submits and uploads only the live ascending prefix with conservative culling', () => {
     installCanvasStub();
     const scene = new THREE.Scene();

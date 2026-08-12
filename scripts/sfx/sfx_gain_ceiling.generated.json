@@ -2370,6 +2370,72 @@
       }
     ]
   },
+  "mount_run_goblin_rocket_sled": {
+    "ceilingDb": 8.7,
+    "tracks": [
+      {
+        "filename": "mount_run_goblin_rocket_sled.mp3",
+        "sha256": "fe904b695a1bba9f506e2afe81dabeee50a505a3947466e7839459e5b96a9651",
+        "size": 229502,
+        "peakDb": -9.7
+      }
+    ]
+  },
+  "mount_run_goblin_rocket_sled_reverse": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "mount_run_goblin_rocket_sled_reverse.mp3",
+        "sha256": "a3255ab4f547d4695b794ec4b394818c1f0bd54028f491637b7ba9e4aeda1142",
+        "size": 253326,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "mount_run_goblin_rocket_sled_reverse_start": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "mount_run_goblin_rocket_sled_reverse_start.mp3",
+        "sha256": "a4b1f4ab817dee74e06a14a38484b22b1cbde3f66235df99cbfe20cde77ee7e7",
+        "size": 31390,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "mount_run_goblin_rocket_sled_reverse_stop": {
+    "ceilingDb": 6,
+    "tracks": [
+      {
+        "filename": "mount_run_goblin_rocket_sled_reverse_stop.mp3",
+        "sha256": "6ffae886c567a7c1bd24640e6cd9528b777ffcc23acc27b26caf5912b6f4475e",
+        "size": 28882,
+        "peakDb": -7
+      }
+    ]
+  },
+  "mount_run_goblin_rocket_sled_start": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "mount_run_goblin_rocket_sled_start.mp3",
+        "sha256": "75dea337075cd04af8eff9681ece0b54dd49712e083608474d7e4b594b8205e2",
+        "size": 34524,
+        "peakDb": -7.1
+      }
+    ]
+  },
+  "mount_run_goblin_rocket_sled_stop": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "mount_run_goblin_rocket_sled_stop.mp3",
+        "sha256": "b8b5ced031ceddf26d4dbf06a26359093d1ae4d2ac35bb13a7aede905cdd8a54",
+        "size": 49571,
+        "peakDb": -7.3
+      }
+    ]
+  },
   "mount_run_grag_bear": {
     "ceilingDb": 5.3,
     "tracks": [

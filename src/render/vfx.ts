@@ -339,6 +339,7 @@ export class Vfx {
   // no Color objects.
   private fwCols: THREE.Color[] = [];
   private fwFlash = new THREE.Color();
+  private rocketExhaustSide = 0;
   private quality = 1;
   private paladinSpellFx: PaladinSpellVfxController;
 
@@ -567,6 +568,7 @@ export class Vfx {
     this.size.fill(0);
     this.alphaAttr.fill(0);
     this.activeCount = 0;
+    this.rocketExhaustSide = 0;
     this.activeSlotFlags.fill(0);
     this.points.geometry.setDrawRange(0, 0);
     this.points.visible = !this.cloudWarmed;
@@ -1923,6 +1925,188 @@ export class Vfx {
       0,
       SPR.sparkle,
     );
+  }
+
+  /** Twin-nozzle combustion trail for the Goblin Rocket Sled. The continuous
+   *  flame is mount-owned geometry; this method contributes only short-lived
+   *  detached tongues, sparks, and restrained sputter smoke to the shared
+   *  bounded particle pool. */
+  mountRocketIgnition(
+    left: THREE.Vector3,
+    right: THREE.Vector3,
+    rear: THREE.Vector3,
+    fullDetail: boolean,
+  ): void {
+    for (const at of [left, right]) {
+      this.spawn(
+        at.x + rear.x * 0.12,
+        at.y,
+        at.z + rear.z * 0.12,
+        rear.x * 2.4,
+        rear.y * 2.4 + 0.08,
+        rear.z * 2.4,
+        0xffb13b,
+        0.38,
+        0.2,
+        -0.08,
+        SPR.firePuff,
+      );
+    }
+
+    const sparkCount = fullDetail ? 8 : 4;
+    for (let i = 0; i < sparkCount; i++) {
+      const at = i % 2 === 0 ? left : right;
+      const speed = 3.8 + Math.random() * 2.6;
+      this.spawn(
+        at.x + rear.x * 0.05,
+        at.y,
+        at.z + rear.z * 0.05,
+        rear.x * speed + (Math.random() - 0.5) * 1.8,
+        rear.y * speed + 0.35 + Math.random() * 1.4,
+        rear.z * speed + (Math.random() - 0.5) * 1.8,
+        0xffe09a,
+        0.07 + Math.random() * 0.045,
+        0.24 + Math.random() * 0.24,
+        1.6,
+        SPR.sparkBurst,
+      );
+    }
+
+    if (fullDetail) {
+      this.spawn(
+        (left.x + right.x) * 0.5 + rear.x * 0.18,
+        (left.y + right.y) * 0.5 + 0.04,
+        (left.z + right.z) * 0.5 + rear.z * 0.18,
+        rear.x * 1.15,
+        0.32,
+        rear.z * 1.15,
+        0x593126,
+        0.42,
+        0.62,
+        -0.06,
+        SPR.smoke,
+      );
+    }
+  }
+
+  /** Small load-change punctuation for the rocket sled. Takeoff throws a few
+   *  hot sparks down the plume; landing makes a brief broad combustion cough.
+   *  Deliberately lighter than mountRocketIgnition's full-bore event. */
+  mountRocketAirbornePulse(
+    left: THREE.Vector3,
+    right: THREE.Vector3,
+    rear: THREE.Vector3,
+    kind: 'takeoff' | 'landing',
+    fullDetail: boolean,
+  ): void {
+    for (const at of [left, right]) {
+      const landing = kind === 'landing';
+      this.spawn(
+        at.x + rear.x * 0.1,
+        at.y + rear.y * 0.1,
+        at.z + rear.z * 0.1,
+        rear.x * (landing ? 1.5 : 2.8),
+        rear.y * (landing ? 1.5 : 2.8) + (landing ? 0.04 : 0.22),
+        rear.z * (landing ? 1.5 : 2.8),
+        landing ? 0xff8a2c : 0xffe3a0,
+        landing ? 0.3 : 0.16,
+        landing ? 0.16 : 0.22,
+        -0.08,
+        SPR.firePuff,
+      );
+    }
+    const sparks = fullDetail ? (kind === 'takeoff' ? 6 : 3) : kind === 'takeoff' ? 3 : 1;
+    for (let i = 0; i < sparks; i++) {
+      const at = i % 2 === 0 ? left : right;
+      const speed = 3.4 + Math.random() * 2;
+      this.spawn(
+        at.x + rear.x * 0.05,
+        at.y,
+        at.z + rear.z * 0.05,
+        rear.x * speed + (Math.random() - 0.5) * 1.1,
+        rear.y * speed + 0.25 + Math.random() * 0.8,
+        rear.z * speed + (Math.random() - 0.5) * 1.1,
+        0xffe5a6,
+        0.06 + Math.random() * 0.035,
+        0.18 + Math.random() * 0.18,
+        1.3,
+        SPR.sparkBurst,
+      );
+    }
+  }
+
+  mountRocketExhaust(
+    left: THREE.Vector3,
+    right: THREE.Vector3,
+    rear: THREE.Vector3,
+    dt: number,
+    strength: number,
+    smokeStrength: number,
+    fullDetail: boolean,
+  ): void {
+    const power = Math.min(1, Math.max(0, strength));
+    if (power <= 0) return;
+    const flameCount = this.emitCount((fullDetail ? 42 : 20) * power, dt);
+    for (let i = 0; i < flameCount; i++) {
+      const at = this.rocketExhaustSide === 0 ? left : right;
+      this.rocketExhaustSide ^= 1;
+      const speed = 2.2 + power * 2.8 + Math.random() * 1.1;
+      const puff = Math.random() < 0.32;
+      this.spawn(
+        at.x + rear.x * 0.08 + (Math.random() - 0.5) * 0.07,
+        at.y + rear.y * 0.08 + (Math.random() - 0.5) * 0.07,
+        at.z + rear.z * 0.08 + (Math.random() - 0.5) * 0.07,
+        rear.x * speed + (Math.random() - 0.5) * 0.45,
+        rear.y * speed + (Math.random() - 0.5) * 0.45 + 0.12,
+        rear.z * speed + (Math.random() - 0.5) * 0.45,
+        puff ? 0xff7426 : 0xffc85c,
+        (puff ? 0.22 : 0.14) + Math.random() * 0.1,
+        0.2 + Math.random() * 0.22,
+        -0.15,
+        puff ? SPR.firePuff : SPR.flame,
+      );
+    }
+
+    if (fullDetail) {
+      const sparkCount = this.emitCount(5 * power, dt);
+      for (let i = 0; i < sparkCount; i++) {
+        const at = Math.random() < 0.5 ? left : right;
+        const speed = 3.5 + Math.random() * 3;
+        this.spawn(
+          at.x,
+          at.y,
+          at.z,
+          rear.x * speed + (Math.random() - 0.5) * 1.3,
+          rear.y * speed + Math.random() * 1.2,
+          rear.z * speed + (Math.random() - 0.5) * 1.3,
+          0xffd37a,
+          0.07 + Math.random() * 0.06,
+          0.28 + Math.random() * 0.32,
+          1.4,
+          SPR.sparkBurst,
+        );
+      }
+
+      const smoke = Math.min(1, Math.max(0, smokeStrength));
+      const smokeCount = this.emitCount(4 * smoke, dt);
+      for (let i = 0; i < smokeCount; i++) {
+        const at = Math.random() < 0.5 ? left : right;
+        const speed = 1.2 + Math.random() * 0.8;
+        this.spawn(
+          at.x + rear.x * 0.18,
+          at.y + 0.04,
+          at.z + rear.z * 0.18,
+          rear.x * speed + (Math.random() - 0.5) * 0.25,
+          0.28 + Math.random() * 0.24,
+          rear.z * speed + (Math.random() - 0.5) * 0.25,
+          0x5b3025,
+          0.3 + Math.random() * 0.15,
+          0.55 + Math.random() * 0.25,
+          -0.08,
+          SPR.smoke,
+        );
+      }
+    }
   }
 
   /**

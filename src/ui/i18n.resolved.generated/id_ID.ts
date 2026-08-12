@@ -1045,6 +1045,7 @@ export const id_ID: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage Sang Kodok Lompat-Bayangan",
       "name_stormfeather_griffin": "Stormfeather Penjelajah Langit",
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
+      "name_goblin_rocket_sled": "Goblin Rocket Sled",
       "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
       "name_drakemaw_raptor": "Raptor Drakemaw",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
@@ -1054,6 +1055,7 @@ export const id_ID: EnTranslations = {
       "desc_shadowjump_toad": "Kodok raksasa masif berpijakan mantap, terlatih dalam lompatan bayangan secepat kilat yang mampu menjangkau medan apa pun.",
       "desc_stormfeather_griffin": "Griffin badai yang anggun, melangkah di tanah dengan cakar bersepatu rune, sayap terlipat rapat.",
       "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.",
+      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
       "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu."
     },
@@ -12166,6 +12168,9 @@ export const id_ID: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Kunci Kontak: Percik Teror, Pengguncang Bumi"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "Ignition Key: Goblin Rocket Sled"
       },
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"

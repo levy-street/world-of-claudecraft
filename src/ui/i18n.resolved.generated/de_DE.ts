@@ -1045,6 +1045,7 @@ export const de_DE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage die Schattensprungkröte",
       "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
       "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
+      "name_goblin_rocket_sled": "Goblin Rocket Sled",
       "name_terrorspark_groundshaker": "Schreckfunke, der Bodenerschütterer",
       "name_drakemaw_raptor": "Drakenrachen-Raptor",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
@@ -1054,6 +1055,7 @@ export const de_DE: EnTranslations = {
       "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
       "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
       "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.",
+      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
       "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten.",
       "desc_drakemaw_raptor": "Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht."
     },
@@ -12166,6 +12168,9 @@ export const de_DE: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Zündschlüssel: Schreckfunke, der Bodenerschütterer"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "Ignition Key: Goblin Rocket Sled"
       },
       "reins_drakemaw_raptor": {
         "name": "Zügel des Drakenrachen-Raptors"

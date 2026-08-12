@@ -354,7 +354,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // honor pieces and the 3 fishing additions (the koi and both rods):
     // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
-    // Wildheart Basin, boneglass_shiv on Spoils): 340. Catalog growth reverts
+    // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the Goblin Rocket
+    // Sled developer checkpoint: 341. Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -362,7 +363,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    expect(full).toEqual({ owned: 341, total: 341 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -373,7 +374,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    expect(character).toEqual({ owned: 312, total: 312 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -383,7 +384,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // catalog by 4, and the measured value wins), and the seven Phase 21
     // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
     // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372, plus the
-    // three daggers the v0.36.0 release merge added to live content: 375 total.
+    // three daggers the v0.36.0 release merge added to live content, then the
+    // Goblin Rocket Sled developer checkpoint: 376 total.
     // Slots, not unique relics: the two Spoils set repeats count again here,
     // and the seven excludeFromCompletion slots (four vault, three bands)
     // count here while adding zero to every completion pair, which is why this
@@ -394,7 +396,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(375);
+    ).toBe(376);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2362,7 +2364,7 @@ const RELIC_SLOTS = RELIQUARY_PAGES.flatMap((page) =>
  * row here in the same change.
  */
 const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
-  // The three gaps are CONTENT gaps, not vocabulary gaps: no live table awards
+  // The four gaps are CONTENT gaps, not vocabulary gaps: no live table awards
   // any of them, so there is no door to name. Every other slot the catalog
   // used to leave pending turned out to be a several-doors slot rather than a
   // no-answer slot, and Phase 13b authored all of them (a relic lists every
@@ -2371,9 +2373,10 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
   // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
   // slot stays listed and sourceless until the mount gets a route.
-  // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
+  // goblin_rocket_sled and terrorspark_groundshaker: dev-grant only,
+  // deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
-  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker'],
+  horizons_mounts: ['drakemaw_raptor', 'goblin_rocket_sled', 'terrorspark_groundshaker'],
   // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
   // engineering recipe produces a slotless, statless tool, masterworkBonusStats
   // returns null for all of them, so the masterwork proc can never fire and
@@ -3325,7 +3328,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the three slots content awards no route at all', () => {
+  it('the surviving pending rows are the four slots content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -3338,6 +3341,7 @@ describe('Reliquary source hint coverage', () => {
     ]);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
+      'goblin_rocket_sled',
       'terrorspark_groundshaker',
     ]);
     // masterwork:engineering pended by the QA ruling 2026-08-07: no
@@ -3654,11 +3658,11 @@ describe('Reliquary source hint coverage', () => {
     expect(delveOnly.counts.vendor).toBeGreaterThanOrEqual(1);
   });
 
-  it('the two pending mounts really have ZERO live award routes (the row is justified)', () => {
+  it('the pending mounts really have ZERO live award routes (the row is justified)', () => {
     // The surviving SOURCE_PENDING_RULING row's whole claim is "no live table
-    // awards either mount", and the acknowledgment sweep can never check it
+    // awards any pending mount", and the acknowledgment sweep can never check it
     // (it short-circuits on un-hinted relics). This is the inverse sweep: the
-    // day content gives either mount ANY route, this reds and forces the hint
+    // day content gives a pending mount ANY route, this reds and forces the hint
     // plus the pending-row deletion in the same change, so the window can
     // never keep painting a blank silhouette content has learned to answer.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
@@ -3708,7 +3712,7 @@ describe('Reliquary source hint coverage', () => {
       if (reliquaryRelicSource(page, relic).length === 0) continue;
       watchedAwardIds.add(awardIdForSlot(relic, slotId));
     }
-    // The two PENDING mounts' reins ride along: their whole pending claim is
+    // The PENDING mounts' reins ride along: their whole pending claim is
     // "no route anywhere", and the nine-family inverse sweep above cannot see
     // these three excluded surfaces, so a pending reins entering one must red
     // HERE rather than leave the silhouette blank while content can answer.

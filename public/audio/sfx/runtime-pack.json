@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "2074fac9f3d7a778014af595331a137a7c1f44acb53ebe2250d901044d89da52",
-  "catalogHash": "3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1",
+  "bundleId": "ce3a5ff826f74efacb69667b1362d8c8dd270c04e30532c35ad809856a534fde",
+  "catalogHash": "b3b4fe8b4f301a88da047e2ebec6f594fe24742aa7353b65770d5b19b09c9d23",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2877,6 +2877,78 @@
       ],
       "gain": 1,
       "playbackRate": 0.92
+    },
+    "mount_run_goblin_rocket_sled": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_goblin_rocket_sled.mp3?v=fe904b695a1b",
+          "bytes": 229502,
+          "sha256": "fe904b695a1bba9f506e2afe81dabeee50a505a3947466e7839459e5b96a9651"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_goblin_rocket_sled_reverse": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_goblin_rocket_sled_reverse.mp3?v=a3255ab4f547",
+          "bytes": 253326,
+          "sha256": "a3255ab4f547d4695b794ec4b394818c1f0bd54028f491637b7ba9e4aeda1142"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_goblin_rocket_sled_reverse_start": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_goblin_rocket_sled_reverse_start.mp3?v=a4b1f4ab817d",
+          "bytes": 31390,
+          "sha256": "a4b1f4ab817dee74e06a14a38484b22b1cbde3f66235df99cbfe20cde77ee7e7"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_goblin_rocket_sled_reverse_stop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_goblin_rocket_sled_reverse_stop.mp3?v=6ffae886c567",
+          "bytes": 28882,
+          "sha256": "6ffae886c567a7c1bd24640e6cd9528b777ffcc23acc27b26caf5912b6f4475e"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_goblin_rocket_sled_start": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_goblin_rocket_sled_start.mp3?v=75dea337075c",
+          "bytes": 34524,
+          "sha256": "75dea337075cd04af8eff9681ece0b54dd49712e083608474d7e4b594b8205e2"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_goblin_rocket_sled_stop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_goblin_rocket_sled_stop.mp3?v=b8b5ced031ce",
+          "bytes": 49571,
+          "sha256": "b8b5ced031ceddf26d4dbf06a26359093d1ae4d2ac35bb13a7aede905cdd8a54"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
     },
     "mount_run_grag_bear": {
       "variants": [

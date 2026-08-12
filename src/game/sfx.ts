@@ -15,6 +15,7 @@ import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
 import {
+  advanceInterruptibleMountEngine,
   advanceMountEngine,
   type MountEngineEntry,
   mountEngineLoopActive,
@@ -122,6 +123,10 @@ export interface PlayOpts {
   // pile up and comb-filter into a metallic ring. 0 (default) plays the clip flat.
   attack?: number; // fade-in seconds (default 0 = instant)
   release?: number; // fade-out seconds; the clip is stopped once it ends
+  /** One live authored transition voice per key. */
+  voiceKey?: string;
+  /** Seconds to crossfade when replacing an existing `voiceKey` voice. */
+  voiceCrossfade?: number;
 }
 
 interface LoopSlot {
@@ -133,6 +138,7 @@ interface LoopSlot {
   x?: number;
   y?: number;
   z?: number;
+  playbackTarget: number;
 }
 
 interface PendingLoop {
@@ -183,10 +189,15 @@ class Sfx {
   private lastPlay = new Map<string, number>();
   private lastPlayPruneAt = 0;
   private loops = new Map<string, LoopSlot>();
+  private keyedOneShots = new Map<string, { src: AudioBufferSourceNode; gain: GainNode }>();
   // Pending auto-stop timers for timedGroundLoop, keyed the same as `loops`.
   private groundLoopTimers = new Map<string, ReturnType<typeof setTimeout>>();
   // Per-entity windup/loop/winddown state for an engine mount (see mountEngine).
   private mountEngines = new Map<number, MountEngineEntry>();
+  // Interruptible bidirectional mounts must remember which authored take set
+  // owns the stop edge: once velocity reaches zero the renderer no longer has
+  // a meaningful backwards flag.
+  private mountEngineDirections = new Map<number, 'forward' | 'reverse'>();
   // Memoized per-mountKey engine clip key triple, or null once a mountKey is
   // known to have no engine take set. mountEngine() is called every frame for
   // every mounted entity in earshot, so this turns the per-frame cost for an
@@ -571,15 +582,46 @@ class Sfx {
       (this.entry(key)?.gain ?? 1) *
       (jitter ? 1 + (Math.random() * 2 - 1) * 0.1 : 1);
     const panner = this.makePanner(x, y, z);
+    const priorVoice = opts?.voiceKey ? this.keyedOneShots.get(opts.voiceKey) : undefined;
+    const voiceCrossfade = Math.max(0, opts?.voiceCrossfade ?? 0);
+    if (priorVoice) {
+      if (voiceCrossfade > 0) {
+        priorVoice.gain.gain.setValueAtTime(priorVoice.gain.gain.value, now);
+        priorVoice.gain.gain.linearRampToValueAtTime(0.0001, now + voiceCrossfade);
+        try {
+          priorVoice.src.stop(now + voiceCrossfade);
+        } catch {
+          /* already stopped */
+        }
+      } else {
+        try {
+          priorVoice.src.stop();
+        } catch {
+          /* already stopped */
+        }
+      }
+    }
+    if (opts?.voiceKey) {
+      this.keyedOneShots.set(opts.voiceKey, { src, gain: g });
+    }
     src.connect(g).connect(panner).connect(master);
     this.active++;
     src.onended = () => {
       this.active--;
+      if (opts?.voiceKey && this.keyedOneShots.get(opts.voiceKey)?.src === src) {
+        this.keyedOneShots.delete(opts.voiceKey);
+      }
       src.disconnect();
       g.disconnect();
       panner.disconnect();
     };
-    this.applyEnvelope(src, g, peak, now, opts);
+    this.applyEnvelope(
+      src,
+      g,
+      peak,
+      now,
+      priorVoice && voiceCrossfade > 0 ? { ...opts, attack: voiceCrossfade } : opts,
+    );
     return true;
   }
 
@@ -764,7 +806,17 @@ class Sfx {
       src.start();
       this.commitVariant(key, variantIndex);
       this.pendingLoopVariants.delete(id);
-      slot = { key, src, gain: g, panner, target: -1, x, y, z };
+      slot = {
+        key,
+        src,
+        gain: g,
+        panner,
+        target: -1,
+        x,
+        y,
+        z,
+        playbackTarget: this.authoredPlaybackRate(key),
+      };
       this.loops.set(id, slot);
       justCreated = true;
     } else if (positional && slot.panner) {
@@ -906,14 +958,15 @@ class Sfx {
     });
   }
 
-  /** Windup/loop/winddown engine audio for a mount with a dedicated take set
-   *  (currently just the tank mount): call every frame a rider is mounted,
-   *  keyed per entity so multiple riders never share state. A mount with no
+  /** Windup/loop/winddown engine audio for mounts with dedicated take sets:
+   *  call every frame a rider is mounted, keyed per entity so multiple riders
+   *  never share state. A mount with no
    *  `_start` take falls through silently, so ordinary mounts keep using
    *  mountRun's per-stride gait beat instead. See mount_engine_state.ts for
-   *  the transition rules (a quick tap plays the windup and winddown back to
-   *  back, no loop; sustained movement crossfades into the loop and back
-   *  out). Returns whether this call drives an engine mount at all, so the
+   *  the transition rules. The tank retains its trailing transition policy;
+   *  the rocket sled hard-splices its tightly authored forward takes and
+   *  interrupts start/stop when input changes. Returns whether this call
+   *  drives an engine mount at all, so the
    *  caller (renderer.ts) knows whether to also skip the generic gait beat. */
   /** Resolve (and cache) the engine clip key triple for a mountKey, or null if
    *  this mount has no dedicated windup/loop/winddown take set. Memoized so
@@ -921,15 +974,19 @@ class Sfx {
    *  costs one map lookup instead of building and discarding 3 strings. */
   private engineClipKeys(
     mountKey: string,
+    direction: 'forward' | 'reverse' = 'forward',
   ): { startKey: string; loopKey: string; stopKey: string } | null {
-    const cached = this.engineClipKeysCache.get(mountKey);
+    const cacheId = direction === 'forward' ? mountKey : `${mountKey}:reverse`;
+    const cached = this.engineClipKeysCache.get(cacheId);
     if (cached !== undefined) return cached;
-    const startKey = `mount_run_${mountKey}_start`;
+    const stem =
+      direction === 'forward' ? `mount_run_${mountKey}` : `mount_run_${mountKey}_reverse`;
+    const startKey = `${stem}_start`;
     const resolved =
       startKey in SFX_CLIPS
-        ? { startKey, loopKey: `mount_run_${mountKey}`, stopKey: `mount_run_${mountKey}_stop` }
+        ? { startKey, loopKey: stem, stopKey: `${stem}_stop` }
         : null;
-    this.engineClipKeysCache.set(mountKey, resolved);
+    this.engineClipKeysCache.set(cacheId, resolved);
     return resolved;
   }
 
@@ -940,46 +997,108 @@ class Sfx {
     mountKey: string,
     moving: boolean,
     entityId: number,
+    backwards = false,
+    airborne = false,
   ): boolean {
-    const keys = this.engineClipKeys(mountKey);
+    const interruptible = mountKey === 'goblin_rocket_sled';
+    const priorDirection = this.mountEngineDirections.get(entityId);
+    const direction: 'forward' | 'reverse' = interruptible
+      ? moving
+        ? backwards
+          ? 'reverse'
+          : 'forward'
+        : (priorDirection ?? 'forward')
+      : 'forward';
+    const directionChanged = interruptible && moving && priorDirection !== undefined && priorDirection !== direction;
+    if (interruptible && moving) this.mountEngineDirections.set(entityId, direction);
+    const keys = this.engineClipKeys(mountKey, direction);
     if (!keys) return false;
     const { startKey, loopKey, stopKey } = keys;
     const ctx = this.ctx;
     if (!ctx) return true;
     const now = ctx.currentTime;
-    const prior = this.mountEngines.get(entityId);
+    const prior = directionChanged ? undefined : this.mountEngines.get(entityId);
+    if (directionChanged) this.unloop(`mountEngine:${entityId}`, 0);
     // variant 0: the only take today (see mountRun/playAt's variant pool for
     // other cues). If a second windup variant ever lands, this needs to
     // resolve whichever variant playAt's round-robin actually picked for
     // THIS play, not always the first.
     const startBuf = this.buffers.get(assetCacheKey(startKey, 0));
     const startDuration = startBuf?.duration ?? MOUNT_ENGINE_START_FALLBACK_SEC;
-    const { next, action } = advanceMountEngine(prior, moving, now, startDuration);
+    const driven = moving;
+    const { next, action } = interruptible
+      ? advanceInterruptibleMountEngine(prior, driven, now, startDuration)
+      : advanceMountEngine(prior, driven, now, startDuration);
     this.mountEngines.set(entityId, next);
-    // jitter: false on the windup: advanceMountEngine schedules the loop
+    // jitter: false on both transitions: the state machine schedules the loop
     // splice off this clip's nominal buffer duration (startDuration above),
     // so the actual playback must match that duration exactly. playAt's
     // default rate jitter (+/-6%) would otherwise let the loop enter up to
     // ~54ms early or late, and cut the windup off before (or past) the
     // level it was authored to hand off to the loop at.
+    const transitionVoice = interruptible ? `mountEngineTransition:${entityId}` : undefined;
     if (action === 'playStart') {
-      this.playAt(startKey, x, y, z, { gain: 0.85, cooldown: 0, jitter: false });
-    } else if (action === 'playStop') this.playAt(stopKey, x, y, z, { gain: 0.85, cooldown: 0 });
+      this.playAt(startKey, x, y, z, {
+        gain: 0.85,
+        cooldown: 0,
+        jitter: false,
+        voiceKey: transitionVoice,
+        voiceCrossfade: interruptible ? 0.04 : undefined,
+      });
+    } else if (action === 'playStop') {
+      this.playAt(stopKey, x, y, z, {
+        gain: 0.85,
+        cooldown: 0,
+        jitter: false,
+        voiceKey: transitionVoice,
+        voiceCrossfade: interruptible ? 0.04 : undefined,
+      });
+    }
     const loopActive = mountEngineLoopActive(next.state);
     const loopId = `mountEngine:${entityId}`;
     // immediate: true, the windup take is authored to already end at the
     // loop's own level, so a fade-in here would read as a swell right where
     // the two takes are meant to splice as one continuous sound.
     if (loopActive) this.loop(loopId, loopKey, 0.85, x, y, z, undefined, true);
-    else if (prior && mountEngineLoopActive(prior.state)) this.unloop(loopId, 0.15);
+    else if (prior && mountEngineLoopActive(prior.state)) {
+      this.unloop(loopId, interruptible ? 0 : 0.15);
+    }
+    // Only the rocket sled's sustained turbine take bends with jump load. The
+    // authored start/stop voices remain at their exact recorded pitch, and an
+    // in-progress start simply receives this target once its loop begins.
+    if (interruptible) {
+      const loop = this.loops.get(loopId);
+      if (loop) {
+        const authored = this.authoredPlaybackRate(loop.key);
+        const pitchTarget = authored * (airborne ? 1.08 : 1);
+        if (loop.playbackTarget !== pitchTarget) {
+          loop.playbackTarget = pitchTarget;
+          loop.src.playbackRate.setTargetAtTime(
+            pitchTarget,
+            now,
+            airborne ? 0.07 : 0.055,
+          );
+        }
+      }
+    }
     return true;
   }
 
   /** Drop an entity's engine-mount state and silence its loop, e.g. on
    *  dismount or when its view is removed (interest culled, disconnect). */
   mountEngineReset(entityId: number): void {
-    if (!this.mountEngines.delete(entityId)) return;
+    this.mountEngines.delete(entityId);
+    this.mountEngineDirections.delete(entityId);
     this.unloop(`mountEngine:${entityId}`, 0.1);
+    const transitionKey = `mountEngineTransition:${entityId}`;
+    const transition = this.keyedOneShots.get(transitionKey);
+    if (!transition) return;
+    this.keyedOneShots.delete(transitionKey);
+    try {
+      transition.src.stop();
+    } catch {
+      /* already stopped */
+    }
   }
 
   /** Warm the three engine clips (windup/loop/winddown) for a mountKey ahead
@@ -998,6 +1117,14 @@ class Sfx {
     this.preload(keys.startKey);
     this.preload(keys.loopKey);
     this.preload(keys.stopKey);
+    if (mountKey === 'goblin_rocket_sled') {
+      const reverse = this.engineClipKeys(mountKey, 'reverse');
+      if (reverse) {
+        this.preload(reverse.startKey);
+        this.preload(reverse.loopKey);
+        this.preload(reverse.stopKey);
+      }
+    }
   }
 
   /** Jump / land / water-entry / swim-stroke. */

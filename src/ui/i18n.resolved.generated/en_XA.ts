@@ -1045,6 +1045,7 @@ export const en_XA: EnTranslations = {
       "name_shadowjump_toad": "[Ķáɱá-Ķáĝé ţĥé Šĥáðóŵ-Ĵúɱþ Ţóáð]",
       "name_stormfeather_griffin": "[Šķý-Ŕéáçĥ Šţóŕɱƒéáţĥéŕ]",
       "name_thunderstrut_gobbler": "[Ţĥúñðéŕšţŕúţ ţĥé Ĝŕáñð Ĝóƀƀļéŕ]",
+      "name_goblin_rocket_sled": "[Ĝóƀļíñ Ŕóçķéţ Šļéð]",
       "name_terrorspark_groundshaker": "[Ţéŕŕóŕšþáŕķ Ĝŕóúñðšĥáķéŕ]",
       "name_drakemaw_raptor": "[Ðŕáķéɱáŵ Ŕáþţóŕ]",
       "desc_valorsteed": "[Á ĥáŕðý, šúŕé-ƒóóţéð šţééð ţĥáţ þŕóʋíðéš éñĥáñçéð ţŕáʋéļ šþééð.]",
@@ -1054,6 +1055,7 @@ export const en_XA: EnTranslations = {
       "desc_shadowjump_toad": "[Á ɱáššíʋé, šúŕé-ƒóóţéð ĝíáñţ ţóáð, ţŕáíñéð íñ ļíĝĥţñíñĝ-ƒášţ šĥáðóŵéð ƀóúñðš ţĥáţ çóʋéŕ áñý ţéŕŕáíñ.]",
       "desc_stormfeather_griffin": "[Á ŕéĝáļ šţóŕɱ ĝŕíƒƒíñ ţĥáţ šţáļķš ţĥé ĝŕóúñð óñ ŕúñé-šĥóð ţáļóñš, ŵíñĝš ƒúŕļéð.]",
       "desc_thunderstrut_gobbler": "[Á çóļóššáļ šţóŕɱ-ĥáţçĥéð ĝóƀƀļéŕ ţĥáţ šţŕúţš ðóŵñ ƒŕóɱ ţĥé Ŵáķíñĝ Þéáķ, ţáíļ ƒáññéð ļíķé á ţĥúñðéŕĥéáð.]",
+      "desc_goblin_rocket_sled": "[Á ðáñĝéŕóúšļý óʋéŕƀúíļţ ĝóƀļíñ šļéð þŕóþéļļéð ƀý ţŵíñ ŕóçķéţš áñð éẋçéļļéñţ ƀáð ĵúðĝɱéñţ.]",
       "desc_terrorspark_groundshaker": "[Á çóɱþáçţ áŕɱóŕéð éñĝíñé ŵíţĥ ĥéáʋý ţŕáçķš, á ðééþ-ƀóŕé çáññóñ, áñð á šáððļé ƀúíļţ ƒóŕ ƒéáŕļéšš þíļóţš.]",
       "desc_drakemaw_raptor": "[Á šáððļé-ƀŕóķéñ ƀŕóóð ŕáþţóŕ ƒŕóɱ ţĥé Ðŕáķéɱáŵ Çáļðéŕá, áļļ šíñéŵ áñð šþŕíñţ, šţíļļ šɱéļļíñĝ ƒáíñţļý óƒ ášĥ.]"
     },
@@ -12166,6 +12168,9 @@ export const en_XA: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "[Íĝñíţíóñ Ķéý: Ţéŕŕóŕšþáŕķ Ĝŕóúñðšĥáķéŕ]"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "[Íĝñíţíóñ Ķéý: Ĝóƀļíñ Ŕóçķéţ Šļéð]"
       },
       "reins_drakemaw_raptor": {
         "name": "[Ŕéíñš óƒ ţĥé Ðŕáķéɱáŵ Ŕáþţóŕ]"

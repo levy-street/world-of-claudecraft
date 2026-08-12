@@ -6476,6 +6476,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Goblin Rocket Sled"
+      },
+      {
+        "kind": "mount",
         "name": "Terrorspark Groundshaker"
       }
     ]

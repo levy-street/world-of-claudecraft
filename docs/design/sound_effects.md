@@ -203,6 +203,12 @@ until that loop stops.
 | `mount_run_shadowjump_toad` | 0.52 | slime spring and damp footfall |
 | `mount_run_stormfeather_griffin` | 0.51 | large wing rush and hard talon contact |
 | `mount_run_thunderstrut_gobbler` | 0.40 | higher feather rush and quick claw contact |
+| `mount_run_goblin_rocket_sled_start` | 1.41 | authored forward rocket ignition ramp, hard-spliced into sustain |
+| `mount_run_goblin_rocket_sled` | 9.53 | seamless forward rocket burner sustain loop |
+| `mount_run_goblin_rocket_sled_stop` | 2.04 | authored forward rocket shutdown ramp, directly interruptible |
+| `mount_run_goblin_rocket_sled_reverse_start` | 1.28 | authored reverse turbine ignition ramp, directly interruptible |
+| `mount_run_goblin_rocket_sled_reverse` | 10.53 | seamless reverse rocket sustain loop |
+| `mount_run_goblin_rocket_sled_reverse_stop` | 1.18 | authored reverse turbine shutdown ramp, directly interruptible |
 | `mount_run_terrorspark_groundshaker` | 0.55 | compact tread clatter with a low mechanical drive pulse |
 | `move_jump` | 0.5 | quick light gear/leather exertion and fabric rustle, a person leaping up |
 | `move_land` | 0.6 | a person landing from a jump, boots thud with armor and gear settle |

@@ -1045,6 +1045,7 @@ export const pt_BR: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, o Sapo Salta-Sombras",
       "name_stormfeather_griffin": "Pluma-Tormenta Alcança-Céu",
       "name_thunderstrut_gobbler": "Pavoneia-Trovões, o Grande Peru",
+      "name_goblin_rocket_sled": "Goblin Rocket Sled",
       "name_terrorspark_groundshaker": "Faíscaterror, Abala-Terra",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
@@ -1054,6 +1055,7 @@ export const pt_BR: EnTranslations = {
       "desc_shadowjump_toad": "Um sapo gigante, maciço e de passo firme, treinado em saltos sombrios relâmpago por qualquer terreno.",
       "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.",
       "desc_thunderstrut_gobbler": "Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade.",
+      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
       "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
       "desc_drakemaw_raptor": "Um raptor da ninhada domado na sela, vindo da Caldeira de Drakemaw, puro músculo e velocidade, ainda com um leve cheiro de cinzas."
     },
@@ -12166,6 +12168,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chave de ignição: Faíscaterror, Abala-Terra"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "Ignition Key: Goblin Rocket Sled"
       },
       "reins_drakemaw_raptor": {
         "name": "Rédeas do Raptor de Drakemaw"

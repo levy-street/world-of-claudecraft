@@ -330,7 +330,8 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
-import { mountBobY, mountVisualSpec } from './mount_visuals';
+import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
+import { mountBobY, mountVisualSpec, stepRocketSledJumpPitch } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -1125,6 +1126,7 @@ export interface EntityView {
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
   mountVisual: CharacterVisual | null; // rideable mount under a player, built lazily
   mountVisualKey: string; // '' = none; diffed each frame for live mount swaps
+  goblinRocketSledFx: GoblinRocketSledFx | null;
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
@@ -1234,6 +1236,8 @@ export interface EntityView {
   hasPrevY: boolean;
   /** Peak downward display speed this flight, reset on landing. */
   fallSpeed: number;
+  /** Goblin Rocket Sled's display-only rigid jump attitude (nose-up radians). */
+  rocketSledJumpPitch: number;
   /** Damped terrain lean plus its cadence-sampled gradient. */
   groundTilt: GroundTiltState;
   tiltGradX: number;
@@ -8759,6 +8763,7 @@ export class Renderer {
       travelVisual: null,
       mountVisual: null,
       mountVisualKey: '',
+      goblinRocketSledFx: null,
       mountLift: 0,
       metamorphVisual: null,
       fireballTravelVisual: null,
@@ -8831,6 +8836,7 @@ export class Renderer {
       prevRenderY: 0,
       hasPrevY: false,
       fallSpeed: 0,
+      rocketSledJumpPitch: 0,
       // Stagger the first resample so a crowd spreads its terrain samples.
       tiltSampleT: (e.id % 7) * (TILT_SAMPLE_INTERVAL / 7),
       tiltGradX: 0,
@@ -10330,6 +10336,8 @@ export class Renderer {
       this.lightRankDirty = true;
     }
     this.nameplatePainter.remove(id);
+    v.goblinRocketSledFx?.dispose();
+    v.goblinRocketSledFx = null;
     const idx = this.clickTargets.indexOf(v.clickTarget);
     if (idx >= 0) this.clickTargets.splice(idx, 1);
     if (v.visual) {
@@ -11234,6 +11242,8 @@ export class Renderer {
       const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
       const mountShown = !!mountSpec && requestedForm === 'base' && !e.dead;
       if (mountSpec && v.mountVisualKey !== mountSpec.visualKey) {
+        v.goblinRocketSledFx?.dispose();
+        v.goblinRocketSledFx = null;
         if (v.mountVisual) {
           v.group.remove(v.mountVisual.root);
           v.mountVisual.dispose();
@@ -11244,6 +11254,9 @@ export class Renderer {
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
           v.mountVisualKey = mountSpec.visualKey;
+          if (mountSpec.visualKey === 'mount_goblin_rocket_sled') {
+            v.goblinRocketSledFx = GoblinRocketSledFx.create(v.mountVisual.root);
+          }
           // A newly summoned mount is exactly a brand-new rig's materials
           // linking for the first time; gate it like a gear swap instead of
           // freezing the frame the mount lands on (#2571).
@@ -11257,6 +11270,8 @@ export class Renderer {
           );
         }
       } else if (!mountSpec && v.mountVisual) {
+        v.goblinRocketSledFx?.dispose();
+        v.goblinRocketSledFx = null;
         v.group.remove(v.mountVisual.root);
         v.mountVisual.dispose();
         v.mountVisual = null;
@@ -11562,14 +11577,19 @@ export class Renderer {
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
       if (sink && d2 < SFX_MOVE_RANGE_SQ) {
+        const rocketSledMounted = logicallyMounted && e.mountKey === 'goblin_rocket_sled';
         // jump / land / water-entry edges
-        if (airborne && !v.wasAirborne && !visuallyDead) sink.movement('jump', ax, ay, az, isSelf);
+        if (airborne && !v.wasAirborne && !visuallyDead) {
+          if (!rocketSledMounted) sink.movement('jump', ax, ay, az, isSelf);
+        }
         else if (!airborne && v.wasAirborne && !visuallyDead) {
           // A flight that ends by catching a ledge is not a fall, and the
           // heavy landing thud on one reads as a bug: you hopped onto a rock
           // mid-arc and the game played a crash. Anything softer than a plain
           // jump's own landing speed gets a footfall instead.
-          if (v.fallSpeed >= SOFT_LANDING_SPEED) {
+          if (rocketSledMounted) {
+            // Its turbine pitch and nozzle compression carry the landing.
+          } else if (v.fallSpeed >= SOFT_LANDING_SPEED) {
             sink.movement('land', ax, ay, az, isSelf);
           } else {
             sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), false, isSelf);
@@ -11599,7 +11619,7 @@ export class Renderer {
           // mount) drives its own state machine every frame instead of the
           // per-stride gait beat below; mountEngine reports whether this
           // mountKey actually has one, so ordinary mounts fall through.
-          if (sink.mountEngine(ax, ay, az, e.mountKey, true, e.id)) {
+          if (sink.mountEngine(ax, ay, az, e.mountKey, true, e.id, st.backwards, false)) {
             // handled entirely by mountEngine
           } else if (loco.speed >= FOOT_RUN_SPEED) {
             v.stepAccum += loco.speed * dt;
@@ -11618,11 +11638,16 @@ export class Renderer {
           // little bump in the road. Skipping the poll entirely leaves the
           // state machine (and any active loop) exactly where it was; the
           // next grounded frame picks the state back up on its own branch.
+          // The rocket sled is the exception: its turbine startup continues
+          // through the hop and an active sustain bends upward under no load.
+          if (rocketSledMounted) {
+            sink.mountEngine(ax, ay, az, e.mountKey, moving, e.id, st.backwards, true);
+          }
         } else if (logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)) {
           // Not moving while mounted (grounded and stopped): still poll an
           // engine mount every frame so the winddown fires on the stop edge;
           // a non-engine mount has nothing to do here (mountEngine no-ops).
-          sink.mountEngine(ax, ay, az, e.mountKey, false, e.id);
+          sink.mountEngine(ax, ay, az, e.mountKey, false, e.id, false, false);
         } else if (moving && !airborne) {
           v.stepAccum += loco.speed * dt;
           const stride = loco.speed >= FOOT_RUN_SPEED ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK;
@@ -11863,9 +11888,25 @@ export class Renderer {
           v.mountVisual.update(dt, mst, animate);
           // the rider floats WITH the procedural bob (the hover cycle's idle
           // float), not just the mount body
-          const bob = mountBobY(mountSpec, this.time, moving);
+          const bob = mountSpec.groundLift + mountBobY(mountSpec, this.time, moving);
+          const rocketSled = e.mountKey === 'goblin_rocket_sled';
+          v.rocketSledJumpPitch = stepRocketSledJumpPitch(
+            v.rocketSledJumpPitch,
+            rocketSled && airborne,
+            dt > 1e-4 ? dyRaw / dt : 0,
+            dt,
+          );
+          const pitch = rocketSled ? v.rocketSledJumpPitch : 0;
+          const rotationX = -pitch;
+          v.mountVisual.root.rotation.x = rotationX;
+          const seatY = v.mountLift + bob;
+          const seatZ = mountSpec.seatFwd;
+          // Rigidly carry the separately-owned rider root around the same
+          // vehicle-origin pivot, keeping pelvis and cushion locked together.
           v.mountVisual.root.position.y = bob;
-          v.visual.root.position.y = v.mountLift + bob;
+          v.visual.root.rotation.x = rotationX;
+          v.visual.root.position.y = seatY * Math.cos(pitch) + seatZ * Math.sin(pitch);
+          v.visual.root.position.z = seatZ * Math.cos(pitch) - seatY * Math.sin(pitch);
           // ambient mount particles: the snail paints its slime path while
           // gliding, the hover cycle streams aether exhaust off its tail
           if (mountSpec.fx === 'slime') {
@@ -11876,6 +11917,23 @@ export class Renderer {
         } else {
           v.mountVisual.advanceOffscreen(dt);
         }
+      } else if (!mountShown) {
+        v.rocketSledJumpPitch = 0;
+        v.visual.root.rotation.x = 0;
+      }
+      if (v.goblinRocketSledFx) {
+        const rocketFxShown = mountShown && !v.mountCompilePending && runCharacterPresentation;
+        v.goblinRocketSledFx.update(
+          dt,
+          this.time,
+          moving,
+          st.backwards,
+          airborne,
+          st.speed,
+          this.reducedMotion(),
+          rocketFxShown,
+          rocketFxShown ? this.vfx : null,
+        );
       }
 
       const emoteId =

@@ -1633,6 +1633,14 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 4.5,
     lazyPreload: true,
   },
+  // Goblin Rocket Sled: clipless rigid vehicle. Runtime exhaust and motion live
+  // in its mount-owned render controller, never in a baked idle animation.
+  mount_goblin_rocket_sled: {
+    url: `${MOUNTS_DIR}/goblin_rocket_sled.glb`,
+    height: 2.5,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
   // its authored tread cadence at the reference ground speeds below.
   mount_terrorspark_groundshaker: {

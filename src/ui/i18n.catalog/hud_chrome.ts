@@ -869,6 +869,7 @@ export const hudChromeStrings = {
     name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
     name_stormfeather_griffin: 'Sky-Reach Stormfeather',
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
+    name_goblin_rocket_sled: 'Goblin Rocket Sled',
     name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
@@ -882,6 +883,8 @@ export const hudChromeStrings = {
       'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
     desc_thunderstrut_gobbler:
       'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
+    desc_goblin_rocket_sled:
+      'A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:

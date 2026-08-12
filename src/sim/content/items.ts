@@ -414,6 +414,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer-only mount checkpoint. It deliberately has no acquisition path;
+  // use /dev mounts or /dev give reins_goblin_rocket_sled during visual review.
+  reins_goblin_rocket_sled: {
+    id: 'reins_goblin_rocket_sled',
+    name: 'Ignition Key: Goblin Rocket Sled',
+    kind: 'mount',
+    mount: 'goblin_rocket_sled',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   mistveil_cord: {
     id: 'mistveil_cord',
     name: 'Mistveil Cord',

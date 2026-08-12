@@ -2,11 +2,11 @@
 // sustained loop, winddown one-shot), decoupled from WebAudio so the
 // transition logic unit-tests without an AudioContext. Most mounts play a
 // per-stride gait one-shot (sfx.ts mountRun); a mount with a dedicated
-// windup/loop/winddown take set (the tank mount) drives through here instead.
+// windup/loop/winddown take set drives through one of the policies here.
 //
-// A quick tap (moving flips back off before the windup finishes) lets the
-// windup finish playing in full, then chains straight into the winddown with
-// no loop ever engaging: two short takes back to back, not an interrupt.
+// The tank policy lets a quick-tap windup finish before its winddown. The
+// interruptible policy used by the rocket sled cuts directly between the
+// authored start and stop takes when input reverses.
 
 export type MountEngineState = 'idle' | 'starting' | 'moving' | 'stopping';
 
@@ -65,6 +65,37 @@ export function advanceMountEngine(
       // is short and left to finish on its own voice underneath.
       if (moving) return { next: { state: 'starting', phaseStartedAt: now }, action: 'playStart' };
       return { next: prior, action: null };
+  }
+}
+
+/** Directly interruptible authored take set. Releasing during start cuts to
+ *  stop immediately; pressing during stop cuts back to start immediately. */
+export function advanceInterruptibleMountEngine(
+  entry: MountEngineEntry | undefined,
+  moving: boolean,
+  now: number,
+  startDuration: number,
+): MountEngineDecision {
+  const prior = entry ?? IDLE;
+  switch (prior.state) {
+    case 'idle':
+      return moving
+        ? { next: { state: 'starting', phaseStartedAt: now }, action: 'playStart' }
+        : { next: prior, action: null };
+    case 'starting':
+      if (!moving) return { next: { state: 'stopping', phaseStartedAt: now }, action: 'playStop' };
+      if (now - prior.phaseStartedAt >= startDuration - EPSILON_SEC) {
+        return { next: { state: 'moving', phaseStartedAt: now }, action: null };
+      }
+      return { next: prior, action: null };
+    case 'moving':
+      return moving
+        ? { next: prior, action: null }
+        : { next: { state: 'stopping', phaseStartedAt: now }, action: 'playStop' };
+    case 'stopping':
+      return moving
+        ? { next: { state: 'starting', phaseStartedAt: now }, action: 'playStart' }
+        : { next: prior, action: null };
   }
 }
 

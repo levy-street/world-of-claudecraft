@@ -10,6 +10,7 @@ import {
   mountBobY,
   mountSeatLift,
   mountVisualSpec,
+  stepRocketSledJumpPitch,
 } from '../src/render/mount_visuals';
 import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
@@ -97,10 +98,11 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     ),
   ].sort();
 
-  it('carries authored COLOR_0 on exactly the Terrorspark Groundshaker and the Valorsteed', () => {
+  it('carries authored COLOR_0 on exactly the authored vertex-painted mounts', () => {
     expect(mountUrls.length).toBeGreaterThanOrEqual(8);
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([
+      'models/mounts/goblin_rocket_sled.glb',
       'models/mounts/terrorspark_groundshaker.glb',
       'models/mounts/valorsteed.glb',
     ]);
@@ -164,6 +166,33 @@ describe('procedural bob math', () => {
       lazyPreload: true,
     });
     expect(mountBobY(spec, 0.7, true)).toBe(0);
+  });
+
+  it('parks the rocket sled still, seats its rider lower, and clears terrain while moving', () => {
+    const spec = MOUNT_VISUAL_SPECS.goblin_rocket_sled;
+    expect(spec.seat).toBe(1.29);
+    expect(spec.bobIdle).toBe(false);
+    expect(mountBobY(spec, 0.25 / spec.bobHz, false)).toBe(0);
+    expect(mountBobY(spec, 0.25 / spec.bobHz, true)).toBeCloseTo(spec.bobAmp, 5);
+    expect(spec.groundLift).toBe(0.09);
+    expect(spec.groundLift).toBeGreaterThan(spec.bobAmp);
+    const lowPoint = spec.groundLift + mountBobY(spec, 0.75 / spec.bobHz, true);
+    expect(lowPoint).toBeGreaterThan(0);
+  });
+
+  it('tips the rocket sled through a velocity-aware jump arc and settles flat', () => {
+    let pitch = 0;
+    for (let i = 0; i < 10; i++) pitch = stepRocketSledJumpPitch(pitch, true, 7.5, 1 / 60);
+    expect((pitch * 180) / Math.PI).toBeGreaterThan(18);
+    expect((pitch * 180) / Math.PI).toBeLessThan(23);
+    for (let i = 0; i < 12; i++) pitch = stepRocketSledJumpPitch(pitch, true, 0, 1 / 60);
+    expect((pitch * 180) / Math.PI).toBeGreaterThan(11);
+    expect((pitch * 180) / Math.PI).toBeLessThan(15);
+    for (let i = 0; i < 20; i++) pitch = stepRocketSledJumpPitch(pitch, true, -7.5, 1 / 60);
+    expect((pitch * 180) / Math.PI).toBeLessThan(0);
+    expect((pitch * 180) / Math.PI).toBeGreaterThan(-5);
+    for (let i = 0; i < 24; i++) pitch = stepRocketSledJumpPitch(pitch, false, 0, 1 / 60);
+    expect(Math.abs((pitch * 180) / Math.PI)).toBeLessThan(0.01);
   });
 
   it('the snail glides flat (no bob at all)', () => {

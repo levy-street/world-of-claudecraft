@@ -1045,6 +1045,7 @@ export const tr_TR: EnTranslations = {
       "name_shadowjump_toad": "Gölge Sıçrayan Kurbağa Kama-Kage",
       "name_stormfeather_griffin": "Gökyüzü Erişimli Fırtınatüy",
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
+      "name_goblin_rocket_sled": "Goblin Rocket Sled",
       "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
@@ -1054,6 +1055,7 @@ export const tr_TR: EnTranslations = {
       "desc_shadowjump_toad": "Her arazi türünü aşan, şimşek hızındaki gölgeli sıçramalarla eğitilmiş, dev ve sağlam adımlı bir kurbağa.",
       "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
       "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
+      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
       "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
       "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor."
     },
@@ -12166,6 +12168,9 @@ export const tr_TR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "Ignition Key: Goblin Rocket Sled"
       },
       "reins_drakemaw_raptor": {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"

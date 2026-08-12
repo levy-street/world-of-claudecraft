@@ -1045,6 +1045,7 @@ export const sv_SE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Skuggsprångspaddan",
       "name_stormfeather_griffin": "Himmelsvidd Stormfjäder",
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
+      "name_goblin_rocket_sled": "Goblin Rocket Sled",
       "name_terrorspark_groundshaker": "Skräckgnista, markskakaren",
       "name_drakemaw_raptor": "Drakgapsraptor",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
@@ -1054,6 +1055,7 @@ export const sv_SE: EnTranslations = {
       "desc_shadowjump_toad": "En massiv, säkerfotad jättepadda, tränad i blixtsnabba skuggsprång som täcker all terräng.",
       "desc_stormfeather_griffin": "En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.",
       "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.",
+      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
       "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.",
       "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska."
     },
@@ -12166,6 +12168,9 @@ export const sv_SE: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Tändningsnyckel: Skräckgnista, markskakaren"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "Ignition Key: Goblin Rocket Sled"
       },
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"

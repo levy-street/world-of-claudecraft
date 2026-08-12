@@ -6027,6 +6027,25 @@
     "marrowpoint",
     "rimefang"
    ]
+  },
+  {
+   "batchId": "goblin-rocket-sled-icon-2026-08-12",
+   "source": "OpenAI image generation (user-supplied accepted result; exact generator surface and prompt not supplied)",
+   "owner": "World of ClaudeCraft",
+   "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+   "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+   },
+   "styleReference": "User-supplied and user-approved V2 vehicle portrait derived from the Goblin Rocket Sled concept and reviewed against the shipped mount plus woc-item-icon-v1. Source and shipping hashes, reference role, processing, and small-size review are retained in docs/design/goblin_rocket_sled/icon-provenance.json; the exact source-generation prompt was not supplied and is explicitly not reconstructed.",
+   "commonPrompt": "Exact source-generation prompt not supplied. Accepted-art constraints verified after generation: one complete three-quarter Goblin Rocket Sled vehicle portrait; opaque dark painted vignette; warm top-left key; tactile red metal, black iron, wood, and leather; safe margins; no rider, text, UI border, watermark, transparency, or crop.",
+   "provenanceRecord": "docs/design/goblin_rocket_sled/icon-provenance.json",
+   "provenanceRecords": [
+    "docs/design/goblin_rocket_sled/icon-provenance.json"
+   ],
+   "itemIds": [
+    "reins_goblin_rocket_sled"
+   ]
   }
  ]
 }

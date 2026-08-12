@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "batchId": "goblin-rocket-sled-icon-2026-08-12",
+  "acceptedDate": "2026-08-12",
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "owner": "World of ClaudeCraft",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "generator": {
+    "reportedFamily": "OpenAI image generation",
+    "surface": "not supplied",
+    "exactModel": "not supplied",
+    "exactPrompt": "not supplied; intentionally not reconstructed"
+  },
+  "item": {
+    "id": "reins_goblin_rocket_sled",
+    "name": "Ignition Key: Goblin Rocket Sled",
+    "sourceMaster": {
+      "originalPath": "E:/goblin_rocket_sled_icon_v2.png",
+      "preservedWorkspacePath": "tmp/asset_src/goblin_rocket_sled/icon/goblin_rocket_sled_icon_v2.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "pixelFormat": "rgb24",
+      "alpha": "opaque",
+      "bytes": 2385571,
+      "sha256": "ce7202c857807cf04a244e5e59464402dbe887a62d56bf52708c1a95036f8808"
+    },
+    "references": [
+      {
+        "path": "docs/design/goblin_rocket_sled/reference-metadata.json",
+        "role": "subject identity and concept provenance",
+        "note": "The generated painting preserves the accepted twin-rocket, long-runner, central-seat, goblin-prow vehicle identity."
+      },
+      {
+        "path": "public/models/mounts/goblin_rocket_sled.glb",
+        "role": "shipping subject verification",
+        "note": "Used during review to confirm red twin rockets, runners, seat, goblin prow, side skull emblem, and exhaust identity."
+      },
+      {
+        "path": "docs/design/item-icon-art-style.md",
+        "role": "house-style and acceptance contract"
+      }
+    ],
+    "review": {
+      "master": "accepted",
+      "sizes": [128, 40, 28, 22],
+      "grayscaleSize": 28,
+      "circularCropSize": 64,
+      "verdict": "V2 accepted: centered complete vehicle, strong small-size twin-rocket silhouette, opaque painted ground, readable materials, safe runner and flame margins, no text, frame, watermark, rider, or transparency.",
+      "reviewer": "user and Codex visual review"
+    },
+    "processing": [
+      "Copied the accepted V2 source into ignored provenance staging.",
+      "Normalized through scripts/convert_item_icons_webp.mjs at the repository default quality with smart subsampling and metadata stripping.",
+      "Source input in public/ui/items was deleted transactionally by the converter after successful shipping installation."
+    ],
+    "shipping": {
+      "path": "public/ui/items/reins_goblin_rocket_sled.webp",
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "alpha": "opaque",
+      "maximumBytes": 15360,
+      "bytes": 3938,
+      "sha256": "23511d3bfe46d71d757675972d3916a48875dbf7b3455fdaadf163b5ca193a5f"
+    }
+  }
+}

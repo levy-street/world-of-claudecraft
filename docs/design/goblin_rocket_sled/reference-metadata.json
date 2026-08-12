@@ -1,0 +1,105 @@
+{
+  "assetId": "goblin_rocket_sled",
+  "sourceKind": "user-supplied AI-generated concept sheet",
+  "sourceTool": "GPT, exact model/version not provided",
+  "sourcePrompt": "not provided",
+  "sourceInputs": "not provided beyond the user's request for a goblin sled mount concept",
+  "generationTimestamp": "not provided",
+  "sourceRedistributed": false,
+  "confirmationDate": "2026-08-10",
+  "permissionContext": "The user supplied /mnt/e/rocketsled.png and asked for a World of ClaudeCraft goblin sled mount based on it.",
+  "shippingPolicy": "The source sheet and transient crops are not committed or shipped in this design pass. The source hash, admission result, observed construction, and design boundary are recorded here without inventing missing generation lineage.",
+  "source": {
+    "pathAtIntake": "/mnt/e/rocketsled.png",
+    "sha256": "66ea789cc7f9356152457afda4208c3674f784502beb22bf4e7695482d0f184f",
+    "bytes": 3099058,
+    "width": 1536,
+    "height": 1024,
+    "colorFormat": "PNG"
+  },
+  "admissionGate": {
+    "tool": "img2threejs forge/stage1_intake/check_reference_admission.py",
+    "ran": true,
+    "viewpoint": "concept-sheet",
+    "admitted": true,
+    "reasons": [],
+    "foregroundCoverage": 0.6314,
+    "largestComponentFraction": 1.0,
+    "pHash": "18120733957400573632",
+    "duplicateOfHash": null,
+    "technicalSuitability": "pass",
+    "semanticSuitability": "pass: one coherent vehicle design with hero, orthographic-like, top-clearance, detail, and rear views"
+  },
+  "designBoundary": {
+    "kept": [
+      "low wide sled silhouette on two long straight runners with shallow upturned tips",
+      "open central tufted seat with no handlebars or visible controls",
+      "two low side-mounted rockets with banded red bodies, dark nozzle stacks, fins, and orange exhaust",
+      "low central banded fuel or bomb tank behind the rider",
+      "layered timber deck, dark iron brackets, rivet rows, pipes, and ramshackle goblin construction",
+      "green goblin skull or mask ornament centered on the prow",
+      "worn blood-red, dark iron, aged wood, brown leather, muted green bone, and orange glow palette",
+      "clear rider zone shown by the top-view diagram"
+    ],
+    "excluded": [
+      "the concept sheet title, labels, arrows, border, construction diagram, and other presentation graphics",
+      "literal smoke, sparks, and painted flame geometry baked into the vehicle GLB",
+      "any readable text, watermark, manufacturer identity, or exact source pixels",
+      "steering, brakes, handlebars, control levers, or other controls the concept explicitly omits",
+      "wheels, a puller creature, a carrier rig, skinning, and baked locomotion clips",
+      "real explosive or projectile gameplay behavior"
+    ],
+    "originalTreatment": [
+      "project-authored underside frame inferred from the admitted side and rear views",
+      "project-authored skull-and-bones markings without text or copied raster pixels",
+      "independent procedural metal, wood, and leather PBR fields rather than extracting baked lighting from the concept",
+      "runtime pooled exhaust effect driven from named nozzle sockets",
+      "runtime procedural bob and terrain tilt owned by a mount-specific render module",
+      "continuous held rocket-loop audio with explicit dismount cleanup"
+    ]
+  },
+  "admittedViews": {
+    "hero": {
+      "description": "Large front-left three-quarter vehicle view in the upper-left and center of the sheet.",
+      "role": "canonical silhouette, palette, runner length, rocket placement, seat, tank, and prow ornament"
+    },
+    "front": {
+      "description": "Front view in the multi-angle row.",
+      "role": "runner spacing, rocket symmetry, and prow width"
+    },
+    "side": {
+      "description": "Left profile in the multi-angle row.",
+      "role": "runner curvature, tank and seat height, rocket length, and chassis stance"
+    },
+    "rear": {
+      "description": "Rear view in the multi-angle row plus the larger fired-up rear detail.",
+      "role": "nozzle construction, exhaust spacing, tank placement, and rear frame width"
+    },
+    "top": {
+      "description": "Top rider-clearance diagram at the lower left.",
+      "role": "safe rider footprint, shoulder and head clearance, rocket offsets, and tank position"
+    },
+    "rocketDetail": {
+      "description": "Rocket body and nozzle close-ups in the upper-right detail grid.",
+      "role": "barrel bands, rivets, conical nose, nozzle rings, paint wear, and glow core"
+    },
+    "seatDetail": {
+      "description": "Seat and backrest close-up in the upper-right detail grid.",
+      "role": "tufted pad segmentation, frame thickness, and open rider volume"
+    },
+    "tankDetail": {
+      "description": "Fuel or bomb tank close-up in the upper-right detail grid.",
+      "role": "band rhythm, top caps, valves, side marking, and end construction"
+    },
+    "detailCloseups": {
+      "description": "Combined close-up grid covering rocket, nozzle, tank, runner tip, mount, and seat.",
+      "role": "meso and micro construction inventory"
+    }
+  },
+  "acceptanceRationale": [
+    "The sheet presents one unambiguous target vehicle rather than a scene.",
+    "Multiple consistent views expose the silhouette, rear, side, top clearance, and identity-critical assemblies.",
+    "The design is well suited to deterministic primitive, profile-extrude, tube, and instanced-fastener construction.",
+    "Hidden underside geometry can be approximated without compromising visible identity."
+  ]
+}

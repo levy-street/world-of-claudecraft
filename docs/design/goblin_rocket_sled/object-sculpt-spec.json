@@ -1,0 +1,4806 @@
+{
+  "targetName": "Goblin Rocket Sled",
+  "targetId": "goblin_rocket_sled",
+  "stageScope": {
+    "thisPass": [
+      "a standalone static goblin rocket sled GLB with no skin or baked animation",
+      "three independent procedural PBR map families for metal, wood, and leather, compressed to KTX2 before shipping",
+      "stable Socket_Rider, Socket_Exhaust_L, and Socket_Exhaust_R nodes",
+      "a mount-owned runtime module for bounded exhaust flicker, gentle movement bob, slope tilt, and dismount cleanup",
+      "a continuous held rocket-loop sound with no per-stride footfall cue",
+      "mount content, reins item, English-first i18n obligations, distinct painted item icon with provenance, and Reliquary catalog entry",
+      "parsed GLB contract tests, focused runtime tests, desktop and mobile visual evidence, and final repository QA"
+    ],
+    "deferred": [
+      "steering, brakes, handlebars, controls, or articulated suspension",
+      "bomb drops, projectiles, collisions, damage, explosions, or any other gameplay power",
+      "destructible or detachable rockets, tank, runners, or chassis parts",
+      "dynamic point lights from the nozzle cores or exhaust",
+      "baked GLB animation clips",
+      "redistribution of the source concept sheet"
+    ]
+  },
+  "designLocks": {
+    "mountClass": "standalone static vehicle, not a creature and not a vehicle-plus-puller compound",
+    "referencePolicy": "user-supplied GPT concept art; admission gate ran and passed; missing prompt and exact model lineage are stated explicitly",
+    "materialSystem": "real UV PBR surface maps generated procedurally per channel, plus semantic vertex colors; no PBR channels extracted from painted concept lighting",
+    "locomotion": "runner-based rocket glide using a continuous held-loop sound, no footfalls",
+    "runtimeMotion": "procedural in src/render/goblin_rocket_sled.ts, never a baked clip or renderer.ts growth",
+    "reviewStatus": "proposed for user approval before model or exporter code"
+  },
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "user-supplied concept sheet described by docs/design/goblin_rocket_sled/reference-metadata.json",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 38.0,
+    "aspect": 1.5,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      0.0,
+      0.0,
+      3.0
+    ],
+    "note": "The sheet contains several independently framed concept views, so no single photographic camera solve applies. Match the hero panel with an approximate 38-degree perspective camera and validate the other views independently."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 0,
+    "silhouette_readability": 0,
+    "depth_inference": 0,
+    "primitive_decomposition": 0,
+    "material_procedurality": 0,
+    "occlusion_risk": 0,
+    "interaction_fit": 0
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "stylized rocket-propelled sled mount",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "stylized hard-surface",
+        "ramshackle goblin engineering",
+        "low-poly mechanical vehicle",
+        "layered riveted construction"
+      ],
+      "structureKind": [
+        "compound object",
+        "branching hierarchy",
+        "repeated modules",
+        "articulated effect emitters"
+      ],
+      "motionPotential": [
+        "whole-object transform",
+        "procedural bob and slope tilt",
+        "continuous exhaust effect",
+        "detachable-looking but non-destructible assemblies"
+      ],
+      "materialFamilies": [
+        "worn red painted steel",
+        "dark iron",
+        "aged wood",
+        "brown leather",
+        "orange emissive exhaust",
+        "bone ornament"
+      ],
+      "notes": "A standalone static vehicle with no puller, carrier, skin, or baked animation. The rider is composed by the existing mount system onto Socket_Rider. Runtime motion and exhaust belong in the sled's own render module."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 3,
+        "repetitionDensity": 3,
+        "materialLayerCount": 3,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 5,
+        "mesoComponents": 18,
+        "microFeatureGroups": 16,
+        "materialLayers": 6,
+        "repetitionSystems": 6
+      },
+      "reasoning": [
+        "The core silhouette is simple, but twin rockets, runner assemblies, seat structure, tank, pipes, brackets, bands, caps, and fins create a deep mechanical hierarchy.",
+        "Rivet rows, tank bands, cushion panels, plank seams, mirrored runners, and mirrored rockets require explicit repetition systems.",
+        "The concept sheet provides hero, front, side, rear, top, and three-quarter views, so most visible structure can be resolved without inventing a hidden-side design.",
+        "The chase-camera mount role makes material separation, rider clearance, effect sockets, and stable runtime pivots part of the quality bar."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The vehicle reads through nested mechanical assemblies and repeated hardware, not through one primary mass."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "grid-4x4",
+      "targetMinDetails": 16,
+      "note": "The 4x4 scan covered the full concept sheet. Details below map to planned component localFeatures or material localOverrides in the sculpt spec.",
+      "details": [
+        {
+          "id": "runner-upturned-tips",
+          "kind": "bevel",
+          "description": "Both long runners terminate in a shallow upward curve with a reinforced dark-metal nose cap.",
+          "region": {
+            "x": 0.02,
+            "y": 0.25,
+            "width": 0.42,
+            "height": 0.34,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "silhouette and runner construction",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "runner-pair/upturned-tips"
+          },
+          "evidenceRef": "hero-and-side-views",
+          "confidence": 0.96
+        },
+        {
+          "id": "runner-edge-rivets",
+          "kind": "fastener",
+          "description": "Regular raised rivets follow both runner edge straps from the front tips toward the chassis.",
+          "region": {
+            "x": 0.02,
+            "y": 0.25,
+            "width": 0.42,
+            "height": 0.34,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "runner surface rhythm",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "runner-pair/edge-rivet-rows"
+          },
+          "evidenceRef": "hero-and-ski-tip-detail",
+          "confidence": 0.94
+        },
+        {
+          "id": "deck-plank-seams",
+          "kind": "seam",
+          "description": "Longitudinal timber planks and dark gaps create the deck's main surface rhythm.",
+          "region": {
+            "x": 0.18,
+            "y": 0.24,
+            "width": 0.34,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "deck construction",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "chassis-deck/plank-seams"
+          },
+          "evidenceRef": "hero-and-top-views",
+          "confidence": 0.95
+        },
+        {
+          "id": "chassis-corner-brackets",
+          "kind": "ridge",
+          "description": "Chunky iron angle brackets overlap the deck and runner frame at corners and cross-members.",
+          "region": {
+            "x": 0.18,
+            "y": 0.24,
+            "width": 0.34,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "chassis hierarchy",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "chassis-deck/reinforcement-brackets"
+          },
+          "evidenceRef": "hero-and-rocket-mount-detail",
+          "confidence": 0.94
+        },
+        {
+          "id": "rocket-band-rivets",
+          "kind": "fastener",
+          "description": "Raised rivets repeat around each rocket's segmented barrel bands.",
+          "region": {
+            "x": 0.38,
+            "y": 0.05,
+            "width": 0.38,
+            "height": 0.34,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "rocket barrel rhythm",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "twin-rockets/band-rivet-rings"
+          },
+          "evidenceRef": "rocket-body-detail",
+          "confidence": 0.98
+        },
+        {
+          "id": "rocket-nozzle-rings",
+          "kind": "ridge",
+          "description": "Concentric stepped rings form each rear nozzle and frame the glowing exhaust core.",
+          "region": {
+            "x": 0.57,
+            "y": 0.05,
+            "width": 0.2,
+            "height": 0.25,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "rocket focal silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "twin-rockets/nozzle-ring-stack"
+          },
+          "evidenceRef": "nozzle-detail-and-rear-view",
+          "confidence": 0.97
+        },
+        {
+          "id": "rocket-exhaust-core",
+          "kind": "emissive",
+          "description": "A hot orange core sits inside each dark nozzle with a brighter center and darker rim.",
+          "region": {
+            "x": 0.57,
+            "y": 0.05,
+            "width": 0.2,
+            "height": 0.25,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "emissive material and runtime exhaust",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "rocket-glow/exhaust-cores"
+          },
+          "evidenceRef": "nozzle-detail-and-rear-view",
+          "confidence": 0.99
+        },
+        {
+          "id": "rocket-tail-fins",
+          "kind": "contour",
+          "description": "Triangular red fins interrupt the rear side silhouette of both rocket bodies.",
+          "region": {
+            "x": 0.2,
+            "y": 0.24,
+            "width": 0.42,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "rocket silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "twin-rockets/tail-fins"
+          },
+          "evidenceRef": "hero-side-and-rear-views",
+          "confidence": 0.93
+        },
+        {
+          "id": "tank-band-rings",
+          "kind": "ridge",
+          "description": "The central tank is divided by multiple wide dark iron bands with riveted faces.",
+          "region": {
+            "x": 0.36,
+            "y": 0.1,
+            "width": 0.27,
+            "height": 0.27,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "tank structure",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "fuel-tank/band-and-rivet-system"
+          },
+          "evidenceRef": "hero-and-tank-detail",
+          "confidence": 0.98
+        },
+        {
+          "id": "tank-caps-valves",
+          "kind": "ridge",
+          "description": "Two top caps and smaller valve hardware project above the low tank profile.",
+          "region": {
+            "x": 0.38,
+            "y": 0.08,
+            "width": 0.25,
+            "height": 0.19,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "tank top silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "fuel-tank/caps-and-valves"
+          },
+          "evidenceRef": "hero-and-tank-detail",
+          "confidence": 0.91
+        },
+        {
+          "id": "fuel-pipe-runs",
+          "kind": "ridge",
+          "description": "Bent dark pipes run from the central tank toward the two rocket mounts.",
+          "region": {
+            "x": 0.32,
+            "y": 0.18,
+            "width": 0.35,
+            "height": 0.24,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "mechanical connectivity",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "fuel-system/pipe-runs"
+          },
+          "evidenceRef": "hero-and-rear-view",
+          "confidence": 0.87
+        },
+        {
+          "id": "tufted-seat-panels",
+          "kind": "seam",
+          "description": "Seat and backrest use segmented red-brown leather pads with recessed seams and button-like dimples.",
+          "region": {
+            "x": 0.34,
+            "y": 0.19,
+            "width": 0.25,
+            "height": 0.27,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "seat material and form",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "rider-seat/tufted-panels"
+          },
+          "evidenceRef": "hero-and-seat-detail",
+          "confidence": 0.97
+        },
+        {
+          "id": "paint-chips-and-scratches",
+          "kind": "scratch",
+          "description": "Red painted steel shows directional scratches and chipped edges exposing dark metal.",
+          "region": {
+            "x": 0.38,
+            "y": 0.05,
+            "width": 0.48,
+            "height": 0.36,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "painted steel response",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "red-painted-steel/edge-chips"
+          },
+          "evidenceRef": "rocket-and-tank-detail-views",
+          "confidence": 0.88
+        },
+        {
+          "id": "iron-rust-cavities",
+          "kind": "stain",
+          "description": "Dark iron bands and brackets carry warm rust in rivet cavities and overlaps.",
+          "region": {
+            "x": 0.38,
+            "y": 0.05,
+            "width": 0.48,
+            "height": 0.36,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "dark iron response",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "dark-iron/rust-cavities"
+          },
+          "evidenceRef": "rocket-and-mount-detail-views",
+          "confidence": 0.86
+        },
+        {
+          "id": "skull-markings",
+          "kind": "decal",
+          "description": "White skull-and-bones markings conform to both side rocket barrels without readable text or tangent-plane protrusion.",
+          "region": {
+            "x": 0.32,
+            "y": 0.14,
+            "width": 0.45,
+            "height": 0.31,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "goblin identity",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "red-painted-steel/skull-markings"
+          },
+          "evidenceRef": "hero-and-tank-detail",
+          "confidence": 0.96
+        },
+        {
+          "id": "front-goblin-face",
+          "kind": "contour",
+          "description": "A green goblin skull mask with red eyes and dark spikes anchors the sled's front center.",
+          "region": {
+            "x": 0.2,
+            "y": 0.31,
+            "width": 0.25,
+            "height": 0.23,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "front silhouette and identity",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "prow-ornament/goblin-face-and-spikes"
+          },
+          "evidenceRef": "hero-and-front-view",
+          "confidence": 0.98
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "not-applicable",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 1.0,
+      "note": "Not applicable to a standalone vehicle."
+    },
+    "sourceImage": "user-supplied concept sheet described by docs/design/goblin_rocket_sled/reference-metadata.json"
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready hero mount",
+    "definitionOfDone": [
+      "The vehicle reads immediately as the concept's low, wide goblin rocket sled from hero, front, profile, rear, and gameplay chase-camera views.",
+      "Twin side rockets, long upturned runners, the open tufted seat, low central tank, and front goblin-face ornament preserve the concept's identity and proportions.",
+      "The rider socket preserves head, shoulder, arm, and leg clearance without adding handlebars or controls absent from the concept.",
+      "Worn red paint, dark iron, wood, leather, bone, and orange exhaust remain distinct under Standard and Low-tier material paths.",
+      "The shipped vehicle stays within the locked triangle, byte, primitive, and material budgets, with no skin or baked animation.",
+      "Runtime-only bob, slope tilt, exhaust flicker, and held rocket loop reset correctly on dismount and do not mutate the shared cached asset."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 5,
+      "mesoComponents": 8,
+      "microFeatureGroups": 16,
+      "materialLayers": 6,
+      "repetitionSystems": 6,
+      "reviewViewpoints": 5
+    },
+    "featureGroups": [
+      {
+        "id": "sled-silhouette",
+        "name": "Low wide sled silhouette",
+        "required": true,
+        "qualityCriteria": [
+          "Long parallel runners, compact chassis, low tank, open seat, and side rockets preserve the concept's width, length, and negative spaces."
+        ],
+        "evidenceRefs": [
+          "hero",
+          "front",
+          "side",
+          "top"
+        ],
+        "failureModes": [
+          "reads as a wheeled cart or hover bike",
+          "runners are too short or rockets too high"
+        ]
+      },
+      {
+        "id": "rocket-pair",
+        "name": "Twin rocket assemblies",
+        "required": true,
+        "qualityCriteria": [
+          "Mirrored barrels include band rhythm, conical noses, rear nozzle stacks, fins, mounts, and emissive cores."
+        ],
+        "evidenceRefs": [
+          "hero",
+          "rocket-detail",
+          "rear"
+        ],
+        "failureModes": [
+          "rockets read as plain cylinders",
+          "nozzles or mounts float from the chassis"
+        ]
+      },
+      {
+        "id": "rider-clearance",
+        "name": "Open rider seat and clearance",
+        "required": true,
+        "qualityCriteria": [
+          "Tufted seat and backrest read clearly while Socket_Rider keeps the live player rig inside the safe zone shown by the top view."
+        ],
+        "evidenceRefs": [
+          "hero",
+          "seat-detail",
+          "top"
+        ],
+        "failureModes": [
+          "rider clips tank, rockets, or backrest",
+          "added controls contradict the concept"
+        ]
+      },
+      {
+        "id": "goblin-construction",
+        "name": "Ramshackle goblin construction language",
+        "required": true,
+        "qualityCriteria": [
+          "Rivets, brackets, plank seams, pipes, skull markings, and prow ornament form an intentional hierarchy that survives gameplay distance."
+        ],
+        "evidenceRefs": [
+          "hero",
+          "detail-closeups",
+          "front"
+        ],
+        "failureModes": [
+          "generic clean sci-fi sled",
+          "unstructured primitive clutter"
+        ]
+      },
+      {
+        "id": "surface-and-exhaust",
+        "name": "Worn PBR surfaces and rocket exhaust",
+        "required": true,
+        "qualityCriteria": [
+          "Independent procedural albedo, normal, and ORM fields preserve material separation; emissive cores and runtime exhaust remain readable without uncontrolled bloom."
+        ],
+        "evidenceRefs": [
+          "rocket-detail",
+          "tank-detail",
+          "rear"
+        ],
+        "failureModes": [
+          "flat plastic surfaces",
+          "albedo reused as unrelated PBR channels",
+          "exhaust obscures rider or terrain"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "sled silhouette and runner length",
+      "rocket diameter and mount height",
+      "seat and rider-zone clearance",
+      "tank-to-seat vertical relationship",
+      "goblin detail density and palette",
+      "rear nozzle and exhaust symmetry"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed if a required feature group lacks component, material, or runtime representation.",
+      "Do not proceed if any connector, pipe, fin, mount, or ornament lacks an explicit attachment contract.",
+      "Do not use baked animation for bob, tilt, or exhaust flicker.",
+      "Do not alias albedo into normal, roughness, metalness, or occlusion channels.",
+      "Do not treat painted lighting in the AI concept as ground-truth PBR evidence.",
+      "Do not proceed if runner, rocket, seat, or tank proportions fail a critical comparison view."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "macro silhouette and proportions",
+      "primary material albedo/roughness response",
+      "reference-derived PBR material response at or above 0.7 confidence when source pixels are usable",
+      "most recognizable local features"
+    ],
+    "niceToHave": [
+      "micro scratches, stains, chips, and dirt masks",
+      "secondary lighting match"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "front",
+      "front-three-quarter",
+      "side",
+      "rear",
+      "gameplay-chase-camera"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "sled-silhouette",
+      "name": "Long runners, low chassis, open seat, tank, and twin-rocket silhouette",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "form-refinement"
+      ],
+      "minimumScore": 0.82,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "chassis-deck",
+        "runner-pair",
+        "twin-rockets",
+        "fuel-tank"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front",
+        "side",
+        "top"
+      ]
+    },
+    {
+      "id": "rocket-assemblies",
+      "name": "Mirrored rocket barrels, bands, noses, fins, nozzle stacks, and mounts",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "form-refinement"
+      ],
+      "minimumScore": 0.82,
+      "mustPass": true,
+      "componentRefs": [
+        "twin-rockets",
+        "rocket-mounts",
+        "exhaust-emitters"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "rocket-detail",
+        "rear"
+      ]
+    },
+    {
+      "id": "rider-clearance",
+      "name": "Open tufted seat and collision-free rider zone",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "interaction-pass"
+      ],
+      "minimumScore": 0.84,
+      "mustPass": true,
+      "componentRefs": [
+        "rider-seat",
+        "seat-frame",
+        "fuel-tank",
+        "twin-rockets"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "seat-detail",
+        "top"
+      ]
+    },
+    {
+      "id": "goblin-construction",
+      "name": "Riveted brackets, plank rhythm, pipes, skull markings, and prow face",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement",
+        "surface-pass"
+      ],
+      "minimumScore": 0.78,
+      "mustPass": true,
+      "componentRefs": [
+        "chassis-deck",
+        "fuel-system",
+        "prow-ornament",
+        "runner-braces"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "detail-closeups",
+        "front"
+      ]
+    },
+    {
+      "id": "surface-and-exhaust",
+      "name": "Worn material separation, emissive nozzle cores, and runtime exhaust read",
+      "tier": "critical",
+      "passIds": [
+        "material-pass",
+        "surface-pass",
+        "interaction-pass"
+      ],
+      "minimumScore": 0.76,
+      "mustPass": true,
+      "componentRefs": [
+        "twin-rockets",
+        "fuel-tank",
+        "rider-seat",
+        "exhaust-emitters"
+      ],
+      "evidenceRefs": [
+        "rocket-detail",
+        "tank-detail",
+        "rear"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "lighting-pass",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass"
+    ],
+    "lastCompletedPass": "surface-pass",
+    "blockedReason": "",
+    "nextRequiredEvidence": [
+      "Form remains readable without relying on the concept's painted highlights.",
+      "lightingFromPhoto with key/fill/rim or environment light",
+      "exposure, tone mapping, background, shadow softness, and contact shadow behavior",
+      "browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet for AI vision review",
+      "AI vision score at or above the visual acceptance threshold",
+      "all critical semantic feature scores from the shared image pair at or above their thresholds",
+      "self-correction review appended with action=continue before the next pass"
+    ]
+  },
+  "lookDevTargets": {
+    "qualityPriority": "reference-fidelity",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 256,
+      "preferredTextureResolution": 1024,
+      "independentMapChannels": [
+        "albedo",
+        "roughness",
+        "height",
+        "normal",
+        "ambient-occlusion"
+      ],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.7,
+        "stopOnLowConfidence": true,
+        "script": "forge/stage1_intake/extract_pbr_evidence.py",
+        "acceptedLimitation": "The admitted source is a lit AI concept sheet, not a material scan. It supplies palette and construction evidence only. Shipping albedo, normal, and ORM maps are generated procedurally from independent fields and never inferred from the painted lighting."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "rim or environment light",
+        "exposure",
+        "tone mapping",
+        "background",
+        "contact shadow"
+      ],
+      "mustAvoid": [
+        "ambient-only lighting",
+        "flat value range",
+        "missing contact shadow",
+        "reference lighting copied without separating material readability"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The source is user-supplied AI concept art generated with GPT; exact model, prompt, and timestamp were not supplied and are not invented here.",
+    "The unseen underside uses a restrained project-authored frame consistent with the admitted side and rear views.",
+    "The sled is a standalone vehicle with no puller or carrier VisualDef.",
+    "Painted highlights and smoke in the concept are illustrative, not material scans or baked texture authority.",
+    "Rocket exhaust, bob, and tilt are runtime effects in a mount-owned render module, never baked GLB animation."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the upturned ski tips and goblin-face ornament",
+    "rear": "-Z, the rocket exhaust nozzles",
+    "up": "+Y",
+    "scaleReference": "approximately 3.8 yards long, 2.5 yards wide, and 1.8 yards tall before live rider-fit tuning"
+  },
+  "silhouette": {
+    "boundingShape": "low wide wedge on two long parallel runners, with a compact central seat and tank between two cylindrical side rockets",
+    "aspectRatios": [
+      "length:width about 1.5:1",
+      "overall height:length about 0.47:1",
+      "rocket diameter:overall width about 0.18:1"
+    ],
+    "symmetry": "strong left-right mechanical symmetry, broken by small pipe and valve details",
+    "dominantCurves": [
+      "shallow upturned runner tips",
+      "cylindrical rocket and tank profiles",
+      "rounded padded seat and backrest"
+    ],
+    "negativeSpaces": [
+      "clear rider volume above the seat",
+      "open gap beneath the deck between the runners",
+      "air gaps around each low rocket mount"
+    ],
+    "landmarks": [
+      "twin side rockets",
+      "long runners",
+      "central red-brown seat",
+      "low banded tank",
+      "front green goblin face"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "hero",
+      "view": "front-left-three-quarter",
+      "path": "reference-metadata.json#admittedViews.hero",
+      "observations": [
+        "canonical silhouette",
+        "rocket-to-seat proportions",
+        "runner length",
+        "front ornament"
+      ],
+      "confidence": 0.98
+    },
+    {
+      "id": "front",
+      "view": "front",
+      "path": "reference-metadata.json#admittedViews.front",
+      "observations": [
+        "runner spacing",
+        "rocket symmetry",
+        "goblin ornament width"
+      ],
+      "confidence": 0.96
+    },
+    {
+      "id": "side",
+      "view": "left-profile",
+      "path": "reference-metadata.json#admittedViews.side",
+      "observations": [
+        "runner curvature",
+        "seat and tank height",
+        "rocket nose-to-nozzle length"
+      ],
+      "confidence": 0.96
+    },
+    {
+      "id": "rear",
+      "view": "rear",
+      "path": "reference-metadata.json#admittedViews.rear",
+      "observations": [
+        "nozzle ring stacks",
+        "exhaust spacing",
+        "rear frame width"
+      ],
+      "confidence": 0.96
+    },
+    {
+      "id": "top",
+      "view": "top-rider-clearance",
+      "path": "reference-metadata.json#admittedViews.top",
+      "observations": [
+        "safe rider zone",
+        "rocket clearance",
+        "tank position"
+      ],
+      "confidence": 0.97
+    },
+    {
+      "id": "rocket-detail",
+      "view": "detail-closeup",
+      "path": "reference-metadata.json#admittedViews.rocketDetail",
+      "observations": [
+        "band and rivet rhythm",
+        "paint wear",
+        "nozzle construction"
+      ],
+      "confidence": 0.98
+    },
+    {
+      "id": "seat-detail",
+      "view": "detail-closeup",
+      "path": "reference-metadata.json#admittedViews.seatDetail",
+      "observations": [
+        "tufted pads",
+        "frame brackets",
+        "arm clearance"
+      ],
+      "confidence": 0.97
+    },
+    {
+      "id": "tank-detail",
+      "view": "detail-closeup",
+      "path": "reference-metadata.json#admittedViews.tankDetail",
+      "observations": [
+        "banded cylinder",
+        "caps and valves",
+        "skull marking"
+      ],
+      "confidence": 0.98
+    },
+    {
+      "id": "detail-closeups",
+      "view": "detail-grid",
+      "path": "reference-metadata.json#admittedViews.detailCloseups",
+      "observations": [
+        "runner tip",
+        "rocket mount",
+        "seat",
+        "tank",
+        "nozzle"
+      ],
+      "confidence": 0.97
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Goblin Rocket Sled",
+      "level": "macro",
+      "role": "vehicle-root",
+      "importance": 1.0,
+      "confidence": 0.98,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The vehicle is a hierarchy of discrete rigid assemblies.",
+      "parent": null,
+      "attachment": null,
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 2.5,
+        "height": 1.8,
+        "depth": 3.8,
+        "units": "yards",
+        "confidence": 0.84
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "dark-iron",
+      "materialLayers": [
+        "red-painted-steel",
+        "dark-iron",
+        "aged-wood",
+        "brown-leather",
+        "bone-ornament",
+        "rocket-glow"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(126, 41, 31, 1)",
+        "secondaryAlbedo": "rgba(48, 47, 43, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.96
+      },
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.12,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.045,
+        "normalPattern": "Independent 1024px metal scratches and dimples, directional wood fibers, and quilted leather grain; never derived from albedo.",
+        "displacementPattern": "No runtime displacement; shallow height fields are converted to tangent normals to preserve silhouette and triangle budget.",
+        "occlusionPattern": "Packed ORM cavity field plus baked per-vertex contact and assembly occlusion at bands, brackets, seams, runner contacts, and upholstery buttons.",
+        "edgeWearPattern": "Metal chips and exposed edges, runner-axis abrasion, wood seam wear, and handled leather crests remain local to their semantic material families.",
+        "notes": "Implemented by scripts/assets/goblin_rocket_sled/surface_maps.mjs and the world-space surface bake in model.js; evidence is the 3x3 surface map sheet and grazing-light close-up."
+      },
+      "evidenceRefs": [
+        "hero",
+        "front",
+        "side",
+        "rear",
+        "top"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "chassis-deck",
+      "name": "Timber deck and iron chassis",
+      "level": "macro",
+      "role": "load-bearing deck",
+      "importance": 0.95,
+      "confidence": 0.96,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Rigid planks, rails, and brackets have countable faces and seams.",
+      "parent": "root",
+      "attachment": {
+        "parentSocket": "Socket_Chassis",
+        "localStart": [
+          0,
+          0.35,
+          0.1
+        ],
+        "localEnd": [
+          0,
+          0.48,
+          0.1
+        ],
+        "contactType": "overlap",
+        "embedDepth": 0.08,
+        "gapTolerance": 0.01
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 1.55,
+        "height": 0.32,
+        "depth": 2.45,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [
+          0,
+          0.4,
+          0.15
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "aged-wood",
+      "materialLayers": [
+        "aged-wood",
+        "dark-iron"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(90, 59, 36, 1)",
+        "secondaryAlbedo": "rgba(48, 47, 43, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      },
+      "localFeatures": [
+        {
+          "id": "plank-seams",
+          "type": "seam",
+          "geometry": "seven longitudinal planks with recessed gaps",
+          "evidenceRefs": [
+            "hero",
+            "top"
+          ]
+        },
+        {
+          "id": "reinforcement-brackets",
+          "type": "ridge",
+          "geometry": "overlapping iron angle plates at frame joints",
+          "evidenceRefs": [
+            "hero",
+            "rocket-detail"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "top",
+        "side"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "runner-pair",
+      "name": "Twin upturned runners",
+      "level": "macro",
+      "role": "ground-contact silhouette",
+      "importance": 1.0,
+      "confidence": 0.97,
+      "primitive": "extrude",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Each runner is a continuous tapered profile whose upward nose curve defines the silhouette.",
+      "parent": "root",
+      "attachment": {
+        "parentSocket": "Socket_RunnerFrame",
+        "localStart": [
+          -0.9,
+          0.12,
+          -0.8
+        ],
+        "localEnd": [
+          -0.9,
+          0.12,
+          1.85
+        ],
+        "contactType": "bracketed",
+        "overlap": 0.06,
+        "gapTolerance": 0.01
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 2.15,
+        "height": 0.26,
+        "depth": 3.65,
+        "units": "yards",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0.14,
+          0.12
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "aged-wood",
+      "materialLayers": [
+        "aged-wood",
+        "dark-iron"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(75, 52, 36, 1)",
+        "secondaryAlbedo": "rgba(52, 51, 49, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      },
+      "localFeatures": [
+        {
+          "id": "upturned-tips",
+          "type": "bevel",
+          "geometry": "shallow curved nose profile with reinforced cap",
+          "evidenceRefs": [
+            "hero",
+            "side"
+          ]
+        },
+        {
+          "id": "edge-rivet-rows",
+          "type": "fastener",
+          "geometry": "instanced raised rivets along both outer straps",
+          "evidenceRefs": [
+            "hero",
+            "rocket-detail"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front",
+        "side"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "twin-rockets",
+      "name": "Mirrored rocket bodies",
+      "level": "macro",
+      "role": "propulsion silhouette",
+      "importance": 1.0,
+      "confidence": 0.98,
+      "primitive": "cylinder",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Each rocket is a discrete coaxial mechanical assembly.",
+      "parent": "root",
+      "attachment": {
+        "parentSocket": "Socket_RocketMounts",
+        "localStart": [
+          -1.0,
+          0.58,
+          0.15
+        ],
+        "localEnd": [
+          -1.0,
+          0.58,
+          -0.95
+        ],
+        "contactType": "clamped",
+        "overlap": 0.08,
+        "gapTolerance": 0.01
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 2.45,
+        "height": 0.72,
+        "depth": 2.15,
+        "units": "yards",
+        "confidence": 0.91
+      },
+      "transform": {
+        "position": [
+          0,
+          0.65,
+          0.05
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "red-painted-steel",
+      "materialLayers": [
+        "red-painted-steel",
+        "dark-iron",
+        "rocket-glow"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(139, 48, 38, 1)",
+        "secondaryAlbedo": "rgba(57, 55, 53, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.97
+      },
+      "localFeatures": [
+        {
+          "id": "band-rivet-rings",
+          "type": "fastener",
+          "geometry": "radial instanced rivets on five bands per rocket",
+          "evidenceRefs": [
+            "rocket-detail"
+          ]
+        },
+        {
+          "id": "nozzle-ring-stack",
+          "type": "ridge",
+          "geometry": "three stepped concentric nozzle rings around a recessed core",
+          "evidenceRefs": [
+            "rocket-detail",
+            "rear"
+          ]
+        },
+        {
+          "id": "tail-fins",
+          "type": "contour",
+          "geometry": "paired triangular fins per rocket",
+          "evidenceRefs": [
+            "hero",
+            "side",
+            "rear"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side",
+        "rear",
+        "rocket-detail"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "fuel-tank",
+      "name": "Central fuel and bomb tank",
+      "level": "macro",
+      "role": "rear mass and seat backdrop",
+      "importance": 0.92,
+      "confidence": 0.98,
+      "primitive": "cylinder",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A rigid cylindrical tank with separate bands, end caps, and valves.",
+      "parent": "root",
+      "attachment": {
+        "parentSocket": "Socket_TankCradle",
+        "localStart": [
+          0,
+          0.86,
+          -0.65
+        ],
+        "localEnd": [
+          0,
+          1.28,
+          -0.65
+        ],
+        "contactType": "cradled",
+        "overlap": 0.07,
+        "gapTolerance": 0.01
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 1.15,
+        "height": 0.78,
+        "depth": 0.72,
+        "units": "yards",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          1.08,
+          -0.72
+        ],
+        "rotation": [
+          0,
+          0,
+          1.5708
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "red-painted-steel",
+      "materialLayers": [
+        "red-painted-steel",
+        "dark-iron"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(127, 43, 34, 1)",
+        "secondaryAlbedo": "rgba(60, 57, 53, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.97
+      },
+      "localFeatures": [
+        {
+          "id": "band-and-rivet-system",
+          "type": "fastener",
+          "geometry": "four wide radial bands with face rivets",
+          "evidenceRefs": [
+            "tank-detail"
+          ]
+        },
+        {
+          "id": "caps-and-valves",
+          "type": "ridge",
+          "geometry": "two top filler caps and small pressure valve cluster",
+          "evidenceRefs": [
+            "hero",
+            "tank-detail"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "rear",
+        "tank-detail"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "rider-seat",
+      "name": "Tufted rider seat",
+      "level": "meso",
+      "role": "rider support",
+      "importance": 1.0,
+      "confidence": 0.98,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Separate padded panels sit inside a rigid frame.",
+      "parent": "root",
+      "attachment": {
+        "parentSocket": "Socket_SeatFrame",
+        "localStart": [
+          0,
+          0.64,
+          0.15
+        ],
+        "localEnd": [
+          0,
+          1.2,
+          -0.05
+        ],
+        "contactType": "framed",
+        "embedDepth": 0.05,
+        "gapTolerance": 0.01
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 0.95,
+        "height": 0.92,
+        "depth": 0.78,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [
+          0,
+          0.92,
+          0.18
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "brown-leather",
+      "materialLayers": [
+        "brown-leather",
+        "dark-iron",
+        "aged-wood"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(111, 56, 43, 1)",
+        "secondaryAlbedo": "rgba(63, 36, 29, 1)",
+        "materialClass": "fabric",
+        "materialClassConfidence": 0.95
+      },
+      "localFeatures": [
+        {
+          "id": "tufted-panels",
+          "type": "seam",
+          "geometry": "segmented pads with recessed seams and button dimples",
+          "evidenceRefs": [
+            "hero",
+            "seat-detail"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "seat-detail",
+        "top"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "fuel-system",
+      "name": "Fuel pipe network",
+      "level": "meso",
+      "role": "tank-to-rocket connectivity",
+      "importance": 0.78,
+      "confidence": 0.87,
+      "primitive": "curve-sweep",
+      "topologyClass": "fiber-strand",
+      "topologyRationale": "Narrow pipes follow bent paths between assemblies.",
+      "parent": "root",
+      "attachment": {
+        "parentSocket": "Socket_FuelPorts",
+        "localStart": [
+          0,
+          1.0,
+          -0.72
+        ],
+        "localEnd": [
+          1.02,
+          0.72,
+          -0.56
+        ],
+        "contactType": "socketed",
+        "embedDepth": 0.04,
+        "gapTolerance": 0.015
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 2.1,
+        "height": 0.35,
+        "depth": 0.5,
+        "units": "yards",
+        "confidence": 0.72
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "dark-iron",
+      "materialLayers": [
+        "dark-iron"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 49, 45, 1)",
+        "secondaryAlbedo": "rgba(92, 58, 40, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.9
+      },
+      "localFeatures": [
+        {
+          "id": "pipe-runs",
+          "type": "ridge",
+          "geometry": "mirrored bent tube runs with elbow collars",
+          "evidenceRefs": [
+            "hero",
+            "rear"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "rear"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "prow-ornament",
+      "name": "Goblin skull prow ornament",
+      "level": "meso",
+      "role": "front identity anchor",
+      "importance": 0.96,
+      "confidence": 0.98,
+      "primitive": "ellipsoid",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "The face is a continuous stylized mask with attached spikes.",
+      "parent": "chassis-deck",
+      "attachment": {
+        "parentSocket": "Socket_Prow",
+        "localStart": [
+          0,
+          0.42,
+          1.34
+        ],
+        "localEnd": [
+          0,
+          0.58,
+          1.48
+        ],
+        "contactType": "bolted",
+        "embedDepth": 0.05,
+        "gapTolerance": 0.01
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 0.62,
+        "height": 0.54,
+        "depth": 0.24,
+        "units": "yards",
+        "confidence": 0.84
+      },
+      "transform": {
+        "position": [
+          0,
+          0.58,
+          1.43
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "bone-ornament",
+      "materialLayers": [
+        "bone-ornament",
+        "dark-iron",
+        "rocket-glow"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(106, 107, 53, 1)",
+        "secondaryAlbedo": "rgba(44, 41, 35, 1)",
+        "materialClass": "unknown",
+        "materialClassConfidence": 0.9
+      },
+      "localFeatures": [
+        {
+          "id": "goblin-face-and-spikes",
+          "type": "contour",
+          "geometry": "brow, nose, tusks, ears, red eye insets, and six dark spikes",
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "rocket-mounts",
+      "name": "Rocket mounting cradles",
+      "level": "meso",
+      "role": "rocket attachment",
+      "importance": 0.82,
+      "confidence": 0.96,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Rigid iron brackets and clamps connect each rocket to the deck.",
+      "parent": "chassis-deck",
+      "attachment": {
+        "parentSocket": "Socket_RocketMounts",
+        "localStart": [
+          -0.92,
+          0.45,
+          0.2
+        ],
+        "localEnd": [
+          -0.92,
+          0.67,
+          0.2
+        ],
+        "contactType": "bolted",
+        "overlap": 0.06,
+        "gapTolerance": 0.01
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 2.15,
+        "height": 0.35,
+        "depth": 1.2,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [
+          0,
+          0.55,
+          0.05
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "dark-iron",
+      "materialLayers": [
+        "dark-iron"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(54, 52, 50, 1)",
+        "secondaryAlbedo": "rgba(107, 67, 44, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.95
+      },
+      "localFeatures": [
+        {
+          "id": "clamp-plates",
+          "type": "ridge",
+          "geometry": "paired saddle plates and square cross-brackets",
+          "evidenceRefs": [
+            "rocket-detail"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "rocket-detail"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "runner-braces",
+      "name": "Runner cross-braces",
+      "level": "meso",
+      "role": "ground-frame attachment",
+      "importance": 0.74,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Rigid cross-members bridge the runner and deck frames.",
+      "parent": "runner-pair",
+      "attachment": {
+        "parentSocket": "Socket_RunnerBraces",
+        "localStart": [
+          -0.88,
+          0.2,
+          -0.9
+        ],
+        "localEnd": [
+          0.88,
+          0.2,
+          -0.9
+        ],
+        "contactType": "bolted",
+        "overlap": 0.05,
+        "gapTolerance": 0.01
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 2.0,
+        "height": 0.18,
+        "depth": 1.7,
+        "units": "yards",
+        "confidence": 0.78
+      },
+      "transform": {
+        "position": [
+          0,
+          0.25,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "dark-iron",
+      "materialLayers": [
+        "dark-iron"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(51, 49, 47, 1)",
+        "secondaryAlbedo": "rgba(90, 57, 39, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      },
+      "localFeatures": [
+        {
+          "id": "brace-bolt-heads",
+          "type": "fastener",
+          "geometry": "instanced hex bolts at brace-to-runner contacts",
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front",
+        "rear"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "seat-frame",
+      "name": "Seat and backrest frame",
+      "level": "meso",
+      "role": "seat structure",
+      "importance": 0.82,
+      "confidence": 0.96,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Rigid timber and iron rails surround the cushions.",
+      "parent": "chassis-deck",
+      "attachment": {
+        "parentSocket": "Socket_SeatFrame",
+        "localStart": [
+          0,
+          0.52,
+          0.08
+        ],
+        "localEnd": [
+          0,
+          1.42,
+          -0.18
+        ],
+        "contactType": "bolted",
+        "embedDepth": 0.06,
+        "gapTolerance": 0.01
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 1.12,
+        "height": 1.0,
+        "depth": 0.82,
+        "units": "yards",
+        "confidence": 0.84
+      },
+      "transform": {
+        "position": [
+          0,
+          0.96,
+          0.05
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "aged-wood",
+      "materialLayers": [
+        "aged-wood",
+        "dark-iron"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(89, 56, 33, 1)",
+        "secondaryAlbedo": "rgba(56, 52, 49, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.94
+      },
+      "localFeatures": [
+        {
+          "id": "frame-corner-rivets",
+          "type": "fastener",
+          "geometry": "raised fasteners on seat corner straps",
+          "evidenceRefs": [
+            "seat-detail"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "seat-detail"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "deck-front",
+      "name": "Armored front apron",
+      "level": "meso",
+      "role": "prow support and deck termination",
+      "importance": 0.7,
+      "confidence": 0.92,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Layered front plates form a rigid apron between runner noses.",
+      "parent": "chassis-deck",
+      "attachment": {
+        "parentSocket": "Socket_DeckFront",
+        "localStart": [
+          0,
+          0.38,
+          1.15
+        ],
+        "localEnd": [
+          0,
+          0.55,
+          1.35
+        ],
+        "contactType": "overlap",
+        "overlap": 0.07,
+        "gapTolerance": 0.01
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 1.2,
+        "height": 0.4,
+        "depth": 0.36,
+        "units": "yards",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0.48,
+          1.24
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "dark-iron",
+      "materialLayers": [
+        "dark-iron",
+        "aged-wood"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 50, 48, 1)",
+        "secondaryAlbedo": "rgba(87, 64, 43, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      },
+      "localFeatures": [
+        {
+          "id": "front-spike-set",
+          "type": "contour",
+          "geometry": "short triangular spikes flanking the goblin face",
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
+      "fidelityTier": "shipping"
+    },
+    {
+      "id": "exhaust-emitters",
+      "name": "Rear nozzle cores and effect sockets",
+      "level": "meso",
+      "role": "runtime exhaust anchors",
+      "importance": 0.9,
+      "confidence": 0.98,
+      "primitive": "cylinder",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Static recessed cores provide stable named effect sockets.",
+      "parent": "twin-rockets",
+      "attachment": {
+        "parentSocket": "Socket_Nozzles",
+        "localStart": [
+          -1.0,
+          0.65,
+          -0.92
+        ],
+        "localEnd": [
+          -1.0,
+          0.65,
+          -1.12
+        ],
+        "contactType": "nested",
+        "embedDepth": 0.08,
+        "gapTolerance": 0.005
+      },
+      "actionProfile": {
+        "animationRole": "static-runtime-driven",
+        "pivot": {
+          "mode": "component-origin",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Non-authoritative authoring proxy only; live player collision remains simulation-owned."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "deferred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "dark-iron"
+        }
+      },
+      "dimensions": {
+        "width": 2.2,
+        "height": 0.42,
+        "depth": 0.28,
+        "units": "yards",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0.65,
+          -1.05
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "material": "rocket-glow",
+      "materialLayers": [
+        "rocket-glow",
+        "dark-iron"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(255, 106, 0, 1)",
+        "secondaryAlbedo": "rgba(255, 208, 90, 1)",
+        "materialClass": "unknown",
+        "materialClassConfidence": 0.98
+      },
+      "localFeatures": [
+        {
+          "id": "socket-pair",
+          "type": "emissive",
+          "geometry": "Socket_Exhaust_L and Socket_Exhaust_R centered inside nozzle throats",
+          "evidenceRefs": [
+            "rear",
+            "rocket-detail"
+          ]
+        }
+      ],
+      "evidenceRefs": [
+        "rear",
+        "rocket-detail"
+      ],
+      "fidelityTier": "shipping"
+    }
+  ],
+  "materials": [
+    {
+      "id": "red-painted-steel",
+      "name": "Worn blood-red painted steel",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial with procedural metal-family KTX2 maps",
+      "baseColor": "#862D23",
+      "color": "#862D23",
+      "textureResolution": 1024,
+      "textureProjection": {
+        "mode": "world-space-box-projected-uv",
+        "texelDensityIntent": "about 1024 pixels per yard with folded repeats and KHR_texture_transform"
+      },
+      "albedo": {
+        "dominant": "#862D23",
+        "secondary": [
+          "#5E211C",
+          "#A54534"
+        ],
+        "samplingNotes": "Use painted red body zones, separated from concept lighting."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.12,
+          "role": "paint value breakup"
+        },
+        {
+          "id": "meso",
+          "frequency": 12,
+          "amplitude": 0.07,
+          "role": "chips and scratches"
+        },
+        {
+          "id": "micro",
+          "frequency": 52,
+          "amplitude": 0.02,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.58,
+        "variation": 0.15,
+        "map": "independent metal ORM field"
+      },
+      "metalness": {
+        "base": 0.28,
+        "variation": 0.14
+      },
+      "normal": {
+        "pattern": "independent scratches and hammered dimples",
+        "strength": 0.32,
+        "scale": 34,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.32,
+        "notes": "bands, rivets, seams, and mount contacts"
+      },
+      "wear": {
+        "edgeWear": 0.18,
+        "scratches": [
+          "directional handling scratches"
+        ],
+        "chips": [
+          "edge chips exposing dark iron"
+        ]
+      },
+      "dirt": {
+        "amount": 0.09,
+        "cavityBias": 0.85,
+        "color": "#2A211D"
+      },
+      "localOverrides": [
+        {
+          "id": "edge-chips",
+          "region": "rocket and tank bevels",
+          "pattern": "dark exposed-metal chips with brighter worn rims",
+          "roughness": 0.48,
+          "evidenceRefs": [
+            "rocket-detail",
+            "tank-detail"
+          ]
+        },
+        {
+          "id": "skull-markings",
+          "region": "outer rocket barrels and tank side",
+          "pattern": "project-authored off-white skull-and-bones canvas decals without text",
+          "roughness": 0.72,
+          "evidenceRefs": [
+            "hero",
+            "tank-detail"
+          ]
+        }
+      ],
+      "notes": "Uses metal-family albedo, normal, and ORM maps; KTX2 compressed before shipping."
+    },
+    {
+      "id": "dark-iron",
+      "name": "Dark iron brackets and runners",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial with procedural metal-family KTX2 maps",
+      "baseColor": "#393735",
+      "color": "#393735",
+      "textureResolution": 1024,
+      "textureProjection": {
+        "mode": "world-space-box-projected-uv",
+        "texelDensityIntent": "about 1024 pixels per yard with folded repeats and KHR_texture_transform"
+      },
+      "albedo": {
+        "dominant": "#393735",
+        "secondary": [
+          "#252422",
+          "#625044"
+        ],
+        "samplingNotes": "Keep enough value headroom for cavity darkening."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.2,
+          "amplitude": 0.1,
+          "role": "broad oxidation variation"
+        },
+        {
+          "id": "meso",
+          "frequency": 15,
+          "amplitude": 0.06,
+          "role": "hammered iron and rust"
+        },
+        {
+          "id": "micro",
+          "frequency": 58,
+          "amplitude": 0.018,
+          "role": "rough highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.7,
+        "variation": 0.14,
+        "map": "independent metal ORM field"
+      },
+      "metalness": {
+        "base": 0.68,
+        "variation": 0.12
+      },
+      "normal": {
+        "pattern": "independent hammered field",
+        "strength": 0.28,
+        "scale": 38,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.32,
+        "contactShadowBias": 0.38,
+        "notes": "deepen bracket overlaps and runner contacts"
+      },
+      "wear": {
+        "edgeWear": 0.12,
+        "scratches": [
+          "runner-direction abrasion"
+        ],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.12,
+        "cavityBias": 0.9,
+        "color": "#241C18"
+      },
+      "localOverrides": [
+        {
+          "id": "rust-cavities",
+          "region": "band edges, rivet roots, and runner brackets",
+          "pattern": "warm rust concentrated in cavities",
+          "roughness": 0.84,
+          "patinaColor": "#7A3F24",
+          "evidenceRefs": [
+            "rocket-detail",
+            "hero"
+          ]
+        }
+      ],
+      "notes": "Shares metal-family maps with painted steel but keeps independent scalar response and vertex colors."
+    },
+    {
+      "id": "aged-wood",
+      "name": "Aged runner and deck wood",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial with procedural wood-family KTX2 maps",
+      "baseColor": "#594028",
+      "color": "#594028",
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "world-space-box-projected-uv",
+        "texelDensityIntent": "directional grain at about 640 pixels per yard"
+      },
+      "albedo": {
+        "dominant": "#594028",
+        "secondary": [
+          "#372719",
+          "#79573A"
+        ],
+        "samplingNotes": "Long grain follows runner and plank axes."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.14,
+          "role": "plank-to-plank variation"
+        },
+        {
+          "id": "meso",
+          "frequency": 10,
+          "amplitude": 0.1,
+          "role": "grain grooves"
+        },
+        {
+          "id": "micro",
+          "frequency": 48,
+          "amplitude": 0.02,
+          "role": "fibrous highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.82,
+        "variation": 0.12,
+        "map": "independent wood ORM field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "directional wood grain",
+        "strength": 0.3,
+        "scale": 28,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.26,
+        "contactShadowBias": 0.35,
+        "notes": "plank gaps and iron contacts"
+      },
+      "wear": {
+        "edgeWear": 0.15,
+        "scratches": [
+          "runner-axis abrasion"
+        ],
+        "chips": [
+          "small runner-tip nicks"
+        ]
+      },
+      "dirt": {
+        "amount": 0.1,
+        "cavityBias": 0.8,
+        "color": "#2C2219"
+      },
+      "localOverrides": [
+        {
+          "id": "runner-contact-wear",
+          "region": "runner undersides and front tips",
+          "pattern": "lighter polished streaks and dark ground grime",
+          "roughness": 0.68,
+          "evidenceRefs": [
+            "side",
+            "hero"
+          ]
+        }
+      ],
+      "notes": "Uses its own directional wood albedo, normal, and ORM maps."
+    },
+    {
+      "id": "brown-leather",
+      "name": "Tufted brown-red leather",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial with procedural leather-family KTX2 maps",
+      "baseColor": "#6D382D",
+      "color": "#6D382D",
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "world-space-box-projected-uv",
+        "texelDensityIntent": "leather grain at about 640 pixels per yard"
+      },
+      "albedo": {
+        "dominant": "#6D382D",
+        "secondary": [
+          "#47231E",
+          "#8A4A3B"
+        ],
+        "samplingNotes": "Separate cushion pads with darker seams."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.1,
+          "role": "pad compression"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.06,
+          "role": "creases and dimples"
+        },
+        {
+          "id": "micro",
+          "frequency": 46,
+          "amplitude": 0.018,
+          "role": "leather grain"
+        }
+      ],
+      "roughness": {
+        "base": 0.74,
+        "variation": 0.12,
+        "map": "independent leather ORM field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent leather grain",
+        "strength": 0.18,
+        "scale": 32,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.24,
+        "contactShadowBias": 0.3,
+        "notes": "tuft seams and frame contacts"
+      },
+      "wear": {
+        "edgeWear": 0.08,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.04,
+        "cavityBias": 0.7,
+        "color": "#2B1C18"
+      },
+      "localOverrides": [
+        {
+          "id": "seat-compression",
+          "region": "seat center and backrest lower third",
+          "pattern": "slightly darker compressed zones with smoother handled crests",
+          "roughness": 0.66,
+          "evidenceRefs": [
+            "seat-detail"
+          ]
+        }
+      ],
+      "notes": "Uses its own leather albedo, normal, and ORM maps."
+    },
+    {
+      "id": "bone-ornament",
+      "name": "Greened bone prow ornament and markings",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial with vertex color and scalar response",
+      "baseColor": "#777343",
+      "color": "#777343",
+      "textureResolution": 256,
+      "textureProjection": {
+        "mode": "generated-procedural-coordinates",
+        "texelDensityIntent": "authoring preview field only; shipping response is vertex-color and scalar"
+      },
+      "albedo": {
+        "dominant": "#777343",
+        "secondary": [
+          "#4D4D2A",
+          "#A09A62"
+        ],
+        "samplingNotes": "Muted goblin green bone, not bright neon."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.1,
+          "role": "face plane separation"
+        },
+        {
+          "id": "meso",
+          "frequency": 14,
+          "amplitude": 0.05,
+          "role": "pits and age"
+        },
+        {
+          "id": "micro",
+          "frequency": 52,
+          "amplitude": 0.015,
+          "role": "matte breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.8,
+        "variation": 0.1,
+        "map": "vertex and scalar"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "geometry planes and sparse pits",
+        "strength": 0.08,
+        "scale": 30,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.25,
+        "notes": "eye sockets, mouth, and spike roots"
+      },
+      "wear": {
+        "edgeWear": 0.06,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.08,
+        "cavityBias": 0.9,
+        "color": "#292719"
+      },
+      "localOverrides": [
+        {
+          "id": "eye-cavities",
+          "region": "prow eye sockets",
+          "pattern": "deep red emissive inserts surrounded by dark cavities",
+          "roughness": 0.4,
+          "evidenceRefs": [
+            "front",
+            "hero"
+          ]
+        }
+      ],
+      "notes": "No embedded map required; geometry and vertex colors carry the ornament at gameplay distance."
+    },
+    {
+      "id": "rocket-glow",
+      "name": "Orange rocket core glow",
+      "type": "emissive",
+      "shaderModel": "MeshStandardMaterial emissive, untextured",
+      "baseColor": "#FF6B05",
+      "color": "#FF6B05",
+      "textureResolution": 256,
+      "textureProjection": {
+        "mode": "generated-procedural-coordinates",
+        "texelDensityIntent": "authoring preview field only; shipping core is untextured emissive"
+      },
+      "albedo": {
+        "dominant": "#FF6B05",
+        "secondary": [
+          "#FFB51C",
+          "#7A1B00"
+        ],
+        "samplingNotes": "Bright center with darker throat rim."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.1,
+          "role": "core-to-rim gradient"
+        },
+        {
+          "id": "meso",
+          "frequency": 8,
+          "amplitude": 0.04,
+          "role": "flicker supplied at runtime"
+        },
+        {
+          "id": "micro",
+          "frequency": 32,
+          "amplitude": 0.01,
+          "role": "subtle highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.32,
+        "variation": 0.05,
+        "map": "independent-procedural-field"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "none",
+        "strength": 0,
+        "scale": 1,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.12,
+        "contactShadowBias": 0.15,
+        "notes": "recess inside nozzle throat"
+      },
+      "wear": {
+        "edgeWear": 0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0,
+        "cavityBias": 0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "exhaust-cores",
+          "region": "paired nozzle interiors",
+          "pattern": "warm emissive core with bounded intensity; runtime flame begins at named socket",
+          "roughness": 0.28,
+          "evidenceRefs": [
+            "rear",
+            "rocket-detail"
+          ]
+        }
+      ],
+      "notes": "No dynamic point light and no embedded texture. Runtime exhaust uses pooled VFX from mount-owned logic."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "runner-rivet-system",
+      "componentRef": "runner-pair",
+      "method": "instanced raised rivet heads",
+      "countMax": 44,
+      "distribution": "even rows along outer runner straps",
+      "seed": "none",
+      "buildsGeometry": true,
+      "drawCallPolicy": "merge into dark-iron export bucket"
+    },
+    {
+      "id": "rocket-band-rivet-system",
+      "componentRef": "twin-rockets",
+      "method": "radially instanced rivet heads",
+      "countMax": 72,
+      "distribution": "six to eight rivets on each authored band ring, mirrored left-right",
+      "seed": "none",
+      "buildsGeometry": true,
+      "drawCallPolicy": "merge into dark-iron export bucket"
+    },
+    {
+      "id": "tank-band-rivet-system",
+      "componentRef": "fuel-tank",
+      "method": "radially instanced rivet heads",
+      "countMax": 24,
+      "distribution": "six rivets on each of four tank bands",
+      "seed": "none",
+      "buildsGeometry": true,
+      "drawCallPolicy": "merge into dark-iron export bucket"
+    },
+    {
+      "id": "deck-plank-system",
+      "componentRef": "chassis-deck",
+      "method": "seven deterministic extruded plank strips",
+      "count": 7,
+      "distribution": "equal spacing across chassis width with narrow recessed gaps",
+      "seed": "none",
+      "buildsGeometry": true,
+      "drawCallPolicy": "merge into aged-wood export bucket"
+    },
+    {
+      "id": "seat-tuft-system",
+      "componentRef": "rider-seat",
+      "method": "instanced recessed seam strips and button dimples",
+      "countMax": 18,
+      "distribution": "three by three backrest rhythm plus seat pad",
+      "seed": "none",
+      "buildsGeometry": true,
+      "drawCallPolicy": "merge by leather or dark-iron material"
+    },
+    {
+      "id": "frame-fastener-system",
+      "componentRefs": [
+        "rocket-mounts",
+        "runner-braces",
+        "seat-frame"
+      ],
+      "method": "instanced hex bolt heads",
+      "countMax": 32,
+      "distribution": "only at visible structural contacts",
+      "seed": "none",
+      "buildsGeometry": true,
+      "drawCallPolicy": "merge into dark-iron export bucket"
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Lock runner, chassis, rocket, tank, and seat proportions plus rider zone.",
+      "componentRefs": [
+        "root",
+        "chassis-deck",
+        "runner-pair",
+        "twin-rockets",
+        "fuel-tank",
+        "rider-seat"
+      ],
+      "acceptance": [
+        "Critical silhouettes pass hero, front, side, rear, and top review.",
+        "Socket_Rider clears the live player rig."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build every named mechanical assembly and attachment.",
+      "componentRefs": [
+        "fuel-system",
+        "prow-ornament",
+        "rocket-mounts",
+        "runner-braces",
+        "seat-frame",
+        "deck-front",
+        "exhaust-emitters"
+      ],
+      "acceptance": [
+        "No floating connector or unsupported assembly.",
+        "All named runtime sockets exist."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine runner curves, rocket rings, tank bands, cushion forms, and goblin ornament.",
+      "componentRefs": [
+        "runner-pair",
+        "twin-rockets",
+        "fuel-tank",
+        "rider-seat",
+        "prow-ornament"
+      ],
+      "acceptance": [
+        "Identity-critical forms meet feature thresholds from multiple angles.",
+        "Each outer side rocket skull emblem has two flat black eye marks that read at gameplay distance without protruding geometry.",
+        "Each skull-and-crossbones plaque is centered between rocket straps 2 and 3 and its diagonal bones have paired endpoint lobes.",
+        "Every side-emblem vertex follows the rocket barrel curvature with only a hairline radial depth offset, so no edge floats in front or rear views.",
+        "The paired fuel-tank valves have identical bases, stems, and wheels.",
+        "Each iron runner strap sits in clean contact on the wooden ski without coplanar overlap or a gap.",
+        "Both runner prisms are watertight and outward-wound, with visible inner and outer walls under front-oblique backface-culling review."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Author independent procedural PBR map families and vertex-color zones.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Metal, wood, leather, bone, and glow remain distinct.",
+        "No concept lighting is baked into shipping albedo."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add chips, scratches, rust, grain, tuft seams, soot, and contact wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Grazing-light review proves real surface response without noisy tiling."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Validate under neutral, grazing, and reference-like lighting.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Form remains readable without relying on the concept's painted highlights."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Prove rider socket, exhaust sockets, procedural motion, audio loop, and dismount reset.",
+      "componentRefs": [
+        "root",
+        "rider-seat",
+        "exhaust-emitters"
+      ],
+      "acceptance": [
+        "The live rider preview visibly uses a seated pose with the pelvis on the cushion rather than standing on the seat.",
+        "No rider clipping.",
+        "No held-loop or render-state leak after dismount."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Optimize only after visual acceptance.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Asset stays within all locked ceilings.",
+        "KTX2, meshopt, node names, and exact bytes pass the asset contract."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-11T12:47:56.023745+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.73,
+      "aiVisionScore": 0.73,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouette": 0.79,
+        "proportions": 0.75,
+        "materials": 0.58,
+        "lighting": 0.72
+      },
+      "featureReviews": [],
+      "referenceScreenshot": "/mnt/e/rocketsled.png",
+      "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/blockout/hero.png",
+      "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/blockout/comparison.png",
+      "cameraView": "front-three-quarter",
+      "notes": "Reviewed hero, front, side, rear, and custom top captures; no degenerate orbit view.",
+      "aiVisionNotes": "The reference and render share the same long-runner/twin-cylinder/central-seat grammar. The render is appropriately sparse for blockout, but its runner tips terminate too close to the prow and the goblin face has not yet reached the skull-like reference silhouette."
+    },
+    {
+      "timestamp": "2026-08-11T13:49:48.358272+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.76,
+        "formDetail": 0.58,
+        "materialSurface": 0.55,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "sled-silhouette",
+          "score": 0.84,
+          "visible": true,
+          "notes": "The corrected runner length, twin side cylinders, central seat/tank stack, and negative spaces match the reference macro read across five views."
+        }
+      ],
+      "referenceScreenshot": "/mnt/e/rocketsled.png",
+      "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/blockout/hero.png",
+      "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/blockout/comparison.png",
+      "cameraView": "multi-angle",
+      "notes": "The real player_warrior GLB was normalized using the runtime skin-aware idle bounds, posed with shipped Sit_Floor_Idle, and measured at rider bounds x -0.627..0.627, y 1.08..3.68, z -0.121..1.226; AABB overlap is false for both rockets and the tank.",
+      "aiVisionNotes": "At blockout scope the shared image pair preserves the reference silhouette grammar and corrected runner reach. Missing rivets, brackets, fins, pipes, tufting, skull planes, and wear are explicitly assigned to later passes rather than counted as blockout failures."
+    },
+    {
+      "timestamp": "2026-08-11T16:35:57.927523+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.83,
+        "formDetail": 0.68,
+        "materialSurface": 0.56,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "rocket-assemblies",
+          "score": 0.83,
+          "visible": true,
+          "notes": "Both rockets visibly carry matched barrel bands, outward rivets, conical noses, stepped dark nozzles, emissive cores, mirrored fins, supported mounts, and buried fuel lines."
+        },
+        {
+          "id": "rider-clearance",
+          "score": 0.86,
+          "visible": true,
+          "notes": "The runtime-normalized shipped knight in Sit_Floor_Idle remains centered between the rockets; per-mesh AABB checks report false for both rockets and the tank, and the seat rails remain below the hands and elbows in hero and top captures."
+        }
+      ],
+      "referenceScreenshot": "/mnt/e/rocketsled.png",
+      "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/structural/hero.png",
+      "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/structural/comparison.png",
+      "cameraView": "multi-angle",
+      "notes": "Reviewed hero, front, right profile, rear, top, and real-rider hero/top images. Mirroring correction restored symmetric bounds x -1.599..1.599. Raw pass is 4925 triangles.",
+      "aiVisionNotes": "The structural render improves the reference-specific assembly language without losing the low sled silhouette. The deterministic silhouette diagnostic reports 0.548 because it segments the annotated concept crop and dark-background render differently; per the locked contract, that code metric is recorded as diagnostic evidence but does not override the reviewed image pair."
+    },
+    {
+      "timestamp": "2026-08-11T17:12:54.969382+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.8,
+        "materialSurface": 0.57,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "sled-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "The 3.8-deep runners, central open deck, rear tank, compact seat, and low mirrored rockets preserve the concept's distinctive vehicle silhouette in hero, front, side, rear, and top views."
+        },
+        {
+          "id": "rocket-assemblies",
+          "score": 0.84,
+          "visible": true,
+          "notes": "The paired rocket systems retain matched conical noses, four-band rhythm, fasteners, stepped nozzles, glow cores, supported mounts, fuel lines, and reduced mirrored fins."
+        },
+        {
+          "id": "goblin-construction",
+          "score": 0.8,
+          "visible": true,
+          "notes": "The prow now reads as a goblin skull through a backed cranium, angled brows, glowing eyes, ears, nose, jaw, mouth cavity, fangs, cheek horns, and backing spikes; rocket plaques, tuft buttons, brackets, pipes, planks, and rivets carry the same ramshackle language."
+        }
+      ],
+      "referenceScreenshot": "/mnt/e/rocketsled.png",
+      "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/form/hero.png",
+      "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/form/comparison.png",
+      "cameraView": "multi-angle",
+      "notes": "Reviewed hero, front, right profile, rear, and top. Bounds remain symmetric x -1.529..1.529 and the form pass stays below the 6500 target at 5671 triangles.",
+      "aiVisionNotes": "The form render now carries the reference-specific goblin identity rather than a generic rocket sled. The deterministic IoU remains 0.547 because the source is an annotated multi-panel concept and the render is isolated on dark look-dev; this known segmentation mismatch is recorded but is not acceptance authority."
+    },
+    {
+      "timestamp": "2026-08-11T17:23:24.892470+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.8,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.78
+      },
+      "featureReviews": [
+        {
+          "id": "surface-and-exhaust",
+          "score": 0.8,
+          "visible": true,
+          "notes": "Red paint, dark iron, wood, leather, off-white plaques, green bone, and orange glow remain distinct. Nine independent 1024px albedo/normal/ORM maps show metal scratches and chips, directional wood grain and seams, and quilted leather relief; nozzle cores remain bounded and readable."
+        }
+      ],
+      "referenceScreenshot": "/mnt/e/rocketsled.png",
+      "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/material/hero.png",
+      "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/material/comparison.png",
+      "cameraView": "multi-angle-and-lookdev",
+      "notes": "gltf-transform inspection confirms six materials, nine 1024x1024 WebP textures, COLOR_0 plus TEXCOORD_0 on mapped geometry, no skins, and no animations. Raw authoring asset remains 5671 triangles.",
+      "aiVisionNotes": "The reviewed sheet preserves the concept palette and material separation while the dedicated evidence views show actual response at neutral and grazing angles. The deterministic diagnostic reports low concept-sheet IoU and a 67 delta-E outlier with null component IDs; the source is painted multi-panel art and the diagnostic compares global clusters against per-part recipes, so this recorded coarse metric does not override direct surface evidence under the spec."
+    },
+    {
+      "timestamp": "2026-08-11T18:35:36.791299+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.83,
+      "aiVisionScore": 0.83,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.81,
+        "materialSurface": 0.82,
+        "lightingCamera": 0.79
+      },
+      "featureReviews": [
+        {
+          "id": "goblin-construction",
+          "score": 0.81,
+          "visible": true,
+          "notes": "Baked cavity/contact shading reinforces the attached bands, brackets, rivets, pipe roots, plank seams, tuft buttons, skull planes, and runner contacts without obscuring their hierarchy."
+        },
+        {
+          "id": "surface-and-exhaust",
+          "score": 0.81,
+          "visible": true,
+          "notes": "Grazing light shows tactile metal, wood, and leather response without noisy tiling. Rear-only soot and runner-underside contact wear are localized in vertex color, while the symmetric nozzle cores remain bounded and clear."
+        }
+      ],
+      "referenceScreenshot": "/mnt/e/rocketsled.png",
+      "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/surface/hero.png",
+      "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/surface/comparison.png",
+      "cameraView": "multi-angle-and-grazing",
+      "notes": "The spec now records concrete component surfaceDetail locality. Surface-stage raw geometry is unchanged at 5671 triangles and six materials; nine 1024px independent maps remain attached.",
+      "aiVisionNotes": "The grazing evidence shows subtle real response rather than wallpapered noise, and the game-distance views retain strong material separation. The deterministic concept-sheet diagnostic again reports 0.552 IoU and a null-ID global color outlier; those known coarse segmentation failures are recorded but do not supersede the direct surface sheet and grazing review."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-11T12:47:56.023745+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.73,
+      "aiVisionScore": 0.73,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouette": 0.79,
+        "proportions": 0.75,
+        "materials": 0.58,
+        "lighting": 0.72
+      },
+      "featureReviews": [],
+      "action": "refine-code",
+      "summary": "Macro identity reads as a low wide twin-rocket sled, but the blockout needs longer ski noses and real seated-rider clearance evidence before structural work.",
+      "matched": [
+        "low wide runner silhouette",
+        "twin side rockets remain symmetric",
+        "central open seat and rear tank read in all rendered views",
+        "rear exhaust cores are clear and symmetric"
+      ],
+      "mismatches": [
+        "runner noses have less forward reach than the concept",
+        "prow face is only a placeholder mass",
+        "clearance overlay is not the live player rig",
+        "blockout triangle count leaves limited detail headroom"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "extend the upturned runner noses while preserving the shallow curve",
+        "capture the real knight rig in Sit_Floor_Idle at the proposed seat lift",
+        "keep new structural detail low-poly and plan material-bucket merges"
+      ],
+      "evidence": [
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/hero.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/front.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/right.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/back.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/top.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "/mnt/e/rocketsled.png",
+        "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/blockout/hero.png",
+        "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/blockout/comparison.png",
+        "cameraView": "front-three-quarter",
+        "notes": "Reviewed hero, front, side, rear, and custom top captures; no degenerate orbit view.",
+        "aiVisionNotes": "The reference and render share the same long-runner/twin-cylinder/central-seat grammar. The render is appropriately sparse for blockout, but its runner tips terminate too close to the prow and the goblin face has not yet reached the skull-like reference silhouette."
+      }
+    },
+    {
+      "timestamp": "2026-08-11T13:49:48.358272+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.76,
+        "formDetail": 0.58,
+        "materialSurface": 0.55,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "sled-silhouette",
+          "score": 0.84,
+          "visible": true,
+          "notes": "The corrected runner length, twin side cylinders, central seat/tank stack, and negative spaces match the reference macro read across five views."
+        }
+      ],
+      "action": "continue",
+      "summary": "Blockout proportions are locked: the corrected 3.8-unit runners, low symmetric rockets, open center seat, rear tank, and prow read consistently, and the exact runtime-normalized knight in Sit_Floor_Idle clears both rockets and the tank.",
+      "matched": [
+        "3.8-unit long parallel upturned runners",
+        "low wide twin-rocket silhouette",
+        "open rider volume",
+        "central seat and rear tank hierarchy",
+        "front, hero, side, rear, and top views remain volumetric",
+        "runtime-normalized seated knight AABB clears both rocket groups and the tank"
+      ],
+      "mismatches": [
+        "prow is still a placeholder face mass",
+        "rocket mounts and seat framing need structural detail",
+        "surfaces remain blockout-flat by design"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "replace prow placeholder with a low-poly goblin skull assembly during form refinement",
+        "add attached fins brackets rivets pipes and seat framing in the structural pass",
+        "merge final geometry by material before optimization"
+      ],
+      "evidence": [
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/hero.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/front.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/right.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/back.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/top.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/rider-fit-hero.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/blockout/rider-fit-top.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "/mnt/e/rocketsled.png",
+        "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/blockout/hero.png",
+        "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/blockout/comparison.png",
+        "cameraView": "multi-angle",
+        "notes": "The real player_warrior GLB was normalized using the runtime skin-aware idle bounds, posed with shipped Sit_Floor_Idle, and measured at rider bounds x -0.627..0.627, y 1.08..3.68, z -0.121..1.226; AABB overlap is false for both rockets and the tank.",
+        "aiVisionNotes": "At blockout scope the shared image pair preserves the reference silhouette grammar and corrected runner reach. Missing rivets, brackets, fins, pipes, tufting, skull planes, and wear are explicitly assigned to later passes rather than counted as blockout failures."
+      }
+    },
+    {
+      "timestamp": "2026-08-11T16:35:57.927523+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.83,
+        "formDetail": 0.68,
+        "materialSurface": 0.56,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "rocket-assemblies",
+          "score": 0.83,
+          "visible": true,
+          "notes": "Both rockets visibly carry matched barrel bands, outward rivets, conical noses, stepped dark nozzles, emissive cores, mirrored fins, supported mounts, and buried fuel lines."
+        },
+        {
+          "id": "rider-clearance",
+          "score": 0.86,
+          "visible": true,
+          "notes": "The runtime-normalized shipped knight in Sit_Floor_Idle remains centered between the rockets; per-mesh AABB checks report false for both rockets and the tank, and the seat rails remain below the hands and elbows in hero and top captures."
+        }
+      ],
+      "action": "continue",
+      "summary": "Structural pass is accepted: mirrored rockets now carry attached bands, rivets, nozzle stacks, top and outer fins, buried fuel lines, supported mounts, tank cradle and valves, deck brackets, runner fasteners, and rider-safe seat rails.",
+      "matched": [
+        "rocket band and nozzle rhythm",
+        "mirrored tail fins and exhaust cores",
+        "fuel pipes overlap tank and rocket endpoints",
+        "deck brackets overlap chassis and cross braces",
+        "seat rails overlap their support posts",
+        "all Socket_Rider and paired exhaust nodes remain present",
+        "runtime-normalized seated knight clears each rocket mesh and tank mesh"
+      ],
+      "mismatches": [
+        "goblin prow remains a simple placeholder",
+        "seat upholstery is not tufted",
+        "outer fin width may be reduced during form tuning if gameplay scale reads too broad",
+        "surface wear and skull markings remain deferred to their locked passes"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "sculpt the prow into a recognizable goblin skull with jaw teeth ears and backing spikes",
+        "add low-cost tufting and reinforcement hierarchy",
+        "preserve the 6500 target by spending no more than about 1200 additional triangles before optimization"
+      ],
+      "evidence": [
+        "docs/screenshots/goblin-rocket-sled/authoring/structural/hero.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/structural/front.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/structural/right.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/structural/back.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/structural/top.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/structural/rider-fit-hero.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/structural/rider-fit-top.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "/mnt/e/rocketsled.png",
+        "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/structural/hero.png",
+        "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/structural/comparison.png",
+        "cameraView": "multi-angle",
+        "notes": "Reviewed hero, front, right profile, rear, top, and real-rider hero/top images. Mirroring correction restored symmetric bounds x -1.599..1.599. Raw pass is 4925 triangles.",
+        "aiVisionNotes": "The structural render improves the reference-specific assembly language without losing the low sled silhouette. The deterministic silhouette diagnostic reports 0.548 because it segments the annotated concept crop and dark-background render differently; per the locked contract, that code metric is recorded as diagnostic evidence but does not override the reviewed image pair."
+      }
+    },
+    {
+      "timestamp": "2026-08-11T17:12:54.969382+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.8,
+        "materialSurface": 0.57,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "sled-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "The 3.8-deep runners, central open deck, rear tank, compact seat, and low mirrored rockets preserve the concept's distinctive vehicle silhouette in hero, front, side, rear, and top views."
+        },
+        {
+          "id": "rocket-assemblies",
+          "score": 0.84,
+          "visible": true,
+          "notes": "The paired rocket systems retain matched conical noses, four-band rhythm, fasteners, stepped nozzles, glow cores, supported mounts, fuel lines, and reduced mirrored fins."
+        },
+        {
+          "id": "goblin-construction",
+          "score": 0.8,
+          "visible": true,
+          "notes": "The prow now reads as a goblin skull through a backed cranium, angled brows, glowing eyes, ears, nose, jaw, mouth cavity, fangs, cheek horns, and backing spikes; rocket plaques, tuft buttons, brackets, pipes, planks, and rivets carry the same ramshackle language."
+        }
+      ],
+      "action": "continue",
+      "summary": "Identity-critical form is accepted at 5671 triangles and six materials: the sled now has a readable goblin skull prow, tuft-button rhythm, skull-and-crossbone barrel plaques, balanced reduced fins, and the full supported mechanical hierarchy.",
+      "matched": [
+        "long shallow runners and compact open deck",
+        "twin banded rockets and stepped nozzles",
+        "mirrored reduced fins",
+        "tufted seat and backrest rhythm",
+        "goblin skull prow with brows eyes ears nose jaw teeth cheek horns and backing spikes",
+        "ramshackle bracket pipe plank and rivet hierarchy",
+        "six authored material buckets"
+      ],
+      "mismatches": [
+        "rocket plaques share the green bone tint until vertex colors are authored",
+        "upholstery softness and quilt seams must come from the material layer",
+        "surfaces still read clean and flat without wear maps",
+        "deterministic silhouette diagnostic remains incompatible with the annotated concept crop"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "author per-vertex semantic tints so barrel plaques can be off-white while prow bone stays green",
+        "merge geometry per material while preserving socket nodes",
+        "add independent procedural albedo normal and ORM fields then KTX2-compress before shipping"
+      ],
+      "evidence": [
+        "docs/screenshots/goblin-rocket-sled/authoring/form/hero.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/form/front.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/form/right.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/form/back.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/form/top.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "/mnt/e/rocketsled.png",
+        "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/form/hero.png",
+        "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/form/comparison.png",
+        "cameraView": "multi-angle",
+        "notes": "Reviewed hero, front, right profile, rear, and top. Bounds remain symmetric x -1.529..1.529 and the form pass stays below the 6500 target at 5671 triangles.",
+        "aiVisionNotes": "The form render now carries the reference-specific goblin identity rather than a generic rocket sled. The deterministic IoU remains 0.547 because the source is an annotated multi-panel concept and the render is isolated on dark look-dev; this known segmentation mismatch is recorded but is not acceptance authority."
+      }
+    },
+    {
+      "timestamp": "2026-08-11T17:23:24.892470+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.8,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.78
+      },
+      "featureReviews": [
+        {
+          "id": "surface-and-exhaust",
+          "score": 0.8,
+          "visible": true,
+          "notes": "Red paint, dark iron, wood, leather, off-white plaques, green bone, and orange glow remain distinct. Nine independent 1024px albedo/normal/ORM maps show metal scratches and chips, directional wood grain and seams, and quilted leather relief; nozzle cores remain bounded and readable."
+        }
+      ],
+      "action": "continue",
+      "summary": "The UV/PBR material pass is accepted: six semantic materials use nine independent 1024px procedural albedo, normal, and ORM maps across metal, wood, and leather families, with bone and glow intentionally untextured.",
+      "matched": [
+        "concept-derived red iron wood leather bone and orange palette",
+        "off-white rocket plaques through semantic vertex colors",
+        "independent albedo normal and ORM fields",
+        "metal scratches chips roughness and exposed-metal response",
+        "directional wood grain plank seams and relief",
+        "leather grain quilting buttons and cavity response",
+        "baked macro cavity contact grime wear seam and mottle shading",
+        "bounded emissive eyes and nozzle cores",
+        "neutral grazing and warm reference-matched evidence"
+      ],
+      "mismatches": [
+        "surface response is deliberately subtle at gameplay distance",
+        "the grazing close-up is harsh evidence lighting rather than presentation lighting",
+        "raw review GLB uses WebP and 145 authoring primitives until the locked KTX2 and merge optimization pass"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "carry the same fields into the surface pass and tune only if close-up inspection reveals wallpapering or crushed values",
+        "KTX2-compress all nine textures before any GLB is copied to public",
+        "merge per material and pin exact final bytes extensions texture count and node names"
+      ],
+      "evidence": [
+        "docs/screenshots/goblin-rocket-sled/authoring/material/hero.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/material/front.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/material/right.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/material/back.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/material/top.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/material/surface-maps.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/material/lookdev-neutral.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/material/lookdev-grazing.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/material/lookdev-reference-match.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "/mnt/e/rocketsled.png",
+        "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/material/hero.png",
+        "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/material/comparison.png",
+        "cameraView": "multi-angle-and-lookdev",
+        "notes": "gltf-transform inspection confirms six materials, nine 1024x1024 WebP textures, COLOR_0 plus TEXCOORD_0 on mapped geometry, no skins, and no animations. Raw authoring asset remains 5671 triangles.",
+        "aiVisionNotes": "The reviewed sheet preserves the concept palette and material separation while the dedicated evidence views show actual response at neutral and grazing angles. The deterministic diagnostic reports low concept-sheet IoU and a 67 delta-E outlier with null component IDs; the source is painted multi-panel art and the diagnostic compares global clusters against per-part recipes, so this recorded coarse metric does not override direct surface evidence under the spec."
+      }
+    },
+    {
+      "timestamp": "2026-08-11T18:35:36.791299+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.83,
+      "aiVisionScore": 0.83,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.81,
+        "materialSurface": 0.82,
+        "lightingCamera": 0.79
+      },
+      "featureReviews": [
+        {
+          "id": "goblin-construction",
+          "score": 0.81,
+          "visible": true,
+          "notes": "Baked cavity/contact shading reinforces the attached bands, brackets, rivets, pipe roots, plank seams, tuft buttons, skull planes, and runner contacts without obscuring their hierarchy."
+        },
+        {
+          "id": "surface-and-exhaust",
+          "score": 0.81,
+          "visible": true,
+          "notes": "Grazing light shows tactile metal, wood, and leather response without noisy tiling. Rear-only soot and runner-underside contact wear are localized in vertex color, while the symmetric nozzle cores remain bounded and clear."
+        }
+      ],
+      "action": "continue",
+      "summary": "Surface pass is accepted: independent PBR fields, baked cavity/contact shading, localized rear soot, and runner-underside wear provide tactile response without noisy tiling or silhouette cost.",
+      "matched": [
+        "grazing light reveals metal scratch and edge response",
+        "wood grain and plank seams remain directional",
+        "leather quilt relief stays broad and padded",
+        "band bracket rivet pipe and button cavities receive localized occlusion",
+        "rocket soot is restricted to rear red surfaces",
+        "runner contact grime is restricted to low runner wood",
+        "no albedo channel is reused as normal roughness metalness or AO"
+      ],
+      "mismatches": [
+        "surface remains intentionally restrained at gameplay distance",
+        "paint-chip density can be revisited only after live scale review",
+        "raw pass still uses WebP evidence maps pending mandatory shipping KTX2 conversion"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "preserve current map frequencies through lighting and interaction review",
+        "do not add more microgeometry",
+        "KTX2-compress all embedded maps during final export and verify extensions and mimetypes in the asset contract"
+      ],
+      "evidence": [
+        "docs/screenshots/goblin-rocket-sled/authoring/surface/hero.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/surface/front.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/surface/right.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/surface/back.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/surface/top.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/surface/lookdev-neutral.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/surface/lookdev-grazing.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/surface/lookdev-reference-match.png",
+        "docs/screenshots/goblin-rocket-sled/authoring/material/surface-maps.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "/mnt/e/rocketsled.png",
+        "renderScreenshot": "docs/screenshots/goblin-rocket-sled/authoring/surface/hero.png",
+        "comparisonImage": "docs/screenshots/goblin-rocket-sled/authoring/surface/comparison.png",
+        "cameraView": "multi-angle-and-grazing",
+        "notes": "The spec now records concrete component surfaceDetail locality. Surface-stage raw geometry is unchanged at 5671 triangles and six materials; nine 1024px independent maps remain attached.",
+        "aiVisionNotes": "The grazing evidence shows subtle real response rather than wallpapered noise, and the game-distance views retain strong material separation. The deterministic concept-sheet diagnostic again reports 0.552 IoU and a null-ID global color outlier; those known coarse segmentation failures are recorded but do not supersede the direct surface sheet and grazing review."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full optimized GLB with runtime exhaust"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "existing character far-LOD policy owns mount visibility; runtime exhaust may shed cosmetically without hiding gameplay information"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "hero mount at chase-camera distance",
+    "targetTriangles": 6500,
+    "premiumReviewThresholdTriangles": 8000,
+    "hardTriangleCeiling": 12000,
+    "targetDrawCalls": 6,
+    "maxDrawCalls": 18,
+    "maxPrimitives": 18,
+    "maxMaterials": 6,
+    "maxCompressedBytes": 1310720,
+    "textureSize": 1024,
+    "embeddedTextures": 9,
+    "animationClips": 0,
+    "fpsTarget": 60,
+    "budgetBasis": "Ordinary shipped mounts range from 1,854 to 5,000 triangles, the current Bonebound Rickshaw build uses 2,732, and the premium Terrorspark Groundshaker uses 12,448. This sled may spend above the ordinary range for premium close-camera detail, but must remain below Terrorspark.",
+    "optimizationPolicy": "Aim for 6,500 triangles. Preserve runners, rocket ring rhythm, rider clearance, tank, goblin ornament, and material separation. Any build above 8,000 triangles needs a visual comparison showing which identity-critical geometry earns the premium cost. Never exceed 12,000. Instance repeated hardware, merge by six material buckets, and share three procedural PBR map families."
+  },
+  "lightingFromPhoto": [
+    "Key light: broad warm front-left key at about 35 degrees elevation, used only to compare shape hierarchy.",
+    "Fill light: cool right-side fill that keeps runner undersides, rocket mounts, and seat frame readable.",
+    "Rim or environment light: restrained rear-right cool rim separating tank valves, fins, and exhaust nozzles.",
+    "Review exposure 1.0 with ACES tone mapping, neutral blue-gray background, soft contact shadow, plus a separate grazing-light material proof."
+  ],
+  "proceduralStrategy": [
+    "Author a purpose-built deterministic scripts/assets/goblin_rocket_sled/model.js factory from named primitive and profile systems.",
+    "Use semantic vertex colors for macro shading and three independent procedural PBR map families for metal, wood, and leather.",
+    "Use world-space box-projected UVs, fold repeats into quantizable range, and restore scale through KHR_texture_transform.",
+    "Merge static geometry by six material buckets while retaining stable named nodes and sockets required at runtime.",
+    "Drive bob, slope tilt, exhaust flicker, and held-loop audio from src/render/goblin_rocket_sled.ts, never renderer.ts or baked animation.",
+    "Run KTX2 compression after every exporter pass and regenerate the media manifest."
+  ],
+  "animationAnchors": [
+    "Socket_Rider: existing player mount attachment point above the seat cushion.",
+    "Socket_Exhaust_L and Socket_Exhaust_R: pooled runtime flame and smoke origins inside the rear nozzles.",
+    "Root_SledMotion: allocation-free procedural bob and slope-tilt transform owned by the sled render module."
+  ],
+  "destructionAnchors": [
+    "No destruction ships this pass; component hierarchy preserves future detachable rocket, runner, and tank seams without exposing runtime break behavior."
+  ],
+  "risks": [
+    "The dense concept can turn into noisy primitive clutter; each pass must preserve the macro hierarchy before adding rivets.",
+    "The rider can clip the tank or side rockets if the seat is scaled from the illustration without live-rig proof.",
+    "Nine embedded maps can exceed the byte ceiling unless resolutions and channel frequencies are tuned before KTX2 compression.",
+    "Runtime exhaust or bloom can obscure the sled and nearby gameplay; effects remain cosmetic, pooled, and bounded.",
+    "Shared mount, audio, content, i18n, icon, and Reliquary files require explicit user approval before modification."
+  ],
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6228,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0328,
+        "colorDelta": {
+          "checked": 13,
+          "maxDeltaE": 62.9,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 7.0
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.67
+            },
+            {
+              "componentId": null,
+              "deltaE": 6.41
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.15
+            },
+            {
+              "componentId": null,
+              "deltaE": 5.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.32
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.0
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.98
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 62.9
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.623 is below threshold 0.85"
+      ],
+      "renderHash": "a0baa8b4bc4143fb",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6228,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0328,
+        "colorDelta": {
+          "checked": 13,
+          "maxDeltaE": 62.9,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 7.0
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.67
+            },
+            {
+              "componentId": null,
+              "deltaE": 6.41
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.15
+            },
+            {
+              "componentId": null,
+              "deltaE": 5.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.32
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.0
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.98
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 62.9
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.623 is below threshold 0.85"
+      ],
+      "renderHash": "a0baa8b4bc4143fb",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5512,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0328,
+        "colorDelta": {
+          "checked": 13,
+          "maxDeltaE": 62.9,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 7.0
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.67
+            },
+            {
+              "componentId": null,
+              "deltaE": 6.41
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.15
+            },
+            {
+              "componentId": null,
+              "deltaE": 5.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.32
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.0
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.98
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 62.9
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.551 is below threshold 0.85"
+      ],
+      "renderHash": "a0baa8b4bc4143fb",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5479,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0353,
+        "colorDelta": {
+          "checked": 13,
+          "maxDeltaE": 62.87,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 6.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.8
+            },
+            {
+              "componentId": null,
+              "deltaE": 6.43
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.09
+            },
+            {
+              "componentId": null,
+              "deltaE": 5.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.03
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.98
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.46
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.33
+            },
+            {
+              "componentId": null,
+              "deltaE": 62.87
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.548 is below threshold 0.85"
+      ],
+      "renderHash": "6b33a1eb80551b26",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5469,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0372,
+        "colorDelta": {
+          "checked": 13,
+          "maxDeltaE": 64.27,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 10.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 6.71
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.67
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.95
+            },
+            {
+              "componentId": null,
+              "deltaE": 4.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.98
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.63
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.33
+            },
+            {
+              "componentId": null,
+              "deltaE": 64.27
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.547 is below threshold 0.85"
+      ],
+      "renderHash": "93e42fdbf5b2106d",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5518,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0328,
+        "colorDelta": {
+          "checked": 13,
+          "maxDeltaE": 67.0,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 10.67
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.85
+            },
+            {
+              "componentId": null,
+              "deltaE": 7.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.52
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.83
+            },
+            {
+              "componentId": null,
+              "deltaE": 4.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.77
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.42
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.98
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.6
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 67.0
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.552 is below threshold 0.85",
+        "max per-part color delta-E 67.0 exceeds threshold 20.0"
+      ],
+      "renderHash": "0db1365454709e30",
+      "passId": "material-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5518,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0328,
+        "colorDelta": {
+          "checked": 13,
+          "maxDeltaE": 67.59,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 11.13
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.52
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.29
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 4.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.07
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.98
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 67.59
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.552 is below threshold 0.85",
+        "max per-part color delta-E 67.59 exceeds threshold 20.0"
+      ],
+      "renderHash": "759ebd3bca38dabe",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5518,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0328,
+        "colorDelta": {
+          "checked": 13,
+          "maxDeltaE": 67.59,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 11.13
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.52
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.29
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 4.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.07
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.98
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 67.59
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.552 is below threshold 0.85",
+        "max per-part color delta-E 67.59 exceeds threshold 20.0"
+      ],
+      "renderHash": "759ebd3bca38dabe",
+      "passId": "lighting-pass"
+    }
+  ]
+}

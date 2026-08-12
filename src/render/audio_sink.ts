@@ -80,6 +80,8 @@ export interface SpatialAudioSink {
     mountKey: string,
     moving: boolean,
     entityId: number,
+    backwards?: boolean,
+    airborne?: boolean,
   ): boolean;
   /** Drop an entity's mountEngine state and silence its loop (dismount,
    *  interest culled, disconnect). */

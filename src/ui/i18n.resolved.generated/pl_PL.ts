@@ -1045,6 +1045,7 @@ export const pl_PL: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Cienioskacząca Ropucha",
       "name_stormfeather_griffin": "Niebosiężny Burzopiór",
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
+      "name_goblin_rocket_sled": "Goblin Rocket Sled",
       "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
       "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
@@ -1054,6 +1055,7 @@ export const pl_PL: EnTranslations = {
       "desc_shadowjump_toad": "Ogromna, pewna kroku olbrzymia ropucha, wyszkolona w błyskawicznych, cienistych skokach, które pokonują każdy teren.",
       "desc_stormfeather_griffin": "Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.",
       "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
+      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
       "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem."
     },
@@ -12166,6 +12168,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "Ignition Key: Goblin Rocket Sled"
       },
       "reins_drakemaw_raptor": {
         "name": "Wodze Raptora Smoczej Paszczy"
