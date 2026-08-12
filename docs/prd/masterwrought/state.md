@@ -2005,3 +2005,62 @@ Grandmaster-craft family, generic by construction.
   widening a reason union means touching that file (now retargeted at the
   extracted core); biome error-gates committed SVG sources on a11y noSvgWithoutTitle,
   so authored SVGs carry their display-name title from birth.
+
+## Phase 07 QA release sync (2026-08-12, merge c2ad3b0176, the QA session's Step 0)
+- RELEASE SYNC: origin/release/v0.37.0 moved to 94333011cc (9 commits: account
+  general chat quotas incl. the admin rate-limit UI and HUD denial routing, and
+  parse threat/health/resource-pool sampling); merged as c2ad3b0176 on top of
+  396d4d7971. One conflict, the generated pending.ts, resolved by regeneration
+  (i18n:gen + i18n:hash --write). Post-merge guards all green: the three naming
+  scrubs 26/26 (the merge brought ja/ko/ru/zh_CN/zh_TW overlay rows), the
+  portrait trio fresh with no re-mint owed (placeholder_art_completion +
+  mob_portrait_source_manifest 20/20), pnpm-lock.yaml untouched so the
+  inscription-tome fingerprint family stands.
+- MERGE AUDIT (six-agent fan-out, full reports in the session task output):
+  CLEAN apart from the ratchet collision below. server/game.ts reconstructs
+  byte-for-byte from a clean three-way (every branch seam verbatim incl. the
+  extract_essence dispatch; the quota admission sits entirely inside case
+  'chat', a sibling case, and cannot swallow or reorder branch dispatch).
+  src/sim/types.ts carries both sides exactly (branch 202-line patch verbatim;
+  release added only the optional error-event fields). All five overlays
+  verified key-by-key: every branch-added/changed row survived with branch
+  values, release chatQuota fills intact, parent key sets disjoint, the
+  detonateHellfireBrand deletion stayed deleted. The catalog delta is purely
+  additive (three new hudChrome.chatQuota.* keys with their five non-Latin
+  fills), so no reword staleness. The release added exactly one endpoint
+  (admin general-chat-rate-limit) as a proper dual-arm RouteDef WITH its
+  surface-inventory row; no new WS commands; no export changed signature; the
+  new db mocks are release-owned full factories and the branch adds no
+  server/db exports, so the stale-mock trap is empty. Every phase 07/08
+  premise re-confirmed intact: nothing incoming touches crafting.ts, the
+  craftDaily arms, ctx.resetDay, the denial chain, or the wiki oncePerDay
+  generator.
+- RATCHET COLLISION (the one blocking find; MERGE FALLOUT, not a phase 07
+  defect): the union of both parents put hud.ts at 19503 vs the branch's
+  19500 ceiling (base 19428; branch +18 net after the phase 07 extraction;
+  release +57 of chat-quota HUD wiring under its own still-19600 ceiling), so
+  monolith_budget was red at the merge commit while both parents were green.
+  Fix per the ratchet: the sixteen display-name/narrative resolvers
+  (itemDisplayNameFromSource through delveDisplayName) moved VERBATIM out of
+  hud.ts into the new pure core src/ui/entity_display_core.ts
+  (UI_PURE_CORES-registered; paired tests/entity_display_core.test.ts pins the
+  routing arms: known-vs-unknown FromSource reversal, stack suffix, and the
+  entityDisplayName ownership/necromancy/kind ladder). hud.ts 19503 to 19431,
+  ceiling LOWERED 19500 to 19490. Both hud source pins survive by
+  construction: localization_coverage's dungeonDisplayNameFromSource token now
+  matches the import + call sites, and gather_event_i18n pins the CALL text at
+  the localizeLootText arm, which stays in hud.ts. questlog_window's private
+  questTitle/questNarrative/questObjectiveLabel/npcDisplayName copies are
+  PRE-EXISTING duplication, recorded as a later unification candidate,
+  deliberately not touched at a sync.
+- ERROR EVENT SHAPE NOTE: the release widened the error SimEvent with optional
+  server-authored code/channel/retryAfterSeconds fields (stable codes
+  general_chat_quota*), and hud.ts now routes error events through
+  generalChatQuotaView BEFORE localizeErrorText. Masterwrought refusal paths
+  verified unaffected (the text-free daily_limit reason rides its own typed
+  channel, not error-event text). A shipped structured-error idiom now exists;
+  consider it for the Phase 14 catalyst-cooldown readout instead of a new
+  matcher row.
+- The QA prompt's premise "branch tip is 396d4d7971" is superseded by this
+  sync; the implementation diff under audit stays e46e5416aa..396d4d7971, and
+  this sync's commits (the merge + the extraction) are the Step 0 record.
