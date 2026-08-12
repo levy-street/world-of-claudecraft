@@ -12359,6 +12359,9 @@ export const id_ID: EnTranslations = {
       "sunspun_handwraps": {
         "name": "Sunspun Handwraps"
       },
+      "sunspun_haversack": {
+        "name": "Sunspun Haversack"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },

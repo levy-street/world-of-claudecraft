@@ -2786,6 +2786,7 @@ export type TranslationKeyFlat =
   | 'entities.items.sunpetal_sickle.name'
   | 'entities.items.sunspun_bolt.name'
   | 'entities.items.sunspun_handwraps.name'
+  | 'entities.items.sunspun_haversack.name'
   | 'entities.items.sunspun_leggings.name'
   | 'entities.items.sunspun_vestments.name'
   | 'entities.items.sunweave_mantle.name'

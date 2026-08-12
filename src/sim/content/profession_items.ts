@@ -1113,4 +1113,16 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 170,
     masterwrought: true,
   },
+  // The apex bag: best carried capacity in the game, one 2-slot step past
+  // mistcallers_duffel (14) on the shipped quality ladder. Deliberately NOT
+  // masterwrought (bags carry no combat power, so it never spends a slot in
+  // the counted equip family) and not item-level eligible (kind bag).
+  sunspun_haversack: {
+    id: 'sunspun_haversack',
+    name: 'Sunspun Haversack',
+    kind: 'bag',
+    quality: 'epic',
+    bagSlots: 16,
+    sellValue: 180,
+  },
 };

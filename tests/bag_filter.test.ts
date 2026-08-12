@@ -529,9 +529,11 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'soggy_boot',
     'soggy_moccasin',
     'stag_antler',
-    // Masterwrought phase 08: forgefold_plating, sunspun_bolt, wyrmfall_core,
-    // and wyrmhide_cording left this list with their apex consumers: they now
-    // derive into the material set and gain the materials chip.
+    // Masterwrought phase 08: the apex bag joins the bag-kind rows;
+    // forgefold_plating, sunspun_bolt, wyrmfall_core, and wyrmhide_cording
+    // left this list with their apex consumers (they now derive into the
+    // material set and gain the materials chip).
+    'sunspun_haversack',
     'tallow_candle',
     'tangled_weed',
     'travelers_knapsack',

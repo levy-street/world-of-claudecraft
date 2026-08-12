@@ -10445,6 +10445,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunspun_vestments.name': 'Солнцепрядное облачение',
   'entities.items.sunspun_leggings.name': 'Солнцепрядные поножи',
   'entities.items.sunspun_handwraps.name': 'Солнцепрядные обмотки',
+  'entities.items.sunspun_haversack.name': 'Солнцепрядная котомка',
   'entities.mobs.wildheart_stalker.name': 'Лазутчик Лозокогтя',
   'entities.mobs.wildheart_ravager.name': 'Разоритель Кровавой Гривы',
   'entities.mobs.wildheart_hexcaller.name': 'Заклинатель Солнечной Кости',

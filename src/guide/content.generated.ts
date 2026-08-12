@@ -9902,6 +9902,45 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 150,
           "zeroAt": 175
         }
+      },
+      {
+        "id": "recipe_sunspun_haversack",
+        "name": "Sunspun Haversack",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sunspun Bolt",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "name": "Pristine Silk",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunspun Haversack",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
       }
     ]
   },

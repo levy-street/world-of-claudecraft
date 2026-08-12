@@ -12359,6 +12359,9 @@ export const cs_CZ: EnTranslations = {
       "sunspun_handwraps": {
         "name": "Sunspun Handwraps"
       },
+      "sunspun_haversack": {
+        "name": "Sunspun Haversack"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },

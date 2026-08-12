@@ -12359,6 +12359,9 @@ export const ru_RU: EnTranslations = {
       "sunspun_handwraps": {
         "name": "Солнцепрядные обмотки"
       },
+      "sunspun_haversack": {
+        "name": "Солнцепрядная котомка"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

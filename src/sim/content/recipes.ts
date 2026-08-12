@@ -2251,6 +2251,24 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     acquisition: ['drop'],
     stationType: 'loom',
   },
+  {
+    id: 'recipe_sunspun_haversack',
+    professionId: 'tailoring',
+    resultItemId: 'sunspun_haversack',
+    resultCount: 1,
+    // Input 280 vs output 180.
+    reagents: [
+      { itemId: 'sunspun_bolt', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'pristine_silk', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'loom',
+  },
 ];
 
 // Exported (not just used internally by recipeById below) so the IWorld

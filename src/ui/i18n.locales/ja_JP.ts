@@ -10284,6 +10284,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunspun_vestments.name': '陽紡ぎの祭服',
   'entities.items.sunspun_leggings.name': '陽紡ぎのレギンス',
   'entities.items.sunspun_handwraps.name': '陽紡ぎの手巻き',
+  'entities.items.sunspun_haversack.name': '陽紡ぎの背負い袋',
   'entities.mobs.wildheart_stalker.name': '蔦爪の追跡者',
   'entities.mobs.wildheart_ravager.name': '血鬣の略奪者',
   'entities.mobs.wildheart_hexcaller.name': '陽骨の呪術師',

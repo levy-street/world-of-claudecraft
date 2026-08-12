@@ -12359,6 +12359,9 @@ export const ko_KR: EnTranslations = {
       "sunspun_handwraps": {
         "name": "태양실 손싸개"
       },
+      "sunspun_haversack": {
+        "name": "태양실 배낭"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

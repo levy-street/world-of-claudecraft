@@ -9822,6 +9822,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunspun_vestments.name': '阳纺法衣',
   'entities.items.sunspun_leggings.name': '阳纺护腿',
   'entities.items.sunspun_handwraps.name': '阳纺裹手',
+  'entities.items.sunspun_haversack.name': '阳纺行囊',
   'entities.mobs.wildheart_stalker.name': '藤爪潜猎者',
   'entities.mobs.wildheart_ravager.name': '血鬃掠夺者',
   'entities.mobs.wildheart_hexcaller.name': '日骨巫咒师',

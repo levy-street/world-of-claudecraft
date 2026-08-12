@@ -12359,6 +12359,9 @@ export const zh_CN: EnTranslations = {
       "sunspun_handwraps": {
         "name": "阳纺裹手"
       },
+      "sunspun_haversack": {
+        "name": "阳纺行囊"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

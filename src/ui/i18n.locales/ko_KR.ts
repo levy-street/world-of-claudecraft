@@ -10268,6 +10268,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunspun_vestments.name': '태양실 예복',
   'entities.items.sunspun_leggings.name': '태양실 각반',
   'entities.items.sunspun_handwraps.name': '태양실 손싸개',
+  'entities.items.sunspun_haversack.name': '태양실 배낭',
   'entities.mobs.wildheart_stalker.name': '덩굴발톱 추적자',
   'entities.mobs.wildheart_ravager.name': '피갈기 약탈자',
   'entities.mobs.wildheart_hexcaller.name': '태양뼈 사술사',

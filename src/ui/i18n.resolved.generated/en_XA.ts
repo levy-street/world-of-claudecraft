@@ -12359,6 +12359,9 @@ export const en_XA: EnTranslations = {
       "sunspun_handwraps": {
         "name": "[Šúñšþúñ Ĥáñðŵŕáþš]"
       },
+      "sunspun_haversack": {
+        "name": "[Šúñšþúñ Ĥáʋéŕšáçķ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

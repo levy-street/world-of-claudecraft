@@ -12359,6 +12359,9 @@ export const tr_TR: EnTranslations = {
       "sunspun_handwraps": {
         "name": "Sunspun Handwraps"
       },
+      "sunspun_haversack": {
+        "name": "Sunspun Haversack"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },

@@ -12359,6 +12359,9 @@ export const pl_PL: EnTranslations = {
       "sunspun_handwraps": {
         "name": "Sunspun Handwraps"
       },
+      "sunspun_haversack": {
+        "name": "Sunspun Haversack"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },

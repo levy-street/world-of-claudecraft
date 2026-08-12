@@ -12359,6 +12359,9 @@ export const ja_JP: EnTranslations = {
       "sunspun_handwraps": {
         "name": "陽紡ぎの手巻き"
       },
+      "sunspun_haversack": {
+        "name": "陽紡ぎの背負い袋"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

@@ -2475,6 +2475,7 @@ const ITEM_ENTITY_IDS = [
   'sunspun_vestments',
   'sunspun_leggings',
   'sunspun_handwraps',
+  'sunspun_haversack',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2650,6 +2651,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   sunspun_vestments: 'Sunspun Vestments',
   sunspun_leggings: 'Sunspun Leggings',
   sunspun_handwraps: 'Sunspun Handwraps',
+  sunspun_haversack: 'Sunspun Haversack',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

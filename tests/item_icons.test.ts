@@ -49,7 +49,7 @@ function walk(dir: string): string[] {
   return out;
 }
 
-// The 6 equippable bags. Pinned as a literal (guard F walks it for the per-bag license
+// The 7 equippable bags. Pinned as a literal (guard F walks it for the per-bag license
 // override), so a renamed bag or a drifted `kind` fails loudly instead of dropping out of
 // the coverage.
 const BAG_IDS = [
@@ -57,6 +57,7 @@ const BAG_IDS = [
   'linen_pouch',
   'mistcallers_duffel',
   'silkspun_satchel',
+  'sunspun_haversack',
   'travelers_knapsack',
   'wolfhide_satchel',
 ];
@@ -383,6 +384,7 @@ describe('item webp icons', () => {
       'linen_pouch',
       'mistcallers_duffel',
       'silkspun_satchel',
+      'sunspun_haversack',
       'travelers_knapsack',
       'wolfhide_satchel',
     ]);
