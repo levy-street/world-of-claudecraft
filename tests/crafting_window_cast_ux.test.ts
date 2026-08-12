@@ -314,7 +314,10 @@ describe('renderCraftingWindow craft-cast UX', () => {
       path.resolve(process.cwd(), 'src/styles/components.css'),
       'utf8',
     ).replace(/\/\*[\s\S]*?\*\//g, '');
-    expect(componentsCss).toMatch(/^\s*\.crafting-duration-chip \{/m);
+    // Selector-list tolerant: the rule stays live if the class is folded
+    // into a list; [^}]* cannot cross a preceding rule's body once comments
+    // are stripped, so the match stays within one selector region.
+    expect(componentsCss).toMatch(/\.crafting-duration-chip\b[^}]*\{/);
     const aria = el.querySelector('.crafting-recipe-btn')!.getAttribute('aria-label') ?? '';
     expect(aria).toContain('Once per day');
     // Mats fit four crafts; the daily cap holds every affordance at one.

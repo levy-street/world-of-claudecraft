@@ -4768,12 +4768,11 @@ function professionsCraft(seed = 5): Scenario {
       meta.craftSkills.alchemy = 75;
       meta.knownRecipes.add('recipe_quickening_catalyst');
       {
-        const apothecary = stationsOfType(STATIONS, 'apothecary')[0];
-        const crafter = (sim as unknown as { entities: Map<number, Entity> }).entities.get(pid);
-        if (!apothecary || !crafter) throw new Error('apothecary station or crafter missing');
-        crafter.pos.x = apothecary.pos.x;
-        crafter.pos.z = apothecary.pos.z;
-        crafter.prevPos = { ...crafter.pos };
+        const apothecary = requireValue(
+          stationsOfType(STATIONS, 'apothecary')[0],
+          'apothecary station',
+        );
+        teleport(sim, requireEntity(sim, pid, 'crafter'), apothecary.pos.x, apothecary.pos.z);
       }
       sim.addItem('sunpetal_herb', 1, pid);
       sim.addItem('goldleaf_herb', 2, pid);
@@ -4791,8 +4790,9 @@ function professionsCraft(seed = 5): Scenario {
       // craftCastRecipeId capture, and the batch counters at 2 of 2) instead
       // of only the at-rest zeros. Deliberately no ticks: this scenario's
       // coverage pin is draw-PRECISE (each craft draws exactly once, the
-      // denial zero), and a cast start draws nothing, so the stream stays at
-      // three draws and the armed cast simply never completes in-scenario.
+      // denials zero), and a cast start draws nothing, so the stream stays at
+      // four draws (step 4b's catalyst included) and the armed cast simply
+      // never completes in-scenario.
       sim.addItem('linen_scrap', 2, pid);
       sim.addItem('spider_leg', 2, pid);
       sim.addItem('silverleaf_herb', 4, pid);

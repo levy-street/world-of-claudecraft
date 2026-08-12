@@ -3517,6 +3517,11 @@ export class Sim {
       // tampered or corrupt row degrades here instead of throwing in
       // addPlayer or riding back out through the save verbatim. Real recipe
       // ids are short and the oncePerDay set is content-bounded near ten.
+      // One deliberate divergence from the sibling: this arm resets the
+      // date when the stamp set empties (below); wyrmfallDaily keeps its
+      // date, so its {date, sources: []} shape can still re-serialize (its
+      // sources carry no live-id filter, so the corner needs a tampered
+      // row there rather than a retired recipe).
       if (s.craftDaily) {
         // Tokens are additionally filtered to LIVE oncePerDay recipe ids
         // (the node_persist anti-tamper doctrine: load-side, so a tampered

@@ -358,10 +358,12 @@ describe('persistence hardening (the wyrmfallDaily load-clamp arm)', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Old');
     // An untouched character's save genuinely lacks the field (the omission
-    // pin above), so this IS the pre-phase shape; nothing to delete. The
-    // premise is asserted so the fixture cannot silently stop matching it.
+    // pin above); the premise is asserted so the fixture cannot silently
+    // stop matching it, and the delete keeps the case testing a field-less
+    // save UNCONDITIONALLY even if serialization ever stops omitting.
     const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
     expect(state.craftDaily).toBeUndefined();
+    delete state.craftDaily;
     const sim2 = makeSim();
     const pid2 = sim2.addPlayer('warrior', 'Old', { state });
     const meta2 = sim2.players.get(pid2) as PlayerMeta;
@@ -408,7 +410,10 @@ describe('persistence hardening (the wyrmfallDaily load-clamp arm)', () => {
       const simN = makeSim();
       const pidN = simN.addPlayer('warrior', 'Bad', { state });
       const metaN = simN.players.get(pidN) as PlayerMeta;
-      expect(metaN.craftDaily).toEqual({ date: '', crafted: new Set() });
+      expect(metaN.craftDaily, `shape ${JSON.stringify(bogus)}`).toEqual({
+        date: '',
+        crafted: new Set(),
+      });
     }
   });
 

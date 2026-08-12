@@ -51,13 +51,21 @@ afterEach(() => setLanguage('en'));
 
 /** The first table row whose es display name differs from its sim English:
  *  the reversal pins need an id where the two arms are distinguishable, and
- *  throwing on none keeps the premise loud instead of silently vacuous. */
+ *  throwing on none keeps the premise loud instead of silently vacuous.
+ *  Rows whose English name a DIFFERENT earlier row shares are skipped: the
+ *  *FromSource resolvers answer with the FIRST row carrying a name, so a
+ *  duplicate-named later twin would red the pin for a reason unrelated to
+ *  the routing it guards. */
 function firstTranslated<T>(
   rows: T[],
   simName: (row: T) => string,
   display: (row: T) => string,
 ): T {
-  const hit = rows.find((row) => display(row) !== simName(row));
+  const hit = rows.find(
+    (row) =>
+      display(row) !== simName(row) &&
+      rows.find((candidate) => simName(candidate) === simName(row)) === row,
+  );
   if (!hit) throw new Error('no es-translated row: the reversal pins would be vacuous');
   return hit;
 }
