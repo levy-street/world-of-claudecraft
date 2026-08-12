@@ -8053,6 +8053,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.crafting.masterworkZoneLine'
   | 'hudChrome.crafting.noBagSpace'
   | 'hudChrome.crafting.noProfessionChoice'
+  | 'hudChrome.crafting.oncePerDay'
   | 'hudChrome.crafting.pairOptionLabel'
   | 'hudChrome.crafting.professionChoice'
   | 'hudChrome.crafting.progressAria'

@@ -3282,6 +3282,7 @@ export const nl_NL: EnTranslations = {
       "recipeNotLearned": "Je hebt dat recept nog niet geleerd.",
       "noBagSpace": "Je hebt geen ruimte voor het vervaardigde voorwerp.",
       "dailyLimit": "You can only craft that once per day.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "Vereist {craft} {skill}",
       "difficultyFull": "Volledige vaardigheidswinst",
       "difficultyReduced": "Verminderde vaardigheidswinst",

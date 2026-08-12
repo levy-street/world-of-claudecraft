@@ -3282,6 +3282,7 @@ export const ru_RU: EnTranslations = {
       "recipeNotLearned": "Вы еще не изучили этот рецепт.",
       "noBagSpace": "В сумках нет места для созданного предмета.",
       "dailyLimit": "Это можно создать лишь раз в день.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "Требуется {craft} {skill}",
       "difficultyFull": "Полный рост навыка",
       "difficultyReduced": "Сниженный рост навыка",

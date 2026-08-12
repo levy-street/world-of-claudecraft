@@ -3282,6 +3282,7 @@ export const vi_VN: EnTranslations = {
       "recipeNotLearned": "Bạn chưa học công thức đó.",
       "noBagSpace": "Túi của bạn không còn chỗ cho vật phẩm vừa chế tạo.",
       "dailyLimit": "You can only craft that once per day.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "Yêu cầu {craft} {skill}",
       "difficultyFull": "Đạt được kỹ năng đầy đủ",
       "difficultyReduced": "Giảm khả năng nhận được kỹ năng",

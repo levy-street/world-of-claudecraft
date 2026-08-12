@@ -1017,7 +1017,11 @@ describe('crafting window station-range repaint liveness (source pins)', () => {
 });
 
 describe('craftResult deny toast names the station (source pins)', () => {
-  const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  // Comment-stripped like the painter scans above: a pinned token inside a
+  // comment must never satisfy a pin about live code (review round).
+  const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
   it('the denial routes through the craft_denial_line_view core with the recipe station type', () => {
     // The reason-to-key mapping moved into the pure core at the Phase 07
@@ -1029,8 +1033,13 @@ describe('craftResult deny toast names the station (source pins)', () => {
     expect(hud).toMatch(/craftDenialLine\(ev\.reason, recipeById\(ev\.recipeId\)\?\.stationType\)/);
   });
 
-  it('a resolved type renders the NAMED toast via stationRequired + stationNameText', () => {
-    expect(hud).toContain("t('hudChrome.crafting.stationRequired', {");
-    expect(hud).toContain('station: stationNameText(denial.stationType),');
+  it('the toast renders the CORE-selected key, station params riding the resolved type', () => {
+    // The render half: the line must come from t(denial.key), never a
+    // hardcoded key beside the core (which would leave the core's mapping
+    // dead data), with the station name interpolated only when the core
+    // resolved a type.
+    expect(hud).toMatch(/t\(\s*denial\.key,/);
+    expect(hud).toContain('station: stationNameText(denial.stationType)');
+    expect(hud).not.toContain("t('hudChrome.crafting.stationRequired'");
   });
 });

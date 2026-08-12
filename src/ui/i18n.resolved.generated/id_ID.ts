@@ -3282,6 +3282,7 @@ export const id_ID: EnTranslations = {
       "recipeNotLearned": "Kamu belum mempelajari resep itu.",
       "noBagSpace": "Kamu tidak punya ruang untuk barang hasil pembuatan.",
       "dailyLimit": "You can only craft that once per day.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "Membutuhkan {craft} {skill}",
       "difficultyFull": "Peningkatan keterampilan penuh",
       "difficultyReduced": "Mengurangi perolehan keterampilan",

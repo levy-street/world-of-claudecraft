@@ -393,6 +393,17 @@ const ARMORCRAFTING_RECIPES = ALL_RECIPES.filter(
     !recipe.oncePerDay &&
     !recipe.reagents.some((reagent) => DAILY_GATED_OUTPUT_IDS.has(reagent.itemId)),
 );
+
+describe('the daily-gate exclusion actually excludes (filter liveness)', () => {
+  it('the gated chain is derived non-empty and the forgefold row is out of the pool', () => {
+    // Without these two pins a rename of oncePerDay or a re-key of the
+    // catalyst turns both filter arms into silent no-ops and the gated row
+    // re-enters the pool inside the window's slack (review round).
+    expect(DAILY_GATED_OUTPUT_IDS.has('quickening_catalyst')).toBe(true);
+    expect(ARMORCRAFTING_RECIPES.length).toBeGreaterThan(0);
+    expect(ARMORCRAFTING_RECIPES.map((r) => r.id)).not.toContain('recipe_forgefold_plating');
+  });
+});
 const ATTUNEMENT = attunedArmorcrafter();
 const RUN = deriveMastery(ARMORCRAFTING_RECIPES, ATTUNEMENT);
 

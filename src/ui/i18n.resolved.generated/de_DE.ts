@@ -3282,6 +3282,7 @@ export const de_DE: EnTranslations = {
       "recipeNotLearned": "Ihr habt dieses Rezept noch nicht erlernt.",
       "noBagSpace": "Du hast keinen Platz für den hergestellten Gegenstand.",
       "dailyLimit": "You can only craft that once per day.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "Erfordert {craft} {skill}",
       "difficultyFull": "Voller Fähigkeitsgewinn",
       "difficultyReduced": "Reduzierter Fähigkeitsgewinn",

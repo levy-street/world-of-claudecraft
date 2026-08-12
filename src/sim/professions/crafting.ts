@@ -468,10 +468,13 @@ export function evaluateCraftAdmission(
   // is set, no other gate's remedy changes the outcome (a stamped recipe
   // stays refused however far the player walks or re-attunes), so telling
   // them anything else sends them on an errand that ends in this same
-  // refusal at the station. Because this admission is shared by cast start,
-  // the complete-side resolve, and the batch auto-continue, a batch stops
-  // itself here the moment the first craft lands the stamp. Read-only, no
-  // rng, no side effect on denial.
+  // refusal at the station. The one corner this trades away is a stamp for
+  // a recipe the character does not KNOW reading daily_limit before
+  // recipe_not_learned; the load clamp filters stamps to live oncePerDay
+  // ids, so reaching it takes a tampered row, an accepted corner. Because
+  // this admission is shared by cast start, the complete-side resolve, and
+  // the batch auto-continue, a batch stops itself here the moment the first
+  // craft lands the stamp. Read-only, no rng, no side effect on denial.
   if (craftDailyLimitReached(ctx, meta, recipe)) {
     return { ok: false, recipeId: recipe.id, reason: 'daily_limit' };
   }

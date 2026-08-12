@@ -4119,6 +4119,11 @@ export const hudChromeStrings = {
     // Masterwrought phase 07: a oncePerDay recipe already crafted inside the
     // current reset-day window (the Quickening Catalyst daily gate).
     dailyLimit: 'You can only craft that once per day.',
+    // The oncePerDay row affordance label (chip, tooltip line, and aria
+    // clause): states the limit BEFORE the attempt, where the dailyLimit
+    // refusal above lands after. Kept non-wordy (no 4-plus lowercase run)
+    // per M16, so no non-Latin fill is owed at PR tier.
+    oncePerDay: 'Once per day',
     // Professions 2.0: crafting window legibility (skill requirement
     // line, skill-gain difficulty labels, hub-station badge) plus the
     // masterwork and tier-up celebration copy. Masterwork is a proc with

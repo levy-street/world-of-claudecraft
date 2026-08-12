@@ -25,10 +25,28 @@ export interface CraftDenialLine {
   stationType?: StationType;
 }
 
+/** Every reason's key, as an EXHAUSTIVE Record (review round): a tenth
+ *  reason added to the CraftResult union fails tsc HERE until it gets a
+ *  line, where the old ternary chain would have silently rendered the
+ *  materials fall-through. station_required's row is the KEYLESS line the
+ *  unresolvable-recipe fall-through renders; the resolvable case is handled
+ *  above the lookup. */
+const DENIAL_KEY_BY_REASON: Record<NonNullable<CraftDenialReason>, TranslationKey> = {
+  unknown_recipe: 'hudChrome.crafting.unknownRecipe',
+  combo_requirement_unmet: 'hudChrome.crafting.comboRequirementUnmet',
+  busy: 'hudChrome.crafting.busy',
+  throttled: 'hudChrome.crafting.busy',
+  recipe_not_learned: 'hudChrome.crafting.recipeNotLearned',
+  no_bag_space: 'hudChrome.crafting.noBagSpace',
+  daily_limit: 'hudChrome.crafting.dailyLimit',
+  insufficient_materials: 'hudChrome.crafting.insufficientMaterials',
+  station_required: 'hudChrome.crafting.insufficientMaterials',
+};
+
 /** The chat-line model for one craftResult denial. `recipeStationType` is the
  *  denied recipe's stationType from static content; it is read only for the
- *  station_required arm. An absent or unrecognized reason reads as the
- *  generic materials line, the historical fall-through. */
+ *  station_required arm. An absent reason reads as the generic materials
+ *  line, the historical fall-through. */
 export function craftDenialLine(
   reason: CraftDenialReason,
   recipeStationType: StationType | undefined,
@@ -37,19 +55,6 @@ export function craftDenialLine(
     return { key: 'hudChrome.crafting.stationRequired', stationType: recipeStationType };
   }
   return {
-    key:
-      reason === 'unknown_recipe'
-        ? 'hudChrome.crafting.unknownRecipe'
-        : reason === 'combo_requirement_unmet'
-          ? 'hudChrome.crafting.comboRequirementUnmet'
-          : reason === 'busy' || reason === 'throttled'
-            ? 'hudChrome.crafting.busy'
-            : reason === 'recipe_not_learned'
-              ? 'hudChrome.crafting.recipeNotLearned'
-              : reason === 'no_bag_space'
-                ? 'hudChrome.crafting.noBagSpace'
-                : reason === 'daily_limit'
-                  ? 'hudChrome.crafting.dailyLimit'
-                  : 'hudChrome.crafting.insufficientMaterials',
+    key: reason ? DENIAL_KEY_BY_REASON[reason] : 'hudChrome.crafting.insufficientMaterials',
   };
 }

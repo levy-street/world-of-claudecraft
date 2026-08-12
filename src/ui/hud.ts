@@ -11895,14 +11895,16 @@ export class Hud {
             if (ev.masterwork) audio.masterwork();
           } else if (!ev.ok) {
             // Key selection lives in the craft_denial_line_view pure core
-            // (every arm table-tested there); this stays the thin render.
+            // (every arm table-tested there); this stays the thin render,
+            // and the core's key is LIVE for the station arm too (review
+            // round: a hardcoded key here left the core's stationRequired
+            // row dead data).
             const denial = craftDenialLine(ev.reason, recipeById(ev.recipeId)?.stationType);
             this.log(
-              denial.stationType
-                ? t('hudChrome.crafting.stationRequired', {
-                    station: stationNameText(denial.stationType),
-                  })
-                : t(denial.key),
+              t(
+                denial.key,
+                denial.stationType ? { station: stationNameText(denial.stationType) } : undefined,
+              ),
               '#ff6b6b',
             );
           }

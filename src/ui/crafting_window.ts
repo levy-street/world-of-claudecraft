@@ -401,6 +401,15 @@ export function renderCraftingWindow(
       const stationAccessible = row.station
         ? `. ${stationLabel}${stationOutOfRange ? `. ${stationOutOfRange}` : ''}`
         : '';
+      // The daily gate is stated BEFORE the attempt (review round: the
+      // capped stepper froze at one with no explanation and the player only
+      // learned why from the refusal line afterward): a chip beside the
+      // duration, a tooltip line, and an aria clause, all one label.
+      const dailyLabel = row.oncePerDay ? t('hudChrome.crafting.oncePerDay') : '';
+      const dailyAccessible = dailyLabel ? `. ${dailyLabel}` : '';
+      const dailyChipHtml = dailyLabel
+        ? ` <span class="crafting-duration-chip crafting-daily-chip">${esc(dailyLabel)}</span>`
+        : '';
 
       // The result icon sits in a fixed socket whose glow derives from the
       // item's quality color (the showcase paperdoll idiom, quality_glow.ts);
@@ -426,7 +435,7 @@ export function renderCraftingWindow(
       // Duration is actionable pace info (fairness): always in the name, never color-only.
       craftBtn.setAttribute(
         'aria-label',
-        `${t('hudChrome.crafting.resultAria', { name: resultName })}. ${t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) })}. ${t('hudChrome.crafting.reagentsNeeded')} ${reagentLines}. ${skillLine}. ${difficultyLabel}${stationAccessible}${comboAccessible}`,
+        `${t('hudChrome.crafting.resultAria', { name: resultName })}. ${t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) })}. ${t('hudChrome.crafting.reagentsNeeded')} ${reagentLines}. ${skillLine}. ${difficultyLabel}${stationAccessible}${dailyAccessible}${comboAccessible}`,
       );
       const resultCountSuffix =
         row.resultCount > 1
@@ -441,14 +450,14 @@ export function renderCraftingWindow(
         : '';
       const chipLabel =
         btnState === 'casting' ? t('hudChrome.crafting.crafting') : t('hudChrome.crafting.create');
-      craftBtn.innerHTML = `${socket}<span class="vi-name"><span class="crafting-recipe-name">${esc(resultName)}${esc(resultCountSuffix)}</span><span class="vi-sub crafting-reagent-line">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${reagentHtml}</span><span class="vi-sub crafting-skill-line">${esc(skillLine)} <span class="crafting-difficulty" data-difficulty="${esc(row.difficulty)}">${esc(difficultyLabel)}</span>${stationBadgeHtml} <span class="crafting-duration-chip">${esc(durationText)}</span></span></span><span class="vi-price crafting-craft-chip">${esc(chipLabel)}</span>`;
+      craftBtn.innerHTML = `${socket}<span class="vi-name"><span class="crafting-recipe-name">${esc(resultName)}${esc(resultCountSuffix)}</span><span class="vi-sub crafting-reagent-line">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${reagentHtml}</span><span class="vi-sub crafting-skill-line">${esc(skillLine)} <span class="crafting-difficulty" data-difficulty="${esc(row.difficulty)}">${esc(difficultyLabel)}</span>${stationBadgeHtml} <span class="crafting-duration-chip">${esc(durationText)}</span>${dailyChipHtml}</span></span><span class="vi-price crafting-craft-chip">${esc(chipLabel)}</span>`;
       craftBtn.addEventListener('click', () => {
         if (canCraft) deps.onCraft(row.recipeId, qty);
       });
       deps.attachTooltip(
         craftBtn,
         () =>
-          `<div class="tt-profession-header">${sectionImageUrl ? `<img src="${esc(sectionImageUrl)}" alt="" draggable="false">` : ''}<span>${esc(sectionName)}</span></div>${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div><div class="tt-sub">${esc(skillLine)} ${esc(difficultyLabel)}</div><div class="tt-sub">${esc(t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) }))}</div>${row.station ? `<div class="tt-sub">${esc(stationLabel)}${stationOutOfRange ? ` ${esc(stationOutOfRange)}` : ''}</div>` : ''}${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
+          `<div class="tt-profession-header">${sectionImageUrl ? `<img src="${esc(sectionImageUrl)}" alt="" draggable="false">` : ''}<span>${esc(sectionName)}</span></div>${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div><div class="tt-sub">${esc(skillLine)} ${esc(difficultyLabel)}</div><div class="tt-sub">${esc(t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) }))}</div>${row.station ? `<div class="tt-sub">${esc(stationLabel)}${stationOutOfRange ? ` ${esc(stationOutOfRange)}` : ''}</div>` : ''}${dailyLabel ? `<div class="tt-sub">${esc(dailyLabel)}</div>` : ''}${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
       );
       item.appendChild(craftBtn);
 

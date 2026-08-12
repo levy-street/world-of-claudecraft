@@ -276,6 +276,39 @@ describe('renderCraftingWindow craft-cast UX', () => {
     expect(d.onCraft).toHaveBeenCalledWith('recipe_test_stew', 4);
   });
 
+  it('a oncePerDay row states the limit and caps every batch affordance at one', () => {
+    // The Phase 07 review pair: maxCraftBatchFit keeps the affordances
+    // honest, and the Once per day label explains the frozen stepper BEFORE
+    // the attempt (chip, and the accessible name; the tooltip line rides
+    // deps.attachTooltip and is pinned by the chip's shared label).
+    const el = document.createElement('div');
+    const gatedView = buildCraftingView(
+      [
+        {
+          id: 'recipe_test_catalyst',
+          professionId: 'cooking',
+          resultItemId: 'test_stew',
+          resultCount: 1,
+          reagents: [{ itemId: 'copper_ore', count: 1 }],
+          skillReq: 0,
+          oncePerDay: true as const,
+        },
+      ],
+      [{ itemId: 'copper_ore', count: 4 }],
+      ITEMS,
+    );
+    const d = deps(1);
+    renderCraftingWindow(el, gatedView, d);
+    expect(el.querySelector('.crafting-daily-chip')?.textContent).toBe('Once per day');
+    const aria = el.querySelector('.crafting-recipe-btn')!.getAttribute('aria-label') ?? '';
+    expect(aria).toContain('Once per day');
+    // Mats fit four crafts; the daily cap holds every affordance at one.
+    const inc = el.querySelector<HTMLButtonElement>('[data-focus-key^="qty-inc:"]');
+    expect(inc!.disabled).toBe(true);
+    el.querySelector<HTMLButtonElement>('.crafting-create-all-btn')!.click();
+    expect(d.onCraft).toHaveBeenCalledWith('recipe_test_catalyst', 1);
+  });
+
   it('disables qty stepper while casting and paints the cold batch label', () => {
     const el = document.createElement('div');
     const session = buildCraftCastSession({

@@ -92,7 +92,11 @@ export function buildCraftCastSession(input: CraftCastSessionInput): CraftCastSe
   };
 }
 
-/** Max crafts payable from reagent have/required rows (capped at CRAFT_BATCH_UI_MAX). */
+/** Max crafts payable from reagent have/required rows (capped at
+ *  CRAFT_BATCH_UI_MAX). UNCAPPED by the daily gate: an AFFORDANCE (stepper
+ *  max, Create All, qty clamp input) must read maxCraftBatchFit below, never
+ *  this raw fit, or a oncePerDay recipe overpromises again. Exported for its
+ *  tests and the capped wrapper. */
 export function maxCraftsFromReagents(
   reagents: readonly { have: number; required: number }[],
 ): number {

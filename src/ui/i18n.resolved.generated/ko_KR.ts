@@ -3282,6 +3282,7 @@ export const ko_KR: EnTranslations = {
       "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다.",
       "noBagSpace": "가방에 제작한 아이템을 넣을 공간이 없습니다.",
       "dailyLimit": "하루에 한 번만 제작할 수 있습니다.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "{craft} {skill} 필요",
       "difficultyFull": "숙련도 전량 상승",
       "difficultyReduced": "숙련도 상승 감소",

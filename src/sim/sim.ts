@@ -853,6 +853,14 @@ const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
  *  same idiom for the join-time seed). Discovery itself is unaffected by the
  *  flag; it only reaches the Reliquary's first-find provenance stamp. */
 const MOVEMENT_GRANT = { movement: true } as const;
+
+/** Live oncePerDay recipe ids, derived once from static content: the
+ *  craftDaily load clamp filters saved stamps to this set (the node_persist
+ *  anti-tamper doctrine). Module-level because content is immutable, so a
+ *  per-load rebuild would be a constant wearing a per-load costume. */
+const ONCE_PER_DAY_RECIPE_IDS: ReadonlySet<string> = new Set(
+  ALL_RECIPES.filter((r) => r.oncePerDay).map((r) => r.id),
+);
 // OBJECT_RESPAWN moved to types.ts (shared with the extracted Nythraxis crypt-relic
 // respawn). The NYTHRAXIS_* encounter consts (relic summons, Aldric id, wardstone /
 // gravebreaker / soul-rend / deathless / transition tuning, room radius, lockout ms,
@@ -3513,9 +3521,9 @@ export class Sim {
         // Tokens are additionally filtered to LIVE oncePerDay recipe ids
         // (the node_persist anti-tamper doctrine: load-side, so a tampered
         // or orphaned stamp, or one whose recipe lost the flag, drops here
-        // instead of riding the save verbatim forever and pinning the row
-        // non-empty against the zero-default serialize omission).
-        const gatedIds = new Set(ALL_RECIPES.filter((r) => r.oncePerDay).map((r) => r.id));
+        // instead of riding the save verbatim; the DATE field is not
+        // filtered, so a surviving date alone can still keep the row
+        // serialized until the next successful craft rolls the window).
         meta.craftDaily = {
           date:
             typeof s.craftDaily.date === 'string' && s.craftDaily.date.length <= 64
@@ -3524,7 +3532,10 @@ export class Sim {
           crafted: new Set(
             Array.isArray(s.craftDaily.crafted)
               ? s.craftDaily.crafted
-                  .filter((x) => typeof x === 'string' && x.length <= 64 && gatedIds.has(x))
+                  .filter(
+                    (x) =>
+                      typeof x === 'string' && x.length <= 64 && ONCE_PER_DAY_RECIPE_IDS.has(x),
+                  )
                   .slice(0, 32)
               : [],
           ),

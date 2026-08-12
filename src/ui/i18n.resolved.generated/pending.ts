@@ -107,6 +107,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -223,6 +224,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -353,6 +355,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -484,6 +487,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -621,6 +625,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -765,6 +770,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -784,10 +790,18 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.crafting.oncePerDay"
+  ],
+  "zh_TW": [
+    "hudChrome.crafting.oncePerDay"
+  ],
+  "ko_KR": [
+    "hudChrome.crafting.oncePerDay"
+  ],
+  "ja_JP": [
+    "hudChrome.crafting.oncePerDay"
+  ],
   "pt_BR": [
     "abilityUi.cast.sundering",
     "entities.abilities.blink.name",
@@ -902,6 +916,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -921,7 +936,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.crafting.oncePerDay"
+  ],
   "cs_CZ": [
     "abilityUi.cast.sundering",
     "entities.abilities.blink.name",
@@ -1046,6 +1063,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -1191,6 +1209,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -1321,6 +1340,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -1441,6 +1461,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -1568,6 +1589,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -1711,6 +1733,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -1835,6 +1858,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",
@@ -1986,6 +2010,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.victoryRush",
     "hudChrome.auraOverlay.procs.victoryRush",
     "hudChrome.crafting.dailyLimit",
+    "hudChrome.crafting.oncePerDay",
     "hudChrome.enchanting.sunderConfirmBody",
     "hudChrome.enchanting.sunderConfirmBodySpecial",
     "hudChrome.enchanting.sunderConfirmTitle",

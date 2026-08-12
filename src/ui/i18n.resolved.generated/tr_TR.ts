@@ -3282,6 +3282,7 @@ export const tr_TR: EnTranslations = {
       "recipeNotLearned": "Bu tarifi henüz öğrenmedin.",
       "noBagSpace": "Çantanızda üretilen eşya için yer yok.",
       "dailyLimit": "You can only craft that once per day.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "{craft} {skill} gerektirir",
       "difficultyFull": "Tam beceri kazanımı",
       "difficultyReduced": "Azaltılmış beceri kazanımı",

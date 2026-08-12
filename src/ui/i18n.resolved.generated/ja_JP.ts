@@ -3282,6 +3282,7 @@ export const ja_JP: EnTranslations = {
       "recipeNotLearned": "そのレシピはまだ習得していません。",
       "noBagSpace": "バッグに製作したアイテムを入れる空きがありません。",
       "dailyLimit": "それは1日に1回しか製作できません。",
+      "oncePerDay": "Once per day",
       "skillReqLine": "{craft} {skill} が必要",
       "difficultyFull": "技能上昇（全量）",
       "difficultyReduced": "技能上昇（減少）",

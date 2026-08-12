@@ -3282,6 +3282,7 @@ export const zh_TW: EnTranslations = {
       "recipeNotLearned": "你還沒有學會這個配方。",
       "noBagSpace": "背包空間不足，無法存放製作的物品。",
       "dailyLimit": "該物品每天只能製作一次。",
+      "oncePerDay": "Once per day",
       "skillReqLine": "需要{craft} {skill}",
       "difficultyFull": "完整技能成長",
       "difficultyReduced": "技能成長減少",
