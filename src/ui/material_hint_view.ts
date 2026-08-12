@@ -53,10 +53,12 @@ export const MATERIAL_HINT_KEYS: Readonly<Record<string, TranslationKey>> = {
   fine_sunpetal_herb: 'hudChrome.materialHint.fineGrade',
   // The nine Masterwrought skill-75 intermediates (Phase 07) share one
   // craft-free lead the same way the fine grades do: they are kind 'junk'
-  // with no def-level use, and until the apex recipes land (Phase 08/09/10)
-  // nothing else in the client says what they are for. The Quickening
-  // Catalyst carries its own line because its craft limit (one per day) is
-  // a rule the tooltip must state; its Used-by line lists the consumers.
+  // with no def-level use. Phase 08 landed the armor-craft consumers, so
+  // plating/cording/bolt now ALSO carry a real Used-by line beside this
+  // lead (the fine-grade coexistence pattern); the remaining six wait on
+  // their phase 09/10 apex rows. The Quickening Catalyst carries its own
+  // line because its craft limit (one per day) is a rule the tooltip must
+  // state; its Used-by line lists the consumers.
   duskforged_billet: 'hudChrome.materialHint.masterwroughtIntermediate',
   forgefold_plating: 'hudChrome.materialHint.masterwroughtIntermediate',
   wyrmhide_cording: 'hudChrome.materialHint.masterwroughtIntermediate',
