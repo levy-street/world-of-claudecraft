@@ -72,6 +72,9 @@ const HONEST_MATERIALS = [
   'pristine_hide',
   'pristine_silk',
   'pristine_venom_gland',
+  // Masterwrought phase 07: derives IN as the junk-kind reagent all nine
+  // intermediate recipes consume (INTERMEDIATE_RECIPES).
+  'quickening_catalyst',
   'raw_bog_eel',
   'raw_frostgill_trout',
   'raw_marsh_pike',
@@ -98,22 +101,35 @@ const HONEST_MATERIALS = [
 ] as const;
 
 // The ONLY non-poor junk allowed outside the material set: four rare-mob
-// trophies plus the placed keep keepsake (Q4 ruled them out of the sweep).
-// A new junk item landing in this assertion's diff must be classified: either
-// author it into a source table (a node yield, grade, component, specimen,
-// salvage return, or junk-kind reagent) so it derives IN, or add it here as a
-// deliberate non-material with the maintainer's sign-off.
+// trophies plus the placed keep keepsake (Q4 ruled them out of the sweep),
+// the phase 04 making-catalyst, and the nine Masterwrought phase 07
+// intermediates that ship before the apex rows consuming them (the
+// wyrmfall_core precedent; the Quickening Catalyst is deliberately NOT here,
+// it derives IN via its nine in-phase consumers). A new junk item landing in
+// this assertion's diff must be classified: either author it into a source
+// table (a node yield, grade, component, specimen, salvage return, or
+// junk-kind reagent) so it derives IN, or add it here as a deliberate
+// non-material with the maintainer's sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
+  'duskforged_billet', // consumed from Phase 08/09/10 apex rows, remove then
   'emberwing_cinderscale',
+  'forgefold_plating', // consumed from Phase 08/09/10 apex rows, remove then
   'gleamstag_charm',
   'guardian_core',
   'last_keep_signet',
+  'lucent_reagent', // consumed from Phase 08/09/10 apex rows, remove then
   'old_cragmaws_pelt',
+  'precision_chassis', // consumed from Phase 08/09/10 apex rows, remove then
+  'prismglass_setting', // consumed from Phase 08/09/10 apex rows, remove then
+  'sablewax_vellum', // consumed from Phase 08/09/10 apex rows, remove then
+  'seasoned_stock', // consumed from Phase 08/09/10 apex rows, remove then
+  'sunspun_bolt', // consumed from Phase 08/09/10 apex rows, remove then
   // Masterwrought phase 04: the tradable making-catalyst ships before the
-  // apex recipes that consume it (phases 07 to 10). The moment a recipe
+  // apex recipes that consume it (phases 08 to 10). The moment a recipe
   // lists it as a reagent it derives IN through the reagent source table;
   // move it out of this allowlist in that change.
   'wyrmfall_core',
+  'wyrmhide_cording', // consumed from Phase 08/09/10 apex rows, remove then
 ] as const;
 
 // The six vendor-buyable crafting staples, ruled IN by name (Q6).
@@ -199,7 +215,7 @@ describe('MATERIAL_ITEM_IDS: class exclusions, keyed on KIND against the live ca
       'artisans_eye', // charm
       'heroic_mark', // kind tool token
       'riding_training', // kind tool token
-      ...ALLOWED_UNCLASSIFIED_JUNK, // the five oddments (Q4: out)
+      ...ALLOWED_UNCLASSIFIED_JUNK, // the allowlisted oddments + pre-consumer intermediates
     ];
     for (const id of ruledOut) {
       expect(ITEMS[id], `${id} has no ITEMS def`).toBeTruthy();
@@ -404,7 +420,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
 });
 
 describe('completeness tripwire: unclassified non-poor junk', () => {
-  it('is exactly the five allowed oddments, no more and no fewer', () => {
+  it('is exactly the pinned allowlist, no more and no fewer', () => {
     const unclassified = Object.values(ITEMS)
       .filter((d) => d.kind === 'junk' && d.quality !== 'poor' && !MATERIAL_ITEM_IDS.has(d.id))
       .map((d) => d.id)

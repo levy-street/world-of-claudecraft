@@ -148,13 +148,16 @@ describe('buildTrainView', () => {
     // window through its recipes' own stationType: 'forge', not through a
     // station of its own. Its three skillReq-0 copper rungs are deliberately
     // absent: like every other free-floor rung they stay teachable at tier 0.
+    // The three skillReq-75 Masterwrought intermediates lock here too.
     const view = buildTrainView('forgemistress_darva', deps());
     const locked = view.rows.filter((row) => row.state === 'locked');
     expect(locked.map((row) => row.recipeId).sort()).toEqual([
       'recipe_arcanite_war_axe',
       'recipe_burnished_thorium_amulet',
+      'recipe_duskforged_billet',
       'recipe_elderwood_battle_staff',
       'recipe_etched_iron_loop',
+      'recipe_forgefold_plating',
       'recipe_forgeguard_bulwark_gauntlets',
       'recipe_gleaming_thorium_loop',
       'recipe_iron_link_choker',
@@ -164,6 +167,7 @@ describe('buildTrainView', () => {
       'recipe_ironlink_legguards',
       'recipe_ironlink_spaulders',
       'recipe_ironshod_maul',
+      'recipe_prismglass_setting',
       'recipe_riveted_iron_signet',
       'recipe_thorium_warblade',
       'recipe_thoriumscale_cuirass',
@@ -175,7 +179,7 @@ describe('buildTrainView', () => {
     // LITERAL requirement values per rung (never the production formula: an
     // expectation composed of tierForSkill * TIER_SKILL_STEP moves in
     // lockstep with the code and can never red on a wrong requirement).
-    const REQUIRED_SKILL_BY_RUNG: Record<number, number> = { 25: 25, 50: 50 };
+    const REQUIRED_SKILL_BY_RUNG: Record<number, number> = { 25: 25, 50: 50, 75: 75 };
     for (const row of locked) {
       const skill = REQUIRED_SKILL_BY_RUNG[row.skillReq];
       expect(skill, `${row.recipeId} rung ${row.skillReq}`).toBeDefined();

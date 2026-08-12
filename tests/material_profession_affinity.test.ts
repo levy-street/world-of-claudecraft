@@ -62,6 +62,28 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('glass_vial')).toEqual(['alchemy', 'inscription']);
   });
 
+  it('the Quickening Catalyst names its nine consuming crafts (Masterwrought phase 07)', () => {
+    // The nine INTERMEDIATE_RECIPES consumers (recipe_duskforged_billet,
+    // recipe_forgefold_plating, recipe_wyrmhide_cording, recipe_sunspun_bolt,
+    // recipe_prismglass_setting, recipe_precision_chassis,
+    // recipe_seasoned_stock, recipe_lucent_reagent, recipe_sablewax_vellum):
+    // every craft on the ring EXCEPT alchemy, whose own 75 rung MINTS the
+    // catalyst rather than consuming it. Ring order, never first-seen recipe
+    // order (first-seen would read weaponcrafting first, the authored row
+    // order in recipes.ts).
+    expect(craftIdsForMaterialItem('quickening_catalyst')).toEqual([
+      'engineering',
+      'cooking',
+      'leatherworking',
+      'tailoring',
+      'inscription',
+      'enchanting',
+      'jewelcrafting',
+      'weaponcrafting',
+      'armorcrafting',
+    ]);
+  });
+
   it('a fine grade inherits its base consumers and keeps fine-only crafts', () => {
     // fine_iron_ore is a tool-recipe reagent (engineering) and stands in for
     // iron_ore (jewelcrafting + weaponcrafting + armorcrafting since the

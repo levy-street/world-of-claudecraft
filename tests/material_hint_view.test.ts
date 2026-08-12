@@ -34,12 +34,43 @@ const ENCHANTING_IDS = [
 // Derived from the live grade table rather than restated, so a tenth gathered
 // material cannot ship with a tooltip that says nothing about its grade.
 const FINE_IDS = Object.values(MATERIAL_GRADES).map((row) => row.fineItemId);
-const EXPECTED_IDS = [...ENCHANTING_IDS, ...FINE_IDS].sort();
+// The Masterwrought skill-75 intermediates (Phase 07): nine share one
+// craft-free lead; the catalyst carries its own line stating the daily limit.
+const MASTERWROUGHT_IDS = [
+  'duskforged_billet',
+  'forgefold_plating',
+  'wyrmhide_cording',
+  'sunspun_bolt',
+  'prismglass_setting',
+  'precision_chassis',
+  'quickening_catalyst',
+  'seasoned_stock',
+  'lucent_reagent',
+  'sablewax_vellum',
+];
+const EXPECTED_IDS = [...ENCHANTING_IDS, ...FINE_IDS, ...MASTERWROUGHT_IDS].sort();
 
 describe('material_hint_view', () => {
-  it('covers exactly the enchanting materials and the fine grades, no more and no less', () => {
+  it('covers exactly the enchanting materials, fine grades, and masterwrought intermediates, no more and no less', () => {
     expect(Object.keys(MATERIAL_HINT_KEYS).slice().sort()).toEqual(EXPECTED_IDS);
     expect(FINE_IDS).toHaveLength(9);
+    expect(MASTERWROUGHT_IDS).toHaveLength(10);
+  });
+
+  it('the nine intermediates share one craft-free lead and the catalyst states its daily limit', () => {
+    const nine = MASTERWROUGHT_IDS.filter((id) => id !== 'quickening_catalyst');
+    const keys = new Set(nine.map((id) => materialHintKey(id)));
+    expect(keys.size, 'the nine intermediates must share exactly one key').toBe(1);
+    expect([...keys][0]).toBe('hudChrome.materialHint.masterwroughtIntermediate');
+    const catalyst = materialHintLine('quickening_catalyst');
+    expect(catalyst).toContain('class="tt-desc"');
+    expect(catalyst).toContain('only one each day');
+    const component = materialHintLine('duskforged_billet');
+    expect(component).toContain('Masterwrought crafting component.');
+    // Craft-free leads: neither may start with the craft-naming prefix that
+    // would move CRAFT_NAMING_HINT_KEYS membership and suppress Used-by.
+    expect(catalyst).not.toContain('Enchanting reagent.');
+    expect(component).not.toContain('Enchanting reagent.');
   });
 
   it('every fine grade carries the one shared hint, and its BASE carries none', () => {
@@ -86,7 +117,7 @@ describe('material_hint_view', () => {
       expect(materialHintKey(id), id).toBeUndefined();
       expect(materialHintLine(id)).toBe('');
     }
-    // A broad sweep: nothing outside the eight ids carries a hint.
+    // A broad sweep: nothing outside the expected ids carries a hint.
     const hinted = Object.keys(ITEMS).filter((id) => materialHintKey(id) !== undefined);
     expect(hinted.slice().sort()).toEqual(EXPECTED_IDS);
   });

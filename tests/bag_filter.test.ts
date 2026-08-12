@@ -488,6 +488,12 @@ describe('chip reachability census: the All-only set, pinned', () => {
   // chip before the narrowing either. This census makes the ruling
   // enforceable: a chip or taxonomy edit that strands MORE items (or quietly
   // rescues one the settlement excluded) reds an exact-set diff naming it.
+  // The nine Masterwrought phase 07 intermediates ride the wyrmfall_core
+  // shape: All-only until their phase 08/09/10 apex consumer lands (each then
+  // derives into the material set and gains the materials chip; move it out
+  // of here in the same change as its ALLOWED_UNCLASSIFIED_JUNK row in
+  // material_taxonomy). The Quickening Catalyst is deliberately absent: its
+  // nine in-phase consumers already classify it as a material.
   const ALL_ONLY = [
     'amber_hide',
     'bandit_bandana',
@@ -498,7 +504,9 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'cracked_ogre_tusk',
     'cracked_wyrm_scale',
     'deepfen_pearl',
+    'duskforged_billet', // phase 07 intermediate, out when its apex row lands
     'emberwing_cinderscale',
+    'forgefold_plating', // phase 07 intermediate, out when its apex row lands
     'frayed_prayer_beads',
     'gleamstag_charm',
     'gravewoven_bag',
@@ -506,17 +514,23 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'inert_storm_shard',
     'last_keep_signet',
     'linen_pouch',
+    'lucent_reagent', // phase 07 intermediate, out when its apex row lands
     'mistcallers_duffel',
     'moonpale_scale',
     'mudfin_scale',
     'ogre_toe_ring',
     'old_cragmaws_pelt',
     'pale_pearl',
+    'precision_chassis', // phase 07 intermediate, out when its apex row lands
+    'prismglass_setting', // phase 07 intermediate, out when its apex row lands
+    'sablewax_vellum', // phase 07 intermediate, out when its apex row lands
+    'seasoned_stock', // phase 07 intermediate, out when its apex row lands
     'silkspun_satchel',
     'soft_down',
     'soggy_boot',
     'soggy_moccasin',
     'stag_antler',
+    'sunspun_bolt', // phase 07 intermediate, out when its apex row lands
     'tallow_candle',
     'tangled_weed',
     'travelers_knapsack',
@@ -526,9 +540,10 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // set and gains the materials chip; move it out of here in the same
     // change as its ALLOWED_UNCLASSIFIED_JUNK row in material_taxonomy).
     'wyrmfall_core',
+    'wyrmhide_cording', // phase 07 intermediate, out when its apex row lands
   ] as const;
 
-  it('exactly the ruled 27 junk items plus the 6 bag-kind items match no chip', () => {
+  it('exactly the pinned All-only set (ruled junk plus the bag-kind items) matches no chip', () => {
     const allOnly = Object.values(REAL_ITEMS)
       .filter((def) => !BAG_CATEGORIES.some((c) => c !== 'all' && matchesCategory(def, c)))
       .map((d) => d.id)

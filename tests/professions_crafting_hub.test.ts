@@ -181,13 +181,16 @@ describe('station content', () => {
     // ruled exception class: a craft with no station of its own (enchanting/
     // jewelcrafting/inscription) may bind a recipe to a foreign station, and
     // that binding then IS the recipe's teaching home (training.ts
-    // trainingStationTypeFor). Three families make up the class today: the
+    // trainingStationTypeFor). Four families make up the class today: the
     // tool-effect charms (enchanting home, toolworks binding), the
     // Masterwrought phase 05 jewelcrafting base catalog (jewelcrafting home,
-    // forge binding at forgemistress_darva), and the Masterwrought phase 06
+    // forge binding at forgemistress_darva), the Masterwrought phase 06
     // inscription base catalog (inscription home, apothecary binding at
-    // alchemist_verane), pinned literally so a new foreign binding is a
-    // deliberate edit here, not a drive-by.
+    // alchemist_verane), and the three station-less-craft rows of the
+    // Masterwrought phase 07 intermediates (Prismglass Setting at the forge,
+    // Lucent Reagent at the toolworks per the phase's enchanting station
+    // decision, Sablewax Vellum at the apothecary), pinned literally so a
+    // new foreign binding is a deliberate edit here, not a drive-by.
     const foreignBound: string[] = [];
     for (const recipe of ALL_RECIPES) {
       if (!recipe.stationType) continue;
@@ -209,8 +212,11 @@ describe('station content', () => {
       'recipe_goldleaf_scroll',
       'recipe_hammered_copper_band',
       'recipe_iron_link_choker',
+      'recipe_lucent_reagent',
       'recipe_polished_copper_loop',
+      'recipe_prismglass_setting',
       'recipe_riveted_iron_signet',
+      'recipe_sablewax_vellum',
       'recipe_silverleaf_primer',
       'recipe_silverleaf_scroll',
       'recipe_sunpetal_grimoire',

@@ -5,6 +5,7 @@ import {
   COMBO_RECIPES,
   COMMON_RECIPES,
   INSCRIPTION_RECIPES,
+  INTERMEDIATE_RECIPES,
   JEWELCRAFTING_RECIPES,
   LADDER_RECIPES,
   ROD_RECIPES,
@@ -436,6 +437,7 @@ describe('craftItem command (#1127)', () => {
       ...LADDER_RECIPES,
       ...JEWELCRAFTING_RECIPES,
       ...INSCRIPTION_RECIPES,
+      ...INTERMEDIATE_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -448,7 +450,8 @@ describe('craftItem command (#1127)', () => {
         COMBO_RECIPES.length +
         LADDER_RECIPES.length +
         JEWELCRAFTING_RECIPES.length +
-        INSCRIPTION_RECIPES.length,
+        INSCRIPTION_RECIPES.length +
+        INTERMEDIATE_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });
