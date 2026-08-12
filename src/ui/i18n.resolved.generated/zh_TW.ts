@@ -2523,7 +2523,9 @@ export const zh_TW: EnTranslations = {
       "resonantHide": "附魔材料。分解精良及以上品質的皮甲可得。",
       "resonantLinks": "附魔材料。分解精良及以上品質的鎖甲可得。",
       "resonantSteel": "附魔材料。分解精良及以上品質的近戰武器可得。",
-      "resonantTimber": "附魔材料。分解精良及以上品質的法杖、魔杖、弓和弩可得。"
+      "resonantTimber": "附魔材料。分解精良及以上品質的法杖、魔杖、弓和弩可得。",
+      "masterwroughtIntermediate": "大師鍛造製作部件。",
+      "quickeningCatalyst": "製作催化劑。鍊金術士每天只能製作一個。"
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const zh_TW: EnTranslations = {
       "busy": "你正忙著。",
       "recipeNotLearned": "你還沒有學會這個配方。",
       "noBagSpace": "背包空間不足，無法存放製作的物品。",
+      "dailyLimit": "該物品每天只能製作一次。",
       "skillReqLine": "需要{craft} {skill}",
       "difficultyFull": "完整技能成長",
       "difficultyReduced": "技能成長減少",
@@ -12291,6 +12294,36 @@ export const zh_TW: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "陽瓣卷軸"
+      },
+      "duskforged_billet": {
+        "name": "暮鍛坯料"
+      },
+      "forgefold_plating": {
+        "name": "疊鍛護板"
+      },
+      "wyrmhide_cording": {
+        "name": "龍皮束繩"
+      },
+      "sunspun_bolt": {
+        "name": "陽紡布匹"
+      },
+      "prismglass_setting": {
+        "name": "稜晶琉璃鑲座"
+      },
+      "precision_chassis": {
+        "name": "精密機架"
+      },
+      "quickening_catalyst": {
+        "name": "活化催化劑"
+      },
+      "seasoned_stock": {
+        "name": "調味高湯"
+      },
+      "lucent_reagent": {
+        "name": "瑩光試劑"
+      },
+      "sablewax_vellum": {
+        "name": "玄蠟犢皮紙"
       },
       "conjured_water4": {
         "name": "魔法泉水"

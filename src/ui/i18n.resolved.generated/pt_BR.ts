@@ -2523,7 +2523,9 @@ export const pt_BR: EnTranslations = {
       "resonantHide": "Reagente de encantamento. Desencantado de armadura de couro rara ou melhor.",
       "resonantLinks": "Reagente de encantamento. Desencantado de armadura de malha rara ou melhor.",
       "resonantSteel": "Reagente de encantamento. Desencantado de armas corpo a corpo raras ou melhores.",
-      "resonantTimber": "Reagente de encantamento. Desencantado de cajados, varinhas, arcos e bestas raros ou melhores."
+      "resonantTimber": "Reagente de encantamento. Desencantado de cajados, varinhas, arcos e bestas raros ou melhores.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const pt_BR: EnTranslations = {
       "busy": "Você está ocupado.",
       "recipeNotLearned": "Você ainda não aprendeu essa receita.",
       "noBagSpace": "Você não tem espaço para o item criado.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Requer {craft} {skill}",
       "difficultyFull": "Ganho total de habilidade",
       "difficultyReduced": "Ganho de habilidade reduzido",
@@ -12291,6 +12294,36 @@ export const pt_BR: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

@@ -2523,7 +2523,9 @@ export const ko_KR: EnTranslations = {
       "resonantHide": "마법부여 재료. 희귀 이상 가죽 방어구의 마력을 추출해 얻습니다.",
       "resonantLinks": "마법부여 재료. 희귀 이상 사슬 방어구의 마력을 추출해 얻습니다.",
       "resonantSteel": "마법부여 재료. 희귀 이상 근접 무기의 마력을 추출해 얻습니다.",
-      "resonantTimber": "마법부여 재료. 희귀 이상 지팡이, 마법봉, 활, 석궁의 마력을 추출해 얻습니다."
+      "resonantTimber": "마법부여 재료. 희귀 이상 지팡이, 마법봉, 활, 석궁의 마력을 추출해 얻습니다.",
+      "masterwroughtIntermediate": "명장 제작용 재료.",
+      "quickeningCatalyst": "제작용 촉매. 연금술사는 하루에 하나만 제작할 수 있습니다."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const ko_KR: EnTranslations = {
       "busy": "지금은 바쁩니다.",
       "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다.",
       "noBagSpace": "가방에 제작한 아이템을 넣을 공간이 없습니다.",
+      "dailyLimit": "하루에 한 번만 제작할 수 있습니다.",
       "skillReqLine": "{craft} {skill} 필요",
       "difficultyFull": "숙련도 전량 상승",
       "difficultyReduced": "숙련도 상승 감소",
@@ -12291,6 +12294,36 @@ export const ko_KR: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "태양꽃잎 두루마리"
+      },
+      "duskforged_billet": {
+        "name": "황혼에 벼린 강편"
+      },
+      "forgefold_plating": {
+        "name": "접쇠 판금"
+      },
+      "wyrmhide_cording": {
+        "name": "용가죽 노끈"
+      },
+      "sunspun_bolt": {
+        "name": "태양실 옷감 뭉치"
+      },
+      "prismglass_setting": {
+        "name": "프리즘 유리 받침"
+      },
+      "precision_chassis": {
+        "name": "정밀 섀시"
+      },
+      "quickening_catalyst": {
+        "name": "활성 촉매"
+      },
+      "seasoned_stock": {
+        "name": "양념 육수"
+      },
+      "lucent_reagent": {
+        "name": "광휘 시약"
+      },
+      "sablewax_vellum": {
+        "name": "흑랍 양피지"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

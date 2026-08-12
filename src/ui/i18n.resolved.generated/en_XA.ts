@@ -2523,7 +2523,9 @@ export const en_XA: EnTranslations = {
       "resonantHide": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ ļéáţĥéŕ áŕɱóŕ.]",
       "resonantLinks": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ ɱáíļ áŕɱóŕ.]",
       "resonantSteel": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ ɱéļéé ŵéáþóñš.]",
-      "resonantTimber": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ šţáʋéš, ŵáñðš, ƀóŵš, áñð çŕóššƀóŵš.]"
+      "resonantTimber": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ šţáʋéš, ŵáñðš, ƀóŵš, áñð çŕóššƀóŵš.]",
+      "masterwroughtIntermediate": "[Ɱášţéŕŵŕóúĝĥţ çŕáƒţíñĝ çóɱþóñéñţ.]",
+      "quickeningCatalyst": "[Çŕáƒţíñĝ çáţáļýšţ. Áñ áļçĥéɱíšţ çáñ çŕáƒţ óñļý óñé éáçĥ ðáý.]"
     },
     "discord": {
       "title": "[Ðíšçóŕð]",
@@ -3279,6 +3281,7 @@ export const en_XA: EnTranslations = {
       "busy": "[Ýóú áŕé ƀúšý.]",
       "recipeNotLearned": "[Ýóú ĥáʋé ñóţ ļéáŕñéð ţĥáţ ŕéçíþé ýéţ.]",
       "noBagSpace": "[Ýóú ðó ñóţ ĥáʋé ŕóóɱ ƒóŕ ţĥé çŕáƒţéð íţéɱ.]",
+      "dailyLimit": "[Ţĥáţ çáñ óñļý ƀé çŕáƒţéð óñçé þéŕ ðáý.]",
       "skillReqLine": "[Ŕéɋúíŕéš {craft} {skill}]",
       "difficultyFull": "[Ƒúļļ šķíļļ ĝáíñ]",
       "difficultyReduced": "[Ŕéðúçéð šķíļļ ĝáíñ]",
@@ -12291,6 +12294,36 @@ export const en_XA: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "[Šúñþéţáļ Šçŕóļļ]"
+      },
+      "duskforged_billet": {
+        "name": "[Ðúšķƒóŕĝéð Ɓíļļéţ]"
+      },
+      "forgefold_plating": {
+        "name": "[Ƒóŕĝéƒóļð Þļáţíñĝ]"
+      },
+      "wyrmhide_cording": {
+        "name": "[Ŵýŕɱĥíðé Çóŕðíñĝ]"
+      },
+      "sunspun_bolt": {
+        "name": "[Šúñšþúñ Ɓóļţ]"
+      },
+      "prismglass_setting": {
+        "name": "[Þŕíšɱĝļášš Šéţţíñĝ]"
+      },
+      "precision_chassis": {
+        "name": "[Þŕéçíšíóñ Çĥáššíš]"
+      },
+      "quickening_catalyst": {
+        "name": "[Ɋúíçķéñíñĝ Çáţáļýšţ]"
+      },
+      "seasoned_stock": {
+        "name": "[Šéášóñéð Šţóçķ]"
+      },
+      "lucent_reagent": {
+        "name": "[Ļúçéñţ Ŕéáĝéñţ]"
+      },
+      "sablewax_vellum": {
+        "name": "[Šáƀļéŵáẋ Ʋéļļúɱ]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

@@ -2523,7 +2523,9 @@ export const it_IT: EnTranslations = {
       "resonantHide": "Reagente dell'incantamento. Si ottiene disincantando armatura di cuoio rara o superiore.",
       "resonantLinks": "Reagente dell'incantamento. Si ottiene disincantando armatura di maglia rara o superiore.",
       "resonantSteel": "Reagente dell'incantamento. Si ottiene disincantando armi da mischia rare o superiori.",
-      "resonantTimber": "Reagente dell'incantamento. Si ottiene disincantando bastoni, bacchette, archi e balestre rari o superiori."
+      "resonantTimber": "Reagente dell'incantamento. Si ottiene disincantando bastoni, bacchette, archi e balestre rari o superiori.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const it_IT: EnTranslations = {
       "busy": "Sei occupato.",
       "recipeNotLearned": "Non hai ancora imparato quella ricetta.",
       "noBagSpace": "Non hai spazio per l'oggetto realizzato.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Richiede {craft} {skill}",
       "difficultyFull": "Guadagno completo di abilità",
       "difficultyReduced": "Guadagno di abilità ridotto",
@@ -12291,6 +12294,36 @@ export const it_IT: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

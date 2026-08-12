@@ -2523,7 +2523,9 @@ export const es_ES: EnTranslations = {
       "resonantHide": "Reactivo de encantamiento. Se obtiene desencantando armadura de cuero rara o mejor.",
       "resonantLinks": "Reactivo de encantamiento. Se obtiene desencantando armadura de malla rara o mejor.",
       "resonantSteel": "Reactivo de encantamiento. Se obtiene desencantando armas de cuerpo a cuerpo raras o mejores.",
-      "resonantTimber": "Reactivo de encantamiento. Se obtiene desencantando bastones, varitas, arcos y ballestas raros o mejores."
+      "resonantTimber": "Reactivo de encantamiento. Se obtiene desencantando bastones, varitas, arcos y ballestas raros o mejores.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const es_ES: EnTranslations = {
       "busy": "Estás ocupado.",
       "recipeNotLearned": "Aún no has aprendido esa receta.",
       "noBagSpace": "No tienes espacio para el objeto elaborado.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Requiere {craft} {skill}",
       "difficultyFull": "Ganancia total de habilidad",
       "difficultyReduced": "Ganancia de habilidad reducida",
@@ -12291,6 +12294,36 @@ export const es_ES: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"

@@ -2523,7 +2523,9 @@ export const ja_JP: EnTranslations = {
       "resonantHide": "エンチャントの材料。レア以上の革防具を魔力分解して得られる。",
       "resonantLinks": "エンチャントの材料。レア以上の鎖防具を魔力分解して得られる。",
       "resonantSteel": "エンチャントの材料。レア以上の近接武器を魔力分解して得られる。",
-      "resonantTimber": "エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。"
+      "resonantTimber": "エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。",
+      "masterwroughtIntermediate": "名匠鍛造の製作部材。",
+      "quickeningCatalyst": "製作用の触媒。錬金術師は1日に1個しか作れません。"
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const ja_JP: EnTranslations = {
       "busy": "手が離せません。",
       "recipeNotLearned": "そのレシピはまだ習得していません。",
       "noBagSpace": "バッグに製作したアイテムを入れる空きがありません。",
+      "dailyLimit": "それは1日に1回しか製作できません。",
       "skillReqLine": "{craft} {skill} が必要",
       "difficultyFull": "技能上昇（全量）",
       "difficultyReduced": "技能上昇（減少）",
@@ -12291,6 +12294,36 @@ export const ja_JP: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "サンペタルの巻物"
+      },
+      "duskforged_billet": {
+        "name": "黄昏鍛えの鋼片"
+      },
+      "forgefold_plating": {
+        "name": "折り鍛えの装甲板"
+      },
+      "wyrmhide_cording": {
+        "name": "竜革の編み紐"
+      },
+      "sunspun_bolt": {
+        "name": "陽紡ぎの反物"
+      },
+      "prismglass_setting": {
+        "name": "プリズムガラスの石座"
+      },
+      "precision_chassis": {
+        "name": "精密シャーシ"
+      },
+      "quickening_catalyst": {
+        "name": "賦活の触媒"
+      },
+      "seasoned_stock": {
+        "name": "調味だし汁"
+      },
+      "lucent_reagent": {
+        "name": "光輝の試薬"
+      },
+      "sablewax_vellum": {
+        "name": "黒蝋のベラム紙"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

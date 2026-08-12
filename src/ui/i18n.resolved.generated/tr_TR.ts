@@ -2523,7 +2523,9 @@ export const tr_TR: EnTranslations = {
       "resonantHide": "Nadir ve üstü deri zırhlardan büyü bozularak elde edilen büyü malzemesi.",
       "resonantLinks": "Nadir ve üstü zincir zırhlardan büyü bozularak elde edilen büyü malzemesi.",
       "resonantSteel": "Nadir ve üstü yakın dövüş silahlarından büyü bozularak elde edilen büyü malzemesi.",
-      "resonantTimber": "Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi."
+      "resonantTimber": "Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const tr_TR: EnTranslations = {
       "busy": "Meşgulsün.",
       "recipeNotLearned": "Bu tarifi henüz öğrenmedin.",
       "noBagSpace": "Çantanızda üretilen eşya için yer yok.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "{craft} {skill} gerektirir",
       "difficultyFull": "Tam beceri kazanımı",
       "difficultyReduced": "Azaltılmış beceri kazanımı",
@@ -12291,6 +12294,36 @@ export const tr_TR: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

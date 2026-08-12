@@ -3003,6 +3003,13 @@ export const hudChromeStrings = {
     resonantSteel: 'Enchanting reagent. Disenchanted from rare and better melee weapons.',
     resonantTimber:
       'Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows.',
+    // One key shared by the nine Masterwrought skill-75 intermediates (Phase
+    // 07): a craft-free lead like fineGrade's, so the Used-by line still
+    // names the consuming craft once the apex recipes land.
+    masterwroughtIntermediate: 'Masterwrought crafting component.',
+    // The Quickening Catalyst states its own craft limit (the tooltip rule:
+    // never hide a limit); the Used-by line lists the nine consuming crafts.
+    quickeningCatalyst: 'Crafting catalyst. An alchemist can craft only one each day.',
   },
   discord: {
     title: 'Discord',
@@ -4109,6 +4116,9 @@ export const hudChromeStrings = {
     // #2350: denied because the output cannot fit the bags, even after the
     // reagents are consumed.
     noBagSpace: 'You do not have room for the crafted item.',
+    // Masterwrought phase 07: a oncePerDay recipe already crafted inside the
+    // current reset-day window (the Quickening Catalyst daily gate).
+    dailyLimit: 'That can only be crafted once per day.',
     // Professions 2.0: crafting window legibility (skill requirement
     // line, skill-gain difficulty labels, hub-station badge) plus the
     // masterwork and tier-up celebration copy. Masterwork is a proc with

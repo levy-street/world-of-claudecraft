@@ -2523,7 +2523,9 @@ export const da_DK: EnTranslations = {
       "resonantHide": "Fortryllelsesreagens. Fås ved affortryllelse af læderrustning af sjælden kvalitet eller bedre.",
       "resonantLinks": "Fortryllelsesreagens. Fås ved affortryllelse af ringbrynje af sjælden kvalitet eller bedre.",
       "resonantSteel": "Fortryllelsesreagens. Fås ved affortryllelse af nærkampsvåben af sjælden kvalitet eller bedre.",
-      "resonantTimber": "Fortryllelsesreagens. Fås ved affortryllelse af stave, tryllestave, buer og armbrøster af sjælden kvalitet eller bedre."
+      "resonantTimber": "Fortryllelsesreagens. Fås ved affortryllelse af stave, tryllestave, buer og armbrøster af sjælden kvalitet eller bedre.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const da_DK: EnTranslations = {
       "busy": "Du er optaget.",
       "recipeNotLearned": "Du har ikke lært den opskrift endnu.",
       "noBagSpace": "Du har ikke plads til den fremstillede genstand.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Kræver {craft} {skill}",
       "difficultyFull": "Fuld færdighedsforøgelse",
       "difficultyReduced": "Reduceret færdighedsforøgelse",
@@ -12291,6 +12294,36 @@ export const da_DK: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

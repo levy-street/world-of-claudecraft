@@ -2523,7 +2523,9 @@ export const vi_VN: EnTranslations = {
       "resonantHide": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp da hiếm trở lên.",
       "resonantLinks": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp lưới hiếm trở lên.",
       "resonantSteel": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc vũ khí cận chiến hiếm trở lên.",
-      "resonantTimber": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trượng, đũa phép, cung, và nỏ hiếm trở lên."
+      "resonantTimber": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trượng, đũa phép, cung, và nỏ hiếm trở lên.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const vi_VN: EnTranslations = {
       "busy": "Bạn đang bận.",
       "recipeNotLearned": "Bạn chưa học công thức đó.",
       "noBagSpace": "Túi của bạn không còn chỗ cho vật phẩm vừa chế tạo.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Yêu cầu {craft} {skill}",
       "difficultyFull": "Đạt được kỹ năng đầy đủ",
       "difficultyReduced": "Giảm khả năng nhận được kỹ năng",
@@ -12291,6 +12294,36 @@ export const vi_VN: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

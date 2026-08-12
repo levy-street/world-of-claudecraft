@@ -11916,7 +11916,9 @@ export class Hud {
                             ? 'hudChrome.crafting.recipeNotLearned'
                             : ev.reason === 'no_bag_space'
                               ? 'hudChrome.crafting.noBagSpace'
-                              : 'hudChrome.crafting.insufficientMaterials',
+                              : ev.reason === 'daily_limit'
+                                ? 'hudChrome.crafting.dailyLimit'
+                                : 'hudChrome.crafting.insufficientMaterials',
                   ),
               '#ff6b6b',
             );

@@ -2523,7 +2523,9 @@ export const pl_PL: EnTranslations = {
       "resonantHide": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiej i lepszej zbroi skórzanej.",
       "resonantLinks": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiej i lepszej kolczugi.",
       "resonantSteel": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiej i lepszej broni do walki wręcz.",
-      "resonantTimber": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkich i lepszych kosturów, różdżek, łuków i kusz."
+      "resonantTimber": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkich i lepszych kosturów, różdżek, łuków i kusz.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const pl_PL: EnTranslations = {
       "busy": "Jesteś zajęty.",
       "recipeNotLearned": "Nie nauczyłeś się jeszcze tego przepisu.",
       "noBagSpace": "Nie masz miejsca na wytworzony przedmiot.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Wymaga {craft} {skill}",
       "difficultyFull": "Pełny przyrost umiejętności",
       "difficultyReduced": "Zmniejszony przyrost umiejętności",
@@ -12291,6 +12294,36 @@ export const pl_PL: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

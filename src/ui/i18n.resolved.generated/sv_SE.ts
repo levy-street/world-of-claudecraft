@@ -2523,7 +2523,9 @@ export const sv_SE: EnTranslations = {
       "resonantHide": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre läderrustning.",
       "resonantLinks": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre ringbrynja.",
       "resonantSteel": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre närstridsvapen.",
-      "resonantTimber": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre stavar, trollstavar, bågar och armborst."
+      "resonantTimber": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre stavar, trollstavar, bågar och armborst.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const sv_SE: EnTranslations = {
       "busy": "Du är upptagen.",
       "recipeNotLearned": "Du har inte lärt dig det receptet än.",
       "noBagSpace": "Du har inte plats för det tillverkade föremålet.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Kräver {craft} {skill}",
       "difficultyFull": "Full skicklighetsvinst",
       "difficultyReduced": "Minskad färdighetsvinst",
@@ -12291,6 +12294,36 @@ export const sv_SE: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

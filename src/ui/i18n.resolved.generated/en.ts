@@ -2523,7 +2523,9 @@ export const en: EnTranslations = {
       "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
       "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
       "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
-      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const en: EnTranslations = {
       "busy": "You are busy.",
       "recipeNotLearned": "You have not learned that recipe yet.",
       "noBagSpace": "You do not have room for the crafted item.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Requires {craft} {skill}",
       "difficultyFull": "Full skill gain",
       "difficultyReduced": "Reduced skill gain",
@@ -12291,6 +12294,36 @@ export const en: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"

@@ -2523,7 +2523,9 @@ export const cs_CZ: EnTranslations = {
       "resonantHide": "Reagencie k okouzlení. Získává se rozzačarováním koženého brnění vzácné kvality a lepšího.",
       "resonantLinks": "Reagencie k okouzlení. Získává se rozzačarováním kroužkového brnění vzácné kvality a lepšího.",
       "resonantSteel": "Reagencie k okouzlení. Získává se rozzačarováním zbraní na blízko vzácné kvality a lepších.",
-      "resonantTimber": "Reagencie k okouzlení. Získává se rozzačarováním holí, hůlek, luků a kuší vzácné kvality a lepších."
+      "resonantTimber": "Reagencie k okouzlení. Získává se rozzačarováním holí, hůlek, luků a kuší vzácné kvality a lepších.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const cs_CZ: EnTranslations = {
       "busy": "Jsi zaneprázdněn(a).",
       "recipeNotLearned": "Tento recept ses ještě nenaučil.",
       "noBagSpace": "Nemáš místo pro vyrobený předmět.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Vyžaduje {craft} {skill}",
       "difficultyFull": "Plný zisk dovedností",
       "difficultyReduced": "Snížený zisk dovedností",
@@ -12291,6 +12294,36 @@ export const cs_CZ: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

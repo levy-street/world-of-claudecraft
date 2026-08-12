@@ -2523,7 +2523,9 @@ export const nl_NL: EnTranslations = {
       "resonantHide": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere leerwapenrusting.",
       "resonantLinks": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere maliënwapenrusting.",
       "resonantSteel": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere meleewapens.",
-      "resonantTimber": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere staven, stokken, bogen en kruisbogen."
+      "resonantTimber": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere staven, stokken, bogen en kruisbogen.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const nl_NL: EnTranslations = {
       "busy": "Je bent bezig.",
       "recipeNotLearned": "Je hebt dat recept nog niet geleerd.",
       "noBagSpace": "Je hebt geen ruimte voor het vervaardigde voorwerp.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Vereist {craft} {skill}",
       "difficultyFull": "Volledige vaardigheidswinst",
       "difficultyReduced": "Verminderde vaardigheidswinst",
@@ -12291,6 +12294,36 @@ export const nl_NL: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

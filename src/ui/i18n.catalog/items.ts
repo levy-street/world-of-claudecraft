@@ -2456,6 +2456,16 @@ const ITEM_ENTITY_IDS = [
   'silverleaf_scroll',
   'goldleaf_scroll',
   'sunpetal_scroll',
+  'duskforged_billet',
+  'forgefold_plating',
+  'wyrmhide_cording',
+  'sunspun_bolt',
+  'prismglass_setting',
+  'precision_chassis',
+  'quickening_catalyst',
+  'seasoned_stock',
+  'lucent_reagent',
+  'sablewax_vellum',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2607,6 +2617,19 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   silverleaf_scroll: 'Sheenleaf Scroll',
   goldleaf_scroll: 'Goldleaf Scroll',
   sunpetal_scroll: 'Sunpetal Scroll',
+  // Masterwrought intermediates (phase 07): the skill-75 rung, one per craft
+  // (content/profession_items.ts). English-appended like the quivers above
+  // until the release fill folds them into the per-locale arrays.
+  duskforged_billet: 'Duskforged Billet',
+  forgefold_plating: 'Forgefold Plating',
+  wyrmhide_cording: 'Wyrmhide Cording',
+  sunspun_bolt: 'Sunspun Bolt',
+  prismglass_setting: 'Prismglass Setting',
+  precision_chassis: 'Precision Chassis',
+  quickening_catalyst: 'Quickening Catalyst',
+  seasoned_stock: 'Seasoned Stock',
+  lucent_reagent: 'Lucent Reagent',
+  sablewax_vellum: 'Sablewax Vellum',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

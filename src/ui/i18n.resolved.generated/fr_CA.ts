@@ -2523,7 +2523,9 @@ export const fr_CA: EnTranslations = {
       "resonantHide": "Réactif d'enchantement. Obtenu en désenchantant de l'armure en cuir rare ou mieux.",
       "resonantLinks": "Réactif d'enchantement. Obtenu en désenchantant de l'armure de mailles rare ou mieux.",
       "resonantSteel": "Réactif d'enchantement. Obtenu en désenchantant des armes de mêlée rares ou mieux.",
-      "resonantTimber": "Réactif d'enchantement obtenu de bâtons, baguettes, arcs et arbalètes rares ou mieux."
+      "resonantTimber": "Réactif d'enchantement obtenu de bâtons, baguettes, arcs et arbalètes rares ou mieux.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
     },
     "discord": {
       "title": "Discord",
@@ -3279,6 +3281,7 @@ export const fr_CA: EnTranslations = {
       "busy": "Vous êtes occupé.",
       "recipeNotLearned": "Vous n'avez pas encore appris cette recette.",
       "noBagSpace": "Vous n'avez pas de place pour l'objet fabriqué.",
+      "dailyLimit": "That can only be crafted once per day.",
       "skillReqLine": "Nécessite {craft} {skill}",
       "difficultyFull": "Gain de compétence complet",
       "difficultyReduced": "Gain de compétences réduit",
@@ -12291,6 +12294,36 @@ export const fr_CA: EnTranslations = {
       },
       "sunpetal_scroll": {
         "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"
