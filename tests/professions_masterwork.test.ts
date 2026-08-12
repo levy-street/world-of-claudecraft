@@ -718,6 +718,20 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
       sunpetal_herb: 2,
       fine_sunpetal_herb: 2,
       arcanite_bar: 2,
+      // Masterwrought intermediates (phase 08, the phase 07 ledger
+      // obligation): refined crafted reagents on the arcanite precedent,
+      // tier 2 as the deliberate ceiling (no new tier, masterwork.ts
+      // constants are locked). Ungraded, so no fine_ siblings.
+      duskforged_billet: 2,
+      forgefold_plating: 2,
+      wyrmhide_cording: 2,
+      sunspun_bolt: 2,
+      prismglass_setting: 2,
+      precision_chassis: 2,
+      quickening_catalyst: 2,
+      seasoned_stock: 2,
+      lucent_reagent: 2,
+      sablewax_vellum: 2,
     });
     // An id absent from the table is tier 0: the baseline mob drops, the
     // eastbrook_vale starter yields, and non-material inputs alike.

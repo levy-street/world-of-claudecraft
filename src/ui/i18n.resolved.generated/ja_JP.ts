@@ -12332,6 +12332,33 @@ export const ja_JP: EnTranslations = {
       "sablewax_vellum": {
         "name": "黒蝋のベラム紙"
       },
+      "spiritweld_girdle": {
+        "name": "スピリットウェルドの帯"
+      },
+      "forgefold_legguards": {
+        "name": "折り鍛えのレッグガード"
+      },
+      "wardspeaker_sabatons": {
+        "name": "ワードスピーカーのサバトン"
+      },
+      "briarstep_jerkin": {
+        "name": "ブライアステップのジャーキン"
+      },
+      "fenbloom_breeches": {
+        "name": "フェンブルームのズボン"
+      },
+      "barksong_handguards": {
+        "name": "バークソングのハンドガード"
+      },
+      "sunspun_vestments": {
+        "name": "陽紡ぎの祭服"
+      },
+      "sunspun_leggings": {
+        "name": "陽紡ぎのレギンス"
+      },
+      "sunspun_handwraps": {
+        "name": "陽紡ぎの手巻き"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

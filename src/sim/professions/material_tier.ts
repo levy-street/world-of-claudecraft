@@ -32,6 +32,16 @@ import { fineMaterialFor } from './material_grades';
 import type { ProfessionReagent } from './types';
 
 // The base rows. An id absent here is tier 0.
+//
+// The ten Masterwrought intermediates (Phase 08, paying the Phase 07 ledger
+// obligation) sit on tier 2 by the arcanite_bar precedent: a refined reagent
+// keyed here directly rather than through a node family. They are one rung
+// past arcanite (skill-75 crafted, each consuming a Quickening Catalyst plus
+// tier-1/2 mats), but tier 2 is deliberately the ceiling: a new tier would
+// change the masterwork bonus scale, and masterwork.ts constants are locked
+// by ruling. These rows are live exactly where an apex recipe consumes an
+// intermediate (materialTierBonusForReagents takes the MAX across the bill);
+// no pre-phase-08 recipe consumed one, so nothing existing moves.
 const BASE_MATERIAL_TIERS: Readonly<Record<string, number>> = Object.freeze({
   iron_ore: 1,
   ashwood_log: 1,
@@ -40,6 +50,16 @@ const BASE_MATERIAL_TIERS: Readonly<Record<string, number>> = Object.freeze({
   elderwood_log: 2,
   sunpetal_herb: 2,
   arcanite_bar: 2,
+  duskforged_billet: 2,
+  forgefold_plating: 2,
+  wyrmhide_cording: 2,
+  sunspun_bolt: 2,
+  prismglass_setting: 2,
+  precision_chassis: 2,
+  quickening_catalyst: 2,
+  seasoned_stock: 2,
+  lucent_reagent: 2,
+  sablewax_vellum: 2,
 });
 
 // Pinned per-material tier table (tests/professions_masterwork.test.ts pins

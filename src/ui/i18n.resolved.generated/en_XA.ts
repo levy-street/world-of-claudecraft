@@ -12332,6 +12332,33 @@ export const en_XA: EnTranslations = {
       "sablewax_vellum": {
         "name": "[Šáƀļéŵáẋ Ʋéļļúɱ]"
       },
+      "spiritweld_girdle": {
+        "name": "[Šþíŕíţŵéļð Ĝíŕðļé]"
+      },
+      "forgefold_legguards": {
+        "name": "[Ƒóŕĝéƒóļð Ļéĝĝúáŕðš]"
+      },
+      "wardspeaker_sabatons": {
+        "name": "[Ŵáŕðšþéáķéŕ Šáƀáţóñš]"
+      },
+      "briarstep_jerkin": {
+        "name": "[Ɓŕíáŕšţéþ Ĵéŕķíñ]"
+      },
+      "fenbloom_breeches": {
+        "name": "[Ƒéñƀļóóɱ Ɓŕééçĥéš]"
+      },
+      "barksong_handguards": {
+        "name": "[Ɓáŕķšóñĝ Ĥáñðĝúáŕðš]"
+      },
+      "sunspun_vestments": {
+        "name": "[Šúñšþúñ Ʋéšţɱéñţš]"
+      },
+      "sunspun_leggings": {
+        "name": "[Šúñšþúñ Ļéĝĝíñĝš]"
+      },
+      "sunspun_handwraps": {
+        "name": "[Šúñšþúñ Ĥáñðŵŕáþš]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

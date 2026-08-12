@@ -59,6 +59,9 @@ const HONEST_MATERIALS = [
   'fine_silverleaf_herb',
   'fine_sunpetal_herb',
   'fine_thorium_ore',
+  // Masterwrought phase 08: derives IN as the reagent the apex armor rows
+  // consume (APEX_ARMOR_RECIPES), per the phase 07 allowlist obligation.
+  'forgefold_plating',
   'game_meat',
   'glass_vial',
   'glimmerfin_koi',
@@ -94,10 +97,16 @@ const HONEST_MATERIALS = [
   'spider_silk',
   'spool_of_thread',
   'sunpetal_herb',
+  // Masterwrought phase 08: derives IN via the tailoring apex rows.
+  'sunspun_bolt',
   'tanning_agent',
   'thorium_ore',
   'venom_gland',
   'wolf_fang',
+  // Masterwrought phase 08: both derive IN via the apex armor rows
+  // (wyrmfall_core is a reagent on all ten, cording on the leather three).
+  'wyrmfall_core',
+  'wyrmhide_cording',
 ] as const;
 
 // The ONLY non-poor junk allowed outside the material set: four rare-mob
@@ -111,25 +120,20 @@ const HONEST_MATERIALS = [
 // junk-kind reagent) so it derives IN, or add it here as a deliberate
 // non-material with the maintainer's sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
-  'duskforged_billet', // consumed from Phase 08/09/10 apex rows, remove then
+  'duskforged_billet', // consumed from Phase 09/10 apex rows, remove then
   'emberwing_cinderscale',
-  'forgefold_plating', // consumed from Phase 08/09/10 apex rows, remove then
   'gleamstag_charm',
   'guardian_core',
   'last_keep_signet',
-  'lucent_reagent', // consumed from Phase 08/09/10 apex rows, remove then
+  'lucent_reagent', // consumed from Phase 09/10 apex rows, remove then
   'old_cragmaws_pelt',
-  'precision_chassis', // consumed from Phase 08/09/10 apex rows, remove then
-  'prismglass_setting', // consumed from Phase 08/09/10 apex rows, remove then
-  'sablewax_vellum', // consumed from Phase 08/09/10 apex rows, remove then
-  'seasoned_stock', // consumed from Phase 08/09/10 apex rows, remove then
-  'sunspun_bolt', // consumed from Phase 08/09/10 apex rows, remove then
-  // Masterwrought phase 04: the tradable making-catalyst ships before the
-  // apex recipes that consume it (phases 08 to 10). The moment a recipe
-  // lists it as a reagent it derives IN through the reagent source table;
-  // move it out of this allowlist in that change.
-  'wyrmfall_core',
-  'wyrmhide_cording', // consumed from Phase 08/09/10 apex rows, remove then
+  'precision_chassis', // consumed from Phase 09/10 apex rows, remove then
+  'prismglass_setting', // consumed from Phase 09/10 apex rows, remove then
+  'sablewax_vellum', // consumed from Phase 09/10 apex rows, remove then
+  'seasoned_stock', // consumed from Phase 09/10 apex rows, remove then
+  // Phase 08 removed forgefold_plating, wyrmhide_cording, sunspun_bolt, and
+  // wyrmfall_core: the apex armor rows are their consumers, so all four now
+  // derive IN through the reagent source table (HONEST_MATERIALS above).
 ] as const;
 
 // The six vendor-buyable crafting staples, ruled IN by name (Q6).

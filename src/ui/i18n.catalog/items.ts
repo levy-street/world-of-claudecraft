@@ -2466,6 +2466,15 @@ const ITEM_ENTITY_IDS = [
   'seasoned_stock',
   'lucent_reagent',
   'sablewax_vellum',
+  'spiritweld_girdle',
+  'forgefold_legguards',
+  'wardspeaker_sabatons',
+  'briarstep_jerkin',
+  'fenbloom_breeches',
+  'barksong_handguards',
+  'sunspun_vestments',
+  'sunspun_leggings',
+  'sunspun_handwraps',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2630,6 +2639,17 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   seasoned_stock: 'Seasoned Stock',
   lucent_reagent: 'Lucent Reagent',
   sablewax_vellum: 'Sablewax Vellum',
+  // Masterwrought apex armor (phase 08): the skill-100 rung for the three
+  // armor crafts plus the apex bag (content/profession_items.ts).
+  spiritweld_girdle: 'Spiritweld Girdle',
+  forgefold_legguards: 'Forgefold Legguards',
+  wardspeaker_sabatons: 'Wardspeaker Sabatons',
+  briarstep_jerkin: 'Briarstep Jerkin',
+  fenbloom_breeches: 'Fenbloom Breeches',
+  barksong_handguards: 'Barksong Handguards',
+  sunspun_vestments: 'Sunspun Vestments',
+  sunspun_leggings: 'Sunspun Leggings',
+  sunspun_handwraps: 'Sunspun Handwraps',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

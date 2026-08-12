@@ -9177,6 +9177,123 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 125,
           "zeroAt": 150
         }
+      },
+      {
+        "id": "recipe_briarstep_jerkin",
+        "name": "Briarstep Jerkin",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Wyrmhide Cording",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Rough Hide",
+            "count": 4
+          },
+          {
+            "name": "Pristine Hide",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Briarstep Jerkin",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_fenbloom_breeches",
+        "name": "Fenbloom Breeches",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Wyrmhide Cording",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Rough Hide",
+            "count": 4
+          },
+          {
+            "name": "Pristine Hide",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbloom Breeches",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_barksong_handguards",
+        "name": "Barksong Handguards",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Wyrmhide Cording",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Rough Hide",
+            "count": 4
+          },
+          {
+            "name": "Pristine Hide",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Barksong Handguards",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
       }
     ]
   },
@@ -9667,6 +9784,123 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 100,
           "minimalAt": 125,
           "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_sunspun_vestments",
+        "name": "Sunspun Vestments",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sunspun Bolt",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "name": "Pristine Silk",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunspun Vestments",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_sunspun_leggings",
+        "name": "Sunspun Leggings",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sunspun Bolt",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "name": "Pristine Silk",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunspun Leggings",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_sunspun_handwraps",
+        "name": "Sunspun Handwraps",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sunspun Bolt",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "name": "Pristine Silk",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunspun Handwraps",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         }
       }
     ]
@@ -11431,6 +11665,123 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 100,
           "minimalAt": 125,
           "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_spiritweld_girdle",
+        "name": "Spiritweld Girdle",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Forgefold Plating",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Spiritweld Girdle",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_forgefold_legguards",
+        "name": "Forgefold Legguards",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Forgefold Plating",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Forgefold Legguards",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_wardspeaker_sabatons",
+        "name": "Wardspeaker Sabatons",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Forgefold Plating",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Wardspeaker Sabatons",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         }
       }
     ]

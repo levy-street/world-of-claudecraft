@@ -12332,6 +12332,33 @@ export const zh_CN: EnTranslations = {
       "sablewax_vellum": {
         "name": "玄蜡犊皮纸"
       },
+      "spiritweld_girdle": {
+        "name": "灵魂熔接腰带"
+      },
+      "forgefold_legguards": {
+        "name": "叠锻腿甲"
+      },
+      "wardspeaker_sabatons": {
+        "name": "唤守护胫"
+      },
+      "briarstep_jerkin": {
+        "name": "棘行皮甲"
+      },
+      "fenbloom_breeches": {
+        "name": "沼花马裤"
+      },
+      "barksong_handguards": {
+        "name": "树歌护手"
+      },
+      "sunspun_vestments": {
+        "name": "阳纺法衣"
+      },
+      "sunspun_leggings": {
+        "name": "阳纺护腿"
+      },
+      "sunspun_handwraps": {
+        "name": "阳纺裹手"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

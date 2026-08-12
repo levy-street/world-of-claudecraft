@@ -2078,6 +2078,181 @@ export const INTERMEDIATE_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The Masterwrought apex armor rung (Phase 08, R8/R13): the skill-100 recipes
+// for the three armor crafts, nine ilvl-31 epics plus the tailoring apex bag.
+// Every row consumes exactly 3 of its own profession's intermediate (the
+// recorded phase 07 demand math: one apex piece = 3 catalyst-days) plus
+// 2 Wyrmfall Cores (the raid/heroic tie; the catalyst stays the pacing gate)
+// plus the craft's gathered family. acquisition ['drop'] per R8: apex patterns
+// land as tradable raid/rift drops and heroic-marks vendor rows in phase 11,
+// so these recipes are deliberately unlearnable until then; NOT trainer rows.
+// stationType matches each craft's existing rows so the per-craft wiki station
+// field stays unanimous. itemLevelBudget feeds only the craft gold fee.
+export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_spiritweld_girdle',
+    professionId: 'armorcrafting',
+    resultItemId: 'spiritweld_girdle',
+    resultCount: 1,
+    // Input 491 vs output 300.
+    reagents: [
+      { itemId: 'forgefold_plating', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_forgefold_legguards',
+    professionId: 'armorcrafting',
+    resultItemId: 'forgefold_legguards',
+    resultCount: 1,
+    // Input 491 vs output 320.
+    reagents: [
+      { itemId: 'forgefold_plating', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_wardspeaker_sabatons',
+    professionId: 'armorcrafting',
+    resultItemId: 'wardspeaker_sabatons',
+    resultCount: 1,
+    // Input 491 vs output 280.
+    reagents: [
+      { itemId: 'forgefold_plating', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_briarstep_jerkin',
+    professionId: 'leatherworking',
+    resultItemId: 'briarstep_jerkin',
+    resultCount: 1,
+    // Input 265 vs output 175.
+    reagents: [
+      { itemId: 'wyrmhide_cording', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'rough_hide', count: 4 },
+      { itemId: 'pristine_hide', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_fenbloom_breeches',
+    professionId: 'leatherworking',
+    resultItemId: 'fenbloom_breeches',
+    resultCount: 1,
+    // Input 265 vs output 160.
+    reagents: [
+      { itemId: 'wyrmhide_cording', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'rough_hide', count: 4 },
+      { itemId: 'pristine_hide', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_barksong_handguards',
+    professionId: 'leatherworking',
+    resultItemId: 'barksong_handguards',
+    resultCount: 1,
+    // Input 265 vs output 140.
+    reagents: [
+      { itemId: 'wyrmhide_cording', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'rough_hide', count: 4 },
+      { itemId: 'pristine_hide', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_sunspun_vestments',
+    professionId: 'tailoring',
+    resultItemId: 'sunspun_vestments',
+    resultCount: 1,
+    // Input 280 vs output 200.
+    reagents: [
+      { itemId: 'sunspun_bolt', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'pristine_silk', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_sunspun_leggings',
+    professionId: 'tailoring',
+    resultItemId: 'sunspun_leggings',
+    resultCount: 1,
+    // Input 280 vs output 190.
+    reagents: [
+      { itemId: 'sunspun_bolt', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'pristine_silk', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_sunspun_handwraps',
+    professionId: 'tailoring',
+    resultItemId: 'sunspun_handwraps',
+    resultCount: 1,
+    // Input 280 vs output 170.
+    reagents: [
+      { itemId: 'sunspun_bolt', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'pristine_silk', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'loom',
+  },
+];
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
@@ -2094,6 +2269,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...JEWELCRAFTING_RECIPES,
   ...INSCRIPTION_RECIPES,
   ...INTERMEDIATE_RECIPES,
+  ...APEX_ARMOR_RECIPES,
 ];
 
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {

@@ -199,7 +199,11 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // measurement (the one-sided band let this note rot 335 bytes upward with
 // no red): the band is the re-measure obligation, forcing the next content
 // growth to update this note with its measured value, while the round-step
-// ceiling stays the structural bound.
+// ceiling stays the structural bound. The Masterwrought phase 08 apex armor
+// catalog then took the recipe count 104 to 114 (ten knownRecipes entries),
+// settling at a measured 10,499 bytes: the 12 KiB ceiling holds with about
+// 1,789 bytes of headroom, and the band below re-centers on the new
+// measurement per the same obligation.
 const PROFESSIONS_BYTE_CEILING = 12288;
 
 function ceilingSim(): Sim {
@@ -465,13 +469,13 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
 
     // The byte bound itself, on the settled state: the two-sided tracking
-    // band around the phase 07 measurement (10,224 settled bytes; the
+    // band around the phase 08 measurement (10,499 settled bytes; the
     // authoritative narrative lives at the bound's note above). A re-measure
     // obligation, not the structural ceiling: drift past either edge reds
     // here and forces the note to be re-read.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(10064);
-    expect(bytes).toBeLessThan(10384);
+    expect(bytes).toBeGreaterThan(10339);
+    expect(bytes).toBeLessThan(10659);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

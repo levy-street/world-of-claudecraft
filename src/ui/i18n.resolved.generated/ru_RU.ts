@@ -12332,6 +12332,33 @@ export const ru_RU: EnTranslations = {
       "sablewax_vellum": {
         "name": "Черновосковый пергамент"
       },
+      "spiritweld_girdle": {
+        "name": "Пояс духовной спайки"
+      },
+      "forgefold_legguards": {
+        "name": "Набедренники складчатой ковки"
+      },
+      "wardspeaker_sabatons": {
+        "name": "Сабатоны заклинателя оберегов"
+      },
+      "briarstep_jerkin": {
+        "name": "Куртка терновой поступи"
+      },
+      "fenbloom_breeches": {
+        "name": "Бриджи болотного цветения"
+      },
+      "barksong_handguards": {
+        "name": "Рукавицы поющей коры"
+      },
+      "sunspun_vestments": {
+        "name": "Солнцепрядное облачение"
+      },
+      "sunspun_leggings": {
+        "name": "Солнцепрядные поножи"
+      },
+      "sunspun_handwraps": {
+        "name": "Солнцепрядные обмотки"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

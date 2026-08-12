@@ -12332,6 +12332,33 @@ export const ko_KR: EnTranslations = {
       "sablewax_vellum": {
         "name": "흑랍 양피지"
       },
+      "spiritweld_girdle": {
+        "name": "정령벼림 허리띠"
+      },
+      "forgefold_legguards": {
+        "name": "접쇠 다리갑옷"
+      },
+      "wardspeaker_sabatons": {
+        "name": "결계술사 쇠장화"
+      },
+      "briarstep_jerkin": {
+        "name": "가시걸음 웃옷"
+      },
+      "fenbloom_breeches": {
+        "name": "늪꽃 바지"
+      },
+      "barksong_handguards": {
+        "name": "나무노래 손보호구"
+      },
+      "sunspun_vestments": {
+        "name": "태양실 예복"
+      },
+      "sunspun_leggings": {
+        "name": "태양실 각반"
+      },
+      "sunspun_handwraps": {
+        "name": "태양실 손싸개"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

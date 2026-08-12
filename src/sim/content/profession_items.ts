@@ -971,4 +971,146 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 45,
   },
+
+  // --- Masterwrought apex armor (Phase 08, R13/R14) --------------------------
+  // The skill-100 rung for the three armor crafts: nine ilvl-31 epics (recipe
+  // level 25 + epic bonus 6) whose primary sums EQUAL primaryStatBudget and
+  // whose single rating follows the band's one-rating-at-40 law, each rating
+  // chosen to COMPLEMENT the same-slot drop rather than duplicate it. Slots
+  // come from the committed slot coverage audit (state.md Phase 08 ledger):
+  // the weakest-covered cells per armor class. Armor values are copied from
+  // the same-band same-slot reference piece, never invented. All nine carry
+  // masterwrought: true (the counted equip family) and requiredLevel 20, a
+  // recorded deviation from the ungated crafted-wearable precedent: every
+  // other tradable ilvl-31 epic wearable gates at 20, and these are the first
+  // crafted items in that band (tradable per R2, so the gate is load-bearing).
+  // sellValues sit strictly below each recipe's reagent input value per the
+  // economy invariant; vendor value is not power. Pure stats per R14: no
+  // procs, no effects, no on-use, anywhere in this block.
+  spiritweld_girdle: {
+    id: 'spiritweld_girdle',
+    name: 'Spiritweld Girdle',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'waist',
+    quality: 'epic',
+    requiredLevel: 20,
+    // ilvl-31 waist epic budget = 15; int:9+spi:6 = 15. Armor: gravescale_girdle.
+    stats: { armor: 224, int: 9, spi: 6 },
+    critRating: 40,
+    sellValue: 300,
+    masterwrought: true,
+  },
+  forgefold_legguards: {
+    id: 'forgefold_legguards',
+    name: 'Forgefold Legguards',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'legs',
+    quality: 'epic',
+    requiredLevel: 20,
+    // ilvl-31 legs epic budget = 20; str:11+sta:9 = 20. Armor: bloodmane_war_legguards.
+    stats: { armor: 315, str: 11, sta: 9 },
+    critRating: 40,
+    sellValue: 320,
+    masterwrought: true,
+  },
+  wardspeaker_sabatons: {
+    id: 'wardspeaker_sabatons',
+    name: 'Wardspeaker Sabatons',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'feet',
+    quality: 'epic',
+    requiredLevel: 20,
+    // ilvl-31 feet epic budget = 14; int:8+spi:6 = 14. Armor: tideworn_warboots.
+    stats: { armor: 212, int: 8, spi: 6 },
+    hasteRating: 40,
+    sellValue: 280,
+    masterwrought: true,
+  },
+  briarstep_jerkin: {
+    id: 'briarstep_jerkin',
+    name: 'Briarstep Jerkin',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // ilvl-31 chest epic budget = 22; agi:13+sta:9 = 22. Armor: basin_stalkers_tunic.
+    stats: { armor: 172, agi: 13, sta: 9 },
+    critRating: 40,
+    sellValue: 175,
+    masterwrought: true,
+  },
+  fenbloom_breeches: {
+    id: 'fenbloom_breeches',
+    name: 'Fenbloom Breeches',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'legs',
+    quality: 'epic',
+    requiredLevel: 20,
+    // ilvl-31 legs epic budget = 20; int:12+spi:8 = 20. Armor: tidewoven_trousers.
+    stats: { armor: 132, int: 12, spi: 8 },
+    hasteRating: 40,
+    sellValue: 160,
+    masterwrought: true,
+  },
+  barksong_handguards: {
+    id: 'barksong_handguards',
+    name: 'Barksong Handguards',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'gloves',
+    quality: 'epic',
+    requiredLevel: 20,
+    // ilvl-31 gloves epic budget = 15; int:9+spi:6 = 15. Armor: sanctum_prowlers_grips.
+    stats: { armor: 104, int: 9, spi: 6 },
+    critRating: 40,
+    sellValue: 140,
+    masterwrought: true,
+  },
+  sunspun_vestments: {
+    id: 'sunspun_vestments',
+    name: 'Sunspun Vestments',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // ilvl-31 chest epic budget = 22; int:12+spi:10 = 22. Armor: shroud_of_the_gravewyrm.
+    stats: { armor: 90, int: 12, spi: 10 },
+    hitRating: 40,
+    sellValue: 200,
+    masterwrought: true,
+  },
+  sunspun_leggings: {
+    id: 'sunspun_leggings',
+    name: 'Sunspun Leggings',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'legs',
+    quality: 'epic',
+    requiredLevel: 20,
+    // ilvl-31 legs epic budget = 20; int:12+spi:8 = 20. Armor: lunar_choir_leggings.
+    stats: { armor: 72, int: 12, spi: 8 },
+    hasteRating: 40,
+    sellValue: 190,
+    masterwrought: true,
+  },
+  sunspun_handwraps: {
+    id: 'sunspun_handwraps',
+    name: 'Sunspun Handwraps',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'gloves',
+    quality: 'epic',
+    requiredLevel: 20,
+    // ilvl-31 gloves epic budget = 15; int:9+spi:6 = 15. Armor: shadowpulse_handwraps.
+    stats: { armor: 52, int: 9, spi: 6 },
+    critRating: 40,
+    sellValue: 170,
+    masterwrought: true,
+  },
 };

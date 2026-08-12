@@ -506,7 +506,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'deepfen_pearl',
     'duskforged_billet', // phase 07 intermediate, out when its apex row lands
     'emberwing_cinderscale',
-    'forgefold_plating', // phase 07 intermediate, out when its apex row lands
     'frayed_prayer_beads',
     'gleamstag_charm',
     'gravewoven_bag',
@@ -530,17 +529,13 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'soggy_boot',
     'soggy_moccasin',
     'stag_antler',
-    'sunspun_bolt', // phase 07 intermediate, out when its apex row lands
+    // Masterwrought phase 08: forgefold_plating, sunspun_bolt, wyrmfall_core,
+    // and wyrmhide_cording left this list with their apex consumers: they now
+    // derive into the material set and gain the materials chip.
     'tallow_candle',
     'tangled_weed',
     'travelers_knapsack',
     'wolfhide_satchel',
-    // Masterwrought phase 04: the tradable making-catalyst is All-only until
-    // the first apex recipe classifies it (it then derives into the material
-    // set and gains the materials chip; move it out of here in the same
-    // change as its ALLOWED_UNCLASSIFIED_JUNK row in material_taxonomy).
-    'wyrmfall_core',
-    'wyrmhide_cording', // phase 07 intermediate, out when its apex row lands
   ] as const;
 
   it('exactly the pinned All-only set (ruled junk plus the bag-kind items) matches no chip', () => {
