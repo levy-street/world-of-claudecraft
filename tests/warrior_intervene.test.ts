@@ -151,7 +151,7 @@ describe('Intervene (level-5 warrior mobility row)', () => {
       const absorb = known
         .find((a) => a.def.id === 'intervene')
         ?.effects.find((e) => e.type === 'absorb');
-      if (!absorb || absorb.type !== 'absorb') throw new Error('no absorb effect');
+      if (absorb?.type !== 'absorb') throw new Error('no absorb effect');
       return absorb.amount / p.maxHp;
     };
 

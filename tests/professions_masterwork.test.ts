@@ -5,7 +5,12 @@
 // zero on denial, proc occurrences reproducible by seed).
 import { describe, expect, it } from 'vitest';
 import { PERK_THRESHOLDS, STATIONS } from '../src/sim/content/professions';
-import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
+import {
+  ALL_RECIPES,
+  APEX_ARMOR_RECIPES,
+  INTERMEDIATE_RECIPES,
+  recipeById,
+} from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { PRIMARY_STATS, primaryStatBudget } from '../src/sim/item_budget';
 import {
@@ -778,6 +783,44 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
     expect(materialTierBonusForReagents(recipeById('recipe_sunpetal_sickle')!.reagents)).toBe(0.02);
   });
 
+  it('the phase 08 tier rows: every apex bill and every intermediate recipe feeds 0.02', () => {
+    // The apex bills max at tier 2 through their own profession's
+    // intermediate reagent; sweep the whole family so a dropped tier row on
+    // any of the ten reds here rather than shipping a quiet 0.01.
+    for (const recipe of APEX_ARMOR_RECIPES) {
+      expect(materialTierBonusForReagents(recipe.reagents), recipe.id).toBe(0.02);
+    }
+    // The catalyst tier row is a deliberate, RECORDED side effect: the nine
+    // phase 07 intermediate recipes consume a Quickening Catalyst, so their
+    // proc-chance INPUTS moved with it (seven really moved: 0.01 to 0.02 for
+    // billet/plating/setting/chassis, 0 to 0.02 for cording/stock/reagent;
+    // bolt and vellum already sat at 0.02 via sunpetal_herb). Pinned so the
+    // move is a fact a retune must confront, not an accident. The companion
+    // arm below is why it ships no behavior.
+    for (const recipe of INTERMEDIATE_RECIPES) {
+      expect(materialTierBonusForReagents(recipe.reagents), recipe.id).toBe(0.02);
+    }
+  });
+
+  it('the moved intermediate inputs are EFFECT-DEAD: slotless junk never bakes a bonus', () => {
+    // Every intermediate output is slotless junk, so masterworkBonusStats
+    // returns null and the crafting.ts effect gate never fires regardless of
+    // the raised chance input above. This is the pin that makes the
+    // material_tier.ts rationale comment true rather than asserted.
+    for (const recipe of INTERMEDIATE_RECIPES) {
+      const def = ITEMS[recipe.resultItemId];
+      expect(
+        masterworkBonusStats({
+          level: recipe.level,
+          quality: def.quality,
+          slot: def.slot,
+          stats: def.stats,
+        }),
+        recipe.id,
+      ).toBeNull();
+    }
+  });
+
   it('a tier-0-only reagent list resolves to exactly 0 (the golden-safety arm)', () => {
     expect(
       materialTierBonusForReagents([
@@ -892,5 +935,61 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
     expect(baseline.result.ok).toBe(true);
     expect(baseline.result.masterwork).toBeUndefined();
     expect(baseline.draws).toBe(1);
+  });
+});
+
+describe('R1: the masterwork proc never mints a quality bump on an APEX craft', () => {
+  // The ruling: on a masterwrought output the craft-time proc grants a
+  // Perfecting head start (phase 12) INSTEAD OF a quality bump; the epic to
+  // legendary stat cliff is exactly what fork B exists to avoid, so phase 08
+  // ships the suppression the moment the first epic slotted crafted outputs
+  // exist. The roll is FORCED to 0 (below every reachable chance) so the
+  // suppression is the only thing standing between the proc and the bump,
+  // and the control arm proves the forcing genuinely forces.
+  const craftForced = (recipeId: string, activeArchetype: string | null) => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    // An Infinity archetype ceiling for the apex arm, so the ceiling gate
+    // cannot be the reason the bump stays off (that would make this arm
+    // pass vacuously for a pre-attunement crafter).
+    if (activeArchetype) meta.archetype.activeArchetype = activeArchetype;
+    const recipe = recipeById(recipeId)!;
+    if (recipe.stationType) {
+      const station = stationsOfType(STATIONS, recipe.stationType as StationType)[0];
+      const e = (sim as any).entities.get(pid);
+      e.pos.x = station.pos.x;
+      e.pos.z = station.pos.z;
+      e.prevPos = { ...e.pos };
+    }
+    meta.knownRecipes?.add(recipe.id);
+    for (const g of recipe.reagents) sim.addItem(g.itemId, g.count, pid);
+    // Force the single output-side proc draw: 0 is below every reachable
+    // chance (base 0.03 at minimum), so absent the R1 guard the masterwork
+    // effect WOULD fire on this craft.
+    const rng: Rng = (sim as any).ctx.rng;
+    (rng as any).next = () => 0;
+    runCraft(sim, recipe.id, false, pid);
+    return { meta, result: { ...(sim as any).lastCraftResult } };
+  };
+
+  it('a forced proc on a masterwrought output grants a plain signed copy, never a bump', () => {
+    const apex = craftForced('recipe_spiritweld_girdle', 'armorcrafting');
+    expect(apex.result.ok).toBe(true);
+    expect(apex.result.masterwork).toBeUndefined();
+    const slot = apex.meta.inventory.find(
+      (s: { itemId: string }) => s.itemId === 'spiritweld_girdle',
+    );
+    expect(slot, 'the apex piece was granted').toBeTruthy();
+    // Epic def quality still signs the instance (#1149); the R1 guard only
+    // removes the rolled masterwork record.
+    expect(slot.instance?.signer).toBeTruthy();
+    expect(slot.instance?.rolled).toBeUndefined();
+  });
+
+  it('the control: the same forced roll still procs a non-apex craft', () => {
+    const control = craftForced('recipe_eastbrook_ritual_vestments', null);
+    expect(control.result.ok).toBe(true);
+    expect(control.result.masterwork).toBe(true);
   });
 });

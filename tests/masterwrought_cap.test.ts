@@ -11,6 +11,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import { type EquipSlot, type ItemDef, isEquipSlot } from '../src/sim/types';
 import { supportedLanguages } from '../src/ui/i18n';
+import { guideStrings } from '../src/ui/i18n.catalog/guide';
 import { DICT } from '../src/ui/sim_i18n';
 
 // Masterwrought is a COUNTED equip family, not a per-item one: a character may
@@ -27,7 +28,10 @@ const LEGENDARY_ERROR = 'You can only equip one legendary Masterwrought item.';
 // sockets plus a neck (three flagged pieces with no armor-weight or dual-wield
 // preconditions), a shield the two-hander displaces, and the two-hander itself.
 // Injected into the live ITEMS table the way unique_equipped/grant_line_view do,
-// and removed afterward; no shipped item carries the flag until content lands.
+// and removed afterward. Since phase 08 the flag also SHIPS on the nine apex
+// armor pieces (tests/masterwrought_budget.test.ts owns that catalog); the
+// synthetic set stays because it covers slot shapes no shipped item exercises
+// yet (jewelry sockets, the shield displacement, the two-hander).
 const RING_ID = 'test_masterwrought_ring';
 const AMULET_ID = 'test_masterwrought_amulet';
 const EMBER_ID = 'test_masterwrought_ember_band';
@@ -167,6 +171,10 @@ describe('masterwrought cap constants', () => {
     // chain from test literal to matcher to emit with no self-comparison link.
     expect(DICT.en['error.masterwroughtCap']).toBe(CAP_ERROR);
     expect(DICT.en['error.masterwroughtLegendary']).toBe(LEGENDARY_ERROR);
+    // The guide gear page (phase 08) spells the equip cap as prose too, in
+    // English and five non-Latin fills: one more copy site the cap retune
+    // sweep above must reach.
+    expect(guideStrings.gear.masterwroughtBody).toContain('at most two Masterwrought');
   });
 
   it('carries a real translation of both refusals in every non-English locale', () => {

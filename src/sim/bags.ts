@@ -340,7 +340,11 @@ export function bagsFullError(ctx: SimContext, pid: number): void {
 }
 
 // The bag ladder the pre-bag save migration draws from, ordered by quality
-// tier then size. Mirrors the shipped bag items in content/items.ts.
+// tier then size. Mirrors the shipped DROP-SOURCED bag items in
+// content/items.ts; the crafted apex bag (sunspun_haversack, 16 slots,
+// phase 08) is deliberately absent, since a save migration must never hand
+// out the best bag in the game for free. The migration ceiling therefore
+// stays at the duffel while the true pooled ceiling is now 16 + 4 x 16.
 const MIGRATION_BAGS: { id: string; slots: number; tier: number }[] = [
   { id: 'linen_pouch', slots: 6, tier: 0 }, // common
   { id: 'travelers_knapsack', slots: 8, tier: 0 }, // common

@@ -10,11 +10,17 @@
 // APEX_ARMOR_RECIPES row into this table, so phases 09/10 APPEND rows here
 // in the same change that ships their items.
 import { describe, expect, it } from 'vitest';
+import { ARMOR_RATING } from '../src/sim/content/heroic_loot';
 import { APEX_ARMOR_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { primaryStatBudget } from '../src/sim/item_budget';
 import { itemLevel, primaryStatSum } from '../src/sim/item_level';
-import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/disenchant_reagents';
+import {
+  ARMOR_SECONDARY_BY_TYPE,
+  DISENCHANT_MATERIAL_BY_QUALITY,
+  typedSecondaryFor,
+} from '../src/sim/professions/disenchant_reagents';
+import { isDisenchantable } from '../src/sim/professions/enchanting';
 import type { EquipSlot, ItemDef } from '../src/sim/types';
 
 type RatingField = 'hitRating' | 'critRating' | 'hasteRating';
@@ -222,20 +228,36 @@ describe('masterwrought apex budget sweep', () => {
     expect(primaryStatSum(def)).toBe(row.budget);
     expect(primaryStatSum(def)).toBe(primaryStatBudget(31, 'epic', row.slot));
 
-    // Exactly ONE rating, at exactly the band's 40, the pinned field.
+    // Exactly ONE rating, at exactly the band's 40, the pinned field. The
+    // band tie is live: ARMOR_RATING is what every same-band drop carries,
+    // so a band retune reds here instead of leaving the apex set behind.
     const [field, value] = row.rating;
     expect(def[field]).toBe(value);
     for (const other of RATING_FIELDS) {
       if (other !== field) expect(def[other], `${id} ${other}`).toBeUndefined();
     }
     expect(value).toBe(40);
+    expect(value).toBe(ARMOR_RATING);
     expect(def.spellPower).toBeUndefined();
     expect(def.pvpOffenseRating).toBeUndefined();
     expect(def.pvpDefenseRating).toBeUndefined();
+    // The complement rule from the def comments: the rating COMPLEMENTS the
+    // same-slot reference drop, never duplicates it.
+    expect(
+      (ITEMS[row.armorRef] as unknown as Record<string, unknown>)[field],
+      `${id} duplicates its reference drop's ${field}`,
+    ).toBeUndefined();
 
-    // Armor is COPIED from the same-band same-slot reference, never invented.
+    // Armor is COPIED from the same-band same-slot reference, never invented,
+    // and the reference's identity is pinned too (same slot, same armor
+    // class, same band), so re-pointing armorRef at a coincidentally equal
+    // piece cannot pass.
+    const ref = ITEMS[row.armorRef] as ItemDef & { armorType?: string };
+    expect(ref.slot).toBe(row.slot);
+    expect(ref.armorType).toBe(row.armorType);
+    expect(itemLevel(ref)).toBe(31);
     expect(armor).toBe(row.armor);
-    expect(armor).toBe((ITEMS[row.armorRef].stats as Record<string, number>).armor);
+    expect(armor).toBe((ref.stats as Record<string, number>).armor);
 
     // R2 tradable texture: no binding or market bans of any kind.
     expect(def.soulbound).toBeUndefined();
@@ -266,9 +288,16 @@ describe('masterwrought apex budget sweep', () => {
   });
 
   it('R12: apex epics disenchant to the standard arcane shard', () => {
-    // The disenchant table is keyed on quality alone, so pinning the epic row
-    // plus every def's epic quality (above) is the whole R12 surface.
     expect(DISENCHANT_MATERIAL_BY_QUALITY.epic).toBe('arcane_shard');
+    // The quality row alone predates this phase, so pin the whole R12
+    // surface per def: each apex piece is actually disenchantable (the kind
+    // gate) and yields its armor class's standard typed secondary beside
+    // the shard, the ordinary epic-armor behavior R12 rides on.
+    for (const [id, row] of Object.entries(APEX_ARMOR)) {
+      const def = ITEMS[id];
+      expect(isDisenchantable(def), id).toBe(true);
+      expect(typedSecondaryFor(def), id).toBe(ARMOR_SECONDARY_BY_TYPE[row.armorType]);
+    }
   });
 
   it('the rating spread complements the drops: one Hit piece, crit and haste fill', () => {
@@ -282,6 +311,14 @@ describe('masterwrought apex budget sweep', () => {
     expect(bag.kind).toBe('bag');
     expect(bag.quality).toBe('epic');
     expect(bag.bagSlots).toBe(16);
+    // The same whole-def key whitelist treatment as the armor pieces: any
+    // new field (a bind, a market ban, an effect) must be admitted here.
+    const ALLOWED_BAG_KEYS = new Set(['id', 'name', 'kind', 'quality', 'bagSlots', 'sellValue']);
+    for (const key of Object.keys(bag)) {
+      expect(ALLOWED_BAG_KEYS.has(key), `${APEX_BAG_ID} carries unexpected field ${key}`).toBe(
+        true,
+      );
+    }
     expect(bag.masterwrought).toBeUndefined();
     expect(bag.soulbound).toBeUndefined();
     expect(bag.noMarketList).toBeUndefined();

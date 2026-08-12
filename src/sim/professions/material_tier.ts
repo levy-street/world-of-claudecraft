@@ -39,9 +39,17 @@ import type { ProfessionReagent } from './types';
 // past arcanite (skill-75 crafted, each consuming a Quickening Catalyst plus
 // tier-1/2 mats), but tier 2 is deliberately the ceiling: a new tier would
 // change the masterwork bonus scale, and masterwork.ts constants are locked
-// by ruling. These rows are live exactly where an apex recipe consumes an
-// intermediate (materialTierBonusForReagents takes the MAX across the bill);
-// no pre-phase-08 recipe consumed one, so nothing existing moves.
+// by ruling. Two consumer surfaces exist: the apex rows (the intended one,
+// every bill maxes at tier 2 via its intermediate) AND the nine phase 07
+// intermediate recipes themselves, whose Quickening Catalyst reagent now
+// carries tier 2, raising their masterworkProcChance INPUT (seven of nine
+// move: 0.01 to 0.02 for billet/plating/setting/chassis, 0 to 0.02 for
+// cording/stock/reagent; bolt and vellum already sat at 2 via sunpetal).
+// That input change is EFFECT-DEAD by a separate mechanism: every
+// intermediate output is slotless junk, so masterworkBonusStats returns
+// null and the crafting.ts effect gate never fires (pinned in
+// tests/professions_masterwork.test.ts). The proc draw is unconditional
+// either way, so no rng draw order moves anywhere.
 const BASE_MATERIAL_TIERS: Readonly<Record<string, number>> = Object.freeze({
   iron_ore: 1,
   ashwood_log: 1,

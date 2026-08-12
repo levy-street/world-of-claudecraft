@@ -394,7 +394,7 @@ export function bisKitForRole(
   fillHands(cls, role, kit, weapons, shields, bestBySlot.get('offhand'));
   if (rings[0]) kit.ring1 = rings[0].id;
   if (rings[1]) kit.ring2 = rings[1].id;
-  enforceMasterwroughtCap(role, kit, bestUnflaggedBySlot, rings);
+  enforceMasterwroughtCap(kit, bestUnflaggedBySlot, rings, (id) => roleItemScore(role, ITEMS[id]));
   return kit;
 }
 
@@ -411,23 +411,26 @@ export function bisKitForRole(
  *  phase must extend fillHands: the sweep in tests/server/pbe_boost.test.ts
  *  holds every role kit at the cap either way). The legendary sub-cap needs
  *  no arm until a legendary-flagged def ships. */
-function enforceMasterwroughtCap(
-  role: BoostRole,
+export function enforceMasterwroughtCap(
   kit: Partial<Record<EquipSlot, string>>,
   bestUnflaggedBySlot: ReadonlyMap<string, { id: string; score: number }>,
   rings: readonly { id: string; score: number }[],
+  scoreOf: (id: string) => number,
+  isFlagged: (id: string) => boolean = (id) => !!ITEMS[id]?.masterwrought,
 ): void {
-  const flagged = (Object.entries(kit) as [EquipSlot, string][]).filter(
-    ([, id]) => ITEMS[id]?.masterwrought,
-  );
+  // Exported with injectable score/flag reads for tests: the ring-refill and
+  // empty-fallback arms are unreachable with shipped data (no flagged ring,
+  // weapon, or fallback-less slot exists until phase 09), and synthetic-input
+  // coverage keeps phase 09 from landing on never-executed code.
+  const flagged = (Object.entries(kit) as [EquipSlot, string][]).filter(([, id]) => isFlagged(id));
   if (flagged.length <= MASTERWROUGHT_EQUIP_CAP) return;
   const scored = flagged
-    .map(([slot, id]) => ({ slot, id, score: roleItemScore(role, ITEMS[id]) }))
+    .map(([slot, id]) => ({ slot, id, score: scoreOf(id) }))
     .sort((a, b) => b.score - a.score);
   for (const demoted of scored.slice(MASTERWROUGHT_EQUIP_CAP)) {
     if (demoted.slot === 'ring1' || demoted.slot === 'ring2') {
       const used = new Set(Object.values(kit));
-      const next = rings.find((r) => !ITEMS[r.id]?.masterwrought && !used.has(r.id));
+      const next = rings.find((r) => !isFlagged(r.id) && !used.has(r.id));
       if (next) kit[demoted.slot] = next.id;
       else delete kit[demoted.slot];
       continue;

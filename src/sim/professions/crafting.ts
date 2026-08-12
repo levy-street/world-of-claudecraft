@@ -532,14 +532,22 @@ export function evaluateCraftAdmission(
       )
     : Infinity;
   const bumped = masterworkBumpedQuality(def?.quality);
-  const bonusStats = def
-    ? masterworkBonusStats({
-        level: recipe.level,
-        quality: def.quality,
-        slot: def.slot,
-        stats: def.stats,
-      })
-    : null;
+  // R1 (Masterwrought): the craft-time masterwork proc on an APEX craft
+  // grants a Perfecting head start instead of a quality bump (the epic to
+  // legendary stat cliff is exactly what fork B exists to avoid), so a
+  // masterwrought def never bakes a bonus record and the effect gate below
+  // stays off; phase 12 wires the head start where this suppression sits.
+  // The proc DRAW is untouched (draw order is load-bearing), and the twin
+  // computation in resolveCraft below carries the same guard.
+  const bonusStats =
+    def && !def.masterwrought
+      ? masterworkBonusStats({
+          level: recipe.level,
+          quality: def.quality,
+          slot: def.slot,
+          stats: def.stats,
+        })
+      : null;
   const commissioned = commission && !!meta && isCommissionEligible(def);
   // #2350 capacity gate: the output must fit AFTER the reagents leave, so
   // simulate the consumption on a scratch copy and require EVERY possible
@@ -639,14 +647,19 @@ export function resolveCraftForRecipe(
       )
     : Infinity;
   const bumped = masterworkBumpedQuality(def?.quality);
-  const bonusStats = def
-    ? masterworkBonusStats({
-        level: recipe.level,
-        quality: def.quality,
-        slot: def.slot,
-        stats: def.stats,
-      })
-    : null;
+  // R1 (Masterwrought): same suppression as the capacity-model twin above; a
+  // masterwrought def never bakes a bonus record, so the masterwork effect
+  // gate below can never mint a quality bump on an apex craft. The proc draw
+  // stays unconditional.
+  const bonusStats =
+    def && !def.masterwrought
+      ? masterworkBonusStats({
+          level: recipe.level,
+          quality: def.quality,
+          slot: def.slot,
+          stats: def.stats,
+        })
+      : null;
   const commissioned = commission && !!meta && isCommissionEligible(def);
   // #1301 gold sink: a fee proportional to the recipe's item-level budget,
   // charged on every successful craft, common tier included (the free-floor

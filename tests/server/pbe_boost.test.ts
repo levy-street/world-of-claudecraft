@@ -30,9 +30,11 @@ import {
   buildBoostedCharacterState,
   CLASS_ROLES,
   classItemScore,
+  enforceMasterwroughtCap,
   NYTHRAXIS_ATTUNEMENT_QUESTS,
   pbeBoostEnabled,
   randomBoostName,
+  roleItemScore,
 } from '../../server/pbe_boost';
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import { WARFARE_ITEMS } from '../../src/sim/content/pvp_honor';
@@ -581,6 +583,7 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
   // BiS kit is a boot-time crash, not a quiet miscount). The sweep holds
   // every role kit of every class at the cap.
   it('every role kit of every class carries at most the cap in flagged pieces', () => {
+    let kitsAtCap = 0;
     for (const cls of Object.keys(CLASS_ROLES) as PlayerClass[]) {
       for (const role of CLASS_ROLES[cls]) {
         const kit = bisKitForRole(cls, role);
@@ -589,24 +592,101 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
           flagged.length,
           `${cls}/${role.id} kit exceeds the Masterwrought cap: ${flagged.join(', ')}`,
         ).toBeLessThanOrEqual(MASTERWROUGHT_EQUIP_CAP);
+        if (flagged.length === MASTERWROUGHT_EQUIP_CAP) kitsAtCap += 1;
       }
     }
+    // Positive control: the sweep would also pass if demotion over-fired and
+    // stripped every flagged pick, so require kits genuinely AT the cap (10
+    // of 16 today).
+    expect(kitsAtCap).toBeGreaterThan(0);
   });
 
   it('a demoted slot falls back to the best unflagged piece, not to empty', () => {
     // shaman/elemental was the worst offender pre-fix (waist, legs, and feet
-    // all apex). The kept pair is the two cap-highest scoring flagged picks
-    // (the mail pieces, whose armor credit outscores the leather legs for a
-    // mail wearer); the demoted legs slot must still hold a real, unflagged,
-    // shaman-equippable item.
+    // all apex). The kept pair is DERIVED, not hand-picked: the cap-highest
+    // scoring flagged candidates under the role's own scorer, so this arm
+    // pins the demotion rule itself rather than an argmax literal that rots
+    // on a retune.
     const role = CLASS_ROLES.shaman.find((r) => r.id === 'elemental');
     expect(role, 'shaman elemental role exists').toBeTruthy();
     const kit = bisKitForRole('shaman', role as BoostRole);
-    expect(kit.waist).toBe('spiritweld_girdle');
-    expect(kit.feet).toBe('wardspeaker_sabatons');
-    expect(kit.legs, 'legs slot still filled').toBeTruthy();
-    expect(ITEMS[kit.legs as string]?.masterwrought, 'demoted legs pick unflagged').toBeFalsy();
-    expect(canEquipItem('shaman', ITEMS[kit.legs as string])).toBe(true);
+    const flaggedCandidates = ['spiritweld_girdle', 'fenbloom_breeches', 'wardspeaker_sabatons'];
+    const expectedKept = [...flaggedCandidates]
+      .sort(
+        (a, b) =>
+          roleItemScore(role as BoostRole, ITEMS[b]) - roleItemScore(role as BoostRole, ITEMS[a]),
+      )
+      .slice(0, MASTERWROUGHT_EQUIP_CAP);
+    const worn = Object.values(kit).filter((id) => id && ITEMS[id]?.masterwrought);
+    expect(worn.sort()).toEqual([...expectedKept].sort());
+    // The demoted slot (whichever the scorer ranks last) is refilled with a
+    // real, unflagged, shaman-equippable piece rather than left empty.
+    const demotedId = flaggedCandidates.find((id) => !expectedKept.includes(id)) as string;
+    const demotedSlot = ITEMS[demotedId].slot as EquipSlot;
+    expect(kit[demotedSlot], `${demotedSlot} slot still filled`).toBeTruthy();
+    expect(ITEMS[kit[demotedSlot] as string]?.masterwrought, 'refill unflagged').toBeFalsy();
+    expect(canEquipItem('shaman', ITEMS[kit[demotedSlot] as string])).toBe(true);
+  });
+
+  it('the synthetic arms phase 09 will land on: ring refill and the empty fallbacks', () => {
+    // No flagged ring, weapon, or fallback-less slot ships yet, so these
+    // arms are unreachable through bisKitForRole; drive them with synthetic
+    // input so phase 09's first flagged ring lands on executed code.
+    const isFlagged = (id: string) => id.startsWith('mw_');
+    const scoreOf = (id: string) => ({ mw_chest: 30, mw_waist: 10, mw_ring: 5 })[id] ?? 0;
+    // Ring refill: three flagged picks; the ring is the lowest-scored, so it
+    // demotes and refills from the scored ring list, skipping flagged rings
+    // and rings already worn in the other ring slot.
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      ring1: 'mw_ring',
+      ring2: 'plain_worn_ring',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map([['waist', { id: 'plain_waist', score: 5 }]]),
+      [
+        { id: 'mw_ring', score: 20 },
+        { id: 'plain_worn_ring', score: 9 },
+        { id: 'plain_spare_ring', score: 8 },
+      ],
+      scoreOf,
+      isFlagged,
+    );
+    expect(kit.chest).toBe('mw_chest');
+    expect(kit.ring1).toBe('plain_spare_ring');
+    expect(kit.waist).toBe('mw_waist');
+    // Empty fallbacks: with no unflagged candidate anywhere, the demoted
+    // slots empty rather than keeping over-cap picks (kept = the two
+    // cap-highest: chest 30 and waist 10; the ring at 5 demotes with no
+    // unflagged ring to refill from, and the waistless map exercises the
+    // armor delete arm via a second pass).
+    const bare: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      ring1: 'mw_ring',
+    };
+    enforceMasterwroughtCap(bare, new Map(), [{ id: 'mw_ring', score: 5 }], scoreOf, isFlagged);
+    expect(bare.chest).toBe('mw_chest');
+    expect(bare.waist).toBe('mw_waist');
+    expect(bare.ring1).toBeUndefined();
+    // The armor-slot delete arm: three flagged armor picks, no fallback map.
+    const bareArmor: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      legs: 'mw_legs',
+    };
+    enforceMasterwroughtCap(
+      bareArmor,
+      new Map(),
+      [],
+      (id) => ({ mw_chest: 30, mw_waist: 10, mw_legs: 40 })[id] ?? 0,
+      isFlagged,
+    );
+    expect(bareArmor.legs).toBe('mw_legs');
+    expect(bareArmor.chest).toBe('mw_chest');
+    expect(bareArmor.waist).toBeUndefined();
   });
 
   it('the previously-crashing class builds a boosted character without throwing', () => {
