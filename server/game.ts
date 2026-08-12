@@ -16,7 +16,7 @@ import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
-import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
+import { SPORT_ROLES, VC_NATION_IDS } from '../src/sim/content/vale_cup';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
@@ -215,6 +215,7 @@ import {
   harvestBandForNode,
   harvestTierForNode,
 } from './economy_telemetry';
+import { isUpdateDue } from './entity_update_cadence';
 // Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
 // barrels), the same way deeds_records imports onDeedRecorded: the barrels
 // drag routes.ts (and its load-time requireAccount over the db module) into
@@ -224,6 +225,15 @@ import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
 import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
+import {
+  classifyOnlineGeneralChat,
+  GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT,
+  GeneralChatQuotaCoordinator,
+  type GeneralChatRateLimitHydration,
+  GeneralChatRateLimitLiveState,
+  resolveGeneralChatAdmission,
+} from './general_chat_quota';
+import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
@@ -310,6 +320,7 @@ import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
+import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
 import { createSerialWriter } from './serial_writer';
 import {
@@ -359,14 +370,6 @@ const INTEREST_QUERY_RADIUS = NPC_DROP_RADIUS;
 // the cross-slot corner check in tests/battleground_band.test.ts.
 export const BG_MATCH_INTEREST_RADIUS = 300;
 export const BG_MATCH_DROP_RADIUS = 320;
-// Distance-tiered update rates: full snapshot rate inside nameplate range
-// (55yd, beyond every ability range), half rate out to the 80yd draw range,
-// quarter rate beyond. The viewer's target and anything attacking the
-// viewer always update at full rate regardless of distance.
-const FULL_RATE_RADIUS_SQ = 55 * 55;
-const HALF_RATE_RADIUS_SQ = 80 * 80;
-const HALF_RATE_DIVISOR = 2;
-const QUARTER_RATE_DIVISOR = 4;
 // How often the achieved tick rate rides the snapshot head. The meter's 3s
 // sliding window moves slowly and the client holds the last value across
 // omissions, so ~2 Hz keeps the overlay live without paying the scalar on
@@ -814,6 +817,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'unequip_bag',
   'use',
   'discard',
+  'lock_item',
   'buy',
   'sell',
   'buyback',
@@ -981,6 +985,11 @@ export interface ClientSession {
   chatLastRateError: number;
   chatRateViolations: number;
   chatCooldownUntil: number;
+  // Advances only when rememberedChat is written (rememberChatChannel), so the
+  // async General quota path can fence its sticky-channel set against a NEWER
+  // channel selection without unrelated commands (/who, /unstuck) tripping it.
+  chatChannelSequence: number;
+  generalChatRateLimit: GeneralChatRateLimit | null;
   // Pre-parse inbound gate state (#978): the frame and byte token buckets
   // plus the windowed abuse score, covering every frame (input, cast, cmd,
   // ...), separate from the chat-only bucket above, so a client flooding
@@ -1653,29 +1662,6 @@ function bgWideInterestApplies(
   return viewerBgTeam?.includes(subjectId) ?? false;
 }
 
-// full rate close up and for anything the viewer is fighting; mid range
-// updates every other tick, far entities every fourth. Measured against
-// the per-session last-sent tick rather than a tick-parity stagger: when
-// the event loop degrades and one broadcast covers several sim ticks, a
-// parity check can stay permanently false and starve entities frozen
-function isUpdateDue(
-  tick: number,
-  e: Entity,
-  d2: number,
-  viewer: Entity,
-  sentAtTick: number,
-): boolean {
-  // The one Vale Cup ball is watched by the whole Sowfield: a far keeper sits
-  // past the 55yd full-rate tier and the stands past 80yd, where a ~25 yd/s
-  // ball turns visibly steppy at half/quarter rate. One entity at full rate
-  // costs one lite record per tick, so it is always due.
-  if (e.templateId === VALE_CUP_BALL_TEMPLATE_ID) return true;
-  if (d2 <= FULL_RATE_RADIUS_SQ) return true;
-  if (viewer.targetId === e.id || e.aggroTargetId === viewer.id) return true;
-  const divisor = d2 <= HALF_RATE_RADIUS_SQ ? HALF_RATE_DIVISOR : QUARTER_RATE_DIVISOR;
-  return tick - sentAtTick >= divisor;
-}
-
 // Per-entity wire fragments, refreshed lazily at most once per tick and
 // shared by every recipient. The version counters bump only when the
 // serialized form actually changes, making per-session diffing O(1).
@@ -1877,6 +1863,8 @@ export class GameServer {
   // a throw.
   private readonly guildBankDeleteWindows = new Set<number>();
   private readonly moderation: ModerationService<ClientSession>;
+  private readonly generalChatQuota: GeneralChatQuotaCoordinator;
+  private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
@@ -2077,7 +2065,13 @@ export class GameServer {
   private readonly riftUpgrader: RiftUpgradeCoordinator;
   private readonly riftAssets: RiftAssetCoordinator;
 
-  constructor() {
+  constructor(generalChatQuotaMaxInFlight = GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT) {
+    this.generalChatQuota = new GeneralChatQuotaCoordinator({
+      consume: consumeGeneralChatQuota,
+      maxInFlight: generalChatQuotaMaxInFlight,
+      observeDbCall: (outcome, durationSeconds) =>
+        gameMetricsCounters().generalChatQuotaDbCall(outcome, durationSeconds),
+    });
     this.sim = new Sim({
       seed: WORLD_SEED,
       playerClass: 'warrior',
@@ -3193,6 +3187,44 @@ export class GameServer {
     }
   }
 
+  /** Apply a committed cross-process policy notification to live sessions. */
+  applyGeneralChatRateLimitLive(accountId: number, rateLimit: GeneralChatRateLimit | null): void {
+    this.generalChatRateLimitLiveState.policyChanged(accountId, rateLimit);
+    this.generalChatQuota.policyChanged(accountId);
+    for (const session of this.clients.values()) {
+      if (session.accountId === accountId) session.generalChatRateLimit = rateLimit;
+    }
+  }
+
+  /** Replace active-session policy state after the LISTEN connection resynchronizes. */
+  resyncGeneralChatRateLimits(
+    accountIds: readonly number[],
+    policies: ReadonlyMap<number, GeneralChatRateLimit>,
+  ): void {
+    const queried = new Set(accountIds);
+    for (const session of this.clients.values()) {
+      if (!queried.has(session.accountId)) continue;
+      session.generalChatRateLimit = policies.get(session.accountId) ?? null;
+    }
+    for (const accountId of queried) {
+      this.generalChatRateLimitLiveState.policyChanged(accountId, policies.get(accountId) ?? null);
+      this.generalChatQuota.policyChanged(accountId);
+    }
+  }
+
+  /** Fence an auth-query policy snapshot against later LISTEN notifications. */
+  beginGeneralChatRateLimitHydration(accountId: number): GeneralChatRateLimitHydration {
+    return this.generalChatRateLimitLiveState.beginHydration(accountId);
+  }
+
+  generalChatQuotaInFlight(): number {
+    return this.generalChatQuota.inFlight;
+  }
+
+  generalChatQuotaCachedAccounts(): number {
+    return this.generalChatQuota.cachedAccounts;
+  }
+
   /** The chat flair of the session at `pid`, read from the SESSION, never an entity. */
   private chatFlairForPid(pid: number): ChatSenderFlair | undefined {
     return this.clients.get(pid)?.chatFlair;
@@ -3711,6 +3743,7 @@ export class GameServer {
         leaseNonce?: string;
         timerWireVersion?: 1 | StableTimerWireVersion;
         petSpecialWireVersion?: 0 | PetSpecialWireVersion;
+        generalChatRateLimit?: GeneralChatRateLimit | null;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
@@ -3841,6 +3874,8 @@ export class GameServer {
       chatLastRateError: 0,
       chatRateViolations: 0,
       chatCooldownUntil: 0,
+      chatChannelSequence: 0,
+      generalChatRateLimit: meta.generalChatRateLimit ?? null,
       msgRate: createMsgRateBucket(Date.now() / 1000),
       msgLanes: createMsgLanes(Date.now() / 1000),
       listReadGuard: createListReadGuard(Date.now() / 1000),
@@ -4052,6 +4087,8 @@ export class GameServer {
     session.chatMutedUntil = meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null;
     session.chatMuteReason = meta.reason ?? '';
     session.chatStrikes = meta.chatStrikes ?? session.chatStrikes;
+    session.generalChatRateLimit = meta.generalChatRateLimit ?? null;
+    this.generalChatQuota.policyChanged(session.accountId);
     session.isAdmin = meta.isAdmin ?? false;
     session.adminPermissions = new Set(meta.adminPermissions ?? []);
     // Re-validate the freshly-read layout (untrusted at rest), same as a fresh
@@ -4247,6 +4284,9 @@ export class GameServer {
     this.cancelAndRecordUnstuck(session);
     session.left = true;
     this.clients.delete(session.pid);
+    if (![...this.clients.values()].some((live) => live.accountId === session.accountId)) {
+      this.generalChatQuota.forgetAccount(session.accountId);
+    }
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
     this.releaseIpSession(session.ip);
     void this.recordOnlineSnapshot();
@@ -6603,6 +6643,19 @@ export class GameServer {
       this.sendCommandOutcome(session, msg, false);
       return;
     }
+    // The Rift forge trio shipped sim+wire complete with no client UI, so the
+    // arms stay closed until the realm explicitly opts in (RIFT_FORGE_ENABLED=1;
+    // rationale in server/rift_forge_gate.ts): a crafted frame must not buy
+    // progression the stock client cannot reach. Refused ABOVE the heavy-self
+    // dirty flag below, so a blocked command cannot force a re-diff either.
+    if (refusedRiftForgeCommand(msg.cmd)) {
+      // Label-free by contract (game_signals.ts): the stock client never sends
+      // these, so the counter is the ops signal that a modified client probes
+      // the closed forge (and that a realm forgot the flag once the UI ships).
+      gameMetricsCounters().riftForgeRefused();
+      this.sendCommandOutcome(session, msg, false);
+      return;
+    }
     // A command that can change a heavy self field forces the next snapshot to
     // re-diff those fields (combat-only commands like cast/target/attack do not,
     // which is what keeps the gating a win during a fight).
@@ -6663,6 +6716,9 @@ export class GameServer {
         break;
       case 'tab':
         sim.tabTarget(pid);
+        break;
+      case 'tabPrev':
+        sim.tabTargetPrev(pid);
         break;
       case 'targetNearest':
         sim.targetNearestEnemy(pid);
@@ -6833,6 +6889,15 @@ export class GameServer {
             pid,
             slot,
           );
+        }
+        break;
+      case 'lock_item':
+        // Always a named slot (issue 3042): a lock toggle mutates ONE specific
+        // bag copy in place, never an id-only bulk action, so a missing/invalid
+        // slot is simply refused inside the sim (selectedInventorySlot).
+        if (typeof msg.item === 'string' && typeof msg.locked === 'boolean') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.setItemLocked(msg.item, msg.locked, pid, slot);
         }
         break;
       case 'buy':
@@ -7219,6 +7284,13 @@ export class GameServer {
         // generous than the ladder, the ladder's cooldown messaging still
         // fires on the subset the lane passes.
         if (!this.consumeLane(session, 'chat', receivedAtMs / 1000)) break;
+        const generalCandidate = classifyOnlineGeneralChat(text, session.rememberedChat.channel);
+        const configuredGeneral =
+          generalCandidate !== null && session.generalChatRateLimit !== null;
+        // Reserve the ordinary chat token before any quota DB work. This sheds
+        // attempts already in the generic cooldown without touching Postgres;
+        // a quota refusal refunds the reservation, so it cannot escalate that
+        // independent all-chat limiter.
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
         if (whoMatch) {
@@ -7242,6 +7314,14 @@ export class GameServer {
         // "!" community commands (lfg/wts/...): broadcast in-world + cross-post to
         // Discord, then stop (not normal chat).
         if (text.startsWith('!') && this.handleRelayCommand(session, text)) break;
+        if (configuredGeneral && generalCandidate) {
+          this.admitGeneralChat(
+            session,
+            generalCandidate.canonicalText,
+            session.chatChannelSequence,
+          );
+          break;
+        }
         // guild and officer chat are persistent + cross-zone, so they live in
         // the server's SocialService rather than the sim (no guild concept).
         // MMO convention: /g is guild; /general remains world chat.
@@ -7252,7 +7332,7 @@ export class GameServer {
           const match = gm ?? om;
           if (!match) break;
           const body = match[1];
-          session.rememberedChat = { channel };
+          this.rememberChatChannel(session, { channel });
           const route = gm
             ? this.social.guildChat(this.actorFor(session), body)
             : this.social.officerChat(this.actorFor(session), body);
@@ -7282,7 +7362,10 @@ export class GameServer {
             });
             break;
           }
-          session.rememberedChat = { channel: 'whisper', target: session.lastWhisperFrom };
+          this.rememberChatChannel(session, {
+            channel: 'whisper',
+            target: session.lastWhisperFrom,
+          });
           this.logChat(session, sim.chat(`/w ${session.lastWhisperFrom} ${rm[1]}`, pid));
           break;
         }
@@ -7847,6 +7930,7 @@ export class GameServer {
             armorClass: msg.armorClass,
             primaryStat: msg.primaryStat,
             rarity: msg.rarity,
+            sort: msg.sort,
             page: typeof msg.page === 'number' ? msg.page : 0,
           }),
           pid,
@@ -10056,7 +10140,7 @@ export class GameServer {
               // every fighter after every match into "You are not in a
               // battleground." Drop back to say, and only from bg.
               if (ev.type === 'bgEnd' && session.rememberedChat.channel === 'battleground') {
-                session.rememberedChat = { channel: 'say' };
+                this.rememberChatChannel(session, { channel: 'say' });
               }
               // remember the last person to whisper us, for /r reply (the
               // recipient copy of a whisper has no `to`; the sender echo does)
@@ -10288,12 +10372,20 @@ export class GameServer {
     const sent = this.sim.chat(text, pid);
     if (sent) {
       if (sent.channel === 'whisper') {
-        if (sent.target) session.rememberedChat = { channel: 'whisper', target: sent.target };
+        if (sent.target) {
+          this.rememberChatChannel(session, { channel: 'whisper', target: sent.target });
+        }
       } else {
-        session.rememberedChat = { channel: sent.channel };
+        this.rememberChatChannel(session, { channel: sent.channel });
       }
     }
     return sent;
+  }
+
+  /** Every sticky-channel write advances the fence the async General path checks. */
+  private rememberChatChannel(session: ClientSession, value: RememberedChat): void {
+    session.chatChannelSequence++;
+    session.rememberedChat = value;
   }
 
   private logChat(session: ClientSession, sent: import('../src/sim/sim').SentChat | null): void {
@@ -10306,6 +10398,40 @@ export class GameServer {
       channel: sent.channel,
       message: sent.message,
     });
+  }
+
+  private admitGeneralChat(
+    session: ClientSession,
+    canonicalText: string,
+    channelSequence: number,
+  ): void {
+    // Capture the whole authority context before the await. A reconnect
+    // changes ws, a leave changes membership, and any newer channel selection
+    // advances chatChannelSequence, so no stale completion can broadcast or
+    // rewrite the sticky channel a later command chose. Resolution semantics
+    // (refunds, dropped accounting, refusal events) live in the quota module.
+    const { accountId, characterId, pid, ws } = session;
+    void resolveGeneralChatAdmission(
+      this.generalChatQuota.admit(accountId, session.generalChatRateLimit),
+      {
+        sessionCurrent: () =>
+          !session.left &&
+          !session.linkdead &&
+          this.clients.get(pid) === session &&
+          session.ws === ws &&
+          session.characterId === characterId,
+        refundChatToken: () => this.refundChatToken(session),
+        deliver: () => {
+          const sent = this.sim.chat(canonicalText, pid);
+          if (sent && session.chatChannelSequence === channelSequence) {
+            this.rememberChatChannel(session, { channel: 'general' });
+          }
+          this.logChat(session, sent);
+        },
+        notify: (event) => this.send(session, { t: 'events', list: [event] }),
+        recordOutcome: (outcome) => gameMetricsCounters().generalChatQuota(outcome),
+      },
+    );
   }
 
   // One-off, player-facing chat notice (reuses the generic error event path the
@@ -10537,6 +10663,10 @@ export class GameServer {
       });
     }
     return false;
+  }
+
+  private refundChatToken(session: ClientSession): void {
+    session.chatTokens = Math.min(CHAT_RATE_BURST, session.chatTokens + 1);
   }
 
   private isChatMuted(session: ClientSession): boolean {

@@ -297,7 +297,8 @@ collision/movement.
   userData but silently DROPS `onBeforeCompile`, and three keys its program cache
   on `customProgramCacheKey()`, whose default return value IS
   `onBeforeCompile.toString()`. So a bare clone of a patched material (rim glow,
-  the worn surface-detail layer) both renders un-patched AND links a whole new
+  the worn surface-detail layer, the armour dye that carries a player's outfit
+  colorway, `characters/armor_dye.ts`) both renders un-patched AND links a whole new
   program on its first draw, wherever that draw lands. `cloneMaterialWithHooks`
   re-attaches exactly the layers the source carried, in the source's order, so
   the composed key comes out identical and the clone reuses the linked program.

@@ -26,10 +26,12 @@ import {
   type BgTeam,
   keepInteriorBounds,
 } from '../battleground_layout';
+import { resolvePosition } from '../colliders';
 import { applyGreaterInvisibilityAftereffect } from '../combat/greater_invisibility';
 import { BG_SLOT_COUNT, battlegroundOrigin } from '../data';
 import { createGroundObject } from '../entity';
 import { detachFromDungeon } from '../instances/dungeons';
+import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { type MatchPetSnapshot, restoreMatchPet, snapshotMatchPet } from '../pet/pet_match_return';
 import { restorePetOnOwnerRevive } from '../pet/pet_owner_revive';
 import {
@@ -332,7 +334,7 @@ export function bgActiveFighterPids(ctx: SimContext, match: BgMatch): number[] {
   return match.state === 'active' ? bgAllPids(match).filter((pid) => ctx.entities.has(pid)) : [];
 }
 
-function bgEmitAll(ctx: SimContext, match: BgMatch, ev: (pid: number) => void): void {
+function bgEmitAll(_ctx: SimContext, match: BgMatch, ev: (pid: number) => void): void {
   for (const mp of bgAllPids(match)) ev(mp);
 }
 
@@ -481,7 +483,7 @@ export function bgFlagAction(ctx: SimContext, pid?: number): void {
   if (!r) return;
   const id = r.meta.entityId;
   const match = ctx.bgMatches.get(id);
-  if (!match || match.state !== 'active' || r.e.dead) return;
+  if (match?.state !== 'active' || r.e.dead) return;
   const near = match.flags.some(
     (f) =>
       f.state !== 'carried' &&
@@ -1158,6 +1160,40 @@ function placeInBg(
   e.mountCastKey = '';
 }
 
+export function bgUnstuckDestination(ctx: SimContext, pid: number): Vec3 | null {
+  const match = ctx.bgMatches.get(pid);
+  const e = ctx.entities.get(pid);
+  if (!match || !e || match.fightersReleased) return null;
+  const team = bgTeamOf(match, pid);
+  const origin = battlegroundOrigin(match.slot);
+  const plot = BG_GRAVEYARDS[team];
+  const candidates = [
+    { x: plot.x, z: plot.z },
+    { x: plot.x - plot.hw * 0.5, z: plot.z },
+    { x: plot.x + plot.hw * 0.5, z: plot.z },
+    { x: plot.x, z: plot.z - plot.hd * 0.5 },
+    { x: plot.x, z: plot.z + plot.hd * 0.5 },
+    { x: plot.x - plot.hw * 0.5, z: plot.z - plot.hd * 0.5 },
+    { x: plot.x + plot.hw * 0.5, z: plot.z + plot.hd * 0.5 },
+    { x: plot.x - plot.hw * 0.5, z: plot.z + plot.hd * 0.5 },
+    { x: plot.x + plot.hw * 0.5, z: plot.z - plot.hd * 0.5 },
+    ...BG_BASES[team].spawns,
+  ];
+  for (const candidate of candidates) {
+    const x = origin.x + candidate.x;
+    const z = origin.z + candidate.z;
+    const resolved = resolvePosition(ctx.cfg.seed, x, z, PLAYER_BODY_RADIUS);
+    const insideGraveyard =
+      Math.abs(resolved.x - (origin.x + plot.x)) <= plot.hw &&
+      Math.abs(resolved.z - (origin.z + plot.z)) <= plot.hd;
+    const insideKeep = BG_BASES[team].spawns.includes(candidate);
+    if (Math.hypot(resolved.x - x, resolved.z - z) <= 1e-6 && (insideGraveyard || insideKeep)) {
+      return ctx.groundPos(x, z);
+    }
+  }
+  return null;
+}
+
 function spawnFlagEntity(ctx: SimContext, flag: BgFlagState): void {
   const e = createGroundObject(ctx.nextId++, '', `${BG_TEAM_NAMES[flag.team]} Flag`, {
     ...flag.pos,
@@ -1199,7 +1235,7 @@ function tickWaveRespawns(ctx: SimContext, match: BgMatch): void {
     match.waveIn[team] += BG_WAVE_PERIOD;
     match.teams[team].forEach((pid) => {
       const e = ctx.entities.get(pid);
-      if (!e || !e.dead || !e.ghost) return;
+      if (!e?.dead || !e.ghost) return;
       e.ghost = false;
       // Cooldowns persist through a battleground death (classic rules); only
       // the match start hands out the full clean slate.
@@ -1237,7 +1273,7 @@ function tickGraveyards(ctx: SimContext, match: BgMatch): void {
     const maxZ = origin.z + plot.z + plot.hd - WARD_INSET;
     for (const pid of match.teams[team]) {
       const e = ctx.entities.get(pid);
-      if (!e || !e.dead || !e.ghost) continue;
+      if (!e?.dead || !e.ghost) continue;
       const cx = Math.min(maxX, Math.max(minX, e.pos.x));
       const cz = Math.min(maxZ, Math.max(minZ, e.pos.z));
       if (cx !== e.pos.x || cz !== e.pos.z) {
@@ -1504,7 +1540,7 @@ function clearCarrierAuras(ctx: SimContext, flag: BgFlagState): void {
 export function bgCancelCarriedFlagAura(ctx: SimContext, e: Entity, auraId: string): boolean {
   if (auraId !== CARRIED_FLAG_AURA_ID) return false;
   const match = ctx.bgMatches.get(e.id);
-  if (!match || match.state !== 'active') return false;
+  if (match?.state !== 'active') return false;
   const flag = match.flags.find((f) => f.carrier === e.id);
   if (!flag) return false;
   // The same authoritative drop the stealth path takes: the flag lands at the
@@ -1634,7 +1670,7 @@ function dropFlag(ctx: SimContext, match: BgMatch, flag: BgFlagState, at: Entity
  */
 export function bgOnPlayerDamaged(ctx: SimContext, victim: Entity, source: Entity): void {
   const match = ctx.bgMatches.get(victim.id);
-  if (!match || match.state !== 'active') return;
+  if (match?.state !== 'active') return;
   // A pet's work is its owner's, the same credit rule the killing blow uses.
   const attackerId = source.kind === 'player' ? source.id : (source.ownerId ?? -1);
   if (attackerId < 0 || attackerId === victim.id) return;
@@ -1663,7 +1699,7 @@ export function bgOnPlayerDamaged(ctx: SimContext, victim: Entity, source: Entit
  */
 export function bgOnPlayerHealed(ctx: SimContext, target: Entity, source: Entity): void {
   const match = ctx.bgMatches.get(target.id);
-  if (!match || match.state !== 'active') return;
+  if (match?.state !== 'active') return;
   const healerId = source.kind === 'player' ? source.id : (source.ownerId ?? -1);
   if (healerId < 0 || healerId === target.id) return; // self-healing is not support
   if (ctx.bgMatches.get(healerId) !== match) return;
@@ -1684,7 +1720,7 @@ export function bgOnPlayerHealed(ctx: SimContext, target: Entity, source: Entity
  *  then waits for the player's own release (spirit.ts owns the rite). */
 export function bgOnPlayerDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
   const match = ctx.bgMatches.get(e.id);
-  if (!match || match.state !== 'active') return;
+  if (match?.state !== 'active') return;
   for (const flag of match.flags) {
     if (flag.carrier === e.id) dropFlag(ctx, match, flag, e);
   }

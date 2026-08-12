@@ -30,6 +30,7 @@ function q(over: Partial<MarketQuery> = {}): MarketQuery {
     armorClass: 'all',
     primaryStat: 'all',
     rarity: 'all',
+    sort: 'name',
     page: 0,
     ...over,
   };
@@ -494,6 +495,18 @@ describe('World Market filters', () => {
     const invalid = sanitizeMarketQuery({ armorClass: 'plate', primaryStat: 'stamina' });
     expect(invalid.armorClass).toBe('all');
     expect(invalid.primaryStat).toBe('all');
+  });
+
+  // Issue #3102: the browse sort axis. Unlike the dropdown filters above it has no
+  // meaningful "all" fallback (there is always an active order), so an omitted or
+  // invalid wire value falls back to the classic name-then-price default rather
+  // than an 'all' sentinel.
+  it('sanitizes the sort axis, defaulting to the classic name order', () => {
+    expect(sanitizeMarketQuery({ sort: 'price' }).sort).toBe('price');
+    expect(sanitizeMarketQuery({ sort: 'name' }).sort).toBe('name');
+    expect(sanitizeMarketQuery({ sort: 'cheapest' }).sort).toBe('name');
+    expect(sanitizeMarketQuery({}).sort).toBe('name');
+    expect(sanitizeMarketQuery(undefined).sort).toBe('name');
   });
 
   it('narrows weapon filters by weapon family', () => {

@@ -698,6 +698,7 @@ function marketInfo(shape: WorldShape): MarketInfo {
     armorClass: 'all',
     primaryStat: 'all',
     rarity: 'all',
+    sort: 'name',
     page: 0,
     pageCount: 1,
     collectionCopper: 0,

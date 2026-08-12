@@ -2526,6 +2526,13 @@ export class CharacterVisual {
     return this.effectSingleMaterial(material) as T;
   }
 
+  // Every overlay cache below clones the rig's live material. They all go
+  // through cloneMaterialWithHooks for the reason material_clone_hooks.ts
+  // spells out: a bare clone() drops onBeforeCompile, so it renders WITHOUT
+  // the rim glow, the worn detail layer and the player's armour dye (a dyed
+  // set reverting to its base colours the moment the character ghosts, goes
+  // shadowform, or shifts to moonkin), and it links a second program on its
+  // first draw because three keys its cache on customProgramCacheKey().
   private effectSingleMaterial(material: THREE.Material): THREE.Material {
     // Death treatments (soul rend, ghost run) win over the shapeshift tints.
     if (this.soulRend) return this.soulRendMaterial(material);
@@ -2545,7 +2552,7 @@ export class CharacterVisual {
     const cache = this.ferocityMaterials[index];
     const cached = cache.get(material);
     if (cached) return cached;
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     const withColor = marked as THREE.Material & {
       color?: THREE.Color;
       emissive?: THREE.Color;
@@ -2576,7 +2583,7 @@ export class CharacterVisual {
     // is unmounted, and the map stays at one clone per source instead of one
     // per (source, color) forever.
     cached?.dispose();
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     marked.userData.runeTintHex = tint;
     const withColor = marked as THREE.Material & {
       color?: THREE.Color;
@@ -2603,7 +2610,7 @@ export class CharacterVisual {
       cached.opacity = opacity;
       return cached;
     }
-    const ghost = material.clone();
+    const ghost = cloneMaterialWithHooks(material);
     ghost.transparent = true;
     ghost.opacity = opacity;
     // depthWrite stays ON: with it off the whole rig depth-blends against
@@ -2618,7 +2625,7 @@ export class CharacterVisual {
   private soulRendMaterial(material: THREE.Material): THREE.Material {
     const cached = this.soulRendMaterials.get(material);
     if (cached) return cached;
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     marked.transparent = true;
     marked.opacity = SOUL_REND_OPACITY;
     marked.depthWrite = false;
@@ -2639,7 +2646,7 @@ export class CharacterVisual {
   private shadowformMaterial(material: THREE.Material): THREE.Material {
     const cached = this.shadowformMaterials.get(material);
     if (cached) return cached;
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     marked.transparent = true;
     marked.opacity = SHADOWFORM_OPACITY;
     marked.depthWrite = true;
@@ -2660,7 +2667,7 @@ export class CharacterVisual {
   private moonkinMaterial(material: THREE.Material): THREE.Material {
     const cached = this.moonkinMaterials.get(material);
     if (cached) return cached;
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     marked.transparent = true;
     marked.opacity = MOONKIN_OPACITY;
     marked.depthWrite = true;
@@ -2681,7 +2688,7 @@ export class CharacterVisual {
   private ascensionMaterial(material: THREE.Material): THREE.Material {
     const cached = this.ascensionMaterials.get(material);
     if (cached) return cached;
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     const withColor = marked as THREE.Material & {
       color?: THREE.Color;
       emissive?: THREE.Color;

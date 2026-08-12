@@ -14,9 +14,10 @@ import { ITEMS } from '../src/sim/data';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Consuming, Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function makeSim(cls: 'warrior' | 'priest' | 'hunter' | 'mage' = 'warrior', seed = 4242): Sim {
-  return new Sim({ seed, playerClass: cls, autoEquip: false });
+  return new Sim({ seed, playerClass: cls, autoEquip: false, world: EMPTY_TEST_WORLD });
 }
 
 describe('#1608: eating stacks with natural hp regen', () => {
@@ -141,7 +142,13 @@ describe('#1608: potionHp/potionMana ladder', () => {
     cls: 'priest' | 'paladin',
     level: number,
   ): { maxHp: number; maxResource: number } {
-    const sim = new Sim({ seed: 1, playerClass: cls, autoEquip: false, noPlayer: true });
+    const sim = new Sim({
+      seed: 1,
+      playerClass: cls,
+      autoEquip: false,
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim.addPlayer(cls, 'Ref');
     sim.setPlayerLevel(level, pid);
     const p = (sim as unknown as { entities: Map<number, Entity> }).entities.get(pid) as Entity;

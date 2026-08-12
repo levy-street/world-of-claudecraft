@@ -801,6 +801,11 @@ export const en_CA: EnTranslations = {
       "resetAction": "Reset",
       "note": "Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Swing",
       "seconds": "{seconds}s"
@@ -892,6 +897,14 @@ export const en_CA: EnTranslations = {
       "bodyWithVersion": "Version {version} of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
       "notNow": "Not now",
       "update": "Update"
+    },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
     },
     "cameraPrompt": {
       "title": "Choose Your Camera",
@@ -994,6 +1007,7 @@ export const en_CA: EnTranslations = {
       "emoteWheel": "Emote Wheel",
       "targetFriendly": "Target Nearest Friendly",
       "targetFriendlyNext": "Cycle Friendly Target",
+      "targetPrev": "Cycle Target Backward",
       "discord": "Discord",
       "valecup": "Vale Cup",
       "bgFlag": "Battleground Flag Action",
@@ -2187,6 +2201,10 @@ export const en_CA: EnTranslations = {
       "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, quantity {count}, masterwork",
       "itemAriaQuest": "{item}, quantity {count}, quest item",
+      "itemAriaLocked": "{item}, quantity {count}, locked",
+      "itemLockedLine": "Locked",
+      "lockItem": "Lock Item",
+      "unlockItem": "Unlock Item",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",
@@ -3217,6 +3235,7 @@ export const en_CA: EnTranslations = {
       "craftedToast": "Crafted: {name}",
       "craftedToastQty": "Crafted: {name} x{qty}",
       "insufficientMaterials": "You do not have the materials for that.",
+      "reagentLocked": "A reagent for that is locked.",
       "unknownRecipe": "That recipe does not exist.",
       "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe.",
       "comboRequires": "Attunement: {craftA} + {craftB}, tier {tier}.",
@@ -3323,6 +3342,7 @@ export const en_CA: EnTranslations = {
       "notHeld": "You do not have that item.",
       "notDisenchantable": "You cannot disenchant that.",
       "notSalvageable": "You cannot salvage that.",
+      "salvageLocked": "That item is locked.",
       "disenchantBusy": "You are busy.",
       "salvageBusy": "You are busy.",
       "enchantBusy": "You are busy.",
@@ -4169,6 +4189,7 @@ export const en_CA: EnTranslations = {
       "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Use action bar abilities (the number row; a second bar sits on the numpad)",
+      "targetPrev": "Cycle target backward",
       "targetFriendly": "Target nearest friendly",
       "cycleFriendly": "Cycle friendly target",
       "targetAuras": "Target buffs and debuffs",
@@ -8898,6 +8919,9 @@ export const en_CA: EnTranslations = {
       "filterPrimaryStatAll": "Any primary stat",
       "filterRarity": "Rarity",
       "filterRarityAll": "All rarities",
+      "filterSort": "Sort",
+      "sortName": "Name (A-Z)",
+      "sortPriceAsc": "Price: Low to High",
       "weaponSword": "Swords",
       "weaponDagger": "Daggers",
       "weaponStaff": "Staves",

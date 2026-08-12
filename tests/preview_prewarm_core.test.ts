@@ -208,6 +208,9 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       prewarmArmorySkin: (skinId, mode) => {
         calls.push(`armory:${skinId}:${mode}`);
       },
+      finishArmoryPrewarm: () => {
+        calls.push('armory:finalize');
+      },
     });
     expect(units.map((entry) => entry.label)).toEqual([
       'preview:char-window',
@@ -222,6 +225,7 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'preview:portrait:mage:0:body',
       'preview:armory:mech_amber:character',
       'preview:armory:mech_amber:weapon',
+      'preview:armory:finalize',
     ]);
     // The armory rows belong to the armory family (their pause key is the
     // store window, not the paperdoll); everything before them is 'char'.
@@ -241,7 +245,66 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'portrait:mage:0:body',
       'armory:mech_amber:character',
       'armory:mech_amber:weapon',
+      // The finalize unit runs LAST: the per-unit warmups keep the small
+      // warmup buffer, and this is the one restore that replaces the old
+      // per-unit reallocation + forced full-size draw.
+      'armory:finalize',
     ]);
+  });
+
+  it('a portrait unit returns its promise so the paced lane actually awaits it', async () => {
+    // Regression pin: renderPortrait may be async (the prewarm path), and a
+    // block-bodied run wrapper would discard the promise, un-pacing the whole
+    // portrait family (the lane would advance mid-render).
+    let resolvePortrait!: () => void;
+    const units = buildPostEntryPreviewPrewarmUnits<string>({
+      playerClass: 'hunter',
+      allClasses: ['hunter'],
+      skinCount: () => 1,
+      cardPoses: [],
+      armorySkinIds: [],
+      includeCharFamily: false,
+      renderCharShell: () => {},
+      prewarmCharSkin: () => {},
+      prewarmCardPose: () => {},
+      renderPortrait: () =>
+        new Promise<void>((resolve) => {
+          resolvePortrait = resolve;
+        }),
+      prewarmArmorySkin: () => {},
+      finishArmoryPrewarm: () => {},
+    });
+    const portraitUnit = units.find(
+      (entry) => entry.label === 'preview:portrait:hunter:0:headshot',
+    );
+    expect(portraitUnit).toBeDefined();
+    let settled = false;
+    const running = Promise.resolve(portraitUnit?.run()).then(() => {
+      settled = true;
+    });
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    expect(settled).toBe(false);
+    resolvePortrait();
+    await running;
+    expect(settled).toBe(true);
+  });
+
+  it('emits no armory finalize unit when the armory catalog is empty', () => {
+    const units = buildPostEntryPreviewPrewarmUnits<string>({
+      playerClass: 'hunter',
+      allClasses: ['hunter'],
+      skinCount: () => 1,
+      cardPoses: [],
+      armorySkinIds: [],
+      includeCharFamily: false,
+      renderCharShell: () => {},
+      prewarmCharSkin: () => {},
+      prewarmCardPose: () => {},
+      renderPortrait: () => {},
+      prewarmArmorySkin: () => {},
+      finishArmoryPrewarm: () => {},
+    });
+    expect(units.some((entry) => entry.label === 'preview:armory:finalize')).toBe(false);
   });
 
   it('excludes the char-window shell/skin/pose units on a graphics-rebuild restart, keeping portrait and armory in order (includeCharFamily false)', () => {
@@ -275,6 +338,9 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       prewarmArmorySkin: (skinId, mode) => {
         calls.push(`armory:${skinId}:${mode}`);
       },
+      finishArmoryPrewarm: () => {
+        calls.push('armory:finalize');
+      },
     });
     expect(units.map((entry) => entry.label)).toEqual([
       'preview:portrait:hunter:0:headshot',
@@ -285,6 +351,7 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'preview:portrait:mage:0:body',
       'preview:armory:mech_amber:character',
       'preview:armory:mech_amber:weapon',
+      'preview:armory:finalize',
     ]);
     expect(units.every((entry) => !entry.label.startsWith('preview:char-window'))).toBe(true);
     expect(units.every((entry) => !entry.label.startsWith('preview:char-skin'))).toBe(true);
@@ -299,6 +366,7 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'portrait:mage:0:body',
       'armory:mech_amber:character',
       'armory:mech_amber:weapon',
+      'armory:finalize',
     ]);
     expect(calls).not.toContain('shell');
   });

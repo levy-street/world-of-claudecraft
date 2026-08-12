@@ -34,6 +34,7 @@ const GROUPS: Group[] = [
     heading: 'guide.controls.groupCombat',
     rows: [
       { keys: ['Tab'], label: 'controls.target' },
+      { keys: ['Shift+Tab'], label: 'guide.controls.targetPrev' },
       { keys: ['H'], label: 'guide.controls.targetFriendly' },
       { keys: ['J'], label: 'guide.controls.cycleFriendly' },
       { keys: ['Shift+J'], label: 'guide.controls.targetAuras' },

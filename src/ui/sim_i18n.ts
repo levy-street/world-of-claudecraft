@@ -161,6 +161,9 @@ const baseEnTable = {
   // Bind invariant: sellItem refuses a bound (boundTo-stamped) copy so
   // the vendor can never launder the Maker's Bond into a plain buyback copy.
   'error.sellBound': 'That item is bound and cannot be sold.',
+  // Player item lock (issue 3042, src/sim/item_lock.ts): a player-locked
+  // copy, distinct from the Maker's Bond bind above.
+  'error.sellLocked': 'That item is locked and cannot be sold.',
   'error.noBuyback': 'That item is not available for buyback.',
   'error.nailedShut': 'It is nailed shut.',
   'error.enoughOfThose': 'You have enough of those.',
@@ -785,6 +788,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'There is no merchant nearby.',
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
+    'error.sellLocked': 'That item is locked and cannot be sold.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -1227,6 +1231,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'No hay ningún vendedor cerca.',
     'error.noSellQuest': 'No puedes vender objetos de misión.',
     'error.sellBound': 'Ese objeto está vinculado y no puede venderse.',
+    'error.sellLocked': 'Ese objeto está bloqueado y no puede venderse.',
     'error.noBuyback': 'Ese objeto no está disponible para recompra.',
     'error.nailedShut': 'Está clavado y no se puede abrir.',
     'error.enoughOfThose': 'Ya tienes suficientes de esos.',
@@ -1675,6 +1680,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'No hay ningún mercader cerca.',
     'error.noSellQuest': 'No puedes vender objetos de misión.',
     'error.sellBound': 'Ese objeto está vinculado y no puede venderse.',
+    'error.sellLocked': 'Ese objeto está bloqueado y no puede venderse.',
     'error.noBuyback': 'Ese objeto no está disponible para recompra.',
     'error.nailedShut': 'Está clavado.',
     'error.enoughOfThose': 'Ya tienes suficientes de esos.',
@@ -2134,6 +2140,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
     'error.noSellQuest': "Vous ne pouvez pas vendre d'objets de quête.",
     'error.sellBound': 'Cet objet est lié et ne peut pas être vendu.',
+    'error.sellLocked': 'Cet objet est verrouillé et ne peut pas être vendu.',
     'error.noBuyback': "Cet objet n'est pas disponible au rachat.",
     'error.nailedShut': "C'est condamné par des clous.",
     'error.enoughOfThose': 'Vous en avez assez.',
@@ -2593,6 +2600,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
     'error.noSellQuest': "Vous ne pouvez pas vendre d'objets de quête.",
     'error.sellBound': 'Cet objet est lié et ne peut pas être vendu.',
+    'error.sellLocked': 'Cet objet est verrouillé et ne peut pas être vendu.',
     'error.noBuyback': "Cet objet n'est pas disponible au rachat.",
     'error.nailedShut': "C'est cloué.",
     'error.enoughOfThose': 'Vous en avez assez.',
@@ -2883,6 +2891,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'There is no merchant nearby.',
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
+    'error.sellLocked': 'That item is locked and cannot be sold.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -3241,6 +3250,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Non c'è nessun mercante nelle vicinanze.",
     'error.noSellQuest': 'Non puoi vendere oggetti delle missioni.',
     'error.sellBound': "Quell'oggetto è legato e non può essere venduto.",
+    'error.sellLocked': "Quell'oggetto è bloccato e non può essere venduto.",
     'error.noBuyback': "Quell'oggetto non è disponibile per il riacquisto.",
     'error.nailedShut': 'È inchiodato.',
     'error.enoughOfThose': 'Ne hai già abbastanza.',
@@ -3694,6 +3704,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Es ist kein Händler in der Nähe.',
     'error.noSellQuest': 'Ihr könnt keine Questgegenstände verkaufen.',
     'error.sellBound': 'Dieser Gegenstand ist gebunden und kann nicht verkauft werden.',
+    'error.sellLocked': 'Dieser Gegenstand ist gesperrt und kann nicht verkauft werden.',
     'error.noBuyback': 'Dieser Gegenstand ist nicht zum Rückkauf verfügbar.',
     'error.nailedShut': 'Es ist vernagelt.',
     'error.enoughOfThose': 'Davon habt Ihr genug.',
@@ -4205,6 +4216,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '附近没有商人。',
     'error.noSellQuest': '你无法出售任务物品。',
     'error.sellBound': '该物品已绑定，无法出售。',
+    'error.sellLocked': '该物品已锁定，无法出售。',
     'error.noBuyback': '该物品无法回购。',
     'error.nailedShut': '它被钉死了。',
     'error.enoughOfThose': '你已经有足够多的这种物品了。',
@@ -4644,6 +4656,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '附近沒有商人。',
     'error.noSellQuest': '你無法出售任務物品。',
     'error.sellBound': '該物品已綁定，無法出售。',
+    'error.sellLocked': '該物品已鎖定，無法出售。',
     'error.noBuyback': '那件物品無法購回。',
     'error.nailedShut': '它被釘死了。',
     'error.enoughOfThose': '你已經有足夠的那種物品了。',
@@ -5090,6 +5103,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '근처에 상인이 없습니다.',
     'error.noSellQuest': '퀘스트 아이템은 판매할 수 없습니다.',
     'error.sellBound': '그 아이템은 귀속되어 판매할 수 없습니다.',
+    'error.sellLocked': '그 아이템은 잠겨 있어 판매할 수 없습니다.',
     'error.noBuyback': '그 아이템은 되살 수 없습니다.',
     'error.nailedShut': '못으로 단단히 박혀 있습니다.',
     'error.enoughOfThose': '그것을 이미 충분히 가지고 있습니다.',
@@ -5547,6 +5561,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '近くに商人がいません。',
     'error.noSellQuest': 'クエストアイテムは売却できません。',
     'error.sellBound': 'そのアイテムはバインドされているため売却できません。',
+    'error.sellLocked': 'そのアイテムはロックされているため売却できません。',
     'error.noBuyback': 'そのアイテムは買い戻しできません。',
     'error.nailedShut': '釘で打ち付けられています。',
     'error.enoughOfThose': 'それはもう十分に持っています。',
@@ -5930,6 +5945,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Não há nenhum comerciante por perto.',
     'error.noSellQuest': 'Você não pode vender itens de missão.',
     'error.sellBound': 'Esse item está vinculado e não pode ser vendido.',
+    'error.sellLocked': 'Esse item está bloqueado e não pode ser vendido.',
     'error.noBuyback': 'Esse item não está disponível para recompra.',
     'error.nailedShut': 'Está pregado e não abre.',
     'error.enoughOfThose': 'Você já tem o bastante desses.',
@@ -6455,6 +6471,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Поблизости нет торговца.',
     'error.noSellQuest': 'Вы не можете продавать предметы заданий.',
     'error.sellBound': 'Этот предмет привязан и не может быть продан.',
+    'error.sellLocked': 'Этот предмет заблокирован и не может быть продан.',
     'error.noBuyback': 'Этот предмет недоступен для выкупа.',
     'error.nailedShut': 'Заколочено наглухо.',
     'error.enoughOfThose': 'У вас достаточно таких предметов.',
@@ -6585,6 +6602,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Tohle už je hotové.',
     'error.emptyLoadoutName': 'Název sestavy nesmí být prázdný.',
     'error.sellBound': 'Tento předmět je vázaný a nelze ho prodat.',
+    'error.sellLocked': 'Tento předmět je zamčený a nelze ho prodat.',
     ...BASE_NEW.cs_CZ,
     'error.unknownAbility': 'Tuto schopnost neznáš.',
     'error.notEnoughRuin': 'Nedostatek Zkázy!',
@@ -6734,6 +6752,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Dit heb je al gedaan.',
     'error.emptyLoadoutName': 'De naam van een build mag niet leeg zijn.',
     'error.sellBound': 'Dat voorwerp is gebonden en kan niet worden verkocht.',
+    'error.sellLocked': 'Dat voorwerp is vergrendeld en kan niet worden verkocht.',
     ...BASE_NEW.nl_NL,
     'error.unknownAbility': 'Je kent die vaardigheid niet.',
     'error.notEnoughRuin': 'Niet genoeg Ruïne!',
@@ -6883,6 +6902,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'To już zrobiłeś.',
     'error.emptyLoadoutName': 'Nazwa buildu nie może być pusta.',
     'error.sellBound': 'Ten przedmiot jest przywiązany i nie można go sprzedać.',
+    'error.sellLocked': 'Ten przedmiot jest zablokowany i nie można go sprzedać.',
     ...BASE_NEW.pl_PL,
     'error.unknownAbility': 'Nie znasz tej zdolności.',
     'error.notEnoughRuin': 'Za mało Ruiny!',
@@ -7032,6 +7052,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Kamu sudah melakukan ini.',
     'error.emptyLoadoutName': 'Nama bangun tidak boleh kosong.',
     'error.sellBound': 'Barang itu terikat dan tidak dapat dijual.',
+    'error.sellLocked': 'Barang itu terkunci dan tidak dapat dijual.',
     ...BASE_NEW.id_ID,
     'error.unknownAbility': 'Kamu belum mengetahui kemampuan itu.',
     'error.notEnoughRuin': 'Ruin tidak cukup!',
@@ -7181,6 +7202,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Bunu zaten yaptın.',
     'error.emptyLoadoutName': 'Derleme adı boş olamaz.',
     'error.sellBound': 'O eşya bağlı ve satılamaz.',
+    'error.sellLocked': 'O eşya kilitli ve satılamaz.',
     ...BASE_NEW.tr_TR,
     'error.unknownAbility': 'Bu yeteneği bilmiyorsun.',
     'error.notEnoughRuin': 'Yeterli Harabiyet yok!',
@@ -7329,6 +7351,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Du har redan gjort det här.',
     'error.emptyLoadoutName': 'Byggets namn får inte vara tomt.',
     'error.sellBound': 'Det föremålet är bundet och kan inte säljas.',
+    'error.sellLocked': 'Det föremålet är låst och kan inte säljas.',
     ...BASE_NEW.sv_SE,
     'error.unknownAbility': 'Du kan inte den förmågan.',
     'error.notEnoughRuin': 'Inte tillräckligt med Ruin!',
@@ -7478,6 +7501,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Bạn đã làm cái này rồi.',
     'error.emptyLoadoutName': 'Tên build không được để trống.',
     'error.sellBound': 'Vật phẩm đó đã bị ràng buộc và không thể bán.',
+    'error.sellLocked': 'Vật phẩm đó đã bị khóa và không thể bán.',
     ...BASE_NEW.vi_VN,
     'error.unknownAbility': 'Bạn chưa học kỹ năng đó.',
     'error.notEnoughRuin': 'Không đủ Ruin!',
@@ -7624,6 +7648,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Du har allerede gjort det her.',
     'error.emptyLoadoutName': 'Navnet på et build må ikke være tomt.',
     'error.sellBound': 'Den genstand er bundet og kan ikke sælges.',
+    'error.sellLocked': 'Den genstand er låst og kan ikke sælges.',
     ...BASE_NEW.da_DK,
     'error.unknownAbility': 'Du kender ikke den evne.',
     'error.notEnoughRuin': 'Ikke nok Ruin!',
@@ -7744,6 +7769,31 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Istapper',
     'aura.perfectMoment': 'Perfekt Øjeblik',
   },
+};
+
+const ARENA_QUEUE_AUTO_LEAVE_1V1: Record<SupportedLanguage, string> = {
+  en: 'You leave the Ashen Coliseum queue.',
+  en_CA: 'You leave the Ashen Coliseum queue.',
+  es: 'Sales de la cola del Coliseo Cinéreo.',
+  es_ES: 'Sales de la cola del Coliseo Cinéreo.',
+  fr_FR: 'Vous quittez la file du Colisée cendré.',
+  fr_CA: 'Vous quittez la file du Colisée cendré.',
+  it_IT: 'Esci dalla coda del Colosseo Cinereo.',
+  de_DE: 'Ihr verlasst die Warteschlange des Aschenen Kolosseums.',
+  zh_CN: '你离开了灰烬斗技场队列。',
+  zh_TW: '你離開了灰燼競技場佇列。',
+  ko_KR: '잿빛 원형경기장 대기열에서 나왔습니다.',
+  ja_JP: '灰の闘技場のキューを離れました。',
+  pt_BR: 'Você sai da fila do Coliseu Cinzento.',
+  ru_RU: 'Вы покидаете очередь Пепельного Колизея.',
+  cs_CZ: 'Opouštíš frontu Ashen Coliseum.',
+  nl_NL: 'Je verlaat de wachtrij van het Ashen Coliseum.',
+  pl_PL: 'Opuszczasz kolejkę Ashen Coliseum.',
+  id_ID: 'Kamu keluar dari antrean Ashen Coliseum.',
+  tr_TR: 'Ashen Coliseum sırasından ayrılıyorsun.',
+  sv_SE: 'Du lämnar Ashen Coliseums kö.',
+  vi_VN: 'Bạn rời hàng đợi Ashen Coliseum.',
+  da_DK: 'Du forlader Ashen Coliseum-køen.',
 };
 
 const PET_DICT_EN: Record<PetSimMessageKey, string> = {
@@ -8273,7 +8323,12 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
     lang,
-    { ...baseEnTable, ...BASE_DICT[lang], ...PET_DICT[lang] },
+    {
+      ...baseEnTable,
+      ...BASE_DICT[lang],
+      ...PET_DICT[lang],
+      'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
+    },
   ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
 
@@ -8858,6 +8913,37 @@ export const ARENA_EXTRA: Record<SupportedLanguage, Record<ArenaExtraKey, string
 function tArenaExtra(key: ArenaExtraKey, params?: InterpolationValues): string {
   const table = ARENA_EXTRA[getLanguage()] ?? ARENA_EXTRA.en;
   return interpolate(table[key] ?? ARENA_EXTRA.en[key], params);
+}
+
+const ARENA_MIN_LEVEL_QUEUE_ERROR: Record<SupportedLanguage, string> = {
+  en: 'You must be level {level} to queue for the arena.',
+  en_CA: 'You must be level {level} to queue for the arena.',
+  es: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  es_ES: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  fr_FR: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  fr_CA: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  it_IT: "Devi essere di livello {level} per metterti in coda per l'arena.",
+  de_DE: 'Ihr müsst Stufe {level} sein, um Euch für die Arena anzumelden.',
+  zh_CN: '你必须达到 {level} 级才能加入竞技场队列。',
+  zh_TW: '你必須達到 {level} 級才能加入競技場佇列。',
+  ko_KR: '투기장 대기열에 들어가려면 레벨 {level}이어야 합니다.',
+  ja_JP: 'アリーナキューに入るにはレベル {level} が必要です。',
+  pt_BR: 'Você precisa estar no nível {level} para entrar na fila da arena.',
+  ru_RU: 'Чтобы встать в очередь арены, нужен уровень {level}.',
+  cs_CZ: 'Pro vstup do fronty arény musíš mít úroveň {level}.',
+  nl_NL: 'Je moet niveau {level} zijn om in de arena-wachtrij te gaan.',
+  pl_PL: 'Musisz mieć poziom {level}, aby dołączyć do kolejki areny.',
+  id_ID: 'Kamu harus level {level} untuk masuk antrean arena.',
+  tr_TR: 'Arena kuyruğuna girmek için seviye {level} olmalısın.',
+  sv_SE: 'Du måste vara nivå {level} för att gå med i arenakön.',
+  vi_VN: 'Bạn phải đạt cấp {level} để vào hàng đợi đấu trường.',
+  da_DK: 'Du skal være niveau {level} for at gå i arenakø.',
+};
+
+function tArenaMinLevelQueueError(level: string): string {
+  return interpolate(ARENA_MIN_LEVEL_QUEUE_ERROR[getLanguage()] ?? ARENA_MIN_LEVEL_QUEUE_ERROR.en, {
+    level,
+  });
 }
 
 // Thornhollow Fields 5v5 capture-the-flag emit strings (src/sim/social/battleground.ts).
@@ -10908,7 +10994,7 @@ const RULES: Rule[] = [
   },
   {
     re: /^You must be level (\d+) to queue for the arena\.$/,
-    build: (m) => tSim('error.arenaMinLevel', { level: m[1] }),
+    build: (m) => tArenaMinLevelQueueError(m[1]),
   },
   {
     re: /^(.+) must be at least level (\d+) to queue for the arena\.$/,
@@ -11160,6 +11246,7 @@ const RULES: Rule[] = [
     re: /^You join the Ashen Coliseum 2v2 queue\. Stand by for opponents[.…]{1,3}$/,
     build: () => tArenaExtra('join2v2'),
   },
+  { re: /^You leave the Ashen Coliseum queue\.$/, build: () => t('hud.logs.arenaLeave') },
   { re: /^You leave the Ashen Coliseum 2v2 queue\.$/, build: () => tArenaExtra('leave2v2') },
   {
     re: /^Your team leaves the Ashen Coliseum 2v2 queue\.$/,

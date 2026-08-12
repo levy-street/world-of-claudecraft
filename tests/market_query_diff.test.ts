@@ -16,6 +16,7 @@ const baseQuery: MarketQuery = {
   armorClass: 'cloth',
   primaryStat: 'int',
   rarity: 'rare',
+  sort: 'price',
   page: 0,
 };
 
@@ -31,6 +32,7 @@ function echoOf(overrides: Partial<MarketInfo> = {}): MarketInfo {
     armorClass: baseQuery.armorClass,
     primaryStat: baseQuery.primaryStat,
     rarity: baseQuery.rarity,
+    sort: baseQuery.sort,
     page: 0,
     pageCount: 1,
     collectionCopper: 0,
@@ -61,6 +63,7 @@ describe('queryDiffersFromEcho (issue #2416)', () => {
       armorClass: 'all',
       primaryStat: 'all',
       rarity: 'all',
+      sort: 'name',
     });
     expect(queryDiffersFromEcho(baseQuery, echo)).toBe(true);
   });
@@ -71,6 +74,7 @@ describe('queryDiffersFromEcho (issue #2416)', () => {
     ['armorClass', { armorClass: 'mail' as const }],
     ['primaryStat', { primaryStat: 'str' as const }],
     ['rarity', { rarity: 'epic' as const }],
+    ['sort', { sort: 'name' as const }],
   ])('detects drift on the %s axis alone', (_axis, overrides) => {
     expect(queryDiffersFromEcho(baseQuery, echoOf(overrides))).toBe(true);
   });

@@ -1,8 +1,16 @@
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { CONSTRAINED_PREWARM_KEEP, skyAssetInlineWaitMs } from '../src/render/prewarm_policy';
+import {
+  CONSTRAINED_PREWARM_KEEP,
+  materialProgramSignature,
+  prewarmProgramContentKeys,
+  skyAssetInlineWaitMs,
+} from '../src/render/prewarm_policy';
 import {
   buildPrewarmCompileUnits,
+  compileRootDistanceSq,
+  orderRootsByDistanceSq,
   type PrewarmResumeEntry,
   resumeDroppedPrewarmEntries,
   settlePrewarmBeforePublish,
@@ -110,18 +118,31 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(idles).toBe(0);
   });
 
-  it('allows each resumed unit to enter a shared scheduler', async () => {
+  it('allows each resumed unit to enter a shared scheduler with its OWNING entry', async () => {
+    // The entry rides along so the runner can schedule by entry class (debt
+    // vs cosmetic); a runner receiving the wrong entry would reclassify
+    // every unit silently, so the pairing is asserted per unit.
     const events: string[] = [];
-    await resumeDroppedPrewarmEntries([entry('textures', ['one', 'two'])], {
-      idleSlot: async () => {
-        events.push('idle');
+    await resumeDroppedPrewarmEntries(
+      [entry('textures.scene', ['one', 'two']), entry('vfx.weapon-skins', ['three'])],
+      {
+        idleSlot: async () => {
+          events.push('idle');
+        },
+        runUnit: async (unit, owner) => {
+          events.push(`scheduled:${owner.id}:${unit.id}`);
+          await unit.run();
+        },
       },
-      runUnit: async (unit) => {
-        events.push(`scheduled:${unit.id}`);
-        await unit.run();
-      },
-    });
-    expect(events).toEqual(['idle', 'scheduled:one', 'idle', 'scheduled:two']);
+    );
+    expect(events).toEqual([
+      'idle',
+      'scheduled:textures.scene:one',
+      'idle',
+      'scheduled:textures.scene:two',
+      'idle',
+      'scheduled:vfx.weapon-skins:three',
+    ]);
   });
 
   it('materializes one executable compile unit per unique archetype root', async () => {
@@ -163,6 +184,51 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(units.map((unit) => unit.id)).toEqual(['scene:0', 'scene:1']);
     for (const unit of units) await unit.run();
     expect(compiled).toEqual(['a', 'c']);
+  });
+
+  it('keeps distinct ShaderMaterial programs under content-key dedupe', async () => {
+    const vertex = 'void main() { gl_Position = vec4(0.0); }';
+    const fragment = 'void main() { gl_FragColor = vec4(1.0); }';
+    const shader = (
+      id: string,
+      overrides: Partial<
+        Pick<THREE.ShaderMaterial, 'vertexShader' | 'fragmentShader' | 'defines'>
+      > = {},
+    ) => ({
+      id,
+      material: new THREE.ShaderMaterial({
+        vertexShader: vertex,
+        fragmentShader: fragment,
+        defines: { MODE: 1 },
+        ...overrides,
+      }),
+    });
+    const roots = [
+      shader('base'),
+      shader('duplicate'),
+      shader('vertex', { vertexShader: `${vertex}\n// vertex variant` }),
+      shader('fragment', { fragmentShader: `${fragment}\n// fragment variant` }),
+      shader('defines', { defines: { MODE: 2 } }),
+    ];
+    expect(roots[0].material.customProgramCacheKey()).toBe(
+      roots[2].material.customProgramCacheKey(),
+    );
+
+    const compiled: string[] = [];
+    const units = buildPrewarmCompileUnits(
+      [{ id: 'weapon-vfx', roots }],
+      async (root) => {
+        compiled.push(root.id);
+      },
+      {
+        dedupeKeys: (root) =>
+          prewarmProgramContentKeys({}, [materialProgramSignature(root.material)]),
+      },
+    );
+
+    expect(units).toHaveLength(4);
+    for (const unit of units) await unit.run();
+    expect(compiled).toEqual(['base', 'vertex', 'fragment', 'defines']);
   });
 
   it('dedupes across calls through a caller-owned shared store', async () => {
@@ -348,10 +414,21 @@ describe('resumeDroppedPrewarmEntries', () => {
     // releaseTail: a resume unit's wall time is its off-thread links; without
     // the tail release each unit occupied the whole serial queue for seconds
     // and live compile gates could not start (the travel-hitch amplifier).
+    // Link/upload debt resumes at BOOT_DEBT (above the cosmetic BACKGROUND
+    // warmers that starved it in production) with its tail HELD so batches
+    // settle serially and the driver link queue stays shallow; everything
+    // else stays at BOOT_RESUME with the released tail
+    // (prewarmResumeIsDebt, prewarm_policy.ts).
     expect(source).toContain(
-      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id, {',
+      'return this.backgroundGpuWork.run(\n                unit.run,\n                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,\n                unit.id,',
     );
-    expect(source).toContain('releaseTail: true,');
+    expect(source).toContain('releaseTail: !debt,');
+    // The old bare `releaseTail: true,` pin drifted: after the debt-class
+    // split the only remaining literal `true` belongs to the preview lane,
+    // an unrelated call site. The resume lane's contract is the class-driven
+    // flag, and the kickoff must order debt ahead of the serial lane's
+    // cosmetic entries (queue priority cannot reorder within the lane).
+    expect(source).toContain('const resume = orderPrewarmResumeEntries(droppedEntries);');
     expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
     expect(resumeSlice).toContain('deferPoolPublication =');
@@ -602,5 +679,118 @@ describe('waitForPrefetch: a stalled fetch can never starve the compute budget',
     expect(settled).toBe(false);
     resolveTask();
     expect(await wait).toBe('ready');
+  });
+});
+
+describe('orderRootsByDistanceSq: the compile debt pays near-first (hitch-hunt P3a)', () => {
+  it('sorts ascending by distance', () => {
+    const roots = [{ d: 900 }, { d: 4 }, { d: 100 }];
+    expect(orderRootsByDistanceSq(roots, (root) => root.d)).toEqual([
+      { d: 4 },
+      { d: 100 },
+      { d: 900 },
+    ]);
+  });
+
+  it('keeps collection order for ties and puts unknown distances last', () => {
+    const a = { id: 'a', d: 25 as number | null };
+    const b = { id: 'b', d: null as number | null };
+    const c = { id: 'c', d: 25 as number | null };
+    const d = { id: 'd', d: null as number | null };
+    expect(orderRootsByDistanceSq([a, b, c, d], (root) => root.d)).toEqual([a, c, b, d]);
+  });
+
+  it('does not mutate the input array', () => {
+    const roots = [{ d: 2 }, { d: 1 }];
+    const input = [...roots];
+    orderRootsByDistanceSq(roots, (root) => root.d);
+    expect(roots).toEqual(input);
+  });
+
+  it('handles an empty collection', () => {
+    expect(orderRootsByDistanceSq([], () => null)).toEqual([]);
+  });
+
+  it('is wired to the live-scene compile collection anchored on the player', () => {
+    const rendererSource = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    );
+    // The 'scene' group is the world-content collection the resume lane
+    // drains in order; the staged prewarm groups sit next to the player and
+    // gain nothing from sorting. Player-anchored on purpose: the early
+    // submit runs before the first updateCamera positions the camera.
+    const sceneAt = rendererSource.indexOf("id: 'scene',");
+    const stagedAt = rendererSource.indexOf('...stagedGroups.flatMap');
+    expect(sceneAt).toBeGreaterThan(-1);
+    expect(stagedAt).toBeGreaterThan(sceneAt);
+    const sceneCollection = rendererSource.slice(sceneAt, stagedAt);
+    expect(sceneCollection).toContain('roots: orderRootsByDistanceSq(');
+    expect(sceneCollection).toContain(
+      'compileRootDistanceSq(root, this.sim.player.pos.x, this.sim.player.pos.z)',
+    );
+  });
+});
+
+describe('compileRootDistanceSq: the honest position of a compile root', () => {
+  const identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+  it('uses the world-transformed bounding-sphere centre when present', () => {
+    // World-baked merged content: mesh at identity, geometry carries the
+    // placement. Translation alone would report (0, 0) for this root.
+    const root = {
+      matrixWorld: { elements: identity },
+      geometry: { boundingSphere: { center: { x: 300, y: 5, z: -40 } } },
+    };
+    expect(compileRootDistanceSq(root, 0, 0)).toBe(300 * 300 + 40 * 40);
+  });
+
+  it('applies the full matrix to the centre, not just the translation', () => {
+    const translated = [...identity];
+    translated[12] = 100;
+    translated[14] = 20;
+    const root = {
+      matrixWorld: { elements: translated },
+      geometry: { boundingSphere: { center: { x: 10, y: 0, z: 5 } } },
+    };
+    expect(compileRootDistanceSq(root, 0, 0)).toBe(110 * 110 + 25 * 25);
+  });
+
+  it('uses an InstancedMesh aggregate sphere instead of its primitive geometry sphere', () => {
+    const geometry = new THREE.BoxGeometry(2, 2, 2);
+    const root = new THREE.InstancedMesh(geometry, new THREE.MeshBasicMaterial(), 1);
+    root.setMatrixAt(0, new THREE.Matrix4().makeTranslation(500, 0, 0));
+    root.computeBoundingSphere();
+    root.updateMatrixWorld(true);
+
+    expect(root.geometry.boundingSphere?.center.x).toBe(0);
+    expect(root.boundingSphere?.center.x).toBe(500);
+    expect(compileRootDistanceSq(root, 0, 0)).toBe(500 * 500);
+  });
+
+  it('falls back to the matrix translation without a computed sphere', () => {
+    const translated = [...identity];
+    translated[12] = 30;
+    translated[14] = -40;
+    expect(compileRootDistanceSq({ matrixWorld: { elements: translated } }, 0, 0)).toBe(2500);
+    expect(
+      compileRootDistanceSq({ matrixWorld: { elements: translated }, geometry: null }, 0, 0),
+    ).toBe(2500);
+  });
+
+  it('orders a near world-baked bake ahead of a far positioned mesh', () => {
+    const nearBaked = {
+      matrixWorld: { elements: identity },
+      geometry: { boundingSphere: { center: { x: 10, y: 0, z: 0 } } },
+    };
+    const farPositioned = (() => {
+      const translated = [...identity];
+      translated[12] = 500;
+      return { matrixWorld: { elements: translated } };
+    })();
+    const ordered = orderRootsByDistanceSq([farPositioned, nearBaked], (root) =>
+      compileRootDistanceSq(root, 0, 0),
+    );
+    expect(ordered).toEqual([nearBaked, farPositioned]);
   });
 });

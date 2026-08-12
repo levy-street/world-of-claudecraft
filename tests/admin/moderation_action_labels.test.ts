@@ -59,6 +59,13 @@ describe('moderation action labels', () => {
     expect(moderationActionVariant('set_streamer')).toBe('neutral');
   });
 
+  it('labels the General chat policy audit action as neutral', () => {
+    expect(moderationActionLabel('general_chat_rate_limit')).toBe(
+      t('moderationHistory.actionGeneralChatRateLimit'),
+    );
+    expect(moderationActionVariant('general_chat_rate_limit')).toBe('neutral');
+  });
+
   it('labels the ip-block history kinds, which only the realm-wide page surfaces', () => {
     expect(moderationActionLabel('block')).toBe(t('moderationHistory.actionIpBlock'));
     expect(moderationActionLabel('unblock')).toBe(t('moderationHistory.actionIpUnblock'));

@@ -25,6 +25,20 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
+  it('maps an options_view change to the graphics dial AND interface tab targets, in order', () => {
+    // Both targets key on 'ui/options_view'; the graphics-options entry sits
+    // first in the registry so the dial card is the lead capture. An
+    // ordering or selector regression here silently drops or duplicates the
+    // options-panel evidence.
+    const plan = classifyDiff(['src/ui/options_view.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'graphics-options-shadow-dial',
+      'interface-options-tabs',
+    ]);
+    expect(plan.generic).toHaveLength(0);
+  });
+
   it('maps the player tooltip view to its focused hover target', () => {
     const plan = classifyDiff(['src/ui/player_tooltip_view.ts']);
     expect(plan.isVisual).toBe(true);

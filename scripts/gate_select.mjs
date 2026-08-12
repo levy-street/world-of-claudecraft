@@ -153,7 +153,7 @@ console.log(`[gate:select] workers=${workers}`);
 
 const branch = git('git', ['branch', '--show-current']).stdout?.trim() ?? '';
 const releaseTier = branch.startsWith('release/');
-const steps = buildFullGateSteps(workers, { releaseTier, skipVitest: true, repoRoot });
+const steps = buildFullGateSteps(workers, { releaseTier, skipVitest: true });
 
 /** @type {Array<{ name: string, cmd: string, args: string[], hint?: string, env?: Record<string, string> }>} */
 const vitestSteps = [];

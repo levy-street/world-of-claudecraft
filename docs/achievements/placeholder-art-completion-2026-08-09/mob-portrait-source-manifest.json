@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "0ca94035dd87c4c5208b959f5384b693b6fc0901ccc5dfbf518bd828c7cbc3de",
+  "rendererFingerprint": "31207893930bf995011e6c52453673887c48b2e5299f5e751586b97f7ee800e6",
   "renderer": {
     "trackedFiles": [
       {
@@ -16,8 +16,8 @@
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
-        "bytes": 8194,
-        "sha256": "935fef8fb5cbd506a3db29c4fb302b6dd695ea4274d22e3c9eccc6bd78c5e2b4"
+        "bytes": 8547,
+        "sha256": "8811b612d40a20c55800e2f15ab58ee1580a905fa3a8cf81574cfc6e3853077b"
       },
       {
         "path": "scripts/lib/mob_portrait_background.mjs",
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 3817005,
-      "sha256": "19197db1119d04e96b429e597a0aa01f822251ee357b19974c4c36e275f6a728",
+      "bytes": 3823101,
+      "sha256": "8c8b7f1d7e2a533f2da8c42affeee263a0f7fcccb7cc2fe6d7aefd21d22bbd83",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -2758,13 +2758,13 @@
       "id": "grix_the_tunnelking",
       "family": "burrower",
       "finderEncounter": false,
-      "visualKey": "mob_kobold",
+      "visualKey": "mob_grix",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/goblin.glb",
-          "path": "public/models/creatures/goblin.glb",
-          "bytes": 48360,
-          "sha256": "a128051c0b5078e0f76f09ed0e15eafe102ae11ae62e984155ccfefa3b08fb92"
+          "url": "models/creatures/grix.glb",
+          "path": "public/models/creatures/grix.glb",
+          "bytes": 485196,
+          "sha256": "224bc3592577b76dbcaca3e3138acea017919cfabf61bbc012828e0994510bd8"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -2773,19 +2773,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#b9770e",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "d5a21a997a39de0cc5a807cbf6b106dd8a8922cacbee1692a2176cd00c3c0517",
+      "sourceFingerprint": "8c5f8738f47b14d6552cae1dee2f65e73e948467835d4723f3f2ce7f416af6fb",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
-        "bytes": 1718,
-        "sha256": "bbd7a6833942e180b3321941ee9d7ca6afaf3a9ff4cec7ce16c2a87033999f92"
+        "bytes": 2830,
+        "sha256": "1478390b23f574f1676e6c4102661ba0cb8620a0bb09be259f911c71e4e7baa3"
       }
     },
     {
@@ -7287,13 +7287,13 @@
       "id": "tunnel_rat",
       "family": "burrower",
       "finderEncounter": false,
-      "visualKey": "mob_kobold",
+      "visualKey": "mob_kobold_digger",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/goblin.glb",
-          "path": "public/models/creatures/goblin.glb",
-          "bytes": 48360,
-          "sha256": "a128051c0b5078e0f76f09ed0e15eafe102ae11ae62e984155ccfefa3b08fb92"
+          "url": "models/creatures/kobold.glb",
+          "path": "public/models/creatures/kobold.glb",
+          "bytes": 324004,
+          "sha256": "1cb4fe6907ed7c03c17150a4af29cc2bc9bba68a30a73ea461f302732fe219c5"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -7302,19 +7302,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#9c640c",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "3f718bbf42b7688a9fff0868334d5630791e9b406631168f8d2807899469874a",
+      "sourceFingerprint": "d19ee3b2692349523e7ade48a684084ba842f30fb1c7a51507397787dc8a5030",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
-        "bytes": 1712,
-        "sha256": "91808491cb1658c2692278ed8d3e915006c7ece53b644991ee164937ba80c322"
+        "bytes": 2564,
+        "sha256": "54329ab570e0a0dbde0530e22955cf1dc65be72907e8894de831b2c9a504acb2"
       }
     },
     {

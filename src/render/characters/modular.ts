@@ -1323,7 +1323,7 @@ export const OUTFIT_COLORWAYS: readonly OutfitColorwayDef[] = [
 // mahogany, so every part of a set reads as a different material instead of
 // one flat repaint. Rules select in HSV (hue band + sat/val trapezoids, all
 // measured off the atlas, never guessed) and remap hue/sat/val; the shader
-// (assets.ts attachArmorDye) evaluates every rule from the ORIGINAL texel so
+// (armor_dye.ts attachArmorDye) evaluates every rule from the ORIGINAL texel so
 // overlapping edges blend instead of compounding.
 
 /** One dye rule: an HSV zone selector plus the remap applied inside it.

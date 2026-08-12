@@ -111,10 +111,8 @@ bounds Vitest workers to avoid load flakes on shared machines. It resolves FFmpe
 falling back to PATH, and refuses to run when neither source yields a working binary.
 
 **Task cache (Turborepo):** pure artifact steps (`i18n:gen`, `wiki:content`, `sfx:check`,
-`check:types`, `build:env`, `build:server`, `build:bot`, `build:bundle`) run through the
-resolved `node_modules/.bin/turbo` binary directly (`resolveTurboBin` in
-`scripts/lib/gate_task_cache.mjs`, skipping `npx`'s own dispatch overhead) with
-inputs/outputs in root `turbo.json`. A warm second gate on an unchanged tree
+`check:types`, `build:env`, `build:server`, `build:bot`, `build:bundle`) run through `npx turbo run`
+with inputs/outputs in root `turbo.json`. A warm second gate on an unchanged tree
 replays those steps from `.turbo/` (often under a second). Full vitest, browser tests,
 malware, changed-file Biome, and the i18n freshness `git diff` always run (they are not
 cached as "passed"). Catalog edits under `src/ui/i18n.catalog/**` invalidate `i18n:gen`.

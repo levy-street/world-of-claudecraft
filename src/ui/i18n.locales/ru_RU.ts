@@ -1157,6 +1157,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.sheathe': 'Убрать/обнажить оружие',
   'hudChrome.keybinds.targetFriendly': 'Ближайший союзник',
   'hudChrome.keybinds.targetFriendlyNext': 'Следующий союзник',
+  'hudChrome.keybinds.targetPrev': 'Цикл целей назад',
   'hudChrome.petFeed.disabledFullHp': 'Питомец полностью здоров',
   'hudChrome.petFeed.disabledNoFood': 'В ваших сумках нет еды, которая могла бы вылечить питомца',
   'hudChrome.options.clickMoveLeft': 'Левая кнопка',
@@ -2722,6 +2723,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterBagAll': 'Все сумки',
   'itemUi.market.filterRarity': 'Редкость',
   'itemUi.market.filterRarityAll': 'Все редкости',
+  'itemUi.market.filterSort': 'Сортировка',
+  'itemUi.market.sortName': 'Название (А-Я)',
+  'itemUi.market.sortPriceAsc': 'Цена: по возрастанию',
   'itemUi.market.weaponSword': 'Мечи',
   'itemUi.market.weaponDagger': 'Кинжалы',
   'itemUi.market.weaponStaff': 'Посохи',
@@ -5572,6 +5576,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatWindow.resetAction': 'Сбросить',
   'hudChrome.chatWindow.note':
     'Перетащите полосу вкладок чата, чтобы переместить окно, или угловой маркер, чтобы изменить размер. Сброс возвращает окно в положение и размер по умолчанию.',
+  'hudChrome.chatQuota.limitReached':
+    'Достигнут лимит общего чата. Повторите попытку через {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Предыдущее сообщение в общий чат ещё отправляется. Повторите попытку через мгновение.',
+  'hudChrome.chatQuota.unavailable':
+    'Общий чат временно недоступен. Повторите попытку позже.',
   'hudChrome.compass.E': 'В',
   'hudChrome.compass.N': 'С',
   'hudChrome.compass.NE': 'СВ',
@@ -5904,6 +5914,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Классическая MMO, в которую можно играть бесплатно прямо в браузере.',
   'guide.skipToContent': 'Перейти к основному содержимому',
   'guide.loading': 'Загрузка...',
+  'guide.controls.targetPrev': 'Цикл целей назад',
   'guide.controls.targetFriendly': 'Ближайший союзник',
   'guide.deedsPage.cat.chronicle': 'Летописи',
   'guide.deedsPage.cat.collection': 'Коллекция',
@@ -7729,6 +7740,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.craftedToast': 'Создано: {name}',
   'hudChrome.crafting.craftedToastQty': 'Создано: {name} x{qty}',
   'hudChrome.crafting.insufficientMaterials': 'У вас недостаточно материалов.',
+  'hudChrome.crafting.reagentLocked': 'Один из реагентов заблокирован.',
   'hudChrome.crafting.unknownRecipe': 'Такого рецепта не существует.',
   'hudChrome.crafting.comboRequires': 'Настройка: {craftA} + {craftB}, ранг {tier}.',
   'hudChrome.crafting.comboMet': 'Готово.',
@@ -10805,6 +10817,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': 'У вас нет этого предмета.',
   'hudChrome.enchanting.notDisenchantable': 'Это нельзя распылить.',
   'hudChrome.enchanting.notSalvageable': 'Это нельзя разобрать.',
+  'hudChrome.enchanting.salvageLocked': 'Этот предмет заблокирован.',
   'hudChrome.enchanting.enchantWrongSlot': 'Эти чары нельзя наложить на этот предмет.',
   'hudChrome.enchanting.enchantUnknown': 'Таких чар не существует.',
   'hudChrome.enchanting.enchantInsufficient': 'У вас нет материалов для этих чар.',
@@ -11478,6 +11491,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmAccept': 'Заменить',
   'hudChrome.bags.itemAriaEnchanted': '{item}, количество {count}, зачарованный экземпляр',
   'hudChrome.bags.itemAriaBound': '{item}, количество {count}, привязанный экземпляр',
+  'hudChrome.bags.itemAriaLocked': '{item}, количество {count}, заблокированный экземпляр',
+  'hudChrome.bags.itemLockedLine': 'Заблокировано',
+  'hudChrome.bags.unlockItem': 'Разблокировать предмет',
   'hudChrome.itemTooltip.enchantedFallback': 'Зачаровано',
   'devCommand.actions.kit.description':
     'Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение.',
@@ -13040,4 +13056,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Выйти из идущего матча значит дезертировать, а рейтинговая лестница не может поощрять тех, кто отключается при проигрышном счете: дезертир тут же получает поражение и связанную с ним потерю рейтинга, роняет флаг, если нес его, а его команда доигрывает вчетвером. Ради этого и существует пустое место. Пока в матче не хватает бойца, очередь может предложить это место тому, кто ждет, и это всегда предложение, которое вы принимаете или отклоняете, а не телепорт, случающийся с вами; отказ ничего не стоит и передает место следующему. Предлагают только одиночкам из очереди, так что группу, вставшую в очередь вместе, никогда не разделят ради заполнения дыры.',
   'guide.thornhollowPage.backfillNote':
     'Занять место по добору намеренно ничем не грозит: вы попадаете в счет, к которому не имели отношения, поэтому матч не тронет ваш рейтинг ни при победе, ни при поражении, а уход из такого матча ничего не стоит. Предложение перестает приходить и тогда, когда матч подошел к концу настолько, что новый боец уже ничего не изменит, так что вас никогда не посадят в чужую развязку.',
+  'hudChrome.bags.lockItem': 'Заблокировать предмет',
+  'hudChrome.otaUpdate.applying': 'Обновление загружено. Игра перезапускается для его применения.',
+  'hudChrome.otaUpdate.continueAnyway': 'Продолжить без обновления',
+  'hudChrome.otaUpdate.downloading': 'Загрузка обновления: {percent}',
+  'hudChrome.otaUpdate.incompatible': 'Для игры требуется обновление. Оно будет применено сразу после завершения загрузки.',
+  'hudChrome.otaUpdate.progressLabel': 'Ход загрузки обновления',
+  'hudChrome.otaUpdate.title': 'Обновление игры',
 };

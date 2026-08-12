@@ -377,7 +377,7 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
 export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
   if (pet.ownerId === null) return;
   const meta = ctx.players.get(pet.ownerId);
-  if (!meta || meta.cls !== 'hunter') return;
+  if (meta?.cls !== 'hunter') return;
   const owner = ctx.entities.get(pet.ownerId);
   if (!owner) return;
   const template = MOBS[pet.templateId];

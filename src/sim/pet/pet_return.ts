@@ -108,7 +108,7 @@ export function restorePetReturn(
 ): void {
   if (!snap) return;
   const pet = ctx.entities.get(snap.petId);
-  if (!pet || pet.kind !== 'mob' || pet.ownerId !== owner.id) {
+  if (pet?.kind !== 'mob' || pet.ownerId !== owner.id) {
     rebuildPetReturn(ctx, owner, snap);
     return;
   }

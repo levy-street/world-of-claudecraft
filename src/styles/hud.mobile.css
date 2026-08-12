@@ -793,12 +793,25 @@
     font-family: var(--ui-font);
     color: #ffdf9c;
     border-color: #8b4e2c;
+    /* The face text is a localized template (hudChrome.mobile.actionPageIndicator),
+       and the English value is a bare digit but a locale is free to translate it
+       into a real word (issue #2975: ja_JP appends "ページ"). Without a clip, a
+       wider string wraps inside this flex column and the circular badge shows a
+       garbled multi-line stack instead of clipping. */
+    overflow: hidden;
   }
   body.mobile-touch #mobile-action-page-toggle .mobile-action-page-indicator {
     font-size: 20px;
     font-weight: bold;
     line-height: 1;
     text-shadow: 1px 1px 2px #000;
+    /* Keep the page number readable first (see the ordering note above) and
+       clip anything a locale appends after it to one line instead of wrapping
+       into the circular badge's clipped overflow. */
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   body.mobile-touch #mobile-action-page-toggle .ui-icon {
     order: 2;

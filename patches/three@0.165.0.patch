@@ -1,8 +1,41 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..d863e413f00db97725049c2909271dd36c1c1228 100644
+index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..ed0cb5204fe7f1bf6aaf3e42101c95250fb79eb4 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
-@@ -29308,7 +29308,11 @@ class WebGLRenderer {
+@@ -29301,21 +29301,57 @@ class WebGLRenderer {
+ 
+ 			return new Promise( ( resolve ) => {
+ 
++				// World of ClaudeCraft: bounded isReady poll pass. Each
++				// COMPLETION_STATUS_KHR query is a synchronous GPU-process
++				// round-trip; with hundreds of pending programs and a
++				// link-backlogged GPU process, one unbounded forEach pass
++				// measured 10.2 s on the production main thread. One pass now
++				// checks pending materials round-robin under a small time
++				// budget (always at least one), so readiness detection
++				// amortizes across passes while links settle off-thread.
++				// The reschedule interval BACKS OFF when a pass was expensive
++				// and made no progress: every concurrent compileAsync promise
++				// owns its own poll timer, and under a link backlog N pollers
++				// each paying a ~30 ms query every 10 ms owned the whole main
++				// thread (measured as sub-1-fps frames locally). Expensive
++				// queries mean readiness is far anyway; the interval resets
++				// the moment a pass progresses or queries come back cheap.
++				const POLL_PASS_BUDGET_MS = 2;
++				const POLL_INTERVAL_MIN_MS = 10;
++				const POLL_INTERVAL_MAX_MS = 320;
++				let pollCursor = 0;
++				let pollIntervalMs = POLL_INTERVAL_MIN_MS;
++
+ 				function checkMaterialsReady() {
+ 
+-					materials.forEach( function ( material ) {
++					const pending = Array.from( materials );
++					const passStart = performance.now();
++
++					for ( let i = 0; i < pending.length; i ++ ) {
+ 
++						const material = pending[ ( pollCursor + i ) % pending.length ];
  						const materialProperties = properties.get( material );
  						const program = materialProperties.currentProgram;
  
@@ -15,3 +48,41 @@ index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..d863e413f00db97725049c2909271dd3
  
  							// remove any programs that report they're ready to use from the list
  							materials.delete( material );
+ 
+ 						}
+ 
+-					} );
++						if ( performance.now() - passStart >= POLL_PASS_BUDGET_MS && i + 1 < pending.length ) {
++
++							pollCursor = ( pollCursor + i + 1 ) % pending.length;
++							break;
++
++						}
++
++					}
+ 
+ 					// once the list of compiling materials is empty, call the callback
+ 
+@@ -29326,9 +29362,19 @@ class WebGLRenderer {
+ 
+ 					}
+ 
+-					// if some materials are still not ready, wait a bit and check again
+-
+-					setTimeout( checkMaterialsReady, 10 );
++					// if some materials are still not ready, wait a bit and check again.
++					// The reset keys on CHEAP QUERIES ONLY, deliberately not on progress:
++					// with ~30 ms queries a poller that finds one ready material per pass
++					// would reset to 10 ms every time and still own ~75 percent of the
++					// main thread while draining. Expensive queries back off whether or
++					// not they progressed; readiness latency is bounded by the cap.
++
++					const passMs = performance.now() - passStart;
++					pollIntervalMs =
++						passMs < POLL_PASS_BUDGET_MS
++							? POLL_INTERVAL_MIN_MS
++							: Math.min( POLL_INTERVAL_MAX_MS, pollIntervalMs * 2 );
++					setTimeout( checkMaterialsReady, pollIntervalMs );
+ 
+ 				}
+ 

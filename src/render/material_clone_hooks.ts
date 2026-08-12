@@ -5,7 +5,8 @@
 // `this.onBeforeCompile.toString()`:
 //
 //   1. a bare clone renders WITHOUT the patches its source shipped with (the
-//      character rim glow, the worn surface-detail layer), and
+//      character rim glow, the worn surface-detail layer, the armour dye that
+//      carries a player's whole outfit colorway), and
 //   2. its cache key no longer matches the source's, so its first draw LINKS A
 //      NEW PROGRAM instead of reusing the one the source already linked.
 //
@@ -20,18 +21,32 @@
 
 import type * as THREE from 'three';
 import { reattachBiomeHazeToClone } from './biome_haze_field';
+import { reapplyArmorDyeToClone } from './characters/armor_dye';
 import { addRimGlow, hasRimGlow } from './gfx';
 import { reapplySurfaceDetailToClone } from './worn_stone';
 
 /**
  * Re-attach to `clone` the onBeforeCompile layers `source` carried, in the
- * order the material factories apply them (rim glow first, zone haze next as
- * surfaceMat attaches it at creation, then surface detail: each later layer
- * chains the previous hook into its own cache key). Only layers the source
- * actually had are re-attached, so a clone never gains a patch its source
- * never carried, which would break program identity just as badly.
+ * order the material factories apply them (armour dye first, then rim glow,
+ * then zone haze as surfaceMat attaches it at creation, then surface detail:
+ * each later layer chains the previous hook into its own cache key). Only
+ * layers the source actually had are re-attached, so a clone never gains a
+ * patch its source never carried, which would break program identity just as
+ * badly.
+ *
+ * The dye goes FIRST because that is the order the rig factory composes them:
+ * characters/assets.ts buildTintedClone re-attaches the outfit dye, then calls
+ * addRimGlow, then applySurfaceDetail (the three calls sit together in its
+ * GFX.standardMaterials arm). No material carries both the dye and the biome
+ * haze: the dye is rig-only and the haze is world-surface-only, so no source
+ * in the tree orders those two against each other.
  */
 export function reattachClonedMaterialHooks(source: THREE.Material, clone: THREE.Material): void {
+  // Reads the JSON spec attachArmorDye records in userData, which clone() did
+  // copy; a no-op for clones of undyed materials. Without it a clone of a
+  // dyed rig material renders the set's BASE colours, which is the visible
+  // half of the same bug the cache key is the invisible half of.
+  reapplyArmorDyeToClone(clone);
   if (hasRimGlow(source)) addRimGlow(clone);
   reattachBiomeHazeToClone(source, clone);
   // Reads the JSON spec applySurfaceDetail records in userData, which clone()

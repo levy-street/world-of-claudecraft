@@ -481,4 +481,17 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.doomMeterLock': 'Bloquear la barra de recurso de Aflicción',
   'hudChrome.warlock.doomMeterUnlock': 'Mover la barra de recurso de Aflicción',
   'hudChrome.warlock.fateThreadsStatus': '{value} de {max} Hilos del destino.',
+  'hudChrome.bags.itemAriaLocked': '{item}, cantidad {count}, artículo bloqueado',
+  'hudChrome.bags.itemLockedLine': 'Artículo bloqueado',
+  'hudChrome.bags.lockItem': 'Bloquear artículo',
+  'hudChrome.bags.unlockItem': 'Desbloquear artículo',
+  'hudChrome.crafting.reagentLocked': 'Un reactivo para eso está bloqueado.',
+  'hudChrome.enchanting.salvageLocked': 'Ese artículo está bloqueado.',
+  'hudChrome.otaUpdate.applying': 'Actualización descargada. Reiniciando el juego para instalarla.',
+  'hudChrome.otaUpdate.continueAnyway': 'Seguir sin actualizar',
+  'hudChrome.otaUpdate.downloading': 'Bajando actualización: {percent}',
+  'hudChrome.otaUpdate.incompatible':
+    'Hace falta actualizar para jugar. Se instalará en cuanto termine la descarga.',
+  'hudChrome.otaUpdate.progressLabel': 'Avance de descarga de la actualización',
+  'hudChrome.otaUpdate.title': 'Actualización del cliente',
 };

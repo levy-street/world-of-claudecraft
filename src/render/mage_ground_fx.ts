@@ -21,6 +21,25 @@
 import * as THREE from 'three';
 import { SCHOOL_COLORS } from './vfx';
 
+/** HSL lightness ceiling applied before a rune ring's additive brightening
+ *  multipliers (below). A near-white school tint (physical 0xffd28a, holy
+ *  0xffe9a0) already sits close to (1,1,1); multiplying it further clips
+ *  every channel toward white and the ring stops reading as a distinct
+ *  danger color at all. Verified against a real case: Warlord Grask
+ *  (rift_boss_brute)'s stomp authors no school and falls back to physical,
+ *  so its windup ring hit exactly this. Capping lightness first keeps every
+ *  school's hue distinguishable at every multiplier used below. */
+const RING_TINT_MAX_LIGHTNESS = 0.5;
+
+/** Caps `color`'s HSL lightness at RING_TINT_MAX_LIGHTNESS, preserving hue
+ *  and saturation. Returns a clone; never mutates the input. */
+export function capRingLightness(color: THREE.Color): THREE.Color {
+  const hsl = { h: 0, s: 0, l: 0 };
+  color.getHSL(hsl);
+  if (hsl.l <= RING_TINT_MAX_LIGHTNESS) return color.clone();
+  return new THREE.Color().setHSL(hsl.h, hsl.s, RING_TINT_MAX_LIGHTNESS);
+}
+
 const METEOR_DROP_HEIGHT = 45; // yards above the impact point it appears
 const METEOR_RADIUS = 1.12;
 const METEOR_TELEGRAPH_SEGMENTS = 72;
@@ -48,6 +67,11 @@ export interface RuneCircleSpawn {
   z: number;
   radius: number;
   duration: number;
+  /** Damage/mechanic school driving the ring's tint. Defaults to arcane, the
+   *  mage's own Rune of Power. A rift boss windup telegraph (stomp/pulse)
+   *  rides this same visual and passes the mechanic's real school, so a fire
+   *  boss doesn't wind up behind a violet ring that doesn't read as danger. */
+  school?: string;
 }
 
 export interface SnowZoneSpawn {
@@ -130,7 +154,10 @@ export class MageGroundFx {
   private runeRingGeo: THREE.RingGeometry | null = null;
   /** Free list of retired materials, bucketed by their fixed config kind
    *  (color/blending/transparency never change after construction here,
-   *  only opacity animates per instance). */
+   *  only opacity animates per instance). The rune family folds the cast's
+   *  school into its kind strings (`<name>:<school>`), so its bucket count
+   *  is bounded by name-count x the 7-member Aura['school'] union, not
+   *  unbounded: a real ceiling, not a cap this pool enforces itself. */
   private readonly materialPool = new Map<string, THREE.Material[]>();
 
   constructor(
@@ -145,8 +172,11 @@ export class MageGroundFx {
 
   /** Reuse a retired material of this kind if the pool has one (resetting the
    *  one animated field, opacity, back to its config baseline), otherwise
-   *  build a fresh one. `kind` identifies the fixed config, never per-spawn
-   *  data (spawn radius/duration/position never feed a material here). */
+   *  build a fresh one. `kind` identifies the FULL fixed config, including a
+   *  discrete config-selecting discriminator such as a cast's school (see
+   *  spawnRune): it must never carry CONTINUOUS per-spawn data (radius,
+   *  duration, position), which would mint one bucket per spawn and never
+   *  reuse anything. */
   private acquireMaterial<TMat extends THREE.Material>(
     kind: string,
     baseOpacity: number,
@@ -595,24 +625,34 @@ export class MageGroundFx {
   }
 
   spawnRune(opts: RuneCircleSpawn): void {
-    const arcane = new THREE.Color(SCHOOL_COLORS.arcane);
+    const school = opts.school ?? 'arcane';
+    const schoolColor = capRingLightness(
+      new THREE.Color(SCHOOL_COLORS[school] ?? SCHOOL_COLORS.arcane),
+    );
     const group = new THREE.Group();
     group.name = 'mage-rune-power';
     const mats: THREE.Material[] = [];
     const matKinds: string[] = [];
     const ownedGeometries: THREE.BufferGeometry[] = [];
     const baseOpacities: number[] = [];
-    // Outer ring at the zone edge, inner ring at half, both additive.
+    // Outer ring at the zone edge, inner ring at half, both additive. Pool
+    // kind carries the school: color is fixed config here (see
+    // acquireMaterial's contract), and different schools must never share a
+    // pooled instance or a later cast would inherit a stale tint. Each kind
+    // string is computed ONCE and reused for both acquire and release, so
+    // the two can never drift apart (a drift would either leak the bucket
+    // forever or resurrect the stale-tint bug this fixes).
     for (const [name, radius, opacity] of [
       ['mage-rune-power-outer-ring', opts.radius, 0.75],
       ['mage-rune-power-inner-ring', opts.radius * 0.55, 0.45],
     ] as const) {
+      const kind = `${name}:${school}`;
       const mat = this.acquireMaterial(
-        name,
+        kind,
         opacity,
         () =>
           new THREE.MeshBasicMaterial({
-            color: arcane.clone().multiplyScalar(1.6),
+            color: schoolColor.clone().multiplyScalar(1.6),
             transparent: true,
             opacity,
             blending: THREE.AdditiveBlending,
@@ -626,18 +666,19 @@ export class MageGroundFx {
       ring.renderOrder = 7;
       group.add(ring);
       mats.push(mat);
-      matKinds.push(name);
+      matKinds.push(kind);
       ownedGeometries.push(ringGeo);
       baseOpacities.push(opacity);
     }
     // Four spokes so the circle reads as an inscribed rune, not a plain ring.
+    const spokeKind = `mage-rune-power-spoke:${school}`;
     for (let i = 0; i < 4; i++) {
       const mat = this.acquireMaterial(
-        'mage-rune-power-spoke',
+        spokeKind,
         0.4,
         () =>
           new THREE.MeshBasicMaterial({
-            color: arcane.clone().multiplyScalar(1.3),
+            color: schoolColor.clone().multiplyScalar(1.3),
             transparent: true,
             opacity: 0.4,
             blending: THREE.AdditiveBlending,
@@ -657,19 +698,20 @@ export class MageGroundFx {
       spoke.renderOrder = 7;
       group.add(spoke);
       mats.push(mat);
-      matKinds.push('mage-rune-power-spoke');
+      matKinds.push(spokeKind);
       ownedGeometries.push(spokeGeo);
       baseOpacities.push(0.4);
     }
     // A soft filled glow at the center plus a ring of orbiting motes: the
     // inscription reads as living magic, not a chalk outline (owner playtest).
     const glowGeo = this.createTerrainDisc(opts.x, opts.z, opts.radius * 0.5, 32);
+    const glowKind = `mage-rune-power-glow:${school}`;
     const glowMat = this.acquireMaterial(
-      'mage-rune-power-glow',
+      glowKind,
       0.18,
       () =>
         new THREE.MeshBasicMaterial({
-          color: arcane.clone().multiplyScalar(0.9),
+          color: schoolColor.clone().multiplyScalar(0.9),
           transparent: true,
           opacity: 0.18,
           blending: THREE.AdditiveBlending,
@@ -682,7 +724,7 @@ export class MageGroundFx {
     glow.renderOrder = 6;
     group.add(glow);
     mats.push(glowMat);
-    matKinds.push('mage-rune-power-glow');
+    matKinds.push(glowKind);
     ownedGeometries.push(glowGeo);
     baseOpacities.push(0.18);
 
@@ -691,13 +733,14 @@ export class MageGroundFx {
     orbit.position.set(opts.x, this.groundY(opts.x, opts.z), opts.z);
     const moteGeo = new THREE.SphereGeometry(0.12, 8, 6);
     ownedGeometries.push(moteGeo);
+    const moteKind = `mage-rune-power-mote:${school}`;
     for (let i = 0; i < 6; i++) {
       const moteMat = this.acquireMaterial(
-        'mage-rune-power-mote',
+        moteKind,
         0.85,
         () =>
           new THREE.MeshBasicMaterial({
-            color: arcane.clone().multiplyScalar(1.9),
+            color: schoolColor.clone().multiplyScalar(1.9),
             transparent: true,
             opacity: 0.85,
             blending: THREE.AdditiveBlending,
@@ -709,7 +752,7 @@ export class MageGroundFx {
       mote.position.set(Math.cos(a) * opts.radius * 0.8, 0.5, Math.sin(a) * opts.radius * 0.8);
       orbit.add(mote);
       mats.push(moteMat);
-      matKinds.push('mage-rune-power-mote');
+      matKinds.push(moteKind);
       baseOpacities.push(0.85);
     }
     group.add(orbit);

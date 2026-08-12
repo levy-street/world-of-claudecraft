@@ -1142,6 +1142,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.sheathe': '무기 넣기/빼기',
   'hudChrome.keybinds.targetFriendly': '가장 가까운 아군 대상 지정',
   'hudChrome.keybinds.targetFriendlyNext': '아군 대상 순환',
+  'hudChrome.keybinds.targetPrev': '대상 역방향 순환',
   'hudChrome.petFeed.disabledFullHp': '펫의 체력이 가득 찼습니다',
   'hudChrome.petFeed.disabledNoFood': '가방에 펫을 치유할 음식이 없습니다',
   'hudChrome.options.clickMoveLeft': '왼쪽 클릭',
@@ -2680,6 +2681,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterBagAll': '모든 가방',
   'itemUi.market.filterRarity': '희귀도',
   'itemUi.market.filterRarityAll': '모든 희귀도',
+  'itemUi.market.filterSort': '정렬',
+  'itemUi.market.sortName': '이름 (A-Z)',
+  'itemUi.market.sortPriceAsc': '가격: 낮은순',
   'itemUi.market.weaponSword': '검',
   'itemUi.market.weaponDagger': '단검',
   'itemUi.market.weaponStaff': '지팡이',
@@ -5508,6 +5512,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatWindow.resetAction': '초기화',
   'hudChrome.chatWindow.note':
     '채팅 탭 줄을 드래그하면 창을 이동하고, 모서리 손잡이를 드래그하면 크기를 조절할 수 있습니다. 초기화하면 기본 위치와 크기로 돌아갑니다.',
+  'hudChrome.chatQuota.limitReached':
+    '일반 채팅 한도에 도달했습니다. {seconds} 후에 다시 시도하세요.',
+  'hudChrome.chatQuota.pending':
+    '이전 일반 채팅 메시지를 아직 보내는 중입니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.chatQuota.unavailable':
+    '일반 채팅은 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.compass.E': '동',
   'hudChrome.compass.N': '북',
   'hudChrome.compass.NE': '북동',
@@ -5839,6 +5849,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': '브라우저에서 무료로 즐기는 클래식 스타일 MMO입니다.',
   'guide.skipToContent': '본문으로 건너뛰기',
   'guide.loading': '불러오는 중...',
+  'guide.controls.targetPrev': '대상 역방향 순환',
   'guide.controls.targetFriendly': '가장 가까운 아군 대상 지정',
   'guide.deedsPage.cat.chronicle': '연대기',
   'guide.deedsPage.cat.collection': '수집',
@@ -7612,6 +7623,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.craftedToast': '제작 완료:{name}',
   'hudChrome.crafting.craftedToastQty': '제작 완료:{name} x{qty}',
   'hudChrome.crafting.insufficientMaterials': '재료가 부족합니다.',
+  'hudChrome.crafting.reagentLocked': '그 재료가 잠겨 있습니다.',
   'hudChrome.crafting.unknownRecipe': '해당 제작법이 존재하지 않습니다.',
   'hudChrome.crafting.comboRequires': '조율 조건: {craftA} + {craftB}, 티어 {tier}.',
   'hudChrome.crafting.comboMet': '준비 완료.',
@@ -10622,6 +10634,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': '해당 아이템을 가지고 있지 않습니다.',
   'hudChrome.enchanting.notDisenchantable': '해당 아이템은 마력을 추출할 수 없습니다.',
   'hudChrome.enchanting.notSalvageable': '해당 아이템은 분해할 수 없습니다.',
+  'hudChrome.enchanting.salvageLocked': '그 아이템은 잠겨 있습니다.',
   'hudChrome.enchanting.enchantWrongSlot': '그 마법부여는 해당 아이템에 적용할 수 없습니다.',
   'hudChrome.enchanting.enchantUnknown': '해당 마법부여가 존재하지 않습니다.',
   'hudChrome.enchanting.enchantInsufficient': '해당 마법부여에 필요한 재료가 없습니다.',
@@ -11288,6 +11301,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmAccept': '대체',
   'hudChrome.bags.itemAriaEnchanted': '{item}, 수량 {count}, 마법부여된 사본',
   'hudChrome.bags.itemAriaBound': '{item}, 수량 {count}, 귀속된 사본',
+  'hudChrome.bags.itemAriaLocked': '{item}, 수량 {count}, 잠김',
+  'hudChrome.bags.itemLockedLine': '잠김',
+  'hudChrome.bags.unlockItem': '아이템 잠금 해제',
   'hudChrome.itemTooltip.enchantedFallback': '마법부여됨',
   'devCommand.actions.kit.description':
     '특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다.',
@@ -12882,4 +12898,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '진행 중인 경기에서 나가는 것은 이탈이며, 레이팅이 걸린 사다리에서 지고 있을 때 접속을 끊는 행위에 보상을 줄 수는 없습니다. 이탈한 사람은 그 자리에서 패배와 그에 따르는 레이팅 하락을 떠안고, 깃발을 들고 있었다면 깃발을 떨어뜨리며, 그 팀은 한 명이 모자란 채로 계속 싸웁니다. 바로 이 마지막 대목이 빈자리가 있는 이유입니다. 경기에 인원이 모자란 동안 대기열은 기다리던 사람에게 그 자리를 제안할 수 있는데, 이는 언제나 받아들이거나 거절할 수 있는 제안이지 멋대로 이루어지는 전송이 아닙니다. 거절해도 아무런 손해가 없고 자리는 다음 사람에게 넘어갑니다. 제안을 받는 것은 혼자 대기한 사람뿐이므로, 함께 대기한 파티가 빈자리를 메우려고 갈라지는 일은 없습니다.',
   'guide.thornhollowPage.backfillNote':
     '보충 자리는 의도적으로 위험이 없습니다. 당신이 들어가는 것은 당신과 무관한 점수판이므로 이기든 지든 이 경기가 당신의 전장 레이팅을 건드리지 않으며, 도중에 떠나도 아무것도 물지 않습니다. 경기가 충분히 끝나가서 새로 온 사람이 결과를 바꿀 수 없는 시점이 되면 제안 자체가 오지 않으므로, 남의 마무리에 앉혀지는 일은 없습니다.',
+  'hudChrome.bags.lockItem': '아이템 잠그기',
+  'hudChrome.otaUpdate.applying': '업데이트를 다운로드했습니다. 적용을 위해 게임을 다시 시작합니다.',
+  'hudChrome.otaUpdate.continueAnyway': '업데이트하지 않고 계속',
+  'hudChrome.otaUpdate.downloading': '업데이트 다운로드 중: {percent}',
+  'hudChrome.otaUpdate.incompatible': '플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.',
+  'hudChrome.otaUpdate.progressLabel': '업데이트 다운로드 진행률',
+  'hudChrome.otaUpdate.title': '게임 업데이트',
 };

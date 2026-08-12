@@ -801,6 +801,11 @@ export const cs_CZ: EnTranslations = {
       "resetAction": "Reset",
       "note": "Tažením lišty karet chatu přesuneš okno, rohovým úchytem změníš velikost. Reset ho vrátí na výchozí pozici a velikost."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Úder",
       "seconds": "{seconds} s"
@@ -892,6 +897,14 @@ export const cs_CZ: EnTranslations = {
       "bodyWithVersion": "Je dostupná verze {version} World of ClaudeCraft. Aktualizuj teď pro nejnovější opravy a vylepšení.",
       "notNow": "Teď ne",
       "update": "Aktualizovat"
+    },
+    "otaUpdate": {
+      "title": "Aktualizace hry",
+      "downloading": "Stahování aktualizace: {percent}",
+      "applying": "Aktualizace stažena. Hra se restartuje, aby se použila.",
+      "incompatible": "Ke hraní je nutná aktualizace. Použije se, jakmile se dokončí stahování.",
+      "continueAnyway": "Pokračovat bez aktualizace",
+      "progressLabel": "Průběh stahování aktualizace"
     },
     "cameraPrompt": {
       "title": "Zvolte si kameru",
@@ -994,6 +1007,7 @@ export const cs_CZ: EnTranslations = {
       "emoteWheel": "Kruh emotů",
       "targetFriendly": "Zacílit nejbližšího spojence",
       "targetFriendlyNext": "Procházet spojenecké cíle",
+      "targetPrev": "Přepínat cíl zpět",
       "discord": "Discord",
       "valecup": "Pohár údolí",
       "bgFlag": "Akce s vlajkou na bojišti",
@@ -2187,6 +2201,10 @@ export const cs_CZ: EnTranslations = {
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
       "itemAriaQuest": "{item}, množství {count}, úkolový předmět",
+      "itemAriaLocked": "{item}, počet {count}, zamčeno",
+      "itemLockedLine": "Zamčeno",
+      "lockItem": "Zamknout předmět",
+      "unlockItem": "Odemknout předmět",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -3217,6 +3235,7 @@ export const cs_CZ: EnTranslations = {
       "craftedToast": "Vyrobeno: {name}",
       "craftedToastQty": "Vyrobeno: {name} x{qty}",
       "insufficientMaterials": "Na to nemáš materiály.",
+      "reagentLocked": "Reagencie pro to je zamčená.",
       "unknownRecipe": "Tento recept neexistuje.",
       "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
       "comboRequires": "Ladění: {craftA} + {craftB}, úroveň {tier}.",
@@ -3323,6 +3342,7 @@ export const cs_CZ: EnTranslations = {
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
       "notSalvageable": "Toto nelze rozebrat.",
+      "salvageLocked": "Tento předmět je zamčený.",
       "disenchantBusy": "Jsi zaneprázdněn(a).",
       "salvageBusy": "Jsi zaneprázdněn(a).",
       "enchantBusy": "Jsi zaneprázdněn(a).",
@@ -4169,6 +4189,7 @@ export const cs_CZ: EnTranslations = {
       "dungeonFinder": "Hledač dungeonů",
       "discord": "Discord",
       "abilities": "Použít schopnosti na akční liště, číselná řada; druhá lišta je na numpadu",
+      "targetPrev": "Přepínat cíl zpět",
       "targetFriendly": "Zacílit nejbližšího spojence",
       "cycleFriendly": "Přepínat spojenecký cíl",
       "targetAuras": "Zacílit buffy a debuffy",
@@ -8898,6 +8919,9 @@ export const cs_CZ: EnTranslations = {
       "filterPrimaryStatAll": "Libovolný hlavní atribut",
       "filterRarity": "Vzácnost",
       "filterRarityAll": "Všechny vzácnosti",
+      "filterSort": "Řazení",
+      "sortName": "Název (A-Z)",
+      "sortPriceAsc": "Cena: od nejnižší po nejvyšší",
       "weaponSword": "Meče",
       "weaponDagger": "Dýky",
       "weaponStaff": "Hole",

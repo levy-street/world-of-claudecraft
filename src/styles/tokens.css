@@ -199,6 +199,17 @@
     --color-bag-fine-wash: color-mix(in srgb, var(--color-bag-fine) 18%, transparent);
     --color-bag-fine-seal: var(--color-bag-fine);
 
+    /* Player item lock (issue 3042, components.css .bi-lock-seal, painted by
+       bags_window.ts / bank_window.ts / guild_bank_window.ts as a class, never
+       an inline color). A player-toggled safety mark, orthogonal to the
+       per-copy glyphs above (a locked copy can also be masterwork/enchanted/
+       signed/bound), so it paints in its OWN bottom-left corner rather than
+       competing for the top-left glyph slot. Warm amber, distinct from every
+       other bag-grid tint (enchanted green, signed/quest gold, bound steel-
+       blue, fine teal). Shape (padlock) is primary, tint is redundant
+       (fairness). */
+    --color-bag-lock-seal: #e0a24a;
+
     /* Empty paperdoll slot greys (char_window.ts uses these so the painter carries
        no raw hex): the muted "Empty" label and the dimmed placeholder-icon border.
        Exact pre-existing values. */

@@ -187,6 +187,17 @@ export class OpenFight {
     this.counters.recordsEmitted++;
   }
 
+  /**
+   * A sampled continuous stream (contract `SampleRecord`). Deliberately NOT
+   * counted against MAX_RAW_EVENTS_PER_FIGHT: samples are a fixed low rate per
+   * second, so a long fight that truncates its raw event lines still keeps a
+   * complete sampled series.
+   */
+  recordSample(tick: number, kind: 'pos' | 'res' | 'threat', data: unknown[]): void {
+    this.sink.enqueue({ t: 'sample', fightId: this.fightId, tick, kind, data });
+    this.counters.recordsEmitted++;
+  }
+
   // Rollup accumulation. The recorder calls these for every routed event even
   // past the raw-line cap, so fight_close totals stay complete.
 

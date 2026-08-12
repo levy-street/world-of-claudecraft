@@ -271,6 +271,7 @@ import {
 } from './item_instance_load';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
+import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import type { JailState } from './jail';
 import {
@@ -685,7 +686,7 @@ import * as valeCupMod from './social/vale_cup';
 import { createVcState, type VcState } from './social/vale_cup';
 import * as valeCupBotsMod from './social/vale_cup_bots';
 import { SpatialGrid } from './spatial';
-import { isStunDrCategory } from './stun_dr';
+import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
@@ -863,23 +864,11 @@ const ARENA_LADDER_SIZE = 10; // live online standings shipped to clients
 // logic. FIESTA_RING_CX/CZ, FIESTA_TOTAL_WAVES, and FIESTA_POWERUP_TELEGRAPH/TTL are
 // imported back (above) for the fiestaMatchInfo presentation accessor, which stays
 // on Sim. (A2 already moved FIESTA_COUNTDOWN to social/arena.ts.)
-const PVP_ROOT_DR_RESET = 18; // seconds before a repeated PvP root is fresh again
-const PVP_STUN_DR_RESET = 18; // stuns share the root-style 100/50/25/immune scheme
-const PVP_POLYMORPH_DR_RESET = 60;
-const PVP_FEAR_DR_RESET = 60;
-const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
-// Polymorph keeps an ABSOLUTE ladder on purpose: exactly one ability rides it
-// (mage polymorph, authored 15s), so the 10s first rung reads as a deliberate PvP
-// cap on a longer PvE value rather than an accident.
-const PVP_POLYMORPH_DR_DURATIONS = [10, 5, 1] as const;
-// Fear is a MULTIPLIER ladder, and must stay one. It was absolute seconds
-// ([8, 4, 2, 1]) returned without reading the ability's authored duration, so in
-// PvP every fear lasted 8s on first application no matter what its tooltip said:
-// Psychic Scream (4s) and Howl of Terror / Death Coil (3s) were all silently
-// doubled or better. Five abilities across three classes share this ladder, so an
-// absolute table can only ever be right for one of them. These factors reproduce
-// the old 8 -> 4 -> 2 -> 1 exactly for an 8s fear.
-const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
+// PVP_*_DR_* crowd-control diminishing-returns tuning (root/stun/polymorph/fear
+// reset windows, the multiplier ladder, and the polymorph/fear staged durations)
+// moved to stun_dr.ts with the two resolvers that read them
+// (crowdControlDurationAfterDr / diminishedCrowdControlDuration): the module
+// that already owns CC diminishing-return categories.
 // Exported for social/chat.ts (broadcastEmote) + the /roll say/yell ranges; the in-sim
 // say/yell distance checks read it too. /say carries a short distance; /yell across a camp.
 export const SAY_RANGE = 25;
@@ -7284,81 +7273,31 @@ export class Sim {
     return moved;
   }
 
-  /**
-   * The one funnel every PLAYER-sourced crowd-control application passes
-   * through: the diminishing-returns ladder, then the item-set duration
-   * reduction on top of it.
-   *
-   * The two are layered rather than fused because they are separate mechanisms.
-   * The ladder has five distinct exits inside its hostile branch and they do not
-   * all want the same treatment: stuns take an early return that exempts them
-   * from the ladder (a deliberate balance pass, see the comment at that site) but
-   * NOT from the set reduction, and a DR-immune target returns null, which means
-   * "apply nothing" and must pass through untouched rather than being multiplied.
-   * Applying the reduction at the generic ladder exit alone would silently miss
-   * stuns, which is the category the bonus most exists for, so it is applied here
-   * once, over whatever the ladder decided.
-   *
-   * The player/hostile gate is duplicated from the inner function on purpose: it
-   * is three cheap reads, it leaves the ladder's shape byte-identical to what
-   * shipped, and it makes the PvE-untouched property readable at one glance.
-   */
+  // The one funnel every PLAYER-sourced crowd-control application passes
+  // through: the PvP diminishing-returns ladder, then the item-set duration
+  // reduction on top of it. Body moved to stun_dr.ts (crowdControlDurationAfterDr
+  // / diminishedCrowdControlDuration, see their doc comments there); kept as a
+  // thin delegate here because SimContext-bound callers (`ctx.diminishedCrowdControlDuration`)
+  // and the in-class applyRootAura caller both resolve it on the Sim facade.
+  // Pre-bound once (not re-allocated per call): this delegate sits on the
+  // per-cast crowd-control path, including the AoE fan-outs in
+  // effect_dispatch.ts that can invoke it once per target in a single tick.
+  private readonly isHostileToBound = (a: Entity, b: Entity) => this.isHostileTo(a, b);
+
   private diminishedCrowdControlDuration(
     source: Entity,
     target: Entity,
     category: CrowdControlDrCategory,
     duration: number,
   ): number | null {
-    const base = this.crowdControlDurationAfterDr(source, target, category, duration);
-    if (base === null) return null; // already DR-immune: apply nothing at all
-    if (source.kind !== 'player' || target.kind !== 'player') return base;
-    if (!this.isHostileTo(source, target)) return base;
-    const reduction = target.ccDurationReduction ?? 0;
-    return reduction > 0 ? base * (1 - reduction) : base;
-  }
-
-  private crowdControlDurationAfterDr(
-    source: Entity,
-    target: Entity,
-    category: CrowdControlDrCategory,
-    duration: number,
-  ): number | null {
-    if (source.kind !== 'player' || target.kind !== 'player' || !this.isHostileTo(source, target)) {
-      return duration;
-    }
-    // Balance pass (maintainer): player stuns are exempt from PvP diminishing
-    // returns. They operate differently from fear: short flat durations behind
-    // real cooldowns, so the ladder only made banked stuns (Twin Gavels) feel
-    // broken. Fear, polymorph, root, and school lockouts keep their ladders.
-    if (isStunDrCategory(category)) return duration;
-    const existing = target.ccDr.get(category);
-    const stage = existing && existing.resetAt > this.time ? existing.stage : 0;
-    const reset =
-      category === 'polymorph'
-        ? PVP_POLYMORPH_DR_RESET
-        : category === 'fear'
-          ? PVP_FEAR_DR_RESET
-          : category === 'lockout'
-            ? PVP_STUN_DR_RESET
-            : isStunDrCategory(category)
-              ? PVP_STUN_DR_RESET
-              : PVP_ROOT_DR_RESET;
-    if (category === 'polymorph') {
-      target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
-      return PVP_POLYMORPH_DR_DURATIONS[Math.min(stage, PVP_POLYMORPH_DR_DURATIONS.length - 1)];
-    }
-    if (category === 'fear') {
-      target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
-      // Scales the ability's OWN duration; see PVP_FEAR_DR_MULTIPLIERS. Like
-      // polymorph and unlike root/stun, fear never reaches full immunity: the
-      // factor clamps at the last rung rather than returning null.
-      return (
-        duration * PVP_FEAR_DR_MULTIPLIERS[Math.min(stage, PVP_FEAR_DR_MULTIPLIERS.length - 1)]
-      );
-    }
-    if (stage >= PVP_CC_DR_MULTIPLIERS.length) return null;
-    target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
-    return duration * PVP_CC_DR_MULTIPLIERS[stage];
+    return diminishedCrowdControlDurationImpl(
+      this.time,
+      this.isHostileToBound,
+      source,
+      target,
+      category,
+      duration,
+    );
   }
 
   private hostilesInRadius(source: Entity, pos: Vec3, radius: number): Entity[] {
@@ -8672,6 +8611,10 @@ export class Sim {
     this.targeting.tabTarget(pid);
   }
 
+  tabTargetPrev(pid?: number): void {
+    this.targeting.tabTargetPrev(pid);
+  }
+
   targetNearestEnemy(pid?: number): void {
     this.targeting.targetNearestEnemy(pid);
   }
@@ -9054,6 +8997,17 @@ export class Sim {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
     items.discardItem(this.ctx, itemId, count, pid, named);
+  }
+
+  setItemLocked(
+    itemId: string,
+    locked: boolean,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    setItemLockedCmd(this.ctx, itemId, locked, pid, named);
   }
 
   equipItem(

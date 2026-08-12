@@ -80,6 +80,13 @@ import { type BiomeHazePreset, hazeLightLevel } from './biome_haze_field_core';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
 import { type BladeGrassBandView, buildBladeGrassBand } from './blade_grass_band';
+import {
+  type BlobShadowSlot,
+  blobBaseRadius,
+  blobShadowPlanInto,
+  createBlobShadowSlot,
+} from './blob_shadow_core';
+import { BlobShadows } from './blob_shadows';
 import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import {
@@ -421,6 +428,7 @@ import {
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
   orderedPrewarmIds,
+  orderPrewarmResumeEntries,
   type PrewarmEntryProgress,
   type PrewarmPolicy,
   partitionMandatoryLandmarkCandidates,
@@ -432,6 +440,8 @@ import {
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
   prewarmProgramContentKeys,
+  prewarmResumeIsDebt,
+  prewarmSubmitShouldStop,
   remainingPrewarmViewBudget,
   resolvePrewarmEntryStatus,
   resolvePrewarmPolicy,
@@ -440,6 +450,8 @@ import {
 } from './prewarm_policy';
 import {
   buildPrewarmCompileUnits,
+  compileRootDistanceSq,
+  orderRootsByDistanceSq,
   type PrewarmResumeEntry,
   type PrewarmResumeUnit,
   resumeDroppedPrewarmEntries,
@@ -460,10 +472,23 @@ import {
   renderBudgetShaderPrewarmLevels,
 } from './render_budget';
 import {
+  emptyRenderDiagnosticsSnapshot,
+  type RenderableDiagnosticObject,
+  RenderDiagnostics,
+  type RenderDiagnosticsSnapshot,
+} from './render_diagnostics';
+import {
+  measureFeatureFootprint,
+  setRenderCategory,
+  type TextureBackedMaterial,
+  type TextureMaterialKey,
+} from './renderer_diagnostics';
+import {
   beginRendererFrameTelemetry,
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
+import { createRevealGate } from './reveal_gate';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
@@ -481,14 +506,28 @@ import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
+import {
+  createShadowCadenceState,
+  resetShadowCadence,
+  updateShadowCadence,
+} from './shadow_cadence_core';
+import {
+  type ShadowAnchor,
+  shadowTexelWorldSize,
+  snapShadowAnchor,
+} from './shadow_texel_snap_core';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import {
   buildSky,
   ensureSkyAssetsAt,
   ensureSkyBiomeAssets,
+  pinSkyBiomeAssets,
   type SkyKey,
   type SkyView,
+  skyBiomesAt,
 } from './sky';
+import { zoneArrivalReady } from './sky_residency_core';
+import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
 import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from './static_matrix';
@@ -566,6 +605,7 @@ import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
+import { zonesEligibleForEviction } from './zone_eviction_core';
 import {
   type FeatureFootprint,
   hasUnseededInstanceMatrix,
@@ -688,6 +728,15 @@ const SPARKLE_DRAW_RANGE_SQ = 40 * 40;
 // weapons stay readable on low while the 80u draw cap still bounds total cost.
 // The literal lives in `crowd_lod.ts` beside the factors that scale it.
 const ENTITY_LOD_RANGE_SQ = CHARACTER_LOD_RANGE_SQ;
+// Contact-blob grounding range on the tiers with no dynamic shadows. Anchored
+// to the FIXED articulated-rig range for the same reason weapon_vfx_shed_core.ts
+// is (read its header): the live crowd-adaptive band edge swings with one
+// client's visible-rig count, so a cue keyed to it would pulse as unrelated
+// players wander through the frustum and two viewers standing in the same spot
+// would not even agree on where it ends. It also lands just inside the 62yd
+// proxy-shadow band the shadowed tiers ground bodies over, so the two tiers
+// carry the cue about as far as each other.
+const BLOB_SHADOW_RANGE_SQ = CHARACTER_LOD_RANGE_SQ;
 
 // Crowd-adaptive character LOD (articulated-rig + shadow ranges, and the mid-band
 // animation cadence) lives in `crowd_lod.ts`: pure policy, unit-tested there.
@@ -869,8 +918,6 @@ const LASTKEEP_SUN_COLOR = 0xffd9a8;
 const LASTKEEP_HEMI_SKY_COLOR = 0xffe4c4;
 const LASTKEEP_HEMI_GROUND_COLOR = 0x4a3826;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
-const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
-const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
 const RENDER_STALL_ATTRIBUTION_MS = 80;
 const PREWARM_MOB_TEMPLATE_IDS = [
   'forest_wolf',
@@ -938,59 +985,6 @@ type RendererPhaseStats = Record<
   RendererPhase,
   { count: number; avg: number; p95: number; max: number }
 >;
-type RenderDiagnosticsCategory = string;
-type RenderableDiagnosticObject = THREE.Object3D & {
-  isMesh?: boolean;
-  isInstancedMesh?: boolean;
-  isSkinnedMesh?: boolean;
-  isPoints?: boolean;
-  isSprite?: boolean;
-  isLine?: boolean;
-  isLineSegments?: boolean;
-  geometry?: THREE.BufferGeometry;
-  material?: THREE.Material | THREE.Material[];
-  count?: number;
-};
-
-type TextureBackedMaterial = THREE.Material & {
-  map?: THREE.Texture | null;
-  alphaMap?: THREE.Texture | null;
-  aoMap?: THREE.Texture | null;
-  bumpMap?: THREE.Texture | null;
-  displacementMap?: THREE.Texture | null;
-  emissiveMap?: THREE.Texture | null;
-  envMap?: THREE.Texture | null;
-  lightMap?: THREE.Texture | null;
-  metalnessMap?: THREE.Texture | null;
-  normalMap?: THREE.Texture | null;
-  roughnessMap?: THREE.Texture | null;
-  specularMap?: THREE.Texture | null;
-  gradientMap?: THREE.Texture | null;
-};
-type TextureMaterialKey = keyof Omit<TextureBackedMaterial, keyof THREE.Material>;
-export interface RenderDiagnosticsCategoryStats {
-  objects: number;
-  draws: number;
-  triangles: number;
-  points: number;
-  materials: number;
-  materialSamples: string[];
-}
-
-export interface RenderDiagnosticsSnapshot {
-  enabled: boolean;
-  totalObjects: number;
-  estimatedDraws: number;
-  estimatedTriangles: number;
-  estimatedPoints: number;
-  programs: number;
-  programDelta: number;
-  textures: number;
-  textureDelta: number;
-  newMaterials: string[];
-  firstVisibleObjects: string[];
-  categories: Record<RenderDiagnosticsCategory, RenderDiagnosticsCategoryStats>;
-}
 
 interface RendererFrameStats {
   phaseMs: RendererFramePhaseMs;
@@ -1343,66 +1337,6 @@ function emptyFoliagePerfStats(): FoliagePerfStats {
     grassBuildMs: 0,
     grassCacheLimit: 0,
   };
-}
-
-function emptyRenderDiagnosticsSnapshot(): RenderDiagnosticsSnapshot {
-  return {
-    enabled: false,
-    totalObjects: 0,
-    estimatedDraws: 0,
-    estimatedTriangles: 0,
-    estimatedPoints: 0,
-    programs: 0,
-    programDelta: 0,
-    textures: 0,
-    textureDelta: 0,
-    newMaterials: [],
-    firstVisibleObjects: [],
-    categories: {},
-  };
-}
-
-function loopbackHostname(hostname: string): boolean {
-  return (
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    hostname === '::1' ||
-    hostname === '[::1]'
-  );
-}
-
-function localRenderDiagnosticsEnabled(): boolean {
-  if (!import.meta.env.DEV) return false;
-  if (typeof location === 'undefined') return false;
-  if (!loopbackHostname(location.hostname)) return false;
-  const params = new URLSearchParams(location.search);
-  return (
-    params.get('perfTrace') === '1' ||
-    params.get('perf_trace') === '1' ||
-    params.get('renderTrace') === '1'
-  );
-}
-
-/**
- * The world-space XZ footprint of a static feature group, for the per-frame
- * distance cull (see zone_feature_visibility_core.ts). Measured once, right
- * after the group is frozen: these groups never move again, so re-deriving
- * bounds every frame would be pure waste. Null when the group has no
- * measurable geometry, which the caller treats as "always visible".
- */
-function measureFeatureFootprint(root: THREE.Object3D): FeatureFootprint | null {
-  const box = new THREE.Box3().setFromObject(root);
-  if (box.isEmpty()) return null;
-  const center = box.getCenter(new THREE.Vector3());
-  const size = box.getSize(new THREE.Vector3());
-  return { centerX: center.x, centerZ: center.z, halfX: size.x / 2, halfZ: size.z / 2 };
-}
-
-// Diagnostics-only label (the census buckets and the renderTrace walker read
-// it); NEVER a behavior or visibility gate, so tagging an actionable object
-// (team rings, corpse beacon) can never become a graphics-fairness break.
-function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosticsCategory): void {
-  obj.userData.renderCategory = category;
 }
 
 function isPersistentPortalObject(e: Entity): boolean {
@@ -1765,6 +1699,16 @@ export class Renderer {
   private moonDir = new THREE.Vector3(0, -1, 0);
   private lightDir = new THREE.Vector3(); // blended sun/moon dir the key light uses
   private shadowLightDirection = new THREE.Vector3();
+  // World units per shadow-map texel (ortho box width / GFX.shadowMap), set
+  // once beside the shadow camera; 0 disables snapping. shadowSnappedAnchor
+  // is the per-frame scratch shadow_texel_snap_core.ts fills so the frustum
+  // follows the player in whole-texel steps (anti shadow-swimming).
+  private shadowTexelWorld = 0;
+  private readonly shadowSnappedAnchor: ShadowAnchor = { x: 0, y: 0, z: 0 };
+  // Budget-governed shadow cadence (shadow_cadence_core.ts): under sustained
+  // render-budget pressure the shadow map updates every other frame, halving
+  // the second scene draw; applied right after the governor each frame.
+  private readonly shadowCadence = createShadowCadenceState();
   private sunUp = 1;
   private moonUp = 0;
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
@@ -1800,6 +1744,11 @@ export class Renderer {
   private campBraziers: CampBraziersView | null = null;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
+  // Contact blobs under nearby bodies, built ONLY on the tiers that cast no
+  // dynamic shadow (null everywhere else), plus the one scratch slot the
+  // entity loop refills per character.
+  private blobShadows: BlobShadows | null = null;
+  private blobShadowSlot: BlobShadowSlot = createBlobShadowSlot();
   // Pooled scratch for the night light field's dynamic entries (the body
   // collector rewrites it each frame; entries past the count are stale).
   private nightBodyLights: NightLightSite[] = [];
@@ -1857,6 +1806,8 @@ export class Renderer {
       dt: number,
       reducedMotion?: boolean,
     ): void;
+    setFarCellRevealGate(gate: { allow(key: string): boolean } | null): void;
+    farCellRevealRoots(key: string): readonly THREE.Object3D[];
   };
   private eastbrookTownView!: EastbrookTownView;
   private fenbridgeTownView!: FenbridgeTownView;
@@ -1870,6 +1821,29 @@ export class Renderer {
   // at every biome boundary. Lives as long as the renderer, like the env RTs.
   private pmremGenerator: THREE.PMREMGenerator | null = null;
   private envBiome: SkyKey = 'vale';
+  // The per-biome sky eviction/restore lane. Its host view is read-through, not
+  // a snapshot: skyView is rebuilt by build(), and envBiome / envTransition move
+  // under an IBL ease long after this field initializes.
+  private readonly skyResidency = new SkyResidencyDriver({
+    isShutdown: () => this.shutdownStarted,
+    lifecycleGeneration: () => this.lifecycleGeneration,
+    scene: () => this.scene,
+    skyView: () => this.skyView,
+    envRTs: () => this.envRTs,
+    envBiome: () => this.envBiome,
+    envTransition: () => this.envTransition,
+    preparedZones: () => this.preparedZones,
+    liveZones: () => this.sim.cfg.world?.zones ?? ZONES,
+    zoneIdAt: (x, z) => this.zoneIdAt(x, z),
+    prewarmTextureInIdle: (texture) => this.prewarmTextureInIdle(texture),
+    runPmrem: (biome, label) =>
+      this.backgroundGpuWork.run(
+        () => this.ensureEnvironmentBiome(biome),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        label,
+      ),
+    idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }),
+  });
   private envOutdoorIntensity = ENV_INTENSITY;
   private envTransition: EnvironmentMapTransition<SkyKey> = createEnvironmentMapTransition(
     'vale',
@@ -2109,14 +2083,15 @@ export class Renderer {
     visibleViews: 0,
   };
   private lastPrewarmStats: RendererPrewarmStats | null = null;
-  private readonly renderDiagnosticsEnabled = localRenderDiagnosticsEnabled();
-  private renderDiagnosticsSnapshot = emptyRenderDiagnosticsSnapshot();
-  private renderDiagnosticsNextSampleAt = 0;
-  private renderDiagnosticsSamplePending = false;
-  private renderDiagnosticsKnownMaterials = new Set<string>();
-  private renderDiagnosticsKnownVisibleObjects = new Set<string>();
-  private renderDiagnosticsLastPrograms = 0;
-  private renderDiagnosticsLastTextures = 0;
+  private readonly renderDiagnostics = new RenderDiagnostics({
+    counters: () => ({
+      programs: this.webgl.info.programs?.length ?? 0,
+      textures: this.webgl.info.memory.textures,
+    }),
+    scene: () => this.scene,
+    generation: () => this.lifecycleGeneration,
+    shutdown: () => this.shutdownStarted,
+  });
   private appliedBudgetLevels: RenderBudgetState['levels'] | null = null;
   private lastQualityChange: RendererQualityChangeStats | null = null;
   private visualPool = new CharacterVisualPool<CharacterVisual>();
@@ -2435,6 +2410,14 @@ export class Renderer {
     // still clears acne on the low-poly facets
     sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.035;
     sun.shadow.radius = 2.25;
+    // Texel size from the REAL map size three will use: WebGLShadowMap scales
+    // a requested mapSize down to the GPU's maxTextureSize at render time, so
+    // an unclamped derivation would quantize to a fraction of a real texel on
+    // a capped device and quietly lose the anti-swimming property.
+    this.shadowTexelWorld = shadowTexelWorldSize(
+      2 * S,
+      Math.min(GFX.shadowMap, this.webgl.capabilities.maxTextureSize),
+    );
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;
@@ -2671,6 +2654,42 @@ export class Renderer {
     freezeStaticSubtreeMatrices(this.fenbridgeTownView.group);
     bd('fenbridge-town');
 
+    // First-reveal compile gates (hitch-hunt P3a): a cull flipping world
+    // content visible for the first time holds it one representation back
+    // until its programs are linked off-thread. Without async compile the
+    // gate itself would be the synchronous stall, so the views stay ungated
+    // there and keep their historical immediate reveal. Reveal compiles ride
+    // BELOW the live entity gates (VISIBLE_PREWARM, not LIVE_VIEW): a
+    // teleport can queue dozens of far cells at once, and cosmetic scenery
+    // must never delay an actionable mob or player reveal.
+    if (this.asyncCompileSupported) {
+      const revealHost = {
+        compile: (root: object) => {
+          const target = root as THREE.Object3D;
+          return this.liveCompileGates.run(
+            () =>
+              this.compilePrewarmColorPrograms(target, false).then(() =>
+                this.compileShadowPrograms(target),
+              ),
+            VIEW_COMPILE_GATE_MAX_MS,
+            {
+              priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+              label: `reveal-gate:${target.name || target.type}`,
+            },
+          );
+        },
+      };
+      this.propsView.setFarCellRevealGate(
+        createRevealGate(revealHost, (key) => this.propsView.farCellRevealRoots(key)),
+      );
+      this.eastbrookTownView.setRevealGate(
+        createRevealGate(revealHost, () => this.eastbrookTownView.staticRevealRoots()),
+      );
+      this.fenbridgeTownView.setRevealGate(
+        createRevealGate(revealHost, () => this.fenbridgeTownView.staticRevealRoots()),
+      );
+    }
+
     // Map-editor play-test: freely placed GLB models (cosmetic, render-only). Loads
     // async and pops in; absent for the built-in world. The view supports live
     // editing (add/move/remove/reSeat), reached through the editor-only
@@ -2719,6 +2738,17 @@ export class Renderer {
     this.mobNightGlow = buildMobNightGlow();
     setRenderCategory(this.mobNightGlow.group, 'ui3d');
     this.scene.add(this.mobNightGlow.group);
+    // Contact-blob grounding, and ONLY where the real shadow pass is off: on
+    // those tiers a body has no contact cue whatsoever and reads as floating.
+    // The tier is fixed for this renderer's lifetime (a graphics change tears
+    // the Renderer down and builds a new one, see
+    // src/game/graphics_rebuild_coordinator.ts), so the gate is settled once
+    // here rather than re-read every frame, and there is no live toggle path.
+    if (!GFX.dynamicShadows) {
+      this.blobShadows = new BlobShadows();
+      setRenderCategory(this.blobShadows.mesh, 'ui3d');
+      this.scene.add(this.blobShadows.mesh);
+    }
     // Ember pools at every authored campfire: static, so they bucket per zone
     // and ride the same distance cull as the lamps.
     this.emberPools = buildEmberPools(this.sim.cfg.seed);
@@ -2969,6 +2999,11 @@ export class Renderer {
           sourceId: impact.sourceId,
           ability: 'summon_infernal',
         });
+      },
+      undefined, // keep the deferred-loaded impact texture default
+      {
+        register: (light) => this.registerBudgetPointLight(light),
+        release: (light) => this.releaseBudgetPointLight(light),
       },
     );
     this.necromancyGroundFx = new NecromancyGroundFx(this.scene, (x, z) =>
@@ -3275,6 +3310,9 @@ export class Renderer {
     this.prewarmRenderTarget = null;
     bestEffort(() => this.pmremGenerator?.dispose());
     this.pmremGenerator = null;
+    // Unbind this dome from the sky module's live-binding set, or a replaced
+    // renderer's dome would pin its last biome pair against eviction forever.
+    bestEffort(() => this.skyView?.dispose());
     for (const target of this.envRTs.values()) {
       bestEffort(() => target.dispose());
     }
@@ -3315,6 +3353,11 @@ export class Renderer {
     // batch or any renderer DOM surface added after the explicit maps above.
     bestEffort(() => this.nameplateLayer.replaceChildren());
     bestEffort(() => this.travelSpeedFx?.dispose());
+    // Renderer-owned (not a module singleton): the graphics-rebuild teardown
+    // comes through HERE (shutdown -> disposeRendererResources), so the blob
+    // pool, texture and material release with the rest of the GPU state.
+    bestEffort(() => this.blobShadows?.dispose());
+    this.blobShadows = null;
     bestEffort(() => this.scene.clear());
     const webgl = this.webgl as THREE.WebGLRenderer | undefined;
     if (webgl) {
@@ -3500,7 +3543,16 @@ export class Renderer {
 
   isZoneReadyAt(x: number, z: number): boolean {
     const id = this.zoneIdAt(x, z);
-    return id === null || (this.preparedZones.has(id) && this.prewarmedZonePrograms.has(id));
+    if (id === null) return true;
+    // Sky residency is part of arrival readiness: a false routes the arrival
+    // through prepareZoneAt's sky recovery branch (curtain, or idle pace).
+    return zoneArrivalReady({
+      prepared: this.preparedZones.has(id),
+      programsPrewarmed: this.prewarmedZonePrograms.has(id),
+      standardMaterials: GFX.standardMaterials,
+      skyResident: () =>
+        skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome)),
+    });
   }
 
   zoneStreamingStats(): {
@@ -3522,7 +3574,10 @@ export class Renderer {
     };
   }
 
-  private ensureEnvironmentBiome(biome: BiomeId): THREE.WebGLRenderTarget | null {
+  // SkyKey, not BiomeId: envRTs, envBiome and skyView.envTexture are all keyed
+  // by the wider sky key. The live callers still pass a zone biome (the two
+  // place-keyed skies have never had a prefiltered environment of their own).
+  private ensureEnvironmentBiome(biome: SkyKey): THREE.WebGLRenderTarget | null {
     if (this.lowGfx) return null;
     const existing = this.envRTs.get(biome);
     if (existing) return existing;
@@ -3556,31 +3611,42 @@ export class Renderer {
     z: number,
     idlePace: boolean,
   ): Promise<void> {
-    await ensureSkyAssetsAt(x, z);
-    const envSource = this.skyView.envTexture(zone.biome);
-    const domeSource = this.skyView.domeTexture(zone.biome);
-    if (!idlePace) {
-      // Initial entry/teleport is already covered by an opaque loading screen.
-      this.ensureEnvironmentBiome(zone.biome);
-      this.prewarmTexture(envSource);
-      this.prewarmTexture(domeSource);
-      return;
+    // Every key the arrival can SEE, not just zone.biome: Farshore and the
+    // Sowfield bowl draw a place-keyed dome whose zone key is another biome,
+    // and warming only that key left the place dome its full 2K upload on
+    // first live bind. PMREM stays on zone.biome (place skies never had one).
+    // The pin holds for the whole warm: an evict mid-warm would dispose a
+    // texture about to be re-uploaded, minting GPU backing no store owns.
+    const skyKeys = skyBiomesAt(x, z);
+    const unpin = pinSkyBiomeAssets(skyKeys);
+    try {
+      await ensureSkyAssetsAt(x, z);
+      if (!idlePace) {
+        // Every non-idle caller (entry, teleport, the blocking sky recovery)
+        // sits behind an opaque loading screen; the walked recovery is idle.
+        this.ensureEnvironmentBiome(zone.biome);
+        this.prewarmTexture(this.skyView.envTexture(zone.biome));
+        for (const key of skyKeys) this.prewarmTexture(this.skyView.domeTexture(key));
+        return;
+      }
+      // A DataTexture upload is synchronous even from requestIdleCallback. Newer
+      // Three runtimes can split HDRIs into row batches; pinned r165 lacks update
+      // ranges and pays one full upload. Either way each atomic WebGL call enters
+      // the shared queue so it cannot overlap a live shader compile.
+      await this.prewarmTextureInIdle(this.skyView.envTexture(zone.biome));
+      // PMREM generation is indivisible in Three r165. Defer two timed-out
+      // callbacks before deliberately paying that single unit under sustained
+      // load, rather than running it on the first forced callback.
+      await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
+      await this.backgroundGpuWork.run(
+        () => this.ensureEnvironmentBiome(zone.biome),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        `pmrem:${zone.biome}`,
+      );
+      for (const key of skyKeys) await this.prewarmTextureInIdle(this.skyView.domeTexture(key));
+    } finally {
+      unpin();
     }
-    // A DataTexture upload is synchronous even from requestIdleCallback. Newer
-    // Three runtimes can split HDRIs into row batches; pinned r165 lacks update
-    // ranges and pays one full upload. Either way each atomic WebGL call enters
-    // the shared queue so it cannot overlap a live shader compile.
-    await this.prewarmTextureInIdle(envSource);
-    // PMREM generation is indivisible in Three r165. Defer two timed-out
-    // callbacks before deliberately paying that single unit under sustained
-    // load, rather than running it on the first forced callback.
-    await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
-    await this.backgroundGpuWork.run(
-      () => this.ensureEnvironmentBiome(zone.biome),
-      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-      `pmrem:${zone.biome}`,
-    );
-    await this.prewarmTextureInIdle(domeSource);
   }
 
   /**
@@ -3602,6 +3668,27 @@ export class Renderer {
     if (this.shutdownStarted) return Promise.resolve();
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.preparedZones.has(zoneId)) {
+      // The zone build stays skipped, but its SKY may have been released while
+      // the player was away (see updateSkyResidency): re-run the sky half only,
+      // and return it so a blocking arrival (a teleport landing back in a realm
+      // it visited hours ago) waits behind the loading screen for its dome
+      // instead of arriving under the previous realm's frozen sky. Gated on
+      // standardMaterials because the shadowless tiers never fetch HDRIs at
+      // all: their stores stay empty by design, the residency predicate is
+      // permanently false there, and this branch would re-run prepareZoneSky
+      // on every arrival forever (review round 1; ensureSkyResidency guards
+      // the same case on the recheck lane). Progress completes only after the
+      // dome work it now awaits, so a blocking arrival's loading bar cannot
+      // sit at 100 percent while the sky loads.
+      if (
+        zoneId !== null &&
+        GFX.standardMaterials &&
+        !skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome))
+      ) {
+        return this.prepareZoneSky(zoneAt(x, z), x, z, opts?.pace === 'idle').then(() => {
+          onProgress?.(1, 1);
+        });
+      }
       onProgress?.(1, 1);
       return Promise.resolve();
     }
@@ -3883,7 +3970,8 @@ export class Renderer {
   // horizon changed. Runs from sync(), one zone in flight at a time.
   private queueVisibleZonePrepares(horizon: number): void {
     const player = this.sim.player;
-    if (this.fogState !== 'outdoor' || this.zoneIdAt(player.pos.x, player.pos.z) === null) {
+    const currentZoneId = this.zoneIdAt(player.pos.x, player.pos.z);
+    if (this.fogState !== 'outdoor' || currentZoneId === null) {
       this.visibleZonePrepareQueue = [];
       return;
     }
@@ -3900,6 +3988,11 @@ export class Renderer {
     this.visibleZoneCheckX = cameraX;
     this.visibleZoneCheckZ = cameraZ;
     this.visibleZoneCheckFar = horizon;
+    this.evictFarZoneIfConstrained(currentZoneId, player.pos.x, player.pos.z);
+    // Same cadence, opposite direction: the per-biome sky stores are unbounded
+    // without an eviction pass, and this is the one place that already knows
+    // the camera moved far enough to reconsider zone residency.
+    this.skyResidency.updateSkyResidency(cameraX, cameraZ);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
     this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
@@ -3911,6 +4004,24 @@ export class Renderer {
       forwardZ,
     ).filter((zone) => !this.preparedZones.has(zone.id) && !this.pendingZonePrepares.has(zone.id));
     this.pumpVisibleZonePrepareQueue();
+  }
+
+  // Thin consumer of zone_eviction_core.ts's zonesEligibleForEviction; no-op on unconstrained hosts.
+  private evictFarZoneIfConstrained(currentZoneId: string, playerX: number, playerZ: number): void {
+    if (!GFX.constrainedMemory) return;
+    const zoneId = zonesEligibleForEviction(
+      ZONES,
+      this.preparedZones,
+      currentZoneId,
+      playerX,
+      playerZ,
+    )[0];
+    if (!zoneId) return;
+    const zone = ZONES.find((z) => z.id === zoneId);
+    if (!zone) return;
+    this.terrainView.unloadZone(zone);
+    this.waterView.unloadZone(zone.id);
+    this.preparedZones.delete(zoneId);
   }
 
   private pumpVisibleZonePrepareQueue(): void {
@@ -4211,6 +4322,8 @@ export class Renderer {
       this.renderBudgetMaxScale(),
     );
     this.applyRenderBudgetState(this.renderBudgetState);
+    resetShadowCadence(this.shadowCadence);
+    this.applyShadowCadence();
     this.applyResolution();
   }
 
@@ -4324,6 +4437,7 @@ export class Renderer {
     renderScale: number;
     effectiveRenderScale: number;
     renderBudget: RenderBudgetState;
+    shadowCadenceHalfRate: boolean;
     pixelRatio: number;
     width: number;
     height: number;
@@ -4377,6 +4491,10 @@ export class Renderer {
       renderScale: this.renderScale,
       effectiveRenderScale: this.effectiveRenderScale,
       renderBudget,
+      // Whether the budget-governed shadow cadence is currently shedding to
+      // every-other-frame updates: surfaced so the ?perf overlay and capture
+      // artifacts can tell a half-rate sample from a full-rate one.
+      shadowCadenceHalfRate: this.shadowCadence.halfRate,
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,
@@ -4572,192 +4690,6 @@ export class Renderer {
     };
   }
 
-  private materialLabels(material: THREE.Material | THREE.Material[] | undefined): string[] {
-    const mats = Array.isArray(material) ? material : material ? [material] : [];
-    return mats.map((mat) => `${mat.name || mat.type}:${mat.uuid.slice(0, 8)}`);
-  }
-
-  private drawCountFor(
-    material: THREE.Material | THREE.Material[] | undefined,
-    geometry?: THREE.BufferGeometry,
-  ): number {
-    if (!material) return 1;
-    if (Array.isArray(material)) return Math.max(1, geometry?.groups.length || material.length);
-    return Math.max(
-      1,
-      geometry?.groups.length && geometry.groups.length > 0 ? geometry.groups.length : 1,
-    );
-  }
-
-  private triangleCountFor(geometry?: THREE.BufferGeometry): number {
-    if (!geometry) return 0;
-    const drawCount = geometry.index?.count ?? geometry.getAttribute('position')?.count ?? 0;
-    return Math.max(0, Math.floor(drawCount / 3));
-  }
-
-  private objectDiagnosticLabel(
-    obj: THREE.Object3D,
-    category: string,
-    materialLabels: string[],
-  ): string {
-    const name = obj.name || obj.type;
-    const material = materialLabels[0] ?? 'no-material';
-    return `${category}:${name}:${material}`.slice(0, 140);
-  }
-
-  private collectRenderDiagnostics(): RenderDiagnosticsSnapshot {
-    if (!this.renderDiagnosticsEnabled) return this.renderDiagnosticsSnapshot;
-    const info = this.webgl.info;
-    const programs = info.programs?.length ?? 0;
-    const textures = info.memory.textures;
-    const programDelta = programs - this.renderDiagnosticsLastPrograms;
-    const textureDelta = textures - this.renderDiagnosticsLastTextures;
-    this.renderDiagnosticsLastPrograms = programs;
-    this.renderDiagnosticsLastTextures = textures;
-
-    type MutableCategoryStats = RenderDiagnosticsCategoryStats & {
-      materialKeys: Set<string>;
-    };
-    const categories: Record<string, MutableCategoryStats> = {};
-    const totals = { objects: 0, draws: 0, triangles: 0, points: 0 };
-    const newMaterials: string[] = [];
-    const firstVisibleObjects: string[] = [];
-    const categoryStats = (category: string): MutableCategoryStats => {
-      categories[category] ??= {
-        objects: 0,
-        draws: 0,
-        triangles: 0,
-        points: 0,
-        materials: 0,
-        materialSamples: [],
-        materialKeys: new Set<string>(),
-      };
-      return categories[category];
-    };
-    const visit = (
-      obj: THREE.Object3D,
-      inheritedCategory: string,
-      inheritedVisible: boolean,
-    ): void => {
-      const visible = inheritedVisible && obj.visible;
-      const category =
-        typeof obj.userData.renderCategory === 'string'
-          ? (obj.userData.renderCategory as string)
-          : inheritedCategory;
-      if (visible) {
-        const renderable = obj as RenderableDiagnosticObject;
-        const hasMesh = Boolean(
-          renderable.isMesh || renderable.isInstancedMesh || renderable.isSkinnedMesh,
-        );
-        const hasPoints = Boolean(renderable.isPoints);
-        const hasSprite = Boolean(renderable.isSprite);
-        const hasLine = Boolean(renderable.isLine || renderable.isLineSegments);
-        if (hasMesh || hasPoints || hasSprite || hasLine) {
-          const geometry = renderable.geometry;
-          const material = renderable.material;
-          const stat = categoryStats(category);
-          const labels = this.materialLabels(material);
-          const draws = this.drawCountFor(material, geometry);
-          let triangles = 0;
-          let pointCount = 0;
-          if (hasMesh) {
-            const instanceCount = renderable.isInstancedMesh
-              ? Math.max(0, renderable.count ?? 0)
-              : 1;
-            triangles = this.triangleCountFor(geometry) * instanceCount;
-          } else if (hasSprite) {
-            triangles = 2;
-          } else if (hasPoints) {
-            pointCount = geometry?.getAttribute('position')?.count ?? 0;
-          }
-          stat.objects++;
-          stat.draws += draws;
-          stat.triangles += triangles;
-          stat.points += pointCount;
-          totals.objects++;
-          totals.draws += draws;
-          totals.triangles += triangles;
-          totals.points += pointCount;
-          for (const label of labels) {
-            if (!stat.materialKeys.has(label)) {
-              stat.materialKeys.add(label);
-              if (stat.materialSamples.length < 8) stat.materialSamples.push(label);
-            }
-            if (!this.renderDiagnosticsKnownMaterials.has(label)) {
-              this.renderDiagnosticsKnownMaterials.add(label);
-              if (newMaterials.length < 16) newMaterials.push(label);
-            }
-          }
-          const visibleKey = `${category}|${obj.uuid}|${geometry?.uuid ?? ''}|${labels.join('|')}`;
-          if (!this.renderDiagnosticsKnownVisibleObjects.has(visibleKey)) {
-            this.renderDiagnosticsKnownVisibleObjects.add(visibleKey);
-            if (firstVisibleObjects.length < 16)
-              firstVisibleObjects.push(this.objectDiagnosticLabel(obj, category, labels));
-          }
-        }
-      }
-      for (const child of obj.children) visit(child, category, visible);
-    };
-    visit(this.scene, 'unknown', true);
-
-    const outCategories: Record<string, RenderDiagnosticsCategoryStats> = {};
-    for (const [category, stat] of Object.entries(categories)) {
-      outCategories[category] = {
-        objects: stat.objects,
-        draws: stat.draws,
-        triangles: stat.triangles,
-        points: stat.points,
-        materials: stat.materialKeys.size,
-        materialSamples: stat.materialSamples,
-      };
-    }
-    return {
-      enabled: true,
-      totalObjects: totals.objects,
-      estimatedDraws: totals.draws,
-      estimatedTriangles: totals.triangles,
-      estimatedPoints: totals.points,
-      programs,
-      programDelta,
-      textures,
-      textureDelta,
-      newMaterials,
-      firstVisibleObjects,
-      categories: outCategories,
-    };
-  }
-
-  private renderDiagnosticsForFrame(now: number, force = false): RenderDiagnosticsSnapshot {
-    if (!this.renderDiagnosticsEnabled) return this.renderDiagnosticsSnapshot;
-    if (force) {
-      this.renderDiagnosticsSnapshot = this.collectRenderDiagnostics();
-      this.renderDiagnosticsNextSampleAt = now + RENDER_DIAGNOSTICS_SAMPLE_MS;
-      return this.renderDiagnosticsSnapshot;
-    }
-    if (!this.renderDiagnosticsSamplePending && now >= this.renderDiagnosticsNextSampleAt) {
-      this.renderDiagnosticsSamplePending = true;
-      this.renderDiagnosticsNextSampleAt = now + RENDER_DIAGNOSTICS_SAMPLE_MS;
-      const generation = this.lifecycleGeneration;
-      const run = (): void => {
-        if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
-        try {
-          this.renderDiagnosticsSnapshot = this.collectRenderDiagnostics();
-        } finally {
-          this.renderDiagnosticsSamplePending = false;
-        }
-      };
-      const win = window as Window & {
-        requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
-      };
-      if (win.requestIdleCallback)
-        win.requestIdleCallback(run, {
-          timeout: RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS,
-        });
-      else window.setTimeout(run, 100);
-    }
-    return this.renderDiagnosticsSnapshot;
-  }
-
   private updateAdaptiveResolution(dt: number): void {
     if (!Number.isFinite(dt) || dt <= 0) return;
     const frameMs = Math.min(250, dt * 1000);
@@ -4799,6 +4731,27 @@ export class Renderer {
     this.stableFrameTime = state.stableSeconds;
     if (this.adaptiveGrace > 0) this.adaptiveGrace = Math.max(0, this.adaptiveGrace - dt);
     this.applyRenderBudgetState(state);
+    updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled);
+    this.applyShadowCadence();
+  }
+
+  /** Write the cadence plan onto three's shadowMap flags. Runs at the top of
+   *  sync(), before the frame's render; the bounded prewarm saves/restores
+   *  BOTH flags around its renders and the per-frame re-assert here makes
+   *  every restore self-healing. An out-of-band render between this write
+   *  and the frame render (renderPrewarmPass, the census probe's frozen
+   *  pass) can consume a pending needsUpdate; the cost is at most one extra
+   *  frame of shadow staleness on those bounded dev/startup paths, never a
+   *  lost update in steady state. */
+  private applyShadowCadence(): void {
+    if (!this.sun.castShadow) return;
+    const shadowMap = this.webgl.shadowMap;
+    const autoUpdate = !this.shadowCadence.halfRate;
+    if (shadowMap.autoUpdate !== autoUpdate) shadowMap.autoUpdate = autoUpdate;
+    // Under half rate three skips the pass when both flags are false and
+    // clears needsUpdate after each rendered pass, so the every-other-frame
+    // arm is exactly this write.
+    if (!autoUpdate && this.shadowCadence.renderThisFrame) shadowMap.needsUpdate = true;
   }
 
   private runtimeViewCreateBudget(dt: number): number {
@@ -5102,6 +5055,11 @@ export class Renderer {
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
+    // The meteor fx registers and releases budget lights AFTER the pass (a
+    // landing frees the visible fall light), which would dip the pinned
+    // visible count for this frame, and numPointLights is in every lit
+    // material's program cache key. Re-run the budget, pads included.
+    if (this.lightRankDirty) this.budgetFireLights(p.pos.x, p.pos.z);
     this.necromancyGroundFx.update(dt, this.reducedMotion());
     this.necromancyArmyPortalFx.update(dt, this.reducedMotion());
     this.abyssalRiftFx.update(dt, this.reducedMotion());
@@ -5949,10 +5907,10 @@ export class Renderer {
   }
 
   private diagnosticsBaselineForPrewarm(): RendererPrewarmDiagnosticsBaselineStats | null {
-    if (!this.renderDiagnosticsEnabled) return null;
-    this.renderDiagnosticsSnapshot = this.collectRenderDiagnostics();
+    if (!this.renderDiagnostics.enabled) return null;
+    const snapshot = this.renderDiagnostics.collect();
     const categories: RendererPrewarmDiagnosticsBaselineStats['categories'] = {};
-    for (const [name, stat] of Object.entries(this.renderDiagnosticsSnapshot.categories)) {
+    for (const [name, stat] of Object.entries(snapshot.categories)) {
       categories[name] = {
         draws: stat.draws,
         triangles: stat.triangles,
@@ -5960,11 +5918,11 @@ export class Renderer {
       };
     }
     return {
-      programs: this.renderDiagnosticsSnapshot.programs,
-      textures: this.renderDiagnosticsSnapshot.textures,
-      totalObjects: this.renderDiagnosticsSnapshot.totalObjects,
-      estimatedDraws: this.renderDiagnosticsSnapshot.estimatedDraws,
-      estimatedTriangles: this.renderDiagnosticsSnapshot.estimatedTriangles,
+      programs: snapshot.programs,
+      textures: snapshot.textures,
+      totalObjects: snapshot.totalObjects,
+      estimatedDraws: snapshot.estimatedDraws,
+      estimatedTriangles: snapshot.estimatedTriangles,
       categories,
     };
   }
@@ -6196,9 +6154,20 @@ export class Renderer {
             ? [
                 {
                   id: 'scene',
-                  roots: compileRoots(
-                    this.scene.children.filter((root) => !stagedRoots.has(root)),
-                    true,
+                  // Near-first: the resume lane drains these in order, and the
+                  // debt the camera can reach first must be the debt paid
+                  // first (hitch-hunt P3a; the S10 632-681 ms submit stalls
+                  // were reveals winning the race against their own compile).
+                  // Anchored on the PLAYER, not the camera: the early submit
+                  // runs before the first updateCamera, when the camera still
+                  // sits at its constructor default.
+                  roots: orderRootsByDistanceSq(
+                    compileRoots(
+                      this.scene.children.filter((root) => !stagedRoots.has(root)),
+                      true,
+                    ),
+                    (root) =>
+                      compileRootDistanceSq(root, this.sim.player.pos.x, this.sim.player.pos.z),
                   ),
                 },
               ]
@@ -6286,9 +6255,20 @@ export class Renderer {
     // group and re-collection rules are pinned by tests.
     const submittedCompileUnits: { id: string; done: Promise<void> }[] = [];
     const submittedCompileGroups = new Set<string>();
+    // Units built (their roots consumed from the shared dedupe store) but not
+    // yet submitted because the loop below hit the GPU submit deadline. The
+    // roots are marked seen at BUILD time, so these exact unit objects are the
+    // only remaining route to their compiles: the compile entry drains them
+    // first when it runs, and the post-manifest hand-off pushes any leftover
+    // to the resume lane (never dropped, hitch-hunt P1).
+    const deferredSubmitUnits: PrewarmResumeUnit[] = [];
     const LATE_COMPILE_GROUPS = new Set(['weapon-vfx']);
     const RECOLLECT_COMPILE_GROUPS = new Set(['scene']);
-    const submitCompileUnits = async (includeLate: boolean) => {
+    // deadlineMs: the early entry stops at the GPU submit guard; the compile
+    // entry's tail call passes min(gpuSubmitDeadline, compileAwaitDeadline)
+    // so the submit loop can never eat the await reserve that keeps
+    // world.initial-frame's programs linked before it draws.
+    const submitCompileUnits = async (includeLate: boolean, deadlineMs = gpuSubmitDeadline) => {
       const plan = planCompileSubmission({
         groups: [
           { id: 'scene', exists: true },
@@ -6302,7 +6282,33 @@ export class Renderer {
       const collect = new Set(plan.collect);
       const units = compileEntryUnits((groupId) => collect.has(groupId));
       for (const groupId of plan.mark) submittedCompileGroups.add(groupId);
-      for (const unit of units) {
+      // Earlier-deferred units resubmit ahead of the fresh collection; their
+      // groups are already marked, so the plan above never re-collected them.
+      const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];
+      for (let i = 0; i < pending.length; i++) {
+        // Deadline-aware, checked BETWEEN units: one uninterrupted submit loop
+        // measured 22 s of synchronous prologue work in production, sailing
+        // past the 15 s hard deadline and dropping every entry behind it, the
+        // deadline-exempt debt payers included (hitch-hunt S1/S2).
+        if (
+          prewarmSubmitShouldStop(
+            performance.now(),
+            deadlineMs,
+            policy.finishFullManifestBeforeReveal,
+          )
+        ) {
+          deferredSubmitUnits.push(...pending.slice(i));
+          // The deferred units' compiles now settle AFTER the manifest, so
+          // the warm entity/NPC pools must not publish from the manifest's
+          // finally block with unlinked programs: the settle-then-publish
+          // arm below publishes them once the resume lane drains (same
+          // contract as the compile entry's whole-deferral path).
+          deferPoolPublication ||=
+            (entityPrewarmPool.length > 0 && (entityPrewarmGroup?.children.length ?? 0) > 0) ||
+            (npcPrewarmPool.length > 0 && (npcPrewarmGroup?.children.length ?? 0) > 0);
+          return;
+        }
+        const unit = pending[i];
         submittedCompileUnits.push({
           id: unit.id,
           done: Promise.resolve(unit.run()).catch((err: unknown) => {
@@ -6786,7 +6792,10 @@ export class Renderer {
           if (policy.skipMonolithCompile || !this.asyncCompileSupported) return;
           await submitCompileUnits(false);
         },
-        detail: () => `submitted=${submittedCompileUnits.length}`,
+        detail: () =>
+          deferredSubmitUnits.length > 0
+            ? `submitted=${submittedCompileUnits.length};deferred=${deferredSubmitUnits.length}`
+            : `submitted=${submittedCompileUnits.length}`,
       },
       {
         // The worn-stone family maps (normal/AO/rough/displacement/metal) and
@@ -7166,8 +7175,12 @@ export class Renderer {
           // the late-staged groups (weapon-vfx stages at priority 61), any
           // group that did not exist yet back then (landmark stages at 48),
           // and the live-scene re-collection.
-          await submitCompileUnits(true);
-          compileUnitsPlanned = submittedCompileUnits.length;
+          await submitCompileUnits(true, Math.min(gpuSubmitDeadline, compileAwaitDeadline));
+          compileUnitsPlanned = submittedCompileUnits.length + deferredSubmitUnits.length;
+          // Honesty gate: units deferred mid-run went to the resume lane, so
+          // this entry must report 'partial', never 'completed'
+          // (resolvePrewarmEntryStatus reads trimmed via the dropped count).
+          compileUnitsDropped = deferredSubmitUnits.length;
           // Await every submitted unit so all of their programs are READY
           // before world.initial-frame renders (a program still linking by
           // then links synchronously inside that frame, the measured
@@ -7221,7 +7234,8 @@ export class Renderer {
               }
             : null,
         detail: () =>
-          `mode=${compileMode};timedOut=${compileTimedOut};compileRoots=${compiledPrewarmRoots}`,
+          `mode=${compileMode};timedOut=${compileTimedOut};compileRoots=${compiledPrewarmRoots}` +
+          (compileUnitsDropped > 0 ? `;deferred=${compileUnitsDropped}` : ''),
       },
       {
         id: 'programs.budget-variants',
@@ -7374,6 +7388,19 @@ export class Renderer {
       cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication });
     }
 
+    // Deferred compile-submit units whose owner never drained them (the
+    // compile entry itself was dropped, or its drain hit the deadline again):
+    // their roots are consumed in the shared dedupe store, so these unit
+    // objects are the only remaining route to those compiles. Hand them to
+    // the resume lane as link debt rather than dropping them (the production
+    // failure this lane exists for, hitch-hunt P1).
+    if (deferredSubmitUnits.length > 0) {
+      droppedEntries.push({
+        id: 'programs.compile-submit',
+        units: deferredSubmitUnits.splice(0, deferredSubmitUnits.length),
+      });
+    }
+
     // Either arm needs the settle-then-publish scheduling below: real dropped
     // work (droppedEntries), or the compile entry's resumeUnits callback
     // withholding pool publication (deferPoolPublication) even though its OWN
@@ -7385,7 +7412,11 @@ export class Renderer {
     if (droppedEntries.length > 0 || deferPoolPublication) {
       // Fire-and-forget: world-entry timing does not depend on this. Every
       // retained item is an explicit small unit, never a whole entry rerun.
-      const resume = droppedEntries.slice();
+      // Debt first: the lane is strictly serial in array order, so the
+      // BOOT_DEBT priority alone cannot reorder it; manifest order would put
+      // the cosmetic entries (which resume BELOW the preview lane) ahead of
+      // the link/upload debt, the exact starvation this lane exists to fix.
+      const resume = orderPrewarmResumeEntries(droppedEntries);
       const failedResumeUnits: string[] = [];
       if (resume.length > 0) {
         console.info(
@@ -7406,16 +7437,33 @@ export class Renderer {
               idleSlot(IDLE_PREWARM_TIMEOUT_MS, {
                 maxTimeoutDeferrals: 2,
               }),
-            runUnit: (unit) =>
-              // releaseTail: a resume unit's wall time is dominated by its
-              // off-thread compileAsync links. Without it each 16-root unit
-              // occupied the whole serial queue for seconds, so live compile
-              // gates (LIVE_VIEW/ACTIONABLE_VIEW, which do declare their
-              // tails) could not START and first-sight content hitched for
-              // minutes after entry (the captured travel-hitch amplifier).
-              this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id, {
-                releaseTail: true,
-              }),
+            runUnit: (unit, entry) => {
+              // Link/upload debt runs at BOOT_DEBT so the cosmetic BACKGROUND
+              // warmers (the preview lane) cannot starve it: production
+              // measured minutes of unpaid link debt behind the previews,
+              // surfacing as first-draw stalls (hitch-hunt P1). Debt keeps
+              // its tail HELD (releaseTail false): released tails let every
+              // debt batch's links pile into the driver concurrently, and
+              // with the whole manifest dropped that queue depth made every
+              // first draw block for seconds (measured sub-1-fps for a full
+              // minute locally). Serial, settled-before-next batches keep the
+              // link queue shallow; live gates (LIVE_VIEW/ACTIONABLE_VIEW)
+              // preempt between batches, waiting at most one batch's settle.
+              const debt = prewarmResumeIsDebt(entry.id);
+              return this.backgroundGpuWork.run(
+                unit.run,
+                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,
+                unit.id,
+                {
+                  // Cosmetic resume keeps the released tail: without it each
+                  // 16-root unit occupied the whole serial queue for seconds,
+                  // so live compile gates could not START and first-sight
+                  // content hitched for minutes after entry (the captured
+                  // travel-hitch amplifier).
+                  releaseTail: !debt,
+                },
+              );
+            },
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
               failedResumeUnits.push(`${entry.id}:${unit.id}`);
@@ -7987,6 +8035,7 @@ export class Renderer {
             z: ev.z,
             radius: ev.radius ?? 8,
             duration: ev.duration ?? 15,
+            school: ev.school,
           });
           break;
         }
@@ -9702,7 +9751,19 @@ export class Renderer {
         if (this.bgViews.has(i)) continue;
         const o = battlegroundOrigin(i);
         if (Math.abs(px - o.x) < 220 && Math.abs(pz - o.z) < 200) {
-          const view = buildBattleground(o, this.sim.cfg.seed, { lowGfx: this.lowGfx });
+          // The field's authored point lights ride the shared fire-light budget
+          // (the yumi-maze hook shape above): the field streams in mid-session,
+          // and up to 14 lights appearing outside the rank would change the
+          // pinned visible point-light count and relink every lit material in
+          // view. The build is async, so the registration lands later; the
+          // callback marks the rank dirty whenever it does.
+          const view = buildBattleground(o, this.sim.cfg.seed, {
+            lowGfx: this.lowGfx,
+            fireLights: this.fireLights,
+            onFireLightsChanged: () => {
+              this.lightRankDirty = true;
+            },
+          });
           this.scene.add(view.group);
           this.bgViews.set(i, view);
         }
@@ -10221,8 +10282,32 @@ export class Renderer {
   // day/night is off, so it keeps the fixed anchor for a stable, cheap look.
   private updateKeyLight(pp: THREE.Vector3): void {
     if (this.lowGfx && !this.sun.castShadow) return;
+    // Follow the player in whole shadow-map texel steps, not raw sub-texel
+    // ones: position and target translate together, so the light DIRECTION
+    // is untouched and only the shadow rasterization grid stops sliding
+    // under static geometry (shadow_texel_snap_core.ts). A shadowless key
+    // light has no grid to align to and keeps the raw position.
+    const anchor = this.shadowSnappedAnchor;
+    anchor.x = pp.x;
+    anchor.y = pp.y;
+    anchor.z = pp.z;
     if (this.lowGfx) {
-      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
+      if (this.sun.castShadow)
+        snapShadowAnchor(
+          SUN_ANCHOR.x,
+          SUN_ANCHOR.y,
+          SUN_ANCHOR.z,
+          pp.x,
+          pp.y,
+          pp.z,
+          this.shadowTexelWorld,
+          anchor,
+        );
+      this.sun.position.set(
+        anchor.x + SUN_ANCHOR.x,
+        anchor.y + SUN_ANCHOR.y,
+        anchor.z + SUN_ANCHOR.z,
+      );
     } else {
       // the key light hands off from the sun to the moon across the terminator.
       // Blend the two directions smoothly (rather than a hard switch) as the sun
@@ -10232,10 +10317,21 @@ export class Renderer {
       t = t < 0 ? 0 : t > 1 ? 1 : t;
       const blend = t * t * (3 - 2 * t);
       this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
+      if (this.sun.castShadow)
+        snapShadowAnchor(
+          this.lightDir.x,
+          this.lightDir.y,
+          this.lightDir.z,
+          pp.x,
+          pp.y,
+          pp.z,
+          this.shadowTexelWorld,
+          anchor,
+        );
       this.sun.position.set(
-        pp.x + this.lightDir.x * SUN_TRAVEL_DISTANCE,
-        pp.y + this.lightDir.y * SUN_TRAVEL_DISTANCE,
-        pp.z + this.lightDir.z * SUN_TRAVEL_DISTANCE,
+        anchor.x + this.lightDir.x * SUN_TRAVEL_DISTANCE,
+        anchor.y + this.lightDir.y * SUN_TRAVEL_DISTANCE,
+        anchor.z + this.lightDir.z * SUN_TRAVEL_DISTANCE,
       );
       // the unlit water shader follows the same key light and grade: glints
       // track the sun by day and the moon by night, and the surface dims with
@@ -10250,12 +10346,12 @@ export class Renderer {
       // texel (foliage_shadow_core.ts). Push it here, where the light's own
       // direction and target are decided, so the two can never disagree.
       if (this.sun.castShadow) {
-        setFoliageShadowVolume(this.lightDir, pp, this.sun.shadow.camera, SUN_TRAVEL_DISTANCE);
+        setFoliageShadowVolume(this.lightDir, anchor, this.sun.shadow.camera, SUN_TRAVEL_DISTANCE);
       } else {
         clearFoliageShadowVolume();
       }
     }
-    this.sun.target.position.set(pp.x, pp.y, pp.z);
+    this.sun.target.position.set(anchor.x, anchor.y, anchor.z);
   }
 
   // Aim the sun and moon disc sprites along their directions and fade them by how
@@ -10607,6 +10703,9 @@ export class Renderer {
     const shadowRangeSq = lodBands.shadowRangeSq;
     const shadowsEnabled = this.sun.castShadow;
     let visibleRigCount = 0;
+    // Contact blobs are refilled from scratch inside the loop below (null on
+    // every tier that casts real shadows).
+    this.blobShadows?.begin();
 
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
@@ -11488,6 +11587,37 @@ export class Renderer {
         v.group.position.y = smoothY;
         if (isSelf) selfPos.y = smoothY;
       }
+      // Contact blob (no-dynamic-shadow tiers only; the painter is null on the
+      // rest). Filled here rather than from a walk of its own because
+      // everything it needs has just been settled for this body: the drawn feet
+      // height, whether the body is on a surface at all, the frustum answer,
+      // and the distance. Far-LOD bodies are included on purpose: the blob is
+      // read off the entity, not the rig, so a frozen static mesh keeps its
+      // grounding. A corpse keeps its blob for as long as the body is drawn.
+      //
+      // Ground reference: the DRAWN feet height while the body is on a
+      // surface, which is exact and free, and keeps a blob flush with a dock, a
+      // crate top, or a step the smoother is still easing. Only an airborne or
+      // swimming body pays a terrain sample (a handful per frame at most), and
+      // for a swimmer the lake bed below collapses the blob by height, which is
+      // what should happen to a body that is not touching the ground.
+      if (this.blobShadows) {
+        const onSurface = !airborne && !swimming;
+        const blobGroundY = onSurface ? smoothY : groundHeight(x, z, this.sim.cfg.seed);
+        this.blobShadows.push(
+          blobShadowPlanInto(
+            this.blobShadowSlot,
+            x,
+            smoothY,
+            z,
+            blobGroundY,
+            blobBaseRadius(active.height, v.liveScale),
+            d2,
+            BLOB_SHADOW_RANGE_SQ,
+            v.group.visible && active.root.visible && charOnScreen,
+          ),
+        );
+      }
       // Terrain lean: near bodies tip toward the surface they stand on. The
       // gradient is resampled on a cadence (four terrain samples) and damped
       // in between, so a crowd costs a handful of samples per frame, and a
@@ -12070,6 +12200,7 @@ export class Renderer {
       if (!charOnScreen) v.group.visible = false;
     }
     this.lastVisibleRigCount = visibleRigCount;
+    this.blobShadows?.commit();
     this.drainWeaponSkinApplies();
 
     // Night mob glow: a warm pool of light on the ground under every nearby body
@@ -12338,6 +12469,9 @@ export class Renderer {
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
+    // Same post-fx budget recovery as the prewarm frame path: a landing or
+    // expiry must not dip the pinned visible count for the frame it lands on.
+    if (this.lightRankDirty) this.budgetFireLights(p.pos.x, p.pos.z, true);
     this.necromancyGroundFx.update(dt, this.reducedMotion());
     this.necromancyArmyPortalFx.update(dt, this.reducedMotion());
     this.abyssalRiftFx.update(dt, this.reducedMotion());
@@ -12679,7 +12813,7 @@ export class Renderer {
     framePhaseMs.total = roundMs(totalMs);
     this.recordRendererPhase('total', totalMs);
     const afterSubmit = performance.now();
-    frameStats.renderDiagnostics = this.renderDiagnosticsForFrame(
+    frameStats.renderDiagnostics = this.renderDiagnostics.forFrame(
       afterSubmit,
       framePhaseMs.submit >= RENDER_STALL_ATTRIBUTION_MS,
     );
@@ -12780,6 +12914,34 @@ export class Renderer {
       // stats on composer tiers (covers the throw path too).
       this.discardOutOfBandDraws();
     }
+  }
+
+  // The registration seam for a point light an fx mints mid-session (the
+  // warlock infernal's fall and impact lights). It MUST join the same ranked
+  // budget as fire and view lights: Three counts a light into numPointLights
+  // iff `visible`, that count is part of every lit material's program cache
+  // key, and one unranked light appearing is a synchronous relink of every lit
+  // material in view (the mid-combat stall the pinned count exists to prevent).
+  // Hidden on the way in because the owning fx updates AFTER budgetFireLights
+  // in the frame, so the light must never count unranked; the post-fx recovery
+  // pass (both frame paths re-run the budget when the rank went dirty) ranks
+  // it before this frame renders, and the budget owns `visible` from then on.
+  // Dynamic means
+  // the budget only ever ZEROES the intensity and never restores it, so an fx
+  // that wants a light back must re-drive its own level from BEFORE the pass
+  // (weapon_vfx.ts is the other dynamic owner and does exactly that).
+  private registerBudgetPointLight(light: THREE.PointLight): void {
+    light.userData.budgetDynamic = true;
+    light.visible = false;
+    this.viewLights.push(light);
+    this.lightRankDirty = true;
+  }
+
+  private releaseBudgetPointLight(light: THREE.PointLight): void {
+    const index = this.viewLights.indexOf(light);
+    if (index < 0) return;
+    this.viewLights.splice(index, 1);
+    this.lightRankDirty = true;
   }
 
   // Forward-renderer point-light budget: every campfire/torch light exists,
@@ -12988,6 +13150,7 @@ export class Renderer {
     this.cancelTerrainStreaming();
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
+    this.blobShadows?.dispose();
   }
 
   /**

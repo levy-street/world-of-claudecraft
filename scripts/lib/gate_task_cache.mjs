@@ -16,13 +16,6 @@
 // - Standalone `npm test` / `npm run build` still regenerate via pretest/build
 //   (Phase 2 generate-once only applies inside gate.mjs).
 //
-// Turbo invocation: gate steps resolve the pnpm-hoisted node_modules/.bin/turbo
-// binary directly (resolveTurboBin) rather than spawning `npx turbo`, so every
-// cacheable step skips npx's own package-resolution and version-check overhead
-// on top of an install `pnpm install --frozen-lockfile` already guarantees.
-
-import path from 'node:path';
-
 /** Tasks the full gate runs through turbo for local disk cache. */
 export const GATE_CACHEABLE_TASKS = Object.freeze([
   'i18n:gen',
@@ -143,26 +136,7 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
 export const GATE_TURBO_UI_ARGS = Object.freeze(['--ui=stream']);
 
 /**
- * Absolute path to the pnpm-hoisted turbo binary for a gate step's `cmd`. Gate
- * steps spawn this directly instead of `npx turbo`, matching how gate.mjs and
- * gate_select.mjs already resolve their own repoRoot (fileURLToPath, not cwd,
- * so the path is correct regardless of the invoking process's working directory).
- * @param {string} repoRoot
- * @returns {string}
- */
-export function resolveTurboBin(repoRoot) {
-  return path.join(
-    repoRoot,
-    'node_modules',
-    '.bin',
-    `turbo${process.platform === 'win32' ? '.cmd' : ''}`,
-  );
-}
-
-/**
- * Args for the resolved turbo binary's `run <tasks...>` (see resolveTurboBin).
- * No leading `turbo` token: the binary itself, not npx's dispatch argv, already
- * names the tool, so `cmd` carries that identity and `args` starts at `run`.
+ * Args for `turbo run <tasks...>`.
  * @param {ReadonlyArray<string>} tasks package.json script names
  * @returns {string[]}
  */
@@ -179,17 +153,10 @@ export function turboRunArgs(tasks) {
 }
 
 /**
- * True when a gate step invokes the resolved turbo binary directly (cacheable
- * pure artifacts). `cmd` is an absolute path from resolveTurboBin, so this
- * matches the binary's basename rather than an exact `npx` command string.
+ * True when a gate step invokes turbo through npx for cacheable pure artifacts.
  * @param {string} cmd
  * @param {ReadonlyArray<string>} args
  */
 export function isTurboGateStep(cmd, args) {
-  return (
-    typeof cmd === 'string' &&
-    /(?:^|[\\/])turbo(?:\.cmd)?$/.test(cmd) &&
-    Array.isArray(args) &&
-    args[0] === 'run'
-  );
+  return /(?:^|[\\/])turbo(?:\.cmd)?$/.test(cmd) && Array.isArray(args) && args[0] === 'run';
 }

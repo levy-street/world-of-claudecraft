@@ -111,9 +111,13 @@ describe('deferred skin atlases on every iOS WebKit host', () => {
   });
 
   it('never caches a portrait rendered while its atlas is still in flight', () => {
+    // The pending guard lives in trackSkinAtlasPending, shared by the sync
+    // capture path (returns null, fallback crest) AND the paced async prewarm
+    // (early-outs before building anything).
     expect(portraitSource).toContain('const atlasPending = ensureSkinTexture(visualKey, skin);');
-    expect(portraitSource).toContain('if (atlasPending) {');
-    expect(portraitSource).toContain('return null;');
+    expect(portraitSource).toContain('if (!atlasPending) return false;');
+    expect(portraitSource).toContain('if (trackSkinAtlasPending(visualKey, skin)) return null;');
+    expect(portraitSource).toContain('atlasPending: () => trackSkinAtlasPending(visualKey, skin),');
     expect(portraitChipSource).toContain('onPortraitUpdate((visualKey, skin) => {');
     expect(mainSource).toContain('refreshStartSkinPickerPortraits(');
   });

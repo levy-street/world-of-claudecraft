@@ -201,6 +201,7 @@ import {
   isAuthError,
   NATIVE_APP,
 } from './net/online';
+import { installOtaUpdateGate } from './net/ota_update_gate';
 import { realmPopulation } from './net/realm_population';
 import { RECONNECT_CONFLICT_ERROR } from './net/reconnect_policy';
 import {
@@ -431,6 +432,7 @@ import { mobileMountAction } from './ui/mount_quick_summon';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
+import { hideOtaUpdateOverlay, renderOtaUpdateOverlay } from './ui/ota_update_overlay';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { applyPerfOrnamentVars } from './ui/perf_ornament_svg';
 import { PerfOverlay } from './ui/perf_overlay';
@@ -462,6 +464,7 @@ import {
 } from './ui/wallet_balance';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
 import type { IWorld } from './world_api';
+import { ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
 
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
@@ -771,6 +774,19 @@ syncAppViewport();
 syncBuildInfo();
 scheduleNativeUpdateCheck(__APP_VERSION__);
 void notifyOtaAppReady();
+// Visible OTA gate (native shells only; installOtaUpdateGate is inert
+// elsewhere): shows the auto-updater's download progress over the start
+// screens, applies a finished download immediately pre-world instead of
+// waiting for a backgrounding, and upgrades the incompatible-version dead end
+// into "updating now" (the onDisconnect arm consults it before fatalOverlay).
+const otaUpdateGate = installOtaUpdateGate({
+  overlay: {
+    render: (model) => renderOtaUpdateOverlay(model, { onContinue: () => otaUpdateGate.dismiss() }),
+    hide: hideOtaUpdateOverlay,
+  },
+  isInWorld: () => document.body.classList.contains('game-active'),
+  onFatalRecoveryFailed: () => fatalOverlay(userFacingApiError(ONLINE_WORLD_INCOMPATIBLE_MESSAGE)),
+});
 preventMobileZoom();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
@@ -1829,6 +1845,7 @@ async function startGame(
     canvas,
     {
       onTab: () => world.tabTarget(),
+      onTabPrev: () => world.tabTargetPrev(),
       onTargetFriendly: () => world.targetNearestFriendly(),
       onCycleFriendly: () => world.friendlyTabTarget(),
       // Pet bar (Ctrl+1..5 by default): drive the existing IWorld pet commands.
@@ -2122,6 +2139,9 @@ async function startGame(
     switch (id) {
       case 'target':
         world.tabTarget();
+        break;
+      case 'targetPrev':
+        world.tabTargetPrev();
         break;
       case 'targetFriendly':
         world.targetNearestFriendly();
@@ -3730,8 +3750,14 @@ async function startGame(
       // procedural math, so gameplay on not-yet-rendered ground stays correct;
       // the chunks under the player stream in first (prepareZoneAt priority),
       // and the fog residency clamp keeps the unbuilt remainder hidden.
+      // A PREPARED zone only reaches here when its sky was evicted: that
+      // sky-only recovery must take prepareZoneSky's idle arm, because there
+      // is no curtain and the fast arm pays a synchronous PMREM plus full
+      // uploads in live play. An unprepared zone keeps the historic
+      // escalating join so the ground under the player still fills fast.
+      const skyOnlyRecovery = renderer.isZonePreparedAt(zoneX, zoneZ);
       zoneWarmup = renderer
-        .prepareZoneAt(zoneX, zoneZ)
+        .prepareZoneAt(zoneX, zoneZ, undefined, skyOnlyRecovery ? { pace: 'idle' } : undefined)
         .then(() => renderer.prewarmZoneAt(zoneX, zoneZ, { background: true }))
         .catch((err) => {
           console.warn('Background zone warmup failed', err);
@@ -6898,6 +6924,13 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     stopActiveEntryDiagnostics();
     clearEntryProbe();
     console.warn('[entry-diag] connection ended; entry probe cleared');
+    // A native shell rejected for a stale world-layout epoch while an OTA
+    // bundle is downloading or staged: the gate takes the screen (progress,
+    // then an immediate reload-apply) instead of the dead-end overlay below,
+    // whose Reload button would just boot the same stale bundle. The resume
+    // marker deliberately survives here: after the update applies, the reload
+    // resumes straight into the world on the NEW bundle.
+    if (otaUpdateGate.handleIncompatibleDisconnect(reason)) return;
     // The session ended for good (retries exhausted, kick, takeover, auth fail):
     // fatalOverlay clears the resume marker so a reload does not loop back into
     // a dead session. Exception: a duplicate-session conflict means the

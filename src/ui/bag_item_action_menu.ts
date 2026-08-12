@@ -32,7 +32,7 @@
 
 import { ENCHANTS } from '../sim/content/enchants';
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, ItemDef, ItemSlot } from '../sim/types';
+import type { EquipSlot, ItemDef, ItemInstancePayload, ItemSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   type BagItemContextActionId,
@@ -125,8 +125,9 @@ export class BagItemActionMenu {
     x: number,
     y: number,
     runDefault: () => void,
+    instance?: ItemInstancePayload,
   ): void {
-    const rows = bagItemContextActions(def, itemId).map((action) => ({
+    const rows = bagItemContextActions(def, itemId, instance).map((action) => ({
       act: action.id,
       html: esc(t(action.labelKey)),
     }));
@@ -136,7 +137,17 @@ export class BagItemActionMenu {
       else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
       else if (id === 'salvage') this.confirmDestroy('salvage', itemId, slotIndex);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
+      // Lock/unlock (issue 3042): a plain in-place toggle, never destructive,
+      // so it skips the confirm-dialog family every disenchant/salvage row
+      // routes through and applies immediately like the classic default row.
+      else if (id === 'lock') this.setLocked(itemId, slotIndex, true);
+      else if (id === 'unlock') this.setLocked(itemId, slotIndex, false);
     });
+  }
+
+  private setLocked(itemId: string, slotIndex: number, locked: boolean): void {
+    this.deps.world().setItemLocked(itemId, locked, { slotIndex });
+    this.deps.afterAction();
   }
 
   // Disenchant / Salvage: both route through the one confirm-dialog family, with

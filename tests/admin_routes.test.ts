@@ -75,6 +75,9 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('POST', '/admin/api/accounts/42/reset-password')).toBe(
       'accounts.password',
     );
+    expect(permissionForAdminRoute('POST', '/admin/api/accounts/42/general-chat-rate-limit')).toBe(
+      'moderation.act',
+    );
     expect(permissionForAdminRoute('GET', '/admin/api/blocked-ips')).toBe('moderation.read');
     expect(permissionForAdminRoute('GET', '/admin/api/moderation/history')).toBe('moderation.read');
     expect(permissionForAdminRoute('POST', '/admin/api/blocked-ips')).toBe('ipblocks.manage');

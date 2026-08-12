@@ -4006,6 +4006,10 @@ export class ClientWorld implements IWorld {
     this.pendingTargetEcho = null;
     this.cmd({ cmd: 'tab' });
   }
+  tabTargetPrev(): void {
+    this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
+    this.cmd({ cmd: 'tabPrev' });
+  }
   targetNearestFriendly(): void {
     this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'targetNearestFriendly' });
@@ -4148,6 +4152,9 @@ export class ClientWorld implements IWorld {
   discardItem(itemId: string, count?: number, target?: { slotIndex: number }): void {
     if (target === undefined) this.cmd({ cmd: 'discard', item: itemId, count });
     else this.cmd({ cmd: 'discard', item: itemId, count, slot: target.slotIndex });
+  }
+  setItemLocked(itemId: string, locked: boolean, target: { slotIndex: number }): void {
+    this.cmd({ cmd: 'lock_item', item: itemId, locked, slot: target.slotIndex });
   }
   buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void {
     // `bulk` and `count` each ride the wire only when non-default (the
@@ -5011,6 +5018,7 @@ export class ClientWorld implements IWorld {
       armorClass: query.armorClass,
       primaryStat: query.primaryStat,
       rarity: query.rarity,
+      sort: query.sort,
       page: query.page,
     });
   }

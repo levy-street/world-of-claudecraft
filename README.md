@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.36.0-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.37.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -63,14 +63,13 @@ Same seed, same world, everywhere. Much of what you see is still drawn from code
 
 ## Screenshots
 
-![The Eastbrook town square, campfire and questgivers](docs/screenshots/party-questing.jpg)
+![A mounted guild muster on the road to the Riftfields](docs/screenshots/guild-muster-mounted.jpg)
 
 | | |
 |:---:|:---:|
-| ![Dusk at the Eastbrook campfire](docs/screenshots/eastbrook-dusk.jpg)<br>*Dusk at the Eastbrook campfire* | ![Elite pulls in the Hollow Crypt](docs/screenshots/hollow-crypt.jpg)<br>*Torch-lit elite pulls in the Hollow Crypt* |
-| ![The restless dead at the ruined chapel](docs/screenshots/restless-dead.jpg)<br>*The restless dead at the ruined chapel* | ![A brawl with Vale Bandits](docs/screenshots/vale-bandits.jpg)<br>*Outnumbered at the bandit camp* |
-| ![Old Greyjaw hunted down on the north road](docs/screenshots/old-greyjaw.jpg)<br>*Old Greyjaw, the rare spawn, run down on the north road* | ![Vendor and bags UI](docs/screenshots/vendor-and-bags.jpg)<br>*Gearing up at Trader Wilkes's, with the vendor and bags open* |
-| ![The moongate on the Glimmermere shore](docs/screenshots/glimmermere-moongate.jpg)<br>*The drowned climb out at the Glimmermere moongate* | ![Ysolei on the altar of the Drowned Temple](docs/screenshots/drowned-temple-altar.jpg)<br>*Lunar Tempest and the altar of the Drowned Temple* |
+| ![Night over a lantern-lit village in Mirefen Marsh](docs/screenshots/mirefen-marsh-night.jpg)<br>*Lantern-light in Mirefen Marsh at night* | ![Spellfire erupts in a torch-lit dungeon hall](docs/screenshots/dungeon-spellfire.jpg)<br>*A dungeon pull goes loud under the green torches* |
+| ![Players crowd together in the snowfall on the live world](docs/screenshots/live-world-crowd.jpg)<br>*A crowded hour on the live world* | ![Riding the Amberfall road under golden trees](docs/screenshots/amberfall-road.jpg)<br>*Every leaf burns gold on the Amberfall road* |
+| ![Rift warnings fill the chat on the night road through the Palmreach](docs/screenshots/palmreach-rift-warnings.jpg)<br>*Rift warnings roll in on the Palmreach road* | ![Rolling into a snowed-in village in the Frostveil Reach](docs/screenshots/frostveil-reach-village.jpg)<br>*Snowbound lamplight in the Frostveil Reach* |
 
 Weather is biome-driven and render-only, so it never touches the deterministic sim:
 
@@ -287,7 +286,7 @@ Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside 
 |---|---|
 | `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held), `Q`/`E` strafe |
 | right-drag / left-drag | mouselook / orbit camera. Wheel zooms, `Space` jumps |
-| `Tab` | cycle nearest enemies. left-click to target, right-click to attack, loot, or talk |
+| `Tab` / `Shift+Tab` | cycle nearest enemies forward / backward. left-click to target, right-click to attack, loot, or talk |
 | `1`-`9`, `0`, `-`, `=` | action bar |
 | `F` | interact (loot a corpse, pick up an object, talk) |
 | `C` `P` `L` `M` `B` `N` `T` | character, spellbook, quest log, world map, bags, talents, crafting |

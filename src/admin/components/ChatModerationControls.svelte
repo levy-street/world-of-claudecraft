@@ -11,6 +11,7 @@
     resetChatStrikes,
   } from '../moderation_actions';
   import Badge from './Badge.svelte';
+  import GeneralChatRateLimitControls from './GeneralChatRateLimitControls.svelte';
   import ModerationActionPrompt from './ModerationActionPrompt.svelte';
 
   type Target = Pick<
@@ -21,6 +22,7 @@
     | 'chatMutedUntil'
     | 'chatMuteReason'
     | 'chatStrikes'
+    | 'generalChatRateLimit'
   >;
   type SelectedAction =
     | { kind: 'mute'; hours: number; label: string }
@@ -136,6 +138,7 @@
       {t('chatMod.resetChatStrikes')}
     </button>
   {/if}
+  <GeneralChatRateLimitControls {target} {onSubmit} />
 </section>
 
 {#if selected}

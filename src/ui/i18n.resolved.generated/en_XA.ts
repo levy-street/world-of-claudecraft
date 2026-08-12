@@ -801,6 +801,11 @@ export const en_XA: EnTranslations = {
       "resetAction": "[Ŕéšéţ]",
       "note": "[Ðŕáĝ ţĥé çĥáţ ţáƀ šţŕíþ ţó ɱóʋé ţĥé ŵíñðóŵ, óŕ ţĥé çóŕñéŕ ĝŕíþ ţó ŕéšížé íţ. Ŕéšéţ ŕéţúŕñš íţ ţó ţĥé ðéƒáúļţ þóšíţíóñ áñð šížé.]"
     },
+    "chatQuota": {
+      "limitReached": "[Ĝéñéŕáļ çĥáţ ļíɱíţ ŕéáçĥéð. Ţŕý áĝáíñ íñ {seconds}.]",
+      "pending": "[Ýóúŕ þŕéʋíóúš Ĝéñéŕáļ çĥáţ ɱéššáĝé íš šţíļļ šéñðíñĝ. Ţŕý áĝáíñ íñ á ɱóɱéñţ.]",
+      "unavailable": "[Ĝéñéŕáļ çĥáţ íš ţéɱþóŕáŕíļý úñáʋáíļáƀļé. Ţŕý áĝáíñ šĥóŕţļý.]"
+    },
     "swing": {
       "ready": "[Šŵíñĝ]",
       "seconds": "[{seconds}š]"
@@ -892,6 +897,14 @@ export const en_XA: EnTranslations = {
       "bodyWithVersion": "[Ʋéŕšíóñ {version} óƒ Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ íš áʋáíļáƀļé. Úþðáţé ñóŵ ƒóŕ ţĥé ļáţéšţ ƒíẋéš áñð íɱþŕóʋéɱéñţš.]",
       "notNow": "[Ñóţ ñóŵ]",
       "update": "[Úþðáţé]"
+    },
+    "otaUpdate": {
+      "title": "[Ĝáɱé Úþðáţé]",
+      "downloading": "[Ðóŵñļóáðíñĝ úþðáţé: {percent}]",
+      "applying": "[Úþðáţé ðóŵñļóáðéð. Ŕéšţáŕţíñĝ ţĥé ĝáɱé ţó áþþļý íţ.]",
+      "incompatible": "[Áñ úþðáţé íš ŕéɋúíŕéð ţó þļáý. Íţ ŵíļļ ƀé áþþļíéð áš šóóñ áš íţ ƒíñíšĥéš ðóŵñļóáðíñĝ.]",
+      "continueAnyway": "[Çóñţíñúé ŵíţĥóúţ úþðáţíñĝ]",
+      "progressLabel": "[Úþðáţé ðóŵñļóáð þŕóĝŕéšš]"
     },
     "cameraPrompt": {
       "title": "[Çĥóóšé Ýóúŕ Çáɱéŕá]",
@@ -994,6 +1007,7 @@ export const en_XA: EnTranslations = {
       "emoteWheel": "[Éɱóţé Ŵĥééļ]",
       "targetFriendly": "[Ţáŕĝéţ Ñéáŕéšţ Ƒŕíéñðļý]",
       "targetFriendlyNext": "[Çýçļé Ƒŕíéñðļý Ţáŕĝéţ]",
+      "targetPrev": "[Çýçļé Ţáŕĝéţ Ɓáçķŵáŕð]",
       "discord": "[Ðíšçóŕð]",
       "valecup": "[Ʋáļé Çúþ]",
       "bgFlag": "[Ɓáţţļéĝŕóúñð Ƒļáĝ Áçţíóñ]",
@@ -2187,6 +2201,10 @@ export const en_XA: EnTranslations = {
       "itemAriaBound": "[{item}, ɋúáñţíţý {count}, ƀóúñð çóþý]",
       "itemAriaMasterwork": "[{item}, ɋúáñţíţý {count}, ɱášţéŕŵóŕķ]",
       "itemAriaQuest": "[{item}, ɋúáñţíţý {count}, ɋúéšţ íţéɱ]",
+      "itemAriaLocked": "[{item}, ɋúáñţíţý {count}, ļóçķéð]",
+      "itemLockedLine": "[Ļóçķéð]",
+      "lockItem": "[Ļóçķ Íţéɱ]",
+      "unlockItem": "[Úñļóçķ Íţéɱ]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
       "filterWeapon": "[Ŵéáþóñš]",
@@ -3217,6 +3235,7 @@ export const en_XA: EnTranslations = {
       "craftedToast": "[Çŕáƒţéð: {name}]",
       "craftedToastQty": "[Çŕáƒţéð: {name} ẋ{qty}]",
       "insufficientMaterials": "[Ýóú ðó ñóţ ĥáʋé ţĥé ɱáţéŕíáļš ƒóŕ ţĥáţ.]",
+      "reagentLocked": "[Á ŕéáĝéñţ ƒóŕ ţĥáţ íš ļóçķéð.]",
       "unknownRecipe": "[Ţĥáţ ŕéçíþé ðóéš ñóţ éẋíšţ.]",
       "comboRequirementUnmet": "[Ýóú ðó ñóţ ĥáʋé ƀóţĥ ŕéɋúíŕéð çŕáƒţš áţ ţĥé ŕéɋúíŕéð ţíéŕ ƒóŕ ţĥáţ ŕéçíþé.]",
       "comboRequires": "[Áţţúñéɱéñţ: {craftA} + {craftB}, ţíéŕ {tier}.]",
@@ -3323,6 +3342,7 @@ export const en_XA: EnTranslations = {
       "notHeld": "[Ýóú ðó ñóţ ĥáʋé ţĥáţ íţéɱ.]",
       "notDisenchantable": "[Ýóú çáññóţ ðíšéñçĥáñţ ţĥáţ.]",
       "notSalvageable": "[Ýóú çáññóţ šáļʋáĝé ţĥáţ.]",
+      "salvageLocked": "[Ţĥáţ íţéɱ íš ļóçķéð.]",
       "disenchantBusy": "[Ýóú áŕé ƀúšý.]",
       "salvageBusy": "[Ýóú áŕé ƀúšý.]",
       "enchantBusy": "[Ýóú áŕé ƀúšý.]",
@@ -4169,6 +4189,7 @@ export const en_XA: EnTranslations = {
       "dungeonFinder": "[Ðúñĝéóñ Ƒíñðéŕ]",
       "discord": "[Ðíšçóŕð]",
       "abilities": "[Úšé áçţíóñ ƀáŕ áƀíļíţíéš (ţĥé ñúɱƀéŕ ŕóŵ; á šéçóñð ƀáŕ šíţš óñ ţĥé ñúɱþáð)]",
+      "targetPrev": "[Çýçļé ţáŕĝéţ ƀáçķŵáŕð]",
       "targetFriendly": "[Ţáŕĝéţ ñéáŕéšţ ƒŕíéñðļý]",
       "cycleFriendly": "[Çýçļé ƒŕíéñðļý ţáŕĝéţ]",
       "targetAuras": "[Ţáŕĝéţ ƀúƒƒš áñð ðéƀúƒƒš]",
@@ -8898,6 +8919,9 @@ export const en_XA: EnTranslations = {
       "filterPrimaryStatAll": "[Áñý þŕíɱáŕý šţáţ]",
       "filterRarity": "[Ŕáŕíţý]",
       "filterRarityAll": "[Áļļ ŕáŕíţíéš]",
+      "filterSort": "[Šóŕţ]",
+      "sortName": "[Ñáɱé (Á-Ž)]",
+      "sortPriceAsc": "[Þŕíçé: Ļóŵ ţó Ĥíĝĥ]",
       "weaponSword": "[Šŵóŕðš]",
       "weaponDagger": "[Ðáĝĝéŕš]",
       "weaponStaff": "[Šţáʋéš]",

@@ -22,6 +22,11 @@ import {
 import { disposeOwnedWeaponSkinMaterials } from './characters/weapon_skin_materials';
 import { trackWebGLContext } from './context_release';
 import {
+  collectPrewarmTextures,
+  uploadTexturesInSlices,
+  yieldToMainThread,
+} from './texture_prewarm';
+import {
   createWeaponVfx,
   SCENE_PRESETS,
   TIERS,
@@ -33,13 +38,29 @@ import { weaponVfxTuningFor } from './weapon_vfx_tuning';
 export type ArmorySceneKey = 'day' | 'dusk' | 'night';
 export type ArmoryPreviewMode = 'character' | 'weapon';
 
+export interface ArmoryPreviewPrewarmOptions {
+  /** Leave the small warmup drawing buffer in place when this call returns.
+   *  The paced post-entry lane runs one (skin, mode) per call; restoring the
+   *  full-size buffer per call cost two EffectComposer target reallocations
+   *  plus a forced full-size draw (a measured 70 to 110 ms) on EVERY unit.
+   *  A keep-buffer caller must end its run with {@link ArmoryPreviewHandle.finishPrewarm}. */
+  keepWarmupBuffer?: boolean;
+}
+
 export interface ArmoryPreviewHandle {
   setActive(active: boolean): void;
   setAppearance(appearance: PreviewAppearance): void;
   setSkin(skinId: string | null): void;
   setMode(mode: ArmoryPreviewMode): void;
   setScene(scene: ArmorySceneKey): void;
-  prewarm(skinIds: readonly string[], modes?: readonly ArmoryPreviewMode[]): Promise<void>;
+  prewarm(
+    skinIds: readonly string[],
+    modes?: readonly ArmoryPreviewMode[],
+    options?: ArmoryPreviewPrewarmOptions,
+  ): Promise<void>;
+  /** Restore the live-size drawing buffer after a keep-buffer prewarm run and
+   *  prepay its reallocation draw. No-op when nothing is held. */
+  finishPrewarm(): void;
   dispose(): void;
 }
 
@@ -196,11 +217,31 @@ export function createArmoryPreview(
   let skinId: string | null = null;
   let active = false;
   let prewarming = false;
+  // Live buffer state to restore after warmup sizing, non-null while the small
+  // warmup buffer is in place. Survives across paced keep-buffer prewarm calls;
+  // cleared by restoreWarmupBuffer() and by resize() (a live resize means the
+  // visible surface reclaimed the buffer, so there is nothing left to restore).
+  let warmupRestore: { size: THREE.Vector2; pixelRatio: number; aspect: number } | null = null;
   // The latest setActive request that arrived while prewarm() owned the
   // renderer/composer buffer and the rAF loop; applied by prewarm's finally
   // instead of the wasActive snapshot it captured at entry, so a window
   // opened or closed mid-warmup is never clobbered back to a stale value.
   let pendingActive: boolean | null = null;
+  // Selection requests (a card click's appearance/scene/mode/skin) that
+  // arrived while prewarm() owned the stage. Deferred for the same reason as
+  // pendingActive: a paced unit's finally reverts to the entry-time selection,
+  // so an immediately-applied click would be clobbered and the overlay would
+  // show the wrong skin until the next interaction. Deferring setAppearance
+  // also keeps its characterRigs disposal out of a unit's in-flight texture
+  // sweep (initTexture on a just-disposed texture would re-upload it with no
+  // dispose event left to release it).
+  interface PendingArmorySelection {
+    appearance?: PreviewAppearance;
+    skin?: string | null;
+    mode?: ArmoryPreviewMode;
+    scene?: ArmorySceneKey;
+  }
+  let pendingSelection: PendingArmorySelection | null = null;
   let disposed = false;
   let renderWidth = Math.max(1, container.clientWidth);
   let renderHeight = Math.max(1, container.clientHeight);
@@ -310,6 +351,21 @@ export function createArmoryPreview(
     frameCamera();
   }
 
+  /** Rebuild the character rigs for a new appearance (shared by the handle's
+   *  setAppearance and the deferred mid-prewarm application). */
+  function applyAppearance(next: PreviewAppearance): void {
+    const nextSig = appearanceSignature(next);
+    if (nextSig === appearanceSig) return;
+    appearanceSig = nextSig;
+    currentAppearance = next;
+    for (const rig of characterRigs.values()) rig.dispose();
+    characterRigs.clear();
+    visual = createCharacterRig(skinId);
+    characterRigs.set(skinId ?? '', visual);
+    characterGroup.add(visual.root);
+    visual.setWeaponVfxPixelScale(pixelHeight());
+  }
+
   function disposeWeaponRigs(): void {
     for (const rig of weaponRigs.values()) {
       rig.vfx?.dispose();
@@ -364,7 +420,21 @@ export function createArmoryPreview(
     // last useful buffer instead of shrinking it to 1x1 and reallocating again
     // on the next animation frame.
     if (w <= 0 || h <= 0) return;
-    if (w === renderWidth && h === renderHeight) return;
+    if (warmupRestore) {
+      // The visible surface reclaims the buffer from a keep-buffer prewarm run:
+      // restore the live pixel ratio here and fall through to the size path
+      // even when the container happens to match the warmup size. ACCEPTED
+      // TRADEOFF: unlike the finalize unit's hidden restore, this path does
+      // not prepay the composer target reallocation draw, so an inspect
+      // opened DURING the armory portion of the schedule pays the old
+      // 70 to 110 ms first-draw once (the pre-P2 cost, paid rarely) in
+      // exchange for dropping that same forced draw from EVERY paced unit.
+      renderer.setPixelRatio(warmupRestore.pixelRatio);
+      composer.setPixelRatio(warmupRestore.pixelRatio);
+      warmupRestore = null;
+    } else if (w === renderWidth && h === renderHeight) {
+      return;
+    }
     renderWidth = w;
     renderHeight = h;
     renderer.setSize(w, h, false);
@@ -379,6 +449,49 @@ export function createArmoryPreview(
 
   applyScene();
   applyMode();
+
+  /** Swap in the small warmup drawing buffer, capturing the live state once;
+   *  idempotent across paced keep-buffer prewarm calls. */
+  function ensureWarmupBuffer(): void {
+    if (warmupRestore) return;
+    const previousSize = new THREE.Vector2();
+    renderer.getSize(previousSize);
+    warmupRestore = {
+      size: previousSize,
+      pixelRatio: renderer.getPixelRatio(),
+      aspect: camera.aspect,
+    };
+    renderer.setPixelRatio(1);
+    renderer.setSize(480, 380, false);
+    renderWidth = 480;
+    renderHeight = 380;
+    composer.setPixelRatio(1);
+    composer.setSize(480, 380);
+    camera.aspect = 480 / 380;
+    camera.updateProjectionMatrix();
+  }
+
+  /** Restore the live buffer captured by ensureWarmupBuffer and prepay the
+   *  composer target reallocation with one hidden draw (leaving that first
+   *  draw to setActive made the first Armory click block for 70 to 110 ms
+   *  even with every shader and rig warm). */
+  function restoreWarmupBuffer(): void {
+    const restore = warmupRestore;
+    if (!restore) return;
+    warmupRestore = null;
+    // A dispose() that raced a prewarm already tore the composer down; there
+    // is no buffer left to restore.
+    if (disposed) return;
+    renderer.setPixelRatio(restore.pixelRatio);
+    renderer.setSize(Math.max(1, restore.size.x), Math.max(1, restore.size.y), false);
+    renderWidth = Math.max(1, restore.size.x);
+    renderHeight = Math.max(1, restore.size.y);
+    composer.setPixelRatio(restore.pixelRatio);
+    composer.setSize(Math.max(1, restore.size.x), Math.max(1, restore.size.y));
+    camera.aspect = restore.aspect;
+    camera.updateProjectionMatrix();
+    composer.render();
+  }
 
   return {
     setActive(next: boolean): void {
@@ -403,27 +516,40 @@ export function createArmoryPreview(
     },
     setAppearance(next: PreviewAppearance): void {
       if (disposed) return;
-      const nextSig = appearanceSignature(next);
-      if (nextSig === appearanceSig) return;
-      appearanceSig = nextSig;
-      currentAppearance = next;
-      for (const rig of characterRigs.values()) rig.dispose();
-      characterRigs.clear();
-      visual = createCharacterRig(skinId);
-      characterRigs.set(skinId ?? '', visual);
-      characterGroup.add(visual.root);
-      visual.setWeaponVfxPixelScale(pixelHeight());
+      if (prewarming) {
+        pendingSelection ??= {};
+        pendingSelection.appearance = next;
+        return;
+      }
+      applyAppearance(next);
     },
     setSkin(next: string | null): void {
+      if (prewarming) {
+        pendingSelection ??= {};
+        pendingSelection.skin = next;
+        return;
+      }
       selectSkin(next);
     },
     setMode(next: ArmoryPreviewMode): void {
-      if (disposed || next === mode) return;
+      if (disposed) return;
+      if (prewarming) {
+        pendingSelection ??= {};
+        pendingSelection.mode = next;
+        return;
+      }
+      if (next === mode) return;
       mode = next;
       applyMode();
     },
     setScene(next: ArmorySceneKey): void {
-      if (disposed || next === sceneKey) return;
+      if (disposed) return;
+      if (prewarming) {
+        pendingSelection ??= {};
+        pendingSelection.scene = next;
+        return;
+      }
+      if (next === sceneKey) return;
       sceneKey = next;
       applyScene();
     },
@@ -433,80 +559,91 @@ export function createArmoryPreview(
       // measured 170 to 225 ms of main-thread block in live play; one mode
       // roughly halves it). Curtained callers keep the both-modes default.
       modes: readonly ArmoryPreviewMode[] = ['character', 'weapon'],
+      options?: ArmoryPreviewPrewarmOptions,
     ): Promise<void> {
       if (disposed || prewarming) return;
       const unique = [...new Set(skinIds)].filter((id) => WEAPON_SKINS[id]);
       if (unique.length === 0 || modes.length === 0) return;
-      const previousSize = new THREE.Vector2();
-      renderer.getSize(previousSize);
-      const previousPixelRatio = renderer.getPixelRatio();
-      const previousAspect = camera.aspect;
       const previousSkin = skinId;
       const previousMode = mode;
       const wasActive = active;
       // Stop the visible loop while compile/upload owns the context. All work
-      // happens while the game's loading screen is opaque.
+      // happens either behind the loading curtain or between live frames on
+      // the paced post-entry lane.
       if (raf !== null) cancelAnimationFrame(raf);
       raf = null;
       active = false;
       clock.stop();
       prewarming = true;
       pendingActive = null;
+      pendingSelection = null;
+      // One Set OBJECT reused across modes (its contents are cleared and
+      // re-collected per mode); a fresh allocation per mode buys nothing, and
+      // re-initTexture on an already-resident texture is a cheap no-op anyway.
+      const textures = new Set<THREE.Texture>();
       try {
-        renderer.setPixelRatio(1);
-        renderer.setSize(480, 380, false);
-        renderWidth = 480;
-        renderHeight = 380;
-        composer.setPixelRatio(1);
-        composer.setSize(480, 380);
-        camera.aspect = 480 / 380;
-        camera.updateProjectionMatrix();
+        ensureWarmupBuffer();
         for (const id of unique) {
           if (disposed) break;
+          // Slice 1: rig construction (the one irreducible CPU block; a
+          // character rig with its weapon skin measured 30 to 100 ms).
           selectSkin(id);
           visual.setWeaponVfxPixelScale(pixelHeight());
           activeWeaponRig?.vfx?.setPixelScale(pixelHeight());
+          await yieldToMainThread();
 
-          // Compile and draw the exact character-mode light/material graph.
-          if (modes.includes('character')) {
-            mode = 'character';
+          for (const nextMode of ['character', 'weapon'] as const) {
+            if (disposed) break;
+            if (!modes.includes(nextMode)) continue;
+            // Compile and draw the exact per-mode light/material graph
+            // ('character': the body wearing the skin; 'weapon': the showcase
+            // turntable with its ground pool). Before the draw, prepay every
+            // texture upload in bounded slices: the first composer.render of a
+            // cold graph otherwise pays them all in one synchronous block.
+            mode = nextMode;
             applyMode();
+            textures.clear();
+            collectPrewarmTextures(scene, textures);
+            await uploadTexturesInSlices(renderer, textures, {
+              yieldToMain: yieldToMainThread,
+              isCancelled: () => disposed,
+            });
+            if (disposed) break;
             await renderer.compileAsync(scene, camera);
             composer.render();
+            await yieldToMainThread();
           }
-
-          // Then the exact weapon-only graph (ground pool + showcase VFX).
-          if (modes.includes('weapon')) {
-            mode = 'weapon';
-            applyMode();
-            await renderer.compileAsync(scene, camera);
-            composer.render();
-          }
-
-          // Keep the loading overlay responsive and avoid turning 29 bounded
-          // warmups into one giant main-thread task on browsers whose shader
-          // compiler cannot link fully in parallel.
-          await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
         }
       } finally {
         selectSkin(previousSkin);
         mode = previousMode;
         applyMode();
-        renderer.setPixelRatio(previousPixelRatio);
-        renderer.setSize(Math.max(1, previousSize.x), Math.max(1, previousSize.y), false);
-        renderWidth = Math.max(1, previousSize.x);
-        renderHeight = Math.max(1, previousSize.y);
-        composer.setPixelRatio(previousPixelRatio);
-        composer.setSize(Math.max(1, previousSize.x), Math.max(1, previousSize.y));
-        camera.aspect = previousAspect;
-        camera.updateProjectionMatrix();
-        // Restoring the logical size/DPR replaces the composer's render
-        // targets. Force their real GPU allocation while the loading screen is
-        // still opaque; leaving this first draw to setActive() made the first
-        // Armory skin click block for 70-110ms even though every shader and rig
-        // had already been warmed above.
-        composer.render();
+        // The paced lane keeps the warmup buffer across its per-unit calls
+        // (restoring it per unit cost two composer target reallocations plus a
+        // forced full-size draw EVERY unit) and restores once via
+        // finishPrewarm; every other caller restores here.
+        if (options?.keepWarmupBuffer !== true) restoreWarmupBuffer();
         prewarming = false;
+        // Selections that arrived mid-prewarm (a card click while a paced
+        // unit was in flight) are applied now, AFTER the entry-state revert
+        // above, so the revert cannot clobber the player's click. (The
+        // assertion defeats control-flow narrowing, which cannot see the
+        // handle setters assigning the closure variable mid-await and pins
+        // it to the entry assignment's null.)
+        const selection = pendingSelection as PendingArmorySelection | null;
+        pendingSelection = null;
+        if (selection && !disposed) {
+          if (selection.appearance) applyAppearance(selection.appearance);
+          if (selection.scene !== undefined) {
+            sceneKey = selection.scene;
+            applyScene();
+          }
+          if (selection.mode !== undefined) {
+            mode = selection.mode;
+            applyMode();
+          }
+          if ('skin' in selection) selectSkin(selection.skin ?? null);
+        }
         // setActive may have arrived mid-prewarm (the store window opened or
         // closed while this buffer was repurposed for warmup); apply that
         // request instead of the wasActive snapshot captured at entry.
@@ -519,6 +656,10 @@ export function createArmoryPreview(
           raf = requestAnimationFrame(animate);
         }
       }
+    },
+    finishPrewarm(): void {
+      if (disposed || prewarming) return;
+      restoreWarmupBuffer();
     },
     dispose(): void {
       if (disposed) return;

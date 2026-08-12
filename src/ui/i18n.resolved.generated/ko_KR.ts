@@ -801,6 +801,11 @@ export const ko_KR: EnTranslations = {
       "resetAction": "초기화",
       "note": "채팅 탭 줄을 드래그하면 창을 이동하고, 모서리 손잡이를 드래그하면 크기를 조절할 수 있습니다. 초기화하면 기본 위치와 크기로 돌아갑니다."
     },
+    "chatQuota": {
+      "limitReached": "일반 채팅 한도에 도달했습니다. {seconds} 후에 다시 시도하세요.",
+      "pending": "이전 일반 채팅 메시지를 아직 보내는 중입니다. 잠시 후 다시 시도하세요.",
+      "unavailable": "일반 채팅은 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도하세요."
+    },
     "swing": {
       "ready": "공격",
       "seconds": "{seconds}초"
@@ -892,6 +897,14 @@ export const ko_KR: EnTranslations = {
       "bodyWithVersion": "World of ClaudeCraft 버전 {version}을(를) 사용할 수 있습니다. 지금 업데이트하여 최신 수정 사항과 개선 사항을 받으세요.",
       "notNow": "나중에",
       "update": "업데이트"
+    },
+    "otaUpdate": {
+      "title": "게임 업데이트",
+      "downloading": "업데이트 다운로드 중: {percent}",
+      "applying": "업데이트를 다운로드했습니다. 적용을 위해 게임을 다시 시작합니다.",
+      "incompatible": "플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.",
+      "continueAnyway": "업데이트하지 않고 계속",
+      "progressLabel": "업데이트 다운로드 진행률"
     },
     "cameraPrompt": {
       "title": "카메라 선택",
@@ -994,6 +1007,7 @@ export const ko_KR: EnTranslations = {
       "emoteWheel": "감정 표현 휠",
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "targetFriendlyNext": "아군 대상 순환",
+      "targetPrev": "대상 역방향 순환",
       "discord": "Discord",
       "valecup": "베일 컵",
       "bgFlag": "전장 깃발 행동",
@@ -2187,6 +2201,10 @@ export const ko_KR: EnTranslations = {
       "itemAriaBound": "{item}, 수량 {count}, 귀속된 사본",
       "itemAriaMasterwork": "{item}, 수량 {count}, 걸작",
       "itemAriaQuest": "{item}, 수량 {count}, 퀘스트 아이템",
+      "itemAriaLocked": "{item}, 수량 {count}, 잠김",
+      "itemLockedLine": "잠김",
+      "lockItem": "아이템 잠그기",
+      "unlockItem": "아이템 잠금 해제",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -3217,6 +3235,7 @@ export const ko_KR: EnTranslations = {
       "craftedToast": "제작 완료:{name}",
       "craftedToastQty": "제작 완료:{name} x{qty}",
       "insufficientMaterials": "재료가 부족합니다.",
+      "reagentLocked": "그 재료가 잠겨 있습니다.",
       "unknownRecipe": "해당 제작법이 존재하지 않습니다.",
       "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.",
       "comboRequires": "조율 조건: {craftA} + {craftB}, 티어 {tier}.",
@@ -3323,6 +3342,7 @@ export const ko_KR: EnTranslations = {
       "notHeld": "해당 아이템을 가지고 있지 않습니다.",
       "notDisenchantable": "해당 아이템은 마력을 추출할 수 없습니다.",
       "notSalvageable": "해당 아이템은 분해할 수 없습니다.",
+      "salvageLocked": "그 아이템은 잠겨 있습니다.",
       "disenchantBusy": "지금은 바쁩니다.",
       "salvageBusy": "지금은 바쁩니다.",
       "enchantBusy": "지금은 바쁩니다.",
@@ -4169,6 +4189,7 @@ export const ko_KR: EnTranslations = {
       "dungeonFinder": "던전 찾기",
       "discord": "Discord",
       "abilities": "행동 단축바 능력 사용 (숫자 키 줄, 두 번째 단축바는 숫자 키패드에 있음)",
+      "targetPrev": "대상 역방향 순환",
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "cycleFriendly": "아군 대상 순환",
       "targetAuras": "대상 강화 및 약화 효과",
@@ -8898,6 +8919,9 @@ export const ko_KR: EnTranslations = {
       "filterPrimaryStatAll": "모든 주 능력치",
       "filterRarity": "희귀도",
       "filterRarityAll": "모든 희귀도",
+      "filterSort": "정렬",
+      "sortName": "이름 (A-Z)",
+      "sortPriceAsc": "가격: 낮은순",
       "weaponSword": "검",
       "weaponDagger": "단검",
       "weaponStaff": "지팡이",

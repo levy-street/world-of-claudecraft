@@ -801,6 +801,11 @@ export const da_DK: EnTranslations = {
       "resetAction": "Nulstil",
       "note": "Træk chatfanestriben for at flytte vinduet, eller hjørnegrebet for at ændre størrelse. Nulstil sætter det tilbage til standardposition og -størrelse."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Slag",
       "seconds": "{seconds}s"
@@ -892,6 +897,14 @@ export const da_DK: EnTranslations = {
       "bodyWithVersion": "Version {version} af World of ClaudeCraft er tilgængelig. Opdater nu for de nyeste rettelser og forbedringer.",
       "notNow": "Ikke nu",
       "update": "Opdater"
+    },
+    "otaUpdate": {
+      "title": "Spilopdatering",
+      "downloading": "Downloader opdatering: {percent}",
+      "applying": "Opdatering downloadet. Spillet genstarter for at anvende den.",
+      "incompatible": "Der kræves en opdatering for at spille. Den anvendes, så snart den er downloadet.",
+      "continueAnyway": "Fortsæt uden at opdatere",
+      "progressLabel": "Status for download af opdatering"
     },
     "cameraPrompt": {
       "title": "Vælg dit kamera",
@@ -994,6 +1007,7 @@ export const da_DK: EnTranslations = {
       "emoteWheel": "Følelseshjul",
       "targetFriendly": "Sigt mod nærmeste allierede",
       "targetFriendlyNext": "Skift allieret mål",
+      "targetPrev": "Skift mål baglæns",
       "discord": "Discord",
       "valecup": "Dalpokalen",
       "bgFlag": "Flaghandling på slagmarken",
@@ -2187,6 +2201,10 @@ export const da_DK: EnTranslations = {
       "itemAriaBound": "{item}, antal {count}, bundet kopi",
       "itemAriaMasterwork": "{item}, antal {count}, mesterværk",
       "itemAriaQuest": "{item}, antal {count}, opgavegenstand",
+      "itemAriaLocked": "{item}, antal {count}, låst",
+      "itemLockedLine": "Låst",
+      "lockItem": "Lås genstand",
+      "unlockItem": "Lås genstand op",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -3217,6 +3235,7 @@ export const da_DK: EnTranslations = {
       "craftedToast": "Udformet: {name}",
       "craftedToastQty": "Udformet: {name} x{qty}",
       "insufficientMaterials": "Det har du ikke materialerne til.",
+      "reagentLocked": "En reagens til det er låst.",
       "unknownRecipe": "Den opskrift findes ikke.",
       "comboRequirementUnmet": "Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift.",
       "comboRequires": "Indstilling: {craftA} + {craftB}, niveau {tier}.",
@@ -3323,6 +3342,7 @@ export const da_DK: EnTranslations = {
       "notHeld": "Du har ikke den genstand.",
       "notDisenchantable": "Du kan ikke affortrylle det.",
       "notSalvageable": "Du kan ikke bjærge det.",
+      "salvageLocked": "Den genstand er låst.",
       "disenchantBusy": "Du er optaget.",
       "salvageBusy": "Du er optaget.",
       "enchantBusy": "Du er optaget.",
@@ -4169,6 +4189,7 @@ export const da_DK: EnTranslations = {
       "dungeonFinder": "Fangekældersfinder",
       "discord": "Discord",
       "abilities": "Brug handlingsbjælkens evner (talrækken; en anden bjælke sidder på det numeriske tastatur)",
+      "targetPrev": "Skift mål baglæns",
       "targetFriendly": "Vælg nærmeste venlige",
       "cycleFriendly": "Skift venligt mål",
       "targetAuras": "Målets styrkelser og svækkelser",
@@ -8898,6 +8919,9 @@ export const da_DK: EnTranslations = {
       "filterPrimaryStatAll": "Alle primære statistikker",
       "filterRarity": "Sjældenhed",
       "filterRarityAll": "Alle sjældenheder",
+      "filterSort": "Sortering",
+      "sortName": "Navn (A-Z)",
+      "sortPriceAsc": "Pris: laveste til højeste",
       "weaponSword": "Sværd",
       "weaponDagger": "Dolke",
       "weaponStaff": "Stave",

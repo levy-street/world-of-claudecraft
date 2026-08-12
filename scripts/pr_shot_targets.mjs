@@ -402,19 +402,32 @@ export const TARGETS = [
             'druid',
           ];
           const names = ['Bryn', 'Cael', 'Dax', 'Eira', 'Finn', 'Gust', 'Hale', 'Ivo', 'Jor'];
+          const botPids = [];
           for (let i = 0; i < 9; i++) {
             const pid = sim.addPlayer(classes[i], names[i]);
             const e = sim.entities.get(pid);
             e.level = 20;
             sim.bgQueueJoin(pid);
+            botPids.push(pid);
           }
           sim.player.level = Math.max(20, sim.player.level);
           sim.bgQueueJoin();
+          window.__bgShotBotPids = botPids;
         }
         return { ok: true };
       });
       if (!staged.ok) return { skip: staged.reason };
-      await wait(400); // one tick seats the match
+      await wait(400); // one tick pops the queue and opens the ready-check proposal
+      // The queue pop is a ready-check now, not a direct seat: every one of the
+      // ten has to accept before the match seats, which is also why a capture
+      // that skipped this step shot the Accept/Decline popup instead of the
+      // field. Answer for the player and all nine bots.
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        sim.bgRespond(true);
+        for (const pid of window.__bgShotBotPids ?? []) sim.bgRespond(true, pid);
+      });
+      await wait(400); // one tick seats the accepted proposal
       const live = await page.evaluate(() => {
         const game = window.__game;
         const sim = game.sim;
@@ -1533,6 +1546,17 @@ export const TARGETS = [
         try {
           sim?.addItemInstance?.('wolf_fang', { signer: 'Toralin' });
           sim?.addItemInstance?.('wolf_fang', { signer: 'Toralin' });
+        } catch {}
+        // Lock one plain-gear stack (issue 3042, item_lock.ts): the padlock
+        // badge (bottom-left) must be visible in the same grid as the other
+        // instance marks above, composing rather than fighting for a corner.
+        // Resolved by itemId rather than a hardcoded index, since the exact
+        // slot a fresh bag lands an item in is an implementation detail.
+        try {
+          const slotIndex = sim?.inventory?.findIndex((s) => s.itemId === 'cryptbone_helm');
+          if (typeof slotIndex === 'number' && slotIndex >= 0) {
+            sim?.setItemLocked?.('cryptbone_helm', true, { slotIndex });
+          }
         } catch {}
         // Force-hide then toggle so the open is deterministic regardless of prior state
         // (the same trick the bag_filter screenshot harness uses).
@@ -3390,6 +3414,28 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-sort-filter-list',
+    label: 'World Market sort control (name / price ascending, open)',
+    // Same keying as market-type-filter-list above: the shared query module (which
+    // now carries the sort axis, issue #3102) plus the view core, not ui/market_window,
+    // so an unrelated painter layout change does not drag this along.
+    when: ['sim/market_query', 'ui/market_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      if (!(await openMarketBrowse(page))) return {};
+      const opened = await page.evaluate(() => {
+        const menu = document.querySelector('[data-market-filter-menu="sort"]');
+        const btn = menu?.querySelector('.mkt-select-btn');
+        if (!btn) return false;
+        btn.click();
+        return true;
+      });
+      if (!opened) return {};
+      await wait(250);
+      return { clip: '#market-window' };
+    },
+  },
+  {
     key: 'market-bag-size-filter',
     label: 'World Market bag capacity filter (Bags selected, sizes open)',
     when: ['sim/market_query', 'ui/market_view'],
@@ -4819,6 +4865,34 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#social-window');
       return open ? { clip: '#social-window' } : {};
+    },
+  },
+  {
+    key: 'graphics-options-shadow-dial',
+    label: 'Graphics options panel (Shadow Quality dial)',
+    when: ['ui/options_view'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        // Graphics is the third button on the main options menu (offline).
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[2]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      // Bring the lighting dial card (Shadow Quality row) into the clip.
+      await page.evaluate(() => {
+        document
+          .querySelector('[data-focus-key="shadowQuality:1"]')
+          ?.scrollIntoView({ block: 'center' });
+      });
+      return { clip: '#options-menu' };
     },
   },
   {

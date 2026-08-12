@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function joinParty(sim: Sim, leaderId: number, memberId: number): void {
   sim.partyInvite(memberId, leaderId);
@@ -13,7 +14,12 @@ describe('Mass Barrier specialization theme', () => {
     ['frost', 'ice_barrier', 30],
   ] as const) {
     it(`also starts ${personalBarrierId}'s cooldown for a ${spec} caster`, () => {
-      const sim = new Sim({ seed: 86, playerClass: 'mage', autoEquip: true });
+      const sim = new Sim({
+        seed: 86,
+        playerClass: 'mage',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       expect(sim.applyTalents({ spec, rows: { 17: 'mag_r17_mass_barrier' } })).toBe(true);
 
@@ -29,7 +35,12 @@ describe('Mass Barrier specialization theme', () => {
     ['frost', 'frost'],
   ] as const) {
     it(`stores the ${school} visual school for a ${spec} caster`, () => {
-      const sim = new Sim({ seed: 87, playerClass: 'mage', autoEquip: true });
+      const sim = new Sim({
+        seed: 87,
+        playerClass: 'mage',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       expect(sim.applyTalents({ spec, rows: { 17: 'mag_r17_mass_barrier' } })).toBe(true);
       const player = sim.player;
@@ -51,7 +62,12 @@ describe('Mass Barrier specialization theme', () => {
   }
 
   it('shields nearby group members but never unrelated friendly players', () => {
-    const sim = new Sim({ seed: 89, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({
+      seed: 89,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: 'frost', rows: { 17: 'mag_r17_mass_barrier' } })).toBe(true);
     const caster = sim.player;
@@ -74,7 +90,12 @@ describe('Mass Barrier specialization theme', () => {
   });
 
   it('always includes a higher-id caster when five allies are co-located', () => {
-    const sim = new Sim({ seed: 88, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: 88,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const lowerIdAllies = [sim.player];
     for (let i = 0; i < 4; i++) {
       const allyId = sim.addPlayer('warrior', `Tie${i}`);

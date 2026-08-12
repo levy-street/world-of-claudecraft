@@ -29,6 +29,7 @@ const apiGet = vi.fn(async (path: string) => {
     chatMutedUntil: null,
     chatMuteReason: '',
     chatStrikes: 0,
+    generalChatRateLimit: null,
     dailyRewardsBan: null,
     dailyRewardsIpBans: [],
     lastLoginIp: null,

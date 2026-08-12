@@ -2825,10 +2825,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 6,
         "rare": false,
         "templateId": "tunnel_rat",
-        "model": "mob_kobold",
+        "model": "mob_kobold_digger",
         "tint": "#9c640c",
-        "tintStrength": 0.2,
-        "still": "/guide-stills/mob_kobold__9c640c__s20.webp"
+        "tintStrength": 0.12,
+        "still": "/guide-stills/mob_kobold_digger__9c640c__s12.webp"
       },
       {
         "name": "Deeprock Tunneler",
@@ -12712,11 +12712,11 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 1.7,
     "tintStrength": 0.45
   },
-  "mob_kobold": {
-    "url": "models/creatures/goblin.glb",
+  "mob_kobold_digger": {
+    "url": "models/creatures/kobold.glb",
     "idle": "Idle",
     "height": 2.1,
-    "tintStrength": 0.2
+    "tintStrength": 0.12
   },
   "mob_bandit": {
     "url": "models/chars/players/rogue_hooded.glb",
@@ -12771,6 +12771,12 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "tintStrength": 0.5
+  },
+  "mob_kobold": {
+    "url": "models/creatures/goblin.glb",
+    "idle": "Idle",
+    "height": 2.1,
+    "tintStrength": 0.2
   },
   "mob_ogre": {
     "url": "models/creatures/giant.glb",

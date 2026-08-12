@@ -801,6 +801,11 @@ export const zh_TW: EnTranslations = {
       "resetAction": "重設",
       "note": "拖曳聊天標籤列可移動視窗，拖曳右下角控點可調整大小。重設可回復到預設位置與大小。"
     },
+    "chatQuota": {
+      "limitReached": "綜合聊天已達到上限。請在 {seconds} 後再試。",
+      "pending": "上一則綜合聊天訊息仍在傳送中。請稍候再試。",
+      "unavailable": "綜合聊天暫時無法使用。請稍後再試。"
+    },
     "swing": {
       "ready": "揮砍",
       "seconds": "{seconds}秒"
@@ -892,6 +897,14 @@ export const zh_TW: EnTranslations = {
       "bodyWithVersion": "World of ClaudeCraft {version} 版本已可用。立即更新以取得最新修正與改進。",
       "notNow": "暫不",
       "update": "更新"
+    },
+    "otaUpdate": {
+      "title": "遊戲更新",
+      "downloading": "正在下載更新：{percent}",
+      "applying": "更新已下載。正在重新啟動遊戲以套用更新。",
+      "incompatible": "需要更新後才能進行遊戲。下載完成後將立即套用。",
+      "continueAnyway": "暫不更新，繼續遊戲",
+      "progressLabel": "更新下載進度"
     },
     "cameraPrompt": {
       "title": "選擇你的鏡頭",
@@ -994,6 +1007,7 @@ export const zh_TW: EnTranslations = {
       "emoteWheel": "表情輪盤",
       "targetFriendly": "選取最近友方",
       "targetFriendlyNext": "切換友方目標",
+      "targetPrev": "反向切換目標",
       "discord": "Discord",
       "valecup": "溪谷盃",
       "bgFlag": "戰場奪旗動作",
@@ -2187,6 +2201,10 @@ export const zh_TW: EnTranslations = {
       "itemAriaBound": "{item}，數量 {count}，已綁定的副本",
       "itemAriaMasterwork": "{item}，數量 {count}，傑作",
       "itemAriaQuest": "{item}，數量 {count}，任務物品",
+      "itemAriaLocked": "{item}，數量 {count}，已鎖定",
+      "itemLockedLine": "已鎖定",
+      "lockItem": "鎖定物品",
+      "unlockItem": "解鎖物品",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -3217,6 +3235,7 @@ export const zh_TW: EnTranslations = {
       "craftedToast": "已製作:{name}",
       "craftedToastQty": "已製作:{name} x{qty}",
       "insufficientMaterials": "你沒有足夠的材料。",
+      "reagentLocked": "該配方所需的材料已鎖定。",
       "unknownRecipe": "該配方不存在。",
       "comboRequirementUnmet": "你尚未達到該配方所需組合的兩項製造技能等級。",
       "comboRequires": "調諧要求：{craftA} + {craftB}，階級 {tier}。",
@@ -3323,6 +3342,7 @@ export const zh_TW: EnTranslations = {
       "notHeld": "你沒有那件物品。",
       "notDisenchantable": "你無法分解那件物品。",
       "notSalvageable": "你無法拆解那件物品。",
+      "salvageLocked": "該物品已鎖定。",
       "disenchantBusy": "你正忙著。",
       "salvageBusy": "你正忙著。",
       "enchantBusy": "你正忙著。",
@@ -4169,6 +4189,7 @@ export const zh_TW: EnTranslations = {
       "dungeonFinder": "地城搜尋器",
       "discord": "Discord",
       "abilities": "使用動作列技能（數字鍵列；第二條動作列位於數字鍵盤上）",
+      "targetPrev": "反向切換目標",
       "targetFriendly": "鎖定最近的友方",
       "cycleFriendly": "切換友方目標",
       "targetAuras": "目標增益與減益效果",
@@ -8898,6 +8919,9 @@ export const zh_TW: EnTranslations = {
       "filterPrimaryStatAll": "任意主要屬性",
       "filterRarity": "稀有度",
       "filterRarityAll": "全部稀有度",
+      "filterSort": "排序",
+      "sortName": "名稱 (A-Z)",
+      "sortPriceAsc": "價格：從低到高",
       "weaponSword": "劍",
       "weaponDagger": "匕首",
       "weaponStaff": "法杖",

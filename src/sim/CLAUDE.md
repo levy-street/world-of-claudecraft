@@ -146,6 +146,8 @@ A leaf is any `src/sim` file with no `sim_context` import; `threat.ts`/`spatial.
 `format_money.ts` above are the pattern. Reuse or imitate one before inlining pure logic
 in a system module; most leaves are self-describing from their module headers, so read
 those rather than a roster here. The ones whose CONTRACT you cannot infer from the name:
+- `stun_dr.ts`: CC diminishing-return categories plus the PvP diminishing-returns
+  ladder constants and the player-sourced crowd-control duration funnel.
 - `launch_paperdoll_slots.ts`: the FROZEN launch-era slot list, for launch-era
   completeness records ONLY: never validate a slot against it; use `isEquipSlot` from
   `types.ts`, derived from the live `ALL_EQUIP_SLOTS`.
@@ -159,6 +161,8 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
 - `vendor_buy_stack.ts`: vendor purchase quantity math shared by `items.ts` `buyItem`
   AND the vendor window's preview, so no affordance can promise a quantity the buy path
   refuses; exports `VendorBuyOptions`, the one buyItem request shape.
+- `market_listing_ids.ts`: the World Market id allocator, including the reserved house
+  band and load-time reissue that keeps one row per id.
 - `resurrection.ts`: both sicknesses (The Keeper's Toll and the shorter Unstuck one),
   shared by every death site.
 - `ride_height.ts`: the waterline ride height slope gating reads for wading and
@@ -167,6 +171,14 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
 - `mob/mechanic_spacing.ts`: the rift boss shared mechanic spacing lock and its
   oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
   `runMobAttackMechanics` drivers.
+- `stun_dr.ts`: CC diminishing-return categories, PLUS the PvP diminishing-returns
+  ladder: the seven `PVP_*_DR_*` reset/multiplier/duration constants and the
+  player-sourced crowd-control funnel, `crowdControlDurationAfterDr`/
+  `diminishedCrowdControlDuration`.
+- `jail.ts`: moderation-jail cage layout, gate teleport, and visitor spot; the jail
+  SYSTEM logic stays on `Sim`.
+- `professions/proficiency_display_heal.ts`: the one-time gathering-proficiency
+  display-band heal applied at character load.
 
 ## The SimContext seam (final shape)
 `sim_context.ts` defines `SimContext` = `SimContextPrimitives` (live getters onto the

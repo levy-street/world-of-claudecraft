@@ -1,4 +1,4 @@
-import type { ArmoryPreviewMode } from '../render/armory_preview';
+import type { ArmoryPreviewMode, ArmoryPreviewPrewarmOptions } from '../render/armory_preview';
 import { WEAPON_SKIN_LIST } from '../sim/content/weapon_skins';
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
@@ -176,9 +176,16 @@ export class DailyRewardsWindow {
   async prewarmArmoryPreviewSkins(
     skinIds: readonly string[],
     modes?: readonly ArmoryPreviewMode[],
+    options?: ArmoryPreviewPrewarmOptions,
   ): Promise<void> {
     if (!this.storeEnabled() || skinIds.length === 0) return;
-    await this.ensureArmoryInspect().prewarm(skinIds, modes);
+    await this.ensureArmoryInspect().prewarm(skinIds, modes, options);
+  }
+
+  /** End a keep-buffer prewarm run (the paced lane's final unit): restore the
+   *  live-size preview buffer once instead of per unit. */
+  finishArmoryPreviewPrewarm(): void {
+    this.armoryInspect?.finishPrewarm();
   }
 
   /** Dispose the profile-bound Armory context; the next open rebuilds it lazily. */

@@ -801,6 +801,11 @@ export const de_DE: EnTranslations = {
       "resetAction": "Zurücksetzen",
       "note": "Ziehe die Chat-Reiterleiste, um das Fenster zu verschieben, oder den Eckgriff, um die Größe zu ändern. Zurücksetzen stellt die Standardposition und -größe wieder her."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Schwung",
       "seconds": "{seconds}s"
@@ -892,6 +897,14 @@ export const de_DE: EnTranslations = {
       "bodyWithVersion": "Version {version} von World of ClaudeCraft ist verfügbar. Aktualisiere jetzt für die neuesten Fehlerbehebungen und Verbesserungen.",
       "notNow": "Jetzt nicht",
       "update": "Aktualisieren"
+    },
+    "otaUpdate": {
+      "title": "Spiel-Update",
+      "downloading": "Update wird heruntergeladen: {percent}",
+      "applying": "Update heruntergeladen. Das Spiel wird neu gestartet, um es anzuwenden.",
+      "incompatible": "Zum Spielen ist ein Update erforderlich. Es wird angewendet, sobald der Download abgeschlossen ist.",
+      "continueAnyway": "Ohne Update fortfahren",
+      "progressLabel": "Fortschritt des Update-Downloads"
     },
     "cameraPrompt": {
       "title": "Kamera wahlen",
@@ -994,6 +1007,7 @@ export const de_DE: EnTranslations = {
       "emoteWheel": "Emote-Rad",
       "targetFriendly": "Nächsten Verbündeten anvisieren",
       "targetFriendlyNext": "Freundliches Ziel wechseln",
+      "targetPrev": "Ziel rückwärts wechseln",
       "discord": "Discord",
       "valecup": "Talpokal",
       "bgFlag": "Schlachtfeld-Flaggenaktion",
@@ -2187,6 +2201,10 @@ export const de_DE: EnTranslations = {
       "itemAriaBound": "{item}, Menge {count}, gebundene Kopie",
       "itemAriaMasterwork": "{item}, Menge {count}, Meisterwerk",
       "itemAriaQuest": "{item}, Menge {count}, Questgegenstand",
+      "itemAriaLocked": "{item}, Anzahl {count}, gesperrt",
+      "itemLockedLine": "Gesperrt",
+      "lockItem": "Gegenstand sperren",
+      "unlockItem": "Gegenstand entsperren",
       "filterGroupAria": "Taschen nach Kategorie filtern",
       "filterAll": "Alle",
       "filterWeapon": "Waffen",
@@ -3217,6 +3235,7 @@ export const de_DE: EnTranslations = {
       "craftedToast": "Hergestellt: {name}",
       "craftedToastQty": "Hergestellt: {name} x{qty}",
       "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
+      "reagentLocked": "Ein Reagenz dafür ist gesperrt.",
       "unknownRecipe": "Dieses Rezept existiert nicht.",
       "comboRequirementUnmet": "Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept.",
       "comboRequires": "Abstimmung: {craftA} + {craftB}, Stufe {tier}.",
@@ -3323,6 +3342,7 @@ export const de_DE: EnTranslations = {
       "notHeld": "Du hast diesen Gegenstand nicht.",
       "notDisenchantable": "Du kannst das nicht entzaubern.",
       "notSalvageable": "Du kannst das nicht zerlegen.",
+      "salvageLocked": "Dieser Gegenstand ist gesperrt.",
       "disenchantBusy": "Du bist beschäftigt.",
       "salvageBusy": "Du bist beschäftigt.",
       "enchantBusy": "Du bist beschäftigt.",
@@ -4169,6 +4189,7 @@ export const de_DE: EnTranslations = {
       "dungeonFinder": "Instanzfinder",
       "discord": "Discord",
       "abilities": "Aktionsleisten-Fähigkeiten einsetzen (die Zahlenreihe; eine zweite Leiste liegt auf dem Nummernblock)",
+      "targetPrev": "Ziel rückwärts durchschalten",
       "targetFriendly": "Nächstes freundliches Ziel anvisieren",
       "cycleFriendly": "Freundliches Ziel durchschalten",
       "targetAuras": "Verstärkungen und Schwächungen des Ziels",
@@ -8898,6 +8919,9 @@ export const de_DE: EnTranslations = {
       "filterPrimaryStatAll": "Beliebiges Primärattribut",
       "filterRarity": "Seltenheit",
       "filterRarityAll": "Alle Seltenheiten",
+      "filterSort": "Sortieren",
+      "sortName": "Name (A-Z)",
+      "sortPriceAsc": "Preis: niedrig bis hoch",
       "weaponSword": "Schwerter",
       "weaponDagger": "Dolche",
       "weaponStaff": "Stäbe",

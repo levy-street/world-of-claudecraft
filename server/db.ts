@@ -34,6 +34,12 @@ import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { bustDiscordStatus } from './discord_status_cache';
+import {
+  GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS,
+  GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS,
+} from './general_chat_quota_config';
+import type { GeneralChatRateLimit } from './general_chat_quota_db';
+import { GENERAL_CHAT_QUOTA_SCHEMA } from './general_chat_quota_schema';
 import { GITHUB_SCHEMA } from './github_db';
 import {
   GuildBankEscrowRefused,
@@ -105,10 +111,10 @@ const DB_POOL_MAX_CLIENTS_DEFAULT = 10;
 // shipped deployment: stock postgres:16 serves max_connections 100 with 3
 // superuser-reserved, so 97 are usable. Every realm process builds its own pool
 // on the one DATABASE_URL and pools have no cross-process coordination, so
-// realms x DB_POOL_MAX_CLIENTS + tooling is what must stay at or under 97, plus
-// one more per realm for ensureSchema's dedicated boot Client (outside the
-// pool, held while that process applies the schema, and a rolling restart pays
-// it on every realm at once). Past that, logins fail with "too many clients"
+// realms x (the shared pool + two General-quota consume clients + one LISTEN client) +
+// tooling is what must stay at or under 97. ensureSchema also uses a dedicated
+// boot Client before LISTEN starts (and a rolling restart can overlap them
+// across old/new processes). Past that, logins fail with "too many clients"
 // exactly at peak.
 // Connections are not the binding constraint on the shipped deployment, though:
 // the game process and Postgres share ONE 4-vCPU box, where the database is
@@ -164,9 +170,14 @@ console.log(
 // rather than raw comma segments. Unset REALMS parses to the single-realm
 // fallback entry, which can never trip the ceiling on its own.
 const configuredRealmCount = REALM_DIRECTORY.length;
-if (configuredRealmCount * DB_POOL_MAX_CLIENTS > DB_POOL_MAX_CLIENTS_CEILING) {
+const configuredSteadyConnections =
+  configuredRealmCount *
+  (DB_POOL_MAX_CLIENTS +
+    GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS +
+    GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS);
+if (configuredSteadyConnections > DB_POOL_MAX_CLIENTS_CEILING) {
   console.warn(
-    `db pool: ${configuredRealmCount} realms x ${DB_POOL_MAX_CLIENTS} clients = ${configuredRealmCount * DB_POOL_MAX_CLIENTS} connections, past the ${DB_POOL_MAX_CLIENTS_CEILING} usable on stock postgres:16 (max_connections 100, 3 superuser-reserved) and before ensureSchema's one boot client per realm. If every realm shares this DATABASE_URL, logins will fail with "too many clients" at peak: lower DB_POOL_MAX_CLIENTS or raise max_connections.`,
+    `db pool: ${configuredRealmCount} realms x (${DB_POOL_MAX_CLIENTS} shared + ${GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS} quota + ${GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS} listener) = ${configuredSteadyConnections} steady connections, past the ${DB_POOL_MAX_CLIENTS_CEILING} usable on stock postgres:16 (max_connections 100, 3 superuser-reserved), before tooling, the transient concurrent-index client, and rolling-restart overlap. If every realm shares this DATABASE_URL, logins will fail with "too many clients" at peak: lower DB_POOL_MAX_CLIENTS or raise max_connections.`,
   );
 }
 
@@ -1250,6 +1261,7 @@ export async function ensureSchema(): Promise<void> {
     // FK-references accounts(id), so it runs after SCHEMA. Applied unconditionally
     // (idempotent), like the Discord tables.
     await client.query(GITHUB_SCHEMA);
+    await client.query(GENERAL_CHAT_QUOTA_SCHEMA);
     // Tier-2 global rate-limit backstop table (pg-backed fixed-window counters,
     // one row per (policy, key)) for the multi-realm deployment. Applied
     // unconditionally (idempotent), like the Discord/GitHub tables. See
@@ -1413,6 +1425,9 @@ export interface AccountModerationStatus {
   // so the WS auth handshake can seed the live session without a second query.
   chatMutedUntil: string | null;
   chatStrikes: number;
+  // Sparse account policy. Null means Unlimited. Loaded in this existing auth
+  // read so a known-unlimited session never performs quota database work.
+  generalChatRateLimit?: GeneralChatRateLimit | null;
 }
 
 export interface AccountChatMuteStatus {
@@ -2778,8 +2793,11 @@ export async function moderationStatusForAccount(
   accountId: number,
 ): Promise<AccountModerationStatus> {
   const res = await pool.query(
-    `SELECT banned_at, suspended_until, moderation_reason, chat_muted_until, chat_strikes, deactivated_at
-     FROM accounts WHERE id = $1`,
+    `SELECT a.banned_at, a.suspended_until, a.moderation_reason, a.chat_muted_until,
+            a.chat_strikes, a.deactivated_at, q.messages, q.window_minutes
+     FROM accounts a
+     LEFT JOIN account_general_chat_rate_limits q ON q.account_id = a.id
+     WHERE a.id = $1`,
     [accountId],
   );
   const row = res.rows[0];
@@ -2792,12 +2810,20 @@ export async function moderationStatusForAccount(
       message: '',
       chatMutedUntil: null,
       chatStrikes: 0,
+      generalChatRateLimit: null,
     };
   }
   const mutedUntilDate = row.chat_muted_until ? new Date(row.chat_muted_until) : null;
   const chatMutedUntil =
     mutedUntilDate && mutedUntilDate.getTime() > Date.now() ? mutedUntilDate.toISOString() : null;
   const chatStrikes = Number(row.chat_strikes ?? 0);
+  const generalChatRateLimit =
+    row.messages === null || row.messages === undefined
+      ? null
+      : {
+          messages: Number(row.messages),
+          windowMinutes: Number(row.window_minutes),
+        };
   // Admin-imposed states (ban, then active suspension) outrank a self-imposed
   // deactivation: a banned+deactivated account must still surface the ban reason
   // and label, not be relabelled "deactivated". All branches resolve to locked.
@@ -2810,6 +2836,7 @@ export async function moderationStatusForAccount(
       message: 'This account has been banned.',
       chatMutedUntil,
       chatStrikes,
+      generalChatRateLimit,
     };
   }
   const suspendedUntil = row.suspended_until ? new Date(row.suspended_until) : null;
@@ -2822,6 +2849,7 @@ export async function moderationStatusForAccount(
       message: `This account is suspended until ${suspendedUntil.toUTCString()}.`,
       chatMutedUntil,
       chatStrikes,
+      generalChatRateLimit,
     };
   }
   // A self-deactivated account is locked out of login + WS auth (same gate as
@@ -2836,6 +2864,7 @@ export async function moderationStatusForAccount(
       message: 'This account has been deactivated.',
       chatMutedUntil,
       chatStrikes,
+      generalChatRateLimit,
     };
   }
   return {
@@ -2846,6 +2875,7 @@ export async function moderationStatusForAccount(
     message: '',
     chatMutedUntil,
     chatStrikes,
+    generalChatRateLimit,
   };
 }
 

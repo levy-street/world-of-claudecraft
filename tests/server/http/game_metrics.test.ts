@@ -36,6 +36,12 @@ import {
   WOC_FISHING_GOT_AWAYS_TOTAL,
   WOC_FISHING_KOI_TOTAL,
   WOC_GATHER_HARVESTS_TOTAL,
+  WOC_GENERAL_CHAT_QUOTA_CACHE_ACCOUNTS,
+  WOC_GENERAL_CHAT_QUOTA_DB_CALLS_TOTAL,
+  WOC_GENERAL_CHAT_QUOTA_DB_DURATION_SECONDS,
+  WOC_GENERAL_CHAT_QUOTA_DB_POOL,
+  WOC_GENERAL_CHAT_QUOTA_LISTENER,
+  WOC_GENERAL_CHAT_QUOTA_TOTAL,
   WOC_GUILD_BANK_INCIDENTS_TOTAL,
   WOC_GUILD_BANK_LOG_CACHE,
   WOC_INPUT_FRAMES_MISSED_TOTAL,
@@ -51,7 +57,11 @@ import {
   WOC_WS_MESSAGES_TOTAL,
   WOC_WS_RATE_KICKS_TOTAL,
 } from '../../../server/http/game_metrics';
-import { GUILD_BANK_INCIDENTS, WS_DROP_CAUSES } from '../../../server/http/game_signals';
+import {
+  GENERAL_CHAT_QUOTA_DB_OUTCOMES,
+  GUILD_BANK_INCIDENTS,
+  WS_DROP_CAUSES,
+} from '../../../server/http/game_signals';
 
 /** A GameStateSource returning fixed values; override any field per test. */
 function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
@@ -63,6 +73,10 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     simTickHz: () => 20,
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
+    generalChatQuotaDbPool: () => ({ total: 2, idle: 1, waiting: 0 }),
+    generalChatQuotaInFlight: () => 0,
+    generalChatQuotaCachedAccounts: () => 0,
+    generalChatQuotaListener: () => ({ connected: 1, reconnects: 0, pendingRefreshes: 0 }),
     guildBankLogCache: () => ({
       reads: 11,
       refreshes: 3,
@@ -147,6 +161,59 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(sampleValue(text, /^woc_db_pool_clients\{state="total"\} (\d+)$/m)).toBe('7');
     expect(sampleValue(text, /^woc_db_pool_clients\{state="idle"\} (\d+)$/m)).toBe('4');
     expect(sampleValue(text, /^woc_db_pool_clients\{state="waiting"\} (\d+)$/m)).toBe('1');
+  });
+
+  it('exports bounded quota pool, listener, cache, call, and duration observability', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(
+      registry,
+      stubSource({
+        generalChatQuotaDbPool: () => ({ total: 2, idle: 1, waiting: 0 }),
+        generalChatQuotaCachedAccounts: () => 9,
+        generalChatQuotaListener: () => ({
+          connected: 1,
+          reconnects: 3,
+          pendingRefreshes: 4,
+        }),
+      }),
+    );
+    counters.generalChatQuotaDbCall('query_timeout', 0.25);
+    const text = await registry.metrics();
+
+    expect(labelValues(text, 'outcome', WOC_GENERAL_CHAT_QUOTA_DB_CALLS_TOTAL)).toEqual(
+      new Set(GENERAL_CHAT_QUOTA_DB_OUTCOMES),
+    );
+    expect(sampleValue(text, /^woc_general_chat_quota_db_pool\{state="total"\} (\d+)$/m)).toBe('2');
+    expect(sampleValue(text, /^woc_general_chat_quota_db_pool\{state="idle"\} (\d+)$/m)).toBe('1');
+    expect(sampleValue(text, /^woc_general_chat_quota_db_pool\{state="waiting"\} (\d+)$/m)).toBe(
+      '0',
+    );
+    expect(labelValues(text, 'state', WOC_GENERAL_CHAT_QUOTA_DB_POOL)).toEqual(
+      new Set(['total', 'idle', 'waiting']),
+    );
+    expect(labelValues(text, 'measure', WOC_GENERAL_CHAT_QUOTA_LISTENER)).toEqual(
+      new Set(['connected', 'reconnects', 'pending_refreshes']),
+    );
+    expect(
+      sampleValue(text, /^woc_general_chat_quota_listener\{measure="reconnects"\} (\d+)$/m),
+    ).toBe('3');
+    expect(sampleValue(text, /^woc_general_chat_quota_cache_accounts (\d+)$/m)).toBe('9');
+    expect(
+      sampleValue(
+        text,
+        /^woc_general_chat_quota_db_calls_total\{outcome="query_timeout"\} (\d+)$/m,
+      ),
+    ).toBe('1');
+    expect(
+      sampleValue(
+        text,
+        /^woc_general_chat_quota_db_duration_seconds_sum\{outcome="query_timeout"\} (\S+)$/m,
+      ),
+    ).toBe('0.25');
+    expect(WOC_GENERAL_CHAT_QUOTA_DB_DURATION_SECONDS).toBe(
+      'woc_general_chat_quota_db_duration_seconds',
+    );
+    expect(WOC_GENERAL_CHAT_QUOTA_CACHE_ACCOUNTS).toBe('woc_general_chat_quota_cache_accounts');
   });
 
   it('reflects a fresh source read on every scrape (no drift)', async () => {
@@ -235,6 +302,8 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     for (const name of [
       WOC_WS_MESSAGES_TOTAL,
       WOC_CHAT_MESSAGES_TOTAL,
+      WOC_GENERAL_CHAT_QUOTA_TOTAL,
+      WOC_GENERAL_CHAT_QUOTA_DB_CALLS_TOTAL,
       WOC_CHARACTERS_CREATED_TOTAL,
     ]) {
       expect(text).toContain(`# TYPE ${name} counter`);
@@ -435,12 +504,20 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
         throw new Error('prom exploded');
       };
     }
+    const quotaDuration = registry.getSingleMetric(
+      WOC_GENERAL_CHAT_QUOTA_DB_DURATION_SECONDS,
+    ) as unknown as { observe: () => never };
+    quotaDuration.observe = () => {
+      throw new Error('prom exploded');
+    };
 
     expect(() => counters.wsMessage('in')).not.toThrow();
     expect(() => counters.wsMessageDropped('rate')).not.toThrow();
     expect(() => counters.wsRateKick()).not.toThrow();
     expect(() => counters.wsInputSeqGap(3)).not.toThrow();
     expect(() => counters.chatMessage()).not.toThrow();
+    expect(() => counters.generalChatQuota('allowed')).not.toThrow();
+    expect(() => counters.generalChatQuotaDbCall('allowed', 0.1)).not.toThrow();
     expect(() => counters.characterCreated()).not.toThrow();
     expect(() => counters.copperCredited('quest', 50)).not.toThrow();
     expect(() => counters.copperSpent('vendor', 20)).not.toThrow();

@@ -372,13 +372,28 @@ describe('graphics tier resolution', () => {
     expect(effectsHigh.ao).toBe(true);
     expect(effectsHigh.bloom).toBe(true);
     expect(effectsHigh.smaa).toBe(true);
-    // Shadows: pure map-size steps; terrain-cast joins at High.
+    // Shadows: pure map-size steps; terrain-cast joins at High. The ladder
+    // caps at High's 4096: a historical stored Insane (2) falls through to
+    // the High base instead of the retired ~256 MB-class 8192 map.
     expect(adv({ shadowQuality: 0 }).shadowMap).toBe(1024);
     expect(adv({ shadowQuality: 0 }).terrainCastShadows).toBe(false);
     expect(adv({ shadowQuality: 0.5 }).shadowMap).toBe(2560);
     expect(adv({ shadowQuality: 1 }).shadowMap).toBe(4096);
     expect(adv({ shadowQuality: 1 }).terrainCastShadows).toBe(true);
-    expect(adv({ shadowQuality: 2 }).shadowMap).toBe(8192);
+    expect(adv({ shadowQuality: 2 }).shadowMap).toBe(4096);
+    expect(adv({ shadowQuality: 2 }).terrainCastShadows).toBe(true);
+    // The load-bearing constrained arm: the retired explicit 8192 write used
+    // to OVERRIDE the phone-class 2048 cap; falling through to the base
+    // restores it (dynamicShadows stays off there regardless, so this pins
+    // the allocation, not a visible shadow).
+    const constrainedInsane = gfxInternalsForTest.settingsFor('high', {
+      graphicsPreset: 5,
+      shadowQuality: 2,
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+    });
+    expect(constrainedInsane.shadowMap).toBe(2048);
   });
 
   it('sheds the memory-spike knobs on constrained (phone-class) browsers, cosmetics only', () => {

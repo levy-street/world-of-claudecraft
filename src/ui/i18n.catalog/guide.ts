@@ -349,6 +349,7 @@ export const guideStrings = {
     dungeonFinder: 'Dungeon Finder',
     discord: 'Discord',
     abilities: 'Use action bar abilities (the number row; a second bar sits on the numpad)',
+    targetPrev: 'Cycle target backward',
     targetFriendly: 'Target nearest friendly',
     cycleFriendly: 'Cycle friendly target',
     targetAuras: 'Target buffs and debuffs',
@@ -1894,7 +1895,8 @@ export const guideStrings = {
     // rule are all broadcast to the whole realm in chat, so they are public. NO rank
     // multipliers, mob levels, drop rates, coin amounts, or boss scripts. The "Rift
     // Forge" is deliberately unnamed: the upgrade/enchant/socket seam has no client
-    // caller, so no player can reach it.
+    // caller and the server refuses its wire commands until the feature ships
+    // (server/rift_forge_gate.ts).
     heading: 'Rifts',
     intro:
       'A rift is a tear in the world itself, not a door you walk to. Step through one and you get a descent nobody has run before: the floors, the monsters, and the thing waiting at the bottom are all built fresh for that rift alone, so the same rank never plays out the same way twice.',
