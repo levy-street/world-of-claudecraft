@@ -93,10 +93,12 @@ const FANOUT_ARMS: readonly string[] = [
   'this.partyFramesPainter.relocalize|',
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
+  'this.riftPainter.relocalize|',
   'this.targetFrameMover.relocalize|',
   'this.playerFrameMover.relocalize|',
   'this.partyFrameMover.relocalize|',
   'this.targetAurasWindow.relocalize|',
+  'this.doomMeter.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',
   "this.renderBags|$('#bags').style.display !== 'none'",
   // The four service windows (copper vendor, heroic quartermaster, train,
@@ -109,12 +111,19 @@ const FANOUT_ARMS: readonly string[] = [
   'this.bankWindow.render|this.bankWindow.isOpen',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
+  // The Reliquary cold window is signature-gated (lastSig); language switch
+  // must force render while open so curator rank chrome and shelf labels re-t().
+  'this.reliquaryWindow.render|this.reliquaryWindow.isOpen',
   // The crafting window's repaint memos are all text-independent (station
   // set, reagent sig, profession surface sig), so an open window kept the
   // previous locale until data moved; the forced rebuild re-runs every t(),
   // identity card included (the phase 22 QA arm).
   "this.renderCrafting|$('#crafting-window').style.display === 'flex'",
   'this.updateDeedTracker|',
+  // The Reliquary tracker is the same always-on strip: its header label, hints,
+  // and per-row page names all resolve at paint, so one forced repaint here
+  // keeps the strip from showing the previous language for up to a slow tick.
+  'this.updateReliquaryTracker|',
   'this.charWindow.renderIfOpen|',
   'this.arenaWindow.relocalize|',
   'this.dungeonFinderWindow.relocalize|',
@@ -240,6 +249,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig'],
     answer: 'this.deedsWindow.render',
     why: 'the earned/watched deed ids and their counters',
+  },
+  {
+    file: 'reliquary_window.ts',
+    memos: ['lastAnnounced', 'lastSig'],
+    answer: 'this.reliquaryWindow.render',
+    why: 'catalog progress, Curator rank labels, shelf page lists, and grid chrome; lastAnnounced holds the LOCALIZED live-region line, but the fan-out render is argument-less (the player-driven arm), which recomputes and rewrites the region unconditionally, so the memo cannot pin stale-language text past a switch',
   },
   {
     file: 'dungeon_finder_proposal_popup.ts',
@@ -370,6 +385,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly reason: string;
 }> = [
   {
+    file: 'map_semantic_accessibility_core.ts',
+    memos: ['lastHash', 'lastLanguage'],
+    reason:
+      'lastHash retains the text-independent marker summary signature, while lastLanguage is compared against getLanguage() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized label on the next map paint, so the gate is explicitly locale-aware rather than a stale-language hazard.',
+  },
+  {
     file: 'claudium_window.ts',
     memos: ['paintedWalletMarkup'],
     reason:
@@ -406,6 +427,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastChip gates only the header ARIA presence swap (aria-expanded / aria-controls / aria-haspopup), which carries no player-visible text. Every string in this painter goes through the elided writer facet, which compares resolved text, and the fan-out drives it through this.updateDeedTracker.',
   },
   {
+    file: 'reliquary_tracker_painter.ts',
+    memos: ['lastChip'],
+    reason:
+      'lastChip gates only the header ARIA presence swap (aria-expanded / aria-controls / aria-haspopup), which carries no player-visible text. Every string in this painter goes through the elided writer facet, which compares resolved text, and the fan-out drives it through this.updateReliquaryTracker.',
+  },
+  {
     file: 'hud.ts',
     memos: 'coordinator',
     reason:
@@ -430,6 +457,53 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
     const main = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
     expect(main).toContain("document.dispatchEvent(new CustomEvent('woc:languagechange'");
     expect(main).toContain('async function changeLanguage(');
+  });
+
+  it('loads all three locale-chunk families before it flips the language', () => {
+    // This registry is about REPAINT, and a repaint cannot show bytes that are
+    // not resident: `changeLanguage` must await the catalog chunk AND every
+    // content channel (deed names, reliquary page names) before setLanguage,
+    // or the fan-out repaints the picked locale with the previous one's page
+    // and deed names. Nothing in half 1 or half 2 covers chunk loading, so a
+    // dropped loader would leave every other pin here green. The content
+    // channels ride CONTENT_LOCALE_CHANNEL_ENSURERS; the membership pin below
+    // holds that list, and this regex holds the await shape. Matched by regex
+    // over the function body so a reflow cannot break it.
+    const main = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
+    const start = main.indexOf('async function changeLanguage(');
+    expect(start, 'changeLanguage was renamed or removed').toBeGreaterThan(-1);
+    const end = main.indexOf('\n}\n', start);
+    expect(end, 'changeLanguage body did not close').toBeGreaterThan(start);
+    const body = main.slice(start, end);
+    expect(body).toMatch(
+      /await Promise\.all\(\[\s*ensureLocaleLoaded\(selected\),\s*\.\.\.CONTENT_LOCALE_CHANNEL_ENSURERS\.map\(\s*\(ensure\)\s*=>\s*ensure\(selected\),?\s*\),?\s*\]\);/,
+    );
+    // The await must PRECEDE the flip: hoisting setLanguage above it would
+    // repaint the picked locale with the previous locale's resident chunks.
+    // indexOf on a missing flip returns -1, which fails the comparison loudly.
+    expect(body.indexOf('await Promise.all([')).toBeLessThan(body.indexOf('setLanguage(selected)'));
+  });
+
+  it('registers both content channels in CONTENT_LOCALE_CHANNEL_ENSURERS, by identity', async () => {
+    // The await-shape regex above proves main.ts drains the registry; this pin
+    // proves the registry actually CONTAINS every content channel, so removing
+    // one from the list (which would quietly stop its chunk loading at all
+    // three main.ts sites) reds here. Identity, not name: a re-export of the
+    // wrong function would pass a name check.
+    const [{ CONTENT_LOCALE_CHANNEL_ENSURERS }, { ensureDeedLocalesLoaded }, reliquary] =
+      await Promise.all([
+        import('../src/ui/locale_channels'),
+        import('../src/ui/deed_i18n'),
+        import('../src/ui/reliquary_i18n'),
+      ]);
+    expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toContain(ensureDeedLocalesLoaded);
+    expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toContain(reliquary.ensureReliquaryLocalesLoaded);
+    // Distinctness: a channel re-exporting the other's ensure would satisfy
+    // both toContain rows and the length while loading only one table.
+    expect(ensureDeedLocalesLoaded).not.toBe(reliquary.ensureReliquaryLocalesLoaded);
+    // Snug: exactly the two shipped channels today, so an accidental duplicate
+    // (double fetch per flip) or a silent drop both fail.
+    expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toHaveLength(2);
   });
 
   it('wires the fan-out to the woc:languagechange event exactly once', () => {
@@ -607,12 +681,19 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // the read-only note is a live region on the demotion-edge paint, never
       // what is drawn; BankWindow.render repaints the pane wholesale and the
       // fan-out already drives it).
-      // 7 as of the bags Sort button: bags_window's `lastSortBaseline`
+      // 7 as of the Reliquary HUD tracker: reliquary_tracker_painter carries the
+      // deed tracker's `lastChip` memo verbatim (the header ARIA presence swap,
+      // no player text), and the fan-out drives it through
+      // this.updateReliquaryTracker.
+      // 8 as of the bags Sort button: bags_window's `lastSortBaseline`
       // gates only whether the one-shot settle ANIMATION plays (which draws
       // no text); fillGrid rebuilds every cell unconditionally and the
       // existing bags fan-out arm repaints the window wholesale on a locale
       // switch.
-    ).toBe(7);
+      // 9 as of map semantic accessibility: lastHash is paired with
+      // lastLanguage in the same guard, so getLanguage() changing explicitly
+      // invalidates the localized summary without a separate fan-out arm.
+    ).toBe(9);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

@@ -107,6 +107,15 @@ describe('isMergeableInstancePayload', () => {
     expect(isMergeableInstancePayload({})).toBe(true);
     expect(isMergeableInstancePayload(undefined)).toBe(true);
   });
+
+  // Issue #3042: a player-locked copy stays one-per-slot for the same reason
+  // charges does, a different one, so merging it into a plain or
+  // differently-locked stack never taints or launders the player's choice.
+  it('refuses a locked payload; locked: false is mergeable like any other shape', () => {
+    expect(isMergeableInstancePayload({ locked: true })).toBe(false);
+    expect(isMergeableInstancePayload({ signer: 'Ana', locked: true })).toBe(false);
+    expect(isMergeableInstancePayload({ locked: false })).toBe(true);
+  });
 });
 
 describe('canStackInstancePayloads', () => {

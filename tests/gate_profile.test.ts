@@ -250,13 +250,13 @@ describe('buildGateProfileSteps', () => {
     // Generate-once: skip pretest after i18n + wiki; client build is turbo build:bundle.
     expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
     const i18n = steps.find((s) => s.name === 'i18n + wiki + sfx artifacts');
-    expect(i18n?.cmd).toBe('npx');
+    expect(i18n?.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
     expect(i18n?.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'i18n:gen', 'wiki:content', 'sfx:check']),
+      expect.arrayContaining(['run', 'i18n:gen', 'wiki:content', 'sfx:check']),
     );
     const client = steps.find((s) => s.name === 'client build');
-    expect(client?.cmd).toBe('npx');
-    expect(client?.args).toEqual(expect.arrayContaining(['turbo', 'run', 'build:bundle']));
+    expect(client?.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
+    expect(client?.args).toEqual(expect.arrayContaining(['run', 'build:bundle']));
   });
 
   it('honors skip flags without dropping unskipped steps', () => {

@@ -1151,6 +1151,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Reliquary (server/reliquary.ts): the population-rarity aggregate, a
+  // registry-only RouteDef born after the migration like the deeds family, and
+  // the deeds-rarity row shape exactly (anonymous public JSON read, budgeted
+  // in-handler with publicReadRateLimited).
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/reliquary/rarity',
+    handler: 'server/reliquary.ts rarityHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
   // Thornhollow Fields (server/battleground.ts): a registry-only RouteDef born after
   // the migration, per the same new-route rule as the deeds family. Public
   // anonymous ladder read, rate-limited in-handler with publicReadRateLimited
@@ -1607,6 +1621,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/accounts\/(\d+)\/reset-password$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/accounts/:id/general-chat-rate-limit',
+    handler: 'generalChatRateLimitMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/accounts\/(\d+)\/general-chat-rate-limit$/,
   },
   // Account flair: the operator-set AI mark and an official streamer's links.
   {

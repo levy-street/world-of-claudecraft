@@ -409,6 +409,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);
+    // Reliquary field-note trophy reuses the same gather_event:* id.
+    expect(meta.reliquary.marks.has('gather_event:perfect_specimen')).toBe(true);
     sim.tick();
     expect(meta.deedsEarned.has('col_perfect_specimen')).toBe(true);
     sim.entities.delete(mob.id);

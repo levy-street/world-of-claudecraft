@@ -64,9 +64,17 @@
   body.mobile-touch #proc-overlay {
     scale: 0.2;
   }
+  /* The Soul Fragment bank is a persistent resource readout, not a transient
+     proc silhouette. Keep its crystals legible and draggable on touch screens. */
+  body.mobile-touch #proc-overlay.necromancy {
+    scale: 0.55;
+  }
   body.mobile-touch .aura-overlay-arc {
     top: 14px;
     height: 156px;
+  }
+  body.mobile-touch #proc-overlay.destruction {
+    scale: 0.6;
   }
   /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
@@ -785,12 +793,25 @@
     font-family: var(--ui-font);
     color: #ffdf9c;
     border-color: #8b4e2c;
+    /* The face text is a localized template (hudChrome.mobile.actionPageIndicator),
+       and the English value is a bare digit but a locale is free to translate it
+       into a real word (issue #2975: ja_JP appends "ページ"). Without a clip, a
+       wider string wraps inside this flex column and the circular badge shows a
+       garbled multi-line stack instead of clipping. */
+    overflow: hidden;
   }
   body.mobile-touch #mobile-action-page-toggle .mobile-action-page-indicator {
     font-size: 20px;
     font-weight: bold;
     line-height: 1;
     text-shadow: 1px 1px 2px #000;
+    /* Keep the page number readable first (see the ordering note above) and
+       clip anything a locale appends after it to one line instead of wrapping
+       into the circular badge's clipped overflow. */
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   body.mobile-touch #mobile-action-page-toggle .ui-icon {
     order: 2;
@@ -928,12 +949,68 @@
       0 0 12px #ffd100aa,
       inset 0 0 0 1px #ffd10077;
   }
+  /* The shared painter toggles the same proc class on desktop and touch.
+     Keep the actionable steady glow even when reduced motion stops the pulse
+     (the grouped reduced-motion and forced-colors overrides live below). */
+  body.mobile-touch #mobile-action-ring button.proc {
+    border-color: #ffd97a;
+    box-shadow:
+      0 0 12px #ffcf40e6,
+      inset 0 0 6px #ffcf4066;
+    animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
+  }
   body.mobile-touch #mobile-action-ring button.empowered {
     border-color: var(--gold);
     box-shadow:
       0 0 14px #ffd100dd,
       inset 0 0 0 1px #fff0a6aa;
     animation: action-empowered-pulse 1.15s ease-in-out infinite;
+  }
+  body.mobile-touch #mobile-action-ring button.ascension-spender::after {
+    content: attr(data-ascension-cost);
+    position: absolute;
+    left: 2px;
+    bottom: 2px;
+    z-index: 7;
+    min-width: 16px;
+    height: 14px;
+    padding: 0 2px;
+    border: 1px solid var(--color-ascension);
+    border-radius: 7px;
+    background: var(--color-bg-dark);
+    color: var(--color-ascension);
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 12px;
+    text-align: center;
+    text-shadow: 0 1px var(--text-outline-color);
+    box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) var(--color-primary-glow-heavy);
+  }
+  body.mobile-touch:has(.paladin-devotion.last-charge) #mobile-action-ring button.empowered {
+    animation-duration: 0.55s;
+    filter: brightness(1.18);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-action-ring button.proc,
+    body.mobile-touch #mobile-action-ring button.empowered {
+      animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch #mobile-action-ring button.proc {
+      forced-color-adjust: none;
+      border: 3px double Highlight;
+      outline: 1px solid CanvasText;
+      box-shadow: none;
+    }
+    body.mobile-touch #mobile-action-ring button.ascension-spender::after {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Canvas;
+      color: Highlight;
+      box-shadow: none;
+    }
   }
   body.mobile-touch #mobile-action-ring button.used {
     border-color: var(--gold);
@@ -1823,6 +1900,28 @@
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: center bottom;
   }
+  body.mobile-touch .warlock-doom-frame {
+    position: fixed;
+    z-index: 21;
+    left: 50%;
+    bottom: calc(66px + env(safe-area-inset-bottom));
+    width: min(246px, 62vw);
+    height: 40px;
+    margin: 0;
+    transform: translateX(-50%);
+  }
+  body.mobile-touch .warlock-doom {
+    width: 100%;
+    height: 14px;
+  }
+  body.mobile-touch .warlock-doom-label {
+    font-size: 10px;
+  }
+  body.mobile-touch .warlock-fate-threads {
+    width: 170px;
+    height: 21px;
+    gap: 17px;
+  }
   /* Pet frame on mobile: the desktop rule keeps it in the #actionbar-stack flow,
      which does not exist here (the player frame is lifted out to position:fixed),
      so re-seat it into the same reserved bottom-centre column, stacked ABOVE the
@@ -1859,6 +1958,31 @@
   }
   body.mobile-touch #player-frame .portrait-wrap {
     z-index: 3;
+  }
+  /* Independent Devotion medallion: compact enough for the phone battlefield,
+     but no longer attached to or covering the player portrait. */
+  body.mobile-touch .paladin-devotion-frame {
+    width: 72px;
+    height: 72px;
+  }
+  body.mobile-touch .paladin-devotion {
+    width: 72px;
+    height: 72px;
+  }
+  body.mobile-touch .paladin-ascension-charges {
+    top: -4px;
+    left: 8px;
+    width: 56px;
+  }
+  body.mobile-touch .paladin-ascension-charges span {
+    width: 9px;
+    height: 9px;
+  }
+  body.mobile-touch .paladin-devotion-label {
+    right: -10px;
+    bottom: -4px;
+    min-width: 40px;
+    font-size: 9px;
   }
   body.mobile-touch #player-frame .uf-bars {
     position: relative;
@@ -4189,6 +4313,114 @@
   body.mobile-touch.hud-mobile-compact #deed-tracker .dt-chevron {
     display: none;
   }
+  /* ---------- mobile Reliquary tracker ---------- */
+  /* The Reliquary tracker folds on exactly the same tiers, for the same reason:
+     glanceable decoration on a phone, with the window itself carrying the full
+     pin list. hud.ts routes the compact-tier tap to The Reliquary instead of the
+     invisible collapse toggle. */
+  body.mobile-touch #reliquary-tracker {
+    font-size: 11px;
+  }
+  body.mobile-touch #reliquary-tracker .dt-list {
+    max-height: 88px;
+    overflow: hidden;
+  }
+  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-list {
+    display: none;
+  }
+  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-chevron {
+    display: none;
+  }
+  /* ---------- mobile Reliquary (standalone window) ---------- */
+  /* Full-bleed safe-area panel, horizontal shelf chips, 40px targets. The
+     body column collapses the desktop rail into a chip row (deeds idiom). */
+  body.mobile-touch #reliquary-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  body.mobile-touch #reliquary-window .reliquary-body {
+    flex-direction: column;
+    min-height: 0;
+  }
+  body.mobile-touch #reliquary-window .reliquary-rail {
+    flex: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+    padding-bottom: 2px;
+  }
+  body.mobile-touch #reliquary-window .reliquary-nav {
+    flex: 0 0 auto;
+  }
+  body.mobile-touch #reliquary-window .reliquary-scroll {
+    min-height: 0;
+  }
+  @media (max-height: 480px) {
+    body.mobile-touch #reliquary-window .reliquary-body {
+      min-height: 44px;
+    }
+    body.mobile-touch #reliquary-window .reliquary-scroll {
+      min-height: 44px;
+    }
+    body.mobile-touch #reliquary-window .reliquary-summary {
+      padding: 1px 0 2px;
+    }
+    body.mobile-touch #reliquary-window .reliquary-recent,
+    body.mobile-touch #reliquary-window .reliquary-nearly {
+      gap: 4px;
+    }
+  }
+  body.mobile-touch #reliquary-window .reliquary-grid {
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    gap: 6px;
+  }
+  body.mobile-touch #reliquary-window .reliquary-cell {
+    min-width: 48px;
+    min-height: 48px;
+  }
+  body.mobile-touch #reliquary-window .reliquary-page-bar {
+    width: 100%;
+    max-width: 220px;
+  }
+  /* The Overview shelf cards stack: three columns inside a phone-width scroll
+     column leave no room for a page name, and the card text wraps rather than
+     truncates. The min-height drops to the touch floor because a stacked card
+     is already taller than that from its own content; it is the floor, not the
+     size. Cards live inside .reliquary-scroll, so they scroll with the Overview
+     and add no pinned chrome the short-landscape clamp above has to absorb. */
+  body.mobile-touch #reliquary-window .reliquary-shelf-cards {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch #reliquary-window .reliquary-shelf-card {
+    min-height: 48px;
+  }
+  /* The recent chips take the window's own 48px touch floor (the
+     .reliquary-cell size, one step above the 40px the deeds strip settled
+     for) on EVERY touch device, not just short-landscape phones: a landscape
+     tablet is body.mobile-touch too. The bare class is deliberate: the
+     jump-button form needs the floor and the inert span form keeps the same
+     box so the wrapped strip stays visually even. The strip wraps, and it
+     sits in the scrolling Overview, so a taller chip row cannot clip the
+     rail. */
+  body.mobile-touch #reliquary-window .reliquary-recent-item {
+    min-width: 48px;
+    min-height: 48px;
+  }
   /* ---------- mobile professions (standalone window) ---------- */
   /* The Professions window follows the deeds/bank STANDALONE full-screen
      convention on touch (no companion panel, so no 50/50 pairing): fixed
@@ -4790,7 +5022,21 @@
     transform: translate(-50%, -50%);
   }
   body.mobile-touch.mobile-map-quest-open {
-    --mobile-map-quest-stack-top: max(10px, env(safe-area-inset-top));
+    /* These values are consumed by siblings inside the zoomed #ui. Keep all
+       viewport and safe-area lengths in author space so their rendered geometry
+       remains inside the physical viewport at every supported UI scale. */
+    --mobile-map-rail: 58px;
+    --mobile-map-frame: 18px;
+    --mobile-map-stack-shell-height: 22px;
+    /* #ui zoom multiplies authored lengths. Counter only the shrink side so
+       every paired-map control retains the literal 40px rendered touch floor
+       below 100% UI scale while larger scales keep their larger targets. */
+    --mobile-map-touch-target: max(40px, calc(40px / var(--ui-scale, 1)));
+    --mobile-map-quest-stack-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    --mobile-map-quest-stack-bottom: calc(
+      max(10px, env(safe-area-inset-bottom)) /
+      var(--ui-scale, 1)
+    );
     --mobile-map-quest-log-max-height: clamp(
       88px,
       calc(var(--app-vh) / var(--ui-scale, 1) - 150px),
@@ -4798,8 +5044,18 @@
     );
     --mobile-map-quest-stack-gap: 8px;
   }
+  body.mobile-touch.mobile-map-quest-open #quest-log-window .ql-item,
+  body.mobile-touch.mobile-map-quest-open #quest-log-window .btn,
+  body.mobile-touch.mobile-map-quest-open #quest-log-window [data-close],
+  body.mobile-touch.mobile-map-quest-open #map-close,
+  body.mobile-touch.mobile-map-quest-open #map-level-toggle,
+  body.mobile-touch.mobile-map-quest-open .map-zoom-btn {
+    min-width: var(--mobile-map-touch-target);
+    min-height: var(--mobile-map-touch-target);
+  }
   body.mobile-touch.mobile-map-quest-open #quest-log-window {
     top: var(--mobile-map-quest-stack-top);
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 32px);
     max-height: var(--mobile-map-quest-log-max-height);
     overflow: auto;
   }
@@ -4810,16 +5066,11 @@
       var(--mobile-map-quest-stack-gap)
     );
     transform: translateX(-50%);
-    width: min(
-      46vw,
-      300px,
-      calc(
-        var(--app-vh) -
-        var(--mobile-map-quest-log-max-height) -
-        var(--mobile-map-quest-stack-gap) -
-        22px
-      )
-    );
+    /* The quest log is stacked above this map, not beside it. Keep the map at
+       the normal near-full portrait width so actionable markers and touch
+       targets do not collapse to a quarter-scale 560px canvas. The available
+       height still limits the window through the stack position and viewport. */
+    width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));
   }
   body.mobile-touch #map-canvas {
     width: 100%;
@@ -5280,10 +5531,13 @@
         52vw,
         320px,
         calc(
-          var(--app-vh) -
+          var(--app-vh) /
+          var(--ui-scale, 1) -
+          var(--mobile-map-quest-stack-top) -
+          var(--mobile-map-quest-stack-bottom) -
           var(--mobile-map-quest-log-max-height) -
           var(--mobile-map-quest-stack-gap) -
-          22px
+          var(--mobile-map-stack-shell-height)
         )
       );
       top: calc(
@@ -5292,9 +5546,85 @@
         var(--mobile-map-quest-stack-gap)
       );
       width: min(
-        calc(var(--mobile-map-size) + var(--mobile-map-rail)),
+        calc(var(--mobile-map-size) + var(--mobile-map-rail) + var(--mobile-map-frame)),
         calc(var(--app-vw) / var(--ui-scale, 1) - 32px)
       );
+      /* This window is already height-budgeted against the viewport. Keep its
+         frame symmetric instead of adding the generic mobile safe-area footer;
+         8px top + 8px bottom + two window borders + two canvas borders is the
+         22px shell height reserved above. */
+      padding-bottom: var(--window-pad);
+    }
+    /* On a wide landscape phone, stacking the quest sheet over the map spends
+       most of the scarce vertical axis and can shrink the 560px map backing to
+       roughly 242 physical pixels. Seat the two windows side by side instead.
+       Every coordinate below is in #ui author space (the shell applies zoom),
+       so viewport and safe-area values are divided by --ui-scale. The 820px
+       gate leaves narrower landscape devices on the proven stacked fallback. */
+    @media (min-width: 820px) {
+      body.mobile-touch.mobile-map-quest-open {
+        /* Shared by the sibling quest sheet and map window. Keeping this on
+           #map-window made the quest-width expression invalid: custom
+           properties inherit down the tree, never sideways or upward. */
+        --mobile-map-dual-edge-left: calc(
+          max(10px, env(safe-area-inset-left)) /
+          var(--ui-scale, 1)
+        );
+        --mobile-map-dual-edge-right: calc(
+          max(10px, env(safe-area-inset-right)) /
+          var(--ui-scale, 1)
+        );
+        --mobile-map-dual-edge-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+        --mobile-map-dual-edge-bottom: calc(
+          max(10px, env(safe-area-inset-bottom)) /
+          var(--ui-scale, 1)
+        );
+        --mobile-map-dual-gap: 8px;
+        --mobile-map-dual-available-width: calc(
+          var(--app-vw) /
+          var(--ui-scale, 1) -
+          var(--mobile-map-dual-edge-left) -
+          var(--mobile-map-dual-edge-right)
+        );
+        --mobile-map-dual-size: min(320px, calc((var(--app-vh) - 104px) / var(--ui-scale, 1)));
+        --mobile-map-dual-quest-width: clamp(
+          220px,
+          calc(
+            var(--mobile-map-dual-available-width) -
+            var(--mobile-map-dual-gap) -
+            var(--mobile-map-rail) -
+            var(--mobile-map-dual-size) -
+            var(--mobile-map-frame)
+          ),
+          300px
+        );
+      }
+      body.mobile-touch.mobile-map-quest-open #quest-log-window {
+        left: var(--mobile-map-dual-edge-left);
+        right: auto;
+        top: var(--mobile-map-dual-edge-top);
+        width: var(--mobile-map-dual-quest-width);
+        max-width: var(--mobile-map-dual-quest-width);
+        max-height: calc(
+          var(--app-vh) /
+          var(--ui-scale, 1) -
+          var(--mobile-map-dual-edge-top) -
+          var(--mobile-map-dual-edge-bottom)
+        );
+        transform: none;
+      }
+      body.mobile-touch.mobile-map-quest-open #map-window {
+        --mobile-map-size: var(--mobile-map-dual-size);
+        left: auto;
+        right: var(--mobile-map-dual-edge-right);
+        top: var(--mobile-map-dual-edge-top);
+        /* #map-window is border-box. Include both 8px window pads and both
+           1px borders so --mobile-map-size remains the canvas size instead
+           of silently losing 16px to its frame. */
+        width: calc(var(--mobile-map-size) + var(--mobile-map-rail) + var(--mobile-map-frame));
+        max-width: calc(var(--mobile-map-size) + var(--mobile-map-rail) + var(--mobile-map-frame));
+        transform: none;
+      }
     }
     body.mobile-touch.mobile-left-handed #mobile-extra-controls {
       left: 50%;

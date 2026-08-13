@@ -4,6 +4,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, type Aura, type Entity, type SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function addTarget(sim: Sim, distance: number): Entity {
   const player = sim.player;
@@ -63,7 +64,12 @@ describe('every retained active row grant casts through the canonical Sim path',
 
     it(`${cls}: ${grants.length} active grants resolve and engage`, () => {
       for (const grant of grants) {
-        const sim = new Sim({ seed: 91, playerClass: cls, autoEquip: true });
+        const sim = new Sim({
+          seed: 91,
+          playerClass: cls,
+          autoEquip: true,
+          world: EMPTY_TEST_WORLD,
+        });
         sim.setPlayerLevel(20);
         expect(
           sim.applyTalents({ spec: null, rows: { [grant.level]: grant.optionId } }),

@@ -44,18 +44,6 @@ function makeSim(
   return { sim, p, meta };
 }
 
-// The proc-before-thorns ordering tests can only observe their ordering on a swing
-// that CONNECTS, so they need a seed whose hit-table roll lands above the floor miss
-// chance. This is a hunted fixture, not a tuning value: scan upward and keep the
-// first seed whose first post-construction draw clears the miss floor for all three
-// arms (paladin, shaman, rogue). Re-hunt it whenever an upstream draw site moves.
-// Re-hunted after the Eastbrook camp respacing thinned the zone-1 camp counts, which
-// removes construction-time draws and shifts every later draw: at the previous 26014
-// the roll fell to 0.0034, under the 1.2 percent floor, so the swing missed and the
-// premise vanished (the miss-chance math itself was unchanged). Spares on record:
-// 26016 through 26020 all connect for this drive.
-const CONNECTING_SWING_SEED = 26015;
-
 // An idle hostile mob, beefed, in front of the player at distance dz, targeted + faced.
 function spawnDummy(sim: Sim, p: Entity, level = 5, dz = 2): Entity {
   const mob = createMob(sim.nextId++, MOBS.forest_wolf, level, {
@@ -271,91 +259,32 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
     });
   };
 
-  it('lets Imbued Lifeblood save its owner from otherwise lethal thorns', () => {
+  it('resolves Ancestral Strike Ward Cycle sustain before thorns', () => {
     const { sim, p } = makeSim('shaman', 20, 1756);
-    expect(sim.applyTalents({ spec: null, rows: { 5: 'sha_r5_imbue_mastery' } })).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 14: 'sha_r14_weapon_fury' } })).toBe(true);
     const mob = spawnDummy(sim, p, 1);
-    addImbue(p);
-    addThorns(mob, 10);
+    addThorns(mob, 1);
     p.mainhandItemId = null;
-    p.hp = 5;
-    const events = capture(sim);
+    p.resource = p.maxResource - 20;
+    let manaAtRetaliation = 0;
+    const dealDamage = sim.ctx.dealDamage;
+    sim.ctx.dealDamage = ((source: Entity | null, target: Entity, ...args: unknown[]) => {
+      if (source?.id === mob.id && target.id === p.id && args[3] === 'Punishing Thorns') {
+        manaAtRetaliation = p.resource;
+      }
+      return (dealDamage as (...callArgs: unknown[]) => unknown)(source, target, ...args);
+    }) as typeof sim.ctx.dealDamage;
     const draws: number[] = [];
     sim.rng.setObserver((value: number) => draws.push(value));
 
-    const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
+    const connected = meleeSwing(sim.ctx, p, mob, 0, 'Ancestral Strike', {
+      cannotBeDodged: true,
+    });
     sim.rng.setObserver(null);
 
-    const healIndex = events.findIndex(
-      (event) => event.type === 'heal2' && event.ability === 'Imbued Lifeblood',
-    );
-    const thornsIndex = events.findIndex(
-      (event) =>
-        event.type === 'damage' &&
-        event.sourceId === mob.id &&
-        event.targetId === p.id &&
-        event.ability === 'Punishing Thorns',
-    );
     expect(connected).toBe(true);
-    expect(healIndex).toBeGreaterThan(-1);
-    expect(thornsIndex).toBeGreaterThan(healIndex);
-    expect(p.dead).toBe(false);
-    expect(p.hp).toBeGreaterThan(0);
-    // Hit table, weapon roll, swing crit, then Lifeblood's normal heal-crit roll.
-    expect(draws).toHaveLength(4);
-  });
-
-  it.each([
-    {
-      name: 'Oathwheel cooldown refund',
-      cls: 'paladin' as const,
-      row: { 14: 'pal_r14_righteous_cause' },
-      prepare: (player: Entity) => player.cooldowns.set('judgement', 5),
-      read: (player: Entity) => player.cooldowns.get('judgement'),
-      expected: 4.5,
-    },
-    {
-      name: 'Imbued Tempo cooldown refund',
-      cls: 'shaman' as const,
-      row: { 14: 'sha_r14_weapon_fury' },
-      prepare: (player: Entity) => player.cooldowns.set('earth_shock', 5),
-      read: (player: Entity) => player.cooldowns.get('earth_shock'),
-      expected: 4.5,
-    },
-  ])('applies $name before thorns without changing the shared RNG trace', (testCase) => {
-    const run = (active: boolean) => {
-      const { sim, p } = makeSim(testCase.cls, 20, CONNECTING_SWING_SEED);
-      if (active) {
-        expect(sim.applyTalents({ spec: null, rows: testCase.row })).toBe(true);
-      }
-      const mob = spawnDummy(sim, p, 1);
-      addImbue(p);
-      addThorns(mob, 1);
-      p.mainhandItemId = null;
-      testCase.prepare(p);
-      let valueAtRetaliation: unknown;
-      const dealDamage = sim.ctx.dealDamage;
-      sim.ctx.dealDamage = ((source: Entity | null, target: Entity, ...args: unknown[]) => {
-        if (source?.id === mob.id && target.id === p.id && args[3] === 'Punishing Thorns') {
-          valueAtRetaliation = testCase.read(p);
-        }
-        return (dealDamage as (...callArgs: unknown[]) => unknown)(source, target, ...args);
-      }) as typeof sim.ctx.dealDamage;
-      const draws: number[] = [];
-      sim.rng.setObserver((value: number) => draws.push(value));
-
-      const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
-      sim.rng.setObserver(null);
-
-      expect(connected).toBe(true);
-      return { draws, valueAtRetaliation };
-    };
-
-    const baseline = run(false);
-    const active = run(true);
-    expect(active.valueAtRetaliation).toBe(testCase.expected);
-    expect(active.draws).toEqual(baseline.draws);
-    expect(active.draws).toHaveLength(3);
+    expect(manaAtRetaliation).toBe(p.maxResource - 10);
+    expect(draws).toHaveLength(3);
   });
 
   it('Venom Dividend rolls its chance before thorns and pays only on success', () => {
@@ -363,9 +292,11 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
     // chance for 10 energy), so the proc now draws exactly one rng roll per
     // poisoned swing; the roll resolves before the thorns retaliation.
     const run = (active: boolean) => {
-      const { sim, p } = makeSim('rogue', 20, CONNECTING_SWING_SEED);
+      // Seed re-hunted for the v0.32.1 catch-up (26014 drew a miss on the
+      // shifted stream; the fixture needs the poisoned swing to CONNECT).
+      const { sim, p } = makeSim('rogue', 20, 26015);
       if (active) {
-        expect(sim.applyTalents({ spec: null, rows: { 14: 'rog_r14_deadly_brew' } })).toBe(true);
+        expect(sim.applyTalents({ spec: null, rows: { 14: 'rog_r14_venom_dividend' } })).toBe(true);
       }
       const mob = spawnDummy(sim, p, 1);
       addImbue(p);

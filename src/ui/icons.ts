@@ -12,7 +12,7 @@ import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { crestIconUrl } from './crest_icon_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
-import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
+import { professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
 export { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
@@ -36,13 +36,55 @@ const TAU = Math.PI * 2;
 // ---------------------------------------------------------------------------
 
 const PALETTES = {
-  steel: { base: '#aebdc8', light: '#eef4f8', dark: '#4e5a66', glow: '#cfe4ff', accent: '#2b333c' },
-  gold: { base: '#e8b33a', light: '#ffe9a8', dark: '#8a5f12', glow: '#ffd97a', accent: '#5c3e08' },
-  blood: { base: '#c0392b', light: '#ff8a70', dark: '#5e120c', glow: '#ff5533', accent: '#2e0805' },
-  bone: { base: '#e8e0cc', light: '#fffaf0', dark: '#8f8468', glow: '#fff8d8', accent: '#4a4334' },
-  ember: { base: '#ff7a1a', light: '#ffd9a0', dark: '#8a2a08', glow: '#ffb45e', accent: '#401004' },
-  ice: { base: '#9fd8ff', light: '#eafaff', dark: '#2a6ea8', glow: '#c8f0ff', accent: '#123c5e' },
-  venom: { base: '#7ad94a', light: '#d8ffb0', dark: '#2a6e18', glow: '#a8ff70', accent: '#0d330a' },
+  steel: {
+    base: '#aebdc8',
+    light: '#eef4f8',
+    dark: '#4e5a66',
+    glow: '#cfe4ff',
+    accent: '#2b333c',
+  },
+  gold: {
+    base: '#e8b33a',
+    light: '#ffe9a8',
+    dark: '#8a5f12',
+    glow: '#ffd97a',
+    accent: '#5c3e08',
+  },
+  blood: {
+    base: '#c0392b',
+    light: '#ff8a70',
+    dark: '#5e120c',
+    glow: '#ff5533',
+    accent: '#2e0805',
+  },
+  bone: {
+    base: '#e8e0cc',
+    light: '#fffaf0',
+    dark: '#8f8468',
+    glow: '#fff8d8',
+    accent: '#4a4334',
+  },
+  ember: {
+    base: '#ff7a1a',
+    light: '#ffd9a0',
+    dark: '#8a2a08',
+    glow: '#ffb45e',
+    accent: '#401004',
+  },
+  ice: {
+    base: '#9fd8ff',
+    light: '#eafaff',
+    dark: '#2a6ea8',
+    glow: '#c8f0ff',
+    accent: '#123c5e',
+  },
+  venom: {
+    base: '#7ad94a',
+    light: '#d8ffb0',
+    dark: '#2a6e18',
+    glow: '#a8ff70',
+    accent: '#0d330a',
+  },
   arcanePink: {
     base: '#c66ee8',
     light: '#f0c8ff',
@@ -71,7 +113,13 @@ const PALETTES = {
     glow: '#9fe070',
     accent: '#0d2e0a',
   },
-  sky: { base: '#6fb6ff', light: '#d4ecff', dark: '#1f5a9e', glow: '#a0d4ff', accent: '#0c2c50' },
+  sky: {
+    base: '#6fb6ff',
+    light: '#d4ecff',
+    dark: '#1f5a9e',
+    glow: '#a0d4ff',
+    accent: '#0c2c50',
+  },
   earthBrown: {
     base: '#a8703c',
     light: '#e0b070',
@@ -93,8 +141,20 @@ const PALETTES = {
     glow: '#d8aa6a',
     accent: '#33200c',
   },
-  cloth: { base: '#b0a4d8', light: '#e0d8f4', dark: '#5a4e84', glow: '#d0c4f0', accent: '#2a2444' },
-  pink: { base: '#f0a8c0', light: '#ffe0ec', dark: '#a05878', glow: '#ffd0e0', accent: '#4e2030' },
+  cloth: {
+    base: '#b0a4d8',
+    light: '#e0d8f4',
+    dark: '#5a4e84',
+    glow: '#d0c4f0',
+    accent: '#2a2444',
+  },
+  pink: {
+    base: '#f0a8c0',
+    light: '#ffe0ec',
+    dark: '#a05878',
+    glow: '#ffd0e0',
+    accent: '#4e2030',
+  },
 } satisfies Record<string, IconPalette>;
 type PaletteName = keyof typeof PALETTES;
 
@@ -1624,6 +1684,45 @@ const PRIMITIVES = {
     ctx.fill();
     noShadow(ctx);
   },
+  ascension_seal(ctx, pal) {
+    noShadow(ctx);
+    ctx.shadowColor = pal.glow;
+    ctx.shadowBlur = 7;
+    ctx.strokeStyle = pal.light;
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 22, 0, TAU);
+    ctx.stroke();
+    for (let index = 0; index < 5; index++) {
+      ctx.save();
+      ctx.rotate((index / 5) * TAU);
+      ctx.translate(0, -27);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = index % 2 === 0 ? pal.light : pal.base;
+      ctx.fillRect(-4, -4, 8, 8);
+      ctx.strokeStyle = pal.accent;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-4, -4, 8, 8);
+      ctx.restore();
+    }
+    ctx.fillStyle = rad(ctx, -3, -4, 13, [
+      [0, '#ffffff'],
+      [0.45, pal.light],
+      [1, pal.base],
+    ]);
+    ctx.beginPath();
+    ctx.arc(0, 0, 11, 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = pal.dark;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(0, -8);
+    ctx.lineTo(0, 8);
+    ctx.moveTo(-8, 0);
+    ctx.lineTo(8, 0);
+    ctx.stroke();
+    noShadow(ctx);
+  },
   moon(ctx, pal) {
     ctx.beginPath();
     ctx.moveTo(4, -16.6);
@@ -2409,7 +2508,12 @@ function r(
   prims: (PrimitiveName | Placement)[],
   fx?: FxName[],
 ): IconRecipe {
-  return { bg, pal, prims: prims.map((p) => (typeof p === 'string' ? { p } : p)), fx };
+  return {
+    bg,
+    pal,
+    prims: prims.map((p) => (typeof p === 'string' ? { p } : p)),
+    fx,
+  };
 }
 
 const ABILITY_RECIPES: Record<string, IconRecipe> = {
@@ -2452,6 +2556,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   pet_attack: r('blood', 'blood', ['fang'], ['motion']),
   pet_growl: r('fury', 'gold', ['roar'], ['arcs']),
   pet_water_jet: r('frost', 'ice', ['bolt', 'snowflake'], ['drips']),
+  emberkin_felbolt: r('fire', 'venom', ['bolt', 'flame'], ['glow']),
+  gloomshade_abyssal_chain: r('shadow', 'shadowPurple', ['tendrils', 'sigil_rune'], ['arcs']),
   pet_feed: r('food', 'ember', ['meat']), // roasted meat: hunters feed, not magic-heal
   pet_mend: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   pet_passive: r('nature', 'earthBrown', ['paw']),
@@ -2589,13 +2695,84 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   seal_of_righteousness: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'sigil_rune'], ['glow']),
   holy_light: r('holy', 'holyGold', ['sunburst'], ['glow', 'sparkle']),
   devotion_aura: r('holy', 'holyGold', ['shield', { p: 'sunburst', ...TL }]),
-  judgement: r('holy', 'gold', [{ p: 'sunburst', ...BIG }, 'mace'], ['glow']),
   blessing_of_might: r('holy', 'gold', ['fist', { p: 'sunburst', ...TL }]),
   divine_protection: r('holy', 'silverWhite', ['shield'], ['glow']),
   sacred_bulwark: r('holy', 'holyGold', ['shield', { p: 'cross', ...BR }], ['arcs', 'glow']),
   hammer_of_justice: r('holy', 'gold', ['mace'], ['arcs']),
   lay_on_hands: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'hand'], ['sparkle', 'glow']),
   holy_taunt: r('holy', 'holyGold', ['roar'], ['arcs']),
+  divine_ascension: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'ascension_seal', ...BIG },
+      { p: 'wing', ...BR },
+    ],
+    ['glow', 'sparkle'],
+  ),
+  hushbrand: r('holy', 'gold', ['fist', { p: 'sigil_rune', ...BR }], ['arcs']),
+  guardian_covenant: r('holy', 'holyGold', ['shield', { p: 'hand', ...BR }], ['glow']),
+  devotion_ward: r('holy', 'silverWhite', ['shield', { p: 'sunburst', ...BIG }], ['arcs']),
+  solar_step: r('holy', 'gold', ['boot', { p: 'lightning', ...TR }], ['motion', 'sparkle']),
+  solar_invocation: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'sunburst', ...BIG },
+      { p: 'heart', ...BR },
+    ],
+    ['arcs', 'sparkle'],
+  ),
+  hammer_of_grace: r('holy', 'sky', ['mace', { p: 'gem', ...BR }], ['glow']),
+  sacred_form: r('holy', 'silverWhite', ['wing', { p: 'cross', ...BR }], ['glow', 'sparkle']),
+  aegis_first_dawn: r(
+    'holy',
+    'holyGold',
+    ['shield', { p: 'sunburst', ...BIG }, { p: 'sigil_rune', ...BR }],
+    ['arcs', 'glow', 'sparkle'],
+  ),
+  radiant_devotion: r('holy', 'arcanePink', ['gem', { p: 'sunburst', ...TR }], ['arcs']),
+  dawn_devotion: r('holy', 'gold', ['fist', { p: 'sunburst', ...BR }], ['glow']),
+  grace_devotion: r('holy', 'sky', ['gem', { p: 'droplet', ...BR }], ['sparkle']),
+  recall_the_fallen: r('holy', 'silverWhite', ['cross', { p: 'hand', ...BR }], ['sparkle']),
+  beacon_of_light: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'sunburst', ...BIG },
+      { p: 'cross', ...BR },
+    ],
+    ['glow', 'sparkle'],
+  ),
+  final_edict: r('fury', 'ember', ['mace', { p: 'sunburst', ...BR }], ['arcs', 'glow']),
+  dawnfall: r('fury', 'holyGold', [{ p: 'sunburst', ...BIG }, 'sword'], ['arcs']),
+  sun_gods_verdict: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'sunburst', ...BIG },
+      { p: 'eye', ...BR },
+    ],
+    ['arcs', 'glow', 'sparkle'],
+  ),
+  valkyrs_calling: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'wing', ...BIG },
+      { p: 'sunburst', ...BR },
+    ],
+    ['motion', 'glow'],
+  ),
+  faithforged_guard: r('steel', 'gold', ['shield', { p: 'sword', ...BR }], ['glow']),
+  mercy_lance: r('holy', 'silverWhite', ['bolt', { p: 'heart', ...BR }], ['sparkle']),
+  dawns_embrace: r('holy', 'pink', ['hand', { p: 'sunburst', ...TR }], ['glow']),
+  radiant_chorus: r('holy', 'silverWhite', [{ p: 'sunburst', ...BIG }, 'cross'], ['sparkle']),
+  life_covenant: r('arcane', 'pink', ['heart', { p: 'shield', ...BR }], ['glow']),
+  vowkeeper_strike: r('steel', 'holyGold', ['mace', { p: 'shield', ...BR }], ['arcs']),
+  bastion_rite: r('steel', 'sky', ['shield', { p: 'sigil_rune', ...BR }], ['glow']),
+  sunward_disc: r('storm', 'gold', ['coin', { p: 'sunburst', ...BR }], ['motion', 'glow']),
+  sacred_challenge: r('storm', 'holyGold', ['roar', { p: 'shield', ...BR }], ['arcs']),
   // hunter
   raptor_strike: r('earth', 'blood', ['claw_slash']),
   aspect_of_the_hawk: r('storm', 'sky', ['wing'], ['glow']),
@@ -2605,6 +2782,34 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   concussive_shot: r('storm', 'sky', ['arrow'], ['arcs']),
   mongoose_bite: r('earth', 'steel', ['fang', { p: 'claw_slash', ...BR }], ['motion']),
   wing_clip: r('earth', 'blood', ['wing', { p: 'claw_slash', ...BR }]),
+  pack_command: r('fury', 'gold', ['paw', { p: 'arrow', ...BR }], ['arcs']),
+  stampede: r(
+    'fury',
+    'blood',
+    [
+      { p: 'paw', ...BIG },
+      { p: 'boot', ...BR },
+    ],
+    ['motion', 'glow'],
+  ),
+  unleash_beast: r('fury', 'blood', [{ p: 'paw', ...BIG }, 'roar'], ['glow', 'arcs']),
+  measured_shot: r('steel', 'gold', ['crosshair', { p: 'arrow', ...BR }], ['sparkle']),
+  pack_rally: r('nature', 'sky', ['roar', { p: 'wing', ...BR }], ['motion', 'glow']),
+  shrapnel_charge: r('steel', 'ember', ['meteor', { p: 'arrow', ...BR }], ['crack']),
+  bloodtrail_assault: r('blood', 'blood', ['boot', { p: 'droplet', ...BR }], ['motion', 'drips']),
+  trailbreak: r('storm', 'leafGreen', ['boot', { p: 'arrow', ...TR }], ['motion', 'arcs']),
+  wildheart: r('nature', 'blood', ['heart', { p: 'paw', ...BR }], ['glow', 'sparkle']),
+  shellskin: r('earth', 'earthBrown', ['shield', { p: 'pelt', ...BR }], ['crack']),
+  frostjaw_trap: r('frost', 'ice', ['fang', { p: 'tendrils', ...BR }], ['arcs', 'glow']),
+  cold_focus: r('frost', 'steel', ['eye', { p: 'crosshair', ...BR }], ['sparkle']),
+  bloodhook: r('blood', 'steel', ['fang', { p: 'tendrils', ...TR }], ['motion', 'drips']),
+  hunting_momentum: r('fury', 'blood', ['boot', { p: 'fang', ...TR }], ['motion', 'glow']),
+  fieldcraft_reentry: r(
+    'earth',
+    'ember',
+    ['tendrils', { p: 'claw_slash', ...BR }],
+    ['motion', 'crack'],
+  ),
   // the Vale Cup sport kit (boarball): the 'coin' disc reads as the ball
   sport_kick: r('earth', 'leather', ['coin', { p: 'boot', ...BR }]),
   sport_shoot: r('fury', 'ember', ['coin', { p: 'boot', ...BR }], ['motion']),
@@ -2634,16 +2839,133 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   flame_shock: r('fire', 'ember', ['flame'], ['arcs']),
   flametongue_weapon: r('fire', 'ember', ['sword', { p: 'flame', s: 0.6 }], ['glow']),
   frostbrand_weapon: r('frost', 'ice', ['sword', { p: 'snowflake', s: 0.6 }], ['glow']),
+  galeheart_weapon: r('storm', 'sky', ['sword', { p: 'lightning', ...TR }], ['motion', 'arcs']),
+  thunder_reservoir: r('storm', 'gold', ['gem', { p: 'lightning', ...TR }], ['arcs', 'glow']),
+  warspirit_cadence: r('storm', 'steel', ['fist', { p: 'sword', ...BR }], ['motion', 'arcs']),
+  stormsurge: r('storm', 'sky', ['lightning', { p: 'sunburst', ...BR }], ['glow', 'sparkle']),
+  lifespring_weapon: r('nature', 'leafGreen', ['droplet', { p: 'heart', ...BR }], ['sparkle']),
+  unleash_weapon: r('nature', 'sky', ['sword', { p: 'droplet', ...BR }], ['arcs', 'glow']),
+  tidecall: r('nature', 'sky', ['sunburst', { p: 'droplet', ...BR }], ['arcs']),
+  stoneward: r('earth', 'earthBrown', ['shield', { p: 'gem', ...TR }], ['crack', 'glow']),
+  primal_exaltation: r('storm', 'gold', ['sunburst', { p: 'lightning', ...BR }], ['glow', 'arcs']),
   // warlock
   shadow_bolt: r('shadow', 'shadowPurple', ['bolt'], ['glow']),
   demon_skin: r('shadow', 'venom', [{ p: 'chestplate', pal: 'venom' }]),
   immolate: r('fire', 'ember', ['flame'], ['crack', 'glow']),
   corruption: r('shadow', 'shadowPurple', ['skull'], ['drips']),
+  evil_eye: r('shadow', 'venom', [{ p: 'eye', s: 1.08 }], ['glow']),
+  maledict_gaze: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', x: -8, s: 0.88 },
+      { p: 'bolt', x: 10, s: 0.72, pal: 'shadowPurple' },
+    ],
+    ['arcs', 'glow'],
+  ),
+  needle_of_fate: r(
+    'shadow',
+    'silverWhite',
+    [
+      { p: 'bolt', s: 0.92 },
+      { p: 'eye', ...TR, s: 0.5, pal: 'venom' },
+    ],
+    ['motion'],
+  ),
+  sentence: r(
+    'shadow',
+    'shadowPurple',
+    [
+      { p: 'skull', s: 0.92 },
+      { p: 'sunburst', ...BR, s: 0.58, pal: 'venom' },
+    ],
+    ['arcs', 'glow'],
+  ),
+  cursed_accomplice: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', ...TL, s: 0.72 },
+      { p: 'hand', ...BR, s: 0.72, pal: 'shadowPurple' },
+    ],
+    ['glow'],
+  ),
+  hex_of_violence: r(
+    'blood',
+    'shadowPurple',
+    [
+      { p: 'skull', s: 0.88 },
+      { p: 'fist', ...BR, s: 0.58, pal: 'blood' },
+    ],
+    ['arcs'],
+  ),
+  cruel_pact: r(
+    'blood',
+    'blood',
+    [
+      { p: 'heart', s: 0.9 },
+      { p: 'claw_slash', ...TR, s: 0.62, pal: 'shadowPurple' },
+    ],
+    ['drips'],
+  ),
+  vicarious_suffering: r(
+    'shadow',
+    'blood',
+    [
+      { p: 'heart', ...TL, s: 0.7 },
+      { p: 'tendrils', ...BR, s: 0.72, pal: 'shadowPurple' },
+    ],
+    ['arcs'],
+  ),
+  coven: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', x: -11, y: -8, s: 0.58 },
+      { p: 'eye', x: 10, y: -7, s: 0.54, pal: 'shadowPurple' },
+      { p: 'eye', x: 0, y: 10, s: 0.64 },
+    ],
+    ['glow', 'arcs'],
+  ),
   life_tap: r('blood', 'shadowPurple', ['heart', { p: 'droplet', ...BR, pal: 'shadowPurple' }]),
   curse_of_agony: r('shadow', 'shadowPurple', ['skull'], ['arcs']),
   drain_life: r('shadow', 'blood', [{ p: 'droplet', pal: 'blood' }], ['motion', 'drips']),
+  umbral_anchor: r(
+    'shadow',
+    'shadowPurple',
+    [
+      { p: 'sunburst', s: 0.9, pal: 'venom' },
+      { p: 'tendrils', ...BR, s: 0.62, pal: 'shadowPurple' },
+    ],
+    ['glow', 'arcs'],
+  ),
+  possess_evil_eye: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', s: 1.05 },
+      { p: 'tendrils', ...BR },
+    ],
+    ['glow', 'arcs'],
+  ),
+  hour_of_judgment: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', s: 0.82 },
+      { p: 'sunburst', s: 1.08, pal: 'shadowPurple' },
+      { p: 'skull', ...BR, s: 0.48, pal: 'blood' },
+    ],
+    ['glow', 'arcs'],
+  ),
   // druid
   wrath: r('nature', 'leafGreen', ['bolt', { p: 'leaf', ...BR }], ['glow']),
+  moonseed: r('arcane', 'leafGreen', ['moon', { p: 'leaf', ...BR }], ['sparkle']),
+  moonlash: r('arcane', 'silverWhite', ['moon', { p: 'lightning', ...BR }], ['arcs', 'glow']),
+  sunlance: r('nature', 'gold', ['sunburst', { p: 'bolt', ...BR }], ['glow']),
+  redharvest: r('blood', 'blood', ['fang', { p: 'droplet', ...BR }], ['drips']),
+  marrowbreak: r('earth', 'earthBrown', ['paw', { p: 'bone', ...BR }], ['crack']),
+  overbloom: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle', 'glow']),
   healing_touch: r('nature', 'leafGreen', ['hand', { p: 'leaf', ...TL }], ['sparkle']),
   mark_of_the_wild: r('nature', 'leafGreen', ['paw'], ['sparkle']),
   moonfire: r('arcane', 'silverWhite', [{ p: 'moon', pal: 'silverWhite' }], ['glow', 'sparkle']),
@@ -2759,6 +3081,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   flash_of_light: r('holy', 'holyGold', ['hand'], ['sparkle', 'glow']),
   exorcism: r('holy', 'holyGold', ['sunburst'], ['glow']),
   consecration: r('holy', 'holyGold', ['sigil_rune'], ['glow']),
+  aura_mastery: r('holy', 'holyGold', ['sunburst', 'shield'], ['arcs', 'glow']),
   righteous_fury: r('holy', 'gold', ['shield'], ['glow']),
   retribution_aura: r('holy', 'gold', ['sunburst'], ['arcs']),
   // hunter
@@ -2796,7 +3119,23 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   summon_felguard: r('shadow', 'steel', ['axe', { p: 'helm', ...TL }], ['glow']),
   summon_infernal: r('fire', 'ember', ['meteor'], ['glow']),
   summon_doomguard: r('shadow', 'shadowPurple', ['wing', { p: 'skull', ...BR }], ['glow']),
-  metamorphosis: r('shadow', 'ember', ['wing', { p: 'chestplate', ...BR }], ['glow']),
+  soul_fragments: r('shadow', 'venom', ['skull'], ['sparkle', 'glow']),
+  soul_harvest: r('shadow', 'venom', ['skull', { p: 'bolt', ...BR }], ['glow']),
+  soul_lance: r('shadow', 'venom', ['bolt', { p: 'skull', ...TR }], ['motion', 'glow']),
+  raise_graveguard: r('shadow', 'bone', ['skull', { p: 'shield', ...BR }], ['glow']),
+  raise_skeletal_warrior: r('shadow', 'bone', ['skull', { p: 'sword', ...BR }], ['arcs', 'glow']),
+  raise_bone_mage: r('shadow', 'venom', ['skull', { p: 'sigil_rune', ...BR }], ['glow']),
+  raise_gravewing: r('shadow', 'bone', ['wing', { p: 'skull', ...BR }], ['motion', 'glow']),
+  bone_armor: r('steel', 'bone', ['chestplate', { p: 'shield', ...BR }], ['glow']),
+  corpse_explosion: r('shadow', 'venom', ['skull'], ['drips', 'glow']),
+  litany_of_guilt: r('shadow', 'shadowPurple', ['scroll', { p: 'skull', ...BR }], ['arcs', 'glow']),
+  funeral_harvest: r('shadow', 'bone', ['hourglass', { p: 'skull', ...TR }], ['sparkle', 'glow']),
+  ossuary_mark: r('shadow', 'bone', ['sigil_rune', { p: 'skull', ...TR }], ['arcs', 'glow']),
+  unholy_command: r('shadow', 'bone', ['roar', { p: 'skull', ...BR }], ['arcs']),
+  reaping_command: r('shadow', 'venom', ['fist', { p: 'skull', ...TR }], ['arcs', 'motion']),
+  sacrifice_undead: r('blood', 'bone', ['heart', { p: 'skull', ...BR }], ['drips']),
+  army_of_the_dead: r('shadow', 'bone', ['wing', { p: 'skull', ...BR }], ['arcs', 'glow']),
+  metamorphosis: r('shadow', 'venom', ['skull', { p: 'helm', ...TR }], ['glow']),
   // druid
   bear_charge: r('earth', 'earthBrown', ['paw', { p: 'boot', ...BR }], ['motion']),
   maul: r('earth', 'earthBrown', ['paw', { p: 'claw_slash', ...TR }], ['glow']),
@@ -2827,6 +3166,9 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   holy_nova: r('holy', 'holyGold', ['sunburst'], ['arcs']),
   shadowform: r('shadow', 'shadowPurple', ['eye'], ['glow']),
   elemental_mastery: r('storm', 'sky', ['lightning', { p: 'sigil_rune', ...BR }], ['glow']),
+  // Warspirit signature trance: the watching eye inside the elements, mana
+  // flowing back (procedural fallback; painted art ships beside it).
+  elemental_trance: r('storm', 'sky', ['eye', { p: 'lightning', ...BR }], ['glow']),
   siphon_life: r('shadow', 'venom', ['heart'], ['drips']),
   conflagrate: r('fire', 'ember', ['flame', { p: 'skull', ...BR }], ['crack']),
   moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
@@ -2878,12 +3220,16 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   avatar: r('earth', 'earthBrown', ['helm', { p: 'fist', ...BR }], ['crack', 'glow']),
   sanguine_aura: r('blood', 'blood', ['droplet', { p: 'heart', ...TL }], ['arcs', 'glow']),
   // paladin
-  cleansing_verdict: r('holy', 'gold', ['sunburst'], ['glow']),
-  holy_wrath: r('holy', 'holyGold', ['sunburst', { p: 'cross', ...BR }], ['arcs']),
-  divine_shield: r('holy', 'gold', ['shield', { p: 'cross', ...BR }], ['glow']),
   avenging_wrath: r('holy', 'gold', ['wing', { p: 'sunburst', ...BR }], ['glow']),
   hammer_of_wrath: r('holy', 'holyGold', ['mace', { p: 'lightning', ...BR }], ['glow']),
-  aura_surge: r('holy', 'holyGold', ['shield', { p: 'sunburst', ...BR }], ['motion', 'glow']),
+  bastion_sweep: r('holy', 'gold', ['shield', { p: 'claw_slash', ...BR }], ['arcs', 'motion']),
+  oath_chain: r('holy', 'holyGold', ['tendrils', { p: 'hand', ...BR }], ['motion', 'glow']),
+  veilbound_march: r(
+    'holy',
+    'silverWhite',
+    ['boot', { p: 'wing', ...TR }, { p: 'sigil_rune', ...BR }],
+    ['motion', 'glow'],
+  ),
   // hunter
   startle_shot: r('nature', 'venom', ['sunburst'], ['glow']),
   frost_trap: r('frost', 'ice', ['snowflake', { p: 'tendrils', ...BR }], ['glow']),
@@ -2892,6 +3238,13 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   aspect_of_the_wild: r('nature', 'leafGreen', ['paw', { p: 'sunburst', ...BR }], ['glow']),
   // rogue
   smoke_screen: r('shadow', 'steel', ['fist'], ['glow']),
+  flurry_of_knives: r('steel', 'silverWhite', ['dagger', { p: 'sunburst', ...BR }], ['motion']),
+  thieves_chorus: r('shadow', 'gold', ['roar', { p: 'dagger', ...BR }], ['sparkle']),
+  venomrend: r('nature', 'venom', ['dagger', { p: 'flame', ...BR }], ['glow']),
+  venom_dart: r('nature', 'venom', ['arrow', { p: 'droplet', ...BR }], ['motion']),
+  body_blow: r('steel', 'blood', ['fist', { p: 'sunburst', ...BR }], ['motion']),
+  knockout_blow: r('steel', 'gold', ['fist', { p: 'skull', ...BR }], ['glow']),
+  veilstrike: r('shadow', 'shadowPurple', ['eye', { p: 'dagger', ...BR }], ['motion']),
   preparation: r('shadow', 'steel', ['scroll', { p: 'dagger', ...BR }], ['sparkle']),
   ghostly_strike: r('shadow', 'silverWhite', ['dagger', { p: 'eye', ...TR }], ['glow']),
   cloak_of_shadows: r('shadow', 'shadowPurple', ['shield', { p: 'eye', ...BR }], ['glow']),
@@ -2903,6 +3256,19 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   desperate_prayer: r('holy', 'holyGold', ['hand', { p: 'heart', ...BR }], ['sparkle']),
   prayer_of_healing: r('holy', 'holyGold', ['cross', { p: 'sunburst', ...BR }], ['sparkle']),
   mind_sear: r('shadow', 'shadowPurple', ['eye', { p: 'flame', ...BR }], ['motion']),
+  // Priest v0.29 redesign: explicit, collision-free recipes for the shared
+  // movement spell, three signatures, and two major-prayer talents.
+  veilstep: r('shadow', 'silverWhite', ['boot', { p: 'wing', ...TR }], ['motion', 'sparkle']),
+  scouring_mercy: r('holy', 'holyGold', ['bolt', { p: 'heart', ...BR }], ['arcs']),
+  seraphic_vigil: r('holy', 'silverWhite', ['eye', { p: 'wing', ...TR }], ['glow']),
+  summon_tithefiend: r('shadow', 'shadowPurple', ['skull', { p: 'tendrils', ...TR }], ['drips']),
+  martyrs_aegis: r('blood', 'holyGold', ['shield', { p: 'heart', ...TR }], ['arcs']),
+  choir_of_deliverance: r(
+    'holy',
+    'arcanePink',
+    ['cross', { p: 'wing', ...BR }],
+    ['sparkle', 'arcs'],
+  ),
   // shaman
   healing_stream: r('nature', 'sky', ['droplet', { p: 'heart', ...BR }], ['sparkle']),
   chain_lightning: r(
@@ -2913,6 +3279,12 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
       { p: 'lightning', x: 9, y: 6, s: 0.72, rot: 0.4 },
     ],
     ['arcs'],
+  ),
+  ancestor_return: r(
+    'nature',
+    'leafGreen',
+    [{ p: 'cross', ...BIG }, 'sigil_rune'],
+    ['sparkle', 'glow'],
   ),
   earthbind: r('earth', 'earthBrown', ['tendrils', { p: 'mace', ...BR }], ['crack']),
   bloodlust: r('fury', 'blood', ['fist', { p: 'lightning', ...BR }], ['glow']),
@@ -2927,10 +3299,37 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   evocation: r('arcane', 'arcanePink', ['hand', { p: 'gem', ...BR }], ['sparkle']),
   // warlock
   voidfeast: r('shadow', 'venom', ['flame'], ['glow']),
+  // The Soul Stone well: the stored heart under glass, 25% back on a claim
+  // (procedural fallback; painted art ships beside it).
+  soulwell: r('shadow', 'venom', ['gem', { p: 'heart', ...BR }], ['glow']),
   howl_of_terror: r('shadow', 'blood', ['roar', { p: 'skull', ...BR }], ['glow']),
   curse_of_exhaustion: r('shadow', 'shadowPurple', ['boot', { p: 'skull', ...TR }], ['motion']),
   death_coil: r('shadow', 'blood', ['skull', { p: 'heart', ...BR }], ['drips']),
   chaos_bolt: r('fire', 'shadowPurple', ['bolt', { p: 'flame', ...BR }], ['crack']),
+  ruinous_brand: r(
+    'fire',
+    'shadowPurple',
+    ['sigil_rune', { p: 'flame', ...BR }],
+    ['crack', 'glow'],
+  ),
+  cinderhide: r('fire', 'ember', ['shield', { p: 'flame', ...BR }], ['crack', 'glow']),
+  destruction_ruin: r('fire', 'ember', ['gem', { p: 'flame', ...BR }], ['crack', 'glow']),
+  desolation: r('fire', 'ember', ['sunburst', { p: 'bolt', ...BR }], ['crack']),
+  duskfire_claim: r('shadow', 'ember', ['skull', { p: 'flame', ...BR }], ['glow']),
+  pyre_guardian: r('fire', 'ember', ['meteor', { p: 'fist', ...BR }], ['glow']),
+  sacrilegious_march: r(
+    'blood',
+    'shadowPurple',
+    ['boot', { p: 'droplet', ...BR }],
+    ['motion', 'drips'],
+  ),
+  dark_pact: r('shadow', 'blood', ['shield', { p: 'droplet', ...BR }], ['glow', 'drips']),
+  abyssal_rift: r(
+    'shadow',
+    'arcanePink',
+    ['sigil_rune', { p: 'tendrils', ...BIG }],
+    ['arcs', 'glow'],
+  ),
   // druid
   typhoon: r('nature', 'sky', ['sunburst'], ['glow']),
   innervate: r('nature', 'leafGreen', ['leaf', { p: 'gem', ...BR }], ['sparkle']),
@@ -3346,6 +3745,18 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_cost_tax: r('shadow', 'shadowPurple', ['gem', { p: 'droplet', ...BR }], ['drips']),
   aura_heal_absorb: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
+  aura_moontide: r('arcane', 'silverWhite', ['moon', { p: 'tendrils', ...BR }], ['glow']),
+  aura_sunwake: r('nature', 'gold', ['sunburst', { p: 'tendrils', ...BR }], ['glow']),
+  aura_old_blood: r('blood', 'blood', ['fang', { p: 'droplet', ...BR }], ['drips']),
+  aura_verdance: r('nature', 'leafGreen', ['leaf', { p: 'heart', ...BR }], ['sparkle']),
+  // Warlock specialization resources and offensive windows use aura_<kind>
+  // identities because they are not all applied by a matching AbilityDef.
+  aura_soul_fragments: r('shadow', 'venom', ['skull'], ['sparkle', 'glow']),
+  aura_affliction_doom: r('shadow', 'shadowPurple', ['scroll', { p: 'skull', ...BR }], ['glow']),
+  aura_destruction_ruin: r('fire', 'ember', ['gem', { p: 'flame', ...BR }], ['crack', 'glow']),
+  aura_desolation: r('fire', 'ember', ['sunburst', { p: 'bolt', ...BR }], ['crack']),
+  aura_duskfire_claim: r('shadow', 'ember', ['skull', { p: 'flame', ...BR }], ['glow']),
+  aura_pyre_guardian: r('fire', 'ember', ['meteor', { p: 'fist', ...BR }], ['glow']),
   // Inert rolling-window markers (kind 'internal_cd': Heating Up, the temporal
   // accumulator, the Water Jet counter). A single ember-on-gold "charging" look;
   // without it every marker warned to the console and fell back, once per frame.
@@ -3644,7 +4055,10 @@ function qualityFx(quality: string | undefined): FxName[] | undefined {
   return undefined;
 }
 
-function trinketPrimitive(name: string): { p: PrimitiveName; pal: PaletteName } {
+function trinketPrimitive(name: string): {
+  p: PrimitiveName;
+  pal: PaletteName;
+} {
   if (has(name, ['skull', 'head'])) return { p: 'skull', pal: 'bone' };
   if (has(name, ['bone'])) return { p: 'bone', pal: 'bone' };
   if (has(name, ['pelt', 'hide', 'fur', 'scrap', 'bandana', 'cloth']))
@@ -3947,25 +4361,81 @@ export function weaponIconUrl(id: string): string | null {
 // fall through to the procedural ABILITY_RECIPES below. ABILITY_IMAGE_IDS and abilityImageUrl
 // are exported for the gate in tests/skill_icons.test.ts.
 const SKILL_ICON_DIR = '/ui/skills';
+const WARLOCK_TALENT_IMAGE_IDS = new Set<string>([
+  'wlk_r5_bane',
+  'wlk_r5_improved_corruption',
+  'wlk_r5_improved_immolate',
+  'wlk_r8_voidfeast',
+  'wlk_r8_howl_of_terror',
+  'wlk_r8_curse_of_exhaustion',
+  'wlk_r11_improved_life_tap',
+  'wlk_r11_fel_concentration',
+  'wlk_r11_demon_armor',
+  'wlk_r14_amplify_curse',
+  'wlk_r14_ruin',
+  'wlk_r14_shadow_mastery',
+  'wlk_r17_death_coil',
+  'wlk_r17_improved_fear',
+  'wlk_r17_demonic_resilience',
+  'wlk_r20_chaos_bolt',
+  'wlk_r20_grimoire_of_haste',
+  'wlk_r20_curse_mastery',
+]);
 export const ABILITY_IMAGE_IDS = new Set<string>([
-  // paladin (CraftPix premium "RPG Paladin skill icons" pack)
+  // paladin (original project art for the overhaul and talent abilities, plus
+  // the existing CraftPix premium "RPG Paladin skill icons" base set)
+  'divine_ascension',
+  'devotion_ward',
+  'aura_mastery',
+  'hammer_of_grace',
+  'hushbrand',
+  'guardian_covenant',
+  'solar_step',
+  'solar_invocation',
+  'recall_the_fallen',
+  'beacon_of_light',
+  'radiant_devotion',
+  'dawn_devotion',
+  'grace_devotion',
+  'final_edict',
+  'dawnfall',
+  'sun_gods_verdict',
+  'valkyrs_calling',
+  'faithforged_guard',
+  'sacred_form',
+  'mercy_lance',
+  'dawns_embrace',
+  'radiant_chorus',
+  'life_covenant',
+  'aegis_first_dawn',
+  'vowkeeper_strike',
+  'bastion_rite',
+  'sunward_disc',
+  'sacred_challenge',
+  'bastion_sweep',
+  'oath_chain',
+  'veilbound_march',
   'seal_of_righteousness',
   'holy_light',
   'devotion_aura',
-  'judgement',
   'blessing_of_might',
   'divine_protection',
+  'sacred_bulwark',
   'hammer_of_justice',
   'lay_on_hands',
+  'holy_taunt',
   'flash_of_light',
   'exorcism',
   'consecration',
   'righteous_fury',
   'retribution_aura',
-  // hunter (CraftPix premium "RPG Archer skill icons" pack). The archer pack is
-  // arrows/bows/traps only — the beast/aspect-animal abilities (aspect_of_the_hawk,
-  // aspect_of_the_monkey, tame_beast, dismiss_pet, revive_pet) have no fitting art
-  // here and intentionally stay on their procedural recipes until a beast pack lands.
+  'crusader_strike',
+  'holy_shock',
+  'holy_shield',
+  'rebuke',
+  'avenging_wrath',
+  'hammer_of_wrath',
+  // hunter (CraftPix premium packs plus project-generated v0.29 class rework art).
   'raptor_strike',
   'mongoose_bite',
   'arcane_shot',
@@ -3973,10 +4443,27 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'concussive_shot',
   'aimed_shot',
   'rapid_fire',
+  'volley',
+  'counter_shot',
+  'bestial_wrath',
   'wing_clip',
   'aspect_of_the_cheetah',
-  // priest (CraftPix premium "RPG Priest skill icons" pack). The pack is all-holy —
-  // the shadow spells (shadow_word_pain, mind_flay) have no dark art and stay procedural.
+  'pack_command',
+  'stampede',
+  'unleash_beast',
+  'measured_shot',
+  'pack_rally',
+  'shrapnel_charge',
+  'bloodtrail_assault',
+  'trailbreak',
+  'wildheart',
+  'shellskin',
+  'frostjaw_trap',
+  'cold_focus',
+  'bloodhook',
+  'hunting_momentum',
+  'fieldcraft_reentry',
+  // priest (CraftPix premium packs plus project-generated v0.29 class rework art).
   'smite',
   'lesser_heal',
   'power_word_fortitude',
@@ -3985,6 +4472,16 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'mind_blast',
   'heal',
   'flash_heal',
+  'psychic_scream',
+  'prayer_of_healing',
+  'holy_nova',
+  'shadowform',
+  'veilstep',
+  'scouring_mercy',
+  'seraphic_vigil',
+  'summon_tithefiend',
+  'martyrs_aegis',
+  'choir_of_deliverance',
   // warlock (CraftPix premium "RPG Warlock skill icons" pack + "RPG Demon skill icons"
   // pack for the summons/life_tap/searing_pain that the warlock pack couldn't cover).
   'shadow_bolt',
@@ -4004,11 +4501,71 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'summon_doomguard',
   'life_tap',
   'searing_pain',
+  // OpenAI-generated Warlock spell art. These complete the current ability catalog while
+  // preserving the existing CraftPix-backed ids above.
+  'rain_of_fire',
+  'evil_eye',
+  'maledict_gaze',
+  'needle_of_fate',
+  'sentence',
+  'cursed_accomplice',
+  'hex_of_violence',
+  'cruel_pact',
+  'vicarious_suffering',
+  'possess_evil_eye',
+  'hour_of_judgment',
+  'coven',
+  'soul_lance',
+  'litany_of_guilt',
+  'umbral_anchor',
+  'soulwell',
+  'ruinous_brand',
+  'soul_harvest',
+  'raise_graveguard',
+  'raise_skeletal_warrior',
+  'raise_bone_mage',
+  'raise_gravewing',
+  'bone_armor',
+  'corpse_explosion',
+  'funeral_harvest',
+  'ossuary_mark',
+  'unholy_command',
+  'reaping_command',
+  'sacrifice_undead',
+  'army_of_the_dead',
+  'metamorphosis',
+  'siphon_life',
+  'conflagrate',
+  'spell_lock',
+  'voidfeast',
+  'sacrilegious_march',
+  'dark_pact',
+  'abyssal_rift',
+  'howl_of_terror',
+  'curse_of_exhaustion',
+  'death_coil',
+  'chaos_bolt',
+  'cinderhide',
+  // Painted signature actions for the two controllable overhaul demons. These
+  // ids are not player ABILITIES, so abilityImageUrl's class projection below
+  // keeps their Warlock ownership explicit.
+  'emberkin_felbolt',
+  'gloomshade_abyssal_chain',
+  // Choice-row talents use their own images instead of borrowing spell art.
+  ...WARLOCK_TALENT_IMAGE_IDS,
   // rogue (CraftPix premium "RPG Thief skill icons" pack). garrote/sap/expose_armor/blind
   // have no fitting art (no garrote-wire, blackjack, armor-shred, or eye-powder) — procedural.
   'sinister_strike',
   'eviscerate',
   'backstab',
+  // 2026-08-09 generated wave (missing-painted-icons accepted-art manifest).
+  'venom_dart',
+  'flurry_of_knives',
+  'thieves_chorus',
+  'venomrend',
+  'body_blow',
+  'knockout_blow',
+  'veilstrike',
   'gouge',
   'cheap_shot',
   'evasion',
@@ -4177,9 +4734,11 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'dash',
   'tigers_fury',
   'rip',
-  // shaman (no dedicated pack — matched against the two generic CraftPix "100 RPG/skill
-  // icon" packs + earth-magician for the earth abilities; aeromancer went unused). 11/11.
+  // shaman (CraftPix generic packs plus project-generated v0.29 class rework art).
   'lightning_bolt',
+  // 2026-08-09 generated wave: the bespoke Elemental Trance replaces the
+  // interim elemental_mastery duplicate.
+  'elemental_trance',
   'rockbiter_weapon',
   'healing_wave',
   'earth_shock',
@@ -4190,6 +4749,22 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'frostbrand_weapon',
   'ghost_wolf',
   'stormstrike',
+  'chain_lightning',
+  'earthquake',
+  'bloodlust',
+  'elemental_mastery',
+  'elemental_trance',
+  'chain_heal',
+  'galeheart_weapon',
+  'thunder_reservoir',
+  'warspirit_cadence',
+  'stormsurge',
+  'lifespring_weapon',
+  'unleash_weapon',
+  'tidecall',
+  'stoneward',
+  'primal_exaltation',
+  'ancestor_return',
   // cross-class fills from the two generic CraftPix "100 RPG/skill icon" packs — abilities
   // their own class pack couldn't cover but a generic icon fit. (warrior taunt completes warrior.)
   'aspect_of_the_hawk',
@@ -4219,6 +4794,13 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   // hashes live in the class mapping files and missing-painted-icons accepted-art manifest.
   // druid
   'berserk',
+  // 2026-08-09 generated wave (missing-painted-icons accepted-art manifest).
+  'moonseed',
+  'moonlash',
+  'sunlance',
+  'redharvest',
+  'marrowbreak',
+  'overbloom',
   'feral_charge',
   'frenzied_regeneration',
   'hurricane',
@@ -4247,16 +4829,12 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'deep_freeze',
   'spellsteal',
   // paladin
-  'aura_surge',
   'avenging_wrath',
-  'cleansing_verdict',
   'crusader_strike',
-  'divine_shield',
   'hammer_of_wrath',
   'holy_shield',
   'holy_shock',
   'holy_taunt',
-  'holy_wrath',
   'rebuke',
   'sacred_bulwark',
   // priest
@@ -4286,6 +4864,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'earthbind',
   'earthquake',
   'elemental_mastery',
+  'elemental_trance',
   'healing_stream',
   // warlock
   'chaos_bolt',
@@ -4344,7 +4923,15 @@ export function abilityImageUrl(id: string): string | null {
           id === 'elemental_convergence' ||
           id === 'overflowing_power'
         ? 'mage'
-        : null);
+        : WARLOCK_TALENT_IMAGE_IDS.has(id) ||
+            id === 'emberkin_felbolt' ||
+            id === 'gloomshade_abyssal_chain' ||
+            id === 'summon_succubus' ||
+            id === 'summon_felhunter' ||
+            id === 'summon_felguard' ||
+            id === 'summon_doomguard'
+          ? 'warlock'
+          : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 
@@ -4805,18 +5392,11 @@ export function itemImageUrl(id: string): string | null {
 const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
 
-// Deeds whose crest art is COMMISSIONED BUT NOT YET COMMITTED, the ITEM_ART_PENDING model one
-// screen up. The Icons authoring rule in docs/design/deeds.md permits this by design ("an artless
-// deed falls back to its procedural category crest, so art can trail the deed"), so the point of
-// the list is not to change behavior (deedImageUrl already declines any id absent from
-// DEED_IMAGE_IDS) but to make the debt ENUMERATED rather than silent, and to give the art tests
-// one name to agree on instead of three copies of the same literal pair.
-// tests/deed_icons.test.ts holds the line from both sides: a stale entry once art lands, and
-// unenumerated debt. Do not add an id here merely to silence that failure; commission the art and
-// file it in docs/achievements/icon-brief.md.
-// Empty after the 2026-08-09 completion wave painted every live deed. Keep the mechanism so a
-// future deed can land safely before its commissioned crest, but do not add debt merely to make
-// the gate green.
+// Exhaustive live-deed art debt ledger, following the ITEM_ART_PENDING model one screen up. The
+// Icons authoring rule in docs/design/deeds.md permits a procedural category fallback while art
+// trails a deed, but every live release deed is painted today. Keep the empty set as the one
+// authoritative ledger: future art debt must be commissioned and filed in
+// docs/achievements/icon-brief.md rather than hidden by an unreviewed fallback.
 export const DEED_ART_PENDING: ReadonlySet<string> = new Set();
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
@@ -4891,6 +5471,9 @@ export function isUnknownIconRecipe(recipe: IconRecipe): boolean {
 export function hasExplicitAbilityIcon(id: string): boolean {
   return Object.hasOwn(ABILITY_RECIPES, id);
 }
+export function hasExplicitAuraIcon(id: string): boolean {
+  return id in AURA_RECIPES;
+}
 
 const DEFAULT_ICON_SIZE = 96; // crisp at 46px buttons on 2x displays
 const canvasCache = new Map<string, HTMLCanvasElement>();
@@ -4950,8 +5533,11 @@ function staticIconUrl(kind: IconKind, id: string): string | null {
     if (img) return img;
   }
   // Committed deed, class, family, and status paintings short-circuit to a
-  // static WebP. Unit portraits still paint the procedural recipe immediately,
-  // then replace it after this same crest art decodes.
+  // static WebP (URL-only is sufficient: crest consumers here are <img> sinks,
+  // the Book of Deeds cards and recent strip and the Reliquary title shelf;
+  // the synchronous iconCanvas path stays class-crest portraits only). Unit
+  // portraits still paint the procedural recipe immediately, then replace it
+  // after this same crest art decodes.
   if (kind === 'crest') return deedImageUrl(id) ?? crestIconUrl(id);
   return null;
 }

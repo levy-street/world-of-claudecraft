@@ -1,3 +1,9 @@
+// format.ts imports adminLanguageTag/t from here, so this pair is a deliberate
+// ESM cycle: both sides use the other only inside function bodies (hoisted
+// declarations, live bindings), never at module-evaluation time. Keeping the
+// Intl construction in format.ts is what the centralization guard
+// (tests/i18n_extra_tables.test.ts) requires.
+import { fmtNumber } from './format';
 import { en_XA, pending, translations } from './i18n.resolved.generated';
 import { LOCALE_LOADERS } from './i18n.resolved.generated/loaders';
 
@@ -199,12 +205,15 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'chat unmute failed': 'error.chatUnmuteFailed',
   'account is not chat muted': 'error.accountNotChatMuted',
   'moderation reason is required': 'error.moderationReasonRequired',
+  'a general chat rate limit or null is required': 'error.generalChatRateLimitRequired',
+  'messages must be an integer from 1 to 1000': 'error.generalChatRateLimitMessages',
+  'windowminutes must be an integer from 1 to 1440': 'error.generalChatRateLimitWindowMinutes',
   'suspension expiry must be in the future': 'error.moderationExpiryFuture',
   'character not found': 'error.characterNotFound',
   'guild not found': 'error.guildNotFound',
   'guild name is already taken': 'error.guildNameTaken',
   'guild name must change': 'error.guildNameUnchanged',
-  'a moderation reason is required (500 chars max)': 'error.guildReasonInvalid',
+  'a moderation reason is required (500 chars max)': 'error.generalChatRateLimitReasonInvalid',
   'guild member limit exceeded': 'error.guildMemberLimit',
   // The guild bank dormant-slot escape hatch (server/admin.ts).
   'a slot index is required': 'error.guildBankSlotRequired',
@@ -223,6 +232,7 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'guild list busy, try again': 'guilds.loadFailed',
   'invalid streamer link': 'error.invalidStreamerLink',
   'admin accounts cannot be chat muted': 'error.cannotChatMuteAdmin',
+  'admin accounts cannot be rate limited': 'error.cannotRateLimitAdmin',
   'tier must be "soft" or "hard"': 'error.invalidWordTier',
   'word is empty after normalization': 'error.wordEmptyAfterNormalization',
   'word not found': 'error.wordNotFound',
@@ -275,7 +285,21 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];
-  return key ? t(key) : message;
+  if (!key) return message;
+  // The quota-bound proses carry locale-grouped numbers. Formatting lives in
+  // src/admin/format.ts (the admin's one sanctioned Intl home, mirroring the
+  // game's src/ui/i18n.ts formatNumber), so the bounds are formatted there and
+  // this module stays free of ad-hoc Intl construction.
+  if (key === 'error.generalChatRateLimitMessages') {
+    return t(key, { min: fmtNumber(1), max: fmtNumber(1_000) });
+  }
+  if (key === 'error.generalChatRateLimitWindowMinutes') {
+    return t(key, { min: fmtNumber(1), max: fmtNumber(1_440) });
+  }
+  if (key === 'error.generalChatRateLimitReasonInvalid') {
+    return t(key, { max: fmtNumber(500) });
+  }
+  return t(key);
 }
 
 // Operator-facing class label for the dashboard tables/charts. The class id is the

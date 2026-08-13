@@ -49,4 +49,15 @@ describe('ViewCreateRetryGate', () => {
 
     expect(gate.canAttempt(8, 'view', 100)).toBe(true);
   });
+
+  it('retries the dedicated Metamorphosis slot and clears it after success', () => {
+    const gate = new ViewCreateRetryGate(2_000);
+
+    gate.markFailed(7, 'form_metamorph', 100);
+    expect(gate.canAttempt(7, 'form_metamorph', 2_099)).toBe(false);
+    expect(gate.canAttempt(7, 'form_metamorph', 2_100)).toBe(true);
+    gate.markSucceeded(7, 'form_metamorph');
+    expect(gate.canAttempt(7, 'form_metamorph', 2_101)).toBe(true);
+    expect(gate.size).toBe(0);
+  });
 });

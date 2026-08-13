@@ -33,9 +33,10 @@ function addAlly(sim: Sim, x: number, z: number, hp = 100): Entity {
 }
 
 describe('reworked signatures', () => {
-  it('Conflagrate and Swiftmend use the retuned cooldowns (6s / 8s)', () => {
+  it('Conflagrate uses two 18s charges and Swiftmend keeps its 8s cooldown', () => {
     const lock = makeSim('warlock', 'destruction');
-    expect(lock.resolvedAbility('conflagrate')?.cooldown).toBe(6);
+    expect(lock.resolvedAbility('conflagrate')?.cooldown).toBe(18);
+    expect(lock.resolvedAbility('conflagrate')?.bonusCharges).toBe(1);
     const druid = makeSim('druid', 'restoration');
     expect(druid.resolvedAbility('swiftmend')?.cooldown).toBe(8);
   });
@@ -102,13 +103,13 @@ describe('reworked signatures', () => {
     expect(bp.resource).toBe(50);
   });
 
-  it('Metamorphosis stacks damage AND haste on the caster (no aura eviction)', () => {
+  it('Lich Form stacks damage and haste on the caster without aura eviction', () => {
     const sim = makeSim('warlock', 'demonology');
     const p = sim.entities.get(sim.playerId) as Entity;
     sim.castAbility('metamorphosis', sim.playerId);
     sim.tick();
     // form marker + spell damage + spell haste all survive apply (distinct aura ids).
-    expect(p.auras.some((a) => a.kind === 'form_metamorph')).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'form_lich')).toBe(true);
     expect(p.auras.some((a) => a.kind === 'buff_spelldmg' && a.value === 0.2)).toBe(true);
     expect(p.auras.some((a) => a.kind === 'buff_spellhaste' && a.value === 0.2)).toBe(true);
     expect(spellDamageMultFromAuras(p)).toBeCloseTo(1.2);
@@ -166,7 +167,8 @@ describe('spell haste plumbing', () => {
     // content debt, so Discipline is the fractional-buff exemplar in the merged tree:
     // its absorb mastery (absorbPct 0.3) runs the resolver's effect-scaling pass over
     // the granted Anointing, whose 0.2 haste buff must pass through un-rounded.
-    const sim = makeSim('priest', 'discipline');
+    const sim = makeSim('priest');
+    expect(sim.applyTalents({ spec: 'discipline', rows: { 17: 'pri_r17_anointing' } })).toBe(true);
     const pi = sim.resolvedAbility('power_infusion');
     const haste = (pi?.effects ?? []).find(
       (e: any) => e.type === 'buffTarget' && e.kind === 'buff_spellhaste',
@@ -177,17 +179,15 @@ describe('spell haste plumbing', () => {
 });
 
 describe('crit-damage masteries', () => {
-  it('the destruction mastery is a scoped Ruinbolt and Gloom Bolt amp now', () => {
-    // Balance pass (maintainer sheet): Desolation is +20% on the two nukes
-    // (the Brittlebreak shape), not a spell-crit-damage multiplier.
+  it('the destruction mastery is rotational state, not a flat damage multiplier', () => {
     const sim = makeSim('warlock', 'destruction');
     const p = sim.entities.get(sim.playerId) as Entity;
     expect(p.critDmgSpellBonus).toBe(0);
     expect(p.critDmgPhysBonus).toBe(0);
     const meta = (sim as any).players.get(p.id);
     const mods = (sim as any).playerMods(meta);
-    expect(mods.abilities.shadow_bolt.dmgPct).toBeCloseTo(0.2);
-    expect(mods.abilities.chaos_bolt.dmgPct).toBeCloseTo(0.2);
+    expect(mods.abilities.shadow_bolt?.dmgPct ?? 0).toBe(0);
+    expect(mods.abilities.chaos_bolt?.dmgPct ?? 0).toBe(0);
   });
 
   it('a non-specced caster has no bonus crit damage', () => {

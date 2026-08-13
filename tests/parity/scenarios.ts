@@ -851,7 +851,8 @@ function paladinConsecration(): Scenario {
     build: () => new Sim({ seed: 1007, playerClass: 'paladin', autoEquip: true }),
     drive(rec: Recorder) {
       const sim = rec.sim;
-      sim.setPlayerLevel(20); // consecration learnLevel 18
+      sim.setPlayerLevel(20); // consecration learnLevel 10
+      sim.setSpec('protection');
       const p = sim.player as AnyEntity;
       beef(p);
       const mob = spawnMob(sim, 'forest_wolf', 5, p.pos.x, p.pos.y, p.pos.z + 3);
@@ -3391,7 +3392,8 @@ function c3AuraRunner(): Scenario {
     build: () => new Sim({ seed: 1017, playerClass: 'paladin', autoEquip: true }),
     drive(rec: Recorder) {
       const sim = rec.sim;
-      sim.setPlayerLevel(20); // consecration learnLevel 18
+      sim.setPlayerLevel(20); // consecration learnLevel 10
+      sim.setSpec('protection');
       const p = sim.player as AnyEntity;
       beef(p);
 
@@ -3476,7 +3478,7 @@ function c3AuraRunner(): Scenario {
       rec.snapshot('regen-expiry');
 
       // ----- Phase C: a ground AoE pulsing over 2+ hostiles -----
-      // Two beefed mobs clustered inside consecration's 8yd radius so pulseGroundAoE
+      // Two beefed mobs clustered inside Consecration's 6 m radius so pulseGroundAoE
       // iterates hostilesInRadius (>=2 targets), drawing rng.range once per target in
       // entities-insertion order, from BOTH callers (the on-cast pulse + deferred ticks).
       const a1 = spawnMob(sim, 'forest_wolf', 5, p.pos.x + 2, p.pos.y, p.pos.z + 2);
@@ -3536,7 +3538,7 @@ function c4aCastingLifecycle(): Scenario {
       const ePriest = sim.entities.get(priest) as AnyEntity;
       const eWarlock = sim.entities.get(warlock) as AnyEntity;
       // Level 12: fireball rank 3 (3.0s), lesser_heal rank 3 (2.0s, holy),
-      // drain_life rank 1 (5s channel / 5 ticks = 1s per tick). drain_life needs >=10.
+      // drain_life rank 1 (3s channel / 3 ticks = 1s per tick). drain_life needs >=9.
       for (const pid of [mage, priest, warlock]) sim.setPlayerLevel(12, pid);
       teleport(sim, eMage, -3, -45);
       teleport(sim, ePriest, 0, -45);
@@ -3847,9 +3849,8 @@ function targetingMarkers(): Scenario {
 //  - mage arcane_explosion: aoeDamage per-target rng.range over 2 in-radius mobs.
 //  - rogue sinister_strike -> eviscerate -> kidney_shot: weaponStrike awardCombo
 //    latch, finisherDamage range-THEN-chance, and the combo-spend reset after the loop.
-//  - paladin seal_of_righteousness -> judgement -> consecration: imbue Seal, the
-//    judgement range-THEN-chance draw (consuming the Seal), and the groundAoE on-cast
-//    pulse (pulseGroundAoE + groundAoEs.push).
+//  - paladin bastion_rite -> consecration: the live Protection self-heal/block
+//    buff and the groundAoE on-cast pulse (pulseGroundAoE + groundAoEs.push).
 //  - druid moonfire -> bear_form -> cat_form -> rejuvenation: directDamage range-then-
 //    chance + a dot in ONE cast, exclusive selfBuff form switch (recalc), and a hot.
 //  - warlock fear -> summon_imp: incapacitate fear-angle draw rng.range(-PI,PI) and the
@@ -3861,7 +3862,6 @@ function c4bEffectDispatch(): Scenario {
     coverage: [
       'runEffects multi-class multi-effect dispatch',
       'directDamage/finisherDamage range-then-chance (druid moonfire, rogue eviscerate)',
-      'judgement range-then-chance (paladin seal -> judgement)',
       'incapacitate fear-angle draw rng.range(-PI,PI) (warlock fear)',
       'aoeDamage per-target rng.range (mage arcane_explosion, 2 mobs)',
       'sunder miss rng.chance (warrior sunder_armor)',
@@ -3898,6 +3898,7 @@ function c4bEffectDispatch(): Scenario {
       // Armor Shear is an authored Protection ability in the winning Warrior
       // kit; make the scenario's intended dispatch arm reachable explicitly.
       sim.setSpec('prot', warrior);
+      sim.setSpec('protection', paladin);
       for (const [x, e] of cells) {
         teleport(sim, e, x, -45);
         beef(e, 50000);
@@ -3978,17 +3979,15 @@ function c4bEffectDispatch(): Scenario {
       sim.castAbility('kidney_shot', rogue); // finisherStun + combo-spend reset
       rec.snapshot('rogue-combo-finishers');
 
-      // --- paladin: seal -> judgement (range-then-chance) -> consecration (groundAoE) ---
+      // --- paladin: Bastion Rite -> consecration (groundAoE) ---
       const mobP = dummy(ePaladin);
       face(ePaladin, mobP);
       sim.targetEntity(mobP.id, paladin);
       ready(ePaladin);
-      sim.castAbility('seal_of_righteousness', paladin); // imbue (sets the Seal)
-      ready(ePaladin);
-      sim.castAbility('judgement', paladin); // judgement: rng.range then rng.chance
+      sim.castAbility('bastion_rite', paladin); // live Protection block/heal choice
       ready(ePaladin);
       sim.castAbility('consecration', paladin); // groundAoE: on-cast pulse + groundAoEs.push
-      rec.snapshot('paladin-judge-consecrate');
+      rec.snapshot('paladin-bastion-consecrate');
 
       // --- druid: moonfire (directDamage range-then-chance + dot) -> forms -> hot ---
       const mobD = dummy(eDruid);
@@ -4062,9 +4061,9 @@ function hitRatingHeroic(withHitGear: boolean): Scenario {
 // updatePlayerAutoAttack tick driver across several swing intervals for five
 // builds at once: a warrior meleeing a spiked-hide boar (thorns reflect tail) with
 // Heroic Strike queued (queuedOnSwing spend + bonus, cooldown 0), a rogue plain
-// melee, a hunter in melee with Raptor Strike queued (queuedOnSwing + on-next-swing
-// cooldown set, cd 6), a hunter at range firing Auto Shot (physical, armor-mitigated,
-// 8yd dead zone), and a mage wanding (arcane, no armor, no dead zone). Targets are
+// melee, a hunter mixing instant Gutting Strike into melee, a hunter at range firing
+// Auto Shot (physical, armor-mitigated, 8yd dead zone), and a mage wanding (arcane,
+// no armor, no dead zone). Targets are
 // re-pinned to their lane each round so the ranged dead-zone vs wand branches stay
 // exercised, and the rogue's auto-attack is stopped at the end (stopAutoAttack entry).
 function c5AutoAttack(): Scenario {
@@ -4074,7 +4073,7 @@ function c5AutoAttack(): Scenario {
       'player auto-attack driver updatePlayerAutoAttack (swingTimer cadence, facing/range gates)',
       'meleeSwing white-hit table: single rng.next() miss/dodge + crit + armor mitigation',
       'queuedOnSwing heroic_strike spend + bonus (warrior, cooldown 0)',
-      'queuedOnSwing raptor_strike spend + bonus + on-next-swing cooldown set (hunter, cooldown 6)',
+      'instant raptor_strike weaponStrike mixed into the hunter melee lane',
       'overpowerUntil window set on a melee dodge',
       'spiked-hide reflect tail of meleeSwing (wild_boar Bristled Hide)',
       'rangedSwing Auto Shot (hunter, physical, armor-mitigated, 8yd dead zone)',
@@ -4146,12 +4145,12 @@ function c5AutoAttack(): Scenario {
         }
         eWarrior.resource = eWarrior.maxResource;
         eHunterM.resource = eHunterM.maxResource;
-        // Queue on-next-swing abilities (the guard avoids the cast-toggle that a
-        // re-cast while already queued would trigger).
+        // Queue the warrior's on-next-swing ability (the guard avoids toggling it
+        // off), while the Hunter uses its immediate melee Focus generator.
         if (eWarrior.gcdRemaining <= 0 && !eWarrior.castingAbility && !eWarrior.queuedOnSwing) {
           sim.castAbility('heroic_strike', warrior);
         }
-        if (eHunterM.gcdRemaining <= 0 && !eHunterM.castingAbility && !eHunterM.queuedOnSwing) {
+        if (eHunterM.gcdRemaining <= 0 && !eHunterM.castingAbility) {
           sim.castAbility('raptor_strike', hunterM);
         }
         rec.tick(10);
@@ -4216,6 +4215,7 @@ function marketRoundTrip(): Scenario {
           armorClass: 'all',
           primaryStat: 'all',
           rarity: 'all',
+          sort: 'name',
           page: 0,
         },
         seller,
@@ -4229,6 +4229,7 @@ function marketRoundTrip(): Scenario {
           armorClass: 'all',
           primaryStat: 'all',
           rarity: 'all',
+          sort: 'name',
           page: 0,
         },
         seller,
@@ -4676,6 +4677,16 @@ function cardDuel(): Scenario {
 // clutch camps, the new elites) moved the shared stream once more, again
 // (5 -> 2) after the Galecrest unspawnable-quest camp fix, and back to 5
 // when those late quest camps moved onto their private scatter stream.
+//
+// The GOLDEN was separately re-recorded (with the seed literal unchanged at
+// the time) when Reliquary Phase 10 made masterwork procs write masterwork:*
+// visited entries beside the marks (applyCraftSuccessHooks in
+// src/sim/professions/crafting.ts): only the state hashes of the proc frame
+// and the frames after it moved (their inlined samples gain the two visited
+// ids), while every event hash and the whole rng draw digest stayed
+// byte-identical, exactly what a markVisited-only change predicts. The visit
+// write landed one commit before the re-record, so a bisect straddling that
+// pair sees a false parity red on the intermediate commit.
 function professionsCraft(seed = 5): Scenario {
   return {
     name: 'professions_craft',
@@ -4944,6 +4955,360 @@ function professionsGather(seed = 1): Scenario {
       }
       rec.snapshot('rare-event-window');
       rec.tick(2);
+    },
+  };
+}
+
+// Shaman v0.29: one seed-pinned run carries all three spec engines through the
+// shared recorder so their aura state, events, stored healing values, and RNG
+// draw order are covered by the same deterministic golden as every other sim.
+function shamanEngines(): Scenario {
+  return {
+    name: 'shaman_engines',
+    coverage: [
+      'class:shaman (Thundercall, Warspirit, Spiritmend)',
+      'Thundercall Arc Bolt build and Earthen Jolt vent',
+      'Warspirit dual-wield cadence and Stormcast state',
+      'Spiritmend Tidecall deposit and Cascading Mend consumption',
+      'Shaman spec state in deterministic headless snapshots',
+    ],
+    build: () => new Sim({ seed: 2929, playerClass: 'shaman', noPlayer: true, autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const elementalId = sim.addPlayer('shaman', 'Stormbank');
+      const warspiritId = sim.addPlayer('shaman', 'Cadence');
+      const spiritmendId = sim.addPlayer('shaman', 'Current');
+      const allyId = sim.addPlayer('warrior', 'Anchor');
+      for (const pid of [elementalId, warspiritId, spiritmendId, allyId]) {
+        sim.setPlayerLevel(20, pid);
+      }
+      sim.setSpec('elemental', elementalId);
+      sim.setSpec('enhancement', warspiritId);
+      sim.setSpec('restoration', spiritmendId);
+      const elemental = sim.entities.get(elementalId) as AnyEntity;
+      const warspirit = sim.entities.get(warspiritId) as AnyEntity;
+      const spiritmend = sim.entities.get(spiritmendId) as AnyEntity;
+      const ally = sim.entities.get(allyId) as AnyEntity;
+      const dummy = spawnMob(
+        sim,
+        'training_dummy',
+        20,
+        elemental.pos.x,
+        elemental.pos.y,
+        elemental.pos.z + 8,
+      );
+      beef(dummy, 1_000_000);
+      rec.track(dummy.id);
+
+      for (const shaman of [elemental, warspirit]) {
+        teleport(sim, shaman, dummy.pos.x, dummy.pos.z - 3);
+        face(shaman, dummy);
+        sim.targetEntity(dummy.id, shaman.id);
+      }
+      elemental.resource = elemental.maxResource;
+      sim.castAbility('lightning_bolt', elemental.id);
+      rec.tick(80);
+      elemental.resource = elemental.maxResource;
+      elemental.gcdRemaining = 0;
+      sim.castAbility('earth_shock', elemental.id);
+      rec.tick(20);
+      rec.snapshot('thundercall-vent');
+
+      sim.addItem('training_mace', 1, warspirit.id);
+      sim.equipItem('training_mace', warspirit.id);
+      warspirit.resource = warspirit.maxResource;
+      sim.castAbility('galeheart_weapon', warspirit.id);
+      rec.tick(2);
+      warspirit.autoAttack = true;
+      warspirit.swingTimer = 0;
+      warspirit.offhandSwingTimer = 0;
+      rec.tick(80);
+      rec.snapshot('warspirit-cadence');
+
+      teleport(sim, spiritmend, ally.pos.x, ally.pos.z - 2);
+      ally.hp = Math.round(ally.maxHp * 0.35);
+      spiritmend.resource = spiritmend.maxResource;
+      sim.targetEntity(ally.id, spiritmend.id);
+      sim.castAbility('tidecall', spiritmend.id);
+      rec.tick(2);
+      spiritmend.resource = spiritmend.maxResource;
+      spiritmend.gcdRemaining = 0;
+      sim.castAbility('chain_heal', spiritmend.id);
+      rec.tick(80);
+      rec.snapshot('spiritmend-consume');
+    },
+  };
+}
+
+// Druid v0.29: action replacement and visible bank state for all three spec
+// engines, driven through normal casts and melee hit resolution.
+function druidEngines(): Scenario {
+  return {
+    name: 'druid_engines',
+    coverage: [
+      'class:druid (Moongrove, Wildfang, Groveheart)',
+      'Moontide and Sunwake action replacements with Moonlash and Sunlance phase flips',
+      'Old Blood landed-strike bank across Wolf and Bruin with both payoffs',
+      'Verdance completed-HoT bank and Overbloom harvest',
+    ],
+    build: () => new Sim({ seed: 2930, playerClass: 'druid', noPlayer: true, autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const moonId = sim.addPlayer('druid', 'Moonbank');
+      const fangId = sim.addPlayer('druid', 'Bloodbank');
+      const groveId = sim.addPlayer('druid', 'Gardenbank');
+      for (const pid of [moonId, fangId, groveId]) sim.setPlayerLevel(20, pid);
+      sim.setSpec('balance', moonId);
+      sim.setSpec('feral', fangId);
+      sim.setSpec('restoration', groveId);
+      const moon = sim.entities.get(moonId) as AnyEntity;
+      const fang = sim.entities.get(fangId) as AnyEntity;
+      const grove = sim.entities.get(groveId) as AnyEntity;
+      const dummy = spawnMob(sim, 'training_dummy', 1, moon.pos.x, moon.pos.y, moon.pos.z + 3);
+      beef(dummy, 1_000_000);
+      rec.track(dummy.id);
+
+      sim.targetEntity(dummy.id, moonId);
+      face(moon, dummy);
+      moon.resource = moon.maxResource;
+      sim.castAbility('moonkin_form', moonId);
+      rec.tick(35);
+      for (let cast = 0; cast < 3; cast++) {
+        moon.resource = moon.maxResource;
+        moon.gcdRemaining = 0;
+        sim.castAbility('wrath', moonId);
+        rec.tick(50);
+      }
+      rec.notes.moonlashArmed = sim.resolvedAbility('moonseed', moonId)?.def.id === 'moonlash';
+      rec.notes.sunlanceArmedToo = sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
+      // Choose the moon: the Moonseed button fires Moonsurge and spends the bank.
+      moon.resource = moon.maxResource;
+      moon.gcdRemaining = 0;
+      sim.castAbility('moonseed', moonId);
+      rec.tick(20);
+      for (let cast = 0; cast < 3; cast++) {
+        moon.resource = moon.maxResource;
+        moon.gcdRemaining = 0;
+        sim.castAbility('wrath', moonId);
+        rec.tick(50);
+      }
+      // Choose the sun: the Skyfall button fires Sunwake this time.
+      rec.notes.sunlanceArmed = sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
+      moon.resource = moon.maxResource;
+      moon.gcdRemaining = 0;
+      sim.castAbility('starfire', moonId);
+      rec.tick(20);
+      rec.snapshot('moongrove-choice');
+
+      teleport(sim, fang, dummy.pos.x, dummy.pos.z - 2);
+      sim.targetEntity(dummy.id, fangId);
+      face(fang, dummy);
+      fang.resource = fang.maxResource;
+      sim.castAbility('cat_form', fangId);
+      rec.tick(35);
+      for (let cast = 0; cast < 8; cast++) {
+        fang.resource = fang.maxResource;
+        fang.gcdRemaining = 0;
+        sim.castAbility('claw', fangId);
+        rec.tick(35);
+      }
+      rec.notes.redharvestArmed =
+        sim.resolvedAbility('ferocious_bite', fangId)?.def.id === 'redharvest';
+      fang.resource = fang.maxResource;
+      fang.gcdRemaining = 0;
+      sim.castAbility('ferocious_bite', fangId);
+      rec.tick(5);
+      for (let cast = 0; cast < 8; cast++) {
+        fang.resource = fang.maxResource;
+        fang.gcdRemaining = 0;
+        sim.castAbility('claw', fangId);
+        rec.tick(35);
+      }
+      fang.gcdRemaining = 0;
+      sim.castAbility('bear_form', fangId);
+      rec.tick(35);
+      rec.notes.marrowbreakArmed = sim.resolvedAbility('maul', fangId)?.def.id === 'marrowbreak';
+      fang.hp = Math.round(fang.maxHp * 0.75);
+      fang.resource = fang.maxResource;
+      fang.gcdRemaining = 0;
+      sim.castAbility('maul', fangId);
+      rec.tick(5);
+      rec.snapshot('wildfang-spend');
+
+      grove.hp = Math.round(grove.maxHp * 0.25);
+      moon.hp = Math.round(moon.maxHp * 0.5);
+      fang.hp = Math.round(fang.maxHp * 0.5);
+      const plantTargets = [groveId, groveId, moonId, moonId, fangId];
+      const plantAbilities = [
+        'rejuvenation',
+        'regrowth',
+        'rejuvenation',
+        'regrowth',
+        'rejuvenation',
+      ];
+      for (let cast = 0; cast < plantTargets.length; cast++) {
+        sim.targetEntity(plantTargets[cast], groveId);
+        grove.resource = grove.maxResource;
+        grove.gcdRemaining = 0;
+        sim.castAbility(plantAbilities[cast], groveId);
+        rec.tick(plantAbilities[cast] === 'rejuvenation' ? 35 : 50);
+      }
+      rec.notes.overbloomArmed = sim.resolvedAbility('swiftmend', groveId)?.def.id === 'overbloom';
+      sim.targetEntity(groveId, groveId);
+      grove.resource = grove.maxResource;
+      grove.gcdRemaining = 0;
+      sim.castAbility('swiftmend', groveId);
+      rec.tick(5);
+      rec.snapshot('groveheart-harvest');
+    },
+  };
+}
+
+// Priest Codex baseline loops: all three specializations execute through the
+// shared Sim host, including source-owned links, attached Vigil, Effigy echoes,
+// the Gloomtithe bank, autonomous Tithefiend strikes, and respec cleanup.
+function priestCodex(seed = 2929): Scenario {
+  return {
+    name: 'priest_codex',
+    coverage: [
+      'class:priest Doctrine linked damage conversion',
+      'class:priest Benison committed and immediate group healing plus Seraphic Vigil',
+      'class:priest Vespers Effigy, deterministic echo, Gloomtithe, and Tithefiend',
+      'Priest respec cleanup removes links, bank, and guardian',
+    ],
+    build: () => new Sim({ seed, playerClass: 'priest', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const doctrineId = sim.addPlayer('priest', 'Doctrine');
+      const doctrineAllyId = sim.addPlayer('warrior', 'Doctrine Ally');
+      const benisonId = sim.addPlayer('priest', 'Benison');
+      const benisonAllyId = sim.addPlayer('warrior', 'Benison Ally');
+      const vespersId = sim.addPlayer('priest', 'Vespers');
+      for (const pid of [doctrineId, doctrineAllyId, benisonId, benisonAllyId, vespersId]) {
+        sim.setPlayerLevel(20, pid);
+      }
+      sim.setSpec('discipline', doctrineId);
+      sim.setSpec('holy', benisonId);
+      sim.setSpec('shadow', vespersId);
+
+      const doctrine = sim.entities.get(doctrineId) as AnyEntity;
+      const doctrineAlly = sim.entities.get(doctrineAllyId) as AnyEntity;
+      const benison = sim.entities.get(benisonId) as AnyEntity;
+      const benisonAlly = sim.entities.get(benisonAllyId) as AnyEntity;
+      const vespers = sim.entities.get(vespersId) as AnyEntity;
+      const origin = doctrine.pos;
+      for (const [index, entity] of [
+        doctrine,
+        doctrineAlly,
+        benison,
+        benisonAlly,
+        vespers,
+      ].entries()) {
+        teleport(sim, entity, origin.x + index, origin.z);
+        beef(entity);
+        // The coverage contract needs every scripted cast to LAND (a resisted
+        // Mindfracture binds no Effigy and silences the whole Vespers loop).
+        // Full hit keeps the resist roll drawn (draw order unchanged) while
+        // pinning its outcome, so upstream content adds cannot flake this
+        // scenario off its contract again.
+        entity.hitBonus = 1;
+      }
+      sim.partyInvite(doctrineAllyId, doctrineId);
+      sim.partyAccept(doctrineAllyId);
+      sim.partyInvite(benisonAllyId, benisonId);
+      sim.partyAccept(benisonAllyId);
+
+      const primary = spawnMob(sim, 'training_dummy', 20, origin.x, origin.y, origin.z + 8);
+      const secondary = spawnMob(sim, 'training_dummy', 20, origin.x + 3, origin.y, origin.z + 9);
+      const tertiary = spawnMob(sim, 'training_dummy', 20, origin.x - 4, origin.y, origin.z + 9);
+      const foreignOnly = spawnMob(
+        sim,
+        'training_dummy',
+        20,
+        origin.x + 1,
+        origin.y,
+        origin.z + 10,
+      );
+      for (const mob of [primary, secondary, tertiary, foreignOnly]) {
+        mob.hostile = true;
+        mob.aiState = 'idle';
+        beef(mob);
+        rec.track(mob.id);
+      }
+
+      const cast = (pid: number, targetId: number, abilityId: string, ticks: number): void => {
+        const caster = sim.entities.get(pid) as AnyEntity;
+        caster.gcdRemaining = 0;
+        caster.resource = caster.maxResource;
+        caster.cooldowns.delete(abilityId);
+        sim.targetEntity(targetId, pid);
+        sim.castAbility(abilityId, pid);
+        rec.tick(ticks);
+      };
+
+      doctrineAlly.hp = Math.floor(doctrineAlly.maxHp * 0.5);
+      cast(doctrineId, doctrineAllyId, 'power_word_shield', 2);
+      cast(doctrineId, primary.id, 'smite', 50);
+
+      benisonAlly.hp = Math.floor(benisonAlly.maxHp * 0.5);
+      cast(benisonId, benisonAllyId, 'seraphic_vigil', 2);
+      sim.dealDamage(
+        primary,
+        benisonAlly,
+        Math.ceil(benisonAlly.maxHp * 0.2),
+        false,
+        'shadow',
+        'Parity Hit',
+        'hit',
+      );
+      rec.snapshot('vigil-triggered');
+      benisonAlly.hp = Math.floor(benisonAlly.maxHp * 0.5);
+      cast(benisonId, benisonAllyId, 'prayer_of_healing', 65);
+      benisonAlly.hp = Math.floor(benisonAlly.maxHp * 0.5);
+      cast(benisonId, benisonAllyId, 'holy_nova', 2);
+
+      cast(vespersId, primary.id, 'shadow_word_pain', 30);
+      cast(vespersId, secondary.id, 'shadow_word_pain', 30);
+      cast(vespersId, tertiary.id, 'shadow_word_pain', 30);
+      cast(doctrineId, foreignOnly.id, 'shadow_word_pain', 30);
+      rec.notes.bankBeforeMindfracture =
+        vespers.auras.find((aura: Aura) => aura.kind === 'gloomtithe')?.stacks ?? 0;
+      const mindfractureEventStart = rec.allEvents.length;
+      cast(vespersId, primary.id, 'mind_blast', 60);
+      rec.notes.bankAfterMindfracture =
+        vespers.auras.find((aura: Aura) => aura.kind === 'gloomtithe')?.stacks ?? 0;
+      const mindfractureEchoTargets: number[] = [];
+      for (const event of rec.allEvents.slice(mindfractureEventStart)) {
+        if (event.type === 'damage' && event.ability === 'Effigy Echo') {
+          mindfractureEchoTargets.push(event.targetId);
+        }
+      }
+      rec.notes.mindfractureEchoTargets = mindfractureEchoTargets;
+      rec.notes.expectedEchoTargets = [secondary.id, tertiary.id];
+      rec.notes.foreignOwnerIsolated = !mindfractureEchoTargets.includes(foreignOnly.id);
+      rec.snapshot('effigy-banked');
+      cast(vespersId, primary.id, 'summon_tithefiend', 2);
+      rec.notes.manaAfterSummon = vespers.resource;
+      const guardian = [...sim.entities.values()].find(
+        (entity) => entity.ownerId === vespersId && entity.guardianState?.key === 'tithefiend',
+      );
+      if (guardian) rec.track(guardian.id);
+      rec.tick(90);
+      rec.notes.manaAfterGuardian = vespers.resource;
+
+      rec.notes.doctrineId = doctrineId;
+      rec.notes.doctrineAllyId = doctrineAllyId;
+      rec.notes.benisonId = benisonId;
+      rec.notes.benisonAllyId = benisonAllyId;
+      rec.notes.vespersId = vespersId;
+      rec.notes.guardianId = guardian?.id ?? null;
+      vespers.inCombat = false;
+      vespers.combatTimer = 10;
+      rec.notes.respecSucceeded = sim.setSpec('discipline', vespersId);
+      rec.snapshot('respec-cleanup');
+      rec.notes.cleanupComplete = ![...sim.entities.values()].some(
+        (entity) => entity.ownerId === vespersId && entity.guardianState?.key === 'tithefiend',
+      );
     },
   };
 }
@@ -5571,6 +5936,9 @@ export const SCENARIOS: Scenario[] = [
   chatSocial(),
   professionsCraft(),
   professionsGather(),
+  shamanEngines(),
+  druidEngines(),
+  priestCodex(),
   professionsGatherFine(),
   professionsFishingSession(),
   professionsToolEffectSlot(),

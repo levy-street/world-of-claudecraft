@@ -1,8 +1,9 @@
 // The repeatable-marker style contract across surfaces (phase 23): the four
 // surfaces render ONE marker over two channels that must each agree
-// everywhere they are stated. The GLYPH channel (nameplate marks, gossip
-// '!', both canvas painters) carries the rare-blue anchor and the 0.55
-// cooldown dim; the TEXT channel (the map tooltip's tag prose) lifts to an
+// everywhere they are stated. The GLYPH channel (nameplate marks and gossip
+// '!') carries the rare-blue anchor and the 0.55 cooldown dim; the map canvas
+// channel uses dedicated, full-opacity state art so cooldown remains legible
+// at map scale. The TEXT channel (the map tooltip's tag prose) lifts to an
 // accessible blue at full opacity, because #0070dd reads 4.07:1 over the
 // panel gradient (under the 4.5:1 AA floor for 13.5px text) and a 0.55 dim
 // about 2:1. Deleting any of these blocks previously reddened nothing
@@ -199,11 +200,16 @@ describe('quest marker style agreement across surfaces', () => {
     expect(hudCss).not.toMatch(/\.np-marker[^}]*text-decoration/s);
   });
 
-  it('dims both canvas painters at the CSS alpha', () => {
-    // Comments are stripped above, so these match the live assignments, not
-    // prose; the painters share the CSS value so all four surfaces dim
-    // identically (each painter test pins the blit-time behavior itself).
-    expect(minimapPainter).toContain(`NPC_GLYPH_COOLDOWN_ALPHA = ${COOLDOWN_ALPHA}`);
-    expect(mapPainter).toContain(`NPC_GLYPH_COOLDOWN_ALPHA = ${COOLDOWN_ALPHA}`);
+  it('uses dedicated full-opacity cooldown art on both canvas painters', () => {
+    // Cooldown is no longer encoded by opacity alone on maps. Each painter
+    // routes the state through its smaller neutral/broken-silhouette asset,
+    // while the detailed painter suites pin exact IDs, sizes, and caller-alpha
+    // preservation. The old shared dim constant must not return.
+    expect(minimapPainter).toContain("'minimapQuestCooldown'");
+    expect(mapPainter).toContain("'mapQuestCooldown'");
+    expect(minimapPainter).toContain('questMarkerArtId(m.marker)');
+    expect(mapPainter).toContain('questMarkerArtId(npc.kind)');
+    expect(minimapPainter).not.toContain('NPC_GLYPH_COOLDOWN_ALPHA');
+    expect(mapPainter).not.toContain('NPC_GLYPH_COOLDOWN_ALPHA');
   });
 });

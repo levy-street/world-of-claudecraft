@@ -88,8 +88,15 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     expect(p.comboPoints).toBe(0); // spendsCombo reset, AFTER the effect loop
   });
 
-  it('rogue rupture: dot damage scales with combo points spent (bleed finisher, not flat)', () => {
-    const dotValueAt = (combo: number): number => {
+  // The three tests below pinned the PR #2447 model, where BOTH bleeds carried a
+  // flat `perCombo` term on the dot effect. The v0.31 rogue and druid overhauls
+  // replaced it (owner ruling 2026-07-29): Bleed Out buys MORE TICKS at a fixed
+  // value (baseDuration/perComboDuration), Bloodrift buys BIGGER ticks over a
+  // fixed window (baseTotal/perComboTotal). The dispatch-level promise is
+  // unchanged and still pinned here: a finisher's payload must reward the points
+  // it consumes, and a damage modifier must scale the WHOLE payload.
+  it('rogue rupture: combo points buy more ticks at a fixed tick value', () => {
+    const bleedAt = (combo: number): Aura => {
       const { sim, p, meta } = makeSim('rogue', 20);
       const mob = spawnTarget(sim, p);
       p.comboPoints = combo;
@@ -97,27 +104,22 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
       runEffects(sim.ctx, p, meta, mob, res);
       const dot = mob.auras.find((a: Aura) => a.kind === 'dot' && a.sourceId === p.id);
       if (!dot) throw new Error('rupture dot did not land');
-      return dot.value;
+      return dot;
     };
 
-    const at1 = dotValueAt(1);
-    const at5 = dotValueAt(5);
+    const at1 = bleedAt(1);
+    const at5 = bleedAt(5);
 
-    // Rupture is a combo-point finisher (spendsCombo: true); banking to 5 combo
-    // points must deal more per-tick damage than spending it at 1, mirroring the
-    // repo's other finishers (eviscerate/ferocious_bite finisherDamage,
-    // slice_and_dice finisherHaste, kidney_shot finisherStun) that all scale with
-    // spentCombo. Before the fix, the 'dot' effect had no perCombo term, so this
-    // was flat regardless of combo points banked.
-    //
-    // Pin the exact tick-value delta rather than a loose greater-than: Rupture's
-    // content record is { total: 16, perCombo: 16, duration: 16, interval: 2 },
-    // so the DoT coefficient is total + perCombo*spentCombo, spread across
-    // duration/interval = 8 ticks. Attack-power scaling (dotSp) is identical at
-    // both combo counts (same character, same gear), so it cancels out of the
-    // delta: dotBase(1) = round((16+16*1)/8) = 4, dotBase(5) = round((16+16*5)/8)
-    // = 12, an exact +8 delta this pin locks in.
-    expect(at5 - at1).toBe(8);
+    // Bleed Out's record is { total: 96, duration: 16, interval: 2,
+    // baseDuration: 6, perComboDuration: 2 }: the window is 6 + 2 x points, and
+    // the tick value is total / (duration / interval) = 96 / 8 = 12, INDEPENDENT
+    // of the spend (attack-power scaling is identical at both, same character).
+    expect(at1.duration).toBe(8);
+    expect(at5.duration).toBe(16);
+    expect(at5.value).toBe(at1.value);
+    expect(at5.tickInterval).toBe(2);
+    // More ticks at the same value = a strictly larger payload for more points.
+    expect(at5.value * (at5.duration / 2)).toBeGreaterThan(at1.value * (at1.duration / 2));
   });
 
   it('garrote: the direct hit carries abilityId, the bleed ticks never do (no per-tick cue replay)', () => {
@@ -145,7 +147,7 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     for (const tick of ticks) expect(tick.abilityId ?? null).toBeNull();
   });
 
-  it('fearImpact is gated to Harrow: Morrowlash shares fearDr but emits none', () => {
+  it('fearImpact is gated to the Harrow ability id, not to landing an incapacitate', () => {
     // Harrow (ability id 'fear'): the landed fear sounds once at the target.
     const harrow = makeSim('warlock', 20);
     const harrowTarget = spawnTarget(harrow.sim, harrow.p);
@@ -163,31 +165,25 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     expect(fearImpacts).toHaveLength(1);
     expect(fearImpacts[0]).toMatchObject({ targetId: harrowTarget.id, ability: 'fear' });
 
-    // Morrowlash (death_coil) also carries fearDr (the graded fear break), but
-    // it has no fear recording and its own directDamage impact already sounds
-    // the hit, so the fearImpact emit must stay gated to Harrow's id.
-    // death_coil is a row-17 choice-row grant, so select it first.
-    const coil = makeSim('warlock', 20);
-    expect(coil.sim.applyTalents({ spec: null, rows: { 17: 'wlk_r17_death_coil' } })).toBe(true);
-    const coilTarget = spawnTarget(coil.sim, coil.p);
-    coil.sim.events.length = 0;
-    runEffects(
-      coil.sim.ctx,
-      coil.p,
-      coil.meta,
-      coilTarget,
-      resolve(coil.sim, 'death_coil', coil.p.id),
-    );
-    expect(coilTarget.auras.some((a: Aura) => a.kind === 'incapacitate')).toBe(true);
-    expect(coil.sim.events.some((ev) => ev.type === 'spellfx' && ev.fx === 'fearImpact')).toBe(
+    // A plain incapacitate (Gouge) lands its aura but must emit no
+    // fearImpact: the emit stays gated to Harrow's ability id. (Morrowlash,
+    // the historical fearDr-without-fear-audio counterexample, retired with
+    // the warlock three-spec overhaul; its def survives hidden for persisted
+    // action bars only.)
+    const toss = makeSim('rogue', 20);
+    const tossTarget = spawnTarget(toss.sim, toss.p);
+    toss.sim.events.length = 0;
+    runEffects(toss.sim.ctx, toss.p, toss.meta, tossTarget, resolve(toss.sim, 'gouge', toss.p.id));
+    expect(tossTarget.auras.some((a: Aura) => a.kind === 'incapacitate')).toBe(true);
+    expect(toss.sim.events.some((ev) => ev.type === 'spellfx' && ev.fx === 'fearImpact')).toBe(
       false,
     );
 
     // The AoE fear shouts emit fearImpact from the separate aoeFear case
     // (once per creature actually feared), which the Harrow id gate above
-    // must not touch. psychic_scream is a row-8 choice-row grant.
+    // must not touch. psychic_scream (Terror Canticle) is priest base kit
+    // since the overhaul; the old row-8 grant became a cooldown talent.
     const shout = makeSim('priest', 20);
-    expect(shout.sim.applyTalents({ spec: null, rows: { 8: 'pri_r8_psychic_scream' } })).toBe(true);
     const shoutTarget = spawnTarget(shout.sim, shout.p);
     shout.sim.events.length = 0;
     runEffects(
@@ -204,8 +200,8 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     expect(shoutImpacts[0]).toMatchObject({ targetId: shoutTarget.id, ability: 'psychic_scream' });
   });
 
-  it('druid rip: dot damage scales with combo points spent (bleed finisher, not flat)', () => {
-    const dotValueAt = (combo: number): number => {
+  it('druid rip: combo points buy bigger ticks over a fixed window', () => {
+    const bleedAt = (combo: number): Aura => {
       const { sim, p, meta } = makeSim('druid', 20);
       const mob = spawnTarget(sim, p);
       p.comboPoints = combo;
@@ -213,78 +209,96 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
       runEffects(sim.ctx, p, meta, mob, res);
       const dot = mob.auras.find((a: Aura) => a.kind === 'dot' && a.sourceId === p.id);
       if (!dot) throw new Error('rip dot did not land');
-      return dot.value;
+      return dot;
     };
 
-    const at1 = dotValueAt(1);
-    const at5 = dotValueAt(5);
+    const at1 = bleedAt(1);
+    const at5 = bleedAt(5);
 
-    // Rip's content record is { total: 10, perCombo: 10, duration: 12, interval: 2 },
-    // 6 ticks. dotBase(1) = round((10+10*1)/6) = 3, dotBase(5) = round((10+10*5)/6)
-    // = 10, an exact +7 delta (attack-power scaling cancels out of the delta the
-    // same way it does for Rupture above).
-    expect(at5 - at1).toBe(7);
+    // Bloodrift's record is { total: 156, duration: 24, interval: 2,
+    // baseTotal: 36, perComboTotal: 24 }: a fixed 24 sec / 12 tick window whose
+    // total is 36 + 24 x points, so dotBase(1) = round(60/12) = 5 and
+    // dotBase(5) = round(156/12) = 13, an exact +8 delta (attack-power scaling
+    // is identical at both spends and cancels out of the delta).
+    expect(at1.duration).toBe(24);
+    expect(at5.duration).toBe(24);
+    expect(at5.value - at1.value).toBe(8);
   });
 
-  it('rupture and rip: the 5-combo-point payload is UNCHANGED from the old flat totals', () => {
-    // The delta pins above lock the SHAPE of the combo scaling but not its
-    // absolute magnitude: a retune of total/perCombo that keeps the same 1-to-5
-    // delta would slip past them. This is the PR's actual behavioral promise
-    // (adding scaling must not change the ability's power at max combo points),
-    // so pin the unmodified content coefficients at 5 combo points to literals.
-    const dotAt5 = (id: 'rupture' | 'rip') => {
-      const eff = ABILITIES[id].effects.find((e) => e.type === 'dot');
-      if (!eff || eff.type !== 'dot') throw new Error(`${id} has no dot effect`);
-      if (eff.perCombo === undefined) throw new Error(`${id} lost its perCombo term`);
-      const total = eff.total + eff.perCombo * 5;
-      return { total, perTick: Math.round(total / (eff.duration / eff.interval)) };
-    };
+  it('rupture and rip: the five-point payload matches the authored content totals', () => {
+    // The shape pins above do not lock absolute magnitude: a retune that kept the
+    // same 1-to-5 relationship would slip past them. Pin the unmodified content
+    // coefficients at a five-point spend to literals.
+    const rupture = ABILITIES.rupture.effects.find((e) => e.type === 'dot');
+    if (rupture?.type !== 'dot') throw new Error('rupture has no dot effect');
+    const rip = ABILITIES.rip.effects.find((e) => e.type === 'dot');
+    if (rip?.type !== 'dot') throw new Error('rip has no dot effect');
 
-    // Rupture was a flat 96 over 16 sec at a 2 sec interval (8 ticks) before the
-    // combo term existed; Rip was a flat 60 over 12 sec (6 ticks).
-    expect(dotAt5('rupture')).toEqual({ total: 96, perTick: 12 });
-    expect(dotAt5('rip')).toEqual({ total: 60, perTick: 10 });
+    // Bleed Out: 96 over the full 16 sec window (8 ticks of 12).
+    expect({
+      window: (rupture.baseDuration ?? 0) + (rupture.perComboDuration ?? 0) * 5,
+      total: rupture.total,
+      perTick: Math.round(rupture.total / (rupture.duration / rupture.interval)),
+    }).toEqual({ window: 16, total: 96, perTick: 12 });
+
+    // Bloodrift: 36 + 24 x 5 = 156 over a fixed 24 sec window (12 ticks of 13).
+    expect({
+      window: rip.duration,
+      total: (rip.baseTotal ?? 0) + (rip.perComboTotal ?? 0) * 5,
+      perTick: Math.round(rip.total / (rip.duration / rip.interval)),
+    }).toEqual({ window: 24, total: 156, perTick: 13 });
   });
 
-  it('rogue rupture: a melee damage-percent modifier scales BOTH the base total and the perCombo term of the dot', () => {
+  it('a melee damage-percent modifier scales the WHOLE bleed payload, not just `total`', () => {
     // Regression test for the scaleEffect gap the reviewer found on PR #2447: the
-    // 'dot' case in scaleEffect (src/sim/content/classes.ts) only scaled `total`,
-    // leaving `perCombo` (which carries most of Rupture's damage at high combo
-    // points) almost inert against damage modifiers. Assassination's spec
-    // baseline (src/sim/content/spec_baselines.ts) grants global.meleeDmgPct:
-    // 0.08, a physical-school modifier that must now multiply BOTH total and
-    // perCombo through applyTalentMods -> scaleEffect.
-    const dotValueAt = (combo: number, spec: string | null): number => {
-      const { sim, p, meta } = makeSim('rogue', 20);
+    // 'dot' case in scaleEffect (src/sim/content/classes.ts) scaled only `total`.
+    // Under the retuned model that gap is worse for Bloodrift, whose tick value
+    // derives from baseTotal + perComboTotal x points and IGNORES `total`, so a
+    // total-only scale left the whole ability inert against damage modifiers.
+    // Assassination and Feral both grant global.meleeDmgPct in their spec
+    // baseline (src/sim/content/spec_baselines.ts), a physical-school modifier
+    // that must reach every damage term through applyTalentMods -> scaleEffect.
+    const bleedValueAt = (
+      cls: 'rogue' | 'druid',
+      abilityId: 'rupture' | 'rip',
+      combo: number,
+      spec: string | null,
+    ): number => {
+      const { sim, p, meta } = makeSim(cls, 20);
       if (spec) sim.setSpec(spec, p.id);
       const mob = spawnTarget(sim, p);
       p.comboPoints = combo;
-      const res = resolve(sim, 'rupture', p.id);
+      const res = resolve(sim, abilityId, p.id);
       runEffects(sim.ctx, p, meta, mob, res);
       const dot = mob.auras.find((a: Aura) => a.kind === 'dot' && a.sourceId === p.id);
-      if (!dot) throw new Error('rupture dot did not land');
+      if (!dot) throw new Error(`${abilityId} dot did not land`);
       return dot.value;
     };
 
-    const baseAt1 = dotValueAt(1, null);
-    const baseAt5 = dotValueAt(5, null);
-    const modAt1 = dotValueAt(1, 'assassination');
-    const modAt5 = dotValueAt(5, 'assassination');
+    // Bleed Out carries its whole payload in `total`, so the fixed tick value
+    // must rise under the modifier.
+    expect(bleedValueAt('rogue', 'rupture', 5, 'assassination')).toBeGreaterThan(
+      bleedValueAt('rogue', 'rupture', 5, null),
+    );
 
-    // The 5-combo-point payload (where perCombo dominates the total) must be
-    // strictly higher under the +8% melee damage modifier.
-    expect(modAt5).toBeGreaterThan(baseAt5);
-    // The whole payload scales: the delta attributable to perCombo (4 combo
-    // points' worth) must ALSO grow under the modifier, not stay flat. Before
-    // the fix, scaleEffect's 'dot' case scaled only `total`, so this delta
-    // (driven entirely by perCombo) was IDENTICAL with or without meleeDmgPct;
-    // this assertion is the direct regression check for that gap.
-    expect(modAt5 - modAt1).toBeGreaterThan(baseAt5 - baseAt1);
+    // Bloodrift's payload lives entirely in baseTotal + perComboTotal. Both terms
+    // must scale: check the one-point spend (baseTotal-dominated) AND the
+    // five-point spend (perComboTotal-dominated), so a fix to only one term still
+    // fails this.
+    expect(bleedValueAt('druid', 'rip', 1, 'feral')).toBeGreaterThan(
+      bleedValueAt('druid', 'rip', 1, null),
+    );
+    const baseSpread =
+      bleedValueAt('druid', 'rip', 5, null) - bleedValueAt('druid', 'rip', 1, null);
+    const modSpread =
+      bleedValueAt('druid', 'rip', 5, 'feral') - bleedValueAt('druid', 'rip', 1, 'feral');
+    expect(modSpread).toBeGreaterThan(baseSpread);
   });
 
   it('paladin consecration: the groundAoE case pushes a ground effect and fires the on-cast pulse', () => {
     const { sim, p, meta } = makeSim('paladin', 20);
-    const mob = spawnTarget(sim, p, 8, 2); // within the 8yd consecration radius
+    expect(sim.setSpec('protection')).toBe(true);
+    const mob = spawnTarget(sim, p, 8, 2); // within the 6 m Consecration radius
     const before = sim.ctx.groundAoEs.length;
     mob.aiState = 'chase';
     mob.aggroTargetId = p.id;
@@ -308,6 +322,42 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     sim.ctx.pulseGroundAoE(sim.ctx.groundAoEs[0]);
     expect(mob.leashAnchor.x).toBeCloseTo(anchorAfterCast.x);
     expect(mob.leashAnchor.z).toBeCloseTo(anchorAfterCast.z);
+  });
+
+  it('cleanseMovement preserves encounter-authored unbreakable roots and slows', () => {
+    const { sim, p, meta } = makeSim('druid', 20);
+    const protectedRoot = {
+      id: 'scripted_root',
+      name: 'Scripted Root',
+      kind: 'root' as const,
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: 424242,
+      school: 'shadow' as const,
+      unbreakableControl: true as const,
+    };
+    const ordinarySlow: Aura = {
+      id: 'ordinary_slow',
+      name: 'Ordinary Slow',
+      kind: 'slow' as const,
+      remaining: 30,
+      duration: 30,
+      value: 0.2,
+      sourceId: 424242,
+      school: 'shadow',
+    };
+    p.auras.push(protectedRoot, ordinarySlow);
+    const base = resolve(sim, 'rejuvenation', p.id);
+    const res: ResolvedAbility = {
+      ...base,
+      effects: [{ type: 'cleanseMovement' }],
+    };
+
+    runEffects(sim.ctx, p, meta, p, res);
+
+    expect(p.auras.some((aura) => aura.id === protectedRoot.id)).toBe(true);
+    expect(p.auras.some((aura) => aura.id === ordinarySlow.id)).toBe(false);
   });
 });
 

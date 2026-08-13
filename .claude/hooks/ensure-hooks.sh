@@ -20,5 +20,17 @@ if [ -z "$current" ]; then
   if git config --local core.hooksPath .githooks 2>/dev/null; then
     echo "World of ClaudeCraft: enabled .githooks (pre-push QA floor: tsc, guard tests, biome, copy rules). Undo with: git config --unset core.hooksPath" >&2
   fi
+else
+  # A pre-existing value is respected (never clobber husky or a contributor's own setup),
+  # but warn when it points at ANOTHER checkout's .githooks: in a multi-worktree setup that
+  # runs a possibly stale copy of the floor instead of this branch's. A custom hooks dir
+  # that is not a .githooks path is somebody's own setup; stay silent about it.
+  case "$current" in
+    /*/.githooks)
+      if [ "$current" != "$dir/.githooks" ]; then
+        echo "World of ClaudeCraft: core.hooksPath points at another checkout's .githooks ($current); the pre-push floor that runs here may be a stale copy. Repoint with: git config --local core.hooksPath .githooks" >&2
+      fi
+      ;;
+  esac
 fi
 exit 0

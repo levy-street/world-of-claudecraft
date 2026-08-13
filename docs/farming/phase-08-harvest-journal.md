@@ -12,6 +12,20 @@ with honest empty states, the map and minimap pins mark the four patch sites, an
 ready notices (banner, chat line, farm_ready cue) fire only for dev-created crops until
 go-live (Phase 9). No seeds are obtainable and no NPC or quest exists.
 
+V0.38.0 SYNC CORRECTION (2026-08-13, Phase 6b; overrides every "map_window_view and
+minimap_markers patterns" line below): the release's map marker overhaul (PR 3369)
+replaced the two-file pin recipe with a marker FAMILY. New farming map/minimap pins
+land through the overhauled contracts: map_marker_semantics_core.ts,
+map_marker_profile_core.ts, map_marker_icon_art.ts (its own icon namespace under
+public/ui/map-markers, never item art), map_marker_palette_lifecycle.ts,
+map_marker_tooltip_adapter.ts, and map_semantic_accessibility_core.ts, with
+map_window_painter/minimap_painter/map_window_view heavily reworked around them. The
+Explore step and Agent B's scope must read those cores on the CURRENT tree and derive
+the farming pin's marker kind, profile, icon, accessibility, and tooltip rows from the
+family's own recipes before writing any pin code. Also note deviation (an) in
+state.md: hud.ts and sim.ts sit at near-zero monolith-ratchet headroom, so every new
+block this phase writes lands as a sibling module from the start.
+
 ### Starter Prompt
 
 ```

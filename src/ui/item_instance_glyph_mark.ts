@@ -62,6 +62,16 @@ export function fineSealMarkHtml(): string {
   return `<span class="bi-fine-seal" aria-hidden="true">${svgIcon('crafting')}</span>`;
 }
 
+/** The player item-lock badge (issue 3042): its OWN bottom-left corner,
+ *  independent of the top-left glyph priority above, so it composes with
+ *  whatever corner mark already wins that slot instead of replacing it.
+ *  Aria-hidden; the cell accessible name carries the locked fact
+ *  (hudChrome.bags.itemAriaLocked). Empty string when not locked. */
+export function lockMarkHtml(locked: boolean): string {
+  if (!locked) return '';
+  return `<span class="bi-lock-seal" aria-hidden="true">${svgIcon('lock')}</span>`;
+}
+
 /** Corner-mark HTML for one resolved kind, or '' when null (plain fungible). */
 export function instanceGlyphMarkHtml(kind: BagInstanceGlyphKind): string {
   if (kind === null) return '';

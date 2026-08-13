@@ -22,6 +22,7 @@ describe('isSelfOnlyAbility', () => {
         'absorb',
         'dismissPet',
         'gainResource',
+        'grantDevotion',
         'imbue',
         'lifeTap',
         'selfBuff',
@@ -42,6 +43,7 @@ describe('isSelfOnlyAbility', () => {
     ['instant_poison', true], // imbue
     ['life_tap', true], // lifeTap
     ['adrenaline_rush', true], // gainResource
+    ['avenging_wrath', true], // selfBuff + grantDevotion
     ['bloodrage', true], // selfDamagePctMax + gainResource
     ['summon_imp', true], // summonDemon
     ['dismiss_pet', true], // dismissPet

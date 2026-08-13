@@ -6,6 +6,7 @@
 import { getTask } from './tripo.mjs';
 
 export const TRIPO_CREDIT_USD = 0.01;
+export const COST_TASK_TIMEOUT_MS = 5_000;
 // gpt-image-2 pricing (July 2026): text input $5/1M, image input $8/1M,
 // image output $30/1M tokens.
 export const OPENAI_USD_PER_TOKEN = {
@@ -38,7 +39,7 @@ export async function jobCost(jobState) {
     let credits = null;
     let status = 'unknown';
     try {
-      const t = await getTask(taskId);
+      const t = await getTask(taskId, { timeoutMs: COST_TASK_TIMEOUT_MS, maxRetries: 1 });
       credits = t.credits_consumed ?? 0;
       status = t.status;
     } catch {

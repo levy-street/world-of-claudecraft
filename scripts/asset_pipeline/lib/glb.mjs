@@ -10,7 +10,9 @@
 // - All: prune+dedup, textures re-encoded WebP (max 512), meshopt on statics
 //   (matching build_assets.mjs 'static'); rigged models keep plain encoding
 //   like CombatMech.glb (resample+prune+dedup only, never simplify/join).
+// biome-ignore assist/source/organizeImports: sharp must initialize before @gltf-transform/functions on Windows.
 import { statSync } from 'node:fs';
+import sharp from 'sharp';
 import { getBounds, NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import {
@@ -433,12 +435,6 @@ export async function normalizeProp(inPath, outPath, { height, rotateY = 0, maxT
 }
 
 async function textureTransforms(maxTex) {
-  let sharp = null;
-  try {
-    sharp = (await import('sharp')).default;
-  } catch {
-    return []; // sharp unavailable: keep original textures
-  }
   return [textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [maxTex, maxTex] })];
 }
 

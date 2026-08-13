@@ -145,6 +145,7 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/claudium/purchase': PROBLEM_JSON,
   '/api/claudium/spend': PROBLEM_JSON,
   '/api/deeds/rarity': PROBLEM_JSON,
+  '/api/reliquary/rarity': PROBLEM_JSON,
   '/api/deeds/broadcasts': PROBLEM_JSON,
   '/api/steam/link': PROBLEM_JSON,
   '/api/steam/status': PROBLEM_JSON,

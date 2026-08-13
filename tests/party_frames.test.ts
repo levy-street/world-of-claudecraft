@@ -6,6 +6,7 @@ import {
   partyFrameAuraIsRelevant,
   partyFrameHealthText,
   partyFrameSignature,
+  prioritizePartyFrameAuras,
   resolvePartyFrameStyle,
   selectPartyFrameMembers,
 } from '../src/ui/party_frames';
@@ -44,6 +45,8 @@ describe('party frame aura relevance', () => {
     expect(partyFrameAuraIsRelevant({ id: 'arcane_intellect', kind: 'buff_int_pct' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'sacred_shield', kind: 'cast_shield' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'temporal_echo', kind: 'temporal_echo' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'priest_doctrine', kind: 'doctrine' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'seraphic_vigil', kind: 'heal_echo' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'renew', kind: 'hot' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'power_word_shield', kind: 'absorb' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'ice_block', kind: 'stasis' })).toBe(true);
@@ -56,6 +59,24 @@ describe('party frame aura relevance', () => {
     expect(partyFrameAuraIsRelevant({ id: 'well_fed', kind: 'buff_sta' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'rend', kind: 'dot' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'wither', kind: 'buff_ap', neg: 1 })).toBe(true);
+  });
+
+  it('keeps Doctrine and Vigil first when the visible strip is crowded', () => {
+    const ordered = prioritizePartyFrameAuras([
+      { id: 'renew', kind: 'hot' },
+      { id: 'rend', kind: 'dot', neg: 1 },
+      { id: 'seraphic_vigil', kind: 'heal_echo' },
+      { id: 'power_word_shield', kind: 'absorb' },
+      { id: 'priest_doctrine', kind: 'doctrine' },
+    ]);
+
+    expect(ordered.map((aura) => aura.id)).toEqual([
+      'priest_doctrine',
+      'seraphic_vigil',
+      'renew',
+      'rend',
+      'power_word_shield',
+    ]);
   });
 });
 

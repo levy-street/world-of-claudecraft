@@ -62,6 +62,11 @@ const bundled = await esbuild.build({
   // This is the union of both sides of the merge: the release added the five
   // runtime/client-origin fields, and this branch's art-pipeline unblock added
   // BASE_URL plus the discord/reown/turnstile/wallet fields the same graph reads.
+  // Pinned for the same reason as the acceptance builder in lib/mob_portrait_jobs.mjs:
+  // esbuild's per-module path comments are relative to absWorkingDir (cwd by default),
+  // so the bundle digest this run stamps into the receipt would otherwise depend on the
+  // launch directory. Both sites must pass the same value or receipts stop validating.
+  absWorkingDir: root,
   define: PORTRAIT_RENDER_DEFINES,
   write: false,
   logLevel: 'silent',

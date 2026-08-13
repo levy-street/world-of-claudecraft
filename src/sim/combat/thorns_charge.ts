@@ -11,6 +11,9 @@
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { CAST_COMPLETE_EPS, DT } from '../types';
+import { masteredPaladinAuraValue } from './paladin_talents';
+import { onThunderWardRetaliated } from './shaman_talents';
+import { applyStoneboundWardSmoothing } from './shaman_warspirit';
 import { onThornsReflect } from './talent_procs';
 
 export interface ThornsState {
@@ -59,7 +62,7 @@ export function applyThornsReaction(ctx: SimContext, defender: Entity, attacker:
       ctx.dealDamage(
         defender,
         attacker,
-        a.value,
+        masteredPaladinAuraValue(defender, a.id, a.value),
         false,
         a.school,
         a.name,
@@ -68,7 +71,11 @@ export function applyThornsReaction(ctx: SimContext, defender: Entity, attacker:
         undefined,
         false,
       );
-      if (defender.kind === 'player') onThornsReflect(ctx, defender, a.id);
+      if (defender.kind === 'player') {
+        applyStoneboundWardSmoothing(ctx, defender, a.id);
+        if (a.id === 'lightning_shield') onThunderWardRetaliated(ctx, defender);
+        onThornsReflect(ctx, defender, a.id);
+      }
     }
   }
   for (let i = defender.auras.length - 1; i >= 0; i--) {

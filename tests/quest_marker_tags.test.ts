@@ -1,6 +1,6 @@
 // The map tooltip's quest-marker tag table (src/ui/quest_marker_tags.ts) and
 // the two questUi.log status keys phase 23 minted for it. Pure Node: the
-// table is what hud.ts's questGiverTooltipHtml renders through, so pinning
+// table is what MapMarkerTooltipContent renders through, so pinning
 // the mapping plus the resolved English here is what makes the tooltip tags
 // a tested behavior rather than an inlined string soup.
 
@@ -43,14 +43,17 @@ describe('questMarkerTooltipTag', () => {
   });
 
   it('is what the map tooltip actually renders through (the wiring pin)', () => {
-    // The mapping above is worthless if hud.ts quietly reverts to inlined
-    // strings: pin the LIVE call and the class emission, comments stripped so
-    // a commented-out call cannot satisfy either arm (the raw-source rule).
-    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8')
+    // The mapping above is worthless if the extracted tooltip helper quietly
+    // reverts to inlined strings: pin the LIVE call and the class emission,
+    // comments stripped so a commented-out call cannot satisfy either arm.
+    const tooltipContent = readFileSync(
+      new URL('../src/ui/hud/map/map_marker_tooltip_content.ts', import.meta.url),
+      'utf8',
+    )
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|[^:])\/\/.*$/gm, '$1');
-    expect(hud).toContain('questMarkerTooltipTag(ref.kind)');
-    expect(hud).toContain('<span class="${tag.cls}">');
-    expect(hud).toContain('esc(t(tag.key))');
+    expect(tooltipContent).toContain('questMarkerTooltipTag(ref.kind)');
+    expect(tooltipContent).toContain('<span class="$' + '{tag.cls}">');
+    expect(tooltipContent).toContain('esc(t(tag.key))');
   });
 });

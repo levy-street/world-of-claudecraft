@@ -11,6 +11,7 @@
 
 import { MOBS } from '../data';
 import type { Entity, MobTemplate, RiftTier } from '../types';
+import { RUN_SPEED } from '../types';
 
 /** Canonical rank -> portal baseLevel map (portals.ts RIFT_TIER_INFO consumes
  * this, and riftRankForBaseLevel inverts it). */
@@ -231,9 +232,38 @@ export const RIFT_HEROIC_TUNING: Partial<Record<RiftTier, RiftRankTuning>> = {
 /** heroic_s death-zone tempo: at S rank the lethal telegraphed zones cast (and
  * therefore detonate) this much faster AND recycle this much sooner, so the
  * boss fight stays in constant motion ("make the red circle faster", playtest
- * 2026-07-21). A radius-9 zone at 0.7 tempo still leaves ~1.8s+ to step out at
- * player run speed 7, so every zone remains fully dodgeable from its centre. */
+ * 2026-07-21). The tempo shortens the FUSE, and the fuse is not the reaction
+ * window: the anchor stands at the centre, so radius/RUN_SPEED of it is spent
+ * running. Author cast times against riftDeathZoneReactionBudget below, never
+ * against the fuse alone. */
 export const RIFT_S_ZONE_TEMPO = 0.7;
+
+/** The fuse a lethal death zone burns before it detonates: the authored cast
+ * time, shortened at S by the tempo above. The zone is placed the instant the
+ * cast starts, so this is the whole window between the telegraph appearing and
+ * the kill. Impairment can stretch it per anchor (impairedZoneFuseMult). */
+export function riftDeathZoneFuse(castTime: number, rank: RiftTier): number {
+  return castTime * (rank === 'S' ? RIFT_S_ZONE_TEMPO : 1);
+}
+
+/** What is actually left to NOTICE the zone and commit to moving, once the run
+ * out of it is paid for. A zone anchors on a player, so the anchor crosses a
+ * full radius at RUN_SPEED; the remainder is the player's reaction time. */
+export function riftDeathZoneReactionBudget(
+  castTime: number,
+  radius: number,
+  rank: RiftTier,
+): number {
+  return riftDeathZoneFuse(castTime, rank) - radius / RUN_SPEED;
+}
+
+/** The floor every lethal zone must leave for reaction, at every rank. Human
+ * visual reaction alone is roughly a quarter second before the body moves, and
+ * an online player pays client latency on top of that, so a budget under this
+ * is a mechanic that kills players who did react. Xarreth's Soul Grave shipped
+ * v0.37.0 at 0.46s (a 2.5s cast against radius 9) and read as undodgeable in
+ * playtest; the rest of the roster was already at or above 1.16s. */
+export const RIFT_MIN_ZONE_REACTION_SEC = 1.0;
 
 /** Non-dodgeable rift mechanic damage (aoePulse, stomp, bigCast: raw numbers
  * with no ground telegraph to step out of) may be VERY threatening but never a

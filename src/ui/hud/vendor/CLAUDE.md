@@ -4,9 +4,11 @@
 
 # src/ui/hud/vendor/: the vendor window family
 
-Four windows on one shape: vendor, heroic vendor, train, and the Maker's
-Bond unbind service, each a pure view core (`*_view.ts`, DOM-free) plus a
-thin window painter, exported only through `index.ts`.
+One shape shared by the whole family: vendor, heroic vendor, train, the
+Maker's Bond unbind service, and the WARFARE quartermaster honor shop
+(`warfare_vendor_window.ts`, root `#warfare-window`), each a pure view core
+(`*_view.ts`, DOM-free) plus a thin window painter, exported only through
+`index.ts` (plus the two siblings named below).
 
 ## The row idiom (shared; extend it, do not fork it)
 - Rows are inset cards: the `--color-border-showcase` hairline token, the
@@ -44,6 +46,29 @@ thin window painter, exported only through `index.ts`.
   `tests/vendor_window_painter.test.ts`.
 - Recipe knownness resolves through the shared `train_view.ts` viewer
   predicates (`isRecipeKnownForViewer`); never a second knownness rule.
+- The in-flight / confirmed Learn state itself lives in `train_learn_core.ts`
+  (`TrainLearnTracker`, pure): a Learn click opens a flight that disables the
+  row immediately; a confirmed trainResult overlays Known before the mirrored
+  known set catches up; flights expire after `TRAIN_PENDING_TTL_MS` so a
+  command lost to a disconnect cannot stick a row disabled forever (a re-send
+  is charge-safe: `train_already_known` resolves before any charging arm).
+
+## Named siblings and recorded decisions
+- `warfare_vendor_window.ts` deliberately shows NO set-bonus text and NO
+  owned-count / "N more for the next bonus" line: both shipped and were CUT
+  (set bonuses live in the item tooltip via the shared `itemSetBlock` path,
+  which every raid tier already uses). Do not add them back. The per-tile
+  Owned marker stays: honor purchases record no buyback, so it is the only
+  thing between a mis-tap and an unrefundable second copy. The view core
+  still exposes the tier/ownedPieces data for a future caller.
+- `buy_quantity_prompt_window.ts` is the custom arm of the 1x/5x/10x/custom
+  purchase row. Its cap derives from the sim's own bag-fit math
+  (`maxBuyCount`, `src/sim/vendor_buy_stack.ts`), so the shown maximum can never
+  promise a quantity the buy path's capacity pre-check would refuse. It
+  consumes the shared modal recipe `src/ui/prompt_dialog.ts` (inert vendor
+  root while open, all teardown through `dismiss()`);
+  `dismissBuyQuantityPrompts` is the force-close backstop the Hud close path
+  calls so the vendor root is never left inert while hidden.
 
 ## Cascade trap (this family specifically)
 Vendor-family rules with a pseudo-class (`.vendor-item:disabled:hover` and

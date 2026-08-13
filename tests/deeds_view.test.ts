@@ -135,6 +135,7 @@ function makeInput(over: Partial<DeedsViewInput> = {}): DeedsViewInput {
     deedStats: freshDeedStats(),
     renown: 0,
     activeTitle: null,
+    activeBorder: null,
     deeds: TEST_DEEDS,
     order: TEST_ORDER,
     category: 'combat',
@@ -384,6 +385,7 @@ describe('buildDeedsView', () => {
       feat: false,
       hiddenBadge: false,
       titleReward: true,
+      borderReward: false,
       crestId: 'deed_cat_combat',
     });
     // Unearned watched counter deed: watchable AND watched, no ribbons.
@@ -398,6 +400,7 @@ describe('buildDeedsView', () => {
       feat: false,
       hiddenBadge: false,
       titleReward: false,
+      borderReward: false,
       crestId: 'deed_cat_combat',
     });
   });
@@ -578,6 +581,135 @@ describe('buildDeedsView', () => {
     expect(fresh.titles).toEqual([{ id: null, active: true }]);
   });
 
+  // -------------------------------------------------------------------------
+  // The border picker (the titles picker's sibling). Its own catalog so the
+  // counts, category and entry pins above stay pinned to what they were
+  // written against; only the reward mix differs from TEST_DEEDS.
+  // -------------------------------------------------------------------------
+  const PICKER_DEEDS: Record<string, DeedDef> = {
+    b_first: {
+      id: 'b_first',
+      name: 'Warded Deep',
+      desc: 'A border-bearing triumph.',
+      category: 'dungeon',
+      renown: 25,
+      trigger: { kind: 'manual' },
+      reward: { kind: 'border', slug: 'test_deepward' },
+    },
+    t_only: {
+      id: 't_only',
+      name: 'Titled Task',
+      desc: 'A title-bearing triumph.',
+      category: 'combat',
+      renown: 25,
+      trigger: { kind: 'manual' },
+      reward: { kind: 'title', text: 'the Titled' },
+    },
+    b_second: {
+      id: 'b_second',
+      name: 'Gilded Shelf',
+      desc: 'A second border-bearing triumph.',
+      category: 'collection',
+      renown: 50,
+      trigger: { kind: 'manual' },
+      reward: { kind: 'border', slug: 'test_gilt' },
+    },
+    b_unearned: {
+      id: 'b_unearned',
+      name: 'Distant Frame',
+      desc: 'A border nobody here has earned.',
+      category: 'collection',
+      renown: 50,
+      trigger: { kind: 'manual' },
+      reward: { kind: 'border', slug: 'test_far' },
+    },
+  };
+  const PICKER_ORDER = Object.keys(PICKER_DEEDS);
+  const pickerInput = (over: Partial<DeedsViewInput> = {}): DeedsViewInput =>
+    makeInput({
+      deeds: PICKER_DEEDS,
+      order: PICKER_ORDER,
+      deedsEarned: new Map([
+        ['b_first', '2026-08-01'],
+        ['t_only', '2026-08-01'],
+        ['b_second', '2026-08-02'],
+      ]),
+      ...over,
+    });
+
+  it('lists earned border deeds in the picker with the active one marked', () => {
+    const view = buildDeedsView(pickerInput({ activeBorder: 'b_second' }));
+    // Catalog order behind the None head, and the ACTIVE flag tracks the input:
+    // b_second is worn, so None is not.
+    expect(view.borders).toEqual([
+      { id: null, active: false },
+      { id: 'b_first', active: false },
+      { id: 'b_second', active: true },
+    ]);
+  });
+
+  it('heads the border picker with None and marks it when nothing is worn', () => {
+    const view = buildDeedsView(pickerInput());
+    expect(view.borders[0]).toEqual({ id: null, active: true });
+    // Unearned border deeds never enter the picker, so the one nobody earned
+    // is absent even though the catalog holds it.
+    expect(view.borders.some((o) => o.id === 'b_unearned')).toBe(false);
+    // Nothing earned at all leaves only the None head.
+    const fresh = buildDeedsView(
+      makeInput({ deeds: PICKER_DEEDS, order: PICKER_ORDER, activeBorder: null }),
+    );
+    expect(fresh.borders).toEqual([{ id: null, active: true }]);
+  });
+
+  it('keeps the two reward pickers disjoint and leaves titles untouched', () => {
+    const view = buildDeedsView(pickerInput({ activeTitle: 't_only' }));
+    // A title deed never enters borders, and a border deed never enters titles.
+    expect(view.borders.map((o) => o.id)).not.toContain('t_only');
+    expect(view.titles).toEqual([
+      { id: null, active: false },
+      { id: 't_only', active: true },
+    ]);
+    // An active BORDER moves nothing on the titles list (and vice versa).
+    const borderWorn = buildDeedsView(
+      pickerInput({ activeTitle: 't_only', activeBorder: 'b_first' }),
+    );
+    expect(borderWorn.titles).toEqual(view.titles);
+  });
+
+  it('flags the reward chip on a border deed card and only there', () => {
+    const view = buildDeedsView(pickerInput({ category: 'dungeon' }));
+    const card = view.entries.find((e) => e.id === 'b_first');
+    expect(card?.borderReward).toBe(true);
+    expect(card?.titleReward).toBe(false);
+    const titled = buildDeedsView(pickerInput({ category: 'combat' })).entries.find(
+      (e) => e.id === 't_only',
+    );
+    expect(titled?.borderReward).toBe(false);
+    expect(titled?.titleReward).toBe(true);
+  });
+
+  it('builds the same border picker from a Sim-shaped and a mirror-shaped input', () => {
+    // The mirror decodes the self keys from wire-shaped plain JSON, so the
+    // border id round-trips through that shape before it is read back.
+    const wire = JSON.parse(JSON.stringify({ aborder: 'b_first' }));
+    const sim = buildDeedsView(pickerInput({ activeBorder: 'b_first' }));
+    const mirror = buildDeedsView(pickerInput({ activeBorder: wire.aborder }));
+    expect(mirror.borders).toEqual(sim.borders);
+    expect(sim.borders).toEqual([
+      { id: null, active: false },
+      { id: 'b_first', active: true },
+      { id: 'b_second', active: false },
+    ]);
+  });
+
+  it('marks a drifted active border inactive rather than inventing an option', () => {
+    // An id the catalog no longer knows: the sim will never echo it, so no
+    // option is active and None must not be marked either (nothing is worn
+    // that this client can name).
+    const view = buildDeedsView(pickerInput({ activeBorder: 'removed_deed' }));
+    expect(view.borders.every((o) => !o.active)).toBe(true);
+  });
+
   it('skips earned ids the catalog no longer knows (content drift), everywhere', () => {
     const view = buildDeedsView(
       makeInput({
@@ -667,13 +799,50 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 262 deeds - 3 feats - 9 hidden = 250 visible to a fresh character (the
+    // 271 deeds - 4 feats - 9 hidden = 258 visible to a fresh character (the
     // Drakelands brood pair, the four battleground deeds, the Rift coverage
-    // pair, the seven per-craft rare-tier profession deeds, and the twelve
-    // remaining starter-zone chronicle pairs, none a feat or hidden).
-    expect(view.summary.visibleTotal).toBe(250);
-    // The bucket sum adds the Feats shelf's own 3 rows back on top.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(253);
+    // pair, the seven per-craft rare-tier profession deeds, the twelve
+    // remaining starter-zone chronicle pairs, the four Reliquary Curator rank
+    // bridges, the three WARFARE honor ranks, and four of the five Phase 18
+    // Reliquary completion-ladder deeds; col_reliquary_complete is the
+    // catalog's one off-prefix feat, so it sits outside the completion
+    // denominator like the three feat_ deeds).
+    expect(view.summary.visibleTotal).toBe(258);
+    // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
+    // shelf plus the off-prefix capstone on Collection).
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(262);
+  });
+
+  it('offers exactly the live catalog border deeds once they are earned', () => {
+    // The four shipped border rewards, pinned as literals in DEED_ORDER order:
+    // a fifth border deed (or one re-homed in the order) has to move this pin,
+    // which is the moment to check it has an accent palette and picker copy.
+    const borderIds = [
+      'prog_prestige_10',
+      'dgn_deepward',
+      'col_discovery_250',
+      'col_reliquary_rank_5',
+    ];
+    const view = buildDeedsView(
+      makeInput({
+        deeds: DEEDS,
+        order: DEED_ORDER,
+        deedsEarned: new Map(borderIds.map((id) => [id, '2026-08-01'] as const)),
+        activeBorder: 'dgn_deepward',
+      }),
+    );
+    expect(view.borders).toEqual([
+      { id: null, active: false },
+      { id: 'prog_prestige_10', active: false },
+      { id: 'dgn_deepward', active: true },
+      { id: 'col_discovery_250', active: false },
+      { id: 'col_reliquary_rank_5', active: false },
+    ]);
+    // Every id the picker offers really carries a border reward (never a title
+    // deed leaking across).
+    for (const option of view.borders) {
+      if (option.id !== null) expect(DEEDS[option.id].reward?.kind).toBe('border');
+    }
   });
 
   it('maps every live catalog category onto a display bucket', () => {
@@ -759,6 +928,7 @@ describe('deedsRefreshSig', () => {
     renown: 15,
     earnedCount: 3,
     activeTitle: 'cmb_title',
+    activeBorder: 'dgn_border',
     filter: 'all',
     search: '',
     category: 'combat',
@@ -780,6 +950,9 @@ describe('deedsRefreshSig', () => {
       },
       (p) => {
         p.activeTitle = null;
+      },
+      (p) => {
+        p.activeBorder = null;
       },
       (p) => {
         p.filter = 'earned';
@@ -959,9 +1132,71 @@ describe('buildDeedUnlockPlan', () => {
       logIds: [],
       bannerId: null,
       titleHintIds: [],
+      borderHintIds: [],
       playSound: false,
       retroCount: 0,
     });
+  });
+
+  // The border hint is the title hint's sibling: three of the four live border
+  // deeds unlock with nothing pointing at the picker that wears them, so the
+  // plan has to carry them the same way. Extended locally rather than in the
+  // shared fixture, so the category/count arms elsewhere in this file are
+  // untouched.
+  const BORDER_DEEDS: Record<string, DeedDef> = {
+    ...TEST_DEEDS,
+    cmb_border: {
+      id: 'cmb_border',
+      name: 'Laurelled',
+      desc: 'A border deed.',
+      category: 'combat',
+      renown: 25,
+      trigger: { kind: 'manual' },
+      reward: { kind: 'border', slug: 'prestige_laurels' },
+    },
+  };
+
+  it('hints a border unlock, and never confuses it with a title unlock', () => {
+    const plan = buildDeedUnlockPlan([{ deedId: 'cmb_border' }], BORDER_DEEDS);
+    expect(plan.borderHintIds).toEqual(['cmb_border']);
+    // The two rewards share one field, so a kind-blind check would hint both.
+    expect(plan.titleHintIds).toEqual([]);
+    expect(plan.logIds).toEqual(['cmb_border']);
+  });
+
+  it('leaves the border hints empty for a title unlock', () => {
+    const plan = buildDeedUnlockPlan([{ deedId: 'cmb_title' }], BORDER_DEEDS);
+    expect(plan.titleHintIds).toEqual(['cmb_title']);
+    expect(plan.borderHintIds).toEqual([]);
+  });
+
+  it('carries both hint lists when one drain unlocks a title and a border', () => {
+    const plan = buildDeedUnlockPlan(
+      [{ deedId: 'cmb_title' }, { deedId: 'cmb_counter' }, { deedId: 'cmb_border' }],
+      BORDER_DEEDS,
+    );
+    expect(plan.titleHintIds).toEqual(['cmb_title']);
+    expect(plan.borderHintIds).toEqual(['cmb_border']);
+    expect(plan.logIds).toEqual(['cmb_title', 'cmb_counter', 'cmb_border']);
+    expect(plan.bannerId).toBe('cmb_border'); // still one banner, the last unlock
+  });
+
+  it('skips a prototype-key id instead of resolving it through the catalog', () => {
+    // The catalog is a plain object, so a bare index answers Object.prototype
+    // for '__proto__' and the id would be logged as a real unlock with no
+    // reward. Same hasOwn guard as the rest of the deed resolver family.
+    const plan = buildDeedUnlockPlan(
+      [{ deedId: '__proto__' }, { deedId: 'constructor' }, { deedId: 'cmb_counter' }],
+      TEST_DEEDS,
+    );
+    expect(plan.logIds).toEqual(['cmb_counter']);
+    expect(plan.bannerId).toBe('cmb_counter');
+  });
+
+  it('never hints a RETRO border (the on-join catch-up stays silent)', () => {
+    const plan = buildDeedUnlockPlan([{ deedId: 'cmb_border', retro: true }], BORDER_DEEDS);
+    expect(plan.borderHintIds).toEqual([]);
+    expect(plan.retroCount).toBe(1);
   });
 });
 

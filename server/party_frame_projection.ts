@@ -78,7 +78,7 @@ export class PartyFrameProjectionCache {
       if (!projection) continue;
       members.push({
         member: projection.member,
-        auras: preparePartyFrameAuras(projection.auras),
+        auras: preparePartyFrameAuras(projection.auras, projection.member.mhp),
       });
     }
     return {

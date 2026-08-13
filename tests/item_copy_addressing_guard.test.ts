@@ -39,6 +39,7 @@ const ADDRESSED_COMMANDS: ReadonlyArray<{ cmd: string; field: string; why?: stri
   { cmd: 'salvage_item', field: 'slot' },
   { cmd: 'disenchant_item', field: 'slot', why: 'the original precise surface' },
   { cmd: 'discard', field: 'slot' },
+  { cmd: 'lock_item', field: 'slot' },
   { cmd: 'sell', field: 'slot' },
   { cmd: 'use', field: 'slot' },
   { cmd: 'pet_feed', field: 'slot' },

@@ -123,6 +123,31 @@ describe('rift sim: dev portal + entry', () => {
     expect(portal?.riftTier).toBe('C');
   });
 
+  it('/dev riftmech spawns a portal whose floor 1 is guaranteed to carry the requested mechanic', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    for (const mech of ['ice', 'roller', 'lava', 'gate'] as const) {
+      sim.chat(`/dev riftmech ${mech}`, sim.player.id);
+      const portal = [...sim.entities.values()]
+        .filter((e) => e.templateId === 'rift_portal')
+        .pop()!;
+      expect(portal, mech).toBeTruthy();
+      const floor = generateRiftFloor(portal.riftSeed!, portal.riftBaseLevel!, 0);
+      if (mech === 'ice') expect(floor.iceZone, mech).not.toBeNull();
+      else if (mech === 'roller') expect(floor.rollers.length, mech).toBeGreaterThan(0);
+      else if (mech === 'lava') expect(floor.hazards.length, mech).toBeGreaterThan(0);
+      else expect(floor.gate, mech).not.toBeNull();
+    }
+  });
+
+  it('/dev riftmech rejects an unrecognized mechanic name', () => {
+    const sim = makeSim();
+    const before = [...sim.entities.values()].filter((e) => e.templateId === 'rift_portal').length;
+    sim.chat('/dev riftmech volcano', sim.player.id);
+    const after = [...sim.entities.values()].filter((e) => e.templateId === 'rift_portal').length;
+    expect(after).toBe(before); // the regex simply doesn't match, so nothing spawns
+  });
+
   it('walking into a letter-ranked dev portal enters an instance at that difficulty', () => {
     const sim = makeSim();
     sim.setPlayerLevel(20);

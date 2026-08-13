@@ -29,11 +29,22 @@ STEP 0 - PRE-FLIGHT
   0a692e8896, fix(test) 5215f712d7 (the three release art-program collision
   heals, deviations (ak)/(al)), test(economy) 22ee3a3857 (the QA-round pins),
   plus the docs commits. Phase 6b (docs/farming/phase-06b-release-sync.md, the
-  big-jump release sync) merges into feature/farming-plan AFTER the Phase 6
-  merge 1a26881d0b and is EXCLUDED from this QA's diff: it carries its own
-  audit, and its progress.md notes record its merge hash. If a Phase 6 pin was
-  legitimately re-recorded by the sync, judge the pin against the sync's
-  ledger entry, not against the Phase 6 numbers.]
+  big-jump release sync, EXECUTED 2026-08-13) merged into feature/farming-plan
+  AFTER the Phase 6 merge 1a26881d0b (its branch was cut off the packet
+  commit d15921bed6) and is EXCLUDED from this QA's diff: it carries its own
+  audit. Its commits are the
+  absorb merge 2c26b6db7b (release/v0.38.0 tip 952c183fc3), the golden
+  re-mint ddb718b95e (deviation (am)), the monolith extractions 7dbb21b605
+  (deviation (an)), the item-lock wiring a4c4c33598 (deviation (ao)), and its
+  docs commits; progress.md's Phase 6b Notes block is the full ledger. If a
+  Phase 6 pin was legitimately re-recorded by the sync (commands 201/214,
+  IWorld 327 = 88 + 239, delta keys 87, facets 34, golden md5 f017045f), judge
+  the pin against the sync's ledger entry, not against the Phase 6 numbers.
+  The sync also RELOCATED Phase 6-adjacent code without changing behavior:
+  the HUD farming feedback arms now live in src/ui/farm_event_feedback.ts and
+  the farming command bodies plus the fplot row in
+  server/farming_commands.ts; audit their content against the Phase 6-era
+  hud.ts/game.ts blocks, not as new logic.]
 - If the diff cannot be identified cleanly, stop and surface.
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus
   mutation-checks-commit-first, i18n-semantic-regressions-gate-trap,

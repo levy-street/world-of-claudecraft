@@ -199,7 +199,11 @@ export function classesThatCanEquipArmorType(armorType: ArmorType): PlayerClass[
 }
 
 export function canDualWield(cls: PlayerClass, spec?: string | null): boolean {
-  return cls === 'rogue' || (cls === 'warrior' && spec === 'fury');
+  return (
+    cls === 'rogue' ||
+    (cls === 'warrior' && spec === 'fury') ||
+    (cls === 'shaman' && spec === 'enhancement')
+  );
 }
 
 export function canDualWieldTwoHand(cls: PlayerClass, spec?: string | null): boolean {

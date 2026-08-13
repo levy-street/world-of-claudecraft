@@ -30,6 +30,7 @@ import {
   zoneAt,
 } from '../data';
 import { formatMoney } from '../format_money';
+import { COMBAT_SPIRIT_REGEN_FRACTION, FIVE_SECOND_RULE_SECONDS } from '../mana_regen';
 import { MARKET_MAX_LISTINGS } from '../market';
 import * as petCommands from '../pet/pet_commands';
 import { FALL_SAFE_DISTANCE, type PlayerMeta } from '../sim';
@@ -324,20 +325,21 @@ export function formReadout(e: Entity): string {
   return `You are in ${form.name}.`;
 }
 // Self-only readout of the five-second-rule mana state (#103 out-of-combat
-// regen). `fiveSecondRule` is the seconds elapsed since the player last spent
-// mana on an ability (reset to 0 at sim.ts cast path, bumped by DT each tick);
-// out-of-combat mana regen only ticks once it reaches FSR_THRESHOLD. Only
-// mana users have meaningful state here — rage/energy classes never spend mana.
+// regen, plus the Spirit-in-combat "mp5" regen). `fiveSecondRule` is the seconds
+// elapsed since the player last spent mana on an ability (reset to 0 at sim.ts
+// cast path, bumped by DT each tick). Spirit regen runs at the reduced combat
+// rate (COMBAT_SPIRIT_REGEN_FRACTION) while the rule is active, then at full rate
+// once it reaches FIVE_SECOND_RULE_SECONDS. Only mana users have meaningful state
+// here: rage/energy classes never spend mana.
 export function manaRegenReadout(e: Entity): string {
-  const FSR_THRESHOLD = 5; // matches the `fiveSecondRule >= 5` gate in updateRegen
   if (e.resourceType !== 'mana') {
     return 'Mana regeneration does not apply to your class.';
   }
-  if (e.fiveSecondRule >= FSR_THRESHOLD) {
-    return 'Your mana is regenerating (out of combat for 5s+).';
+  if (e.fiveSecondRule >= FIVE_SECOND_RULE_SECONDS) {
+    return 'Your mana is regenerating at full rate (out of combat for 5s+).';
   }
-  const resumesIn = Math.ceil(FSR_THRESHOLD - e.fiveSecondRule);
-  return `Mana regen is paused — resumes in ${resumesIn}s (you spent mana recently).`;
+  const resumesIn = Math.ceil(FIVE_SECOND_RULE_SECONDS - e.fiveSecondRule);
+  return `Your mana is regenerating at ${Math.round(COMBAT_SPIRIT_REGEN_FRACTION * 100)}% while in combat, full rate in ${resumesIn}s (you spent mana recently).`;
 }
 // Self-only readout of vertical/fall state — surfaces the otherwise-invisible
 // jump physics (sim.ts updatePlayerMovement). Reads only live Entity fields and

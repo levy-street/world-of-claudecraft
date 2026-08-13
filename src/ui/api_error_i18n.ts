@@ -76,6 +76,8 @@ export const API_ERROR_KEYS = {
   'character.already_in_world': 'apiError.character.already_in_world',
   'character.taken_over': 'apiError.character.taken_over',
   'character.rename_required': 'apiError.character.rename_required',
+  'character.invalid_appearance': 'apiError.character.invalid_appearance',
+  'character.reroll_unavailable': 'apiError.character.reroll_unavailable',
 
   // moderation: enforcement states set by a moderator.
   'moderation.suspended_until': 'apiError.moderation.suspended_until',

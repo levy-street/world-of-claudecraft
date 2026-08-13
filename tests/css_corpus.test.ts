@@ -116,6 +116,8 @@ const CORPUS = [
   inlineStyleCss('play.html'),
   extractedStyleCss(),
 ].join('\n');
+const MOBILE_HUD_CSS = readFileSync(join(stylesDir, 'hud.mobile.css'), 'utf8');
+const DESKTOP_HUD_CSS = readFileSync(join(stylesDir, 'hud.css'), 'utf8');
 const CORPUS_SECTIONS = new Set(sectionNames(CORPUS));
 
 // PINNED manifest: the ten-dash section banners, enumerated live from the shipped
@@ -247,6 +249,26 @@ describe('css_corpus section completeness (inline UNION src/styles)', () => {
       `section banners missing from index/play inline <style> UNION src/styles/*.css ` +
         `(a section dropped during CSS extraction, or a renamed banner):\n${missing.join('\n')}`,
     ).toEqual([]);
+  });
+});
+
+describe('Paladin Ascension action indicators remain accessible across HUD tiers', () => {
+  it('stops the mobile empowered pulse when reduced motion is requested', () => {
+    expect(MOBILE_HUD_CSS).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?#mobile-action-ring button\.empowered\s*\{\s*animation:\s*none;/,
+    );
+  });
+
+  it('restores system colors for the mobile cost badge after mobile-layer styling', () => {
+    expect(MOBILE_HUD_CSS).toMatch(
+      /@media \(forced-colors: active\)[\s\S]*?#mobile-action-ring button\.ascension-spender::after\s*\{[\s\S]*?border-color:\s*Highlight;[\s\S]*?background:\s*Canvas;[\s\S]*?color:\s*Highlight;/,
+    );
+  });
+
+  it('renders the localized painter-provided cost instead of a CSS number literal', () => {
+    expect(DESKTOP_HUD_CSS).toContain('content: attr(data-ascension-cost);');
+    expect(MOBILE_HUD_CSS).toContain('content: attr(data-ascension-cost);');
+    expect(`${DESKTOP_HUD_CSS}\n${MOBILE_HUD_CSS}`).not.toMatch(/content:\s*["']-1["']/);
   });
 });
 

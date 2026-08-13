@@ -13,15 +13,27 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { BG_HALF_X, BG_HALF_Z, bgFieldPlanWalls } from '../src/sim/battleground_layout';
 import { battlegroundOrigin, GATHER_NODES, QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
 import { TH_GRAVEYARDS } from '../src/sim/thornhollow_field.generated';
-import { isQuestTurnInNpc } from '../src/sim/types';
+import { EASTBROOK_NOTICEBOARD_TEMPLATE_ID, isQuestTurnInNpc } from '../src/sim/types';
 import {
   BG_SURFACE_GRASS,
   BG_SURFACE_GRAVE,
   bgFieldSurfaceAt,
 } from '../src/ui/bg_field_relief_core';
 import { bgAtlasMarks } from '../src/ui/hud/battleground';
-import { createMinimapMarkers } from '../src/ui/minimap_markers';
 import {
+  MAP_MARKER_ART_IDS,
+  MAP_MARKER_SIZES,
+  type MapMarkerArt,
+  type MapMarkerArtId,
+  type MapMarkerSize,
+} from '../src/ui/map_marker_icon_art';
+import {
+  createMinimapMarkers,
+  type MinimapMarker,
+  type MinimapObjectSemantic,
+} from '../src/ui/minimap_markers';
+import {
+  type MinimapColors,
   MinimapPainter,
   MINIMAP_COLOR_TOKENS as PAINTER_TOKEN_TABLE,
 } from '../src/ui/minimap_painter';
@@ -122,21 +134,6 @@ describe('minimap_painter: no magic values (canvas sub-rule)', () => {
 });
 
 describe('minimap_painter: cached background + ~10Hz cadence preserved', () => {
-  it('a locked node carries the non-hue strike on both respawn silhouettes', () => {
-    // DESIGN.md color independence: the lock state must never ride tint
-    // alone. The strike sits AFTER the ready/else fill split, gated on the
-    // lock alone, so both silhouettes carry it.
-    const nodeCase = sliceFrom(code, "case 'gather-node'", 'break;');
-    const strikeAt = nodeCase.indexOf('if (m.locked)');
-    expect(strikeAt).toBeGreaterThan(-1);
-    const strike = nodeCase.slice(strikeAt);
-    expect(strike).toContain('moveTo');
-    expect(strike).toContain('lineTo');
-    // Reachable from BOTH branches: the cooldown fill precedes it.
-    expect(nodeCase.indexOf('gatherCooldown')).toBeLessThan(strikeAt);
-    expect(nodeCase.indexOf('gatherReady')).toBeLessThan(strikeAt);
-  });
-
   it('blits the Hud-owned cached terrain background rather than rebuilding it', () => {
     // The painter receives the cached bg and only drawImages it (no terrain build).
     expect(code).toContain('ctx.drawImage(');
@@ -147,9 +144,11 @@ describe('minimap_painter: cached background + ~10Hz cadence preserved', () => {
   });
 
   it("still redraws updateMinimap from hud.update()'s fastHud (~10Hz) band", () => {
-    // The minimap stays gated on the fast band, NOT every frame (graphics tiering may later throttle it).
+    // The minimap stays gated on the fast band, NOT every frame. Ordinary low-tier
+    // maps retain their cost throttle, but Rift lethal mechanics must never inherit it.
     expect(hud).toContain('const fastHud = now - this.lastHudFastAt >= 100;');
     expect(hud).toContain('this.updateMinimap();');
+    expect(hud).toContain("minimapRedrawIntervalMs(fxTier, minimapMode(this.sim) === 'rift')");
   });
 
   it("routes the '#zone-label' text through the elided setText (the one DOM write)", () => {
@@ -215,8 +214,8 @@ describe('minimap_painter: cached background + ~10Hz cadence preserved', () => {
 // NPC glyph sprite cache, driven through a fake 2D context.
 //
 // Every canvas text entry point (the ctx.font setter, fillText, measureText) re-resolves
-// font state against the document, so a per-marker fillText loop costs in proportion to
-// how dirty the style tree is. The glyph rasterizes ONCE into a per-(glyph, color) sprite
+// font state against the document, so a per-marker text loop costs in proportion to
+// how dirty the style tree is. The glyph rasterizes ONCE into a per-(glyph, fill, outline) sprite
 // and each redraw blits it, which is flat. These are behavior pins: the anchor arithmetic,
 // the whole-pixel rounding, the sprite geometry, and the cache actually being consulted.
 
@@ -229,12 +228,32 @@ interface SpriteInk {
   fillStyle: string;
 }
 
+/** One recorded `strokeText` into a sprite's own context. */
+interface SpriteOutline extends SpriteInk {
+  strokeStyle: string;
+  lineWidth: number;
+  lineJoin: CanvasLineJoin;
+}
+
 /** A fake offscreen canvas standing in for a glyph sprite. */
 interface FakeSprite {
   width: number;
   height: number;
   ink: SpriteInk[];
+  outlines: SpriteOutline[];
+  textPasses: Array<'stroke' | 'fill'>;
   getContext(kind: string): unknown;
+}
+
+/** A successful painted marker sprite returned by the injected art seam. */
+interface FakeMarkerSprite {
+  markerId: MapMarkerArtId;
+  sizeId: MapMarkerSize;
+}
+
+interface MarkerArtCall {
+  id: MapMarkerArtId;
+  size: MapMarkerSize;
 }
 
 interface GlyphTrace {
@@ -242,6 +261,13 @@ interface GlyphTrace {
    *  with the context's globalAlpha AT BLIT TIME (the cooldown dim rides the
    *  blit, never the sprite raster). */
   blits: Array<{ sprite: FakeSprite; dx: number; dy: number; alpha: number }>;
+  /** Successful stable-marker blits, kept separate from NPC glyph sprites. */
+  markerBlits: Array<{
+    sprite: FakeMarkerSprite;
+    dx: number;
+    dy: number;
+    alpha: number;
+  }>;
   /** Every canvas created through `document.createElement('canvas')`. */
   sprites: FakeSprite[];
   /** Any text drawn straight onto the MINIMAP context (must stay zero). */
@@ -249,13 +275,44 @@ interface GlyphTrace {
   /** Any `ctx.font` assignment on the MINIMAP context (must stay zero). */
   minimapFontWrites: number;
   color: string;
+  outlineColor: string;
   /** Line segments the MINIMAP context path-built, marked when a stroke()
    *  actually rasterized them (the lock-strike decisiveness rig: a built
    *  but never-stroked path draws nothing). */
   segments: Array<{ fromX: number; fromY: number; toX: number; toY: number; stroked: boolean }>;
+  /** Arcs that reached fill(), used to prove a missing/unsupported sprite takes
+   *  the procedural portal fallback rather than disappearing. */
+  filledArcs: Array<{ x: number; y: number; radius: number }>;
+  /** Arcs that reached stroke(), including their resolved treatment. */
+  strokedArcs: Array<{
+    x: number;
+    y: number;
+    radius: number;
+    strokeStyle: string;
+    lineWidth: number;
+  }>;
+  /** Command grammar and treatment of each stroked immediate-mode path. This
+   *  pins punctuation identity without coupling the test to one screen pixel. */
+  strokedPaths: Array<{
+    commands: string[];
+    strokeStyle: string;
+    lineWidth: number;
+  }>;
+  /** Immediate-mode rectangle paints. A hollow lootable-corpse marker uses
+   *  these instead of depending on color alone. */
+  rects: Array<{
+    op: 'fill' | 'stroke';
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    color: string;
+    lineWidth: number;
+  }>;
 }
 
 const NPC_QUEST_TOKEN = '--color-minimap-npc-quest';
+const MINIMAP_OUTLINE_TOKEN = '--color-minimap-outline';
 // A real quest whose giver is also its turn-in npc, so one npc template carries both
 // the 'available' ('!') and 'ready' ('?') branches against real content.
 function requireReadyQuest() {
@@ -269,21 +326,42 @@ const READY_QUEST = requireReadyQuest();
 
 function makeFakeSprite(trace: GlyphTrace): FakeSprite {
   const ink: SpriteInk[] = [];
+  const outlines: SpriteOutline[] = [];
+  const textPasses: Array<'stroke' | 'fill'> = [];
   const sctx = {
     font: '',
     fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    lineJoin: 'miter' as CanvasLineJoin,
     // globalAlpha + fillRect are what ensureMazeBg draws its wall slabs with; the glyph
     // sprite itself only ever needs font/fillStyle/fillText.
     globalAlpha: 1,
     fillRect(): void {},
     fillText(glyph: string, x: number, y: number): void {
       ink.push({ glyph, x, y, font: sctx.font, fillStyle: sctx.fillStyle });
+      textPasses.push('fill');
+    },
+    strokeText(glyph: string, x: number, y: number): void {
+      outlines.push({
+        glyph,
+        x,
+        y,
+        font: sctx.font,
+        fillStyle: sctx.fillStyle,
+        strokeStyle: sctx.strokeStyle,
+        lineWidth: sctx.lineWidth,
+        lineJoin: sctx.lineJoin,
+      });
+      textPasses.push('stroke');
     },
   };
   const sprite: FakeSprite = {
     width: 0,
     height: 0,
     ink,
+    outlines,
+    textPasses,
     getContext: (kind: string) => (kind === '2d' ? sctx : null),
   };
   trace.sprites.push(sprite);
@@ -291,6 +369,10 @@ function makeFakeSprite(trace: GlyphTrace): FakeSprite {
 }
 
 function installGlyphGlobals(trace: GlyphTrace, spriteContext = true): void {
+  const resolvedColors = new Map<string, () => string>([
+    [NPC_QUEST_TOKEN, () => trace.color],
+    [MINIMAP_OUTLINE_TOKEN, () => trace.outlineColor],
+  ]);
   vi.stubGlobal('document', {
     documentElement: {},
     createElement(tag: string): unknown {
@@ -302,25 +384,64 @@ function installGlyphGlobals(trace: GlyphTrace, spriteContext = true): void {
   });
   vi.stubGlobal('getComputedStyle', () => ({
     // Distinguish the quest token so a mis-keyed cache shows up as the wrong color.
-    getPropertyValue: (token: string) =>
-      token === NPC_QUEST_TOKEN ? trace.color : `paint:${token}`,
+    getPropertyValue: (token: string) => resolvedColors.get(token)?.() ?? `paint:${token}`,
   }));
 }
 
 function newTrace(): GlyphTrace {
   return {
     blits: [],
+    markerBlits: [],
     sprites: [],
     minimapTextCalls: 0,
     minimapFontWrites: 0,
     color: 'quest-a',
+    outlineColor: 'paint:--color-minimap-outline',
     segments: [],
+    filledArcs: [],
+    strokedArcs: [],
+    strokedPaths: [],
+    rects: [],
+  };
+}
+
+function isMarkerSprite(image: unknown): image is FakeMarkerSprite {
+  return typeof image === 'object' && image !== null && 'markerId' in image;
+}
+
+/** Fake MapMarkerArt with an explicit success set. Every request is recorded,
+ *  including misses, so fallback and size routing are both observable. */
+function fakeMarkerArt(available: readonly MapMarkerArtId[]): {
+  art: MapMarkerArt;
+  calls: MarkerArtCall[];
+} {
+  const calls: MarkerArtCall[] = [];
+  const allowed = new Set(available);
+  const sprites = new Map<string, FakeMarkerSprite>();
+  return {
+    calls,
+    art: {
+      sprite(id, size): CanvasImageSource | null {
+        calls.push({ id, size });
+        if (!allowed.has(id)) return null;
+        const key = `${id}:${size}`;
+        let sprite = sprites.get(key);
+        if (!sprite) {
+          sprite = { markerId: id, sizeId: size };
+          sprites.set(key, sprite);
+        }
+        return sprite as unknown as CanvasImageSource;
+      },
+      preload(): void {},
+    },
   };
 }
 
 function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
   let font = '';
   let alpha = 1;
+  let pendingArcs: GlyphTrace['filledArcs'] = [];
+  let pendingCommands: string[] = [];
   const ctx = {
     fillStyle: '',
     strokeStyle: '',
@@ -346,9 +467,14 @@ function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
       trace.minimapTextCalls++;
     },
     drawImage(image: unknown, ...rest: number[]): void {
-      // The 3-argument form is a glyph sprite; the terrain sub-rect blit passes 9.
+      // The 3-argument form is a glyph or painted-marker sprite; the terrain
+      // sub-rect blit passes 9.
       if (rest.length === 2) {
-        trace.blits.push({ sprite: image as FakeSprite, dx: rest[0], dy: rest[1], alpha });
+        if (isMarkerSprite(image)) {
+          trace.markerBlits.push({ sprite: image, dx: rest[0], dy: rest[1], alpha });
+        } else {
+          trace.blits.push({ sprite: image as FakeSprite, dx: rest[0], dy: rest[1], alpha });
+        }
       }
     },
     clearRect(): void {},
@@ -357,34 +483,102 @@ function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
     beginPath(): void {
       pathStart = null;
       pending.length = 0;
+      pendingArcs = [];
+      pendingCommands = [];
     },
-    closePath(): void {},
+    closePath(): void {
+      pendingCommands.push('closePath');
+    },
     clip(): void {},
-    arc(): void {},
+    arc(x: number, y: number, radius: number): void {
+      pendingCommands.push('arc');
+      pendingArcs.push({ x, y, radius });
+    },
     moveTo(x: number, y: number): void {
+      pendingCommands.push('moveTo');
       pathStart = { x, y };
     },
     lineTo(x: number, y: number): void {
+      pendingCommands.push('lineTo');
       if (pathStart !== null) {
         pending.push({ fromX: pathStart.x, fromY: pathStart.y, toX: x, toY: y, stroked: false });
       }
       pathStart = { x, y };
     },
-    fill(): void {},
+    fill(): void {
+      trace.filledArcs.push(...pendingArcs);
+    },
     stroke(): void {
+      trace.strokedPaths.push({
+        commands: [...pendingCommands],
+        strokeStyle: String(ctx.strokeStyle),
+        lineWidth: ctx.lineWidth,
+      });
       for (const seg of pending) {
         seg.stroked = true;
         trace.segments.push(seg);
       }
+      for (const arc of pendingArcs) {
+        trace.strokedArcs.push({
+          ...arc,
+          strokeStyle: String(ctx.strokeStyle),
+          lineWidth: ctx.lineWidth,
+        });
+      }
       pending.length = 0;
     },
-    fillRect(): void {},
+    fillRect(x: number, y: number, width: number, height: number): void {
+      trace.rects.push({
+        op: 'fill',
+        x,
+        y,
+        width,
+        height,
+        color: String(ctx.fillStyle),
+        lineWidth: ctx.lineWidth,
+      });
+    },
+    strokeRect(x: number, y: number, width: number, height: number): void {
+      trace.rects.push({
+        op: 'stroke',
+        x,
+        y,
+        width,
+        height,
+        color: String(ctx.strokeStyle),
+        lineWidth: ctx.lineWidth,
+      });
+    },
     translate(): void {},
     rotate(): void {},
   };
   let pathStart: { x: number; y: number } | null = null;
   const pending: GlyphTrace['segments'] = [];
   return ctx as unknown as CanvasRenderingContext2D;
+}
+
+const SYMBOL_COLORS = Object.fromEntries(
+  Object.keys(PAINTER_TOKEN_TABLE).map((key) => [key, `paint:${key}`]),
+) as MinimapColors;
+
+/** Exercise the actual private immediate-mode draw loop without making entity
+ *  classification part of these painter-only silhouette assertions. */
+function drawSymbols(
+  markers: readonly MinimapMarker[],
+  profile: 'standard' | 'compact' = 'standard',
+  markerArt?: MapMarkerArt,
+): GlyphTrace {
+  const trace = newTrace();
+  const painter = newPainter(markerArt) as unknown as {
+    drawMarkers(
+      ctx: CanvasRenderingContext2D,
+      markers: readonly MinimapMarker[],
+      colors: MinimapColors,
+      profile?: 'standard' | 'compact',
+    ): void;
+  };
+  painter.drawMarkers(fakeMinimapContext(trace), markers, SYMBOL_COLORS, profile);
+  return trace;
 }
 
 // The player sits at an overworld position with no gather node or station in the rim.
@@ -451,13 +645,18 @@ function glyphWorld(
   } as unknown as IWorld;
 }
 
-function newPainter(): MinimapPainter {
+function newPainter(
+  markerArt?: MapMarkerArt,
+  markerProfile: () => 'standard' | 'compact' = () => 'standard',
+): MinimapPainter {
   return new MinimapPainter(
     { setText: () => {} } as never,
     () => 'cls-color',
     (zoneId: string) => zoneId,
     (name: string, rank: string | null) => (rank ? `${name} ${rank}` : name),
     () => 'Thornhollow Fields',
+    markerArt,
+    markerProfile,
   );
 }
 
@@ -474,13 +673,386 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('minimap_painter: the lock strike RASTERIZES on both silhouettes (decisive trace)', () => {
-  // The phase 14 QA proved the source-order pin above gameable (moving the
-  // strike inside the cooldown-only branch passed all four assertions).
-  // This drives the real paint through the segment-tracing context: a
-  // stroked up-right diagonal must exist for a locked node on BOTH respawn
-  // silhouettes and never for an unlocked one, which also fails if the
-  // stroke() call is dropped (a built path that never rasterizes).
+describe('minimap_painter: tiny procedural symbols carry identity without hue', () => {
+  it('draws a friend as an outlined circle and a guildmate as an outlined diamond', () => {
+    const friend = drawSymbols([{ kind: 'ally', mx: 20, my: 30, ally: 'friend' }]);
+    const guild = drawSymbols([{ kind: 'ally', mx: 20, my: 30, ally: 'guild' }]);
+
+    expect(friend.filledArcs).toEqual([{ x: 20, y: 30, radius: 3 }]);
+    expect(friend.strokedArcs).toEqual([
+      {
+        x: 20,
+        y: 30,
+        radius: 3,
+        strokeStyle: 'paint:outline',
+        lineWidth: 1.5,
+      },
+    ]);
+    expect(friend.segments).toEqual([]);
+
+    expect(guild.filledArcs).toEqual([]);
+    expect(guild.strokedArcs).toEqual([]);
+    expect(guild.segments).toEqual([
+      { fromX: 20, fromY: 26.5, toX: 23.5, toY: 30, stroked: true },
+      { fromX: 23.5, fromY: 30, toX: 20, toY: 33.5, stroked: true },
+      { fromX: 20, fromY: 33.5, toX: 16.5, toY: 30, stroked: true },
+    ]);
+  });
+
+  it('gives loose loot, calm mobs, aggro mobs, and lootable corpses four silhouettes', () => {
+    const looseLoot = drawSymbols([{ kind: 'object-loot', mx: 20, my: 30 }]);
+    const calmMob = drawSymbols([{ kind: 'mob', mx: 20, my: 30, aggro: false }]);
+    const aggroMob = drawSymbols([{ kind: 'mob', mx: 20, my: 30, aggro: true }]);
+    const mobLoot = drawSymbols([{ kind: 'mob-loot', mx: 20, my: 30 }]);
+
+    // Loose loot is an eight-point sparkle. The fake records the seven explicit
+    // edges; closePath supplies the eighth in the real canvas.
+    expect(looseLoot.segments).toHaveLength(7);
+    expect(looseLoot.segments[0]).toEqual({
+      fromX: 20,
+      fromY: 26,
+      toX: 21,
+      toY: 29,
+      stroked: true,
+    });
+    expect(looseLoot.strokedArcs).toEqual([]);
+    expect(looseLoot.rects).toEqual([]);
+
+    expect(calmMob.strokedArcs).toEqual([
+      {
+        x: 20,
+        y: 30,
+        radius: 2.25,
+        strokeStyle: 'paint:outline',
+        lineWidth: 1.25,
+      },
+    ]);
+    expect(calmMob.segments).toEqual([]);
+
+    expect(aggroMob.strokedArcs).toEqual([]);
+    expect(aggroMob.segments).toEqual([
+      { fromX: 20, fromY: 26.5, toX: 23.5, toY: 30, stroked: true },
+      { fromX: 23.5, fromY: 30, toX: 20, toY: 33.5, stroked: true },
+      { fromX: 20, fromY: 33.5, toX: 16.5, toY: 30, stroked: true },
+    ]);
+
+    expect(mobLoot.strokedArcs).toEqual([]);
+    expect(mobLoot.segments).toEqual([]);
+    expect(mobLoot.rects).toEqual([
+      {
+        op: 'fill',
+        x: 17.5,
+        y: 27.5,
+        width: 5,
+        height: 5,
+        color: 'paint:mobLoot',
+        lineWidth: 1.25,
+      },
+      {
+        op: 'stroke',
+        x: 17.5,
+        y: 27.5,
+        width: 5,
+        height: 5,
+        color: 'paint:outline',
+        lineWidth: 1.25,
+      },
+      {
+        op: 'fill',
+        x: 19.25,
+        y: 29.25,
+        width: 1.5,
+        height: 1.5,
+        color: 'paint:outline',
+        lineWidth: 1.25,
+      },
+    ]);
+  });
+
+  it('crosses out dead party discs and arrows while leaving live silhouettes clean', () => {
+    const liveDisc = drawSymbols([
+      { kind: 'party-disc', mx: 20, my: 30, radius: 5, cls: 'mage', dead: false, pip: true },
+    ]);
+    const deadDisc = drawSymbols([
+      { kind: 'party-disc', mx: 20, my: 30, radius: 5, cls: 'mage', dead: true, pip: false },
+    ]);
+    const liveArrow = drawSymbols([
+      { kind: 'party-arrow', mx: 20, my: 30, angle: 0, cls: 'mage', dead: false },
+    ]);
+    const deadArrow = drawSymbols([
+      { kind: 'party-arrow', mx: 20, my: 30, angle: 0, cls: 'mage', dead: true },
+    ]);
+
+    expect(liveDisc.segments).toEqual([]);
+    expect(deadDisc.segments).toEqual([
+      { fromX: 17.25, fromY: 27.25, toX: 22.75, toY: 32.75, stroked: true },
+      { fromX: 22.75, fromY: 27.25, toX: 17.25, toY: 32.75, stroked: true },
+    ]);
+    // The first two segments are the arrow body. Only the dead arrow adds the
+    // two short crossing strokes inside it.
+    expect(liveArrow.segments).toHaveLength(2);
+    expect(deadArrow.segments.slice(2)).toEqual([
+      { fromX: -2.5, fromY: -2.5, toX: 2.5, toY: 2.5, stroked: true },
+      { fromX: 2.5, fromY: -2.5, toX: -2.5, toY: 2.5, stroked: true },
+    ]);
+  });
+
+  it('keeps dungeon entrance and exit fallbacks distinct and dark-outlined', () => {
+    const entrance = drawSymbols([{ kind: 'portal', mx: 20, my: 30, portal: 'dungeon-entrance' }]);
+    const exit = drawSymbols([{ kind: 'portal', mx: 20, my: 30, portal: 'dungeon-exit' }]);
+
+    expect(entrance.filledArcs).toEqual([
+      { x: 20, y: 30, radius: 3.5 },
+      { x: 20, y: 30, radius: 1.25 },
+    ]);
+    expect(entrance.strokedArcs).toEqual([
+      {
+        x: 20,
+        y: 30,
+        radius: 3.5,
+        strokeStyle: 'paint:outline',
+        lineWidth: 1.5,
+      },
+    ]);
+    expect(entrance.segments).toEqual([]);
+
+    // Exit is an outlined upward arrow, never another portal dot.
+    expect(exit.filledArcs).toEqual([]);
+    expect(exit.strokedArcs).toEqual([]);
+    expect(exit.segments).toEqual([
+      { fromX: 20, fromY: 26, toX: 23.5, toY: 30, stroked: true },
+      { fromX: 23.5, fromY: 30, toX: 21.5, toY: 30, stroked: true },
+      { fromX: 21.5, fromY: 30, toX: 21.5, toY: 33.5, stroked: true },
+      { fromX: 21.5, fromY: 33.5, toX: 18.5, toY: 33.5, stroked: true },
+      { fromX: 18.5, fromY: 33.5, toX: 18.5, toY: 30, stroked: true },
+      { fromX: 18.5, fromY: 30, toX: 16.5, toY: 30, stroked: true },
+    ]);
+  });
+
+  it.each([
+    { navigation: 'delve-entrance', id: 'delve-entrance' },
+    { navigation: 'world-passage', id: 'world-passage' },
+  ] as const)('blits cached $id art for stable routes on both profiles', ({ navigation, id }) => {
+    for (const [profile, size] of [
+      ['standard', 'minimapNavigation'],
+      ['compact', 'minimapNavigationCompact'],
+    ] as const) {
+      const markerArt = fakeMarkerArt([id]);
+      const trace = drawSymbols(
+        [{ kind: 'stable-navigation', mx: 20, my: 30, navigation }],
+        profile,
+        markerArt.art,
+      );
+      expect(markerArt.calls).toEqual([{ id, size }]);
+      expect(trace.markerBlits).toEqual([
+        {
+          sprite: { markerId: id, sizeId: size },
+          dx: Math.round(20 - MAP_MARKER_SIZES[size] / 2),
+          dy: Math.round(30 - MAP_MARKER_SIZES[size] / 2),
+          alpha: 1,
+        },
+      ]);
+      expect(trace.minimapTextCalls).toBe(0);
+      expect(trace.minimapFontWrites).toBe(0);
+    }
+  });
+
+  it('keeps delve-door and world-passage loading fallbacks visually distinct', () => {
+    const delve = drawSymbols([
+      { kind: 'stable-navigation', mx: 20, my: 30, navigation: 'delve-entrance' },
+    ]);
+    const passage = drawSymbols([
+      { kind: 'stable-navigation', mx: 20, my: 30, navigation: 'world-passage' },
+    ]);
+    const operations = (trace: GlyphTrace) => [trace.segments, trace.filledArcs, trace.rects];
+    expect(operations(delve)).not.toEqual(operations(passage));
+    expect(delve.minimapTextCalls + passage.minimapTextCalls).toBe(0);
+    expect(delve.minimapFontWrites + passage.minimapFontWrites).toBe(0);
+  });
+
+  it('draws every semantic-object family and rift mechanic without canvas text', () => {
+    const semantics: MinimapObjectSemantic[] = [
+      { kind: 'rift-entrance', rank: 'S' },
+      { kind: 'rift-descent' },
+      { kind: 'rift-return', route: 'beacon', rank: null },
+      { kind: 'rift-return', route: 'egress', rank: 'A' },
+      { kind: 'rift-reward', reward: 'treasure', state: 'available' },
+      { kind: 'rift-reward', reward: 'cache', state: 'locked' },
+      { kind: 'rift-reward', reward: 'cache', state: 'opened' },
+      { kind: 'rift-reward', reward: 'cache', state: 'jammed' },
+      { kind: 'delve-passage', state: 'sealed' },
+      { kind: 'delve-passage', state: 'open' },
+      { kind: 'delve-surface' },
+      { kind: 'delve-reward', reward: 'cache', state: 'locked', bountiful: true },
+      { kind: 'delve-reward', reward: 'reliquary', state: 'ready', bountiful: false },
+      { kind: 'delve-reward', reward: 'reliquary', state: 'active', bountiful: false },
+      { kind: 'delve-reward', reward: 'reliquary', state: 'opened', bountiful: false },
+      { kind: 'rift-mechanic', mechanic: 'pylon', state: 'unlit' },
+      { kind: 'rift-mechanic', mechanic: 'pylon', state: 'lit' },
+      { kind: 'rift-mechanic', mechanic: 'sequence-rune', state: 'unlit' },
+      { kind: 'rift-mechanic', mechanic: 'ice-goal', state: 'target' },
+      { kind: 'rift-mechanic', mechanic: 'boulder-pad', state: 'target' },
+      { kind: 'rift-mechanic', mechanic: 'boulder', state: 'movable' },
+      { kind: 'rift-mechanic', mechanic: 'boulder', state: 'placed' },
+      { kind: 'rift-mechanic', mechanic: 'gate', state: 'sealed' },
+      { kind: 'rift-mechanic', mechanic: 'gate', state: 'open' },
+      { kind: 'rift-mechanic', mechanic: 'switch', state: 'ready' },
+      { kind: 'rift-mechanic', mechanic: 'switch', state: 'on' },
+      { kind: 'rift-mechanic', mechanic: 'orb', state: 'dormant' },
+      { kind: 'rift-mechanic', mechanic: 'orb', state: 'active' },
+      { kind: 'rift-mechanic', mechanic: 'roller', state: 'hazard' },
+    ];
+    for (const semantic of semantics) {
+      const trace = drawSymbols([{ kind: 'semantic-object', mx: 20, my: 30, semantic }]);
+      const operations =
+        trace.segments.length +
+        trace.filledArcs.length +
+        trace.strokedArcs.length +
+        trace.rects.length;
+      expect(operations, JSON.stringify(semantic)).toBeGreaterThan(0);
+      expect(trace.minimapTextCalls, JSON.stringify(semantic)).toBe(0);
+      expect(trace.minimapFontWrites, JSON.stringify(semantic)).toBe(0);
+    }
+  });
+
+  it.each([
+    {
+      semantic: { kind: 'rift-entrance', rank: 'S' },
+      id: 'rift-entrance',
+      standard: 'minimapNavigationRankS',
+      compact: 'minimapNavigationRankSCompact',
+    },
+    {
+      semantic: { kind: 'rift-return', route: 'beacon', rank: null },
+      id: 'rift-beacon',
+      standard: 'minimapNavigation',
+      compact: 'minimapNavigationCompact',
+    },
+    {
+      semantic: { kind: 'rift-reward', reward: 'cache', state: 'jammed' },
+      id: 'reward-locked-cache',
+      standard: 'minimapRewardJammed',
+      compact: 'minimapRewardJammedCompact',
+    },
+    {
+      semantic: {
+        kind: 'delve-reward',
+        reward: 'reliquary',
+        state: 'active',
+        bountiful: true,
+      },
+      id: 'reward-reliquary',
+      standard: 'minimapRewardActiveBountiful',
+      compact: 'minimapRewardActiveBountifulCompact',
+    },
+    {
+      semantic: { kind: 'delve-passage', state: 'sealed' },
+      id: 'delve-passage',
+      standard: 'minimapNavigationLocked',
+      compact: 'minimapNavigationLockedCompact',
+    },
+  ] as const)(
+    'blits cached $id art for semantic state on both profiles',
+    ({ semantic, id, standard, compact }) => {
+      for (const [profile, size] of [
+        ['standard', standard],
+        ['compact', compact],
+      ] as const) {
+        const markerArt = fakeMarkerArt([id]);
+        const trace = drawSymbols(
+          [{ kind: 'semantic-object', mx: 20, my: 30, semantic }],
+          profile,
+          markerArt.art,
+        );
+        expect(markerArt.calls).toEqual([{ id, size }]);
+        expect(trace.markerBlits).toEqual([
+          {
+            sprite: { markerId: id, sizeId: size },
+            dx: Math.round(20 - MAP_MARKER_SIZES[size] / 2),
+            dy: Math.round(30 - MAP_MARKER_SIZES[size] / 2),
+            alpha: 1,
+          },
+        ]);
+        expect(trace.minimapTextCalls).toBe(0);
+      }
+    },
+  );
+
+  it('keeps rift mechanics procedural and does not request unrelated generated art', () => {
+    const markerArt = fakeMarkerArt([...MAP_MARKER_ART_IDS]);
+    const trace = drawSymbols(
+      [
+        {
+          kind: 'semantic-object',
+          mx: 20,
+          my: 30,
+          semantic: { kind: 'rift-mechanic', mechanic: 'gate', state: 'sealed' },
+        },
+      ],
+      'standard',
+      markerArt.art,
+    );
+    expect(markerArt.calls).toEqual([]);
+    expect(trace.segments.length + trace.rects.length).toBeGreaterThan(0);
+  });
+
+  it('uses hue-independent interior marks for blocked, available, and completed states', () => {
+    const semantic = (value: MinimapObjectSemantic) =>
+      drawSymbols([{ kind: 'semantic-object', mx: 20, my: 30, semantic: value }]);
+    const sealed = semantic({ kind: 'delve-passage', state: 'sealed' });
+    const open = semantic({ kind: 'delve-passage', state: 'open' });
+    expect(sealed.segments).not.toEqual(open.segments);
+
+    const locked = semantic({ kind: 'rift-reward', reward: 'cache', state: 'locked' });
+    const opened = semantic({ kind: 'rift-reward', reward: 'cache', state: 'opened' });
+    const jammed = semantic({ kind: 'rift-reward', reward: 'cache', state: 'jammed' });
+    expect(locked.segments).not.toEqual(opened.segments);
+    expect(jammed.segments).not.toEqual(opened.segments);
+
+    const unlit = semantic({ kind: 'rift-mechanic', mechanic: 'pylon', state: 'unlit' });
+    const lit = semantic({ kind: 'rift-mechanic', mechanic: 'pylon', state: 'lit' });
+    expect(unlit.segments).not.toEqual(lit.segments);
+  });
+
+  it('shows rift rank with one to four pips and scales semantic geometry for compact touch', () => {
+    const entrance = (rank: 'C' | 'B' | 'A' | 'S', profile: 'standard' | 'compact') =>
+      drawSymbols(
+        [{ kind: 'semantic-object', mx: 20, my: 30, semantic: { kind: 'rift-entrance', rank } }],
+        profile,
+      );
+    expect(entrance('C', 'standard').rects).toHaveLength(1);
+    expect(entrance('S', 'standard').rects).toHaveLength(4);
+    const standardRadius = entrance('C', 'standard').strokedArcs[0].radius;
+    const compactRadius = entrance('C', 'compact').strokedArcs[0].radius;
+    expect(compactRadius).toBeGreaterThan(standardRadius);
+  });
+
+  it('restores lineCap after cooldown and lock fallbacks', () => {
+    const trace = newTrace();
+    const ctx = fakeMinimapContext(trace);
+    ctx.lineCap = 'square';
+    const painter = newPainter() as unknown as {
+      drawMarkers(
+        ctx: CanvasRenderingContext2D,
+        markers: readonly MinimapMarker[],
+        colors: MinimapColors,
+        profile?: 'standard' | 'compact',
+      ): void;
+    };
+    painter.drawMarkers(
+      ctx,
+      [{ kind: 'gather-node', mx: 20, my: 30, type: 'ore', ready: false, locked: true }],
+      SYMBOL_COLORS,
+      'compact',
+    );
+    expect(ctx.lineCap).toBe('square');
+  });
+});
+
+describe('minimap_painter: gathering state cues (decisive trace)', () => {
+  // Drive the real fallback paint through the tracing context. The broken
+  // cooldown ring and bronze lock remain independent, including when both
+  // states apply. No gathering state uses a diagonal strike.
   function nodeWorld(over: { locked: boolean; ready: boolean }): IWorld {
     const node = GATHER_NODES[0];
     const entities = new Map<number, unknown>();
@@ -507,332 +1079,677 @@ describe('minimap_painter: the lock strike RASTERIZES on both silhouettes (decis
       questState: () => 'unavailable',
     } as unknown as IWorld;
   }
-  const strikesOf = (trace: GlyphTrace) =>
+  const diagonalStrikesOf = (trace: GlyphTrace) =>
     trace.segments.filter(
       (s) => s.stroked && s.toX - s.fromX > 0 && s.toX - s.fromX === -(s.toY - s.fromY),
     );
 
-  it('locked-ready and locked-cooldown both strike; unlocked never does', () => {
-    for (const [locked, ready, expected] of [
-      [true, true, true],
-      [true, false, true],
-      [false, true, false],
+  it('shows cooldown and lock independently without a diagonal strike', () => {
+    for (const [locked, ready, centeredArcCount] of [
+      [true, true, 1],
+      [true, false, 3],
+      [false, true, 1],
+      [false, false, 3],
     ] as const) {
       const trace = newTrace();
       installGlyphGlobals(trace);
       paint(newPainter(), fakeMinimapContext(trace), nodeWorld({ locked, ready }));
-      expect(strikesOf(trace).length > 0, `locked=${locked} ready=${ready}`).toBe(expected);
+      expect(diagonalStrikesOf(trace), `locked=${locked} ready=${ready}`).toEqual([]);
+      expect(
+        trace.strokedArcs.filter((arc) => arc.x === 81 && arc.y === 81),
+        `locked=${locked} ready=${ready} cooldown ring`,
+      ).toHaveLength(centeredArcCount);
+      expect(trace.rects.length > 0, `locked=${locked} ready=${ready} lock badge`).toBe(locked);
       vi.unstubAllGlobals();
     }
   });
 });
 
-describe('minimap_painter: NPC glyphs draw from the sprite cache, never per-marker fillText', () => {
-  it('blits the sprite on the inline anchor, rounded to a whole pixel', () => {
-    const trace = newTrace();
-    installGlyphGlobals(trace);
-    const ctx = fakeMinimapContext(trace);
-    // x = 4 yards map-left, z = 1.5 yards up, at the base scale 1.7 px/yard:
-    //   mx = 81 - 4 * 1.7      = 74.2  -> 74.2 - 2 (offset) - 2 (sprite origin) = 70.2
-    //   my = 81 + 1.5 * 1.7    = 83.55 -> 83.55 + 3 (offset) - 12 (baseline)    = 74.55
-    // Both fractional, so this fails if the destination stops being rounded, and every
-    // component is distinct so it also fails on a flipped sign or swapped axis.
-    paint(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], 'ready'));
+// ---------------------------------------------------------------------------
+// Painted stable marker art. The injected fake returns opaque identities rather
+// than canvases so id/size routing, alpha composition, and fallback are visible
+// without loading browser images.
 
-    expect(trace.blits).toHaveLength(1);
-    expect(trace.blits[0].dx).toBe(70);
-    expect(trace.blits[0].dy).toBe(75);
-    expect(Number.isInteger(trace.blits[0].dx)).toBe(true);
-    expect(Number.isInteger(trace.blits[0].dy)).toBe(true);
-  });
+const isolatedGatherNode = GATHER_NODES.find(
+  (node) =>
+    node.tier === 1 &&
+    GATHER_NODES.every(
+      (other) =>
+        other === node || Math.hypot(other.pos.x - node.pos.x, other.pos.z - node.pos.z) > 43,
+    ),
+);
+if (!isolatedGatherNode) throw new Error('expected an isolated tier-1 gathering node');
+const ISOLATED_GATHER_NODE = isolatedGatherNode;
 
-  it('never touches the minimap context text API while drawing markers', () => {
-    const trace = newTrace();
-    installGlyphGlobals(trace);
-    const ctx = fakeMinimapContext(trace);
-    paint(
-      newPainter(),
-      ctx,
-      glyphWorld(
-        [
-          { x: 4, z: 98.5, quest: true },
-          { x: -3, z: 101, quest: true },
-          { x: 6, z: 100, quest: false },
-        ],
-        'ready',
+const GATHER_IDENTITY_TYPES = ['ore', 'wood', 'herb'] as const;
+const ISOLATED_GATHER_NODES_BY_TYPE = GATHER_IDENTITY_TYPES.map((type) => {
+  const node = GATHER_NODES.find(
+    (candidate) =>
+      candidate.type === type &&
+      candidate.tier === 1 &&
+      GATHER_NODES.every(
+        (other) =>
+          other === candidate ||
+          Math.hypot(other.pos.x - candidate.pos.x, other.pos.z - candidate.pos.z) > 44,
       ),
-    );
+  );
+  if (!node) throw new Error(`expected an isolated tier-1 ${type} gathering node`);
+  return node;
+});
 
-    expect(trace.blits).toHaveLength(3);
-    expect(trace.minimapTextCalls).toBe(0);
-    expect(trace.minimapFontWrites).toBe(0);
-  });
+const TEST_STATION_TYPES = [
+  'forge',
+  'kitchens',
+  'apothecary',
+  'tannery',
+  'loom',
+  'toolworks',
+] as const;
 
-  it('rasterizes each glyph once at the pinned font and reuses it across markers and redraws', () => {
-    const trace = newTrace();
-    installGlyphGlobals(trace);
-    const ctx = fakeMinimapContext(trace);
-    const p = newPainter();
-    const world = glyphWorld(
-      [
-        { x: 4, z: 98.5, quest: true },
-        { x: -3, z: 101, quest: true },
-      ],
-      'ready',
-    );
+function gatherArtWorld(
+  ready: boolean,
+  locked: boolean,
+  node: (typeof GATHER_NODES)[number] = ISOLATED_GATHER_NODE,
+): IWorld {
+  const player = {
+    id: 1,
+    kind: 'player',
+    name: 'Me',
+    pos: { ...node.pos },
+    facing: 0,
+  };
+  return {
+    player,
+    entities: new Map([[1, player]]),
+    partyInfo: null,
+    socialInfo: null,
+    delveRun: null,
+    cfg: { seed: 42, playerClass: 'warrior' },
+    playerId: 1,
+    inventory: locked
+      ? []
+      : [
+          { itemId: 'copper_mining_pick', count: 1 },
+          { itemId: 'handaxe', count: 1 },
+          { itemId: 'gathering_sickle', count: 1 },
+        ],
+    gatheringProficiency: { mining: 1, logging: 1, herbalism: 1 },
+    stationPlacements: [],
+    nodeHarvestableByMe: (id: string) => id === node.id && ready,
+    questState: () => 'unavailable',
+  } as unknown as IWorld;
+}
 
-    paint(p, ctx, world);
-    paint(p, ctx, world);
-
-    // Two markers over two redraws: four blits, but the glyph rasterizes ONCE. Without
-    // this the change silently stops working and costs more than the fillText it replaced.
-    expect(trace.blits).toHaveLength(4);
-    expect(trace.sprites).toHaveLength(1);
-    expect(trace.blits.every((b) => b.sprite === trace.sprites[0])).toBe(true);
-
-    const sprite = trace.sprites[0];
-    expect(sprite.width).toBe(16);
-    expect(sprite.height).toBe(16);
-    expect(sprite.ink).toEqual([
-      { glyph: '?', x: 2, y: 12, font: 'bold 11px Georgia', fillStyle: 'quest-a' },
-    ]);
-  });
-
-  it('rasterizes the repeat variant in the repeat token, same box, full alpha', () => {
-    // The phase 23 blue "!": a completed repeatable resolves the
-    // npc-quest-repeat token (never the gold), rasterizes into the SAME
-    // 16x16 box at the same origin/baseline (the sprite geometry that clips
-    // silently when it shrinks, acceptance (d)), and blits undimmed.
-    const trace = newTrace();
-    installGlyphGlobals(trace);
-    const ctx = fakeMinimapContext(trace);
-    paint(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], 'repeat'));
-
-    expect(trace.blits).toHaveLength(1);
-    expect(trace.blits[0].alpha).toBe(1);
-    const sprite = trace.blits[0].sprite;
-    expect(sprite.width).toBe(16);
-    expect(sprite.height).toBe(16);
-    expect(sprite.ink).toEqual([
-      {
-        glyph: '!',
-        x: 2,
-        y: 12,
-        font: 'bold 11px Georgia',
-        fillStyle: 'paint:--color-minimap-npc-quest-repeat',
-      },
-    ]);
-  });
-
-  it('blits the cooldown variant from the repeat sprite, dimmed, and restores alpha', () => {
-    // A work order inside its cadence window: the SAME repeat-token sprite
-    // (no third raster), blitted at the cooldown dim, with the context's
-    // globalAlpha restored so no later marker inherits the dim.
-    const trace = newTrace();
-    installGlyphGlobals(trace);
-    const ctx = fakeMinimapContext(trace);
-    paint(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], 'cooldown'));
-
-    expect(trace.blits).toHaveLength(1);
-    expect(trace.blits[0].alpha).toBe(0.55);
-    expect(ctx.globalAlpha).toBe(1);
-    const sprite = trace.blits[0].sprite;
-    expect(sprite.ink[0].glyph).toBe('!');
-    expect(sprite.ink[0].fillStyle).toBe('paint:--color-minimap-npc-quest-repeat');
-  });
-
-  it('restores the CALLER alpha around the cooldown blit, not a literal 1', () => {
-    // The restore-prior contract is only observable under a non-1 caller
-    // alpha: a reverted literal-1 restore stays green on every 1-alpha
-    // fixture and reddens here.
-    const trace = newTrace();
-    installGlyphGlobals(trace);
-    const ctx = fakeMinimapContext(trace);
-    ctx.globalAlpha = 0.9;
-    paint(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], 'cooldown'));
-    expect(trace.blits).toHaveLength(1);
-    expect(trace.blits[0].alpha).toBe(0.55);
-    expect(ctx.globalAlpha).toBe(0.9);
-  });
-
-  it('shares ONE blue raster between a repeat and a cooldown marker in the same frame', () => {
-    // The budget claim (at most six 16x16 sprites: two colors by three
-    // glyphs) holds only if the cooldown variant never mints its own dimmed
-    // raster, and a fillStyle comparison alone cannot see a second canvas
-    // with identical ink. Two givers, one offered again and one inside its
-    // window, must blit the IDENTICAL sprite object, dimmed only at blit.
-    const amends = Object.values(QUESTS).find((q) => q.repeatable && !q.repeatCadenceTicks);
-    if (!amends) throw new Error('expected an uncadenced repeatable quest');
-    const entities = new Map<number, unknown>();
-    const player = { id: 1, kind: 'player', name: 'Me', pos: { ...PLAYER_POS }, facing: 0 };
-    entities.set(1, player);
-    const npc = (id: number, questId: string, giver: string, x: number, z: number) => ({
-      id,
-      kind: 'npc',
-      name: `Npc${id}`,
-      dead: false,
+function stableMarkerWorld(opts: {
+  portals?: Array<'dungeon_door' | 'dungeon_exit'>;
+  services?: Array<'mailbox' | typeof EASTBROOK_NOTICEBOARD_TEMPLATE_ID>;
+  station?: boolean;
+  stationTypes?: readonly (typeof TEST_STATION_TYPES)[number][];
+}): IWorld {
+  const player = { id: 1, kind: 'player', name: 'Me', pos: { ...PLAYER_POS }, facing: 0 };
+  const entities = new Map<number, unknown>([[1, player]]);
+  opts.portals?.forEach((templateId, index) => {
+    entities.set(index + 2, {
+      id: index + 2,
+      kind: 'object',
+      name: templateId,
+      templateId,
       lootable: false,
-      aggroTargetId: null,
-      templateId: giver,
-      questIds: [questId],
-      pos: { x, z },
+      pos: { x: PLAYER_POS.x + 4 + index * 3, z: PLAYER_POS.z - 1.5 },
     });
-    entities.set(2, npc(2, amends.id, amends.giverNpcId as string, 4, 98.5));
-    entities.set(3, npc(3, WORK_ORDER_QUEST.id, WORK_ORDER_QUEST.giverNpcId as string, -3, 101));
-    const world = {
-      player,
-      entities,
-      partyInfo: null,
-      socialInfo: null,
-      delveRun: null,
-      cfg: { seed: 42, playerClass: 'warrior' },
-      playerId: 1,
-      inventory: [],
-      stationPlacements: [],
-      nodeHarvestableByMe: () => false,
-      questState: (q: string) => (q === amends.id ? 'available' : 'unavailable'),
-      questsDone: new Set([amends.id, WORK_ORDER_QUEST.id]),
-      craftingIdentity: {
-        version: 1,
-        synced: true,
-        cadenceBlockedQuests: [WORK_ORDER_QUEST.id],
-      },
-    } as unknown as IWorld;
-
-    const trace = newTrace();
-    installGlyphGlobals(trace);
-    const ctx = fakeMinimapContext(trace);
-    paint(newPainter(), ctx, world);
-
-    expect(trace.blits).toHaveLength(2);
-    const repeatBlit = trace.blits.find((b) => b.alpha === 1);
-    const coolBlit = trace.blits.find((b) => b.alpha === 0.55);
-    expect(repeatBlit).toBeTruthy();
-    expect(coolBlit).toBeTruthy();
-    // Object identity, not ink equality: one raster serves both markers.
-    expect(coolBlit?.sprite).toBe(repeatBlit?.sprite);
-    expect(trace.sprites).toHaveLength(1);
-    expect(trace.sprites[0].ink[0].fillStyle).toBe('paint:--color-minimap-npc-quest-repeat');
   });
+  opts.services?.forEach((templateId, index) => {
+    const id = entities.size + 1;
+    entities.set(id, {
+      id,
+      kind: 'object',
+      name: templateId,
+      templateId,
+      lootable: false,
+      pos: { x: PLAYER_POS.x - 4 - index * 3, z: PLAYER_POS.z + 1.5 },
+    });
+  });
+  const stationTypes = opts.stationTypes ?? (opts.station ? (['forge'] as const) : []);
+  return {
+    player,
+    entities,
+    partyInfo: null,
+    socialInfo: null,
+    delveRun: null,
+    cfg: { seed: 42, playerClass: 'warrior' },
+    playerId: 1,
+    inventory: [],
+    gatheringProficiency: {},
+    stationPlacements: stationTypes.map((type, index) => ({
+      id: `station_test_${type}`,
+      type,
+      zoneId: 'eastbrook_vale',
+      pos: { x: PLAYER_POS.x - 3 + index * 2, z: PLAYER_POS.z + 2 },
+      masterNpcId: `test_${type}_master`,
+    })),
+    nodeHarvestableByMe: () => false,
+    questState: () => 'unavailable',
+  } as unknown as IWorld;
+}
 
-  it('keeps every non-repeat glyph on the gold token at full alpha (the negative arm)', () => {
-    // Acceptance (b): a plain available quest and a ready turn-in stay
-    // pixel-identical to the pre-phase painter: gold token, no dim.
-    for (const state of ['available', 'ready'] as const) {
+const gatherDiagonalStrikes = (trace: GlyphTrace) =>
+  trace.segments.filter(
+    (segment) =>
+      segment.stroked &&
+      segment.toX - segment.fromX > 0 &&
+      segment.toX - segment.fromX === -(segment.toY - segment.fromY),
+  );
+
+describe('minimap_painter: painted stable marker sprites', () => {
+  it.each(ISOLATED_GATHER_NODES_BY_TYPE)(
+    'routes gather-$type through its exact painted identity',
+    (node) => {
+      const id = `gather-${node.type}` as MapMarkerArtId;
+      const markerArt = fakeMarkerArt([id]);
+      const trace = newTrace();
+      installGlyphGlobals(trace);
+
+      paint(
+        newPainter(markerArt.art),
+        fakeMinimapContext(trace),
+        gatherArtWorld(true, false, node),
+      );
+
+      expect(markerArt.calls.filter((call) => call.id === id)).toEqual([
+        { id, size: 'minimapGatherReady' },
+      ]);
+      expect(trace.markerBlits).toEqual([
+        {
+          sprite: { markerId: id, sizeId: 'minimapGatherReady' },
+          dx: 81 - MAP_MARKER_SIZES.minimapGatherReady / 2,
+          dy: 81 - MAP_MARKER_SIZES.minimapGatherReady / 2,
+          alpha: 1,
+        },
+      ]);
+    },
+  );
+
+  it.each([
+    { ready: true, locked: false, size: 'minimapGatherReady' },
+    { ready: false, locked: false, size: 'minimapGatherCooldown' },
+    { ready: true, locked: true, size: 'minimapGatherReadyLocked' },
+    { ready: false, locked: true, size: 'minimapGatherCooldownLocked' },
+  ] as const)(
+    'routes gathering ready=$ready locked=$locked through precomputed $size',
+    ({ ready, locked, size }) => {
+      const id = `gather-${ISOLATED_GATHER_NODE.type}` as MapMarkerArtId;
+      const markerArt = fakeMarkerArt([id]);
       const trace = newTrace();
       installGlyphGlobals(trace);
       const ctx = fakeMinimapContext(trace);
-      paint(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], state));
-      expect(trace.blits, state).toHaveLength(1);
-      expect(trace.blits[0].alpha, state).toBe(1);
-      expect(trace.blits[0].sprite.ink[0].fillStyle, state).toBe('quest-a');
-      expect(trace.blits[0].sprite.ink[0].glyph, state).toBe(state === 'ready' ? '?' : '!');
-      vi.unstubAllGlobals();
-    }
-  });
+      ctx.globalAlpha = 0.8;
 
-  it('gives each glyph its own sprite', () => {
+      paint(newPainter(markerArt.art), ctx, gatherArtWorld(ready, locked));
+
+      expect(markerArt.calls).toEqual([{ id, size }]);
+      expect(trace.markerBlits).toHaveLength(1);
+      expect(trace.markerBlits[0].sprite).toEqual({ markerId: id, sizeId: size });
+      expect(trace.markerBlits[0].alpha).toBeCloseTo(0.8);
+      expect(trace.markerBlits[0].dx).toBe(Math.round(81 - MAP_MARKER_SIZES[size] / 2));
+      expect(trace.markerBlits[0].dy).toBe(Math.round(81 - MAP_MARKER_SIZES[size] / 2));
+      expect(gatherDiagonalStrikes(trace)).toEqual([]);
+      expect(trace.rects).toEqual([]);
+      expect(ctx.globalAlpha).toBe(0.8);
+    },
+  );
+
+  it.each([
+    { ready: true, locked: false, size: 'minimapGatherReadyCompact' },
+    { ready: false, locked: false, size: 'minimapGatherCooldownCompact' },
+    { ready: true, locked: true, size: 'minimapGatherReadyLockedCompact' },
+    { ready: false, locked: true, size: 'minimapGatherCooldownLockedCompact' },
+  ] as const)('uses compact gathering raster $size', ({ ready, locked, size }) => {
+    const id = `gather-${ISOLATED_GATHER_NODE.type}` as MapMarkerArtId;
+    const markerArt = fakeMarkerArt([id]);
     const trace = newTrace();
     installGlyphGlobals(trace);
-    const ctx = fakeMinimapContext(trace);
+    const profile = vi.fn(() => 'compact' as const);
 
     paint(
-      newPainter(),
-      ctx,
-      glyphWorld(
-        [
-          { x: 4, z: 98.5, quest: true },
-          { x: 6, z: 100, quest: false },
-        ],
-        'ready',
-      ),
+      newPainter(markerArt.art, profile),
+      fakeMinimapContext(trace),
+      gatherArtWorld(ready, locked),
     );
 
-    expect(trace.sprites.map((s) => s.ink[0].glyph)).toEqual(['?', '•']);
-    expect(trace.blits[0].sprite).not.toBe(trace.blits[1].sprite);
+    expect(profile).toHaveBeenCalledTimes(1);
+    expect(markerArt.calls).toEqual([{ id, size }]);
+    expect(trace.markerBlits[0].sprite).toEqual({ markerId: id, sizeId: size });
   });
 
-  it('re-rasterizes when the resolved quest color changes (the cache key carries it)', () => {
+  it('routes all six station identities through the minimap size and centers each sprite', () => {
+    const stationIds = TEST_STATION_TYPES.map((type) => `station-${type}` as MapMarkerArtId);
+    const markerArt = fakeMarkerArt(stationIds);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+
+    paint(
+      newPainter(markerArt.art),
+      fakeMinimapContext(trace),
+      stableMarkerWorld({ stationTypes: TEST_STATION_TYPES }),
+    );
+
+    expect(markerArt.calls.filter((call) => call.id.startsWith('station-'))).toEqual(
+      stationIds.map((id) => ({ id, size: 'minimapStation' })),
+    );
+    expect(trace.markerBlits.map((blit) => blit.sprite)).toEqual(
+      stationIds.map((markerId) => ({ markerId, sizeId: 'minimapStation' })),
+    );
+    expect(
+      trace.markerBlits.every((blit) => Number.isInteger(blit.dx) && Number.isInteger(blit.dy)),
+    ).toBe(true);
+  });
+
+  it('falls back to the procedural station diamond while its art is unavailable', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const world = stableMarkerWorld({ station: true });
+
+    paint(newPainter(markerArt.art), fakeMinimapContext(trace), world);
+
+    expect(markerArt.calls.filter((call) => call.id.startsWith('station-'))).toEqual([
+      { id: 'station-forge', size: 'minimapStation' },
+    ]);
+    expect(trace.markerBlits.some((blit) => blit.sprite.markerId === 'station-forge')).toBe(false);
+    const station = createMinimapMarkers()
+      .build(world, 162, 1.7)
+      .markers.find((marker) => marker.kind === 'station');
+    if (station?.kind !== 'station') throw new Error('expected the station marker');
+    expect(trace.segments).toEqual(
+      expect.arrayContaining([
+        {
+          fromX: station.mx,
+          fromY: station.my - 3,
+          toX: station.mx + 3,
+          toY: station.my,
+          stroked: true,
+        },
+        {
+          fromX: station.mx + 3,
+          fromY: station.my,
+          toX: station.mx,
+          toY: station.my + 3,
+          stroked: true,
+        },
+        {
+          fromX: station.mx,
+          fromY: station.my + 3,
+          toX: station.mx - 3,
+          toY: station.my,
+          stroked: true,
+        },
+      ]),
+    );
+  });
+
+  it('routes distinct dungeon entrance and exit paintings through the shared minimap size', () => {
+    const markerArt = fakeMarkerArt(['dungeon-entrance', 'dungeon-exit']);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+
+    paint(
+      newPainter(markerArt.art),
+      fakeMinimapContext(trace),
+      stableMarkerWorld({ portals: ['dungeon_door', 'dungeon_exit'] }),
+    );
+
+    expect(markerArt.calls.filter((call) => call.id.startsWith('dungeon-'))).toEqual([
+      { id: 'dungeon-entrance', size: 'minimapDungeon' },
+      { id: 'dungeon-exit', size: 'minimapDungeon' },
+    ]);
+    expect(trace.markerBlits.map((blit) => blit.sprite)).toEqual([
+      { markerId: 'dungeon-entrance', sizeId: 'minimapDungeon' },
+      { markerId: 'dungeon-exit', sizeId: 'minimapDungeon' },
+    ]);
+    expect(trace.filledArcs.filter((arc) => arc.radius === 3.5)).toHaveLength(0);
+  });
+
+  it('routes civic services through distinct identities at minimapService size', () => {
+    const markerArt = fakeMarkerArt(['service-mailbox', 'service-noticeboard']);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+
+    paint(
+      newPainter(markerArt.art),
+      fakeMinimapContext(trace),
+      stableMarkerWorld({ services: ['mailbox', EASTBROOK_NOTICEBOARD_TEMPLATE_ID] }),
+    );
+
+    expect(markerArt.calls.filter((call) => call.id.startsWith('service-'))).toEqual([
+      { id: 'service-mailbox', size: 'minimapService' },
+      { id: 'service-noticeboard', size: 'minimapService' },
+    ]);
+    expect(
+      trace.markerBlits
+        .filter((blit) => blit.sprite.markerId.startsWith('service-'))
+        .map((blit) => blit.sprite),
+    ).toEqual([
+      { markerId: 'service-mailbox', sizeId: 'minimapService' },
+      { markerId: 'service-noticeboard', sizeId: 'minimapService' },
+    ]);
+  });
+
+  it('uses distinct mailbox and noticeboard silhouettes while service art is unavailable', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const world = stableMarkerWorld({ services: ['mailbox', EASTBROOK_NOTICEBOARD_TEMPLATE_ID] });
+
+    paint(newPainter(markerArt.art), fakeMinimapContext(trace), world);
+
+    expect(markerArt.calls.filter((call) => call.id.startsWith('service-'))).toEqual([
+      { id: 'service-mailbox', size: 'minimapService' },
+      { id: 'service-noticeboard', size: 'minimapService' },
+    ]);
+    expect(trace.markerBlits.some((blit) => blit.sprite.markerId === 'service-mailbox')).toBe(
+      false,
+    );
+    const service = createMinimapMarkers()
+      .build(world, 162, 1.7)
+      .markers.find((marker) => marker.kind === 'service');
+    if (service?.kind !== 'service') throw new Error('expected the service marker');
+    expect(trace.segments).toEqual(
+      expect.arrayContaining([
+        {
+          fromX: service.mx,
+          fromY: service.my - 3,
+          toX: service.mx + 3,
+          toY: service.my,
+          stroked: true,
+        },
+        {
+          fromX: service.mx + 3,
+          fromY: service.my,
+          toX: service.mx,
+          toY: service.my + 3,
+          stroked: true,
+        },
+        {
+          fromX: service.mx,
+          fromY: service.my + 3,
+          toX: service.mx - 3,
+          toY: service.my,
+          stroked: true,
+        },
+      ]),
+    );
+    const services = createMinimapMarkers()
+      .build(world, 162, 1.7)
+      .markers.filter((marker) => marker.kind === 'service');
+    const noticeboard = services.find((marker) => marker.service === 'noticeboard');
+    if (!noticeboard) throw new Error('expected the noticeboard marker');
+    expect(trace.segments).toEqual(
+      expect.arrayContaining([
+        {
+          fromX: noticeboard.mx - 3,
+          fromY: noticeboard.my - 2,
+          toX: noticeboard.mx + 3,
+          toY: noticeboard.my - 2,
+          stroked: true,
+        },
+      ]),
+    );
+  });
+
+  it('falls back to the procedural entrance dot while art is unavailable', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+
+    paint(
+      newPainter(markerArt.art),
+      fakeMinimapContext(trace),
+      stableMarkerWorld({ portals: ['dungeon_door'] }),
+    );
+
+    expect(markerArt.calls.filter((call) => call.id.startsWith('dungeon-'))).toEqual([
+      { id: 'dungeon-entrance', size: 'minimapDungeon' },
+    ]);
+    expect(trace.markerBlits).toEqual([]);
+    expect(trace.filledArcs.filter((arc) => arc.radius === 3.5)).toHaveLength(1);
+  });
+});
+
+describe('minimap_painter: generated quest art', () => {
+  it.each([
+    { state: 'available', id: 'quest-available', size: 'minimapQuest' },
+    { state: 'ready', id: 'quest-ready', size: 'minimapQuest' },
+    { state: 'repeat', id: 'quest-repeat', size: 'minimapQuest' },
+    { state: 'cooldown', id: 'quest-cooldown', size: 'minimapQuestCooldown' },
+  ] as const)(
+    'routes $state through its exact standard raster at full alpha',
+    ({ state, id, size }) => {
+      const markerArt = fakeMarkerArt([id]);
+      const trace = newTrace();
+      installGlyphGlobals(trace);
+      const ctx = fakeMinimapContext(trace);
+
+      paint(newPainter(markerArt.art), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], state));
+
+      expect(markerArt.calls.filter((call) => call.id.startsWith('quest-'))).toEqual([
+        { id, size },
+      ]);
+      expect(trace.markerBlits).toEqual([
+        {
+          sprite: { markerId: id, sizeId: size },
+          dx: Math.round(74.2 - MAP_MARKER_SIZES[size] / 2),
+          dy: Math.round(83.55 - MAP_MARKER_SIZES[size] / 2),
+          alpha: 1,
+        },
+      ]);
+      expect(trace.blits).toEqual([]);
+      expect(trace.minimapTextCalls).toBe(0);
+      expect(trace.minimapFontWrites).toBe(0);
+    },
+  );
+
+  it.each([
+    { state: 'available', id: 'quest-available', size: 'minimapQuestCompact' },
+    { state: 'ready', id: 'quest-ready', size: 'minimapQuestCompact' },
+    { state: 'repeat', id: 'quest-repeat', size: 'minimapQuestCompact' },
+    {
+      state: 'cooldown',
+      id: 'quest-cooldown',
+      size: 'minimapQuestCooldownCompact',
+    },
+  ] as const)('uses the larger compact $state raster', ({ state, id, size }) => {
+    const markerArt = fakeMarkerArt([id]);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const markerProfile = vi.fn(() => 'compact' as const);
+
+    paint(
+      newPainter(markerArt.art, markerProfile),
+      fakeMinimapContext(trace),
+      glyphWorld([{ x: 4, z: 98.5, quest: true }], state),
+    );
+
+    expect(markerProfile).toHaveBeenCalledTimes(1);
+    expect(markerArt.calls.filter((call) => call.id.startsWith('quest-'))).toEqual([{ id, size }]);
+    expect(trace.markerBlits[0]).toMatchObject({
+      sprite: { markerId: id, sizeId: size },
+      dx: Math.round(74.2 - MAP_MARKER_SIZES[size] / 2),
+      dy: Math.round(83.55 - MAP_MARKER_SIZES[size] / 2),
+      alpha: 1,
+    });
+  });
+
+  it('keeps cooldown art at the caller alpha and never mutates the context', () => {
+    const markerArt = fakeMarkerArt(['quest-cooldown']);
     const trace = newTrace();
     installGlyphGlobals(trace);
     const ctx = fakeMinimapContext(trace);
-    const p = newPainter();
-    const world = glyphWorld([{ x: 4, z: 98.5, quest: true }], 'ready');
+    ctx.globalAlpha = 0.73;
 
-    paint(p, ctx, world);
-    // Simulate the theme / contrast cache bust the color cache documents: drop the
-    // resolved colors and resolve a different quest color on the next redraw.
-    trace.color = 'quest-b';
-    (p as unknown as { colors: unknown }).colors = null;
-    paint(p, ctx, world);
+    paint(newPainter(markerArt.art), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], 'cooldown'));
 
-    expect(trace.sprites).toHaveLength(2);
-    expect(trace.sprites.map((s) => s.ink[0].fillStyle)).toEqual(['quest-a', 'quest-b']);
-    expect(trace.blits[1].sprite).toBe(trace.sprites[1]);
+    expect(trace.markerBlits[0].alpha).toBe(0.73);
+    expect(ctx.globalAlpha).toBe(0.73);
   });
 
-  it('does not cache a sprite whose 2D context failed', () => {
-    const trace = newTrace();
-    installGlyphGlobals(trace, false);
-    const ctx = fakeMinimapContext(trace);
-    const p = newPainter();
-    const world = glyphWorld([{ x: 4, z: 98.5, quest: true }], 'ready');
-
-    paint(p, ctx, world);
-    paint(p, ctx, world);
-
-    // Caching the blank canvas would hide every NPC glyph for the rest of the session;
-    // both sibling caches in this file (ensureMazeBg, resolveColors) refuse it too.
-    expect(trace.sprites).toHaveLength(2);
-    expect(trace.sprites[0].ink).toEqual([]);
-  });
-
-  it('does not cache a sprite rasterized before the tokens resolved', () => {
-    const trace = newTrace();
-    // A redraw before the stylesheet applies: every token reads ''. resolveColors
-    // deliberately refuses to freeze that, and the glyph cache must refuse it too, or
-    // three default-black sprites stay resident for the rest of the session.
-    trace.color = '';
-    installGlyphGlobals(trace);
-    const ctx = fakeMinimapContext(trace);
-    const p = newPainter();
-    const world = glyphWorld([{ x: 4, z: 98.5, quest: true }], 'ready');
-
-    paint(p, ctx, world);
-    paint(p, ctx, world);
-
-    expect(trace.sprites).toHaveLength(2);
-    // It still DRAWS on that redraw, exactly as the inline fillText did with an
-    // unresolved fillStyle: rasterized, just never frozen.
-    expect(trace.sprites[0].ink).toHaveLength(1);
-    expect(trace.blits).toHaveLength(2);
-  });
-
-  it('applies the same rounded blit on the Protect Yumi arm', () => {
+  it('draws a quiet hollow ring for a non-actionable NPC without loading quest art', () => {
+    const markerArt = fakeMarkerArt([
+      'quest-available',
+      'quest-ready',
+      'quest-repeat',
+      'quest-cooldown',
+    ]);
     const trace = newTrace();
     installGlyphGlobals(trace);
-    const ctx = fakeMinimapContext(trace);
-    // paintYumiMaze shares drawMarkers, so the maze arm must land the glyph on the same
-    // rounded anchor. Marker projection is player-relative, so holding the npc at the
-    // same offset keeps the expected destination. Its maze background canvas is built
-    // first, hence the extra createElement in trace.sprites.
-    const world = glyphWorld([{ x: YUMI_BAND_X_MIN + 4, z: 98.5, quest: true }], 'ready');
-    (world.player as { pos: { x: number } }).pos.x = YUMI_BAND_X_MIN;
-    paintMaze(newPainter(), ctx, world);
 
-    expect(trace.blits).toHaveLength(1);
-    expect(trace.blits[0].dx).toBe(70);
-    expect(trace.blits[0].dy).toBe(75);
+    paint(
+      newPainter(markerArt.art),
+      fakeMinimapContext(trace),
+      glyphWorld([{ x: 6, z: 100, quest: false }], 'ready'),
+    );
+
+    expect(markerArt.calls.filter((call) => call.id.startsWith('quest-'))).toEqual([]);
+    expect(trace.markerBlits).toEqual([]);
+    expect(
+      trace.strokedArcs.filter((arc) => arc.x === 70.8 && arc.y === 81).map((arc) => arc.radius),
+    ).toEqual([3, 3]);
     expect(trace.minimapTextCalls).toBe(0);
     expect(trace.minimapFontWrites).toBe(0);
   });
 
-  it('keeps fillText and ctx.font assignment out of the per-marker draw loop', () => {
-    // Source-level companion to the behavior pin above: it covers EVERY marker branch,
-    // not just the npc one the fake context exercises.
+  it.each([
+    {
+      state: 'available',
+      commands: ['moveTo', 'lineTo'],
+      ink: 'quest-a',
+      outlineWidth: 3,
+      inkWidth: 1.25,
+    },
+    {
+      state: 'ready',
+      commands: ['arc', 'lineTo'],
+      ink: 'quest-a',
+      outlineWidth: 3,
+      inkWidth: 1.25,
+    },
+    {
+      state: 'repeat',
+      commands: [
+        'moveTo',
+        'lineTo',
+        'moveTo',
+        'lineTo',
+        'lineTo',
+        'moveTo',
+        'lineTo',
+        'moveTo',
+        'lineTo',
+      ],
+      ink: 'paint:--color-minimap-npc-quest-repeat',
+      outlineWidth: 3,
+      inkWidth: 1.25,
+    },
+    {
+      state: 'cooldown',
+      commands: ['moveTo', 'lineTo', 'lineTo', 'lineTo'],
+      ink: 'paint:--color-minimap-gather-cooldown',
+      outlineWidth: 3 * (16 / 20),
+      inkWidth: 1,
+    },
+  ] as const)(
+    'uses a distinct allocation-free $state fallback with no canvas text API',
+    ({ state, commands, ink, outlineWidth, inkWidth }) => {
+      const markerArt = fakeMarkerArt([]);
+      const trace = newTrace();
+      installGlyphGlobals(trace);
+
+      paint(
+        newPainter(markerArt.art),
+        fakeMinimapContext(trace),
+        glyphWorld([{ x: 4, z: 98.5, quest: true }], state),
+      );
+
+      expect(markerArt.calls.filter((call) => call.id.startsWith('quest-'))).toEqual([
+        {
+          id: `quest-${state}`,
+          size: state === 'cooldown' ? 'minimapQuestCooldown' : 'minimapQuest',
+        },
+      ]);
+      expect(trace.markerBlits).toEqual([]);
+      expect(trace.minimapTextCalls).toBe(0);
+      expect(trace.minimapFontWrites).toBe(0);
+      expect(trace.segments.length + trace.strokedArcs.length).toBeGreaterThan(0);
+      expect(
+        trace.strokedPaths.filter(
+          (path) => path.strokeStyle === ink && path.lineWidth === inkWidth,
+        ),
+      ).toEqual([{ commands: [...commands], strokeStyle: ink, lineWidth: inkWidth }]);
+      expect(trace.strokedPaths).toContainEqual({
+        commands: [...commands],
+        strokeStyle: 'paint:--color-minimap-outline',
+        lineWidth: outlineWidth,
+      });
+    },
+  );
+
+  it('keeps all four loading fallbacks pairwise shape-distinct through the real quest classifier', () => {
+    const traces = new Map<string, string>();
+    for (const state of ['available', 'ready', 'repeat', 'cooldown'] as const) {
+      const markerArt = fakeMarkerArt([]);
+      const trace = newTrace();
+      installGlyphGlobals(trace);
+      paint(
+        newPainter(markerArt.art),
+        fakeMinimapContext(trace),
+        glyphWorld([{ x: 4, z: 98.5, quest: true }], state),
+      );
+      traces.set(
+        state,
+        JSON.stringify({
+          segments: trace.segments,
+          filledArcs: trace.filledArcs,
+          strokedArcs: trace.strokedArcs,
+        }),
+      );
+      vi.unstubAllGlobals();
+    }
+
+    expect(new Set(traces.values()).size).toBe(4);
+    const states = [...traces.keys()];
+    for (let left = 0; left < states.length; left++) {
+      for (let right = left + 1; right < states.length; right++) {
+        expect(traces.get(states[left]), `${states[left]} versus ${states[right]}`).not.toBe(
+          traces.get(states[right]),
+        );
+      }
+    }
+  });
+
+  it('uses the same compact art routing on the Protect Yumi surface', () => {
+    const markerArt = fakeMarkerArt(['quest-ready']);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const profile = vi.fn(() => 'compact' as const);
+    const world = glyphWorld([{ x: YUMI_BAND_X_MIN + 4, z: 98.5, quest: true }], 'ready');
+    (world.player as { pos: { x: number } }).pos.x = YUMI_BAND_X_MIN;
+
+    paintMaze(newPainter(markerArt.art, profile), fakeMinimapContext(trace), world);
+
+    expect(profile).toHaveBeenCalledTimes(1);
+    expect(markerArt.calls).toEqual([{ id: 'quest-ready', size: 'minimapQuestCompact' }]);
+    expect(trace.markerBlits[0].sprite).toEqual({
+      markerId: 'quest-ready',
+      sizeId: 'minimapQuestCompact',
+    });
+  });
+
+  it('keeps every text entry point and profile lookup out of the per-marker loop', () => {
     const drawMarkersBody = sliceFrom(code, 'private drawMarkers(');
     expect(drawMarkersBody).not.toContain('fillText');
+    expect(drawMarkersBody).not.toContain('strokeText');
+    expect(drawMarkersBody).not.toContain('measureText');
     expect(drawMarkersBody).not.toContain('ctx.font');
+    expect(drawMarkersBody).not.toContain('markerProfile()');
   });
 });
 

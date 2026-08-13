@@ -1,7 +1,7 @@
 // Pure view-core for the Book of Deeds window (#deeds-window) and the
 // watchlist HUD tracker. DOM/Three/i18n-free: it maps the IWorldDeeds facet
-// reads (earned map, lifetime stat block, renown, active title) plus the
-// static catalog (injected, so tests drive synthetic tables) to flat render
+// reads (earned map, lifetime stat block, renown, the two worn cosmetics) plus
+// the static catalog (injected, so tests drive synthetic tables) to flat render
 // models the thin painters draw. Registered in UI_PURE_CORES; unit-tested
 // against both Sim- and ClientWorld-shaped inputs in tests/deeds_view.test.ts.
 //
@@ -101,10 +101,38 @@ export function deedJumpCategory(
   return deedDisplayCategory(def.category);
 }
 
+/** The crest-id prefix every deed crest carries (`deed_<deedId>` painted,
+ *  `deed_cat_<category>` fallback). One spelling for deedCrestId and the
+ *  painted-art membership below. */
+const DEED_CREST_ID_PREFIX = 'deed_';
+
+/** Prefix of the display-category FALLBACK crests (procedural recipes
+ *  composited over an opaque radial in icons.ts, unlike the alpha-matted
+ *  painted `deed_<id>` art). */
+export const DEED_CATEGORY_CREST_PREFIX = 'deed_cat_';
+
 export function deedCrestId(id: string, category: string): string {
   return DEED_IMAGE_IDS.has(id) || DEED_BESPOKE_CRESTS.has(id)
-    ? `deed_${id}`
-    : `deed_cat_${deedDisplayCategory(category)}`;
+    ? `${DEED_CREST_ID_PREFIX}${id}`
+    : `${DEED_CATEGORY_CREST_PREFIX}${deedDisplayCategory(category)}`;
+}
+
+/**
+ * True when this crest id resolves to committed painted art (an alpha-matted
+ * WebP under public/ui/deeds), false for every crest the icon system must
+ * COMPOSITE procedurally: the deed_cat_* category fallbacks AND a bespoke
+ * crest whose commissioned art has not landed yet (deedCrestId still answers
+ * `deed_<id>` for those, so a prefix test cannot tell the two apart). The
+ * procedural compositor fills its whole tile with an opaque radial, which is
+ * what the reliquary's missing-state carve-out keys on (reliquaryCellArtOpaque).
+ * Mirrors icons.ts deedImageUrl's membership without importing the canvas
+ * module into a pure core.
+ */
+export function deedCrestHasPaintedArt(crestId: string): boolean {
+  return (
+    crestId.startsWith(DEED_CREST_ID_PREFIX) &&
+    DEED_IMAGE_IDS.has(crestId.slice(DEED_CREST_ID_PREFIX.length))
+  );
 }
 
 export interface DeedProgress {
@@ -171,6 +199,9 @@ export interface DeedsViewInput {
   deedStats: Readonly<DeedStats>;
   renown: number;
   activeTitle: string | null;
+  // The selected nameplate border, a deed id like activeTitle (never the
+  // reward slug): the picker marks this option active.
+  activeBorder: string | null;
   // The static catalog, injected (the bank-view lookup precedent): the
   // painter binds the live DEEDS/DEED_ORDER, tests drive synthetic tables.
   deeds: Readonly<Record<string, DeedDef>>;
@@ -247,6 +278,9 @@ export interface DeedEntryModel {
   // Earned-only badge for a hidden deed now revealed on the Feats shelf.
   hiddenBadge: boolean;
   titleReward: boolean;
+  // The card's reward chip for the other worn cosmetic: a border-reward deed
+  // says so before it is earned, the way a title-reward deed already does.
+  borderReward: boolean;
   crestId: string;
 }
 
@@ -256,11 +290,21 @@ export interface DeedTitleOption {
   active: boolean;
 }
 
+export interface DeedBorderOption {
+  // null is the "No Border" option.
+  id: string | null;
+  active: boolean;
+}
+
 export interface DeedsViewModel {
   summary: DeedsSummaryModel;
   categories: DeedsCategoryModel[];
   entries: DeedEntryModel[];
   titles: DeedTitleOption[];
+  // Earned border-reward deeds, the titles list's sibling. Both arrays are in
+  // input.order (catalog) order behind their None head, which the picker
+  // renders verbatim: array order is a consumer contract, never re-sorted.
+  borders: DeedBorderOption[];
   // input.focusDeedId when that deed rendered an entry this paint, else null.
   focusDeedId: string | null;
 }
@@ -274,6 +318,7 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
 
   const entries: DeedEntryModel[] = [];
   const titles: DeedTitleOption[] = [{ id: null, active: input.activeTitle === null }];
+  const borders: DeedBorderOption[] = [{ id: null, active: input.activeBorder === null }];
   let earnedCount = 0;
   let visibleTotal = 0;
 
@@ -299,6 +344,11 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
     if (earned && def.reward?.kind === 'title') {
       titles.push({ id, active: input.activeTitle === id });
     }
+    // A deed carries at most one reward, so the two pickers can never list the
+    // same id: a title deed is absent from borders and a border deed from titles.
+    if (earned && def.reward?.kind === 'border') {
+      borders.push({ id, active: input.activeBorder === id });
+    }
     if (input.category !== bucket) continue;
     const progress = earned ? null : deedProgress(def.trigger, input.deedStats);
     if (!matchesFilter(input.filter, earned, progress)) continue;
@@ -315,6 +365,7 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
       feat,
       hiddenBadge: def.hidden === true,
       titleReward: def.reward?.kind === 'title',
+      borderReward: def.reward?.kind === 'border',
       crestId: deedCrestId(id, def.category),
     });
   }
@@ -328,6 +379,7 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
     }),
     entries,
     titles,
+    borders,
     focusDeedId: focus !== null && entries.some((e) => e.id === focus) ? focus : null,
   };
 }
@@ -545,6 +597,9 @@ export interface DeedUnlockPlan {
   // Non-retro unlocks whose reward is a title: a second log line hints the
   // Titles section.
   titleHintIds: string[];
+  // The border sibling: without it three of the four border deeds unlock with
+  // no pointer at the picker that wears them.
+  borderHintIds: string[];
   // One celebration sound per drain, not one per unlock.
   playSound: boolean;
   // Retro back-credits (on-join catch-up): NO banner, NO audio, ONE summary
@@ -560,9 +615,15 @@ export function buildDeedUnlockPlan(
 ): DeedUnlockPlan {
   const logIds: string[] = [];
   const titleHintIds: string[] = [];
+  const borderHintIds: string[] = [];
   let retroCount = 0;
   for (const event of events) {
-    const def = deeds[event.deedId];
+    // hasOwn, like every other resolver in this family (deed_border_view,
+    // the sim validators): the catalog is a plain object, so a bare index on
+    // a prototype key answers truthy and would surface a deed that does not
+    // exist. These ids are server-authored today; the guard costs nothing and
+    // keeps the family uniform.
+    const def = Object.hasOwn(deeds, event.deedId) ? deeds[event.deedId] : undefined;
     if (!def) continue;
     if (event.retro) {
       retroCount++;
@@ -570,11 +631,13 @@ export function buildDeedUnlockPlan(
     }
     logIds.push(event.deedId);
     if (def.reward?.kind === 'title') titleHintIds.push(event.deedId);
+    if (def.reward?.kind === 'border') borderHintIds.push(event.deedId);
   }
   return {
     logIds,
     bannerId: logIds.length > 0 ? logIds[logIds.length - 1] : null,
     titleHintIds,
+    borderHintIds,
     playSound: logIds.length > 0,
     retroCount,
   };
@@ -586,11 +649,15 @@ export function buildDeedUnlockPlan(
 // (dropping one would silently freeze an open window).
 // ---------------------------------------------------------------------------
 
-/** The eight dimensions a slow-band repaint keys on. */
+/** The dimensions a slow-band repaint keys on. Both worn cosmetics are here
+ *  for the same reason: neither picker writes an optimistic local copy, so
+ *  online the accepted choice only shows up when the snapshot echo moves this
+ *  signature. */
 export interface DeedsRefreshSigParts {
   renown: number;
   earnedCount: number;
   activeTitle: string | null;
+  activeBorder: string | null;
   filter: DeedsFilter;
   search: string;
   category: DeedDisplayCategory | 'titles';
@@ -605,6 +672,7 @@ export function deedsRefreshSig(parts: DeedsRefreshSigParts): string {
     parts.renown,
     parts.earnedCount,
     parts.activeTitle,
+    parts.activeBorder,
     parts.filter,
     parts.search,
     parts.category,

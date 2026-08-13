@@ -223,6 +223,9 @@ const itemStringsEn = {
       filterPrimaryStatAll: 'Any primary stat',
       filterRarity: 'Rarity',
       filterRarityAll: 'All rarities',
+      filterSort: 'Sort',
+      sortName: 'Name (A-Z)',
+      sortPriceAsc: 'Price: Low to High',
       weaponSword: 'Swords',
       weaponDagger: 'Daggers',
       weaponStaff: 'Staves',
@@ -2420,6 +2423,10 @@ const ITEM_ENTITY_IDS = [
   'artisans_eye',
   'reins_terrorspark_groundshaker',
   'reins_drakemaw_raptor',
+  'rimefang',
+  'marrowpoint',
+  'duskwhisper',
+  'boneglass_shiv',
   'moggers_hide_quiver',
   'cragmaw_huntquiver',
   'gravewyrm_bone_quiver',
@@ -2475,6 +2482,10 @@ type ItemEntityTranslation = { name: string };
 type ItemEntityTranslations = Record<ItemEntityId, ItemEntityTranslation>;
 
 const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
+  rimefang: 'Rimefang',
+  marrowpoint: 'Marrowpoint',
+  duskwhisper: 'Duskwhisper',
+  boneglass_shiv: 'Boneglass Shiv',
   rift_essence: 'Rift Essence',
   rift_gem_crimson: 'Crimson Rift Gem',
   rift_gem_azure: 'Azure Rift Gem',
@@ -2681,6 +2692,7 @@ function itemTranslationsEn(names: readonly string[]) {
     ...itemTranslations(names),
     conjured_water4: { name: 'Conjured Springwater' },
     conjured_bread4: { name: 'Conjured Feastloaf' },
+    soul_stone: { name: 'Soul Stone' },
   };
 }
 

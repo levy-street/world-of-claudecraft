@@ -44,6 +44,7 @@ describe('farmDeniedLineKey', () => {
       'no_fee_produce',
       'no_tonic',
       'tool',
+      'locked',
     ];
     const keys = reasons.map((r) => farmDeniedLineKey(r));
     expect(keys).toEqual([
@@ -60,6 +61,7 @@ describe('farmDeniedLineKey', () => {
       'hudChrome.farming.denied.no_fee_produce',
       'hudChrome.farming.denied.no_tonic',
       'hudChrome.farming.denied.tool',
+      'hudChrome.farming.denied.locked',
     ]);
     // Every key must actually EXIST: t() throws on an untracked key in test,
     // so this is what a leaf missing from the catalog fails on rather than a
@@ -260,31 +262,33 @@ describe('farmDeniedToast: the tool refusal names the crop tier when it can', ()
   });
 });
 
-describe('the hud seed-back render arms (source pin)', () => {
-  // The two seed-back arms live in the hud.ts coordinator's farmHarvested and
-  // farmWithered case bodies, which no jsdom suite drives, so this pins the
-  // source directly (the 'hud composition source pin' precedent in
-  // tests/gather_tool_tooltip.test.ts): each arm calls farmSeedBackLineKey
-  // exactly once, INSIDE a positive seedBackCount guard, in its own case
-  // body. Assertions run on extracted case slices and a brace-matched guard
+describe('the farm feedback seed-back render arms (source pin)', () => {
+  // The seed-back arms lived in hud.ts's farmHarvested and farmWithered case
+  // bodies until the v0.38.0 sync's monolith extraction moved them whole to
+  // src/ui/farm_event_feedback.ts, where tests/farm_event_feedback.test.ts
+  // now DRIVES them directly (the executed coverage this pin's original
+  // premise said was missing). The structural pin stays as belt-and-braces
+  // over the extracted source: each arm calls farmSeedBackLineKey exactly
+  // once, INSIDE a positive seedBackCount guard, in its own case body.
+  // Assertions run on extracted case slices and a brace-matched guard
   // block, never on whole-file proximity regex; whole-line comments are
   // stripped first so a commented-out call cannot satisfy the pin.
-  const hudSrc = readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8').replace(
-    /^\s*\/\/.*$/gm,
-    '',
-  );
+  const feedbackSrc = readFileSync(
+    path.join(__dirname, '../src/ui/farm_event_feedback.ts'),
+    'utf8',
+  ).replace(/^\s*\/\/.*$/gm, '');
 
   /** The case arm's slice: from its own label to the next case label, with
    *  both anchors demanded unique so the slice cannot silently widen. */
   function caseSlice(label: string, nextLabel: string): string {
     const open = `case '${label}': {`;
     const close = `case '${nextLabel}': {`;
-    const start = hudSrc.indexOf(open);
-    const end = hudSrc.indexOf(close);
+    const start = feedbackSrc.indexOf(open);
+    const end = feedbackSrc.indexOf(close);
     expect(start, `case '${label}' exists`).toBeGreaterThan(-1);
-    expect(hudSrc.indexOf(open, start + 1), `case '${label}' appears once`).toBe(-1);
+    expect(feedbackSrc.indexOf(open, start + 1), `case '${label}' appears once`).toBe(-1);
     expect(end, `case '${nextLabel}' bounds the slice`).toBeGreaterThan(start);
-    return hudSrc.slice(start, end);
+    return feedbackSrc.slice(start, end);
   }
 
   /** The brace-matched block of the arm's one positive seed-back guard. */
@@ -329,7 +333,7 @@ describe('the hud seed-back render arms (source pin)', () => {
     expect(at, 'the depletion gate exists').toBeGreaterThan(-1);
     expect(arm.indexOf(gate, at + 1), 'exactly one depletion gate').toBe(-1);
     const gated = arm.slice(at, arm.indexOf('}', at) + 1);
-    expect(gated).toContain("this.showSelfNote(t('hudChrome.professions.toolEffectDepleted'))");
+    expect(gated).toContain("host.showSelfNote(t('hudChrome.professions.toolEffectDepleted'))");
     // The note never renders outside its gate, and never in the withered arm.
     expect(arm.split('toolEffectDepleted').length - 1).toBe(1);
     const witheredArm = caseSlice('farmWithered', 'farmDenied');

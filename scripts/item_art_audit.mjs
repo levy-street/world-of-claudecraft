@@ -99,16 +99,17 @@ const build = await buildItemArtAudit({
   mapping,
   pendingArtIds: [...pendingArtIds].sort(),
   expected: {
-    catalogCount: 817,
+    catalogCount: 822,
     // The ART-SUBJECT count: live defs minus the declared procedural-art
     // debt (ITEM_ART_PENDING, exact-set-pinned in tests/item_icons.test.ts).
-    // 831 is the 2026-08-09 reviewed universe and stays a hard literal: a
+    // 837 is the v0.38.0 reviewed universe (the 2026-08-09 831 plus the
+    // release's six art-shipping additions) and stays a hard literal: a
     // new item ships art (joining this count) or joins the pending pin, and
     // either move is a visible, deliberate edit.
-    liveItemCount: 831,
-    generatedHeroicDefinitions: 63,
+    liveItemCount: 837,
+    generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
-    heroicWeaponArtAliases: 15,
+    heroicWeaponArtAliases: 16,
     sheetPageCount: 26,
     groupCount: 22,
   },

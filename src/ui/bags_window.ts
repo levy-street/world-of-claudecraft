@@ -21,6 +21,7 @@ import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
+import { isItemLocked } from '../sim/item_lock';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
@@ -76,6 +77,7 @@ import {
   cornerMarkHtml,
   INSTANCE_GLYPH_ARIA_KEYS,
   instanceGlyphMarkHtml,
+  lockMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
@@ -260,6 +262,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     x: number,
     y: number,
     runDefault: () => void,
+    instance?: ItemInstancePayload,
   ): void;
 }
 
@@ -871,16 +874,22 @@ export class BagsWindow {
       // corner (a masterwork fine stack keeps its rim).
       const glyphKind = bagInstanceGlyphKind(s.instance);
       const cornerMark = bagCornerMark(glyphKind, questMark, fineMark);
+      const locked = isItemLocked(s.instance);
       row.style.setProperty('--bag-slot-quality', qColor);
-      // Accessible name: quest stacks always announce quest item (the seal is
-      // aria-hidden). Instanced stacks keep their per-copy flag. Plain stacks,
-      // fine included, keep the plain label: a fine id's NAME already carries
-      // the grade word (see the fine-grade aria note above the category map).
-      const itemAriaKey = questMark
-        ? 'hudChrome.bags.itemAriaQuest'
-        : glyphKind
-          ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
-          : 'itemUi.bags.itemAria';
+      // Accessible name: the player item lock (issue 3042) outranks every
+      // other announcement, since "this copy is protected" is the single most
+      // actionable fact about a locked slot. Otherwise quest stacks always
+      // announce quest item (the seal is aria-hidden); instanced stacks keep
+      // their per-copy flag; plain stacks, fine included, keep the plain
+      // label (a fine id's NAME already carries the grade word, see the
+      // fine-grade aria note above the category map).
+      const itemAriaKey = locked
+        ? 'hudChrome.bags.itemAriaLocked'
+        : questMark
+          ? 'hudChrome.bags.itemAriaQuest'
+          : glyphKind
+            ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
+            : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
         t(itemAriaKey, {
@@ -898,7 +907,8 @@ export class BagsWindow {
       // --fx gate). Ready seals share the seal markup and brighten via
       // .bi-quest-seal-ready (static; optional pulse is CSS-only).
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
-      row.innerHTML = `${this.deps.itemIcon(item)}${cornerSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      const lockSeal = lockMarkHtml(locked);
+      row.innerHTML = `${this.deps.itemIcon(item)}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
       // 5s throw pacing is visible in the bag. The bag is a cold window with no
       // per-frame driver, so the sweep is a self-contained CSS animation seeded from
@@ -948,12 +958,14 @@ export class BagsWindow {
           this.deps.insertItemChatLink(s.itemId);
           return;
         }
-        // Touch has no right-click, so a tap on an item with an action
-        // (Disenchant / Salvage / Apply Enchant) opens the action menu instead of
+        // Touch has no right-click, so a tap opens the action menu instead of
         // running the classic action directly; the menu's first row is that
-        // classic action, so nothing is lost. A plain item taps straight through,
-        // byte-identical to today. Long-press still peeks (handled above).
-        if (this.deps.isTouchHud() && this.itemMenuAvailable(item, s.itemId)) {
+        // classic action, so nothing is lost. Since the player item lock
+        // (issue 3042) added Lock/Unlock to every item's menu, this is now
+        // ALWAYS available (previously only for Disenchant / Salvage / Apply
+        // Enchant items; a plain item tapped straight through). Long-press
+        // still peeks (handled above).
+        if (this.deps.isTouchHud() && this.itemMenuAvailable(item, s.itemId, s.instance)) {
           this.openItemMenuFor(item, s, ev);
           return;
         }
@@ -983,12 +995,12 @@ export class BagsWindow {
           return;
         }
         ev.preventDefault();
-        // An item with an action (Disenchant / Salvage / Apply Enchant)
-        // opens the action menu, whose FIRST row is the classic left-click action
-        // so that binding survives. Every other item keeps today's behavior
-        // byte-identical: right-click runs the SAME action as left-click (use /
-        // equip), never a destroy (destroying is the drag-out-to-world gesture).
-        if (this.itemMenuAvailable(item, s.itemId)) {
+        // The action menu opens, whose FIRST row is the classic left-click
+        // action so that binding survives (right-click never destroys;
+        // destroying is the drag-out-to-world gesture). Every item now offers
+        // at least Lock/Unlock (issue 3042), so this always opens the menu;
+        // left-click is unchanged (still runs the classic action instantly).
+        if (this.itemMenuAvailable(item, s.itemId, s.instance)) {
           this.openItemMenuFor(item, s, ev);
           return;
         }
@@ -1625,7 +1637,11 @@ export class BagsWindow {
   // The bank arm reads bankOpen for the same reason bagDestroyAction does: a
   // bank view with no deposit target is still the bank owning the slot, and the
   // menu's rows are the very use / equip / destroy actions this surface refuses.
-  private itemMenuAvailable(item: ItemDef, itemId: string): boolean {
+  private itemMenuAvailable(
+    item: ItemDef,
+    itemId: string,
+    instance?: ItemInstancePayload,
+  ): boolean {
     const mode = this.bagMode();
     const inDefaultMode =
       !mode.tradeOpen &&
@@ -1636,7 +1652,7 @@ export class BagsWindow {
       !mode.bankDeposit &&
       !mode.guildBankDeposit &&
       !mode.petFeed;
-    return inDefaultMode && bagItemHasContextActions(item, itemId);
+    return inDefaultMode && bagItemHasContextActions(item, itemId, instance);
   }
 
   // Open the action menu at the event's viewport point (falling back to the row
@@ -1648,7 +1664,15 @@ export class BagsWindow {
     const x = ev.clientX || rect?.left || 0;
     const y = ev.clientY || rect?.top || 0;
     const index = bagStackIndex(this.deps.world().inventory, s);
-    this.deps.openItemActionMenu(item, s.itemId, index, x, y, () => this.runBagAction(item, s, ev));
+    this.deps.openItemActionMenu(
+      item,
+      s.itemId,
+      index,
+      x,
+      y,
+      () => this.runBagAction(item, s, ev),
+      s.instance,
+    );
   }
 
   /** The copy selection for a clicked stack, or undefined when the stack is no

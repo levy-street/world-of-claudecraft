@@ -12,7 +12,15 @@
 import { describe, expect, it } from 'vitest';
 import { DELVE_X_MIN, GATHER_NODES, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
-import { createMinimapMarkers, type MinimapMarker, minimapMode } from '../src/ui/minimap_markers';
+import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
+import {
+  createMinimapMarkers,
+  MINIMAP_CLIP_INSET,
+  type MinimapMarker,
+  minimapMode,
+  minimapPaintedMarkerClearance,
+  minimapSafeCenterRadius,
+} from '../src/ui/minimap_markers';
 import type { IWorld } from '../src/world_api';
 import { assertAllocationStable } from './util/alloc_probe';
 
@@ -45,6 +53,7 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
   const junk = shape === 'sim' ? { hp: 100, maxHp: 100, castingAbility: null } : {};
   const ent = (over: Record<string, unknown>) => ({
     dead: false,
+    hostile: false,
     lootable: false,
     aggroTargetId: null,
     questIds: [],
@@ -74,11 +83,36 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     [8, ent({ id: 8, kind: 'npc', name: 'Quiet', questIds: [], pos: { x: 9, z: PZ } })],
     [9, ent({ id: 9, kind: 'object', templateId: 'dungeon_door', pos: { x: 10, z: PZ } })],
     [10, ent({ id: 10, kind: 'object', lootable: true, pos: { x: 11, z: PZ } })],
-    [11, ent({ id: 11, kind: 'mob', aggroTargetId: 1, pos: { x: 12, z: PZ } })],
-    [12, ent({ id: 12, kind: 'mob', aggroTargetId: null, pos: { x: 13, z: PZ } })],
-    [13, ent({ id: 13, kind: 'mob', dead: true, lootable: true, pos: { x: 14, z: PZ } })],
+    [11, ent({ id: 11, kind: 'mob', hostile: true, aggroTargetId: 1, pos: { x: 12, z: PZ } })],
+    [12, ent({ id: 12, kind: 'mob', hostile: true, aggroTargetId: null, pos: { x: 13, z: PZ } })],
+    [
+      13,
+      ent({
+        id: 13,
+        kind: 'mob',
+        hostile: true,
+        dead: true,
+        lootable: true,
+        pos: { x: 14, z: PZ },
+      }),
+    ],
     // far beyond the rim -> culled.
-    [14, ent({ id: 14, kind: 'mob', pos: { x: 80, z: PZ } })],
+    [14, ent({ id: 14, kind: 'mob', hostile: true, pos: { x: 80, z: PZ } })],
+    [15, ent({ id: 15, kind: 'object', templateId: 'dungeon_exit', pos: { x: 15, z: PZ } })],
+    [
+      17,
+      ent({ id: 17, kind: 'object', templateId: 'mailbox', lootable: true, pos: { x: 16, z: PZ } }),
+    ],
+    [
+      18,
+      ent({
+        id: 18,
+        kind: 'object',
+        templateId: 'noticeboard_eastbrook',
+        lootable: true,
+        pos: { x: 17, z: PZ },
+      }),
+    ],
   ]);
   const partyInfo = {
     leader: 1,
@@ -166,34 +200,194 @@ describe('minimapMode (delve vs overworld discriminator)', () => {
 });
 
 describe('createMinimapMarkers: the discriminated union per draw kind', () => {
+  it('keeps a painted marker full-corner-safe at the circular clip in both profiles', () => {
+    for (const size of [16, 18, 20, 22, 24, 26]) {
+      const clearance = minimapPaintedMarkerClearance(size);
+      const centerRadius = minimapSafeCenterRadius(S, clearance);
+      const outerCornerRadius = centerRadius + clearance;
+      expect(outerCornerRadius).toBeLessThanOrEqual(S / 2 - MINIMAP_CLIP_INSET);
+    }
+  });
+
+  it.each([
+    {
+      profile: 'standard' as const,
+      guild: { radius: 3.5, outline: 1.5 },
+      loot: { radius: 4, shoulder: 1, outline: 1.25 },
+      aggro: { radius: 3.5, outline: 1.25 },
+      arrow: { tip: 6, back: -4, halfY: 4.5, outline: 1.5 },
+    },
+    {
+      profile: 'compact' as const,
+      guild: { radius: 5.25, outline: 2 },
+      loot: { radius: 6, shoulder: 1.5, outline: 1.75 },
+      aggro: { radius: 5.25, outline: 1.75 },
+      arrow: { tip: 9, back: -6, halfY: 6.75, outline: 2 },
+    },
+  ])(
+    'contains every sharp outlined $profile silhouette, including its true miter apex',
+    ({ profile, guild, loot, aggro, arrow }) => {
+      const clipRadius = S / 2 - MINIMAP_CLIP_INSET;
+      const diamondClearance = (radius: number, outline: number) =>
+        radius + (outline / 2) * Math.SQRT2;
+      const sparkClearance = (radius: number, shoulder: number, outline: number) =>
+        radius + (outline / 2) * (Math.hypot(shoulder, radius - shoulder) / shoulder);
+      const arrowClearance =
+        arrow.tip +
+        (arrow.outline / 2) * (Math.hypot(arrow.tip - arrow.back, arrow.halfY) / arrow.halfY);
+      const specs = [
+        { id: 3, kind: 'ally' as const, clearance: diamondClearance(guild.radius, guild.outline) },
+        {
+          id: 10,
+          kind: 'object-loot' as const,
+          clearance: sparkClearance(loot.radius, loot.shoulder, loot.outline),
+        },
+        { id: 11, kind: 'mob' as const, clearance: diamondClearance(aggro.radius, aggro.outline) },
+      ];
+
+      for (const spec of specs) {
+        const world = makeWorld('client') as unknown as {
+          player: { id: number; pos: { x: number; z: number } };
+          entities: Map<number, { id: number; pos: { x: number; z: number } }>;
+          stationPlacements: unknown[];
+          partyInfo: null;
+        };
+        const target = world.entities.get(spec.id);
+        if (!target) throw new Error(`expected seeded marker entity ${spec.id}`);
+        world.entities = new Map([
+          [world.player.id, world.player],
+          [target.id, target],
+        ]);
+        world.stationPlacements = [];
+        world.partyInfo = null;
+
+        const safeCenter = clipRadius - spec.clearance;
+        target.pos.x = world.player.pos.x - (safeCenter + 0.01);
+        target.pos.z = world.player.pos.z;
+        expect(
+          createMinimapMarkers()
+            .build(world as unknown as IWorld, S, 1, profile)
+            .markers.some((marker) => marker.kind === spec.kind),
+          `${profile} ${spec.kind} must reject a center whose miter crosses the clip`,
+        ).toBe(false);
+
+        target.pos.x = world.player.pos.x - (safeCenter - 0.01);
+        const marker = createMinimapMarkers()
+          .build(world as unknown as IWorld, S, 1, profile)
+          .markers.find((candidate) => candidate.kind === spec.kind);
+        expect(marker, `${profile} ${spec.kind} just inside the safe center`).toBeDefined();
+        if (!marker) continue;
+        expect(
+          Math.hypot(marker.mx - S / 2, marker.my - S / 2) + spec.clearance,
+        ).toBeLessThanOrEqual(clipRadius);
+      }
+
+      const partyWorld = makeWorld('client') as unknown as {
+        player: { id: number; pos: { x: number; z: number } };
+        entities: Map<number, unknown>;
+        stationPlacements: unknown[];
+        partyInfo: {
+          leader: number;
+          raid: boolean;
+          members: Array<{ pid: number; cls: string; dead: number; x: number; z: number }>;
+        };
+      };
+      partyWorld.entities = new Map([[partyWorld.player.id, partyWorld.player]]);
+      partyWorld.stationPlacements = [];
+      partyWorld.partyInfo = {
+        leader: partyWorld.player.id,
+        raid: false,
+        members: [
+          {
+            pid: partyWorld.player.id,
+            cls: 'warrior',
+            dead: 0,
+            x: partyWorld.player.pos.x,
+            z: partyWorld.player.pos.z,
+          },
+          {
+            pid: 99,
+            cls: 'priest',
+            dead: 0,
+            x: partyWorld.player.pos.x - 1000,
+            z: partyWorld.player.pos.z,
+          },
+        ],
+      };
+      const partyArrow = createMinimapMarkers()
+        .build(partyWorld as unknown as IWorld, S, 1, profile)
+        .markers.find(
+          (marker): marker is Extract<MinimapMarker, { kind: 'party-arrow' }> =>
+            marker.kind === 'party-arrow',
+        );
+      expect(partyArrow).toBeDefined();
+      if (partyArrow) {
+        expect(
+          Math.hypot(partyArrow.mx - S / 2, partyArrow.my - S / 2) + arrowClearance,
+        ).toBeCloseTo(clipRadius, 8);
+      }
+    },
+  );
+
+  it('uses the compact quest footprint when deciding whether a rim NPC can draw', () => {
+    const world = makeWorld('client');
+    const player = world.player;
+    const giver = world.entities.get(6);
+    if (!giver) throw new Error('expected quest giver fixture');
+    world.entities = new Map([
+      [player.id, player],
+      [giver.id, giver],
+    ]);
+    Object.defineProperty(world, 'stationPlacements', { value: [] });
+    // 62 backing pixels from center: the 20px standard quest art fits, but
+    // the 26px compact art would cross the 79px circular clip at its corner.
+    giver.pos.x = -62 / PPY;
+    giver.pos.z = PZ;
+    const core = createMinimapMarkers();
+    expect(
+      core
+        .build(world as unknown as IWorld, S, PPY, 'standard')
+        .markers.some((marker) => marker.kind === 'npc'),
+    ).toBe(true);
+    expect(
+      core
+        .build(world as unknown as IWorld, S, PPY, 'compact')
+        .markers.some((marker) => marker.kind === 'npc'),
+    ).toBe(false);
+  });
+
   it('emits exactly the expected kinds, classifies friend/guild, and skips party + stranger', () => {
     const markers = buildMarkers(makeWorld('sim'));
     const kinds = markers.map((m) => m.kind);
-    // ally (friend), ally (guild), npc('!'), npc('•'), portal, object-loot, mob(aggro),
-    // mob, mob-loot, party-disc (pid 5), party-arrow (pid 16), player. The stranger
+    // Dungeon portals, mailbox/noticeboard services, and the full-footprint-safe
+    // gather node paint
+    // first, then ally (friend), ally (guild), object-loot, mob(aggro), mob,
+    // mob-loot, party-disc (pid 5), party-arrow
+    // (pid 16), quest NPCs, player. The stranger
     // (id 4) and the party member (id 5) produce NO entity-loop marker; id 14 is culled.
     //
-    // The two gather-node entries are content, not fixture: wood_eastbrook_4 and
-    // wood_eastbrook_5 sit 25.0 and 40.6 yards from (0, PZ), inside the
-    // 43.53-yard rim, and the node loop runs between the party loop and the
-    // player arrow. They appeared when the Eastbrook wood stands were spread up
-    // the north road instead of clumped at Webwood; a future stand near (0, 100)
-    // legitimately re-mints this list, which is why the whole ordered sequence is
-    // asserted rather than a subset.
+    // The gather-node entry is content, not fixture: wood_eastbrook_4 sits 25.0
+    // yards from (0, PZ). wood_eastbrook_5's centre is inside the clip but its
+    // full ready raster would cross the circular edge, so it is intentionally
+    // omitted. Static map paintings precede
+    // every live entity marker, and the navigation stack remains above both,
+    // which is why the whole ordered sequence is asserted rather than a subset.
     expect(kinds).toEqual([
-      'ally',
-      'ally',
-      'npc',
-      'npc',
       'portal',
+      'portal',
+      'service',
+      'service',
+      'gather-node',
+      'ally',
+      'ally',
       'object-loot',
       'mob',
       'mob',
       'mob-loot',
       'party-disc',
       'party-arrow',
-      'gather-node',
-      'gather-node',
+      'npc',
+      'npc',
       'player',
     ]);
     const allies = markers.filter((m) => m.kind === 'ally') as Extract<
@@ -218,6 +412,184 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     expect(npcs.map((n) => n.glyph)).toEqual(['!', '•']);
     // The marker variant behind each glyph: gold first-offer, neutral none.
     expect(npcs.map((n) => n.marker)).toEqual(['available', 'none']);
+  });
+
+  it('never presents friendly summons or their bodies as hostile minimap markers', () => {
+    const world = makeWorld('sim') as unknown as {
+      entities: Map<number, Record<string, unknown>>;
+    };
+    world.entities.set(30, {
+      id: 30,
+      kind: 'mob',
+      hostile: false,
+      ownerId: 1,
+      dead: false,
+      lootable: false,
+      aggroTargetId: null,
+      pos: { x: 12, z: PZ },
+    });
+    world.entities.set(31, {
+      id: 31,
+      kind: 'mob',
+      hostile: false,
+      ownerId: 1,
+      dead: true,
+      lootable: true,
+      aggroTargetId: null,
+      pos: { x: 14, z: PZ },
+    });
+
+    const markers = buildMarkers(world as unknown as IWorld);
+    expect(markers.filter((marker) => marker.kind === 'mob')).toHaveLength(2);
+    expect(markers.filter((marker) => marker.kind === 'mob-loot')).toHaveLength(1);
+  });
+
+  it('preserves each gathering node type for the painter', () => {
+    const nodes = buildMarkers(makeWorld('sim')).filter((marker) => marker.kind === 'gather-node');
+
+    expect(nodes.map((node) => node.type)).toEqual(['wood']);
+  });
+
+  it('separates dungeon directions and civic services from generic loot', () => {
+    const markers = buildMarkers(makeWorld('sim'));
+    expect(
+      markers.filter((marker) => marker.kind === 'portal').map((marker) => marker.portal),
+    ).toEqual(['dungeon-entrance', 'dungeon-exit']);
+    expect(
+      markers.filter((marker) => marker.kind === 'service').map((marker) => marker.service),
+    ).toEqual(['mailbox', 'noticeboard']);
+    expect(markers.filter((marker) => marker.kind === 'object-loot')).toHaveLength(1);
+  });
+
+  it('classifies rift and delve rewards before generic loot, then draw-orders navigation above rewards', () => {
+    const world = makeWorld('client') as unknown as {
+      player: { id: number; pos: { x: number; z: number } };
+      entities: Map<number, unknown>;
+      delveRun: {
+        exitPortalOpen: boolean;
+        bountiful: boolean;
+        rite: { phase: 'input' };
+      };
+    };
+    const player = world.entities.get(world.player.id);
+    if (!player) throw new Error('expected the seeded player');
+    const at = (id: number, templateId: string, x: number, extra: Record<string, unknown> = {}) =>
+      [
+        id,
+        {
+          id,
+          kind: 'object',
+          templateId,
+          lootable: true,
+          pos: { x, z: PZ },
+          ...extra,
+        },
+      ] as const;
+    world.entities = new Map<number, unknown>([
+      [world.player.id, player],
+      // Deliberately interleave source order. The output must group rewards
+      // before navigation without sorting or weakening the radial cull.
+      at(30, 'rift_descent', 2),
+      at(31, 'rift_treasure', 3),
+      at(32, 'rift_exit', 4, { riftTier: 'S' }),
+      at(33, 'rift_locked_chest', 5),
+      at(34, 'rift_beacon', 6, { lootable: false }),
+      at(35, 'delve_module_exit', 7),
+      at(36, 'delve_locked_chest', 8),
+      at(37, 'delve_surface_exit', 9),
+      at(39, 'rift_pylon_lit', 10),
+      // A recognized reward beyond the established rim remains culled.
+      at(38, 'rift_treasure_open', 80),
+    ]);
+    world.delveRun = { exitPortalOpen: true, bountiful: true, rite: { phase: 'input' } };
+
+    const markers = buildMarkers(world as unknown as IWorld);
+    const semantic = markers.filter(
+      (marker): marker is Extract<MinimapMarker, { kind: 'semantic-object' }> =>
+        marker.kind === 'semantic-object',
+    );
+    expect(semantic.map((marker) => marker.semantic)).toEqual([
+      { kind: 'rift-mechanic', mechanic: 'pylon', state: 'lit' },
+      { kind: 'rift-reward', reward: 'treasure', state: 'available' },
+      { kind: 'rift-reward', reward: 'cache', state: 'locked' },
+      { kind: 'delve-reward', reward: 'cache', state: 'locked', bountiful: true },
+      { kind: 'rift-descent' },
+      { kind: 'rift-return', route: 'egress', rank: 'S' },
+      { kind: 'rift-return', route: 'beacon', rank: null },
+      { kind: 'delve-passage', state: 'open' },
+      { kind: 'delve-surface' },
+    ]);
+    expect(markers.filter((marker) => marker.kind === 'object-loot')).toHaveLength(0);
+  });
+
+  it('draw-orders quest punctuation above collocated station paintings', () => {
+    const world = makeWorld('sim') as unknown as {
+      entities: Map<number, { pos: { x: number; z: number } }>;
+      stationPlacements: typeof STATIONS;
+    };
+    const npc = world.entities.get(6);
+    if (!npc) throw new Error('expected the seeded quest npc');
+    npc.pos = { ...STATIONS[0].pos };
+    world.stationPlacements = [STATIONS[0]];
+    const markers = buildMarkers(world as unknown as IWorld);
+    expect(markers.findIndex((marker) => marker.kind === 'station')).toBeLessThan(
+      markers.findIndex((marker) => marker.kind === 'npc'),
+    );
+  });
+
+  it('orders one collocated stack: static art, live entities, then the existing top markers', () => {
+    const anchor = GATHER_NODES.find((node) => node.id === 'wood_eastbrook_4');
+    if (!anchor) throw new Error('expected the seeded gathering node');
+    const world = makeWorld('sim') as unknown as {
+      player: {
+        pos: { x: number; z: number };
+        ghost: boolean;
+        corpsePos: { x: number; z: number };
+      };
+      entities: Map<number, { pos: { x: number; z: number } }>;
+      partyInfo: { members: Array<{ pid: number; x: number; z: number }> };
+      stationPlacements: Array<(typeof STATIONS)[number]>;
+    };
+    world.player.pos = { ...anchor.pos };
+    world.player.ghost = true;
+    world.player.corpsePos = { ...anchor.pos };
+    // Deliberately mix the source-map order: the ally is id 2 and the hostile
+    // is id 11, while the portal/service are ids 9 and 17. Output grouping must
+    // not depend on which category happened to occur first in world.entities.
+    for (const id of [2, 6, 9, 10, 11, 13, 17]) {
+      const entity = world.entities.get(id);
+      if (!entity) throw new Error(`expected seeded entity ${id}`);
+      entity.pos = { ...anchor.pos };
+    }
+    const party = world.partyInfo.members.find((member) => member.pid === 5);
+    if (!party) throw new Error('expected seeded party member');
+    party.x = anchor.pos.x;
+    party.z = anchor.pos.z;
+    world.stationPlacements = [
+      {
+        ...STATIONS[0],
+        id: 'collocated_station',
+        pos: { ...anchor.pos },
+      },
+    ];
+
+    const markers = buildMarkers(world as unknown as IWorld);
+    const center = markers.filter((marker) => marker.mx === S / 2 && marker.my === S / 2);
+    const kinds = center.map((marker) => marker.kind);
+    expect(kinds).toEqual([
+      'portal',
+      'service',
+      'gather-node',
+      'station',
+      'ally',
+      'object-loot',
+      'mob',
+      'mob-loot',
+      'corpse',
+      'party-disc',
+      'npc',
+      'player',
+    ]);
   });
 
   it("renders the '?' glyph when an npc has a ready turn-in (distinct from '!')", () => {
@@ -373,6 +745,60 @@ describe('determinism', () => {
   });
 });
 
+describe('stable overworld navigation markers', () => {
+  it('projects every delve door and both sides of every world passage at the player-centered point', () => {
+    for (const landmark of STABLE_MAP_NAVIGATION_LANDMARKS) {
+      const world = makeWorld('client') as unknown as {
+        player: { id: number; pos: { x: number; z: number } };
+        entities: Map<number, { id: number; pos: { x: number; z: number } }>;
+        stationPlacements: unknown[];
+      };
+      world.player.pos = { x: landmark.x, z: landmark.z };
+      world.entities = new Map([[world.player.id, world.player]]);
+      world.stationPlacements = [];
+      const markers = buildMarkers(world as unknown as IWorld).filter(
+        (marker) => marker.kind === 'stable-navigation',
+      );
+      expect(markers).toContainEqual({
+        kind: 'stable-navigation',
+        mx: S / 2,
+        my: S / 2,
+        navigation: landmark.kind,
+      });
+    }
+  });
+
+  it('draw-orders static navigation above ordinary dynamics and below NPC/player guidance', () => {
+    const landmark = STABLE_MAP_NAVIGATION_LANDMARKS[0];
+    const world = makeWorld('sim') as unknown as {
+      player: { id: number; pos: { x: number; z: number } };
+      entities: Map<number, unknown>;
+      stationPlacements: unknown[];
+    };
+    world.player.pos = { x: landmark.x, z: landmark.z };
+    world.entities = new Map<number, unknown>([
+      [world.player.id, world.player],
+      [
+        50,
+        {
+          id: 50,
+          kind: 'mob',
+          name: 'Nearby mob',
+          templateId: '',
+          dead: false,
+          lootable: false,
+          aggroTargetId: null,
+          pos: { ...world.player.pos },
+        },
+      ],
+    ]);
+    world.stationPlacements = [];
+    const kinds = buildMarkers(world as unknown as IWorld).map((marker) => marker.kind);
+    expect(kinds.indexOf('mob')).toBeLessThan(kinds.indexOf('stable-navigation'));
+    expect(kinds.indexOf('stable-navigation')).toBeLessThan(kinds.indexOf('player'));
+  });
+});
+
 describe('allocation budget (the reused-reference proxy, wrapper floor)', () => {
   it('reuses the returned container AND its markers array across calls', () => {
     // The wrapper floor: the container object + its markers array stay identical. The
@@ -472,6 +898,8 @@ describe('station markers (Professions 2.0)', () => {
     expect(markers).toEqual([
       {
         kind: 'station',
+        stationId: 'custom_station',
+        type: 'forge',
         mx: S / 2 - (2 - VIEW_POS.x) * PPY,
         my: S / 2 - (12 - VIEW_POS.z) * PPY,
       },
@@ -725,7 +1153,7 @@ describe('gather-node markers scale with the rim, not the node table (phase 16)'
   function nodeMarkersAt(x: number, z: number) {
     return buildMarkers(nodeWorldAt(x, z)).filter((m) => m.kind === 'gather-node');
   }
-  const RIM_PX = S / 2 - 7; // byte-faithful to the core's half - RIM_INSET
+  const READY_RIM_PX = minimapSafeCenterRadius(S, minimapPaintedMarkerClearance(18));
 
   it('draws exactly the in-rim subset, probed standing on one node of every zone', () => {
     const zones = [...new Set(GATHER_NODES.map((n) => n.zoneId))];
@@ -738,7 +1166,7 @@ describe('gather-node markers scale with the rim, not the node table (phase 16)'
       const inRim = GATHER_NODES.filter((n) => {
         const dx = (n.pos.x - anchor.pos.x) * PPY;
         const dz = (n.pos.z - anchor.pos.z) * PPY;
-        return dx * dx + dz * dz <= RIM_PX * RIM_PX;
+        return dx * dx + dz * dz <= READY_RIM_PX * READY_RIM_PX;
       });
       const drawn = nodeMarkersAt(anchor.pos.x, anchor.pos.z);
       expect(drawn, `zone ${zoneId}`).toHaveLength(inRim.length);

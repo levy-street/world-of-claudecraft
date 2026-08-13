@@ -26,6 +26,10 @@ export const thornhollowFields: GuidePage = {
         ${section('guide.thornhollowPage.respawnHeading', `<p>${esc(t('guide.thornhollowPage.respawnBody'))}</p>`)}
         ${section('guide.thornhollowPage.carrierHeading', `<p>${esc(t('guide.thornhollowPage.carrierBody'))}</p>`)}
         ${section('guide.thornhollowPage.rewardsHeading', p('guide.thornhollowPage.rewardsBody'))}
+        ${section(
+          'guide.thornhollowPage.leavingHeading',
+          `<p>${esc(t('guide.thornhollowPage.leavingBody'))}</p>${callout(esc(t('guide.thornhollowPage.backfillNote')), { variant: 'note' })}`,
+        )}
         ${section('guide.thornhollowPage.ladderHeading', `<p>${esc(t('guide.thornhollowPage.ladderBody'))}</p>`)}
         ${related([
           { href: hrefFor('arena'), key: 'guide.nav.arena' },

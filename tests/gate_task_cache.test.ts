@@ -23,10 +23,9 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 };
 
 describe('turboRunArgs', () => {
-  it('builds npx-ready turbo run argv with stream UI', () => {
-    expect(turboRunArgs(['i18n:gen'])).toEqual(['turbo', 'run', 'i18n:gen', '--ui=stream']);
+  it('builds turbo run argv with stream UI', () => {
+    expect(turboRunArgs(['i18n:gen'])).toEqual(['run', 'i18n:gen', '--ui=stream']);
     expect(turboRunArgs(['check:types', 'build:env', 'build:server'])).toEqual([
-      'turbo',
       'run',
       'check:types',
       'build:env',
@@ -116,8 +115,9 @@ describe('buildFullGateSteps orchestration', () => {
 
     const artifacts = byName['i18n + wiki + sfx artifacts'];
     expect(isTurboGateStep(artifacts.cmd, artifacts.args)).toBe(true);
+    expect(artifacts.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
     expect(artifacts.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'i18n:gen', 'wiki:content', 'sfx:check']),
+      expect.arrayContaining(['run', 'i18n:gen', 'wiki:content', 'sfx:check']),
     );
     expect(byName['i18n freshness'].cmd).toBe('git');
     expect(byName['i18n freshness'].args).toEqual(
@@ -133,16 +133,9 @@ describe('buildFullGateSteps orchestration', () => {
     expect(byName['browser regressions'].cmd).toBe('npm');
 
     const typesBuilds = byName['typecheck + env/server/bot builds'];
-    expect(typesBuilds.cmd).toBe('npx');
+    expect(typesBuilds.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
     expect(typesBuilds.args).toEqual(
-      expect.arrayContaining([
-        'turbo',
-        'run',
-        'check:types',
-        'build:env',
-        'build:server',
-        'build:bot',
-      ]),
+      expect.arrayContaining(['run', 'check:types', 'build:env', 'build:server', 'build:bot']),
     );
     expect(isTurboGateStep(byName['client build'].cmd, byName['client build'].args)).toBe(true);
     expect(byName['client build'].args).toContain('build:bundle');

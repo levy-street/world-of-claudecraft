@@ -1038,4 +1038,30 @@ export const tr_TR: Record<string, string> = {
   'bugReports.reviewed': 'İncelendi',
   'dialog.report': 'Rapor',
   'theme.darkModeLabel': 'Koyu mod',
+  'error.cannotRateLimitAdmin': 'yönetici hesapları sınırlandırılamaz',
+  'error.generalChatRateLimitMessages': '{min} ile {max} arasında mesaj gir.',
+  'error.generalChatRateLimitReasonInvalid':
+    'En fazla {max} karakterlik bir moderasyon gerekçesi gir.',
+  'error.generalChatRateLimitRequired': 'Geçerli bir Genel sohbet sınırı seç ya da kaldır.',
+  'error.generalChatRateLimitWindowMinutes': '{min} ile {max} dakika arasında bir pencere gir.',
+  'generalChatRateLimit.confirmRemove': 'Sınırı kaldır',
+  'generalChatRateLimit.current':
+    'Mevcut sınır: {minutes} dakikalık pencerede {messages} mesaj hakkı',
+  'generalChatRateLimit.edit': 'Sınırı düzenle',
+  'generalChatRateLimit.messagesError': '{min} ile {max} arasında bir tam sayı gir.',
+  'generalChatRateLimit.messagesLabel': 'İzin verilen mesaj sayısı',
+  'generalChatRateLimit.reasonPlaceholder': 'Bu Genel sohbet sınırı neden değişiyor?',
+  'generalChatRateLimit.reasonRequired': 'Bir moderasyon gerekçesi gir.',
+  'generalChatRateLimit.reasonTooLong': 'Gerekçe için en fazla {max} karakter kullan.',
+  'generalChatRateLimit.remove': 'Sınırı kaldır',
+  'generalChatRateLimit.removeHint':
+    'Bu hesap geçersiz kılmasını kaldırmak Genel sohbeti Sınırsız durumuna döndürür.',
+  'generalChatRateLimit.save': 'Sınırı kaydet',
+  'generalChatRateLimit.scope':
+    'Yalnızca Genel sohbete uygulanır. Diğer sohbet kanalları etkilenmez.',
+  'generalChatRateLimit.title': 'Genel sohbet sınırı',
+  'generalChatRateLimit.unlimited': 'Sınırsız',
+  'generalChatRateLimit.windowMinutesError': '{min} ile {max} arasında bir tam sayı gir.',
+  'generalChatRateLimit.windowMinutesLabel': 'Pencere uzunluğu (dakika)',
+  'moderationHistory.actionGeneralChatRateLimit': 'Genel sohbet sınırı değiştirildi',
 };

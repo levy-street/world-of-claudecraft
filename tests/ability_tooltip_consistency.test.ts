@@ -31,6 +31,18 @@ import {
 // truth. Keep this list SHORT and justified; prefer a placeholder in the
 // description over a new entry here.
 const NUMBER_ALLOWLIST: Record<string, number[]> = {
+  // Grace Devotion's mana cadence is stamped by effect_dispatch from its effect kind.
+  grace_devotion: [5],
+  // The Soul Stone heal fraction is SOUL_STONE_HEAL_PCT_MAX (src/sim/soulwell.ts),
+  // an engine constant, not an effects-array value.
+  soulwell: [25],
+  // Flash of Light's Devotion comes from the Paladin generation table, not its heal effect.
+  flash_of_light: [1],
+  // Lay on Hands Devotion comes from the Paladin generation table, not its heal effect.
+  lay_on_hands: [1],
+  // Hammer of Grace generates Devotion through the class table; Solar Reprisal's
+  // full-damage self-heal is applied by the dedicated Paladin proc module.
+  hammer_of_grace: [1, 100],
   // "generating 9 rage and stunning it for 1 sec": both are constants in the
   // charge arm of effect_dispatch.ts, not effect fields.
   charge: [9, 1],
@@ -54,14 +66,60 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   cat_form: [8, 2],
   // "for 30 sec": the sunder aura duration hardcoded in effect_dispatch.ts.
   faerie_fire: [30],
-  expose_armor: [30],
   sunder_armor: [30],
   // "Conjures 2 ...": the stack size hardcoded in casting_lifecycle.ts.
   conjure_water: [2],
+  // Worked per-combo examples (owner feedback: every finisher must spell out
+  // its combo scaling): "5 combo points: N sec" is derived from base+perCombo,
+  // not a raw effect field.
+  kidney_shot: [5, 6],
+  slice_and_dice: [5, 32],
+  rupture: [2, 6, 5, 16],
+  expose_armor: [2, 5, 30],
+  rip: [5],
+  // Druid spec-engine interaction lines: the cited numbers are engine
+  // constants in combat/druid_engines.ts (the Moonseed extension seconds on
+  // the Lunar Tempest line, the Verdance stage cap on the Wildbloom line),
+  // not per-rank effect fields.
+  moonfire: [6],
+  rejuvenation: [5],
+  // Rogue spec-engine interaction lines: the cited numbers are engine
+  // constants in combat/rogue_engines.ts (ritual stages, stage refund, the
+  // Redline window seconds and its 4+ combo opener, the shadow veil seconds,
+  // the Venom Dart wound extension), not per-rank effect fields.
+  eviscerate: [4, 8],
+  backstab: [15, 6],
+  garrote: [6],
+  ambush: [6],
+  venom_dart: [6],
   conjure_food: [2],
   // Patch Up's dead-pet revive fraction is owned by the pet lifecycle branch;
   // the living-pet HoT remains fully data-driven by the ability effect.
   revive_pet: [35],
+  // Fieldcraft's Focus, Momentum, and re-entry rules live in hunter_fieldcraft.ts.
+  raptor_strike: [1, 3, 8, 15],
+  trailbreak: [15, 18, 24],
+  // The Priest spec relationship rules are post-damage hooks rather than ability effects.
+  smite: [15, 30],
+  // 10 = VESPERS_DOT_DAMAGE_MULT (1.1), applied by resolveVespersAbility at
+  // cast time, not by the ability effect table.
+  shadow_word_pain: [1, 10],
+  mind_blast: [1, 3, 30],
+  // Thundercall and Stonebound values live in their spec runtime modules.
+  lightning_bolt: [1, 5],
+  rockbiter_weapon: [3, 10],
+  earth_shock: [3, 5, 125],
+  // Spiritmend deposits are calculated after the direct heal resolves.
+  healing_wave: [12, 30, 50],
+  // Unleash Weapon dispatches to four spec enchant implementations. Their
+  // values live in shaman_unleash_weapon.ts and shaman_spiritmend.ts rather
+  // than one shared ability effect array.
+  unleash_weapon: [54, 64, 30, 2, 20, 6, 75, 3, 4, 125, 8, 50],
+  // The shared Temporal Exhaustion gate is owned by combat/haste_burst.ts.
+  bloodlust: [10],
+  // Divine Ascension's resource price, charge count and lifetime are owned by
+  // the dedicated paladin devotion state machine, not an AbilityEffect.
+  divine_ascension: [20, 5, 45],
 };
 
 // Every resolved rank of every class ability (deduped by rank).

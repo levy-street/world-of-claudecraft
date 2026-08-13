@@ -13,6 +13,7 @@
 // that reshapes or re-orders the serialized field fails even when the parsed
 // value still matches.
 import { describe, expect, it, vi } from 'vitest';
+import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
@@ -61,7 +62,9 @@ function joinServer(
   return session;
 }
 
-const STABLE_META = { timerWireVersion: 2 } as unknown as Parameters<GameServer['join']>[7];
+const STABLE_META = {
+  timerWireVersion: STABLE_TIMER_WIRE_VERSION,
+} as unknown as Parameters<GameServer['join']>[7];
 
 function broadcast(server: GameServer): void {
   (server as unknown as { broadcastSnapshots: () => void }).broadcastSnapshots();
@@ -217,7 +220,7 @@ describe('ncd bytes per player per tick under the delta rules (stable arm)', () 
     broadcast(server);
     const raw = lastRawSnap(fc.sent);
     // The arm under measurement really is the stable wire.
-    expect(raw).toContain('"tw":2');
+    expect(raw).toContain(`"tw":${STABLE_TIMER_WIRE_VERSION}`);
     const m = raw.match(/"ncd":(\{[^}]*\})/);
     expect(m).not.toBeNull();
     const payload = m?.[1] ?? '';

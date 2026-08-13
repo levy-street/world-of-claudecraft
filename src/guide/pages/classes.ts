@@ -10,8 +10,9 @@
 // Spoiler-safe: no balance numbers; ability "what it's for" lines are authored guide keys,
 // never the number-laden sim ability descriptions.
 
-import type { PlayerClass } from '../../sim/types';
+import type { PlayerClass, ResourceType } from '../../sim/types';
 import { CLASS_DETAILS } from '../../ui/class_details_data';
+import { crestImageFallbackAttributes } from '../../ui/crest_image_fallback';
 import { esc } from '../../ui/esc';
 import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
 import { iconDataUrl } from '../../ui/icons';
@@ -126,13 +127,13 @@ function classCard(c: GuideClassInfo): string {
     ? ` data-roles="${esc(c.roles.join(' '))}" data-resource="${esc(c.resource)}" data-style="${esc(m.style)}" data-complexity="${esc(m.complexity)}" data-first="${m.goodFirst}"`
     : ` data-roles="${esc(c.roles.join(' '))}" data-resource="${esc(c.resource)}"`;
   // Show the actual class figure (the pre-rendered character still) as the card image, the
-  // same subject the detail page turntable spins; fall back to the procedural class crest only
-  // if a still is somehow absent (the guide.test asset guard makes that a build failure). The
-  // image is decorative here (alt=""): the whole card is a link the adjacent name span already
-  // labels, so a non-empty alt would double the link's accessible name ("Warrior Warrior...").
+  // same subject the detail page turntable spins; fall back to the procedural class crest if a
+  // still is absent or fails at runtime (the guide.test asset guard makes absence a build
+  // failure). The image is decorative here (alt=""): the whole card is a link the adjacent name
+  // span already labels, so a non-empty alt would double its accessible name.
   const figure = c.still
     ? `<div class="guide-class-card-portrait">
-        <img class="guide-class-card-still" src="${esc(c.still)}" alt="" width="88" height="88" loading="lazy" decoding="async" />
+        <img class="guide-class-card-still" src="${esc(c.still)}" ${crestImageFallbackAttributes(`class_${c.id}`, 128, { decorative: true })} alt="" width="88" height="88" loading="lazy" decoding="async" />
       </div>`
     : crestImg(classCrest(c.id, 128), 64, 'guide-class-crest', '', `class_${c.id}`);
   return `
@@ -232,10 +233,20 @@ function notFoundInline(): string {
   </article>`;
 }
 
+// Typed per-resource key map: adding a ResourceType without a guide string is
+// a compile error here, instead of an untracked-key throw on the class page
+// (review 3050 finding: the `as TranslationKey` cast hid the focus gap).
+const RESOURCE_NAME_KEYS: Record<ResourceType, TranslationKey> = {
+  rage: 'guide.resourceName.rage',
+  mana: 'guide.resourceName.mana',
+  energy: 'guide.resourceName.energy',
+  focus: 'guide.resourceName.focus',
+};
+
 function factsHtml(c: GuideClassInfo): string {
   const details = CLASS_DETAILS[c.id as PlayerClass];
   const rows: [TranslationKey, string][] = [
-    ['classDetails.labels.resource', t(`guide.resourceName.${c.resource}` as TranslationKey)],
+    ['classDetails.labels.resource', t(RESOURCE_NAME_KEYS[c.resource])],
   ];
   if (details) {
     rows.unshift(['classDetails.labels.weapons', t(details.weaponsKey)]);
@@ -299,10 +310,11 @@ function fullKitHtml(c: GuideClassInfo): string {
 }
 
 function warlockPetsHtml(): string {
+  const poster = classCrest('warlock', 96);
   const items = GUIDE_WARLOCK_PETS.map(
     (pet) => `
       <li class="guide-pet">
-        ${modelViewerEmbed({ modelKey: pet.model, tint: pet.tint, name: pet.name, still: pet.still })}
+        ${modelViewerEmbed({ modelKey: pet.model, tint: pet.tint, name: pet.name, still: pet.still, poster, posterCrestId: 'class_warlock' })}
         <span class="guide-pet-name">${esc(pet.name)}</span>
         <span class="guide-pet-line">${esc(t(`guide.petHook.${pet.id}` as TranslationKey))}</span>
       </li>`,
@@ -361,13 +373,14 @@ const FORM_NAME_KEY: Record<string, TranslationKey> = {
 };
 
 function druidFormsHtml(): string {
+  const poster = classCrest('druid', 96);
   const items = GUIDE_DRUID_FORMS.map((f) => {
     const nameKey = FORM_NAME_KEY[f.id];
     if (!nameKey) return '';
     const name = t(nameKey);
     return `
       <li class="guide-pet">
-        ${modelViewerEmbed({ modelKey: f.model, tint: f.tint, name, still: f.still })}
+        ${modelViewerEmbed({ modelKey: f.model, tint: f.tint, name, still: f.still, poster, posterCrestId: 'class_druid' })}
         <span class="guide-pet-name">${esc(name)}</span>
         <span class="guide-pet-line">${esc(t(`guide.classPage.formLine.${f.id}` as TranslationKey))}</span>
       </li>`;
@@ -395,7 +408,7 @@ function detailHtml(id: string): string {
           <h1 class="guide-class-hero-name">${esc(className(c.id))}</h1>
           <div class="guide-badges">
             ${roleBadges(c.roles)}
-            ${badge(t(`guide.resourceName.${c.resource}` as TranslationKey), 'guide-badge-resource')}
+            ${badge(t(RESOURCE_NAME_KEYS[c.resource]), 'guide-badge-resource')}
           </div>
           ${classTags(c.id)}
         </div>

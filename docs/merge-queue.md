@@ -13,10 +13,14 @@ the queue on a branch whose ci.yml lacks the trigger stalls every queued PR).
 Until a branch is covered by the ruleset, its merge button is unchanged.
 The same sequencing applies to every NEW required name after that: add a
 check's context to the ruleset only AFTER the PR introducing the job has
-merged into the target branch (`PR gate (long sims)` is the first case), and
+merged into the target branch (`PR gate (long sims)` was the first case), and
 expect open PRs whose heads predate the job to need a base re-merge before
 they can queue, since a required context that never reports blocks the merge
-forever.
+forever. Renames follow the same choreography in reverse plus forward: when
+the lane-diet PR split `PR gate (long sims)` into `PR gate (long sims A)` and
+`PR gate (long sims B)`, the old context had to leave the ruleset at the same
+time the two new ones joined (after the split merged), because a required
+name no run produces anymore blocks every later merge.
 
 Why: on 2026-08-05 two merges landed on an already-red release tip, every open
 PR inherited 67 broken tests, and repair took a day of close/reopen churn. The
@@ -32,11 +36,28 @@ automatically instead of by hand.
   builds the candidate merge result (your PR merged onto the current tip, plus
   any PRs queued ahead of you) and runs CI on it as a `merge_group` event.
   ci.yml routes that run through the full PR tier: `changes` reports
-  `test_mode=full`, so the queue always runs the complete suite (the 8-shard
-  matrix plus the long-sims lane) plus checks, browser, and lint on the tree
-  it is about to make the branch tip.
+  `test_mode=full`, so the queue always runs every suite (the 8-shard matrix
+  plus the two long-sims lane halves) plus checks, browser, and lint on the
+  tree it is about to make the branch tip. "Every suite" means every test
+  FILE; the balance harnesses inside the lanes run their PR-tier diet
+  configuration here exactly as on PRs and release pushes, and only the
+  nightly workflow restores their full sweep (`WOC_FULL_BALANCE_SWEEP`,
+  docs/qa-gate.md, "The balance-harness diet").
 - If the queue run is green, GitHub merges automatically. No close/reopen, no
   re-merge of the base: base movement is the queue's job now.
+- The queue gives a candidate **90 minutes** for its checks to report
+  (`check_response_timeout_minutes` on the merge_queue rule; grouping is
+  ALLGREEN, and it builds at most 2 entries at a time). That value is the
+  ceiling every job bound has to fit under, so keep this invariant true when
+  resizing any bound: the `changes` bound, plus the largest REQUIRED job
+  bound, plus runner-acquisition slack (which `timeout-minutes` does not count
+  but the queue's timer does) must stay comfortably under it. Today that is
+  8 + 40 (the `changes` bound plus the pr-gate shard bound, the largest
+  required one), so a required critical path of 48 minutes against a 90
+  minute ceiling. A candidate that blows the queue timeout is ejected,
+  which blocks the merge rather than merging anything unproven, but it
+  costs a full queue cycle and reads like a mystery without this number
+  written down.
 - The queue merges with one repo-wide method (merge commit). The per-PR
   squash/merge choice does not apply on the protected branches.
 - Direct pushes to the protected branches are blocked by the
@@ -61,13 +82,27 @@ the Checks tab (filter by event: merge_group).
    it greens, re-queue. Judge red CI by clean-runner reruns.
 5. A job that failed with "exceeded the maximum execution time of N minutes"
    hit its checkout-stall bound (the test and browser jobs carry job-level
-   timeout-minutes sized from measured healthy worst cases; the stall class
+   timeout-minutes sized from measured healthy worst cases, or, where a job
+   has repeatedly died before finishing on a slow runner OR has been measured
+   sitting inside its own margin on a healthy one, from its healthy JOB wall
+   scaled by the measured fast-to-slow runner ratio; the stall class
    is runner-side and runs tens of minutes inside actions/checkout, 9.6 to
    24.4 in the incident sample and up to 68 in the 24 hour replay). First open the killed job's log: if a test step was
    already failing or still running near the bound, treat it as a real
    failure or a real slowdown, not a stall (a genuinely red shard on a
    runner with a setup spike can die AS a timeout). Otherwise it is a rerun,
-   not a code investigation: re-run the failed jobs and re-queue. If the
+   not a code investigation: re-run the failed jobs and re-queue. Two
+   automatic nets exist: ci.yml's workflow-wide git low-speed abort catches
+   a fetch that slows to a trickle (the 2026-08-10 hang variant evades it,
+   see the ci.yml env block), and the CI stall auto-rerun
+   workflow (ci-stall-rerun.yml, decision core scripts/lib/ci_stall_rerun.mjs)
+   reruns a run's failed jobs once, on attempt 1 only, when the dead step
+   was a bound-killed setup step or a failed checkout (the two recognized
+   stall shapes), nothing else that ran had failed, and nothing after the
+   dead step ran. The auto-rerun deliberately skips merge_group runs (the
+   queue has already ejected the PR and dissolved the group's ref, so only
+   the manual rerun-and-re-queue above applies there); on pull_request and
+   push runs a stall you meet by hand is usually already on attempt 2. If the
    SAME job times out twice on healthy-looking logs, treat it as a real
    slowdown and investigate before resizing any bound.
 
@@ -95,13 +130,15 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
   which string-matches none of these required contexts and leaves them
   "expected" forever, so the PR could never be queued or merged (observed live
   on the Phase 3 queue drills).
-- `PR gate (long sims)`: the dedicated lane for the long rotation sims
-  (`CI_LONG_SUITES` in `scripts/lib/ci_shard_plan.mjs`). The shard matrix
-  deliberately excludes those files, so this job carries coverage nothing else
-  in the run has: it is required for the same reason the shards are. It runs
-  (or docs-only-skips) on every `pull_request` and `merge_group` run; unlike
-  the shard matrix, a job-level skip is safe here because a non-matrix job's
-  skipped check run keeps its exact required name, which satisfies protection.
+- `PR gate (long sims A)` and `PR gate (long sims B)`: the dedicated lane
+  pair for the long rotation sims (`CI_LONG_SUITES` split by
+  `CI_LONG_SUITE_HALVES` in `scripts/lib/ci_shard_plan.mjs`). The shard
+  matrix deliberately excludes those files, so these jobs carry coverage
+  nothing else in the run has: both are required for the same reason the
+  shards are. Each runs (or docs-only-skips) on every `pull_request` and
+  `merge_group` run; unlike the shard matrix, a job-level skip is safe here
+  because a non-matrix job's skipped check run keeps its exact required name,
+  which satisfies protection.
 - `PR checks (freshness, typecheck, builds)`.
 - `Format + lint (Biome, changed files)`: deterministic, diff-scoped, minutes
   long, and a red here is always a real defect in the changed files. On queue

@@ -1,4 +1,5 @@
 import { MIREFEN_IMPACT_CRATER } from '../sim/world';
+import { clamp01 } from './num_clamp';
 
 export interface ImpactCraterTerrainBlend {
   ash: number;
@@ -6,8 +7,6 @@ export interface ImpactCraterTerrainBlend {
   dirt: number;
   rock: number;
 }
-
-const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
 function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = clamp01((x - edge0) / (edge1 - edge0));
@@ -21,8 +20,9 @@ export function impactCraterTerrainBlend(x: number, z: number): ImpactCraterTerr
   }
 
   const bowl = 1 - smoothstep(0, MIREFEN_IMPACT_CRATER.bowlRadius, d);
-  const lip = smoothstep(MIREFEN_IMPACT_CRATER.bowlRadius * 0.62, MIREFEN_IMPACT_CRATER.bowlRadius, d)
-    * (1 - smoothstep(MIREFEN_IMPACT_CRATER.bowlRadius, MIREFEN_IMPACT_CRATER.radius, d));
+  const lip =
+    smoothstep(MIREFEN_IMPACT_CRATER.bowlRadius * 0.62, MIREFEN_IMPACT_CRATER.bowlRadius, d) *
+    (1 - smoothstep(MIREFEN_IMPACT_CRATER.bowlRadius, MIREFEN_IMPACT_CRATER.radius, d));
   const scorch = Math.max(bowl, lip * 0.55);
 
   return {

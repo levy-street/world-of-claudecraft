@@ -401,6 +401,10 @@ export function registerClassSkin({ cls, model, texturePath, suffix }) {
 
 /** Append an attribution row (the "Project asset" style used for generated art).
  *  Idempotent on the asset cell text. */
+export function formatCreditsRow({ assets, source }) {
+  return `| ${assets} | World of ClaudeCraft | ${source} | Project asset | With the project only |\n`;
+}
+
 export function appendCreditsRow({ assets, source }) {
   let credits = read(FILES.credits);
   if (credits.includes(assets)) return [`CREDITS.md already lists "${assets}" (skipped)`];
@@ -408,7 +412,7 @@ export function appendCreditsRow({ assets, source }) {
   if (!rows.length) throw new Error('CREDITS.md table not found');
   const last = rows[rows.length - 1];
   const insertAt = last.index + last[0].length + 1;
-  const row = `| ${assets} | World of ClaudeCraft | ${source} | Project asset | With the project only |\n`;
+  const row = formatCreditsRow({ assets, source });
   credits = credits.slice(0, insertAt) + row + credits.slice(insertAt);
   write(FILES.credits, credits);
   return ['appended CREDITS.md row'];

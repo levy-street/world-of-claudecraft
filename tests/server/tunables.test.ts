@@ -719,7 +719,9 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // -> configuredRealmCount derivation stays pinned end to end: the env
     // literal must still feed the directory parser where it now lives.
     expect(codeOnly(read('server/realm.ts'))).toContain('parseRealms(process.env.REALMS)');
-    const warnStart = dbCode.indexOf('if (configuredRealmCount * DB_POOL_MAX_CLIENTS >');
+    const warnStart = dbCode.indexOf(
+      'if (configuredSteadyConnections > DB_POOL_MAX_CLIENTS_CEILING)',
+    );
     expect(warnStart).toBeGreaterThan(-1);
     const warnBranch = dbCode.slice(warnStart, dbCode.indexOf('\n}', warnStart));
     expect(warnBranch).toContain('console.warn(');
@@ -728,8 +730,10 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // The threshold IS the parser's accepted ceiling (one constant, so the two
     // can never drift), pinned here to its literal value, and to the default
     // beside it: the derivation plus the number, the trap this file exists for.
-    expect(dbCode).toContain(
-      'configuredRealmCount * DB_POOL_MAX_CLIENTS > DB_POOL_MAX_CLIENTS_CEILING',
+    expect(dbCode).toContain('GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS');
+    expect(dbCode).toContain('GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS');
+    expect(dbCode).toMatch(
+      /configuredSteadyConnections\s*=\s*configuredRealmCount\s*\*[\s\S]*DB_POOL_MAX_CLIENTS[\s\S]*GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS[\s\S]*GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS/,
     );
     expect(dbCode).toContain('const DB_POOL_MAX_CLIENTS_CEILING = 97;');
     expect(dbCode).toContain('const DB_POOL_MAX_CLIENTS_DEFAULT = 10;');
@@ -782,6 +786,17 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     );
     expect(bodyOf(read('server/deeds_db.ts'), 'export async function deedRarityCounts')).toContain(
       'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+    );
+    // The reliquary aggregate detoasts every eligible character's state blob
+    // across THREE statements, and statement_timeout is per statement: under
+    // the 60 s heavy allowance one refresh could hold a pooled client for
+    // minutes, so the module carries its OWN deliberately lower bound (the
+    // GUILD_BANK_LOG_TIMEOUT_MS lowering precedent), pinned here with its
+    // literal so a quiet raise back to the heavy tier reds.
+    const reliquarySrc = read('server/reliquary_rarity_db.ts');
+    expect(reliquarySrc).toContain('export const RELIQUARY_RARITY_STATEMENT_TIMEOUT_MS = 10_000');
+    expect(bodyOf(reliquarySrc, 'export async function reliquaryRarityCounts')).toContain(
+      'runWithStatementTimeout(RELIQUARY_RARITY_STATEMENT_TIMEOUT_MS',
     );
     // The on-demand admin reads carry the wrapper in the body that owns their
     // heaviest scan: sessionsByDay and accountDetail wrap directly; clientPerfSummary

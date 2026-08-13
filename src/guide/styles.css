@@ -892,6 +892,20 @@ body.guide-has-sidebar .guide-layout {
   color: var(--g-text-dim);
 }
 
+/* The Reliquary catalog's outside-completion label (Retired / Personal):
+   muted and plain on both the heading tag and the explanatory note, never
+   the celebratory gold (the in-game chip rule, mirrored on the wiki). */
+.guide-reliquary-flag {
+  color: var(--g-text-dim);
+  font-size: 0.85em;
+  font-weight: 400;
+}
+.guide-reliquary-note {
+  margin: 0;
+  color: var(--g-text-dim);
+  font-style: italic;
+}
+
 /* controls reference table */
 .guide-keytable {
   width: 100%;

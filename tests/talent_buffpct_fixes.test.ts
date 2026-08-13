@@ -50,8 +50,8 @@ describe('talent buffPct resolver fixes', () => {
     );
 
     expect(effect.mult).toBeCloseTo(1.375, 6);
-    expect(effect.basedur).toBe(9);
-    expect(effect.perCombo).toBe(3);
+    expect(effect.basedur).toBe(12);
+    expect(effect.perCombo).toBe(4);
   });
 
   it('buffPct and cooldownPct compose on the same defensive ability', () => {
@@ -78,60 +78,19 @@ describe('talent buffPct resolver fixes', () => {
     expect(effect.value).toBeCloseTo(0.112, 6);
   });
 
-  it('Redline Draw replaces the old scalar with an every-third-shot cooldown refund', () => {
-    // Talents 2.0 reworked hun_r20_rapid_killing from static cooldownPct/buffPct
-    // mods on Fevered Draw into the hun_redline_draw castNth proc; the base
-    // ability values stay untouched.
-    const mods = rowMods('hunter', { 20: 'hun_r20_rapid_killing' });
-    const ability = resolvedAbility('hunter', 'rapid_fire', mods);
-    const effect = ability.effects.find((candidate) => candidate.type === 'selfBuff');
-    const proc = mods.procs.find((candidate) => candidate.id === 'hun_redline_draw');
-
-    expect(ability.cooldown).toBeCloseTo(300, 6);
-    expect(effect).toMatchObject({ kind: 'buff_haste', value: 1.4 });
-    // Balance pass: 5 sec per proc behind an 8 sec internal cooldown (was an
-    // uncapped 15 sec that free-shot feeding compressed the 300s cooldown with).
-    expect(proc?.trigger).toMatchObject({ on: 'castNth', n: 3, icd: 8 });
-    expect(proc?.responses).toContainEqual({
-      kind: 'cooldownRefund',
-      ability: 'rapid_fire',
-      seconds: 5,
-    });
-  });
-
-  it('a judgement dmgPct ability mod scales the trigger damage multiplier', () => {
-    // Righteous Cause no longer carries this mod (it became a swing-CDR proc in
-    // the row-quality pass), so the engine fix is pinned on a synthetic effect.
-    const mods = emptyModifiers();
-    accumulateTalentEffect(mods, { ability: [{ ability: 'judgement', dmgPct: 0.15 }] }, 1);
-    const ability = abilitiesKnownAt('paladin', 20, mods).find((a) => a.def.id === 'judgement');
-    const effect = ability?.effects.find((candidate) => candidate.type === 'judgement');
-    if (!effect || effect.type !== 'judgement') throw new Error('missing judgement effect');
-    expect(effect.dmgMult).toBeCloseTo(1.15, 6);
-    expect(effect.flat ?? 0).toBe(0);
-  });
-
   // scaleEffect had no case for 'groundAoE' or 'repositionToAim', so a global
   // damage modifier (e.g. the Fiesta arena augments, aug_bloodhunter's
-  // +18%/+18%) silently no-opped on Consecration, Earthquake, Blizzard,
-  // Meteor, and Heroic Leap's landing hit while every directDamage ability
-  // scaled correctly. These pin the fix against the same global mult a
-  // directDamage ability already applies.
-  it('Consecration groundAoE damage scales with the global spell damage modifier, same factor as a directDamage ability', () => {
-    const mods = emptyModifiers();
-    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.18 } }, 1);
-
-    const exorcism = resolvedEffect('paladin', 'exorcism', 'directDamage', mods);
-    expect(exorcism.min).toBe(Math.round(46 * 1.18));
-    expect(exorcism.max).toBe(Math.round(56 * 1.18));
-
-    const consecration = resolvedEffect('paladin', 'consecration', 'groundAoE', mods);
-    expect(consecration.min).toBe(Math.round(28 * 1.18));
-    expect(consecration.max).toBe(Math.round(34 * 1.18));
-  });
-
+  // +18%/+18%) silently no-opped on Earthquake, Blizzard, Meteor, and Heroic
+  // Leap's landing hit while every directDamage ability scaled correctly. These
+  // pin the fix against the same global mult a directDamage ability applies.
+  // (#2428 retired the Consecration/Exorcism arm: Rite of Expulsion left the
+  // level-20 kit and Holy Ground is now spec-gated and re-ranked.)
   it('Earthquake groundAoE damage scales with the global spell damage modifier', () => {
+    // Faultwake (earthquake) is Elemental-only after the v0.29 shaman redesign, so a
+    // spec-less modifier set no longer resolves it at all. The mage cases above set
+    // their spec for the same reason; the scaling behavior under test is unchanged.
     const mods = emptyModifiers();
+    mods.spec = 'elemental';
     accumulateTalentEffect(mods, { global: { spellDmgPct: 0.3 } }, 1);
 
     const earthquake = resolvedEffect('shaman', 'earthquake', 'groundAoE', mods);

@@ -35,6 +35,38 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Abort dead checkout transfers fast instead of letting them ride a job bound
+# to its kill. The runner-side checkout-stall class (the timeout-minutes
+# rationale on each job below) presents as a git fetch at ZERO throughput for
+# tens of minutes: run 31392590628 (2026-08-10) bound-killed the same lane
+# three attempts in a row, at its then-20-minute bound each time, on fetches
+# that produced nothing and then completed moments after the kill. git's own
+# low-speed abort ends any HTTP transfer whose received payload stays under
+# 1000 bytes per second for 120 consecutive seconds (mechanism proven: a live
+# HTTPS fetch under an absurd floor dies in 2 s with curl 28), and
+# actions/checkout then retries the fetch in-step (3 attempts, 10 to 20
+# second backoff). HONEST LIMIT, measured, not assumed: the floor polices an
+# in-progress transfer that slows to a trickle, but the hang variant observed
+# on 2026-08-10 (run 31402711619: four fetches sat 19m52s producing NOTHING,
+# WITH this floor confirmed in each step's env) dies in a phase curl's speed
+# timer never polices, so this env block did not catch it. Keep it (it is
+# free and covers the trickle variant); the reliable net for the hang variant is
+# ci-stall-rerun.yml, which reruns the run's failed jobs once (nothing
+# after the dead checkout ran, so nothing can be masked). Workflow-wide on
+# purpose: it also covers the lint job's base-ref fetch and the changes
+# job's sparse checkout, and it is inert for every non-HTTP git call (the
+# git-subprocess test fixtures run on local disk and never engage
+# git-remote-https). A healthy fetch of this repository runs orders of
+# magnitude above the floor, so a merely slow transfer is never clipped.
+# Accepted tradeoff: the bare git fetches in the lint job's "Determine base
+# ref" step gain the same floor with no retry wrapper and no auto-rerun
+# coverage (not a checkout step), so a trickle-abort there fails the
+# minutes-long lint job fast and takes a manual rerun; that beats a
+# 15-minute bound ride. Values pinned by tests/ci_workflow.test.ts.
+env:
+  GIT_HTTP_LOW_SPEED_LIMIT: '1000'
+  GIT_HTTP_LOW_SPEED_TIME: '120'
+
 # Two-tier i18n gate, split by git ref in this one file. Each tier is a parallel
 # pair (tests job + checks job, no needs edge either way) so wall clock is
 # max(tests, checks), not their sum. Locally `npm run gate` (scripts/gate.mjs)
@@ -52,14 +84,16 @@ concurrency:
 #                 (each shard executes a partition of the test files), so the
 #                 job's wall time is the slowest shard, not the whole suite.
 #
-#   pr-long-sims  the long-sims lane (Phase 4 of the CI/CD performance packet):
-#                 the CI_LONG_SUITES rotation sims (scripts/lib/ci_shard_plan.mjs)
+#   pr-long-sims-a/-b  the long-sims lane pair (Phase 4 of the CI/CD
+#                 performance packet, split in two by the lane-diet PR): the
+#                 CI_LONG_SUITES rotation sims (scripts/lib/ci_shard_plan.mjs)
 #                 each cost 90+ seconds inside a shard and were setting the
-#                 slowest shard's wall clock, so this job runs them alone while
-#                 every pr-gate shard leg excludes them. Same triggers and
-#                 filters as pr-gate; mode for mode, the nine PR-tier test jobs
-#                 together run exactly what the pre-lane 8-shard layout would
-#                 have run (pinned by tests/ci_shard_plan.test.ts).
+#                 slowest shard's wall clock, so these two jobs run them alone
+#                 (one CI_LONG_SUITE_HALVES half each) while every pr-gate
+#                 shard leg excludes them. Same triggers and filters as
+#                 pr-gate; mode for mode, the ten PR-tier test jobs together
+#                 run exactly what the pre-lane 8-shard layout would have run
+#                 (pinned by tests/ci_shard_plan.test.ts).
 #
 #   pr-checks     the PR tier's serialized checks (i18n freshness + coverage
 #                 summary, malware gate, game/admin typecheck, env/server/bot/client
@@ -88,7 +122,7 @@ concurrency:
 #
 # Path filters (D10): a cheap `changes` job classifies pull_request diffs as
 # code vs docs-only. Docs/markdown/screenshot-only PRs keep lint (and any
-# other always-on cheap jobs) and skip the PR-tier work: pr-long-sims,
+# other always-on cheap jobs) and skip the PR-tier work: pr-long-sims-a/-b,
 # pr-checks, and browser-gate skip at JOB level, while pr-gate's matrix legs
 # start and skip at STEP level so all eight suffixed required check runs
 # still report (see the pr-gate job comment for why that difference is
@@ -111,7 +145,7 @@ concurrency:
 # full-suite backstops.
 #
 # Merge queue runs: a merge_group event routes through the PR-tier jobs
-# (changes, lint, pr-gate, pr-long-sims, pr-checks, browser-gate). The
+# (changes, lint, pr-gate, pr-long-sims-a/-b, pr-checks, browser-gate). The
 # changes job treats every non-PR event as code=true and test_mode=full, so
 # the queue always runs the FULL suite on the exact merge result it is about
 # to make the branch tip.
@@ -362,10 +396,11 @@ jobs:
         # Restores ~/.cache/ms-playwright when the Playwright version matches.
         # The install step always runs: on a hit it is a cheap no-op for the
         # browser download and only ensures OS deps; on a miss it downloads.
-        # No restore-keys: a version-prefix fallback would restore a stale
-        # Playwright version's binaries alongside the new install, which the
-        # cache never evicts, so every future bump would leave dead weight
-        # cached forever instead of a clean version-scoped miss.
+        # No restore-keys: a version-prefix fallback would still restore a
+        # stale Chromium build. npx playwright install then throws it away
+        # (playwright's own browser GC deletes any revision the resolved
+        # version does not claim), so all the fallback buys is a wasted
+        # restore and extract on every version bump.
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
@@ -413,21 +448,46 @@ jobs:
     # runs sat 9.6 to 24.4 minutes inside actions/checkout before completing
     # (healthy checkout is under 3 minutes; worst stalled wall 32.8 minutes,
     # run 31111919431 attempt 1), and the stall, not any test, set those
-    # runs' tails. Sized from the measured healthy worst case plus margin:
-    # the slowest healthy GREEN shard observed is 13.6 minutes (the Phase 2
-    # content-only selective drill, PR #2991) and the slowest healthy RED
-    # one 18.6 minutes (run 31067745370, a 17.8 minute failing test step),
-    # so 20 kills only stalled jobs. Two independent 24 hour replays (the
-    # review's and its verifier's, different windows and counting bases)
-    # both found ZERO healthy jobs over their bound, and 21 to 31
-    # stalled-but-green jobs per day these bounds convert into reds needing
-    # a manual failed-jobs rerun: the buy is bounding the unbounded worst
-    # case (the pre-Phase-1 90 minute wedges) and making stalls visible as
-    # failures for the runner escalation, not the average tail. Full
-    # evidence: the CI/CD performance packet's detect-wedge postmortem note
-    # (an internal, untracked packet record; the run ids above are the
-    # in-repo anchors).
-    timeout-minutes: 20
+    # runs' tails. The original 20 was sized from a 13.6 minute healthy
+    # GREEN worst case (the Phase 2 content-only selective drill, PR #2991)
+    # and an 18.6 minute healthy RED one (run 31067745370), and two
+    # independent 24 hour replays then found zero healthy jobs over that
+    # bound. That zero did not survive sim-deep selective PRs. Selective
+    # mode always runs the computed blind/partial floor (779 of the 2674
+    # suite files when this was sized; the floor is recomputed in-job, see
+    # scripts/lib/test_visibility.mjs), and a diff deep in the sim import
+    # graph stacks the expensive sim suites on top of it: 917 collected
+    # files on PR #3342 against 782 on a comparable net-only PR, so the
+    # floor plus about 135 sim-heavy files, which the sha1-contiguous packs
+    # can concentrate in one shard. On 2026-08-12 shard 1 of PR #3342 was
+    # bound-killed at a 20.25
+    # minute wall on two attempts, both with the test step at 19.0 minutes
+    # and still running (deterministic workload, not runner variance), and
+    # fix/item-provenance-boundaries died the same way at 20.08; sibling
+    # GREEN shards on the same run walked 16 to 17 minutes against the 13.6
+    # prior baseline, so that runner set ran about 1.25x slow. 40 applies
+    # release-gate's slow-runner arithmetic to this workload: the projected
+    # completed shard 1 wall is about 22 minutes on those runners, about 18
+    # fast-runner-equivalent, and 18 x 1.60 (the fast-to-slow runner ratio
+    # measured at b160a1ba18) x 1.37 (the margin the original bounds were
+    # chosen with) is 39.5. Label the base honestly when re-deriving: no
+    # killed attempt ever completed, so 22 is an extrapolation bounded
+    # below by the kill wall; if a healthy shard is bound-killed again,
+    # remeasure a completed wall rather than re-raising by feel. The
+    # stall-detection buy survives the raise: the
+    # stall class dies in checkout or setup, where ci-stall-rerun.yml's
+    # nothing-ran-after-it predicate reruns it regardless of the bound's
+    # value, and the git low-speed abort still ends trickle transfers in
+    # about 2 minutes; a healthy long test step, which both 2026-08-12
+    # kills interrupted, is exactly what this bound must not kill. The
+    # accepted cost is the hang variant the low-speed floor does not
+    # police (the header's run 31402711619): a hung shard now burns 40
+    # minutes before the reactor can fire, double the old latency, taken
+    # because a false kill of a required healthy shard blocks PRs outright
+    # while a hang costs only latency. The
+    # queue-side ceiling this has to fit under is recorded in
+    # docs/merge-queue.md.
+    timeout-minutes: 40
     runs-on: ubuntu-latest
 
     # fail-fast stays off: shards pass or fail independently, so one red shard
@@ -506,9 +566,9 @@ jobs:
       # restricting this step's save to push events, never restore-keys
       # (though note the long-sims lane leans on PR-scope saves, so that
       # lever costs the lane most of its benefit). Scope arithmetic after
-      # the lane copy landed: a pr-gate-tier producer scope (main, dev-*)
-      # holds 9 entries (8 shard + 1 lane); the release scope stays at 8
-      # (release-gate is deliberately not lane-split).
+      # the lane copies landed: a pr-gate-tier producer scope (main, dev-*)
+      # holds 10 entries (8 shard + 2 lane halves); the release scope stays
+      # at 8 (release-gate is deliberately not lane-split).
       # Producers beyond release-gate: pr-gate's own main and dev-* push runs
       # seed those branches' scopes the same way.
       # Per-shard keys: in full mode each shard transforms
@@ -537,7 +597,7 @@ jobs:
       # Phase 2 (docs/qa-gate.md, "Selective PR-tier CI"): the runner reads the
       # changes job's selection decision. test_mode=full spawns the old step
       # (`npm test -- --shard=i/8`) minus the long-sims lane files, which the
-      # pr-long-sims job runs in this same run (Phase 4); test_mode=selective
+      # pr-long-sims-a/-b jobs run in this same run (Phase 4); test_mode=selective
       # runs the always-run floor (blind/partial tests + invariant guard
       # suites + changed tests, recomputed in this tree, minus the lane's
       # floor members) plus `vitest related` over the changed sources, both
@@ -552,37 +612,61 @@ jobs:
           CHANGED_FILES: ${{ needs.changes.outputs.changed_files }}
         run: node scripts/ci_shard_test.mjs --shard=${{ matrix.shard }}/8
 
-  # The long-sims lane (Phase 4 of the CI/CD performance packet). Runs the
-  # CI_LONG_SUITES files (scripts/lib/ci_shard_plan.mjs) that every pr-gate
-  # shard leg excludes: each costs 90+ seconds inside a shard, and together
-  # they were setting the slowest shard's wall clock. Same event routing and
-  # code path filter as pr-gate, so it reports (or docs-only-skips) on every
-  # pull_request AND merge_group run, which is the bar docs/merge-queue.md
-  # sets for a REQUIRED check; this job is required (it carries coverage the
-  # shards deliberately exclude), so its display name is load-bearing three
-  # ways (ruleset, tests/ci_workflow.test.ts, docs/merge-queue.md). In
-  # selective mode the lane runs only the lane files the floor or the diff
-  # would have carried; in full mode and on any unprovable input it runs all
-  # of them, mirroring the shard planner's fail-closed ladder, so mode for
-  # mode the shards plus the lane run exactly what the pre-lane shard plan
-  # would have run. release-gate is deliberately NOT lane-split: release/**
-  # pushes keep the full suite in their 8 shards.
-  pr-long-sims:
-    name: PR gate (long sims)
+  # The long-sims lanes (Phase 4 of the CI/CD performance packet; split into
+  # two parallel jobs by the lane-diet PR). The pair runs the CI_LONG_SUITES
+  # files (scripts/lib/ci_shard_plan.mjs) that every pr-gate shard leg
+  # excludes, one CI_LONG_SUITE_HALVES half per job, so the lane's wall clock
+  # is the slower half instead of the whole nine-suite list. Same event
+  # routing and code path filter as pr-gate, so each job reports (or
+  # docs-only-skips) on every pull_request AND merge_group run, which is the
+  # bar docs/merge-queue.md sets for a REQUIRED check; both jobs are required
+  # (they carry coverage the shards deliberately exclude), so their display
+  # names are load-bearing three ways (ruleset, tests/ci_workflow.test.ts,
+  # docs/merge-queue.md). In selective mode each lane runs only its half's
+  # lane files the floor or the diff would have carried; in full mode and on
+  # any unprovable input it runs its whole half, mirroring the shard
+  # planner's fail-closed ladder, so mode for mode the shards plus the two
+  # lanes run exactly what the pre-lane shard plan would have run.
+  # release-gate is deliberately NOT lane-split: release/** pushes keep the
+  # full suite in their 8 shards.
+  pr-long-sims-a:
+    name: PR gate (long sims A)
     needs: changes
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
-    # The lane concentrates the four slowest suites in one required job with
-    # no sibling shard to report around it, so a hang would otherwise hold a
-    # required check for GitHub's 6 hour default. 20 matches the shard
-    # matrices (rationale and the checkout-stall evidence on the pr-gate
-    # bound): the lane's healthy worst cases are 8.1 minutes GREEN and 10.7
-    # minutes RED (run 31118669058), the sample is thin (the job is days
-    # old), the chronomancy sweep inside it is the suite whose budget was
-    # raised for loaded runners, and a bound below 20 cannot lower the run
-    # tail anyway while pr-gate holds 20 in the same run. Its one stalled
-    # run sat 15.6 minutes in checkout inside a 23.3 minute wall
-    # (run 31105262161).
-    timeout-minutes: 20
+    # Each lane half concentrates slow suites in one required job with no
+    # sibling shard to report around it, so a hang would otherwise hold a
+    # required check for GitHub's 6 hour default. The single-job lane's bound
+    # was 60 (run 31290316610 measured ~4400s aggregate suite time on a
+    # slow-quartile runner). The lane-diet PR then cut the nine suites'
+    # aggregate from 1786s to 901s LOCAL-measured and split the list (half A
+    # 403s / half B 498s aggregate; per-suite evidence in the PR body), and
+    # sized 20 from a projection of under 10 minutes per half.
+    #
+    # That projection did not survive CI measurement, and this comment is the
+    # re-derivation the lane-diet note asks for whenever a member's cost moves.
+    # On run 31450179645 (2026-08-11, a healthy runner, full mode) lane A ran
+    # a 13.73 minute JOB wall and lane B 12.55, because owned_class_balance_harness
+    # alone measured 739268ms in-lane: the local aggregate for all three half-A
+    # files understates that ONE file by most of a factor of two. Lane A's wall
+    # breaks down as 66s of setup plus a 753s test step, so the job and step
+    # figures are close here only because its caches were warm; size from the
+    # JOB wall regardless, because a setup spike counts inside the bound.
+    # Lane isolation does not reliably shrink the harness either: in-lane it
+    # measured 739s, which sits BETWEEN the two in-shard figures (527s fast,
+    # 842s slow). Those three samples are not controlled against each other,
+    # so read them as runner-to-runner variance dominating, not as a proof
+    # about contention.
+    #
+    # 30 applies the same arithmetic as release-gate's bound: healthy JOB wall
+    # times the 1.60 fast-to-slow runner ratio measured at b160a1ba18
+    # (13.73 x 1.60 = 22.0 for the slower half), then the 1.37x margin the
+    # original bounds were chosen with. At 20 this REQUIRED check was roughly
+    # one slow runner away from bound-killing and blocking the merge queue,
+    # which is the more expensive failure than the release backstop's, so it
+    # is raised in the same change. Both halves share one bound so the a/b
+    # assignment can still rebalance freely without re-sizing. The queue-side
+    # ceiling this has to fit under is recorded in docs/merge-queue.md.
+    timeout-minutes: 30
     runs-on: ubuntu-latest
 
     steps:
@@ -609,34 +693,83 @@ jobs:
       # key, no restore-keys, save-on-miss-only, measured sizes) sits on the
       # pr-gate copy of this step. This job has no shard matrix, so the key
       # carries a lane segment where the matrices carry shard${{ matrix.shard }}:
-      # a bare matrix.shard would render empty here, and the lane's store (in
-      # full mode, the four CI_LONG_SUITES import closures; in selective mode
-      # only the floor/changed members, so a PR-scope save can be a thin
-      # store that save-on-miss never refreshes within that key) only
-      # partially resembles any one shard's, so it earns its own entry
-      # instead of borrowing shard keys. Producer reality for this key:
-      # release-gate is deliberately not lane-split, so release/** push runs
-      # never save a lane entry into the base-branch scope; main's entry
-      # (seeded by this job's own main and dev-* push runs) only hits while
-      # the release branch's four key inputs still hash like main's, which
-      # they do not whenever main trails the release lockfile (true today),
-      # so for release-based PRs most warm hits come from later runs of the
-      # SAME PR restoring the first run's save into the PR's own scope.
+      # a bare matrix.shard would render empty here, and each lane half's
+      # store (in full mode, its half of the CI_LONG_SUITES import closures;
+      # in selective mode only the floor/changed members, so a PR-scope save
+      # can be a thin store that save-on-miss never refreshes within that
+      # key) only partially resembles any one shard's or the other half's,
+      # so it earns its own entry instead of borrowing keys. Producer
+      # reality for this key: release-gate is deliberately not lane-split,
+      # so release/** push runs never save a lane entry into the base-branch
+      # scope; main's entry (seeded by this job's own main and dev-* push
+      # runs) only hits while the release branch's four key inputs still
+      # hash like main's, which they do not whenever main trails the release
+      # lockfile (true today), so for release-based PRs most warm hits come
+      # from later runs of the SAME PR restoring the first run's save into
+      # the PR's own scope.
       - name: Cache vitest transform cache
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-a-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
 
       # Same selection relay as the shard step (env, never run-line
       # interpolation); the lane entry spawns `npm test` itself, so pretest
       # regenerates the i18n artifacts here exactly as in every shard.
-      - name: Run tests (PR tier, long-sims lane)
+      - name: Run tests (PR tier, long-sims lane A)
         env:
           TEST_MODE: ${{ needs.changes.outputs.test_mode }}
           TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
           CHANGED_FILES: ${{ needs.changes.outputs.changed_files }}
-        run: node scripts/ci_shard_test.mjs --lane=long-sims
+        run: node scripts/ci_shard_test.mjs --lane=long-sims-a
+
+  # Second half of the long-sims lane pair; every design note sits on
+  # pr-long-sims-a above (identical shape, its own CI_LONG_SUITE_HALVES half
+  # and its own cache key segment).
+  pr-long-sims-b:
+    name: PR gate (long sims B)
+    needs: changes
+    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
+    # Sized with pr-long-sims-a (evidence there, in the lane-diet PR, and in
+    # the run 31450179645 re-derivation the sibling comment carries).
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Same vitest transform cache step as pr-long-sims-a, keyed for this
+      # half (rationale on the pr-gate copy).
+      - name: Cache vitest transform cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.experimental-vitest-cache
+          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-b-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+
+      # Same selection relay as the shard step (env, never run-line
+      # interpolation); the lane entry spawns `npm test` itself, so pretest
+      # regenerates the i18n artifacts here exactly as in every shard.
+      - name: Run tests (PR tier, long-sims lane B)
+        env:
+          TEST_MODE: ${{ needs.changes.outputs.test_mode }}
+          TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
+          CHANGED_FILES: ${{ needs.changes.outputs.changed_files }}
+        run: node scripts/ci_shard_test.mjs --lane=long-sims-b
 
   # Runs in parallel with pr-gate: same if-condition, no needs edge in either
   # direction. The default pull_request merge-ref checkout MUST be preserved
@@ -652,9 +785,12 @@ jobs:
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     # Unmatrixed single toolchain-setup-plus-checks job, comparable in shape to
     # browser-gate, but heavier: i18n generation, the malware gate, a
-    # typecheck, and four builds. 20 matches the shard matrices' bound so a
-    # stalled runner here dies and reruns instead of holding a required check
-    # for hours.
+    # typecheck, and four builds. 20 was sized beside the shard matrices'
+    # original bound and still fits this job's serialized check list;
+    # pr-gate's own bound has since moved for its sim-heavy selective test
+    # packs, which this job does not run, so the two values parted on
+    # purpose. A stalled runner here still dies and reruns instead of
+    # holding a required check for hours.
     timeout-minutes: 20
     runs-on: ubuntu-latest
 
@@ -715,20 +851,14 @@ jobs:
           restore-keys: |
             tsc-buildinfo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig.json') }}-
 
-      - name: Typecheck
-        run: npm run check:types
-
-      - name: Build headless environment
-        run: npm run build:env
-
-      - name: Build server
-        run: npm run build:server
-
+      # Same turbo multi-task run gate.mjs uses for wall-clock overlap across
+      # these four independent pure steps (scripts/lib/gate_steps.mjs), so CI and
+      # the local gate share one cache-aware idiom instead of drifting apart.
       # The Discord bot bundles from the same tree and ships in the same image
       # (Dockerfile runs build:bot), so a broken bot bundle must fail here rather
       # than on the production host during docker compose up --build.
-      - name: Build Discord bot
-        run: npm run build:bot
+      - name: Typecheck + env/server/bot builds
+        run: npx turbo run check:types build:env build:server build:bot --ui=stream
 
       - name: Build client
         run: npm run wiki:content && npm run build:bundle
@@ -746,14 +876,53 @@ jobs:
     # the label is what an operator reads in the checks list to tell the two reds apart.
     name: Release gate (tests)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
-    # Same checkout-stall bound as pr-gate (rationale and evidence there).
-    # This matrix keeps the long sims in-shard by design; its slowest
-    # healthy shard observed is 14.63 minutes (run 31117143257, a sample
-    # that also carried a 4.68 minute runner "Set up job" spike, a
-    # component that counts inside the bound), so 20 keeps a 5 minute
-    # margin. The nightly workflow deliberately keeps its own generous
-    # bounds and is untouched.
-    timeout-minutes: 20
+    # Sized from this matrix's own workload, independently of pr-gate's
+    # bound: this matrix keeps the long sims in-shard by design, since
+    # pr-gate hands its CI_LONG_SUITES files to
+    # the lane pair, and release-gate deliberately does not
+    # (scripts/lib/ci_shard_plan.mjs states that ruling), so a release shard
+    # can draw several multi-minute harnesses at once. Default vitest --shard
+    # is sha1-contiguous (vite.config.ts records that the balanced sequencers
+    # were measured and left unwired), so WHICH shard draws them moves with any
+    # change to the collected file set; sizing this bound for the healthy
+    # median is what made it fragile.
+    #
+    # 20 was sized from a 14.63 minute healthy worst case (run 31117143257).
+    # That premise died on 2026-08-11 at b160a1ba18, where shard 1 drew FOUR
+    # of the nine long suites (owned_class_balance_harness, nythraxis_matrix,
+    # hunter_dps_balance, and druid_balance_probe) and was bound-killed four
+    # times (run 31443047694 attempts 1 through 3, run 31443040285 attempt 1)
+    # while attempt 2 of that same push run passed the identical scope in 16
+    # minutes. Same commit, same warm transform cache: the differentiator was
+    # runner speed, with owned_class_balance_harness measured at 527s on the
+    # fast runner and 842s on the slow one, a ratio of 1.60.
+    #
+    # Sizing, stated as the arithmetic rather than a feel. Every figure below
+    # is a JOB wall, which is what timeout-minutes actually polices: setup
+    # (checkout, pnpm, node, install, cache restore) counts inside the bound
+    # and can spike on its own, so a base taken from the test STEP alone would
+    # under-size this. Label the kind whenever you re-derive it. The healthy
+    # job wall is the 16 minute passing attempt, so the slow-runner projection
+    # is 16 x 1.60 = 25.6 minutes, and 35 holds the 1.37x margin the 20 bound
+    # was originally chosen with (20 / 14.63). Scaling the whole job wall by a
+    # CPU ratio is deliberately conservative, since setup is I/O bound and does
+    # not scale with it. Do NOT re-derive this from the
+    # killed attempt's file count: it had finished 271 of 330 files at 18m53s,
+    # but druid_balance_probe was still unfinished, so the remaining time was
+    # bounded below by a multi-minute file rather than by a per-file average,
+    # and the linear extrapolation that suggests (about 23 minutes) reads low.
+    #
+    # Raising this costs stall-kill latency on this job only, which is the
+    # right trade for a post-merge backstop. Note what does NOT cover it: the
+    # stall reactor (.github/workflows/ci-stall-rerun.yml) reruns a bound-killed
+    # SETUP step or a failed checkout, never a test-step kill like this one, and
+    # it stays inert until its workflow file reaches the default branch. A
+    # test-step kill here is a manual rerun by design. pr-gate's bound is
+    # derived separately from its own selective-pack evidence (on its bound
+    # above); its shards exclude these suites, so this evidence does not
+    # size it. The nightly workflow deliberately keeps its own
+    # generous bounds and is untouched.
+    timeout-minutes: 35
     runs-on: ubuntu-latest
 
     # No I18N_RELEASE_TIER here BY DESIGN (D8 revised, issue #2820). This job runs
@@ -816,7 +985,7 @@ jobs:
   # under the flag run here, so this job answers exactly one question: has the
   # 21-locale fill been done? It is EXPECTED to be red for most of a cycle, and that
   # is the point: it is red on its own name, next to a release-gate that stays green
-  # unless code is genuinely broken. Unsharded and seconds long (five files), so it
+  # unless code is genuinely broken. Unsharded and seconds long (six files), so it
   # costs a runner slot, not runner minutes. The file list is pinned three ways
   # (this command, I18N_RELEASE_TIER_SUITES in scripts/lib/gate_steps.mjs, and a scan
   # of tests/ for readers of the flag) by tests/release_i18n_tier_coverage.test.ts,
@@ -854,7 +1023,7 @@ jobs:
       # `npm test` regenerates the i18n artifacts itself (pretest), which these
       # suites read.
       - name: Run i18n release-tier suites (21-locale + empty-pending)
-        run: npm test -- tests/deed_i18n.test.ts tests/i18n_status_registry.test.ts tests/i18n_t_behavior.test.ts tests/localization_coverage.test.ts tests/localization_fixes.test.ts
+        run: npm test -- tests/deed_i18n.test.ts tests/i18n_status_registry.test.ts tests/i18n_t_behavior.test.ts tests/localization_coverage.test.ts tests/localization_fixes.test.ts tests/reliquary_i18n.test.ts
 
   # Runs in parallel with release-gate: same if-condition, no needs edge in
   # either direction. Does not set I18N_RELEASE_TIER; the checks here do not
@@ -919,19 +1088,13 @@ jobs:
           restore-keys: |
             tsc-buildinfo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig.json') }}-
 
-      - name: Typecheck
-        run: npm run check:types
-
-      - name: Build headless environment
-        run: npm run build:env
-
-      - name: Build server
-        run: npm run build:server
-
+      # Same turbo multi-task run gate.mjs uses for wall-clock overlap across
+      # these four independent pure steps (scripts/lib/gate_steps.mjs), so CI and
+      # the local gate share one cache-aware idiom instead of drifting apart.
       # Same reason as the PR-tier job: the bot bundles from this tree and ships
       # in the same image, so a broken bot bundle fails here, not on the host.
-      - name: Build Discord bot
-        run: npm run build:bot
+      - name: Typecheck + env/server/bot builds
+        run: npx turbo run check:types build:env build:server build:bot --ui=stream
 
       - name: Build client
         run: npm run wiki:content && npm run build:bundle

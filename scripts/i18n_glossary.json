@@ -56,6 +56,31 @@
         "game.milestone.eternal"
       ]
     },
+    "reliquaryName": {
+      "note": "The feature name The Reliquary itself, one term per locale across every surface that names it: the window title (hudChrome.reliquary.title), the mobile button (hudChrome.mobile.reliquary), the character-sheet labels (charCompletionLabel, charOpen), the retro catch-up summary, the loading tip, the keybind rows, and the whole wiki chapter (guide.nav.reliquary, guide.controls.reliquary, guide.reliquaryPage.*). zh_CN 圣物库, zh_TW 聖物庫, ja 聖遺物庫, ko 성물고 (the compact Sino-Korean cognate of the ja/zh forms; unified in the v0.35.0 cycle after the wiki side shipped 성유물 보관소), ru Реликварий. Sentence keys embed the same term, never a synonym.",
+      "keyPatterns": [
+        "hudChrome.reliquary.title",
+        "hudChrome.mobile.reliquary",
+        "hudChrome.reliquary.charCompletionLabel",
+        "hudChrome.reliquary.charOpen",
+        "hudChrome.plurals.reliquaryRetroSummary.*",
+        "loading.tips.reliquary",
+        "guide.nav.reliquary",
+        "guide.controls.reliquary",
+        "guide.reliquaryPage.*"
+      ]
+    },
+    "reliquaryShelves": {
+      "note": "The three Reliquary shelf names, aligned between the window nav (hudChrome.reliquary.nav*) and the wiki reliquary page (guide.reliquaryPage.shelf.*). Conquerors: zh_CN 征服者, zh_TW 征服者, ja 征服者, ko 정복자, ru Завоеватели. Professions locks to the professions window title (hudChrome.professions.title): zh_CN 专业, zh_TW 專業, ja 専門技能, ko 전문 기술, ru Профессии. Horizons uses the metaphorical new-horizons reading, never the literal horizon line: zh_CN 远景, zh_TW 遠景, ja 地平, ko 지평, ru Горизонты. Keep each identical on both surfaces wherever a shelf is named.",
+      "keyPatterns": [
+        "hudChrome.reliquary.navConquerors",
+        "hudChrome.reliquary.navProfessions",
+        "hudChrome.reliquary.navHorizons",
+        "guide.reliquaryPage.shelf.conquerors",
+        "guide.reliquaryPage.shelf.professions",
+        "guide.reliquaryPage.shelf.horizons"
+      ]
+    },
     "steamLink": {
       "note": "Steam account-link vocabulary (the character-select card + apiError.steam.*), locked by the non-Latin fills shipped with the link surface. Steam stays Latin everywhere (brand). Link (the account-link verb): zh_CN 关联, zh_TW 連結, ja 連携, ko 연동, ru привязать (linked state: привязан). Steam achievements (the platform term the deeds mirror writes to): zh_CN Steam 成就, zh_TW Steam 成就, ja Steam実績, ko Steam 도전 과제, ru достижения Steam. Keep each identical wherever the link surface is referenced.",
       "keyPatterns": ["hudChrome.steam.*", "apiError.steam.*"]
@@ -63,6 +88,25 @@
     "epicLink": {
       "note": "Epic account-link vocabulary (the character-select card + apiError.epic.*), locked by the non-Latin fills shipped with the link surface. Epic stays Latin everywhere (brand). Link (the account-link verb) follows the Steam link-verb choices per locale: zh_CN 关联, zh_TW 連結, ja 連携, ko 연동, ru привязать (linked state: привязан). Epic achievements (the platform term the deeds mirror writes to): zh_CN Epic 成就, zh_TW Epic 成就, ja Epic実績, ko Epic 도전 과제, ru достижения Epic. Keep each identical wherever the link surface is referenced.",
       "keyPatterns": ["hudChrome.epic.*", "apiError.epic.*"]
+    },
+    "masterwork": {
+      "note": "The masterwork craft-proc term, ONE form per locale on every surface: zh_CN 杰作, zh_TW 傑作, ja 傑作, ko 걸작, ru шедевр. The 2026-08-07 QA aligned the Reliquary gallery to the crafting surfaces' form (ja had coined 名作, ko 명작); never re-coin a per-surface variant. One surface these patterns cannot police: the Reliquary PAGE NAMES live in src/ui/reliquary_i18n.locales/ (not the catalog), so the gallery title must be kept aligned by hand (its overlay comments point back here).",
+      "keyPatterns": [
+        "hudChrome.crafting.masterworkSeal",
+        "hudChrome.crafting.masterworkToast",
+        "hudChrome.crafting.masterworkZoneLine",
+        "hudChrome.bags.itemAriaMasterwork",
+        "itemUi.bags.unknownItemAriaMasterwork",
+        "hudChrome.reliquary.markFind.masterwork_first",
+        "hudChrome.reliquary.markFind.masterwork_weaponcrafting",
+        "hudChrome.reliquary.markFind.masterwork_armorcrafting",
+        "hudChrome.reliquary.markFind.masterwork_tailoring",
+        "hudChrome.reliquary.markFind.masterwork_leatherworking",
+        "hudChrome.reliquary.markFind.masterwork_engineering",
+        "hudChrome.reliquary.sourceActivityMasterworkCraft",
+        "guide.profPages.masterworkHeading",
+        "guide.profPages.masterworkBody"
+      ]
     }
   }
 }

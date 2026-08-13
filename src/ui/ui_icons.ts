@@ -285,15 +285,28 @@ function chromeArtIcon(url: string): string {
  *
  * A name with committed painted art (CHROME_ART_IDS) hydrates as that `<img>` instead of
  * the inline SVG: these placeholders ARE the primary destinations (the side rail, the
- * mobile bar, the More tray), which DESIGN.md section 6 gives painted art. The SVG stays
- * the source everywhere else, including every direct `svgIcon()` call, so the small inline
- * uses beside text keep tinting with `currentColor`.
+ * mobile bar, the More tray), which DESIGN.md section 6 gives painted art. A failed image
+ * load swaps that one icon slot to the existing SVG glyph. The SVG stays the source
+ * everywhere else, including every direct `svgIcon()` call, so the small inline uses beside
+ * text keep tinting with `currentColor`.
  */
 export function hydrateIcons(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>('[data-icon]').forEach((el) => {
     const name = el.dataset.icon;
     if (!name || !hasUiIcon(name) || el.querySelector(':scope > .ui-icon')) return;
     const art = chromeIconUrl(name);
-    el.insertAdjacentHTML('afterbegin', art ? chromeArtIcon(art) : svgIcon(name));
+    if (!art) {
+      el.insertAdjacentHTML('afterbegin', svgIcon(name));
+      return;
+    }
+    el.insertAdjacentHTML('afterbegin', chromeArtIcon(art));
+    const image = el.querySelector<HTMLImageElement>(':scope > img.ui-icon-art');
+    image?.addEventListener(
+      'error',
+      () => {
+        image.outerHTML = svgIcon(name);
+      },
+      { once: true },
+    );
   });
 }

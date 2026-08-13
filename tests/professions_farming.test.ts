@@ -25,6 +25,7 @@ import { FARM_BED_IDS, farmBedById } from '../src/sim/content/farm_patches';
 import { DEFAULT_MOUNT } from '../src/sim/content/mounts';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
+import { setItemLocked } from '../src/sim/item_lock';
 import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import type { PlotState } from '../src/sim/professions/farm_projection';
 import {
@@ -2758,5 +2759,158 @@ describe('content wiring', () => {
       expect(farmBedById(bedId)).toBeDefined();
     }
     expect(farmBedById('bed_not_a_real_bed')).toBeUndefined();
+  });
+});
+
+describe('item lock (issue 3042): locked copies are invisible to every farming spend', () => {
+  // The v0.38.0 sync heal: the release's player lock names profession
+  // consumption as a refusing boundary, and farming's spends are exactly
+  // that. Every sufficiency gate counts UNLOCKED units only and the payment
+  // walk never victimizes a locked slot (the crafting.ts reagent idiom).
+  // One arm per touched site: the seed gate, the payment walk, the compost
+  // gate, the fee planner callback, the tonic gate, and the husk trade's
+  // count and spend.
+
+  function lockOneCopy(h: Harness, itemId: string): void {
+    const idx = h.meta.inventory.findIndex(
+      (s) => s.itemId === itemId && s.instance?.locked !== true,
+    );
+    expect(idx, `no unlocked ${itemId} slot to lock`).toBeGreaterThanOrEqual(0);
+    expect(setItemLocked(h.sim.ctx, itemId, true, h.pid, idx).ok).toBe(true);
+  }
+
+  // Hand-rolled reads (never the production lock helpers, which are the very
+  // code under test): units by lock state, straight off the slots.
+  function lockedUnits(h: Harness, itemId: string): number {
+    return h.meta.inventory
+      .filter((s) => s.itemId === itemId && s.instance?.locked === true)
+      .reduce((n, s) => n + s.count, 0);
+  }
+  function unlockedUnits(h: Harness, itemId: string): number {
+    return h.meta.inventory
+      .filter((s) => s.itemId === itemId && s.instance?.locked !== true)
+      .reduce((n, s) => n + s.count, 0);
+  }
+
+  it('a locked-only seed refuses the plant as locked (not no_seed), draw-free, seed kept', () => {
+    const h = makeHarness();
+    giveSeeds(h, 1);
+    lockOneCopy(h, SEED_ID);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plant(h))).toBe(0);
+    // The lock-only split (issue 3042 acceptance): the raw count would have
+    // passed, so the denial names the lock, never a phantom shortage.
+    expect(denyReason(h.sim, from)).toBe('locked');
+    expect(lockedUnits(h, SEED_ID)).toBe(1);
+  });
+
+  it('the payment walk spends the UNLOCKED seed and the locked spare survives', () => {
+    const h = makeHarness();
+    giveSeeds(h, 2);
+    // Locking splits one unit into its own fresh END slot, exactly where the
+    // hub removal walk (highest bag index first) would consume FIRST; the
+    // lock-aware walk must never pick it.
+    lockOneCopy(h, SEED_ID);
+    const from = h.sim.events.length;
+    plant(h);
+    expect(eventsOf(h.sim, from, 'farmPlanted')).toHaveLength(1);
+    expect(lockedUnits(h, SEED_ID)).toBe(1);
+    expect(unlockedUnits(h, SEED_ID)).toBe(0);
+  });
+
+  it('a locked-only compost refuses a compost plant as locked with nothing consumed', () => {
+    const h = makeHarness();
+    giveSeeds(h, 1);
+    h.sim.addItem(FARM_COMPOST_ITEM_ID, 1, h.pid);
+    lockOneCopy(h, FARM_COMPOST_ITEM_ID);
+    const from = h.sim.events.length;
+    expect(
+      countDraws(h.sim, () =>
+        plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { compost: true }),
+      ),
+    ).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('locked');
+    expect(unlockedUnits(h, SEED_ID)).toBe(1);
+    expect(lockedUnits(h, FARM_COMPOST_ITEM_ID)).toBe(1);
+  });
+
+  it('locked fee produce is invisible to the watch fee planner (locked, plan-vs-raw split)', () => {
+    const h = makeHarness();
+    giveSeeds(h, 1);
+    // Tier 1 fee is 2 produce; hold exactly 2 but lock 1, leaving the
+    // planner one short while the RAW count still affords the fee: the
+    // deny-path re-plan proves locks alone denied it.
+    h.sim.addItem(PRODUCE_ID, 2, h.pid);
+    lockOneCopy(h, PRODUCE_ID);
+    const from = h.sim.events.length;
+    expect(
+      countDraws(h.sim, () =>
+        plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { watch: true }),
+      ),
+    ).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('locked');
+    expect(unlockedUnits(h, PRODUCE_ID)).toBe(1);
+    expect(lockedUnits(h, PRODUCE_ID)).toBe(1);
+  });
+
+  it('a genuine fee shortfall stays no_fee_produce even when the only copy held is locked', () => {
+    const h = makeHarness();
+    giveSeeds(h, 1);
+    // One produce held (locked), fee is 2: the raw count fails too, so the
+    // reason must stay the family shortfall, never a lock claim.
+    h.sim.addItem(PRODUCE_ID, 1, h.pid);
+    lockOneCopy(h, PRODUCE_ID);
+    const from = h.sim.events.length;
+    expect(
+      countDraws(h.sim, () =>
+        plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { watch: true }),
+      ),
+    ).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_fee_produce');
+  });
+
+  it('a locked-only tonic refuses a tonic plant as locked', () => {
+    const h = makeHarness();
+    giveSeeds(h, 1);
+    h.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, h.pid);
+    lockOneCopy(h, FARM_GROWTH_TONIC_ITEM_ID);
+    const from = h.sim.events.length;
+    expect(
+      countDraws(h.sim, () =>
+        plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { tonic: true }),
+      ),
+    ).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('locked');
+    expect(lockedUnits(h, FARM_GROWTH_TONIC_ITEM_ID)).toBe(1);
+  });
+
+  it('locked husks join neither the batch count nor the spend', () => {
+    const h = makeHarness();
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, 2 * FARM_HUSKS_PER_COMPOST, h.pid);
+    for (let i = 0; i < FARM_HUSKS_PER_COMPOST; i++) {
+      lockOneCopy(h, FARM_WITHERED_HUSK_ITEM_ID);
+    }
+    const from = h.sim.events.length;
+    convertHusks(h.sim.ctx, h.sim.player, h.meta);
+    const ev = eventsOf(h.sim, from, 'farmHusksConverted');
+    expect(ev).toHaveLength(1);
+    expect(ev[0].husks).toBe(FARM_HUSKS_PER_COMPOST);
+    expect(ev[0].compost).toBe(1);
+    expect(lockedUnits(h, FARM_WITHERED_HUSK_ITEM_ID)).toBe(FARM_HUSKS_PER_COMPOST);
+    expect(unlockedUnits(h, FARM_WITHERED_HUSK_ITEM_ID)).toBe(0);
+  });
+
+  it('all-locked husks refuse the trade as locked with the husks kept', () => {
+    const h = makeHarness();
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    for (let i = 0; i < FARM_HUSKS_PER_COMPOST; i++) {
+      lockOneCopy(h, FARM_WITHERED_HUSK_ITEM_ID);
+    }
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => convertHusks(h.sim.ctx, h.sim.player, h.meta))).toBe(0);
+    // Raw count affords a batch, unlocked count does not: 'locked', never a
+    // phantom "not enough husks".
+    expect(denyReason(h.sim, from)).toBe('locked');
+    expect(lockedUnits(h, FARM_WITHERED_HUSK_ITEM_ID)).toBe(FARM_HUSKS_PER_COMPOST);
   });
 });

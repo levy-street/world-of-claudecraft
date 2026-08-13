@@ -10,6 +10,7 @@
 // no Math.random/Date.now), enforced by tests/architecture.test.ts.
 
 import type { Aura, DamageBreakBudget, Entity } from '../types';
+import { isVeilboundMarchActive } from './paladin_veilbound_state';
 
 // Some scripted encounter control is part of the encounter timeline rather
 // than ordinary combat CC. Player immunity, cleanse, dispel, control-break, and
@@ -108,7 +109,7 @@ export function isFearAura(
 }
 
 export function isRooted(e: Entity): boolean {
-  return isStunned(e) || e.auras.some((a) => a.kind === 'root');
+  return isStunned(e) || (!isVeilboundMarchActive(e) && e.auras.some((a) => a.kind === 'root'));
 }
 
 export function isRootedOrChilled(e: Entity): boolean {

@@ -28,4 +28,16 @@ describe('playerStealthed', () => {
     const auras = [{ kind: 'regen' }, { kind: 'stealth' }, { kind: 'form_cat' }];
     expect(playerStealthed(auras)).toBe(true);
   });
+
+  it('is true inside the shadow veil: shadow-wreathed openers must light up', () => {
+    // The veil aura is kind buff_dmg_done, matched by id: the sim cast gates
+    // waive stealth for openers while it is worn, so the bar must agree.
+    expect(playerStealthed([{ kind: 'buff_dmg_done', id: 'veilstrike' }])).toBe(true);
+    expect(playerStealthed([{ kind: 'buff_dmg_done', id: 'some_other_buff' }])).toBe(false);
+  });
+
+  it('is true with a FULL Gloam bank and false below it: the armed openers are the detonator', () => {
+    expect(playerStealthed([{ kind: 'gloam', id: 'gloam', stacks: 3 }])).toBe(true);
+    expect(playerStealthed([{ kind: 'gloam', id: 'gloam', stacks: 2 }])).toBe(false);
+  });
 });

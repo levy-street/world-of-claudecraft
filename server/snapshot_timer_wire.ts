@@ -1,3 +1,4 @@
+import { isPersistentEngineAura } from '../src/sim/persistent_aura';
 import type { Aura, Entity } from '../src/sim/types';
 import type { StableCooldownWire } from '../src/world_api';
 
@@ -32,6 +33,7 @@ interface StableAuraRecord {
   // - that decrements per hit and would churn this cache (see game.ts WireAura.bt).
   breakArmed: boolean;
   paused: boolean;
+  permanent: boolean;
   deadline: number;
 }
 
@@ -40,6 +42,7 @@ interface StableAuraWire {
   name: string;
   kind: string;
   dur: number;
+  perm?: 1;
   exp?: number;
   rem?: number;
   value?: number;
@@ -71,13 +74,26 @@ function sameStringList(
   return true;
 }
 
+// Stacks are omitted below 2 as a sparsity rule, EXCEPT for the persistent
+// engine banks (druid/shaman/hunter spec engines): their badge and tooltip
+// teach the live stage including 0 and 1, and the decode side cannot tell
+// "absent because 1" from "absent because 0", so the count is always sent.
+// Mirrors the legacy wireAura stacks rule in server/game.ts exactly, so both
+// encoders cannot drift.
+function wireStacks(aura: Aura): number | undefined {
+  if (isPersistentEngineAura(aura.id)) return aura.stacks ?? 0;
+  return aura.stacks && aura.stacks > 1 ? aura.stacks : undefined;
+}
+
 function auraMatches(
   record: StableAuraRecord,
   aura: Aura,
   simTime: number,
   paused: boolean,
 ): boolean {
-  const deadline = round2(paused ? aura.remaining : simTime + aura.remaining);
+  const wirePaused = paused || isPersistentEngineAura(aura.id);
+  const permanent = aura.permanent === true;
+  const deadline = permanent ? 0 : round2(wirePaused ? aura.remaining : simTime + aura.remaining);
   return (
     record.id === aura.id &&
     record.name === aura.name &&
@@ -88,18 +104,20 @@ function auraMatches(
     record.value3 === aura.value3 &&
     record.tickInterval === aura.tickInterval &&
     record.school === aura.school &&
-    record.stacks === (aura.stacks && aura.stacks > 1 ? aura.stacks : undefined) &&
+    record.stacks === wireStacks(aura) &&
     record.charges === aura.charges &&
     sameStringList(record.empowerAbilities, aura.empowerAbilities) &&
     record.sourceId === aura.sourceId &&
     record.unbreakableControl === (aura.unbreakableControl === true) &&
     record.breakArmed === (aura.breakThreshold !== undefined) &&
-    record.paused === paused &&
+    record.paused === wirePaused &&
+    record.permanent === permanent &&
     record.deadline === deadline
   );
 }
 
 function auraRecord(aura: Aura, simTime: number, paused: boolean): StableAuraRecord {
+  const wirePaused = paused || isPersistentEngineAura(aura.id);
   return {
     id: aura.id,
     name: aura.name,
@@ -110,14 +128,15 @@ function auraRecord(aura: Aura, simTime: number, paused: boolean): StableAuraRec
     value3: aura.value3,
     tickInterval: aura.tickInterval,
     school: aura.school,
-    stacks: aura.stacks && aura.stacks > 1 ? aura.stacks : undefined,
+    stacks: wireStacks(aura),
     charges: aura.charges,
     empowerAbilities: aura.empowerAbilities ? [...aura.empowerAbilities] : undefined,
     sourceId: aura.sourceId,
     unbreakableControl: aura.unbreakableControl === true,
     breakArmed: aura.breakThreshold !== undefined,
-    paused,
-    deadline: round2(paused ? aura.remaining : simTime + aura.remaining),
+    paused: wirePaused,
+    permanent: aura.permanent === true,
+    deadline: aura.permanent ? 0 : round2(wirePaused ? aura.remaining : simTime + aura.remaining),
   };
 }
 
@@ -126,9 +145,10 @@ function auraWire(record: StableAuraRecord): StableAuraWire {
     id: record.id,
     name: record.name,
     kind: record.kind,
-    dur: record.duration,
+    dur: record.permanent ? 0 : record.duration,
   };
-  if (record.paused) wire.rem = record.deadline;
+  if (record.permanent) wire.perm = 1;
+  else if (record.paused) wire.rem = record.deadline;
   else wire.exp = record.deadline;
   if (record.value !== 0) wire.value = record.value;
   if (record.value2 !== undefined) wire.value2 = record.value2;
@@ -145,7 +165,7 @@ function auraWire(record: StableAuraRecord): StableAuraWire {
 }
 
 /**
- * Per-entity v2 aura cache. Live countdowns are represented as absolute expiry
+ * Per-entity stable aura cache. Live countdowns are represented as absolute expiry
  * times, so an ordinary tick does not allocate or stringify a new aura list.
  */
 export class StableAuraWireCache {

@@ -87,6 +87,11 @@ export const MARKET_RARITY_FILTERS = [
   'epic',
   'legendary',
 ] as const;
+// Browse sort order (issue 3102). 'name' is the classic default (name-then-price,
+// what the memoized sortedBook() has always produced); 'price' surfaces the whole
+// matched book cheapest-first. Kept as its own axis rather than folded into the
+// dropdown filters: it reorders the result set, it never narrows it.
+export const MARKET_SORT_OPTIONS = ['name', 'price'] as const;
 
 // Listings per browse page (the count of OTHER sellers' listings shown at a time;
 // the player's own listings are always wired on top for quick reclaim).
@@ -102,8 +107,9 @@ export type MarketSubtypeFilter =
 export type MarketArmorClassFilter = (typeof MARKET_ARMOR_CLASS_FILTERS)[number];
 export type MarketPrimaryStatFilter = (typeof MARKET_PRIMARY_STAT_FILTERS)[number];
 export type MarketRarityFilter = (typeof MARKET_RARITY_FILTERS)[number];
+export type MarketSort = (typeof MARKET_SORT_OPTIONS)[number];
 
-/** The full browse state: search text, filters, and the page index. */
+/** The full browse state: search text, filters, sort, and the page index. */
 export interface MarketQuery {
   search: string;
   itemType: MarketItemTypeFilter;
@@ -111,6 +117,7 @@ export interface MarketQuery {
   armorClass: MarketArmorClassFilter;
   primaryStat: MarketPrimaryStatFilter;
   rarity: MarketRarityFilter;
+  sort: MarketSort;
   page: number;
 }
 
@@ -122,6 +129,7 @@ export function defaultMarketQuery(): MarketQuery {
     armorClass: 'all',
     primaryStat: 'all',
     rarity: 'all',
+    sort: 'name',
     page: 0,
   };
 }
@@ -137,6 +145,7 @@ export function sanitizeMarketQuery(
         armorClass?: unknown;
         primaryStat?: unknown;
         rarity?: unknown;
+        sort?: unknown;
         page?: unknown;
       }
     | null
@@ -163,6 +172,7 @@ export function sanitizeMarketQuery(
     armorClass: oneOf(MARKET_ARMOR_CLASS_FILTERS, raw?.armorClass, 'all'),
     primaryStat: oneOf(MARKET_PRIMARY_STAT_FILTERS, raw?.primaryStat, 'all'),
     rarity: oneOf(MARKET_RARITY_FILTERS, raw?.rarity, 'all'),
+    sort: oneOf(MARKET_SORT_OPTIONS, raw?.sort, 'name'),
     page,
   };
 }

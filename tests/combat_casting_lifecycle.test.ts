@@ -14,6 +14,7 @@ import {
   updateCasting,
 } from '../src/sim/combat/casting_lifecycle';
 import { handleDeath } from '../src/sim/combat/damage';
+import { ABILITIES } from '../src/sim/content/classes';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { BUILTIN_WORLD, LAKE, MOBS } from '../src/sim/data';
 import { clearNythraxisWardChannelCast } from '../src/sim/encounters/nythraxis';
@@ -283,13 +284,23 @@ describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)',
   });
 
   it('also auto-acquires for a dual-purpose (targetType "any") ability', () => {
+    // The generic 'any' acquire arm has no LIVE consumer on this line: the
+    // paladin overhaul retired holy_shock to legacy-hidden, and Unleash
+    // Weapon resolves its own target before this arm runs. Unhide the legacy
+    // exemplar for the pin (restored below) so the arm stays guarded for the
+    // next dual-purpose ability that ships.
     const { sim, p } = makeSim('paladin', 12);
-    sim.setSpec('holy'); // Holy Shock is the Holy spec's signature ability
-    const attacker = spawnAttacker(sim, p, 8);
-    expect(p.targetId).toBeNull();
+    ABILITIES.holy_shock.hiddenFromPlayer = false;
+    try {
+      sim.setSpec('holy');
+      const attacker = spawnAttacker(sim, p, 8);
+      expect(p.targetId).toBeNull();
 
-    castAbility(sim.ctx, 'holy_shock', p.id);
-    expect(p.targetId).toBe(attacker.id);
+      castAbility(sim.ctx, 'holy_shock', p.id);
+      expect(p.targetId).toBe(attacker.id);
+    } finally {
+      ABILITIES.holy_shock.hiddenFromPlayer = true;
+    }
     expect(p.castingAbility).toBeNull(); // holy_shock is instant (castTime 0)
   });
 
@@ -329,6 +340,22 @@ describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)',
 });
 
 describe('casting_lifecycle: channel start -> tick -> finish', () => {
+  it('starts Consume damage on the first channel update instead of waiting one second', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    const mob = spawnTarget(sim, p);
+    const mobHp0 = mob.hp;
+
+    castAbility(sim.ctx, 'drain_life', p.id);
+    updateCasting(sim.ctx, p, meta);
+
+    expect(p.channelTicksLeft).toBe(2);
+    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
+    for (let tick = 0; tick < 20 && mob.hp === mobHp0; tick++) {
+      advancePendingProjectiles(sim.ctx);
+    }
+    expect(mob.hp).toBeLessThan(mobHp0);
+  });
+
   it('starts a channel (channeling, resource spent at START), ticks drain, then finishes', () => {
     const { sim, p, meta } = makeSim('warlock', 12);
     const mob = spawnTarget(sim, p);
@@ -421,6 +448,26 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
       .drainEvents()
       .filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
     expect(stops.some((e: any) => e.success === false)).toBe(true);
+  });
+
+  it('keeps Litany of Woe on the existing projectile channel path', () => {
+    const { sim, p } = makeSim('priest', 20);
+    const mob = spawnTarget(sim, p, 20, 6);
+    sim.drainEvents();
+    castAbility(sim.ctx, 'mind_flay', p.id);
+
+    const events: any[] = [];
+    for (let tick = 0; tick < 25; tick++) events.push(...sim.tick());
+
+    expect(
+      events.some(
+        (event) =>
+          event.type === 'spellfx' &&
+          event.fx === 'projectile' &&
+          event.sourceId === p.id &&
+          event.targetId === mob.id,
+      ),
+    ).toBe(true);
   });
 });
 
@@ -798,6 +845,7 @@ describe('casting_lifecycle: determinism', () => {
 describe('casting_lifecycle: physical ranged shots resolve on projectile impact (Long Draw)', () => {
   it('deals no damage at cast completion; damage lands when the arrow arrives', () => {
     const { sim, p, meta } = makeSim('hunter', 20);
+    expect(sim.setSpec('marksmanship')).toBe(true);
     p.resource = p.maxResource = 500;
     const mob = spawnTarget(sim, p, 20, 20); // 20yd: within 35yd range, beyond the 8yd deadzone
     const events: Array<Record<string, any>> = [];

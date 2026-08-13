@@ -47,6 +47,8 @@ Repository skills live in `.agents/skills/` and are invoked as `$skill-name`:
 - `$woc-feature-plan`: produce an implementation-ready plan for cross-cutting work.
 - `$woc-review-pr`: verify a pull request without posting unless explicitly requested.
 - `$woc-file-issue`: draft an issue, and file it only with explicit authorization.
+- `$woc-write-game-tooltips`: write or audit plain English tooltips against live combat values and
+  scaling.
 - `$woc-image-to-glb`: build a shipping GLB asset from a reference image through the
   repo pipeline.
 - `$woc-release-merge-audit`: find semantic damage after release integration.
@@ -69,7 +71,8 @@ Pair it with persistence or security review when those concerns also apply.
 ## Completion contract
 
 Run checks proportional to the change while iterating. Before calling an implementation
-complete, use `$woc-qa` or follow `docs/qa-gate.md`, including `npm run gate` when the
-canonical gate requires it. Report the exact commands and outcomes, remaining risks, and
+complete, use `$woc-qa` or follow `docs/qa-gate.md`, including the pre-merge bar
+`node scripts/gate_select.mjs` (or the deeper `npm run gate`) when the canonical gate
+requires it. Report the exact commands and outcomes, remaining risks, and
 any checks you could not run. A hook or subagent report never substitutes for the shared
 test, typecheck, build, i18n, and security gates.

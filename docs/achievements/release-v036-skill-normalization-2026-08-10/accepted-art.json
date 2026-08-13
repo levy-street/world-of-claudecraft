@@ -1,0 +1,657 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "release-v036-skill-normalization-2026-08-10",
+    "acceptedDate": "2026-08-10",
+    "owner": "World of ClaudeCraft",
+    "artIdentityChanged": false,
+    "provenanceRuling": "Each source painting keeps the authorship, source, and license recorded by its per-class mapping.json entry. This record owns only the shipping normalization and historical supersession link."
+  },
+  "scope": {
+    "normalizedSkillIcons": 36,
+    "classes": {
+      "mage": 33,
+      "warrior": 3
+    },
+    "formerDimensions": {
+      "1254x1254": 31,
+      "512x512": 5
+    }
+  },
+  "contracts": {
+    "ability": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "processing": {
+    "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+    "converter": "scripts/convert_skill_icons_webp.mjs",
+    "command": "npm run assets:skills",
+    "intake": "Decode each captured shipping WebP to a lossless PNG with no crop or art edits, then feed that PNG to the canonical converter.",
+    "resize": {
+      "width": 128,
+      "height": 128,
+      "fit": "cover",
+      "position": "centre"
+    },
+    "colorSpace": "srgb",
+    "encoding": {
+      "format": "webp",
+      "quality": 82,
+      "alphaQuality": 100,
+      "smartSubsample": true,
+      "effort": 6
+    }
+  },
+  "supersessionAudit": {
+    "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+    "method": "git grep -n -I -F at the source commit for every former shipping SHA-256",
+    "preexistingLiteralHashPins": 0,
+    "ruling": "No tracked historical record pinned the former shipping hashes. This accepted-art manifest is the new immutable link from every former shipping identity to its normalized replacement; no earlier record was rewritten."
+  },
+  "review": {
+    "evidenceRoot": "tmp/release-art-audit-v036/skill-normalization/",
+    "reviewSizes": [128, 40, 28],
+    "sideBySideSheets": ["compare-128.png", "compare-40.png", "compare-28.png"],
+    "trackedEvidence": [
+      {
+        "path": "docs/screenshots/release-v036-skill-normalization-2026-08-10/skill-icons-before-after-128.webp",
+        "layout": "Former shipping art on the left, normalized shipping art on the right, labeled at 128px.",
+        "acceptedSha256": "06ca4d443d82ca83bf69d3b46ac7100ef197effa9a6ef405a8b30f02ca929e68",
+        "acceptedBytes": 550286
+      },
+      {
+        "path": "docs/screenshots/release-v036-skill-normalization-2026-08-10/skill-icons-before-after-compact.webp",
+        "layout": "Former art on each left half and normalized art on each right half, with 40px above 28px.",
+        "acceptedSha256": "b196f45f9eaddf853c540eeb43d27a89f3adad72360e6fc4c2c863884dcf5979",
+        "acceptedBytes": 115864
+      }
+    ],
+    "totalBytesBefore": 10852710,
+    "totalBytesAfter": 271244,
+    "maxMeanAbsoluteError": 8.910522,
+    "minPeakSignalToNoiseDb": 26.00389,
+    "verdict": "Accepted. Side-by-side review preserves subject, framing, palette, border, and small-size readability at every review size."
+  },
+  "assets": [
+    {
+      "kind": "ability",
+      "id": "arcane_surge",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/arcane_surge.webp",
+      "acceptedSha256": "d63c1d4eb2d650a534593817ab478d41c2a143768a95e0a8648de0d9e775bc57",
+      "acceptedBytes": 6190,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "65050b2aa702f96f57a2a97071fd24bbf2810dfb3ac40dc0e3ac5ee408514701",
+        "bytes": 49384,
+        "width": 512,
+        "height": 512
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "blink",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/blink.webp",
+      "acceptedSha256": "dcdf301e9b5e672cdcbd777f40198a07a7e697d788ccd4f238b5c45a3806c764",
+      "acceptedBytes": 5250,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "eec718cd37677a4a4b10529351d6d6675b5c3b46f91ad59031e46770f6d1df75",
+        "bytes": 36948,
+        "width": 512,
+        "height": 512
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "blink_while_casting",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/blink_while_casting.webp",
+      "acceptedSha256": "242d2a872ee6219dc55f9a0183c630f13273f23ee98acb01ba2b4696791ea370",
+      "acceptedBytes": 7626,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "9ea78e7ebed3198bba5ef645637c4b1fb50916333395fc14e22af33743f97d15",
+        "bytes": 314160,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "blizzard",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/blizzard.webp",
+      "acceptedSha256": "86c44979464814718c0fb690a14e41589a61a79f89a7cfbc819f03eeee9bfe76",
+      "acceptedBytes": 8118,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "45b98de2f47006f1ed56264d9b486c01acfc3a66b7a3cb51943cbb18abf3278c",
+        "bytes": 426798,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "cold_snap",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/cold_snap.webp",
+      "acceptedSha256": "9fa69298aee02e2b7c998976718712ef0aa9dfd1d6cee5fd8cbb6566af3269b0",
+      "acceptedBytes": 9000,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "fc18c201d408a6bee6e853692fcc0ddbc6626198e5b316e1f253ac0aef38a428",
+        "bytes": 395268,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "collective_reversal",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/collective_reversal.webp",
+      "acceptedSha256": "2c6fa12e7037eb0ac2ce7b3820a2c33bc0febe10d48521e41c6072afb18dad3a",
+      "acceptedBytes": 8154,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "74bb531e17ddfd5655c7d9044cdade02eb60b72e2e3c3badb12c94f620fb96ce",
+        "bytes": 338516,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "counterspell",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/counterspell.webp",
+      "acceptedSha256": "a8af6866f5edb8ee6b71c517b2bf8cf5202a8b6e30061c1e1525f0a55e895d12",
+      "acceptedBytes": 8150,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "f116d92bc139ac12bd3413bfad3b663c4e0e99d5de2bd8200605f01352a6c809",
+        "bytes": 247466,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "double_blink",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/double_blink.webp",
+      "acceptedSha256": "94908bb4206a4ba42a050e10271981738811a9b24610e3e15b1358580813ed2f",
+      "acceptedBytes": 7392,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "927885daacebacb2bfed8842ebee9361325d7c59e6884df420b10cd009e08363",
+        "bytes": 320458,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "elemental_convergence",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/elemental_convergence.webp",
+      "acceptedSha256": "3214e36e5787570926ddcd83d35beee6ef529a475c13e72e72078f1c780c4797",
+      "acceptedBytes": 8670,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "52f4df5210ee19696f44f3d9c39ff8ba355fff77fbec0c23b70fb1358de99b4d",
+        "bytes": 367494,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "evocation",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/evocation.webp",
+      "acceptedSha256": "34880be58ee8f86c60bf4b9b9cf9ae10189e630b1c27772ac60f0958ee3e9c57",
+      "acceptedBytes": 6796,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "0f19506938a89f1ab46bf82adfc88bbac80a29e8b956724b5cd1a7723bd0632d",
+        "bytes": 235034,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "fireball_form",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/fireball_form.webp",
+      "acceptedSha256": "9f909f74f0516c634b01460c43d386c1ae7fdd7c244dff14c3eca3bc1f6ad4ab",
+      "acceptedBytes": 7390,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "3f40672575cc845663d3e171c8254314e23080a92e01c5ff43d76ac76ff1cf08",
+        "bytes": 236654,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "flurry",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/flurry.webp",
+      "acceptedSha256": "b02bba37c74c49aa10726e0bb5d774f6bb7d405af4a7b6d4150cd6c085ea7fff",
+      "acceptedBytes": 7386,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "a78a4544945b7ab0c499aa46b0f5ceceec9d86db1847a84254d3d1f0ea3d398e",
+        "bytes": 377996,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "frozen_orb",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/frozen_orb.webp",
+      "acceptedSha256": "b4a2a70e60b7aba05102bc59ab4ab139245b378264aa8eea11e5d3e089d08334",
+      "acceptedBytes": 7862,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "316b526550182974daf7cb00f4b75c81e2ad95e9502ebcf59c92f855b6d99838",
+        "bytes": 423774,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "greater_invisibility",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/greater_invisibility.webp",
+      "acceptedSha256": "8c4be0ef36fc16f7f6bc10d489f4713d3fa3a265789c551b51a176018c4482df",
+      "acceptedBytes": 7230,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "cd4bd4b03600382572fe71d6d5c2948fc53a5f9cd119da7e228dc76db9c73a9e",
+        "bytes": 388764,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "ice_floes",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/ice_floes.webp",
+      "acceptedSha256": "6cc3f505575e2dbed6737a1ac59c4e1af644dd721380ac9505eb40fb1b143602",
+      "acceptedBytes": 7730,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "80fc1b1e8c84b34a162c4adbaf23c248b6f4f919e0fbfb2736abc106d27448d9",
+        "bytes": 373472,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "ice_lance",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/ice_lance.webp",
+      "acceptedSha256": "8001af4412b604ab17f63b6691c175b8392651635805e506cf9dca6cbfeb826d",
+      "acceptedBytes": 6772,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "67bad0e70da8ba8762f7a3bb3244664000914dfc5b32b9d63f9762ce576cb981",
+        "bytes": 357194,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "icy_veins",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/icy_veins.webp",
+      "acceptedSha256": "76f2eca18341a803537d92ae7fb7b2263b429b0c09cfd0f9c80492c7fb14ac40",
+      "acceptedBytes": 7968,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "a9753f0a4870224927caef371742457224599a81a694af3228880334afd800bd",
+        "bytes": 369606,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "mass_barrier",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/mass_barrier.webp",
+      "acceptedSha256": "e9f8ac231a41808ed9ddc3a209d77ae9039221d8cf7d162342cb8ccf09c4f573",
+      "acceptedBytes": 8006,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "0412f2465f09b9bd07bd02e6fec30327b3f8689e8f139ba01ff1f37845db0c65",
+        "bytes": 343322,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "overflowing_power",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/overflowing_power.webp",
+      "acceptedSha256": "9ddd876ff039b23fa08e276da663d024b178b79b0becfa0b2996e8be4bdd08bc",
+      "acceptedBytes": 8368,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "517fe36f11e140ebdf6d15cf29d6da83c15b297c4ea521c03f26423edba29441",
+        "bytes": 306886,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "overload",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/overload.webp",
+      "acceptedSha256": "37fbe8b3a2883bdffa1f2246b72fc5e094b5ba14aa3bb4136bc84930c96c3bfa",
+      "acceptedBytes": 9284,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "b4a9c7464cd876e5721430e2cedb6113b54e91bd72641e1b855082b6fc234cf1",
+        "bytes": 373220,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "perfect_moment",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/perfect_moment.webp",
+      "acceptedSha256": "58f5fd57e8d89d02ebde688f8972c67bbb3c553730bd6a6ba86cd8244fd85e56",
+      "acceptedBytes": 9812,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "08ad27e7d3481f9a830e815dcdf96b64e5103939c0a30fec6d6b7b591b552d83",
+        "bytes": 374908,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "power_echo",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/power_echo.webp",
+      "acceptedSha256": "2ff65526198e99195b3f497d50bac30676874a9a5c866742155436b2380b5d6a",
+      "acceptedBytes": 7988,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "ffe4c846c7a5b1ede39291698a308600fe4cc9b47c400ecb3ba041f0ba12fdf9",
+        "bytes": 388006,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "presence_of_mind",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/presence_of_mind.webp",
+      "acceptedSha256": "434e0605b8fd2ddb875d6dd81f4727d9e2a508eb3aefe85a401da70993cc2b24",
+      "acceptedBytes": 7284,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "2aa6a6fa64d8a0ca6766debe21ae1efa662cdd8c41f43c5373e457676b81e5b3",
+        "bytes": 251098,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "rings_of_frost",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/rings_of_frost.webp",
+      "acceptedSha256": "fd17daae4e0553586a28177a024eeb9254a2f44016a4c63503da6db5f5a8f576",
+      "acceptedBytes": 7370,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "02888551bcf5320d2348991fa1f0c613e9e5d03b1e8649631db3340c84229a33",
+        "bytes": 371176,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "rune_of_power",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/rune_of_power.webp",
+      "acceptedSha256": "0cdd2f475938927675eee7d4871589f9160ce09d582b40b08ad8e69563bbc187",
+      "acceptedBytes": 7350,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "be967db4e4ed2c5b05efea2cfcac6728e86eb64bbf4514f922e0a0751a3f3694",
+        "bytes": 268672,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "snap_polymorph",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/snap_polymorph.webp",
+      "acceptedSha256": "6c213d2de89b006645870ca85582cdf5963b55dbb99ae16854b946ae9056ecdb",
+      "acceptedBytes": 7204,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "57376a4595387ee69483f9a0dce033e531bd4d91dcf652049b49aa3481fef832",
+        "bytes": 359006,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "temporal_barrier",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/temporal_barrier.webp",
+      "acceptedSha256": "d452df930598e1c1197b889f4ccb982b7ab0cc37e635648b70f41af2797ecdf6",
+      "acceptedBytes": 6320,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "57d5b6467139edf87d77f62ff1fcf785e948780d07c798ff5892116d65290beb",
+        "bytes": 46692,
+        "width": 512,
+        "height": 512
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "temporal_echo",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/temporal_echo.webp",
+      "acceptedSha256": "f4b8ac8b656e1b693206076651cea0e20169c6eebb83f977d41a805a27937fe3",
+      "acceptedBytes": 5210,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "317680411650106f0f26771ef14e68537a1689d503c90877bb69595b58b9fbfd",
+        "bytes": 39960,
+        "width": 512,
+        "height": 512
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "temporal_hourglass",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/temporal_hourglass.webp",
+      "acceptedSha256": "24989828a6d648e9cce98aa7f3f253b45aba688b44dcd95e80abba687b387704",
+      "acceptedBytes": 8672,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "e10f05c3d50d57ec2a7461968e081d1ec698751cd5c3fb400efe56ea932a544e",
+        "bytes": 409774,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "temporal_mend",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/temporal_mend.webp",
+      "acceptedSha256": "9c2eb6d8b16a0356128758fda3bc47ef57fbd88a7d871b871954fa2ab757ac0f",
+      "acceptedBytes": 6436,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "590c86b04c10c07678a4dd8d804157432ceae9268866ee7e1e49b77e82b71bfa",
+        "bytes": 49528,
+        "width": 512,
+        "height": 512
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "temporal_rift",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/temporal_rift.webp",
+      "acceptedSha256": "bd3329f773b7eca89f999e3bc84c922cca9e2032426f282620b316337c3a58e0",
+      "acceptedBytes": 7350,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "742ea6157d4f3fcb13338a6401853cbc5bc868617a22420ec298d9b1bc0692b2",
+        "bytes": 361610,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "twin_frost_nova",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/twin_frost_nova.webp",
+      "acceptedSha256": "2ccc21efcf1989b04fad8d888883254c8af1df300a8fa40b2ba0075e3862f2ec",
+      "acceptedBytes": 8420,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "20aa20033011886b3d4db53b00b98ad3ebbc1bfe31f3b63ff124526d1f6992e1",
+        "bytes": 397932,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "warded",
+      "class": "mage",
+      "runtimeUrl": "/ui/skills/mage/warded.webp",
+      "acceptedSha256": "559c4e1699077060763457d60e66c4fb51143222e485405f15125a329afe6e0e",
+      "acceptedBytes": 8118,
+      "sourceMapping": "public/ui/skills/mage/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "b728af1fee03b97a620589e6883f5aa6bb4b92f76e94201240e791cb7b0c3f8a",
+        "bytes": 387708,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "combat_mastery",
+      "class": "warrior",
+      "runtimeUrl": "/ui/skills/warrior/combat_mastery.webp",
+      "acceptedSha256": "866ba9f6e94c292d651592e695a27a175b4c3f9885c7c71d711fdb4b3a1dc19c",
+      "acceptedBytes": 5768,
+      "sourceMapping": "public/ui/skills/warrior/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "f7261683e1b8252eb2509019e7bd3bb478fdca10b0b1585a2b5eb0a01c82b644",
+        "bytes": 190076,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "crushing_charge",
+      "class": "warrior",
+      "runtimeUrl": "/ui/skills/warrior/crushing_charge.webp",
+      "acceptedSha256": "ab110d995b387562f84e316b806ba6c3f3a1be70f110220f58958291dbefd73f",
+      "acceptedBytes": 7768,
+      "sourceMapping": "public/ui/skills/warrior/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "fe6bb90d80263ff7b99435548f177a83a177a70928bbd7ec7258d04f0bdd12e4",
+        "bytes": 365078,
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "kind": "ability",
+      "id": "double_charge",
+      "class": "warrior",
+      "runtimeUrl": "/ui/skills/warrior/double_charge.webp",
+      "acceptedSha256": "0a5a8f8c1dfd40095b21fee21fefb10ba421485d34dcb90edaa3d33739e8c966",
+      "acceptedBytes": 6832,
+      "sourceMapping": "public/ui/skills/warrior/mapping.json",
+      "supersedes": {
+        "sourceCommit": "32abfff7b0cbee34123dc36f69ed3fcab24f7a65",
+        "sha256": "477cac76f4bd385f17dd97181db7c27d8d99a78242817d419f2690edb63e0618",
+        "bytes": 309072,
+        "width": 1254,
+        "height": 1254
+      }
+    }
+  ]
+}

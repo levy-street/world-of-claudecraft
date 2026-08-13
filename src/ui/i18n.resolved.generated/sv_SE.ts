@@ -127,6 +127,10 @@ export const sv_SE: EnTranslations = {
         "label": "Utrusta nivå 20-kit",
         "description": "Ta på nivå 20-förvalet före Sanctum för en specialisering, väskor först. Endast utrustning."
       },
+      "biskit": {
+        "label": "Utrusta BIS nivå 20-kit",
+        "description": "Ta på en specialiserings bästa episka set i varje plats. Endast utrustning."
+      },
       "gold": {
         "label": "Lägg till guld",
         "description": "Lägg till guld i den aktuella börsen."
@@ -240,7 +244,8 @@ export const sv_SE: EnTranslations = {
     },
     "hud": {
       "lowMana": "Låg mana",
-      "lowEnergy": "Låg energi"
+      "lowEnergy": "Låg energi",
+      "lowFocus": "Lågt fokus"
     },
     "talents": {
       "title": "Talanger",
@@ -316,6 +321,25 @@ export const sv_SE: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Fördömelse",
+      "fateThreadsLabel": "Ödestrådar",
+      "doomMeterUnlock": "Flytta resurspanelen för Vånda",
+      "doomMeterLock": "Lås resurspanelen för Vånda",
+      "doomEmptyStatus": "{value} av {max} Fördömelse.",
+      "doomStatus": "{value} av {max} Fördömelse; {remaining}.",
+      "fateThreadsStatus": "{value} av {max} Ödestrådar.",
+      "fateThreadsConsumeReady": "Tre Ödestrådar: Förtär kan väva in dem till ytterligare Fördömelse.",
+      "fateThreadsSentenceReady": "Tre Ödestrådar: Sentence kan förbruka dem för 18% ökad skada."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Själfragment",
+      "ruinMeter": "Wrack",
+      "ruinStatus": "{value} av {max} Wrack"
+    },
+    "comboMeter": {
+      "label": "KP"
+    },
     "spectate": {
       "banner": "Åskådar {name}"
     },
@@ -337,10 +361,10 @@ export const sv_SE: EnTranslations = {
       "healerConfirmCancel": "Avbryt"
     },
     "wiki": {
-      "confirmTitle": "Open the Wiki?",
-      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
-      "confirmOpen": "Open Wiki",
-      "confirmCancel": "Cancel"
+      "confirmTitle": "Öppna wikin?",
+      "confirmBody": "Detta öppnar World of ClaudeCraft-wikin i din webbläsare. Spelet fortsätter att köras.",
+      "confirmOpen": "Öppna wiki",
+      "confirmCancel": "Avbryt"
     },
     "unstuck": {
       "menuButton": "Fastna-hjälp",
@@ -373,7 +397,7 @@ export const sv_SE: EnTranslations = {
       "unavailable": "Fastna-hjälp är inte tillgänglig i ditt nuvarande tillstånd."
     },
     "fct": {
-      "absorbed": "{amount} absorberat",
+      "absorbed": "Absorberat ({amount})",
       "cheap": "Billigare!"
     },
     "emotes": {
@@ -777,6 +801,11 @@ export const sv_SE: EnTranslations = {
       "resetAction": "Återställ",
       "note": "Dra chattflikraden för att flytta fönstret, eller hörnhandtaget för att ändra storlek. Återställ sätter det till standardläge och -storlek."
     },
+    "chatQuota": {
+      "limitReached": "Gränsen för Allmänt-chatten är nådd. Försök igen om {seconds}.",
+      "pending": "Ditt föregående meddelande i Allmänt-chatten skickas fortfarande. Försök igen om en stund.",
+      "unavailable": "Allmänt-chatten är tillfälligt otillgänglig. Försök igen snart."
+    },
     "swing": {
       "ready": "Sving",
       "seconds": "{seconds}s"
@@ -787,6 +816,14 @@ export const sv_SE: EnTranslations = {
     },
     "rest": {
       "resting": "Vilar"
+    },
+    "paladin": {
+      "devotion": "Hängivenhet",
+      "devotionValue": "Hängivenhet {value} av {max}",
+      "devotionAscensionCharges": "Hängivenhet {value} av {max}. Upphöjelse: {charges} laddningar.",
+      "devotionAscensionLast": "Hängivenhet {value} av {max}. Upphöjelse: sista laddningen.",
+      "ascensionLastAnnouncement": "Upphöjelse: sista laddningen",
+      "ascensionSpenderAria": "Handlingsplats {slot}: {ability}. Förbrukar en upphöjelseladdning."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -819,6 +856,7 @@ export const sv_SE: EnTranslations = {
       "deeds": "Bedrifter",
       "mounts": "Riddjur",
       "professions": "Yrken",
+      "reliquary": "Relikvarium",
       "nameplates": "Namn",
       "haptics": "Haptik",
       "hapticsOff": "Haptik av",
@@ -859,6 +897,14 @@ export const sv_SE: EnTranslations = {
       "bodyWithVersion": "Version {version} av World of ClaudeCraft är tillgänglig. Uppdatera nu för de senaste korrigeringarna och förbättringarna.",
       "notNow": "Inte nu",
       "update": "Uppdatera"
+    },
+    "otaUpdate": {
+      "title": "Speluppdatering",
+      "downloading": "Laddar ner uppdatering: {percent}",
+      "applying": "Uppdateringen har laddats ner. Spelet startas om för att tillämpa den.",
+      "incompatible": "En uppdatering krävs för att spela. Den tillämpas så snart nedladdningen är klar.",
+      "continueAnyway": "Fortsätt utan att uppdatera",
+      "progressLabel": "Förlopp för nedladdning av uppdatering"
     },
     "cameraPrompt": {
       "title": "Välj din kamera",
@@ -961,6 +1007,7 @@ export const sv_SE: EnTranslations = {
       "emoteWheel": "Gesthjul",
       "targetFriendly": "Måltavla närmaste vänlig",
       "targetFriendlyNext": "Växla vänligt mål",
+      "targetPrev": "Växla mål bakåt",
       "discord": "Discord",
       "valecup": "Dalcupen",
       "bgFlag": "Slagfältets flaggåtgärd",
@@ -1319,7 +1366,7 @@ export const sv_SE: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Håller muspekaren inuti fönstret medan du drar för att rotera kameran, så att den inte kan nå skärmkanten eller flytta till en annan skärm. Stäng av om du föredrar en fri pekare.",
       "showWalletOnCharacterScreen": "Visa plånbok på karaktärsskärmen",
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
-      "showPlaytime": "Show Time Played on Character Screen",
+      "showPlaytime": "Visa tid spelad på karaktärsskärmen",
       "showDevBadges": "Visa utvecklarmärken",
       "showOwnNameplate": "Visa min namnskylt",
       "showPlayerNameplates": "Visa spelares namnskyltar",
@@ -1456,169 +1503,169 @@ export const sv_SE: EnTranslations = {
         "offline": "Offline"
       },
       "diagnostics": {
-        "panelAria": "World of ClaudeCraft performance diagnostics",
-        "title": "ClaudeCraft Performance Doctor",
-        "subtitle": "A game-specific scan with evidence and code-level fixes.",
+        "panelAria": "World of ClaudeCraft-prestandadiagnostik",
+        "title": "ClaudeCraft-prestandadoktor",
+        "subtitle": "En spelspecifik skanning med bevis och fixar på kodnivå.",
         "aria": {
-          "liveMeasurements": "Live performance measurements",
-          "scanProgress": "Diagnostic scan progress",
-          "findings": "Ranked diagnostic findings"
+          "liveMeasurements": "Direkta prestandamätningar",
+          "scanProgress": "Förlopp för diagnostisk skanning",
+          "findings": "Rankade diagnostiska fynd"
         },
         "controls": {
-          "minimize": "Minimize",
-          "expand": "Expand",
-          "start": "Start 15-second scan",
-          "refreshCensus": "Refresh scene census",
-          "copyReport": "Copy clear report",
-          "downloadReport": "Download report",
-          "scanning": "Scanning...",
-          "scanAnother": "Scan another area",
-          "reportLogged": "Report logged to console",
-          "copied": "Copied",
-          "copyBlocked": "Copy blocked: report logged",
-          "retestLowGraphics": "Retest on Low graphics"
+          "minimize": "Minimera",
+          "expand": "Expandera",
+          "start": "Starta 15-sekunders skanning",
+          "refreshCensus": "Uppdatera scenräkning",
+          "copyReport": "Kopiera tydlig rapport",
+          "downloadReport": "Ladda ner rapport",
+          "scanning": "Skannar...",
+          "scanAnother": "Skanna ett annat område",
+          "reportLogged": "Rapport loggad till konsolen",
+          "copied": "Kopierat",
+          "copyBlocked": "Kopiering blockerad: rapport loggad",
+          "retestLowGraphics": "Testa om med Låg grafik"
         },
-        "instruction": "For the best signal, enter Play Offline, move through the slow area, rotate the camera, and trigger the effect that stutters while the scan is running.",
+        "instruction": "För bästa signal, gå in i Spela offline, rör dig genom det långsamma området, rotera kameran, och utlös den effekt som hackar medan skanningen pågår.",
         "status": {
-          "pausedHiddenRestart": "Scan paused while this tab is hidden. It will restart when you return.",
-          "restoredRestart": "Tab restored. Restarting a clean 15-second active-gameplay capture.",
-          "worldLoaded": "World loaded. Waiting for the first playable frame.",
-          "pausedHiddenContinue": "Scan paused while this tab is hidden. Return to the game to continue.",
+          "pausedHiddenRestart": "Skanningen pausad medan denna flik är dold. Den startar om när du återvänder.",
+          "restoredRestart": "Fliken återställd. Startar om en ren 15-sekunders mätning av aktivt spelande.",
+          "worldLoaded": "Världen inläst. Väntar på den första spelbara bilden.",
+          "pausedHiddenContinue": "Skanningen pausad medan denna flik är dold. Återgå till spelet för att fortsätta.",
           "collectingRemaining": {
-            "one": "Collecting active gameplay: {seconds} second remaining",
-            "other": "Collecting active gameplay: {seconds} seconds remaining"
+            "one": "Samlar in aktivt spelande: {seconds} sekund kvar",
+            "other": "Samlar in aktivt spelande: {seconds} sekunder kvar"
           },
-          "waitingFrames": "Waiting for representative gameplay frames: {current}/{minimum}",
-          "collectingNow": "Collecting active gameplay: move through the problem area now.",
-          "ready": "Ready to scan. Press Start and reproduce the slowdown.",
-          "waitingWorld": "Waiting for the game world. Choose Play Offline or enter an online character."
+          "waitingFrames": "Väntar på representativa spelbilder: {current}/{minimum}",
+          "collectingNow": "Samlar in aktivt spelande: rör dig genom problemområdet nu.",
+          "ready": "Redo att skanna. Tryck på Starta och återskapa nedsaktningen.",
+          "waitingWorld": "Väntar på spelvärlden. Välj Spela offline eller gå in med en uppkopplad karaktär."
         },
         "metrics": {
-          "waitingRenderer": "renderer: waiting",
-          "waitingCensus": "scene census: waiting",
-          "waitingHitch": "hitch attribution: armed on world entry",
-          "recent": "recent  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}",
-          "render": "render  submit {submit} ms | world {world} ms | entities {entities} ms",
-          "scene": "scene   {calls} calls | {triangles} tris | {views} views",
-          "hitches": "hitches {hitches} | shaders {shaders} | uploads {uploads} | views {views}",
+          "waitingRenderer": "renderare: väntar",
+          "waitingCensus": "scenräkning: väntar",
+          "waitingHitch": "hackattribution: aktiverad vid världsinträde",
+          "recent": "senaste {fps} FPS | p95 {p95} ms | >50 ms {longFrames}",
+          "render": "render  inskickning {submit} ms | värld {world} ms | entiteter {entities} ms",
+          "scene": "scen    {calls} anrop | {triangles} tri | {views} vyer",
+          "hitches": "hack    {hitches} | shaders {shaders} | uppladdningar {uploads} | vyer {views}",
           "gpu": "GPU     {renderer}",
-          "waitingValue": "waiting"
+          "waitingValue": "väntar"
         },
         "scoreHeadline": "{score}/100: {headline}",
-        "healthyNoFindings": "No actionable threshold fired. If a short hitch still bothers you, rerun the scan along the exact movement path that triggers it.",
-        "findingMeta": "{severity} | {confidence} confidence",
+        "healthyNoFindings": "Inget åtgärdbart tröskelvärde utlöstes. Om ett kort hack ändå stör dig, kör om skanningen längs exakt den rörelsebana som utlöser det.",
+        "findingMeta": "{severity} | {confidence} tillförlitlighet",
         "sections": {
-          "evidence": "Evidence",
-          "tryNow": "Try now",
-          "codeFix": "Code fix",
-          "source": "Relevant source"
+          "evidence": "Bevis",
+          "tryNow": "Prova nu",
+          "codeFix": "Kodfix",
+          "source": "Relevant källkod"
         },
         "severity": {
-          "critical": "CRITICAL",
-          "warning": "WARNING",
+          "critical": "KRITISK",
+          "warning": "VARNING",
           "info": "INFO"
         },
         "confidence": {
-          "high": "high",
-          "medium": "medium",
-          "low": "low"
+          "high": "hög",
+          "medium": "medel",
+          "low": "låg"
         },
         "diagnosis": {
-          "noProblemTitle": "No material performance problem detected",
+          "noProblemTitle": "Inget betydande prestandaproblem upptäckt",
           "summary": {
             "findings": {
-              "one": "{findings} actionable finding from the last 10 seconds at {fps} FPS and {p95} frame p95.",
-              "other": "{findings} actionable findings from the last 10 seconds at {fps} FPS and {p95} frame p95."
+              "one": "{findings} åtgärdbart fynd från de senaste 10 sekunderna vid {fps} FPS och {p95} bild-p95.",
+              "other": "{findings} åtgärdbara fynd från de senaste 10 sekunderna vid {fps} FPS och {p95} bild-p95."
             },
-            "healthy": "The last 10 seconds held {fps} FPS with a {p95} frame p95. No game, browser, GPU, memory, asset, or network threshold fired."
+            "healthy": "De senaste 10 sekunderna höll {fps} FPS med ett bild-p95 på {p95}. Inget tröskelvärde för spel, webbläsare, GPU, minne, resurser eller nätverk utlöstes."
           },
           "titles": {
-            "hardwareAcceleration": "Software rendering is active",
-            "integratedGpu": "The game is using the integrated GPU",
-            "highDpi": "High resolution rendering is expensive here",
-            "forcedHighGraphics": "Forced high graphics is reducing performance",
-            "lowMemory": "Available device memory is low",
-            "browserStalls": "Browser or extension stalls were detected",
-            "heapPressure": "Browser memory pressure was detected",
-            "contextLoss": "The graphics context was reset",
-            "gpuSubmit": "GPU submission is the main frame bottleneck",
-            "sceneDraw": "Scene draw cost exceeds the active graphics budget",
-            "shadowPass": "The shadow pass uses a large share of draw calls",
-            "rendererWorld": "World renderer updates are CPU-bound",
-            "rendererEntities": "Entity view updates are CPU-bound",
-            "rendererNameplates": "Nameplate painting is expensive",
-            "simCpu": "Simulation work is consuming the frame",
-            "hudCpu": "HUD updates are consuming the frame",
-            "eventCpu": "Event processing is consuming the frame",
-            "shaderCompile": "Shaders are compiling during gameplay",
-            "textureUpload": "Texture uploads are causing gameplay hitches",
-            "viewCreate": "Entity view creation is causing hitches",
-            "otherHitch": "Unattributed long frames remain",
-            "assetStartup": "Game startup is delayed by asset work",
-            "longTasks": "Long browser tasks are blocking frames",
-            "networkLatency": "Network delivery is delaying visible response",
-            "snapshotApply": "Snapshot processing is blocking the client",
-            "generic": "Performance rule {rule} needs attention"
+            "hardwareAcceleration": "Mjukvarurendering är aktiv",
+            "integratedGpu": "Spelet använder den integrerade GPU:n",
+            "highDpi": "Högupplöst rendering är kostsam här",
+            "forcedHighGraphics": "Tvingad hög grafik minskar prestandan",
+            "lowMemory": "Tillgängligt enhetsminne är lågt",
+            "browserStalls": "Stopp i webbläsare eller tillägg upptäcktes",
+            "heapPressure": "Minnestryck i webbläsaren upptäcktes",
+            "contextLoss": "Grafikkontexten återställdes",
+            "gpuSubmit": "GPU-inskickning är den främsta flaskhalsen för bilden",
+            "sceneDraw": "Scenens ritkostnad överskrider den aktiva grafikbudgeten",
+            "shadowPass": "Skuggpasset använder en stor andel av ritanropen",
+            "rendererWorld": "Uppdateringar av världsrenderaren är CPU-bundna",
+            "rendererEntities": "Uppdateringar av entitetsvyer är CPU-bundna",
+            "rendererNameplates": "Målning av namnskyltar är kostsam",
+            "simCpu": "Simuleringsarbete förbrukar bildtiden",
+            "hudCpu": "HUD-uppdateringar förbrukar bildtiden",
+            "eventCpu": "Händelsehantering förbrukar bildtiden",
+            "shaderCompile": "Shaders kompileras under spelets gång",
+            "textureUpload": "Texturuppladdningar orsakar hack i spelet",
+            "viewCreate": "Skapande av entitetsvyer orsakar hack",
+            "otherHitch": "Otillskrivna långa bilder kvarstår",
+            "assetStartup": "Speluppstarten fördröjs av resursarbete",
+            "longTasks": "Långa webbläsaruppgifter blockerar bilder",
+            "networkLatency": "Nätverksleverans fördröjer synlig respons",
+            "snapshotApply": "Bearbetning av ögonblicksbilder blockerar klienten",
+            "generic": "Prestandaregeln {rule} behöver uppmärksamhet"
           },
           "causes": {
-            "environment": "A detected browser, GPU, memory, or device setting can limit performance before the game renders a frame.",
-            "graphics": "Measured graphics work is above the active frame or scene budget for this capture.",
-            "cpu": "A measured CPU phase is taking enough main-thread time to miss the frame budget.",
-            "loading": "Resource preparation or first-use work happened on a visible gameplay or startup path.",
-            "network": "Network delivery or client snapshot processing is delaying the latest playable state."
+            "environment": "En upptäckt inställning för webbläsare, GPU, minne eller enhet kan begränsa prestandan innan spelet renderar en bild.",
+            "graphics": "Uppmätt grafikarbete överstiger den aktiva bild- eller scenbudgeten för denna mätning.",
+            "cpu": "En uppmätt CPU-fas tar tillräckligt med tid på huvudtråden för att missa bildbudgeten.",
+            "loading": "Förberedelse av resurser eller förstagångsarbete inträffade på en synlig spel- eller uppstartsväg.",
+            "network": "Nätverksleverans eller klientens bearbetning av ögonblicksbilder fördröjer det senaste spelbara tillståndet."
           },
           "evidence": {
-            "environment": "The environment rule {rule} matched this device and browser.",
-            "gpuSubmit": "WebGL submission p95 is {submit}, or {share} of renderer p95.",
-            "frame": "The recent window measured {fps} FPS with a {p95} frame p95.",
-            "sceneCalls": "The scene uses {calls} draw calls against a target of {target}.",
-            "sceneTriangles": "The scene submits {triangles} triangles against a target of {target}.",
-            "sceneCategory": "Scene category {category} contributes {calls} calls and {triangles} measured triangles.",
-            "censusNeeded": "Refresh the scene census to identify the leading render category.",
-            "shadow": "The shadow pass submits {calls} calls, {share} of the baseline, and {triangles} triangles.",
-            "cpuPhase": "Measured phase {phase} has a p95 of {p95}.",
-            "hitch": "{count} of {total} recorded hitches matched cause {cause}.",
-            "assets": "The preload gate waited {wait} for {tasks} registered tasks.",
-            "failedAssets": "Failed asset groups: {groups}.",
-            "longTasks": "{count} long tasks were measured, with p95 {p95} and maximum {max}.",
-            "network": "Snapshot interval is {interval}, latest age is {age}, and input echo p95 is {echo}.",
-            "snapshot": "Snapshot parse and apply p95 is {work}; network gap p95 is {gap}.",
-            "generic": "Diagnostic rule {rule} matched this capture."
+            "environment": "Miljöregeln {rule} matchade denna enhet och webbläsare.",
+            "gpuSubmit": "WebGL-inskickningens p95 är {submit}, eller {share} av renderarens p95.",
+            "frame": "Det senaste fönstret uppmätte {fps} FPS med ett bild-p95 på {p95}.",
+            "sceneCalls": "Scenen använder {calls} ritanrop mot ett mål på {target}.",
+            "sceneTriangles": "Scenen skickar {triangles} trianglar mot ett mål på {target}.",
+            "sceneCategory": "Scenkategorin {category} bidrar med {calls} anrop och {triangles} uppmätta trianglar.",
+            "censusNeeded": "Uppdatera scenräkningen för att identifiera den ledande renderingskategorin.",
+            "shadow": "Skuggpasset skickar {calls} anrop, {share} av basvärdet, och {triangles} trianglar.",
+            "cpuPhase": "Den uppmätta fasen {phase} har ett p95 på {p95}.",
+            "hitch": "{count} av {total} registrerade hack matchade orsaken {cause}.",
+            "assets": "Förladdningsspärren väntade {wait} på {tasks} registrerade uppgifter.",
+            "failedAssets": "Misslyckade resursgrupper: {groups}.",
+            "longTasks": "{count} långa uppgifter uppmättes, med p95 {p95} och maximalt {max}.",
+            "network": "Ögonblicksbildens intervall är {interval}, senaste åldern är {age}, och inmatningsekots p95 är {echo}.",
+            "snapshot": "Tolkning och tillämpning av ögonblicksbilden har ett p95 på {work}; nätverksglappets p95 är {gap}.",
+            "generic": "Diagnostikregeln {rule} matchade denna mätning."
           },
           "tryNow": {
-            "environment": "Correct the detected environment setting, restart, and repeat the same scan.",
-            "graphics": "Retest the same camera path on Low graphics to confirm graphics pressure.",
-            "cpu": "Repeat the scan while idle and while moving to isolate the CPU phase.",
-            "loading": "Repeat the same route or first-use action to confirm when the hitch occurs.",
-            "network": "Compare Play Offline with the same movement and camera path."
+            "environment": "Rätta till den upptäckta miljöinställningen, starta om, och upprepa samma skanning.",
+            "graphics": "Testa om samma kamerabana med Låg grafik för att bekräfta grafiktrycket.",
+            "cpu": "Upprepa skanningen både i vila och under förflyttning för att isolera CPU-fasen.",
+            "loading": "Upprepa samma rutt eller förstagångsåtgärd för att bekräfta när hacket inträffar.",
+            "network": "Jämför Spela offline med samma rörelse- och kamerabana."
           },
           "codeFix": {
-            "environment": "Keep the detected fallback path within the shared graphics and memory budgets.",
-            "graphics": "Use the existing render budget, instancing, material sharing, LOD, and hidden-work skips.",
-            "cpu": "Profile the named phase, remove repeated work and allocations, and preserve gameplay behavior.",
-            "loading": "Preload, pool, or spread the identified first-use work through the existing startup and streaming budgets.",
-            "network": "Reduce delivery or snapshot processing cost without weakening the authoritative server model."
+            "environment": "Håll den upptäckta reservvägen inom de delade grafik- och minnesbudgetarna.",
+            "graphics": "Använd den befintliga renderingsbudgeten, instansiering, materialdelning, LOD och hopp över dolt arbete.",
+            "cpu": "Profilera den namngivna fasen, ta bort upprepat arbete och allokeringar, och bevara spelbeteendet.",
+            "loading": "Förladda, poola eller sprid ut det identifierade förstagångsarbetet över de befintliga uppstarts- och strömningsbudgetarna.",
+            "network": "Minska kostnaden för leverans eller bearbetning av ögonblicksbilder utan att försvaga den auktoritativa servermodellen."
           }
         },
         "report": {
-          "title": "World of ClaudeCraft performance diagnosis",
+          "title": "World of ClaudeCraft-prestandadiagnos",
           "statusLine": "Status: {status} ({score}/100)",
-          "capturedLine": "Captured: {captured}",
-          "topFindingLine": "Top finding: {finding}",
-          "summaryLine": "Summary: {summary}",
+          "capturedLine": "Insamlat: {captured}",
+          "topFindingLine": "Främsta fyndet: {finding}",
+          "summaryLine": "Sammanfattning: {summary}",
           "gpuLine": "GPU: {gpu}",
-          "graphicsLine": "Graphics: {tier}, render scale {scale}",
-          "recentLine": "Recent: {fps} FPS, p95 {p95}, {longFrames} frames over 50 ms, {frames} measured frames",
-          "resultHeading": "Result",
-          "noThreshold": "No actionable threshold fired in this capture.",
+          "graphicsLine": "Grafik: {tier}, renderingsskala {scale}",
+          "recentLine": "Senaste: {fps} FPS, p95 {p95}, {longFrames} bilder över 50 ms, {frames} uppmätta bilder",
+          "resultHeading": "Resultat",
+          "noThreshold": "Inget åtgärdbart tröskelvärde utlöstes i denna mätning.",
           "findingHeading": "{index}. {title}",
-          "findingMeta": "Severity: {severity}. Confidence: {confidence}.",
-          "rawSnapshotHeading": "Raw snapshot",
-          "notAvailable": "not available",
+          "findingMeta": "Allvarlighetsgrad: {severity}. Tillförlitlighet: {confidence}.",
+          "rawSnapshotHeading": "Rå ögonblicksbild",
+          "notAvailable": "ej tillgänglig",
           "status": {
-            "critical": "critical",
-            "needsAttention": "needs attention",
-            "healthy": "healthy"
+            "critical": "kritisk",
+            "needsAttention": "behöver uppmärksamhet",
+            "healthy": "stabil"
           }
         }
       }
@@ -1720,12 +1767,12 @@ export const sv_SE: EnTranslations = {
     "charSheet": {
       "offense": "Anfall",
       "defense": "Försvar",
-      "playtimeLabel": "Time Played",
+      "playtimeLabel": "Tid spelad",
       "playtimeParts": "{major}, {minor}",
-      "playtimeUnderMinute": "Less than a minute",
-      "playtimeHidden": "Hidden",
-      "showPlaytimeAria": "Show time played",
-      "hidePlaytimeAria": "Hide time played"
+      "playtimeUnderMinute": "Mindre än en minut",
+      "playtimeHidden": "Dold",
+      "showPlaytimeAria": "Visa tid spelad",
+      "hidePlaytimeAria": "Dölj tid spelad"
     },
     "statInfo": {
       "fromYour": "Från dina {value} {stat}:",
@@ -1743,7 +1790,7 @@ export const sv_SE: EnTranslations = {
         "agi": "Skärper dina reflexer och din sikte, vilket förbättrar flera av dina stridsattribut.",
         "sta": "Härdar din kropp, höjer din maximala hälsa och hur snabbt du återhämtar hälsa under vila.",
         "int": "Utvidgar en besvärjares manapool och förbättrar chansen att landa en kritisk besvärjelseträff.",
-        "spi": "Snabbar på hur fort en besvärjares mana återkommer under vila, utanför strid.",
+        "spi": "Snabbar på hur fort en besvärjares mana återvänder. Det mesta flödar under vila, utanför strid, och en del fortsätter komma tillbaka även i strid.",
         "armor": "Mildrar inkommande fysiska slag. Minskningen är större mot anfallare på lägre nivå och har ett tak på 75 %.",
         "attackPower": "Driver dina vapenattacker. Var 14:e attackstyrka ger 1 skada per sekund.",
         "spellPower": "Ökar skadan från dina besvärjelser och styrkan i dina läkningar. Varje poäng Intellekt ger lite Besvärjelsekraft, utöver det från utrustning eller förstärkningar.",
@@ -1767,6 +1814,7 @@ export const sv_SE: EnTranslations = {
         "spellCritPct": "+{value} % Kritisk besvärjelseträff",
         "healthRegen": "Cirka {value} hälsa var 5:e sek under vila",
         "manaRegen": "Cirka {value} mana var 5:e sek under vila",
+        "manaRegenCombat": "Ungefär {value} mana var 5:e sekund i strid",
         "damageReduction": "Skademinskning mot en anfallare på nivå {level}: {value} %",
         "dpsFromAp": "Lägger till {value} skada per sekund till dina attacker"
       },
@@ -1787,11 +1835,11 @@ export const sv_SE: EnTranslations = {
     },
     "talents": {
       "defaultBuildName": "Bygge {n}",
-      "newBuildWithGear": "New Build (save gear too)",
-      "gearRestored": "Restored {n} gear pieces from this build.",
-      "gearNotHeld": "You no longer have {n} of this build's saved pieces.",
-      "gearCopyGone": "{n} saved pieces were not the copy this build pinned.",
-      "gearTakenByOtherSlot": "{n} saved pieces need another copy you do not have."
+      "newBuildWithGear": "Nytt bygge (spara även utrustning)",
+      "gearRestored": "Återställde {n} utrustningsdelar från detta bygge.",
+      "gearNotHeld": "Du har inte längre {n} av detta bygges sparade delar.",
+      "gearCopyGone": "{n} sparade delar var inte den kopia detta bygge fäste.",
+      "gearTakenByOtherSlot": "{n} sparade delar behöver en annan kopia du inte har."
     },
     "tips": {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
@@ -1853,22 +1901,22 @@ export const sv_SE: EnTranslations = {
         "other": "{count} sekunder kvar"
       },
       "playtimeDays": {
-        "one": "{count} day",
-        "few": "{count} days",
-        "many": "{count} days",
-        "other": "{count} days"
+        "one": "{count} dag",
+        "few": "{count} dagar",
+        "many": "{count} dagar",
+        "other": "{count} dagar"
       },
       "playtimeHours": {
-        "one": "{count} hour",
-        "few": "{count} hours",
-        "many": "{count} hours",
-        "other": "{count} hours"
+        "one": "{count} timme",
+        "few": "{count} timmar",
+        "many": "{count} timmar",
+        "other": "{count} timmar"
       },
       "playtimeMinutes": {
-        "one": "{count} minute",
-        "few": "{count} minutes",
-        "many": "{count} minutes",
-        "other": "{count} minutes"
+        "one": "{count} minut",
+        "few": "{count} minuter",
+        "many": "{count} minuter",
+        "other": "{count} minuter"
       },
       "playersOnline": {
         "one": "Vilka: {count} spelare online på {realm}.",
@@ -1881,6 +1929,48 @@ export const sv_SE: EnTranslations = {
         "few": "Vilka: {count} spelare matchar \"{query}\" på {realm}.",
         "many": "Vilka: {count} spelare matchar \"{query}\" på {realm}.",
         "other": "Vilka: {count} spelare matchar \"{query}\" på {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Ditt relikvarium kommer ikapp: {count} relik katalogiserad.",
+        "few": "Ditt relikvarium kommer ikapp: {count} reliker katalogiserade.",
+        "many": "Ditt relikvarium kommer ikapp: {count} reliker katalogiserade.",
+        "other": "Ditt relikvarium kommer ikapp: {count} reliker katalogiserade."
+      },
+      "reliquarySearchResults": {
+        "one": "{count} träff.",
+        "few": "{count} träffar.",
+        "many": "{count} träffar.",
+        "other": "{count} träffar."
+      },
+      "reliquaryToGo": {
+        "one": "{count} kvar",
+        "few": "{count} kvar",
+        "many": "{count} kvar",
+        "other": "{count} kvar"
+      },
+      "reliquaryObtainedTimes": {
+        "one": "Erhållen {count} gång",
+        "few": "Erhållen {count} gånger",
+        "many": "Erhållen {count} gånger",
+        "other": "Erhållen {count} gånger"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}, katalogiserad, erhållen {count} gång",
+        "few": "{name}, katalogiserad, erhållen {count} gånger",
+        "many": "{name}, katalogiserad, erhållen {count} gånger",
+        "other": "{name}, katalogiserad, erhållen {count} gånger"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}, katalogiserad, först funnen vid klarning {clears}, erhållen {count} gång",
+        "few": "{name}, katalogiserad, först funnen vid klarning {clears}, erhållen {count} gånger",
+        "many": "{name}, katalogiserad, först funnen vid klarning {clears}, erhållen {count} gånger",
+        "other": "{name}, katalogiserad, först funnen vid klarning {clears}, erhållen {count} gånger"
+      },
+      "deedsRetroSummary": {
+        "one": "Din krönika kommer ikapp: {count} bedrift nedtecknad.",
+        "few": "Din krönika kommer ikapp: {count} bedrifter nedtecknade.",
+        "many": "Din krönika kommer ikapp: {count} bedrifter nedtecknade.",
+        "other": "Din krönika kommer ikapp: {count} bedrifter nedtecknade."
       }
     },
     "bugReport": {
@@ -2109,6 +2199,10 @@ export const sv_SE: EnTranslations = {
       "itemAriaBound": "{item}, antal {count}, bunden kopia",
       "itemAriaMasterwork": "{item}, antal {count}, mästerverk",
       "itemAriaQuest": "{item}, antal {count}, uppdragsföremål",
+      "itemAriaLocked": "{item}, antal {count}, låst",
+      "itemLockedLine": "Låst",
+      "lockItem": "Lås föremål",
+      "unlockItem": "Lås upp föremål",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
@@ -2123,9 +2217,9 @@ export const sv_SE: EnTranslations = {
       "sortRecent": "Senaste",
       "sortQuality": "Kvalitet",
       "sortName": "Namn",
-      "sortButton": "Sort",
-      "sortButtonAria": "Sort your bags",
-      "sortButtonHint": "Combine stacks and group items by type",
+      "sortButton": "Sortera",
+      "sortButtonAria": "Sortera dina väskor",
+      "sortButtonHint": "Slå ihop högar och gruppera föremål efter typ",
       "searchPlaceholder": "Sök föremål",
       "searchAria": "Sök väskföremål efter namn",
       "noMatch": "Inga föremål matchar dina filter.",
@@ -2151,18 +2245,36 @@ export const sv_SE: EnTranslations = {
     "auraEffect": {
       "dot": "Gör {value} {school}-skada var {interval}:e s",
       "hot": "Återställer {value} hälsa var {interval}:e s",
+      "mendingCurrent": "Lagrar {value} läkning, frisläppt över tid eller förbrukad av Kaskadlagning",
+      "mendingCurrentPercent": "Lagrar läkning motsvarande {pct}% av maxhälsan för Kaskadlagning",
       "absorb": "Absorberar {value} skada",
       "healAbsorb": "Absorberar {value} inkommande läkning",
       "thorns": "Verursacht bei Angreifern {value} {school}schaden",
+      "stasis": "Immun och oförmögen att handla",
       "slow": "Verringert Bewegungstempo um {pct}%",
       "speed": "Erhöht Bewegungstempo um {pct}%",
       "attackSpeedSlow": "Verlangsamt Angriffstempo um {pct}%",
       "attackSpeedFast": "Erhöht Angriffstempo um {pct}%",
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
+      "imbueRange": "Vapen besjälat: {min} till {max} bonusskada vid Utslag",
+      "petDamage": "Ökar ditt husdjurs skada med {pct}%",
+      "petHaste": "Ökar ditt husdjurs handlingshastighet med {pct}%",
+      "spellDamage": "Ökar besvärjelseskada med {pct}%",
+      "spellHaste": "Ökar besvärjelsehastighet med {pct}%",
+      "sated": "Kan inte dra nytta av ännu en grupphastighetsvåg",
+      "cauterizeFatigue": "Bränning kan inte förhindra ännu ett dödligt slag",
+      "castShield": "Kastningar kan inte avbrytas eller få pushback av skada",
       "dmgDone": "Ökar orsakad skada med {pct}%",
       "dmgDoneReduce": "Minskar orsakad skada med {pct}%",
       "heatingUp": "Ditt nästa på varandra följande kritiska Eld-byggarslag ger Het svit; ett icke-kritiskt byggarslag tar bort Värms upp",
       "elementalConvergencePrimed": "Din nästa besvärjelse från den andra elementarskolan ger Elementär konvergens",
+      "hunterFerocity": "{stacks} Flockvildhet: ditt husdjur gör {pct}% mer skada",
+      "cooldownCap": "{used} av {cap} sek nedkylningsreduktion använd i detta fönster",
+      "funeralHarvestLock": "Funeral Harvest kan inte skapa ännu ett Själfragment än",
+      "leadenHexLock": "Blytung förbannelse kan inte rota fast detta mål igen än",
+      "forbiddenReflectionReady": "Din nästa kvalificerade häxmästarförmåga kan kastas igen",
+      "forbiddenReflectionLock": "Förbjuden spegling kan inte förberedas igen än",
+      "internalCooldown": "Denna effekt kan inte utlösas igen förrän timern löper ut",
       "carriedFlag": "Du bär på fiendens flagga. Avbryt den här förstärkningen för att tappa den.",
       "battleStance": "Stridsställning: 10% mer raserigenerering",
       "berserkerStance": "Bärsärkaställning: kritiska träffar sker 3% oftare och slår 3% hårdare",
@@ -2177,6 +2289,13 @@ export const sv_SE: EnTranslations = {
       "revengeFree": "Din nästa Hämnd kostar inget raseri",
       "victoryRush": "Segerrus är redo",
       "maxHpPct": "Ökar maximal hälsa med {pct}%",
+      "enrage": "Vållad skada ökad med {damagePct}%, attackhastighet med {hastePct}% och förflyttningshastighet med {movePct}%",
+      "suddenDeath": "Din nästa Tidig grav kostar inget raseri och ignorerar sitt hälsokrav",
+      "aoeEcho": "{charges} ekon återstår: förmågor mot ett enda mål vållar {pct}% skada till upp till {targets} närliggande fiender",
+      "sureCrit": "{charges} kastningar av skadeförmågor är garanterat kritiska träffar",
+      "temporalEcho": "Kastarens arkanskada läker dig för {singlePct}% av enmålsskada eller {areaPct}% av områdesskada",
+      "arcaneCharge": "{stacks} Arkanladdningar: Etersvall gör {damagePct}% mer skada, kastas {castPct}% snabbare och kostar {costMult}x mana",
+      "physicalReduction": "Minskar mottagen fysisk skada med {pct}%",
       "temporalHourglass": "Immun och oförmögen att handla; återställer hälsa och accelererar nedkylningsåterhämtning. Högerklicka för att avbryta.",
       "tongues": "Erhöht Zauberzeit um {pct}%",
       "combustionCrit": "Dina Eld-besvärjelser kritikträffar alltid",
@@ -2186,6 +2305,22 @@ export const sv_SE: EnTranslations = {
       "freeCast": "Ditt nästa kast kostar ingenting",
       "instantCast": "Din nästa besvärjelse med kasttid är omedelbar",
       "cheapCast": "Din nästa besvärjelse kostar {pct}% mindre",
+      "radiantResonance": "Ditt nästa Lagande ljus blir omedelbart, eller din nästa Gryningens famn kostar {pct}% mindre mana och kastas på {castTime} sek",
+      "solarReprisal": "Din nästa Solskiva kostar ingen mana, ignorerar nedkylningen och gör {pct}% mer skada; Nådens hammare ignorerar sin nedkylning och läker dig för 100% av skadan; eller Lagande ljus blir omedelbart",
+      "dawnsWrath": "VH: all hälsa · +1 användning · Nedkylning 0 · +{pct}% skada",
+      "venomRitual": "Giftritual: steg {stacks} av {max}. Uppbyggande slag lägger till steg; vid {max} blir Sista vilan till Giftslitning",
+      "gloam": "Skymning: steg {stacks} av {max}. Vid {max} låses dina skymningsslöjeöppningar upp i öppen terräng, och nästa du kastar är GRATIS och detonerar förrådet till skuggslöjan",
+      "redline": "Röd linje: hack {stacks} av {max}. Kroppsträffar lägger till hack; Nådastöten slår {pct}% hårdare per hack och stänger fönstret. Går det ut först förloras det",
+      "veilstrikeWindow": "Skuggslöja: dina skymningsslöjeöppningar kan användas i öppen terräng från valfri vinkel, och skadan du gör ökar med {pct}%",
+      "veiledEdge": "Ditt nästa lurarslag slår dubbelt så hårt",
+      "duskEconomy": "Förmågor kostar {pct}% mindre energi",
+      "moontide": "Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den",
+      "oldBlood": "Gammalt Blod: steg {stacks} av {max}. Träffande Varg- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross",
+      "verdance": "Grönska: steg {stacks} av {max}. Fullbordade besvärjelser av Vildblomning och Andra blomningen fyller den; vid {max} blir Snabb läkning Överblomning",
+      "freeExecute": "Din nästa kvalificerade avrättningsförmåga kostar ingenting",
+      "resourceSap": "Återställer {value} av din nuvarande resurs var {interval}:e sek",
+      "nextAttackCrit": "Din nästa attack blir garanterat en kritisk träff",
+      "healEcho": "Att falla under {threshold}% hälsa återställer {value} hälsa",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Ökar besvärjelsekraft med {value}",
@@ -2224,6 +2359,8 @@ export const sv_SE: EnTranslations = {
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
+      "bleedVuln": "Ökar mottagen blödningsskada med {pct}%",
+      "sourceVuln": "Tar {pct}% mer skada från den som orsakade den här effekten",
       "spellVuln": "Erhöht erlittenen Magieschaden um {pct}%",
       "critVuln": "Erhöht Chance, kritisch getroffen zu werden, um {pct}%",
       "costTax": "Erhöht Fähigkeitskosten um {pct}%",
@@ -2237,14 +2374,46 @@ export const sv_SE: EnTranslations = {
       "disarm": "Entwaffnet: kann keine Waffenangriffe nutzen",
       "lockout": "Zauberschule gesperrt",
       "imbue": "Waffe mit Bonuseffekten erfüllt",
-      "imbueRange": "Vapen besjälat: {min} till {max} bonusskada vid Utslag",
+      "galeheartWeapon": "Att fullborda {steps}-slags Krigsandens kadens ekar slaget {count} gånger för {pct}% av dess skada som naturskada",
+      "elementalTrance": "Mottagen skada minskad med {pct}%. {mana}% av all skada du vållar omvandlas till mana",
       "stealth": "Verborgen; Bewegungstempo um {pct}% verringert",
       "formBear": "Bruinform: ökad hälsa och rustning",
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Fleetform: förflyttningshastighet ökad med {pct}%",
       "formFireball": "Ember Form: rörelsehastigheten ökad med {pct}%; attacker och besvärjelser är inaktiverade",
+      "formMoonkin": "Månugglaform: besvärjelseskada ökad med {pct}% och rustning ökad med {armorPct}%",
+      "formShadow": "Dunkelslöja: skuggskada ökad med {pct}%",
+      "resourceCount": "{value} av {max}",
+      "formLich": "Soul Lance träffar även upp till {targets} närliggande fiender för {pct}% skada",
+      "afflictionEye": "Maledict Gaze attackerar var {interval}:e sek; effekter vid detta Evil Eye genererar {pct}% Fördömelse",
+      "afflictionEyeSecondary": "Effekter vid detta Evil Eye genererar {doomPct}% Fördömelse; Sentence ekar hit för {echoPct}% skada",
+      "afflictionAccomplice": "Kvalificerande skada ger {value} Fördömelse, högst en gång var {interval}:e sek",
+      "afflictionViolence": "{charges} vedergällningar återstår; en fiendeattack ger {doom} Fördömelse och vållar {damage} skuggskada tillbaka",
+      "afflictionVicarious": "Omdirigerar eller minskar {pct}% av inkommande skada och kan generera upp till {max} Fördömelse",
+      "afflictionPossession": "Förstärker Needle of Fate, Förtär, Maledict Gaze och Sentence",
+      "afflictionJudgment": "Primära Evil Eye genererar {eyePct}% mer Fördömelse; Sentence gör {sentencePct}% mer skada och den första återbetalar {refund} Fördömelse",
+      "afflictionLitany": "Fördömelse-vinster vållar {damage} skuggskada till upp till {targets} fiender inom {radius} m, en gång per sekund",
+      "afflictionFateThreads": "{stacks} Ödestrådar: Sentence gör {sentencePct}% mer skada, eller Förtär får {doom} extra Fördömelse per tillfälle",
+      "afflictionConsumeThreads": "Förtär förbrukar {stacks} Ödestrådar för {doom} extra Fördömelse per tillfälle",
+      "necromancyHarvestMark": "Döden kan skapa 1 Själfragment",
+      "necromancyOssuaryMark": "Lagrar {storedPct}% av din och dina odödas skada, plus {lancePct}% av Soul Lance-skada; kasta igen för att detonera. Döden exploderar inom {radius} m och skapar 1 Själfragment",
+      "necromancyDeathEcho": "Föråldrat Dödseko; ingen nuvarande förmåga förbrukar det",
+      "warlockAnchor": "Kasta igen inom {range} m för att återvända hit och förbruka ankaret",
+      "formMetamorph": "Demonform: kroppsstorlek ökad med {pct}%; övriga bonusar hanteras av separata buffar",
+      "energyRegen": "Ökar energiregenereringen med {pct}%",
       "defensiveStance": "Gardställning: minskad mottagen skada, mer hot",
       "righteousFury": "Brinnande ed: kraftigt ökat hot från helig skada",
+      "overpowerCharge": "{stacks} laddningar: ditt nästa Stympande hugg vållar {pct}% mer skada",
+      "sweepingStrikes": "Enmålsslag träffar även {targets} närliggande fiende för {pct}% skada",
+      "fingersOfFrost": "{charges} laddningar: Islans behandlar sitt mål som fryst och vållar {pct}% frusen skada",
+      "brainFreeze": "Din nästa Vinterpiska är omedelbar och ignorerar sin nedkylning",
+      "wintersChill": "{charges} laddningar: kompatibla besvärjelser behandlar detta mål som fryst",
+      "icicles": "{value} av {max} Istappar; vid {max} kan Glaciärtagg kastas",
+      "desolation": "{charges} laddningar: din nästa Fördärvsbult kastas {castPct}% snabbare, eller din nästa Eldregn landar omedelbart",
+      "ruinousBrand": "{charges} kopior återstår: direkta besvärjelser kopierar {otherPct}% skada hit, eller {selfPct}% när detta är deras mål",
+      "duskfireClaim": "Döden ger {value} Wrack",
+      "pyreGuardian": "Genererar {ruin} Wrack var {ruinInterval}:e sek och vållar {damage} eldskada inom {radius} m var {damageInterval}:e sek",
+      "perfectMoment": "Eterpilar förbrukar inte Arkanladdningar",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "school": {
@@ -2914,7 +3083,8 @@ export const sv_SE: EnTranslations = {
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic.",
-        "tool": "You have no farming hoe fit for that crop."
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -3047,11 +3217,11 @@ export const sv_SE: EnTranslations = {
       "toolEffectRechargeFull": "{effect} är redan fulladdad.",
       "toolEffectRechargeToolCapped": "Bär ett bättre verktyg för {profession} för att ladda {effect} vidare.",
       "toolEffectRechargeMaterials": "Att ladda om {effect} kräver {material} x{count}.",
-      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
-      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
-      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
-      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
-      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
+      "craftingProgress": "Du tillverkar: {remaining}s av {total}s återstår.",
+      "disenchantingProgress": "Du avförtrollar: {remaining}s av {total}s återstår.",
+      "enchantingProgress": "Du förtrollar: {remaining}s av {total}s återstår.",
+      "salvagingProgress": "Du bärgar: {remaining}s av {total}s återstår.",
+      "rechargingToolEffectProgress": "Du laddar om en verktygseffekt: {remaining}s av {total}s återstår.",
       "tierPipAria": "Nivå {tier}",
       "nextUnlockTier": "{points} poäng till nästa nivå: mästerverksodds förbättras",
       "nextUnlockSpecialized": "{points} poäng till Specialiserad: materialkostnaderna sjunker",
@@ -3102,6 +3272,7 @@ export const sv_SE: EnTranslations = {
       "craftedToast": "Tillverkad: {name}",
       "craftedToastQty": "Tillverkad: {name} x{qty}",
       "insufficientMaterials": "Du har inte materialet för det.",
+      "reagentLocked": "En reagens för det är låst.",
       "unknownRecipe": "Det receptet finns inte.",
       "comboRequirementUnmet": "Du har inte båda de hantverk som krävs på den nivå receptet kräver.",
       "comboRequires": "Inriktning: {craftA} + {craftB}, nivå {tier}.",
@@ -3208,6 +3379,7 @@ export const sv_SE: EnTranslations = {
       "notHeld": "Du har inte det föremålet.",
       "notDisenchantable": "Du kan inte avförtrylla det.",
       "notSalvageable": "Du kan inte bärga det.",
+      "salvageLocked": "Det föremålet är låst.",
       "disenchantBusy": "Du är upptagen.",
       "salvageBusy": "Du är upptagen.",
       "enchantBusy": "Du är upptagen.",
@@ -3348,14 +3520,14 @@ export const sv_SE: EnTranslations = {
       "denyNoSpace": "Beställaren har ingen plats i sina väskor."
     },
     "bgOffer": {
-      "title": "Thornhollow Fields is ready",
-      "backfillTitle": "Thornhollow Fields needs a fighter",
-      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
-      "accepted": "{accepted} of {size} ready",
-      "remaining": "{seconds}s to answer",
-      "accept": "Accept",
-      "decline": "Decline",
-      "acceptedWait": "Waiting for the others..."
+      "title": "Törnhålefälten är redo",
+      "backfillTitle": "Törnhålefälten behöver en kämpe",
+      "backfillBody": "Denna strid pågår redan. Du kommer att gå med i den sida som saknar spelare, och denna match påverkar inte din rankning.",
+      "accepted": "{accepted} av {size} redo",
+      "remaining": "{seconds}s att svara",
+      "accept": "Acceptera",
+      "decline": "Avböj",
+      "acceptedWait": "Väntar på de andra..."
     },
     "finder": {
       "title": "Fängelsehålsletaren",
@@ -3459,6 +3631,135 @@ export const sv_SE: EnTranslations = {
         "dread_curse": "Skräckförbannelse (endast heroisk, staplande försvagning för tankbyte)"
       }
     },
+    "reliquary": {
+      "title": "Relikvariet",
+      "close": "Stäng Relikvariet",
+      "countLabel": "{owned}/{total} reliker",
+      "completionAria": "Fyllda reliker: {owned} av {total}",
+      "curatorRank": "Intendentgrad {rank}",
+      "curatorUnranked": "Intendent utan grad",
+      "curatorRankName1": "Lärlingsintendent",
+      "curatorRankName2": "Bytesväktare",
+      "curatorRankName3": "Mästerintendent",
+      "curatorRankName4": "Storintendent",
+      "curatorRankName5": "Evig intendent",
+      "rankUpBanner": "Intendentgrad {rank}: {name}",
+      "rankUpToast": "Intendentgrad {rank} uppnådd: {name}",
+      "borderWearableNote": "Ramen {name} går att bära via Bedrifternas bok.",
+      "sigilCaption": "Intendentsigill",
+      "recentLabel": "Senaste fynden:",
+      "nearlyLabel": "Nästan kompletta:",
+      "nearlyJumpAria": "Öppna {name}, {owned} av {total} fyllda",
+      "progressText": "{owned}/{total}",
+      "shelvesAria": "Relikvariets hyllor",
+      "navOverview": "Översikt",
+      "navConquerors": "Erövrare",
+      "navProfessions": "Yrken",
+      "navHorizons": "Horisonter",
+      "navCountAria": "{shelf}: {owned} av {total} reliker fyllda",
+      "shelfEmpty": "Inga sidor på den här hyllan än.",
+      "pageComplete": "Illuminerad",
+      "clearsLabel": "{count} klarningar",
+      "srankClearsLabel": "{count} klarningar med rang S",
+      "retiredLabel": "Utgången",
+      "personalLabel": "Personlig",
+      "backToShelf": "Tillbaka till hyllan",
+      "gridAria": "Reliker på {name}",
+      "pageProgressAria": "Sidans framsteg: {owned} av {total} reliker fyllda",
+      "cellOwnedAria": "{name}, katalogiserad",
+      "cellMissingAria": "{name}, ännu inte funnen",
+      "ownedTooltipStatus": "Katalogiserad i Relikvariet",
+      "missingTooltipStatus": "Ännu inte funnen",
+      "firstFindClears": "Först funnen vid klarning {count}",
+      "unlockToast": "Relik katalogiserad: {name}",
+      "illuminateBanner": "Sida illuminerad: {name}",
+      "illuminateToast": "Varje relik på {name} är fylld.",
+      "illuminationBroadcastLine": "{name} har illuminerat en relikvariesida: {page}",
+      "markFind": {
+        "masterwork_first": "Första mästerverket",
+        "masterwork_weaponcrafting": "Mästerverk i vapensmide",
+        "masterwork_armorcrafting": "Mästerverk i rustningssmide",
+        "masterwork_tailoring": "Mästerverk i skrädderi",
+        "masterwork_leatherworking": "Mästerverk i läderhantverkeri",
+        "masterwork_engineering": "Mästerverk i ingenjörskonst",
+        "gather_event_pristine_vein": "Orörd åder",
+        "gather_event_ancient_heartwood": "Uråldrig kärnved",
+        "gather_event_moonlit_bloom": "Månbelyst blomma",
+        "gather_event_perfect_specimen": "Perfekt exemplar",
+        "slain_old_greyjaw": "Fälld: Gamle Gråkäft",
+        "slain_mogger": "Fälld: Mogger",
+        "slain_grix_the_tunnelking": "Fälld: Grix Tunnelkungen",
+        "slain_captain_verlan": "Fälld: Kapten Verlan",
+        "slain_wraithbinder_maldrec": "Fälld: Vålnadsbindare Maldrec",
+        "slain_mirejaw_the_ravenous": "Fälld: Kärrkäft den glupske",
+        "slain_sloomtooth_the_drowned": "Fälld: Sloomtooth den drunknade",
+        "slain_sister_nhalia": "Fälld: Syster Nhalia",
+        "slain_grubjaw": "Fälld: Grubjaw den glupske",
+        "slain_ironvein_foreman": "Fälld: Järnådersförman",
+        "slain_brutok_skullsmasher": "Fälld: Brutok Skallkrossare",
+        "slain_voskar_emberwing": "Fälld: Voskar Glödvingen",
+        "slain_marrowlord_varkas": "Fälld: Märgherre Varkas",
+        "slain_old_cragmaw": "Fälld: Gamle Klippkäft",
+        "slain_shardlord_kazzix": "Fälld: Skärvherre Kazzix",
+        "slain_gleamstag": "Fälld: Glimmerhjorten",
+        "slain_old_marrowshell": "Fälld: Gamla Märgskalet",
+        "slain_aurelhorn": "Fälld: Aurelhorn, hjordens förste",
+        "slain_drakemaw_broodlord": "Fälld: Drakgapets kullherre"
+      },
+      "accountScopeBadge": "Konto",
+      "accountScopeNote": "Kontosamling: upplåst på varje rollperson på det här kontot.",
+      "unknownRelic": "Oregistrerad relik",
+      "sourceBossDungeon": "Fälls av {boss} i {dungeon}",
+      "sourceBoss": "Fälls av {boss}",
+      "sourceZone": "Hittas i {zone}",
+      "sourceProfession": "Förtjänas genom {profession}",
+      "sourceDeed": "Ges av bedriften {deed}",
+      "sourceVendor": "Säljs av {vendor}",
+      "sourceBossZone": "Fälls av {boss} i {zone}",
+      "sourceDelve": "Hittas i delven {delve}",
+      "sourceRift": "Fälls vid klarningar av Revor med rang {rank}",
+      "sourceQuest": "Belöning från uppdraget {quest}",
+      "sourceStore": "Köps i WOC-butiken",
+      "sourceActivityCorpseHarvest": "Bärgad vid skörd av varelsekadaver",
+      "sourceActivityMasterworkCraft": "Förtjänas genom att tillverka ett mästerverk",
+      "sourceActivityRiftFirstClear": "Tilldelas varje medlem i gruppen som vinner första klarningen av en rankad Reva",
+      "cellMissingSourceAria": "{name}, ännu inte funnen, {source}",
+      "cellOwnedClearsAria": "{name}, katalogiserad, först funnen vid klarning {count}",
+      "searchPlaceholder": "Sök reliker",
+      "searchAria": "Sök i Relikvariet efter namn",
+      "searchEmpty": "Ingen relik matchar den sökningen.",
+      "filterEmpty": "Ingen relik matchar det här filtret.",
+      "filterGroupAria": "Filtrera reliker efter om du har hittat dem",
+      "gridKeyboardHint": "Använd piltangenterna för att flytta mellan reliker, Home och End för ytterlägena.",
+      "filterAll": "Alla",
+      "filterOwned": "Katalogiserade",
+      "filterMissing": "Saknade",
+      "recentJumpAria": "Öppna sidan för {name}",
+      "recentEmpty": "Inga fynd än. Reliker du katalogiserar från och med nu hamnar här.",
+      "nearlyEmpty": "Sidor som närmar sig fullbordan samlas här.",
+      "stripNoMatch": "Inget här matchar din sökning.",
+      "shelfRecent": "Senaste fyndet: {name}",
+      "shelfNoFinds": "Inget katalogiserat på den här hyllan än.",
+      "shelfOpenAria": "Öppna hyllan {name}, {owned} av {total} fyllda",
+      "sharedUniquesNote": "Din totalsumma räknar varje relik en enda gång; hyll- och sidräkningarna listar varje plats, så en relik som visas på fler än en sida räknas av var och en av dem.",
+      "charCompletionLabel": "Relikvarium",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "Intendent",
+      "charOpen": "Relikvariet",
+      "trackerLabel": "Relikvarium",
+      "collapseHint": "Fäll ihop relikvariespåraren",
+      "expandHint": "Fäll ut relikvariespåraren",
+      "openWindowHint": "Öppna Relikvariet",
+      "pin": "Fäst",
+      "unpin": "Lossa",
+      "pinFull": "Spåraren är full (upp till {cap} sidor)",
+      "pinAria": "Fäst {name} i gränssnittets spårare",
+      "unpinAria": "Lossa {name}",
+      "rarityLine": "Funnen av {percent} av samlarna",
+      "pageRarityLine": "Illuminerad av {percent} av samlarna",
+      "cellAriaWithRarity": "{base}, {rarity}",
+      "cellAriaWithAccountScope": "{base}, {scope}"
+    },
     "deeds": {
       "title": "Bedrifternas bok",
       "close": "Stäng Bedrifternas bok",
@@ -3495,18 +3796,23 @@ export const sv_SE: EnTranslations = {
       "featRibbon": "Bragd",
       "hiddenBadge": "Dold",
       "titleChip": "Titelbelöning",
+      "borderChip": "Rambelöning",
       "watch": "Bevaka",
       "unwatch": "Sluta bevaka",
       "watchFull": "Bevakningslistan är full (högst {cap})",
       "watchAria": "Bevaka {name} i HUD-spåraren",
       "unwatchAria": "Sluta bevaka {name}",
+      "cosmeticsSection": "Titlar och ramar",
       "titlesSection": "Titlar",
       "titlesAria": "Välj vilken titel som ska visas",
       "titlesNone": "Ingen titel",
       "titlesEmpty": "Fullborda en bedrift som skänker en titel för att låsa upp den här hyllan.",
+      "bordersSection": "Ramar",
+      "bordersNone": "Ingen ram",
+      "bordersEmpty": "Utför en bedrift som ger en ram för att låsa upp den här hyllan.",
       "unlockedBanner": "Bedrift fullbordad: {name}",
       "unlockedTitleHint": "Ny titel förtjänad: {title}. Välj den i Bedrifternas bok.",
-      "retroSummary": "Din krönika kommer ikapp: {count} bedrifter nedtecknade.",
+      "unlockedBorderHint": "Ny ram förtjänad: {name}. Bär den via Bedrifternas bok.",
       "broadcastLine": "{name} har fullbordat en bedrift: {deed}",
       "rarityLine": "Fullbordad av {percent} av äventyrarna",
       "trackerLabel": "Bedrifter",
@@ -3516,6 +3822,7 @@ export const sv_SE: EnTranslations = {
       "charTitleLabel": "Titel",
       "charTitleNone": "Ingen titel vald",
       "charOpenBook": "Bedrifternas bok",
+      "charBorderWorn": "{name} (buren)",
       "lbTab": "Ryktbarhet",
       "lbTitleCol": "Titel",
       "lbScopeNote": "Konton rangordnade efter livstids Ryktbarhet. Varje bedrift räknas en gång för alla karaktärer på ett konto.",
@@ -3534,7 +3841,7 @@ export const sv_SE: EnTranslations = {
       "levels": "Nivåer {min} till {max}"
     },
     "arenaGate": {
-      "minLevelNote": "Requires level {level}"
+      "minLevelNote": "Kräver nivå {level}"
     }
   },
   "gatherEvent": {
@@ -3598,7 +3905,9 @@ export const sv_SE: EnTranslations = {
       "delete_confirm": "Skriv karaktärens namn för att bekräfta raderingen.",
       "already_in_world": "Karaktären är redan i världen.",
       "taken_over": "Din karaktär togs över av en annan session.",
-      "rename_required": "Denna karaktär måste byta namn innan den går in i världen."
+      "rename_required": "Denna karaktär måste byta namn innan den går in i världen.",
+      "invalid_appearance": "Det utseendet kunde inte sparas. Justera designen och försök igen.",
+      "reroll_unavailable": "Den här karaktären har ingen gratis omformning tillgänglig."
     },
     "moderation": {
       "suspended_until": "Detta konto är avstängt till {date}.",
@@ -3690,13 +3999,13 @@ export const sv_SE: EnTranslations = {
       "quests": "Uppdrag",
       "dungeons": "Fängelsehål och raider",
       "delves": "Delver",
-      "rifts": "Rifts",
-      "mounts": "Mounts & Riding",
+      "rifts": "Revor",
+      "mounts": "Riddjur och ridning",
       "reference": "Referens",
       "controls": "Kontroller",
-      "commands": "Slash Commands",
-      "interface": "Interface & HUD",
-      "editor": "World Editor",
+      "commands": "Snedstreckskommandon",
+      "interface": "Gränssnitt och HUD",
+      "editor": "Kartredigerare",
       "settings": "Inställningar och prestanda",
       "combat": "Strid",
       "talents": "Talanger",
@@ -3704,6 +4013,7 @@ export const sv_SE: EnTranslations = {
       "valeCup": "Dalcupen",
       "thornhollow": "Törnhålefälten",
       "deeds": "Bedrifternas bok",
+      "reliquary": "Relikvariet",
       "glossary": "Ordlista",
       "wishIKnew": "Saker jag önskar att jag visste",
       "faq": "FAQ",
@@ -3719,10 +4029,10 @@ export const sv_SE: EnTranslations = {
     "groups": {
       "start": "Kom igång",
       "compendium": "Kompendium",
-      "world": "The World",
-      "character": "Your Character",
-      "endgame": "Group Content",
-      "compete": "Player versus Player",
+      "world": "Världen",
+      "character": "Din karaktär",
+      "endgame": "Gruppinnehåll",
+      "compete": "Spelare mot spelare",
       "reference": "Referens"
     },
     "breadcrumb": {
@@ -3762,7 +4072,9 @@ export const sv_SE: EnTranslations = {
       "typeDelve": "Delve",
       "typeTerm": "Term",
       "typeAbility": "Förmåga",
-      "typeDeed": "Bedrift"
+      "typeDeed": "Bedrift",
+      "typeReliquaryPage": "Relikvariesida",
+      "typeRelic": "Relik"
     },
     "home": {
       "eyebrow": "Klassiskt MMO i webbläsaren",
@@ -3772,8 +4084,8 @@ export const sv_SE: EnTranslations = {
       "ctaLearn": "Så spelar du",
       "what": {
         "heading": "Ett klassiskt MMO, gjort för att tas upp",
-        "pillarPlayTitle": "Spela i din webbläsare",
-        "pillarPlayBody": "Ingen nedladdning, ingen launcher. Skapa en karaktär och du är i världen på några sekunder, på dator eller mobil.",
+        "pillarPlayTitle": "Öppna sidan och spela",
+        "pillarPlayBody": "Ingen nedladdning, ingen startare. Skapa en rollperson så är du i världen på några sekunder, på datorn eller i telefonen. Det finns även inbyggda appar, om du vill ha en.",
         "pillarClassesTitle": "Nio klasser, tre roller",
         "pillarClassesBody": "Tanka, läk eller dela ut skadan. Varje klass spelas så som dess arketyp bör, med talanger för att göra den till din egen.",
         "pillarOpenTitle": "Gratis och öppen källkod",
@@ -3787,7 +4099,7 @@ export const sv_SE: EnTranslations = {
       "world": {
         "heading": "Utforska världen",
         "sub": "Ett sammanhängande land, tre zoner, från stilla dalar till frusna toppar.",
-        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
+        "subCount": "Ett sammanhängande land med {zones} zoner, från stilla dalar och sjunkna kärr till askvidder, frusna höjder och häcklabyrintträdgårdar.",
         "levels": "Nivå {min} till {max}",
         "cta": "Se världen",
         "valeName": "Östbäcksdalen",
@@ -3806,19 +4118,19 @@ export const sv_SE: EnTranslations = {
         "amberBlurb": "Bortom de västra klipporna en höst som aldrig tar slut, och lyktor på en gyllene sjö.",
         "fenName": "Pilkärret",
         "fenBlurb": "Bortom höstens krona, ett ljust kärr av pilar och stilla vatten, och en stad bakom en vallgrav.",
-        "farshoreName": "The Farshore",
-        "farshoreBlurb": "An island across the sandbar, where the sky tears open over the Riftfields and Gullhaven rings its bell for every breach.",
-        "nightName": "The Nightbloom",
-        "nightBlurb": "A country of starry midnight where the flowers light the paths and Moonrest keeps its vigil.",
-        "hauntName": "The Wraithwood",
-        "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gallowmere are the only honest light on the road.",
-        "jungleName": "The Palmreach",
-        "jungleBlurb": "Palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.",
-        "gardenName": "The Evergarden",
-        "gardenBlurb": "A hedge-maze realm still trimmed by no gardener anyone has seen, entered past Hedgewick and its fountain courts.",
-        "galeName": "The Galecrest",
-        "galeBlurb": "Sea-cliffs and howling downs where the wind never rests and Wickharbor shuts its doors tight.",
-        "levelsCap": "Level {level}"
+        "farshoreName": "Fjärrkusten",
+        "farshoreBlurb": "En ö bortom sandreveln, där himlen brister upp över Revfälten och Måshamn ringer sin klocka för varje bräsch.",
+        "nightName": "Nattblomstret",
+        "nightBlurb": "Ett land av stjärnklar midnatt där blommorna lyser upp stigarna och Månvila håller sin vaka.",
+        "hauntName": "Vålnadsskogen",
+        "hauntBlurb": "En hemsökt skog under jättelika lövtak, där Galgsjöns lyktor är det enda ärliga ljuset på vägen.",
+        "jungleName": "Palmvidden",
+        "jungleBlurb": "Palmer, vit sand och högljudda fåglar, med strandstaden Drivhamn som håller en eld tänd på stranden.",
+        "gardenName": "Evighetsträdgården",
+        "gardenBlurb": "Ett häcklabyrintrike som fortfarande klipps av ingen trädgårdsmästare någon har sett, nått förbi Häckby och dess fontängårdar.",
+        "galeName": "Stormkammen",
+        "galeBlurb": "Havsklippor och tjutande hedar där vinden aldrig vilar och Vikhamn stänger sina dörrar hårt.",
+        "levelsCap": "Nivå {level}"
       },
       "group": {
         "heading": "Slå er samman för de svåra delarna",
@@ -3841,7 +4153,7 @@ export const sv_SE: EnTranslations = {
         "a3": "Ja. Det finns ett omedelbart enspelarläge i din webbläsare, plus den delade onlinevärlden.",
         "q4": "Hur lång tid tar det att nå maxnivå?",
         "a4": "Taket är nivå {cap}, nått genom tre zoner av uppdrag, fängelsehål och utforskning.",
-        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
+        "a4Count": "Taket är nivå {cap}, nått genom zoner av uppdrag, fängelsehål och utforskning. Det finns {zones} zoner totalt, och de mest avlägsna av dem är byggda för karaktärer som redan är vid taket."
       },
       "community": {
         "heading": "Gå med i världen",
@@ -3874,26 +4186,26 @@ export const sv_SE: EnTranslations = {
       "questsTitle": "Uppdrag",
       "questsBody": "Anta uppdrag från personer med en markör över huvudet, slutför målet och lämna in dem för erfarenhet, mynt och utrustning. Spåraren på skärmen håller dina mål i sikte.",
       "deathTitle": "Döden är inte slutet",
-      "deathBody": "Om du faller ligger din kropp kvar där den föll, och du reser dig som en gengångare vid närmaste kyrkogård. Spring med din ande tillbaka till kroppen för att återupplivas på fläcken, utan påföljd, eller ta emot Den bleka väktaren vid kyrkogården för en omedelbar uppståndelse till priset av en övergående försvagning. Helt nya hjältar skonas från försvagningen helt och hållet, och inget du äger eller förtjänat går någonsin förlorat.",
+      "deathBody": "Om du faller ligger din kropp kvar där den föll, och du reser dig som en gengångare vid närmaste kyrkogård. Spring med din ande tillbaka till kroppen för att återupplivas på fläcken, utan påföljd, eller ta emot Den bleka väktaren vid kyrkogården för en omedelbar uppståndelse till priset av en övergående försvagning. Helt nya hjältar skonas från försvagningen helt och hållet, och inget du äger eller förtjänat går någonsin förlorat. Spelet berättar också vad det var: en rad i din chatt namnger det som utdelade dödsstöten, vilket brukar vara snabbaste sättet att lista ut vad som gick fel.",
       "groupingTitle": "Spela tillsammans",
       "groupingBody": "Bjud in andra till en grupp för att dela uppdragskredit och ta dig an fängelsehål. Större delen av världen går att klara solo, så att gruppa är ett val, inte ett tvång.",
       "onlineTitle": "Online eller offline",
       "onlineBody": "Spela den delade onlinevärlden med alla andra, eller starta en omedelbar offlinevärld i din webbläsare för att lära dig grunderna.",
-      "reassure": "Talanger låses upp vid nivå 10 och kan återställas när som helst så länge du är utanför strid, så dina tidiga val är aldrig permanenta. Experimentera fritt.",
+      "reassure": "Talanger börjar på nivå 5, och det finns sex rader totalt, en på vardera nivå 5, 8, 11, 14, 17 och 20. Varje rad är ett enda val bland tre, och du kan återställa när som helst så länge du är utanför strid och inte i en arenamatch, så dina tidiga val är aldrig permanenta. Experimentera fritt.",
       "controlsLink": "Se den fullständiga referensen för kontroller",
-      "step0Title": "Get in",
-      "step0Body": "Offline play asks for nothing: choose Offline on the start screen and press Play. To play with everyone else, make a free account (a username, a password, and an email address for recovery) or sign in to the one you have, then pick a world from the World List.",
-      "worldsTitle": "Choosing a world",
-      "worldsBody": "Online play happens on worlds, and each one is a full copy of the game with its own players, its own World Market, and its own standings. The World List shows how busy each world is, from Low to Full, so pick a quiet one for elbow room or a busy one for company. Your characters live on the world you made them on, and you can keep characters on more than one.",
-      "charactersTitle": "Your characters",
-      "charactersBody": "One account can keep up to ten characters on each world, so there is room to try several classes without giving anything up. Deleting one is deliberate: the character has to be out of the world, and the game asks you to type its name before it will go. A deleted character is gone for good, and its World Market listings and Ravenpost mail go with it.\n\nOnce you have picked a class you get to decide what your hero looks like. A tabbed panel holds Body, Face, Hair, and Style: pick male or female, work the face over with a set of sliders and a choice of eyes, then choose a hair style and color and a skin tone, either from the named presets or from the color wheel behind them. A randomize button rolls a whole look if you would rather be surprised, and a reset puts your character back to the standard face for the body you chose. None of it touches how your character plays.",
-      "namesTitle": "Naming your hero",
-      "namesBody": "A name is 2 to 16 letters long, starts with a letter, and can hold spaces, hyphens, and apostrophes. No two characters on the same world can share one, and capitalization does not make a name free: if Ashwind is taken, ashwind is taken too. Your own spelling is kept exactly as you typed it. Pick a name you will be happy with, because it stays with the character.",
-      "connectionTitle": "If your connection drops",
-      "connectionBody": "A lost signal, a closed lid, or a page reload does not log you out. Your character is held in the world for about five minutes while the game reconnects on its own, and you come back to the same spot in the same session. That also means dropping out is not a way to leave a fight: your character is still standing there. Logging out from the game menu leaves at once instead of waiting, and so does signing in on another character on the same account."
+      "step0Title": "Kom in",
+      "step0Body": "Att spela frånkopplat kräver ingenting: välj Frånkopplad på startskärmen och tryck på Spela. För att spela med alla andra, skapa ett gratis konto (ett användarnamn, ett lösenord och en e-postadress för återställning) eller logga in på det du redan har, och välj sedan en värld från Världslistan.",
+      "worldsTitle": "Välja en värld",
+      "worldsBody": "Onlinespelet sker på världar, och var och en är en fullständig kopia av spelet med egna spelare, en egen Världsmarknad och en egen ställning. Världslistan visar hur upptagen varje värld är, från Låg till Fullt, så välj en lugn för mer utrymme eller en livlig för sällskap. Dina karaktärer bor på den värld du skapade dem på, och du kan ha karaktärer på fler än en.",
+      "charactersTitle": "Dina karaktärer",
+      "charactersBody": "Ett konto kan hålla upp till tio karaktärer på varje värld, så det finns gott om utrymme att prova flera klasser utan att ge upp något. Att radera en är avsiktligt: karaktären måste vara ute ur världen, och spelet ber dig skriva dess namn innan den försvinner. En raderad karaktär är borta för gott, och dess annonser på Världsmarknaden och post i Korpposten försvinner med den.\n\nNär du har valt en klass får du bestämma hur din hjälte ser ut. En panel med flikar rymmer Kropp, Ansikte, Hår och Stil: välj man eller kvinna, forma ansiktet med en uppsättning reglage och ett urval ögon, välj sedan en hårstil, en hårfärg och en hudton, antingen från de namngivna förinställningarna eller från färghjulet bakom dem. Slumpa rullar fram ett helt utseende om du hellre vill bli överraskad, och Återställ sätter din karaktär tillbaka till standardansiktet för kroppen du valde. Inget av detta påverkar hur din karaktär spelas.",
+      "namesTitle": "Namnge din hjälte",
+      "namesBody": "Ett namn är 2 till 16 tecken långt, börjar med en bokstav och kan innehålla mellanslag, bindestreck och apostrofer. Inga två karaktärer på samma värld kan dela ett namn, och stor eller liten bokstav gör inte namnet ledigt: om Ashwind är upptaget är ashwind upptaget också. Din egen stavning behålls precis som du skrev den. Välj ett namn du blir nöjd med, för det följer karaktären för alltid.",
+      "connectionTitle": "Om din anslutning bryts",
+      "connectionBody": "En förlorad signal, ett stängt datorlock eller en omladdning av sidan loggar inte ut dig. Din karaktär hålls kvar i världen i ungefär fem minuter medan spelet återansluter på egen hand, och du kommer tillbaka till samma plats i samma session. Det betyder också att det inte går att lämna en strid genom att koppla ner: din karaktär står fortfarande kvar där. Att logga ut via spelmenyn lämnar världen direkt i stället för att vänta, och detsamma gäller att logga in på en annan karaktär på samma konto."
     },
     "controls": {
-      "intro": "Standardtangenter för dator. Varje bindning kan ändras i spelets inställningar, utom Esc, som alltid öppnar spelmenyn, och en bindning kan vara en modifierarkombination som Shift+Z.",
+      "intro": "Standardtangenter för dator. Varje bindning här går att ändra från panelen Tangentbindningar i spelmenyn, utom Esc, som alltid öppnar den menyn. Varje handling rymmer upp till två tangenter, en huvudtangent och en alternativ, och en bindning kan vara en modifierarkombination som Skift+Z. Den kan också vara en musknapp: mittenknappen är M3 och tumknapparna är M4 och M5, och eventuella fler knappar räknas uppåt därifrån. Vänster- och högerklick förblir reserverade för kameran, klickförflyttning och för att klicka på saker i världen.",
       "keyHeader": "Tangent",
       "actionHeader": "Handling",
       "groupMovement": "Förflyttning",
@@ -3902,9 +4214,10 @@ export const sv_SE: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Talanger",
       "professions": "Yrken",
-      "arena": "Arena",
+      "arena": "PvP-fönstret (arenorna och Törnhålefälten)",
       "leaderboard": "Topplista",
       "deeds": "Bedrifternas bok",
+      "reliquary": "Relikvariet",
       "sheathe": "Slida/Ta fram vapen",
       "crafting": "Hantverk",
       "valeCup": "Dalcupen",
@@ -3913,6 +4226,7 @@ export const sv_SE: EnTranslations = {
       "dungeonFinder": "Fängelsehålsletaren",
       "discord": "Discord",
       "abilities": "Använd förmågor i handlingsfältet (sifferraden; ett andra fält ligger på det numeriska tangentbordet)",
+      "targetPrev": "Växla mål bakåt",
       "targetFriendly": "Måla in närmaste vänliga",
       "cycleFriendly": "Växla mellan vänliga mål",
       "targetAuras": "Målets buffar och debuffar",
@@ -3922,42 +4236,42 @@ export const sv_SE: EnTranslations = {
       "arrowKeys": "Piltangenter",
       "groupPet": "Djurkommandon",
       "petBar": "Djurrad: Anfall, Stopp, Håna, Defensiv, Aggressiv (med ett jägar- eller häxmästardjur ute)",
-      "attackMoveNote": "En till, avstängd som standard: aktivera Anfallsförflyttning i inställningarna för att reservera en tangent (A, medan alternativet är på) som för dig mot markören och öppnar eld på fienden under den, eller den första du möter längs vägen.",
+      "attackMoveNote": "Attackförflyttning är avstängd tills du slår på den: öppna panelen Tangentbindningar, aktivera den, och raden A ovanför börjar fungera. Med pekaren över spelvärlden går du mot pekaren och öppnar eld mot fienden under den, eller mot den första fientliga du möter på vägen. Så länge alternativet är på utlöser A den attackförflyttningen i stället för att vrida vänster, så vrid med vänsterpiltangenten, som Vrid vänster också bär som standard, eller ge Vrid vänster en egen tangent.",
       "mobileHeading": "På mobil",
       "mobileBody": "Pekkontroller visas automatiskt på telefoner och surfplattor: en rörelsespak till vänster, dra var som helst annars för att titta, nyp med två fingrar för att zooma kameran, och knappar på skärmen för dina förmågor och menyer. En liten pil i övre vänstra hörnet visar eller döljer menyknapparna, och Mer-knappen där rymmer resten av dina fönster.",
       "controllerHeading": "På handkontroll",
       "controllerBody": "Handkontroller fungerar också, och stöd för handkontroll är på som standard. Vänsterspaken förflyttar dig, högerspaken styr kameran, och ansikts- och axelknapparna täcker dina förmågor, hopp och interaktion. Öppna ett fönster som dina väskor för att ta fram en pekare på skärmen, och spelmenyn navigeras direkt med styrkorset och ansiktsknapparna. Du kan binda om knapparna och justera spakens dödzon, kamerahastighet, vibration och inverterat sikte i handkontrollsinställningarna under alternativ.",
-      "moveAlt": "Move and turn (the same four actions, on their second key)",
-      "jumpSwim": "Jump, and swim up while you are in the water",
-      "swimDown": "Swim down while you are in the water (hold)",
-      "swimNote": "Swimming uses two keys: hold Space to rise and LCtrl to sink. Aiming the camera down while you swim forward dives as well, so you can steer your depth with the view. LCtrl is the one default that is a modifier key on its own, and a lone modifier press is ignored while you are binding, so pick a key that is not a modifier if you rebind Swim Down.",
-      "bgFlag": "Take the enemy flag in Thornhollow Fields",
-      "attackMove": "Attack Move (only once you switch the option on)",
-      "meters": "Damage meters (damage, healing, and threat)",
-      "petMark": "Pet: Mark, select your own pet (the same as clicking its frame)",
-      "onBarBinding": "You can also bind straight from the bar: choose Edit action bar keys in the Key Bindings panel, then click a slot on the live bar and press the key you want. Click Done when you are finished. This one is desktop only, since it needs a physical keyboard.",
-      "clickMoveNote": "Click to Move is off until you switch it on: open the Key Bindings panel in the game menu, turn on Click to Move, then use the Click Move Button row under it to choose which mouse button does the walking (Left Click by default, or Right Click). Once it is on, clicking a spot on the ground sends you walking there, with a marker on the ground showing where you are headed. Clicking a creature or another player walks you over to them and stops in range, while that click still does its usual job of targeting or interacting; if you are already close enough to reach what you clicked, you simply interact and stay where you are. Any of the movement keys takes control straight back and ends the trip, and so does holding the mouse button to look around. Jumping does not, so you keep travelling through the hop, and opening the game menu only pauses the trip, which carries on when you close the menu."
+      "moveAlt": "Förflytta och vänd (samma fyra handlingar, på deras andra tangent)",
+      "jumpSwim": "Hoppa, och simma uppåt medan du är i vattnet",
+      "swimDown": "Simma nedåt medan du är i vattnet (håll intryckt)",
+      "swimNote": "Simning använder två tangenter: håll Mellanslag intryckt för att stiga och LCtrl för att sjunka. Att rikta kameran nedåt medan du simmar framåt dyker också, så du kan styra ditt djup med vyn. LCtrl är den enda standardtangenten som är en modifierartangent i sig själv, och ett ensamt modifierartryck ignoreras medan du binder om, så välj en tangent som inte är en modifierare om du binder om Simma nedåt.",
+      "bgFlag": "Ta fiendens flagga i Törnhålefälten",
+      "attackMove": "Anfallsförflyttning (bara sedan du slår på alternativet)",
+      "meters": "Skademätare (skada, läkning och hot)",
+      "petMark": "Djur: Markera, välj ditt eget djur (samma som att klicka på dess ram)",
+      "onBarBinding": "Du kan också binda direkt från fältet: välj Redigera handlingsfältets tangenter i panelen Tangentbindningar, klicka sedan på en plats på det aktiva fältet och tryck på tangenten du vill ha. Klicka på Klar när du är färdig. Det här alternativet är bara för dator, eftersom det kräver ett fysiskt tangentbord.",
+      "clickMoveNote": "Klicka för att flytta är avstängt tills du slår på det: öppna panelen Tangentbindningar i spelmenyn, slå på Klicka för att flytta, och använd sedan raden Klickflyttningsknapp under den för att välja vilken musknapp som sköter gåendet (Vänsterklick som standard, eller Högerklick). När det är på skickar ett klick på en punkt på marken iväg dig gåendes dit, med en markör på marken som visar vart du är på väg. Att klicka på en varelse eller en annan spelare får dig att gå fram till dem och stanna inom räckhåll, medan det klicket ändå gör sitt vanliga jobb med att sikta på eller interagera; om du redan är tillräckligt nära för att nå det du klickade på interagerar du bara och stannar kvar där du är. Vilken som helst av förflyttningstangenterna tar direkt tillbaka kontrollen och avslutar resan, och det gör även att hålla nere musknappen för att titta runt. Att hoppa gör det inte, så du fortsätter färden genom hoppet, och att öppna spelmenyn pausar bara resan, som fortsätter när du stänger menyn."
     },
     "settingsPage": {
       "heading": "Inställningar och prestanda",
       "intro": "Få spelet att se bäst ut eller kör det snabbaste. Tre färdiga laddningar, plus vad varje grafikalternativ verkligen gör.",
-      "wherePath": "Allt på den här sidan lever i spelet: tryck på Esc för att öppna alternativen. Menyn öppnas på en Översikt av fästa väsentligheter, med kategorierna på en rad bredvid: inställningarna nedan finns under Grafik, Gränssnitt och Tillgänglighet i Skärm-gruppen, och Prestandaöverlägget under System. Ännu snabbare: skriv in ett namn i sökrutan högst upp och hoppa direkt dit.",
+      "wherePath": "Allt på den här sidan finns i spelet: tryck Esc för att öppna spelmenyn. Den listar panelerna som knappar: Tangentbindningar, Handkontroll, Grafik, Gränssnitt, Auror, Ljud och Prestandaöverlägg, med Wiki, Lossa, Logga ut och Tillbaka till spelet under dem, och Rapportera ett fel tillkommer i listan medan du spelar online. Grafik och Gränssnitt rymmer nästan allt som beskrivs här.",
       "fairnessTitle": "Fair by design",
-      "fairnessBody": "Inget alternativ här byter skönhet mot makt. Lower inställningar släpper bara kosmetisk polering, aldrig information du slåss med: dina debuffs, cast bars, partyhälsa och skadenummer är identiska från Low till Ultra. Att spela på en blygsam maskin är aldrig ett handikapp.",
+      "fairnessBody": "Inget alternativ här byter skönhet mot makt. Lägre inställningar offrar bara kosmetisk finish, aldrig information du strider med: dina försvagningar, besvärjelsemätare, gruppens hälsa och skadesiffror är identiska från Low till Insane. Att spela på en blygsam maskin är aldrig ett handikapp.",
       "loadoutsHeading": "Tre färdiga laddningar",
       "loadoutsIntro": "Börja från laddningen som låter som din maskin, justera sedan ett alternativ i taget tills det känns rätt.",
       "recommended": "Rekommenderad",
       "whyLabel": "Varför det fungerar:",
-      "tagReload": "efter omladdning",
+      "tagReload": "tryck Tillämpa",
       "fpsTitle": "Bästa FPS",
       "fpsTagline": "För äldre bärbara datorer, integrerad grafik och batterispel.",
       "fpsWhy": "Grafikkvalitet är huvudbrytaren och Render Quality är det starkaste reglaget: med 70 % drar världen ungefär hälften av pixlarna medan gränssnittet förblir perfekt skarpt.",
       "balancedTitle": "Balanserad",
       "balancedTagline": "Det bästa stället för de flesta maskiner och vårt standardråd.",
-      "balancedWhy": "Medium ger riktiga skuggor och fullmaterial; High lägger till omgivande ocklusion och blomning. Under Ultra absorberar ett inbyggt skyddsnät plötsliga dippar i hektiska slagsmål, så Balanced förblir smidig utan att vara barnvakt.",
+      "balancedWhy": "Medium ger riktiga skuggor och fullständiga material, och High lägger till omgivningsocklusion och bloom ovanpå. Det inbyggda skyddsnätet står spänt på varje nivå, så Balanced rider ut en hektisk strid utan att du behöver passa den.",
       "visualsTitle": "Bästa visuella",
       "visualsTagline": "Skärmbildsläge för kraftfulla stationära datorer.",
-      "visualsWhy": "Ultra återger med den högsta upplösningen din skärm erbjuder med den rikaste belysningen. Det stänger också av skyddsnätet, och det är endast för skrivbordet: telefoner och appen toppas vid High.",
+      "visualsWhy": "Ultra renderar i den högsta upplösning din skärm erbjuder, med den rikaste belysningen. Ovanför den ligger Insane, uppvisningen där allt är påslaget: den måste du välja för hand, för spelet väljer den aldrig åt dig hur stark din maskin än är.",
       "value50to70": "50 till 70 %",
       "value90to100": "90 till 100 %",
       "value100": "100 %",
@@ -3965,16 +4279,16 @@ export const sv_SE: EnTranslations = {
       "valueOnOptional": "På (valfritt)",
       "howHeading": "Hur alternativen beter sig",
       "factDetectTitle": "Spelet ställer in sig själv först",
-      "factDetectBody": "Vid din första start läser spelet din enhet och väljer en vettig nivå, från Low på en blygsam telefon till Ultra på ett starkt skrivbord. Alla val du gör själv vinner alltid.",
+      "factDetectBody": "Vid första starten läser spelet av din enhet och sparar en förnuftig nivå åt dig. Varje telefon och surfplatta börjar på Low så att du kommer rakt in i världen, och det gör ett gammalt eller programvarubaserat grafikkort också. En stark dator börjar på Ultra, eller på High när maskinen verkar knapp på minne. Det spelet inte kan placera stannar på Medium. Varje val du gör själv vinner alltid, och det sitter kvar.",
       "factReloadTitle": "Två sorters alternativ",
-      "factReloadBody": "Grafikkvalitet och de avancerade väljarna träder i kraft efter en omladdning, och panelen erbjuder en Ladda om nu-knapp när det behövs. Alla andra alternativ gäller i det ögonblick du ändrar det.",
+      "factReloadBody": "Grafikpanelen redigerar ett utkast. Ändra Grafikkvalitet eller någon av detaljrattarna, tryck sedan Tillämpa så bygger spelet om världen där du står, utan omladdning. Raden bredvid knappen säger till när det är klart. Alla andra alternativ, i den panelen och överallt annars, gäller i samma stund du ändrar dem, och bara en ombyggnad som misslyckas helt erbjuder dig en omladdningsknapp i stället.",
       "factGovernorTitle": "Ett inbyggt skyddsnät",
-      "factGovernorBody": "På varje nivå under Ultra tunnar spelet lugnt ut gräs, effekter och belysning för ett ögonblick när ett stort slagsmål spikar, och återställer dem sedan. Att välja Ultra säger att du hellre vill behålla varje detalj.",
-      "factSearchTitle": "Sök hittar det först",
-      "factSearchBody": "Osäker på var ett alternativ finns? Skriv i sökrutan högst upp i menyn. Den förstår vanliga formuleringar också, så fps hittar FPS-mätaren, och att välja ett resultat hoppar dig till inställningen och lämnar den markerad.",
-      "advancedHeading": "Den avancerade förinställningen: blanda din egen",
-      "advancedBody": "Avancerat börjar från nivån High och låser upp fyra extra väljare, så att du kan spendera dina ramar där du faktiskt lägger märke till dem: Terrängdetalj, Lövdensitet, Effekter & Ljus och Skuggkvalitet. Liksom Graphics Quality tillämpas de efter en omladdning.",
-      "advancedMixes": "Två favoritblandningar: behåll Shadow Quality på High och ställ in Effects & Lighting på Low för en skarp, glödfri look som blir ljus, eller gör tvärtom för att behålla blomningen och mjuka upp skuggorna.",
+      "factGovernorBody": "Varje nivå håller ett skyddsnät spänt: när en stor strid toppar tunnar spelet diskret ut gräs, effekter och belysning ett ögonblick och återställer dem sedan. Ultra och Insane väntar helt enkelt mycket längre innan de gör det, så en premiuminställning störs aldrig av en enda långsam bildruta.",
+      "factSearchTitle": "Var en inställning bor",
+      "factSearchBody": "Det finns ingen sökruta, så det hjälper att känna menyns form. Grafik är upplagd som kort: Kvalitet, Världsdetaljer, Belysning och effekter, Kamera, Skärm och System, plus Pekkontroller på en pekskärm. Gränssnitt är uppdelat på fyra flikar: Allmänt, Fönster, Chatt och Strid. Ändrar en inställning hur världen ritas ligger den under Grafik, och ändrar den vad gränssnittet visar dig ligger den under Gränssnitt.",
+      "advancedHeading": "Detaljrattarna och Advanced-blandningen",
+      "advancedBody": "Du behöver inte välja Advanced för att se detaljrattarna. Grafikpanelen visar dem alltid, i två kort: Världsdetaljer rymmer Terrängdetaljer, Lövtäthet, Ytdetaljer, Siktavstånd, Vattenkvalitet och Rollpersonsdetaljer, och Belysning och effekter rymmer Effekter och belysning, Skuggkvalitet, Omgivningsocklusion, Bloom, Kantutjämning, Dynamiska ljus och Partikeleffekter. Under en fast förinställning visar varje ratt ungefär var den förinställningen ligger.",
+      "advancedMixes": "Två favoritblandningar: håll Skuggkvalitet högt och sätt Effekter och belysning på Low för ett skarpt, glödfritt utseende som går lätt, eller gör tvärtom för att behålla bloomen och mjuka upp skuggorna. En sak att veta innan du blandar: Omgivningsocklusion, Bloom och Kantutjämning hänger i samma kedja som Effekter och belysning, så med den ratten på Low har de ingenting att köra på.",
       "tableHeading": "Varje grafikalternativ, förklarat",
       "colSetting": "Miljö",
       "colDoes": "Vad den gör",
@@ -3991,286 +4305,286 @@ export const sv_SE: EnTranslations = {
       "rowBrowserEffects": "Hur fancy själva gränssnittet tillåts vara: glasoskärpa, glöd, animerade menyer. Auto matchar din webbläsare; 3D-världen är orörd hur som helst.",
       "rowTerrainDetail": "Rika, blandade markstrukturer kontra en enklare, snabbare terränglook.",
       "rowFoliageDensity": "Hur långt och hur tjockt gräset växer runt din karaktär.",
-      "rowEffectsQuality": "Blomning, omgivande ocklusion och hur många facklor och besvärjelser som kastar verkligt ljus. Den enskilt största besparingen bland de avancerade plockarna.",
+      "rowEffectsQuality": "Bloom, omgivningsocklusion och hur många facklor och besvärjelser som kastar riktigt ljus. Den enskilt största besparingen bland detaljrattarna, och strömbrytaren som de andra belysningsrattarna hänger på.",
       "rowShadowQuality": "Skugga sprödhet. Low behåller skuggor men mjukar upp deras kanter.",
       "rowFrostedPanels": "En suddig frostat glas bakom fönster. Vackert, och precis den typ av effekt en svagare webbläsare känner; lämna det för den klassiska skarpa looken.",
       "rowReduceMotion": "Tar bort gränssnittsanimationer så att fönster visas direkt. Ett tillgänglighetsalternativ först, med en liten prestationsbonus.",
       "rowPerfOverlay": "En avläsning på skärmen av FPS, bildtid och mer. Slå på den medan du ställer in den här sidan och dölj den sedan igen.",
-      "tableFoot": "Letar du efter ett skjutavståndsreglage eller en FPS-keps? Det finns inget att jaga efter: visningsavstånd är en del av varje kvalitetsnivå, och bildrutetempo följer din skärm.",
+      "tableFoot": "Letar du efter ett FPS-tak? Det finns inget att leta efter: bildtakten följer din skärm. Ritavståndet är en egen ratt, Siktavstånd, i kortet Världsdetaljer, och varje förinställning ställer den åt dig tills du flyttar den själv.",
       "mobileTitle": "På telefoner och surfplattor",
-      "mobileBody": "Mobilen hanterar mer åt dig: spelet väljer nivån, håller upplösningen en knapptryckning lägre för att skydda batteri och värme, och behåller de högsta nivåerna endast på skrivbordet. Belastningarna ovan gäller fortfarande; telefoner toppar helt enkelt vid High.",
-      "touchBody": "På en pekskärm får alternativen också en egen bekvämlighetssamling: spakstorlek och känslighet, storlek och opacitet på knapparna på skärmen, en vänsterhänt spegelvänd layout, en valfri kameraspak och inverterad pekblick, så att skärmen passar dina händer i stället för tvärtom.",
+      "mobileBody": "På en telefon eller surfplatta startar spelet dig på Low. Varje pekenhet landar där vid första starten, med flit, så att du kommer in i världen och spelar; höj den själv från Grafikpanelen när du vill. I en Android-webbläsare står hela stegen öppen för dig och ditt val sitter kvar. På iPhone och iPad kan du fortfarande välja de översta förinställningarna och de tar fäste så snart du trycker Tillämpa, men spelet sätter tillbaka dig på High nästa gång du startar, eftersom iOS kan avsluta fliken medan en så stor scen byggs. Den nedladdade appen är snävare ändå: dess lista över förinställningar slutar vid High och de enskilda systemrattarna är dolda, eftersom appen sköter dem själv.",
+      "touchBody": "På en pekskärm får Grafikpanelen ett eget kort Pekkontroller: styrspakens storlek och dödzon, storlek på skärmknapparna, kontrollernas opacitet, en valfri kameraspak, en speglad layout för vänsterhänta och inverterad pekstyrd blick, så att skärmen formar sig efter dina händer i stället för tvärtom.",
       "audioTitle": "Ljud och språk",
-      "audioBody": "Alternativfönstret är inte bara bildpunkter. En Ljud-kategori håller separata volymreglage för effekter, musik och röst, och Gränssnitt-kategorin bär en språkväljare som omlokaliserar hela gränssnittet på fläcken, ingen omladdning behövs, plus en temaväljare för fönstrens utsmyckning. Språk är också fäst först på Översikten, så det är alltid ett steg från att menyn öppnas.",
-      "autolootBody": "Föredrar du att inte klicka på varje kropp? Ett gränssnittsalternativ, avstängt som standard, håvar in bytet från dina egna dråp när du går förbi dem.",
-      "panelsMoreBody": "The two panels this page does not table are worth a look anyway. Auras is where you shape the big on-screen alerts that fire when one of your class procs comes up: which ones show, their size, color, opacity, and where they sit on screen. Performance Overlay is the readout you turn on while you tune this page, then hide again.",
-      "valueUltraOrInsane": "Ultra, or Insane if you want everything",
-      "advancedLadder": "Move any one of them and the quality preset switches to Advanced, seeded from exactly the levels you were looking at, so your custom mix starts from what you already saw rather than from scratch. Press Apply when you like it. Advanced sits at the end of the preset list for that reason: it is the expert profile where your own mix lives.",
-      "rowSurfaceDetail": "The worn detail layer on stone and paving, from off to a full parallax finish. It is the town-street dial: the more of it you keep, the busier a paved street is to draw.",
-      "rowViewDistance": "How far into the distance the world is drawn before it fades out. Each preset sets it for you until you move it yourself.",
-      "rowWaterQuality": "How lakes, rivers, and the open sea are shaded, from flat and cheap to fully reflective.",
-      "rowCharacterDetail": "How far away other characters keep their full animated rig before they drop to a simpler one. Higher is kinder to the eye in a crowded hub, and heavier.",
-      "rowAmbientOcclusion": "The soft contact shadow where surfaces meet. Off, half resolution, or full.",
-      "rowBloom": "The gentle glow around bright light, fire, and spell effects.",
-      "rowAntiAliasing": "Smooths the jagged edges of distant geometry. Cheap, and worth keeping on most machines.",
-      "rowDynamicLights": "How many torches, campfires, and spells cast real light into the scene around them.",
-      "rowParticleEffects": "How thick the spell, weather, and ambient particle work is allowed to get.",
-      "rowCameraSpeed": "How quickly the camera swings when you look around with the mouse.",
-      "rowTouchLookSpeed": "The same thing for swipe-look, and it only appears when you are on a touchscreen.",
-      "rowFullscreen": "Fills the whole screen with the game.",
-      "rowWaterRipples": "Wakes and ripples that spread out behind you as you swim. Off by default, and the one water effect that costs real frames; splashes and bubbles are unaffected either way.",
-      "rowOverflowXp": "At maximum level, whether your bar keeps filling with overflow experience or shows the classic static max-level text instead.",
-      "rowInterfaceMode": "Whether you get the desktop interface or the on-screen touch controls. Auto reads your device, and you can force either one: a tablet with a keyboard can take the desktop layout, and a touchscreen laptop can take the touch controls.",
-      "interfaceHeading": "The Interface panel",
-      "interfaceIntro": "Interface is the biggest panel in the game, and it is split into four tabs. Nothing in here changes what the world can do to you: it changes what you are shown and how large it is. These are the rows most worth knowing about.",
-      "interfaceFoot": "That is not all of them. Every tab carries more sliders and switches than are worth tabling here, so open it once and read down the list. It is five minutes well spent.",
-      "ifGeneralIntro": "Scale, contrast, and what the interface shows about you. The language and theme pickers sit at the top of this tab too.",
-      "ifFramesIntro": "Your own frame, your target frame, and the whole party layout. The party cluster also carries scale, width, height, spacing, and column sliders so a raid grid fits your screen, and a Reset button at the foot of the tab puts every frame back where it started.",
-      "ifChatIntro": "How the chat window reads. A reset for the chat windows themselves lives here as well.",
-      "ifCombatIntro": "How your bars behave and what combat puts on screen.",
-      "ifUiScale": "Scales the whole interface at once. It lands when you let go of the slider, so the window under your cursor does not move while you drag it.",
-      "ifHudOpacity": "How solid the HUD panels are over the world behind them.",
-      "ifTooltipScale": "Tooltip text size, handy on a small screen or a very large one.",
-      "ifHighContrastText": "Heavier, higher-contrast interface text. An accessibility option first, and a good one on a bright screen.",
-      "ifHighContrastBackground": "A plainer, higher-contrast background behind the start and character screens.",
-      "ifInvertLookY": "Flips the up and down direction of mouse look.",
-      "ifShowItemLevel": "Adds an item level line to every item tooltip. Off by default, which keeps the classic stat-only tooltip.",
-      "ifShowPlaytime": "Shows your lifetime time played on the character sheet. On by default, and the sheet has an eye button that flips it per device, which is handy if you stream or take screenshots. The total keeps counting either way.",
-      "ifShowOwnNameplate": "Draws your own overhead nameplate exactly as other players see it, flair and all. Turn it off for the classic view.",
-      "ifShowPlayerNameplates": "Draws other players nameplates. Off declutters a crowded hub, and your current target stays readable either way.",
-      "ifWallet": "Whether your wallet is shown on the character screen. There is a matching switch for the player card.",
-      "ifDailyChest": "Whether the daily rewards chest sits on your HUD.",
-      "ifPlayerFrameScale": "The size of your own unit frame.",
-      "ifTargetFrameScale": "The size of your target frame.",
-      "ifPartyStyle": "The party layout: Automatic follows your group size, Classic is the traditional stack, and Raid packs everyone into the compact grid.",
-      "ifPartyHealthText": "What the party bars print: nothing, a percentage, current health, or current and maximum.",
-      "ifPartySort": "The order party members are listed in: group order, role, or name.",
-      "ifPartyShowAuras": "Whether buffs and debuffs show on the party frames. Matching switches cover resource bars, absorbs, pets, and whether you appear in your own party list.",
-      "ifAurasOnPlayerFrame": "Puts your buffs and debuffs on your own unit frame as well as the aura bar.",
-      "ifTargetOfTarget": "Shows who your target is targeting, the classic way to tell whether the tank still has it.",
-      "ifPetFrame": "Shows a frame for your pet.",
-      "ifChatFontScale": "Chat text size.",
-      "ifChatOpacity": "How solid the chat background is.",
-      "ifCompactChat": "Tightens the chat lines so more of them fit.",
-      "ifChatTimestamps": "Adds a time to each chat line, in 12-hour or 24-hour form.",
-      "ifStartAttack": "Whether using an ability also starts your auto-attack. On by default, and the classic behavior most players expect.",
-      "ifStopAutoAttack": "Whether switching targets stops your swing. Off by default, so your attack carries over to the new target.",
-      "ifShowAttackButton": "Puts an explicit Attack button on your action bar.",
-      "ifWalkByAutoloot": "Scoops the loot from your own kills as you walk past them. Off by default.",
-      "ifGroundReticle": "Shows the ground circle while you are aiming a placed spell.",
-      "ifMouseoverCast": "Lets a heal or a friendly spell land on the party frame you are hovering, without changing your target.",
-      "ifStickyTarget": "Keeps your current target when you click on empty ground, instead of clearing it.",
-      "ifFctScale": "The size of the damage and healing numbers that float off your target.",
-      "ifExtraBars": "Reveals a second action bar row, and a third once the second is on. The slots stay reachable by their keybinds even while the rows are hidden.",
-      "ifHideUnused": "Hides empty action slots so only the buttons you actually use are drawn.",
-      "ifLockBars": "Locks your bars so you cannot drag an ability out of a slot by accident.",
-      "keybindsHeading": "The Key Bindings panel",
-      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, the left-handed touch layout, and the profanity filter for chat.",
-      "keybindsMouseBody": "Two things there are easy to miss. Mouse buttons bind like keys, so the wheel click and the thumb buttons can carry abilities, while left and right click stay reserved for the camera and for clicking on the world. And you can bind straight from the action bar: turn on the on-bar binding mode here, then click a slot and press the key you want."
+      "audioBody": "Alternativfönstret är inte bara pixlar. Ljud rymmer tre volymreglage, för ljudeffekter, musik och röst, plus en strömbrytare för musik och fyra brytare för de ljud som oftast tröttar ut: NPC-röster, fotsteg, gränssnittsljud och klickrespons. Fliken Allmänt i Gränssnittspanelen bär en språkväljare som lokaliserar om hela gränssnittet på fläcken, utan omladdning, och en temaväljare för fönstrens utstyrsel.",
+      "autolootBody": "Föredrar du att inte klicka på varje lik? Automatisk plundring i förbifarten, på fliken Strid i Gränssnittspanelen och avstängd som standard, skopar upp bytet från dina egna byten medan du går förbi dem.",
+      "panelsMoreBody": "De två panelerna den här sidan inte tar upp är värda en titt ändå. Auror är där du formar de stora larmen på skärmen som utlöses när en av dina klass-procar dyker upp: vilka som visas, deras storlek, färg, opacitet och var de sitter på skärmen. Prestandaöverlägget är avläsningen du slår på medan du finjusterar den här sidan, och sedan döljer igen.",
+      "valueUltraOrInsane": "Ultra, eller Extrem om du vill ha allt",
+      "advancedLadder": "Flyttar du någon av dem växlar kvalitetsförinställningen till Avancerad, fylld med exakt de nivåer du redan tittade på, så din egen blandning utgår från det du redan sett i stället för att börja om från noll. Tryck på Tillämpa grafik när du är nöjd. Avancerad ligger sist i listan över förinställningar av just den anledningen: det är expertprofilen där din egen blandning bor.",
+      "rowSurfaceDetail": "Det slitna detaljlagret på sten och beläggning, från av till en fullständig parallaxfinish. Det är gatureglaget för städer: ju mer av det du behåller, desto mer krävande är det att rita en belagd gata.",
+      "rowViewDistance": "Hur långt bort världen ritas innan den tonar bort. Varje förinställning ställer in det åt dig tills du själv flyttar det.",
+      "rowWaterQuality": "Hur sjöar, floder och det öppna havet skuggas, från platt och billigt till fullt reflekterande.",
+      "rowCharacterDetail": "Hur långt bort andra karaktärer behåller sin fulla animerade rigg innan de växlar till en enklare. Högre är skonsammare för ögat i en fullpackad knutpunkt, och tyngre.",
+      "rowAmbientOcclusion": "Den mjuka kontaktskuggan där ytor möts. Av, halv upplösning, eller full.",
+      "rowBloom": "Den mjuka glöden runt starkt ljus, eld och besvärjelseeffekter.",
+      "rowAntiAliasing": "Mjukar upp de taggiga kanterna på avlägsen geometri. Billigt, och värt att ha på på de flesta maskiner.",
+      "rowDynamicLights": "Hur många facklor, lägereldar och besvärjelser som kastar riktigt ljus i scenen runt omkring dem.",
+      "rowParticleEffects": "Hur tätt besvärjelse-, väder- och omgivningspartiklarna får bli.",
+      "rowCameraSpeed": "Hur snabbt kameran svänger när du ser dig omkring med musen.",
+      "rowTouchLookSpeed": "Samma sak för pekblicken, och den visas bara när du är på en pekskärm.",
+      "rowFullscreen": "Fyller hela skärmen med spelet.",
+      "rowWaterRipples": "Kölvatten och krusningar som sprider sig bakom dig när du simmar. Avstängt som standard, och den enda vatteneffekten som kostar riktiga bildrutor; stänk och bubblor påverkas inte oavsett.",
+      "rowOverflowXp": "Vid maxnivå, om ditt fält fortsätter fyllas med överflödeserfarenhet eller i stället visar den klassiska statiska texten för maxnivå.",
+      "rowInterfaceMode": "Om du får skrivbordsgränssnittet eller pekkontrollerna på skärmen. Auto läser av din enhet, och du kan tvinga fram endera: en surfplatta med tangentbord kan ta skrivbordslayouten, och en pekskärmsbärbar kan ta pekkontrollerna.",
+      "interfaceHeading": "Panelen Gränssnitt",
+      "interfaceIntro": "Gränssnitt är den största panelen i spelet, och den är uppdelad i fyra flikar. Ingenting här ändrar vad världen kan göra med dig: det ändrar vad du visas och hur stort det är. Det här är de rader som är mest värda att känna till.",
+      "interfaceFoot": "Det är inte alla. Varje flik bär fler skjutreglage och brytare än det är värt att lista här, så öppna den en gång och läs igenom listan. Det är fem minuter väl spenderade.",
+      "ifGeneralIntro": "Skala, kontrast, och vad gränssnittet visar om dig. Språk- och temaväljarna sitter också högst upp på den här fliken.",
+      "ifFramesIntro": "Din egen ram, din målram, och hela gruppens layout. Gruppklustret bär också skjutreglage för skala, bredd, höjd, mellanrum och kolumner så att ett raidrutnät passar din skärm, och en Återställ-knapp längst ner på fliken sätter tillbaka varje ram där den började.",
+      "ifChatIntro": "Hur chattfönstret ser ut. Här finns också en återställning för själva chattfönstren.",
+      "ifCombatIntro": "Hur dina handlingsfält beter sig och vad striden visar på skärmen.",
+      "ifUiScale": "Skalar hela gränssnittet på en gång. Ändringen slår igenom när du släpper skjutreglaget, så fönstret under markören inte flyttar sig medan du drar.",
+      "ifHudOpacity": "Hur solida HUD-panelerna är över världen bakom dem.",
+      "ifTooltipScale": "Textstorlek i verktygstips, praktiskt på en liten skärm eller en mycket stor en.",
+      "ifHighContrastText": "Tyngre gränssnittstext med högre kontrast. Ett tillgänglighetsalternativ först och främst, och ett bra val på en ljus skärm.",
+      "ifHighContrastBackground": "En enklare bakgrund med högre kontrast bakom start- och karaktärsskärmarna.",
+      "ifInvertLookY": "Vänder upp- och nedriktningen för musblicken.",
+      "ifShowItemLevel": "Lägger till en rad med föremålsnivå på varje föremåls verktygstips. Avstängt som standard, vilket behåller det klassiska verktygstipset med bara statistik.",
+      "ifShowPlaytime": "Visar din livstids speltid på karaktärsbladet. Aktiverat som standard, och bladet har en ögonknapp som slår av och på det per enhet, vilket är praktiskt om du strömmar eller tar skärmbilder. Totalen fortsätter räkna oavsett.",
+      "ifShowOwnNameplate": "Ritar din egen namnskylt ovanför huvudet precis som andra spelare ser den, med all dess utsmyckning. Stäng av den för den klassiska vyn.",
+      "ifShowPlayerNameplates": "Ritar andra spelares namnskyltar. Avstängt städar upp i en fullpackad knutpunkt, och ditt nuvarande mål förblir läsbart oavsett.",
+      "ifWallet": "Om din plånbok visas på karaktärsskärmen. Det finns en motsvarande brytare för spelarkortet.",
+      "ifDailyChest": "Om kistan för dagliga belöningar syns på ditt HUD.",
+      "ifPlayerFrameScale": "Storleken på din egen ram.",
+      "ifTargetFrameScale": "Storleken på din målram.",
+      "ifPartyStyle": "Gruppens layout: Automatisk följer gruppens storlek, Klassisk är den traditionella stapeln, och Raid packar alla i det kompakta rutnätet.",
+      "ifPartyHealthText": "Vad gruppfälten visar: inget, en procentsats, nuvarande hälsa, eller nuvarande och maximal.",
+      "ifPartySort": "Ordningen gruppmedlemmarna listas i: gruppordning, roll eller namn.",
+      "ifPartyShowAuras": "Om buffar och debuffar visas på gruppramarna. Motsvarande brytare täcker resursfält, absorptioner, djur och om du själv syns i din egen grupplista.",
+      "ifAurasOnPlayerFrame": "Lägger dina buffar och debuffar på din egen ram, utöver aurafältet.",
+      "ifTargetOfTarget": "Visar vem ditt mål siktar på, det klassiska sättet att se om tanken fortfarande har aggro.",
+      "ifPetFrame": "Visar en ram för ditt djur.",
+      "ifChatFontScale": "Textstorlek i chatten.",
+      "ifChatOpacity": "Hur solid chattens bakgrund är.",
+      "ifCompactChat": "Gör chattraderna tätare så att fler ryms.",
+      "ifChatTimestamps": "Lägger till en tid på varje chattrad, i 12- eller 24-timmarsformat.",
+      "ifStartAttack": "Om det att använda en förmåga även startar ditt automatiska anfall. Aktiverat som standard, och det klassiska beteendet de flesta spelare förväntar sig.",
+      "ifStopAutoAttack": "Om målbyte stoppar ditt anfall. Avstängt som standard, så ditt anfall fortsätter över till det nya målet.",
+      "ifShowAttackButton": "Lägger en tydlig Anfall-knapp på ditt handlingsfält.",
+      "ifWalkByAutoloot": "Håvar in bytet från dina egna dråp när du går förbi dem. Avstängt som standard.",
+      "ifGroundReticle": "Visar markcirkeln medan du siktar en placerad besvärjelse.",
+      "ifMouseoverCast": "Låter en läkning eller en vänlig besvärjelse landa på den gruppram du hovrar över, utan att byta mål.",
+      "ifStickyTarget": "Behåller ditt nuvarande mål när du klickar på tom mark, i stället för att rensa det.",
+      "ifFctScale": "Storleken på de skade- och läkningssiffror som flyter upp från ditt mål.",
+      "ifExtraBars": "Visar ett andra handlingsfält, och ett tredje när det andra är på. Platserna går fortfarande att nå med sina tangentbindningar även när fälten är dolda.",
+      "ifHideUnused": "Döljer tomma handlingsplatser så att bara knapparna du faktiskt använder ritas ut.",
+      "ifLockBars": "Låser dina handlingsfält så att du inte råkar dra ut en förmåga ur en plats av misstag.",
+      "keybindsHeading": "Panelen Tangentbindningar",
+      "keybindsBody": "Tangentlistan är bara halva den panelen. Ovanför den sitter brytarna som avgör hur din mus styr spelet: muskamera, om pekaren låses medan du roterar, klicka för att flytta och vilken musknapp som utlöser det, anfallsförflyttning, den vänsterhänta pekstyrningen, och svordomsfiltret för chatten.",
+      "keybindsMouseBody": "Två saker där är lätta att missa. Musknappar binds som tangenter, så klick på hjulet och tumknapparna kan bära förmågor, medan vänster- och högerklick förblir reserverade för kameran och för att klicka i världen. Och du kan binda direkt från handlingsfältet: slå på läget för att binda från fältet här, klicka sedan på en plats och tryck på tangenten du vill ha."
     },
     "combat": {
       "intro": "Strid följer välbekanta klassiska MMO-regler. Du behöver aldrig studera något av det för att spela bra, detta är bara formen för hur strider fungerar.",
       "hitTitle": "Inte varje slag landar",
-      "hitBody": "Attacker kan missa eller undvikas, och det kan fiendens också, medan besvärjelser kan motstås helt. Att slåss nära din egen nivå är vad som får dina slag att träffa; ju större nivåskillnaden är, desto mer slår du i tomma luften.",
+      "hitBody": "Attacker kan missa, och de kan undvikas, och fiendens likaså. Två andra svar tillhör bara spelare: en krigare kan avleda ett slag med en parering, och en krigare eller paladin med sköld kan dämpa det till en blockering, båda bara mot det som kommer framifrån. Världens varelser gör varken det ena eller det andra, så ett hugg mot ett monster träffar, missar eller undviks. Besvärjelser följer sin egen regel och missar aldrig: de motstås i stället. Att strida nära din egen nivå är vad som håller dina träffar sittande; ju större nivåskillnaden är, desto oftare slår du i luften.",
       "mitigationTitle": "Rustning och hälsa håller dig på fötter",
       "mitigationBody": "Rustning mjukar upp fysiska slag, så bättre rustning är din främsta källa till stryktålighet i närstrid. Magi är en annan sak: du står emot besvärjelser med en djupare hälsopool och chansen att motstå en helt, inte med rustning. Tyngre rustningsklasser skakar av sig mer, men inget gör dig oberörbar.",
       "resourcesTitle": "Varje klass har sin egen rytm",
       "resourcesBody": "Krigare bygger Raseri mitt i en strid, skurkar förbrukar Energi som stadigt återvänder, och besvärjare hanterar en pool av Mana. Att lära sig din resurs är hälften av att spela din klass väl.",
       "growTitle": "Du blir starkare för varje nivå",
-      "growBody": "Varje nivå gör dig tåligare och låser upp nya förmågor, hela vägen till taket på nivå {cap}. Att lösa uppdrag är det snabbaste sättet uppåt; jakt, fängelsehåleturer och delver rundar av det.",
+      "growBody": "Varje nivå gör dig tåligare och låser upp nya förmågor, hela vägen till taket på nivå {cap}. Uppdrag är den snabbaste vägen uppåt; jakt, fängelsehålor, delves och de yrken du utövar längs vägen fyller ut resten.",
       "effectsTitle": "Förstärkningar, försvagningar och masskontroll",
       "effectsBody": "Många förmågor lägger på en effekt som dröjer kvar. Hjälpsamma (förstärkningar) höjer dina egenskaper, skyddar dig eller läker dig lite i taget; skadliga (försvagningar) tömmer din hälsa med skada över tid eller försvagar dig. Håll koll på de små ikonerna i skärmens övre hörn, bredvid minikartan, för att se vad som ligger på dig och hur länge det varar.",
-      "ccBody": "Masskontroll är ett särskilt slags försvagning som begränsar vad ett mål kan göra: bedövningar, rötter och nedsaktningar, tystnader som stoppar besvärjelser, avväpningar, skräckeffekter, och förvandlingar som gör en fiende ofarlig för ett ögonblick. Mot andra spelare tunnas kontrollen ut av upprepning: samma slag som läggs på igen för snabbt försvagas och slutar sedan verka helt, och en bedövning som inleds från smygläge räknas skilt från de bedövningar som följer, så ingen kan kedjas hjälplös i all evighet. Världens varelser hyser inget sådant agg: kontroll försvagas aldrig av upprepning mot dem, även om många av de mäktigaste fienderna, namngivna eliter och de starkaste bossarna bland dem, inte kan kontrolleras alls.",
+      "ccBody": "Kontroll är ett särskilt slags försvagning som begränsar vad ett mål kan göra: bedövningar, rotningar och nedsaktningar, tystnader som stoppar besvärjande, avväpningar, skräck och förvandlingar som gör en fiende ofarlig ett ögonblick. Mot andra spelare nöts merparten av kontrollen av vid upprepning: skräck, förvandlingar, rotningar och skolspärrar som läggs om för snabbt blir kortare och slutar sedan verka helt, så ingen kan hållas hjälplös för alltid. Bedövningar är det medvetna undantaget, eftersom de redan är korta och vilar på riktiga nedkylningar, så upprepning kortar dem aldrig, även om utrustning som skär ner kontrolltider fortfarande putsar dem. Världens varelser hyser inget sådant agg: mot dem försvagas kontroll aldrig av upprepning, även om många av de mäktigaste fienderna, namngivna eliter och de starkaste bossarna bland dem, inte går att kontrollera alls.",
       "metersBody": "Nyfiken på hur en strid gick? Tryck på Shift+H för att öppna gruppmätarna, som räknar skada, läkning och hot för din grupp, drabbning för drabbning.",
       "queueTitle": "Ditt nästa drag är redan laddat",
       "queueBody": "Du behöver inte tajma dina tryck till bildrutan. Tryck på din nästa förmåga under de sista ögonblicken av den pågående besvärjelsen, så köas den och avfyras i samma stund som besvärjelsen är klar, så att inövat spel flyter utan luckor. Ett tryck för tidigt avvisas helt enkelt, så inget går till spillo. Vissa närstridshugg fungerar likadant och rider ut på din nästa vapensving.",
       "deathTitle": "När du faller",
       "deathBody": "Om din hälsa når noll blir du nedlagd där du står, och din kropp ligger kvar. Släpp din ande, så reser du dig som en gengångare vid närmaste kyrkogård: snabbare till fots än de levande, utom räckhåll för dina fiender, men oförmögen att slåss, plundra eller tala med någon annan än Den bleka väktaren som svävar över stenarna. Därifrån väljer du. Spring med din gengångare tillbaka till din kropp, så återupplivas du på fläcken med en del av din hälsa och mana återställd och helt utan påföljd. Eller anta Den bleka väktarens omedelbara uppståndelse där du står, till priset av Väktartullen: en tillfällig försvagning av allt du är, som varar längre ju mer luttrad du är och som skonar helt nya karaktärer helt och hållet. Faller du inne i en fängelsehåla väntar din ande vid kyrkogården utanför; gå med din gengångare tillbaka genom dörren, så återupplivas du vid ingången. Delver är undantaget: faller du där sätts du helt enkelt på fötter igen vid delvens ingång, men ett andra fall avslutar passet. Vilken väg du än väljer förlorar du ingen erfarenhet, utrustning eller mynt. Mellan strider, sätt dig ner och ät och drick så att du börjar nästa vid full styrka.",
-      "threatTitle": "Who the enemy hits",
-      "threatBody": "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Wolf Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
-      "hazardsTitle": "The water can kill you",
-      "breathBody": "Deep water is swimmable, and you can dive under it. While your head is under, a blue breath bar appears near the top of the screen and drains; break the surface and it refills far faster than it emptied. Let it empty while you are still under and you begin to drown, losing a chunk of your health every second until you reach air, so keep an eye on the bar on a long dive. Death clears it, so a corpse run always starts with a full lungful.",
-      "fatigueBody": "The sea has no wall. The crossings the world means you to swim, the straits and meres between one stretch of land and the next, and the inland lakes, are safe to cross however long they take. Strike out past the shore into genuinely open water instead and it starts to sap your strength: a warning appears, you get a real window to turn around, and after that the sea deals steadily heavier damage that nothing can prevent until you head back toward land. Drown or wear yourself out that far from shore and you release like any other death, so treat the horizon as scenery rather than a destination.",
-      "allyRezTitle": "When an ally can raise you",
-      "allyRezBody": "You do not always have to walk back. An ally with a resurrection spell can raise you instead, and it comes to you as a prompt you accept or decline; leave it sitting and it expires, so answer it while it is there. Accept and you rise beside the friend who cast it with part of your health and mana back. Some healers can offer the whole downed party at once, though each of you still answers your own prompt. Thornhollow Fields is the exception: no resurrection spell reaches you there, and you wait for your team's next wave.",
-      "unstuckTitle": "When you are truly stuck",
-      "unstuckBody": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
-      "climbTitle": "Pulling yourself up a ledge",
-      "climbBody": "Ledges are not walls. Jump at something too tall to step onto and your character catches the lip near the top of the jump and hauls up onto it, with no key of its own to press. Anything low enough to clear on your own goes by without ceremony; the full pull-up is saved for lips above your head. It is brief, and it takes the reins while it runs, so you cannot steer out of it partway. A stun catches you mid-pull and you let go and fall, measured from where the jump left the ground, and a stun or a root stops a climb starting at all, which is worth remembering when you are trying to get out of a bad spot in a fight."
+      "threatTitle": "Vem fienden anfaller",
+      "threatBody": "Varje fiende håller räkning på vem som har retat den mest. Skada bygger på den, och det gör läkning också: en läkning lägger hot på de fiender som redan slåss mot personen du läkte, uppdelat mellan dem, så den säkraste läkningen är en på någon som tanken redan har tag i. Tankar aktiverar en Gardställning eller en skyddande form som mångdubblar allt hot de genererar, medan druidens Vargform i stället gör sig av med hot, och en hån lyfter besvärjaren rakt till toppen av listan och håller fast fienden på dem i några sekunder. Fiender byter inte mål i samma stund som någon går om tanken: det krävs ett tydligt försprång för att lyckas, och ett större försprång på avstånd än i närstrid, så lite tålamod i början av en pull håller striden där den hör hemma.",
+      "hazardsTitle": "Vattnet kan döda dig",
+      "breathBody": "Djupt vatten går att simma i, och du kan dyka under det. Medan ditt huvud är under vattnet visas en blå andningsmätare nära skärmens topp och den töms; bryt ytan och den fylls på mycket snabbare än den tömdes. Låter du den tömmas helt medan du fortfarande är under börjar du drunkna och förlorar en bit av din hälsa varje sekund tills du når luft, så håll ett öga på mätaren vid en lång dykning. Döden nollställer den, så en likfärd börjar alltid med fulla lungor.",
+      "fatigueBody": "Havet har ingen vägg. Överfarterna världen är tänkt att du ska simma, sunden och tjärnarna mellan en landremsa och nästa, samt insjöarna, är säkra att korsa hur lång tid det än tar. Ge dig i stället ut förbi stranden i genuint öppet vatten och det börjar tära på din kraft: en varning visas, du får ett verkligt fönster att vända om, och därefter vållar havet stadigt tyngre skada som ingenting kan förhindra förrän du vänder tillbaka mot land. Drunknar du eller sliter du ut dig så långt från stranden släpper du din ande precis som vid vilken annan död, så behandla horisonten som utsikt snarare än ett resmål.",
+      "allyRezTitle": "När en allierad kan återuppliva dig",
+      "allyRezBody": "Du behöver inte alltid gå tillbaka till fots. En allierad med en återupplivningsbesvärjelse kan återuppliva dig i stället, och det kommer till dig som en förfrågan du accepterar eller avvisar; låter du den ligga kvar går den ut, så svara på den medan den finns där. Accepterar du reser du dig bredvid vännen som kastade den, med en del av din hälsa och mana återställd. Vissa helare kan erbjuda hela den fallna gruppen på en gång, men var och en av er svarar ändå på sin egen förfrågan. Törnhålefälten är undantaget: ingen återupplivningsbesvärjelse når dig där, och du väntar på ditt lags nästa återuppståndelsevåg.",
+      "unstuckTitle": "När du verkligen sitter fast",
+      "unstuckBody": "Om världen fångar dig någonstans du inte kan ta dig ut ifrån, skriv /unstuck. Du måste vara utanför strid och stå stilla, inte hållen av en bedövning eller en rot, och inte i en duell eller en arenamatch: en kort nedräkning löper, och att röra dig eller ta skada avbryter den. När den är klar sätts du ner vid närmaste kyrkogård. Den dödar dig aldrig och lämnar inget lik efter sig, och om du redan låg nere återupplivar den dig där i stället. Priset är Räddningssjuka, en tillfällig försvagning av allt du är som har klingat av innan du kan använda kommandot igen, och precis som Väktartullen skonar den helt nya karaktärer helt och hållet.",
+      "climbTitle": "Att dra dig upp på en avsats",
+      "climbBody": "Avsatser är inte väggar. Hoppa mot något för högt för att kliva upp på, så griper din karaktär tag i kanten nära hoppets topp och drar sig upp på den, utan att någon egen knapp behöver tryckas. Allt som är lågt nog för att klara på egen hand passeras utan ceremoni; det fullständiga greppet sparas för kanter ovanför ditt huvud. Det är kort, och det tar över styrningen medan det pågår, så du kan inte styra dig ur det halvvägs. Fångas du av en bedövning mitt i greppet släpper du taget och faller, mätt från platsen där hoppet lämnade marken, och en bedövning eller en rot hindrar en klättring från att ens börja, vilket är värt att komma ihåg när du försöker ta dig ur en svår sits i en strid."
     },
     "interfacePage": {
-      "intro": "A map of the screen: what every frame, bar, and button on your interface does, and which window each key opens.",
-      "scopeTitle": "Keys, and where to change them",
-      "scopeBody": "Every key named on this page is the default, and every one of them can be rebound. The full key table lives on the Controls page, and the options that change how the interface looks and behaves live on the Settings page. Esc closes whatever window is on top, and opens the game menu when nothing is open.",
-      "glanceTitle": "The screen at a glance",
-      "glanceBody": "The interface lives around the edges of the screen and leaves the middle clear for the world. Your own frame, your action bars, and your experience bar sit along the bottom. Your target and your party sit in the top left. The minimap and the zone name sit in the top right, with your trackers running down the right side below them. The chat box sits in the bottom left corner, and a rail of small square buttons sits in the bottom right.\n\nEverything else is a window you open and close. Most windows have a key of their own, most also have a button in that rail in the bottom right, and every one of them closes with its own key again or with Esc.",
-      "framesTitle": "Unit frames",
-      "framesBody": "A unit frame is a portrait with bars beside it: a health bar always, a resource bar when the unit has one, and a name and a level chip. A damage shield paints as a lighter segment laid over the top of the health bar, so you can watch the shield spend itself before the health starts to move. It shows on your own frame, on your target, and on your party rows; the two small frames, your pet and your target's target, carry no shield overlay.",
-      "frameSelfTitle": "Your own frame",
-      "frameSelfBody": "Bottom center, next to your action bars. Portrait, level, health, and your resource, with a mark while you are in combat, a resting mark while you are resting, and a row of combo points for the classes that build them. Clicking the frame targets yourself.",
-      "frameTargetTitle": "Your target",
-      "frameTargetBody": "Top left, appearing the moment you select something and gone again when you drop it. The same portrait and bars, plus an Elite tag on the tougher enemies, a cast bar showing what your target is casting, and a strip of the effects that are on it.",
-      "frameTotTitle": "Your target's target",
-      "frameTotBody": "A small frame beside your target frame showing who your target is currently on. It is the quickest way to tell whether a monster is fighting your tank or coming for you. It stays hidden until you switch it on in the options.",
-      "framePartyTitle": "Your party",
-      "framePartyBody": "Party members stack under your target frame on the left, one row each. A row dims when that member walks out of range, shows the effects worth reacting to, and can show their pet beside them. How much health text a row carries is up to you: none, a percentage, the numbers, or both.",
-      "framePetTitle": "Your pet",
-      "framePetBody": "Hunters, warlocks, and anyone else with a pet out get a small frame for it beside their own, with its name, level, and health. Clicking that frame selects your pet, and Ctrl+6 does the same from the keyboard.",
-      "framesMoveBody": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. If they end up somewhere you regret, Reset Frame Positions in the options snaps them all back to where they started.",
-      "barsTitle": "Bars, timers, and combat text",
-      "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
-      "aurasTitle": "Buffs and debuffs",
-      "aurasBody": "Your own buffs show as a row of small icons in the top right corner beside the minimap, each counting down the time it has left, with your debuffs in a row below them. Right-clicking one of your own buffs drops it, as long as it is one you are allowed to drop; debuffs never are, and your target's strip is read-only.\n\nBuffs on the Player Frame, an option that is off to begin with, moves your buff row onto your own unit frame and leaves the whole corner to your debuffs. It is a desktop setting: the phone and tablet layout places your auras for you.\n\nYour target's buffs and debuffs sit together in a strip under its frame. When you want more room for them, Shift+J opens a separate Target Buffs and Debuffs window that you can move, filter down to just buffs or just debuffs, and leave open.",
-      "actionBarsTitle": "Your action bars",
-      "actionBarsBody": "Three rows of eleven ability slots sit above your experience bar, with a dedicated attack button at the head of the first row. Only the first row is there to begin with: the second and third are switched on in the options when you want the room, and the third needs the second. The number row across the top of your keyboard fires the first bar, and the extra bars default to the numpad.\n\nAbilities come from your spellbook (P): drag one out of the book onto a slot, or use the toggle on its row to put it on the first free one. Items work the same way, so a stack of potions or a bandage can live on a slot and be used with a key.\n\nOnce a bar is arranged the way you like it, you can lock it. Locking refuses drags, drops, and clears while leaving the abilities themselves as usable as ever, so a fumbled click in a fight cannot rearrange your buttons.\n\nTwo smaller bars join the row when they apply: the pet bar, with Attack, Stop, Taunt, Defensive, and Aggressive on Ctrl plus 1 through 5, and a stance bar for the classes that change stance or form.",
-      "minimapTitle": "The minimap",
-      "minimapBody": "Top right: a round minimap with the zone name above it and your coordinates below, ringed by a dial that paints the time of day.\n\nThe disc carries more than terrain. Your own arrow sits at the center, pointing the way you face, with your party around you as class-colored dots and an edge arrow for anyone who has wandered off it. Quest givers wear the same marks there as they do in the world, and you will also pick out gathering nodes and crafting stations, travel portals, lootable bodies and containers, any hostile that has taken an interest in you, friends and guildmates who are nearby, and your own body while you are running back as a ghost.\n\nSmall indicators appear on it when they have something to say: an envelope while unread letters are waiting for you, a coin while sale proceeds or returned goods are waiting at the Merchant, and a button listing your raid lockouts.",
-      "mapTitle": "The world map and your trackers",
-      "mapBody": "M opens the world map: the continent drawn out, with your own arrow on it, the zones and their names, the points of interest around you, the travel portals, and the gathering nodes you have found. Your party shows on it too. Inside a delve the map switches to a schematic of the rooms you have explored so far.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
-      "chatTitle": "The chat box",
-      "chatBody": "Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.",
-      "keyWindowsTitle": "Windows you open with a key",
-      "keyWindowsBody": "Each of these has a default key and a button in the rail in the bottom right corner. Press the key again, or Esc, to close it.",
-      "winCharTitle": "Character sheet (C)",
-      "winCharBody": "Your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. It also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and the button that composes your player card.",
-      "winBagsTitle": "Bags (B)",
-      "winBagsBody": "Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag.",
-      "winSpellbookTitle": "Spellbook (P)",
-      "winSpellbookBody": "Every ability your class has, learned and still to come, in order. This is where you drag abilities onto your action bars.",
-      "winTalentsTitle": "Talents (N)",
-      "winTalentsBody": "Where you choose your specialization, and your six talent rows with the three options each one offers and what every option does. Rows you have not reached yet are shown beside the ones you can pick now.",
-      "winProfessionsTitle": "Professions (Shift+P)",
-      "winProfessionsBody": "What you have learned, how skilled you are at each, and how far each one can still go.",
-      "winCraftingTitle": "Crafting (T)",
-      "winCraftingBody": "Your recipes, what each one needs, and what you can make right now with what you are carrying.",
-      "winQuestLogTitle": "Quest log (L)",
-      "winQuestLogBody": "Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows.",
-      "winDeedsTitle": "Book of Deeds (Shift+Z)",
-      "winDeedsBody": "The record of what you have done, the titles and Renown it has paid you, and what is still open.",
-      "winSocialTitle": "Friends and Guild (O)",
-      "winSocialBody": "Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked.",
-      "winFinderTitle": "Dungeon Finder (Shift+I)",
-      "winFinderBody": "The catalogue of group content you can queue for. Tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together.",
-      "winMetersTitle": "Damage meters (Shift+H)",
-      "winMetersBody": "Damage, healing, and threat for you and everyone with you, kept in segments so you can look back at the fight before last. The healing and threat panels can be pulled out to stand on their own.",
-      "winMoreTitle": "And a few more",
-      "winMoreBody": "The world map (M), the PvP window (G), the Vale Cup (Y), the leaderboard (K), the event calendar (I), and the emote wheel (X) all work the same way. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, and one for the daily standings.\n\nRight-click another player, on their nameplate or on their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more, and it needs them to be close enough to see.",
-      "worldWindowsTitle": "Windows the world opens for you",
-      "worldWindowsBody": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback tab holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. A class trainer opens the list of what you can learn now and what is still ahead of you.\n\nA banker opens your vault, the strongbox of extra slots you can buy more of. If your guild has opened a bank, a second tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market at the Merchant has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
-      "lootTitle": "Loot and rolls",
-      "lootBody": "Interact with a body you have earned and the loot window opens, listing what dropped. Click a line to take it.\n\nIn a group, a good drop under the group's loot rules puts a roll prompt on your screen instead: Need if you want it for yourself, Greed if you would take it to sell, or Pass to leave it to someone else. A small panel then shows who has rolled and what they chose while the timer runs down.\n\nThe loot rules themselves live in a small window of their own. The group leader can change them there, and everyone else sees the same window read-only, so the rules are never a secret.\n\nSome bodies can also be harvested for their parts. When they can, a Harvest section appears at the foot of the loot window with a box to tick for each component you want.",
-      "playerCardTitle": "Your player card",
-      "playerCardBody": "A button on your character sheet composes a player card: a picture with a close-up of your character, the gear you are wearing, and your stats, ready to save or share. It is a snapshot for showing off a new set, and it changes nothing in the game.",
-      "wikiTitle": "The Wiki button",
-      "wikiBody": "This wiki is one click away in game. A button for it sits with the others in the rail in the bottom right corner, there is a row for it in the Esc game menu, and on a phone it lives in the More tray. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.",
-      "mobileTitle": "On a phone or a tablet",
-      "mobileBody": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with five action buttons beside it, and a page toggle that swaps the ring through the rest of your slots, up to seven pages once you have all three action bars switched on. Around them sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping, plus a pull-out row of your consumables that fills itself from what you are carrying.\n\nAlong the bottom edge are Chat, Social, Quests, Settings, and More. More opens a tray holding the rest of your windows, including your character, the Dungeon Finder, PvP, the Vale Cup, emotes, and the wiki. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
-      "railTitle": "The button rail",
-      "railBody": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons, one per window, arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, spellbook, talents, quest log, Book of Deeds, professions, world map, bags, and crafting. The second opens with the WOC Store and runs on through PvP, the Dungeon Finder, the Vale Cup, Card Duel, the leaderboard, emotes, music, friends and guild, this wiki, and the game menu. A few more join them only when they apply."
+      "intro": "En karta över skärmen: vad varje ram, mätare och knapp i ditt gränssnitt gör, och vilket fönster varje tangent öppnar.",
+      "scopeTitle": "Tangenter, och var du ändrar dem",
+      "scopeBody": "Varje tangent som nämns på den här sidan är standardvalet, och var och en av dem kan bindas om. Den fullständiga tangenttabellen finns på sidan Kontroller, och alternativen som ändrar hur gränssnittet ser ut och beter sig finns på sidan Inställningar och prestanda. Esc stänger vilket fönster som än ligger överst, och öppnar spelmenyn när inget är öppet.",
+      "glanceTitle": "Skärmen i korthet",
+      "glanceBody": "Gränssnittet lever runt kanterna av skärmen och lämnar mitten fri för världen. Din egen ram, dina handlingsfält och din erfarenhetsmätare sitter längs botten. Ditt mål och din grupp sitter uppe till vänster. Minikartan och zonens namn sitter uppe till höger, med dina spårare löpande nerför högerkanten under dem. Chattrutan sitter i nedre vänstra hörnet, och en rad små fyrkantiga knappar sitter i nedre högra hörnet.\n\nAllt annat är ett fönster du öppnar och stänger. De flesta fönster har en egen tangent, de flesta har också en knapp i den raden nere till höger, och vart och ett av dem stängs med sin egen tangent igen eller med Esc.",
+      "framesTitle": "Enhetsramar",
+      "framesBody": "En enhetsram är ett porträtt med mätare bredvid: en hälsomätare alltid, en resursmätare när enheten har en, samt ett namn och en liten nivåbricka. En skadesköld målas som ett ljusare segment lagt ovanpå hälsomätaren, så att du kan se skölden ta slut innan hälsan börjar röra sig. Den visas på din egen ram, på ditt mål och på dina gruppmedlemmars rader; de två små ramarna, ditt djur och målets mål, bär ingen sköldöverlagring.",
+      "frameSelfTitle": "Din egen ram",
+      "frameSelfBody": "Nederst i mitten, bredvid dina handlingsfält. Porträtt, nivå, hälsa och din resurs, med en markering medan du är i strid, en vilomarkering medan du vilar, och en rad kombopoäng för de klasser som bygger upp dem. Att klicka på ramen markerar dig själv.",
+      "frameTargetTitle": "Ditt mål",
+      "frameTargetBody": "Uppe till vänster, dyker upp så fort du markerar något och försvinner igen när du avmarkerar det. Samma porträtt och mätare, plus en Elit-märkning på de tuffare fienderna, en besvärjelsemätare som visar vad ditt mål kastar, och en remsa med de effekter som ligger på det.",
+      "frameTotTitle": "Målets mål",
+      "frameTotBody": "En liten ram bredvid din målram som visar vem ditt mål just nu riktar sig mot. Det är det snabbaste sättet att avgöra om ett monster slåss mot din tank eller är på väg mot dig. Den förblir dold tills du slår på den i inställningarna.",
+      "framePartyTitle": "Din grupp",
+      "framePartyBody": "Gruppmedlemmar staplas under din målram till vänster, en rad var. En rad tonas ner när den medlemmen går utom räckhåll, visar de effekter som är värda att reagera på, och kan visa deras djur bredvid dem. Hur mycket hälsotext en rad bär är upp till dig: ingen, en procentandel, siffrorna, eller båda.",
+      "framePetTitle": "Ditt djur",
+      "framePetBody": "Jägare, häxmästare och alla andra som har ett djur framme får en liten ram för det bredvid sin egen, med dess namn, nivå och hälsa. Att klicka på den ramen markerar ditt djur, och Ctrl+6 gör detsamma från tangentbordet.",
+      "framesMoveBody": "Din ram, din målram och dina gruppramar kan alla flyttas. Var och en bär en liten flyttknapp i sitt hörn: lås upp den, dra ramen dit du vill ha den, och lås den igen så att ett felklick inte kan flytta den. Om de hamnar någonstans du ångrar finns Återställ ramarnas positioner i inställningarna, som slänger tillbaka dem alla dit de började.",
+      "barsTitle": "Mätare, timer och stridstext",
+      "barsBody": "Din besvärjelsemätare visas mitt på skärmen, precis ovanför dina handlingsfält, närhelst du kastar eller kanaliserar, och bär besvärjelsens namn och tiden som återstår. Ditt mål får en egen besvärjelsemätare på sin ram, så du kan se vad som kommer och svara på det.\n\nEn tunn svingmätare sitter under din besvärjelsemätare och fylls mellan dina vapensvingar, så en närstrids- eller distansanfallare kan se när nästa automatiska träff landar.\n\nDin erfarenhetsmätare löper i full bredd under dina handlingsfält, uppdelad i segment, med en ljusare sträcka som visar den vilade erfarenhet du har sparat.\n\nSimma under vatten så visas en blå andningsmätare högst upp på skärmen. Den tappas medan huvudet är under ytan, blinkar rött när den tar slut och du börjar drunkna, och fylls snabbt på igen så fort du dyker upp. Blanksteg simmar dig upp, och tangenten Simma ner, Ctrl som standard, tar dig djupare.\n\nSkada och läkning flyter upp över det de landade på som små siffror, så du kan läsa en strid utan att läsa text. Fliken Stridslogg i din chattruta håller den fullständiga skriftliga redogörelsen.",
+      "aurasTitle": "Buffar och debuffar",
+      "aurasBody": "Dina egna buffar visas som en rad små ikoner i det övre högra hörnet bredvid minikartan, var och en med en nedräkning av tiden som är kvar, med dina debuffar i en rad under dem. Att högerklicka på en av dina egna buffar tar bort den, så länge det är en du får ta bort; debuffar går aldrig att ta bort, och ditt måls remsa är skrivskyddad.\n\nFörstärkningar på spelarramen, ett alternativ som är avstängt från början, flyttar din buffrad till din egen ram och lämnar hela hörnet åt dina debuffar. Det är en skrivbordsinställning: layouten för telefon och surfplatta placerar dina auror åt dig.\n\nDitt måls buffar och debuffar sitter tillsammans i en remsa under dess ram. När du vill ha mer utrymme för dem öppnar Shift+J ett separat fönster, Målets buffar och debuffar, som du kan flytta, filtrera ner till enbart buffar eller enbart debuffar, och lämna öppet.",
+      "actionBarsTitle": "Dina handlingsfält",
+      "actionBarsBody": "Tre handlingsfält med elva förmågeplatser vardera sitter ovanför din erfarenhetsmätare, med en egen anfallsknapp längst fram på det första fältet. Bara det första fältet finns till att börja med: det andra och tredje slås på i inställningarna när du vill ha mer utrymme, och det tredje kräver det andra. Sifferraden överst på tangentbordet avfyrar det första fältet, och de extra fälten använder det numeriska tangentbordet som standard.\n\nFörmågor kommer från din trollformelsbok (P): dra en ur boken till en plats, eller använd växlingsknappen på dess rad för att lägga den på den första lediga. Föremål fungerar likadant, så en stapel drycker eller ett bandage kan ligga på en plats och användas med en tangent.\n\nNär ett fält är arrangerat som du vill kan du låsa det. Låsning avvisar dragningar, släpp och rensningar samtidigt som förmågorna själva förblir lika användbara som alltid, så ett felklick i strid kan inte kasta om dina knappar.\n\nTvå mindre fält ansluter när de gäller: Djurraden, med Anfall, Stopp, Håna, Defensiv och Aggressiv på Ctrl plus 1 till 5, samt en ställningsrad för de klasser som byter ställning eller form.",
+      "minimapTitle": "Minikartan",
+      "minimapBody": "Uppe till höger: en rund minikarta med zonens namn ovanför och dina koordinater under, omringad av en urtavla som målar dygnets timme.\n\nSkivan bär mer än terräng. Din egen pil sitter i mitten och pekar dit du är vänd, med din grupp runt omkring dig som klassfärgade prickar och en kantpil för den som har vandrat utanför den. Uppdragsgivare bär samma märken där som de gör ute i världen, och du kommer också att upptäcka insamlingsnoder och hantverksstationer, reseportaler, plundringsbara kroppar och behållare, alla fientliga som fattat intresse för dig, vänner och gillesmedlemmar i närheten, och din egen kropp medan du springer tillbaka som en gengångare.\n\nSmå indikatorer dyker upp på den när de har något att säga: ett kuvert medan olästa brev väntar på dig, ett mynt medan försäljningsintäkter eller returnerade varor väntar hos Köpmannen, och en knapp med lista över dina Raidlåsningar.",
+      "mapTitle": "Världskartan och dina spårare",
+      "mapBody": "M öppnar världskartan: kontinenten uppritad, med din egen pil på den, zonerna och deras namn, intressepunkterna runt dig, reseportalerna och de insamlingsnoder du har hittat. Din grupp visas också på den. Inne i en delve växlar kartan till en skiss över de rum du har utforskat hittills.\n\nNer längs högerkanten, under minikartan, håller en stapel spårare din pågående verksamhet i sikte utan att du behöver öppna något: dina spårade uppdrag och deras mål, dina bedriftsframsteg, den delve du befinner dig i, och den reva du deltar i. Uppdragsspåraren fälls ihop när du vill ha skärmen tillbaka.",
+      "chatTitle": "Chattrutan",
+      "chatBody": "Nere till vänster. Tryck på Enter för att börja skriva och Enter igen för att skicka.\n\nTvå flikar finns alltid: Chatt, den samlade loggen över allt som sägs runt omkring dig, och Stridslogg, den skriftliga redogörelsen för din strid. Plus-knappen lägger till fler, en per kanal: Säg, Ropa, Grupp, Allmänt, Världen, LFG, Gille och Officer, samt en Viska-flik som samlar varenda viskning du skickar och tar emot på ett ställe. Att skriva i en kanalflik skickar till den kanalen utan att du behöver skriva om kommandot.\n\nHela rutan kan dras till en annan plats och ändra storlek, och den kommer ihåg var du lämnade den.",
+      "keyWindowsTitle": "Fönster du öppnar med en tangent",
+      "keyWindowsBody": "Var och en av dessa har en standardtangent och en knapp i raden nere i högra hörnet. Tryck på tangenten igen, eller Esc, för att stänga den.",
+      "winCharTitle": "Karaktärsblad (C)",
+      "winCharBody": "Din utrustade utrustning på ena sidan, dina egenskaper och de statistikvärden de föder på den andra, med ett verktygstips på varje värde som berättar vad det gör för din klass. Den bär också din totala speltid, med ett litet öga bredvid som döljer siffran när du hellre inte vill visa den, och knappen som sätter ihop ditt spelarkort.",
+      "winBagsTitle": "Väskor (B)",
+      "winBagsBody": "Allt du bär på, i en enda packning med fyra väskfack. Kategorichips längst upp snävar in det till vapen, rustning, förbrukningsvaror, material, verktyg, uppdragsföremål eller riddjur, och en sökruta filtrerar på namn. En sorteringsmeny ordnar om det du tittar på efter senast, kvalitet eller namn, och det valet kommer ihåg mellan sessioner. En separat Sortera-knapp städar de faktiska rutorna i packningen med ett enda tryck, rensar chipsen och sökningen så att du ser hela den uppstädade väskan.",
+      "winSpellbookTitle": "Trollformelsbok (P)",
+      "winSpellbookBody": "Varje förmåga din klass har, inlärda och ännu att komma, i ordning. Det är här du drar förmågor till dina handlingsfält.",
+      "winTalentsTitle": "Talanger (N)",
+      "winTalentsBody": "Där du väljer din specialisering, och dina sex talangrader med de tre alternativ som var och en erbjuder och vad varje alternativ gör. Rader du ännu inte har nått visas bredvid dem du kan välja nu.",
+      "winProfessionsTitle": "Yrken (Shift+P)",
+      "winProfessionsBody": "Vad du har lärt dig, hur skicklig du är i varje, och hur mycket längre var och en fortfarande kan nå.",
+      "winCraftingTitle": "Hantverk (T)",
+      "winCraftingBody": "Dina recept, vad vart och ett kräver, och vad du kan tillverka just nu med det du bär på dig.",
+      "winQuestLogTitle": "Uppdragslogg (L)",
+      "winQuestLogBody": "Varje uppdrag du har tagit, dess berättelse, dess mål och dina framsteg, med ett sätt att visa vad som helst av det på kartan och att välja vilka uppdrag din spårare följer.",
+      "winDeedsTitle": "Bedrifternas bok (Shift+Z)",
+      "winDeedsBody": "Uppteckningen över vad du har uträttat, titlarna och Ryktbarheten den har betalat ut till dig, och vad som fortfarande står öppet.",
+      "winSocialTitle": "Vänner och gille (O)",
+      "winSocialBody": "Flikar för dina vänner, ditt gille och dess roster, din raid, och de spelare du har ignorerat eller blockerat.",
+      "winFinderTitle": "Fängelsehålsletaren (Shift+I)",
+      "winFinderBody": "Katalogen över gruppinnehåll du kan ställa dig i kö för. Kryssa i de aktiviteter du vill ha, gå med i en kö själv eller lägg upp en annons för din egen grupp, och acceptera när en grupp kommer samman.",
+      "winMetersTitle": "Skademätare (Shift+H)",
+      "winMetersBody": "Skada, läkning och hot för dig och alla med dig, sparade i segment så att du kan titta tillbaka på striden före den senaste. Läknings- och hotpanelerna kan dras ut för att stå för sig själva.",
+      "winMoreTitle": "Och några till",
+      "winMoreBody": "Världskartan (M), PvP-fönstret (G), Dalcupen (Y), Topplistan (K), Händelsekalendern (I) och emotehjulet (X) fungerar alla på samma sätt. Topplistan är värd en stund vid ditt första besök: den har en flik för spelare, en för gillen, en som rankar hela konton efter Ryktbarhet från Bedrifternas bok, och en för de dagliga ställningarna.\n\nHögerklicka på en annan spelare, på deras namnskylt eller på deras namn i chatten, så öppnar Spelarinfo ett kort om dem: utrustningen de bär, med verktygstips, och de offentliga detaljerna om deras karaktär. Det är bara en titt, inget mer, och det kräver att de är tillräckligt nära för att synas.",
+      "worldWindowsTitle": "Fönster som världen öppnar åt dig",
+      "worldWindowsBody": "Vissa fönster trycker du aldrig upp med en tangent: de öppnas när du pratar med rätt person eller klickar på rätt sak.\n\nEn handlare öppnar köpmansfönstret, med deras lager att köpa från och en flik för Återköp som håller det du senast sålde, ifall du sålde det av misstag. En rad antalsknappar sitter bredvid lagret, så en stapel reagenser blir ett enda tryck fem eller tio åt gången i stället för tio tryck, och ett eget antal finns där när ingetdera passar. En klasstränare öppnar listan över vad du kan lära dig nu och vad som fortfarande ligger framför dig.\n\nEn kamrer öppnar ditt valv, kassakistan med extra platser du kan köpa fler av. Om ditt gille har öppnat en bank visar en andra flik den: varje medlem kan titta i den även utan tillåtelse att ta ut något, så ingen behöver fråga vad gillet håller på, graderna avgör vem som får sätta in, ta ut och flytta gillets pengar, och en logg för in varje rörelse.\n\nEn brevlåda från Korpposten öppnar dina brev, med det som har kommit på en flik och ett formulär för att skicka på en annan, bilagor och allt. Världsmarknaden hos Köpmannen har sitt eget fönster: bläddra och köp på en flik, lista dina egna varor på en annan, och hämta ut det som sålts på en tredje. Att handla ansikte mot ansikte med en annan spelare öppnar ett handelsfönster med varsin sida.",
+      "lootTitle": "Byte och tärningsslag",
+      "lootBody": "Interagera med en kropp du har förtjänat, så öppnas bytesfönstret och listar vad som föll. Klicka på en rad för att ta det.\n\nI en grupp sätter ett bra byte, under gruppens byteinställningar, i stället upp en tärningsprompt på din skärm: Behov om du vill ha det själv, Girighet om du skulle ta det för att sälja, eller Avstå för att lämna det till någon annan. En liten panel visar sedan vem som har slagit och vad de valde medan tiden räknas ner.\n\nSjälva byteinställningarna bor i ett litet eget fönster. Gruppledaren kan ändra dem där, och alla andra ser samma fönster skrivskyddat, så reglerna är aldrig en hemlighet.\n\nVissa kroppar kan också skördas för sina delar. När de kan visas ett Skörda-avsnitt längst ner i bytesfönstret, med en ruta att kryssa i för varje komponent du vill ha.",
+      "playerCardTitle": "Ditt spelarkort",
+      "playerCardBody": "En knapp på ditt karaktärsblad sätter ihop ett spelarkort: en bild med en närbild av din karaktär, utrustningen du bär och dina egenskaper, redo att sparas eller delas. Det är en ögonblicksbild för att visa upp ett nytt set, och den ändrar ingenting i spelet.",
+      "wikiTitle": "Wiki-knappen",
+      "wikiBody": "Den här wikin är ett klick bort i spelet. En knapp för den sitter tillsammans med de andra i raden nere i högra hörnet, det finns en rad för den i Esc-spelmenyn, och på en telefon bor den i Mer-brickan. Eftersom att öppna den lämnar över dig till din webbläsare ber knappen alltid om en bekräftelse först, så ett oavsiktligt tryck mitt i en strid aldrig kan dra dig ut ur den. Spelet fortsätter köra bakom den.",
+      "mobileTitle": "På telefon eller surfplatta",
+      "mobileBody": "Pekkontroller dyker upp av sig själva, och layouten anpassar sig efter din skärm: en kompakt uppställning på en liten telefon, en standarduppställning på en större telefon, och en rymligare på en surfplatta.\n\nDina förmågor sitter i en ring i stället för en sifferrad: anfallsknappen med fem handlingsknappar bredvid sig, och en sidväxlare som byter ringen genom resten av dina platser, upp till sju sidor när alla tre handlingsfält är påslagna. Runt omkring dem sitter de knappar en pekspelare når efter mest: byta mål, använda det som är framför dig, och hoppa, plus en utdragbar rad med dina förbrukningsvaror som fyller sig själv från det du bär.\n\nLängs nederkanten finns Chatt, Socialt, Uppdrag, Inställningar och Mer. Mer öppnar en bricka som rymmer resten av dina fönster, bland annat din karaktär, Fängelsehålsletaren, PvP, Dalcupen, emotes och wikin. Fönster fyller skärmen här snarare än flyter ovanpå den.\n\nAtt flytta dina enhetsramar är en skrivbordsgrej: på touch placerar layouten dem åt dig.",
+      "railTitle": "Knappraden",
+      "railBody": "Nere i skärmens nedre högra hörn, långt från minikartan, sitter en rad av små fyrkantiga knappar, en per fönster, ordnade i två korta kolumner sida vid sida. De flesta av dem är märkta med sin standardtangent.\n\nDen första kolumnen täcker din karaktär, trollformelsbok, talanger, uppdragslogg, Bedrifternas bok, yrken, världskarta, väskor och hantverk. Den andra öppnar med WOC-butiken och fortsätter genom PvP, Fängelsehålsletaren, Dalcupen, Kortduell, topplistan, emotes, musik, vänner och gille, den här wikin och spelmenyn. Några till ansluter bara när de gäller."
     },
     "commandsPage": {
-      "intro": "Every command you can type into chat, grouped by what it is for, with its short forms.",
-      "slashBody": "Anything you type in the chat box that starts with a slash is a command rather than something you say out loud. Press Enter and it either acts (you follow someone, you invite them, you roll) or it prints a private line only you can see.",
-      "aliasBody": "Most commands have short forms, and every form listed in a row does exactly the same thing: /w, /t and /tell are one command. Words in angle brackets are required, words in square brackets are optional, and the capitalization of the command itself never matters.",
-      "helpTipTitle": "The game knows the list too",
-      "helpTipBody": "Type /help in game, or /commands, or just /?, and the whole command list prints into your chat. Mistype a command and the game tells you it did not recognize it, and points you back at /help.",
-      "cmdHeader": "Command",
-      "doesHeader": "What it does",
-      "groupTalking": "Talking",
-      "say": "Speak to the players standing near you. A plain line with no slash goes to whichever chat tab you have selected, and Say is the one you start on.",
-      "yell": "Shout, so players much further away than say range hear you.",
-      "whisper": "Send a private message to one player who is online. Their name matches whatever capitalization you type, as long as only one player could be meant.",
-      "reply": "Answer whoever whispered you last, without typing their name again.",
-      "me": "Freeform action text in the third person, so \"/me ponders the fountain\" reads as your name followed by the action. Everyone near you sees it.",
-      "partyChat": "Talk to everyone in your party or raid.",
-      "groupChannels": "Channels",
-      "channelsIntro": "General reaches the whole realm and you are in it from the moment you log in. World and LFG are opt in: join one first, then you can read and talk in it.",
-      "general": "The realm-wide General channel.",
-      "gAlias": "A short form with two meanings, so it is worth knowing: offline it sends to General, but online it is your guild channel. Type /general or /1 when you definitely mean General.",
-      "guild": "Talk to your guild. Online play only, and you need to be in a guild.",
-      "officer": "The officer channel of your guild, open to officers and the Guild Master. Online play only.",
-      "join": "Join or leave an optional channel. The two you can join are world and lfg, and typing /join on its own lists them. Opening a chat tab for one of them joins it for you.",
-      "world": "Talk in the World channel, once you have joined it.",
-      "lfg": "Talk in the LFG channel, where people look for groups. Join it first.",
-      "groupParty": "Party and group",
-      "invite": "Invite an online player to your party by name, however far away they are standing.",
-      "partyRoster": "With no message after it, this prints your party roster instead: every member with their level, class and health, and the leader marked.",
-      "ready": "The party or raid leader starts a ready check, and everyone else gets a prompt to answer yes or no.",
-      "assist": "Target whatever the named player is targeting. With no name it assists the player you have targeted. It reaches your party and raid anywhere in the world, and anyone else close enough for you to see.",
-      "follow": "Trail another player automatically. With no name it follows your current target. Moving, casting, fighting, picking a new target, or the other player pulling away all end it, and you cannot start it in combat.",
-      "unfollow": "Stop following.",
-      "roll": "Roll a random number, from 1 to 100 unless you name a limit or a range. Your party sees the result, or everyone nearby when you are not in one. The roll is made by the server, so nobody can fake one.",
-      "groupPeople": "Other players",
-      "who": "List the players online. Add text to narrow it to names or zones containing that text.",
-      "inspect": "Look up an online player's level, class and health.",
-      "ignore": "Hide a player's public chat and their overhead chat bubbles from you. Their whispers, rolls, invites and mail still arrive. The list form prints who you are ignoring.",
-      "block": "The stronger version: it also stops their whispers, invites and mail, and hides the two of you from each other in /who. The list form prints who you have blocked.",
-      "peopleNote": "The /who roster and your ignore and block lists are kept by the server, so those work in online play only.",
-      "groupSelf": "Your character",
-      "selfIntro": "These print a private line into your chat that nobody else sees. Nothing is broadcast, so they are safe to use in the middle of a fight.",
-      "played": "How long this character has been in the world during this session.",
-      "playtime": "How long this character has been played in total, across every session.",
-      "xp": "Your level and how far through it you are.",
-      "gold": "What is in your purse.",
-      "stats": "A one-line character summary: level, class, health, your resource, attack power, crit chance and armor.",
-      "gear": "Everything you have equipped, slot by slot, so the empty slots stand out.",
-      "bags": "What you are carrying, best quality first, with your money at the end.",
-      "abilities": "The abilities you have learned.",
-      "talents": "Your specialization, and how many of your six talent rows you have chosen so far.",
-      "quests": "Your active quest log, with the progress on each objective.",
-      "completed": "The quests you have already turned in, in the order you finished them.",
-      "session": "What you have done since you logged in: kills, deaths, damage and experience.",
-      "arena": "Your Ashen Coliseum standing in both brackets: rating, wins, losses and win rate for 1v1 and for 2v2.",
-      "listings": "Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.",
-      "buyback": "What you sold to a vendor recently and could still buy back.",
-      "groupState": "How you are right now",
-      "buffs": "The buffs and debuffs on you, with the time left on each.",
-      "cooldowns": "Which of your abilities are cooling down, soonest ready first.",
-      "pet": "Your pet's name, level, family and health.",
-      "petTaunt": "Your pet's taunt cooldown, and whether it is set to cast it on its own.",
-      "speed": "How fast you are moving compared to a normal run, and whether something has you rooted.",
-      "form": "The shapeshift form or combat stance you are in.",
-      "manaRegen": "For mana users: whether your out-of-combat mana regeneration has started ticking again.",
-      "savedMana": "For a mana user who is shapeshifted: the mana parked while you are shifted, which comes back when you shift out.",
-      "combo": "How many combo points you are holding.",
-      "consumable": "The food and drink working on you right now, and how long each has left.",
-      "potion": "The shared combat potion cooldown, which is separate from your ability cooldowns.",
-      "falling": "Whether you are airborne, how far above the ground you are, and whether the landing is going to hurt.",
-      "groupCombat": "In a fight",
-      "target": "Your current target: name, level, what it is, and health.",
-      "targetBuffs": "The auras on your target, each tagged as a buff or a debuff.",
-      "range": "How far away your target is, and whether that is inside melee range.",
-      "attack": "Whether auto attack is running, on what, and how long your swing takes.",
-      "casting": "What you are casting or channeling, and how long is left.",
-      "combat": "Whether you are in combat, and when you are due to drop out of it.",
-      "threat": "Who the enemies fighting you are currently focused on.",
-      "consider": "How dangerous your target's level makes it, compared to yours.",
-      "queued": "The ability armed to go off on your next melee swing.",
-      "overpower": "For warriors: whether the Overpower window that an enemy dodge opens is still available.",
-      "groupWorld": "World and travel",
-      "where": "The zone you are standing in, its level range, and your coordinates.",
-      "zones": "Every zone in travel order with its level range, and the one you are in marked.",
-      "nearby": "The living things closest to you, nearest first.",
-      "pois": "The landmarks of your current zone, nearest first, with the distance to each.",
-      "graveyard": "Where your spirit would return to if you fell here.",
-      "dungeons": "Every dungeon with the zone its door sits in and the party size it is built for, plus the difficulty you are currently set to.",
-      "dungeonMode": "Switch your dungeons between the normal and heroic difficulty.",
-      "dungeonReset": "Abandon your own empty instances, which is what you do after changing difficulty.",
-      "groupRecovery": "Recovery and presence",
-      "unstuck": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. It leaves you weakened by Unstuck Sickness for a while afterwards, so it is a last resort rather than a shortcut.",
-      "afk": "Mark yourself Away From Keyboard, with an optional message that anyone who whispers you gets as an automatic reply. Repeat it with no message to clear it; any other chat clears it too.",
-      "dnd": "Do Not Disturb: like away, except whispers sent to you are held back instead of delivered.",
-      "sit": "Sit down where you are, and stand back up. You stand automatically the moment you move, cast, or take a hit.",
-      "help": "Print the command list into your chat.",
+      "intro": "Varje kommando du kan skriva i chatten, grupperat efter vad det används till, med sina korta former.",
+      "slashBody": "Allt du skriver i chattrutan som börjar med ett snedstreck är ett kommando snarare än något du säger högt. Tryck Enter så antingen agerar det (du följer någon, du bjuder in dem, du slår tärning) eller så skriver det ut en privat rad bara du kan se.",
+      "aliasBody": "De flesta kommandon har korta former, och varje form som listas på en rad gör exakt samma sak: /w, /t och /tell är ett och samma kommando. Ord inom vinkelparenteser är obligatoriska, ord inom hakparenteser är valfria, och versaler eller gemener i själva kommandot spelar aldrig någon roll.",
+      "helpTipTitle": "Spelet känner till listan också",
+      "helpTipBody": "Skriv /help i spelet, eller /commands, eller bara /?, så skrivs hela kommandolistan ut i din chatt. Skriver du fel på ett kommando säger spelet att det inte kändes igen, och hänvisar dig tillbaka till /help.",
+      "cmdHeader": "Kommando",
+      "doesHeader": "Vad det gör",
+      "groupTalking": "Att prata",
+      "say": "Tala till spelarna som står nära dig. En vanlig rad utan snedstreck går till den chattflik du har valt, och Säg är den du börjar på.",
+      "yell": "Ropa, så att spelare mycket längre bort än pratavstånd hör dig.",
+      "whisper": "Skicka ett privat meddelande till en spelare som är online. Deras namn matchar oavsett hur du skriver det med versaler eller gemener, så länge bara en spelare kan menas.",
+      "reply": "Svara den som senast viskade dig, utan att skriva deras namn igen.",
+      "me": "Fri handlingstext i tredje person, så \"/me funderar över fontänen\" läses som ditt namn följt av handlingen. Alla nära dig ser det.",
+      "partyChat": "Prata med alla i din grupp eller räd.",
+      "groupChannels": "Kanaler",
+      "channelsIntro": "Allmänt når hela riket och du är med i det från stunden du loggar in. Världen och LFG är valfria: gå med i en först, sedan kan du läsa och prata i den.",
+      "general": "Den rikstäckande Allmänt-kanalen.",
+      "gAlias": "En kort form med två betydelser, så den är värd att känna till: offline skickar den till Allmänt, men online är den din gillekanal. Skriv /general eller /1 när du verkligen menar Allmänt.",
+      "guild": "Prata med ditt gille. Endast onlinespel, och du måste vara med i ett gille.",
+      "officer": "Ditt gilles officerskanal, öppen för officerare och gillesmästaren. Endast onlinespel.",
+      "join": "Gå med i eller lämna en valfri kanal. De två du kan gå med i är world och lfg, och att skriva /join för sig själv listar dem. Att öppna en chattflik för en av dem gör att du går med i den automatiskt.",
+      "world": "Prata i Världen-kanalen, när du väl har gått med i den.",
+      "lfg": "Prata i LFG-kanalen, där folk letar efter grupper. Gå med i den först.",
+      "groupParty": "Grupp och sällskap",
+      "invite": "Bjud in en online-spelare till din grupp med namn, oavsett hur långt bort de står.",
+      "partyRoster": "Utan ett meddelande efter det skriver detta i stället ut din grupplista: varje medlem med sin nivå, klass och hälsa, och ledaren markerad.",
+      "ready": "Gruppens eller rädens ledare startar en Redokontroll, och alla andra får en förfrågan att svara ja eller nej.",
+      "assist": "Sikta på det den namngivna spelaren siktar på. Utan namn assisterar det spelaren du har som mål. Det når din grupp och räd var som helst i världen, och alla andra som är tillräckligt nära för att du ska se dem.",
+      "follow": "Följ automatiskt efter en annan spelare. Utan namn följer det ditt nuvarande mål. Att röra dig, kasta, slåss, välja ett nytt mål, eller att den andra spelaren drar sig undan avslutar det, och du kan inte starta det i strid.",
+      "unfollow": "Sluta följa.",
+      "roll": "Slå ett slumptal, från 1 till 100 om du inte anger en gräns eller ett intervall. Din grupp ser resultatet, eller alla i närheten när du inte är i en. Slaget görs av servern, så ingen kan fejka ett.",
+      "groupPeople": "Andra spelare",
+      "who": "Lista spelarna online. Lägg till text för att begränsa det till namn eller zoner som innehåller den texten.",
+      "inspect": "Slå upp en online-spelares nivå, klass och hälsa.",
+      "ignore": "Dölj en spelares offentliga chatt och deras pratbubblor ovanför huvudet för dig. Deras viskningar, tärningsslag, inbjudningar och post kommer fortfarande fram. Listformen skriver ut vilka du ignorerar.",
+      "block": "Den starkare versionen: den stoppar även deras viskningar, inbjudningar och post, och döljer er två för varandra i /who. Listformen skriver ut vilka du har blockerat.",
+      "peopleNote": "/who-listan och dina ignorerings- och blockeringslistor hålls av servern, så de fungerar bara i onlinespel.",
+      "groupSelf": "Din karaktär",
+      "selfIntro": "Dessa skriver ut en privat rad i din chatt som ingen annan ser. Inget sänds ut, så de är säkra att använda mitt i en strid.",
+      "played": "Hur länge den här karaktären har varit i världen under den här sessionen.",
+      "playtime": "Hur länge den här karaktären har spelats totalt, över alla sessioner.",
+      "xp": "Din nivå och hur långt in i den du är.",
+      "gold": "Vad som finns i din börs.",
+      "stats": "En radsammanfattning av din karaktär: nivå, klass, hälsa, din resurs, anfallskraft, kritisk chans och rustning.",
+      "gear": "Allt du har utrustat, plats för plats, så att de tomma platserna syns tydligt.",
+      "bags": "Vad du bär på dig, bästa kvalitet först, med dina pengar sist.",
+      "abilities": "Förmågorna du har lärt dig.",
+      "talents": "Din specialisering, och hur många av dina sex talangrader du har valt hittills.",
+      "quests": "Din aktiva uppdragslogg, med framstegen för varje mål.",
+      "completed": "Uppdragen du redan har lämnat in, i den ordning du avslutade dem.",
+      "session": "Vad du har gjort sedan du loggade in: dödade fiender, dödsfall, skada och erfarenhet.",
+      "arena": "Din Coliseum-status i båda divisionerna: rankning, vinster, förluster och vinstprocent för 1v1 och 2v2.",
+      "listings": "Dina egna listningar på Världsmarknaden, med begärt pris, tiden var och en har kvar, och hur mycket utrymme du har för fler.",
+      "buyback": "Vad du nyligen sålt till en handlare och fortfarande kan köpa tillbaka.",
+      "groupState": "Hur du har det just nu",
+      "buffs": "Förstärkningarna och försvagningarna på dig, med återstående tid för var och en.",
+      "cooldowns": "Vilka av dina förmågor som kyls ner, den som blir redo snarast först.",
+      "pet": "Ditt djurs namn, nivå, familj och hälsa.",
+      "petTaunt": "Nedkylningen för ditt djurs hån, och om det är inställt att kasta det på egen hand.",
+      "speed": "Hur snabbt du rör dig jämfört med ett normalt löpsteg, och om något håller dig rotfäst.",
+      "form": "Skiftesformen eller stridsställningen du befinner dig i.",
+      "manaRegen": "För manaanvändare: om din manaåterhämtning utanför strid har börjat ticka igen.",
+      "savedMana": "För en manaanvändare som har skiftat form: manan som parkeras medan du är skiftad, vilken kommer tillbaka när du skiftar ur.",
+      "combo": "Hur många kombopoäng du har.",
+      "consumable": "Maten och drycken som verkar på dig just nu, och hur lång tid var och en har kvar.",
+      "potion": "Den delade nedkylningen för stridsdrycker, som är skild från dina förmågors nedkylningar.",
+      "falling": "Om du är i luften, hur högt över marken du är, och om landningen kommer att göra ont.",
+      "groupCombat": "I strid",
+      "target": "Ditt nuvarande mål: namn, nivå, vad det är, och hälsa.",
+      "targetBuffs": "Aurorna på ditt mål, var och en märkt som en förstärkning eller en försvagning.",
+      "range": "Hur långt bort ditt mål är, och om det är inom närstridsräckhåll.",
+      "attack": "Om automatisk attack är igång, mot vad, och hur lång tid din vapensving tar.",
+      "casting": "Vad du kastar eller kanaliserar, och hur lång tid som återstår.",
+      "combat": "Om du är i strid, och när du är på väg att lämna den.",
+      "threat": "Vem fienderna som slåss mot dig just nu är fokuserade på.",
+      "consider": "Hur farligt ditt måls nivå gör det, jämfört med din egen.",
+      "queued": "Förmågan som är laddad att utlösas på din nästa närstridssving.",
+      "overpower": "För krigare: om Rödhand-fönstret som öppnas när en fiende väjer undan fortfarande är tillgängligt.",
+      "groupWorld": "Värld och resor",
+      "where": "Zonen du står i, dess nivåintervall, och dina koordinater.",
+      "zones": "Varje zon i reseordning med dess nivåintervall, och den du befinner dig i markerad.",
+      "nearby": "De levande varelserna närmast dig, närmast först.",
+      "pois": "Landmärkena i din nuvarande zon, närmast först, med avståndet till vart och ett.",
+      "graveyard": "Var din ande skulle återvända till om du föll här.",
+      "dungeons": "Varje fängelsehåla med zonen dess dörr ligger i och gruppstorleken den är byggd för, plus svårighetsgraden du för närvarande är inställd på.",
+      "dungeonMode": "Växla dina fängelsehålor mellan normal och heroisk svårighetsgrad.",
+      "dungeonReset": "Överge dina egna tomma instanser, vilket är vad du gör efter att ha bytt svårighetsgrad.",
+      "groupRecovery": "Återhämtning och närvaro",
+      "unstuck": "Vägen ut när världen har fångat dig. Stå stilla genom en kort nedräkning så flyttas du till närmaste kyrkogård, och återupplivas där om du redan hade fallit. Det lämnar dig försvagad av Räddningssjuka ett tag efteråt, så det är en sista utväg snarare än en genväg.",
+      "afk": "Markera dig som Borta, med ett valfritt meddelande som den som viskar dig får som automatiskt svar. Upprepa utan meddelande för att rensa det; all annan chatt rensar det också.",
+      "dnd": "Stör ej: som borta, förutom att viskningar som skickas till dig hålls tillbaka i stället för att levereras.",
+      "sit": "Sätt dig ner där du står, och res dig upp igen. Du reser dig automatiskt i samma stund som du rör dig, kastar en besvärjelse eller tar en träff.",
+      "help": "Skriv ut kommandolistan i din chatt.",
       "emotesHeading": "Emotes",
-      "emotesBody": "The social emotes are commands too: /wave, /bow, /cheer, /dance, /laugh and the rest, each shown to everyone in say range. Add a name to aim one at somebody, as in \"/wave Aleph\", and /me covers anything the list does not.",
-      "emotesMore": "More about emotes and playing together",
-      "bangHeading": "Community commands",
-      "bangBody": "A few commands start with an exclamation mark instead of a slash. They announce something to the realm and post it to the community Discord at the same time, so people who are not logged in see it too. They are part of online play.",
-      "bangList": "The set is !lfg for looking for a group, !wts and !wtb for selling and buying, !recruit for guild recruitment, !event for a raid or a meetup, and !help when you are stuck. Type the command, then your message.",
-      "unknownHeading": "If a command does not work",
-      "unknownBody": "A command the game does not recognize comes back as an unknown-command notice, and nothing is said out loud, so a typo never lands in the channel you were talking in. Commands sent too quickly in a row are throttled: slow down for a moment and they go through again. Some need something to act on, so /follow with nobody targeted, or /reply when nobody has whispered you, will tell you so.",
-      "stickyBody": "Which chat tab you have selected decides where a plain line with no slash goes. Select the World tab and your next untagged line goes to World, so glance at the tab before you type. A slash command always wins over the tab, so /w Bob hi whispers Bob whichever tab is up, and on the whisper tab a plain line answers whoever whispered you last."
+      "emotesBody": "De sociala emotesen är kommandon också: /wave, /bow, /cheer, /dance, /laugh och resten, var och en visas för alla inom pratavstånd. Lägg till ett namn för att rikta ett mot någon, som i \"/wave Aleph\", och /me täcker allt listan inte gör.",
+      "emotesMore": "Mer om emotes och att spela tillsammans",
+      "bangHeading": "Gemenskapskommandon",
+      "bangBody": "Några kommandon börjar med ett utropstecken i stället för ett snedstreck. De meddelar riket något och postar det samtidigt till gemenskapens Discord, så att även de som inte är inloggade ser det. De är en del av onlinespelet.",
+      "bangList": "Uppsättningen är !lfg för att söka en grupp, !wts och !wtb för att sälja och köpa, !recruit för gillesrekrytering, !event för en räd eller en träff, och !help när du sitter fast. Skriv kommandot, sedan ditt meddelande.",
+      "unknownHeading": "Om ett kommando inte fungerar",
+      "unknownBody": "Ett kommando spelet inte känner igen kommer tillbaka som ett meddelande om okänt kommando, och inget sägs högt, så en felstavning hamnar aldrig i kanalen du pratade i. Kommandon som skickas för snabbt efter varandra strypas: sakta ner en stund så går de igenom igen. Vissa behöver något att agera på, så /follow utan något mål markerat, eller /reply när ingen har viskat dig, kommer att säga till om det.",
+      "stickyBody": "Vilken chattflik du har valt avgör vart en vanlig rad utan snedstreck går. Välj fliken Världen så går din nästa omärkta rad till Världen, så kasta en blick på fliken innan du skriver. Ett snedstreckskommando vinner alltid över fliken, så /w Bob hej viskar till Bob oavsett vilken flik som är uppe, och på viskningsfliken svarar en vanlig rad den som senast viskade dig."
     },
     "glossary": {
       "intro": "En snabb referens för termerna som används genom hela den här guiden och i chatten.",
@@ -4303,7 +4617,7 @@ export const sv_SE: EnTranslations = {
       "healerTerm": "Helare",
       "healerDef": "Gruppmedlemmen som håller alla vid liv med läkande besvärjelser.",
       "specTerm": "Spec",
-      "specDef": "En specialisering: vägen du lutar din klass mot, som läkning eller skada, allt eftersom du spenderar talanger.",
+      "specDef": "En specialisering: den väg du väljer för din klass på nivå 5, som läkning eller skada. Den fastställer din roll, ger en signaturförmåga och en bestående mästerskap, och den stannar hos dig även när du återställer dina talanger.",
       "pullTerm": "Pull",
       "pullDef": "Att dra in en fiende eller grupp i en strid, vanligtvis avsiktligt och en omgång i taget.",
       "instanceTerm": "Instans",
@@ -4331,7 +4645,7 @@ export const sv_SE: EnTranslations = {
       "targetMarkerTerm": "Målmarkör",
       "targetMarkerDef": "En symbol som vilken grupp- eller raidmedlem som helst kan fästa över ett mål så att alla fokuserar på, eller undviker, samma. Åtta symboler, ett mål per symbol.",
       "loadoutTerm": "Uppsättning",
-      "loadoutDef": "En sparad talanguppsättning. Behåll flera och växla mellan byggen utan att spendera om dina poäng ett i taget.",
+      "loadoutDef": "En sparad talanguppsättning, upp till tio stycken. Var och en minns sina radval och sin handlingsrad, och kan även minnas utrustningen du bar, så att byta bygge är ett klick i stället för att göra om varje rad.",
       "readyCheckTerm": "Redokontroll",
       "readyCheckDef": "En gruppledare som skriver /ready för att fråga gruppen eller raiden: alla bekräftar Redo eller Inte redo, och gruppen ser sammanräkningen.",
       "soulboundTerm": "Själsbunden",
@@ -4340,54 +4654,54 @@ export const sv_SE: EnTranslations = {
       "spiritHealerDef": "Rikets andeläkare, som svävar över varje kyrkogård: den kan resa din gengångare på fläcken till priset av en övergående försvagning.",
       "worldBossTerm": "Världsboss",
       "worldBossDef": "En boss av raidstyrka som reser sig i den öppna världen i en jämn rytm, bekämpad av vem som än samlas för att svara snarare än av en fast grupp.",
-      "fiveSecondTerm": "The five-second rule",
-      "fiveSecondDef": "Your mana only starts refilling on its own once five seconds have passed since you last spent any. It is why casters pace themselves instead of casting flat out.",
-      "talentRowTerm": "Talent row",
-      "talentRowDef": "Talents arrive as six rows, one at each of levels 5, 8, 11, 14, 17 and 20. Every row offers three options and you take one of them, so there are no points to save up or spend.",
-      "riftTerm": "Rift",
-      "riftDef": "A tear that opens on its own out in the zones, leading down through floors of an instance built fresh from that rift's own seed. Rifts are ranked C, B, A or S. The entrance closes to new parties after a while, and only the first party in the realm to reach the bottom seals it.",
-      "riftRankTerm": "Rank (rifts)",
-      "riftRankDef": "The letter on a rift, C, B, A or S, and the only thing that sets how hard it is. A rift never scales to the size of your group, so the rank is the whole difficulty ladder: C is the gentlest and S the fiercest, and every rank is meant for a group.",
-      "finderTerm": "Dungeon Finder",
-      "finderDef": "The window that catalogues the dungeons and raids, queues you for a quick match, and lists the premade groups looking for people. Shift+I opens it by default.",
-      "premadeTerm": "Premade",
-      "premadeDef": "A group a player put together by hand and listed on the Dungeon Finder board, rather than one the quick match queue assembled for you.",
-      "chronicleTerm": "Chronicle",
-      "chronicleDef": "A zone's own collection of deeds, gathered into chapters by a local Chronicler. You can work through the chapters in whatever order suits you.",
-      "marksTerm": "Delve Marks and Heroic Marks",
-      "marksDef": "The two rewards the repeatable endgame pays besides loot. Delves pay Delve Marks, which buy gear from the delve shop and upgrade your companion; heroic dungeons pay Heroic Marks, which buy gear from the heroic quartermaster.",
-      "honorTerm": "Honor",
-      "honorDef": "What fighting other players pays out: arena victories, Thornhollow Fields wins, and honorable kills all add to it. You spend it on the Warfare sets.",
-      "warfareTerm": "Warfare",
-      "warfareDef": "The gear side of player-versus-player. A quartermaster sells sets of Warfare armor for Honor, and the Warfare rating they carry counts only in fights against other players.",
-      "fatigueTerm": "Fatigue",
-      "fatigueDef": "Swim far enough out into open sea and the water begins to sap you: a warning comes first, then rising damage until you turn back toward land.",
-      "unstuckTerm": "Unstuck Sickness",
-      "unstuckDef": "The price of using Unstuck from the game menu. Stand still through the countdown and it sets you down at the nearest graveyard, and you carry a temporary weakness for a while afterwards.",
-      "itemLevelTerm": "Item level",
-      "itemLevelDef": "One number summing up how strong a piece of gear is, handy when you want to compare two pieces quickly. Turn on Show Item Level in the options to see it on tooltips. Only gear with a known source carries one, so plain vendor basics and starter gear show nothing, and a missing figure is normal rather than a fault.",
-      "requiredLevelTerm": "Required level",
-      "requiredLevelDef": "The level you have to reach before you can wear or wield a piece of gear. The tooltip shows it in red while you are still under it.",
-      "offHandTerm": "Off hand",
-      "offHandDef": "The second hand slot. It holds a shield or a held item such as a lantern or a quiver, and a second weapon only if your class and specialization can dual wield.",
-      "setBonusTerm": "Set bonus",
-      "setBonusDef": "An extra reward for wearing several pieces of the same armor family at once. The tooltip counts how many pieces of the set you have on, and more pieces unlock more of the bonus.",
-      "commissionTerm": "Commission and the Maker's Bond",
-      "commissionDef": "A craft made for someone else. The crafter flags the piece as a commission, and it binds to whoever receives it in a trade; a station master will unbind it again later for a fee.",
-      "masterworkTerm": "Masterwork",
-      "masterworkDef": "The finest version of a craft, which a skilled crafter turns out now and then in place of a plain copy. A masterwork always carries its maker's name.",
-      "toolCharmTerm": "Tool charm",
-      "toolCharmDef": "A crafted charm you slot onto a mining, logging, or herbalism tool from the Professions window to improve what it brings back. Slotting consumes the charm, and the effect lasts for a set number of charges. When those run out you recharge the slot with materials rather than crafting a new charm.",
-      "mountTerm": "Mount",
-      "mountDef": "A creature you ride to cross the land faster. Almost anything else you do takes you off it: swimming, entering combat, gathering, and crafting all put you back on your feet.",
-      "ridingTerm": "Riding",
-      "ridingDef": "The skill that lets you ride at all. You buy it once from a stablemaster at level 20, and after that it stays with your character for good.",
-      "reinsTerm": "Reins",
-      "reinsDef": "The item that is a mount. Keep a pair in your bags or your bank and that mount is yours; use them to ride. Reins can be traded, mailed, and sold to other players.",
+      "fiveSecondTerm": "Femsekundersregeln",
+      "fiveSecondDef": "Din mana fylls på i full takt först när fem sekunder har gått sedan du senast spenderade något. Fram till dess fortsätter den att sippra in i nedsatt takt i stället för att stanna helt. Det är därför besvärjare håller tempot i stället för att kasta för fullt.",
+      "talentRowTerm": "Talangrad",
+      "talentRowDef": "Talanger kommer i sex rader, en vid vardera nivå 5, 8, 11, 14, 17 och 20. Varje rad erbjuder tre alternativ och du väljer ett av dem, så det finns inga poäng att spara ihop eller spendera.",
+      "riftTerm": "Reva",
+      "riftDef": "En reva som öppnar sig av sig själv ute i zonerna och leder ner genom våningarna i en instans byggd helt från revans eget frö. Revor rangordnas C, B, A eller S. Ingången stängs för nya grupper efter ett tag, och bara den första gruppen i riket som når botten förseglar den.",
+      "riftRankTerm": "Rang (revor)",
+      "riftRankDef": "Bokstaven på en reva, C, B, A eller S, och det enda som avgör hur svår den är. En reva skalar aldrig efter din grupps storlek, så rangen är hela svårighetsstegen: C är den mildaste och S den hårdaste, och varje rang är avsedd för en grupp.",
+      "finderTerm": "Fängelsehålsletaren",
+      "finderDef": "Fönstret som katalogiserar fängelsehålorna och raiderna, ställer dig i kö för en snabbmatch, och listar de förberedda grupperna som letar efter folk. Shift+I öppnar det som standard.",
+      "premadeTerm": "Förberedd grupp",
+      "premadeDef": "En grupp som en spelare har satt ihop för hand och lagt upp under Förberedda grupper i Fängelsehålsletaren, snarare än en som Snabbmatch satte ihop åt dig.",
+      "chronicleTerm": "Krönika",
+      "chronicleDef": "En zons egen samling bedrifter, sammanställd i kapitel av en lokal krönikör. Du får beta av kapitlen i den ordning som passar dig.",
+      "marksTerm": "Delve-märken och Heroiska märken",
+      "marksDef": "De två belöningarna som det repeterbara slutspelet betalar ut utöver byte. Delver betalar Delve-märken, som köper utrustning hos delvevaktaren och uppgraderar din följeslagare; heroiska fängelsehålor betalar Heroiska märken, som köper utrustning hos den heroiska kvartersmästaren.",
+      "honorTerm": "Heder",
+      "honorDef": "Vad striden mot andra spelare betalar ut: arenasegrar, vinster på Törnhålefälten och hederliga dråp lägger alla till den. Du spenderar den på Krigföringssetten.",
+      "warfareTerm": "Krigföring",
+      "warfareDef": "Utrustningssidan av spelare mot spelare. En kvartersmästare säljer uppsättningar Krigföringsrustning för Heder, och Krigföringsvärdet de bär räknas bara i strider mot andra spelare.",
+      "fatigueTerm": "Utmattning",
+      "fatigueDef": "Simma tillräckligt långt ut på öppet hav så börjar vattnet tära på dig: en varning kommer först, sedan stigande skada tills du vänder tillbaka mot land.",
+      "unstuckTerm": "Räddningssjuka",
+      "unstuckDef": "Priset för att använda Räddning från spelmenyn. Stå still genom nedräkningen så sätter den ner dig vid närmaste kyrkogård, och du bär på en tillfällig försvagning ett tag efteråt.",
+      "itemLevelTerm": "Föremålsnivå",
+      "itemLevelDef": "Ett enda tal som sammanfattar hur stark en utrustningspjäs är, praktiskt när du snabbt vill jämföra två pjäser. Slå på Visa föremålsnivå i alternativen för att se den på verktygstips. Bara utrustning med känd källa bär en, så enkla handelsvaror och startutrustning visar ingenting, och en saknad siffra är normal snarare än ett fel.",
+      "requiredLevelTerm": "Nivåkrav",
+      "requiredLevelDef": "Nivån du måste nå innan du kan bära eller föra ett stycke utrustning. Verktygstipset visar den i rött så länge du fortfarande ligger under den.",
+      "offHandTerm": "Andra hand",
+      "offHandDef": "Den andra handplatsen. Den håller en sköld eller ett hållet föremål som en lykta eller ett koger, och ett andra vapen bara om din klass och specialisering kan bära ett vapen i vardera handen.",
+      "setBonusTerm": "Setbonus",
+      "setBonusDef": "En extra belöning för att bära flera delar av samma rustningsfamilj samtidigt. Verktygstipset räknar hur många delar av setet du har på dig, och fler delar låser upp mer av bonusen.",
+      "commissionTerm": "Beställning och Tillverkarens Band",
+      "commissionDef": "Ett hantverk skapat åt någon annan. Hantverkaren flaggar pjäsen som en beställning, och den binder till den som tar emot den i en handel; en stationsmästare kan lösa upp den igen senare mot en avgift.",
+      "masterworkTerm": "Mästerverk",
+      "masterworkDef": "Den finaste versionen av ett hantverk, som en skicklig hantverkare producerar då och då i stället för en vanlig kopia. Ett mästerverk bär alltid sin tillverkares namn.",
+      "toolCharmTerm": "Verktygsamulett",
+      "toolCharmDef": "En tillverkad amulett du monterar på ett gruv-, skogsavverknings- eller örtinsamlingsverktyg från Yrkesfönstret för att förbättra vad det ger tillbaka. Monteringen förbrukar amuletten, och effekten varar ett bestämt antal laddningar. När de tar slut laddar du om platsen med material i stället för att tillverka en ny amulett.",
+      "mountTerm": "Riddjur",
+      "mountDef": "En varelse du rider för att korsa landet snabbare. Nästan allt annat du gör får dig av: att simma, gå in i strid, samla resurser och hantverka sätter dig alla tillbaka på fötterna.",
+      "ridingTerm": "Ridning",
+      "ridingDef": "Färdigheten som över huvud taget låter dig rida. Du köper den en gång av en stallmästare vid nivå 20, och därefter stannar den hos din karaktär för gott.",
+      "reinsTerm": "Tyglar",
+      "reinsDef": "Föremålet som är ett riddjur. Behåll ett par i dina väskor eller din bank så är det riddjuret ditt; använd dem för att rida. Tyglar kan bytas, skickas med post och säljas till andra spelare.",
       "claudiumTerm": "Claudium",
-      "claudiumDef": "The currency of the WOC Store, spent on cosmetics and nothing else. It never buys power or progression.",
-      "worldTerm": "World",
-      "worldDef": "One shared copy of the online game, with its own players, market, and standings. This guide also calls it a realm, and your character lives on the world you made it on."
+      "claudiumDef": "Valutan i WOC-butiken, spenderad på kosmetika och inget annat. Den köper aldrig styrka eller progression.",
+      "worldTerm": "Värld",
+      "worldDef": "En delad kopia av onlinespelet, med egna spelare, en egen marknad och en egen ställning. Den här guiden kallar den också för ett rike, och din karaktär bor på den värld du skapade den på."
     },
     "faqPage": {
       "intro": "Frågorna som nya spelare ställer oftast.",
@@ -4396,14 +4710,14 @@ export const sv_SE: EnTranslations = {
       "q2": "Behöver jag en kryptoplånbok eller några tokens?",
       "a2": "Nej. Spelet är fullt spelbart utan en sådan. Den valfria community-token lägger bara till kosmetisk flärd och en andel av prispotten för dagliga belöningar, och den påverkar aldrig styrka eller progression.",
       "q3": "Kan jag spela på min telefon?",
-      "a3": "Ja. Spelet körs i en mobilwebbläsare med pekkontroller, och det finns även en datorklient.",
+      "a3": "Ja. Spelet går i vilken modern mobilwebbläsare som helst med pekkontroller, och det finns appar också: versioner för iOS och Android, och en datorapp för Windows, macOS och Linux som håller sig uppdaterad själv.",
       "q4": "Kan jag spela offline eller ensam?",
       "a4": "Ja. Det finns ett direktstartat enspelarläge offline, och onlinevärlden går helt att klara ensam förutom fängelsehålor, raiden och världsbossen.",
       "q5": "Hur många klasser finns det?",
       "a5": "Nio, som täcker de klassiska rollerna tank, läkare och skadegörare, var och en med ett resurssystem (raseri, mana eller energi) och sina egna signaturförmågor.",
       "q6": "Vad är nivåtaket?",
       "a6": "Nivå {cap}, nådd genom tre sammanlänkade zoner av uppdrag, fängelsehålor och utforskning.",
-      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
+      "a6Count": "Nivå {cap}, nådd genom zoner av uppdrag, fängelsehålor och utforskning. Det finns {zones} zoner totalt, från startdalen till regioner byggda för karaktärer redan vid taket.",
       "q7": "Kommer min karaktär att sparas?",
       "a7": "Onlinekaraktärer sparas på servern automatiskt. Offlinekaraktärer lever i din webbläsare för snabba sessioner och testning.",
       "q8": "Kan jag driva min egen kopia?",
@@ -4411,27 +4725,27 @@ export const sv_SE: EnTranslations = {
       "q9": "Finns det PvP?",
       "a9": "Ja. Duellera vem som helst på skoj, eller kliv in i Askkolosseum för att slåss mot andra spelare. PvP är frivilligt, så du tvingas aldrig in i det.",
       "q10": "Vad finns det att göra på maxnivå?",
-      "a10": "Taket är nivå {cap}. Därifrån kör du fängelsehålorna för fem spelare och raiden för tio, tar dig an dem igen i heroiskt läge för uppgraderat byte, möter världsbossen när han reser sig, prövar dig själv i arenan, dyker ner i delver med en följeslagare vid din sida, och jagar bedrifter i Bedrifternas bok för att klättra i rikets ställning.",
+      "a10": "Taket är nivå {cap}. Därifrån går du fängelsehålorna för fem spelare och raiden för tio, tar dem igen i heroiskt läge för uppgraderat byte, stiger ner genom rämnorna våning för våning, möter världsbossen när han reser sig, prövar dig i arenan eller på slagfältet Törnhålefälten, spelar en säsong av Dalpokalen, dyker ner i delves med en följeslagare vid din sida, tar ett yrke hela vägen till mästerverksmide, samlar riddjur och jagar bedrifter i Bedrifternas bok för att klättra i rankningarna.",
       "q11": "Hur hittar jag en grupp?",
       "a11": "Bjud in vem du än möter till en grupp, fråga i chatten, eller slå er ihop vid en fängelsehåla. Det mesta av världen går att klara ensam, så att gruppera sig är ett val, inte ett krav.",
-      "q12": "Is there a cash shop?",
-      "a12": "There is an optional cosmetic store. It sells looks: the Season 1 Armory weapon skins, bought with Claudium, the store currency. Nothing in it adds stats, power, or progression, and a skin never changes how your weapon hits, so every piece of gear that matters still comes from playing.",
-      "q13": "Where can I get the app?",
-      "a13": "The browser version needs nothing at all: open the site and play. If you would rather have an app, the desktop download for Windows, macOS, and Linux is on the Download page of the game site. Native iOS and Android apps are in the works, and until they land a phone or tablet plays the browser version with full touch controls. Every version signs in to the same account and the same worlds, so your characters follow you.",
-      "q14": "What do I need to run it?",
-      "a14": "A recent browser on a laptop, desktop, phone, or tablet. On your first launch the game reads your device and picks a graphics tier to match, from Low to Ultra, and any choice you make yourself always wins. Mouse and keyboard, touch, and a game controller all work. The settings and controls pages have the detail.",
-      "q15": "Do I need an account?",
-      "a15": "Only to play online. The offline world asks for nothing: choose Offline on the start screen and press Play. An online account is free, takes a username, a password, and an email address for account recovery, and keeps your characters saved on the server. Once you have one you can turn on two-factor authentication from the options.",
-      "q16": "What is a world?",
-      "a16": "Online play happens on worlds, and each one is a full copy of the game with its own players, its own World Market, and its own standings. When you sign in, the World List shows how busy each world is, from Low to Full, so you can pick a quiet one for elbow room or a busy one for company. Your characters live on the world you made them on, and you can keep characters on more than one.",
-      "q17": "How many characters can I have, and can I delete one?",
-      "a17": "Up to ten characters per world on one account, and you can have characters on more than one world. To remove one, delete it from the character list: the character must not be in the world, and you have to type its name to confirm, which is why a slip of the finger cannot cost you a hero. Deleting is permanent. That character's belongings go with it, its World Market listings are pulled from the market, and its Ravenpost mailbox is cleared.",
-      "q18": "Can I change my character's name?",
-      "a18": "Not by yourself, so choose one you like. Names are 2 to 16 letters, start with a letter, and allow spaces, hyphens, and apostrophes, and each one is unique on its world no matter how it is capitalized. Names that break the rules of conduct are refused. The one time you are asked to rename is when a moderator requires it. Closing your account can release its names for other players, and merely not playing for a while never does: an inactive account keeps its names.",
-      "q19": "What happens if I get disconnected?",
-      "a19": "Your character stays in the world for about five minutes and the game tries to reconnect on its own, so a dropped signal, a shut laptop, or a reload usually puts you right back where you were, in the same session. Because your character really is still standing there, disconnecting is not a way to escape a fight. Choosing Logout from the game menu leaves immediately rather than waiting out that window.",
-      "q20": "I found a bug. How do I report it?",
-      "a20": "From inside the online game, open the menu with Esc and choose Report a Bug. Describe what happened and send it: your world, your character, and where you were standing ride along automatically, together with your version and device details, and you can tick Include Screenshot to attach a picture of what you were looking at. If you send several in a row you may be asked to wait a moment before the next one."
+      "q12": "Finns det en butik för riktiga pengar?",
+      "a12": "Det finns en valfri kosmetisk butik. Den säljer utseenden: vapenskinnen i säsong 1-vapenhuset, köpta med Claudium, butikens egen valuta. Inget i den lägger till statistik, styrka eller progression, och ett skinn ändrar aldrig hur ditt vapen träffar, så all utrustning som spelar roll fortfarande kommer från att spela.",
+      "q13": "Var kan jag hämta appen?",
+      "a13": "Webbläsarversionen behöver ingenting alls: öppna sajten och spela. Om du hellre vill ha en app finns datorklienten för Windows, macOS och Linux på spelsajtens nedladdningssida. Inbyggda iOS- och Android-appar är på gång, och tills de landar spelar en telefon eller platta webbläsarversionen med fullständiga pekkontroller. Varje version loggar in på samma konto och samma världar, så dina karaktärer följer med dig.",
+      "q14": "Vad behöver jag för att köra det?",
+      "a14": "En modern webbläsare på en bärbar dator, stationär dator, telefon eller platta. Vid din första start läser spelet din enhet och väljer en grafiknivå som matchar, från Låg till Ultra, och varje val du gör själv vinner alltid. Mus och tangentbord, touch och en handkontroll fungerar alla. Sidorna om Inställningar och prestanda samt Kontroller har detaljerna.",
+      "q15": "Behöver jag ett konto?",
+      "a15": "Bara för att spela online. Offlinevärlden kräver ingenting: välj Offline på startskärmen och tryck på Spela. Ett onlinekonto är gratis, kräver ett användarnamn, ett lösenord och en e-postadress för kontoåterställning, och sparar dina karaktärer på servern. När du väl har ett kan du slå på tvåfaktorsautentisering från alternativen.",
+      "q16": "Vad är en värld?",
+      "a16": "Onlinespel sker på världar, och var och en är en fullständig kopia av spelet med sina egna spelare, sin egen Världsmarknad och sin egen ställning. När du loggar in visar Världslistan hur upptagen varje värld är, från Låg till Fullt, så du kan välja en lugn för gott om plats eller en livlig för sällskap. Dina karaktärer bor på världen du skapade dem på, och du kan ha karaktärer på mer än en.",
+      "q17": "Hur många karaktärer kan jag ha, och kan jag radera en?",
+      "a17": "Upp till tio karaktärer per värld på ett konto, och du kan ha karaktärer på mer än en värld. För att ta bort en, radera den från karaktärslistan: karaktären får inte befinna sig i världen, och du måste skriva dess namn för att bekräfta, vilket är varför ett feltryck aldrig kan kosta dig en hjälte. Radering är permanent. Den karaktärens ägodelar följer med, dess annonser på Världsmarknaden dras tillbaka från marknaden, och dess brevlåda hos Korpposten töms.",
+      "q18": "Kan jag ändra min karaktärs namn?",
+      "a18": "Inte på egen hand, så välj ett du gillar. Namn är 2 till 16 bokstäver, börjar med en bokstav och tillåter mellanslag, bindestreck och apostrofer, och varje namn är unikt på sin värld oavsett hur det skrivs med versaler och gemener. Namn som bryter mot uppförandereglerna avvisas. Den enda gången du blir ombedd att byta namn är när en moderator kräver det. Att stänga ditt konto kan frigöra dess namn för andra spelare, medan att bara inte spela ett tag aldrig gör det: ett inaktivt konto behåller sina namn.",
+      "q19": "Vad händer om jag kopplas ner?",
+      "a19": "Din karaktär stannar kvar i världen i ungefär fem minuter medan spelet försöker återansluta på egen hand, så en tappad anslutning, en nedslagen laptop eller en omladdning brukar sätta dig rakt tillbaka där du var, i samma session. Eftersom din karaktär verkligen fortfarande står kvar där är det inte ett sätt att fly en strid genom att koppla ner. Att välja Logga ut från spelmenyn lämnar omedelbart i stället för att vänta ut det fönstret.",
+      "q20": "Jag hittade en bugg. Hur rapporterar jag den?",
+      "a20": "Inifrån onlinespelet, öppna menyn med Esc och välj Rapportera ett fel. Beskriv vad som hände och skicka det: din värld, din karaktär och var du stod följer med automatiskt, tillsammans med dina version- och enhetsuppgifter, och du kan bocka i Inkludera skärmbild för att bifoga en bild av vad du tittade på. Skickar du flera i rad kan du bli ombedd att vänta en stund innan nästa."
     },
     "classList": {
       "heading": "De nio klasserna",
@@ -4445,7 +4759,8 @@ export const sv_SE: EnTranslations = {
     "resourceName": {
       "rage": "Raseri",
       "mana": "Mana",
-      "energy": "Energi"
+      "energy": "Energi",
+      "focus": "Fokus"
     },
     "classPage": {
       "back": "Alla klasser",
@@ -4459,23 +4774,23 @@ export const sv_SE: EnTranslations = {
       "fullKitNote": "Uppsättningen den här klassen lär sig medan den stiger i nivå, i den ordning den blir tillgänglig. Talanger ger några förmågor till och avgör vilka som bär ditt bygge.",
       "petsHeading": "Demoner",
       "petsNote": "Häxmästare frammanar demoner att slåss vid sin sida, var och en lämpad för en annan uppgift.",
-      "mageLore": "Mages bend Fire and Frost to destroy enemies, summon a Water Elemental, freeze threats in place, or bend time itself to shield and mend their allies.",
-      "mageEleHeading": "Water Elemental",
-      "mageEleNote": "A Frost mage learns to summon a Water Elemental, a ranged companion that throws Waterbolts at your target on its own. It answers the pet bar like a hunter beast or a warlock demon, though it is not built to hold a target for you.",
-      "mageEleJet": "Water Jet sits on the pet bar as a button of its own: click it to lock a chilling beam onto one enemy, or right-click it (touch and hold on mobile) to let the elemental fire it on its own whenever it is ready.",
-      "formsHeading": "Shapeshifting",
-      "formsNote": "A druid fights by changing shape. Most druid abilities belong to one shape, so the form you are in decides what you can cast, and shifting costs a little mana. You can shift in or out of combat, as often as you like.",
-      "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.",
+      "mageLore": "Magiker böjer Eld och Frost för att förgöra fiender, frammanar en Vattenelementar, fryser hot på plats, eller böjer själva tiden för att skydda och läka sina allierade.",
+      "mageEleHeading": "Vattenelementar",
+      "mageEleNote": "En Frostmagiker lär sig att frammana en Vattenelementar, en följeslagare på avstånd som på egen hand slungar Vattenprojektiler mot ditt mål. Den svarar på djurraden precis som ett jägar- eller häxmästardjur, även om den inte är byggd för att hålla ett mål åt dig.",
+      "mageEleJet": "Vattenstråle har en egen knapp på djurraden: klicka på den för att låsa en kylande stråle på en fiende, eller högerklicka på den (håll intryckt på mobil) för att låta elementaren avfyra den på egen hand så snart den är redo.",
+      "formsHeading": "Formskiftning",
+      "formsNote": "En druid slåss genom att byta form. De flesta av druidens förmågor hör till en enda form, så formen du befinner dig i avgör vad du kan kasta, och att skifta kostar lite mana. Du kan skifta in eller ut ur strid, så ofta du vill.",
+      "formsMoonwing": "En Månlund-druid får en form till, Månugglaform, besvärjarformen en Balans-druid strider i. Det är den enda djurformen som behåller dina besvärjelser, och din trollstav fungerar bara i den eller i din vanliga besvärjarform.",
       "formLine": {
-        "form_bear": "The tanking shape: a heavy hide, rage instead of mana, and extra threat so enemies keep swinging at you.",
-        "form_cat": "The melee damage shape: energy and combo points, like a rogue, and much less threat.",
-        "form_travel": "The travelling shape: far quicker across the ground, but no other abilities until you shift out."
+        "form_bear": "Tankformen: en tjock hud, Raseri i stället för mana, och extra hot så att fiender fortsätter slå på dig.",
+        "form_cat": "Närstridsskadeformen: Energi och kombopoäng, precis som en Skurk, och betydligt mindre hot.",
+        "form_travel": "Reseformen: betydligt snabbare över mark, men inga andra förmågor förrän du skiftar ur."
       },
-      "mageEleSummon": "A Frost spell that calls the elemental to your side and sets it on your target.",
+      "mageEleSummon": "En Frost-besvärjelse som kallar elementaren till din sida och sätter den på ditt mål.",
       "formName": {
-        "form_bear": "Bruin Form",
-        "form_cat": "Wolf Form",
-        "form_travel": "Fleet Form"
+        "form_bear": "Bruinform",
+        "form_cat": "Vargform",
+        "form_travel": "Fleetform"
       }
     },
     "classHook": {
@@ -4514,19 +4829,32 @@ export const sv_SE: EnTranslations = {
       "none": "Ingen klass matchar varje filter. Rensa ett för att se fler."
     },
     "abilityHook": {
+      "evil_eye": "Namnger fienden vars handlingar och lidande föder din Fördömelse.",
       "heroic_strike": "Köar ett tyngre svingslag som förbrukar raseri på ditt nästa slag.",
       "revenge": "Träffar fiender framför dig och kan bli kostnadsfri efter en undvikning eller parering.",
       "hamstring": "Hämmar en fiendes rörelse så att den inte kan fly.",
       "battle_shout": "Ett samlande rop som höjer attackstyrkan för gruppen.",
       "charge": "Stormar mot en avlägsen fiende för att öppna striden med en kort bedövning.",
       "thunder_clap": "Slår allt runt omkring dig och saktar ner deras attacker.",
-      "seal_of_righteousness": "Besjälar dina sving med helig skada, förbruka den sedan med Verdict.",
+      "seal_of_righteousness": "Genomsyrar dina närstridshugg med ytterligare Helig skada.",
       "holy_light": "En stadig, rejäl läkning för att toppa upp en allierad eller dig själv.",
       "devotion_aura": "En varaktig självförstärkning som höjer rustningen så slag landar mjukare.",
       "judgement": "Förbrukar ditt aktiva sigill för att slå en fiende från kort avstånd.",
+      "hammer_of_wrath": "Avrättar en sårad fiende på avstånd, eller vilken fiende som helst medan dina vingar är aktiva.",
+      "avenging_wrath": "Ger 10 hängivenhet och fördubblar sedan hängivenheten som förmågor genererar i femton sekunder.",
+      "bastion_sweep": "Sveper skölden genom en grupp för att rycka åt sig hot och bygga hängivenhet.",
+      "oath_chain": "Släpar en avlägsen fiende in i din flock och bromsar dess flykt.",
+      "veilbound_march": "Gå genom en grupp för att märka den, trubba av dess skada mot dig och låsa fast hotet.",
+      "holy_shield": "Spenderar hängivenhet på ett aktivt blockfönster, absorption och en hotpuls.",
+      "consecration": "Gör anspråk på marken runt dig med ihållande helig skada och hot.",
+      "hammer_of_justice": "Stoppar en fiende med en kort, pålitlig bedövning.",
+      "lay_on_hands": "Återställer en stor mängd hälsa när en allierad är nära att falla.",
       "blessing_of_might": "Höjer ett vänligt måls attackstyrka, bra att kasta före en anstormning.",
       "divine_protection": "Ett snabbt skyddande värn för att suga upp skada när det blir tufft.",
       "raptor_strike": "Ett hårt närstridssving för när något sluter avståndet till dig.",
+      "pack_command": "Befaller din följeslagare att slå och bygga Flockvildhet. Varje stapel får ditt husdjur att göra 10% mer skada, upp till 30%, innan Släpp loss besten spenderar staplarna.",
+      "stampede": "Kallar tre bestar att attackera i 12 sekunder. Använd den vid full Flockvildhet så att de behåller den maximala skadebonusen under hela frammaningen.",
+      "measured_shot": "Ett medvetet distansskott som återställer fokus för dina tyngre attacker.",
       "aspect_of_the_hawk": "En skepnad du håller uppe för att skärpa din avståndsattackstyrka.",
       "serpent_sting": "Landar ett gift som blöder naturskada över tid.",
       "arcane_shot": "Ett omedelbart skott på avstånd för snabb extra skada.",
@@ -4545,11 +4873,21 @@ export const sv_SE: EnTranslations = {
       "power_word_shield": "Sveper in en allierad i en sköld som suger upp slag innan de landar.",
       "renew": "En läkning som tickar över tid, bra att kasta och fortsätta röra dig.",
       "lightning_bolt": "En avståndskastning av naturskada, ditt förstaval på långt håll.",
+      "chain_lightning": "Träffar ett mål och hoppar till två närliggande fiender och bygger en Åska för hela kastningen.",
+      "thunder_reservoir": "Lagrar blixtar tills Jordstöten eller Jordbävningen kan frigöra en utbetalning med full kraft.",
       "rockbiter_weapon": "Besjälar ditt vapen så att varje sving landar hårdare i närstrid.",
       "healing_wave": "Din huvudsakliga läkning, en direkt botning för dig själv eller en allierad.",
       "earth_shock": "En omedelbar chock för snabb naturskada när du behöver det nu.",
       "lightning_shield": "Laddar dig så att angripare tar naturskada när de slår dig.",
       "flame_shock": "En omedelbar brand som slår direkt och fortsätter att svida över tid.",
+      "galeheart_weapon": "Fyller båda vapnen med stormvind och belönar en jämn attackrytm.",
+      "warspirit_cadence": "Förvandlar en stadig vapenrytm till Stormhjärteekon och ett tillfälle till en omedelbar besvärjelse.",
+      "stormsurge": "Ger ibland tillbaka Förfäderslaget tidigt efter att du spenderat ett Stormteckentillfälle.",
+      "lifespring_weapon": "Fyller ditt vapen med läkande vatten och stärker ditt fortlöpande läkningsflöde.",
+      "tidecall": "Kallar på tidvattnet och förstärker nästa följd av läkande besvärjelser.",
+      "ancestor_return": "Återför varje fallen grupp- eller rädmedlem till livet efter en lång kastning utanför strid.",
+      "stoneward": "Reser en laddad stensköld som omvandlar mottagen skada till läkning.",
+      "primal_exaltation": "Släpper kortvarigt lös din specialiserings elementarkraft.",
       "fireball": "Din huvudsakliga eldkanon, landar ett slag och lämnar målet brinnande.",
       "fireball_form": "Bli en levande glöd för att ta dig över öppen mark med hög hastighet.",
       "frost_armor": "En varaktig självförstärkning som härdar din rustning före en strid.",
@@ -4566,7 +4904,7 @@ export const sv_SE: EnTranslations = {
       "conjure_water": "Frammanar drycker som återställer mana, så du kan fylla på mellan anstormningarna.",
       "conjure_food": "Frammanar mat som återställer hälsa när du sätter dig ner och äter.",
       "shadow_bolt": "En skuggpil du kastar mot ett mål, din förstavalskanon.",
-      "summon_imp": "Kallar fram en Emberkin som slungar eldpilar mot fiender från avstånd.",
+      "summon_imp": "Kallar fram en Emberkin som kastar Felbolt mot fiender på avstånd.",
       "demon_skin": "En varaktig självförstärkning som härdar din hud och ger rustning.",
       "immolate": "Sätter ett mål i brand för ett inledande slag och en brand som dröjer kvar.",
       "corruption": "Förmultnar ett mål med skugga som tickar medan du gör andra saker.",
@@ -4575,17 +4913,14 @@ export const sv_SE: EnTranslations = {
       "healing_touch": "En stor enmålsläkning med lång kasttid, för att toppa upp någon.",
       "mark_of_the_wild": "En varaktig välsignelse du lägger på dig själv eller en allierad före en strid.",
       "moonfire": "Slår omedelbart och lämnar målet brinnande, bra medan du rör dig.",
+      "moonseed": "Lägger till ett Månflod-steg och förlänger Månstorm medan du är i Månugglaform.",
       "rejuvenation": "Kastas omedelbart och läker en allierad över tid, så du kan fortsätta agera.",
       "thorns": "Skyddar en allierad så att närstridsangripare skadar sig själva när de slår."
     },
     "petHook": {
-      "emberkin": "En eldpilskastande demon på avstånd som naggar fiender från säkert håll.",
-      "gloomshade": "En robust demon som hånar och absorberar slag så att du kan besvärja i lugn och ro.",
-      "duskborn": "En snabb närstridsdemon som slår hårt men viker sig under press.",
-      "spellhound": "En skuggstrejfare som jagar fiendens besvärjare.",
-      "warfiend": "En tålig närstridskämpe, allroundern när du väl kan frammana den.",
-      "pyre_colossus": "En massiv anfallsvagn med krossande närstrid, frammanad för ren styrka.",
-      "wraithborn": "En elitbesvärjare som regnar tunga skuggor på avstånd."
+      "emberkin": "En demon på avstånd vars kännetecknande Felbolt naggar fienderna på tryggt håll.",
+      "gloomshade": "En tålig tankdemon som hånar och använder Abyssal Chain för att dra tillbaka flyende vanliga fiender inom räckhåll; bossar motstår ryckningen.",
+      "pyre_colossus": "En massiv anfallsvagn med krossande närstrid, frammanad för ren styrka."
     },
     "bestiary": {
       "heading": "Bestiarium",
@@ -4654,40 +4989,40 @@ export const sv_SE: EnTranslations = {
       }
     },
     "mountsPage": {
-      "heading": "Mounts and riding",
-      "intro": "A mount is a faster way across the world, and that is all it is. You learn to ride at the stables, buy your first set of reins, and every road after that is shorter.",
-      "whatHeading": "What a mount is",
-      "whatBody": "A mount is a beast you ride, and what it gives you is speed. No armor, no damage, no stats: it carries you over the ground faster, and springs a little higher when you jump, and that is the whole of the bargain. Every mount in the game is a ground mount, so there is no flying, and none of them swim.",
-      "learnHeading": "Learning to ride",
-      "learnBody": "Riding is a skill you buy once, and it opens at level {level}. Marla Hitchen, the stablemaster, keeps the Galecrest Stables out on the downs, and she sells Riding Training for 80 gold. That one purchase is what lets you sit a mount at all, and it stays with you for good.\n\nOnce you have it, Marla has a quest for you: Riding Lessons. Take it, follow the marker to the glowing square behind the start arch, and press Start Race. She lends you a training Valorsteed for the lesson, so the lesson itself costs you nothing. Ride the course, finish it, and go back to her for your coin and experience. The lent steed goes back in the barn afterward, so the lesson teaches you the seat rather than handing you a horse.",
-      "whereHeading": "Where to find her",
-      "whereBody": "The Galecrest Stables are marked on the map of The Galecrest, out on the downs between the Shear and the Wreckfields. Marla stands beside the barn, facing the race yard.",
-      "firstHeading": "Your first mount",
-      "firstBody": "The Valorsteed is the only mount sold anywhere in the world. Once you have learned Riding, Marla will sell you the Reins of the Valorsteed for 10 gold, and those reins are yours to keep. Every other mount is earned out in the world, so the horse is where nearly every rider starts.",
-      "rideHeading": "Getting on and getting off",
-      "rideBody": "There is no mount window and no favorite to set, because the reins are the mount. Use a set of reins from your bags or from an action bar slot and you ride that mount. Summoning takes a moment, a short call rather than an instant one, so it will not save you from a bad pull. Getting off is instant and never blocked.\n\nUse the reins you are already riding and you put that mount away. Use a different set while mounted and you swap straight to it, with nothing to summon in between. The Mount and Dismount key, the backquote key by default, only ever gets you off: it is the way down, not the way up. The one exception is the riding lesson, where that same key calls the steed Marla lends you, since a borrowed horse has no reins to click. On a phone or tablet, the Mount button in the More tray works both ways, though it calls the first set of reins sitting in your bags rather than one you pick, so tap the reins themselves when you want a particular mount.",
-      "breaksHeading": "What puts you back on your feet",
-      "breaksBody": "Water always wins. Ride into anything deep enough to swim in and you are down at once, because no ground mount swims, and dying drops you where you fall. You cannot call one while you are in combat, while you are dead or making your way back as a spirit, or at any point during a Thornhollow Fields match, which is fought on foot from the form-up to the final hold: if you were riding while you waited, being seated into the match puts you down with it. Walking into combat or into water partway through a summon cancels it as well.\n\nMost of what you do puts you down too. Swinging at something, starting a cast, harvesting a node, fishing, crafting, enchanting, salvaging, and recharging a profession tool all dismount you the moment you start, so expect to hop off at every vein. Calling a mount also drops any shapeshift form you are holding: you are never both shifted and mounted.",
-      "speedHeading": "Speed and tiers",
-      "speedBody": "Speed is the only thing that separates one mount from another. The Valorsteed you buy from Marla sets the base pace, and the mounts you collect out in the world ride above it: the rarer the reins, the quicker the ride, in a few clear steps rather than a smooth slide. There is no second rank of riding to train and no upgrade to buy afterward. You pay for Riding once, and from then on the reins you used decide how fast you travel.",
-      "collectHeading": "Where the rarer mounts come from",
-      "collectBody": "Beyond Marla's counter, reins are found rather than bought. They come off the last bosses of the five-player dungeons and the raid on heroic, and out of rift clears, where the harder the rift you finish the rarer the reins it can leave behind. They are rare finds by design and no run promises one, so the kind way to hunt a mount is to bring the hunt along on the runs you were making anyway. This page will not tell you which mount hangs on which boss: that part is yours to find out.",
-      "raceHeading": "The stables race",
-      "raceBody": "The show-jumping course in Marla's paddock is open to anyone, any time, not only during the lesson. Sit a mount, stand on the glowing square behind the arch, and press Start Race. A countdown holds you still, then the clock runs: clear all seven jumps and ride back out through the arch before it runs down.\n\nA jump only counts if you are genuinely in the air over the bar, so an easy ride-through clears nothing. You may take them in any order and from either side, and a missed one is not the end of the world: circle back and take it again. Dying, getting off, or leaving the paddock ends the attempt, and so does letting the clock run out, which sets you down out of the saddle where you stand; cancelling it yourself just stops the clock. Nothing stops you starting another. There is no fee, no cooldown, and no prize beyond the time itself, and any number of riders can run the course at once without getting in each other's way.",
-      "goodsHeading": "Reins are ordinary goods",
-      "goodsBody": "A mount is an item, which makes it something the economy can move. You own a mount for as long as its reins sit in your bags or your bank, though banked reins keep the mount yours without letting you ride it: to call the beast you have to be carrying the reins. Player reins carry no soulbind, so they trade, travel by mail, and list on the World Market like any other find, unless the item itself says otherwise. Two things are worth knowing before you part with one: no merchant will ever buy a set of reins back, so a mount is a purchase you keep or pass on rather than cash out, and if the reins leave your bags and your bank both while you are riding, traded away, mailed off, or sold on the market, the mount goes with them and you are set down where you stand."
+      "heading": "Riddjur och ridning",
+      "intro": "Ett riddjur är ett snabbare sätt att ta sig fram genom världen, och det är allt det är. Du lär dig rida vid stallet, köper ditt första par tyglar, och varje väg efter det blir kortare.",
+      "whatHeading": "Vad ett riddjur är",
+      "whatBody": "Ett riddjur är en best du rider, och det den ger dig är rörlighet. Ingen rustning, ingen skada, inga egenskaper: den bär dig över marken snabbare, och hoppar lite högre när du hoppar, och det är hela affären. Varje riddjur i spelet är marklevande, så det finns ingen flygning, och inget av dem simmar.",
+      "learnHeading": "Att lära sig rida",
+      "learnBody": "Ridning är en färdighet du köper en gång, och den öppnas vid nivå {level}. Marla Hitchen, stallmästaren, sköter Stormkammens stall ute bland kullarna, och hon säljer Ridträning för 80 guld. Det enda köpet är vad som över huvud taget låter dig sitta upp på ett riddjur, och det stannar hos dig för gott.\n\nNär du har det har Marla ett uppdrag åt dig: Ridlektioner. Ta det, följ markören till den glödande rutan bakom startbågen, och tryck på Starta loppet. Hon lånar dig en övnings-Valorsteed till lektionen, så själva lektionen kostar dig ingenting. Rid banan, avsluta den, och gå tillbaka till henne för ditt guld och din erfarenhet. Det lånade riddjuret går tillbaka till ladan efteråt, så lektionen lär dig sadeln snarare än ger dig en häst.",
+      "whereHeading": "Var du hittar henne",
+      "whereBody": "Stormkammens stall är utmärkt på kartan över Stormkammen, ute bland kullarna mellan Branten och Vrakfälten. Marla står bredvid ladan, vänd mot tävlingsplanen.",
+      "firstHeading": "Ditt första riddjur",
+      "firstBody": "Valorsteed är det enda riddjur som säljs någonstans i världen. Så snart du har lärt dig Ridning säljer Marla Tyglar till Valorsteed till dig för 10 guld, och de tyglarna är dina att behålla. Varje annat riddjur förtjänas ute i världen, så hästen är där nästan varje ryttare börjar.",
+      "rideHeading": "Att sitta upp och stiga av",
+      "rideBody": "Det finns inget riddjursfönster och ingen favorit att ställa in, för tyglarna är riddjuret. Använd ett par tyglar från dina väskor eller från en plats i handlingsfältet så rider du det riddjuret. Att frammana tar en stund, ett kort kall snarare än ett omedelbart, så det räddar dig inte från en dålig pull. Att stiga av är omedelbart och blockeras aldrig.\n\nAnvänd tyglarna du redan rider och du ställer undan det riddjuret. Använd ett annat par medan du är beriden och du byter direkt till det, utan något att frammana emellan. Tangenten Sitt upp / Stig av, backquote-tangenten (`) som standard, får dig bara någonsin av: den är vägen ner, inte vägen upp. Det enda undantaget är ridlektionen, där samma tangent kallar på riddjuret Marla lånar dig, eftersom en lånad häst inte har några tyglar att klicka på. På en telefon eller surfplatta fungerar Sitt upp-knappen i Mer-menyn åt båda hållen, även om den kallar på det första paret tyglar som ligger i dina väskor snarare än ett du väljer, så tryck på tyglarna själva när du vill ha ett visst riddjur.",
+      "breaksHeading": "Vad som sätter dig till fots igen",
+      "breaksBody": "Vattnet vinner alltid. Rid ut i något djupt nog att simma i och du stiger av med detsamma, för inget marklevande riddjur simmar, och dör du hamnar du där du faller. Du kan inte kalla på ett riddjur medan du är i strid, medan du är död eller på väg tillbaka som ande, eller när som helst under en match i Törnhålefälten, som utkämpas till fots från den inledande samlingen till den sista striden: var du beriden medan du väntade sätter insättningen i matchen av dig ur sadeln också. Går du in i strid eller ut i vatten mitt under en frammaning avbryts den också.\n\nDet mesta du gör gör att du stiger av också. Att slå till något, börja kasta en besvärjelse, skörda en fyndplats, fiska, tillverka, förtrolla, bärga eller ladda om ett yrkesverktyg får dig alla att stiga av i samma stund du börjar, så räkna med att kliva av vid varje ådra. Att kalla på ett riddjur upphäver också all skepnad du bär: du är aldrig både skiftad och beriden på samma gång.",
+      "speedHeading": "Rörlighet och nivåer",
+      "speedBody": "Rörlighet är det enda som skiljer ett riddjur från ett annat. Valorsteed du köper av Marla sätter grundtempot, och riddjuren du samlar in ute i världen rider förbi det: ju sällsyntare tyglarna är, desto snabbare färd, i några tydliga steg snarare än en jämn glidning. Det finns ingen andra ridgrad att träna och ingen uppgradering att köpa efteråt. Du betalar för Ridning en gång, och därefter avgör tyglarna du använde hur snabbt du färdas.",
+      "collectHeading": "Var de sällsyntare riddjuren kommer ifrån",
+      "collectBody": "Bortom Marlas disk hittas tyglar snarare än köps. De faller från de sista bossarna i fängelsehålorna för fem spelare och i raiden på heroiskt, och ur avklarade revor, där ju svårare reva du avslutar desto sällsyntare tyglar den kan lämna efter sig. De är sällsynta fynd med flit, och ingen omgång lovar en, så det snälla sättet att jaga ett riddjur är att ta jakten med på de omgångar du ändå skulle köra. Den här sidan avslöjar inte vilket riddjur som hänger på vilken boss: den delen är din att ta reda på.",
+      "raceHeading": "Stallets lopp",
+      "raceBody": "Hoppbanan i Marlas hage står öppen för vem som helst, när som helst, inte bara under lektionen. Sitt upp på ett riddjur, stå på den glödande rutan bakom bågen, och tryck på Starta loppet. En nedräkning håller dig stilla, sedan börjar klockan gå: klara alla sju hoppen och rid tillbaka ut genom bågen innan tiden runnit ut.\n\nEtt hopp räknas bara om du verkligen är i luften över ribban, så en enkel genomridning klarar ingenting. Du får ta dem i vilken ordning som helst och från vilken sida som helst, och ett missat hopp är inte världens undergång: sväng tillbaka och ta det igen. Att dö, stiga av eller lämna hagen avslutar försöket, och det gör det också om klockan rinner ut, vilket sätter dig ur sadeln där du står; att avbryta själv stoppar bara klockan. Inget hindrar dig från att starta ett nytt försök. Det finns ingen avgift, ingen nedkylning och inget pris utöver tiden själv, och hur många ryttare som helst kan köra banan samtidigt utan att stå i vägen för varandra.",
+      "goodsHeading": "Tyglar är vanliga varor",
+      "goodsBody": "Ett riddjur är ett föremål, vilket gör det till något ekonomin kan flytta på. Du äger ett riddjur så länge dess tyglar ligger i dina väskor eller i din bank, även om bankförvarade tyglar håller riddjuret ditt utan att låta dig rida det: för att kalla på besten måste du bära tyglarna. Spelartyglar är aldrig själsbundna, så de handlas, skickas med post och listas på Världsmarknaden som vilket annat fynd som helst, om inte föremålet självt säger något annat. Två saker är värda att veta innan du skiljer dig från ett: ingen handlare köper någonsin tillbaka ett par tyglar, så ett riddjur är ett köp du behåller eller för vidare snarare än löser in, och om tyglarna lämnar både dina väskor och din bank medan du rider, handlas bort, skickas med post eller säljs på marknaden, följer riddjuret med dem och du sätts ner där du står."
     },
     "worldPage": {
       "heading": "Världen",
-      "intro": "World of ClaudeCraft är ett enda sammanhängande land som du korsar till fots, tre zoner lagda från söder till norr. Det finns ingen snabbresa, så resan är en del av äventyret.",
+      "intro": "World of ClaudeCraft är ett sammanhängande land som du korsar till fots. Den gamla vägen löper från söder till norr genom startdalen, träsket och topparna, och den fortsätter klättra bortom dem in i sänkan därefter och snölandet högst upp på kartan. En rad högre riken öppnar sig från den vägen västerut och en annan österut, och en ö ligger utanför Dalens östkust. Det finns ingen snabbresa, inga flygrutter och inga skjutsar: varje färd går till fots eller till häst, så att komma fram hör till äventyret.\n\nLandet håller också tiden. En dygnscykel löper på en verklig klocka som alla på din värld delar, så himlen övergår från gryning via middag till skymning och mörker för er allihop samtidigt, månen kommer och går genom sina faser, och ljuset på marken skiftar med den. Ringen runt din minikarta är där du läser av timmen.",
       "hub": "Hembas",
-      "mapHeading": "Vägen norrut",
-      "mapSub": "Tre zoner, från söder till norr, var och en ett steg högre i nivå. Följ uppdragsspåret så bär landet dig från dalen till topparna.",
+      "mapHeading": "Vägen och rikena bortom",
+      "mapSub": "Uppdragsspåret löper från söder till norr längs kartans mitt: dal, träsk, toppar, och vidare bortom dem in i sänkan och snön. De andra rikena öppnar sig utmed den vägen snarare än efter den, genom portar öster och väster om träskvägen, medan ön Farshore nås från Dalens östkust. Det som håller dig utanför de fjärran rikena är deras nivåband, inte vandringen: fem av dem delar det översta bandet, så när du väl är redo kan du ta dem i vilken ordning du vill. Farshore är undantaget, lågnivåland som du kan besöka tidigt.",
       "places": "Anmärkningsvärda platser",
       "residents": "Vem du kommer att möta",
       "valeBlurb": "Den gröna startdalen, där nya hjältar prövar sina krafter på vargar och banditer kring staden Eastbrook.",
       "marshBlurb": "Ett dränkt land av dimma och ruiner. Mudfiner svärmar i grundvattnet och något äldre rör sig under ytan, bevakat från bro-staden Fenbridge.",
-      "peaksBlurb": "Vindpiskade åsar och gamla gruvverk som klättrar mot rikets kallaste, högsta faror, hållna av utposten Highwatch.",
+      "peaksBlurb": "Vindpiskade åsar och gamla gruvverk som klättrar mot de hårdaste farorna på startvägen, hållna av utposten Highwatch.",
       "duskBlurb": "En dal i evig skymning under Fornglimmers stora träd, där kristallruiner glöder och luften surrar av gammal magi.",
       "emberBlurb": "Stormbelysta ödemarker av aska och blodglas där drakar kretsar över kaldera, och trollens eldar brinner bland dynerna, vaktade från porten Drakvakten.",
       "frostBlurb": "En tystnad av snö och mörka granar under norrskenet, där kylan själv känns vaken och Ismanteln håller sina eldar brinnande.",
@@ -4741,24 +5076,24 @@ export const sv_SE: EnTranslations = {
       "gladeBody": "Inte varje berättelse i the Vale handlar om de döda. I norr håller en solbelyst lund kallad Brightwood Glade sin egen mildare rytm, med tysta stigar och fläckvist ljus under grenverket. Det är en mjuk motpol till spåret du följer, och värt att se när vägen ger dig utrymme att vandra.",
       "worldBossTitle": "När berget vaknar: världsbossen",
       "worldBossBody": "Högt uppe på Törntoppen samlar stormen över Stormcrag ibland en skepnad. Thunzharr, det vaknande berget reser sig där i en jämn rytm, en elementar av raidstyrka som bekämpas i den öppna världen av vem som än svarar på uppropet, och han växer sig mäktigare ju fler utmanare som står emot honom. Alla som ansluter till striden förtjänar sin egen kastning på hans byte, hedrad på raidspärrens villkor, och hans fall dröjer kvar länge nog för de fallna att springa tillbaka och kräva sitt. Samla fler svärd än du tror du behöver.",
-      "farshoreBlurb": "An island of gull-cry and salt wind off the Vale's east coast, where rifts tear open without warning and the fishing town of Gullhaven holds its shore.",
-      "farshoreGreeting": "You came over the Ferrywalk? Then you are the first in a week, and the Warden will want to look you over.",
-      "farshoreGreeter": "Bellkeeper Tam, the Landing",
-      "farshorePlaceNotes": "Gullhaven is the island's only town and its redoubt. The Landing is where the Ferrywalk comes ashore, with a watchbell standing over the point; the Watch Meadow keeps the high ground southeast of town, where a riftwatcher listens for the next break; the Sundered Cliffs crack open at the island's southern end; and the Riftfields are the wracked grain rows east of Gullhaven, still crawling with what came through the break there.",
-      "travelTitle": "Getting around",
-      "travelBody": "Every road in the realm is walked or ridden. There are no flight paths, no taxis, and no teleport network: the map is one connected landmass, and every connection is something you can stand on. Ridges divide one realm from the next, and where two realms share a ridge the road climbs through a pass. Not every border works that way, though. In the north a long causeway carries the road out over the water from the Veiled Hollow into the snow country beyond, and back south a thin natural sandbar called the Ferrywalk runs east from the Vale's coast to the Landing on the island of the Farshore, which has no land border at all. And there is exactly one true doorway in the whole overworld: a veil of dusk high on Thornpeak that opens into the Veiled Hollow. The Hollow's southern ridge is sealed with no pass through it, so that veil is how you first get in, and it closes behind you on the way back.\n\nWherever you fall, the walk back is a short one. Every zone keeps at least one graveyard with a Pale Keeper hovering over the stones, and a released spirit rises at the nearest of them.\n\nThe map does not end in an invisible wall. The land runs out into beaches and headlands, and then into open water. The crossings the world means you to swim, the straits and meres between one realm and the next, are calm and safe to cross. Strike out for the open sea instead and the distance itself turns you back: you are warned, and warned again, and if you keep swimming the sea wears you down until it kills you. Diving has its own limit, since your breath runs out under the surface, so come up for air and turn around when the water tells you to.",
-      "mountsTitle": "Mounts",
-      "mountsBody": "Riding is the one thing that makes the world smaller, and it is a lesson before it is a horse. At level 20 the stablemaster, Marla, will take you on: you buy the riding skill from her, and the riding lesson itself is free, a jumping course you ride around her paddock on a lent steed. Pass it, turn the lesson in, and your first Valorsteed is yours, and from then on you cross the realm noticeably faster on horseback. Speed is the only thing a mount gives you: the rarer ones, which come from the hardest content, are faster still, but none of them change your power in a fight. Mount and dismount with the key bound in your controls. You cannot climb on while you are in combat, and swinging a weapon, casting a spell, wading into water, or falling in battle all put you back on your feet.",
-      "mountsMore": "Everything about mounts",
-      "riftTitle": "Rift portals",
-      "riftBody": "Something keeps tearing holes in the realm. Rift portals open by themselves out in the world, never on the three zones of the starting road but across every realm beyond them and out on the Farshore, and the whole realm hears the news when one tears open. Each portal carries a rank, and a higher rank means a harder, richer descent. A portal is a shared event: any group can step through and gets its own run inside, but only one group ever takes the first clear, so a fresh rift is worth hurrying to. You need to be level 20 to enter one, and if nobody answers in time the rift collapses on its own.",
-      "riftMore": "Everything about rifts"
+      "farshoreBlurb": "En ö av måsskrik och salt vind utanför Dalens östkust, där revor river upp sig utan förvarning och fiskeläget Måshamn håller sin kust.",
+      "farshoreGreeting": "Du kom över Färjeleden? Då är du den första på en vecka, och Väktaren kommer vilja se på dig.",
+      "farshoreGreeter": "Klockväktaren Tam, Landningsplatsen",
+      "farshorePlaceNotes": "Måshamn är öns enda stad och dess sista skans. Landningsplatsen är där Färjeleden går i land, med en vaktklocka som står över udden; Vaktängen håller höjdmarken sydost om staden, där en revvakt lyssnar efter nästa bräsch; De klyvda klipporna spricker upp vid öns södra ände; och Revfälten är de sönderslitna sädesraderna öster om Måshamn, fortfarande fulla av vad som kom igenom bräschen där.",
+      "travelTitle": "Att ta sig fram",
+      "travelBody": "Varje väg i riket vandras eller rids. Det finns inga flygvägar, inga taxitjänster och inget teleportnätverk: kartan är en enda sammanhängande landmassa, och varje förbindelse är något du kan stå på. Höjdryggar skiljer ett rike från nästa, och där två riken delar en höjdrygg klättrar vägen genom ett pass. Men inte varje gräns fungerar så. I norr bär en lång vägbank vägen ut över vattnet från Slöjhålan in i snölandet bortom, och längre söderut löper en smal, naturlig sandrevel som kallas Färjeleden österut från Dalens kust till Landningsplatsen på Fjärrkustens ö, som inte har någon landgräns alls. Och det finns exakt en enda sann dörr i hela överjorden: en skymningsslöja högt uppe på Törntoppen som öppnar in i Slöjhålan. Hålans södra höjdrygg är förseglad utan pass genom den, så den slöjan är hur du först kommer in, och den stängs bakom dig på vägen tillbaka.\n\nVar du än faller är vägen tillbaka kort. Varje zon har minst en kyrkogård med Den bleka väktaren svävande över stenarna, och en frigjord ande stiger upp vid den närmaste av dem.\n\nKartan slutar inte i en osynlig vägg. Landet rinner ut i stränder och uddar, och sedan i öppet vatten. De passager världen menar att du ska simma, sunden och fjärdarna mellan ett rike och nästa, är lugna och säkra att korsa. Ge dig istället ut på öppet hav och avståndet självt vänder dig om: du varnas, och varnas igen, och om du fortsätter simma tröttar havet ut dig tills det dödar dig. Dykning har sin egen gräns, eftersom din andedräkt tar slut under ytan, så kom upp för luft och vänd om när vattnet säger åt dig.",
+      "mountsTitle": "Riddjur",
+      "mountsBody": "Ridning är det enda som gör världen mindre, och det är en lektion innan det är en häst. Vid nivå 20 tar stallmästaren Marla sig an dig: du köper ridfärdigheten av henne, och själva ridlektionen är gratis, en hinderbana du rider runt i hennes hage på en lånad häst. Klara den, lämna in lektionen, och din första Valorsteed är din, och därefter korsar du riket märkbart snabbare till häst. Fart är det enda ett riddjur ger dig: de sällsyntare, som kommer från det svåraste innehållet, är ännu snabbare, men ingen av dem ändrar din styrka i strid. Sitt upp och stig av med tangenten bunden i dina kontroller. Du kan inte kliva upp medan du är i strid, och att svinga ett vapen, kasta en besvärjelse, vada ut i vatten eller falla i strid sätter dig alla tillbaka på fötterna.",
+      "mountsMore": "Allt om riddjur",
+      "riftTitle": "Revportaler",
+      "riftBody": "Något fortsätter riva hål i riket. Revportaler öppnar sig av sig själva ute i världen, aldrig i de tre zonerna på startvägen men över varje rike bortom dem och ute på Fjärrkusten, och hela riket hör nyheten när en river upp sig. Varje portal bär en grad, och en högre grad betyder en svårare, rikare nedstigning. En portal är en delad händelse: vilken grupp som helst kan kliva igenom och får sin egen körning inuti, men bara en grupp tar någonsin den första rensningen, så en färsk reva är värd att skynda till. Du måste vara nivå 20 för att gå in i en, och om ingen svarar i tid kollapsar revan av sig själv.",
+      "riftMore": "Allt om revor"
     },
     "questsPage": {
       "heading": "Uppdrag",
       "intro": "Uppdrag är världens hjärta och det snabbaste sättet att stiga i nivå. Här är hur de fungerar.",
       "acceptTitle": "Hitta och anta",
-      "acceptBody": "Folk med en markör över huvudet har arbete åt dig. Prata med dem för att anta ett uppdrag. I Östbäck väntar Marskalk Redbrook med Vargar vid dörren, ett av de första uppdragen du kan anta.",
+      "acceptBody": "Personer med ett märke över huvudet har arbete åt dig, och märket säger vilket slag. Ett gyllene utropstecken betyder ett uppdrag du kan ta genast, och ett gyllene frågetecken ett uppdrag du har slutfört och kan lämna in. På en namnbricka ser du också ett grått frågetecken, vilket betyder att du har det uppdraget men inte är klar än. Upprepbart arbete använder samma märken i blått: ett klarblått utropstecken är ett värv du redan gjort och kan ta igen, och samma märke nedtonat är ett som ännu är inne i sin väntan. Alla märken utom det grå syns på namnbrickor, på minikartan och på världskartan, så du kan upptäcka arbete tvärs över staden. I Eastbrook väntar marskalk Redbrook med Vargar vid dörren, ett av de första uppdrag du kan ta.",
       "objectivesTitle": "Mål",
       "objectivesBody": "Dräp vissa fiender, samla föremål eller interagera med något i världen. Skärmens spårare räknar din framgång allteftersom. Om du ändrar dig kan du släppa ett uppdrag från din uppdragslogg och ta upp det igen från dess givare senare.",
       "turninTitle": "Lämna in",
@@ -4771,11 +5106,11 @@ export const sv_SE: EnTranslations = {
       "typesTitle": "De sorters uppdrag du kommer att se",
       "typesBody": "De flesta uppdrag har en av några bekanta former. Skärmens spårare stavar exakt ut vad var och ett vill, så du lämnas aldrig att gissa.",
       "typeSlayTitle": "Dräp",
-      "typeSlayBody": "Tunna ut en flock bestar eller bryt en kults grepp genom att besegra ett bestämt antal av en markerad fiende. Ett av dina första uppdrag, att rensa vargar från Östbäcksvägen, är ett av dessa.",
+      "typeSlayBody": "Gallra en flock bestar eller bryt en kults grepp genom att besegra ett bestämt antal av en utmärkt fiende. Ett av dina första uppdrag, att rensa vargarna från vägen vid Eastbrook, är ett sådant. Då och då väcker ett uppdrag sina egna mål: något som vid din förra vända läste som kuliss får en namnbricka och blir något du kan slå på så snart du bär uppdraget som rör det, så gå tillbaka och titta igen.",
       "typeGatherTitle": "Samla",
-      "typeGatherBody": "Samla föremål från världen eller från vad fiender släpper: örter, malm, en kults dystra reagenser. Vissa delar faller bara från en särskild fiende, så jakten och bytet hör ihop.",
+      "typeGatherBody": "Samla föremål från världen eller från det fienderna tappar: örter, malm, en kults dystra reagenser. Vissa stycken faller bara från en särskild fiende, så jakten och skörden hör ihop. Saker på marken som hör till ett uppdrag ger sig bara medan du faktiskt har det, och de säger till om du inte har det, eller om du redan har nog. Vissa uppdrag ger dig också ett verktyg när du antar dem: håll ögonen på väskorna och använd det som uppdragstexten beskriver. Behöver ett uppdrag ett verktyg som ett tidigare steg gav dig, lämnar antagandet tillbaka det när du inte längre har det, så ett förlorat verktyg kan inte köra kedjan in i en återvändsgränd.",
       "typeInteractTitle": "Interagera",
-      "typeInteractBody": "Använd, rena eller läs något fast i världen: en skändad grav, en varning ristad på en strandsten, en förseglad kryptdörr. Gå fram till markören och agera på den.",
+      "typeInteractBody": "Använd, rena eller läs något fast i världen: en skändad grav, en varning ristad i en strandklippa, en förseglad kryptdörr. Gå fram till märket och verka på det. När ett uppdrag begär flera menar det flera olika: varje föremål ger dig tillgodo en enda gång, så leta upp nästa i stället för att använda samma två gånger. Föremålet förbrukas inte när du verkar på det, så alla i din grupp kan hämta sitt eget tillgodo från det.",
       "typeMusterTitle": "Mönstra försvaret",
       "typeMusterBody": "Vissa uppdrag låter dig samla en stad inför en framstöt norrut: tunna ut hotet vid portarna och samla det försvararna behöver. Dessa är dräp- och insamlingsmål i tjänst hos folket vars berättelse du befinner dig i, och de håller dig i rörelse med dem.",
       "typeGroupTitle": "Gruppfinaler",
@@ -4795,12 +5130,12 @@ export const sv_SE: EnTranslations = {
       "sideCryptBody": "Högt uppe på topparna löper ett tystare mysterium: gamla gravar märkta med en krona ingen uppteckning minns. Läs de döda, samla det de vaktade och bryt förseglingen på en grav som var menad att förbli stängd. Det är ett detektivspår som öppnar vägen till rikets slutspelsraid för tio spelare.",
       "sideTempleTitle": "Det drunknade templet",
       "sideTempleBody": "En port av blekt ljus vid en hög tjärn uppe i topparna öppnar mot en sjunken helgedom där en drunknad kult ännu sjunger. Dess korta kedja står åtskild från huvudberättelsen, ett självständigt mysterium för var och en som klättrar upp till stranden, läser varningarna ristade i klipporna och går ner för att se vad de var till för.",
-      "availableTitle": "Why an NPC has nothing for you",
-      "availableBody": "Quests come in chains. Most are offered only once you have turned in the one before them, and many also ask for a minimum level, so an NPC with nothing for you today may have plenty after your next few levels or once you close the quest you are already carrying. A few have a condition of their own, such as the riding lessons, which open only after you have bought the riding skill. Group quests say so up front by listing how many players they suggest you bring. Some jobs are repeatable: you can take them again after a wait, and the marker over the giver tells you when one has come back around.",
-      "typeEscortTitle": "Escort",
-      "typeEscortBody": "Someone needs walking somewhere dangerous. Take the quest, find the person waiting at the start of the road, and speak to them to set off. They walk their own path while you keep pace, and the trouble that lives along it comes for them, not always for you. Stay close: enemies ambush the walk in waves, and the walk only resumes once a wave is down. You cannot attack the person you are escorting, but you can heal them, and if they fall the run simply resets so you can try again. Reach the far end with them alive and you beside them, and the quest credits.",
-      "cardMasterTitle": "Not every NPC has a quest: the Card Master",
-      "cardMasterBody": "One NPC in Eastbrook deals cards instead of errands. Talk to the Card Master, pick the Card Duel line out of his menu, and you join a queue that pairs you with the next player waiting. Any class can sit down, and nothing about your level or your gear comes into it. You each play from your own deck of twenty cards, values one to ten, holding four of them at a time and drawing a fresh one each round: the higher card takes the round, and two matching cards are a push that scores for neither of you. First to two rounds takes the match, so a duel is best of three. Rounds run on a clock, so leave your card unplayed for ninety seconds and the match goes to the other side, unless no round has been scored yet, in which case it is simply thrown out with no winner. The same is true if you walk away from a duel yourself. You have to be standing with the Card Master to join the queue, but once you are matched the board opens itself and you can play from anywhere. It takes two, so the offline world never offers it."
+      "availableTitle": "Varför en NPC inte har något åt dig",
+      "availableBody": "Uppdrag kommer i kedjor. De flesta erbjuds bara sedan du har lämnat in det som kom före dem, och många kräver också en lägsta nivå, så en NPC som inte har något åt dig i dag kan ha gott om det efter dina nästa nivåer eller så snart du avslutar uppdraget du redan bär på. Ett fåtal har ett eget villkor, som ridlektionerna, vilka öppnas först sedan du har köpt ridfärdigheten. Gruppuppdrag säger det rakt ut i förväg genom att lista hur många spelare de föreslår att du tar med. Vissa uppdrag är repeterbara: du kan ta dem igen efter en väntetid, och markören över givaren talar om när ett har kommit tillbaka.",
+      "typeEscortTitle": "Eskort",
+      "typeEscortBody": "Någon behöver följas till en farlig plats. Ta uppdraget, hitta personen som väntar vid vägens början, och tala med denne för att ge er av. De vandrar sin egen väg medan du håller jämna steg, och besvären som lever längs den söker upp dem, inte alltid dig. Håll dig nära: fiender bakhåller vandringen i vågor, och den återupptas först när en våg är nedgjord. Du kan inte anfalla den du eskorterar, men du kan läka denne, och om de faller återställs försöket helt enkelt så att du kan pröva igen. Nå fram till andra änden med dem vid liv och dig vid deras sida, så tillgodoräknas uppdraget.",
+      "cardMasterTitle": "Inte varje NPC har ett uppdrag: Kortmästaren",
+      "cardMasterBody": "En NPC i Östbäck delar ut kort i stället för ärenden. Prata med Kortmästaren, välj Kortduell-alternativet i hans meny, så går du med i en kö som parar ihop dig med nästa väntande spelare. Vilken klass som helst kan sätta sig ner, och varken din nivå eller din utrustning spelar någon roll. Ni spelar var och en från er egen kortlek om tjugo kort, med värden ett till tio, håller fyra av dem åt gången och drar ett nytt varje omgång: det högre kortet tar omgången, och två matchande kort är oavgjort och ger poäng åt ingen av er. Den som först tar två omgångar vinner matchen, så en duell avgörs bäst av tre. Omgångarna löper på en klocka, så låter du ditt kort ligga ospelat i nittio sekunder går matchen till motståndaren, om inte ingen omgång ännu räknats, i vilket fall den helt enkelt kastas utan vinnare. Detsamma gäller om du själv går ifrån en duell. Du måste stå hos Kortmästaren för att gå med i kön, men när ni väl är matchade öppnas duellen av sig själv och du kan spela varifrån du vill. Det krävs två, så offlinevärlden erbjuder den aldrig."
     },
     "lore": {
       "figuresTitle": "Ansikten du kommer att lära känna",
@@ -4813,8 +5148,8 @@ export const sv_SE: EnTranslations = {
     "dungeonsPage": {
       "heading": "Fängelsehålor och raider",
       "intro": "När den öppna världen inte räcker, samla en grupp och kliv in i en instans: en privat kopia av en fängelsehåla skapad bara för din grupp.",
-      "party": "Fängelsehålor är byggda för en grupp på fem. Slutspelsraiden är för tio.",
-      "soloLead": "Varje fängelsehåla inleds med en uppdragsupptakt som kan klaras ensam, så du vet alltid varför du går in.",
+      "party": "Fängelsehålor är byggda för en grupp om fem. Slutspelsraiden är för tio. Har du inte fyra vänner till hands bygger Fängelsehålsletaren en grupp åt de vändor den ställer i kö. Nivåbandet på varje kort nedan är den nivå vändan är skriven för, inte ett lås på dörren: inget hindrar dig från att gå in tidigt eller komma tillbaka senare, även om Fängelsehålsletaren bara placerar dig i en vända som passar din nivå.",
+      "soloLead": "Fråga runt i städerna i närheten innan du går: deras uppdragsgivare delar ut kedjor som slutar i dessa salar, och att bära med sig en in gör att vändan lönar sig dubbelt.",
       "levelExact": "Nivå {n}",
       "levelBand": "Nivå {min} till {max}",
       "partySize": "{n} spelare",
@@ -4833,46 +5168,46 @@ export const sv_SE: EnTranslations = {
       "raidBody": "Bortom en förseglad kunglig dörr väntar en prövning för tio spelare: en strid i flera faser och en odödlig kraft som hela raiden måste stänga ner tillsammans. Förtjäna din väg in, ta sedan med dig nio vänner.",
       "heroicTitle": "Heroiskt läge",
       "heroicBody": "Varje fängelsehåla för fem spelare, och raiden själv, har en heroisk version som väntar bortom nivåtaket. Samma salar, omgjorda för ett välrustat slutspelsgäng: allt slår hårdare, inget går att springa ifrån till fots, och bossarna skakar av sig bedövningar och snaror helt och hållet. Väx först ur de normala versionerna; heroiskt förutsätter att du har gjort det.",
-      "heroicHowBody": "Välj svårighetsgrad innan din grupp gör anspråk på instansen: skriv /dungeon heroic, eller slå om reglaget Fängelsehålans svårighetsgrad i gruppmenyn. Valet delas av hela gruppen och låses fast vid dörren, så att ett pass förblir det som det gjordes anspråk på.",
+      "heroicHowBody": "Välj svårighetsgrad innan din grupp gör anspråk på instansen: skriv /dungeon heroic, eller välj Ställ in fängelsehålans svårighet i menyn för ditt eget porträtt. På egen hand ställer du in den själv; i grupp kan bara ledaren göra det, och valet gäller alla och låses vid dörren, så en vända förblir det den gjordes anspråk på som.",
       "heroicRewardsTitle": "Heroiska märken och uppgraderat byte",
-      "heroicRewardsBody": "Heroiska bossar släpper bytet du känner igen, uppgraderat och märkt Heroisk i verktygstipset, och den sista bossen i varje pass lägger till episka föremål som inte finns någon annanstans. Det sista dråpet lämnar också Heroiska märken åt varje deltagare: en valuta du spenderar hos Kvartersmästare Vex i Highwatch, vars lager av ringar och halsband är rikets enda smycken.",
-      "heroicLockoutBody": "Normala fängelsehålor går att köra hela dagen. Heroiskt kräver tålamod: dråpet på den sista bossen låser alla i passet till en heroisk rensning av den fängelsehålan per dag, och raiden håller en daglig spärr för varje svårighetsgrad. Ett rensat pass för fem spelare förblir öppet för den egna gruppen för likfärder och byte, så att ingen låses ute från det de förtjänat där. Raiden är strängare: så snart dess dråp låser dig förblir dörren stängd fram till den dagliga återställningen, så samla dina byten innan du lämnar arenan.",
+      "heroicRewardsBody": "Heroiska bossar tappar bytet du känner till, uppgraderat och märkt Heroiskt i informationsrutan, och slutbossen i varje vända lägger till episka föremål som inte finns någon annanstans. Den sista segern lämnar också Heroiska märken till varje deltagare: en valuta som spenderas hos kvartermästare Vex i Highwatch, vars disk är en hylla med ringar och hängen som ingenting utom beviset från de heroiska djupen kan köpa.",
+      "heroicLockoutBody": "Vanliga fängelsehålor går att löpa hela dagen. Heroiskt kräver tålamod: slutbossens fall begränsar alla i vändan till en enda heroisk genomgång av den fängelsehålan per dag, och raiden håller en daglig spärr för varje svårighetsgrad. På ett aktivt rike släpper alla dagliga spärrar tillsammans vid rikets egen nattliga återställningstimme, så en genomgång tagen strax före den timmen och en tagen strax efter hamnar på två olika dagar; spela i stället offline i din webbläsare och en spärr löper helt enkelt ut ett dygn efter ditt eget bossfall. En redan klarad vända för fem spelare står kvar öppen för den egna gruppen för likvandringar och byte, så ingen låses ute från det den förtjänat där. Raiden är strängare: när dess seger väl har spärrat dig står dörren stängd till återställningen, och enda vägen tillbaka in är en likvandring av någon som föll i just den vända som spärrade dem, så en levande raidare som går ut har gått ut för dagen. Samla ihop dina byten innan du lämnar arenan. Var och en av dessa spärrar tillhör den rollperson som förtjänade den, så en genomgång på din huvudperson lämnar dina andra rollpersoner fria.",
       "resetTitle": "Återställa dina instanser",
-      "resetBody": "Om du byter svårighetsgrad medan gruppen fortfarande har hävdade rundor ligger de gamla anspråken kvar en stund. Gruppledaren kan släppa dem direkt genom att välja Återställ alla instanser i menyn på sitt eget porträtt eller skriva /dungeon reset. Svårighetsgraden måste faktiskt ha ändrats, ingen levande eller fallen får vara kvar inuti och en kort väntetid skiljer återställningarna åt. Vid dörren på fel svårighetsgrad varnar spelet innan starten. Raiden återställs aldrig så här; dess egna låsningsregler gäller.",
+      "resetBody": "Byt svårighetsgrad medan din grupp fortfarande håller vändor i anspråk och de gamla anspråken dröjer kvar en stund innan de släpper av sig själva. Gruppledaren kan släppa dem på en gång i stället: välj Återställ alla instanser i menyn för det egna porträttet, eller skriv /dungeon reset. En återställning fungerar först efter att svårighetsgraden faktiskt har ändrats, bara så länge ingen, levande eller fallen, är kvar därinne, bara när varje lik därinne har plundrats rent, och en kort nedkylning skiljer en återställning från nästa. Kommer ni till dörren med fel svårighetsgrad säger spelet till innan vändan börjar. Raiden återställs aldrig så; dess egna spärregler står fast.",
       "templeLoreTitle": "Det dränkta templet, lite djupare",
       "templeLoreBody": "Templet har sin egen legend, äldre än kulten du jagar på andra håll. Vid stranden av Glimmertjärnen, en tjärn som dricker månljuset och ger tillbaka de dränkta, vaktar en ensam väktare en port av blekt ljus. Under ytan löper en trappa av kall sten ner till den. Folket som sjönk där dränktes inte av olyckshändelse: de var Den bleka kören, som gick under i tillbedjan och aldrig slutade sjunga. De gamla väktarna ristade en enda varning i klipporna innan vattnet tog dem, en bön till något de kallade Den dränkta månen, med en stadigare hand som lade till två ord under den: den bara sover.",
       "cryptLeadTitle": "En dörr de döda var menade att hålla stängd",
       "cryptLeadBody": "Högt uppe på topparna, bortom huvudstriden, vilar ett kallare mysterium. Gamla gravar bär en krona som ingen krönika minns, och de döda som vaktar dem tjänade en gång en bortglömd kung. Läs deras stenar, samla de nyckelstenar de bevarade, så kan du bryta förseglingen på en grav som tre lojala själar dog för att hålla stängd, den valfria prövningen som öppnar riket för dess raid för tio spelare åt dem som följer ledtrådarna ända till slutet.",
-      "formatsNote": "Dungeons and the raid are one of three instanced formats. Delves are the short descents for one or two, and rifts are the tears that open out in the world and drop a group into a dungeon built fresh every time.",
-      "finderTitle": "Finding a group",
-      "finderBody": "You do not have to shout in chat to fill a party. Open the Dungeon Finder to see the runs it queues for, pick the ones you would go to, choose the role you will play, and join the queue. The finder builds a full group with the right mix of tank, healer, and damage, then offers it to everyone at once, and you are grouped the moment the party accepts. The list is not only five-player runs: the ten-player raid queues here too, at both difficulties, though the finder never checks whether you have earned your way in, so the door itself can still turn you back. Not every run in the realm is on its list, so glance at it before you count on it for a particular dungeon. One thing it does not do is move you: the finder forms the group and points you at the entrance, and everybody still travels to the door on their own feet.",
-      "finderRolesBody": "Your role choices come from your class before you specialize, and from your active specialization once you have one, so a healer queues as a healer. Past the level talents open at, the finder wants you to have chosen a specialization before it will give you a role at all. Each run on the list also carries its own level band, tighter than the door itself, and every member of a queued party has to sit inside it: the finder will not seat a character the group would have to carry.",
-      "finderOfferBody": "A formed group is offered for a short window, so answer promptly. Let the offer lapse or turn it down and the finder holds you out of the queue for a moment before you can rejoin, which keeps a half-answered group from stalling everyone else.",
-      "finderBoardBody": "Prefer to pick your own company? A party leader can post the group on the premade board instead, tagged with what the run is for: a first run, a quest run, a full clear, a learning run, or a fast one. Other players apply and the leader decides who comes along. There is no free-form advertisement text, only the tags, and one entry on the list is board-only, offered for a posting rather than an automatic queue."
+      "formatsNote": "Fängelsehålorna och raiden är ett av tre instansierade format. Delver är de korta nedstigningarna för en eller två, och revor är rämnorna som slår upp ute i världen och släpper ner en grupp i en fängelsehåla byggd på nytt varje gång.",
+      "finderTitle": "Hitta en grupp",
+      "finderBody": "Du behöver inte ropa i chatten för att fylla en grupp. Öppna Fängelsehålsletaren för att se de genomgångar den köar för, välj de du skulle gå på, välj rollen du vill spela och ställ dig i kön. Letaren bygger en full grupp med rätt blandning av tank, helare och skadegörare, erbjuder den till alla samtidigt, och du grupperas i samma stund som gruppen accepterar. Listan är inte bara femspelargenomgångar: tiospelarraiden köar här också, i båda svårighetsgraderna, även om letaren aldrig kontrollerar om du har förtjänat din plats, så själva dörren kan fortfarande visa dig bort. Inte varje genomgång i riket finns på dess lista, så kasta en blick på den innan du räknar med den för en specifik fängelsehåla. En sak den inte gör är att flytta dig: letaren formar gruppen och pekar dig mot ingången, men alla reser fortfarande till dörren på egna ben.",
+      "finderRolesBody": "Dina rollval kommer från din klass innan du specialiserar dig, och från din aktiva specialisering när du väl har en, så en helare köar som helare. Bortom nivån där talanger öppnas vill letaren att du ska ha valt en specialisering innan den ger dig någon roll alls. Varje genomgång på listan har också sitt eget nivåband, snävare än själva dörren, och varje medlem i en köad grupp måste ligga inom det: letaren sätter aldrig in en karaktär som gruppen skulle behöva bära.",
+      "finderOfferBody": "En bildad grupp erbjuds under ett kort fönster, så svara snabbt. Låter du erbjudandet rinna ut eller tackar nej håller letaren dig utanför kön en stund innan du kan gå med igen, vilket hindrar en halvbesvarad grupp från att sinka alla andra.",
+      "finderBoardBody": "Föredrar du att välja ditt eget sällskap? En gruppledare kan i stället publicera gruppen på fliken Förberedda grupper, taggad med vad genomgången är till för: Första genomgången, Uppdragsgenomgång, Full rensning, Nybörjare välkomna, eller Snabb genomgång. Andra spelare ansöker, och ledaren bestämmer vem som får följa med. Det finns ingen fritextannons, bara taggarna, och en post på listan finns bara på den tavlan, erbjuden som en annons snarare än en automatisk kö."
     },
     "riftsPage": {
-      "heading": "Rifts",
-      "intro": "A rift is a tear in the world itself, not a door you walk to. Step through one and you get a descent nobody has run before: the floors, the monsters, and the thing waiting at the bottom are all built fresh for that rift alone, so the same rank never plays out the same way twice.",
-      "whatHeading": "What a rift is",
-      "whatBody": "Dungeons are places. They sit where they have always sat, and you learn them until you know every corner. A delve is a short private descent you start from a board, cut for one or two. A rift is neither: it opens on its own, out in the world, with no warning, and everything inside it is generated the moment it does. Nobody has a route to hand you, because nobody has been down this one. It is instanced like the other two, so what you find inside belongs to you and your group alone, but it is the only instanced content in the game that comes looking for you rather than waiting to be found.",
-      "openHeading": "Where rifts open, and how often",
-      "openBody": "Rifts tear open out in the wider zones of the realm rather than in the early valley, and the whole realm hears about it: a line in your chat names the rank and the zone the moment one appears. Each eligible zone comes up for a rift about once an hour, and a zone that already has one standing waits its turn rather than opening a second. A rift nobody closes collapses on its own after a couple of hours, and the realm hears that too. A zone whose rift was sealed stays quiet until its next turn comes around, so an announcement is worth walking toward while it is fresh.",
-      "ranksHeading": "The four ranks",
-      "ranksBody": "Every rift is ranked C, B, A, or S, and the rank rides in the announcement, so you know what you are walking toward before you leave town. C is the gentlest, B and A climb from there, and S is the hardest thing a rift can be. Rank is the dial that decides how mean the floors are, and the harder ranks pay accordingly, so take the one your group can actually hold.",
-      "rankFmt": "Rank {rank}",
-      "groupHeading": "Who goes in",
-      "groupBody": "Bring a group. A rift does not soften because fewer of you walked through it: nothing inside counts how many are standing there, so the rank on the portal is the rank you fight, whether that is five of you or one. The doorway will let you in alone, and people do try it, but a rift is group content at every rank and it is honest about that from the first room. Your party gets its own copy of the rift, so no other group can spill into your run. If you fall, you can walk back in as a ghost and collect yourself once the fighting inside has stopped.",
-      "levelNote": "Rifts are endgame content. You have to be at the level cap, level {n}, to step through one, at any rank.",
-      "floorsHeading": "Down through the floors",
-      "floorsBody": "A rift runs a handful of floors, each one built fresh, and the way down does not open until the floor is finished with you: clear what is living on it, solve whatever it has locked across your path, and the descent tears open. The last floor ends on a boss. Every floor takes a character of its own, so a single run can carry you out of the frost and into the embers, and your chat names each floor as you arrive on it. The tracker on your screen is where you learn how many floors this one has. A few rifts open onto a hand-built set piece instead of a generated descent, which runs to its own fixed length.",
-      "boundHeading": "Once you draw blood",
-      "boundBody": "The first kill your group takes inside a rift settles the run, and so does the first off-path cache you crack open. From that moment you are bound to that copy of it: step out for any reason and coming back puts you in the run you left, never in another group's and never in a fresh one, for as long as the entrance out in the world is still standing. Before that first kill, and before that first cache, nothing is settled, so a group that is still gathering can regroup and walk in together without stranding half-started copies behind them.",
-      "raceHeading": "The race for the first clear",
-      "raceBody": "Every group in the realm can attack the same rift at once, each in its own copy, and only the first to bring down the thing at the bottom seals it. When a group wins, the realm hears their names and their time, and the way in closes behind them. Losing the race does not end your run: your copy stays open, the thing at the bottom still falls to you, and you still walk out under your own power. What it costs you is everything that clearing it would have paid. The boss leaves nothing behind for the group that came second, so what you carry home is what dropped off the mobs on the way down, and nothing more. The Book of Deeds still counts the clear, because you did put the thing down. It is the only race in the game you can lose without ever laying eyes on the people who beat you.",
-      "rewardsHeading": "What you carry out",
-      "rewardsBody": "Sealing a rift, not merely surviving one, is what pays. Bring the rift down first and it pays like the instanced content its rank stands beside, so the harder ranks are worth the harder run. Sealing also puts a Riftbound band in the hands of everyone who was there, cut to your class's role and personal to you, and leaves Rift Essence in your bags besides, with rift gems on top of it at the harder ranks. Beside the way home, the thing at the bottom leaves a sealed cache your group can pick open for extra spoils, using the same Tumbler's Path lockpicking you know from delve chests, so a clean, patient job pays better than a rushed one. None of that reaches a group that came second: a lost race leaves you only what dropped off the mobs on the way down. The Book of Deeds is the exception, and it counts your clear either way, with a deed for closing your first rift and another for taking down an S-rank one.",
-      "trackerHeading": "The tracker on your screen",
-      "trackerBody": "While you are inside, a small strip on your screen keeps you oriented: which floor you are on out of how many, and a live countdown. Read that countdown carefully, because it is not your run running out. It is the entrance back in the world closing. Once you are through, your group plays the rift out at its own pace, however long that takes, but when that clock reaches zero the way in is gone for everybody, so think twice about stepping outside near the end of it."
+      "heading": "Revor",
+      "intro": "En reva är bokstavligen en reva i själva världen, inte en dörr du går fram till. Kliv igenom en och du får en nedstigning ingen någonsin gått förut: våningarna, monstren och det som väntar längst ner byggs alla på nytt just för den revan, så samma grad spelar aldrig ut sig likadant två gånger.",
+      "whatHeading": "Vad en reva är",
+      "whatBody": "Fängelsehålor är platser. De ligger där de alltid har legat, och ni lär er dem tills ni känner varje hörn. En delve är en kort privat nedstigning ni startar från en tavla, gjord för en eller två. En reva är varken det ena eller det andra: den öppnas av sig själv, ute i världen, utan förvarning, och allt därinne genereras i samma stund. Ingen kan ge er en rutt, för ingen har gått ner i just den här. Den är instansierad som de andra två, så det ni hittar därinne tillhör bara er och er grupp, men det är det enda instansierade innehållet i spelet som kommer och letar upp er i stället för att vänta på att hittas.",
+      "openHeading": "Var revor rivs upp, och hur ofta",
+      "openBody": "Revor rivs upp ute i rikets vidare zoner snarare än i den tidiga dalen, och hela riket hör talas om det: en rad i er chatt namnger graden och zonen i samma stund en dyker upp. Varje kvalificerad zon får en chans till en reva ungefär en gång i timmen, och en zon som redan har en stående väntar på sin tur i stället för att öppna en andra. En reva som ingen stänger kollapsar av sig själv efter ett par timmar, och riket hör det också. En zon vars reva förseglades ligger tyst tills dess nästa tur kommer, så en kungörelse är värd att gå mot medan den är färsk.",
+      "ranksHeading": "De fyra graderna",
+      "ranksBody": "Varje reva har en grad: C, B, A eller S, och graden följer med i kungörelsen, så ni vet vad ni går mot innan ni lämnar staden. C är den mildaste, B och A stiger därifrån, och S är det hårdaste en reva kan bli. Graden är ratten som avgör hur elaka våningarna är, och de hårdare graderna betalar därefter, så ta den ni faktiskt klarar av att hålla.",
+      "rankFmt": "Grad {rank}",
+      "groupHeading": "Vilka som går in",
+      "groupBody": "Ta med en grupp. En reva mjuknar inte för att färre av er gick igenom den: ingenting därinne räknar hur många som står där, så portalens grad är den grad ni möter, vare sig ni är fem eller en. Dörren släpper in er ensamma också, och folk provar faktiskt det, men en reva är gruppinnehåll på varje grad, och den är ärlig med det redan från det första rummet. Er grupp får sin egen kopia av revan, så ingen annan grupp kan blanda sig i den. Om ni faller kan ni gå tillbaka in som spöke och samla ihop er själva när striden därinne har lagt sig.",
+      "levelNote": "Revor är slutspelsinnehåll. Du måste ha nått maxnivån, nivå {n}, för att kliva igenom en, oavsett grad.",
+      "floorsHeading": "Ner genom våningarna",
+      "floorsBody": "En reva rymmer en handfull våningar, var och en nybyggd, och vägen ner öppnas inte förrän våningen är färdig med er: rensa det som lever där, lös vad den än har låst över er väg, och nedstigningen river upp sig. Den sista våningen slutar vid en boss. Varje våning bär sin egen karaktär, så en och samma reva kan föra er från frosten rakt in i glöden, och er chatt namnger varje våning när ni når den. Spåraren på skärmen är där ni ser hur många våningar just den här har. Ett fåtal revor öppnar mot ett handbyggt scenarium i stället för en genererad nedstigning, och det har sin egen fasta längd.",
+      "boundHeading": "Så snart blod flutit",
+      "boundBody": "Gruppens första dråp inne i en reva avgör vilken kopia ni är bundna till, och detsamma gör det första förrådet utanför vägen som ni bryter upp. Från det ögonblicket är ni bundna till just den kopian: kliver ni ut av någon anledning och kommer tillbaka hamnar ni i samma kopia ni lämnade, aldrig i en annan grupps och aldrig i en ny, så länge ingången ute i världen fortfarande står kvar. Före det första dråpet, och före det första förrådet, är ingenting avgjort, så en grupp som fortfarande samlas kan gruppera om och gå in tillsammans utan att lämna halvpåbörjade kopior bakom sig.",
+      "raceHeading": "Kapplöpningen om den första rensningen",
+      "raceBody": "Varje grupp i riket kan anfalla samma reva samtidigt, var och en i sin egen kopia, och bara den första som fäller det som väntar längst ner förseglar den. När en grupp vinner hör riket deras namn och deras tid, och vägen in stängs bakom dem. Att förlora kapplöpningen avslutar inte er kopia: den står kvar öppen, det som väntar längst ner faller ändå för er, och ni går ut på egna ben ändå. Vad det kostar er är allt det som en riktig rensning skulle ha betalat. Bossen lämnar ingenting efter sig åt gruppen som kom tvåa, så det ni bär hem är bara det som föll från de andra fienderna på vägen ner, och inget mer. Bedrifternas bok räknar rensningen ändå, för ni fällde faktiskt det som väntade. Det är den enda kapplöpningen i spelet ni kan förlora utan att någonsin se de som slog er.",
+      "rewardsHeading": "Vad ni bär ut",
+      "rewardsBody": "Det är att försegla en reva, inte bara att överleva en, som lönar sig. Fäller ni revan först betalar den som det instansinnehåll dess grad står bredvid, så de hårdare graderna är värda den hårdare körningen. Att försegla lägger också en Revbunden ring i händerna på alla som var där, var och en skuren efter den egna klassens roll och personlig för den spelaren, och lämnar Revessens i era väskor därtill, med revstenar ovanpå det på de hårdare graderna. Vid sidan av vägen hem lämnar det som väntar längst ner ett förseglat förråd er grupp kan dyrka upp för extra byte, med samma Tappens väg-dyrkning ni känner från delve-kistor, så ett rent, tålmodigt arbete lönar sig bättre än ett hastigt. Inget av detta når en grupp som kom tvåa: en förlorad kapplöpning lämnar er bara det som föll från fienderna på vägen ner. Bedrifternas bok är undantaget, och den räknar er rensning oavsett, med en bedrift för att försegla er första reva och en till för att fälla en av grad S.",
+      "trackerHeading": "Spåraren på din skärm",
+      "trackerBody": "Medan ni är därinne håller en liten rad på skärmen er orienterade: vilken våning ni är på av hur många, och en levande nedräkning. Läs den nedräkningen noga, för det är inte er kopia som rinner ut. Det är ingången tillbaka ut i världen som stängs. När ni väl är igenom spelar er grupp ut revan i sin egen takt, hur lång tid det än tar, men när klockan når noll är vägen in borta för alla, så tänk er för innan ni kliver ut nära slutet av den."
     },
     "delvesPage": {
       "heading": "Delver",
@@ -4886,7 +5221,7 @@ export const sv_SE: EnTranslations = {
       "tiersLabel": "Svårighetsgrader",
       "affixesLabel": "Möjliga modifierare",
       "whatHeading": "Vad en delve är",
-      "whatBody": "En delve är en liten instansierad fängelsehåla gjord enbart för dig och upp till en allierad, en privat kopia där du inte kan bli störd. Du startar den från en tavla som sköts av en delvevaktare ute i världen, hoppar in, slåss dig ner genom en handfull rum och avslutar på en enda väktare. Omgångar går snabbt och är menade att upprepas, så en delve är en pålitlig bit framsteg närhelst den öppna världen sinar.",
+      "whatBody": "En delve är en liten instansierad fängelsehåla gjord bara för dig och högst en bundsförvant, en privat kopia där du inte kan störas. Du startar den från en anslagstavla som en delve-väktare håller ute i världen, du stiger ner, slåss dig igenom en handfull rum och avslutar på en enda väktare. Vad som väntar bortom den väktaren skiljer sig från delve till delve: en förseglar sitt byte bakom ett lås, en annan begär en rit av dig. Vändorna är snabba och menade att upprepas, så en delve är pålitligt framsteg närhelst den öppna världen sinar.",
       "howHeading": "Så fungerar en omgång",
       "howBody": "Prata med vaktaren för att öppna tavlan, välj en svårighetsgrad och stig ner. Varje omgång knyter ihop ett par korta kammare och avslutas vid sin väktare; rensa den för att kräva din belöning och återvända till ytan. Ta med en vän om du har en, eller luta dig mot din följeslagare om du inte har det.",
       "companionHeading": "Din följeslagare",
@@ -4898,27 +5233,28 @@ export const sv_SE: EnTranslations = {
       "affixesHeading": "Omgångsmodifierare",
       "affixesBody": "Svårare omgångar slumpar fram en modifierare som ändrar hur nedstigningen spelas, från rastlösa döda, till dålig luft, till takverk som ger vika. De höjer faran och belöningen tillsammans. Varje delve drar från de modifierare som passar dess tema; i hela riket ser poolen ut så här:",
       "marksHeading": "Delve-märken",
-      "marksBody": "Att rensa delver ger Delve-märken, en valuta som hålls åtskild från ditt mynt. Spendera dem hos vaktaren för att stärka din följeslagare och plocka upp utrustning du inte hittar någon annanstans.",
+      "marksBody": "Att rensa delves ger Delve-märken, en valuta som hålls skild från dina pengar. Spendera dem hos väktaren för att stärka din följeslagare och plocka upp utrustning du inte hittar någon annanstans.\n\nMärken belönar dagens första vändor mest. De tre första genomgångarna varje dag betalar fullt, och därefter betalar en delve fortfarande, bara mindre pålitligt, där den svårare graden håller sig bättre än den lättare. Räkningen rullar om dagligen, så det finns ingen anledning att köra en delve i botten: kom tillbaka i morgon så väntar den goda taxan.",
       "whereHeading": "Var du hittar en",
       "whereBody": "Den första delven, Det rasade relikvariet, öppnar vid Relikkullen i startdalen Östbäcksdalen. Broder Halven sköter tavlan där, och han skickar ner dig så snart du är redo. Hans rundor slutar inte där: bortom Trollhögarna vid Dykärrsträskets norra rand öppnar samme väktare Den dränkta litanian för delvare som har hittat fotfästet.",
-      "lockpickAnteBody": "You settle the terms before you touch the lock. Take three picks and you have room to fumble, but the chest pays its plainest prize; take two for the middle bargain; take one and a clean solve pays the richest of all. The fewer picks you hold, the less time you have to think between moves, and if the last one snaps the lock jams for good: that chest is lost until you clear the delve again.",
-      "riteHeading": "When a delve ends in a rite",
-      "riteBody": "Not every delve ends at a lock. The Drowned Litany closes on a rite instead: once its guardian falls, the shrines around the reliquary light in an order and ask you to answer it back. You choose how hard to make it before it begins, the same bargain the picks ask for. The gentle setting replays the sequence for you more than once and gives you more than one attempt, but it caps what the reliquary will pay; the sternest shows the order a single time, gives you a single attempt, and is the only way to the richest prize."
+      "lockpickAnteBody": "Du gör upp villkoren innan du rör låset. Ta tre dyrkar och du har utrymme att fumla, men kistan betalar sitt blygsammaste pris; ta två för medelbra villkor; ta en, och en ren lösning betalar det allra rikaste. Ju färre dyrkar du håller, desto mindre tid har du att tänka mellan dragen, och om den sista går av kärvar låset för gott: den kistan är förlorad tills du rensar delven igen.",
+      "riteHeading": "När en delve avslutas med en rit",
+      "riteBody": "Inte varje delve avslutas vid ett lås. Den dränkta litanian stänger med en rit i stället: när dess väktare faller flammar helgedomarna runt relikvariet upp i en ordning och ber dig svara tillbaka. Du väljer hur svårt du vill göra det innan det börjar, samma avvägning som dyrkarna kräver. Den mildaste inställningen spelar upp sekvensen för dig mer än en gång och ger dig mer än ett försök, men den sätter ett tak för vad relikvariet betalar ut; den strängaste visar ordningen en enda gång, ger dig ett enda försök, och är den enda vägen till det allra rikaste priset."
     },
     "talentsPage": {
       "heading": "Talanger och specialiseringar",
       "intro": "Talanger är hur du gör en klass till din egen. De är frivilliga, förlåtande och lätta att ändra, så du kan experimentera utan rädsla.",
       "whatHeading": "Vad talanger gör",
-      "whatBody": "När du levlar tjänar du talangpoäng att spendera på små, permanenta förbättringar av dina förmågor och egenskaper. De formar hur en klass känns och lutar den mot mer skada, robustare försvar eller starkare läkning.",
+      "whatBody": "Dina talanger är en kort stege av val snarare än en hög med poäng. Varje rad som öppnas erbjuder tre alternativ, och du tar exakt ett. De formar hur en klass känns och lutar den mot mer skada, tåligare försvar eller starkare läkning.",
       "howHeading": "Så fungerar de",
-      "howBody": "Talanger låses upp vid nivå 10, och du fortsätter tjäna poäng medan du klättrar mot maxnivån. Du spenderar dem i din klass talangpanel, där djupare rader öppnas allteftersom du investerar och stiger i nivå, och du kan spara fler än en uppsättning för att växla mellan byggen.",
+      "howBody": "Talanger öppnas på nivå 5, samma nivå där du väljer din specialisering. Fem rader till följer allteftersom du stiger, en på vardera nivå 8, 11, 14, 17 och 20, så att den sista landar på nivåtaket. Du gör dina val i din klass talangpanel, på fliken Val bredvid fliken Specialisering.",
       "shareNote": "Ett färdigt bygge kan kopieras till en kort delbar kod och ges till en vän, som klistrar in den rakt i sin egen talangpanel för att ladda det.",
-      "choiceNote": "Ett fåtal poäng i varje träd är en vägkorsning snarare än ett köp: noden erbjuder två eller tre alternativ och du binder dig vid ett av dem. Din nästa återställning öppnar valet på nytt, precis som allt annat i trädet.",
+      "choiceNote": "Varje rad är ett vägskäl: den erbjuder tre alternativ och du binder dig vid ett av dem. Din nästa återställning öppnar vart och ett av de valen på nytt.",
       "resetTitle": "Inget är permanent",
-      "resetNote": "Du kan återställa dina talanger när som helst du är utanför strid och inte i en arenamatch, så ett tidigt val är aldrig en fälla. Prova saker, se vad du gillar, och ändra dig fritt.",
+      "resetNote": "Du kan återställa dina talanger när som helst så länge du är utanför strid och inte i en arenamatch, så ett tidigt val är aldrig en fälla. En återställning rensar dina radval och kostar ingenting, och din specialisering står kvar som den är, så en återställning tar aldrig ifrån dig din roll mitt i en vända. Slagfältet är undantaget, och där kan du ändra ditt bygge mellan striderna. Prova saker, se vad du gillar och ändra dig fritt.",
       "specsHeading": "Specialiseringar per klass",
-      "specsBody": "Varje klass har en handfull specialiseringar, var och en med sin egen roll och ett kännetecknande fokus. Att välja en i talangpanelen ger en kännetecknande förmåga och ett bestående mästerskap av sitt eget slag. Här är formen på dem alla. Öppna en klass för dess fullständiga uppsättning.",
-      "loadoutNote": "You do not have to settle on one build. Save a named layout in the panel and it remembers both its picks and your action bar, so switching to another one is a single click, under the same rule as a reset: out of combat, and not in an arena match or a battleground."
+      "specsBody": "Varje klass har en handfull specialiseringar, var och en med sin egen roll och ett kännetecknande fokus. Du väljer en i talangpanelen på nivå 5. Den ger en signaturförmåga och ett bestående mästerskap, de flesta lägger till passiva bonusar som passar rollen, och det är också rollen du anmäler dig som i Fängelsehålsletaren. Här är formen på dem alla. Öppna en klass för dess fulla utrustning.",
+      "loadoutNote": "Du behöver inte nöja dig med ett enda bygge. Spara en namngiven layout i panelen så minns den både dina val och ditt handlingsfält, så att byta till en annan bara blir ett enda klick, under samma regel som en återställning: utanför strid, och inte i en arenamatch.",
+      "loadoutGearNote": "En uppsättning kan bära din utrustning också. Spara den med posten som erbjuder sig att behålla utrustningen med, så tecknar den även ner vad du hade på dig, och det är det som gör ett PvP-set och ett fängelsehålsset ett klick ifrån varandra i stället för sexton. Den minns det exakta stycket och inte bara dess namn, så en förtrollad ring byts aldrig tyst mot den enkla tvillingen som ligger bredvid den i väskorna. Det den inte hittar när du byter tillbaka lämnas helt enkelt i fred och rapporteras, så ett set som förlorat ett stycke till banken eller marknaden utrustar ändå allt annat."
     },
     "arenaPage": {
       "heading": "Arena och PvP",
@@ -4926,24 +5262,24 @@ export const sv_SE: EnTranslations = {
       "duelsHeading": "Dueller",
       "duelsBody": "Utmana vilken spelare du än möter till en vänskaplig duell. Inget står på spel utom stoltheten, så det är det enklaste sättet att lära sig en matchning eller göra upp en vänskaplig tvist.",
       "coliseumHeading": "Det askgråa colosseumet",
-      "coliseumBody": "Coliseum är rikets arena, där du möter andra spelare i rankade matcher, en mot en eller två mot två. Varje division håller sin egen ställning, så en seger lyfter dig uppför den stegen för hela riket att se. Öppna Arena-fönstret för att anmäla dig till en division, ensam eller med din partner.",
+      "coliseumBody": "Kolosseum är rikets arena, där du möter andra spelare i rankade matcher, en mot en eller två mot två. Varje klass håller sin egen ställning, så en seger lyfter dig på den stegen inför hela riket. Rankat spel öppnar på nivå 15, och det gäller din partner också: är någon av er under den står kön stängd tills ni båda kvalificerar er. Allt spelare mot spelare bor bakom en enda knapp, märkt PvP: öppna den och välj en flik, Törnhålefälten, en mot en eller två mot två, och anmäl dig sedan ensam eller med din partner. Medan du står i kö eller är i en match förblir de andra flikarna låsta, så du kan aldrig stå i två köer samtidigt.",
       "ladderHeading": "Klättra på rankingstegen",
       "ladderBody": "Rankat spel följer din ställning över tid. Kolla topplistan för att se var du befinner dig och vem som håller rikets topp.",
-      "rewardsHeading": "What ranked play pays",
-      "rewardsBody": "A ranked win pays Honor, the player versus player currency, and a loss costs you nothing but rating. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further, a long winning day pays a little less per win as it goes on, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset.",
-      "honorHeading": "Honor",
-      "honorBody": "Honor is the currency of fighting other players. You earn it in the Coliseum and out on Thornhollow Fields, it is kept apart from your coin and never mixes with it, and your character sheet shows how much you are holding. There is exactly one thing to spend it on: Warfare gear.",
-      "quartermastersBody": "Two quartermasters keep the same shelves, so trade with whichever is nearer. FURY, the Honor Quartermaster, stands in Eastbrook Vale, and Warmarshal Draven Kole, Master of the Warfare Stores, keeps the counter in Highwatch. Their stock is the Warfare tier: five armor families, plus necks, rings, and weapons shared across all of them.",
-      "honorFinalNote": "Honor purchases are final. A coin purchase can be undone from a vendor's buyback list, but an Honor purchase never lands there, and Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything. The shop asks you to confirm for that reason: read the piece before you press it.",
-      "warfareHeading": "Warfare gear",
-      "warfareBody": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit is worth nothing on a dungeon boss.",
-      "warfareTradeBody": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and everything it does bring is spent on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons."
+      "rewardsHeading": "Vad rankat spel betalar",
+      "rewardsBody": "En rankad vinst betalar Heder, valutan för spelare mot spelare, och en förlust kostar dig ingenting annat än ställning. Heder är tänkt att belöna riktiga matcher: att besegra samma motståndare eller samma lag igen samma dag betalar inget mer, en lång vinstdag ger lite mindre Heder per vinst ju längre den pågår, och en match din motståndare ger förlorad flyttar ändå din ställning men betalar ingen Heder alls. Den dagen är Hederns egen, och den rullar över på sin egen klocka snarare än med rikets instansåterställning.",
+      "honorHeading": "Heder",
+      "honorBody": "Heder är valutan för att slåss mot andra spelare. Du tjänar den i Coliseum och ute på Törnhålefälten, den hålls skild från ditt mynt och blandas aldrig med det, och ditt karaktärsblad visar hur mycket du har. Det finns precis en enda sak att spendera den på: Krigföringsutrustning.",
+      "quartermastersBody": "Två kvartersmästare håller samma hyllor, så handla med den som är närmast. RASERI, Hederskvartermästaren, står i Östbäcksdalen, och Krigsmarskalk Draven Kole, Mästare av Krigföringsförråden, sköter disken i Highwatch. Deras lager är Krigföringsnivån: fem rustningsfamiljer, plus halsband, ringar och vapen som delas mellan dem alla.",
+      "honorFinalNote": "Hederköp är slutgiltiga. Ett myntköp kan ångras från en handlares återköpslista, men ett Hederköp hamnar aldrig där, och Krigföringsutrustning blir själsbunden i samma stund du köper den, så den kan aldrig bytas, skickas med post eller säljas tillbaka för något. Butiken ber dig bekräfta av just den anledningen: läs plagget innan du trycker på det.",
+      "warfareHeading": "Krigföringsutrustning",
+      "warfareBody": "Varje Krigföringsplagg bär Krigföringsanfallsvärdering och Krigföringsförsvarsvärdering, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare: i en duell, i arenan eller på slagfältet, där Anfallsvärdering lägger till skadan du vållar och Försvarsvärdering minskar skadan du tar, vardera upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså Krigföringsvärdering eller effekter som bara fungerar mot spelare, så en full uppsättning krigföringsutrustning är värdelös mot en fängelsehåleboss.",
+      "warfareTradeBody": "Det är den medvetna avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålenivåerna: ett Krigföringsplagg bär aldrig de stridsvärden en episk fängelsehålepjäs i samma plats gör, och allt det faktiskt ger spenderas på andra spelare. Vill du hålla din egen i arenan, köp den. Vill du klara heroiska snabbare, förtjäna din utrustning i fängelsehålorna."
     },
     "thornhollowPage": {
       "heading": "Törnhålefälten",
       "intro": "Ett rankat slagfält för fem mot fem där man erövrar flaggan, utkämpat i en murad sänka i den gamla skogen nedanför Törntoppen, där två förfallna fästningar möter varandra utmed en ravin och en äldre gård ligger mellan dem som ingen av dem någonsin har hållit. Två lag om fem, två fästningar, ett mål: stjäl fiendens banér och spring det hem innan de springer med ditt.",
       "queueHeading": "Ställa sig i kö",
-      "queueBody": "Öppna Törnhålefälten-panelen och ställ dig i kön ensam, eller ta med en grupp på upp till fem och köa tillsammans: grupper hålls alltid på samma lag, och de återstående platserna fylls med ensamma mästare. När tio står redo placerar matchen båda lagen vid sina fästningar för en kort samling innan flaggorna aktiveras.",
+      "queueBody": "Törnhålefälten öppnar på nivå 20, och varje medlem i en grupp måste nå den innan gruppen kan anmäla sig. Öppna knappen PvP och välj fliken Törnhålefälten, den flik den öppnar på, och gå sedan in i kön ensam, eller ta med en grupp på upp till fem och anmäl er tillsammans: grupper hålls alltid i samma lag, och de återstående platserna fylls med ensamma mästare. När tio står redo placerar matchen båda lagen vid sina fästen för en kort uppställning innan flaggorna går live. Skulle en grupp om fyra eller fem annars möta bara ensamanmälda håller matchningen tillbaka matchen en kort stund för att se om en andra grupp dyker upp, så en grupp av den storleken väntar ibland några ögonblick längre innan portarna öppnas. Den väntan är kort och ger alltid med sig till slut, så ingen blir sittande i kön för den.",
       "fieldHeading": "Fältet",
       "fieldBody": "Ett murat fält i det fria, format i tre kammare: varje lag har sitt eget fält framför sin fästning, och den murade Ruingården ligger mellan dem. Två murar spänner över hela bredden, och varje förflyttning mellan kamrarna passerar en omstridd korsning: den breda huvudporten, eller porthuset, ett litet rum som spänner över muren, vars förskjutna dörrar tvingar fram en avstickare förbi ett bakhållshörn. Varje fästning är stängd utom sin mynning, så varje flaggspring börjar och slutar genom samma öppning, och en låg barrikad bryter den raka stormningen in i den. Gården rymmer ruinen i hålans hjärta och de två flankernas Fartrunor; de andra två väntar vid flaggornas infarter. En Stridsruna eller Värnruna (mer skada utdelad, eller mindre skada tagen, i några sekunder) väntar vid varje huvudports mynning mot gården: båda plattorna öppnar matchen på samma sida och byter sida vid varje tagning.",
       "flagsHeading": "Flaggor",
@@ -4953,10 +5289,13 @@ export const sv_SE: EnTranslations = {
       "respawnBody": "Döden följer det klassiska riten: din kropp ligger kvar där den föll tills DU släpper, och anden reser sig på den inhägnade kyrkogården bredvid din fästning, skyddad där tills ditt lags nästa återuppståndelsevåg. Vågen reser varje väntande ande tillsammans, och de två lagens vågor är medvetet förskjutna i tid, så striden återställs aldrig helt på en gång. Det finns ingen likfärd och ingen uppgörelse med Andeläkaren: släpp, vänta ut vågen, slåss.",
       "carrierHeading": "Att bära flaggan",
       "carrierBody": "En bärare som håller fiendens flagga för länge blir alltmer sårbar och tar allt mer skada tills flaggan erövras, tappas eller återlämnas. Att gömma sig med flaggan är en förlorande plan; att springa hem den är den vinnande.",
+      "leavingHeading": "Att lämna tidigt, och att fylla en tom plats",
+      "leavingBody": "Att lämna en pågående match är att desertera från den, och en rankad stege kan inte belöna den som drar ur sladden vid en förlorande ställning: en desertör tar förlusten och rankningen som följer med den på fläcken, tappar flaggan om den bars, och laget strider vidare en spelare kort. Just den sista delen är vad den tomma platsen är till för. Så länge en match saknar en stridande kan kön erbjuda stolen till någon som väntar, och det är alltid ett erbjudande du antar eller avböjer, inte en teleportering som drabbar dig; att avböja kostar dig ingenting och skickar det vidare till nästa i ledet. Bara de som ställt sig i kö ensamma tillfrågas, så en grupp som anmält sig tillsammans splittras aldrig för att fylla ett hål.",
+      "backfillNote": "Att ta en inhopparplats är avsiktligt riskfritt: du kliver in i en ställning du inte haft någon del i, så matchen rör inte din rankning åt något håll, vinst eller förlust, och att lämna en sådan är du inte skyldig något. Erbjudandet slutar dessutom komma så snart en match är nära nog sitt slut för att en ankomst inte skulle kunna ändra den, så du sätts aldrig in i någon annans avslutning.",
       "ladderHeading": "Stegen",
-      "ladderBody": "Varje match påverkar en beständig, karaktärsbunden slagfältsrankning, vinst eller förlust, och topplistan genom tiderna rankar rikets mästare. Segrar och hårt kämpade förluster ger också Heder genom Krigföringssystemet.",
-      "rewardsHeading": "What a match pays",
-      "rewardsBody": "Every finished match pays Honor: more for a win, a consolation for a loss or a draw, plus a small amount for every killing blow you land and every one you help with, so fighting away from the flags is still worth doing. Your first win of each day pays a bonus on top, and the panel tells you while that bonus is still waiting for you. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset. Meeting the same team over and over pays less for the match itself after the first, quickly settling at a floor instead of falling away to nothing, and a forfeited match pays nothing at all. Spend what you earn at either Warfare quartermaster."
+      "ladderBody": "Varje match flyttar en bestående slagfältsrankning knuten till rollpersonen, vinst eller förlust, och tabellen genom tiderna rangordnar rikets mästare.",
+      "rewardsHeading": "Vad en match ger",
+      "rewardsBody": "Varje avslutad match ger Heder: mer för en vinst, en tröstepremie för en förlust eller oavgjort, plus ett litet tillägg för varje dödsstöt du delar ut och varje du bidrar till, så att slåss borta från flaggorna ändå lönar sig. Din första vinst varje dag ger en bonus utöver detta, och panelen visar det medan den bonusen fortfarande väntar på dig. Den dagen är Hederns egen, och den rullar över på sitt eget klockslag snarare än med rikets instansåterställning. Att möta samma lag om och om igen ger mindre för själva matchen efter den första gången, och sjunker snabbt till ett golv i stället för att falla bort till noll, och en uppgiven match ger ingenting alls. Spendera det du tjänar hos endera Krigföringskvartersmästaren."
     },
     "valeCupPage": {
       "heading": "Dalcupen",
@@ -4993,11 +5332,11 @@ export const sv_SE: EnTranslations = {
       "howHeading": "Så fungerar bedrifter",
       "howBody": "Bedrifter fullbordas och bevaras en karaktär i taget, så varje hjälte du spelar bygger en egen Bok; bara rikets topplista samlar din Ryktbarhet över alla karaktärer du spelar, och räknar varje bedrift bara en gång. Varje bedrift berättar rakt på sak vad den kräver av dig, direkt i Bedrifternas bok i spelet, så du vet alltid vad du ska jaga, och du kan bevaka dem du är ute efter för att hålla dem i sikte medan du spelar. Ett litet fåtal förblir hemliga och visar sig först när du har fullbordat dem. Boken håller sig också ärlig: allt som ditt tidigare facit kan bevisa krediterar den på fläcken, så en veteran öppnar den aldrig till en tom sida; bara de räknande bedrifterna börjar sin räkning från noll.",
       "renownHeading": "Ryktbarhet",
-      "renownBody": "Ryktbarhet är poängen bakom Boken. Varje bedrift du fullbordar är värd ett fast belopp, och din totalsumma klättrar bara uppåt, så en lugn vecka kostar dig aldrig mark. En handfull bedrifter bygger på tur snarare än skicklighet, och Bragder är en heder för sig, så båda är värda noll Ryktbarhet. Bedrifter utan Ryktbarhet räknas fortfarande mot fullbordande i din Bok; de ger bara aldrig poäng.",
+      "renownBody": "Ryktbarhet är poängen bakom Boken. Varje bedrift du vinner är värd en bestämd summa, och din totalsumma stiger bara, så en lugn vecka kostar dig aldrig mark. En handfull hänger på tur snarare än skicklighet, andra samlarbedrifter är sin egen belöning, och Stordåd är en ära för sig, så ingen av dem är värd någon Ryktbarhet. Bedrifter utan Ryktbarhet räknas ändå mot att fullborda din Bok; de ger bara aldrig poäng. Stordåd är det enda undantaget, hållna helt utanför räkningen.",
       "rewardsHeading": "Titlar och ramar",
-      "rewardsBody": "Belöningarna är enbart för syns skull, och det är hela poängen. Vissa bedrifter skänker en titel att bära eller en ram som pryder ditt namn, men aldrig något som gör din hjälte starkare. Välj den titel du vill ha i Bedrifternas bok, så följer den med på din namnskylt, i chatten och på topplistorna där alla kan se den.",
+      "rewardsBody": "Belöningarna är rena skrytsaker, och det är hela poängen. Vissa bedrifter ger en titel du kan bära eller en ram som inramar ditt namn, och aldrig något som gör din hjälte starkare. Välj den titel och den ram du vill ha i Bedrifternas bok: titeln följer med på din namnskylt, i chatten och på listorna där alla ser den, och ramen drar sina egna färger runt din namnskylt och ditt porträtt.",
       "chroniclesHeading": "Krönikor",
-      "chroniclesBody": "Varje zon har sin egen krönika, en samling bedrifter sammanställd av en lokal krönikör som tagit på sig att nedteckna varje resenär som färdas genom trakten. Saul i Östbäcksdalen är den förste av dem. En krönika är uppdelad i kapitel, och du får beta av dem i den ordning som passar dig.",
+      "chroniclesBody": "Varje zon håller sin egen Krönika, en samling bedrifter hopsamlade av en lokal krönikör som tagit på sig att teckna ner varje resenär som passerar. Saul från Eastbrookdalen är den förste av dem, Osric Fenn håller Träskkrönikan i Fenbridge ute i Mirefen, och Zenzie tecknar Toppkrönikan uppe i Highwatch. En Krönika är indelad i kapitel, och du är fri att arbeta dig igenom dem i den ordning som passar dig.",
       "featsHeading": "Bragder",
       "featsBody": "Bragder står på en hylla för sig: uppteckningar av arv och av att vara först i världen, bedrifter knutna till en svunnen era eller ett ögonblick som bara inträffar en enda gång. De ger ingen ryktbarhet och räknas inte in i fullbordandet, utan bevaras för alltid som ett minne av det som uträttades.",
       "catalogHeading": "Den fullständiga bedriftsrullan",
@@ -5021,10 +5360,30 @@ export const sv_SE: EnTranslations = {
         "exploration": "Utforskning",
         "feat": "Bragder"
       },
-      "bookHeading": "Inside the Book",
-      "bookBody": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles shelf, where you choose the one you wear.",
-      "platformHeading": "Steam and Epic achievements",
-      "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
+      "bookHeading": "Inuti Boken",
+      "bookBody": "Boken sorterar varje bedrift i kategorier du kan växla mellan, med en sökruta och filter för allt, för det du har fullbordat, för det du inte har, och för de du nästan är klara med. En Nyligen-rad högst upp håller dina senaste upplåsningar, och att klicka på en hoppar direkt till dess kort, precis som att klicka på ett bedriftsnamn någon delar i chatten. Bredvid den pekar Nästan framme dig mot den handfull du är närmast att fullborda. Ute i ett rike bär varje bedrift också sin sällsynthet, andelen äventyrare som har fullbordat den, så du kan se med en blick vilka som är vanliga och vilka som är en verklig utmaning; offlinevärlden har ingen befolkning att räkna, så den visar ingenting. Längst ut på raden sitter Titelhyllan, där du väljer den du bär.",
+      "platformHeading": "Steam- och Epic-prestationer",
+      "platformBody": "Om du länkar ett Steam- eller Epic Games-konto från skrivbordsappen speglas bedrifterna du tjänar in utåt som prestationer på det kontot. Spelvärlden förblir den avgörande auktoriteten: du tjänar bedriften här, den registreras på din karaktär, och prestationen följer efter. Inte varje bedrift har en matchande prestation, och om en inte dyker upp direkt hinner den ikapp nästa gång du loggar in. Att länka är bara någonsin en länk, aldrig ett sätt att logga in."
+    },
+    "reliquaryPage": {
+      "intro": "Relikvariet är museet över det unika byte du har katalogiserat: eftertraktade fynd ur fängelsehålor, yrkestroféer, riddjur, vapenutseenden och titlar. Det hör ihop med Bedrifternas bok på samma sätt som en trofésal hör ihop med en bragdbok.",
+      "howHeading": "Så fungerar samlingen",
+      "howBody": "Öppna Relikvariet i spelet (Skift+X som standard). Varje hylla rymmer sidor med unika reliker. Du fyller en silhuett när du får just det föremålet för första gången på den rollpersonen, och du illuminerar en sida när varje relik på den är fylld. Ett fåtal sidor är märkta Utgången eller Personlig: de står utanför fullbordandet och spärrar därför aldrig en hylla eller hela katalogen. Fynd ger en avisering direkt och uppdaterar det öppna fönstret; framstegen hör till rollpersonen, utom vapenutseenden, som är kontokosmetika.",
+      "ranksHeading": "Intendent-grader",
+      "ranksBody": "Intendent-graderna stiger med varje unik katalogiserad relik och ger uteslutande kosmetiska titlar och ramar. De ger aldrig stridsstyrka, byteschans eller oturskompensation. Vapenutseenden knutna till kontot ger inga poäng mot Intendent-graden, så att anseendet förblir knutet till rollpersonen, och reliker på Utgångna eller Personliga sidor ger inte heller några poäng mot den.",
+      "retiredTag": "Utgången",
+      "personalTag": "Personlig",
+      "retiredNote": "Dessa reliker går inte längre att vinna. Sidan hedrar de veteraner som behållit dem och räknas varken mot fullbordandet eller mot Intendent-graden.",
+      "personalNote": "Varje rollperson kan bara äga sin egen. Sidan räknas varken mot fullbordandet eller mot Intendent-graden.",
+      "catalogHeading": "Katalog över sidor",
+      "catalogBody": "Varje skriven sida i Relikvariet och namnen på relikerna den rymmer. Listan innehåller bara namn utan spoilers: öppna Relikvariet i spelet för att se dina egna framsteg, dina klarningar och silhuetterna.",
+      "spoilerNote": "Den personliga historiken över första fynd, antalet klarningar och läget saknad kontra ägd stannar i spelklienten. Wikin publicerar aldrig en spelares samling.",
+      "shelfHeading": "{label} ({count})",
+      "shelf": {
+        "conquerors": "Erövrare",
+        "professions": "Yrken",
+        "horizons": "Horisonter"
+      }
     },
     "wishPage": {
       "heading": "Saker jag önskar att jag visste",
@@ -5034,7 +5393,7 @@ export const sv_SE: EnTranslations = {
       "i2Title": "Att dö kostar dig knappt något",
       "i2Body": "När du faller reser du dig som en gengångare vid närmaste kyrkogård. Spring tillbaka till din kropp för att återupplivas utan påföljd, eller ta Den bleka väktarens omedelbara uppståndelse och bär en kortvarig försvagning för bekvämligheten. Ingen erfarenhet, utrustning eller mynt går någonsin förlorad, så det är tryggt att ta risker och lära sig.",
       "i3Title": "Talanger är ingen fälla",
-      "i3Body": "De låses upp vid nivå 10 och återställs när du vill, så länge du är utanför strid, så dina tidiga val är aldrig permanenta.",
+      "i3Body": "Din första talang kommer på nivå 5, och var och en av de sex raderna är ett enda val bland tre, så ett bygge är en handfull beslut du överblickar med en blick. Du kan återställa när du är utanför strid och inte i en arenamatch, så ingenting du väljer tidigt låser in dig.",
       "i4Title": "Följ uppdragsspåret",
       "i4Body": "Uppdrag är det snabbaste sättet att levla och de leder dig tvärs över världen. När du är osäker på vart du ska, leta upp nästa markör.",
       "i5Title": "Håll din utrustning aktuell",
@@ -5056,37 +5415,37 @@ export const sv_SE: EnTranslations = {
       "posterAlt": "{name}"
     },
     "editorPage": {
-      "intro": "A map editor of your own, in the browser. Shape the land, plant props and camps, then drop into the result and walk around it.",
-      "whereTitle": "Where to find it",
-      "whereBody": "The editor is a page of its own at /editor, apart from the game. It opens on a fresh, untitled map built from the world you already know, so you always start with real ground under your feet. A short guided tour runs the first time you visit, and Help in the top bar can run it again.",
-      "buildTitle": "What you can build",
-      "buildBody": "Tools live on the rail down the left, each with a single-letter shortcut shown on its button. Pick one and work straight on the map in front of you. Ctrl+Z undoes and Ctrl+Y redoes, so nothing you try is permanent.",
-      "toolLandTitle": "Shape the land",
-      "toolLandBody": "Raise, lower, smooth, and flatten the ground under a brush whose size you set as you go, with a strength dial on the raising, lowering, and smoothing passes.",
-      "toolSurfaceTitle": "Paint and flood",
-      "toolSurfaceBody": "Paint biome ground cover over a zone default, and set the one water level that every lake the map declares rises or falls to.",
-      "toolPlaceTitle": "Place props",
-      "toolPlaceBody": "Drop pieces from the built-in asset catalog onto the ground. The select tool, the first button on the rail, picks a placed piece back up so you can move, rotate, scale, or duplicate it, and the erase tool lifts one off the map when you change your mind. A placement can be given collision so a player walks around it instead of through it. For the broad strokes, a procedural panel sits under the same tool: scatter a whole category of assets across an area in one go, or raise a run of hills, both worked from the map seed, so the same settings always give you the same result.",
-      "toolCampTitle": "Camps and a spawn point",
-      "toolCampBody": "Lay out mob camps that come alive in playtest, and set the spot where a playtest drops the player in.",
-      "toolBlockerTitle": "Invisible walls",
-      "toolBlockerBody": "Drag blocker walls that stop movement without showing anything, for an edge you want quietly closed off.",
-      "toolRegionTitle": "Copy a whole area",
-      "toolRegionBody": "Box-select terrain and placed assets with the region tool, then paste that selection somewhere else on the map.",
-      "viewsTitle": "Two views of the same map",
-      "viewsBody": "The 3D viewport draws your map with the real game renderer, so what you see is what you get: drag to orbit, scroll to zoom. The 2D overhead map is the plan view, better for moving zone markers such as hubs, graveyards, and points of interest, and for framing a large area before you sculpt it. The toggle sits in the top bar.",
-      "playtestTitle": "Play your map",
-      "playtestBody": "Playtest hands the map to the game and drops you into it as a warrior. Everything you made is underfoot: camps spawn, blocker walls hold, and placements with collision push you around them. When you have seen enough, come back to the editor and keep working.",
-      "sandboxTitle": "A sandbox, not the live world",
-      "sandboxBody": "Custom maps never change the game everyone else is playing. A playtest runs offline in your own browser and never talks to the server, so nothing that happens in it reaches your characters or the shared world.",
-      "saveTitle": "Saving your work",
-      "saveBody": "Ctrl+S saves, and while there are unsaved edits a dot sits beside the map name and the Save button calls for your attention. Without an account the editor still works: maps are kept in your own browser, an autosave can be switched on, and Export writes a map out as a plain JSON file that Import reads straight back.\n\nSigned in with your game account, a save also goes to the server, so your maps follow you to another machine. The Open window has one tab for the drafts in this browser and another for the maps saved to your account. If the editor shows an offline badge, sign in to the game in another tab, then reload the editor.",
-      "shareTitle": "Publishing and forking",
-      "shareBody": "Maps saved to your account start private. From the Open window you can publish one, which lists it for anyone to browse, and unpublish it again at any time. The Public tab in that same window browses everything other players have published: Open loads one so you can look around how it was made, and Fork drops a private copy into your own list to change however you like. A copy is a new map: editing it never touches the original.\n\nThere is a limit on how many maps one account may keep, so tidy up the experiments you are done with.",
-      "uploadTitle": "Bringing your own models",
-      "uploadBody": "Signed in, the Upload button takes a GLB model of your own and adds it to the asset browser beside the built-in catalog, ready to place like any other prop. Uploads are stored on your account, count against a size and storage limit, and can be deleted from the asset browser when you no longer want them.",
-      "helpTitle": "Learning the tools",
-      "helpBody": "Help in the top bar opens a reference covering every tool, the keyboard shortcuts, and the mouse moves, and it can restart the guided tour at any time. The rest is poking at things: undo is always a keystroke away, and Export gives you a copy of a map you can always come back to."
+      "intro": "En egen kartredigerare, i webbläsaren. Forma marken, plantera rekvisita och läger, och kliv sedan in i resultatet och gå runt i det.",
+      "whereTitle": "Var du hittar den",
+      "whereBody": "Redigeraren är en egen sida på /editor, skild från spelet. Den öppnas på en ny, namnlös karta byggd från världen du redan känner, så du börjar alltid med riktig mark under fötterna. En kort rundtur körs första gången du besöker sidan, och Hjälp i verktygsfältet högst upp kan köra den igen.",
+      "buildTitle": "Vad du kan bygga",
+      "buildBody": "Verktygen finns på raden längst till vänster, vart och ett med ett kortkommando på en bokstav visat på sin knapp. Välj ett och arbeta direkt på kartan framför dig. Ctrl+Z ångrar och Ctrl+Y gör om, så inget du provar är permanent.",
+      "toolLandTitle": "Forma marken",
+      "toolLandBody": "Höj, sänk, jämna ut och platta till marken under en pensel vars storlek du ställer in medan du arbetar, med ett styrkereglage på höjnings-, sänknings- och utjämningsdragen.",
+      "toolSurfaceTitle": "Måla och översvämma",
+      "toolSurfaceBody": "Måla biommarktäcke över zonens standard, och ställ in den enda vattennivå som varje sjö kartan deklarerar stiger eller sjunker till.",
+      "toolPlaceTitle": "Placera rekvisita",
+      "toolPlaceBody": "Släpp resurser från den inbyggda katalogen på marken. Verktyget Markera, den första knappen på raden, plockar upp en placerad resurs igen så att du kan flytta, rotera, skala eller duplicera den, och verktyget Radera lyfter bort en från kartan när du ändrar dig. En placering kan ges kollision så att en spelare går runt den i stället för rakt igenom. För de breda penseldragen sitter en Procedurell-panel under samma verktyg: strö ut en hel kategori resurser över ett område i ett svep, eller generera en rad kullar, båda utgår från kartans frö, så samma inställningar alltid ger dig samma resultat.",
+      "toolCampTitle": "Läger och en startpunkt",
+      "toolCampBody": "Lägg ut fiendeläger som vaknar till liv i speltest, och ange platsen där ett speltest släpper ner spelaren.",
+      "toolBlockerTitle": "Osynliga väggar",
+      "toolBlockerBody": "Dra spärrväggar som stoppar rörelse utan att visa något, för en kant du vill stänga av i tysthet.",
+      "toolRegionTitle": "Kopiera ett helt område",
+      "toolRegionBody": "Rutmarkera terräng och placerade resurser med regionverktyget, och klistra sedan in markeringen någon annanstans på kartan.",
+      "viewsTitle": "Två vyer av samma karta",
+      "viewsBody": "3D-vyn ritar din karta med den riktiga spelmotorn, så det du ser är det du får: dra för att kretsa, skrolla för att zooma. 2D-översiktskartan är planvyn, bättre för att flytta zonmarkörer som knutpunkter, kyrkogårdar och intressepunkter, och för att rama in ett stort område innan du skulpterar det. Växlingen sitter i verktygsfältet högst upp.",
+      "playtestTitle": "Spela din karta",
+      "playtestBody": "Speltest lämnar över kartan till spelet och släpper ner dig i den som en krigare. Allt du har byggt finns under fötterna: läger dyker upp, spärrväggar håller, och placeringar med kollision knuffar dig runt dem. När du har sett tillräckligt, kom tillbaka till redigeraren och fortsätt arbeta.",
+      "sandboxTitle": "En sandlåda, inte den levande världen",
+      "sandboxBody": "Anpassade kartor ändrar aldrig spelet som alla andra spelar. Ett speltest körs offline i din egen webbläsare och pratar aldrig med servern, så inget som händer i det når dina karaktärer eller den delade världen.",
+      "saveTitle": "Spara ditt arbete",
+      "saveBody": "Ctrl+S sparar, och medan det finns osparade ändringar sitter en prick bredvid kartnamnet och Spara-knappen ber om din uppmärksamhet. Utan ett konto fungerar redigeraren ändå: kartor sparas i din egen webbläsare, ett Autospar kan slås på, och Exportera skriver ut en karta som en vanlig JSON-fil som Importera läser tillbaka direkt.\n\nInloggad med ditt spelkonto går en sparning också till servern, så dina kartor följer med dig till en annan maskin. Öppna-fönstret har en flik för utkasten i den här webbläsaren och en annan för kartorna som sparats till ditt konto. Om redigeraren visar en Offline-märkning, logga in på spelet i en annan flik och ladda sedan om redigeraren.",
+      "shareTitle": "Publicera och förgrena",
+      "shareBody": "Kartor som sparas till ditt konto börjar privata. Från Öppna-fönstret kan du publicera en, vilket listar den för alla att bläddra bland, och avpublicera den igen när som helst. Fliken Offentliga kartor i samma fönster låter dig bläddra bland allt andra spelare har publicerat: Öppna laddar en så att du kan se dig omkring i hur den byggdes, och Förgrena släpper en privat kopia in i din egen lista att ändra hur du vill. En kopia är en ny karta: att redigera den rör aldrig originalet.\n\nDet finns en gräns för hur många kartor ett konto får behålla, så städa bort experimenten du är klar med.",
+      "uploadTitle": "Ta med dina egna modeller",
+      "uploadBody": "Inloggad tar Ladda upp-knappen en egen GLB-modell och lägger till den i Resursbläddraren bredvid den inbyggda katalogen, redo att placeras som vilken annan resurs som helst. Uppladdningar lagras på ditt konto, räknas mot en storleks- och lagringsgräns, och kan raderas från Resursbläddraren när du inte längre vill ha dem.",
+      "helpTitle": "Lär dig verktygen",
+      "helpBody": "Hjälp i verktygsfältet högst upp öppnar en referens som täcker varje verktyg, tangentbordsgenvägarna och musrörelserna, och den kan köra rundturen igen när som helst. Resten handlar om att pröva sig fram: ångra är alltid ett tangenttryck bort, och Exportera ger dig en kopia av en karta du alltid kan komma tillbaka till."
     },
     "models": {
       "title": "3D-modellvisare",
@@ -5106,7 +5465,7 @@ export const sv_SE: EnTranslations = {
     "gear": {
       "intro": "Utrustning är det din karaktär bär och föremålen du har med dig. Bättre utrustning är det stadigaste sättet att bli starkare, och du plockar upp det mesta bara genom att spela.",
       "slotsTitle": "Vad du kan utrusta",
-      "slotsBody": "Du har en vapenplats, sju rustningsplatser och tre smyckesplatser: en hals och två fingrar. Varje klass kan bara använda vissa vapen och bär rustning upp till sin egen tyngd, tyg, läder eller ringbrynja, så de uppgraderingar som passar dig är de som är gjorda för din klass. Smycken väger ingenting alls: vilken klass som helst bär vad den än förtjänar. Inom det, fyll varje plats med den bästa pjäsen du hittar.",
+      "slotsBody": "Du har en plats för huvudvapen, en plats för andrahanden, sju rustningsplatser och tre smyckesplatser: en hals och två fingrar. Varje klass kan bara bära vissa vapen och bär rustning upp till sin egen vikt, tyg, läder eller ringbrynja, så uppgraderingarna som passar dig är de som är gjorda för din klass. Smycken har ingen vikt alls: vilken klass som helst bär det den förtjänar. Inom det, fyll varje plats med det bästa stycke du hittar.",
       "slotMainhand": "Vapen",
       "slotHelmet": "Huvud",
       "slotNeck": "Hals",
@@ -5118,7 +5477,7 @@ export const sv_SE: EnTranslations = {
       "slotFeet": "Fötter",
       "slotFinger": "Finger",
       "bagsTitle": "Väskor och lastutrymme",
-      "bagsBody": "Allt du plockar upp ryms i en enda gemensam packning, och du utökar den genom att utrusta väskor. Ditt väskfönster har fyra väskfack: klicka på en väska i din packning för att sätta den i ett ledigt fack, och varje väska du bär lägger till sitt eget utrymme. Enkla väskor är billiga handlarvaror, rymligare släpps av bestar, och de finaste kommer från fängelsehålebossar, så ditt lastutrymme växer i takt med din utrustning.",
+      "bagsBody": "Allt du plockar upp åker i en gemensam ränsel, och du utökar den genom att utrusta väskor. Ditt väskfönster har fyra väskplatser: klicka på en väska i ränseln för att slänga in den i en ledig plats, och varje väska du bär lägger till sitt eget utrymme. Enkla väskor är billiga handelsvaror, rymligare tappas av bestar, och de finaste kommer från fängelsehålsbossar, så ditt bärutrymme växer i takt med din utrustning. Allt som staplas anger i sin informationsruta hur många en plats rymmer, vilket är hur du vet i förväg att en rejäl brygdrunda kommer att kosta dig två.",
       "qualityTitle": "Kvalitet, med en blick",
       "qualityBody": "Varje föremål har en kvalitet, och dess namn är färglagt för att matcha så att du kan avläsa dess värde med en blick. Från vanligast till mest eftertraktad:",
       "qualityPoor": "Usel",
@@ -5132,18 +5491,18 @@ export const sv_SE: EnTranslations = {
       "upgradeBody": "Att byta ut en gammal pjäs mot en ny uppgradering gör mer för dig än att spela perfekt i utrustning du vuxit ur. När något bättre släpps eller ett uppdrag erbjuder det, ta det. Spara inte dina goda föremål till senare.",
       "itemLevelBody": "Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.",
       "sourcesTitle": "Var utrustning kommer ifrån",
-      "sourcesBody": "Det mesta av dina tidiga uppgraderingar är uppdragsbelöningar, så det lönar sig att slutföra uppdrag snarare än att grinda. Fiender släpper utrustning när du besegrar dem, handlare i staden säljer solida basvaror, hantverkare förvandlar insamlade material till bärbara pjäser, och spelarmarknaden låter dig köpa från andra äventyrare. Högst upp på kullen köper två märkesvalutor utrustning som inte finns någon annanstans: Delve-märken hos delvevaktaren, och heroiska märken hos den heroiska kvartersmästaren.",
+      "sourcesBody": "De flesta av dina tidiga uppgraderingar är uppdragsbelöningar, så det lönar sig att slutföra uppdrag snarare än att grinda. Fiender tappar utrustning när du besegrar dem, handlarna i staden säljer gedigna grunder, hantverkare gör insamlat material till bärbara stycken, och spelarmarknaden låter dig köpa av andra äventyrare. Högst upp på backen köper tre förtjänade valutor utrustning som inte finns någon annanstans: Delve-märken hos delve-väktaren, Heroiska märken hos den heroiska kvartermästaren, och Heder hos hedersskvartermästarna.",
       "soulboundTitle": "Själsbunden: din och endast din",
       "soulboundBody": "Ett fåtal särskilda belöningar är själsbundna, bundna till din karaktär från det ögonblick du förtjänar dem. Ett själsbundet föremål kan inte bytas, skickas med post, säljas till en handlare eller läggas upp på marknaden; det är ditt och endast ditt. I dag skyddar det värnet prispolletter som Heroiska märken, medan utrustningen du vinner är din att byta, sälja eller dela fritt.",
       "uniqueTitle": "Unikt utrustad: ett legendariskt föremål av varje slag",
       "uniqueBody": "Legendariska föremål är unikt utrustade: din karaktär kan bara bära en kopia av ett givet legendariskt föremål åt gången, och dess heroiska version räknas som samma föremål. En andra kopia kan ligga i dina väskor, i banken eller på marknaden, men att försöka bära båda samtidigt nekas, och verktygstipset bär en gyllene Unikt utrustad-tagg så att du ser regeln innan du planerar ett bygge kring två av dem.",
       "setsTitle": "Set och setbonusar",
-      "setsBody": "En del rustning kommer i matchande familjer, flera pjäser skurna för att se ut och slåss som en. Bär nog av en familj samtidigt så vaknar settet, vilket ger bonusar utöver varje pjäs egna egenskaper, och ju fler pjäser du bär desto starkare blir det. Några sådana familjer dyker upp som eftertraktade byten medan du klättrar i nivå; de främsta av dem kommer från det tuffaste gruppinnehållet nära nivåtaket, så att jaga ett komplett set är ett klassiskt slutspelsmål.",
+      "setsBody": "En del rustning kommer i matchande familjer, flera stycken skurna för att se ut och strida som ett. Bär tillräckligt många stycken ur en familj samtidigt så vaknar setet och ger bonusar ovanpå varje styckes egna värden, och ju fler stycken du bär desto starkare blir det. Ett fåtal sådana familjer dyker upp som eftertraktat byte medan du stiger i nivå, och de största kommer från det hårdaste gruppinnehållet nära nivåtaket, så att jaga ett fullständigt set är ett klassiskt slutspelsmål. Striden mot andra spelare har egna matchande familjer, köpta ett stycke i taget med Heder; de vaknar vid andra styckeantal än bytesfamiljerna, och deras bonusar svarar bara när fienden är en annan spelare.",
       "consumablesTitle": "Förbrukningsvaror",
       "consumablesIntro": "Vissa föremål används en gång för en snabb fördel. De är billig försäkring, så ha några till hands.",
-      "consumablesPotions": "Drycker återställer hälsa eller mana i samma stund som du använder dem, även mitt i strid, vilket gör dem till en livräddare när ett angrepp går snett. De delar en kort nedkylning, så planera in ett bra tillfälle att använda dem.",
+      "consumablesPotions": "Brygder återställer hälsa eller mana i samma stund du använder dem, till och med mitt i strid, vilket gör dem till en avgörande räddning när ett drag går fel. Alla brygder delar en enda nedkylning på ett par minuter, så du får ett bra tillfälle per strid i stället för en kedja av dem. De återställer också mindre än att sätta sig och äta eller dricka, vilket är priset för att inte sätta sig. Brygder kommer i grader skurna för varje sträcka av världen, så bär den grad som är gjord för din nivå: en gammal låggradig brygd är en flisa på en fullvuxen rollperson.",
       "consumablesFood": "Mat och dryck återställer dig medan du sitter och vilar mellan strider. Att äta återhämtar hälsa, att dricka återhämtar mana, och att vila på det här sättet är gratis. Sätt dig ner några sekunder efter en tuff strid i stället för att rusa in i nästa halvläkt.",
-      "consumablesElixirs": "Elixir ger en tillfällig förstärkning medan du äventyrar, en liten fördel som hjälper när du vill pressa lite längre.",
+      "consumablesElixirs": "Elixir ger en tillfällig förstärkning medan du är ute på äventyr, ett litet övertag som hjälper när du vill pressa lite längre. De delar inte brygdernas nedkylning, så du kan dricka ett och ändå hålla en läkebrygd i reserv. Två elixir för samma egenskap staplas inte, och det sista du dricker är det som blir kvar.",
       "fishingTitle": "Fiske",
       "fishingBody": "Fiske är ett lugnt avbrott. Bär ett fiskespö, använd det vid öppet vatten och dra in det som nappar. Mestadels fångar du fisk som är mat du kan äta, enstaka skräp att sälja för några mynt, och då och då en eftertraktad sällsynt fångst. Vad du hittar beror på vattnet du fiskar i.",
       "fishingFood": "Fisken du drar in är mat: ät en medan du sitter och vilar så återställer den hälsa, med den bättre fisken från de kallare, djupare vattnen i norr. En lina i sjön är ett stilla sätt att hålla din packning fylld mellan strider.",
@@ -5151,18 +5510,18 @@ export const sv_SE: EnTranslations = {
       "cosmeticsTitle": "Utseenden och kosmetika",
       "cosmeticsBody": "Vissa belöningar ändrar bara hur din karaktär ser ut, aldrig hur stark du är. Dessa kosmetiska skinn låter dig sticka ut utan att påverka spelet, så bär vilket du vill.",
       "cosmeticsRanks": "Kosmetika kommer i egna sällsynthetsnivåer, och de sällsyntare är något kul att jaga. Att förtjäna en högre nivå låser även upp utseendena under den.",
-      "cosmeticsSkins": "Det finns två kosmetiska linjer att samla. De flesta klasser har flera alternativa utseenden, en ny tolkning av klassens look som är din ensam att bära. Vid sidan av dem finns kromer: namngivna tvåfärgade färgscheman som målar om ett utseende helt, från dämpade metaller till lysande kejserliga färger.",
+      "cosmeticsSkins": "Din rollpersons utseende kommer i två linjer. De flesta klasser har flera alternativa utseenden, en ny läsning av klassens look som är din att bära. Vid deras sida står chroman: namngivna tvåtonsfärgscheman som målar om en look helt och hållet, från sobra metaller till klara kejserliga färger.",
       "cosmeticsCache": "Några av dessa kommer från en mystisk kosmetisk skattgömma, ett förseglat pris som rullar en av tre kvalitetsgrader när du öppnar det och ger utseendet som matchar. Det är rent för utseendet: inget inuti gör dig starkare, bara finare att se på.",
       "cosmeticsApply": "Ställ in ditt aktiva utseende från utseenderaden på din karaktärsskärm, och växla fritt bland allt du har låst upp.",
-      "slotOffhand": "Off Hand",
-      "offhandBody": "What the off hand takes depends on your class. A shield goes there, and so does a held focus such as an orb or a tome, or a quiver for a hunter. Classes that can dual wield put a second weapon in it instead, at a price worth knowing: fighting with a weapon in each hand makes your ordinary swings miss noticeably more often, though it leaves your abilities alone. A two-handed weapon normally needs both hands, so equipping one benches whatever the off hand was holding, unless your specialization is one of the rare ones that can carry two of them at once.",
-      "bagsSort": "When the pack gets messy, the Sort button in the bags window tidies it in one press. Partial stacks of the same thing are merged together, and everything is laid back out in a readable order: weapons and armor first, then bags, consumables, tools, and mounts, then crafting materials with each fine grade sitting beside its plain version, then quest items, with grey junk last so you can see at a glance what to sell. Nothing is ever created or lost, only rearranged, so it is always safe to press.",
-      "requiredLevelBody": "Some pieces also carry a required level, shown on the tooltip. You can loot, buy, or be handed such a piece at any level, but you cannot wear it until you get there. The requirement follows where the piece came from rather than its color alone, so a rare you win at your own level is usually wearable straight away, while a hand-me-down from far above you waits in your bags until you catch up.",
-      "sourcesHonor": "Honor is what fighting other players pays, and the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, keep the Warfare stores that Honor alone buys: whole armor families, jewelry, and weapons no coin merchant carries. The arena page covers how the Honor itself is earned.",
-      "sourcesRifts": "Rifts add one more source once you are at the level cap, and a rift is a race: the group that clears one first wins its rewards. That first clear pays gear on top of everything else the run leaves behind, including a Riftbound band cut to your class role, a ring you will not find anywhere else in the world. A group that finishes second still finishes its own run and keeps the credit for the clear; what it forfeits are the first-clear rewards. The rifts page covers the race itself.",
-      "bindOnTradeBody": "A softer version of the same idea also exists: some things bind on trade, meaning they can change hands exactly once and then belong to whoever received them. A crafted piece made on commission binds when the crafter hands it over. A copy under that rule never rides the market or the post, which are anonymous; it passes face to face or not at all, and once it has passed, it is bound. The tooltip says which rule a piece follows, so check before you plan to resell it.",
-      "cosmeticsWeapons": "Weapon skins are a third line, and they change what you carry rather than who carries it. A skin repaints a weapon type, so the look follows whichever sword, staff, or bow you have equipped, and it never touches the weapon's stats, reach, or speed. Skins unlock for your whole account rather than one character, and they come in collections with rarity tiers like everything else. They are offered in the Armory's seasonal collections rather than found out in the world, and the Armory is also where you set them, one per weapon type, rather than from the appearance row. Everyone standing near you sees the skin you are wearing.",
-      "soulboundBodyBound": "A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. That guards prize tokens such as Heroic Marks, and it covers every piece of Warfare gear bought with Honor, so a player-versus-player kit is worn only by the character who earned it. Most of the gear you win from the world is still yours to trade, sell, or share freely."
+      "slotOffhand": "Andra hand",
+      "offhandBody": "Vad andra handen tar beror på din klass. En sköld går dit, liksom ett hållet fokusföremål som en orb eller en bok, eller ett koger för en jägare. Klasser som kan bära ett vapen i vardera handen sätter i stället ett andra vapen där, till ett pris värt att känna till: att slåss med ett vapen i varje hand gör att dina vanliga svingar missar märkbart oftare, även om det lämnar dina förmågor orörda. Ett tvåhänt vapen behöver normalt båda händerna, så att utrusta ett bänkar det andra handen höll, om inte din specialisering är en av de sällsynta som kan bära två av dem samtidigt.",
+      "bagsSort": "När packningen blir stökig ordnar Sortera-knappen i väskfönstret upp den med ett enda tryck. Delade högar av samma sak slås ihop, och allt läggs tillbaka i en läsbar ordning: vapen och rustning först, sedan väskor, förbrukningsvaror, verktyg och riddjur, sedan hantverksmaterial med varje fin kvalitet bredvid sin vanliga version, sedan uppdragsföremål, med grått skräp sist så att du kan se med en blick vad du ska sälja. Inget skapas eller går någonsin förlorat, bara omplaceras, så det är alltid säkert att trycka.",
+      "requiredLevelBody": "Vissa pjäser bär också ett nivåkrav, visat på verktygstipset. Du kan plundra, köpa eller få en sådan pjäs på vilken nivå som helst, men du kan inte bära den förrän du når dit. Kravet följer varifrån pjäsen kom snarare än enbart dess färg, så en sällsynt du vinner på din egen nivå går oftast att bära direkt, medan en pjäs ärvd från långt över dig väntar i dina väskor tills du hinner ikapp.",
+      "sourcesHonor": "Heder är vad striden mot andra spelare betalar ut, och hederskvartermästarna, RASERI i Eastbrook och Krigsmarskalk Draven Kole i Highwatch, håller Krigföringsförråden som bara Heder kan köpa: hela rustningsfamiljer, smycken och vapen som ingen mynthandlare bär. Sidan om Arena och PvP tar upp hur Heder i sig tjänas in.",
+      "sourcesRifts": "Revor lägger till ännu en källa så snart du är vid nivåtaket, och en reva är ett lopp: gruppen som rensar en först vinner dess belöningar. Den första rensningen betalar ut utrustning utöver allt annat genomgången lämnar efter sig, inklusive en Revbunden ring skuren för din klassroll, en ring du inte hittar någon annanstans i världen. En grupp som kommer tvåa fullbordar ändå sin egen genomgång och behåller äran för rensningen; det den går miste om är belöningarna för den första rensningen. Sidan om revor tar upp själva loppet.",
+      "bindOnTradeBody": "En mildare variant av samma idé finns också: vissa saker binder vid handel, vilket betyder att de kan byta ägare exakt en gång och sedan tillhöra den som tog emot dem. Ett hantverk gjort som en beställning binder när hantverkaren lämnar över det. En kopia under den regeln åker aldrig med på marknaden eller posten, som båda är anonyma; den byter ägare ansikte mot ansikte eller inte alls, och när den väl har bytt ägare är den bunden. Verktygstipset anger vilken regel en pjäs följer, så kontrollera innan du planerar att sälja den vidare.",
+      "cosmeticsWeapons": "Vapenskins är en tredje linje, och de ändrar vad du bär snarare än vem som bär det. Ett skin målar om en vapentyp, så utseendet följer vilket svärd, vilken stav eller båge du än har utrustat, och det rör aldrig vapnets egenskaper, räckvidd eller hastighet. Skins låses upp för hela ditt konto snarare än en enskild karaktär, och de kommer i samlingar med sällsynthetsnivåer som allt annat. De erbjuds i Vapenhusets säsongssamlingar snarare än hittas ute i världen, och Vapenhuset är också där du ställer in dem, ett per vapentyp, snarare än från utseenderaden. Alla som står nära dig ser skinnet du bär.",
+      "soulboundBodyBound": "Ett fåtal särskilda belöningar är själsbundna, bundna till din karaktär från det ögonblick du förtjänar dem. Ett själsbundet föremål kan inte bytas, skickas med post, säljas till en handlare eller läggas upp på marknaden; det är ditt och endast ditt. Det skyddar prispolletter som Heroiska märken, och det gäller varje del av Krigföringsutrustning köpt med Heder, så en uppsättning för spelare mot spelare bärs bara av karaktären som förtjänade den. Det mesta av utrustningen du vinner från världen är fortfarande din att byta, sälja eller dela fritt."
     },
     "professions": {
       "intro": "Bortom strider och uppdrag belönar världen dig för att bruka jorden och smedjan: samla råmaterial, förvandla dem till utrustning och varor genom tio hantverksyrken, och slå dig till ro i en identitet som en av de tio arketyper yrkena representerar.",
@@ -5202,10 +5561,10 @@ export const sv_SE: EnTranslations = {
       "colHub": "Ort",
       "colMaster": "Mästare",
       "masterCellFmt": "{name}, {title}",
-      "harvestBodyFamilies": "Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, claws, tusks, silk, venom, cloth, and meat, straight from the corpse alongside its ordinary loot; one press opens both. Where a beast carries more than one workable component, the choice is yours: take everything it can give, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, Pristine Claw, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.",
-      "focusBodyTiers": "Every hub town keeps a Town Focus panel for visiting harvesters: stand in town, open it from beside the minimap, and spread a budget of 10 focus points across the component types you care about. Every 5 points on a component raises its harvest grade one step (two steps at most), and each point adds 10 percent to its yield; unfocused components are never made worse.\n\nYour allocation follows your character everywhere and can be re-aimed on any later visit to town, at a pace you choose. Taking your time is free: the re-aim runs for 1 minute per point you move. Paying a little speeds it up, 15 seconds per point plus 5 copper and 1 Chime Dust per point, and paying in full makes it instant for 25 copper and 5 Chime Dust per point. Only the points you actually move are counted, so nudging a single point is cheap, and a panel you open and close unchanged costs nothing at any tier.",
-      "toolEffectsHeading": "Tool effects",
-      "toolEffectsBody": "A gathering tool has a slot in it, and an enchanter's charm is what goes in. A Gatherer's Cache adds a unit to what a harvest yields; an Artisan's Eye raises the grade of what it pulls up. Tinker Gizzel, Master of the Toolworks in Eastbrook, teaches both to enchanters who have reached 25 skill in the craft, and both are made at his toolworks.\\n\\nA freshly slotted charm carries 20 charges on a common tool and 10 more for every rarity rung above common, so the same charm slotted on an epic pick starts at 50. A charge is spent only when the charm actually changed the outcome, never on a harvest it did not improve, and a slot can be set to ask each use, so the charm waits until you say Use a Charge. Slotting a fresh charm re-mints the slot around the tool you are carrying at that moment, so it fills to what that tool can hold rather than back to some earlier high mark, and a re-slot that would change nothing at all is turned away instead of eating the charm.\\n\\nRunning out of charges does not destroy the charm: the tool's owner refills the slot, 10 charges for each arcane material spent, and which material it asks for follows the better of the tool you are carrying and the best tool that slot has ever been filled by, Chime Dust for a common or uncommon tool, Chime Essence for a rare one, and a Chime Shard for an epic. Leaving the good tool in the bank does not buy a cheaper refill, only a smaller one at the same price; the honest way down to a cheaper rung is to slot a fresh charm while carrying the lesser tool, which re-mints the slot there. If the slot's ceiling sits above what your current tool can fill, the refill stops where that tool stops and tells you to carry the better one. The refill costs half the materials when you are the enchanter who signed the charm, and less again if you are specialized in Enchanting; anyone else pays the full rate. A refill is a short cast, like the rest of the craft family."
+      "harvestBodyFamilies": "Insamling stannar inte vid fyndplatser. Många slagna bestar kan skördas en gång var, först till kvarn, för hudar, huggtänder, klor, betar, silke, gift, tyg och kött, direkt från kroppen vid sidan av det vanliga bytet; ett tryck öppnar båda. När en best bär mer än en användbar komponent är valet ditt: ta allt den kan ge, eller koncentrera dig på färre komponenter och ta en mätbart finare kvalitet av det du tar.\n\nEtt sällsynt eller bättre skördeslag på en exemplarbärande familj ger också ett signerat perfekt exemplar (ett Orört skinn, Orörd siden, Orörd giftkörtel, Orörd klo eller Förstklassig styckdetalj) utöver det vanliga utbytet, och registrerar Ett perfekt exemplar i din Bedrifternas bok. Vilken karaktär som helst kan skörda, ingen träning krävs, och vilket insamlingsverktyg du äger räknas mot premiumarmen, oavsett vilket yrke det tillhör.",
+      "focusBodyTiers": "Varje huvudort har en Stadsfokus-panel för besökande skördare: stå i staden, öppna den bredvid minikartan, och sprid en budget på 10 fokuspoäng över de komponenttyper du bryr dig om. Var femte poäng på en komponent höjer dess skördegrad ett steg (högst två steg), och varje poäng lägger till 10 procent till dess utbyte; ofokuserade komponenter blir aldrig sämre.\n\nDin fördelning följer din karaktär vart den än vandrar och kan riktas om vid vilket senare besök i staden som helst, i den takt du väljer. Att ta din tid är gratis: omriktningen tar 1 minut per poäng du flyttar. Att betala lite snabbar på det, 15 sekunder per poäng plus 5 koppar och 1 Klingdamm per poäng, och att betala fullt ut gör det omedelbart för 25 koppar och 5 Klingdamm per poäng. Bara de poäng du faktiskt flyttar räknas, så att knuffa en enda poäng är billigt, och en panel du öppnar och stänger oförändrad kostar ingenting på någon nivå.",
+      "toolEffectsHeading": "Verktygseffekter",
+      "toolEffectsBody": "Ett insamlingsverktyg har en plats i sig, och det som monteras där är en förtrollares amulett. Samlarens gömma lägger till en enhet till det en skörd ger; Hantverkarens öga höjer graden på det som kommer upp. Fixare Gizzel, Verktygsverkets mästare i Östbäck, lär ut båda till förtrollare som nått 25 i skicklighet i hantverket, och båda tillverkas vid hans verktygsverkstad.\\n\\nEn nymonterad amulett bär 20 laddningar på ett vanligt verktyg och 10 fler för varje sällsynthetssteg över vanligt, så samma amulett monterad på en episk hacka börjar på 50. En laddning förbrukas bara när amuletten faktiskt ändrade utfallet, aldrig på en skörd den inte förbättrade, och en plats kan ställas in på att fråga vid varje användning, så amuletten väntar tills du säger Använd en laddning. Att montera en färsk amulett präglar om platsen kring verktyget du bär för stunden, så den fylls till vad det verktyget klarar av snarare än tillbaka till något tidigare maxmärke, och en ommontering som inte skulle ändra någonting alls avvisas i stället för att förbruka amuletten.\\n\\nAtt ta slut på laddningar förstör inte amuletten: verktygets ägare laddar om platsen, 10 laddningar för varje förbrukat arkant material, och vilket material den ber om följer det bättre av verktyget du bär och det bästa verktyg platsen någonsin fyllts med, Klingdamm för ett vanligt eller ovanligt verktyg, Klingessens för ett sällsynt, och en Klingskarva för ett episkt. Att lämna det bra verktyget i banken köper inte en billigare omladdning, bara en mindre till samma pris; det ärliga sättet ner till ett billigare steg är att montera en färsk amulett medan du bär det sämre verktyget, vilket präglar om platsen där. Om platsens tak ligger över vad ditt nuvarande verktyg klarar av stannar omladdningen där det verktyget stannar och säger åt dig att bära det bättre. Omladdningen kostar hälften av materialen när du är förtrollaren som signerade amuletten, och mindre ännu om du är specialiserad i Förtrollning; alla andra betalar fullt pris. En omladdning är ett kort kast, som resten av hantverksfamiljen."
     },
     "profPages": {
       "back": "Tillbaka till yrken",
@@ -5363,9 +5722,9 @@ export const sv_SE: EnTranslations = {
         "salvageHeading": "Bärgning",
         "salvageNote": "Bärgning är vanliga människans kusin till avförtrollning: samma vapen och rustning, ingen skicklighet krävs och ingen vinns, och returnerar vanligt hantverksskrot efter kvalitet i stället för något arkaniskt. Vem som helst kan göra det, förtrollare eller ej. När du håller en pjäs värd att bryta är valet enkelt: från sällsynt och uppåt är avförtrollning strikt det bättre alternativet, medan båda avkastningarna vid vanlig säljer för ungefär det samma till handlare, så bryt mot det material du faktiskt behöver.",
         "bonusFmt": "+{value} {stat}",
-        "enchantsNoteOffhand": "Enchants come in three tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed two more sinks besides, the two charm recipes at five apiece and the top rung of tool-effect recharges, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.",
-        "charmsHeading": "Charms for a gatherer's tools",
-        "charmsBody": "Enchanting is also where a gatherer's charms come from. Tinker Gizzel teaches both at the Eastbrook toolworks once your Enchanting reaches 25: the Gatherer's Cache, which adds a unit to a harvest, and the Artisan's Eye, which raises the grade of what comes up. Each is crafted once, then slotted into a pick, axe, or sickle, where it spends a charge only on the harvests it actually improves.\n\nThe refill is where the trade keeps earning. Charges are restored by whoever owns the tool, not by a visiting enchanter, and the refill costs half the materials when that owner is the enchanter who signed the charm, less again with an Enchanting specialization. So a charm sold across the counter is a single sale, while the charms riding your own tools are the cheap ones to keep running. The full charge and material ladder is on any gathering profession page, under Tool effects."
+        "enchantsNoteOffhand": "Förtrollningar finns i tre nivåer. Basnivån drivs av Klingdamm (med lite Klingessens i den övre änden) och täcker vapenplatsen, andra handen och varje rustningsplats, med så många egenskapsaxlar att varje bygge hittar något till varje plats: sköldar och hållna besvärjarföremål i andra handen får en egen Uthållighetsförtrollning, så ingen buren plats saknar en förtrollning att välja. Högre-nivån kostar en Klingskarva plus Klingessens: starkare bonusar på de platser som märks mest. Skärvorna matar dessutom två sänkor till, de två berlockrecepten på fem stycken vardera och det översta steget av uppladdningar av verktygseffekter, så lägg undan några innan du spenderar.\n\nMellan dem sitter de fem Runristade förtrollningarna, en avnämare per typad sekundär, så inget du maler ner blir någonsin en återvändsgränd: Runristad egg (vapen, Styrka, förbrukar Resonant Stål), Runat sigill (vapen, Intelligens, Resonant Timmer), Runvävnad (bröst, Ande, Resonant Tråd), Runhud (ben, Rörlighet, Resonant Skinn) och Runlänkar (hjälm, Uthållighet, Resonant Länkpjäser). Var och en tar dessutom två Klingessens; där en plats och en egenskap har både en bas- och en Högre-förtrollning landar den runristade bonusen mellan dem, medan Runvävnad är den starkaste Ande-förtrollningen för bröstet rakt av och Runhud är den enda Rörlighets-förtrollningen för benen över huvud taget. De exakta bonusarna finns alla i tabellen nedan.",
+        "charmsHeading": "Amuletter för en samlares verktyg",
+        "charmsBody": "Förtrollning är också där en samlares amuletter kommer ifrån. Fixare Gizzel lär ut båda vid verktygsverkstaden i Östbäck så snart din Förtrollning når 25: Samlarens gömma, som lägger till en enhet till en skörd, och Hantverkarens öga, som höjer graden på det som kommer upp. Var och en tillverkas en gång, monteras sedan på en hacka, yxa eller skära, där den förbrukar en laddning bara på de skördar den faktiskt förbättrar.\n\nOmladdningen är där hantverket fortsätter tjäna. Laddningar återställs av den som äger verktyget, inte av en besökande förtrollare, och omladdningen kostar hälften av materialen när den ägaren är förtrollaren som signerade amuletten, ännu mindre med en specialisering i Förtrollning. Så en amulett såld över disk är en enda försäljning, medan amuletterna som rider på dina egna verktyg är de billiga att hålla i gång. Den fullständiga laddnings- och materialstegen finns på varje insamlingsyrkes sida, under Verktygseffekter."
       },
       "gatherIntro": {
         "mining": "Gruvdrift bryter malm rakt ur världens berg: koppar i Östbäcksdalen, järn i Dykärrsträsket och osmium uppe i Törntoppshöjderna, med nybörjarådror utspridda genom varje yngre zon bortom dem, som föder smedjehantverken. Öppen för alla från nivå 1: en gruvhacka för 20 koppar från en disk i Östbäck, Fenbron eller Högvakt öppnar varje nybörjaråder, och hackstegens högre steg vaknar allteftersom din egen räknare förtjänar dem. Spårad på en egen räknare till ett tak på 100.",
@@ -5411,7 +5770,7 @@ export const sv_SE: EnTranslations = {
         "startBody": "Ett Enkelt metspö kostar 20 koppar hos Fiskare Brandt i Östbäck (leta efter den gamla sjöbjörnen vid stadens östra kant, vid vägen mot Spegelsjön); Fixare Gizzel, Proviantmästare Hale i Fenbron och Kvartersmästare Bree i Högvakt har också spön i lager. Använd spöet vänd mot vatten som är djupt nog att hysa fisk, upp till ungefär 24 yard framför dig, så seglar flötet ut.\n\nDu kan inte kasta i strid, medan du simmar eller när du är död: att kasta från stranden är den avsedda hållningen. Vattnet blir dock svårare i takt med landet: träsket vill ha minst nivå 2-spöet Järnrullespöet och höjderna nivå 3-spöet Silverbäcksspöet, och en lina som kastas utan det spö vattnet kräver lämnar aldrig din hand. Två spön sitter ovanför dessa, Stormrullespöet och Tidvattensspöet: ingenjörer tillverkar dem vid verktygsverkstaden av det en lina drar upp, och delvedisken vid Den dränkta litanian säljer dem för Delve-märken bakom sina rensningsgrindar, men aldrig för mynt. Inget vatten kräver dem, så de köper kortare väntan och ett bredare indragningsfönster i stället för tillträde, vilket på det översta steget betyder ett napp på jämna tre sekunder.",
         "biteHeading": "Napp och indragning",
         "biteBody": "Efter kastet kommer ett napp i ett dolt ögonblick mellan {min} och {max} sekunder; fördröjningen avgörs när linan landar, så inga två kast känns riktigt lika. När flötet dyker har du ett fönster på {reel} sekunder att trycka på spöet igen och dra in: dra in inom det så landar fångsten, tveka förbi det och fisken kommer undan utan att lämna något efter sig. En hel session har ett tak på {cap} sekunder, så även ett stillsamt kast avgörs snabbt.\n\nBättre spön skärper båda ändarna av minispelet: varje spönivå över den första skalar bort {rod} sekunder från den längsta möjliga väntan, aldrig under golvet på tre sekunder som toppspöet redan tangerar, och lägger till {reelRod} sekunder på indragningsfönstret, så Järnrullespöet drar ner den värsta väntan till 6,5 sekunder med ett fönster på 3,25 sekunder, och Silverbäcksspöet till 5 med ett fönster förbi 4, där dess sällsynthet vidgar indragningen lite utöver vad nivån ensam betalar. De snabbaste nappen ändras aldrig oavsett vad du håller i, och ett spö behöver bara ligga i väskorna för att räknas.",
-        "earlyReelNote": "En varning för ivriga tummar: tryck på spöet igen innan något nappar och du drar in en tom lina, vilket avslutar kastet (ett kort ögonblicks nåd direkt efter kastet förlåter en ofrivillig dubbeltryckning). Tålamod är hela spelet: vänta på nappet, slå sedan till.",
+        "earlyReelNote": "En varning för ivriga tummar: tryck på spöet igen innan något nappar och du drar in en tom lina, vilket avslutar kastet. Den första sekunden efter att linan landat förlåts, så ett oavsiktligt dubbeltryck kostar dig ingenting; därefter är ett för tidigt tryck ett bortkastat kast. Tålamod är hela spelet: vänta på nappet, och hugg sedan.",
         "scheduleHeading": "Skicklighetsvinst",
         "scheduleNote": "Fiskevinsten följer ett fast schema utan tärningar: en hel poäng per fångst under 50 skicklighet, en halv poäng under 100, en tiondel under 150 och ett långsamt sipprande på 0,02 från 150 till 200. Den sista sträckan är med flit en resa på tusentals fångster: 200 är ett ställningstagande, inte en anhalt på vägen mot något annat.\n\nSkräp slutar lära ut helt vid {cutoff}: därifrån och framåt är sjögräs och stövlar bara sjögräs och stövlar. Vattnet självt sätter också tak för lärdomen: Dalens nivå 1-vatten (och varje ung strand bortom kärnlandet) lär inte ut något förbi 100, träskets slutar vid 150, och bara Törntopps vatten skolar en fiskare hela vägen till 200. Varje landad fångst ger annars vinst i schemats takt, så när räknaren stannar säger schemat åt dig att söka djupare vatten.",
         "colProficiency": "Skicklighet",
@@ -5472,9 +5831,9 @@ export const sv_SE: EnTranslations = {
         "castPaceBatch": "Satsvis tillverkning: upp till {count} i en order, ett kast var",
         "doctrineHeading": "Spelare handlar med spelare",
         "doctrineBody": "Hantverksekonomin är byggd på en idé: spelare försörjer spelare. Samlare matar hantverkare, hantverkare matar korsfarare och raidare, och avbrytare matar förtrollare, med handlare och stationsmästare på kanterna för att ta in skräp och mynt snarare än att konkurrera med dig. Om du vill tjäna pengar på ett yrke är din kund en person: lär dig vad andra spelare bränner igenom, prissätt mot Världsmarknaden, och behandla NPC-systemen som ett golv under dina priser, inte som marknaden själv.\n\nTillverkad utrustning är inställd för att ligga under raidgolvet: även ett mästerverk är alltid bara en kvalitetsnivå över sitt recept, aldrig förbi legendarisk, och dess statbudget stannar under raidlootbandet. Smedjan gör dig redo för det svåraste innehållet; den ersätter det inte. Det håller hantverkare, raidare och marknaden i en stabil triangel: raidfynd förblir aspirationsbaserade, och tillverkade pjäser förblir den bästa utrustning pengar faktiskt kan köpa.",
-        "orderBoardHeading": "The commission board",
-        "orderBoardBody": "You do not have to find a crafter in chat. Open your crafting window and the commission board is one click away in its header. Anyone can post an order there: name the recipe you want made, then either leave it open for any crafter to take, or aim it at one named crafter, who is then the only person who can pick it up. A crafter browsing the board accepts an order, and accepting commits them, so a job is only ever worked by one person at a time.\n\nNothing is held back when you post: an order reserves no coin and no materials, so the price and who supplies the reagents stay between the two of you, agreed the way any commission is agreed. You can cancel your own order while it is still open, and an order nobody accepts expires by itself after a day. Once a crafter has accepted, delivery is what closes it.\n\nDelivery happens face to face. The crafter makes the piece as a commission, comes to you, and hands it over, so keep a bag slot free to receive it. What arrives follows the ordinary commission rules below, binding to you through the Maker's Bond.",
-        "commissionsBoardNote": "There are two ways into a commission: an order you post on the board above, which brings the work to a crafter, and a crafter simply choosing to make a piece for you. Both end in the same bond."
+        "orderBoardHeading": "Beställningstavlan",
+        "orderBoardBody": "Du behöver inte hitta en hantverkare i chatten. Öppna ditt hantverksfönster, så är beställningstavlan ett klick bort i dess sidhuvud. Vem som helst kan lägga upp en order där: namnge receptet du vill ha tillverkat, och lämna det antingen öppet för vilken hantverkare som helst att ta, eller rikta det mot en namngiven hantverkare, som då är den enda som kan plocka upp det. En hantverkare som bläddrar i tavlan accepterar en order, och att acceptera binder dem, så ett jobb utförs alltid bara av en person i taget.\n\nInget hålls tillbaka när du lägger upp den: en order reserverar varken mynt eller material, så priset och vem som står för reagenserna stannar mellan er två, avtalat på samma sätt som varje beställning avtalas. Du kan avbryta din egen order medan den fortfarande är öppen, och en order som ingen accepterar går ut av sig själv efter en dag. När en hantverkare väl har accepterat är det leveransen som avslutar den.\n\nLeverans sker ansikte mot ansikte. Hantverkaren tillverkar pjäsen som en beställning, kommer till dig och lämnar över den, så håll en väskplats fri för att ta emot den. Det som anländer följer de vanliga beställningsreglerna nedan, och binds till dig genom Tillverkarens Band.",
+        "commissionsBoardNote": "Det finns två vägar in i en beställning: en order du lägger upp på tavlan ovan, som för fram arbetet till en hantverkare, och att en hantverkare helt enkelt väljer att tillverka en pjäs åt dig. Båda slutar i samma band."
       },
       "faq": {
         "title": "Yrkens FAQ",
@@ -5495,13 +5854,13 @@ export const sv_SE: EnTranslations = {
         "a7": "Skördekanaliseringen börjar på 2,5 sekunder och kortas ner på två sätt: 0,4 sekunder för varje verktygsnivå du bär och kan hantera över nodens egen nivå, och 0,15 sekunder när ditt yrkes räknare passerar sitt 100-band, med ett golv på 1,5 sekunder. Flytta dig från nivå 1-noder upp till nivå 3-noder så försvinner ditt överskott, och samma hacka svingar långsamt igen. Att hålla exakt den nivå som krävs köper ingen fart; den öppnar bara noden.\n\nSkicklighetsvinsten bleknar på samma sätt som vid hantverk: en nod grånar när din skicklighet klättrar förbi dess nivå (nivå 1-noder lär inte ut något från skicklighet 75 och uppåt), så svaret på långsamma vinster är noder av högre nivå. De kräver ett verktyg av minst sin egen nivå i väskorna (ingen nod bearbetas någonsin med bara händerna, nivå 1 inräknad), och ett landverktyg över nivå 1 kräver dessutom att du först nått dess hanteringsgräns, 40/70/85/100 i sitt eget yrke för nivå 2 till 5. Fiske följer sin egen avsmalning: full vinst under 50 skicklighet, hälften under 100, ett sipprande på 0,1 under 150 och 0,02 under 200, skräpfångster lär inte ut något alls från 100 och uppåt, och vattnet självt sätter tak för lärdomen (nivå 1-vatten slutar lära ut vid 100, träskets vid 150), så en stillastående räknare kan också betyda att du vuxit ur vattnet.",
         "q8": "Kan jag tillverka utanfor staden?",
         "a8": "Delvis. De nio vanliga fältrecepten (nybörjarvapnet, rustningen, maten och trolldryckerna) tillverkas var som helst, när som helst, och det gör även de tre kombinationsrecepten hos de svurna paren. Allt annat ovanför dem är bundet till en stationstyp: smedja, kök, apotek, garveri, vävstol eller verktygsverkstad, och du måste vara inom 20 yard från stationen för att hantverket ska gå igenom.\n\nVid 75 skicklighet i ett hantverk specialiserar du dig, och tillsammans med 20 procent materialrabatt får du en mobil station: ställ upp den i fält så står den i 10 minuter och betjänar det hantverkets recept som om du stod vid den riktiga. Den mobila stationen är bara till för att tillverka: att lära sig recept och att lösa upp beställningar kräver alltid den riktiga stationen i staden.",
-        "q9": "How do I get something crafted for me?",
-        "a9": "Post it on the commission board. Open the crafting window, open the board from its header, and name the recipe you want made: leave the order open for any crafter to accept, or aim it at one crafter you already know. Accepting commits that crafter to the job, and an order is only ever held by one person at a time.\n\nNo coin and no materials are held when you post, so agree the price and who brings the reagents between yourselves, the way commissions have always been arranged. You can cancel your own order while it is still open, and an order nobody accepts expires after a day. Delivery is in person: stand near your crafter with a free bag slot when the piece is ready. It arrives bound to you through the Maker's Bond, which any station master will undo for the usual fee.",
-        "q10": "What is a charm, and what happens when it runs out?",
-        "a10": "A charm is a slotted tool effect: an enchanter's work that sits in a gathering tool and improves what it brings up. A Gatherer's Cache adds a unit to a harvest, an Artisan's Eye raises its grade, and Tinker Gizzel teaches both at the Eastbrook toolworks at 25 Enchanting. A charge is spent only when the charm actually changed the outcome, so a harvest it could not improve costs you nothing, and a slot can be set to ask each use if you would rather decide charge by charge.\\n\\nA fresh charm carries 20 charges on a common tool and 10 more for each rarity rung above it, so an epic tool starts at 50. Running out does not destroy the charm: the tool's owner refills the slot, 10 charges per arcane material, with the material following the better of the tool they are carrying and the best tool that slot has ever been filled by (Chime Dust for a common or uncommon tool, Chime Essence for a rare one, a Chime Shard for an epic). Banking the good tool before a refill never makes it cheaper, only smaller at the same price, and slotting a fresh charm while carrying the lesser tool is the way back down to a cheaper rung. The enchanter who signed the charm pays half to refill their own, and less again with an Enchanting specialization."
+        "q9": "Hur får jag något tillverkat åt mig?",
+        "a9": "Lägg upp den på beställningstavlan. Öppna hantverksfönstret, öppna tavlan från dess sidhuvud, och namnge receptet du vill ha tillverkat: lämna ordern öppen för vilken hantverkare som helst att acceptera, eller rikta den mot en hantverkare du redan känner. Att acceptera binder den hantverkaren till jobbet, och en order hålls alltid bara av en person i taget.\n\nInget mynt och inga material hålls kvar när du lägger upp den, så kom överens om priset och vem som tar med reagenserna er emellan, på samma sätt som beställningar alltid har avtalats. Du kan avbryta din egen order medan den fortfarande är öppen, och en order som ingen accepterar går ut efter en dag. Leverans sker personligen: stå nära din hantverkare med en ledig väskplats när pjäsen är klar. Den anländer bunden till dig genom Tillverkarens Band, vilket vilken stationsmästare som helst löser upp mot den vanliga avgiften.",
+        "q10": "Vad är en amulett, och vad händer när den tar slut?",
+        "a10": "En amulett är en monterad verktygseffekt: en förtrollares arbete som sitter i ett insamlingsverktyg och förbättrar det som kommer upp. Samlarens gömma lägger till en enhet till en skörd, Hantverkarens öga höjer dess grad, och Fixare Gizzel lär ut båda vid verktygsverkstaden i Östbäck vid 25 i Förtrollning. En laddning förbrukas bara när amuletten faktiskt ändrade utfallet, så en skörd den inte kunde förbättra kostar dig ingenting, och en plats kan ställas in på att fråga vid varje användning om du hellre vill avgöra det laddning för laddning.\\n\\nEn färsk amulett bär 20 laddningar på ett vanligt verktyg och 10 fler för varje sällsynthetssteg däröver, så ett episkt verktyg börjar på 50. Att ta slut förstör inte amuletten: verktygets ägare laddar om platsen, 10 laddningar per arkant material, där materialet följer det bättre av verktyget de bär och det bästa verktyg platsen någonsin fyllts med (Klingdamm för ett vanligt eller ovanligt verktyg, Klingessens för ett sällsynt, en Klingskarva för ett episkt). Att banka det bra verktyget före en omladdning gör den aldrig billigare, bara mindre till samma pris, och att montera en färsk amulett medan du bär det sämre verktyget är vägen tillbaka ner till ett billigare steg. Förtrollaren som signerade amuletten betalar hälften för att ladda om sin egen, och mindre ännu med en specialisering i Förtrollning."
       },
-      "findingNodesNote": "You do not have to find these by eye. Every node in the zone is drawn on the zone map wherever the map is showing that ground, and on the minimap as you pass it, so a farming loop can be planned from the map screen before you set out. A node your tools cannot work yet is marked rather than hidden: it keeps its place with a struck, dimmed mark, so you can see the ground you are training toward. On desktop, hovering a vein, stand, or patch in the world names it, tells you the tool it wants, and, once you have worked it, counts your own respawn down to the second. On touch there is nothing to hover, so the minimap marks tell the same story.",
-      "specimenBodyFamilies": "Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, claw, meat) keeps its ordinary yield plain and mints the signed specimen beside it; the other three, fang, cloth, and tusk, sign the yield itself."
+      "findingNodesNote": "Du behöver inte hitta dessa med ögat. Varje fyndplats i zonen är utritad på zonkartan var kartan än visar den marken, och på minikartan när du passerar den, så en insamlingsrunda kan planeras från kartskärmen innan du ger dig av. En fyndplats dina verktyg ännu inte kan bearbeta är markerad snarare än dold: den behåller sin plats med en genomstruken, nedtonad markering, så du kan se marken du tränar dig mot. På datorn räcker det att föra muspekaren över en ådra, ett bestånd eller en fläck i världen: den namnges, du får veta vilket verktyg den vill ha, och när du väl har bearbetat den räknas din egen återspawning ner till sekunden. På pekskärm finns det inget att föra en pekare över, så minikartans markeringar berättar samma historia.",
+      "specimenBodyFamilies": "Håll lite ledigt väskutrymme när du samlar: ett signerat vindfall behöver en egen plats eller en matchande signerad stapel att landa i, och om inget passar anländer utbytet ändå, men signaturen går förlorad. Kroppsskörd har också sin egen premiumarm: omkring {pct}% av varje skördad komponent kommer upp sällsynt eller bättre. En familj med ett perfekt exemplar att ge (hud, silke, gift, klo, kött) håller sitt vanliga utbyte enkelt och präglar det signerade exemplaret bredvid; de andra tre, huggtand, tyg och bete, signerar själva utbytet."
     },
     "economy": {
       "intro": "Mynt smörjer hela världen: de köper din utrustning, dina förnödenheter och din reseutrustning, och byter ägare mellan spelare. Du plockar upp allt detta bara genom att spela, så se den här sidan som en karta över var dina pengar kommer ifrån och var de tar vägen.",
@@ -5509,7 +5868,7 @@ export const sv_SE: EnTranslations = {
       "coinBody": "Pengar finns i tre mynt. Hundra koppar blir ett silver, och hundra silver blir ett guld, så din börs fylls från det minsta myntet först. Du tjänar dem från uppdragsbelöningar, från att plundra fallna fiender och från att sälja det du inte längre behöver.",
       "vendorsTitle": "Handlare och vad de har",
       "vendorsBody": "Städer och utposter är fulla av köpmän, var och en med sin egen handel. Provianthandlare har mat och dryck, vapensmeder och rustningssmeder bär utrustning, och en kvartersmästare håller praktisk reseutrustning. Gå fram till en för att se vad de säljer.",
-      "marksTitle": "Märken: valutorna bortom mynt",
+      "marksTitle": "Märken och Heder: valutorna bortom mynt",
       "marksBody": "Mynt är inte det enda du lägger på hög. Delver betalar ut Delve-märken, som du bara spenderar hos delvevaktaren på följeslagaruppgraderingar och utrustning du inte hittar någon annanstans. Heroiska fängelsehåleomgångar lämnar heroiska märken på slutbossen, som du spenderar hos den heroiska kvartersmästaren i Highwatch på smycken som ingen annan del av riket säljer. Ingendera blandas någonsin med ditt mynt.",
       "bankTitle": "Banken",
       "bankBody": "Varje huvudort har en filial av Förgyllda kassakistan, rikets bankhus. Tala med kamreren där för att öppna ditt valv, ett privat förvaringsutrymme bortom dina väskor som din karaktär behåller livet ut. Vad du än lämnar hos dem väntar tryggt, oavsett vilken filial du besöker härnäst.",
@@ -5529,16 +5888,16 @@ export const sv_SE: EnTranslations = {
       "marketTitle": "Världsmarknaden",
       "marketBody": "Köpmannen driver Världsmarknaden, en spelardriven börs där du kan köpa och sälja med folk du kanske aldrig träffar. Tala med Köpmannen i Östbäck, eller med Auktionsförrättare Voss uppe i Highwatch, för att öppna den: båda förvaltarna betjänar en och samma delade marknad. Köpmannen håller också ett stående lager av sina egna varor listade där, så det finns alltid något att köpa även när inga andra spelare har lagt upp något.",
       "marketBrowse": "Bläddra: skrolla genom annonserna eller sök på namn för att hitta det som är till salu. Varje annons visar varorna, säljaren och begärt pris för hela bunten.",
-      "marketPost": "Lägg upp: välj en bunt från dina väskor, sätt ditt pris och annonsera den. Varorna hålls av Köpmannen tills någon köper dem. Osålda annonser kommer tillbaka till dig efter ett tag, och du kan ta tillbaka en i förtid om du ångrar dig.",
-      "marketCollect": "Hämta: när dina varor säljs väntar din ersättning på dig hos Köpmannen. Återvänd för att hämta mynten, tillsammans med allt som kom tillbaka osålt. Köpmannen tar en liten andel av varje genomförd försäljning.",
+      "marketPost": "Att lägga ut: välj en trave ur dina väskor, sätt ditt pris och lägg ut den. Varan förvaras av Köpmannen tills någon köper den. Osålda annonser kommer tillbaka till dig efter en tid, och du kan hämta tillbaka en tidigare om du ändrar dig. Att lägga ut är i sig gratis, så ett optimistiskt pris kostar dig inget annat än tid.",
+      "marketCollect": "Att hämta ut: när din vara säljs väntar din behållning hos Köpmannen. Kom tillbaka och hämta mynten, tillsammans med allt som kom tillbaka osålt. Köpmannen tar en liten andel av varje avslutad försäljning. Fliken Hämta ut specificerar vad som väntar, en rad per avslutad försäljning med varan, köparen och vad du tjänade, så du ser precis vad som sålts innan du tar mynten.",
       "marketPricing": "Prissättningen är upp till dig. Att lägga sig lite under vad andra begär brukar sälja snabbare, medan ett brant pris kan bli liggande orört. Bläddra först för att se hur gångpriset ser ut innan du lägger upp.",
-      "honorBody": "Fighting other players pays a third currency, Honor. Winning a ranked arena bout pays it, and a played-out match on Thornhollow Fields pays it whether you win or lose, so a hard-fought loss on the Fields is never a wasted match. Honor collects on your character sheet without ever mixing with your coin. You spend it with the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, who share one stock between them: the Warfare armor families, jewelry, and weapons that Honor alone buys. Those purchases are final, and the gear binds to you the moment you buy it, so read a piece before you confirm it. The arena page covers how Honor is earned.",
-      "guildBankNote": "Your guild keeps a vault of its own alongside your personal one, opened at the same bursar and reached from a tab in the same window: a shared treasury of coin and a pooled store of goods. Every member can look at it, and officers are the ones who may move things in and out. The social page has the details."
+      "honorBody": "Att slåss mot andra spelare betalar ut en tredje valuta, Heder. En rankad arenamatch betalar ut den vid seger, och en utspelad match på Törnhålefälten betalar ut den oavsett om du vinner eller förlorar, så en hårt kämpad förlust på fälten är aldrig en bortkastad match. Heder samlas på din karaktärspanel utan att någonsin blandas med ditt mynt. Du spenderar den hos hederskvartermästarna, RASERI i Eastbrook och Krigsmarskalk Draven Kole i Highwatch, som delar ett gemensamt lager: Krigföringens rustningsfamiljer, smycken och vapen som bara Heder kan köpa. Dessa köp är slutgiltiga, och utrustningen binder till dig i samma stund du köper den, så läs en pjäs innan du bekräftar den. Sidan om Arena och PvP tar upp hur Heder tjänas in.",
+      "guildBankNote": "Ditt gille håller ett eget valv vid sidan av ditt personliga, öppnat hos samma kamrer och nått via en flik i samma fönster: en delad skattkammare av mynt och ett gemensamt lager av varor. Alla medlemmar kan titta i det, och det är officerarna som får flytta saker in och ut. Sidan om Socialt och grupper har detaljerna."
     },
     "social": {
       "intro": "Det mesta av världen kan klaras på egen hand, men spelet är byggt för att spelas med andra. Här är hur du pratar, slår dig ihop och hittar din skara.",
       "chatHeading": "Chattkanaler",
-      "chatBody": "Chatten är uppdelad i kanaler, var och en visad på sin egen flik. Skriv ett meddelande för att skicka det på den aktiva kanalen, eller använd ett snedstreckskommando för att rikta en rad någon annanstans. Detta är kanalerna du kan prata på:",
+      "chatBody": "Chattfönstret börjar med två vyer som alltid finns där, en samlad logg över allt som sägs och en stridslogg. Utöver dem lägger du till de flikar du vill med plusknappen, en per kanal, och på datorn kan du dra dem i vilken ordning du vill (Alt med vänster- eller högerpiltangenten flyttar den fokuserade fliken från tangentbordet); högerklicka på en flik för att stänga den igen, och din ordning minns mellan sessionerna. Att skriva i en kanalflik skickar på den kanalen, och ett snedstreckskommando skickar en rad någon annanstans utan att byta flik. Det finns också en viskningsflik som samlar varje viskning du skickar och tar emot på ett ställe, och där skrivandet helt enkelt svarar den som skrev till dig senast. Det här är kanalerna du kan tala på:",
       "chanSay": "Säg.",
       "chanSayBody": "Din standardröst. Den når spelare nära dig och är den att använda medan ni löser uppdrag sida vid sida.",
       "chanYell": "Ropa.",
@@ -5547,6 +5906,8 @@ export const sv_SE: EnTranslations = {
       "chanWhisperBody": "Ett privat meddelande till en spelare vid namn, var de än är. Använd det för ett tyst ord.",
       "chanParty": "Grupp.",
       "chanPartyBody": "Prata med alla i din grupp, oavsett hur utspridda ni är.",
+      "chanBattleground": "Slagfält.",
+      "chanBattlegroundBody": "Prata med alla stridande i ditt slagfält, båda sidorna. Bara medan en match pågår.",
       "chanGeneral": "Allmänt.",
       "chanGeneralBody": "En ständigt påslagen rikstäckande kanal som når alla som är online, bra för att ställa en fråga eller småprata. Till skillnad från World och Looking for Group behöver du aldrig välja att gå med.",
       "chanWorld": "Värld.",
@@ -5569,43 +5930,43 @@ export const sv_SE: EnTranslations = {
       "lootRollBody": "När ett föremål går till en rullning väljer varje berättigad medlem Behov om de vill ha det, Girighet om de bara skulle ta det till övers, eller Avstå för att kliva av. Den högsta rullningen vinner.",
       "lootMasterTitle": "Bytesmästare.",
       "lootMasterBody": "Ledaren kan i stället ta hand om de bättre fynden och dela ut vart och ett till den medlem som bör få det. Det hindrar eftertraktad utrustning från att gå till ett vilset kast, så som en organiserad grupp kör en fängelsehåla.",
-      "friendsHeading": "Vänner och ignorering",
+      "friendsHeading": "Vänner, ignorera och blockera",
       "friendsBody": "Lägg till spelare i din vänlista för att se när de är online och var de befinner sig, så du kan gruppera dig så snart de loggar in.",
-      "ignoreBody": "Om någon stör dig, lägg till dem i din ignoreringslista så slutar du se deras chatt.",
+      "ignoreBody": "Om någon pratar mer än du vill, lägg till den på din ignoreringslista så slutar dennes offentliga chatt nå dig. Att ignorera är bara en chattinställning, och det tar aldrig bort någon från din vänlista.",
       "guildHeading": "Gillen",
-      "guildBody": "Ett gille är en bestående grupp av spelare du tillhör mellan sessioner. Skapa ett eller anta en inbjudan för att gå med, och du kan vara med i ett gille åt gången. Medlemmar innehar en rang: en ledare, officerare och medlemmar.",
-      "guildChatBody": "Att tillhöra ett gille ger dig en privat gilleschattkanal och visar dina gilleskamrater på en gemensam roster, så det finns alltid bekanta ansikten online.",
+      "guildBody": "Ett gille är en varaktig grupp spelare som du hör till mellan sessionerna. Att grunda ett kostar grundaren en engångsavgift på 1 guld, eller så kan du helt enkelt anta en inbjudan för att gå med, och du kan vara i ett gille i taget. Medlemmar bär en rang: en ledare, officerare och medlemmar.",
+      "guildChatBody": "Att höra till ett gille ger dig en privat gilleskanal i chatten och en delad lista över dina gilleskamrater. Nyare medlemmar bär en Rekryt-bricka och långvariga en Veteran-bricka i stället för den enkla medlemsetiketten, medan officerare och gillesledaren alltid visar sin rang, och du kan dölja de frånkopplade namnen när du bara vill se vilka som är här just nu. Officerare och gillesledaren kan också nåla upp ett kort anslag högst upp på fliken Gille, och det läses upp i din chattlogg nästa gång du loggar in, vilket är hur de flesta gillen kungör veckans planer.",
       "communityHeading": "Att kalla på hela communityn",
       "communityBody": "Inled en chattrad med ett utropstecken för att göra ett community-upprop: !lfg för att söka en grupp, !wts och !wtb för att handla, !recruit för ditt gille, !event för att tillkännage en raid eller ett möte, och !help för att be om en hjälpande hand. En meny över uppropen dyker upp i samma stund du skriver tecknet. Varje upprop sänds ut i världen och ekar till community-Discorden, så att det når spelare som inte ens är inloggade. Community-upprop är en del av onlinespelet.",
       "slashHeading": "Praktiska snedstreckskommandon",
       "slashBody": "Några vardagskommandon är värda att lägga på minnet: /w Namn skickar en viskning och /r svarar på den senaste du fick, /invite bjuder in någon i din grupp, /follow faller in i steg bakom en vän, /roll kastar tärning för gruppen att se, /who visar vilka som är online, och /afk markerar dig som borta. Skriv /help i spelet för hela listan.",
       "emotesBody": "Din karaktär kan också tala utan ord: skriv en emote som /wave, /dance, /cheer eller /bow, rikta den mot en vän genom att välja denne först, eller håll in X för att öppna emotehjulet för ett snabbt uttryck ovanför huvudet.",
       "calendarHeading": "Händelsekalendern",
-      "calendarBody": "Tryck på I för att öppna händelsekalendern. Den markerar de dagar i riket det är värt att planera kring, från det veckovisa raiduppropet till fiesta-kvällen, och det är där gillen håller sitt schema: gilleledaren och officerarna kan boka evenemang på den, och varje medlem ser dem på samma sida.",
+      "calendarBody": "Tryck I för att öppna evenemangskalendern. Den markerar de rikesdagar det lönar sig att planera kring, det veckovisa Raidkallet, Marknadsdagen, Arenadusten och Fisketävlingen, plus den månatliga Delve-dagen och Månportskommunionen, och det är där gillen håller sitt schema: gillesledaren och officerarna kan boka evenemang på den, och varje medlem ser dem på samma sida. Rikesdagarna är en uppmaning att samlas, inte en bonus; ingenting med din rollperson ändras för att en dag är markerad.",
       "readyHeading": "Redokontroller",
       "readyBody": "Före en stor dragning kan gruppledaren skriva /ready för att fråga rummet: alla andra får en fråga om Redo eller Inte redo, och när alla har svarat, eller 30 sekunder runnit ut, ser hela gruppen en enda sammanfattning av räkningen. Ingen pekas ut; poängen är räkningen, inte den skyldige.",
       "markersHeading": "Målmarkörer",
       "markersBody": "I en grupp, välj en fientlig varelse och högerklicka på dess porträtt i målramen (långtryck på pekskärm) för att kröna den med en av åtta raidsymboler. Vilken medlem som helst kan markera, varje symbol lever på ett mål i taget, och att lägga en symbol på nytt på dess eget mål tar bort den. Dödsordning, masskontrollsuppdrag eller ett enkelt \"den här först\" färdas alla snabbare som en symbol än som en mening.",
       "etiquetteHeading": "Gruppetikett",
-      "etiquetteBody": "Att gruppera är ett val, inte ett tvång. Säg hej när du går med, rulla Behov bara på utrustning du faktiskt kommer att använda, och låt gruppen veta innan du drar vidare. Lite hyfs räcker långt, och de flesta spelare uppskattar sällskapet. Moderatorer håller ordning, och en spelare som inte låter andra njuta av spelet kan flyttas till en fängelsecell tills en moderator släpper ut denne.",
-      "realmsHeading": "Worlds",
-      "realmsBody": "Online play runs on worlds, and each world is a separate place with its own players. You pick one from the World List before you play, and every row shows how busy that world is right now, from Low through Medium and High up to Full, or Offline for a world that is not currently up. Low means plenty of room, High means plenty of company, and a world that has reached its limit shows Full and turns new logins away until someone logs out, so pick where your friends are or where there is space.",
-      "realmsScopeBody": "What you do stays on the world you chose: your characters, your friends list, your guild, and the Market all live there, and the guild and player boards you open in game rank that world alone, while the board on the website gathers every world together. Each world also keeps its own daily raid reset, on its own local time.",
-      "finderHeading": "Finding a group",
-      "finderBody": "You do not have to shout in Looking for Group to fill a run. Open the Dungeon Finder, choose the run you want and the roles you are willing to fill, and join the queue on your own or with the party you already have. The finder waits until it has a full set of roles, then offers the group to everyone at once: a popup asks each of you to accept, and the party forms the moment the last person says yes. Turning an offer down, or letting it run out, puts you on a short cooldown before the queue offers you another, so the line keeps moving.",
-      "finderBoardBody": "The finder also keeps a board of premade groups. A leader posts a listing with tags saying what the run is for, from a first visit to a straight full clear, and you apply to it for the leader to approve. The automatic queue fills the dungeons and the endgame raid, each at normal and heroic, while the board can also carry the solo attunement run, which the queue never fills for you; delves and open-world outings are yours to arrange. Either way the finder only builds the group: walking to the door, setting the difficulty, and agreeing the loot rules are still yours.",
-      "finderMore": "See what is inside each dungeon",
-      "blockBody": "Block is the heavier tool, for a player who will not leave you alone. A block cuts their invites, their whispers, and their mail as well as their chat, makes the two of you invisible to each other in /who, and drops them from your friends list if they were on it. Block from the right-click menu on their name or with /block, /unblock lifts it again, and /blocklist shows who is on it.",
-      "guildBoardBody": "Guilds are ranked too. The Leaderboard window keeps a Guilds board beside the player boards, ranking guilds on what their members have earned together, so a busy guild can see where it stands.",
-      "guildBankHeading": "The guild bank",
-      "guildBankBody": "A guild also keeps a vault of its own. Step up to a banker in one of the hub towns, open your bank, and switch to the Guild tab: there you will find a treasury of coin and a pooled store of items the guild owns together. Every member can open it and look at what is inside, and the pane says plainly who can do more. Only the guild leader and officers can act, putting coin and goods in and handing them back out, and every deposit and withdrawal is written into a log the guild can read, so nothing moves without a record.",
-      "guildBankRulesBody": "The item store starts closed. An officer opens it out of their own pocket, and the guild can pay from the treasury to widen it later. Quest items, anything soulbound, and gear the Market will not take stay out of it, the same as the mail and the Market, so the bank is for goods that can still change hands.",
-      "discordLinkBody": "The Discord panel in game goes the other way too. Link your Discord account to it and the community roles you hold there follow you into the world: a colored name over your head, and a tag on the chat lines of the staff roles, so you can always tell a real moderator from someone borrowing the name. Linking also tracks a status that climbs as you take part. None of it grants any power in the game.",
-      "moderationHeading": "Reporting a player",
-      "moderationBody": "If a player is out of line, right-click their name and choose Report Player. Pick a reason, from harassment to spam to cheating, add a line about what happened, and send it: the report goes to the moderators to read. A report is a note to them, not a punishment in itself. Sending one does not silence, kick, or jail anyone, and no reply comes back telling you what was decided. Blocking them stops the bother while you wait.",
-      "jailBody": "Moderators keep the peace, and a player who will not let others enjoy the game can be moved to a jail cell. A sentence always has a set length, though a moderator can end it early, and it runs on the clock whether or not you stay logged in.",
-      "chatMore": "More on the chat window and the rest of the interface",
-      "jailHeading": "Moderators and the jail"
+      "etiquetteBody": "Att gruppa är ett val, inte ett måste. Säg hej när du ansluter, rulla Behov bara på utrustning du faktiskt kommer att använda, och låt gruppen veta innan du drar vidare. Lite hyfs räcker långt, och de flesta spelare är glada över sällskapet.",
+      "realmsHeading": "Världar",
+      "realmsBody": "Onlinespelet drivs på världar, och varje värld är en egen plats med sina egna spelare. Du väljer en från Världslistan innan du spelar, och varje rad visar hur upptagen den världen är just nu, från Låg genom Medel och Hög upp till Fullt, eller Offline för en värld som inte är uppe just nu. Låg betyder gott om plats, Hög betyder gott om sällskap, och en värld som nått sin gräns visar Fullt och avvisar nya inloggningar tills någon loggar ut, så välj där dina vänner är eller där det finns plats.",
+      "realmsScopeBody": "Det du gör stannar på världen du valde: dina karaktärer, din vänlista, ditt gille och Marknaden finns alla där, och gille- och spelartopplistorna du öppnar i spelet rankar bara den världen, medan topplistan på webbplatsen samlar alla världar tillsammans. Varje värld har också sin egen dagliga raidåterställning, i sin egen lokala tid.",
+      "finderHeading": "Att hitta en grupp",
+      "finderBody": "Du behöver inte ropa i Söker grupp för att fylla en körning. Öppna Fängelsehålsletaren, välj körningen du vill ha och rollerna du är villig att fylla, och gå med i kön på egen hand eller med gruppen du redan har. Letaren väntar tills den har en full uppsättning roller, och erbjuder sedan gruppen till alla på en gång: en popup ber var och en av er acceptera, och gruppen bildas i samma stund den sista personen säger ja. Att tacka nej till ett erbjudande, eller låta det rinna ut, ger dig en kort nedkylning innan kön erbjuder dig en till, så att kön fortsätter röra sig.",
+      "finderBoardBody": "Letaren håller också en tavla med förberedda grupper. En ledare lägger upp en annons med taggar som säger vad körningen är till för, från ett första besök till en ren fullständig rensning, och du ansöker om den för att ledaren ska godkänna dig. Den automatiska kön fyller fängelsehålorna och slutspelsraiden, var och en på normal och heroisk, medan tavlan också kan bära solo-länkningsomgången, som kön aldrig fyller åt dig; delver och utflykter i den öppna världen är dina att ordna själv. Hur som helst bygger letaren bara gruppen: att gå till dörren, ställa in svårighetsgraden och komma överens om bytesreglerna är fortfarande upp till er.",
+      "finderMore": "Se vad som finns inuti varje fängelsehåla",
+      "blockBody": "Blockera är det tyngre verktyget, för en spelare som inte lämnar dig ifred. En blockering stänger av deras inbjudningar, viskningar och post liksom deras chatt, gör er osynliga för varandra i /who, och tar bort dem från din vänlista om de fanns på den. Blockera från högerklicksmenyn på deras namn eller med /block, /unblock hävdar den igen, och /blocklist visar vilka som är på den.",
+      "guildBoardBody": "Gillen rankas också. Topplistan håller en flik för Gillen bredvid spelarflikarna, och rankar gillen efter vad deras medlemmar har tjänat tillsammans, så att ett aktivt gille kan se var det står.",
+      "guildBankHeading": "Gillesbanken",
+      "guildBankBody": "Ett gille håller också ett eget valv. Gå fram till en bankir i en av knutpunktsstäderna, öppna din bank, och växla till fliken Gille: där hittar du en kassa med mynt och ett gemensamt lager av föremål som gillet äger tillsammans. Alla medlemmar kan öppna den och se vad som finns inuti, och panelen säger tydligt vem som kan göra mer. Bara gilleledaren och officerarna kan agera, sätta in och ta ut mynt och varor, och varje insättning och uttag skrivs in i en logg gillet kan läsa, så inget flyttas utan en notering.",
+      "guildBankRulesBody": "Föremålsförrådet börjar stängt. En officer öppnar det ur egen ficka, och gillet kan betala från kassan för att utöka det senare. Uppdragsföremål, allt som är själsbundet, och utrustning Marknaden inte tar emot hålls utanför det, precis som posten och Marknaden, så banken är till för varor som fortfarande kan byta ägare.",
+      "discordLinkBody": "Discord-panelen i spelet fungerar åt andra hållet också. Länka ditt Discord-konto till den så följer gemenskapsrollerna du har där med dig in i världen: ett färgat namn ovanför ditt huvud, och en tagg på chattraderna för personalrollerna, så att du alltid kan skilja en riktig moderator från någon som lånar namnet. Att länka spårar också en status som stiger allteftersom du deltar. Inget av det ger någon makt i spelet.",
+      "moderationHeading": "Att anmäla en spelare",
+      "moderationBody": "Om en spelare beter sig illa, högerklicka på deras namn och välj Anmäl spelare. Välj en orsak, från trakasserier till skräppost till fusk, lägg till en rad om vad som hände, och skicka den: rapporten går till moderatorerna för granskning. En rapport är en anteckning till dem, inte ett straff i sig. Att skicka en tystar, sparkar eller fängslar ingen, och inget svar kommer tillbaka som berättar vad som beslutades. Att blockera dem stoppar besväret medan du väntar.",
+      "jailBody": "Moderatorer håller ordningen, och en spelare som inte låter andra njuta av spelet kan flyttas till en fängelsecell. En strafftid har alltid en bestämd längd, även om en moderator kan avsluta den i förtid, och den räknas ner oavsett om du förblir inloggad eller inte.",
+      "chatMore": "Mer om chattfönstret och resten av gränssnittet",
+      "jailHeading": "Moderatorer och fängelset"
     },
     "stats": {
       "intro": "Din karaktär beskrivs av en handfull egenskaper. Du behöver aldrig memorera dem för att spela bra, men att ungefär veta vad var och en gör hjälper dig att läsa ditt karaktärsblad och välja rätt uppgraderingar.",
@@ -5620,7 +5981,7 @@ export const sv_SE: EnTranslations = {
       "intTitle": "Intellekt",
       "intBody": "Intellekt växer en besvärjares manapool, höjer deras besvärjelsekraft så att deras besvärjelser slår hårdare, och förbättrar chansen att deras besvärjelser blir kritiska. Det spelar roll för de klasser som besvärjer från mana; för en raseri- eller energiklass gör det föga.",
       "spiTitle": "Ande",
-      "spiBody": "Ande styr hur snabbt en besvärjares mana återvänder närhelst denne pausar sina besvärjelser, vilket är merparten av tiden mellan strider. Liksom Intellekt tjänar den manaklasserna och betyder föga för de andra.",
+      "spiBody": "Ande styr hur fort en besvärjares mana återvänder. Den betalar fullt först när några sekunder gått utan att något spenderats, och en del av den fortsätter flöda även mitt i en besvärjelse, så Ande är aldrig död vikt i en strid, även om en besvärjare som kör för fullt ändå kommer att torka ut. Att pausa för att hämta andan är ett verkligt manabeslut, i strid lika mycket som mellan striderna. Liksom Intellekt tjänar Ande manaklasserna och betyder lite för de andra.",
       "armorTitle": "Rustning",
       "armorBody": "Rustning minskar den fysiska skada du tar. Den kommer mestadels från vad du bär, och de tyngre rustningsklasserna bär långt mer av den. Mer rustning mot en fiende nära din nivå innebär att var och en av dess träffar landar mjukare.",
       "apTitle": "Anfallskraft",
@@ -5639,31 +6000,31 @@ export const sv_SE: EnTranslations = {
       "sheetBody": "Öppna karaktärsfönstret i spelet för att se allt detta på ett ställe: dina fem egenskaper på ena sidan och de stats de göder på den andra. För muspekaren över valfritt värde så bryter en verktygstips ner vad det gör för din klass, så du kan se på ett ögonkast vilka siffror en uppgradering faktiskt flyttade.",
       "growHeading": "Hur dina egenskaper växer",
       "growBody": "Två saker höjer dina egenskaper. Varje nivå lägger till en fast mängd av varje attribut för att passa din klass, och utrustningen du bär lägger till mer ovanpå. Att hålla din utrustning aktuell är det stadigaste sättet att växa sig starkare, hela vägen till maxnivån.",
-      "hitTitle": "Hit rating",
-      "hitBody": "Hit rating comes from your gear and its set bonuses. It makes your attacks miss less often and your spells resisted less often, and it earns its keep against enemies above your own level, where misses pile up fastest. Your sheet shows it as Hit Rating.",
-      "parryTitle": "Parry",
-      "parryBody": "Parry is the warrior's own defense: a chance to turn a melee blow aside entirely and take no damage, and it grows with Strength. Only an attack coming at your front can be parried, which is one more reason to keep facing whatever is hitting you. Other classes see the row on their sheet sitting at zero.",
-      "warfareTitle": "Warfare",
-      "warfareBody": "Warfare is the one stat that counts only against other players: it raises the damage you deal to them and lowers the damage you take from them, and your sheet shows both halves on one line. Against creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "hitTitle": "Träffvärde",
+      "hitBody": "Träffvärde kommer från din utrustning och dess setbonusar. Det gör att dina attacker missar mer sällan och dina besvärjelser motarbetas mer sällan, och det gör mest nytta mot fiender över din egen nivå, där missar staplas snabbast. Ditt blad visar det som Träffvärde.",
+      "parryTitle": "Parering",
+      "parryBody": "Parering är krigarens eget försvar: en chans att helt avvärja ett närstridsslag och inte ta någon skada, och den växer med Styrka. Bara en attack som kommer framifrån kan pareras, vilket är ännu en anledning att hålla dig vänd mot det som slår dig. Andra klasser ser raden på sitt blad stå på noll.",
+      "warfareTitle": "Krigföring",
+      "warfareBody": "Krigföring är den enda statistiken som bara räknas mot andra spelare: den höjer skadan du tillfogar dem och sänker skadan du tar från dem, och ditt blad visar båda halvorna på en rad. Mot varelser gör den ingenting alls. Den kommer från Krigföringsutrustning du köper med Heder, så den är en belöning för att spela PvP snarare än något att jaga medan du stiger i nivå."
     },
     "progression": {
       "intro": "Varje strid, uppdrag och steg norrut gör din hjälte starkare. Här är hur nivåökning fungerar och vad som håller dig växande när du väl når toppen.",
       "xpTitle": "Hur du tjänar erfarenhet",
-      "xpBody": "Du tjänar erfarenhet genom att slutföra uppdrag, genom att besegra fiender och genom att rensa delver. Uppdrag ger absolut mest, så att följa uppdragsspåret är det snabbaste sättet att klättra. Dråp och delveturer längs vägen fyller i resten.",
+      "xpBody": "Du tjänar erfarenhet genom att slutföra uppdrag, besegra fiender, rensa delves och utöva ett yrke: att skörda och tillverka betalar rollpersonserfarenhet utöver den yrkesfärdighet de lär ut, så länge arbetet fortfarande lär dig något. Uppdrag ger överlägset mest, så att följa uppdragsspåret är den snabbaste vägen uppåt, medan besegrade fiender, delves och samlandet du gör längs vägen fyller ut resten.",
       "capBody": "Varje nivå gör dig tåligare och ger nya förmågor, hela vägen upp till maxnivån {cap}.",
       "journeyTitle": "Resan norrut",
       "journeyBody": "Världen är ett enda sammanhängande land, tre zoner lagda från söder till norr, var och en ett steg högre i nivå. Du börjar i den gröna dalen, tränger på genom träsket och avslutar i de kalla höga topparna. Följ uppdragsspåret så bär landet dig från den ena till den nästa.",
-      "journeyBodyCount": "The world is one continuous land of {zones} zones. Three of them are the road you level on, laid south to north: you start in the green valley, press on through the marsh, and finish in the cold high peaks. Follow the quest trail and the land carries you from one to the next. An island sits off the valley coast for the early levels, and the rest of the realms open off that same road, built for characters who have already made the climb.",
+      "journeyBodyCount": "Världen är ett enda sammanhängande land av {zones} zoner. Tre av dem är vägen du levlar på, lagda från söder till norr: du börjar i den gröna dalen, tränger på genom träsket och avslutar i de kalla höga topparna. Följ uppdragsspåret så bär landet dig från den ena till den nästa. En ö ligger utanför dalens kust för de tidiga nivåerna, och resten av riket öppnas från samma väg, byggt för karaktärer som redan har klarat klättringen.",
       "bandLabel": "Nivå {min} till {max}",
       "restedTitle": "Vilad erfarenhet",
-      "restedBody": "Kliv in på ett värdshus och håll dig utanför strid, så bygger din karaktär upp vilad erfarenhet medan du väntar. Varje stad har ett. Nästa gång du ger dig ut och strider ger den poolen dina dråp en extra skjuts tills den sinar. En paus vid värdshuset är aldrig bortkastad tid; den snabbar på din nästa sträcka av nivåökning.",
+      "restedBody": "Stig in på ett värdshus och håll dig utanför strid, så bygger din rollperson upp vilad erfarenhet medan du väntar. Varje stad har ett. Nästa gång du går ut och strider ger den reserven dina segrar ett extra påslag tills den sinar. En paus på värdshuset är aldrig bortkastad tid; den snabbar på din nästa sträcka av nivåklättring. Reserven har ett tak, så en övernattning samlar ungefär lika mycket som en väldigt lång vistelse, och när du väl nått nivåtaket finns ingen nivåmätare kvar att fylla, så vilad erfarenhet slutar byggas upp.",
       "capTitle": "Att nå nivå {cap}",
       "capJourneyBody": "Nivå {cap} är taket, slutet på nivåökningen men inte på utvecklingen. Därifrån kör du fängelsehålor och raiden på normal och heroisk, möter världsbossen när han reser sig, jagar bättre utrustning och prövar dig själv i arenan.",
-      "capEndgameBody": "Rifts are the one thing that waits for the cap itself. They tear open out in the realms on their own schedule, ranked from C to S, and every group in the world races to be the one that closes each of them. The delve boards keep going too, and their harder tier is worth another look once your gear has caught up.",
+      "capEndgameBody": "Revor är det enda som väntar på själva taket. De river upp sig ute i riket efter eget schema, rankade från C till S, och varje grupp i världen kapplöper om att vara den som stänger var och en av dem. Delvetavlorna fortsätter också, och deras svårare grad är värd en ny titt när din utrustning väl har hunnit ikapp.",
       "prestigeBody": "Erfarenheten räknas vidare även efter taket. Den göder en kosmetisk virtuell nivå, så din erfarenhetsmätare fortsätter klättra, och en långsiktig prestigerang du kan hämta ut från ditt karaktärsblad när du väl är där. Att passera stora milstolpar i livstidserfarenhet förtjänar också bedrifter i din Bedrifternas bok, med kosmetiska titlar och namnskyltsramar som visas på ditt karaktärsblad. Allt är helt valfritt och ger aldrig kraft, bara ett tecken på vägen du har vandrat.",
       "noRush": "Det är ingen brådska. Världen finns där att njuta av i din egen takt, så vandra omkring, ta de uppdrag som fångar din blick och låt din hjälte växa längs vägen.",
-      "ridingTitle": "Learning to ride",
-      "ridingBody": "Riding is one of the things waiting at the end of the climb. At level {level} a stablemaster will teach you the skill for a serious sum of gold, and a lesson out on the training course earns you your first set of reins. A mount grants no power at all; it simply makes the world smaller, which after a long walk north is its own kind of reward."
+      "ridingTitle": "Att lära sig rida",
+      "ridingBody": "Ridning är en av sakerna som väntar vid slutet av klättringen. Vid nivå {level} lär en stallmästare dig färdigheten för en rejäl summa guld, och en lektion ute på träningsbanan ger dig ditt första par tyglar. Ett riddjur ger ingen kraft alls; det gör helt enkelt världen mindre, vilket efter en lång vandring norrut är sin egen sorts belöning."
     },
     "placeholder": {
       "note": "Den här delen av guiden är på väg."
@@ -6406,7 +6767,7 @@ export const sv_SE: EnTranslations = {
     "browSoft": "Mjuka",
     "browThick": "Tjocka",
     "browAngled": "Vinklade",
-    "earrings": "Örhängen",
+    "earrings": "Piercingar",
     "jewelMaterial": "Smyckesmaterial",
     "jewelDefault": "Som smidd",
     "jewelGold": "Guld",
@@ -7393,7 +7754,8 @@ export const sv_SE: EnTranslations = {
       "guilds": "Tips: när du går med i ett gille får du en privat chattkanal och en gemensam lista över dina gilleskamrater.",
       "professions": "Tips: samlar- och hantverksyrken kan tränas parallellt med din stridsklass.",
       "loadouts": "Tips: spara mer än en talanguppsättning för att växla mellan byggen utan att spendera poäng två gånger.",
-      "pvp": "Tips: utmana en annan spelare på en vänskaplig duell, eller ställ dig i kö till arenan i Det askgråa colosseumet för att testa ditt bygge."
+      "pvp": "Tips: utmana en annan spelare på en vänskaplig duell, eller ställ dig i kö till arenan i Det askgråa colosseumet för att testa ditt bygge.",
+      "reliquary": "Tips: Relikvariet håller reda på det unika byte du samlar, hylla för hylla."
     }
   },
   "errors": {
@@ -7458,9 +7820,9 @@ export const sv_SE: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
     "bodyWeb": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Aktivera hårdvaruacceleration i din webbläsares inställningar, uppdatera dina grafikdrivrutiner och starta sedan om din webbläsare.",
-    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
-    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
-    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyWindows": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort, ställ in din webbläsare på Höga prestanda under Inställningar > System > Bildskärm > Grafik, och starta sedan om den. Skrivbordsappen väljer det separata grafikkortet automatiskt.",
+    "hybridBodyLinux": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort kan din webbläsare eller grafikdrivrutin erbjuda en egen inställning för val av grafikkort, eller så kan din distribution erbjuda ett verktyg för att växla grafikkort (till exempel PRIME eller optimus-manager). Skrivbordsappen väljer det separata grafikkortet automatiskt.",
+    "hybridBodyOther": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort, kontrollera din webbläsares och ditt operativsystems grafikinställningar för att aktivera det. Skrivbordsappen väljer det separata grafikkortet automatiskt.",
     "dismiss": "Stäng"
   },
   "perfNudge": {
@@ -7516,7 +7878,12 @@ export const sv_SE: EnTranslations = {
     "sortLevel": "Nivå",
     "sortName": "Namn",
     "sortRecent": "Senast spelad",
-    "sortPlaytime": "Speltid"
+    "sortPlaytime": "Speltid",
+    "redesign": "Omforma",
+    "redesignHint": "Den här rollfiguren skapades före den nya figurskaparen. Du har en gratis omformning; den används när du sparar.",
+    "redesignTitle": "Omforma {name}",
+    "redesignSave": "Spara nytt utseende",
+    "redesignCancel": "Behåll nuvarande utseende"
   },
   "deleteCharacter": {
     "title": "Radera karaktär",
@@ -7544,7 +7911,8 @@ export const sv_SE: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energi",
-      "rage": "Raseri"
+      "rage": "Raseri",
+      "focus": "Fokus"
     },
     "roles": {
       "warrior": "Tank / Närstrids-DPS",
@@ -7647,6 +8015,7 @@ export const sv_SE: EnTranslations = {
           "say": "Säg",
           "yell": "Ropa",
           "party": "Grupp",
+          "battleground": "Slagfält",
           "general": "Allmänt",
           "world": "Världen",
           "lfg": "LFG",
@@ -7673,7 +8042,111 @@ export const sv_SE: EnTranslations = {
       "zoomIn": "Zooma in",
       "zoomOut": "Zooma ut",
       "mapCanvasLabel": "Karta",
-      "mapSummary": "Karta över {zone}."
+      "mapSummary": "Karta över {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Inga relevanta markörer är synliga.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Ytterligare markörer: {count}.",
+      "mapMarkerDirections": {
+        "center": "i mitten",
+        "north": "i norr",
+        "northeast": "i nordost",
+        "east": "i öster",
+        "southeast": "i sydost",
+        "south": "i söder",
+        "southwest": "i sydväst",
+        "west": "i väster",
+        "northwest": "i nordväst"
+      },
+      "mapMarkerDistances": {
+        "near": "i närheten",
+        "medium": "på medellångt avstånd",
+        "far": "långt bort"
+      },
+      "mapMarkerLabels": {
+        "you": "Du",
+        "availableQuest": "Tillgängligt uppdrag",
+        "readyQuest": "Uppdrag redo att lämnas in",
+        "repeatQuest": "Upprepbart uppdrag",
+        "cooldownQuest": "Uppdrag under nedkylning",
+        "questObjective": "Område med uppdragsmål",
+        "readyOre": "Tillgänglig malmåder",
+        "readyWood": "Tillgängligt timmerbestånd",
+        "readyHerb": "Tillgänglig örtfläck",
+        "readyLockedOre": "Tillgänglig malmåder, verktyg låst",
+        "readyLockedWood": "Tillgängligt timmerbestånd, verktyg låst",
+        "readyLockedHerb": "Tillgänglig örtfläck, verktyg låst",
+        "cooldownOre": "Uttömd malmåder",
+        "cooldownWood": "Uttömt timmerbestånd",
+        "cooldownHerb": "Uttömd örtfläck",
+        "cooldownLockedOre": "Uttömd malmåder, verktyg låst",
+        "cooldownLockedWood": "Uttömt timmerbestånd, verktyg låst",
+        "cooldownLockedHerb": "Uttömd örtfläck, verktyg låst",
+        "station": "Hantverksstation: {name}",
+        "service": "Tjänst: {name}",
+        "partyMember": "Gruppmedlem: {name}",
+        "deadPartyMember": "Död gruppmedlem: {name}",
+        "partyMemberGeneric": "Gruppmedlem",
+        "deadPartyMemberGeneric": "Död gruppmedlem",
+        "friend": "Vän: {name}",
+        "guildMember": "Gillesmedlem: {name}",
+        "pointOfInterest": "Intressepunkt: {name}",
+        "dungeonEntrance": "Fängelsehålsingång: {name}",
+        "dungeonExit": "Fängelsehålsutgång",
+        "delveEntrance": "Delve-ingång: {name}",
+        "worldPassage": "Passage till {zone}",
+        "riftEntrance": "Ingång till revan: {name}",
+        "hostileEnemy": "Fientligt mål",
+        "aggressiveEnemy": "Fiende angriper dig",
+        "lootableEnemy": "Plundringsbar fiende",
+        "corpse": "Din kropp",
+        "deathZone": "Farozon",
+        "teammate": "Lagkamrat",
+        "deadTeammate": "Död lagkamrat",
+        "flagCarrier": "Lagkamrat med flaggan",
+        "ownFlagStand": "Din flaggplats",
+        "enemyFlagStand": "Fiendens flaggplats",
+        "riftDescent": "Nedstigning i revan",
+        "riftReturnBeacon": "Återvändningsbåk",
+        "riftReturnExit": "Återvändningsutgång",
+        "ranked": "{marker}, grad {rank}",
+        "riftTreasureAvailable": "Tillgänglig skatt",
+        "riftTreasureLocked": "Låst skatt",
+        "riftTreasureOpened": "Öppnad skatt",
+        "riftTreasureJammed": "Skatt med fastkilat lås",
+        "riftCacheAvailable": "Tillgängligt förråd i revan",
+        "riftCacheLocked": "Låst förråd",
+        "riftCacheOpened": "Öppnat förråd",
+        "riftCacheJammed": "Förråd med fastkilat lås",
+        "pylonUnlit": "Släckt runpelare",
+        "pylonLit": "Tänd runpelare",
+        "sequenceRuneUnlit": "Släckt sekvensruna",
+        "sequenceRuneLit": "Tänd sekvensruna",
+        "iceGoal": "Ismål",
+        "boulderPad": "Stenblocksmål",
+        "boulderMovable": "Flyttbart stenblock",
+        "boulderPlaced": "Placerat stenblock",
+        "gateSealed": "Förseglad port",
+        "gateOpen": "Öppen port",
+        "switchReady": "Brytare redo att användas",
+        "switchOn": "Aktiverad brytare",
+        "orbDormant": "Slumrande orb",
+        "orbActive": "Aktiv orb",
+        "rollerHazard": "Farligt rullande stenblock",
+        "delvePassageSealed": "Förseglad passage",
+        "delvePassageOpen": "Öppen passage",
+        "delveSurfaceExit": "Utgång till ytan",
+        "delveCacheLocked": "Låst delve-kista",
+        "delveCacheReady": "Delve-kista redo",
+        "delveCacheActive": "Delve-kista aktiv",
+        "delveCacheOpened": "Öppnad delve-kista",
+        "delveReliquaryLocked": "Låst relikvarium",
+        "delveReliquaryReady": "Relikvarium redo",
+        "delveReliquaryActive": "Relikvarierit aktiv",
+        "delveReliquaryOpened": "Öppnat relikvarium",
+        "bountiful": "{marker} med rikligt byte"
+      }
     },
     "options": {
       "gameMenu": "Spelmeny",
@@ -7808,6 +8281,7 @@ export const sv_SE: EnTranslations = {
     "chat": {
       "rightClickName": "Högerklicka på {name}",
       "templates": {
+        "battleground": "[Slagfält] {name}: {message}",
         "party": "[Grupp] {name}: {message}",
         "yell": "{name} ropar: {message}",
         "whisper": "{name} viskar: {message}",
@@ -7922,7 +8396,7 @@ export const sv_SE: EnTranslations = {
       "deathRecapAbility": "Du har dött. Dräpt av {ability}.",
       "deathRecapFalling": "Du har dött. Du föll till din död.",
       "deathRecapDrowned": "Du har dött. Du drunknade.",
-      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
+      "deathRecapCauterized": "Du har dött. Bränningen övermannade dig.",
       "respawn": "Du känner dig utvilad och hel igen.",
       "ignoringChat": "Ignorerar chatt från {name}.",
       "noLongerIgnoring": "Ignorerar inte längre {name}.",
@@ -7951,6 +8425,7 @@ export const sv_SE: EnTranslations = {
       "notEnoughRage": "Inte tillräckligt med raseri!",
       "notEnoughEnergy": "Inte tillräckligt med energi!",
       "notEnoughMana": "Inte tillräckligt med mana!",
+      "notEnoughDevotion": "Inte tillräckligt med hängivenhet!",
       "notEnoughResource": "Inte tillräckligt med {resource}!",
       "notEnoughHealth": "Inte tillräckligt med hälsa.",
       "targetMustDodge": "Ditt mål måste väja undan först.",
@@ -7966,7 +8441,7 @@ export const sv_SE: EnTranslations = {
       "outOfRange": "Utom räckhåll.",
       "noTarget": "Du har inget mål.",
       "tooClose": "För nära!",
-      "mustTargetAlly": "You must target an ally.",
+      "mustTargetAlly": "Du måste ha en allierad som mål.",
       "facing": "Du måste vara vänd mot ditt mål.",
       "targetHealthBelow": "Den förmågan kräver att målet har under {percent}% hälsa.",
       "dagger": "Du måste bära en dolk.",
@@ -8079,6 +8554,10 @@ export const sv_SE: EnTranslations = {
     "pet": {
       "attack": "Anfall",
       "waterJet": "Vattenstråle",
+      "felbolt": "Felbolt",
+      "abyssalChain": "Abyssal Chain",
+      "autocastOn": "Auto-kasta på. Högerklicka, tryck och håll, eller tryck Shift+Enter för att stänga av det.",
+      "autocastOff": "Auto-kasta av. Högerklicka, tryck och håll, eller tryck Shift+Enter för att slå på det.",
       "taunt": "Håna",
       "healDemon": "Läk demon",
       "healPet": "Läk djur",
@@ -8089,6 +8568,10 @@ export const sv_SE: EnTranslations = {
       "petAttackDesc": "Befall ditt djur att angripa ditt nuvarande fientliga mål.",
       "waterJetTitle": "Vattenstråle",
       "waterJetDesc": "Beordra din Vattenelementar att kanalisera en bromsande stråle i 3 sekunder. 8 sekunders nedkylning. Högerklicka för att auto-kasta den så snart nedkylningen är över.",
+      "felboltTitle": "Felbolt",
+      "felboltDesc": "Befall Emberkin att avfyra en extra demonisk projektil mot ditt mål. 8 sekunders nedkylning. Högerklicka, tryck och håll, eller tryck Shift+Enter för att växla auto-kasta.",
+      "abyssalChainTitle": "Abyssal Chain",
+      "abyssalChainDesc": "Befall Gloomshade att dra en normal fiende mer än 8 och upp till 20 meter tillbaka till sig själv. Bossar kan inte dras. 15 sekunders nedkylning. Högerklicka, tryck och håll, eller tryck Shift+Enter för att växla auto-kasta.",
       "petTauntTitle": "Djurets hån",
       "petTauntDesc": "Befall ditt djur att gå till anfall och morra när det är inom räckhåll. 10 sekunders nedkylning.",
       "healDemonDesc": "Förbruka mana för att kanalisera läkning in i din demon under 5 sekunder.",
@@ -8244,6 +8727,7 @@ export const sv_SE: EnTranslations = {
     "tooltip": {
       "rank": "Rang {rank}",
       "cost": "{cost} {resource}",
+      "ruinCost": "{cost} Wrack",
       "range": "{range} yards räckvidd",
       "rangeWithMin": "{min}-{max} yards räckvidd",
       "instant": "Omedelbar",
@@ -8254,7 +8738,8 @@ export const sv_SE: EnTranslations = {
       "unavailable": "Otillgänglig",
       "requiresLevel": "Kräver nivå {level}",
       "requiresForm": "Kräver {form}form",
-      "requiresStealth": "Kräver smygande",
+      "requiresStealth": "Kräver att du är dold",
+      "requiresStealthSkulduggery": "Kräver att du är dold (behövs inte vid 3 Skymningsförråd eller under Skuggslöjan)",
       "requiresCombo": "Förbrukar kombopoäng",
       "requiresTargetHealthBelow": "Kräver att målet är under {percent}% hälsa",
       "requiresDodge": "Endast användbar efter att målet väjer",
@@ -8270,7 +8755,9 @@ export const sv_SE: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Raseri",
-      "energy": "Energi"
+      "energy": "Energi",
+      "focus": "fokus",
+      "devotion": "Hängivenhet"
     },
     "forms": {
       "bear": "Björn",
@@ -8472,6 +8959,7 @@ export const sv_SE: EnTranslations = {
       "clickDestroy": "Klicka för att förstöra",
       "useFishing": "Använd: Fiska i närliggande vatten.",
       "useHealingPotion": "Använd: Återställer omedelbart {amount} hälsa. Användbar i strid. 1 min nedkylning.",
+      "useHealingPotionPct": "Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 2 min nedkylning.",
       "useManaPotion": "Använd: Återställer omedelbart {amount} mana. Användbar i strid. 1 min nedkylning.",
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
@@ -8575,6 +9063,9 @@ export const sv_SE: EnTranslations = {
       "filterPrimaryStatAll": "Alla primära attribut",
       "filterRarity": "Sällsynthet",
       "filterRarityAll": "Alla sällsyntheter",
+      "filterSort": "Sortera",
+      "sortName": "Namn (A-Z)",
+      "sortPriceAsc": "Pris: lågt till högt",
       "weaponSword": "Svärd",
       "weaponDagger": "Dolkar",
       "weaponStaff": "Stavar",
@@ -8703,19 +9194,71 @@ export const sv_SE: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Eldregn",
-        "description": "Låter ett eldregn falla över målområdet i 4 sek och bränner fiender för {damage} eldskada varje sekund."
+        "description": "Förbrukar 3 Förödelse för att låta eld regna över målområdet och vålla {damage} Eldskada varje sekund i 4 sek, förlängt till 6 sek på rang 2. Ödeläggelse kallar ner den första vågen omedelbart."
       },
       "volley": {
         "name": "Pilregn",
-        "description": "Låter pilar regna över målområdet i 3 sek och vållar {damage} skada var 0.5 sek på fiender som fångas i det."
+        "description": "Låter pilar regna över ett område på 8 m i 3 sek. Fiender i området tar {damage} Fysisk skada var 0.5 sek. Skadan ökar med anfallskraft på avstånd."
+      },
+      "pack_command": {
+        "name": "Flockbefallning",
+        "description": "Befall ditt levande husdjur att slå för 36 till 48 fysisk skada. Skadan ökar med husdjurets attackkraft. En träff återställer 20 fokus och ger 1 Flockvildhet i 30 sek, upp till 3. Varje stapel ökar all skada ditt husdjur gör med 10%. Detta slag använder de staplar du hade före träffen."
+      },
+      "stampede": {
+        "name": "Vilt språng",
+        "description": "Frammanar 3 bestar i 12 sek. Var och en attackerar var 2:e sek för {damage} fysisk skada. Den visade skadan inkluderar 8% av din distansattackkraft före husdjursskadebonusar. Bestarna låser Flockvildheten när de frammanas och får 10% skada per stapel. Medan Vilt språng är på nedkylning har lyckade Flockbefallningar 20% chans att återställa det, garanterat efter 5 misslyckade chanser. Det kan inte återställas medan bestarna är aktiva. (Flockherre)"
+      },
+      "unleash_beast": {
+        "name": "Släpp loss besten",
+        "description": "Förbrukar 3 Flockvildhet efter att ditt husdjur slagit för 83 till 105 fysisk skada och skakat varje fiende inom 6 meter för 26 till 34. Slaget och skakningen använder Flockvildhetens fulla husdjursskadebonus på 30% och ökar med husdjurets attackkraft. I 8 sek därefter gör husdjuret 25% mer skada, attackerar 35% snabbare och får Ondskeskott att träffa upp till 2 närliggande fiender."
+      },
+      "measured_shot": {
+        "name": "Avvägt skott",
+        "description": "Skjut målet för {damage} fysisk skada. En träff återställer 20 fokus. Skadan ökar med distansattackkraft."
+      },
+      "cold_focus": {
+        "name": "Kallt fokus",
+        "description": "I 12 sek återställer Avvägt skott 50% mer fokus, och Långt drag kostar 25% mindre och kastas 30% snabbare. (Kallsiktsignatur)"
+      },
+      "bloodhook": {
+        "name": "Blodkrok",
+        "description": "Storma mot en fiende och applicera Blodkrokssår som gör 34 fysisk grundskada plus 26% av din distansattackkraft över 12 sek i 4 pulser. (Fältkonstsignatur)"
+      },
+      "shrapnel_charge": {
+        "name": "Splitterladdning",
+        "description": "Träffar målet för 24 till 30 fysisk skada och upp till 4 andra fiender inom 6 meter för 13 till 17. De andra målen blöder också för 12 skada över 6 sek. Om huvudmålet bär ditt Blodkrokssår görs 1 sårpuls omedelbart. Direktskadan ökar med distansattackkraft."
+      },
+      "bloodtrail_assault": {
+        "name": "Blodspårsanfall",
+        "description": "I 12 sek sprider Blodkroken ett sår med 60% styrka till upp till 2 närliggande fiender, Sårslitning befaller en husdjursattack på 18 skada, och Splitterladdningen får 2 meter, gör 25% mer grundskada på sitt huvudmål och utlöser 50% mer sårskada."
+      },
+      "trailbreak": {
+        "name": "Spårbrott",
+        "description": "Hoppa 12 meter bakåt. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek."
+      },
+      "wildheart": {
+        "name": "Vildhjärta",
+        "description": "Återställer omedelbart 30% av din maximala hälsa."
+      },
+      "shellskin": {
+        "name": "Skalhud",
+        "description": "Minskar skadan du tar med 60% i 8 sek, men hindrar attacker medan den är aktiv."
+      },
+      "frostjaw_trap": {
+        "name": "Frostkäftsfälla",
+        "description": "Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek."
+      },
+      "pack_rally": {
+        "name": "Flocksamling",
+        "description": "Anta Springarens skepnad och samla närliggande allierade med 30% förflyttningshastighet och 10% attack- och kasthastighet i 10 sek."
       },
       "hurricane": {
         "name": "Orkan",
         "description": "Släpper lös en orkan över målområdet i 6 sek och slår fiender för {damage} naturskada varje sekund."
       },
       "earthquake": {
-        "name": "Jordbävning",
-        "description": "Skakar målområdet i 6 sek och slår fiender för {damage} naturskada var 1.5 sek."
+        "name": "Förkastningsvak",
+        "description": "Skakar ett område på 8 m i 6 sek och vållar {damage} Naturskada var 1.5 sek. Skadan ökar med Besvärjelsekraft. Elementär: vid 5 Åska vållas 100% mer skada, varefter all Åska förbrukas."
       },
       "heroic_strike": {
         "name": "Plundrarhugg",
@@ -8923,15 +9466,20 @@ export const sv_SE: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Ondsint hugg",
-        "description": "Ett omedelbart hugg för vapenskada plus {damage}. Ger 1 kombopoäng."
+        "description": "Ett omedelbart slag för vapenskada plus {damage}. Ger 1 kombopoäng.",
+        "specNote_assassination": "Lägger till 1 Giftritual (max 6).",
+        "specNote_combat": "Medan Röd linje är aktiv blir denna knapp Kroppsslag: 130% vapenskada plus 10, ger 2 kombopoäng och lägger till 1 Röd linje (max 4)."
       },
       "eviscerate": {
         "name": "Sista vilan",
-        "description": "Avslutande manöver som vållar {damage}."
+        "description": "Avslutande drag som orsakar {damage}.",
+        "specNote_assassination": "Vid 6 Giftritual blir denna knapp Giftrivning: ett slag som omedelbart ger all skada dina blödningar ännu skulle ha gett, planterar ett färskt Giftrivning-sår och återställer 20 energi.",
+        "specNote_combat": "Att landa denna med 4 eller fler kombopoäng startar Röd linje i 8 sek: Ondsint hugg blir Kroppsslag och denna knapp blir Knockoutslag (45 plus 35 per kombopoäng, som slår 25% hårdare för varje uppbyggd Röd linje, återställer 25 energi). Förbruka den innan Röd linje tar slut."
       },
       "backstab": {
         "name": "Feg stöt",
-        "description": "Ryggdolka målet för 150 % vapenskada plus {damage}. Måste vara bakom målet. Kräver en dolk. Ger 1 kombopoäng."
+        "description": "Driv din dolk in i målets rygg för 150% vapenskada plus {damage}. Du måste vara bakom målet. Kräver en dolk. Ger 1 kombopoäng.",
+        "specNote_assassination": "Varje slag lägger till 1 Giftritual (max 6) och återställer 15 energi. Vid 6 Giftritual blir Sista vilan till Giftrivning (den detonerar dina blödningars återstående skada på en gång)."
       },
       "gouge": {
         "name": "Ögonstöt",
@@ -8943,7 +9491,7 @@ export const sv_SE: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Skoningslöst tempo",
-        "description": "Avslutande manöver som ökar attackhastigheten i närstrid med 30 %. Varar längre per kombopoäng."
+        "description": "Avslutande drag som ökar närstridens attackhastighet med 30% i 12 sek plus 4 sek per kombopoäng (5 kombopoäng: 32 sek)."
       },
       "sprint": {
         "name": "Snabba hälar",
@@ -8951,15 +9499,17 @@ export const sv_SE: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Lågt slag",
-        "description": "Avslutande manöver som bedövar målet. Varar 1 sek längre per kombopoäng."
+        "description": "Avslutande drag som bedövar målet i 1 sek plus 1 sek per kombopoäng (5 kombopoäng: 6 sek)."
       },
       "ambush": {
         "name": "Smygarens hugg",
-        "description": "Lägg bakhåll för målet för 250 % vapenskada plus {damage}. Måste vara smygande och bakom målet. Kräver en dolk. Ger 1 kombopoäng."
+        "description": "Slå till från skuggorna för 250% vapenskada plus {damage}. Du måste vara dold och bakom målet. Kräver en dolk. Ger 1 kombopoäng.",
+        "specNote_subtlety": "Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold och från valfri vinkel: den användningen kostar inget, förbrukar alla 3 Skymningsförråd, startar den 6 sekunder långa Skuggslöjan och slår dubbelt så hårt."
       },
       "stealth": {
         "name": "Skymningsslöja",
-        "description": "Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 50 % långsammare. Att anfalla eller ta skada bryter Duskveil. Kasta igen för att kliva fram."
+        "description": "Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 50% långsammare. Att attackera eller ta skada bryter Skymningsslöja. Kasta igen för att kliva ut.",
+        "specNote_subtlety": "Varje öppnare du använder från Skymningsslöja lägger till 1 Skymningsförråd (max 3)."
       },
       "adrenaline_rush": {
         "name": "Kvickat blod",
@@ -8967,11 +9517,13 @@ export const sv_SE: EnTranslations = {
       },
       "garrote": {
         "name": "Strupvajer",
-        "description": "Stryper fienden, vållar {damage} skada nu och får den att blöda för {overTime} över 18 sek. Måste vara i smyg. Ger 1 kombopoäng."
+        "description": "Slinga en vajer runt fiendens strupe, vilket orsakar {damage} skada nu och blödning för {overTime} under 18 sek. Du måste vara dold. Ger 1 kombopoäng.",
+        "specNote_subtlety": "Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold: den användningen kostar inget, förbrukar alla 3 Skymningsförråd och startar den 6 sekunder långa Skuggslöjan."
       },
       "cheap_shot": {
         "name": "Magslag",
-        "description": "Slå målet för {damage} skada och bedöva det i 4 sek. Måste vara smygande. Ger 2 kombopoäng."
+        "description": "Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Du måste vara dold. Ger 2 kombopoäng.",
+        "specNote_subtlety": "Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold: den användningen kostar inget, förbrukar alla 3 Skymningsförråd och startar den 6 sekunder långa Skuggslöjan."
       },
       "sap": {
         "name": "Klubba ner",
@@ -8983,11 +9535,11 @@ export const sv_SE: EnTranslations = {
       },
       "expose_armor": {
         "name": "Rustningsbräsch",
-        "description": "Avslutande manöver som blottar målet och sänker dess rustning med {damage} i 30 sek."
+        "description": "Avslutande drag som exponerar målet i 30 sek: varje förbrukat kombopoäng minskar dess rustning med 2% (5 kombopoäng: {damage}%)."
       },
       "rupture": {
         "name": "Förblöda",
-        "description": "Avslutande manöver som sårar målet och får det att blöda för {damage} under 16 sek."
+        "description": "Avslutande drag som sårar målet: det blöder var 2:e sek, i 6 sek plus 2 sek per kombopoäng (5 kombopoäng: 16 sek och {damage} total skada)."
       },
       "vanish": {
         "name": "Rökssteg",
@@ -9007,19 +9559,131 @@ export const sv_SE: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Edsbrand",
-        "description": "Fyller dig med helig kraft i 30 sek, vilket får vart och ett av dina närstridsslag att göra {damage} extra helig skada. Släpp loss den med domslut."
-      },
-      "holy_light": {
-        "name": "Lagande ljus",
-        "description": "Läker ett vänligt mål för {damage}."
-      },
-      "devotion_aura": {
-        "name": "Ståndaktig aura",
-        "description": "Ökar din rustning med {buff} i 30 min."
+        "description": "Fyller er med Helig kraft i 30 sek, så att vart och ett av era närstridshugg vållar {damage} extra Helig skada."
       },
       "judgement": {
         "name": "Utslag",
         "description": "Släpper lös ditt aktiva sigill mot fienden och förbrukar det för att vålla dess lagrade heliga skada."
+      },
+      "holy_light": {
+        "name": "Lagande ljus",
+        "description": "Läker snabbt ett vänligt mål för {damage}. Att återställa hälsa alstrar 1 Hängivenhet, även utan specialisering. Strålande resonans eller Solvedergällning gör den omedelbar."
+      },
+      "divine_ascension": {
+        "name": "Gudomlig upphöjelse",
+        "description": "Förbrukar 20 hängivenhet för att få 5 upphöjelseladdningar i upp till 45 sek. Märkta förmågor förbrukar en laddning och får en extra effekt."
+      },
+      "aura_mastery": {
+        "name": "Helig endräkt",
+        "description": "Förstärker i 8 sek varje aktiv hängivenhet och vedergällningsaura i din grupp. Bastionens hängivenhet minskar skadan med 15%; Vedergällning gör 15 helig skada. Flera användningar förnyar i stället för att staplas."
+      },
+      "devotion_ward": {
+        "name": "Bastionens hängivenhet",
+        "description": "Minskar skadan du och gruppmedlemmarna tar med 5% till döden eller ersättning. Bara denna aura och Vedergällningsauran ersätter varandra; Strålande, Gryningens och Nådens hängivenhet samexisterar."
+      },
+      "hammer_of_grace": {
+        "name": "Nådens hammare",
+        "description": "Slungar omedelbart en helig hammare mot en fiende inom 20 m för {damage}, återställer 70 mana, läker dig för 50% av skadan och genererar 1 hängivenhet när den gör skada. Solvedergällning låter Nådens hammare ignorera sin nedkylning och läka dig för 100% av skadan."
+      },
+      "hushbrand": {
+        "name": "Tystnadsmärke",
+        "description": "Avbryter besvärjelser och hindrar besvärjelser från den skolan i 4 sek."
+      },
+      "guardian_covenant": {
+        "name": "Väktarens förbund",
+        "description": "Skyddar ett vänligt mål och dig själv och minskar skadan ni tar med 20% i 8 sek. Väljer dig som standard när inget vänligt mål är valt."
+      },
+      "solar_step": {
+        "name": "Solsteg",
+        "description": "Ökar din förflyttningshastighet med 150% i 2 sek."
+      },
+      "solar_invocation": {
+        "name": "Solåkallan",
+        "description": "Läker omedelbart en allierad för {damage} eller gör måttlig helig skada på en fiende. Båda användningarna genererar 1 hängivenhet. Under Upphöjelse läker en läkande kastning även allierade spelare inom 10 m av målet för hälften."
+      },
+      "radiant_devotion": {
+        "name": "Strålande hängivenhet",
+        "description": "Ökar besvärjelsekraften hos dig och gruppmedlemmarna med 20 i 30 min. Ersätter din egen Gryningens eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner."
+      },
+      "dawn_devotion": {
+        "name": "Gryningens hängivenhet",
+        "description": "Ökar attackkraften hos dig och gruppmedlemmarna med 40 i 30 min. Ersätter din egen Strålande eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner och med krigarrop."
+      },
+      "grace_devotion": {
+        "name": "Nådens hängivenhet",
+        "description": "Du och gruppmedlemmarna återfår 15 mana var 5:e sek och betalar 3% mindre mana i 30 min. Ersätter din egen Strålande eller Gryningens hängivenhet, men samexisterar med hängivenheter från andra paladiner."
+      },
+      "recall_the_fallen": {
+        "name": "Kalla de fallna",
+        "description": "Återför en död gruppmedlem till livet med 35% hälsa och mana. En Solhelare på nivå 16 eller högre kallar i stället tillbaka varje fallen medlem i gruppen."
+      },
+      "beacon_of_light": {
+        "name": "Ljusets båk",
+        "description": "Märk en gruppmedlem som din Ljusets båk. 50% av din effektiva direktläkning på en annan gruppmedlem inom 60 m läker även båken. Ytläkning och periodisk läkning överförs inte. Varar tills någon av er dör."
+      },
+      "final_edict": {
+        "name": "Sista påbudet",
+        "description": "Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en helig explosion runt dig."
+      },
+      "dawnfall": {
+        "name": "Gryningsfall",
+        "description": "Gör {damage} helig skada på närliggande fiender och genererar 1 hängivenhet. Att träffa minst en fiende minskar Sista påbudets återstående nedkylning med 2 sek. Upphöjelse ökar dess skada och radie."
+      },
+      "sun_gods_verdict": {
+        "name": "Solgudens dom",
+        "description": "Dömer en fiende under Solgudens dom i 30 sek. Sista påbudet och Gryningsfall inskriver en laddning vid varje lyckad träff. Förmågan som sätter den tredje laddningen dikterar domen: Sista påbudet släpper lös förödande skada på den dömde; Gryningsfall detonerar domen och skadar och bedövar närliggande fiender i 1,5 sek."
+      },
+      "valkyrs_calling": {
+        "name": "Valkyrians kallelse",
+        "description": "Stig upp i luften och bli immun mot skada medan du flyger mot fienden. Efter 2 sek störtar du ned över målområdet för {damage} helig skada och genererar 1 hängivenhet. Upphöjelse ökar nedslagsskadan med 50% och förbrukar 1 laddning."
+      },
+      "faithforged_guard": {
+        "name": "Ljusets skuld",
+        "description": "I 8 sek besvaras nästa fiendeträff mot dig: upp till {buff} skada nekas och återförs till angriparen som helig skada, och du får 1 hängivenhet. Endast ett slag besvaras. Upphöjelse höjer mängden den kan besvara med 50%."
+      },
+      "mercy_lance": {
+        "name": "Barmhärtighetens lans",
+        "description": "Gör {damage} helig skada på en fiende och genererar 1 hängivenhet när den gör skada. Under Upphöjelse förbrukar den 1 laddning för att garantera en kritisk träff."
+      },
+      "sacred_form": {
+        "name": "Helig gestalt",
+        "description": "Går in i ett heligt tillstånd till döden, ökar läkning med 10% och kritisk besvärjelsechans med 5%, och minskar genererat hot med 50%. Endast för Solhelare."
+      },
+      "dawns_embrace": {
+        "name": "Gryningens famn",
+        "description": "Levererar en kraftfull läkning och genererar 1 hängivenhet. Strålande resonans minskar dess manakostnad med 50% och kasttiden till 1,5 sek. Upphöjelse gör den omedelbar och ökar dess läkning med 35%."
+      },
+      "radiant_chorus": {
+        "name": "Strålande kör",
+        "description": "Läker närliggande allierade för {damage} och genererar 1 hängivenhet. Att effektivt läka minst 2 allierade ger Strålande resonans: ditt nästa Lagande ljus blir omedelbart, eller din nästa Gryningens famn kostar 50% mindre mana och kastas på 1,5 sek. Upphöjelse ökar Strålande körs läkning och radie."
+      },
+      "life_covenant": {
+        "name": "Livets förbund",
+        "description": "Minskar skadan en allierad tar med 40% i 6 sek. Under Upphöjelse ger den även en sköld på 120 poäng utan att förbruka en laddning."
+      },
+      "aegis_first_dawn": {
+        "name": "Första gryningens egid",
+        "description": "Kanalisera i 5 sek och skapa en helig kupol på 10 meter. Allierade inuti läks varje sekund och tar 50% mindre skada. Att fullborda kanaliseringen frigör en sista läkning och ger 30% förflyttningshastighet i 4 sek."
+      },
+      "vowkeeper_strike": {
+        "name": "Edvaktarens slag",
+        "description": "Slår med hög hotnivå och genererar 1 hängivenhet. Ett lyckat slag har 20% chans att ge Solvedergällning i 8 sek; varje lyckad block har 25%. Solvedergällning förstärker din nästa Solskiva, Nådens hammare eller Lagande ljus. Upphöjelse ger även en liten absorptionssköld."
+      },
+      "bastion_rite": {
+        "name": "Bastionens rit",
+        "description": "Minskar fysisk skada du tar med 20% och ökar blockchansen med 20% i 6 sek. Upphöjelse förlänger varaktigheten till 10 sek."
+      },
+      "sunward_disc": {
+        "name": "Solskiva",
+        "description": "Kräver en sköld. Slungar en strålande skiva som träffar och sedan studsar mellan närliggande fiender. Varje skadande nedslag genererar 1 hängivenhet. Solvedergällning gör att Solskivan inte kostar mana, ignorerar sin nedkylning och gör 20% mer skada. Upphöjelse förstärker 5 studsar."
+      },
+      "sacred_challenge": {
+        "name": "Helig sporre",
+        "description": "Tvingar en fiende att attackera dig. Under Upphöjelse minskar den även all skada du tar med 15% i 4 sek utan att förbruka en laddning."
+      },
+      "devotion_aura": {
+        "name": "Ståndaktig aura",
+        "description": "Ökar din rustning med {buff} i 30 min."
       },
       "blessing_of_might": {
         "name": "Järnets ed",
@@ -9027,7 +9691,7 @@ export const sv_SE: EnTranslations = {
       },
       "divine_protection": {
         "name": "Trons värn",
-        "description": "Ett heligt värn absorberar {damage} skada i 10 sek."
+        "description": "En helig sköld absorberar {damage}% av din maximala hälsa i {duration} sek."
       },
       "hammer_of_justice": {
         "name": "Klyvande domarklubba",
@@ -9035,7 +9699,7 @@ export const sv_SE: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Sista smörjelsen",
-        "description": "En massiv våg av läkning: återställer {damage} hälsa. 10 min nedkylning."
+        "description": "En massiv våg av läkning återställer {damage}% av din maximala hälsa. 10 min nedkylning."
       },
       "holy_taunt": {
         "name": "Helig Sporre",
@@ -9043,7 +9707,7 @@ export const sv_SE: EnTranslations = {
       },
       "flash_of_light": {
         "name": "Ljuslagning",
-        "description": "En snabb, effektiv ljusskur som läker ett vänligt mål för {damage}."
+        "description": "En snabb, effektiv skur av Ljus som läker ett vänligt mål för {damage}. Att återställa hälsa alstrar 1 Hängivenhet, även utan specialisering."
       },
       "exorcism": {
         "name": "Utdrivningens rit",
@@ -9051,15 +9715,31 @@ export const sv_SE: EnTranslations = {
       },
       "consecration": {
         "name": "Helig mark",
-        "description": "Inviger marken under dig och svedjar närliggande fiender för {damage} helig skada varannan sek i 10 sek."
+        "description": "Inviger marken i 9 sek och orsakar {damage} helig skada varje sekund. Trosväktare tar 10% mindre skada medan de står där."
+      },
+      "bastion_sweep": {
+        "name": "Bastionssvep",
+        "description": "Svep din utrustade sköld genom fiender i en 180 graders frontal båge för {damage} helig skada med hög hotnivå och generera 1 hängivenhet. Upphöjelse ökar skadan med 30% och radien till 8 m."
+      },
+      "oath_chain": {
+        "name": "Edkedja",
+        "description": "Binder omedelbart en avlägsen fiende med en helig kedja. Fienden färdas mot dig med 18 m per sekund tills den når 3 m och saktas sedan ned med 50% i 4 sek. Under Upphöjelse binder den en andra närliggande fiende."
+      },
+      "veilbound_march": {
+        "name": "Slöjmarsch",
+        "description": "Bli eterisk i 4 sek, få 40% förflyttningshastighet och 30% rustning och bli immun mot rötter, inbromsningar och förflyttning. Fiender du passerar genom får Slöjmärket i 6 sek: de tar helig skada varje sekund, gör 20% mindre skada på dig och genererar extra hot. Det första märket ger 1 hängivenhet. När marschen slutar tar närliggande märkta fiender en sista urladdning. Upphöjelse ökar urladdningen med 50% och drar dem lätt mot dig."
+      },
+      "veilbound_mark": {
+        "name": "Slöjmärke",
+        "description": "Tar helig skada varje sekund, gör 20% mindre skada på paladinen som satte märket och genererar extra hot mot den paladinen."
       },
       "righteous_fury": {
         "name": "Brinnande ed",
-        "description": "Ökar hotet som din heliga skada genererar med 60 % i 30 min. Hörnstenen för paladinen som tankar."
+        "description": "Ökar passivt hotet som er Heliga skada alstrar med 60%. Endast Trosväktare."
       },
       "retribution_aura": {
         "name": "Vedergällningsaura",
-        "description": "Omger dig med helig energi i 30 min och tillfogar 5 helig skada till varje fiende som slår dig i närstrid."
+        "description": "Omger dig och din grupp med helig energi till döden eller tills den ersätts. Fiender som träffar en påverkad allierad i närstrid tar {buff} helig skada, och påverkade allierade gör {buff} extra helig skada med automatiska attacker."
       },
       "tame_beast": {
         "name": "Vildband",
@@ -9071,119 +9751,131 @@ export const sv_SE: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Uppsprättande hugg",
-        "description": "Ett kraftfullt närstridsanfall som ökar skadan med {damage}. Aktiveras vid ditt nästa hugg."
+        "description": "Slår för 10% vapenskada plus {damage}. En träff återställer 15 Fokus och ger 1 Jaktfart. Skadan ökar med anfallskraft via vapenskadan."
       },
       "aspect_of_the_hawk": {
         "name": "Kärrhökens skepnad",
-        "description": "Anta kärrhökens skepnad och öka attackkraften med {buff} i 30 min."
+        "description": "Anta kärrhökens skepnad och öka er anfallskraft med {buff} i 30 min."
       },
       "serpent_sting": {
         "name": "Gifthulling",
-        "description": "Sticker målet och tillfogar {damage} naturskada under 15 sek."
+        "description": "Vållar totalt {damage} Naturskada under 15 sek, en gång var 3 sek. Skadan ökar med anfallskraft på avstånd."
       },
       "arcane_shot": {
         "name": "Ondskeskott",
-        "description": "Ett omedelbart skott som vållar {damage} arkanskada."
+        "description": "Skjuter målet för {damage} Arkan skada. Skadan ökar med anfallskraft på avstånd."
       },
       "concussive_shot": {
         "name": "Skakande skott",
-        "description": "Omtöcknar målet för {damage} skada och saktar förflyttningen med 50 % i 4 sek."
+        "description": "Skjuter målet för {damage} Fysisk skada och saktar ner det med 50% i 4 sek. Skadan ökar med anfallskraft på avstånd."
       },
       "mongoose_bite": {
-        "name": "Mothugg",
-        "description": "Motanfall efter att målet väjt undan för vapenskada plus {damage}. Kan inte väjas undan."
+        "name": "Sårslitare",
+        "description": "Slår för 45% vapenskada plus {damage}. Bär målet ert Blodkrokssår vållas 1 sårtick omedelbart och såret förnyas till 12 sek. Skadan ökar med anfallskraft via vapenskadan."
+      },
+      "hunting_momentum": {
+        "name": "Jaktfart",
+        "description": "Passiv: Rensarslaget ger 1 Jaktfart i 8 sek, upp till 3. Vid 3 staplar gör Sårslitning 45% mer slagskada och förbrukar staplarna. (Fältkonst)"
+      },
+      "fieldcraft_reentry": {
+        "name": "Beväpnad återkomst",
+        "description": "Passiv: Spårbrott förnyar Jaktfarten och laddar ditt nästa Rensarslag eller Blodkrok i 12 sek. Rensarslaget gör 15% mer skada per stapel. Blodkroken gör 18 till 24 extra fysisk skada, ökad med 15% per stapel och av din distansattackkraft. Vid 3 staplar förbrukar endera attacken Jaktfarten. (Fältkonst)"
       },
       "wing_clip": {
         "name": "Fjättrande hugg",
-        "description": "Tillfogar ett sår för {damage} skada och saktar ner fienden med 40 % i 10 sek."
+        "description": "Snittar målet för {damage} Fysisk skada och saktar ner det med 40% i 10 sek. Skadan ökar med anfallskraft."
       },
       "aspect_of_the_monkey": {
         "name": "Mårdens skepnad",
-        "description": "Anta mårdens skepnad och öka din chans att väja med 8 % i 30 min."
+        "description": "Anta mårdens skepnad och öka er chans att undvika med 8% i 30 min."
       },
       "aspect_of_the_cheetah": {
         "name": "Springarens skepnad",
-        "description": "Anta springarens skepnad och öka förflyttningshastigheten med 30 % i 30 min."
+        "description": "Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min."
       },
       "aimed_shot": {
         "name": "Långt drag",
-        "description": "Ett omsorgsfullt draget skott som vållar {damage} skada."
+        "description": "Skjuter målet för {damage} Fysisk skada. Skadan ökar med anfallskraft på avstånd."
       },
       "rapid_fire": {
         "name": "Febrigt drag",
-        "description": "Ökar din anfallshastighet med 40 % i 15 sek."
+        "description": "Kanalisera sex snabba skott under 2,4 sek. medan du rör dig. Varje skott orsakar {damage} fysisk skada."
       },
       "smite": {
-        "name": "Tukta",
-        "description": "Tuktar fienden för {damage} helig skada."
+        "name": "Luttrande hymn",
+        "description": "Vållar {damage} Helig skada. Skadan ökar med Besvärjelsekraft. Disciplin: läker varje länkad bundsförvant för 30% av skadan. Är ingen bundsförvant länkad läks gruppmedlemmen med lägst hälsa för 15%."
       },
       "lesser_heal": {
         "name": "Viskad bön",
-        "description": "Läker ett vänligt mål för {damage}."
+        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft."
       },
       "power_word_fortitude": {
         "name": "Beslutsamhetens litania",
-        "description": "Ökar målets uthållighet med {buff} i 30 min."
+        "description": "Ökar varje gruppmedlems Uthållighet med {buff}% i 30 min."
       },
       "shadow_word_pain": {
         "name": "Förruttnelsens klagosång",
-        "description": "Ett mörkrets ord tillfogar {damage} skuggskada under 18 sek."
+        "description": "Vållar totalt {damage} Skuggskada under 18 sek, en gång var 3 sek. Skadan ökar med Besvärjelsekraft. Skugga: vållar 10% mer skada, och varje tick på er Bildstod ger 1 Dysterhetstionde."
       },
       "power_word_shield": {
         "name": "Värnpsalm",
-        "description": "Skyddar målet och absorberar {damage} skada i 30 sek."
+        "description": "Skyddar ett vänligt mål och absorberar {damage} skada i 30 sek. Disciplin länkar dessutom målet till er Heliga skada i 30 sek."
       },
       "renew": {
         "name": "Dröjande nåd",
-        "description": "Läker målet för {damage} under 15 sek."
+        "description": "Läker målet för {damage} under 15 sek, en gång var 3 sek. Läkningen ökar med Besvärjelsekraft."
       },
       "mind_blast": {
         "name": "Sinnessplittring",
-        "description": "Spränger målets sinne för {damage} skuggskada."
+        "description": "Vållar {damage} Skuggskada. Skadan ökar med Besvärjelsekraft. Skugga binder ett mål med er Förruttnelsens klagosång som dess Bildstod, ger 1 Dysterhetstionde och ekar 30% av skadan till upp till 3 andra fiender som bär er Klagosång."
       },
       "heal": {
         "name": "Högtidlig bön",
-        "description": "En långsam men kraftfull bön som läker ett vänligt mål för {damage}."
+        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft."
       },
       "mind_flay": {
         "name": "Sorgens litania",
-        "description": "Angriper målets sinne med skuggenergi och vållar {damage} skada varje sekund i 3 sek."
+        "description": "Kanaliserar i 3 sek och vållar {damage} Skuggskada varje sekund. Skadan ökar med Besvärjelsekraft."
       },
       "flash_heal": {
         "name": "Brådskande bön",
-        "description": "En snabb bön som läker ett vänligt mål för {damage}."
+        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft."
       },
       "lightning_bolt": {
         "name": "Bågblixt",
-        "description": "Slungar en blixt för {damage} naturskada."
+        "description": "Vållar {damage} Naturskada. Skadan ökar med Besvärjelsekraft. Elementär: en träff ger 1 Åska."
+      },
+      "thunder_reservoir": {
+        "name": "Åskreservoar",
+        "description": "Passiv: Bågblixten och Gaffelblixten ger Åska, upp till 5. Vid 5 Åska gör Jordstöten 125% mer skada eller Jordbävningen 100% mer, och sedan förbrukas all Åska. (Åskkallelse)"
       },
       "rockbiter_weapon": {
         "name": "Stenbundet vapen",
-        "description": "Genomsyrar ditt vapen med stenens raseri: varje slag gör {damage} extra skada i 5 min."
+        "description": "Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 30% rustning, tar 10% mindre skada och alstrar dubbelt så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek."
       },
       "healing_wave": {
         "name": "Lagande vatten",
-        "description": "Läker ett vänligt mål för {damage}."
+        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft. Återställning: sparar 50% av den fulla läkningen före överläkning som Läkande ström i 12 sek, upp till 30% av målets maximala hälsa."
       },
       "earth_shock": {
         "name": "Jordstöt",
-        "description": "Chockar omedelbart målet med dånande kraft för {damage} naturskada."
+        "description": "Vållar {damage} Naturskada. Skadan ökar med Besvärjelsekraft. Elementär: vid 5 Åska vållas 125% mer skada, varefter all Åska förbrukas. Stenbunden: tvingar målet att anfalla er i 3 sek."
       },
       "lightning_shield": {
         "name": "Åskvärn",
-        "description": "Omger dig med knastrande blixtar: närstridsanfallare tar {buff} naturskada, upp till 3 laddningar och högst en gång var 5 sek."
+        "description": "Omger er med blixtar i 10 min. De 3 nästa närstridsanfallen mot er vållar {buff} Naturskada på angriparen, som mest en gång var 5 sek."
       },
       "flame_shock": {
         "name": "Glödstöt",
-        "description": "Sveder målet med eld för {damage} skada plus {overTime} över 12 sek."
+        "description": "Vållar {damage} Eldskada, sedan {overTime} Eldskada under 12 sek. Den första träffen ökar med Besvärjelsekraft."
       },
       "flametongue_weapon": {
         "name": "Pyrobrandsvapen",
-        "description": "Förlänar ditt vapen elementarisk eld: varje hugg vållar {damage} extra eldskada i 5 min."
+        "description": "Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra Eldskada."
       },
       "frost_shock": {
         "name": "Rimstöt",
-        "description": "Chockar omedelbart målet med frost för {damage} frostskada och saktar dess förflyttning med 50 % i 8 sek."
+        "description": "Vållar {damage} Frostskada och saktar ner målet med 50% i 8 sek. Skadan ökar med Besvärjelsekraft."
       },
       "frostbrand_weapon": {
         "name": "Rimbundet vapen",
@@ -9191,11 +9883,11 @@ export const sv_SE: EnTranslations = {
       },
       "ghost_wolf": {
         "name": "Skuggvarg",
-        "description": "Förvandlar dig till en Shadewolf och ökar förflyttningshastigheten med 40 % i 10 min."
+        "description": "Bli en Shadewolf och rör er 40% snabbare. Besvärj igen för att återgå till er vanliga skepnad."
       },
       "stormstrike": {
         "name": "Anfäders hugg",
-        "description": "Kanaliserar stormen genom ditt vapen och hugger omedelbart för vapenskada plus {damage}."
+        "description": "Slår för vapenskada plus {damage} och för Krigsandens kadens framåt 2 steg. Skadan ökar med anfallskraft via vapenskadan."
       },
       "shadow_bolt": {
         "name": "Dysterbult",
@@ -9213,9 +9905,29 @@ export const sv_SE: EnTranslations = {
         "name": "Svartröta",
         "description": "Fördärvar målet och vållar {damage} skuggskada under 18 sek."
       },
+      "evil_eye": {
+        "name": "Evil Eye",
+        "description": "Märker en fiende som fokus för dina förbannelser. Att flytta Evil Eye bevarar Fördömelse men förnyar inte dess 20 sekunders utgång."
+      },
+      "maledict_gaze": {
+        "name": "Maledict Gaze",
+        "description": "Ditt Maledict Eye attackerar ditt valda primära Evil Eye var 2,5:e sek för skuggskada. Possess the Evil Eye fördubblar dess attackhastighet."
+      },
+      "needle_of_fate": {
+        "name": "Needle of Fate",
+        "description": "Genomborrar fienden för {damage} skuggskada och genererar 5 Fördömelse om den bär ditt Evil Eye. Varje träff på ditt primära Evil Eye lägger till en Ödestråd i 12 sek, upp till 3. Om inget Evil Eye finns märker Needle först sitt mål."
+      },
+      "sentence": {
+        "name": "Sentence",
+        "description": "Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Varje Tråd ökar skadan med 6%. Extra effekter trappas upp vid 20, 50, 80 och 100 Fördömelse. Dess skalning av skada planar ut efter nivå 16."
+      },
       "life_tap": {
         "name": "Hårt köpslag",
         "description": "Omvandlar {damage} hälsa till {damage} mana."
+      },
+      "cursed_accomplice": {
+        "name": "Cursed Accomplice",
+        "description": "Länkar ditt Maledict Eye när ingen allierad är vald, vilket får dess Gaze att generera 2 Fördömelse. Att länka en vald gruppmedlem gör att bara deras skada mot ditt Evil Eye genererar 3 i stället. En ny länk ersätter den föregående och kan utlösas högst en gång var 2:e sek."
       },
       "curse_of_agony": {
         "name": "Våndans häxkonst",
@@ -9223,7 +9935,47 @@ export const sv_SE: EnTranslations = {
       },
       "drain_life": {
         "name": "Förtär",
-        "description": "Dränerar målets liv och överför {damage} hälsa till dig varje sekund i 5 sek."
+        "description": "Förtär målets livskraft, vållar {damage} Skuggskada varje sekund och överför 70% av den som hälsa till er. Vanmakt överför i stället alltihop. Kanaliserad på ert främsta Evil Eye förbrukar den alla Ödestrådar vid början, och varje Tråd alstrar 1 extra Fördömelse per tick."
+      },
+      "litany_of_guilt": {
+        "name": "Litany of Guilt",
+        "description": "Förbannar ditt primära Evil Eye i 6 sek. Fördömelse-vinster släpper en våg som skadar upp till 2 andra fiender inom 8 meter, högst en gång per sekund. Rang 2 förlänger den till 8 sek och 4 fiender."
+      },
+      "cinderhide": {
+        "name": "Cinderhide",
+        "description": "Härdar din hud till svalnande slagg i 10 sek, vilket minskar all mottagen skada med 25%."
+      },
+      "umbral_anchor": {
+        "name": "Umbral Anchor",
+        "description": "Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket förbrukar ankaret och startar en 45 sekunders nedkylning."
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Frammanar en Soulwell i 3 min. Utanför strid kan gruppmedlemmar fylla på sina Själstenar upp till 3. En Själsten återställer 25% av maximal hälsa och delar nedkylning med drycker."
+      },
+      "hex_of_violence": {
+        "name": "Hex of Violence",
+        "description": "Förhäxar fienden i 8 sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 16 skuggskada."
+      },
+      "cruel_pact": {
+        "name": "Cruel Pact",
+        "description": "Offrar 12% av din maximala hälsa för att återställa 1,5% av din maximala mana och generera 20 Fördömelse. Kan inte användas vid eller under 20% hälsa."
+      },
+      "vicarious_suffering": {
+        "name": "Vicarious Suffering",
+        "description": "Länkar ditt lidande i 8 sek och genererar upp till 15 Fördömelse från fientliga träffar. På dig själv minskar den mottagen skada med 20%. På en allierad omdirigerar den upp till 20% till dig utan att ta dig under 15% hälsa."
+      },
+      "possess_evil_eye": {
+        "name": "Possess the Evil Eye",
+        "description": "Maledictorn tar över ditt primära Evil Eye i 15 sek och genererar 35 Fördömelse. Needle of Fate kastas på 1 sek och genererar 2 extra Fördömelse, Förtär kan kanaliseras i rörelse, och Sentence gör 25% mer skada och släpper ett fördröjt eko för 60% skada, avtagande till 30% mellan nivåerna 17 och 20."
+      },
+      "hour_of_judgment": {
+        "name": "Hour of Judgment",
+        "description": "Kallar fram dom över ditt primära Evil Eye i 15 sek, vilket ger 40 Fördömelse och 3 Ödestrådar, aktiverar Possession, fördubblar Fördömelse genererad genom det primära Eye, och ökar Sentence-skada med 20%. Den första Sentence återbetalar 50 Fördömelse."
+      },
+      "coven": {
+        "name": "Coven",
+        "description": "Skapar sekundära Evil Eyes på upp till 4 närliggande fiender i 15 sek. De matar den delade Fördömelse-poolen med 50%, och Sentence ekar till dem för 35% skada."
       },
       "fear": {
         "name": "Plåga",
@@ -9235,11 +9987,16 @@ export const sv_SE: EnTranslations = {
       },
       "shadowburn": {
         "name": "Skymningseld",
-        "description": "Spränger omedelbart målet med brännande skugga för {damage} skuggskada."
+        "description": "Förbrukar 1 Förödelse för att avrätta en fiende under 20% hälsa för {damage} Skuggskada. Betalar tillbaka sin Förödelse om det utpekade målet dör inom 5 sek."
+      },
+      "ruinous_brand": {
+        "name": "Ruinous Brand",
+        "description": "Märker en fiende i 15 sek. Dina nästa 3 direkta besvärjelser ekar för 25% skada mot det märkta målet, eller kopierar 50% skada till det när de kastas mot ett annat mål."
       },
       "wrath": {
         "name": "Vildbult",
-        "description": "Slungar en pil av naturenergi för {damage} naturskada."
+        "description": "Slungar en stråle av naturenergi för {damage} naturskada.",
+        "specNote_balance": "I Månugglaform lägger varje fullbordad besvärjelse till 1 Månflod (max 3). Vid 3 Månflod blir Månfrö Månsvall och Himlafall Solspår."
       },
       "healing_touch": {
         "name": "Vildläkning",
@@ -9251,11 +10008,17 @@ export const sv_SE: EnTranslations = {
       },
       "moonfire": {
         "name": "Månstorm",
-        "description": "Bränner fienden med måneld för {damage} arkanskada plus skada över tid."
+        "description": "Bränner fienden med Månstorm för {damage} arkan skada plus skada över tid.",
+        "specNote_balance": "Håll den brinnande: Månfrö förlänger den med 6 sek."
+      },
+      "moonseed": {
+        "name": "Månfrö",
+        "description": "Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till 6 sek per användning. Vid full Månflod blir Månfrö Månsvall."
       },
       "rejuvenation": {
         "name": "Vildblomning",
-        "description": "Läker målet för {damage} över 12 sek."
+        "description": "Läker målet för {damage} under 12 sek.",
+        "specNote_restoration": "Att plantera en NY blomning lägger till 1 Grönska (max 5). Vid 5 Grönska blir Snabb läkning Överblomning."
       },
       "thorns": {
         "name": "Törnvärn",
@@ -9271,7 +10034,8 @@ export const sv_SE: EnTranslations = {
       },
       "maul": {
         "name": "Benkross",
-        "description": "Ett mörbultande anfall som ökar närstridsskadan med {damage} och vållar en stor mängd hot. Aktiveras vid ditt nästa hugg. Endast i Bruinform."
+        "description": "En krossande attack som ökar närstridsskadan med {damage} och orsakar stort hot. Aktiveras vid ditt nästa slag. Endast i Bruinform.",
+        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett slag för 78 till 96 skada med högt hot; under halv hälsa skyddar det dig i stället med en sköld på 18% av din maximala hälsa och återbetalar 15 raseri."
       },
       "growl": {
         "name": "Hota",
@@ -9279,23 +10043,27 @@ export const sv_SE: EnTranslations = {
       },
       "cat_form": {
         "name": "Vargform",
-        "description": "Skiftar gestalt till en varg: attackkraften stiger med din nivå, dina attacker använder energi och kombopoäng, och du genererar 29 % mindre hot. Kasta igen för att återgå till besvärjarform."
+        "description": "Förvandlar er till en varg: smidigheten stiger med er nivå, anfallskraft +8 plus 2 per nivå, era anfall använder energi och kombopoäng, och ni alstrar 29% mindre hot. Besvärj igen för att återgå till besvärjarskepnaden."
       },
       "claw": {
-        "name": "Klo",
-        "description": "Klö fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i vargform."
+        "name": "Rivklo",
+        "description": "Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Vargform.",
+        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
       },
       "ferocious_bite": {
         "name": "Blodsbett",
-        "description": "Avslutande manöver som vållar {damage}. Endast i vargform."
+        "description": "Avslutande drag som orsakar {damage}. Endast i Vargform.",
+        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd: ett bett för 70 plus 43 per kombopoäng som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer 30 energi."
       },
       "swipe": {
         "name": "Svepande klor",
-        "description": "Svep mot närliggande fiender för {damage} skada. Orsakar extra hot. Endast i Bruinform."
+        "description": "Svep dina klor genom närliggande fiender för {damage} skada. Orsakar extra hot. Endast i Bruinform.",
+        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
       },
       "regrowth": {
         "name": "Andra blomningen",
-        "description": "Läker ett vänligt mål för {damage} och en ytterligare mängd över 21 sek."
+        "description": "Läker ett vänligt mål för {damage} och ytterligare en mängd under 21 sek.",
+        "specNote_restoration": "Att plantera en NY blomning lägger till 1 Grönska (max 5)."
       },
       "barkskin": {
         "name": "Ekhud",
@@ -9311,7 +10079,8 @@ export const sv_SE: EnTranslations = {
       },
       "starfire": {
         "name": "Himlafall",
-        "description": "Kallar ner en pil av stjärneld och tillfogar {damage} arkan skada."
+        "description": "Kallar ner en stråle av stjärneld, vilket orsakar {damage} arkan skada.",
+        "specNote_balance": "I Månugglaform lägger varje fullbordad besvärjelse till 1 Månflod (max 3). Vid 3 Månflod blir denna knapp Solspår: ett omedelbart slag som ger 80 till 100 naturskada plus en brännskada på 45 under 9 sek, återställer 35 mana och förbrukar alla 3."
       },
       "travel_form": {
         "name": "Fleetform",
@@ -9327,7 +10096,7 @@ export const sv_SE: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Häxljus",
-        "description": "Sänker målets rustning med {damage}% i 40 sek. Stackas inte med Rustningsklipp."
+        "description": "Minskar målets rustning med {damage}% i 40 sek."
       },
       "hibernate": {
         "name": "Slummer",
@@ -9350,8 +10119,9 @@ export const sv_SE: EnTranslations = {
         "description": "Ökar attackstyrkan med {buff} i {duration} sek. Endast vargform."
       },
       "rip": {
-        "name": "Riv upp",
-        "description": "Avslutande manöver som tillfogar {damage} blödningsskada över 12 sek. Förbrukar kombopoäng. Endast vargform."
+        "name": "Blodsspricka",
+        "description": "Avslutande drag som får målet att blöda var 2:e sek, i 24 sek: 36 skada plus 24 per förbrukat kombopoäng (5 kombopoäng: {damage} totalt). Endast i Vargform.",
+        "specNote_feral": "Det landade slaget lägger till 1 Gammalt Blod (max 3)."
       },
       "mortal_strike": {
         "name": "Stympande hugg",
@@ -9378,32 +10148,120 @@ export const sv_SE: EnTranslations = {
         "description": "Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)"
       },
       "chain_heal": {
-        "name": "Kedjeläkning",
-        "description": "Läker ett vänligt mål för en stor mängd och hoppar sedan till upp till 2 ytterligare allierade i närheten. Varje hopp läker för 50% mindre. (Återställningssignatur)"
+        "name": "Kaskadläkning",
+        "description": "Läker ett vänligt mål för {damage} och hoppar sedan vidare till upp till 2 allierade inom 12 meter. Varje hopp läker för 50% av föregående mål. Varje nådd allierad förbrukar din återstående Lagningsström och läker omedelbart för 125% av den förbrukade mängden. Den inledande läkningen ökar med besvärjelsekraft. (Återställningssignatur)"
+      },
+      "galeheart_weapon": {
+        "name": "Stormhjärtevapen",
+        "description": "Förtrollar båda vapnen i 30 min och möjliggör Krigsandens kadens."
+      },
+      "warspirit_cadence": {
+        "name": "Krigsandens kadens",
+        "description": "Passiv: var 3:e landad vapenattack utlöser 2 Stormhjärteekon för 50% naturskada och ger ett Stormtecken i 12 sek. Stormtecknet gör din nästa Bågblixt, Stöt eller Lagande vatten omedelbar och sänker manakostnaden med 50%. Förfäderslaget räknas som 2 attacker. (Krigsande)"
+      },
+      "stormsurge": {
+        "name": "Stormsvall",
+        "description": "Passiv: medan Förfäderslaget är på nedkylning har förbrukandet av ett Stormtecken 25% chans att återställa det. Om de 3 första chanserna misslyckas återställer den 4:e det alltid. (Krigsande)"
+      },
+      "lifespring_weapon": {
+        "name": "Livskällevapen",
+        "description": "Förtrollar ditt vapen i 30 min. Lagande vatten och Tidvattenskallelse lägger till 20% mer läkning till Lagningsströmmen."
+      },
+      "unleash_weapon": {
+        "name": "Släpp loss vapnet",
+        "description": "Släpper loss ditt vapens aktiva förtrollning. Eldmärket gör 54 till 64 eldskada, får 30% av besvärjelsekraften och ger 2 Åska. Stormhjärtat slår med ditt vapen, driver Krigsandens kadens framåt och ger 20% attackhastighet i 6 sek. Stenbundet slår för 75% vapenskada, tvingar målet att attackera dig och minskar skadan du tar med 20% i 4 sek. Livskällan förbrukar din Lagningsström, läker för 125% av dess återstående läkning och minskar nästa träff inom 8 sek med 50% av den återställda hälsan."
+      },
+      "elemental_trance": {
+        "name": "Elemental Trance",
+        "description": "Gå in i en elementär trans i 15 sek, vilket minskar mottagen skada med 30% och omvandlar 20% av all skada du vållar till mana. (Warspirit-motorn)"
+      },
+      "primal_exaltation": {
+        "name": "Urtida upphöjelse",
+        "description": "I 12 sek kastas Åskkallelsens Bågblixt och Gaffelblixt 50% snabbare, och Bågblixten ger 2 Åska; Krigsanden utlöser sin kadens var 2:a vapenträff; Andelagningen lägger till 50% mer läkning till Lagningsströmmen. (Shamantalang)"
+      },
+      "stoneward": {
+        "name": "Stenvärn",
+        "description": "Skyddar en allierad i 60 sek med 6 laddningar. Skada förbrukar en laddning för att läka 5% av maxhälsan, en gång var 3:e sek. (Shamantalang)"
+      },
+      "tidecall": {
+        "name": "Tidvattenskallelse",
+        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med besvärjelsekraft. Lägger hela läkningen före överläkning till Lagningsströmmen, upp till 30% av målets maximala hälsa."
+      },
+      "soul_harvest": {
+        "name": "Essence Reap",
+        "description": "River i fiendens själ för {damage} skuggskada och skapar 1 Själfragment, upp till 5."
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Kastar en spöklik lans för {damage} skuggskada. Mot ditt Ossuary Mark läggs 50% av dess skada till märket."
+      },
+      "raise_graveguard": {
+        "name": "Raise Graveguard",
+        "description": "Väcker upp en permanent defensiv följeslagare. Graveguard hånar automatiskt, avleder 20% av din skada genom Gravherravälde, och Reaping Command får den att håna och ta 30% mindre skada i 4 sek."
+      },
+      "raise_skeletal_warrior": {
+        "name": "Raise Skeletal Warrior",
+        "description": "Förbrukar 1 Själfragment för att lägga till en beständig Skeletal Warrior i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Den klyver närliggande fiender för 45% skada var 6:e sek, och Reaping Command förlångsammar dess mål med 40% i 4 sek."
+      },
+      "raise_bone_mage": {
+        "name": "Raise Bone Mage",
+        "description": "Förbrukar 2 Själfragment för att lägga till en beständig Bone Mage på avstånd i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Dess attacker exponerar målet för 5% mer magisk skada i 6 sek, och Reaping Command höjer den svagheten till 8%."
+      },
+      "bone_armor": {
+        "name": "Bone Armor",
+        "description": "Sveper dig i ben och absorberar skada motsvarande 20% av din maximala hälsa."
+      },
+      "corpse_explosion": {
+        "name": "Corpse Explosion",
+        "description": "Offrar först en Bone Mage, sedan en Skeletal Warrior, och en Gravewing endast som sista utväg. Bland dubbletter väljs den med kortast återstående varaktighet, sedan den svagaste, för att vålla {damage} skuggskada på den valda platsen."
+      },
+      "funeral_harvest": {
+        "name": "Funeral Harvest",
+        "description": "När en fiende som nyligen skadats av dig eller dina odöda dör får du 1 Själfragment. Detta kan inträffa högst en gång var 3:e sek."
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Märker en fiende i 12 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 meter och skapar 1 Själfragment."
+      },
+      "unholy_command": {
+        "name": "Unholy Command",
+        "description": "Förbrukar 3 Själfragment för att befalla alla dina odöda att vålla 25% mer skada och agera 20% snabbare i 12 sek."
+      },
+      "reaping_command": {
+        "name": "Reaping Command",
+        "description": "Förbrukar 2 Själfragment för att befalla varje odöd tjänare att slå i samklang. Graveguards hånar och spänner sig, Skeletal Warriors förlångsammar sina mål, Bone Mages exponerar magiska försvar, och Gravewing sliter i alla träffade fiender."
+      },
+      "sacrifice_undead": {
+        "name": "Sacrifice Undead",
+        "description": "Förstör en tjänare från ditt Herravälde för att återställa 25% av din maximala hälsa."
+      },
+      "raise_gravewing": {
+        "name": "Raise Gravewing",
+        "description": "Förbrukar 2 Själfragment för att lägga till en beständig Gravewing i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Den klyver närliggande fiender för 65% skada var 5:e sek, och Reaping Command gör att varje träffad fiende tar 8% mer skada i 5 sek."
+      },
+      "army_of_the_dead": {
+        "name": "Army of the Dead",
+        "description": "River upp en gravportal för att väcka upp en tillfällig Skeletal Warrior, Bone Mage och Gravewing i 20 sek, vilket fyller de platser dina stående Herravälde-tjänare lämnar tomma."
       },
       "metamorphosis": {
-        "name": "Metamorfos",
-        "description": "Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)"
+        "name": "Lichskepnad",
+        "description": "Bli en lich i 20 sek, vilket skapar 3 Själfragment och ökar er besvärjelseskada och besvärjelsehastighet med 20%. Era odöda vållar 50% mer skada och agerar 20% snabbare, och Soul Lance tränger igenom sitt mål och träffar upp till 2 närliggande fiender för 50% av sin skada. (Signatur för Nekromanti)"
       },
       "holy_shock": {
         "name": "Helig chock",
         "description": "Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)"
       },
-      "aura_surge": {
-        "name": "Gryningsrikoschett",
-        "description": "Slungar en gryningssmidd sköld för {damage} Helig skada, tystar huvudmålet i 2 sek. och studsar sedan till upp till 2 ytterligare fiender inom 10 meter för 75% skada per studs. (Paladintalang)"
-      },
       "holy_shield": {
         "name": "Helig sköld",
-        "description": "Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)"
+        "description": "Ökar blockering med 30% och ger en sköld på {damage}% av din maximala hälsa i {duration} sek. Ascension stärker försvaret."
       },
       "bestial_wrath": {
         "name": "Bestialisk vrede",
-        "description": "Driver dig in i bestialisk vrede och ökar attackkraft med 55 i 15 sek. (Odjursmästarsignatur)"
+        "description": "Ger 3 Flockvildhet. Ert nästa Släpp loss besten inom 20 sek vållar 50% mer hugg- och tassskada, och dess ursinne varar 12 sek i stället för 8. (Signatur för Bestbemästring)"
       },
       "trueshot_aura": {
         "name": "Träffsäkerhetsaura",
-        "description": "Inspirerar närliggande allierade och ökar attackkraft med 35 i 5 min. (Skytte signatur)"
+        "description": "Ökar anfallskraften hos bundsförvanter inom 30 m med 10% i 30 min. (Signatur för Prickskytte)"
       },
       "wyvern_sting": {
         "name": "Wyvernsting",
@@ -9423,31 +10281,31 @@ export const sv_SE: EnTranslations = {
       },
       "cold_blood": {
         "name": "Kallt blod",
-        "description": "Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)"
+        "description": "Fokuserar ditt dödliga uppsåt så att din nästa attack blir en kritisk träff. (Knifework-motorn)"
       },
       "blade_flurry": {
         "name": "Klingflod",
-        "description": "Släpper lös en flod av klingor och ökar attackhastighet med 20% i 12 sek. (Stridssignatur)"
+        "description": "Släpper lös en klingflod, vilket ökar attackhastigheten med 20% i 12 sek. (Thuggery-motorn)"
       },
       "hemorrhage": {
         "name": "Blödning",
-        "description": "Slår fienden för vapenskada plus {damage} och orsakar blödningsskada under 12 sek. Ger 1 kombopoäng. (Finesssignatur)"
+        "description": "Slår fienden för vapenskada plus {damage}, orsakar blödningsskada under 12 sek och ökar mottagen blödningsskada med 40%. Ger 1 kombopoäng. Var 2:a användning lägger till 1 Skymningsförråd (max 3). (Skulduggery-motorn)"
       },
       "power_infusion": {
         "name": "Kraftinfusion",
-        "description": "Infuserar ett vänligt mål med kraft och ökar besvärjelsekraft med 28 i 15 sek. (Disciplin signatur)"
+        "description": "Smörjer ett vänligt mål och ökar skada, läkning och besvärjelsehastighet med 20% i 15 sek."
       },
       "holy_nova": {
-        "name": "Helig nova",
-        "description": "Skapar en explosion av heligt ljus, läker närliggande allierade för {damage} och skadar närliggande fiender. (Helig signatur)"
+        "name": "Solsång",
+        "description": "Läker bundsförvanter inom 10 m för {damage} och vållar 24 till 30 Helig skada på fiender i samma område. Båda beloppen ökar med Besvärjelsekraft. (Grund för Helig)"
       },
       "shadowform": {
-        "name": "Skuggform",
-        "description": "Anta skuggform och stärk skuggmagi tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Skuggsignatur)"
+        "name": "Skymningsslöja",
+        "description": "Träd in i Skymningsslöjan och öka er Skuggskada med 25%. Besvärj igen för att lämna Skymningsslöjan. (Signatur för Skugga)"
       },
       "elemental_mastery": {
         "name": "Elementär mästerskap",
-        "description": "Åkallar elementär mästerskap och gör din nästa besvärjelse omedelbar. (Elementär signatur)"
+        "description": "I 12 sek ger Bågblixt 2 Åska. Er nästa Bågblixt eller Gaffelblixt är omedelbar, och er nästa fulla Åskutbetalning vållar 25% mer skada. (Signatur för Elementär)"
       },
       "siphon_life": {
         "name": "Livssifon",
@@ -9455,7 +10313,7 @@ export const sv_SE: EnTranslations = {
       },
       "conflagrate": {
         "name": "Storbrand",
-        "description": "Förbrukar din Förbränna på fienden för att antända den för {damage} eldskada. (Förstörelsesignatur)"
+        "description": "För fram ett kommande tick av er Brinnande pakt och antänder sedan målet för {damage} Eldskada. Alstrar 1 Förödelse och 1 Ödeläggelse. Rymmer 2 laddningar. (Signatur för Förstörelse)"
       },
       "moonkin_form": {
         "name": "Månugglaform",
@@ -9467,15 +10325,35 @@ export const sv_SE: EnTranslations = {
       },
       "swiftmend": {
         "name": "Snabb läkning",
-        "description": "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka det för {damage}. (Återställningssignatur)"
+        "description": "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Plantering av Vildblomning och Andra blomningen lägger till Grönska; vid 5 Grönska blir denna knapp Överblomning, som skördar varje läkning över tid du äger på alla allierade och omedelbart läker dem för 60% av dess återstående läkning. (Groveheart-motorn)"
+      },
+      "moonlash": {
+        "name": "Månsvall",
+        "description": "Förbrukar dina 3 Månflod för ett tungt slag som ger {damage} arkan skada: skadevalet. Solspår förbrukar samma 3 Månflod, så välj ett."
+      },
+      "sunlance": {
+        "name": "Solspår",
+        "description": "Förbrukar dina 3 Månflod för ett slag som ger {damage} naturskada plus en brännskada på {overTime} under 9 sek och återställer 35 mana: manavalet. Månsvall förbrukar samma 3 Månflod, så välj ett."
+      },
+      "redharvest": {
+        "name": "Röd Skörd",
+        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer 30 energi. Fungerar utan kombopoäng."
+      },
+      "marrowbreak": {
+        "name": "Märgbräckare",
+        "description": "Förbrukar dina 3 Gammalt Blod för ett tungt slag med högt hot som ger {damage} skada. Under halv hälsa skyddar det dig i stället med en sköld på 18% av din maximala hälsa i 8 sek och återbetalar 15 raseri."
+      },
+      "overbloom": {
+        "name": "Överblomning",
+        "description": "Förbrukar 5 Grönska. Skördar varje läkning över tid du äger på alla allierade för 60% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet."
       },
       "summon_imp": {
         "name": "Frammana Emberkin",
-        "description": "Frammanar en Emberkin under häxmästarens befäl. Emberkin slungar askpilar mot dina fiender från avstånd. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången."
+        "description": "Frammanar en Emberkin under häxmästarens befäl. Emberkin kastar Felbolt mot era fiender på avstånd. Att frammana en ny demon avskedar er nuvarande. Ni kan ha en demon åt gången."
       },
       "summon_voidwalker": {
         "name": "Frammana Gloomshade",
-        "description": "Frammanar en Gloomshade under häxmästarens befäl. Gloomshade är en robust demon som hånar dina fiender och suger upp stryk. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången."
+        "description": "Frammanar en Gloomshade under häxmästarens befäl. Den här tåliga demonen hånar fiender och använder Abyssal Chain för att dra tillbaka avlägsna vanliga fiender inom räckhåll. Bossar kan inte dras. Att frammana en ny demon avskedar er nuvarande. Ni kan ha en demon åt gången."
       },
       "summon_succubus": {
         "name": "Frammana Duskborn",
@@ -9491,7 +10369,7 @@ export const sv_SE: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Frammana Pyre Colossus",
-        "description": "Binder en Pyre Colossus till din vilja, en väldig pansarvräng med krossande närstrid och de djupaste hälso- och rustningsvärdena av alla demoner. En lång nedkylning hindrar dess råa kraft. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången."
+        "description": "Kallar ner en Pyre Colossus i målområdet och orsakar 58-72 Eldskada vid nedslaget. Den strider i 30 sek. utan att ersätta din demon, bränner fiender i närheten varannan sekund och genererar 1 Wrack varje sekund."
       },
       "summon_doomguard": {
         "name": "Frammana Wraithborn",
@@ -9586,8 +10464,8 @@ export const sv_SE: EnTranslations = {
         "description": "Defensiv nedkylning: i 8 sek tar du 30 % mindre skada och väjer undan för långt fler attacker."
       },
       "intervene": {
-        "name": "Intervene",
-        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
+        "name": "Ingripande",
+        "description": "Rusa till en vänlig spelare och skydda dem från {damage} skada i 6 sek."
       },
       "recklessness": {
         "name": "Hänsynslöshet",
@@ -9603,7 +10481,7 @@ export const sv_SE: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Skräckinjagande rop",
-        "description": "Ett skräckinjagande rop som får upp till 5 fiender inom 8 meter att fly i skräck i 8 sek. Skada kan bryta effekten."
+        "description": "Ett skräckinjagande rop som får upp till 5 fiender inom 8 m att fly i skräck i 4 sek. Skada kan bryta effekten."
       },
       "revenge": {
         "name": "Hämnd",
@@ -9626,8 +10504,8 @@ export const sv_SE: EnTranslations = {
         "description": "Förvandla dig till en koloss i 20 sek., bryt alla kontrolleffekter på dig och öka din utdelade skada med 20%."
       },
       "avenging_wrath": {
-        "name": "Hämndvinge",
-        "description": "Åkallar hämnande kraft och ökar din attackkraft med 60 och besvärjelsekraft med 30 i 20 sek. (paladintalang)"
+        "name": "Hämnande vrede",
+        "description": "Vecklar ut lekamliga vingar av gyllene helig kraft, vinner 10 Hängivenhet och fördubblar den Hängivenhet era förmågor alstrar i 15 sek. Ökar dessutom skadan och läkningen ni utdelar med 20%. Gryningsskördare: möjliggör Vredens hammare mot vilket mål som helst."
       },
       "berserk": {
         "name": "Röd dimma",
@@ -9643,19 +10521,23 @@ export const sv_SE: EnTranslations = {
       },
       "bloodlust": {
         "name": "Krigstrummor",
-        "description": "Driver allierade inom 30 m till raseri och ökar deras attackhastighet med 30 % i 15 sek. (schamantalang)"
+        "description": "Ökar anfalls-, besvärjelse- och kanaliseringshastigheten hos grupp- eller raidbundsförvanter inom 30 m med 30% i 15 sek. Påverkade bundsförvanter kan inte dra nytta av Krigstrummor eller Tidsacceleration igen på 10 min. (Shamantalang)"
       },
       "chain_lightning": {
         "name": "Gaffelblixt",
-        "description": "Slungar blixtar mot målområdet och ger {damage} skada till fiender i närheten. (schamantalang)"
+        "description": "Träffar upp till 3 fiender inom 10 m för {damage} Naturskada var. Elementär: en träff ger 1 Åska. Skadan ökar med Besvärjelsekraft."
+      },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "River upp en reva på den valda platsen, drar fiender inom 8 meter till dess mitt, vållar {damage} skuggskada och bedövar dem i 2 sek. Bossar tar skada men motstår dragningen och bedövningen."
       },
       "chaos_bolt": {
         "name": "Fördärvsbult",
-        "description": "Slungar en kaotisk eldblixt som ger {damage} Eldskada. (häxmästartalang)"
+        "description": "Förbrukar 3 Förödelse för att slunga en tung kaotisk eldblixt som vållar {damage} Eldskada. Ödeläggelse kortar dess besvärjelse med 30%."
       },
-      "cleansing_verdict": {
-        "name": "Renande Domslut",
-        "description": "Rensar bort en skadlig magisk effekt från ett vänligt mål och helar det med Helig magi för {damage}."
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Offrar 10% av din nuvarande hälsa för att absorbera skada motsvarande 30% av din maximala hälsa i 8 sek."
       },
       "cloak_of_shadows": {
         "name": "Skuggmantel",
@@ -9683,23 +10565,23 @@ export const sv_SE: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Sista bön",
-        "description": "Helar dig omedelbart för {damage}. (prästtalang)"
+        "description": "Läker dig omedelbart för 30% av din maximala hälsa."
       },
       "deterrence": {
         "name": "Borstvakt",
         "description": "Ökar din chans att undvika med 50 procentenheter i 10 sek. (jägartalang)"
       },
-      "divine_shield": {
-        "name": "Ljusvärn",
-        "description": "Skyddar dig med helig kraft och absorberar 900 skada i 8 sek. (paladintalang)"
-      },
       "earthbind": {
         "name": "Gripande jord",
-        "description": "Binder fiender i närheten till marken och rotar dem i 2 sek. (schamantalang)"
+        "description": "Rotar fiender inom 4 m från målpunkten i 2 sek och saktar sedan ner dem med 40% i 6 sek. (Shamantalang)"
       },
       "evocation": {
         "name": "Eterbrunn",
         "description": "Restaura mana rápidamente. (magikertalang)"
+      },
+      "flurry_of_knives": {
+        "name": "Knivstorm",
+        "description": "Piskar alla fiender inom 6 m med kastknivar, vållar {damage} fysisk skada och ger 2 kombopoäng. (skurktalang)"
       },
       "frenzied_regeneration": {
         "name": "Vild läkning",
@@ -9711,19 +10593,15 @@ export const sv_SE: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Vålnadsslag",
-        "description": "Träffar fienden för vapenskada plus {damage}, ökar undvikandet kortvarigt och ger 1 kombinationspoäng. (skurktalang)"
+        "description": "Slår fienden för vapenskada plus {damage} och ökar din chans att väja med 15% i 7 sek. Ger 1 kombopoäng. (skurktalang)"
       },
       "hammer_of_wrath": {
-        "name": "Klingande hammare",
-        "description": "Slungar en helig hammare mot en sårad fiende och ger {damage} Helig skada. Kan bara användas under 20 % hälsa. (paladintalang)"
+        "name": "Vredens hammare",
+        "description": "Slungar en helig hammare för {damage} skada och alstrar 1 Hängivenhet. Kan användas under 20% hälsa, eller under Gudomlig upphöjelse eller Hämnande vrede. Gryningens vrede ger en extra kastning mot vilket mål som helst som bortser från dess pågående nedkylning och vållar 20% mer skada. Upphöjelse ökar dess skada med 30%."
       },
       "healing_stream": {
         "name": "Källbrunn",
         "description": "Återställer 120 hälsa hos ett allierat mål under 12 sek. (schamantalang)"
-      },
-      "holy_wrath": {
-        "name": "Helgonvrede",
-        "description": "Släpper lös helig kraft och ger {damage} skada till fiender i närheten. (paladintalang)"
       },
       "howl_of_terror": {
         "name": "Skräckyl",
@@ -9735,7 +10613,7 @@ export const sv_SE: EnTranslations = {
       },
       "inner_focus": {
         "name": "Stillat sinne",
-        "description": "Gör din nästa besvärjelse kostnadsfri. Varar i 60 sek. (prästtalang)"
+        "description": "Gör er nästa prästbesvärjelse gratis och omöjlig att avbryta. Varar 60 sek."
       },
       "innervate": {
         "name": "Livssav",
@@ -9781,6 +10659,10 @@ export const sv_SE: EnTranslations = {
         "name": "Kollektiv återgång",
         "description": "Spolar tillbaka tidslinjen för varje fallen medlem i din grupp eller raid och återupplivar dem vid kroppen med 30% hälsa och mana. Kan inte användas i strid. (Kronomanti)"
       },
+      "ancestor_return": {
+        "name": "Förfädernas återkomst",
+        "description": "Kallar varje fallen medlem i din grupp eller räd tillbaka till livet vid sin kropp med 30% hälsa och mana. Kan inte kastas i strid. (Andelagning)"
+      },
       "temporal_rewind": {
         "name": "Tillbakaspolning",
         "description": "Skickar en arkan våg genom din grupp eller raid och spolar tillbaka tiden för att återställa 30% av skadan varje allierad inom 40 yards tog under de senaste 5 sekunderna (upp till 35% av deras maximala hälsa). Kan inte vara ett kritiskt slag. (Kronomantik)"
@@ -9803,7 +10685,7 @@ export const sv_SE: EnTranslations = {
       },
       "mind_sear": {
         "name": "Tankebrand",
-        "description": "Kanaliserar skuggenergi mot målområdet och ger {damage} skada varje sekund till fiender i närheten. (prästtalang)"
+        "description": "Kanaliserar i 3 sek och vållar {damage} Skuggskada varje sekund på fiender inom 8 m från målområdet. Skadan ökar med Besvärjelsekraft. (Prästtalang)"
       },
       "multi_shot": {
         "name": "Splitterskott",
@@ -9811,7 +10693,7 @@ export const sv_SE: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Körläkning",
-        "description": "Helar allierade i närheten för {damage}. (prästtalang)"
+        "description": "Läker bundsförvanter inom 30 m för {damage}. Läkningen ökar med Besvärjelsekraft. (Helig)"
       },
       "preparation": {
         "name": "Reservplan",
@@ -9823,11 +10705,11 @@ export const sv_SE: EnTranslations = {
       },
       "psychic_scream": {
         "name": "Psykiskt skrik",
-        "description": "Skrämmer fiender i närheten i upp till 4 sek. Skada kan bryta effekten. (prästtalang)"
+        "description": "Skrämmer fiender inom 8 m i upp till 4 sek. Skada kan bryta effekten."
       },
       "counter_shot": {
         "name": "Dämpande Skott",
-        "description": "Ett snabbt skott som avbryter målets besvärjelse och låser den magiskolan i 4 sek."
+        "description": "Avbryter målet och hindrar det från att besvärja ur den skolan i 4 sek."
       },
       "rebuke": {
         "name": "Förebråelse",
@@ -9845,6 +10727,10 @@ export const sv_SE: EnTranslations = {
         "name": "Rökridå",
         "description": "Du försvinner i ett rökmoln, vilket ökar din chans att undvika med 30 % i 8 sek."
       },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Ökar förflyttningshastigheten med 35%, men offrar 2% av din maximala hälsa varje sekund. Kasta igen för att avbryta. Den stängs av vid 20% hälsa."
+      },
       "spellsteal": {
         "name": "Besvärjelsestöld",
         "description": "Stjäl en gynnsam magisk effekt från en fiende och överför den till dig."
@@ -9858,12 +10744,37 @@ export const sv_SE: EnTranslations = {
         "description": "En framåtstötande skallning som avbryter målets besvärjelse och låser den magiskolan i 4 sek."
       },
       "spell_lock": {
-        "name": "Munkavle",
-        "description": "Tystar målet mitt i en besvärjelse och hindrar det från att kasta besvärjelser från den magiskolan i 5 sek."
+        "name": "Avgrundsmunkavle",
+        "description": "Avbryter fiendens besvärjande och hindrar den från att besvärja ur den skolan i 4 sek."
+      },
+      "thieves_chorus": {
+        "name": "Tjuvarnas kör",
+        "description": "En visslad signal sporrar din grupp: attack-, besvärjelse- och kanaliseringstakt ökad med 10% i 10 sek. Allierade som nyligen fått en grupphastighetsvåg är för utmattade för att gynnas. (skurktalang)"
       },
       "tranquility": {
         "name": "Gläntsång",
         "description": "Kanaliserar återställande energi i 4 sek. och helar allierade inom 30 m för 42 till 52 varje sekund. (druidtalang)"
+      },
+      "venom_dart": {
+        "name": "Giftpil",
+        "description": "Slungar en förgiftad pil för {damage} naturskada. Ger 1 combopoäng. Knifework: förlänger ditt Giftrivning-sår med 6 sek, upp till 20 sek.",
+        "specNote_assassination": "Lägger till 1 Giftritual och förlänger ditt Giftrivning-sår med 6 sek (såret går aldrig över 20 sek)."
+      },
+      "body_blow": {
+        "name": "Kroppsslag",
+        "description": "Ett tungt slag för 130% vapenskada plus 10 som ger 2 combopoäng och fördjupar Redline med ett steg. (Thuggery-motorn)"
+      },
+      "knockout_blow": {
+        "name": "Knockoutslag",
+        "description": "Avsluta Redline med en knockout: slår för 45 plus 35 per combopoäng, 25% hårdare per Redline-steg, och återställer 25 energi. (Thuggery-motorn)"
+      },
+      "veilstrike": {
+        "name": "Slöjhugg",
+        "description": "Förtär Skymningsförrådet och sveper dig i skugga i 6 sek: dina smygöppnare fungerar i det öppna och du gör 25% mer skada. (Skulduggery-motorn)"
+      },
+      "venomrend": {
+        "name": "Giftrivning",
+        "description": "Förtär Giftritualen: slår för 22 plus 26 per kombopoäng, detonerar dina blödningars återstående skada och återställer 25 energi. (Knifework-motorn)"
       },
       "typhoon": {
         "name": "Tyfon",
@@ -9872,6 +10783,30 @@ export const sv_SE: EnTranslations = {
       "voidfeast": {
         "name": "Tomhetsmåltid",
         "description": "Slukar en magisk effekt (en gynnsam från en fiende eller en skadlig från en allierad) och helar dig med 6 % av din maximala hälsa."
+      },
+      "veilstep": {
+        "name": "Slöjsteg",
+        "description": "Kliver genom slöjan i den riktning du blickar."
+      },
+      "scouring_mercy": {
+        "name": "Rensande nåd",
+        "description": "Gör 72 till 84 helig skada på en fiende eller läker ett vänligt mål för 130 till 155. Båda beloppen ökar med besvärjelsekraft. Skadan läker även varje läroförbunden allierad för 30%, eller gruppmedlemmen med lägst hälsa för 15% om ingen allierad är förbunden. (Lärosignatur)"
+      },
+      "seraphic_vigil": {
+        "name": "Serafisk vaka",
+        "description": "Skyddar en allierad i 30 sek. Den första träffen som för denne under 35% hälsa förbrukar Vakan och läker denne för 180. (Välsignelsesignatur)"
+      },
+      "summon_tithefiend": {
+        "name": "Frammana tiondedemon",
+        "description": "Förbrukar all Dysterhetstionde för att frammana en tiondedemon i 6, 8, 10, 12 eller 15 sek vid 1 till 5 staplar. Den attackerar var 2:e sek för 20 till 24 skuggskada, plus 8 per extra stapel. Vid fem staplar blir den större och dess skada ökar med 25%. Dess skada ökar med din besvärjelsekraft. Den föredrar din Bildstod. Varje träff återställer 1% av maxmanan och ekar 15% av skadan till upp till 3 andra fiender med din Förfallets klagosång. (Aftonsångssignatur)"
+      },
+      "martyrs_aegis": {
+        "name": "Martyrens egid",
+        "description": "Minskar skadan en allierad tar med 40% i 8 sek."
+      },
+      "choir_of_deliverance": {
+        "name": "Befrielsens kör",
+        "description": "Kanaliserar i 6 sek och läker gruppmedlemmar inom 30 meter för {damage} varannan sekund. Läkningen ökar med besvärjelsekraft."
       },
       "bear_charge": {
         "name": "Bruinrusning",
@@ -9887,7 +10822,8 @@ export const sv_SE: EnTranslations = {
       },
       "rake": {
         "name": "Flå",
-        "description": "En smygöppnare som krafsar fienden för vapenskada plus {damage} och vållar blödningsskada över 9 sek. Ger 1 kombopoäng. Endast i vargform."
+        "description": "Flå fienden för vapenskada plus {damage} och orsaka blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Vargform.",
+        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
       },
       "revive_pet": {
         "name": "Lappa ihop",
@@ -11404,6 +12340,18 @@ export const sv_SE: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"
       },
+      "rimefang": {
+        "name": "Rimtand"
+      },
+      "marrowpoint": {
+        "name": "Märgspets"
+      },
+      "duskwhisper": {
+        "name": "Skymningsviskning"
+      },
+      "boneglass_shiv": {
+        "name": "Benglasdolk"
+      },
       "moggers_hide_quiver": {
         "name": "Moggers skinnkoger"
       },
@@ -11547,6 +12495,9 @@ export const sv_SE: EnTranslations = {
       },
       "conjured_bread4": {
         "name": "Frambesvärjt festbröd"
+      },
+      "soul_stone": {
+        "name": "Själsten"
       },
       "bristleback_maul": {
         "name": "Gallowglass-hammare"
@@ -12933,9 +13884,6 @@ export const sv_SE: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix Tunnelkungen"
       },
@@ -12957,17 +13905,8 @@ export const sv_SE: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Vålnadsbindare Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Körmoder Selthe"
@@ -13007,6 +13946,18 @@ export const sv_SE: EnTranslations = {
       },
       "water_elemental": {
         "name": "Vattenelementar"
+      },
+      "graveguard": {
+        "name": "Graveguard"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "Skeletal Warrior"
+      },
+      "necromancy_bone_mage": {
+        "name": "Bone Mage"
+      },
+      "necromancy_gravewing": {
+        "name": "Gravewing"
       }
     },
     "npcs": {
@@ -13633,6 +14584,16 @@ export const sv_SE: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "Gryningsbundna tomen",
+        "text": "Ljuset vilar inte tyst i dig, {playerName}. Jag har sett dig lägga de döda till ro, och jag tror att du är redo för det som få paladiner någonsin får lära sig: Återkallelsens rit, genom vilken en fallen själ kallas tillbaka till de levande. Dess ord förvaras i Gryningsbundna tomen, här i min vård, men en bok är ingen välsignelse så länge de rastlösa döda ännu vandrar på denna mark. Återlämna 6 Rastlösa ben till jorden, så börjar jag undervisa dig.",
+        "completion": "Kapellgården blir tyst. Du är redo för orden, {playerName}, men Återkallelsens rit kan inte uttalas i ett varmt kapell. Den måste sjungas där slöjan mellan liv och död tunnas ut. Jag ämnar bära tomen norrut till Mirefenkärret. Följ mig dit, så avslutar vi detta.",
+        "objectives": {
+          "0": {
+            "label": "Rastlösa ben lagda till ro"
+          }
+        }
+      },
       "q_bandits": {
         "title": "Dalens banditer",
         "text": "En flock banditer har slagit läger i de sydvästra kullarna. De har rånat tre vagnar denna vecka. Driv ut dem - dräp 10 Dalbanditer.",
@@ -13786,6 +14747,16 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Dränkt död lagd till ro"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "Återkallelsens rit",
+        "text": "Så du följde mig ut i dyn, {playerName}. Bra. Jag har Gryningsbundna tomen här, och denna dränkta mark är där dess ord hör hemma: ingenstans är slöjan mellan liv och död tunnare än där de döda inte stannar begravda. Men de dränkta skulle dra ned din röst mitt i versen. Röj en plats värdig riten: lägg 8 av de Dränkta döda till ro, så inviger vi den tillsammans.",
+        "completion": "Knäböj, {playerName}, och läs orden högt. Där. Känner du det? Ljuset lagar inte längre bara de levande i dina händer, det kan kalla tillbaka dem som gått över. Använd det vist. En själ som kallas tillbaka till en hopplös strid är en grymhet, inte en nåd. Res dig, Återlösare.",
+        "objectives": {
+          "0": {
+            "label": "Dränkta döda lagda till ro"
           }
         }
       },
@@ -16254,33 +17225,33 @@ export const sv_SE: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Asksmygarens utrustning",
-        "bonus2": "Ökar KRIGFÖRING-försvarsvärdering med 40.",
-        "bonus4": "Ökar KRIGFÖRING-anfallsvärdering med 40, och kontrollförluster som fientliga spelare lägger på dig varar 15% kortare.",
-        "bonus7": "Ökar KRIGFÖRING-anfalls- och försvarsvärdering med 80. Att döda en fientlig spelare ger Asksteg, som ökar rörelsehastigheten med 40% i 6 sek."
+        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
+        "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Att döda en fientlig spelare ger Askesteg, vilket ökar förflyttningshastigheten med 40% i 6 sek."
       },
       "warfare_cinderweave": {
         "name": "Glödvävsregalier",
-        "bonus2": "Ökar KRIGFÖRING-försvarsvärdering med 40.",
-        "bonus4": "Ökar KRIGFÖRING-anfallsvärdering med 40, och kontrollförluster som fientliga spelare lägger på dig varar 15% kortare.",
-        "bonus7": "Ökar KRIGFÖRING-anfalls- och försvarsvärdering med 80. Dina besvärjelser har 15% chans att ge Glödvärn, som absorberar 120 skada i 8 sek."
+        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
+        "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Era besvärjelser har 15% chans att ge Glödvakt, vilket absorberar 120 skada i 8 sek."
       },
       "warfare_furyforged": {
         "name": "Raserismidd stridsutrustning",
-        "bonus2": "Ökar KRIGFÖRING-försvarsvärdering med 40.",
-        "bonus4": "Ökar KRIGFÖRING-anfallsvärdering med 40, och kontrollförluster som fientliga spelare lägger på dig varar 15% kortare.",
-        "bonus7": "Ökar KRIGFÖRING-anfalls- och försvarsvärdering med 80. Att döda en fientlig spelare ger Obruten ed, som absorberar 200 skada i 10 sek."
+        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
+        "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Att döda en fientlig spelare ger Obruten ed, vilket absorberar 200 skada i 10 sek."
       },
       "warfare_stormbound": {
         "name": "Stormbunden skrud",
-        "bonus2": "Ökar KRIGFÖRING-försvarsvärdering med 40.",
-        "bonus4": "Ökar KRIGFÖRING-anfallsvärdering med 40, och kontrollförluster som fientliga spelare lägger på dig varar 15% kortare.",
-        "bonus7": "Ökar KRIGFÖRING-anfalls- och försvarsvärdering med 80. Dina besvärjelser har 15% chans att ge Glödvärn, som absorberar 120 skada i 8 sek."
+        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
+        "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Era besvärjelser har 15% chans att ge Glödvakt, vilket absorberar 120 skada i 8 sek."
       },
       "warfare_thornhide": {
         "name": "Törnhudens dräkt",
-        "bonus2": "Ökar KRIGFÖRING-försvarsvärdering med 40.",
-        "bonus4": "Ökar KRIGFÖRING-anfallsvärdering med 40, och kontrollförluster som fientliga spelare lägger på dig varar 15% kortare.",
-        "bonus7": "Ökar KRIGFÖRING-anfalls- och försvarsvärdering med 80. Dina besvärjelser har 15% chans att ge Törnvärn, som ökar undvikande med 15% i 6 sek."
+        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
+        "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Era besvärjelser har 15% chans att ge Törnvakt, vilket ökar chansen att undvika med 15% i 6 sek."
       },
       "wyrmshadow": {
         "name": "Nightfang-skrud",

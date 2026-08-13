@@ -1,0 +1,21 @@
+// Play Asset Delivery install-time pack carrying the heavy, immutable web
+// assets (public/media and public/audio) so the BASE module stays under
+// Google Play's 500 MB compressed-download ceiling (docs/mobile-store-release.md,
+// "Keeping the Play build under the size cap"). Install-time packs are
+// delivered with the install and merge into the app's AssetManager, which is
+// exactly how Capacitor serves the web tree (AndroidProtocolHandler ->
+// context.getAssets()), so the WebView sees one unchanged public/ tree.
+//
+// The assets under src/main/assets/ are NOT checked in: they are relocated
+// out of app/src/main/assets/public by scripts/native_assets_pack.mjs, which
+// npm run native:sync runs after every cap sync. The solanaStore flavor (a
+// plain APK, no Play delivery) merges this same directory back into its own
+// assets via a sourceSets entry in app/build.gradle.
+apply plugin: 'com.android.asset-pack'
+
+assetPack {
+    packName = "woc_media_pack"
+    dynamicDelivery {
+        deliveryType = "install-time"
+    }
+}

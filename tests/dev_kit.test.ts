@@ -60,6 +60,19 @@ describe('dev kit role table', () => {
     );
     expect(bad).toEqual([]);
   });
+
+  it('builds the Enhancement Shaman test kit with two weapons', () => {
+    const role = devKitRole('shaman', 'enhancement');
+    const kit = buildDevKit('shaman', 'enhancement');
+    const mainhand = kit?.equip.mainhand;
+    const offhand = kit?.equip.offhand;
+
+    expect(role?.hands).toBe('dualWield');
+    expect(mainhand).toBeDefined();
+    expect(offhand).toBeDefined();
+    expect(ITEMS[mainhand ?? '']?.kind).toBe('weapon');
+    expect(ITEMS[offhand ?? '']?.kind).toBe('weapon');
+  });
 });
 
 describe('fresh-20 item pool', () => {
@@ -296,8 +309,7 @@ describe('/dev kit against a real Sim', () => {
   function kitted(cls: PlayerClass, spec: string): Sim {
     const sim = new Sim({ seed: 7, playerClass: cls, devCommands: true });
     sim.setPlayerLevel(DEV_KIT_LEVEL);
-    const meta = sim.players.get(sim.playerId);
-    if (meta) meta.talents.spec = spec;
+    if (!sim.setSpec(spec)) throw new Error(`could not select ${cls} ${spec}`);
     sim.chat(`/dev kit ${spec}`);
     return sim;
   }
@@ -313,6 +325,16 @@ describe('/dev kit against a real Sim', () => {
     for (const slot of ['helmet', 'chest', 'legs', 'mainhand'] as const) {
       expect(meta?.equipment?.[slot], slot).toBeTruthy();
     }
+  });
+
+  it('equips Enhancement Shaman with an active offhand weapon', () => {
+    const sim = kitted('shaman', 'enhancement');
+    const equipment = sim.players.get(sim.playerId)?.equipment;
+
+    expect(ITEMS[equipment?.mainhand ?? '']?.kind).toBe('weapon');
+    expect(ITEMS[equipment?.offhand ?? '']?.kind).toBe('weapon');
+    expect(sim.player.dualWielding).toBe(true);
+    expect(sim.player.offhandWeapon).not.toBeNull();
   });
 
   it('leaves level and spec alone: this is a GEAR command', () => {

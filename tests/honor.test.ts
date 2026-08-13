@@ -26,9 +26,10 @@ import type { ArenaMatch } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import * as arena from '../src/sim/social/arena';
 import * as fiesta from '../src/sim/social/fiesta';
+import { RL_TEST_WORLD } from './sim_shared';
 
 function world(): Sim {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: RL_TEST_WORLD });
 }
 
 function liveArena(): { sim: Sim; a: number; b: number; match: ArenaMatch } {
@@ -293,7 +294,7 @@ describe('Fiesta honor', () => {
     );
     expect(sameTeam.sim.meta(allyKiller)!.honor).toBe(0);
 
-    const practice = new Sim({ seed: 7, playerClass: 'warrior' });
+    const practice = new Sim({ seed: 7, playerClass: 'warrior', world: RL_TEST_WORLD });
     expect(practice.startFiestaPractice()).toBe(true);
     let match: ArenaMatch | null = null;
     for (let i = 0; i < 20 * 8; i++) {

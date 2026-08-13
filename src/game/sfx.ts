@@ -15,6 +15,11 @@ import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
 import {
+  advanceMountEngine,
+  type MountEngineEntry,
+  mountEngineLoopActive,
+} from './mount_engine_state';
+import {
   SFX_CATALOG_HASH,
   SFX_CLIPS,
   SFX_RUNTIME_PACK_URL,
@@ -35,6 +40,8 @@ const ABILITY_GAIN = 0.34;
 export const REF_DISTANCE = 5; // world units at which a sound is at full volume
 export const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
 const POINT_AMBIENCE_GAIN = 0.18;
+const COOLDOWN_ENTRY_TTL = 60;
+const COOLDOWN_PRUNE_INTERVAL = 30;
 // amb_forge's custom recording still reads quiet in-game even with the
 // catalog's keyTrimDb ceiling (scripts/sfx/sfx_gain_map.json) applied at its
 // full sanctioned +5dB, the maximum true-peak headroom under the shared
@@ -64,6 +71,16 @@ const FORGE_AMBIENCE_GAIN = 0.625;
 // 6) heading into town, and still 8 units narrower than the shared 46
 // default.
 export const FORGE_MAX_DISTANCE = 38;
+// Fallback windup duration for mountEngine's very first call on a cold cache
+// (the real decoded AudioBuffer.duration takes over once the clip loads);
+// close to the tank mount's actual ~0.9s windup take so the first play still
+// splices to the loop at roughly the right instant.
+const MOUNT_ENGINE_START_FALLBACK_SEC = 0.9;
+
+// Rift roller/portal loops (src/render/rift_ambience.ts): a moving hazard or
+// an open portal should read as a clear nearby presence, not a wallpaper bed
+// like campfire/forge, but must still sit under foreground one-shots.
+const RIFT_AMBIENCE_GAIN = 0.4;
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
   dirt: 'foot_dirt',
@@ -97,6 +114,7 @@ export interface PlayOpts {
   gain?: number; // 0..1 multiplier (default 1)
   rate?: number; // playback-rate multiplier (default 1); ±6% jitter added
   cooldown?: number; // min seconds between plays of this key (default 0.03)
+  cooldownKey?: string; // optional namespace when one asset serves unrelated cues
   jitter?: boolean; // randomize rate/gain slightly (default true)
   // Percussive amplitude envelope. `release` truncates the clip to a crisp
   // transient that fully decays within `attack + release` seconds, used by fast
@@ -124,6 +142,12 @@ interface PendingLoop {
   y?: number;
   z?: number;
   maxDistance?: number;
+  // Carries the caller's `immediate` request through the cold-buffer wait so
+  // a resumed loop() call (once the buffer finishes loading) still snaps
+  // straight to target gain instead of silently falling back to a fade-in.
+  // See loop()'s doc comment: this matters for mountEngine's windup-to-loop
+  // splice, which must never read as an audible swell.
+  immediate?: boolean;
 }
 
 // 'kind' is the closed set of point-ambience station sources today (campfire,
@@ -135,7 +159,7 @@ interface PendingLoop {
 // same pattern, no changes needed to the override mechanism itself.
 interface AmbientPointSource {
   readonly id: string;
-  readonly kind: 'campfire' | 'forge';
+  readonly kind: 'campfire' | 'forge' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
   readonly x: number;
   readonly y: number;
   readonly z: number;
@@ -157,9 +181,21 @@ class Sfx {
   private vol = 0.8;
   private active = 0;
   private lastPlay = new Map<string, number>();
+  private lastPlayPruneAt = 0;
   private loops = new Map<string, LoopSlot>();
   // Pending auto-stop timers for timedGroundLoop, keyed the same as `loops`.
   private groundLoopTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  // Per-entity windup/loop/winddown state for an engine mount (see mountEngine).
+  private mountEngines = new Map<number, MountEngineEntry>();
+  // Memoized per-mountKey engine clip key triple, or null once a mountKey is
+  // known to have no engine take set. mountEngine() is called every frame for
+  // every mounted entity in earshot, so this turns the per-frame cost for an
+  // ordinary (non-engine) mount into a plain map lookup instead of 3 fresh
+  // template-literal string allocations that are immediately thrown away.
+  private engineClipKeysCache = new Map<
+    string,
+    { startKey: string; loopKey: string; stopKey: string } | null
+  >();
   private footstepsOn = false; // off by default; driven by the footstepSfx setting
   private lx = 0;
   private lz = 0; // cached listener position
@@ -507,17 +543,19 @@ class Sfx {
       }
       return false;
     }
-    if (this.active >= MAX_VOICES) return false;
     const now = ctx.currentTime;
+    this.pruneLastPlay(now);
+    if (this.active >= MAX_VOICES) return false;
     const cd = opts?.cooldown ?? 0.03;
+    const cooldownKey = opts?.cooldownKey ?? key;
     // -Infinity, not -1: a fresh key (never played) must never be blocked, at
     // any cooldown length. A -1 sentinel worked by accident while every
     // cooldown here stayed under 1s (now - -1 was always >= cooldown); a
     // longer cooldown (e.g. audio.error()'s 1.5s) can make now - -1 itself
     // read as "still on cooldown" moments after AudioContext starts, wrongly
     // swallowing the very first play of that key.
-    if (now - (this.lastPlay.get(key) ?? Number.NEGATIVE_INFINITY) < cd) return false;
-    this.lastPlay.set(key, now);
+    if (now - (this.lastPlay.get(cooldownKey) ?? Number.NEGATIVE_INFINITY) < cd) return false;
+    this.lastPlay.set(cooldownKey, now);
     this.commitVariant(key, variantIndex);
 
     const jitter = opts?.jitter !== false;
@@ -601,8 +639,9 @@ class Sfx {
       }
       return;
     }
-    if (this.active >= MAX_VOICES) return;
     const now = ctx.currentTime;
+    this.pruneLastPlay(now);
+    if (this.active >= MAX_VOICES) return;
     const cd = opts?.cooldown ?? 0;
     // -Infinity sentinel: see the matching comment on playAt's cooldown check.
     if (cd > 0 && now - (this.lastPlay.get(key) ?? Number.NEGATIVE_INFINITY) < cd) return;
@@ -638,7 +677,12 @@ class Sfx {
   // one caster's channel) is reused and cross-faded rather than restarted.
 
   /** Ensure a loop `id` is playing `key` at `target` gain; (x,y,z) makes it
-   *  positional. Ramps gain smoothly; creating from scratch fades in from 0. */
+   *  positional. Ramps gain smoothly; creating from scratch fades in from 0,
+   *  UNLESS `immediate` is set, which snaps straight to full target gain on
+   *  creation instead (a hard splice from a preceding one-shot that was
+   *  authored to already end at the loop's own level, e.g. mountEngine's
+   *  windup-to-loop handoff: a fade-in there would read as an audible swell
+   *  right where the two takes are meant to read as one continuous sound). */
   // maxDistance defaults to makePanner's own default (the shared MAX_DISTANCE),
   // so every existing caller keeps its current audible range; only a caller
   // that needs its own falloff (pointAmbient's 'forge' branch) passes an
@@ -652,6 +696,7 @@ class Sfx {
     y?: number,
     z?: number,
     maxDistance?: number,
+    immediate = false,
   ): void {
     const ctx = this.ctx,
       master = this.master;
@@ -662,6 +707,7 @@ class Sfx {
       this.unloop(id, 0);
       slot = undefined;
     }
+    let justCreated = false;
     if (!slot) {
       const pending = this.pendingLoops.get(id);
       const pendingVariant = pending?.key === key ? this.pendingLoopVariants.get(id) : undefined;
@@ -675,7 +721,7 @@ class Sfx {
           this.pendingLoopVariants.delete(id);
           return;
         }
-        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance });
+        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance, immediate });
         this.pendingLoopVariants.set(id, variantIndex);
         if (this.pendingLoopLoads.get(id) !== key) {
           this.pendingLoopLoads.set(id, key);
@@ -700,6 +746,7 @@ class Sfx {
               pending.y,
               pending.z,
               pending.maxDistance,
+              pending.immediate,
             );
           });
         }
@@ -719,6 +766,7 @@ class Sfx {
       this.pendingLoopVariants.delete(id);
       slot = { key, src, gain: g, panner, target: -1, x, y, z };
       this.loops.set(id, slot);
+      justCreated = true;
     } else if (positional && slot.panner) {
       if (slot.x !== x || slot.y !== y || slot.z !== z) {
         this.setPannerPos(slot.panner, x, y, z);
@@ -740,7 +788,8 @@ class Sfx {
     const mixedTarget = target * (this.entry(key)?.gain ?? 1);
     if (slot.target !== mixedTarget) {
       slot.target = mixedTarget;
-      slot.gain.gain.setTargetAtTime(mixedTarget, ctx.currentTime, 0.25);
+      if (justCreated && immediate) slot.gain.gain.setValueAtTime(mixedTarget, ctx.currentTime);
+      else slot.gain.gain.setTargetAtTime(mixedTarget, ctx.currentTime, 0.25);
     }
   }
 
@@ -857,6 +906,100 @@ class Sfx {
     });
   }
 
+  /** Windup/loop/winddown engine audio for a mount with a dedicated take set
+   *  (currently just the tank mount): call every frame a rider is mounted,
+   *  keyed per entity so multiple riders never share state. A mount with no
+   *  `_start` take falls through silently, so ordinary mounts keep using
+   *  mountRun's per-stride gait beat instead. See mount_engine_state.ts for
+   *  the transition rules (a quick tap plays the windup and winddown back to
+   *  back, no loop; sustained movement crossfades into the loop and back
+   *  out). Returns whether this call drives an engine mount at all, so the
+   *  caller (renderer.ts) knows whether to also skip the generic gait beat. */
+  /** Resolve (and cache) the engine clip key triple for a mountKey, or null if
+   *  this mount has no dedicated windup/loop/winddown take set. Memoized so
+   *  the common case (an ordinary mount, checked every frame it is ridden)
+   *  costs one map lookup instead of building and discarding 3 strings. */
+  private engineClipKeys(
+    mountKey: string,
+  ): { startKey: string; loopKey: string; stopKey: string } | null {
+    const cached = this.engineClipKeysCache.get(mountKey);
+    if (cached !== undefined) return cached;
+    const startKey = `mount_run_${mountKey}_start`;
+    const resolved =
+      startKey in SFX_CLIPS
+        ? { startKey, loopKey: `mount_run_${mountKey}`, stopKey: `mount_run_${mountKey}_stop` }
+        : null;
+    this.engineClipKeysCache.set(mountKey, resolved);
+    return resolved;
+  }
+
+  mountEngine(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    moving: boolean,
+    entityId: number,
+  ): boolean {
+    const keys = this.engineClipKeys(mountKey);
+    if (!keys) return false;
+    const { startKey, loopKey, stopKey } = keys;
+    const ctx = this.ctx;
+    if (!ctx) return true;
+    const now = ctx.currentTime;
+    const prior = this.mountEngines.get(entityId);
+    // variant 0: the only take today (see mountRun/playAt's variant pool for
+    // other cues). If a second windup variant ever lands, this needs to
+    // resolve whichever variant playAt's round-robin actually picked for
+    // THIS play, not always the first.
+    const startBuf = this.buffers.get(assetCacheKey(startKey, 0));
+    const startDuration = startBuf?.duration ?? MOUNT_ENGINE_START_FALLBACK_SEC;
+    const { next, action } = advanceMountEngine(prior, moving, now, startDuration);
+    this.mountEngines.set(entityId, next);
+    // jitter: false on the windup: advanceMountEngine schedules the loop
+    // splice off this clip's nominal buffer duration (startDuration above),
+    // so the actual playback must match that duration exactly. playAt's
+    // default rate jitter (+/-6%) would otherwise let the loop enter up to
+    // ~54ms early or late, and cut the windup off before (or past) the
+    // level it was authored to hand off to the loop at.
+    if (action === 'playStart') {
+      this.playAt(startKey, x, y, z, { gain: 0.85, cooldown: 0, jitter: false });
+    } else if (action === 'playStop') this.playAt(stopKey, x, y, z, { gain: 0.85, cooldown: 0 });
+    const loopActive = mountEngineLoopActive(next.state);
+    const loopId = `mountEngine:${entityId}`;
+    // immediate: true, the windup take is authored to already end at the
+    // loop's own level, so a fade-in here would read as a swell right where
+    // the two takes are meant to splice as one continuous sound.
+    if (loopActive) this.loop(loopId, loopKey, 0.85, x, y, z, undefined, true);
+    else if (prior && mountEngineLoopActive(prior.state)) this.unloop(loopId, 0.15);
+    return true;
+  }
+
+  /** Drop an entity's engine-mount state and silence its loop, e.g. on
+   *  dismount or when its view is removed (interest culled, disconnect). */
+  mountEngineReset(entityId: number): void {
+    if (!this.mountEngines.delete(entityId)) return;
+    this.unloop(`mountEngine:${entityId}`, 0.1);
+  }
+
+  /** Warm the three engine clips (windup/loop/winddown) for a mountKey ahead
+   *  of the first time they are actually needed. Called from the mountKey
+   *  transition edge in renderer.ts (the same edge that calls
+   *  mountEngineReset), so a fresh mount or a swap has its buffers already
+   *  decoded, or at least in flight, by the time movement first calls
+   *  mountEngine. Without this, a cold first ride can still hit playAt's/
+   *  loop()'s cold paths (dropped one-shot, or a fallback fade-in) if the
+   *  rider starts moving before the fetch+decode finishes; this preload just
+   *  makes that window much smaller in practice. A no-op for a mount with no
+   *  engine take set.*/
+  preloadMountEngine(mountKey: string): void {
+    const keys = this.engineClipKeys(mountKey);
+    if (!keys) return;
+    this.preload(keys.startKey);
+    this.preload(keys.loopKey);
+    this.preload(keys.stopKey);
+  }
+
   /** Jump / land / water-entry / swim-stroke. */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',
@@ -876,6 +1019,60 @@ class Sfx {
     this.playAt(key, x, y, z, { gain: kind === 'swim' ? 0.5 : 0.7, cooldown: 0.08 });
   }
 
+  necromancy(
+    kind: 'lichTransform' | 'lichHeartbeat' | 'soulConsume',
+    x: number,
+    y: number,
+    z: number,
+    _self: boolean,
+    sourceId?: number,
+  ): void {
+    const sourceKey =
+      sourceId === undefined ? `${Math.round(x * 4)}:${Math.round(z * 4)}` : `${sourceId}`;
+    if (kind === 'lichTransform') {
+      this.playAt('impact_shadow', x, y, z, {
+        gain: 0.95,
+        rate: 0.68,
+        cooldown: 0.5,
+        cooldownKey: `necromancy:transform:${sourceKey}`,
+        jitter: false,
+        attack: 0.02,
+        release: 0.65,
+      });
+      return;
+    }
+    if (kind === 'lichHeartbeat') {
+      this.playAt('impact_bone', x, y, z, {
+        gain: 0.2,
+        rate: 0.55,
+        cooldown: 2.8,
+        cooldownKey: `necromancy:heartbeat:${sourceKey}`,
+        jitter: false,
+        attack: 0.025,
+        release: 0.22,
+      });
+      return;
+    }
+    this.playAt('proj_shadow', x, y, z, {
+      gain: 0.62,
+      rate: 0.74,
+      cooldown: 0.12,
+      cooldownKey: `necromancy:soul:${sourceKey}`,
+      jitter: false,
+      attack: 0.015,
+      release: 0.48,
+    });
+  }
+
+  private pruneLastPlay(now: number): void {
+    if (now < this.lastPlayPruneAt) return;
+    const cutoff = now - COOLDOWN_ENTRY_TTL;
+    for (const [key, playedAt] of this.lastPlay) {
+      if (playedAt < cutoff) this.lastPlay.delete(key);
+    }
+    this.lastPlayPruneAt = now + COOLDOWN_PRUNE_INTERVAL;
+  }
+
   private ambient(key: string, target: number): void {
     if (target > 0) this.loop(key, key, target);
     else this.unloop(key, 0.7);
@@ -892,8 +1089,30 @@ class Sfx {
       }
       return;
     }
-    const key = source.kind === 'campfire' ? 'amb_campfire' : 'amb_forge';
-    const gain = source.kind === 'forge' ? FORGE_AMBIENCE_GAIN : POINT_AMBIENCE_GAIN;
+    let key: string;
+    let gain: number;
+    switch (source.kind) {
+      case 'campfire':
+        key = 'amb_campfire';
+        gain = POINT_AMBIENCE_GAIN;
+        break;
+      case 'forge':
+        key = 'amb_forge';
+        gain = FORGE_AMBIENCE_GAIN;
+        break;
+      case 'rift_portal':
+        key = 'rift_portal_drone';
+        gain = RIFT_AMBIENCE_GAIN;
+        break;
+      case 'rift_roller':
+        key = 'rift_boulder_roll';
+        gain = RIFT_AMBIENCE_GAIN;
+        break;
+      case 'rift_ice_glide':
+        key = 'rift_ice_glide';
+        gain = RIFT_AMBIENCE_GAIN;
+        break;
+    }
     this.loop(source.id, key, gain, source.x, source.y, source.z, maxDistance);
   }
 
@@ -961,7 +1180,26 @@ class Sfx {
     this.ambient('amb_rain', precip === 'rain' ? 0.11 : 0); // sharp clip, kept very low
     this.ambient('amb_snow', precip === 'snow' ? 0.13 : 0);
     this.ambient('amb_water', nearWater ? 0.18 : 0);
-    for (let i = 0; i < points.length; i++) this.pointAmbient(points[i]);
+    const activeIds = new Set<string>();
+    for (let i = 0; i < points.length; i++) {
+      activeIds.add(points[i].id);
+      this.pointAmbient(points[i]);
+    }
+    // Unlike the static campfire/forge set (the same fixed sources every frame,
+    // culled only by distance), a rift portal/roller/gliding-player source can
+    // disappear entirely between frames (instance ends, portal expires, the
+    // glide stops) without ever crossing the tooFar threshold: sweep any such
+    // loop no longer present.
+    const isDynamicRiftId = (id: string): boolean =>
+      id.startsWith('rift_portal:') ||
+      id.startsWith('rift_roller:') ||
+      id.startsWith('rift_ice_glide:');
+    for (const id of this.loops.keys()) {
+      if (isDynamicRiftId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
+    }
+    for (const id of this.pendingLoops.keys()) {
+      if (isDynamicRiftId(id) && !activeIds.has(id)) this.pendingLoops.delete(id);
+    }
   }
 
   // --- Vale Cup one-shots (HUD-armed on vcupGoal/vcupEnd events) -----------

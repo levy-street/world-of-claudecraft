@@ -1,5 +1,6 @@
 import { isPartyFrameRelevantAura } from './aura_classify';
 import { echoVisibleTo, partyAuraPriority } from './combat/chronomancy';
+import { MENDING_CURRENT_ID } from './combat/shaman_spiritmend';
 import type { Role } from './content/talents';
 import type { AbilityEffect, Aura, Entity } from './types';
 import { PARTY_MEMBER_AURA_CAP } from './types';
@@ -9,6 +10,7 @@ export interface PartyFrameAuraSummary {
   kind: Aura['kind'];
   neg?: 1;
   remaining: number;
+  poolPct?: number;
 }
 
 export interface PartyFrameResolvedAbility {
@@ -22,17 +24,31 @@ export interface PreparedPartyFrameAura {
 
 /** Perform the relevance, priority, and summary work once before applying a
  * viewer-specific Temporal Echo visibility filter. */
-export function preparePartyFrameAuras(auras: readonly Aura[]): PreparedPartyFrameAura[] {
+function mendingPoolPct(aura: Aura, maxHp: number | undefined): number | undefined {
+  if (aura.id !== MENDING_CURRENT_ID || aura.value <= 0 || !maxHp || maxHp <= 0) return undefined;
+  return Math.max(1, Math.min(100, Math.round((aura.value / maxHp) * 100)));
+}
+
+function partyFrameAuraSummary(aura: Aura, maxHp: number | undefined): PartyFrameAuraSummary {
+  const poolPct = mendingPoolPct(aura, maxHp);
+  return {
+    id: aura.id,
+    kind: aura.kind,
+    ...(aura.value < 0 ? { neg: 1 as const } : {}),
+    remaining: Math.max(0, Math.ceil(aura.remaining)),
+    ...(poolPct !== undefined ? { poolPct } : {}),
+  };
+}
+
+export function preparePartyFrameAuras(
+  auras: readonly Aura[],
+  maxHp?: number,
+): PreparedPartyFrameAura[] {
   const relevant = auras.filter((aura) => isPartyFrameRelevantAura(aura));
   relevant.sort((a, b) => partyAuraPriority(a) - partyAuraPriority(b));
   return relevant.map((aura) => ({
     sourceId: aura.sourceId,
-    summary: {
-      id: aura.id,
-      kind: aura.kind,
-      ...(aura.value < 0 ? { neg: 1 as const } : {}),
-      remaining: Math.max(0, Math.ceil(aura.remaining)),
-    },
+    summary: partyFrameAuraSummary(aura, maxHp),
   }));
 }
 
@@ -66,18 +82,14 @@ export function partyFrameAurasForViewer(
 export function partyFrameAuras(
   auras: readonly Aura[],
   cap = PARTY_MEMBER_AURA_CAP,
+  maxHp?: number,
 ): PartyFrameAuraSummary[] {
   // Keep the offline path single-pass. Routing it through the prepared server
   // representation would allocate both an intermediate wrapper list and the
   // final summaries for every offline tick.
   const relevant = auras.filter((aura) => isPartyFrameRelevantAura(aura));
   relevant.sort((a, b) => partyAuraPriority(a) - partyAuraPriority(b));
-  return relevant.slice(0, cap).map((aura) => ({
-    id: aura.id,
-    kind: aura.kind,
-    ...(aura.value < 0 ? { neg: 1 as const } : {}),
-    remaining: Math.max(0, Math.ceil(aura.remaining)),
-  }));
+  return relevant.slice(0, cap).map((aura) => partyFrameAuraSummary(aura, maxHp));
 }
 
 /** Remaining damage absorption, matching the player and target frame total. */

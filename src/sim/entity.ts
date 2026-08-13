@@ -153,6 +153,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     drinking: null,
     weaponStowed: false,
     helmHidden: false,
+    modularAppearance: null,
     afk: false,
     aiState: 'idle',
     tappedById: null,
@@ -237,6 +238,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     equippedInstances: {},
     guild: '',
     title: null,
+    border: null,
   };
 }
 
@@ -254,6 +256,16 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
   if (cls === 'warrior') {
     const stance = buildStanceAura(BATTLE_STANCE, id);
     if (stance) e.auras.push(stance);
+  }
+  if (cls === 'paladin') {
+    e.paladinDevotion = {
+      value: 0,
+      ascensionCharges: 0,
+      ascensionRemaining: 0,
+      outOfCombatTime: 0,
+      decayProgress: 0,
+      blockIcdRemaining: 0,
+    };
   }
   return e;
 }
@@ -693,7 +705,7 @@ export function recalcPlayerStats(
       : Math.round(e.maxResource * manaFrac);
   } else {
     e.resourceType = def.resourceType;
-    e.maxResource = 100; // rage and energy both cap at 100
+    e.maxResource = 100; // rage, energy, and Focus all cap at 100
     e.resource = Math.min(e.resource, 100);
   }
 }

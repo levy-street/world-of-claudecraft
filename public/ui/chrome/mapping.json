@@ -2,7 +2,7 @@
   "license": "Project asset, rights reserved. Generated for World of ClaudeCraft; see the HUD chrome launcher icons row in CREDITS.md.",
   "iconSize": 128,
   "note": "Painted art for the HUD's primary destinations (DESIGN.md section 6): the side-rail launchers, the mobile bottom bar, and the mobile More tray. Each file basename is a UiIconName listed in CHROME_ART_IDS (src/ui/chrome_icon_art.ts). Authored on a flat magenta (#FF00FF) key, then keyed to alpha, trimmed, centered, and encoded by `npm run assets:chrome`. WebP only; tests/chrome_icons.test.ts gates the tree, the alpha, the 128px square, and the wiring in both directions.",
-  "source": "Google Gemini image generation, one shared art direction: painted classic-MMO icon, pale gold and warm bronze with cream parchment, thick dark outline, simple silhouette that reads at 24px, light from the top left.",
+  "source": "Google Gemini image generation except where an entry names its own source, one shared art direction: painted classic-MMO icon, pale gold and warm bronze with cream parchment, thick dark outline, simple silhouette that reads at 24px, light from the top left.",
   "entries": [
     { "icon": "arena", "motif": "Crossed swords over a round shield" },
     { "icon": "bags", "motif": "Leather satchel drawn shut with a gold cord" },
@@ -12,6 +12,11 @@
     { "icon": "character", "motif": "Plumed helm and pauldrons, front facing" },
     { "icon": "chest", "motif": "Open treasure chest spilling coins (the store)" },
     { "icon": "crafting", "motif": "Anvil with a smith's hammer" },
+    {
+      "icon": "crown",
+      "motif": "Five-peak gold crown with a bezel-set ruby (the Reliquary)",
+      "source": "Authored in-repo as layered SVG to the shared art direction (scripts/assets/chrome_crown/crown.svg, rendered onto the key by scripts/assets/chrome_crown/render_source.mjs), then keyed and encoded by the same converter"
+    },
     { "icon": "dfinder", "motif": "Stone dungeon archway with a raised portcullis" },
     { "icon": "donate", "motif": "Solid gold heart" },
     { "icon": "emote", "motif": "Round gold medallion with a smiling face in relief" },

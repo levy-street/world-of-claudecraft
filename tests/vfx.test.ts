@@ -319,6 +319,8 @@ describe('pooled VFX cloud', () => {
     expect(source.match(/this\.vfx\.prepareDraw\(this\.camera\);/g)).toHaveLength(3);
     expect(source).toContain(`this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);
+    this.needleOfFateVfx.update(dt, this.reducedMotion());
+    this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);`);
     expect(source).toMatch(/this\.captureGlIdentity\(\);\s+this\.vfx\?\.onContextRestored\(\);/);
   });

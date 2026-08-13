@@ -8,7 +8,9 @@ export const HITCH_VIEWPORT_LABEL = `${HITCH_VIEWPORT.width}x${HITCH_VIEWPORT.he
 export const HITCH_SETTLED_HEAP_WAIT_MS = 100;
 export const HITCH_BROWSER_EXTRA_ARGS = Object.freeze([
   '--disable-gpu-shader-disk-cache',
-  '--disable-crashpad-for-testing',
+  // --disable-crashpad-for-testing aborts EVERY navigation on Chrome 151+
+  // (net::ERR_ABORTED on the initial document); crash reporting stays off via
+  // the two flags below.
   '--disable-crash-reporter',
   '--disable-breakpad',
   '--enable-precise-memory-info',

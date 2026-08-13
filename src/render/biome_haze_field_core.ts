@@ -30,6 +30,7 @@ import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z } from '../sim/data'
 import type { BiomeId } from '../sim/types';
 import { zoneBiomeAt } from '../sim/world';
 import { FAR_WORLD_MARGIN } from './far_terrain_core';
+import { clamp01 } from './num_clamp';
 
 /** World yards per field texel. Small enough that a zone band (360 yards on
  *  its short axis) is fifteen texels across, large enough that the shipped
@@ -170,10 +171,6 @@ export interface HazeSample {
   g: number;
   b: number;
   strength: number;
-}
-
-function clamp01(v: number): number {
-  return v < 0 ? 0 : v > 1 ? 1 : v;
 }
 
 /** sRGB transfer, the same curve THREE.Color.setHex applies. */

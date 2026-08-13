@@ -62,6 +62,33 @@ export function wireModelViewers(root: HTMLElement, opts: WireOptions = {}): () 
     const btn = fig.querySelector<HTMLButtonElement>('.guide-viewer-load');
     const stage = fig.querySelector<HTMLElement>('.guide-viewer-stage');
     if (!btn || !stage) continue;
+
+    // A baked still is the accessible subject while it loads successfully. If its fetch or
+    // decode fails, replace it once with the supplied 2D crest/icon, which is decorative just
+    // like an embed rendered without a still. Remove the listener before assigning the fallback
+    // so a broken fallback cannot trigger an error loop. This wiring precedes the WebGL check:
+    // poster recovery is especially important when the reader cannot open the turntable.
+    const poster = fig.querySelector<HTMLImageElement>(
+      '.guide-viewer-poster[data-poster-fallback]',
+    );
+    const posterFallback = poster?.dataset.posterFallback;
+    if (poster && posterFallback) {
+      let fallbackApplied = false;
+      const usePosterFallback = (): void => {
+        if (fallbackApplied) return;
+        fallbackApplied = true;
+        poster.removeEventListener('error', usePosterFallback);
+        delete poster.dataset.posterFallback;
+        poster.classList.remove('guide-viewer-poster-still');
+        poster.alt = '';
+        poster.src = posterFallback;
+      };
+      poster.addEventListener('error', usePosterFallback);
+      cleanups.push(() => poster.removeEventListener('error', usePosterFallback));
+      // A cached failure can settle before route mount attaches the event listener.
+      if (poster.complete && poster.naturalWidth === 0) usePosterFallback();
+    }
+
     if (noWebGL) {
       fig.dataset.state = 'nowebgl'; // CSS hides the button; the 2D poster remains
       continue;

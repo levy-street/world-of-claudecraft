@@ -97,6 +97,11 @@ unchanged. All numbers are level-20 baselines, PTR-tunable.
 
 ### Paladin
 
+This table records the pre-v0.30 choice-row pass and is retained only as decision history. It
+is not the current Paladin inventory. The live rows are authored in
+`src/sim/content/choice_rows.ts`; the current ability progression is pinned by
+`tests/paladin_progression.test.ts` and documented in `paladin-devotion-core.md`.
+
 | Row | Option | New behavior |
 |---|---|---|
 | 5 | Blessed Momentum | KEEP. |
@@ -108,11 +113,11 @@ unchanged. All numbers are level-20 baselines, PTR-tunable.
 | 11 | Greater Blessing | KEEP (passive third). |
 | 14 | Swift Verdicts | KEEP. |
 | 14 | Righteous Cause | Melee swings while your Seal is up shave 0.5 sec off Judgement's cooldown (replaces the half-broken passive after the engine fix). |
-| 17 | Lightward | KEEP the grant; divine_shield absorb retuned 5000 -> level-scaled (roughly 2x max hp at 20). |
+| 17 | Lightward | Historical plan, superseded by the Paladin v0.30 overhaul. Lightward and `divine_shield` are removed. |
 | 17 | Sacred Ward | Lay on Hands also shields every nearby ally for 60. |
 | 17 | Deathless Ardor | Cheat death: a killing blow leaves you at 1 hp instead (3 min internal cooldown). |
 | 20 | Wrathwing / Tolling Hammer | KEEP. |
-| 20 | Aura Mastery | Activate: your aura's effect is doubled for 10 sec (2 min cooldown), granted as an active ability. |
+| 20 | Sacred Concord | Activate: your aura's effect is doubled for 10 sec (2 min cooldown), granted as an active ability. |
 
 ## Constraints carried from the repo rules
 

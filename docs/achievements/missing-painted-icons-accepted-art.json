@@ -8,12 +8,12 @@
     "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
   },
   "scope": {
-    "targetRows": 209,
-    "rasterPaintings": 194,
-    "abilities": 90,
+    "targetRows": 220,
+    "rasterPaintings": 204,
+    "abilities": 100,
     "items": 101,
     "deeds": 3,
-    "heroicWeaponResolvers": 15,
+    "heroicWeaponResolvers": 16,
     "originalInventoryRows": 197,
     "supplementalCurrentHeadRows": 12
   },
@@ -48,16 +48,15 @@
     "abilities": [
       "arcane_power",
       "aspect_of_the_wild",
-      "aura_surge",
       "avenging_wrath",
       "berserk",
       "bestial_wrath",
       "blade_flurry",
       "bloodlust",
+      "body_blow",
       "chain_heal",
       "chain_lightning",
       "chaos_bolt",
-      "cleansing_verdict",
       "cleaving_blows",
       "cloak_of_shadows",
       "cold_blood",
@@ -72,12 +71,13 @@
       "desperate_prayer",
       "deterrence",
       "diabolical_twinstrike",
-      "divine_shield",
       "earthbind",
       "earthquake",
       "elemental_mastery",
+      "elemental_trance",
       "enrage_passive",
       "feral_charge",
+      "flurry_of_knives",
       "frenzied_regeneration",
       "frost_trap",
       "ghostly_strike",
@@ -88,18 +88,22 @@
       "holy_shield",
       "holy_shock",
       "holy_taunt",
-      "holy_wrath",
       "howl_of_terror",
       "hurricane",
       "inner_focus",
       "innervate",
       "kick",
+      "knockout_blow",
+      "marrowbreak",
       "measured_fury",
       "mend_pet",
       "metamorphosis",
       "mind_sear",
       "moonkin_form",
+      "moonlash",
+      "moonseed",
       "multi_shot",
+      "overbloom",
       "power_infusion",
       "prayer_of_healing",
       "preparation",
@@ -107,6 +111,7 @@
       "psychic_scream",
       "rain_of_fire",
       "rebuke",
+      "redharvest",
       "sacred_bulwark",
       "seasoned_soldier",
       "shadowform",
@@ -129,10 +134,15 @@
       "sport_shoulder",
       "startle_shot",
       "sudden_death",
+      "sunlance",
       "swiftmend",
+      "thieves_chorus",
       "tranquility",
       "trueshot_aura",
       "typhoon",
+      "veilstrike",
+      "venom_dart",
+      "venomrend",
       "voidfeast",
       "volley",
       "wyvern_sting"
@@ -273,6 +283,17 @@
         "heldModelPath": "public/models/weapons/adv_sword_2handed_color.glb",
         "canonicalDisplayName": "Direfang Greatblade",
         "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Direfang Greatblade; inherits base visual variant adv_sword_2handed_color.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
+        "id": "heroic_duskwhisper",
+        "baseId": "duskwhisper",
+        "variant": "purple_dagger",
+        "bagIconUrl": "/ui/weapons/purple_dagger.jpg",
+        "portraitPath": "public/ui/weapons/purple_dagger.jpg",
+        "heldModelPath": "public/models/weapons/purple_dagger.glb",
+        "canonicalDisplayName": "Duskwhisper",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Duskwhisper (Fanglord Beastmaster heroic boss drop); inherits base visual variant purple_dagger.",
         "validationStatus": "implemented and focused tests passing"
       },
       {
@@ -534,67 +555,6 @@
     },
     {
       "kind": "ability",
-      "id": "aura_surge",
-      "runtimeUrl": "/ui/skills/paladin/aura_surge.webp",
-      "acceptedSha256": "3da241e75ea46900563b2f72b6715ff8c41aaf4550fa0b22a77efaa2280d7e58",
-      "acceptedBytes": 4470,
-      "master": {
-        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/paladin/aura_surge.png",
-        "bytes": 2116260,
-        "sha256": "622452af1e34e14186751e1daf6d6b2dd3a63cfc35ddd0df34f5b81bb43ae225",
-        "width": 1254,
-        "height": 1254,
-        "format": "png",
-        "colourspace": "srgb"
-      },
-      "source": {
-        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/aura_surge.png",
-        "bytes": 388137,
-        "sha256": "3cd32d7ce47abc051c2422fc1e13485956a5beeadfb94d048b585eb2f565481c",
-        "width": 512,
-        "height": 512,
-        "format": "png",
-        "colourspace": "srgb",
-        "alpha": "opaque"
-      },
-      "canonicalDisplayName": "Dawnward Ricochet",
-      "canonicalGameplayMeaningOrAcquisition": "Dawnward Ricochet hits the primary target for 100 to 120 Holy damage, bounces to 2 enemies at 75% per hop, and silences the primary for 2 sec; 20 sec cooldown.",
-      "intendedVisualSubject": "A dawnforged shield tracing a three-target ricochet with a sealed rune over the first target.",
-      "generation": {
-        "source": "OpenAI built-in image generation",
-        "owner": "World of ClaudeCraft",
-        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Dawnward Ricochet (aura_surge)\nCanonical mechanic: Dawnward Ricochet hits the primary target for 100 to 120 Holy damage, bounces to 2 enemies at 75% per hop, and silences the primary for 2 sec; 20 sec cooldown.\nSubject: A dawnforged shield tracing a three-target ricochet with a sealed rune over the first target.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
-        "references": [
-          {
-            "path": "public/ui/skills/paladin/judgement.webp",
-            "role": "composition reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          },
-          {
-            "path": "public/ui/skills/paladin/divine_protection.webp",
-            "role": "subject reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          }
-        ]
-      },
-      "processing": [
-        "Copied the accepted image-generation master into the worktree.",
-        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
-        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
-      ],
-      "expected": {
-        "width": 128,
-        "height": 128,
-        "maxBytes": 15360,
-        "alpha": "opaque"
-      },
-      "class": "paladin"
-    },
-    {
-      "kind": "ability",
       "id": "avenging_wrath",
       "runtimeUrl": "/ui/skills/paladin/avenging_wrath.webp",
       "acceptedSha256": "95da7400aa47172fadd548f92bb82c297710be95755329dce3eda9942d1c511c",
@@ -628,7 +588,7 @@
         "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wrathwing (avenging_wrath)\nCanonical mechanic: Wrathwing grants 60 attack power and 30 spell power for 20 sec; 180 sec cooldown.\nSubject: Golden wings flanking a sword and spell orb, both ignited by one halo.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "style reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -900,6 +860,67 @@
     },
     {
       "kind": "ability",
+      "id": "body_blow",
+      "runtimeUrl": "/ui/skills/rogue/body_blow.webp",
+      "acceptedSha256": "9683bb32d832ab7d3ae1defed61d0efdb2bc214da41f957c77d9bddd5f04fa44",
+      "acceptedBytes": 3784,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/rogue/body_blow.png",
+        "bytes": 1554771,
+        "sha256": "86448d7950b9aee81debd614c8ebae0915dda055084490be082aca0f9778bcae",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/body_blow.png",
+        "bytes": 541814,
+        "sha256": "f7ab6602e2810247b0d2de9cce13f46d6f4ad65075710ef205bf01939f92d429",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Haymaker",
+      "canonicalGameplayMeaningOrAcquisition": "A heavy blow for 130% weapon damage. Awards 2 combo points and adds 1 Redline.",
+      "intendedVisualSubject": "A wrapped brawler fist mid-haymaker, heavy motion arcs behind it.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Haymaker (body_blow)\nCanonical mechanic: A heavy blow for 130% weapon damage. Awards 2 combo points and adds 1 Redline.\nSubject: A wrapped brawler fist mid-haymaker, heavy motion arcs behind it.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/rogue/sinister_strike.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/rogue/eviscerate.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "rogue"
+    },
+    {
+      "kind": "ability",
       "id": "chain_heal",
       "runtimeUrl": "/ui/skills/shaman/chain_heal.webp",
       "acceptedSha256": "43c100ab08ee4f08f1af21b9b62673b070612d5952156b76a7fa5d6704629a80",
@@ -1080,67 +1101,6 @@
         "alpha": "opaque"
       },
       "class": "warlock"
-    },
-    {
-      "kind": "ability",
-      "id": "cleansing_verdict",
-      "runtimeUrl": "/ui/skills/paladin/cleansing_verdict.webp",
-      "acceptedSha256": "42b5aa21c4aedef8876475aaf1efb960ed91590e1ede7475fba0caedfe715534",
-      "acceptedBytes": 2796,
-      "master": {
-        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/paladin/cleansing_verdict.png",
-        "bytes": 1899300,
-        "sha256": "b56d4401a197ef218bf0e2566b185cecc0895df6b2ee20f97d9b6388ed8e2621",
-        "width": 1254,
-        "height": 1254,
-        "format": "png",
-        "colourspace": "srgb"
-      },
-      "source": {
-        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/cleansing_verdict.png",
-        "bytes": 324205,
-        "sha256": "ecc5e29a0dc6a0e17b6f944aa90ac2748fc6ac0ed6fd354f14f3b81afb6b2c56",
-        "width": 512,
-        "height": 512,
-        "format": "png",
-        "colourspace": "srgb",
-        "alpha": "opaque"
-      },
-      "canonicalDisplayName": "Cleansing Verdict",
-      "canonicalGameplayMeaningOrAcquisition": "Cleansing Verdict removes one harmful magic effect from a friendly and heals them for 40 to 50; 30 yd, 8 sec cooldown.",
-      "intendedVisualSubject": "A radiant hand lifting a dark rune from an ally's heart and burning it away.",
-      "generation": {
-        "source": "OpenAI built-in image generation",
-        "owner": "World of ClaudeCraft",
-        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Cleansing Verdict (cleansing_verdict)\nCanonical mechanic: Cleansing Verdict removes one harmful magic effect from a friendly and heals them for 40 to 50; 30 yd, 8 sec cooldown.\nSubject: A radiant hand lifting a dark rune from an ally's heart and burning it away.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
-        "references": [
-          {
-            "path": "public/ui/skills/paladin/holy_light.webp",
-            "role": "subject reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          },
-          {
-            "path": "public/ui/skills/paladin/judgement.webp",
-            "role": "style reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          }
-        ]
-      },
-      "processing": [
-        "Copied the accepted image-generation master into the worktree.",
-        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
-        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
-      ],
-      "expected": {
-        "width": 128,
-        "height": 128,
-        "maxBytes": 15360,
-        "alpha": "opaque"
-      },
-      "class": "paladin"
     },
     {
       "kind": "ability",
@@ -1543,7 +1503,7 @@
         "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Crusader Strike (crusader_strike)\nCanonical mechanic: Crusader Strike deals weapon damage plus 24 Holy damage; 4 sec cooldown.\nSubject: A cross-marked sword carving a bright diagonal holy arc.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "style reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -1998,67 +1958,6 @@
     },
     {
       "kind": "ability",
-      "id": "divine_shield",
-      "runtimeUrl": "/ui/skills/paladin/divine_shield.webp",
-      "acceptedSha256": "51e12e57c01a47db3857486dd07089f3457ed0656fad6547610d0f672c33902b",
-      "acceptedBytes": 5628,
-      "master": {
-        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/paladin/divine_shield.png",
-        "bytes": 2472279,
-        "sha256": "9ed6b699602a2fd92262adf664130599f43d3298d81c04afed0a87dd652384e1",
-        "width": 1254,
-        "height": 1254,
-        "format": "png",
-        "colourspace": "srgb"
-      },
-      "source": {
-        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/divine_shield.png",
-        "bytes": 453544,
-        "sha256": "11b70c450220c9d085a932913327fe4d4201eccf08039d13220a1c23fd81e406",
-        "width": 512,
-        "height": 512,
-        "format": "png",
-        "colourspace": "srgb",
-        "alpha": "opaque"
-      },
-      "canonicalDisplayName": "Lightward",
-      "canonicalGameplayMeaningOrAcquisition": "Lightward absorbs 900 damage for 8 sec; 300 sec cooldown. Current mechanics are a large absorb, not immunity.",
-      "intendedVisualSubject": "A sealed luminous dome around a kneeling paladin, layered like thick glass.",
-      "generation": {
-        "source": "OpenAI built-in image generation",
-        "owner": "World of ClaudeCraft",
-        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Lightward (divine_shield)\nCanonical mechanic: Lightward absorbs 900 damage for 8 sec; 300 sec cooldown. Current mechanics are a large absorb, not immunity.\nSubject: A sealed luminous dome around a kneeling paladin, layered like thick glass.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
-        "references": [
-          {
-            "path": "public/ui/skills/paladin/divine_protection.webp",
-            "role": "subject reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          },
-          {
-            "path": "public/ui/skills/paladin/holy_light.webp",
-            "role": "style reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          }
-        ]
-      },
-      "processing": [
-        "Copied the accepted image-generation master into the worktree.",
-        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
-        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
-      ],
-      "expected": {
-        "width": 128,
-        "height": 128,
-        "maxBytes": 15360,
-        "alpha": "opaque"
-      },
-      "class": "paladin"
-    },
-    {
-      "kind": "ability",
       "id": "earthbind",
       "runtimeUrl": "/ui/skills/shaman/earthbind.webp",
       "acceptedSha256": "2ab007bab1ea9bf7dbd9e3858ad07913f13e3a109afdcf51b7eca3d342d59d77",
@@ -2242,6 +2141,67 @@
     },
     {
       "kind": "ability",
+      "id": "elemental_trance",
+      "runtimeUrl": "/ui/skills/shaman/elemental_trance.webp",
+      "acceptedSha256": "5cf7eeaf1052e9d3993fb2780b9009c33c9fd329f9801cb63ae7568d32dc98a2",
+      "acceptedBytes": 5046,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/shaman/elemental_trance.png",
+        "bytes": 1772443,
+        "sha256": "c96dc5ae7e7d2ec39a4aa8661b665971788bd8365ea2007430d68f4f2b9c94f8",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/elemental_trance.png",
+        "bytes": 640458,
+        "sha256": "c7e650fd788d78117962e085e802f9ce37bb9cd60df0f5e19f40cb563cb2d09d",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Elemental Trance",
+      "canonicalGameplayMeaningOrAcquisition": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of damage dealt into mana.",
+      "intendedVisualSubject": "A meditating silhouette ringed by orbiting motes of flame, water, and stone.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Elemental Trance (elemental_trance)\nCanonical mechanic: Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of damage dealt into mana.\nSubject: A meditating silhouette ringed by orbiting motes of flame, water, and stone.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/shaman/lightning_bolt.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/shaman/rockbiter_weapon.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "shaman"
+    },
+    {
+      "kind": "ability",
       "id": "enrage_passive",
       "runtimeUrl": "/ui/skills/warrior/enrage_passive.webp",
       "acceptedSha256": "78c573539ef93e9d526000e620e19a835d6e0d722b2512ba986ad6b99d1daf43",
@@ -2361,6 +2321,67 @@
         "alpha": "opaque"
       },
       "class": "druid"
+    },
+    {
+      "kind": "ability",
+      "id": "flurry_of_knives",
+      "runtimeUrl": "/ui/skills/rogue/flurry_of_knives.webp",
+      "acceptedSha256": "a6f4377c005b7844058a8b365c2a841ed163edf2e67b825e3e971046b9cc9dcf",
+      "acceptedBytes": 4178,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/rogue/flurry_of_knives.png",
+        "bytes": 1729901,
+        "sha256": "cd9ed85b8a1d74f64b6cf2419373b3351244d0d5e84879a5a04c7b7e0cf18117",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/flurry_of_knives.png",
+        "bytes": 602739,
+        "sha256": "8edd86a1e867e195f2ab050a5787fc6ac4140b510d99e6622ba5aa708ccf127e",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Flurry of Knives",
+      "canonicalGameplayMeaningOrAcquisition": "Lash every enemy within 6 yd with thrown knives and gain 2 combo points.",
+      "intendedVisualSubject": "A fan of thrown knives spinning outward in a deadly circle.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Flurry of Knives (flurry_of_knives)\nCanonical mechanic: Lash every enemy within 6 yd with thrown knives and gain 2 combo points.\nSubject: A fan of thrown knives spinning outward in a deadly circle.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/rogue/sinister_strike.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/rogue/eviscerate.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "rogue"
     },
     {
       "kind": "ability",
@@ -2586,7 +2607,7 @@
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           },
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "composition reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -2830,7 +2851,7 @@
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           },
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "composition reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -2891,7 +2912,7 @@
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           },
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "composition reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -2952,69 +2973,8 @@
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           },
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "style reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          }
-        ]
-      },
-      "processing": [
-        "Copied the accepted image-generation master into the worktree.",
-        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
-        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
-      ],
-      "expected": {
-        "width": 128,
-        "height": 128,
-        "maxBytes": 15360,
-        "alpha": "opaque"
-      },
-      "class": "paladin"
-    },
-    {
-      "kind": "ability",
-      "id": "holy_wrath",
-      "runtimeUrl": "/ui/skills/paladin/holy_wrath.webp",
-      "acceptedSha256": "81257cfa84b6682f5e221de77d78c56bdf04e4fc41daf19a807e33873e181a5f",
-      "acceptedBytes": 4628,
-      "master": {
-        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/paladin/holy_wrath.png",
-        "bytes": 2160093,
-        "sha256": "bfcf26a8cae6ca3b642263201a223cdf7b22bf99b61d2c73a2ac2f0186e7d4a5",
-        "width": 1254,
-        "height": 1254,
-        "format": "png",
-        "colourspace": "srgb"
-      },
-      "source": {
-        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/holy_wrath.png",
-        "bytes": 410999,
-        "sha256": "81b03ae17f4488adc3b09785724719b4545d21beb6272bddad717e97b3a2107d",
-        "width": 512,
-        "height": 512,
-        "format": "png",
-        "colourspace": "srgb",
-        "alpha": "opaque"
-      },
-      "canonicalDisplayName": "Saint's Ire",
-      "canonicalGameplayMeaningOrAcquisition": "Saint's Ire deals 54 to 68 Holy damage to enemies within 10 yd; 20 sec cooldown.",
-      "intendedVisualSubject": "A paladin at the center of a white-gold sunburst striking a ring of enemies.",
-      "generation": {
-        "source": "OpenAI built-in image generation",
-        "owner": "World of ClaudeCraft",
-        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Saint's Ire (holy_wrath)\nCanonical mechanic: Saint's Ire deals 54 to 68 Holy damage to enemies within 10 yd; 20 sec cooldown.\nSubject: A paladin at the center of a white-gold sunburst striking a ring of enemies.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
-        "references": [
-          {
-            "path": "public/ui/skills/paladin/judgement.webp",
-            "role": "style reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          },
-          {
-            "path": "public/ui/skills/paladin/hammer_of_justice.webp",
-            "role": "composition reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           }
@@ -3340,6 +3300,128 @@
     },
     {
       "kind": "ability",
+      "id": "knockout_blow",
+      "runtimeUrl": "/ui/skills/rogue/knockout_blow.webp",
+      "acceptedSha256": "860870b2aa41dc7b9729903b12fbf1aa0a18633d5380cef765a185062936e35e",
+      "acceptedBytes": 3418,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/rogue/knockout_blow.png",
+        "bytes": 1604726,
+        "sha256": "b681f8e6c8b193ede914e9eac58e74f12990e6d9859ef87ffa4494499bb16ed1",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/knockout_blow.png",
+        "bytes": 554067,
+        "sha256": "0f32f85ca7dfe86b7969b2e7aadfd65737a0a40165bd4a1719c769bcd7316654",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Lights Out",
+      "canonicalGameplayMeaningOrAcquisition": "Ends Redline with a knockout strike hitting 25% harder per Redline built, recovering 25 energy.",
+      "intendedVisualSubject": "A fist connecting square with a burst of fading stars and a dimming lantern.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Lights Out (knockout_blow)\nCanonical mechanic: Ends Redline with a knockout strike hitting 25% harder per Redline built, recovering 25 energy.\nSubject: A fist connecting square with a burst of fading stars and a dimming lantern.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/rogue/sinister_strike.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/rogue/eviscerate.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "rogue"
+    },
+    {
+      "kind": "ability",
+      "id": "marrowbreak",
+      "runtimeUrl": "/ui/skills/druid/marrowbreak.webp",
+      "acceptedSha256": "c08f417b2ef5791433e00578b97b892a050bf6ae0a87ed94270694d18f75e384",
+      "acceptedBytes": 4522,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/druid/marrowbreak.png",
+        "bytes": 1963135,
+        "sha256": "d9b7bf48300957699376b41346cacaaa4fd8dbc63f99d689934ed97911fa2db3",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/marrowbreak.png",
+        "bytes": 615445,
+        "sha256": "63d621e4edf8b179fdaa6045d0618de536a0c6ccd917f1632099f9376ad686ce",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Marrowbreak",
+      "canonicalGameplayMeaningOrAcquisition": "Spends 3 Old Blood for a heavy, high-threat strike; below half health it shields you instead.",
+      "intendedVisualSubject": "A great bear paw slamming down and cracking a massive bleached bone.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Marrowbreak (marrowbreak)\nCanonical mechanic: Spends 3 Old Blood for a heavy, high-threat strike; below half health it shields you instead.\nSubject: A great bear paw slamming down and cracking a massive bleached bone.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/druid/wrath.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/druid/healing_touch.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "druid"
+    },
+    {
+      "kind": "ability",
       "id": "measured_fury",
       "runtimeUrl": "/ui/skills/warrior/measured_fury.webp",
       "acceptedSha256": "09534094bdb6995eb0201e70c8bf19ba5341799adced3458f3be72007f591656",
@@ -3645,6 +3727,128 @@
     },
     {
       "kind": "ability",
+      "id": "moonlash",
+      "runtimeUrl": "/ui/skills/druid/moonlash.webp",
+      "acceptedSha256": "3441210263f0a46a313b54481b8c52c4a8856271af8b4cb94a8510acbcb694da",
+      "acceptedBytes": 4820,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/druid/moonlash.png",
+        "bytes": 1776627,
+        "sha256": "58df96f6f50250cb643599e6bcb025e88987be14bbd0911a0964332b38d2314b",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/moonlash.png",
+        "bytes": 660671,
+        "sha256": "337c035b79fe804d1c999777b7993f6c1d24b885c6b3b59504bb60680ed8f84e",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Moonsurge",
+      "canonicalGameplayMeaningOrAcquisition": "Spends 3 Moontide for a heavy strike of Arcane damage: the damage choice.",
+      "intendedVisualSubject": "A crashing tidal wave of cold moonlight breaking over a dark field.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Moonsurge (moonlash)\nCanonical mechanic: Spends 3 Moontide for a heavy strike of Arcane damage: the damage choice.\nSubject: A crashing tidal wave of cold moonlight breaking over a dark field.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/druid/wrath.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/druid/healing_touch.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "druid"
+    },
+    {
+      "kind": "ability",
+      "id": "moonseed",
+      "runtimeUrl": "/ui/skills/druid/moonseed.webp",
+      "acceptedSha256": "bd1a7f9d916b5e8fe2bf2063287ebd1ff0eea3089d541652c5249954c4f72457",
+      "acceptedBytes": 4198,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/druid/moonseed.png",
+        "bytes": 1659791,
+        "sha256": "a629a96690f52043cca7cb4deaaad0e94a7842fc0dd1df8199af94f772c3f477",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/moonseed.png",
+        "bytes": 666525,
+        "sha256": "828cac6a6271e4f3faa40f5d3d49b637a31cb7350aa10ede5eb066f2331afd57",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Moonseed",
+      "canonicalGameplayMeaningOrAcquisition": "Moonwing Form only. Strikes for Arcane damage, adds 1 Moontide, and extends Lunar Tempest.",
+      "intendedVisualSubject": "A glowing silver seed haloed by a crescent moon, sprouting faint arcane tendrils.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Moonseed (moonseed)\nCanonical mechanic: Moonwing Form only. Strikes for Arcane damage, adds 1 Moontide, and extends Lunar Tempest.\nSubject: A glowing silver seed haloed by a crescent moon, sprouting faint arcane tendrils.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/druid/wrath.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/druid/healing_touch.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "druid"
+    },
+    {
+      "kind": "ability",
       "id": "multi_shot",
       "runtimeUrl": "/ui/skills/hunter/multi_shot.webp",
       "acceptedSha256": "2c07ed6244fa87627b792fafbc68e2f8101c8602b1f2cfc4300c2e736930edb4",
@@ -3703,6 +3907,67 @@
         "alpha": "opaque"
       },
       "class": "hunter"
+    },
+    {
+      "kind": "ability",
+      "id": "overbloom",
+      "runtimeUrl": "/ui/skills/druid/overbloom.webp",
+      "acceptedSha256": "eac1e6739eafb85ab52e26c48cc1bbfaec293b50d8db2c0e779ce2219e5787e2",
+      "acceptedBytes": 6088,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/druid/overbloom.png",
+        "bytes": 1751940,
+        "sha256": "9db4efb126e1ad6d1ccd374f38cc8ab5b52d6ab5c35df0a30e7b493794b789aa",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/overbloom.png",
+        "bytes": 686020,
+        "sha256": "d9834568956c67847d9bbc878a20b10dbb5c6a5e79d1254032e3e02f73951515",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Overbloom",
+      "canonicalGameplayMeaningOrAcquisition": "Spends 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of what those effects had left.",
+      "intendedVisualSubject": "A verdant flower bursting open in an overwhelming bloom of healing light.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Overbloom (overbloom)\nCanonical mechanic: Spends 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of what those effects had left.\nSubject: A verdant flower bursting open in an overwhelming bloom of healing light.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/druid/wrath.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/druid/healing_touch.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "druid"
     },
     {
       "kind": "ability",
@@ -4111,7 +4376,7 @@
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           },
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "style reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -4130,6 +4395,67 @@
         "alpha": "opaque"
       },
       "class": "paladin"
+    },
+    {
+      "kind": "ability",
+      "id": "redharvest",
+      "runtimeUrl": "/ui/skills/druid/redharvest.webp",
+      "acceptedSha256": "8e317a6d063e19129813bdd807bf071cc610f07b6dd2caa9274f5329e8e446f0",
+      "acceptedBytes": 4254,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/druid/redharvest.png",
+        "bytes": 1879813,
+        "sha256": "06da7af2ee5601a73a286d3b8eba11520d0294eaafebe160f777d457a568c07a",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/redharvest.png",
+        "bytes": 575888,
+        "sha256": "06cb5de3c4b4bcd6fa9a1779899a75b16d2b73b934233cc10ddbad1238e0a348",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Redharvest",
+      "canonicalGameplayMeaningOrAcquisition": "Spends 3 Old Blood: strike, instantly deal all remaining bleed damage, remove both bleeds.",
+      "intendedVisualSubject": "A clawed paw reaping a sheaf of taut crimson strands like a wheat harvest.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Redharvest (redharvest)\nCanonical mechanic: Spends 3 Old Blood: strike, instantly deal all remaining bleed damage, remove both bleeds.\nSubject: A clawed paw reaping a sheaf of taut crimson strands like a wheat harvest.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/druid/wrath.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/druid/healing_touch.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "druid"
     },
     {
       "kind": "ability",
@@ -5535,6 +5861,67 @@
     },
     {
       "kind": "ability",
+      "id": "sunlance",
+      "runtimeUrl": "/ui/skills/druid/sunlance.webp",
+      "acceptedSha256": "f7c2dfd48e5df20c9cffabf46c276a08a3f250d28521ebc4cda2d49421f9dc50",
+      "acceptedBytes": 4746,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/druid/sunlance.png",
+        "bytes": 1697097,
+        "sha256": "7bd2ef24159fd8a5dd21ae125229f5691193d524b2f94124fd791abb9d6fa609",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/sunlance.png",
+        "bytes": 628479,
+        "sha256": "beb39c29d5a772b39684311311f0c36aeb4e3e4b0e84d895a6a3ab43c0efd725",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Sunwake",
+      "canonicalGameplayMeaningOrAcquisition": "Spends 3 Moontide for a Nature strike plus a burn over 9 sec, restoring 35 mana: the mana choice.",
+      "intendedVisualSubject": "A golden lance of dawn sunlight striking down through parting clouds.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Sunwake (sunlance)\nCanonical mechanic: Spends 3 Moontide for a Nature strike plus a burn over 9 sec, restoring 35 mana: the mana choice.\nSubject: A golden lance of dawn sunlight striking down through parting clouds.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/druid/wrath.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/druid/healing_touch.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "druid"
+    },
+    {
+      "kind": "ability",
       "id": "swiftmend",
       "runtimeUrl": "/ui/skills/druid/swiftmend.webp",
       "acceptedSha256": "0b8a352fdf8f42036a0ebb48b428b070bbbe2bd64003c5ea9092540c4cf1ce5b",
@@ -5593,6 +5980,67 @@
         "alpha": "opaque"
       },
       "class": "druid"
+    },
+    {
+      "kind": "ability",
+      "id": "thieves_chorus",
+      "runtimeUrl": "/ui/skills/rogue/thieves_chorus.webp",
+      "acceptedSha256": "68897aad6c1e58cec22d2596d706fb61ac9bed82c7f6347c69b7520de3618072",
+      "acceptedBytes": 4020,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/rogue/thieves_chorus.png",
+        "bytes": 1628522,
+        "sha256": "45542890bcc78b90be1f849de7db982698a228140af76d04d0cac3efa133f4cc",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/thieves_chorus.png",
+        "bytes": 594130,
+        "sha256": "d1a1d5bf4bb9bfacbdb081b615b9e7da279072fd62593594402497e13af884ff",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Thieves' Chorus",
+      "canonicalGameplayMeaningOrAcquisition": "A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec.",
+      "intendedVisualSubject": "Crossed daggers under three rising whistled notes cut from cold night air.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Thieves' Chorus (thieves_chorus)\nCanonical mechanic: A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec.\nSubject: Crossed daggers under three rising whistled notes cut from cold night air.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/rogue/sinister_strike.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/rogue/eviscerate.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "rogue"
     },
     {
       "kind": "ability",
@@ -5776,6 +6224,189 @@
         "alpha": "opaque"
       },
       "class": "druid"
+    },
+    {
+      "kind": "ability",
+      "id": "veilstrike",
+      "runtimeUrl": "/ui/skills/rogue/veilstrike.webp",
+      "acceptedSha256": "22c6aedfb9e161351b611923b6c0d1364f209a7281fc30130bce47fbfe7e5e66",
+      "acceptedBytes": 3626,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/rogue/veilstrike.png",
+        "bytes": 1504824,
+        "sha256": "7997b746c7c638b55cc4bd0b79a66e8842bdc29815582608970f704a5850fa40",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/veilstrike.png",
+        "bytes": 576755,
+        "sha256": "3715fca62f7f0a13d6ad7b00ebfa73a1958bbd1b33298443ca2b98106c082923",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Shadow Veil",
+      "canonicalGameplayMeaningOrAcquisition": "For 6 sec your openers work without stealth and from any angle, and you deal 10% more damage.",
+      "intendedVisualSubject": "A dagger vanishing into a hanging curtain of living shadow.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Shadow Veil (veilstrike)\nCanonical mechanic: For 6 sec your openers work without stealth and from any angle, and you deal 10% more damage.\nSubject: A dagger vanishing into a hanging curtain of living shadow.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/rogue/sinister_strike.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/rogue/eviscerate.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "rogue"
+    },
+    {
+      "kind": "ability",
+      "id": "venom_dart",
+      "runtimeUrl": "/ui/skills/rogue/venom_dart.webp",
+      "acceptedSha256": "bc4b024c162332f9a320cfa07136c6d86185d3235551a5f7c080d843d6a06592",
+      "acceptedBytes": 3792,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/rogue/venom_dart.png",
+        "bytes": 1245770,
+        "sha256": "48e1bb349153c2557b12b362ff14f9b054665ef175b3c3028c4ee7a082ba9937",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/venom_dart.png",
+        "bytes": 483869,
+        "sha256": "2663bfc3cff76faed631bb637d55b1d12c913ea8fda999ee1ed958f5f938daf8",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Venom Dart",
+      "canonicalGameplayMeaningOrAcquisition": "Flick a poisoned dart for Nature damage. Awards 1 combo point.",
+      "intendedVisualSubject": "A slender thrown dart mid-flight, trailing luminous green venom droplets.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Venom Dart (venom_dart)\nCanonical mechanic: Flick a poisoned dart for Nature damage. Awards 1 combo point.\nSubject: A slender thrown dart mid-flight, trailing luminous green venom droplets.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/rogue/sinister_strike.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/rogue/eviscerate.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "rogue"
+    },
+    {
+      "kind": "ability",
+      "id": "venomrend",
+      "runtimeUrl": "/ui/skills/rogue/venomrend.webp",
+      "acceptedSha256": "c864a06ba325a68ee213be540037eb4c64bd33af05e78c2cf06f5ba2048f7e9e",
+      "acceptedBytes": 5438,
+      "master": {
+        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/rogue/venomrend.png",
+        "bytes": 1923629,
+        "sha256": "c1094b7a4a21c6d9131d5ebb86b567b9d68e08ffc9b9f2ff12293d58a6fa9023",
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/venomrend.png",
+        "bytes": 606730,
+        "sha256": "90d84d94f5a87d0cc81d170f8f20efb066e1deb5162522f43ec0146245275a70",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Venomrend",
+      "canonicalGameplayMeaningOrAcquisition": "Spends 6 Venom Ritual: strike, instantly deal all remaining bleed damage, then plant a fresh wound.",
+      "intendedVisualSubject": "A serrated blade tearing through flesh with venom spraying from the wound.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Venomrend (venomrend)\nCanonical mechanic: Spends 6 Venom Ritual: strike, instantly deal all remaining bleed damage, then plant a fresh wound.\nSubject: A serrated blade tearing through flesh with venom spraying from the wound.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "references": [
+          {
+            "path": "public/ui/skills/rogue/sinister_strike.webp",
+            "role": "style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/rogue/eviscerate.webp",
+            "role": "composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "rogue"
     },
     {
       "kind": "ability",

@@ -52,6 +52,7 @@ export const guideStrings = {
     valeCup: 'Vale Cup',
     thornhollow: 'Thornhollow Fields',
     deeds: 'Book of Deeds',
+    reliquary: 'The Reliquary',
     glossary: 'Glossary',
     wishIKnew: 'Things I Wish I Knew',
     faq: 'FAQ',
@@ -130,6 +131,10 @@ export const guideStrings = {
     typeTerm: 'Term',
     typeAbility: 'Ability',
     typeDeed: 'Deed',
+    // A Reliquary collection page (a shelf entry), not a wiki page: keep the
+    // Reliquary term of the glossary reliquaryName row in every locale.
+    typeReliquaryPage: 'Reliquary Page',
+    typeRelic: 'Relic',
   },
 
   // Home / overview landing.
@@ -299,7 +304,7 @@ export const guideStrings = {
     onlineBody:
       'Play the shared online world with everyone else, or start an instant offline world in your browser to learn the ropes.',
     reassure:
-      'Talents start at level 5, and there are six rows in all, one each at levels 5, 8, 11, 14, 17, and 20. Every row is a single pick of three, and you can reset whenever you are out of combat and not in an arena or battleground match, so your early choices are never permanent. Experiment freely.',
+      'Talents start at level 5, and there are six rows in all, one each at levels 5, 8, 11, 14, 17, and 20. Every row is a single pick of three, and you can reset whenever you are out of combat and not in an arena match, so your early choices are never permanent. Experiment freely.',
     controlsLink: 'See the full controls reference',
     // Step 0 leads the list; the existing step1 to step6 keys keep their numbers so the
     // locale fills that already exist stay valid.
@@ -335,6 +340,7 @@ export const guideStrings = {
     arena: 'PvP window (the arenas and Thornhollow Fields)',
     leaderboard: 'Leaderboard',
     deeds: 'Book of Deeds',
+    reliquary: 'The Reliquary',
     sheathe: 'Sheathe/Unsheathe Weapon',
     crafting: 'Crafting',
     valeCup: 'Vale Cup',
@@ -343,6 +349,7 @@ export const guideStrings = {
     dungeonFinder: 'Dungeon Finder',
     discord: 'Discord',
     abilities: 'Use action bar abilities (the number row; a second bar sits on the numpad)',
+    targetPrev: 'Cycle target backward',
     targetFriendly: 'Target nearest friendly',
     cycleFriendly: 'Cycle friendly target',
     targetAuras: 'Target buffs and debuffs',
@@ -1026,7 +1033,7 @@ export const guideStrings = {
       'A symbol any party or raid member can pin over a target so everyone focuses, or avoids, the same one. Eight symbols, one target per symbol.',
     loadoutTerm: 'Loadout',
     loadoutDef:
-      'A saved talent layout, up to ten of them. Each one remembers its row picks and its action bar, so swapping builds is one click instead of redoing every row.',
+      'A saved talent layout, up to ten of them. Each one remembers its row picks and its action bar, and can remember the gear you were wearing too, so swapping builds is one click instead of redoing every row.',
     readyCheckTerm: 'Ready check',
     readyCheckDef:
       'A group leader typing /ready to poll the party or raid: everyone confirms Ready or Not Ready, and the group sees the counts.',
@@ -1039,11 +1046,12 @@ export const guideStrings = {
     worldBossTerm: 'World boss',
     worldBossDef:
       'A raid-strength boss that rises in the open world on a steady rhythm, fought by whoever gathers to answer rather than a fixed party.',
-    // Mana regen only resumes five seconds after the last mana spend
-    // (src/sim/combat/auras.ts `fiveSecondRule >= 5`).
+    // FULL Spirit regen resumes five seconds after the last mana spend; while the rule
+    // is active a share still flows (src/sim/mana_regen.ts, FIVE_SECOND_RULE_SECONDS
+    // and COMBAT_SPIRIT_REGEN_FRACTION). No percentages here, per the page's policy.
     fiveSecondTerm: 'The five-second rule',
     fiveSecondDef:
-      'Your mana only starts refilling on its own once five seconds have passed since you last spent any. It is why casters pace themselves instead of casting flat out.',
+      'Your mana comes back at full speed only once five seconds have passed since you last spent any. Until then it still trickles in at a reduced rate rather than stopping outright, which is why casters pace themselves instead of casting flat out.',
     // Talents are six choice rows at levels 5, 8, 11, 14, 17 and 20, one of
     // three options each (src/sim/content/talent_rows.ts ROW_LEVELS,
     // OPTIONS_PER_ROW). There is no point pool to spend.
@@ -1194,6 +1202,7 @@ export const guideStrings = {
     rage: 'Rage',
     mana: 'Mana',
     energy: 'Energy',
+    focus: 'Focus',
   },
   classPage: {
     back: 'All classes',
@@ -1303,19 +1312,37 @@ export const guideStrings = {
   // One spoiler-safe, number-free line per signature ability (what it is for, when you
   // press it). Keyed by the sim ability id.
   abilityHook: {
+    evil_eye: 'Names the enemy whose actions and suffering will feed your Condemnation.',
     heroic_strike: 'Queues a heavier swing that spends rage on your next hit.',
     revenge: 'Sweeps enemies in front of you, with a chance to become free after a dodge or parry.',
     hamstring: "Cripples an enemy's movement to keep it from escaping.",
     battle_shout: 'A rallying cry that raises attack power for the party.',
     charge: 'Rushes a distant enemy to open the fight with a brief stun.',
     thunder_clap: 'Hits everything around you and slows their attacks.',
-    seal_of_righteousness: 'Imbues your swings with Holy damage, then spend it with Verdict.',
+    seal_of_righteousness: 'Imbues your melee swings with additional Holy damage.',
     holy_light: 'A steady, sizable heal for topping off an ally or yourself.',
     devotion_aura: 'A lasting self-buff that raises armor so hits land softer.',
     judgement: 'Spends your active Seal to strike an enemy from short range.',
+    hammer_of_wrath:
+      'Executes a wounded enemy from range, or any enemy while your wings are active.',
+    avenging_wrath:
+      'Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.',
+    bastion_sweep: 'Sweeps your shield through a group to seize threat and build Devotion.',
+    oath_chain: 'Drags a distant enemy into your pack and slows its escape.',
+    veilbound_march:
+      'Pass through a pack to mark it, blunt its damage against you, and lock in threat.',
+    holy_shield: 'Spends Devotion on an active block window, absorption, and a threat pulse.',
+    consecration: 'Claims the ground around you with sustained Holy damage and threat.',
+    hammer_of_justice: 'Stops one enemy with a short, reliable stun.',
+    lay_on_hands: 'Restores a large amount of health when an ally is close to falling.',
     blessing_of_might: "Raises a friendly target's attack power, good to cast before a pull.",
     divine_protection: 'A quick protective ward to soak damage when things get rough.',
     raptor_strike: 'A hard melee swing for when something closes the gap on you.',
+    pack_command:
+      'Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.',
+    stampede:
+      'Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.',
+    measured_shot: 'A deliberate ranged shot that restores Focus for your heavier attacks.',
     aspect_of_the_hawk: 'A stance you keep up to sharpen your ranged attack power.',
     serpent_sting: 'Lands a venom that bleeds nature damage over time.',
     arcane_shot: 'An instant shot from range for quick extra damage.',
@@ -1335,11 +1362,28 @@ export const guideStrings = {
     power_word_shield: 'Wraps an ally in a shield that soaks hits before they land.',
     renew: 'A heal that ticks over time, good to cast and keep moving.',
     lightning_bolt: 'A ranged cast of Nature damage, your go-to from afar.',
+    chain_lightning:
+      'Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.',
+    thunder_reservoir:
+      'Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.',
     rockbiter_weapon: 'Imbues your weapon so each swing lands harder in melee.',
     healing_wave: 'Your main heal, a direct mend for yourself or an ally.',
     earth_shock: 'An instant shock for quick Nature damage when you need it now.',
     lightning_shield: 'Charges you so attackers take Nature damage when they hit you.',
     flame_shock: 'An instant burn that hits up front and keeps searing over time.',
+    galeheart_weapon:
+      'Imbues both weapons with storm winds that reward a steady dual-wield rhythm.',
+    warspirit_cadence:
+      'Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.',
+    stormsurge:
+      'Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.',
+    lifespring_weapon:
+      'Imbues your weapon with restorative water that strengthens your healing flow.',
+    tidecall: 'Immediately heals an ally and deposits a full Mending Current pool.',
+    ancestor_return:
+      'Returns every fallen group or raid member to life after a long out-of-combat cast.',
+    stoneward: 'Raises a charged stone shield that turns incoming damage into recovery.',
+    primal_exaltation: 'Unleashes a short specialization-specific surge of elemental power.',
     fireball: 'Your main fire nuke, lands a hit and leaves the target burning.',
     fireball_form: 'Become a living ember to cross open ground at high speed.',
     frost_armor: 'A lasting self-buff that hardens your armor before a fight.',
@@ -1358,7 +1402,7 @@ export const guideStrings = {
     conjure_water: 'Conjures drinks that restore mana, so you can refill between pulls.',
     conjure_food: 'Conjures food that restores health when you sit down to eat.',
     shadow_bolt: 'A bolt of shadow you cast at a target, your go-to nuke.',
-    summon_imp: 'Calls up an Emberkin that flings firebolts at enemies from range.',
+    summon_imp: 'Calls up an Emberkin that casts Felbolt at enemies from range.',
     demon_skin: 'A lasting self-buff that toughens your skin and adds armor.',
     immolate: 'Sets a target alight for an opening hit and a burn that lingers.',
     corruption: 'Rots a target with shadow that ticks while you do other things.',
@@ -1367,19 +1411,17 @@ export const guideStrings = {
     healing_touch: 'A big single-target heal with a long cast, for topping someone off.',
     mark_of_the_wild: 'A lasting blessing you put on yourself or an ally before a fight.',
     moonfire: 'Hits instantly and leaves the target burning, good while moving.',
+    moonseed: 'Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.',
     rejuvenation: 'Casts instantly and heals an ally over time, so you can keep acting.',
     thorns: 'Wards an ally so melee attackers hurt themselves for striking.',
   },
 
   // Warlock demon roster flavor, keyed by pet id.
   petHook: {
-    emberkin: 'A ranged firebolt demon that chips at enemies from a safe distance.',
-    gloomshade: 'A sturdy demon that taunts and soaks hits so you can cast in peace.',
-    duskborn: 'A fast melee demon that hits hard but folds under pressure.',
-    spellhound: 'A shadow skirmisher that hounds enemy casters.',
-    warfiend: 'A durable melee bruiser, the all-rounder once you can summon it.',
+    emberkin: 'A ranged demon whose signature Felbolt chips at enemies from a safe distance.',
+    gloomshade:
+      'A sturdy tank demon that taunts and uses Abyssal Chain to pull fleeing normal enemies back into reach; bosses resist the pull.',
     pyre_colossus: 'A hulking juggernaut with crushing melee, summoned for raw power.',
-    wraithborn: 'An elite caster that rains heavy shadow from afar.',
   },
 
   // Bestiary.
@@ -1853,7 +1895,8 @@ export const guideStrings = {
     // rule are all broadcast to the whole realm in chat, so they are public. NO rank
     // multipliers, mob levels, drop rates, coin amounts, or boss scripts. The "Rift
     // Forge" is deliberately unnamed: the upgrade/enchant/socket seam has no client
-    // caller, so no player can reach it.
+    // caller and the server refuses its wire commands until the feature ships
+    // (server/rift_forge_gate.ts).
     heading: 'Rifts',
     intro:
       'A rift is a tear in the world itself, not a door you walk to. Step through one and you get a descent nobody has run before: the floors, the monsters, and the thing waiting at the bottom are all built fresh for that rift alone, so the same rank never plays out the same way twice.',
@@ -1962,15 +2005,23 @@ export const guideStrings = {
     choiceNote:
       'Every row is a crossroads: it offers three options and you commit to one of them. Your next reset reopens every one of those choices.',
     resetTitle: 'Nothing is permanent',
+    // Combat is the line, not the venue: talentLockReason (src/sim/progression/talents.ts)
+    // blocks only combat and an arena match. A battleground is deliberately allowed, so a
+    // queue pop that catches a farming build can be put right between fights.
     resetNote:
-      'You can reset your talents any time you are out of combat and not in an arena match or a battleground, so an early pick is never a trap. A reset clears your row picks and costs nothing, and your specialization stays as it is, so resetting never takes your role away mid-run. Try things, see what you like, and change your mind freely.',
+      'You can reset your talents any time you are out of combat and not in an arena match, so an early pick is never a trap. A reset clears your row picks and costs nothing, and your specialization stays as it is, so resetting never takes your role away mid-run. A battleground is the exception, and you can change your build there between fights. Try things, see what you like, and change your mind freely.',
     specsHeading: 'Specializations by class',
     specsBody:
       'Every class has a handful of specializations, each with its own role and a signature focus. You pick one in the talent panel at level 5. It grants a signature ability and a lasting mastery, most of them add passive bonuses that suit the role, and it is also the role you queue as in the Dungeon Finder. Here is the shape of all of them. Open a class for its full kit.',
-    // Saved builds: SavedLoadout { name, alloc, bar } with MAX_LOADOUTS = 10
+    // Saved builds: SavedLoadout { name, alloc, bar, gear? } with MAX_LOADOUTS = 10
     // (src/sim/content/talents.ts); the client reapplies the saved action bar on switch.
+    // The gear set is OPT-IN per save (saveLoadout's captureGear, src/sim/loadout_gear.ts):
+    // the menu carries a second "save gear too" entry beside the plain one. It pins the
+    // COPY, not just the item id, so an enchanted twin is not swapped for a plain one.
     loadoutNote:
-      'You do not have to settle on one build. Save a named layout in the panel and it remembers both its picks and your action bar, so switching to another one is a single click, under the same rule as a reset: out of combat, and not in an arena match or a battleground.',
+      'You do not have to settle on one build. Save a named layout in the panel and it remembers both its picks and your action bar, so switching to another one is a single click, under the same rule as a reset: out of combat, and not in an arena match.',
+    loadoutGearNote:
+      'A layout can carry your gear as well. Save it with the entry that offers to keep your gear too and it also records what you were wearing, which is what makes a PvP set and a dungeon set one click apart instead of sixteen. It remembers the exact piece rather than merely its name, so an enchanted ring is never quietly swapped for the plain twin sitting beside it in your bags. Anything it cannot find when you switch back is simply left alone and reported, so a set that lost a piece to the bank or the market still equips everything else.',
   },
 
   // Arena and PvP.
@@ -2038,6 +2089,14 @@ export const guideStrings = {
     carrierHeading: 'Carrying the flag',
     carrierBody:
       'A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.',
+    // Desertion and backfill (bgResolveDesertion + backfillBgMatches,
+    // src/sim/social/battleground.ts; the cutoffs live in battleground_backfill.ts).
+    // Shapes only, per the page policy: no rating math, no time or score cutoffs.
+    leavingHeading: 'Leaving early, and filling an empty seat',
+    leavingBody:
+      'Quitting a match under way is deserting it, and a rated ladder cannot reward pulling the plug on a losing scoreline: a deserter takes the loss and the rating that goes with it there and then, drops the flag if they were carrying it, and their team fights on a player short. That last part is what the empty seat is for. While a match is short a fighter, the queue can offer the chair to somebody waiting, and it is always an offer you accept or decline rather than a teleport that happens to you; declining costs you nothing and passes it to the next in line. Only solo queuers are asked, so a party that queued together is never split up to fill a hole.',
+    backfillNote:
+      "Taking a backfill seat is deliberately free of risk: you drop into a scoreline you had no hand in, so the match does not touch your rating either way, win or lose, and leaving one owes nothing. The offer also stops coming once a match is close enough to finished that an arrival could not change it, so you are never seated into somebody else's ending.",
     ladderHeading: 'The ladder',
     ladderBody:
       'Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions.',
@@ -2112,7 +2171,7 @@ export const guideStrings = {
       'Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful turn on luck rather than skill, other collection deeds are their own reward, and Feats are an honor apart, so none of those are worth any Renown. Deeds without Renown still count toward completion in your Book; they simply never score. Feats are the one exception, kept outside the count entirely.',
     rewardsHeading: 'Titles and borders',
     rewardsBody:
-      'The rewards are all for show, and that is the point. Some deeds grant a title you can wear or a border to frame your name, and never anything that makes your hero stronger. Choose the title you want from the Book of Deeds and it rides along on your nameplate, in chat, and on the boards for everyone to see.',
+      'The rewards are all for show, and that is the point. Some deeds grant a title you can wear or a border to frame your name, and never anything that makes your hero stronger. Choose the title and the border you want from the Book of Deeds: the title rides along on your nameplate, in chat, and on the boards for everyone to see, and the border draws its own colors around your nameplate and your portrait.',
     chroniclesHeading: 'Chronicles',
     chroniclesBody:
       'Each zone keeps its own Chronicle, a set of deeds gathered by a local Chronicler who has taken it upon themselves to record every traveler who passes through. Saul of Eastbrook Vale is the first of them, Osric Fenn keeps the Marsh Chronicle at Fenbridge out in the Mirefen, and Zenzie records the Peaks Chronicle up at Highwatch. A Chronicle is split into chapters, and you are free to work through them in whatever order suits you.',
@@ -2150,10 +2209,48 @@ export const guideStrings = {
     // Interface facts only, never deed criteria (src/ui/deeds_window.ts, deeds_view.ts).
     bookHeading: 'Inside the Book',
     bookBody:
-      'The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles shelf, where you choose the one you wear.',
+      'The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles and Borders shelf, with a picker for each: one for the title you wear, one for the border that frames your nameplate.',
     platformHeading: 'Steam and Epic achievements',
     platformBody:
       'If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in.',
+  },
+
+  // The Reliquary (collection trophy hall) page. Spoiler-safe: shelves, page
+  // names, and relic display names only. No personal progress, clear counts,
+  // or drop sources. Page and relic names are English proper nouns baked from
+  // the sim and rendered as raw text, not from these keys. The game window
+  // localizes page names through src/ui/reliquary_i18n.ts while the wiki keeps
+  // the English proper nouns, an accepted divergence (the wiki is a
+  // spoiler-safe reference, not a localized surface).
+  reliquaryPage: {
+    intro:
+      'The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.',
+    howHeading: 'How the collection works',
+    howBody:
+      'Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when you obtain that piece for the first time on the character, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is character-scoped except weapon skins, which are account cosmetics.',
+    ranksHeading: 'Curator ranks',
+    ranksBody:
+      'Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable, and relics on Retired or Personal pages score nothing toward it either.',
+    // The outside-completion tags and notes (rule 7 on the wiki): a retired or
+    // class-personal page must be labeled here too, or a reader chases relics
+    // that can no longer be won or can never all be held by one character.
+    retiredTag: 'Retired',
+    personalTag: 'Personal',
+    retiredNote:
+      'These relics can no longer be won. The page honors the veterans who keep them and does not count toward completion or Curator rank.',
+    personalNote:
+      'Each character can only ever hold their own. The page does not count toward completion or Curator rank.',
+    catalogHeading: 'Catalog of pages',
+    catalogBody:
+      'Every authored Reliquary page and the relic names it holds. This list is spoiler-safe names only: open The Reliquary in game to see your own progress, clear counts, and silhouettes.',
+    spoilerNote:
+      'Personal first-find history, clear numbers, and missing-versus-owned state stay in the game client. The wiki never publishes a player collection.',
+    shelfHeading: '{label} ({count})',
+    shelf: {
+      conquerors: 'Conquerors',
+      professions: 'Professions',
+      horizons: 'Horizons',
+    },
   },
 
   // "Things I Wish I Knew" beginner page.
@@ -2169,7 +2266,7 @@ export const guideStrings = {
       "When you fall you rise as a ghost at the nearest graveyard. Run back to your body to revive free, or take the Pale Keeper's instant raise and carry a short-lived weakness for the convenience. No experience, gear, or coin is ever lost, so it is safe to take risks and learn.",
     i3Title: 'Talents are not a trap',
     i3Body:
-      'Your first talent comes at level 5, and each of the six rows is a single pick of three, so a build is a handful of choices you can see at a glance. You can reset whenever you are out of combat and not in an arena or battleground match, so nothing you choose early locks you in.',
+      'Your first talent comes at level 5, and each of the six rows is a single pick of three, so a build is a handful of choices you can see at a glance. You can reset whenever you are out of combat and not in an arena match, so nothing you choose early locks you in.',
     i4Title: 'Follow the quest trail',
     i4Body:
       'Quests are the fastest way to level and they lead you across the world. When you are unsure where to go, find the next marker.',
@@ -3050,6 +3147,9 @@ export const guideStrings = {
       'A private message to one player by name, wherever they are. Use it for a quiet word.',
     chanParty: 'Party.',
     chanPartyBody: 'Talk to everyone in your group, no matter how spread out you are.',
+    chanBattleground: 'Battleground.',
+    chanBattlegroundBody:
+      'Talk to every fighter in your battleground, both sides. Only while a match is running.',
     chanGeneral: 'General.',
     chanGeneralBody:
       'An always-on realm-wide channel that reaches everyone online, good for asking a question or general chatter. Unlike World and Looking for Group, you never have to opt in.',
@@ -3208,7 +3308,7 @@ export const guideStrings = {
       "Intellect grows a spellcaster's mana pool, raises their spell power so their spells hit harder, and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
     spiTitle: 'Spirit',
     spiBody:
-      "Spirit governs how quickly a caster's mana returns, but only once they have gone a few seconds without spending any, so a caster who never stops casting never regenerates. Pausing for a breath is a real mana decision, in a fight as much as between them. Like Intellect, Spirit serves the mana classes and means little to the others.",
+      "Spirit governs how quickly a caster's mana returns. It pays in full only once they have gone a few seconds without spending any, and a share of it keeps flowing even mid-cast, so Spirit is never dead weight in a fight, though a caster nuking flat out will still run dry. Pausing for a breath is a real mana decision, in a fight as much as between them. Like Intellect, Spirit serves the mana classes and means little to the others.",
 
     // Secondary / derived stats.
     armorTitle: 'Armor',

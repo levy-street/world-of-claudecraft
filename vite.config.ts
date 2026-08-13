@@ -14,8 +14,10 @@ import {
   diagnosticsCaptureAllowed,
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
+import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
+const disableVitestFsModuleCache = shouldDisableVitestFsModuleCache(root);
 
 // Lightning CSS engine targets, derived from .browserslistrc (the single source of
 // the floor) via the zero-dep parser, never a hand-typed object. Drives both the
@@ -436,6 +438,7 @@ export default defineConfig({
         '**/.codex/**',
         '**/.agents/**',
         '**/.worktrees/**',
+        '**/.wt/**',
         '**/.venv/**',
         '**/tmp/**',
       ],
@@ -506,11 +509,13 @@ export default defineConfig({
     //   config or instruction files are not product test sources. Excluding them keeps a
     //   stale local worktree from duplicating tests. .venv is local Python tooling.
     //   .worktrees/ is the repo's own gitignored convention for local linked worktrees
-    //   (see .gitignore); leaving it out of this list meant a worktree left checked out
-    //   there re-ran its whole frozen test tree on every `vitest run`, so a stale branch
-    //   snapshot inside it could fail tests/architecture.test.ts or
-    //   tests/localization_fixes.test.ts and block pre-push for reasons unrelated to the
-    //   current branch.
+    //   (see .gitignore), while .wt/ is the OSS Brain linked-worktree cache used by
+    //   release automation. These entries are root-relative on purpose: an active
+    //   checkout can itself live under .wt/, and an absolute-style **/.wt/** pattern
+    //   hides its entire suite. Leaving either parked-worktree directory out of this
+    //   list means a stale branch snapshot can fail tests/architecture.test.ts or
+    //   tests/localization_fixes.test.ts and block pre-push for reasons unrelated to
+    //   the current branch.
     // - the opt-in browser suite (vitest.browser.config.ts, npm run test:browser) must NOT
     //   leak into a bare `vitest run`: excluding its files keeps the default Node run from
     //   importing the Playwright provider or launching a browser. Cross-engine CI is P17b.
@@ -521,11 +526,12 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
-      '**/.claude/**',
-      '**/.codex/**',
-      '**/.agents/**',
-      '**/.worktrees/**',
-      '**/.venv/**',
+      '.claude/**',
+      '.codex/**',
+      '.agents/**',
+      '.worktrees/**',
+      '.wt/**',
+      '.venv/**',
       'tmp/**',
       'tests/browser/**',
       '**/*.browser.test.ts',
@@ -541,10 +547,15 @@ export default defineConfig({
     // Phase 4 local-gate-perf: persist Vite module transform cache across runs
     // (Vitest 4.1 experimental.fsModuleCache). Default path is under
     // node_modules/.experimental-vitest-cache (gitignored via node_modules/).
+    // OSS Brain linked worktrees symlink node_modules back to the parent checkout,
+    // and base-health gates run from that parent checkout under ORCH. Both shapes
+    // can contend on the same experimental temp-file store and fail before
+    // reporting parseable tests. Disable it for OSS Brain-controlled checkouts;
+    // normal local checkouts and CI keep the warm-cache path.
     // Clear with `npx vitest --clearCache` if a warm run misbehaves. Full gate
     // remains the merge bar; this speeds warm re-runs and related/day-loop paths.
     experimental: {
-      fsModuleCache: true,
+      fsModuleCache: !disableVitestFsModuleCache,
     },
   },
 });

@@ -919,4 +919,48 @@ export const table: DeedLocaleTable = {
     name: 'Pladet til perfektion',
     desc: 'Skab dit første sjældne udstyrsstykke i Rustningsfremstilling.',
   },
+  col_reliquary_rank_2: {
+    name: 'Byttevogter',
+    desc: 'Nå Kurator-rang 2 i Relikvariet (10 enestående katalogiserede relikvier).',
+    title: 'Byttevogter',
+  },
+  col_reliquary_rank_3: {
+    name: 'Katalogisatoren',
+    desc: 'Nå Kurator-rang 3 i Relikvariet (25 enestående katalogiserede relikvier).',
+    title: 'Katalogisatoren',
+  },
+  col_reliquary_rank_4: {
+    name: 'Ærkekurator',
+    desc: 'Nå Kurator-rang 4 i Relikvariet (50 enestående katalogiserede relikvier).',
+    title: 'Ærkekurator',
+  },
+  col_reliquary_rank_5: {
+    name: 'Evigt bytte',
+    desc: 'Nå Kurator-rang 5 i Relikvariet (100 enestående katalogiserede relikvier).',
+  },
+  col_reliquary_complete: {
+    name: 'Det Store Relikvarium',
+    desc: 'Katalogiser hver relikvie i Relikvariet, som en figur kan beholde. At kataloget vokser senere, tager det aldrig fra dig.',
+    title: 'Hvælvingens kurator',
+  },
+  col_reliquary_conquerors: {
+    name: 'Erobrernes hylde',
+    desc: 'Katalogiser hver relikvie på Relikvariets hylde Erobrere. At kataloget vokser senere, tager det aldrig fra dig.',
+    title: 'Hvælvingsbryder',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis illumineret',
+    desc: 'Illuminer siden Heroisk: Nythraxis-raid i Relikvariet.',
+    title: "Nythraxis' lys",
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr illumineret',
+    desc: 'Illuminer siden Thunzharr, den Vågnende Tinde i Relikvariet.',
+    title: 'Thunzharrs lys',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Helligdommen illumineret',
+    desc: 'Illuminer siden Heroisk: Gravormens Helligdom i Relikvariet.',
+    title: 'Helligdommens lys',
+  },
 };

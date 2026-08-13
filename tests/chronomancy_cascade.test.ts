@@ -3,7 +3,7 @@
 //   - target selection: caster + LIVING group/raid members only, primary always in,
 //     nearest-four-to-the-primary within 15 yd, ties by stable id, cap of five,
 //   - the group echo's stored origin + reduced coefficient (13% single / 6% area),
-//   - the individual-overlap rule (keep 35%, extend-to-8 not refresh-to-15, count in five),
+//   - the individual-overlap rule (keep 40%, extend-to-8 not refresh-to-15, count in five),
 //   - the group->individual upgrade then move (ally left bare, no group rebuild in v1),
 //   - conversion: each marked ally converts its OWN coefficient from one hit (no shared
 //     budget), area reduction, non-crit, no recursion, never heals a dead ally,
@@ -152,14 +152,14 @@ describe('Cascada group echo + individual overlap', () => {
     expect(a.remaining).toBe(8);
   });
 
-  it('keeps a pre-existing individual echo at 35%, extending up to 8s but never to 15s', () => {
+  it('keeps a pre-existing individual echo at 40%, extending up to 8s but never to 15s', () => {
     const { sim, p } = chronoMage();
     const ally = addAlly(sim, p.pos.x, p.pos.z + 2, 'Ally');
     placeTemporalEcho(ctxOf(sim), p, ally, 15);
     const indiv = echoAura(ally, p.id)!;
     expect(indiv.echoGroup).toBe(false);
 
-    // Less than 8s left: the group cast extends it up to 8, still individual/35%.
+    // Less than 8s left: the group cast extends it up to 8, still individual/40%.
     indiv.remaining = 3;
     placeGroupEcho(ctxOf(sim), p, ally, 8);
     const after = echoAura(ally, p.id)!;
@@ -180,7 +180,7 @@ describe('Cascada group echo + individual overlap', () => {
     placeGroupEcho(ctxOf(sim), p, allyA, 8);
     expect(echoAura(allyA, p.id)!.echoGroup).toBe(true);
 
-    // Single Temporal Echo onto the group-marked ally UPGRADES it to 35%.
+    // Single Temporal Echo onto the group-marked ally UPGRADES it to 40%.
     placeTemporalEcho(ctxOf(sim), p, allyA, 15);
     expect(echoAura(allyA, p.id)!.echoGroup).toBe(false);
 
@@ -196,12 +196,12 @@ describe('Cascada conversion', () => {
     const { sim, p } = chronoMage();
     const single = addAlly(sim, p.pos.x, p.pos.z + 2, 'Single');
     const group = addAlly(sim, p.pos.x, p.pos.z + 3, 'Group');
-    placeTemporalEcho(ctxOf(sim), p, single, 15); // 35%
+    placeTemporalEcho(ctxOf(sim), p, single, 15); // 40%
     placeGroupEcho(ctxOf(sim), p, group, 8); // 13%
     const s0 = single.hp;
     const g0 = group.hp;
     chronomancyConvertArcaneDamage(ctxOf(sim), p, 100, 'arcane', false);
-    expect(single.hp - s0).toBe(Math.round(100 * ECHO_CONVERT_SINGLE)); // 35
+    expect(single.hp - s0).toBe(Math.round(100 * ECHO_CONVERT_SINGLE)); // 40
     expect(group.hp - g0).toBe(Math.round(100 * ECHO_GROUP_CONVERT_SINGLE)); // 13
   });
 
@@ -252,7 +252,7 @@ describe('two chronomancers keep independent marks by sourceId', () => {
     // the source id + the mark's stored rate, so we can place marks directly.
     const ally = addAlly(sim, p.pos.x, p.pos.z + 2, 'Ally');
     placeGroupEcho(ctxOf(sim), p, ally, 8); // mage1: 13%
-    placeTemporalEcho(ctxOf(sim), mage2, ally, 15); // mage2: 35%
+    placeTemporalEcho(ctxOf(sim), mage2, ally, 15); // mage2: 40%
     expect(marked(ally, p.id)).toBe(true);
     expect(marked(ally, mage2.id)).toBe(true);
 
@@ -261,7 +261,7 @@ describe('two chronomancers keep independent marks by sourceId', () => {
     chronomancyConvertArcaneDamage(ctxOf(sim), p, 100, 'arcane', false);
     expect(ally.hp - h).toBe(Math.round(100 * ECHO_GROUP_CONVERT_SINGLE));
 
-    // Mage2's arcane damage heals via its own 35% mark, independently.
+    // Mage2's arcane damage heals via its own 40% mark, independently.
     h = ally.hp;
     chronomancyConvertArcaneDamage(ctxOf(sim), mage2, 100, 'arcane', false);
     expect(ally.hp - h).toBe(Math.round(100 * ECHO_CONVERT_SINGLE));

@@ -78,5 +78,9 @@ bundled into the game client or server. Root `CLAUDE.md` and
 
 ## Verification
 
-Run the pure project/catalog tests, the SFX runtime tests, changed-file Biome,
-TypeScript, and the real browser studio smoke flow after authoring changes.
+After authoring changes here, run the studio and conform suites
+(`npx vitest run tests/sfx_studio.test.ts tests/sfx_studio_server_security.test.ts
+tests/sfx_export_core.test.ts tests/sfx_conform.test.ts`), the runtime manifest and
+pack suites (`npx vitest run tests/sfx_manifest.test.ts tests/sfx_runtime_pack.test.ts
+tests/sfx_gain_ceiling.test.ts`), changed-file Biome (`npm run ci:changed`),
+`npx tsc --noEmit`, and the real browser smoke (`npm run sfx:studio:smoke`).

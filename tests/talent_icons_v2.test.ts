@@ -8,6 +8,7 @@ import {
 } from '../src/sim/content/talents';
 import { hasAbilityIconIdentity, iconDataUrl, storePrewarmedIconDataUrl } from '../src/ui/icons';
 import {
+  PALADIN_TALENT_IMAGE_IDS,
   type TalentSpecIconRef,
   talentRowOptionIconRef,
   talentSpecIconCssBackground,
@@ -20,6 +21,14 @@ describe('Talents V2 icon routing', () => {
       .flatMap((row) => row.options)
       .find((candidate) => candidate.id === id);
     if (!option) throw new Error(`Missing Warrior row option: ${id}`);
+    return option;
+  };
+
+  const warlockOption = (id: string) => {
+    const option = ROW_TREES.warlock
+      .flatMap((row) => row.options)
+      .find((candidate) => candidate.id === id);
+    if (!option) throw new Error(`Missing Warlock row option: ${id}`);
     return option;
   };
 
@@ -46,10 +55,54 @@ describe('Talents V2 icon routing', () => {
 
     expect(authored).toHaveLength(144);
     for (const option of authored) {
+      // The paladin rows author real painted webp art (PALADIN_TALENT_IMAGE_IDS):
+      // those route to a bare image ref the browser fetches directly, not a
+      // procedural ability icon (composed with the overhaul integration).
+      if (option.icon && PALADIN_TALENT_IMAGE_IDS.has(option.icon)) {
+        expect(talentRowOptionIconRef(option), option.id).toEqual({
+          kind: 'image',
+          url: `/ui/skills/paladin/${option.icon}.webp`,
+        });
+        continue;
+      }
       expect(hasAbilityIconIdentity(option.icon ?? ''), `${option.id} painted icon`).toBe(true);
       expect(talentRowOptionIconRef(option), option.id).toEqual({
         kind: 'ability',
         id: option.icon,
+      });
+    }
+  });
+
+  it('keeps every choice in a row visually distinct', () => {
+    for (const [playerClass, rows] of Object.entries(ROW_TREES)) {
+      for (const row of rows) {
+        const routed = row.options.map((option) => talentRowOptionIconRef(option));
+        const identities = routed.map((ref) =>
+          ref.kind === 'image' ? ref.url : `${ref.kind}:${ref.id}`,
+        );
+        expect(
+          new Set(identities).size,
+          `${playerClass} level ${row.level}: ${row.options.map((option) => option.id).join(', ')}`,
+        ).toBe(identities.length);
+      }
+    }
+  });
+
+  it('uses semantically distinct painted sources for the four formerly colliding choices', () => {
+    const options = Object.values(ROW_TREES)
+      .flat()
+      .flatMap((row) => row.options);
+    for (const [optionId, abilityId] of [
+      ['pri_r5_twisted_faith', 'choir_of_deliverance'],
+      ['pri_r17_inner_fire', 'martyrs_aegis'],
+      ['sha_r5_improved_lightning_shield', 'galeheart_weapon'],
+      ['sha_r8_improved_earth_shock', 'stoneward'],
+    ] as const) {
+      const option = options.find((candidate) => candidate.id === optionId);
+      expect(option?.icon, optionId).toBe(abilityId);
+      expect(option && talentRowOptionIconRef(option), optionId).toEqual({
+        kind: 'ability',
+        id: abilityId,
       });
     }
   });
@@ -68,10 +121,12 @@ describe('Talents V2 icon routing', () => {
     const classicOptions = Object.values(ROW_TREES)
       .flat()
       .flatMap((row) => row.options);
+    // The release authored these pins over the pre-overhaul lanes. The warlock
+    // overhaul re-authored its rows with their own talent icons (covered by the
+    // authored-icon warlock test above), and the shaman overhaul re-authored
+    // this lane onto lightning_shield; the pin follows the composed tree.
     for (const [optionId, abilityId] of [
-      ['wlk_r14_ruin', 'searing_pain'],
-      ['wlk_r17_demonic_resilience', 'drain_life'],
-      ['sha_r17_elemental_warding', 'healing_wave'],
+      ['sha_r17_elemental_warding', 'lightning_shield'],
     ] as const) {
       const option = classicOptions.find((candidate) => candidate.id === optionId);
       expect(option?.icon, optionId).toBe(abilityId);
@@ -112,6 +167,17 @@ describe('Talents V2 icon routing', () => {
       kind: 'ability',
       id: 'combat_mastery',
     });
+  });
+
+  it('routes every Warlock choice through its unique authored talent icon', () => {
+    for (const row of ROW_TREES.warlock) {
+      for (const option of row.options) {
+        expect(talentRowOptionIconRef(warlockOption(option.id))).toEqual({
+          kind: 'ability',
+          id: option.id,
+        });
+      }
+    }
   });
 
   it('uses normalized WebP art for all three Mage specs', () => {

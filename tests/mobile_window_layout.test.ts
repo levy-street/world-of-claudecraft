@@ -200,4 +200,22 @@ describe('mobile window layout CSS', () => {
       /@media \(pointer: coarse\) \{\s*\.prompt \.btn \{[^}]*min-width: 40px;[^}]*min-height: 40px;/,
     );
   });
+
+  it('clips the mobile action-page indicator instead of wrapping a locale-widened label (#2975)', () => {
+    // hudChrome.mobile.actionPageIndicator's English value is a bare digit, but
+    // a locale can translate it into a real word (ja_JP appends "ページ"). Without
+    // this, the wider string wraps inside the flex column and the circular
+    // badge shows a garbled multi-line stack instead of the page number.
+    const toggle = mobileCss.match(/body\.mobile-touch #mobile-action-page-toggle \{([^}]*)\}/);
+    expect(toggle).not.toBeNull();
+    expect(toggle?.[1]).toContain('overflow: hidden;');
+
+    const indicator = mobileCss.match(
+      /body\.mobile-touch #mobile-action-page-toggle \.mobile-action-page-indicator \{([^}]*)\}/,
+    );
+    expect(indicator).not.toBeNull();
+    expect(indicator?.[1]).toContain('white-space: nowrap;');
+    expect(indicator?.[1]).toContain('overflow: hidden;');
+    expect(indicator?.[1]).toContain('text-overflow: ellipsis;');
+  });
 });

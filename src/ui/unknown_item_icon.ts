@@ -58,9 +58,24 @@ export function unknownItemIconHtml(itemId: string, quality: string = 'common'):
     // these surfaces rather than surfacing; the never-a-throw contract is
     // worth that trade here.
   }
-  // The quality rides a CLASS attribute: esc() stops quote breakout but not
-  // token injection (a space would append a second class), so the rung is
-  // allowlisted to the known ladder and anything else paints common.
+  return itemIconImgHtml(src, quality);
+}
+
+/** The item-cell `<img>` for art that comes from OUTSIDE the item pipeline:
+ *  a committed public file or an authored data URL the caller already resolved
+ *  (The Reliquary paints mount reins, Armory skin thumbnails, deed crests, and
+ *  profession marks this way). It must land in exactly this shape, because the
+ *  `.item-icon` class is what every owned-cell grid sizes and what the missing
+ *  state silhouettes; art emitted any other way blows out of its cell.
+ *
+ *  An optional fallback src rides a data attribute for a mounted consumer to
+ *  arm; both sources are escaped here so that consumer never has to rebuild
+ *  trusted markup. The quality rides a CLASS attribute: esc() stops quote
+ *  breakout but not token injection (a space would append a second class).
+ *  The rung is constrained to a lowercase-alpha charset; anything else paints common
+ *  (an unranked lowercase rung passes and takes default styling). */
+export function itemIconImgHtml(src: string, quality: string, fallbackSrc?: string): string {
   const rung = /^[a-z]+$/.test(quality) ? quality : 'common';
-  return `<img class="item-icon q-${rung}" src="${esc(src)}" alt="" draggable="false">`;
+  const fallback = fallbackSrc === undefined ? '' : ` data-icon-fallback-src="${esc(fallbackSrc)}"`;
+  return `<img class="item-icon q-${rung}" src="${esc(src)}"${fallback} alt="" draggable="false">`;
 }

@@ -320,7 +320,12 @@ export type SocialEvent =
   // A guildmate's or followed friend's marquee deed unlock. Carries the deed
   // ID only, never English (the client composes the line from deed_i18n plus
   // its own chrome key, the calendarResult convention).
-  | { type: 'deedBroadcast'; characterName: string; deedId: string };
+  | { type: 'deedBroadcast'; characterName: string; deedId: string }
+  // A guildmate's or followed friend's first-ever Reliquary page Illumination
+  // (Phase 18). Carries the page ID only, never English (the client composes
+  // the line from reliquary_i18n plus its own chrome key, the deedBroadcast
+  // convention).
+  | { type: 'reliquaryIlluminationBroadcast'; characterName: string; pageId: string };
 
 export type CalendarResultCode =
   | 'created'
@@ -1308,19 +1313,43 @@ export class SocialService {
     return true;
   }
 
-  // Fan one marquee deed unlock out to the earner's online guildmates and the
-  // players who friended the earner (friends are one-directional: whoever put
-  // the earner on THEIR list chose to follow them, the position-push rule).
+  // Fan one marquee deed unlock out to the earner's online guildmates and
+  // followers (broadcastToEarnerAudience below owns the audience semantics).
   // Pure delivery: the caller (game.ts) has already applied the marquee bar,
-  // the retro gate, and the earner's opt-out; this resolves the audience and
-  // filters it BIDIRECTIONALLY: each recipient's block list is honoured like
-  // guild chat (a deed unlock is not chat, so the lighter chat-only ignore does
-  // not hide it), and the earner's own block list also excludes a recipient
-  // (blockAdd only unfriends the earner's edge, so a blocked follower would
-  // otherwise stay in whoFriended and keep hearing these). The earner never
-  // receives it (their own toast is client-side from the sim event).
+  // the retro gate, and the earner's opt-out.
   async broadcastDeedUnlock(actor: SocialActor, deedId: string): Promise<void> {
-    const event: SocialEvent = { type: 'deedBroadcast', characterName: actor.name, deedId };
+    await this.broadcastToEarnerAudience(actor, {
+      type: 'deedBroadcast',
+      characterName: actor.name,
+      deedId,
+    });
+  }
+
+  // Fan one first-ever Reliquary page Illumination (Phase 18) out to the same
+  // audience a marquee deed unlock reaches. Pure delivery, the
+  // broadcastDeedUnlock contract exactly: the caller (game.ts) has already
+  // applied the first-ever gate (the sim's sticky illuminatedPages set), the
+  // retro gate, the fail-closed page validation, and the earner's opt-out.
+  async broadcastIllumination(actor: SocialActor, pageId: string): Promise<void> {
+    await this.broadcastToEarnerAudience(actor, {
+      type: 'reliquaryIlluminationBroadcast',
+      characterName: actor.name,
+      pageId,
+    });
+  }
+
+  // The one earner-audience computation both celebration broadcasts share (a
+  // pure move of broadcastDeedUnlock's body): the earner's online guildmates
+  // and the players who friended the earner (friends are one-directional:
+  // whoever put the earner on THEIR list chose to follow them, the
+  // position-push rule). Resolves the audience and filters it
+  // BIDIRECTIONALLY: each recipient's block list is honoured like guild chat
+  // (a celebration is not chat, so the lighter chat-only ignore does not hide
+  // it), and the earner's own block list also excludes a recipient (blockAdd
+  // only unfriends the earner's edge, so a blocked follower would otherwise
+  // stay in whoFriended and keep hearing these). The earner never receives it
+  // (their own toast is client-side from the sim event).
+  private async broadcastToEarnerAudience(actor: SocialActor, event: SocialEvent): Promise<void> {
     const [membership, followerIds, earnerBlockedIds] = await Promise.all([
       this.db.guildMembership(actor.characterId),
       this.db.whoFriended(actor.characterId),

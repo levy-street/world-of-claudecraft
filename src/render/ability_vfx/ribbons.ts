@@ -22,11 +22,22 @@ const TRAIL_SPEED = 26; // yards/sec, matches Vfx.projectile so the trail rides 
 const WHITE = new THREE.Color(0xffffff);
 const COIL_PTS = 14; // gallery coil resolution: 14 samples over the 1.9 yd tail
 const COIL_DIRS = [1, -1]; // twin counter-rotating helices
+const SHADOW_FANG_TRAIL_YARDS = 3.2;
+const SHADOW_FANG_SAMPLE_YARDS = 0.4;
 
 // Per-style projectile identity, ported from the gallery's buildProjMesh +
 // trail feel (arc_bolt_preview.js bolt archetype). Styled trails carry their
 // own head sprite (drawHeads), so the generic Vfx comet stays off for them.
-export type BoltTrailStyle = 'comet' | 'rock' | 'shard' | 'arrow' | 'wisp';
+export type BoltTrailStyle =
+  | 'comet'
+  | 'rock'
+  | 'shard'
+  | 'arrow'
+  | 'wisp'
+  | 'felLance'
+  | 'shadowFang'
+  | 'essenceLance'
+  | 'soulLance';
 
 // Trail strip DNA per style: width and brightness multipliers over the
 // baseline comet ribbon (glow strip / core strip).
@@ -39,7 +50,37 @@ const TRAIL_DNA: Record<
   shard: { wGlow: 0.65, mGlow: 0.85, wCore: 0.6, mCore: 1.3 }, // narrow crisp glint
   arrow: { wGlow: 0.4, mGlow: 0.55, wCore: 0.4, mCore: 1.1 }, // whisper-thin streak
   wisp: { wGlow: 1.25, mGlow: 1.25, wCore: 1, mCore: 0.65 }, // soft smoky drift
+  felLance: { wGlow: 1.15, mGlow: 1.15, wCore: 0.72, mCore: 1.45 }, // dense spear wake
+  shadowFang: { wGlow: 0.44, mGlow: 0.58, wCore: 0.32, mCore: 0.95 }, // short, sharp shadow wake
+  essenceLance: { wGlow: 0.56, mGlow: 0.82, wCore: 0.36, mCore: 1.12 }, // compact spectral spear
+  soulLance: { wGlow: 0.88, mGlow: 1.25, wCore: 0.52, mCore: 1.7 }, // spectral shaft and cold soul wake
 };
+
+// Select the oldest retained point for a fixed world-length trail window.
+// Frame-rate changes alter the number of samples, not the visible wake length.
+export function trailWindowStart(
+  points: readonly RibbonPoint[],
+  count: number,
+  maxLength: number,
+): number {
+  if (count <= 2 || maxLength <= 0) return Math.max(0, count - 2);
+  let start = count - 1;
+  let length = 0;
+  while (start > 0) {
+    const current = points[start];
+    const previous = points[start - 1];
+    const segment = Math.hypot(
+      current.x - previous.x,
+      current.y - previous.y,
+      current.z - previous.z,
+    );
+    if (length + segment > maxLength && start < count - 1) break;
+    length += segment;
+    start--;
+    if (length >= maxLength) break;
+  }
+  return Math.min(start, count - 2);
+}
 
 // Spawn-time options for a styled projectile trail (the full spec's bolt DNA).
 // Garnish flags (coils/jagTrail/forkEvery/tracer) are pre-gated by the caller's
@@ -48,6 +89,8 @@ export interface StyledTrailOpts {
   speed: number;
   style: BoltTrailStyle;
   headSize: number; // 0 = no head sprite (legacy trails riding a Vfx comet)
+  coreHex?: number;
+  accentHex?: number;
   coils: boolean;
   jagTrail: boolean;
   forkEvery: number;
@@ -110,11 +153,14 @@ interface TrailSlot {
   glow: THREE.Color;
   colorHex: number;
   coreHex: number;
+  headCoreHex: number;
+  accentHex: number;
   head: THREE.Vector3;
   ring: THREE.Vector3[]; // last TRAIL_PTS head positions, oldest overwritten
   ringHead: number;
   ringCount: number;
   onArrive: ((x: number, y: number, z: number) => void) | null;
+  onTerminate: ((x: number, y: number, z: number) => void) | null;
   // fixed world-point target (ground-aimed volleys): when set, the head flies
   // to fixedTo instead of chasing a live entity anchor
   fixedTarget: boolean;
@@ -134,6 +180,7 @@ interface TrailSlot {
   origin: THREE.Vector3; // launch point (tracer etch endpoint)
   aim: THREE.Vector3; // target-anchor offset (volley spread)
   dir: THREE.Vector3; // unit travel direction (coils/jag/forks)
+  samplePos: THREE.Vector3; // last distance-spaced shadow-wake sample
   groundY: ((x: number, z: number) => number) | null;
   seed: number; // per-slot phase for head shimmer/writhe
 }
@@ -192,6 +239,7 @@ export class AbilityVfxRibbons {
   private a2 = new THREE.Vector3();
   private ordered: THREE.Vector3[] = allocPts(TRAIL_PTS + 1); // scratch, holds refs only
   private coilScratch: THREE.Vector3[] = allocPts(COIL_PTS); // reused for both helices
+  private shadowHeadScratch: THREE.Vector3[] = allocPts(3); // directional fang, reused per trail
 
   constructor(
     scene: THREE.Scene,
@@ -276,11 +324,14 @@ export class AbilityVfxRibbons {
         glow: new THREE.Color(),
         colorHex: 0xffffff,
         coreHex: 0xffffff,
+        headCoreHex: 0xffffff,
+        accentHex: 0xffffff,
         head: new THREE.Vector3(),
         ring: allocPts(TRAIL_PTS),
         ringHead: 0,
         ringCount: 0,
         onArrive: null,
+        onTerminate: null,
         fixedTarget: false,
         fixedTo: new THREE.Vector3(),
         speed: TRAIL_SPEED,
@@ -297,6 +348,7 @@ export class AbilityVfxRibbons {
         origin: new THREE.Vector3(),
         aim: new THREE.Vector3(),
         dir: new THREE.Vector3(1, 0, 0),
+        samplePos: new THREE.Vector3(),
         groundY: null,
         seed: 0,
       });
@@ -403,8 +455,17 @@ export class AbilityVfxRibbons {
     colorHex: number,
     width: number,
     onArrive: ((x: number, y: number, z: number) => void) | null = null,
+    onTerminate: ((x: number, y: number, z: number) => void) | null = null,
   ): void {
-    this.spawnTrailStyled(sourceId, targetId, colorHex, width, LEGACY_TRAIL_OPTS, onArrive);
+    this.spawnTrailStyled(
+      sourceId,
+      targetId,
+      colorHex,
+      width,
+      LEGACY_TRAIL_OPTS,
+      onArrive,
+      onTerminate,
+    );
   }
 
   // A styled projectile trail carrying the full spec's bolt DNA: its own head
@@ -417,8 +478,9 @@ export class AbilityVfxRibbons {
     width: number,
     opts: StyledTrailOpts,
     onArrive: ((x: number, y: number, z: number) => void) | null = null,
+    onTerminate: ((x: number, y: number, z: number) => void) | null = null,
   ): void {
-    this.spawnTrailSlot(sourceId, targetId, null, colorHex, width, opts, onArrive);
+    this.spawnTrailSlot(sourceId, targetId, null, colorHex, width, opts, onArrive, onTerminate);
   }
 
   // Point-target variant (ground-aimed bolt volleys): the trail flies from the
@@ -434,9 +496,10 @@ export class AbilityVfxRibbons {
     width: number,
     opts: StyledTrailOpts,
     onArrive: ((x: number, y: number, z: number) => void) | null = null,
+    onTerminate: ((x: number, y: number, z: number) => void) | null = null,
   ): void {
     this.s2.set(tx, ty, tz);
-    this.spawnTrailSlot(sourceId, -1, this.s2, colorHex, width, opts, onArrive);
+    this.spawnTrailSlot(sourceId, -1, this.s2, colorHex, width, opts, onArrive, onTerminate);
   }
 
   private spawnTrailSlot(
@@ -447,25 +510,33 @@ export class AbilityVfxRibbons {
     width: number,
     opts: StyledTrailOpts,
     onArrive: ((x: number, y: number, z: number) => void) | null,
+    onTerminate: ((x: number, y: number, z: number) => void) | null,
   ): void {
-    const from = this.anchor(sourceId, 0.62);
+    const from = this.anchor(sourceId, 0.62, this.a1);
     if (!from) return;
     const slot = this.trails.find((t) => !t.active) ?? this.trails[0];
+    if (slot.active) this.terminateTrail(slot);
     slot.active = true;
     slot.targetId = targetId;
     slot.sourceId = sourceId;
     slot.fixedTarget = fixedTo !== null;
     if (fixedTo) slot.fixedTo.copy(fixedTo);
     slot.width = width;
-    slot.core.setHex(colorHex).lerp(WHITE, 0.4);
+    if (opts.style === 'shadowFang' || opts.style === 'essenceLance')
+      slot.core.setHex(opts.coreHex ?? 0x1b0a2a);
+    else slot.core.setHex(colorHex).lerp(WHITE, 0.4);
     slot.glow.setHex(colorHex);
     slot.colorHex = colorHex;
     slot.coreHex = slot.core.getHex();
+    slot.headCoreHex = opts.coreHex ?? (opts.style === 'felLance' ? 0x0b3d1b : 0x16091f);
+    slot.accentHex = opts.accentHex ?? 0xb896e8;
     slot.head.copy(from);
+    slot.samplePos.copy(from);
     slot.ring[0].copy(from);
     slot.ringHead = 1 % TRAIL_PTS;
     slot.ringCount = 1;
     slot.onArrive = onArrive;
+    slot.onTerminate = onTerminate;
     slot.speed = Math.max(4, opts.speed);
     slot.style = opts.style;
     slot.headSize = opts.headSize;
@@ -483,7 +554,7 @@ export class AbilityVfxRibbons {
     slot.seed = Math.random() * Math.PI * 2;
     // life scales with the real flight time (a 7 yd/s orb crossing 30 yd
     // must not evaporate at the legacy 3 s cap)
-    const to = slot.fixedTarget ? slot.fixedTo : this.anchor(targetId, 0.5);
+    const to = slot.fixedTarget ? slot.fixedTo : this.anchor(targetId, 0.5, this.a2);
     if (to) {
       this.s1.copy(to).add(slot.aim).sub(from);
       const dist = this.s1.length();
@@ -633,7 +704,7 @@ export class AbilityVfxRibbons {
     }
   }
 
-  update(dt: number, camPos: THREE.Vector3): void {
+  update(dt: number, camPos: THREE.Vector3, reducedMotion = false): void {
     this.time += dt;
     this.camPos.copy(camPos);
     this.v = 0;
@@ -667,6 +738,7 @@ export class AbilityVfxRibbons {
         if (from) {
           t.head.copy(from);
           t.origin.copy(from);
+          t.samplePos.copy(from);
           t.ring[0].copy(from);
           t.ringHead = 1 % TRAIL_PTS;
           t.ringCount = 1;
@@ -676,7 +748,7 @@ export class AbilityVfxRibbons {
       t.ttl -= dt;
       const target = t.fixedTarget ? t.fixedTo : this.anchor(t.targetId, 0.5, this.a1);
       if (!target || t.ttl <= 0) {
-        t.active = false;
+        this.terminateTrail(t);
         continue;
       }
       this.s1.copy(target).add(t.aim);
@@ -685,17 +757,19 @@ export class AbilityVfxRibbons {
       const step = t.speed * dt;
       if (dist <= Math.max(0.7, step)) {
         if (t.tracer) this.spawnTracer(t, this.s1.x, this.s1.y, this.s1.z);
-        if (t.onArrive) t.onArrive(this.s1.x, this.s1.y, this.s1.z);
+        const onArrive = t.onArrive;
+        t.onArrive = null;
+        t.onTerminate = null;
         t.active = false;
+        onArrive?.(this.s1.x, this.s1.y, this.s1.z);
         continue;
       }
       t.dir.copy(this.t1).multiplyScalar(1 / dist);
       t.head.addScaledVector(t.dir, step);
-      t.ring[t.ringHead].copy(t.head);
-      t.ringHead = (t.ringHead + 1) % TRAIL_PTS;
-      if (t.ringCount < TRAIL_PTS) t.ringCount++;
+      if (t.style === 'shadowFang' || t.style === 'essenceLance') this.sampleShadowFang(t);
+      else this.appendTrailSample(t, t.head);
       // style garnish (the spawner already gated these by degrade tier)
-      if (t.coils) this.drawCoils(t, dt);
+      if (t.coils && !reducedMotion) this.drawCoils(t, dt);
       if (t.jagTrail) {
         // the gallery's flicker cadence: regen the electric tail every ~45ms
         t.jagTimer -= dt;
@@ -746,10 +820,41 @@ export class AbilityVfxRibbons {
         const idx = (t.ringHead - t.ringCount + k + TRAIL_PTS * 2) % TRAIL_PTS;
         this.ordered[n++] = t.ring[idx];
       }
+      if (
+        (t.style === 'shadowFang' || t.style === 'essenceLance') &&
+        n > 0 &&
+        this.ordered[n - 1].distanceToSquared(t.head) > 1e-6
+      ) {
+        this.ordered[n++] = t.head;
+      }
+      if ((t.style === 'shadowFang' || t.style === 'essenceLance') && n >= 2) {
+        const start = trailWindowStart(this.ordered, n, SHADOW_FANG_TRAIL_YARDS);
+        if (start > 0) {
+          const kept = n - start;
+          for (let k = 0; k < kept; k++) this.ordered[k] = this.ordered[start + k];
+          n = kept;
+        }
+      }
       if (n >= 2) {
         const dna = TRAIL_DNA[t.style];
-        this.add(this.ordered, n, t.width * 2.6 * dna.wGlow, t.glow, 1.2 * dna.mGlow, 0.85);
-        this.add(this.ordered, n, t.width * dna.wCore, t.core, 2.2 * dna.mCore, 0.85);
+        const repeats = t.style === 'shadowFang' ? 1 : t.style === 'essenceLance' ? 2 : 3;
+        this.add(
+          this.ordered,
+          n,
+          t.width * 2.6 * dna.wGlow,
+          t.glow,
+          1.2 * dna.mGlow,
+          0.85,
+          repeats,
+        );
+        this.add(this.ordered, n, t.width * dna.wCore, t.core, 2.2 * dna.mCore, 0.85, repeats);
+      }
+      if (t.style === 'shadowFang' || t.style === 'essenceLance') {
+        this.shadowHeadScratch[0].copy(t.head).addScaledVector(t.dir, -0.34);
+        this.shadowHeadScratch[1].copy(t.head);
+        this.shadowHeadScratch[2].copy(t.head).addScaledVector(t.dir, 0.48);
+        this.add(this.shadowHeadScratch, 3, t.width * 1.15, t.glow, 0.75, 0.96, 1);
+        this.add(this.shadowHeadScratch, 3, t.width * 0.42, t.core, 1.35, 0.98, 1);
       }
     }
 
@@ -770,8 +875,55 @@ export class AbilityVfxRibbons {
 
   clear(): void {
     for (const b of this.bolts) b.active = false;
-    for (const t of this.trails) t.active = false;
+    for (const t of this.trails) {
+      t.active = false;
+      t.onArrive = null;
+      t.onTerminate = null;
+    }
     for (const a of this.arcs) a.active = false;
+    this.geo.setDrawRange(0, 0);
+    this.wasEmpty = true;
+  }
+
+  private terminateTrail(t: TrailSlot): void {
+    const onTerminate = t.onTerminate;
+    t.onArrive = null;
+    t.onTerminate = null;
+    t.active = false;
+    onTerminate?.(t.head.x, t.head.y, t.head.z);
+  }
+
+  private appendTrailSample(t: TrailSlot, point: RibbonPoint): void {
+    t.ring[t.ringHead].copy(point);
+    t.ringHead = (t.ringHead + 1) % TRAIL_PTS;
+    if (t.ringCount < TRAIL_PTS) t.ringCount++;
+  }
+
+  /**
+   * Samples the filler wake by distance rather than render frames. Its pooled
+   * nine-point history therefore covers the same world-space span at 60 Hz
+   * and 240 Hz, without allocating or adding a per-projectile frame loop.
+   */
+  private sampleShadowFang(t: TrailSlot): void {
+    this.s1.subVectors(t.head, t.samplePos);
+    let remaining = this.s1.length();
+    if (remaining > SHADOW_FANG_TRAIL_YARDS * 1.5) {
+      t.ringCount = 0;
+      t.ringHead = 0;
+      t.samplePos.copy(t.head);
+      this.appendTrailSample(t, t.head);
+      return;
+    }
+    for (
+      let sample = 0;
+      sample < TRAIL_PTS - 1 && remaining >= SHADOW_FANG_SAMPLE_YARDS;
+      sample++
+    ) {
+      t.samplePos.addScaledVector(this.s1, SHADOW_FANG_SAMPLE_YARDS / remaining);
+      this.appendTrailSample(t, t.samplePos);
+      this.s1.subVectors(t.head, t.samplePos);
+      remaining = this.s1.length();
+    }
   }
 
   // Per-style head sprites for the styled trails, emitted through the fx
@@ -789,13 +941,134 @@ export class AbilityVfxRibbons {
       alpha: number,
       brightness: number,
     ) => void,
+    reducedMotion = false,
   ): void {
     for (const t of this.trails) {
       if (!t.active || t.headSize <= 0 || t.delay > 0) continue;
       const hs = t.headSize;
       const h = t.head;
-      const pulse = 1 + 0.12 * Math.sin(time * 40 + t.seed);
+      const pulse = reducedMotion ? 1 : 1 + 0.12 * Math.sin(time * 40 + t.seed);
       switch (t.style) {
+        case 'shadowFang': {
+          // Essence Reap's compressed shadow head: a cold pointed tip over a
+          // near-black body. The actual pointed silhouette is a tapered
+          // velocity-aligned mesh drawn in update(); these three restrained
+          // overlays add depth without turning it back into a round orb.
+          sink(
+            h.x + t.dir.x * 0.28 * hs,
+            h.y + t.dir.y * 0.28 * hs,
+            h.z + t.dir.z * 0.28 * hs,
+            t.accentHex,
+            0.06 * hs * pulse,
+            OVERLAY_CELL.spark,
+            0.95,
+            3,
+          );
+          sink(h.x, h.y, h.z, t.headCoreHex, 0.16 * hs, OVERLAY_CELL.glow, 0.82, 0.7);
+          sink(h.x, h.y, h.z, t.colorHex, 0.08 * hs, OVERLAY_CELL.star, 0.75, 2);
+          break;
+        }
+        case 'felLance': {
+          // Ruinbolt's directional head: a white-hot forward fang, dense
+          // toxic core, and two spec-dark swept-back jaws (legacy fel green
+          // when no core is authored). The offsets ride the actual travel
+          // vector, so the front remains readable through turns instead of
+          // collapsing into a generic glowing sphere.
+          const sideX = -t.dir.z;
+          const sideZ = t.dir.x;
+          sink(
+            h.x + t.dir.x * 0.3 * hs,
+            h.y + t.dir.y * 0.3 * hs,
+            h.z + t.dir.z * 0.3 * hs,
+            t.coreHex,
+            0.25 * hs * pulse,
+            OVERLAY_CELL.star,
+            1,
+            3.2,
+          );
+          sink(h.x, h.y, h.z, t.colorHex, 0.55 * hs, OVERLAY_CELL.glow, 0.92, 1.8);
+          sink(h.x, h.y, h.z, t.coreHex, 0.24 * hs, OVERLAY_CELL.star, 0.95, 2.9);
+          for (const side of [-1, 1]) {
+            sink(
+              h.x - t.dir.x * 0.28 * hs + sideX * side * 0.2 * hs,
+              h.y - t.dir.y * 0.28 * hs + side * 0.06 * hs,
+              h.z - t.dir.z * 0.28 * hs + sideZ * side * 0.2 * hs,
+              t.headCoreHex,
+              0.3 * hs,
+              OVERLAY_CELL.glow,
+              0.82,
+              1.15,
+            );
+          }
+          break;
+        }
+        case 'essenceLance':
+        case 'soulLance': {
+          // Soul Lance is a long directional bone spear, not a purple comet.
+          // Its ivory point and shaft lead the travel vector, twin dark bone
+          // fins sweep behind it, and two cold soul wisps orbit the rear third.
+          // Essence Reap shares that seven-part silhouette at a smaller scale
+          // and with a short pooled wake, so the family reads without giving
+          // the rotational generator the finisher's weight.
+          const sideX = -t.dir.z;
+          const sideZ = t.dir.x;
+          sink(
+            h.x + t.dir.x * 0.48 * hs,
+            h.y + t.dir.y * 0.48 * hs,
+            h.z + t.dir.z * 0.48 * hs,
+            0xf2f0ff,
+            0.2 * hs * pulse,
+            OVERLAY_CELL.spark,
+            1,
+            3.4,
+          );
+          sink(
+            h.x + t.dir.x * 0.12 * hs,
+            h.y + t.dir.y * 0.12 * hs,
+            h.z + t.dir.z * 0.12 * hs,
+            t.colorHex,
+            0.48 * hs,
+            OVERLAY_CELL.glow,
+            0.9,
+            1.7,
+          );
+          sink(
+            h.x + t.dir.x * 0.2 * hs,
+            h.y + t.dir.y * 0.2 * hs,
+            h.z + t.dir.z * 0.2 * hs,
+            t.headCoreHex,
+            0.13 * hs,
+            OVERLAY_CELL.star,
+            0.96,
+            3,
+          );
+          for (const side of [-1, 1]) {
+            sink(
+              h.x - t.dir.x * 0.3 * hs + sideX * side * 0.2 * hs,
+              h.y - t.dir.y * 0.3 * hs + side * 0.05 * hs,
+              h.z - t.dir.z * 0.3 * hs + sideZ * side * 0.2 * hs,
+              t.accentHex,
+              0.23 * hs,
+              OVERLAY_CELL.spark,
+              0.82,
+              1.8,
+            );
+          }
+          for (const side of [-1, 1]) {
+            const orbit = reducedMotion ? side * 0.16 : side * (0.14 + 0.03 * Math.sin(time * 12));
+            sink(
+              h.x - t.dir.x * 0.22 * hs + sideX * orbit * hs,
+              h.y - t.dir.y * 0.22 * hs + side * 0.13 * hs,
+              h.z - t.dir.z * 0.22 * hs + sideZ * orbit * hs,
+              t.accentHex,
+              0.14 * hs,
+              OVERLAY_CELL.glow,
+              0.72,
+              1.6,
+            );
+          }
+          break;
+        }
         case 'shard':
           // elongated crystal glint: the thin spark flash over a faint halo
           sink(h.x, h.y, h.z, t.coreHex, 0.4 * hs * pulse, OVERLAY_CELL.spark, 0.95, 2.8);
@@ -935,6 +1208,7 @@ export class AbilityVfxRibbons {
     color: THREE.Color,
     mul: number,
     taper: number,
+    uvRepeats = 3,
   ): void {
     if (n < 2 || this.v + n * 2 > MAX_VERTS || this.i + (n - 1) * 6 > MAX_INDICES) return;
     const base = this.v;
@@ -967,9 +1241,9 @@ export class AbilityVfxRibbons {
       this.col[vi + 4] = g;
       this.col[vi + 5] = bl;
       const ui = (base + k * 2) * 2;
-      this.uv[ui] = u * 3;
+      this.uv[ui] = u * uvRepeats;
       this.uv[ui + 1] = 0;
-      this.uv[ui + 2] = u * 3;
+      this.uv[ui + 2] = u * uvRepeats;
       this.uv[ui + 3] = 1;
     }
     for (let k = 0; k < n - 1; k++) {

@@ -225,6 +225,7 @@ describe('batched canvas nameplate state', () => {
       id: 2,
       guild: 'Canvas Raiders',
       title: 'prog_veteran',
+      border: 'prog_prestige_10',
       overheadEmoteId: 'wave',
       holderTier: 1,
       devTier: 4,
@@ -245,6 +246,8 @@ describe('batched canvas nameplate state', () => {
     // and the per-frame draw path never allocates it.
     expect(state.guildLabel).toBe('<Canvas Raiders>');
     expect(state.title).toBe('Veteran');
+    // The wire carries the DEED ID; the plate carries the resolved SLUG.
+    expect(state.border).toBe('prestige_laurels');
     expect(state.opacity).toBe(0.55);
     expect(state.badges).toHaveLength(3);
     expect(state.badges[2]).toMatchObject({
@@ -313,6 +316,36 @@ describe('batched canvas nameplate state', () => {
     painter.update(true);
     expect(state.guild).toBe('');
     expect(state.guildLabel).toBe('');
+  });
+
+  it('resolves the border slug per entity and clears it for every borderless case', () => {
+    // The slug is resolved on the SAME tier-cadenced resolveContent pass as the
+    // title, so a border change repaints exactly like a title change. Every arm
+    // here is a way a stale slug could survive onto the wrong plate.
+    const bordered = entity({ id: 2, border: 'col_reliquary_rank_5' });
+    const mob = entity({ id: 3, kind: 'mob', templateId: 'wolf', hostile: true });
+    const object = entity({ id: 4, kind: 'object', templateId: 'delve_locked_chest' });
+    const { painter } = harness([bordered, mob, object]);
+
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
+    // A mob and a world object never carry one, so the accent is player identity.
+    expect(stateOf(painter, 3).border).toBe('');
+    expect(stateOf(painter, 4).border).toBe('');
+
+    // Cleared selection: the reset must blank the slug the plate already holds.
+    bordered.border = null;
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+
+    // A TITLE-reward deed is not a border, and an id the catalog no longer has
+    // (a save that outlived its content record) resolves to no accent either.
+    bordered.border = 'prog_veteran';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+    bordered.border = 'deed_that_no_longer_exists';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
   });
 
   it('maps object, quest NPC, boss, and lootable corpse presentation', () => {

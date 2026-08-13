@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e836976c",
+      "state": "b7e2dc0d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,6 +73,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -149,8 +153,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "c395d0b1",
-      "events": "911add89",
+      "state": "88f6a958",
+      "events": "436da46f",
       "rng": {
         "draws": 7,
         "digest": "4f9a2cfb"
@@ -160,7 +164,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "eea107ad",
+      "state": "60bf3124",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -171,8 +175,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "9364cbc3",
-      "events": "30c22ce9",
+      "state": "28e88902",
+      "events": "5a9ce44f",
       "rng": {
         "draws": 174,
         "digest": "847684f0"
@@ -182,7 +186,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 965,
-      "state": "438c9d2f",
+      "state": "19156d7e",
       "events": "14b3b208",
       "rng": {
         "draws": 263,
@@ -263,6 +267,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -409,7 +417,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 965,
-      "state": "98199d99",
+      "state": "8ac2a452",
       "events": "7d77b079",
       "rng": {
         "draws": 309,
@@ -494,6 +502,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 25,
           "talents": {
             "rows": {}

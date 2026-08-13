@@ -32,6 +32,7 @@ const modDetail = {
     chatMutedUntil: null,
     chatMuteReason: '',
     chatStrikes: 0,
+    generalChatRateLimit: null,
     lastLoginIp: '1.2.3.4',
     playtimeSeconds: 3600,
     characters: [],

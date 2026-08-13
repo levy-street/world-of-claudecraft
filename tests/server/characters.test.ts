@@ -18,8 +18,10 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase12_u
 
 import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  APPEARANCE_REROLL_CUTOFF,
   type CharactersRuntime,
   configureCharactersRuntime,
   purgeDeletedCharacterWorldState,
@@ -104,6 +106,8 @@ function fakeRuntime(overrides: Partial<CharactersRuntime> = {}): CharactersRunt
     isCharacterOnline: () => false,
     takeOverCharacter: async () => 'not-online',
     rekeyMarketSeller: () => false,
+    setHelmHiddenForCharacter: () => false,
+    applyAppearanceForCharacter: () => false,
     saveMarket: async () => {},
     purgeMarketSeller: () => false,
     rekeyMailOwner: () => false,
@@ -379,6 +383,13 @@ describe('character list handlers', () => {
           mainhandItemId: 'worn_sword',
           offhandItemId: 'eastbrook_buckler',
           weaponSkinId: 'ice_fang_sword',
+          appearance: null,
+          helmHidden: false,
+          createdAt: null,
+          // No authored look and the token unspent, so this row still owes its
+          // player one free design (created_at is null in this fixture, so it
+          // is the never-designed arm carrying it, not the window).
+          appearanceRerollAvailable: true,
         },
         {
           id: 2,
@@ -394,6 +405,13 @@ describe('character list handlers', () => {
           mainhandItemId: null,
           offhandItemId: null,
           weaponSkinId: null,
+          appearance: null,
+          helmHidden: false,
+          createdAt: null,
+          // No authored look and the token unspent, so this row still owes its
+          // player one free design (created_at is null in this fixture, so it
+          // is the never-designed arm carrying it, not the window).
+          appearanceRerollAvailable: true,
         },
       ],
     };
@@ -880,6 +898,334 @@ describe('create handler', () => {
 // ---------------------------------------------------------------------------
 // Rename handler.
 // ---------------------------------------------------------------------------
+
+describe('create handler appearance', () => {
+  it('bounds a posted appearance and stores it beside the new row', async () => {
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const posted = { gender: 'female', hair: 'fantasybraid', skinLight: 0.8, evil: 'payload' };
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior', appearance: posted },
+    });
+    expect(res.status).toBe(200);
+    const stored = createCharacterCapped.mock.calls[0][5] as Record<string, unknown>;
+    // Known keys survive verbatim; unknown ones never reach the row (it is
+    // re-broadcast to other players). Value MEANING is the renderer's job:
+    // see tests/appearance_wire_bounds.test.ts.
+    expect(stored).toEqual({ gender: 'female', hair: 'fantasybraid', skinLight: 0.8 });
+  });
+
+  it('hides the helm by default so the authored face is what enters the world', async () => {
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior', appearance: { gender: 'female' } },
+    });
+    expect(res.status).toBe(200);
+    const state = createCharacterCapped.mock.calls[0][4] as { helmHidden?: boolean };
+    expect(state.helmHidden).toBe(true);
+  });
+
+  it('leaves a client that sends no helmHidden AND no look with its helm', async () => {
+    // The creator always posts the toggle, so an omission means a client that
+    // predates it: a cached web bundle, an older native shell, a script. Those
+    // characters have no authored face to bury and used to get a helm; the
+    // hidden default must not reach back and change what they create.
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(200);
+    const state = createCharacterCapped.mock.calls[0][4] as { helmHidden?: boolean };
+    expect(state.helmHidden).toBeUndefined();
+  });
+
+  it('keeps the helm shown when the creator previewed it on (helmHidden false)', async () => {
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior', helmHidden: false },
+    });
+    expect(res.status).toBe(200);
+    // Zero-default omission: a shown helm writes NOTHING into the blob.
+    const state = createCharacterCapped.mock.calls[0][4] as { helmHidden?: boolean };
+    expect(state.helmHidden).toBeUndefined();
+  });
+
+  it('stores null when no appearance is posted (a legacy-rig character)', async () => {
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(200);
+    expect(createCharacterCapped.mock.calls[0][5]).toBeNull();
+  });
+
+  it('400s a present-but-malformed appearance without creating', async () => {
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior', appearance: 'not-an-object' },
+    });
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: 'invalid appearance', code: 'character.invalid_appearance' });
+    expect(createCharacterCapped).not.toHaveBeenCalled();
+  });
+});
+
+describe('free-redesign window', () => {
+  /** The list handler is where appearanceRerollAvailable is observable. */
+  async function tokensFor(rows: CharacterRow[]): Promise<Record<string, boolean>> {
+    authedDb({ listCharacters: async () => rows });
+    const res = await callHandler('GET', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+    });
+    expect(res.status).toBe(200);
+    const body = res.body as { characters: { name: string; appearanceRerollAvailable: boolean }[] };
+    return Object.fromEntries(body.characters.map((c) => [c.name, c.appearanceRerollAvailable]));
+  }
+
+  const before = new Date(APPEARANCE_REROLL_CUTOFF.getTime() - 60_000).toISOString();
+  const after = new Date(APPEARANCE_REROLL_CUTOFF.getTime() + 60_000).toISOString();
+  const look = { gender: 'female' };
+
+  it('gives a free redesign to every character created inside the window', async () => {
+    // Including one that already has an authored look: the window is "you
+    // existed before the cutoff", not "you never chose".
+    const tokens = await tokensFor([
+      charRow({ id: 1, name: 'Designed', created_at: before, appearance: look }),
+      charRow({ id: 2, name: 'Bare', created_at: before, appearance: null }),
+    ]);
+    expect(tokens).toEqual({ Designed: true, Bare: true });
+  });
+
+  it('closes the window after the cutoff for a character that already has a look', async () => {
+    const tokens = await tokensFor([
+      charRow({ id: 3, name: 'Newcomer', created_at: after, appearance: look }),
+    ]);
+    expect(tokens).toEqual({ Newcomer: false });
+  });
+
+  it('still covers a character created after the cutoff with NO look', async () => {
+    // The safety net, not the product rule: a client too old to post an
+    // appearance would otherwise leave its character with neither a look nor
+    // any way to choose one.
+    const tokens = await tokensFor([
+      charRow({ id: 4, name: 'Oldclient', created_at: after, appearance: null }),
+    ]);
+    expect(tokens).toEqual({ Oldclient: true });
+  });
+
+  it('a spent token beats both arms', async () => {
+    const tokens = await tokensFor([
+      charRow({
+        id: 5,
+        name: 'Spent',
+        created_at: before,
+        appearance: look,
+        appearance_reroll_used: true,
+      }),
+      charRow({
+        id: 6,
+        name: 'SpentBare',
+        created_at: after,
+        appearance: null,
+        appearance_reroll_used: true,
+      }),
+    ]);
+    expect(tokens).toEqual({ Spent: false, SpentBare: false });
+  });
+});
+
+describe('roster appearance echoes', () => {
+  it('carries the stored look and helm preference through the list body', async () => {
+    // charselectLook reads exactly these two fields off the roster row; a
+    // handler that hardcoded null/false would silently draw every row as a
+    // bare class rig with the helm on, and nothing else would fail.
+    const look = { gender: 'female', hair: 'highbun' };
+    authedDb({
+      listCharacters: async () => [
+        charRow({ id: 1, name: 'Designed', appearance: look, state: st({ helmHidden: true }) }),
+        charRow({ id: 2, name: 'Bare', appearance: null, state: null }),
+      ],
+    });
+    const res = await callHandler('GET', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+    });
+    expect(res.status).toBe(200);
+    const rows = (res.body as { characters: Record<string, unknown>[] }).characters;
+    expect(rows[0]).toMatchObject({ name: 'Designed', appearance: look, helmHidden: true });
+    expect(rows[1]).toMatchObject({ name: 'Bare', appearance: null, helmHidden: false });
+  });
+
+  it('nulls a legacy empty-object appearance instead of echoing it raw', async () => {
+    // A row whose appearance column is `{}` (or a slider map that sanitizes down
+    // to nothing, `{"face":{}}`) predates the current sanitizeAppearance bounds.
+    // Echoing it raw is truthy through charselectLook, so char-select would
+    // compose the default modular body for a character the join path (ws_auth.ts
+    // sanitizeAppearance) renders as the bare class rig in world. The roster must
+    // agree with the join path: both null it out.
+    authedDb({
+      listCharacters: async () => [
+        charRow({ id: 1, name: 'EmptyObject', appearance: {} }),
+        charRow({ id: 2, name: 'EmptySlider', appearance: { face: {} } }),
+      ],
+    });
+    const res = await callHandler('GET', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+    });
+    expect(res.status).toBe(200);
+    const rows = (res.body as { characters: Record<string, unknown>[] }).characters;
+    expect(rows[0]).toMatchObject({ name: 'EmptyObject', appearance: null });
+    expect(rows[1]).toMatchObject({ name: 'EmptySlider', appearance: null });
+  });
+});
+
+describe('reroll route hardening', () => {
+  it('mounts the per-action limiter on the token-spending route (source pin)', () => {
+    // The one new mutation that spends a one-shot token and takes an untrusted
+    // body must not be the one character mutation without a limiter. Source
+    // pin, the mntOwn pattern: the RouteDef arm is data, not reachable
+    // middleware, so assert the mount in the table itself.
+    const src = readFileSync(resolve(process.cwd(), 'server/characters.ts'), 'utf8');
+    const at = src.indexOf("path: '/api/characters/:id/appearance-reroll'");
+    expect(at).toBeGreaterThan(-1);
+    expect(src.slice(at, at + 400)).toContain('rateLimit(CHARACTER_REROLL_POLICY');
+  });
+
+  it('mounts activeGuard, not readGuard, ahead of the limiter (source pin)', () => {
+    // A read-scoped companion token must not be able to spend the one-shot
+    // redesign. The middleware order matters here (auth guard before the
+    // limiter, matching the other mutation routes), so this pin fails loudly
+    // if a future edit swaps in readGuard instead of leaving the route open.
+    const src = readFileSync(resolve(process.cwd(), 'server/characters.ts'), 'utf8');
+    const at = src.indexOf("path: '/api/characters/:id/appearance-reroll'");
+    expect(at).toBeGreaterThan(-1);
+    const slice = src.slice(at, at + 400);
+    expect(slice).toContain('activeGuard');
+    expect(slice.indexOf('activeGuard')).toBeLessThan(
+      slice.indexOf('rateLimit(CHARACTER_REROLL_POLICY'),
+    );
+  });
+});
+
+describe('appearance reroll handler', () => {
+  it('200s the bounded look and spends the token through the atomic update', async () => {
+    const consumeAppearanceReroll = vi.fn(async (..._args: unknown[]) => true);
+    setCharactersDbForTests({ consumeAppearanceReroll });
+    const character = charRow({ id: 5 });
+    const res = await callHandler('POST', '/api/characters/:id/appearance-reroll', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { appearance: { gender: 'female', hair: 'highbun', evil: 'payload' } },
+    });
+    const bounded = { gender: 'female', hair: 'highbun' };
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ ok: true, appearance: bounded, helmHidden: null });
+    const [accountId, characterId, stored, helmHidden, cutoff] = consumeAppearanceReroll.mock
+      .calls[0] as [number, number, Record<string, unknown>, boolean, Date];
+    expect(accountId).toBe(7);
+    expect(characterId).toBe(5);
+    expect(stored).toEqual(bounded);
+    // NULL, not false: this body carried no helmHidden, and false would have
+    // made the UPDATE run `state - 'helmHidden'`, un-hiding a helm the player
+    // had hidden in world. Null leaves the blob alone.
+    expect(helmHidden).toBeNull();
+    // The free window rides through to the UPDATE, which is what decides
+    // eligibility; the handler never compares dates itself.
+    expect(cutoff).toBe(APPEARANCE_REROLL_CUTOFF);
+  });
+
+  it('persists the editor helm toggle and pushes it onto a live session', async () => {
+    // The redesign's helmet toggle is the creation toggle: a standing wardrobe
+    // choice, not a preview. The push exists because an in-world session holds
+    // the old value in memory and would autosave straight over the row.
+    const consumeAppearanceReroll = vi.fn(async (..._args: unknown[]) => true);
+    const setHelmHiddenForCharacter = vi.fn(() => true);
+    setCharactersDbForTests({ consumeAppearanceReroll });
+    resetCharactersRuntimeForTests();
+    configureCharactersRuntime(fakeRuntime({ setHelmHiddenForCharacter }));
+    const res = await callHandler('POST', '/api/characters/:id/appearance-reroll', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 5 })),
+      body: { appearance: { gender: 'female' }, helmHidden: true },
+    });
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ ok: true, appearance: { gender: 'female' }, helmHidden: true });
+    expect(consumeAppearanceReroll.mock.calls[0][3]).toBe(true);
+    expect(setHelmHiddenForCharacter).toHaveBeenCalledWith(5, true);
+  });
+
+  it('leaves the helm alone entirely when the client sends no toggle', async () => {
+    const consumeAppearanceReroll = vi.fn(async (..._args: unknown[]) => true);
+    const setHelmHiddenForCharacter = vi.fn(() => true);
+    setCharactersDbForTests({ consumeAppearanceReroll });
+    resetCharactersRuntimeForTests();
+    configureCharactersRuntime(fakeRuntime({ setHelmHiddenForCharacter }));
+    const res = await callHandler('POST', '/api/characters/:id/appearance-reroll', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 5 })),
+      body: { appearance: { gender: 'female' } },
+    });
+    expect(res.status).toBe(200);
+    // No write, and nothing pushed at a live session either: an omitted field
+    // is "I have no opinion", not "show it".
+    expect(consumeAppearanceReroll.mock.calls[0][3]).toBeNull();
+    expect(setHelmHiddenForCharacter).not.toHaveBeenCalled();
+  });
+
+  it('400s reroll-unavailable when the atomic update matches no row', async () => {
+    // One WHERE arm failed: not owned, outside the free window with a look
+    // already, or the token is already spent. The handler cannot tell which,
+    // and must not care.
+    setCharactersDbForTests({ consumeAppearanceReroll: async () => false });
+    const res = await callHandler('POST', '/api/characters/:id/appearance-reroll', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 5 })),
+      body: { appearance: { gender: 'female' } },
+    });
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({
+      error: 'appearance reroll is not available for this character',
+      code: 'character.reroll_unavailable',
+    });
+  });
+
+  it('400s a missing or malformed appearance without touching the token', async () => {
+    const consumeAppearanceReroll = vi.fn(async (..._args: unknown[]) => true);
+    setCharactersDbForTests({ consumeAppearanceReroll });
+    // `{}` is in the list on purpose: an appearance carrying no known key is
+    // not a design, and accepting it would burn the one-shot token on a body
+    // nobody authored.
+    for (const body of [
+      {},
+      { appearance: 'not-an-object' },
+      { appearance: [1, 2] },
+      { appearance: {} },
+      { appearance: { nothing: 'known' } },
+    ]) {
+      const res = await callHandler('POST', '/api/characters/:id/appearance-reroll', {
+        account: { accountId: 7, scope: 'full' },
+        state: stateWith(charRow({ id: 5 })),
+        body,
+      });
+      expect(res.status).toBe(400);
+      expect(res.body).toEqual({
+        error: 'invalid appearance',
+        code: 'character.invalid_appearance',
+      });
+    }
+    expect(consumeAppearanceReroll).not.toHaveBeenCalled();
+  });
+});
 
 describe('rename handler', () => {
   it('200s a rename and rekeys the market seller (saveMarket when a rekey lands)', async () => {
@@ -1636,8 +1982,8 @@ describe('character-mutation limiters (newLimiterCharacterMutations 429)', () =>
 // ---------------------------------------------------------------------------
 
 describe('routes table', () => {
-  it('registers the nine character routes on the api surface', () => {
-    expect(routes).toHaveLength(9);
+  it('registers the ten character routes on the api surface', () => {
+    expect(routes).toHaveLength(10);
     for (const r of routes) {
       expect(r.surface).toBe('api');
       expect(typeof r.handler).toBe('function');
@@ -1651,6 +1997,7 @@ describe('routes table', () => {
       'GET /api/characters/:id/deeds-recent',
       'POST /api/characters/:id/rename',
       'POST /api/characters/:id/takeover',
+      'POST /api/characters/:id/appearance-reroll',
       'DELETE /api/characters/:id',
     ];
     for (const key of ownedPaths) {

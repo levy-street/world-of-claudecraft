@@ -1,5 +1,6 @@
 import { bgFieldHeightLocal } from './battleground_field';
 import { beaconSpiralLift } from './beacon_spiral';
+import { BORDER_EDGES } from './border_edges';
 import {
   castleLift,
   castlePadTarget,
@@ -242,80 +243,14 @@ const BIOME_SHAPE: Record<
   cave: { hill: 9, base: 1, hubHeight: 1, crag: 6 },
 };
 
-// Ridge walls along every shared zone edge, each opened by a road pass. A
-// zone with sealedSouthBorder instead gets a taller, narrower wall with NO
-// pass, its crest shifted into the sealed zone's own band so the southern
-// neighbor's border content keeps (nearly) its original ground. Sealed
-// zones are entered only through a portal (see portals content).
-//
-// The world is a GRID of zone rectangles (see data.ts zoneAt): horizontal
-// edges separate north-south neighbors (the classic band borders) and
-// vertical edges separate east-west columns with the same math rotated a
-// quarter turn. An edge that spans its whole world row keeps the classic
-// unbounded ridge (byte-identical to the strip era); a partial edge
-// feathers to nothing past its span ends.
-export interface BorderEdge {
-  kind: 'h' | 'v';
-  at: number; // the edge line: z for 'h', x for 'v'
-  lo: number; // span start along the edge (x for 'h', z for 'v')
-  hi: number; // span end
-  fullRow: boolean; // spans the whole world row: no end feather
-  passAt: number; // pass coordinate along the span
-  sealed: boolean;
-}
+// Ridge walls along every shared zone edge, each opened by a road pass. The
+// edge geometry itself (BorderEdge, computeBorderEdges, the derived
+// BORDER_EDGES table, SEALED_BORDERS, and the crossesSealedBorder movement
+// wall) lives in the border_edges.ts leaf; re-exported here so existing
+// consumers (colliders.ts, the border/grid tests) need no changes.
+export type { BorderEdge } from './border_edges';
+export { computeBorderEdges, crossesSealedBorder, SEALED_BORDERS } from './border_edges';
 
-/** All shared edges between adjacent zone rects (pure; exported for tests). */
-export function computeBorderEdges(zones: readonly ZoneDef[]): BorderEdge[] {
-  const zx0 = (zn: ZoneDef) => zn.xMin ?? STRIP_MIN_X;
-  const zx1 = (zn: ZoneDef) => zn.xMax ?? STRIP_MAX_X;
-  const edges: BorderEdge[] = [];
-  for (const a of zones) {
-    for (const b of zones) {
-      // horizontal edge: b sits directly north of a, rects overlapping in x
-      if (a.zMax === b.zMin) {
-        const lo = Math.max(zx0(a), zx0(b));
-        const hi = Math.min(zx1(a), zx1(b));
-        if (hi - lo > 1) {
-          const sealed = b.sealedSouthBorder === true;
-          // full row = nothing that touches or crosses the border line lies
-          // beyond this span (a column zone whose band SPANS the line counts
-          // too: its interior must not inherit the row wall)
-          const fullRow = zones.every(
-            (zn) => zn.zMax < a.zMax || zn.zMin > a.zMax || (zx0(zn) >= lo && zx1(zn) <= hi),
-          );
-          edges.push({
-            kind: 'h',
-            at: a.zMax + (sealed ? 15 : 0),
-            lo,
-            hi,
-            fullRow,
-            passAt: b.southPassX ?? 0,
-            sealed,
-          });
-        }
-      }
-      // vertical edge: b sits directly east of a, rects overlapping in z
-      if (zx1(a) === zx0(b)) {
-        const lo = Math.max(a.zMin, b.zMin);
-        const hi = Math.min(a.zMax, b.zMax);
-        if (hi - lo > 1) {
-          edges.push({
-            kind: 'v',
-            at: zx1(a),
-            lo,
-            hi,
-            fullRow: false, // a column border never spans the world's full z
-            passAt: b.westPassZ ?? a.eastPassZ ?? (lo + hi) / 2,
-            sealed: false,
-          });
-        }
-      }
-    }
-  }
-  return edges;
-}
-
-const BORDER_EDGES: readonly BorderEdge[] = computeBorderEdges(ZONES);
 // Low, broad border ranges: steep enough to read as a border, gentle
 // enough that ANY land contact between two maps is walkable over (the
 // pass roads stay the easy way; the hills are never a hard wall). Only
@@ -332,23 +267,6 @@ const RIDGE_SIGMA = 26; // gaussian width of the wall
 const SEALED_RIDGE_HEIGHT = 60;
 const SEALED_RIDGE_SIGMA = 12;
 
-// Crest z of every sealed border: an uncrossable line for swept movement
-// within the edge's x span (plus its feather). Portal teleports assign
-// positions directly and are unaffected; the column realms whose bands
-// span the same z live outside the span and walk freely.
-export const SEALED_BORDERS: readonly { at: number; lo: number; hi: number }[] =
-  BORDER_EDGES.filter((e) => e.kind === 'h' && e.sealed).map((e) => ({
-    at: e.at,
-    lo: e.lo - 24,
-    hi: e.hi + 24,
-  }));
-
-export function crossesSealedBorder(x: number, z0: number, z1: number): boolean {
-  for (const b of SEALED_BORDERS) {
-    if (x >= b.lo && x <= b.hi && (z0 - b.at) * (z1 - b.at) < 0) return true;
-  }
-  return false;
-}
 const PASS_HALF_WIDTH = 10; // flat opening around the road
 const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
 
@@ -1700,7 +1618,25 @@ function applyValeCoast(x: number, z: number, h: number): number {
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = WATER_LEVEL - 3.4 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.4)) * shelf;
-  return h + (floor + (h - floor) * t - h) * w;
+  let out = h + (floor + (h - floor) * t - h) * w;
+  // At the vale's northwest coast a low beach shelf (a few yards above water)
+  // aprons the foot of the steep grey cliff and reads as a proud triangle spit
+  // where it meets the bay (player report). Submerge that shelf so the bay water
+  // runs right up to the cliff foot with no spit. The height gate lowers ONLY
+  // the low shelf and never the cliff it fronts (protected from 12.5yd up); the
+  // z window covers the shelf and fades out before the cliff shoulder (z ~146),
+  // and the x window spans the shelf around x = -172. Deepened to open-sea level
+  // so it reads as bay water, not a submerged sandbar.
+  const spitW =
+    smoothstep(116, 122, z) *
+    (1 - smoothstep(141, 146, z)) *
+    (1 - smoothstep(22, 40, Math.abs(x + 172))) *
+    (1 - smoothstep(9.5, 12.5, out));
+  if (spitW > 0) {
+    const sea = Math.min(out, WATER_LEVEL - 2);
+    out = out + (sea - out) * spitW;
+  }
+  return out;
 }
 
 // The Ferrywalk: a natural sandbar causeway from the vale's west point across

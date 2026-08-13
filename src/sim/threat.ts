@@ -43,6 +43,8 @@ export function threatModifier(source: Entity, school: string): number {
     else if (a.kind === 'form_bear') mod *= BEAR_FORM_THREAT_MULT;
     else if (a.kind === 'form_cat') mod *= CAT_FORM_THREAT_MULT;
     else if (a.kind === 'righteous_fury' && school === 'holy') mod *= RIGHTEOUS_FURY_THREAT_MULT;
+    else if (a.kind === 'buff_threat') mod *= a.value;
+    else if (a.kind === 'sacred_form') mod *= a.value3 ?? 0.5;
   }
   return mod;
 }

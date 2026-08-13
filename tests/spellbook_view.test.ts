@@ -12,7 +12,7 @@
 // markup + drag/tooltip wiring is covered by the spellbook_window.ts source guard.
 
 import { describe, expect, it } from 'vitest';
-import { CLASSES } from '../src/sim/data';
+import { ABILITIES, CLASSES } from '../src/sim/data';
 import type { ResolvedAbility } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { ACTION_BAR_ABILITY_SLOTS } from '../src/ui/hud/action_bar/action_bar_layout_core';
@@ -20,7 +20,13 @@ import { buildSpellbookView, type SpellbookInput } from '../src/ui/spellbook_vie
 
 // A class whose kit has at least two abilities, so we can exercise known/locked.
 const CLASS_ID = Object.values(CLASSES).find((c) => c.abilities.length >= 2)!.id as PlayerClass;
-const KIT = CLASSES[CLASS_ID].abilities;
+const FULL_KIT = CLASSES[CLASS_ID].abilities;
+// The unspecced book: spec-exclusive entries are hidden until a spec commits,
+// so the baseline expectations run against the open (spec-free) kit.
+const KIT = FULL_KIT.filter((id) => !ABILITIES[id]?.specs);
+// A spec-exclusive entry plus a spec it belongs to, for the gate pins below.
+const GATED_ID = FULL_KIT.find((id) => ABILITIES[id]?.specs?.length)!;
+const GATED_SPEC = ABILITIES[GATED_ID].specs![0];
 
 // Minimal ResolvedAbility stub: the core reads only `def.id` and `rank`. shape:
 // 'sim' carries extra fields the core must ignore.
@@ -32,7 +38,7 @@ function known(shape: 'sim' | 'client', abilityId: string, rank = 1): ResolvedAb
 function input(over: Partial<SpellbookInput> = {}): SpellbookInput {
   return {
     classId: CLASS_ID,
-    abilities: KIT,
+    abilities: FULL_KIT,
     known: [],
     barAbilityIds: [],
     hasFreeSlot: true,
@@ -43,7 +49,7 @@ function input(over: Partial<SpellbookInput> = {}): SpellbookInput {
 }
 
 describe('buildSpellbookView: class kit + learned state', () => {
-  it('maps the class kit to rows in display order', () => {
+  it('maps the open class kit to rows in display order', () => {
     const v = buildSpellbookView(input());
     expect(v.rows.map((r) => r.abilityId)).toEqual([...KIT]);
     expect(v.classId).toBe(CLASS_ID);
@@ -76,6 +82,30 @@ describe('buildSpellbookView: class kit + learned state', () => {
   it('passes the form-bars flag through (drives the reset button)', () => {
     expect(buildSpellbookView(input({ hasFormBars: true })).hasFormBars).toBe(true);
     expect(buildSpellbookView(input({ hasFormBars: false })).hasFormBars).toBe(false);
+  });
+});
+
+describe('buildSpellbookView: the spec gate', () => {
+  it('hides a spec-exclusive row while no spec is committed', () => {
+    const v = buildSpellbookView(input());
+    expect(v.rows.some((r) => r.abilityId === GATED_ID)).toBe(false);
+  });
+
+  it('hides a spec-exclusive row for a committed spec outside its list', () => {
+    const v = buildSpellbookView(input({ spec: 'not_a_real_spec' }));
+    expect(v.rows.some((r) => r.abilityId === GATED_ID)).toBe(false);
+  });
+
+  it('shows the row once the matching spec is committed', () => {
+    const v = buildSpellbookView(input({ spec: GATED_SPEC }));
+    expect(v.rows.some((r) => r.abilityId === GATED_ID)).toBe(true);
+  });
+
+  it('keeps an already-learned spec-exclusive row regardless of the gate', () => {
+    const v = buildSpellbookView(input({ known: [known('sim', GATED_ID)] }));
+    const row = v.rows.find((r) => r.abilityId === GATED_ID);
+    expect(row).toBeDefined();
+    expect(row!.known).not.toBeNull();
   });
 });
 

@@ -3,6 +3,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { pageFor } from '../src/guide/pages';
 import { GUIDE_ROUTES } from '../src/guide/routes';
+import { hydrateCrestImageFallbacks } from '../src/ui/crest_image_fallback';
 import { setLanguage } from '../src/ui/i18n';
 
 // An INERT 2D context. happy-dom ships no canvas backend, and the procedural icon
@@ -109,6 +110,73 @@ describe('Guide route rendering', () => {
       expect((html?.match(/<h1[\s>]/g) ?? []).length, `${label} must render one h1`).toBe(1);
       expect(html?.match(/\bguide\.[a-zA-Z0-9_.]+/g) ?? [], `${label} leaked keys`).toEqual([]);
       expect(html?.match(/\{[a-zA-Z][a-zA-Z0-9_]*\}/g) ?? [], `${label} left a token`).toEqual([]);
+    }
+  });
+
+  it('keeps class and creature stills until an error swaps in their exact decorative crest', () => {
+    setLanguage('en');
+    const cases = [
+      {
+        routeId: 'classes',
+        selector: '.guide-class-card-still[data-crest-fallback-id="class_warrior"]',
+        fallbackSize: '128',
+        primaryAlt: '',
+      },
+      {
+        routeId: 'bestiary',
+        selector: '.guide-creature-still[data-crest-fallback-id="family_beast"]',
+        fallbackSize: '96',
+        primaryAlt: 'Forest Wolf',
+      },
+    ];
+
+    for (const c of cases) {
+      const page = pageFor(c.routeId);
+      const root = document.createElement('div');
+      root.innerHTML =
+        page?.render({ params: [], sub: c.routeId, titleKey: 'guide.nav.classes' }) ?? '';
+      const image = root.querySelector<HTMLImageElement>(c.selector);
+      expect(image, `${c.routeId} must retain its exact crest fallback identity`).toBeTruthy();
+      if (!image) continue;
+
+      const primarySrc = image.getAttribute('src');
+      expect(primarySrc).toMatch(/^\/guide-stills\/.+\.webp$/);
+      expect(image.dataset.crestFallbackSize).toBe(c.fallbackSize);
+      expect(image.dataset.crestFallbackDecorative).toBe('true');
+      expect(image.alt).toBe(c.primaryAlt);
+
+      Object.defineProperties(image, {
+        complete: { configurable: true, value: true },
+        naturalWidth: { configurable: true, value: 88 },
+      });
+      hydrateCrestImageFallbacks(root);
+      expect(image.getAttribute('src')).toBe(primarySrc);
+
+      image.dispatchEvent(new Event('error'));
+      expect(image.getAttribute('src')).not.toBe(primarySrc);
+      expect(image.src).toMatch(/^data:image\/png;base64,/);
+      expect(image.alt).toBe('');
+    }
+  });
+
+  it('supplies a class crest fallback for every pet and shapeshift viewer still', () => {
+    setLanguage('en');
+    for (const cls of ['warlock', 'druid']) {
+      const html =
+        pageFor('classes')?.render({
+          params: [cls],
+          sub: 'classes',
+          titleKey: 'guide.nav.classes',
+        }) ?? '';
+      const root = document.createElement('div');
+      root.innerHTML = html;
+      const posters = [
+        ...root.querySelectorAll<HTMLImageElement>('.guide-pet .guide-viewer-poster-still'),
+      ];
+      expect(posters.length, `${cls} detail page viewer stills`).toBe(3);
+      for (const poster of posters) {
+        expect(poster.getAttribute('data-poster-fallback')).toBe(`/ui/classes/${cls}.webp`);
+      }
     }
   });
 });

@@ -1,7 +1,11 @@
 import type { SimContext } from '../sim_context';
 import type { Aura, AuraKind, Entity } from '../types';
+import {
+  RADIANT_RESONANCE_DAWN_COST_MULTIPLIER,
+  RADIANT_RESONANCE_KIND,
+} from './paladin_radiant_resonance';
 
-function matches(aura: Aura, abilityId?: string): boolean {
+function matches(aura: { empowerAbilities?: readonly string[] }, abilityId?: string): boolean {
   if (!aura.empowerAbilities) return true;
   return abilityId !== undefined && aura.empowerAbilities.includes(abilityId);
 }
@@ -15,6 +19,7 @@ const EMPOWER_CAST_KINDS: ReadonlySet<string> = new Set([
   'next_execute_free',
   'next_cast_instant',
   'next_cast_cheap',
+  RADIANT_RESONANCE_KIND,
 ]);
 
 export function consumeAuraKind(
@@ -26,7 +31,12 @@ export function consumeAuraKind(
   const idx = e.auras.findIndex((aura) => aura.kind === kind && matches(aura, abilityId));
   if (idx < 0) return null;
   if (EMPOWER_CAST_KINDS.has(kind)) e.castConsumedEmpower = true;
-  const [aura] = e.auras.splice(idx, 1);
+  const aura = e.auras[idx];
+  if ((aura.charges ?? 1) > 1) {
+    aura.charges = (aura.charges ?? 1) - 1;
+    return aura;
+  }
+  e.auras.splice(idx, 1);
   ctx.emit({
     type: 'aura',
     targetId: e.id,
@@ -45,6 +55,13 @@ export function hasNextCastFree(e: Entity, abilityId?: string): boolean {
   );
 }
 
+/** The movement-cast aura eligible for this exact ability. Unscoped Ice
+ *  Floes and Wayfarer Grace remain universal; Flowing Elements names its two
+ *  allowed casts. */
+export function iceFloesAuraForAbility(e: Entity, abilityId: string): Aura | undefined {
+  return e.auras.find((aura) => aura.kind === 'ice_floes' && matches(aura, abilityId));
+}
+
 export function hasNextExecuteFree(e: Entity, abilityId: string): boolean {
   return e.auras.some(
     (aura) =>
@@ -53,11 +70,28 @@ export function hasNextExecuteFree(e: Entity, abilityId: string): boolean {
   );
 }
 
-export function nextCastCheapMultiplier(e: Entity, abilityId?: string): number | null {
+export function nextCastCheapMultiplierFromAuras(
+  auras: readonly {
+    kind: string;
+    value?: number;
+    empowerAbilities?: readonly string[];
+  }[],
+  abilityId?: string,
+): number | null {
   return (
-    e.auras.find((aura) => aura.kind === 'next_cast_cheap' && matches(aura, abilityId))?.value ??
-    null
+    auras.find((aura) => aura.kind === 'next_cast_cheap' && matches(aura, abilityId))?.value ?? null
   );
+}
+
+export function nextCastCheapMultiplier(e: Entity, abilityId?: string): number | null {
+  if (
+    abilityId === 'dawns_embrace' &&
+    (e.castRadiantResonance === true ||
+      e.auras.some((aura) => aura.kind === RADIANT_RESONANCE_KIND))
+  ) {
+    return RADIANT_RESONANCE_DAWN_COST_MULTIPLIER;
+  }
+  return nextCastCheapMultiplierFromAuras(e.auras, abilityId);
 }
 
 export const BATTLE_TRANCE_ABILITIES: ReadonlySet<string> = new Set([
@@ -105,8 +139,22 @@ export function consumeFreeCostFor(ctx: SimContext, e: Entity, abilityId: string
   return REVENGE_FREE_ABILITIES.has(abilityId) && consumeAuraKind(ctx, e, 'revenge_free') !== null;
 }
 
+export function consumeNextCastInstantAura(
+  ctx: SimContext,
+  e: Entity,
+  abilityId?: string,
+): Aura | null {
+  const instant = consumeAuraKind(ctx, e, 'next_cast_instant', abilityId);
+  if (instant !== null) return instant;
+  // Radiant Resonance also makes Mending Light instant. It lives on this
+  // aura-returning variant, not on the boolean wrapper below, because the cast
+  // path calls THIS one (it needs the aura to spot a Stormcast charge).
+  if (abilityId === 'holy_light') return consumeAuraKind(ctx, e, RADIANT_RESONANCE_KIND, abilityId);
+  return null;
+}
+
 export function consumeNextCastInstant(ctx: SimContext, e: Entity, abilityId?: string): boolean {
-  return consumeAuraKind(ctx, e, 'next_cast_instant', abilityId) !== null;
+  return consumeNextCastInstantAura(ctx, e, abilityId) !== null;
 }
 
 export function hasScopedNextCastInstant(e: Entity, abilityId: string): boolean {
@@ -123,8 +171,36 @@ export function consumeNextCastCheap(
   e: Entity,
   abilityId?: string,
 ): number | null {
-  const aura = consumeAuraKind(ctx, e, 'next_cast_cheap', abilityId);
+  if (
+    abilityId === 'dawns_embrace' &&
+    (e.castRadiantResonance === true ||
+      e.auras.some((aura) => aura.kind === RADIANT_RESONANCE_KIND))
+  ) {
+    e.castRadiantResonance = undefined;
+    consumeAuraKind(ctx, e, RADIANT_RESONANCE_KIND, abilityId);
+    return RADIANT_RESONANCE_DAWN_COST_MULTIPLIER;
+  }
+  const aura = consumeNextCastCheapAura(ctx, e, abilityId);
   return aura?.value ?? null;
+}
+
+export function consumeRadiantResonanceForDawn(
+  ctx: SimContext,
+  e: Entity,
+  abilityId?: string,
+): boolean {
+  if (abilityId !== 'dawns_embrace') return false;
+  const reserved = e.castRadiantResonance === true;
+  e.castRadiantResonance = undefined;
+  return consumeAuraKind(ctx, e, RADIANT_RESONANCE_KIND, abilityId) !== null || reserved;
+}
+
+export function consumeNextCastCheapAura(
+  ctx: SimContext,
+  e: Entity,
+  abilityId?: string,
+): Aura | null {
+  return consumeAuraKind(ctx, e, 'next_cast_cheap', abilityId);
 }
 
 export function consumeNextAttackCrit(ctx: SimContext, e: Entity): boolean {

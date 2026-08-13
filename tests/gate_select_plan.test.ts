@@ -767,6 +767,7 @@ describe('discovery scope matches vitest collection over the real tree', () => {
     '.codex',
     '.agents',
     '.worktrees',
+    '.wt',
     '.venv',
     'tmp',
   ]);
@@ -792,6 +793,17 @@ describe('discovery scope matches vitest collection over the real tree', () => {
     // If this ever fails, either move the test under tests/ or extend the
     // discovery walk (and this guard) to the new location in the same change.
     expect(offenders).toEqual([]);
+  });
+
+  it('keeps OSS Brain linked worktree tests out of discovery', () => {
+    const rels = [
+      'tests/alive.test.ts',
+      '.wt/wt-pr2982/tests/stale.test.ts',
+      'nested/.wt/wt-pr2982/tests/stale.test.ts',
+      '.worktrees/wt-old/tests/stale.test.ts',
+    ];
+    const collected = rels.filter(isCollectedTestFile);
+    expect(collected).toEqual(['tests/alive.test.ts']);
   });
 
   it('finds no directory named browser under tests/ except the opt-in tests/browser', () => {

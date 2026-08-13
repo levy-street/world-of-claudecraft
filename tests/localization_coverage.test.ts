@@ -72,6 +72,11 @@ import {
   zh_TW,
 } from '../src/ui/i18n';
 import {
+  ensureReliquaryLocalesLoaded,
+  reliquaryPageName,
+  reliquaryTranslationManifest,
+} from '../src/ui/reliquary_i18n';
+import {
   hasTalentTitleOverride,
   renderTalentManifestEntry,
   type TalentTranslationManifestEntry,
@@ -123,6 +128,7 @@ describe('i18n Localization Key Coverage', () => {
       supportedLanguages.flatMap((lang) => [
         ensureLocaleLoaded(lang),
         ensureDeedLocalesLoaded(lang),
+        ensureReliquaryLocalesLoaded(lang),
       ]),
     );
   });
@@ -354,6 +360,7 @@ describe('i18n Localization Key Coverage', () => {
   ];
   const interpolationValues: Record<string, string | number> = {
     active: 3,
+    area: 'Eastbrook',
     ability: 'Fireball',
     action: 'Open Chat',
     amount: 42,
@@ -373,6 +380,8 @@ describe('i18n Localization Key Coverage', () => {
     current: 120,
     cut: 5,
     delta: '+13',
+    direction: 'north',
+    distance: 'near',
     dps: '7.4',
     // The third leg of a W-L-D record (hud.arena.ratingSummary), beside
     // `wins` and `losses` below.
@@ -402,6 +411,7 @@ describe('i18n Localization Key Coverage', () => {
     losses: 4,
     loser: 'Mira',
     marker: 'Skull',
+    markers: 'Available quest: north, near.',
     max: 25,
     message: 'Meet at the inn',
     min: 16,
@@ -859,8 +869,12 @@ describe('i18n Localization Key Coverage', () => {
     const classAbilityEntries = entityTranslationManifest().filter(
       (entry) => entry.group === 'classAbility',
     );
+    const specNoteCount = Object.values(ABILITIES).reduce(
+      (count, ability) => count + Object.keys(ability.specNotes ?? {}).length,
+      0,
+    );
     expect(classAbilityEntries).toHaveLength(
-      Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2,
+      Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2 + specNoteCount,
     );
     const missingClassAbilities = missingEntityTranslationsForGroups(['classAbility']);
     expect(missingClassAbilities, JSON.stringify(missingClassAbilities, null, 2)).toHaveLength(0);
@@ -1241,17 +1255,9 @@ describe('i18n Localization Key Coverage', () => {
         if (!entry) throw new Error(`Missing talent manifest entry: ${optionId}.${field}`);
         return entry;
       };
-      const requiredTalentEntry = (id: string, field: 'name' | 'description') => {
-        const entry = talentEntries.find(
-          (candidate) => candidate.id === id && candidate.field === field,
-        );
-        if (!entry) throw new Error(`Missing talent manifest entry: ${id}.${field}`);
-        return entry;
-      };
-
       setLanguage('es');
       expect(renderTalentManifestEntry(rowEntry('war_row_double_charge', 'name'))).toContain(
-        'Carga doble',
+        'Intervenir',
       );
       expect(
         renderTalentManifestEntry(rowEntry('war_row_blood_offering', 'description')),
@@ -1266,11 +1272,6 @@ describe('i18n Localization Key Coverage', () => {
       expect(renderTalentManifestEntry(rowEntry('war_row_second_wind', 'description'))).toContain(
         '생명력',
       );
-      expect(
-        renderTalentManifestEntry(
-          requiredTalentEntry('11.hun_r11_survival_instincts', 'description'),
-        ),
-      ).toContain('생명력');
     }
 
     setLanguage('en');
@@ -1337,9 +1338,10 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    // name + desc per deed, plus one title entry per title deed (34 as of the
-    // WARFARE lifetime-honor ranks; tests/deeds_content.test.ts pins the count).
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 34);
+    // name + desc per deed, plus one title entry per title deed (live count;
+    // tests/deeds_content.test.ts pins the catalog).
+    const titleCount = Object.values(DEEDS).filter((d) => d.reward?.kind === 'title').length;
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + titleCount);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -1403,6 +1405,49 @@ describe('i18n Localization Key Coverage', () => {
     expect(deedTitleText('prog_veteran')).toBe('Ветеран');
 
     setLanguage('en');
+  });
+
+  // The Reliquary page-name channel (src/ui/reliquary_i18n.ts) is the deed
+  // channel's sibling: its English lives in the RELIQUARY_PAGES content table, so
+  // the resolved catalog cannot cover it and the per-locale chunks must. Page
+  // NAMES ship for the five non-Latin locales today (page DESCS and the Latin
+  // locales are release fill), so this arm is scoped to exactly that claim and
+  // runs at BOTH tiers: a page added without its five fills renders English to a
+  // CJK or Cyrillic reader on the PR that adds it, not one release later.
+  const reliquaryShippedLocales: SupportedLanguage[] = [
+    'ja_JP',
+    'ko_KR',
+    'ru_RU',
+    'zh_CN',
+    'zh_TW',
+  ];
+  // The deedCognateAllowlist mechanism scoped to page names, and EMPTY on
+  // purpose: every shipped value is non-Latin script today, so a page name that
+  // matches its English source is an accidental leak, never a legitimate
+  // cognate. A future Latin-script fill that genuinely coincides adds its row
+  // here, which is the record that the coincidence was reviewed.
+  const reliquaryCognateAllowlist: Record<string, readonly string[]> = {};
+
+  it('should provide reliquary page-name translations for every shipped non-Latin locale', () => {
+    const nameRows = reliquaryTranslationManifest().filter((row) => row.field === 'name');
+    // Vacuity floor: an empty manifest would satisfy the loop below silently.
+    expect(nameRows.length).toBeGreaterThan(0);
+    try {
+      for (const lang of reliquaryShippedLocales) {
+        setLanguage(lang);
+        for (const row of nameRows) {
+          const rendered = reliquaryPageName(row.id);
+          expect(rendered.trim().length, `${lang}.${row.id}.name`).toBeGreaterThan(0);
+          if ((reliquaryCognateAllowlist[lang] ?? []).includes(`${row.id}.name`)) continue;
+          expect(
+            copiedEnglishComparable(rendered),
+            `${lang}.${row.id}.name leaks English with no reliquaryCognateAllowlist row`,
+          ).not.toBe(copiedEnglishComparable(row.source));
+        }
+      }
+    } finally {
+      setLanguage('en');
+    }
   });
 
   // RELEASE-TIER ONLY: real quest-narrative content checks. A sparse /

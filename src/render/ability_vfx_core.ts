@@ -62,6 +62,7 @@ export type AbilityVfxWindupStyle =
   | 'none'
   | 'stance'
   | 'vortex'
+  | 'compression'
   | 'weapon'
   | 'orb'
   | 'runes'
@@ -97,6 +98,9 @@ export interface AbilityVfxImpactSpec {
   blood?: boolean | number;
   liteAudio?: boolean;
   sample?: string;
+  // Keep a marquee hit visually concentrated around one victim rather than
+  // reading as an area attack. Painters may tighten sheets and wavefronts.
+  focused?: boolean;
 }
 
 export interface AbilityVfxBuffSpec {
@@ -143,6 +147,10 @@ export interface AbilityVfxFullSpec {
   archetype: AbilityVfxArchetype;
   palette: string;
   power?: number;
+  /** Frequent rotational fillers opt out of gallery-scale crescendo multipliers. */
+  filler?: boolean;
+  /** Authored resource streams that converge during windup/release, capped at three. */
+  chargeStreams?: number;
   windup?: number;
   windupStyle?: AbilityVfxWindupStyle;
   motifs?: AbilityVfxMotif[];
@@ -153,7 +161,18 @@ export interface AbilityVfxFullSpec {
   bolt?: {
     speed?: number;
     headScale?: number;
-    style?: 'rock' | 'shard' | 'comet' | 'arrow' | 'wisp';
+    style?:
+      | 'rock'
+      | 'shard'
+      | 'comet'
+      | 'arrow'
+      | 'wisp'
+      | 'felLance'
+      | 'shadowFang'
+      | 'essenceLance'
+      | 'soulLance';
+    core?: string;
+    accent?: string;
     coils?: boolean;
     jagged?: boolean;
     forkEvery?: number;
@@ -258,6 +277,12 @@ export function abilityHexColor(value: string): number {
 // The compact spec's main color.
 export function abilityVfxColor(spec: AbilityVfxSpec): number {
   return abilityHexColor(spec.c);
+}
+
+export function abilityVfxChargeStreams(spec: AbilityVfxFullSpec | undefined): number {
+  const streams = spec?.chargeStreams;
+  if (!Number.isFinite(streams)) return 1;
+  return Math.min(3, Math.max(1, Math.round(streams ?? 1)));
 }
 
 function clamp(value: number, min: number, max: number): number {

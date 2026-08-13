@@ -581,6 +581,7 @@ function mobileCallbacks() {
     onDailyRewards: noop,
     onMountToggle: noop,
     onDeeds: noop,
+    onReliquary: noop,
     onProfessions: noop,
     onNameplates: () => false,
     onMusic: () => true,

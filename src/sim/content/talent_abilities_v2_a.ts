@@ -1,114 +1,7 @@
 import type { AbilityDef } from '../types';
 
-/** Retained Talents V2 active grants: Paladin, Hunter, Rogue, Priest, and Shaman. */
+/** Retained Talents V2 active grants: Hunter, Rogue, Priest, and Shaman. */
 export const TALENT_ABILITIES_V2_A = {
-  cleansing_verdict: {
-    id: 'cleansing_verdict',
-    name: 'Cleansing Verdict',
-    class: 'paladin',
-    learnLevel: 8,
-    cost: 25,
-    castTime: 0,
-    cooldown: 8,
-    range: 30,
-    school: 'holy',
-    requiresTarget: true,
-    targetType: 'friendly',
-    effects: [
-      { type: 'dispel', count: 1 },
-      { type: 'heal', min: 40, max: 50 },
-    ],
-    description: 'Purges a harmful magic effect from a friendly target and heals them for $d Holy.',
-  },
-  holy_wrath: {
-    id: 'holy_wrath',
-    name: "Saint's Ire",
-    class: 'paladin',
-    learnLevel: 10,
-    cost: 85,
-    castTime: 0,
-    cooldown: 20,
-    range: 0,
-    school: 'holy',
-    requiresTarget: false,
-    effects: [{ type: 'aoeDamage', min: 54, max: 68, radius: 10 }],
-    description: 'Unleashes holy power, damaging nearby enemies for $d. (Paladin talent)',
-  },
-  divine_shield: {
-    id: 'divine_shield',
-    name: 'Lightward',
-    class: 'paladin',
-    learnLevel: 10,
-    cost: 35,
-    castTime: 0,
-    cooldown: 300,
-    range: 0,
-    school: 'holy',
-    requiresTarget: false,
-    effects: [{ type: 'absorb', amount: 900, duration: 8 }],
-    description: 'Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)',
-  },
-  avenging_wrath: {
-    id: 'avenging_wrath',
-    name: 'Wrathwing',
-    class: 'paladin',
-    learnLevel: 10,
-    cost: 60,
-    castTime: 0,
-    cooldown: 180,
-    range: 0,
-    school: 'holy',
-    requiresTarget: false,
-    effects: [
-      { type: 'selfBuff', kind: 'buff_ap', value: 60, duration: 20 },
-      { type: 'selfBuff', kind: 'buff_spellpower', value: 30, duration: 20 },
-    ],
-    description:
-      'Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)',
-  },
-  hammer_of_wrath: {
-    id: 'hammer_of_wrath',
-    name: 'Tolling Hammer',
-    class: 'paladin',
-    learnLevel: 10,
-    cost: 65,
-    castTime: 0,
-    cooldown: 6,
-    range: 30,
-    school: 'holy',
-    requiresTarget: true,
-    requiresTargetHpBelow: 0.2,
-    effects: [{ type: 'directDamage', min: 110, max: 136 }],
-    description:
-      'Hurls a holy hammer at a wounded enemy for $d Holy damage. Only usable below 20% health. (Paladin talent)',
-  },
-  aura_surge: {
-    id: 'aura_surge',
-    name: 'Dawnward Ricochet',
-    class: 'paladin',
-    learnLevel: 20,
-    cost: 55,
-    castTime: 0,
-    cooldown: 20,
-    range: 30,
-    school: 'holy',
-    requiresTarget: true,
-    effects: [
-      {
-        type: 'chainDamage',
-        min: 100,
-        max: 120,
-        jumps: 2,
-        falloff: 0.75,
-        radius: 10,
-        hitsPrimary: true,
-      },
-      { type: 'silence', duration: 2 },
-    ],
-    description:
-      'Hurl a dawnforged shield for $d Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)',
-  },
-
   startle_shot: {
     id: 'startle_shot',
     name: 'Startle Shot',
@@ -215,6 +108,7 @@ export const TALENT_ABILITIES_V2_A = {
 
   smoke_screen: {
     id: 'smoke_screen',
+    tooltipOmitEffectLines: true,
     name: 'Smoke Screen',
     class: 'rogue',
     learnLevel: 8,
@@ -226,6 +120,147 @@ export const TALENT_ABILITIES_V2_A = {
     school: 'physical',
     effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.3, duration: 8 }],
     description: 'Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec.',
+  },
+  flurry_of_knives: {
+    id: 'flurry_of_knives',
+    name: 'Flurry of Knives',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 45,
+    range: 0,
+    requiresTarget: false,
+    school: 'physical',
+    awardsCombo: 2,
+    // Classic never-crits AoE path (no canCrit): zero extra rng per cast.
+    effects: [{ type: 'aoeDamage', min: 48, max: 62, radius: 6 }],
+    description:
+      'Lash every enemy within 6 yd with thrown knives for $d Physical damage and gain 2 combo points. (Rogue talent)',
+  },
+  thieves_chorus: {
+    id: 'thieves_chorus',
+    name: "Thieves' Chorus",
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 25,
+    castTime: 0,
+    cooldown: 90,
+    range: 0,
+    requiresTarget: false,
+    school: 'physical',
+    // Shares the group haste-burst exhaustion (combat/haste_burst.ts) so it can
+    // never be chained with Storm Chorus or Temporal Acceleration.
+    effects: [
+      {
+        type: 'aoeAllyHaste',
+        mult: 1.1,
+        duration: 10,
+        radius: 30,
+        spell: true,
+        exhaust: true,
+        groupOnly: true,
+      },
+    ],
+    description:
+      'A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec. Allies recently affected by a group haste burst are too exhausted to benefit. (Rogue talent)',
+  },
+  venomrend: {
+    id: 'venomrend',
+    name: 'Venomrend',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 30,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    spendsCombo: true,
+    // The armed Venom Ritual: Dirt Nap transforms into this at 6 stages
+    // (actionReplacement on eviscerate); casting consumes the whole ritual.
+    // Six stages against a five-thrust combo cycle means the finisher
+    // alternates Dirt Nap, then Venomrend: the two-beat rhythm.
+    requiresAuraKind: 'venom_ritual',
+    requiresAuraStacks: 6,
+    // Owner playtest pass: the detonation is self-sustaining. It consumes
+    // every bleed (including the wound it opened last time), then reopens the
+    // wound itself, so the player never juggles Bleed Out upkeep against the
+    // ritual cadence. Consumes fire before the fresh dot applies. Sized for
+    // landing every OTHER full finisher (Dirt Nap covers the off-beat).
+    effects: [
+      { type: 'finisherDamage', base: 100, perCombo: 55, variance: 12 },
+      { type: 'consumeDot', dot: 'rupture' },
+      { type: 'consumeDot', dot: 'garrote' },
+      { type: 'consumeDot', dot: 'venomrend' },
+      { type: 'dot', total: 120, duration: 20, interval: 2 },
+      { type: 'gainResource', amount: 20 },
+    ],
+    description:
+      'Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)',
+  },
+  body_blow: {
+    id: 'body_blow',
+    name: 'Haymaker',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    awardsCombo: 2,
+    // The Redline builder: Wicked Slash transforms into this while the window
+    // runs (actionReplacement on sinister_strike). Each landing deepens the
+    // run by one pip (rogueEngineOnCast), feeding the Knockout cash-out.
+    effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 1.3, normalized: true }],
+    description:
+      'A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
+  },
+  knockout_blow: {
+    id: 'knockout_blow',
+    name: 'Lights Out',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 30,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    spendsCombo: true,
+    // The Redline cash-out: Dirt Nap transforms into this while the window
+    // runs. The pip multiplier and the run-ending consumption live in the
+    // engine module (knockoutRedlineMult at the finisherDamage case), so a
+    // window that expires first forfeits the Knockout entirely.
+    effects: [
+      { type: 'finisherDamage', base: 45, perCombo: 35, variance: 12 },
+      { type: 'gainResource', amount: 25 },
+    ],
+    description:
+      'Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)',
+  },
+  veilstrike: {
+    id: 'veilstrike',
+    tooltipOmitEffectLines: true,
+    name: 'Shadow Veil',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    // Never learned or castable: this def is the display card (icon, name,
+    // tooltip) for the veil aura the engine raises when a Duskveil opener
+    // detonates a full Gloam bank (rogueGloamDetonation). The owner cut the
+    // transformed stealth button: the openers themselves are the trigger,
+    // and the Veiled Edge is applied by the same engine hook.
+    effects: [{ type: 'selfBuff', kind: 'buff_dmg_done', value: 0.1, duration: 6 }],
+    description:
+      "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)",
   },
   preparation: {
     id: 'preparation',
@@ -244,6 +279,7 @@ export const TALENT_ABILITIES_V2_A = {
   },
   ghostly_strike: {
     id: 'ghostly_strike',
+    tooltipOmitEffectLines: true,
     name: 'Wraith Strike',
     class: 'rogue',
     learnLevel: 10,
@@ -259,7 +295,7 @@ export const TALENT_ABILITIES_V2_A = {
       { type: 'selfBuff', kind: 'buff_dodge', value: 0.15, duration: 7 },
     ],
     description:
-      'Strikes the enemy for weapon damage plus $d and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
+      'Strikes the enemy for weapon damage plus $d and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)',
   },
   cloak_of_shadows: {
     id: 'cloak_of_shadows',
@@ -318,8 +354,7 @@ export const TALENT_ABILITIES_V2_A = {
     school: 'shadow',
     requiresTarget: false,
     effects: [{ type: 'aoeFear', duration: 4, radius: 8 }],
-    description:
-      'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
+    description: 'Frighten enemies within 8 yards for up to 4 sec. Damage may break the effect.',
   },
   inner_focus: {
     id: 'inner_focus',
@@ -332,8 +367,11 @@ export const TALENT_ABILITIES_V2_A = {
     range: 0,
     school: 'holy',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'next_cast_free', value: 1, duration: 60 }],
-    description: 'Makes your next spell free. Lasts 60 sec. (Priest talent)',
+    effects: [
+      { type: 'selfBuff', kind: 'next_cast_free', value: 1, duration: 60 },
+      { type: 'selfBuff', kind: 'cast_shield', value: 1, duration: 60 },
+    ],
+    description: 'Makes your next Priest spell free and uninterruptible. Lasts 60 sec.',
   },
   desperate_prayer: {
     id: 'desperate_prayer',
@@ -346,13 +384,14 @@ export const TALENT_ABILITIES_V2_A = {
     range: 0,
     school: 'holy',
     requiresTarget: false,
-    effects: [{ type: 'heal', min: 150, max: 185 }],
-    description: 'Instantly heals you for $d. (Priest talent)',
+    effects: [{ type: 'selfHealPctMax', pct: 0.3 }],
+    description: 'Instantly heals you for 30% of maximum health.',
   },
   prayer_of_healing: {
     id: 'prayer_of_healing',
     name: 'Choirmend',
     class: 'priest',
+    specs: ['holy'],
     learnLevel: 10,
     cost: 130,
     castTime: 3,
@@ -369,7 +408,8 @@ export const TALENT_ABILITIES_V2_A = {
         effects: [{ type: 'aoeHeal', min: 145, max: 177, radius: 30 }],
       },
     ],
-    description: 'Heals nearby allies for $d. (Priest talent)',
+    description:
+      'Heal allies within 30 yards for $d. Healing increases with Spell Power. (Benison)',
   },
   mind_sear: {
     id: 'mind_sear',
@@ -386,7 +426,7 @@ export const TALENT_ABILITIES_V2_A = {
     targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 24, max: 28, radius: 8 }],
     description:
-      'Channels shadow energy at the target area, damaging nearby enemies each second for $d. (Priest talent)',
+      'Channel for 3 sec, dealing $d Shadow damage each second to enemies within 8 yards of the target area. Damage increases with Spell Power. (Priest talent)',
   },
 
   healing_stream: {
@@ -408,17 +448,27 @@ export const TALENT_ABILITIES_V2_A = {
     id: 'chain_lightning',
     name: 'Skybranch',
     class: 'shaman',
-    learnLevel: 10,
+    specs: ['elemental'],
+    learnLevel: 14,
     cost: 80,
     castTime: 2.5,
     cooldown: 6,
     range: 30,
     school: 'nature',
-    requiresTarget: false,
-    targetMode: 'position',
-    effects: [{ type: 'aoeDamage', min: 70, max: 86, radius: 8 }],
+    requiresTarget: true,
+    effects: [
+      {
+        type: 'chainDamage',
+        min: 52,
+        max: 60,
+        jumps: 2,
+        falloff: 1,
+        radius: 10,
+        hitsPrimary: true,
+      },
+    ],
     description:
-      'Hurls lightning at the target area, damaging nearby enemies for $d. (Shaman talent)',
+      'Strike up to 3 enemies within 10 yards for $d Nature damage each. Thundercall: a hit grants 1 Thunder. Damage increases with Spell Power.',
   },
   earthbind: {
     id: 'earthbind',
@@ -428,17 +478,50 @@ export const TALENT_ABILITIES_V2_A = {
     cost: 45,
     castTime: 0,
     cooldown: 30,
+    range: 30,
+    school: 'nature',
+    requiresTarget: false,
+    targetMode: 'position',
+    effects: [{ type: 'aoeRoot', duration: 2, radius: 4, min: 0, max: 0 }],
+    description:
+      'Roots enemies within 4 yd of the target point for 2 sec, then slows them by 40% for 6 sec. (Shaman talent)',
+  },
+  stoneward: {
+    id: 'stoneward',
+    name: 'Stoneward',
+    class: 'shaman',
+    learnLevel: 8,
+    cost: 40,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [],
+    description:
+      'Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)',
+  },
+  primal_exaltation: {
+    id: 'primal_exaltation',
+    name: 'Primal Exaltation',
+    class: 'shaman',
+    learnLevel: 17,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'aoeRoot', duration: 2, radius: 8, min: 0, max: 0 }],
-    description: 'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
+    effects: [],
+    description:
+      'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)',
   },
   bloodlust: {
     id: 'bloodlust',
     name: 'Storm Chorus',
     class: 'shaman',
-    learnLevel: 10,
+    learnLevel: 20,
     cost: 85,
     castTime: 0,
     cooldown: 300,
@@ -461,6 +544,6 @@ export const TALENT_ABILITIES_V2_A = {
       },
     ],
     description:
-      'Whips your group or raid into a frenzy, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Storm Chorus or Temporal Acceleration are too exhausted to benefit. (Shaman talent)',
+      'Increase the attack, casting, and channeling speed of group or raid allies within 30 yards by 30% for 15 sec. Affected allies cannot benefit from Storm Chorus or Temporal Acceleration again for 10 min. (Shaman talent)',
   },
 } satisfies Record<string, AbilityDef>;

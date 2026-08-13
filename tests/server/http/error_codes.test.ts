@@ -38,6 +38,8 @@ const EXPECTED_CODES = [
   'character.online',
   'character.rename_not_permitted',
   'character.rename_required',
+  'character.invalid_appearance',
+  'character.reroll_unavailable',
   'character.taken_over',
   'db.conflict',
   'discord.already_linked',

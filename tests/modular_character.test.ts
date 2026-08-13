@@ -2,7 +2,10 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { applyModularSliderMorphs } from '../src/render/characters/assets';
+import {
+  applyModularSliderMorphs,
+  PALADIN_SYNTHESIZED_CLIP_SOURCES,
+} from '../src/render/characters/assets';
 import {
   type ClipMap,
   modularVisualKey,
@@ -1199,6 +1202,15 @@ describe('per-class modular defs', () => {
     for (const p of [def.url, ...(def.animUrls ?? [])]) {
       const path = fileURLToPath(new URL(`../public/${p}`, import.meta.url));
       for (const n of glbClipNames(path)) names.add(n);
+    }
+    // The paladin's two prepare-time synthesized attack clips (Templar's
+    // Verdict, Bastion Sweep) never appear in a GLB scan: prepareVisual builds
+    // each from a source clip, for the modular key too, so a synthesized name
+    // resolves exactly when its source clip does.
+    if (cls === 'paladin') {
+      for (const [synthesized, source] of Object.entries(PALADIN_SYNTHESIZED_CLIP_SOURCES)) {
+        if (names.has(source)) names.add(synthesized);
+      }
     }
     const missing = referencedClips(def.clips).filter((c) => !names.has(c));
     expect(missing, `unresolvable clips for ${cls}`).toEqual([]);

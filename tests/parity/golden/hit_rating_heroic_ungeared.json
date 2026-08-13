@@ -14,7 +14,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "84e509fa",
+      "state": "8622146b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,6 +72,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -135,7 +139,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 965,
-      "state": "f457b389",
+      "state": "a7572b64",
       "events": "046562c0",
       "rng": {
         "draws": 3,
@@ -146,7 +150,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "1f83a3c3",
+      "state": "fd5f82be",
       "events": "cc147418",
       "rng": {
         "draws": 3,
@@ -157,7 +161,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 965,
-      "state": "4e1a4742",
+      "state": "09006d69",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -168,7 +172,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "db7dd40f",
+      "state": "d68fcf2a",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -179,7 +183,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 965,
-      "state": "ab6951ba",
+      "state": "aa348721",
       "events": "7d70158c",
       "rng": {
         "draws": 72,
@@ -190,7 +194,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "d74a6906",
+      "state": "e103c79d",
       "events": "741638a5",
       "rng": {
         "draws": 153,
@@ -201,7 +205,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 965,
-      "state": "4b2899dd",
+      "state": "eb5e5d08",
       "events": "741638a5",
       "rng": {
         "draws": 241,
@@ -212,7 +216,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 965,
-      "state": "ead29bc4",
+      "state": "d2f47b43",
       "events": "17f6bb90",
       "rng": {
         "draws": 329,
@@ -223,7 +227,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 965,
-      "state": "a4d6fca9",
+      "state": "50a335ec",
       "events": "2c1249d3",
       "rng": {
         "draws": 414,
@@ -234,7 +238,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 965,
-      "state": "d4d71594",
+      "state": "15154533",
       "events": "741638a5",
       "rng": {
         "draws": 509,
@@ -245,7 +249,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 965,
-      "state": "0a30f44d",
+      "state": "69b213a0",
       "events": "741638a5",
       "rng": {
         "draws": 609,
@@ -256,7 +260,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 965,
-      "state": "0a66c436",
+      "state": "51189e00",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -267,7 +271,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 965,
-      "state": "0a66c436",
+      "state": "51189e00",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -360,6 +364,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 55,
           "talents": {
             "rows": {}
@@ -397,7 +405,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1411,
+          "resource": 1427,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -495,7 +503,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 965,
-      "state": "0a66c436",
+      "state": "51189e00",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -588,6 +596,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 55,
           "talents": {
             "rows": {}
@@ -625,7 +637,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1411,
+          "resource": 1427,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,

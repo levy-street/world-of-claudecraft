@@ -73,6 +73,7 @@ function makeInput(userAgent?: string) {
   };
   const cb = {
     onTab: vi.fn(),
+    onTabPrev: vi.fn(),
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
     onPet: vi.fn(),
@@ -324,6 +325,26 @@ describe('Input pet bar chords', () => {
       // The chord carries Ctrl, so the browser accelerator default is cancelled.
       expect(preventDefault).toHaveBeenCalled();
     }
+  });
+
+  it('routes bare Tab forward and Shift+Tab backward through the target cycle', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+
+    windowListeners.get('keydown')!({ code: 'Tab', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onTab).toHaveBeenCalledTimes(1);
+    expect(cb.onTabPrev).not.toHaveBeenCalled();
+
+    // Edge actions match the FULL chord, so the shifted press is its own action
+    // and does not also fire the forward cycle.
+    windowListeners.get('keydown')!({
+      code: 'Tab',
+      shiftKey: true,
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+    expect(cb.onTabPrev).toHaveBeenCalledTimes(1);
+    expect(cb.onTab).toHaveBeenCalledTimes(1);
   });
 
   it('does not fire a pet action for a bare digit (that stays an action-bar slot)', () => {

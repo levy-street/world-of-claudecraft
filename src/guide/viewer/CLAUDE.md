@@ -7,12 +7,12 @@ pre-rendered stills and links to the gallery.
 
 ## Why standalone (not the renderer's preview)
 The renderer's `src/render/characters` pipeline (`CharacterVisual`, `CharacterPreview`)
-preloads the entire ~23 MB character/creature GLB set at module import, fine for the
-game, far too heavy for a docs page on mobile. So this viewer reuses ONLY the renderer's
-pure GLB loader (`src/render/assets/loader` `loadGltf`, which also resolves dev/prod asset
-URLs) and mirrors the small `assembleModel` logic (accessory allowlist, weapon attach,
-orientation fixups, tint) itself. Net result: opening one class page fetches one ~1.2 MB
-GLB, not the whole set.
+preloads the whole character/creature GLB set at module import, fine for the game, far
+too heavy for a docs page on mobile. So this viewer reuses ONLY the renderer's pure GLB
+loader (`src/render/assets/loader` `loadGltf`, which also resolves dev/prod asset URLs)
+and mirrors the small `assembleModel` logic (accessory allowlist, weapon attach,
+orientation fixups, tint) itself. Net result: opening one class page fetches a single
+small GLB, not the whole set.
 
 ## Data
 Model specs are baked by `scripts/wiki/build_content.mjs` from the renderer's `VisualDef`
@@ -40,8 +40,7 @@ only*.
 split above: pure math (like `framing.ts`) is its own Node-testable module in the lazy
 chunk; markup/wiring goes in `embed.ts`/`mount.ts`; pages import only the `index.ts`
 barrel. Tests live in `tests/guide_viewer_*.test.ts` (embed, mount, framing,
-skin_bounds); fix viewer bugs test-first there (a failing test that reproduces the bug,
-then the smallest green change).
+skin_bounds).
 
 ## Page contract
 - `render()`: emit `modelViewerEmbed({ modelKey, tint, name, poster, still, autoplay? })`. The

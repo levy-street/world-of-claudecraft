@@ -14,7 +14,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "84e509fa",
+      "state": "8622146b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,6 +72,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -135,8 +139,8 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 965,
-      "state": "3d6615ff",
-      "events": "10c1c556",
+      "state": "7037d347",
+      "events": "9cdc52f8",
       "rng": {
         "draws": 3,
         "digest": "80e78b7c"
@@ -146,7 +150,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "de393d75",
+      "state": "9f137d61",
       "events": "cc147418",
       "rng": {
         "draws": 3,
@@ -157,7 +161,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 965,
-      "state": "7ba03766",
+      "state": "9e2a21f6",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -168,7 +172,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "53358e9d",
+      "state": "d3ea2919",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -179,7 +183,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 965,
-      "state": "86b682b8",
+      "state": "8d747f44",
       "events": "ad3d74ad",
       "rng": {
         "draws": 72,
@@ -190,7 +194,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "4931dce4",
+      "state": "fd489208",
       "events": "741638a5",
       "rng": {
         "draws": 153,
@@ -201,7 +205,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 965,
-      "state": "512a2965",
+      "state": "830e52d1",
       "events": "741638a5",
       "rng": {
         "draws": 241,
@@ -212,7 +216,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 965,
-      "state": "174f5dd4",
+      "state": "70931ad4",
       "events": "17f6bb90",
       "rng": {
         "draws": 329,
@@ -223,7 +227,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 965,
-      "state": "46c7f0c5",
+      "state": "a596387d",
       "events": "14e00dba",
       "rng": {
         "draws": 414,
@@ -234,7 +238,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 965,
-      "state": "58858e86",
+      "state": "6e25177a",
       "events": "741638a5",
       "rng": {
         "draws": 509,
@@ -245,7 +249,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 965,
-      "state": "d4f95629",
+      "state": "8ee38469",
       "events": "741638a5",
       "rng": {
         "draws": 609,
@@ -256,7 +260,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 965,
-      "state": "3bf69390",
+      "state": "33fd1a90",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -267,7 +271,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 965,
-      "state": "3bf69390",
+      "state": "33fd1a90",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -377,6 +381,26 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "lunar_choir_leggings": 1,
+              "lunar_tide_greatstaff": 1,
+              "sash_of_the_sunken_court": 1,
+              "shadowpulse_handwraps": 1
+            },
+            "firstFind": {
+              "lunar_choir_leggings": {},
+              "lunar_tide_greatstaff": {},
+              "sash_of_the_sunken_court": {},
+              "shadowpulse_handwraps": {}
+            },
+            "recent": [
+              "shadowpulse_handwraps",
+              "sash_of_the_sunken_court",
+              "lunar_choir_leggings",
+              "lunar_tide_greatstaff"
+            ]
+          },
           "renown": 55,
           "talents": {
             "rows": {}
@@ -416,7 +440,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 2041,
+          "resource": 2063,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -514,7 +538,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 965,
-      "state": "3bf69390",
+      "state": "33fd1a90",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -624,6 +648,26 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "lunar_choir_leggings": 1,
+              "lunar_tide_greatstaff": 1,
+              "sash_of_the_sunken_court": 1,
+              "shadowpulse_handwraps": 1
+            },
+            "firstFind": {
+              "lunar_choir_leggings": {},
+              "lunar_tide_greatstaff": {},
+              "sash_of_the_sunken_court": {},
+              "shadowpulse_handwraps": {}
+            },
+            "recent": [
+              "shadowpulse_handwraps",
+              "sash_of_the_sunken_court",
+              "lunar_choir_leggings",
+              "lunar_tide_greatstaff"
+            ]
+          },
           "renown": 55,
           "talents": {
             "rows": {}
@@ -663,7 +707,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 2041,
+          "resource": 2063,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,

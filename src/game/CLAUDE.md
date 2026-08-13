@@ -12,15 +12,14 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
 |---|---|
 | `input.ts` | `Input`: keyboard/mouse to `readMoveInput()` (polled each frame) + edge actions via `InputCallbacks` (`onAbility`, `onUiKey`, `onTab`, `onClickPick`). Owns `camYaw/camPitch/camDist`, autorun, pointer-lock, rebind capture. |
 | `keybinds.ts` | `Keybinds` + `BIND_ACTIONS`: the classic remappable layout (pure, no DOM). |
-| `interactions.ts` | `handlePickedEntity`: routes a click-pick to target/loot/quest/enter-dungeon via injected `PickInteractionWorld`/`PickInteractionHud`; one of the two files here that call `IWorld` (the other is `autoloot.ts`). |
+| `interactions.ts` | `handlePickedEntity`: routes a click-pick to target/loot/quest/enter-dungeon via injected `PickInteractionWorld`/`PickInteractionHud` (one of the world-touching modules; see the first invariant below). |
 | `autoloot.ts` | `AutoLoot`: the walk-by loot pass; fires `IWorld.autoLoot(id)` for corpses the local player looks eligible for (best-effort only, the sim's `autoLootForParty` gate stays authoritative). Caller passes the clock in, so it unit-tests deterministically. |
 | `gamepad.ts` / `gamepad_map.ts` / `gamepad_bindings.ts` | pad support: thin polling consumer + pure deterministic mapping core + a separate remappable pad layout (deliberately NOT folded into `Keybinds`; different input space). Stick movement feeds `Input.setGamepadMove` (merged into `readMoveInput()`), camera via `applyGamepadLook`, edge buttons dispatch through the host's `onAction(id)` keybind path. Tests: `tests/gamepad.test.ts`, `tests/gamepad_map.test.ts`. |
-| `mobile_controls.ts` | `MobileControls`: touch joysticks to `input.setTouchMove`/`setTouchLook`. |
 | `touch_router.ts` | Pure, DOM-free touch ownership router: `getTouchOwner`/`isInteractiveHudElement`/`isCameraDragAllowedAt` + a per-pointer `TouchOwnerLedger`, consumed by `mobile_controls.ts` to keep move/combat/camera/menu touches from fighting over the same finger. |
-| `audio.ts` | `GameAudio` (`audio` singleton): compatibility facade mapping non-positional UI/event methods to typed sampled `sfx.playUi()` cues. |
+| `audio.ts` | `GameAudio` (`audio` singleton): the personal UI/event cue surface (facade contract in the music invariant below). |
 | `music.ts` / `music_tracks.ts` | `MusicDirector` (`music` singleton): streamed remastered zone/combat soundtrack (`public/audio/music/`, catalog + combat pick in `music_tracks.ts`); the note-data compositions and `MusicSynth` remain here for the music editor and offline render tooling. |
 | `sfx.ts` / `voice.ts` | `sfx` / `voice` singletons: play pre-rendered clips from `public/audio/` (spatial 3D SFX + NPC voice lines) via their `*_manifest.generated.ts`. |
-| `settings.ts` | `Settings`: persisted Esc-menu options. |
+| `entry_crash_guard.ts` / `entry_diagnostics.ts` / `startup_graphics_safety.ts` / `graphics_rebuild_*.ts` | the WebKit memory-kill recovery cluster: phone-class WebKit can KILL the process during the synchronous world-entry scene build (no error event, no unload), so `entry_crash_guard` stamps a probe right before the build and the next boot reads it to back the graphics preset off instead of reload-looping; `entry_diagnostics` keeps a small bounded checkpoint record that survives the kill; `startup_graphics_safety` is the pure clamp that refuses a persisted Ultra/Advanced preset on that engine class; the `graphics_rebuild_*` trio swaps the live renderer in place (coordinator with injected steps + rollback, pure core, and its own probe key so a kill during a DELIBERATE teardown is not misclassified as a failed entry). |
 | `click_move.ts` / `pointer_pick.ts` / `camera_follow.ts` | pure, DOM-free input/camera math extracted from the render loop so they unit-test in isolation |
 | `pointer_lock.ts` / `pointer_lock_edge.ts` | pure, DOM-free pointer-lock decisions for camera drags: `pointer_lock.ts` owns the wanted/release/per-engine rules, `pointer_lock_edge.ts` owns WHEN the lock is actually needed (only inside the viewport edge band, so ordinary looks never trigger the browser's own pointer-capture notice). `input.ts` is the thin consumer. |
 | `camera_driven_facing.ts` / `mouselook_release.ts` / `movement_visual.ts` / `keyboard_turn_facing.ts` / `self_alpha_lead.ts` | pure facing-and-feel math, an interlocking cluster (edit one knowing the others, or the facing-snap bug class returns): `camera_driven_facing` is the single source of truth for "is a camera driving facing this frame"; `mouselook_release` commits the final camera-yaw slice exactly once on the falling edge (the settle-back-snap fix); `movement_visual` is render-only diagonal facing, never gameplay facing; `keyboard_turn_facing` integrates local `TURN_SPEED` turns streamed as the authoritative wire facing (`main.ts` zeroes the turn flags while it owns the channel); `self_alpha_lead` is the echo-driven adaptive self render lead. |
@@ -31,9 +30,10 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
 
 ## Local invariants
 - **Never mutate sim state directly.** `input.ts` only records intent and fires
-  callbacks; only `interactions.ts` and `autoloot.ts` touch the world, and only
-  through the `IWorld`-shaped interfaces passed to them. Do not import
-  `Sim`/`ClientWorld` here.
+  callbacks. The world-touching modules (`interactions.ts`, `autoloot.ts`,
+  `gather_tool_use.ts`, `escort_interact.ts`, and any future sibling) act only
+  through injected `IWorld`-shaped interfaces (often a `Pick<IWorld, ...>`), never
+  by importing `Sim`/`ClientWorld`.
 - **`music.ts` streams the remastered soundtrack:** every zone and battle cue is
   a looping mp3 media element (`public/audio/music/`, catalog in
   `music_tracks.ts`) routed through one WebAudio graph and crossfaded by gain,
@@ -44,7 +44,11 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
   no decoding or bandwidth. The note-data compositions and `MusicSynth` voices
   stay in `music.ts` as the AUTHORING source: the music editor and
   `scripts/render_music.mjs` consume them, and the shipped mp3s are remastered
-  renders of exactly those themes. **`audio.ts` is
+  renders of exactly those themes. The mix-audibility decision (enabled, menu
+  pause, boss/sowfield ducking, volume) is the pure `music_mix_policy.ts`, and
+  which instance/battle music zone applies at a location is the pure
+  `instance_music.ts` (`instanceMusicDecision`); `music.ts` consumes both.
+  **`audio.ts` is
   a compatibility facade over `sfx.ts`:** every personal UI/event method resolves
   to a typed sampled `ui_*` cue; there is no remaining procedural WebAudio bed.
   `sfx.ts` and `voice.ts` play pre-rendered clips under `public/audio/`
@@ -68,12 +72,14 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
   One-shot caller rates and jitter multiply the authored rate; loops use the
   authored rate directly. `playbackRate` intentionally couples pitch and speed.
   These values never rewrite, conform, or resample the audio asset.
-- **Production SFX packs are strict whole-catalog overrides.** On startup,
-  `sfx.ts` may load `/audio/sfx/runtime-pack.json` before preloading audio. The
-  pack can override only ordered track URLs, gain, and playback rate for the
-  exact compiled key set and catalog hash. Invalid or unavailable packs fall
-  back as a whole to the generated manifest. One-shots cycle tracks only when a
-  source is accepted; loops pin a track until stopped.
+- **Production SFX packs are strict whole-catalog overrides.** Pack loading and
+  validation live in the sibling `sfx_runtime_pack.ts` (`loadRuntimeSfxPack`, pack
+  format `woc-sfx-runtime-pack`); `sfx.ts` is the thin consumer that may load
+  `/audio/sfx/runtime-pack.json` on startup before preloading audio. A pack can
+  override only ordered track URLs, gain, and playback rate for the exact compiled
+  key set and catalog hash. Invalid or unavailable packs fall back as a whole to
+  the generated manifest. One-shots cycle tracks only when a source is accepted;
+  loops pin a track until stopped.
 - **Each module owns its `localStorage` key:** keybinds `woc_keybinds` (namespaced
   per character: `woc_keybinds:char:<id>` online, `woc_keybinds:offline:<class>:<name>`
   offline, with the bare key kept as a read-only legacy seed for fresh characters),
@@ -113,8 +119,7 @@ A NEW behavior lands as its own pure, unit-tested sibling module with a
 `tests/<name>.test.ts` (the `gamepad_map`/`click_move`/`pointer_pick`/`perf_doctor`
 pattern), plus a thin DOM/side-effect consumer if it needs one (`gamepad.ts` over
 `gamepad_map.ts` is the current reference split); never grow `input.ts` or
-`main.ts`. Bug fix: reproduce with a failing test first (extract the buried logic
-into a pure module if needed), then the smallest change that turns it green.
+`main.ts`.
 
 - **A new keybind/action:** add one entry to `BIND_ACTIONS` in `keybinds.ts`
   (`kind: 'held'` for movement polled in `readMoveInput`, else `'edge'`). For an
@@ -135,6 +140,11 @@ into a pure module if needed), then the smallest change that turns it green.
   pipeline know it, render and remaster it to `public/audio/music/<zone>.mp3`,
   map it in `ZONE_STREAM_URLS` (music_tracks.ts, pinned by
   `tests/music_tracks.test.ts`), and drive it from `music.update(zone, inCombat)`.
+  Know the overrides layer: `buildMusicThemes(withOverrides = true)` merges
+  `MUSIC_OVERRIDES` from `music_overrides.generated.ts` over the composed themes
+  for the editor, tests, and render tool alike. That file is generated by the
+  music editor itself (`npm run dev`, open `/music_editor.html`, edit, Save),
+  never hand-edited; the shipped game still streams the remastered renders.
 
 ## Never
 - Never read `localStorage`/`window`/`AudioContext` from a constructor without a

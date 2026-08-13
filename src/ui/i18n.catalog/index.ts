@@ -169,6 +169,10 @@ export const en = {
         label: 'Equip fresh-20 kit',
         description: 'Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only.',
       },
+      biskit: {
+        label: 'Equip BIS-20 kit',
+        description: 'Wear the best-in-slot epic set for a spec across every slot. Gear only.',
+      },
       gold: { label: 'Add gold', description: 'Add gold to the current purse.' },
       quest: { label: 'Complete quest', description: 'Complete a specific quest by id.' },
       quests: {
@@ -559,7 +563,9 @@ export const en = {
     browSoft: 'Soft',
     browThick: 'Thick',
     browAngled: 'Angled',
-    earrings: 'Earrings',
+    // "Piercings", not "Earrings": the set includes a nose ring, and the
+    // fantasy sets carry face piercings too (see the note below).
+    earrings: 'Piercings',
     jewelMaterial: 'Jewellery Material',
     jewelDefault: 'As Forged',
     jewelGold: 'Gold',
@@ -1671,6 +1677,10 @@ export const en = {
       ...mergeEntities.en.mobs,
       ...mergeExtra.en.mobs,
       water_elemental: { name: 'Water Elemental' },
+      graveguard: { name: 'Graveguard' },
+      necromancy_skeletal_warrior: { name: 'Skeletal Warrior' },
+      necromancy_bone_mage: { name: 'Bone Mage' },
+      necromancy_gravewing: { name: 'Gravewing' },
     },
     npcs: { ...worldNames.en.entities.npcs, ...mergeExtra.en.npcs },
     quests: {

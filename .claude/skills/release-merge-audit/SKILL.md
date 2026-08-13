@@ -100,18 +100,16 @@ added (Step 4), bindings re-checked (Step 5), premises corrected (Step 6), each 
 Apply the fixes in the same change with a parity/regression test per divergence, then run the
 targeted suites plus `npx tsc --noEmit` (or `npm run gate` if the merge was large).
 
-One i18n merge-mechanics note: the aggregate baseline (`src/ui/i18n.resolved.sha256`) and the
-status summary (`src/ui/i18n.status.summary.json`) are no longer committed (removed by the
-2026-07-14 degit change), so a merge where both sides changed catalog keys only needs
-`npm run i18n:gen` to reconcile the committed line-item slices. The historical stale-baseline
-trap (taking either side of the aggregate left a hash neither parent had, needing a manual
-re-baseline) applies only when auditing merges on branches that predate that change.
+Two recurring traps to check in the same pass:
 
-A second recurring trap (reddened the gate on a later v0.23.0 merge into the bank-system
-branch): a release-authored test that drives GameServer mocks `../server/db` with the export
-list as of the RELEASE tree, so a db function the BRANCH added to game.join/leave or the
-autosave loop throws "No X export is defined on the mock" only on the merged tree. Neither parent can carry
-the fix, targeted suites miss it, and only the full gate catches it. After any merge that
-brings new `vi.mock('../server/db')` sites, diff each new mock's keys against what
-`server/game.ts` imports from db on the branch, and mirror the branch's canonical mock shape
-(for the character-lease surface: `tests/character_lease_game.test.ts`).
+- **i18n merge mechanics.** The aggregate baseline and status summary are no longer
+  committed, so a merge where both sides changed catalog keys only needs `npm run i18n:gen`
+  to reconcile the committed line-item slices. Never re-baseline by hand; that historical
+  trap applies only to branches predating the baseline's removal.
+- **Stale db-mock export lists.** A release-authored test that drives GameServer can mock
+  `../server/db` with the RELEASE tree's export list, so a db function the BRANCH added
+  throws "No X export is defined on the mock" only on the merged tree; neither parent
+  carries the fix and only the full gate catches it. After any merge bringing new
+  `vi.mock('../server/db')` sites, diff each mock's keys against what `server/game.ts`
+  imports on the branch and mirror the branch's canonical mock shape (template:
+  `tests/character_lease_game.test.ts`).

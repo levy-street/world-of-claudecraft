@@ -8,39 +8,37 @@ Tests import `src/sim/` and `server/` modules **directly** and exercise them
 tests. Browser/E2E + screenshot tests live in `scripts/*.mjs` (need `npm run
 dev`/`server`), NOT here.
 
-## Where a new test lands (module-first, test-first)
+## Where a new test lands
 A NEW module (sim system, pure-core view, painter, RouteDef) gets its OWN paired
 `tests/<module>.test.ts` (RouteDef suites under `tests/server/`); never append its
-cases to `sim.test.ts` or another existing big suite. Bug fixes are test-first: a
-failing repro test first (extract the buried unit into its own module if needed),
-then the smallest change that turns it green (`extract-and-test` skill).
+cases to `sim.test.ts` or another existing big suite. REUSE the `tests/server/helpers/`
+fakes via their `index.ts` barrel instead of hand-rolling mocks. The module-first and
+test-first bug-fix workflow itself is root CLAUDE.md's (plus the `extract-and-test` skill).
 
 ## Map
 Most tests sit flat here: `<area>.test.ts` pairs with the module under test; `ls tests/`
 to find an area. Cross-boundary pairs worth knowing: `social_system.test.ts` to
 `server/social.ts`, `snapshots.test.ts`/`bandwidth.test.ts` to `server/game.ts`.
-Subdirectories (plus one shared fixture):
+Subdirectories and shared fixtures:
 - `parity/`: the golden-trace sim-drift gate; own `CLAUDE.md` (see Coverage & guards).
 - `server/`: the RouteDef/http-pipeline suite. REUSE the shared fakes in
   `tests/server/helpers/` (`fake_ctx`, `fake_db`, `fake_http`, ... via the `index.ts`
   barrel) instead of hand-rolling mocks; scaffold a new endpoint with
   `npm run new:endpoint` (see `server/http/CLAUDE.md`).
-- `admin/`: the Svelte admin components, per-file jsdom (DOM rule below; the
-  `tests/admin/_setup.ts` header documents the convention).
+- `admin/`: the Svelte admin components, per-file DOM env, happy-dom by default (DOM rule
+  below; the `tests/admin/_setup.ts` header documents the convention).
 - `browser/`: OPT-IN real-browser Playwright suite (`*.browser.test.ts`,
   `npm run test:browser`) for WebKit/Safari CSS, axe, target-size; never a bare `vitest run`.
 - `progression/`: mirrors `src/sim/progression/` (unit tests for the extracted modules).
-- `helpers/` + `util/`: shared cross-suite utilities (`bare_client.ts`, the shared
-  `bareClient()`/`fakeWs()`/`lastSnap()`/`joinServer()`/`broadcast()` family, see
-  "Server tests" below; `fake_dom.ts`, the reusable hand-rolled fake DOM for controller
-  suites, `i18n_determinism.ts`, `ts_files_under.ts`
-  and `css_tree_under.ts`, the two source walks, `scan_guard_self_audit.ts`, the pin that
-  keeps a guard from re-growing its own directory read, `method_call_sites.ts`, the
-  `ts.createSourceFile` walk that reports the calls a class method evaluates, each with the
-  `if` chain guarding each, `test_block_calls.ts`, the `ts.createSourceFile` walk that reports
-  every `describe`/`it`/`test`/`suite` call in a source tagged with the block enclosing it,
-  `driver_callback_bodies.ts`, the `ts.createSourceFile` walk that resolves a repeating
-  driver's callback and every same-module body one of its ticks can reach, `alloc_probe.ts`).
+- `helpers/` + `util/`: shared cross-suite utilities; each helper's own header explains it,
+  so no inventory here. The policy-bearing ones: the shared walkers (`ts_files_under.ts`
+  for `.ts` trees, `css_tree_under.ts` for the `src/styles` sheets, `source_files_under.ts`
+  the single home of the `SOURCE_EXTENSIONS` policy) plus `scan_guard_self_audit.ts` (see
+  Coverage & guards), `bare_client.ts` (see Server tests), and `fake_dom.ts` (see the DOM
+  rule under Running & adding).
+- `fixtures/` + `server/fixtures/`: shared data fixtures (`parse_golden.ndjson`,
+  `terrain_height_parity.v1.f64le.gz`, `v025_warrior_character.json`, and the server
+  request/response corpora); consumed by the matching suites, referenced by path.
 - `global_setup.ts`: runs on every vitest invocation (`vite.config.ts` `test.globalSetup`);
   mints the SFX Studio temp root (`WOC_SFX_STUDIO_TEST_ROOT`).
 
@@ -53,7 +51,7 @@ copy the pattern from `sim.test.ts`:
 const makeSim = (cls='warrior', seed=42) => new Sim({ seed, playerClass: cls, autoEquip: true });
 // teleport: set pos.{x,z}, then pos.y = terrainHeight(x,z, sim.cfg.seed), then prevPos = {...pos}
 // face a target: sim.player.facing = Math.atan2(t.pos.x-p.pos.x, t.pos.z-p.pos.z)
-for (let i = 0; i < 20 * 120 && !done; i++) sim.tick();  // 20 = ticks/sec (DT=1/20); `20*N` = N seconds
+for (let i = 0; i < 20 * 120 && !done; i++) sim.tick();  // `20*N` ticks = N seconds
 const ev = sim.tick();  // tick() RETURNS SimEvent[]; assert on e.type ('death','playerDeath','error',...)
 ```
 
@@ -74,13 +72,17 @@ a manual sweep across suites. Import it rather than hand-rolling `Object.create(
 again, unless the suite genuinely needs a narrower or differently-shaped fixture (a few do, each
 marked with a one-line "kept bespoke on purpose" comment, issue #2088).
 `server/social.ts` etc. take injected interfaces: implement an in-memory `FakeDb`/
-transport (see `social_system.test.ts`) rather than mocking. REST/RouteDef endpoints
+transport (see `social_system.test.ts`) rather than mocking. RouteDef endpoint suites
 use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
 
 ## Coverage & guards
 - **A guard that scans a directory of sources walks it with a shared walker, never its own
   `readdirSync`:** `helpers/ts_files_under.ts` for `.ts`, `helpers/css_tree_under.ts` for
-  the `src/styles` sheets. A single-level read is a defect, not a style choice: the
+  the `src/styles` sheets, and `helpers/source_files_under.ts` for a wider source corpus
+  (it is the single home of the `SOURCE_EXTENSIONS` policy: the JS/TS module family plus
+  `.glsl`/`.frag`/`.vert`, listed BEFORE any standalone shader file exists so the first one
+  added is scanned rather than silently ignored; a sibling of `ts_files_under` by ruling,
+  not a knob on it). A single-level read is a defect, not a style choice: the
   day the scanned root grows a subdirectory, everything inside leaves the scan and the
   guard stays green over a quietly smaller surface (#2485, then #2489 three times over,
   then #2502 four more). Apart from `src/ui`, every scan root is flat today, so no
@@ -103,8 +105,8 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   is written at the read, and a subdirectory fails loudly rather than narrowing the scan
   (#2499, #2502).
 - `tests/parity/` is the golden-trace gate: ANY sim behavior change turns it red by
-  design. Read `tests/parity/CLAUDE.md` first; regenerate only deliberately via
-  `UPDATE_PARITY=1 npx vitest run tests/parity`, in its own reviewed commit.
+  design. Read `tests/parity/CLAUDE.md` first; it owns the `UPDATE_PARITY=1`
+  regeneration discipline.
 - `architecture.test.ts` is the `src/sim` purity backstop: scans every sim file, fails on a
   render/ui/game/net/three import, a DOM global, or `Math.random`/`Date.now`/`performance.now`;
   run it after any `src/sim/` change. It ALSO completeness-checks the UI/render pure cores: a NEW
@@ -116,6 +118,11 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   painter-side helper, which then may only mint its own canvas and must stay deterministic and
   colorless) or in `UI_DOM_MODULES` (it owns browser state), and anything unregistered must touch
   no browser global at all.
+- `monolith_budget.test.ts` is the line-count RATCHET for the named coordinator/monolith
+  files (root CLAUDE.md, Modularity): each row pins a per-file ceiling and its extraction
+  seam; growth past the ceiling fails, a real extraction LOWERS the ceiling in the same
+  change, and the failure message points at the `extract-and-test` skill. It reads sizes
+  off disk (no source imports), so the selective gate classifies it blind and always runs it.
 - **Never register the same block twice.** `duplicate_test_blocks.test.ts` walks every `.ts`
   under `tests/` and fails on any `describe`/`it`/`test`/`suite` call whose source text repeats
   an earlier SIBLING's byte for byte. Vitest runs duplicate titles silently, so nothing else
@@ -172,10 +179,9 @@ yourself or the S3 guard throws "status.json is missing".
   the `localizeServerText`/`localizeSimText` matchers (plus `simDICT`/`serverDICT`/`adminDICT`
   completeness + placeholder parity per locale). Add or change a sim/server player string and update
   the matcher in the SAME change or this fails.
-- **Two tiers via `I18N_RELEASE_TIER`** (also read by `localization_coverage`, `i18n_status_registry`,
-  `i18n_t_behavior`, `deed_i18n`): unset = PR tier (registration/key-existence only, English-only
-  legal); `=1` = release tier (hard-fails on any `pending` locale row + full-localization checks).
-  The tier runs as its OWN job / gate step over exactly those suites (`release-i18n` in
+- **`I18N_RELEASE_TIER` mechanics** (tier POLICY is root CLAUDE.md's; the flag is read by
+  `localization_coverage`, `i18n_status_registry`, `i18n_t_behavior`, `deed_i18n`):
+  the release tier runs as its OWN job / gate step over exactly those suites (`release-i18n` in
   `.github/workflows/ci.yml`, `vitest (release-tier i18n)` locally), never over the whole suite:
   a release branch is red for un-filled locales through most of a cycle, and fusing that with
   the test signal let a real regression hide inside expected noise (#2820). Adding a suite that
@@ -194,9 +200,11 @@ yourself or the S3 guard throws "status.json is missing".
   **hand-rolled fake DOM** modeling only the contract under test (reuse
   `tests/helpers/fake_dom.ts` before hand-rolling a new one; `focus_manager.test.ts`,
   `painter_host.test.ts`); prefer these for pure cores and painters. A HUD controller/window
-  suite that needs a real DOM tree opts in with a per-file `// @vitest-environment jsdom`
-  docblock (`fiesta_controller.test.ts`; the Svelte admin suite in `tests/admin/` additionally
-  imports `./_setup`); jsdom stays scoped per-file so the Node-env majority keeps the fast
-  default.
-  Enumerate the live jsdom set with `grep -rl '@vitest-environment jsdom' tests/`.
+  suite that needs a real DOM tree opts in with a per-file docblock, and the default DOM env
+  is **happy-dom**: `// @vitest-environment happy-dom` (`fiesta_controller.test.ts`; the
+  Svelte admin suite in `tests/admin/` additionally imports `./_setup`). `jsdom` is the
+  scoped exception, kept only where happy-dom's fidelity falls short (e.g. a CSS-selector
+  gap; the exception list rationale is in `docs/local-gate-perf/experiment-log.md`, Phase 5).
+  DOM envs stay per-file so the Node-env majority keeps the fast default.
+  Enumerate the live DOM-env set with `grep -rl '@vitest-environment' tests/`.
 - Add/update a test here when you change sim or server behavior (see root CLAUDE.md).

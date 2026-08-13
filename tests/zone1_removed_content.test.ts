@@ -61,10 +61,11 @@ describe('removed Eastbrook Vale quest content', () => {
     }
   });
 
-  it('moves Mogger Must Fall directly after the former trail prerequisite', () => {
+  it('keeps Mogger Must Fall after the trail and the Paladin Tome detour', () => {
     expect(QUESTS.q_mogger).toBeTruthy();
     expect(QUESTS.q_mogger.requiresQuest).toBe('q_gravecallers_trail');
-    expect(QUEST_ORDER[QUEST_ORDER.indexOf('q_gravecallers_trail') + 1]).toBe('q_mogger');
+    expect(QUEST_ORDER[QUEST_ORDER.indexOf('q_gravecallers_trail') + 1]).toBe('q_divine_tome');
+    expect(QUEST_ORDER[QUEST_ORDER.indexOf('q_divine_tome') + 1]).toBe('q_mogger');
   });
 
   it('scrubs removed quests and objective items while preserving reward items', () => {

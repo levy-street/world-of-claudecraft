@@ -24,6 +24,7 @@ import { CRAFT_RING, GATHERING_PROFESSIONS } from '../src/sim/content/profession
 import { PROFICIENCY_BAND_THRESHOLDS } from '../src/sim/professions/proficiency_bands';
 import { DISPLAY_HEAL_BAND } from '../src/sim/professions/proficiency_display_heal';
 import { type CharacterState, Sim } from '../src/sim/sim';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type Blob = Record<string, unknown>;
 
@@ -34,7 +35,7 @@ function clone<T>(v: T): T {
 // Load a blob into a fresh deterministic world and serialize it straight back
 // (no ticks, so nothing but the load path itself can move a field).
 function roundTrip(state: CharacterState, seed: number, playerClass = 'warrior'): Blob {
-  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
   // biome-ignore lint/suspicious/noExplicitAny: rehearsal rows may carry any class
   const pid = sim.addPlayer(playerClass as any, 'Rehearsal', { state: clone(state) });
   const blob = sim.serializeCharacter(pid);
@@ -227,7 +228,7 @@ function rehearse(state: CharacterState, seed: number, playerClass = 'warrior'):
 // five documented variants.
 
 function buildModernBlob(): CharacterState {
-  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
   const pid = sim.addPlayer('warrior', 'Corpus');
   // biome-ignore lint/suspicious/noExplicitAny: corpus construction reaches meta
   const meta = (sim as any).players.get(pid);

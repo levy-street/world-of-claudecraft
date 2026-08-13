@@ -73,6 +73,14 @@ The coverage shards (`coverage_a..c.test.ts`) assert each scenario's subsystem a
 FIRES (not merely named in a comment). Read those files, never a hand-written list,
 before adding a scenario.
 
+The exemplar for closing a documented gap with a driving scenario:
+`professions_fishing_session` runs the fishing lifecycle through the REAL entry
+points (`startFishing` cast start with its bite-delay draw, the tick-path bite,
+the reel re-press whose `completeFishing` spends the one table draw, then a fresh
+post-completion cast). It exists because the phase-10 reel-arm hoist above the
+in-combat and swim denials was a guard reorder the old cancel-only coverage
+(scenarios hand-assigning `castingAbility`) could not see.
+
 Layout note: the gate is SHARDED for wall-time (`parity_a..g.test.ts` +
 `coverage_a..c.test.ts`, contiguous scenario slices over the shared runner in
 `run_scenarios.ts`); `npx vitest run tests/parity` and `UPDATE_PARITY=1` work
@@ -104,20 +112,16 @@ confirmed each):
   else that must pin an unresolved roll needs the same trick. Extracting one of these should add a scenario that drives it (the
   precedents: `market_round_trip`, `bank_round_trip`, `dungeon_instances`) or sample
   the collection directly.
-- **Profession SESSIONS: two are driven, the rest are not.** `professions_fishing_session`
-  drives a real cast, bite and reel through `startFishing`/`completeFishing`, and
-  `farming_session` drives real plants and harvests through `plantCrop`/`harvestCrop`
-  (its growth window writes `readyAtMs` down rather than ticking 45 minutes, the
-  draw-free `/dev farmgrow` equivalence). Both pin their own draws. What is still
-  NOT driven is every other reference: the two casting-lifecycle scenarios hand-assign
-  `castingAbility = FISHING_CAST_ID` to exercise the `cancelCast` arm only, and no
-  scenario drives a profession's DENY arms. Those denials are draw-free by contract,
-  which is exactly why nothing here would notice one starting to draw, so a change to a
-  gate order still needs its own suite. The per-profession live coverage is
-  `tests/professions_fishing.test.ts` (literal catch sequences off a fixed seed),
-  `tests/professions_farming.test.ts` (the lifecycle plus the draw-count pins), and
-  `tests/professions_deeds_playthrough.test.ts` (hunted indices across one shared
-  stream); this gate pins the sessions, not the surface around them.
+- **The farming SESSION is driven; profession DENY arms are not.** `farming_session`
+  drives real plants and harvests through `plantCrop`/`harvestCrop` (its growth
+  window writes `readyAtMs` down rather than ticking 45 minutes, the draw-free
+  `/dev farmgrow` equivalence) and pins its own draws, the exact sibling of the
+  `professions_fishing_session` exemplar described above. What is still NOT
+  driven is a profession's DENY arms: those denials are draw-free by contract,
+  which is exactly why nothing here would notice one starting to draw, so a
+  change to a gate order still needs its own suite. Farming's live coverage is
+  `tests/professions_farming.test.ts` (the lifecycle plus the draw-count pins);
+  this gate pins the session, not the surface around it.
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim
   ctor, so ctor draws are not in the draw digest; ambient camp mobs are spawned but
   never tracked. A same-draw-count reorder of ctor spawns that changes only
@@ -147,3 +151,14 @@ One scenario ballooning past a few hundred KB means you are tracking too many en
 A red trace means behavior changed. **Fix the extraction, never the harness.** Do
 not widen `round6`, delete sampled fields, or regenerate goldens to "make it pass."
 Regenerate only via `UPDATE_PARITY=1` as a deliberate, separate, reviewed commit.
+
+One sanctioned exception, for pure renames: display names (and sanctioned coined
+ids) flow into the state and event digests, so a rename legitimately moves those
+hashes while every rng fingerprint and frame shape stays byte-identical.
+`rename_state_proof.test.ts` (env-gated on `RENAME_PROOF=1`; baseline golden set
+read from the `RENAME_PROOF_BASE` git ref, default `HEAD`) machine-proves that
+ONLY the renamed tokens moved: it re-records each scenario, reverse-maps every
+string leaf new-to-old, re-digests, and requires the result to equal the baseline
+goldens frame by frame, so any behavioral drift cannot survive the reverse map.
+It is the ONLY sanctioned path for accepting state-hash-only golden deltas
+(`ip-refactor/golden_token_inspector.mjs --allow-state-hashes`).

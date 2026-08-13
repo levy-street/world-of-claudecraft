@@ -314,6 +314,7 @@ describe('side rail height budget', () => {
       '#quest-tracker \\.qt-header',
       '#quest-tracker \\.qt-title',
       '#deed-tracker \\.dt-header',
+      '#reliquary-tracker \\.dt-header',
       '#delve-tracker \\.dt-affix-row',
     ]) {
       const rule = new RegExp(`${selector} \\{([^}]*)\\}`).exec(hudCss)?.[1] ?? '';

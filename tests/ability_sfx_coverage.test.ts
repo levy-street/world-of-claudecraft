@@ -72,6 +72,33 @@ describe('release: the launch whoosh belongs to the recorded proj_ pack', () => 
       'shadow',
     ]);
   });
+
+  it('is recorded for the five caster-buff shouts, ahead of the projectile-school check', () => {
+    // Iron Bellow/battle_shout, Direhowl/demoralizing_shout, Emboldening
+    // Roar/emboldening_roar, Defiant Bellow/defiant_bellow, Valor
+    // Roar/rallying_cry: one shout recording covers the whole cast, launch
+    // included, so their procedural release whoosh must stay silent too.
+    for (const abilityId of [
+      'battle_shout',
+      'demoralizing_shout',
+      'emboldening_roar',
+      'defiant_bellow',
+      'rallying_cry',
+    ]) {
+      expect(
+        isAbilityMomentRecorded('release', { school: 'physical', archetype: 'shout', abilityId }),
+      ).toBe(true);
+    }
+    // An ordinary shout ability with no dedicated recording keeps the
+    // procedural release (school 'physical' is never in RECORDED_PROJECTILE_SCHOOLS).
+    expect(
+      isAbilityMomentRecorded('release', {
+        school: 'physical',
+        archetype: 'shout',
+        abilityId: 'charge',
+      }),
+    ).toBe(false);
+  });
 });
 
 describe('impact: the landing belongs to the recorded impact_ pack', () => {
@@ -118,6 +145,20 @@ describe('impact: the landing belongs to the recorded impact_ pack', () => {
         abilityId: 'polymorph',
       }),
     ).toBe(false);
+  });
+
+  it('is recorded for the five caster-buff shouts regardless of archetype passed', () => {
+    for (const abilityId of [
+      'battle_shout',
+      'demoralizing_shout',
+      'emboldening_roar',
+      'defiant_bellow',
+      'rallying_cry',
+    ]) {
+      expect(
+        isAbilityMomentRecorded('impact', { school: 'physical', archetype: 'shout', abilityId }),
+      ).toBe(true);
+    }
   });
 
   it('is recorded for the plain cc override (hammer_of_justice, entangling_roots, blind, cheap_shot, kidney_shot, sap)', () => {

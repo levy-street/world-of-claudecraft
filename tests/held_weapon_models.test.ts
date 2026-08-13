@@ -64,6 +64,7 @@ describe('held weapon models', () => {
       'heroic_bonewrought_greatsword',
       'heroic_deathless_heartwood',
       'heroic_direfang_greatblade',
+      'heroic_duskwhisper',
       'heroic_fang_of_korzul',
       'heroic_fanglords_beastspear',
       'heroic_gravewyrm_thornmaul',
@@ -297,6 +298,11 @@ describe('held weapon models', () => {
     const TYPES = [
       'sword',
       'dagger',
+      // dagger-family model names that carry a VAR_DAGGER grip without the
+      // literal 'dagger' token (the base dagger grip is 'Knife'): fangs and
+      // knives (ice_fang, whittler_s_knife, obsidian_fang, ...).
+      'fang',
+      'knife',
       'staff',
       'hammer',
       'axe',

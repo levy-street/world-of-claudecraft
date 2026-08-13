@@ -1,0 +1,124 @@
+name: CI stall auto-rerun
+
+# Reruns a completed CI run's failed jobs ONCE when the run died of the
+# runner-side checkout-stall class (a setup step dead at zero throughput
+# until the job bound killed it, or a checkout the git low-speed abort
+# failed early). This is docs/merge-queue.md's own triage rule ("a rerun,
+# not a code investigation") as automation for attempt 1; the decision
+# predicate lives in scripts/lib/ci_stall_rerun.mjs and is pinned with the
+# real incident fixtures by tests/ci_stall_rerun.test.ts.
+#
+# PERMISSIONS: every other workflow in this repository declares
+# contents: read at the workflow level (nightly.yml's report job carries
+# the one job-scoped issues: write). This one departs, and each scope is
+# load-bearing:
+#   - actions: write is the rerun-failed-jobs call, the workflow's whole
+#     point. Proven against cancelled jobs live: the 2026-08-10 rerun of
+#     run 31398462129 (that day's second stall incident, distinct from the
+#     triple-kill run 31392590628 in the ci.yml notes) restarted two
+#     bound-killed (cancelled) shards through this exact endpoint.
+#   - checks: read fetches the killed job's annotations; the runner's
+#     "exceeded the maximum execution time" annotation is what separates a
+#     bound kill from a user or concurrency cancellation (a superseded PR
+#     run cancelled mid-checkout is step-for-step identical and must never
+#     be resurrected).
+#   - contents: read checks out the decision scripts pinned to the DEFAULT
+#     branch. A workflow_run workflow executes with write-capable
+#     permissions, so it must never check out or run the triggering run's
+#     PR-authored code; the triggering run's tree is only READ, via the
+#     API, as data.
+# No repository secrets are used, only the ephemeral github.token.
+#
+# Safety properties. The first two are re-verified inside the decision
+# core, so for them the job-level if below is only a cheap gate that keeps
+# green runs and rerun attempts from spinning a runner; the merge_group
+# exclusion is enforced by that if ALONE (the core never sees the
+# triggering event), which is sound while workflow_run is this file's only
+# trigger:
+#   - only attempt 1 ever reruns, so the rerun's own completion event can
+#     never rerun again; a second stall of the same job is the merge-queue
+#     doc's "real slowdown, investigate" case and stays with a human.
+#   - a rerun is only requested when nothing else that ran had failed (the
+#     dead step is the one allowed failure) and nothing after the dead
+#     setup step ran (in particular no test step), so a rerun can never
+#     mask a real failure. A late setup step (a cache restore after the
+#     freshness checks) can die with earlier PASSED work steps behind it;
+#     that reruns green work, never a red.
+#   - merge_group runs are excluded: a rejected PR is already out of the
+#     queue and its gh-readonly-queue ref is deleted when the group
+#     dissolves, so a rerun cannot re-queue anything; queue rejections
+#     keep the manual triage in docs/merge-queue.md.
+#   - a rerun may target a head SHA the author has since pushed past;
+#     checks attach per SHA, so that wastes at most one matrix and is
+#     accepted rather than guarded.
+#
+# workflow_run only fires for a workflow file present on the DEFAULT
+# branch: this file is inert while it only exists on a release branch and
+# arms at the next release-to-main merge (same rollout choreography as the
+# merge-queue's required checks).
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  actions: write
+  checks: read
+  contents: read
+
+# Duplicate webhook deliveries are at-least-once: without a group, two
+# reactors for the same run can race each other into a 403 on the rerun
+# POST and a spurious red reactor run. Keyed per triggering run so distinct
+# runs never queue behind each other; cancel stays off because the loser
+# of the race must still run its own no-op decision (the driver re-reads
+# the live run and refuses once the attempt moved on).
+concurrency:
+  group: ci-stall-rerun-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+# The reactor's own checkout gets the same dead-transfer floor ci.yml
+# carries; it would be silly for the stall net to hang on the stall class.
+env:
+  GIT_HTTP_LOW_SPEED_LIMIT: '1000'
+  GIT_HTTP_LOW_SPEED_TIME: '120'
+
+jobs:
+  rerun:
+    name: Rerun stalled CI jobs once
+    if: >-
+      github.event.workflow_run.run_attempt == 1 &&
+      github.event.workflow_run.event != 'merge_group' &&
+      (github.event.workflow_run.conclusion == 'cancelled' ||
+      github.event.workflow_run.conclusion == 'failure')
+    # Three small API reads, one POST, no dependency install: minutes of
+    # margin over a healthy run without ever holding a runner long.
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out decision scripts
+        uses: actions/checkout@v6
+        with:
+          # Pinned to the default branch explicitly: never the triggering
+          # run's head, which would execute PR-authored code with this
+          # workflow's write permissions. Blobless + sparse (the
+          # nightly.yml script-checkout shape): this job needs the scripts
+          # subtree, not the repository's full media payload.
+          ref: ${{ github.event.repository.default_branch }}
+          filter: blob:none
+          sparse-checkout: scripts
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+
+      # The run id rides an env var, never a run-line interpolation, the
+      # same hardened relay shape as ci.yml's selection inputs.
+      - name: Decide and rerun once
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: node scripts/ci_stall_rerun.mjs

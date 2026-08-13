@@ -13,15 +13,15 @@ import {
   type AbilityVfxPlan,
   type AbilityVfxSpec,
   abilityHexColor,
+  abilityVfxChargeStreams,
   abilityVfxColor,
   localCasterTier,
   planCast,
   planImpact,
   wornCcBand,
 } from '../ability_vfx_core';
-import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
-import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
+import { abilityVfxFullSpec, abilityVfxSpec } from '../ability_vfx_registry';
 import { isVisuallyDead } from '../anim_state';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
@@ -292,7 +292,7 @@ const HOSTILE_AURA_SUFFIXES = new Set(['_slow', '_root']);
 const auraSpecIdMemo = new Map<string, string | null>();
 const auraHostileWornMemo = new Set<string>();
 function auraSpecId(auraId: string): string | null {
-  if (ABILITY_VFX_SPECS[auraId] !== undefined) return auraId;
+  if (abilityVfxSpec(auraId) !== undefined) return auraId;
   let base = auraSpecIdMemo.get(auraId);
   if (base === undefined) {
     base = null;
@@ -300,7 +300,7 @@ function auraSpecId(auraId: string): string | null {
     for (const s of AURA_ID_SUFFIXES) {
       if (auraId.endsWith(s)) {
         const stripped = auraId.slice(0, -s.length);
-        if (ABILITY_VFX_SPECS[stripped] !== undefined) {
+        if (abilityVfxSpec(stripped) !== undefined) {
           base = stripped;
           hostile = HOSTILE_AURA_SUFFIXES.has(s);
         }
@@ -360,6 +360,13 @@ const PULSE_BURST_BY_PALETTE: Record<string, ParticleBurstKind> = {
   shadow: 'smoke',
   venom: 'smoke',
 };
+
+// The pet signature abilities whose creature rigs author an attackByAbility
+// clip (manifest: mob_emberkin, mob_gloomshade). Only these carry the ability
+// id through the mob throw fallback. Pinned against the sim pet roster and
+// the manifest by tests/pet_signature_attack_ids.test.ts, so a new pet rig
+// authoring a signature clip cannot silently miss this list.
+export const PET_SIGNATURE_ATTACK_IDS = new Set(['emberkin_felbolt', 'gloomshade_abyssal_chain']);
 
 export class AbilityVfx {
   private quality = 1;
@@ -492,9 +499,9 @@ export class AbilityVfx {
   // its generic school-colored arm), false to fall through unchanged.
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
     if (!ev.ability || !CAST_FX.has(ev.fx)) return false;
-    const spec = ABILITY_VFX_SPECS[ev.ability];
+    const spec = abilityVfxSpec(ev.ability);
     if (!spec) return false;
-    const full = ABILITY_VFX_FULL_SPECS[ev.ability];
+    const full = abilityVfxFullSpec(ev.ability);
     // Beam-archetype channels (mind rays, drains) never fly a projectile:
     // every tick's cast-fx event feeds the channel tracker, which draws the
     // crescendoing cord and lands the full impact stack once, on the last tick.
@@ -593,7 +600,7 @@ export class AbilityVfx {
           }
         }
         if (!plan.whirl && ev.attackAnimation !== 'ranged-shot') {
-          this.mobThrowFallback(ev.sourceId);
+          this.mobThrowFallback(ev.sourceId, ev.ability);
           this.playerGestureRelease(ev.sourceId, ev.ability);
         }
         break;
@@ -608,7 +615,7 @@ export class AbilityVfx {
             fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         }
         if (!plan.whirl) {
-          this.mobThrowFallback(ev.sourceId);
+          this.mobThrowFallback(ev.sourceId, ev.ability);
           this.playerGestureRelease(ev.sourceId, ev.ability);
         }
         break;
@@ -621,7 +628,7 @@ export class AbilityVfx {
           fx.beamRibbon(ev.sourceId, ev.targetId, plan.color);
           this.spawned++;
         }
-        if (!plan.whirl) this.mobThrowFallback(ev.sourceId);
+        if (!plan.whirl) this.mobThrowFallback(ev.sourceId, ev.ability);
         break;
       case 'windup':
         // The generic windup arm's whole job is the throw animation: keep it.
@@ -798,7 +805,7 @@ export class AbilityVfx {
         color: planCast(spec, this.quality, tier).color,
       };
       this.beamChannels.set(ev.sourceId, ch);
-      this.mobThrowFallback(ev.sourceId);
+      this.mobThrowFallback(ev.sourceId, ev.ability);
     }
     ch.lastAt = nowSec;
     ch.targetId = ev.targetId;
@@ -869,7 +876,7 @@ export class AbilityVfx {
   handleSpellfxAt(ev: AbilityVfxSpellfxAtEvent): boolean {
     if (!ev.ability) return false;
     if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
-    const spec = ABILITY_VFX_SPECS[ev.ability];
+    const spec = abilityVfxSpec(ev.ability);
     if (!spec) return false;
     const casterId = ev.sourceId ?? -1;
     const fx = this.deps.fx;
@@ -895,7 +902,7 @@ export class AbilityVfx {
       this.recordStat(ev.ability, true);
       return true;
     }
-    const full = ABILITY_VFX_FULL_SPECS[ev.ability];
+    const full = abilityVfxFullSpec(ev.ability);
     // recurring emits of the same aimed nova replay only the cheap re-hit
     const seqKey = `${casterId}:${ev.ability}`;
     const lastSeq = this.pointSeqAt.get(seqKey);
@@ -1050,9 +1057,9 @@ export class AbilityVfx {
       return;
     }
     const abilityId = attackAbilityId(ev.ability);
-    const spec = abilityId ? ABILITY_VFX_SPECS[abilityId] : undefined;
+    const spec = abilityId ? abilityVfxSpec(abilityId) : undefined;
     if (!spec || !abilityId) return;
-    const full = ABILITY_VFX_FULL_SPECS[abilityId];
+    const full = abilityVfxFullSpec(abilityId);
     const arch = full?.archetype ?? spec.a ?? 'strike';
     const isCastMoment = !!full && (arch === 'strike' || arch === 'dash' || arch === 'buff');
     // Local-player crit hitstop + screen pop (gallery critHit feel): body and
@@ -1121,7 +1128,7 @@ export class AbilityVfx {
     if (!ev.gained) return;
     const abilityId = ev.ability ?? abilityIdGuess;
     if (!abilityId) return;
-    const spec = ABILITY_VFX_SPECS[abilityId];
+    const spec = abilityVfxSpec(abilityId);
     if (!spec) return;
     this.deps.vfx.buffSwirl(ev.targetId, planCast(spec, this.quality, 0).swirlColor);
   }
@@ -1130,7 +1137,7 @@ export class AbilityVfx {
   // undefined to keep the generic school color. Cached parse, zero allocation:
   // safe to call every frame from the renderer's entity sync.
   sparkleColorFor(abilityId: string | null | undefined): number | undefined {
-    const spec = abilityId ? ABILITY_VFX_SPECS[abilityId] : undefined;
+    const spec = abilityId ? abilityVfxSpec(abilityId) : undefined;
     return spec ? abilityVfxColor(spec) : undefined;
   }
 
@@ -1173,11 +1180,11 @@ export class AbilityVfx {
     let glowStrength = 0;
     let glowSlow = false;
     if (e.castingAbility) {
-      const spec = ABILITY_VFX_SPECS[e.castingAbility];
+      const spec = abilityVfxSpec(e.castingAbility);
       if (spec) {
         const progress =
           e.castTotal > 0 ? Math.min(1, Math.max(0, 1 - e.castRemaining / e.castTotal)) : 0;
-        const full = ABILITY_VFX_FULL_SPECS[e.castingAbility];
+        const full = abilityVfxFullSpec(e.castingAbility);
         const style = full?.windupStyle ?? 'orb';
         glowColor = rimColorOf(full, spec);
         glowStrength = 1.2 * (full?.power ?? 1);
@@ -1189,6 +1196,8 @@ export class AbilityVfx {
           progress,
           style,
           this.deps.localPlayerId?.() === e.id,
+          abilityVfxChargeStreams(full),
+          rimColorOf(full, spec),
         );
         if (windupStarted && !castingWasHeld) {
           this.spawned = 1;
@@ -1233,11 +1242,11 @@ export class AbilityVfx {
         auraId = FEAR_BREAK_SPEC_ID;
         hostileWorn = true;
       }
-      const spec = ABILITY_VFX_SPECS[auraId];
+      const spec = abilityVfxSpec(auraId);
       if (spec === undefined) continue;
       // maintenance passives (stances, spellbook traits): no read at all
       if (isPassiveAura(auraId)) continue;
-      const full = ABILITY_VFX_FULL_SPECS[auraId];
+      const full = abilityVfxFullSpec(auraId);
       const wornDebuff = hostileWorn && full?.debuff !== undefined;
       // Long-worn buffs are SILENT while held (the long-buff policy,
       // ability_vfx_longbuff_core.ts): no orbit band, ground disc, shell, or
@@ -1383,8 +1392,8 @@ export class AbilityVfx {
     // shows the armed strike's color while queued and reverts on release. No
     // gain swirl: arming a level-1 filler is a tell, not a ceremony.
     if (e.queuedOnSwing && bands < 3) {
-      const qspec = ABILITY_VFX_SPECS[e.queuedOnSwing];
-      const qfull = ABILITY_VFX_FULL_SPECS[e.queuedOnSwing];
+      const qspec = abilityVfxSpec(e.queuedOnSwing);
+      const qfull = abilityVfxFullSpec(e.queuedOnSwing);
       const qstyle = qspec ? asOrbitStyle(qfull?.buff?.orbit ?? qspec.bo) : null;
       if (qspec !== undefined && qstyle !== null) {
         if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
@@ -1412,8 +1421,8 @@ export class AbilityVfx {
   }
 
   // Advances the primitive engine (ribbons, rings, decals, orbit/windup draw).
-  update(dt: number): void {
-    this.deps.fx.update(dt);
+  update(dt: number, reducedMotion = false): void {
+    this.deps.fx.update(dt, reducedMotion);
     for (const [entityId, held] of this.heldSemantic) {
       if (held.frameSeen !== this.semanticFrame) this.heldSemantic.delete(entityId);
     }
@@ -1468,12 +1477,22 @@ export class AbilityVfx {
   // hurling an instant bolt/ray with NO cast state has nothing else animating
   // the throw, so play its attack one-shot at launch. Claiming an event must
   // not lose that read.
-  private mobThrowFallback(sourceId: number): void {
+  // In THIS fallback a plain mob's throw stays ID-LESS: the base #2961
+  // invariant pins that the ability-carrying triggerAttack read on the throw
+  // paths is the player gesture tell. The ONE exception here is the pet
+  // signature set above, whose creature rigs author an attackByAbility clip
+  // the id routes to. (The 'windup' arm is a different, deliberate channel:
+  // it forwards the id for every caster because boss mechanic clips ride
+  // attackByAbility off windup cues, e.g. the broodlord's Cleave/Stun.)
+  private mobThrowFallback(sourceId: number, abilityId?: string): void {
     const d = this.deps;
     if (!d.isMob?.(sourceId)) return;
     if (d.castingAbilityOf?.(sourceId)) return;
     if (d.isMidOneShot?.(sourceId)) return;
-    d.triggerAttack(sourceId);
+    d.triggerAttack(
+      sourceId,
+      abilityId !== undefined && PET_SIGNATURE_ATTACK_IDS.has(abilityId) ? abilityId : undefined,
+    );
   }
 
   // Player projectile/lightning/nova release had no rig read at all: only

@@ -37,6 +37,7 @@ import {
   dist2d,
   type Entity,
   INTERACT_RANGE,
+  type PlayerClass,
   type QuestDef,
   type QuestProgress,
   type QuestState,
@@ -66,6 +67,7 @@ export function computeQuestState(
   // ctx.tickCount, the online client from the server-computed cprof mirror), so
   // this shared decision point never reasons about tick domains itself.
   withinCadence?: ReadonlySet<string>,
+  playerClass?: PlayerClass,
 ): QuestState {
   const qp = questLog.get(questId);
   if (qp) return qp.state === 'ready' ? 'ready' : 'active';
@@ -75,6 +77,10 @@ export function computeQuestState(
   if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
   if (quest.minLevel && playerLevel < quest.minLevel) return 'unavailable';
   if (quest.retired) return 'unavailable';
+  // Class-locked quest (the paladin-only Divine Tome chain): invisible to any
+  // other class. A missing class fails closed so a class-less caller never opens it.
+  if (quest.requiredClass && (!playerClass || !quest.requiredClass.includes(playerClass)))
+    return 'unavailable';
   if (
     quest.completionEffect &&
     professionState &&
@@ -122,6 +128,7 @@ export function questState(ctx: SimContext, questId: string, pid?: number): Ques
     r.e.level,
     r.meta.archetype,
     withinCadence,
+    r.meta.cls,
   );
 }
 
@@ -446,6 +453,11 @@ export function turnInQuestCore(
   if (quest.repeatCadenceTicks && quest.repeatCadenceTicks > 0) {
     armCadence(meta.questCadence, questId, ctx.tickCount, quest.repeatCadenceTicks);
   }
+  // A quest that unlocks a quest-gated ability (recall_the_fallen <-
+  // q_rite_of_redemption) must surface it now: rebuild the known list (which reads
+  // the just-updated questsDone) and announce the newly learned ability. The diff
+  // in refreshKnownAbilities means an ordinary turn-in announces nothing.
+  ctx.refreshKnownAbilities(meta, true);
   ctx.emit({ type: 'questDone', questId, pid: meta.entityId });
   ctx.emit({
     type: 'log',

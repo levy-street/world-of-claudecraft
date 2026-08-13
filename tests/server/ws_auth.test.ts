@@ -12,6 +12,7 @@ import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WebSocket, WebSocketServer } from 'ws';
 import type { AccountModerationStatus, CharacterRow } from '../../server/db';
+import { GeneralChatRateLimitLiveState } from '../../server/general_chat_quota';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
@@ -75,6 +76,7 @@ function baseChar(over: Partial<CharacterRow> = {}): CharacterRow {
 function setup() {
   const ws = new FakeWs();
   const session = { pid: 1, tag: 'fake-session' };
+  const generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
   const game = {
     isIpBlocked: vi.fn((_ip: string) => false),
     countIpSessions: vi.fn((_ip: string) => 0),
@@ -85,6 +87,9 @@ function setup() {
     handleMessage: vi.fn(),
     leave: vi.fn(async () => {}),
     socketClosed: vi.fn(() => true),
+    beginGeneralChatRateLimitHydration: vi.fn((accountId: number) =>
+      generalChatRateLimitLiveState.beginHydration(accountId),
+    ),
   };
   const deps: WsAuthDeps = {
     game: game as unknown as WsAuthDeps['game'],
@@ -129,7 +134,7 @@ function setup() {
     maxPlayersPerRealm: 0,
   };
   const req = {} as http.IncomingMessage;
-  return { ws, game, session, deps, req };
+  return { ws, game, session, deps, req, generalChatRateLimitLiveState };
 }
 
 function joinedMeta(game: ReturnType<typeof setup>['game']): Record<string, unknown> {
@@ -239,13 +244,13 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it('2c. rejects an auth-world-4 client on the auth-world-5 server before all admission work', async () => {
+  it('2c. rejects an auth-world-5 client on the auth-world-6 server before all admission work', async () => {
     const fixture = setup();
     const { ws, deps, req } = fixture;
 
     await createWsAuth(deps).authenticateWebSocket(
       asWs(ws),
-      JSON.stringify({ t: 'auth-world-4', token: 'tok', character: 7 }),
+      JSON.stringify({ t: 'auth-world-5', token: 'tok', character: 7 }),
       req,
     );
 
@@ -256,7 +261,7 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it.each(['auth-world', 'auth-world-6', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
+  it.each(['auth-world', 'auth-world-7', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
     '2d. rejects the non-current world auth discriminator %s before all admission work',
     async (authType) => {
       const fixture = setup();
@@ -453,15 +458,15 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
 });
 
 describe('createWsAuth: timer-wire capability negotiation', () => {
-  it('passes only the exact optional v2 capability into the recipient session meta', async () => {
+  it('passes only the exact optional v3 capability into the recipient session meta', async () => {
     const capable = setup();
     await createWsAuth(capable.deps).authenticateWebSocket(
       asWs(capable.ws),
-      authRaw({ timerWire: 2 }),
+      authRaw({ timerWire: 3 }),
       capable.req,
     );
     expect(capable.game.join).toHaveBeenCalledTimes(1);
-    expect(joinedMeta(capable.game)).toMatchObject({ timerWireVersion: 2 });
+    expect(joinedMeta(capable.game)).toMatchObject({ timerWireVersion: 3 });
 
     const legacy = setup();
     await createWsAuth(legacy.deps).authenticateWebSocket(asWs(legacy.ws), authRaw(), legacy.req);
@@ -477,7 +482,7 @@ describe('createWsAuth: timer-wire capability negotiation', () => {
     expect(unknown.game.join).toHaveBeenCalledTimes(1);
     expect(joinedMeta(unknown.game)).toMatchObject({ timerWireVersion: 1 });
 
-    for (const coercible of ['2', true, { valueOf: () => 2 }]) {
+    for (const coercible of ['3', true, { valueOf: () => 3 }]) {
       const strict = setup();
       await createWsAuth(strict.deps).authenticateWebSocket(
         asWs(strict.ws),
@@ -492,11 +497,43 @@ describe('createWsAuth: timer-wire capability negotiation', () => {
     resume.game.hasSessionForCharacter.mockReturnValue(true);
     await createWsAuth(resume.deps).authenticateWebSocket(
       asWs(resume.ws),
-      authRaw({ timerWire: 2 }),
+      authRaw({ timerWire: 3 }),
       resume.req,
     );
     expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
-    expect(joinedMeta(resume.game)).toMatchObject({ timerWireVersion: 2 });
+    expect(joinedMeta(resume.game)).toMatchObject({ timerWireVersion: 3 });
+  });
+});
+
+describe('createWsAuth: Warlock pet-special capability negotiation', () => {
+  it('accepts only the exact optional v1 capability and otherwise fails closed', async () => {
+    const capable = setup();
+    await createWsAuth(capable.deps).authenticateWebSocket(
+      asWs(capable.ws),
+      authRaw({ petSpecialWire: 1 }),
+      capable.req,
+    );
+    expect(joinedMeta(capable.game)).toMatchObject({ petSpecialWireVersion: 1 });
+
+    for (const advertised of [undefined, 2, '1', true]) {
+      const legacy = setup();
+      await createWsAuth(legacy.deps).authenticateWebSocket(
+        asWs(legacy.ws),
+        authRaw(advertised === undefined ? {} : { petSpecialWire: advertised }),
+        legacy.req,
+      );
+      expect(joinedMeta(legacy.game)).toMatchObject({ petSpecialWireVersion: 0 });
+    }
+
+    const resume = setup();
+    resume.game.hasSessionForCharacter.mockReturnValue(true);
+    await createWsAuth(resume.deps).authenticateWebSocket(
+      asWs(resume.ws),
+      authRaw({ petSpecialWire: 1 }),
+      resume.req,
+    );
+    expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
+    expect(joinedMeta(resume.game)).toMatchObject({ petSpecialWireVersion: 1 });
   });
 });
 
@@ -811,6 +848,7 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
         mutedUntil: null,
         reason: '',
         chatStrikes: 0,
+        generalChatRateLimit: null,
         accountCosmetics: {
           completedQuestIds: [],
           mechChromaIds: [],
@@ -938,6 +976,69 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
     );
   });
 
+  it('passes the General quota loaded by the existing moderation auth query into join', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.moderationStatusForAccount = vi.fn(async () =>
+      modStatus({ generalChatRateLimit: { messages: 7, windowMinutes: 15 } }),
+    );
+    await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(deps.moderationStatusForAccount).toHaveBeenCalledTimes(1);
+    expect(game.join).toHaveBeenCalledWith(
+      ws,
+      1,
+      7,
+      'Aldric',
+      'warrior',
+      null,
+      false,
+      expect.objectContaining({
+        generalChatRateLimit: { messages: 7, windowMinutes: 15 },
+      }),
+    );
+  });
+
+  it.each([
+    {
+      label: 'set',
+      hydrated: null,
+      committed: { messages: 3, windowMinutes: 8 },
+    },
+    {
+      label: 'clear',
+      hydrated: { messages: 7, windowMinutes: 15 },
+      committed: null,
+    },
+  ])(
+    'uses a committed $label notification that arrives during auth hydration',
+    async ({ hydrated, committed }) => {
+      const current = setup();
+      let resolveCharacter!: (character: CharacterRow | null) => void;
+      current.deps.moderationStatusForAccount = vi.fn(async () =>
+        modStatus({ generalChatRateLimit: hydrated }),
+      );
+      current.deps.getCharacter = vi.fn(
+        () =>
+          new Promise<CharacterRow | null>((resolve) => {
+            resolveCharacter = resolve;
+          }),
+      );
+      const authenticating = createWsAuth(current.deps).authenticateWebSocket(
+        asWs(current.ws),
+        authRaw(),
+        current.req,
+      );
+      await vi.waitFor(() =>
+        expect(current.deps.moderationStatusForAccount).toHaveBeenCalledOnce(),
+      );
+
+      current.generalChatRateLimitLiveState.policyChanged(1, committed);
+      resolveCharacter(baseChar());
+      await authenticating;
+
+      expect(joinedMeta(current.game).generalChatRateLimit).toEqual(committed);
+    },
+  );
+
   it('falls back to the chat-level mute when the account has no mute', async () => {
     const { ws, game, deps, req } = setup();
     deps.chatMuteStatusForAccount = vi.fn(async () => ({
@@ -997,6 +1098,80 @@ describe('createWsAuth: bank bonus stamp', () => {
     expect(deps.bankBonusForAccount).not.toHaveBeenCalled();
     const joinMeta = (game.join as any).mock.calls[0][7] as { bankBonus?: unknown };
     expect(joinMeta.bankBonus).toBeUndefined();
+  });
+});
+
+describe('createWsAuth: authored look on the join meta', () => {
+  // The `appearance` column is JSONB the server re-broadcasts to every player in
+  // view, so it is bounded on the way IN (the redesign route) and re-validated
+  // on the way OUT here, the same belt-and-braces the hotbar layout gets. A row
+  // can predate the current rules, or come from an older build, a migration, or
+  // a direct database edit, and the read path is the last gate before the wire.
+
+  it('re-validates the stored look on the way to the world', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.getCharacter = vi.fn(
+      async () =>
+        baseChar({
+          // a row that today's bounds would never have written: unknown keys, an
+          // attacker-chosen slider name, and free text where a style id goes
+          appearance: {
+            gender: 'female',
+            hair: 'BUY GOLD AT EXAMPLE COM',
+            evil: '<script>alert(1)</script>',
+            face: { jaw: 0.5, 'ATTACKER TEXT': 1 },
+          },
+        }) as CharacterRow | null,
+    );
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(joinedMeta(game).appearance).toEqual({ gender: 'female', face: { jaw: 0.5 } });
+  });
+
+  it('passes a clean look through untouched', async () => {
+    const look = { gender: 'male', hair: 'mohawk', skinLight: 0.42, lashes: false };
+    const { ws, game, deps, req } = setup();
+    deps.getCharacter = vi.fn(async () => baseChar({ appearance: look }) as CharacterRow | null);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(joinedMeta(game).appearance).toEqual(look);
+  });
+
+  it('sends null for a character with no look, never undefined', async () => {
+    // `undefined` means "absent" on the resume arm (keep what the session has),
+    // so a look-less character must be an explicit null rather than a hole.
+    const { ws, game, deps, req } = setup();
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    const meta = joinedMeta(game);
+    expect('appearance' in meta).toBe(true);
+    expect(meta.appearance).toBeNull();
+    // ...and a row whose column holds junk is the same thing: no usable look.
+    const junk = setup();
+    junk.deps.getCharacter = vi.fn(
+      async () => baseChar({ appearance: { evil: 'x' } as never }) as CharacterRow | null,
+    );
+    await createWsAuth(junk.deps).authenticateWebSocket(asWs(junk.ws), authRaw(), junk.req);
+    expect(joinedMeta(junk.game).appearance).toBeNull();
+  });
+
+  it('re-validates on the RESUME arm too, where a redesign may have landed', async () => {
+    // The linkdead window is exactly when a redesign can be saved against a row
+    // the live entity does not know about, so the resume arm carries a freshly
+    // read look and it goes through the same gate.
+    const { ws, game, deps, req } = setup();
+    game.hasSessionForCharacter = vi.fn(() => true);
+    deps.getCharacter = vi.fn(
+      async () =>
+        baseChar({ appearance: { hair: 'mohawk', junk: 'x'.repeat(200) } }) as CharacterRow | null,
+    );
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(joinedMeta(game).appearance).toEqual({ hair: 'mohawk' });
   });
 });
 

@@ -424,7 +424,7 @@ const FLIP_FRAME: Record<
   (g: CanvasRenderingContext2D, cx: number, cy: number, t: number) => void
 > = {
   electric(g, cx, cy, t) {
-    // the original: flash → eroding ring → filaments
+    // the original: flash ? eroding ring ? filaments
     const flashA = Math.max(0, 1 - t * 2.6) ** 1.7;
     if (flashA > 0.01) {
       const r0 = 8 + 30 * easeOutCubic(Math.min(1, t * 3));

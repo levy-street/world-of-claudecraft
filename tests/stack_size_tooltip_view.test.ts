@@ -28,8 +28,11 @@ describe('stackSizeTooltipLine', () => {
   });
 
   it('every potion and elixir in the item catalog states the same cap', () => {
+    // The warlock overhaul's Soul Stone is kind 'potion' with a deliberate
+    // authored 3-cap (a class utility, not part of the alchemy ladders), so
+    // it is exempt from the shared 20 sweep and pinned separately below.
     const consumables = Object.values(ITEMS).filter(
-      (def) => def.kind === 'potion' || def.kind === 'elixir',
+      (def) => (def.kind === 'potion' || def.kind === 'elixir') && def.id !== 'soul_stone',
     );
     // 16 at authoring time (the vendor ladders, the crafted alchemy ladder,
     // and the combo elixirs); a floor rather than an exact pin so new potion
@@ -40,6 +43,7 @@ describe('stackSizeTooltipLine', () => {
         '<div class="tt-sub">Max stack: 20</div>',
       );
     }
+    expect(stackSizeTooltipLine(ITEMS.soul_stone)).toBe('<div class="tt-sub">Max stack: 3</div>');
   });
 
   it('the line is a biconditional of the real bag rule over the WHOLE catalog', () => {

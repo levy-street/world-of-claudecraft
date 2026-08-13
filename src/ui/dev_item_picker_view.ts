@@ -43,10 +43,12 @@ export interface DevItemPickerResult {
   idle: boolean;
 }
 
-// How many rows the dropdown may show. Small on purpose: the bug being fixed is a
-// list that grew past the viewport and swallowed its own window, so this cap is
-// load-bearing, not cosmetic.
-export const DEV_ITEM_PICKER_LIMIT = 12;
+// How many rows the dropdown may show. The cap is load-bearing, not cosmetic: the
+// bug this picker replaced was a list that grew past the viewport and swallowed
+// its own window. Sized with the CSS max-height so the full cap fits WITHOUT a
+// scrollbar (a scrollbar in an anchored listbox is a trap: grabbing it blurs the
+// input, and the blur teardown drops the list mid-drag).
+export const DEV_ITEM_PICKER_LIMIT = 14;
 
 // Rank order. Lower sorts first. An exact id match wins outright because a tester
 // pasting a known id must never have it buried under fuzzy name hits.

@@ -13,6 +13,7 @@
 // entity whose ownerId is its owner's entity id (src/sim/pet/pet_commands.ts,
 // petOf), so ownership is re-derived from the roster on both hosts identically.
 
+import { isTemporaryNecromancyUndeadTemplateId } from '../sim/content/necromancy';
 import { DELVE_COMPANIONS } from '../sim/data';
 import type { UnitFrameDescriptor } from './unit_frame';
 
@@ -36,6 +37,9 @@ export interface PetFrameUnit {
   hp: number;
   maxHp: number;
   dead: boolean;
+  // Optional so a bare test fixture stays valid: when absent, the pyre_guardian
+  // exclusion below simply cannot match.
+  auras?: readonly { id: string }[];
 }
 
 /**
@@ -58,6 +62,15 @@ export function findOwnPet<T extends PetFrameUnit>(
   for (const e of entities) {
     if (e.kind !== 'mob' || e.ownerId !== playerId) continue;
     if (DELVE_COMPANION_TEMPLATE_IDS.has(e.templateId)) continue;
+    // The class-overhaul exclusions, kept identical to the sim's petOf rule
+    // (pet/pet_selection.ts isPrimaryOwnedPetEntity) and the pet-bar rule
+    // (pet_entity.ts isControllableOwnedPet): the Destruction Pyre Colossus
+    // (pyre_guardian aura) and the temporary Necromancy undead explicitly do
+    // NOT replace the controlled demon, and guardian_* templates are not
+    // controllable pets. The PERMANENT graveguard is a real pet and stays.
+    if (isTemporaryNecromancyUndeadTemplateId(e.templateId)) continue;
+    if (e.templateId.startsWith('guardian_')) continue;
+    if (e.auras?.some((a) => a.id === 'pyre_guardian')) continue;
     return e;
   }
   return null;

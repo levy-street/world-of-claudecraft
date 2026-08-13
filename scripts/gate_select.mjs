@@ -83,7 +83,7 @@ const vitestBin = path.join(
 // Same preflights as gate.mjs (dependency sync, then ffmpeg/ffprobe by
 // execution). They exist to turn a confusing mid-gate failure into a clear early
 // one, and this path is the one people run most.
-runGatePreflights({ label: 'gate:select', shell });
+await runGatePreflights({ label: 'gate:select', shell, command: 'node scripts/gate_select.mjs' });
 
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),

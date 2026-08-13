@@ -236,19 +236,26 @@ describe('client HTML shell', () => {
     expect(liveHtml).not.toContain('id="chat-input"');
   });
 
-  it('carries the map-canvas a11y label + #map-summary live region in BOTH entries', () => {
+  it('carries the concise live map summary and detailed non-live description in BOTH entries', () => {
     // updateMapWindow() writes the sr-only summary on every redraw via
     // setText($('#map-summary'), ...), which is not null-guarded, so the element
     // MUST exist in every entry that ships the map window or opening the map
     // throws. index.html and play.html both boot src/main.ts and both carry the
     // map window, so the live region + canvas accessible name must be in both.
     expect(hudTs).toContain("const summaryEl = $('#map-summary');");
+    expect(hudTs).toContain("const markerSummaryEl = $('#map-marker-summary');");
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="map-canvas"');
       expect(entry).toContain('data-i18n-aria="hud.core.mapCanvasLabel"');
+      expect(entry).toContain('aria-describedby="map-summary map-marker-summary"');
+      expect(entry).not.toMatch(/id="map-canvas"[^>]*tabindex=/);
       expect(entry).toContain('<span id="map-summary"');
       expect(entry).toContain('role="status"');
       expect(entry).toContain('aria-live="polite"');
+      const markerSummary = entry.match(/<span id="map-marker-summary"[^>]*>/)?.[0] ?? '';
+      expect(markerSummary).toContain('class="visually-hidden"');
+      expect(markerSummary).not.toContain('role=');
+      expect(markerSummary).not.toContain('aria-live=');
     }
   });
 
@@ -1564,15 +1571,19 @@ describe('client HTML shell', () => {
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel #char-list::-webkit-scrollbar {\n      width: 8px;',
     );
+    // By CLASS, not by id: the redesign editor is a second panel in the same
+    // docked slot, and an id-keyed override left it unstyled on mobile.
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-news {\n      grid-column: 1 / -1;',
+      'body.mobile-touch #charselect-panel .cs-news-panel {\n      grid-column: 1 / -1;',
     );
     expect(shellCss).toContain('scrollbar-gutter: stable;\n      scrollbar-width: auto;');
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel {\n      height: auto;\n      overflow: visible;',
     );
+    // The feed shares this rule with the redesign editor's customizer host:
+    // both render at natural height and let the PAGE scroll.
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel .cs-news-feed {\n    flex: none;\n    min-height: 0;\n    overflow: visible;',
+      'body.mobile-touch #charselect-panel .cs-news-feed,\n  body.mobile-touch #charselect-panel .cs-reroll-panel #charselect-reroll-host {\n    flex: none;\n    min-height: 0;\n    overflow: visible;',
     );
     // charselect's columns stay overflow:hidden (their #char-list and
     // .cs-news-feed CHILDREN scroll); charcreate's columns hold a
@@ -1683,10 +1694,22 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('stacks the character-select news panel on mobile', () => {
+  it('stacks BOTH docked character-select panels on mobile', () => {
+    // The news feed and the one-shot redesign editor share the slot and the
+    // `cs-news-panel` chrome. The override is keyed on that class rather than on
+    // `#charselect-news`, because an id-keyed one left the redesign panel at the
+    // desktop fixed height with none of the mobile fixes while its button
+    // rendered on every device.
     expect(html).toContain('id="charselect-news"');
+    expect(html).toContain('id="charselect-reroll"');
+    expect(html).toContain('class="cs-news-panel cs-reroll-panel"');
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-news {\n    flex: none;\n    width: 100%;',
+      'body.mobile-touch #charselect-panel .cs-news-panel {\n    flex: none;\n    width: 100%;',
+    );
+    // ...and the customizer follows the feed's "the page is the scroller" rule,
+    // rather than scrolling inside a panel that is itself scrolling.
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-reroll-panel #charselect-reroll-host {',
     );
   });
 
@@ -2559,14 +2582,21 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain('this.isWindowVisible(mapWindow)');
     expect(hudTs).toContain('this.isWindowVisible(questLogWindow)');
     expect(hudMobileCss).toContain(
-      '--mobile-map-quest-stack-top: max(10px, env(safe-area-inset-top));',
+      '--mobile-map-quest-stack-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
+    );
+    expect(hudMobileCss).toContain(
+      '--mobile-map-quest-stack-bottom: calc(\n      max(10px, env(safe-area-inset-bottom)) /\n      var(--ui-scale, 1)\n    );',
     );
     expect(hudMobileCss).toContain('body.mobile-touch.mobile-map-quest-open #quest-log-window');
     expect(hudMobileCss).toContain('top: var(--mobile-map-quest-stack-top);');
     expect(hudMobileCss).toContain('max-height: var(--mobile-map-quest-log-max-height);');
     expect(hudMobileCss).toContain('body.mobile-touch.mobile-map-quest-open #map-window');
     expect(hudMobileCss).toContain('var(--mobile-map-quest-stack-gap)');
-    expect(hudMobileCss).toContain('22px');
+    expect(hudMobileCss).toContain('var(--mobile-map-stack-shell-height)');
+    expect(hudMobileCss).toContain(
+      'width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));',
+    );
+    expect(hudMobileCss).not.toContain('width: min(\n      46vw,\n      300px,');
   });
 
   it('caps mobile quest and NPC panels instead of stretching them edge to edge', () => {

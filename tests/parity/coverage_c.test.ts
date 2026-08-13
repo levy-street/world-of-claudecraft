@@ -78,7 +78,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'death')).toBe(true);
   });
 
-  it('c4b_effect_dispatch: runEffects fans across sunder/aoe/finisher/judgement/fear/groundAoE/summon/form', () => {
+  it('c4b_effect_dispatch: runEffects fans across sunder/aoe/finisher/fear/groundAoE/summon/form', () => {
     const rec = run('c4b_effect_dispatch');
     const ev = rec.allEvents as Ev[];
     const ents = entities(rec);
@@ -110,7 +110,7 @@ describe('coverage: each scenario fires its subsystem', () => {
       ev.some((e) => e.type === 'damage' && e.sourceId === rogue && e.school === 'physical'),
     ).toBe(true);
     expect(ev.some((e) => e.type === 'comboPoint' && e.pid === rogue && e.points === 0)).toBe(true);
-    // paladin judgement: a holy damage from the paladin (the Seal unleashed).
+    // paladin consecration: holy damage came from the Paladin.
     const paladin = rec.notes.paladinId as number;
     expect(
       ev.some((e) => e.type === 'damage' && e.sourceId === paladin && e.school === 'holy'),
@@ -416,6 +416,49 @@ describe('coverage: each scenario fires its subsystem', () => {
     const signedUnits = signed.reduce((n: number, s: any) => n + s.count, 0);
     expect(signedUnits).toBeGreaterThanOrEqual(rareGather!.qty);
     expect(signed.length).toBeLessThanOrEqual(Math.ceil(signedUnits / 20));
+  });
+  it('druid_engines: all three live buttons arm and their payoffs fire', () => {
+    const rec = run('druid_engines');
+    expect(rec.notes.moonlashArmed).toBe(true);
+    expect(rec.notes.sunlanceArmed).toBe(true);
+    expect(rec.notes.redharvestArmed).toBe(true);
+    expect(rec.notes.marrowbreakArmed).toBe(true);
+    expect(rec.notes.overbloomArmed).toBe(true);
+    const abilities = (rec.allEvents as Ev[])
+      .filter((event) => event.type === 'damage' || event.type === 'heal2')
+      .map((event) => event.ability);
+    expect(abilities).toContain('Moonsurge');
+    expect(abilities).toContain('Sunwake');
+    expect(abilities).toContain('Redharvest');
+    expect(abilities).toContain('Marrowbreak');
+    expect(abilities).toContain('Overbloom');
+  });
+
+  it('priest_codex: all three baseline loops fire and respec cleanup completes', () => {
+    const rec = run('priest_codex');
+    const ev = rec.allEvents as Ev[];
+    expect(ev.some((event) => event.type === 'heal2' && event.ability === 'Doctrine')).toBe(true);
+    expect(ev.some((event) => event.type === 'heal2' && event.ability === 'Seraphic Vigil')).toBe(
+      true,
+    );
+    expect(ev.some((event) => event.type === 'heal2' && event.ability === 'Choirmend')).toBe(true);
+    expect(
+      ev.some((event) => event.type === 'heal2' && event.ability === 'Sunburst Canticle'),
+    ).toBe(true);
+    expect(ev.some((event) => event.type === 'damage' && event.ability === 'Effigy Echo')).toBe(
+      true,
+    );
+    expect(
+      ev.some((event) => event.type === 'damage' && event.ability === 'Tithefiend Strike'),
+    ).toBe(true);
+    expect(rec.notes.guardianId).not.toBeNull();
+    expect(rec.notes.bankBeforeMindfracture).toBe(0);
+    expect(rec.notes.bankAfterMindfracture).toBe(1);
+    expect(rec.notes.mindfractureEchoTargets).toEqual(rec.notes.expectedEchoTargets);
+    expect(rec.notes.foreignOwnerIsolated).toBe(true);
+    expect(rec.notes.manaAfterGuardian).toBeGreaterThan(rec.notes.manaAfterSummon as number);
+    expect(rec.notes.respecSucceeded).toBe(true);
+    expect(rec.notes.cleanupComplete).toBe(true);
   });
 
   // This block exists because its absence is what let the scenario rot. Its

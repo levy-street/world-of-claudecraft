@@ -20,9 +20,10 @@ import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function chronoMage(level = 20) {
-  const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true });
+  const sim = new Sim({ seed: 1, playerClass: 'mage', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(level);
   expect(sim.setSpec('arcane')).toBe(true);
   sim.tick();
@@ -189,10 +190,10 @@ describe('Aether Surge feeds Temporal Echo (no hidden heal bonus)', () => {
       )
       .reduce((a, e) => a + e.amount, 0);
     expect(dmg).toBeGreaterThan(0);
-    // Echo heals 35% of the single-target Arcane damage: purely the damage, no
+    // Echo heals 40% of the single-target Arcane damage: purely the damage, no
     // hidden heal bonus (allow +/-1 for per-hit rounding).
     expect(echo).toBeGreaterThan(0);
-    expect(Math.abs(echo - Math.round(dmg * 0.35))).toBeLessThanOrEqual(1);
+    expect(Math.abs(echo - Math.round(dmg * 0.4))).toBeLessThanOrEqual(1);
   });
 });
 
@@ -276,7 +277,10 @@ describe('Aether Surge free-cast proc', () => {
     sim.targetEntity(mob.id);
     sim.castAbility('arcane_surge');
     collect(sim, 2.3);
-    expect(before - p.resource).toBe(0); // charged cost waived
+    // Cost waived: the free cast pays nothing, so mana never dropped below `before`.
+    // (A mana user now passively regenerates Spirit mana in combat, so the window can
+    // even leave resource slightly higher; what matters is the cast itself spent 0.)
+    expect(p.resource).toBeGreaterThanOrEqual(before);
     expect(aetherSurgeStacks(p)).toBe(3); // still banked a charge
 
     // Single-use: strip any fresh proc the free cast may have rolled, then the

@@ -21,6 +21,7 @@
 // changed-file biome are never treated as cacheable "green forever".
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import { cwd } from 'node:process';
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import { runGatePreflights } from './lib/gate_preflight.mjs';
 import { buildFullGateSteps } from './lib/gate_steps.mjs';
@@ -63,11 +64,12 @@ const shell = process.platform === 'win32';
 // side effect of an empty PATH also making `npm` itself unspawnable.
 // Both preflights now live in lib/gate_preflight.mjs so gate:select shares them
 // rather than silently losing the early, clear failure they exist to produce.
-runGatePreflights({ label: 'gate', shell });
+await runGatePreflights({ label: 'gate', shell });
 
 const branch =
   spawnSync('git', ['branch', '--show-current'], { encoding: 'utf8', shell }).stdout?.trim() ?? '';
 const releaseTier = branch.startsWith('release/');
+const repoRoot = cwd();
 // Base env for every step. Per-step overlays (e.g. pretest skip on vitest) merge on top.
 // The release tier is NOT applied here. It rides on the one dedicated vitest step
 // buildFullGateSteps adds for a release branch (lib/gate_steps.mjs), mirroring the
@@ -78,7 +80,7 @@ const baseEnv = { ...process.env };
 // Shared step list (Phase 2 generate-once + Phase 8 turbo cacheable pure steps).
 // The bot build rides inside buildFullGateSteps (scripts/lib/gate_steps.mjs), so
 // the packet's R7 step stays in every consumer of the shared list.
-const steps = buildFullGateSteps(workers, { releaseTier });
+const steps = buildFullGateSteps(workers, { releaseTier, repoRoot });
 
 if (releaseTier) {
   console.log(

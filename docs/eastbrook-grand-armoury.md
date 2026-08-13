@@ -39,7 +39,7 @@ geometry or draw. Supported alternate seeds and localized custom-terrain edits r
 same entrance grade while a solid skirt extends to the deterministic footprint minimum;
 seed `4717`, for example, requires a `0.9766606569`-yard extension. Camera collision derives
 its roof height from the same terrain envelope. Online admission uses layout epoch `3` and
-the strict `auth-world-3` discriminator so clients and servers with different footprint data
+the strict `auth-world-4` discriminator so clients and servers with incompatible content
 fail before credentials or world admission.
 
 ## Visual and production contract

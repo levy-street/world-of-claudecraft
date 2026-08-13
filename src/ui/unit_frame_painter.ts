@@ -27,17 +27,27 @@
 // are never touched here, so folding the resource-type class into toggleClass does
 // not clobber the low-power pulse.
 
+import { borderAccent } from './deed_border_view';
 import type { PainterHostWriters } from './painter_host';
 import type { UnitFrameView } from './unit_frame';
 
 // The mutually-exclusive resource-type classes the painter toggles on the resource
 // container. Exactly one is on for a live power bar; all are off for `none`.
-const RES_TYPE_CLASSES = ['rage', 'energy', 'mana'] as const;
+const RES_TYPE_CLASSES = ['rage', 'energy', 'focus', 'mana'] as const;
 // The shield-overlay class (the shield reaches the bar's right edge).
 const OVERSHIELD_CLASS = 'overshield';
 // Frame-state classes target/party need; the player always passes them off.
 const DEAD_CLASS = 'dead';
 const OUT_OF_RANGE_CLASS = 'oor';
+// The Book of Deeds portrait accent. The ATTRIBUTE carries the slug (the CSS ring
+// rule gates on a non-empty value) and the three custom properties carry that
+// slug's palette, so hud.css holds ONE ring treatment and zero per-slug colors:
+// deed_border_view.ts stays the single source of truth. Exported so the styles
+// test can pin the CSS against these exact names rather than a copy of them.
+export const PORTRAIT_BORDER_ATTR = 'data-border';
+export const PORTRAIT_BORDER_FRAME_PROP = '--border-accent-frame';
+export const PORTRAIT_BORDER_EDGE_PROP = '--border-accent-edge';
+export const PORTRAIT_BORDER_GLOW_PROP = '--border-accent-glow';
 
 /** The optional resource-bar elements (a target frame has none). */
 export interface UnitFrameResourceElements {
@@ -72,6 +82,11 @@ export interface UnitFrameElements {
    *  node (setText clobbers children). */
   titlePre?: HTMLElement;
   titlePost?: HTMLElement;
+  /** The portrait accent host (the `.portrait-wrap`), which carries the Book of
+   *  Deeds border ring; omitted by frames with no border surface, which then pay
+   *  zero writes. Never the `.portrait` itself: its border-color / box-shadow are
+   *  claimed by the combat / elite / boss states. */
+  portraitBorder?: HTMLElement;
   /** The absorb-shield overlay; omitted by a frame with no shield bar (party). */
   absorb?: HTMLElement;
   /** The resource bar group; omitted by a frame with no resource bar (target). */
@@ -126,6 +141,7 @@ export class UnitFramePainter {
     if (this.el.name) this.writers.setText(this.el.name, view.name);
     if (this.el.titlePre) this.writers.setText(this.el.titlePre, view.titlePre);
     if (this.el.titlePost) this.writers.setText(this.el.titlePost, view.titlePost);
+    this.paintPortraitBorder(view);
     this.gatePortrait(view.portraitKey);
     this.writers.setText(this.el.level, view.levelText ?? '');
     this.writers.setTransform(this.el.hpFill, this.barScaleX(view.hpFrac));
@@ -136,6 +152,24 @@ export class UnitFramePainter {
       this.writers.toggleClass(this.el.frame, DEAD_CLASS, view.dead);
       this.writers.toggleClass(this.el.frame, OUT_OF_RANGE_CLASS, view.outOfRange);
     }
+  }
+
+  // The Book of Deeds portrait ring: the slug attribute the CSS rule gates on plus
+  // that slug's palette as custom properties. The PALETTE gates the attribute too:
+  // a borderless, stale, title-reward, or otherwise uncolorable slug resolves to no
+  // accent and writes '' into all four slots, so the CSS :not([data-border=""])
+  // gate stays closed and no transparent ::after box paints (the same borderless
+  // outcome the nameplate reaches by early-returning). No lastBorderSlug field:
+  // setAttr / setStyleProp are multi-slot cached, so a repeat paint elides every
+  // one of these writes. Skipped entirely for a frame with no border surface.
+  private paintPortraitBorder(view: UnitFrameView): void {
+    const host = this.el.portraitBorder;
+    if (!host) return;
+    const accent = borderAccent(view.borderSlug);
+    this.writers.setAttr(host, PORTRAIT_BORDER_ATTR, accent ? view.borderSlug : '');
+    this.writers.setStyleProp(host, PORTRAIT_BORDER_FRAME_PROP, accent ? accent.frame : '');
+    this.writers.setStyleProp(host, PORTRAIT_BORDER_EDGE_PROP, accent ? accent.edge : '');
+    this.writers.setStyleProp(host, PORTRAIT_BORDER_GLOW_PROP, accent ? accent.glow : '');
   }
 
   // The shield overlay: a scaleX transform to (hp + absorb)/maxHp plus the

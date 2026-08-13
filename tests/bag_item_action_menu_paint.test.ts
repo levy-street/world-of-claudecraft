@@ -171,9 +171,10 @@ describe('BagItemActionMenu.paint placement reserves', () => {
     h.openPlain();
     expect(h.placed).toHaveLength(1);
     expect(h.placed[0].reserveRight).toBe(190);
-    // Dust rows: the classic default action plus Apply Enchant, nothing else.
+    // Dust rows: the classic default action, Apply Enchant, and the lock
+    // toggle every item now offers (issue #3042).
     const rows = h.el.querySelectorAll('.ctx-item').length;
-    expect(rows).toBe(2);
+    expect(rows).toBe(3);
     expect(h.placed[0].reserveBottom).toBe(80 + rows * 32);
     expect(h.el.classList.contains(CTX_MENU_PICKER_CLASS)).toBe(false);
   });

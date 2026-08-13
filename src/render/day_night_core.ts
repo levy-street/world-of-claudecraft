@@ -16,6 +16,7 @@
 // consistency across clients, not about parity.
 
 import type { BiomeId } from '../sim/types';
+import { clamp01 } from './num_clamp';
 
 /** Full day-to-night-to-day period. Twenty real minutes, so every play session
  *  sees the whole cycle several times over; epoch-anchored below, so the phase
@@ -395,10 +396,6 @@ export const REALM_DAYNIGHT_AMPLITUDE: Record<BiomeId, number> = Object.fromEntr
     1 - resistance * (1 - MIN_DAYNIGHT_AMPLITUDE),
   ]),
 ) as Record<BiomeId, number>;
-
-function clamp01(v: number): number {
-  return v < 0 ? 0 : v > 1 ? 1 : v;
-}
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;

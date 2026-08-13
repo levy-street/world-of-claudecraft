@@ -106,6 +106,10 @@ describe('parry: the one-roll mob-swing hit table', () => {
     const mob = spawnMobInFront(sim);
     const p = sim.player;
     p.dodgeChance = 0;
+    // Block shares the roll band too (Protection overhaul: paladins block with a
+    // shield); remove it so parry is isolated, like dodge above.
+    p.blockChance = 0;
+    p.blockValue = 0;
     // The roll a warrior of this Strength WOULD parry: for a paladin it connects.
     const roll = swingMissChance(mob, p) + warriorParryChance(p.stats.str) / 2;
     sim.rng.next = () => roll;

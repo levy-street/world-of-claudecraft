@@ -4,23 +4,33 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 5 QA done 2026-08-09 (PASS-WITH-FOLLOWUPS); Phase 6
-(economy hooks) is next. Packet authored 2026-08-07 off release/v0.36.0; the
-branch has absorbed release/v0.36.0 through 6e1ead1fea (ninth absorb, opening
-Phase 5 QA 2026-08-09: the gfx-perf GPU queue and entry-prewarm batches, PRs
-3217 and 3219, render-only; release-merge-audit clean with an EMPTY
-farming-footprint intersection, no new endpoints, no lockfile change; parity
-and snapshots re-proven green on the merged HEAD, farming_session golden
-byte-identical. Count-pin baselines unchanged from the eighth absorb:
-command_schema 196/209, IWorld members 308 (79 data, 229 method), delta keys
-84. The eighth absorb 5819c005a7 opened Phase 5: the gate-perf CI batch,
-warrior Intervene and fear DR, the three r165 compileAsync patch with its
-lockfile-driven asset seal re-mint, idle-mob distance culling with its own
-parity scenario, the 16 static self-record scalars moved behind the delta
-gate, and bg_respond. The seventh absorb 66c2340242 landed at Phase 4 QA;
-the sixth 1478f9d2ba opened Phase 4. NOTE for any farming GLB
-work (Phase 7 props, Phase 13 art): fingerprints must be minted against the
-pnpm-lock.yaml the EIGHTH absorb brought, or the asset suites red.)
+Current phase: Phase 6 (economy hooks) done 2026-08-09 (merge 1a26881d0b);
+Phase 6b (the v0.38.0 release sync, the first big-jump mid-phase) done
+2026-08-13; Phase 6 QA is next. Packet authored 2026-08-07 off
+release/v0.36.0; the branch has absorbed release/v0.38.0 through 952c183fc3
+(ELEVENTH absorb, the Phase 6b sync, absorb merge 2c26b6db7b: 1453 commits,
+2376 files, 117-file farming intersection; headline systems the Reliquary
+facet and catalog, the owned-classes overhaul with warlock pets, the
+Thornhollow Fields battleground, the map marker overhaul, the player item
+lock, civic service anchors, the three.js audit batch, and the monolith
+line-count ratchet tests/monolith_budget.test.ts). Count-pin baselines as of
+the eleventh absorb, all re-recorded from suite runs on the merged tree:
+command_schema 201/214 send/dispatch, IWorld members 327 (88 data, 239
+method), delta keys 87 (fplot stays the branch's own), facet count 34. The farming-only baselines held with zero movement:
+FARM_MATERIAL_ITEM_IDS 27 exact, ITEM_ART_PENDING 39 exact, farming.ts
+silent-loot grant sites 6, blob floor/ceiling pins unchanged. The
+farming_session golden was deliberately re-minted ONCE for the release's
+sampled reliquary field (deviation (am)); md5 is now
+f017045f5fa0e85f6d740c99ea4eb225. The tenth absorb 7ce12bad9e opened Phase 6
+(v036 artwork overhaul, rift boss parity scenario, Evergarden east-edge
+terrain); the ninth 6e1ead1fea opened Phase 5 QA; the eighth 5819c005a7
+opened Phase 5 with the lockfile-driven seal re-mint. NOTE for any farming
+GLB work (Phase 7 props, Phase 13 art): fingerprints must be minted against
+the pnpm-lock.yaml the ELEVENTH absorb brought (the v0.38.0 lockfile), or
+the asset suites red; the eleventh absorb itself needed NO seal re-mint
+because the merge took the release's lockfile byte-identical and the release
+delta carried its own coherent re-minted seals (all 8 suites green,
+verified).
 Working tree: ALL farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`. Other sessions share the main checkout; never work there.
 
@@ -926,6 +936,93 @@ question does not arise (farming has no station).
   craftIdsForMaterialItem and the taxonomy now map farm produce to cooking,
   whose consumers are all UI (hint lines, bag/bank filters), none tick-side
   or wire-side, so determinism is untouched.
+  V0.38.0 RECONCILE (the eleventh absorb, 2026-08-13; this paragraph is the
+  current (al) mechanism): the release evolved the art program its own way
+  and the branch mechanism SURVIVED beside it. scripts/item_art_audit.mjs now
+  carries the release's expected literals (catalogCount 822, liveItemCount
+  837, generatedHeroicDefinitions 64, heroicWeaponArtAliases 16) with the
+  branch's ART-SUBJECT rule intact (live defs minus ITEM_ART_PENDING; the
+  release literal stands because every farming id is pending). The release
+  added scripts/lib/mob_portrait_manifest_diff.mjs (a drift DIAGNOSTIC that
+  says which manifest part moved) and normalized the stills bundle bytes
+  (absWorkingDir pin plus node_modules path normalization in
+  mob_portrait_jobs.mjs), which re-minted the portrait fingerprint
+  release-side; the branch's fingerprint-only refresh path in
+  mob_portrait_manifest_guard.mjs composes with both and the absorb
+  checklist below held EXACTLY as written: the committed manifest conflicted
+  (both sides re-minted), resolved by re-running the CLI on the merged tree
+  (a 3-field fingerprint-only write, receipt-free), the verdict conflicted
+  and was re-minted through --refresh-verdict (bytes preserved at 107997,
+  sheet digests this environment's), and both accepted-art registries were
+  re-pointed at the fresh digests. The fresh-checkout literals in
+  tests/item_art_audit_builder.test.ts were re-recorded from the merged-tree
+  run (catalog sha 731bc17b, the merged lib self-hash; renderer fingerprint
+  f748b74e, the branch value, because the release never touched the item
+  renderer).
+  (am) The farming_session parity golden was deliberately re-minted at the
+  v0.38.0 sync (commit ddb718b95e), the ONE golden move of the phase and the
+  mirror of D23's own recipe: the release samples the new Reliquary block
+  (reliquary.counts / reliquary.firstFind) into every player sample and
+  re-recorded all ITS goldens in the delta, but farming_session is
+  branch-only so the release could not re-record it. Verified before
+  minting, machine-classified: the rng digests and draw counts are
+  byte-identical across the whole trace, and the old-to-new diff is exactly
+  11 added reliquary blocks plus the 18 paired state-digest moves they
+  cause, nothing else (no draws, tick, time, event, or entity lines). Golden
+  md5 bf00c277b89e142446550f00c1035696 to f017045f5fa0e85f6d740c99ea4eb225.
+  (an) The release's monolith line-count ratchet
+  (tests/monolith_budget.test.ts, ceilings minted against release-side
+  sizes) was red on the merged tree because farming's pre-ratchet additions
+  pushed src/ui/hud.ts to 19617 (ceiling 19490) and server/game.ts to 10979
+  (ceiling 10900). Healed by extraction per the ratchet's own policy, never
+  a ceiling edit (commit 7dbb21b605): the five HUD farming feedback arms
+  moved whole to src/ui/farm_event_feedback.ts (the Hud satisfies the host
+  seam structurally; new behavioral suite
+  tests/farm_event_feedback.test.ts), and the three farming command bodies
+  plus the fplot row builder moved whole to server/farming_commands.ts (the
+  case labels stay in dispatchMessage for the command-schema scan; the
+  snapshots delta-key scrape gained the extracted emitter as a second
+  source). STANDING WARNING for phases 7 to 13: the merged tree sits at
+  NEAR-ZERO headroom under these ceilings (hud.ts 4 lines, server/game.ts 2,
+  sim.ts 82), so every future phase touching a ratcheted coordinator works
+  extraction-first: land the new logic as a sibling module from the start.
+  Ceiling raises stay a maintainer decision. The ceilings were deliberately
+  NOT lowered after these extractions (the root CLAUDE.md lower-after-
+  extraction rule): the values are the release's own mints and the
+  extractions land just under them, so lowering to exact-current would fight
+  the table's stated authoring style (current size plus margin) and any
+  re-pin is the maintainer's call at feature review; the QA reviewer
+  concurred. WATCH ITEM: the snapshots delta-key scrape's source list is
+  now a hand-maintained two-file constant (game.ts +
+  server/farming_commands.ts); any future extraction that moves a maybe()
+  emitter out of either file must join the scrape's source list in the same
+  change or the pin silently narrows.
+  (ao) Farming's spends are LOCK-AWARE as of the sync (commit a4c4c33598):
+  the release's player item lock (issue 3042) names profession consumption a
+  refusing boundary, and farming's seed, compost, watch-fee, tonic, and husk
+  spends all ran through the lock-blind ctx.countItem/ctx.removeItem (a
+  locked split slot sat exactly where the hub removal walk consumes FIRST).
+  Every sufficiency gate now counts unlocked units only
+  (countUnlockedInSlots) and every payment runs removeUnlockedFromSlots,
+  mirroring the crafting.ts reagent idiom (one quest-hook call per payment;
+  plant_crop's HEAVY_SELF_CMDS membership keeps the self snapshot fresh, so
+  dropping ctx.removeItem's own wireRev bump is covered). Seven arms in
+  tests/professions_farming.test.ts pin each touched site; two scripted
+  mutations (lock-blind seed gate, lock-blind payment walk) both killed by
+  name. Draws unchanged; golden unchanged by this heal.
+  COMPLETION (the review round): the first pass copied the release's
+  consumption idiom but not its refusal idiom (the architecture reviewer's
+  one SHOULD-FIX): issue 3042's acceptance line, quoted in crafting.ts,
+  demands a clear locked-item message, and crafting/salvage ship a distinct
+  'locked' reason. farmDenied gained 'locked' (appended to the wire union,
+  never reordered), each of the five deny sites splits lock-only refusals
+  from genuine shortfalls by re-reading the RAW count on the deny path only
+  (the insufficientMaterialsIsLockOnly twin; the fee gate re-plans with the
+  raw reader), and hudChrome.farming.denied.locked ships with its five M16
+  non-Latin fills (zh_CN, zh_TW, ja_JP, ko_KR, ru_RU). The five lock arms
+  now assert 'locked', a sixth arm pins the genuine-shortfall polarity (one
+  locked produce, fee two: stays no_fee_produce), and the reason-to-line
+  distinctness pin covers the new leaf.
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the

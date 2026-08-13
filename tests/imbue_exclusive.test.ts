@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass, SimEvent } from '../src/sim/types';
 
-// Weapon imbues (shaman rockbiter/flametongue/frostbrand, rogue instant/deadly
+// Weapon imbues (shaman Stonebound/Galeheart, rogue instant/deadly
 // poison, paladin seal) are a single weapon-enchant slot: classic allows exactly
 // one active at a time. The deterministic sim must never carry two `imbue` auras,
 // because meleeSwing sums every one of them (H2-1). These tests pin that a fresh
@@ -12,8 +12,11 @@ function makePlayer(cls: PlayerClass, level: number): { sim: Sim; p: Entity } {
   const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
   const pid = sim.addPlayer(cls, 'Imbuer');
   sim.setPlayerLevel(level, pid);
+  if (cls === 'shaman' && !sim.setSpec('enhancement', pid)) throw new Error('no enhancement spec');
   sim.tick();
-  return { sim, p: sim.entities.get(pid)! };
+  const p = sim.entities.get(pid);
+  if (!p) throw new Error('missing imbue test player');
+  return { sim, p };
 }
 
 // Cast an instant imbue and let it resolve, clearing the GCD/cost gate first so a
@@ -30,14 +33,13 @@ function cast(sim: Sim, p: Entity, ability: string): SimEvent[] {
 const imbues = (p: Entity) => p.auras.filter((a) => a.kind === 'imbue');
 
 describe('weapon imbues are a mutually-exclusive single slot (H2-1)', () => {
-  it('shaman cannot stack rockbiter + flametongue + frostbrand', () => {
+  it('enhancement shaman cannot stack Stonebound + Galeheart', () => {
     const { sim, p } = makePlayer('shaman', 16);
     cast(sim, p, 'rockbiter_weapon');
-    cast(sim, p, 'flametongue_weapon');
-    cast(sim, p, 'frostbrand_weapon');
+    cast(sim, p, 'galeheart_weapon');
     // exactly one imbue survives: the most recently applied
     expect(imbues(p)).toHaveLength(1);
-    expect(imbues(p)[0].id).toBe('frostbrand_weapon');
+    expect(imbues(p)[0].id).toBe('galeheart_weapon');
   });
 
   it('rogue cannot stack instant + deadly poison', () => {
@@ -53,7 +55,7 @@ describe('weapon imbues are a mutually-exclusive single slot (H2-1)', () => {
   it('emits an aura-lost event for the displaced imbue so the old buff icon clears', () => {
     const { sim, p } = makePlayer('shaman', 16);
     cast(sim, p, 'rockbiter_weapon');
-    const events = cast(sim, p, 'flametongue_weapon');
+    const events = cast(sim, p, 'galeheart_weapon');
     // the replaced imbue is announced lost (this is what clears its client buff
     // icon); the fade also carries its attribution since the parse fidelity
     // widening, so match on the load-bearing fields rather than deep equality
@@ -63,6 +65,7 @@ describe('weapon imbues are a mutually-exclusive single slot (H2-1)', () => {
         targetId: p.id,
         name: 'Stonebound Weapon',
         gained: false,
+        auraKind: 'imbue',
       }),
     );
     // and the new imbue is announced gained
@@ -70,7 +73,7 @@ describe('weapon imbues are a mutually-exclusive single slot (H2-1)', () => {
       expect.objectContaining({
         type: 'aura',
         targetId: p.id,
-        name: 'Pyrebrand Weapon',
+        name: 'Galeheart Weapon',
         gained: true,
       }),
     );
@@ -89,19 +92,18 @@ describe('weapon imbues are a mutually-exclusive single slot (H2-1)', () => {
     expect(imbues(p)[0].remaining).toBe(dur); // refreshed to full
   });
 
-  it('paladin seal remains a single imbue (unchanged) and still carries judge values', () => {
+  it('keeps the retired Paladin seal out of the authoritative imbue slot', () => {
     const { sim, p } = makePlayer('paladin', 4);
+    expect(sim.resolvedAbility('seal_of_righteousness')).toBeNull();
     cast(sim, p, 'seal_of_righteousness');
-    expect(imbues(p)).toHaveLength(1);
-    expect(imbues(p)[0].id).toBe('seal_of_righteousness');
-    expect(imbues(p)[0].value2).toBeDefined(); // judge min/max preserved
+    expect(imbues(p)).toHaveLength(0);
   });
 
   it('is deterministic: same seed yields the same single-imbue result', () => {
     const run = () => {
       const { sim, p } = makePlayer('shaman', 16);
       cast(sim, p, 'rockbiter_weapon');
-      cast(sim, p, 'flametongue_weapon');
+      cast(sim, p, 'galeheart_weapon');
       return imbues(p).map((a) => ({ id: a.id, value: a.value }));
     };
     expect(run()).toEqual(run());

@@ -153,11 +153,16 @@ export function grantCopies(
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
 ): void {
+  // movement: every pipe that shares this grant hands over copies that already
+  // existed in somebody's hands (a market purchase, a cancelled or collected
+  // listing coming home, a mail attachment), so none of them is a world-sourced
+  // acquisition for the Reliquary tally. Discovery still fires as it always has.
   if (instance)
     ctx.addItemInstance(itemId, cloneItemInstancePayload(instance), pid, count, {
       craftedRecipeId,
+      movement: true,
     });
-  else ctx.addItem(itemId, count, pid, { craftedRecipeId });
+  else ctx.addItem(itemId, count, pid, { craftedRecipeId, movement: true });
 }
 
 /** Rebuild a persisted exchange-escrow slot (market collection item, mail

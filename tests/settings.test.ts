@@ -139,6 +139,15 @@ describe('Settings', () => {
     expect(s.set('cameraFov', 75)).toBe(75);
   });
 
+  it('clamps a stored historical Insane shadow dial (2) down to High on load', () => {
+    // The Shadow Quality ladder is capped at High (the 4096 map): the retired
+    // Insane rung persisted 2, which must come back as High, not survive.
+    localStorage.setItem('woc_settings', JSON.stringify({ shadowQuality: 2 }));
+    const s = new Settings();
+    expect(SETTING_RANGES.shadowQuality.max).toBe(1);
+    expect(s.get('shadowQuality')).toBe(1);
+  });
+
   it('clamps out-of-range values to the slider bounds', () => {
     const s = new Settings();
     expect(s.set('cameraSpeed', 99)).toBe(SETTING_RANGES.cameraSpeed.max);

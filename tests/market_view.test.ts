@@ -44,6 +44,7 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     armorClass: 'all',
     primaryStat: 'all',
     rarity: 'all',
+    sort: 'name',
     page: 0,
     pageCount: 1,
     collectionCopper: 0,

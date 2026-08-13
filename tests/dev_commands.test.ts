@@ -4,9 +4,16 @@ import { FARM_BED_IDS, farmBedById } from '../src/sim/content/farm_patches';
 import { normalizeFarmPlots, serializeFarmPlots } from '../src/sim/professions/farm_persist';
 import { Sim } from '../src/sim/sim';
 import { MAX_LEVEL } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function devSim(seed = 42): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  return new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+    world: EMPTY_TEST_WORLD,
+  });
 }
 
 function devSpawns(sim: Sim, ownerId = sim.playerId) {
@@ -49,7 +56,13 @@ describe('dev commands', () => {
   });
 
   it('despawns only mobs created by the requesting developer', () => {
-    const sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const sim = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      noPlayer: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const alpha = sim.addPlayer('warrior', 'Alpha');
     const beta = sim.addPlayer('mage', 'Beta');
     sim.chat('/dev spawn forest_wolf 2', alpha);
@@ -70,7 +83,13 @@ describe('dev commands', () => {
   });
 
   it('clears every player target and owned spawn when its developer leaves', () => {
-    const sim = new Sim({ seed: 15, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const sim = new Sim({
+      seed: 15,
+      playerClass: 'warrior',
+      noPlayer: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const alpha = sim.addPlayer('warrior', 'Alpha');
     const beta = sim.addPlayer('mage', 'Beta');
     sim.chat('/dev spawn forest_wolf 2', alpha);
@@ -158,7 +177,12 @@ describe('dev commands', () => {
   });
 
   it('is inert when dev commands are disabled', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: false });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: false,
+      world: EMPTY_TEST_WORLD,
+    });
     const beforeIds = [...sim.entities.keys()];
 
     sim.chat('/dev spawn forest_wolf 4');
@@ -172,7 +196,13 @@ describe('dev commands', () => {
 
 describe('/dev bg (Thornhollow Fields force-start)', () => {
   it('force-starts a short-handed match from whoever is queued, no bots', () => {
-    const sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const sim = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      noPlayer: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const a = sim.addPlayer('warrior', 'Alpha');
     const b = sim.addPlayer('mage', 'Beta');
     const c = sim.addPlayer('priest', 'Gamma');
@@ -269,7 +299,12 @@ describe('/dev bg (Thornhollow Fields force-start)', () => {
   });
 
   it('is inert without devCommands', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: false });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: false,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.chat('/dev bg');
     expect(sim.bgMatchFor(sim.playerId)).toBeNull();
   });

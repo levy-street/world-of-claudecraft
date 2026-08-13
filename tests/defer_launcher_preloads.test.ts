@@ -197,7 +197,10 @@ describe('startGame wiring', () => {
   // opening it after would silently reintroduce the serialization.
   it('opens the deferred preload lane BEFORE awaiting the locale fetch', () => {
     const beginAt = mainSource.indexOf('beginDeferredPreloads()');
-    const localeAwaitAt = mainSource.indexOf('await Promise.all([ensureLocaleLoaded(');
+    // Reflow-proof: the locale await is the multi-line CONTENT_LOCALE_CHANNEL_ENSURERS
+    // block (three loaders), so match on structure, not a pasted one-line literal
+    // (same rule as the sibling pin in tests/ios_entry_memory.test.ts).
+    const localeAwaitAt = mainSource.search(/await Promise\.all\(\[\s*ensureLocaleLoaded\(/);
     expect(beginAt).toBeGreaterThan(-1);
     expect(localeAwaitAt).toBeGreaterThan(beginAt);
   });

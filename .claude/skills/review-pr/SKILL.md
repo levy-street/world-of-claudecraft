@@ -24,11 +24,8 @@ end and posts the result. They are different jobs.
 - Lead with what is genuinely good when it is good, then the issues. Do not flatter.
 - Every finding carries a **severity** and **evidence**: `blocking` / `should-fix` /
   `nit`, with a `file:line` pointer and a one-line why.
-- **i18n: review English only. The maintainer does every other locale at release time.**
-  Check only that new player-visible strings are English `t()` keys in the right catalog.
-  Never raise a missing-translation finding, never draft a locale string, and never ask
-  the contributor about any non-English locale (the non-Latin overlays and the M16 gate
-  included). All of that is release-time maintainer work.
+- **i18n: review English only.** The full policy (what to check, what never to raise)
+  lives in the i18n domain block under Step 2; do not improvise beyond it.
 - Post as a plain comment review (not approve / request-changes) unless told otherwise.
 - Match the depth to the change: a one-file fix gets a tight note; a sim/wire/auth
   change earns the full invariant pass.
@@ -67,6 +64,22 @@ sub `CLAUDE.md` files are the source of truth; this is the checklist.
   `net/`. (`tests/architecture.test.ts` guards this; confirm the diff respects it.)
 - Tick-based timers count `tickCount`/`DT`, not wall-clock. Session-only fields (e.g.
   `joinedAt`) are re-derived on load, never persisted with a stale tick epoch.
+
+**Content (`src/sim/content/**`) -> the same-change obligations.**
+New game content carries obligations that must land in the SAME PR (root `CLAUDE.md`,
+new-content bullet); a content add missing one is a finding:
+- Conquerable content (dungeon, delve, raid, world boss, zone, rare) authors its Book of
+  Deeds records (`docs/design/deeds.md`; `tests/deeds_content.test.ts` pins the catalog),
+  and conquerable unique loot authors its Reliquary pages (`docs/design/reliquary.md`,
+  `tests/reliquary_content.test.ts`).
+- Player-facing content regenerates the wiki (`npm run wiki:content`, freshness-gated by
+  `tests/guide.test.ts`) and adds any new `guide.*` prose keys.
+- Every new item id ships committed WebP art (`tests/item_icons.test.ts`) and,
+  for a wordy English name, its M16 non-Latin fills; new named entities get
+  `src/ui/world_entity_i18n.ts` entries.
+- Balance numbers follow the classic-era formulas in `docs/design/`, never invented.
+- The `content-obligations-reviewer` agent audits exactly this list; dispatch it for any
+  content-record change instead of re-deriving the checks.
 
 **Wire / parity (`server/game.ts`, `src/net/online.ts`, `types.ts`, `entity.ts`).**
 - A new `Entity` field either round-trips BOTH ways (encoded in `wireEntity` /
@@ -112,14 +125,17 @@ sub `CLAUDE.md` files are the source of truth; this is the checklist.
 **i18n (any player-visible string). Review English only; the maintainer does every other
 locale at release time.**
 - Check only that new player-visible strings are English `t()` keys in the right
-  `src/ui/i18n.catalog/<domain>.ts`, rendered via `t()`. `hud_chrome` is the English-only
-  catalog domain. Numbers/money/dates/percents go through the formatters, never string
-  concat.
+  `src/ui/i18n.catalog/<domain>.ts`, rendered via `t()`. `hud_chrome`, `guide`, and
+  `editor` are all English-only catalog domains (no per-locale blocks; an English-only
+  add there is correct, not a gap). Numbers/money/dates/percents go through the
+  formatters, never string concat.
 - Do NOT raise any non-English i18n finding. Missing translations, the five non-Latin
-  overlays (`zh_CN`, `zh_TW`, `ja_JP`, `ko_KR`, `ru_RU`), Latin-script `pending` rows, and
-  the M16 completeness gate (`tests/i18n_completeness.test.ts`) are all release-time
-  maintainer work, not a review finding and not a contributor ask. From the contributor's
-  side a PR is English-only.
+  overlays (`zh_CN`, `zh_TW`, `ja_JP`, `ko_KR`, `ru_RU`), and Latin-script `pending` rows
+  are release-time maintainer work, not a review finding and not a contributor ask. From
+  the contributor's side a PR is English-only, with ONE exception (M16, root `CLAUDE.md`):
+  a NEW wordy English value also needs its non-Latin fills in the same change
+  (`tests/i18n_completeness.test.ts` gates it); a missing fill for a new wordy value is a
+  legitimate finding.
 - `shell.ts` and some catalog modules carry inline per-locale blocks that need all
   locales present for `tsc`; that is structural, not a policy violation, and still not
   something to flag.
@@ -179,7 +195,9 @@ review in your own voice. Do not let a subagent author the final review prose or
 the voice and the verify-before-accuse bar are yours to hold. Prefer the purpose-built
 agents (`architecture-reviewer` for `src/sim/` determinism + the `SimContext` seam,
 `cross-platform-sync`, `migration-safety`, `database-performance-reviewer`,
-`privacy-security-review`, `qa-checklist`) for
+`server-hot-path-reviewer` for server tick/broadcast/cache/retention work,
+`privacy-security-review`, `content-obligations-reviewer` for content-record diffs,
+`gate-integrity-reviewer` for gate/CI pipeline diffs, `qa-checklist`) for
 their domains.
 
 ## Quick reference: domain -> first things to check
@@ -191,4 +209,5 @@ their domains.
 | `src/render/**` | reads not mutates; own module; per-frame cost |
 | `src/ui/**` + `index.html` | IWorld seam; own module; play.html CSS parity; a11y/mobile; i18n |
 | `server/**` routes/db | token-scoped auth; parameterized SQL; additive idempotent DDL; no oversharing; tests |
-| i18n strings | English `t()` in catalog only; all other locales are release-time maintainer work, do not flag; line-item slice conflict = regen |
+| i18n strings | English `t()` in catalog only; other locales are release-time work, do not flag (M16 wordy-name exception aside); line-item slice conflict = regen |
+| `src/sim/content/**` | same-change obligations: deeds, reliquary, wiki regen + `guide.*` keys, WebP item art, M16 fills, entity names |

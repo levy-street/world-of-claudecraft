@@ -107,6 +107,10 @@ export const ERROR_CODES = deepFreeze({
   'character.taken_over': { params: [] },
   // identity: "this character must be renamed before entering the world."
   'character.rename_required': { params: [] },
+  // identity: "invalid appearance"
+  'character.invalid_appearance': { params: [] },
+  // identity: "appearance reroll is not available for this character"
+  'character.reroll_unavailable': { params: [] },
 
   // moderation: enforcement states set by a moderator.
   // identity: "this account is suspended until {date}."

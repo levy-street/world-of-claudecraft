@@ -19,6 +19,8 @@
 // branch-wide --changed with GATE_FAST_BASE=<ref>.
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   buildDayLoopVitestPlan,
   buildGuardVitestArgs,
@@ -35,6 +37,18 @@ import {
 
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+// Resolve the vitest binary directly instead of going through `npx --no-install
+// vitest`: npx still pays a real per-invocation startup cost even when it skips
+// the install check, and this file spawns vitest at both call sites below.
+const vitestBin = path.join(
+  repoRoot,
+  'node_modules',
+  '.bin',
+  process.platform === 'win32' ? 'vitest.cmd' : 'vitest',
+);
 
 const tierRaw = process.env.GATE_WORKER_TIER;
 const tier = parseGateWorkerTier(tierRaw);
@@ -69,16 +83,12 @@ const guardArgs = buildGuardVitestArgs({ workers });
 const steps = [
   ['malware scan', 'npm', ['run', 'security:gate']],
   ['biome (changed files)', 'npm', ['run', 'ci:changed']],
-  ['guard tests (architecture + localization)', 'npx', ['--no-install', 'vitest', ...guardArgs]],
+  ['guard tests (architecture + localization)', vitestBin, [...guardArgs]],
   ['typecheck (check:ts incremental)', 'npm', ['run', 'check:ts']],
 ];
 
 if (vitestPlan.mode !== 'skip' && vitestPlan.args) {
-  steps.push([
-    'vitest (related / changed tests)',
-    'npx',
-    ['--no-install', 'vitest', ...vitestPlan.args],
-  ]);
+  steps.push(['vitest (related / changed tests)', vitestBin, [...vitestPlan.args]]);
 }
 
 console.log('[gate:fast] day-loop path (NOT the merge bar; use `npm run gate` before merge)');

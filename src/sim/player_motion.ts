@@ -18,7 +18,10 @@
 // by the extraction.
 
 import { isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
+import { afflictionCanCastWhileMoving } from './combat/affliction';
 import { isRooted, isStunned } from './combat/cc';
+import { iceFloesAuraForAbility } from './combat/empower_next';
+import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { mountMoveSpeedPct } from './content/mounts';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import {
@@ -207,8 +210,10 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   if (e.ghost) return GHOST_RUN_MULT;
   let slow = 1,
     speed = 1;
+  const slowImmune =
+    isVeilboundMarchActive(e) || e.auras.some((aura) => aura.kind === 'slow_immunity');
   for (const a of e.auras) {
-    if (a.kind === 'slow' || a.kind === 'stealth') slow = Math.min(slow, a.value);
+    if ((!slowImmune && a.kind === 'slow') || a.kind === 'stealth') slow = Math.min(slow, a.value);
     // Speed buffs and travel forms carry a 1+fraction multiplier (1.4 = +40%).
     if (a.kind === 'buff_speed' || a.kind === 'form_travel' || a.kind === 'form_fireball') {
       speed = Math.max(speed, a.value);
@@ -354,7 +359,9 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         casting != null &&
         (casting.def.castWhileMoving ||
           casting.castWhileMoving ||
-          p.auras.some((a) => a.kind === 'ice_floes'));
+          iceFloesAuraForAbility(p, p.castingAbility) !== undefined ||
+          afflictionCanCastWhileMoving(p, p.castingAbility) ||
+          p.auras.some((a) => a.kind === 'processional_grace'));
       if (!mobile) deps.cancelCast(p);
     }
     const len = Math.hypot(mx, mz);
