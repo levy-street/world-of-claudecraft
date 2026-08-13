@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Master's Field Forge</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3a322c"/>
+<stop offset="0.55" stop-color="#1d1a16"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="anvilG" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#7d8492"/>
+<stop offset="0.5" stop-color="#454a55"/>
+<stop offset="1" stop-color="#1a1c22"/>
+</linearGradient>
+<linearGradient id="anvilDeep" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#565b66"/>
+<stop offset="0.55" stop-color="#2e3138"/>
+<stop offset="1" stop-color="#121318"/>
+</linearGradient>
+<linearGradient id="boxG" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#4a3a2b"/>
+<stop offset="0.5" stop-color="#2c211a"/>
+<stop offset="1" stop-color="#150f09"/>
+</linearGradient>
+<linearGradient id="brass" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#f4dc90"/>
+<stop offset="0.55" stop-color="#bb903e"/>
+<stop offset="1" stop-color="#6a4d18"/>
+</linearGradient>
+<radialGradient id="coalGlow" cx="0.5" cy="0.5" r="0.7">
+<stop offset="0" stop-color="#ffdf9a"/>
+<stop offset="0.5" stop-color="#ff7a2a"/>
+<stop offset="1" stop-color="#e0561f" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="coal" cx="0.4" cy="0.35" r="0.9">
+<stop offset="0" stop-color="#ffc258"/>
+<stop offset="0.5" stop-color="#ff7a2a"/>
+<stop offset="1" stop-color="#6e2410"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- faint warm atmosphere behind the key side -->
+<ellipse cx="180" cy="160" rx="185" ry="150" fill="#6b5134" opacity="0.15" filter="url(#soft)"/>
+<!-- grounded contact shadow -->
+<ellipse cx="256" cy="442" rx="175" ry="28" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="438" rx="120" ry="17" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- brazier glow spilling up from the firebox -->
+<ellipse cx="256" cy="312" rx="150" ry="70" fill="url(#coalGlow)" opacity="0.55" filter="url(#soft)"/>
+<!-- folding trestle legs: an A-frame under each end of the box -->
+<g stroke="#0e0c08" stroke-width="20" stroke-linecap="round">
+  <path d="M 162 366 L 122 438"/>
+  <path d="M 162 366 L 208 438"/>
+  <path d="M 350 366 L 304 438"/>
+  <path d="M 350 366 L 390 438"/>
+</g>
+<g stroke="url(#anvilDeep)" stroke-width="13" stroke-linecap="round">
+  <path d="M 162 366 L 122 438"/>
+  <path d="M 162 366 L 208 438"/>
+  <path d="M 350 366 L 304 438"/>
+  <path d="M 350 366 L 390 438"/>
+</g>
+<path d="M 142 406 L 192 408" stroke="#0e0c08" stroke-width="9" stroke-linecap="round"/>
+<path d="M 320 408 L 370 406" stroke="#0e0c08" stroke-width="9" stroke-linecap="round"/>
+<!-- firebox chest -->
+<path d="M 128 304 L 384 304 L 376 372 L 136 372 Z" fill="url(#boxG)" stroke="#0e0c08" stroke-width="5"/>
+<path d="M 128 304 L 384 304 L 382 320 L 130 320 Z" fill="#1c130c" stroke="#0e0c08" stroke-width="3"/>
+<!-- coal grate: ember light between the slats -->
+<g stroke="url(#coal)" stroke-width="7" stroke-linecap="round">
+  <path d="M 152 330 L 360 330"/>
+  <path d="M 156 348 L 356 348"/>
+</g>
+<g stroke="#0e0c08" stroke-width="10" opacity="0.85">
+  <path d="M 176 322 L 172 358"/>
+  <path d="M 224 322 L 222 360"/>
+  <path d="M 272 322 L 272 360"/>
+  <path d="M 320 322 L 322 358"/>
+</g>
+<!-- brass corner fittings and side handle -->
+<path d="M 128 304 l 18 0 l -4 68 l -16 0 Z" fill="url(#brass)" stroke="#241a06" stroke-width="3"/>
+<path d="M 366 304 l 18 0 l -8 68 l -16 0 Z" fill="url(#brass)" stroke="#241a06" stroke-width="3"/>
+<path d="M 388 324 q 26 8 0 38" fill="none" stroke="#241a06" stroke-width="9"/>
+<path d="M 388 324 q 26 8 0 38" fill="none" stroke="url(#brass)" stroke-width="5.5"/>
+<circle cx="140" cy="316" r="3.5" fill="#241a06"/>
+<circle cx="140" cy="358" r="3.5" fill="#241a06"/>
+<circle cx="374" cy="316" r="3.5" fill="#241a06"/>
+<circle cx="370" cy="358" r="3.5" fill="#241a06"/>
+<!-- glowing coals peeking over the box lip -->
+<g stroke="#0e0c08" stroke-width="2.5" fill="url(#coal)">
+  <circle cx="180" cy="304" r="13"/>
+  <circle cx="216" cy="300" r="15"/>
+  <circle cx="298" cy="302" r="14"/>
+  <circle cx="330" cy="304" r="12"/>
+</g>
+<circle cx="212" cy="296" r="5" fill="#ffe9c0" opacity="0.85"/>
+<circle cx="302" cy="298" r="4" fill="#ffe9c0" opacity="0.7"/>
+<!-- anvil base block seated over the coals -->
+<path d="M 206 276 L 306 276 L 314 304 L 198 304 Z" fill="url(#anvilDeep)" stroke="#0c0d12" stroke-width="4"/>
+<!-- anvil waist -->
+<path d="M 226 240 L 286 240 L 296 276 L 216 276 Z" fill="url(#anvilDeep)" stroke="#0c0d12" stroke-width="4"/>
+<path d="M 232 248 L 228 270" stroke="#8b919d" stroke-width="2" opacity="0.35"/>
+<!-- anvil body: face with overhang, tapered horn left, squared heel right -->
+<path d="M 196 202 L 316 202 L 322 240 L 190 240 Z" fill="url(#anvilG)" stroke="#0c0d12" stroke-width="4"/>
+<path d="M 154 176 C 122 182 98 196 92 214 C 114 216 142 210 158 202 Z" fill="url(#anvilG)" stroke="#0c0d12" stroke-width="5"/>
+<path d="M 356 178 L 396 186 C 404 196 400 208 388 212 L 352 204 Z" fill="url(#anvilG)" stroke="#0c0d12" stroke-width="5"/>
+<path d="M 158 168 L 354 168 C 362 168 366 172 366 178 L 366 194 C 366 200 362 204 354 204 L 158 204 C 150 204 146 200 146 194 L 146 178 C 146 172 150 168 158 168 Z" fill="url(#anvilG)" stroke="#0c0d12" stroke-width="5"/>
+<!-- horn tip highlight and face sheen -->
+<path d="M 104 206 C 118 200 136 196 152 194" fill="none" stroke="#c7ccd6" stroke-width="3" opacity="0.6" stroke-linecap="round"/>
+<path d="M 156 174 L 348 174" stroke="#d5dae2" stroke-width="3.5" opacity="0.65" stroke-linecap="round"/>
+<ellipse cx="216" cy="182" rx="56" ry="9" fill="#e2e7ee" opacity="0.14" filter="url(#soft4)"/>
+<!-- hardy hole and pritchel -->
+<rect x="326" y="178" width="12" height="12" rx="2" fill="#0e0f13"/>
+<circle cx="308" cy="184" r="4.5" fill="#0e0f13"/>
+<!-- ember heat shimmer under the anvil base -->
+<path d="M 206 274 L 306 274" stroke="#ff7a2a" stroke-width="3" opacity="0.5"/>
+<!-- maker's hammer resting against the box -->
+<g transform="rotate(-24 420 328)">
+  <path d="M 414 240 L 424 240 L 420 360 L 410 360 Z" fill="url(#boxG)" stroke="#0e0c08" stroke-width="3.5"/>
+  <path d="M 392 224 L 444 224 C 452 224 456 230 454 238 L 450 252 L 388 252 L 384 238 C 382 230 386 224 392 224 Z" fill="url(#anvilG)" stroke="#0c0d12" stroke-width="4"/>
+  <path d="M 390 230 L 444 230" stroke="#c7ccd6" stroke-width="2.5" opacity="0.55"/>
+</g>
+<!-- drifting sparks -->
+<circle cx="330" cy="246" r="3" fill="#ffc258" opacity="0.8"/>
+<circle cx="350" cy="224" r="2" fill="#ff7a2a" opacity="0.6"/>
+<circle cx="176" cy="256" r="2.5" fill="#ffc258" opacity="0.6"/>
+<circle cx="160" cy="234" r="2" fill="#ff7a2a" opacity="0.45"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

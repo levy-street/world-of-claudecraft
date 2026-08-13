@@ -626,6 +626,86 @@
    "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "duskforged_warblade",
+   "name": "Duskforged Warblade",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "duskforged_bulwark",
+   "name": "Duskforged Bulwark",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "ridgebreaker",
+   "name": "Ridgebreaker",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "wyrmfall_pendant",
+   "name": "Wyrmfall Pendant",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "warhewn_signet",
+   "name": "Warhewn Signet",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "prismglass_loop",
+   "name": "Prismglass Loop",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "makers_charm",
+   "name": "Maker's Charm",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "gyrelens_array",
+   "name": "Gyrelens Array",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "masters_field_forge",
+   "name": "Master's Field Forge",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+  },
+  {
+   "itemId": "voidbound_grimoire",
+   "name": "Voidbound Grimoire",
+   "sourcePack": "woc_original_svg",
+   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
   }
  ],
  "generatedBatches": [

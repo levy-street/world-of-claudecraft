@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Wyrmfall Pendant</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#2c3532"/>
+<stop offset="0.55" stop-color="#181d1b"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="gold" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#ffe9a8"/>
+<stop offset="0.55" stop-color="#d9ac48"/>
+<stop offset="1" stop-color="#8a6522"/>
+</linearGradient>
+<linearGradient id="goldDeep" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#d9ac48"/>
+<stop offset="0.55" stop-color="#9a7226"/>
+<stop offset="1" stop-color="#5a4114"/>
+</linearGradient>
+<linearGradient id="prismA" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#c8fff4"/>
+<stop offset="0.45" stop-color="#3fbfae"/>
+<stop offset="1" stop-color="#14554e"/>
+</linearGradient>
+<linearGradient id="prismB" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#e9fbff"/>
+<stop offset="0.5" stop-color="#7fd8cc"/>
+<stop offset="1" stop-color="#1e6f66"/>
+</linearGradient>
+<radialGradient id="gemGlow" cx="0.5" cy="0.5" r="0.7">
+<stop offset="0" stop-color="#9df0e2" stop-opacity="0.55"/>
+<stop offset="1" stop-color="#3fbfae" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- faint cool atmosphere behind the key side -->
+<ellipse cx="185" cy="165" rx="185" ry="150" fill="#3a6b60" opacity="0.15" filter="url(#soft)"/>
+<!-- grounded contact shadow -->
+<ellipse cx="256" cy="422" rx="150" ry="27" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="418" rx="100" ry="16" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- rigid torque ring, opening downward at the gem seat -->
+<g fill="none">
+  <path d="M 152 330 A 128 128 0 1 1 360 330" stroke="#241a06" stroke-width="34" stroke-linecap="round"/>
+  <path d="M 152 330 A 128 128 0 1 1 360 330" stroke="url(#goldDeep)" stroke-width="28" stroke-linecap="round"/>
+  <path d="M 152 330 A 128 128 0 1 1 360 330" stroke="url(#gold)" stroke-width="18" stroke-linecap="round"/>
+  <!-- twisted-metal grooves following the ring -->
+  <path d="M 162 316 A 114 114 0 1 1 350 316" stroke="#8a6522" stroke-width="3" opacity="0.6"/>
+  <path d="M 146 326 A 136 136 0 1 1 368 326" stroke="#5a4114" stroke-width="3" opacity="0.5"/>
+  <g stroke="#7a5a1c" stroke-width="2.5" opacity="0.55">
+    <path d="M 196 148 l -14 -22"/>
+    <path d="M 256 128 l 0 -26"/>
+    <path d="M 316 148 l 14 -22"/>
+    <path d="M 156 196 l -22 -14"/>
+    <path d="M 356 196 l 22 -14"/>
+    <path d="M 138 260 l -26 0"/>
+    <path d="M 374 260 l 26 0"/>
+  </g>
+  <!-- key-light sweep along the upper-left arc -->
+  <path d="M 168 180 A 122 122 0 0 1 268 134" stroke="#fff3c4" stroke-width="5" opacity="0.7" stroke-linecap="round"/>
+</g>
+<!-- wyrm-claw terminals seating the gem -->
+<path d="M 138 316 C 136 344 150 362 176 368 L 196 344 C 176 340 162 330 160 310 Z" fill="url(#gold)" stroke="#241a06" stroke-width="4"/>
+<path d="M 374 316 C 376 344 362 362 336 368 L 316 344 C 336 340 350 330 352 310 Z" fill="url(#gold)" stroke="#241a06" stroke-width="4"/>
+<path d="M 148 322 C 150 340 162 352 178 356" fill="none" stroke="#fff3c4" stroke-width="2.5" opacity="0.6"/>
+<!-- claw talons -->
+<g fill="url(#goldDeep)" stroke="#241a06" stroke-width="3">
+  <path d="M 176 368 C 190 380 206 386 222 386 L 214 360 C 202 362 190 366 182 360 Z"/>
+  <path d="M 336 368 C 322 380 306 386 290 386 L 298 360 C 310 362 322 366 330 360 Z"/>
+</g>
+<!-- prismatic gem glow -->
+<circle cx="256" cy="352" r="86" fill="url(#gemGlow)" filter="url(#soft4)"/>
+<!-- faceted prismatic drop gem -->
+<path d="M 256 288 L 306 330 L 288 402 L 224 402 L 206 330 Z" fill="url(#prismA)" stroke="#0e2f2a" stroke-width="4"/>
+<path d="M 256 288 L 306 330 L 256 344 Z" fill="url(#prismB)" opacity="0.9"/>
+<path d="M 256 288 L 206 330 L 256 344 Z" fill="#5ecfc0" opacity="0.75"/>
+<path d="M 206 330 L 224 402 L 256 344 Z" fill="#2a9488" opacity="0.8"/>
+<path d="M 306 330 L 288 402 L 256 344 Z" fill="#14554e" opacity="0.85"/>
+<path d="M 224 402 L 288 402 L 256 344 Z" fill="#1e6f66" opacity="0.9"/>
+<!-- prism fire: refracted color slivers -->
+<path d="M 240 310 L 256 344 L 232 372 Z" fill="#e9fbff" opacity="0.4"/>
+<path d="M 268 320 L 280 380 L 262 352 Z" fill="#b7f0ff" opacity="0.3"/>
+<path d="M 236 352 L 244 388 L 230 376 Z" fill="#8ae8d8" opacity="0.35"/>
+<!-- crisp facet highlights -->
+<path d="M 256 292 L 296 328" fill="none" stroke="#f2fffc" stroke-width="3" opacity="0.8" stroke-linecap="round"/>
+<path d="M 218 330 L 250 342" fill="none" stroke="#d5fff7" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+<circle cx="266" cy="306" r="5" fill="#ffffff" opacity="0.85"/>
+<circle cx="272" cy="314" r="2.5" fill="#ffffff" opacity="0.6"/>
+<!-- gem bail joining the claws -->
+<rect x="240" y="272" width="32" height="22" rx="8" fill="url(#gold)" stroke="#241a06" stroke-width="4"/>
+<path d="M 246 278 h 20" stroke="#fff3c4" stroke-width="2.5" opacity="0.7" stroke-linecap="round"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

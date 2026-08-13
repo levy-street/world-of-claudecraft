@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Duskforged Warblade</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3a322c"/>
+<stop offset="0.55" stop-color="#1d1a16"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="bladeG" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#8d94a1"/>
+<stop offset="0.48" stop-color="#565b66"/>
+<stop offset="0.52" stop-color="#33363e"/>
+<stop offset="1" stop-color="#1c1e24"/>
+</linearGradient>
+<linearGradient id="fullerG" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#23252c"/>
+<stop offset="0.5" stop-color="#15161b"/>
+<stop offset="1" stop-color="#23252c"/>
+</linearGradient>
+<linearGradient id="emberEdge" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ffc258"/>
+<stop offset="0.5" stop-color="#ff7a2a"/>
+<stop offset="1" stop-color="#e0561f"/>
+</linearGradient>
+<linearGradient id="guardG" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#4b4f59"/>
+<stop offset="0.55" stop-color="#2a2c33"/>
+<stop offset="1" stop-color="#17181d"/>
+</linearGradient>
+<linearGradient id="gripG" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#3d3833"/>
+<stop offset="0.5" stop-color="#241f1c"/>
+<stop offset="1" stop-color="#14110f"/>
+</linearGradient>
+<radialGradient id="emberGem" cx="0.38" cy="0.32" r="0.95">
+<stop offset="0" stop-color="#ffe2a0"/>
+<stop offset="0.5" stop-color="#ff7a2a"/>
+<stop offset="1" stop-color="#8a2f10"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- faint warm atmosphere behind the key side -->
+<ellipse cx="180" cy="170" rx="180" ry="150" fill="#6b5134" opacity="0.14" filter="url(#soft)"/>
+<!-- grounded contact shadow -->
+<ellipse cx="256" cy="430" rx="165" ry="28" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="426" rx="112" ry="17" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- dusk ember haze along the blade line -->
+<ellipse cx="290" cy="220" rx="60" ry="150" fill="#e0561f" opacity="0.1" filter="url(#soft)" transform="rotate(32 290 220)"/>
+<g transform="rotate(32 256 256)">
+  <!-- straight dusk-steel blade -->
+  <path d="M 256 42 L 279 84 L 279 306 L 233 306 L 233 84 Z" fill="url(#bladeG)" stroke="#0c0d12" stroke-width="4"/>
+  <!-- fuller -->
+  <path d="M 250 92 L 262 92 L 262 296 L 250 296 Z" fill="url(#fullerG)" stroke="#0a0b0f" stroke-width="1.5"/>
+  <!-- ember quench line along the leading edge -->
+  <path d="M 256 50 L 276 86 L 276 304 L 270 304 L 270 88 L 253 56 Z" fill="url(#emberEdge)" opacity="0.85"/>
+  <path d="M 272 100 L 272 300" stroke="#ffc258" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+  <!-- cool key-side highlight -->
+  <path d="M 238 90 L 238 300" stroke="#c7ccd6" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+  <path d="M 256 46 L 240 82" stroke="#dfe3ea" stroke-width="3" opacity="0.6" stroke-linecap="round"/>
+  <!-- forge-fold shimmer -->
+  <g fill="none" stroke="#7b828f" stroke-width="1.5" opacity="0.35">
+    <path d="M 242 120 q 8 30 -2 62"/>
+    <path d="M 242 200 q 8 30 -2 62"/>
+  </g>
+  <!-- crossguard: down-swept dusk steel with ember studs -->
+  <path d="M 176 310 C 210 296 302 296 336 310 C 340 320 336 328 328 330 C 300 318 212 318 184 330 C 176 328 172 320 176 310 Z" fill="url(#guardG)" stroke="#0c0d12" stroke-width="4"/>
+  <path d="M 186 310 C 216 300 296 300 326 310" fill="none" stroke="#9aa1ad" stroke-width="2.5" opacity="0.5"/>
+  <circle cx="196" cy="318" r="5" fill="url(#emberGem)" stroke="#331107" stroke-width="1.5"/>
+  <circle cx="316" cy="318" r="5" fill="url(#emberGem)" stroke="#331107" stroke-width="1.5"/>
+  <!-- riser collar -->
+  <rect x="242" y="328" width="28" height="12" rx="4" fill="url(#guardG)" stroke="#0c0d12" stroke-width="3"/>
+  <!-- wrapped grip -->
+  <path d="M 244 340 L 268 340 L 265 408 L 247 408 Z" fill="url(#gripG)" stroke="#0c0d12" stroke-width="3.5"/>
+  <g fill="none" stroke="#0d0b09" stroke-width="4" opacity="0.7">
+    <path d="M 245 352 L 267 358"/>
+    <path d="M 246 366 L 266 372"/>
+    <path d="M 246 380 L 266 386"/>
+    <path d="M 247 394 L 265 399"/>
+  </g>
+  <g fill="none" stroke="#5c524a" stroke-width="1.5" opacity="0.6">
+    <path d="M 245 349 L 267 355"/>
+    <path d="M 246 363 L 266 369"/>
+    <path d="M 246 377 L 266 383"/>
+    <path d="M 247 391 L 265 396"/>
+  </g>
+  <!-- pommel with ember core -->
+  <circle cx="256" cy="424" r="17" fill="url(#guardG)" stroke="#0c0d12" stroke-width="4"/>
+  <circle cx="256" cy="424" r="8" fill="url(#emberGem)" stroke="#331107" stroke-width="2"/>
+  <path d="M 244 414 A 16 16 0 0 1 258 408" fill="none" stroke="#b9bfc9" stroke-width="2.5" opacity="0.6"/>
+  <circle cx="252" cy="420" r="3" fill="#ffe2a0" opacity="0.5" filter="url(#soft4)"/>
+</g>
+<!-- ember spark drifting off the tip -->
+<circle cx="366" cy="112" r="3" fill="#ffc258" opacity="0.7"/>
+<circle cx="382" cy="94" r="2" fill="#ff7a2a" opacity="0.5"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

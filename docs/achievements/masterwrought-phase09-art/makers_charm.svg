@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Maker's Charm</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#332c38"/>
+<stop offset="0.55" stop-color="#1b181e"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="gold" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#ffe9a8"/>
+<stop offset="0.55" stop-color="#d9ac48"/>
+<stop offset="1" stop-color="#8a6522"/>
+</linearGradient>
+<linearGradient id="goldDeep" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#d9ac48"/>
+<stop offset="0.55" stop-color="#9a7226"/>
+<stop offset="1" stop-color="#5a4114"/>
+</linearGradient>
+<linearGradient id="darkFrame" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#4b4f59"/>
+<stop offset="0.55" stop-color="#2a2c33"/>
+<stop offset="1" stop-color="#15161b"/>
+</linearGradient>
+<radialGradient id="irisG" cx="0.4" cy="0.35" r="0.9">
+<stop offset="0" stop-color="#d9c2ff"/>
+<stop offset="0.45" stop-color="#8a55e0"/>
+<stop offset="1" stop-color="#341563"/>
+</radialGradient>
+<radialGradient id="irisGlow" cx="0.5" cy="0.5" r="0.7">
+<stop offset="0" stop-color="#a883e8" stop-opacity="0.55"/>
+<stop offset="1" stop-color="#8a55e0" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="emberBead" cx="0.38" cy="0.32" r="0.95">
+<stop offset="0" stop-color="#ffe2a0"/>
+<stop offset="0.5" stop-color="#ff7a2a"/>
+<stop offset="1" stop-color="#8a2f10"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- faint warm atmosphere behind the key side -->
+<ellipse cx="182" cy="162" rx="185" ry="150" fill="#5d4a63" opacity="0.16" filter="url(#soft)"/>
+<!-- grounded contact shadow -->
+<ellipse cx="256" cy="430" rx="140" ry="26" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="426" rx="92" ry="15" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- hanging loop and short chain -->
+<circle cx="256" cy="92" r="17" fill="none" stroke="#241a06" stroke-width="13"/>
+<circle cx="256" cy="92" r="17" fill="none" stroke="url(#gold)" stroke-width="9"/>
+<path d="M 244 82 A 15 15 0 0 1 258 76" fill="none" stroke="#fff3c4" stroke-width="2.5" opacity="0.7"/>
+<ellipse cx="256" cy="64" rx="9" ry="12" fill="none" stroke="url(#goldDeep)" stroke-width="6"/>
+<ellipse cx="256" cy="44" rx="9" ry="12" fill="none" stroke="url(#gold)" stroke-width="6" opacity="0.8"/>
+<!-- radiant maker's rays behind the eye -->
+<g stroke="url(#goldDeep)" stroke-width="7" stroke-linecap="round" opacity="0.85">
+  <path d="M 256 128 L 256 152"/>
+  <path d="M 256 392 L 256 368"/>
+  <path d="M 130 260 L 156 260"/>
+  <path d="M 382 260 L 356 260"/>
+  <path d="M 168 172 L 186 190"/>
+  <path d="M 344 172 L 326 190"/>
+  <path d="M 168 348 L 186 330"/>
+  <path d="M 344 348 L 326 330"/>
+</g>
+<g stroke="#ffe9a8" stroke-width="2.5" stroke-linecap="round" opacity="0.5">
+  <path d="M 256 132 L 256 148"/>
+  <path d="M 172 176 L 184 188"/>
+  <path d="M 134 260 L 150 260"/>
+</g>
+<!-- almond eye frame: dark steel under gold, one step past Artisan's Eye -->
+<path d="M 256 150 C 342 150 398 208 412 260 C 398 312 342 370 256 370 C 170 370 114 312 100 260 C 114 208 170 150 256 150 Z" fill="url(#darkFrame)" stroke="#0c0d12" stroke-width="5"/>
+<path d="M 256 162 C 334 162 386 214 400 260 C 386 306 334 358 256 358 C 178 358 126 306 112 260 C 126 214 178 162 256 162 Z" fill="none" stroke="url(#gold)" stroke-width="8"/>
+<path d="M 256 176 C 324 176 370 220 384 260 C 370 300 324 344 256 344 C 188 344 142 300 128 260 C 142 220 188 176 256 176 Z" fill="#17141c" stroke="#0c0d12" stroke-width="3"/>
+<!-- gold filigree at the corners -->
+<g fill="none" stroke="url(#gold)" stroke-width="4">
+  <path d="M 112 254 C 96 250 88 260 92 272 C 98 266 106 262 116 264"/>
+  <path d="M 400 254 C 416 250 424 260 420 272 C 414 266 406 262 396 264"/>
+</g>
+<circle cx="88" cy="266" r="5" fill="url(#emberBead)" stroke="#331107" stroke-width="2"/>
+<circle cx="424" cy="266" r="5" fill="url(#emberBead)" stroke="#331107" stroke-width="2"/>
+<!-- engraved sockets along the upper lid -->
+<g fill="url(#goldDeep)" stroke="#241a06" stroke-width="2">
+  <circle cx="196" cy="176" r="5"/>
+  <circle cx="256" cy="164" r="5"/>
+  <circle cx="316" cy="176" r="5"/>
+</g>
+<!-- iris glow -->
+<circle cx="256" cy="260" r="110" fill="url(#irisGlow)" filter="url(#soft4)"/>
+<!-- the eye: faceted violet iris with a forge-slit pupil -->
+<circle cx="256" cy="260" r="64" fill="url(#irisG)" stroke="#241243" stroke-width="4"/>
+<g fill="none" stroke="#c8aaf5" stroke-width="2" opacity="0.4">
+  <path d="M 256 200 L 256 320"/>
+  <path d="M 204 230 L 308 290"/>
+  <path d="M 308 230 L 204 290"/>
+  <path d="M 198 260 L 314 260"/>
+</g>
+<circle cx="256" cy="260" r="40" fill="none" stroke="#341563" stroke-width="3" opacity="0.7"/>
+<!-- forge-slit pupil with ember heart -->
+<path d="M 256 214 C 264 236 264 284 256 306 C 248 284 248 236 256 214 Z" fill="#120826" stroke="#0c0d12" stroke-width="2"/>
+<path d="M 256 228 C 261 244 261 276 256 292 C 251 276 251 244 256 228 Z" fill="url(#emberBead)"/>
+<!-- key-light glints -->
+<path d="M 208 214 A 66 66 0 0 1 250 196" fill="none" stroke="#efe2ff" stroke-width="4" opacity="0.7" stroke-linecap="round"/>
+<circle cx="226" cy="222" r="7" fill="#ffffff" opacity="0.8"/>
+<circle cx="238" cy="212" r="3.5" fill="#ffffff" opacity="0.55"/>
+<!-- lower-lash ember drops -->
+<path d="M 216 356 q -4 14 4 24" fill="none" stroke="url(#gold)" stroke-width="4" stroke-linecap="round"/>
+<circle cx="221" cy="386" r="5" fill="url(#emberBead)" stroke="#331107" stroke-width="2"/>
+<path d="M 296 356 q 4 14 -4 24" fill="none" stroke="url(#gold)" stroke-width="4" stroke-linecap="round"/>
+<circle cx="291" cy="386" r="5" fill="url(#emberBead)" stroke="#331107" stroke-width="2"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

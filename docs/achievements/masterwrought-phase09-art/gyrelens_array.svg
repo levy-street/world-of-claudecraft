@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Gyrelens Array</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#382f26"/>
+<stop offset="0.55" stop-color="#1c1913"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="brass" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#f4dc90"/>
+<stop offset="0.55" stop-color="#bb903e"/>
+<stop offset="1" stop-color="#6a4d18"/>
+</linearGradient>
+<linearGradient id="brassDeep" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#c9a04e"/>
+<stop offset="0.55" stop-color="#8a6522"/>
+<stop offset="1" stop-color="#463008"/>
+</linearGradient>
+<radialGradient id="lensG" cx="0.38" cy="0.32" r="0.95">
+<stop offset="0" stop-color="#e9f6ff"/>
+<stop offset="0.45" stop-color="#9cc8e0"/>
+<stop offset="0.8" stop-color="#3e6d88"/>
+<stop offset="1" stop-color="#1d3a4c"/>
+</radialGradient>
+<radialGradient id="lensDeep" cx="0.4" cy="0.35" r="0.9">
+<stop offset="0" stop-color="#bcd8ea"/>
+<stop offset="0.6" stop-color="#4d7c96"/>
+<stop offset="1" stop-color="#1a3140"/>
+</radialGradient>
+<linearGradient id="ironArm" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#565b66"/>
+<stop offset="0.55" stop-color="#2e3138"/>
+<stop offset="1" stop-color="#121318"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- faint warm atmosphere behind the key side -->
+<ellipse cx="180" cy="160" rx="185" ry="150" fill="#6b5a34" opacity="0.15" filter="url(#soft)"/>
+<!-- grounded contact shadow -->
+<ellipse cx="228" cy="440" rx="150" ry="26" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="222" cy="436" rx="100" ry="15" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- iron spine rail the lens stack telescopes along -->
+<path d="M 172 384 L 396 112" fill="none" stroke="#0e0c08" stroke-width="24" stroke-linecap="round"/>
+<path d="M 172 384 L 396 112" fill="none" stroke="url(#ironArm)" stroke-width="16" stroke-linecap="round"/>
+<path d="M 178 374 L 390 118" fill="none" stroke="#8b919d" stroke-width="3" opacity="0.35"/>
+<!-- rail collar clamps at each lens seat -->
+<g fill="url(#brassDeep)" stroke="#241a06" stroke-width="3">
+  <rect x="352" y="152" width="34" height="16" rx="5" transform="rotate(-50 369 160)"/>
+  <rect x="282" y="238" width="38" height="18" rx="5" transform="rotate(-50 301 247)"/>
+  <rect x="196" y="340" width="44" height="20" rx="6" transform="rotate(-50 218 350)"/>
+</g>
+<!-- smallest rear lens, top of the stack -->
+<circle cx="372" cy="136" r="46" fill="none" stroke="#241a06" stroke-width="15"/>
+<circle cx="372" cy="136" r="46" fill="none" stroke="url(#brassDeep)" stroke-width="11"/>
+<circle cx="372" cy="136" r="37" fill="url(#lensDeep)" stroke="#122531" stroke-width="3"/>
+<path d="M 346 114 A 35 35 0 0 1 370 102" fill="none" stroke="#e6f4fc" stroke-width="3" opacity="0.7" stroke-linecap="round"/>
+<circle cx="358" cy="120" r="4" fill="#ffffff" opacity="0.75"/>
+<g fill="url(#brass)" stroke="#241a06" stroke-width="1.5">
+  <circle cx="372" cy="88" r="3.5"/>
+  <circle cx="414" cy="160" r="3.5"/>
+  <circle cx="330" cy="160" r="3.5"/>
+</g>
+<!-- middle lens seated behind the prime lens -->
+<circle cx="300" cy="226" r="72" fill="none" stroke="#241a06" stroke-width="19"/>
+<circle cx="300" cy="226" r="72" fill="none" stroke="url(#brassDeep)" stroke-width="14"/>
+<circle cx="300" cy="226" r="59" fill="url(#lensDeep)" stroke="#122531" stroke-width="3"/>
+<path d="M 258 194 A 56 56 0 0 1 296 172" fill="none" stroke="#e6f4fc" stroke-width="4" opacity="0.7" stroke-linecap="round"/>
+<circle cx="276" cy="200" r="6" fill="#ffffff" opacity="0.75"/>
+<g fill="url(#brass)" stroke="#241a06" stroke-width="1.5">
+  <circle cx="300" cy="150" r="4"/>
+  <circle cx="234" cy="264" r="4"/>
+  <circle cx="366" cy="264" r="4"/>
+</g>
+<!-- prime lens: the big front ring at the foot of the stack -->
+<circle cx="212" cy="330" r="108" fill="none" stroke="#241a06" stroke-width="30"/>
+<circle cx="212" cy="330" r="108" fill="none" stroke="url(#brass)" stroke-width="22"/>
+<!-- knurled adjustment teeth around the prime ring -->
+<g stroke="#241a06" stroke-width="3" opacity="0.7">
+  <path d="M 212 208 l 0 12"/>
+  <path d="M 271 226 l -6 10"/>
+  <path d="M 313 268 l -10 6"/>
+  <path d="M 330 330 l -12 0"/>
+  <path d="M 313 392 l -10 -6"/>
+  <path d="M 271 434 l -6 -10"/>
+  <path d="M 212 452 l 0 -12"/>
+  <path d="M 153 434 l 6 -10"/>
+  <path d="M 111 392 l 10 -6"/>
+  <path d="M 94 330 l 12 0"/>
+  <path d="M 111 268 l 10 6"/>
+  <path d="M 153 226 l 6 10"/>
+</g>
+<path d="M 138 258 A 102 102 0 0 1 208 228" fill="none" stroke="#ffedb0" stroke-width="6" opacity="0.75" stroke-linecap="round"/>
+<!-- prime glass -->
+<circle cx="212" cy="330" r="90" fill="url(#lensG)" stroke="#122531" stroke-width="4"/>
+<!-- concentric ground-glass rings -->
+<g fill="none" stroke="#20495e" stroke-width="2.5" opacity="0.55">
+  <circle cx="212" cy="330" r="69"/>
+  <circle cx="212" cy="330" r="46"/>
+  <circle cx="212" cy="330" r="23"/>
+</g>
+<g fill="none" stroke="#bfe2f2" stroke-width="2" opacity="0.35">
+  <path d="M 148 302 A 71 71 0 0 1 182 268"/>
+  <path d="M 170 310 A 48 48 0 0 1 194 288"/>
+</g>
+<!-- focus spot drifting off center -->
+<circle cx="242" cy="362" r="16" fill="#eaf7ff" opacity="0.5" filter="url(#soft4)"/>
+<circle cx="242" cy="362" r="7" fill="#ffffff" opacity="0.85"/>
+<!-- big key-light sweep on the prime glass -->
+<path d="M 148 276 A 82 82 0 0 1 202 244" fill="none" stroke="#f2fbff" stroke-width="7" opacity="0.75" stroke-linecap="round"/>
+<ellipse cx="172" cy="284" rx="32" ry="19" fill="#ffffff" opacity="0.25" filter="url(#soft4)" transform="rotate(-38 172 284)"/>
+<!-- rivets on the prime ring -->
+<g fill="url(#brass)" stroke="#241a06" stroke-width="2">
+  <circle cx="212" cy="215" r="5"/>
+  <circle cx="312" cy="273" r="5"/>
+  <circle cx="312" cy="387" r="5"/>
+  <circle cx="212" cy="445" r="5"/>
+  <circle cx="112" cy="387" r="5"/>
+  <circle cx="112" cy="273" r="5"/>
+</g>
+<!-- side adjustment screw with wing key -->
+<path d="M 104 366 L 66 380" stroke="#0e0c08" stroke-width="14" stroke-linecap="round"/>
+<path d="M 104 366 L 66 380" stroke="url(#brassDeep)" stroke-width="9" stroke-linecap="round"/>
+<circle cx="58" cy="384" r="13" fill="url(#brass)" stroke="#241a06" stroke-width="3"/>
+<path d="M 50 376 a 11 11 0 0 1 9 -4" fill="none" stroke="#ffedb0" stroke-width="2.5" opacity="0.8"/>
+<!-- stray glass sparkle at the stack head -->
+<path d="M 432 84 l 3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3 Z" fill="#e8f4ff" opacity="0.7"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

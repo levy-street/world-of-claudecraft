@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 860,
-    "liveItemDefinitions": 875,
+    "itemArtFilesReviewed": 870,
+    "liveItemDefinitions": 885,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -293,24 +293,24 @@
       "armor-gloves": 42,
       "armor-helmet": 41,
       "armor-legs": 61,
-      "armor-neck": 11,
-      "armor-offhand": 5,
-      "armor-ring": 23,
+      "armor-neck": 12,
+      "armor-offhand": 6,
+      "armor-ring": 25,
       "armor-shoulder": 49,
       "armor-waist": 28,
       "bag": 7,
       "drink": 9,
       "elixir": 4,
       "food": 21,
-      "held_offhand": 12,
+      "held_offhand": 14,
       "junk": 92,
       "mount": 9,
       "potion": 13,
       "quest": 97,
       "scroll": 3,
-      "tool": 47,
+      "tool": 49,
       "ui-backpack": 1,
-      "weapon": 123
+      "weapon": 125
     },
     "incrementalReviews": [
       {
@@ -391,7 +391,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 860,
+    "passCount": 870,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -566,6 +566,8 @@
       "drownstep_treads",
       "duskfang_dirk",
       "duskforged_billet",
+      "duskforged_bulwark",
+      "duskforged_warblade",
       "duskhide_wraps",
       "duskthorn_mantle",
       "duskwhisper",
@@ -710,6 +712,7 @@
       "guardian_core",
       "gullhaven_watchbell",
       "gutripper_shiv",
+      "gyrelens_array",
       "hammered_copper_band",
       "handaxe",
       "healing_potion",
@@ -830,6 +833,7 @@
       "lunar_tide_greatstaff",
       "lunarward_cinch",
       "magenta_cyan_armor_plate",
+      "makers_charm",
       "makers_ember",
       "maldrecs_soulbinder",
       "mana_potion",
@@ -847,6 +851,7 @@
       "marshstalker_jerkin",
       "marshstalker_spaulders",
       "marshstrider_boots",
+      "masters_field_forge",
       "maul_of_the_scourged_wilds",
       "mawscale_pauldrons",
       "medallion_of_endless_profit",
@@ -943,6 +948,7 @@
       "precision_chassis",
       "priests_sigil",
       "prime_cut",
+      "prismglass_loop",
       "prismglass_setting",
       "pristine_claw",
       "pristine_hide",
@@ -988,6 +994,7 @@
       "revenant_silk_robe",
       "revenantstep_treads",
       "ridge_stalker_pelt",
+      "ridgebreaker",
       "ridgestalker_treads",
       "riding_training",
       "rift_essence",
@@ -1196,6 +1203,7 @@
       "vestments_of_the_waking_grove",
       "vigil_star_chart",
       "vineclaw_stalking_breeches",
+      "voidbound_grimoire",
       "voidscar_handwraps",
       "voidsong_dirk",
       "voidweave_mantle",
@@ -1207,6 +1215,7 @@
       "wardplate_cuirass",
       "wardspeaker_sabatons",
       "wardweave_cowl",
+      "warhewn_signet",
       "waterlogged_idol",
       "wayfarers_hood",
       "weathered_ledger_page",
@@ -1240,6 +1249,7 @@
       "wyrmcult_soulsteps",
       "wyrmcult_spellgrips",
       "wyrmfall_core",
+      "wyrmfall_pendant",
       "wyrmfang_greatblade",
       "wyrmhide_cording",
       "wyrmscale_jerkin",
@@ -1258,7 +1268,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 860 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12."
+    "summary": "All 870 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13."
   },
   "nonVisualContentWatch": [
     {
@@ -1415,8 +1425,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "185028dc4fb1b563013a1c1c2bd812966269ef2f0e381057483065a7e53ef106",
-      "bytes": 471776
+      "sha256": "e2ff30c7fcf3c3f0be1306cc5223dc0d4b14034b5b6749050698743afd963c36",
+      "bytes": 476973
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 216,
@@ -1430,7 +1440,7 @@
       "small-multiview": 27,
       "identity": 27
     },
-    "sheetSetSha256": "e0246fd65ad6efc6eb61e78ddb3286429f0c5bbd3b8e57a930f6a7729d4f45d5",
+    "sheetSetSha256": "fb42818452fb6d5a9583381203726ab687ddac3b8edf577af59e0b06ce2b6a5b",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -1818,192 +1828,192 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--128-color.png",
-        "sha256": "6fd460cf5c17c547e50c827afa236f029c4afe0599c4a59038b5a6f7eca8d27c",
-        "bytes": 328887,
+        "sha256": "0c9b653efe3dd7ef832546cdd6cfa9c05719f1684308abee861334e54deab08b",
+        "bytes": 348483,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--40-color.png",
-        "sha256": "1a151459e4abc640d177a0dd3f132e475a3adc133f78fa906ba92ab111271be7",
-        "bytes": 65735,
+        "sha256": "96e059b47dcc4bfb2d3d7c59bc0633e320bbce8f3c331dac47a695fb8f39636f",
+        "bytes": 70386,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--28-color.png",
-        "sha256": "fea3466c610a5c9b7c02161a3955e824e2ca0c38d9057b795529f3c26940d81f",
-        "bytes": 47961,
+        "sha256": "bb33c506e4a5e36b64d91a7118df05b38d4d5f528d396343008d0196976d9cb8",
+        "bytes": 51486,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--22-color.png",
-        "sha256": "0b4d752ddc372f10f56c583d2011197e04ffa7320859060f81492eae6c1b6cd2",
-        "bytes": 38690,
+        "sha256": "b7513ff6b9f7087198e01edf5928dda14c32e298b8ccd69eb78ae3a75d2be3d8",
+        "bytes": 41453,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--28-grayscale.png",
-        "sha256": "df7f55e2a0ae7ceb4a1c3c351d94764d499c951430aaea469f28ac1a94e5f004",
-        "bytes": 37570,
+        "sha256": "a1c018becd1bfbfd24b8f0e384cad9f50f45ef2e4aafc7a5ea725729e86d377a",
+        "bytes": 40389,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--64-circle.png",
-        "sha256": "80c177c3d6fa7b545e6d0a5f2aec9cba1a190a84b8a97ecc7a84cff389613c29",
-        "bytes": 110906,
+        "sha256": "2ad72ab05f4da428f721b8e46cd820d6b72acd5d7c0ba1656d0ff9ff25ff882f",
+        "bytes": 117859,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--small-multiview.png",
-        "sha256": "15874331bbc5a24a7aa3f32c6d69288be419d8378719144a479bb430e1df0545",
-        "bytes": 201460,
+        "sha256": "c3310a7a9c290d3f17910bdfc7b9339a36539f9544d8ff4c537c7a8c0fc9e5cc",
+        "bytes": 215421,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--identity.png",
-        "sha256": "cad658e1b4fd82fbaccb0766d6c8b930bee3662fc338b0eb78f264b2f7f24ff4",
-        "bytes": 344676,
+        "sha256": "44529c0dfa5d510dddb85280a822bac0340c9bf488cb5eef0920f14994494fc3",
+        "bytes": 365110,
         "width": 1800,
         "height": 452,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--128-color.png",
-        "sha256": "2efbde9a35a9adc7041890b5a0cbdf0e467deda220f5931fb1c2f99f4f8c0129",
-        "bytes": 203061,
+        "sha256": "4723b455e82628b033e0a2e33d36d0f8525c68d9edbf31525ef26aaafb3b3e21",
+        "bytes": 221751,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--40-color.png",
-        "sha256": "55ff7d96079f793a2320552e49095bb93ddc48f71f7db104b96ae0f801aa4b84",
-        "bytes": 38522,
+        "sha256": "6d017b3f2b5f3b5bd79c4cec2f136ae73f18f1b590fa9b8033282a61b858c805",
+        "bytes": 42971,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--28-color.png",
-        "sha256": "03cb0383999294bcc5768798935628271bea119250efde17e2aed3b571a577e2",
-        "bytes": 27724,
+        "sha256": "1429d7edde34bb06810ad62502ef135ffdb4f1dac69ef57c48984f7b82d5e208",
+        "bytes": 31373,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--22-color.png",
-        "sha256": "5bd2908d5efd6be2f0a92a902c521ec14311b9a9ab7b726ba4b76753f8016a4e",
-        "bytes": 22674,
+        "sha256": "a8cca75d5215bf52adcea2bee2daa1fd12340300347bc34cf582d727979c89b9",
+        "bytes": 25176,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--28-grayscale.png",
-        "sha256": "89a153361fc8edce5c6f9eddd7dd667ac2951ef3d010ac30ffd4450cec4e960b",
-        "bytes": 23660,
+        "sha256": "33c773c0e6201a98bc7c67bf02acde41b9246b5aca3ac6620dc555c488084a13",
+        "bytes": 26024,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--64-circle.png",
-        "sha256": "76e508465a6eb33a624ce5b0790df66ff5590cbb4a85afa870081bbdbf1ad9a6",
-        "bytes": 66258,
+        "sha256": "d3f5a567e120b0710edee0f7ccd3113982067a097b79864b37b93da4ee760763",
+        "bytes": 73561,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--small-multiview.png",
-        "sha256": "be704ed70bb439a53ccbdc6649b6f685c458ff97e64a8a8132c91dcde3922e28",
-        "bytes": 117029,
+        "sha256": "af06cffc9fbbe456cae68b1e4aa98804f32ede07c94c2dc80bbfa72ec462e08c",
+        "bytes": 130289,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--identity.png",
-        "sha256": "556e6c0f0cd2733f4879fc9ddd183c19e65de47268a7eb3cfed503ae1d8917bc",
-        "bytes": 211654,
+        "sha256": "491b3956518b0a8888d1ac1f8efb80fe1b54929fc17f2062bfff1eaa2d752982",
+        "bytes": 231493,
         "width": 1800,
         "height": 248,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--128-color.png",
-        "sha256": "a2e4f2103f1e3342a0dd74874b648445d2e897b44341a2a454c663b7975cc66e",
-        "bytes": 660078,
+        "sha256": "8d354a20426d95c2d8c1de88edeb89a88d0d2810f3512471447abf1dcb3f7c69",
+        "bytes": 700175,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--40-color.png",
-        "sha256": "1c19604dc08e40badea909794376735097fc5c567e2b03c957d91ca80da388ea",
-        "bytes": 129543,
+        "sha256": "cb9b04e1aa7814be009620da6bccc265556c557b00ca16453adcaff05c2d17d0",
+        "bytes": 138900,
         "width": 1600,
         "height": 410,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--28-color.png",
-        "sha256": "a5e980184a4d68cc8811ba707c5a244c2f7cebc2a55e6400ea31fedfff8e7cc2",
-        "bytes": 91737,
+        "sha256": "d0cfdc09a9928b6a32c1728abb36d7e0bd6456f13d3d7c7ba2cbfc7dd926daf3",
+        "bytes": 98388,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--22-color.png",
-        "sha256": "a1e7dd4fa53c3dc2e985bc075b334cb7c898c177802557d2d996eb32c92de829",
-        "bytes": 73664,
+        "sha256": "6cbbea2f737b8d616371669d592ea5b98c90444597c2649803c8cfe5787b17b7",
+        "bytes": 78790,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--28-grayscale.png",
-        "sha256": "364b2a6199aa624b6e8566c668db4cf76f3eab55db90a8bc0e34353c5c6e43de",
-        "bytes": 69491,
+        "sha256": "aacc323f8ec83b1fff36b875a9ef8ccbbbce402c9174892d5e62af91ecdb8c7b",
+        "bytes": 74140,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--64-circle.png",
-        "sha256": "17eecda5e126b65165f5e58ea7c0ab9a9bcc818760ef874acf27e5d81e73a8d8",
-        "bytes": 227792,
+        "sha256": "05bdae740d32890b9f48cd7c30f9184336b22d592afc8ff66dfb72ac046637b4",
+        "bytes": 241057,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--small-multiview.png",
-        "sha256": "eefe306f68d440b0744e8626604477e90a76c95d1c43fac791b20f360efc15d8",
-        "bytes": 405498,
+        "sha256": "9f737f4968eaace5033028924e84ad173ea80e8d28041d84cbc0cd717f979c70",
+        "bytes": 433535,
         "width": 1800,
         "height": 698,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--identity.png",
-        "sha256": "2a729bd4e8fddd3d9a98e792e63e832098711ef6d32ea7d0ca0fb0dd52d731c6",
-        "bytes": 690447,
+        "sha256": "e947d5d4ace58e1175d348afccb158f5d376a1819b530f1843da7339b67c5fcc",
+        "bytes": 730828,
         "width": 1800,
         "height": 656,
         "format": "png"
@@ -2394,64 +2404,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--128-color.png",
-        "sha256": "812a89e11862b6c0c32f21715ef1c1f04b135ec799033919f97630333402bf07",
-        "bytes": 328695,
+        "sha256": "877135b7a5033486008c6df3f6eeb32bde685d3543028045efa0bd4f4653fb68",
+        "bytes": 371262,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--40-color.png",
-        "sha256": "9219884fbf39998a17ec669b83a284c7ea6a5f64b4a7411d6ff61559120c20bc",
-        "bytes": 65745,
+        "sha256": "fc99ee7705e2280b8717a5940d5cbd3de1ea961e21f0c59867d6ab0a1640d5ba",
+        "bytes": 75555,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--28-color.png",
-        "sha256": "855fe1c56e873625c765e8b3475394f78f91062cb86ea0eed8de99d5d3ebc4ce",
-        "bytes": 48850,
+        "sha256": "1790154dffdf2c6ff977d92aff285816d2f0a5d823ee616159f57483bf07a935",
+        "bytes": 55838,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--22-color.png",
-        "sha256": "3f0e07a51f72eee6d61856ab0bf6faa8397b9ecada06e44df50390377c3da68c",
-        "bytes": 39862,
+        "sha256": "035b4e25ca72905cdf22fc698389f8e28fc9283c725eff8d50ab45900f7d9e3e",
+        "bytes": 45303,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--28-grayscale.png",
-        "sha256": "0d78a7f0da71b316a76a44198d49421fc1a5c6f38d8622ad0efed92f4ee92bc8",
-        "bytes": 39075,
+        "sha256": "283d89a4c8bd72073c4f332c07adf360e4fe91786dc3ebd2c255c7aeba34b3d2",
+        "bytes": 44303,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--64-circle.png",
-        "sha256": "9f3ed6d46fc936db84c75677392f2bdc2a061e322e9a2c383d7e4ad42b62f6ee",
-        "bytes": 113075,
+        "sha256": "eca11a882bac15ece0eda856dc0f4f551a988e30d5cd090cc0aac37b39ea8ce0",
+        "bytes": 128010,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--small-multiview.png",
-        "sha256": "301ee2b58f6b3ee60c34607c37d0459b5c43b44cafa17a28d1b8656ee0e64818",
-        "bytes": 203010,
+        "sha256": "c5250ce36f4282bb2f5dd918af1ee7cf3b35dc476c44e797e4558374377f3119",
+        "bytes": 232107,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--identity.png",
-        "sha256": "88841e59eefd19a21dcab3a410f7290e3cdfb85d4c6f2d274c0a82d8656dc1d0",
-        "bytes": 342204,
+        "sha256": "809b0fd346c46bfb511a6b50d422307cf99fd7937c106dd1c20177821bcc2b7d",
+        "bytes": 387066,
         "width": 1800,
         "height": 452,
         "format": "png"
@@ -2906,64 +2916,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--128-color.png",
-        "sha256": "b98d9807ff5ba2e1fe2e498bee6429113a8106d006216138617f48aee47daf46",
-        "bytes": 1504251,
+        "sha256": "0ca9018f25123d0ea4eee9a7b8459795780c0639502402d95cf3d4de3d8edb46",
+        "bytes": 1544145,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--40-color.png",
-        "sha256": "04b09e2bf23e0aa6a239109b461cec8e20ecf2254599215291011e5a57081a3c",
-        "bytes": 274183,
+        "sha256": "09bd54f87c7f9a6a31dbe0e616d7451d17a275df421a327324aae3e0745b8e89",
+        "bytes": 282884,
         "width": 1600,
         "height": 654,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--28-color.png",
-        "sha256": "ffcf11b3e03b5031b0e858254177a5aa3d1e20a886ff6eb88e9a3f155d7b074a",
-        "bytes": 185432,
+        "sha256": "171a6d19a227a078ed84ec8e9d8c88c9be0ded746f1d2cacd70cced0fc4df3e5",
+        "bytes": 190772,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--22-color.png",
-        "sha256": "8e97e3934952c75f31f415ae66faf5c62e423c36139127ca57782da008e2eb8e",
-        "bytes": 144064,
+        "sha256": "ff0047091426426cfa0873424c0a62770cfe942c7394748960968c573e6f6fca",
+        "bytes": 149088,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--28-grayscale.png",
-        "sha256": "190e3ea406046bf482a2ae905be6fbd1223bbdb33c178172c123a614f66da596",
-        "bytes": 134251,
+        "sha256": "b4224e375c655bebb8d27fc182c60279221509a16444eb775445ebbd6fe8589b",
+        "bytes": 137933,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--64-circle.png",
-        "sha256": "67f22129a474e384914f0ee69d0b6ad97fc497fd20c7f81ea13bc30f0109b3f1",
-        "bytes": 469506,
+        "sha256": "434ef2de572c8a491f111b3b07846a19028b812eae6ca052635900f18b86deea",
+        "bytes": 483048,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--small-multiview.png",
-        "sha256": "467049cb4bc6d23e473fa40981d36e4456b6d685078bfe336bfb0688fe44ec11",
-        "bytes": 868972,
+        "sha256": "71aaa176aeb002b32de6bb3fa0d0e47d8beeccb41b57e8681a2a3e966d137c54",
+        "bytes": 895511,
         "width": 1800,
         "height": 1134,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--identity.png",
-        "sha256": "20e8027be9409eaa032af78784f715b875947e5428e3f39b861e90887d07da25",
-        "bytes": 1552664,
+        "sha256": "1ed5246a15280a55dff6467c8feeab3f06805d9549a1ec1187ffd55dd399a7a0",
+        "bytes": 1593931,
         "width": 1800,
         "height": 1064,
         "format": "png"
@@ -3034,133 +3044,133 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--128-color.png",
-        "sha256": "28c0b7d25dcbcdb5490e7a0c9b82e01c8ff002552329e5708855cc8dccae0d67",
-        "bytes": 2343201,
+        "sha256": "147667f4919ab96cfe240f366222d42060c841c973a3d5a227b1c5d8bfe4d3f2",
+        "bytes": 2322232,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--40-color.png",
-        "sha256": "f9fb1bc9539900f673d655aad92431514c6226897da4409a74bf3635f75f061e",
-        "bytes": 460615,
+        "sha256": "92b2d929d7b3f58ec25f69d0bb58faded8dc4f1eb3c97195d98d38a0d883e022",
+        "bytes": 459078,
         "width": 1600,
         "height": 1020,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--28-color.png",
-        "sha256": "7bc0f440ab437b025d7158c2efdf01fb75a5cd6302becf0c70740a7988187f4b",
-        "bytes": 309449,
+        "sha256": "e65f1b1442c880acb72f6b2892309105ae0c15967e91a3ad7e61e58f9517efa9",
+        "bytes": 308864,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--22-color.png",
-        "sha256": "07462dcb9e99d1d9f9ff04c1db7ab880555913fa647538d971b9b7850cc657b7",
-        "bytes": 236741,
+        "sha256": "b71be95747fd6e7fedd4fdd5a9b1e945ae98f35bab7a7c4ffe7e94465515515b",
+        "bytes": 236563,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--28-grayscale.png",
-        "sha256": "8ecf2e0138fd130d91827b86f2ff362930d54179ab50e9c1dcd9660bf609d18c",
-        "bytes": 215120,
+        "sha256": "e20032ebc92343bf6903cfd9c6c8983df69cb97301edfb8726223943cad47c2b",
+        "bytes": 215087,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--64-circle.png",
-        "sha256": "43a9dba3f59abd9a7a2017a86eacbc82d3c57831b4f69182272225a0b8e05f46",
-        "bytes": 727058,
+        "sha256": "dc466602207a30cb4d2904f5c87246c30749b83eee16654d66ed5d586919ea17",
+        "bytes": 721946,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--small-multiview.png",
-        "sha256": "10368a0dba07519b3fa1d425735dcfe35b69ec4c475e4018910245befe2ea02d",
-        "bytes": 1391548,
+        "sha256": "4a542c2c6639ded71fd2b267d2d99afa0624258399c44aafbef956168a71e2d7",
+        "bytes": 1384867,
         "width": 1800,
         "height": 1788,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--identity.png",
-        "sha256": "00a7fc648856095bd9bfd2f449968b5b0bf7bca4dd709740cb1df858f2bb789b",
-        "bytes": 2433526,
+        "sha256": "a76dd86d87111216e8921e18e8d87b013d081ac1f9851d4b5189b03bfac12dfd",
+        "bytes": 2412534,
         "width": 1800,
         "height": 1676,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--128-color.png",
-        "sha256": "465cc21428f171948b6e0a59639203150e086a8d90198086b36aa2206ff69e98",
-        "bytes": 1037424,
+        "sha256": "a22cc279521049344f37efbd23ddb2c816cf05707767978689c20f70d1547559",
+        "bytes": 1089917,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--40-color.png",
-        "sha256": "43a035e4bdf4d125c12d719b49d375818b7b8e7a92c92b366493b4f4aaea9288",
-        "bytes": 213054,
+        "sha256": "85e950feb717d0709c588ea96bccbbb36a9049239dbaf5017726e76d6c471565",
+        "bytes": 223546,
         "width": 1600,
         "height": 654,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--28-color.png",
-        "sha256": "b95f10e71216d6e568f53f89ba5da0d117fffbde13c205f55ff954e8e22a9f16",
-        "bytes": 152274,
+        "sha256": "d68b032c4bbe73717af2c4c510282e3177f8cf1f32de76ca1755bc15305b1ac2",
+        "bytes": 160201,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--22-color.png",
-        "sha256": "08ff03647103cb2899783b2eba07dab162d3d6a8afb9356c0732ec8e83e37a1b",
-        "bytes": 121326,
+        "sha256": "c45d4fb9739e4cf23dac90e63b927d315a0cfe38d0eba7aa5f8d08316c2a21ae",
+        "bytes": 127148,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--28-grayscale.png",
-        "sha256": "7fb20a9a123844a97557bb91abc835a1bf535f0508b00f3068c9f4eaefc2f3f9",
-        "bytes": 112911,
+        "sha256": "79d145b4c684515b57cddc42124f18c21f4ec2efc6f4cfd89d6a723e8da6b706",
+        "bytes": 118080,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--64-circle.png",
-        "sha256": "ac01ded0ac0e0340e953c08108c76f1453b5cd8a0b3864798a7b1dba042ebc87",
-        "bytes": 345029,
+        "sha256": "44a26e9e7d7875370a0e507a627fa80070894e5a3084ca44d7838f0e96cdaeb7",
+        "bytes": 362094,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--small-multiview.png",
-        "sha256": "ac841bc758b59f2667b336f8f458d804854af0db728893cb77d9d793750ccf4c",
-        "bytes": 645240,
+        "sha256": "ed383321da6576f03500dde312c8780d000b5c9ebd28d12688887c3cc8cba30f",
+        "bytes": 677926,
         "width": 1800,
         "height": 1134,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--identity.png",
-        "sha256": "2ae8d23a5828cae35ce1a5b66deaff3c0d851fdc5f4ca8bda65f88d5868f55d0",
-        "bytes": 1085894,
+        "sha256": "755295012993d44038b0673701a8b0ea040abecc0f6879e29f0b1551c3099fba",
+        "bytes": 1140129,
         "width": 1800,
         "height": 1064,
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "7260291be47b0dc122d3348d1668c8d1125701c001741d1ccebe177ce06184a5"
+    "shippingCatalogSha256": "98adcfdac8ed174640dcab03da641693c324016014563c2b05d4b077d2e483b4"
   }
 }

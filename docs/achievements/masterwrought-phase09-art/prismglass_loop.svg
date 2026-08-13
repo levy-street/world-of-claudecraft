@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Prismglass Loop</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#2c313a"/>
+<stop offset="0.55" stop-color="#181b20"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="glassA" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#dfeaf6"/>
+<stop offset="0.5" stop-color="#93a7bd"/>
+<stop offset="1" stop-color="#3a4557"/>
+</linearGradient>
+<linearGradient id="glassB" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#f4f9ff"/>
+<stop offset="0.5" stop-color="#b8c0cd"/>
+<stop offset="1" stop-color="#485468"/>
+</linearGradient>
+<linearGradient id="glassDeep" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#77808f"/>
+<stop offset="0.55" stop-color="#3a3f4a"/>
+<stop offset="1" stop-color="#1a1d24"/>
+</linearGradient>
+<linearGradient id="silver" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#f0f4fa"/>
+<stop offset="0.55" stop-color="#9aa3b2"/>
+<stop offset="1" stop-color="#4c515d"/>
+</linearGradient>
+<radialGradient id="coolGlow" cx="0.5" cy="0.5" r="0.7">
+<stop offset="0" stop-color="#bfe0ff" stop-opacity="0.5"/>
+<stop offset="1" stop-color="#93a7bd" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- faint cool atmosphere behind the key side -->
+<ellipse cx="185" cy="165" rx="185" ry="150" fill="#48607e" opacity="0.16" filter="url(#soft)"/>
+<!-- grounded contact shadow -->
+<ellipse cx="256" cy="440" rx="152" ry="26" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="436" rx="100" ry="15" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- ambient refraction pool under the loop -->
+<ellipse cx="256" cy="310" rx="165" ry="140" fill="url(#coolGlow)" filter="url(#soft4)"/>
+<g transform="translate(256 268) scale(1.18) translate(-256 -263)">
+<!-- faceted glass hoop: segmented prism blocks around the band -->
+<g stroke="#10141c" stroke-width="4">
+  <path d="M 256 138 L 306 150 L 292 204 L 256 196 Z" fill="url(#glassB)"/>
+  <path d="M 306 150 L 352 180 L 324 226 L 292 204 Z" fill="url(#glassA)"/>
+  <path d="M 352 180 L 376 232 L 336 258 L 324 226 Z" fill="url(#glassDeep)"/>
+  <path d="M 376 232 L 376 292 L 334 292 L 336 258 Z" fill="url(#glassA)"/>
+  <path d="M 376 292 L 352 344 L 322 314 L 334 292 Z" fill="url(#glassDeep)"/>
+  <path d="M 352 344 L 306 376 L 290 336 L 322 314 Z" fill="url(#glassA)"/>
+  <path d="M 306 376 L 256 388 L 256 342 L 290 336 Z" fill="url(#glassDeep)"/>
+  <path d="M 256 388 L 206 376 L 222 336 L 256 342 Z" fill="url(#glassA)"/>
+  <path d="M 206 376 L 160 344 L 190 314 L 222 336 Z" fill="url(#glassDeep)"/>
+  <path d="M 160 344 L 136 292 L 178 292 L 190 314 Z" fill="url(#glassA)"/>
+  <path d="M 136 292 L 136 232 L 176 258 L 178 292 Z" fill="url(#glassB)"/>
+  <path d="M 136 232 L 160 180 L 188 226 L 176 258 Z" fill="url(#glassA)"/>
+  <path d="M 160 180 L 206 150 L 220 204 L 188 226 Z" fill="url(#glassB)"/>
+  <path d="M 206 150 L 256 138 L 256 196 L 220 204 Z" fill="url(#glassA)"/>
+</g>
+<!-- inner rim of the loop -->
+<ellipse cx="256" cy="263" rx="72" ry="70" fill="none" stroke="#10141c" stroke-width="4"/>
+<ellipse cx="256" cy="263" rx="72" ry="70" fill="none" stroke="url(#glassDeep)" stroke-width="2.5" opacity="0.8"/>
+<!-- refracted spectra split inside the facets -->
+<path d="M 214 158 L 236 198 L 208 214 Z" fill="#ffffff" opacity="0.35"/>
+<path d="M 292 158 L 276 198 L 300 208 Z" fill="#d5f0ff" opacity="0.3"/>
+<path d="M 150 246 L 172 262 L 152 282 Z" fill="#bfe8ff" opacity="0.3"/>
+<path d="M 344 208 L 330 236 L 356 244 Z" fill="#c9b4f2" opacity="0.4"/>
+<path d="M 366 268 L 344 276 L 362 296 Z" fill="#a3e2ef" opacity="0.35"/>
+<path d="M 318 350 L 300 332 L 292 360 Z" fill="#f0d2a0" opacity="0.35"/>
+<path d="M 176 330 L 196 318 L 200 344 Z" fill="#d8c2f4" opacity="0.3"/>
+<path d="M 344 340 L 322 318 L 340 302 Z" fill="#0e1219" opacity="0.4"/>
+<path d="M 230 372 L 250 344 L 258 380 Z" fill="#0e1219" opacity="0.35"/>
+<!-- crisp key-light glints -->
+<path d="M 212 152 L 250 142" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.85" stroke-linecap="round"/>
+<path d="M 166 184 L 196 162" fill="none" stroke="#e8f4ff" stroke-width="3" opacity="0.6" stroke-linecap="round"/>
+<path d="M 142 240 L 152 210" fill="none" stroke="#cfe4fa" stroke-width="2.5" opacity="0.5" stroke-linecap="round"/>
+<circle cx="228" cy="150" r="4" fill="#ffffff" opacity="0.9"/>
+<circle cx="236" cy="146" r="2" fill="#ffffff" opacity="0.6"/>
+</g>
+<!-- silver bezel seating the crown prism on the band -->
+<path d="M 232 130 L 280 130 L 272 152 L 240 152 Z" fill="url(#silver)" stroke="#10141c" stroke-width="4"/>
+<!-- crown prism: a small kite-cut stone riding the top of the band -->
+<path d="M 256 74 L 286 112 L 274 136 L 238 136 L 226 112 Z" fill="url(#glassB)" stroke="#10141c" stroke-width="4"/>
+<path d="M 256 74 L 274 136 L 238 136 Z" fill="url(#glassA)" opacity="0.85"/>
+<path d="M 256 74 L 238 136 L 226 112 Z" fill="#e6f2fc" opacity="0.5"/>
+<path d="M 256 74 L 286 112 L 274 136 Z" fill="#2c3542" opacity="0.55"/>
+<path d="M 252 82 L 242 126" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.8" stroke-linecap="round"/>
+<circle cx="250" cy="94" r="4" fill="#ffffff" opacity="0.9"/>
+<circle cx="256" cy="112" r="34" fill="#bfe0ff" opacity="0.15" filter="url(#soft4)"/>
+<!-- stray refraction sparkles -->
+<g fill="#e8f4ff">
+  <path d="M 372 142 l 3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3 Z" opacity="0.7"/>
+  <path d="M 142 394 l 2.5 7 7 2.5 -7 2.5 -2.5 7 -2.5 -7 -7 -2.5 7 -2.5 Z" opacity="0.5"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

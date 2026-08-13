@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Warhewn Signet</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3a322c"/>
+<stop offset="0.55" stop-color="#1d1a16"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="ironBand" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#7d8492"/>
+<stop offset="0.5" stop-color="#454a55"/>
+<stop offset="1" stop-color="#1a1c22"/>
+</linearGradient>
+<linearGradient id="ironDeep" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#565b66"/>
+<stop offset="0.55" stop-color="#2e3138"/>
+<stop offset="1" stop-color="#121318"/>
+</linearGradient>
+<linearGradient id="bronze" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#f0c273"/>
+<stop offset="0.55" stop-color="#b0793a"/>
+<stop offset="1" stop-color="#5e3c16"/>
+</linearGradient>
+<linearGradient id="faceG" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#6a707c"/>
+<stop offset="0.5" stop-color="#383c45"/>
+<stop offset="1" stop-color="#191b20"/>
+</linearGradient>
+<radialGradient id="emberSeal" cx="0.4" cy="0.35" r="0.9">
+<stop offset="0" stop-color="#ffdf9a"/>
+<stop offset="0.55" stop-color="#ff7a2a"/>
+<stop offset="1" stop-color="#7e2a0e"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- faint warm atmosphere behind the key side -->
+<ellipse cx="180" cy="160" rx="185" ry="150" fill="#6b5134" opacity="0.14" filter="url(#soft)"/>
+<!-- grounded contact shadow -->
+<ellipse cx="256" cy="424" rx="145" ry="26" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="420" rx="96" ry="15" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- heavy iron hoop in three-quarter view -->
+<g fill="none">
+  <path d="M 256 148 C 152 148 92 214 92 288 C 92 362 160 414 256 414 C 352 414 420 362 420 288 C 420 214 360 148 256 148 Z" stroke="#0c0d12" stroke-width="60"/>
+  <path d="M 256 148 C 152 148 92 214 92 288 C 92 362 160 414 256 414 C 352 414 420 362 420 288 C 420 214 360 148 256 148 Z" stroke="url(#ironDeep)" stroke-width="52"/>
+  <path d="M 256 152 C 156 152 98 216 98 288 C 98 358 164 408 256 408 C 348 408 414 358 414 288 C 414 216 356 152 256 152 Z" stroke="url(#ironBand)" stroke-width="34"/>
+  <!-- hewn chisel facets around the band -->
+  <g stroke="#14161b" stroke-width="4" opacity="0.65">
+    <path d="M 128 214 l 30 20"/>
+    <path d="M 104 262 l 34 10"/>
+    <path d="M 102 314 l 36 -2"/>
+    <path d="M 126 362 l 32 -16"/>
+    <path d="M 176 396 l 22 -26"/>
+    <path d="M 384 214 l -30 20"/>
+    <path d="M 408 262 l -34 10"/>
+    <path d="M 410 314 l -36 -2"/>
+    <path d="M 386 362 l -32 -16"/>
+    <path d="M 336 396 l -22 -26"/>
+  </g>
+  <g stroke="#9ba2b0" stroke-width="2.5" opacity="0.4">
+    <path d="M 132 210 l 28 20"/>
+    <path d="M 108 258 l 32 10"/>
+    <path d="M 130 358 l 30 -16"/>
+    <path d="M 380 210 l -28 20"/>
+  </g>
+  <!-- key light along the upper-left of the hoop -->
+  <path d="M 136 196 C 168 164 210 150 250 150" stroke="#d5dae2" stroke-width="6" opacity="0.6" stroke-linecap="round"/>
+  <path d="M 106 250 C 112 230 122 212 136 198" stroke="#aab1bd" stroke-width="4" opacity="0.4" stroke-linecap="round"/>
+</g>
+<!-- bronze rivet studs flanking the shoulders -->
+<circle cx="140" cy="222" r="9" fill="url(#bronze)" stroke="#2e1c06" stroke-width="3"/>
+<circle cx="372" cy="222" r="9" fill="url(#bronze)" stroke="#2e1c06" stroke-width="3"/>
+<path d="M 135 216 a 8 8 0 0 1 7 -3" fill="none" stroke="#ffe9b8" stroke-width="2" opacity="0.7"/>
+<path d="M 367 216 a 8 8 0 0 1 7 -3" fill="none" stroke="#ffe9b8" stroke-width="2" opacity="0.7"/>
+<!-- massive flat signet face -->
+<path d="M 158 118 L 354 118 C 372 118 382 130 378 146 L 362 208 C 358 222 346 230 330 230 L 182 230 C 166 230 154 222 150 208 L 134 146 C 130 130 140 118 158 118 Z" fill="url(#ironBand)" stroke="#0c0d12" stroke-width="5"/>
+<path d="M 168 128 L 344 128 C 356 128 362 136 360 146 L 348 198 C 345 208 336 214 326 214 L 186 214 C 176 214 167 208 164 198 L 152 146 C 150 136 156 128 168 128 Z" fill="url(#faceG)" stroke="#0c0d12" stroke-width="4"/>
+<!-- bronze frame line inside the face -->
+<path d="M 174 136 L 338 136 C 346 136 350 141 348 148 L 338 192 C 336 199 330 204 322 204 L 190 204 C 182 204 176 199 174 192 L 164 148 C 162 141 166 136 174 136 Z" fill="none" stroke="url(#bronze)" stroke-width="4"/>
+<!-- embossed crossed war-axes seal, struck in ember bronze -->
+<g stroke="#0c0d12" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.8">
+  <path d="M 216 148 L 296 194"/>
+  <path d="M 296 148 L 216 194"/>
+</g>
+<g stroke="url(#emberSeal)" stroke-width="4.5" stroke-linecap="round" fill="none">
+  <path d="M 216 148 L 296 194"/>
+  <path d="M 296 148 L 216 194"/>
+</g>
+<g fill="url(#emberSeal)" stroke="#331107" stroke-width="2.5">
+  <path d="M 210 140 C 200 146 198 158 204 166 C 210 158 216 152 224 150 Z"/>
+  <path d="M 302 140 C 312 146 314 158 308 166 C 302 158 296 152 288 150 Z"/>
+</g>
+<circle cx="256" cy="171" r="9" fill="url(#emberSeal)" stroke="#331107" stroke-width="3"/>
+<circle cx="253" cy="167" r="3" fill="#ffe9c0" opacity="0.8"/>
+<!-- face key light -->
+<path d="M 170 132 L 300 132" stroke="#c7ccd6" stroke-width="3" opacity="0.55" stroke-linecap="round"/>
+<ellipse cx="212" cy="150" rx="52" ry="18" fill="#d8dde6" opacity="0.12" filter="url(#soft4)"/>
+<!-- shoulder chamfers joining face to hoop -->
+<path d="M 150 208 L 128 246 L 158 232 Z" fill="url(#ironDeep)" stroke="#0c0d12" stroke-width="4"/>
+<path d="M 362 208 L 384 246 L 354 232 Z" fill="url(#ironDeep)" stroke="#0c0d12" stroke-width="4"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

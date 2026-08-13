@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Ridgebreaker</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3a322c"/>
+<stop offset="0.55" stop-color="#1d1a16"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="stoneG" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#7d7468"/>
+<stop offset="0.5" stop-color="#4e463d"/>
+<stop offset="1" stop-color="#241f1a"/>
+</linearGradient>
+<linearGradient id="bandG" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#565b66"/>
+<stop offset="0.55" stop-color="#2a2c33"/>
+<stop offset="1" stop-color="#14151a"/>
+</linearGradient>
+<linearGradient id="haftG" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#4a3a2b"/>
+<stop offset="0.5" stop-color="#2c211a"/>
+<stop offset="1" stop-color="#171009"/>
+</linearGradient>
+<linearGradient id="crackG" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ffc258"/>
+<stop offset="0.5" stop-color="#ff7a2a"/>
+<stop offset="1" stop-color="#b23f14"/>
+</linearGradient>
+<radialGradient id="emberCore" cx="0.5" cy="0.5" r="0.7">
+<stop offset="0" stop-color="#ffdf9a"/>
+<stop offset="0.6" stop-color="#ff7a2a"/>
+<stop offset="1" stop-color="#e0561f" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- faint warm atmosphere behind the key side -->
+<ellipse cx="180" cy="160" rx="185" ry="150" fill="#6b5134" opacity="0.14" filter="url(#soft)"/>
+<!-- grounded contact shadow -->
+<ellipse cx="252" cy="432" rx="170" ry="28" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="252" cy="428" rx="116" ry="17" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<g transform="rotate(24 256 256)">
+  <!-- thick haft -->
+  <path d="M 244 208 L 270 208 L 264 430 L 250 430 Z" fill="url(#haftG)" stroke="#0c0a08" stroke-width="4"/>
+  <path d="M 249 214 L 249 424" stroke="#6b543c" stroke-width="2.5" opacity="0.55"/>
+  <!-- leather grip wrap -->
+  <path d="M 247 330 L 267 330 L 264 392 L 250 392 Z" fill="#241c15" stroke="#0c0a08" stroke-width="3"/>
+  <g fill="none" stroke="#0d0b09" stroke-width="4" opacity="0.7">
+    <path d="M 248 342 L 266 348"/>
+    <path d="M 248 356 L 266 362"/>
+    <path d="M 249 370 L 265 376"/>
+  </g>
+  <g fill="none" stroke="#544437" stroke-width="1.5" opacity="0.6">
+    <path d="M 248 339 L 266 345"/>
+    <path d="M 248 353 L 266 359"/>
+    <path d="M 249 367 L 265 373"/>
+  </g>
+  <!-- butt cap -->
+  <path d="M 248 430 h 18 v 10 c 0 7 -18 7 -18 0 Z" fill="url(#bandG)" stroke="#0c0a08" stroke-width="3"/>
+  <!-- massive cracked-stone head -->
+  <path d="M 138 84 C 132 70 148 58 168 60 L 348 66 C 368 66 380 78 376 92 L 372 178 C 372 194 358 204 340 204 L 168 200 C 150 200 138 190 138 176 Z" fill="url(#stoneG)" stroke="#0c0a08" stroke-width="5"/>
+  <!-- hewn facets -->
+  <g fill="none" stroke="#191510" stroke-width="3" opacity="0.6">
+    <path d="M 190 62 L 178 200"/>
+    <path d="M 296 64 L 306 202"/>
+    <path d="M 140 128 L 372 134"/>
+  </g>
+  <g fill="none" stroke="#9a8f80" stroke-width="2" opacity="0.4">
+    <path d="M 196 64 L 185 198"/>
+    <path d="M 146 92 L 366 98"/>
+  </g>
+  <!-- key light on the upper-left face -->
+  <path d="M 150 74 C 160 64 176 62 196 63 L 300 66" fill="none" stroke="#c8bda9" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
+  <ellipse cx="196" cy="96" rx="70" ry="30" fill="#d8c7a8" opacity="0.14" filter="url(#soft4)"/>
+  <!-- ember glow bleeding from the deep crack -->
+  <ellipse cx="252" cy="140" rx="60" ry="40" fill="url(#emberCore)" opacity="0.5" filter="url(#soft4)"/>
+  <!-- cracks -->
+  <path d="M 214 62 L 232 104 L 220 136 L 246 170 L 238 200" fill="none" stroke="#0c0a08" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 214 64 L 231 104 L 219 136 L 245 170 L 238 198" fill="none" stroke="url(#crackG)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 232 104 L 258 118 L 282 112" fill="none" stroke="#0c0a08" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 233 105 L 258 118 L 280 112" fill="none" stroke="url(#crackG)" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 246 170 L 276 160 L 296 172" fill="none" stroke="#0c0a08" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 247 170 L 276 161 L 294 171" fill="none" stroke="url(#crackG)" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+  <!-- steel binding bands -->
+  <path d="M 154 58 L 178 58 L 174 206 L 150 204 Z" fill="url(#bandG)" stroke="#0c0a08" stroke-width="4"/>
+  <path d="M 158 64 L 170 64" stroke="#9aa1ad" stroke-width="2.5" opacity="0.6"/>
+  <path d="M 158 76 L 168 190" stroke="#9aa1ad" stroke-width="2" opacity="0.35"/>
+  <path d="M 336 62 L 360 64 L 356 208 L 332 206 Z" fill="url(#bandG)" stroke="#0c0a08" stroke-width="4"/>
+  <path d="M 340 74 L 350 194" stroke="#7b828f" stroke-width="2" opacity="0.3"/>
+  <circle cx="164" cy="82" r="4" fill="#565b66" stroke="#0c0a08" stroke-width="1.5"/>
+  <circle cx="162" cy="182" r="4" fill="#565b66" stroke="#0c0a08" stroke-width="1.5"/>
+  <circle cx="346" cy="86" r="4" fill="#565b66" stroke="#0c0a08" stroke-width="1.5"/>
+  <circle cx="344" cy="186" r="4" fill="#565b66" stroke="#0c0a08" stroke-width="1.5"/>
+  <!-- collar seating the head on the haft -->
+  <path d="M 238 200 L 276 202 L 272 232 L 242 230 Z" fill="url(#bandG)" stroke="#0c0a08" stroke-width="4"/>
+  <path d="M 243 208 L 269 210" stroke="#9aa1ad" stroke-width="2" opacity="0.5"/>
+</g>
+<!-- drifting ember motes -->
+<circle cx="330" cy="96" r="3" fill="#ffc258" opacity="0.7"/>
+<circle cx="352" cy="76" r="2" fill="#ff7a2a" opacity="0.5"/>
+<circle cx="170" cy="120" r="2" fill="#ffc258" opacity="0.4"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Duskforged Bulwark</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3a322c"/>
+<stop offset="0.55" stop-color="#1d1a16"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="plateG" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#5a5f6a"/>
+<stop offset="0.5" stop-color="#33363e"/>
+<stop offset="1" stop-color="#15161b"/>
+</linearGradient>
+<linearGradient id="rimG" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#8d94a1"/>
+<stop offset="0.55" stop-color="#4b4f59"/>
+<stop offset="1" stop-color="#1c1e24"/>
+</linearGradient>
+<linearGradient id="scaleG" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#4b505b"/>
+<stop offset="1" stop-color="#22242b"/>
+</linearGradient>
+<radialGradient id="bossG" cx="0.38" cy="0.32" r="0.95">
+<stop offset="0" stop-color="#ffe2a0"/>
+<stop offset="0.5" stop-color="#ff7a2a"/>
+<stop offset="1" stop-color="#8a2f10"/>
+</radialGradient>
+<clipPath id="clipFace">
+<path d="M 136 96 C 136 78 158 68 256 66 C 354 68 376 78 376 96 L 374 268 C 374 340 330 402 256 434 C 182 402 138 340 138 268 Z"/>
+</clipPath>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- faint warm atmosphere behind the key side -->
+<ellipse cx="180" cy="160" rx="185" ry="150" fill="#6b5134" opacity="0.14" filter="url(#soft)"/>
+<!-- grounded contact shadow -->
+<ellipse cx="256" cy="438" rx="160" ry="27" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="434" rx="105" ry="16" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- tower body -->
+<path d="M 128 92 C 128 70 154 60 256 58 C 358 60 384 70 384 92 L 382 270 C 382 346 334 410 256 444 C 178 410 130 346 130 270 Z" fill="url(#rimG)" stroke="#0c0d12" stroke-width="5"/>
+<path d="M 136 96 C 136 78 158 68 256 66 C 354 68 376 78 376 96 L 374 268 C 374 340 330 402 256 434 C 182 402 138 340 138 268 Z" fill="url(#plateG)" stroke="#0c0d12" stroke-width="4"/>
+<g clip-path="url(#clipFace)">
+  <!-- key light and lower shadow -->
+  <ellipse cx="180" cy="150" rx="150" ry="120" fill="#aeb6c4" opacity="0.22" filter="url(#soft)"/>
+  <ellipse cx="168" cy="132" rx="80" ry="60" fill="#d8c7a8" opacity="0.12" filter="url(#soft)"/>
+  <ellipse cx="360" cy="392" rx="170" ry="140" fill="#04060c" opacity="0.5" filter="url(#soft)"/>
+  <!-- wyrm-scale ribs: overlapping plate arcs descending the face -->
+  <g stroke="#0c0d12" stroke-width="4" fill="url(#scaleG)">
+    <path d="M 138 150 C 180 128 332 128 374 150 L 374 196 C 332 172 180 172 138 196 Z"/>
+    <path d="M 138 210 C 180 188 332 188 374 210 L 374 256 C 332 232 180 232 138 256 Z"/>
+    <path d="M 138 270 C 180 248 332 248 374 270 L 373 314 C 330 292 182 292 139 314 Z"/>
+    <path d="M 144 330 C 186 308 326 308 368 330 L 356 368 C 320 350 192 350 156 368 Z"/>
+    <path d="M 166 384 C 200 366 312 366 346 384 L 322 412 C 298 400 214 400 190 412 Z"/>
+  </g>
+  <!-- scale ridge highlights -->
+  <g fill="none" stroke="#9aa1ad" stroke-width="2.5" opacity="0.45">
+    <path d="M 146 150 C 186 130 326 130 366 150"/>
+    <path d="M 146 210 C 186 190 326 190 366 210"/>
+    <path d="M 146 270 C 186 250 326 250 366 270"/>
+    <path d="M 152 330 C 190 312 322 312 360 330"/>
+    <path d="M 172 384 C 204 368 308 368 340 384"/>
+  </g>
+  <!-- ember seams under the scale overlaps -->
+  <g fill="none" stroke="#e0561f" stroke-width="2" opacity="0.5">
+    <path d="M 150 194 C 190 172 322 172 362 194"/>
+    <path d="M 150 254 C 190 232 322 232 362 254"/>
+    <path d="M 152 312 C 192 290 320 290 360 312"/>
+  </g>
+  <!-- rivet studs down the flanks -->
+  <g fill="#565b66" stroke="#0c0d12" stroke-width="1.5">
+    <circle cx="154" cy="176" r="4.5"/>
+    <circle cx="358" cy="176" r="4.5"/>
+    <circle cx="154" cy="236" r="4.5"/>
+    <circle cx="358" cy="236" r="4.5"/>
+    <circle cx="156" cy="296" r="4.5"/>
+    <circle cx="356" cy="296" r="4.5"/>
+    <circle cx="168" cy="352" r="4.5"/>
+    <circle cx="344" cy="352" r="4.5"/>
+  </g>
+</g>
+<!-- crest plate across the top -->
+<path d="M 150 92 C 190 76 322 76 362 92 L 356 116 C 318 102 194 102 156 116 Z" fill="url(#rimG)" stroke="#0c0d12" stroke-width="4"/>
+<path d="M 158 92 C 196 78 316 78 354 92" fill="none" stroke="#c7ccd6" stroke-width="2.5" opacity="0.55"/>
+<!-- central boss: ember heart in a steel ring -->
+<circle cx="256" cy="238" r="46" fill="none" stroke="#0c0d12" stroke-width="14" opacity="0.6"/>
+<circle cx="256" cy="238" r="46" fill="none" stroke="url(#rimG)" stroke-width="10"/>
+<path d="M 222 210 A 46 46 0 0 1 268 194" fill="none" stroke="#c7ccd6" stroke-width="3" opacity="0.6"/>
+<circle cx="256" cy="238" r="30" fill="#1a1b21" stroke="#0c0d12" stroke-width="3"/>
+<circle cx="256" cy="238" r="20" fill="url(#bossG)" stroke="#331107" stroke-width="3"/>
+<circle cx="256" cy="238" r="30" fill="#ff7a2a" opacity="0.18" filter="url(#soft4)"/>
+<circle cx="249" cy="230" r="5" fill="#ffe9c0" opacity="0.75"/>
+<!-- boss claw mounts -->
+<g fill="url(#rimG)" stroke="#0c0d12" stroke-width="3">
+  <path d="M 256 186 l 9 14 h -18 Z"/>
+  <path d="M 256 290 l 9 -14 h -18 Z"/>
+  <path d="M 204 238 l 14 -9 v 18 Z"/>
+  <path d="M 308 238 l -14 -9 v 18 Z"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>
