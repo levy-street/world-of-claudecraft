@@ -596,9 +596,11 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
       }
     }
     // Positive control: the sweep would also pass if demotion over-fired and
-    // stripped every flagged pick, so require kits genuinely AT the cap (10
-    // of 16 today).
-    expect(kitsAtCap).toBeGreaterThan(0);
+    // stripped every flagged pick. A bare > 0 floor would stay green while
+    // demotion over-fired on nine of the ten, so pin the exact count; a
+    // phase 09/10 append that moves which kits sit at the cap re-acknowledges
+    // the new number here deliberately.
+    expect(kitsAtCap).toBe(10);
   });
 
   it('a demoted slot falls back to the best unflagged piece, not to empty', () => {
