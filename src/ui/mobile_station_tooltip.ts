@@ -10,10 +10,7 @@
 // (content/professions.ts), with TICK_RATE (types.ts) turning ticks into
 // the minutes the English speaks.
 
-import {
-  MOBILE_CRAFTING_STATION_DURATION_TICKS,
-  STATION_RADIUS,
-} from '../sim/content/professions';
+import { MOBILE_CRAFTING_STATION_DURATION_TICKS, STATION_RADIUS } from '../sim/content/professions';
 import { stationTypeForCraft } from '../sim/professions/stations';
 import { type ItemDef, type ItemUse, type StationType, TICK_RATE } from '../sim/types';
 import { esc } from './esc';
