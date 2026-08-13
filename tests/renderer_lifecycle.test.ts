@@ -148,7 +148,22 @@ describe('Renderer lifecycle wiring', () => {
     expect(airborneBranch).toBeGreaterThan(-1);
     expect(notMovingBranch).toBeGreaterThan(airborneBranch);
     const airborneBranchBody = audioBlock.slice(airborneBranch, notMovingBranch);
-    expect(airborneBranchBody).not.toContain('sink.mountEngine(');
+    // ORDINARY mounts still must not poll: strip the one sanctioned exception
+    // first, then assert nothing else calls it. The Goblin Rocket Sled is a
+    // deliberate carve-out, not a regression: its turbine startup continues
+    // through a hop and an active sustain bends pitch upward under no load, so
+    // it needs the poll the hold exists to avoid for everything else. Keeping
+    // the guard shaped this way means a SECOND mount cannot quietly join the
+    // exception without editing this line.
+    const sledException = airborneBranchBody.indexOf('if (rocketSledMounted) {');
+    expect(sledException).toBeGreaterThan(-1);
+    const sledExceptionEnd = airborneBranchBody.indexOf(
+      '}',
+      airborneBranchBody.indexOf('sink.mountEngine(', sledException),
+    );
+    const withoutSledException =
+      airborneBranchBody.slice(0, sledException) + airborneBranchBody.slice(sledExceptionEnd);
+    expect(withoutSledException).not.toContain('sink.mountEngine(');
   });
 
   it('tears down a still-active engine-mount loop when the rider exits the move-audio range gate', () => {

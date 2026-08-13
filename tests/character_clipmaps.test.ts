@@ -150,6 +150,10 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
 const CLIPLESS_RIGS = new Set([
   'mount_stalkglider_snail',
   'mount_aether_hover_cycle',
+  // the Goblin Rocket Sled: a static prop whose exhaust, jump attitude and
+  // rider pivot are all driven procedurally (goblin_rocket_sled_fx.ts,
+  // mount_visuals.ts), so its GLB carries no clips to lose.
+  'mount_goblin_rocket_sled',
   'mob_glimmerwisp',
   'mob_duskwisp',
   'mob_spider_egg_sac',

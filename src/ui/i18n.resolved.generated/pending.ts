@@ -58,26 +58,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
-  "zh_CN": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
-  ],
-  "zh_TW": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
-  ],
-  "ko_KR": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
-  ],
-  "ja_JP": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.chatQuota.limitReached",
@@ -86,11 +70,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
-  "ru_RU": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.chatQuota.limitReached",
