@@ -86,7 +86,6 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
-import { FARM_COMPOST_ITEM_ID, FARM_WITHERED_HUSK_ITEM_ID } from '../sim/professions/farming';
 import {
   computeRespecCost,
   FOCUS_POINT_BUDGET,
@@ -304,15 +303,7 @@ import {
 } from './entity_i18n';
 import { ERROR_LOG_CHAN, ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
-import {
-  farmDeniedToast,
-  farmFineLineKey,
-  farmHarvestLineKey,
-  farmHusksConvertedLineKey,
-  farmPlantedTokenId,
-  farmSeedBackLineKey,
-  farmWitheredLineKey,
-} from './farming_view';
+import { handleFarmEvent } from './farm_event_feedback';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
@@ -12445,138 +12436,16 @@ export class Hud {
           audio.fishReel();
           break;
         }
-        case 'farmPlanted': {
-          // A crop went into a bed (Farming, the growth-engine phase). The
-          // event is text-free and id-carrying, so the pure core resolves
-          // which item the line names (the crop's seed, the one it consumed)
-          // and the crop-drift fallback with it. No cue: the plant cast has no
-          // recorded sound yet and the render / juice phase owns that, so a
-          // borrowed one would have to be undone.
-          this.log(
-            t('hudChrome.farming.plantLine', {
-              name: grantItemToken(farmPlantedTokenId(ev.cropId)),
-            }),
-            '#c8f7c5',
-          );
+        case 'farmPlanted':
+        case 'farmHarvested':
+        case 'farmWithered':
+        case 'farmDenied':
+        case 'farmHusksConverted':
+          // Farming's five feedback arms, extracted whole to
+          // src/ui/farm_event_feedback.ts at the v0.38.0 sync (the monolith
+          // ratchet heal); the Hud itself is the host seam.
+          handleFarmEvent(ev, this);
           break;
-        }
-        case 'farmHarvested': {
-          // The produce a ready plot paid. These are the ONLY lines for the
-          // grant (the farming resolver emits its hub grants callerLogs, the
-          // #2430 one-line rule), so they carry the quantity. The fine-grade
-          // twin takes a second line for the same reason a Pristine specimen
-          // does: it is a different item granted BESIDE the plain produce, so
-          // one line would read as the same yield reported twice.
-          this.log(
-            t(farmHarvestLineKey(ev.count), {
-              name: grantItemToken(ev.itemId),
-              qty: grantQtyText(ev.count),
-            }),
-            '#7fdc4f',
-          );
-          // Both halves demanded, not just the id: the emitter always writes
-          // the pair together (a present pair means a MIXED harvest), but the
-          // wire type declares them as independent optionals, and a half-pair
-          // from a stale or foreign server would otherwise render an implicit
-          // "x1" for a real multi-unit fine yield. A malformed half-pair
-          // renders nothing rather than something wrong.
-          if (ev.fineItemId !== undefined && ev.fineCount !== undefined) {
-            this.log(
-              t(farmFineLineKey(ev.fineCount), {
-                name: grantItemToken(ev.fineItemId),
-                qty: grantQtyText(ev.fineCount),
-              }),
-              '#7fdc4f',
-            );
-          }
-          // The tier 3/4 seed-back sentence, only when the event carries a
-          // POSITIVE count (the emitter omits zero; the positive guard also
-          // drops a malformed zero from a stale or foreign server rather
-          // than printing "x0"). The seed item resolves client-side from the
-          // crop id through the same shared hop the plant line uses.
-          if (ev.seedBackCount !== undefined && ev.seedBackCount > 0) {
-            this.log(
-              t(farmSeedBackLineKey(ev.seedBackCount), {
-                name: grantItemToken(farmPlantedTokenId(ev.cropId)),
-                qty: grantQtyText(ev.seedBackCount),
-              }),
-              '#7fdc4f',
-            );
-          }
-          // The last-charge signal (the gatherResult arm's farming twin):
-          // the harvest that spent the slotted effect's final charge
-          // announces it as an FCT self-note. ONE surface on purpose: the
-          // professions window's charge row is the durable record, so a log
-          // line here would be the double-feedback trap.
-          if (ev.effectDepleted) {
-            this.showSelfNote(t('hudChrome.professions.toolEffectDepleted'));
-          }
-          break;
-        }
-        case 'farmWithered': {
-          // The plot lost its survival pre-roll and paid husks instead. Grey,
-          // the no-cost-miss register (gotAwayLine): a withered crop costs the
-          // seed and the wait, never the bed, and the line says so plainly
-          // rather than dressing a failure as a yield.
-          this.log(
-            t(farmWitheredLineKey(ev.count), {
-              name: grantItemToken(FARM_WITHERED_HUSK_ITEM_ID),
-              qty: grantQtyText(ev.count),
-            }),
-            '#a8a8a8',
-          );
-          // The seed-back consolation on a failed high-tier crop (the roll
-          // fires on BOTH outcomes): a real grant, so it keeps the grant
-          // green rather than the failure grey, and the same positive guard
-          // as the harvested arm above.
-          if (ev.seedBackCount !== undefined && ev.seedBackCount > 0) {
-            this.log(
-              t(farmSeedBackLineKey(ev.seedBackCount), {
-                name: grantItemToken(farmPlantedTokenId(ev.cropId)),
-                qty: grantQtyText(ev.seedBackCount),
-              }),
-              '#7fdc4f',
-            );
-          }
-          break;
-        }
-        case 'farmDenied': {
-          // A refused plant, harvest or husk trade: an error toast ONLY, no
-          // line, no cue, no other state (the gatherDenied pattern). The sim
-          // event is text-free, so the pure core resolves the key, and for
-          // the 'tool' reason also the tier the refused crop demands (the
-          // tierRequired.farming line, node-path parity), which is formatted
-          // HERE because the pure core stays formatter-free.
-          const toast = farmDeniedToast(ev.reason, ev.cropId);
-          this.showError(
-            t(
-              toast.key,
-              toast.params
-                ? { tier: formatNumber(toast.params.tier, { maximumFractionDigits: 0 }) }
-                : undefined,
-            ),
-          );
-          break;
-        }
-        case 'farmHusksConverted': {
-          // The husk trade (the knobs phase). The event owns both halves of
-          // the feedback (the compost grant rides its hub loot event silent +
-          // callerLogs, the #2430 one-line rule), so this one line names both
-          // sides of the trade AS ITEM TOKENS: the husks spent and the
-          // compost gained, each through grantItemToken so neither can drift
-          // from its localized item name. Same grant green as the harvest
-          // line; no cue (the render / juice phase owns farming audio).
-          this.log(
-            t(farmHusksConvertedLineKey(ev.compost), {
-              husksName: grantItemToken(FARM_WITHERED_HUSK_ITEM_ID),
-              husks: grantQtyText(ev.husks),
-              name: grantItemToken(FARM_COMPOST_ITEM_ID),
-              qty: grantQtyText(ev.compost),
-            }),
-            '#7fdc4f',
-          );
-          break;
-        }
         case 'gatherRareEvent': {
           // Soft zone broadcast (Professions 2.0): every recipient in
           // the zone logs the localized flavor line; only the finder also gets

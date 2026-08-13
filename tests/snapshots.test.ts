@@ -5304,8 +5304,15 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
-  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from server/game.ts (multi-line lockouts incl.)', () => {
-    const raw = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from the self-snapshot emit sources (multi-line lockouts incl.)', () => {
+    // The emit surface is server/game.ts plus the one extracted emitter:
+    // farming's fplot row moved whole to server/farming_commands.ts at the
+    // v0.38.0 sync monolith heal (appendFarmPlotsWire), so that file joins
+    // the scrape; a key emitted from an unscraped module would silently
+    // vacate this pin's coverage.
+    const raw =
+      readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8') +
+      readFileSync(resolve(process.cwd(), 'server/farming_commands.ts'), 'utf8');
     // Strip comments before scraping so a commented-out call cannot keep its key
     // in the scraped set (the `(^|[^:])` guard keeps protocol `://` intact).
     const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
