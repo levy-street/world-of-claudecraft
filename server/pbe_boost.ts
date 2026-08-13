@@ -391,10 +391,18 @@ export function bisKitForRole(
     const best = bestBySlot.get(slot);
     if (best) kit[slot] = best.id;
   }
-  fillHands(cls, role, kit, weapons, shields, bestBySlot.get('offhand'));
+  const held = bestBySlot.get('offhand');
+  fillHands(cls, role, kit, weapons, shields, held);
   if (rings[0]) kit.ring1 = rings[0].id;
   if (rings[1]) kit.ring2 = rings[1].id;
-  enforceMasterwroughtCap(kit, bestUnflaggedBySlot, rings, (id) => roleItemScore(role, ITEMS[id]));
+  enforceMasterwroughtCap(
+    kit,
+    bestUnflaggedBySlot,
+    rings,
+    (id) => roleItemScore(role, ITEMS[id]),
+    undefined,
+    { cls, role, weapons, shields, held },
+  );
   return kit;
 }
 
@@ -403,37 +411,41 @@ export function bisKitForRole(
  *  weakest-covered slots are all apex-crafted picks over the cap and
  *  buildBoostedCharacterState hard-throws at the third equip (the state.md
  *  phases 03/08 open item; four role kits really did hit 3 before this).
- *  The demoted slots fall back to the best unflagged pick for the slot; the
- *  KEPT picks are the cap-highest scoring flagged ones. Phase 08 flagged
- *  items are all body armor; if phase 09 ships a flagged weapon or ring it
- *  lands in the hand/ring arms below (rings refill from the scored ring
- *  list). The HAND arms split on WEAPON versus non-weapon, and both sides
- *  are wrong for phase 09 as they stand: a demoted flagged WEAPON (mainhand
- *  or a dual-wield offhand) has no fallback at all (weapons skip the slot
- *  map, so the slot empties), while a demoted flagged shield or held
- *  offhand DOES refill from the slot map, but this runs after fillHands and
- *  re-applies neither the two-hand exclusion nor shield legality, so the
- *  refill could build an illegal kit. Phase 09 must route hand demotion
- *  through fillHands, not merely add a weapon fallback: the sweep in
- *  tests/server/pbe_boost.test.ts holds every role kit at the cap either
- *  way. The legendary sub-cap needs no arm until a legendary-flagged def
- *  ships. */
+ *  The KEPT picks are the cap-highest scoring flagged ones. A demoted armor
+ *  slot falls back to the best unflagged pick for the slot; a demoted ring
+ *  refills from the scored ring list. A demoted HAND pick (mainhand or
+ *  offhand: weapon, shield, or held offhand) clears its slot and the hand
+ *  slots are refilled by re-running fillHands over the candidate lists with
+ *  every non-KEPT flagged id excluded, so the two-hand exclusion, dual-wield
+ *  distinctness, spec legality, and shield legality all hold through the
+ *  refill by construction, and the refill can never re-select a different
+ *  over-cap flagged item (a second-best flagged weapon is excluded even when
+ *  it was never worn). Kept flagged hand picks stay candidates, so the
+ *  re-run re-selects them under the same ordering that picked them. Any slot
+ *  with no eligible refill empties rather than keeping an over-cap or
+ *  illegal pick; the sweep in tests/server/pbe_boost.test.ts holds every
+ *  role kit at the cap either way. The legendary sub-cap needs no arm until
+ *  a legendary-flagged def ships. */
 export function enforceMasterwroughtCap(
   kit: Partial<Record<EquipSlot, string>>,
   bestUnflaggedBySlot: ReadonlyMap<string, { id: string; score: number }>,
   rings: readonly { id: string; score: number }[],
   scoreOf: (id: string) => number,
   isFlagged: (id: string) => boolean = (id) => !!ITEMS[id]?.masterwrought,
+  hands?: HandRefillSources,
 ): void {
-  // Exported with injectable score/flag reads for tests: the ring-refill and
-  // empty-fallback arms are unreachable with shipped data (no flagged ring,
-  // weapon, or fallback-less slot exists until phase 09), and synthetic-input
-  // coverage keeps phase 09 from landing on never-executed code.
+  // Exported with injectable score/flag/legality reads for tests: the
+  // ring-refill, hand-refill, and empty-fallback arms are unreachable with
+  // shipped data (every shipped flagged item is body armor; no flagged ring,
+  // weapon, shield, or held offhand exists yet), and synthetic-input
+  // coverage keeps them executed rather than dead.
   const flagged = (Object.entries(kit) as [EquipSlot, string][]).filter(([, id]) => isFlagged(id));
   if (flagged.length <= MASTERWROUGHT_EQUIP_CAP) return;
   const scored = flagged
     .map(([slot, id]) => ({ slot, id, score: scoreOf(id) }))
     .sort((a, b) => b.score - a.score);
+  const kept = new Set(scored.slice(0, MASTERWROUGHT_EQUIP_CAP).map((e) => e.id));
+  let handDemoted = false;
   for (const demoted of scored.slice(MASTERWROUGHT_EQUIP_CAP)) {
     if (demoted.slot === 'ring1' || demoted.slot === 'ring2') {
       const used = new Set(Object.values(kit));
@@ -442,21 +454,75 @@ export function enforceMasterwroughtCap(
       else delete kit[demoted.slot];
       continue;
     }
+    if (demoted.slot === 'mainhand' || demoted.slot === 'offhand') {
+      // Cleared here so a refill-less re-run leaves the slot empty; fillHands
+      // only ever sets, never deletes, and must not inherit the over-cap id.
+      delete kit[demoted.slot];
+      handDemoted = true;
+      continue;
+    }
     const fallback = bestUnflaggedBySlot.get(demoted.slot as string);
     if (fallback) kit[demoted.slot] = fallback.id;
     else delete kit[demoted.slot];
   }
+  if (!handDemoted || !hands) return;
+  const allowed = (id: string) => !isFlagged(id) || kept.has(id);
+  // The held candidate is a single pick, not a list, so an excluded one
+  // substitutes the best unflagged offhand-slot item (the same bucket the
+  // original held was drawn from).
+  const held =
+    hands.held && allowed(hands.held.id) ? hands.held : bestUnflaggedBySlot.get('offhand');
+  fillHands(
+    hands.cls,
+    hands.role,
+    kit,
+    hands.weapons.filter((w) => allowed(w.id)),
+    hands.shields.filter((s) => allowed(s.id)),
+    held,
+    hands.reads,
+  );
 }
 
-type ScoredItem = { id: string; score: number };
-type ScoredWeapon = ScoredItem & { twoHand: boolean };
+export type ScoredItem = { id: string; score: number };
+export type ScoredWeapon = ScoredItem & { twoHand: boolean };
+
+/** The per-item legality reads fillHands makes, injectable so the cap
+ *  enforcer's hand-refill arm is drivable with synthetic defs that never
+ *  touch ITEMS (the same seam pattern as isFlagged above). */
+export interface HandLegalityReads {
+  canEquipInSlot: (
+    cls: PlayerClass,
+    id: string,
+    slot: 'mainhand' | 'offhand',
+    spec: string | null,
+  ) => boolean;
+  canDualWieldSpecless: (cls: PlayerClass) => boolean;
+}
+
+const ITEM_HAND_READS: HandLegalityReads = {
+  canEquipInSlot: (cls, id, slot, spec) => canEquipItemInSlot(cls, ITEMS[id], slot, spec),
+  canDualWieldSpecless: (cls) => canDualWield(cls, null),
+};
+
+/** The candidate pools fillHands drew from, handed to enforceMasterwroughtCap
+ *  so a flagged hand demotion refills through the real layout rules. */
+export interface HandRefillSources {
+  cls: PlayerClass;
+  role: BoostRole;
+  weapons: readonly ScoredWeapon[];
+  shields: readonly ScoredItem[];
+  held: ScoredItem | undefined;
+  reads?: HandLegalityReads;
+}
 
 /** Resolve the weapon slots by the role's hand layout. Alternate-role kits
  *  ride in the bags and are equipped AFTER the tester commits the spec, so
  *  their legality is checked under role.id; the default layout keeps the
  *  spec-less check because the primary kit is equipped at spawn, before any
  *  spec exists. Every layout falls back to the default when its pieces do
- *  not exist, so a content change can never produce a weaponless kit. */
+ *  not exist, so a content change can never produce a weaponless kit.
+ *  Re-run by enforceMasterwroughtCap after a flagged hand demotion, over
+ *  candidate lists filtered of the over-cap flagged ids. */
 function fillHands(
   cls: PlayerClass,
   role: BoostRole,
@@ -464,6 +530,7 @@ function fillHands(
   weapons: readonly ScoredWeapon[],
   shields: readonly ScoredItem[],
   held: ScoredItem | undefined,
+  reads: HandLegalityReads = ITEM_HAND_READS,
 ): void {
   if (role.hands === 'shield') {
     // A tank holds the best one-hander plus the best shield (Shieldcrack
@@ -479,9 +546,9 @@ function fillHands(
   if (role.hands === 'dualWield') {
     // Both hands get the best distinct spec-legal weapons; under Titan's
     // Grip (fury) canEquipItemInSlot admits two-handers in either hand.
-    const main = weapons.find((w) => canEquipItemInSlot(cls, ITEMS[w.id], 'mainhand', role.id));
+    const main = weapons.find((w) => reads.canEquipInSlot(cls, w.id, 'mainhand', role.id));
     const off = weapons.find(
-      (w) => w.id !== main?.id && canEquipItemInSlot(cls, ITEMS[w.id], 'offhand', role.id),
+      (w) => w.id !== main?.id && reads.canEquipInSlot(cls, w.id, 'offhand', role.id),
     );
     if (main && off) {
       kit.mainhand = main.id;
@@ -499,9 +566,9 @@ function fillHands(
     // The second weapon must be offhand-legal (canEquipItemInSlot excludes
     // two-handers and mainhand-only weapons for a spec-less dual-wielder);
     // anything else would displace the mainhand pick on equip.
-    const second = canDualWield(cls, null)
+    const second = reads.canDualWieldSpecless(cls)
       ? weapons.find(
-          (w) => w.id !== mainhand.id && canEquipItemInSlot(cls, ITEMS[w.id], 'offhand', null),
+          (w) => w.id !== mainhand.id && reads.canEquipInSlot(cls, w.id, 'offhand', null),
         )
       : undefined;
     const off = [held, second]

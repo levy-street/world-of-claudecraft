@@ -31,6 +31,7 @@ import {
   CLASS_ROLES,
   classItemScore,
   enforceMasterwroughtCap,
+  type HandLegalityReads,
   NYTHRAXIS_ATTUNEMENT_QUESTS,
   pbeBoostEnabled,
   randomBoostName,
@@ -698,5 +699,298 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
       (id) => id && ITEMS[id]?.masterwrought,
     );
     expect(flaggedWorn.length).toBeLessThanOrEqual(MASTERWROUGHT_EQUIP_CAP);
+  });
+});
+
+describe('Masterwrought cap: hand demotion routes through fillHands (phase 09)', () => {
+  // No flagged weapon, shield, or held offhand ships yet, so every arm here
+  // drives enforceMasterwroughtCap with synthetic defs through the injectable
+  // isFlagged and legality-reads seams (the phase 08 synthetic block above is
+  // the idiom). Winners are derived from the layout rules, never read back
+  // from the function; each pin's comment names the wrong pick a regression
+  // would produce.
+  const isFlagged = (id: string) => id.startsWith('mw_');
+  const scoreOf = (scores: Record<string, number>) => (id: string) => scores[id] ?? 0;
+  const anyLegal: HandLegalityReads = {
+    canEquipInSlot: () => true,
+    canDualWieldSpecless: () => true,
+  };
+  const noDualWield: HandLegalityReads = {
+    canEquipInSlot: () => true,
+    canDualWieldSpecless: () => false,
+  };
+  const ROLE: BoostRole = { id: 'test', weights: {}, melee: true };
+
+  it('a demoted flagged mainhand refills with the best unflagged weapon, never empty', () => {
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      mainhand: 'mw_sword',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map(),
+      [],
+      scoreOf({ mw_chest: 100, mw_waist: 90, mw_sword: 10 }),
+      isFlagged,
+      {
+        cls: 'warrior',
+        role: ROLE,
+        weapons: [
+          { id: 'mw_sword', score: 10, twoHand: false },
+          { id: 'plain_axe', score: 8, twoHand: false },
+          { id: 'plain_club', score: 5, twoHand: false },
+        ],
+        shields: [],
+        held: undefined,
+        reads: noDualWield,
+      },
+    );
+    // Kept: chest (100) and waist (90); the sword (10) demotes. The pre-fix
+    // code deleted the slot outright (weapons have no slot-map fallback),
+    // and a refill blind to the score order would hold plain_club.
+    expect(kit.mainhand).toBe('plain_axe');
+    expect(kit.offhand).toBeUndefined();
+    expect(kit.chest).toBe('mw_chest');
+    expect(kit.waist).toBe('mw_waist');
+  });
+
+  it('a demoted flagged two-hander refills as a two-hander with the offhand kept empty', () => {
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      mainhand: 'mw_greatsword',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map([['offhand', { id: 'plain_orb', score: 20 }]]),
+      [],
+      scoreOf({ mw_chest: 100, mw_waist: 90, mw_greatsword: 50 }),
+      isFlagged,
+      {
+        cls: 'warrior',
+        role: ROLE,
+        weapons: [
+          { id: 'mw_greatsword', score: 50, twoHand: true },
+          { id: 'plain_greataxe', score: 40, twoHand: true },
+          { id: 'plain_sword', score: 30, twoHand: false },
+        ],
+        shields: [],
+        held: { id: 'plain_orb', score: 20 },
+        reads: anyLegal,
+      },
+    );
+    // The refill lands on the next-best weapon, an unflagged two-hander;
+    // because it occupies both hands, neither the held orb nor the one-hand
+    // sword may ride into the offhand. A per-slot refill that ignored the
+    // two-hand exclusion would put the orb there and the equip path would
+    // displace one of the two picks.
+    expect(kit.mainhand).toBe('plain_greataxe');
+    expect(kit.offhand).toBeUndefined();
+  });
+
+  it('a demoted flagged dual-wield offhand refills with a distinct, spec-legal weapon', () => {
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      mainhand: 'plain_fang',
+      offhand: 'mw_shiv',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map([['offhand', { id: 'plain_orb', score: 1 }]]),
+      [],
+      scoreOf({ mw_chest: 100, mw_waist: 90, mw_shiv: 50 }),
+      isFlagged,
+      {
+        cls: 'rogue',
+        role: { ...ROLE, hands: 'dualWield' },
+        weapons: [
+          { id: 'plain_fang', score: 60, twoHand: false },
+          { id: 'mw_shiv', score: 50, twoHand: false },
+          { id: 'plain_polearm', score: 45, twoHand: false },
+          { id: 'plain_kris', score: 40, twoHand: false },
+        ],
+        shields: [],
+        held: undefined,
+        reads: {
+          canEquipInSlot: (_cls, id, slot) => !(slot === 'offhand' && id === 'plain_polearm'),
+          canDualWieldSpecless: () => true,
+        },
+      },
+    );
+    // The mainhand keeps its unflagged pick; the offhand refill must skip
+    // the mainhand weapon (distinctness), the offhand-illegal polearm (spec
+    // legality), and must not come from the slot map (the orb): plain_kris.
+    expect(kit.mainhand).toBe('plain_fang');
+    expect(kit.offhand).toBe('plain_kris');
+  });
+
+  it('a demoted flagged shield refills with a legal shield under the shield layout', () => {
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      mainhand: 'plain_hammer',
+      offhand: 'mw_bulwark',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map(),
+      [],
+      scoreOf({ mw_chest: 100, mw_waist: 90, mw_bulwark: 50 }),
+      isFlagged,
+      {
+        cls: 'warrior',
+        role: { ...ROLE, hands: 'shield' },
+        weapons: [
+          { id: 'plain_greatmaul', score: 70, twoHand: true },
+          { id: 'plain_hammer', score: 60, twoHand: false },
+        ],
+        shields: [
+          { id: 'mw_bulwark', score: 50 },
+          { id: 'mw_aegis', score: 45 },
+          { id: 'plain_kite', score: 40 },
+        ],
+        held: undefined,
+        reads: anyLegal,
+      },
+    );
+    // Shield layout holds through the refill: the mainhand stays the best
+    // ONE-hander (a default-layout relapse grabs the higher-scored two-hand
+    // maul and drops the shield), and the shield refill skips the never-worn
+    // flagged mw_aegis for the best unflagged shield. The pre-fix slot-map
+    // arm has no entry here and would have emptied the slot.
+    expect(kit.mainhand).toBe('plain_hammer');
+    expect(kit.offhand).toBe('plain_kite');
+  });
+
+  it('a demoted flagged held offhand refills legally through the layout', () => {
+    const hands = {
+      cls: 'priest' as PlayerClass,
+      role: ROLE,
+      weapons: [
+        { id: 'plain_mace', score: 60, twoHand: false },
+        { id: 'plain_kris', score: 40, twoHand: false },
+      ],
+      shields: [],
+      held: { id: 'mw_orb', score: 50 },
+    };
+    const bySlot = new Map([['offhand', { id: 'plain_tome', score: 30 }]]);
+    const scores = scoreOf({ mw_chest: 100, mw_waist: 90, mw_orb: 50 });
+    // With dual wield available the refill re-enters the held-versus-second
+    // comparison: the 40-point second weapon beats the 30-point unflagged
+    // held substitute. The pre-fix slot-map arm could only ever hand back
+    // the tome, without re-checking the layout at all.
+    const kitDw: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      mainhand: 'plain_mace',
+      offhand: 'mw_orb',
+    };
+    enforceMasterwroughtCap(kitDw, bySlot, [], scores, isFlagged, { ...hands, reads: anyLegal });
+    expect(kitDw.mainhand).toBe('plain_mace');
+    expect(kitDw.offhand).toBe('plain_kris');
+    // Without dual wield the refill is the best unflagged held item: never
+    // the demoted orb, and never an emptied slot.
+    const kitHeld: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      mainhand: 'plain_mace',
+      offhand: 'mw_orb',
+    };
+    enforceMasterwroughtCap(kitHeld, bySlot, [], scores, isFlagged, {
+      ...hands,
+      reads: noDualWield,
+    });
+    expect(kitHeld.mainhand).toBe('plain_mace');
+    expect(kitHeld.offhand).toBe('plain_tome');
+  });
+
+  it('the refill never picks a different over-cap flagged item', () => {
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      mainhand: 'mw_sword',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map(),
+      [],
+      scoreOf({ mw_chest: 100, mw_waist: 90, mw_sword: 10 }),
+      isFlagged,
+      {
+        cls: 'warrior',
+        role: ROLE,
+        weapons: [
+          { id: 'mw_sword', score: 10, twoHand: false },
+          { id: 'mw_saber', score: 9, twoHand: false },
+          { id: 'plain_mace', score: 8, twoHand: false },
+        ],
+        shields: [],
+        held: undefined,
+        reads: noDualWield,
+      },
+    );
+    // mw_saber outscores the mace but was never worn, so it is not among the
+    // KEPT picks: refilling with it would rebuild a third flagged pick. An
+    // exclusion covering only the demoted id would pick it.
+    expect(kit.mainhand).toBe('plain_mace');
+    const flagged = Object.values(kit).filter((id) => id && isFlagged(id));
+    expect(flagged).toHaveLength(MASTERWROUGHT_EQUIP_CAP);
+  });
+
+  it('a KEPT flagged hand pick stays through the refill re-run', () => {
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      mainhand: 'mw_fang',
+      offhand: 'mw_shiv',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map(),
+      [],
+      scoreOf({ mw_chest: 100, mw_fang: 80, mw_shiv: 50 }),
+      isFlagged,
+      {
+        cls: 'rogue',
+        role: { ...ROLE, hands: 'dualWield' },
+        weapons: [
+          { id: 'mw_fang', score: 80, twoHand: false },
+          { id: 'mw_shiv', score: 50, twoHand: false },
+          { id: 'plain_kris', score: 40, twoHand: false },
+        ],
+        shields: [],
+        held: undefined,
+        reads: anyLegal,
+      },
+    );
+    // Kept: chest (100) and fang (80); the shiv (50) demotes. The re-run
+    // must re-select the kept flagged mainhand (kept ids stay candidates)
+    // and refill only the demoted offhand with the unflagged kris; an
+    // exclusion that also stripped kept ids would demote the fang too and
+    // leave the kit under the cap it earned.
+    expect(kit.mainhand).toBe('mw_fang');
+    expect(kit.offhand).toBe('plain_kris');
+  });
+
+  it('without hand sources a demoted hand slot empties rather than refilling unchecked', () => {
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      offhand: 'mw_orb',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map([['offhand', { id: 'plain_tome', score: 30 }]]),
+      [],
+      scoreOf({ mw_chest: 100, mw_waist: 90, mw_orb: 10 }),
+      isFlagged,
+    );
+    // The pre-fix arm refilled a demoted offhand from the slot map with no
+    // layout re-check; hand demotion now refills only through fillHands, so
+    // with no sources the slot empties instead.
+    expect(kit.offhand).toBeUndefined();
+    expect(kit.chest).toBe('mw_chest');
+    expect(kit.waist).toBe('mw_waist');
   });
 });
