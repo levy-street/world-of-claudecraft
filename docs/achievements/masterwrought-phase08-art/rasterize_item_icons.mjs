@@ -12,7 +12,12 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const require = createRequire('/Users/fernando/Documents/wocc-masterwrought/package.json');
+// Resolve sharp against the repo root's package.json relative to this file
+// (docs/achievements/<dir>/ is three levels down), so the script runs from any
+// clone or worktree, not just the machine it was authored on.
+const require = createRequire(
+  path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..', 'package.json'),
+);
 const sharp = require('sharp');
 
 const SRC_DIR = path.dirname(fileURLToPath(import.meta.url));
