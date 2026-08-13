@@ -82,6 +82,17 @@ Agent 3 (rng discipline + i18n):
   scenario in tests/parity exercising an attempt deterministically across hosts.
 - Refusal lines (not apex, skill too low, missing materials, already Perfected): sim
   emit + sim_i18n.ts matcher in the SAME change (S3 guard).
+- AMENDED at the v0.38.0 sync (merge fa51741408): the release's player item lock
+  (src/sim/item_lock.ts, issue 3042) broke this phase's implicit premise that held
+  materials are always consumable; consumption is now refusable PER COPY. Every
+  Perfecting consume arm must count sufficiency through the lock-aware family
+  (countUnlockedItem / countUnlockedInSlots, the crafting.ts precedent), deny a
+  lock-only shortfall with a dedicated locked reason rather than a misleading
+  missing-materials line (the craft path already renders
+  hudChrome.crafting.reagentLocked via craft_denial_line_view.ts), and spend copies
+  through a passed selection, never the id-only newest-first walk
+  (item_copy_ref.ts frozen-fallback doctrine; the pattern-learn wrong-victim fix at
+  this sync is the exemplar). The refusal-lines list above gains that arm.
 
 INVARIANTS IN PLAY: masterwork.ts untouched (R1); the crafting proc site keeps exactly
 one rng draw per successful craft in the same order; every new draw via ctx.rng at the

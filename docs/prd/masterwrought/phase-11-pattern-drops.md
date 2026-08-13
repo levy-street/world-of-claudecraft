@@ -34,9 +34,11 @@ STEP 1 - LOAD CONTEXT (Explore agent; do not read planning docs in the main loop
   src/sim/loot/loot_roll.ts (rollGroup rules), the raid loot tables and
   src/sim/rift/loot_pools.ts (where drop entries append), src/sim/content/heroic_vendor.ts
   (the Heroic Quartermaster stock + heroic_mark pricing), the market query/filter seam:
-  implementation-plan.md names market_query.ts, but on this branch the surface is
-  src/sim/market.ts + src/ui/market_filters.ts + src/world_api/market.ts (verify where
-  category/search logic lives and record the actual seam in state.md),
+  src/sim/market_query.ts EXISTS on the merged tree and is the filter/sort home
+  (implementation-plan.md was right after all; the v0.38.0 sync extended it with a
+  sort passthrough), alongside src/sim/market.ts + src/ui/market_filters.ts +
+  src/world_api/market.ts (verify where category/search logic lives and record the
+  actual seam in state.md; premise corrected at the v0.38.0 sync, merge fa51741408),
   tests/parity/ (scenario + golden shape), src/sim/CLAUDE.md.
 Return: how a loot entry appends without disturbing existing draws, the quartermaster
 row shape, where market categories are defined and filtered.

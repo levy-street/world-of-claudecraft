@@ -2551,3 +2551,119 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   tooltip tag + the /wiki gear section + the "From a found pattern" source
   cell, and the S2 shipping-window note (structurally void under the one-PR
   contract, recorded for the maintainer regardless).
+
+## Phase 08 QA release sync (2026-08-13, merge fa51741408; the QA audit itself runs in a follow-up session)
+- RELEASE SYNC: the release fanned into TWO branches since the phase 08 close.
+  origin/release/v0.37.1 is a hotfix line (0.37.1 version-surface bump, the
+  PR #3363 queue-pop arming fix, a portrait re-bless) NOT contained in
+  v0.38.0; merging it would poison the branch with 0.37.1 version surfaces,
+  so the sync target is origin/release/v0.38.0 (tip 51b342bdae, 155 commits:
+  the issue #3042 player item lock, the combat-rogue re-band 8c972a3cd3, the
+  rift forge rollback migration, dockerignore fix, locale fills), merged as
+  fa51741408 on top of d14adba5b9. Fifteen conflicts resolved hunk-level:
+  crafting.ts keeps the release's onInventoryChangedForQuests hook (first,
+  consumption-tied) AND the phase 07 oncePerDay stamp (second; neither draws
+  rng, the hook never reads craftDaily, audit-verified); the bag context menu
+  composes sunder with the release's lock/unlock rows; craft_denial_line_view
+  gained the release's 'locked' reason exactly as its exhaustive-Record
+  design intended (tsc red until the row landed, plus the literal table row
+  in its test); pet_commands keeps the Duskmurk title over the release's
+  EMPTY_TEST_WORLD ctor trim; eastbrook provenance re-minted (three literals
+  advanced); portrait manifest re-minted via the full receipt flow (renderer
+  fingerprint moved, so the guard demanded all 230 rows: 230/230 rerender
+  BYTE-IDENTICAL, manifest written, accepted-art manifest pin advanced
+  sha/bytes, evidence pin unchanged); pending.ts regenerated.
+- THE COUNT-PIN TRAP FIRED A THIRD TIME: both sides read IWorld 321 and
+  commands 198/211 pre-merge (branch extractEssence vs release setItemLocked
+  / lock_item), git auto-merged the identical numbers, and the merged tree
+  carries both. Set from suite runs: IWorld 322 (85 data / 237 methods,
+  including the union-size pins at the facet-union test), commands 199/212.
+  NOTE the wire token is lock_item; setItemLocked is only the IWorld member
+  (the pin comment first said set_item_locked; corrected, and the merge
+  commit message carries the slip immutably).
+- POST-MERGE GREEN before the audit: tsc, parity 207 (goldens COMPOSE across
+  the merge, no re-mint owed), the three naming scrubs 26/26 (the merge took
+  363 overlay rows across 20 locales), portrait trio, eastbrook pair,
+  monolith_budget (no ratchet collision this time), architecture, S3 +
+  snapshots, masterwrought core suites 152, and the overlap suites
+  (heroic_vendor, market_filters, item_copy_addressing_guard,
+  professions_blob_growth, training_dummy, warrior_intervene,
+  guide_key_coverage).
+- MERGE AUDIT (seven-auditor workflow + six adversarial verifiers, all 13
+  agents completed; full reports in the session task output): sim cluster
+  proven an exact union mechanically (release-side change lines byte-equal to
+  merged-vs-branch change lines across all six files); server/net/world_api
+  seams verbatim (extract_essence dispatch beside lock_item, which also
+  joined HEAVY_SELF_CMDS; extract_essence stays correctly outside it, the
+  salvage_item cast-start rationale); no injected helper changed shape
+  (item_copy_ref/sim_context untouched by the release); db-mock trap EMPTY
+  (zero new vi.mock db sites); ci.yml delta is a shard timeout bump only;
+  i18n delta purely additive with all six lock keys filled in all 20
+  overlays (M16 satisfied by the release), branch keys all survive, admin
+  overlays keep the Broodsworn rename over the release's Wyrmcult rows.
+- FIXED AT THE SYNC (verified findings, mutation-proven where a pin landed):
+  (1) pattern-learn wrong-victim: the recipe arm of useItem dropped the
+  validated slotIndex, so with two copies of one pattern the lock-blind
+  newest-first walk could destroy the copy the player did NOT click, the
+  release's locked copy included. useRecipePatternItem now takes the
+  selection and spends the exact clicked copy via consumeSelectedInventorySlot
+  (id-only fallback byte-identical per the item_copy_ref frozen-fallback
+  doctrine); pinned both ways in tests/recipe_pattern_items.test.ts (slot arm
+  mutation-proven red on a dropped forward; id-only newest-first walk pinned
+  as doctrine, locked copies included). (2) sunder-x-lock pinned end to end:
+  the merge classified sunder lock-EXEMPT (the disenchant precedent; the
+  release scope is salvage/craft-consumption/vendor-sell only), and NO test
+  on either side pinned it; now pinned in tests/bag_item_context_menu.test.ts
+  (locked raid epic keeps Sunder, loses Salvage) and
+  tests/masterwrought_materials.test.ts (a pinned-slot sunder of a locked
+  copy completes), each naming the other so they flip together.
+- RULING WANTED (maintainer ratification): sunder lock-exemption was taken by
+  merge fiat, not a recorded ruling. Current shape: a player-locked raid epic
+  CAN be deliberately sundered (menu offers it, sim admits it), consistent
+  with disenchant. If the lock should instead protect against sunder (it is
+  irreversible destruction, the exact thing a lock guards), flip the two pins
+  above and add the lock deny to sunderAdmitted; note the id-only fallback
+  ladder (consumePreferredDisenchantVictim) has no lock arm either, so a
+  ratified deny must cover victim selection too.
+- RELEASE-OWNED FINDINGS (recorded, NOT fixed on branch; surface to the
+  maintainer): (a) v0.38.0 does NOT carry the v0.37.1 queue-pop arming fix
+  (PR #3363 / commit 3d1546b34a), so the merged tree still has the
+  zero-battleground-seats defect that hotfix fixed; needs a forward-port to
+  v0.38.0 (no branch overlap: the branch never touches those popups).
+  (b) scripts/rift_forge_rollback_migration.ts runs a whole-row
+  characters.state UPDATE inside bare BEGIN/COMMIT with no advisory or row
+  locks (plain SELECT, no FOR UPDATE), so running it against live realms can
+  clobber concurrent saves and let online sessions resurrect rolled-back
+  forge state behind the completion marker; deploy playbook should stop
+  realms first or the script should take locks. (c) the vendor partial-sell
+  toast says 'Kept {n} bound copies' even when the spared units were
+  player-LOCKED, not bound (items.ts partial-sale summary; release-parent
+  code). (d) the release extracted isUpdateDue out of server/game.ts without
+  lowering the game.ts monolith ceiling (still 10900 with slack; ratchet
+  hygiene). (e) phase 15 note: the combat-rogue re-band (apPct 0.55 to 0.2)
+  moves the pre-packet raid BiS throughput baseline R5 measures against;
+  build the phase 15 baseline AFTER this sync, on merged numbers.
+- PREMISES AMENDED at this sync (audit step 6): phase-12-perfecting.md gains
+  the per-copy lock refusal premise (lock-aware sufficiency, dedicated locked
+  deny, selection-based consumes); phase-11-pattern-drops.md market-seam
+  sentence corrected (src/sim/market_query.ts exists and is the filter/sort
+  home; the release extended it with a sort passthrough). Verified INTACT:
+  the rolled.quality successor premise (rift forge rollback only rewrites
+  rift payload objects and preserves unknown JSONB keys; masterwrought ids
+  stay disjoint), all phase 08 QA prompt claims, R4 (no battleground reward
+  behavior landed; the proposal test change is a test(perf) world trim).
+- Equip-peek note for phase 12 (audit nit, inert today): equipItem's sub-cap
+  quality peek reads the HIGHEST-index copy (equipCandidateQuality) while the
+  consume honors a named slotIndex, so a slot-addressed equip of two
+  same-id copies with different rolled quality can peek one and lift the
+  other. Unreachable for masterwrought defs until the phase 12
+  rolled.quality-successor ruling lands; fold into that phase's re-validation
+  work (the items.ts comment claiming the peek reads 'the exact copy the
+  consume will lift' is only true for id-only equips).
+- The 60 masterwrought-family Latin pending rows ride unchanged through this
+  merge (release-fill obligation already recorded in the phase ledgers;
+  release-tier gate reds until the fill).
+- The QA prompt's premise "sync expects a no-op or a small merge" is
+  superseded by this record; the phase 08 implementation diff under audit
+  stays a3a3f6a009..d14adba5b9, and this sync's commits (the merge + the
+  audit fixes) are the Step 0 record.
