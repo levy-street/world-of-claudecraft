@@ -28,7 +28,6 @@
 import { ITEMS } from './data';
 import { consumeSelectedInventorySlot } from './item_copy_ref';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
-import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
   cloneItemInstancePayload,
