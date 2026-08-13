@@ -8785,6 +8785,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_fee_produce': '망보기 삯을 치를 농산물이 없습니다.',
   'hudChrome.farming.denied.no_tonic': '성장 토닉이 없습니다.',
   'hudChrome.farming.denied.tool': '그 작물에 맞는 농사 괭이가 없습니다.',
+  'hudChrome.farming.denied.locked': '지불에 쓸 아이템이 잠겨 있습니다.',
   'hudChrome.farming.husksConvertedLine': '{husksName} x{husks}을(를) {name}(으)로 교환했습니다.',
   'hudChrome.farming.husksConvertedLineQty':
     '{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다.',

@@ -8802,6 +8802,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_fee_produce': '見張り料を払う作物がありません。',
   'hudChrome.farming.denied.no_tonic': '成長トニックがありません。',
   'hudChrome.farming.denied.tool': 'その作物に合う農耕鍬を持っていません。',
+  'hudChrome.farming.denied.locked': 'その支払いに使えるアイテムがロックされています。',
   'hudChrome.farming.husksConvertedLine': '{husksName} x{husks}を{name}と交換した。',
   'hudChrome.farming.husksConvertedLineQty': '{husksName} x{husks}を{name} x{qty}と交換した。',
   'gatherEvent.pristineVein': '{finder}が純粋な鉱脈を掘り当てた！',

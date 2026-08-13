@@ -3832,6 +3832,12 @@ export const hudChromeStrings = {
       // The hoe phase: the step-12 hoe gate's refusal, one line for both the
       // no-hoe and the tier-short (or wield-short) case.
       tool: 'You have no farming hoe fit for that crop.',
+      // Player item lock (issue 3042, the v0.38.0 sync): fired instead of the
+      // family shortfall line when the shortfall is caused solely by a locked
+      // copy, so the denial names the real cause rather than reading as a
+      // generic shortage (the crafting.reagentLocked twin). One line for all
+      // five farming spends: the event does not say which leg was locked.
+      locked: 'An item that would pay for that is locked.',
     },
     // The husk trade's one line (the knobs phase): names BOTH sides of the
     // trade, what left the bags and what arrived, because the compost grant's

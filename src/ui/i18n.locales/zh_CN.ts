@@ -8412,6 +8412,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_fee_produce': '你没有可以支付看守费的农产品。',
   'hudChrome.farming.denied.no_tonic': '你没有生长滋补剂。',
   'hudChrome.farming.denied.tool': '你没有适合该作物的耕作锄。',
+  'hudChrome.farming.denied.locked': '有一件可用于支付的物品已被锁定。',
   'hudChrome.farming.husksConvertedLine': '你用{husksName} x{husks}换取了{name}。',
   'hudChrome.farming.husksConvertedLineQty': '你用{husksName} x{husks}换取了{name} x{qty}。',
   'gatherEvent.pristineVein': '{finder}挖到了一条纯净的矿脉！',

@@ -504,9 +504,15 @@ export function plantCrop(
   // 8. Seed in bags. LOCK-AWARE (issue 3042, the v0.38.0 sync heal): a copy
   //    the owner locked is invisible to every farming sufficiency gate and
   //    spend below, the same disposal-boundary rule the lock module's header
-  //    names for craft reagent consumption (crafting.ts is the idiom).
+  //    names for craft reagent consumption (crafting.ts is the idiom). On
+  //    every deny below, ctx.countItem (RAW on purpose, the one legitimate
+  //    raw read left in this file) splits the lock-only refusal from the
+  //    genuine shortfall (the insufficientMaterialsIsLockOnly twin): when
+  //    the raw count would have passed, the toast says 'locked' rather than
+  //    claiming the player holds nothing they can see in their bags.
   if (countUnlockedInSlots(meta.inventory, crop.seedItemId) < 1) {
-    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_seed', bedId, cropId });
+    const reason = ctx.countItem(crop.seedItemId, meta.entityId) >= 1 ? 'locked' : 'no_seed';
+    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason, bedId, cropId });
     return;
   }
   // 9 to 11: the knob gates (the knobs phase), in the payload's own order:
@@ -521,7 +527,9 @@ export function plantCrop(
   const wantTonic = knobs.tonic === true;
   // 9. Compost in bags (one per plant).
   if (wantCompost && countUnlockedInSlots(meta.inventory, FARM_COMPOST_ITEM_ID) < 1) {
-    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_compost', bedId, cropId });
+    const reason =
+      ctx.countItem(FARM_COMPOST_ITEM_ID, meta.entityId) >= 1 ? 'locked' : 'no_compost';
+    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason, bedId, cropId });
     return;
   }
   // 10. The watch fee: tier-scaled produce in kind, planned here and spent
@@ -532,13 +540,19 @@ export function plantCrop(
   if (wantWatch) {
     feePlan = planWatchFee(crop.tier, (itemId) => countUnlockedInSlots(meta.inventory, itemId));
     if (!feePlan) {
-      ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_fee_produce', bedId, cropId });
+      // The raw-count re-plan runs on the deny path only (draw-free): a plan
+      // that exists with locks ignored means locks alone denied the fee.
+      const rawPlan = planWatchFee(crop.tier, (itemId) => ctx.countItem(itemId, meta.entityId));
+      const reason = rawPlan ? 'locked' : 'no_fee_produce';
+      ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason, bedId, cropId });
       return;
     }
   }
   // 11. Tonic in bags (one per plant).
   if (wantTonic && countUnlockedInSlots(meta.inventory, FARM_GROWTH_TONIC_ITEM_ID) < 1) {
-    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_tonic', bedId, cropId });
+    const reason =
+      ctx.countItem(FARM_GROWTH_TONIC_ITEM_ID, meta.entityId) >= 1 ? 'locked' : 'no_tonic';
+    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason, bedId, cropId });
     return;
   }
   // 12. The hoe gate (the crop-ladder phase's tool half, the #2343 rule's
@@ -584,6 +598,10 @@ export function plantCrop(
   // removeUnlockedFromSlots mutates the array only, so the quest hook fires
   // once for the whole payment below (plant_crop stays a HEAVY_SELF_CMDS
   // member, which is what keeps the self snapshot fresh).
+  // The four legs can never alias one another: fee legs are produce and
+  // fine-produce ids only, disjoint from every seed, compost, and tonic id
+  // (pinned against the live catalog in tests/farm_watch_fee.test.ts), so
+  // no leg can spend units another leg's gate already promised.
   removeUnlockedFromSlots(meta.inventory, crop.seedItemId, 1);
   if (wantCompost) removeUnlockedFromSlots(meta.inventory, FARM_COMPOST_ITEM_ID, 1);
   if (feePlan) {
@@ -985,7 +1003,13 @@ export function convertHusks(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   const husks = countUnlockedInSlots(meta.inventory, FARM_WITHERED_HUSK_ITEM_ID);
   const batches = Math.floor(husks / FARM_HUSKS_PER_COMPOST);
   if (batches < 1) {
-    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_husks' });
+    // The lock-only split, the plant gates' twin: a raw count that affords a
+    // batch means locks alone denied the trade.
+    const rawBatches = Math.floor(
+      ctx.countItem(FARM_WITHERED_HUSK_ITEM_ID, meta.entityId) / FARM_HUSKS_PER_COMPOST,
+    );
+    const reason = rawBatches >= 1 ? 'locked' : 'no_husks';
+    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason });
     return;
   }
   const spent = batches * FARM_HUSKS_PER_COMPOST;

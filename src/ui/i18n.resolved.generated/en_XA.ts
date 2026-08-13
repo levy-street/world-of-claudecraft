@@ -3083,7 +3083,8 @@ export const en_XA: EnTranslations = {
         "no_compost": "[Ýóú ĥáʋé ñó çóɱþóšţ.]",
         "no_fee_produce": "[Ýóú ĥáʋé ñó þŕóðúçé ţó þáý ţĥé ŵáţçĥ ƒéé.]",
         "no_tonic": "[Ýóú ĥáʋé ñó ĝŕóŵţĥ ţóñíç.]",
-        "tool": "[Ýóú ĥáʋé ñó ƒáŕɱíñĝ ĥóé ƒíţ ƒóŕ ţĥáţ çŕóþ.]"
+        "tool": "[Ýóú ĥáʋé ñó ƒáŕɱíñĝ ĥóé ƒíţ ƒóŕ ţĥáţ çŕóþ.]",
+        "locked": "[Áñ íţéɱ ţĥáţ ŵóúļð þáý ƒóŕ ţĥáţ íš ļóçķéð.]"
       },
       "husksConvertedLine": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name}.]",
       "husksConvertedLineQty": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name} ẋ{qty}.]"

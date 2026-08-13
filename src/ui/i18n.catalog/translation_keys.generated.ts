@@ -8594,6 +8594,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.farming.denied.bad_bed'
   | 'hudChrome.farming.denied.bad_crop'
   | 'hudChrome.farming.denied.bed_taken'
+  | 'hudChrome.farming.denied.locked'
   | 'hudChrome.farming.denied.no_compost'
   | 'hudChrome.farming.denied.no_fee_produce'
   | 'hudChrome.farming.denied.no_husks'

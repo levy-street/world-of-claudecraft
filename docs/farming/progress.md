@@ -1143,6 +1143,20 @@ Notes (the phase report):
   phase-13 (the Reliquary same-change obligation joined the sweep), plus
   the monolith extraction-first warning in state.md deviation (an) for
   every phase touching a ratcheted coordinator.
+- REVIEWS (all three delivered full reports, 0 BLOCKING anywhere):
+  cross-platform-sync SIGNED OFF (proved the extraction changed no wire
+  bytes, the lock heal keeps freshness through three independent paths,
+  and all five IWorldFarming members reconcile on the 327-member pin);
+  qa-checklist READY (both SHOULD-FIX items folded in: the farm_watch_fee
+  COUNT SEMANTICS comment reworded for lock-awareness, the
+  ceilings-not-lowered rationale ledgered in (an)); architecture-reviewer
+  0 BLOCKING with one SHOULD-FIX adopted as the (ao) completion: the
+  farmDenied 'locked' reason (wire-union append, five deny-site splits,
+  the catalog leaf with its five M16 fills, both test polarities). The
+  remaining reviewer notes (stale game.ts HEAVY_SELF comment chain, the
+  fee-leg id-space aliasing comment, the hudSrc rename) were all fixed in
+  the same round; the optional-chained quest hook call stays as the
+  deliberate crafting.ts-idiom match.
 
 ### Phase 7
 (not started)

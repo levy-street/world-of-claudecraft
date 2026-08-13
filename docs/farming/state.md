@@ -986,7 +986,17 @@ question does not arise (farming has no station).
   NEAR-ZERO headroom under these ceilings (hud.ts 4 lines, server/game.ts 2,
   sim.ts 82), so every future phase touching a ratcheted coordinator works
   extraction-first: land the new logic as a sibling module from the start.
-  Ceiling raises stay a maintainer decision.
+  Ceiling raises stay a maintainer decision. The ceilings were deliberately
+  NOT lowered after these extractions (the root CLAUDE.md lower-after-
+  extraction rule): the values are the release's own mints and the
+  extractions land just under them, so lowering to exact-current would fight
+  the table's stated authoring style (current size plus margin) and any
+  re-pin is the maintainer's call at feature review; the QA reviewer
+  concurred. WATCH ITEM: the snapshots delta-key scrape's source list is
+  now a hand-maintained two-file constant (game.ts +
+  server/farming_commands.ts); any future extraction that moves a maybe()
+  emitter out of either file must join the scrape's source list in the same
+  change or the pin silently narrows.
   (ao) Farming's spends are LOCK-AWARE as of the sync (commit a4c4c33598):
   the release's player item lock (issue 3042) names profession consumption a
   refusing boundary, and farming's seed, compost, watch-fee, tonic, and husk
@@ -999,8 +1009,20 @@ question does not arise (farming has no station).
   dropping ctx.removeItem's own wireRev bump is covered). Seven arms in
   tests/professions_farming.test.ts pin each touched site; two scripted
   mutations (lock-blind seed gate, lock-blind payment walk) both killed by
-  name. Deny reasons unchanged; draws unchanged; golden unchanged by this
-  heal.
+  name. Draws unchanged; golden unchanged by this heal.
+  COMPLETION (the review round): the first pass copied the release's
+  consumption idiom but not its refusal idiom (the architecture reviewer's
+  one SHOULD-FIX): issue 3042's acceptance line, quoted in crafting.ts,
+  demands a clear locked-item message, and crafting/salvage ship a distinct
+  'locked' reason. farmDenied gained 'locked' (appended to the wire union,
+  never reordered), each of the five deny sites splits lock-only refusals
+  from genuine shortfalls by re-reading the RAW count on the deny path only
+  (the insufficientMaterialsIsLockOnly twin; the fee gate re-plans with the
+  raw reader), and hudChrome.farming.denied.locked ships with its five M16
+  non-Latin fills (zh_CN, zh_TW, ja_JP, ko_KR, ru_RU). The five lock arms
+  now assert 'locked', a sixth arm pins the genuine-shortfall polarity (one
+  locked produce, fee two: stays no_fee_produce), and the reason-to-line
+  distinctness pin covers the new leaf.
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the

@@ -2792,13 +2792,15 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
       .reduce((n, s) => n + s.count, 0);
   }
 
-  it('a locked-only seed refuses the plant as no_seed, draw-free, seed kept', () => {
+  it('a locked-only seed refuses the plant as locked (not no_seed), draw-free, seed kept', () => {
     const h = makeHarness();
     giveSeeds(h, 1);
     lockOneCopy(h, SEED_ID);
     const from = h.sim.events.length;
     expect(countDraws(h.sim, () => plant(h))).toBe(0);
-    expect(denyReason(h.sim, from)).toBe('no_seed');
+    // The lock-only split (issue 3042 acceptance): the raw count would have
+    // passed, so the denial names the lock, never a phantom shortage.
+    expect(denyReason(h.sim, from)).toBe('locked');
     expect(lockedUnits(h, SEED_ID)).toBe(1);
   });
 
@@ -2816,7 +2818,7 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
     expect(unlockedUnits(h, SEED_ID)).toBe(0);
   });
 
-  it('a locked-only compost refuses a compost plant as no_compost with nothing consumed', () => {
+  it('a locked-only compost refuses a compost plant as locked with nothing consumed', () => {
     const h = makeHarness();
     giveSeeds(h, 1);
     h.sim.addItem(FARM_COMPOST_ITEM_ID, 1, h.pid);
@@ -2827,16 +2829,17 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
         plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { compost: true }),
       ),
     ).toBe(0);
-    expect(denyReason(h.sim, from)).toBe('no_compost');
+    expect(denyReason(h.sim, from)).toBe('locked');
     expect(unlockedUnits(h, SEED_ID)).toBe(1);
     expect(lockedUnits(h, FARM_COMPOST_ITEM_ID)).toBe(1);
   });
 
-  it('locked fee produce is invisible to the watch fee planner (no_fee_produce)', () => {
+  it('locked fee produce is invisible to the watch fee planner (locked, plan-vs-raw split)', () => {
     const h = makeHarness();
     giveSeeds(h, 1);
     // Tier 1 fee is 2 produce; hold exactly 2 but lock 1, leaving the
-    // planner one short.
+    // planner one short while the RAW count still affords the fee: the
+    // deny-path re-plan proves locks alone denied it.
     h.sim.addItem(PRODUCE_ID, 2, h.pid);
     lockOneCopy(h, PRODUCE_ID);
     const from = h.sim.events.length;
@@ -2845,12 +2848,28 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
         plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { watch: true }),
       ),
     ).toBe(0);
-    expect(denyReason(h.sim, from)).toBe('no_fee_produce');
+    expect(denyReason(h.sim, from)).toBe('locked');
     expect(unlockedUnits(h, PRODUCE_ID)).toBe(1);
     expect(lockedUnits(h, PRODUCE_ID)).toBe(1);
   });
 
-  it('a locked-only tonic refuses a tonic plant as no_tonic', () => {
+  it('a genuine fee shortfall stays no_fee_produce even when the only copy held is locked', () => {
+    const h = makeHarness();
+    giveSeeds(h, 1);
+    // One produce held (locked), fee is 2: the raw count fails too, so the
+    // reason must stay the family shortfall, never a lock claim.
+    h.sim.addItem(PRODUCE_ID, 1, h.pid);
+    lockOneCopy(h, PRODUCE_ID);
+    const from = h.sim.events.length;
+    expect(
+      countDraws(h.sim, () =>
+        plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { watch: true }),
+      ),
+    ).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_fee_produce');
+  });
+
+  it('a locked-only tonic refuses a tonic plant as locked', () => {
     const h = makeHarness();
     giveSeeds(h, 1);
     h.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, h.pid);
@@ -2861,7 +2880,7 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
         plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { tonic: true }),
       ),
     ).toBe(0);
-    expect(denyReason(h.sim, from)).toBe('no_tonic');
+    expect(denyReason(h.sim, from)).toBe('locked');
     expect(lockedUnits(h, FARM_GROWTH_TONIC_ITEM_ID)).toBe(1);
   });
 
@@ -2881,7 +2900,7 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
     expect(unlockedUnits(h, FARM_WITHERED_HUSK_ITEM_ID)).toBe(0);
   });
 
-  it('all-locked husks refuse the trade as no_husks with the husks kept', () => {
+  it('all-locked husks refuse the trade as locked with the husks kept', () => {
     const h = makeHarness();
     h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
     for (let i = 0; i < FARM_HUSKS_PER_COMPOST; i++) {
@@ -2889,7 +2908,9 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
     }
     const from = h.sim.events.length;
     expect(countDraws(h.sim, () => convertHusks(h.sim.ctx, h.sim.player, h.meta))).toBe(0);
-    expect(denyReason(h.sim, from)).toBe('no_husks');
+    // Raw count affords a batch, unlocked count does not: 'locked', never a
+    // phantom "not enough husks".
+    expect(denyReason(h.sim, from)).toBe('locked');
     expect(lockedUnits(h, FARM_WITHERED_HUSK_ITEM_ID)).toBe(FARM_HUSKS_PER_COMPOST);
   });
 });

@@ -3083,7 +3083,8 @@ export const ko_KR: EnTranslations = {
         "no_compost": "퇴비가 없습니다.",
         "no_fee_produce": "망보기 삯을 치를 농산물이 없습니다.",
         "no_tonic": "성장 토닉이 없습니다.",
-        "tool": "그 작물에 맞는 농사 괭이가 없습니다."
+        "tool": "그 작물에 맞는 농사 괭이가 없습니다.",
+        "locked": "지불에 쓸 아이템이 잠겨 있습니다."
       },
       "husksConvertedLine": "{husksName} x{husks}을(를) {name}(으)로 교환했습니다.",
       "husksConvertedLineQty": "{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다."

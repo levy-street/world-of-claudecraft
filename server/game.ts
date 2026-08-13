@@ -831,10 +831,10 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'vcup_bet', // debits copper: refresh the self snapshot so the purse updates
   // Farming's two plot mutations, added when `fplot` moved behind the heavy
   // gate. BELT AND BRACES, stated honestly rather than overclaimed: every
-  // SUCCESSFUL plant spends a seed and every successful harvest grants produce
-  // or husks, both of which route through ctx.removeItem/addItem into
-  // onInventoryChangedForQuests, which bumps meta.wireRev, which is itself a
-  // heavyDue input. So freshness on the paths that change anything is already
+  // SUCCESSFUL plant spends a seed (the lock-aware walk fires
+  // onInventoryChangedForQuests directly) and every successful harvest grants
+  // produce or husks through ctx.addItem into the same hook, which bumps
+  // meta.wireRev, which is itself a heavyDue input. So freshness on the paths that change anything is already
   // guaranteed without these two lines (verified by deleting each and watching
   // the end-to-end snapshot arms stay green).
   //
@@ -850,7 +850,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'harvest_crop',
   // The knobs phase's husk conversion, the same belt-and-braces trade as the
   // pair above: a SUCCESSFUL conversion touches bags in both directions
-  // (husks out through ctx.removeItem, compost in through ctx.addItem), so
+  // (husks out through the lock-aware walk, compost in through ctx.addItem), so
   // wireRev already guarantees freshness on the path that changes anything,
   // and the loot event the compost grant rides is a HEAVY_SELF_EVENTS member
   // on top. The entry keeps the guarantee LOCAL to the command per the

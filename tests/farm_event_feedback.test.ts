@@ -167,6 +167,12 @@ describe('farm_event_feedback: the five HUD arms', () => {
     expect(drifted).toHaveLength(1);
     expect(drifted[0].fn).toBe('showError');
     expect(drifted[0].text).not.toContain('{tier}');
+    // The lock-only refusal (issue 3042, the v0.38.0 sync): resolves through
+    // the same reason-keyed template to its own line, one toast.
+    const locked = drive({ type: 'farmDenied', pid: 1, reason: 'locked' });
+    expect(locked).toHaveLength(1);
+    expect(locked[0].fn).toBe('showError');
+    expect(locked[0].text.length).toBeGreaterThan(0);
   });
 
   it('farmHusksConverted logs ONE grant-green line naming BOTH sides of the trade', () => {

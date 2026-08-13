@@ -8978,6 +8978,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_fee_produce': 'У вас нет урожая, чтобы оплатить присмотр.',
   'hudChrome.farming.denied.no_tonic': 'У вас нет тоника роста.',
   'hudChrome.farming.denied.tool': 'У вас нет мотыги земледельца, подходящей для этой культуры.',
+  'hudChrome.farming.denied.locked': 'Предмет, которым можно за это заплатить, заблокирован.',
   'hudChrome.farming.husksConvertedLine': 'Вы обмениваете {husksName} x{husks} на {name}.',
   'hudChrome.farming.husksConvertedLineQty':
     'Вы обмениваете {husksName} x{husks} на {name} x{qty}.',

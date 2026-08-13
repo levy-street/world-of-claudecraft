@@ -92,12 +92,14 @@ export interface WatchFeeLeg {
  *  plan is a pure read; the caller consumes the legs only after every other
  *  gate has passed, so a refused plant spends nothing.
  *
- *  COUNT SEMANTICS: `countOf` is the caller's bag reader, and plantCrop
- *  wires ctx.countItem, which sums EVERY matching slot, instanced copies
- *  included. That is the deliberate reading for a fee paid in fungible
- *  common produce (nothing farming mints is instanced today); a later phase
- *  that stamps signed produce copies must switch the lambda to the
- *  fungible-only counter rather than letting a keepsake be spent as fee. */
+ *  COUNT SEMANTICS: `countOf` is the caller's bag reader. Since the v0.38.0
+ *  sync plantCrop wires countUnlockedInSlots (issue 3042): every matching
+ *  slot counts EXCEPT one the owner locked, so a locked copy is neither
+ *  promised nor spent (the deny path re-plans with the raw reader purely to
+ *  tell the 'locked' refusal from a genuine shortfall). A later phase that
+ *  stamps signed produce copies must switch the lambda to a counter that is
+ *  BOTH fungible-only and lock-aware rather than letting a keepsake be
+ *  spent as fee. */
 export function planWatchFee(
   cropTier: number,
   countOf: (itemId: string) => number,

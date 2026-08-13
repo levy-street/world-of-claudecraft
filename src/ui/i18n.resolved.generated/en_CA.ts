@@ -3083,7 +3083,8 @@ export const en_CA: EnTranslations = {
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic.",
-        "tool": "You have no farming hoe fit for that crop."
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."

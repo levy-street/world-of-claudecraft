@@ -6573,7 +6573,14 @@ export type SimEvent = { pid?: number } & (
         // WIELDABLE farming hoe covering the crop's tier in bags; one reason
         // for both the no-hoe and the tier-short case, like gatherDenied's
         // tool arm).
-        | 'tool';
+        | 'tool'
+        // The v0.38.0 sync, appended: the shortfall is caused SOLELY by the
+        // owner's own item locks (issue 3042 acceptance: "each refused
+        // action surfaces a clear locked-item message", the CraftResult
+        // 'locked' twin). Fired when the raw held count would have passed
+        // the gate that the unlocked count failed, for any of the five
+        // farming spends.
+        | 'locked';
       bedId?: string;
       cropId?: string;
     }

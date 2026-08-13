@@ -44,6 +44,7 @@ describe('farmDeniedLineKey', () => {
       'no_fee_produce',
       'no_tonic',
       'tool',
+      'locked',
     ];
     const keys = reasons.map((r) => farmDeniedLineKey(r));
     expect(keys).toEqual([
@@ -60,6 +61,7 @@ describe('farmDeniedLineKey', () => {
       'hudChrome.farming.denied.no_fee_produce',
       'hudChrome.farming.denied.no_tonic',
       'hudChrome.farming.denied.tool',
+      'hudChrome.farming.denied.locked',
     ]);
     // Every key must actually EXIST: t() throws on an untracked key in test,
     // so this is what a leaf missing from the catalog fails on rather than a
@@ -271,7 +273,7 @@ describe('the farm feedback seed-back render arms (source pin)', () => {
   // Assertions run on extracted case slices and a brace-matched guard
   // block, never on whole-file proximity regex; whole-line comments are
   // stripped first so a commented-out call cannot satisfy the pin.
-  const hudSrc = readFileSync(
+  const feedbackSrc = readFileSync(
     path.join(__dirname, '../src/ui/farm_event_feedback.ts'),
     'utf8',
   ).replace(/^\s*\/\/.*$/gm, '');
@@ -281,12 +283,12 @@ describe('the farm feedback seed-back render arms (source pin)', () => {
   function caseSlice(label: string, nextLabel: string): string {
     const open = `case '${label}': {`;
     const close = `case '${nextLabel}': {`;
-    const start = hudSrc.indexOf(open);
-    const end = hudSrc.indexOf(close);
+    const start = feedbackSrc.indexOf(open);
+    const end = feedbackSrc.indexOf(close);
     expect(start, `case '${label}' exists`).toBeGreaterThan(-1);
-    expect(hudSrc.indexOf(open, start + 1), `case '${label}' appears once`).toBe(-1);
+    expect(feedbackSrc.indexOf(open, start + 1), `case '${label}' appears once`).toBe(-1);
     expect(end, `case '${nextLabel}' bounds the slice`).toBeGreaterThan(start);
-    return hudSrc.slice(start, end);
+    return feedbackSrc.slice(start, end);
   }
 
   /** The brace-matched block of the arm's one positive seed-back guard. */

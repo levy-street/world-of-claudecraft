@@ -3083,7 +3083,8 @@ export const ru_RU: EnTranslations = {
         "no_compost": "У вас нет компоста.",
         "no_fee_produce": "У вас нет урожая, чтобы оплатить присмотр.",
         "no_tonic": "У вас нет тоника роста.",
-        "tool": "У вас нет мотыги земледельца, подходящей для этой культуры."
+        "tool": "У вас нет мотыги земледельца, подходящей для этой культуры.",
+        "locked": "Предмет, которым можно за это заплатить, заблокирован."
       },
       "husksConvertedLine": "Вы обмениваете {husksName} x{husks} на {name}.",
       "husksConvertedLineQty": "Вы обмениваете {husksName} x{husks} на {name} x{qty}."

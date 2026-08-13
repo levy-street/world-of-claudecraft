@@ -3083,7 +3083,8 @@ export const ja_JP: EnTranslations = {
         "no_compost": "堆肥がありません。",
         "no_fee_produce": "見張り料を払う作物がありません。",
         "no_tonic": "成長トニックがありません。",
-        "tool": "その作物に合う農耕鍬を持っていません。"
+        "tool": "その作物に合う農耕鍬を持っていません。",
+        "locked": "その支払いに使えるアイテムがロックされています。"
       },
       "husksConvertedLine": "{husksName} x{husks}を{name}と交換した。",
       "husksConvertedLineQty": "{husksName} x{husks}を{name} x{qty}と交換した。"
