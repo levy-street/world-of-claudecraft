@@ -122,6 +122,23 @@ Binding of Isaac's Filigree Feather, GW2's The Missing Facet, Lost Ark's Facet o
 Another Level; shared jewelry vocabulary, not a coined term). Grandmaster
 Jewelcrafting (prog_grandmaster_jewelcrafting title) follows the shipped mechanical
 Grandmaster-craft family, generic by construction.
+Phase 09 amendments (2026-08-13, all web-verified at authoring; full verdicts in
+naming-audit.md): the six apex gear names, all CLEAR: Duskforged Warblade,
+Duskforged Bulwark, Wyrmfall Pendant, Warhewn Signet, Prismglass Loop, Maker's
+Charm (recorded caveat: WoW's Maker's Mark / Maker's Edge are different pairings,
+the accepted Maker's Ember caveat class). New coins: none. Warhewn (recorded CLEAR
+at phase 08) gets its first shipped use; Duskforged, Wyrmfall, and Prismglass
+extend their registry families with generic slot nouns; the possessive charm
+ladder now reads Gatherer's, Artisan's, Maker's. The two Duskforged pieces are a
+deliberate same-craft, same-archetype sword-and-board pair (the phase 08
+rejection class was pieces spanning two stat archetypes). Rejected at authoring:
+Runeglass Band (New World's Runeglass crafted-gem system), Maker's Hand (EQ2's
+The Hand of the Maker, an equippable tradeskill item in the same crafting-buff
+role), Masterwright's Charm (in-repo deed-name collision), Forgefold Bulwark and
+Duskforged Signet (cross-craft matched-set misreads), Wyrmfall Aegis, Wyrmfall
+Edge, and Prismglass Pendant (one family per stat archetype), Duskforged Edge
+(three in-repo Edge surfaces plus the WoW Maker's Edge adjacency), Ridgehewn Band
+and Spellglass Band (needless second coins).
 Phase 08 amendments (2026-08-12, all web-verified at authoring by a proposing
 agent plus an adversarial second pass; full verdicts in naming-audit.md): the ten
 apex armor names, all CLEAR: Spiritweld Girdle, Forgefold Legguards, Wardspeaker

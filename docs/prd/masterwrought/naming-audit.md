@@ -230,6 +230,65 @@ Vellum.
     archetypes would read as one matched set with mismatched stats),
     Warhewn Legguards (CLEAR standalone alternate, lost to the zero-coin
     family extension).
+- MINTED AT PHASE 09 (the six apex gear names, all web-verified 2026-08-13 by
+  the proposing agent with exact-phrase plus coined-token searches and in-repo
+  neighbor greps; new coins: none, every name extends a registry family or a
+  shipped generic noun):
+  - **Duskforged Warblade** (1H sword) CLEAR: family extension of the
+    registry-verified Duskforged (Duskforged Billet) with warblade, a noun
+    this repo already ships three times (Osmium, Highwatch, Emberfang
+    Warblade); full pairing zero-hit (nearest are WoW's generic Draenic and
+    Sin'dorei Warblades and The Dusk Blade, all different names). Rejected:
+    Duskforged Edge (Edge already carries three in-repo surfaces plus the
+    WoW Maker's Edge adjacency), Wyrmfall Edge (family allocated to the
+    necklace; a second Wyrmfall piece would span stat archetypes, the phase
+    08 mismatched-set class).
+  - **Duskforged Bulwark** (shield) CLEAR: second Duskforged piece forming a
+    deliberate same-craft, same-archetype sword-and-board pair with the 1H
+    (the phase 08 rejection class was pieces spanning TWO stat archetypes,
+    which this pair avoids); bulwark is a shipped generic noun (Ancestral,
+    Bonewrought, Emberforged, Sacred, Stone). Full pairing zero-hit;
+    recorded adjacency considered and passed: "-forged Bulwark" is a live
+    WoW pattern (Lightforged, Felforged) under different coins, the
+    Forgefold Legguards nearest-neighbor class. Rejected: Forgefold Bulwark
+    (cross-craft false set membership with the phase 08 armorcrafting
+    family), Wyrmfall Aegis (family allocation).
+  - **Wyrmfall Pendant** (necklace) CLEAR: family extension of the
+    registry-verified Wyrmfall (Wyrmfall Core) with the generic pendant
+    noun; the flavor is the apex core worn as the centerpiece stone. Full
+    pairing zero-hit (nearest WoW's Pendant of the Fallen Dragon, a
+    different name form, recorded and passed). Rejected: Prismglass Pendant
+    (family allocated to the int ring), Lucent Choker (Lucent is the
+    enchanting material family; a jewelcrafting necklace named into it
+    reads as enchanting output).
+  - **Warhewn Signet** (str ring) CLEAR: the coin Warhewn was recorded CLEAR
+    standalone at phase 08 and re-verified fresh at this authoring
+    (zero-hit for the coin and both pairings; nearest WoW's The Warden's
+    Signet, a different name); signet is the repo's martial ring noun.
+    Rejected: Duskforged Signet (cross-craft false family with the
+    sword-and-board pair), Ridgehewn Band (Ridge- reads as family with
+    Ridgebreaker, and it would mint a second coin where one suffices).
+  - **Prismglass Loop** (int ring) CLEAR: family extension of the
+    registry-verified Prismglass (Prismglass Setting) with loop, a shipped
+    ring noun (Abyssal, Etched Iron, Gleaming Osmium, Polished Copper
+    Loop); full pairing zero-hit. Rejected: Runeglass Band (COLLISION: New
+    World's distinctive Runeglass crafted-gem system, verified live),
+    Spellglass Band (mints a new coin where the family extension needs
+    none).
+  - **Maker's Charm** (engineering apex tool charm, id makers_charm) CLEAR
+    with recorded caveat: full pairing zero-hit (nearest WoW's generic
+    Lovely / Lucky / Small Charm, sharing only the noun the shipped
+    Springback Charm already uses); the possessive charm ladder now reads
+    Gatherer's, Artisan's, Maker's, the packet's own apex-craft word
+    (Maker's Ember, Deed of Making). Caveat: WoW ships Maker's Mark and
+    Maker's Edge (Titan Makers lore), different pairings, the same caveat
+    class the registry already accepted for Maker's Ember. Rejected:
+    Maker's Hand (COLLISION CLASS: EverQuest 2's The Hand of the Maker is
+    an equippable tradeskill item in the same crafting-buff role, and a
+    possessive inversion of a same-role name fails maintainer strictness;
+    Conan Exiles also ships a Hand of the Maker landmark), Masterwright's
+    Charm (in-repo collision: Masterwright is a shipped deed name and
+    title, so the charm would read as that deed's reward).
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
