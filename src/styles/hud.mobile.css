@@ -5022,7 +5022,21 @@
     transform: translate(-50%, -50%);
   }
   body.mobile-touch.mobile-map-quest-open {
-    --mobile-map-quest-stack-top: max(10px, env(safe-area-inset-top));
+    /* These values are consumed by siblings inside the zoomed #ui. Keep all
+       viewport and safe-area lengths in author space so their rendered geometry
+       remains inside the physical viewport at every supported UI scale. */
+    --mobile-map-rail: 58px;
+    --mobile-map-frame: 18px;
+    --mobile-map-stack-shell-height: 22px;
+    /* #ui zoom multiplies authored lengths. Counter only the shrink side so
+       every paired-map control retains the literal 40px rendered touch floor
+       below 100% UI scale while larger scales keep their larger targets. */
+    --mobile-map-touch-target: max(40px, calc(40px / var(--ui-scale, 1)));
+    --mobile-map-quest-stack-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    --mobile-map-quest-stack-bottom: calc(
+      max(10px, env(safe-area-inset-bottom)) /
+      var(--ui-scale, 1)
+    );
     --mobile-map-quest-log-max-height: clamp(
       88px,
       calc(var(--app-vh) / var(--ui-scale, 1) - 150px),
@@ -5030,8 +5044,18 @@
     );
     --mobile-map-quest-stack-gap: 8px;
   }
+  body.mobile-touch.mobile-map-quest-open #quest-log-window .ql-item,
+  body.mobile-touch.mobile-map-quest-open #quest-log-window .btn,
+  body.mobile-touch.mobile-map-quest-open #quest-log-window [data-close],
+  body.mobile-touch.mobile-map-quest-open #map-close,
+  body.mobile-touch.mobile-map-quest-open #map-level-toggle,
+  body.mobile-touch.mobile-map-quest-open .map-zoom-btn {
+    min-width: var(--mobile-map-touch-target);
+    min-height: var(--mobile-map-touch-target);
+  }
   body.mobile-touch.mobile-map-quest-open #quest-log-window {
     top: var(--mobile-map-quest-stack-top);
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 32px);
     max-height: var(--mobile-map-quest-log-max-height);
     overflow: auto;
   }
@@ -5042,16 +5066,11 @@
       var(--mobile-map-quest-stack-gap)
     );
     transform: translateX(-50%);
-    width: min(
-      46vw,
-      300px,
-      calc(
-        var(--app-vh) -
-        var(--mobile-map-quest-log-max-height) -
-        var(--mobile-map-quest-stack-gap) -
-        22px
-      )
-    );
+    /* The quest log is stacked above this map, not beside it. Keep the map at
+       the normal near-full portrait width so actionable markers and touch
+       targets do not collapse to a quarter-scale 560px canvas. The available
+       height still limits the window through the stack position and viewport. */
+    width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));
   }
   body.mobile-touch #map-canvas {
     width: 100%;
@@ -5512,10 +5531,13 @@
         52vw,
         320px,
         calc(
-          var(--app-vh) -
+          var(--app-vh) /
+          var(--ui-scale, 1) -
+          var(--mobile-map-quest-stack-top) -
+          var(--mobile-map-quest-stack-bottom) -
           var(--mobile-map-quest-log-max-height) -
           var(--mobile-map-quest-stack-gap) -
-          22px
+          var(--mobile-map-stack-shell-height)
         )
       );
       top: calc(
@@ -5524,9 +5546,85 @@
         var(--mobile-map-quest-stack-gap)
       );
       width: min(
-        calc(var(--mobile-map-size) + var(--mobile-map-rail)),
+        calc(var(--mobile-map-size) + var(--mobile-map-rail) + var(--mobile-map-frame)),
         calc(var(--app-vw) / var(--ui-scale, 1) - 32px)
       );
+      /* This window is already height-budgeted against the viewport. Keep its
+         frame symmetric instead of adding the generic mobile safe-area footer;
+         8px top + 8px bottom + two window borders + two canvas borders is the
+         22px shell height reserved above. */
+      padding-bottom: var(--window-pad);
+    }
+    /* On a wide landscape phone, stacking the quest sheet over the map spends
+       most of the scarce vertical axis and can shrink the 560px map backing to
+       roughly 242 physical pixels. Seat the two windows side by side instead.
+       Every coordinate below is in #ui author space (the shell applies zoom),
+       so viewport and safe-area values are divided by --ui-scale. The 820px
+       gate leaves narrower landscape devices on the proven stacked fallback. */
+    @media (min-width: 820px) {
+      body.mobile-touch.mobile-map-quest-open {
+        /* Shared by the sibling quest sheet and map window. Keeping this on
+           #map-window made the quest-width expression invalid: custom
+           properties inherit down the tree, never sideways or upward. */
+        --mobile-map-dual-edge-left: calc(
+          max(10px, env(safe-area-inset-left)) /
+          var(--ui-scale, 1)
+        );
+        --mobile-map-dual-edge-right: calc(
+          max(10px, env(safe-area-inset-right)) /
+          var(--ui-scale, 1)
+        );
+        --mobile-map-dual-edge-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+        --mobile-map-dual-edge-bottom: calc(
+          max(10px, env(safe-area-inset-bottom)) /
+          var(--ui-scale, 1)
+        );
+        --mobile-map-dual-gap: 8px;
+        --mobile-map-dual-available-width: calc(
+          var(--app-vw) /
+          var(--ui-scale, 1) -
+          var(--mobile-map-dual-edge-left) -
+          var(--mobile-map-dual-edge-right)
+        );
+        --mobile-map-dual-size: min(320px, calc((var(--app-vh) - 104px) / var(--ui-scale, 1)));
+        --mobile-map-dual-quest-width: clamp(
+          220px,
+          calc(
+            var(--mobile-map-dual-available-width) -
+            var(--mobile-map-dual-gap) -
+            var(--mobile-map-rail) -
+            var(--mobile-map-dual-size) -
+            var(--mobile-map-frame)
+          ),
+          300px
+        );
+      }
+      body.mobile-touch.mobile-map-quest-open #quest-log-window {
+        left: var(--mobile-map-dual-edge-left);
+        right: auto;
+        top: var(--mobile-map-dual-edge-top);
+        width: var(--mobile-map-dual-quest-width);
+        max-width: var(--mobile-map-dual-quest-width);
+        max-height: calc(
+          var(--app-vh) /
+          var(--ui-scale, 1) -
+          var(--mobile-map-dual-edge-top) -
+          var(--mobile-map-dual-edge-bottom)
+        );
+        transform: none;
+      }
+      body.mobile-touch.mobile-map-quest-open #map-window {
+        --mobile-map-size: var(--mobile-map-dual-size);
+        left: auto;
+        right: var(--mobile-map-dual-edge-right);
+        top: var(--mobile-map-dual-edge-top);
+        /* #map-window is border-box. Include both 8px window pads and both
+           1px borders so --mobile-map-size remains the canvas size instead
+           of silently losing 16px to its frame. */
+        width: calc(var(--mobile-map-size) + var(--mobile-map-rail) + var(--mobile-map-frame));
+        max-width: calc(var(--mobile-map-size) + var(--mobile-map-rail) + var(--mobile-map-frame));
+        transform: none;
+      }
     }
     body.mobile-touch.mobile-left-handed #mobile-extra-controls {
       left: 50%;

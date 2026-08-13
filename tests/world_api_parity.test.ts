@@ -142,6 +142,7 @@ export const IWORLD_MEMBERS = [
   { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
+  { name: 'civicServicePlacements', kind: 'data' },
   { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
@@ -599,6 +600,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // The v0.38.0 sync composed AGAIN: the release's player item lock (issue
     // #3042) adds setItemLocked (IWorldInventory, a method), and both sides
     // read 321 pre-merge, so the merged tree carries both, leaving 322.
+    // The v0.38.0 map-marker sync composed a THIRD time: the release's civic
+    // service anchors add civicServicePlacements (IWorldInteraction, data),
+    // and both sides read 322 pre-merge, so the merged tree carries both,
+    // leaving 323.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -608,8 +613,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(322);
-    expect(DATA_MEMBERS.length).toBe(85);
+    expect(IWORLD_MEMBERS.length).toBe(323);
+    expect(DATA_MEMBERS.length).toBe(86);
     expect(METHOD_MEMBERS.length).toBe(237);
   });
   it('has no duplicate member names', () => {
@@ -675,6 +680,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'changeWeaponSkin',
       'characterProfile',
       'chat',
+      'civicServicePlacements',
       'claimEventSkin',
       'clearMarker',
       'collectDelveChestLoot',
@@ -965,6 +971,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bgInfo',
       'cardMinigameInfo',
       'cfg',
+      'civicServicePlacements',
       'commissionOrders',
       'companionState',
       'companionUpgrades',
@@ -1381,6 +1388,7 @@ type _ExhaustTargeting = AssertNever<
 >;
 
 const FACET_INTERACTION = [
+  'civicServicePlacements',
   'interact',
   'lootCorpse',
   'harvestCorpse',
@@ -1884,8 +1892,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(322);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(322);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(323);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(323);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

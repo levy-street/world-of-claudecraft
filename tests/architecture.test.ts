@@ -202,6 +202,11 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/map_entity_disclosure_core.ts',
+  'src/ui/map_navigation_landmarks_core.ts',
+  'src/ui/map_marker_profile_core.ts',
+  'src/ui/map_marker_semantics_core.ts',
+  'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
   'src/ui/aura_overlay_view.ts',
@@ -238,6 +243,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/master_craft_core.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
+  'src/ui/hud/rift/rift_map_core.ts',
   'src/ui/hud/battleground/battleground_map_view.ts',
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
   'src/ui/hud/battleground/battleground_proposal_view.ts',
@@ -1796,6 +1802,8 @@ const UI_DOM_MODULES = [
   'src/ui/mailbox_window.ts',
   'src/ui/map_art.ts',
   'src/ui/map_bg.ts',
+  'src/ui/map_marker_icon_loader.ts',
+  'src/ui/map_marker_palette_lifecycle.ts',
   'src/ui/market_window.ts',
   'src/ui/meters.ts',
   'src/ui/meters_frame.ts',

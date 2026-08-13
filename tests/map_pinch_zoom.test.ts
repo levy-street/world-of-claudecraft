@@ -80,7 +80,9 @@ describe('map pinch zoom', () => {
     expect(mapGestureSource).toContain(
       'mapTapReleaseFromPointer(ev, mapTapStart, MAP_TAP_MOVE_TOLERANCE_PX)',
     );
-    expect(mapGestureSource).toContain('showMapTipAt,');
+    expect(mapGestureSource).toContain(
+      '(clientX, clientY) => showMapTipAt(clientX, clientY, true),',
+    );
     expect(zoomMapSource).toContain('this.mapZoom = nextMapZoom(this.mapZoom, factor)');
     expect(zoomMapSource).not.toMatch(/\b(?:camera|renderer|input|zoomBy)\b/i);
     expect(pinchSource).toContain("canvas.addEventListener('pointercancel', endPinchPointer)");

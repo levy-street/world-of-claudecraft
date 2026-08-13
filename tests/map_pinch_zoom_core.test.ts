@@ -57,14 +57,17 @@ describe('map pinch zoom core', () => {
     expect(zoomOutExitsZoneLevel(Number.NaN, 0.9)).toBe(false);
   });
 
-  it('is wired into every world-map zoom-out path, and not into a delve', () => {
+  it('is wired into every world-map zoom-out path, and only runs in the overworld', () => {
     // The rule lives in Hud.zoomMap, which the minus button, the wheel and the
     // pinch gesture all funnel through, so all three inherit it from one place.
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     expect(hud).toContain("$('#map-zoom-out')?.addEventListener('click', () => this.zoomMap(");
     expect(hud).toContain('onZoom: (factor) => this.zoomMap(factor)');
     expect(hud).toMatch(
-      /zoomOutExitsZoneLevel\(this\.mapZoom, factor\) &&\s*mapWindowMode\(this\.sim\) !== 'delve'\s*\)\s*\{\s*this\.setMapLevel\('continent'\);/,
+      /private zoomMap\(factor: number\): void \{\s*if \(mapWindowMode\(this\.sim\) !== 'overworld'\) return;/,
+    );
+    expect(hud).toMatch(
+      /zoomOutExitsZoneLevel\(this\.mapZoom, factor\)\s*\) \{\s*this\.setMapLevel\('continent'\);/,
     );
   });
 

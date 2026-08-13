@@ -269,21 +269,40 @@
     --color-map-graveyard: #8a929c;
     --color-map-mudhut: #7a6a4a;
     --color-map-campfire: #ff9a3c;
-    /* Zone-map gather nodes (profession-colored, distinct from the minimap's
-       single ready-green): ore copper, wood forest, herb violet. Cooldown is a
-       desaturated sibling of the ready hue; locked references the minimap rust
+    /* Zone-map ready nodes follow the painted resources themselves: ore copper,
+       wood amber, herb leaf-green. Every cooldown fallback shares the same
+       neutral gray as the minimap; the cached paintings receive the matching
+       grayscale treatment before paint. Locked references the minimap rust
        token so both surfaces agree structurally (retune one, both follow).
        Glow is a soft ready halo (rgba) under the icon. */
     --color-map-gather-ore-ready: #e8a44a;
-    --color-map-gather-ore-cooldown: #7a6240;
+    --color-map-gather-ore-cooldown: #90989a;
     --color-map-gather-ore-glow: rgba(232, 164, 74, 0.32);
-    --color-map-gather-wood-ready: #5ecf6a;
-    --color-map-gather-wood-cooldown: #3d6a44;
-    --color-map-gather-wood-glow: rgba(94, 207, 106, 0.32);
-    --color-map-gather-herb-ready: #c084fc;
-    --color-map-gather-herb-cooldown: #6a5288;
-    --color-map-gather-herb-glow: rgba(192, 132, 252, 0.32);
+    --color-map-gather-wood-ready: #e0a142;
+    --color-map-gather-wood-cooldown: #90989a;
+    --color-map-gather-wood-glow: rgba(224, 161, 66, 0.32);
+    --color-map-gather-herb-ready: #69cf72;
+    --color-map-gather-herb-cooldown: #90989a;
+    --color-map-gather-herb-glow: rgba(105, 207, 114, 0.32);
     --color-map-gather-locked: var(--color-minimap-node-locked);
+    /* Cached map-marker raster treatments. The shared Hud cache resolves these
+       at construction, re-samples them on theme and forced-colors signals, and
+       rebuilds only when a value changed. Keylines, cooldown rings, locks,
+       ranks, and reward-state badges stay outside every painter redraw. */
+    --color-map-marker-keyline: #f5dfad;
+    --color-map-marker-cooldown-arc-dark: #24292a;
+    --color-map-marker-cooldown-arc-light: #c8cdcc;
+    --color-map-marker-lock-dark: #24170f;
+    --color-map-marker-lock-bronze: #d39a45;
+    --color-map-marker-lock-highlight: #f2c46d;
+    --color-map-marker-semantic-dark: #171a1d;
+    --color-map-marker-semantic-bronze: #c28a42;
+    --color-map-marker-semantic-silver: #d7dce1;
+    --color-map-marker-semantic-gold: #f2c357;
+    --color-map-marker-semantic-cyan: #70d8ff;
+    --color-map-marker-semantic-jammed: #e56d45;
+    --color-map-marker-semantic-opened: #d8dddc;
+    --color-map-marker-neutral-fallback: #9ba1a2;
     /* continent overview: the open water the world_overview plate is letterboxed
        into (resolved by continent_map_painter.ts). Its own token rather than
        --color-map-ocean above, because the plate is a tall portrait crop of the
@@ -330,10 +349,10 @@
     --color-minimap-player: #fff;
     --color-minimap-outline: #000;
     --color-minimap-gather-ready: #3ef07a;
-    --color-minimap-gather-cooldown: #5a5f57;
+    --color-minimap-gather-cooldown: #90989a;
     --color-minimap-station: #d98e4a;
     /* Tool-tier locked gather node (Professions 2.0): a dark rust
-       clearly apart from the ready green, the cooldown olive-gray, and the
+       clearly apart from the ready green, neutral cooldown gray, and the
        bright mob red, so the lock reads at minimap marker size. */
     --color-minimap-node-locked: #8a4a3a;
 

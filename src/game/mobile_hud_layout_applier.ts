@@ -17,7 +17,7 @@ import { resolveMobileHudLayout } from '../ui/mobile_hud_layout';
 import { isNativeAppShell, useTouchInterface } from './mobile_controls';
 
 const TIER_CLASSES = ['hud-mobile-compact', 'hud-mobile-standard', 'hud-mobile-tablet'];
-const STATE_CLASSES = ['hud-menu-open', 'hud-chat-open'];
+const STATE_CLASSES = ['hud-mobile-landscape', 'hud-menu-open', 'hud-chat-open'];
 const ALL_LAYOUT_CLASSES = [...TIER_CLASSES, ...STATE_CLASSES];
 
 let previousClasses: string[] = [];

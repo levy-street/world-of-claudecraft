@@ -236,19 +236,26 @@ describe('client HTML shell', () => {
     expect(liveHtml).not.toContain('id="chat-input"');
   });
 
-  it('carries the map-canvas a11y label + #map-summary live region in BOTH entries', () => {
+  it('carries the concise live map summary and detailed non-live description in BOTH entries', () => {
     // updateMapWindow() writes the sr-only summary on every redraw via
     // setText($('#map-summary'), ...), which is not null-guarded, so the element
     // MUST exist in every entry that ships the map window or opening the map
     // throws. index.html and play.html both boot src/main.ts and both carry the
     // map window, so the live region + canvas accessible name must be in both.
     expect(hudTs).toContain("const summaryEl = $('#map-summary');");
+    expect(hudTs).toContain("const markerSummaryEl = $('#map-marker-summary');");
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="map-canvas"');
       expect(entry).toContain('data-i18n-aria="hud.core.mapCanvasLabel"');
+      expect(entry).toContain('aria-describedby="map-summary map-marker-summary"');
+      expect(entry).not.toMatch(/id="map-canvas"[^>]*tabindex=/);
       expect(entry).toContain('<span id="map-summary"');
       expect(entry).toContain('role="status"');
       expect(entry).toContain('aria-live="polite"');
+      const markerSummary = entry.match(/<span id="map-marker-summary"[^>]*>/)?.[0] ?? '';
+      expect(markerSummary).toContain('class="visually-hidden"');
+      expect(markerSummary).not.toContain('role=');
+      expect(markerSummary).not.toContain('aria-live=');
     }
   });
 
@@ -2575,14 +2582,21 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain('this.isWindowVisible(mapWindow)');
     expect(hudTs).toContain('this.isWindowVisible(questLogWindow)');
     expect(hudMobileCss).toContain(
-      '--mobile-map-quest-stack-top: max(10px, env(safe-area-inset-top));',
+      '--mobile-map-quest-stack-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
+    );
+    expect(hudMobileCss).toContain(
+      '--mobile-map-quest-stack-bottom: calc(\n      max(10px, env(safe-area-inset-bottom)) /\n      var(--ui-scale, 1)\n    );',
     );
     expect(hudMobileCss).toContain('body.mobile-touch.mobile-map-quest-open #quest-log-window');
     expect(hudMobileCss).toContain('top: var(--mobile-map-quest-stack-top);');
     expect(hudMobileCss).toContain('max-height: var(--mobile-map-quest-log-max-height);');
     expect(hudMobileCss).toContain('body.mobile-touch.mobile-map-quest-open #map-window');
     expect(hudMobileCss).toContain('var(--mobile-map-quest-stack-gap)');
-    expect(hudMobileCss).toContain('22px');
+    expect(hudMobileCss).toContain('var(--mobile-map-stack-shell-height)');
+    expect(hudMobileCss).toContain(
+      'width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));',
+    );
+    expect(hudMobileCss).not.toContain('width: min(\n      46vw,\n      300px,');
   });
 
   it('caps mobile quest and NPC panels instead of stretching them edge to edge', () => {

@@ -62,8 +62,9 @@ export interface MobileHudLayoutInput {
 export interface MobileHudLayout {
   tier: MobileHudTier;
   /** Exactly one of hud-mobile-compact / hud-mobile-standard / hud-mobile-tablet,
-   *  plus hud-menu-open iff menuOpen and hud-chat-open iff chatOpen. Empty when
-   *  touchMode is false (desktop stays untouched). */
+   *  plus hud-mobile-landscape when width exceeds height, hud-menu-open iff
+   *  menuOpen, and hud-chat-open iff chatOpen. Empty when touchMode is false
+   *  (desktop stays untouched). */
   classes: string[];
   /** CSS custom properties this layout wants set on body (currently the safe-area
    *  echo used by the tier CSS; the raw insets are also directly available via
@@ -95,6 +96,7 @@ export function resolveMobileHudLayout(input: MobileHudLayoutInput): MobileHudLa
   }
   const tier = resolveTier(input.width, input.height);
   const classes: string[] = [TIER_CLASS[tier]];
+  if (input.width > input.height) classes.push('hud-mobile-landscape');
   if (input.menuOpen) classes.push('hud-menu-open');
   if (input.chatOpen) classes.push('hud-chat-open');
   const cssVars: Record<string, string> = {

@@ -426,6 +426,7 @@ import {
 } from './ui/loading_slow_hint';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
 import { CONTENT_LOCALE_CHANNEL_ENSURERS } from './ui/locale_channels';
+import { installMapMarkerPaletteLifecycle } from './ui/map_marker_palette_lifecycle';
 import { applyMinimapOrnamentVars } from './ui/minimap_gilded_ornament';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { mobileMountAction } from './ui/mount_quick_summon';
@@ -1390,10 +1391,12 @@ async function startGame(
   // UI theming: apply the persisted theme's CSS variables to :root, then keep a
   // hook so the Options panel can switch preset / override colours live.
   const themeStore = new ThemeStore();
+  let mapMarkerPaletteLifecycle: ReturnType<typeof installMapMarkerPaletteLifecycle> | null = null;
   function applyTheme(): void {
     const vars = themeStore.cssVars();
     for (const name of Object.keys(vars))
       document.documentElement.style.setProperty(name, vars[name]);
+    mapMarkerPaletteLifecycle?.notify();
   }
   applyTheme();
   // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
@@ -1490,6 +1493,9 @@ async function startGame(
       devCommandsEnabled: import.meta.env.DEV,
       constrainedMemory: GFX.constrainedMemory,
     });
+    mapMarkerPaletteLifecycle = installMapMarkerPaletteLifecycle(window, () =>
+      hud.refreshMapMarkerArtPalette(),
+    );
     loadPhaseEnd('hud-ctor');
     perf.setHud(hud);
     // Every zone the renderer makes resident (boot, teleport warmup, or the
