@@ -2245,9 +2245,14 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
     waist 1 (sash_of_the_sunken_court), LEGS 1 (lunar_choir_leggings),
     GLOVES 1 (shadowpulse_handwraps), feet 1 (shadowpulse_slippers).
 - SLOT PICKS (weakest-covered first; ties broken by exact-31 depth, then retirement
-  holes, then budget impact, then the plan default):
+  holes, then budget impact, then the plan default; exact-31 depth TIES across every
+  tied cell below, so the recorded reasoning starts at retirement holes: verified at
+  the 2026-08-13 QA, every member of the tied leather and cloth cells is an
+  acquirable ilvl-31 heroic drop):
   - armorcrafting (mail): WAIST, LEGS, FEET (all at 1). OVERRIDES the plan default
-    chest/legs/waist: mail chest is the best-covered mail body slot (3).
+    chest/legs/waist: mail chest is the best-covered mail body slot (3; body here
+    means the non-head/shoulder slots, since helmet and shoulder sit at 4; the
+    three count-1 slots are the unique argmin either way).
   - leatherworking (leather): LEGS, GLOVES (both at 1), CHEST (third pick: the 2-count
     tie among chest/waist/feet breaks to chest on the retirement hole and the largest
     budget, 22 vs 15 vs 14). OVERRIDES the plan default chest/shoulders/feet.
@@ -2264,11 +2269,17 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   the largest-budget slot goes to the armor class's majority archetype (deterministic
   crafted access beside the lone RNG drop). Applied: mail legs str/sta (majority,
   2 of 3 mail classes), mail waist int, mail feet int; leather chest agi/sta (majority),
-  leather legs int/spi, leather gloves int; cloth all int-based, the spi-vs-sta
-  split decided per the band's reference rows and ratings per the heroic policy.
-  (OUTCOME, recorded at the build: all three cloth pieces shipped int/spi, since
-  the band ships no int/sta cloth at all; the original "spi/sta split" phrasing
-  named the decision, not a mixed result.)
+  leather legs int/spi, leather gloves int; cloth all int-based with the spi/sta
+  split and ratings decided per the heroic policy (healer-facing pieces never take
+  Hit). (OUTCOME, recorded at the build; the never-Hit clause restored at the
+  2026-08-13 QA after the ledger close 063842c7ab dropped it without an amendment:
+  all three cloth pieces shipped int/spi, since the three PICKED cloth cells'
+  references all ship int/spi (the band's int/sta cloth sits in unpicked cells:
+  sash_of_the_sunken_court and the soulflame pair); the original "spi/sta split"
+  phrasing named the decision, not a mixed result. The never-Hit clause was JUDGED
+  at the build, not violated: the catalog classes healer-facing by an authored Hit
+  seed (heroic_variants.ts), not by int/spi wholesale, so Hit landed on
+  sunspun_vestments per the RULINGS TAKEN IN-PHASE bullet below.)
 - BUDGETS (law, primaryStatBudget at ilvl 31 epic): chest 22, legs 20, waist 15,
   gloves 15, feet 14. Ratings: the whole 31 band carries exactly ONE rating at 40
   (heroic_loot.ts ARMOR_RATING, rift RIFT_ARMOR_RATING); every apex piece takes exactly
