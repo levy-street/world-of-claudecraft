@@ -853,7 +853,15 @@ export type ItemUse =
   // single source of the effect-to-item mapping; a guard derives the craftable
   // set from these defs against the R9 slot policy so no item can exist for an
   // effect the policy refuses everywhere.
-  | { type: 'toolEffect'; effectId: ToolEffectId };
+  | { type: 'toolEffect'; effectId: ToolEffectId }
+  // Places a party-shared mobile crafting station at the user's position
+  // (Masterwrought phase 09, the Master's Field Forge): no specialization
+  // gate, holding the item is the credential, and the item is never consumed
+  // (a permanent tool). `stationCraftId` is a CRAFT id, not a StationType, so
+  // stationTypeForCraft resolves the station's type (weaponcrafting or
+  // armorcrafting for a forge) and MobileCraftingStation plus the `mst` wire
+  // value keep their existing craft-id shape unchanged.
+  | { type: 'placeMobileStation'; stationCraftId: string };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).

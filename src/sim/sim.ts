@@ -456,7 +456,7 @@ import {
 } from './professions/masterwrought_materials';
 import { applyMasteryReset, updateMasteryResetNotices } from './professions/mastery_reset';
 import {
-  isStationActive,
+  activeMobileStationCraftForViewer,
   type MobileCraftingStation,
   placeMobileStationForPlayer,
 } from './professions/mobile_station';
@@ -9589,10 +9589,11 @@ export class Sim {
   /** Per-player form of `activeMobileStationCraft`, for the server's `mst`
    *  self-delta (server/game.ts): the expiry check runs server-side against
    *  this sim's own tickCount, so the client mirrors a server-authoritative
-   *  value and never reasons about tick domains. */
+   *  value and never reasons about tick domains. The resolver body (own
+   *  station first, else the nearest in-range partyShared party station)
+   *  lives in professions/mobile_station.ts. */
   activeMobileStationCraftFor(pid: number): string | null {
-    const station = this.players.get(pid)?.mobileStation;
-    return station && isStationActive(station, this.tickCount) ? station.craftId : null;
+    return activeMobileStationCraftForViewer(this.ctx, pid);
   }
 
   // Recipe acquisition command (#1299): a thin delegate onto

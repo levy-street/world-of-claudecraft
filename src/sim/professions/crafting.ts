@@ -99,7 +99,7 @@ import {
 } from './masterwork';
 import { countAcrossGrades, materialGradeIds, planGradeRemoval } from './material_grades';
 import { materialTierBonusForReagents } from './material_tier';
-import { isStationActive } from './mobile_station';
+import { isStationActive, partySharedStationSatisfies } from './mobile_station';
 import { craftActionXp } from './profession_xp';
 import { isAtStation, stationTypeForCraft } from './stations';
 import type { ProfessionReagent, ProfessionRecipeRecord } from './types';
@@ -541,9 +541,13 @@ export function evaluateCraftAdmission(
   // Station gate (supersedes #1297's hub gate; the level arm retired
   // with it): a station-bound recipe requires the player to stand at a
   // station of the recipe's type, OR to have their own ACTIVE mobile station
-  // (mobile_station.ts) whose craft maps to that type. Checked before every
-  // other remedy-able gate, no side effect on denial, no rng, same shape as
-  // the combo-requirement check below.
+  // (mobile_station.ts) whose craft maps to that type, OR (Masterwrought
+  // phase 09) a party member's ACTIVE partyShared mobile station of that
+  // type within STATION_RADIUS of the crafter (the party arm is
+  // proximity-gated unlike the any-distance own arm; the walk short-circuits
+  // behind the cheaper arms and runs per craft command, never per tick).
+  // Checked before every other remedy-able gate, no side effect on denial,
+  // no rng, same shape as the combo-requirement check below.
   if (recipe.stationType) {
     const entity = ctx.entities.get(pid);
     const mobileSatisfies =
@@ -552,7 +556,16 @@ export function evaluateCraftAdmission(
       stationTypeForCraft(meta.mobileStation.craftId) === recipe.stationType;
     if (
       !entity ||
-      (!isAtStation(ctx.stationPlacements, entity.pos, recipe.stationType) && !mobileSatisfies)
+      (!isAtStation(ctx.stationPlacements, entity.pos, recipe.stationType) &&
+        !mobileSatisfies &&
+        !partySharedStationSatisfies(
+          ctx.partyOf(pid),
+          pid,
+          ctx.players,
+          entity.pos,
+          recipe.stationType,
+          ctx.tickCount,
+        ))
     ) {
       return { ok: false, recipeId: recipe.id, reason: 'station_required' };
     }

@@ -5,7 +5,11 @@
 // now accepts an ACTIVE own mobile station (isStationActive against the
 // current tick) in place of physical presence at a station, for recipes
 // whose stationType matches stationTypeForCraft(station.craftId)
-// (stations.ts). The per-player slot is `PlayerMeta.mobileStation` (sim.ts):
+// (stations.ts). Masterwrought phase 09 adds the partyShared arm: a
+// station placed through the Master's Field Forge ITEM
+// (placeMobileStationFromItem below) also serves the owner's party members,
+// but only within STATION_RADIUS of the crafter (partySharedStationSatisfies
+// below). The per-player slot is `PlayerMeta.mobileStation` (sim.ts):
 // TRANSIENT, never serialized to the character save, since tick-domain
 // expiry is not restart-safe. Placement rides the IWorld
 // `placeMobileStation` member (world_api/professions.ts) and the
@@ -17,15 +21,27 @@
 // `MobileCraftingStation` value; `placeMobileStationForPlayer` below is the
 // one command-shaped writer, storing onto the resolved player's meta slot.
 
-import { MOBILE_CRAFTING_STATION_DURATION_TICKS } from '../content/professions';
+import { MOBILE_CRAFTING_STATION_DURATION_TICKS, STATION_RADIUS } from '../content/professions';
 import { refusedWhileDead } from '../dead_gate';
 import type { SimContext } from '../sim_context';
+import type { StationType } from '../types';
+import { stationTypeForCraft } from './stations';
 import { type CraftSkillState, isSpecialized } from './wheel';
 
 export interface MobileCraftingStation {
   playerId: string;
-  /** Which craft the placing player was specialized in when they placed it. */
+  /** Which craft this station serves (stationTypeForCraft maps it to a
+   *  station type). Specialization placements record the craft the placing
+   *  player was specialized in; item placements record the craft the item
+   *  names. */
   craftId: string;
+  /** Party-usable placement (Masterwrought phase 09, the Master's Field
+   *  Forge item path): while active, party members of the owner within
+   *  STATION_RADIUS also satisfy the crafting station gate (crafting.ts).
+   *  Optional so the pre-phase record shape (and every literal built to it)
+   *  stays valid: absent reads as false, owner-only, which is what every
+   *  specialization placement sets explicitly. */
+  partyShared?: boolean;
   pos: { x: number; z: number };
   /** Sim tick this station was placed at. */
   placedAtTick: number;
@@ -54,6 +70,9 @@ export function placeMobileCraftingStation(
   return {
     playerId,
     craftId,
+    // Specialization placements stay owner-only: the party grant is the
+    // Master's Field Forge item's alone (placeMobileStationFromItem).
+    partyShared: false,
     pos,
     placedAtTick: nowTick,
     expiresAtTick: nowTick + MOBILE_CRAFTING_STATION_DURATION_TICKS,
@@ -97,4 +116,107 @@ export function placeMobileStationForPlayer(
   );
   if (station) r.meta.mobileStation = station;
   return station;
+}
+
+/**
+ * Command body behind the `placeMobileStation` ItemUse arm (items.ts useItem):
+ * the Master's Field Forge (Masterwrought phase 09) and any future
+ * station-placing item. Deliberately NO isSpecialized gate: holding the item
+ * IS the credential (crafting it already sat behind the apex ladder), so the
+ * only refusals are the shared dead gate (the matcher-covered while-dead
+ * error line, same as placeMobileStationForPlayer) and an unresolvable pid.
+ * The placed station is partyShared: party members within STATION_RADIUS of
+ * it satisfy the crafting station gate (crafting.ts). Stores into the same
+ * per-player PlayerMeta.mobileStation slot, replacing any previous station.
+ * Draws no rng, reads no wall clock; the CALLER never consumes the item (a
+ * permanent tool, the mount-reins convention).
+ */
+export function placeMobileStationFromItem(
+  ctx: SimContext,
+  stationCraftId: string,
+  pid?: number,
+): MobileCraftingStation | undefined {
+  if (refusedWhileDead(ctx, pid)) return undefined;
+  const r = ctx.resolve(pid);
+  if (!r) return undefined;
+  const station: MobileCraftingStation = {
+    playerId: r.meta.name,
+    craftId: stationCraftId,
+    partyShared: true,
+    pos: { x: r.e.pos.x, z: r.e.pos.z },
+    placedAtTick: ctx.tickCount,
+    expiresAtTick: ctx.tickCount + MOBILE_CRAFTING_STATION_DURATION_TICKS,
+  };
+  r.meta.mobileStation = station;
+  return station;
+}
+
+/**
+ * The party arm of the crafting station gate (Masterwrought phase 09): true
+ * while any OTHER member of `party` holds an ACTIVE partyShared mobile
+ * station whose craft serves `type`, within STATION_RADIUS of `crafterPos`
+ * (squared-distance, the stations.ts isAtStation idiom). The crafter's own
+ * slot is skipped on purpose: their own station already satisfies the gate
+ * at ANY distance (the training precedent, crafting.ts), and an owner-only
+ * station must never leak through the party walk. Pure: `metas` is any
+ * pid-keyed lookup (the live ctx.players view in production);
+ * allocation-free, run per craft command, never per tick.
+ */
+export function partySharedStationSatisfies(
+  party: { members: readonly number[] } | null,
+  crafterPid: number,
+  metas: { get(pid: number): { mobileStation: MobileCraftingStation | null } | undefined },
+  crafterPos: { x: number; z: number },
+  type: StationType,
+  nowTick: number,
+): boolean {
+  if (!party) return false;
+  const radiusSq = STATION_RADIUS * STATION_RADIUS;
+  for (const memberPid of party.members) {
+    if (memberPid === crafterPid) continue;
+    const station = metas.get(memberPid)?.mobileStation;
+    if (!station || !station.partyShared || !isStationActive(station, nowTick)) continue;
+    if (stationTypeForCraft(station.craftId) !== type) continue;
+    const dx = crafterPos.x - station.pos.x;
+    const dz = crafterPos.z - station.pos.z;
+    if (dx * dx + dz * dz <= radiusSq) return true;
+  }
+  return false;
+}
+
+/**
+ * The per-viewer resolver behind Sim.activeMobileStationCraftFor (and so the
+ * `mst` snapshot delta and the offline getter): the viewer's own ACTIVE
+ * station's craft first, else the craft of the NEAREST ACTIVE partyShared
+ * station owned by another party member within STATION_RADIUS of the viewer,
+ * else null. Single-id asymmetry, accepted: `mst` stays ONE craft id (zero
+ * new wire fields, zero new IWorld members), so when the viewer's own
+ * station and an in-range shared station serve DIFFERENT crafts only the own
+ * craft surfaces; the crafting gate itself (crafting.ts) still honors the
+ * shared station regardless of what the resolver shows.
+ */
+export function activeMobileStationCraftForViewer(ctx: SimContext, pid: number): string | null {
+  const own = ctx.players.get(pid)?.mobileStation;
+  if (own && isStationActive(own, ctx.tickCount)) return own.craftId;
+  const viewer = ctx.entities.get(pid);
+  if (!viewer) return null;
+  const party = ctx.partyOf(pid);
+  if (!party) return null;
+  let bestCraft: string | null = null;
+  // Seeded at the radius so the range gate and the nearest pick are one
+  // compare; the first station AT the boundary is accepted (<=), a tie after
+  // that keeps the earlier party-order member (deterministic in both hosts).
+  let bestDistSq = STATION_RADIUS * STATION_RADIUS;
+  for (const memberPid of party.members) {
+    if (memberPid === pid) continue;
+    const station = ctx.players.get(memberPid)?.mobileStation;
+    if (!station || !station.partyShared || !isStationActive(station, ctx.tickCount)) continue;
+    const dx = viewer.pos.x - station.pos.x;
+    const dz = viewer.pos.z - station.pos.z;
+    const distSq = dx * dx + dz * dz;
+    if (distSq > bestDistSq || (distSq === bestDistSq && bestCraft !== null)) continue;
+    bestDistSq = distSq;
+    bestCraft = station.craftId;
+  }
+  return bestCraft;
 }

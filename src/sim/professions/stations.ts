@@ -3,7 +3,10 @@
 // carrying a `stationType` (professions/types.ts ProfessionRecipeRecord)
 // resolves only while the crafter stands at a matching station, or while
 // their own mobile station (mobile_station.ts) whose craft maps to that
-// type is ACTIVE (the mobile arm checks activity and type, never distance). This replaces the retired level-20 crafting-hub gate (#1297's
+// type is ACTIVE (the own-mobile arm checks activity and type, never
+// distance), or (Masterwrought phase 09) while a party member's ACTIVE
+// partyShared mobile station of that type sits within STATION_RADIUS of the
+// crafter. This replaces the retired level-20 crafting-hub gate (#1297's
 // crafting_hub.ts): the level arm is gone entirely (2026-07-17 maintainer
 // ruling), and the single hub circle is replaced by per-type stations spread
 // across the towns (content/professions.ts STATIONS).
@@ -80,10 +83,11 @@ export function craftsForStationType(type: StationType): string[] {
 /**
  * The set of station types the crafting UI should treat as in range right
  * now: every type with a physical station within STATION_RADIUS of `pos`,
- * plus the type served by the viewer's own ACTIVE mobile station's craft
- * (pass the craft id, or null when none is active; the caller owns the
- * active/expiry check since only it holds the tick). Pure and cheap (six
- * stations), computed once per repaint by the HUD.
+ * plus the type served by the viewer's ACTIVE mobile-station craft (their
+ * own, or since Masterwrought phase 09 an in-range partyShared one: pass
+ * the resolver's craft id, or null when none is active; the caller owns the
+ * active/expiry/range checks since only it holds the tick). Pure and cheap
+ * (six stations), computed once per repaint by the HUD.
  */
 export function inRangeStationTypes(
   stations: readonly StationDef[],

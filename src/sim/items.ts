@@ -59,6 +59,7 @@ import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
+import { placeMobileStationFromItem } from './professions/mobile_station';
 import { useRecipePatternItem } from './professions/pattern_items';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -770,6 +771,16 @@ export function useItem(
   }
   if (def.use?.type === 'skinSelect') {
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
+    return;
+  }
+  // The Master's Field Forge (Masterwrought phase 09): places a party-shared
+  // mobile crafting station at the user's position. Sits with the early arms
+  // above (before the busy/dead gates below) so the ITEM surface matches the
+  // place_mobile_station wire command, which has no busy gate; the module
+  // body owns the dead gate and every placement rule. NEVER consumed: a
+  // permanent tool like mount reins, so no consumeOneUnit here.
+  if (def.use?.type === 'placeMobileStation') {
+    placeMobileStationFromItem(ctx, def.use.stationCraftId, meta.entityId);
     return;
   }
   // Raw fishing catches are cooking reagents only (kind junk, no foodHp).
