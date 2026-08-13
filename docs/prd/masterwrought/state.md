@@ -2667,3 +2667,30 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   superseded by this record; the phase 08 implementation diff under audit
   stays a3a3f6a009..d14adba5b9, and this sync's commits (the merge + the
   audit fixes) are the Step 0 record.
+- SYNC FIX-ROUND REVIEW (the fixes are unreviewed code rule): a fresh
+  architecture reviewer over fa51741408..436ab252b1 returned 0 blocking, 2
+  should-fix, 5 notes; ALL applied at 32c32dd8f2. The two should-fix: the
+  consume's tri-state was collapsed (null fell into the newest-first walk;
+  now a pre-effect pin gate refuses a bad selection before the learn and the
+  null arm is explicit per the item_copy_ref contract), and the slot arm's
+  quest-hook call was a mutation survivor (deleting it left both new tests
+  green while silently desyncing the online bag mirror via the missed
+  meta.wireRev bump; now pinned, probe-proven red). Notes applied: both lock
+  fixtures stamp through the real setItemLocked command; an online-host pin
+  drives the wire slot field through the real dispatch; the professions
+  CLAUDE.md pattern_items row records the copy-choice discipline. Reviewer
+  all-clear on: rng draw-order (both consume paths draw zero), sim purity,
+  SimContext contract, slot-vs-id arm bookkeeping parity, the discarded
+  InventoryUnit return (correct to discard; noted as the future
+  learned-from-a-signed-pattern plug point), and the sunder pins' accuracy.
+  Reviewer note for the frontend gate (recorded, not actioned at the sync):
+  bags_window's copyRefFor returns undefined on a stale repaint index, so a
+  stale bag click still reaches the sim id-only; pre-existing, shared with
+  equip/discard/sell, bounded by patterns being excluded from the action bar.
+- Sync checkpoint tip: 32c32dd8f2 (merge fa51741408 + 4 fix/docs commits).
+  gate_select at the committed tip is deliberately NOT run at this
+  checkpoint: the QA session re-running the phase-08-qa prompt owns the gate
+  (its Step 4), and every targeted surface this sync touched is green (tsc,
+  parity 207, naming guards, portrait trio, eastbrook, monolith,
+  architecture, S3, snapshots, masterwrought suites, and the touched suites
+  156 post-review).
