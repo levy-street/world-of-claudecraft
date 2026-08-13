@@ -51,6 +51,7 @@ import type { CharacterState } from '../../src/sim/sim';
 import { Sim } from '../../src/sim/sim';
 import {
   type EquipSlot,
+  type ItemDef,
   type PlayerClass,
   type WorldContent,
   xpToReachLevel,
@@ -995,5 +996,90 @@ describe('Masterwrought cap: hand demotion routes through fillHands (phase 09)',
     expect(kit.offhand).toBeUndefined();
     expect(kit.chest).toBe('mw_chest');
     expect(kit.waist).toBe('mw_waist');
+  });
+});
+
+describe('bisKitForRole wires the hand sources into the cap enforcer (phase 09 wiring pin)', () => {
+  it('a real kit with a demoted flagged top weapon still gets legal, filled hands', () => {
+    // The synthetic describe above drives enforceMasterwroughtCap directly,
+    // so nothing there would notice the CALL SITE dropping the hands bag:
+    // without it a flagged hand demotion deletes the slot and never refills
+    // (enforceMasterwroughtCap returns early on a missing hands argument),
+    // leaving a boosted character weaponless. This arm goes through
+    // bisKitForRole itself over the live ITEMS table: a synthetic flagged
+    // weapon out-scores every real one for warrior prot, two synthetic
+    // flagged armor pieces out-score IT to become the kept pair, and the
+    // demoted weapon must refill through fillHands into a legal
+    // one-hander-plus-shield layout rather than empty hands.
+    const SYNTH: ItemDef[] = [
+      {
+        id: 'test_pbe_mw_axe',
+        name: 'Test test_pbe_mw_axe',
+        kind: 'weapon',
+        slot: 'mainhand',
+        quality: 'epic',
+        masterwrought: true,
+        requiredClass: ['warrior'],
+        weapon: { min: 60, max: 80, speed: 2 },
+        stats: { sta: 200 },
+        sellValue: 1,
+      } as ItemDef,
+      {
+        id: 'test_pbe_mw_chest',
+        name: 'Test test_pbe_mw_chest',
+        kind: 'armor',
+        armorType: 'mail',
+        slot: 'chest',
+        quality: 'epic',
+        masterwrought: true,
+        stats: { sta: 900 },
+        sellValue: 1,
+      } as ItemDef,
+      {
+        id: 'test_pbe_mw_waist',
+        name: 'Test test_pbe_mw_waist',
+        kind: 'armor',
+        armorType: 'mail',
+        slot: 'waist',
+        quality: 'epic',
+        masterwrought: true,
+        stats: { sta: 800 },
+        sellValue: 1,
+      } as ItemDef,
+    ];
+    for (const def of SYNTH) ITEMS[def.id] = def;
+    try {
+      const role = CLASS_ROLES.warrior.find((r) => r.id === 'prot') as BoostRole;
+      expect(role, 'warrior prot role exists').toBeTruthy();
+      // Premise check, not an assumption: the flagged weapon really is the
+      // top prot pick, so its demotion is what the cap arm must repair.
+      const axeScore = roleItemScore(role, ITEMS.test_pbe_mw_axe);
+      for (const item of Object.values(ITEMS)) {
+        if (item.kind !== 'weapon' || item.id === 'test_pbe_mw_axe') continue;
+        if (!canEquipItem('warrior', item)) continue;
+        expect(roleItemScore(role, item), `${item.id} outscores the synthetic axe`).toBeLessThan(
+          axeScore,
+        );
+      }
+      const kit = bisKitForRole('warrior', role);
+      const flagged = Object.values(kit).filter((id) => id && ITEMS[id]?.masterwrought);
+      expect(flagged.length).toBeLessThanOrEqual(MASTERWROUGHT_EQUIP_CAP);
+      expect(kit.chest).toBe('test_pbe_mw_chest');
+      expect(kit.waist).toBe('test_pbe_mw_waist');
+      // The hands must be FILLED (the missing-hands early return leaves the
+      // demoted mainhand deleted) and legal under the shield layout: an
+      // unflagged one-hander plus an unflagged shield.
+      const mainhand = ITEMS[kit.mainhand as string];
+      expect(mainhand, 'mainhand filled').toBeTruthy();
+      expect(mainhand.masterwrought).toBeFalsy();
+      expect(mainhand.kind === 'weapon' && mainhand.hand !== 'twohand').toBe(true);
+      expect(canEquipItemInSlot('warrior', mainhand, 'mainhand', role.id)).toBe(true);
+      const offhand = ITEMS[kit.offhand as string];
+      expect(offhand, 'offhand filled').toBeTruthy();
+      expect(isShieldItem(offhand)).toBe(true);
+      expect(offhand.masterwrought).toBeFalsy();
+    } finally {
+      for (const def of SYNTH) delete ITEMS[def.id];
+    }
   });
 });

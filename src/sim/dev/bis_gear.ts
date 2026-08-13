@@ -9,7 +9,11 @@
 
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
-import { canEquipItemInSlot, MASTERWROUGHT_EQUIP_CAP } from '../equipment_rules';
+import {
+  canEquipItemInSlot,
+  displacedSlotForEquip,
+  MASTERWROUGHT_EQUIP_CAP,
+} from '../equipment_rules';
 import type { SimContext } from '../sim_context';
 import type { EquipSlot, ItemDef } from '../types';
 import { ALL_EQUIP_SLOTS } from '../types';
@@ -80,11 +84,13 @@ export function bestEpicGearFor(
   // dev outfit could silently exceed the counted-family cap the moment
   // flagged pieces out-score their references (the pbe_boost twin,
   // enforceMasterwroughtCap, hit exactly that). Keep the cap-highest scoring
-  // flagged picks and refill each demoted slot with its best unflagged
-  // candidate under the same slot rules. Like the twin, the legendary
-  // sub-cap needs no arm until a legendary-flagged def ships; unlike the
-  // twin this sort carries an explicit id tie-break (the twin leans on sort
-  // stability), both deterministic.
+  // flagged picks and refill each demoted slot under the same slot rules,
+  // with every non-KEPT flagged id excluded (the twin's semantics: a refill
+  // can never re-select a different over-cap flagged item, worn or not).
+  // Like the twin, the legendary sub-cap needs no arm until a
+  // legendary-flagged def ships; unlike the twin this sort carries an
+  // explicit id tie-break (the twin leans on sort stability), both
+  // deterministic.
   const flagged = (Object.entries(picks) as [EquipSlot, string][]).filter(
     ([, id]) => ITEMS[id]?.masterwrought,
   );
@@ -92,14 +98,56 @@ export function bestEpicGearFor(
     const scored = flagged
       .map(([slot, id]) => ({ slot, id, s: score(ITEMS[id]) }))
       .sort((a, b) => b.s - a.s || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    const kept = new Set(scored.slice(0, MASTERWROUGHT_EQUIP_CAP).map((entry) => entry.id));
+    const allowedRefill = (item: ItemDef): boolean => !item.masterwrought || kept.has(item.id);
     for (const demoted of scored.slice(MASTERWROUGHT_EQUIP_CAP)) {
       used.delete(demoted.id);
-      const fallback = bestFor(demoted.slot, (item) => !item.masterwrought);
+      const fallback = bestFor(demoted.slot, allowedRefill);
       if (fallback) {
         picks[demoted.slot] = fallback.id;
         used.add(fallback.id);
       } else {
         delete picks[demoted.slot];
+      }
+    }
+    // bestFor is per-slot legality only: a hand refill re-applies the
+    // one-hander preference but never the two-hand/offhand exclusion, so a
+    // mainhand refilled to a two-hander (when nothing one-handed remained)
+    // can stand beside an offhand pick, and an offhand refill can land
+    // beside a kept two-hand mainhand. Re-validate the pair with the shared
+    // displacement rule and, when it fails, re-run the hand fill in the
+    // initial order (mainhand first, then a partner the mainhand does not
+    // displace) under the same refill exclusion; kept flagged hand picks
+    // stay candidates, so the re-run re-selects them.
+    const clsKey = cls as Parameters<typeof canEquipItemInSlot>[0];
+    const lookup = (id: string) => ITEMS[id];
+    const offhandDef = picks.offhand !== undefined ? ITEMS[picks.offhand] : undefined;
+    const pairIllegal =
+      picks.mainhand !== undefined &&
+      offhandDef !== undefined &&
+      displacedSlotForEquip(offhandDef, 'offhand', picks, lookup, clsKey, spec) !== null;
+    if (pairIllegal) {
+      for (const slot of ['mainhand', 'offhand'] as const) {
+        const id = picks[slot];
+        if (id !== undefined) {
+          used.delete(id);
+          delete picks[slot];
+        }
+      }
+      const main = bestFor('mainhand', allowedRefill);
+      if (main) {
+        picks.mainhand = main.id;
+        used.add(main.id);
+      }
+      const off = bestFor(
+        'offhand',
+        (item) =>
+          allowedRefill(item) &&
+          displacedSlotForEquip(item, 'offhand', picks, lookup, clsKey, spec) === null,
+      );
+      if (off) {
+        picks.offhand = off.id;
+        used.add(off.id);
       }
     }
   }

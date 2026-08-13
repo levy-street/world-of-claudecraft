@@ -2494,8 +2494,35 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...APEX_GEAR_RECIPES,
 ];
 
+// O(1) indexes for the two per-lookup resolvers below (the recipe table grows
+// every content phase, and recipeById sits on crafting hot paths). NOT built
+// once at load: ALL_RECIPES is append-only content at runtime, but test
+// fixtures push and splice synthetic recipes around a suite
+// (tests/recipe_pattern_items.test.ts relies on recipeById seeing them), so
+// the indexes rebuild whenever the table's length changes; a same-length
+// in-place swap is outside the contract (nothing replaces rows). First
+// insertion wins, preserving the linear scans' first-match semantics, and a
+// miss stays undefined.
+let recipeIndexSize = -1;
+let recipeByIdIndex: ReadonlyMap<string, ProfessionRecipeRecord> = new Map();
+let recipeByResultItemIndex: ReadonlyMap<string, ProfessionRecipeRecord> = new Map();
+
+function ensureRecipeIndexes(): void {
+  if (recipeIndexSize === ALL_RECIPES.length) return;
+  const byId = new Map<string, ProfessionRecipeRecord>();
+  const byResultItem = new Map<string, ProfessionRecipeRecord>();
+  for (const recipe of ALL_RECIPES) {
+    if (!byId.has(recipe.id)) byId.set(recipe.id, recipe);
+    if (!byResultItem.has(recipe.resultItemId)) byResultItem.set(recipe.resultItemId, recipe);
+  }
+  recipeIndexSize = ALL_RECIPES.length;
+  recipeByIdIndex = byId;
+  recipeByResultItemIndex = byResultItem;
+}
+
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {
-  return ALL_RECIPES.find((r) => r.id === recipeId);
+  ensureRecipeIndexes();
+  return recipeByIdIndex.get(recipeId);
 }
 
 // The hands-vs-stations field set (Professions 2.0): the recipe ids
@@ -2508,10 +2535,11 @@ export const FIELD_RECIPES: ReadonlySet<string> = new Set(COMMON_RECIPES.map((r)
 // Reverse lookup (#1149, Battlefield Experience): the recipe whose crafting
 // produced a given result item id, so a tracked-event handler holding only an
 // item instance can resolve back to the craft (professionId) that made it.
-// Searches ALL_RECIPES (common, tool, caster hub, combo, and ladder alike),
+// Indexes ALL_RECIPES (common, tool, caster hub, combo, and ladder alike),
 // not just COMMON_RECIPES: a narrower search here silently broke attribution
 // for every recipe outside the common set. First match wins: no two recipes
 // in this table share a resultItemId today.
 export function recipeForResultItem(itemId: string): ProfessionRecipeRecord | undefined {
-  return ALL_RECIPES.find((r) => r.resultItemId === itemId);
+  ensureRecipeIndexes();
+  return recipeByResultItemIndex.get(itemId);
 }

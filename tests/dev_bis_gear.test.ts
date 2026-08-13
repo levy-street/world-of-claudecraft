@@ -67,28 +67,36 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
     'druid',
   ] as const;
 
-  it('every class outfit stays inside the counted-family cap', () => {
+  it('every class outfit picks exactly the cap of flagged pieces', () => {
     // equipBestInSlotForDev writes equipment directly and never runs
     // masterwroughtConflictSlot, so the picker itself must hold the cap.
-    // FORWARD NET, not present-tense coverage: against the shipped catalog
-    // every class picks ZERO flagged pieces today (the score ignores
-    // ratings, so apex pieces tie their references and the tiebreak
-    // decides), so this sweep asserts 0 <= cap at rest; the synthetic
-    // demotion arm below carries the live coverage of the cap arm itself.
+    // Deliberate EXACT pin, not <= cap: against the shipped phase 09 catalog
+    // every class picks exactly 2 flagged pieces (2 is also the current
+    // MASTERWROUGHT_EQUIP_CAP, so this sweep sits AT the boundary the cap
+    // arm defends). The dev score() counts weapon dps and the raw stat bag
+    // and ignores hit/crit/haste ratings, which is what lets the flagged
+    // pieces win their slots. A content phase that moves a winner, or a cap
+    // retune, re-acknowledges the new number here instead of drifting.
     for (const cls of CLASSES) {
       const picks = bestEpicGearFor(cls, null);
       const flagged = Object.values(picks).filter((id) => id && ITEMS[id]?.masterwrought);
-      expect(
-        flagged.length,
-        `${cls} dev bis exceeds the Masterwrought cap: ${flagged.join(', ')}`,
-      ).toBeLessThanOrEqual(MASTERWROUGHT_EQUIP_CAP);
+      expect(flagged.length, `${cls} dev bis flagged picks: ${flagged.join(', ')}`).toBe(2);
     }
+    // Warrior wears flagged pieces in BOTH hand slots, and both are RAW
+    // BUDGET wins under score(), not id tie-breaks: duskforged_warblade
+    // scores 214.0 (weapon dps plus stats) over gravewyrm_cleaver at 213.5,
+    // and duskforged_bulwark's armor pool totals 748 over
+    // heroic_bonewrought_bulwark at 697. The hit rating on the warblade is
+    // invisible to score(); it wins without it.
+    const warrior = bestEpicGearFor('warrior', null);
+    expect(warrior.mainhand).toBe('duskforged_warblade');
+    expect(warrior.offhand).toBe('duskforged_bulwark');
   });
 
   it('demotes the lowest-scoring flagged pick and refills the slot (synthetic over-cap)', () => {
-    // The shipped catalog cannot push a dev outfit over the cap yet (the
-    // score ignores ratings, so apex pieces tie their references), so drive
-    // the demotion arm the way masterwrought_cap.test.ts drives the equip
+    // The shipped catalog cannot push a dev outfit OVER the cap (the flagged
+    // winners stop exactly at it: the exact pin above), so drive the
+    // demotion arm the way masterwrought_cap.test.ts drives the equip
     // rule: three synthetic flagged epics injected into the live ITEMS table
     // that out-score everything in their slots, removed afterward.
     const IDS = ['test_bis_mw_chest', 'test_bis_mw_legs', 'test_bis_mw_waist'] as const;
@@ -129,6 +137,104 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       expect(flagged.length).toBe(MASTERWROUGHT_EQUIP_CAP);
     } finally {
       for (const id of IDS) delete ITEMS[id];
+    }
+  });
+
+  it('re-pairs the hands after a flagged hand demotion (synthetic 2H refill)', () => {
+    // The cross-hand arm: the per-slot refill re-applies slot legality but
+    // not the two-hand/offhand exclusion, so a demoted flagged mainhand
+    // whose only remaining refill candidate is a two-hander would stand
+    // beside the offhand pick, an illegal pair the equip path would break
+    // by displacement. A fake class name isolates BOTH hand pools to the
+    // synthetic defs below (every real epic weapon, shield, and held
+    // offhand carries a requiredClass list naming real classes only), while
+    // real cloth epics still fill the armor slots.
+    const CLS = 'test_bis_cls';
+    const REQ = [CLS] as unknown as ItemDef['requiredClass'];
+    const weaponDef = (
+      id: string,
+      hand: 'onehand' | 'twohand',
+      dps: number,
+      masterwrought: boolean,
+    ): ItemDef =>
+      ({
+        id,
+        name: `Test ${id}`,
+        kind: 'weapon',
+        slot: 'mainhand',
+        hand,
+        quality: 'epic',
+        masterwrought,
+        requiredClass: REQ,
+        weapon: { min: dps, max: dps, speed: 1 },
+        sellValue: 1,
+      }) as ItemDef;
+    const SYNTH: ItemDef[] = [
+      // The flagged one-hander wins the mainhand (one-hander preference),
+      // scores 600, and is the LOWEST of the three heavy flagged picks, so
+      // it demotes. score() = dps * 12 at speed 1.
+      weaponDef('test_bis_mw_1h', 'onehand', 50, true),
+      // Over-cap bait for the refill: flagged, out-scores every other
+      // weapon, never worn. Picking it would rebuild a third flagged pick.
+      weaponDef('test_bis_mw_2h_bait', 'twohand', 100, true),
+      // The only legal refill candidate left for the mainhand: unflagged
+      // and two-handed, which is what forces the illegal pair.
+      weaponDef('test_bis_2h_plain', 'twohand', 50, false),
+      {
+        id: 'test_bis_shield_plain',
+        name: 'Test test_bis_shield_plain',
+        kind: 'armor',
+        slot: 'offhand',
+        shield: true,
+        quality: 'epic',
+        requiredClass: REQ,
+        stats: { sta: 500 },
+        sellValue: 1,
+      } as ItemDef,
+      // Two flagged armor pieces out-scoring the weapon push the flagged
+      // count over the cap and become the kept pair.
+      {
+        id: 'test_bis_mw_chest2',
+        name: 'Test test_bis_mw_chest2',
+        kind: 'armor',
+        armorType: 'cloth',
+        slot: 'chest',
+        quality: 'epic',
+        masterwrought: true,
+        stats: { int: 900 },
+        sellValue: 1,
+      } as ItemDef,
+      {
+        id: 'test_bis_mw_legs2',
+        name: 'Test test_bis_mw_legs2',
+        kind: 'armor',
+        armorType: 'cloth',
+        slot: 'legs',
+        quality: 'epic',
+        masterwrought: true,
+        stats: { int: 800 },
+        sellValue: 1,
+      } as ItemDef,
+    ];
+    for (const def of SYNTH) ITEMS[def.id] = def;
+    try {
+      const picks = bestEpicGearFor(CLS, null);
+      // Kept: chest (900) and legs (800). The mainhand (600) demotes; its
+      // refill pool holds only the unflagged two-hander, so the re-pair
+      // must keep it and EMPTY the offhand (the shield occupies a hand).
+      // A naive per-slot refill leaves the shield standing beside it.
+      expect(picks.chest).toBe('test_bis_mw_chest2');
+      expect(picks.legs).toBe('test_bis_mw_legs2');
+      expect(picks.mainhand).toBe('test_bis_2h_plain');
+      expect(picks.offhand).toBeUndefined();
+      // The refill never picks another over-cap flagged id: the bait
+      // two-hander out-scores the plain one but was demoted unworn.
+      expect(Object.values(picks)).not.toContain('test_bis_mw_2h_bait');
+      expect(Object.values(picks)).not.toContain('test_bis_mw_1h');
+      const flagged = Object.values(picks).filter((id) => id && ITEMS[id]?.masterwrought);
+      expect(flagged.sort()).toEqual(['test_bis_mw_chest2', 'test_bis_mw_legs2']);
+    } finally {
+      for (const def of SYNTH) delete ITEMS[def.id];
     }
   });
 });

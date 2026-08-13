@@ -435,10 +435,11 @@ export function enforceMasterwroughtCap(
   hands?: HandRefillSources,
 ): void {
   // Exported with injectable score/flag/legality reads for tests: the
-  // ring-refill, hand-refill, and empty-fallback arms are unreachable with
-  // shipped data (every shipped flagged item is body armor; no flagged ring,
-  // weapon, shield, or held offhand exists yet), and synthetic-input
-  // coverage keeps them executed rather than dead.
+  // ring-refill, hand-refill, and empty-fallback arms are live with shipped
+  // data (phase 09 ships flagged weapons, a shield, held offhands, and
+  // rings), but no shipped flagged item is an argmax pick for any role today
+  // (roleItemScore ignores hitRating), so real kits exercise these arms only
+  // when scores shift; the synthetic arms remain the deterministic coverage.
   const flagged = (Object.entries(kit) as [EquipSlot, string][]).filter(([, id]) => isFlagged(id));
   if (flagged.length <= MASTERWROUGHT_EQUIP_CAP) return;
   const scored = flagged
