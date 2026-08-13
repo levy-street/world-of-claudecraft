@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { TOOL_EFFECT_IDS } from '../src/sim/content/professions';
 import {
   MATERIAL_RARITY_MAX_PROFICIENCY,
   type MaterialRarity,
@@ -192,7 +193,10 @@ describe('a slotted tool effect changes the yield and never the draw stream', ()
     // (R9 refuses it at the mint and drops it at load); it stays as defense
     // in depth for the slotEffect leaf itself, not as live-path coverage, so
     // do not delete it as dead or mistake it for one.
-    for (const effectId of ['gatherers_cache', 'artisans_eye', 'quickening_charm'] as const) {
+    // Sweep the LIVE catalog rather than a literal, so every future effect
+    // (makers_charm was the first to outgrow the old three-id list) is
+    // self-covering in the rng-stream neutrality proof.
+    for (const effectId of TOOL_EFFECT_IDS) {
       const withSlot = drawsFor(slotEffect(effectId, { toolRarity: 'epic' }), 4242);
       expect(withSlot, `${effectId} moved the stream`).toEqual(without);
     }

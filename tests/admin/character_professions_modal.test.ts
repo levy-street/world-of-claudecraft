@@ -47,7 +47,7 @@ const sheet: CharacterProfessionsSheet = {
   nodeTimers: [
     { nodeId: 'ore_eastbrook_1', zoneId: 'eastbrook_vale', nodeType: 'ore', remainingSeconds: 120 },
   ],
-  toolEffectIds: ['gatherers_cache', 'artisans_eye', 'quickening_charm'],
+  toolEffectIds: ['gatherers_cache', 'artisans_eye', 'quickening_charm', 'makers_charm'],
 };
 
 let activeSheet: CharacterProfessionsSheet = sheet;

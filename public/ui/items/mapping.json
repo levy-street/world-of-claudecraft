@@ -6317,11 +6317,11 @@
         "id": "woc-item-icon-v1",
         "document": "docs/design/item-icon-art-style.md"
       },
-      "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 and 08 woc_original_svg batches: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+      "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
       "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
       "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
       "provenanceRecords": [
-        "docs/achievements/masterwrought-phase09-art/"
+        "docs/achievements/masterwrought-phase09-art/README.md"
       ],
       "itemIds": [
         "duskforged_warblade",

@@ -132,6 +132,14 @@ describe('painted weapon inventory icons', () => {
       .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
       .sort();
     expect(masterwroughtWeaponIds).toEqual(['duskforged_warblade', 'ridgebreaker']);
+    // The first weapon-owning woc_original_svg batch: pin its provenance
+    // fields the way the loop below pins the two generated batches.
+    expect(masterwroughtBatch?.source).toBe('woc_original_svg');
+    expect(masterwroughtBatch?.owner).toBe('World of ClaudeCraft');
+    expect(masterwroughtBatch?.license).toContain('project asset');
+    expect(masterwroughtBatch?.provenanceRecord).toBe(
+      'docs/achievements/masterwrought-phase09-art/',
+    );
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
         (id) =>
