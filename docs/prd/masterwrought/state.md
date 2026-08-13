@@ -2275,7 +2275,8 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   2026-08-13 QA after the ledger close 063842c7ab dropped it without an amendment:
   all three cloth pieces shipped int/spi, since the three PICKED cloth cells'
   references all ship int/spi (the band's int/sta cloth sits in unpicked cells:
-  sash_of_the_sunken_court and the soulflame pair); the original "spi/sta split"
+  sash_of_the_sunken_court and the soulflame pair, plus the pair's
+  auto-generated heroic variants); the original "spi/sta split"
   phrasing named the decision, not a mixed result. The never-Hit clause was JUDGED
   at the build, not violated: the catalog classes healer-facing by an authored Hit
   seed (heroic_variants.ts), not by int/spi wholesale, so Hit landed on
