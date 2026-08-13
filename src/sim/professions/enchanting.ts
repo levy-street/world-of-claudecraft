@@ -974,10 +974,14 @@ function resolveReplaceEnchantBagged(
   // the replacement: the payload transform above carries every `instance` field
   // through, but the marker lives on the SLOT, so without this the replace arm
   // would launder a self-crafted piece exactly as the plain apply arm did.
+  // movement: this re-mints the player's OWN copy in place, the same reason
+  // silent + callerLogs are set, so it is not a new acquisition for the
+  // Reliquary tally either (re-enchanting a relic must not raise its count).
   ctx.addItemInstance(itemId, replacedEnchantPayloadFor(consumed.instance, enchant), pid, 1, {
     silent: true,
     callerLogs: true,
     craftedRecipeId: consumed.craftedRecipeId,
+    movement: true,
   });
   // Quality-tiered gain: the applied enchant's reagent-derived tier, exactly
   // like the plain arms (also stamps the shared throttle).
@@ -1116,10 +1120,13 @@ export function resolveApplyEnchant(
   // reopening the anti-farm gate (professions/crafting.ts
   // isCraftedDisenchantTrackedOutput) through a craft -> enchant -> disenchant
   // loop the player runs entirely on their own gear.
+  // movement: the plain apply arm re-mints the player's own copy too (see the
+  // replace arm above), so it is a relocation, not an acquisition.
   ctx.addItemInstance(itemId, merged, pid, 1, {
     silent: true,
     callerLogs: true,
     craftedRecipeId: consumed?.craftedRecipeId,
+    movement: true,
   });
   // Quality-tiered gain: the applied enchant's reagent-derived tier.
   if (meta) grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));

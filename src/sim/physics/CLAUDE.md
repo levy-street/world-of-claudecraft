@@ -19,7 +19,7 @@ walkable surface is a heightfield (`world.ts` `groundHeight`). So a body capsule
 reduces EXACTLY to a circle sweep in XZ plus scalar height tests: cheaper than a
 general 3D solver and exact rather than approximate for this content.
 
-## The two files
+## The three files
 - `sweep.ts`: the math leaf. Continuous time-of-impact for a moving body circle
   against a circle or an OBB (slab test plus rounded corners via the Minkowski
   sum), and the minimum-translation overlap query used for depenetration.
@@ -29,6 +29,16 @@ general 3D solver and exact rather than approximate for this content.
   within `MAX_STEP_HEIGHT`, then the terrain wall gate with contour sliding.
   Also `floorHeightAt` (terrain maxed with the standable prop top), which IS
   what the kernel's vertical pass lands and snaps against.
+- `ledge.ts`: the ledge-grab query: can this body, mid-jump, get its hands on
+  something above it and pull up? It completes the traversal ladder by
+  obstacle height: below `MAX_STEP_HEIGHT` the body strides (step), up to
+  `MANTLE_REACH` airborne a jump arc carries it over (vault), up to
+  `LEDGE_GRAB_MAX` a jump grabs and climbs (climb), above that it is a wall.
+  Exports `LEDGE_GRAB_MIN`, pinned equal to `MAX_STEP_HEIGHT` and
+  `MANTLE_REACH` so the rungs meet with no gap. A pure query against the same
+  collider set and heightfield the solver uses, so a climb can only start onto
+  a surface the body could legitimately stand on; the scripted pull-up
+  movement mode it hands off to lives in `src/sim/climb.ts`.
 
 `index.ts` is the barrel; import from it, never from the files directly.
 
@@ -86,9 +96,7 @@ general 3D solver and exact rather than approximate for this content.
 - **Allocation-light steady state.** Module scratch (`candidates`, `hit`,
   `push`) is reused and `moveCharacter` fills a caller-owned result, so no
   per-call lists or poses are minted; the kernel owns one params/result pair
-  (`player_motion.ts`). Small vector literals do still escape from `rotY` in
-  the OBB path, which is the next thing to squeeze if this ever shows up in a
-  profile.
+  (`player_motion.ts`).
 - **No rng, no wall clock.** Guarded by `tests/architecture.test.ts`.
 
 ## Tuning

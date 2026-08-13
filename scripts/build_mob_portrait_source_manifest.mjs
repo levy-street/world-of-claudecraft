@@ -18,6 +18,7 @@ import {
   portraitRendererFingerprint,
   sha256,
 } from './lib/mob_portrait_jobs.mjs';
+import { describeManifestDrift, formatManifestDrift } from './lib/mob_portrait_manifest_diff.mjs';
 import { assertManifestWriteAuthorized } from './lib/mob_portrait_manifest_guard.mjs';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -59,12 +60,30 @@ export async function buildManifest() {
   };
 }
 
+// Two 64-character hashes are not a diagnosis. Whenever the committed acceptance can still be
+// parsed, say WHICH part of it moved: a bundle-only drift (unrelated source churn, no art
+// change) and a real portrait regression read identically otherwise, and guessing wrong costs
+// a 230-portrait rerender pointed at the wrong problem.
 function printDiffHint(label, expected, actual) {
   const expectedHash = sha256(expected);
   const actualHash = actual === null ? 'missing' : sha256(actual);
+  console.error(`${label} is stale (expected ${expectedHash}, found ${actualHash}).`);
+  if (actual !== null) {
+    let committed = null;
+    try {
+      committed = JSON.parse(actual.toString('utf8'));
+    } catch {
+      committed = null;
+    }
+    if (committed) {
+      const detail = formatManifestDrift(
+        describeManifestDrift(committed, JSON.parse(expected.toString('utf8'))),
+      );
+      if (detail) console.error(`what moved:\n${detail}`);
+    }
+  }
   console.error(
-    `${label} is stale (expected ${expectedHash}, found ${actualHash}). ` +
-      'Rerender changed portraits with PORTRAIT_RECEIPT set, review them, then pass that ' +
+    'Rerender changed portraits with PORTRAIT_RECEIPT set, review them, then pass that ' +
       'receipt to this script with --write --receipt <path>.',
   );
 }

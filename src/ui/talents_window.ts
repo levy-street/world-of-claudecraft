@@ -69,9 +69,8 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
     alloc: TalentAllocation,
     captureGear?: boolean,
   ): void;
-  switchLoadout(index: number): void;
+  switchLoadout(index: number, bar: (string | null)[], alloc: TalentAllocation): void;
   deleteLoadout(index: number): void;
-  applyLoadoutBar(bar: (string | null)[], alloc: TalentAllocation): void;
   // Shared HUD chrome components.
   inputDialog(opts: {
     title: string;
@@ -333,6 +332,13 @@ export class TalentsWindow {
   }
 
   private paintRowsTab(body: HTMLElement, view: TalentsView): void {
+    if (!view.hasRows) {
+      body.innerHTML =
+        `<div class="tal-empty tal-coming-soon" data-talents-coming-soon>` +
+        `<b>${t('game.talents.comingSoonTitle')}</b>` +
+        `<span>${t('game.talents.comingSoonBody')}</span></div>`;
+      return;
+    }
     const wrap = document.createElement('div');
     wrap.className = 'tal-rows';
     const soon = t('hudChrome.talentRows.comingSoon');
@@ -506,8 +512,7 @@ export class TalentsWindow {
         cls: 'tal-lo-pick',
         onPick: () => {
           this.closeLoadoutMenu(root);
-          this.deps.switchLoadout(index);
-          this.deps.applyLoadoutBar(loadout.bar, loadout.alloc);
+          this.deps.switchLoadout(index, loadout.bar, loadout.alloc);
           this.refreshFromAuthority();
         },
       });

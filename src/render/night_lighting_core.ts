@@ -23,9 +23,7 @@
 // is no per-tier scaling here, and nothing a player reacts to is hidden either
 // way (the lamp posts, mobs, and nameplates are drawn on every tier regardless).
 
-function clamp01(v: number): number {
-  return v < 0 ? 0 : v > 1 ? 1 : v;
-}
+import { clamp01 } from './num_clamp';
 
 /** Hermite ease, matching day_night_core's own smoothstep so the ramps agree. */
 function smoothstep(t: number): number {

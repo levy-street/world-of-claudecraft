@@ -106,29 +106,144 @@
       "generationPrompt": "Create one fresh distinct premium hand-painted dark-fantasy MMORPG Hunter ability icon for Marten's Guise (runtime id aspect_of_the_monkey). Image 1 is the Hunter class brushwork/style reference, Image 2 is the green-gold class palette and creature-composition reference, and Image 3 is a readable creature-action reference. Do not copy any animal, face, sun, ring, or layout from them. Canonical mechanic: a level-5 Nature aspect granting the Hunter 8% dodge for 30 minutes. Paint one anatomically coherent lithe pine marten in a full-body twisting leap, its long flexible torso forming a strong diagonal S-curve as a blurred claw strike or arrow passes just behind it, a clear near-miss that reads as supernatural agility and dodge, not stealth or aggression. Warm chestnut and cream fur, alert dark eyes, restrained green-gold leaf-stream motion, opaque deep forest atmospheric background. One dominant action; focal subject fills 78-86% with equivalent 8-14px safe margin at 128px; perfectly centered visual mass; crisp marten head, forepaws, and tail silhouette at 32px and 48px; deep values and controlled highlights. Must be visually unrelated to the existing golden-eyes Prowl icon. No text, letters, numbers, border, frame, badge, rarity chrome, watermark, modern graphic design, flat glyph, duplicated anatomy, extra animals, human figure, excessive bloom, or crop."
     },
     {
-      "abilityId": "aspect_of_the_wild",
+      "abilityId": "pack_command",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "pack_command.webp"
+    },
+    {
+      "abilityId": "stampede",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "stampede.webp"
+    },
+    {
+      "abilityId": "unleash_beast",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "unleash_beast.webp"
+    },
+    {
+      "abilityId": "measured_shot",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "measured_shot.webp"
+    },
+    {
+      "abilityId": "pack_rally",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "pack_rally.webp"
+    },
+    {
+      "abilityId": "shrapnel_charge",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "shrapnel_charge.webp"
+    },
+    {
+      "abilityId": "bloodtrail_assault",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "bloodtrail_assault.webp"
+    },
+    {
+      "abilityId": "trailbreak",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "trailbreak.webp"
+    },
+    {
+      "abilityId": "wildheart",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "wildheart.webp"
+    },
+    {
+      "abilityId": "shellskin",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "shellskin.webp"
+    },
+    {
+      "abilityId": "frostjaw_trap",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "frostjaw_trap.webp"
+    },
+    {
+      "abilityId": "cold_focus",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "cold_focus.webp"
+    },
+    {
+      "abilityId": "bloodhook",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "bloodhook.webp"
+    },
+    {
+      "abilityId": "hunting_momentum",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "hunting_momentum.webp"
+    },
+    {
+      "abilityId": "fieldcraft_reentry",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "fieldcraft_reentry.webp"
+    },
+    {
+      "abilityId": "volley",
       "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
-      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/hunter/aspect_of_the_wild.png",
-      "output": "aspect_of_the_wild.webp",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/hunter/volley.png",
+      "output": "volley.webp",
       "source": "OpenAI built-in image generation",
       "owner": "World of ClaudeCraft",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "Wolf, hawk, and great-cat profiles arranged around a rally sun.",
+      "intendedVisualSubject": "Dense overhead arrow rain converging on a circular ground marker.",
       "references": [
         {
-          "path": "public/ui/skills/hunter/aspect_of_the_hawk.webp",
+          "path": "public/ui/skills/hunter/aimed_shot.webp",
           "role": "subject reference",
           "provenance": "CraftPix Premium art licensed to Levy Street for this project",
           "license": "CraftPix premium royalty-free commercial license, non-transferable"
         },
         {
-          "path": "public/ui/skills/hunter/revive_pet.webp",
-          "role": "style reference",
+          "path": "public/ui/skills/hunter/concussive_shot.webp",
+          "role": "composition reference",
           "provenance": "CraftPix Premium art licensed to Levy Street for this project",
           "license": "CraftPix premium royalty-free commercial license, non-transferable"
         }
       ],
-      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wildfang Rally (aspect_of_the_wild)\nCanonical mechanic: Wildfang Rally grants allies within 30 yd 45 attack power and 5% attack speed for 5 min.\nSubject: Wolf, hawk, and great-cat profiles arranged around a rally sun.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Volley (volley)\nCanonical mechanic: Volley channels for 3 sec over a ground area, dealing 12 to 16 Physical damage every 0.5 sec for 6 ticks within 8 yd; 8 sec cooldown.\nSubject: Dense overhead arrow rain converging on a circular ground marker.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "counter_shot",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/hunter/counter_shot.png",
+      "output": "counter_shot.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An arrow splitting a glowing spell rune in flight.",
+      "references": [
+        {
+          "path": "public/ui/skills/hunter/aimed_shot.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/hunter/concussive_shot.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Hushing Shot (counter_shot)\nCanonical mechanic: Hushing Shot is a physical projectile interrupt at 8 to 35 yd with a 4 sec school lockout; 20 sec cooldown.\nSubject: An arrow splitting a glowing spell rune in flight.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     },
     {
       "abilityId": "bestial_wrath",
@@ -156,29 +271,29 @@
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Howling Rage (bestial_wrath)\nCanonical mechanic: Howling Rage grants the hunter 20% attack power and the pet 100% damage for 15 sec; 120 sec cooldown.\nSubject: Hunter and beast profiles howling together inside one crimson rage aura.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     },
     {
-      "abilityId": "counter_shot",
+      "abilityId": "aspect_of_the_wild",
       "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
-      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/hunter/counter_shot.png",
-      "output": "counter_shot.webp",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/hunter/aspect_of_the_wild.png",
+      "output": "aspect_of_the_wild.webp",
       "source": "OpenAI built-in image generation",
       "owner": "World of ClaudeCraft",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "An arrow splitting a glowing spell rune in flight.",
+      "intendedVisualSubject": "Wolf, hawk, and great-cat profiles arranged around a rally sun.",
       "references": [
         {
-          "path": "public/ui/skills/hunter/aimed_shot.webp",
+          "path": "public/ui/skills/hunter/aspect_of_the_hawk.webp",
           "role": "subject reference",
           "provenance": "CraftPix Premium art licensed to Levy Street for this project",
           "license": "CraftPix premium royalty-free commercial license, non-transferable"
         },
         {
-          "path": "public/ui/skills/hunter/concussive_shot.webp",
-          "role": "composition reference",
+          "path": "public/ui/skills/hunter/revive_pet.webp",
+          "role": "style reference",
           "provenance": "CraftPix Premium art licensed to Levy Street for this project",
           "license": "CraftPix premium royalty-free commercial license, non-transferable"
         }
       ],
-      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Hushing Shot (counter_shot)\nCanonical mechanic: Hushing Shot is a physical projectile interrupt at 8 to 35 yd with a 4 sec school lockout; 20 sec cooldown.\nSubject: An arrow splitting a glowing spell rune in flight.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wildfang Rally (aspect_of_the_wild)\nCanonical mechanic: Wildfang Rally grants allies within 30 yd 45 attack power and 5% attack speed for 5 min.\nSubject: Wolf, hawk, and great-cat profiles arranged around a rally sun.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     },
     {
       "abilityId": "deterrence",
@@ -331,31 +446,6 @@
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Sureflight Aura (trueshot_aura)\nCanonical mechanic: Sureflight Aura grants allies within 30 yd 10% attack power for 30 min.\nSubject: A golden arrow standard radiating concentric aim rings through allied silhouettes.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     },
     {
-      "abilityId": "volley",
-      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
-      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/hunter/volley.png",
-      "output": "volley.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "Dense overhead arrow rain converging on a circular ground marker.",
-      "references": [
-        {
-          "path": "public/ui/skills/hunter/aimed_shot.webp",
-          "role": "subject reference",
-          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-          "license": "CraftPix premium royalty-free commercial license, non-transferable"
-        },
-        {
-          "path": "public/ui/skills/hunter/concussive_shot.webp",
-          "role": "composition reference",
-          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-          "license": "CraftPix premium royalty-free commercial license, non-transferable"
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Volley (volley)\nCanonical mechanic: Volley channels for 3 sec over a ground area, dealing 12 to 16 Physical damage every 0.5 sec for 6 ticks within 8 yd; 8 sec cooldown.\nSubject: Dense overhead arrow rain converging on a circular ground marker.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
-    },
-    {
       "abilityId": "wyvern_sting",
       "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
       "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/hunter/wyvern_sting.png",
@@ -381,7 +471,12 @@
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wyvern Sting (wyvern_sting)\nCanonical mechanic: Wyvern Sting incapacitates a target 8 to 30 yd away for up to 4 sec; damage breaks it; 60 sec cooldown.\nSubject: A winged serpent stinger piercing a closing eye with sleep vapor.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
-  "note": "Every live Hunter ability has painted art. Existing procedural recipes remain available as runtime resilience if a static asset cannot load.",
+  "note": "The v0.29 Hunter class rework icons are original project-generated art. Earlier abilities retain their recorded CraftPix provenance. Existing procedural recipes remain available as runtime resilience if a static asset cannot load.",
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v034_audit_2026_08_02 entries are project-generated and explicitly override it."
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v034_audit_2026_08_02 entries are project-generated and explicitly override it.",
+  "generatedArt": {
+    "source": "OpenAI image generation through Codex",
+    "generatedOn": "2026-07-25",
+    "purpose": "Original project art for the v0.29 Hunter class rework"
+  }
 }

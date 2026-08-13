@@ -30,7 +30,7 @@ import { MAIL_DELIVERY_SECONDS } from '../src/sim/mail/post_office';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { runApplyEnchant, runCraft, runDisenchant } from './helpers/enchant_family_cast';
-import { EMPTY_TEST_WORLD } from './sim_shared';
+import { EMPTY_TEST_WORLD, VENDOR_TEST_WORLD } from './sim_shared';
 
 // A crafted, masterwork-procced, enchanted, signed piece: every marker channel
 // at once. Deliberately an EQUIPPABLE armour piece so the equip/unequip and
@@ -91,7 +91,12 @@ function expectFullyMarked(slot: InvSlot | undefined, where: string): void {
 }
 
 function makeSim(seed: number): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  // VENDOR_TEST_WORLD keeps BUILTIN_WORLD.npcs untouched (bankers, trader_wilkes,
+  // the_merchant, all at fixed content-authored positions) while trimming camps
+  // to a single forest_wolf slice and zeroing groundObjects: exactly the ambient
+  // bulk this file's rows never touch (they only stand at named NPCs and move
+  // inventory/bank/equipment/mail/market slots).
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: VENDOR_TEST_WORLD });
 }
 
 function standAt(sim: Sim, pid: number, templateId: string): void {

@@ -37,7 +37,9 @@ describe('painted weapon inventory icons', () => {
     .sort();
 
   it('covers every authored base weapon exactly once', () => {
-    expect(baseWeapons).toHaveLength(119);
+    // 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
+    // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10.
+    expect(baseWeapons).toHaveLength(123);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -50,7 +52,8 @@ describe('painted weapon inventory icons', () => {
     const heroics = Object.values(ITEMS).filter(
       (item) => item.kind === 'weapon' && item.heroicOf !== undefined,
     );
-    expect(heroics).toHaveLength(15);
+    // 16 with heroic_duskwhisper (aliases the duskwhisper base painting).
+    expect(heroics).toHaveLength(16);
     for (const heroic of heroics) {
       expect(WEAPON_IMAGE_IDS.has(heroic.id), heroic.id).toBe(false);
       expect(weaponIconUrl(heroic.id), heroic.id).toBe(
@@ -65,7 +68,7 @@ describe('painted weapon inventory icons', () => {
     const weaponBatches = batches.filter((batch) =>
       batch.itemIds.some((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
     );
-    expect(weaponBatches).toHaveLength(2);
+    expect(weaponBatches).toHaveLength(3);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -100,8 +103,26 @@ describe('painted weapon inventory icons', () => {
       'hollow_vigil_staff',
       'widowfang_dirk',
     ]);
+    // The class-overhaul integration adds four daggers in their own batch
+    // (integration-dagger-icons-2026-08-10); the historical campaign batch
+    // owns every weapon that predates both it and the replacements.
+    const integrationBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'integration-dagger-icons-2026-08-10',
+    );
+    expect(integrationBatch).toBeDefined();
+    const integrationWeaponIds = (integrationBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(integrationWeaponIds).toEqual([
+      'boneglass_shiv',
+      'duskwhisper',
+      'marrowpoint',
+      'rimefang',
+    ]);
     expect(historicalBatch?.itemIds).toEqual(
-      expected.filter((id) => !replacementWeaponIds.includes(id)),
+      expected.filter(
+        (id) => !replacementWeaponIds.includes(id) && !integrationWeaponIds.includes(id),
+      ),
     );
     expect(
       replacementBatch?.itemIds.filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)).sort(),
@@ -139,10 +160,14 @@ describe('painted weapon inventory icons', () => {
     const chunkD = readJsonRecord(weaponGenerationRecordFiles[3]) as {
       finalAssets: Array<{ id: string }>;
     };
-    expect(chunkA.assets.map(({ id }) => id)).toEqual(expected.slice(0, 40));
-    expect(chunkB.assets.map(({ id }) => id)).toEqual(expected.slice(40, 80));
-    expect(chunkC).toEqual(expected.slice(80, 100));
-    expect(chunkD.finalAssets.map(({ id }) => id)).toEqual(expected.slice(100));
+    // The chunk records are the frozen weapon campaign's generation reports:
+    // they slice the pre-integration weapon roster, without the four
+    // integration daggers that postdate the campaign.
+    const campaignExpected = expected.filter((id) => !integrationWeaponIds.includes(id));
+    expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
+    expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));
+    expect(chunkC).toEqual(campaignExpected.slice(80, 100));
+    expect(chunkD.finalAssets.map(({ id }) => id)).toEqual(campaignExpected.slice(100));
 
     const provenanceReadme = readFileSync(path.join(provenanceDir, 'README.md'), 'utf8');
     for (const filename of weaponGenerationRecordFiles) {

@@ -16,7 +16,7 @@
 // ratios are preserved. Nothing here changes pool caps, slot counts, or
 // per-frame allocation behavior: bigger sprites/ribbons/quads ride the same
 // pooled primitives.
-import type { AbilityVfxArchetype } from '../ability_vfx_core';
+import type { AbilityVfxArchetype, AbilityVfxFullSpec } from '../ability_vfx_core';
 
 // The archetypes whose release/impact moment measured far below the gallery.
 // nova/shout (ground rings at parity), heal/buff/cc (gentle by design), and
@@ -30,6 +30,16 @@ const CRESCENDO_ARCHETYPES: ReadonlySet<AbilityVfxArchetype> = new Set([
 
 export function isCrescendoArchetype(arch: AbilityVfxArchetype): boolean {
   return CRESCENDO_ARCHETYPES.has(arch);
+}
+
+// A bolt can use the full phase anatomy without carrying marquee-scale
+// release flashes, screen trauma, or long afterglow. This keeps rapidly cast
+// fillers inside the same renderer architecture without flattening the visual
+// hierarchy between rotational attacks and finishers.
+export function usesCrescendoScale(
+  spec: Pick<AbilityVfxFullSpec, 'archetype' | 'filler'>,
+): boolean {
+  return spec.filler !== true && isCrescendoArchetype(spec.archetype);
 }
 
 export const SPECTACLE = {

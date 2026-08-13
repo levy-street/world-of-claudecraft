@@ -24,6 +24,7 @@ import { Sim } from '../src/sim/sim';
 import * as tradeMod from '../src/sim/social/trade';
 import type { ItemDef, ItemInstancePayload, SimEvent } from '../src/sim/types';
 import { runSalvage } from './helpers/enchant_family_cast';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const STEEL = 'resonant_steel';
 const HIDE = 'resonant_hide';
@@ -35,7 +36,7 @@ afterAll(() => {
 });
 
 function makeSim(seed = 7) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
 }
 
 function countDraws<T>(sim: Sim, fn: () => T): { result: T; draws: number } {
@@ -55,7 +56,13 @@ function slotFor(sim: Sim, pid: number, itemId: string) {
 }
 
 function makeTradeSim(seed = 42) {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false, noPlayer: true });
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: false,
+    noPlayer: true,
+    world: EMPTY_TEST_WORLD,
+  });
   const a = sim.addPlayer('warrior', 'Ayla');
   const b = sim.addPlayer('warrior', 'Borin');
   const ea = sim.ctx.entities.get(a)!;

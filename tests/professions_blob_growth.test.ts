@@ -40,8 +40,17 @@ import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import { ALL_EQUIP_SLOTS, type InvSlot } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
-const makeSim = (seed = 31) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+// This file never spawns, targets, or asserts on a camp, npc, or ground
+// object: every expect() resolves to a static content-table length/id, a
+// literal the test itself assigns, or a self-consistency check between two
+// settle passes of the SAME world config. EMPTY_TEST_WORLD keeps zones,
+// terrain, props, and playerStart identical to the built-in world (so
+// findSafePos/groundPos still settle every fixture the same way) while
+// skipping the camp/npc/ground-object population that this file never reads.
+const makeSim = (seed = 31) =>
+  new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
 
 // The professions-owned key list, mirrored from the roundtrip sweep. The
 // scrape test below pins the two lists together so neither can silently
@@ -115,10 +124,22 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'arena1v1Rating',
   'arena1v1Wins',
   'arena1v1Losses',
+  // The W-L-D draws counters (v0.36.0): persisted beside their bracket's
+  // wins/losses; classified here at the Phase 21 QA release sync because
+  // the release change landed without this guard's row.
+  'arena1v1Draws',
   'arena2v2Rating',
   'arena2v2Wins',
   'arena2v2Losses',
+  'arena2v2Draws',
+  // The battleground group, written together behind one conditional spread.
+  'bgRating',
+  'bgWins',
+  'bgLosses',
+  'bgDraws',
+  'bgCaptures',
   'weaponStowed',
+  'helmHidden',
   'vcupWins',
   'vcupLosses',
   'vcupDraws',
@@ -151,7 +172,10 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'deeds',
   'deedStats',
   'activeTitle',
+  'activeBorder',
   'renown',
+  // The Reliquary trophy hall, written through an IIFE spread like deedStats.
+  'reliquary',
 ] as const;
 
 // The settled ceiling measured 8,469 bytes when this bound was re-minted
@@ -329,6 +353,66 @@ function professionsBytes(state: CharacterState): number {
   return JSON.stringify(subset).length;
 }
 
+/**
+ * Arm every NON-professions key the ceiling fixture leaves at its default, so
+ * the complement pin below is a decisive floor rather than a documentary list.
+ *
+ * Why it is needed: the source scrape in that test captures only the FIRST key
+ * of each spread it matches, so a multi-key conditional group (the battleground
+ * four) is represented by one name and the rest are invisible to it. The armed
+ * fixture closes that gap from the other side: every key here really is written
+ * by a real serialize, survives a real load, and therefore MUST be classified.
+ *
+ * The one key no sim fixture can arm is `jail` (the server stamps it after
+ * serialization); the allowlist carries it explicitly for that reason.
+ *
+ * Nothing here moves the byte bound: professionsBytes measures only the
+ * PROFESSIONS_BLOB_FIELDS subset.
+ */
+function armNonProfessionsFields(sim: Sim): void {
+  const meta = sim.players.get(sim.playerId) as PlayerMeta;
+  const e = sim.entities.get(sim.playerId)!;
+  // Honor + the daily arena window (dated today, or the load prunes it as a
+  // rolled-over day and the key never reaches the settled state).
+  meta.honor = 150;
+  meta.lifetimeHonor = 900;
+  meta.honorArenaDaily = {
+    date: new Date().toISOString().slice(0, 10),
+    totalWins: 2,
+    winsByOpponent: { warrior: 2 },
+    fiestaCompletionsByOpponent: { warrior: 1 },
+  };
+  // The battleground group: one conditional spread, four keys.
+  meta.bgWins = 4;
+  meta.bgLosses = 2;
+  meta.bgCaptures = 3;
+  meta.bgRating = 1600;
+  // The Vale Cup groups (three spreads, eight keys).
+  meta.vcupWins = 3;
+  meta.vcupLosses = 1;
+  meta.vcupDraws = 1;
+  meta.vcupGuildWins = 2;
+  meta.vcupGuildLosses = 1;
+  meta.vcupBetWins = 2;
+  meta.vcupBetLosses = 1;
+  meta.vcupBetNet = 250;
+  // Riding + the PBE kit stamp.
+  meta.mountTrainingFeePaid = true;
+  meta.ridingTrained = true;
+  meta.pbeBoostKit = 1;
+  // Both worn cosmetics, through the real validators (they refuse anything
+  // unearned or of the wrong reward kind, so the deeds are earned first).
+  meta.deedsEarned.set('prog_veteran', '2026-08-08');
+  meta.deedsEarned.set('prog_prestige_10', '2026-08-08');
+  sim.setActiveTitle('prog_veteran');
+  sim.setActiveBorder('prog_prestige_10');
+  // The Reliquary blob (sparse: absent while empty).
+  meta.reliquary.marks.add('gather_event:pristine_vein');
+  // Entity-side appearance toggles.
+  e.weaponStowed = true;
+  e.helmHidden = true;
+}
+
 describe('the professions blob growth bound (phase 16)', () => {
   it('the field list mirrors the roundtrip sweep exactly, scraped from its source', () => {
     // Two files carry the professions field list (the roundtrip sweep and
@@ -429,11 +513,36 @@ describe('the professions blob growth bound (phase 16)', () => {
     // direction it can be closed: a new key must be added to one list or the
     // other, and choosing which is the classification decision.
     const sim = ceilingSim();
+    // Two layers, and the comment says which does what: the SCRAPE below sees
+    // one key per matched spread across the three write forms, and this armed
+    // fixture is the decisive floor for everything actually serialized, the
+    // multi-key groups the scrape can only represent by their first name
+    // included.
+    armNonProfessionsFields(sim);
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
     const settled = makeSim(37);
     const pid = settled.addPlayer('warrior', 'Complement', { state: s1 });
     const state = settled.serializeCharacter(pid) as CharacterState;
     const nonProfessions = new Set<string>(NON_PROFESSIONS_BLOB_FIELDS);
+    // The armed set really did survive the round trip: without this, a load
+    // that silently dropped one of these would quietly shrink the floor back.
+    for (const key of [
+      'honor',
+      'honorArenaDaily',
+      'bgWins',
+      'bgRating',
+      'vcupWins',
+      'vcupBetNet',
+      'ridingTrained',
+      'pbeBoostKit',
+      'activeTitle',
+      'activeBorder',
+      'reliquary',
+      'weaponStowed',
+      'helmHidden',
+    ]) {
+      expect(key in state, `the fixture must arm "${key}" through a real load`).toBe(true);
+    }
     const professionsKeys = Object.keys(state).filter((key) => !nonProfessions.has(key));
     expect(professionsKeys.sort()).toEqual([...PROFESSIONS_BLOB_FIELDS].sort());
     // FIXTURE-INDEPENDENCE ARM (the fix-round audit): the settled fixture
@@ -448,12 +557,29 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(serializeStart).toBeGreaterThan(-1);
     const body = simSrc.slice(serializeStart, simSrc.indexOf('\n  }', serializeStart));
     const written = new Set<string>();
+    // Both conditional spread forms the serializer writes: the `cond && { k }`
+    // guard and the `cond ? { k } : {}` ternary. The ternary arm was missing,
+    // so every key written that way (the whole worn-cosmetics group included)
+    // silently escaped this classification sweep.
     for (const m of body.matchAll(
-      /^\s{6}(?:\.\.\.\((?:[^)]*&&\s*)?\{\s*)?([A-Za-z][A-Za-z0-9]*):/gm,
+      /^\s{6}(?:\.\.\.\((?:[^)]*(?:&&|\?)\s*)?\{\s*)?([A-Za-z][A-Za-z0-9]*):/gm,
     )) {
       written.add(m[1]);
     }
+    // The THIRD form: an IIFE spread whose key is written by a `return cond ?
+    // { k } : {}` inside the closure (nodeHarvestCooldowns, questCadence,
+    // deedStats, reliquary). Neither pattern above reaches inside a closure,
+    // so those keys were invisible to this sweep as well.
+    for (const m of body.matchAll(/^\s+return [^;\n]*\?\s*\{\s*([A-Za-z][A-Za-z0-9]*)\s*[,:}]/gm)) {
+      written.add(m[1]);
+    }
     expect(written.size).toBeGreaterThan(20); // the scrape genuinely parsed the literal
+    // The three forms are load-bearing: name one key from each, so a regex
+    // narrowed back to the plain form reddens here instead of silently
+    // sweeping less.
+    for (const key of ['level', 'activeBorder', 'reliquary']) {
+      expect(written.has(key), `the scrape must reach "${key}"`).toBe(true);
+    }
     for (const key of written) {
       expect(
         nonProfessions.has(key) || (PROFESSIONS_BLOB_FIELDS as readonly string[]).includes(key),

@@ -29,7 +29,7 @@ import { BROWSER_PATH as DETECTED } from './browser_path.mjs';
 // the 'low' tier, which routes through Lambert materials plus an unconditional
 // low-readability white lift that swamps the class tint delta this shot exists
 // to show. Real players hitting this bug are on standard-tier materials.
-const URL = (process.env.GAME_URL ?? 'http://localhost:5173') + '?gfx=high';
+const URL = `${process.env.GAME_URL ?? 'http://localhost:5173'}?gfx=high`;
 const OUT_DIR = process.env.OUT_DIR ?? 'tmp/charcreate-tint-shots';
 fs.mkdirSync(OUT_DIR, { recursive: true });
 

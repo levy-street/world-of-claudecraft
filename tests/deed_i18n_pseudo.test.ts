@@ -4,10 +4,12 @@
 // surface un-keyed literals: every catalog leaf is accent-pushed and bracketed.
 // Deed names/descs/titles resolve their English from the sim content table, OUTSIDE
 // the i18n catalog, so the tableFor pseudo swap misses them; deed_i18n folds them at
-// render time through a port of the generator's transform (scripts/i18n_pseudo.mjs).
-// This pins the fold on/off behavior and the drift pin that the port cannot silently
-// diverge from the generator. jsdom is needed so the i18n init reads the URL, and a
-// fresh import per active case picks up the pseudo flag.
+// render time through the shared port of the generator's transform
+// (src/ui/i18n_pseudo_port.ts, a copy of scripts/i18n_pseudo.mjs). This suite pins the
+// fold on/off behavior for THIS channel; the port's total drift pin against the
+// committed en_XA table lives in tests/i18n_pseudo_port.test.ts. A DOM (the happy-dom
+// pragma above) is needed so the i18n init reads the URL, and a fresh import per active
+// case picks up the pseudo flag.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';

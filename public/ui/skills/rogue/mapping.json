@@ -338,6 +338,181 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Smoke Screen (smoke_screen)\nCanonical mechanic: Smoke Screen increases dodge chance by 30 percentage points for 8 sec; 30 sec cooldown. It does not grant invisibility.\nSubject: A crouched rogue in dense smoke while a blade passes through an afterimage.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "venom_dart",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/venom_dart.png",
+      "output": "venom_dart.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A slender thrown dart mid-flight, trailing luminous green venom droplets.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/sinister_strike.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/eviscerate.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Venom Dart (venom_dart)\nCanonical mechanic: Flick a poisoned dart for Nature damage. Awards 1 combo point.\nSubject: A slender thrown dart mid-flight, trailing luminous green venom droplets.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "flurry_of_knives",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/flurry_of_knives.png",
+      "output": "flurry_of_knives.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A fan of thrown knives spinning outward in a deadly circle.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/sinister_strike.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/eviscerate.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Flurry of Knives (flurry_of_knives)\nCanonical mechanic: Lash every enemy within 6 yd with thrown knives and gain 2 combo points.\nSubject: A fan of thrown knives spinning outward in a deadly circle.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "thieves_chorus",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/thieves_chorus.png",
+      "output": "thieves_chorus.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Crossed daggers under three rising whistled notes cut from cold night air.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/sinister_strike.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/eviscerate.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Thieves' Chorus (thieves_chorus)\nCanonical mechanic: A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec.\nSubject: Crossed daggers under three rising whistled notes cut from cold night air.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "venomrend",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/venomrend.png",
+      "output": "venomrend.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A serrated blade tearing through flesh with venom spraying from the wound.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/sinister_strike.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/eviscerate.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Venomrend (venomrend)\nCanonical mechanic: Spends 6 Venom Ritual: strike, instantly deal all remaining bleed damage, then plant a fresh wound.\nSubject: A serrated blade tearing through flesh with venom spraying from the wound.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "body_blow",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/body_blow.png",
+      "output": "body_blow.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A wrapped brawler fist mid-haymaker, heavy motion arcs behind it.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/sinister_strike.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/eviscerate.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Haymaker (body_blow)\nCanonical mechanic: A heavy blow for 130% weapon damage. Awards 2 combo points and adds 1 Redline.\nSubject: A wrapped brawler fist mid-haymaker, heavy motion arcs behind it.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "knockout_blow",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/knockout_blow.png",
+      "output": "knockout_blow.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A fist connecting square with a burst of fading stars and a dimming lantern.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/sinister_strike.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/eviscerate.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Lights Out (knockout_blow)\nCanonical mechanic: Ends Redline with a knockout strike hitting 25% harder per Redline built, recovering 25 energy.\nSubject: A fist connecting square with a burst of fading stars and a dimming lantern.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "veilstrike",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/veilstrike.png",
+      "output": "veilstrike.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A dagger vanishing into a hanging curtain of living shadow.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/sinister_strike.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/eviscerate.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Shadow Veil (veilstrike)\nCanonical mechanic: For 6 sec your openers work without stealth and from any angle, and you deal 10% more damage.\nSubject: A dagger vanishing into a hanging curtain of living shadow.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
   "deferredStayProcedural": {},

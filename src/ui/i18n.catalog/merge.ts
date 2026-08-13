@@ -104,7 +104,6 @@ const MERGE_MOB_IDS = [
   'varkas_boneguard',
   'emberkin',
   'gloomshade',
-  'duskborn',
   'grix_the_tunnelking',
   'brutok_skullsmasher',
   'captain_verlan',
@@ -112,10 +111,7 @@ const MERGE_MOB_IDS = [
   'sloomtooth_the_drowned',
   'voskar_emberwing',
   'wraithbinder_maldrec',
-  'spellhound',
-  'warfiend',
   'pyre_colossus',
-  'wraithborn',
 ] as const;
 
 type MergeNameTranslations<TId extends string> = Record<TId, { name: string }>;
@@ -143,6 +139,10 @@ const mergePetHud = {
   en: {
     attack: 'Attack',
     waterJet: 'Water Jet',
+    felbolt: 'Felbolt',
+    abyssalChain: 'Abyssal Chain',
+    autocastOn: 'Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.',
+    autocastOff: 'Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.',
     taunt: 'Taunt',
     healDemon: 'Heal Demon',
     healPet: 'Feed Pet',
@@ -154,6 +154,12 @@ const mergePetHud = {
     waterJetTitle: 'Water Jet',
     waterJetDesc:
       'Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.',
+    felboltTitle: 'Felbolt',
+    felboltDesc:
+      'Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.',
+    abyssalChainTitle: 'Abyssal Chain',
+    abyssalChainDesc:
+      'Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.',
     petTauntTitle: 'Pet Taunt',
     petTauntDesc:
       'Command your pet to engage and Growl when in range. 10 second cooldown. Right-click to auto-cast it whenever it is off cooldown.',
@@ -179,6 +185,12 @@ const mergePetHud = {
   es: {
     attack: 'Atacar',
     waterJet: 'Chorro de agua',
+    felbolt: 'Descarga vil',
+    abyssalChain: 'Cadena abisal',
+    autocastOn:
+      'Lanzamiento automático activado. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para desactivarlo.',
+    autocastOff:
+      'Lanzamiento automático desactivado. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para activarlo.',
     taunt: 'Provocar',
     healDemon: 'Sanar demonio',
     healPet: 'Sanar mascota',
@@ -190,6 +202,12 @@ const mergePetHud = {
     waterJetTitle: 'Chorro de agua',
     waterJetDesc:
       'Ordena a tu elemental de agua canalizar un chorro ralentizador durante 3 segundos. Reutilización de 8 segundos. Clic derecho para autolanzarlo cuando esté disponible.',
+    felboltTitle: 'Descarga vil',
+    felboltDesc:
+      'Ordena a Emberkin lanzar un proyectil vil adicional contra tu objetivo. Reutilización de 8 segundos. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para alternar el lanzamiento automático.',
+    abyssalChainTitle: 'Cadena abisal',
+    abyssalChainDesc:
+      'Ordena a Gloomshade arrastrar hacia sí a un enemigo normal situado a más de 8 y hasta 20 metros. No funciona contra jefes. Reutilización de 15 segundos. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para alternar el lanzamiento automático.',
     petTauntTitle: 'Provocación de mascota',
     petTauntDesc:
       'Ordena a tu mascota entrar en combate y usar Gruñido al estar en alcance. Reutilización de 10 segundos. Clic derecho para autolanzarlo cuando esté disponible.',
@@ -546,6 +564,8 @@ const mergeStringsEn = {
       useFishing: 'Use: Fish in nearby waters.',
       useHealingPotion:
         'Use: Instantly restores {amount} health. Usable in combat. 2 min cooldown.',
+      useHealingPotionPct:
+        'Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.',
       useManaPotion: 'Use: Instantly restores {amount} mana. Usable in combat. 2 min cooldown.',
       clickUseInstant: 'Click to use instantly in combat',
       clickUse: 'Click to use',
@@ -830,7 +850,11 @@ export const mergeStrings = {
           dead: 'Muerto',
         },
         statusWithZone: '{status} - {zone}',
-        ranks: { leader: 'Maestro de hermandad', officer: 'Oficial', member: 'Miembro' },
+        ranks: {
+          leader: 'Maestro de hermandad',
+          officer: 'Oficial',
+          member: 'Miembro',
+        },
         guildHeadOne: 'eres {rank}, {count} miembro',
         guildHeadMany: 'eres {rank}, {count} miembros',
       },
@@ -999,7 +1023,11 @@ export const mergeStrings = {
           dead: 'Mort',
         },
         statusWithZone: '{status} - {zone}',
-        ranks: { leader: 'Maître de guilde', officer: 'Officier', member: 'Membre' },
+        ranks: {
+          leader: 'Maître de guilde',
+          officer: 'Officier',
+          member: 'Membre',
+        },
         guildHeadOne: 'vous êtes {rank}, {count} membre',
         guildHeadMany: 'vous êtes {rank}, {count} membres',
       },
@@ -1214,7 +1242,11 @@ export const mergeStrings = {
   de_DE: {
     abilityUi: {
       ...abilityStrings.de_DE.abilityUi,
-      cast: { fishing: 'Angeln', demonHeal: 'Dämonenheilung', thunzharrStormcall: 'Sturmruf' },
+      cast: {
+        fishing: 'Angeln',
+        demonHeal: 'Dämonenheilung',
+        thunzharrStormcall: 'Sturmruf',
+      },
       actionBar: {
         ...abilityStrings.de_DE.abilityUi.actionBar,
         clearHint: 'Umschalt-Rechtsklick oder Umschalt-Entf zum Leeren',
@@ -1331,7 +1363,11 @@ export const mergeStrings = {
           dead: 'Tot',
         },
         statusWithZone: '{status} - {zone}',
-        ranks: { leader: 'Gildenmeister', officer: 'Offizier', member: 'Mitglied' },
+        ranks: {
+          leader: 'Gildenmeister',
+          officer: 'Offizier',
+          member: 'Mitglied',
+        },
         guildHeadOne: 'Ihr seid {rank}, {count} Mitglied',
         guildHeadMany: 'Ihr seid {rank}, {count} Mitglieder',
       },
@@ -2056,7 +2092,11 @@ export const mergeStrings = {
           dead: '死亡',
         },
         statusWithZone: '{status} - {zone}',
-        ranks: { leader: 'ギルドマスター', officer: '士官', member: 'メンバー' },
+        ranks: {
+          leader: 'ギルドマスター',
+          officer: '士官',
+          member: 'メンバー',
+        },
         guildHeadOne: 'あなたは{rank}、{count}人のメンバー',
         guildHeadMany: 'あなたは{rank}、{count}人のメンバー',
       },
@@ -2224,7 +2264,11 @@ export const mergeStrings = {
           dead: 'Morto',
         },
         statusWithZone: '{status} - {zone}',
-        ranks: { leader: 'Mestre da guilda', officer: 'Oficial', member: 'Membro' },
+        ranks: {
+          leader: 'Mestre da guilda',
+          officer: 'Oficial',
+          member: 'Membro',
+        },
         guildHeadOne: 'você é {rank}, {count} membro',
         guildHeadMany: 'você é {rank}, {count} membros',
       },
@@ -2407,7 +2451,11 @@ export const mergeStrings = {
           dead: 'Мертв',
         },
         statusWithZone: '{status} - {zone}',
-        ranks: { leader: 'Глава гильдии', officer: 'Офицер', member: 'Участник' },
+        ranks: {
+          leader: 'Глава гильдии',
+          officer: 'Офицер',
+          member: 'Участник',
+        },
         guildHeadOne: 'вы {rank}, {count} участник',
         guildHeadMany: 'вы {rank}, {count} участников',
       },
@@ -2562,7 +2610,6 @@ const mergeEntitiesEn = {
       'Varkas Boneguard',
       'Emberkin',
       'Gloomshade',
-      'Duskborn',
       'Grix the Tunnelking',
       'Brutok Skullsmasher',
       'Captain Verlan',
@@ -2570,10 +2617,7 @@ const mergeEntitiesEn = {
       'Sloomtooth the Drowned',
       'Voskar the Emberwing',
       'Wraithbinder Maldrec',
-      'Spellhound',
-      'Warfiend',
       'Pyre Colossus',
-      'Wraithborn',
     ],
     'mob',
   ),
@@ -2694,7 +2738,6 @@ export const mergeEntities = {
         'Guardahuesos de Varkas',
         'Diablillo',
         'Caminante del Vacío',
-        'Súcubo',
         'Grix el Rey del Túnel',
         'Brutok Rompecráneos',
         'Capitán Verlan',
@@ -2702,10 +2745,7 @@ export const mergeEntities = {
         'Sloomtooth el Ahogado',
         'Voskar Aladebrasa',
         'Maldrec el Ataespectros',
-        'Cazador vil',
-        'Guardia vil',
         'Infernal',
-        'Guardián del Terror',
       ],
       'mob',
     ),
@@ -2824,7 +2864,6 @@ export const mergeEntities = {
         'Garde-os de Varkas',
         'Diablotin',
         'Marcheur du Vide',
-        'Succube',
         'Grix le Roi des tunnels',
         'Brutok Brise-crânes',
         'Capitaine Verlan',
@@ -2832,10 +2871,7 @@ export const mergeEntities = {
         'Sloomtooth le Noyé',
         'Voskar Aile-de-braise',
         'Maldrec le Lie-spectres',
-        'Limier corrompu',
-        'Gangregarde',
         'Infernal',
-        "Seigneur de l'effroi",
       ],
       'mob',
     ),
@@ -2955,7 +2991,6 @@ export const mergeEntities = {
         "Guardia d'ossa di Varkas",
         'Folletto',
         'Camminatore del Vuoto',
-        'Succube',
         'Grix il Re dei tunnel',
         'Brutok Spaccacranio',
         'Capitano Verlan',
@@ -2963,10 +2998,7 @@ export const mergeEntities = {
         "Sloomtooth l'Annegato",
         'Voskar Aladibrace',
         'Maldrec il Legaspettri',
-        'Segugio vile',
-        'Guardia vile',
         'Infernale',
-        'Guardia del Terrore',
       ],
       'mob',
     ),
@@ -3084,7 +3116,6 @@ export const mergeEntities = {
         "Varkas' Knochenwache",
         'Wichtel',
         'Leerwandler',
-        'Sukkubus',
         'Grix der Tunnelkönig',
         'Brutok Schädelschmetterer',
         'Hauptmann Verlan',
@@ -3092,10 +3123,7 @@ export const mergeEntities = {
         'Sloomzahn der Ertrunkene',
         'Voskar Glutschwinge',
         'Maldrec der Geisterbinder',
-        'Teufelsjäger',
-        'Teufelswache',
         'Inferno',
-        'Schreckenswache',
       ],
       'mob',
     ),
@@ -3213,7 +3241,6 @@ export const mergeEntities = {
         '瓦尔卡斯骨卫',
         '小鬼',
         '虚空行者',
-        '魅魔',
         'Grix the Tunnelking',
         '碎颅者布鲁托克',
         '维尔兰队长',
@@ -3221,10 +3248,7 @@ export const mergeEntities = {
         '溺亡者涝牙',
         '炽翼沃斯卡',
         '缚魂者玛尔德雷克',
-        '地狱猎犬',
-        '恶魔卫士',
         '地狱火',
-        '末日守卫',
       ],
       'mob',
     ),
@@ -3341,7 +3365,6 @@ export const mergeEntities = {
         '瓦爾卡斯骨衛',
         '小鬼',
         '虛空行者',
-        '魅魔',
         'Grix the Tunnelking',
         '碎顱者布魯托克',
         '維爾蘭隊長',
@@ -3349,10 +3372,7 @@ export const mergeEntities = {
         '溺亡者澇牙',
         '熾翼沃斯卡',
         '縛魂者瑪爾德雷克',
-        '地獄獵犬',
-        '惡魔守衛',
         '地獄火',
-        '末日守衛',
       ],
       'mob',
     ),
@@ -3469,7 +3489,6 @@ export const mergeEntities = {
         '바르카스 뼈수호병',
         '임프',
         '공허추적자',
-        '서큐버스',
         'Grix the Tunnelking',
         '해골분쇄자 브루톡',
         '베를란 대장',
@@ -3477,10 +3496,7 @@ export const mergeEntities = {
         '익사한 슬룸투스',
         '잿불날개 보스카르',
         '영혼결속자 말드렉',
-        '지옥사냥개',
-        '지옥수호병',
         '지옥불정령',
-        '파멸의 수호병',
       ],
       'mob',
     ),
@@ -3598,7 +3614,6 @@ export const mergeEntities = {
         'ヴァーカスの骨衛兵',
         'インプ',
         'ヴォイドウォーカー',
-        'サキュバス',
         'Grix the Tunnelking',
         '頭蓋砕きブルトーク',
         'ヴァーラン隊長',
@@ -3606,10 +3621,7 @@ export const mergeEntities = {
         '溺れし者スルームトゥース',
         '燃え翼のヴォスカル',
         '魂縛りマルドレク',
-        'フェルハンター',
-        'フェルガード',
         'インファーナル',
-        'ドゥームガード',
       ],
       'mob',
     ),
@@ -3727,7 +3739,6 @@ export const mergeEntities = {
         'Guardião dos ossos de Varkas',
         'Diabrete',
         'Caminhante do Vazio',
-        'Súcubo',
         'Grix, o Rei dos Túneis',
         'Brutok Quebra-crânios',
         'Capitão Verlan',
@@ -3735,10 +3746,7 @@ export const mergeEntities = {
         'Sloomtooth o Afogado',
         'Voskar Asa-de-brasa',
         'Maldrec o Atador-de-espectros',
-        'Caçador Vil',
-        'Guarda Vil',
         'Infernal',
-        'Guarda Sinistro',
       ],
       'mob',
     ),
@@ -3856,7 +3864,6 @@ export const mergeEntities = {
         'Костяной страж Варкаса',
         'Бес',
         'Страж Бездны',
-        'Суккуб',
         'Грикс, Король туннелей',
         'Бруток Сокрушитель черепов',
         'Капитан Верлан',
@@ -3864,10 +3871,7 @@ export const mergeEntities = {
         'Слумтус Утопший',
         'Воскар Жарокрыл',
         'Малдрек Пленитель призраков',
-        'Охотник Скверны',
-        'Страж Скверны',
         'Инфернал',
-        'Страж Рока',
       ],
       'mob',
     ),
@@ -3947,7 +3951,8 @@ const mergeExtraEn = {
     [
       'rake',
       'Flense',
-      'A stealth opener that rakes the enemy for weapon damage plus {damage} and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only.',
+      'Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.',
+      { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
     ],
     [
       'revive_pet',
@@ -4027,7 +4032,10 @@ const mergeExtraEn = {
       text: 'The waders do not act alone. Among them walk the Drowned Votaries — the cult that sank with the temple, still in their rotted vestments, still singing the prayer from the shore-rocks. Silence eight of them, and bring me six of the offerings they carry. I would know what they mean to give their goddess.',
       completion:
         "Pearls, knuckle-bones, a child's carved fish... grave-gifts, {playerName}. They are not raising the dead. They are dressing them, the way you dress a body for burial. The temple is a tomb that refuses to close.",
-      objectives: { 0: { label: 'Drowned Votary silenced' }, 1: { label: 'Drowned Offering' } },
+      objectives: {
+        0: { label: 'Drowned Votary silenced' },
+        1: { label: 'Drowned Offering' },
+      },
     },
     q_drowned_moon: {
       title: 'The Drowned Moon',
@@ -4137,12 +4145,16 @@ export const mergeExtra = {
       boundstone_helm: { name: 'Yelmo Piedravínculo' },
       cryptbone_helm: { name: 'Yelmo Huesocripta' },
       cryptbone_pauldrons: { name: 'Hombreras Huesocripta' },
-      deathlords_dread_visage: { name: 'Visaje aterrador del Señor de la Muerte' },
+      deathlords_dread_visage: {
+        name: 'Visaje aterrador del Señor de la Muerte',
+      },
       gravewyrm_gauntlets: { name: 'Guanteletes del Gravewyrm' },
       gravewyrm_mantle: { name: 'Manto del Gravewyrm' },
       mistveil_cord: { name: 'Cordón Veloniebla' },
       mistveil_grips: { name: 'Agarraderas Veloniebla' },
-      necromancers_soulspire_mantle: { name: 'Manto Aguja de Almas del nigromante' },
+      necromancers_soulspire_mantle: {
+        name: 'Manto Aguja de Almas del nigromante',
+      },
       wyrmshadow_talongrips: { name: 'Agarraderas Garra Sombravermis' },
     },
     mobs: mergeNameTranslations(
@@ -4177,14 +4189,19 @@ export const mergeExtra = {
         text: 'Los vadeadores no actúan solos. Entre ellos caminan los Devotos Ahogados: la secta que se hundió con el templo, aún con sus vestiduras putrefactas, aún entonando la plegaria desde las rocas de la orilla. Silencia a ocho de ellos y tráeme seis de las ofrendas que portan. Quiero saber qué pretenden entregar a su diosa.',
         completion:
           'Perlas, nudillos, un pez tallado de niño... ofrendas funerarias, {playerName}. No están resucitando a los muertos. Los están vistiendo, como se viste un cuerpo para el entierro. El templo es una tumba que se niega a cerrarse.',
-        objectives: { 0: { label: 'Devoto ahogado silenciado' }, 1: { label: 'Ofrenda ahogada' } },
+        objectives: {
+          0: { label: 'Devoto ahogado silenciado' },
+          1: { label: 'Ofrenda ahogada' },
+        },
       },
       q_drowned_moon: {
         title: 'La Luna Ahogada',
         text: 'He leído el último de los calcos, {playerName}, y ahora comprendo lo que la secta se ahogó para mantener dormido. Ysolei —la Luna Ahogada hecha carne— se enrosca en el altar en el corazón del templo, y el calor robado de cada vida que el lago se llevó se vierte en su despertar. Cuando la luna esté llena, ella se alzará, y el agua se alzará con ella: el lago, el muro, toda la montaña que hay debajo. Reúne a los más fuertes que encuentres y vuelve a dormirla. Esta vez, para siempre.',
         completion:
           'El altar está apagado, el agua quieta, y la luna sobre el lago no es más que la luna. Esta noche ahogaste a una diosa, {playerName}, y la montaña nunca sabrá cuán cerca estuvo. Que los guardianes de las rocas de la orilla descansen al fin tranquilos.',
-        objectives: { 0: { label: 'Ysolei, Avatar de la Luna Ahogada, abatida' } },
+        objectives: {
+          0: { label: 'Ysolei, Avatar de la Luna Ahogada, abatida' },
+        },
       },
       q_glimmermere_light: {
         title: 'Luz sobre el agua',
@@ -4289,7 +4306,9 @@ export const mergeExtra = {
       gravewyrm_mantle: { name: 'Mantelet du Gravewyrm' },
       mistveil_cord: { name: 'Corde Voilebrume' },
       mistveil_grips: { name: 'Poignes Voilebrume' },
-      necromancers_soulspire_mantle: { name: "Mantelet Flèche-d'âme du nécromancien" },
+      necromancers_soulspire_mantle: {
+        name: "Mantelet Flèche-d'âme du nécromancien",
+      },
       wyrmshadow_talongrips: { name: 'Poignes Serre Ombrewyrm' },
     },
     mobs: mergeNameTranslations(
@@ -4471,7 +4490,9 @@ export const mergeExtra = {
         text: "Ho letto l'ultimo dei calchi, {playerName}, e ora capisco cosa la setta annegò se stessa per tenere addormentato. Ysolei — la Luna Annegata fatta carne — si avvolge sull'altare nel cuore del tempio, e il calore rubato a ogni vita che lo stagno ha preso si riversa nel suo risveglio. Quando la luna sarà piena, lei sorgerà, e l'acqua sorgerà con lei — il lago, la diga, l'intera montagna sotto di esso. Raduna i più forti che riesci a trovare e rimettila a dormire. Per sempre, stavolta.",
         completion:
           "L'altare è spento, l'acqua è immobile, e la luna sul lago è soltanto la luna. Hai annegato una dea stanotte, {playerName} — e la montagna non saprà mai quanto fu vicina alla fine. Lascia che i guardiani delle rocce della riva riposino finalmente in pace.",
-        objectives: { 0: { label: 'Ysolei, Avatar della Luna Annegata, uccisa' } },
+        objectives: {
+          0: { label: 'Ysolei, Avatar della Luna Annegata, uccisa' },
+        },
       },
       q_glimmermere_light: {
         title: "Luce sull'Acqua",
@@ -4608,7 +4629,9 @@ export const mergeExtra = {
         text: 'Ich habe den letzten der Abriebe gelesen, {playerName}, und ich begreife nun, was der Kult sich selbst ertränkte, um es schlafen zu halten. Ysolei — der Ertränkte Mond, Fleisch geworden — windet sich um den Altar im Herzen des Tempels, und die gestohlene Wärme jedes Lebens, das der See nahm, strömt in ihr Erwachen. Wenn der Mond voll steht, erhebt sie sich, und das Wasser steigt mit ihr — der Bergsee, der Wall, der ganze Berg darunter. Versammle die Stärksten, die du finden kannst, und bring sie wieder zum Schlafen. Diesmal für immer.',
         completion:
           'Der Altar ist dunkel, das Wasser ist still, und der Mond über dem Bergsee ist nur der Mond. Du hast heute Nacht eine Göttin ertränkt, {playerName} — und der Berg wird nie erfahren, wie nahe er dem Untergang war. Mögen die Wächter der Uferfelsen endlich in Frieden ruhen.',
-        objectives: { 0: { label: 'Ysolei, Avatar des Ertränkten Mondes, erschlagen' } },
+        objectives: {
+          0: { label: 'Ysolei, Avatar des Ertränkten Mondes, erschlagen' },
+        },
       },
       q_glimmermere_light: {
         title: 'Licht auf dem Wasser',
@@ -4731,7 +4754,10 @@ export const mergeExtra = {
         text: '那些涉行者并非孤身行动。它们之中游走着溺亡信徒——随神殿一同沉没的邪教徒，至今仍披着腐烂的法衣，仍在岸边礁石上吟唱祷词。让其中八名永远噤声，再为我带回它们随身携带的六件祭品。我想知道它们打算献给女神什么。',
         completion:
           '珍珠、指骨、一条孩童雕刻的小鱼……这些都是陪葬之物，{playerName}。它们并非要让死者复生，而是在为死者更衣，就像为下葬的尸身着装一般。这座神殿是一座拒绝合拢的坟墓。',
-        objectives: { 0: { label: '已使溺亡信徒噤声' }, 1: { label: '溺亡祭品' } },
+        objectives: {
+          0: { label: '已使溺亡信徒噤声' },
+          1: { label: '溺亡祭品' },
+        },
       },
       q_drowned_moon: {
         title: '溺月',
@@ -4860,7 +4886,10 @@ export const mergeExtra = {
         text: '那些涉者並非單獨行動。在牠們之間行走的，是溺亡信徒——隨神殿一同沉沒的邪教徒，仍披著腐朽的法衣，仍從岸岩之間唱著那篇禱文。讓其中八人歸於沉寂，並為我帶回他們所攜的六件供品。我想知道他們要獻給女神的究竟是什麼。',
         completion:
           '珍珠、指骨、一條孩童雕刻的小魚……都是陪葬之物，{playerName}。他們並非在喚醒死者，而是在裝扮死者，就像替屍身著裝下葬一般。這座神殿是一座拒絕闔上的墳塚。',
-        objectives: { 0: { label: '溺亡信徒已沉寂' }, 1: { label: '溺者供品' } },
+        objectives: {
+          0: { label: '溺亡信徒已沉寂' },
+          1: { label: '溺者供品' },
+        },
       },
       q_drowned_moon: {
         title: '溺月',
@@ -4989,7 +5018,10 @@ export const mergeExtra = {
         text: '물거리들은 홀로 움직이지 않는다네. 그들 사이를 익사한 신도들이 걷고 있지 — 신전과 함께 가라앉은 그 광신도들은, 썩어버린 제의를 여전히 걸친 채 물가 바위에서 부르던 기도를 아직도 노래하고 있네. 그들 중 여덟을 침묵시키고, 그들이 지닌 제물 여섯 개를 내게 가져오게. 그들이 그 여신에게 무엇을 바치려는지 알고 싶네.',
         completion:
           '진주, 손가락뼈, 아이가 깎아 만든 물고기... 무덤에 바치는 공물이로군, {playerName}. 그들은 죽은 자를 되살리려는 게 아니야. 마치 매장을 위해 시신을 단장하듯, 그들을 치장하고 있는 거지. 저 신전은 닫히기를 거부하는 무덤이라네.',
-        objectives: { 0: { label: '익사한 신도 침묵시킴' }, 1: { label: '익사한 제물' } },
+        objectives: {
+          0: { label: '익사한 신도 침묵시킴' },
+          1: { label: '익사한 제물' },
+        },
       },
       q_drowned_moon: {
         title: '익사한 달',
@@ -5119,7 +5151,10 @@ export const mergeExtra = {
         text: '渡り手どもは独りで動いているのではない。その中に溺れし信徒たちが歩いている——神殿とともに沈んだ教団だ。腐った祭服をまとったまま、岸の岩場から祈りを歌い続けている。八体を沈黙させ、奴らが携える供物を六つ持ち帰れ。奴らが女神に何を捧げようとしているのか、私は知りたいのだ。',
         completion:
           '真珠、指の骨、子供が彫った魚……これは墓への供物だ、{playerName}。奴らは死者を蘇らせているのではない。死者を着飾らせているのだ——埋葬のために亡骸を整えるようにな。あの神殿は、閉じることを拒む墓場なのだ。',
-        objectives: { 0: { label: '溺れし信徒を沈黙させた' }, 1: { label: '溺れし供物' } },
+        objectives: {
+          0: { label: '溺れし信徒を沈黙させた' },
+          1: { label: '溺れし供物' },
+        },
       },
       q_drowned_moon: {
         title: '溺れし月',
@@ -5253,7 +5288,10 @@ export const mergeExtra = {
         text: 'Os vadeadores não agem sozinhos. Entre eles caminham os Devotos Afogados — o culto que afundou com o templo, ainda em suas vestes apodrecidas, ainda cantando a prece desde as rochas da costa. Silencie oito deles e traga-me seis das oferendas que carregam. Eu gostaria de saber o que pretendem dar à sua deusa.',
         completion:
           'Pérolas, ossos de dedos, um peixe entalhado de criança... presentes fúnebres, {playerName}. Eles não estão erguendo os mortos. Estão vestindo-os, do modo como se prepara um corpo para o sepultamento. O templo é um túmulo que se recusa a fechar.',
-        objectives: { 0: { label: 'Devoto Afogado silenciado' }, 1: { label: 'Oferenda Afogada' } },
+        objectives: {
+          0: { label: 'Devoto Afogado silenciado' },
+          1: { label: 'Oferenda Afogada' },
+        },
       },
       q_drowned_moon: {
         title: 'A Lua Afogada',
@@ -5397,7 +5435,9 @@ export const mergeExtra = {
         text: 'Я прочёл последний из оттисков, {playerName}, и теперь понимаю, что культ утопил себя, дабы держать спящим. Изолея — Утонувшая луна, ставшая плотью, — обвилась вокруг алтаря в самом сердце храма, и украденное тепло каждой жизни, что забрал омут, вливается в её пробуждение. Когда луна станет полной, она восстанет, и вода поднимется вместе с ней — озерцо, стена, вся гора под ними. Собери сильнейших, кого найдёшь, и усыпи её вновь. На сей раз — навсегда.',
         completion:
           'Алтарь тёмен, вода недвижна, а луна над озерцом — лишь луна. Этой ночью ты утопил богиню, {playerName} — и гора так и не узнает, как близко была к гибели. Пусть стражи прибрежных скал наконец упокоятся с миром.',
-        objectives: { 0: { label: 'Изолея, Воплощение Утонувшей луны, повержена' } },
+        objectives: {
+          0: { label: 'Изолея, Воплощение Утонувшей луны, повержена' },
+        },
       },
       q_glimmermere_light: {
         title: 'Свет на воде',

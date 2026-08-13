@@ -1208,14 +1208,17 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       };
     else if (effectsValue < 0.75)
       settings = { ...settings, ao: true, aoFullRes: false, bloom: false, smaa: false };
-    // Shadow Quality: pure map-size steps (1024 / 2560 / 4096 / 8192);
-    // terrain-cast shadows join at High, matching the tier ladder where every
-    // dynamic-shadow tier casts terrain.
+    // Shadow Quality: pure map-size steps (1024 / 2560 / 4096); terrain-cast
+    // shadows join at High, matching the tier ladder where every
+    // dynamic-shadow tier casts terrain. The ladder caps at High's 4096 map:
+    // the retired Insane rung's single 8192x8192 target was a ~256 MB-class
+    // GPU allocation redrawn every frame for marginal visible gain, so a
+    // historical stored Insane value falls through to the High base here
+    // (and the settings store clamps it to High on its next write).
     const shadowLevel = levelOf(hints.shadowQuality ?? 1);
     if (shadowLevel === 0) settings = { ...settings, shadowMap: 1024, terrainCastShadows: false };
     else if (shadowLevel === 1)
       settings = { ...settings, shadowMap: 2560, terrainCastShadows: false };
-    else if (shadowLevel === 3) settings = { ...settings, shadowMap: 8192 };
     // Per-effect switches (round 12), layered AFTER Effects & Lighting and
     // authoritative over its per-effect writes: Effects & Lighting stays the
     // post-CHAIN master (its Low arm sheds the composer, and with no composer

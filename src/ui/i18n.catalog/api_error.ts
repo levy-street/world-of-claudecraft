@@ -117,6 +117,10 @@ export const apiErrorStrings = {
     taken_over: 'Your character was taken over by another session.',
     // reuses errors.api.renameBeforeEntering
     rename_required: 'This character must be renamed before entering the world.',
+    // the redesign editor's malformed-look rejection
+    invalid_appearance: 'That appearance could not be saved. Adjust the design and try again.',
+    // the ordinary redesign failure: token already spent, or two racing tabs
+    reroll_unavailable: 'This character does not have a free redesign available.',
   },
   // moderation: enforcement states set by a moderator.
   moderation: {

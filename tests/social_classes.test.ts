@@ -4,6 +4,7 @@
 // The class tests that fight a live forest wolf only need a forest_wolf camp mob,
 // not the rest of the built-in world; see CLASS_WOLF_TEST_WORLD below.
 import { describe, expect, it } from 'vitest';
+import { computeTalentModifiers, TALENTS } from '../src/sim/content/talents';
 import {
   ABILITIES,
   abilitiesKnownAt,
@@ -43,18 +44,62 @@ describe('nine classes', () => {
       // Expanded kits can exceed the 12 action-bar slots; overflow remains
       // available from the spellbook and can be dragged onto the bar.
       expect(CLASSES[cls].abilities.length).toBeGreaterThan(0);
-      // the full kit resolves at MAX_LEVEL; the 10-20 band still has things to learn
-      const kit = abilitiesKnownAt(cls, MAX_LEVEL);
-      const sharedKit = CLASSES[cls].abilities.filter(
-        (id) => !ABILITIES[id]?.specs && (ABILITIES[id]?.learnLevel ?? Infinity) <= MAX_LEVEL,
+      // At MAX_LEVEL a no-spec player resolves every ability EXCEPT the ones
+      // reserved for a committed spec (the class redesigns gate spec kits behind
+      // `specs`) and the hidden internals, so the resolvable no-spec kit is
+      // EXACTLY the ungated abilities. Quest-gated abilities count as unlocked.
+      // Spec-gated abilities are reachable across the committed specializations.
+      const questUnlocks = new Set(
+        CLASSES[cls].abilities
+          .map((id) => ABILITIES[id]?.requiresQuest)
+          .filter((questId): questId is string => questId !== undefined),
       );
-      expect(kit.map((known) => known.def.id)).toEqual(sharedKit);
-      expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
+      const kit = abilitiesKnownAt(cls, MAX_LEVEL, undefined, questUnlocks);
+      const sharedKit = CLASSES[cls].abilities.filter(
+        (id) =>
+          !ABILITIES[id]?.specs &&
+          !ABILITIES[id]?.hiddenFromPlayer &&
+          (ABILITIES[id]?.learnLevel ?? Infinity) <= MAX_LEVEL,
+      );
+      expect(new Set(kit.map((known) => known.def.id))).toEqual(new Set(sharedKit));
+      const reachable = new Set(kit.map((known) => known.def.id));
+      for (const spec of TALENTS[cls].specs) {
+        const mods = computeTalentModifiers(cls, { spec: spec.id, rows: {} }, MAX_LEVEL);
+        for (const known of abilitiesKnownAt(cls, MAX_LEVEL, mods)) reachable.add(known.def.id);
+      }
+      expect(
+        CLASSES[cls].abilities
+          .filter((abilityId) => !ABILITIES[abilityId]?.hiddenFromPlayer)
+          .filter((abilityId) => (ABILITIES[abilityId]?.learnLevel ?? Infinity) <= MAX_LEVEL)
+          .every((abilityId) => reachable.has(abilityId)),
+      ).toBe(true);
+      if (cls === 'warlock') {
+        // The overhauled Warlock completes its shared kit at level 10; its
+        // 10-20 progression now belongs to each specialization instead.
+        for (const spec of ['affliction', 'demonology', 'destruction'] as const) {
+          const at10 = abilitiesKnownAt(
+            cls,
+            10,
+            computeTalentModifiers(cls, { spec, rows: {} }, 10),
+          );
+          const atMax = abilitiesKnownAt(
+            cls,
+            MAX_LEVEL,
+            computeTalentModifiers(cls, { spec, rows: {} }, MAX_LEVEL),
+          );
+          expect(at10.length, `${spec} should keep learning after level 10`).toBeLessThan(
+            atMax.length,
+          );
+        }
+      } else {
+        expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
+      }
       // every class's core kit keeps scaling: something reaches rank 3+ by 20
       expect(kit.some((k) => k.rank >= 3)).toBe(true);
       // resource type sane
       if (cls === 'warrior') expect(p.resourceType).toBe('rage');
       else if (cls === 'rogue') expect(p.resourceType).toBe('energy');
+      else if (cls === 'hunter') expect(p.resourceType).toBe('focus');
       else expect(p.resourceType).toBe('mana');
     }
   });
@@ -106,43 +151,6 @@ describe('nine classes', () => {
     sim.castAbility('renew');
     for (let i = 0; i < 20 * 7; i++) sim.tick();
     expect(p.hp).toBeGreaterThan(30);
-  });
-
-  it('paladin seal empowers swings and judgement consumes it', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'paladin', world: CLASS_WOLF_TEST_WORLD });
-    sim.setPlayerLevel(4);
-    const p = sim.player;
-    sim.castAbility('seal_of_righteousness');
-    sim.tick();
-    expect(p.auras.some((a) => a.kind === 'imbue')).toBe(true);
-    const wolf = nearestMob(sim, 'forest_wolf');
-    teleport(sim, p.id, wolf.pos.x + 3, wolf.pos.z);
-    sim.targetEntity(wolf.id);
-    face(sim, p.id, wolf.id);
-    p.resource = p.maxResource;
-    // wait out gcd then judge
-    for (let i = 0; i < 35; i++) sim.tick();
-    // Judgement's spell hit is an RNG roll (capped at 99%), so a single cast can
-    // miss on some world seeds and deal no damage. Re-seal and retry until it
-    // lands, so this checks the mechanic (judgement hits and consumes the seal)
-    // rather than a lucky roll, robust to RNG-stream shifts from new content.
-    let landed = false;
-    for (let attempt = 0; attempt < 25 && !landed; attempt++) {
-      if (!p.auras.some((a) => a.kind === 'imbue')) {
-        sim.castAbility('seal_of_righteousness');
-        sim.tick();
-      }
-      p.gcdRemaining = 0;
-      p.cooldowns.delete('judgement');
-      p.resource = p.maxResource;
-      face(sim, p.id, wolf.id);
-      const dealtBefore = sim.counters.damageDealt;
-      sim.castAbility('judgement');
-      sim.tick();
-      landed = sim.counters.damageDealt > dealtBefore;
-    }
-    expect(landed).toBe(true); // judgement connected and dealt damage
-    expect(p.auras.some((a) => a.kind === 'imbue')).toBe(false); // consumed
   });
 
   it('warlock life taps and drains life', () => {

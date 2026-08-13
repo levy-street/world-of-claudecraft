@@ -16,12 +16,21 @@ import { startFishing } from '../src/sim/professions/fishing';
 import { Sim } from '../src/sim/sim';
 import { type Entity, FISHING_CAST_ID, GATHER_CAST_ID } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const NODE = GATHER_NODES.find((n) => n.zoneId === 'veiled_hollow' && n.type === 'ore');
 if (!NODE) throw new Error('no veiled_hollow ore node in content');
 
+// Every case here exercises mounts (reins_valorsteed, item-driven, a content
+// table of its own), gathering (GATHER_NODES) and fishing (LAKE), neither of
+// which is part of WorldContent, plus the file's own despawnMobs() helper,
+// which neutralizes every camp-spawned mob before any assertion runs. No
+// test ever reads an npc or a ground object either, so the ambient
+// BUILTIN_WORLD population (every camp/npc/ground object across 11 zones)
+// is pure overhead here: EMPTY_TEST_WORLD keeps zones/roads/props/services
+// and drops only camps/npcs/groundObjects.
 function makeSim(seed = 7): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: EMPTY_TEST_WORLD });
 }
 
 function despawnMobs(sim: Sim): void {

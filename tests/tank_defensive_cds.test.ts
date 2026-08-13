@@ -1,5 +1,5 @@
 // Tank defensive cooldowns, one distinct mechanic per class:
-//   - Paladin Sacred Bulwark: a cheat-death that denies a lethal blow and restores 35%.
+//   - Paladin Bastion Rite: physical mitigation plus block chance.
 //   - Druid Primal Reflexes: a dodge cooldown (buff_dodge), usable while shapeshifted.
 // Also covers the druid parity buff (Dire Bruin now +20% threat / +15% armor).
 import { describe, expect, it } from 'vitest';
@@ -18,6 +18,7 @@ function make(cls: string) {
     world: EMPTY_TEST_WORLD,
   });
   sim.setPlayerLevel(20);
+  if (cls === 'paladin') expect(sim.setSpec('protection')).toBe(true);
   const pid = sim.playerId;
   const p = sim.entities.get(pid) as Entity & Record<string, unknown>;
   for (let i = 0; i < 5; i++) sim.tick();
@@ -87,9 +88,9 @@ function startArenaMode(format: '1v1' | 'fiesta' | 'yumi3') {
 }
 
 describe('Tank defensive cooldowns: known by their class at 20', () => {
-  it('paladin knows Sacred Bulwark, druid Primal Reflexes', () => {
+  it('paladin knows Bastion Rite, druid Primal Reflexes', () => {
     const CD: Record<string, string> = {
-      paladin: 'sacred_bulwark',
+      paladin: 'bastion_rite',
       druid: 'primal_reflexes',
     };
     for (const [cls, id] of Object.entries(CD)) {
@@ -102,11 +103,12 @@ describe('Tank defensive cooldowns: known by their class at 20', () => {
     const expected = [
       {
         cls: 'paladin',
-        id: 'sacred_bulwark',
-        cost: 15,
-        cooldown: 180,
-        duration: 10,
-        value: 0.35,
+        id: 'bastion_rite',
+        cost: 20,
+        cooldown: 10,
+        duration: 6,
+        value: 0.2,
+        offGcd: false,
       },
       {
         cls: 'druid',
@@ -115,6 +117,7 @@ describe('Tank defensive cooldowns: known by their class at 20', () => {
         cooldown: 60,
         duration: 6,
         value: 0.5,
+        offGcd: true,
       },
     ] as const;
 
@@ -124,7 +127,7 @@ describe('Tank defensive cooldowns: known by their class at 20', () => {
       const effect = resolved.effects[0];
       expect(resolved.cost, `${tuning.id} cost`).toBe(tuning.cost);
       expect(resolved.cooldown, `${tuning.id} cooldown`).toBe(tuning.cooldown);
-      expect(resolved.def.offGcd, `${tuning.id} offGcd`).toBe(true);
+      expect(resolved.def.offGcd === true, `${tuning.id} offGcd`).toBe(tuning.offGcd);
       expect(effect.type, `${tuning.id} effect`).toBe('selfBuff');
       if (effect.type !== 'selfBuff') throw new Error(`${tuning.id} is not a self buff`);
       expect(effect.duration, `${tuning.id} duration`).toBe(tuning.duration);
@@ -156,10 +159,10 @@ describe('Generic shield-wall ward infrastructure', () => {
   });
 });
 
-describe('Sacred Bulwark (paladin): divine cheat-death', () => {
+describe('Generic guardian ward infrastructure', () => {
   it('denies a lethal blow and restores 35% health, consuming the ward', () => {
     const { sim, p, pid } = make('paladin');
-    cast(sim, 'sacred_bulwark', pid);
+    p.auras.push(guardianWard(pid));
     expect(p.auras.some((a) => a.kind === 'guardian_ward')).toBe(true);
     const mob = spawnMob(sim, p, 3);
     p.hp = p.maxHp;
@@ -174,7 +177,7 @@ describe('Sacred Bulwark (paladin): divine cheat-death', () => {
 
   it('a non-lethal blow leaves the ward intact', () => {
     const { sim, p, pid } = make('paladin');
-    cast(sim, 'sacred_bulwark', pid);
+    p.auras.push(guardianWard(pid));
     const mob = spawnMob(sim, p, 3);
     p.hp = p.maxHp;
     (sim as any).dealDamage(mob, p, 10, false, 'physical', null, 'hit');
@@ -183,7 +186,7 @@ describe('Sacred Bulwark (paladin): divine cheat-death', () => {
 
   it('does not trigger on sourceless environmental damage', () => {
     const { sim, p, pid } = make('paladin');
-    cast(sim, 'sacred_bulwark', pid);
+    p.auras.push(guardianWard(pid));
     p.hp = 100;
     (sim as any).dealDamage(null, p, 150, false, 'physical', 'Falling', 'hit');
     expect(p.dead).toBe(true);
@@ -192,7 +195,7 @@ describe('Sacred Bulwark (paladin): divine cheat-death', () => {
 
   it('does not trigger on friendly sourced damage', () => {
     const { sim, p, pid } = make('paladin');
-    cast(sim, 'sacred_bulwark', pid);
+    p.auras.push(guardianWard(pid));
     const allyPid = sim.addPlayer('priest', 'Ally');
     const ally = sim.entities.get(allyPid)!;
     p.hp = 100;
@@ -217,7 +220,7 @@ describe('Sacred Bulwark (paladin): divine cheat-death', () => {
 
   it('clamps overkill and still runs normal damage bookkeeping and interruptions', () => {
     const { sim, p, pid } = make('paladin');
-    cast(sim, 'sacred_bulwark', pid);
+    p.auras.push(guardianWard(pid));
     const sourcePid = sim.addPlayer('warrior', 'Attacker');
     const source = sim.entities.get(sourcePid)!;
     const sourceMeta = sim.players.get(sourcePid)!;

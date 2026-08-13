@@ -24,6 +24,7 @@ import {
   t,
 } from './i18n';
 import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
+import { localizeTalentTitle } from './talent_i18n';
 
 const baseEnTable = {
   'log.deathwardSaves': 'A deathward saves you!',
@@ -127,6 +128,7 @@ const baseEnTable = {
     'You leave the paddock and the lesson ends. Come back to Marla to try again.',
   'error.invalidBuild': 'Invalid talent build.',
   'error.unknownSpec': 'Unknown specialization.',
+  'error.unknownAbility': 'You do not know that ability.',
   'error.maxLoadouts': 'You can save at most {count} loadouts.',
   'error.emptyLoadoutName': 'Loadout name cannot be empty.',
   'error.noLoadout': 'No such loadout.',
@@ -159,6 +161,8 @@ const baseEnTable = {
   'error.nothingToConsume': 'Nothing to consume.',
   'error.nothingToDevour': 'Nothing to devour.',
   'error.recentKillRequired': 'You need a recent kill.',
+  'error.burningPactRequired': 'Conflagrate requires Burning Pact on the target.',
+  'error.notEnoughRuin': 'Not enough Wrack!',
   'error.merchantUnavailable': 'That merchant is not available.',
   'error.notForSale': 'That item is not for sale.',
   'error.noMerchant': 'There is no merchant nearby.',
@@ -166,6 +170,9 @@ const baseEnTable = {
   // Bind invariant: sellItem refuses a bound (boundTo-stamped) copy so
   // the vendor can never launder the Maker's Bond into a plain buyback copy.
   'error.sellBound': 'That item is bound and cannot be sold.',
+  // Player item lock (issue 3042, src/sim/item_lock.ts): a player-locked
+  // copy, distinct from the Maker's Bond bind above.
+  'error.sellLocked': 'That item is locked and cannot be sold.',
   'error.noBuyback': 'That item is not available for buyback.',
   'error.nailedShut': 'It is nailed shut.',
   'error.enoughOfThose': 'You have enough of those.',
@@ -179,6 +186,8 @@ const baseEnTable = {
   'error.noItem': "You don't have that item.",
   'error.cantWhileDead': "You can't do that while dead.",
   'error.cantWhileSwimming': "You can't do that while swimming.",
+  'error.shellskinPreventsAttacks': 'Shellskin prevents attacks.',
+  'error.tithefiendNeedsDirge': 'Your Tithefiend needs an enemy affected by Dirge of Decay.',
   'error.alreadyEating': 'You are already eating.',
   'error.alreadyDrinking': 'You are already drinking.',
   'error.tameThat': 'You cannot tame that.',
@@ -365,6 +374,7 @@ const baseEnTable = {
   'log.deletedBuild': 'Deleted build “{name}”.',
   'log.dismissPet': 'You dismiss {name}.',
   'log.summonDemon': 'You summon {name}.',
+  'log.pyreCrashes': '{name} crashes into the battle.',
   'log.tamedPet': '{name} is now your loyal companion.',
   'log.entityDies': '{name} dies.',
   'log.prestiged': 'You have prestiged! Prestige Rank {rank}.',
@@ -522,6 +532,9 @@ const baseEnTable = {
   'aura.colossus': 'Colossus',
   // 4-piece set-bonus proc buffs (src/sim/content/item_sets.ts SetProc names).
   'aura.clearcasting': 'Clearcasting',
+  'aura.effigy': 'Effigy',
+  'aura.gloomtithe': 'Gloomtithe',
+  'aura.tithefiend': 'Tithefiend',
   // Talent-proc buff/ward names (choice_rows_classic.ts ProcDef names).
   'aura.searingLight': 'Searing Light',
   'aura.lingeringGraceWard': 'Lingering Grace',
@@ -571,6 +584,10 @@ const baseEnTable = {
   'aura.improvedImmolate': 'Improved Immolate',
   'aura.demonArmor': 'Demon Armor',
   'aura.desolation': 'Desolation',
+  'aura.destructionRuin': 'Ruin',
+  'aura.ruinousBrand': 'Ruinous Brand',
+  'aura.duskfireClaim': 'Duskfire Claim',
+  'aura.pyreGuardian': 'Pyre Guardian',
   'aura.umbralMastery': 'Umbral Mastery',
   'aura.improvedFear': 'Improved Fear',
   'aura.unyieldingPact': 'Unyielding Pact',
@@ -613,6 +630,14 @@ const baseEnTable = {
   'aura.wintersChill': "Winter's Chill",
   'aura.icicles': 'Icicles',
   'aura.perfectMoment': 'Perfect Moment',
+  'aura.radiantResonance': 'Radiant Resonance',
+  'aura.solarReprisal': 'Solar Reprisal',
+  'aura.dawnsWrath': "Dawn's Wrath",
+  'aura.moontide': 'Moontide',
+  'aura.oldBlood': 'Old Blood',
+  'aura.verdance': 'Verdance',
+  'aura.lopingStride': 'Loping Stride',
+  'aura.marrowbreak': 'Marrowbreak',
   // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
   'log.cardDuelQueued': 'You queue for a Card Duel.',
   'log.cardDuelLeftQueue': 'You leave the Card Duel queue.',
@@ -772,6 +797,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'There is no merchant nearby.',
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
+    'error.sellLocked': 'That item is locked and cannot be sold.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -785,6 +811,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noItem': "You don't have that item.",
     'error.cantWhileDead': "You can't do that while dead.",
     'error.cantWhileSwimming': "You can't do that while swimming.",
+    'error.shellskinPreventsAttacks': 'Shellskin prevents attacks.',
+    'error.tithefiendNeedsDirge': 'Your Tithefiend needs an enemy affected by Dirge of Decay.',
     'error.alreadyEating': 'You are already eating.',
     'error.alreadyDrinking': 'You are already drinking.',
     'error.tameThat': 'You cannot tame that.',
@@ -927,6 +955,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.unstuckSickness': 'Unstuck Sickness',
   },
   es: {
+    'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
+    'error.arenaMinLevelMember':
+      '{name} debe ser al menos nivel {level} para entrar en cola de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Sales de la cola del Coliseo Cinéreo.',
+    'error.unknownAbility': 'No conoces esa habilidad.',
+    'error.notEnoughRuin': '¡No hay suficiente Ruina!',
+    'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
+    'error.shellskinPreventsAttacks': 'Piel de Caparazón impide atacar.',
+    'error.tithefiendNeedsDirge':
+      'Tu Diezmademonio necesita un enemigo afectado por Endecha de Descomposición.',
     'error.guildBankNoGuild': 'Debes estar en una hermandad para usar el banco de la hermandad.',
     'error.guildBankRank':
       'Solo los oficiales de la hermandad pueden usar el banco de la hermandad.',
@@ -1202,6 +1240,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'No hay ningún vendedor cerca.',
     'error.noSellQuest': 'No puedes vender objetos de misión.',
     'error.sellBound': 'Ese objeto está vinculado y no puede venderse.',
+    'error.sellLocked': 'Ese objeto está bloqueado y no puede venderse.',
     'error.noBuyback': 'Ese objeto no está disponible para recompra.',
     'error.nailedShut': 'Está clavado y no se puede abrir.',
     'error.enoughOfThose': 'Ya tienes suficientes de esos.',
@@ -1368,6 +1407,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
   },
   es_ES: {
+    'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
+    'error.arenaMinLevelMember':
+      '{name} debe ser al menos nivel {level} para entrar en cola de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Sales de la cola del Coliseo Cinéreo.',
+    'error.unknownAbility': 'No conoces esa habilidad.',
+    'error.notEnoughRuin': '¡No hay suficiente Ruina!',
+    'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
+    'error.shellskinPreventsAttacks': 'Piel de Caparazón impide atacar.',
+    'error.tithefiendNeedsDirge':
+      'Tu Diezmademonio necesita un enemigo afectado por Endecha de Descomposición.',
     'error.guildBankNoGuild': 'Debes estar en una hermandad para usar el banco de la hermandad.',
     'error.guildBankRank':
       'Solo los oficiales de la hermandad pueden usar el banco de la hermandad.',
@@ -1640,6 +1689,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'No hay ningún mercader cerca.',
     'error.noSellQuest': 'No puedes vender objetos de misión.',
     'error.sellBound': 'Ese objeto está vinculado y no puede venderse.',
+    'error.sellLocked': 'Ese objeto está bloqueado y no puede venderse.',
     'error.noBuyback': 'Ese objeto no está disponible para recompra.',
     'error.nailedShut': 'Está clavado.',
     'error.enoughOfThose': 'Ya tienes suficientes de esos.',
@@ -1809,6 +1859,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
   },
   fr_FR: {
+    'error.arenaMinLevel': "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+    'error.arenaMinLevelMember':
+      "{name} doit être au moins niveau {level} pour rejoindre la file d'arène.",
+    'log.arenaQueueAutoLeave1v1': 'Vous quittez la file du Colisée cendré.',
+    'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
+    'error.notEnoughRuin': 'Pas assez de Ruine !',
+    'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
+    'error.shellskinPreventsAttacks': "Peau de carapace empêche d'attaquer.",
+    'error.tithefiendNeedsDirge':
+      "Votre Démon de dîme a besoin d'un ennemi affecté par Chant funèbre de pourriture.",
     'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
     'error.guildBankRank': 'Seuls les officiers de la guilde peuvent utiliser la banque de guilde.',
     'error.guildBankFull': 'La banque de guilde est pleine.',
@@ -2089,6 +2149,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
     'error.noSellQuest': "Vous ne pouvez pas vendre d'objets de quête.",
     'error.sellBound': 'Cet objet est lié et ne peut pas être vendu.',
+    'error.sellLocked': 'Cet objet est verrouillé et ne peut pas être vendu.',
     'error.noBuyback': "Cet objet n'est pas disponible au rachat.",
     'error.nailedShut': "C'est condamné par des clous.",
     'error.enoughOfThose': 'Vous en avez assez.',
@@ -2259,6 +2320,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
   },
   fr_CA: {
+    'error.arenaMinLevel': "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+    'error.arenaMinLevelMember':
+      "{name} doit être au moins niveau {level} pour rejoindre la file d'arène.",
+    'log.arenaQueueAutoLeave1v1': 'Vous quittez la file du Colisée cendré.',
+    'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
+    'error.notEnoughRuin': 'Pas assez de Ruine !',
+    'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
+    'error.shellskinPreventsAttacks': "Peau de carapace empêche d'attaquer.",
+    'error.tithefiendNeedsDirge':
+      "Votre Démon de dîme a besoin d'un ennemi affecté par Chant funèbre de pourriture.",
     'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
     'error.guildBankRank': 'Seuls les officiers de la guilde peuvent utiliser la banque de guilde.',
     'error.guildBankFull': 'La banque de guilde est pleine.',
@@ -2538,6 +2609,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
     'error.noSellQuest': "Vous ne pouvez pas vendre d'objets de quête.",
     'error.sellBound': 'Cet objet est lié et ne peut pas être vendu.',
+    'error.sellLocked': 'Cet objet est verrouillé et ne peut pas être vendu.',
     'error.noBuyback': "Cet objet n'est pas disponible au rachat.",
     'error.nailedShut': "C'est cloué.",
     'error.enoughOfThose': 'Vous en avez assez.',
@@ -2828,6 +2900,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'There is no merchant nearby.',
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
+    'error.sellLocked': 'That item is locked and cannot be sold.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -2902,6 +2975,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Might of the Serpent',
   },
   it_IT: {
+    'error.arenaMinLevel': "Devi essere di livello {level} per metterti in coda per l'arena.",
+    'error.arenaMinLevelMember':
+      "{name} deve essere almeno di livello {level} per mettersi in coda per l'arena.",
+    'log.arenaQueueAutoLeave1v1': 'Esci dalla coda del Colosseo Cinereo.',
+    'error.unknownAbility': 'Non conosci questa abilità.',
+    'error.notEnoughRuin': 'Rovina insufficiente!',
+    'error.burningPactRequired': 'Conflagrazione richiede Patto Ardente sul bersaglio.',
+    'error.shellskinPreventsAttacks': 'Pelle di Corazza impedisce di attaccare.',
+    'error.tithefiendNeedsDirge':
+      'Il tuo Demone della Decima richiede un nemico affetto da Canto Funebre della Putrefazione.',
     'error.guildBankNoGuild': 'Devi essere in una gilda per usare la banca della gilda.',
     'error.guildBankRank': 'Solo gli ufficiali della gilda possono usare la banca della gilda.',
     'error.guildBankFull': 'La banca della gilda è piena.',
@@ -3176,6 +3259,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Non c'è nessun mercante nelle vicinanze.",
     'error.noSellQuest': 'Non puoi vendere oggetti delle missioni.',
     'error.sellBound': "Quell'oggetto è legato e non può essere venduto.",
+    'error.sellLocked': "Quell'oggetto è bloccato e non può essere venduto.",
     'error.noBuyback': "Quell'oggetto non è disponibile per il riacquisto.",
     'error.nailedShut': 'È inchiodato.',
     'error.enoughOfThose': 'Ne hai già abbastanza.',
@@ -3344,6 +3428,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
   },
   de_DE: {
+    'error.arenaMinLevel': 'Du musst Stufe {level} sein, um dich für die Arena einzureihen.',
+    'error.arenaMinLevelMember':
+      '{name} muss mindestens Stufe {level} sein, um sich für die Arena einzureihen.',
+    'log.arenaQueueAutoLeave1v1': 'Ihr verlasst die Warteschlange des Aschenen Kolosseums.',
+    'error.unknownAbility': 'Ihr beherrscht diese Fähigkeit nicht.',
+    'error.notEnoughRuin': 'Nicht genug Verderben!',
+    'error.burningPactRequired': 'Feuersbrunst erfordert Brennender Pakt auf dem Ziel.',
+    'error.shellskinPreventsAttacks': 'Panzerhaut verhindert Angriffe.',
+    'error.tithefiendNeedsDirge':
+      'Euer Zehntteufel benötigt einen Gegner mit Klagelied des Verfalls.',
     'error.guildBankNoGuild': 'Ihr müsst in einer Gilde sein, um die Gildenbank zu benutzen.',
     'error.guildBankRank': 'Nur Gildenoffiziere dürfen die Gildenbank benutzen.',
     'error.guildBankFull': 'Die Gildenbank ist voll.',
@@ -3619,6 +3713,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Es ist kein Händler in der Nähe.',
     'error.noSellQuest': 'Ihr könnt keine Questgegenstände verkaufen.',
     'error.sellBound': 'Dieser Gegenstand ist gebunden und kann nicht verkauft werden.',
+    'error.sellLocked': 'Dieser Gegenstand ist gesperrt und kann nicht verkauft werden.',
     'error.noBuyback': 'Dieser Gegenstand ist nicht zum Rückkauf verfügbar.',
     'error.nailedShut': 'Es ist vernagelt.',
     'error.enoughOfThose': 'Davon habt Ihr genug.',
@@ -3790,6 +3885,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
   },
   zh_CN: {
+    'error.arenaMinLevel': '你必须达到等级 {level} 才能加入竞技场队列。',
+    'error.arenaMinLevelMember': '{name} 必须至少达到等级 {level} 才能加入竞技场队列。',
+    'log.arenaQueueAutoLeave1v1': '你离开了灰烬斗技场队列。',
+    'error.unknownAbility': '你尚未学会该技能。',
+    'error.notEnoughRuin': '毁灭不足！',
+    'error.burningPactRequired': '燃尽需要目标身上有燃烧契约。',
+    'error.shellskinPreventsAttacks': '甲壳之肤阻止攻击。',
+    'error.tithefiendNeedsDirge': '你的什一魔需要一个受腐朽挽歌影响的敌人。',
     'error.guildBankNoGuild': '你必须加入公会才能使用公会银行。',
     'error.guildBankRank': '只有公会官员才能使用公会银行。',
     'error.guildBankFull': '公会银行已满。',
@@ -3880,6 +3983,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '死亡护符救了你！',
     'error.heroicMarksNeeded': '购买{name}需要{marks}个英雄徽记。',
     'aura.clearcasting': '清晰施法',
+    'aura.effigy': '巫蛊像',
+    'aura.gloomtithe': '幽暗什一',
+    'aura.tithefiend': '什一魔',
     'aura.searingLight': '灼热圣光',
     'aura.lingeringGraceWard': '萦绕恩泽',
     'aura.nocturns': '冥想',
@@ -4119,6 +4225,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '附近没有商人。',
     'error.noSellQuest': '你无法出售任务物品。',
     'error.sellBound': '该物品已绑定，无法出售。',
+    'error.sellLocked': '该物品已锁定，无法出售。',
     'error.noBuyback': '该物品无法回购。',
     'error.nailedShut': '它被钉死了。',
     'error.enoughOfThose': '你已经有足够多的这种物品了。',
@@ -4218,6 +4325,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '你的专注重置已完成。',
   },
   zh_TW: {
+    'error.arenaMinLevel': '你必須達到等級 {level} 才能加入競技場佇列。',
+    'error.arenaMinLevelMember': '{name} 必須至少達到等級 {level} 才能加入競技場佇列。',
+    'log.arenaQueueAutoLeave1v1': '你離開了灰燼競技場佇列。',
+    'error.unknownAbility': '你尚未學會該技能。',
+    'error.notEnoughRuin': '毀滅不足！',
+    'error.burningPactRequired': '燃盡需要目標身上有燃燒契約。',
+    'error.shellskinPreventsAttacks': '甲殼之膚阻止攻擊。',
+    'error.tithefiendNeedsDirge': '你的什一魔需要一個受腐朽輓歌影響的敵人。',
     'error.guildBankNoGuild': '你必須加入公會才能使用公會銀行。',
     'error.guildBankRank': '只有公會幹部才能使用公會銀行。',
     'error.guildBankFull': '公會銀行已滿。',
@@ -4308,6 +4423,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '死亡護符救了你！',
     'error.heroicMarksNeeded': '購買{name}需要{marks}個英雄徽記。',
     'aura.clearcasting': '清晰施法',
+    'aura.effigy': '巫毒塑像',
+    'aura.gloomtithe': '幽暗什一',
+    'aura.tithefiend': '什一魔',
     'aura.searingLight': '灼熱聖光',
     'aura.lingeringGraceWard': '綿延恩典',
     'aura.nocturns': '冥想',
@@ -4547,6 +4665,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '附近沒有商人。',
     'error.noSellQuest': '你無法出售任務物品。',
     'error.sellBound': '該物品已綁定，無法出售。',
+    'error.sellLocked': '該物品已鎖定，無法出售。',
     'error.noBuyback': '那件物品無法購回。',
     'error.nailedShut': '它被釘死了。',
     'error.enoughOfThose': '你已經有足夠的那種物品了。',
@@ -4646,6 +4765,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '你的專注重置已完成。',
   },
   ko_KR: {
+    'error.arenaMinLevel': '투기장 대기열에 참가하려면 레벨 {level} 이상이어야 합니다.',
+    'error.arenaMinLevelMember':
+      '{name}님은 투기장 대기열에 참가하려면 레벨 {level} 이상이어야 합니다.',
+    'log.arenaQueueAutoLeave1v1': '잿빛 원형경기장 대기열에서 나왔습니다.',
+    'error.unknownAbility': '아직 배우지 않은 기술입니다.',
+    'error.notEnoughRuin': '파멸이 부족합니다!',
+    'error.burningPactRequired': '점화하려면 대상에게 불타는 계약이 있어야 합니다.',
+    'error.shellskinPreventsAttacks': '갑각 피부 상태에서는 공격할 수 없습니다.',
+    'error.tithefiendNeedsDirge': '십일조 악마에게는 부패의 만가에 걸린 적이 필요합니다.',
     'error.guildBankNoGuild': '길드 은행을 사용하려면 길드에 소속되어 있어야 합니다.',
     'error.guildBankRank': '길드 임원만 길드 은행을 사용할 수 있습니다.',
     'error.guildBankFull': '길드 은행이 가득 찼습니다.',
@@ -4737,6 +4865,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '죽음의 수호가 당신을 구했습니다!',
     'error.heroicMarksNeeded': '{name}을(를) 구매하려면 영웅의 징표 {marks}개가 필요합니다.',
     'aura.clearcasting': '선명한 시전',
+    'aura.effigy': '제물 인형',
+    'aura.gloomtithe': '암흑 십일조',
+    'aura.tithefiend': '십일조 악마',
     'aura.searingLight': '타오르는 빛',
     'aura.lingeringGraceWard': '지속되는 은총',
     'aura.nocturns': '명상',
@@ -4981,6 +5112,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '근처에 상인이 없습니다.',
     'error.noSellQuest': '퀘스트 아이템은 판매할 수 없습니다.',
     'error.sellBound': '그 아이템은 귀속되어 판매할 수 없습니다.',
+    'error.sellLocked': '그 아이템은 잠겨 있어 판매할 수 없습니다.',
     'error.noBuyback': '그 아이템은 되살 수 없습니다.',
     'error.nailedShut': '못으로 단단히 박혀 있습니다.',
     'error.enoughOfThose': '그것을 이미 충분히 가지고 있습니다.',
@@ -5083,6 +5215,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
   },
   ja_JP: {
+    'error.arenaMinLevel': 'アリーナのキューに参加するにはレベル{level}が必要です。',
+    'error.arenaMinLevelMember':
+      '{name}はアリーナのキューに参加するにはレベル{level}以上である必要があります。',
+    'log.arenaQueueAutoLeave1v1': '灰の闘技場のキューを離れました。',
+    'error.unknownAbility': 'そのアビリティをまだ習得していません。',
+    'error.notEnoughRuin': '破滅が足りません！',
+    'error.burningPactRequired': 'コンフラグレートには対象に灼熱の契約が必要です。',
+    'error.shellskinPreventsAttacks': '甲殻の皮膚により攻撃できません。',
+    'error.tithefiendNeedsDirge': 'タイスフィーンドには腐朽の葬送歌を受けた敵が必要です。',
     'error.guildBankNoGuild': 'ギルド銀行を利用するにはギルドに加入している必要があります。',
     'error.guildBankRank': 'ギルド銀行を利用できるのはギルド幹部のみです。',
     'error.guildBankFull': 'ギルド銀行がいっぱいです。',
@@ -5178,6 +5319,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '死の加護があなたを救った！',
     'error.heroicMarksNeeded': '{name}を購入するには英雄の証が{marks}個必要です。',
     'aura.clearcasting': 'クリアキャスティング',
+    'aura.effigy': '呪いの人形',
+    'aura.gloomtithe': '闇の献納',
+    'aura.tithefiend': 'タイスフィーンド',
     'aura.searingLight': '灼熱の光',
     'aura.lingeringGraceWard': '留まる恩寵',
     'aura.nocturns': '瞑想',
@@ -5426,6 +5570,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '近くに商人がいません。',
     'error.noSellQuest': 'クエストアイテムは売却できません。',
     'error.sellBound': 'そのアイテムはバインドされているため売却できません。',
+    'error.sellLocked': 'そのアイテムはロックされているため売却できません。',
     'error.noBuyback': 'そのアイテムは買い戻しできません。',
     'error.nailedShut': '釘で打ち付けられています。',
     'error.enoughOfThose': 'それはもう十分に持っています。',
@@ -5529,6 +5674,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
   },
   pt_BR: {
+    'error.arenaMinLevel': 'Você precisa ser nível {level} para entrar na fila da arena.',
+    'error.arenaMinLevelMember':
+      '{name} precisa ser pelo menos nível {level} para entrar na fila da arena.',
+    'log.arenaQueueAutoLeave1v1': 'Você sai da fila do Coliseu Cinzento.',
+    'error.unknownAbility': 'Você não conhece essa habilidade.',
+    'error.notEnoughRuin': 'Ruína insuficiente!',
+    'error.burningPactRequired': 'Conflagrar exige Pacto Ardente no alvo.',
+    'error.shellskinPreventsAttacks': 'Pele de Casco impede ataques.',
+    'error.tithefiendNeedsDirge':
+      'Seu Demônio do Dízimo precisa de um inimigo afetado por Réquiem da Ruína.',
     'error.guildBankNoGuild': 'Você precisa estar em uma guilda para usar o banco da guilda.',
     'error.guildBankRank': 'Somente oficiais da guilda podem usar o banco da guilda.',
     'error.guildBankFull': 'O banco da guilda está cheio.',
@@ -5799,6 +5954,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Não há nenhum comerciante por perto.',
     'error.noSellQuest': 'Você não pode vender itens de missão.',
     'error.sellBound': 'Esse item está vinculado e não pode ser vendido.',
+    'error.sellLocked': 'Esse item está bloqueado e não pode ser vendido.',
     'error.noBuyback': 'Esse item não está disponível para recompra.',
     'error.nailedShut': 'Está pregado e não abre.',
     'error.enoughOfThose': 'Você já tem o bastante desses.',
@@ -5968,6 +6124,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
   },
   ru_RU: {
+    'error.arenaMinLevel': 'Чтобы встать в очередь на арену, нужен {level} уровень.',
+    'error.arenaMinLevelMember':
+      'Для постановки {name} в очередь на арену нужен как минимум {level} уровень.',
+    'log.arenaQueueAutoLeave1v1': 'Вы покидаете очередь Пепельного Колизея.',
+    'error.unknownAbility': 'Вы не знаете эту способность.',
+    'error.notEnoughRuin': 'Недостаточно Погибели!',
+    'error.burningPactRequired': 'Для Поджигания на цели должен быть Пылающий договор.',
+    'error.shellskinPreventsAttacks': 'Панцирная кожа не позволяет атаковать.',
+    'error.tithefiendNeedsDirge':
+      'Вашему демону десятины нужен противник под действием Панихиды распада.',
     'error.guildBankNoGuild': 'Чтобы пользоваться банком гильдии, нужно состоять в гильдии.',
     'error.guildBankRank': 'Пользоваться банком гильдии могут только офицеры гильдии.',
     'error.guildBankFull': 'Банк гильдии полон.',
@@ -6060,6 +6226,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': 'Оберег от смерти спасает вас!',
     'error.heroicMarksNeeded': 'Вам нужно {marks} Героических знаков, чтобы купить {name}.',
     'aura.clearcasting': 'Ясность',
+    'aura.effigy': 'Изваяние',
+    'aura.gloomtithe': 'Мрачная десятина',
+    'aura.tithefiend': 'Демон десятины',
     'aura.searingLight': 'Жгучий свет',
     'aura.lingeringGraceWard': 'Длящаяся благодать',
     'aura.nocturns': 'Медитация',
@@ -6311,6 +6480,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Поблизости нет торговца.',
     'error.noSellQuest': 'Вы не можете продавать предметы заданий.',
     'error.sellBound': 'Этот предмет привязан и не может быть продан.',
+    'error.sellLocked': 'Этот предмет заблокирован и не может быть продан.',
     'error.noBuyback': 'Этот предмет недоступен для выкупа.',
     'error.nailedShut': 'Заколочено наглухо.',
     'error.enoughOfThose': 'У вас достаточно таких предметов.',
@@ -6414,6 +6584,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   ...BASE_NEW,
   cs_CZ: {
+    'error.arenaMinLevel': 'Musíš být na úrovni {level}, abys se mohl(a) zařadit do fronty arény.',
+    'error.arenaMinLevelMember':
+      '{name} musí být alespoň na úrovni {level}, aby se mohl(a) zařadit do fronty arény.',
+    'log.arenaQueueAutoLeave1v1': 'Opouštíš frontu Popelavého kolosea.',
     'error.guildBankNoGuild': 'Pro použití cechovní banky musíš být v cechu.',
     'error.guildBankRank': 'Cechovní banku smí používat pouze důstojníci.',
     'error.guildBankFull': 'Cechovní banka je plná.',
@@ -6437,7 +6611,13 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Tohle už je hotové.',
     'error.emptyLoadoutName': 'Název sestavy nesmí být prázdný.',
     'error.sellBound': 'Tento předmět je vázaný a nelze ho prodat.',
+    'error.sellLocked': 'Tento předmět je zamčený a nelze ho prodat.',
     ...BASE_NEW.cs_CZ,
+    'error.unknownAbility': 'Tuto schopnost neznáš.',
+    'error.notEnoughRuin': 'Nedostatek Zkázy!',
+    'error.burningPactRequired': 'Vzplanutí vyžaduje Hořící pakt na cíli.',
+    'error.shellskinPreventsAttacks': 'Krunýřová kůže brání útokům.',
+    'error.tithefiendNeedsDirge': 'Tvůj desátkový běs potřebuje nepřítele pod Žalozpěvem rozkladu.',
     'error.toolEffectSlotFromWindow': 'Zasaď to v okně Profese.',
     'error.mountTrainInProgress': 'Jezdecká lekce už probíhá.',
     'error.mountTrainDismountFirst': 'Nejdřív sesedni.',
@@ -6553,6 +6733,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Dokonalý okamžik',
   },
   nl_NL: {
+    'error.arenaMinLevel':
+      'Je moet niveau {level} zijn om je aan te sluiten bij de wachtrij voor de arena.',
+    'error.arenaMinLevelMember':
+      '{name} moet minstens niveau {level} zijn om zich aan te sluiten bij de wachtrij voor de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Je verlaat de wachtrij van het Ashen Coliseum.',
     'error.guildBankNoGuild': 'Je moet in een gilde zitten om de gildebank te gebruiken.',
     'error.guildBankRank': 'Alleen gildeofficieren mogen de gildebank gebruiken.',
     'error.guildBankFull': 'De gildebank is vol.',
@@ -6576,7 +6761,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Dit heb je al gedaan.',
     'error.emptyLoadoutName': 'De naam van een build mag niet leeg zijn.',
     'error.sellBound': 'Dat voorwerp is gebonden en kan niet worden verkocht.',
+    'error.sellLocked': 'Dat voorwerp is vergrendeld en kan niet worden verkocht.',
     ...BASE_NEW.nl_NL,
+    'error.unknownAbility': 'Je kent die vaardigheid niet.',
+    'error.notEnoughRuin': 'Niet genoeg Ruïne!',
+    'error.burningPactRequired': 'Ontvlamming vereist Brandpact op het doelwit.',
+    'error.shellskinPreventsAttacks': 'Schildhuid verhindert aanvallen.',
+    'error.tithefiendNeedsDirge':
+      'Je Tiendduivel heeft een vijand nodig die onder Klaaglied van Verval lijdt.',
     'error.toolEffectSlotFromWindow': 'Open Beroepen om dit aan te brengen.',
     'error.mountTrainInProgress': 'Er is al een rijles bezig.',
     'error.mountTrainDismountFirst': 'Stijg eerst af.',
@@ -6691,6 +6883,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Volmaakt Ogenblik',
   },
   pl_PL: {
+    'error.arenaMinLevel': 'Musisz mieć poziom {level}, aby dołączyć do kolejki na arenę.',
+    'error.arenaMinLevelMember':
+      '{name} musi mieć co najmniej poziom {level}, aby dołączyć do kolejki na arenę.',
+    'log.arenaQueueAutoLeave1v1': 'Opuszczasz kolejkę do Popielnego Koloseum.',
     'error.guildBankNoGuild': 'Musisz należeć do gildii, aby korzystać z banku gildii.',
     'error.guildBankRank': 'Tylko oficerowie gildii mogą korzystać z banku gildii.',
     'error.guildBankFull': 'Bank gildii jest pełny.',
@@ -6715,7 +6911,13 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'To już zrobiłeś.',
     'error.emptyLoadoutName': 'Nazwa buildu nie może być pusta.',
     'error.sellBound': 'Ten przedmiot jest przywiązany i nie można go sprzedać.',
+    'error.sellLocked': 'Ten przedmiot jest zablokowany i nie można go sprzedać.',
     ...BASE_NEW.pl_PL,
+    'error.unknownAbility': 'Nie znasz tej zdolności.',
+    'error.notEnoughRuin': 'Za mało Ruiny!',
+    'error.burningPactRequired': 'Pożoga wymaga Płonącego paktu na celu.',
+    'error.shellskinPreventsAttacks': 'Pancerna Skóra uniemożliwia ataki.',
+    'error.tithefiendNeedsDirge': 'Twój Dziesięcinnik potrzebuje wroga objętego Pieśnią rozkładu.',
     'error.toolEffectSlotFromWindow': 'Otwórz Zawody, aby to osadzić.',
     'error.mountTrainInProgress': 'Lekcja jazdy konnej już trwa.',
     'error.mountTrainDismountFirst': 'Najpierw zsiądź.',
@@ -6833,6 +7035,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Idealna chwila',
   },
   id_ID: {
+    'error.arenaMinLevel': 'Kamu harus level {level} untuk mengantre ke arena.',
+    'error.arenaMinLevelMember': '{name} harus setidaknya level {level} untuk mengantre ke arena.',
+    'log.arenaQueueAutoLeave1v1': 'Kamu meninggalkan antrean Koloseum Abu.',
     'error.guildBankNoGuild': 'Kamu harus berada dalam sebuah guild untuk menggunakan bank guild.',
     'error.guildBankRank': 'Hanya perwira guild yang boleh menggunakan bank guild.',
     'error.guildBankFull': 'Bank guild penuh.',
@@ -6856,7 +7061,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Kamu sudah melakukan ini.',
     'error.emptyLoadoutName': 'Nama bangun tidak boleh kosong.',
     'error.sellBound': 'Barang itu terikat dan tidak dapat dijual.',
+    'error.sellLocked': 'Barang itu terkunci dan tidak dapat dijual.',
     ...BASE_NEW.id_ID,
+    'error.unknownAbility': 'Kamu belum mengetahui kemampuan itu.',
+    'error.notEnoughRuin': 'Ruin tidak cukup!',
+    'error.burningPactRequired': 'Kobaran Api membutuhkan Pakta Membara pada target.',
+    'error.shellskinPreventsAttacks': 'Kulit Cangkang mencegah serangan.',
+    'error.tithefiendNeedsDirge':
+      'Iblis Persepuluhan-mu membutuhkan musuh yang terkena Ratapan Pembusukan.',
     'error.toolEffectSlotFromWindow': 'Buka Profesi untuk memasangnya.',
     'error.mountTrainInProgress': 'Sudah ada pelajaran menunggang yang sedang berlangsung.',
     'error.mountTrainDismountFirst': 'Turun dulu.',
@@ -6972,6 +7184,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momen Sempurna',
   },
   tr_TR: {
+    'error.arenaMinLevel': 'Arena sırasına girmek için {level}. seviyeye ulaşmalısın.',
+    'error.arenaMinLevelMember':
+      '{name} arena sırasına girmek için en az {level}. seviyede olmalı.',
+    'log.arenaQueueAutoLeave1v1': 'Kül Koliseumu sırasından ayrıldın.',
     'error.guildBankNoGuild': 'Lonca bankasını kullanmak için bir loncada olmalısın.',
     'error.guildBankRank': 'Lonca bankasını yalnızca subaylar kullanabilir.',
     'error.guildBankFull': 'Lonca bankası dolu.',
@@ -6995,7 +7211,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Bunu zaten yaptın.',
     'error.emptyLoadoutName': 'Derleme adı boş olamaz.',
     'error.sellBound': 'O eşya bağlı ve satılamaz.',
+    'error.sellLocked': 'O eşya kilitli ve satılamaz.',
     ...BASE_NEW.tr_TR,
+    'error.unknownAbility': 'Bu yeteneği bilmiyorsun.',
+    'error.notEnoughRuin': 'Yeterli Harabiyet yok!',
+    'error.burningPactRequired': 'Tutuşturma için hedefte Yanan Ahit olmalı.',
+    'error.shellskinPreventsAttacks': 'Kabuk Deri saldırıları engelliyor.',
+    'error.tithefiendNeedsDirge':
+      'Öşür İfritin, Çürüme Ağıdı etkisindeki bir düşmana ihtiyaç duyar.',
     'error.toolEffectSlotFromWindow': 'Bunu takmak için Meslekler penceresini aç.',
     'error.mountTrainInProgress': 'Zaten devam eden bir binicilik dersi var.',
     'error.mountTrainDismountFirst': 'Önce in.',
@@ -7111,6 +7334,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Mükemmel An',
   },
   sv_SE: {
+    'error.arenaMinLevel': 'Du måste vara nivå {level} för att köa till arenan.',
+    'error.arenaMinLevelMember': '{name} måste vara minst nivå {level} för att köa till arenan.',
+    'log.arenaQueueAutoLeave1v1': 'Du lämnar kön till Askgrå kolosseum.',
     'error.guildBankNoGuild': 'Du måste vara med i ett gille för att använda gillesbanken.',
     'error.guildBankRank': 'Endast gillesofficerare får använda gillesbanken.',
     'error.guildBankFull': 'Gillesbanken är full.',
@@ -7134,7 +7360,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Du har redan gjort det här.',
     'error.emptyLoadoutName': 'Byggets namn får inte vara tomt.',
     'error.sellBound': 'Det föremålet är bundet och kan inte säljas.',
+    'error.sellLocked': 'Det föremålet är låst och kan inte säljas.',
     ...BASE_NEW.sv_SE,
+    'error.unknownAbility': 'Du kan inte den förmågan.',
+    'error.notEnoughRuin': 'Inte tillräckligt med Ruin!',
+    'error.burningPactRequired': 'Storbrand kräver Brinnande pakt på målet.',
+    'error.shellskinPreventsAttacks': 'Skalhud förhindrar attacker.',
+    'error.tithefiendNeedsDirge':
+      'Din tiondedemon behöver en fiende som påverkas av Förruttnelsens klagosång.',
     'error.toolEffectSlotFromWindow': 'Öppna Yrken för att sätta in den.',
     'error.mountTrainInProgress': 'En ridlektion pågår redan.',
     'error.mountTrainDismountFirst': 'Stig av först.',
@@ -7249,6 +7482,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Perfekt ögonblick',
   },
   vi_VN: {
+    'error.arenaMinLevel': 'Bạn phải đạt cấp {level} để xếp hàng vào đấu trường.',
+    'error.arenaMinLevelMember':
+      '{name} phải đạt tối thiểu cấp {level} để xếp hàng vào đấu trường.',
+    'log.arenaQueueAutoLeave1v1': 'Bạn rời hàng chờ Đấu Trường Tro Tàn.',
     'error.guildBankNoGuild': 'Bạn phải ở trong một bang hội để sử dụng ngân hàng bang hội.',
     'error.guildBankRank': 'Chỉ sĩ quan bang hội mới có thể sử dụng ngân hàng bang hội.',
     'error.guildBankFull': 'Ngân hàng bang hội đã đầy.',
@@ -7273,7 +7510,13 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Bạn đã làm cái này rồi.',
     'error.emptyLoadoutName': 'Tên build không được để trống.',
     'error.sellBound': 'Vật phẩm đó đã bị ràng buộc và không thể bán.',
+    'error.sellLocked': 'Vật phẩm đó đã bị khóa và không thể bán.',
     ...BASE_NEW.vi_VN,
+    'error.unknownAbility': 'Bạn chưa học kỹ năng đó.',
+    'error.notEnoughRuin': 'Không đủ Ruin!',
+    'error.burningPactRequired': 'Bùng Cháy cần mục tiêu đang chịu Khế Ước Rực Cháy.',
+    'error.shellskinPreventsAttacks': 'Da Mai ngăn không cho tấn công.',
+    'error.tithefiendNeedsDirge': 'Quỷ Thập Phân của bạn cần một kẻ địch đang chịu Ai Ca Mục Rữa.',
     'error.toolEffectSlotFromWindow': 'Mở Nghề nghiệp để khảm nó.',
     'error.mountTrainInProgress': 'Đã có một bài học cưỡi ngựa đang diễn ra.',
     'error.mountTrainDismountFirst': 'Xuống thú cưỡi trước đã.',
@@ -7387,6 +7630,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Khoảnh Khắc Hoàn Hảo',
   },
   da_DK: {
+    'error.arenaMinLevel': 'Du skal være niveau {level} for at stille dig i kø til arenaen.',
+    'error.arenaMinLevelMember':
+      '{name} skal være mindst niveau {level} for at stille sig i kø til arenaen.',
+    'log.arenaQueueAutoLeave1v1': 'Du forlader køen til Det Askegrå Kolosseum.',
     'error.guildBankNoGuild': 'Du skal være i et laug for at bruge laugsbanken.',
     'error.guildBankRank': 'Kun laugsofficerer må bruge laugsbanken.',
     'error.guildBankFull': 'Laugsbanken er fuld.',
@@ -7410,7 +7657,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Du har allerede gjort det her.',
     'error.emptyLoadoutName': 'Navnet på et build må ikke være tomt.',
     'error.sellBound': 'Den genstand er bundet og kan ikke sælges.',
+    'error.sellLocked': 'Den genstand er låst og kan ikke sælges.',
     ...BASE_NEW.da_DK,
+    'error.unknownAbility': 'Du kender ikke den evne.',
+    'error.notEnoughRuin': 'Ikke nok Ruin!',
+    'error.burningPactRequired': 'Antændelse kræver Brændende Pagt på målet.',
+    'error.shellskinPreventsAttacks': 'Skalhud forhindrer angreb.',
+    'error.tithefiendNeedsDirge':
+      'Din Tiendedæmon skal bruge en fjende, der er ramt af Forfaldets Klagesang.',
     'error.toolEffectSlotFromWindow': 'Åbn Erhverv for at sætte den i.',
     'error.mountTrainInProgress': 'Der er allerede en ridelektion i gang.',
     'error.mountTrainDismountFirst': 'Stig af først.',
@@ -7524,6 +7778,31 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Istapper',
     'aura.perfectMoment': 'Perfekt Øjeblik',
   },
+};
+
+const ARENA_QUEUE_AUTO_LEAVE_1V1: Record<SupportedLanguage, string> = {
+  en: 'You leave the Ashen Coliseum queue.',
+  en_CA: 'You leave the Ashen Coliseum queue.',
+  es: 'Sales de la cola del Coliseo Cinéreo.',
+  es_ES: 'Sales de la cola del Coliseo Cinéreo.',
+  fr_FR: 'Vous quittez la file du Colisée cendré.',
+  fr_CA: 'Vous quittez la file du Colisée cendré.',
+  it_IT: 'Esci dalla coda del Colosseo Cinereo.',
+  de_DE: 'Ihr verlasst die Warteschlange des Aschenen Kolosseums.',
+  zh_CN: '你离开了灰烬斗技场队列。',
+  zh_TW: '你離開了灰燼競技場佇列。',
+  ko_KR: '잿빛 원형경기장 대기열에서 나왔습니다.',
+  ja_JP: '灰の闘技場のキューを離れました。',
+  pt_BR: 'Você sai da fila do Coliseu Cinzento.',
+  ru_RU: 'Вы покидаете очередь Пепельного Колизея.',
+  cs_CZ: 'Opouštíš frontu Ashen Coliseum.',
+  nl_NL: 'Je verlaat de wachtrij van het Ashen Coliseum.',
+  pl_PL: 'Opuszczasz kolejkę Ashen Coliseum.',
+  id_ID: 'Kamu keluar dari antrean Ashen Coliseum.',
+  tr_TR: 'Ashen Coliseum sırasından ayrılıyorsun.',
+  sv_SE: 'Du lämnar Ashen Coliseums kö.',
+  vi_VN: 'Bạn rời hàng đợi Ashen Coliseum.',
+  da_DK: 'Du forlader Ashen Coliseum-køen.',
 };
 
 const PET_DICT_EN: Record<PetSimMessageKey, string> = {
@@ -8053,7 +8332,12 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
     lang,
-    { ...baseEnTable, ...BASE_DICT[lang], ...PET_DICT[lang] },
+    {
+      ...baseEnTable,
+      ...BASE_DICT[lang],
+      ...PET_DICT[lang],
+      'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
+    },
   ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
 
@@ -8082,6 +8366,7 @@ const mobNameToId = new Map<string, string>();
 for (const [id, m] of Object.entries(MOBS)) mobNameToId.set(m.name, id);
 const abilityNameToId = new Map<string, string>();
 for (const [id, a] of Object.entries(ABILITIES)) abilityNameToId.set(a.name, id);
+abilityNameToId.set('Veil Mark', 'veilbound_mark');
 const delveNameToId = new Map<string, string>();
 for (const [id, d] of Object.entries(DELVES)) delveNameToId.set(d.name, id);
 // Module display names are also the delveUi.moduleName.* source values; reverse
@@ -8139,6 +8424,11 @@ function locPetGrowlAutoState(state: string): string {
 // player (stun/incapacitate/absorb aura) and as the boss "unleashes" combat-log line, so
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
+  Moontide: 'aura.moontide',
+  'Old Blood': 'aura.oldBlood',
+  Verdance: 'aura.verdance',
+  'Loping Stride': 'aura.lopingStride',
+  Marrowbreak: 'aura.marrowbreak',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
   // src/sim/content/classes.ts); shown on the buff bar and combat log.
   'Bladed Echo': 'aura.bladedEcho',
@@ -8255,6 +8545,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Colossus: 'aura.colossus',
   // 4-piece set-bonus proc buffs (item_sets.ts): shown in the buff frame.
   Clearcasting: 'aura.clearcasting',
+  Effigy: 'aura.effigy',
+  Gloomtithe: 'aura.gloomtithe',
+  Tithefiend: 'aura.tithefiend',
   Gravemight: 'aura.gravemight',
   Fangrush: 'aura.fangrush',
   Bonesplinter: 'aura.bonesplinter',
@@ -8273,6 +8566,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   "Winter's Chill": 'aura.wintersChill',
   Icicles: 'aura.icicles',
   'Perfect Moment': 'aura.perfectMoment',
+  'Radiant Resonance': 'aura.radiantResonance',
+  'Solar Reprisal': 'aura.solarReprisal',
+  "Dawn's Wrath": 'aura.dawnsWrath',
   // Talent-proc buff/ward names (choice rows).
   'Searing Light': 'aura.searingLight',
   'Lingering Grace': 'aura.lingeringGraceWard',
@@ -8322,15 +8618,44 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Improved Immolate': 'aura.improvedImmolate',
   'Demon Armor': 'aura.demonArmor',
   Desolation: 'aura.desolation',
+  Ruin: 'aura.destructionRuin',
+  'Ruinous Brand': 'aura.ruinousBrand',
+  'Duskfire Claim': 'aura.duskfireClaim',
+  'Pyre Guardian': 'aura.pyreGuardian',
   'Umbral Mastery': 'aura.umbralMastery',
   'Improved Fear': 'aura.improvedFear',
   'Unyielding Pact': 'aura.unyieldingPact',
   'Grimoire of Carnage': 'aura.grimoireOfCarnage',
   'Curse Mastery': 'aura.curseMastery',
 };
+
+const WARLOCK_ABILITY_AURA_IDS: Readonly<Record<string, string>> = {
+  'Umbral Anchor': 'umbral_anchor',
+  'Possess the Evil Eye': 'possess_evil_eye',
+  'Hour of Judgment': 'hour_of_judgment',
+  Coven: 'coven',
+  'Sacrilegious March': 'sacrilegious_march',
+  'Sanguine Covenant': 'dark_pact',
+};
+
+const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
+  'Blacktide',
+  'Leaden Hex',
+  'Shadow Credit',
+  'Hexstorm',
+  'Forbidden Reflection',
+]);
+
 export function localizeSimAuraName(name: string): string | null {
   const key = AURA_NAME_KEY[name];
-  return key ? tSim(key) : null;
+  if (key) return tSim(key);
+  if (name === 'Condemnation') return t('hudChrome.warlock.doomLabel');
+  if (name === 'Fate Threads') return t('hudChrome.warlock.fateThreadsLabel');
+  if (name === 'Soul Fragments') return t('hudChrome.procOverlay.soulFragmentsMeter');
+  const abilityId = WARLOCK_ABILITY_AURA_IDS[name];
+  if (abilityId) return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+  if (WARLOCK_TALENT_AURA_NAMES.has(name)) return localizeTalentTitle(name);
+  return null;
 }
 
 // A boss/mob "mechanic" name spliced into "{mob} unleashes {mechanic}!". Reuses the shared
@@ -8599,6 +8924,37 @@ function tArenaExtra(key: ArenaExtraKey, params?: InterpolationValues): string {
   return interpolate(table[key] ?? ARENA_EXTRA.en[key], params);
 }
 
+const ARENA_MIN_LEVEL_QUEUE_ERROR: Record<SupportedLanguage, string> = {
+  en: 'You must be level {level} to queue for the arena.',
+  en_CA: 'You must be level {level} to queue for the arena.',
+  es: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  es_ES: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  fr_FR: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  fr_CA: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  it_IT: "Devi essere di livello {level} per metterti in coda per l'arena.",
+  de_DE: 'Ihr müsst Stufe {level} sein, um Euch für die Arena anzumelden.',
+  zh_CN: '你必须达到 {level} 级才能加入竞技场队列。',
+  zh_TW: '你必須達到 {level} 級才能加入競技場佇列。',
+  ko_KR: '투기장 대기열에 들어가려면 레벨 {level}이어야 합니다.',
+  ja_JP: 'アリーナキューに入るにはレベル {level} が必要です。',
+  pt_BR: 'Você precisa estar no nível {level} para entrar na fila da arena.',
+  ru_RU: 'Чтобы встать в очередь арены, нужен уровень {level}.',
+  cs_CZ: 'Pro vstup do fronty arény musíš mít úroveň {level}.',
+  nl_NL: 'Je moet niveau {level} zijn om in de arena-wachtrij te gaan.',
+  pl_PL: 'Musisz mieć poziom {level}, aby dołączyć do kolejki areny.',
+  id_ID: 'Kamu harus level {level} untuk masuk antrean arena.',
+  tr_TR: 'Arena kuyruğuna girmek için seviye {level} olmalısın.',
+  sv_SE: 'Du måste vara nivå {level} för att gå med i arenakön.',
+  vi_VN: 'Bạn phải đạt cấp {level} để vào hàng đợi đấu trường.',
+  da_DK: 'Du skal være niveau {level} for at gå i arenakø.',
+};
+
+function tArenaMinLevelQueueError(level: string): string {
+  return interpolate(ARENA_MIN_LEVEL_QUEUE_ERROR[getLanguage()] ?? ARENA_MIN_LEVEL_QUEUE_ERROR.en, {
+    level,
+  });
+}
+
 // Thornhollow Fields 5v5 capture-the-flag emit strings (src/sim/social/battleground.ts).
 // English is authoritative; the non-Latin surfaces ship real fills (the M16
 // spirit) and the remaining locales fall back to English here until the
@@ -8620,6 +8976,7 @@ type BgExtraKey =
   | 'teamCrimson'
   | 'teamAzure'
   | 'errInBattleground'
+  | 'errNotInBattleground'
   | 'errQueueDead'
   | 'errQueueInMatch'
   | 'errMemberQueued'
@@ -8675,6 +9032,7 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
   teamCrimson: 'Crimson',
   teamAzure: 'Azure',
   errInBattleground: 'You are already in a battleground.',
+  errNotInBattleground: 'You are not in a battleground.',
   errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
   errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
   errMemberQueued: 'A party member is already queued or in a match.',
@@ -8713,6 +9071,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: '赤红队',
     teamAzure: '蔚蓝队',
     errInBattleground: '你已经在战场中了。',
+    errNotInBattleground: '你不在战场中。',
     errQueueDead: '死亡状态下无法排队进入荆谷原野。',
     errQueueInMatch: '比赛进行中无法排队进入荆谷原野。',
     errMemberQueued: '有队友已在队列或比赛中。',
@@ -8750,6 +9109,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: '赤紅隊',
     teamAzure: '蔚藍隊',
     errInBattleground: '你已經在戰場中了。',
+    errNotInBattleground: '你不在戰場中。',
     errQueueDead: '死亡狀態下無法排隊進入荊谷原野。',
     errQueueInMatch: '比賽進行中無法排隊進入荊谷原野。',
     errMemberQueued: '有隊友已在佇列或比賽中。',
@@ -8792,6 +9152,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'クリムゾン',
     teamAzure: 'アズール',
     errInBattleground: 'すでに戦場にいます。',
+    errNotInBattleground: '戦場にいません。',
     errQueueDead: '死亡中はソーンホロウ平原のキューに参加できません。',
     errQueueInMatch: '別の試合中はソーンホロウ平原のキューに参加できません。',
     errMemberQueued: 'パーティメンバーがすでにキューまたは試合に参加しています。',
@@ -8837,6 +9198,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: '진홍팀',
     teamAzure: '청람팀',
     errInBattleground: '이미 전장에 있습니다.',
+    errNotInBattleground: '전장에 있지 않습니다.',
     errQueueDead: '죽은 상태로는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
     errQueueInMatch: '다른 경기 중에는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
     errMemberQueued: '파티원이 이미 대기열이나 경기에 참가 중입니다.',
@@ -8882,6 +9244,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Багровых',
     teamAzure: 'Лазурных',
     errInBattleground: 'Вы уже находитесь на поле боя.',
+    errNotInBattleground: 'Вы не находитесь на поле боя.',
     errQueueDead: 'Нельзя встать в очередь Терновой Лощины, будучи мертвым.',
     errQueueInMatch: 'Нельзя встать в очередь Терновой Лощины во время другого матча.',
     errMemberQueued: 'Кто-то из группы уже в очереди или в матче.',
@@ -8928,6 +9291,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Crimson',
     teamAzure: 'Azure',
     errInBattleground: 'You are already in a battleground.',
+    errNotInBattleground: 'You are not in a battleground.',
     errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
     errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
     errMemberQueued: 'A party member is already queued or in a match.',
@@ -8976,6 +9340,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Carmesí',
     teamAzure: 'Azur',
     errInBattleground: 'Ya estás en un campo de batalla.',
+    errNotInBattleground: 'No estás en un campo de batalla.',
     errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
     errQueueInMatch:
       'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
@@ -9026,6 +9391,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Carmesí',
     teamAzure: 'Azur',
     errInBattleground: 'Ya estás en un campo de batalla.',
+    errNotInBattleground: 'No estás en un campo de batalla.',
     errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
     errQueueInMatch:
       'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
@@ -9075,6 +9441,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'les Cramoisis',
     teamAzure: 'les Azurs',
     errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errNotInBattleground: "Vous n'êtes pas sur un champ de bataille.",
     errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
     errQueueInMatch:
       'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
@@ -9124,6 +9491,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'les Cramoisis',
     teamAzure: 'les Azurs',
     errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errNotInBattleground: "Vous n'êtes pas sur un champ de bataille.",
     errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
     errQueueInMatch:
       'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
@@ -9173,6 +9541,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'i Cremisi',
     teamAzure: 'gli Azzurri',
     errInBattleground: 'Sei già in un campo di battaglia.',
+    errNotInBattleground: 'Non sei in un campo di battaglia.',
     errQueueDead: 'Non puoi entrare in coda per i Campi di Thornhollow da morto.',
     errQueueInMatch:
       'Non puoi entrare in coda per i Campi di Thornhollow mentre sei in un’altra partita.',
@@ -9224,6 +9593,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'die Karmesinroten',
     teamAzure: 'die Azurblauen',
     errInBattleground: 'Du bist bereits auf einem Schlachtfeld.',
+    errNotInBattleground: 'Du bist auf keinem Schlachtfeld.',
     errQueueDead: 'Du kannst dich nicht für die Thornhollow-Felder anmelden, solange du tot bist.',
     errQueueInMatch:
       'Du kannst dich nicht für die Thornhollow-Felder anmelden, während du in einem anderen Match bist.',
@@ -9274,6 +9644,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Carmesins',
     teamAzure: 'Azuis',
     errInBattleground: 'Você já está em um campo de batalha.',
+    errNotInBattleground: 'Você não está em um campo de batalha.',
     errQueueDead: 'Você não pode entrar na fila dos Campos de Thornhollow enquanto estiver morto.',
     errQueueInMatch:
       'Você não pode entrar na fila dos Campos de Thornhollow durante outra partida.',
@@ -9323,6 +9694,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Rudé',
     teamAzure: 'Azurové',
     errInBattleground: 'Už jsi na bojišti.',
+    errNotInBattleground: 'Nejsi na bojišti.',
     errQueueDead: 'Do fronty na Thornhollowská pole se nemůžeš zařadit mrtvý.',
     errQueueInMatch: 'Do fronty na Thornhollowská pole se nemůžeš zařadit během jiného zápasu.',
     errMemberQueued: 'Někdo ze skupiny už je ve frontě nebo v zápase.',
@@ -9370,6 +9742,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'de Karmozijnen',
     teamAzure: 'de Azuren',
     errInBattleground: 'Je bent al op een slagveld.',
+    errNotInBattleground: 'Je bent niet op een slagveld.',
     errQueueDead: 'Je kunt je niet aanmelden voor de Doornholte-Velden terwijl je dood bent.',
     errQueueInMatch:
       'Je kunt je niet aanmelden voor de Doornholte-Velden tijdens een andere wedstrijd.',
@@ -9420,6 +9793,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Szkarłatnych',
     teamAzure: 'Lazurowych',
     errInBattleground: 'Jesteś już na polu bitwy.',
+    errNotInBattleground: 'Nie jesteś na polu bitwy.',
     errQueueDead: 'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny, będąc martwym.',
     errQueueInMatch:
       'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny w trakcie innego meczu.',
@@ -9468,6 +9842,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Merah Tua',
     teamAzure: 'Biru Langit',
     errInBattleground: 'Kamu sudah berada di medan perang.',
+    errNotInBattleground: 'Kamu tidak berada di medan perang.',
     errQueueDead: 'Kamu tidak bisa mengantre Padang Thornhollow saat tewas.',
     errQueueInMatch:
       'Kamu tidak bisa mengantre Padang Thornhollow saat sedang dalam pertandingan lain.',
@@ -9515,6 +9890,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Kızıllar',
     teamAzure: 'Gökmaviler',
     errInBattleground: 'Zaten bir savaş alanındasın.',
+    errNotInBattleground: 'Bir savaş alanında değilsin.',
     errQueueDead: 'Ölüyken Dikenvadi Ovaları sırasına giremezsin.',
     errQueueInMatch: 'Başka bir maçtayken Dikenvadi Ovaları sırasına giremezsin.',
     errMemberQueued: 'Grup üyelerinden biri zaten sırada ya da bir maçta.',
@@ -9558,6 +9934,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'de Karmosinröda',
     teamAzure: 'de Azurblå',
     errInBattleground: 'Du är redan på ett slagfält.',
+    errNotInBattleground: 'Du är inte på ett slagfält.',
     errQueueDead: 'Du kan inte köa till Törnhålefälten medan du är död.',
     errQueueInMatch: 'Du kan inte köa till Törnhålefälten under en annan match.',
     errMemberQueued: 'En gruppmedlem står redan i kö eller är i en match.',
@@ -9601,6 +9978,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'phe Đỏ Thẫm',
     teamAzure: 'phe Xanh Biếc',
     errInBattleground: 'Bạn đã ở trong một chiến trường rồi.',
+    errNotInBattleground: 'Bạn không ở trong chiến trường.',
     errQueueDead: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đã chết.',
     errQueueInMatch: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đang ở trận đấu khác.',
     errMemberQueued: 'Một thành viên tổ đội đã ở trong hàng chờ hoặc đang thi đấu.',
@@ -9647,6 +10025,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'de Karmosinrøde',
     teamAzure: 'de Azurblå',
     errInBattleground: 'Du er allerede på en slagmark.',
+    errNotInBattleground: 'Du er ikke på en slagmark.',
     errQueueDead: 'Du kan ikke stille dig i kø til Tornehule Sletter, mens du er død.',
     errQueueInMatch: 'Du kan ikke stille dig i kø til Tornehule Sletter under en anden kamp.',
     errMemberQueued: 'Et gruppemedlem står allerede i kø eller er i en kamp.',
@@ -10489,6 +10868,11 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  {
+    re: /^Your Umbral Anchor is out of range\.$/,
+    build: () =>
+      `${tEntity({ kind: 'ability', id: 'umbral_anchor', field: 'name' })}: ${t('hud.errors.outOfRange')}`,
+  },
   // #1144: timed town-focus re-spec queued (Sim.setTownFocus).
   {
     re: /^Your focus re-spec will complete in (\d+)s\.$/,
@@ -10619,7 +11003,7 @@ const RULES: Rule[] = [
   },
   {
     re: /^You must be level (\d+) to queue for the arena\.$/,
-    build: (m) => tSim('error.arenaMinLevel', { level: m[1] }),
+    build: (m) => tArenaMinLevelQueueError(m[1]),
   },
   {
     re: /^(.+) must be at least level (\d+) to queue for the arena\.$/,
@@ -10638,6 +11022,10 @@ const RULES: Rule[] = [
   { re: /^Deleted build "(.+)"\.$/, build: (m) => tSim('log.deletedBuild', { name: m[1] }) },
   { re: /^You dismiss (.+)\.$/, build: (m) => tSim('log.dismissPet', { name: locMob(m[1]) }) },
   { re: /^You summon (.+)\.$/, build: (m) => tSim('log.summonDemon', { name: locMob(m[1]) }) },
+  {
+    re: /^(.+) crashes into the battle\.$/,
+    build: (m) => tSim('log.pyreCrashes', { name: locMob(m[1]) }),
+  },
   {
     re: /^(.+) fades back into the void\.$/,
     build: (m) => tSim('log.petFadesVoid', { name: locMob(m[1]) }),
@@ -10867,6 +11255,7 @@ const RULES: Rule[] = [
     re: /^You join the Ashen Coliseum 2v2 queue\. Stand by for opponents[.…]{1,3}$/,
     build: () => tArenaExtra('join2v2'),
   },
+  { re: /^You leave the Ashen Coliseum queue\.$/, build: () => t('hud.logs.arenaLeave') },
   { re: /^You leave the Ashen Coliseum 2v2 queue\.$/, build: () => tArenaExtra('leave2v2') },
   {
     re: /^Your team leaves the Ashen Coliseum 2v2 queue\.$/,
@@ -10982,6 +11371,7 @@ const RULES: Rule[] = [
   { re: /^You seize a Battle Rune!$/, build: () => tBg('seizeBattleRune') },
   { re: /^You seize a Ward Rune!$/, build: () => tBg('seizeWardRune') },
   { re: /^You are already in a battleground\.$/, build: () => tBg('errInBattleground') },
+  { re: /^You are not in a battleground\.$/, build: () => tBg('errNotInBattleground') },
   {
     re: /^You cannot queue for Thornhollow Fields while dead\.$/,
     build: () => tBg('errQueueDead'),

@@ -1033,4 +1033,31 @@ export const ja_JP: Record<string, string> = {
   'bugReports.reviewed': '確認済み',
   'dialog.report': '報告',
   'theme.darkModeLabel': 'ダークモード',
+  'error.cannotRateLimitAdmin': '管理者アカウントはレート制限できません',
+  'error.generalChatRateLimitMessages': '{min}件から{max}件までのメッセージ数を入力してください。',
+  'error.generalChatRateLimitReasonInvalid':
+    'モデレーション理由は{max}文字以内で入力してください。',
+  'error.generalChatRateLimitRequired':
+    '有効な一般チャットのレート制限を選択するか、削除してください。',
+  'error.generalChatRateLimitWindowMinutes':
+    'ウィンドウは{min}分から{max}分の範囲で入力してください。',
+  'generalChatRateLimit.confirmRemove': '制限を削除',
+  'generalChatRateLimit.current': '現在のレート: {minutes}分間で{messages}件のメッセージを許可',
+  'generalChatRateLimit.edit': '制限を編集',
+  'generalChatRateLimit.messagesError': '{min}から{max}までの整数を入力してください。',
+  'generalChatRateLimit.messagesLabel': '許可メッセージ数',
+  'generalChatRateLimit.reasonPlaceholder': 'この一般チャットのレート制限を変更する理由は？',
+  'generalChatRateLimit.reasonRequired': 'モデレーション理由を入力してください。',
+  'generalChatRateLimit.reasonTooLong': '理由は{max}文字以内にしてください。',
+  'generalChatRateLimit.remove': '制限を削除',
+  'generalChatRateLimit.removeHint':
+    'このアカウントの上書き設定を削除すると、一般チャットは無制限に戻ります。',
+  'generalChatRateLimit.save': '制限を保存',
+  'generalChatRateLimit.scope':
+    '一般チャットにのみ適用されます。他のチャットチャンネルには影響しません。',
+  'generalChatRateLimit.title': '一般チャットのレート制限',
+  'generalChatRateLimit.unlimited': '無制限',
+  'generalChatRateLimit.windowMinutesError': '{min}から{max}までの整数を入力してください。',
+  'generalChatRateLimit.windowMinutesLabel': 'ウィンドウの長さ（分）',
+  'moderationHistory.actionGeneralChatRateLimit': '一般チャットのレート制限変更',
 };

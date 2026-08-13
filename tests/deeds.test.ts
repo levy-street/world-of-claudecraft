@@ -31,9 +31,10 @@ import { type ArenaMatch, type CharacterState, Sim } from '../src/sim/sim';
 import * as duelMod from '../src/sim/social/duel';
 import { type Entity, MAX_LEVEL, MILESTONES, type SimEvent } from '../src/sim/types';
 import { runSalvage } from './helpers/enchant_family_cast';
+import { VENDOR_TEST_WORLD } from './sim_shared';
 
 function makeSim(seed = 42): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: VENDOR_TEST_WORLD });
 }
 
 function primary(sim: Sim) {
@@ -52,7 +53,12 @@ function deedEvents(evs: SimEvent[]): Extract<SimEvent, { type: 'deedUnlocked' }
 // fiesta-takedown arm of dealDamage can be driven directly. Mirrors the
 // startFiesta harness in tests/fiesta.test.ts.
 function startFiestaBout(): { sim: Sim; match: ArenaMatch } {
-  const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: VENDOR_TEST_WORLD,
+  });
   const pids = [
     sim.addPlayer('warrior', 'P0'),
     sim.addPlayer('mage', 'P1'),
@@ -73,7 +79,12 @@ function startFiestaBout(): { sim: Sim; match: ArenaMatch } {
 // the yumi player-down arm of dealDamage can be driven directly. Mirrors the
 // startYumi3 harness in tests/yumi_match.test.ts.
 function startYumiBout(): { sim: Sim; match: ArenaMatch } {
-  const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: VENDOR_TEST_WORLD,
+  });
   const pids = [
     sim.addPlayer('warrior', 'P0'),
     sim.addPlayer('mage', 'P1'),
@@ -392,6 +403,27 @@ describe('grant path', () => {
     expect(meta.renown).toBe(before + 5);
   });
 
+  it('refuses a prototype-keyed id a bare index would resolve, so renown never goes NaN', () => {
+    // DEEDS is a plain object, so grantDeed(meta, '__proto__') without the hasOwn
+    // guard resolves def = Object.prototype (truthy, past `!def`), then runs
+    // `renown += undefined` (NaN, and it seeds the SQL sort index) and adds a
+    // non-string legacy value to unlockedMilestones. The guard fails closed.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    grantDeed(sim.ctx, meta, 'soc_meet_bursar'); // a real 5-renown grant first
+    const before = meta.renown;
+    const earnedBefore = meta.deedsEarned.size;
+    const milestonesBefore = meta.unlockedMilestones.size;
+    for (const key of ['__proto__', 'constructor', 'toString', 'valueOf']) {
+      expect(sim.ctx.grantDeed(meta, key), key).toBe(false);
+    }
+    expect(Number.isNaN(meta.renown)).toBe(false);
+    expect(meta.renown).toBe(before);
+    expect(meta.deedsEarned.size).toBe(earnedBefore);
+    expect(meta.deedsEarned.has('__proto__')).toBe(false);
+    expect(meta.unlockedMilestones.size).toBe(milestonesBefore);
+  });
+
   it('the meta fixpoint resolves chained deeds within a single pass', () => {
     const sim = makeSim();
     const { meta, e } = primary(sim);
@@ -669,8 +701,8 @@ describe('retro on join', () => {
   });
 
   it('the retro pass is a pure function of the loaded state and the catalog', () => {
-    const a = new Sim({ seed: 7, playerClass: 'mage' });
-    const b = new Sim({ seed: 7, playerClass: 'mage' });
+    const a = new Sim({ seed: 7, playerClass: 'mage', world: VENDOR_TEST_WORLD });
+    const b = new Sim({ seed: 7, playerClass: 'mage', world: VENDOR_TEST_WORLD });
     const pa = a.addPlayer('warrior', 'Same', { state: veteranState() });
     const pb = b.addPlayer('warrior', 'Same', { state: veteranState() });
     expect([...a.players.get(pa)!.deedsEarned.keys()].sort()).toEqual(
@@ -1514,6 +1546,11 @@ describe('bounded sets on load', () => {
       visited: [
         'poi:eastbrook_vale:eastbrook',
         'gather_event:perfect_specimen',
+        // Same round-trip contract for the masterwork proof marks: the
+        // Reliquary trophy refills from them at join, so a load-drop would
+        // strand a lifetime trophy on every relog.
+        'masterwork:first',
+        'masterwork:weaponcrafting',
         'garbage',
         'evil:namespace',
       ],
@@ -1522,6 +1559,8 @@ describe('bounded sets on load', () => {
     expect([...stats.visited]).toEqual([
       'poi:eastbrook_vale:eastbrook',
       'gather_event:perfect_specimen',
+      'masterwork:first',
+      'masterwork:weaponcrafting',
     ]);
   });
 });
@@ -1715,7 +1754,12 @@ describe('site wiring (real modules, not direct bumps)', () => {
   });
 
   it('a shared party kill through handleDeath credits kills to every eligible member, not just the tapper', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const puller = sim.addPlayer('warrior', 'Puller');
     const healer = sim.addPlayer('priest', 'Healer');
     sim.tick();
@@ -1828,7 +1872,12 @@ describe('active title selection (setActiveTitle)', () => {
     const state = sim.serializeCharacter(sim.playerId)!;
     expect(state.activeTitle).toBe('prog_veteran');
 
-    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Loaded', { state });
     expect(sim2.players.get(pid)!.activeTitle).toBe('prog_veteran');
     expect(sim2.entities.get(pid)!.title).toBe('prog_veteran');
@@ -1845,7 +1894,12 @@ describe('active title selection (setActiveTitle)', () => {
     const legacy: CharacterState = { ...state };
     delete legacy.activeTitle;
 
-    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Legacy', { state: legacy });
     expect(sim2.players.get(pid)!.activeTitle).toBeNull();
     expect(sim2.entities.get(pid)!.title).toBeNull();
@@ -1863,10 +1917,295 @@ describe('active title selection (setActiveTitle)', () => {
     const state = sim.serializeCharacter(sim.playerId)!;
     const tampered: CharacterState = { ...state, deeds: {} }; // the earned record vanished
 
-    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Stale', { state: tampered });
     expect(sim2.players.get(pid)!.activeTitle).toBeNull();
     expect(sim2.entities.get(pid)!.title).toBeNull();
+  });
+});
+
+describe('active border selection (setActiveBorder)', () => {
+  // The nameplate border is the title's sibling cosmetic: same earned set,
+  // same reward field, different reward KIND. prog_prestige_10 rewards
+  // { kind: 'border', slug: 'prestige_laurels' }; dgn_deepward is the second
+  // border deed (tests/deeds_content.test.ts pins all four).
+  const BORDER_DEED = 'prog_prestige_10';
+
+  it('accepts an earned border-reward deed and stamps meta AND entity together', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    grantDeed(sim.ctx, meta, BORDER_DEED);
+    sim.setActiveBorder(BORDER_DEED);
+    // both read paths agree within the same tick: no tick() between set and read
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+    // the stored value is the DEED ID, never the reward slug
+    expect(meta.activeBorder).not.toBe('prestige_laurels');
+    expect((DEEDS[BORDER_DEED].reward as { slug: string }).slug).toBe('prestige_laurels');
+  });
+
+  it('the activeBorder facet getter reads the border field, not the title', () => {
+    // A getter wired to primary.activeTitle would return the title id here and
+    // pass every meta.activeBorder / e.border assertion in this file (those read
+    // the field directly). Distinct ids make the wrong-field wiring visible:
+    // this is the read behind the self portrait ring (hud playerFrame.borderSlug)
+    // and the picker's worn state.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    grantDeed(sim.ctx, meta, 'prog_veteran'); // title reward
+    grantDeed(sim.ctx, meta, BORDER_DEED); // border reward
+    sim.setActiveTitle('prog_veteran');
+    sim.setActiveBorder(BORDER_DEED);
+    expect(sim.activeBorder).toBe(BORDER_DEED);
+    expect(sim.activeTitle).toBe('prog_veteran');
+    expect(sim.activeBorder).not.toBe(sim.activeTitle);
+  });
+
+  it('silently rejects an unearned deed, an earned rewardless deed, an earned TITLE deed, and an unknown id', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    grantDeed(sim.ctx, meta, BORDER_DEED);
+    sim.setActiveBorder(BORDER_DEED);
+
+    // unearned border deed (dgn_deepward is a real border deed, not earned here)
+    sim.setActiveBorder('dgn_deepward');
+    expect(meta.activeBorder).toBe(BORDER_DEED); // prior selection untouched
+    expect(e.border).toBe(BORDER_DEED);
+
+    // earned, but carries no reward at all
+    grantDeed(sim.ctx, meta, 'prog_first_steps');
+    sim.setActiveBorder('prog_first_steps');
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+
+    // earned, but the reward is a title, not a border (the cross-kind arm;
+    // the title setter's mirror-image case is pinned in the title suite above)
+    grantDeed(sim.ctx, meta, 'prog_veteran');
+    sim.setActiveBorder('prog_veteran');
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+
+    // unknown/deleted id
+    sim.setActiveBorder('prog_not_a_deed');
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+
+    // content drift: EARNED on an older content version but since removed
+    // from DEEDS (the earned-map hit must not bypass the catalog check)
+    meta.deedsEarned.set('zz_removed_by_content_patch', '2025-01-01');
+    sim.setActiveBorder('zz_removed_by_content_patch');
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+  });
+
+  it('silently rejects a prototype key and an absurdly long id, even when EARNED', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    grantDeed(sim.ctx, meta, BORDER_DEED);
+    sim.setActiveBorder(BORDER_DEED);
+
+    // DEEDS is a plain object: a bare index on '__proto__' or 'constructor'
+    // resolves to a truthy prototype value, so the earned-map check is not the
+    // only thing standing between a hostile id and a stamped border. Earned
+    // here on purpose, to clear that first check and reach the catalog one.
+    for (const hostile of ['__proto__', 'constructor', 'toString']) {
+      meta.deedsEarned.set(hostile, '2026-08-08');
+      sim.setActiveBorder(hostile);
+      expect(meta.activeBorder, `${hostile} must not become a worn border`).toBe(BORDER_DEED);
+      expect(e.border).toBe(BORDER_DEED);
+    }
+
+    // A 20k-character id: a no-op, never a stored value that would ride the
+    // identity wire to every viewer in range.
+    const huge = 'x'.repeat(20000);
+    sim.setActiveBorder(huge);
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+    meta.deedsEarned.set(huge, '2026-08-08'); // and still a no-op once "earned"
+    sim.setActiveBorder(huge);
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+  });
+
+  it('refuses a prototype-chain deed record that a bare index WOULD accept', () => {
+    // The decisive arm for the Object.hasOwn guard in both validators. The
+    // arms above stay green with the guard deleted, because no natural
+    // prototype value carries a reward; this one plants a record that looks
+    // exactly like a border deed on Object.prototype, which is what a bare
+    // DEEDS[id] index would happily resolve.
+    const POLLUTED = 'planted_by_prototype';
+    Object.defineProperty(Object.prototype, POLLUTED, {
+      value: { reward: { kind: 'border', slug: 'prestige_laurels' } },
+      configurable: true,
+      enumerable: false,
+    });
+    try {
+      const sim = makeSim();
+      const { meta, e } = primary(sim);
+      meta.deedsEarned.set(POLLUTED, '2026-08-08'); // clears the earned check
+      expect(DEEDS[POLLUTED]?.reward?.kind).toBe('border'); // a bare index resolves it
+      sim.setActiveBorder(POLLUTED);
+      expect(meta.activeBorder).toBeNull();
+      expect(e.border).toBeNull();
+
+      // The title validator is the same shape and gets the same guard.
+      Object.defineProperty(Object.prototype, POLLUTED, {
+        value: { reward: { kind: 'title', text: 'the Planted' } },
+        configurable: true,
+        enumerable: false,
+      });
+      sim.setActiveTitle(POLLUTED);
+      expect(meta.activeTitle).toBeNull();
+      expect(e.title).toBeNull();
+    } finally {
+      delete (Object.prototype as Record<string, unknown>)[POLLUTED];
+    }
+  });
+
+  it('is a silent no-op for an unresolvable player id', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    grantDeed(sim.ctx, meta, BORDER_DEED);
+    // No entity 9999: the setter must resolve nothing and throw nothing (the
+    // server dispatch passes a session pid that a leave can retire mid-frame).
+    expect(() => sim.setActiveBorder(BORDER_DEED, 9999)).not.toThrow();
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+  });
+
+  it('loads a hostile saved activeBorder shape as borderless, without throwing', () => {
+    // The load path coerces with `typeof s.activeBorder === 'string'`, and a
+    // save is attacker-influenced state (a tampered blob, a drifted writer).
+    // Every non-string shape must land borderless on BOTH reads, not throw and
+    // not stamp a non-string onto the entity wire field.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    grantDeed(sim.ctx, meta, BORDER_DEED);
+    sim.setActiveBorder(BORDER_DEED);
+    const state = sim.serializeCharacter(sim.playerId)!;
+
+    const hostile: unknown[] = [
+      7,
+      { deedId: BORDER_DEED },
+      [BORDER_DEED],
+      new String(BORDER_DEED),
+      '',
+    ];
+    for (const shape of hostile) {
+      const tampered = { ...state, activeBorder: shape } as unknown as CharacterState;
+      const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+      let pid = -1;
+      expect(
+        () => {
+          pid = sim2.addPlayer('warrior', 'Tampered', { state: tampered });
+        },
+        `activeBorder: ${JSON.stringify(shape)} must load without throwing`,
+      ).not.toThrow();
+      expect(
+        sim2.players.get(pid)!.activeBorder,
+        `${typeof shape} must load borderless`,
+      ).toBeNull();
+      expect(sim2.entities.get(pid)!.border).toBeNull();
+    }
+  });
+
+  it('the two cosmetics are independent: selecting one never disturbs the other', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    grantDeed(sim.ctx, meta, BORDER_DEED);
+    grantDeed(sim.ctx, meta, 'prog_veteran');
+    sim.setActiveBorder(BORDER_DEED);
+    sim.setActiveTitle('prog_veteran');
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(meta.activeTitle).toBe('prog_veteran');
+
+    // clearing the border leaves the title worn, and the reverse
+    sim.setActiveBorder(null);
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+    expect(meta.activeTitle).toBe('prog_veteran');
+    expect(e.title).toBe('prog_veteran');
+
+    sim.setActiveBorder(BORDER_DEED);
+    sim.setActiveTitle(null);
+    expect(meta.activeTitle).toBeNull();
+    expect(e.title).toBeNull();
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+  });
+
+  it('null clears both the meta field and the entity wire field', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    grantDeed(sim.ctx, meta, BORDER_DEED);
+    sim.setActiveBorder(BORDER_DEED);
+    sim.setActiveBorder(null);
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+  });
+
+  it('a saved border round-trips through save/load onto meta and the spawned entity', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    grantDeed(sim.ctx, meta, BORDER_DEED);
+    sim.setActiveBorder(BORDER_DEED);
+    const state = sim.serializeCharacter(sim.playerId)!;
+    expect(state.activeBorder).toBe(BORDER_DEED);
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim2.addPlayer('warrior', 'Loaded', { state });
+    expect(sim2.players.get(pid)!.activeBorder).toBe(BORDER_DEED);
+    expect(sim2.entities.get(pid)!.border).toBe(BORDER_DEED);
+  });
+
+  it('the serializer omits the key while borderless (pre-border saves stay byte-equal)', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    grantDeed(sim.ctx, meta, BORDER_DEED); // earned but never selected
+    const state = sim.serializeCharacter(sim.playerId)!;
+    expect('activeBorder' in state).toBe(false);
+  });
+
+  it('a save written before borders existed (no activeBorder key) loads as borderless', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    grantDeed(sim.ctx, meta, BORDER_DEED);
+    sim.setActiveBorder(BORDER_DEED);
+    const state = sim.serializeCharacter(sim.playerId)!;
+    // activeBorder is optional on CharacterState precisely so old saves load;
+    // the serializer also omits it when null, and this pins that both forms
+    // (absent key, never-set) land borderless
+    const legacy: CharacterState = { ...state };
+    delete legacy.activeBorder;
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim2.addPlayer('warrior', 'Legacy', { state: legacy });
+    expect(sim2.players.get(pid)!.activeBorder).toBeNull();
+    expect(sim2.entities.get(pid)!.border).toBeNull();
+    // the earned record itself still loads
+    expect(sim2.players.get(pid)!.deedsEarned.has(BORDER_DEED)).toBe(true);
+  });
+
+  it('a stale saved border (earned record lost) loads as borderless instead of dangling', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // dgn_deepward is a NON-milestone border deed: a milestone id would
+    // re-enter the earned map through the legacy unlockedMilestones union and
+    // defeat the staleness.
+    grantDeed(sim.ctx, meta, 'dgn_deepward');
+    sim.setActiveBorder('dgn_deepward');
+    const state = sim.serializeCharacter(sim.playerId)!;
+    const tampered: CharacterState = { ...state, deeds: {} }; // the earned record vanished
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim2.addPlayer('warrior', 'Stale', { state: tampered });
+    expect(sim2.players.get(pid)!.activeBorder).toBeNull();
+    expect(sim2.entities.get(pid)!.border).toBeNull();
   });
 });
 
@@ -1895,7 +2234,12 @@ describe('deedsRecent (offline facet arm)', () => {
     const granted = ['dgn_korzul_flawless', 'prog_first_steps', 'cmb_first_blood'];
     for (const id of granted) grantDeed(sim.ctx, meta, id);
     const state = sim.serializeCharacter(sim.playerId);
-    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     // JSON round-trip: exactly what the offline save does, and the step that
     // would destroy the order if key order were not preserved.
     sim2.addPlayer('warrior', 'Reload', { state: JSON.parse(JSON.stringify(state)) });

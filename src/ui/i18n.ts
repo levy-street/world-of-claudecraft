@@ -97,9 +97,10 @@ let pseudoActive = false;
  *  English, {placeholders} preserved). The `!import.meta.env.PROD` guard mirrors
  *  tableFor, so a release build statically resolves this to `false` and any
  *  consumer's pseudo branch tree-shakes away. Player text that resolves its
- *  English OUTSIDE the catalog table (deed names/descs/titles come from the sim
- *  content table, so tableFor never pseudo-folds them) consults this to fold at
- *  render time (src/ui/deed_i18n.ts). */
+ *  English OUTSIDE the catalog table (deed and reliquary-page names come from
+ *  the sim content tables, so tableFor never pseudo-folds them) consults this
+ *  to fold at render time (src/ui/i18n_pseudo_port.ts, shared by the deed and
+ *  reliquary channels). */
 export function isPseudoActive(): boolean {
   return !import.meta.env.PROD && pseudoActive;
 }
@@ -194,7 +195,9 @@ export function setLanguage(lang: SupportedLanguage): void {
 // statically available (only `en` is), so the bootstrap await (src/main.ts startGame,
 // behind the loading screen) is a REAL per-locale fetch that populates resident before the
 // HUD's first localized paint.
-const resident: Partial<Record<SupportedLanguage, EnTranslations>> = { en };
+const resident: Partial<Record<SupportedLanguage, EnTranslations>> & { en: EnTranslations } = {
+  en,
+};
 // One in-flight load promise per locale so concurrent callers coalesce onto a single
 // import instead of racing N of them.
 const inflight = new Map<SupportedLanguage, Promise<void>>();
@@ -348,7 +351,7 @@ function tableFor(lang: SupportedLanguage): EnTranslations {
   // resident.en is the universal English fallback for a locale not yet loaded (or one whose
   // chunk failed to fetch): the synchronous read never blocks and never throws. Callers that
   // need the localized table await ensureLocaleLoaded(lang) first (bootstrap / picker).
-  return resident[lang] ?? resident.en!;
+  return resident[lang] ?? resident.en;
 }
 
 // --- the resolved-string memo (hitch-elimination B3) -----------------------

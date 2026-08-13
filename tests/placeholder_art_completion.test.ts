@@ -280,7 +280,15 @@ describe('v0.36 placeholder-art completion evidence', () => {
     const targets = manifest().targetSets;
     expect(targets.deeds).toEqual([...COMPLETION_DEED_IDS]);
     expect(targets.deeds.every((id) => DEED_IMAGE_IDS.has(id))).toBe(true);
-    expect(targets.weaponItems).toEqual(sorted(Object.keys(ITEM_WEAPON_VARIANTS)));
+    // The campaign's frozen weapon scope predates the class-overhaul
+    // integration's four daggers (integration-dagger-icons-2026-08-10 owns
+    // their art), so the live registry minus that batch is the campaign set.
+    const INTEGRATION_WEAPON_IDS = ['boneglass_shiv', 'duskwhisper', 'marrowpoint', 'rimefang'];
+    expect(targets.weaponItems).toEqual(
+      sorted(
+        Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !INTEGRATION_WEAPON_IDS.includes(id)),
+      ),
+    );
     expect(targets.itemCleanup).toEqual([...CLEANUP_ITEM_IDS]);
 
     const generatedSpecs = sorted(

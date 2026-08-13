@@ -3,15 +3,16 @@
 //
 // Reads the selection decision the `changes` job relayed (TEST_MODE,
 // TEST_MODE_REASON, CHANGED_FILES) plus this job's `--shard=i/N` (or
-// `--lane=long-sims`) argv, builds the legs through the pure planner
+// `--lane=long-sims-a` / `--lane=long-sims-b`) argv, builds the legs through the pure planner
 // (lib/ci_shard_plan.mjs), prints the whole decision so a suspicious green can
 // be audited from the job log alone, and runs the legs through the leg
 // runner (lib/ci_leg_runner.mjs), which carries the ONE sanctioned
 // known-flake retry: the exact teardown-rpc signature, every test passed but
 // exit 1 (Phase 6; docs/qa-gate.md, "Known-flake handling"). Fail closed
-// everywhere: any unreadable input runs this job's full half, the shard's
-// suite-minus-lane or the lane's whole CI_LONG_SUITES list, whose union is
-// exactly the pre-selection full suite.
+// everywhere: any unreadable input runs this job's full share, the shard's
+// suite-minus-lane or the lane job's whole CI_LONG_SUITE_HALVES list, whose
+// union across the shards and both lane jobs is exactly the pre-selection
+// full suite.
 //
 // Selection applies to PR-tier CI only: release-gate keeps its unconditional
 // `npm test -- --shard=i/N` run line and never runs this script, and the
@@ -27,18 +28,20 @@ import { collectSuiteVisibility } from './lib/gate_discovery.mjs';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const usage =
-  '[ci-shard] usage: node scripts/ci_shard_test.mjs (--shard=<i>/<N> | --lane=long-sims) [--plan-only]';
+  '[ci-shard] usage: node scripts/ci_shard_test.mjs (--shard=<i>/<N> | --lane=long-sims-a | --lane=long-sims-b) [--plan-only]';
 
 const argv = process.argv.slice(2);
 const shard = parseShardArg(argv);
-// The long-sims lane ("PR gate (long sims)"): the one job that runs the
-// CI_LONG_SUITES files the shard legs exclude. Exactly one --lane flag with
-// the exact literal; any other value, a duplicate, or ANY --shard token
-// beside it (even a malformed one parseShardArg rejects) is a wiring bug,
-// same doctrine as a malformed shard spec: fail loud, never guess a
-// partition.
+// The long-sims lanes ("PR gate (long sims A)" / "PR gate (long sims B)"):
+// the two jobs that split the CI_LONG_SUITES files the shard legs exclude
+// (CI_LONG_SUITE_HALVES). Exactly one --lane flag with one of the two exact
+// literals; any other value, a duplicate, or ANY --shard token beside it
+// (even a malformed one parseShardArg rejects) is a wiring bug, same
+// doctrine as a malformed shard spec: fail loud, never guess a partition.
 const laneArgs = argv.filter((a) => a.startsWith('--lane='));
-const lane = laneArgs.length === 1 && laneArgs[0] === '--lane=long-sims';
+const LANE_FLAGS = { '--lane=long-sims-a': 'a', '--lane=long-sims-b': 'b' };
+const laneHalf = laneArgs.length === 1 ? (LANE_FLAGS[laneArgs[0]] ?? null) : null;
+const lane = laneHalf !== null;
 const hasShardToken = argv.some((a) => a.startsWith('--shard='));
 if ((laneArgs.length > 0 && !lane) || (lane && hasShardToken) || (!lane && !shard)) {
   console.error(usage);
@@ -103,6 +106,7 @@ const plan = lane
       testFiles,
       workers,
       exists,
+      half: laneHalf,
     })
   : buildShardPlan({
       mode,
@@ -116,7 +120,7 @@ const plan = lane
 
 console.log(
   lane
-    ? `[ci-shard] long-sims lane, workers=${workers}`
+    ? `[ci-shard] long-sims-${laneHalf} lane, workers=${workers}`
     : `[ci-shard] shard ${shard.index}/${shard.total}, workers=${workers}`,
 );
 console.log(
@@ -141,10 +145,10 @@ if (lane) {
 } else {
   if (plan.laneExcluded.length > 0) {
     // Shard-side half of the lane accounting: these files are excluded from
-    // every leg below and owned by the "PR gate (long sims)" job in this run.
+    // every leg below and owned by the two long-sims lane jobs in this run.
     console.log(
       `[ci-shard] long-sims lane: ${plan.laneExcluded.length} suite(s) excluded from this ` +
-        'shard and owned by the "PR gate (long sims)" job',
+        'shard and owned by the "PR gate (long sims A)" and "PR gate (long sims B)" jobs',
     );
   }
   if (plan.mode === 'selective') {
@@ -193,7 +197,7 @@ if (planOnly) {
   } else {
     console.log(
       `\n[ci-shard] PASS: ${plan.legs.length} leg(s) green on ${
-        lane ? 'the long-sims lane' : `shard ${shard.index}/${shard.total}`
+        lane ? `the long-sims-${laneHalf} lane` : `shard ${shard.index}/${shard.total}`
       }${
         result.retriedLegNames.length > 0
           ? ` (known-flake retry used on: ${result.retriedLegNames.join(', ')})`

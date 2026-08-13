@@ -127,6 +127,10 @@ export const it_IT: EnTranslations = {
         "label": "Equipaggia kit livello 20",
         "description": "Equipaggia il preset di livello 20 pre-Santuario per una specializzazione, prima le borse. Solo equipaggiamento."
       },
+      "biskit": {
+        "label": "Equipaggia kit BIS livello 20",
+        "description": "Equipaggia il set epico migliore di una specializzazione in ogni slot. Solo equipaggiamento."
+      },
       "gold": {
         "label": "Aggiungi oro",
         "description": "Aggiunge oro alla borsa attuale."
@@ -240,7 +244,8 @@ export const it_IT: EnTranslations = {
     },
     "hud": {
       "lowMana": "Mana basso",
-      "lowEnergy": "Energia bassa"
+      "lowEnergy": "Energia bassa",
+      "lowFocus": "Concentrazione bassa"
     },
     "talents": {
       "title": "Talenti",
@@ -316,6 +321,25 @@ export const it_IT: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Condanna",
+      "fateThreadsLabel": "Filamenti del Fato",
+      "doomMeterUnlock": "Sposta la barra della risorsa Afflizione",
+      "doomMeterLock": "Blocca la barra della risorsa Afflizione",
+      "doomEmptyStatus": "{value} su {max} Condanna.",
+      "doomStatus": "{value} su {max} Condanna; {remaining}.",
+      "fateThreadsStatus": "{value} su {max} Filamenti del Fato.",
+      "fateThreadsConsumeReady": "Tre Filamenti del Fato: Divorare può intrecciarli in Condanna aggiuntiva.",
+      "fateThreadsSentenceReady": "Tre Filamenti del Fato: Sentence può consumarli per un aumento del 18% dei danni."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Frammenti d'Anima",
+      "ruinMeter": "Rovina",
+      "ruinStatus": "{value} su {max} Rovina"
+    },
+    "comboMeter": {
+      "label": "PC"
+    },
     "spectate": {
       "banner": "Stai osservando {name}"
     },
@@ -337,10 +361,10 @@ export const it_IT: EnTranslations = {
       "healerConfirmCancel": "Annulla"
     },
     "wiki": {
-      "confirmTitle": "Open the Wiki?",
-      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
-      "confirmOpen": "Open Wiki",
-      "confirmCancel": "Cancel"
+      "confirmTitle": "Aprire la Wiki?",
+      "confirmBody": "Questo apre la wiki di World of ClaudeCraft nel tuo browser. Il gioco continua a funzionare.",
+      "confirmOpen": "Apri la Wiki",
+      "confirmCancel": "Annulla"
     },
     "unstuck": {
       "menuButton": "Sblocco",
@@ -373,7 +397,7 @@ export const it_IT: EnTranslations = {
       "unavailable": "Sblocco non è disponibile nel tuo stato attuale."
     },
     "fct": {
-      "absorbed": "Assorbito {amount}",
+      "absorbed": "Assorbito ({amount})",
       "cheap": "Costo ridotto!"
     },
     "emotes": {
@@ -777,6 +801,11 @@ export const it_IT: EnTranslations = {
       "resetAction": "Ripristina",
       "note": "Trascina la barra delle schede della chat per spostare la finestra, oppure l'angolo per ridimensionarla. Ripristina la riporta a posizione e dimensioni predefinite."
     },
+    "chatQuota": {
+      "limitReached": "Limite della chat Generale raggiunto. Riprova tra {seconds}.",
+      "pending": "Il tuo messaggio precedente nella chat Generale si sta ancora inviando. Riprova tra un momento.",
+      "unavailable": "La chat Generale è temporaneamente non disponibile. Riprova tra poco."
+    },
     "swing": {
       "ready": "Attacco",
       "seconds": "{seconds}s"
@@ -787,6 +816,14 @@ export const it_IT: EnTranslations = {
     },
     "rest": {
       "resting": "A riposo"
+    },
+    "paladin": {
+      "devotion": "Devozione",
+      "devotionValue": "Devozione {value} su {max}",
+      "devotionAscensionCharges": "Devozione {value} su {max}. Ascensione: {charges} cariche.",
+      "devotionAscensionLast": "Devozione {value} su {max}. Ascensione: ultima carica.",
+      "ascensionLastAnnouncement": "Ascensione: ultima carica",
+      "ascensionSpenderAria": "Slot azione {slot}: {ability}. Consuma una carica di Ascensione."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -819,6 +856,7 @@ export const it_IT: EnTranslations = {
       "deeds": "Imprese",
       "mounts": "Cavalcature",
       "professions": "Professioni",
+      "reliquary": "Reliquiario",
       "nameplates": "Nomi",
       "haptics": "Vibrazione",
       "hapticsOff": "Vibrazione disattivata",
@@ -859,6 +897,14 @@ export const it_IT: EnTranslations = {
       "bodyWithVersion": "La versione {version} di World of ClaudeCraft è disponibile. Aggiorna ora per le ultime correzioni e migliorie.",
       "notNow": "Non ora",
       "update": "Aggiorna"
+    },
+    "otaUpdate": {
+      "title": "Aggiornamento del gioco",
+      "downloading": "Download aggiornamento in corso: {percent}",
+      "applying": "Aggiornamento scaricato. Il gioco si riavvia per applicarlo.",
+      "incompatible": "È necessario un aggiornamento per giocare. Verrà applicato non appena il download sarà completato.",
+      "continueAnyway": "Continua senza aggiornare",
+      "progressLabel": "Avanzamento download aggiornamento"
     },
     "cameraPrompt": {
       "title": "Scegli la Telecamera",
@@ -961,6 +1007,7 @@ export const it_IT: EnTranslations = {
       "emoteWheel": "Ruota emote",
       "targetFriendly": "Bersaglia l'amico più vicino",
       "targetFriendlyNext": "Scorri i bersagli amici",
+      "targetPrev": "Scorri i bersagli indietro",
       "discord": "Discord",
       "valecup": "Coppa della Valle",
       "bgFlag": "Azione Bandiera del Campo di Battaglia",
@@ -1319,7 +1366,7 @@ export const it_IT: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Mantiene il cursore del mouse dentro la finestra mentre trascini per ruotare la telecamera, così non può raggiungere il bordo dello schermo o passare a un altro monitor. Disattiva l'opzione se preferisci un cursore libero.",
       "showWalletOnCharacterScreen": "Mostra portafoglio nella schermata personaggi",
       "showWalletOnPlayerCard": "Mostra portafoglio nella scheda giocatore",
-      "showPlaytime": "Show Time Played on Character Screen",
+      "showPlaytime": "Mostra tempo di gioco nella schermata personaggi",
       "showDevBadges": "Mostra distintivi sviluppatore",
       "showOwnNameplate": "Mostra la mia targhetta",
       "showPlayerNameplates": "Mostra targhe dei giocatori",
@@ -1456,169 +1503,169 @@ export const it_IT: EnTranslations = {
         "offline": "Offline"
       },
       "diagnostics": {
-        "panelAria": "World of ClaudeCraft performance diagnostics",
-        "title": "ClaudeCraft Performance Doctor",
-        "subtitle": "A game-specific scan with evidence and code-level fixes.",
+        "panelAria": "Diagnostica delle prestazioni di World of ClaudeCraft",
+        "title": "Dottore delle Prestazioni di ClaudeCraft",
+        "subtitle": "Una scansione specifica per il gioco, con prove e correzioni a livello di codice.",
         "aria": {
-          "liveMeasurements": "Live performance measurements",
-          "scanProgress": "Diagnostic scan progress",
-          "findings": "Ranked diagnostic findings"
+          "liveMeasurements": "Misurazioni delle prestazioni in tempo reale",
+          "scanProgress": "Avanzamento della scansione diagnostica",
+          "findings": "Riscontri diagnostici classificati"
         },
         "controls": {
-          "minimize": "Minimize",
-          "expand": "Expand",
-          "start": "Start 15-second scan",
-          "refreshCensus": "Refresh scene census",
-          "copyReport": "Copy clear report",
-          "downloadReport": "Download report",
-          "scanning": "Scanning...",
-          "scanAnother": "Scan another area",
-          "reportLogged": "Report logged to console",
-          "copied": "Copied",
-          "copyBlocked": "Copy blocked: report logged",
-          "retestLowGraphics": "Retest on Low graphics"
+          "minimize": "Minimizza",
+          "expand": "Espandi",
+          "start": "Avvia scansione di 15 secondi",
+          "refreshCensus": "Aggiorna il censimento della scena",
+          "copyReport": "Copia il rapporto in chiaro",
+          "downloadReport": "Scarica rapporto",
+          "scanning": "Scansione in corso...",
+          "scanAnother": "Scansiona un'altra area",
+          "reportLogged": "Rapporto registrato nella console",
+          "copied": "Copiato",
+          "copyBlocked": "Copia bloccata: rapporto registrato",
+          "retestLowGraphics": "Ripeti il test con grafica Bassa"
         },
-        "instruction": "For the best signal, enter Play Offline, move through the slow area, rotate the camera, and trigger the effect that stutters while the scan is running.",
+        "instruction": "Per il segnale migliore, entra in Gioca offline, attraversa l'area lenta, ruota la telecamera e attiva l'effetto che scatta mentre la scansione è in corso.",
         "status": {
-          "pausedHiddenRestart": "Scan paused while this tab is hidden. It will restart when you return.",
-          "restoredRestart": "Tab restored. Restarting a clean 15-second active-gameplay capture.",
-          "worldLoaded": "World loaded. Waiting for the first playable frame.",
-          "pausedHiddenContinue": "Scan paused while this tab is hidden. Return to the game to continue.",
+          "pausedHiddenRestart": "Scansione in pausa perché questa scheda è nascosta. Ripartirà quando tornerai.",
+          "restoredRestart": "Scheda ripristinata. Riavvio di una cattura pulita di 15 secondi di gioco attivo.",
+          "worldLoaded": "Mondo caricato. In attesa del primo frame giocabile.",
+          "pausedHiddenContinue": "Scansione in pausa perché questa scheda è nascosta. Torna al gioco per continuare.",
           "collectingRemaining": {
-            "one": "Collecting active gameplay: {seconds} second remaining",
-            "other": "Collecting active gameplay: {seconds} seconds remaining"
+            "one": "Raccolta dati di gioco attivo: {seconds} secondo rimanente",
+            "other": "Raccolta dati di gioco attivo: {seconds} secondi rimanenti"
           },
-          "waitingFrames": "Waiting for representative gameplay frames: {current}/{minimum}",
-          "collectingNow": "Collecting active gameplay: move through the problem area now.",
-          "ready": "Ready to scan. Press Start and reproduce the slowdown.",
-          "waitingWorld": "Waiting for the game world. Choose Play Offline or enter an online character."
+          "waitingFrames": "In attesa di frame di gioco rappresentativi: {current}/{minimum}",
+          "collectingNow": "Raccolta dati di gioco attivo: attraversa ora l'area del problema.",
+          "ready": "Pronto per la scansione. Premi Avvia e riproduci il rallentamento.",
+          "waitingWorld": "In attesa del mondo di gioco. Scegli Gioca offline oppure entra con un personaggio online."
         },
         "metrics": {
-          "waitingRenderer": "renderer: waiting",
-          "waitingCensus": "scene census: waiting",
-          "waitingHitch": "hitch attribution: armed on world entry",
-          "recent": "recent  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}",
-          "render": "render  submit {submit} ms | world {world} ms | entities {entities} ms",
-          "scene": "scene   {calls} calls | {triangles} tris | {views} views",
-          "hitches": "hitches {hitches} | shaders {shaders} | uploads {uploads} | views {views}",
+          "waitingRenderer": "renderer: in attesa",
+          "waitingCensus": "censimento scena: in attesa",
+          "waitingHitch": "attribuzione scatti: attivata all'ingresso nel mondo",
+          "recent": "recente {fps} FPS | p95 {p95} ms | >50 ms {longFrames}",
+          "render": "render  invio {submit} ms | mondo {world} ms | entità {entities} ms",
+          "scene": "scena   {calls} chiamate | {triangles} tri | {views} viste",
+          "hitches": "scatti  {hitches} | shader {shaders} | upload {uploads} | viste {views}",
           "gpu": "GPU     {renderer}",
-          "waitingValue": "waiting"
+          "waitingValue": "in attesa"
         },
         "scoreHeadline": "{score}/100: {headline}",
-        "healthyNoFindings": "No actionable threshold fired. If a short hitch still bothers you, rerun the scan along the exact movement path that triggers it.",
-        "findingMeta": "{severity} | {confidence} confidence",
+        "healthyNoFindings": "Nessuna soglia utile è scattata. Se uno scatto breve continua a darti fastidio, ripeti la scansione seguendo esattamente il percorso di movimento che lo provoca.",
+        "findingMeta": "{severity} | affidabilità {confidence}",
         "sections": {
-          "evidence": "Evidence",
-          "tryNow": "Try now",
-          "codeFix": "Code fix",
-          "source": "Relevant source"
+          "evidence": "Prove",
+          "tryNow": "Prova ora",
+          "codeFix": "Correzione codice",
+          "source": "Sorgente pertinente"
         },
         "severity": {
-          "critical": "CRITICAL",
-          "warning": "WARNING",
+          "critical": "CRITICO",
+          "warning": "AVVISO",
           "info": "INFO"
         },
         "confidence": {
-          "high": "high",
-          "medium": "medium",
-          "low": "low"
+          "high": "alta",
+          "medium": "media",
+          "low": "bassa"
         },
         "diagnosis": {
-          "noProblemTitle": "No material performance problem detected",
+          "noProblemTitle": "Nessun problema di prestazioni rilevante individuato",
           "summary": {
             "findings": {
-              "one": "{findings} actionable finding from the last 10 seconds at {fps} FPS and {p95} frame p95.",
-              "other": "{findings} actionable findings from the last 10 seconds at {fps} FPS and {p95} frame p95."
+              "one": "{findings} riscontro utile negli ultimi 10 secondi, a {fps} FPS e {p95} p95 di frame.",
+              "other": "{findings} riscontri utili negli ultimi 10 secondi, a {fps} FPS e {p95} p95 di frame."
             },
-            "healthy": "The last 10 seconds held {fps} FPS with a {p95} frame p95. No game, browser, GPU, memory, asset, or network threshold fired."
+            "healthy": "Gli ultimi 10 secondi hanno mantenuto {fps} FPS con un p95 di frame di {p95}. Nessuna soglia di gioco, browser, GPU, memoria, risorse o rete è scattata."
           },
           "titles": {
-            "hardwareAcceleration": "Software rendering is active",
-            "integratedGpu": "The game is using the integrated GPU",
-            "highDpi": "High resolution rendering is expensive here",
-            "forcedHighGraphics": "Forced high graphics is reducing performance",
-            "lowMemory": "Available device memory is low",
-            "browserStalls": "Browser or extension stalls were detected",
-            "heapPressure": "Browser memory pressure was detected",
-            "contextLoss": "The graphics context was reset",
-            "gpuSubmit": "GPU submission is the main frame bottleneck",
-            "sceneDraw": "Scene draw cost exceeds the active graphics budget",
-            "shadowPass": "The shadow pass uses a large share of draw calls",
-            "rendererWorld": "World renderer updates are CPU-bound",
-            "rendererEntities": "Entity view updates are CPU-bound",
-            "rendererNameplates": "Nameplate painting is expensive",
-            "simCpu": "Simulation work is consuming the frame",
-            "hudCpu": "HUD updates are consuming the frame",
-            "eventCpu": "Event processing is consuming the frame",
-            "shaderCompile": "Shaders are compiling during gameplay",
-            "textureUpload": "Texture uploads are causing gameplay hitches",
-            "viewCreate": "Entity view creation is causing hitches",
-            "otherHitch": "Unattributed long frames remain",
-            "assetStartup": "Game startup is delayed by asset work",
-            "longTasks": "Long browser tasks are blocking frames",
-            "networkLatency": "Network delivery is delaying visible response",
-            "snapshotApply": "Snapshot processing is blocking the client",
-            "generic": "Performance rule {rule} needs attention"
+            "hardwareAcceleration": "Il rendering software è attivo",
+            "integratedGpu": "Il gioco sta usando la GPU integrata",
+            "highDpi": "Il rendering ad alta risoluzione è costoso qui",
+            "forcedHighGraphics": "La grafica Alta forzata sta riducendo le prestazioni",
+            "lowMemory": "La memoria disponibile del dispositivo è scarsa",
+            "browserStalls": "Sono stati rilevati blocchi del browser o di un'estensione",
+            "heapPressure": "È stata rilevata pressione sulla memoria del browser",
+            "contextLoss": "Il contesto grafico è stato reimpostato",
+            "gpuSubmit": "L'invio alla GPU è il principale collo di bottiglia del frame",
+            "sceneDraw": "Il costo di disegno della scena supera il budget grafico attivo",
+            "shadowPass": "La passata delle ombre usa una grande quota delle chiamate di disegno",
+            "rendererWorld": "Gli aggiornamenti del renderer del mondo sono limitati dalla CPU",
+            "rendererEntities": "Gli aggiornamenti delle viste entità sono limitati dalla CPU",
+            "rendererNameplates": "Il disegno delle targhette è costoso",
+            "simCpu": "Il lavoro di simulazione sta consumando il frame",
+            "hudCpu": "Gli aggiornamenti dell'HUD stanno consumando il frame",
+            "eventCpu": "L'elaborazione degli eventi sta consumando il frame",
+            "shaderCompile": "Gli shader si stanno compilando durante il gioco",
+            "textureUpload": "I caricamenti delle texture stanno causando scatti di gioco",
+            "viewCreate": "La creazione delle viste entità sta causando scatti",
+            "otherHitch": "Restano frame lunghi non attribuiti",
+            "assetStartup": "L'avvio del gioco è ritardato dal lavoro sulle risorse",
+            "longTasks": "Attività lunghe del browser stanno bloccando i frame",
+            "networkLatency": "La consegna di rete sta ritardando la risposta visibile",
+            "snapshotApply": "L'elaborazione degli snapshot sta bloccando il client",
+            "generic": "La regola di prestazioni {rule} richiede attenzione"
           },
           "causes": {
-            "environment": "A detected browser, GPU, memory, or device setting can limit performance before the game renders a frame.",
-            "graphics": "Measured graphics work is above the active frame or scene budget for this capture.",
-            "cpu": "A measured CPU phase is taking enough main-thread time to miss the frame budget.",
-            "loading": "Resource preparation or first-use work happened on a visible gameplay or startup path.",
-            "network": "Network delivery or client snapshot processing is delaying the latest playable state."
+            "environment": "Un'impostazione rilevata del browser, della GPU, della memoria o del dispositivo può limitare le prestazioni ancora prima che il gioco disegni un frame.",
+            "graphics": "Il lavoro grafico misurato supera il budget di frame o di scena attivo per questa cattura.",
+            "cpu": "Una fase della CPU misurata occupa abbastanza tempo sul thread principale da superare il budget di frame.",
+            "loading": "La preparazione delle risorse o il lavoro al primo utilizzo è avvenuto durante una fase di gioco o di avvio visibile.",
+            "network": "La consegna di rete o l'elaborazione degli snapshot del client sta ritardando lo stato di gioco più recente."
           },
           "evidence": {
-            "environment": "The environment rule {rule} matched this device and browser.",
-            "gpuSubmit": "WebGL submission p95 is {submit}, or {share} of renderer p95.",
-            "frame": "The recent window measured {fps} FPS with a {p95} frame p95.",
-            "sceneCalls": "The scene uses {calls} draw calls against a target of {target}.",
-            "sceneTriangles": "The scene submits {triangles} triangles against a target of {target}.",
-            "sceneCategory": "Scene category {category} contributes {calls} calls and {triangles} measured triangles.",
-            "censusNeeded": "Refresh the scene census to identify the leading render category.",
-            "shadow": "The shadow pass submits {calls} calls, {share} of the baseline, and {triangles} triangles.",
-            "cpuPhase": "Measured phase {phase} has a p95 of {p95}.",
-            "hitch": "{count} of {total} recorded hitches matched cause {cause}.",
-            "assets": "The preload gate waited {wait} for {tasks} registered tasks.",
-            "failedAssets": "Failed asset groups: {groups}.",
-            "longTasks": "{count} long tasks were measured, with p95 {p95} and maximum {max}.",
-            "network": "Snapshot interval is {interval}, latest age is {age}, and input echo p95 is {echo}.",
-            "snapshot": "Snapshot parse and apply p95 is {work}; network gap p95 is {gap}.",
-            "generic": "Diagnostic rule {rule} matched this capture."
+            "environment": "La regola ambientale {rule} corrisponde a questo dispositivo e browser.",
+            "gpuSubmit": "Il p95 di invio WebGL è {submit}, ossia il {share} del p95 del renderer.",
+            "frame": "La finestra recente ha misurato {fps} FPS con un p95 di frame pari a {p95}.",
+            "sceneCalls": "La scena usa {calls} chiamate di disegno contro un obiettivo di {target}.",
+            "sceneTriangles": "La scena invia {triangles} triangoli contro un obiettivo di {target}.",
+            "sceneCategory": "La categoria di scena {category} contribuisce con {calls} chiamate e {triangles} triangoli misurati.",
+            "censusNeeded": "Aggiorna il censimento della scena per identificare la categoria di rendering predominante.",
+            "shadow": "La passata delle ombre invia {calls} chiamate, il {share} della base di riferimento, e {triangles} triangoli.",
+            "cpuPhase": "La fase misurata {phase} ha un p95 di {p95}.",
+            "hitch": "{count} scatti registrati su {total} corrispondono alla causa {cause}.",
+            "assets": "Il cancello di precaricamento ha atteso {wait} per {tasks} attività registrate.",
+            "failedAssets": "Gruppi di risorse non riusciti: {groups}.",
+            "longTasks": "Sono state misurate {count} attività lunghe, con p95 {p95} e massimo {max}.",
+            "network": "L'intervallo tra gli snapshot è {interval}, l'età dell'ultimo è {age}, e il p95 dell'eco di input è {echo}.",
+            "snapshot": "Il p95 di analisi e applicazione dello snapshot è {work}; il p95 del divario di rete è {gap}.",
+            "generic": "La regola diagnostica {rule} corrisponde a questa cattura."
           },
           "tryNow": {
-            "environment": "Correct the detected environment setting, restart, and repeat the same scan.",
-            "graphics": "Retest the same camera path on Low graphics to confirm graphics pressure.",
-            "cpu": "Repeat the scan while idle and while moving to isolate the CPU phase.",
-            "loading": "Repeat the same route or first-use action to confirm when the hitch occurs.",
-            "network": "Compare Play Offline with the same movement and camera path."
+            "environment": "Correggi l'impostazione ambientale rilevata, riavvia, e ripeti la stessa scansione.",
+            "graphics": "Ripeti il test dello stesso percorso della telecamera con grafica Bassa per confermare il carico grafico.",
+            "cpu": "Ripeti la scansione da fermo e in movimento per isolare la fase della CPU.",
+            "loading": "Ripeti lo stesso percorso o la stessa azione al primo utilizzo per confermare quando si verifica lo scatto.",
+            "network": "Confronta con Gioca offline usando lo stesso percorso di movimento e telecamera."
           },
           "codeFix": {
-            "environment": "Keep the detected fallback path within the shared graphics and memory budgets.",
-            "graphics": "Use the existing render budget, instancing, material sharing, LOD, and hidden-work skips.",
-            "cpu": "Profile the named phase, remove repeated work and allocations, and preserve gameplay behavior.",
-            "loading": "Preload, pool, or spread the identified first-use work through the existing startup and streaming budgets.",
-            "network": "Reduce delivery or snapshot processing cost without weakening the authoritative server model."
+            "environment": "Mantieni il percorso di fallback rilevato entro i budget condivisi di grafica e memoria.",
+            "graphics": "Usa il budget di rendering esistente, l'instancing, la condivisione dei materiali, gli LOD e i salti del lavoro nascosto.",
+            "cpu": "Profila la fase indicata, elimina lavoro e allocazioni ripetute, e mantieni invariato il comportamento di gioco.",
+            "loading": "Precarica, metti in pool o distribuisci il lavoro al primo utilizzo individuato nei budget di avvio e streaming esistenti.",
+            "network": "Riduci il costo della consegna o dell'elaborazione degli snapshot senza indebolire il modello a server autoritativo."
           }
         },
         "report": {
-          "title": "World of ClaudeCraft performance diagnosis",
-          "statusLine": "Status: {status} ({score}/100)",
-          "capturedLine": "Captured: {captured}",
-          "topFindingLine": "Top finding: {finding}",
-          "summaryLine": "Summary: {summary}",
+          "title": "Diagnosi delle prestazioni di World of ClaudeCraft",
+          "statusLine": "Stato: {status} ({score}/100)",
+          "capturedLine": "Cattura: {captured}",
+          "topFindingLine": "Riscontro principale: {finding}",
+          "summaryLine": "Riepilogo: {summary}",
           "gpuLine": "GPU: {gpu}",
-          "graphicsLine": "Graphics: {tier}, render scale {scale}",
-          "recentLine": "Recent: {fps} FPS, p95 {p95}, {longFrames} frames over 50 ms, {frames} measured frames",
-          "resultHeading": "Result",
-          "noThreshold": "No actionable threshold fired in this capture.",
+          "graphicsLine": "Grafica: {tier}, scala di rendering {scale}",
+          "recentLine": "Recente: {fps} FPS, p95 {p95}, {longFrames} frame oltre 50 ms, {frames} frame misurati",
+          "resultHeading": "Risultato",
+          "noThreshold": "Nessuna soglia utile è scattata in questa cattura.",
           "findingHeading": "{index}. {title}",
-          "findingMeta": "Severity: {severity}. Confidence: {confidence}.",
-          "rawSnapshotHeading": "Raw snapshot",
-          "notAvailable": "not available",
+          "findingMeta": "Gravità: {severity}. Affidabilità: {confidence}.",
+          "rawSnapshotHeading": "Snapshot grezzo",
+          "notAvailable": "non disponibile",
           "status": {
-            "critical": "critical",
-            "needsAttention": "needs attention",
-            "healthy": "healthy"
+            "critical": "critico",
+            "needsAttention": "richiede attenzione",
+            "healthy": "sano"
           }
         }
       }
@@ -1720,12 +1767,12 @@ export const it_IT: EnTranslations = {
     "charSheet": {
       "offense": "Attacco",
       "defense": "Difesa",
-      "playtimeLabel": "Time Played",
+      "playtimeLabel": "Tempo di gioco",
       "playtimeParts": "{major}, {minor}",
-      "playtimeUnderMinute": "Less than a minute",
-      "playtimeHidden": "Hidden",
-      "showPlaytimeAria": "Show time played",
-      "hidePlaytimeAria": "Hide time played"
+      "playtimeUnderMinute": "Meno di un minuto",
+      "playtimeHidden": "Nascosto",
+      "showPlaytimeAria": "Mostra il tempo di gioco",
+      "hidePlaytimeAria": "Nascondi il tempo di gioco"
     },
     "statInfo": {
       "fromYour": "Dai tuoi {value} punti {stat}:",
@@ -1743,7 +1790,7 @@ export const it_IT: EnTranslations = {
         "agi": "Affina i tuoi riflessi e la tua mira, migliorando diverse delle tue statistiche di combattimento.",
         "sta": "Irrobustisce il tuo corpo, aumentando la tua salute massima e la velocità con cui recuperi salute mentre riposi.",
         "int": "Amplia la riserva di mana di un incantatore e migliora la sua probabilità di mettere a segno un colpo critico magico.",
-        "spi": "Accelera la velocità con cui il mana di un incantatore si rigenera mentre riposa, fuori dal combattimento.",
+        "spi": "Accelera la velocità con cui torna il mana di un incantatore. La maggior parte fluisce durante il riposo, fuori dal combattimento, e una porzione continua a tornare anche in combattimento.",
         "armor": "Attutisce i colpi fisici in arrivo. La riduzione è maggiore contro avversari di livello inferiore ed è limitata al 75%.",
         "attackPower": "Potenzia gli attacchi della tua arma. Ogni 14 punti di potenza d'attacco aggiungono 1 punto di danni al secondo.",
         "spellPower": "Aumenta il danno dei tuoi incantesimi e la potenza delle tue cure. Ogni punto di Intelletto conferisce un po' di Potere Magico, in aggiunta a quello dell'equipaggiamento o dei potenziamenti.",
@@ -1767,6 +1814,7 @@ export const it_IT: EnTranslations = {
         "spellCritPct": "+{value}% Colpo critico magico",
         "healthRegen": "Circa {value} salute ogni 5 sec mentre riposi",
         "manaRegen": "Circa {value} mana ogni 5 sec mentre riposi",
+        "manaRegenCombat": "Circa {value} mana ogni 5 sec in combattimento",
         "damageReduction": "Riduzione dei danni contro un avversario di livello {level}: {value}%",
         "dpsFromAp": "Aggiunge {value} danni al secondo ai tuoi attacchi"
       },
@@ -1787,11 +1835,11 @@ export const it_IT: EnTranslations = {
     },
     "talents": {
       "defaultBuildName": "Build {n}",
-      "newBuildWithGear": "New Build (save gear too)",
-      "gearRestored": "Restored {n} gear pieces from this build.",
-      "gearNotHeld": "You no longer have {n} of this build's saved pieces.",
-      "gearCopyGone": "{n} saved pieces were not the copy this build pinned.",
-      "gearTakenByOtherSlot": "{n} saved pieces need another copy you do not have."
+      "newBuildWithGear": "Nuova Build (salva anche l'equipaggiamento)",
+      "gearRestored": "Ripristinati {n} pezzi di equipaggiamento da questa build.",
+      "gearNotHeld": "Non possiedi più {n} dei pezzi salvati di questa build.",
+      "gearCopyGone": "{n} pezzi salvati non erano la copia associata a questa build.",
+      "gearTakenByOtherSlot": "{n} pezzi salvati richiedono un'altra copia che non possiedi."
     },
     "tips": {
       "joinChannels": "Suggerimento: digita /join world o /join lfg per chattare con i giocatori di tutto il mondo."
@@ -1853,22 +1901,22 @@ export const it_IT: EnTranslations = {
         "other": "{count} secondi rimanenti"
       },
       "playtimeDays": {
-        "one": "{count} day",
-        "few": "{count} days",
-        "many": "{count} days",
-        "other": "{count} days"
+        "one": "{count} giorno",
+        "few": "{count} giorni",
+        "many": "{count} giorni",
+        "other": "{count} giorni"
       },
       "playtimeHours": {
-        "one": "{count} hour",
-        "few": "{count} hours",
-        "many": "{count} hours",
-        "other": "{count} hours"
+        "one": "{count} ora",
+        "few": "{count} ore",
+        "many": "{count} ore",
+        "other": "{count} ore"
       },
       "playtimeMinutes": {
-        "one": "{count} minute",
-        "few": "{count} minutes",
-        "many": "{count} minutes",
-        "other": "{count} minutes"
+        "one": "{count} minuto",
+        "few": "{count} minuti",
+        "many": "{count} minuti",
+        "other": "{count} minuti"
       },
       "playersOnline": {
         "one": "Chi: {count} giocatore online su {realm}.",
@@ -1881,6 +1929,48 @@ export const it_IT: EnTranslations = {
         "few": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}.",
         "many": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}.",
         "other": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Il tuo reliquiario si aggiorna: {count} reliquia catalogata.",
+        "few": "Il tuo reliquiario si aggiorna: {count} reliquie catalogate.",
+        "many": "Il tuo reliquiario si aggiorna: {count} reliquie catalogate.",
+        "other": "Il tuo reliquiario si aggiorna: {count} reliquie catalogate."
+      },
+      "reliquarySearchResults": {
+        "one": "{count} risultato.",
+        "few": "{count} risultati.",
+        "many": "{count} risultati.",
+        "other": "{count} risultati."
+      },
+      "reliquaryToGo": {
+        "one": "ne manca {count}",
+        "few": "ne mancano {count}",
+        "many": "ne mancano {count}",
+        "other": "ne mancano {count}"
+      },
+      "reliquaryObtainedTimes": {
+        "one": "Ottenuta {count} volta",
+        "few": "Ottenuta {count} volte",
+        "many": "Ottenuta {count} volte",
+        "other": "Ottenuta {count} volte"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}, catalogata, ottenuta {count} volta",
+        "few": "{name}, catalogata, ottenuta {count} volte",
+        "many": "{name}, catalogata, ottenuta {count} volte",
+        "other": "{name}, catalogata, ottenuta {count} volte"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}, catalogata, trovata per la prima volta alla conquista {clears}, ottenuta {count} volta",
+        "few": "{name}, catalogata, trovata per la prima volta alla conquista {clears}, ottenuta {count} volte",
+        "many": "{name}, catalogata, trovata per la prima volta alla conquista {clears}, ottenuta {count} volte",
+        "other": "{name}, catalogata, trovata per la prima volta alla conquista {clears}, ottenuta {count} volte"
+      },
+      "deedsRetroSummary": {
+        "one": "La tua cronaca si aggiorna: {count} impresa registrata.",
+        "few": "La tua cronaca si mette in pari: {count} imprese registrate.",
+        "many": "La tua cronaca si mette in pari: {count} imprese registrate.",
+        "other": "La tua cronaca si mette in pari: {count} imprese registrate."
       }
     },
     "bugReport": {
@@ -2109,6 +2199,10 @@ export const it_IT: EnTranslations = {
       "itemAriaBound": "{item}, quantita {count}, copia vincolata",
       "itemAriaMasterwork": "{item}, quantita {count}, capolavoro",
       "itemAriaQuest": "{item}, quantita {count}, oggetto missione",
+      "itemAriaLocked": "{item}, quantità {count}, bloccato",
+      "itemLockedLine": "Bloccato",
+      "lockItem": "Blocca oggetto",
+      "unlockItem": "Sblocca oggetto",
       "filterGroupAria": "Filtra le borse per categoria",
       "filterAll": "Tutti",
       "filterWeapon": "Armi",
@@ -2123,9 +2217,9 @@ export const it_IT: EnTranslations = {
       "sortRecent": "Recenti",
       "sortQuality": "Qualità",
       "sortName": "Nome",
-      "sortButton": "Sort",
-      "sortButtonAria": "Sort your bags",
-      "sortButtonHint": "Combine stacks and group items by type",
+      "sortButton": "Ordina",
+      "sortButtonAria": "Ordina le tue borse",
+      "sortButtonHint": "Unisci le pile e raggruppa gli oggetti per tipo",
       "searchPlaceholder": "Cerca oggetti",
       "searchAria": "Cerca gli oggetti della borsa per nome",
       "noMatch": "Nessun oggetto corrisponde ai tuoi filtri.",
@@ -2151,18 +2245,36 @@ export const it_IT: EnTranslations = {
     "auraEffect": {
       "dot": "Infligge {value} danni da {school} ogni {interval} s",
       "hot": "Ripristina {value} salute ogni {interval} s",
+      "mendingCurrent": "Accumula {value} di cura, rilasciata nel tempo o consumata da Rammendo a Cascata",
+      "mendingCurrentPercent": "Accumula cure pari al {pct}% della salute massima per Rammendo a Cascata",
       "absorb": "Assorbe {value} danni",
       "healAbsorb": "Assorbe {value} cure ricevute",
       "thorns": "Infligge {value} danni da {school} agli attaccanti",
+      "stasis": "Immune e impossibilitato ad agire",
       "slow": "Riduce la velocità di movimento del {pct}%",
       "speed": "Aumenta la velocità di movimento del {pct}%",
       "attackSpeedSlow": "Rallenta la velocità di attacco del {pct}%",
       "attackSpeedFast": "Aumenta la velocità di attacco del {pct}%",
       "haste": "Aumenta la velocità di attacco e lancio del {pct}%",
+      "imbueRange": "Arma infusa: da {min} a {max} danni bonus su Verdict",
+      "petDamage": "Aumenta i danni della mascotte del {pct}%",
+      "petHaste": "Aumenta la velocità d'azione della mascotte del {pct}%",
+      "spellDamage": "Aumenta i danni degli incantesimi del {pct}%",
+      "spellHaste": "Aumenta la velocità di lancio degli incantesimi del {pct}%",
+      "sated": "Non puoi beneficiare di un altro effetto di velocità di gruppo",
+      "cauterizeFatigue": "La Cauterizzazione non può prevenire un altro colpo letale",
+      "castShield": "Il lancio non può essere interrotto né ritardato dai danni",
       "dmgDone": "Aumenta i danni inflitti del {pct}%",
       "dmgDoneReduce": "Riduce i danni inflitti del {pct}%",
       "heatingUp": "Il prossimo colpo critico consecutivo con un costruttore del Fuoco concede Vampata; un costruttore non critico rimuove Surriscaldamento",
       "elementalConvergencePrimed": "Il prossimo incantesimo dall'altra scuola elementale concede Convergenza Elementale",
+      "hunterFerocity": "{stacks} Ferocia del Branco: il tuo famiglio infligge il {pct}% di danni in più",
+      "cooldownCap": "{used} di {cap} sec di riduzione del tempo di recupero usati in questa finestra",
+      "funeralHarvestLock": "Funeral Harvest non può ancora creare un altro Frammento d'Anima",
+      "leadenHexLock": "Maleficio Plum beo non può ancora radicare di nuovo questo bersaglio",
+      "forbiddenReflectionReady": "Il tuo prossimo tempo di recupero idoneo dello Stregone può essere lanciato di nuovo",
+      "forbiddenReflectionLock": "Il Riflesso Proibito non può ancora essere preparato di nuovo",
+      "internalCooldown": "Questo effetto non può attivarsi di nuovo prima che il timer scada",
       "carriedFlag": "Stai portando la bandiera nemica. Annulla questo effetto per lasciarla cadere.",
       "battleStance": "Posizione di Battaglia: 10% di generazione di rabbia in più",
       "berserkerStance": "Posizione del Berserker: colpi critici il 3% più frequenti e il 3% più potenti",
@@ -2177,6 +2289,13 @@ export const it_IT: EnTranslations = {
       "revengeFree": "La tua prossima Vendetta non costa rabbia",
       "victoryRush": "Impeto della Vittoria è pronto",
       "maxHpPct": "Aumenta la salute massima del {pct}%",
+      "enrage": "Danni inflitti aumentati del {damagePct}%, velocità d'attacco del {hastePct}%, e velocità di movimento del {movePct}%",
+      "suddenDeath": "La tua prossima Tomba Prematura non costa rabbia e ignora il suo requisito di salute",
+      "aoeEcho": "Restano {charges} echi: le abilità a bersaglio singolo infliggono il {pct}% dei danni fino a {targets} nemici vicini",
+      "sureCrit": "{charges} lanci di abilità dannose sono colpi critici garantiti",
+      "temporalEcho": "I danni Arcani del lanciatore ti curano per il {singlePct}% dei danni a bersaglio singolo o il {areaPct}% dei danni ad area",
+      "arcaneCharge": "{stacks} Cariche Arcane: Potere d'Etere infligge il {damagePct}% di danni in più, si lancia il {castPct}% più veloce e costa {costMult}x mana",
+      "physicalReduction": "Riduce i danni Fisici subiti del {pct}%",
       "temporalHourglass": "Immune e impossibilitato ad agire; ripristina la salute e accelera il recupero dei tempi di recupero. Clic destro per annullare.",
       "tongues": "Aumenta il tempo di lancio del {pct}%",
       "combustionCrit": "I tuoi incantesimi del Fuoco colpiscono sempre criticamente",
@@ -2186,6 +2305,22 @@ export const it_IT: EnTranslations = {
       "freeCast": "Il prossimo lancio non costa nulla",
       "instantCast": "Il prossimo incantesimo con un tempo di lancio è istantaneo",
       "cheapCast": "Il prossimo incantesimo costa il {pct}% in meno",
+      "radiantResonance": "La tua prossima Luce Risanatrice è istantanea, oppure il tuo prossimo Abbraccio dell'Alba costa il {pct}% di mana in meno e si lancia in {castTime} s",
+      "solarReprisal": "Il tuo prossimo Disco Solare non costa mana, ignora il tempo di recupero e infligge il {pct}% di danni in più; il Martello della Grazia ignora il tempo di recupero e ti cura per il 100% dei danni inflitti; oppure la Luce Risanatrice è istantanea",
+      "dawnsWrath": "MdI: qualsiasi salute · +1 uso · Recupero 0 · +{pct}% danni",
+      "venomRitual": "Rituale del Veleno: stadio {stacks} su {max}. I colpi generatori aggiungono stadi; a {max}, Sonno Eterno diventa Squarciaveleno",
+      "gloam": "Caligine: stadio {stacks} su {max}. A {max} le tue aperture del Velo Crepuscolare si sbloccano allo scoperto, e la prossima lanciata è GRATUITA e fa detonare la riserva nel velo d'ombra",
+      "redline": "Linea Rossa: tacca {stacks} su {max}. I Colpi al Corpo aggiungono tacche; il Colpo di Grazia colpisce il {pct}% più forte per tacca e chiude la finestra. Se scade prima, va persa",
+      "veilstrikeWindow": "Velo d'Ombra: le tue aperture del Velo Crepuscolare sono utilizzabili allo scoperto da qualsiasi angolazione, e i danni inflitti aumentano del {pct}%",
+      "veiledEdge": "Il tuo prossimo Colpo dell'Agguato colpisce il doppio",
+      "duskEconomy": "Le abilità costano il {pct}% di energia in meno",
+      "moontide": "Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono",
+      "oldBlood": "Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Lupo e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma",
+      "verdance": "Verzura: stadio {stacks} di {max}. I lanci completati di Fioritura Selvaggia e Seconda Fioritura la riempiono; a {max}, Rapidità di Guarigione diventa Sovrafioritura",
+      "freeExecute": "La tua prossima abilità di esecuzione idonea non costa nulla",
+      "resourceSap": "Ripristina {value} della tua risorsa attuale ogni {interval} sec",
+      "nextAttackCrit": "Il tuo prossimo attacco è garantito come colpo critico",
+      "healEcho": "Scendere sotto il {threshold}% di salute ripristina {value} salute",
       "increase": {
         "ap": "Aumenta la potenza di attacco di {value}",
         "sp": "Aumenta il potere degli incantesimi di {value}",
@@ -2224,6 +2359,8 @@ export const it_IT: EnTranslations = {
       "mortalWound": "Riduce le cure ricevute del {pct}%",
       "vulnerability": "Aumenta i danni subiti del {pct}%",
       "physVuln": "Aumenta i danni fisici subiti del {pct}%",
+      "bleedVuln": "Aumenta i danni da sanguinamento subiti del {pct}%",
+      "sourceVuln": "Subisce il {pct}% di danni in più dal lanciatore che ha applicato questo effetto",
       "spellVuln": "Aumenta i danni magici subiti del {pct}%",
       "critVuln": "Aumenta la probabilità di subire colpi critici del {pct}%",
       "costTax": "Aumenta i costi delle abilità del {pct}%",
@@ -2237,14 +2374,46 @@ export const it_IT: EnTranslations = {
       "disarm": "Disarmato: impossibile usare attacchi con arma",
       "lockout": "Scuola di magia bloccata",
       "imbue": "Arma infusa con effetti bonus",
-      "imbueRange": "Arma infusa: da {min} a {max} danni bonus su Verdict",
+      "galeheartWeapon": "Completare la Cadenza dello Spirito Guerriero da {steps} colpi fa risuonare il colpo {count} volte per il {pct}% dei suoi danni come danni da Natura",
+      "elementalTrance": "Danni subiti ridotti del {pct}%. Il {mana}% di tutti i danni che infliggi viene convertito in mana",
       "stealth": "Nascosto; velocità di movimento ridotta del {pct}%",
       "formBear": "Forma di Bruin: salute e armatura aumentate",
       "formCat": "Forma felina: danni in mischia ed energia",
       "formTravel": "Forma di Fleet: velocità di movimento aumentata del {pct}%",
       "formFireball": "Forma Brace: velocità di movimento aumentata del {pct}%; attacchi e incantesimi disabilitati",
+      "formMoonkin": "Forma di Lunagufo: danni degli incantesimi aumentati del {pct}% e armatura aumentata del {armorPct}%",
+      "formShadow": "Forma d'Ombra: danni da Ombra aumentati del {pct}%",
+      "resourceCount": "{value} su {max}",
+      "formLich": "Soul Lance colpisce anche fino a {targets} nemici vicini per il {pct}% dei danni",
+      "afflictionEye": "Maledict Gaze attacca ogni {interval} sec; gli effetti su questo Evil Eye generano il {pct}% di Condanna",
+      "afflictionEyeSecondary": "Gli effetti su questo Evil Eye generano il {doomPct}% di Condanna; Sentence riecheggia qui per il {echoPct}% dei danni",
+      "afflictionAccomplice": "I danni idonei concedono {value} Condanna, al massimo una volta ogni {interval} sec",
+      "afflictionViolence": "Restano {charges} rappresaglie; un attacco nemico concede {doom} Condanna e infligge {damage} danni da Ombra di ritorno",
+      "afflictionVicarious": "Reindirizza o riduce il {pct}% dei danni subiti e può generare fino a {max} Condanna",
+      "afflictionPossession": "Potenzia Needle of Fate, Divorare, Maledict Gaze e Sentence",
+      "afflictionJudgment": "L'Evil Eye primario genera il {eyePct}% di Condanna in più; Sentence infligge il {sentencePct}% di danni in più e la prima rimborsa {refund} Condanna",
+      "afflictionLitany": "I guadagni di Condanna infliggono {damage} danni da Ombra fino a {targets} nemici entro {radius} metri, una volta al secondo",
+      "afflictionFateThreads": "{stacks} Filamenti del Fato: Sentence infligge il {sentencePct}% di danni in più, oppure Divorare guadagna {doom} Condanna extra per tick",
+      "afflictionConsumeThreads": "Divorare sta consumando {stacks} Filamenti del Fato per {doom} Condanna extra per tick",
+      "necromancyHarvestMark": "La morte può creare 1 Frammento d'Anima",
+      "necromancyOssuaryMark": "Accumula il {storedPct}% dei tuoi danni e di quelli dei tuoi non morti, più il {lancePct}% dei danni di Soul Lance; rilancia per farla detonare. La morte esplode entro {radius} metri e crea 1 Frammento d'Anima",
+      "necromancyDeathEcho": "Eco della Morte residuo; nessuna abilità attuale lo consuma",
+      "warlockAnchor": "Rilancia entro {range} metri per tornare qui e consumare l'ancora",
+      "formMetamorph": "Forma demoniaca: dimensioni del corpo aumentate del {pct}%; gli altri bonus viaggiano su potenziamenti separati",
+      "energyRegen": "Aumenta la rigenerazione di Energia del {pct}%",
       "defensiveStance": "Posizione Guardinga: danni subiti ridotti, più minaccia",
       "righteousFury": "Giuramento Ardente: minaccia da danni Sacri molto aumentata",
+      "overpowerCharge": "{stacks} cariche: il tuo prossimo Colpo Mutilante infligge il {pct}% di danni in più",
+      "sweepingStrikes": "I colpi a bersaglio singolo colpiscono anche {targets} nemici vicini per il {pct}% dei danni",
+      "fingersOfFrost": "{charges} cariche: Lancia di Ghiaccio tratta il bersaglio come congelato e infligge il {pct}% di danni da congelamento",
+      "brainFreeze": "La tua prossima Sferza d'Inverno è istantanea e ignora il suo tempo di recupero",
+      "wintersChill": "{charges} cariche: gli incantesimi compatibili trattano questo bersaglio come congelato",
+      "icicles": "{value} su {max} Ghiaccioli; a {max}, Spuntone Glaciale può essere lanciato",
+      "desolation": "{charges} cariche: il tuo prossimo Dardo della Rovina si lancia il {castPct}% più veloce, oppure la tua prossima Pioggia di Fuoco atterra immediatamente",
+      "ruinousBrand": "Restano {charges} copie: gli incantesimi diretti copiano il {otherPct}% dei danni qui, o il {selfPct}% quando questo è il loro bersaglio",
+      "duskfireClaim": "La morte concede {value} Rovina",
+      "pyreGuardian": "Genera {ruin} Rovina ogni {ruinInterval} sec e infligge {damage} danni da Fuoco entro {radius} metri ogni {damageInterval} sec",
+      "perfectMoment": "Dardi d'Etere non consuma Cariche Arcane",
       "scale": "Taglia aumentata del {pct}%",
       "jump": "Altezza di salto aumentata del {pct}%",
       "school": {
@@ -3047,11 +3216,11 @@ export const it_IT: EnTranslations = {
       "toolEffectRechargeFull": "{effect} è già a piena carica.",
       "toolEffectRechargeToolCapped": "Porta uno strumento da {profession} migliore per caricare ancora {effect}.",
       "toolEffectRechargeMaterials": "Per ricaricare {effect} servono {material} x{count}.",
-      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
-      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
-      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
-      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
-      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
+      "craftingProgress": "Stai creando: {remaining}s su {total}s rimanenti.",
+      "disenchantingProgress": "Stai disincantando: {remaining}s su {total}s rimanenti.",
+      "enchantingProgress": "Stai incantando: {remaining}s su {total}s rimanenti.",
+      "salvagingProgress": "Stai smantellando: {remaining}s su {total}s rimanenti.",
+      "rechargingToolEffectProgress": "Stai ricaricando un effetto da strumento: {remaining}s su {total}s rimanenti.",
       "tierPipAria": "Livello {tier}",
       "nextUnlockTier": "{points} punta al livello successivo: le probabilità di capolavori migliorano",
       "nextUnlockSpecialized": "{points} punti alla specializzazione: i costi dei materiali diminuiscono",
@@ -3102,6 +3271,7 @@ export const it_IT: EnTranslations = {
       "craftedToast": "Realizzato: {name}",
       "craftedToastQty": "Realizzato: {name} x{qty}",
       "insufficientMaterials": "Non hai i materiali per quello.",
+      "reagentLocked": "Un reagente per questo è bloccato.",
       "unknownRecipe": "Quella ricetta non esiste.",
       "comboRequirementUnmet": "Non possiedi entrambe le professioni richieste al livello necessario per quella ricetta.",
       "comboRequires": "Attunement: {craftA} + {craftB}, livello {tier}.",
@@ -3208,6 +3378,7 @@ export const it_IT: EnTranslations = {
       "notHeld": "Non possiedi quell'oggetto.",
       "notDisenchantable": "Non puoi disincantare quello.",
       "notSalvageable": "Non puoi smantellare quello.",
+      "salvageLocked": "Quell'oggetto è bloccato.",
       "disenchantBusy": "Sei occupato.",
       "salvageBusy": "Sei occupato.",
       "enchantBusy": "Sei occupato.",
@@ -3348,14 +3519,14 @@ export const it_IT: EnTranslations = {
       "denyNoSpace": "Il richiedente non ha spazio nelle borse."
     },
     "bgOffer": {
-      "title": "Thornhollow Fields is ready",
-      "backfillTitle": "Thornhollow Fields needs a fighter",
-      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
-      "accepted": "{accepted} of {size} ready",
-      "remaining": "{seconds}s to answer",
-      "accept": "Accept",
-      "decline": "Decline",
-      "acceptedWait": "Waiting for the others..."
+      "title": "I Campi di Thornhollow sono pronti",
+      "backfillTitle": "Ai Campi di Thornhollow serve un combattente",
+      "backfillBody": "Questa battaglia è già in corso. Ti unirai alla squadra in inferiorità numerica, e questa partita non modificherà il tuo indice.",
+      "accepted": "{accepted} di {size} pronti",
+      "remaining": "{seconds}s per rispondere",
+      "accept": "Accetta",
+      "decline": "Rifiuta",
+      "acceptedWait": "In attesa degli altri..."
     },
     "finder": {
       "title": "Cercatore di Dungeon",
@@ -3459,6 +3630,135 @@ export const it_IT: EnTranslations = {
         "dread_curse": "Maledizione del Terrore (solo eroica, penalità cumulativa per cambio tank)"
       }
     },
+    "reliquary": {
+      "title": "Il Reliquiario",
+      "close": "Chiudi Il Reliquiario",
+      "countLabel": "{owned}/{total} reliquie",
+      "completionAria": "Reliquie riempite: {owned} su {total}",
+      "curatorRank": "Grado di Curatore {rank}",
+      "curatorUnranked": "Curatore senza grado",
+      "curatorRankName1": "Curatore apprendista",
+      "curatorRankName2": "Custode dei bottini",
+      "curatorRankName3": "Maestro Curatore",
+      "curatorRankName4": "Gran Curatore",
+      "curatorRankName5": "Curatore eterno",
+      "rankUpBanner": "Grado di Curatore {rank}: {name}",
+      "rankUpToast": "Raggiunto il grado di Curatore {rank}: {name}",
+      "borderWearableNote": "Il bordo {name} si può indossare dal Libro delle Imprese.",
+      "sigilCaption": "Sigillo del Curatore",
+      "recentLabel": "Ritrovamenti recenti:",
+      "nearlyLabel": "Quasi complete:",
+      "nearlyJumpAria": "Apri {name}, {owned} riempite su {total}",
+      "progressText": "{owned}/{total}",
+      "shelvesAria": "Scaffali del Reliquiario",
+      "navOverview": "Panoramica",
+      "navConquerors": "Conquistatori",
+      "navProfessions": "Professioni",
+      "navHorizons": "Orizzonti",
+      "navCountAria": "{shelf}: {owned} reliquie riempite su {total}",
+      "shelfEmpty": "Ancora nessuna pagina su questo scaffale.",
+      "pageComplete": "Miniata",
+      "clearsLabel": "{count} conquiste",
+      "srankClearsLabel": "{count} conquiste di rango S",
+      "retiredLabel": "Ritirata",
+      "personalLabel": "Personale",
+      "backToShelf": "Torna allo scaffale",
+      "gridAria": "Reliquie di {name}",
+      "pageProgressAria": "Progressi della pagina: {owned} reliquie riempite su {total}",
+      "cellOwnedAria": "{name}, catalogata",
+      "cellMissingAria": "{name}, non ancora trovata",
+      "ownedTooltipStatus": "Catalogata nel Reliquiario",
+      "missingTooltipStatus": "Non ancora trovata",
+      "firstFindClears": "Trovata per la prima volta alla conquista {count}",
+      "unlockToast": "Reliquia catalogata: {name}",
+      "illuminateBanner": "Pagina miniata: {name}",
+      "illuminateToast": "Ogni reliquia di {name} è riempita.",
+      "illuminationBroadcastLine": "{name} ha miniato una pagina del Reliquiario: {page}",
+      "markFind": {
+        "masterwork_first": "Primo capolavoro",
+        "masterwork_weaponcrafting": "Capolavoro di forgiatura di armi",
+        "masterwork_armorcrafting": "Capolavoro di forgiatura di armature",
+        "masterwork_tailoring": "Capolavoro di sartoria",
+        "masterwork_leatherworking": "Capolavoro di lavorazione del cuoio",
+        "masterwork_engineering": "Capolavoro di ingegneria",
+        "gather_event_pristine_vein": "Vena incontaminata",
+        "gather_event_ancient_heartwood": "Durame antico",
+        "gather_event_moonlit_bloom": "Fiore al chiaro di luna",
+        "gather_event_perfect_specimen": "Esemplare perfetto",
+        "slain_old_greyjaw": "Ucciso: Vecchio Greyjaw",
+        "slain_mogger": "Ucciso: Mogger",
+        "slain_grix_the_tunnelking": "Ucciso: Grix il Re dei Cunicoli",
+        "slain_captain_verlan": "Ucciso: Capitano Verlan",
+        "slain_wraithbinder_maldrec": "Ucciso: Maldrec il Legaspettri",
+        "slain_mirejaw_the_ravenous": "Ucciso: Mirejaw il Famelico",
+        "slain_sloomtooth_the_drowned": "Ucciso: Sloomtooth l'Annegato",
+        "slain_sister_nhalia": "Uccisa: Sorella Nhalia",
+        "slain_grubjaw": "Ucciso: Grubjaw il Goloso",
+        "slain_ironvein_foreman": "Ucciso: Caposquadra Venaferrata",
+        "slain_brutok_skullsmasher": "Ucciso: Brutok Spaccacranio",
+        "slain_voskar_emberwing": "Ucciso: Voskar Aladibrace",
+        "slain_marrowlord_varkas": "Ucciso: Signore del Midollo Varkas",
+        "slain_old_cragmaw": "Ucciso: Vecchio Cragmaw",
+        "slain_shardlord_kazzix": "Ucciso: Signore dei frammenti Kazzix",
+        "slain_gleamstag": "Ucciso: Il Cervo Splendente",
+        "slain_old_marrowshell": "Ucciso: Vecchio Marrowshell",
+        "slain_aurelhorn": "Ucciso: Aurelhorn, Primo della Mandria",
+        "slain_drakemaw_broodlord": "Ucciso: Signore della covata di Drakemaw"
+      },
+      "accountScopeBadge": "Account",
+      "accountScopeNote": "Collezione dell'account: sbloccata su ogni personaggio di questo account.",
+      "unknownRelic": "Reliquia non registrata",
+      "sourceBossDungeon": "Bottino di {boss} in {dungeon}",
+      "sourceBoss": "Bottino di {boss}",
+      "sourceZone": "Si trova in {zone}",
+      "sourceProfession": "Si ottiene con {profession}",
+      "sourceDeed": "Concessa dall'impresa {deed}",
+      "sourceVendor": "Venduta da {vendor}",
+      "sourceBossZone": "Bottino di {boss} in {zone}",
+      "sourceDelve": "Si trova nell'incursione {delve}",
+      "sourceRift": "Bottino delle conquiste di Squarci di rango {rank}",
+      "sourceQuest": "Ricompensa della missione {quest}",
+      "sourceStore": "Si acquista nel Negozio WOC",
+      "sourceActivityCorpseHarvest": "Recuperata raccogliendo dalle carcasse delle creature",
+      "sourceActivityMasterworkCraft": "Si ottiene creando un capolavoro",
+      "sourceActivityRiftFirstClear": "Assegnata a ogni membro del gruppo che ottiene la prima conquista di uno Squarcio classificato",
+      "cellMissingSourceAria": "{name}, non ancora trovata, {source}",
+      "cellOwnedClearsAria": "{name}, catalogata, trovata per la prima volta alla conquista {count}",
+      "searchPlaceholder": "Cerca reliquie",
+      "searchAria": "Cerca nel Reliquiario per nome",
+      "searchEmpty": "Nessuna reliquia corrisponde a questa ricerca.",
+      "filterEmpty": "Nessuna reliquia corrisponde a questo filtro.",
+      "filterGroupAria": "Filtra le reliquie in base al fatto che tu le abbia trovate",
+      "gridKeyboardHint": "Usa i tasti freccia per spostarti tra le reliquie, Inizio e Fine per andare alle estremità.",
+      "filterAll": "Tutte",
+      "filterOwned": "Catalogate",
+      "filterMissing": "Mancanti",
+      "recentJumpAria": "Apri la pagina di {name}",
+      "recentEmpty": "Ancora nessun ritrovamento. Le reliquie che cataloghi da ora in poi compaiono qui.",
+      "nearlyEmpty": "Qui si raccolgono le pagine vicine al completamento.",
+      "stripNoMatch": "Qui non c'è nulla che corrisponda alla tua ricerca.",
+      "shelfRecent": "Ultimo ritrovamento: {name}",
+      "shelfNoFinds": "Ancora nulla di catalogato su questo scaffale.",
+      "shelfOpenAria": "Apri lo scaffale {name}, {owned} riempite su {total}",
+      "sharedUniquesNote": "Il tuo totale complessivo conta ogni reliquia una sola volta; i conteggi di scaffale e di pagina elencano ogni casella, quindi una reliquia presente su più pagine viene contata da ciascuna di esse.",
+      "charCompletionLabel": "Reliquiario",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "Curatore",
+      "charOpen": "Il Reliquiario",
+      "trackerLabel": "Reliquiario",
+      "collapseHint": "Comprimi il tracciatore del Reliquiario",
+      "expandHint": "Espandi il tracciatore del Reliquiario",
+      "openWindowHint": "Apri Il Reliquiario",
+      "pin": "Fissa",
+      "unpin": "Sgancia",
+      "pinFull": "Il tracciatore è pieno (fino a {cap} pagine)",
+      "pinAria": "Fissa {name} al tracciatore dell'interfaccia",
+      "unpinAria": "Sgancia {name}",
+      "rarityLine": "Trovata dal {percent} dei collezionisti",
+      "pageRarityLine": "Miniata dal {percent} dei collezionisti",
+      "cellAriaWithRarity": "{base}, {rarity}",
+      "cellAriaWithAccountScope": "{base}, {scope}"
+    },
     "deeds": {
       "title": "Libro delle Imprese",
       "close": "Chiudi il Libro delle Imprese",
@@ -3495,18 +3795,23 @@ export const it_IT: EnTranslations = {
       "featRibbon": "Prodezza",
       "hiddenBadge": "Nascosta",
       "titleChip": "Titolo in premio",
+      "borderChip": "Ricompensa bordo",
       "watch": "Segui",
       "unwatch": "Non seguire più",
       "watchFull": "Elenco dei seguiti pieno (massimo {cap})",
       "watchAria": "Segui {name} nel riquadro Imprese sull'HUD",
       "unwatchAria": "Smetti di seguire {name}",
+      "cosmeticsSection": "Titoli e bordi",
       "titlesSection": "Titoli",
       "titlesAria": "Scegli il titolo da mostrare",
       "titlesNone": "Nessun titolo",
       "titlesEmpty": "Ottieni un'impresa che conferisce un titolo per sbloccare questo scaffale.",
+      "bordersSection": "Bordi",
+      "bordersNone": "Nessun bordo",
+      "bordersEmpty": "Compi un'impresa che concede un bordo per sbloccare questo scaffale.",
       "unlockedBanner": "Impresa compiuta: {name}",
       "unlockedTitleHint": "Nuovo titolo ottenuto: {title}. Sceglilo nel Libro delle Imprese.",
-      "retroSummary": "La tua cronaca si mette in pari: {count} imprese registrate.",
+      "unlockedBorderHint": "Nuovo bordo ottenuto: {name}. Indossalo dal Libro delle Imprese.",
       "broadcastLine": "{name} ha compiuto un'impresa: {deed}",
       "rarityLine": "Ottenuta dal {percent} degli avventurieri",
       "trackerLabel": "Imprese",
@@ -3516,6 +3821,7 @@ export const it_IT: EnTranslations = {
       "charTitleLabel": "Titolo",
       "charTitleNone": "Nessun titolo scelto",
       "charOpenBook": "Libro delle Imprese",
+      "charBorderWorn": "{name} (in uso)",
       "lbTab": "Fama",
       "lbTitleCol": "Titolo",
       "lbScopeNote": "Account classificati per Fama cumulativa. Ogni impresa conta una volta su tutti i personaggi dell'account.",
@@ -3534,7 +3840,7 @@ export const it_IT: EnTranslations = {
       "levels": "Livelli da {min} a {max}"
     },
     "arenaGate": {
-      "minLevelNote": "Requires level {level}"
+      "minLevelNote": "Richiede il livello {level}"
     }
   },
   "gatherEvent": {
@@ -3598,7 +3904,9 @@ export const it_IT: EnTranslations = {
       "delete_confirm": "Digita il nome del personaggio per confermare l'eliminazione.",
       "already_in_world": "Il personaggio è già nel mondo.",
       "taken_over": "Il tuo personaggio è stato preso in controllo da un'altra sessione.",
-      "rename_required": "Questo personaggio deve essere rinominato prima di entrare nel mondo."
+      "rename_required": "Questo personaggio deve essere rinominato prima di entrare nel mondo.",
+      "invalid_appearance": "Non è stato possibile salvare questo aspetto. Modifica il design e riprova.",
+      "reroll_unavailable": "Questo personaggio non ha un ridisegno gratuito disponibile."
     },
     "moderation": {
       "suspended_until": "Questo account è sospeso fino al {date}.",
@@ -3690,13 +3998,13 @@ export const it_IT: EnTranslations = {
       "quests": "Missioni",
       "dungeons": "Dungeon e Incursioni",
       "delves": "Incursioni",
-      "rifts": "Rifts",
-      "mounts": "Mounts & Riding",
+      "rifts": "Squarci",
+      "mounts": "Cavalcature ed equitazione",
       "reference": "Riferimento",
       "controls": "Comandi",
-      "commands": "Slash Commands",
-      "interface": "Interface & HUD",
-      "editor": "World Editor",
+      "commands": "Comandi slash",
+      "interface": "Interfaccia e HUD",
+      "editor": "Editor di Mappe",
       "settings": "Impostazioni e prestazioni",
       "combat": "Combattimento",
       "talents": "Talenti",
@@ -3704,6 +4012,7 @@ export const it_IT: EnTranslations = {
       "valeCup": "Coppa della Valle",
       "thornhollow": "Campi di Thornhollow",
       "deeds": "Libro delle Imprese",
+      "reliquary": "Il Reliquiario",
       "glossary": "Glossario",
       "wishIKnew": "Cose che avrei voluto sapere",
       "faq": "FAQ",
@@ -3719,10 +4028,10 @@ export const it_IT: EnTranslations = {
     "groups": {
       "start": "Inizia",
       "compendium": "Compendio",
-      "world": "The World",
-      "character": "Your Character",
-      "endgame": "Group Content",
-      "compete": "Player versus Player",
+      "world": "Il mondo",
+      "character": "Il tuo personaggio",
+      "endgame": "Contenuti di gruppo",
+      "compete": "Giocatore contro giocatore",
       "reference": "Riferimento"
     },
     "breadcrumb": {
@@ -3762,7 +4071,9 @@ export const it_IT: EnTranslations = {
       "typeDelve": "Incursione",
       "typeTerm": "Termine",
       "typeAbility": "Abilità",
-      "typeDeed": "Impresa"
+      "typeDeed": "Impresa",
+      "typeReliquaryPage": "Pagina del Reliquiario",
+      "typeRelic": "Reliquia"
     },
     "home": {
       "eyebrow": "MMO da browser in stile classico",
@@ -3772,8 +4083,8 @@ export const it_IT: EnTranslations = {
       "ctaLearn": "Come si gioca",
       "what": {
         "heading": "Un MMO classico, fatto per essere preso al volo",
-        "pillarPlayTitle": "Gioca nel tuo browser",
-        "pillarPlayBody": "Nessun download, nessun launcher. Crea un personaggio e sei nel mondo in pochi secondi, su desktop o telefono.",
+        "pillarPlayTitle": "Apri il sito e gioca",
+        "pillarPlayBody": "Nessun download, nessun launcher. Crea un personaggio e sei nel mondo in pochi secondi, su desktop o su telefono. Ci sono anche app native, se ne vuoi una.",
         "pillarClassesTitle": "Nove classi, tre ruoli",
         "pillarClassesBody": "Fai da tank, cura o infliggi danni. Ogni classe gioca come il suo archetipo dovrebbe, con i talenti per renderla tua.",
         "pillarOpenTitle": "Gratuito e open source",
@@ -3787,7 +4098,7 @@ export const it_IT: EnTranslations = {
       "world": {
         "heading": "Esplora il mondo",
         "sub": "Una terra continua, tre zone, dalle valli tranquille alle vette ghiacciate.",
-        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
+        "subCount": "Una sola terra continua di {zones} zone, dalle valli tranquille e le paludi sommerse alle lande di cenere, le alture ghiacciate e i giardini a labirinto di siepi.",
         "levels": "Livelli da {min} a {max}",
         "cta": "Scopri il mondo",
         "valeName": "Valle di Eastbrook",
@@ -3806,19 +4117,19 @@ export const it_IT: EnTranslations = {
         "amberBlurb": "Dietro le scogliere occidentali un autunno che non finisce mai, e lanterne su uno stagno dorato.",
         "fenName": "Willowfen",
         "fenBlurb": "Oltre la corona di autunno, una palude luminosa di salici e acque immobili, e un paese dietro un fossato.",
-        "farshoreName": "The Farshore",
-        "farshoreBlurb": "An island across the sandbar, where the sky tears open over the Riftfields and Gullhaven rings its bell for every breach.",
-        "nightName": "The Nightbloom",
-        "nightBlurb": "A country of starry midnight where the flowers light the paths and Moonrest keeps its vigil.",
-        "hauntName": "The Wraithwood",
-        "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gallowmere are the only honest light on the road.",
-        "jungleName": "The Palmreach",
-        "jungleBlurb": "Palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.",
-        "gardenName": "The Evergarden",
-        "gardenBlurb": "A hedge-maze realm still trimmed by no gardener anyone has seen, entered past Hedgewick and its fountain courts.",
-        "galeName": "The Galecrest",
-        "galeBlurb": "Sea-cliffs and howling downs where the wind never rests and Wickharbor shuts its doors tight.",
-        "levelsCap": "Level {level}"
+        "farshoreName": "Farshore",
+        "farshoreBlurb": "Un'isola oltre la barra di sabbia, dove il cielo si squarcia sopra i Campi degli Squarci e Gullhaven suona la sua campana per ogni breccia.",
+        "nightName": "Nightbloom",
+        "nightBlurb": "Una terra di mezzanotte stellata dove i fiori illuminano i sentieri e Moonrest veglia senza sosta.",
+        "hauntName": "Wraithwood",
+        "hauntBlurb": "Una foresta infestata sotto chiome gigantesche, dove le lanterne di Gallowmere sono l'unica luce onesta sulla strada.",
+        "jungleName": "Palmreach",
+        "jungleBlurb": "Palme, sabbia bianca e uccelli chiassosi, con la città-spiaggia di Drifthaven che tiene un fuoco acceso sulla riva.",
+        "gardenName": "Evergarden",
+        "gardenBlurb": "Un regno-giardino labirinto di siepi ancora potato da nessun giardiniere che qualcuno abbia mai visto, a cui si accede oltre Hedgewick e le sue corti di fontane.",
+        "galeName": "Galecrest",
+        "galeBlurb": "Scogliere marine e colline ululanti dove il vento non si ferma mai, e Wickharbor chiude bene le sue porte.",
+        "levelsCap": "Livello {level}"
       },
       "group": {
         "heading": "Raggruppatevi per le parti difficili",
@@ -3841,7 +4152,7 @@ export const it_IT: EnTranslations = {
         "a3": "Sì. C'è una modalità immediata per giocatore singolo nel tuo browser, oltre al mondo online condiviso.",
         "q4": "Quanto ci vuole per raggiungere il livello massimo?",
         "a4": "Il limite è il livello {cap}, raggiunto attraverso tre zone di missioni, dungeon ed esplorazione.",
-        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
+        "a4Count": "Il limite è il livello {cap}, raggiunto attraverso zone di missioni, dungeon ed esplorazione. Ci sono {zones} zone in tutto, e le più lontane sono pensate per personaggi già al limite."
       },
       "community": {
         "heading": "Unisciti al mondo",
@@ -3874,26 +4185,26 @@ export const it_IT: EnTranslations = {
       "questsTitle": "Missioni",
       "questsBody": "Accetta missioni dalle persone con un indicatore sopra la testa, completa l'obiettivo e consegnale per esperienza, monete ed equipaggiamento. Il tracciatore a schermo tiene in vista i tuoi obiettivi.",
       "deathTitle": "La morte non è la fine",
-      "deathBody": "Se cadi, il tuo corpo resta dove è caduto e risorgi come spettro al cimitero più vicino. Riporta il tuo spirito fino al corpo per rivivere sul posto, senza penalità, oppure affidati al Custode Pallido al cimitero per un risveglio immediato al prezzo di una debolezza passeggera. Gli eroi appena creati sono del tutto risparmiati dalla debolezza, e nulla di ciò che possiedi o hai guadagnato va mai perduto.",
+      "deathBody": "Se cadi, il tuo corpo resta dove è caduto e risorgi come spettro al cimitero più vicino. Riporta il tuo spirito fino al corpo per rivivere sul posto, senza penalità, oppure affidati al Custode Pallido al cimitero per un risveglio immediato al prezzo di una debolezza passeggera. Gli eroi appena creati sono del tutto risparmiati dalla debolezza, e nulla di ciò che possiedi o hai guadagnato va mai perduto. Il gioco ti dice anche cosa è stato: una riga nella chat nomina ciò che ha inferto il colpo mortale, che di solito è il modo più rapido per capire cosa è andato storto.",
       "groupingTitle": "Giocare insieme",
       "groupingBody": "Invita altri in un gruppo per condividere il credito delle missioni e affrontare i dungeon. Gran parte del mondo è affrontabile in solitaria, perciò raggrupparsi è una scelta, non un obbligo.",
       "onlineTitle": "Online o offline",
       "onlineBody": "Gioca il mondo online condiviso con tutti gli altri, oppure avvia un mondo offline immediato nel tuo browser per imparare le basi.",
-      "reassure": "I talenti si sbloccano al livello 10 e possono essere reimpostati in qualsiasi momento fuori dal combattimento, quindi le tue scelte iniziali non sono mai permanenti. Sperimenta liberamente.",
+      "reassure": "I talenti iniziano al livello 5, e in tutto ci sono sei file, una a ciascuno dei livelli 5, 8, 11, 14, 17 e 20. Ogni fila è una singola scelta fra tre, e puoi azzerarli ogni volta che sei fuori dal combattimento e non in un incontro in arena, quindi le tue scelte iniziali non sono mai definitive. Sperimenta liberamente.",
       "controlsLink": "Consulta il riferimento completo dei comandi",
-      "step0Title": "Get in",
-      "step0Body": "Offline play asks for nothing: choose Offline on the start screen and press Play. To play with everyone else, make a free account (a username, a password, and an email address for recovery) or sign in to the one you have, then pick a world from the World List.",
-      "worldsTitle": "Choosing a world",
-      "worldsBody": "Online play happens on worlds, and each one is a full copy of the game with its own players, its own World Market, and its own standings. The World List shows how busy each world is, from Low to Full, so pick a quiet one for elbow room or a busy one for company. Your characters live on the world you made them on, and you can keep characters on more than one.",
-      "charactersTitle": "Your characters",
-      "charactersBody": "One account can keep up to ten characters on each world, so there is room to try several classes without giving anything up. Deleting one is deliberate: the character has to be out of the world, and the game asks you to type its name before it will go. A deleted character is gone for good, and its World Market listings and Ravenpost mail go with it.\n\nOnce you have picked a class you get to decide what your hero looks like. A tabbed panel holds Body, Face, Hair, and Style: pick male or female, work the face over with a set of sliders and a choice of eyes, then choose a hair style and color and a skin tone, either from the named presets or from the color wheel behind them. A randomize button rolls a whole look if you would rather be surprised, and a reset puts your character back to the standard face for the body you chose. None of it touches how your character plays.",
-      "namesTitle": "Naming your hero",
-      "namesBody": "A name is 2 to 16 letters long, starts with a letter, and can hold spaces, hyphens, and apostrophes. No two characters on the same world can share one, and capitalization does not make a name free: if Ashwind is taken, ashwind is taken too. Your own spelling is kept exactly as you typed it. Pick a name you will be happy with, because it stays with the character.",
-      "connectionTitle": "If your connection drops",
-      "connectionBody": "A lost signal, a closed lid, or a page reload does not log you out. Your character is held in the world for about five minutes while the game reconnects on its own, and you come back to the same spot in the same session. That also means dropping out is not a way to leave a fight: your character is still standing there. Logging out from the game menu leaves at once instead of waiting, and so does signing in on another character on the same account."
+      "step0Title": "Entra",
+      "step0Body": "Il gioco offline non chiede nulla: scegli Offline nella schermata iniziale e premi Gioca. Per giocare con tutti gli altri, crea un account gratuito (un nome utente, una password e un indirizzo email per il recupero) oppure accedi a quello che hai già, poi scegli un mondo dalla Lista dei mondi.",
+      "worldsTitle": "Scegliere un mondo",
+      "worldsBody": "Il gioco online si svolge sui mondi, e ognuno è una copia completa del gioco con i propri giocatori, il proprio Mercato Mondiale e le proprie classifiche. La Lista dei mondi mostra quanto è affollato ciascun mondo, da Basso a Pieno, così puoi scegliere un mondo tranquillo per avere più spazio o uno affollato per avere compagnia. I tuoi personaggi vivono sul mondo in cui li hai creati, e puoi tenere personaggi su più di uno.",
+      "charactersTitle": "I tuoi personaggi",
+      "charactersBody": "Un account può tenere fino a dieci personaggi su ogni mondo, quindi c'è spazio per provare diverse classi senza rinunciare a niente. Eliminarne uno è un gesto deliberato: il personaggio deve trovarsi fuori dal mondo, e il gioco ti chiede di digitare il suo nome prima di procedere. Un personaggio eliminato è perso per sempre, e con lui vanno perse anche le sue inserzioni sul Mercato Mondiale e la sua corrispondenza della Posta dei Corvi.\n\nUna volta scelta la classe, decidi che aspetto avrà il tuo eroe. Un pannello a schede raccoglie Corpo, Viso, Capelli e Stile: scegli se sarà un uomo o una donna, modella il viso con una serie di cursori e una scelta di occhi, poi scegli uno stile e un colore per i capelli e una tonalità della pelle, sia dai preset con nome sia dalla ruota dei colori dietro di essi. Un pulsante Aspetto Casuale genera un intero aspetto se preferisci lasciarti sorprendere, e Ripristina Aspetto riporta il tuo personaggio al viso standard per il corpo che hai scelto. Niente di tutto questo influisce su come gioca il tuo personaggio.",
+      "namesTitle": "Dai un nome al tuo eroe",
+      "namesBody": "Un nome è lungo da 2 a 16 lettere, inizia con una lettera e può contenere spazi, trattini e apostrofi. Due personaggi sullo stesso mondo non possono condividerlo, e le maiuscole non liberano un nome: se Ashwind è già preso, anche ashwind lo è. La tua grafia viene mantenuta esattamente come l'hai digitata. Scegli un nome di cui sarai contento, perché resterà con il personaggio.",
+      "connectionTitle": "Se perdi la connessione",
+      "connectionBody": "Un segnale perso, un coperchio chiuso o un ricaricamento della pagina non ti disconnettono. Il tuo personaggio resta nel mondo per circa cinque minuti mentre il gioco si riconnette da solo, e tornerai esattamente nello stesso punto della stessa sessione. Questo significa anche che uscire dal gioco non è un modo per abbandonare uno scontro: il tuo personaggio resta comunque lì, in piedi. Disconnettersi dal menu di gioco ti fa uscire subito invece di aspettare, e lo stesso vale se accedi con un altro personaggio dello stesso account."
     },
     "controls": {
-      "intro": "Tasti predefiniti per il desktop. Ogni associazione può essere cambiata nelle opzioni di gioco, tranne Esc, che apre sempre il menu di gioco, e un'associazione può essere una combinazione con tasto modificatore come Maiusc+Z.",
+      "intro": "Tasti predefiniti per desktop. Ogni assegnazione qui si può cambiare dal pannello Comandi da tastiera nel menu di gioco, tranne Esc, che apre sempre quel menu. Ogni azione tiene fino a due tasti, uno principale e uno alternativo, e un'assegnazione può essere una combinazione con modificatore come Maiusc+Z. Può anche essere un pulsante del mouse: il pulsante centrale è M3 e i pulsanti del pollice sono M4 e M5, con gli eventuali altri contati a salire da lì. Il clic sinistro e il destro restano riservati alla telecamera, al movimento con clic e al clic sulle cose nel mondo.",
       "keyHeader": "Tasto",
       "actionHeader": "Azione",
       "groupMovement": "Movimento",
@@ -3902,9 +4213,10 @@ export const it_IT: EnTranslations = {
       "groupCamera": "Telecamera",
       "talents": "Talenti",
       "professions": "Professioni",
-      "arena": "Arena",
+      "arena": "Finestra GcG (le arene e i Campi di Thornhollow)",
       "leaderboard": "Classifica",
       "deeds": "Libro delle Imprese",
+      "reliquary": "Il Reliquiario",
       "sheathe": "Rinfodera/Sfodera Arma",
       "crafting": "Creazione",
       "valeCup": "Coppa della Valle",
@@ -3913,6 +4225,7 @@ export const it_IT: EnTranslations = {
       "dungeonFinder": "Cercatore di Dungeon",
       "discord": "Discord",
       "abilities": "Usa le abilità della barra delle azioni (la fila dei numeri; una seconda barra è sul tastierino numerico)",
+      "targetPrev": "Scorri i bersagli indietro",
       "targetFriendly": "Bersaglia l'amico più vicino",
       "cycleFriendly": "Scorri i bersagli amici",
       "targetAuras": "Potenziamenti e malus del bersaglio",
@@ -3922,42 +4235,42 @@ export const it_IT: EnTranslations = {
       "arrowKeys": "Tasti freccia",
       "groupPet": "Comandi del famiglio",
       "petBar": "Barra del famiglio: Attacca, Ferma, Provoca, Difensivo, Aggressivo (con un famiglio del cacciatore o dello stregone evocato)",
-      "attackMoveNote": "Un'ultima, disattivata di default: abilita Attacca in Movimento nelle opzioni per riservare un tasto (A, quando l'opzione è attiva) che ti fa avanzare verso il cursore e colpire il nemico sotto di esso, o il primo che incontri lungo il cammino.",
+      "attackMoveNote": "Il movimento d'attacco resta spento finché non lo accendi: apri il pannello Comandi da tastiera, attivalo e la riga A qui sopra inizia a funzionare. Con il cursore sopra il mondo di gioco, ti porta verso il cursore e apre il fuoco sul nemico che vi si trova sotto, o sul primo ostile che incontri lungo il cammino. Mentre l'opzione è attiva, A esegue quel movimento d'attacco invece di girare a sinistra, quindi gira con la freccia sinistra, che anche Gira a sinistra porta per impostazione predefinita, oppure assegna a Gira a sinistra un tasto tuo.",
       "mobileHeading": "Su mobile",
       "mobileBody": "I comandi touch compaiono automaticamente su telefoni e tablet: un joystick di movimento a sinistra, trascina altrove per guardarti intorno, pizzica con due dita per regolare lo zoom della telecamera, e pulsanti a schermo per abilità e menu. Una piccola freccia nell'angolo in alto a sinistra mostra o nasconde i pulsanti dei menu, e il pulsante Altro lì contiene il resto delle tue finestre.",
       "controllerHeading": "Con un controller",
       "controllerBody": "Funzionano anche i gamepad, e il supporto al controller è attivo di default. La levetta sinistra ti sposta, la destra orienta la telecamera, e i pulsanti frontali e dorsali coprono abilità, salto e interazioni. Apri una finestra come le tue borse per far comparire un puntatore a schermo, e il menu di gioco si naviga direttamente con la croce direzionale e i pulsanti frontali. Puoi rimappare i pulsanti e regolare la zona morta delle levette, la velocità della telecamera, la vibrazione e la vista invertita dalle impostazioni del controller nelle opzioni.",
-      "moveAlt": "Move and turn (the same four actions, on their second key)",
-      "jumpSwim": "Jump, and swim up while you are in the water",
-      "swimDown": "Swim down while you are in the water (hold)",
-      "swimNote": "Swimming uses two keys: hold Space to rise and LCtrl to sink. Aiming the camera down while you swim forward dives as well, so you can steer your depth with the view. LCtrl is the one default that is a modifier key on its own, and a lone modifier press is ignored while you are binding, so pick a key that is not a modifier if you rebind Swim Down.",
-      "bgFlag": "Take the enemy flag in Thornhollow Fields",
-      "attackMove": "Attack Move (only once you switch the option on)",
-      "meters": "Damage meters (damage, healing, and threat)",
-      "petMark": "Pet: Mark, select your own pet (the same as clicking its frame)",
-      "onBarBinding": "You can also bind straight from the bar: choose Edit action bar keys in the Key Bindings panel, then click a slot on the live bar and press the key you want. Click Done when you are finished. This one is desktop only, since it needs a physical keyboard.",
-      "clickMoveNote": "Click to Move is off until you switch it on: open the Key Bindings panel in the game menu, turn on Click to Move, then use the Click Move Button row under it to choose which mouse button does the walking (Left Click by default, or Right Click). Once it is on, clicking a spot on the ground sends you walking there, with a marker on the ground showing where you are headed. Clicking a creature or another player walks you over to them and stops in range, while that click still does its usual job of targeting or interacting; if you are already close enough to reach what you clicked, you simply interact and stay where you are. Any of the movement keys takes control straight back and ends the trip, and so does holding the mouse button to look around. Jumping does not, so you keep travelling through the hop, and opening the game menu only pauses the trip, which carries on when you close the menu."
+      "moveAlt": "Movimento e rotazione (le stesse quattro azioni, sul loro secondo tasto)",
+      "jumpSwim": "Salta, e nuota verso l'alto quando sei in acqua",
+      "swimDown": "Nuota verso il basso quando sei in acqua (tieni premuto)",
+      "swimNote": "Il nuoto usa due tasti: tieni premuto Spazio per risalire e Ctrl sinistro per scendere. Anche puntare la telecamera verso il basso mentre nuoti in avanti ti fa immergere, così puoi controllare la profondità con la visuale. Ctrl sinistro è l'unico predefinito che è di per sé un tasto modificatore, e una pressione isolata di un modificatore viene ignorata durante l'associazione, quindi scegli un tasto che non sia un modificatore se riassoci Nuota verso il basso.",
+      "bgFlag": "Prendi la bandiera nemica ai Campi di Thornhollow",
+      "attackMove": "Attacca in Movimento (solo dopo aver attivato l'opzione)",
+      "meters": "Misuratori danni (danno, cura e minaccia)",
+      "petMark": "Famiglio: bersaglia, seleziona il tuo famiglio (equivale a cliccare sul suo riquadro)",
+      "onBarBinding": "Puoi anche associare i tasti direttamente dalla barra: scegli Modifica i tasti della barra delle azioni nel pannello Comandi da tastiera, poi clicca uno slot sulla barra attiva e premi il tasto che vuoi. Clicca Fatto quando hai finito. Questa opzione è solo desktop, perché richiede una tastiera fisica.",
+      "clickMoveNote": "Clicca per muoverti è disattivato finché non lo attivi: apri il pannello Comandi da tastiera nel menu di gioco, attiva Clicca per muoverti, poi usa la riga Pulsante clic per muovere sotto di esso per scegliere quale pulsante del mouse cammina (Clic sinistro per impostazione predefinita, oppure Clic destro). Una volta attivato, cliccare un punto sul terreno ti fa camminare fin lì, con un indicatore a terra che mostra dove sei diretto. Cliccare una creatura o un altro giocatore ti fa camminare verso di loro fermandoti a portata, mentre quel clic svolge comunque il suo compito abituale di bersagliare o interagire; se sei già abbastanza vicino da raggiungere ciò su cui hai cliccato, interagisci semplicemente e resti dove sei. Uno qualsiasi dei tasti di movimento riprende subito il controllo e termina il tragitto, e lo stesso fa tenere premuto il pulsante del mouse per guardarti intorno. Saltare no, quindi continui il viaggio anche durante il balzo, e aprire il menu di gioco mette solo in pausa il tragitto, che riprende quando chiudi il menu."
     },
     "settingsPage": {
       "heading": "Impostazioni e prestazioni",
       "intro": "Rendi il gioco migliore o eseguilo più velocemente. Tre equipaggiamenti già pronti, oltre a ciò che fa realmente ogni opzione grafica.",
-      "wherePath": "Tutto in questa pagina risiede nel gioco: premi Esc per aprire le opzioni. Il menu si apre su una Panoramica degli elementi essenziali fissati, con le categorie su una barra laterale accanto: le impostazioni qui sotto si trovano sotto Grafica, Interfaccia e Accessibilità nel gruppo Schermo, e la Sovrapposizione prestazioni sotto Sistema. Più rapido ancora, scrivi un nome nella casella di ricerca in alto e salta dritto ad essa.",
+      "wherePath": "Tutto in questa pagina risiede nel gioco: premi Esc per aprire il menu di gioco. Elenca i pannelli come pulsanti: Comandi da tastiera, Controller, Grafica, Interfaccia, Aure, Audio e Sovrapposizione prestazioni, con sotto Wiki, Sblocca, Esci e Torna al gioco, e Segnala un bug che si aggiunge alla lista mentre giochi online. Grafica e Interfaccia contengono quasi tutto ciò che è descritto qui.",
       "fairnessTitle": "Giusto per progettazione",
-      "fairnessBody": "Nessuna opzione qui baratta la bellezza con il potere. Le impostazioni di Lower perdono solo il miglioramento estetico, mai le informazioni con cui combatti: i tuoi debuff, le barre di lancio, la salute del gruppo e i numeri di danno sono identici da Low a Ultra. Giocare su una macchina modesta non è mai un handicap.",
+      "fairnessBody": "Nessuna opzione qui scambia bellezza con potenza. Le impostazioni più basse rinunciano solo alla rifinitura estetica, mai alle informazioni con cui combatti: i tuoi malus, le barre di lancio, la salute del gruppo e i numeri di danno sono identici da Low a Insane. Giocare su una macchina modesta non è mai uno svantaggio.",
       "loadoutsHeading": "Tre equipaggiamenti già pronti",
       "loadoutsIntro": "Inizia dal loadout che assomiglia alla tua macchina, quindi regola un'opzione alla volta finché non ti sembra quella giusta.",
       "recommended": "Raccomandato",
       "whyLabel": "Perché funziona:",
-      "tagReload": "dopo la ricarica",
+      "tagReload": "premi Applica",
       "fpsTitle": "Il migliore FPS",
       "fpsTagline": "Per laptop più vecchi, grafica integrata e autonomia della batteria.",
       "fpsWhy": "La qualità grafica è l'interruttore principale e la qualità di rendering è lo slider più potente: al 70% il mondo disegna circa la metà dei pixel mentre l'interfaccia rimane perfettamente nitida.",
       "balancedTitle": "Equilibrato",
       "balancedTagline": "Il punto debole per la maggior parte delle macchine e il nostro consiglio predefinito.",
-      "balancedWhy": "Medium porta ombre reali e materiali pieni; High aggiunge occlusione ambientale e fioritura. Sotto Ultra una rete di sicurezza integrata assorbe i cali improvvisi durante i combattimenti intensi, quindi Balanced rimane fluido senza fare da babysitter.",
+      "balancedWhy": "Medium porta ombre reali e materiali completi, e High vi aggiunge occlusione ambientale e bloom. La rete di sicurezza integrata resta armata su ogni livello, così Balanced attraversa un combattimento affollato senza che tu debba sorvegliarlo.",
       "visualsTitle": "Le migliori immagini",
       "visualsTagline": "Modalità screenshot per potenti macchine desktop.",
-      "visualsWhy": "Ultra esegue il rendering alla massima risoluzione offerta dal display con l'illuminazione più ricca. Disattiva anche la rete di sicurezza ed è solo per desktop: i telefoni e l'app si completano a High.",
+      "visualsWhy": "Ultra effettua il rendering alla risoluzione più alta che il tuo schermo offre, con l'illuminazione più ricca. Sopra c'è Insane, la vetrina con tutto attivo: quello devi sceglierlo a mano, perché il gioco non lo seleziona mai per te, per quanto potente sia la tua macchina.",
       "value50to70": "dal 50 al 70%",
       "value90to100": "dal 90 al 100%",
       "value100": "100%",
@@ -3965,16 +4278,16 @@ export const it_IT: EnTranslations = {
       "valueOnOptional": "Attivo (facoltativo)",
       "howHeading": "Come si comportano le opzioni",
       "factDetectTitle": "Il gioco si sintonizza prima",
-      "factDetectBody": "Al primo avvio il gioco legge il tuo dispositivo e sceglie un livello ragionevole, da Low su un telefono modesto a Ultra su un desktop potente. Qualunque scelta tu faccia, vince sempre.",
+      "factDetectBody": "Al primo avvio il gioco esamina il tuo dispositivo e memorizza un livello sensato per te. Ogni telefono e tablet parte da Low così entri subito nel mondo, e lo stesso vale per una scheda grafica vecchia o software. Un desktop potente parte da Ultra, oppure da High quando la macchina sembra scarsa di memoria. Ciò che il gioco non riesce a collocare resta su Medium. Qualsiasi scelta tu faccia vince sempre, e resta.",
       "factReloadTitle": "Due tipi di opzioni",
-      "factReloadBody": "La qualità grafica e i selettori avanzati hanno effetto dopo una ricarica e il pannello offre un pulsante Ricarica ora quando necessario. Ogni altra opzione si applica nel momento in cui la modifichi.",
+      "factReloadBody": "Il pannello Grafica modifica una bozza. Cambia la Qualità grafica o una qualsiasi delle manopole di dettaglio, poi premi Applica e il gioco ricostruisce il mondo dove ti trovi, senza ricaricare. La riga accanto al pulsante ti dice quando è fatto. Ogni altra opzione, in quel pannello e ovunque altrove, si applica nel momento in cui la cambi, e solo una ricostruzione che fallisce del tutto ti offre invece un pulsante di ricarica.",
       "factGovernorTitle": "Una rete di sicurezza integrata",
-      "factGovernorBody": "Su ogni livello inferiore a Ultra, il gioco riduce silenziosamente l'erba, gli effetti e l'illuminazione per un momento quando un grande combattimento raggiunge il picco, quindi li ripristina. Scegliendo Ultra significa che preferiresti mantenere ogni dettaglio.",
-      "factSearchTitle": "La ricerca la trova per prima",
-      "factSearchBody": "Non sai dove si trovi un'opzione? Scrivi nella casella di ricerca in cima al menu. Capisce anche le formulazioni comuni, così fps trova l'indicatore FPS, e scegliere un risultato ti porta dritto all'impostazione e la lascia evidenziata.",
-      "advancedHeading": "La preimpostazione avanzata: mescola la tua",
-      "advancedBody": "Avanzato inizia dal livello High e sblocca quattro selettori extra, così puoi spendere i tuoi fotogrammi dove li noti effettivamente: dettaglio del terreno, densità del fogliame, effetti e illuminazione e qualità delle ombre. Come la qualità grafica, si applicano dopo una ricarica.",
-      "advancedMixes": "Due mix preferiti: mantieni la qualità delle ombre su High e imposta Effetti e illuminazione su Low per un look nitido e privo di bagliore che scorre leggero, oppure fai il contrario per mantenere la fioritura e ammorbidire le ombre.",
+      "factGovernorBody": "Ogni livello tiene armata una rete di sicurezza: quando un grande combattimento si infiamma, il gioco dirada in silenzio erba, effetti e illuminazione per un momento, poi li ripristina. Ultra e Insane semplicemente aspettano molto più a lungo prima di farlo, così un preset di fascia alta non viene mai disturbato da un singolo fotogramma lento.",
+      "factSearchTitle": "Dove si trova un'impostazione",
+      "factSearchBody": "Non c'è una casella di ricerca, quindi conviene conoscere la forma del menu. Grafica è disposta in schede: Qualità, Dettaglio del mondo, Illuminazione ed effetti, Telecamera, Schermo e Sistema, più Comandi touch su uno schermo tattile. Interfaccia è divisa in quattro linguette: Generale, Finestre, Chat e Combattimento. Se un'impostazione cambia il modo in cui il mondo viene disegnato è in Grafica, e se cambia ciò che l'interfaccia ti mostra è in Interfaccia.",
+      "advancedHeading": "Le manopole di dettaglio e il mix Advanced",
+      "advancedBody": "Non devi scegliere Advanced per vedere le manopole di dettaglio. Il pannello Grafica le mostra sempre, in due schede: Dettaglio del mondo raccoglie Dettaglio del terreno, Densità del fogliame, Dettaglio delle superfici, Distanza visiva, Qualità dell'acqua e Dettaglio dei personaggi, e Illuminazione ed effetti raccoglie Effetti e illuminazione, Qualità delle ombre, Occlusione ambientale, Bloom, Anti-aliasing, Luci dinamiche ed Effetti particellari. Sotto un preset fisso ogni manopola mostra all'incirca dove si colloca quel preset.",
+      "advancedMixes": "Due mix preferiti: tieni alta la Qualità delle ombre e metti Effetti e illuminazione su Low per un aspetto nitido e senza aloni che gira leggero, oppure fai il contrario per conservare il bloom e ammorbidire le ombre. Una cosa da sapere prima di mescolare: Occlusione ambientale, Bloom e Anti-aliasing pendono dalla stessa catena di Effetti e illuminazione, quindi con quella manopola su Low non hanno più nulla su cui girare.",
       "tableHeading": "Ogni opzione grafica, spiegata",
       "colSetting": "Collocamento",
       "colDoes": "Cosa fa",
@@ -3991,286 +4304,286 @@ export const it_IT: EnTranslations = {
       "rowBrowserEffects": "Quanto può essere fantasiosa l'interfaccia stessa: sfocatura del vetro, bagliore, menu animati. Si adatta automaticamente al tuo browser; il mondo 3D è intatto in ogni caso.",
       "rowTerrainDetail": "Texture del terreno ricche e miste rispetto a un aspetto del terreno più semplice e veloce.",
       "rowFoliageDensity": "Quanto lontano e quanto fitto cresce l'erba attorno al tuo personaggio.",
-      "rowEffectsQuality": "Bloom, occlusione ambientale e quante torce e incantesimi proiettano luce reale. Il risparmio più grande tra i raccoglitori avanzati.",
+      "rowEffectsQuality": "Bloom, occlusione ambientale e quante torce e quanti incantesimi proiettano luce reale. Il risparmio più grande fra le manopole di dettaglio, e l'interruttore da cui dipendono le altre manopole di illuminazione.",
       "rowShadowQuality": "Freschezza dell'ombra. Low mantiene le ombre ma ne ammorbidisce i bordi.",
       "rowFrostedPanels": "Una macchia di vetro smerigliato dietro le finestre. Carina ed esattamente il tipo di effetto percepito da un browser più debole; lascialo fuori per il classico look frizzante.",
       "rowReduceMotion": "Rimuove le animazioni dell'interfaccia in modo che le finestre vengano visualizzate immediatamente. Innanzitutto un'opzione di accessibilità, con un piccolo bonus in termini di prestazioni.",
       "rowPerfOverlay": "Una lettura sullo schermo di FPS, frame time e altro. Attivalo mentre ottimizzi questa pagina, quindi nascondilo di nuovo.",
-      "tableFoot": "Cerchi uno slider per la distanza di visualizzazione o un cap FPS? Non c'è niente da cercare: la distanza di visualizzazione fa parte di ogni livello di qualità e il ritmo dei fotogrammi segue la visualizzazione.",
+      "tableFoot": "Cerchi un limite di FPS? Non c'è nulla da cercare: la cadenza dei fotogrammi segue il tuo schermo. La distanza di disegno è una manopola a sé, Distanza visiva, nella scheda Dettaglio del mondo, e ogni preset la imposta per te finché non la sposti tu.",
       "mobileTitle": "Su telefoni e tablet",
-      "mobileBody": "I dispositivi mobili gestiscono di più per te: il gioco sceglie il livello, mantiene la risoluzione leggermente inferiore per proteggere la batteria e il calore e mantiene i livelli più alti solo per desktop. Gli equipaggiamenti sopra riportati sono ancora validi; i telefoni si ricaricano semplicemente a High.",
-      "touchBody": "Su uno schermo tattile le opzioni si arricchiscono anche di un gruppo di comfort tutto loro: dimensione e sensibilità del joystick, dimensione e opacità dei pulsanti a schermo, un layout speculare per mancini, una levetta opzionale per la telecamera e la visuale tattile invertita, così è lo schermo ad adattarsi alle tue mani e non il contrario.",
+      "mobileBody": "Su telefono o tablet il gioco ti fa partire da Low. Ogni dispositivo tattile atterra lì al primo avvio, di proposito, così entri nel mondo e giochi; alzalo tu stesso dal pannello Grafica quando vuoi. In un browser Android l'intera scala ti è aperta e la tua scelta resta. Su iPhone e iPad puoi comunque scegliere i preset più alti e prendono effetto appena premi Applica, ma il gioco ti riporta a High al prossimo avvio, perché iOS può chiudere la scheda mentre viene costruita una scena così grande. L'app scaricata è ancora più stretta: la sua lista di preset si ferma a High e le singole manopole di sistema sono nascoste, perché l'app le gestisce da sé.",
+      "touchBody": "Su uno schermo tattile il pannello Grafica guadagna una scheda Comandi touch tutta sua: dimensione e zona morta del joystick, dimensione dei pulsanti a schermo, opacità dei comandi, uno stick della telecamera opzionale, una disposizione speculare per mancini e la visuale tattile invertita, così lo schermo si adatta alle tue mani anziché il contrario.",
       "audioTitle": "Suono e lingua",
-      "audioBody": "La finestra delle opzioni non è solo pixel. Una categoria Audio raccoglie controlli di volume separati per effetti, musica e voce, e la categoria Interfaccia porta un selettore della lingua che rilocalizza l'intera interfaccia all'istante, senza bisogno di ricaricare, oltre a un selettore del tema per l'aspetto delle finestre. La lingua è anche fissata per prima nella Panoramica, così è sempre a un passo dall'apertura del menu.",
-      "autolootBody": "Preferisci non cliccare ogni cadavere? Un'opzione dell'interfaccia, disattivata di default, raccoglie il bottino delle tue uccisioni mentre ci passi accanto.",
-      "panelsMoreBody": "The two panels this page does not table are worth a look anyway. Auras is where you shape the big on-screen alerts that fire when one of your class procs comes up: which ones show, their size, color, opacity, and where they sit on screen. Performance Overlay is the readout you turn on while you tune this page, then hide again.",
-      "valueUltraOrInsane": "Ultra, or Insane if you want everything",
-      "advancedLadder": "Move any one of them and the quality preset switches to Advanced, seeded from exactly the levels you were looking at, so your custom mix starts from what you already saw rather than from scratch. Press Apply when you like it. Advanced sits at the end of the preset list for that reason: it is the expert profile where your own mix lives.",
-      "rowSurfaceDetail": "The worn detail layer on stone and paving, from off to a full parallax finish. It is the town-street dial: the more of it you keep, the busier a paved street is to draw.",
-      "rowViewDistance": "How far into the distance the world is drawn before it fades out. Each preset sets it for you until you move it yourself.",
-      "rowWaterQuality": "How lakes, rivers, and the open sea are shaded, from flat and cheap to fully reflective.",
-      "rowCharacterDetail": "How far away other characters keep their full animated rig before they drop to a simpler one. Higher is kinder to the eye in a crowded hub, and heavier.",
-      "rowAmbientOcclusion": "The soft contact shadow where surfaces meet. Off, half resolution, or full.",
-      "rowBloom": "The gentle glow around bright light, fire, and spell effects.",
-      "rowAntiAliasing": "Smooths the jagged edges of distant geometry. Cheap, and worth keeping on most machines.",
-      "rowDynamicLights": "How many torches, campfires, and spells cast real light into the scene around them.",
-      "rowParticleEffects": "How thick the spell, weather, and ambient particle work is allowed to get.",
-      "rowCameraSpeed": "How quickly the camera swings when you look around with the mouse.",
-      "rowTouchLookSpeed": "The same thing for swipe-look, and it only appears when you are on a touchscreen.",
-      "rowFullscreen": "Fills the whole screen with the game.",
-      "rowWaterRipples": "Wakes and ripples that spread out behind you as you swim. Off by default, and the one water effect that costs real frames; splashes and bubbles are unaffected either way.",
-      "rowOverflowXp": "At maximum level, whether your bar keeps filling with overflow experience or shows the classic static max-level text instead.",
-      "rowInterfaceMode": "Whether you get the desktop interface or the on-screen touch controls. Auto reads your device, and you can force either one: a tablet with a keyboard can take the desktop layout, and a touchscreen laptop can take the touch controls.",
-      "interfaceHeading": "The Interface panel",
-      "interfaceIntro": "Interface is the biggest panel in the game, and it is split into four tabs. Nothing in here changes what the world can do to you: it changes what you are shown and how large it is. These are the rows most worth knowing about.",
-      "interfaceFoot": "That is not all of them. Every tab carries more sliders and switches than are worth tabling here, so open it once and read down the list. It is five minutes well spent.",
-      "ifGeneralIntro": "Scale, contrast, and what the interface shows about you. The language and theme pickers sit at the top of this tab too.",
-      "ifFramesIntro": "Your own frame, your target frame, and the whole party layout. The party cluster also carries scale, width, height, spacing, and column sliders so a raid grid fits your screen, and a Reset button at the foot of the tab puts every frame back where it started.",
-      "ifChatIntro": "How the chat window reads. A reset for the chat windows themselves lives here as well.",
-      "ifCombatIntro": "How your bars behave and what combat puts on screen.",
-      "ifUiScale": "Scales the whole interface at once. It lands when you let go of the slider, so the window under your cursor does not move while you drag it.",
-      "ifHudOpacity": "How solid the HUD panels are over the world behind them.",
-      "ifTooltipScale": "Tooltip text size, handy on a small screen or a very large one.",
-      "ifHighContrastText": "Heavier, higher-contrast interface text. An accessibility option first, and a good one on a bright screen.",
-      "ifHighContrastBackground": "A plainer, higher-contrast background behind the start and character screens.",
-      "ifInvertLookY": "Flips the up and down direction of mouse look.",
-      "ifShowItemLevel": "Adds an item level line to every item tooltip. Off by default, which keeps the classic stat-only tooltip.",
-      "ifShowPlaytime": "Shows your lifetime time played on the character sheet. On by default, and the sheet has an eye button that flips it per device, which is handy if you stream or take screenshots. The total keeps counting either way.",
-      "ifShowOwnNameplate": "Draws your own overhead nameplate exactly as other players see it, flair and all. Turn it off for the classic view.",
-      "ifShowPlayerNameplates": "Draws other players nameplates. Off declutters a crowded hub, and your current target stays readable either way.",
-      "ifWallet": "Whether your wallet is shown on the character screen. There is a matching switch for the player card.",
-      "ifDailyChest": "Whether the daily rewards chest sits on your HUD.",
-      "ifPlayerFrameScale": "The size of your own unit frame.",
-      "ifTargetFrameScale": "The size of your target frame.",
-      "ifPartyStyle": "The party layout: Automatic follows your group size, Classic is the traditional stack, and Raid packs everyone into the compact grid.",
-      "ifPartyHealthText": "What the party bars print: nothing, a percentage, current health, or current and maximum.",
-      "ifPartySort": "The order party members are listed in: group order, role, or name.",
-      "ifPartyShowAuras": "Whether buffs and debuffs show on the party frames. Matching switches cover resource bars, absorbs, pets, and whether you appear in your own party list.",
-      "ifAurasOnPlayerFrame": "Puts your buffs and debuffs on your own unit frame as well as the aura bar.",
-      "ifTargetOfTarget": "Shows who your target is targeting, the classic way to tell whether the tank still has it.",
-      "ifPetFrame": "Shows a frame for your pet.",
-      "ifChatFontScale": "Chat text size.",
-      "ifChatOpacity": "How solid the chat background is.",
-      "ifCompactChat": "Tightens the chat lines so more of them fit.",
-      "ifChatTimestamps": "Adds a time to each chat line, in 12-hour or 24-hour form.",
-      "ifStartAttack": "Whether using an ability also starts your auto-attack. On by default, and the classic behavior most players expect.",
-      "ifStopAutoAttack": "Whether switching targets stops your swing. Off by default, so your attack carries over to the new target.",
-      "ifShowAttackButton": "Puts an explicit Attack button on your action bar.",
-      "ifWalkByAutoloot": "Scoops the loot from your own kills as you walk past them. Off by default.",
-      "ifGroundReticle": "Shows the ground circle while you are aiming a placed spell.",
-      "ifMouseoverCast": "Lets a heal or a friendly spell land on the party frame you are hovering, without changing your target.",
-      "ifStickyTarget": "Keeps your current target when you click on empty ground, instead of clearing it.",
-      "ifFctScale": "The size of the damage and healing numbers that float off your target.",
-      "ifExtraBars": "Reveals a second action bar row, and a third once the second is on. The slots stay reachable by their keybinds even while the rows are hidden.",
-      "ifHideUnused": "Hides empty action slots so only the buttons you actually use are drawn.",
-      "ifLockBars": "Locks your bars so you cannot drag an ability out of a slot by accident.",
-      "keybindsHeading": "The Key Bindings panel",
-      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, the left-handed touch layout, and the profanity filter for chat.",
-      "keybindsMouseBody": "Two things there are easy to miss. Mouse buttons bind like keys, so the wheel click and the thumb buttons can carry abilities, while left and right click stay reserved for the camera and for clicking on the world. And you can bind straight from the action bar: turn on the on-bar binding mode here, then click a slot and press the key you want."
+      "audioBody": "La finestra delle opzioni non è fatta solo di pixel. Audio raccoglie tre cursori del volume, per effetti sonori, musica e voce, più un interruttore per la musica e quattro interruttori per i suoni che stancano prima: voci dei PNG, passi, suoni dell'interfaccia e riscontro al clic. La linguetta Generale del pannello Interfaccia porta un selettore di lingua che rilocalizza l'intera interfaccia all'istante, senza ricaricare, e un selettore di tema per l'aspetto delle finestre.",
+      "autolootBody": "Preferisci non cliccare ogni cadavere? Il saccheggio automatico di passaggio, nella linguetta Combattimento del pannello Interfaccia e disattivato per impostazione predefinita, raccoglie il bottino delle tue uccisioni mentre ci passi accanto.",
+      "panelsMoreBody": "I due pannelli che questa pagina non elenca meritano comunque un'occhiata. Aure è dove modelli i grandi avvisi a schermo che scattano quando arriva uno dei proc della tua classe: quali mostrare, la loro dimensione, il colore, l'opacità e dove si collocano sullo schermo. Sovrapposizione prestazioni è la lettura che attivi mentre ottimizzi questa pagina, per poi nasconderla di nuovo.",
+      "valueUltraOrInsane": "Ultra, oppure Estrema se vuoi tutto al massimo",
+      "advancedLadder": "Sposta anche solo uno di essi e il preset di qualità passa ad Avanzata, avviato esattamente dai livelli che stavi guardando, così il tuo mix personalizzato parte da ciò che avevi già visto invece che da zero. Premi Applica quando ti soddisfa. Avanzata si trova per questo alla fine dell'elenco dei preset: è il profilo esperto dove vive il tuo mix personale.",
+      "rowSurfaceDetail": "Lo strato di dettaglio consumato su pietra e pavimentazione, da disattivato a una finitura parallasse completa. È la manopola delle strade di città: più ne mantieni, più impegnativa è da disegnare una strada pavimentata.",
+      "rowViewDistance": "Fino a che distanza viene disegnato il mondo prima di dissolversi. Ogni preset la imposta per te finché non la modifichi tu stesso.",
+      "rowWaterQuality": "Come vengono ombreggiati laghi, fiumi e mare aperto, da un aspetto piatto ed economico a uno pienamente riflettente.",
+      "rowCharacterDetail": "Fino a che distanza gli altri personaggi mantengono il proprio modello animato completo prima di passare a uno più semplice. Più alto è più gradevole all'occhio in un hub affollato, ma anche più pesante.",
+      "rowAmbientOcclusion": "L'ombra di contatto morbida dove le superfici si incontrano. Disattivata, a mezza risoluzione, o completa.",
+      "rowBloom": "Il bagliore delicato attorno a luci intense, fuoco ed effetti degli incantesimi.",
+      "rowAntiAliasing": "Ammorbidisce i bordi frastagliati della geometria distante. Economico, e vale la pena tenerlo attivo sulla maggior parte delle macchine.",
+      "rowDynamicLights": "Quante torce, fuochi da campo e incantesimi proiettano luce reale nella scena circostante.",
+      "rowParticleEffects": "Quanto possono infittirsi gli effetti particellari di incantesimi, meteo e ambiente.",
+      "rowCameraSpeed": "Quanto rapidamente ruota la telecamera quando ti guardi attorno con il mouse.",
+      "rowTouchLookSpeed": "La stessa cosa per la visuale a scorrimento, e appare solo quando sei su un touchscreen.",
+      "rowFullscreen": "Riempie l'intero schermo con il gioco.",
+      "rowWaterRipples": "Scie e increspature che si allargano dietro di te mentre nuoti. Disattivate di default, ed è l'unico effetto dell'acqua che costa davvero fotogrammi; spruzzi e bolle non ne risentono in ogni caso.",
+      "rowOverflowXp": "Al livello massimo, se la tua barra continua a riempirsi con l'esperienza eccedente oppure mostra invece il classico testo statico di livello massimo.",
+      "rowInterfaceMode": "Se ottieni l'interfaccia desktop o i controlli touch a schermo. Auto legge il tuo dispositivo, ma puoi forzare entrambi: un tablet con tastiera può usare il layout desktop, e un laptop touchscreen può usare i controlli touch.",
+      "interfaceHeading": "Il pannello Interfaccia",
+      "interfaceIntro": "Interfaccia è il pannello più grande del gioco, ed è diviso in quattro schede. Niente qui cambia ciò che il mondo può farti: cambia cosa ti viene mostrato e quanto è grande. Queste sono le voci più utili da conoscere.",
+      "interfaceFoot": "Non sono tutte qui. Ogni scheda porta più cursori e interruttori di quanti valga la pena elencare in questa sede, quindi aprila una volta e scorri l'elenco. Sono cinque minuti ben spesi.",
+      "ifGeneralIntro": "Scala, contrasto e cosa l'interfaccia mostra di te. I selettori di lingua e tema si trovano anch'essi in cima a questa scheda.",
+      "ifFramesIntro": "Il tuo riquadro, il riquadro del bersaglio e l'intero layout del gruppo. Il blocco del gruppo porta anche cursori di scala, larghezza, altezza, spaziatura e colonne, così una griglia da incursione si adatta al tuo schermo, e un pulsante Ripristina in fondo alla scheda riporta ogni riquadro al punto di partenza.",
+      "ifChatIntro": "Come si legge la finestra della chat. Qui trovi anche un ripristino per le finestre di chat stesse.",
+      "ifCombatIntro": "Come si comportano le tue barre e cosa il combattimento mostra a schermo.",
+      "ifUiScale": "Ridimensiona l'intera interfaccia in una volta sola. Si applica quando rilasci il cursore, così la finestra sotto il puntatore non si sposta mentre trascini.",
+      "ifHudOpacity": "Quanto sono solidi i pannelli dell'HUD rispetto al mondo dietro di loro.",
+      "ifTooltipScale": "Dimensione del testo dei suggerimenti, comoda su uno schermo piccolo o molto grande.",
+      "ifHighContrastText": "Testo dell'interfaccia più marcato e a contrasto più elevato. Prima di tutto un'opzione di accessibilità, ed è utile anche su uno schermo molto luminoso.",
+      "ifHighContrastBackground": "Uno sfondo più semplice e a contrasto più elevato dietro le schermate iniziale e dei personaggi.",
+      "ifInvertLookY": "Inverte la direzione su e giù della visuale con il mouse.",
+      "ifShowItemLevel": "Aggiunge una riga di livello oggetto a ogni suggerimento degli oggetti. Disattivata di default, il che mantiene il classico suggerimento con le sole statistiche.",
+      "ifShowPlaytime": "Mostra il tuo tempo di gioco complessivo sulla scheda del personaggio. Attivata di default, e la scheda ha un pulsante a forma di occhio che la nasconde per dispositivo, comodo se streammi o fai screenshot. Il totale continua comunque a contare.",
+      "ifShowOwnNameplate": "Disegna la tua targhetta sopra la testa esattamente come la vedono gli altri giocatori, decorazioni comprese. Disattivala per la visuale classica.",
+      "ifShowPlayerNameplates": "Disegna le targhette degli altri giocatori. Disattivata sgombra un hub affollato, e il tuo bersaglio attuale resta comunque leggibile.",
+      "ifWallet": "Se il tuo portafoglio è mostrato nella schermata del personaggio. C'è un interruttore corrispondente per la scheda giocatore.",
+      "ifDailyChest": "Se il forziere delle ricompense giornaliere compare sul tuo HUD.",
+      "ifPlayerFrameScale": "La dimensione del tuo riquadro del giocatore.",
+      "ifTargetFrameScale": "La dimensione del tuo riquadro del bersaglio.",
+      "ifPartyStyle": "Il layout del gruppo: Automatico segue la dimensione della tua squadra, Classico è la pila tradizionale, e Incursione stipa tutti nella griglia compatta.",
+      "ifPartyHealthText": "Cosa stampano le barre del gruppo: niente, una percentuale, la salute attuale, oppure salute attuale e massima.",
+      "ifPartySort": "L'ordine in cui sono elencati i membri del gruppo: ordine di gruppo, ruolo, o nome.",
+      "ifPartyShowAuras": "Se buff e debuff compaiono sui riquadri del gruppo. Interruttori corrispondenti coprono le barre risorsa, gli assorbimenti, i famigli e se compari nella tua stessa lista del gruppo.",
+      "ifAurasOnPlayerFrame": "Mette i tuoi buff e debuff sul tuo riquadro del giocatore oltre che sulla barra delle aure.",
+      "ifTargetOfTarget": "Mostra chi sta bersagliando il tuo bersaglio, il modo classico per capire se il tank ha ancora la minaccia.",
+      "ifPetFrame": "Mostra un riquadro per il tuo famiglio.",
+      "ifChatFontScale": "Dimensione del testo della chat.",
+      "ifChatOpacity": "Quanto è solido lo sfondo della chat.",
+      "ifCompactChat": "Comprime le righe di chat così ce ne stanno di più.",
+      "ifChatTimestamps": "Aggiunge un orario a ogni riga di chat, in formato 12 ore o 24 ore.",
+      "ifStartAttack": "Se usare un'abilità avvia anche il tuo attacco automatico. Attivata di default, ed è il comportamento classico che la maggior parte dei giocatori si aspetta.",
+      "ifStopAutoAttack": "Se cambiare bersaglio interrompe il tuo attacco. Disattivata di default, così il tuo attacco prosegue sul nuovo bersaglio.",
+      "ifShowAttackButton": "Mette un pulsante Attacco esplicito sulla tua barra delle azioni.",
+      "ifWalkByAutoloot": "Raccoglie il bottino delle tue uccisioni mentre ci passi accanto. Disattivata di default.",
+      "ifGroundReticle": "Mostra il cerchio a terra mentre stai mirando un incantesimo posizionato.",
+      "ifMouseoverCast": "Permette a una cura o a un incantesimo amico di colpire il riquadro del gruppo su cui passi il mouse, senza cambiare il tuo bersaglio.",
+      "ifStickyTarget": "Mantiene il tuo bersaglio attuale quando fai clic su terreno vuoto, invece di rimuoverlo.",
+      "ifFctScale": "La dimensione dei numeri di danno e cura che fluttuano dal tuo bersaglio.",
+      "ifExtraBars": "Rivela una seconda fila della barra delle azioni, e una terza una volta attivata la seconda. Gli slot restano raggiungibili tramite i loro tasti assegnati anche quando le file sono nascoste.",
+      "ifHideUnused": "Nasconde gli slot azione vuoti così vengono disegnati solo i pulsanti che usi davvero.",
+      "ifLockBars": "Blocca le tue barre così non puoi trascinare per sbaglio un'abilità fuori da uno slot.",
+      "keybindsHeading": "Il pannello Comandi da tastiera",
+      "keybindsBody": "L'elenco dei tasti è solo metà di quel pannello. Sopra di esso si trovano gli interruttori che decidono come il mouse guida il gioco: telecamera con mouse, se il cursore si blocca durante la rotazione, clic per muoversi e quale pulsante del mouse lo attiva, movimento d'attacco, il layout touch per mancini, e il filtro del linguaggio per la chat.",
+      "keybindsMouseBody": "Due cose lì sono facili da non notare. I pulsanti del mouse si associano come i tasti, quindi il clic della rotellina e i pulsanti laterali possono portare abilità, mentre il clic sinistro e destro restano riservati alla telecamera e al clic sul mondo. E puoi associare i tasti direttamente dalla barra delle azioni: attiva qui la modalità di associazione sulla barra, poi fai clic su uno slot e premi il tasto che vuoi."
     },
     "combat": {
       "intro": "Il combattimento segue le familiari regole degli MMO classici. Non hai mai bisogno di studiarne nulla per giocare bene, questa è solo la forma di come funzionano gli scontri.",
       "hitTitle": "Non tutti i colpi vanno a segno",
-      "hitBody": "Gli attacchi possono mancare o essere schivati, e lo stesso vale per quelli del nemico, mentre gli incantesimi possono essere resistiti del tutto. Combattere vicino al tuo livello è ciò che fa andare a segno i tuoi colpi; più ampio è il divario di livello, più colpisci a vuoto.",
+      "hitBody": "Gli attacchi possono mancare, e possono essere schivati, e lo stesso vale per quelli del nemico. Altre due risposte appartengono solo ai giocatori: un guerriero può deviare un colpo con una parata, e un guerriero o un paladino con uno scudo può smorzarlo in un blocco, entrambe le cose solo contro ciò che arriva di fronte. Le creature del mondo non fanno né l'una né l'altra, quindi un colpo contro un mostro va a segno, manca o viene schivato. Gli incantesimi seguono una regola loro e non mancano mai: vi si resiste invece. Combattere vicino al tuo livello è ciò che fa andare a segno i tuoi colpi; più ampio è il divario di livello, più colpisci l'aria.",
       "mitigationTitle": "Corazza e salute ti tengono in piedi",
       "mitigationBody": "La corazza attenua i colpi fisici, perciò una corazza migliore è la tua principale fonte di resistenza nel corpo a corpo. La magia è un altro paio di maniche: agli incantesimi resisti con una riserva di salute più ampia e la possibilità di resistere del tutto a uno di essi, non con la corazza. Le classi con corazza più pesante incassano di più, ma nulla ti rende invulnerabile.",
       "resourcesTitle": "Ogni classe ha il suo ritmo",
       "resourcesBody": "I guerrieri accumulano Ira nel vivo dello scontro, i ladri spendono Energia che si rigenera costantemente, e gli incantatori gestiscono una riserva di Mana. Imparare la tua risorsa è metà del giocare bene la tua classe.",
       "growTitle": "Diventi più forte ad ogni livello",
-      "growBody": "Ogni livello ti rende più resistente e sblocca nuove abilità, fino al limite del livello {cap}. Le missioni sono la via più rapida per salire; la caccia, i dungeon e le esplorazioni completano il quadro.",
+      "growBody": "Ogni livello ti rende più resistente e sblocca nuove abilità, fino al limite del livello {cap}. Le missioni sono la via più rapida verso l'alto; la caccia, i dungeon, le incursioni e le professioni che eserciti lungo il cammino completano il quadro.",
       "effectsTitle": "Potenziamenti, malus e controllo della folla",
       "effectsBody": "Molte abilità applicano un effetto che permane. Quelli benefici (potenziamenti) aumentano le tue statistiche, ti proteggono o ti curano un po' alla volta; quelli dannosi (malus) ti prosciugano la salute con danno nel tempo o ti indeboliscono. Tieni d'occhio le piccole icone nell'angolo in alto dello schermo, accanto alla minimappa, per vedere cosa hai addosso e quanto dura.",
-      "ccBody": "Il controllo della folla è un tipo speciale di malus che limita ciò che un bersaglio può fare: stordimenti, radicamenti e rallentamenti, silenzi che fermano il lancio di incantesimi, disarmi, paure e trasformazioni che rendono un nemico inoffensivo per un momento. Contro gli altri giocatori, il controllo si logora con la ripetizione: lo stesso tipo riapplicato troppo in fretta si indebolisce e poi fallisce del tutto, e uno stordimento che apre dalla furtività viene conteggiato a parte rispetto agli stordimenti che seguono, così nessuno può essere incatenato indifeso per sempre. Le creature del mondo non serbano un tale rancore: su di loro il controllo non si indebolisce mai con la ripetizione, anche se molti dei nemici più possenti, gli elite dotati di nome e i boss più forti tra loro, non possono essere controllati affatto.",
+      "ccBody": "Il controllo è un tipo particolare di malus che limita ciò che un bersaglio può fare: storditori, radicamenti e rallentamenti, silenzi che fermano il lancio di incantesimi, disarmi, paure e trasformazioni che rendono un avversario inoffensivo per un momento. Contro gli altri giocatori la maggior parte del controllo si logora con la ripetizione: paure, trasformazioni, radicamenti e blocchi di scuola riapplicati troppo in fretta si accorciano e poi falliscono del tutto, così nessuno può essere tenuto inerme per sempre. Gli storditori sono l'eccezione voluta, dato che sono già brevi e poggiano su veri tempi di recupero: la ripetizione non li accorcia mai, anche se l'equipaggiamento che riduce le durate di controllo continua a limarli. Le creature del mondo non serbano questo rancore: contro di loro il controllo non si indebolisce mai con la ripetizione, per quanto molti dei nemici più temibili, le élite con un nome e i boss più forti fra loro, non possano essere controllati affatto.",
       "metersBody": "Curioso di sapere com'è andato uno scontro? Premi Shift+H per aprire i misuratori del gruppo, che tengono il conto di danno, cure e minaccia della tua squadra, scontro per scontro.",
       "queueTitle": "La tua prossima mossa è già pronta",
       "queueBody": "Non devi cronometrare le pressioni al singolo istante. Premi la prossima abilità negli attimi finali del lancio in corso e viene messa in coda, scattando nell'istante in cui il lancio si completa, così il gioco esperto scorre senza pause. Una pressione troppo anticipata viene semplicemente rifiutata, quindi nulla va sprecato. Alcuni colpi in mischia funzionano allo stesso modo, partendo con il tuo prossimo fendente.",
       "deathTitle": "Quando cadi",
       "deathBody": "Se la tua salute arriva a zero, cadi a terra dove ti trovi, e il tuo corpo resta lì. Libera il tuo spirito e risorgi come spettro al cimitero più vicino: più rapido dei vivi, fuori dalla portata dei tuoi nemici, ma incapace di combattere, saccheggiare o parlare con chiunque tranne il Custode Pallido che aleggia sulle pietre. Da lì scegli. Riporta il tuo spettro fino al corpo e rivivi sul posto con parte della salute e del mana ripristinati e senza alcuna penalità. Oppure accetta dal Custode Pallido un risveglio immediato dove ti trovi, al prezzo del Mal di resurrezione: un indebolimento temporaneo di tutto ciò che sei, che dura più a lungo quanto più sei navigato e risparmia del tutto i personaggi appena creati. Cadi dentro un dungeon e il tuo spirito ti attende al cimitero all'esterno; riporta lo spettro oltre la soglia e rivivi all'ingresso. Le esplorazioni fanno eccezione: se cadi lì vieni semplicemente rimesso in piedi all'ingresso dell'esplorazione, anche se una seconda caduta pone fine alla spedizione. In un modo o nell'altro, non perdi esperienza, equipaggiamento o monete. Tra uno scontro e l'altro, siediti a mangiare e bere così affronti il prossimo a piena forza.",
-      "threatTitle": "Who the enemy hits",
-      "threatBody": "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Wolf Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
-      "hazardsTitle": "The water can kill you",
-      "breathBody": "Deep water is swimmable, and you can dive under it. While your head is under, a blue breath bar appears near the top of the screen and drains; break the surface and it refills far faster than it emptied. Let it empty while you are still under and you begin to drown, losing a chunk of your health every second until you reach air, so keep an eye on the bar on a long dive. Death clears it, so a corpse run always starts with a full lungful.",
-      "fatigueBody": "The sea has no wall. The crossings the world means you to swim, the straits and meres between one stretch of land and the next, and the inland lakes, are safe to cross however long they take. Strike out past the shore into genuinely open water instead and it starts to sap your strength: a warning appears, you get a real window to turn around, and after that the sea deals steadily heavier damage that nothing can prevent until you head back toward land. Drown or wear yourself out that far from shore and you release like any other death, so treat the horizon as scenery rather than a destination.",
-      "allyRezTitle": "When an ally can raise you",
-      "allyRezBody": "You do not always have to walk back. An ally with a resurrection spell can raise you instead, and it comes to you as a prompt you accept or decline; leave it sitting and it expires, so answer it while it is there. Accept and you rise beside the friend who cast it with part of your health and mana back. Some healers can offer the whole downed party at once, though each of you still answers your own prompt. Thornhollow Fields is the exception: no resurrection spell reaches you there, and you wait for your team's next wave.",
-      "unstuckTitle": "When you are truly stuck",
-      "unstuckBody": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
-      "climbTitle": "Pulling yourself up a ledge",
-      "climbBody": "Ledges are not walls. Jump at something too tall to step onto and your character catches the lip near the top of the jump and hauls up onto it, with no key of its own to press. Anything low enough to clear on your own goes by without ceremony; the full pull-up is saved for lips above your head. It is brief, and it takes the reins while it runs, so you cannot steer out of it partway. A stun catches you mid-pull and you let go and fall, measured from where the jump left the ground, and a stun or a root stops a climb starting at all, which is worth remembering when you are trying to get out of a bad spot in a fight."
+      "threatTitle": "Chi colpisce il nemico",
+      "threatBody": "Ogni nemico tiene un proprio conto privato di chi lo ha infastidito di più. I danni lo alimentano, e così fanno anche le cure: una cura genera minaccia sui nemici che stanno già combattendo la persona che hai curato, ripartita tra loro, quindi la cura più sicura è quella su qualcuno che il tank ha già in pugno. I tank attivano una posizione guardinga o una forma protettiva che moltiplica tutto ciò che generano, mentre la Forma del Lupo del druido riduce invece la minaccia, e una provocazione porta chi la lancia direttamente in cima al conto e blocca il nemico su di lui per pochi secondi. I nemici non cambiano bersaglio nell'istante in cui qualcuno supera il tank: serve un vantaggio netto per strapparne uno, e un vantaggio maggiore a distanza che in mischia, quindi un po' di pazienza all'inizio di un pull mantiene lo scontro dove deve stare.",
+      "hazardsTitle": "L'acqua può ucciderti",
+      "breathBody": "L'acqua profonda si può nuotare, e puoi immergerti sott'acqua. Mentre la testa è sott'acqua, una barra del respiro blu appare vicino alla parte superiore dello schermo e si esaurisce; riemergi e si riempie molto più in fretta di quanto si sia svuotata. Lasciala esaurire mentre sei ancora sott'acqua e inizi ad annegare, perdendo una parte della tua salute ogni secondo finché non raggiungi l'aria, quindi tieni d'occhio la barra durante un'immersione lunga. La morte la azzera, quindi una corsa al cadavere inizia sempre con i polmoni pieni.",
+      "fatigueBody": "Il mare non ha un muro. Gli attraversamenti che il mondo intende farti nuotare, gli stretti e le lagune tra un tratto di terra e il successivo, e i laghi interni, sono sicuri da attraversare per quanto tempo ci vuole. Spingiti invece oltre la costa in acque davvero aperte e comincerai a perdere le forze: appare un avviso, hai una vera finestra di tempo per tornare indietro, e dopo quella il mare infligge un danno costantemente crescente che nulla può prevenire finché non torni verso terra. Annega o sfinisciti così lontano dalla riva e liberi lo spirito come per qualsiasi altra morte, quindi tratta l'orizzonte come uno scenario, non come una destinazione.",
+      "allyRezTitle": "Quando un alleato può riportarti in vita",
+      "allyRezBody": "Non devi sempre tornare a piedi. Un alleato con un incantesimo di resurrezione può riportarti in vita al suo posto, e ti arriva come una richiesta da accettare o rifiutare; lasciala in sospeso e scade, quindi rispondi finché è ancora lì. Accetta e ti rialzi accanto all'amico che l'ha lanciato, con parte della salute e del mana ripristinati. Alcuni guaritori possono offrirla a tutto il gruppo caduto in una volta sola, anche se ciascuno di voi risponde comunque alla propria richiesta. I Campi di Thornhollow sono l'eccezione: nessun incantesimo di resurrezione ti raggiunge lì, e devi attendere la prossima ondata della tua squadra.",
+      "unstuckTitle": "Quando sei davvero bloccato",
+      "unstuckBody": "Se il mondo ti intrappola da qualche parte da cui non riesci a uscire, digita /unstuck. Devi essere fuori dal combattimento e fermo, non immobilizzato da uno stordimento o un radicamento, e non in un duello o in un incontro d'arena: parte un breve conto alla rovescia, e muoverti o subire danni lo annulla. Al termine vieni depositato al cimitero più vicino. Non ti uccide mai e non lascia alcun corpo, e se eri già caduto ti rianima lì. Il prezzo è il Mal di sblocco, un indebolimento temporaneo di tutto ciò che sei, che si sarà esaurito per quando potrai usare di nuovo il comando, e come il Mal di resurrezione risparmia del tutto i personaggi appena creati.",
+      "climbTitle": "Issarti su una sporgenza",
+      "climbBody": "Le sporgenze non sono muri. Salta verso qualcosa troppo alto per salirci sopra normalmente e il tuo personaggio afferra il bordo vicino al culmine del salto e si issa sopra, senza alcun tasto dedicato da premere. Qualsiasi cosa abbastanza bassa da superare da solo passa senza cerimonie; l'issata completa è riservata ai bordi sopra la tua testa. È breve, e prende il controllo per tutta la sua durata, quindi non puoi deviarla a metà. Uno stordimento ti coglie a metà issata e lasci la presa, cadendo da dove il salto ha lasciato il terreno, e uno stordimento o un radicamento impediscono del tutto l'inizio di un'issata, il che vale la pena ricordare quando cerchi di uscire da una brutta posizione in uno scontro."
     },
     "interfacePage": {
-      "intro": "A map of the screen: what every frame, bar, and button on your interface does, and which window each key opens.",
-      "scopeTitle": "Keys, and where to change them",
-      "scopeBody": "Every key named on this page is the default, and every one of them can be rebound. The full key table lives on the Controls page, and the options that change how the interface looks and behaves live on the Settings page. Esc closes whatever window is on top, and opens the game menu when nothing is open.",
-      "glanceTitle": "The screen at a glance",
-      "glanceBody": "The interface lives around the edges of the screen and leaves the middle clear for the world. Your own frame, your action bars, and your experience bar sit along the bottom. Your target and your party sit in the top left. The minimap and the zone name sit in the top right, with your trackers running down the right side below them. The chat box sits in the bottom left corner, and a rail of small square buttons sits in the bottom right.\n\nEverything else is a window you open and close. Most windows have a key of their own, most also have a button in that rail in the bottom right, and every one of them closes with its own key again or with Esc.",
-      "framesTitle": "Unit frames",
-      "framesBody": "A unit frame is a portrait with bars beside it: a health bar always, a resource bar when the unit has one, and a name and a level chip. A damage shield paints as a lighter segment laid over the top of the health bar, so you can watch the shield spend itself before the health starts to move. It shows on your own frame, on your target, and on your party rows; the two small frames, your pet and your target's target, carry no shield overlay.",
-      "frameSelfTitle": "Your own frame",
-      "frameSelfBody": "Bottom center, next to your action bars. Portrait, level, health, and your resource, with a mark while you are in combat, a resting mark while you are resting, and a row of combo points for the classes that build them. Clicking the frame targets yourself.",
-      "frameTargetTitle": "Your target",
-      "frameTargetBody": "Top left, appearing the moment you select something and gone again when you drop it. The same portrait and bars, plus an Elite tag on the tougher enemies, a cast bar showing what your target is casting, and a strip of the effects that are on it.",
-      "frameTotTitle": "Your target's target",
-      "frameTotBody": "A small frame beside your target frame showing who your target is currently on. It is the quickest way to tell whether a monster is fighting your tank or coming for you. It stays hidden until you switch it on in the options.",
-      "framePartyTitle": "Your party",
-      "framePartyBody": "Party members stack under your target frame on the left, one row each. A row dims when that member walks out of range, shows the effects worth reacting to, and can show their pet beside them. How much health text a row carries is up to you: none, a percentage, the numbers, or both.",
-      "framePetTitle": "Your pet",
-      "framePetBody": "Hunters, warlocks, and anyone else with a pet out get a small frame for it beside their own, with its name, level, and health. Clicking that frame selects your pet, and Ctrl+6 does the same from the keyboard.",
-      "framesMoveBody": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. If they end up somewhere you regret, Reset Frame Positions in the options snaps them all back to where they started.",
-      "barsTitle": "Bars, timers, and combat text",
-      "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
-      "aurasTitle": "Buffs and debuffs",
-      "aurasBody": "Your own buffs show as a row of small icons in the top right corner beside the minimap, each counting down the time it has left, with your debuffs in a row below them. Right-clicking one of your own buffs drops it, as long as it is one you are allowed to drop; debuffs never are, and your target's strip is read-only.\n\nBuffs on the Player Frame, an option that is off to begin with, moves your buff row onto your own unit frame and leaves the whole corner to your debuffs. It is a desktop setting: the phone and tablet layout places your auras for you.\n\nYour target's buffs and debuffs sit together in a strip under its frame. When you want more room for them, Shift+J opens a separate Target Buffs and Debuffs window that you can move, filter down to just buffs or just debuffs, and leave open.",
-      "actionBarsTitle": "Your action bars",
-      "actionBarsBody": "Three rows of eleven ability slots sit above your experience bar, with a dedicated attack button at the head of the first row. Only the first row is there to begin with: the second and third are switched on in the options when you want the room, and the third needs the second. The number row across the top of your keyboard fires the first bar, and the extra bars default to the numpad.\n\nAbilities come from your spellbook (P): drag one out of the book onto a slot, or use the toggle on its row to put it on the first free one. Items work the same way, so a stack of potions or a bandage can live on a slot and be used with a key.\n\nOnce a bar is arranged the way you like it, you can lock it. Locking refuses drags, drops, and clears while leaving the abilities themselves as usable as ever, so a fumbled click in a fight cannot rearrange your buttons.\n\nTwo smaller bars join the row when they apply: the pet bar, with Attack, Stop, Taunt, Defensive, and Aggressive on Ctrl plus 1 through 5, and a stance bar for the classes that change stance or form.",
-      "minimapTitle": "The minimap",
-      "minimapBody": "Top right: a round minimap with the zone name above it and your coordinates below, ringed by a dial that paints the time of day.\n\nThe disc carries more than terrain. Your own arrow sits at the center, pointing the way you face, with your party around you as class-colored dots and an edge arrow for anyone who has wandered off it. Quest givers wear the same marks there as they do in the world, and you will also pick out gathering nodes and crafting stations, travel portals, lootable bodies and containers, any hostile that has taken an interest in you, friends and guildmates who are nearby, and your own body while you are running back as a ghost.\n\nSmall indicators appear on it when they have something to say: an envelope while unread letters are waiting for you, a coin while sale proceeds or returned goods are waiting at the Merchant, and a button listing your raid lockouts.",
-      "mapTitle": "The world map and your trackers",
-      "mapBody": "M opens the world map: the continent drawn out, with your own arrow on it, the zones and their names, the points of interest around you, the travel portals, and the gathering nodes you have found. Your party shows on it too. Inside a delve the map switches to a schematic of the rooms you have explored so far.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
-      "chatTitle": "The chat box",
-      "chatBody": "Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.",
-      "keyWindowsTitle": "Windows you open with a key",
-      "keyWindowsBody": "Each of these has a default key and a button in the rail in the bottom right corner. Press the key again, or Esc, to close it.",
-      "winCharTitle": "Character sheet (C)",
-      "winCharBody": "Your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. It also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and the button that composes your player card.",
-      "winBagsTitle": "Bags (B)",
-      "winBagsBody": "Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag.",
-      "winSpellbookTitle": "Spellbook (P)",
-      "winSpellbookBody": "Every ability your class has, learned and still to come, in order. This is where you drag abilities onto your action bars.",
-      "winTalentsTitle": "Talents (N)",
-      "winTalentsBody": "Where you choose your specialization, and your six talent rows with the three options each one offers and what every option does. Rows you have not reached yet are shown beside the ones you can pick now.",
-      "winProfessionsTitle": "Professions (Shift+P)",
-      "winProfessionsBody": "What you have learned, how skilled you are at each, and how far each one can still go.",
-      "winCraftingTitle": "Crafting (T)",
-      "winCraftingBody": "Your recipes, what each one needs, and what you can make right now with what you are carrying.",
-      "winQuestLogTitle": "Quest log (L)",
-      "winQuestLogBody": "Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows.",
-      "winDeedsTitle": "Book of Deeds (Shift+Z)",
-      "winDeedsBody": "The record of what you have done, the titles and Renown it has paid you, and what is still open.",
-      "winSocialTitle": "Friends and Guild (O)",
-      "winSocialBody": "Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked.",
-      "winFinderTitle": "Dungeon Finder (Shift+I)",
-      "winFinderBody": "The catalogue of group content you can queue for. Tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together.",
-      "winMetersTitle": "Damage meters (Shift+H)",
-      "winMetersBody": "Damage, healing, and threat for you and everyone with you, kept in segments so you can look back at the fight before last. The healing and threat panels can be pulled out to stand on their own.",
-      "winMoreTitle": "And a few more",
-      "winMoreBody": "The world map (M), the PvP window (G), the Vale Cup (Y), the leaderboard (K), the event calendar (I), and the emote wheel (X) all work the same way. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, and one for the daily standings.\n\nRight-click another player, on their nameplate or on their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more, and it needs them to be close enough to see.",
-      "worldWindowsTitle": "Windows the world opens for you",
-      "worldWindowsBody": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback tab holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. A class trainer opens the list of what you can learn now and what is still ahead of you.\n\nA banker opens your vault, the strongbox of extra slots you can buy more of. If your guild has opened a bank, a second tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market at the Merchant has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
-      "lootTitle": "Loot and rolls",
-      "lootBody": "Interact with a body you have earned and the loot window opens, listing what dropped. Click a line to take it.\n\nIn a group, a good drop under the group's loot rules puts a roll prompt on your screen instead: Need if you want it for yourself, Greed if you would take it to sell, or Pass to leave it to someone else. A small panel then shows who has rolled and what they chose while the timer runs down.\n\nThe loot rules themselves live in a small window of their own. The group leader can change them there, and everyone else sees the same window read-only, so the rules are never a secret.\n\nSome bodies can also be harvested for their parts. When they can, a Harvest section appears at the foot of the loot window with a box to tick for each component you want.",
-      "playerCardTitle": "Your player card",
-      "playerCardBody": "A button on your character sheet composes a player card: a picture with a close-up of your character, the gear you are wearing, and your stats, ready to save or share. It is a snapshot for showing off a new set, and it changes nothing in the game.",
-      "wikiTitle": "The Wiki button",
-      "wikiBody": "This wiki is one click away in game. A button for it sits with the others in the rail in the bottom right corner, there is a row for it in the Esc game menu, and on a phone it lives in the More tray. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.",
-      "mobileTitle": "On a phone or a tablet",
-      "mobileBody": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with five action buttons beside it, and a page toggle that swaps the ring through the rest of your slots, up to seven pages once you have all three action bars switched on. Around them sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping, plus a pull-out row of your consumables that fills itself from what you are carrying.\n\nAlong the bottom edge are Chat, Social, Quests, Settings, and More. More opens a tray holding the rest of your windows, including your character, the Dungeon Finder, PvP, the Vale Cup, emotes, and the wiki. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
-      "railTitle": "The button rail",
-      "railBody": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons, one per window, arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, spellbook, talents, quest log, Book of Deeds, professions, world map, bags, and crafting. The second opens with the WOC Store and runs on through PvP, the Dungeon Finder, the Vale Cup, Card Duel, the leaderboard, emotes, music, friends and guild, this wiki, and the game menu. A few more join them only when they apply."
+      "intro": "Una mappa dello schermo: cosa fa ogni riquadro, barra e pulsante della tua interfaccia, e quale finestra apre ciascun tasto.",
+      "scopeTitle": "I tasti, e dove cambiarli",
+      "scopeBody": "Ogni tasto citato in questa pagina è quello predefinito, e ognuno può essere riassegnato. La tabella completa dei tasti si trova nella pagina Comandi, e le opzioni che cambiano l'aspetto e il comportamento dell'interfaccia si trovano nella pagina Impostazioni e prestazioni. Esc chiude qualsiasi finestra sia in primo piano, e apre il menu di gioco quando non c'è nulla di aperto.",
+      "glanceTitle": "Lo schermo a colpo d'occhio",
+      "glanceBody": "L'interfaccia vive lungo i bordi dello schermo e lascia libero il centro per il mondo. Il tuo riquadro, le tue barre delle azioni e la tua barra dell'esperienza stanno in basso. Il tuo bersaglio e il tuo gruppo stanno in alto a sinistra. La minimappa e il nome della zona stanno in alto a destra, con i tuoi tracciatori che scendono lungo il lato destro sotto di essi. La finestra della chat sta nell'angolo in basso a sinistra, e una fila di piccoli pulsanti quadrati sta in basso a destra.\n\nTutto il resto è una finestra che apri e chiudi. La maggior parte delle finestre ha un proprio tasto, la maggior parte ha anche un pulsante in quella fila in basso a destra, e ognuna si chiude con il proprio tasto premuto di nuovo oppure con Esc.",
+      "framesTitle": "Riquadri unità",
+      "framesBody": "Un riquadro unità è un ritratto con delle barre accanto: una barra della salute sempre, una barra della risorsa quando l'unità ne ha una, e un nome con un'etichetta di livello. Uno scudo si dipinge come un segmento più chiaro sovrapposto alla parte superiore della barra della salute, così puoi osservare lo scudo consumarsi prima che la salute inizi a muoversi. Compare sul tuo riquadro, su quello del tuo bersaglio e sulle file del tuo gruppo; i due piccoli riquadri, quello del tuo famiglio e quello del bersaglio del tuo bersaglio, non portano alcuna sovrapposizione dello scudo.",
+      "frameSelfTitle": "Il tuo riquadro",
+      "frameSelfBody": "In basso al centro, accanto alle tue barre delle azioni. Ritratto, livello, salute e la tua risorsa, con un contrassegno mentre sei in combattimento, un contrassegno A riposo mentre riposi, e una fila di punti combo per le classi che li accumulano. Fare clic sul riquadro seleziona te stesso.",
+      "frameTargetTitle": "Il tuo bersaglio",
+      "frameTargetBody": "In alto a sinistra, appare nell'istante in cui selezioni qualcosa e scompare di nuovo quando lo lasci. Lo stesso ritratto e le stesse barre, più un'etichetta Elite sui nemici più tosti, una barra di lancio che mostra cosa sta lanciando il tuo bersaglio, e una striscia degli effetti che porta addosso.",
+      "frameTotTitle": "Il bersaglio del tuo bersaglio",
+      "frameTotBody": "Un piccolo riquadro accanto al riquadro del tuo bersaglio che mostra su chi si trova attualmente il tuo bersaglio. È il modo più rapido per capire se un mostro sta combattendo contro il tuo tank o sta arrivando verso di te. Resta nascosto finché non lo attivi nelle opzioni.",
+      "framePartyTitle": "Il tuo gruppo",
+      "framePartyBody": "I membri del gruppo si impilano sotto il riquadro del bersaglio, a sinistra, una fila ciascuno. Una fila si affievolisce quando quel membro esce dal raggio, mostra gli effetti a cui vale la pena reagire, e può mostrare il suo famiglio accanto a sé. Quanto testo sulla salute porta una fila dipende da te: nessuno, una percentuale, i numeri, o entrambi.",
+      "framePetTitle": "Il tuo famiglio",
+      "framePetBody": "Cacciatori, stregoni e chiunque altro abbia un famiglio evocato ottengono per lui un piccolo riquadro accanto al proprio, con nome, livello e salute. Fare clic su quel riquadro seleziona il tuo famiglio, e Ctrl+6 fa lo stesso da tastiera.",
+      "framesMoveBody": "Il tuo riquadro, il riquadro del tuo bersaglio e i riquadri del tuo gruppo possono essere tutti spostati. Ognuno porta un piccolo pulsante di spostamento nel proprio angolo: premi Sposta per sbloccarlo, trascina il riquadro dove vuoi, e premi di nuovo Blocca così un clic accidentale non può spostarlo. Se finiscono in un punto che non ti piace, Ripristina posizione dei riquadri nelle opzioni li riporta tutti dove erano all'inizio.",
+      "barsTitle": "Barre, timer e testo di combattimento",
+      "barsBody": "La tua barra di lancio appare al centro dello schermo, appena sopra le barre delle azioni, ogni volta che lanci o canalizzi un incantesimo, e riporta il nome dell'incantesimo e il tempo rimanente. Anche il tuo bersaglio ha una propria barra di lancio sul suo riquadro, così puoi vedere cosa sta arrivando e rispondere.\n\nUna sottile barra dell'attacco sta sotto la tua barra di lancio e si riempie tra un colpo d'arma e l'altro, così chi attacca in mischia o a distanza può vedere quando arriverà il prossimo colpo automatico.\n\nLa tua barra dell'esperienza occupa tutta la larghezza sotto le barre delle azioni, suddivisa in segmenti, con un tratto più chiaro che mostra l'esperienza da riposo che hai accumulato.\n\nNuota sott'acqua e in cima allo schermo compare una barra del Fiato blu. Si consuma finché hai la testa sott'acqua, lampeggia di rosso quando si esaurisce e inizi ad annegare, e si riempie di nuovo in fretta non appena riemergi. Barra spaziatrice ti fa nuotare verso l'alto, e il tasto Nuota Verso il Basso, Ctrl di default, ti porta più in profondità.\n\nI danni e le cure salgono fluttuando sopra ciò che hanno colpito come piccoli numeri, così puoi leggere uno scontro senza leggere del testo. La scheda Combattimento nella tua chat conserva il resoconto scritto completo.",
+      "aurasTitle": "Potenziamenti e indebolimenti",
+      "aurasBody": "I tuoi potenziamenti compaiono come una fila di piccole icone nell'angolo in alto a destra accanto alla minimappa, ciascuna con il conto alla rovescia del tempo rimasto, con i tuoi indebolimenti in una fila sotto di essi. Fare clic destro su uno dei tuoi potenziamenti lo rimuove, purché sia uno che ti è permesso rimuovere; gli indebolimenti non lo sono mai, e la striscia del tuo bersaglio è di sola lettura.\n\nBuff sul riquadro del giocatore, un'opzione disattivata all'inizio, sposta la fila dei tuoi potenziamenti sul tuo riquadro e lascia l'intero angolo ai tuoi indebolimenti. È un'impostazione da desktop: la disposizione per telefono e tablet posiziona le tue aure al posto tuo.\n\nI potenziamenti e gli indebolimenti del tuo bersaglio stanno insieme in una striscia sotto il suo riquadro. Quando vuoi più spazio per loro, Maiusc+J apre una finestra separata Potenziamenti e Indebolimenti del Bersaglio che puoi spostare, filtrare per mostrare solo potenziamenti o solo indebolimenti, e lasciare aperta.",
+      "actionBarsTitle": "Le tue barre delle azioni",
+      "actionBarsBody": "Tre file di undici caselle per le abilità stanno sopra la tua barra dell'esperienza, con un pulsante Attacco dedicato in testa alla prima fila. Solo la prima fila è presente all'inizio: la seconda e la terza si attivano nelle opzioni quando vuoi più spazio, e la terza richiede la seconda. La fila dei numeri in cima alla tastiera aziona la prima barra, e le barre extra sono assegnate di default al tastierino numerico.\n\nLe abilità arrivano dal tuo libro degli incantesimi (P): trascinane una dal libro su una casella, oppure usa l'interruttore sulla sua fila per metterla sulla prima libera. Gli oggetti funzionano allo stesso modo, così una pila di pozioni o una benda possono stare su una casella ed essere usati con un tasto.\n\nUna volta sistemata una barra come preferisci, puoi bloccarla. Il blocco rifiuta trascinamenti, rilasci e cancellazioni, pur lasciando le abilità stesse utilizzabili come sempre, così un clic sbagliato durante uno scontro non può riordinare i tuoi pulsanti.\n\nDue barre più piccole si aggiungono alla fila quando si applicano: la barra del famiglio, con Attacca, Ferma, Provoca, Difensivo e Aggressivo su Ctrl più 1-5, e una barra delle posizioni per le classi che cambiano posizione o forma.",
+      "minimapTitle": "La minimappa",
+      "minimapBody": "In alto a destra: una minimappa rotonda con il nome della zona sopra e le tue coordinate sotto, cinta da una ghiera che dipinge l'ora del giorno.\n\nIl disco porta più del solo terreno. La tua freccia sta al centro, rivolta nella direzione in cui guardi, con il tuo gruppo intorno a te come puntini colorati per classe e una freccia sul bordo per chiunque se ne sia allontanato. Chi assegna missioni porta sulla minimappa gli stessi simboli che porta nel mondo, e riconoscerai anche i nodi di raccolta e le stazioni di lavorazione, i portali di viaggio, i cadaveri e i contenitori saccheggiabili, qualsiasi ostile che si è interessato a te, gli amici e i compagni di gilda nelle vicinanze, e il tuo stesso corpo mentre corri indietro come spettro.\n\nPiccoli indicatori compaiono su di essa quando hanno qualcosa da dire: una busta mentre ti aspettano lettere non lette, una moneta mentre ricavi di vendita o oggetti restituiti attendono al Mercante, e un pulsante che elenca i tuoi blocchi d'incursione.",
+      "mapTitle": "La mappa del mondo e i tuoi tracciatori",
+      "mapBody": "M apre la mappa del mondo: il continente disegnato per intero, con sopra la tua freccia, le zone e i loro nomi, i punti di interesse intorno a te, i portali di viaggio e i nodi di raccolta che hai trovato. Anche il tuo gruppo compare sulla mappa. All'interno di un'incursione, la mappa passa a uno schema delle stanze che hai esplorato finora.\n\nLungo il lato destro, sotto la minimappa, una pila di tracciatori tiene sott'occhio i tuoi affari del momento senza che tu debba aprire nulla: le missioni che tieni sotto traccia e i loro obiettivi, il tuo progresso nelle imprese, l'incursione in cui ti trovi, e qualsiasi squarcio a cui stai partecipando. Il tracciatore delle missioni si comprime quando vuoi indietro lo schermo.",
+      "chatTitle": "La finestra della chat",
+      "chatBody": "In basso a sinistra. Premi Invio per iniziare a scrivere e di nuovo Invio per inviare.\n\nDue schede sono sempre presenti: Chat, il registro combinato di tutto ciò che viene detto intorno a te, e Combattimento, il resoconto scritto del tuo scontro. Il pulsante più ne aggiunge altre, una per canale: Dire, Gridare, Gruppo, Generale, Mondo, LFG, Gilda e Ufficiale, più una scheda Sussurri che raccoglie in un unico posto ogni sussurro che invii e ricevi. Scrivere in una scheda di canale invia a quel canale senza bisogno di ridigitare il comando.\n\nL'intera finestra può essere trascinata altrove e ridimensionata, e ricorda dove l'hai lasciata.",
+      "keyWindowsTitle": "Finestre che apri con un tasto",
+      "keyWindowsBody": "Ognuna di queste ha un tasto predefinito e un pulsante nella fila in basso a destra. Premi di nuovo il tasto, oppure Esc, per chiuderla.",
+      "winCharTitle": "Scheda del personaggio (C)",
+      "winCharBody": "Il tuo equipaggiamento indossato da un lato, i tuoi attributi e le statistiche che alimentano dall'altro, con un tooltip su ogni valore che spiega cosa fa per la tua classe. Porta anche il tuo Tempo di gioco totale, con un piccolo occhio accanto che nasconde il numero quando preferisci non mostrarlo, e il pulsante che compone la tua scheda giocatore.",
+      "winBagsTitle": "Borse (B)",
+      "winBagsBody": "Tutto ciò che porti con te, in un unico zaino con quattro alloggiamenti per borse. Delle etichette di categoria in alto lo restringono ad Armi, Armatura, Consumabili, Materiali, Strumenti, Missione o Cavalcature, e una casella di ricerca filtra per nome. Un menu a tendina di ordinamento riordina ciò che stai guardando per più recenti, qualità o nome, e quella scelta viene ricordata tra una sessione e l'altra. Un pulsante Ordina separato rimette in ordine le celle reali dello zaino con una sola pressione, azzerando le etichette e la ricerca così vedi l'intera borsa riordinata.",
+      "winSpellbookTitle": "Libro degli incantesimi (P)",
+      "winSpellbookBody": "Ogni abilità della tua classe, imparata e ancora da imparare, in ordine. È qui che trascini le abilità sulle tue barre delle azioni.",
+      "winTalentsTitle": "Talenti (N)",
+      "winTalentsBody": "Dove scegli la tua specializzazione, insieme alle tue sei file di talenti, con le tre opzioni che ciascuna offre e cosa fa ogni opzione. Le file che non hai ancora raggiunto sono mostrate accanto a quelle che puoi scegliere ora.",
+      "winProfessionsTitle": "Professioni (Maiusc+P)",
+      "winProfessionsBody": "Cosa hai imparato, quanto sei abile in ciascuna, e quanto può ancora crescere ognuna.",
+      "winCraftingTitle": "Creazione (T)",
+      "winCraftingBody": "Le tue ricette, cosa richiede ciascuna, e cosa puoi fabbricare adesso con quello che porti con te.",
+      "winQuestLogTitle": "Registro delle missioni (L)",
+      "winQuestLogBody": "Ogni missione che hai accettato, la sua storia, i suoi obiettivi e il tuo progresso, con un modo per mostrare tutto questo sulla mappa e per scegliere quali missioni segue il tuo tracciatore.",
+      "winDeedsTitle": "Libro delle Imprese (Maiusc+Z)",
+      "winDeedsBody": "Il registro di ciò che hai fatto, i titoli e la Fama che ti ha fruttato, e ciò che è ancora aperto.",
+      "winSocialTitle": "Amici e gilda (O)",
+      "winSocialBody": "Schede per i tuoi amici, la tua gilda e il suo elenco membri, la tua incursione, e i giocatori che hai ignorato o bloccato.",
+      "winFinderTitle": "Cercatore di Dungeon (Maiusc+I)",
+      "winFinderBody": "Il catalogo dei contenuti di gruppo per cui puoi metterti in coda. Spunta le attività che vuoi, unisciti a una coda da solo oppure pubblica un annuncio per il tuo gruppo, e accetta quando un gruppo si forma.",
+      "winMetersTitle": "Misuratori di danno (Maiusc+H)",
+      "winMetersBody": "Danni, cure e minaccia per te e per chiunque sia con te, tenuti in segmenti così puoi riguardare lo scontro precedente a quello attuale. I pannelli delle cure e della minaccia possono essere estratti per stare da soli.",
+      "winMoreTitle": "E altre ancora",
+      "winMoreBody": "La mappa del mondo (M), la finestra del PvP (G), la Coppa della Valle (Y), la classifica (K), il calendario degli eventi (I) e la ruota delle emote (X) funzionano tutte allo stesso modo. La classifica merita un momento alla tua prima visita: tiene una scheda per i giocatori, una per le gilde, una che classifica interi account per Fama dal Libro delle Imprese, e una per le classifiche giornaliere.\n\nFai clic destro su un altro giocatore, sulla sua targhetta o sul suo nome in chat, e Informazioni Giocatore apre una scheda su di lui: l'equipaggiamento che indossa, con i tooltip, e i dettagli pubblici del suo personaggio. È solo uno sguardo, niente di più, e richiede che sia abbastanza vicino da poter essere visto.",
+      "worldWindowsTitle": "Finestre che il mondo apre per te",
+      "worldWindowsBody": "Alcune finestre non si aprono mai premendo un tasto: si aprono quando parli con la persona giusta o clicchi sulla cosa giusta.\n\nUn mercante apre la finestra del venditore, con la sua merce da comprare e una scheda Riacquisto che custodisce ciò che hai venduto l'ultima volta, nel caso tu l'abbia venduto per sbaglio. Una fila di pulsanti di quantità affianca la merce, così una pila di reagenti si compra con una sola pressione da cinque o dieci alla volta anziché con dieci pressioni, e una quantità personalizzata è lì per quando nessuna delle due si adatta. Un istruttore di classe apre l'elenco di ciò che puoi imparare ora e di ciò che ti aspetta ancora.\n\nUn banchiere apre la tua banca, il forziere di spazi extra che puoi ampliare comprandone altri. Se la tua gilda ha aperto una banca, una seconda scheda lì la mostra: ogni membro può guardarci dentro anche senza il permesso di prelevare qualcosa, così nessuno deve chiedere cosa possiede la gilda, i ranghi decidono chi può depositare, ritirare e spostare il denaro della gilda, e un registro segna ogni movimento.\n\nUna cassetta postale della Posta dei Corvi apre le tue lettere, con ciò che è arrivato in una scheda e un modulo per l'invio in un'altra, allegati compresi. Il Mercato Mondiale presso il Mercante ha una finestra propria: sfoglia e compra in una scheda, metti in vendita le tue merci in un'altra, e ritira ciò che hai venduto in una terza. Scambiare faccia a faccia con un altro giocatore apre una finestra di scambio con un lato per ciascuno.",
+      "lootTitle": "Bottino e tiri",
+      "lootBody": "Interagisci con un cadavere che hai guadagnato e si apre la finestra del bottino, che elenca cosa è caduto. Fai clic su una riga per prenderlo.\n\nIn un gruppo, un buon drop soggetto alle regole del bottino del gruppo mette invece sullo schermo un prompt di tiro: Bisogno se lo vuoi per te, Brama se lo prenderesti solo per venderlo, o Passa per lasciarlo a qualcun altro. Un piccolo pannello mostra poi chi ha tirato e cosa ha scelto mentre il timer scorre.\n\nLe regole del bottino vivono in una piccola finestra a parte. Il capogruppo può cambiarle lì, e tutti gli altri vedono la stessa finestra in sola lettura, così le regole non sono mai un segreto.\n\nAlcuni cadaveri possono anche essere raccolti per le loro parti. Quando è possibile, una sezione Raccolta compare in fondo alla finestra del bottino con una casella da spuntare per ogni componente che vuoi.",
+      "playerCardTitle": "La tua scheda giocatore",
+      "playerCardBody": "Un pulsante sulla tua scheda del personaggio compone una scheda giocatore: un'immagine con un primo piano del tuo personaggio, l'equipaggiamento che indossi e le tue statistiche, pronta da salvare o condividere. È un'istantanea per mostrare un nuovo set, e non cambia nulla nel gioco.",
+      "wikiTitle": "Il pulsante Wiki",
+      "wikiBody": "Questa wiki è a un clic di distanza dentro al gioco. Un pulsante per raggiungerla sta insieme agli altri nella fila in basso a destra, c'è una riga per lei nel menu di gioco di Esc, e su telefono vive nel vassoio Altro. Poiché aprirla ti passa al tuo browser, il pulsante chiede sempre prima una conferma, così un tocco accidentale durante uno scontro non può mai tirartene fuori. Il gioco continua a funzionare dietro di essa.",
+      "mobileTitle": "Su telefoni e tablet",
+      "mobileBody": "I comandi touch compaiono da soli, e il layout si adatta alle dimensioni del tuo schermo: una disposizione compatta su un telefono piccolo, una standard su un telefono più grande, e una più spaziosa su un tablet.\n\nLe tue abilità stanno in un anello anziché in una fila di numeri: il pulsante Attacca con cinque pulsanti di azione accanto, e un interruttore di pagina che scorre l'anello attraverso il resto delle tue caselle, fino a sette pagine una volta attivate tutte e tre le barre delle azioni. Intorno a essi stanno i pulsanti a cui un giocatore su touch ricorre più spesso: Scambia bersaglio, Usa per ciò che hai davanti, e Salta, più una fila estraibile dei tuoi consumabili che si riempie da sola con quello che porti.\n\nLungo il bordo inferiore trovi Chat, Sociale, Missioni, Impostazioni e Altro. Altro apre un vassoio con il resto delle tue finestre, tra cui il tuo personaggio, il Cercatore di Dungeon, il PvP, la Coppa della Valle, le emote e la wiki. Qui le finestre riempiono lo schermo invece di fluttuarci sopra.\n\nSpostare i tuoi riquadri unità è una cosa da desktop: su touch il layout li posiziona al posto tuo.",
+      "railTitle": "La fila dei pulsanti",
+      "railBody": "Giù nell'angolo in basso a destra dello schermo, lontano dalla minimappa, sta una fila di piccoli pulsanti quadrati, uno per finestra, disposti in due colonne corte affiancate. La maggior parte porta stampato il proprio tasto predefinito.\n\nLa prima colonna copre il tuo personaggio, il libro degli incantesimi, i talenti, il registro delle missioni, il Libro delle Imprese, le professioni, la mappa del mondo, le borse e la creazione. La seconda si apre con il Negozio WOC e prosegue con il PvP, il Cercatore di Dungeon, la Coppa della Valle, il Duello di Carte, la classifica, le emote, la musica, amici e gilda, questa wiki e il menu di gioco. Alcuni altri si aggiungono solo quando si applicano."
     },
     "commandsPage": {
-      "intro": "Every command you can type into chat, grouped by what it is for, with its short forms.",
-      "slashBody": "Anything you type in the chat box that starts with a slash is a command rather than something you say out loud. Press Enter and it either acts (you follow someone, you invite them, you roll) or it prints a private line only you can see.",
-      "aliasBody": "Most commands have short forms, and every form listed in a row does exactly the same thing: /w, /t and /tell are one command. Words in angle brackets are required, words in square brackets are optional, and the capitalization of the command itself never matters.",
-      "helpTipTitle": "The game knows the list too",
-      "helpTipBody": "Type /help in game, or /commands, or just /?, and the whole command list prints into your chat. Mistype a command and the game tells you it did not recognize it, and points you back at /help.",
-      "cmdHeader": "Command",
-      "doesHeader": "What it does",
-      "groupTalking": "Talking",
-      "say": "Speak to the players standing near you. A plain line with no slash goes to whichever chat tab you have selected, and Say is the one you start on.",
-      "yell": "Shout, so players much further away than say range hear you.",
-      "whisper": "Send a private message to one player who is online. Their name matches whatever capitalization you type, as long as only one player could be meant.",
-      "reply": "Answer whoever whispered you last, without typing their name again.",
-      "me": "Freeform action text in the third person, so \"/me ponders the fountain\" reads as your name followed by the action. Everyone near you sees it.",
-      "partyChat": "Talk to everyone in your party or raid.",
-      "groupChannels": "Channels",
-      "channelsIntro": "General reaches the whole realm and you are in it from the moment you log in. World and LFG are opt in: join one first, then you can read and talk in it.",
-      "general": "The realm-wide General channel.",
-      "gAlias": "A short form with two meanings, so it is worth knowing: offline it sends to General, but online it is your guild channel. Type /general or /1 when you definitely mean General.",
-      "guild": "Talk to your guild. Online play only, and you need to be in a guild.",
-      "officer": "The officer channel of your guild, open to officers and the Guild Master. Online play only.",
-      "join": "Join or leave an optional channel. The two you can join are world and lfg, and typing /join on its own lists them. Opening a chat tab for one of them joins it for you.",
-      "world": "Talk in the World channel, once you have joined it.",
-      "lfg": "Talk in the LFG channel, where people look for groups. Join it first.",
-      "groupParty": "Party and group",
-      "invite": "Invite an online player to your party by name, however far away they are standing.",
-      "partyRoster": "With no message after it, this prints your party roster instead: every member with their level, class and health, and the leader marked.",
-      "ready": "The party or raid leader starts a ready check, and everyone else gets a prompt to answer yes or no.",
-      "assist": "Target whatever the named player is targeting. With no name it assists the player you have targeted. It reaches your party and raid anywhere in the world, and anyone else close enough for you to see.",
-      "follow": "Trail another player automatically. With no name it follows your current target. Moving, casting, fighting, picking a new target, or the other player pulling away all end it, and you cannot start it in combat.",
-      "unfollow": "Stop following.",
-      "roll": "Roll a random number, from 1 to 100 unless you name a limit or a range. Your party sees the result, or everyone nearby when you are not in one. The roll is made by the server, so nobody can fake one.",
-      "groupPeople": "Other players",
-      "who": "List the players online. Add text to narrow it to names or zones containing that text.",
-      "inspect": "Look up an online player's level, class and health.",
-      "ignore": "Hide a player's public chat and their overhead chat bubbles from you. Their whispers, rolls, invites and mail still arrive. The list form prints who you are ignoring.",
-      "block": "The stronger version: it also stops their whispers, invites and mail, and hides the two of you from each other in /who. The list form prints who you have blocked.",
-      "peopleNote": "The /who roster and your ignore and block lists are kept by the server, so those work in online play only.",
-      "groupSelf": "Your character",
-      "selfIntro": "These print a private line into your chat that nobody else sees. Nothing is broadcast, so they are safe to use in the middle of a fight.",
-      "played": "How long this character has been in the world during this session.",
-      "playtime": "How long this character has been played in total, across every session.",
-      "xp": "Your level and how far through it you are.",
-      "gold": "What is in your purse.",
-      "stats": "A one-line character summary: level, class, health, your resource, attack power, crit chance and armor.",
-      "gear": "Everything you have equipped, slot by slot, so the empty slots stand out.",
-      "bags": "What you are carrying, best quality first, with your money at the end.",
-      "abilities": "The abilities you have learned.",
-      "talents": "Your specialization, and how many of your six talent rows you have chosen so far.",
-      "quests": "Your active quest log, with the progress on each objective.",
-      "completed": "The quests you have already turned in, in the order you finished them.",
-      "session": "What you have done since you logged in: kills, deaths, damage and experience.",
-      "arena": "Your Ashen Coliseum standing in both brackets: rating, wins, losses and win rate for 1v1 and for 2v2.",
-      "listings": "Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.",
-      "buyback": "What you sold to a vendor recently and could still buy back.",
-      "groupState": "How you are right now",
-      "buffs": "The buffs and debuffs on you, with the time left on each.",
-      "cooldowns": "Which of your abilities are cooling down, soonest ready first.",
-      "pet": "Your pet's name, level, family and health.",
-      "petTaunt": "Your pet's taunt cooldown, and whether it is set to cast it on its own.",
-      "speed": "How fast you are moving compared to a normal run, and whether something has you rooted.",
-      "form": "The shapeshift form or combat stance you are in.",
-      "manaRegen": "For mana users: whether your out-of-combat mana regeneration has started ticking again.",
-      "savedMana": "For a mana user who is shapeshifted: the mana parked while you are shifted, which comes back when you shift out.",
-      "combo": "How many combo points you are holding.",
-      "consumable": "The food and drink working on you right now, and how long each has left.",
-      "potion": "The shared combat potion cooldown, which is separate from your ability cooldowns.",
-      "falling": "Whether you are airborne, how far above the ground you are, and whether the landing is going to hurt.",
-      "groupCombat": "In a fight",
-      "target": "Your current target: name, level, what it is, and health.",
-      "targetBuffs": "The auras on your target, each tagged as a buff or a debuff.",
-      "range": "How far away your target is, and whether that is inside melee range.",
-      "attack": "Whether auto attack is running, on what, and how long your swing takes.",
-      "casting": "What you are casting or channeling, and how long is left.",
-      "combat": "Whether you are in combat, and when you are due to drop out of it.",
-      "threat": "Who the enemies fighting you are currently focused on.",
-      "consider": "How dangerous your target's level makes it, compared to yours.",
-      "queued": "The ability armed to go off on your next melee swing.",
-      "overpower": "For warriors: whether the Overpower window that an enemy dodge opens is still available.",
-      "groupWorld": "World and travel",
-      "where": "The zone you are standing in, its level range, and your coordinates.",
-      "zones": "Every zone in travel order with its level range, and the one you are in marked.",
-      "nearby": "The living things closest to you, nearest first.",
-      "pois": "The landmarks of your current zone, nearest first, with the distance to each.",
-      "graveyard": "Where your spirit would return to if you fell here.",
-      "dungeons": "Every dungeon with the zone its door sits in and the party size it is built for, plus the difficulty you are currently set to.",
-      "dungeonMode": "Switch your dungeons between the normal and heroic difficulty.",
-      "dungeonReset": "Abandon your own empty instances, which is what you do after changing difficulty.",
-      "groupRecovery": "Recovery and presence",
-      "unstuck": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. It leaves you weakened by Unstuck Sickness for a while afterwards, so it is a last resort rather than a shortcut.",
-      "afk": "Mark yourself Away From Keyboard, with an optional message that anyone who whispers you gets as an automatic reply. Repeat it with no message to clear it; any other chat clears it too.",
-      "dnd": "Do Not Disturb: like away, except whispers sent to you are held back instead of delivered.",
-      "sit": "Sit down where you are, and stand back up. You stand automatically the moment you move, cast, or take a hit.",
-      "help": "Print the command list into your chat.",
-      "emotesHeading": "Emotes",
-      "emotesBody": "The social emotes are commands too: /wave, /bow, /cheer, /dance, /laugh and the rest, each shown to everyone in say range. Add a name to aim one at somebody, as in \"/wave Aleph\", and /me covers anything the list does not.",
-      "emotesMore": "More about emotes and playing together",
-      "bangHeading": "Community commands",
-      "bangBody": "A few commands start with an exclamation mark instead of a slash. They announce something to the realm and post it to the community Discord at the same time, so people who are not logged in see it too. They are part of online play.",
-      "bangList": "The set is !lfg for looking for a group, !wts and !wtb for selling and buying, !recruit for guild recruitment, !event for a raid or a meetup, and !help when you are stuck. Type the command, then your message.",
-      "unknownHeading": "If a command does not work",
-      "unknownBody": "A command the game does not recognize comes back as an unknown-command notice, and nothing is said out loud, so a typo never lands in the channel you were talking in. Commands sent too quickly in a row are throttled: slow down for a moment and they go through again. Some need something to act on, so /follow with nobody targeted, or /reply when nobody has whispered you, will tell you so.",
-      "stickyBody": "Which chat tab you have selected decides where a plain line with no slash goes. Select the World tab and your next untagged line goes to World, so glance at the tab before you type. A slash command always wins over the tab, so /w Bob hi whispers Bob whichever tab is up, and on the whisper tab a plain line answers whoever whispered you last."
+      "intro": "Ogni comando che puoi digitare in chat, raggruppato per funzione, con le sue forme brevi.",
+      "slashBody": "Qualsiasi cosa digiti nella casella di chat che inizia con una barra è un comando, non qualcosa che dici ad alta voce. Premi Invio e o compie un'azione (segui qualcuno, lo inviti, tiri un numero) oppure stampa una riga privata che solo tu puoi vedere.",
+      "aliasBody": "La maggior parte dei comandi ha forme brevi, e ogni forma elencata in una riga fa esattamente la stessa cosa: /w, /t e /tell sono un solo comando. Le parole tra parentesi angolari sono obbligatorie, quelle tra parentesi quadre sono facoltative, e le maiuscole nel comando stesso non contano mai.",
+      "helpTipTitle": "Anche il gioco conosce l'elenco",
+      "helpTipBody": "Digita /help in gioco, oppure /commands, o semplicemente /?, e l'intero elenco dei comandi viene stampato nella tua chat. Sbaglia a digitare un comando e il gioco ti dice che non lo ha riconosciuto, rimandandoti a /help.",
+      "cmdHeader": "Comando",
+      "doesHeader": "Cosa fa",
+      "groupTalking": "Parlare",
+      "say": "Parla con i giocatori vicini a te. Una riga semplice senza barra va alla scheda di chat che hai selezionato, e Dire è quella su cui inizi.",
+      "yell": "Urla, così i giocatori molto più lontani della portata di Dire ti sentono.",
+      "whisper": "Invia un messaggio privato a un giocatore online. Il suo nome corrisponde a qualsiasi maiuscola tu digiti, purché possa intendersi un solo giocatore.",
+      "reply": "Rispondi a chi ti ha sussurrato per ultimo, senza dover digitare di nuovo il suo nome.",
+      "me": "Testo d'azione libero in terza persona, così \"/me osserva la fontana\" si legge come il tuo nome seguito dall'azione. Chiunque sia vicino a te lo vede.",
+      "partyChat": "Parla con tutti nel tuo gruppo o nella tua incursione.",
+      "groupChannels": "Canali",
+      "channelsIntro": "Generale raggiunge tutto il reame e ne fai parte dal momento in cui accedi. Mondo e Cerca Gruppo sono su base volontaria: unisciti prima a uno di essi, poi potrai leggerlo e parlarci.",
+      "general": "Il canale Generale, esteso a tutto il reame.",
+      "gAlias": "Una forma breve con due significati, quindi vale la pena conoscerla: offline invia al canale Generale, ma online è il tuo canale di gilda. Digita /general o /1 quando intendi sicuramente Generale.",
+      "guild": "Parla con la tua gilda. Solo nel gioco online, e devi far parte di una gilda.",
+      "officer": "Il canale ufficiali della tua gilda, aperto a ufficiali e capogilda. Solo nel gioco online.",
+      "join": "Unisciti o esci da un canale facoltativo. I due a cui puoi unirti sono mondo e cerca gruppo, e digitare /join da solo li elenca. Aprire una scheda di chat per uno di essi ti unisce automaticamente.",
+      "world": "Parla nel canale Mondo, una volta che ti sei unito.",
+      "lfg": "Parla nel canale Cerca Gruppo, dove le persone cercano compagni di gruppo. Unisciti prima.",
+      "groupParty": "Gruppo",
+      "invite": "Invita nel tuo gruppo un giocatore online chiamandolo per nome, non importa quanto sia lontano.",
+      "partyRoster": "Senza messaggio dopo di esso, stampa invece l'elenco del tuo gruppo: ogni membro con livello, classe e salute, con il capogruppo contrassegnato.",
+      "ready": "Chi guida il gruppo o l'incursione avvia una verifica di prontezza, e tutti gli altri ricevono una richiesta a cui rispondere sì o no.",
+      "assist": "Seleziona come bersaglio ciò che il giocatore indicato ha come bersaglio. Senza nome, assiste il giocatore che hai come bersaglio. Raggiunge il tuo gruppo e la tua incursione ovunque nel mondo, e chiunque altro sia abbastanza vicino da vedere.",
+      "follow": "Segui automaticamente un altro giocatore. Senza nome, segue il tuo bersaglio attuale. Muoverti, lanciare, combattere, scegliere un nuovo bersaglio, o l'allontanarsi dell'altro giocatore interrompono tutti l'inseguimento, e non puoi avviarlo in combattimento.",
+      "unfollow": "Smetti di seguire.",
+      "roll": "Tira un numero casuale, da 1 a 100 a meno che tu non indichi un limite o un intervallo. Il tuo gruppo vede il risultato, oppure tutti nelle vicinanze quando non ne fai parte. Il tiro è generato dal server, quindi nessuno può falsificarlo.",
+      "groupPeople": "Altri giocatori",
+      "who": "Elenca i giocatori online. Aggiungi del testo per restringere l'elenco a nomi o zone che lo contengono.",
+      "inspect": "Consulta livello, classe e salute di un giocatore online.",
+      "ignore": "Nasconde la chat pubblica di un giocatore e le sue nuvolette di chat sopra la testa. I suoi sussurri, tiri, inviti e posta arrivano comunque. La forma senza argomenti stampa chi stai ignorando.",
+      "block": "La versione più forte: blocca anche i loro sussurri, inviti e posta, e vi nasconde a vicenda in /who. La forma senza argomenti stampa chi hai bloccato.",
+      "peopleNote": "L'elenco di /who e le tue liste di ignorati e bloccati sono gestite dal server, quindi funzionano solo nel gioco online.",
+      "groupSelf": "Il tuo personaggio",
+      "selfIntro": "Questi stampano una riga privata nella tua chat che nessun altro vede. Niente viene trasmesso, quindi sono sicuri da usare nel bel mezzo di uno scontro.",
+      "played": "Da quanto tempo questo personaggio è nel mondo durante questa sessione.",
+      "playtime": "Da quanto tempo questo personaggio è stato giocato in totale, considerando tutte le sessioni.",
+      "xp": "Il tuo livello e quanto sei avanzato al suo interno.",
+      "gold": "Quanto denaro possiedi.",
+      "stats": "Un riepilogo del personaggio in una riga: livello, classe, salute, la tua risorsa, potenza d'attacco, probabilità di critico e armatura.",
+      "gear": "Tutto ciò che hai equipaggiato, slot per slot, così gli slot vuoti risaltano.",
+      "bags": "Cosa stai trasportando, dalla qualità migliore in giù, con le tue monete alla fine.",
+      "abilities": "Le abilità che hai imparato.",
+      "talents": "La tua specializzazione, e quante delle tue sei file di talenti hai scelto finora.",
+      "quests": "Il tuo registro missioni attive, con l'avanzamento di ogni obiettivo.",
+      "completed": "Le missioni che hai già consegnato, nell'ordine in cui le hai completate.",
+      "session": "Cosa hai fatto da quando hai effettuato l'accesso: uccisioni, morti, danni ed esperienza.",
+      "arena": "Il tuo piazzamento nel Colosseo Cinereo in entrambe le categorie: indice, vittorie, sconfitte e percentuale di vittorie per l'1v1 e per il 2v2.",
+      "listings": "Le tue inserzioni sul Mercato Mondiale, con il prezzo richiesto, il tempo rimasto per ciascuna, e quanto spazio hai per aggiungerne altre.",
+      "buyback": "Cosa hai venduto di recente a un venditore e potresti ancora ricomprare.",
+      "groupState": "Il tuo stato attuale",
+      "buffs": "I potenziamenti e gli indebolimenti su di te, con il tempo rimasto per ciascuno.",
+      "cooldowns": "Quali delle tue abilità sono in tempo di recupero, le più vicine alla fine per prime.",
+      "pet": "Nome, livello, famiglia e salute del tuo famiglio.",
+      "petTaunt": "Il tempo di recupero della Provocazione del tuo famiglio, e se è impostata per l'autolancio.",
+      "speed": "Quanto velocemente ti stai muovendo rispetto a una corsa normale, e se qualcosa ti tiene radicato.",
+      "form": "La forma o la posizione di combattimento in cui ti trovi.",
+      "manaRegen": "Per chi usa mana: se la rigenerazione di mana fuori combattimento ha ricominciato a scorrere.",
+      "savedMana": "Per chi usa mana ed è trasformato: il mana messo da parte mentre sei trasformato, che ritorna quando esci dalla forma.",
+      "combo": "Quanti punti combo hai accumulato.",
+      "consumable": "Il cibo e le bevande attivi su di te in questo momento, e quanto tempo resta a ciascuno.",
+      "potion": "Il tempo di recupero condiviso delle pozioni da combattimento, separato dai tempi di recupero delle tue abilità.",
+      "falling": "Se sei in aria, quanto sei alto rispetto al suolo, e se l'atterraggio farà male.",
+      "groupCombat": "In combattimento",
+      "target": "Il tuo bersaglio attuale: nome, livello, cosa è, e salute.",
+      "targetBuffs": "Le aure sul tuo bersaglio, ciascuna contrassegnata come potenziamento o indebolimento.",
+      "range": "Quanto è lontano il tuo bersaglio, e se rientra nella portata della mischia.",
+      "attack": "Se l'attacco automatico è attivo, su cosa, e quanto dura il tuo colpo.",
+      "casting": "Cosa stai lanciando o canalizzando, e quanto tempo resta.",
+      "combat": "Se sei in combattimento, e quando ne uscirai.",
+      "threat": "Su chi sono attualmente concentrati i nemici che ti stanno combattendo.",
+      "consider": "Quanto è pericoloso il tuo bersaglio in base al suo livello, rispetto al tuo.",
+      "queued": "L'abilità in coda pronta a scattare al tuo prossimo colpo in mischia.",
+      "overpower": "Per i guerrieri: se la finestra di Mano Rossa aperta da una schivata nemica è ancora disponibile.",
+      "groupWorld": "Mondo e viaggi",
+      "where": "La zona in cui ti trovi, il suo intervallo di livello, e le tue coordinate.",
+      "zones": "Ogni zona in ordine di viaggio con il suo intervallo di livello, con quella in cui ti trovi contrassegnata.",
+      "nearby": "Gli esseri viventi più vicini a te, dal più vicino.",
+      "pois": "I punti di interesse della tua zona attuale, dal più vicino, con la distanza da ciascuno.",
+      "graveyard": "Dove tornerebbe il tuo spirito se cadessi qui.",
+      "dungeons": "Ogni dungeon con la zona in cui si trova la sua porta e la dimensione di gruppo per cui è pensato, più la difficoltà attualmente impostata.",
+      "dungeonMode": "Passa i tuoi dungeon tra difficoltà normale ed eroica.",
+      "dungeonReset": "Abbandona le tue istanze vuote, cosa che si fa dopo aver cambiato difficoltà.",
+      "groupRecovery": "Recupero e presenza",
+      "unstuck": "La via d'uscita quando il mondo ti ha intrappolato. Resta fermo per un breve conto alla rovescia e verrai spostato al cimitero più vicino, rianimato lì se eri già caduto. Ti lascia indebolito dal Mal di sblocco per un po' di tempo dopo, quindi è un'ultima risorsa, non una scorciatoia.",
+      "afk": "Segnati come Assente, con un messaggio facoltativo che chiunque ti sussurri riceve come risposta automatica. Ripetilo senza messaggio per annullarlo; qualsiasi altra chat lo annulla anch'essa.",
+      "dnd": "Non Disturbare: come assente, tranne che i sussurri inviati a te vengono trattenuti invece che recapitati.",
+      "sit": "Siediti dove ti trovi, e rialzati. Ti alzi automaticamente nel momento in cui ti muovi, lanci un incantesimo o subisci un colpo.",
+      "help": "Stampa l'elenco dei comandi nella tua chat.",
+      "emotesHeading": "Emote",
+      "emotesBody": "Anche le emote sociali sono comandi: /wave, /bow, /cheer, /dance, /laugh e le altre, ciascuna mostrata a tutti a portata di Dire. Aggiungi un nome per indirizzarne una a qualcuno, come in \"/wave Aleph\", e /me copre tutto ciò che l'elenco non include.",
+      "emotesMore": "Altro sulle emote e sul giocare insieme",
+      "bangHeading": "Comandi della community",
+      "bangBody": "Alcuni comandi iniziano con un punto esclamativo invece che con una barra. Annunciano qualcosa al reame e lo pubblicano contemporaneamente sul Discord della community, così lo vedono anche le persone non collegate. Fanno parte del gioco online.",
+      "bangList": "L'insieme comprende !lfg per cercare un gruppo, !wts e !wtb per vendere e comprare, !recruit per il reclutamento in gilda, !event per un'incursione o un raduno, e !help quando sei bloccato. Digita il comando, poi il tuo messaggio.",
+      "unknownHeading": "Se un comando non funziona",
+      "unknownBody": "Un comando che il gioco non riconosce torna con un avviso di comando sconosciuto, e non viene detto nulla ad alta voce, quindi un errore di battitura non finisce mai nel canale in cui stavi parlando. I comandi inviati troppo rapidamente in successione vengono limitati: rallenta per un momento e torneranno a funzionare. Alcuni hanno bisogno di qualcosa su cui agire, quindi /follow senza nessun bersaglio selezionato, oppure /reply quando nessuno ti ha sussurrato, te lo diranno.",
+      "stickyBody": "La scheda di chat che hai selezionato decide dove va una riga semplice senza barra. Seleziona la scheda Mondo e la tua prossima riga senza prefisso andrà a Mondo, quindi dai un'occhiata alla scheda prima di digitare. Un comando con la barra ha sempre la precedenza sulla scheda, quindi /w Bob ciao sussurra a Bob qualunque scheda sia aperta, e sulla scheda dei sussurri una riga semplice risponde a chi ti ha sussurrato per ultimo."
     },
     "glossary": {
       "intro": "Un rapido riferimento per i termini usati in questa guida e nella chat.",
@@ -4303,7 +4616,7 @@ export const it_IT: EnTranslations = {
       "healerTerm": "Guaritore",
       "healerDef": "Il membro del gruppo che tiene tutti in vita con gli incantesimi di cura.",
       "specTerm": "Spec",
-      "specDef": "Una specializzazione: il percorso verso cui orienti la tua classe, come cura o danno, man mano che spendi i talenti.",
+      "specDef": "Una specializzazione: la via che scegli per la tua classe al livello 5, come la cura o il danno. Fissa il tuo ruolo, concede un'abilità distintiva e una maestria duratura, e ti resta anche quando azzeri i talenti.",
       "pullTerm": "Pull",
       "pullDef": "Attirare un nemico o un gruppo in uno scontro, di solito deliberatamente e un'ondata alla volta.",
       "instanceTerm": "Istanza",
@@ -4331,7 +4644,7 @@ export const it_IT: EnTranslations = {
       "targetMarkerTerm": "Simbolo bersaglio",
       "targetMarkerDef": "Un simbolo che qualsiasi membro del gruppo o dell'incursione può fissare su un bersaglio così tutti si concentrano, o evitano, lo stesso. Otto simboli, un bersaglio per simbolo.",
       "loadoutTerm": "Configurazione",
-      "loadoutDef": "Una disposizione di talenti salvata. Tienine diverse e passa da una costruzione all'altra senza rispendere i punti uno per uno.",
+      "loadoutDef": "Una disposizione di talenti salvata, fino a dieci. Ognuna ricorda le sue scelte di fila e la sua barra delle azioni, e può ricordare anche l'equipaggiamento che indossavi, così cambiare build è un clic invece di rifare ogni fila.",
       "readyCheckTerm": "Verifica di prontezza",
       "readyCheckDef": "Un capogruppo che digita /ready per interpellare il gruppo o l'incursione: ognuno conferma Pronto o Non pronto, e il gruppo vede i conteggi.",
       "soulboundTerm": "Vincolato all'anima",
@@ -4340,54 +4653,54 @@ export const it_IT: EnTranslations = {
       "spiritHealerDef": "Il guaritore degli spiriti del reame, che aleggia su ogni cimitero: può risollevare il tuo spettro sul posto al prezzo di una debolezza passeggera.",
       "worldBossTerm": "Boss del mondo",
       "worldBossDef": "Un boss della potenza di un'incursione che si erge nel mondo aperto con un ritmo costante, affrontato da chiunque si raduni a rispondere anziché da un gruppo fisso.",
-      "fiveSecondTerm": "The five-second rule",
-      "fiveSecondDef": "Your mana only starts refilling on its own once five seconds have passed since you last spent any. It is why casters pace themselves instead of casting flat out.",
-      "talentRowTerm": "Talent row",
-      "talentRowDef": "Talents arrive as six rows, one at each of levels 5, 8, 11, 14, 17 and 20. Every row offers three options and you take one of them, so there are no points to save up or spend.",
-      "riftTerm": "Rift",
-      "riftDef": "A tear that opens on its own out in the zones, leading down through floors of an instance built fresh from that rift's own seed. Rifts are ranked C, B, A or S. The entrance closes to new parties after a while, and only the first party in the realm to reach the bottom seals it.",
-      "riftRankTerm": "Rank (rifts)",
-      "riftRankDef": "The letter on a rift, C, B, A or S, and the only thing that sets how hard it is. A rift never scales to the size of your group, so the rank is the whole difficulty ladder: C is the gentlest and S the fiercest, and every rank is meant for a group.",
-      "finderTerm": "Dungeon Finder",
-      "finderDef": "The window that catalogues the dungeons and raids, queues you for a quick match, and lists the premade groups looking for people. Shift+I opens it by default.",
-      "premadeTerm": "Premade",
-      "premadeDef": "A group a player put together by hand and listed on the Dungeon Finder board, rather than one the quick match queue assembled for you.",
-      "chronicleTerm": "Chronicle",
-      "chronicleDef": "A zone's own collection of deeds, gathered into chapters by a local Chronicler. You can work through the chapters in whatever order suits you.",
-      "marksTerm": "Delve Marks and Heroic Marks",
-      "marksDef": "The two rewards the repeatable endgame pays besides loot. Delves pay Delve Marks, which buy gear from the delve shop and upgrade your companion; heroic dungeons pay Heroic Marks, which buy gear from the heroic quartermaster.",
-      "honorTerm": "Honor",
-      "honorDef": "What fighting other players pays out: arena victories, Thornhollow Fields wins, and honorable kills all add to it. You spend it on the Warfare sets.",
-      "warfareTerm": "Warfare",
-      "warfareDef": "The gear side of player-versus-player. A quartermaster sells sets of Warfare armor for Honor, and the Warfare rating they carry counts only in fights against other players.",
-      "fatigueTerm": "Fatigue",
-      "fatigueDef": "Swim far enough out into open sea and the water begins to sap you: a warning comes first, then rising damage until you turn back toward land.",
-      "unstuckTerm": "Unstuck Sickness",
-      "unstuckDef": "The price of using Unstuck from the game menu. Stand still through the countdown and it sets you down at the nearest graveyard, and you carry a temporary weakness for a while afterwards.",
-      "itemLevelTerm": "Item level",
-      "itemLevelDef": "One number summing up how strong a piece of gear is, handy when you want to compare two pieces quickly. Turn on Show Item Level in the options to see it on tooltips. Only gear with a known source carries one, so plain vendor basics and starter gear show nothing, and a missing figure is normal rather than a fault.",
-      "requiredLevelTerm": "Required level",
-      "requiredLevelDef": "The level you have to reach before you can wear or wield a piece of gear. The tooltip shows it in red while you are still under it.",
-      "offHandTerm": "Off hand",
-      "offHandDef": "The second hand slot. It holds a shield or a held item such as a lantern or a quiver, and a second weapon only if your class and specialization can dual wield.",
-      "setBonusTerm": "Set bonus",
-      "setBonusDef": "An extra reward for wearing several pieces of the same armor family at once. The tooltip counts how many pieces of the set you have on, and more pieces unlock more of the bonus.",
-      "commissionTerm": "Commission and the Maker's Bond",
-      "commissionDef": "A craft made for someone else. The crafter flags the piece as a commission, and it binds to whoever receives it in a trade; a station master will unbind it again later for a fee.",
-      "masterworkTerm": "Masterwork",
-      "masterworkDef": "The finest version of a craft, which a skilled crafter turns out now and then in place of a plain copy. A masterwork always carries its maker's name.",
-      "toolCharmTerm": "Tool charm",
-      "toolCharmDef": "A crafted charm you slot onto a mining, logging, or herbalism tool from the Professions window to improve what it brings back. Slotting consumes the charm, and the effect lasts for a set number of charges. When those run out you recharge the slot with materials rather than crafting a new charm.",
-      "mountTerm": "Mount",
-      "mountDef": "A creature you ride to cross the land faster. Almost anything else you do takes you off it: swimming, entering combat, gathering, and crafting all put you back on your feet.",
-      "ridingTerm": "Riding",
-      "ridingDef": "The skill that lets you ride at all. You buy it once from a stablemaster at level 20, and after that it stays with your character for good.",
-      "reinsTerm": "Reins",
-      "reinsDef": "The item that is a mount. Keep a pair in your bags or your bank and that mount is yours; use them to ride. Reins can be traded, mailed, and sold to other players.",
+      "fiveSecondTerm": "La regola dei cinque secondi",
+      "fiveSecondDef": "Il tuo mana si rigenera a pieno ritmo soltanto dopo che sono trascorsi cinque secondi dall'ultima volta che ne hai speso. Fino ad allora continua a rientrare a ritmo ridotto invece di fermarsi del tutto. È il motivo per cui gli incantatori dosano il ritmo invece di lanciare senza sosta.",
+      "talentRowTerm": "Fila di talenti",
+      "talentRowDef": "I talenti arrivano in sei file, una a ciascuno dei livelli 5, 8, 11, 14, 17 e 20. Ogni fila offre tre opzioni e ne scegli una, quindi non ci sono punti da risparmiare o da spendere.",
+      "riftTerm": "Squarcio",
+      "riftDef": "Uno squarcio che si apre da solo nelle zone, e che scende attraverso i piani di un'istanza costruita di fresco dal seme di quello squarcio. Gli squarci hanno rango C, B, A o S. L'ingresso si chiude ai nuovi gruppi dopo un po', e solo il primo gruppo del reame a raggiungere il fondo lo sigilla.",
+      "riftRankTerm": "Rango (squarci)",
+      "riftRankDef": "La lettera su uno squarcio, C, B, A o S, l'unico fattore che ne determina la difficoltà. Uno squarcio non si adatta mai alle dimensioni del tuo gruppo, quindi il rango è l'intera scala di difficoltà: C è il più mite e S il più feroce, e ogni rango è pensato per un gruppo.",
+      "finderTerm": "Cercatore di Dungeon",
+      "finderDef": "La finestra che cataloga i dungeon e le incursioni, ti mette in coda per una partita rapida ed elenca i gruppi prefissati in cerca di persone. Si apre con Maiusc+I per impostazione predefinita.",
+      "premadeTerm": "Gruppo preformato",
+      "premadeDef": "Un gruppo che un giocatore ha messo insieme a mano e pubblicato sul tabellone del Cercatore di Dungeon, anziché uno assemblato per te dalla coda di partita rapida.",
+      "chronicleTerm": "Cronaca",
+      "chronicleDef": "La raccolta di imprese di una zona, riunita in capitoli da un Cronista locale. Puoi affrontare i capitoli nell'ordine che preferisci.",
+      "marksTerm": "Sigilli d'Incursione e Marchi Eroici",
+      "marksDef": "Le due ricompense che il contenuto ripetibile di fine gioco paga oltre al bottino. Le incursioni pagano Sigilli d'Incursione, che comprano equipaggiamento al negozio dell'incursione e potenziano la tua compagna; i dungeon eroici pagano Marchi Eroici, che comprano equipaggiamento dal quartiermastro eroico.",
+      "honorTerm": "Onore",
+      "honorDef": "Ciò che paga il combattere altri giocatori: le vittorie in arena, le vittorie ai Campi di Thornhollow e le uccisioni onorevoli vi contribuiscono tutte. Lo spendi sui set da Guerra.",
+      "warfareTerm": "Guerra",
+      "warfareDef": "Il lato equipaggiamento del giocatore contro giocatore. Un quartiermastro vende set di armatura da Guerra in cambio di Onore, e l'indice Guerra che portano conta solo negli scontri contro altri giocatori.",
+      "fatigueTerm": "Affaticamento",
+      "fatigueDef": "Nuota abbastanza al largo in mare aperto e l'acqua comincia a fiaccarti: prima arriva un avvertimento, poi danni crescenti finché non torni verso la riva.",
+      "unstuckTerm": "Mal di sblocco",
+      "unstuckDef": "Il prezzo di usare Sblocco dal menu di gioco. Resta fermo per tutto il conto alla rovescia e ti deposita al cimitero più vicino, lasciandoti poi una debolezza temporanea per un po'.",
+      "itemLevelTerm": "Livello oggetto",
+      "itemLevelDef": "Un unico numero che riassume quanto è forte un pezzo di equipaggiamento, utile per confrontare rapidamente due pezzi. Attiva Mostra livello oggetto nelle opzioni per vederlo nei suggerimenti. Solo l'equipaggiamento di provenienza nota ne porta uno, quindi gli articoli base dei mercanti e l'equipaggiamento iniziale non mostrano nulla, e un valore mancante è normale, non un difetto.",
+      "requiredLevelTerm": "Livello richiesto",
+      "requiredLevelDef": "Il livello che devi raggiungere prima di poter indossare o impugnare un pezzo d'equipaggiamento. Il tooltip lo mostra in rosso finché non lo hai ancora raggiunto.",
+      "offHandTerm": "Mano secondaria",
+      "offHandDef": "Il secondo slot per le mani. Contiene uno scudo o un oggetto impugnato come una lanterna o una faretra, e una seconda arma solo se la tua classe e specializzazione possono impugnare un'arma per mano.",
+      "setBonusTerm": "Bonus di set",
+      "setBonusDef": "Una ricompensa extra per indossare più pezzi della stessa famiglia di armatura contemporaneamente. Il tooltip conta quanti pezzi del set indossi, e più pezzi sbloccano più bonus.",
+      "commissionTerm": "Commissione e il Vincolo dell'Artigiano",
+      "commissionDef": "Una lavorazione fatta per qualcun altro. L'artigiano contrassegna il pezzo come commissione, e questo si vincola a chiunque lo riceva in uno scambio; un maestro di stazione potrà in seguito scioglierlo di nuovo dietro pagamento di una tariffa.",
+      "masterworkTerm": "Capolavoro",
+      "masterworkDef": "La versione più raffinata di una lavorazione, che un artigiano esperto realizza di tanto in tanto al posto di una copia semplice. Un capolavoro porta sempre il nome del suo artefice.",
+      "toolCharmTerm": "Amuleto per attrezzo",
+      "toolCharmDef": "Un amuleto fabbricato che incastoni su un attrezzo da minatore, boscaiolo o erborista dalla finestra Professioni per migliorare ciò che porta indietro. Incastonarlo consuma l'amuleto, e l'effetto dura per un numero fisso di cariche. Quando si esauriscono, ricarichi l'incastro con dei materiali invece di fabbricare un nuovo amuleto.",
+      "mountTerm": "Cavalcatura",
+      "mountDef": "Una creatura che cavalchi per attraversare il territorio più in fretta. Quasi ogni altra azione ti fa scendere: nuotare, entrare in combattimento, raccogliere e fabbricare ti rimettono tutti a piedi.",
+      "ridingTerm": "Equitazione",
+      "ridingDef": "L'abilità che ti permette di cavalcare. La acquisti una sola volta da uno stalliere al livello 20, e da quel momento resta con il tuo personaggio per sempre.",
+      "reinsTerm": "Redini",
+      "reinsDef": "L'oggetto che rappresenta una cavalcatura. Tienine un paio nelle borse o in banca e quella cavalcatura è tua; usale per cavalcare. Le redini possono essere scambiate, spedite per posta e vendute ad altri giocatori.",
       "claudiumTerm": "Claudium",
-      "claudiumDef": "The currency of the WOC Store, spent on cosmetics and nothing else. It never buys power or progression.",
-      "worldTerm": "World",
-      "worldDef": "One shared copy of the online game, with its own players, market, and standings. This guide also calls it a realm, and your character lives on the world you made it on."
+      "claudiumDef": "La valuta del Negozio WOC, spesa solo in cosmetici e in nient'altro. Non compra mai potere o progressione.",
+      "worldTerm": "Mondo",
+      "worldDef": "Una copia condivisa del gioco online, con i propri giocatori, il proprio mercato e le proprie classifiche. Questa guida lo chiama anche reame, e il tuo personaggio vive nel mondo in cui lo hai creato."
     },
     "faqPage": {
       "intro": "Le domande che i nuovi giocatori pongono più spesso.",
@@ -4396,14 +4709,14 @@ export const it_IT: EnTranslations = {
       "q2": "Mi serve un wallet crypto o dei token?",
       "a2": "No. Il gioco è pienamente giocabile senza. Il token comunitario opzionale aggiunge solo fronzoli estetici e una quota del montepremi delle ricompense giornaliere, e non influisce mai su potere o progressione.",
       "q3": "Posso giocare sul telefono?",
-      "a3": "Sì. Il gioco gira in un browser mobile con comandi touch, e c'è anche un launcher per desktop.",
+      "a3": "Sì. Il gioco gira in qualsiasi browser mobile moderno con comandi touch, e ci sono anche le app: versioni iOS e Android, e un'app desktop per Windows, macOS e Linux che si tiene aggiornata da sola.",
       "q4": "Posso giocare offline o in solitaria?",
       "a4": "Sì. C'è una modalità offline per giocatore singolo immediata, e il mondo online è pienamente affrontabile in solitaria a parte i dungeon, l'incursione e il boss del mondo.",
       "q5": "Quante classi ci sono?",
       "a5": "Nove, che coprono i ruoli classici di tank, guaritore e danno, ognuna con un sistema di risorse (ira, mana o energia) e le proprie abilità distintive.",
       "q6": "Qual è il livello massimo?",
       "a6": "Livello {cap}, raggiunto attraverso tre zone collegate di missioni, dungeon ed esplorazione.",
-      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
+      "a6Count": "Livello {cap}, raggiunto attraverso zone di missioni, dungeon ed esplorazione. Sono {zones} zone in tutto, dalla valle iniziale alle regioni pensate per i personaggi già al livello massimo.",
       "q7": "Il mio personaggio verrà salvato?",
       "a7": "I personaggi online vengono salvati automaticamente sul server. I personaggi offline vivono nel tuo browser per sessioni rapide e test.",
       "q8": "Posso ospitare una mia copia?",
@@ -4411,27 +4724,27 @@ export const it_IT: EnTranslations = {
       "q9": "C'è il PvP?",
       "a9": "Sì. Sfida a duello chiunque per divertimento, oppure entra nel Colosseo di Cenere per combattere altri giocatori. Il PvP è facoltativo, quindi non ci sei mai costretto.",
       "q10": "Cosa c'è da fare al livello massimo?",
-      "a10": "Il limite è il livello {cap}. Da lì affronti i dungeon a cinque giocatori e l'incursione a dieci, li ripeti in modalità eroica per bottino potenziato, sfidi il boss del mondo quando si erge, ti metti alla prova nell'arena, ti cali nelle esplorazioni con un compagno al fianco e insegui le imprese nel Libro delle Imprese per scalare le graduatorie del reame.",
+      "a10": "Il limite è il livello {cap}. Da lì affronti i dungeon a cinque e l'incursione a dieci, li riprendi in modalità eroica per bottino migliorato, scendi nelle fenditure piano per piano, affronti il boss del mondo quando si leva, ti misuri in arena o sul campo di battaglia dei Campi di Thornhollow, giochi una stagione della Coppa della Valle, ti cali nelle incursioni con un compagno al fianco, porti una professione fino all'artigianato da capolavoro, collezioni cavalcature e insegui imprese nel Libro delle Imprese per salire nelle classifiche.",
       "q11": "Come trovo un gruppo?",
       "a11": "Invita nel gruppo chiunque incontri, chiedi in chat o fai squadra a un dungeon. Gran parte del mondo è affrontabile da soli, quindi fare gruppo è una scelta, non un obbligo.",
-      "q12": "Is there a cash shop?",
-      "a12": "There is an optional cosmetic store. It sells looks: the Season 1 Armory weapon skins, bought with Claudium, the store currency. Nothing in it adds stats, power, or progression, and a skin never changes how your weapon hits, so every piece of gear that matters still comes from playing.",
-      "q13": "Where can I get the app?",
-      "a13": "The browser version needs nothing at all: open the site and play. If you would rather have an app, the desktop download for Windows, macOS, and Linux is on the Download page of the game site. Native iOS and Android apps are in the works, and until they land a phone or tablet plays the browser version with full touch controls. Every version signs in to the same account and the same worlds, so your characters follow you.",
-      "q14": "What do I need to run it?",
-      "a14": "A recent browser on a laptop, desktop, phone, or tablet. On your first launch the game reads your device and picks a graphics tier to match, from Low to Ultra, and any choice you make yourself always wins. Mouse and keyboard, touch, and a game controller all work. The settings and controls pages have the detail.",
-      "q15": "Do I need an account?",
-      "a15": "Only to play online. The offline world asks for nothing: choose Offline on the start screen and press Play. An online account is free, takes a username, a password, and an email address for account recovery, and keeps your characters saved on the server. Once you have one you can turn on two-factor authentication from the options.",
-      "q16": "What is a world?",
-      "a16": "Online play happens on worlds, and each one is a full copy of the game with its own players, its own World Market, and its own standings. When you sign in, the World List shows how busy each world is, from Low to Full, so you can pick a quiet one for elbow room or a busy one for company. Your characters live on the world you made them on, and you can keep characters on more than one.",
-      "q17": "How many characters can I have, and can I delete one?",
-      "a17": "Up to ten characters per world on one account, and you can have characters on more than one world. To remove one, delete it from the character list: the character must not be in the world, and you have to type its name to confirm, which is why a slip of the finger cannot cost you a hero. Deleting is permanent. That character's belongings go with it, its World Market listings are pulled from the market, and its Ravenpost mailbox is cleared.",
-      "q18": "Can I change my character's name?",
-      "a18": "Not by yourself, so choose one you like. Names are 2 to 16 letters, start with a letter, and allow spaces, hyphens, and apostrophes, and each one is unique on its world no matter how it is capitalized. Names that break the rules of conduct are refused. The one time you are asked to rename is when a moderator requires it. Closing your account can release its names for other players, and merely not playing for a while never does: an inactive account keeps its names.",
-      "q19": "What happens if I get disconnected?",
-      "a19": "Your character stays in the world for about five minutes and the game tries to reconnect on its own, so a dropped signal, a shut laptop, or a reload usually puts you right back where you were, in the same session. Because your character really is still standing there, disconnecting is not a way to escape a fight. Choosing Logout from the game menu leaves immediately rather than waiting out that window.",
-      "q20": "I found a bug. How do I report it?",
-      "a20": "From inside the online game, open the menu with Esc and choose Report a Bug. Describe what happened and send it: your world, your character, and where you were standing ride along automatically, together with your version and device details, and you can tick Include Screenshot to attach a picture of what you were looking at. If you send several in a row you may be asked to wait a moment before the next one."
+      "q12": "C'è un negozio a pagamento?",
+      "a12": "Esiste un negozio di cosmetici facoltativo. Vende aspetti: gli aspetti per armi dell'Armeria della Stagione 1, acquistati con Claudium, la valuta del negozio. Niente al suo interno aggiunge statistiche, potere o progressione, e un aspetto non cambia mai il modo in cui la tua arma colpisce, quindi ogni pezzo di equipaggiamento che conta viene ancora e solo dal giocare.",
+      "q13": "Dove trovo l'app?",
+      "a13": "La versione browser non richiede nulla: apri il sito e gioca. Se preferisci un'app, il download desktop per Windows, macOS e Linux si trova nella pagina Scarica del sito di gioco. Le app native per iOS e Android sono in lavorazione, e finché non arrivano un telefono o un tablet gioca la versione browser con comandi touch completi. Ogni versione accede allo stesso account e agli stessi mondi, così i tuoi personaggi ti seguono.",
+      "q14": "Cosa mi serve per farlo funzionare?",
+      "a14": "Un browser recente su laptop, desktop, telefono o tablet. Al primo avvio il gioco legge il tuo dispositivo e sceglie un livello grafico adatto, da Bassa a Ultra, e qualsiasi scelta tu faccia in autonomia ha sempre la priorità. Funzionano mouse e tastiera, touch e un controller. Le pagine di impostazioni e comandi hanno i dettagli.",
+      "q15": "Mi serve un account?",
+      "a15": "Solo per giocare online. Il mondo offline non chiede nulla: scegli Offline nella schermata iniziale e premi Gioca. Un account online è gratuito, richiede un nome utente, una password e un indirizzo email per il recupero dell'account, e mantiene i tuoi personaggi salvati sul server. Una volta che ne hai uno puoi attivare l'autenticazione a due fattori dalle opzioni.",
+      "q16": "Cos'è un mondo?",
+      "a16": "Il gioco online si svolge sui mondi, e ognuno è una copia completa del gioco con i propri giocatori, il proprio Mercato Mondiale e le proprie classifiche. Quando accedi, la Lista dei mondi mostra quanto è affollato ciascun mondo, da Bassa a Pieno, così puoi scegliere un mondo tranquillo per avere più spazio o uno affollato per avere compagnia. I tuoi personaggi vivono sul mondo in cui li hai creati, e puoi tenere personaggi su più di un mondo.",
+      "q17": "Quanti personaggi posso avere, e posso eliminarne uno?",
+      "a17": "Fino a dieci personaggi per mondo su un account, e puoi avere personaggi su più di un mondo. Per rimuoverne uno, eliminalo dall'elenco dei personaggi: il personaggio non deve trovarsi nel mondo, e devi digitarne il nome per confermare, motivo per cui uno scivolone del dito non può costarti un eroe. L'eliminazione è permanente. I beni di quel personaggio se ne vanno con lui, le sue inserzioni sul Mercato Mondiale vengono ritirate dal mercato, e la sua cassetta postale della Posta dei Corvi viene svuotata.",
+      "q18": "Posso cambiare il nome del mio personaggio?",
+      "a18": "Non da solo, quindi sceglilo con cura. I nomi vanno da 2 a 16 lettere, iniziano con una lettera e ammettono spazi, trattini e apostrofi, e ognuno è unico sul proprio mondo indipendentemente da come viene scritto in maiuscolo o minuscolo. I nomi che violano le norme di comportamento vengono rifiutati. L'unica volta in cui ti viene chiesto di rinominarti è quando lo richiede un moderatore. Chiudere il tuo account può liberare i suoi nomi per altri giocatori, mentre il semplice non giocare per un po' non lo fa mai: un account inattivo conserva i propri nomi.",
+      "q19": "Cosa succede se mi disconnetto?",
+      "a19": "Il tuo personaggio resta nel mondo per circa cinque minuti e il gioco prova a riconnettersi da solo, così un segnale caduto, un laptop chiuso o una ricarica di solito ti riportano esattamente dove eri, nella stessa sessione. Poiché il tuo personaggio è davvero ancora lì in piedi, disconnettersi non è un modo per sfuggire a uno scontro. Scegliere Esci dal menu di gioco ti fa uscire immediatamente invece di aspettare quella finestra di tempo.",
+      "q20": "Ho trovato un bug. Come lo segnalo?",
+      "a20": "Dall'interno del gioco online, apri il menu con Esc e scegli Segnala un bug. Descrivi cosa è successo e invia: il tuo mondo, il tuo personaggio e dove ti trovavi vengono allegati automaticamente, insieme ai dettagli sulla tua versione e sul tuo dispositivo, e puoi spuntare Includi schermata per allegare un'immagine di ciò che stavi guardando. Se ne invii diverse una dopo l'altra potrebbe esserti chiesto di attendere un momento prima della successiva."
     },
     "classList": {
       "heading": "Le nove classi",
@@ -4445,7 +4758,8 @@ export const it_IT: EnTranslations = {
     "resourceName": {
       "rage": "Ira",
       "mana": "Mana",
-      "energy": "Energia"
+      "energy": "Energia",
+      "focus": "Concentrazione"
     },
     "classPage": {
       "back": "Tutte le classi",
@@ -4459,23 +4773,23 @@ export const it_IT: EnTranslations = {
       "fullKitNote": "L'arsenale che questa classe impara salendo di livello, nell'ordine in cui diventa disponibile. I talenti concedono qualche abilità in più e decidono quali sorreggono la tua costruzione.",
       "petsHeading": "Demoni",
       "petsNote": "Gli Stregoni evocano demoni che combattono al loro fianco, ciascuno adatto a un compito diverso.",
-      "mageLore": "Mages bend Fire and Frost to destroy enemies, summon a Water Elemental, freeze threats in place, or bend time itself to shield and mend their allies.",
-      "mageEleHeading": "Water Elemental",
-      "mageEleNote": "A Frost mage learns to summon a Water Elemental, a ranged companion that throws Waterbolts at your target on its own. It answers the pet bar like a hunter beast or a warlock demon, though it is not built to hold a target for you.",
-      "mageEleJet": "Water Jet sits on the pet bar as a button of its own: click it to lock a chilling beam onto one enemy, or right-click it (touch and hold on mobile) to let the elemental fire it on its own whenever it is ready.",
-      "formsHeading": "Shapeshifting",
-      "formsNote": "A druid fights by changing shape. Most druid abilities belong to one shape, so the form you are in decides what you can cast, and shifting costs a little mana. You can shift in or out of combat, as often as you like.",
-      "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.",
+      "mageLore": "I maghi piegano Fuoco e Gelo per distruggere i nemici, evocano un Elementale dell'Acqua, congelano le minacce sul posto, oppure piegano il tempo stesso per proteggere e curare i loro alleati.",
+      "mageEleHeading": "Elementale dell'Acqua",
+      "mageEleNote": "Un mago di Gelo impara a evocare un Elementale dell'Acqua, un compagno a distanza che scaglia Dardi d'Acqua sul tuo bersaglio in autonomia. Risponde alla barra del famiglio come il famiglio di un cacciatore o il demone di uno stregone, anche se non è pensato per tenere un bersaglio al posto tuo.",
+      "mageEleJet": "Getto d'Acqua compare sulla barra del famiglio come pulsante a sé stante: cliccalo per bloccare un raggio gelido su un nemico, oppure fai clic destro su di esso (tocca e tieni premuto su mobile) per lasciare che l'elementale lo lanci da solo ogni volta che è pronto.",
+      "formsHeading": "Trasformazioni",
+      "formsNote": "Un druido combatte cambiando forma. La maggior parte delle abilità del druido appartiene a una forma specifica, quindi la forma in cui ti trovi decide cosa puoi lanciare, e trasformarti costa un po' di mana. Puoi trasformarti dentro o fuori dal combattimento, tutte le volte che vuoi.",
+      "formsMoonwing": "Un druido di Equilibrio ottiene una forma in più, la Forma di Lunagufo, la forma da incantatore in cui combatte questa specializzazione. È l'unica forma animale che conserva i tuoi incantesimi, e la tua bacchetta funziona solo con essa o con la tua normale forma da incantatore.",
       "formLine": {
-        "form_bear": "The tanking shape: a heavy hide, rage instead of mana, and extra threat so enemies keep swinging at you.",
-        "form_cat": "The melee damage shape: energy and combo points, like a rogue, and much less threat.",
-        "form_travel": "The travelling shape: far quicker across the ground, but no other abilities until you shift out."
+        "form_bear": "La forma da tank: una pelle spessa, rabbia al posto del mana, e minaccia extra così i nemici continuano ad attaccarti.",
+        "form_cat": "La forma da danno in mischia: energia e punti combo, come un ladro, e molta meno minaccia.",
+        "form_travel": "La forma da viaggio: molto più veloce sul terreno, ma nessun'altra abilità finché non ne esci."
       },
-      "mageEleSummon": "A Frost spell that calls the elemental to your side and sets it on your target.",
+      "mageEleSummon": "Un incantesimo di Gelo che richiama l'elementale al tuo fianco e lo indirizza contro il tuo bersaglio.",
       "formName": {
-        "form_bear": "Bruin Form",
-        "form_cat": "Wolf Form",
-        "form_travel": "Fleet Form"
+        "form_bear": "Forma di Bruin",
+        "form_cat": "Forma del Lupo",
+        "form_travel": "Forma di Fleet"
       }
     },
     "classHook": {
@@ -4514,19 +4828,32 @@ export const it_IT: EnTranslations = {
       "none": "Nessuna classe corrisponde a tutti i filtri. Azzerane uno per vederne di più."
     },
     "abilityHook": {
+      "evil_eye": "Nomina il nemico le cui azioni e sofferenza alimentano la tua Condanna.",
       "heroic_strike": "Mette in coda un fendente più pesante che spende ira al tuo prossimo colpo.",
       "revenge": "Colpisce i nemici davanti a te e può diventare gratuita dopo una schivata o una parata.",
       "hamstring": "Ostacola il movimento di un nemico per impedirgli di fuggire.",
       "battle_shout": "Un grido di incitamento che aumenta la potenza d'attacco del gruppo.",
       "charge": "Si scaglia su un nemico distante per aprire lo scontro con un breve stordimento.",
       "thunder_clap": "Colpisce tutto ciò che ti circonda e rallenta i loro attacchi.",
-      "seal_of_righteousness": "Imbeve i tuoi colpi di danno Sacro, poi spendilo con Verdict.",
+      "seal_of_righteousness": "Permea i tuoi colpi in mischia con danno Sacro aggiuntivo.",
       "holy_light": "Una cura costante e di buona entità per rimettere in piedi un alleato o te stesso.",
       "devotion_aura": "Un potenziamento personale duraturo che aumenta la corazza, così i colpi feriscono meno.",
       "judgement": "Spende il tuo Sigillo attivo per colpire un nemico dalla corta distanza.",
+      "hammer_of_wrath": "Giustizia un nemico ferito a distanza, o qualsiasi nemico mentre le tue ali sono attive.",
+      "avenging_wrath": "Concede 10 Devozione, poi raddoppia la Devozione generata dalle abilità per quindici secondi.",
+      "bastion_sweep": "Fa roteare lo scudo in un gruppo per strappare la minaccia e accumulare Devozione.",
+      "oath_chain": "Trascina un nemico lontano dentro il tuo branco e ne rallenta la fuga.",
+      "veilbound_march": "Attraversa un gruppo per marchiarlo, smussarne i danni contro di te e assicurarti la minaccia.",
+      "holy_shield": "Spende Devozione per una finestra di parata attiva, assorbimento e un impulso di minaccia.",
+      "consecration": "Rivendica il terreno attorno a te con danni Sacri e minaccia continui.",
+      "hammer_of_justice": "Ferma un nemico con uno stordimento breve e affidabile.",
+      "lay_on_hands": "Recupera una grande quantità di salute quando un alleato sta per cadere.",
       "blessing_of_might": "Aumenta la potenza d'attacco di un alleato, ottima da lanciare prima di un pull.",
       "divine_protection": "Una rapida barriera protettiva per assorbire i danni quando le cose si fanno difficili.",
       "raptor_strike": "Un duro fendente in mischia per quando qualcosa ti arriva addosso.",
+      "pack_command": "Ordina al tuo compagno di colpire e accumulare Ferocia del Branco. Ogni accumulo fa sì che il tuo famiglio infligga il 10% di danni in più, fino al 30%, prima che Scatena la Bestia consumi gli accumuli.",
+      "stampede": "Chiama tre bestie ad attaccare per 12 secondi. Usala con la Ferocia del Branco al massimo perché mantengano il bonus ai danni completo per tutta l'evocazione.",
+      "measured_shot": "Un tiro a distanza ponderato che recupera concentrazione per i tuoi attacchi più pesanti.",
       "aspect_of_the_hawk": "Un aspetto che tieni attivo per affinare la tua potenza d'attacco a distanza.",
       "serpent_sting": "Infligge un veleno che fa sanguinare danni da natura nel tempo.",
       "arcane_shot": "Un tiro istantaneo dalla distanza per un rapido danno aggiuntivo.",
@@ -4545,11 +4872,21 @@ export const it_IT: EnTranslations = {
       "power_word_shield": "Avvolge un alleato in uno scudo che assorbe i colpi prima che vadano a segno.",
       "renew": "Una cura che pulsa nel tempo, ottima da lanciare per poi continuare a muoverti.",
       "lightning_bolt": "Un lancio a distanza di danno da Natura, il tuo punto di riferimento dalla lontananza.",
+      "chain_lightning": "Colpisce un bersaglio e rimbalza su due nemici vicini, accumulando un Tuono per l'intero lancio.",
+      "thunder_reservoir": "Accumula fulmini finché la Scossa Tellurica o il Terremoto non possono liberare una ricompensa a piena potenza.",
       "rockbiter_weapon": "Imbeve la tua arma, così ogni fendente colpisce più forte in mischia.",
       "healing_wave": "La tua cura principale, un rimedio diretto per te o un alleato.",
       "earth_shock": "Una folgore istantanea per un rapido danno da Natura quando ti serve subito.",
       "lightning_shield": "Ti carica così gli attaccanti subiscono danni da Natura quando ti colpiscono.",
       "flame_shock": "Un'ustione istantanea che colpisce subito e continua a bruciare nel tempo.",
+      "galeheart_weapon": "Infonda entrambe le armi di venti tempestosi e premia un ritmo d'attacco costante.",
+      "warspirit_cadence": "Trasforma un ritmo d'arma costante in Echi del Cuore di Bufera e in un'occasione di incantesimo istantaneo.",
+      "stormsurge": "A volte riporta prima il Colpo Ancestrale dopo che hai speso un'occasione di Presagio di Tempesta.",
+      "lifespring_weapon": "Infonda la tua arma di acqua risanatrice e rafforza il flusso continuo delle cure.",
+      "tidecall": "Richiama la marea e potenzia la successiva sequenza di incantesimi curativi.",
+      "ancestor_return": "Riporta in vita ogni membro caduto del gruppo o dell'incursione dopo un lungo lancio fuori dal combattimento.",
+      "stoneward": "Erige uno scudo di pietra carico che trasforma i danni subiti in cure.",
+      "primal_exaltation": "Scatena brevemente il potere elementale della tua specializzazione.",
       "fireball": "Il tuo principale colpo di fuoco, infligge un danno e lascia il bersaglio in fiamme.",
       "fireball_form": "Diventa una brace vivente per attraversare terreno aperto ad alta velocità.",
       "frost_armor": "Un potenziamento personale duraturo che indurisce la tua corazza prima di uno scontro.",
@@ -4566,7 +4903,7 @@ export const it_IT: EnTranslations = {
       "conjure_water": "Evoca bevande che ripristinano il mana, così puoi rifornirti tra un pull e l'altro.",
       "conjure_food": "Evoca del cibo che ripristina la salute quando ti siedi a mangiare.",
       "shadow_bolt": "Un dardo d'ombra che lanci su un bersaglio, il tuo colpo di riferimento.",
-      "summon_imp": "Richiama un Emberkin che scaglia dardi di fuoco sui nemici dalla distanza.",
+      "summon_imp": "Chiama un Emberkin che lancia Dardo di Cenere sui nemici dalla distanza.",
       "demon_skin": "Un potenziamento personale duraturo che irrobustisce la pelle e aggiunge corazza.",
       "immolate": "Incendia un bersaglio per un colpo iniziale e un'ustione che perdura.",
       "corruption": "Marcisce il bersaglio con l'ombra, che continua a pulsare mentre fai altro.",
@@ -4575,17 +4912,14 @@ export const it_IT: EnTranslations = {
       "healing_touch": "Una grande cura a bersaglio singolo dal lancio lungo, per rimettere in piedi qualcuno.",
       "mark_of_the_wild": "Una benedizione duratura che metti su di te o un alleato prima di uno scontro.",
       "moonfire": "Colpisce all'istante e lascia il bersaglio in fiamme, ottimo mentre ti muovi.",
+      "moonseed": "Aggiunge uno stadio di Marea Lunare ed estende Tempesta Lunare mentre sei in Forma di Lunagufo.",
       "rejuvenation": "Si lancia all'istante e cura un alleato nel tempo, così puoi continuare ad agire.",
       "thorns": "Protegge un alleato, così gli attaccanti in mischia si feriscono colpendolo."
     },
     "petHook": {
-      "emberkin": "Un demone che scaglia dardi di fuoco a distanza e fiacca i nemici da una distanza di sicurezza.",
-      "gloomshade": "Un demone robusto che provoca e assorbe i colpi, così puoi lanciare in tranquillità.",
-      "duskborn": "Un demone veloce in mischia che colpisce forte ma cede sotto pressione.",
-      "spellhound": "Uno scaramucciatore d'ombra che dà la caccia agli incantatori nemici.",
-      "warfiend": "Un picchiatore resistente in mischia, il tuttofare una volta che riesci a evocarlo.",
-      "pyre_colossus": "Un colosso massiccio dalla mischia devastante, evocato per pura potenza.",
-      "wraithborn": "Un evocatore d'élite che fa piovere ombra pesante dalla distanza."
+      "emberkin": "Un demone a distanza il cui iconico Dardo di Cenere logora i nemici da distanza di sicurezza.",
+      "gloomshade": "Un solido demone tank che provoca e usa Catena Abissale per trascinare a portata i nemici normali in fuga; i boss resistono al richiamo.",
+      "pyre_colossus": "Un colosso massiccio dalla mischia devastante, evocato per pura potenza."
     },
     "bestiary": {
       "heading": "Bestiario",
@@ -4654,40 +4988,40 @@ export const it_IT: EnTranslations = {
       }
     },
     "mountsPage": {
-      "heading": "Mounts and riding",
-      "intro": "A mount is a faster way across the world, and that is all it is. You learn to ride at the stables, buy your first set of reins, and every road after that is shorter.",
-      "whatHeading": "What a mount is",
-      "whatBody": "A mount is a beast you ride, and what it gives you is speed. No armor, no damage, no stats: it carries you over the ground faster, and springs a little higher when you jump, and that is the whole of the bargain. Every mount in the game is a ground mount, so there is no flying, and none of them swim.",
-      "learnHeading": "Learning to ride",
-      "learnBody": "Riding is a skill you buy once, and it opens at level {level}. Marla Hitchen, the stablemaster, keeps the Galecrest Stables out on the downs, and she sells Riding Training for 80 gold. That one purchase is what lets you sit a mount at all, and it stays with you for good.\n\nOnce you have it, Marla has a quest for you: Riding Lessons. Take it, follow the marker to the glowing square behind the start arch, and press Start Race. She lends you a training Valorsteed for the lesson, so the lesson itself costs you nothing. Ride the course, finish it, and go back to her for your coin and experience. The lent steed goes back in the barn afterward, so the lesson teaches you the seat rather than handing you a horse.",
-      "whereHeading": "Where to find her",
-      "whereBody": "The Galecrest Stables are marked on the map of The Galecrest, out on the downs between the Shear and the Wreckfields. Marla stands beside the barn, facing the race yard.",
-      "firstHeading": "Your first mount",
-      "firstBody": "The Valorsteed is the only mount sold anywhere in the world. Once you have learned Riding, Marla will sell you the Reins of the Valorsteed for 10 gold, and those reins are yours to keep. Every other mount is earned out in the world, so the horse is where nearly every rider starts.",
-      "rideHeading": "Getting on and getting off",
-      "rideBody": "There is no mount window and no favorite to set, because the reins are the mount. Use a set of reins from your bags or from an action bar slot and you ride that mount. Summoning takes a moment, a short call rather than an instant one, so it will not save you from a bad pull. Getting off is instant and never blocked.\n\nUse the reins you are already riding and you put that mount away. Use a different set while mounted and you swap straight to it, with nothing to summon in between. The Mount and Dismount key, the backquote key by default, only ever gets you off: it is the way down, not the way up. The one exception is the riding lesson, where that same key calls the steed Marla lends you, since a borrowed horse has no reins to click. On a phone or tablet, the Mount button in the More tray works both ways, though it calls the first set of reins sitting in your bags rather than one you pick, so tap the reins themselves when you want a particular mount.",
-      "breaksHeading": "What puts you back on your feet",
-      "breaksBody": "Water always wins. Ride into anything deep enough to swim in and you are down at once, because no ground mount swims, and dying drops you where you fall. You cannot call one while you are in combat, while you are dead or making your way back as a spirit, or at any point during a Thornhollow Fields match, which is fought on foot from the form-up to the final hold: if you were riding while you waited, being seated into the match puts you down with it. Walking into combat or into water partway through a summon cancels it as well.\n\nMost of what you do puts you down too. Swinging at something, starting a cast, harvesting a node, fishing, crafting, enchanting, salvaging, and recharging a profession tool all dismount you the moment you start, so expect to hop off at every vein. Calling a mount also drops any shapeshift form you are holding: you are never both shifted and mounted.",
-      "speedHeading": "Speed and tiers",
-      "speedBody": "Speed is the only thing that separates one mount from another. The Valorsteed you buy from Marla sets the base pace, and the mounts you collect out in the world ride above it: the rarer the reins, the quicker the ride, in a few clear steps rather than a smooth slide. There is no second rank of riding to train and no upgrade to buy afterward. You pay for Riding once, and from then on the reins you used decide how fast you travel.",
-      "collectHeading": "Where the rarer mounts come from",
-      "collectBody": "Beyond Marla's counter, reins are found rather than bought. They come off the last bosses of the five-player dungeons and the raid on heroic, and out of rift clears, where the harder the rift you finish the rarer the reins it can leave behind. They are rare finds by design and no run promises one, so the kind way to hunt a mount is to bring the hunt along on the runs you were making anyway. This page will not tell you which mount hangs on which boss: that part is yours to find out.",
-      "raceHeading": "The stables race",
-      "raceBody": "The show-jumping course in Marla's paddock is open to anyone, any time, not only during the lesson. Sit a mount, stand on the glowing square behind the arch, and press Start Race. A countdown holds you still, then the clock runs: clear all seven jumps and ride back out through the arch before it runs down.\n\nA jump only counts if you are genuinely in the air over the bar, so an easy ride-through clears nothing. You may take them in any order and from either side, and a missed one is not the end of the world: circle back and take it again. Dying, getting off, or leaving the paddock ends the attempt, and so does letting the clock run out, which sets you down out of the saddle where you stand; cancelling it yourself just stops the clock. Nothing stops you starting another. There is no fee, no cooldown, and no prize beyond the time itself, and any number of riders can run the course at once without getting in each other's way.",
-      "goodsHeading": "Reins are ordinary goods",
-      "goodsBody": "A mount is an item, which makes it something the economy can move. You own a mount for as long as its reins sit in your bags or your bank, though banked reins keep the mount yours without letting you ride it: to call the beast you have to be carrying the reins. Player reins carry no soulbind, so they trade, travel by mail, and list on the World Market like any other find, unless the item itself says otherwise. Two things are worth knowing before you part with one: no merchant will ever buy a set of reins back, so a mount is a purchase you keep or pass on rather than cash out, and if the reins leave your bags and your bank both while you are riding, traded away, mailed off, or sold on the market, the mount goes with them and you are set down where you stand."
+      "heading": "Cavalcature ed equitazione",
+      "intro": "Una cavalcatura è un modo più veloce per attraversare il mondo, e non è nient'altro che questo. Impari a cavalcare alle stalle, compri il tuo primo paio di redini, e ogni strada dopo di allora è più breve.",
+      "whatHeading": "Cos'è una cavalcatura",
+      "whatBody": "Una cavalcatura è una bestia che cavalchi, e ciò che ti dà è velocità. Nessuna armatura, nessun danno, nessuna statistica: ti porta sul terreno più velocemente e ti fa saltare un po' più in alto quando salti, e questo è tutto l'accordo. Ogni cavalcatura del gioco è una cavalcatura terrestre, quindi non si vola, e nessuna di esse nuota.",
+      "learnHeading": "Imparare a cavalcare",
+      "learnBody": "L'Equitazione è un'abilità che compri una sola volta, e si sblocca al livello {level}. Marla Hitchen, la stalliera capo, tiene le Stalle di Galecrest sulle colline, e vende l'Addestramento all'Equitazione per 80 monete d'oro. Quell'unico acquisto è ciò che ti permette di salire in sella a una cavalcatura, e resta con te per sempre.\n\nUna volta ottenuto, Marla ha una missione per te: Lezioni di equitazione. Accettala, segui il segnale fino al riquadro luminoso dietro l'arco di partenza, e premi Inizia la Corsa. Ti presta un Destriero del Valore da addestramento per la lezione, quindi la lezione in sé non ti costa nulla. Percorri il tracciato, completalo, e torna da lei per la tua moneta e la tua esperienza. Il destriero prestato torna poi nella stalla, quindi la lezione ti insegna a stare in sella piuttosto che regalarti un cavallo.",
+      "whereHeading": "Dove trovarla",
+      "whereBody": "Le Stalle di Galecrest sono segnate sulla mappa del Galecrest, sulle colline tra lo Strapiombo e i Campi dei Relitti. Marla si trova accanto alla stalla, rivolta verso il campo delle corse.",
+      "firstHeading": "La tua prima cavalcatura",
+      "firstBody": "Il Destriero del Valore è l'unica cavalcatura in vendita in tutto il mondo. Una volta imparata l'Equitazione, Marla ti venderà le Redini del Destriero del Valore per 10 monete d'oro, e quelle redini restano tue per sempre. Ogni altra cavalcatura si guadagna nel mondo, quindi il cavallo è dove inizia quasi ogni cavaliere.",
+      "rideHeading": "Salire in sella e scendere",
+      "rideBody": "Non esiste una finestra delle cavalcature né un preferito da impostare, perché sono le redini stesse a essere la cavalcatura. Usa un paio di redini dalle tue borse o da uno slot della barra delle azioni e cavalchi quella cavalcatura. Il richiamo richiede un momento, un'invocazione breve anziché istantanea, quindi non ti salverà da un pull sbagliato. Scendere di sella è istantaneo e non viene mai bloccato.\n\nUsa le redini che stai già cavalcando e riponi quella cavalcatura. Usa un paio diverso mentre sei in sella e passi direttamente a esso, senza nulla da richiamare nel mezzo. Il tasto Monta / Smonta, l'accento grave per impostazione predefinita, ti fa solo ed esclusivamente scendere: è la via verso il basso, non verso l'alto. L'unica eccezione è la lezione di equitazione, dove quello stesso tasto richiama il destriero che Marla ti presta, dato che un cavallo preso in prestito non ha redini su cui cliccare. Su telefono o tablet, il pulsante Cavalcature nel menu Altro funziona in entrambe le direzioni, anche se richiama il primo paio di redini che si trova nelle tue borse anziché uno che scegli tu, quindi tocca le redini stesse quando vuoi una cavalcatura precisa.",
+      "breaksHeading": "Cosa ti fa scendere di sella",
+      "breaksBody": "L'acqua vince sempre. Entra a cavallo in qualcosa di abbastanza profondo da nuotarci e scendi di sella all'istante, perché nessuna cavalcatura terrestre nuota, e morire ti fa cadere a terra dove sei. Non puoi richiamarne una mentre sei in combattimento, mentre sei morto o stai facendo ritorno come spirito, o in qualsiasi momento durante una partita ai Campi di Thornhollow, che si combatte a piedi dallo schieramento fino alla fine dello scontro: se stavi cavalcando durante l'attesa, l'ingresso nella partita ti farà scendere di sella insieme a essa. Entrare in combattimento o in acqua a metà di un richiamo lo annulla altrettanto.\n\nAnche la maggior parte di ciò che fai ti fa scendere di sella. Attaccare qualcosa, iniziare un lancio, raccogliere un nodo, pescare, fabbricare, incantare, smantellare e ricaricare uno strumento da professione ti fanno scendere di sella nel momento stesso in cui inizi, quindi aspettati di scendere a ogni filone. Richiamare una cavalcatura fa cadere anche qualsiasi forma di trasformazione che stai mantenendo: non sei mai sia trasformato sia in sella.",
+      "speedHeading": "Velocità e livelli",
+      "speedBody": "La velocità è l'unica cosa che distingue una cavalcatura dall'altra. Il Destriero del Valore che compri da Marla stabilisce il ritmo base, e le cavalcature che raccogli nel mondo cavalcano al di sopra di esso: più rare sono le redini, più veloce è la corsa, in pochi gradini netti anziché in una progressione fluida. Non esiste un secondo grado di equitazione da addestrare né un potenziamento da comprare in seguito. Paghi l'Equitazione una sola volta, e da quel momento in poi sono le redini che hai usato a decidere quanto velocemente viaggi.",
+      "collectHeading": "Da dove vengono le cavalcature più rare",
+      "collectBody": "Oltre al bancone di Marla, le redini si trovano anziché si comprano. Cadono dagli ultimi boss dei dungeon a cinque giocatori e dell'incursione in modalità eroica, e dalle chiusure degli Squarci, dove più difficile è lo Squarcio che completi, più rare sono le redini che può lasciare cadere. Sono ritrovamenti rari per scelta progettuale e nessuna spedizione ne garantisce una, quindi il modo più sereno per dare la caccia a una cavalcatura è portare quella caccia nelle spedizioni che stavi già facendo comunque. Questa pagina non ti dirà quale cavalcatura è legata a quale boss: quella parte spetta a te scoprirla.",
+      "raceHeading": "La corsa delle stalle",
+      "raceBody": "Il percorso di salto ostacoli nel recinto di Marla è aperto a chiunque, in qualsiasi momento, non solo durante la lezione. Sali in sella, mettiti sul riquadro luminoso dietro l'arco, e premi Inizia la Corsa. Un conto alla rovescia ti tiene fermo, poi il tempo comincia a scorrere: supera tutti e sette gli ostacoli e torna a cavallo attraverso l'arco prima che scada.\n\nUn salto conta solo se sei davvero in aria sopra la sbarra, quindi attraversarla facilmente non fa punteggio. Puoi affrontarli in qualsiasi ordine e da entrambi i lati, e mancarne uno non è la fine del mondo: torna indietro e riprovalo. Morire, scendere di sella o lasciare il recinto pone fine al tentativo, e lo stesso fa lasciare che il tempo scada, il che ti fa scendere di sella dove ti trovi; annullarlo tu stesso ferma semplicemente il cronometro. Niente ti impedisce di iniziarne un'altra. Non c'è tariffa, nessun tempo di recupero e nessun premio oltre al tempo stesso, e qualsiasi numero di cavalieri può percorrere il tracciato contemporaneamente senza intralciarsi a vicenda.",
+      "goodsHeading": "Le redini sono merce ordinaria",
+      "goodsBody": "Una cavalcatura è un oggetto, il che la rende qualcosa che l'economia può muovere. Possiedi una cavalcatura finché le sue redini restano nelle tue borse o nella tua banca, anche se redini custodite in banca la mantengono tua senza permetterti di cavalcarla: per richiamare la bestia devi avere le redini con te. Le redini dei giocatori non sono mai vincolate all'anima, quindi si scambiano, viaggiano per posta e si mettono in vendita sul Mercato Mondiale come qualsiasi altro ritrovamento, a meno che l'oggetto stesso non dica diversamente. Due cose vale la pena sapere prima di separartene: nessun mercante ricomprerà mai un paio di redini, quindi una cavalcatura è un acquisto che tieni o cedi piuttosto che liquidare, e se le redini lasciano sia le tue borse sia la tua banca mentre sei in sella, scambiate, spedite per posta o vendute sul mercato, la cavalcatura se ne va con loro e ti ritrovi a scendere di sella dove ti trovi."
     },
     "worldPage": {
       "heading": "Il mondo",
-      "intro": "World of ClaudeCraft è una terra continua che attraversi a piedi, tre zone disposte da sud a nord. Non c'è viaggio rapido, perciò il viaggio è parte dell'avventura.",
+      "intro": "World of ClaudeCraft è una terra continua che attraversi a piedi. La vecchia strada corre da sud a nord attraverso la valle iniziale, la palude e le vette, e continua a salire oltre di esse fino alla conca successiva e alle nevi in cima alla mappa. Una colonna di reami più elevati si apre da quella strada a ovest e un'altra a est, e un'isola si trova al largo della costa orientale della Valle. Non c'è viaggio rapido, non ci sono rotte di volo né diligenze: ogni tragitto si percorre a piedi o in sella, quindi arrivare fa parte dell'avventura.\n\nLa terra tiene anche il tempo. Un ciclo di giorno e notte scorre su un orologio reale condiviso da tutti quelli del tuo mondo, così il cielo passa dall'alba al mezzogiorno e poi al tramonto e al buio per tutti voi insieme, la luna va e viene attraverso le sue fasi, e la luce sul terreno cambia con essa. Il quadrante attorno alla tua minimappa è dove leggi l'ora.",
       "hub": "Base operativa",
-      "mapHeading": "La strada verso nord",
-      "mapSub": "Tre zone, da sud a nord, ognuna un gradino più in alto di livello. Segui la scia delle missioni e la terra ti porta dalla valle alle vette.",
+      "mapHeading": "La strada e i reami oltre",
+      "mapSub": "La pista delle missioni corre da sud a nord lungo il centro della mappa: valle, palude, vette, e oltre di esse fino alla conca e alle nevi. Gli altri reami si aprono lungo quella strada anziché dopo di essa, attraverso porte a est e a ovest della strada della palude, mentre l'isola di Farshore si raggiunge dalla costa orientale della Valle. Ciò che ti tiene fuori dai reami lontani sono le loro fasce di livello, non il cammino: cinque di essi condividono la fascia più alta, quindi una volta pronto puoi affrontarli nell'ordine che preferisci. Farshore è l'eccezione, terra di basso livello che puoi visitare presto.",
       "places": "Luoghi notevoli",
       "residents": "Chi incontrerai",
       "valeBlurb": "La verde valle di partenza, dove i nuovi eroi si fanno le ossa su lupi e banditi intorno alla città di Eastbrook.",
       "marshBlurb": "Una terra annegata di nebbia e rovine. I mudfin brulicano nelle secche e qualcosa di più antico si agita sotto l'acqua, sorvegliato dalla città-ponte di Fenbridge.",
-      "peaksBlurb": "Creste sferzate dal vento e antiche miniere che salgono verso i pericoli più gelidi e alti del reame, presidiati dall'avamposto di Highwatch.",
+      "peaksBlurb": "Creste spazzate dal vento e vecchie opere minerarie che salgono verso i pericoli più duri della strada iniziale, tenute dall'avamposto di Highwatch.",
       "duskBlurb": "Una valle di crepuscolo perenne sotto il grande albero di Eldergleam, dove rovine di cristallo risplendono e l’aria vibra di antica magia.",
       "emberBlurb": "Lande desolate illuminate dalla tempesta, di cenere e vetro di sangue, dove i draghi volteggiano sopra la caldera e i fuochi dei troll ardono tra le dune, vegliate dalla città-cancello di Wyrmwatch.",
       "frostBlurb": "Un silenzio di neve e pini scuri sotto l’aurora, dove il freddo stesso sembra sveglio e Icemantle mantiene accesi i suoi fuochi.",
@@ -4741,24 +5075,24 @@ export const it_IT: EnTranslations = {
       "gladeBody": "Non ogni storia della Valle parla dei morti. A nord, una radura assolata chiamata Brightwood Glade mantiene un ritmo più gentile tutto suo, fatto di sentieri silenziosi e luce screziata sotto i rami. È un contrappunto lieve alla pista che stai seguendo e vale la pena vederla quando la strada ti lascia spazio per vagare.",
       "worldBossTitle": "Quando la vetta si desta: il boss del mondo",
       "worldBossBody": "In alto su Thornpeak, la tempesta sopra Stormcrag a volte prende forma. Thunzharr, la Vetta Risvegliata si erge lì con un ritmo costante, un elementale della potenza di un'incursione affrontato nel mondo aperto da chiunque risponda alla chiamata, e diventa più possente quanto più sfidanti gli si oppongono. Chiunque si unisca allo scontro guadagna il proprio tiro sul suo bottino, onorato secondo le regole di blocco d'incursione, e la sua caduta indugia abbastanza a lungo perché i caduti possano tornare di corsa a reclamare il dovuto. Raduna più spade di quante pensi ti servano.",
-      "farshoreBlurb": "An island of gull-cry and salt wind off the Vale's east coast, where rifts tear open without warning and the fishing town of Gullhaven holds its shore.",
-      "farshoreGreeting": "You came over the Ferrywalk? Then you are the first in a week, and the Warden will want to look you over.",
-      "farshoreGreeter": "Bellkeeper Tam, the Landing",
-      "farshorePlaceNotes": "Gullhaven is the island's only town and its redoubt. The Landing is where the Ferrywalk comes ashore, with a watchbell standing over the point; the Watch Meadow keeps the high ground southeast of town, where a riftwatcher listens for the next break; the Sundered Cliffs crack open at the island's southern end; and the Riftfields are the wracked grain rows east of Gullhaven, still crawling with what came through the break there.",
-      "travelTitle": "Getting around",
-      "travelBody": "Every road in the realm is walked or ridden. There are no flight paths, no taxis, and no teleport network: the map is one connected landmass, and every connection is something you can stand on. Ridges divide one realm from the next, and where two realms share a ridge the road climbs through a pass. Not every border works that way, though. In the north a long causeway carries the road out over the water from the Veiled Hollow into the snow country beyond, and back south a thin natural sandbar called the Ferrywalk runs east from the Vale's coast to the Landing on the island of the Farshore, which has no land border at all. And there is exactly one true doorway in the whole overworld: a veil of dusk high on Thornpeak that opens into the Veiled Hollow. The Hollow's southern ridge is sealed with no pass through it, so that veil is how you first get in, and it closes behind you on the way back.\n\nWherever you fall, the walk back is a short one. Every zone keeps at least one graveyard with a Pale Keeper hovering over the stones, and a released spirit rises at the nearest of them.\n\nThe map does not end in an invisible wall. The land runs out into beaches and headlands, and then into open water. The crossings the world means you to swim, the straits and meres between one realm and the next, are calm and safe to cross. Strike out for the open sea instead and the distance itself turns you back: you are warned, and warned again, and if you keep swimming the sea wears you down until it kills you. Diving has its own limit, since your breath runs out under the surface, so come up for air and turn around when the water tells you to.",
-      "mountsTitle": "Mounts",
-      "mountsBody": "Riding is the one thing that makes the world smaller, and it is a lesson before it is a horse. At level 20 the stablemaster, Marla, will take you on: you buy the riding skill from her, and the riding lesson itself is free, a jumping course you ride around her paddock on a lent steed. Pass it, turn the lesson in, and your first Valorsteed is yours, and from then on you cross the realm noticeably faster on horseback. Speed is the only thing a mount gives you: the rarer ones, which come from the hardest content, are faster still, but none of them change your power in a fight. Mount and dismount with the key bound in your controls. You cannot climb on while you are in combat, and swinging a weapon, casting a spell, wading into water, or falling in battle all put you back on your feet.",
-      "mountsMore": "Everything about mounts",
-      "riftTitle": "Rift portals",
-      "riftBody": "Something keeps tearing holes in the realm. Rift portals open by themselves out in the world, never on the three zones of the starting road but across every realm beyond them and out on the Farshore, and the whole realm hears the news when one tears open. Each portal carries a rank, and a higher rank means a harder, richer descent. A portal is a shared event: any group can step through and gets its own run inside, but only one group ever takes the first clear, so a fresh rift is worth hurrying to. You need to be level 20 to enter one, and if nobody answers in time the rift collapses on its own.",
-      "riftMore": "Everything about rifts"
+      "farshoreBlurb": "Un'isola di grida di gabbiani e vento salmastro al largo della costa orientale della Valle, dove gli squarci si aprono senza preavviso e la città di pescatori di Gullhaven difende la sua costa.",
+      "farshoreGreeting": "Sei venuto attraverso il Ferrywalk? Allora sei il primo in una settimana, e il Guardiano vorrà darti un'occhiata.",
+      "farshoreGreeter": "Guardiano della Campana Tam, l'Approdo",
+      "farshorePlaceNotes": "Gullhaven è l'unico paese dell'isola e il suo ridotto. L'Approdo è dove il Ferrywalk tocca la riva, con una campana di vedetta che sovrasta la punta; il Prato della Vedetta tiene l'altura a sud-est del paese, dove una sentinella degli squarci ascolta la prossima breccia; le Scogliere Squarciate si spaccano all'estremità meridionale dell'isola; e i Campi degli Squarci sono i filari di grano devastati a est di Gullhaven, ancora brulicanti di ciò che è passato attraverso la breccia lì.",
+      "travelTitle": "Come spostarsi",
+      "travelBody": "Ogni strada del reame si percorre a piedi o a cavallo. Non ci sono percorsi di volo, non ci sono taxi, e non c'è una rete di teletrasporto: la mappa è un'unica massa continentale, e ogni collegamento è qualcosa su cui puoi mettere i piedi. Le creste dividono un reame dal successivo, e dove due reami condividono una cresta la strada sale attraverso un passo. Non tutti i confini funzionano così, però. A nord una lunga strada rialzata porta la via sull'acqua dalla Valletta Velata fino alle terre innevate oltre, e più a sud un sottile banco di sabbia naturale chiamato Ferrywalk corre a est dalla costa della Valle fino all'Approdo sull'isola del Farshore, che non ha alcun confine di terra. E c'è esattamente un'unica vera porta in tutto il mondo aperto: un velo di crepuscolo alto su Thornpeak che si apre sulla Valletta Velata. Il crinale meridionale della Valletta è sigillato, senza alcun passo che lo attraversi, quindi quel velo è il modo in cui vi entri la prima volta, e si richiude alle tue spalle sulla via del ritorno.\n\nOvunque tu cada, la strada del ritorno è breve. Ogni zona custodisce almeno un cimitero con un Custode Pallido che aleggia sulle pietre, e uno spirito liberato risorge nel più vicino di essi.\n\nLa mappa non finisce contro un muro invisibile. La terra sfuma in spiagge e promontori, e poi in acque aperte. I tratti d'acqua che il mondo prevede tu attraversi a nuoto, gli stretti e i laghetti tra un reame e l'altro, sono calmi e sicuri da attraversare. Se ti spingi invece verso il mare aperto, è la distanza stessa a respingerti: vieni avvisato, e avvisato di nuovo, e se continui a nuotare il mare ti prosciuga le forze finché non ti uccide. Anche immergersi ha il proprio limite, dato che il fiato si esaurisce sott'acqua, quindi risali per respirare e torna indietro quando l'acqua te lo dice.",
+      "mountsTitle": "Cavalcature",
+      "mountsBody": "Cavalcare è l'unica cosa che rimpicciolisce il mondo, ed è una lezione prima ancora che un cavallo. Al livello 20 la Stalliera capo Marla ti prenderà sotto la sua ala: le compri l'abilità di equitazione, e la lezione di equitazione in sé è gratuita, un percorso di salti che affronti nel suo recinto in sella a un destriero prestato. Superalo, consegna la lezione, e il tuo primo Destriero del Valore è tuo: da quel momento attraversi il reame a cavallo notevolmente più in fretta. La velocità è l'unica cosa che una cavalcatura ti dà: le più rare, che provengono dal contenuto più difficile, sono ancora più veloci, ma nessuna di esse cambia il tuo potere in uno scontro. Monta e smonta con il tasto assegnato nei tuoi comandi. Non puoi salire in sella mentre sei in combattimento, e brandire un'arma, lanciare un incantesimo, entrare in acqua o cadere in battaglia ti fanno scendere di sella.",
+      "mountsMore": "Tutto sulle cavalcature",
+      "riftTitle": "Squarci",
+      "riftBody": "Qualcosa continua a squarciare buchi nel reame. Gli squarci si aprono da soli nel mondo, mai nelle tre zone della strada iniziale ma in ogni reame oltre di esse e sul Farshore, e l'intero reame ne sente parlare ogni volta che uno si apre. Ogni squarcio porta un rango, e un rango più alto significa una discesa più dura e più ricca. Uno squarcio è un evento condiviso: qualsiasi gruppo può attraversarlo e ottiene la propria istanza al suo interno, ma solo un gruppo ottiene mai il primo completamento, quindi vale la pena affrettarsi verso uno squarcio appena aperto. Devi essere di livello 20 per entrarci, e se nessuno risponde in tempo lo squarcio collassa da solo.",
+      "riftMore": "Tutto sugli squarci"
     },
     "questsPage": {
       "heading": "Missioni",
       "intro": "Le missioni sono il cuore del mondo e il modo più rapido per salire di livello. Ecco come funzionano.",
       "acceptTitle": "Trovare e accettare",
-      "acceptBody": "Le persone con un indicatore sopra la testa hanno del lavoro per te. Parla con loro per accettare una missione. A Eastbrook, il Maresciallo Redbrook ti aspetta con Lupi alla Porta, una delle prime missioni che puoi accettare.",
+      "acceptBody": "Le persone con un contrassegno sopra la testa hanno lavoro per te, e il contrassegno ti dice di che tipo. Un punto esclamativo dorato indica una missione che puoi prendere subito, e un punto interrogativo dorato una missione che hai completato e puoi consegnare. Su una targhetta vedrai anche un punto interrogativo grigio, che significa che quella missione ce l'hai ma non l'hai ancora finita. Il lavoro ripetibile usa gli stessi contrassegni in blu: un punto esclamativo azzurro brillante è un incarico che hai già svolto e puoi riprendere, e lo stesso contrassegno smorzato è uno ancora dentro la sua attesa. Ogni contrassegno tranne quello grigio compare sulle targhette, sulla minimappa e sulla mappa del mondo, così individui il lavoro da un capo all'altro della città. A Eastbrook, il maresciallo Redbrook aspetta con Lupi alla porta, una delle prime missioni che puoi prendere.",
       "objectivesTitle": "Obiettivi",
       "objectivesBody": "Uccidi certi nemici, raccogli oggetti o interagisci con qualcosa nel mondo. Il tracciatore a schermo conta i tuoi progressi mentre avanzi. Se cambi idea, puoi abbandonare una missione dal tuo registro delle missioni e riprenderla più tardi da chi te l'ha affidata.",
       "turninTitle": "Consegna",
@@ -4771,11 +5105,11 @@ export const it_IT: EnTranslations = {
       "typesTitle": "I tipi di missione che incontrerai",
       "typesBody": "Gran parte delle missioni rientra in poche forme familiari. Il tracciatore a schermo spiega esattamente cosa vuole ciascuna, così non resti mai a tirare a indovinare.",
       "typeSlayTitle": "Uccidi",
-      "typeSlayBody": "Dirada un branco di bestie o spezza la presa di un culto sconfiggendo un dato numero di un nemico segnato. Una delle tue prime missioni, ripulire i lupi dalla strada di Eastbrook, è una di queste.",
+      "typeSlayBody": "Dirada un branco di bestie o spezza la presa di un culto sconfiggendo un certo numero di un nemico contrassegnato. Una delle tue prime missioni, ripulire dai lupi la strada di Eastbrook, è una di queste. Ogni tanto una missione risveglia i propri bersagli: ciò che al tuo ultimo passaggio sembrava scenario acquista una targhetta e diventa qualcosa che puoi colpire una volta che porti la missione che lo riguarda, quindi torna indietro e guarda di nuovo.",
       "typeGatherTitle": "Raccogli",
-      "typeGatherBody": "Raccogli oggetti dal mondo o da ciò che i nemici lasciano cadere: erbe, minerale, i tetri reagenti di un culto. Alcuni pezzi cadono solo da un nemico particolare, perciò la caccia e il bottino vanno di pari passo.",
+      "typeGatherBody": "Raccogli oggetti dal mondo o da ciò che i nemici lasciano cadere: erbe, minerale, i truci reagenti di un culto. Alcuni pezzi cadono solo da un nemico preciso, così la caccia e il raccolto vanno di pari passo. Le cose a terra che appartengono a una missione si lasciano prendere solo mentre la stai effettivamente svolgendo, e te lo dicono se non è così, o se ne hai già abbastanza. Alcune missioni ti consegnano anche uno strumento quando le accetti: tieni d'occhio le borse e usalo come descrive il testo della missione. Se una missione ha bisogno di uno strumento che un passo precedente ti aveva dato, accettarla te lo restituisce quando non ce l'hai più, così uno strumento perduto non può portare la catena in un vicolo cieco.",
       "typeInteractTitle": "Interagisci",
-      "typeInteractBody": "Usa, purifica o leggi qualcosa di fisso nel mondo: una tomba profanata, un avvertimento inciso su una roccia della riva, una porta di cripta sigillata. Avvicinati al segnale e agisci su di esso.",
+      "typeInteractBody": "Usa, purifica o leggi qualcosa di fisso nel mondo: una tomba profanata, un avvertimento inciso su uno scoglio, la porta sigillata di una cripta. Avvicinati al contrassegno e agisci su di esso. Quando una missione ne chiede diversi, ne intende diversi distinti: ogni oggetto ti accredita una sola volta, quindi cerca il successivo invece di usare due volte lo stesso. L'oggetto non si consuma quando ci agisci sopra, così tutti nel tuo gruppo possono prendersene il proprio credito.",
       "typeMusterTitle": "Raduna la difesa",
       "typeMusterBody": "Alcune missioni ti fanno radunare una città prima di una spinta verso nord: riduci la minaccia alle porte e raccogli ciò di cui hanno bisogno i difensori. Sono obiettivi di uccisione e raccolta al servizio delle persone della cui storia fai parte, e ti tengono in movimento con loro.",
       "typeGroupTitle": "Finali di gruppo",
@@ -4795,12 +5129,12 @@ export const it_IT: EnTranslations = {
       "sideCryptBody": "In alto sulle vette corre un mistero più silenzioso: vecchie tombe segnate da una corona di cui nessuna cronaca conserva memoria. Leggi i morti, raccogli ciò che custodivano e dissigilla un sepolcro che doveva restare chiuso. È la pista di un investigatore che apre la via all'incursione di fine gioco per dieci giocatori del reame.",
       "sideTempleTitle": "Il Tempio Annegato",
       "sideTempleBody": "Un cancello di pallida luce su un alto laghetto montano tra le vette si apre su un santuario sommerso dove un culto annegato canta ancora. La sua breve catena di missioni resta separata dalla storia principale, un mistero a sé stante per chiunque salga fino alla riva, legga gli avvertimenti incisi sulle rocce e scenda a scoprire a cosa servissero.",
-      "availableTitle": "Why an NPC has nothing for you",
-      "availableBody": "Quests come in chains. Most are offered only once you have turned in the one before them, and many also ask for a minimum level, so an NPC with nothing for you today may have plenty after your next few levels or once you close the quest you are already carrying. A few have a condition of their own, such as the riding lessons, which open only after you have bought the riding skill. Group quests say so up front by listing how many players they suggest you bring. Some jobs are repeatable: you can take them again after a wait, and the marker over the giver tells you when one has come back around.",
-      "typeEscortTitle": "Escort",
-      "typeEscortBody": "Someone needs walking somewhere dangerous. Take the quest, find the person waiting at the start of the road, and speak to them to set off. They walk their own path while you keep pace, and the trouble that lives along it comes for them, not always for you. Stay close: enemies ambush the walk in waves, and the walk only resumes once a wave is down. You cannot attack the person you are escorting, but you can heal them, and if they fall the run simply resets so you can try again. Reach the far end with them alive and you beside them, and the quest credits.",
-      "cardMasterTitle": "Not every NPC has a quest: the Card Master",
-      "cardMasterBody": "One NPC in Eastbrook deals cards instead of errands. Talk to the Card Master, pick the Card Duel line out of his menu, and you join a queue that pairs you with the next player waiting. Any class can sit down, and nothing about your level or your gear comes into it. You each play from your own deck of twenty cards, values one to ten, holding four of them at a time and drawing a fresh one each round: the higher card takes the round, and two matching cards are a push that scores for neither of you. First to two rounds takes the match, so a duel is best of three. Rounds run on a clock, so leave your card unplayed for ninety seconds and the match goes to the other side, unless no round has been scored yet, in which case it is simply thrown out with no winner. The same is true if you walk away from a duel yourself. You have to be standing with the Card Master to join the queue, but once you are matched the board opens itself and you can play from anywhere. It takes two, so the offline world never offers it."
+      "availableTitle": "Perché un PNG non ha nulla per te",
+      "availableBody": "Le missioni si susseguono in catene. La maggior parte viene offerta solo dopo aver consegnato quella precedente, e molte richiedono anche un livello minimo, così un PNG che oggi non ha nulla per te potrebbe averne parecchio tra qualche livello, o una volta chiusa la missione che hai già in corso. Alcune hanno una condizione tutta loro, come le Lezioni di equitazione, che si sbloccano solo dopo aver acquistato l'Addestramento all'Equitazione. Le missioni di gruppo lo dichiarano subito, elencando quanti giocatori consigliano di portare. Alcuni incarichi sono ripetibili: puoi riprenderli dopo un'attesa, e l'indicatore sopra chi te li assegna ti avvisa quando uno è tornato disponibile.",
+      "typeEscortTitle": "Scorta",
+      "typeEscortBody": "Qualcuno ha bisogno di essere scortato in un luogo pericoloso. Accetta la missione, trova la persona che aspetta all'inizio della strada, e parlale per mettervi in cammino. Percorre la propria strada mentre tu le tieni il passo, e i guai che vi si annidano ce l'hanno con lei, non sempre con te. Resta vicino: i nemici tendono agguati alla marcia a ondate, e il cammino riprende solo dopo che un'ondata è stata abbattuta. Non puoi attaccare la persona che stai scortando, ma puoi curarla, e se cade la missione si reimposta semplicemente, così puoi riprovare. Raggiungi la fine del percorso con lei viva al tuo fianco, e ottieni il credito della missione.",
+      "cardMasterTitle": "Non ogni PNG ha una missione: il Maestro delle Carte",
+      "cardMasterBody": "Un PNG a Eastbrook distribuisce carte invece di commissioni. Parla con il Maestro delle Carte, scegli la voce Duello di Carte dal suo menu, ed entri in una coda che ti abbina al prossimo giocatore in attesa. Qualsiasi classe può sedersi al tavolo, e non conta né il tuo livello né il tuo equipaggiamento. Giocate ciascuno dal proprio mazzo di venti carte, con valori da uno a dieci, tenendone quattro in mano alla volta e pescandone una nuova a ogni turno: la carta più alta vince il turno, e due carte uguali sono un pareggio che non assegna punti a nessuno dei due. Il primo a vincere due turni si aggiudica la partita, quindi un duello si gioca al meglio dei tre. I turni corrono contro un orologio: lascia la tua carta ingiocata per novanta secondi e la partita va all'avversario, a meno che non sia ancora stato assegnato nessun turno, nel qual caso viene semplicemente annullata senza vincitore. Vale lo stesso se abbandoni tu un duello. Devi essere accanto al Maestro delle Carte per entrare in coda, ma una volta trovato un avversario il tavolo si apre da solo e puoi giocare da qualsiasi punto. Serve in due, quindi il mondo offline non lo offre mai."
     },
     "lore": {
       "figuresTitle": "Volti che imparerai a conoscere",
@@ -4813,8 +5147,8 @@ export const it_IT: EnTranslations = {
     "dungeonsPage": {
       "heading": "Dungeon e Incursioni",
       "intro": "Quando il mondo aperto non basta, raduna un gruppo ed entra in un'istanza: una copia privata di un dungeon creata solo per il tuo gruppo.",
-      "party": "I dungeon sono pensati per un gruppo di cinque. L'incursione di fine gioco è per dieci.",
-      "soloLead": "Ogni dungeon si apre con una missione introduttiva affrontabile in solitaria, così sai sempre perché ci stai entrando.",
+      "party": "I dungeon sono pensati per un gruppo di cinque. L'incursione di fine gioco è per dieci. Se non hai quattro amici sottomano, il Cercatore di Dungeon formerà un gruppo per le sessioni che mette in coda. La fascia di livello su ciascuna scheda qui sotto è il livello per cui la sessione è scritta, non un lucchetto sulla porta: nulla ti impedisce di entrare prima o di tornare più tardi, anche se il Cercatore di Dungeon ti farà sedere solo in una sessione adatta al tuo livello.",
+      "soloLead": "Chiedi in giro nelle città vicine prima di andare: i loro assegnatori di missioni distribuiscono catene che si concludono in queste sale, e portarne una dentro con te fa sì che la sessione renda il doppio.",
       "levelExact": "Livello {n}",
       "levelBand": "Livelli da {min} a {max}",
       "partySize": "{n} giocatori",
@@ -4833,46 +5167,46 @@ export const it_IT: EnTranslations = {
       "raidBody": "Oltre una porta reale sigillata attende una prova per dieci giocatori: uno scontro a più fasi e un potere immortale che l'intera incursione deve neutralizzare insieme. Guadagnati l'ingresso, poi porta nove amici.",
       "heroicTitle": "Modalità eroica",
       "heroicBody": "Ogni dungeon da cinque giocatori, e l'incursione stessa, ha una versione eroica che ti attende oltre il livello massimo. Le stesse sale, rifatte per un gruppo di fine gioco ben equipaggiato: tutto colpisce più forte, nulla si può seminare a piedi, e i boss ignorano del tutto stordimenti e rallentamenti. Supera prima le versioni normali; l'eroica dà per scontato che tu l'abbia fatto.",
-      "heroicHowBody": "Scegli la difficoltà prima che il gruppo rivendichi l'istanza: digita /dungeon heroic, oppure attiva l'interruttore Difficoltà del Dungeon nel menu del gruppo. La scelta è condivisa da tutto il gruppo e si blocca alla porta, così una spedizione resta ciò che è stata dichiarata.",
+      "heroicHowBody": "Scegli la difficoltà prima che il gruppo rivendichi l'istanza: digita /dungeon heroic, oppure scegli Imposta difficoltà dungeon nel menu del tuo ritratto. Da solo la imposti tu; in gruppo può farlo solo il capogruppo, e la scelta vale per tutti e si blocca sulla porta, così una sessione resta ciò per cui è stata rivendicata.",
       "heroicRewardsTitle": "Marchi Eroici e bottino potenziato",
-      "heroicRewardsBody": "I boss eroici lasciano cadere il bottino che conosci, potenziato e contrassegnato come Eroico nel suggerimento, e il boss finale di ogni spedizione aggiunge oggetti epici introvabili altrove. Quell'ultima uccisione lascia anche Marchi Eroici a ogni partecipante: una valuta da spendere con il Quartiermastro Vex a Highwatch, la cui scorta di anelli e collane è l'unica gioielleria del reame.",
-      "heroicLockoutBody": "I dungeon normali si possono affrontare tutto il giorno. L'eroica chiede pazienza: l'uccisione del boss finale blocca tutti i presenti a una sola conquista eroica di quel dungeon al giorno, e l'incursione mantiene un blocco giornaliero per ciascuna difficoltà. Una spedizione a cinque giocatori già completata resta aperta al suo stesso gruppo per le corse al cadavere e il bottino, così nessuno viene escluso da ciò che vi ha guadagnato. L'incursione è più severa: una volta che la sua uccisione ti blocca, la porta resta chiusa fino al ripristino giornaliero, perciò raccogli il tuo bottino prima di lasciare l'arena.",
+      "heroicRewardsBody": "I boss eroici lasciano cadere il bottino che conosci, migliorato e contrassegnato come Eroico nella descrizione, e il boss finale di ogni sessione aggiunge epici introvabili altrove. Quell'ultima uccisione lascia anche Sigilli Eroici a ogni partecipante: una valuta che si spende dal quartiermastro Vex a Highwatch, il cui bancone è uno scaffale di anelli e pendenti che nulla se non la prova delle profondità eroiche può comprare.",
+      "heroicLockoutBody": "I dungeon normali si possono percorrere tutto il giorno. L'eroico chiede pazienza: l'uccisione del boss finale limita tutti i partecipanti a un solo completamento eroico di quel dungeon al giorno, e l'incursione tiene un blocco giornaliero per ciascuna difficoltà. Su un reame in linea tutti i blocchi giornalieri decadono insieme all'ora del ripristino notturno del reame, così un completamento preso poco prima di quell'ora e uno preso poco dopo cadono in due giorni diversi; gioca invece offline nel tuo browser e un blocco scade semplicemente un giorno dopo la tua uccisione. Una sessione a cinque già completata resta aperta al suo stesso gruppo per corse del cadavere e bottino, così nessuno viene escluso da ciò che vi ha guadagnato. L'incursione è più severa: una volta che la sua uccisione ti ha bloccato, la porta resta chiusa fino al ripristino, e l'unico modo di rientrarvi è una corsa del cadavere di qualcuno caduto proprio nella sessione che lo ha bloccato, quindi un incursore vivo che esce è uscito per la giornata. Raccogli le tue spoglie prima di lasciare l'arena. Ognuno di questi blocchi appartiene al personaggio che se l'è guadagnato, così un completamento sul tuo personaggio principale lascia liberi gli altri.",
       "resetTitle": "Reimpostare le istanze",
-      "resetBody": "Se cambi difficoltà mentre il gruppo conserva ancora delle spedizioni assegnate, le vecchie assegnazioni restano per un po’ prima di svanire. Il capogruppo può abbandonarle subito scegliendo Reimposta tutte le istanze dal menu del proprio ritratto oppure digitando /dungeon reset. La difficoltà deve essere stata davvero cambiata, nessuno, vivo o caduto, può trovarsi all’interno e tra due ripristini passa un breve tempo di recupero. Se arrivi all’ingresso con la difficoltà sbagliata, il gioco ti avvisa prima dell’inizio. L’incursione non viene mai reimpostata così e mantiene le proprie regole di vincolo.",
+      "resetBody": "Se cambiate difficoltà mentre il gruppo tiene ancora sessioni rivendicate, le vecchie rivendicazioni restano un poco prima di decadere da sole. Il capogruppo può lasciarle andare subito: scegliete Azzera tutte le istanze nel menu del proprio ritratto, oppure digitate /dungeon reset. Un azzeramento funziona solo dopo che la difficoltà è stata davvero cambiata, solo finché nessuno, vivo o caduto, resta all'interno, solo una volta che ogni cadavere là dentro è stato saccheggiato del tutto, e un breve tempo di recupero separa un azzeramento dal successivo. Arrivate alla porta con la difficoltà sbagliata e il gioco ve lo dice prima che la sessione inizi. L'incursione non si azzera mai così; valgono le sue regole di blocco.",
       "templeLoreTitle": "Il Tempio Annegato, un po' più a fondo",
       "templeLoreBody": "Il tempio ha una sua leggenda, più antica del culto che insegui altrove. Sulla riva del Glimmermere, un laghetto che beve la luce della luna e restituisce gli annegati, un solitario guardiano custodisce una porta di pallida luce. Sotto la superficie, una scalinata di pietra fredda scende fino ad esso. Coloro che vi affondarono non annegarono per disgrazia: erano il Coro Pallido, che si immerse in preghiera e non smise mai di cantare. I vecchi custodi incisero un solo avvertimento nelle rocce prima che l'acqua li prendesse, una preghiera a qualcosa che chiamavano la Luna Annegata, con una mano più ferma che aggiunse due parole sotto di essa: dorme soltanto.",
       "cryptLeadTitle": "Una porta che i morti dovevano tenere chiusa",
       "cryptLeadBody": "In alto sulle vette, lontano dallo scontro principale, giace un mistero più gelido. Vecchie tombe portano una corona di cui nessuna cronaca conserva memoria, e i morti che le custodiscono servirono un tempo un re dimenticato. Leggi le loro lapidi, raccogli le chiavi di volta che custodivano, e potrai dissigillare un sepolcro che tre anime fedeli morirono per tenere chiuso: la prova facoltativa che apre il reame alla sua incursione per dieci giocatori, per chi segue gli indizi fino in fondo.",
-      "formatsNote": "Dungeons and the raid are one of three instanced formats. Delves are the short descents for one or two, and rifts are the tears that open out in the world and drop a group into a dungeon built fresh every time.",
-      "finderTitle": "Finding a group",
-      "finderBody": "You do not have to shout in chat to fill a party. Open the Dungeon Finder to see the runs it queues for, pick the ones you would go to, choose the role you will play, and join the queue. The finder builds a full group with the right mix of tank, healer, and damage, then offers it to everyone at once, and you are grouped the moment the party accepts. The list is not only five-player runs: the ten-player raid queues here too, at both difficulties, though the finder never checks whether you have earned your way in, so the door itself can still turn you back. Not every run in the realm is on its list, so glance at it before you count on it for a particular dungeon. One thing it does not do is move you: the finder forms the group and points you at the entrance, and everybody still travels to the door on their own feet.",
-      "finderRolesBody": "Your role choices come from your class before you specialize, and from your active specialization once you have one, so a healer queues as a healer. Past the level talents open at, the finder wants you to have chosen a specialization before it will give you a role at all. Each run on the list also carries its own level band, tighter than the door itself, and every member of a queued party has to sit inside it: the finder will not seat a character the group would have to carry.",
-      "finderOfferBody": "A formed group is offered for a short window, so answer promptly. Let the offer lapse or turn it down and the finder holds you out of the queue for a moment before you can rejoin, which keeps a half-answered group from stalling everyone else.",
-      "finderBoardBody": "Prefer to pick your own company? A party leader can post the group on the premade board instead, tagged with what the run is for: a first run, a quest run, a full clear, a learning run, or a fast one. Other players apply and the leader decides who comes along. There is no free-form advertisement text, only the tags, and one entry on the list is board-only, offered for a posting rather than an automatic queue."
+      "formatsNote": "I dungeon e l'incursione di fine gioco sono uno dei tre formati istanziati. Le incursioni sono le brevi discese per uno o due giocatori, mentre gli squarci sono le lacerazioni che si aprono nel mondo e calano un gruppo in un dungeon costruito di nuovo ogni volta.",
+      "finderTitle": "Trovare un gruppo",
+      "finderBody": "Non devi urlare in chat per riempire un gruppo. Apri il Cercatore di Dungeon per vedere le corse per cui mette in coda, scegli quelle a cui vorresti andare, scegli il ruolo che giocherai, e unisciti alla coda. Il cercatore costruisce un gruppo completo con il giusto mix di tank, guaritore e danno, poi lo offre a tutti in una volta, e vieni raggruppato nell'istante in cui il gruppo accetta. L'elenco non comprende solo corse da cinque giocatori: qui si mette in coda anche l'incursione da dieci giocatori, a entrambe le difficoltà, anche se il cercatore non controlla mai se ti sei guadagnato l'ingresso, quindi la porta stessa può comunque respingerti. Non ogni corsa del reame è sul suo elenco, quindi dagli un'occhiata prima di contarci per un dungeon particolare. Una cosa che non fa è spostarti: il cercatore forma il gruppo e ti indica l'ingresso, e tutti viaggiano comunque fino alla porta con le proprie gambe.",
+      "finderRolesBody": "Le tue scelte di ruolo derivano dalla tua classe prima di specializzarti, e dalla tua specializzazione attiva una volta che ne hai una, così un guaritore si mette in coda come guaritore. Oltre il livello a cui si aprono i talenti, il cercatore vuole che tu abbia scelto una specializzazione prima di assegnarti un ruolo. Ogni corsa dell'elenco porta anche la propria fascia di livello, più stretta della porta stessa, e ogni membro di un gruppo in coda deve rientrarci: il cercatore non inserirà un personaggio che il gruppo dovrebbe portare in spalla.",
+      "finderOfferBody": "Un gruppo formato viene offerto per una breve finestra di tempo, quindi rispondi tempestivamente. Se lasci scadere l'offerta o la rifiuti, il cercatore ti tiene fuori dalla coda per un momento prima che tu possa rientrare, il che impedisce a un gruppo con risposte a metà di bloccare tutti gli altri.",
+      "finderBoardBody": "Preferisci scegliere tu la compagnia? Un capogruppo può invece pubblicare il gruppo sulla bacheca dei gruppi prefissati, etichettato con lo scopo della corsa: prima corsa, corsa missioni, pulizia completa, principianti benvenuti o corsa veloce. Gli altri giocatori si candidano e il capogruppo decide chi si unisce. Non esiste un testo libero per l'annuncio, solo le etichette, e una voce dell'elenco è disponibile soltanto tramite bacheca, offerta con un annuncio anziché con una coda automatica."
     },
     "riftsPage": {
-      "heading": "Rifts",
-      "intro": "A rift is a tear in the world itself, not a door you walk to. Step through one and you get a descent nobody has run before: the floors, the monsters, and the thing waiting at the bottom are all built fresh for that rift alone, so the same rank never plays out the same way twice.",
-      "whatHeading": "What a rift is",
-      "whatBody": "Dungeons are places. They sit where they have always sat, and you learn them until you know every corner. A delve is a short private descent you start from a board, cut for one or two. A rift is neither: it opens on its own, out in the world, with no warning, and everything inside it is generated the moment it does. Nobody has a route to hand you, because nobody has been down this one. It is instanced like the other two, so what you find inside belongs to you and your group alone, but it is the only instanced content in the game that comes looking for you rather than waiting to be found.",
-      "openHeading": "Where rifts open, and how often",
-      "openBody": "Rifts tear open out in the wider zones of the realm rather than in the early valley, and the whole realm hears about it: a line in your chat names the rank and the zone the moment one appears. Each eligible zone comes up for a rift about once an hour, and a zone that already has one standing waits its turn rather than opening a second. A rift nobody closes collapses on its own after a couple of hours, and the realm hears that too. A zone whose rift was sealed stays quiet until its next turn comes around, so an announcement is worth walking toward while it is fresh.",
-      "ranksHeading": "The four ranks",
-      "ranksBody": "Every rift is ranked C, B, A, or S, and the rank rides in the announcement, so you know what you are walking toward before you leave town. C is the gentlest, B and A climb from there, and S is the hardest thing a rift can be. Rank is the dial that decides how mean the floors are, and the harder ranks pay accordingly, so take the one your group can actually hold.",
-      "rankFmt": "Rank {rank}",
-      "groupHeading": "Who goes in",
-      "groupBody": "Bring a group. A rift does not soften because fewer of you walked through it: nothing inside counts how many are standing there, so the rank on the portal is the rank you fight, whether that is five of you or one. The doorway will let you in alone, and people do try it, but a rift is group content at every rank and it is honest about that from the first room. Your party gets its own copy of the rift, so no other group can spill into your run. If you fall, you can walk back in as a ghost and collect yourself once the fighting inside has stopped.",
-      "levelNote": "Rifts are endgame content. You have to be at the level cap, level {n}, to step through one, at any rank.",
-      "floorsHeading": "Down through the floors",
-      "floorsBody": "A rift runs a handful of floors, each one built fresh, and the way down does not open until the floor is finished with you: clear what is living on it, solve whatever it has locked across your path, and the descent tears open. The last floor ends on a boss. Every floor takes a character of its own, so a single run can carry you out of the frost and into the embers, and your chat names each floor as you arrive on it. The tracker on your screen is where you learn how many floors this one has. A few rifts open onto a hand-built set piece instead of a generated descent, which runs to its own fixed length.",
-      "boundHeading": "Once you draw blood",
-      "boundBody": "The first kill your group takes inside a rift settles the run, and so does the first off-path cache you crack open. From that moment you are bound to that copy of it: step out for any reason and coming back puts you in the run you left, never in another group's and never in a fresh one, for as long as the entrance out in the world is still standing. Before that first kill, and before that first cache, nothing is settled, so a group that is still gathering can regroup and walk in together without stranding half-started copies behind them.",
-      "raceHeading": "The race for the first clear",
-      "raceBody": "Every group in the realm can attack the same rift at once, each in its own copy, and only the first to bring down the thing at the bottom seals it. When a group wins, the realm hears their names and their time, and the way in closes behind them. Losing the race does not end your run: your copy stays open, the thing at the bottom still falls to you, and you still walk out under your own power. What it costs you is everything that clearing it would have paid. The boss leaves nothing behind for the group that came second, so what you carry home is what dropped off the mobs on the way down, and nothing more. The Book of Deeds still counts the clear, because you did put the thing down. It is the only race in the game you can lose without ever laying eyes on the people who beat you.",
-      "rewardsHeading": "What you carry out",
-      "rewardsBody": "Sealing a rift, not merely surviving one, is what pays. Bring the rift down first and it pays like the instanced content its rank stands beside, so the harder ranks are worth the harder run. Sealing also puts a Riftbound band in the hands of everyone who was there, cut to your class's role and personal to you, and leaves Rift Essence in your bags besides, with rift gems on top of it at the harder ranks. Beside the way home, the thing at the bottom leaves a sealed cache your group can pick open for extra spoils, using the same Tumbler's Path lockpicking you know from delve chests, so a clean, patient job pays better than a rushed one. None of that reaches a group that came second: a lost race leaves you only what dropped off the mobs on the way down. The Book of Deeds is the exception, and it counts your clear either way, with a deed for closing your first rift and another for taking down an S-rank one.",
-      "trackerHeading": "The tracker on your screen",
-      "trackerBody": "While you are inside, a small strip on your screen keeps you oriented: which floor you are on out of how many, and a live countdown. Read that countdown carefully, because it is not your run running out. It is the entrance back in the world closing. Once you are through, your group plays the rift out at its own pace, however long that takes, but when that clock reaches zero the way in is gone for everybody, so think twice about stepping outside near the end of it."
+      "heading": "Squarci",
+      "intro": "Uno squarcio è una lacerazione nel mondo stesso, non una porta verso cui camminare. Attraversane uno e ottieni una discesa che nessuno ha mai percorso prima: i piani, i mostri e la cosa che attende in fondo sono costruiti da zero solo per quello squarcio, così lo stesso rango non si gioca mai due volte allo stesso modo.",
+      "whatHeading": "Cos'è uno squarcio",
+      "whatBody": "I dungeon sono luoghi. Stanno dove sono sempre stati, e li impari finché non ne conosci ogni angolo. Un'incursione è una breve discesa privata che avvii da un tabellone, pensata per uno o due giocatori. Uno squarcio non è né l'una né l'altra cosa: si apre da solo, nel mondo, senza preavviso, e tutto ciò che contiene viene generato nell'istante in cui si apre. Nessuno può darti un percorso da seguire, perché nessuno ha mai affrontato questo in particolare. È istanziato come gli altri due, quindi ciò che trovi al suo interno appartiene solo a te e al tuo gruppo, ma è l'unico contenuto istanziato del gioco che viene a cercarti invece di aspettare di essere trovato.",
+      "openHeading": "Dove si aprono gli squarci, e con che frequenza",
+      "openBody": "Gli squarci si aprono nelle zone più ampie del reame, non nella valle iniziale, e l'intero reame ne viene informato: una riga nella tua chat nomina il rango e la zona nell'istante in cui uno squarcio compare. Ogni zona idonea ha una possibilità di squarcio circa una volta all'ora, e una zona che ne ha già uno aperto attende il proprio turno invece di aprirne un secondo. Uno squarcio che nessuno chiude collassa da solo dopo un paio d'ore, e anche di questo il reame viene informato. Una zona il cui squarcio è stato sigillato resta silenziosa fino al suo turno successivo, quindi vale la pena dirigersi verso un annuncio finché è ancora fresco.",
+      "ranksHeading": "I quattro ranghi",
+      "ranksBody": "Ogni squarcio ha un rango C, B, A o S, e il rango viaggia nell'annuncio, così sai verso cosa ti stai dirigendo prima ancora di lasciare la città. C è il più mite, B e A salgono da lì, e S è la cosa più dura che uno squarcio possa essere. Il rango è la manopola che decide quanto siano ostili i piani, e i ranghi più duri pagano di conseguenza, quindi scegli quello che il tuo gruppo può davvero reggere.",
+      "rankFmt": "Rango {rank}",
+      "groupHeading": "Chi entra",
+      "groupBody": "Porta un gruppo. Uno squarcio non si ammorbidisce perché siete entrati in meno: nulla al suo interno conta quanti siete, quindi il rango sul portale è il rango che affronti, che siate in cinque o da soli. Il varco ti lascia entrare anche da solo, e c'è chi ci prova, ma uno squarcio è contenuto di gruppo a ogni rango, e lo dichiara onestamente fin dalla prima stanza. Il tuo gruppo ottiene una copia tutta sua dello squarcio, così nessun altro gruppo può riversarsi nella tua run. Se cadi, puoi rientrare come spettro e recuperare il tuo corpo una volta che i combattimenti al suo interno si sono fermati.",
+      "levelNote": "Gli squarci sono contenuto di fine gioco. Devi essere al livello massimo, livello {n}, per attraversarne uno, a qualsiasi rango.",
+      "floorsHeading": "Giù attraverso i piani",
+      "floorsBody": "Uno squarcio si snoda per una manciata di piani, ognuno costruito da zero, e la via verso il basso non si apre finché il piano non ha finito con te: ripulisci ciò che ci vive, risolvi qualsiasi cosa abbia sbarrato il tuo cammino, e la discesa si squarcia. L'ultimo piano si conclude con un boss. Ogni piano ha un proprio carattere, così una singola run può portarti fuori dal gelo e dentro le braci, e la tua chat nomina ogni piano non appena vi arrivi. Il tracciatore sul tuo schermo è dove scopri quanti piani ha questo in particolare. Alcuni squarci si aprono su uno scenario costruito a mano invece che su una discesa generata, che ha una lunghezza fissa tutta sua.",
+      "boundHeading": "Una volta versato il primo sangue",
+      "boundBody": "La prima uccisione del tuo gruppo dentro uno squarcio fissa la run, e lo stesso vale per il primo scrigno fuori percorso che scassini. Da quel momento sei vincolato a quella copia: se esci per qualsiasi motivo, il ritorno ti riporta nella run che hai lasciato, mai in quella di un altro gruppo e mai in una nuova, finché l'ingresso nel mondo resta ancora aperto. Prima di quella prima uccisione, e prima di quel primo scrigno, nulla è fissato, quindi un gruppo che si sta ancora radunando può ricompattarsi ed entrare insieme senza lasciarsi dietro copie iniziate a metà.",
+      "raceHeading": "La corsa per il primo completamento",
+      "raceBody": "Ogni gruppo del reame può attaccare lo stesso squarcio nello stesso momento, ciascuno nella propria copia, e solo il primo che abbatte la cosa in fondo lo sigilla. Quando un gruppo vince, il reame ne sente i nomi e il tempo, e la via d'ingresso si chiude alle loro spalle. Perdere la corsa non pone fine alla tua run: la tua copia resta aperta, la cosa in fondo cade comunque sotto i tuoi colpi, ed esci comunque con le tue forze. Ciò che ti costa è tutto ciò che avrebbe pagato completarlo. Il boss non lascia nulla al gruppo arrivato secondo, quindi ciò che porti a casa è solo ciò che i mostri hanno lasciato cadere lungo la discesa, e nient'altro. Il Libro delle Imprese conta comunque il completamento, perché quella cosa l'hai abbattuta tu. È l'unica corsa del gioco che puoi perdere senza mai posare gli occhi su chi ti ha battuto.",
+      "rewardsHeading": "Cosa porti fuori",
+      "rewardsBody": "È sigillare uno squarcio, non semplicemente sopravvivergli, a pagare. Sigillalo per primo e paga come il contenuto istanziato al cui fianco si colloca il suo rango, così i ranghi più duri valgono la run più dura. Sigillarlo mette anche un Anello dello Squarcio nelle mani di tutti quelli che erano presenti, tagliato per il ruolo della tua classe e personale per te, e lascia inoltre Essenza dello Squarcio nelle tue borse, con gemme dello squarcio in aggiunta ai ranghi più duri. Oltre alla via del ritorno, la cosa in fondo lascia uno scrigno sigillato che il tuo gruppo può forzare per bottino extra, usando lo stesso scasso della Via del Cilindro che conosci dagli scrigni delle incursioni, quindi un lavoro pulito e paziente paga meglio di uno frettoloso. Niente di tutto questo arriva al gruppo arrivato secondo: una corsa persa ti lascia solo ciò che i mostri hanno lasciato cadere lungo la discesa. Il Libro delle Imprese è l'eccezione, e conta comunque il tuo completamento, con un'impresa per aver chiuso il tuo primo squarcio e un'altra per averne abbattuto uno di rango S.",
+      "trackerHeading": "Il tracciatore sul tuo schermo",
+      "trackerBody": "Mentre sei all'interno, una piccola striscia sul tuo schermo ti tiene orientato: su quale piano ti trovi rispetto al totale, e un conto alla rovescia in tempo reale. Leggi quel conto alla rovescia con attenzione, perché non è la tua run che sta per scadere: è l'ingresso nel mondo che si sta chiudendo. Una volta dentro, il tuo gruppo gioca lo squarcio al proprio ritmo, per quanto tempo serva, ma quando l'orologio arriva a zero la via d'ingresso scompare per tutti, quindi pensaci due volte prima di uscire fuori verso la fine."
     },
     "delvesPage": {
       "heading": "Incursioni",
@@ -4886,7 +5220,7 @@ export const it_IT: EnTranslations = {
       "tiersLabel": "Difficoltà",
       "affixesLabel": "Modificatori possibili",
       "whatHeading": "Cos'è un'incursione",
-      "whatBody": "Un'incursione è un piccolo dungeon istanziato creato solo per te e al più un alleato, una copia privata in cui nessuno può disturbarti. La avvii da un tabellone tenuto da un custode delle incursioni sparso per il mondo, scendi, ti fai strada attraverso una manciata di stanze e finisci su un unico guardiano. Le incursioni sono rapide e pensate per essere ripetute, perciò un'incursione è un progresso affidabile ogni volta che il mondo aperto si esaurisce.",
+      "whatBody": "Un'incursione è un piccolo dungeon istanziato fatto solo per te e al massimo un alleato, una copia privata in cui non puoi essere disturbato. La avvii da una bacheca tenuta da un custode delle incursioni là fuori nel mondo, scendi, ti fai strada attraverso una manciata di stanze e concludi su un unico guardiano. Ciò che attende oltre quel guardiano varia da incursione a incursione: una sigilla le sue spoglie dietro una serratura, un'altra ti chiede un rito. Le sessioni sono rapide e pensate per essere ripetute, quindi un'incursione è un progresso affidabile ogni volta che il mondo aperto si prosciuga.",
       "howHeading": "Come funziona un'incursione",
       "howBody": "Parla con il custode per aprire il tabellone, scegli una difficoltà e scendi. Ogni incursione concatena alcune brevi camere e si conclude sul suo guardiano: sconfiggilo per riscuotere la ricompensa e tornare in superficie. Porta un amico se ce l'hai, oppure appoggiati alla tua compagna se non l'hai.",
       "companionHeading": "La tua compagna",
@@ -4898,27 +5232,28 @@ export const it_IT: EnTranslations = {
       "affixesHeading": "Modificatori dell'incursione",
       "affixesBody": "Le incursioni più difficili estraggono un modificatore che cambia come si svolge la discesa, dai morti inquieti all'aria viziata fino alle volte cadenti. Alzano insieme il pericolo e la ricompensa. Ogni incursione attinge ai modificatori adatti al proprio tema; in tutto il reame, l'insieme si presenta così:",
       "marksHeading": "Sigilli d'Incursione",
-      "marksBody": "Completare le incursioni fa guadagnare Sigilli d'Incursione, una valuta tenuta separata dalle tue monete. Spendili dal custode per rafforzare la tua compagna e procurarti equipaggiamento che non troverai da nessun'altra parte.",
+      "marksBody": "Ripulire le incursioni frutta Sigilli d'Incursione, una valuta tenuta separata dal tuo denaro. Spendili dal custode per rafforzare la tua compagna e procurarti equipaggiamento che non troverai altrove.\n\nI sigilli premiano soprattutto le prime sessioni della tua giornata. I primi tre completamenti di ogni giorno pagano per intero, e dopo un'incursione paga ancora, solo in modo meno affidabile, con il livello più difficile che tiene meglio di quello più facile. Il conteggio si rinnova ogni giorno, quindi non serve consumare un'incursione fino all'osso: torna domani e la tariffa buona ti aspetta.",
       "whereHeading": "Dove trovarne una",
       "whereBody": "La prima incursione, il Reliquiario Crollato, si apre alla Collina del Reliquiario, nella valle iniziale della Valle di Eastbrook. Fratello Halven custodisce lì il tabellone, e ti manderà giù quando sarai pronto. Il suo giro non finisce lì: oltre i Tumuli dei Troll, al margine settentrionale della Palude di Mirefen, lo stesso custode apre La Litania Annegata per gli incursori che hanno preso confidenza.",
-      "lockpickAnteBody": "You settle the terms before you touch the lock. Take three picks and you have room to fumble, but the chest pays its plainest prize; take two for the middle bargain; take one and a clean solve pays the richest of all. The fewer picks you hold, the less time you have to think between moves, and if the last one snaps the lock jams for good: that chest is lost until you clear the delve again.",
-      "riteHeading": "When a delve ends in a rite",
-      "riteBody": "Not every delve ends at a lock. The Drowned Litany closes on a rite instead: once its guardian falls, the shrines around the reliquary light in an order and ask you to answer it back. You choose how hard to make it before it begins, the same bargain the picks ask for. The gentle setting replays the sequence for you more than once and gives you more than one attempt, but it caps what the reliquary will pay; the sternest shows the order a single time, gives you a single attempt, and is the only way to the richest prize."
+      "lockpickAnteBody": "Decidi i termini prima ancora di toccare la serratura. Prendi tre grimaldelli e avrai margine per sbagliare, ma lo scrigno pagherà il premio più modesto; prendine due per il compromesso di mezzo; prendine uno solo e una soluzione pulita paga il premio più pregiato di tutti. Meno grimaldelli tieni, meno tempo hai per pensare tra una mossa e l'altra, e se l'ultimo si spezza la serratura si incepperà per sempre: quello scrigno è perduto finché non completi di nuovo l'incursione.",
+      "riteHeading": "Quando un'incursione finisce in un rito",
+      "riteBody": "Non tutte le incursioni finiscono davanti a una serratura. La Litania Annegata si conclude invece con un rito: una volta caduto il suo guardiano, i santuari attorno al reliquiario si accendono in un certo ordine e ti chiedono di ripeterlo. Scegli quanto renderlo difficile prima che inizi, lo stesso compromesso che chiedono i grimaldelli. L'impostazione più dolce ripete la sequenza più di una volta e ti concede più di un tentativo, ma limita quanto pagherà il reliquiario; la più severa mostra l'ordine una sola volta, ti concede un solo tentativo ed è l'unica via al premio più pregiato."
     },
     "talentsPage": {
       "heading": "Talenti e specializzazioni",
       "intro": "I talenti sono il modo in cui rendi una classe tua. Sono facoltativi, indulgenti e facili da cambiare, così puoi sperimentare senza timori.",
       "whatHeading": "Cosa fanno i talenti",
-      "whatBody": "Salendo di livello, guadagni punti talento da spendere in piccoli, permanenti miglioramenti alle tue abilità e statistiche. Plasmano il modo in cui una classe si sente, orientandola verso più danno, una difesa più solida o cure più potenti.",
+      "whatBody": "I tuoi talenti sono una breve scala di scelte più che un mucchio di punti. Ogni fila che si apre offre tre opzioni, e tu ne prendi esattamente una. Plasmano il modo in cui una classe si sente, inclinandola verso più danno, una difesa più solida o cure più forti.",
       "howHeading": "Come funzionano",
-      "howBody": "I talenti si sbloccano al livello 10, e continui a guadagnare punti man mano che sali verso il limite. Li spendi nel pannello dei talenti della tua classe, dove le file più profonde si aprono man mano che investi e sali di livello, e puoi salvare più di una configurazione per passare da una costruzione all'altra.",
+      "howBody": "I talenti si aprono al livello 5, lo stesso livello in cui scegli la tua specializzazione. Altre cinque file seguono man mano che sali, una a ciascuno dei livelli 8, 11, 14, 17 e 20, così l'ultima arriva al livello massimo. Fai le tue scelte nel pannello dei talenti della tua classe, nella linguetta Scelte accanto alla linguetta Specializzazione.",
       "shareNote": "Una configurazione finita può essere copiata in un breve codice condivisibile e passata a un amico, che lo incolla direttamente nel proprio pannello dei talenti per caricarla.",
-      "choiceNote": "Alcuni punti su ogni albero sono un bivio anziché un acquisto: il nodo offre due o tre opzioni e tu ti impegni per una di esse. Il tuo prossimo azzeramento riapre la scelta, come tutto il resto dell'albero.",
+      "choiceNote": "Ogni fila è un bivio: offre tre opzioni e tu ti impegni su una di esse. Il tuo prossimo azzeramento riapre ognuna di quelle scelte.",
       "resetTitle": "Niente è permanente",
-      "resetNote": "Puoi reimpostare i tuoi talenti in qualsiasi momento, purché tu sia fuori dal combattimento e non in una partita d'arena, quindi una scelta iniziale non è mai una trappola. Prova le cose, scopri cosa ti piace e cambia idea liberamente.",
+      "resetNote": "Puoi azzerare i tuoi talenti in qualsiasi momento tu sia fuori dal combattimento e non in un incontro in arena, quindi una scelta iniziale non è mai una trappola. Un azzeramento cancella le tue scelte di fila e non costa nulla, e la tua specializzazione resta com'è, quindi azzerare non ti toglie mai il ruolo a metà sessione. Il campo di battaglia è l'eccezione, e lì puoi cambiare build fra un combattimento e l'altro. Prova le cose, guarda cosa ti piace e cambia idea liberamente.",
       "specsHeading": "Specializzazioni per classe",
-      "specsBody": "Ogni classe ha una manciata di specializzazioni, ciascuna con il proprio ruolo e un'impronta caratteristica. Sceglierne una nel pannello dei talenti concede un'abilità distintiva e una maestria duratura tutta sua. Ecco la forma di tutte quante. Apri una classe per il suo arsenale completo.",
-      "loadoutNote": "You do not have to settle on one build. Save a named layout in the panel and it remembers both its picks and your action bar, so switching to another one is a single click, under the same rule as a reset: out of combat, and not in an arena match or a battleground."
+      "specsBody": "Ogni classe ha una manciata di specializzazioni, ciascuna con il proprio ruolo e un tratto distintivo. Ne scegli una nel pannello dei talenti al livello 5. Concede un'abilità distintiva e una maestria duratura, la maggior parte aggiunge bonus passivi adatti al ruolo, ed è anche il ruolo con cui ti iscrivi nel Cercatore di Dungeon. Ecco la forma di tutte. Apri una classe per il suo repertorio completo.",
+      "loadoutNote": "Non devi limitarti a un'unica build. Salva una configurazione con nome nel pannello: ricorda sia le sue scelte sia la tua barra delle azioni, così passare a un'altra è questione di un solo clic, secondo la stessa regola di un azzeramento: fuori dal combattimento, e non durante una partita d'arena.",
+      "loadoutGearNote": "Una disposizione può portare anche il tuo equipaggiamento. Salvala con la voce che propone di conservare anche l'equipaggiamento e registrerà pure ciò che indossavi, ed è questo che mette un set GcG e un set da dungeon a un clic di distanza invece che a sedici. Ricorda il pezzo esatto e non soltanto il suo nome, così un anello incantato non viene mai scambiato in silenzio con il gemello semplice che gli sta accanto nelle borse. Ciò che non riesce a trovare quando torni indietro viene semplicemente lasciato stare e segnalato, così un set che ha perso un pezzo alla banca o al mercato equipaggia comunque tutto il resto."
     },
     "arenaPage": {
       "heading": "Arena e PvP",
@@ -4926,24 +5261,24 @@ export const it_IT: EnTranslations = {
       "duelsHeading": "Duelli",
       "duelsBody": "Sfida a duello amichevole qualsiasi giocatore che incontri. In palio non c'è altro che l'orgoglio, quindi è il modo più semplice per imparare uno scontro o risolvere una disputa amichevole.",
       "coliseumHeading": "Il Colosseo di Cenere",
-      "coliseumBody": "Il Colosseo è l'arena del reame, dove affronti altri giocatori in partite classificate, uno contro uno o due contro due. Ogni categoria mantiene la propria classifica, perciò una vittoria ti fa salire in quella graduatoria sotto gli occhi di tutto il reame. Apri la finestra dell'Arena per iscriverti a una categoria, da solo o con il tuo compagno.",
+      "coliseumBody": "Il Colosseo è l'arena del reame, dove affronti altri giocatori in incontri classificati, uno contro uno o due contro due. Ogni categoria tiene la propria classifica, quindi una vittoria ti solleva su quella scala sotto gli occhi di tutto il reame. Il gioco classificato si apre al livello 15, e vale anche per il tuo compagno: se uno dei due è sotto, la coda resta chiusa finché non vi qualificate entrambi. Tutto il giocatore contro giocatore sta dietro un unico pulsante, marcato GcG: aprilo e scegli una linguetta, Campi di Thornhollow, uno contro uno o due contro due, poi iscriviti da solo o con il tuo compagno. Mentre sei in coda o in un incontro, le altre linguette restano bloccate, così non puoi mai stare in due code alla volta.",
       "ladderHeading": "Scalare la classifica",
       "ladderBody": "Il gioco classificato traccia la tua posizione nel tempo. Controlla la classifica per vedere dove ti trovi e chi domina la vetta del reame.",
-      "rewardsHeading": "What ranked play pays",
-      "rewardsBody": "A ranked win pays Honor, the player versus player currency, and a loss costs you nothing but rating. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further, a long winning day pays a little less per win as it goes on, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset.",
-      "honorHeading": "Honor",
-      "honorBody": "Honor is the currency of fighting other players. You earn it in the Coliseum and out on Thornhollow Fields, it is kept apart from your coin and never mixes with it, and your character sheet shows how much you are holding. There is exactly one thing to spend it on: Warfare gear.",
-      "quartermastersBody": "Two quartermasters keep the same shelves, so trade with whichever is nearer. FURY, the Honor Quartermaster, stands in Eastbrook Vale, and Warmarshal Draven Kole, Master of the Warfare Stores, keeps the counter in Highwatch. Their stock is the Warfare tier: five armor families, plus necks, rings, and weapons shared across all of them.",
-      "honorFinalNote": "Honor purchases are final. A coin purchase can be undone from a vendor's buyback list, but an Honor purchase never lands there, and Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything. The shop asks you to confirm for that reason: read the piece before you press it.",
-      "warfareHeading": "Warfare gear",
-      "warfareBody": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit is worth nothing on a dungeon boss.",
-      "warfareTradeBody": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and everything it does bring is spent on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons."
+      "rewardsHeading": "Cosa paga il gioco classificato",
+      "rewardsBody": "Una vittoria classificata paga Onore, la moneta del giocatore contro giocatore, e una sconfitta non ti costa altro che indice. L'Onore è pensato per premiare incontri autentici: battere di nuovo lo stesso avversario o la stessa squadra nello stesso giorno non paga più nulla, una lunga giornata di vittorie rende un po' meno per ogni vittoria man mano che procede, e una partita che il tuo avversario abbandona muove comunque il tuo indice ma non paga alcun Onore. Quella giornata appartiene solo all'Onore, e si rinnova secondo un proprio ciclo orario, non con il ripristino delle istanze del reame.",
+      "honorHeading": "Onore",
+      "honorBody": "L'Onore è la moneta che si guadagna combattendo altri giocatori. Lo ottieni nel Colosseo e nei Campi di Thornhollow, viene tenuto separato dalle tue monete e non si mescola mai con esse, e la tua scheda del personaggio mostra quanto ne possiedi. C'è esattamente una cosa su cui spenderlo: l'equipaggiamento da Guerra.",
+      "quartermastersBody": "Due quartiermastri tengono gli stessi scaffali, quindi commercia con quello più vicino a te. FURIA, il Quartiermastro d'Onore, si trova nella Valle di Eastbrook, mentre il Guerramaresciallo Draven Kole, Maestro del Negozio della Guerra, tiene banco a Highwatch. Il loro assortimento è il livello Guerra: cinque famiglie di armature, più collane, anelli e armi condivisi tra tutte.",
+      "honorFinalNote": "Gli acquisti in Onore sono definitivi. Un acquisto in monete può essere annullato dall'elenco di riacquisto di un venditore, ma un acquisto in Onore non vi compare mai, e l'equipaggiamento da Guerra si vincola all'anima nel momento stesso in cui lo acquisti, quindi non potrà mai essere scambiato, spedito per posta, né rivenduto per nulla. Per questo il negozio ti chiede conferma: leggi bene il pezzo prima di confermarlo.",
+      "warfareHeading": "Equipaggiamento da Guerra",
+      "warfareBody": "Ogni pezzo da Guerra porta un Indice di Attacco GUERRA e un Indice di Difesa GUERRA, e questi due indici non hanno alcun effetto contro i mostri. Si applicano solo quando combatti un altro giocatore, in duello, in arena o sul campo di battaglia, dove l'Attacco aumenta il danno che infliggi e la Difesa riduce il danno che subisci, ciascuno fino al proprio tetto massimo. Ogni famiglia di armature è anche un set, e i suoi bonus di set sono a loro volta indici GUERRA o effetti che funzionano solo contro i giocatori, quindi un kit da onore completo non vale nulla contro un boss di dungeon.",
+      "warfareTradeBody": "Questo è lo scambio voluto. L'equipaggiamento da Guerra è costruito per combattere altri giocatori, non come scorciatoia per saltare i livelli dei dungeon: un pezzo da Guerra non porta mai gli indici di combattimento di un epico da dungeon nello stesso slot, e tutto ciò che offre si spende su altri giocatori. Se vuoi tenere testa in arena, compralo. Se vuoi completare le eroiche più in fretta, guadagnati l'equipaggiamento nei dungeon."
     },
     "thornhollowPage": {
       "heading": "Campi di Thornhollow",
       "intro": "Un campo di battaglia classificato 5c5 cattura la bandiera, combattuto in una valletta murata nel bosco antico sotto Thornpeak, dove due rocche in rovina si fronteggiano lungo un burrone e un cortile più antico si trova tra loro, mai conquistato da nessuno dei due. Due squadre da cinque, due rocche, un solo obiettivo: ruba la bandiera nemica e portala a casa prima che loro portino la tua.",
       "queueHeading": "Mettersi in coda",
-      "queueBody": "Apri il pannello dei Campi di Thornhollow ed entra in coda da solo, oppure porta un gruppo fino a cinque e mettetevi in coda insieme: i gruppi restano sempre nella stessa squadra, e i posti rimanenti si riempiono con campioni singoli. Quando dieci sono pronti, la partita schiera entrambe le squadre alle loro rocche per un breve schieramento prima che le bandiere entrino in gioco.",
+      "queueBody": "I Campi di Thornhollow si aprono al livello 20, e ogni membro di un gruppo deve raggiungerlo prima che il gruppo possa iscriversi. Apri il pulsante GcG e scegli la linguetta Campi di Thornhollow, che è quella su cui si apre, poi entra in coda da solo, oppure porta un gruppo fino a cinque e iscrivetevi insieme: i gruppi restano sempre nella stessa squadra, e i posti rimanenti si riempiono di campioni solitari. Quando dieci sono pronti, l'incontro colloca entrambe le squadre alle loro fortezze per un breve raduno prima che le bandiere si attivino. Se un gruppo di quattro o cinque dovesse altrimenti trovarsi di fronte solo iscritti solitari, l'accoppiatore trattiene brevemente l'incontro per vedere se si presenta un secondo gruppo, quindi un gruppo di quella dimensione a volte attende qualche istante in più prima che i cancelli si aprano. Quell'attesa è breve e alla fine cede sempre, così nessuno resta piantato in coda per essa.",
       "fieldHeading": "Il campo",
       "fieldBody": "Un campo a cielo aperto e murato, diviso in tre settori: ogni squadra ha il proprio campo davanti alla sua rocca, e tra le due si trova il murato Cortile in Rovina. Due mura di cinta attraversano l'intera larghezza, e ogni passaggio tra i settori attraversa un varco conteso: l'ampio cancello principale, oppure il corpo di guardia, una piccola stanza a cavallo del muro le cui porte sfalsate costringono a una deviazione oltre un angolo da imboscata. Ogni rocca è sigillata tranne il suo ingresso, quindi ogni corsa con la bandiera inizia e finisce attraverso la stessa apertura, e una bassa barricata spezza la carica diretta verso di essa. Il cortile custodisce la rovina del cuore cavo e le due Rune di Scatto ai lati; le altre due attendono lungo gli approcci alle bandiere. Una Runa di Battaglia o di Protezione (più danno inflitto, o meno danno subito, per alcuni secondi) attende all'imbocco del cortile presso ogni cancello principale: entrambe le zone si attivano dalla stessa parte all'inizio della partita e si alternano a ogni conquista.",
       "flagsHeading": "Bandiere",
@@ -4953,10 +5288,13 @@ export const it_IT: EnTranslations = {
       "respawnBody": "La morte mantiene il rito classico: il tuo corpo resta dove è caduto finché TU non liberi lo spirito, che risorge nel cimitero recintato accanto alla tua rocca, protetto lì fino alla prossima ondata di rientro della tua squadra. L'ondata risolleva insieme ogni spirito in attesa, e le due ondate delle squadre sono deliberatamente sfalsate, così lo scontro non si azzera mai del tutto in una volta. Non c'è corsa al cadavere né patto con il Guaritore degli Spiriti: liberati, aspetta l'ondata, combatti.",
       "carrierHeading": "Portare la bandiera",
       "carrierBody": "Un portabandiera che trattiene troppo a lungo la bandiera nemica diventa sempre più vulnerabile, subendo danni crescenti finché la bandiera non viene catturata, lasciata cadere o restituita. Nascondersi con la bandiera è un piano perdente; portarla di corsa a casa è quello vincente.",
+      "leavingHeading": "Andarsene presto, e occupare un posto vuoto",
+      "leavingBody": "Abbandonare un incontro in corso significa disertarlo, e una scala classificata non può premiare chi stacca la spina su un punteggio perdente: un disertore si prende la sconfitta e la classifica che ne consegue lì per lì, lascia cadere la bandiera se la portava, e la sua squadra combatte con un giocatore in meno. È proprio a questo che serve il posto vuoto. Finché a un incontro manca un combattente, la coda può offrire la sedia a chi sta aspettando, ed è sempre un'offerta che accetti o rifiuti, non una teletrasportazione che ti capita; rifiutare non ti costa nulla e la passa al prossimo in fila. Vengono interpellati solo gli iscritti solitari, così un gruppo che si è iscritto insieme non viene mai diviso per tappare un buco.",
+      "backfillNote": "Prendere un posto di rincalzo è privo di rischio per scelta: entri in un punteggio a cui non hai preso parte, quindi l'incontro non tocca la tua classifica in alcun senso, vittoria o sconfitta, e lasciarlo non ti costa nulla. L'offerta inoltre smette di arrivare quando un incontro è abbastanza vicino alla fine da rendere ininfluente un arrivo, così non vieni mai messo a sedere nel finale di qualcun altro.",
       "ladderHeading": "La classifica",
-      "ladderBody": "Ogni partita modifica un indice del campo di battaglia persistente per personaggio, che tu vinca o perda, e la classifica storica premia i campioni del reame. Vittorie e sconfitte combattute con onore pagano anche Onore tramite il sistema Guerra.",
-      "rewardsHeading": "What a match pays",
-      "rewardsBody": "Every finished match pays Honor: more for a win, a consolation for a loss or a draw, plus a small amount for every killing blow you land and every one you help with, so fighting away from the flags is still worth doing. Your first win of each day pays a bonus on top, and the panel tells you while that bonus is still waiting for you. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset. Meeting the same team over and over pays less for the match itself after the first, quickly settling at a floor instead of falling away to nothing, and a forfeited match pays nothing at all. Spend what you earn at either Warfare quartermaster."
+      "ladderBody": "Ogni incontro muove una classifica di campo di battaglia persistente e legata al personaggio, vittoria o sconfitta, e la tabella di tutti i tempi ordina i campioni del reame.",
+      "rewardsHeading": "Cosa paga una partita",
+      "rewardsBody": "Ogni partita conclusa paga Onore: di più per una vittoria, una consolazione per una sconfitta o un pareggio, più una piccola quantità per ogni colpo di grazia che infliggi e ogni assistenza che fornisci, così combattere lontano dalle bandiere vale comunque la pena. La tua prima vittoria di ogni giorno paga un bonus in più, e il pannello ti avvisa finché quel bonus ti sta ancora aspettando. Quel giorno è tutto dell'Onore, e si rinnova secondo il proprio orologio anziché con il reset delle istanze del reame. Affrontare la stessa squadra più e più volte paga sempre meno per la partita in sé dopo la prima, assestandosi rapidamente su un minimo anziché scendere fino a zero, e una partita abbandonata non paga assolutamente nulla. Spendi ciò che guadagni presso uno dei due quartiermastri della Guerra."
     },
     "valeCupPage": {
       "heading": "La Coppa della Valle",
@@ -4993,11 +5331,11 @@ export const it_IT: EnTranslations = {
       "howHeading": "Come funzionano le imprese",
       "howBody": "Le imprese si ottengono e si custodiscono con un personaggio alla volta, così ogni eroe che giochi costruisce un Libro tutto suo; solo la Classifica del reame raccoglie la tua Fama su tutti i personaggi che giochi, e conta ogni impresa una volta sola. Ogni impresa dichiara chiaramente che cosa ti chiede, direttamente nel Libro delle Imprese in gioco, così sai sempre a che cosa dare la caccia, e puoi seguire quelle che ti stanno a cuore per tenerle in vista mentre giochi. Poche restano segrete e si rivelano soltanto una volta ottenute. Il Libro si mantiene anche onesto: tutto ciò che il tuo passato può dimostrare, te lo accredita all'istante, così un veterano non lo apre mai su una pagina vuota; solo le imprese a conteggio iniziano il loro computo da zero.",
       "renownHeading": "Fama",
-      "renownBody": "La Fama è il punteggio dietro al Libro. Ogni impresa che ottieni vale una quantità stabilita, e il tuo totale sale soltanto, quindi una settimana tranquilla non ti fa perdere terreno. Una manciata di imprese dipende dalla fortuna piuttosto che dall'abilità, e le Prodezze sono un onore a sé, quindi nessuna delle due conferisce Fama. Le imprese senza Fama contano ancora verso il completamento nel tuo Libro; semplicemente non segnano mai.",
+      "renownBody": "La Fama è il punteggio dietro il Libro. Ogni impresa che ottieni vale una quantità fissa, e il tuo totale non fa che salire, così una settimana tranquilla non ti costa mai terreno. Una manciata dipendono dalla fortuna più che dall'abilità, altre imprese di collezione sono la ricompensa di sé stesse, e le Prodezze sono un onore a parte, quindi nessuna di quelle vale alcuna Fama. Le imprese senza Fama contano comunque per il completamento del tuo Libro; semplicemente non danno mai punti. Le Prodezze sono l'unica eccezione, tenute del tutto fuori dal conteggio.",
       "rewardsHeading": "Titoli e bordi",
-      "rewardsBody": "Le ricompense sono tutte estetiche, ed è proprio questo il punto. Alcune imprese concedono un titolo da indossare o un bordo che incornicia il tuo nome, e mai nulla che renda più forte il tuo eroe. Scegli il titolo che preferisci dal Libro delle Imprese e ti seguirà sulla targhetta del nome, in chat e in classifica, sotto gli occhi di tutti.",
+      "rewardsBody": "Le ricompense sono tutte pura apparenza, ed è proprio questo il punto. Alcune imprese concedono un titolo da indossare o un bordo per incorniciare il tuo nome, e mai nulla che renda il tuo eroe più forte. Scegli il titolo e il bordo che preferisci dal Libro delle Imprese: il titolo ti accompagna sulla targhetta del nome, in chat e nelle classifiche, sotto gli occhi di tutti, e il bordo disegna i propri colori attorno alla targhetta e al ritratto.",
       "chroniclesHeading": "Cronache",
-      "chroniclesBody": "Ogni zona custodisce la propria Cronaca, una raccolta di imprese messa insieme da un Cronista del luogo che si è preso l'impegno di registrare ogni viandante di passaggio. Saul della Valle di Eastbrook è il primo di loro. Una Cronaca è divisa in capitoli, e sei libero di affrontarli nell'ordine che preferisci.",
+      "chroniclesBody": "Ogni zona tiene la propria Cronaca, un insieme di imprese raccolte da un cronista locale che si è preso il compito di registrare ogni viaggiatore che passa. Saul della Valle di Eastbrook è il primo di loro, Osric Fenn tiene la Cronaca della Palude a Fenbridge, là nel Mirefen, e Zenzie registra la Cronaca delle Vette su a Highwatch. Una Cronaca è divisa in capitoli, e sei libero di affrontarli nell'ordine che preferisci.",
       "featsHeading": "Prodezze",
       "featsBody": "Le Prodezze sono uno scaffale a parte: memorie di un'eredità e primati del mondo, le imprese legate a un'epoca ormai passata o a un momento che accadrà una volta sola. Non valgono Fama e restano fuori dal conteggio di completamento, custodite per sempre a ricordo di ciò che è stato compiuto.",
       "catalogHeading": "Il registro completo delle imprese",
@@ -5021,10 +5359,30 @@ export const it_IT: EnTranslations = {
         "exploration": "Esplorazione",
         "feat": "Prodezze"
       },
-      "bookHeading": "Inside the Book",
-      "bookBody": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles shelf, where you choose the one you wear.",
-      "platformHeading": "Steam and Epic achievements",
-      "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
+      "bookHeading": "Dentro il Libro",
+      "bookBody": "Il Libro ordina ogni impresa in categorie tra cui puoi passare liberamente, con una casella di ricerca e filtri per tutto: per ciò che hai ottenuto, per ciò che non hai ancora ottenuto e per le imprese quasi completate. Una fascia Recenti in alto raccoglie i tuoi ultimi sblocchi, e cliccarne uno ti porta dritto alla sua scheda, proprio come cliccare il nome di un'impresa che qualcuno posta in chat. Accanto, Ci sei quasi ti indica la manciata di imprese a cui manca meno per essere completate. In un reame ogni impresa porta anche la propria rarità, la quota di avventurieri che l'ha ottenuta, così puoi vedere a colpo d'occhio quali sono comuni e quali una vera scalata; il mondo offline non ha una popolazione da contare, quindi non mostra nulla. In fondo alla fila si trova lo scaffale dei Titoli, dove scegli quello da indossare.",
+      "platformHeading": "Obiettivi di Steam ed Epic",
+      "platformBody": "Se colleghi un account Steam o Epic Games dall'app desktop, le imprese che ottieni vengono rispecchiate all'esterno come obiettivi su quell'account. Il mondo di gioco resta l'autorità: l'impresa la ottieni qui, viene registrata sul tuo personaggio, e l'obiettivo segue dopo. Non ogni impresa ha un obiettivo corrispondente, e se uno non arriva subito recupera al prossimo accesso. Collegare è sempre e solo un collegamento, mai un modo per accedere."
+    },
+    "reliquaryPage": {
+      "intro": "Il Reliquiario è il museo dei bottini unici che hai catalogato: i pezzi più ambiti dei dungeon, i trofei di professione, le cavalcature, gli aspetti delle armi e i titoli. Fa coppia con il Libro delle Imprese come una sala dei trofei fa coppia con un libro delle conquiste.",
+      "howHeading": "Come funziona la collezione",
+      "howBody": "Apri Il Reliquiario in gioco (Maiusc+X di base). Ogni scaffale custodisce pagine di reliquie uniche. Riempi una sagoma quando ottieni quel pezzo per la prima volta con quel personaggio, e minia una pagina quando ogni sua reliquia è riempita. Alcune pagine portano l'etichetta Ritirata o Personale: restano fuori dal completamento, quindi non bloccano mai uno scaffale né l'intero catalogo. I ritrovamenti in tempo reale mostrano un avviso e aggiornano la finestra aperta; i progressi sono legati al personaggio, tranne gli aspetti delle armi, che sono cosmetici dell'account.",
+      "ranksHeading": "Gradi di Curatore",
+      "ranksBody": "I gradi di Curatore salgono con ogni reliquia unica catalogata e concedono soltanto titoli e bordi cosmetici. Non danno mai potenza in combattimento, probabilità di bottino o compensazione per la sfortuna. Gli aspetti delle armi legati all'account non contano per il grado di Curatore, così il prestigio resta legato al personaggio, e nemmeno le reliquie delle pagine Ritirate o Personali vi contribuiscono.",
+      "retiredTag": "Ritirata",
+      "personalTag": "Personale",
+      "retiredNote": "Queste reliquie non si possono più conquistare. La pagina rende onore ai veterani che le conservano e non conta ai fini del completamento né del grado di Curatore.",
+      "personalNote": "Ogni personaggio può possedere solo la propria. La pagina non conta ai fini del completamento né del grado di Curatore.",
+      "catalogHeading": "Catalogo delle pagine",
+      "catalogBody": "Tutte le pagine scritte del Reliquiario e i nomi delle reliquie che contengono. Questo elenco riporta solo nomi privi di spoiler: apri Il Reliquiario in gioco per vedere i tuoi progressi, le tue conquiste e le sagome.",
+      "spoilerNote": "Lo storico personale dei primi ritrovamenti, il numero di conquiste e lo stato mancante o posseduto restano nel client di gioco. Il wiki non pubblica mai la collezione di un giocatore.",
+      "shelfHeading": "{label} ({count})",
+      "shelf": {
+        "conquerors": "Conquistatori",
+        "professions": "Professioni",
+        "horizons": "Orizzonti"
+      }
     },
     "wishPage": {
       "heading": "Cose che avrei voluto sapere",
@@ -5034,7 +5392,7 @@ export const it_IT: EnTranslations = {
       "i2Title": "Morire ti costa pochissimo",
       "i2Body": "Quando cadi, risorgi come spettro al cimitero più vicino. Torna di corsa al tuo corpo per rivivere senza penalità, oppure accetta il risveglio immediato del Custode Pallido e porta con te una debolezza passeggera in cambio della comodità. Non si perde mai esperienza, equipaggiamento o monete, quindi puoi correre rischi e imparare in tutta sicurezza.",
       "i3Title": "I talenti non sono una trappola",
-      "i3Body": "Si sbloccano al livello 10 e si reimpostano quando vuoi, fuori dal combattimento, quindi le tue scelte iniziali non sono mai permanenti.",
+      "i3Body": "Il tuo primo talento arriva al livello 5, e ciascuna delle sei file è una singola scelta fra tre, quindi una build è una manciata di decisioni che abbracci con un colpo d'occhio. Puoi azzerarla ogni volta che sei fuori dal combattimento e non in un incontro in arena, quindi nulla di ciò che scegli presto ti chiude dentro.",
       "i4Title": "Segui la scia delle missioni",
       "i4Body": "Le missioni sono il modo più rapido per salire di livello e ti conducono per il mondo. Quando non sai dove andare, trova il prossimo indicatore.",
       "i5Title": "Tieni aggiornato il tuo equipaggiamento",
@@ -5056,37 +5414,37 @@ export const it_IT: EnTranslations = {
       "posterAlt": "{name}"
     },
     "editorPage": {
-      "intro": "A map editor of your own, in the browser. Shape the land, plant props and camps, then drop into the result and walk around it.",
-      "whereTitle": "Where to find it",
-      "whereBody": "The editor is a page of its own at /editor, apart from the game. It opens on a fresh, untitled map built from the world you already know, so you always start with real ground under your feet. A short guided tour runs the first time you visit, and Help in the top bar can run it again.",
-      "buildTitle": "What you can build",
-      "buildBody": "Tools live on the rail down the left, each with a single-letter shortcut shown on its button. Pick one and work straight on the map in front of you. Ctrl+Z undoes and Ctrl+Y redoes, so nothing you try is permanent.",
-      "toolLandTitle": "Shape the land",
-      "toolLandBody": "Raise, lower, smooth, and flatten the ground under a brush whose size you set as you go, with a strength dial on the raising, lowering, and smoothing passes.",
-      "toolSurfaceTitle": "Paint and flood",
-      "toolSurfaceBody": "Paint biome ground cover over a zone default, and set the one water level that every lake the map declares rises or falls to.",
-      "toolPlaceTitle": "Place props",
-      "toolPlaceBody": "Drop pieces from the built-in asset catalog onto the ground. The select tool, the first button on the rail, picks a placed piece back up so you can move, rotate, scale, or duplicate it, and the erase tool lifts one off the map when you change your mind. A placement can be given collision so a player walks around it instead of through it. For the broad strokes, a procedural panel sits under the same tool: scatter a whole category of assets across an area in one go, or raise a run of hills, both worked from the map seed, so the same settings always give you the same result.",
-      "toolCampTitle": "Camps and a spawn point",
-      "toolCampBody": "Lay out mob camps that come alive in playtest, and set the spot where a playtest drops the player in.",
-      "toolBlockerTitle": "Invisible walls",
-      "toolBlockerBody": "Drag blocker walls that stop movement without showing anything, for an edge you want quietly closed off.",
-      "toolRegionTitle": "Copy a whole area",
-      "toolRegionBody": "Box-select terrain and placed assets with the region tool, then paste that selection somewhere else on the map.",
-      "viewsTitle": "Two views of the same map",
-      "viewsBody": "The 3D viewport draws your map with the real game renderer, so what you see is what you get: drag to orbit, scroll to zoom. The 2D overhead map is the plan view, better for moving zone markers such as hubs, graveyards, and points of interest, and for framing a large area before you sculpt it. The toggle sits in the top bar.",
-      "playtestTitle": "Play your map",
-      "playtestBody": "Playtest hands the map to the game and drops you into it as a warrior. Everything you made is underfoot: camps spawn, blocker walls hold, and placements with collision push you around them. When you have seen enough, come back to the editor and keep working.",
-      "sandboxTitle": "A sandbox, not the live world",
-      "sandboxBody": "Custom maps never change the game everyone else is playing. A playtest runs offline in your own browser and never talks to the server, so nothing that happens in it reaches your characters or the shared world.",
-      "saveTitle": "Saving your work",
-      "saveBody": "Ctrl+S saves, and while there are unsaved edits a dot sits beside the map name and the Save button calls for your attention. Without an account the editor still works: maps are kept in your own browser, an autosave can be switched on, and Export writes a map out as a plain JSON file that Import reads straight back.\n\nSigned in with your game account, a save also goes to the server, so your maps follow you to another machine. The Open window has one tab for the drafts in this browser and another for the maps saved to your account. If the editor shows an offline badge, sign in to the game in another tab, then reload the editor.",
-      "shareTitle": "Publishing and forking",
-      "shareBody": "Maps saved to your account start private. From the Open window you can publish one, which lists it for anyone to browse, and unpublish it again at any time. The Public tab in that same window browses everything other players have published: Open loads one so you can look around how it was made, and Fork drops a private copy into your own list to change however you like. A copy is a new map: editing it never touches the original.\n\nThere is a limit on how many maps one account may keep, so tidy up the experiments you are done with.",
-      "uploadTitle": "Bringing your own models",
-      "uploadBody": "Signed in, the Upload button takes a GLB model of your own and adds it to the asset browser beside the built-in catalog, ready to place like any other prop. Uploads are stored on your account, count against a size and storage limit, and can be deleted from the asset browser when you no longer want them.",
-      "helpTitle": "Learning the tools",
-      "helpBody": "Help in the top bar opens a reference covering every tool, the keyboard shortcuts, and the mouse moves, and it can restart the guided tour at any time. The rest is poking at things: undo is always a keystroke away, and Export gives you a copy of a map you can always come back to."
+      "intro": "Un editor di mappe tutto tuo, nel browser. Modella il terreno, pianta oggetti di scena e campi, poi entra nel risultato e cammina al suo interno.",
+      "whereTitle": "Dove trovarlo",
+      "whereBody": "L'editor è una pagina a sé su /editor, separata dal gioco. Si apre su una mappa nuova e senza titolo costruita a partire dal mondo che già conosci, così parti sempre con un terreno vero sotto i piedi. Un breve tour guidato parte alla tua prima visita, e Aiuto nella barra in alto può farlo ripartire.",
+      "buildTitle": "Che cosa puoi costruire",
+      "buildBody": "Gli strumenti si trovano nella barra a sinistra, ciascuno con una scorciatoia di una sola lettera mostrata sul suo pulsante. Scegline uno e lavora direttamente sulla mappa che hai davanti. Ctrl+Z annulla e Ctrl+Y ripete, così nulla di ciò che provi è permanente.",
+      "toolLandTitle": "Modella il terreno",
+      "toolLandBody": "Alza, abbassa, leviga e appiattisci il terreno sotto un pennello di cui imposti la dimensione mentre lavori, con un cursore di intensità per i passaggi di innalzamento, abbassamento e levigatura.",
+      "toolSurfaceTitle": "Dipingi e allaga",
+      "toolSurfaceBody": "Dipingi la copertura del terreno del bioma sopra quella predefinita della zona, e imposta l'unico livello dell'acqua a cui sale o scende ogni lago dichiarato dalla mappa.",
+      "toolPlaceTitle": "Posiziona oggetti di scena",
+      "toolPlaceBody": "Trascina pezzi dal catalogo di asset integrato sul terreno. Lo strumento Seleziona, il primo pulsante della barra, riprende in mano un pezzo posizionato così puoi spostarlo, ruotarlo, ridimensionarlo o duplicarlo, e lo strumento Cancella lo toglie dalla mappa quando cambi idea. Un posizionamento può ricevere la collisione così un giocatore lo aggira invece di attraversarlo. Per i tratti larghi, sotto lo stesso strumento si trova un pannello procedurale: dissemina un'intera categoria di asset su un'area in un colpo solo, oppure solleva una catena di colline, entrambi calcolati a partire dal seme della mappa, così le stesse impostazioni danno sempre lo stesso risultato.",
+      "toolCampTitle": "Campi e un punto di comparsa",
+      "toolCampBody": "Disponi campi di mob che prendono vita nella prova di gioco, e imposta il punto in cui la prova di gioco fa comparire il giocatore.",
+      "toolBlockerTitle": "Muri invisibili",
+      "toolBlockerBody": "Trascina muri invisibili che bloccano il movimento senza mostrare nulla, per un bordo che vuoi chiudere silenziosamente.",
+      "toolRegionTitle": "Copia un'intera area",
+      "toolRegionBody": "Seleziona con un riquadro il terreno e gli asset posizionati usando lo strumento Regione, poi incolla quella selezione altrove sulla mappa.",
+      "viewsTitle": "Due viste della stessa mappa",
+      "viewsBody": "La visuale 3D disegna la tua mappa con il vero renderer di gioco, quindi quello che vedi è quello che ottieni: trascina per orbitare, usa la rotellina per lo zoom. La mappa 2D dall'alto è la vista in pianta, migliore per spostare i contrassegni di zona come hub, cimiteri e punti di interesse, e per inquadrare una grande area prima di scolpirla. L'interruttore si trova nella barra in alto.",
+      "playtestTitle": "Gioca la tua mappa",
+      "playtestBody": "La Prova di gioco consegna la mappa al gioco e ti fa entrare come guerriero. Tutto ciò che hai creato è sotto i tuoi piedi: i campi generano mob, i muri invisibili reggono, e i posizionamenti con collisione ti costringono ad aggirarli. Quando ne hai visto abbastanza, torna all'editor e continua a lavorare.",
+      "sandboxTitle": "Un ambiente di prova, non il mondo condiviso",
+      "sandboxBody": "Le mappe personalizzate non modificano mai il gioco che tutti gli altri stanno giocando. Una prova di gioco viene eseguita offline nel tuo browser e non comunica mai con il server, quindi nulla di ciò che vi accade raggiunge i tuoi personaggi o il mondo condiviso.",
+      "saveTitle": "Salvare il tuo lavoro",
+      "saveBody": "Ctrl+S salva, e finché ci sono modifiche non salvate un punto compare accanto al nome della mappa e il pulsante Salva richiama la tua attenzione. Anche senza un account l'editor funziona: le mappe restano nel tuo browser, puoi attivare il salvataggio automatico, ed Esporta scrive la mappa in un semplice file JSON che Importa rilegge direttamente.\n\nAccedendo con il tuo account di gioco, un salvataggio va anche sul server, così le tue mappe ti seguono su un'altra macchina. La finestra Apri Mappa ha una scheda per le bozze in questo browser e un'altra per le mappe salvate sul tuo account. Se l'editor mostra il badge Offline, accedi al gioco in un'altra scheda, poi ricarica l'editor.",
+      "shareTitle": "Pubblicare e fare il fork",
+      "shareBody": "Le mappe salvate sul tuo account partono private. Dalla finestra Apri Mappa puoi pubblicarne una, il che la elenca per la consultazione di chiunque, e annullarne la pubblicazione in qualsiasi momento. La scheda Mappe Pubbliche nella stessa finestra permette di sfogliare tutto ciò che altri giocatori hanno pubblicato: Apri ne carica una così puoi vedere come è stata realizzata, e Fork ne inserisce una copia privata nel tuo elenco da modificare come preferisci. Una copia è una mappa nuova: modificarla non tocca mai l'originale.\n\nC'è un limite a quante mappe un account può conservare, quindi metti in ordine gli esperimenti che hai finito di usare.",
+      "uploadTitle": "Portare i tuoi modelli",
+      "uploadBody": "Una volta effettuato l'accesso, il pulsante Carica Asset prende un tuo modello GLB e lo aggiunge al catalogo degli asset accanto a quello integrato, pronto per essere posizionato come qualsiasi altro oggetto di scena. I caricamenti vengono conservati sul tuo account, contano ai fini di un limite di dimensione e di archiviazione, e possono essere eliminati dal catalogo degli asset quando non ti servono più.",
+      "helpTitle": "Imparare gli strumenti",
+      "helpBody": "Aiuto nella barra in alto apre un riferimento che copre ogni strumento, le scorciatoie da tastiera e i movimenti del mouse, e può far ripartire il tour guidato in qualsiasi momento. Per il resto si tratta di provare le cose: annullare è sempre a un tasto di distanza, ed Esporta ti dà una copia della mappa a cui potrai sempre tornare."
     },
     "models": {
       "title": "Visualizzatore di modelli 3D",
@@ -5106,7 +5464,7 @@ export const it_IT: EnTranslations = {
     "gear": {
       "intro": "L'equipaggiamento è ciò che il tuo personaggio indossa e gli oggetti che porta con sé. Un equipaggiamento migliore è il modo più costante per diventare più forte, e ne raccogli gran parte semplicemente giocando.",
       "slotsTitle": "Cosa puoi equipaggiare",
-      "slotsBody": "Hai uno slot per l'arma, sette slot per l'armatura e tre slot per i gioielli: un collo e due dita. Ogni classe può usare solo certe armi e indossa armatura fino al proprio peso, stoffa, cuoio o maglia, perciò i miglioramenti adatti a te sono quelli fatti per la tua classe. I gioielli non hanno alcun peso: qualsiasi classe indossa ciò che guadagna. Detto questo, riempi ogni slot con il pezzo migliore che trovi.",
+      "slotsBody": "Hai uno slot per l'arma principale, uno slot per la mano secondaria, sette slot di armatura e tre slot di gioielli: un collo e due dita. Ogni classe può usare solo certe armi e indossa armatura fino al proprio peso, stoffa, cuoio o maglia, quindi i miglioramenti che ti servono sono quelli fatti per la tua classe. I gioielli non hanno alcun peso: qualsiasi classe indossa ciò che si guadagna. Entro questo, riempi ogni slot con il pezzo migliore che trovi.",
       "slotMainhand": "Arma",
       "slotHelmet": "Testa",
       "slotNeck": "Collo",
@@ -5118,7 +5476,7 @@ export const it_IT: EnTranslations = {
       "slotFeet": "Piedi",
       "slotFinger": "Dito",
       "bagsTitle": "Borse e spazio di carico",
-      "bagsBody": "Tutto ciò che raccogli viaggia in un unico zaino condiviso, che ingrandisci equipaggiando borse. La finestra delle borse tiene quattro slot per borse: clicca una borsa nello zaino per infilarla in uno slot libero, e ogni borsa che indossi aggiunge il proprio spazio. Le borse semplici sono merce da poco dei venditori, quelle più capienti cadono dalle bestie, e le migliori vengono dai boss dei dungeon, così il tuo spazio di carico cresce di pari passo con il tuo equipaggiamento.",
+      "bagsBody": "Tutto ciò che raccogli viaggia in uno zaino condiviso, e lo allarghi equipaggiando borse. La tua finestra delle borse tiene quattro slot: clicca una borsa nello zaino per infilarla in uno slot libero, e ogni borsa che indossi aggiunge il proprio spazio. Le borse semplici sono merce da mercante a buon mercato, quelle più capienti cadono dalle bestie, e le più pregiate vengono dai boss dei dungeon, così la tua capacità di carico cresce di pari passo con l'equipaggiamento. Tutto ciò che si impila dice sulla propria descrizione quante unità ne tiene uno slot, ed è così che sai in anticipo che una bella scorta di pozioni te ne costerà due.",
       "qualityTitle": "La qualità, a colpo d'occhio",
       "qualityBody": "Ogni oggetto ha una qualità e il suo nome assume il colore corrispondente, così puoi capirne il valore a colpo d’occhio. Dal più comune al più prezioso:",
       "qualityPoor": "Scadente",
@@ -5132,18 +5490,18 @@ export const it_IT: EnTranslations = {
       "upgradeBody": "Sostituire un vecchio pezzo con un miglioramento fresco fa di più per te che giocare alla perfezione con un equipaggiamento che hai superato. Quando cade qualcosa di migliore o una missione te lo offre, prendilo. Non conservare i tuoi oggetti buoni per dopo.",
       "itemLevelBody": "Per confrontare rapidamente due pezzi, attiva Mostra livello oggetto nelle opzioni. L’equipaggiamento di provenienza nota, ottenuto da nemici, missioni e mestieri, mostra un livello oggetto: un unico valore che ne indica approssimativamente la potenza in base alla fonte e rende immediata la scelta del miglior potenziamento, anche tra slot diversi. I pezzi senza tale provenienza, come gli articoli base dei mercanti e l’equipaggiamento iniziale, non mostrano alcun livello; è normale.",
       "sourcesTitle": "Da dove arriva l'equipaggiamento",
-      "sourcesBody": "Gran parte dei tuoi primi miglioramenti sono ricompense delle missioni, perciò conviene portarle a termine invece di macinare nemici. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i venditori in città vendono solide basi, gli artigiani trasformano i materiali raccolti in pezzi indossabili, e il mercato dei giocatori ti permette di comprare da altri avventurieri. In cima alla scalata, due valute in marchi comprano equipaggiamento introvabile altrove: i Sigilli d'Incursione presso il custode delle incursioni, e i Marchi Eroici presso il Quartiermastro Eroico.",
+      "sourcesBody": "La maggior parte dei tuoi primi miglioramenti sono ricompense di missione, quindi conviene completare missioni invece di farmare. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i mercanti in città vendono solide basi, gli artigiani trasformano i materiali raccolti in pezzi indossabili, e il mercato dei giocatori ti permette di comprare da altri avventurieri. In cima alla salita, tre valute guadagnate comprano equipaggiamento introvabile altrove: i Sigilli d'Incursione dal custode delle incursioni, i Sigilli Eroici dal quartiermastro eroico, e l'Onore dai quartiermastri dell'onore.",
       "soulboundTitle": "Vincolato all'anima: tuo e tuo soltanto",
       "soulboundBody": "Alcune ricompense speciali sono vincolate all'anima, legate al tuo personaggio dal momento in cui le ottieni. Un oggetto vincolato all'anima non può essere scambiato, spedito, venduto a un venditore o messo in vendita sul mercato; è tuo e tuo soltanto. Oggi questa protezione custodisce i gettoni premio come i Marchi Eroici, mentre l'equipaggiamento che vinci è tuo da scambiare, vendere o condividere liberamente.",
       "uniqueTitle": "Unico Equipaggiato: un solo leggendario per tipo",
       "uniqueBody": "Gli oggetti leggendari sono Unico Equipaggiato: il tuo personaggio può indossare solo una copia di un dato leggendario alla volta, e la sua versione eroica conta come lo stesso oggetto. Una seconda copia può restare nelle tue borse, in banca o sul mercato, ma cercare di indossarle entrambe insieme viene rifiutato, e la descrizione porta un'etichetta dorata Unico Equipaggiato così puoi vedere la regola prima di pianificare una build basata su due copie.",
       "setsTitle": "Le tenute e i loro bonus",
-      "setsBody": "Alcune armature arrivano in famiglie coordinate, più pezzi tagliati per apparire e combattere come una cosa sola. Indossa abbastanza pezzi di una famiglia insieme e la tenuta si risveglia, concedendo bonus che si aggiungono alle statistiche di ciascun pezzo, e più pezzi indossi più diventa forte. Alcune di queste famiglie compaiono come bottino ambito mentre sali di livello; le più grandi arrivano dai contenuti di gruppo più ardui vicino al limite di livello, perciò inseguire una tenuta completa è un classico obiettivo di fine gioco.",
+      "setsBody": "Certe armature vengono in famiglie abbinate, più pezzi tagliati per apparire e combattere come uno solo. Indossa abbastanza pezzi di una famiglia insieme e il set si risveglia, concedendo bonus sopra le statistiche proprie di ciascun pezzo, e più pezzi indossi più diventa forte. Alcune di queste famiglie compaiono come bottino ambito mentre sali di livello, e le più grandi vengono dal contenuto di gruppo più duro vicino al livello massimo, quindi inseguire un set completo è un classico obiettivo di fine gioco. Il combattimento fra giocatori ha famiglie abbinate tutte sue, comprate un pezzo alla volta con l'Onore; si risvegliano a conteggi di pezzi diversi da quelli delle famiglie di bottino, e i loro bonus rispondono solo quando il nemico è un altro giocatore.",
       "consumablesTitle": "Consumabili",
       "consumablesIntro": "Alcuni oggetti si usano una sola volta per un beneficio immediato. Sono un'assicurazione economica, perciò tienine qualcuno a portata di mano.",
-      "consumablesPotions": "Le pozioni ripristinano salute o mana nell'istante in cui le usi, anche in pieno scontro, il che le rende una salvezza decisiva quando un attacco va storto. Condividono un breve tempo di recupero, perciò pianifica un buon momento per usarle.",
+      "consumablesPotions": "Le pozioni ripristinano salute o mana nel momento in cui le usi, anche in pieno combattimento, il che le rende un salvataggio decisivo quando un pull va storto. Tutte le pozioni condividono un unico tempo di recupero di un paio di minuti, quindi hai un buon momento per combattimento invece di una catena. Ripristinano anche meno che sedersi a mangiare o bere, ed è il prezzo di non sedersi. Le pozioni vengono in livelli tagliati per ogni tratto del mondo, quindi porta il livello fatto per il tuo: una vecchia pozione di livello basso è una scheggia su un personaggio cresciuto.",
       "consumablesFood": "Cibo e bevande ti ristorano mentre ti siedi a riposare tra uno scontro e l'altro. Mangiare recupera salute, bere recupera mana, e riposare in questo modo è gratuito. Siediti per qualche secondo dopo uno scontro duro invece di lanciarti nel successivo curato a metà.",
-      "consumablesElixirs": "Gli elisir concedono un potenziamento temporaneo mentre sei all'avventura, un piccolo vantaggio che aiuta quando vuoi spingerti un po' oltre.",
+      "consumablesElixirs": "Gli elisir concedono un beneficio temporaneo mentre sei in giro, un piccolo vantaggio che aiuta quando vuoi spingerti un po' oltre. Non condividono il tempo di recupero delle pozioni, quindi puoi berne uno e tenere comunque una pozione curativa di riserva. Due elisir della stessa statistica non si sommano, e l'ultimo che bevi è quello che ti resta.",
       "fishingTitle": "Pesca",
       "fishingBody": "La pesca è un sereno cambio di ritmo. Equipaggia una canna da pesca, usala accanto ad acque aperte e tira su ciò che abbocca. Per lo più catturi pesci che sono cibo che puoi mangiare, qualche cianfrusaglia da vendere per pochi spiccioli, e di tanto in tanto una preziosa cattura rara. Ciò che trovi dipende dalle acque in cui peschi.",
       "fishingFood": "I pesci che tiri su sono cibo: mangiane uno mentre ti siedi a riposare e ti ripristina la salute, con i pesci più sostanziosi che vengono dalle acque più fredde e profonde a nord. Una lenza nel lago è un modo tranquillo per tenere la sacca rifornita tra uno scontro e l'altro.",
@@ -5151,18 +5509,18 @@ export const it_IT: EnTranslations = {
       "cosmeticsTitle": "Aspetti ed estetica",
       "cosmeticsBody": "Alcune ricompense cambiano solo l'aspetto del tuo personaggio, mai quanto sei forte. Queste skin estetiche ti permettono di distinguerti senza influire sul gioco, perciò indossa quella che preferisci.",
       "cosmeticsRanks": "Gli oggetti estetici hanno i propri gradi di rarità, e i più rari sono una bella cosa da inseguire. Guadagnare un grado superiore sblocca anche gli aspetti sottostanti.",
-      "cosmeticsSkins": "Ci sono due linee estetiche da collezionare. La maggior parte delle classi ha diversi aspetti alternativi, una nuova interpretazione del look della classe che è tua da indossare. Accanto a essi ci sono i chroma: schemi di colore bicolore con nome che ridipingono interamente un aspetto, dai metalli sobri ai vivaci colori imperiali.",
+      "cosmeticsSkins": "L'aspetto del tuo personaggio viene in due linee. La maggior parte delle classi ha diversi aspetti alternativi, una rilettura del look della classe che è tua da indossare. Accanto a essi stanno i chroma: schemi di due colori con un nome proprio che ridipingono un aspetto per intero, dai metalli sobri ai vivaci colori imperiali.",
       "cosmeticsCache": "Alcune di queste provengono da un misterioso scrigno estetico, un premio sigillato che estrae uno di tre gradi di qualità quando lo apri e ti concede l'aspetto corrispondente. È puramente estetico: nulla al suo interno ti rende più forte, solo più bello da vedere.",
       "cosmeticsApply": "Imposta il tuo aspetto attivo dalla riga dell'aspetto nella schermata del personaggio, e passa liberamente tra tutto ciò che hai sbloccato.",
-      "slotOffhand": "Off Hand",
-      "offhandBody": "What the off hand takes depends on your class. A shield goes there, and so does a held focus such as an orb or a tome, or a quiver for a hunter. Classes that can dual wield put a second weapon in it instead, at a price worth knowing: fighting with a weapon in each hand makes your ordinary swings miss noticeably more often, though it leaves your abilities alone. A two-handed weapon normally needs both hands, so equipping one benches whatever the off hand was holding, unless your specialization is one of the rare ones that can carry two of them at once.",
-      "bagsSort": "When the pack gets messy, the Sort button in the bags window tidies it in one press. Partial stacks of the same thing are merged together, and everything is laid back out in a readable order: weapons and armor first, then bags, consumables, tools, and mounts, then crafting materials with each fine grade sitting beside its plain version, then quest items, with grey junk last so you can see at a glance what to sell. Nothing is ever created or lost, only rearranged, so it is always safe to press.",
-      "requiredLevelBody": "Some pieces also carry a required level, shown on the tooltip. You can loot, buy, or be handed such a piece at any level, but you cannot wear it until you get there. The requirement follows where the piece came from rather than its color alone, so a rare you win at your own level is usually wearable straight away, while a hand-me-down from far above you waits in your bags until you catch up.",
-      "sourcesHonor": "Honor is what fighting other players pays, and the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, keep the Warfare stores that Honor alone buys: whole armor families, jewelry, and weapons no coin merchant carries. The arena page covers how the Honor itself is earned.",
-      "sourcesRifts": "Rifts add one more source once you are at the level cap, and a rift is a race: the group that clears one first wins its rewards. That first clear pays gear on top of everything else the run leaves behind, including a Riftbound band cut to your class role, a ring you will not find anywhere else in the world. A group that finishes second still finishes its own run and keeps the credit for the clear; what it forfeits are the first-clear rewards. The rifts page covers the race itself.",
-      "bindOnTradeBody": "A softer version of the same idea also exists: some things bind on trade, meaning they can change hands exactly once and then belong to whoever received them. A crafted piece made on commission binds when the crafter hands it over. A copy under that rule never rides the market or the post, which are anonymous; it passes face to face or not at all, and once it has passed, it is bound. The tooltip says which rule a piece follows, so check before you plan to resell it.",
-      "cosmeticsWeapons": "Weapon skins are a third line, and they change what you carry rather than who carries it. A skin repaints a weapon type, so the look follows whichever sword, staff, or bow you have equipped, and it never touches the weapon's stats, reach, or speed. Skins unlock for your whole account rather than one character, and they come in collections with rarity tiers like everything else. They are offered in the Armory's seasonal collections rather than found out in the world, and the Armory is also where you set them, one per weapon type, rather than from the appearance row. Everyone standing near you sees the skin you are wearing.",
-      "soulboundBodyBound": "A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. That guards prize tokens such as Heroic Marks, and it covers every piece of Warfare gear bought with Honor, so a player-versus-player kit is worn only by the character who earned it. Most of the gear you win from the world is still yours to trade, sell, or share freely."
+      "slotOffhand": "Mano secondaria",
+      "offhandBody": "Ciò che la mano secondaria può tenere dipende dalla tua classe. Vi trova posto uno scudo, così come un focus impugnato quale una sfera o un tomo, o una faretra per un cacciatore. Le classi che possono impugnare un'arma per mano ne mettono invece una seconda, a un prezzo che vale la pena conoscere: combattere con un'arma in ciascuna mano fa mancare i tuoi colpi ordinari sensibilmente più spesso, anche se lascia intatte le tue abilità. Un'arma a due mani normalmente richiede entrambe le mani, quindi equipaggiarne una libera qualunque cosa la mano secondaria stesse tenendo, a meno che la tua specializzazione non sia una delle rare che possono portarne due contemporaneamente.",
+      "bagsSort": "Quando lo zaino diventa disordinato, il pulsante Ordina nella finestra delle borse lo rimette in ordine con un solo clic. Le pile parziali dello stesso oggetto vengono unite insieme, e tutto viene ridisposto in un ordine leggibile: prima armi e armatura, poi borse, consumabili, strumenti e cavalcature, quindi i materiali da fabbricazione con ogni grado pregiato accanto alla propria versione semplice, poi gli oggetti missione, con le cianfrusaglie di qualità Scadente per ultime così puoi vedere a colpo d'occhio cosa vendere. Non viene mai creato o perso nulla, solo riordinato, quindi premerlo è sempre sicuro.",
+      "requiredLevelBody": "Alcuni pezzi portano anche un livello richiesto, indicato nel suggerimento. Puoi saccheggiare, comprare o ricevere un pezzo simile a qualsiasi livello, ma non potrai indossarlo finché non lo raggiungi. Il requisito segue la provenienza del pezzo più che il suo solo colore, quindi un raro che vinci al tuo stesso livello è di solito indossabile subito, mentre un'eredità che arriva da molto più in alto di te aspetta nelle tue borse finché non lo raggiungi.",
+      "sourcesHonor": "L'Onore è ciò che paga il combattere altri giocatori, e i quartiermastri d'onore, FURIA a Eastbrook e il Guerramaresciallo Draven Kole a Highwatch, custodiscono i negozi da Guerra che solo l'Onore può comprare: intere famiglie di armatura, gioielli e armi che nessun mercante vende per monete. La pagina dell'arena spiega come si guadagna l'Onore stesso.",
+      "sourcesRifts": "Gli squarci aggiungono un'altra fonte una volta raggiunto il livello massimo, e uno squarcio è una corsa: il gruppo che lo completa per primo ne vince le ricompense. Quel primo completamento paga equipaggiamento oltre a tutto ciò che la corsa lascia comunque, incluso un Anello dello Squarcio adatto al tuo ruolo di classe, un anello che non troverai da nessun'altra parte nel mondo. Un gruppo che arriva secondo porta comunque a termine la propria corsa e conserva il merito del completamento; ciò che perde sono le ricompense da primo completamento. La pagina degli squarci copre la corsa in sé.",
+      "bindOnTradeBody": "Esiste anche una versione più blanda della stessa idea: alcune cose si vincolano allo scambio, cioè possono cambiare mano esattamente una volta e poi appartengono a chi le ha ricevute. Un pezzo fabbricato su commissione si vincola quando l'artigiano lo consegna. Una copia soggetta a questa regola non passa mai per il mercato o per la posta, che sono anonimi; passa di mano in mano oppure non passa affatto, e una volta passata, è vincolata. Il suggerimento indica quale regola segue un pezzo, quindi controlla prima di pensare di rivenderlo.",
+      "cosmeticsWeapons": "Gli aspetti per le armi sono una terza linea, e cambiano cosa porti piuttosto che chi lo porta. Un aspetto ridipinge un tipo di arma, quindi il look segue qualunque spada, bastone o arco tu abbia equipaggiato, e non tocca mai le statistiche, la portata o la velocità dell'arma. Gli aspetti si sbloccano per l'intero account anziché per un solo personaggio, e arrivano in collezioni con gradi di rarità come tutto il resto. Sono offerti nelle collezioni stagionali dell'Armeria anziché trovati nel mondo, ed è sempre nell'Armeria che li imposti, uno per tipo di arma, anziché dalla riga dell'Aspetto. Chiunque ti stia vicino vede l'aspetto che indossi.",
+      "soulboundBodyBound": "Alcune ricompense speciali sono vincolate all'anima, legate al tuo personaggio dal momento in cui le ottieni. Un oggetto vincolato all'anima non può essere scambiato, spedito, venduto a un venditore o messo in vendita sul mercato; è tuo e tuo soltanto. Questa protezione custodisce i gettoni premio come i Marchi Eroici, e copre ogni pezzo di equipaggiamento da Guerra acquistato con l'Onore, così un kit da giocatore contro giocatore viene indossato solo dal personaggio che se l'è guadagnato. Gran parte dell'equipaggiamento che vinci nel mondo resta tuo da scambiare, vendere o condividere liberamente."
     },
     "professions": {
       "intro": "Oltre al combattimento e alle missioni, il mondo ti ricompensa per il lavoro della terra e della forgia: raccogliere materie prime, trasformarle in equipaggiamento e beni attraverso dieci mestieri artigiani e assumere un'identità come uno dei dieci archetipi che quei mestieri rappresentano.",
@@ -5202,10 +5560,10 @@ export const it_IT: EnTranslations = {
       "colHub": "Hub",
       "colMaster": "Maestro",
       "masterCellFmt": "{name}, {title}",
-      "harvestBodyFamilies": "Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, claws, tusks, silk, venom, cloth, and meat, straight from the corpse alongside its ordinary loot; one press opens both. Where a beast carries more than one workable component, the choice is yours: take everything it can give, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, Pristine Claw, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.",
-      "focusBodyTiers": "Every hub town keeps a Town Focus panel for visiting harvesters: stand in town, open it from beside the minimap, and spread a budget of 10 focus points across the component types you care about. Every 5 points on a component raises its harvest grade one step (two steps at most), and each point adds 10 percent to its yield; unfocused components are never made worse.\n\nYour allocation follows your character everywhere and can be re-aimed on any later visit to town, at a pace you choose. Taking your time is free: the re-aim runs for 1 minute per point you move. Paying a little speeds it up, 15 seconds per point plus 5 copper and 1 Chime Dust per point, and paying in full makes it instant for 25 copper and 5 Chime Dust per point. Only the points you actually move are counted, so nudging a single point is cheap, and a panel you open and close unchanged costs nothing at any tier.",
-      "toolEffectsHeading": "Tool effects",
-      "toolEffectsBody": "A gathering tool has a slot in it, and an enchanter's charm is what goes in. A Gatherer's Cache adds a unit to what a harvest yields; an Artisan's Eye raises the grade of what it pulls up. Tinker Gizzel, Master of the Toolworks in Eastbrook, teaches both to enchanters who have reached 25 skill in the craft, and both are made at his toolworks.\\n\\nA freshly slotted charm carries 20 charges on a common tool and 10 more for every rarity rung above common, so the same charm slotted on an epic pick starts at 50. A charge is spent only when the charm actually changed the outcome, never on a harvest it did not improve, and a slot can be set to ask each use, so the charm waits until you say Use a Charge. Slotting a fresh charm re-mints the slot around the tool you are carrying at that moment, so it fills to what that tool can hold rather than back to some earlier high mark, and a re-slot that would change nothing at all is turned away instead of eating the charm.\\n\\nRunning out of charges does not destroy the charm: the tool's owner refills the slot, 10 charges for each arcane material spent, and which material it asks for follows the better of the tool you are carrying and the best tool that slot has ever been filled by, Chime Dust for a common or uncommon tool, Chime Essence for a rare one, and a Chime Shard for an epic. Leaving the good tool in the bank does not buy a cheaper refill, only a smaller one at the same price; the honest way down to a cheaper rung is to slot a fresh charm while carrying the lesser tool, which re-mints the slot there. If the slot's ceiling sits above what your current tool can fill, the refill stops where that tool stops and tells you to carry the better one. The refill costs half the materials when you are the enchanter who signed the charm, and less again if you are specialized in Enchanting; anyone else pays the full rate. A refill is a short cast, like the rest of the craft family."
+      "harvestBodyFamilies": "La raccolta non si ferma ai nodi. Molte bestie uccise possono essere raccolte una volta ciascuna, primo arrivato primo servito, per pelli, zanne, artigli, difese, seta, veleno, panno e carne, direttamente dalla carcassa insieme al bottino ordinario; una pressione apre entrambi. Quando una bestia porta più di un componente lavorabile, la scelta è tua: prendi tutto quello che può dare, oppure concentrati su meno componenti e ottieni una qualità misurabilmente superiore di ciò che scegli di prendere.\n\nUn tiro di raccolto raro o superiore su una famiglia che porta esemplari concede anche un esemplare puro firmato (una Pelle Pura, Seta Pura, Ghiandola di Veleno Pura, Artiglio Puro o Taglio Pregiato) in aggiunta alla resa ordinaria, e registra Un Esemplare Perfetto nel tuo Libro delle Imprese. Qualunque personaggio può raccogliere, senza alcun addestramento richiesto, e qualsiasi strumento di raccolta che possiedi conta verso il bonus avanzato, indipendentemente dal mestiere a cui appartiene.",
+      "focusBodyTiers": "Ogni città principale tiene un pannello Focus Cittadino per i raccoglitori di passaggio: fermati in città, aprilo da accanto alla minimappa e distribuisci un budget di 10 punti focus tra i tipi di componente che ti interessano. Ogni 5 punti su un componente ne innalza il grado di raccolta di un gradino (due gradini al massimo), e ogni punto aggiunge il 10 percento alla sua resa; i componenti non focalizzati non vengono mai peggiorati.\n\nLa tua ripartizione segue il tuo personaggio ovunque vada e può essere ridiretta a ogni successiva visita in città, al ritmo che scegli. Prendersi il proprio tempo è gratis: la ridirezione richiede 1 minuto per ogni punto che sposti. Pagare un po' la velocizza, 15 secondi per punto più 5 rame e 1 Polvere di Tintinnio per punto, e pagare per intero la rende istantanea per 25 rame e 5 Polveri di Tintinnio per punto. Vengono contati solo i punti che sposti davvero, quindi spostare un solo punto costa poco, e un pannello che apri e chiudi senza modifiche non costa nulla a nessun livello.",
+      "toolEffectsHeading": "Effetti da strumento",
+      "toolEffectsBody": "Uno strumento di raccolta ha uno slot al suo interno, ed è il ciondolo di un incantatore ciò che vi si inserisce. Una Riserva del Raccoglitore aggiunge un'unità a ciò che un raccolto produce; un Occhio dell'Artigiano innalza il grado di ciò che estrae. L'Armeggiatore Gizzel, Maestro degli Attrezzi a Eastbrook, insegna entrambi agli incantatori che hanno raggiunto 25 di competenza nel mestiere, ed entrambi si fabbricano alla sua officina degli attrezzi.\\n\\nUn ciondolo appena inserito porta 20 cariche su uno strumento comune e 10 in più per ogni gradino di rarità sopra il comune, quindi lo stesso ciondolo inserito su un piccone epico parte da 50. Una carica viene spesa solo quando il ciondolo ha effettivamente cambiato l'esito, mai su un raccolto che non ha migliorato, e uno slot può essere impostato per chiedere conferma a ogni utilizzo, così il ciondolo aspetta finché non premi Usa una carica. Inserire un ciondolo appena fabbricato rigenera lo slot attorno allo strumento che stai portando in quel momento, quindi si riempie fino a ciò che quello strumento può contenere anziché tornare a un massimo raggiunto in precedenza, e un nuovo inserimento che non cambierebbe nulla viene respinto invece di consumare il ciondolo.\\n\\nEsaurire le cariche non distrugge il ciondolo: il proprietario dello strumento ricarica lo slot, 10 cariche per ogni materiale arcano speso, e il materiale richiesto segue il migliore tra lo strumento che porti con te e il miglior strumento con cui quello slot sia mai stato riempito, Polvere di Tintinnio per uno strumento comune o non comune, Essenza di Tintinnio per uno raro, e un Frammento di Tintinnio per uno epico. Lasciare lo strumento buono in banca non compra una ricarica più economica, solo una più piccola allo stesso prezzo; il modo onesto per scendere a un gradino più economico è inserire un ciondolo appena fabbricato mentre porti lo strumento inferiore, il che rigenera lo slot lì. Se il tetto dello slot sta sopra ciò che il tuo strumento attuale può riempire, la ricarica si ferma dove si ferma quello strumento e ti dice di portare quello migliore. La ricarica costa la metà dei materiali quando sei l'incantatore che ha firmato il ciondolo, e ancora meno se sei specializzato in Incantamento; chiunque altro paga la tariffa piena. Una ricarica è un lancio breve, come il resto della famiglia del mestiere."
     },
     "profPages": {
       "back": "Torna alle Professioni",
@@ -5363,9 +5721,9 @@ export const it_IT: EnTranslations = {
         "salvageHeading": "Smantellamento",
         "salvageNote": "Lo smantellamento e il cugino per tutti del disincanto: le stesse armi e armature, nessuna competenza richiesta e nessuna guadagnata, che restituisce rottami artigianali semplici in base alla qualita invece di qualcosa di arcano. Chiunque puo farlo, incantatore o no. Quando tieni un pezzo che vale la pena smontare, la scelta e semplice: dal raro in su, il disincanto e nettamente l'affare migliore, mentre al comune i due valori si vendono all'incirca allo stesso prezzo al venditore, quindi smonta verso il materiale di cui hai effettivamente bisogno.",
         "bonusFmt": "+{value} {stat}",
-        "enchantsNoteOffhand": "Enchants come in three tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed two more sinks besides, the two charm recipes at five apiece and the top rung of tool-effect recharges, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.",
-        "charmsHeading": "Charms for a gatherer's tools",
-        "charmsBody": "Enchanting is also where a gatherer's charms come from. Tinker Gizzel teaches both at the Eastbrook toolworks once your Enchanting reaches 25: the Gatherer's Cache, which adds a unit to a harvest, and the Artisan's Eye, which raises the grade of what comes up. Each is crafted once, then slotted into a pick, axe, or sickle, where it spends a charge only on the harvests it actually improves.\n\nThe refill is where the trade keeps earning. Charges are restored by whoever owns the tool, not by a visiting enchanter, and the refill costs half the materials when that owner is the enchanter who signed the charm, less again with an Enchanting specialization. So a charm sold across the counter is a single sale, while the charms riding your own tools are the cheap ones to keep running. The full charge and material ladder is on any gathering profession page, under Tool effects."
+        "enchantsNoteOffhand": "Gli incanti esistono in tre livelli. Il livello Base funziona a Polvere di Tintinnio (con un po' di Essenza nella fascia alta) e copre lo slot arma, la mano secondaria e ogni slot d'armatura, con abbastanza opzioni di statistica perché ogni build trovi qualcosa per ciascuno slot: gli scudi e le mani secondarie da incantatore tenute in mano hanno un proprio incanto di Tempra, così nessuno slot equipaggiato resta privo di incanto. Il livello Superiore costa un Frammento di Tintinnio più Essenza: bonus più forti sugli slot di maggiore impatto. I Frammenti alimentano inoltre altri due assorbimenti, le due ricette di ciondolo a cinque ciascuna e il gradino più alto delle ricariche degli effetti degli strumenti, quindi mettine da parte qualcuno prima di spendere.\n\nTra i due si collocano i cinque incanti Runici, un consumatore per ogni secondario tipizzato, così nulla di ciò che scomponi è mai un vicolo cieco: Filo Runico (arma, Forza, consuma Acciaio Risonante), Concentrazione Runica (arma, Intelletto, Legname Risonante), Tessiturarunica (petto, Spirito, Filo Risonante), Pelle Runica (gambe, Agilità, Pelle Risonante) e Maglie Runiche (elmo, Tempra, Anelli Risonanti). Ognuno richiede anche due Essenze di Tintinnio; dove uno slot e una statistica hanno sia un incanto base sia uno Superiore, il bonus Runico si colloca tra i due, mentre Tessiturarunica è senz'altro il più forte incanto di Spirito per il petto e Pelle Runica è l'unico incanto di Agilità per le gambe in assoluto. I bonus esatti sono tutti nella tabella qui sotto.",
+        "charmsHeading": "Ciondoli per gli strumenti di un raccoglitore",
+        "charmsBody": "L'Incantamento è anche l'origine dei ciondoli di un raccoglitore. L'Armeggiatore Gizzel li insegna entrambi all'officina degli attrezzi di Eastbrook una volta che il tuo Incantamento raggiunge 25: la Riserva del Raccoglitore, che aggiunge un'unità a un raccolto, e l'Occhio dell'Artigiano, che innalza il grado di ciò che viene estratto. Ciascuno viene fabbricato una sola volta, poi inserito in un piccone, un'ascia o un falcetto, dove spende una carica solo sui raccolti che effettivamente migliora.\n\nÈ nella ricarica che il mestiere continua a guadagnare. Le cariche vengono ripristinate da chi possiede lo strumento, non da un incantatore di passaggio, e la ricarica costa la metà dei materiali quando quel proprietario è l'incantatore che ha firmato il ciondolo, ancora meno con una specializzazione in Incantamento. Quindi un ciondolo venduto al banco è una vendita unica, mentre i ciondoli che viaggiano sui tuoi stessi strumenti sono quelli economici da mantenere in funzione. La scala completa di cariche e materiali si trova in qualsiasi pagina delle professioni di raccolta, sotto Effetti da strumento."
       },
       "gatherIntro": {
         "mining": "L'Estrazione mineraria strappa il minerale direttamente dalla roccia del mondo: rame nella Valle di Eastbrook, ferro nella Palude di Mirefen e osmio lassù sulle Alture di Thornpeak, con filoni iniziali sparsi per ogni zona più giovane oltre di esse, che alimentano i mestieri della forgia. Aperta a tutti dal livello 1: un piccone da estrazione da 20 monete di rame preso a un bancone di Eastbrook, Fenbridge o Highwatch apre ogni filone iniziale, e i gradini più alti della scala dei picconi si risvegliano man mano che il tuo contatore se li guadagna. Tracciata su un contatore proprio fino a un limite di 100.",
@@ -5411,7 +5769,7 @@ export const it_IT: EnTranslations = {
         "startBody": "Una Canna da pesca semplice costa 20 monete di rame dal Pescatore Brandt a Eastbrook (cerca il Vecchio Sale al margine orientale della città, sulla strada per il Lago Specchio); anche l'Armeggiatore Gizzel, il Provveditore Hale a Fenbridge e il Quartiermastro Bree a Highwatch tengono canne in magazzino. Usa la canna rivolto verso acqua abbastanza profonda da contenere pesci, fino a circa 24 yard davanti a te, e il tuo galleggiante volerà fuori.\n\nNon puoi lanciare in combattimento, mentre nuoti o da morto: lanciare dalla riva è la postura prevista. L'acqua però si fa dura come si fa dura la terra: la palude vuole almeno la Canna con mulinello di ferro di livello 2 e le vette la Canna del ruscello d'argento di livello 3, e una lenza lanciata senza la canna che quell'acqua pretende non lascia mai la tua mano. Due canne stanno sopra queste, la Canna della Tempesta e la Canna Forgiamarea: gli ingegneri le fabbricano all'officina con ciò che la lenza tira su, e il banco dell'incursione della Litania Annegata le vende per Sigilli d'Incursione dietro ai suoi requisiti di completamento, ma mai per monete. Nessuna acqua le richiede, quindi comprano un'attesa più breve e una finestra di recupero più ampia invece dell'accesso, il che al gradino più alto significa un'abboccata in tre secondi netti.",
         "biteHeading": "Abboccata e salpata",
         "biteBody": "Dopo il lancio, l'abboccata arriva in un momento nascosto tra {min} e {max} secondi; il ritardo viene deciso quando la lenza tocca l'acqua, quindi non ci sono due lanci davvero uguali. Quando il galleggiante abbocca hai una finestra di {reel} secondi per premere di nuovo la canna e recuperare: recupera entro quel tempo e la cattura è tua, esita oltre e il pesce se ne va senza lasciarti nulla. Un'intera sessione si ferma a {cap} secondi, quindi anche un lancio tranquillo si risolve in fretta.\n\nLe canne migliori affinano entrambe le estremità del minigioco: ogni livello di canna sopra il primo taglia {rod} secondi dall'attesa più lunga possibile, mai sotto il minimo di tre secondi che la canna di punta già sfiora, e aggiunge {reelRod} secondi alla finestra di recupero, così la Canna con mulinello di ferro porta l'attesa peggiore a 6,5 secondi con una finestra di 3,25 secondi, e la Canna del ruscello d'argento a 5 con una finestra oltre i 4, dato che la sua rarità allarga il recupero un po' più di quanto paghi il livello da solo. Le abboccate più rapide non cambiano mai, qualunque cosa tu impugni, e a una canna basta stare nelle tue borse per contare.",
-        "earlyReelNote": "Un avvertimento per i pollici impazienti: premi di nuovo la canna prima che qualcosa abbocchi e recupererai una lenza vuota, terminando il lancio (un attimo di grazia subito dopo il lancio perdona una doppia pressione accidentale). La pazienza è tutto il gioco: aspetta l'abboccata, poi colpisci.",
+        "earlyReelNote": "Un avvertimento per le dita impazienti: premi di nuovo la canna prima che qualcosa abbocchi e recuperi una lenza vuota, chiudendo il lancio. Il primo secondo dopo che la lenza si posa è perdonato, quindi una doppia pressione accidentale non ti costa nulla; oltre quello, una pressione anticipata è un lancio sprecato. La pazienza è tutto il gioco: aspetta l'abboccata, poi ferra.",
         "scheduleHeading": "Guadagno di competenza",
         "scheduleNote": "Il guadagno della Pesca segue un calendario fisso senza dadi: un punto intero per cattura sotto 50 di competenza, mezzo punto sotto 100, un decimo sotto 150 e un lento gocciolio di 0,02 da 150 a 200. Quell'ultimo tratto è deliberatamente un viaggio da migliaia di catture: 200 è una dichiarazione, non una tappa verso qualcos'altro.\n\nL'immondizia smette del tutto di insegnare a {cutoff}: da lì in poi, alghe e stivali sono soltanto alghe e stivali. Anche l'acqua stessa pone un tetto alla lezione: le acque di livello 1 della Valle (e ogni riva giovane oltre le terre centrali) non insegnano nulla oltre 100, quelle della palude si fermano a 150, e solo quelle di Thornpeak istruiscono un pescatore per l'intero tragitto fino a 200. Per il resto ogni cattura portata a riva guadagna al ritmo previsto, quindi quando il contatore si blocca, è il calendario che ti sta dicendo di cercare acque più profonde.",
         "colProficiency": "Competenza",
@@ -5472,9 +5830,9 @@ export const it_IT: EnTranslations = {
         "castPaceBatch": "Creazione in serie: fino a {count} in un solo ordine, un lancio ciascuno",
         "doctrineHeading": "I giocatori commerciano con i giocatori",
         "doctrineBody": "L'economia artigianale e costruita su un'idea: i giocatori riforniscono i giocatori. I raccoglitori alimentano gli artigiani, gli artigiani alimentano chi fa missioni e chi fa raid, e chi smantella alimenta gli incantatori, con venditori e maestri di stazione ai margini per assorbire robaccia e monete piuttosto che competere con te. Se vuoi guadagnare denaro da una professione, il tuo cliente e una persona: scopri cosa consumano gli altri giocatori, fissa i prezzi in base al Mercato Mondiale, e tratta i sistemi PNG come un pavimento sotto i tuoi prezzi, non come il mercato stesso.\n\nL'equipaggiamento artigianale e calibrato per stare sotto il livello del raid: persino un capolavoro e sempre solo un livello di qualita sopra alla sua ricetta, mai oltre il leggendario, e il suo budget di statistiche rimane sotto la fascia del bottino del raid. La fucina ti prepara per i contenuti piu difficili; non li sostituisce. Questo mantiene artigiani, raider e il mercato in un triangolo stabile: i drop del raid rimangono ambiziosi, e i pezzi artigianali rimangono il miglior equipaggiamento che il denaro possa effettivamente comprare.",
-        "orderBoardHeading": "The commission board",
-        "orderBoardBody": "You do not have to find a crafter in chat. Open your crafting window and the commission board is one click away in its header. Anyone can post an order there: name the recipe you want made, then either leave it open for any crafter to take, or aim it at one named crafter, who is then the only person who can pick it up. A crafter browsing the board accepts an order, and accepting commits them, so a job is only ever worked by one person at a time.\n\nNothing is held back when you post: an order reserves no coin and no materials, so the price and who supplies the reagents stay between the two of you, agreed the way any commission is agreed. You can cancel your own order while it is still open, and an order nobody accepts expires by itself after a day. Once a crafter has accepted, delivery is what closes it.\n\nDelivery happens face to face. The crafter makes the piece as a commission, comes to you, and hands it over, so keep a bag slot free to receive it. What arrives follows the ordinary commission rules below, binding to you through the Maker's Bond.",
-        "commissionsBoardNote": "There are two ways into a commission: an order you post on the board above, which brings the work to a crafter, and a crafter simply choosing to make a piece for you. Both end in the same bond."
+        "orderBoardHeading": "La bacheca delle commissioni",
+        "orderBoardBody": "Non devi cercare un artigiano in chat. Apri la tua finestra di fabbricazione e la bacheca delle commissioni è a un clic di distanza nella sua intestazione. Chiunque può pubblicare un ordine lì: indica la ricetta che vuoi far realizzare, poi lascialo aperto per qualsiasi artigiano che voglia accettarlo, oppure indirizzalo a un artigiano specifico, che sarà allora l'unico a poterlo prendere in carico. Un artigiano che sfoglia la bacheca accetta un ordine, e accettarlo lo impegna, quindi un lavoro è sempre svolto da una sola persona alla volta.\n\nNulla viene trattenuto quando pubblichi: un ordine non riserva né monete né materiali, quindi il prezzo e chi fornisce i reagenti restano tra voi due, concordati nel modo in cui si concorda qualsiasi commissione. Puoi annullare il tuo ordine finché è ancora aperto, e un ordine che nessuno accetta scade da solo dopo un giorno. Una volta che un artigiano ha accettato, è la consegna a chiuderlo.\n\nLa consegna avviene faccia a faccia. L'artigiano realizza il pezzo come commissione, viene da te e te lo consegna, quindi tieni libero uno slot della borsa per riceverlo. Ciò che arriva segue le normali regole della commissione qui sotto, vincolandosi a te tramite il Vincolo dell'Artigiano.",
+        "commissionsBoardNote": "Esistono due strade per arrivare a una commissione: un ordine che pubblichi sulla bacheca qui sopra, che porta il lavoro a un artigiano, oppure un artigiano che sceglie semplicemente di realizzare un pezzo per te. Entrambe finiscono nello stesso Vincolo dell'Artigiano."
       },
       "faq": {
         "title": "Domande Frequenti sulle Professioni",
@@ -5495,13 +5853,13 @@ export const it_IT: EnTranslations = {
         "a7": "Il lancio di raccolta parte da 2,5 secondi e viene limato in due modi: 0,4 secondi per ogni livello di strumento che porti e sai impugnare al di sopra del livello del nodo stesso, e 0,15 secondi quando il contatore del tuo mestiere supera la fascia dei 100, con un minimo di 1,5 secondi. Passa dai nodi di livello 1 ai nodi di livello 3 e il tuo margine svanisce, quindi lo stesso piccone torna a colpire più lentamente. Avere esattamente il livello richiesto non compra velocità; apre soltanto il nodo.\n\nIl guadagno svanisce come per la fabbricazione: un nodo diventa grigio man mano che la tua competenza supera il suo livello (i nodi di livello 1 non insegnano più nulla da competenza 75 in poi), quindi la risposta ai guadagni lenti sono nodi di livello più alto. Questi richiedono nelle borse uno strumento almeno del loro livello (nessun nodo si lavora mai a mani nude, livello 1 compreso), e uno strumento da terra sopra il livello 1 vuole prima anche il suo requisito d'uso, 40/70/85/100 nel proprio mestiere per i livelli da 2 a 5. La Pesca segue una discesa tutta sua: guadagno pieno sotto 50 di competenza, metà sotto 100, un gocciolio di 0,1 sotto 150 e di 0,02 sotto 200, le catture di immondizia non insegnano più nulla da 100 in poi, e l'acqua stessa pone un tetto alla lezione (le acque di livello 1 smettono di insegnare a 100, quelle della palude a 150), quindi un contatore fermo può anche voler dire che hai superato quell'acqua.",
         "q8": "Posso lavorare lontano dalla citta?",
         "a8": "In parte. Le nove ricette comuni da campo (i capisaldi iniziali di arma, armatura, cibo e pozione) si fabbricano ovunque e in qualsiasi momento, e lo stesso vale per le tre ricette combinate delle coppie giurate. Tutto il resto sopra di esse è legato a un tipo di stazione: forgia, cucine, apotecario, conceria, telaio od officina, e devi trovarti entro 20 yard dalla stazione perché la lavorazione vada a buon fine.\n\nA 75 di abilità in un mestiere ti specializzi, e insieme a uno sconto del 20 percento sui materiali ottieni una stazione mobile: piazzala sul campo e resta in piedi per 10 minuti, servendo le ricette di quel mestiere come se fossi alla stazione vera. La stazione mobile serve solo a fabbricare: imparare le ricette e sciogliere le commissioni richiedono sempre la stazione autentica in città.",
-        "q9": "How do I get something crafted for me?",
-        "a9": "Post it on the commission board. Open the crafting window, open the board from its header, and name the recipe you want made: leave the order open for any crafter to accept, or aim it at one crafter you already know. Accepting commits that crafter to the job, and an order is only ever held by one person at a time.\n\nNo coin and no materials are held when you post, so agree the price and who brings the reagents between yourselves, the way commissions have always been arranged. You can cancel your own order while it is still open, and an order nobody accepts expires after a day. Delivery is in person: stand near your crafter with a free bag slot when the piece is ready. It arrives bound to you through the Maker's Bond, which any station master will undo for the usual fee.",
-        "q10": "What is a charm, and what happens when it runs out?",
-        "a10": "A charm is a slotted tool effect: an enchanter's work that sits in a gathering tool and improves what it brings up. A Gatherer's Cache adds a unit to a harvest, an Artisan's Eye raises its grade, and Tinker Gizzel teaches both at the Eastbrook toolworks at 25 Enchanting. A charge is spent only when the charm actually changed the outcome, so a harvest it could not improve costs you nothing, and a slot can be set to ask each use if you would rather decide charge by charge.\\n\\nA fresh charm carries 20 charges on a common tool and 10 more for each rarity rung above it, so an epic tool starts at 50. Running out does not destroy the charm: the tool's owner refills the slot, 10 charges per arcane material, with the material following the better of the tool they are carrying and the best tool that slot has ever been filled by (Chime Dust for a common or uncommon tool, Chime Essence for a rare one, a Chime Shard for an epic). Banking the good tool before a refill never makes it cheaper, only smaller at the same price, and slotting a fresh charm while carrying the lesser tool is the way back down to a cheaper rung. The enchanter who signed the charm pays half to refill their own, and less again with an Enchanting specialization."
+        "q9": "Come faccio a farmi realizzare qualcosa su commissione?",
+        "a9": "Pubblicalo sulla bacheca delle commissioni. Apri la finestra di fabbricazione, apri la bacheca dalla sua intestazione, e indica la ricetta che vuoi far realizzare: lascia l'ordine aperto per qualsiasi artigiano che voglia accettarlo, oppure indirizzalo a un artigiano che già conosci. Accettarlo impegna quell'artigiano al lavoro, e un ordine è sempre in mano a una sola persona alla volta.\n\nNessuna moneta e nessun materiale vengono trattenuti quando pubblichi, quindi concordate tra voi il prezzo e chi porta i reagenti, nel modo in cui le commissioni sono sempre state organizzate. Puoi annullare il tuo ordine finché è ancora aperto, e un ordine che nessuno accetta scade dopo un giorno. La consegna avviene di persona: sta' vicino al tuo artigiano con uno slot della borsa libero quando il pezzo è pronto. Arriva vincolato a te tramite il Vincolo dell'Artigiano, che qualsiasi maestro di stazione scioglierà per la tariffa consueta.",
+        "q10": "Cos'è un ciondolo, e cosa succede quando si esaurisce?",
+        "a10": "Un ciondolo è un effetto da strumento inseribile: il lavoro di un incantatore che si trova in uno strumento di raccolta e migliora ciò che porta alla luce. Una Riserva del Raccoglitore aggiunge un'unità a un raccolto, un Occhio dell'Artigiano ne innalza il grado, e l'Armeggiatore Gizzel insegna entrambi all'officina degli attrezzi di Eastbrook a 25 di Incantamento. Una carica viene spesa solo quando il ciondolo ha effettivamente cambiato l'esito, quindi un raccolto che non poteva migliorare non ti costa nulla, e uno slot può essere impostato per chiedere conferma a ogni utilizzo, se preferisci decidere carica per carica.\n\nUn ciondolo appena inserito porta 20 cariche su uno strumento comune e 10 in più per ogni gradino di rarità sopra di esso, quindi uno strumento epico parte da 50. Esaurirlo non distrugge il ciondolo: il proprietario dello strumento ricarica lo slot, 10 cariche per ogni materiale arcano, con il materiale che segue il migliore tra lo strumento che porta con sé e il miglior strumento con cui quello slot sia mai stato riempito (Polvere di Tintinnio per uno strumento comune o non comune, Essenza di Tintinnio per uno raro, un Frammento di Tintinnio per uno epico). Mettere in banca lo strumento buono prima di una ricarica non la rende mai più economica, solo più piccola allo stesso prezzo, e inserire un ciondolo appena fabbricato mentre porti lo strumento inferiore è il modo onesto per tornare a un gradino più economico. L'incantatore che ha firmato il ciondolo paga la metà per ricaricare il proprio, e ancora meno con una specializzazione in Incantamento."
       },
-      "findingNodesNote": "You do not have to find these by eye. Every node in the zone is drawn on the zone map wherever the map is showing that ground, and on the minimap as you pass it, so a farming loop can be planned from the map screen before you set out. A node your tools cannot work yet is marked rather than hidden: it keeps its place with a struck, dimmed mark, so you can see the ground you are training toward. On desktop, hovering a vein, stand, or patch in the world names it, tells you the tool it wants, and, once you have worked it, counts your own respawn down to the second. On touch there is nothing to hover, so the minimap marks tell the same story.",
-      "specimenBodyFamilies": "Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, claw, meat) keeps its ordinary yield plain and mints the signed specimen beside it; the other three, fang, cloth, and tusk, sign the yield itself."
+      "findingNodesNote": "Non devi trovarli a occhio. Ogni nodo della zona è disegnato sulla mappa della zona ovunque essa mostri quel terreno, e sulla minimappa mentre lo attraversi, così un giro di raccolta può essere pianificato dalla schermata della mappa prima ancora di partire. Un nodo che i tuoi strumenti non possono ancora lavorare è segnato anziché nascosto: mantiene il suo posto con un segno barrato e attenuato, così puoi vedere il terreno verso cui ti stai allenando. Su desktop, passare il puntatore su un filone, un boschetto o un'aiuola nel mondo lo nomina, ti dice lo strumento che richiede e, una volta che l'hai lavorato, fa il conto alla rovescia al secondo fino alla tua ricomparsa personale. Su schermo touch non c'è nulla su cui passare il puntatore, quindi i segni sulla minimappa raccontano la stessa storia.",
+      "specimenBodyFamilies": "Tieni un po' di spazio libero nelle borse quando raccogli: un colpo di fortuna firmato ha bisogno di uno slot tutto suo o di una pila firmata corrispondente in cui atterrare, e se non entra da nessuna parte la resa arriva comunque, ma la firma va perduta. Anche la raccolta dalle carcasse ha il suo ramo da jackpot: circa il {pct}% di ogni componente raccolto esce raro o superiore. Una famiglia che ha un esemplare perfetto da dare (pelle, seta, veleno, artiglio, carne) mantiene semplice la sua resa ordinaria e conia l'esemplare firmato accanto a essa; le altre tre, zanna, panno e difesa, firmano la resa stessa."
     },
     "economy": {
       "intro": "Le monete fanno girare tutto il mondo: comprano il tuo equipaggiamento, le provviste e l'attrezzatura da viaggio, e passano di mano tra i giocatori. Raccogli tutto questo semplicemente giocando, perciò considera questa pagina come una mappa di dove arriva e dove va il tuo denaro.",
@@ -5509,7 +5867,7 @@ export const it_IT: EnTranslations = {
       "coinBody": "Il denaro si presenta in tre monete. Cento rame fanno un argento, e cento argenti fanno un oro, perciò la tua borsa si riempie a partire dalla moneta più piccola. Lo guadagni dalle ricompense delle missioni, saccheggiando i nemici caduti e vendendo ciò che non ti serve più.",
       "vendorsTitle": "I venditori e ciò che tengono",
       "vendorsBody": "Città e avamposti sono disseminati di mercanti, ognuno con il proprio commercio. I provvigionieri tengono cibo e bevande, armaioli e fabbri portano equipaggiamento, e un quartiermastro tiene attrezzatura pratica da viaggio. Avvicinati a uno per vedere cosa vende.",
-      "marksTitle": "Sigilli e Marchi: le valute oltre le monete",
+      "marksTitle": "Sigilli e Onore: le valute oltre il denaro",
       "marksBody": "Le monete non sono l'unica cosa che metti da parte. Le incursioni pagano in Sigilli d'Incursione, spesi solo dal custode delle incursioni in potenziamenti per la compagna ed equipaggiamento che non troverai altrove. Le versioni eroiche dei dungeon lasciano Marchi Eroici sul boss finale, spesi presso il Quartiermastro Eroico a Highwatch in gioielli che nessun altro angolo del reame vende. Nessuna delle due si mescola mai con le tue monete.",
       "bankTitle": "La banca",
       "bankBody": "Ogni città principale ospita una filiale del Forziere Dorato, la casa bancaria del reame. Parla con l'economo del posto per aprire il tuo caveau, una riserva privata di spazio oltre le tue borse che il tuo personaggio conserva per tutta la vita. Qualunque cosa lasci in custodia ti aspetta al sicuro, quale che sia la filiale che visiterai la prossima volta.",
@@ -5529,16 +5887,16 @@ export const it_IT: EnTranslations = {
       "marketTitle": "Il Mercato Mondiale",
       "marketBody": "Il Mercante gestisce il Mercato Mondiale, una piazza di scambio guidata dai giocatori dove puoi comprare e vendere con persone che forse non incontrerai mai. Parla con il Mercante a Eastbrook, o con il Banditore Voss lassù a Highwatch, per aprirlo: entrambi i custodi servono l'unico mercato condiviso. Il Mercante tiene anche una scorta fissa di merce propria in vendita lì, così c'è sempre qualcosa da comprare anche quando nessun altro giocatore ha messo in vendita nulla.",
       "marketBrowse": "Sfogliare: scorri gli annunci o cerca per nome per trovare ciò che è in vendita. Ogni annuncio mostra la merce, il venditore e il prezzo richiesto per l'intera pila.",
-      "marketPost": "Mettere in vendita: scegli una pila dalle tue borse, fissa il prezzo e mettila in lista. La merce resta in custodia del Mercante finché qualcuno non la compra. Gli annunci invenduti ti tornano dopo un po', e puoi recuperarne uno in anticipo se cambi idea.",
-      "marketCollect": "Riscuotere: quando la tua merce viene venduta, i proventi ti aspettano dal Mercante. Torna a riscuotere le monete, insieme a tutto ciò che è tornato invenduto. Il Mercante trattiene una piccola percentuale su ogni vendita completata.",
+      "marketPost": "Mettere in vendita: scegli una pila dalle tue borse, fissa il prezzo e mettila in vendita. La merce è custodita dal Mercante finché qualcuno non la compra. Le inserzioni invendute ti tornano dopo un po', e puoi riprenderne una in anticipo se cambi idea. Mettere in vendita è gratuito di per sé, quindi un prezzo ottimista non ti costa altro che tempo.",
+      "marketCollect": "Riscuotere: quando la tua merce si vende, il ricavato ti aspetta dal Mercante. Torna a riscuotere le monete, insieme a tutto ciò che è tornato invenduto. Il Mercante trattiene una piccola quota di ogni vendita conclusa. La linguetta Riscuoti elenca ciò che ti aspetta, una riga per ogni vendita conclusa con la merce, l'acquirente e quanto hai ricavato, così vedi esattamente cosa si è venduto prima di prendere le monete.",
       "marketPricing": "Il prezzo lo decidi tu. Elencare a un po' meno di quanto chiedono gli altri tende a vendere più in fretta, mentre un prezzo esagerato può restare intatto. Sfoglia prima per vedere qual è la quotazione corrente prima di mettere in vendita.",
-      "honorBody": "Fighting other players pays a third currency, Honor. Winning a ranked arena bout pays it, and a played-out match on Thornhollow Fields pays it whether you win or lose, so a hard-fought loss on the Fields is never a wasted match. Honor collects on your character sheet without ever mixing with your coin. You spend it with the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, who share one stock between them: the Warfare armor families, jewelry, and weapons that Honor alone buys. Those purchases are final, and the gear binds to you the moment you buy it, so read a piece before you confirm it. The arena page covers how Honor is earned.",
-      "guildBankNote": "Your guild keeps a vault of its own alongside your personal one, opened at the same bursar and reached from a tab in the same window: a shared treasury of coin and a pooled store of goods. Every member can look at it, and officers are the ones who may move things in and out. The social page has the details."
+      "honorBody": "Combattere altri giocatori paga una terza valuta, l'Onore. Vincere un incontro classificato in arena lo paga, e una partita portata a termine ai Campi di Thornhollow lo paga sia che tu vinca sia che tu perda, così una sconfitta combattuta con onore ai Campi non è mai una partita sprecata. L'Onore si accumula sulla tua scheda personaggio senza mai mescolarsi alle tue monete. Lo spendi con i quartiermastri d'onore, FURIA a Eastbrook e il Guerramaresciallo Draven Kole a Highwatch, che condividono un'unica scorta: le famiglie di armatura da Guerra, i gioielli e le armi che solo l'Onore può comprare. Questi acquisti sono definitivi, e l'equipaggiamento si vincola a te nel momento in cui lo compri, quindi leggi un pezzo prima di confermarlo. La pagina dell'arena spiega come si guadagna l'Onore.",
+      "guildBankNote": "La tua gilda tiene un caveau tutto suo accanto al tuo personale, aperto dallo stesso economo e raggiungibile da una scheda della stessa finestra: una tesoreria condivisa di monete e una scorta comune di beni. Ogni membro può consultarla, e sono gli ufficiali a poter spostare cose dentro e fuori. La pagina di Socialità e gruppi porta i dettagli."
     },
     "social": {
       "intro": "Gran parte del mondo è affrontabile in solitaria, ma il gioco è costruito per essere giocato con altre persone. Ecco come parlare, fare squadra e trovare la tua compagnia.",
       "chatHeading": "Canali di chat",
-      "chatBody": "La chat è divisa in canali, ciascuno mostrato nella propria scheda. Scrivi un messaggio per inviarlo sul canale attivo, oppure usa un comando barra per dirigere una riga altrove. Questi sono i canali su cui puoi parlare:",
+      "chatBody": "La finestra della chat parte con due viste sempre presenti, un registro combinato di tutto ciò che si dice e un registro di combattimento. Oltre a quelle, aggiungi le linguette che vuoi con il pulsante più, una per canale, e su desktop puoi trascinarle nell'ordine che preferisci (Alt con la freccia sinistra o destra sposta da tastiera la linguetta a fuoco); clicca col destro su una linguetta per richiuderla, e la tua disposizione viene ricordata fra una sessione e l'altra. Scrivere in una linguetta di canale invia su quel canale, e un comando con la barra invia una riga altrove senza cambiare linguetta. C'è anche una linguetta dei sussurri che raccoglie in un solo posto ogni sussurro che invii e ricevi, e dove scrivere risponde semplicemente a chi ti ha scritto per ultimo. Questi sono i canali su cui puoi parlare:",
       "chanSay": "Dire.",
       "chanSayBody": "La tua voce predefinita. Raggiunge i giocatori vicini a te ed è quella da usare mentre fate missioni fianco a fianco.",
       "chanYell": "Urlare.",
@@ -5547,6 +5905,8 @@ export const it_IT: EnTranslations = {
       "chanWhisperBody": "Un messaggio privato a un giocatore per nome, ovunque si trovi. Usalo per uno scambio riservato.",
       "chanParty": "Gruppo.",
       "chanPartyBody": "Parla con tutti nel tuo gruppo, per quanto siate sparpagliati.",
+      "chanBattleground": "Campo di battaglia.",
+      "chanBattlegroundBody": "Parla con tutti i combattenti nel tuo campo di battaglia, di entrambe le squadre. Solo mentre una partita è in corso.",
       "chanGeneral": "Generale.",
       "chanGeneralBody": "Un canale di tutto il reame sempre attivo che raggiunge tutti gli online, buono per fare una domanda o chiacchierare in generale. A differenza dei canali Mondo e Cerca gruppo, non devi mai iscriverti.",
       "chanWorld": "Mondo.",
@@ -5569,43 +5929,43 @@ export const it_IT: EnTranslations = {
       "lootRollBody": "Quando un oggetto va a tiro, ogni membro idoneo sceglie Bisogno se lo vuole, Brama se lo prenderebbe solo come scorta, o Passa per chiamarsi fuori. Il tiro più alto vince.",
       "lootMasterTitle": "Saccheggiatore designato.",
       "lootMasterBody": "Il capo può invece occuparsi del bottino migliore, assegnando ogni pezzo al membro che dovrebbe riceverlo. Evita che l'equipaggiamento più ambito finisca a un tiro di dado casuale, come fa un gruppo organizzato quando affronta un dungeon.",
-      "friendsHeading": "Amici e ignorati",
+      "friendsHeading": "Amici, ignorati e bloccati",
       "friendsBody": "Aggiungi giocatori alla tua lista amici per vedere quando sono online e dove si trovano, così puoi fare gruppo nel momento in cui si connettono.",
-      "ignoreBody": "Se qualcuno ti dà fastidio, aggiungilo alla tua lista ignorati e smetterai di vedere la sua chat.",
+      "ignoreBody": "Se qualcuno chiacchiera più di quanto vorresti, aggiungilo alla tua lista degli ignorati e la sua chat pubblica smetterà di raggiungerti. Ignorare è solo un'impostazione della chat, e non toglie mai nessuno dalla tua lista degli amici.",
       "guildHeading": "Gilde",
-      "guildBody": "Una gilda è un gruppo duraturo di giocatori a cui appartieni tra una sessione e l'altra. Creane una o accetta un invito per unirti, e puoi stare in una sola gilda alla volta. I membri hanno un grado: un capo, gli ufficiali e i membri.",
-      "guildChatBody": "Appartenere a una gilda ti dà un canale di chat di gilda privato e mostra i tuoi compagni di gilda su un elenco condiviso, così ci sono sempre volti familiari online.",
+      "guildBody": "Una gilda è un gruppo duraturo di giocatori a cui appartieni fra una sessione e l'altra. Fondarne una costa al fondatore una quota una tantum di 1 oro, oppure puoi semplicemente accettare un invito per unirti, e puoi stare in una sola gilda alla volta. I membri hanno un grado: un capo, ufficiali e membri.",
+      "guildChatBody": "Appartenere a una gilda ti dà un canale di chat di gilda privato e un elenco condiviso dei tuoi compagni di gilda. I membri più recenti portano un contrassegno Recluta e quelli di lunga data uno Veterano al posto della semplice etichetta di membro, mentre gli ufficiali e il capogilda mostrano sempre il proprio grado, e puoi nascondere i nomi non in linea quando vuoi vedere solo chi c'è adesso. Gli ufficiali e il capogilda possono anche affiggere un breve messaggio in cima alla linguetta Gilda, che ti viene letto nel registro della chat al prossimo accesso, ed è così che la maggior parte delle gilde annuncia i piani della settimana.",
       "communityHeading": "Chiamare a raccolta tutta la community",
       "communityBody": "Inizia una riga di chat con un punto esclamativo per lanciare un appello alla community: !lfg per cercare un gruppo, !wts e !wtb per commerciare, !recruit per la tua gilda, !event per annunciare un'incursione o un raduno, e !help per chiedere una mano. Un menu degli appelli compare nell'istante in cui digiti il punto. Ogni appello viene trasmesso nel mondo e riecheggiato sul Discord della community, così raggiunge anche i giocatori che non sono nemmeno collegati. Gli appelli alla community fanno parte del gioco online.",
       "slashHeading": "Comandi slash utili",
       "slashBody": "Vale la pena memorizzare qualche comando di tutti i giorni: /w Nome invia un sussurro e /r risponde all'ultimo che hai ricevuto, /invite chiede a qualcuno di unirsi al tuo gruppo, /follow ti fa seguire i passi di un amico, /roll tira i dadi sotto gli occhi del gruppo, /who mostra chi è online, e /afk ti segna come assente. Digita /help nel gioco per l'elenco completo.",
       "emotesBody": "Il tuo personaggio può anche esprimersi senza parole: digita un'emote come /wave, /dance, /cheer o /bow, seleziona prima un amico per indirizzargliela, oppure tieni premuto X per aprire la ruota delle emote e ottenere una rapida espressione sopra la testa.",
       "calendarHeading": "Il calendario degli eventi",
-      "calendarBody": "Premi I per aprire il calendario degli eventi. Segna i giorni del reame attorno a cui vale la pena organizzarsi, dall'appello settimanale all'incursione alla serata fiesta, ed è dove le gilde tengono il proprio programma: il capogilda e gli ufficiali possono fissarvi eventi, e ogni membro li vede sulla stessa pagina.",
+      "calendarBody": "Premi I per aprire il calendario degli eventi. Segna i giorni del reame attorno a cui vale la pena organizzarsi, l'Appello all'Incursione settimanale, il Giorno di Mercato, lo Scontro d'Arena e la Gara di Pesca, più il Giorno d'Incursione mensile e la Comunione della Porta Lunare, ed è dove le gilde tengono il proprio calendario: il capogilda e gli ufficiali possono fissarvi eventi, e ogni membro li vede sulla stessa pagina. I giorni del reame sono un invito a riunirsi, non un bonus; nulla del tuo personaggio cambia perché un giorno è segnato.",
       "readyHeading": "Verifiche di prontezza",
       "readyBody": "Prima di un grande ingaggio, il capogruppo può digitare /ready per interpellare la stanza: tutti gli altri ricevono una richiesta Pronto o Non pronto, e una volta che tutti hanno risposto, o scaduti 30 secondi, l'intero gruppo vede un unico riepilogo dei conteggi. Nessuno viene messo alla gogna; conta il totale, non il colpevole.",
       "markersHeading": "Simboli bersaglio",
       "markersBody": "In un gruppo, seleziona una creatura ostile e fai clic destro sul suo ritratto nel riquadro del bersaglio (tocco prolungato su schermo tattile) per incoronarla con uno di otto simboli d'incursione. Qualsiasi membro può marcare, ogni simbolo sta su un bersaglio alla volta, e riapplicare un simbolo al proprio stesso bersaglio lo rimuove. L'ordine di uccisione, gli incarichi di controllo o un semplice \"prima questo\" viaggiano tutti più in fretta come simbolo che come frase.",
       "etiquetteHeading": "Galateo di gruppo",
-      "etiquetteBody": "Fare gruppo è una scelta, non un dovere. Saluta quando ti unisci, tira Bisogno solo sull'equipaggiamento che userai davvero, e avvisa il gruppo prima di andartene. Un po' di cortesia fa molta strada, e la maggior parte dei giocatori è lieta della compagnia. I moderatori mantengono l'ordine, e un giocatore che non lascia gli altri godersi il gioco può essere spostato in una cella di prigione finché un moderatore non lo fa uscire.",
-      "realmsHeading": "Worlds",
-      "realmsBody": "Online play runs on worlds, and each world is a separate place with its own players. You pick one from the World List before you play, and every row shows how busy that world is right now, from Low through Medium and High up to Full, or Offline for a world that is not currently up. Low means plenty of room, High means plenty of company, and a world that has reached its limit shows Full and turns new logins away until someone logs out, so pick where your friends are or where there is space.",
-      "realmsScopeBody": "What you do stays on the world you chose: your characters, your friends list, your guild, and the Market all live there, and the guild and player boards you open in game rank that world alone, while the board on the website gathers every world together. Each world also keeps its own daily raid reset, on its own local time.",
-      "finderHeading": "Finding a group",
-      "finderBody": "You do not have to shout in Looking for Group to fill a run. Open the Dungeon Finder, choose the run you want and the roles you are willing to fill, and join the queue on your own or with the party you already have. The finder waits until it has a full set of roles, then offers the group to everyone at once: a popup asks each of you to accept, and the party forms the moment the last person says yes. Turning an offer down, or letting it run out, puts you on a short cooldown before the queue offers you another, so the line keeps moving.",
-      "finderBoardBody": "The finder also keeps a board of premade groups. A leader posts a listing with tags saying what the run is for, from a first visit to a straight full clear, and you apply to it for the leader to approve. The automatic queue fills the dungeons and the endgame raid, each at normal and heroic, while the board can also carry the solo attunement run, which the queue never fills for you; delves and open-world outings are yours to arrange. Either way the finder only builds the group: walking to the door, setting the difficulty, and agreeing the loot rules are still yours.",
-      "finderMore": "See what is inside each dungeon",
-      "blockBody": "Block is the heavier tool, for a player who will not leave you alone. A block cuts their invites, their whispers, and their mail as well as their chat, makes the two of you invisible to each other in /who, and drops them from your friends list if they were on it. Block from the right-click menu on their name or with /block, /unblock lifts it again, and /blocklist shows who is on it.",
-      "guildBoardBody": "Guilds are ranked too. The Leaderboard window keeps a Guilds board beside the player boards, ranking guilds on what their members have earned together, so a busy guild can see where it stands.",
-      "guildBankHeading": "The guild bank",
-      "guildBankBody": "A guild also keeps a vault of its own. Step up to a banker in one of the hub towns, open your bank, and switch to the Guild tab: there you will find a treasury of coin and a pooled store of items the guild owns together. Every member can open it and look at what is inside, and the pane says plainly who can do more. Only the guild leader and officers can act, putting coin and goods in and handing them back out, and every deposit and withdrawal is written into a log the guild can read, so nothing moves without a record.",
-      "guildBankRulesBody": "The item store starts closed. An officer opens it out of their own pocket, and the guild can pay from the treasury to widen it later. Quest items, anything soulbound, and gear the Market will not take stay out of it, the same as the mail and the Market, so the bank is for goods that can still change hands.",
-      "discordLinkBody": "The Discord panel in game goes the other way too. Link your Discord account to it and the community roles you hold there follow you into the world: a colored name over your head, and a tag on the chat lines of the staff roles, so you can always tell a real moderator from someone borrowing the name. Linking also tracks a status that climbs as you take part. None of it grants any power in the game.",
-      "moderationHeading": "Reporting a player",
-      "moderationBody": "If a player is out of line, right-click their name and choose Report Player. Pick a reason, from harassment to spam to cheating, add a line about what happened, and send it: the report goes to the moderators to read. A report is a note to them, not a punishment in itself. Sending one does not silence, kick, or jail anyone, and no reply comes back telling you what was decided. Blocking them stops the bother while you wait.",
-      "jailBody": "Moderators keep the peace, and a player who will not let others enjoy the game can be moved to a jail cell. A sentence always has a set length, though a moderator can end it early, and it runs on the clock whether or not you stay logged in.",
-      "chatMore": "More on the chat window and the rest of the interface",
-      "jailHeading": "Moderators and the jail"
+      "etiquetteBody": "Fare gruppo è una scelta, non una seccatura. Saluta quando ti unisci, tira Necessità solo sull'equipaggiamento che userai davvero, e avvisa il gruppo prima di andartene. Un po' di cortesia va lontano, e la maggior parte dei giocatori è contenta della compagnia.",
+      "realmsHeading": "Mondi",
+      "realmsBody": "Il gioco online funziona su mondi, e ogni mondo è un luogo separato con i propri giocatori. Ne scegli uno dalla Lista dei mondi prima di giocare, e ogni riga mostra quanto è affollato quel mondo in questo momento, da Bassa a Media e Alta fino a Pieno, oppure Offline per un mondo che al momento non è attivo. Bassa significa molto spazio, Alta significa molta compagnia, e un mondo che ha raggiunto il proprio limite mostra Pieno e respinge i nuovi accessi finché qualcuno non esce, quindi scegli dove sono i tuoi amici o dove c'è spazio.",
+      "realmsScopeBody": "Ciò che fai resta sul mondo che hai scelto: i tuoi personaggi, la tua lista amici, la tua gilda e il Mercato vivono tutti lì, e le classifiche di gilde e giocatori che apri in gioco classificano solo quel mondo, mentre la classifica sul sito web riunisce tutti i mondi insieme. Ogni mondo mantiene anche il proprio ripristino giornaliero dell'incursione, secondo il proprio orario locale.",
+      "finderHeading": "Trovare un gruppo",
+      "finderBody": "Non devi gridare nel canale Cerca Gruppo per completare una squadra. Apri il Cercatore di Dungeon, scegli la run che vuoi e i ruoli che sei disposto a coprire, e unisciti alla coda da solo o con il gruppo che hai già. Il cercatore aspetta di avere un set completo di ruoli, poi offre il gruppo a tutti contemporaneamente: una finestra chiede a ciascuno di voi di accettare, e il gruppo si forma nel momento in cui l'ultima persona dice sì. Rifiutare un'offerta, o lasciarla scadere, ti mette in un breve tempo di recupero prima che la coda te ne offra un'altra, così la fila continua a muoversi.",
+      "finderBoardBody": "Il Cercatore di Dungeon tiene anche una bacheca di gruppi prefissati. Un capo gruppo pubblica un annuncio con etichette che dicono a cosa serve la run, da una prima visita a una pulizia completa diretta, e tu ti candidi perché il capo gruppo ti approvi. La coda automatica riempie i dungeon e l'incursione di fine gioco, ciascuna a Normale ed Eroico, mentre la bacheca può portare anche la corsa di sintonizzazione in solitaria, che la coda non riempie mai per te; le incursioni e le uscite nel mondo aperto sono tue da organizzare. In entrambi i casi il cercatore costruisce solo il gruppo: raggiungere la porta, impostare la difficoltà e concordare le regole del bottino restano compiti tuoi.",
+      "finderMore": "Scopri cosa c'è dentro ogni dungeon",
+      "blockBody": "Il blocco è lo strumento più severo, per un giocatore che non ti lascia in pace. Un blocco taglia i suoi inviti, i suoi sussurri e la sua posta oltre alla sua chat, vi rende invisibili a vicenda in /who, e lo rimuove dalla tua lista amici se ci si trovava. Blocca dal menu con il tasto destro sul suo nome oppure con /block, /unblock lo revoca di nuovo, e /blocklist mostra chi ne fa parte.",
+      "guildBoardBody": "Anche le gilde hanno una classifica. La finestra della Classifica tiene una scheda Gilde accanto alle schede dei giocatori, classificando le gilde in base a ciò che i loro membri hanno guadagnato insieme, così una gilda attiva può vedere a che punto è.",
+      "guildBankHeading": "La banca della gilda",
+      "guildBankBody": "Anche una gilda tiene un proprio caveau. Avvicinati a un banchiere in una delle città principali, apri la tua banca e passa alla scheda Gilda: lì troverai una tesoreria di monete e una scorta comune di oggetti che la gilda possiede insieme. Ogni membro può aprirla e vedere cosa contiene, e il pannello dichiara chiaramente chi può fare di più. Solo il capo gilda e gli ufficiali possono agire, depositando monete e beni e restituendoli, e ogni deposito e prelievo viene scritto in un registro che la gilda può leggere, così nulla si muove senza lasciare traccia.",
+      "guildBankRulesBody": "La scorta di oggetti parte chiusa. Un ufficiale la apre di tasca propria, e in seguito la gilda può pagare dalla tesoreria per ampliarla. Gli oggetti delle missioni, tutto ciò che è vincolato all'anima, e l'equipaggiamento che il Mercato non accetta restano fuori da essa, proprio come dalla posta e dal Mercato, quindi la banca è per i beni che possono ancora cambiare di mano.",
+      "discordLinkBody": "Il pannello Discord nel gioco funziona anche al contrario. Collega il tuo account Discord e i ruoli della community che detieni lì ti seguono nel mondo: un nome colorato sopra la testa, e un contrassegno sulle righe di chat dei ruoli dello staff, così puoi sempre distinguere un vero moderatore da chi ne prende in prestito il nome. Il collegamento tiene traccia anche di un grado di stato che sale man mano che partecipi. Niente di tutto questo concede alcun potere nel gioco.",
+      "moderationHeading": "Segnalare un giocatore",
+      "moderationBody": "Se un giocatore esagera, fai clic con il tasto destro sul suo nome e scegli Segnala giocatore. Scegli un motivo, dalle molestie allo spam ai trucchi, aggiungi una riga su cosa è successo, e invia: la segnalazione arriva ai moderatori perché la leggano. Una segnalazione è una nota per loro, non una punizione in sé. Inviarne una non zittisce, espelle o imprigiona nessuno, e non arriva alcuna risposta che ti dica cosa è stato deciso. Bloccarlo ferma il fastidio mentre aspetti.",
+      "jailBody": "I moderatori mantengono l'ordine, e un giocatore che non lascia gli altri godersi il gioco può essere spostato in una cella di prigione. Una pena ha sempre una durata stabilita, anche se un moderatore può porvi fine in anticipo, e il tempo scorre sia che tu resti connesso sia che tu esca dal gioco.",
+      "chatMore": "Altro sulla finestra della chat e sul resto dell'interfaccia",
+      "jailHeading": "I moderatori e la prigione"
     },
     "stats": {
       "intro": "Il tuo personaggio è descritto da una manciata di attributi. Non devi mai memorizzarli per giocare bene, ma sapere all'incirca cosa fa ciascuno ti aiuta a leggere la tua scheda del personaggio e a scegliere i miglioramenti giusti.",
@@ -5620,7 +5980,7 @@ export const it_IT: EnTranslations = {
       "intTitle": "Intelletto",
       "intBody": "L'Intelletto accresce la riserva di mana di un incantatore, ne aumenta il potere magico così che i suoi incantesimi colpiscano più forte, e migliora la probabilità che i suoi incantesimi colpiscano in critico. Conta per le classi che lanciano dal mana; per una classe a Ira o Energia fa poco.",
       "spiTitle": "Spirito",
-      "spiBody": "Lo Spirito governa la rapidità con cui torna il mana di un incantatore ogni volta che interrompe il lancio, cioè per la maggior parte del tempo tra uno scontro e l'altro. Come l'Intelletto, serve le classi a mana e conta poco per le altre.",
+      "spiBody": "Lo Spirito governa la velocità con cui torna il mana di un incantatore. Paga per intero solo dopo qualche secondo senza spendere nulla, e una quota continua a fluire anche mentre lanci, quindi lo Spirito non è mai peso morto in combattimento, per quanto un incantatore che spara senza sosta finirà comunque a secco. Fermarsi a prendere fiato è una vera decisione di mana, in combattimento tanto quanto fra un combattimento e l'altro. Come l'Intelletto, lo Spirito serve alle classi con mana e significa poco per le altre.",
       "armorTitle": "Armatura",
       "armorBody": "L'armatura riduce il danno fisico che subisci. Proviene per lo più da ciò che indossi, e le classi con armatura più pesante ne portano molta di più. Più armatura contro un nemico vicino al tuo livello significa che ognuno dei suoi colpi arriva più attenuato.",
       "apTitle": "Potenza d'attacco",
@@ -5639,31 +5999,31 @@ export const it_IT: EnTranslations = {
       "sheetBody": "Apri la finestra del personaggio in gioco per vedere tutto questo in un unico posto: i tuoi cinque attributi da un lato e le statistiche che alimentano dall'altro. Passa sopra un qualsiasi valore e una descrizione scompone ciò che fa per la tua classe, così puoi vedere a colpo d'occhio quali numeri ha effettivamente mosso un miglioramento.",
       "growHeading": "Come crescono le tue statistiche",
       "growBody": "Due cose accrescono le tue statistiche. Ogni livello aggiunge una quantità fissa di ciascun attributo adatta alla tua classe, e l'equipaggiamento che indossi ne aggiunge altra ancora. Tenere il tuo equipaggiamento aggiornato è il modo più costante per diventare più forte, fino al limite di livello.",
-      "hitTitle": "Hit rating",
-      "hitBody": "Hit rating comes from your gear and its set bonuses. It makes your attacks miss less often and your spells resisted less often, and it earns its keep against enemies above your own level, where misses pile up fastest. Your sheet shows it as Hit Rating.",
-      "parryTitle": "Parry",
-      "parryBody": "Parry is the warrior's own defense: a chance to turn a melee blow aside entirely and take no damage, and it grows with Strength. Only an attack coming at your front can be parried, which is one more reason to keep facing whatever is hitting you. Other classes see the row on their sheet sitting at zero.",
-      "warfareTitle": "Warfare",
-      "warfareBody": "Warfare is the one stat that counts only against other players: it raises the damage you deal to them and lowers the damage you take from them, and your sheet shows both halves on one line. Against creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "hitTitle": "Valutazione colpo",
+      "hitBody": "La valutazione colpo proviene dal tuo equipaggiamento e dai suoi bonus di set. Fa sì che i tuoi attacchi manchino meno spesso e i tuoi incantesimi vengano resistiti meno spesso, e si fa notare soprattutto contro nemici di livello superiore al tuo, dove i colpi mancati si accumulano più in fretta. La tua scheda la mostra come Valutazione Colpo.",
+      "parryTitle": "Parata",
+      "parryBody": "La Parata è la difesa propria del Guerriero: la possibilità di deviare del tutto un colpo in mischia senza subire danno, e cresce con la Forza. Solo un attacco che arriva di fronte può essere parato, un motivo in più per restare sempre rivolto verso chi ti sta colpendo. Le altre classi vedono questa riga della scheda ferma a zero.",
+      "warfareTitle": "Guerra",
+      "warfareBody": "La Guerra è l'unica statistica che conta soltanto contro altri giocatori: aumenta il danno che infliggi loro e riduce quello che subisci da loro, e la tua scheda mostra entrambe le metà sulla stessa riga. Contro le creature non fa assolutamente nulla. Proviene dall'equipaggiamento da Guerra che compri con l'Onore, quindi è una ricompensa per chi gioca in PvP piuttosto che qualcosa da inseguire mentre sali di livello."
     },
     "progression": {
       "intro": "Ogni scontro, ogni missione e ogni passo verso nord rende più forte il tuo eroe. Ecco come funziona la crescita di livello e cosa ti mantiene in crescita una volta raggiunta la cima.",
       "xpTitle": "Come guadagni esperienza",
-      "xpBody": "Guadagni esperienza completando missioni, sconfiggendo nemici e portando a termine le esplorazioni. Le missioni ne danno di gran lunga di più, perciò seguire la pista delle missioni è il modo più rapido per salire. Le uccisioni e le esplorazioni lungo la strada riempiono il resto.",
+      "xpBody": "Guadagni esperienza completando missioni, sconfiggendo nemici, ripulendo incursioni ed esercitando una professione: raccogliere e fabbricare pagano esperienza del personaggio oltre all'abilità di mestiere che insegnano, finché il lavoro ha ancora qualcosa da insegnarti. Le missioni danno di gran lunga di più, quindi seguire la pista delle missioni è la via più rapida per salire, mentre le uccisioni, le incursioni e la raccolta che fai lungo il cammino completano il resto.",
       "capBody": "Ogni livello ti rende più resistente e porta nuove abilità, fino al limite del livello {cap}.",
       "journeyTitle": "Il viaggio verso nord",
       "journeyBody": "Il mondo è una terra continua, tre zone disposte da sud a nord, ciascuna un gradino più alta di livello. Inizi nella verde valle, prosegui attraverso la palude e concludi tra le fredde alte vette. Segui la pista delle missioni e la terra ti porta dall'una all'altra.",
-      "journeyBodyCount": "The world is one continuous land of {zones} zones. Three of them are the road you level on, laid south to north: you start in the green valley, press on through the marsh, and finish in the cold high peaks. Follow the quest trail and the land carries you from one to the next. An island sits off the valley coast for the early levels, and the rest of the realms open off that same road, built for characters who have already made the climb.",
+      "journeyBodyCount": "Il mondo è una terra continua di {zones} zone. Tre di esse sono la strada su cui sali di livello, disposte da sud a nord: inizi nella verde valle, prosegui attraverso la palude e concludi tra le fredde alte vette. Segui la pista delle missioni e la terra ti porta dall'una all'altra. Un'isola sorge al largo della costa della valle per i primi livelli, e il resto dei reami si apre da quella stessa strada, costruito per personaggi che hanno già compiuto la scalata.",
       "bandLabel": "Livelli da {min} a {max}",
       "restedTitle": "Esperienza da riposo",
-      "restedBody": "Entra in una locanda e resta fuori dal combattimento, e il tuo personaggio accumula esperienza da riposo mentre aspetti. Ogni città ne ha una. La prossima volta che esci a combattere, quella riserva dà alle tue uccisioni una spinta extra finché non si esaurisce. Una pausa alla locanda non è mai tempo sprecato; accelera il tuo prossimo tratto di salita di livello.",
+      "restedBody": "Entra in una locanda e resta fuori dal combattimento, e il tuo personaggio accumula esperienza da riposo mentre aspetti. Ogni città ne ha una. La prossima volta che uscirai a combattere, quella riserva darà una spinta in più alle tue uccisioni finché non si esaurisce. Una pausa in locanda non è mai tempo perso; accelera il tuo prossimo tratto di salita. La riserva ha un tetto, quindi una notte accumula più o meno quanto un soggiorno lunghissimo, e una volta raggiunto il livello massimo non resta barra di livello da riempire, quindi l'esperienza da riposo smette di accumularsi.",
       "capTitle": "Raggiungere il livello {cap}",
       "capJourneyBody": "Il livello {cap} è il limite, la fine della crescita di livello ma non della crescita in sé. Da lì affronti i dungeon e l'incursione in modalità normale ed eroica, sfidi il boss del mondo quando si erge, insegui un equipaggiamento migliore e ti metti alla prova nell'arena.",
-      "capEndgameBody": "Rifts are the one thing that waits for the cap itself. They tear open out in the realms on their own schedule, ranked from C to S, and every group in the world races to be the one that closes each of them. The delve boards keep going too, and their harder tier is worth another look once your gear has caught up.",
+      "capEndgameBody": "Gli Squarci sono l'unica cosa che aspetta il limite stesso. Si aprono nei reami secondo il proprio calendario, classificati da C a S, e ogni gruppo nel mondo corre per essere quello che chiude ciascuno di essi. Anche i tabelloni delle incursioni continuano a funzionare, e il loro livello più difficile merita un'altra occhiata una volta che il tuo equipaggiamento si è messo al passo.",
       "prestigeBody": "L'esperienza continua a contare anche dopo il limite. Alimenta un livello virtuale estetico, così la tua barra dell'esperienza continua a salire, e un grado di prestigio a lungo termine che puoi reclamare dalla scheda del personaggio una volta arrivato. Superare grandi traguardi di esperienza totale fa guadagnare anche imprese nel tuo Libro delle Imprese, con titoli estetici e bordi della targhetta che compaiono sulla scheda del personaggio. È tutto puramente facoltativo e non concede mai potere, solo un segno della strada che hai percorso.",
       "noRush": "Non c'è fretta. Il mondo è lì per essere goduto al tuo ritmo, perciò vaga, prendi le missioni che attirano il tuo sguardo e lascia che il tuo eroe cresca lungo il cammino.",
-      "ridingTitle": "Learning to ride",
-      "ridingBody": "Riding is one of the things waiting at the end of the climb. At level {level} a stablemaster will teach you the skill for a serious sum of gold, and a lesson out on the training course earns you your first set of reins. A mount grants no power at all; it simply makes the world smaller, which after a long walk north is its own kind of reward."
+      "ridingTitle": "Imparare a cavalcare",
+      "ridingBody": "L'Equitazione è una delle cose che ti aspettano alla fine della scalata. Al livello {level} una stalliera capo ti insegnerà l'abilità per una discreta somma d'oro, e una lezione sul percorso di addestramento ti fa guadagnare il tuo primo paio di redini. Una cavalcatura non conferisce alcun potere; rende semplicemente il mondo più piccolo, il che dopo una lunga camminata verso nord è già una ricompensa di per sé."
     },
     "placeholder": {
       "note": "Questa parte della guida è in arrivo."
@@ -6406,7 +6766,7 @@ export const it_IT: EnTranslations = {
     "browSoft": "Morbide",
     "browThick": "Folte",
     "browAngled": "Inclinate",
-    "earrings": "Orecchini",
+    "earrings": "Piercing",
     "jewelMaterial": "Materiale Gioielli",
     "jewelDefault": "Come Forgiato",
     "jewelGold": "Oro",
@@ -7393,7 +7753,8 @@ export const it_IT: EnTranslations = {
       "guilds": "Suggerimento: unirti a una gilda ti offre un canale di chat privato e un elenco condiviso dei compagni di gilda.",
       "professions": "Suggerimento: puoi apprendere le professioni di raccolta e creazione insieme alla tua classe di combattimento.",
       "loadouts": "Suggerimento: salva più configurazioni dei talenti per passare da una build all’altra senza spendere i punti due volte.",
-      "pvp": "Suggerimento: sfida un altro giocatore a un duello amichevole oppure mettiti in coda per l’arena del Colosseo Cinereo per mettere alla prova la tua build."
+      "pvp": "Suggerimento: sfida un altro giocatore a un duello amichevole oppure mettiti in coda per l’arena del Colosseo Cinereo per mettere alla prova la tua build.",
+      "reliquary": "Consiglio: il Reliquiario tiene traccia dei bottini unici che collezioni, scaffale dopo scaffale."
     }
   },
   "errors": {
@@ -7458,9 +7819,9 @@ export const it_IT: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Il gioco sta girando senza accelerazione GPU e sarà lento. Aggiorna i driver grafici, poi riavvia il gioco. Su Windows, imposta anche il gioco su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica.",
     "bodyWeb": "Il gioco sta girando senza accelerazione GPU e sarà lento. Abilita l'accelerazione hardware nelle impostazioni del browser, aggiorna i driver grafici, poi riavvia il browser.",
-    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
-    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
-    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyWindows": "Questa sessione sta girando sulla GPU integrata (a risparmio energetico). Se questo computer ha anche una GPU dedicata per il gioco, imposta il browser su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica, poi riavvialo. L'app desktop seleziona automaticamente la GPU dedicata.",
+    "hybridBodyLinux": "Questa sessione sta girando sulla GPU integrata (a risparmio energetico). Se questo computer ha anche una GPU dedicata per il gioco, il browser o il driver grafico potrebbero offrire un'impostazione di selezione GPU propria, oppure la tua distribuzione potrebbe offrire uno strumento di commutazione GPU (come PRIME o optimus-manager). L'app desktop seleziona automaticamente la GPU dedicata.",
+    "hybridBodyOther": "Questa sessione sta girando sulla GPU integrata (a risparmio energetico). Se questo computer ha anche una GPU dedicata per il gioco, controlla le impostazioni grafiche del browser e del sistema operativo per abilitarla. L'app desktop seleziona automaticamente la GPU dedicata.",
     "dismiss": "Ignora"
   },
   "perfNudge": {
@@ -7516,7 +7877,12 @@ export const it_IT: EnTranslations = {
     "sortLevel": "Livello",
     "sortName": "Nome",
     "sortRecent": "Giocati di recente",
-    "sortPlaytime": "Tempo di gioco"
+    "sortPlaytime": "Tempo di gioco",
+    "redesign": "Ridisegna",
+    "redesignHint": "Questo personaggio è precedente al nuovo creatore di personaggi. Hai un ridisegno gratuito; viene usato al salvataggio.",
+    "redesignTitle": "Ridisegna {name}",
+    "redesignSave": "Salva nuovo aspetto",
+    "redesignCancel": "Mantieni aspetto attuale"
   },
   "deleteCharacter": {
     "title": "Elimina personaggio",
@@ -7544,7 +7910,8 @@ export const it_IT: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energia",
-      "rage": "Rabbia"
+      "rage": "Rabbia",
+      "focus": "Concentrazione"
     },
     "roles": {
       "warrior": "Tank / DPS da mischia",
@@ -7647,6 +8014,7 @@ export const it_IT: EnTranslations = {
           "say": "Dire",
           "yell": "Gridare",
           "party": "Gruppo",
+          "battleground": "Campo di battaglia",
           "general": "Generale",
           "world": "Mondo",
           "lfg": "LFG",
@@ -7673,7 +8041,111 @@ export const it_IT: EnTranslations = {
       "zoomIn": "Aumenta zoom",
       "zoomOut": "Riduci zoom",
       "mapCanvasLabel": "Mappa",
-      "mapSummary": "Mappa di {zone}."
+      "mapSummary": "Mappa di {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Non sono visibili indicatori rilevanti.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Indicatori aggiuntivi: {count}.",
+      "mapMarkerDirections": {
+        "center": "al centro",
+        "north": "a nord",
+        "northeast": "a nord-est",
+        "east": "a est",
+        "southeast": "a sud-est",
+        "south": "a sud",
+        "southwest": "a sud-ovest",
+        "west": "a ovest",
+        "northwest": "a nord-ovest"
+      },
+      "mapMarkerDistances": {
+        "near": "nelle vicinanze",
+        "medium": "a media distanza",
+        "far": "a grande distanza"
+      },
+      "mapMarkerLabels": {
+        "you": "Tu",
+        "availableQuest": "Missione disponibile",
+        "readyQuest": "Missione pronta da consegnare",
+        "repeatQuest": "Missione ripetibile",
+        "cooldownQuest": "Missione in attesa",
+        "questObjective": "Area obiettivo della missione",
+        "readyOre": "Filone di minerale pronto",
+        "readyWood": "Boschetto di alberi pronto",
+        "readyHerb": "Aiuola d'erbe pronta",
+        "readyLockedOre": "Filone di minerale pronto, strumento non disponibile",
+        "readyLockedWood": "Boschetto di alberi pronto, strumento non disponibile",
+        "readyLockedHerb": "Aiuola d'erbe pronta, strumento non disponibile",
+        "cooldownOre": "Filone di minerale esaurito",
+        "cooldownWood": "Boschetto di alberi esaurito",
+        "cooldownHerb": "Aiuola d'erbe esaurita",
+        "cooldownLockedOre": "Filone di minerale esaurito, strumento non disponibile",
+        "cooldownLockedWood": "Boschetto di alberi esaurito, strumento non disponibile",
+        "cooldownLockedHerb": "Aiuola d'erbe esaurita, strumento non disponibile",
+        "station": "Stazione di artigianato: {name}",
+        "service": "Servizio: {name}",
+        "partyMember": "Membro del gruppo: {name}",
+        "deadPartyMember": "Membro del gruppo caduto: {name}",
+        "partyMemberGeneric": "Membro del gruppo",
+        "deadPartyMemberGeneric": "Membro del gruppo caduto",
+        "friend": "Amico: {name}",
+        "guildMember": "Membro della gilda: {name}",
+        "pointOfInterest": "Punto di interesse: {name}",
+        "dungeonEntrance": "Ingresso del dungeon: {name}",
+        "dungeonExit": "Uscita dal dungeon",
+        "delveEntrance": "Ingresso dell'incursione: {name}",
+        "worldPassage": "Passaggio per {zone}",
+        "riftEntrance": "Ingresso dello squarcio: {name}",
+        "hostileEnemy": "Nemico ostile",
+        "aggressiveEnemy": "Nemico che ti sta attaccando",
+        "lootableEnemy": "Nemico con bottino",
+        "corpse": "Il tuo cadavere",
+        "deathZone": "Zona pericolosa",
+        "teammate": "Compagno di squadra",
+        "deadTeammate": "Compagno di squadra caduto",
+        "flagCarrier": "Compagno di squadra portabandiera",
+        "ownFlagStand": "Piedistallo della tua bandiera",
+        "enemyFlagStand": "Piedistallo della bandiera nemica",
+        "riftDescent": "Discesa dello squarcio",
+        "riftReturnBeacon": "Faro di ritorno",
+        "riftReturnExit": "Uscita di ritorno",
+        "ranked": "{marker}, rango {rank}",
+        "riftTreasureAvailable": "Tesoro disponibile",
+        "riftTreasureLocked": "Tesoro chiuso a chiave",
+        "riftTreasureOpened": "Tesoro aperto",
+        "riftTreasureJammed": "Tesoro con serratura inceppata",
+        "riftCacheAvailable": "Scrigno dello squarcio disponibile",
+        "riftCacheLocked": "Scrigno chiuso a chiave",
+        "riftCacheOpened": "Scrigno aperto",
+        "riftCacheJammed": "Scrigno con serratura inceppata",
+        "pylonUnlit": "Pilone runico spento",
+        "pylonLit": "Pilone runico acceso",
+        "sequenceRuneUnlit": "Runa della sequenza spenta",
+        "sequenceRuneLit": "Runa della sequenza accesa",
+        "iceGoal": "Bersaglio di ghiaccio",
+        "boulderPad": "Bersaglio del masso",
+        "boulderMovable": "Masso spostabile",
+        "boulderPlaced": "Masso posizionato",
+        "gateSealed": "Cancello sigillato",
+        "gateOpen": "Cancello aperto",
+        "switchReady": "Interruttore pronto",
+        "switchOn": "Interruttore attivato",
+        "orbDormant": "Sfera dormiente",
+        "orbActive": "Sfera attiva",
+        "rollerHazard": "Rullo pericoloso",
+        "delvePassageSealed": "Passaggio sigillato",
+        "delvePassageOpen": "Passaggio aperto",
+        "delveSurfaceExit": "Uscita in superficie",
+        "delveCacheLocked": "Scrigno dell'incursione chiuso a chiave",
+        "delveCacheReady": "Scrigno dell'incursione pronto",
+        "delveCacheActive": "Scrigno dell'incursione attivo",
+        "delveCacheOpened": "Scrigno dell'incursione aperto",
+        "delveReliquaryLocked": "Reliquiario chiuso a chiave",
+        "delveReliquaryReady": "Reliquiario pronto",
+        "delveReliquaryActive": "Rito del reliquiario attivo",
+        "delveReliquaryOpened": "Reliquiario aperto",
+        "bountiful": "Ricompensa abbondante: {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu di gioco",
@@ -7808,6 +8280,7 @@ export const it_IT: EnTranslations = {
     "chat": {
       "rightClickName": "Clic destro su {name}",
       "templates": {
+        "battleground": "[Campo di battaglia] {name}: {message}",
         "party": "[Gruppo] {name}: {message}",
         "yell": "{name} urla: {message}",
         "whisper": "{name} sussurra: {message}",
@@ -7922,7 +8395,7 @@ export const it_IT: EnTranslations = {
       "deathRecapAbility": "Sei morto. Ucciso da {ability}.",
       "deathRecapFalling": "Sei morto. Sei caduto nel vuoto.",
       "deathRecapDrowned": "Sei morto. Sei annegato.",
-      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
+      "deathRecapCauterized": "Sei morto. L'ustione della Cauterizzazione ti ha sopraffatto.",
       "respawn": "Ti senti di nuovo riposato e integro.",
       "ignoringChat": "Chat di {name} ignorata.",
       "noLongerIgnoring": "Non ignori più {name}.",
@@ -7951,6 +8424,7 @@ export const it_IT: EnTranslations = {
       "notEnoughRage": "Rabbia insufficiente!",
       "notEnoughEnergy": "Energia insufficiente!",
       "notEnoughMana": "Mana insufficiente!",
+      "notEnoughDevotion": "Devozione insufficiente!",
       "notEnoughResource": "{resource} insufficiente!",
       "notEnoughHealth": "Salute insufficiente.",
       "targetMustDodge": "Il bersaglio deve prima schivare.",
@@ -7966,7 +8440,7 @@ export const it_IT: EnTranslations = {
       "outOfRange": "Fuori portata.",
       "noTarget": "Non hai un bersaglio.",
       "tooClose": "Troppo vicino!",
-      "mustTargetAlly": "You must target an ally.",
+      "mustTargetAlly": "Devi avere un alleato come bersaglio.",
       "facing": "Devi guardare il bersaglio.",
       "targetHealthBelow": "Quell'abilità richiede il bersaglio sotto il {percent}% di salute.",
       "dagger": "Devi impugnare un pugnale.",
@@ -8079,6 +8553,10 @@ export const it_IT: EnTranslations = {
     "pet": {
       "attack": "Attacca",
       "waterJet": "Getto d'Acqua",
+      "felbolt": "Dardo di Cenere",
+      "abyssalChain": "Catena Abissale",
+      "autocastOn": "Autolancio attivato. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per disattivarlo.",
+      "autocastOff": "Autolancio disattivato. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivarlo.",
       "taunt": "Provoca",
       "healDemon": "Cura demone",
       "healPet": "Cura mascotte",
@@ -8089,6 +8567,10 @@ export const it_IT: EnTranslations = {
       "petAttackDesc": "Ordina alla tua mascotte di attaccare il tuo attuale bersaglio ostile.",
       "waterJetTitle": "Getto d'Acqua",
       "waterJetDesc": "Ordina al tuo Elementale dell'Acqua di canalizzare un flusso rallentante per 3 secondi. Tempo di recupero: 8 secondi. Clic destro per lanciarlo automaticamente ogni volta che non è in recupero.",
+      "felboltTitle": "Dardo di Cenere",
+      "felboltDesc": "Ordina a Emberkin di lanciare un dardo di cenere aggiuntivo contro il tuo bersaglio. Tempo di recupero: 8 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l'autolancio.",
+      "abyssalChainTitle": "Catena Abissale",
+      "abyssalChainDesc": "Ordina a Gloomshade di trascinare a sé un nemico normale a più di 8 e fino a 20 metri di distanza. I boss non possono essere trascinati. Tempo di recupero: 15 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l'autolancio.",
       "petTauntTitle": "Provocazione mascotte",
       "petTauntDesc": "Ordina alla tua mascotte di ingaggiare e usare Ringhio quando è a portata. Recupero di 10 secondi.",
       "healDemonDesc": "Spendi mana per canalizzare cure nel tuo demone per 5 secondi.",
@@ -8244,6 +8726,7 @@ export const it_IT: EnTranslations = {
     "tooltip": {
       "rank": "Grado {rank}",
       "cost": "{cost} {resource}",
+      "ruinCost": "{cost} Rovina",
       "range": "Portata {range} m",
       "rangeWithMin": "Portata {min}-{max} m",
       "instant": "Istantaneo",
@@ -8255,6 +8738,7 @@ export const it_IT: EnTranslations = {
       "requiresLevel": "Richiede livello {level}",
       "requiresForm": "Richiede Forma di {form}",
       "requiresStealth": "Richiede furtività",
+      "requiresStealthSkulduggery": "Richiede furtività (non necessaria a 3 Caligine o durante il Velo d'Ombra)",
       "requiresCombo": "Consuma punti combo",
       "requiresTargetHealthBelow": "Richiede il bersaglio sotto il {percent}% di salute",
       "requiresDodge": "Utilizzabile solo dopo una schivata del bersaglio",
@@ -8270,7 +8754,9 @@ export const it_IT: EnTranslations = {
     "resources": {
       "mana": "mana",
       "rage": "rabbia",
-      "energy": "energia"
+      "energy": "energia",
+      "focus": "concentrazione",
+      "devotion": "Devozione"
     },
     "forms": {
       "bear": "orso",
@@ -8472,6 +8958,7 @@ export const it_IT: EnTranslations = {
       "clickDestroy": "Clicca per distruggere",
       "useFishing": "Uso: pesca nelle acque vicine.",
       "useHealingPotion": "Uso: ripristina istantaneamente {amount} salute. Usabile in combattimento. Recupero 1 min.",
+      "useHealingPotionPct": "Uso: ripristina istantaneamente il {percent}% della salute massima. Usabile in combattimento. Recupero 2 min.",
       "useManaPotion": "Uso: ripristina istantaneamente {amount} mana. Usabile in combattimento. Recupero 1 min.",
       "clickUseInstant": "Clicca per usare subito in combattimento",
       "clickUse": "Clicca per usare",
@@ -8575,6 +9062,9 @@ export const it_IT: EnTranslations = {
       "filterPrimaryStatAll": "Qualsiasi statistica principale",
       "filterRarity": "Rarità",
       "filterRarityAll": "Tutte le rarità",
+      "filterSort": "Ordina",
+      "sortName": "Nome (A-Z)",
+      "sortPriceAsc": "Prezzo: dal più basso al più alto",
       "weaponSword": "Spade",
       "weaponDagger": "Pugnali",
       "weaponStaff": "Bastoni",
@@ -8703,19 +9193,71 @@ export const it_IT: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Pioggia di Fuoco",
-        "description": "Fa piovere fuoco sulla zona bersaglio per 4 sec, bruciando i nemici per {damage} danni da Fuoco ogni secondo."
+        "description": "Spende 3 Devastazione per far piovere fuoco sull'area bersaglio, infliggendo {damage} danni da Fuoco ogni secondo per 4 sec, estesi a 6 sec al rango 2. Rovina fa scendere subito la prima ondata."
       },
       "volley": {
         "name": "Scarica di Frecce",
-        "description": "Fa piovere frecce sulla zona bersaglio per 3 sec, infliggendo {damage} danni ogni 0.5 sec ai nemici colpiti."
+        "description": "Fa piovere frecce su un'area di 8 m per 3 sec. I nemici nell'area subiscono {damage} danni Fisici ogni 0.5 sec. Il danno aumenta con la potenza d'attacco a distanza."
+      },
+      "pack_command": {
+        "name": "Comando del Branco",
+        "description": "Ordina al tuo famiglio vivo di colpire per 36-48 danni Fisici. I danni aumentano con la potenza d'attacco del famiglio. Un colpo a segno recupera 20 concentrazione e concede 1 Ferocia del Branco per 30 s, fino a 3. Ogni accumulo aumenta del 10% tutti i danni inflitti dal tuo famiglio. Questo colpo usa gli accumuli che avevi prima dell'impatto."
+      },
+      "stampede": {
+        "name": "Fuggifuggi",
+        "description": "Evoca 3 bestie per 12 s. Ognuna attacca ogni 2 s per {damage} danni Fisici. I danni mostrati includono l'8% della tua potenza d'attacco a distanza prima dei bonus ai danni del famiglio. Le bestie fissano la Ferocia del Branco all'evocazione, guadagnando il 10% di danni per accumulo. Mentre Fuggifuggi è in recupero, i Comandi del Branco riusciti hanno il 20% di probabilità di azzerarlo, garantito dopo 5 tentativi falliti. Non può azzerarsi mentre le bestie sono attive. (Signore del Branco)"
+      },
+      "unleash_beast": {
+        "name": "Scatena la Bestia",
+        "description": "Consuma 3 Ferocia del Branco dopo che il tuo famiglio ha colpito per 83-105 danni Fisici e scosso ogni nemico entro 6 metri per 26-34. Il colpo e la scossa usano il bonus completo del 30% ai danni del famiglio della Ferocia del Branco e aumentano con la potenza d'attacco del famiglio. Per gli 8 s successivi il famiglio infligge il 25% di danni in più, attacca il 35% più velocemente e fa sì che il Tiro Nefasto colpisca fino a 2 nemici vicini."
+      },
+      "measured_shot": {
+        "name": "Tiro Misurato",
+        "description": "Colpisci il bersaglio per {damage} danni Fisici. Un colpo a segno recupera 20 concentrazione. I danni aumentano con la potenza d'attacco a distanza."
+      },
+      "cold_focus": {
+        "name": "Concentrazione Gelida",
+        "description": "Per 12 s il Tiro Misurato recupera il 50% di concentrazione in più, e la Tesa Lunga costa il 25% in meno e si lancia il 30% più velocemente. (Distintivo di Vista Gelida)"
+      },
+      "bloodhook": {
+        "name": "Uncino Sanguinario",
+        "description": "Carica verso un nemico e applica Ferita da Uncino Sanguinario, infliggendo 34 danni Fisici base più il 26% della tua potenza d'attacco a distanza in 12 s con 4 impulsi. (Distintivo di Arte del Campo)"
+      },
+      "shrapnel_charge": {
+        "name": "Carica a Frammentazione",
+        "description": "Colpisci il bersaglio per 24-30 danni Fisici e fino ad altri 4 nemici entro 6 metri per 13-17. Gli altri bersagli sanguinano anche per 12 danni in 6 s. Se il bersaglio principale ha la tua Ferita da Uncino Sanguinario, infligge subito 1 impulso di ferita. I danni diretti aumentano con la potenza d'attacco a distanza."
+      },
+      "bloodtrail_assault": {
+        "name": "Assalto della Scia di Sangue",
+        "description": "Per 12 s l'Uncino Sanguinario propaga una ferita al 60% di potenza fino a 2 nemici vicini, Squarciaferite comanda un attacco del famiglio da 18 danni, e la Carica a Frammentazione guadagna 2 metri, infligge il 25% di danni base in più al bersaglio principale e attiva il 50% di danni da ferita in più."
+      },
+      "trailbreak": {
+        "name": "Rompipista",
+        "description": "Balza 12 metri all'indietro. Se hai Slancio di Caccia, lo rinnova e prepara il Rientro per 12 s."
+      },
+      "wildheart": {
+        "name": "Cuore Selvaggio",
+        "description": "Recupera all'istante il 30% della tua salute massima."
+      },
+      "shellskin": {
+        "name": "Pelle di Corazza",
+        "description": "Riduce i danni subiti del 60% per 8 s, ma impedisce di attaccare mentre è attiva."
+      },
+      "frostjaw_trap": {
+        "name": "Trappola Fauci di Gelo",
+        "description": "Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s."
+      },
+      "pack_rally": {
+        "name": "Adunata del Branco",
+        "description": "Assumi la Sembianza del Corsiero e aduna gli alleati vicini con il 30% di velocità di movimento e il 10% di velocità d'attacco e di lancio per 10 s."
       },
       "hurricane": {
         "name": "Uragano",
         "description": "Scatena un uragano sulla zona bersaglio per 6 sec, colpendo i nemici per {damage} danni della Natura ogni secondo."
       },
       "earthquake": {
-        "name": "Terremoto",
-        "description": "Scuote la zona bersaglio per 6 sec, colpendo i nemici per {damage} danni della Natura ogni 1.5 sec."
+        "name": "Risveglio di Faglia",
+        "description": "Scuote un'area di 8 m per 6 sec, infliggendo {damage} danni da Natura ogni 1.5 sec. Il danno aumenta con il Potere Magico. Elementale: a 5 Tuono, infligge il 100% di danno in più e consuma tutto il Tuono."
       },
       "heroic_strike": {
         "name": "Colpo del Predone",
@@ -8923,15 +9465,20 @@ export const it_IT: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Fendente Malvagio",
-        "description": "Colpo istantaneo per danni dell'arma più {damage}. Conferisce 1 punto combo."
+        "description": "Un colpo istantaneo per danni dell'arma più {damage}. Conferisce 1 punto combo.",
+        "specNote_assassination": "Aggiunge 1 Rituale del Veleno (massimo 6).",
+        "specNote_combat": "Mentre la Linea Rossa è attiva, questo pulsante diventa Colpo al corpo: 130% dei danni dell'arma più 10, conferisce 2 punti combo e aggiunge 1 Linea Rossa (massimo 4)."
       },
       "eviscerate": {
         "name": "Sonno Eterno",
-        "description": "Mossa finale che infligge {damage}."
+        "description": "Mossa finale che infligge {damage}.",
+        "specNote_assassination": "A 6 Rituale del Veleno, questo pulsante diventa Squarcio velenoso: un colpo che infligge istantaneamente tutti i danni che i tuoi sanguinamenti avrebbero ancora inflitto, pianta una nuova ferita avvelenata e ripristina 20 energia.",
+        "specNote_combat": "Colpire con questo a 4 o più punti combo avvia la Linea Rossa per 8 sec: Fendente Malvagio diventa Colpo al corpo e questo pulsante diventa Colpo da knockout (45 più 35 per punto combo, che colpisce il 25% più forte per ogni tacca di Linea Rossa accumulata, e ripristina 25 energia). Spendilo prima che la Linea Rossa finisca."
       },
       "backstab": {
         "name": "Affondo Codardo",
-        "description": "Pugnala il bersaglio per il 150% dei danni dell'arma più {damage}. Devi essere dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo."
+        "description": "Conficca il tuo pugnale nella schiena del bersaglio per il 150% dei danni dell'arma più {damage}. Devi essere dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
+        "specNote_assassination": "Ogni colpo aggiunge 1 Rituale del Veleno (massimo 6) e rimborsa 15 energia. A 6 Rituale del Veleno, Sonno Eterno diventa Squarcio velenoso (infligge tutti i danni da sanguinamento residui in una volta)."
       },
       "gouge": {
         "name": "Colpo all'Occhio",
@@ -8943,7 +9490,7 @@ export const it_IT: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Ritmo Sanguinario",
-        "description": "Mossa finale che aumenta la velocità d'attacco in mischia del 30%. Dura più a lungo per ogni punto combo."
+        "description": "Mossa finale che aumenta la velocità d'attacco in mischia del 30% per 12 sec più 4 sec per punto combo (5 punti combo: 32 sec)."
       },
       "sprint": {
         "name": "Calcagni Veloci",
@@ -8951,15 +9498,17 @@ export const it_IT: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Colpo Basso",
-        "description": "Mossa finale che stordisce il bersaglio. Dura 1 s in più per punto combo."
+        "description": "Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec)."
       },
       "ambush": {
         "name": "Colpo dell'Agguato",
-        "description": "Tende un agguato al bersaglio per il 250% dei danni dell'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo."
+        "description": "Colpisci dalle ombre per il 250% dei danni dell'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
+        "specNote_subtlety": "Usata dal Velo Crepuscolare, aggiunge 1 Caligine (massimo 3). A 3 Caligine puoi usarla SENZA furtività e da qualsiasi angolazione: quell'uso non costa nulla, spende tutte le 3 Caligine, avvia il Velo d'Ombra di 6 sec e colpisce per il doppio."
       },
       "stealth": {
         "name": "Velo Crepuscolare",
-        "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Duskveil. Lanciala di nuovo per uscire."
+        "description": "Ti nasconde nell'ombra: i nemici a stento ti notano, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
+        "specNote_subtlety": "Ogni apertura furtiva che usi dal Velo Crepuscolare aggiunge 1 Caligine (massimo 3)."
       },
       "adrenaline_rush": {
         "name": "Sangue Impetuoso",
@@ -8967,11 +9516,13 @@ export const it_IT: EnTranslations = {
       },
       "garrote": {
         "name": "Filo alla Gola",
-        "description": "Garrota il nemico, infliggendo {damage} danni immediati e provocando sanguinamento per {overTime} in 18 sec. Devi essere furtivo. Conferisce 1 punto combo."
+        "description": "Avvolgi un filo intorno alla gola del nemico, infliggendo {damage} danni ora e facendolo sanguinare per {overTime} in 18 sec. Devi essere furtivo. Conferisce 1 punto combo.",
+        "specNote_subtlety": "Usata dal Velo Crepuscolare, aggiunge 1 Caligine (massimo 3). A 3 Caligine puoi usarla SENZA furtività: quell'uso non costa nulla, spende tutte le 3 Caligine e avvia il Velo d'Ombra di 6 sec."
       },
       "cheap_shot": {
         "name": "Pugno allo Stomaco",
-        "description": "Colpisce il bersaglio per {damage} danni, stordendolo per 4 sec. Devi essere furtivo. Conferisce 2 punti combo."
+        "description": "Colpisci il bersaglio per {damage} danni, stordendolo per 4 sec. Devi essere furtivo. Conferisce 2 punti combo.",
+        "specNote_subtlety": "Usata dal Velo Crepuscolare, aggiunge 1 Caligine (massimo 3). A 3 Caligine puoi usarla SENZA furtività: quell'uso non costa nulla, spende tutte le 3 Caligine e avvia il Velo d'Ombra di 6 sec."
       },
       "sap": {
         "name": "Tramortimento",
@@ -8983,11 +9534,11 @@ export const it_IT: EnTranslations = {
       },
       "expose_armor": {
         "name": "Breccia nell'Armatura",
-        "description": "Mossa finale che espone il bersaglio, riducendone la corazza di {damage} per 30 sec."
+        "description": "Mossa finale che espone il bersaglio per 30 sec: ogni punto combo speso riduce la sua armatura del 2% (5 punti combo: {damage}%)."
       },
       "rupture": {
         "name": "Dissanguamento",
-        "description": "Mossa finale che ferisce il bersaglio, provocando sanguinamento per {damage} in 16 sec."
+        "description": "Mossa finale che ferisce il bersaglio: sanguina ogni 2 sec, per 6 sec più 2 sec per punto combo (5 punti combo: 16 sec e {damage} danni totali)."
       },
       "vanish": {
         "name": "Passo di Fumo",
@@ -9007,19 +9558,131 @@ export const it_IT: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Marchio del Giuramento",
-        "description": "Ti riempie di potere Sacro per 30 sec, facendo infliggere {damage} danni Sacri aggiuntivi a ogni tuo colpo in mischia. Scatenalo con Verdict."
-      },
-      "holy_light": {
-        "name": "Luce Risanatrice",
-        "description": "Cura un bersaglio alleato di {damage}."
-      },
-      "devotion_aura": {
-        "name": "Aura Incrollabile",
-        "description": "Aumenta la tua armatura di {buff} per 30 min."
+        "description": "Vi riempie di potere Sacro per 30 sec, facendo sì che ogni vostro colpo in mischia infligga {damage} danni Sacri aggiuntivi."
       },
       "judgement": {
         "name": "Verdetto",
         "description": "Scatena il tuo Sigillo attivo sul nemico, consumandolo per infliggere i suoi danni Sacri accumulati."
+      },
+      "holy_light": {
+        "name": "Luce Risanatrice",
+        "description": "Cura rapidamente un bersaglio alleato di {damage}. Ripristinare salute genera 1 Devozione, anche senza specializzazione. Risonanza Radiosa o Rappresaglia Solare lo rende istantaneo."
+      },
+      "divine_ascension": {
+        "name": "Ascensione Divina",
+        "description": "Consuma 20 Devozione per ottenere 5 cariche di Ascensione per un massimo di 45 s. Le abilità contrassegnate consumano una carica e ottengono un effetto aggiuntivo."
+      },
+      "aura_mastery": {
+        "name": "Concordia Sacra",
+        "description": "Per 8 s potenzia ogni Devozione e Aura di Rappresaglia attiva nel tuo gruppo. La Devozione del Bastione riduce i danni del 15%; la Rappresaglia infligge 15 danni Sacri. Gli usi multipli si rinnovano invece di sommarsi."
+      },
+      "devotion_ward": {
+        "name": "Devozione del Bastione",
+        "description": "Riduce del 5% i danni subiti da te e dai membri del gruppo fino alla morte o alla sostituzione. Solo quest'aura e l'Aura di Rappresaglia si sostituiscono a vicenda; le Devozioni Radiante, dell'Alba e della Grazia coesistono."
+      },
+      "hammer_of_grace": {
+        "name": "Martello della Grazia",
+        "description": "Scaglia all'istante un martello sacro contro un nemico entro 20 m per {damage}, recupera 70 mana, ti cura per il 50% dei danni inflitti e genera 1 Devozione quando infligge danni. La Rappresaglia Solare permette al Martello della Grazia di ignorare il tempo di recupero e di curarti per il 100% dei danni inflitti."
+      },
+      "hushbrand": {
+        "name": "Marchio del Silenzio",
+        "description": "Interrompe il lancio e impedisce gli incantesimi di quella scuola per 4 s."
+      },
+      "guardian_covenant": {
+        "name": "Patto del Guardiano",
+        "description": "Protegge un bersaglio alleato e te stesso, riducendo i danni subiti del 20% per 8 s. Seleziona te per impostazione predefinita se non è scelto alcun bersaglio alleato."
+      },
+      "solar_step": {
+        "name": "Passo Solare",
+        "description": "Aumenta la tua velocità di movimento del 150% per 2 s."
+      },
+      "solar_invocation": {
+        "name": "Invocazione Solare",
+        "description": "Cura all'istante un alleato per {damage} oppure infligge danni Sacri moderati a un nemico. Entrambi gli usi generano 1 Devozione. Durante l'Ascensione, un lancio di cura cura anche i giocatori alleati entro 10 m dal bersaglio per metà."
+      },
+      "radiant_devotion": {
+        "name": "Devozione Radiante",
+        "description": "Aumenta di 20 la potenza magica tua e dei membri del gruppo per 30 min. Sostituisce la tua Devozione dell'Alba o della Grazia, ma coesiste con le Devozioni di altri paladini."
+      },
+      "dawn_devotion": {
+        "name": "Devozione dell'Alba",
+        "description": "Aumenta di 40 la potenza d'attacco tua e dei membri del gruppo per 30 min. Sostituisce la tua Devozione Radiante o della Grazia, ma coesiste con le Devozioni di altri paladini e con i gridi del guerriero."
+      },
+      "grace_devotion": {
+        "name": "Devozione della Grazia",
+        "description": "Tu e i membri del gruppo recuperate 15 mana ogni 5 s e pagate il 3% di mana in meno per 30 min. Sostituisce la tua Devozione Radiante o dell'Alba, ma coesiste con le Devozioni di altri paladini."
+      },
+      "recall_the_fallen": {
+        "name": "Richiamo dei Caduti",
+        "description": "Riporta in vita un membro morto del gruppo con il 35% di salute e mana. Un Sanasole di livello 16 o superiore richiama invece tutti i membri caduti del gruppo."
+      },
+      "beacon_of_light": {
+        "name": "Faro di Luce",
+        "description": "Marchia un membro del gruppo come tuo Faro di Luce. Il 50% delle tue cure dirette efficaci su un altro membro del gruppo entro 60 m cura anche il Faro. Le cure ad area e periodiche non vengono trasferite. Dura finché uno dei due non muore."
+      },
+      "final_edict": {
+        "name": "Editto Finale",
+        "description": "Assesta un colpo d'arma devastante e genera 1 Devozione quando infligge danni. Un colpo riuscito riduce di 2 s il tempo di recupero rimanente della Caduta dell'Alba. Gli attacchi automatici riusciti e i colpi dell'Editto Finale hanno il 15% di probabilità di concedere Ira dell'Alba per 8 s. L'Ascensione libera inoltre un'esplosione Sacra attorno a te."
+      },
+      "dawnfall": {
+        "name": "Caduta dell'Alba",
+        "description": "Infligge {damage} danni Sacri ai nemici vicini e genera 1 Devozione. Colpire almeno un nemico riduce di 2 s il tempo di recupero rimanente dell'Editto Finale. L'Ascensione ne aumenta danni e raggio."
+      },
+      "sun_gods_verdict": {
+        "name": "Verdetto del Dio Sole",
+        "description": "Giudica un nemico sotto il Verdetto del Dio Sole per 30 s. L'Editto Finale e la Caduta dell'Alba incidono una carica a ogni colpo riuscito. L'abilità che assesta la terza carica detta la sentenza: l'Editto Finale scatena danni devastanti sul condannato; la Caduta dell'Alba fa detonare il verdetto, danneggiando e stordendo i nemici vicini per 1,5 s."
+      },
+      "valkyrs_calling": {
+        "name": "Richiamo della Valchiria",
+        "description": "Ti innalzi in volo, diventando immune ai danni mentre voli verso il nemico. Dopo 2 s piombi sull'area bersaglio per {damage} danni Sacri e generi 1 Devozione. L'Ascensione aumenta del 50% i danni d'impatto e consuma 1 carica."
+      },
+      "faithforged_guard": {
+        "name": "Debito di Luce",
+        "description": "Per 8 s il prossimo colpo nemico contro di te riceve risposta: fino a {buff} danni vengono negati e restituiti all'attaccante come danni Sacri, e ottieni 1 Devozione. Viene risposto a un solo colpo. L'Ascensione aumenta del 50% la quantità a cui può rispondere."
+      },
+      "mercy_lance": {
+        "name": "Lancia della Misericordia",
+        "description": "Infligge {damage} danni Sacri a un nemico e genera 1 Devozione quando infligge danni. Durante l'Ascensione consuma 1 carica per garantire un colpo critico."
+      },
+      "sacred_form": {
+        "name": "Forma Sacra",
+        "description": "Entra in uno stato sacro fino alla morte, aumentando le cure del 10% e la probabilità di critico magico del 5%, e riducendo la minaccia generata del 50%. Solo per Sanasole."
+      },
+      "dawns_embrace": {
+        "name": "Abbraccio dell'Alba",
+        "description": "Libera una cura potente e genera 1 Devozione. La Risonanza Radiante ne riduce il costo in mana del 50% e il tempo di lancio a 1,5 s. L'Ascensione la rende istantanea e ne aumenta le cure del 35%."
+      },
+      "radiant_chorus": {
+        "name": "Coro Radiante",
+        "description": "Cura gli alleati vicini per {damage} e genera 1 Devozione. Curare efficacemente almeno 2 alleati concede Risonanza Radiante: la tua prossima Luce Risanatrice è istantanea, oppure il tuo prossimo Abbraccio dell'Alba costa il 50% di mana in meno e si lancia in 1,5 s. L'Ascensione aumenta cure e raggio del Coro Radiante."
+      },
+      "life_covenant": {
+        "name": "Patto della Vita",
+        "description": "Riduce del 40% i danni subiti da un alleato per 6 s. Durante l'Ascensione concede anche uno scudo di 120 punti senza consumare una carica."
+      },
+      "aegis_first_dawn": {
+        "name": "Egida della Prima Alba",
+        "description": "Canalizza per 5 s creando una cupola sacra di 10 metri. Gli alleati all'interno vengono curati ogni secondo e subiscono il 50% di danni in meno. Completare la canalizzazione libera una cura finale e concede il 30% di velocità di movimento per 4 s."
+      },
+      "vowkeeper_strike": {
+        "name": "Colpo del Custode dei Voti",
+        "description": "Colpisce con minaccia elevata e genera 1 Devozione. Un colpo riuscito ha il 20% di probabilità di concedere Rappresaglia Solare per 8 s; ogni parata riuscita il 25%. La Rappresaglia Solare potenzia il tuo prossimo Disco Solare, Martello della Grazia o Luce Risanatrice. L'Ascensione concede anche un piccolo scudo di assorbimento."
+      },
+      "bastion_rite": {
+        "name": "Rito del Bastione",
+        "description": "Riduce i danni fisici subiti del 20% e aumenta la probabilità di parata del 20% per 6 s. L'Ascensione porta la durata a 10 s."
+      },
+      "sunward_disc": {
+        "name": "Disco Solare",
+        "description": "Richiede uno scudo. Scaglia un disco radiante che colpisce e poi rimbalza tra i nemici vicini. Ogni impatto dannoso genera 1 Devozione. La Rappresaglia Solare fa sì che il Disco Solare non costi mana, ignori il tempo di recupero e infligga il 20% di danni in più. L'Ascensione potenzia 5 rimbalzi."
+      },
+      "sacred_challenge": {
+        "name": "Pungolo Sacro",
+        "description": "Costringe un nemico ad attaccarti. Durante l'Ascensione riduce anche del 15% tutti i danni subiti per 4 s senza consumare una carica."
+      },
+      "devotion_aura": {
+        "name": "Aura Incrollabile",
+        "description": "Aumenta la tua armatura di {buff} per 30 min."
       },
       "blessing_of_might": {
         "name": "Giuramento di Ferro",
@@ -9027,7 +9690,7 @@ export const it_IT: EnTranslations = {
       },
       "divine_protection": {
         "name": "Barriera della Fede",
-        "description": "Una barriera protettiva assorbe {damage} danni per 10 sec."
+        "description": "Uno scudo sacro assorbe il {damage}% della tua salute massima per {duration} sec."
       },
       "hammer_of_justice": {
         "name": "Maglio Frantumante",
@@ -9035,7 +9698,7 @@ export const it_IT: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Ultimo Rito",
-        "description": "Una grande ondata di guarigione: ripristina {damage} salute. Tempo di recupero di 10 min."
+        "description": "Una grande ondata di guarigione ripristina il {damage}% della tua salute massima. Tempo di recupero di 10 min."
       },
       "holy_taunt": {
         "name": "Pungolo Sacro",
@@ -9043,7 +9706,7 @@ export const it_IT: EnTranslations = {
       },
       "flash_of_light": {
         "name": "Rammendo di Luce",
-        "description": "Un rapido ed efficiente sprazzo di Luce che cura un bersaglio alleato di {damage}."
+        "description": "Un lampo di Luce rapido ed efficiente che cura un bersaglio alleato di {damage}. Ripristinare salute genera 1 Devozione, anche senza specializzazione."
       },
       "exorcism": {
         "name": "Rito di Espulsione",
@@ -9051,15 +9714,31 @@ export const it_IT: EnTranslations = {
       },
       "consecration": {
         "name": "Terra Consacrata",
-        "description": "Consacra il terreno sotto di te, bruciando i nemici vicini per {damage} danni Sacri ogni 2 sec per 10 sec."
+        "description": "Consacra il terreno per 9 sec e infligge {damage} danni Sacri ogni secondo. I Guardiani della Fede subiscono il 10% di danni in meno al suo interno."
+      },
+      "bastion_sweep": {
+        "name": "Falciata del Bastione",
+        "description": "Fai roteare lo scudo equipaggiato contro i nemici in un arco frontale di 180 gradi per {damage} danni Sacri con minaccia elevata e generi 1 Devozione. L'Ascensione aumenta i danni del 30% e il raggio a 8 m."
+      },
+      "oath_chain": {
+        "name": "Catena del Giuramento",
+        "description": "Vincola all'istante un nemico lontano con una catena sacra. Il nemico avanza verso di te a 18 m al secondo finché non raggiunge i 3 m, poi viene rallentato del 50% per 4 s. Durante l'Ascensione vincola un secondo nemico vicino."
+      },
+      "veilbound_march": {
+        "name": "Marcia del Velo",
+        "description": "Diventi etereo per 4 s, ottenendo il 40% di velocità di movimento e il 30% di armatura e diventando immune a radicamenti, rallentamenti e spostamenti. I nemici che attraversi ricevono il Marchio del Velo per 6 s: subiscono danni Sacri ogni secondo, ti infliggono il 20% di danni in meno e generano minaccia aggiuntiva. Il primo marchio concede 1 Devozione. Al termine della marcia, i nemici marchiati vicini subiscono un'esplosione finale. L'Ascensione aumenta l'esplosione del 50% e li attira leggermente verso di te."
+      },
+      "veilbound_mark": {
+        "name": "Marchio del Velo",
+        "description": "Subisce danni Sacri ogni secondo, infligge il 20% di danni in meno al paladino che ha applicato il marchio e genera minaccia aggiuntiva verso quel paladino."
       },
       "righteous_fury": {
         "name": "Giuramento Ardente",
-        "description": "Aumenta del 60% la minaccia generata dai tuoi danni Sacri per 30 min. Il cardine del paladino difensore."
+        "description": "Aumenta passivamente del 60% la minaccia generata dai vostri danni Sacri. Solo Custode della fede."
       },
       "retribution_aura": {
         "name": "Aura della Rivalsa",
-        "description": "Ti avvolge in energia sacra per 30 min, infliggendo 5 danni Sacri a ogni nemico che ti colpisce in mischia."
+        "description": "Avvolge te e il tuo gruppo in energia sacra fino alla morte o alla sostituzione. I nemici che colpiscono in mischia un alleato interessato subiscono {buff} danni Sacri, e gli alleati interessati infliggono {buff} danni Sacri aggiuntivi con gli attacchi automatici."
       },
       "tame_beast": {
         "name": "Vincolo Selvaggio",
@@ -9071,119 +9750,131 @@ export const it_IT: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Colpo Sventratore",
-        "description": "Forte attacco in mischia che aumenta i danni di {damage}. Si attiva al tuo prossimo colpo."
+        "description": "Colpisce per il 10% del danno dell'arma più {damage}. Un colpo a segno ripristina 15 Concentrazione e concede 1 Slancio di Caccia. Il danno aumenta con la potenza d'attacco attraverso il danno dell'arma."
       },
       "aspect_of_the_hawk": {
         "name": "Sembianze dell'Albanella",
-        "description": "Assumi le sembianze dell'albanella, aumentando la potenza d'attacco di {buff} per 30 min."
+        "description": "Assumete l'aspetto dell'albanella e aumentate la vostra potenza d'attacco di {buff} per 30 min."
       },
       "serpent_sting": {
         "name": "Aculeo Velenoso",
-        "description": "Punzecchia il bersaglio, infliggendo {damage} danni da Natura in 15 s."
+        "description": "Infligge {damage} danni da Natura in totale nell'arco di 15 sec, una volta ogni 3 sec. Il danno aumenta con la potenza d'attacco a distanza."
       },
       "arcane_shot": {
         "name": "Tiro Nefasto",
-        "description": "Tiro istantaneo che infligge {damage} danni Arcani."
+        "description": "Colpisce il bersaglio per {damage} danni Arcani. Il danno aumenta con la potenza d'attacco a distanza."
       },
       "concussive_shot": {
         "name": "Tiro Scuotente",
-        "description": "Stordisce leggermente il bersaglio per {damage} danni, rallentandone il movimento del 50% per 4 sec."
+        "description": "Colpisce il bersaglio per {damage} danni Fisici e lo rallenta del 50% per 4 sec. Il danno aumenta con la potenza d'attacco a distanza."
       },
       "mongoose_bite": {
-        "name": "Controzanna",
-        "description": "Contrattacca dopo che il bersaglio schiva, infliggendo danni dell'arma più {damage}. Non può essere schivato."
+        "name": "Squarciaferite",
+        "description": "Colpisce per il 45% del danno dell'arma più {damage}. Se il bersaglio porta la vostra Ferita da Uncino Sanguigno, infligge subito 1 impulso di ferita e rinnova la ferita a 12 sec. Il danno aumenta con la potenza d'attacco attraverso il danno dell'arma."
+      },
+      "hunting_momentum": {
+        "name": "Slancio di Caccia",
+        "description": "Passiva: il Colpo Sventratore concede 1 Slancio di Caccia per 8 s, fino a 3. A 3 accumuli, Squarciaferite infligge il 45% di danni da colpo in più e consuma gli accumuli. (Arte del Campo)"
+      },
+      "fieldcraft_reentry": {
+        "name": "Rientro Armato",
+        "description": "Passiva: Rompipista rinnova lo Slancio di Caccia e prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Il Colpo Sventratore infligge il 15% di danni in più per accumulo. L'Uncino Sanguinario infligge da 18 a 24 danni Fisici aggiuntivi, aumentati del 15% per accumulo e dalla tua potenza d'attacco a distanza. A 3 accumuli, uno dei due attacchi consuma lo Slancio di Caccia. (Arte del Campo)"
       },
       "wing_clip": {
         "name": "Fendente Immobilizzante",
-        "description": "Infligge una ferita per {damage} danni, rallentando il nemico del 40% per 10 sec."
+        "description": "Squarcia il bersaglio per {damage} danni Fisici e lo rallenta del 40% per 10 sec. Il danno aumenta con la potenza d'attacco."
       },
       "aspect_of_the_monkey": {
         "name": "Sembianze della Martora",
-        "description": "Assumi le sembianze della martora, aumentando la tua probabilità di schivata dell'8% per 30 min."
+        "description": "Assumete l'aspetto della martora e aumentate la vostra probabilità di schivata dell'8% per 30 min."
       },
       "aspect_of_the_cheetah": {
         "name": "Sembianze del Corsiero",
-        "description": "Assumi le sembianze del corsiero, aumentando la velocità di movimento del 30% per 30 min."
+        "description": "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min."
       },
       "aimed_shot": {
         "name": "Tiro Teso",
-        "description": "Un tiro accuratamente teso che infligge {damage} danni."
+        "description": "Colpisce il bersaglio per {damage} danni Fisici. Il danno aumenta con la potenza d'attacco a distanza."
       },
       "rapid_fire": {
         "name": "Tiro Febbrile",
-        "description": "Aumenta la tua velocità d'attacco del 40% per 15 s."
+        "description": "Incanala sei colpi rapidi in 2,4 s mentre ti muovi. Ogni colpo infligge {damage} danni fisici."
       },
       "smite": {
-        "name": "Punizione",
-        "description": "Colpisce il nemico per {damage} danni Sacri."
+        "name": "Inno Purificatore",
+        "description": "Infligge {damage} danni Sacri. Il danno aumenta con il Potere Magico. Disciplina: cura ogni alleato collegato del 30% del danno. Se nessun alleato è collegato, cura del 15% il membro del gruppo con meno salute."
       },
       "lesser_heal": {
         "name": "Preghiera Sussurrata",
-        "description": "Cura un bersaglio alleato di {damage}."
+        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico."
       },
       "power_word_fortitude": {
         "name": "Litania della Fermezza",
-        "description": "Aumenta la Tempra del bersaglio di {buff} per 30 min."
+        "description": "Aumenta la Costituzione di ogni membro del gruppo del {buff}% per 30 min."
       },
       "shadow_word_pain": {
         "name": "Canto Funebre della Putrefazione",
-        "description": "Una parola d'oscurità infligge {damage} danni da Ombra in 18 s."
+        "description": "Infligge {damage} danni da Ombra in totale nell'arco di 18 sec, una volta ogni 3 sec. Il danno aumenta con il Potere Magico. Ombra: infligge il 10% di danno in più, e ogni impulso sulla vostra Effigie concede 1 Decima Tenebrosa."
       },
       "power_word_shield": {
         "name": "Salmo di Protezione",
-        "description": "Protegge il bersaglio, assorbendo {damage} danni per 30 sec."
+        "description": "Protegge un bersaglio alleato assorbendo {damage} danni per 30 sec. Disciplina collega inoltre il bersaglio ai vostri danni Sacri per 30 sec."
       },
       "renew": {
         "name": "Grazia Persistente",
-        "description": "Cura il bersaglio di {damage} in 15 s."
+        "description": "Cura il bersaglio di {damage} nell'arco di 15 sec, una volta ogni 3 sec. La cura aumenta con il Potere Magico."
       },
       "mind_blast": {
         "name": "Frattura Mentale",
-        "description": "Colpisce la mente del bersaglio per {damage} danni da Ombra."
+        "description": "Infligge {damage} danni da Ombra. Il danno aumenta con il Potere Magico. Ombra lega un bersaglio con il vostro Canto Funebre della Putrefazione come sua Effigie, concede 1 Decima Tenebrosa e riecheggia il 30% del danno su un massimo di 3 altri nemici che portano il vostro Canto Funebre."
       },
       "heal": {
         "name": "Preghiera Solenne",
-        "description": "Una preghiera lenta ma potente che cura un bersaglio alleato di {damage}."
+        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico."
       },
       "mind_flay": {
         "name": "Litania della Sventura",
-        "description": "Assale la mente del bersaglio con energia d'Ombra, infliggendo {damage} danni ogni secondo per 3 s."
+        "description": "Incanala per 3 sec, infliggendo {damage} danni da Ombra ogni secondo. Il danno aumenta con il Potere Magico."
       },
       "flash_heal": {
         "name": "Preghiera Urgente",
-        "description": "Una preghiera veloce che cura un bersaglio alleato di {damage}."
+        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico."
       },
       "lightning_bolt": {
         "name": "Dardo Folgorante",
-        "description": "Scaglia un fulmine per {damage} danni da Natura."
+        "description": "Infligge {damage} danni da Natura. Il danno aumenta con il Potere Magico. Elementale: un colpo a segno concede 1 Tuono."
+      },
+      "thunder_reservoir": {
+        "name": "Riserva di Tuono",
+        "description": "Passiva: il Dardo Folgorante e il Fulmine Biforcuto concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)"
       },
       "rockbiter_weapon": {
         "name": "Arma Legapietra",
-        "description": "Imbeve la tua arma con la furia della pietra: ogni colpo infligge {damage} danni aggiuntivi per 5 min."
+        "description": "Permea la vostra arma per 30 min. Ogni colpo infligge {damage} danni aggiuntivi. Potenziamento guadagna inoltre il 30% di armatura, subisce il 10% di danni in meno e genera il doppio della minaccia. Scossa Tellurica costringe il proprio bersaglio ad attaccarvi per 3 sec, e Barriera di Tuono concede il 10% di riduzione del danno per 3 sec."
       },
       "healing_wave": {
         "name": "Acque Risananti",
-        "description": "Cura un bersaglio alleato di {damage}."
+        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico. Ripristino: conserva il 50% della cura piena prima dell'eccesso come Corrente Curativa per 12 sec, fino al 30% della salute massima del bersaglio."
       },
       "earth_shock": {
         "name": "Scossa Tellurica",
-        "description": "Scuote istantaneamente il bersaglio con forza dirompente per {damage} danni da Natura."
+        "description": "Infligge {damage} danni da Natura. Il danno aumenta con il Potere Magico. Elementale: a 5 Tuono, infligge il 125% di danno in più e consuma tutto il Tuono. Vincolo di Pietra: costringe il bersaglio ad attaccarvi per 3 sec."
       },
       "lightning_shield": {
         "name": "Barriera di Tuono",
-        "description": "Ti circonda di fulmini crepitanti: gli assalitori in mischia subiscono {buff} danni da Natura, fino a 3 cariche e al massimo una volta ogni 5 secondi."
+        "description": "Vi circonda di fulmini per 10 min. I 3 attacchi in mischia successivi contro di voi infliggono {buff} danni da Natura all'attaccante, al massimo una volta ogni 5 sec."
       },
       "flame_shock": {
         "name": "Scossa di Braci",
-        "description": "Brucia il bersaglio con il fuoco per {damage} danni più {overTime} in 12 sec."
+        "description": "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di 12 sec. Il colpo iniziale aumenta con il Potere Magico."
       },
       "flametongue_weapon": {
         "name": "Arma Marchiofuoco",
-        "description": "Imbeve la tua arma con fuoco elementale: ogni colpo infligge {damage} danni da Fuoco aggiuntivi per 5 min."
+        "description": "Permea la vostra arma per 30 min. Ogni colpo infligge {damage} danni da Fuoco aggiuntivi."
       },
       "frost_shock": {
         "name": "Scossa di Brina",
-        "description": "Scuote istantaneamente il bersaglio col gelo per {damage} danni da Gelo e rallenta il movimento del 50% per 8 s."
+        "description": "Infligge {damage} danni da Gelo e rallenta il bersaglio del 50% per 8 sec. Il danno aumenta con il Potere Magico."
       },
       "frostbrand_weapon": {
         "name": "Arma Legabrina",
@@ -9191,11 +9882,11 @@ export const it_IT: EnTranslations = {
       },
       "ghost_wolf": {
         "name": "Lupo d'Ombra",
-        "description": "Ti trasforma in un Shadewolf, aumentando la velocità di movimento del 40% per 10 min."
+        "description": "Diventate uno Shadewolf e vi muovete il 40% più in fretta. Lanciate di nuovo per tornare alla vostra forma normale."
       },
       "stormstrike": {
         "name": "Colpo Ancestrale",
-        "description": "Canalizza la tempesta attraverso la tua arma, colpendo istantaneamente per danni dell'arma più {damage}."
+        "description": "Colpisce per il danno dell'arma più {damage} e fa avanzare la Cadenza dello Spirito Guerriero di 2 passi. Il danno aumenta con la potenza d'attacco attraverso il danno dell'arma."
       },
       "shadow_bolt": {
         "name": "Dardo di Tenebra",
@@ -9213,9 +9904,29 @@ export const it_IT: EnTranslations = {
         "name": "Marciume Nero",
         "description": "Corrompe il bersaglio, infliggendo {damage} danni da Ombra in 18 s."
       },
+      "evil_eye": {
+        "name": "Evil Eye",
+        "description": "Marchia un nemico come bersaglio delle tue maledizioni. Spostare l'Evil Eye preserva la Condanna ma non rinnova la sua scadenza di 20 sec."
+      },
+      "maledict_gaze": {
+        "name": "Maledict Gaze",
+        "description": "Il tuo Maledict Eye attacca il tuo Evil Eye primario selezionato ogni 2,5 sec per danni da Ombra. Possess the Evil Eye raddoppia la sua velocità d'attacco."
+      },
+      "needle_of_fate": {
+        "name": "Needle of Fate",
+        "description": "Trafigge il nemico per {damage} danni da Ombra e genera 5 Condanna se porta il tuo Evil Eye. Ogni colpo sul tuo Evil Eye primario aggiunge un Filamento del Fato per 12 sec, fino a 3. Se non esiste alcun Evil Eye, Needle of Fate marchia per prima il suo bersaglio."
+      },
+      "sentence": {
+        "name": "Sentence",
+        "description": "Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Ogni Filamento aumenta i danni del 6%. Gli effetti aggiuntivi si intensificano a 20, 50, 80 e 100 Condanna. La sua scalatura dei danni si appiattisce dopo il livello 16."
+      },
       "life_tap": {
         "name": "Patto Amaro",
         "description": "Converte {damage} salute in {damage} mana."
+      },
+      "cursed_accomplice": {
+        "name": "Cursed Accomplice",
+        "description": "Collega il tuo Evil Eye quando nessun alleato è selezionato, facendo sì che il suo Maledict Gaze generi 2 Condanna. Collegare un membro del gruppo selezionato fa sì che solo i loro danni al tuo Evil Eye generino 3 invece. Un nuovo collegamento sostituisce quello precedente e può attivarsi una volta ogni 2 sec."
       },
       "curse_of_agony": {
         "name": "Maleficio dell'Angoscia",
@@ -9223,7 +9934,47 @@ export const it_IT: EnTranslations = {
       },
       "drain_life": {
         "name": "Divorare",
-        "description": "Risucchia la vita del bersaglio, trasferendoti {damage} salute ogni secondo per 5 s."
+        "description": "Consuma la vitalità del bersaglio, infliggendo {damage} danni da Ombra ogni secondo e trasferendovene il 70% come salute. Afflizione ne trasferisce invece la totalità. Quando è incanalato sul vostro Evil Eye primario, consuma all'inizio tutti i Filamenti del Fato, e ogni Filamento genera 1 Condanna in più per impulso."
+      },
+      "litany_of_guilt": {
+        "name": "Litany of Guilt",
+        "description": "Maledice il tuo Evil Eye primario per 6 sec. I guadagni di Condanna rilasciano un'onda che danneggia fino a 2 altri nemici entro 8 metri, al massimo una volta al secondo. Il Grado 2 lo estende a 8 sec e 4 nemici."
+      },
+      "cinderhide": {
+        "name": "Cinderhide",
+        "description": "Indurisce la tua pelle in scoria raffreddante per 10 sec, riducendo tutti i danni subiti del 25%."
+      },
+      "umbral_anchor": {
+        "name": "Umbral Anchor",
+        "description": "Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, consumando l'ancora e avviando un tempo di recupero di 45 sec."
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Evoca un Soulwell per 3 min. Fuori dal combattimento, i membri del gruppo possono ricaricare le loro Pietre dell'Anima fino a 3. Una Pietra dell'Anima ripristina il 25% della salute massima e condivide il tempo di recupero delle pozioni."
+      },
+      "hex_of_violence": {
+        "name": "Hex of Violence",
+        "description": "Lancia un maleficio sul nemico per 8 sec. Le sue prossime 3 azioni dannose generano ciascuna 7 Condanna e lo colpiscono per 16 danni da Ombra."
+      },
+      "cruel_pact": {
+        "name": "Cruel Pact",
+        "description": "Sacrifica il 12% della tua salute massima per ripristinare l'1,5% del tuo mana massimo e generare 20 Condanna. Non utilizzabile al 20% di salute o meno."
+      },
+      "vicarious_suffering": {
+        "name": "Vicarious Suffering",
+        "description": "Collega la tua sofferenza per 8 sec e genera fino a 15 Condanna dai colpi ostili. Su te stesso, riduce i danni subiti del 20%. Su un alleato, reindirizza fino al 20% verso di te senza farti scendere sotto il 15% di salute."
+      },
+      "possess_evil_eye": {
+        "name": "Possess the Evil Eye",
+        "description": "Il Maledictor possiede il tuo Evil Eye primario per 15 sec e genera 35 Condanna. Needle of Fate si lancia in 1 sec e genera 2 Condanna extra, Divorare può essere incanalato in movimento, e Sentence infligge il 25% di danni in più e rilascia un'eco ritardata per il 60% dei danni, che scende al 30% tra i livelli 17 e 20."
+      },
+      "hour_of_judgment": {
+        "name": "Hour of Judgment",
+        "description": "Chiama un giudizio sul tuo Evil Eye primario per 15 sec, concedendo 40 Condanna e 3 Filamenti del Fato, attivando la Possessione, raddoppiando la Condanna generata tramite l'Evil Eye primario e aumentando i danni di Sentence del 20%. La prima Sentence rimborsa 50 Condanna."
+      },
+      "coven": {
+        "name": "Coven",
+        "description": "Crea Evil Eye secondari su un massimo di 4 nemici vicini per 15 sec. Alimentano la riserva condivisa di Condanna al 50%, e Sentence riecheggia su di loro per il 35% dei danni."
       },
       "fear": {
         "name": "Tormento",
@@ -9235,11 +9986,16 @@ export const it_IT: EnTranslations = {
       },
       "shadowburn": {
         "name": "Fuoco Crepuscolare",
-        "description": "Travolge istantaneamente il bersaglio con ombra rovente per {damage} danni da Ombra."
+        "description": "Spende 1 Devastazione per giustiziare un nemico sotto il 20% di salute infliggendo {damage} danni da Ombra. Restituisce la sua Devastazione se il bersaglio reclamato muore entro 5 sec."
+      },
+      "ruinous_brand": {
+        "name": "Ruinous Brand",
+        "description": "Marchia un nemico per 15 sec. I tuoi prossimi 3 incantesimi diretti riecheggiano per il 25% dei danni contro il nemico marchiato, oppure copiano il 50% dei danni su di esso quando lanciati contro un altro bersaglio."
       },
       "wrath": {
         "name": "Dardo Silvano",
-        "description": "Scaglia un dardo di energia naturale per {damage} danni da Natura."
+        "description": "Scaglia un fulmine di energia naturale per {damage} danni da Natura.",
+        "specNote_balance": "In Forma di Lunagufo, ogni lancio completato aggiunge 1 Marea Lunare (massimo 3). A 3 Marea Lunare, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare."
       },
       "healing_touch": {
         "name": "Rammendo Selvaggio",
@@ -9251,11 +10007,17 @@ export const it_IT: EnTranslations = {
       },
       "moonfire": {
         "name": "Tempesta Lunare",
-        "description": "Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo."
+        "description": "Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.",
+        "specNote_balance": "Mantienilo acceso: Seme Lunare lo estende di 6 sec."
+      },
+      "moonseed": {
+        "name": "Seme Lunare",
+        "description": "Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge uno stadio di Marea Lunare ed estende la tua Tempesta Lunare di 6 sec, fino a 6 sec per applicazione. A Marea Lunare piena, Seme Lunare diventa Ondata Lunare."
       },
       "rejuvenation": {
         "name": "Fioritura Selvaggia",
-        "description": "Cura il bersaglio di {damage} in 12 s."
+        "description": "Cura il bersaglio di {damage} in 12 s.",
+        "specNote_restoration": "Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5). A 5 Verzura, Rapidità di Guarigione diventa Sovrafioritura."
       },
       "thorns": {
         "name": "Guardia di Rovi",
@@ -9271,7 +10033,8 @@ export const it_IT: EnTranslations = {
       },
       "maul": {
         "name": "Frantumaossa",
-        "description": "Attacco brutale che aumenta i danni in mischia di {damage} e causa molta minaccia. Si attiva al tuo prossimo colpo. Solo in Forma di Bruin."
+        "description": "Un attacco lacerante che aumenta i danni in mischia di {damage} e causa un'elevata quantità di minaccia. Si attiva al tuo prossimo colpo. Solo Forma di Bruin.",
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti protegge invece con uno scudo pari al 18% della tua salute massima e rimborsa 15 rabbia."
       },
       "growl": {
         "name": "Intimidazione",
@@ -9279,23 +10042,27 @@ export const it_IT: EnTranslations = {
       },
       "cat_form": {
         "name": "Forma del Lupo",
-        "description": "Mutamenti in lupo: la potenza d'attacco cresce con il livello, gli attacchi usano energia e punti combo, e generi il 29% di minaccia in meno. Lanciala di nuovo per tornare alla forma da incantatore."
+        "description": "Vi trasforma in lupo: l'agilità sale con il vostro livello, potenza d'attacco +8 più 2 per livello, i vostri attacchi usano energia e punti combo, e generate il 29% di minaccia in meno. Lanciate di nuovo per tornare alla forma da incantatore."
       },
       "claw": {
-        "name": "Artigliata",
-        "description": "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Lupo."
+        "name": "Artiglio Lacerante",
+        "description": "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Lupo.",
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "ferocious_bite": {
         "name": "Morso Cruento",
-        "description": "Mossa finale che infligge {damage}. Solo Forma del Lupo."
+        "description": "Mossa finale che infligge {damage}. Solo Forma del Lupo.",
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Mietitura Rossa: un morso per 70 più 43 per punto combo che infligge anche istantaneamente tutti i danni che Scarnificare e Squartare avrebbero ancora inflitto, e ripristina 30 energia."
       },
       "swipe": {
         "name": "Artigli Falcianti",
-        "description": "Falcia i nemici vicini per {damage} danni. Genera minaccia extra. Solo in Forma di Bruin."
+        "description": "Colpisci con gli artigli i nemici vicini per {damage} danni. Causa minaccia aggiuntiva. Solo Forma di Bruin.",
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "regrowth": {
         "name": "Seconda Fioritura",
-        "description": "Cura un bersaglio alleato di {damage} e di una quantità aggiuntiva in 21 s."
+        "description": "Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 21 s.",
+        "specNote_restoration": "Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5)."
       },
       "barkskin": {
         "name": "Scorza di Quercia",
@@ -9311,7 +10078,8 @@ export const it_IT: EnTranslations = {
       },
       "starfire": {
         "name": "Caduta Celeste",
-        "description": "Richiama un dardo di fuoco stellare, infliggendo {damage} danni Arcani."
+        "description": "Richiama un fulmine di fuoco stellare, infliggendo {damage} danni Arcani.",
+        "specNote_balance": "In Forma di Lunagufo, ogni lancio completato aggiunge 1 Marea Lunare (massimo 3). A 3 Marea Lunare, questo pulsante diventa Scia Solare: un colpo istantaneo da 80 a 100 danni da Natura più una bruciatura di 45 in 9 sec, che ripristina 35 mana e spende tutte e 3."
       },
       "travel_form": {
         "name": "Forma di Fleet",
@@ -9327,7 +10095,7 @@ export const it_IT: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Luce Stregata",
-        "description": "Riduce l'armatura del bersaglio del {damage}% per 40 sec. Non si somma con Trancia Armatura."
+        "description": "Riduce l'armatura del bersaglio del {damage}% per 40 sec."
       },
       "hibernate": {
         "name": "Sopore",
@@ -9350,8 +10118,9 @@ export const it_IT: EnTranslations = {
         "description": "Aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Lupo."
       },
       "rip": {
-        "name": "Squartare",
-        "description": "Mossa finale che infligge {damage} danni da sanguinamento in 12 sec. Consuma i punti combo. Solo Forma del Lupo."
+        "name": "Faglia Sanguigna",
+        "description": "Mossa finale che fa sanguinare il bersaglio ogni 2 sec per 24 sec: 36 danni più 24 per punto combo speso (5 punti combo: {damage} danni totali). Solo Forma del Lupo.",
+        "specNote_feral": "Il colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "mortal_strike": {
         "name": "Colpo Mutilante",
@@ -9378,32 +10147,120 @@ export const it_IT: EnTranslations = {
         "description": "Colpisce il bersaglio infliggendo danni dell’arma più {damage} danni sacri. (talento da paladino)"
       },
       "chain_heal": {
-        "name": "Guarigione a Catena",
-        "description": "Cura abbondantemente un bersaglio alleato, poi si propaga a un massimo di altri 2 alleati vicini, curando il 50% in meno a ogni salto. (Abilità distintiva di Rigenerazione)"
+        "name": "Cura a Cascata",
+        "description": "Cura un bersaglio alleato di {damage}, poi rimbalza su un massimo di 2 alleati entro 12 metri. Ogni rimbalzo cura del 50% del bersaglio precedente. Ogni alleato raggiunto consuma la tua Corrente Risanatrice residua e cura immediatamente del 125% della quantità consumata. La cura iniziale aumenta con il potere magico. (firma Ripristino)"
+      },
+      "galeheart_weapon": {
+        "name": "Arma Cuore di Bufera",
+        "description": "Incanta entrambe le armi per 30 min, abilitando la Cadenza dello Spirito Guerriero."
+      },
+      "warspirit_cadence": {
+        "name": "Cadenza dello Spirito Guerriero",
+        "description": "Passiva: ogni 3° attacco d'arma andato a segno attiva 2 Echi del Cuore di Bufera per il 50% di danni da Natura e concede Presagio di Tempesta per 12 s. Il Presagio di Tempesta rende istantaneo il tuo prossimo Dardo Folgorante, Scossa o Acque Risanatrici e ne riduce il costo in mana del 50%. Il Colpo Ancestrale conta come 2 attacchi. (Spirito Guerriero)"
+      },
+      "stormsurge": {
+        "name": "Mareggiata",
+        "description": "Passiva: mentre il Colpo Ancestrale è in recupero, consumare un Presagio di Tempesta ha il 25% di probabilità di azzerarlo. Se i primi 3 tentativi falliscono, il 4° lo azzera sempre. (Spirito Guerriero)"
+      },
+      "lifespring_weapon": {
+        "name": "Arma Fonte di Vita",
+        "description": "Incanta la tua arma per 30 min. Acque Risanatrici e il Richiamo della Marea aggiungono il 20% di cure in più alla Corrente Risanatrice."
+      },
+      "unleash_weapon": {
+        "name": "Scatena l'Arma",
+        "description": "Scatena l'incantamento attivo della tua arma. Il Marchio Pirico infligge da 54 a 64 danni da Fuoco, guadagna il 30% della potenza magica e concede 2 Tuono. Il Cuore di Bufera colpisce con la tua arma, fa avanzare la Cadenza dello Spirito Guerriero e concede il 20% di velocità d'attacco per 6 s. Il Vincolo di Pietra colpisce per il 75% dei danni d'arma, costringe il bersaglio ad attaccarti e riduce i danni subiti del 20% per 4 s. La Fonte di Vita consuma la tua Corrente Risanatrice, cura per il 125% delle cure rimanenti e riduce il prossimo colpo entro 8 s del 50% della salute recuperata."
+      },
+      "elemental_trance": {
+        "name": "Elemental Trance",
+        "description": "Entra in trance elementale per 15 sec, riducendo i danni subiti del 30% e convertendo il 20% di tutti i danni che infliggi in mana. (firma Warspirit)"
+      },
+      "primal_exaltation": {
+        "name": "Esaltazione Primordiale",
+        "description": "Per 12 s il Dardo Folgorante e il Fulmine Biforcuto del Richiamo del Tuono si lanciano il 50% più velocemente, e il Dardo Folgorante concede 2 Tuono; lo Spirito Guerriero attiva la sua cadenza ogni 2 colpi d'arma; il Rammendo Spirituale aggiunge il 50% di cure in più alla Corrente Risanatrice. (Talento sciamano)"
+      },
+      "stoneward": {
+        "name": "Guardia di Pietra",
+        "description": "Protegge un alleato per 60 s con 6 cariche. I danni consumano una carica per curare il 5% della salute massima, una volta ogni 3 s. (Talento sciamano)"
+      },
+      "tidecall": {
+        "name": "Richiamo della Marea",
+        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il potere magico. Aggiunge la cura completa prima delle cure in eccesso alla Corrente Risanatrice, fino al 30% della salute massima del bersaglio."
+      },
+      "soul_harvest": {
+        "name": "Essence Reap",
+        "description": "Lacera l'anima del nemico per {damage} danni da Ombra e crea 1 Frammento d'Anima, fino a 5."
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Scaglia una lancia spettrale per {damage} danni da Ombra. Contro il tuo Ossuary Mark, il 50% dei suoi danni viene aggiunto al marchio."
+      },
+      "raise_graveguard": {
+        "name": "Raise Graveguard",
+        "description": "Solleva un compagno difensivo permanente. Il Guardiano Sepolcrale provoca automaticamente, intercetta il 20% dei tuoi danni tramite il Dominio della Tomba, e Reaping Command lo fa provocare e subire il 30% di danni in meno per 4 sec."
+      },
+      "raise_skeletal_warrior": {
+        "name": "Raise Skeletal Warrior",
+        "description": "Spende 1 Frammento d'Anima per aggiungere un Guerriero Scheletrico permanente al tuo Dominio a 2 posti. Solo uno può servirti. Colpisce in area i nemici vicini per il 45% dei danni ogni 6 sec, e Reaping Command blocca il suo bersaglio con un rallentamento del 40% per 4 sec."
+      },
+      "raise_bone_mage": {
+        "name": "Raise Bone Mage",
+        "description": "Spende 2 Frammenti d'Anima per aggiungere un Mago d'Ossa a distanza permanente al tuo Dominio a 2 posti. Solo uno può servirti. I suoi attacchi espongono il bersaglio a un 5% in più di danni magici per 6 sec, e Reaping Command aumenta quella debolezza all'8%."
+      },
+      "bone_armor": {
+        "name": "Bone Armor",
+        "description": "Ti avvolge nelle ossa, assorbendo danni pari al 20% della tua salute massima."
+      },
+      "corpse_explosion": {
+        "name": "Corpse Explosion",
+        "description": "Sacrifica prima un Mago d'Ossa, poi un Guerriero Scheletrico, e un'Ala Sepolcrale solo come ultima risorsa. Tra i duplicati sceglie quello con la durata residua minore, poi il più debole, per infliggere {damage} danni da Ombra nel punto scelto."
+      },
+      "funeral_harvest": {
+        "name": "Funeral Harvest",
+        "description": "Quando un nemico danneggiato di recente da te o dai tuoi non morti muore, guadagni 1 Frammento d'Anima. Questo può verificarsi una volta ogni 3 sec."
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Marchia un nemico per 12 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima."
+      },
+      "unholy_command": {
+        "name": "Unholy Command",
+        "description": "Spende 3 Frammenti d'Anima per comandare tutti i tuoi non morti a infliggere il 25% di danni in più e agire il 20% più velocemente per 12 sec."
+      },
+      "reaping_command": {
+        "name": "Reaping Command",
+        "description": "Spende 2 Frammenti d'Anima per comandare ogni servitore non morto a colpire all'unisono. I Guardiani Sepolcrali provocano e si preparano, i Guerrieri bloccano, i Maghi d'Ossa espongono le difese magiche, e l'Ala Sepolcrale lacera tutti i nemici colpiti."
+      },
+      "sacrifice_undead": {
+        "name": "Sacrifice Undead",
+        "description": "Distrugge un servitore del Dominio per ripristinare il 25% della tua salute massima."
+      },
+      "raise_gravewing": {
+        "name": "Raise Gravewing",
+        "description": "Spende 2 Frammenti d'Anima per aggiungere un'Ala Sepolcrale permanente al tuo Dominio a 2 posti. Solo una può servirti. Colpisce in area i nemici vicini per il 65% dei danni ogni 5 sec, e Reaping Command fa sì che ogni nemico colpito subisca l'8% di danni in più per 5 sec."
+      },
+      "army_of_the_dead": {
+        "name": "Army of the Dead",
+        "description": "Squarcia un portale sepolcrale per evocare temporaneamente un Guerriero Scheletrico, un Mago d'Ossa e un'Ala Sepolcrale per 20 sec, riempiendo i ranghi che i tuoi servitori stabili del Dominio lasciano vuoti."
       },
       "metamorphosis": {
-        "name": "Metamorfosi",
-        "description": "Assumi potere demoniaco, aumentando armatura e potenza d’attacco per 20 s. (talento da stregone)"
+        "name": "Forma di Lich",
+        "description": "Diventate un lich per 20 sec, creando 3 Frammenti d'Anima e aumentando del 20% i vostri danni magici e la vostra velocità di lancio. I vostri non morti infliggono il 50% di danni in più e agiscono il 20% più in fretta, e Soul Lance trapassa il proprio bersaglio colpendo fino a 2 nemici vicini per il 50% del suo danno. (Distintivo di Negromanzia)"
       },
       "holy_shock": {
         "name": "Shock Sacro",
         "description": "Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)"
       },
-      "aura_surge": {
-        "name": "Rimbalzo dell'Alba",
-        "description": "Scaglia uno scudo forgiato all'alba che infligge {damage} danni Sacri, silenzia il bersaglio principale per 2 sec. e rimbalza su un massimo di 2 nemici aggiuntivi entro 10 metri, infliggendo il 75% dei danni per rimbalzo. (talento del Paladino)"
-      },
       "holy_shield": {
         "name": "Scudo Sacro",
-        "description": "Ti protegge con potere Sacro per 10 s, aumentando l’armatura di 90 e colpendo gli assalitori in mischia per 12 danni Sacri. (firma Protezione)"
+        "description": "Aumenta il blocco del 30% e concede per {duration} sec uno scudo pari al {damage}% della tua salute massima. Ascensione rafforza la difesa."
       },
       "bestial_wrath": {
         "name": "Ira Bestiale",
-        "description": "Ti spinge in una furia bestiale, aumentando la potenza d’attacco di 55 per 15 s. (firma Affinità Animale)"
+        "description": "Concede 3 Ferocia del Branco. Il vostro prossimo Scatena la Bestia entro 20 sec infligge il 50% di danno in più da colpo e da zampata, e la sua frenesia dura 12 sec invece di 8. (Distintivo di Maestria delle bestie)"
       },
       "trueshot_aura": {
         "name": "Aura di Precisione",
-        "description": "Ispira gli alleati vicini, aumentando la potenza d’attacco di 35 per 5 min. (firma Precisione)"
+        "description": "Aumenta del 10% la potenza d'attacco degli alleati entro 30 m per 30 min. (Distintivo di Precisione)"
       },
       "wyvern_sting": {
         "name": "Morso della Viverna",
@@ -9423,31 +10280,31 @@ export const it_IT: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sangue Freddo",
-        "description": "Concentra il tuo intento omicida, così il tuo prossimo attacco è un colpo critico. (firma Assassinio)"
+        "description": "Concentra il tuo istinto omicida così che il tuo prossimo attacco sia un colpo critico. (firma Knifework)"
       },
       "blade_flurry": {
         "name": "Vortice di Lame",
-        "description": "Scatena un turbine di lame, aumentando la velocità d’attacco del 20% per 12 s. (firma Combattimento)"
+        "description": "Scatena una raffica di lame, aumentando la velocità d'attacco del 20% per 12 sec. (firma Thuggery)"
       },
       "hemorrhage": {
         "name": "Emorragia",
-        "description": "Colpisce il nemico per danni dell’arma più {damage} e causa danni da sanguinamento per 12 s. Conferisce 1 punto combo. (firma Scaltrezza)"
+        "description": "Colpisce il nemico per danni dell'arma più {damage}, causa danni da sanguinamento in 12 sec e aumenta i danni da sanguinamento subiti del 40%. Conferisce 1 punto combo. Ogni 2° uso aggiunge 1 Caligine (massimo 3). (firma Skulduggery)"
       },
       "power_infusion": {
         "name": "Infusione di Potere",
-        "description": "Infone potere in un bersaglio alleato, aumentando la potenza magica di 28 per 15 s. (firma Disciplina)"
+        "description": "Unge un bersaglio alleato, aumentando del 20% i danni, le cure e la velocità di lancio per 15 sec."
       },
       "holy_nova": {
-        "name": "Nova Sacra",
-        "description": "Provoca un’esplosione di luce Sacra, curando gli alleati vicini di {damage} e danneggiando i nemici vicini. (firma Sacro)"
+        "name": "Cantico Solare",
+        "description": "Cura gli alleati entro 10 m di {damage} e infligge da 24 a 30 danni Sacri ai nemici nella stessa area. Entrambi gli importi aumentano con il Potere Magico. (Base di Sacro)"
       },
       "shadowform": {
-        "name": "Forma d'Ombra",
-        "description": "Assume Forma d’Ombra, potenziando la magia d’ombra finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Ombra)"
+        "name": "Velo Crepuscolare",
+        "description": "Entrate nel Velo Crepuscolare e aumentate del 25% i vostri danni da Ombra. Lanciate di nuovo per lasciare il Velo Crepuscolare. (Distintivo di Ombra)"
       },
       "elemental_mastery": {
         "name": "Maestria Elementale",
-        "description": "Invoca la maestria elementale, rendendo istantaneo il tuo prossimo incantesimo. (firma Elementale)"
+        "description": "Per 12 sec, Dardo Folgorante concede 2 Tuono. Il vostro prossimo Dardo Folgorante o Fulmine Biforcuto è istantaneo, e la vostra prossima scarica piena di Tuono infligge il 25% di danno in più. (Distintivo di Elementale)"
       },
       "siphon_life": {
         "name": "Risucchio Vitale",
@@ -9455,7 +10312,7 @@ export const it_IT: EnTranslations = {
       },
       "conflagrate": {
         "name": "Conflagrazione",
-        "description": "Consuma il tuo Immolazione sul nemico per incendiarlo, infliggendo {damage} danni da Fuoco. (firma Distruzione)"
+        "description": "Anticipa un impulso futuro del vostro Patto Ardente, poi incendia il bersaglio per {damage} danni da Fuoco. Genera 1 Devastazione e 1 Rovina. Tiene 2 cariche. (Distintivo di Distruzione)"
       },
       "moonkin_form": {
         "name": "Forma di Lunagufo",
@@ -9467,15 +10324,35 @@ export const it_IT: EnTranslations = {
       },
       "swiftmend": {
         "name": "Rapidità di Guarigione",
-        "description": "Consuma un effetto di cura periodica su un bersaglio alleato per curarlo di {damage}. (firma Guarigione)"
+        "description": "Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Piantare Fioritura Selvaggia e Seconda Fioritura aggiunge Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)"
+      },
+      "moonlash": {
+        "name": "Ondata Lunare",
+        "description": "Consuma 3 Marea Lunare per un colpo pesante da {damage} danni Arcani: la scelta del danno. Scia Solare consuma le stesse 3 Marea Lunare, quindi scegline una."
+      },
+      "sunlance": {
+        "name": "Scia Solare",
+        "description": "Consuma 3 Marea Lunare per un colpo da {damage} danni di Natura più una bruciatura di {overTime} in 9 sec, e ripristina 35 mana: la scelta del mana. Ondata Lunare consuma le stesse 3 Marea Lunare, quindi scegline una."
+      },
+      "redharvest": {
+        "name": "Mietitura Rossa",
+        "description": "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina 30 energia. Funziona anche senza punti combo."
+      },
+      "marrowbreak": {
+        "name": "Spezzamidollo",
+        "description": "Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti protegge invece con uno scudo pari al 18% della tua salute massima per 8 sec e rimborsa 15 rabbia."
+      },
+      "overbloom": {
+        "name": "Sovrafioritura",
+        "description": "Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il 60% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio."
       },
       "summon_imp": {
         "name": "Evoca Emberkin",
-        "description": "Evoca un Emberkin al comando dello stregone. L'Emberkin scaglia Dardi di cenere contro i tuoi nemici a distanza. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta."
+        "description": "Evoca un Emberkin agli ordini dello stregone. L'Emberkin lancia Dardo di Cenere sui vostri nemici dalla distanza. Evocare un nuovo demone congeda quello attuale. Potete avere un solo demone alla volta."
       },
       "summon_voidwalker": {
         "name": "Evoca Gloomshade",
-        "description": "Evoca un Gloomshade al comando dello stregone. Il Gloomshade è un demone robusto che provoca i tuoi nemici e assorbe i colpi. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta."
+        "description": "Evoca un Gloomshade agli ordini dello stregone. Questo solido demone provoca i nemici e usa Catena Abissale per trascinare a portata i nemici normali lontani. I boss non possono essere trascinati. Evocare un nuovo demone congeda quello attuale. Potete avere un solo demone alla volta."
       },
       "summon_succubus": {
         "name": "Evoca Duskborn",
@@ -9491,7 +10368,7 @@ export const it_IT: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Evoca Pyre Colossus",
-        "description": "Vincola un Pyre Colossus al tuo volere: un colosso possente con una mischia devastante e la salute e l'armatura più elevate di qualsiasi demone. Un lungo tempo di recupero ne limita la potenza bruta. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta."
+        "description": "Fa precipitare un Pyre Colossus nell'area bersaglio, infliggendo 58-72 danni da Fuoco all'impatto. Combatte per 30 s senza sostituire il tuo demone, brucia i nemici vicini ogni 2 s e genera 1 Rovina ogni secondo."
       },
       "summon_doomguard": {
         "name": "Evoca Wraithborn",
@@ -9586,8 +10463,8 @@ export const it_IT: EnTranslations = {
         "description": "Tempo di recupero difensivo: per 8 sec subisci il 30% di danni in meno e schivi molti più attacchi."
       },
       "intervene": {
-        "name": "Intervene",
-        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
+        "name": "Intervento",
+        "description": "Ti lanci verso un alleato, proteggendolo da {damage} danni per 6 sec."
       },
       "recklessness": {
         "name": "Temerarietà",
@@ -9603,7 +10480,7 @@ export const it_IT: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Urlo Intimidatorio",
-        "description": "Un urlo terrificante che fa fuggire in preda alla paura fino a 5 nemici entro 8 metri per 8 sec. I danni possono interrompere l'effetto."
+        "description": "Un urlo terrificante che fa fuggire per la paura fino a 5 nemici entro 8 m per 4 sec. Il danno può spezzare l'effetto."
       },
       "revenge": {
         "name": "Vendetta",
@@ -9626,8 +10503,8 @@ export const it_IT: EnTranslations = {
         "description": "Ti trasformi in un colosso per 20 s, liberandoti da tutti gli effetti di controllo e aumentando del 20% i danni inflitti."
       },
       "avenging_wrath": {
-        "name": "Alavendetta",
-        "description": "Invoca un potere vendicativo, aumentando la tua potenza d’attacco di 60 e la potenza magica di 30 per 20 sec. (talento del Paladino)"
+        "name": "Ira Vendicatrice",
+        "description": "Dispiega ali fisiche di dorato potere sacro, guadagnando 10 Devozione e raddoppiando per 15 sec la Devozione generata dalle vostre abilità. Aumenta inoltre del 20% i danni e le cure che infliggete. Mietitore dell'alba: consente Martello dell'Ira contro qualsiasi bersaglio."
       },
       "berserk": {
         "name": "Bruma Rossa",
@@ -9643,19 +10520,23 @@ export const it_IT: EnTranslations = {
       },
       "bloodlust": {
         "name": "Tamburi di Guerra",
-        "description": "Spinge gli alleati entro 30 m alla frenesia, aumentando la loro velocità d’attacco del 30% per 15 sec. (talento dello Sciamano)"
+        "description": "Aumenta del 30% la velocità d'attacco, di lancio e di incanalamento degli alleati di gruppo o incursione entro 30 m per 15 sec. Gli alleati colpiti non possono beneficiare di nuovo di Tamburi di Guerra o Accelerazione Temporale per 10 min. (Talento da sciamano)"
       },
       "chain_lightning": {
         "name": "Fulmine Biforcuto",
-        "description": "Scaglia un fulmine nell’area bersaglio, infliggendo {damage} danni ai nemici vicini. (talento dello Sciamano)"
+        "description": "Colpisce fino a 3 nemici entro 10 m per {damage} danni da Natura ciascuno. Elementale: un colpo a segno concede 1 Tuono. Il danno aumenta con il Potere Magico."
+      },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "Squarcia una faglia nel punto selezionato, attirando i nemici entro 8 metri verso il suo centro, infliggendo {damage} danni da Ombra e stordendoli per 2 sec. I boss subiscono danni ma resistono all'attrazione e allo stordimento."
       },
       "chaos_bolt": {
         "name": "Dardo della Rovina",
-        "description": "Scaglia un dardo di fuoco caotico che infligge {damage} danni da Fuoco. (talento dello Stregone)"
+        "description": "Spende 3 Devastazione per scagliare un pesante dardo di fuoco caotico che infligge {damage} danni da Fuoco. Rovina ne accorcia il lancio del 30%."
       },
-      "cleansing_verdict": {
-        "name": "Verdetto Purificante",
-        "description": "Dissipa un effetto magico dannoso da un bersaglio alleato e lo cura di {damage} con magia Sacra."
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Sacrifica il 10% della tua salute attuale per assorbire danni pari al 30% della tua salute massima per 8 sec."
       },
       "cloak_of_shadows": {
         "name": "Manto d’Ombra",
@@ -9683,23 +10564,23 @@ export const it_IT: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Ultima Preghiera",
-        "description": "Ti cura istantaneamente di {damage}. (talento del Sacerdote)"
+        "description": "Ti cura istantaneamente del 30% della salute massima."
       },
       "deterrence": {
         "name": "Guardia Ispida",
         "description": "Aumenta la tua probabilità di schivata di 50 punti percentuali per 10 sec. (talento del Cacciatore)"
       },
-      "divine_shield": {
-        "name": "Custodia di Luce",
-        "description": "Ti protegge con il potere sacro, assorbendo 900 danni per 8 sec. (talento del Paladino)"
-      },
       "earthbind": {
         "name": "Terra Avvinghiante",
-        "description": "Lega alla terra i nemici vicini, immobilizzandoli per 2 sec. (talento dello Sciamano)"
+        "description": "Radica i nemici entro 4 m dal punto bersaglio per 2 sec, poi li rallenta del 40% per 6 sec. (Talento da sciamano)"
       },
       "evocation": {
         "name": "Pozzo d’Etere",
         "description": "Restaura mana rápidamente. (talento da mago)"
+      },
+      "flurry_of_knives": {
+        "name": "Raffica di coltelli",
+        "description": "Sferza tutti i nemici entro 6 m con coltelli da lancio, infliggendo {damage} danni fisici e conferendo 2 punti combo. (talento del Ladro)"
       },
       "frenzied_regeneration": {
         "name": "Rammendo Selvaggio",
@@ -9711,19 +10592,15 @@ export const it_IT: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Colpo Spettrale",
-        "description": "Colpisce il nemico infliggendo i danni dell’arma più {damage}, aumenta brevemente la schivata e assegna 1 punto combo. (talento del Ladro)"
+        "description": "Colpisce il nemico per danni dell'arma più {damage} e aumenta la tua probabilità di schivata del 15% per 7 sec. Conferisce 1 punto combo. (talento del Ladro)"
       },
       "hammer_of_wrath": {
-        "name": "Martello Rintoccante",
-        "description": "Scaglia un martello sacro contro un nemico ferito, infliggendo {damage} danni sacri. Utilizzabile solo sotto il 20% di salute. (talento del Paladino)"
+        "name": "Martello dell'Ira",
+        "description": "Scaglia un martello sacro per {damage} danni e genera 1 Devozione. Utilizzabile sotto il 20% di salute, oppure durante Ascensione Divina o Ira Vendicatrice. Ira dell'Alba concede un lancio aggiuntivo contro qualsiasi bersaglio che ignora il tempo di recupero in corso e infligge il 20% di danno in più. Ascensione ne aumenta il danno del 30%."
       },
       "healing_stream": {
         "name": "Fonte Viva",
         "description": "Ripristina 120 salute a un bersaglio alleato in 12 sec. (talento dello Sciamano)"
-      },
-      "holy_wrath": {
-        "name": "Ira del Santo",
-        "description": "Scatena il potere sacro, infliggendo {damage} danni ai nemici vicini. (talento del Paladino)"
       },
       "howl_of_terror": {
         "name": "Ululato del Terrore",
@@ -9735,7 +10612,7 @@ export const it_IT: EnTranslations = {
       },
       "inner_focus": {
         "name": "Mente Quietata",
-        "description": "Rende gratuita la tua prossima magia. Dura 60 sec. (talento del Sacerdote)"
+        "description": "Rende il vostro prossimo incantesimo da sacerdote gratuito e non interrompibile. Dura 60 sec."
       },
       "innervate": {
         "name": "Linfa Vitale",
@@ -9781,6 +10658,10 @@ export const it_IT: EnTranslations = {
         "name": "Inversione collettiva",
         "description": "Riavvolge la linea temporale di ogni membro morto del gruppo o dell'incursione, riportandolo in vita accanto al corpo con il 30% di salute e mana. Non può essere lanciata in combattimento. (Cronomanzia)"
       },
+      "ancestor_return": {
+        "name": "Ritorno degli Antenati",
+        "description": "Richiama in vita presso il loro corpo tutti i membri caduti del tuo gruppo o incursione con il 30% di salute e mana. Non può essere lanciata in combattimento. (Rammendo Spirituale)"
+      },
       "temporal_rewind": {
         "name": "Riavvolgimento",
         "description": "Invia un'onda arcana attraverso il tuo gruppo o incursione, riavvolgendo il tempo per ripristinare il 30% dei danni che ogni alleato entro 40 metri ha subito negli ultimi 5 secondi (fino al 35% della loro salute massima). Non può essere un effetto critico. (Cronomanzia)"
@@ -9803,7 +10684,7 @@ export const it_IT: EnTranslations = {
       },
       "mind_sear": {
         "name": "Bruciamente",
-        "description": "Incanala energia d’Ombra nell’area bersaglio, infliggendo {damage} danni ogni secondo ai nemici vicini. (talento del Sacerdote)"
+        "description": "Incanala per 3 sec, infliggendo {damage} danni da Ombra ogni secondo ai nemici entro 8 m dall'area bersaglio. Il danno aumenta con il Potere Magico. (Talento da sacerdote)"
       },
       "multi_shot": {
         "name": "Tiro Sdoppiato",
@@ -9811,7 +10692,7 @@ export const it_IT: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Cura del Coro",
-        "description": "Cura gli alleati vicini di {damage}. (talento del Sacerdote)"
+        "description": "Cura gli alleati entro 30 m di {damage}. La cura aumenta con il Potere Magico. (Sacro)"
       },
       "preparation": {
         "name": "Contingenza",
@@ -9823,11 +10704,11 @@ export const it_IT: EnTranslations = {
       },
       "psychic_scream": {
         "name": "Urlo Psichico",
-        "description": "Terrorizza i nemici vicini per un massimo di 4 sec. I danni possono interrompere l’effetto. (talento del Sacerdote)"
+        "description": "Atterrisce i nemici entro 8 m per un massimo di 4 sec. Il danno può spezzare l'effetto."
       },
       "counter_shot": {
         "name": "Tiro Silenziante",
-        "description": "Un tiro rapido che interrompe il lancio dell'incantesimo del bersaglio e blocca quella scuola per 4 s."
+        "description": "Interrompe il bersaglio e gli impedisce di lanciare incantesimi di quella scuola per 4 sec."
       },
       "rebuke": {
         "name": "Rimprovero",
@@ -9845,6 +10726,10 @@ export const it_IT: EnTranslations = {
         "name": "Cortina Fumogena",
         "description": "Scompari in una nube di fumo, aumentando del 30% la probabilità di schivare per 8 s."
       },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Aumenta la velocità di movimento del 35%, ma sacrifica il 2% della tua salute massima ogni secondo. Rilancia per annullare. Si disattiva al 20% di salute."
+      },
       "spellsteal": {
         "name": "Rubamagie",
         "description": "Ruba un effetto magico benefico da un nemico e lo trasferisce su di te."
@@ -9858,12 +10743,37 @@ export const it_IT: EnTranslations = {
         "description": "Una testata in affondo che interrompe il lancio dell'incantesimo del bersaglio e blocca quella scuola per 4 s."
       },
       "spell_lock": {
-        "name": "Ordine del Silenzio",
-        "description": "Silenzia il bersaglio durante il lancio e impedisce di lanciare incantesimi di quella scuola per 5 s."
+        "name": "Bavaglio Abissale",
+        "description": "Interrompe il lancio di incantesimi del nemico e gli impedisce di lanciare incantesimi di quella scuola per 4 sec."
+      },
+      "thieves_chorus": {
+        "name": "Coro dei ladri",
+        "description": "Un fischio d’intesa sprona il tuo gruppo: velocità di attacco, lancio e canalizzazione aumentata del 10% per 10 s. Gli alleati colpiti di recente da uno slancio di celerità di gruppo sono troppo esausti per beneficiarne. (talento del Ladro)"
       },
       "tranquility": {
         "name": "Canto della Radura",
         "description": "Incanala energia rigenerante per 4 sec., curando ogni secondo gli alleati entro 30 m di 42-52. (talento del Druido)"
+      },
+      "venom_dart": {
+        "name": "Dardo velenoso",
+        "description": "Scaglia un dardo avvelenato che infligge {damage} danni da Natura. Conferisce 1 punto combo. Knifework: prolunga la tua ferita di Squarcio velenoso di 6 sec, fino a 20 sec.",
+        "specNote_assassination": "Aggiunge 1 Rituale del Veleno ed estende la tua ferita avvelenata di 6 sec (la ferita non supera mai i 20 sec)."
+      },
+      "body_blow": {
+        "name": "Colpo al corpo",
+        "description": "Un colpo pesante per il 130% del danno dell’arma più 10 che conferisce 2 punti combo e approfondisce la Redline di una tacca. (motore Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Colpo da knockout",
+        "description": "Concludi la Redline con un knockout: colpisce per 45 più 35 per punto combo, il 25% più forte per ogni tacca della Redline, e recupera 25 energia. (motore Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Colpo del velo",
+        "description": "Consuma la riserva di Brumora per avvolgerti nell’ombra per 6 s: le tue aperture furtive funzionano allo scoperto e infliggi il 25% di danni in più. (motore Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Squarcio velenoso",
+        "description": "Consuma il Rituale del veleno: colpisce per 22 più 26 per punto combo, fa detonare i danni residui dei tuoi sanguinamenti e ripristina 25 energia. (motore Knifework)"
       },
       "typhoon": {
         "name": "Tifone",
@@ -9872,6 +10782,30 @@ export const it_IT: EnTranslations = {
       "voidfeast": {
         "name": "Banchetto del Vuoto",
         "description": "Divora un effetto magico (uno benefico da un nemico o uno dannoso da un alleato) e ti cura del 6% della salute massima."
+      },
+      "veilstep": {
+        "name": "Passo del Velo",
+        "description": "Attraversa il velo nella direzione verso cui guardi."
+      },
+      "scouring_mercy": {
+        "name": "Misericordia Purificatrice",
+        "description": "Infligge da 72 a 84 danni Sacri a un nemico oppure cura un bersaglio alleato da 130 a 155. Entrambi gli importi aumentano con la potenza magica. I danni curano inoltre del 30% ogni alleato legato dalla Dottrina, o del 15% il membro del gruppo con meno salute se nessun alleato è legato. (Distintivo di Dottrina)"
+      },
+      "seraphic_vigil": {
+        "name": "Veglia Serafica",
+        "description": "Protegge un alleato per 30 s. Il primo colpo che lo porta sotto il 35% di salute consuma la Veglia e lo cura per 180. (Distintivo di Benedizione)"
+      },
+      "summon_tithefiend": {
+        "name": "Evoca Demone della Decima",
+        "description": "Consuma tutta la Decima Tenebrosa per evocare un Demone della Decima per 6, 8, 10, 12 o 15 s con 1-5 accumuli. Attacca ogni 2 s per 20-24 danni Ombra, più 8 per ogni accumulo extra. Con cinque accumuli diventa più grande e i suoi danni aumentano del 25%. I suoi danni aumentano con la tua potenza magica. Preferisce la tua Effigie. Ogni colpo recupera l'1% del mana massimo e riverbera il 15% dei danni fino ad altri 3 nemici con il tuo Canto di Decadimento. (Distintivo di Vespri)"
+      },
+      "martyrs_aegis": {
+        "name": "Egida del Martire",
+        "description": "Riduce del 40% i danni subiti da un alleato per 8 s."
+      },
+      "choir_of_deliverance": {
+        "name": "Coro della Liberazione",
+        "description": "Canalizza per 6 sec e cura i membri del gruppo entro 30 metri di {damage} ogni 2 sec. La cura aumenta con il potere magico."
       },
       "bear_charge": {
         "name": "Carica di Bruin",
@@ -9887,7 +10821,8 @@ export const it_IT: EnTranslations = {
       },
       "rake": {
         "name": "Scarnificare",
-        "description": "Un'apertura furtiva che dilania il nemico infliggendo danno dell'arma più {damage} e provoca danno da sanguinamento per 9 sec. Conferisce 1 punto combo. Solo in Forma del Lupo."
+        "description": "Scarnifica il nemico per danni dell'arma più {damage} e causa danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Lupo.",
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "revive_pet": {
         "name": "Rattoppare",
@@ -11404,6 +12339,18 @@ export const it_IT: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Redini del Raptor di Drakemaw"
       },
+      "rimefang": {
+        "name": "Zanna di Brina"
+      },
+      "marrowpoint": {
+        "name": "Punta di Midollo"
+      },
+      "duskwhisper": {
+        "name": "Sussurro del Crepuscolo"
+      },
+      "boneglass_shiv": {
+        "name": "Stiletto Ossovetro"
+      },
       "moggers_hide_quiver": {
         "name": "Faretra di cuoio di Mogger"
       },
@@ -11547,6 +12494,9 @@ export const it_IT: EnTranslations = {
       },
       "conjured_bread4": {
         "name": "Pane da banchetto evocato"
+      },
+      "soul_stone": {
+        "name": "Pietra dell'Anima"
       },
       "bristleback_maul": {
         "name": "Martello Gallowglass"
@@ -12933,9 +13883,6 @@ export const it_IT: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix il Re dei Cunicoli"
       },
@@ -12957,17 +13904,8 @@ export const it_IT: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Maldrec il Legaspettri"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Selthe Madre del Coro"
@@ -13007,6 +13945,18 @@ export const it_IT: EnTranslations = {
       },
       "water_elemental": {
         "name": "Elementale dell'Acqua"
+      },
+      "graveguard": {
+        "name": "Guardiano Sepolcrale"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "Guerriero Scheletrico"
+      },
+      "necromancy_bone_mage": {
+        "name": "Mago d'Ossa"
+      },
+      "necromancy_gravewing": {
+        "name": "Ala Sepolcrale"
       }
     },
     "npcs": {
@@ -13633,6 +14583,16 @@ export const it_IT: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "Il Tomo dell'Alba",
+        "text": "La Luce non riposa in te in silenzio, {playerName}. Ti ho visto dare pace ai morti, e credo tu sia pronto per ciò che a pochi paladini viene mai insegnato: il Rito del Richiamo, con cui un'anima caduta viene richiamata tra i vivi. Le sue parole sono custodite nel Tomo dell'Alba, qui sotto la mia custodia, ma un libro non è alcuna benedizione finché i morti inquieti camminano ancora su questa terra. Riporta altre 6 Ossa Inquiete alla terra, e comincerò a insegnarti.",
+        "completion": "Il cortile della cappella torna silenzioso. Sei pronto per le parole, {playerName}, ma il Rito del Richiamo non può essere pronunciato in una cappella tiepida. Deve essere cantato dove il velo tra la vita e la morte si assottiglia. Intendo portare il Tomo a nord, nella Palude di Mirefen. Seguimi là e porteremo a termine questo.",
+        "objectives": {
+          "0": {
+            "label": "Ossa Inquiete riposte"
+          }
+        }
+      },
       "q_bandits": {
         "title": "Banditi della Valle",
         "text": "Una banda di tagliagole si è accampata sulle colline sud-occidentali. Hanno rapinato tre carri questa settimana. Uccidi 10 banditi della Valle.",
@@ -13786,6 +14746,16 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Morto annegato restituito al riposo"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "Il Rito del Richiamo",
+        "text": "Così mi hai seguito nel fango, {playerName}. Bene. Ho qui il Tomo dell'Alba, e questa terra annegata è dove le sue parole appartengono: in nessun luogo il velo tra la vita e la morte è più sottile che dove i morti non restano sepolti. Ma gli annegati trascinerebbero giù la tua voce a metà del verso. Libera uno spazio degno del rito: riponi 8 degli Annegati, e lo consacreremo insieme.",
+        "completion": "Inginocchiati, {playerName}, e leggi le parole ad alta voce. Ecco. Lo senti? La Luce nelle tue mani non ripara più soltanto i vivi, può richiamare indietro coloro che hanno varcato la soglia. Usala con saggezza. Un'anima richiamata in una lotta senza speranza è una crudeltà, non una misericordia. Alzati, Redentore.",
+        "objectives": {
+          "0": {
+            "label": "Annegati riposti"
           }
         }
       },
@@ -16254,33 +17224,33 @@ export const it_IT: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Kit Braccacenere",
-        "bonus2": "Aumenta l'Indice di Difesa GUERRA di 40.",
-        "bonus4": "Aumenta l'Indice di Attacco GUERRA di 40, e il controllo della folla lanciato su di te da giocatori ostili dura il 15% in meno.",
-        "bonus7": "Aumenta l'Indice di Attacco e Difesa GUERRA di 80. Uccidere un giocatore ostile concede Passo di Cenere, aumentando la velocità di movimento del 40% per 6 sec."
+        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
+        "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. Uccidere un giocatore ostile concede Passo di Cenere, aumentando la velocità di movimento del 40% per 6 sec."
       },
       "warfare_cinderweave": {
         "name": "Paramenti Braciotessuti",
-        "bonus2": "Aumenta l'Indice di Difesa GUERRA di 40.",
-        "bonus4": "Aumenta l'Indice di Attacco GUERRA di 40, e il controllo della folla lanciato su di te da giocatori ostili dura il 15% in meno.",
-        "bonus7": "Aumenta l'Indice di Attacco e Difesa GUERRA di 80. I tuoi incantesimi hanno il 15% di probabilità di concedere Guardiabrace, assorbendo 120 danni per 8 sec."
+        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
+        "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. I vostri incantesimi hanno il 15% di probabilità di concedere Guardia di Brace, assorbendo 120 danni per 8 sec."
       },
       "warfare_furyforged": {
         "name": "Armatura da Battaglia Forgiafuria",
-        "bonus2": "Aumenta l'Indice di Difesa GUERRA di 40.",
-        "bonus4": "Aumenta l'Indice di Attacco GUERRA di 40, e il controllo della folla lanciato su di te da giocatori ostili dura il 15% in meno.",
-        "bonus7": "Aumenta l'Indice di Attacco e Difesa GUERRA di 80. Uccidere un giocatore ostile concede Giuramento Incrollabile, assorbendo 200 danni per 10 sec."
+        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
+        "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. Uccidere un giocatore ostile concede Giuramento Infranto, assorbendo 200 danni per 10 sec."
       },
       "warfare_stormbound": {
         "name": "Paramenti Legatempesta",
-        "bonus2": "Aumenta l'Indice di Difesa GUERRA di 40.",
-        "bonus4": "Aumenta l'Indice di Attacco GUERRA di 40, e il controllo della folla lanciato su di te da giocatori ostili dura il 15% in meno.",
-        "bonus7": "Aumenta l'Indice di Attacco e Difesa GUERRA di 80. I tuoi incantesimi hanno il 15% di probabilità di concedere Guardiabrace, assorbendo 120 danni per 8 sec."
+        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
+        "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. I vostri incantesimi hanno il 15% di probabilità di concedere Guardia di Brace, assorbendo 120 danni per 8 sec."
       },
       "warfare_thornhide": {
         "name": "Abito di Pelle di Spine",
-        "bonus2": "Aumenta l'Indice di Difesa GUERRA di 40.",
-        "bonus4": "Aumenta l'Indice di Attacco GUERRA di 40, e il controllo della folla lanciato su di te da giocatori ostili dura il 15% in meno.",
-        "bonus7": "Aumenta l'Indice di Attacco e Difesa GUERRA di 80. I tuoi incantesimi hanno il 15% di probabilità di concedere Guardiaspine, aumentando la schivata del 15% per 6 sec."
+        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
+        "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. I vostri incantesimi hanno il 15% di probabilità di concedere Guardia di Spine, aumentando la schivata del 15% per 6 sec."
       },
       "wyrmshadow": {
         "name": "Vesti Nightfang",

@@ -24,6 +24,8 @@ export interface ClipMap {
   attack: string[];
   /** Optional per-ability swing or cast-gesture override. */
   attackByAbility?: Record<string, string>;
+  /** Playback rate for authored per-ability clips that must keep exact timing. */
+  attackTimeScaleByAbility?: Record<string, number>;
   /** Optional weapon-style override for plain auto attacks. */
   attackByHand?: { twohand?: string; dualwield?: string };
   death: string;
@@ -499,6 +501,17 @@ const KOBOLD_ENEMY7: ClipMap = {
   attack: ['Kobold_Pounce'],
 };
 
+// Grix the Tunnelking's drop authors Idle/Walk/Run/Attack/Death and NO hit
+// reaction, so his hit slot is the shared HitRecieve_Heavy alone rather than
+// ENEMY7's ['HitRecieve', 'HitRecieve_Heavy']. Naming a clip his GLB does not
+// carry is not a soft failure: tests/character_clipmaps.test.ts gates every
+// ClipMap name against the clips actually shipped. He is a one-off rare, so this
+// is his own constant rather than a widened ENEMY7, which mob_ogre also reads.
+const GRIX: ClipMap = {
+  ...ENEMY7,
+  hit: ['HitRecieve_Heavy'],
+};
+
 // floating/flying rigs (goleling/dragon) — hover instead of walking
 const FLOATING: ClipMap = {
   idle: 'Flying_Idle',
@@ -691,6 +704,7 @@ const PLAYERS = 'models/chars/players';
 /** Modular part library (one GLB, every part), see modular.ts. */
 const MODULAR = 'models/chars/modular';
 const ENEMIES = 'models/chars/enemies';
+const FORMS = 'models/chars/forms';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
 const MOUNTS_DIR = 'models/mounts';
@@ -1067,18 +1081,17 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: { twohand: '2H_Melee_Attack_Chop' },
-      // Ability-specific clips (scripts/build_paladin_ability_anims.mjs,
-      // issue #2889 follow-up batch): the paladin had zero attackByAbility
-      // overrides across its kit, so every ability played the same melee
-      // chop. Almost the whole kit shares school: 'holy' (classes.ts), so
-      // school cannot differentiate anything the way it did for the mage:
-      // mapped instead by the ability's EFFECT TYPE (judgement, groundAoE,
+      // Ability-specific clips: the composed union of the overhaul's
+      // Dawnreaver entries (final_edict/sunward_disc/bastion_sweep) and the
+      // #2889 follow-up batch mapped by the ability's EFFECT TYPE (groundAoE,
       // stun, absorb/defensive selfBuff, buffTarget/aura selfBuff, heal).
-      // Not every ability in the kit is listed: this is a representative
-      // slice, not exhaustive coverage (seal_of_righteousness, exorcism,
-      // holy_taunt, and rebuke keep the default chop until a later batch).
+      // The batch's judgement row is dropped: the overhaul retired that id
+      // (final_edict is its successor and carries the Verdict clip). Not
+      // every ability is listed; unlisted ids keep the default chop.
       attackByAbility: {
-        judgement: 'Cast_Verdict',
+        final_edict: 'Paladin_Templars_Verdict_1H',
+        sunward_disc: 'Spellcast_Raise',
+        bastion_sweep: 'Paladin_Bastion_Sweep',
         consecration: 'Cast_Consecrate',
         hammer_of_justice: 'Cast_HammerBash',
         divine_protection: 'Cast_Ward',
@@ -1091,6 +1104,7 @@ export const VISUALS: Record<string, VisualDef> = {
         flash_of_light: 'Cast_HolyMend',
         lay_on_hands: 'Cast_HolyMend',
       },
+      attackTimeScaleByAbility: { final_edict: 1, sunward_disc: 1.8, bastion_sweep: 1 },
     },
     // Ability-specific clips (scripts/build_paladin_ability_anims.mjs): a
     // mesh-free clip donor GLB baked off this rig's own poses.
@@ -1524,6 +1538,26 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 5.4,
     attackTimeScale: 1,
   },
+  form_metamorph: {
+    url: `${FORMS}/metamorphosis.glb`,
+    height: 2.55,
+    // Generated Lich rig. Tripo bipeds face +X, while character visuals face
+    // +Z at world facing 0. Jump is intentionally absent: the generic biped
+    // jump distorted this winged silhouette, so airborne frames use Idle plus
+    // the controlled procedural wing pose in CharacterVisual.
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+  },
   // Druid Wolf Form AND shaman Shadewolf (ghost_wolf renders this visual with
   // the ghost material on top). Same custom baked wolf as the world wolves;
   // the tawny tint keeps the druid form readable against grey pack wolves.
@@ -1899,6 +1933,69 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.04,
   },
+  // The authored kobold body (the Kolbolds v02 artist drop, combined by
+  // tmp/kobold_build.mjs). Zone 1's Deeprock Diggers and their Tunnelking ONLY:
+  // the `burrower` family default deliberately stays mob_kobold (goblin.glb),
+  // because the other ten burrowers on it are sprites, gnomes and wretches that
+  // would every one of them read as a giant rat.
+  //
+  // `clips` is plain ENEMY7: the GLB carries Idle/Walk/Run/Attack/HitRecieve/
+  // Death, so this needs neither the KOBOLD_ENEMY7 attack override nor
+  // kobold_ability_anims.glb. That donor is deliberately NOT in animUrls, and
+  // this is the trap worth naming: prepareVisual fills its clip map from the
+  // base GLB and THEN lets every animUrls entry overwrite BY NAME, so listing it
+  // would silently replace this model's authored Attack with the synthesized
+  // Kobold_Pounce baked off goblin.glb's poses. goblin_hit_variety_anims.glb
+  // still rides along, for HitRecieve_Heavy, which no kobold drop authors.
+  //
+  // walkRef/runRef are MEASURED off the clips themselves
+  // (tmp/kobold_gait_measure.mjs) at tunnel_rat's 0.85 template scale, the
+  // dominant population by 14 spawns to 1: natural 1.23 and 2.51 yd/s on the v02
+  // body. Left on the 2.2/7 defaults, a 7 yd/s chase runs the cycle at 1.0x and
+  // the planted foot trails the body 2.8x; measured, the run pushes to its 1.6
+  // clamp and the walk lands near an exact foot match. Re-measure on any new
+  // drop: v01's cycles gave 1.31/2.22, and its Walk was 1.00s against v02's 1.13s.
+  mob_kobold_digger: {
+    url: `${CREATURES}/kobold.glb`,
+    height: 2.1,
+    animUrls: [`${CREATURES}/goblin_hit_variety_anims.glb`],
+    clips: ENEMY7,
+    walkRef: 1.23,
+    runRef: 2.51,
+    // Light wash, for grubjaw's reason above: the drop ships an authored brown
+    // hide, and the goblin body's 0.2 (sized to keep a GREEN skin readable) only
+    // muddies it.
+    tint: 'entity',
+    tintStrength: 0.12,
+  },
+  // Grix the Tunnelking: his own body at last. He was the clearest case of the
+  // gap this batch closes, a rare ELITE rendering identically to the level-4
+  // Deeprock Diggers he summons, with only the rare/elite nameplate frame to
+  // tell a player which one was the boss.
+  //
+  // The GLB carries a bone-parented PROP: his shovel is a child of
+  // mixamorigRightHand, not a skinned part, so it rides the hand through every
+  // clip with no track of its own. That also means two materials (body, shovel),
+  // each with its own basecolor, which is why tmp/grix_build.mjs supplies them
+  // per material instead of through the single-texture path the kobolds use.
+  //
+  // No `tint`, deliberately, even though his template DOES carry a colour
+  // (0xb9770e in zone1.ts). On the shared goblin/kobold bodies the entity tint is
+  // what separates one template from the next; Grix is a one-off with authored
+  // art (crown, robes, the shovel) and washing an amber over it only muddies it.
+  // His template colour still earns its keep elsewhere: the minimap/nameplate
+  // surfaces read it. Same reasoning as mob_water_elemental's untinted body.
+  //
+  // walkRef/runRef MEASURED (tmp/grix_gait_measure.mjs) at his template scale of
+  // 1.0: natural 1.23 and 2.31 yd/s against a 7 yd/s chase.
+  mob_grix: {
+    url: `${CREATURES}/grix.glb`,
+    height: 2.1,
+    animUrls: [`${CREATURES}/goblin_hit_variety_anims.glb`],
+    clips: GRIX,
+    walkRef: 1.23,
+    runRef: 2.31,
+  },
   mob_troll: {
     url: `${CREATURES}/orc.glb`,
     height: 2.4,
@@ -2005,6 +2102,25 @@ export const VISUALS: Record<string, VisualDef> = {
     hover: 0.12,
     clips: WATER_ELEMENTAL,
     attackTimeScale: 1.1,
+  },
+  mob_gravewing: {
+    url: `${CREATURES}/gravewing.glb`,
+    height: 2.4,
+    // Tripo's rig faces +X; character visuals face +Z at world facing 0.
+    yaw: -Math.PI / 2,
+    // The source Attack clip is 6.625s. Gravewing swings every 1.8s, or about
+    // 1.29s with both Necromancy haste buffs, so play it in 1.10s and return
+    // to locomotion before another swing can restart the full-body one-shot.
+    attackTimeScale: 6,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      jump: 'Jump',
+    },
   },
   mob_dragonkin: {
     url: `${CREATURES}/dragonevolved.glb`,
@@ -2119,8 +2235,65 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.15,
   },
-  // warlock demon pets (emberkin/gloomshade) — one biped rig, the entity colour and
-  // the mob template's scale tell the little orange emberkin from the bulky gloomshade
+  // Dedicated Destruction summons generated through the creature pipeline.
+  // Their authored fel textures stay untinted. The manifest height combines
+  // with each MobTemplate scale to render Emberkin at 1.15 units, Gloomshade
+  // at 3.0 units, and the Pyre Colossus at 4.25 units.
+  mob_emberkin: {
+    url: `${CREATURES}/emberkin.glb`,
+    height: 2.1,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+      attackByAbility: { emberkin_felbolt: 'Cast' },
+    },
+  },
+  mob_gloomshade: {
+    url: `${CREATURES}/gloomshade_abyssal_guardian.glb`,
+    height: 2.6,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+      attackByAbility: { gloomshade_abyssal_chain: 'Cast' },
+    },
+  },
+  mob_pyre_colossus: {
+    url: `${CREATURES}/pyre_colossus.glb`,
+    height: 2.5,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+  },
+  // Shared fallback rig for the remaining warlock demons. The entity colour
+  // and the mob template's scale distinguish their silhouettes.
   mob_demon: {
     url: `${CREATURES}/demonalt.glb`,
     height: 1.8,
@@ -2680,6 +2853,15 @@ const MOB_KEYS: Record<string, string> = {
   dragonkin_egg: 'mob_dragon_egg',
   // Grubjaw the Glutton: his own body now, not the shared troll stand-in.
   grubjaw: 'mob_grubjaw',
+  // Eastbrook Vale's kobolds: the authored rat body, not the goblin stand-in
+  // the `burrower` family still falls back to. Scoped to the two zone-1
+  // templates on purpose (see mob_kobold_digger): the family also carries the
+  // hedge gnome and the willow/fen/harvest sprites, and repointing the family
+  // would turn all of them into rats. Zone 3's deeprock_kobold and the Ironvein
+  // pair are the natural next adopters, but they are a separate call.
+  tunnel_rat: 'mob_kobold_digger',
+  // Grix has his own body now (mob_grix), so he no longer shares the Diggers'.
+  grix_the_tunnelking: 'mob_grix',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',
@@ -2690,12 +2872,19 @@ const MOB_KEYS: Record<string, string> = {
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
   training_dummy: 'mob_training_dummy',
-  emberkin: 'mob_demon',
+  emberkin: 'mob_emberkin',
+  gloomshade: 'mob_gloomshade',
+  pyre_colossus: 'mob_pyre_colossus',
   water_elemental: 'mob_water_elemental',
-  gloomshade: 'mob_demon',
-  duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
+  guardian_tithefiend: 'mob_demonalt',
+  // Packlord Stampede guardians are transient local templates, not MOBS rows.
+  // Give the three summoned beasts distinct existing bodies instead of the
+  // generic humanoid bandit fallback.
+  guardian_stampede_0: 'greyjaw',
+  guardian_stampede_1: 'mob_boar',
+  guardian_stampede_2: 'mob_raptor',
   wild_boar: 'mob_boar',
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',
@@ -2743,6 +2932,10 @@ const MOB_KEYS: Record<string, string> = {
   nythraxis_heroic_warrior_add: 'skel_warrior',
   nythraxis_heroic_priest_add: 'skel_necromancer',
   nythraxis_heroic_rogue_add: 'skel_rogue',
+  graveguard: 'skel_warrior',
+  necromancy_skeletal_warrior: 'skel_minion',
+  necromancy_bone_mage: 'skel_mage',
+  necromancy_gravewing: 'mob_gravewing',
   brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
   sexton_marrow: 'skel_mage',

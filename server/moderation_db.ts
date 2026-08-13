@@ -42,6 +42,10 @@ export const MODERATION_ACTIONS = [
   'daily_rewards_ip_unban',
   'reactivate',
   'chat_strikes_reset',
+  // Account-scoped General-only quota policy change. The quota DB module owns
+  // the surrounding transaction because its before/after JSON and NOTIFY must
+  // commit atomically with the policy row.
+  'general_chat_rate_limit',
   // Account flair. Not punitive (they grant a cosmetic mark, they do not sanction),
   // so unlike every action above they take an OPTIONAL reason. Audited all the same:
   // the AI mark and a streamer's links are visible to every player, so who set them

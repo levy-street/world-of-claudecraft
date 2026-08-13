@@ -292,6 +292,12 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.maxHpPct': 'Accroît les points de vie maximum de {pct}%',
   'hudChrome.statInfo.desc.parry':
     'Vos chances de parer entièrement une attaque de mêlée de front, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
+  'hudChrome.chatQuota.limitReached':
+    'Limite du clavardage Général atteinte. Réessayez dans {seconds}.',
+  'hudChrome.chatQuota.pending':
+    "Votre message précédent dans le clavardage Général est toujours en cours d'envoi. Réessayez dans un instant.",
+  'hudChrome.chatQuota.unavailable':
+    "Le clavardage Général est temporairement indisponible. Réessayez d'ici peu.",
   'hudChrome.interfaceTabs.chat': 'Clavardage',
   'hudChrome.options.mouseoverCast': 'Lancement au survol sur les cadres de groupe',
   'hud.errors.marketListBound': 'Cet objet est lié et ne peut pas être inscrit au marché.',
@@ -300,4 +306,17 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.guildInviteCancelled':
     'Une invitation de guilde en attente a été annulée parce que la guilde a été renommée.',
   'hud.prompts.guildRenamed': "Votre guilde a été renommée en {name} par l'équipe de modération.",
+  'hudChrome.bags.itemAriaLocked': '{item}, quantité {count}, barré',
+  'hudChrome.bags.itemLockedLine': 'Barré',
+  'hudChrome.bags.lockItem': "Barrer l'objet",
+  'hudChrome.bags.unlockItem': "Débarrer l'objet",
+  'hudChrome.crafting.reagentLocked': 'Un composant pour cela est barré.',
+  'hudChrome.enchanting.salvageLocked': 'Cet objet est barré.',
+  'hudChrome.otaUpdate.applying': 'Actualización descargada. Reiniciando el juego para aplicarla.',
+  'hudChrome.otaUpdate.continueAnyway': 'Continuar sin actualizar',
+  'hudChrome.otaUpdate.downloading': 'Descargando actualización: {percent}',
+  'hudChrome.otaUpdate.incompatible':
+    'Se necesita una actualización para jugar. Se aplicará en cuanto termine la descarga.',
+  'hudChrome.otaUpdate.progressLabel': 'Progreso de descarga de la actualización',
+  'hudChrome.otaUpdate.title': 'Actualización del juego',
 };

@@ -22,6 +22,10 @@ function deferred<T>(): {
 
 vi.mock('../src/render/assets/loader', () => ({
   loadTexture: mocks.loadTexture,
+  // The surface-detail families (worn_stone.ts, pulled in transitively) load
+  // their compressed siblings; share the mock so their calls land in the same
+  // stream the atlas filters below already ignore.
+  loadKtx2Texture: mocks.loadTexture,
 }));
 
 vi.mock('../src/render/assets/preload', () => ({

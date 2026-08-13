@@ -43,6 +43,22 @@ describe('Mage barrier visual', () => {
     expect((temporalShell.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0x9f6cff);
   });
 
+  it('renders Ward of Faith as a narrower golden holy shell', () => {
+    expect(
+      mageBarrierStateForAuras([
+        { id: 'divine_protection', kind: 'absorb', value: 110, remaining: 10 },
+      ]),
+    ).toEqual({ theme: 'holy', value: 110, remaining: 10 });
+
+    const visual = new MageBarrierVisual(1.8, 'holy');
+    visual.update({ theme: 'holy', value: 110 }, 1);
+    const shell = visual.group.getObjectByName('mage-barrier-shell') as THREE.Mesh;
+    expect((shell.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0xf2bd42);
+    expect(shell.scale.x).toBeLessThan(0.85);
+    expect(shell.scale.z).toBeLessThan(0.85);
+    expect(shell.scale.y).toBeGreaterThan(1.15);
+  });
+
   it('maps Mass Barrier to the casting specialization carried by its aura school', () => {
     expect(
       mageBarrierStateForAuras([

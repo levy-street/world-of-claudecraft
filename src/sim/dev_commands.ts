@@ -2,6 +2,7 @@ import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_KEYS, TRAINING_MOUNT_KEY } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
+import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
@@ -11,8 +12,9 @@ import { isGatheringProfessionId, queueGatheringGrant } from './professions/gath
 import { placeMobileStationForPlayer } from './professions/mobile_station';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
+import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
-import { generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
+import { generateRiftFloor, generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
 import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
@@ -458,6 +460,13 @@ export function handleDevChat(
     return null;
   }
 
+  if (/^\/(?:dev\s+bis|devbis)\s*$/i.test(raw)) {
+    const equipped = equipBestInSlotForDev(ctx, pid);
+    if (equipped === 0) ctx.error(pid, '[dev] Could not outfit best-in-slot gear.');
+    else emitDevLog(ctx, pid, `[dev] Equipped ${equipped} best-in-slot epic pieces.`);
+    return null;
+  }
+
   const lfgMatch = /^\/(?:dev\s+lfg|devlfg)(?:\s+(\S+))?\s*$/i.exec(raw);
   if (lfgMatch) {
     const mode = (lfgMatch[1] ?? 'queue').toLowerCase();
@@ -620,9 +629,78 @@ export function handleDevChat(
     portal.facing = e.facing + Math.PI; // face back toward the player
     portal.prevFacing = portal.facing;
     ctx.addEntity(portal);
+    riftFx(ctx, portal.pos.x, portal.pos.z, 'arcane', 'burst', 'rift_portal_spawn');
     ctx.emit({
       type: 'log',
       text: `[dev] Opened a ${tier}-rank portal to ${plan.name} (${plan.floorCount} floors, L${baseLevel}). Walk through it.`,
+      color: '#b9f',
+      pid,
+    });
+    return null;
+  }
+
+  // [dev] Spawn a portal whose FIRST floor is guaranteed to roll a specific
+  // headline mechanic, for testing the rift SFX pass without hunting seeds by
+  // hand: /dev riftmech <ice|roller|lava|gate> [level]. Iterates seeds (same
+  // approach as the /dev portal kind search above) checking generateRiftFloor's
+  // floor-0 plan until one matches, since exactly one headline mechanic rolls
+  // per floor (rift_gen.ts). Bails with an error after a bounded search rather
+  // than spinning forever on a level/mechanic combination that cannot roll.
+  const riftMechMatch =
+    /^\/(?:dev\s+riftmech|devriftmech)\s+(ice|roller|lava|gate)(?:\s+(\d+))?\s*$/i.exec(raw);
+  if (riftMechMatch) {
+    const e = ctx.entities.get(pid);
+    if (!e) return null;
+    const wantMech = riftMechMatch[1].toLowerCase();
+    const baseLevel = Math.max(
+      1,
+      Math.min(60, riftMechMatch[2] ? Number(riftMechMatch[2]) : e.level),
+    );
+    let seed = ctx.rng.int(1, 1_000_000_000) >>> 0;
+    let found = false;
+    for (let i = 0; i < 5000; i++) {
+      if (isSetPieceSeed(seed)) {
+        seed = (seed + 1) >>> 0;
+        continue;
+      }
+      const floor = generateRiftFloor(seed, baseLevel, 0);
+      const matches =
+        wantMech === 'ice'
+          ? floor.iceZone !== null
+          : wantMech === 'roller'
+            ? floor.rollers.length > 0
+            : wantMech === 'lava'
+              ? floor.hazards.length > 0
+              : floor.gate !== null;
+      if (matches) {
+        found = true;
+        break;
+      }
+      seed = (seed + 1) >>> 0;
+    }
+    if (!found) {
+      ctx.error(pid, `[dev] Found no ${wantMech} floor at L${baseLevel}. Try again.`);
+      return null;
+    }
+    const tier = riftRankForBaseLevel(Math.round(baseLevel));
+    const d = 5;
+    const px = e.pos.x + Math.sin(e.facing) * d;
+    const pz = e.pos.z + Math.cos(e.facing) * d;
+    const plan = generateRiftPlan(seed, baseLevel);
+    const portal = createGroundObject(ctx.nextId++, '', plan.name, ctx.groundPos(px, pz));
+    portal.templateId = 'rift_portal';
+    portal.objectItemId = null;
+    portal.lootable = true;
+    portal.riftSeed = seed;
+    portal.riftBaseLevel = baseLevel;
+    portal.riftTier = tier;
+    portal.facing = e.facing + Math.PI;
+    portal.prevFacing = portal.facing;
+    ctx.addEntity(portal);
+    riftFx(ctx, portal.pos.x, portal.pos.z, 'arcane', 'burst', 'rift_portal_spawn');
+    ctx.emit({
+      type: 'log',
+      text: `[dev] Opened a portal to ${plan.name} (L${baseLevel}); floor 1 has the ${wantMech} mechanic. Walk through it.`,
       color: '#b9f',
       pid,
     });
@@ -701,7 +779,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

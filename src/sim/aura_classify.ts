@@ -11,6 +11,7 @@ import type { Aura, AuraKind } from './types';
 // the various combat penalties (silence/disarm/blind/lockout/expose/...).
 export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'dot',
+  'forced_move',
   'slow',
   'root',
   'stun',
@@ -34,9 +35,17 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'tongues',
   'cost_tax',
   'heal_absorb',
+  'ruinous_brand',
+  'duskfire_claim',
   'critvuln',
   'sated', // shared Bloodlust / Temporal Acceleration exhaustion lockout
   'cauterize_fatigue', // Cauterize's 5 min "already saved you" lockout
+  'sun_verdict',
+  'affliction_eye',
+  'affliction_eye_secondary',
+  'affliction_fate_threads',
+  'affliction_violence',
+  'necromancy_harvest_mark',
 ]);
 
 // A negative-value stat aura (e.g. a mob's Withering Wail sapping attack power, or
@@ -64,9 +73,14 @@ export function isPlayerRemovableAura(
 // magic-school only, and the cast's direction picks the polarity (an OFFENSIVE dispel
 // strips a benefit off an enemy; a friendly one strips a harmful effect off an ally).
 export function isDispellableAura(
-  aura: Pick<Aura, 'kind' | 'value' | 'school' | 'unbreakableControl' | 'undispellable'>,
+  aura: Pick<Aura, 'kind' | 'value' | 'school'> &
+    Partial<Pick<Aura, 'id' | 'unbreakableControl' | 'undispellable' | 'permanent'>>,
   offensive: boolean,
 ): boolean {
+  // Ascension is a player-owned resource state surfaced as an aura for HUD clarity,
+  // not a transferable magic buff. Letting dispel/steal remove only the synthetic
+  // icon would leave its charges active invisibly (or copy a mechanically inert icon).
+  if (aura.id === 'divine_ascension' || aura.permanent) return false;
   if (!isPlayerRemovableAura(aura)) return false;
   if (aura.school === 'physical') return false;
   const harmful = isDebuffAura(aura.kind, aura.value);
@@ -75,6 +89,7 @@ export function isDispellableAura(
 
 const PARTY_FRAME_HELPFUL_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'temporal_echo',
+  'beacon_of_light',
   'hot',
   'absorb',
   'cast_shield',
@@ -86,7 +101,11 @@ const PARTY_FRAME_HELPFUL_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
 
 // Evasion and Deterrence share buff_dodge with long-lived maintenance buffs, so
 // their stable ability ids distinguish the major defensives from passive upkeep.
-const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set(['evasion', 'deterrence']);
+const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set([
+  'evasion',
+  'deterrence',
+  'priest_doctrine',
+]);
 
 /** Effects worth surfacing on a compact party/raid frame. Generic maintenance
  * buffs, forms, stances, and personal damage procs remain on the normal aura UI. */

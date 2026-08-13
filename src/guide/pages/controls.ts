@@ -34,6 +34,7 @@ const GROUPS: Group[] = [
     heading: 'guide.controls.groupCombat',
     rows: [
       { keys: ['Tab'], label: 'controls.target' },
+      { keys: ['Shift+Tab'], label: 'guide.controls.targetPrev' },
       { keys: ['H'], label: 'guide.controls.targetFriendly' },
       { keys: ['J'], label: 'guide.controls.cycleFriendly' },
       { keys: ['Shift+J'], label: 'guide.controls.targetAuras' },
@@ -57,6 +58,7 @@ const GROUPS: Group[] = [
       { keys: ['N'], label: 'guide.controls.talents' },
       { keys: ['Z'], label: 'guide.controls.sheathe' },
       { keys: ['Shift+Z'], label: 'guide.controls.deeds' },
+      { keys: ['Shift+X'], label: 'guide.controls.reliquary' },
       { keys: ['T'], label: 'guide.controls.crafting' },
       { keys: ['O'], label: 'controls.friends' },
       { keys: ['G'], label: 'guide.controls.arena' },

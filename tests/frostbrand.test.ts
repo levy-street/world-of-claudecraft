@@ -1,19 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
-import { Sim } from '../src/sim/sim';
+import { computeTalentModifiers } from '../src/sim/content/talents';
 
-function shaman(level: number) {
-  const sim = new Sim({ seed: 42, playerClass: 'shaman', noPlayer: true });
-  const pid = sim.addPlayer('shaman', 'Thrall');
-  sim.tick();
-  sim.setPlayerLevel(level, pid);
-  const p = sim.entities.get(pid)!;
-  p.gm = true;
-  return { sim, pid, p };
-}
-
-describe('Frostbrand Weapon (shaman frost imbue)', () => {
-  it('is a pure-data frost imbue defined on the shaman kit', () => {
+describe('Frostbrand Weapon (retired shaman frost imbue)', () => {
+  it('retains its pure-data definition for save compatibility', () => {
     const def = ABILITIES.frostbrand_weapon;
     expect(def).toBeDefined();
     expect(def.class).toBe('shaman');
@@ -25,28 +15,12 @@ describe('Frostbrand Weapon (shaman frost imbue)', () => {
     expect(def.ranks?.[0]).toMatchObject({ rank: 2, level: 20 });
   });
 
-  it('is gated by learn level and ranks up at 20', () => {
-    expect(abilitiesKnownAt('shaman', 4).some((k) => k.def.id === 'frostbrand_weapon')).toBe(false);
-    const at5 = abilitiesKnownAt('shaman', 5).find((k) => k.def.id === 'frostbrand_weapon');
-    expect(at5?.rank).toBe(1);
-    const at20 = abilitiesKnownAt('shaman', 20).find((k) => k.def.id === 'frostbrand_weapon');
-    expect(at20?.rank).toBe(2);
-  });
-
-  it('casting applies an imbue aura that adds flat damage per swing', () => {
-    const { sim, pid, p } = shaman(12);
-    sim.castAbility('frostbrand_weapon', pid);
-    sim.tick();
-    const aura = p.auras.find((a) => a.id === 'frostbrand_weapon');
-    expect(aura?.kind).toBe('imbue');
-    expect(aura?.value).toBe(8);
-  });
-
-  it('rank 2 imbues a larger per-swing bonus', () => {
-    const { sim, pid, p } = shaman(20);
-    sim.castAbility('frostbrand_weapon', pid);
-    sim.tick();
-    const aura = p.auras.find((a) => a.id === 'frostbrand_weapon');
-    expect(aura?.value).toBe(13);
+  it('is no longer offered by any v0.29 shaman specialization', () => {
+    for (const spec of ['elemental', 'enhancement', 'restoration']) {
+      const mods = computeTalentModifiers('shaman', { spec, rows: {} }, 20);
+      expect(
+        abilitiesKnownAt('shaman', 20, mods).some((k) => k.def.id === 'frostbrand_weapon'),
+      ).toBe(false);
+    }
   });
 });

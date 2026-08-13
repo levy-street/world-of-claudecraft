@@ -6,24 +6,41 @@ import { describe, expect, it } from 'vitest';
 import mapping from '../public/ui/skills/warrior/mapping.json';
 import { abilityImageUrl } from '../src/ui/icons';
 
+// The served skill-icon contract, from the converter that owns these files
+// (scripts/convert_skill_icons_webp.mjs: ICON_SIZE, SIZE_CAP). Mirrored rather than
+// imported because that script is an .mjs build tool, not a module the suite loads.
+const ICON_SIZE = 128;
+const ICON_SIZE_CAP = 15 * 1024;
+
+// The three hand-authored ("custom-user") Warrior paintings. Their bytes are pinned so an
+// automated pass cannot swap the author's art for a substitute.
+//
+// WHY THESE BLOBS MOVED ONCE. They shipped at full desktop resolution (309,072 / 365,078 /
+// 190,076 bytes), 20x to 24x over the 15 KiB cap the converter enforces, while every sibling
+// icon was already a 128px square. The v0.36 art audit ran them through
+// convert_skill_icons_webp.mjs, which is exactly what that script exists to do to
+// hand-authored icons. The paintings are unchanged; only the encode is. Re-pinning alone
+// would have turned this guard into a rubber stamp, so the contract that justified the
+// re-encode is now pinned BESIDE the blob: a future full-resolution regression fails on
+// size, and a substitution still fails on the blob.
 const AUTHORED_ICONS = {
   double_charge: {
     sourcePack: 'custom-user',
     sourceFile: 'desktop/Doble carga.png',
     output: 'double_charge.webp',
-    blob: '335e3c113f7bb729caec313b14b586d3c9ba0d30',
+    blob: 'f9d50e9bbc246052ed7c74b7f4951dd0efc1869a',
   },
   crushing_charge: {
     sourcePack: 'custom-user',
     sourceFile: 'desktop/el otro cargar.png',
     output: 'crushing_charge.webp',
-    blob: '3f0f9c858635c054f59c950e8259833699f8b47c',
+    blob: 'ec4135e03438cda7015068720e29e3891f945da7',
   },
   combat_mastery: {
     sourcePack: 'custom-user',
     sourceFile: 'desktop/Nuevo talento.png',
     output: 'combat_mastery.webp',
-    blob: '756978b7da595ec543be28cec98b03da79a60d9b',
+    blob: '493bd39c1ee12f02832855931a56f46305177e80',
   },
 } as const;
 
@@ -117,6 +134,22 @@ describe('winning Warrior authored talent icons', () => {
     for (const expected of Object.values(AUTHORED_ICONS)) {
       const path = resolve('public/ui/skills/warrior', expected.output);
       expect(gitBlobHash(path), expected.output).toBe(expected.blob);
+    }
+  });
+
+  it('serves those authored paintings at the 128px skill-icon contract', async () => {
+    const { default: sharp } = await import('sharp');
+    for (const expected of Object.values(AUTHORED_ICONS)) {
+      const path = resolve('public/ui/skills/warrior', expected.output);
+      const bytes = readFileSync(path);
+      // The regression this catches is the one that actually shipped: a full-resolution
+      // desktop painting served straight to the icon slot, 20x over cap.
+      expect(bytes.length, `${expected.output} bytes`).toBeLessThanOrEqual(ICON_SIZE_CAP);
+      const { width, height } = await sharp(bytes).metadata();
+      expect({ width, height }, `${expected.output} dimensions`).toEqual({
+        width: ICON_SIZE,
+        height: ICON_SIZE,
+      });
     }
   });
 

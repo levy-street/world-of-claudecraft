@@ -35,12 +35,18 @@ export type VfxAnchorResolver = (
 ) => THREE.Vector3 | null;
 
 /** A displayed entity pose: the view group's world position plus the height
- *  the anchor fraction is measured against (rig height x entity scale). */
+ *  the anchor fraction is measured against (rig height x entity scale). A fill
+ *  that serves offset resolves (createOffsetVfxAnchor) also supplies the
+ *  displayed yaw (radians) and the world scale local offsets stretch with;
+ *  both are reset before every fill, so an omitting fill reads as unrotated
+ *  and unscaled rather than as the previous entity's pose. */
 export interface VfxAnchorPose {
   x: number;
   y: number;
   z: number;
   height: number;
+  yaw?: number;
+  scale?: number;
 }
 
 /**
@@ -64,5 +70,46 @@ export function createVfxAnchor(fill: VfxAnchorPoseFill): VfxAnchorResolver {
     if (!fill(id, pose)) return null;
     const target = out ?? new THREE.Vector3();
     return target.set(pose.x, pose.y + pose.height * frac, pose.z);
+  };
+}
+
+/**
+ * Resolve the world point at `heightFrac` of an entity's displayed height,
+ * displaced by a local-frame offset rotated to the entity's displayed yaw and
+ * stretched by its scale. The warlock drain beams anchor on the hovering
+ * affliction familiar this way (a fixed offset beside the caster, whichever
+ * way the body faces). Same `out` contract as VfxAnchorResolver.
+ */
+export type VfxOffsetAnchorResolver = (
+  id: number,
+  heightFrac: number,
+  localX?: number,
+  localZ?: number,
+  out?: THREE.Vector3,
+) => THREE.Vector3 | null;
+
+/** Build the offset-capable resolver over the same pose lookup. */
+export function createOffsetVfxAnchor(fill: VfxAnchorPoseFill): VfxOffsetAnchorResolver {
+  const pose: VfxAnchorPose = { x: 0, y: 0, z: 0, height: 0, yaw: 0, scale: 1 };
+  return (
+    id: number,
+    frac: number,
+    localX = 0,
+    localZ = 0,
+    out?: THREE.Vector3,
+  ): THREE.Vector3 | null => {
+    pose.yaw = 0;
+    pose.scale = 1;
+    if (!fill(id, pose)) return null;
+    const yaw = pose.yaw ?? 0;
+    const scale = pose.scale ?? 1;
+    const cos = Math.cos(yaw);
+    const sin = Math.sin(yaw);
+    const target = out ?? new THREE.Vector3();
+    return target.set(
+      pose.x + (localX * cos + localZ * sin) * scale,
+      pose.y + pose.height * frac,
+      pose.z + (-localX * sin + localZ * cos) * scale,
+    );
   };
 }

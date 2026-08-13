@@ -30,6 +30,17 @@ export type CustomMapMeta = MapDocMeta;
 // here; serialization casts back to the mutable MapDoc shape.
 export type CustomMap = Omit<MapDoc, 'content'> & { content: ZoneContent };
 
+// CustomMap and MapDoc describe the SAME on-wire document: only the static
+// type of `content` differs (CustomMap's ZoneContent is readonly so the
+// editor can share live table references with the marker model; MapDoc's
+// MapDocContent is mutable, the shape the shared sanitizer/serializer and the
+// server expect). The unsafe cast that bridges the two lives here, ONCE, so
+// every save/serialize call site asks for the shared shape by name instead of
+// re-deriving `map as unknown as MapDoc` inline.
+export function toMapDoc(map: CustomMap): MapDoc {
+  return map as unknown as MapDoc;
+}
+
 // The shipped world seed; a fresh map defaults to it so its built-in derived
 // terrain matches what the editor previews (mirrors DEFAULT_PLAYTEST_SEED).
 const DEFAULT_SEED = WORLD_SEED;

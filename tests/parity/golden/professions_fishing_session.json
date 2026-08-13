@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e836976c",
+      "state": "b7e2dc0d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,6 +74,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -150,7 +154,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "03d52ddc",
+      "state": "18c4351d",
       "events": "9988cb27",
       "rng": {
         "draws": 1,
@@ -211,6 +215,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -292,7 +300,7 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 964,
-      "state": "d9acf061",
+      "state": "8795deca",
       "events": "affa4108",
       "rng": {
         "draws": 1,
@@ -353,6 +361,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -434,7 +446,7 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 964,
-      "state": "adf6b297",
+      "state": "10b71ce0",
       "events": "cffa3816",
       "rng": {
         "draws": 2,
@@ -509,6 +521,10 @@
             }
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -586,7 +602,7 @@
       "tick": 99,
       "time": 4.95,
       "nextId": 964,
-      "state": "a8a124c8",
+      "state": "ba73f8e9",
       "events": "943b953c",
       "rng": {
         "draws": 3,
@@ -667,6 +683,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 10,
           "talents": {
             "rows": {}

@@ -33,14 +33,16 @@ function creatureFlavor(c: GuideCreature): string {
 }
 
 // Each creature card pairs a pre-rendered still of the creature with its name and level
-// band. The still falls back to the family crest only if a render is somehow absent (the
-// guide.test asset guard makes that a build failure, not a runtime hole).
+// band. The still falls back to the family crest if a render is absent or fails at runtime (the
+// guide.test asset guard makes absence a build failure, not a runtime hole).
 function creatureCard(c: GuideCreature, family: string): string {
   const rare = c.rare
     ? `<span class="guide-badge guide-badge-rare">${esc(t('guide.bestiary.rare'))}</span>`
     : '';
   const img = c.still ?? familyCrest(family);
-  const fallback = c.still ? '' : ` ${crestImageFallbackAttributes(familyCrestId(family), 96)}`;
+  const fallback = ` ${crestImageFallbackAttributes(familyCrestId(family), 96, {
+    decorative: true,
+  })}`;
   // The still IS the subject, so its alt names the creature (via the shared viewer key, the
   // same path embed.ts uses); the crest fallback is decoration (alt="").
   const alt = c.still ? esc(t('guide.viewer.posterAlt', { name: c.name })) : '';

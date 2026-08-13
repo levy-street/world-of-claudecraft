@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { onCastCompleted, onHotExpired } from '../src/sim/combat/talent_procs';
+import { onCastCompleted } from '../src/sim/combat/talent_procs';
+import { WARLOCK_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -66,113 +67,15 @@ function completeCast(sim: Sim, ability: string, target: Entity | null = null): 
   );
 }
 
-function expireHot(sim: Sim, ability: string, target: Entity): void {
-  onHotExpired(
-    (sim as unknown as { ctx: Parameters<typeof onHotExpired>[0] }).ctx,
-    sim.player,
-    ability,
-    target,
-  );
-}
-
-// The mage tree was replaced wholesale by the owner's design (2026-07-11);
-// its coverage lives in tests/mage_choice_rows.test.ts.
-describe('hunter wave 2 choice rows', () => {
-  it('the reworked shot rows: venom damage, mana-only Lean Quiver, no relays', () => {
-    // Balance pass: Deepvenom is a flat poison boost (no free-shot relay),
-    // Lean Quiver only returns mana (no instant Long Draw), and Steady Draw
-    // replaced the Rattling Ambush reset+free loop outright.
-    const { sim, p } = rig('hunter', 20, {
-      5: 'hun_r5_improved_serpent_sting',
-      11: 'hun_r11_efficiency',
-      14: 'hun_r14_sniper_training',
-    });
-    p.resource = p.maxResource - 30;
-    for (let i = 0; i < 3; i++) completeCast(sim, 'serpent_sting');
-    expect(p.auras.some((a) => a.id === 'hun_venom_relay')).toBe(false);
-    expect(p.auras.some((a) => a.id === 'hun_lean_quiver')).toBe(false);
-    expect(p.resource).toBe(p.maxResource - 10); // the every-3rd 20 mana survives
-    completeCast(sim, 'concussive_shot');
-    expect(p.auras.some((a) => a.id === 'hun_full_draw_rhythm')).toBe(false);
-    // Deepvenom: the poison dot resolves 20% harder (rank 3 total 55 -> 66).
-    expect(sim.resolvedAbility('serpent_sting')?.effects[0]).toMatchObject({
-      type: 'dot',
-      total: 66,
-    });
-  });
-
-  it('Pinning Barb and Guisecraft are plain ability improvements now', () => {
-    // Balance pass round two: Pinning Barb keeps the base 12 sec cooldown
-    // (a cut pushed the 50% slow toward half uptime) and instead deepens the
-    // slow to 70% inside the same window; Guisecraft is 25% (50% was too
-    // strong once the swap-discount abuse case was gone).
-    const { sim } = rig('hunter', 20, {
-      5: 'hun_r5_aspect_mastery',
-      8: 'hun_r8_improved_concussive',
-    });
-    const rattling = sim.resolvedAbility('concussive_shot');
-    expect(rattling?.cooldown).toBeCloseTo(12);
-    expect(rattling?.effects.some((e) => e.type === 'root')).toBe(false);
-    expect(
-      rattling?.effects.some((e) => e.type === 'slow' && e.mult === 0.3 && e.duration === 4),
-    ).toBe(true);
-    expect(sim.resolvedAbility('aspect_of_the_hawk')?.effects[0]).toMatchObject({
-      type: 'selfBuff',
-      value: 63, // rank 3 at level 20: 50 AP * 1.25 rounded
-    });
-  });
-
-  it('Bloodbond, Deathless Will, and Steady Rain use pet-share, big-hit, and passive hooks', () => {
-    // The final #1756 choice pass made the row 17 option (Bloodbond) a passive
-    // 20% pet damage share and the row 20 option (Steady Rain) a passive
-    // Arrowfall buff; neither is a HoT-expiry or channel proc anymore. The
-    // Steady Rain pushback immunity is pinned in
-    // tests/talent_retained_semantics_v026.test.ts.
-    const { sim, p } = rig('hunter', 20, {
-      11: 'hun_r11_mend_pet',
-      17: 'hun_r17_master_tamer',
-      20: 'hun_r20_improved_volley',
-    });
-    const pet = createMob(9300, MOBS.forest_wolf, 20, {
-      x: p.pos.x + 2,
-      y: p.pos.y,
-      z: p.pos.z,
-    });
-    pet.hostile = false;
-    pet.ownerId = p.id;
-    pet.maxHp = pet.hp = 1000;
-    (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
-    p.hp = p.maxHp;
-    dealDamage(sim, p, 100);
-    expect(p.maxHp - p.hp).toBe(80);
-    expect(1000 - pet.hp).toBe(20);
-    // Patch Up: revive_pet heals 50% more (baseline HoT total 240 -> 360).
-    expect(sim.resolvedAbility('revive_pet')?.effects[0]).toMatchObject({
-      type: 'hot',
-      total: 360,
-    });
-    // Steady Rain: Arrowfall ticks resolve 50% harder (12-16 -> 18-24).
-    expect(sim.resolvedAbility('volley')?.effects[0]).toMatchObject({
-      type: 'aoeDamage',
-      min: 18,
-      max: 24,
-    });
-
-    const guarded = rig('hunter', 20, { 11: 'hun_r11_survival_instincts' });
-    dealDamage(guarded.sim, guarded.p, Math.ceil(guarded.p.maxHp * 0.35));
-    // Balance pass round three: shields are priest-only, so the panic
-    // response is the 40% escape burst.
-    const burst = guarded.p.auras.find((a) => a.id === 'hun_deathless_will');
-    expect(burst?.kind).toBe('buff_speed');
-    expect(burst?.value).toBeCloseTo(1.4);
-  });
-});
+// The mage and Hunter trees were replaced wholesale by owner-approved designs.
+// Their coverage lives in tests/mage_choice_rows.test.ts and
+// tests/hunter_talents.test.ts.
 
 describe('rogue wave 2 choice rows', () => {
   it('Evasion grants a cheap builder and poison swings restore energy', () => {
     const { sim, p } = rig('rogue', 20, {
-      14: 'rog_r14_deadly_brew',
-      17: 'rog_r17_improved_evasion',
+      14: 'rog_r14_venom_dividend',
+      17: 'rog_r17_ghostfoot_gambit',
     });
     addTargetMob(sim, 100000, 3);
     p.resource = 40;
@@ -186,7 +89,7 @@ describe('rogue wave 2 choice rows', () => {
   });
 
   it('Cheat Death prevents one killing blow', () => {
-    const { sim, p } = rig('rogue', 20, { 17: 'rog_r17_cheat_death' });
+    const { sim, p } = rig('rogue', 20, { 8: 'rog_r8_borrowed_breath' });
     dealDamage(sim, p, p.hp + 100);
     expect(p.dead).toBe(false);
     expect(p.hp).toBe(1);
@@ -194,145 +97,169 @@ describe('rogue wave 2 choice rows', () => {
 });
 
 describe('druid wave 2 choice rows', () => {
-  it('form and heal loops create cheap casts, cooldown resets, and echoes', () => {
-    const { sim, p } = rig('druid', 20, {
-      5: 'dru_r5_ferocity',
-      14: 'dru_r14_empowered_touch',
-    });
+  it('Loping Stride triggers once per internal cooldown after a form change', () => {
+    const { sim, p } = rig('druid', 20, { 5: 'dru_r5_ferocity' });
     castAndSettle(sim, 'cat_form', 1);
-    expect(p.auras.some((a) => a.id === 'dru_redmaw')).toBe(true);
-
-    // Bloom's End is self-contained since the final #1756 pass: a full
-    // Wildbloom arms an instant Wildmend instead of resetting Swiftmend
-    // (unobtainable alongside this row).
-    const healer = rig('druid', 20, { 5: 'dru_r5_natures_bounty' });
-    healer.p.hp = Math.round(healer.p.maxHp * 0.5);
-    expireHot(healer.sim, 'rejuvenation', healer.p);
-    expect(healer.p.auras.find((a) => a.id === 'dru_natures_bounty')?.kind).toBe(
-      'next_cast_instant',
-    );
+    expect(p.auras.some((a) => a.id === 'loping_stride' && a.kind === 'buff_speed')).toBe(true);
+    p.auras = p.auras.filter((a) => a.id !== 'loping_stride');
+    p.gcdRemaining = 0;
+    sim.castAbility('bear_form');
+    expect(p.auras.some((a) => a.id === 'loping_stride')).toBe(false);
   });
 
-  it('Empowered Touch echo and Survival of the Fittest big-hit loop resolve', () => {
-    const { sim, p } = rig('druid', 20, { 14: 'dru_r14_empowered_touch' });
-    p.hp = Math.round(p.maxHp * 0.7);
-    sim.targetEntity(sim.playerId);
-    castAndSettle(sim, 'healing_touch', 4);
-    expect(p.auras.some((a) => a.id === 'dru_empowered_touch')).toBe(true);
-    p.hp = Math.round(p.maxHp * 0.4);
-    dealDamage(sim, p, Math.ceil(p.maxHp * 0.2));
-    expect(p.auras.some((a) => a.id === 'dru_empowered_touch')).toBe(false);
-
-    const bear = rig('druid', 20, {
-      17: 'dru_r17_survival_of_the_fittest',
-      20: 'dru_r20_improved_hurricane',
-    });
-    // Ironhide Reflex is self-contained since the final #1756 pass: a big hit
-    // restores 20 rage (only in Bruin Form, via the resourceType gate) and
-    // grants a shield, instead of refunding the same-row Savage Mending.
-    castAndSettle(bear.sim, 'bear_form', 1);
-    expect(bear.p.resourceType).toBe('rage');
-    bear.p.resource = 0;
-    dealDamage(bear.sim, bear.p, Math.ceil(bear.p.maxHp * 0.25));
-    expect(bear.p.resource).toBe(20);
-    expect(bear.p.auras.some((a) => a.id === 'dru_survival_of_the_fittest')).toBe(true);
-    // Balance pass round two: the capstone is Nature's Fury (a passive
-    // moonwing party-crit radiator, covered in tests/natures_fury.test.ts);
-    // Galeheart casts no longer refund or arm anything.
-    bear.p.cooldowns.set('hurricane', 10);
-    completeCast(bear.sim, 'hurricane');
-    expect(bear.p.cooldowns.get('hurricane')).toBe(10);
-    expect(bear.p.auras.some((a) => a.id === 'dru_improved_hurricane')).toBe(false);
+  it('Ironhide Reflex absorbs a large hit and respects its internal cooldown', () => {
+    const { sim, p } = rig('druid', 20, { 8: 'dru_r8_improved_roots' });
+    dealDamage(sim, p, Math.ceil(p.maxHp * 0.25));
+    const shield = p.auras.find((a) => a.id === 'dru_ironhide_reflex');
+    expect(shield?.kind).toBe('absorb');
+    expect(shield?.value).toBe(Math.round(p.maxHp * 0.15));
+    p.auras = p.auras.filter((a) => a.id !== 'dru_ironhide_reflex');
+    dealDamage(sim, p, Math.ceil(p.maxHp * 0.25));
+    expect(p.auras.some((a) => a.id === 'dru_ironhide_reflex')).toBe(false);
   });
 });
 
 describe('warlock wave 2 choice rows', () => {
-  it('only Hexstorm still empowers Gloom Bolt, behind its internal cooldown', () => {
-    // Balance pass: Pact Deepened and Ashen Focus are flat ability talents
-    // (the instant-relay soup is gone); Hexstorm survives with an icd.
-    const { sim, p } = rig('warlock', 20, {
-      5: 'wlk_r5_improved_immolate',
-      14: 'wlk_r14_ruin',
-      20: 'wlk_r20_curse_mastery',
-    });
-    for (let i = 0; i < 3; i++) completeCast(sim, 'immolate');
-    expect(p.auras.some((a) => a.id === 'wlk_improved_immolate')).toBe(false);
-    const immolate = sim.resolvedAbility('immolate');
-    expect(immolate?.effects[0]).toMatchObject({ type: 'directDamage' });
-    for (let i = 0; i < 3; i++) completeCast(sim, 'curse_of_agony');
-    expect(p.auras.some((a) => a.id === 'wlk_curse_mastery')).toBe(true);
-    // Inside the 10 sec icd three more curses do NOT re-arm it.
-    p.auras.length = 0;
-    for (let i = 0; i < 3; i++) completeCast(sim, 'curse_of_agony');
-    expect(p.auras.some((a) => a.id === 'wlk_curse_mastery')).toBe(false);
-  });
-
-  it('Hellglass Ward shields the warlock on the 3rd damaging cast, never the mob', () => {
-    const { sim, p } = rig('warlock', 20, { 20: 'wlk_r20_grimoire_of_haste' });
-    const mob = addTargetMob(sim);
-    // Hold the mob still so nothing consumes the ward while the casts settle.
-    mob.auras.push({
-      id: 'test_hold',
-      name: 'Test Hold',
-      kind: 'stun',
-      remaining: 600,
-      duration: 600,
-      value: 0,
-      sourceId: p.id,
-      school: 'shadow',
-    });
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'shadow_bolt');
-    expect(mob.dead).toBe(false);
-    expect(p.auras.some((a) => a.id === 'wlk_grimoire_of_carnage' && a.kind === 'absorb')).toBe(
-      true,
+  it('names Grand Malediction targets and describes class talents without internal shared jargon', () => {
+    const dreadChorus = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 8)
+      ?.options.find((option) => option.id === 'wlk_r8_howl_of_terror');
+    expect(dreadChorus?.description).toBe(
+      'Grants Dread Chorus: frighten enemies within 8 yards for up to 3 sec. Damage may break the effect. 40 sec cooldown.',
     );
-    expect(mob.auras.some((a) => a.id === 'wlk_grimoire_of_carnage')).toBe(false);
+    const shadowCredit = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 14)
+      ?.options.find((option) => option.id === 'wlk_r14_shadow_mastery');
+    expect(shadowCredit?.description).toBe(
+      'Each time you spend at least 40% of your specialization resource, you gain 1 free generator. Spending at least 80% at once grants 2. Separate triggers can accumulate up to 2 charges.',
+    );
+
+    const grandMalediction = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 17)
+      ?.options.find((option) => option.id === 'wlk_r17_death_coil');
+    expect(grandMalediction?.description).toBe(
+      "Reduces your specialization's setup cooldown by 25%: Hex of Violence (Affliction; punishes the enemy's damaging actions), Unholy Command (Necromancy; briefly empowers all your undead), or Ruinous Brand (Destruction; echoes your direct spells).",
+    );
+
+    const capstones = WARLOCK_CHOICE_ROWS.rows.find((row) => row.level === 20)?.options ?? [];
+    const unbrokenRitual = capstones.find((option) => option.id === 'wlk_r20_chaos_bolt');
+    const forbiddenReflection = capstones.find(
+      (option) => option.id === 'wlk_r20_grimoire_of_haste',
+    );
+    expect(unbrokenRitual?.description).toBe(
+      'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class and specialization abilities by 0.5 sec. Does not affect capstone talents.',
+    );
+    expect(forbiddenReflection?.description).toBe(
+      'The first Warlock class or specialization ability with a cooldown that you use, except Soulwell and Army of the Dead, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec.',
+    );
+    expect(`${unbrokenRitual?.description} ${forbiddenReflection?.description}`).not.toMatch(
+      /\bshared\b/i,
+    );
   });
 
-  it('Deepened Hex and defensive pact hooks change live combat outcomes', () => {
-    const hit = (withDot: boolean) => {
-      // Seed hunted (post-merge camp order) so the level-20 bolt LANDS in both
-      // arms (a resist zeroes the delta and voids the ratio). Spares: 3, 4.
-      const { sim } = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' }, null, 2);
-      const mob = addTargetMob(sim);
-      if (withDot) {
-        mob.auras.push({
-          id: 'corruption',
-          name: 'Corruption',
-          kind: 'dot',
-          remaining: 10,
-          duration: 10,
-          value: 1,
-          tickInterval: 99,
-          tickTimer: 99,
-          sourceId: sim.player.id,
-          school: 'shadow',
-        });
-      }
-      const before = mob.hp;
-      sim.player.resource = sim.player.maxResource;
-      sim.castAbility('shadow_bolt');
-      for (let i = 0; i < 20 * 4; i++) sim.tick();
-      expect(mob.dead).toBe(false);
-      return before - mob.hp;
-    };
-    expect(hit(true)).toBeGreaterThan(hit(false) * 1.15);
+  it('Grand Malediction reduces an already-known setup cooldown for every specialization', () => {
+    for (const [spec, ability, cooldown] of [
+      ['affliction', 'hex_of_violence', 11.25],
+      ['demonology', 'unholy_command', 33.75],
+      ['destruction', 'ruinous_brand', 15],
+    ] as const) {
+      const { sim } = rig('warlock', 20, { 17: 'wlk_r17_death_coil' }, spec);
+      expect(sim.resolvedAbility(ability)?.cooldown, spec).toBe(cooldown);
+    }
+  });
 
-    // Phase-2 defensive pass: Fiendward is a demonic safety net now: the big
-    // hit arms a 10 sec echo that pays 15% max health only if the wearer then
-    // falls below 35%.
-    const guarded = rig('warlock', 20, {
-      11: 'wlk_r11_demon_armor',
-      17: 'wlk_r17_demonic_resilience',
+  it('Ashen Focus keeps generators stationary and the final active is Abyssal Rift', () => {
+    for (const [spec, generator] of [
+      ['affliction', 'needle_of_fate'],
+      ['demonology', 'soul_harvest'],
+      ['destruction', 'shadow_bolt'],
+    ] as const) {
+      const { sim } = rig('warlock', 20, { 17: 'wlk_r17_improved_fear' }, spec);
+      expect(sim.resolvedAbility(generator)?.castWhileMoving, spec).not.toBe(true);
+    }
+
+    const { sim } = rig('warlock', 20, { 20: 'wlk_r20_curse_mastery' });
+    expect(sim.resolvedAbility('abyssal_rift')).toMatchObject({
+      cooldown: 90,
+      effects: [
+        expect.objectContaining({
+          type: 'aoeDamage',
+          radius: 8,
+          pullToCenter: true,
+          stunSec: 2,
+        }),
+      ],
     });
-    guarded.p.hp = Math.round(guarded.p.maxHp * 0.8);
-    dealDamage(guarded.sim, guarded.p, Math.ceil(guarded.p.maxHp * 0.2)); // arms at ~60%
-    const echo = guarded.p.auras.find((a) => a.id === 'wlk_demon_armor');
-    expect(echo?.kind).toBe('heal_echo');
-    expect(echo?.value).toBe(Math.round(guarded.p.maxHp * 0.15));
-    const beforeDrop = guarded.p.hp;
-    dealDamage(guarded.sim, guarded.p, Math.ceil(guarded.p.maxHp * 0.3)); // below 35%
-    expect(guarded.p.hp).toBeGreaterThan(beforeDrop - Math.ceil(guarded.p.maxHp * 0.3));
-    expect(guarded.p.auras.some((a) => a.id === 'wlk_demon_armor')).toBe(false);
+  });
+
+  it('Hexstorm empowers each primary generator behind its internal cooldown', () => {
+    for (const [spec, generator] of [
+      ['affliction', 'needle_of_fate'],
+      ['demonology', 'soul_harvest'],
+      ['destruction', 'shadow_bolt'],
+    ] as const) {
+      const { sim, p } = rig(
+        'warlock',
+        20,
+        {
+          17: 'wlk_r17_demonic_resilience',
+        },
+        spec,
+      );
+      for (let i = 0; i < 3; i++) completeCast(sim, generator);
+      expect(
+        p.auras.some((a) => a.id === 'wlk_curse_mastery'),
+        spec,
+      ).toBe(true);
+      // Inside the 10 sec icd three more generators do not re-arm it.
+      p.auras.length = 0;
+      for (let i = 0; i < 3; i++) completeCast(sim, generator);
+      expect(
+        p.auras.some((a) => a.id === 'wlk_curse_mastery'),
+        spec,
+      ).toBe(false);
+    }
+  });
+
+  it('Forbidden Reflection arms after a shared cooldown instead of creating a ward', () => {
+    const { sim, p } = rig('warlock', 20, {
+      11: 'wlk_r11_fel_concentration',
+      20: 'wlk_r20_grimoire_of_haste',
+    });
+    castAndSettle(sim, 'dark_pact', 1);
+    expect(p.auras.some((a) => a.id === 'wlk_forbidden_reflection')).toBe(true);
+    expect(p.auras.some((a) => a.id === 'wlk_grimoire_of_carnage')).toBe(false);
+  });
+
+  it('generator economy, Blood Credit, and Sanguine Covenant change live outcomes', () => {
+    const economical = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' }, 'destruction');
+    expect(economical.sim.resolvedAbility('shadow_bolt')?.cost).toBe(42);
+
+    const credited = rig('warlock', 20, { 14: 'wlk_r14_ruin' });
+    credited.p.resource = 0;
+    const hpBeforeTap = credited.p.hp;
+    credited.sim.castAbility('life_tap');
+    expect(credited.p.resource).toBe(128);
+    expect(credited.p.hp).toBe(hpBeforeTap - 85);
+
+    const afflictionCredit = rig('warlock', 20, { 14: 'wlk_r14_ruin' }, 'affliction');
+    afflictionCredit.p.resource = 0;
+    const hpBeforeCruelPact = afflictionCredit.p.hp;
+    afflictionCredit.sim.castAbility('cruel_pact');
+    expect(afflictionCredit.p.resource).toBe(
+      Math.round(afflictionCredit.p.maxResource * 0.015 * 1.5),
+    );
+    expect(afflictionCredit.p.hp).toBe(
+      hpBeforeCruelPact - Math.round(afflictionCredit.p.maxHp * 0.12),
+    );
+
+    const guarded = rig('warlock', 20, { 11: 'wlk_r11_fel_concentration' });
+    const beforePact = guarded.p.hp;
+    guarded.sim.castAbility('dark_pact');
+    expect(guarded.p.hp).toBe(beforePact - Math.round(beforePact * 0.1));
+    expect(guarded.p.auras.find((a) => a.id === 'dark_pact')).toMatchObject({
+      kind: 'absorb',
+      value: Math.round(guarded.p.maxHp * 0.3),
+    });
   });
 });

@@ -65,6 +65,29 @@ describe('partyFrameAuras', () => {
     expect(rows).toEqual([{ id: 'wither', kind: 'buff_ap', neg: 1, remaining: 12 }]);
   });
 
+  it('projects Mending Current as a percentage of the ally health pool', () => {
+    const rows = partyFrameAuras(
+      [
+        aura({
+          id: 'shaman_mending_current',
+          kind: 'hot',
+          value: 300,
+          sourceId: 77,
+        }),
+      ],
+      PARTY_MEMBER_AURA_CAP,
+      1_000,
+    );
+    expect(rows).toEqual([
+      {
+        id: 'shaman_mending_current',
+        kind: 'hot',
+        remaining: 10,
+        poolPct: 30,
+      },
+    ]);
+  });
+
   it('does not mutate the input array', () => {
     const input = [
       aura({ id: 'renew', kind: 'hot', value: 20 }),

@@ -7,8 +7,8 @@ official Discord server and the game two ways:
   instructions); status-tier roles + a level-on-name nickname synced from in-game
   data (the `/flex` command was removed; `FlexData` survives because the role-sync
   poll reads it); in-game "!" community posts relayed as embeds with a respond
-  deep-link button; a significant-activity feed (max level, rare drops, duels,
-  arena, Vale Cup wins, masterwork crafts, title deeds + the first koi);
+  deep-link button; a significant-activity feed (the kind set is pinned by
+  `SERVER_KINDS`; see Activity-kind parity below);
   daily-rewards top-10 winner posts; a member reward on guild join
   (server-deduped; no welcome message is posted, intentionally quiet).
 - **Into the game:** presence (online count + the featured voice room) and member
@@ -49,7 +49,10 @@ includes `DOM` for the game client. Nothing in `bot/` may depend on a browser gl
   counters. A 400 enters that cache but deliberately does NOT spend breaker budget:
   the breaker counts against Discord's own invalid-request ban threshold, which counts
   401, 403 and 429 and never 400. Only the rate state is remapped; the queues are
-  never re-keyed, which is what makes the remap safe mid-flight. Time is injected; it reads no clock.
+  never re-keyed, which is what makes the remap safe mid-flight. Time is injected; it reads
+  no clock. Pinned across the
+  `tests/discord_bot_governor_{breaker,counters,determinism,forbidden,pacing,scopes}.test.ts`
+  family.
 - `discord_api.ts`: thin Discord REST client (bot-token authed), an IO shell over the
   governor. Also owns the governor's production IO (`systemGovernorClock`,
   `consoleGovernorLog`) and `governorFromConfig`, the ONE construction site for a
@@ -57,11 +60,8 @@ includes `DOM` for the game client. Nothing in `bot/` may depend on a browser gl
   it. Every dispatched call carries an abort deadline (`DISCORD_CALL_TIMEOUT_MS`), armed
   INSIDE the send callback so it times Discord's answer and never the governor's queue
   wait. Tested in `tests/discord_bot_discord_api.test.ts`.
-- `server_client.ts`: client for the game server's secret-gated `/internal/discord/*`
-  endpoints (`x-woc-discord-secret`); grep `/internal/discord/` there for the live set.
-  Tested in `tests/discord_bot_server_client.test.ts`.
-- `config.ts`: env to `BotConfig` (throws on missing required). Tested in
-  `tests/discord_bot_config.test.ts`.
+- `server_client.ts`: tested in `tests/discord_bot_server_client.test.ts`.
+- `config.ts`: tested in `tests/discord_bot_config.test.ts`.
 - `cadence.ts`: the poll-loop interval DEFAULTS, importable without booting `main.ts`.
   `config.ts` layers the D13 env overrides over them; `main.ts` reads the resolved
   `BotConfig` fields, never these constants.
@@ -109,11 +109,10 @@ includes `DOM` for the game client. Nothing in `bot/` may depend on a browser gl
 ## New bot feature recipe (module-first)
 1. Pure message-builder/diff/shaping logic in `logic.ts`, with a test in the suite that
    owns that family: message builders and protocol shaping in `tests/discord_bot.test.ts`,
-   diff-before-write predicates in `tests/discord_bot_diffs.test.ts`. Bug fixes are
-   test-first: a failing test that reproduces the bug, then the smallest change that turns
-   it green.
+   diff-before-write predicates in `tests/discord_bot_diffs.test.ts`.
 2. If it talks to the game: a method in `server_client.ts` plus the matching
-   secret-gated `RouteDef` in `server/internal.ts` (registered via `server/http/registry.ts`).
+   secret-gated (`x-woc-discord-secret`) `RouteDef` in `server/internal.ts` (registered
+   via `server/http/registry.ts`).
 3. Only the wiring (a dispatch case or a poll loop) lands in `main.ts`.
 
 ### Activity-kind parity (server to bot)
@@ -172,10 +171,18 @@ of `src/ui/` imports.
   (`subjectKey` for a member write so the 401/403 cache can see it, `essential: true`
   only for traffic that must survive an open breaker, such as a slash-command reply and
   its 3 second deadline), never a bare call to the injected sender.
+- **Every interaction-handler failure path must best-effort reply.**
+  `interactionFailureFallback` (`logic.ts`, wired in `main.ts`) decides the shape: once the
+  interaction's ONE allowed initial response has actually landed (a successful respond or
+  defer, tracked as `acknowledged`), the only remaining way to reach the player is EDITING
+  that response; otherwise the fallback itself becomes the initial response. Skipping the
+  fallback leaves Discord's "Bot is thinking..." placeholder up until the ~15 minute
+  webhook-token expiry. A failure inside the fallback is only logged; there is no further
+  fallback.
 - **No credential ever reaches a bucket key, a log line, or a thrown message.** Three
   interaction routes carry a live ~15 minute bearer token in the PATH. `routeTemplate`
   emits `:token` and `redactPath` redacts the throw; ids are deliberately kept.
-- **Secrets are env only**; never commit them. `DISCORD_BOT_SECRET` must match the server's.
+- `DISCORD_BOT_SECRET` must match the server's copy.
 - **Privileged intents:** `GUILD_MEMBERS` + `GUILD_PRESENCES` must be enabled for the
   application in the Discord developer portal, or IDENTIFY is rejected (close 4014). That
   close is FATAL, so the bot exits 1 rather than retrying a handshake that cannot succeed.
@@ -192,12 +199,10 @@ survived restarts. Every loop is a `scheduler.add({...})` task instead: the next
 armed only after the previous run SETTLES, delays are jittered so loops armed in one boot do
 not stay phase-locked, and repeated event kicks coalesce into exactly one follow-up run.
 - Role sync (`role-sync`): one paced SLICE of the linked-member set per run, every
-  `cfg.sweepSliceMs` (3 s) while a pass has ids left, decaying to `cfg.roleSyncIntervalMs`
-  (5 min) between passes, which is the pass interval itself. The window is a FLOOR, not a
-  deadline: a pass opens at the first wake at or after it. The idle intervals double
-  3, 6, 12, 24, 48, 96, 192 s (the 300 s ceiling is never reached before a pass opens),
-  putting the cumulative wakes at 3, 9, 21, 45, 93, 189, then 381 s, so the default
-  effective gap between passes is about 6.4 minutes (an event kick bypasses it).
+  `cfg.sweepSliceMs` while a pass has ids left, with the idle backoff doubling toward
+  `cfg.roleSyncIntervalMs` between passes, which is the pass interval itself. The window
+  is a FLOOR, not a deadline: a pass opens at the first wake at or after it (an event
+  kick bypasses the wait).
   `linked_sweep.ts` decides WHICH members, the scheduler decides WHEN. Feed-dirtied members
   are served ahead of the pass, BOUNDED: dirty and pass-shaped work (an in-flight cursor,
   an armed discovery walk, or a requested or due pass) alternate slices, so a busy feed
@@ -206,22 +211,22 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   pass window still open), by a COMPLETE roster seed, and by the outbox link-change feed
   when it moved something.
 - Special-roles refresh + members-meta push (`special-roles-and-meta`): every
-  `cfg.roleSyncIntervalMs` (5 min), plus a coalescing `kick()` on `GUILD_CREATE` and when
+  `cfg.roleSyncIntervalMs`, plus a coalescing `kick()` on `GUILD_CREATE` and when
   the op 8 member backfill finishes. The refresh and the push are ONE task because the push
   reads the index the refresh rebuilds, so their ordering is load bearing. Tier-role refresh
-  (`tier-roles`) runs once at startup (before the gateway connects) and on the same 5 min
+  (`tier-roles`) runs once at startup (before the gateway connects) and on the same
   cadence.
   The role sync also sets the level-on-name nickname (`buildLevelNick`; the base name
   fallback can be the member's own already-suffixed live nick, so `buildLevelNick` strips any
   existing suffix first to stay idempotent across re-syncs; `DISCORD_SYNC_NICKNAMES=0`
   disables).
 - Presence push (`presence-push`): a `debounce` task, so voice/presence events open one
-  `cfg.presenceDebounceMs` (4 s) window and every event inside it folds into one push.
-- Outbox (`outbox`): the ONE pickup loop, every `cfg.outboxPollMs` (3 s) while it keeps
-  finding work, decaying to `cfg.outboxIdleMs` (15 s) once the drains come back empty.
+  `cfg.presenceDebounceMs` window and every event inside it folds into one push.
+- Outbox (`outbox`): the ONE pickup loop, every `cfg.outboxPollMs` while it keeps
+  finding work, decaying to `cfg.outboxIdleMs` once the drains come back empty.
   `GET /internal/discord/outbox` answers four streams at once (relay posts, the activity
   feed, the reward-winner days, and the link-change feed), replacing the three separate
-  3 s pollers and the sweep's full flex re-read. `outbox_consumer.ts` owns what it does with
+  pollers and the sweep's full flex re-read. `outbox_consumer.ts` owns what it does with
   them: it will NOT drain while the rate governor's breaker is open or half-open (those
   posts are non-essential, so the governor would refuse them, and a 200 is the outbox's only
   acknowledgement, so draining into refusals loses the items); each post is caught per item;
@@ -234,7 +239,7 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   (`OutboxPollState`) keeps a day whose MARK keeps failing from being re-announced every
   poll (the re-serve skips straight to the mark retry; a restart costs the one documented
   duplicate); and the poll runs on its own much longer
-  deadline (`cfg.outboxTimeoutMs`, 70 s), which must stay ABOVE the server's read deadline.
+  deadline (`cfg.outboxTimeoutMs`), which must stay ABOVE the server's read deadline.
   didWork is split by stream class: the three DRAINED streams count by carriage, the
   re-served winners read counts by successful MARK (the event that stops the re-serve), so
   a winners day that cannot finish (unset channel, durable 403, a failing mark endpoint)
@@ -247,7 +252,7 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   breaker closes or, if the Phase 5 ladder evicted the items, until the hourly full-resync
   reconciliation heals it (about one hour worst case).
 - Liveness stamp (`heartbeat-file`): re-writes `cfg.heartbeatFile` every
-  `cfg.heartbeatIntervalMs` (`DISCORD_HEARTBEAT_INTERVAL_MS`, 30 s), and the compose
+  `cfg.heartbeatIntervalMs` (`DISCORD_HEARTBEAT_INTERVAL_MS`), and the compose
   healthcheck compares that file's mtime against now. It is on the scheduler rather than
   on a timer of its own so that it PROVES something, and exactly this much: the mtime
   advances only while the process, its event loop, and the scheduler machinery are alive
@@ -259,8 +264,8 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   bot.
 - Daily engagement grant: first message or voice-join per member per day, deduped
   bot-side AND server-side (grant dedupe key), so it is exactly-once.
-- The adaptive active-to-idle backoff has two consumers: the outbox poll (D1: 3 s active
-  decaying to 15 s idle) and the role sweep (slice interval decaying to the pass interval).
+- The adaptive active-to-idle backoff has two consumers: the outbox poll (D1: active
+  decaying to idle) and the role sweep (slice interval decaying to the pass interval).
   Every other task sets `activeMs` only, so its cadence is constant. Backoff is only safe
   because recovery is instant: a run that finds work snaps straight back to `activeMs`.
 - **Every `run` handed to `scheduler.add` must always settle** (ledger L10). The next delay
@@ -331,31 +336,34 @@ Required: `DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`,
 (one-time startup announcement), `DISCORD_RELAY_CHANNEL_ID` (falls back to test),
 `DISCORD_ACTIVITY_CHANNEL_ID` (falls back to relay, then test),
 `DISCORD_DAILY_REWARDS_CHANNEL_ID`, `DISCORD_SYNC_NICKNAMES` (`0` disables, default
-on). Governor knobs (all optional, safe defaults): `DISCORD_MAX_RPS` (8),
-`DISCORD_BAN_PAUSE_MS` (600000), `DISCORD_BREAKER_LIMIT` (300),
-`DISCORD_FORBIDDEN_TTL_MS` (86400000). Loop cadences (D13, all optional):
-`DISCORD_ROLE_SYNC_INTERVAL_MS` (300000), `DISCORD_PRESENCE_DEBOUNCE_MS` (4000),
-`DISCORD_OUTBOX_POLL_MS` (3000), `DISCORD_OUTBOX_IDLE_MS` (15000),
-`DISCORD_SWEEP_SLICE_MS` (3000), `DISCORD_HEARTBEAT_INTERVAL_MS` (30000); the defaults are
-`bot/cadence.ts`, so the value the suite
-pins and the value the bot falls back to cannot drift apart. The three knobs that are NOT
-cadences take their defaults from the module that spends them, for the same reason:
-`DISCORD_SWEEP_SLICE_SIZE` (100, `DEFAULT_SWEEP_SLICE_SIZE` in `linked_sweep.ts`, how many
-members one slice may write to), `DISCORD_OUTBOX_TIMEOUT_MS` (70000,
-`DEFAULT_OUTBOX_TIMEOUT_MS` in `server_client.ts`, one poll's abort deadline; the
-default is also an enforced FLOOR, since a deadline under the server's own 65 s
-drain deadline silently loses outbox items, so the knob can only raise it), and
-`DISCORD_HEARTBEAT_FILE` (`/tmp/discord-bot-heartbeat`, `DEFAULT_HEARTBEAT_FILE` in
-`liveness.ts`, the path the compose healthcheck stats; empty or whitespace falls back, and
-the value is trimmed). Each of these
-knobs falls back to its default for an empty or non-numeric value, never to 0. `DISCORD_WELCOME_CHANNEL_ID` is read but currently
-unwired (no welcome message is posted). Boot loads `.env`/`.env.local` when present but
-runs fine from ambient env alone (`process.loadEnvFile`).
+on). Governor knobs (all optional, safe defaults): `DISCORD_MAX_RPS`,
+`DISCORD_BAN_PAUSE_MS`, `DISCORD_BREAKER_LIMIT`, `DISCORD_FORBIDDEN_TTL_MS`. Loop
+cadences (D13, all optional): `DISCORD_ROLE_SYNC_INTERVAL_MS`,
+`DISCORD_PRESENCE_DEBOUNCE_MS`, `DISCORD_OUTBOX_POLL_MS`, `DISCORD_OUTBOX_IDLE_MS`,
+`DISCORD_SWEEP_SLICE_MS`, `DISCORD_HEARTBEAT_INTERVAL_MS`; the defaults live in
+`bot/cadence.ts`, so the value the suite pins and the value the bot falls back to cannot
+drift apart. The three knobs that are NOT cadences take their defaults from the module
+that spends them, for the same reason: `DISCORD_SWEEP_SLICE_SIZE`
+(`DEFAULT_SWEEP_SLICE_SIZE` in `linked_sweep.ts`, how many members one slice may write
+to), `DISCORD_OUTBOX_TIMEOUT_MS` (`DEFAULT_OUTBOX_TIMEOUT_MS` in `server_client.ts`, one
+poll's abort deadline; the default is also an enforced FLOOR, since a deadline under the
+server's own drain deadline silently loses outbox items, so the knob can only raise it,
+and `config.ts` logs once and clamps a value below the floor), and
+`DISCORD_HEARTBEAT_FILE` (`DEFAULT_HEARTBEAT_FILE` in `liveness.ts`, the path the compose
+healthcheck stats; empty or whitespace falls back, and the value is trimmed). Each of
+these knobs falls back to its default for an empty or non-numeric value, never to 0.
+`DISCORD_WELCOME_CHANNEL_ID` is read but currently unwired (no welcome message is
+posted). Boot loads `.env`/`.env.local` when present but runs fine from ambient env alone
+(`process.loadEnvFile`).
 
-Adding an env key means adding it to `BOT_ENV_KEYS` in
-`tests/discord_bot_config.test.ts` too: that suite pins the complete key set and asserts
-exactly one dynamic `process.env[...]` lookup, so read a new key as a direct
-`process.env.NAME` and pass the VALUE to a parser.
+Adding an env key carries SAME-change obligations, each pinned by name:
+- `BOT_ENV_KEYS` in `tests/discord_bot_config.test.ts`: that suite pins the complete key
+  set and asserts exactly one dynamic `process.env[...]` lookup, so read a new key as a
+  direct `process.env.NAME` and pass the VALUE to a parser.
+- The container contract in `tests/deploy_discord_bot.test.ts`: `docker-compose.yml` must
+  forward every bot tunable into the container (an unforwarded knob is inert on the real
+  host), and `DEPLOY.md` must document every key the bot reads as a table row. Passing the
+  config suite alone is NOT done; the deploy suite fails separately, by key name.
 
 ## Limits / notes
 - Guild state is seeded from `GUILD_CREATE` and then kept live: `GUILD_MEMBER_ADD`

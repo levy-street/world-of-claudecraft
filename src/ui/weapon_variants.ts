@@ -67,6 +67,13 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   mistcallers_fang: 'adv_dagger', // EPIC: Heroic Vael dagger
   wildheart_fangknife: 'adv_dagger',
   voidsong_dirk: 'adv_dagger', // LEGENDARY: the S-rift caster dirk
+  // New rogue epics/rare, each a distinct unused dagger model (not adv_dagger)
+  rimefang: 'ice_fang', // EPIC: Rift frost dagger
+  marrowpoint: 'redskull_dagger', // EPIC: Cindraleth (Drakelands) bone dagger
+  duskwhisper: 'purple_dagger', // EPIC: Wildheart Beastmaster shadow dagger
+  // heroic_duskwhisper inherits the base variant via heroicOf (auto-generated);
+  // it must NOT have its own entry here (held_weapon_models pins that).
+  boneglass_shiv: 'whittler_s_knife', // RARE: Basin Lv17-19 filler
 
   // ---- staves (staff_a..d + adv_staff + adv_druid_staff) ----------------------
   gnarled_staff: 'staff_a',

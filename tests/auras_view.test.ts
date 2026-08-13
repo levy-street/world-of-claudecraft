@@ -76,6 +76,10 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
   it('matches the exact shared set of harmful kinds', () => {
     expect([...DEBUFF_AURA_KINDS].sort()).toEqual(
       [
+        'affliction_eye',
+        'affliction_eye_secondary',
+        'affliction_fate_threads',
+        'affliction_violence',
         'attackspeed',
         'blind',
         'bleed_vuln',
@@ -85,21 +89,26 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'critvuln',
         'debuff_ap',
         'disarm',
+        'duskfire_claim',
         'dot',
         'expose',
         'faerie_fire',
+        'forced_move',
         'heal_absorb',
         'hex',
         'incapacitate',
         'lockout',
         'mortal_wound',
+        'necromancy_harvest_mark',
         'polymorph',
         'root',
+        'ruinous_brand',
         'sated',
         'silence',
         'slow',
         'spellvuln',
         'stun',
+        'sun_verdict',
         'sunder',
         'tongues',
         'vulnerability',
@@ -214,6 +223,28 @@ describe('createAurasView: derivation per mode', () => {
     const debuffs = createAurasView('debuffs', deps()).tick(entity(auras));
     expect(debuffs.count).toBe(2);
     expect(debuffs.slots.slice(0, 2).map((s) => s.key)).toEqual(['deep_wounds', 'sunder']);
+  });
+
+  it('surfaces Divine Ascension as a charged buff', () => {
+    const state = createAurasView('buffs', deps()).tick(
+      entity([
+        aura({
+          id: 'divine_ascension',
+          name: 'Divine Ascension',
+          kind: 'internal_cd',
+          remaining: 45,
+          charges: 5,
+          value: 0,
+        }),
+      ]),
+    );
+
+    expect(state.count).toBe(1);
+    expect(state.slots[0]).toMatchObject({
+      key: 'divine_ascension',
+      isDebuff: false,
+      stacksText: '5',
+    });
   });
 
   it('renders bleed vulnerability as a non-cancelable debuff, never a helpful buff', () => {
@@ -417,6 +448,27 @@ describe('createAurasView: derivation per mode', () => {
     ).toBe('20s');
   });
 
+  it('hides fake one-day timers for persistent class engine states', () => {
+    const v = createAurasView('all', deps());
+    for (const id of [
+      'hunter_overdraw_counter',
+      'shaman_flow_state_progress',
+      'shaman_flow_state_ready',
+      'shaman_thunder_charges',
+      'shaman_warspirit_cadence',
+      'moontide',
+      'sunwake',
+      'old_blood',
+      'verdance',
+    ]) {
+      expect(
+        v.tick(entity([aura({ id, kind: 'internal_cd', remaining: 86_400 })])).slots[0]
+          .durationText,
+        id,
+      ).toBe('');
+    }
+  });
+
   it('compactAuraDuration boundaries: seconds round UP, larger units to nearest', () => {
     const U = { s: 's', m: 'm', h: 'h', d: 'd' };
     expect(compactAuraDuration(59.9, U)).toBe('60s');
@@ -433,6 +485,12 @@ describe('createAurasView: derivation per mode', () => {
     expect(v.tick(entity([aura({ id: 'a', stacks: undefined })])).slots[0].stacksText).toBe('');
     expect(v.tick(entity([aura({ id: 'a', stacks: 1 })])).slots[0].stacksText).toBe('');
     expect(v.tick(entity([aura({ id: 'a', stacks: 4 })])).slots[0].stacksText).toBe('4');
+  });
+
+  it('always badges Druid engine stages, including zero and one', () => {
+    const v = createAurasView('all', deps());
+    expect(v.tick(entity([aura({ id: 'moontide', stacks: 0 })])).slots[0].stacksText).toBe('0');
+    expect(v.tick(entity([aura({ id: 'old_blood', stacks: 1 })])).slots[0].stacksText).toBe('1');
   });
 
   it('badges remaining charges (shown even at 1) and prefers charges over stacks', () => {

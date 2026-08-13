@@ -9,7 +9,9 @@ The Thornhollow Fields 5v5 capture-the-flag HUD surface behind the `index.ts` ba
   the strip), and the all-time board is fetched best-effort from
   `GET /api/battleground/leaderboard`. There is no separate battleground
   window, launcher, or keybind anymore; `hud.toggleBattleground()` deep-opens
-  the merged window on the Thornhollow Fields tab.
+  the merged window on the Thornhollow Fields tab. The standing and board show
+  a W-L-D record including DRAWS (#3099); every wire row folds `draws ?? 0`, so
+  a record stored before the field existed cannot render NaN.
 - `bg_end_banner_view.ts`: the copy model for the two across-screen CALLS that
   are not flag plays: the match-end verdict (one big word reusing the
   scoreboard's own `resultVictory`/`resultDefeat`/`resultDraw` keys, over
@@ -19,7 +21,9 @@ The Thornhollow Fields 5v5 capture-the-flag HUD surface behind the `index.ts` ba
   unit-testable without a DOM.
 - `battleground_scoreboard_view.ts` + `battleground_scoreboard_painter.ts`: the
   in-match strip (#bg-scoreboard, self-mounted) plus the wave-respawn overlay
-  (#bg-respawn) and spawn-protection line (#bg-protected). The `ValeCupHud`
+  (#bg-respawn), which owns the personal respawn/protection readout. No module
+  mints a #bg-protected element anymore (a leftover rule in
+  `src/styles/components.css` still names that id; do not build on it). The `ValeCupHud`
   shape: structural sig gates the skeleton; every per-second value rides the
   PainterHost elided writers. The painter is also the SINGLE source of truth for
   whether the expanded board is open: it holds the player's pin, the
@@ -30,6 +34,25 @@ The Thornhollow Fields 5v5 capture-the-flag HUD surface behind the `index.ts` ba
   reveal the board on `.ended`: a second, invisible reveal there left the aria
   state lying and made the outside-click dismissal inert.
 
+- `battleground_kill_feed_view.ts` + `battleground_kill_feed_painter.ts`: the
+  top-right kill feed. The pure core owns the cap/expiry list rules and returns
+  the SAME array when nothing expired, so the per-frame caller elides its
+  repaint on reference equality (the frame budget only pays on a death or an
+  expiry); the painter owns the DOM and the LOCALIZED line text. A kill call is
+  actionable information and is never tier-gated.
+- `battleground_proposal_view.ts` + `battleground_proposal_popup.ts`: the
+  queue-pop Accept/Decline prompt, deliberately the same component shape as
+  `src/ui/dungeon_finder_proposal_popup.ts` (same question asked the same way;
+  two queues that prompt differently would read as a bug). It never steals
+  keyboard focus (the player may be mid-fight): role=alert, tab-reachable
+  buttons. The view is COUNTS ONLY, never names (a decline must not leak who
+  was on the other side; the sim promises anonymity and the core has no field
+  to break it with). A backfill is a materially different offer (a live match,
+  a scoreline the joiner had no part in, no rating either way), so the prompt
+  body says so itself rather than relying on the chat line that scrolls away.
+  Perf contract: closed it does zero work (it only OPENS from the bgProposed
+  SimEvent); open, it rebuilds DOM only when the structural sig changes and
+  refreshes the countdown text slot in place.
 - `battleground_map_view.ts` + `battleground_map_painter.ts`: the M-key world
   map's Thornhollow surface. The view is the HONEST marker model (self plus
   same-team mates and the static flag stands; never enemies, never live flag

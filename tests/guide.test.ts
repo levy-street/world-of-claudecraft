@@ -2,8 +2,12 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
+// The English the /c/ public sheet resolves a mark id to. Imported here so the
+// generator's own hand table cannot drift away from what the sheet says.
+import { RELIQUARY_MARK_ENGLISH } from '../server/character_sheet';
 import { BIND_ACTIONS } from '../src/game/keybinds';
 import {
   GUIDE_CLASSES,
@@ -23,6 +27,7 @@ import {
   GUIDE_PROF_PAGES,
   GUIDE_PROF_RING,
   GUIDE_PROF_STATIONS,
+  GUIDE_RELIQUARY,
   GUIDE_WARLOCK_PETS,
   GUIDE_ZONES,
 } from '../src/guide/content.generated';
@@ -32,6 +37,7 @@ import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
 import { professions as professionsPage } from '../src/guide/pages/professions';
 import { gatheringDetailHtml } from '../src/guide/pages/professions_gathering';
+import { reliquaryCatalogSections, reliquary as reliquaryPage } from '../src/guide/pages/reliquary';
 import { world as worldPage } from '../src/guide/pages/world';
 import {
   GUIDE_BASE,
@@ -58,11 +64,12 @@ import {
   STATIONS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
 import {
   TIER2_TOOL_GATE_PROFICIENCY,
   TIER3_TOOL_GATE_PROFICIENCY,
 } from '../src/sim/content/vendor_row_gates';
-import { CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { ABILITIES, CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
   WORK_ORDER_CADENCE_TICKS,
@@ -105,6 +112,7 @@ import {
   TIER5_TOOL_WIELD_PROFICIENCY,
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
+import type { DeedDef } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
@@ -132,6 +140,17 @@ const generatedSource = readFileSync(
   new URL('../src/guide/content.generated.ts', import.meta.url),
   'utf8',
 );
+
+// The player-facing prose that would spoil a hidden deed on any public surface: its name, its
+// criteria, and (when it grants one) the title text the secret rewards. The title text is in
+// scope because it spoils as much as the name and it is what actually leaked: the deeds arm
+// filtered hidden defs, but a Reliquary title relic published the reward text anyway. Callers
+// that also forbid the bare id prepend it; the module scan below deliberately does not.
+const hiddenDeedProse = (d: DeedDef): string[] => [
+  d.name,
+  d.desc,
+  ...(d.reward?.kind === 'title' ? [d.reward.text] : []),
+];
 
 describe('Guide routes', () => {
   it('treats the base and empty sub as the home route', () => {
@@ -276,11 +295,23 @@ describe('Guide generated class content', () => {
     expect(GUIDE_CLASSES).toHaveLength(9);
     for (const c of GUIDE_CLASSES) {
       expect(c.color).toMatch(/^#[0-9a-f]{6}$/);
-      expect(['rage', 'mana', 'energy']).toContain(c.resource);
+      expect(['rage', 'mana', 'energy', 'focus']).toContain(c.resource);
       expect(c.roles.length).toBeGreaterThan(0);
       expect(c.specs.length).toBeGreaterThan(0);
       expect(c.signatureAbilities.length).toBeGreaterThan(0);
       expect(c.abilities.length).toBeGreaterThanOrEqual(c.signatureAbilities.length);
+      for (const ability of c.abilities) {
+        expect(
+          ABILITIES[ability.id]?.hiddenFromPlayer,
+          `${c.id}.${ability.id} is hidden from players`,
+        ).not.toBe(true);
+      }
+      for (const ability of c.signatureAbilities) {
+        expect(
+          ABILITIES[ability.id]?.hiddenFromPlayer,
+          `${c.id}.${ability.id} signature is hidden from players`,
+        ).not.toBe(true);
+      }
       for (const s of c.specs) {
         expect(['tank', 'healer', 'dps']).toContain(s.role);
         expect(s.signature.length).toBeGreaterThan(0);
@@ -583,8 +614,12 @@ describe('Guide deeds spoiler safety', () => {
     // filter were deleted, a hidden deed's id and name would appear here and fail the assert.
     const hidden = Object.values(DEEDS).filter((d) => d.hidden);
     expect(hidden.length).toBeGreaterThan(0); // the catalog has hidden deeds; this guard is meaningful
+    expect(
+      hidden.some((d) => d.reward?.kind === 'title'),
+      'the reward-text arm needs a live hidden title deed',
+    ).toBe(true);
     for (const d of hidden) {
-      for (const needle of [d.id, d.name, d.desc]) {
+      for (const needle of [d.id, ...hiddenDeedProse(d)]) {
         expect(
           generatedSource.includes(needle),
           `hidden deed "${d.id}" leaked "${needle}" into content.generated.ts`,
@@ -780,7 +815,156 @@ describe('Guide deeds spoiler safety', () => {
     // Deeds is endgame content, so it sits with the dungeons, delves and rifts.
     expect(route?.group).toBe('endgame');
   });
+});
 
+// The Reliquary wiki page: spoiler-safe catalog of pages and relic names only.
+// Freshness of GUIDE_RELIQUARY is covered by the shared generator freshness gate;
+// these pins lock field allowlist, catalog parity, and render wiring.
+describe('Guide Reliquary spoiler-safe catalog', () => {
+  it('emits exactly the live RELIQUARY_PAGES ids in catalog order', () => {
+    expect(GUIDE_RELIQUARY.map((p) => p.id)).toEqual(RELIQUARY_PAGES.map((p) => p.id));
+    expect(GUIDE_RELIQUARY.length).toBe(RELIQUARY_PAGES.length);
+    expect(GUIDE_RELIQUARY.length).toBeGreaterThanOrEqual(28);
+  });
+
+  it('bakes only allowlisted fields (no progress, clears, firstFind, or sources)', () => {
+    // excludeFromCompletion joined at Phase 21 QA: catalog data, not player
+    // state, and rule 7 requires the wiki to LABEL an outside-completion page.
+    const pageFields = new Set(['id', 'shelf', 'name', 'relics', 'excludeFromCompletion']);
+    const relicFields = new Set(['kind', 'name']);
+    for (const page of GUIDE_RELIQUARY) {
+      for (const k of Object.keys(page)) {
+        expect(pageFields.has(k), `page "${page.id}" unexpected field "${k}"`).toBe(true);
+      }
+      expect(page.relics.length, `page "${page.id}" empty`).toBeGreaterThan(0);
+      for (const relic of page.relics) {
+        for (const k of Object.keys(relic)) {
+          expect(relicFields.has(k), `page "${page.id}" relic unexpected "${k}"`).toBe(true);
+        }
+        expect(relic.name.length).toBeGreaterThan(0);
+      }
+    }
+    // Stronger: personal / progress tokens never appear as field names in the blob.
+    const blob = JSON.stringify(GUIDE_RELIQUARY);
+    for (const leak of [
+      'firstFind',
+      'clears',
+      'owned',
+      'recent',
+      'clearSource',
+      'itemId',
+      'markId',
+    ]) {
+      expect(blob.includes(`"${leak}"`), `leaked field token ${leak}`).toBe(false);
+    }
+  });
+
+  it('labels exactly the two outside-completion pages, and renders tag plus note for each', () => {
+    // The generated blob carries the flag for exactly the live flagged set
+    // (a third flagged page must surface here the moment it is authored)...
+    expect(
+      GUIDE_RELIQUARY.filter((p) => p.excludeFromCompletion !== undefined).map((p) => [
+        p.id,
+        p.excludeFromCompletion,
+      ]),
+    ).toEqual([
+      ['horizons_vault_of_ages', 'retired'],
+      ['horizons_riftbound', 'personal'],
+    ]);
+    // ...and the rendered catalog SHOWS the label: the tag beside the page
+    // heading and the explanatory note, one pair per flagged page, resolved
+    // through t() (never hardcoded English), with none on ordinary pages.
+    const html = reliquaryCatalogSections(GUIDE_RELIQUARY);
+    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(2);
+    expect(html.match(/guide-reliquary-note/g)?.length).toBe(2);
+    expect(html).toContain(`(${t('guide.reliquaryPage.retiredTag')})`);
+    expect(html).toContain(`(${t('guide.reliquaryPage.personalTag')})`);
+    expect(html).toContain(t('guide.reliquaryPage.retiredNote'));
+    expect(html).toContain(t('guide.reliquaryPage.personalNote'));
+    // The note sits inside the flagged page's own section (reach, not mere
+    // presence): the vault section carries the retired pair.
+    const vault = html.match(
+      /<section[^>]*id="reliquary-horizons_vault_of_ages"[\s\S]*?<\/section>/,
+    )?.[0];
+    expect(vault, 'vault section').toBeTruthy();
+    expect(vault).toContain(t('guide.reliquaryPage.retiredTag'));
+    expect(vault).toContain(t('guide.reliquaryPage.retiredNote'));
+  });
+
+  it('every generated mark name equals the shipped English the sheet resolves', () => {
+    // The generator keeps its OWN hand table of mark names
+    // (RELIQUARY_MARK_GUIDE_NAMES in scripts/wiki/build_content.mjs), so the
+    // wiki could print a name the /c/ sheet never says. Anchor the two
+    // together on RELIQUARY_MARK_ENGLISH, which the character-sheet cross-pin
+    // already binds to the live MOBS display names: through that pin this
+    // reaches MOBS transitively, without re-deriving it here.
+    //
+    // The generated relics carry {kind, name} only (no markId, by the field
+    // allowlist above), so the id comes from the live catalog page at the SAME
+    // index: the emit walks page.relics in order, which the id-order pin above
+    // already holds.
+    let checked = 0;
+    const nonSlain: string[] = [];
+    for (const guidePage of GUIDE_RELIQUARY) {
+      const live = RELIQUARY_PAGES.find((p) => p.id === guidePage.id);
+      expect(live, `live page for ${guidePage.id}`).toBeDefined();
+      if (!live) continue;
+      expect(guidePage.relics.length, `${guidePage.id} relic count`).toBe(live.relics.length);
+      for (let i = 0; i < live.relics.length; i++) {
+        const relic = live.relics[i];
+        if (relic.kind !== 'mark') continue;
+        const expected = RELIQUARY_MARK_ENGLISH.get(relic.markId);
+        expect(expected, `${relic.markId} has shipped English`).toBeDefined();
+        expect(guidePage.relics[i]?.name, `${guidePage.id}:${relic.markId}`).toBe(expected);
+        checked += 1;
+        if (!relic.markId.startsWith('slain:')) nonSlain.push(relic.markId);
+      }
+    }
+    // Floor at today's measured catalog: 19 rare-slain proofs plus the 10
+    // profession marks. A page that stopped emitting marks would otherwise
+    // make every assertion above vacuous.
+    expect(checked).toBeGreaterThanOrEqual(29);
+    // And the sweep really spans the whole table FAMILY, not just the slain
+    // namespace the Rares page contributes: masterwork and gather_event rows
+    // are checked too, so a generator edit scoped to one family cannot hide.
+    expect(nonSlain.some((id) => id.startsWith('masterwork:'))).toBe(true);
+    expect(nonSlain.some((id) => id.startsWith('gather_event:'))).toBe(true);
+  });
+
+  it('pins the reliquary route wiring to literals', () => {
+    const route = GUIDE_ROUTES.find((r) => r.id === 'reliquary');
+    expect(route?.sub).toBe('reliquary');
+    expect(route?.navKey).toBe('guide.nav.reliquary');
+    // 'endgame' since the release's sidebar regroup retired the catch-all
+    // compendium group: the page files beside deeds/dungeons/delves/rifts.
+    expect(route?.group).toBe('endgame');
+    expect(pageFor('reliquary')).toBe(reliquaryPage);
+  });
+
+  it('renders shelves and every page name without inventing player progress chrome', () => {
+    setLanguage('en');
+    const html = reliquaryPage.render({
+      params: [],
+      sub: 'reliquary',
+      titleKey: 'guide.nav.reliquary',
+    });
+    expect(html).toContain(t('guide.nav.reliquary'));
+    expect(html).toContain(t('guide.reliquaryPage.shelf.conquerors' as never));
+    expect(html).toContain(t('guide.reliquaryPage.shelf.professions' as never));
+    expect(html).toContain(t('guide.reliquaryPage.shelf.horizons' as never));
+    for (const page of GUIDE_RELIQUARY) {
+      expect(html).toContain(page.name);
+    }
+    // Pure catalog helper covers the same rows the page composes.
+    const sections = reliquaryCatalogSections(GUIDE_RELIQUARY);
+    // Exact class token (not the h3's guide-reliquary-page-h prefix).
+    expect((sections.match(/class="guide-block guide-reliquary-page"/g) ?? []).length).toBe(
+      GUIDE_RELIQUARY.length,
+    );
+  });
+});
+
+describe('Guide deeds page render (continued)', () => {
   it('renders the whole page: correct per-category counts, no hidden or boss leak', () => {
     setLanguage('en');
     // GuidePage.render requires a PageContext; this page renders the same for any ctx
@@ -816,8 +1000,14 @@ describe('Guide deeds spoiler safety', () => {
     // sanctioned Chronicler flavor
     expect(html).toContain('Saul');
     // no hidden deed and no boss:true name reaches the rendered page
-    for (const d of Object.values(DEEDS).filter((x) => x.hidden)) {
-      for (const needle of [d.id, d.name, d.desc]) {
+    const hidden = Object.values(DEEDS).filter((x) => x.hidden);
+    expect(hidden.length).toBeGreaterThan(0);
+    expect(
+      hidden.some((d) => d.reward?.kind === 'title'),
+      'the reward-text arm needs a live hidden title deed',
+    ).toBe(true);
+    for (const d of hidden) {
+      for (const needle of [d.id, ...hiddenDeedProse(d)]) {
         expect(html.includes(needle), `hidden "${d.id}" leaked "${needle}"`).toBe(false);
       }
     }
@@ -995,15 +1185,19 @@ describe('Guide module-graph spoiler containment', () => {
 
     // And no hidden deed prose rides ANY module the guide graph reaches (a
     // future aggregate or a copied table would re-leak the secret without
-    // touching content/deeds.ts). Bare ids are tolerated by maintainer
-    // judgment: deed_image_ids.ts carries them for the committed crest art,
-    // and an id alone spoils nothing.
+    // touching content/deeds.ts), reward titles included. Bare ids are
+    // tolerated by maintainer judgment: deed_image_ids.ts carries them for the
+    // committed crest art, and an id alone spoils nothing.
     const hidden = Object.values(DEEDS).filter((d) => d.hidden);
     expect(hidden.length).toBeGreaterThan(0);
+    expect(
+      hidden.some((d) => d.reward?.kind === 'title'),
+      'the reward-text arm needs a live hidden title deed',
+    ).toBe(true);
     for (const file of reached) {
       const source = readFileSync(file, 'utf8');
       for (const d of hidden) {
-        for (const needle of [d.name, d.desc]) {
+        for (const needle of hiddenDeedProse(d)) {
           expect(
             source.includes(needle),
             `hidden deed "${d.id}" prose leaked into guide-reachable ${file.slice(repoRoot.length)}`,
@@ -1031,6 +1225,19 @@ describe('Guide deeds cross-page surfaces', () => {
     });
     // the key glyph and the label render inside one table row
     expect(html).toContain('<kbd>Shift+Z</kbd></td><td>Book of Deeds</td>');
+  });
+
+  it('lists The Reliquary bind on the controls page, matching the in-game default', () => {
+    setLanguage('en');
+    const reliquaryBind = BIND_ACTIONS.find((a) => a.id === 'reliquary');
+    expect(reliquaryBind?.defaults).toEqual(['Shift+KeyX']);
+    expect(t('guide.controls.reliquary')).toBe('The Reliquary');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>Shift+X</kbd></td><td>The Reliquary</td>');
   });
 
   it('cross-links the deeds catalog from the dungeons page', () => {
@@ -1061,6 +1268,37 @@ describe('Guide deeds cross-page surfaces', () => {
       expect(html, `dungeon card missing anchor id "dungeon-${d.id}"`).toContain(
         `id="dungeon-${d.id}"`,
       );
+    }
+  });
+
+  it('never leaks a boss personal name into the reliquary page PROSE', () => {
+    // The same withhold-the-name standard, extended to the newest public
+    // guide surface. The catalog sections legitimately carry some boss names
+    // (the raid page IS 'Nythraxis Raid'; relic names like 'Fangknife of
+    // Zulgar' name their boss), so the scan strips the embedded
+    // reliquaryCatalogSections output verbatim and holds the REMAINDER (the
+    // guide-authored prose, headings, and any future intro copy) to the
+    // withhold-the-name rule for EVERY boss, no carve-out: a per-name
+    // allowlist here would excuse exactly the prose the dungeons-page pin
+    // below exists to protect.
+    setLanguage('en');
+    const html = reliquaryPage.render({
+      params: [],
+      sub: 'reliquary',
+      titleKey: 'guide.nav.reliquary',
+    });
+    const catalogHtml = reliquaryCatalogSections(GUIDE_RELIQUARY);
+    // Premise: the strip really removed the catalog block, so the prose
+    // remainder is what is scanned (an embedding change would make the scan
+    // silently re-cover catalog names and fail on the raid pages).
+    expect(html.includes(catalogHtml)).toBe(true);
+    const prose = html.replace(catalogHtml, '');
+    for (const boss of Object.values(MOBS).filter((m) => m.boss)) {
+      const personalName = boss.name.split(',')[0];
+      expect(
+        prose.includes(personalName),
+        `boss personal name "${personalName}" leaked into the reliquary page prose`,
+      ).toBe(false);
     }
   });
 
@@ -1138,6 +1376,20 @@ describe('Guide deeds cross-page surfaces', () => {
         html.includes(forbidden),
         `boss personal name "${forbidden}" leaked into the ${locale} dungeons page`,
       ).toBe(false);
+      // The reliquary page holds the same standard per locale (its English-only
+      // sibling above records why prose-only): the catalog strip is recomputed
+      // HERE because section headings localize, so the block differs per locale.
+      const reliquaryHtml = reliquaryPage.render({
+        params: [],
+        sub: 'reliquary',
+        titleKey: 'guide.nav.reliquary',
+      });
+      const localeCatalogHtml = reliquaryCatalogSections(GUIDE_RELIQUARY);
+      expect(reliquaryHtml.includes(localeCatalogHtml), locale).toBe(true);
+      expect(
+        reliquaryHtml.replace(localeCatalogHtml, '').includes(forbidden),
+        `boss personal name "${forbidden}" leaked into the ${locale} reliquary page prose`,
+      ).toBe(false);
     }
     setLanguage('en');
   });
@@ -1203,6 +1455,7 @@ describe('Guide controls reference completeness', () => {
     expect(html).toContain('<kbd>Shift+F</kbd></td><td>Take the enemy flag in Thornhollow Fields');
     expect(html).toContain('<kbd>Shift+H</kbd></td><td>Damage meters');
     expect(html).toContain('<kbd>Ctrl+6</kbd></td><td>Pet: Mark');
+    expect(html).toContain('<kbd>Shift+Tab</kbd></td><td>Cycle target backward');
   });
 
   it('keeps the second-wave binds in step with the game defaults', () => {
@@ -1211,6 +1464,7 @@ describe('Guide controls reference completeness', () => {
     expect(defaults.get('bgFlag')).toEqual(['Shift+KeyF']);
     expect(defaults.get('meters')).toEqual(['Shift+KeyH']);
     expect(defaults.get('targetPet')).toEqual(['Ctrl+Digit6']);
+    expect(defaults.get('targetPrev')).toEqual(['Shift+Tab']);
     // The arrow keys are the SECOND default of the four movement actions, which is the
     // whole claim the Arrow Keys row makes.
     expect(defaults.get('forward')).toEqual(['KeyW', 'ArrowUp']);
@@ -1259,6 +1513,23 @@ describe('Guide model stills', () => {
         `missing still on disk: "${url}" (run \`npm run wiki:stills\`)`,
       ).toBe(true);
     }
+  });
+
+  it('ships a visible 320px WebP for the dedicated Gloomshade still', async () => {
+    const gloomshade = GUIDE_WARLOCK_PETS.find((pet) => pet.id === 'gloomshade');
+    expect(gloomshade?.model).toBe('mob_gloomshade');
+    expect(gloomshade?.still).toBe('/guide-stills/mob_gloomshade.webp');
+    const bytes = readFileSync(publicPath(gloomshade?.still ?? ''));
+    expect(bytes.byteLength).toBeGreaterThan(2048);
+    expect(bytes.toString('ascii', 0, 4)).toBe('RIFF');
+    expect(bytes.toString('ascii', 8, 12)).toBe('WEBP');
+    const decoded = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    expect(decoded.info).toMatchObject({ width: 320, height: 320, channels: 4 });
+    let visiblePixels = 0;
+    for (let offset = 3; offset < decoded.data.length; offset += 4) {
+      if (decoded.data[offset] > 0) visiblePixels++;
+    }
+    expect(visiblePixels).toBeGreaterThan(1000);
   });
 
   it('has no orphan WebP (every committed still is referenced by a figure)', () => {

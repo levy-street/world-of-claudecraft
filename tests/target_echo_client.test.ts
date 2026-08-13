@@ -15,7 +15,7 @@
 // wireEntity (which emits `tgt` only when the target is non-null) plus the precise
 // `target` self field (always present, null when untargeted).
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 
 // --- harness: a real ClientWorld, DOM/network-free (mirrors account_flair_client.test.ts) ---
@@ -198,7 +198,12 @@ describe('ClientWorld pending-target echo protection', () => {
     expect(selfTarget(world)).toBeNull();
   });
 
-  for (const retarget of ['tabTarget', 'targetNearestFriendly', 'friendlyTabTarget'] as const) {
+  for (const retarget of [
+    'tabTarget',
+    'tabTargetPrev',
+    'targetNearestFriendly',
+    'friendlyTabTarget',
+  ] as const) {
     it(`server-resolved retarget (${retarget}) clears the hold: its result applies from the next snapshot`, () => {
       const { world, wire } = seededWorld();
       world.targetEntity(77);
@@ -210,6 +215,21 @@ describe('ClientWorld pending-target echo protection', () => {
       expect(selfTarget(world)).toBe(88);
     });
   }
+
+  // The count pins in command_schema re-derive the send set from source, which
+  // cannot say WHICH method emits a token. Pin the backward cycle's own send so
+  // a swapped or copy-pasted token on this method reds here.
+  it('tabTargetPrev sends the tabPrev token, distinct from tabTarget', () => {
+    const { world } = seededWorld();
+    const cmd = vi.spyOn(world as unknown as { cmd: (m: unknown) => void }, 'cmd');
+
+    world.tabTargetPrev();
+    expect(cmd).toHaveBeenCalledWith({ cmd: 'tabPrev' });
+
+    cmd.mockClear();
+    world.tabTarget();
+    expect(cmd).toHaveBeenCalledWith({ cmd: 'tab' });
+  });
 
   it('a refused local pre-check (unknown entity) arms no hold: the next snapshot applies as before', () => {
     const { world, wire } = seededWorld();

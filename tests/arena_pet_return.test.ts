@@ -58,11 +58,15 @@ function givePet(sim: AnySim, pid: number, dead = false): Entity {
     templateId: PET_TEMPLATE,
     name: 'Rip',
     level: owner.level,
-    hp: dead ? 0 : 40,
+    // Full current maxHp: a partial seed-pinned HP leaves room for out-of-bout
+    // regen and desyncs the formation snapshot from the live pet under test.
+    hp: dead ? 0 : 1,
     dead,
     mode: 'defensive',
   });
-  return sim.petOf(pid, true)!;
+  const pet = sim.petOf(pid, true)!;
+  if (!dead) pet.hp = pet.maxHp;
+  return pet;
 }
 
 // Give a warlock a live demon through the ordinary summon path.

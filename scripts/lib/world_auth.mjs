@@ -1,7 +1,7 @@
 // Node-side WebSocket clients cannot import the TypeScript world API directly.
 // Keep this discriminator in lockstep with src/world_api.ts; the paired Vitest
 // freshness contract fails whenever the authoritative layout epoch changes.
-export const ONLINE_WORLD_AUTH_TYPE = 'auth-world-5';
+export const ONLINE_WORLD_AUTH_TYPE = 'auth-world-6';
 
 // The rejection the server sends when the discriminator above is NOT the epoch
 // it speaks. Mirrors ONLINE_WORLD_INCOMPATIBLE_MESSAGE in src/world_api.ts and

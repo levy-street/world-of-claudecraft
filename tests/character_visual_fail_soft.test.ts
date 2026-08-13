@@ -132,8 +132,6 @@ describe('CharacterVisual dispose() clears every cosmetic-overlay material cache
     visual.setShadowform(false);
     visual.setMoonkin(true);
     visual.setMoonkin(false);
-    visual.setMetamorph(true);
-    visual.setMetamorph(false);
     visual.setAuraGlow(0xffffff, 0.5);
     visual.setAuraGlow(0xffffff, 0);
 
@@ -142,7 +140,6 @@ describe('CharacterVisual dispose() clears every cosmetic-overlay material cache
       'soulRendMaterials',
       'shadowformMaterials',
       'moonkinMaterials',
-      'metamorphMaterials',
       'auraGlowMaterials',
     ] as const;
     const caches = visual as unknown as Record<string, Map<unknown, unknown>>;

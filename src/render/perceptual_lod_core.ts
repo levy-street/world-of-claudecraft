@@ -2,6 +2,8 @@
 // size. Painters provide the live camera projection and keep all gameplay
 // visibility decisions outside this module.
 
+import { clamp01 } from './num_clamp';
+
 const GRASS_PROTECTED_RADIUS_FRACTION = 0.85;
 const GRASS_MIN_PROJECTED_PIXELS = 6;
 const GRASS_FULL_PROJECTED_PIXELS = 10;
@@ -24,10 +26,6 @@ export interface FarFieldDensityInput {
   projectedPixels: number;
   /** Preset floor for a still-partly-visible far chunk. */
   minKeepFraction: number;
-}
-
-function clamp01(value: number): number {
-  return Math.min(1, Math.max(0, value));
 }
 
 function smoothstep(edge0: number, edge1: number, value: number): number {

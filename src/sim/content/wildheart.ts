@@ -5,6 +5,33 @@
 import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
 
 export const WILDHEART_ITEMS: Record<string, ItemDef> = {
+  // Rogue dagger (drops from the Fanglord Beastmaster, the Wildheart Basin
+  // mid-boss). Shadow-bolt on-hit; the heroic twin lives in HEROIC_ITEMS.
+  duskwhisper: {
+    id: 'duskwhisper',
+    name: 'Duskwhisper',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    weapon: { min: 20, max: 31, speed: 1.7, dagger: true },
+    // ilvl-26 mainhand budget (18): the stamina point over budget came off the
+    // DPS-neutral stat, keeping the agility identity.
+    stats: { agi: 12, sta: 6 },
+    sellValue: 9000,
+    requiredClass: ['rogue', 'hunter'],
+    requiredLevel: 20,
+    weaponProcs: [
+      {
+        id: 'duskwhisper_bolt',
+        name: 'Duskbolt',
+        trigger: 'weaponHit',
+        chance: 0.08,
+        effects: [
+          { kind: 'chainArc', school: 'shadow', damage: 20, jumps: 0, falloff: 0.6, radius: 8 },
+        ],
+      },
+    ],
+  },
   wildheart_tuskblade: {
     id: 'wildheart_tuskblade',
     name: 'Wildheart Tuskblade',
@@ -264,6 +291,7 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       // Guaranteed troll trophy junk: the Grubjaw rare convention (zone2.ts).
       { itemId: 'chipped_tusk', chance: 1 },
       { itemId: 'fanglords_beastspear', chance: 0.12 },
+      { itemId: 'duskwhisper', chance: 0.12 },
     ],
     scale: 2.35,
     color: 0x485b3d,

@@ -55,14 +55,18 @@ export const FINDER_BOARD_LISTING_CAP = 50;
 // ---------------------------------------------------------------------------
 
 // Roles a character may select: below the first talent level a fixed class
-// capability table applies; from there on, exactly the active spec's role
-// (no active spec = cannot use the finder).
+// capability table applies; from there on, the active spec's role. Wildfang
+// is deliberately dual-role: the player chooses tank for Bruin or damage for
+// Wolf rather than the finder hardcoding the whole spec to one form.
 export function compatibleFinderRoles(
   cls: PlayerClass,
   level: number,
   specRole: Role | null,
 ): Role[] {
-  if (level >= FIRST_TALENT_LEVEL) return specRole ? [specRole] : [];
+  if (level >= FIRST_TALENT_LEVEL) {
+    if (cls === 'druid' && specRole === 'tank') return ['tank', 'dps'];
+    return specRole ? [specRole] : [];
+  }
   return FINDER_ROLE_ORDER.filter((role) => FINDER_PRE_SPEC_ROLES[role].includes(cls));
 }
 

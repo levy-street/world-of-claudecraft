@@ -4,10 +4,13 @@
 
 # src/world_api/ : the `IWorld` facet files
 
-`IWorld` is one interface per domain facet (`combat.ts`, `inventory.ts`, `quests.ts`,
-`bank.ts`, ...; the FACET MAP comment at the top of `src/world_api.ts` names them
-all). The aggregate `src/world_api.ts` re-aggregates every facet via `extends` and
-re-exports the aux types, so downstream `from '../world_api'` imports never change.
+`IWorld` is one interface per domain facet, from the core surfaces (`combat.ts`,
+`inventory.ts`, `quests.ts`) through the endgame/social ones (`battleground.ts`,
+`pet.ts`, `bank.ts`, `guild_bank.ts`, `deeds.ts`, `reliquary.ts`, ...). The list keeps
+growing: enumerate with `ls src/world_api`, and the FACET MAP comment at the top of
+`src/world_api.ts` names them all with a one-line scope each. The aggregate
+`src/world_api.ts` re-aggregates every facet via `extends` and re-exports the aux
+types, so downstream `from '../world_api'` imports never change.
 
 ## The contract
 - **Every `IWorld` member belongs to exactly ONE facet**; aux types travel with

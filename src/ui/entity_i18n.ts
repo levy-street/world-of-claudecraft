@@ -82,11 +82,28 @@ export type EntityTranslationField =
   | ItemSetBonusField
   | 'sender'
   | 'subject'
-  | 'body';
+  | 'body'
+  | AbilitySpecNoteField;
+
+/** Per-spec tooltip note fields (spec-aware ability tooltips): rendered only
+ *  for the player's current specialization. One literal per spec that carries
+ *  notes today, so a typo'd spec id fails the type check. */
+export type AbilitySpecNoteField =
+  | 'specNote_assassination'
+  | 'specNote_combat'
+  | 'specNote_subtlety'
+  | 'specNote_balance'
+  | 'specNote_feral'
+  | 'specNote_restoration';
 
 export type EntityTranslationRequest =
   | { kind: 'class'; id: PlayerClass; field: 'name' | 'description'; values?: InterpolationValues }
-  | { kind: 'ability'; id: string; field: 'name' | 'description'; values?: InterpolationValues }
+  | {
+      kind: 'ability';
+      id: string;
+      field: 'name' | 'description' | AbilitySpecNoteField;
+      values?: InterpolationValues;
+    }
   | { kind: 'item'; id: string; field: 'name'; values?: InterpolationValues }
   | {
       kind: 'itemSet';
@@ -531,6 +548,21 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
         entityTranslationKey({ kind: 'ability', id: ability.id, field: 'description' }),
       ),
     );
+    for (const [spec, note] of Object.entries(ability.specNotes ?? {}).sort(([a], [b]) =>
+      a.localeCompare(b),
+    )) {
+      const field = `specNote_${spec}` as AbilitySpecNoteField;
+      entries.push(
+        entry(
+          'ability',
+          ability.id,
+          field,
+          note,
+          'classAbility',
+          entityTranslationKey({ kind: 'ability', id: ability.id, field }),
+        ),
+      );
+    }
   }
   for (const item of Object.values(ITEMS).sort(compareById)) {
     // Heroic upgraded variants carry no name key: they share the base item's name

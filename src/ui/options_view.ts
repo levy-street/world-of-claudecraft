@@ -267,9 +267,14 @@ const qualityLadderOptions: ChoiceOption[] = [
   { value: 1, labelKey: 'hud.options.graphicsPresetHigh' },
   { value: 2, labelKey: 'hud.options.graphicsPresetInsane' },
 ];
-// Effects & Lighting stops at High (the full high-tier post stack); the
-// ultra/insane tiers' full-res AO rides the preset, not this dial.
-const effectsLadderOptions: ChoiceOption[] = [
+// The High-capped three-step ladder, shared by the dials that stop at High.
+// Effects & Lighting: High is already the full high-tier post stack (the
+// ultra/insane tiers' full-res AO rides the preset, not this dial). Shadow
+// Quality: High is the 4096 map, and the retired Insane rung's single
+// 8192x8192 shadow target was a ~256 MB-class GPU allocation redrawn every
+// frame for marginal visible gain. Particle Effects: a three-step band clamp
+// by design (see its gfx.ts mapping).
+const highCapLadderOptions: ChoiceOption[] = [
   { value: 0, labelKey: 'hud.options.graphicsPresetLow' },
   { value: 0.5, labelKey: 'hud.options.graphicsPresetMedium' },
   { value: 1, labelKey: 'hud.options.graphicsPresetHigh' },
@@ -420,8 +425,8 @@ export function buildGraphicsSections(
     choice(s, 'characterDetail', 'hudChrome.options.gfxCharacterDetail', lowHighOptions, true),
   ];
   const lighting: OptionsControl[] = [
-    choice(s, 'effectsQuality', 'hud.options.effectsQuality', effectsLadderOptions, true),
-    choice(s, 'shadowQuality', 'hud.options.shadowQuality', qualityLadderOptions, true),
+    choice(s, 'effectsQuality', 'hud.options.effectsQuality', highCapLadderOptions, true),
+    choice(s, 'shadowQuality', 'hud.options.shadowQuality', highCapLadderOptions, true),
     choice(
       s,
       'ambientOcclusion',
@@ -436,7 +441,7 @@ export function buildGraphicsSections(
       s,
       'particleEffects',
       'hudChrome.options.gfxParticleEffects',
-      effectsLadderOptions,
+      highCapLadderOptions,
       true,
     ),
     // The per-effect switches ride the post chain: Effects & Lighting on Low

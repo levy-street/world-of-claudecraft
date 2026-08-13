@@ -71,6 +71,10 @@ export const shellStrings = {
         loadouts:
           'Tip: save more than one talent loadout to swap between builds without spending points twice.',
         pvp: 'Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build.',
+        // The tips rotation renders through a bare t(key) with no values, so no
+        // tip can name a live keybind without going stale when a player rebinds
+        // it. This one used to spell out Shift+X; it now stays chord-free.
+        reliquary: 'Tip: the Reliquary tracks the unique spoils you collect, shelf by shelf.',
       },
     },
     errors: {
@@ -229,6 +233,12 @@ export const shellStrings = {
       sortName: 'Name',
       sortRecent: 'Recently Played',
       sortPlaytime: 'Playtime',
+      redesign: 'Redesign',
+      redesignHint:
+        'This character predates the new character creator. You get one free redesign; it is used when you save.',
+      redesignTitle: 'Redesign {name}',
+      redesignSave: 'Save New Look',
+      redesignCancel: 'Keep Current Look',
     },
     deleteCharacter: {
       title: 'Delete Character',
@@ -257,6 +267,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energy',
         rage: 'Rage',
+        focus: 'Focus',
       },
       roles: {
         warrior: 'Tank / Melee DPS',
@@ -457,6 +468,7 @@ export const shellStrings = {
         mana: 'Maná',
         energy: 'Energía',
         rage: 'Ira',
+        focus: 'Concentración',
       },
       roles: {
         warrior: 'Tanque / DPS cuerpo a cuerpo',
@@ -660,6 +672,7 @@ export const shellStrings = {
         mana: 'Maná',
         energy: 'Energía',
         rage: 'Ira',
+        focus: 'Concentración',
       },
       roles: {
         warrior: 'Tanque / DPS cuerpo a cuerpo',
@@ -864,6 +877,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Énergie',
         rage: 'Rage',
+        focus: 'Concentration',
       },
       roles: {
         warrior: 'Tank / DPS mêlée',
@@ -1068,6 +1082,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Énergie',
         rage: 'Rage',
+        focus: 'Concentration',
       },
       roles: {
         warrior: 'Tank / DPS mêlée',
@@ -1284,6 +1299,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energy',
         rage: 'Rage',
+        focus: 'Focus',
       },
       roles: {
         warrior: 'Tank / Melee DPS',
@@ -1486,6 +1502,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energia',
         rage: 'Rabbia',
+        focus: 'Concentrazione',
       },
       roles: {
         warrior: 'Tank / DPS da mischia',
@@ -1690,6 +1707,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energie',
         rage: 'Wut',
+        focus: 'Fokus',
       },
       roles: {
         warrior: 'Tank / Nahkampf-DPS',
@@ -1891,6 +1909,7 @@ export const shellStrings = {
         mana: '法力',
         energy: '能量',
         rage: '怒气',
+        focus: '集中值',
       },
       roles: {
         warrior: '坦克 / 近战 DPS',
@@ -2079,6 +2098,7 @@ export const shellStrings = {
         mana: '法力',
         energy: '能量',
         rage: '怒氣',
+        focus: '集中值',
       },
       roles: {
         warrior: '坦克 / 近戰 DPS',
@@ -2268,6 +2288,7 @@ export const shellStrings = {
         mana: '마나',
         energy: '기력',
         rage: '분노',
+        focus: '집중',
       },
       roles: {
         warrior: '탱커 / 근접 DPS',
@@ -2468,6 +2489,7 @@ export const shellStrings = {
         mana: 'マナ',
         energy: 'エネルギー',
         rage: '怒り',
+        focus: '集中値',
       },
       roles: {
         warrior: 'タンク / 近接DPS',
@@ -2666,6 +2688,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energia',
         rage: 'Raiva',
+        focus: 'Foco',
       },
       roles: {
         warrior: 'Tanque / DPS corpo a corpo',
@@ -2869,6 +2892,7 @@ export const shellStrings = {
         mana: 'Мана',
         energy: 'Энергия',
         rage: 'Ярость',
+        focus: 'Концентрация',
       },
       roles: {
         warrior: 'Танк / ближний DPS',

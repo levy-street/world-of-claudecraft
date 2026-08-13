@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { lineOfSightClear, resolveMovement } from '../src/sim/colliders';
+import { AFFLICTION_EYE_DEATH_GAIN, doomValue } from '../src/sim/combat/affliction';
 import {
   ARENA_SLOT_COUNT,
   ARENA_X_MIN,
@@ -474,6 +475,44 @@ describe('arena: a full bout', () => {
     expect(eb.dead).toBe(false);
   });
 
+  it('pays an Affliction Eye death through ranked-arena elimination', () => {
+    const { sim, a, b } = queueDuo('warlock', 'warrior', (world, warlockId) => {
+      world.setPlayerLevel(20, warlockId);
+      expect(world.setSpec('affliction', warlockId)).toBe(true);
+    });
+    startBout(sim);
+    const warlock = sim.entities.get(a)!;
+    const target = sim.entities.get(b)!;
+    target.auras.push({
+      id: 'evil_eye',
+      name: 'Evil Eye',
+      kind: 'affliction_eye',
+      remaining: 3600,
+      duration: 3600,
+      value: 1,
+      sourceId: a,
+      school: 'shadow',
+    });
+    sim.drainEvents();
+
+    (sim as any).dealDamage(warlock, target, 99999, false, 'shadow', 'Test', 'hit');
+    const events = sim.drainEvents();
+
+    expect(target.dead).toBe(true);
+    // objectContaining: the aura gain event also carries the parse-fidelity
+    // attribution fields (sourceId/abilityId/stacks) since v0.35.0.
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'aura',
+        targetId: a,
+        name: 'Condemnation',
+        gained: true,
+      }),
+    );
+    expect(AFFLICTION_EYE_DEATH_GAIN).toBe(10);
+    expect(doomValue(warlock)).toBe(0);
+  });
+
   it('a slot frees up after the bout so the arena can host again', () => {
     const { sim, a, b } = queueDuo();
     startBout(sim);
@@ -888,7 +927,15 @@ describe('arena: class ability target filters', () => {
         expect(sim.setSpec('arcane', pid)).toBe(true);
       },
     },
-    { cls: 'paladin', ability: 'consecration', level: 20 },
+    {
+      cls: 'paladin',
+      ability: 'consecration',
+      level: 20,
+      beforeQueue: (sim, pid) => {
+        sim.setPlayerLevel(20, pid);
+        expect(sim.setSpec('protection', pid)).toBe(true);
+      },
+    },
     {
       cls: 'druid',
       ability: 'swipe',

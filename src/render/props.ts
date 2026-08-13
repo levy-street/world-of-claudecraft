@@ -48,6 +48,7 @@ import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
+import type { RevealGateCore } from './reveal_gate_core';
 import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
@@ -88,6 +89,16 @@ export interface PropsResult {
     dt: number,
     reducedMotion?: boolean,
   ): void;
+  /**
+   * First-reveal compile gating for the far-cell bakes (hitch-hunt P3a): a
+   * cell's first drawn far swap is held in the pixel-identical near
+   * representation until the gate warms its key. No gate keeps the immediate
+   * flip (tests, renderers without async compile; the editor viewport
+   * composes the real Renderer and is therefore gated too).
+   */
+  setFarCellRevealGate(gate: RevealGateCore | null): void;
+  /** The compile roots behind a far-cell gate key (that cell's bake meshes). */
+  farCellRevealRoots(key: string): readonly THREE.Object3D[];
 }
 
 const mergeBandDepth = (): number => (GFX.standardMaterials ? 180 : 90);
@@ -2283,12 +2294,20 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // spike the v0.27.2 memory hotfix class guards against, and the draw-call
   // win matters most on the desktop tiers.
   const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
+  const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
+  let farCellRevealGate: RevealGateCore | null = null;
 
   return {
     group,
     flames,
     windmillFans,
     fireLights,
+    setFarCellRevealGate(gate: RevealGateCore | null): void {
+      farCellRevealGate = gate;
+    },
+    farCellRevealRoots(key: string): readonly THREE.Object3D[] {
+      return farCellsByKey.get(key)?.meshes ?? [];
+    },
     update(
       camX: number,
       camY: number,
@@ -2310,7 +2329,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       // (where the ghost fade can fire) draw the individuals while the bake
       // stays as the shadow-only caster. Pixel-identical both ways.
       for (const cell of farCells) {
-        updatePropCell(cell, camX, camZ, fogFar);
+        updatePropCell(cell, camX, camZ, fogFar, undefined, farCellRevealGate);
       }
       for (let i = 0; i < hideables.length; i++) {
         const h = hideables[i];
@@ -2388,11 +2407,13 @@ interface Hideable {
 // and their union IS the bake, so the shadows are pixel-identical while the
 // per-structure shadow submissions collapse to one per (material, cell).
 interface FarPropCell {
+  key: string;
   bounds: PropCellBounds;
   meshes: THREE.InstancedMesh[];
   hideables: Hideable[];
   farMode: boolean;
   visible: boolean;
+  farReady: boolean;
 }
 
 type Footprint = Omit<
@@ -2657,14 +2678,16 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
     }
   }
   const out: FarPropCell[] = [];
-  for (const cellBuild of cells.values()) {
+  for (const [cellKey, cellBuild] of cells) {
     const meshes: THREE.InstancedMesh[] = [];
     const cell: FarPropCell = {
+      key: cellKey,
       bounds: cellBuild.bounds,
       meshes,
       hideables: cellBuild.hideables,
       farMode: false,
       visible: true,
+      farReady: false,
     };
     for (const bucket of cellBuild.buckets.values()) {
       const geo = mergeGeometries(bucket.geoms, false);
@@ -2675,6 +2698,7 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
       // per frame without touching visibility (three's instanced draw path
       // is a free no-op at count 0).
       const mesh = new THREE.InstancedMesh(geo, bucket.material, 1);
+      mesh.name = `far-bake:${cellKey}`;
       mesh.setMatrixAt(0, new THREE.Matrix4());
       mesh.instanceMatrix.needsUpdate = true;
       // Pin the object bounds to the world-baked geometry bounds NOW: the

@@ -6,18 +6,18 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "25da305f8bbcc0d7fa146370599010ec25ede09c107e6c7f309081af9b680081",
+  "rendererFingerprint": "62d76e8f4d8dc86db375a70dbfa72ac6c29f31e7969cd46a6306f91f651d5fe1",
   "renderer": {
     "trackedFiles": [
       {
         "path": "scripts/render_finder_portraits.mjs",
-        "bytes": 10612,
-        "sha256": "880ce694cf37f72ef39c4d1932b812e09f2d43fd70eedcae850d40a2544e5709"
+        "bytes": 10988,
+        "sha256": "5f9b0357f3062fee9cc2021a0bfbd43691b2a30b09e90c96d989171c0f89cec7"
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
-        "bytes": 7528,
-        "sha256": "9c0e229d5ddf62b480df001d0c8a0bc045ffdfb15f772f955bb5cb521a2d2377"
+        "bytes": 8547,
+        "sha256": "8811b612d40a20c55800e2f15ab58ee1580a905fa3a8cf81574cfc6e3853077b"
       },
       {
         "path": "scripts/lib/mob_portrait_background.mjs",
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 3735232,
-      "sha256": "6768fdd6cc60780fd33245481d9565b69bb4a6a340ed09a307a20f9409ccf31a",
+      "bytes": 3851000,
+      "sha256": "059301c203a2a56a68b655da18bd443f3d8f0c8073d2ee944b33129bb92093d2",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1705,40 +1705,6 @@
       }
     },
     {
-      "id": "duskborn",
-      "family": "demon",
-      "finderEncounter": false,
-      "visualKey": "mob_demon",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/demonalt.glb",
-          "path": "public/models/creatures/demonalt.glb",
-          "bytes": 160088,
-          "sha256": "2ade9fc07ae9d1af93747b736669d377264fdb9e695ffa0f6fe17c93aebc6db3"
-        },
-        "idle": "Idle",
-        "height": 1.8,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.5
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#c6469b",
-        "strength": 0.5
-      },
-      "sourceFingerprint": "ffcafdf116e44bc62048944865bf155937e8a12bede4633c2922674b77201a76",
-      "output": {
-        "path": "public/ui/mobs/duskborn.webp",
-        "bytes": 1864,
-        "sha256": "5ea810b75c3e09f7820db5b379117200026af45e90cb71592406614187f4859c"
-      }
-    },
-    {
       "id": "duskwisp",
       "family": "elemental",
       "finderEncounter": false,
@@ -1823,34 +1789,34 @@
       "id": "emberkin",
       "family": "demon",
       "finderEncounter": false,
-      "visualKey": "mob_demon",
+      "visualKey": "mob_emberkin",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/demonalt.glb",
-          "path": "public/models/creatures/demonalt.glb",
-          "bytes": 160088,
-          "sha256": "2ade9fc07ae9d1af93747b736669d377264fdb9e695ffa0f6fe17c93aebc6db3"
+          "url": "models/creatures/emberkin.glb",
+          "path": "public/models/creatures/emberkin.glb",
+          "bytes": 1415428,
+          "sha256": "845af8ccbc2eee155ec3149f95a8309b8f4a61d43bd1ebb9ab822d258e912993"
         },
         "idle": "Idle",
-        "height": 1.8,
-        "yaw": null,
+        "height": 2.1,
+        "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.5
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#ff7a2a",
-        "strength": 0.5
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "63a2e981cde00160399f48f8b6926f952ba3a89cc6f039ecbb812abe1444e84a",
+      "sourceFingerprint": "37514330c6a7f8f1ae956851b4050e050b1ee8b3f827b6cd7ae1e10e955ea1de",
       "output": {
         "path": "public/ui/mobs/emberkin.webp",
-        "bytes": 2152,
-        "sha256": "dbd8acd90f46451a5e58340a5a4a1e4259f628b988cdaa753638853ff6d9dc42"
+        "bytes": 1872,
+        "sha256": "a6befa336638b4ba43de0933241434f795be9bdc711be2d9fa46a40a9ff69bc9"
       }
     },
     {
@@ -2367,34 +2333,34 @@
       "id": "gloomshade",
       "family": "demon",
       "finderEncounter": false,
-      "visualKey": "mob_demon",
+      "visualKey": "mob_gloomshade",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/demonalt.glb",
-          "path": "public/models/creatures/demonalt.glb",
-          "bytes": 160088,
-          "sha256": "2ade9fc07ae9d1af93747b736669d377264fdb9e695ffa0f6fe17c93aebc6db3"
+          "url": "models/creatures/gloomshade_abyssal_guardian.glb",
+          "path": "public/models/creatures/gloomshade_abyssal_guardian.glb",
+          "bytes": 1435296,
+          "sha256": "819810fe4cb785ac1ddf449ae5388eb873dd13345ebe1b0f1e32cd77c7ad1283"
         },
         "idle": "Idle",
-        "height": 1.8,
-        "yaw": null,
+        "height": 2.6,
+        "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.5
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#3a3a6e",
-        "strength": 0.5
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "87e53e7a23329d51f64e01fe50d58abc6dd0ead7c2087af6b7cee6b84b8340e6",
+      "sourceFingerprint": "ca7dd27429b29be37459c4ea0b92ee4f2adfc4a8dbad1d3edab94506d69f2fc2",
       "output": {
         "path": "public/ui/mobs/gloomshade.webp",
-        "bytes": 1692,
-        "sha256": "c790d49b025be324aef681a27fe2bf9b034f021042d1cf57966d00810f3d3dc4"
+        "bytes": 2570,
+        "sha256": "07443108e6ccf3f05e0f97c4f0cf49f6eb3de6f1298ddc6ad24ca8167307fd93"
       }
     },
     {
@@ -2721,6 +2687,40 @@
       }
     },
     {
+      "id": "graveguard",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_warrior",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_warrior.glb",
+          "path": "public/models/chars/enemies/skeleton_warrior.glb",
+          "bytes": 523236,
+          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8aa89a",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "76dc2103e032148d6aebcee7ef2af92aa70940ff6eacb5c70d4cb0e9405c9c3d",
+      "output": {
+        "path": "public/ui/mobs/graveguard.webp",
+        "bytes": 2272,
+        "sha256": "3a0ccdcd9fa58d34ce646b4095999569539c9326f13afb2a54943bf0fcab3d9e"
+      }
+    },
+    {
       "id": "gravenbark_shambler",
       "family": "ogre",
       "finderEncounter": false,
@@ -2758,13 +2758,13 @@
       "id": "grix_the_tunnelking",
       "family": "burrower",
       "finderEncounter": false,
-      "visualKey": "mob_kobold",
+      "visualKey": "mob_grix",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/goblin.glb",
-          "path": "public/models/creatures/goblin.glb",
-          "bytes": 48360,
-          "sha256": "a128051c0b5078e0f76f09ed0e15eafe102ae11ae62e984155ccfefa3b08fb92"
+          "url": "models/creatures/grix.glb",
+          "path": "public/models/creatures/grix.glb",
+          "bytes": 485196,
+          "sha256": "224bc3592577b76dbcaca3e3138acea017919cfabf61bbc012828e0994510bd8"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -2773,19 +2773,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#b9770e",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "d5a21a997a39de0cc5a807cbf6b106dd8a8922cacbee1692a2176cd00c3c0517",
+      "sourceFingerprint": "8c5f8738f47b14d6552cae1dee2f65e73e948467835d4723f3f2ce7f416af6fb",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
-        "bytes": 1718,
-        "sha256": "bbd7a6833942e180b3321941ee9d7ca6afaf3a9ff4cec7ce16c2a87033999f92"
+        "bytes": 2830,
+        "sha256": "1478390b23f574f1676e6c4102661ba0cb8620a0bb09be259f911c71e4e7baa3"
       }
     },
     {
@@ -3862,6 +3862,121 @@
       }
     },
     {
+      "id": "necromancy_bone_mage",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_mage",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_mage.glb",
+          "path": "public/models/chars/enemies/skeleton_mage.glb",
+          "bytes": 802628,
+          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/skeleton_staff.glb",
+              "path": "public/models/weapons/skeleton_staff.glb",
+              "bytes": 51660,
+              "sha256": "75147e92b25e4d88a5edaf35b55b0eb6b2e2fe538694995507ecbb651072a78e"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#9bc5b4",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "a871b80e65654961d1204757e6926ae3d6324f813222114304118479f7456d60",
+      "output": {
+        "path": "public/ui/mobs/necromancy_bone_mage.webp",
+        "bytes": 2250,
+        "sha256": "15b6652f6b4a7b77c2b03b778b8c62a1d4d11d28c6b59918ca93182f5adafe03"
+      }
+    },
+    {
+      "id": "necromancy_gravewing",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "mob_gravewing",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/gravewing.glb",
+          "path": "public/models/creatures/gravewing.glb",
+          "bytes": 1190128,
+          "sha256": "06a6a68e9e9276169c3229864c6fa4b4eb8408d5a7a9062f21ad0898f2fe64f0"
+        },
+        "idle": "Idle",
+        "height": 2.4,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "038b3f2553d81a4373e93733fff792cd056dca01d7fd09c00c000c8fa4caaf9d",
+      "output": {
+        "path": "public/ui/mobs/necromancy_gravewing.webp",
+        "bytes": 2642,
+        "sha256": "e73140abd3061cc0cfb31e5d88a323027e48315660c0557e4368e8546124b423"
+      }
+    },
+    {
+      "id": "necromancy_skeletal_warrior",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#c7d0bd",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "bf2198d09351b19170955448e1e8f63e12abf1449bc17dcca3c3750220e0f362",
+      "output": {
+        "path": "public/ui/mobs/necromancy_skeletal_warrior.webp",
+        "bytes": 2824,
+        "sha256": "1f72928e66b81ac081250c793569ad5339d148235fabda70805b406801c66c36"
+      }
+    },
+    {
       "id": "nhalia_mourner",
       "family": "humanoid",
       "finderEncounter": false,
@@ -4430,34 +4545,34 @@
       "id": "pyre_colossus",
       "family": "demon",
       "finderEncounter": false,
-      "visualKey": "mob_demonalt",
+      "visualKey": "mob_pyre_colossus",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/demonalt.glb",
-          "path": "public/models/creatures/demonalt.glb",
-          "bytes": 160088,
-          "sha256": "2ade9fc07ae9d1af93747b736669d377264fdb9e695ffa0f6fe17c93aebc6db3"
+          "url": "models/creatures/pyre_colossus.glb",
+          "path": "public/models/creatures/pyre_colossus.glb",
+          "bytes": 1707388,
+          "sha256": "5edb7b6c76e614e5c784a94c04f62400c6e3f2a6b7e8b28dce6a4c59e2e62752"
         },
         "idle": "Idle",
-        "height": 2.1,
-        "yaw": null,
+        "height": 2.5,
+        "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#d24a2a",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "f459b9372d6f289f01fcaf105cdd5e497c104300dcac45a346451e0e2c74616d",
+      "sourceFingerprint": "9543027f2d0927ff688b05dcba243ff4d1701a4105384257a2bf613e82704783",
       "output": {
         "path": "public/ui/mobs/pyre_colossus.webp",
-        "bytes": 2024,
-        "sha256": "4b52aa517b75744e99b48d884293f4ebb075d837f63b38bfe5c9e895023cd15e"
+        "bytes": 2246,
+        "sha256": "bae787cb1f78174bec3244fac328c6657493a4c18f916d406cf1bfe4a4c85e5a"
       }
     },
     {
@@ -6322,40 +6437,6 @@
       }
     },
     {
-      "id": "spellhound",
-      "family": "demon",
-      "finderEncounter": false,
-      "visualKey": "mob_demonalt",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/demonalt.glb",
-          "path": "public/models/creatures/demonalt.glb",
-          "bytes": 160088,
-          "sha256": "2ade9fc07ae9d1af93747b736669d377264fdb9e695ffa0f6fe17c93aebc6db3"
-        },
-        "idle": "Idle",
-        "height": 2.1,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.35
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#4a7d4a",
-        "strength": 0.35
-      },
-      "sourceFingerprint": "1ffb2b9f701956356d6118125478936848e6c8a8ad1d2ad51a997753493a90e7",
-      "output": {
-        "path": "public/ui/mobs/spellhound.webp",
-        "bytes": 1778,
-        "sha256": "b49d3ba7b81bfb764661d21ee39df880a2bef75f21bf4d9fec1708c1da00e340"
-      }
-    },
-    {
       "id": "spider_egg",
       "family": "spider",
       "finderEncounter": false,
@@ -7206,13 +7287,13 @@
       "id": "tunnel_rat",
       "family": "burrower",
       "finderEncounter": false,
-      "visualKey": "mob_kobold",
+      "visualKey": "mob_kobold_digger",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/goblin.glb",
-          "path": "public/models/creatures/goblin.glb",
-          "bytes": 48360,
-          "sha256": "a128051c0b5078e0f76f09ed0e15eafe102ae11ae62e984155ccfefa3b08fb92"
+          "url": "models/creatures/kobold.glb",
+          "path": "public/models/creatures/kobold.glb",
+          "bytes": 324004,
+          "sha256": "1cb4fe6907ed7c03c17150a4af29cc2bc9bba68a30a73ea461f302732fe219c5"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -7221,19 +7302,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#9c640c",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "3f718bbf42b7688a9fff0868334d5630791e9b406631168f8d2807899469874a",
+      "sourceFingerprint": "d19ee3b2692349523e7ade48a684084ba842f30fb1c7a51507397787dc8a5030",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
-        "bytes": 1712,
-        "sha256": "91808491cb1658c2692278ed8d3e915006c7ece53b644991ee164937ba80c322"
+        "bytes": 2564,
+        "sha256": "54329ab570e0a0dbde0530e22955cf1dc65be72907e8894de831b2c9a504acb2"
       }
     },
     {
@@ -7757,40 +7838,6 @@
         "path": "public/ui/mobs/waking_warden.webp",
         "bytes": 2802,
         "sha256": "0451fa88b9d4dd2c8cd79d1823696ee5dd5ad58624b3f147679619506aa0dfb2"
-      }
-    },
-    {
-      "id": "warfiend",
-      "family": "demon",
-      "finderEncounter": false,
-      "visualKey": "mob_demonalt",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/demonalt.glb",
-          "path": "public/models/creatures/demonalt.glb",
-          "bytes": 160088,
-          "sha256": "2ade9fc07ae9d1af93747b736669d377264fdb9e695ffa0f6fe17c93aebc6db3"
-        },
-        "idle": "Idle",
-        "height": 2.1,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.35
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#6e5a2a",
-        "strength": 0.35
-      },
-      "sourceFingerprint": "ac43fa49ce4d8a7dafbc97536bf4c0e9d70d513e0a3a07dfd8ea02f97c4fe4be",
-      "output": {
-        "path": "public/ui/mobs/warfiend.webp",
-        "bytes": 1836,
-        "sha256": "bdb005f812115d832f582fba542366fc12b719ff3966833976ad6b5b5c16605f"
       }
     },
     {
@@ -8335,40 +8382,6 @@
         "path": "public/ui/mobs/wraithbinder_maldrec.webp",
         "bytes": 2790,
         "sha256": "0872d572002d705c01de664b38528e2004445e6645d7497db0f1b676f442f0af"
-      }
-    },
-    {
-      "id": "wraithborn",
-      "family": "demon",
-      "finderEncounter": false,
-      "visualKey": "mob_demonalt",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/demonalt.glb",
-          "path": "public/models/creatures/demonalt.glb",
-          "bytes": 160088,
-          "sha256": "2ade9fc07ae9d1af93747b736669d377264fdb9e695ffa0f6fe17c93aebc6db3"
-        },
-        "idle": "Idle",
-        "height": 2.1,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.35
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#7a3a8e",
-        "strength": 0.35
-      },
-      "sourceFingerprint": "ac28b6b97ba56adc25fec03261057fba10f8655148284a5d8b85d81caf994a0b",
-      "output": {
-        "path": "public/ui/mobs/wraithborn.webp",
-        "bytes": 1750,
-        "sha256": "c2cc74d96b84610c0fac216c305010c73eb280ab531ccdd18725f83340ddade1"
       }
     },
     {

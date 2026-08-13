@@ -30,13 +30,19 @@ describe('entry probe covers the await window', () => {
   it('arms the probe before the locale and asset awaits and re-stamps the build', () => {
     const startAt = mainSource.indexOf("entryDiagnostics.start(settings.get('graphicsPreset'));");
     const awaitCheckpointAt = mainSource.indexOf("entryDiagnostics.checkpoint('assets-await'");
-    const localeAwaitAt = mainSource.indexOf(
-      'await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);',
+    // Reflow-proof: the boot block must await all THREE locale-chunk loaders
+    // together (the catalog chunk, the deed chunk, the Reliquary page-name
+    // chunk). Matching on names and structure rather than on a pasted
+    // indentation literal, so a biome reformat does not read as a dropped
+    // loader, while dropping one really does fail.
+    const localeAwaitAt = mainSource.search(
+      /await Promise\.all\(\[\s*ensureLocaleLoaded\(getLanguage\(\)\),\s*\.\.\.CONTENT_LOCALE_CHANNEL_ENSURERS\.map\(\s*\(ensure\)\s*=>\s*ensure\(getLanguage\(\)\),?\s*\),?\s*\]\);/,
     );
     const assetsAwaitAt = mainSource.indexOf('await assetsReady(');
     const sceneRestampAt = mainSource.indexOf("entryDiagnostics.checkpoint('scene-build-start'");
     expect(startAt).toBeGreaterThan(-1);
     expect(awaitCheckpointAt).toBeGreaterThan(startAt);
+    expect(localeAwaitAt, 'the three-loader await block form drifted').toBeGreaterThan(-1);
     expect(localeAwaitAt).toBeGreaterThan(awaitCheckpointAt);
     expect(assetsAwaitAt).toBeGreaterThan(localeAwaitAt);
     expect(sceneRestampAt).toBeGreaterThan(assetsAwaitAt);
@@ -63,13 +69,31 @@ describe('entry-crash recovery arms tight memory', () => {
 });
 
 describe('tight-memory residency diet', () => {
-  it('skips the two secondary-context preview prewarms on the tight profile', () => {
-    const gateAt = mainSource.indexOf('if (!GFX.tightMemory) {');
-    const characterPrewarmAt = mainSource.indexOf('await hud.prewarmCharacterPreview();');
-    const armoryPrewarmAt = mainSource.indexOf('await hud.prewarmArmoryPreview();');
+  it('skips the secondary-context preview prewarm schedule on the tight profile', () => {
+    const startAt = mainSource.indexOf('if (!GFX.tightMemory) hud.startPostEntryPreviewPrewarm();');
+    expect(startAt).toBeGreaterThan(-1);
+    // The schedule runs BEHIND the live frame (post-reveal), so the secondary
+    // preview contexts never add to the curtained entry allocation spike; the
+    // tight profile skips them entirely and keeps the lazy first-open path.
+    const revealAt = mainSource.indexOf('const revealWorld = (): void => {');
+    expect(revealAt).toBeGreaterThan(-1);
+    expect(startAt).toBeGreaterThan(revealAt);
+  });
+
+  it('keeps the curtain-side paperdoll shell build inside the tight-memory gate', () => {
+    const callAt = mainSource.indexOf('hud.prewarmCharPreviewShell();');
+    expect(callAt).toBeGreaterThan(-1);
+    // Anchor on the NEAREST preceding gate, not the first one in the file: a
+    // plain indexOf-ordering check (gate index before call index) would still
+    // pass if some unrelated earlier "!GFX.tightMemory" text existed anywhere
+    // above the call.
+    const gateAt = mainSource.lastIndexOf('if (!GFX.tightMemory) {', callAt);
     expect(gateAt).toBeGreaterThan(-1);
-    expect(characterPrewarmAt).toBeGreaterThan(gateAt);
-    expect(armoryPrewarmAt).toBeGreaterThan(characterPrewarmAt);
+    // The gate's own closing brace must not appear between the gate and the
+    // call: that would mean the block already ended and the call runs
+    // unconditionally, even though the ordering check above would still hold.
+    const between = mainSource.slice(gateAt, callAt);
+    expect(between).not.toMatch(/\n {2}\}/);
   });
 });
 
@@ -87,9 +111,13 @@ describe('deferred skin atlases on every iOS WebKit host', () => {
   });
 
   it('never caches a portrait rendered while its atlas is still in flight', () => {
+    // The pending guard lives in trackSkinAtlasPending, shared by the sync
+    // capture path (returns null, fallback crest) AND the paced async prewarm
+    // (early-outs before building anything).
     expect(portraitSource).toContain('const atlasPending = ensureSkinTexture(visualKey, skin);');
-    expect(portraitSource).toContain('if (atlasPending) {');
-    expect(portraitSource).toContain('return null;');
+    expect(portraitSource).toContain('if (!atlasPending) return false;');
+    expect(portraitSource).toContain('if (trackSkinAtlasPending(visualKey, skin)) return null;');
+    expect(portraitSource).toContain('atlasPending: () => trackSkinAtlasPending(visualKey, skin),');
     expect(portraitChipSource).toContain('onPortraitUpdate((visualKey, skin) => {');
     expect(mainSource).toContain('refreshStartSkinPickerPortraits(');
   });

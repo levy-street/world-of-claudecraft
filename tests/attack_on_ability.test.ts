@@ -29,6 +29,7 @@ describe('abilityStartsAutoAttack', () => {
   it('does not engage on heals or self/ally buffs', () => {
     expect(abilityStartsAutoAttack(effectsOf('battle_shout'))).toBe(false); // selfBuff
     expect(abilityStartsAutoAttack(effectsOf('mark_of_the_wild'))).toBe(false); // buffTarget (friendly)
+    expect(abilityStartsAutoAttack(effectsOf('hour_of_judgment'))).toBe(false);
   });
 
   it('does not engage on pure crowd control', () => {

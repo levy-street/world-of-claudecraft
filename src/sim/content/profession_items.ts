@@ -220,8 +220,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'uncommon',
-    weapon: { min: 5, max: 9, speed: 1.8, dagger: true },
-    stats: { agi: 4, sta: 2 },
+    // Retuned: the old 5-9@1.8 (3.9 dps) was less than half a Lv15 craft's
+    // weapon budget; 16-24@1.8 (11.1 dps) puts it in line with its tier.
+    weapon: { min: 16, max: 24, speed: 1.8, dagger: true },
+    stats: { agi: 5, sta: 2 },
     sellValue: 45,
   },
   thorium_warblade: {

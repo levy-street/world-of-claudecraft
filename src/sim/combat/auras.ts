@@ -38,14 +38,27 @@
 
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
 import { pctValue, recalcPlayerStats } from '../entity';
+import { manaRegenPer2s } from '../mana_regen';
+import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import { tickAfflictionAura, tickMaledictGaze } from './affliction';
 import { isStunned } from './cc';
+import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
+import { druidEngineOnBleedTick } from './druid_engines';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
+import { detonateOssuaryMark, OSSUARY_MARK_ABILITY_ID } from './necromancy';
+import { tickPaladinOathChainPull } from './paladin_control';
+import { priestOnAuraEnded } from './priest/talents';
+import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
+import { tickMendingCurrent } from './shaman_spiritmend';
+import { tickShamanTalentAura } from './shaman_talents';
+import { stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
+import { tickSacrilegiousMarch, tickWarlockTalentState } from './warlock_talents';
 
 const SECOND_WIND_THRESHOLD = 0.35;
 
@@ -78,6 +91,7 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
 
 export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
+  regenerateRuinOutOfCombat(ctx, p, meta);
   // Lifesap restores whichever resource bar is currently live, including across
   // form changes. Hard control stills the sap rather than banking free resource.
   if (!isStunned(p)) {
@@ -88,20 +102,25 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
     }
   }
   if (p.resourceType === 'mana') {
-    if (p.fiveSecondRule >= 5) {
-      // out-of-combat mana regen: faster than before and scales with spirit
-      // (gear/level) plus a small flat per-level floor so low-spirit casters
-      // still recover at a reasonable pace (#103)
-      const regen =
-        (p.stats.spi / 3 + 4 + Math.floor(p.level / 5)) *
-        (1 + ctx.playerMods(meta).global.manaRegenPct);
-      p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
-    }
+    // Spirit regen: the FULL amount out of combat (past the five-second rule),
+    // and COMBAT_SPIRIT_REGEN_FRACTION of it while the rule is active, so Spirit
+    // keeps returning mana in combat like WoW's mp5 stat. The out-of-combat
+    // amount is unchanged from the #103 formula (Spirit + flat + per-level floor).
+    const regen = manaRegenPer2s(
+      p.stats.spi,
+      p.level,
+      ctx.playerMods(meta).global.manaRegenPct,
+      p.fiveSecondRule,
+    );
+    p.resource = Math.min(p.maxResource, p.resource + regen);
   } else if (p.resourceType === 'energy') {
     // Feral Instinct (cat form) grants a buff_energyregen aura (value = fraction, 1 = +100%).
     let regen = 20;
     for (const a of p.auras) if (a.kind === 'buff_energyregen') regen *= 1 + a.value;
     p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
+  } else if (p.resourceType === 'focus') {
+    // Hunter Focus returns at 5 per second on the classic two-second tick.
+    p.resource = Math.min(p.maxResource, p.resource + 10);
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }
@@ -181,7 +200,11 @@ export function updateTimers(p: Entity): void {
         );
       }
       // Parallel per-charge recharge: every running timer ticks at once.
-      const delta = temporalHourglassCooldownDelta(p, abilityId);
+      const primalExaltationRate =
+        abilityId === 'tidecall' && p.auras.some((aura) => aura.id === 'shaman_primal_exaltation')
+          ? 2
+          : 1;
+      const delta = temporalHourglassCooldownDelta(p, abilityId) * primalExaltationRate;
       state.recharges = state.recharges.map((t) => t - delta);
       while (state.recharges.length > 0 && state.recharges[0] <= 0) {
         state.recharges.shift();
@@ -227,6 +250,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   let statsDirty = false;
   // Talent-proc internal cooldowns age at the same cadence as auras.
   tickProcState(e, DT);
+  if (e.kind === 'player') {
+    const meta = ctx.players.get(e.id);
+    if (meta) tickWarlockTalentState(ctx, e, meta);
+  }
   // Walk a SNAPSHOT of e.auras, not the live array. A DoT tick's own
   // ctx.dealDamage call can splice an aura out of this SAME array mid-walk
   // (damage.ts's own backward sweeps remove a breaksOnDamage control aura, or a
@@ -243,7 +270,17 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   for (let i = snapshot.length - 1; i >= 0; i--) {
     const a = snapshot[i];
     if (!e.auras.includes(a)) continue; // removed by an earlier entry's side effect this tick
-    a.remaining -= DT;
+    tickPaladinOathChainPull(ctx, e, a);
+    // A permanent aura (the paladin's Devotion auras) has no timer to run down.
+    if (
+      !a.permanent &&
+      !isPersistentEngineAura(a.id) &&
+      (a.kind !== 'gloomtithe' || !preservesGloomtithe(ctx, e.id))
+    ) {
+      a.remaining -= DT;
+    }
+    tickShamanTalentAura(a);
+    tickAfflictionAura(ctx, e, a, DT);
     // charge-limited thorns (Lightning Shield): age its internal cooldown so the
     // next melee hit can reflect once it elapses. No-op for ungated thorns.
     if (a.kind === 'thorns') tickThornsCooldown(a);
@@ -251,9 +288,16 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
         a.tickTimer += a.tickInterval;
-        if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
+        if (a.kind === 'pyre_guardian') {
+          tickPyreGuardian(ctx, e, a);
+        } else if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
           tickTemporalHourglassHealing(ctx, e, a);
+        } else if (a.id === 'sacrilegious_march' && a.kind === 'buff_speed') {
+          tickSacrilegiousMarch(ctx, e, a);
+        } else if (a.kind === 'affliction_eye') {
+          tickMaledictGaze(ctx, e, a);
         } else if (a.kind === 'dot') {
+          const dotSource = ctx.entities.get(a.sourceId) ?? null;
           let tickDamage = a.value;
           if (a.school === 'physical') {
             let bleedAmp = 0;
@@ -270,7 +314,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             fx: 'tick',
           });
           ctx.dealDamage(
-            ctx.entities.get(a.sourceId) ?? null,
+            dotSource,
             e,
             tickDamage,
             false,
@@ -278,7 +322,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.name,
             'hit',
             true,
-            undefined,
+            // The source's Stonebound posture and the aura's own authored threat
+            // multiplier are independent, so a DoT carrying both applies both.
+            dotSource || a.threatMult !== undefined
+              ? {
+                  mult:
+                    (dotSource ? stoneboundThreatMultiplier(ctx, dotSource) : 1) *
+                    (a.threatMult ?? 1),
+                }
+              : undefined,
             // Periodic (DoT) ticks are not a direct attack: they must not walk a
             // mob's leash anchor, so a DoT-kited mob still leashes home. Ticks
             // also deliberately carry NO abilityId (the label above is FCT and
@@ -293,8 +345,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // multipliers so the payout equals what was banked, once.
             a.finalDamage === true,
           );
+          vespersOnDotTick(ctx, e, a);
+          druidEngineOnBleedTick(ctx, dotSource, a);
           if (a.leechPct !== undefined) {
-            const src = ctx.entities.get(a.sourceId);
+            const src = dotSource;
             if (src && !src.dead) {
               const intended = Math.round(tickDamage * a.leechPct);
               const healed = Math.min(intended, src.maxHp - src.hp);
@@ -315,7 +369,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             }
           }
           if (e.dead) return;
-        } else if (a.kind === 'hot') {
+        } else if (a.kind === 'hot' && !tickMendingCurrent(ctx, e, a)) {
           const intended = Math.round(a.value * ctx.healingTakenMult(e));
           const healed = Math.min(intended, e.maxHp - e.hp);
           if (healed > 0) {
@@ -335,13 +389,20 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             const src = ctx.entities.get(a.sourceId);
             if (src) ctx.healingThreat(src, e, healed);
           }
+        } else if (a.kind === 'buff_mana_grace' && e.resourceType === 'mana') {
+          e.resource = Math.min(e.maxResource, e.resource + Math.round(a.value));
         } else if (a.kind === 'polymorph') {
           const heal = Math.round(e.maxHp * 0.1);
           e.hp = Math.min(e.maxHp, e.hp + heal);
         }
       }
     }
-    if (a.remaining <= CAST_COMPLETE_EPS) {
+    if (!a.permanent && a.remaining <= CAST_COMPLETE_EPS) {
+      if (a.id === OSSUARY_MARK_ABILITY_ID && a.kind === 'necromancy_ossuary_mark') {
+        detonateOssuaryMark(ctx, e, a);
+        if (e.dead) return;
+        continue;
+      }
       // `i` indexes the snapshot, which no longer matches e.auras once a mid-tick
       // removal has shifted it, so splice the aura's actual live position. The
       // guard covers the one remaining self-removal window (an aura whose OWN
@@ -353,6 +414,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       const liveIndex = e.auras.indexOf(a);
       if (liveIndex < 0) continue;
       e.auras.splice(liveIndex, 1);
+      priestOnAuraEnded(ctx, e, a);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
       applyGreaterInvisibilityAftereffect(ctx, e, a);

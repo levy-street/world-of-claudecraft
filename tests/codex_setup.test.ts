@@ -235,6 +235,7 @@ describe('Codex skills', () => {
       'woc-release-malware-audit',
       'woc-release-merge-audit',
       'woc-review-pr',
+      'woc-write-game-tooltips',
     ]);
 
     const descriptions = new Set<string>();

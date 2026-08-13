@@ -355,6 +355,115 @@ describe('applyPointLightBudget', () => {
     expect(method).not.toContain('pointLightPadCount(ranked.length');
   });
 
+  it('wires mid-session fx lights into the same ranked budget', () => {
+    // An fx that mints a point light mid-session (the warlock infernal) must
+    // hand it to the renderer's registration seam: marked dynamic, hidden until
+    // the first budget pass ranks it, in the SAME viewLights pool with the rank
+    // marked dirty, and spliced back out on release. Any half dropped puts an
+    // unranked visible light in the scene, which changes numPointLights and
+    // relinks every lit material in view.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const registerStart = source.indexOf('private registerBudgetPointLight(');
+    const releaseStart = source.indexOf('private releaseBudgetPointLight(');
+    const budgetStart = source.indexOf('private budgetFireLights(');
+    expect(registerStart).toBeGreaterThan(-1);
+    expect(releaseStart).toBeGreaterThan(registerStart);
+    expect(budgetStart).toBeGreaterThan(releaseStart);
+
+    const register = source.slice(registerStart, releaseStart);
+    expect(register).toContain('light.userData.budgetDynamic = true;');
+    expect(register).toContain('light.visible = false;');
+    expect(register).toContain('this.viewLights.push(light);');
+    expect(register).toContain('this.lightRankDirty = true;');
+
+    const release = source.slice(releaseStart, budgetStart);
+    expect(release).toContain('this.viewLights.indexOf(light)');
+    expect(release).toContain('this.viewLights.splice(index, 1);');
+    expect(release).toContain('this.lightRankDirty = true;');
+
+    // And the warlock meteor fx is actually handed that seam.
+    const fxStart = source.indexOf('this.warlockMeteorFx = new WarlockMeteorFx(');
+    const fxEnd = source.indexOf('this.necromancyGroundFx = new NecromancyGroundFx(', fxStart);
+    expect(fxStart).toBeGreaterThan(-1);
+    expect(fxEnd).toBeGreaterThan(fxStart);
+    const construction = source.slice(fxStart, fxEnd);
+    expect(construction).toContain('register: (light) => this.registerBudgetPointLight(light),');
+    expect(construction).toContain('release: (light) => this.releaseBudgetPointLight(light),');
+  });
+
+  it('a post-pass fx lifecycle change re-run restores the pinned total (landing and expiry)', () => {
+    // Frame order on a meteor landing: budget pass first, then the fx update
+    // releases the visible fall light and registers the hidden impact light.
+    // Without a recovery pass the frame renders one light short of the pinned
+    // total, numPointLights moves, and every lit material relinks. The
+    // recovery re-run (budget plus pads) must restore the total in-frame.
+    const VISIBLE = 4;
+    const ranked: RankedPointLight[] = [];
+    for (let i = 0; i < 6; i++) ranked.push(rankedLight(i * 2 + 2, 0));
+    const fall = new THREE.PointLight(0xffffff, 9, 26, 1.7);
+    const fallEntry: RankedPointLight = {
+      light: fall,
+      d2: 0,
+      worldPos: new THREE.Vector3(1, 0, 0),
+      base: null,
+      dynamic: false,
+    };
+    ranked.push(fallEntry);
+
+    let drawn = applyPointLightBudget(ranked, 0, 0, VISIBLE, VISIBLE, RANGE_SQ);
+    expect(fall.visible).toBe(true);
+    expect(visibleCount(ranked) + pointLightPadCount(drawn, VISIBLE)).toBe(VISIBLE);
+
+    // Landing: the fx releases the visible fall light and registers the
+    // impact light hidden (the registration seam hides it on the way in).
+    ranked.splice(ranked.indexOf(fallEntry), 1);
+    const impact = new THREE.PointLight(0xffffff, 14, 28, 1.5);
+    impact.visible = false;
+    ranked.push({
+      light: impact,
+      d2: 0,
+      worldPos: new THREE.Vector3(0.5, 0, 0),
+      base: null,
+      dynamic: true,
+    });
+
+    // The defect: without the recovery pass the rendered total dips by one.
+    expect(visibleCount(ranked) + pointLightPadCount(drawn, VISIBLE)).toBe(VISIBLE - 1);
+
+    drawn = applyPointLightBudget(ranked, 0, 0, VISIBLE, VISIBLE, RANGE_SQ);
+    expect(visibleCount(ranked) + pointLightPadCount(drawn, VISIBLE)).toBe(VISIBLE);
+
+    // Impact expiry releases its light too; the re-run restores again.
+    ranked.pop();
+    drawn = applyPointLightBudget(ranked, 0, 0, VISIBLE, VISIBLE, RANGE_SQ);
+    expect(visibleCount(ranked) + pointLightPadCount(drawn, VISIBLE)).toBe(VISIBLE);
+  });
+
+  it('both frame paths re-run the budget after the meteor fx update', () => {
+    // The meteor fx is the one budget-light owner updating after the pass: a
+    // landing or expiry frame must re-run the budget before rendering, or the
+    // pinned visible total dips for exactly that frame.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const sites = [
+      ...source.matchAll(/this\.warlockMeteorFx\.update\(dt, this\.reducedMotion\(\)\);/g),
+    ];
+    expect(sites.length).toBe(2);
+    const windows = sites.map((site) => {
+      const from = (site.index ?? 0) + site[0].length;
+      const next = source.indexOf('this.necromancyGroundFx.update(', from);
+      expect(next).toBeGreaterThan(from);
+      return source.slice(from, next);
+    });
+    // The prewarm frame path budgets without flicker, the live sync path with:
+    // each recovery call must mirror its own path's primary pass exactly.
+    expect(windows[0]).toContain(
+      'if (this.lightRankDirty) this.budgetFireLights(p.pos.x, p.pos.z);',
+    );
+    expect(windows[1]).toContain(
+      'if (this.lightRankDirty) this.budgetFireLights(p.pos.x, p.pos.z, true);',
+    );
+  });
+
   it('wires contributor flicker after the renderer completes selection', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const methodStart = source.indexOf('private budgetFireLights(');

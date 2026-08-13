@@ -26,6 +26,7 @@ import {
 import type { RiftEvent, RiftInstance } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const SEED = 777;
 
@@ -36,6 +37,7 @@ function makeSim(seed = SEED) {
     autoEquip: true,
     devCommands: true,
     riftPortals: true,
+    world: EMPTY_TEST_WORLD,
   });
 }
 
@@ -475,6 +477,7 @@ describe('rift portals: per-zone close-gated cadence (issue #2659)', () => {
       playerClass: 'warrior',
       noPlayer: true,
       riftPortals: true,
+      world: EMPTY_TEST_WORLD,
     });
     const openZoneId = 'farshore_isle';
     const closingZoneId = 'willowfen';
@@ -498,6 +501,7 @@ describe('rift portals: per-zone close-gated cadence (issue #2659)', () => {
       playerClass: 'warrior',
       noPlayer: true,
       riftPortals: true,
+      world: EMPTY_TEST_WORLD,
     });
     loadRiftWorldState(target.ctx, saved, nowMs + 250);
 

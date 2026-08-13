@@ -20,13 +20,19 @@ Codex have different entry points and share the same deterministic scripts and c
 
 ### Instant copy gate
 
-The Stop gate scans the uncommitted added lines (the unstaged tracked diff plus
-untracked text files) for an em dash, en dash, emoji, focused `.only(` test, or leftover
-`debugger`. It takes milliseconds and never runs TypeScript, Vitest, Biome, browser
-work, or an agent. `.claude/settings.json` and `.codex/hooks.json` share the Claude
-implementation; the Codex adapter (`.codex/hooks/qa-stop.sh`) delegates to it, then
-additionally scans TOML and `.mts`/`.cts` TypeScript module files that the shared
-extension filter omits.
+The Stop gate scans the uncommitted added lines (the tracked diff against HEAD, staged
+and unstaged, plus untracked text files) for an em dash, en dash, emoji, focused
+`.only(` test, leftover `debugger`, or a `Math.random`/`Date.now`/`performance.now`
+call added under `src/sim/` (the determinism invariant's instant tripwire). The locale
+overlays and `docs/i18n/*.ru_RU.md` are excluded, matching the pre-push copy scan. It
+takes milliseconds and never runs TypeScript, Vitest, Biome, browser work, or an agent.
+`.claude/settings.json` and `.codex/hooks.json` share the Claude implementation; the
+Codex adapter (`.codex/hooks/qa-stop.sh`) delegates to it, then re-scans TOML and
+`.mts`/`.cts` module files (the shared filter now covers those itself, so the adapter's
+extra pass is a harmless belt). A companion `PreToolUse` hook
+(`.claude/hooks/deny-generated-edit.sh`) blocks direct agent edits to generated
+artifacts (`*.generated.ts`, the `i18n.resolved.generated/` bundles) at the tool-call
+boundary.
 
 ### Deterministic floor
 
@@ -83,8 +89,8 @@ transforms under `node_modules/.experimental-vitest-cache` (clear with
 `npx vitest --clearCache` if a warm run looks wrong). The same store is persisted
 across CI runs since Phase 4 of the CI/CD performance packet: the pr-gate and
 release-gate shard jobs carry an `actions/cache` step for it, keyed per shard, and the
-long-sims lane job carries the same step keyed per lane (Phase 6, the recorded Phase 4
-rider), all over the node_modules-layout inputs (lockfile, vite config, `.npmrc`,
+two long-sims lane jobs carry the same step keyed per lane half (Phase 6, the recorded
+Phase 4 rider), all over the node_modules-layout inputs (lockfile, vite config, `.npmrc`,
 `package.json`), with the design constraints written on the pr-gate copy of the step in
 `.github/workflows/ci.yml` and pinned by `tests/ci_workflow.test.ts`. The nightly gate deliberately stays cold: it is the
 uncached full replay. Most DOM-environment unit
@@ -94,7 +100,8 @@ Phase 5). Default environment remains `node`.
 
 ### Full local gate
 
-`npm run gate` (or `pnpm run gate`) is the **merge and "done" contract**. It mirrors CI:
+`npm run gate` (or `pnpm run gate`) is the **full CI mirror, the deeper check behind the
+selective merge bar** (`gate:select`, below, is the bar itself). It mirrors CI:
 generated i18n freshness, malware scanning, changed-file formatting, the SFX conformance
 check, the full test suite, the browser regression suite (`npm run test:browser`, which
 drives Chromium through Playwright), the typecheck, and env, server, bot, and client
@@ -111,11 +118,11 @@ malware, changed-file Biome, and the i18n freshness `git diff` always run (they 
 cached as "passed"). Catalog edits under `src/ui/i18n.catalog/**` invalidate `i18n:gen`.
 Contributor detail: [`docs/local-gate-perf/task-cache.md`](local-gate-perf/task-cache.md).
 
-Use this command instead of an ad hoc shell pipeline, and always before calling a change
-ready or opening a mergeable PR. Piping a test run can hide its exit status, and
-unconstrained full-suite parallelism can make healthy heavy sim tests flake. Day-loop
-iteration may use `npm run gate:fast`; a green fast path alone is never enough to claim
-done.
+Use this command instead of an ad hoc shell pipeline whenever you want the whole suite
+locally; the pre-merge bar itself is the selective gate (next section). Piping a test
+run can hide its exit status, and unconstrained full-suite parallelism can make healthy
+heavy sim tests flake. Day-loop iteration may use `npm run gate:fast`; a green fast path
+alone is never enough to claim done.
 
 ### Selective gate (`gate:select`)
 
@@ -197,28 +204,49 @@ API-fetched file listing that decides `code` (`scripts/lib/ci_test_select.mjs`),
 the long-sims lane files (below); in selective mode, the always-run floor plus
 `vitest related` over the changed sources, both sharded.
 
-**The long-sims lane** (Phase 4). The `CI_LONG_SUITES` files
-(`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90 seconds inside a full-mode
-shard, the chronomancy balance sweep among them) run in the dedicated
-`PR gate (long sims)` job (`node scripts/ci_shard_test.mjs --lane=long-sims`), and every
-shard leg excludes them, so a single multi-minute file no longer sets the slowest shard's
-wall clock. Completeness is a pinned invariant, not an intention: the lane fails closed to
-its whole file list on exactly the inputs that make a shard fail closed to full, the
-shard legs exclude exactly the files the lane owns, and in selective mode the lane runs
-just the lane files the floor or the PR's diff would have carried (the related legs stay
+**The long-sims lanes** (Phase 4; split in two by the lane-diet PR). The
+`CI_LONG_SUITES` files (`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90
+seconds inside a full-mode shard, the chronomancy balance sweep among them) run in the
+dedicated `PR gate (long sims A)` / `PR gate (long sims B)` job pair
+(`node scripts/ci_shard_test.mjs --lane=long-sims-a` / `--lane=long-sims-b`, one
+`CI_LONG_SUITE_HALVES` half each), and every shard leg excludes the whole union, so a
+single multi-minute file no longer sets the slowest shard's wall clock and the lane's
+own wall clock is the slower HALF, not the whole list. Completeness is a pinned
+invariant, not an intention: each lane fails closed to its whole half on exactly the
+inputs that make a shard fail closed to full, the shard legs exclude exactly the files
+the two lanes own between them, and in selective mode each lane runs just its half's
+lane files the floor or the PR's diff would have carried (the related legs stay
 unfiltered, so a reached lane file re-runs there: duplicate work, never a gap). Mode for
-mode, the nine PR-tier test jobs together therefore run exactly what the pre-lane
+mode, the ten PR-tier test jobs together therefore run exactly what the pre-lane
 8-shard layout would have run (`tests/ci_shard_plan.test.ts` pins the partition;
 selective mode still skips the outside-floor remainder by design, exactly as before the
-lane). The latency win is concentrated in FULL mode: three of the four lane files are
+lane). The latency win is concentrated in FULL mode: most lane files are
 graph-visible, so on a sim-heavy selective PR the `related` legs pull them back into a
-shard exactly as they did before the lane, and only the blind member (plus any lane
-test the PR itself changed) rides the lane.
-The lane reproduces locally with
-`node scripts/ci_shard_test.mjs --lane=long-sims --plan-only`, printing the same
-`[ci-shard]` audit lines as the shards. `release-gate` is deliberately not lane-split:
-`release/**` pushes keep the full suite in their 8 shards; a push to `main` or `dev-*`
-runs the PR tier, so it gets the shards-plus-lane layout.
+shard exactly as they did before the lane, and only the blind members (plus any lane
+test the PR itself changed) ride the lanes.
+The lanes reproduce locally with
+`node scripts/ci_shard_test.mjs --lane=long-sims-a --plan-only` (and `-b`), printing the
+same `[ci-shard]` audit lines as the shards. `release-gate` is deliberately not
+lane-split: `release/**` pushes keep the full suite in their 8 shards; a push to `main`
+or `dev-*` runs the PR tier, so it gets the shards-plus-lanes layout.
+
+**The balance-harness diet.** The heavy balance suites in the lane are regression
+tripwires, not measurements (the authoritative instrument is the offline Monte Carlo
+sweep), so at PR time they run a reduced configuration: fewer fixed seeds, the
+band-carrying scenarios only, and shorter windows where a coefficient change still
+shows inside the first minute. `WOC_FULL_BALANCE_SWEEP=1`, set only by the nightly
+workflow's test job, restores the full five-seed, all-scenario, 120-second
+configuration nightly. That scoping is deliberate and complete: `release/**` push
+runs, merge-queue runs, and the local `npm run gate` all run the diet configuration
+too (they run every test FILE, at diet depth), and the nightly is the ONE surface
+that runs the full sweep. `tests/ci_workflow.test.ts` pins the flag OUT of ci.yml
+and `tests/ci_shard_plan.test.ts` pins exactly which suites read it, so neither a
+new diet nor a stray full-sweep can land silently. Every band is pinned to a measurement at its own configuration
+(the diet bands were re-derived with the same relative margins as the full bands they
+mirror; the lane-diet PR body carries the measurement table). When you change balance
+and a band moves, re-pin BOTH configurations from their own printed actuals; never
+carry one configuration's band under the other, and never shorten a window that guards
+long-fight behavior (mana sustain, time-to-OOM).
 
 The CI floor is a superset of the local one: every blind/partial test (recomputed in the
 PR's own tree via the shared `collectSuiteVisibility`), PLUS the invariant guard suites by
@@ -321,6 +349,11 @@ the nightly, and the local gate carry NO auto-retry: there a teardown-rpc red st
 and the remedy remains a manual rerun of the red shard
 (`gh run rerun <run-id> --failed`).
 
+A separate reactor handles the checkout-stall class (a runner that hangs before tests
+even start): `.github/workflows/ci-stall-rerun.yml` drives `scripts/ci_stall_rerun.mjs`
+to rerun runs killed by that narrow signature, and the driver can be invoked by hand
+for a stalled run. Triage recipes for both classes: the `ci-triage` skill.
+
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
 of those (`Math.random` and the asset deletion) `vitest related` selected **nothing** and
@@ -384,17 +417,27 @@ before reporting readiness.
 | Cross-host parity | `cross-platform-sync` | `woc_cross_platform` |
 | Persistence and migrations | `migration-safety` | `woc_persistence` |
 | Database performance | `database-performance-reviewer` | `woc_database_performance` |
+| Server hot-path performance | `server-hot-path-reviewer` | (not yet mirrored) |
 | Privacy and security | `privacy-security-review` | `woc_security` |
 | Decisive tests | `test-coverage-auditor` | `woc_test_coverage` |
 | Frontend and graphics | `frontend-seam-reviewer` | `woc_frontend` |
 | Release malware | `release-malware-audit` | `woc_release_malware` |
+| Content same-change obligations | `content-obligations-reviewer` | (not yet mirrored) |
+| Gate/CI selection integrity | `gate-integrity-reviewer` | (not yet mirrored) |
 
 These roles encode non-obvious review heuristics. Canonical architecture stays in root
-and local `CLAUDE.md` files. Persistence review owns compatibility, save/load shape, and
-rollback safety. Database-performance review owns query cadence, cardinality, plans,
+and local `CLAUDE.md` files. Content-obligations review owns the same-change authoring
+duties of any `src/sim/content/` diff (deeds, Reliquary pages, wiki regen, item art,
+name fills, referential integrity). Gate-integrity review owns changes to the selection
+pipeline itself (`scripts/gate*.mjs`, `scripts/lib/gate_*.mjs`, `scripts/lib/ci_*.mjs`,
+`scripts/lib/test_visibility.mjs`, the workflows and their pins), where the failure mode
+is silently skipped tests. Persistence review owns
+compatibility, save/load shape, and rollback safety. Database-performance review owns query cadence, cardinality, plans,
 indexes, pool pressure, locks, timeout scope, write amplification, driver/dependency upgrades,
 PostgreSQL engine/resource/configuration/topology changes, and production-scale observability.
-Dispatch both when both sets of risk apply.
+Server-hot-path review owns the non-SQL server budget: tick CPU, broadcast fan-out and
+serialization, cache seams, and retention for anything that grows (the seams in
+`server/CLAUDE.md` "Hot paths"). Dispatch every role whose set of risk applies.
 
 ## Keep the gate current
 

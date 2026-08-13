@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   type ChatContextMenuPort,
@@ -259,6 +260,53 @@ describe('ChatWindowController', () => {
   });
 
   // Issue #1365: chat tabs can be dragged to reorder, and the order persists.
+  it('drops the /bg send-stickiness when the match ends, so plain text goes to say', () => {
+    // Review catch: the server clears its own remembered channel on bgEnd, but
+    // the HUD composes a plain line through ITS sticky before anything is sent.
+    // Without the client half, the first plain line after every match is still
+    // composed as "/bg ..." and comes back refused.
+    const harness = makeHarness();
+    harness.controller.init();
+
+    harness.controller.noteSentChannel('/bg incoming mid', false);
+    expect(harness.controller.composeSend('on my way'), 'the sticky is live').toBe('/bg on my way');
+
+    harness.controller.clearBattlegroundSticky();
+
+    // Composed for SAY (the explicit prefix is how this controller spells the
+    // default), which is the point: it reaches say instead of being refused by a
+    // battleground the player already left.
+    expect(harness.controller.composeSend('on my way'), 'plain text falls back to say').toBe(
+      '/say on my way',
+    );
+  });
+
+  it('is actually WIRED to the bgEnd arm, not just callable', () => {
+    // The two cases above drive the method directly, so they would both stay
+    // green if the hud stopped calling it: they pin the behavior, not the hookup.
+    // This reads the source instead, which is the same shape the repo already
+    // uses for hud wiring it cannot reach from a unit test. It proves the call
+    // EXISTS inside the bgEnd arm; it cannot prove the arm runs, which the sim
+    // suite covers by asserting bgEnd is emitted.
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const arm = hud.slice(hud.indexOf("case 'bgEnd': {"));
+    const armEnd = arm.indexOf("case '");
+    expect(
+      arm.slice(0, armEnd > 0 ? armEnd : 4000),
+      'the bgEnd arm must clear the battleground send-stickiness',
+    ).toContain('clearBattlegroundSticky()');
+  });
+
+  it('leaves a NON-battleground sticky alone when a match ends', () => {
+    // The reset is scoped: a player who was last talking in party or guild keeps
+    // that sticky across a battleground ending they were not chatting in.
+    const harness = makeHarness();
+    harness.controller.init();
+    harness.controller.noteSentChannel('/p pulling now', false);
+    harness.controller.clearBattlegroundSticky();
+    expect(harness.controller.composeSend('pulling now')).toBe('/p pulling now');
+  });
+
   describe('tab reordering (issue #1365)', () => {
     it('drags a channel tab onto a sibling to reorder it, and persists the new order', () => {
       const harness = makeHarness({ woc_chat_tabs: '["world","guild","party"]' });

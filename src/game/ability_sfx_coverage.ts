@@ -78,6 +78,26 @@ export const CC_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
   'sap',
 ]);
 
+/** The five caster-buff/utility warrior shouts whose one cast moment now has
+ *  a dedicated recording (fx:'shout', combat_sfx.ts's SHOUT_ABILITY_CUES):
+ *  Iron Bellow/battle_shout, Direhowl/demoralizing_shout, Emboldening
+ *  Roar/emboldening_roar, Defiant Bellow/defiant_bellow, Valor Roar/
+ *  rallying_cry. All five are archetype 'shout', deal no damage, and land no
+ *  separate impact, so the one recording covers both the launch and the
+ *  landed instant: unlike FEAR_IMPACT_ABILITIES/CC_IMPACT_ABILITIES (which
+ *  override 'impact' only, because those abilities' recordings play at the
+ *  landed moment while a distinct procedural release still carries the cast),
+ *  these override BOTH 'release' and 'impact'. Intimidating Shout is
+ *  deliberately absent: it already resolves through FEAR_IMPACT_ABILITIES
+ *  above. */
+export const SHOUT_CAST_ABILITIES: ReadonlySet<string> = new Set([
+  'battle_shout',
+  'demoralizing_shout',
+  'emboldening_roar',
+  'defiant_bellow',
+  'rallying_cry',
+]);
+
 /** Ground-zone abilities (groundAoE, effect_dispatch.ts) whose pulse now has a
  *  dedicated recording (fx:'tick', combat_sfx.ts's GROUND_TICK_ABILITY_CUES):
  *  Meteor's single delayed hit. Every other zone (Consecration, Blizzard's
@@ -130,6 +150,9 @@ export function isAbilityMomentRecorded(
     // same instant and position the sequencer asks for its release whoosh.
     // No projectile event means no recording, hence the opt-out check.
     case 'release':
+      // SHOUT_CAST_ABILITIES' one recording covers the whole cast, launch
+      // included, so it wins ahead of the projectile-school check below.
+      if (ctx.abilityId && SHOUT_CAST_ABILITIES.has(ctx.abilityId)) return true;
       return (
         ctx.isProjectile !== false && !!ctx.school && RECORDED_PROJECTILE_SCHOOLS.has(ctx.school)
       );
@@ -137,9 +160,11 @@ export function isAbilityMomentRecorded(
       // The per-ability overrides win regardless of archetype: Harrow's is
       // 'cc', the fear shouts' is 'shout', the plain cc trio's is 'cc' too
       // (all normally uncovered), and all now have a real recording for
-      // this moment (see FEAR_IMPACT_ABILITIES / CC_IMPACT_ABILITIES).
+      // this moment (see FEAR_IMPACT_ABILITIES / CC_IMPACT_ABILITIES /
+      // SHOUT_CAST_ABILITIES).
       if (ctx.abilityId && FEAR_IMPACT_ABILITIES.has(ctx.abilityId)) return true;
       if (ctx.abilityId && CC_IMPACT_ABILITIES.has(ctx.abilityId)) return true;
+      if (ctx.abilityId && SHOUT_CAST_ABILITIES.has(ctx.abilityId)) return true;
       return !!ctx.archetype && RECORDED_IMPACT_ARCHETYPES.has(ctx.archetype);
     // combat_crit is a recording and plays on every crit against a non-boss.
     // A boss is exempt by design (a crit sting is the wrong beat mid-boss

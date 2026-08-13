@@ -1,0 +1,101 @@
+import type { MobTemplate } from '../types';
+
+export const NECROMANCY_TEMPORARY_UNDEAD_SLOTS: Readonly<Record<string, number>> = {
+  necromancy_skeletal_warrior: 1,
+  necromancy_bone_mage: 1,
+  necromancy_gravewing: 1,
+};
+
+export function isTemporaryNecromancyUndeadTemplateId(templateId: string): boolean {
+  return NECROMANCY_TEMPORARY_UNDEAD_SLOTS[templateId] !== undefined;
+}
+
+export const NECROMANCY_MOBS: Record<string, MobTemplate> = {
+  graveguard: {
+    id: 'graveguard',
+    name: 'Graveguard',
+    minLevel: 1,
+    maxLevel: 60,
+    family: 'undead',
+    hpBase: 85,
+    hpPerLevel: 30,
+    dmgBase: 5,
+    dmgPerLevel: 1.2,
+    attackSpeed: 2.2,
+    armorPerLevel: 42,
+    moveSpeed: 5,
+    aggroRadius: 8,
+    loot: [],
+    scale: 1.05,
+    color: 0x8aa89a,
+    petRole: 'melee_tank',
+    petCanTaunt: true,
+  },
+  necromancy_skeletal_warrior: {
+    id: 'necromancy_skeletal_warrior',
+    name: 'Skeletal Warrior',
+    minLevel: 1,
+    maxLevel: 60,
+    family: 'undead',
+    hpBase: 28,
+    hpPerLevel: 11,
+    dmgBase: 2.5,
+    dmgPerLevel: 0.65,
+    attackSpeed: 1.8,
+    armorPerLevel: 16,
+    moveSpeed: 5.4,
+    aggroRadius: 8,
+    loot: [],
+    scale: 0.85,
+    color: 0xc7d0bd,
+    petCleave: { radius: 4, mult: 0.45, cooldown: 6 },
+  },
+  necromancy_bone_mage: {
+    id: 'necromancy_bone_mage',
+    name: 'Bone Mage',
+    minLevel: 1,
+    maxLevel: 60,
+    family: 'undead',
+    hpBase: 22,
+    hpPerLevel: 9,
+    dmgBase: 3.5,
+    dmgPerLevel: 0.75,
+    attackSpeed: 2.2,
+    armorPerLevel: 10,
+    moveSpeed: 5.1,
+    aggroRadius: 8,
+    loot: [],
+    scale: 0.8,
+    color: 0x9bc5b4,
+    petRanged: {
+      range: 25,
+      school: 'shadow',
+      ability: 'bone_mage_shadow_bolt',
+      spellVuln: { amp: 0.05, duration: 6 },
+    },
+  },
+  necromancy_gravewing: {
+    id: 'necromancy_gravewing',
+    name: 'Gravewing',
+    minLevel: 1,
+    maxLevel: 60,
+    family: 'undead',
+    elite: true,
+    // Gravewing keeps its elite durability and area profile, but its sustained
+    // weapon budget matches the other persistent Dominion choices. Army of the
+    // Dead still makes the missing archetypes fight together temporarily.
+    hpBase: 38,
+    hpPerLevel: 14,
+    dmgBase: 2,
+    dmgPerLevel: 1.25,
+    attackSpeed: 1.8,
+    armorPerLevel: 28,
+    moveSpeed: 5.6,
+    aggroRadius: 8,
+    loot: [],
+    scale: 1.1,
+    color: 0x51406b,
+    petCanTaunt: false,
+    petCleave: { radius: 5, mult: 0.65, cooldown: 5 },
+  },
+};

@@ -7,7 +7,7 @@ import type { SimEvent } from '../src/sim/types';
 import { FAKE_PARSE_FLAGS, type FakeSim, fakeSim } from './helpers/parse_fake_sim';
 
 function player(id: number): RecorderEntityView {
-  return { id, templateId: 'mage', level: 20, dead: false };
+  return { id, templateId: 'mage', name: `Player${id}`, level: 20, dead: false };
 }
 
 const FLAGS = FAKE_PARSE_FLAGS;
@@ -72,6 +72,7 @@ function seedDungeon(sim: FakeSim, overrides: Partial<InstanceSlotView> = {}): I
   sim.entities.set(500, {
     id: 500,
     templateId: 'morthen',
+    name: 'Morthen the Gravecaller',
     level: 20,
     hp: 5000,
     maxHp: 5000,
@@ -85,6 +86,7 @@ function seedDungeon(sim: FakeSim, overrides: Partial<InstanceSlotView> = {}): I
   sim.entities.set(501, {
     id: 501,
     templateId: 'crypt_skeleton',
+    name: 'Crypt Skeleton',
     level: 19,
     hp: 400,
     maxHp: 400,
@@ -134,6 +136,12 @@ describe('DungeonSegmenter via ParseRecorder', () => {
 
     const close = records.find((r) => r.t === 'fight_close');
     expect(close).toMatchObject({ outcome: 'kill', endedTick: 30 });
+    // The actor roster names every tracked hostile npc so the dashboard can
+    // label mob entity ids instead of showing raw numbers.
+    expect((close as { actors?: { id: number; name: string }[] }).actors).toContainEqual({
+      id: 500,
+      name: 'Morthen the Gravecaller',
+    });
     const deathEvents = records.filter(
       (r) => r.t === 'ev' && (r.ev as { type: string }).type === 'death',
     );

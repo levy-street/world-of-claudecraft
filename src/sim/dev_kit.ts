@@ -286,9 +286,21 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
     const shield = bestBy(shields, score);
     if (shield) equip.offhand = shield.id;
   } else if (role.hands === 'dualWield') {
+    // A dual-wield spec wants a ONE-hander in the main hand so the second
+    // weapon fits beside it (the same demotion the shield branch does): the
+    // raw best-score pick is often a two-hander, and the equip path would
+    // then rightly refuse the offhand, leaving the hand empty.
+    const oneHand = bestBy(
+      weapons.filter((item) => !isTwoHanded(item)),
+      score,
+    );
+    if (oneHand) equip.mainhand = oneHand.id;
     const offhand = bestBy(
       weapons.filter(
-        (item) => item.id !== equip.mainhand && canEquipItemInSlot(cls, item, 'offhand', spec),
+        (item) =>
+          item.id !== equip.mainhand &&
+          !isTwoHanded(item) &&
+          canEquipItemInSlot(cls, item, 'offhand', spec),
       ),
       score,
     );
@@ -296,7 +308,9 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
     // Fall back to a held offhand rather than leaving the slot empty. Reached when a
     // role claims dual-wield that canDualWield refuses, or when the pool holds no
     // legal second weapon: either way an empty hand is worse than a held item.
-    else if (mainhand && !isTwoHanded(mainhand)) {
+    // Guard on the RESOLVED mainhand: the demotion above may have replaced the
+    // raw two-hand pick the local variable still holds.
+    else if (equip.mainhand && !isTwoHanded(ITEMS[equip.mainhand])) {
       const held = bestBy(
         pool.filter((item) => item.kind === 'held_offhand' && canEquipItem(cls, item)),
         score,

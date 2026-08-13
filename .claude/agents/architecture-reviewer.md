@@ -56,14 +56,16 @@ a real determinism regression is far worse than a low-confidence false alarm.
    (`npx vitest run tests/parity`). A red or regenerated draw digest alongside a non-trivial
    change is BLOCKING.
 
-3. **Tick-phase order.** `tick()` is load-bearing. The ground-AoE pass (`tickGroundAoEs`, in
-   `entity_roster.ts`) runs early in the tick prologue, just after the pending-mob-respawn and
-   world-boss passes (the `lap?.(...)` markers in `tick()` are the authoritative phase order),
-   and it draws rng; dead players still tick timers/auras; the end-of-tick system block runs in a
-   FIXED order (duels -> arena -> trades -> loot -> instances -> delves -> market ->
-   delayedEvents), then the grid refresh last. The `engagedPids` combat-flag pass stays INLINE in
-   `tick()` and is never moved into a slice. Flag any relocated `tick*`/`update*` call, any
-   reordered phase, any `engagedPids` move.
+3. **Tick-phase order.** `tick()` is load-bearing, and the `lap?.(...)` markers inside it are
+   the ONLY authoritative phase order: read them from the current tree, never from a memorized
+   enumeration (system phases are added over time, so any hardcoded list is stale by
+   construction). The ground-AoE pass (`tickGroundAoEs`, in `entity_roster.ts`) runs early in
+   the tick prologue, just after the pending-mob-respawn and world-boss passes, and it draws
+   rng; dead players still tick timers/auras; the end-of-tick system block runs in the FIXED
+   order the lap markers spell out, with the grid refresh last. The `engagedPids` combat-flag
+   pass stays INLINE in `tick()` and is never moved into a slice. Flag any relocated
+   `tick*`/`update*` call, any phase reordered relative to the current markers, any
+   `engagedPids` move.
 
 4. **Shared entry points stay reachable through the seam.** Methods called from multiple foreign
    hot paths (for example `mobSwing`, `updateRangedPetAttack`, `pulseGroundAoE` whose second

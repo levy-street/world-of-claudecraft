@@ -1,11 +1,13 @@
 // Pure per-element graphics-tier knobs (v0.16.0). Now
 // that every hot HUD element is a core+painter, each per-element cost knob
 // becomes a pure function of the STATIC ui effects tier (the data-fx-level the
-// applier stamps from graphicsPresetLabel), NEVER the FPS governor. That is the
+// applier stamps from graphicsPresetLabel), NEVER the FPS governor. A narrow
+// actionability input may only bypass shedding and restore full cadence, as the
+// Rift minimap does for lethal mechanics. That is the
 // two-controller hazard: the auto-governor
 // cannot measure HUD/compositor cost, so the HUD effect tier is owned by the preset the
-// player chose. This module is the single home of that mapping, so a knob can only move
-// when the static preset moves.
+// player chose. This module is the single home of that mapping, so no hidden
+// runtime controller can move a knob.
 //
 // This file is host-agnostic and DOM/Three-free: it imports nothing at runtime (only the
 // UiEffectsTier TYPE, erased at compile time), references no governor, and uses no DOM
@@ -58,8 +60,9 @@ export function fctTtlScale(tier: UiEffectsTier): number {
 }
 
 // ---------------------------------------------------------------------------
-// Minimap: the canvas redraw cadence. The marker core + painter are
-// unchanged; only how often the Hud calls them is tiered.
+// Minimap: the canvas redraw cadence. The marker core + painter are unchanged;
+// only how often the Hud calls them is tiered. A reaction-critical surface may
+// disable the low-tier shed, but can never become slower than its base tier.
 // ---------------------------------------------------------------------------
 
 /** Minimum ms between minimap redraws on low. The Hud drives the minimap from its
@@ -68,9 +71,11 @@ export function fctTtlScale(tier: UiEffectsTier): number {
 export const MINIMAP_REDRAW_INTERVAL_LOW_MS = 250;
 
 /** Minimum ms between minimap redraws for `tier`. 0 (full tiers) means "no extra
- *  throttle" (redraw every fastHud tick = the unchanged ~10Hz); low throttles. */
-export function minimapRedrawIntervalMs(tier: UiEffectsTier): number {
-  return tier === 'low' ? MINIMAP_REDRAW_INTERVAL_LOW_MS : 0;
+ * throttle" (redraw every fastHud tick = the unchanged ~10Hz). A surface with
+ * lethal dynamic mechanics also stays at that full cadence on low, so a graphics
+ * preset can never delay information the player must immediately react to. */
+export function minimapRedrawIntervalMs(tier: UiEffectsTier, fullCadenceRequired = false): number {
+  return tier === 'low' && !fullCadenceRequired ? MINIMAP_REDRAW_INTERVAL_LOW_MS : 0;
 }
 
 // ---------------------------------------------------------------------------

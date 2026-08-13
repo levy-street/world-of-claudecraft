@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the db layers so no Postgres is needed; the router logic is under test.
 vi.mock('../server/db', () => ({
+  DATABASE_URL: 'postgres://test:test@127.0.0.1:1/test',
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   findAccount: vi.fn(),
   touchLogin: vi.fn(),
@@ -101,7 +102,9 @@ import {
   configureAdminPlayersCap,
   handleAdminApi,
   parsePageParams,
+  resetAdminGeneralChatRateLimitDepsForTests,
   resetAdminPlayersCapForTests,
+  setAdminGeneralChatRateLimitDepsForTests,
 } from '../server/admin';
 import { resetAdminActivityCacheForTests } from '../server/admin_activity_cache';
 import {
@@ -251,6 +254,7 @@ const fakeGameState = {
   reloadChatFilter: vi.fn(async () => {}),
   liftChatMuteLive: vi.fn(),
   resetChatStrikesLive: vi.fn(),
+  applyGeneralChatRateLimitLive: vi.fn(),
   isIpBlocked: vi.fn(() => false),
   reloadBlockedIps: vi.fn(async () => {}),
   disconnectByIp: vi.fn(),
@@ -277,6 +281,11 @@ beforeEach(() => {
   resetModerationQueueCacheForTests();
   resetAdminGuildListReadsForTests();
   resetAdminPlayersCapForTests();
+  resetAdminGeneralChatRateLimitDepsForTests();
+  setAdminGeneralChatRateLimitDepsForTests({
+    set: async (input) => ({ before: null, after: input.rateLimit, changed: true }),
+    isAdminAccount: async () => false,
+  });
   // The per-account failed-login throttle (server/ratelimit.ts) is real, module-level
   // state; reset it so one test's failures never leak into the next.
   resetAuthFailures();
@@ -1071,6 +1080,7 @@ describe('admin api auth', () => {
       chatMutedUntil: null,
       chatMuteReason: '',
       chatStrikes: 0,
+      generalChatRateLimit: null,
       isAi: false,
       isStreamer: false,
       streamerLinks: {},
@@ -1094,7 +1104,7 @@ describe('admin api auth', () => {
     expect(res.body.data.account.online).toBe(true);
   });
 
-  it('includes the in-memory online state in account detail without another query', async () => {
+  it('includes the in-memory online state and General chat policy in account detail', async () => {
     vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(accountDetail).mockResolvedValue({
@@ -1109,6 +1119,7 @@ describe('admin api auth', () => {
       chatMutedUntil: null,
       chatMuteReason: '',
       chatStrikes: 0,
+      generalChatRateLimit: null,
       isAi: false,
       isStreamer: false,
       streamerLinks: {},
@@ -1128,6 +1139,7 @@ describe('admin api auth', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body.data.online).toBe(true);
+    expect(res.body.data.generalChatRateLimit).toBeNull();
     expect(accountDetail).toHaveBeenCalledWith(9);
   });
 
@@ -1832,6 +1844,7 @@ describe('admin api chat filter', () => {
       chatMutedUntil: null,
       chatMuteReason: '',
       chatStrikes: 0,
+      generalChatRateLimit: null,
       isAi: false,
       isStreamer: false,
       streamerLinks: {},

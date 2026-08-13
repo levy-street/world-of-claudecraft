@@ -6,6 +6,7 @@ export function spellCritBonusFromAuras(p: Entity): number {
   let bonus = 0;
   for (const aura of p.auras) {
     if (aura.kind === 'buff_spellcrit') bonus += aura.value;
+    else if (aura.kind === 'sacred_form') bonus += aura.value2 ?? 0.05;
   }
   return bonus;
 }

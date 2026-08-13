@@ -31,6 +31,11 @@ describe('deed_i18n English resolution', () => {
     expect(deedName('removed_deed')).toBe('removed_deed');
     expect(deedDesc('removed_deed')).toBe('');
     expect(deedTitleText('removed_deed')).toBe('');
+    // Prototype keys index truthy on a plain object; the hasOwn guard keeps
+    // the raw-id contract for a hostile or drifted id.
+    expect(deedName('__proto__')).toBe('__proto__');
+    expect(deedDesc('constructor')).toBe('');
+    expect(deedTitleText('__proto__')).toBe('');
   });
 
   it("returns title text only for title-reward deeds, '' otherwise (the hide gate)", () => {
@@ -44,14 +49,16 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 259 deeds x (name + desc) + the 31 shipped title rewards (both counts
+    // 271 deeds x (name + desc) + the 42 shipped title rewards (both counts
     // pinned by tests/deeds_content.test.ts): the Drakelands brood pair, the
     // four Thornhollow Fields battleground deeds, the Rift coverage pair
     // (dgn_rift, dgn_rift_s_rank), the seven per-craft rare-tier profession
-    // deeds, and the twelve remaining starter-zone chronicle pairs, none of
-    // which carry a title reward.
-    expect(manifest.length).toBe(262 * 2 + 34);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(34);
+    // deeds, the twelve remaining starter-zone chronicle pairs, the four
+    // Reliquary Curator rank bridges (3 titles + 1 border; the border has no
+    // title manifest row), the three WARFARE lifetime-honor rank titles, and
+    // the five Phase 18 Reliquary completion-ladder titles.
+    expect(manifest.length).toBe(271 * 2 + 42);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(42);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',
@@ -206,6 +213,11 @@ describe('deed locale chunks (the per-base-locale release fill)', () => {
   it('keeps every value free of em/en dashes and emoji (these files sit outside the overlay copy-scan exemption)', () => {
     const forbidden =
       /[\u{2013}\u{2014}\u{2015}]|[\u{1F000}-\u{1FAFF}]|[\u{1F1E6}-\u{1F1FF}]|[\u{2600}-\u{27BF}]|\u{FE0F}/u;
+    // Prove the guard trips: a regex typo would otherwise make every assertion
+    // below pass vacuously. Escape form on purpose, so this file stays clean
+    // under the repo copy scan that the regex itself enforces.
+    expect(forbidden.test('a\u2014b')).toBe(true);
+    expect(forbidden.test('a-b')).toBe(false);
     for (const lang of tableLocales()) {
       for (const [id, entry] of Object.entries(tables[lang])) {
         for (const field of ['name', 'desc', 'title'] as const) {
@@ -251,6 +263,11 @@ describe('deed locale chunks (the per-base-locale release fill)', () => {
   it('dialect overrides carry only real catalog ids and obey the same copy rules', () => {
     const forbidden =
       /[\u{2013}\u{2014}\u{2015}]|[\u{1F000}-\u{1FAFF}]|[\u{1F1E6}-\u{1F1FF}]|[\u{2600}-\u{27BF}]|\u{FE0F}/u;
+    // Prove the guard trips: a regex typo would otherwise make every assertion
+    // below pass vacuously. Escape form on purpose, so this file stays clean
+    // under the repo copy scan that the regex itself enforces.
+    expect(forbidden.test('a\u2014b')).toBe(true);
+    expect(forbidden.test('a-b')).toBe(false);
     for (const [dialect, table] of Object.entries(overrides)) {
       const base = dialect === 'es_ES' ? tables.es : tables.fr_FR;
       for (const [id, entry] of Object.entries(table)) {

@@ -79,8 +79,8 @@ describe('hunter aspect mutual exclusion', () => {
 
 describe('class self-buff mutual exclusion groups', () => {
   it('marks paladin auras and warrior stances with their own exclusive groups', () => {
-    expect(ABILITIES.devotion_aura.exclusiveGroup).toBe('paladin_aura');
-    expect(ABILITIES.retribution_aura.exclusiveGroup).toBe('paladin_aura');
+    expect(ABILITIES.devotion_ward.exclusiveGroup).toBe('paladin_devotion');
+    expect(ABILITIES.retribution_aura.exclusiveGroup).toBe('paladin_devotion');
     expect(ABILITIES.battle_stance.exclusiveGroup).toBe('warrior_stance');
     expect(ABILITIES.defensive_stance.exclusiveGroup).toBe('warrior_stance');
     expect(ABILITIES.berserker_stance.exclusiveGroup).toBe('warrior_stance');
@@ -90,15 +90,19 @@ describe('class self-buff mutual exclusion groups', () => {
     const sim = new Sim({ seed: 42, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(16); // devotion(1) + retribution(16) known
 
-    castSelfBuff(sim, 'devotion_aura');
-    expect(sim.player.auras.filter((a) => a.id.endsWith('_aura')).map((a) => a.id)).toEqual([
-      'devotion_aura',
-    ]);
+    castSelfBuff(sim, 'devotion_ward');
+    expect(
+      sim.player.auras
+        .filter((a) => a.id === 'devotion_ward' || a.id === 'retribution_aura')
+        .map((a) => a.id),
+    ).toEqual(['devotion_ward']);
 
     castSelfBuff(sim, 'retribution_aura');
-    expect(sim.player.auras.filter((a) => a.id.endsWith('_aura')).map((a) => a.id)).toEqual([
-      'retribution_aura',
-    ]);
+    expect(
+      sim.player.auras
+        .filter((a) => a.id === 'devotion_ward' || a.id === 'retribution_aura')
+        .map((a) => a.id),
+    ).toEqual(['retribution_aura']);
   });
 
   it('keeps only one self-applied warrior stance active', () => {

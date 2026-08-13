@@ -147,11 +147,31 @@ describe('crest image fallback', () => {
     expect(iconMocks.procedural).toHaveBeenCalledWith('crest', 'family_beast', 64);
   });
 
+  it('clears subject alt text only when the procedural crest fallback is decorative', () => {
+    const decorative = fakeImage();
+    decorative.image.alt = 'Forest Wolf';
+    decorative.image.setAttribute('data-crest-fallback-id', 'family_beast');
+    decorative.image.setAttribute('data-crest-fallback-size', '96');
+    decorative.image.setAttribute('data-crest-fallback-decorative', 'true');
+    const accessible = fakeImage();
+    accessible.image.alt = 'Portrait of Ada';
+    accessible.image.setAttribute('data-crest-fallback-id', 'class_mage');
+    accessible.image.setAttribute('data-crest-fallback-size', '96');
+
+    hydrateCrestImageFallbacks(fakeRoot(decorative.image, accessible.image));
+    decorative.emitError();
+    accessible.emitError();
+
+    expect(decorative.image.alt).toBe('');
+    expect(accessible.image.alt).toBe('Portrait of Ada');
+  });
+
   it('clears hydrated fallback state before a real portrait replaces the crest', () => {
     iconMocks.cached.mockReturnValue('data:image/png;base64,warmed');
     const { image, attrs, classes, emitError } = fakeImage();
     image.setAttribute('data-crest-fallback-id', 'class_druid');
     image.setAttribute('data-crest-fallback-size', '96');
+    image.setAttribute('data-crest-fallback-decorative', 'true');
     hydrateCrestImageFallbacks(fakeRoot(image));
     clearCrestImageFallback(image);
     image.src = 'data:image/png;base64,transparent-portrait';
@@ -160,6 +180,7 @@ describe('crest image fallback', () => {
 
     expect(attrs.has('data-crest-fallback-id')).toBe(false);
     expect(attrs.has('data-crest-fallback-size')).toBe(false);
+    expect(attrs.has('data-crest-fallback-decorative')).toBe(false);
     expect(classes.has('crest-image-fallback')).toBe(false);
     expect(image.style.backgroundImage).toBe('');
     expect(iconMocks.procedural).not.toHaveBeenCalled();
@@ -169,6 +190,9 @@ describe('crest image fallback', () => {
   it('emits the trusted hydration attributes expected by mounted image consumers', () => {
     expect(crestImageFallbackAttributes('class_mage', 96)).toBe(
       'data-crest-fallback-id="class_mage" data-crest-fallback-size="96"',
+    );
+    expect(crestImageFallbackAttributes('class_mage', 96, { decorative: true })).toBe(
+      'data-crest-fallback-id="class_mage" data-crest-fallback-size="96" data-crest-fallback-decorative="true"',
     );
     expect(() => crestImageFallbackAttributes('../mage', 96)).toThrow('unsafe crest fallback id');
     expect(() => crestImageFallbackAttributes('class_mage', 0)).toThrow(

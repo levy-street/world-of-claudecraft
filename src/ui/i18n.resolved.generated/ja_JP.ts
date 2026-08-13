@@ -127,6 +127,10 @@ export const ja_JP: EnTranslations = {
         "label": "新規20キットを装備",
         "description": "指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。"
       },
+      "biskit": {
+        "label": "BIS-20キットを装備",
+        "description": "指定したスペック向けの最高のエピック装備を全部位に装備します。装備品のみです。"
+      },
       "gold": {
         "label": "ゴールドを追加",
         "description": "現在の所持金にゴールドを追加します。"
@@ -240,7 +244,8 @@ export const ja_JP: EnTranslations = {
     },
     "hud": {
       "lowMana": "マナ低下",
-      "lowEnergy": "エネルギー低下"
+      "lowEnergy": "エネルギー低下",
+      "lowFocus": "集中値低下"
     },
     "talents": {
       "title": "タレント",
@@ -316,6 +321,25 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "断罪",
+      "fateThreadsLabel": "運命の糸",
+      "doomMeterUnlock": "苦痛リソースバーを移動",
+      "doomMeterLock": "苦痛リソースバーを固定",
+      "doomEmptyStatus": "断罪 {value}/{max}。",
+      "doomStatus": "断罪 {value}/{max}、残り {remaining}。",
+      "fateThreadsStatus": "運命の糸 {value}/{max}。",
+      "fateThreadsConsumeReady": "運命の糸が3本: 喰らうで追加の断罪へ紡げます。",
+      "fateThreadsSentenceReady": "運命の糸が3本: 宣告で消費するとダメージが18%増加します。"
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "魂の欠片",
+      "ruinMeter": "破滅",
+      "ruinStatus": "破滅 {value}/{max}"
+    },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "{name}を観戦中"
     },
@@ -373,7 +397,7 @@ export const ja_JP: EnTranslations = {
       "unavailable": "現在の状態ではスタック解除を使用できません。"
     },
     "fct": {
-      "absorbed": "{amount} 吸収",
+      "absorbed": "吸収（{amount}）",
       "cheap": "低コスト!"
     },
     "emotes": {
@@ -777,6 +801,11 @@ export const ja_JP: EnTranslations = {
       "resetAction": "リセット",
       "note": "チャットのタブ列をドラッグするとウィンドウを移動でき、右下のグリップをドラッグするとサイズを変更できます。リセットすると既定の位置とサイズに戻ります。"
     },
+    "chatQuota": {
+      "limitReached": "一般チャットの上限に達しました。{seconds}後にもう一度お試しください。",
+      "pending": "直前の一般チャットのメッセージは送信中です。少し待ってからもう一度お試しください。",
+      "unavailable": "一般チャットは一時的に利用できません。しばらくしてからもう一度お試しください。"
+    },
     "swing": {
       "ready": "攻撃",
       "seconds": "{seconds}秒"
@@ -787,6 +816,14 @@ export const ja_JP: EnTranslations = {
     },
     "rest": {
       "resting": "休息中"
+    },
+    "paladin": {
+      "devotion": "献身",
+      "devotionValue": "献身 {value} / {max}",
+      "devotionAscensionCharges": "献身 {value} / {max}。昇天のチャージ数: {charges}。",
+      "devotionAscensionLast": "献身 {value} / {max}。昇天の最後のチャージ。",
+      "ascensionLastAnnouncement": "昇天の最後のチャージ",
+      "ascensionSpenderAria": "アクションスロット {slot}: {ability}。昇天のチャージを1消費する。"
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -819,6 +856,7 @@ export const ja_JP: EnTranslations = {
       "deeds": "功績",
       "mounts": "マウント",
       "professions": "専門技能",
+      "reliquary": "聖遺物庫",
       "nameplates": "ネームプレート",
       "haptics": "振動",
       "hapticsOff": "振動オフ",
@@ -859,6 +897,14 @@ export const ja_JP: EnTranslations = {
       "bodyWithVersion": "World of ClaudeCraft のバージョン {version} が利用可能です。今すぐアップデートして最新の修正と改善を入手しましょう。",
       "notNow": "後で",
       "update": "更新"
+    },
+    "otaUpdate": {
+      "title": "ゲームアップデート",
+      "downloading": "アップデートをダウンロード中：{percent}",
+      "applying": "アップデートをダウンロードしました。適用のためゲームを再起動しています。",
+      "incompatible": "プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。",
+      "continueAnyway": "更新せずに続行",
+      "progressLabel": "アップデートのダウンロード進行状況"
     },
     "cameraPrompt": {
       "title": "カメラを選択",
@@ -961,6 +1007,7 @@ export const ja_JP: EnTranslations = {
       "emoteWheel": "エモートホイール",
       "targetFriendly": "最も近い味方をターゲット",
       "targetFriendlyNext": "味方ターゲットを順に切り替え",
+      "targetPrev": "ターゲットを逆順に切り替え",
       "discord": "Discord",
       "valecup": "ヴェイルカップ",
       "bgFlag": "戦場フラッグアクション",
@@ -1743,7 +1790,7 @@ export const ja_JP: EnTranslations = {
         "agi": "反射神経と狙いを鋭くし、複数の戦闘ステータスを向上させます。",
         "sta": "肉体を強化し、最大体力と休憩中の体力回復速度を高めます。",
         "int": "術者の最大マナを増やし、呪文のクリティカル発生率を向上させます。",
-        "spi": "戦闘外で休憩している間の、術者のマナ回復速度を速めます。",
+        "spi": "術者のマナが戻る速さを高めます。その大半は戦闘外で休んでいる間に流れ込み、一部は戦闘中でも戻り続けます。",
         "armor": "物理攻撃のダメージを軽減します。軽減量は格下の攻撃者に対してより大きくなり、上限は75%です。",
         "attackPower": "武器による攻撃を強化します。攻撃力14ごとに秒間ダメージが1上昇します。",
         "spellPower": "呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。",
@@ -1767,6 +1814,7 @@ export const ja_JP: EnTranslations = {
         "spellCritPct": "呪文クリティカル +{value}%",
         "healthRegen": "休憩中、5秒ごとに体力が約{value}回復",
         "manaRegen": "休憩中、5秒ごとにマナが約{value}回復",
+        "manaRegenCombat": "戦闘中、5秒ごとにマナが約{value}回復",
         "damageReduction": "レベル{level}の攻撃者に対するダメージ軽減: {value}%",
         "dpsFromAp": "攻撃の秒間ダメージを{value}上昇させます"
       },
@@ -1881,6 +1929,48 @@ export const ja_JP: EnTranslations = {
         "few": "Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。",
         "many": "Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。",
         "other": "Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。"
+      },
+      "reliquaryRetroSummary": {
+        "one": "聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。",
+        "few": "聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。",
+        "many": "聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。",
+        "other": "聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。"
+      },
+      "reliquarySearchResults": {
+        "one": "{count} 件見つかりました。",
+        "few": "{count} 件見つかりました。",
+        "many": "{count} 件見つかりました。",
+        "other": "{count} 件見つかりました。"
+      },
+      "reliquaryToGo": {
+        "one": "あと {count} 件",
+        "few": "あと {count} 件",
+        "many": "あと {count} 件",
+        "other": "あと {count} 件"
+      },
+      "reliquaryObtainedTimes": {
+        "one": "入手回数：{count} 回",
+        "few": "入手回数：{count} 回",
+        "many": "入手回数：{count} 回",
+        "other": "入手回数：{count} 回"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}、収蔵済み、入手回数 {count} 回",
+        "few": "{name}、収蔵済み、入手回数 {count} 回",
+        "many": "{name}、収蔵済み、入手回数 {count} 回",
+        "other": "{name}、収蔵済み、入手回数 {count} 回"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回",
+        "few": "{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回",
+        "many": "{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回",
+        "other": "{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回"
+      },
+      "deedsRetroSummary": {
+        "one": "年代記が追いつきました: {count} 件の功績を記録。",
+        "few": "年代記が追いつきました: {count} 件の功績を記録。",
+        "many": "年代記が追いつきました: {count} 件の功績を記録。",
+        "other": "年代記が追いつきました: {count} 件の功績を記録。"
       }
     },
     "bugReport": {
@@ -2109,6 +2199,10 @@ export const ja_JP: EnTranslations = {
       "itemAriaBound": "{item}、数量 {count}、バインド済みの品",
       "itemAriaMasterwork": "{item}、数量 {count}、傑作",
       "itemAriaQuest": "{item}、数量 {count}、クエストアイテム",
+      "itemAriaLocked": "{item}、数量 {count}、ロック済み",
+      "itemLockedLine": "ロック中",
+      "lockItem": "アイテムをロック",
+      "unlockItem": "アイテムのロック解除",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -2151,18 +2245,36 @@ export const ja_JP: EnTranslations = {
     "auraEffect": {
       "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
       "hot": "{interval}秒ごとに体力を{value}回復する",
+      "mendingCurrent": "{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する",
+      "mendingCurrentPercent": "最大体力の{pct}%分の回復量を流転の癒し用に蓄える",
       "absorb": "{value}のダメージを吸収する",
       "healAbsorb": "受ける回復を{value}吸収する",
       "thorns": "攻撃者に{value}の{school}ダメージを与える",
+      "stasis": "無敵になるが行動できない",
       "slow": "移動速度を{pct}%低下させる",
       "speed": "移動速度を{pct}%上昇させる",
       "attackSpeedSlow": "攻撃速度を{pct}%低下させる",
       "attackSpeedFast": "攻撃速度を{pct}%上昇させる",
       "haste": "攻撃速度と詠唱速度を{pct}%上昇させる",
+      "imbueRange": "武器付与: ヴァーディクトで{min}から{max}の追加ダメージ",
+      "petDamage": "ペットのダメージが{pct}%増加する",
+      "petHaste": "ペットの行動速度が{pct}%上昇する",
+      "spellDamage": "呪文ダメージが{pct}%増加する",
+      "spellHaste": "呪文の詠唱速度が{pct}%上昇する",
+      "sated": "別のグループ加速効果を受けられない",
+      "cauterizeFatigue": "コーテライズは次の致死ダメージを防げない",
+      "castShield": "ダメージで詠唱が中断または遅延しない",
       "dmgDone": "与えるダメージを{pct}%上昇させる",
       "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
       "heatingUp": "次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます",
       "elementalConvergencePrimed": "次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します",
+      "hunterFerocity": "群れの獰猛さ{stacks}スタック：ペットの与えるダメージが{pct}%上昇",
+      "cooldownCap": "この時間枠でクールダウン短縮を{used}/{cap}秒使用済み",
+      "funeralHarvestLock": "フューネラル・ハーベストはまだ次の魂の欠片を生成できない",
+      "leadenHexLock": "レドン・ヘックスはまだこの対象を再び移動不能にできない",
+      "forbiddenReflectionReady": "次の対象となるウォーロックのクールダウンを再使用できる",
+      "forbiddenReflectionLock": "フォービドゥン・リフレクションはまだ再準備できない",
+      "internalCooldown": "タイマー終了までこの効果は再発動しない",
       "carriedFlag": "敵の旗を運搬中です。このバフを解除すると旗を落とします。",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
       "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
@@ -2177,6 +2289,13 @@ export const ja_JP: EnTranslations = {
       "revengeFree": "次の意趣返しの怒りコストが0になる",
       "victoryRush": "勝利の追撃が使用可能",
       "maxHpPct": "最大体力を{pct}%上昇させる",
+      "enrage": "与えるダメージが{damagePct}%、攻撃速度が{hastePct}%、移動速度が{movePct}%上昇する",
+      "suddenDeath": "次のエグゼキュートは怒気を消費せず、体力条件を無視する",
+      "aoeEcho": "残り{charges}回：単体アビリティが近くの最大{targets}体にも{pct}%のダメージを与える",
+      "sureCrit": "次のダメージアビリティ{charges}回が必ずクリティカルになる",
+      "temporalEcho": "術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる",
+      "arcaneCharge": "秘術チャージ{stacks}：エーテル・サージのダメージが{damagePct}%増加、詠唱が{castPct}%短縮、マナ消費が{costMult}倍になる",
+      "physicalReduction": "受ける物理ダメージが{pct}%減少する",
       "temporalHourglass": "ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。",
       "tongues": "詠唱時間を{pct}%増加させる",
       "combustionCrit": "火炎呪文が必ずクリティカルになる",
@@ -2186,6 +2305,22 @@ export const ja_JP: EnTranslations = {
       "freeCast": "次の詠唱のコストがゼロになる",
       "instantCast": "次の詠唱時間のある呪文が即時発動になる",
       "cheapCast": "次の呪文のコストが{pct}%減少する",
+      "radiantResonance": "次の癒やしの光が即時発動になる。または次の暁の抱擁のマナ消費が{pct}%減少し、詠唱時間が{castTime}秒になる",
+      "solarReprisal": "次の陽光の円盤はマナを消費せず、クールダウンを無視してダメージが{pct}%増加する。恩寵の槌はクールダウンを無視し、与えたダメージの100%を回復する。または癒やしの光が即時発動になる",
+      "dawnsWrath": "制裁の鎚: HP不問 · +1回 · CD0 · ダメージ+{pct}%",
+      "venomRitual": "毒の儀式:{stacks}/{max}段階。「卑劣な突き」「邪悪な斬撃」「毒針」で1段階ずつ進む。{max}段階で「永の眠り」が「毒裂き」に変化する",
+      "gloam": "薄闇の蓄え:{stacks}/{max}段階。ダスクヴェールから使った先制技ごとに1段階進む。{max}段階で先制技がステルスなしで使用可能になり、次の1回はコストなしで3段階すべてを消費し、ヴェールストライクが始まる",
+      "redline": "レッドライン:{stacks}/{max}ピップ。「ヘイメーカー」ごとにピップが1増える。「消灯」はピップごとに{pct}%強化され、レッドラインを終了させる。先に時間切れになるとノックアウトは失われる",
+      "veilstrikeWindow": "影に包まれている:ダスクヴェール専用の先制技をどの角度からでも使用でき、与ダメージが{pct}%増加する",
+      "veiledEdge": "次に放つ「潜伏者の一撃」は2倍のダメージを与える",
+      "duskEconomy": "アビリティの消費エナジーが{pct}%減少する",
+      "moontide": "月潮：{stacks}/{max}段階。月翼形態での野生の稲妻・天墜・月の種の詠唱ごとに1段階進む。{max}段階で月の種はムーンサージに、天墜は陽醒に変化し、どちらを使っても3段階すべてを消費する",
+      "oldBlood": "古き血：{stacks}/{max}段階。裂き爪・皮剥ぎ・血の亀裂・血噛み・薙ぎ払う爪・骨砕きの命中ごとに1段階蓄える。{max}段階で、ウルフフォームでは血噛みが血の収穫に、ブルーインフォームでは骨砕きが骨髄砕きに変化する",
+      "verdance": "翠成：{stacks}/{max}段階。新しく植えた野生の芽吹きまたは二度目の開花ごとに1段階進む。{max}段階でスウィフトメンドが満開に変化する",
+      "freeExecute": "次の対象となる処刑アビリティはコストを消費しない",
+      "resourceSap": "{interval}秒ごとに現在のリソースを{value}回復する",
+      "nextAttackCrit": "次の攻撃が必ずクリティカルになる",
+      "healEcho": "体力が{threshold}%未満になると体力を{value}回復する",
       "increase": {
         "ap": "攻撃力を{value}上昇させる",
         "sp": "呪文の威力を{value}上昇させる",
@@ -2224,6 +2359,8 @@ export const ja_JP: EnTranslations = {
       "mortalWound": "受ける回復量を{pct}%低下させる",
       "vulnerability": "受けるダメージを{pct}%増加させる",
       "physVuln": "受ける物理ダメージを{pct}%増加させる",
+      "bleedVuln": "受ける出血ダメージが{pct}%増加する",
+      "sourceVuln": "この効果を付与した術者から受けるダメージが{pct}%増加する",
       "spellVuln": "受ける魔法ダメージを{pct}%増加させる",
       "critVuln": "クリティカルを受ける確率を{pct}%増加させる",
       "costTax": "アビリティのコストを{pct}%増加させる",
@@ -2237,14 +2374,46 @@ export const ja_JP: EnTranslations = {
       "disarm": "武装解除: 武器攻撃を使用できない",
       "lockout": "呪文系統がロックされている",
       "imbue": "武器に追加効果が付与されている",
-      "imbueRange": "武器付与: ヴァーディクトで{min}から{max}の追加ダメージ",
+      "galeheartWeapon": "ウォースピリットの{steps}連撃サイクルを完了すると、その一撃が{count}回反響し、それぞれダメージの{pct}%の自然ダメージを与える",
+      "elementalTrance": "受けるダメージが{pct}%軽減される。与えた全ダメージの{mana}%がマナに変換される",
       "stealth": "隠密状態。移動速度が{pct}%低下する",
       "formBear": "ブルーインフォーム: 体力と防御力が上昇",
       "formCat": "キャットフォーム: 近接ダメージとエネルギー",
       "formTravel": "フリートフォーム: 移動速度が{pct}%上昇",
       "formFireball": "火球形態：移動速度が{pct}%上昇、攻撃と呪文は使用不可",
+      "formMoonkin": "ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する",
+      "formShadow": "グロームヴェイル形態：影ダメージが{pct}%増加する",
+      "resourceCount": "{value}/{max}",
+      "formLich": "ソウル・ランスが近くの最大{targets}体にも{pct}%のダメージを与える",
+      "afflictionEye": "マレディクト・ゲイズが{interval}秒ごとに攻撃し、この邪眼での効果は断罪を{pct}%生成する",
+      "afflictionEyeSecondary": "この邪眼での効果は断罪を{doomPct}%生成し、センテンスがここへ{echoPct}%のダメージで反響する",
+      "afflictionAccomplice": "対象となるダメージが断罪を{value}生成する。{interval}秒に1回まで",
+      "afflictionViolence": "報復は残り{charges}回。敵の攻撃で断罪を{doom}生成し、{damage}の影ダメージを返す",
+      "afflictionVicarious": "受けるダメージの{pct}%を転送または軽減し、断罪を最大{max}生成する",
+      "afflictionPossession": "ニードル・オブ・フェイト、ドレイン・ライフ、マレディクト・ゲイズ、センテンスを強化する",
+      "afflictionJudgment": "主邪眼の断罪生成が{eyePct}%増加し、センテンスのダメージが{sentencePct}%増加、最初の1回は断罪を{refund}返還する",
+      "afflictionLitany": "断罪獲得時、{radius}ヤード内の最大{targets}体に{damage}の影ダメージを与える。1秒に1回まで",
+      "afflictionFateThreads": "運命の糸{stacks}：センテンスのダメージが{sentencePct}%増加、またはドレイン・ライフの各ティックが断罪を{doom}追加生成する",
+      "afflictionConsumeThreads": "ドレイン・ライフが運命の糸{stacks}を消費し、各ティックで断罪を{doom}追加生成する",
+      "necromancyHarvestMark": "死亡時に魂の欠片を1個生成することがある",
+      "necromancyOssuaryMark": "あなたとアンデッドのダメージの{storedPct}%、ソウル・ランスはさらに{lancePct}%を蓄積する。再使用で爆発。死亡時は{radius}ヤード内で爆発し魂の欠片を1個生成する",
+      "necromancyDeathEcho": "旧仕様のデス・エコー。現在これを消費するアビリティはない",
+      "warlockAnchor": "{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する",
+      "formMetamorph": "悪魔形態：体格が{pct}%大きくなる。ほかのボーナスは別のバフで表示される",
+      "energyRegen": "エネルギー回復速度が{pct}%上昇する",
       "defensiveStance": "ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇",
       "righteousFury": "バーニングオース: 神聖ダメージによる脅威度が大幅に上昇",
+      "overpowerCharge": "チャージ{stacks}：次のメイミング・ストライクのダメージが{pct}%増加する",
+      "sweepingStrikes": "単体攻撃が近くの敵{targets}体にも{pct}%のダメージを与える",
+      "fingersOfFrost": "残り{charges}チャージ：アイス・ランスは対象を凍結扱いにし、凍結時ダメージ{pct}%を与える",
+      "brainFreeze": "次のフラーリィが即時発動し、クールダウンを無視する",
+      "wintersChill": "残り{charges}チャージ：対象となる呪文はこの敵を凍結扱いにする",
+      "icicles": "アイシクル{value}/{max}。{max}でグレイシャル・スパイクを使用できる",
+      "desolation": "残り{charges}チャージ：次のカオス・ボルトの詠唱が{castPct}%短縮、または次のレイン・オブ・ファイアが即着弾する",
+      "ruinousBrand": "残り{charges}回：直接呪文がここへ{otherPct}%のダメージを複製し、ここが主対象なら{selfPct}%を複製する",
+      "duskfireClaim": "対象の死亡時にルインを{value}得る",
+      "pyreGuardian": "{ruinInterval}秒ごとにルインを{ruin}生成し、{damageInterval}秒ごとに{radius}ヤード内へ{damage}の火ダメージを与える",
+      "perfectMoment": "エーテル・ダーツが秘術チャージを消費しない",
       "scale": "サイズが{pct}%増加",
       "jump": "ジャンプの高さが{pct}%増加",
       "school": {
@@ -3102,6 +3271,7 @@ export const ja_JP: EnTranslations = {
       "craftedToast": "製作しました:{name}",
       "craftedToastQty": "製作しました:{name} x{qty}",
       "insufficientMaterials": "材料が不足しています。",
+      "reagentLocked": "その素材はロックされています。",
       "unknownRecipe": "そのレシピは存在しません。",
       "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。",
       "comboRequires": "調律条件：{craftA} + {craftB}、ティア {tier}。",
@@ -3208,6 +3378,7 @@ export const ja_JP: EnTranslations = {
       "notHeld": "そのアイテムを所持していません。",
       "notDisenchantable": "それは魔力分解できません。",
       "notSalvageable": "それは解体できません。",
+      "salvageLocked": "そのアイテムはロックされています。",
       "disenchantBusy": "手が離せません。",
       "salvageBusy": "手が離せません。",
       "enchantBusy": "手が離せません。",
@@ -3459,6 +3630,135 @@ export const ja_JP: EnTranslations = {
         "dread_curse": "ドレッドカース（ヒロイック限定、タンク交代用の累積デバフ）"
       }
     },
+    "reliquary": {
+      "title": "聖遺物庫",
+      "close": "聖遺物庫を閉じる",
+      "countLabel": "聖遺物 {owned}/{total}",
+      "completionAria": "埋めた聖遺物：{owned}/{total}",
+      "curatorRank": "キュレーターランク {rank}",
+      "curatorUnranked": "未ランクのキュレーター",
+      "curatorRankName1": "見習いキュレーター",
+      "curatorRankName2": "戦利品の守り手",
+      "curatorRankName3": "マスターキュレーター",
+      "curatorRankName4": "グランドキュレーター",
+      "curatorRankName5": "エターナルキュレーター",
+      "rankUpBanner": "キュレーターランク {rank}：{name}",
+      "rankUpToast": "キュレーターランク {rank} に到達：{name}",
+      "borderWearableNote": "功績の書で{name}の枠飾りを着用できます。",
+      "sigilCaption": "キュレーターの印章",
+      "recentLabel": "最近の発見：",
+      "nearlyLabel": "もうすぐ完成：",
+      "nearlyJumpAria": "{name}を開く、{owned}/{total} 埋め済み",
+      "progressText": "{owned}/{total}",
+      "shelvesAria": "聖遺物庫の棚",
+      "navOverview": "概要",
+      "navConquerors": "征服者",
+      "navProfessions": "専門技能",
+      "navHorizons": "地平",
+      "navCountAria": "{shelf}：聖遺物 {owned}/{total} 埋め済み",
+      "shelfEmpty": "この棚にはまだページがありません。",
+      "pageComplete": "照耀済み",
+      "clearsLabel": "クリア {count} 回",
+      "srankClearsLabel": "Sランク・クリア {count} 回",
+      "retiredLabel": "絶版",
+      "personalLabel": "専用",
+      "backToShelf": "棚に戻る",
+      "gridAria": "{name} の聖遺物",
+      "pageProgressAria": "ページ進捗：聖遺物 {owned}/{total} 埋め済み",
+      "cellOwnedAria": "{name}、収蔵済み",
+      "cellMissingAria": "{name}、未発見",
+      "ownedTooltipStatus": "聖遺物庫に収蔵済み",
+      "missingTooltipStatus": "まだ見つかっていません",
+      "firstFindClears": "初回入手：クリア {count} 回目",
+      "unlockToast": "聖遺物を収蔵：{name}",
+      "illuminateBanner": "ページが照耀されました：{name}",
+      "illuminateToast": "{name} の聖遺物がすべて埋まりました。",
+      "illuminationBroadcastLine": "{name}が聖遺物庫のページ「{page}」を照耀しました",
+      "markFind": {
+        "masterwork_first": "初めての傑作",
+        "masterwork_weaponcrafting": "武器製作の傑作",
+        "masterwork_armorcrafting": "防具製作の傑作",
+        "masterwork_tailoring": "裁縫の傑作",
+        "masterwork_leatherworking": "皮革細工の傑作",
+        "masterwork_engineering": "工学の傑作",
+        "gather_event_pristine_vein": "無垢の鉱脈",
+        "gather_event_ancient_heartwood": "古代の心材",
+        "gather_event_moonlit_bloom": "月明かりの花",
+        "gather_event_perfect_specimen": "完璧な標本",
+        "slain_old_greyjaw": "討伐: 老グレイジョー",
+        "slain_mogger": "討伐: モガー",
+        "slain_grix_the_tunnelking": "討伐: トンネルキングのグリックス",
+        "slain_captain_verlan": "討伐: ヴァーラン隊長",
+        "slain_wraithbinder_maldrec": "討伐: 魂縛りマルドレク",
+        "slain_mirejaw_the_ravenous": "討伐: 貪るマイアジョー",
+        "slain_sloomtooth_the_drowned": "討伐: 溺れし者スルームトゥース",
+        "slain_sister_nhalia": "討伐: シスター・ナリア",
+        "slain_grubjaw": "討伐: 大食いグラブジョー",
+        "slain_ironvein_foreman": "討伐: 鉄脈の現場監督",
+        "slain_brutok_skullsmasher": "討伐: 頭蓋砕きブルトーク",
+        "slain_voskar_emberwing": "討伐: 燃え翼のヴォスカル",
+        "slain_marrowlord_varkas": "討伐: 髄王ヴァーカス",
+        "slain_old_cragmaw": "討伐: 老いたるクラッグモウ",
+        "slain_shardlord_kazzix": "討伐: 破片卿カジックス",
+        "slain_gleamstag": "討伐: グリームスタッグ",
+        "slain_old_marrowshell": "討伐: オールド・マロウシェル",
+        "slain_aurelhorn": "討伐: アウレルホーン、群れの長",
+        "slain_drakemaw_broodlord": "討伐: 火口の巣主"
+      },
+      "accountScopeBadge": "アカウント",
+      "accountScopeNote": "アカウント収集：このアカウントの全キャラクターで解除されます。",
+      "unknownRelic": "記録のない聖遺物",
+      "sourceBossDungeon": "{dungeon}の{boss}がドロップ",
+      "sourceBoss": "{boss}がドロップ",
+      "sourceZone": "{zone}で入手",
+      "sourceProfession": "{profession}で入手",
+      "sourceDeed": "功績「{deed}」の報酬",
+      "sourceVendor": "{vendor}が販売",
+      "sourceBossZone": "{zone}の{boss}がドロップ",
+      "sourceDelve": "デルヴ「{delve}」で入手",
+      "sourceRift": "{rank}ランク・リフトのクリアでドロップ",
+      "sourceQuest": "クエスト「{quest}」の報酬",
+      "sourceStore": "WOCストアで購入",
+      "sourceActivityCorpseHarvest": "敵の死体の採取で入手",
+      "sourceActivityMasterworkCraft": "傑作の製作で入手",
+      "sourceActivityRiftFirstClear": "ランク付きリフトの初回クリアを制したパーティーの全員に授与",
+      "cellMissingSourceAria": "{name}、未発見、{source}",
+      "cellOwnedClearsAria": "{name}、収蔵済み、初回入手はクリア {count} 回目",
+      "searchPlaceholder": "聖遺物を検索",
+      "searchAria": "名前で聖遺物庫を検索",
+      "searchEmpty": "該当する聖遺物はありません。",
+      "filterEmpty": "このフィルターに一致する聖遺物はありません。",
+      "filterGroupAria": "発見状況で聖遺物を絞り込む",
+      "gridKeyboardHint": "矢印キーで聖遺物を移動、Home キーと End キーで先頭と末尾に移動します。",
+      "filterAll": "すべて",
+      "filterOwned": "収蔵済み",
+      "filterMissing": "未発見",
+      "recentJumpAria": "{name} のページを開く",
+      "recentEmpty": "まだ発見はありません。これから収蔵した聖遺物がここに並びます。",
+      "nearlyEmpty": "完成が近いページはここに集まります。",
+      "stripNoMatch": "ここには検索に一致するものがありません。",
+      "shelfRecent": "最新の発見：{name}",
+      "shelfNoFinds": "この棚にはまだ何も収蔵されていません。",
+      "shelfOpenAria": "{name} の棚を開く、{owned}/{total} 埋め済み",
+      "sharedUniquesNote": "全体の合計は各聖遺物を1回だけ数えます。棚とページの数字は枠ごとに数えるため、複数のページに載る聖遺物はそれぞれのページで数えられます。",
+      "charCompletionLabel": "聖遺物庫",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "キュレーター",
+      "charOpen": "聖遺物庫",
+      "trackerLabel": "聖遺物庫",
+      "collapseHint": "聖遺物庫トラッカーを折りたたむ",
+      "expandHint": "聖遺物庫トラッカーを展開",
+      "openWindowHint": "聖遺物庫を開く",
+      "pin": "ピン留め",
+      "unpin": "ピン留め解除",
+      "pinFull": "トラッカーが満杯です（最大 {cap} ページ）",
+      "pinAria": "{name}をHUDトラッカーにピン留め",
+      "unpinAria": "{name}のピン留めを解除",
+      "rarityLine": "収集家の{percent}が発見",
+      "pageRarityLine": "収集家の{percent}が照耀",
+      "cellAriaWithRarity": "{base}、{rarity}",
+      "cellAriaWithAccountScope": "{base}、{scope}"
+    },
     "deeds": {
       "title": "功績の書",
       "close": "功績の書を閉じる",
@@ -3495,18 +3795,23 @@ export const ja_JP: EnTranslations = {
       "featRibbon": "偉業",
       "hiddenBadge": "隠し",
       "titleChip": "称号報酬",
+      "borderChip": "枠飾り報酬",
       "watch": "追跡",
       "unwatch": "追跡解除",
       "watchFull": "追跡リストが満杯です（最大 {cap} 件）",
       "watchAria": "{name}をHUDトラッカーで追跡",
       "unwatchAria": "{name}の追跡をやめる",
+      "cosmeticsSection": "称号と枠飾り",
       "titlesSection": "称号",
       "titlesAria": "表示する称号を選択",
       "titlesNone": "称号なし",
       "titlesEmpty": "称号付きの功績を獲得するとこの棚が解放されます。",
+      "bordersSection": "枠飾り",
+      "bordersNone": "枠飾りなし",
+      "bordersEmpty": "枠飾り付きの功績を獲得するとこの棚が解放されます。",
       "unlockedBanner": "功績達成: {name}",
       "unlockedTitleHint": "新しい称号を獲得: {title}。功績の書で選択できます。",
-      "retroSummary": "年代記が追いつきました: {count} 件の功績を記録。",
+      "unlockedBorderHint": "新しい枠飾りを獲得: {name}。功績の書で着用できます。",
       "broadcastLine": "{name}が功績「{deed}」を達成しました",
       "rarityLine": "冒険者の{percent}が達成",
       "trackerLabel": "功績",
@@ -3516,6 +3821,7 @@ export const ja_JP: EnTranslations = {
       "charTitleLabel": "称号",
       "charTitleNone": "称号未選択",
       "charOpenBook": "功績の書",
+      "charBorderWorn": "{name}（着用中）",
       "lbTab": "名声",
       "lbTitleCol": "称号",
       "lbScopeNote": "アカウントの生涯名声で順位付けされます。各功績は、アカウントの全キャラクターを通じて一度だけ数えられます。",
@@ -3598,7 +3904,9 @@ export const ja_JP: EnTranslations = {
       "delete_confirm": "削除を確認するにはキャラクター名を入力してください。",
       "already_in_world": "キャラクターは既に世界にいます。",
       "taken_over": "あなたのキャラクターは別のセッションに引き継がれました。",
-      "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。"
+      "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。",
+      "invalid_appearance": "この外見は保存できませんでした。デザインを調整してもう一度お試しください。",
+      "reroll_unavailable": "このキャラクターには無料の再デザインがありません。"
     },
     "moderation": {
       "suspended_until": "このアカウントは {date} まで停止されています。",
@@ -3704,6 +4012,7 @@ export const ja_JP: EnTranslations = {
       "valeCup": "ヴェイルカップ",
       "thornhollow": "ソーンホロウ平原",
       "deeds": "功績の書",
+      "reliquary": "聖遺物庫",
       "glossary": "用語集",
       "wishIKnew": "知っておきたかったこと",
       "faq": "FAQ",
@@ -3762,7 +4071,9 @@ export const ja_JP: EnTranslations = {
       "typeDelve": "デルヴ",
       "typeTerm": "用語",
       "typeAbility": "アビリティ",
-      "typeDeed": "功績"
+      "typeDeed": "功績",
+      "typeReliquaryPage": "聖遺物庫ページ",
+      "typeRelic": "聖遺物"
     },
     "home": {
       "eyebrow": "クラシックスタイルのブラウザMMO",
@@ -3772,8 +4083,8 @@ export const ja_JP: EnTranslations = {
       "ctaLearn": "遊び方",
       "what": {
         "heading": "気軽に始められる、クラシックMMO",
-        "pillarPlayTitle": "ブラウザでプレイ",
-        "pillarPlayBody": "ダウンロードもランチャーも不要。キャラクターを作れば数秒でワールドへ。PCでもスマホでも。",
+        "pillarPlayTitle": "サイトを開いて遊ぶ",
+        "pillarPlayBody": "ダウンロードもランチャーも不要です。キャラクターを作れば数秒で世界の中、デスクトップでもスマートフォンでも同じです。ほしければネイティブアプリもあります。",
         "pillarClassesTitle": "9つのクラス、3つのロール",
         "pillarClassesBody": "タンク、ヒーラー、ダメージのいずれでも。どのクラスもアーキタイプらしい立ち回りができ、タレントで自分好みに育てられる。",
         "pillarOpenTitle": "無料、そしてオープンソース",
@@ -3874,14 +4185,14 @@ export const ja_JP: EnTranslations = {
       "questsTitle": "クエスト",
       "questsBody": "頭上にマーカーが表示された人物からクエストを受け、目標を達成して報告すると、経験値、コイン、装備が手に入ります。画面上のトラッカーで目標を常に確認できます。",
       "deathTitle": "死は終わりではない",
-      "deathBody": "倒れると、亡骸はその場に残り、あなたは最寄りの墓地で亡霊として起き上がります。霊魂を亡骸まで走らせれば、ペナルティなしでその場で復活できます。あるいは墓地の霊魂の癒し手を頼れば、つかの間の衰弱と引き換えに、その場ですぐ蘇らせてもらえます。生まれたての英雄は衰弱を完全に免除され、あなたの持ち物も稼いだものも決して失われません。",
+      "deathBody": "倒れると、亡骸は倒れた場所に残り、あなたは最寄りの墓地で霊となって立ち上がります。霊を亡骸まで走らせればその場で復活でき、罰は一切ありません。あるいは墓地の蒼白の守り手を受け入れれば即座に立ち上がれますが、代償として一時の衰弱を負います。作りたての英雄はこの衰弱をまったく受けず、所持品も稼いだものも決して失われません。何にやられたのかもゲームが教えてくれます。チャットの一行が致命の一撃を与えた相手を名指ししてくれるので、たいていはそれが何を誤ったかを知る最短の道です。",
       "groupingTitle": "一緒に遊ぶ",
       "groupingBody": "他のプレイヤーをパーティに招待すれば、クエストの達成を共有したりダンジョンに挑んだりできます。ワールドの大半はソロで進められるので、グループ行動は義務ではなく選択です。",
       "onlineTitle": "オンラインかオフラインか",
       "onlineBody": "みんなと一緒に共有のオンラインワールドで遊ぶか、ブラウザですぐに始められるオフラインワールドで基本を覚えるか、選べます。",
-      "reassure": "タレントはレベル10で解放され、戦闘の外ならいつでもリセットできます。序盤の選択が永久に固定されることはないので、自由に試してみてください。",
+      "reassure": "タレントはレベル5から始まり、段は全部で六つ、レベル5、8、11、14、17、20にそれぞれ一段ずつあります。どの段も三つから一つを選ぶだけで、戦闘外かつアリーナの試合中でなければいつでも振り直せるので、序盤の選択が永久に固定されることはありません。自由に試してみてください。",
       "controlsLink": "操作方法の完全なリファレンスを見る",
-      "step0Title": "Get in",
+      "step0Title": "ゲームを始める",
       "step0Body": "オフラインで遊ぶなら、何も必要ありません。スタート画面で「オフライン」を選び、「プレイ」を押すだけです。ほかのみんなと一緒に遊ぶなら、無料のアカウントを作るか（ユーザー名、パスワード、そして復旧用のメールアドレスが要ります）、すでにお持ちのアカウントでサインインし、ワールドリストからワールドを一つ選びましょう。",
       "worldsTitle": "ワールドを選ぶ",
       "worldsBody": "オンラインの遊びはワールドの上で進みます。どのワールドもゲームまるごと一つ分の写しで、そこに住むプレイヤーも、世界市場も、順位もそれぞれ独立しています。ワールドリストには各ワールドの混み具合が「低」から「満員」まで表示されるので、ゆったり遊びたいなら空いているワールドを、賑わいを求めるなら混んでいるワールドを選びましょう。キャラクターは作成したワールドに住み、複数のワールドにキャラクターを持つこともできます。",
@@ -3893,7 +4204,7 @@ export const ja_JP: EnTranslations = {
       "connectionBody": "回線が切れても、ふたを閉じても、ページを再読み込みしても、ログアウトにはなりません。ゲームが自分で再接続する間、あなたのキャラクターは5分ほどワールドに保たれ、同じセッションの同じ場所へ戻ってこられます。つまり、抜けることは戦いから離れる手段にはなりません。キャラクターはその場に立ったままです。ゲームメニューからログアウトすれば待たずにすぐ退出しますし、同じアカウントの別のキャラクターでサインインした場合も同じです。"
     },
     "controls": {
-      "intro": "PC用のデフォルトキーです。すべてのキー割り当てはゲームのオプションで変更できます。ただしEscだけは例外で、常にゲームメニューを開きます。また、Shift+Zのような修飾キーの組み合わせを割り当てることもできます。",
+      "intro": "デスクトップの既定キーです。ここにある割り当ては、ゲームメニューの「キー設定」パネルからすべて変更できます。例外はEscで、これは常にそのメニューを開きます。各操作にはキーを二つまで、主キーと代替キーを持たせられ、割り当てはShift+Zのような修飾キーの組み合わせにもできます。マウスボタンでも構いません。中ボタンがM3、親指ボタンがM4とM5で、それ以上のボタンはそこから順に数えます。左クリックと右クリックは、カメラ、クリック移動、そして世界の物をクリックする操作のために予約されたままです。",
       "keyHeader": "キー",
       "actionHeader": "アクション",
       "groupMovement": "移動",
@@ -3902,9 +4213,10 @@ export const ja_JP: EnTranslations = {
       "groupCamera": "カメラ",
       "talents": "タレント",
       "professions": "生産職",
-      "arena": "アリーナ",
+      "arena": "PvPウィンドウ（アリーナとソーンホロウ平原）",
       "leaderboard": "リーダーボード",
       "deeds": "功績の書",
+      "reliquary": "聖遺物庫",
       "sheathe": "武器を納刀/抜刀",
       "crafting": "製作",
       "valeCup": "ヴェイルカップ",
@@ -3913,6 +4225,7 @@ export const ja_JP: EnTranslations = {
       "dungeonFinder": "ダンジョンファインダー",
       "discord": "Discord",
       "abilities": "アクションバーのアビリティを使用（数字キーの列。二つ目のバーはテンキーにあります）",
+      "targetPrev": "ターゲットを逆順に切り替え",
       "targetFriendly": "最も近い友好的な対象をターゲット",
       "cycleFriendly": "友好的なターゲットを順に切り替え",
       "targetAuras": "ターゲットのバフとデバフ",
@@ -3922,7 +4235,7 @@ export const ja_JP: EnTranslations = {
       "arrowKeys": "矢印キー",
       "groupPet": "ペットコマンド",
       "petBar": "ペットバー：攻撃、停止、挑発、防御、攻撃的（ハンターまたはウォーロックのペットを出しているとき）",
-      "attackMoveNote": "もう一つ、初期設定ではオフのものがあります。オプションでアタックムーブを有効にするとキーがひとつ確保され（オンの間はA）、押せばカーソルの方へ歩き出し、カーソルの下にいる敵、あるいは道中で最初に出会った敵に攻撃を仕掛けます。",
+      "attackMoveNote": "アタックムーブは自分でオンにするまで無効のままです。「キー設定」パネルを開いて有効にすると、上のAの行が働き始めます。カーソルがゲーム世界の上にあるとき、カーソルへ向かって歩き、その下の敵、あるいは道中で最初に出会った敵対者に攻撃を仕掛けます。この設定が有効な間、Aは左旋回ではなくそのアタックムーブを行うので、旋回には左矢印キーを使ってください。「左を向く」も既定でそのキーを持っています。あるいは「左を向く」に自分専用のキーを割り当ててもかまいません。",
       "mobileHeading": "モバイルでは",
       "mobileBody": "スマートフォンやタブレットでは、タッチ操作が自動で表示されます。左側に移動用スティック、それ以外の場所はどこでもドラッグして視点操作、二本指でつまむとカメラをズームでき、そしてアビリティやメニュー用の画面上ボタンが現れます。左上隅の小さな矢印でメニューボタンの表示と非表示を切り替えられ、そこにある「その他」ボタンに残りのウィンドウがまとめられています。",
       "controllerHeading": "コントローラーでは",
@@ -3941,23 +4254,23 @@ export const ja_JP: EnTranslations = {
     "settingsPage": {
       "heading": "設定とパフォーマンス",
       "intro": "見た目を最高にするのも、動作を最速にするのも自由自在。すぐに使える3つの構成と、各グラフィックオプションの本当の働きを紹介します。",
-      "wherePath": "このページの内容はすべてゲーム内にあります。Escキーを押すとオプションが開きます。メニューは、ピン留めされた要点をまとめた「概要」から開き、その脇のレールにカテゴリが並びます。以下で触れる設定は、「表示」グループの「グラフィック」「インターフェース」「アクセシビリティ」の下にあり、「パフォーマンスオーバーレイ」は「システム」の下にあります。さらに手早く行うなら、上部の検索ボックスに名前を打ち込んで直接そこへ飛べます。",
+      "wherePath": "このページにあるものはすべてゲーム内にあります。Escを押してゲームメニューを開いてください。メニューは各パネルをボタンとして並べます。キー設定、コントローラー、グラフィック、インターフェース、オーラ、オーディオ、パフォーマンス表示、その下にウィキ、スタック解除、ログアウト、ゲームに戻る、そしてオンラインでプレイ中は「不具合を報告」も並びます。ここで述べていることのほとんどは、グラフィックとインターフェースに収まっています。",
       "fairnessTitle": "公平さは設計から",
-      "fairnessBody": "ここにあるオプションは、見た目と引き換えに強さを得るものではありません。設定を下げて削られるのは装飾的な美しさだけで、戦いに使う情報は決して失われません。デバフ、詠唱バー、パーティの体力、ダメージ数値は「低」から「ウルトラ」まで完全に同一です。控えめなマシンでのプレイが不利になることはありません。",
+      "fairnessBody": "ここには美しさを強さと引き換えにする設定は一つもありません。設定を下げても失われるのは見た目の磨き込みだけで、戦いに使う情報は決して失われません。自分の弱体化効果、詠唱バー、パーティの体力、ダメージ数値は、LowからInsaneまでまったく同じです。ささやかな機械で遊ぶことが不利になることはありません。",
       "loadoutsHeading": "すぐに使える3つの構成",
       "loadoutsIntro": "お使いのマシンに近そうな構成から始めて、しっくりくるまでオプションを1つずつ調整していきましょう。",
       "recommended": "おすすめ",
       "whyLabel": "なぜ効くのか：",
-      "tagReload": "再読み込み後",
+      "tagReload": "「適用」を押す",
       "fpsTitle": "FPS優先",
       "fpsTagline": "古めのノートPC、内蔵グラフィック、バッテリー駆動でのプレイに。",
       "fpsWhy": "グラフィック品質が全体を束ねるマスタースイッチで、描画品質は最も効き目の大きいスライダーです。70%にするとワールドの描画ピクセル数はおよそ半分になりますが、インターフェースは完全にくっきりしたままです。",
       "balancedTitle": "バランス",
       "balancedTagline": "ほとんどの環境にちょうどいい、まずおすすめしたい構成です。",
-      "balancedWhy": "「中」では本格的な影とフルマテリアルが有効になり、「高」ではアンビエントオクルージョンとブルームが加わります。ウルトラ未満のティアでは内蔵のセーフティネットが激しい戦闘での急な負荷を吸収してくれるため、バランス構成は手をかけなくても滑らかに動き続けます。",
+      "balancedWhy": "Mediumは本物の影と完全なマテリアルをもたらし、Highはその上にアンビエントオクルージョンとブルームを加えます。内蔵の安全網はどの段でも張られたままなので、Balancedは見張っていなくても賑やかな戦いを乗り切ります。",
       "visualsTitle": "最高画質",
       "visualsTagline": "強力なデスクトップマシンのためのスクリーンショットモード。",
-      "visualsWhy": "ウルトラは、ディスプレイが対応する最高解像度と最も豊かな照明で描画します。セーフティネットもオフになり、デスクトップ専用です。スマートフォンとアプリ版では上限が「高」になります。",
+      "visualsWhy": "Ultraはあなたのディスプレイが出せる最高の解像度で、最も豊かな照明で描画します。その上にあるのがInsane、すべてを盛った見本の段です。これは自分の手で選ぶ必要があります。どれほど強力な機械でも、ゲームが代わりに選ぶことは決してないからです。",
       "value50to70": "50%から70%",
       "value90to100": "90%から100%",
       "value100": "100%",
@@ -3965,16 +4278,16 @@ export const ja_JP: EnTranslations = {
       "valueOnOptional": "オン（お好みで）",
       "howHeading": "オプションの仕組み",
       "factDetectTitle": "まずはゲームが自動調整",
-      "factDetectBody": "初回起動時にゲームがお使いの端末を読み取り、控えめなスマートフォンなら「低」、強力なデスクトップなら「ウルトラ」まで、無理のないティアを自動で選びます。自分で選んだ設定は常にそれより優先されます。",
+      "factDetectBody": "初回起動時、ゲームはあなたの端末を読み取り、妥当な段をあなたのために保存します。スマートフォンとタブレットはすべてLowから始まり、まず世界に入れるようにしてあります。古いグラフィックカードやソフトウェア描画も同じです。強力なデスクトップはUltraから、メモリが心もとなく見える機械ならHighから始まります。ゲームが判別できなかったものはMediumのままです。あなた自身が下した選択は常に優先され、そのまま保たれます。",
       "factReloadTitle": "オプションは2種類",
-      "factReloadBody": "グラフィック品質と「詳細」の各設定は再読み込み後に反映され、必要なときはパネルに「今すぐ再読み込み」ボタンが表示されます。それ以外のオプションは、変更した瞬間に適用されます。",
+      "factReloadBody": "グラフィックパネルが編集しているのは下書きです。「グラフィック品質」か詳細つまみのいずれかを変えたら「適用」を押してください。ゲームはあなたの立っている場所で世界を組み直します。再読み込みは不要です。ボタンの横の行が、それが済んだことを知らせます。他のすべての設定は、このパネルでも他のどこでも、変えたその瞬間に効きます。完全に失敗した組み直しのときにだけ、代わりに再読み込みボタンが提示されます。",
       "factGovernorTitle": "内蔵のセーフティネット",
-      "factGovernorBody": "ウルトラ未満のすべてのティアでは、大規模な戦闘で負荷が跳ね上がった瞬間、ゲームが草やエフェクト、照明をさりげなく一時的に間引き、収まればすぐ元に戻します。ウルトラを選ぶことは、細部をひとつも削らないでほしいという意思表示になります。",
-      "factSearchTitle": "検索が真っ先に見つける",
-      "factSearchBody": "どこに設定があるかわからないときは、メニュー上部の検索ボックスに入力しましょう。よくある言い回しも理解するので、「fps」と打てばFPS表示が見つかります。結果を選ぶとその設定へ直接飛び、ハイライトされたまま残ります。",
-      "advancedHeading": "「詳細」プリセット：自分だけの組み合わせ",
-      "advancedBody": "「詳細」プリセットは「高」ティアを出発点に、地形の詳細、草木の密度、エフェクトと照明、影の品質という4つの追加設定を開放します。本当に違いを実感できるところへフレームを振り分けられるようになります。グラフィック品質と同じく、変更は再読み込み後に適用されます。",
-      "advancedMixes": "おすすめの組み合わせを2つ。影の品質を「高」に保ちつつエフェクトと照明を「低」にすると、光の演出を抑えたくっきり軽快な画面になります。逆にすれば、ブルームの輝きを残したまま影を柔らかくできます。",
+      "factGovernorBody": "どの段も安全網を張ったままにしています。大きな戦いが跳ね上がると、ゲームは草や効果や照明を静かに一瞬だけ間引き、その後に元へ戻します。UltraとInsaneはそれを行うまでにずっと長く待つだけなので、上位のプリセットが一枚の遅いフレームで乱されることはありません。",
+      "factSearchTitle": "設定はどこにあるか",
+      "factSearchBody": "検索欄はないので、メニューの形を知っておくと助かります。グラフィックはカードで並びます。品質、ワールド詳細、照明と効果、カメラ、ディスプレイ、システム、タッチ画面ではさらにタッチ操作。インターフェースは四つのタブに分かれます。一般、ウィンドウ、チャット、戦闘。設定が世界の描かれ方を変えるならグラフィックに、インターフェースが見せるものを変えるならインターフェースにあります。",
+      "advancedHeading": "詳細つまみとAdvancedの調合",
+      "advancedBody": "詳細つまみを見るためにAdvancedを選ぶ必要はありません。グラフィックパネルは常に二枚のカードでそれらを表示します。ワールド詳細には地形詳細、草木の密度、表面詳細、視界距離、水質、キャラクター詳細が入り、照明と効果には効果と照明、影の品質、アンビエントオクルージョン、ブルーム、アンチエイリアス、動的ライト、パーティクル効果が入ります。固定のプリセットのもとでは、各つまみがそのプリセットのおおよその位置を示します。",
+      "advancedMixes": "お気に入りの調合が二つ。影の品質を高く保ったまま効果と照明をLowにすると、輝きのない引き締まった画になり、動作も軽くなります。逆にすればブルームを残して影を柔らげられます。混ぜる前に一つ知っておくべきことがあります。アンビエントオクルージョン、ブルーム、アンチエイリアスは効果と照明と同じ鎖につながっているので、そのつまみがLowだと動く土台がなくなります。",
       "tableHeading": "グラフィックの全オプション解説",
       "colSetting": "設定項目",
       "colDoes": "効果",
@@ -3991,18 +4304,18 @@ export const ja_JP: EnTranslations = {
       "rowBrowserEffects": "インターフェース自体の演出の豪華さを決めます。ガラスのぼかし、発光、メニューのアニメーションなどです。「自動」ならお使いのブラウザに合わせて調整され、どちらにしても3Dワールドには影響しません。",
       "rowTerrainDetail": "豊かにブレンドされた地面のテクスチャにするか、シンプルで軽快な地形表示にするかを選びます。",
       "rowFoliageDensity": "キャラクターの周囲に生える草の範囲と密度を調整します。",
-      "rowEffectsQuality": "ブルーム、アンビエントオクルージョン、そして実際に光を放つ松明や呪文の数を制御します。「詳細」の設定の中では、単独で最も大きく負荷を減らせる項目です。",
+      "rowEffectsQuality": "ブルーム、アンビエントオクルージョン、そしてどれだけの松明と呪文が本物の光を落とすか。詳細つまみの中で単独では最大の節約であり、他の照明つまみが依存しているスイッチでもあります。",
       "rowShadowQuality": "影のくっきり具合を調整します。「低」でも影は残り、輪郭が柔らかくなるだけです。",
       "rowFrostedPanels": "ウィンドウの背後にすりガラスのぼかしをかけます。美しい反面、非力なブラウザにはまさに応える種類のエフェクトです。昔ながらのくっきりした表示が好みなら、オフのままにしておきましょう。",
       "rowReduceMotion": "インターフェースのアニメーションをなくし、ウィンドウを即座に表示します。第一にはアクセシビリティのためのオプションですが、パフォーマンスもわずかに向上します。",
       "rowPerfOverlay": "FPSやフレームタイムなどを画面上に表示します。このページの設定を調整する間だけオンにして、終わったらまた非表示に戻しましょう。",
-      "tableFoot": "描画距離のスライダーやFPS上限をお探しですか。探す必要はありません。視界距離は各品質ティアに組み込まれており、フレームペーシングはお使いのディスプレイに従います。",
+      "tableFoot": "FPSの上限をお探しですか。探すものはありません。フレームの歩調はあなたのディスプレイに従います。描画距離はワールド詳細カードにある「視界距離」という独立したつまみで、あなたが自分で動かすまでは各プリセットが設定してくれます。",
       "mobileTitle": "スマートフォンとタブレットでは",
-      "mobileBody": "モバイルではゲームがより多くを自動で管理します。ティアの選択はゲーム側が行い、バッテリーの消耗と発熱を抑えるために解像度をわずかに低めに保ち、最上位ティアはデスクトップ専用のままにします。上記の構成はそのまま役立ちますが、スマートフォンでは上限が「高」になります。",
-      "touchBody": "タッチスクリーンでは、オプションに専用の快適設定がひとまとまり加わります。ジョイスティックの大きさと感度、画面上ボタンの大きさと不透明度、左右を反転した左利きレイアウト、任意のカメラスティック、そしてタッチ視点の反転です。あなたの手を画面に合わせるのではなく、画面があなたの手に合うようになります。",
+      "mobileBody": "スマートフォンやタブレットでは、ゲームはLowから始めます。タッチ端末はどれも初回起動でそこに着地します。これは意図的で、まず世界に入って遊べるようにするためです。グラフィックパネルからいつでも自分で上げてください。Androidのブラウザでは段のすべてが開かれており、選択もそのまま保たれます。iPhoneとiPadでも最上位のプリセットは選べ、「適用」を押せばすぐに効きますが、次回の起動時にゲームがHighへ戻します。これほど大きな場面を組み立てている最中に、iOSがタブを終了させることがあるためです。ダウンロード版アプリはさらに絞られていて、プリセットの一覧はHighで止まり、個別のシステムつまみは隠されています。アプリがそれらを自分で管理するからです。",
+      "touchBody": "タッチ画面では、グラフィックパネルに専用の「タッチ操作」カードが増えます。スティックの大きさとデッドゾーン、画面ボタンの大きさ、操作の不透明度、任意のカメラスティック、左利き向けの左右反転レイアウト、そして反転タッチ視点。画面のほうがあなたの手に合わせるのであって、その逆ではありません。",
       "audioTitle": "サウンドと言語",
-      "audioBody": "オプションウィンドウにあるのは映像の設定だけではありません。オーディオタブには効果音、音楽、ボイスそれぞれの音量調整があり、インターフェースの項目には言語の選択が用意されていて、再読み込みなしにその場でインターフェース全体を選んだ言語へ切り替えられます。",
-      "autolootBody": "一つ一つの亡骸をクリックするのが面倒ですか。初期設定ではオフのインターフェース設定を使えば、自分が倒した相手の戦利品を、そばを通り過ぎるだけで自動で拾えます。",
+      "audioBody": "設定ウィンドウは画素だけでできているわけではありません。オーディオには音量スライダーが三つ、効果音、音楽、ボイス用にあり、さらに音楽のオンオフと、飽きやすい音のための四つのスイッチがあります。NPCのボイス、足音、インターフェース音、クリックの手応えです。インターフェースパネルの「一般」タブには、再読み込みなしでその場でインターフェース全体を翻訳し直す言語選択と、ウィンドウの装いを選ぶテーマ選択が載っています。",
+      "autolootBody": "亡骸を一つずつクリックしたくないですか。インターフェースパネルの「戦闘」タブにある、既定では無効の「通りすがりの自動収集」が、自分が倒した相手の戦利品を、そばを歩くだけで拾い上げます。",
       "panelsMoreBody": "このページで表にしていない2つのパネルも、目を通しておく価値があります。「オーラ」は、クラスの発動が来たときに画面へ大きく出るアラートを整えるところです。どれを表示するか、その大きさ、色、不透明度、画面上の位置を決められます。「パフォーマンスオーバーレイ」は、このページの設定を調整するあいだだけ出しておき、終わったらまた隠す読み取り表示です。",
       "valueUltraOrInsane": "ウルトラ、すべてを求めるなら極限",
       "advancedLadder": "そのうちのどれか一つでも動かすと、画質プリセットは「詳細」に切り替わり、いま見ていたとおりの段階がそのまま引き継がれます。ですからあなた好みの組み合わせは、ゼロからではなく、すでに目にしていた状態から始まります。気に入ったら「適用」を押しましょう。「詳細」がプリセット一覧の末尾に置かれているのはそのためです。あなた自身の組み合わせが住まう、上級者向けのプロファイルなのです。",
@@ -4071,16 +4384,16 @@ export const ja_JP: EnTranslations = {
     "combat": {
       "intro": "戦闘はおなじみのクラシックMMOのルールに沿っています。うまく遊ぶために細かく学ぶ必要はまったくありません。これは戦いの仕組みの概要にすぎません。",
       "hitTitle": "すべての一撃が命中するわけではない",
-      "hitBody": "攻撃はミスしたり回避されたりすることがあり、それは敵の攻撃も同じです。一方、呪文は完全にレジストされることがあります。自分のレベルに近い相手と戦うことが、攻撃を確実に当て続けるコツです。レベル差が広がるほど、空を切ることが多くなります。",
+      "hitBody": "攻撃は外れることも、かわされることもあり、敵の攻撃も同じです。さらに二つの応じ方はプレイヤーだけのものです。戦士はパリィで一撃をそらせ、盾を構えた戦士やパラディンはそれをブロックへと和らげられます。どちらも正面から来るものにしか働きません。世界の生き物はどちらも行わないので、モンスターへの一振りは命中するか、外れるか、かわされるかのいずれかです。呪文は独自の規則に従い、決して外れません。代わりに抵抗されます。自分のレベルに近い相手と戦うことこそ、攻撃を当て続ける鍵です。レベル差が開くほど、空を切る回数が増えます。",
       "mitigationTitle": "アーマーと体力が生存を支える",
       "mitigationBody": "アーマーは物理ダメージを和らげるので、優れたアーマーは近接戦における生存力の主な源になります。魔法は別の話です。呪文は、アーマーではなく、より深い体力のプールと完全にレジストする可能性で凌ぎます。重装のクラスほど多くを受け流せますが、無敵になれるわけではありません。",
       "resourcesTitle": "クラスごとに独自のリズムがある",
       "resourcesBody": "ウォリアーは激しい戦いの中でレイジを溜め、ローグは着実に回復するエナジーを消費し、キャスターはマナのプールを管理します。自分のリソースを理解することが、クラスをうまく使いこなす半分です。",
       "growTitle": "レベルごとに強くなる",
-      "growBody": "レベルが上がるたびに頑丈になり、新たなアビリティを習得します。これはレベル上限{cap}まで続きます。最速で成長するのはクエストで、狩り、ダンジョン攻略、デルヴがそれを補います。",
+      "growBody": "レベルが上がるたびに打たれ強くなり、新しいアビリティが解放されます。上限のレベル{cap}までずっとです。クエストが最も速い登り道で、狩り、ダンジョン、デルヴ、そして道中で営む専門技能が残りを埋めます。",
       "effectsTitle": "バフ、デバフ、群衆制御",
       "effectsBody": "多くのアビリティは、しばらく残る効果を付与します。有益なもの（バフ）はステータスを上げ、盾を張り、少しずつ回復させてくれます。有害なもの（デバフ）は継続ダメージで体力を削り、あるいはあなたを弱体化させます。画面の上隅、ミニマップの脇にある小さなアイコンを見れば、何が付いていて、あとどれくらい続くのかがわかります。",
-      "ccBody": "群衆制御は、対象にできることを制限する特殊なデバフです。スタン、根縛りや減速、呪文詠唱を止めるサイレンス、武装解除、フィアー、そして一瞬だけ敵を無害にする変身系があります。相手が他のプレイヤーの場合、制御は繰り返すほど利きが薄れます。同じ種類をあまりに早く再付与すると弱まり、やがて完全に効かなくなり、またステルスから仕掛けるスタンはその後に続くスタンとは別に数えられるので、誰も永遠に無力なまま連鎖され続けることはありません。世界のクリーチャーたちはそのような恨みを抱かず、彼らには繰り返しても制御が弱まることはありません。ただし最強の敵たちの多く、名前を持つエリートやその中でも最強のボスたちは、そもそも制御がまったく効きません。",
+      "ccBody": "行動制御は、対象にできることを狭める特別な弱体化です。スタン、根絶やしと減速、詠唱を止める沈黙、武装解除、恐怖、そして敵を一瞬無害にする変身などがあります。他のプレイヤーが相手だと、ほとんどの制御は繰り返すほどすり減ります。恐怖、変身、根絶やし、系統の封じは、間を置かずに掛け直すと持続が短くなり、やがてまったく効かなくなるので、誰かを永久に無力なままにしておくことはできません。スタンは意図された例外です。もともと短く、実際のクールダウンに支えられているので、繰り返しても短くなることはありません。ただし制御時間を削る装備は変わらずそれを削ります。世界の生き物はそうした恨みを抱きません。彼らに対しては繰り返しても制御が弱まることはありませんが、最も手強い敵の多く、名前付きのエリートやその中でも最強のボスは、そもそも制御が効きません。",
       "metersBody": "戦いの首尾が気になりますか。Shift+Hキーを押すとパーティメーターが開き、グループのダメージ、回復、脅威を戦闘ごとに集計してくれます。",
       "queueTitle": "次の一手はもう装填済み",
       "queueBody": "ボタンを押す瞬間をフレーム単位で合わせる必要はありません。今のアビリティを詠唱している間に次のアビリティを押せば先行入力として蓄えられ、詠唱が完了した瞬間に発動します。だから練達のプレイは途切れなく流れていきます。一部の近接攻撃も同じ仕組みで、次の武器の一振りに乗って繰り出されます。",
@@ -4114,7 +4427,7 @@ export const ja_JP: EnTranslations = {
       "frameTotBody": "ターゲットフレームの脇に出る小さなフレームで、あなたのターゲットが今誰を狙っているかを示します。敵がタンクと戦っているのか、それともあなたに向かってくるのかを見分ける、いちばん早い方法です。オプションで有効にするまでは表示されません。",
       "framePartyTitle": "パーティ",
       "framePartyBody": "パーティメンバーは、画面左側のターゲットフレームの下に、1人1行ずつ積み重なります。距離が離れたメンバーの行は暗くなり、対処すべき効果が表示され、そのメンバーのペットを横に並べることもできます。体力の文字をどこまで出すかはあなた次第です。表示なし、パーセント、数値、その両方から選べます。",
-      "framePetTitle": "Your pet",
+      "framePetTitle": "ペット",
       "framePetBody": "ハンターやウォーロックをはじめ、ペットを出している人には、自分のフレームの脇にペット用の小さなフレームが付き、名前、レベル、体力が表示されます。そのフレームをクリックするとペットをターゲットでき、キーボードならCtrl+6でも同じことができます。",
       "framesMoveBody": "自分のフレーム、ターゲットフレーム、パーティフレームは、いずれも移動できます。どれも隅に小さな移動ボタンを備えているので、固定を外し、好きな位置へドラッグし、もう一度固定すれば、うっかりクリックしてもずれません。置き場所を悔やむことになったら、オプションの「フレーム位置をリセット」で、すべて元の場所へ戻せます。",
       "barsTitle": "バー、タイマー、戦闘テキスト",
@@ -4133,7 +4446,7 @@ export const ja_JP: EnTranslations = {
       "keyWindowsBody": "ここに挙げるウィンドウには、それぞれ初期設定のキーと、右下のレールのボタンがあります。もう一度そのキーを押すか、Escを押せば閉じられます。",
       "winCharTitle": "キャラクターシート（C）",
       "winCharBody": "片側に装備中のギア、もう片側に能力値とそこから伸びるステータスが並び、どの数値にも、あなたのクラスにとって何を意味するのかを教えるツールチップが付きます。累計のプレイ時間もここに載っており、脇の小さな目のアイコンで、見せたくないときは数値を隠せます。プレイヤーカードを組み上げるボタンも、このウィンドウにあります。",
-      "winBagsTitle": "Bags (B)",
+      "winBagsTitle": "バッグ（B）",
       "winBagsBody": "持ち物のすべてが、4つのバッグソケットを備えた一つの荷物にまとまります。上部のカテゴリーチップで武器、防具、消耗品、素材、道具、クエストアイテム、マウントに絞り込め、検索ボックスで名前から探せます。並び替えのドロップダウンは、今見えているものを最近、品質、名前の順に並べ替え、その選択はセッションをまたいで覚えられます。別にある「並べ替え」ボタンは、ひと押しで荷物の実際のマスを整え、チップと検索を解除して、整った荷物の全体を見せてくれます。",
       "winSpellbookTitle": "スペルブック（P）",
       "winSpellbookBody": "あなたのクラスのアビリティが、習得済みのものもこれから覚えるものも、順番どおりに並びます。アクションバーへアビリティをドラッグするのは、ここからです。",
@@ -4303,7 +4616,7 @@ export const ja_JP: EnTranslations = {
       "healerTerm": "ヒーラー",
       "healerDef": "回復呪文でみんなを生かし続けるパーティメンバー。",
       "specTerm": "スペック",
-      "specDef": "スペシャライゼーション。タレントを振ることで、回復やダメージなどクラスを傾けていく方向性のことです。",
+      "specDef": "専門化：レベル5で自分のクラスに選ぶ道のことで、たとえば回復や火力です。役割を定め、象徴的なアビリティと長く続く熟達を授け、タレントを振り直しても手元に残り続けます。",
       "pullTerm": "プル",
       "pullDef": "敵やそのグループを戦闘に引き込むこと。たいていは意図的に、1グループずつ行います。",
       "instanceTerm": "インスタンス",
@@ -4331,7 +4644,7 @@ export const ja_JP: EnTranslations = {
       "targetMarkerTerm": "ターゲットマーカー",
       "targetMarkerDef": "パーティやレイドのメンバーが誰でも対象の上に付けられる記号で、全員が同じ相手に集中したり、逆に避けたりできます。記号は八種類で、一つの記号につき一体の対象に付けられます。",
       "loadoutTerm": "保存ビルド",
-      "loadoutDef": "保存しておけるタレント配分。いくつか持っておけば、ポイントを一つずつ振り直すことなくビルドを切り替えられます。",
+      "loadoutDef": "保存したタレント配分で、十個まで持てます。それぞれが各段の選択とアクションバーを覚え、さらに着ていた装備まで覚えられるので、ビルドの切り替えは各段をやり直すのではなく一度のクリックで済みます。",
       "readyCheckTerm": "準備確認",
       "readyCheckDef": "グループリーダーが /ready と入力してパーティやレイドに問う確認。全員が準備完了か準備未完了かを答え、グループにはその集計が表示されます。",
       "soulboundTerm": "魂縛",
@@ -4341,10 +4654,10 @@ export const ja_JP: EnTranslations = {
       "worldBossTerm": "ワールドボス",
       "worldBossDef": "一定の周期でオープンワールドに現れるレイド級のボス。決まったパーティではなく、呼びかけに集まった者たちが立ち向かいます。",
       "fiveSecondTerm": "5秒ルール",
-      "fiveSecondDef": "マナが自然に回復し始めるのは、最後にマナを使ってから5秒が過ぎてからです。キャスターが撃ちっぱなしにせず、配分を考えて詠唱するのはこのためです。",
+      "fiveSecondDef": "マナが本来の速さで回復するのは、最後にマナを使ってから5秒が過ぎてからです。それまでも完全に止まるわけではなく、落ちた速さで回復し続けます。キャスターが撃ちっぱなしにせず、配分を考えて詠唱するのはこのためです。",
       "talentRowTerm": "タレント行",
       "talentRowDef": "タレントはレベル5、8、11、14、17、20でそれぞれ1行ずつ、計6行に分かれて届きます。どの行にも3つの選択肢があってそのうち1つを選ぶので、貯めたり振り分けたりするポイントはありません。",
-      "riftTerm": "Rift",
+      "riftTerm": "リフト",
       "riftDef": "ゾーンのどこかに自然と口を開く裂け目で、そのリフト固有のシードから毎回新しく組み上がるインスタンスの階層へと下っていきます。リフトにはC、B、A、Sのランクがあります。入口はしばらくすると新たなパーティを受け付けなくなり、封じられるのはレルムで最初に最下層へ到達したパーティによってのみです。",
       "riftRankTerm": "ランク（リフト）",
       "riftRankDef": "リフトに付いたC、B、A、Sの文字で、難しさを決めるのはこれだけです。リフトがグループの人数に合わせて調整されることはないので、ランクがそのまま難易度の梯子になります。Cが最もやさしく、Sが最も苛烈で、どのランクもグループで挑むことを前提としています。",
@@ -4396,7 +4709,7 @@ export const ja_JP: EnTranslations = {
       "q2": "暗号通貨ウォレットやトークンは必要ですか?",
       "a2": "いいえ。ウォレットがなくても完全にプレイできます。任意のコミュニティトークンは、見た目の装飾と、デイリー報酬の賞金プールの分け前を加えるだけで、性能や進行には一切影響しません。",
       "q3": "スマートフォンで遊べますか?",
-      "a3": "はい。モバイルブラウザでタッチ操作によりプレイでき、デスクトップ用ランチャーもあります。",
+      "a3": "はい。ゲームは最新のモバイルブラウザならどれでもタッチ操作で動きますし、アプリもあります。iOS版とAndroid版、それに自分で最新に保つWindows、macOS、Linux向けのデスクトップアプリです。",
       "q4": "オフラインやソロで遊べますか?",
       "a4": "はい。すぐに遊べるシングルプレイのオフラインモードがあり、オンラインの世界もダンジョン、レイド、ワールドボスを除けば完全にソロで進められます。",
       "q5": "クラスはいくつありますか?",
@@ -4411,7 +4724,7 @@ export const ja_JP: EnTranslations = {
       "q9": "PvPはありますか。",
       "a9": "あります。誰とでも気軽に決闘できますし、灰のコロシアムに足を踏み入れて他のプレイヤーと戦うこともできます。PvPは任意参加なので、強制されることはありません。",
       "q10": "最大レベルになったら何ができますか。",
-      "a10": "上限はレベル{cap}です。そこからは5人用ダンジョンと10人用レイドに挑み、ヒロイックモードで再び攻略して強化された戦利品を狙い、ワールドボスが現れれば立ち向かい、アリーナで腕を試し、仲間を連れてデルヴに潜り、功績の書で功績を追い求めてレルムの順位を駆け上がります。",
+      "a10": "上限はレベル{cap}です。そこからは五人用ダンジョンと十人用レイドを回り、強化された戦利品を求めてヒロイックモードで挑み直し、リフトを一層ずつ降り、ワールドボスが起き上がれば立ち向かい、アリーナやソーンホロウ平原の戦場で腕を試し、ヴェイル・カップの一シーズンを戦い、供を連れてデルヴへ潜り、専門技能を傑作づくりまで極め、乗り物を集め、功績の書の功績を追ってランキングを登っていきます。",
       "q11": "グループはどうやって見つけますか。",
       "a11": "出会った相手をパーティに誘ったり、チャットで呼びかけたり、ダンジョンで合流したりしましょう。ワールドのほとんどはソロで進められるので、グループを組むかどうかは必須ではなく選択です。",
       "q12": "課金ストアはありますか。",
@@ -4445,7 +4758,8 @@ export const ja_JP: EnTranslations = {
     "resourceName": {
       "rage": "レイジ",
       "mana": "マナ",
-      "energy": "エナジー"
+      "energy": "エナジー",
+      "focus": "フォーカス"
     },
     "classPage": {
       "back": "すべてのクラス",
@@ -4474,7 +4788,7 @@ export const ja_JP: EnTranslations = {
       "mageEleSummon": "エレメンタルを傍らに呼び出し、あなたの標的に差し向けるフロストの呪文です。",
       "formName": {
         "form_bear": "ブルーインフォーム",
-        "form_cat": "Wolf Form",
+        "form_cat": "ウルフフォーム",
         "form_travel": "フリートフォーム"
       }
     },
@@ -4514,19 +4828,32 @@ export const ja_JP: EnTranslations = {
       "none": "すべての条件に合うクラスはありません。一つ解除するともっと表示されます。"
     },
     "abilityHook": {
+      "evil_eye": "敵を一体指定し、その行動と苦痛から断罪を蓄積します。",
       "heroic_strike": "次の一撃にレイジを乗せ、より重い攻撃を予約します。",
       "revenge": "前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。",
       "hamstring": "敵の移動を妨げ、逃走を阻止する。",
       "battle_shout": "パーティの攻撃力を高める鼓舞の雄叫びです。",
       "charge": "離れた敵に突進し、短いスタンで戦闘の口火を切ります。",
       "thunder_clap": "周囲のすべてに当たり、相手の攻撃を遅くします。",
-      "seal_of_righteousness": "一振りごとにホーリーダメージを付与し、ヴァーディクトで消費します。",
+      "seal_of_righteousness": "近接の一振りに追加の神聖ダメージを宿します。",
       "holy_light": "味方や自分の体力を満タンに戻す、安定した大きめのヒールです。",
       "devotion_aura": "アーマーを上げて被弾を和らげる、持続する自己強化です。",
       "judgement": "現在のシールを消費し、近距離から敵を打ち据えます。",
+      "hammer_of_wrath": "遠距離から瀕死の敵を処刑する。翼が発動中なら、どの敵にも使用できる。",
+      "avenging_wrath": "献身を10獲得し、15秒間、能力による献身の生成量を2倍にする。",
+      "bastion_sweep": "盾で敵集団を薙ぎ払い、脅威を掌握して献身を蓄える。",
+      "oath_chain": "遠くの敵を集団へ引き寄せ、逃走を遅らせる。",
+      "veilbound_march": "敵集団をすり抜けて印を刻み、自身へのダメージを弱め、脅威を固定する。",
+      "holy_shield": "献身を消費し、一定時間のブロック、吸収効果、脅威の波動を発動する。",
+      "consecration": "周囲の地を聖別し、持続的な神聖ダメージと脅威を与える。",
+      "hammer_of_justice": "短時間の確実なスタンで敵1体を止める。",
+      "lay_on_hands": "味方が倒れかけたとき、その体力を大幅に回復する。",
       "blessing_of_might": "味方の攻撃力を上げます。プルの前に唱えておくとよいでしょう。",
       "divine_protection": "状況が厳しいときにダメージを吸収する、素早い守りの結界です。",
       "raptor_strike": "敵に距離を詰められたときに使う、重い近接の一撃です。",
+      "pack_command": "相棒に攻撃を命じ、獣の解放に必要な獰猛さを蓄えます。",
+      "stampede": "3体の獣を12秒間呼び出して攻撃させます。群れの獰猛さが最大の時に使うと、召喚中ずっと最大のダメージ上昇を保ちます。",
+      "measured_shot": "慎重に狙う遠距離射撃で、強力な攻撃に使う集中値を回復します。",
       "aspect_of_the_hawk": "維持し続けることで遠隔攻撃力を高めるスタンスです。",
       "serpent_sting": "毒を浴びせ、継続してネイチャーダメージを与えます。",
       "arcane_shot": "遠距離からの即時ショットで、手早く追加ダメージを与えます。",
@@ -4545,11 +4872,21 @@ export const ja_JP: EnTranslations = {
       "power_word_shield": "味方をシールドで包み、攻撃が当たる前に吸収します。",
       "renew": "継続して回復するヒールで、唱えてから移動を続けるのに向いています。",
       "lightning_bolt": "ネイチャーダメージを与える遠距離詠唱。遠くからの主力です。",
+      "chain_lightning": "1体を攻撃して近くの敵2体へ跳び、1回の発動全体で雷鳴を1つ蓄えます。",
+      "thunder_reservoir": "雷を蓄え、大地の衝撃か断層の目覚めで最大威力を解放します。",
       "rockbiter_weapon": "武器に付与し、近接の一振りごとに重い一撃を与えます。",
       "healing_wave": "主力のヒール。自分や味方を直接回復します。",
       "earth_shock": "今すぐ必要なときに手早くネイチャーダメージを与える即時のショックです。",
       "lightning_shield": "身にまとい、攻撃してきた相手にネイチャーダメージを与えます。",
       "flame_shock": "前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。",
+      "galeheart_weapon": "二刀に嵐の風を宿し、安定した攻撃リズムを力に変えます。",
+      "warspirit_cadence": "安定した武器のリズムを疾風の残響と即時呪文の機会に変えます。",
+      "stormsurge": "ストームキャストを消費すると、祖霊の一撃が早く戻ることがあります。",
+      "lifespring_weapon": "武器に癒やしの水を宿し、継続する回復の流れを強めます。",
+      "tidecall": "味方1体を即時に回復し、癒しの水流を最大まで蓄えます。",
+      "ancestor_return": "戦闘外で長く詠唱し、倒れたパーティーまたはレイドの全員を蘇生します。",
+      "stoneward": "力を蓄えた石の盾を掲げ、受けたダメージを回復に変えます。",
+      "primal_exaltation": "専門分野に応じた元素の力を短時間解き放ちます。",
       "fireball": "主力のファイア火力。一撃を当て、標的を燃焼させ続けます。",
       "fireball_form": "生きた火球へと姿を変え、開けた場所を高速で駆け抜けます。",
       "frost_armor": "戦闘の前にアーマーを固める、持続する自己強化です。",
@@ -4566,7 +4903,7 @@ export const ja_JP: EnTranslations = {
       "conjure_water": "マナを回復する飲み物を作り出し、プルの合間に補充できます。",
       "conjure_food": "座って食べると体力を回復する食料を作り出します。",
       "shadow_bolt": "標的に放つシャドウのボルト。主力の火力です。",
-      "summon_imp": "遠距離から敵にファイアボルトを放つエンバーキンを呼び出します。",
+      "summon_imp": "エンバーキンを呼び出し、遠くから敵へフェルボルトを放たせます。",
       "demon_skin": "肌を硬化させてアーマーを上げる、持続する自己強化です。",
       "immolate": "標的に火を放ち、初撃を与えつつ燃焼を残します。",
       "corruption": "標的をシャドウで蝕み、他の行動をしている間も継続して効果が続きます。",
@@ -4575,17 +4912,14 @@ export const ja_JP: EnTranslations = {
       "healing_touch": "詠唱は長いものの回復量の大きい単体ヒールで、体力を満タンに戻します。",
       "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
       "moonfire": "即座に当たり標的を燃焼させるため、移動中にも向いています。",
+      "moonseed": "月翼形態中、月潮を1段階進め、月の嵐の効果時間を延長します。",
       "rejuvenation": "即座に唱えられ、味方を継続的に回復するので、行動を続けられます。",
       "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。"
     },
     "petHook": {
-      "emberkin": "安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。",
-      "gloomshade": "挑発して攻撃を受け止める頑丈なデーモンで、安心して詠唱できるようにします。",
-      "duskborn": "素早い近接のデーモンで、大きなダメージを与えますが打たれ弱いです。",
-      "spellhound": "敵のキャスターに食らいつくシャドウのスカーミッシャーです。",
-      "warfiend": "頑丈な近接のブルーザーで、召喚できるようになればオールラウンドにこなせます。",
-      "pyre_colossus": "強力な近接を持つ巨大なジャガーノートで、純粋な力を求めて召喚します。",
-      "wraithborn": "遠くから重いシャドウを降らせるエリートのキャスターです。"
+      "emberkin": "遠距離のデーモンで、象徴的なフェルボルトで安全な間合いから敵を削ります。",
+      "gloomshade": "頑丈なタンク役のデーモン。挑発し、深淵の鎖で逃げる通常の敵を間合いへ引き戻します。ボスは引き寄せに抵抗します。",
+      "pyre_colossus": "強力な近接を持つ巨大なジャガーノートで、純粋な力を求めて召喚します。"
     },
     "bestiary": {
       "heading": "モンスター図鑑",
@@ -4679,15 +5013,15 @@ export const ja_JP: EnTranslations = {
     },
     "worldPage": {
       "heading": "世界",
-      "intro": "World of ClaudeCraftは、自らの足で歩いて渡る一続きの大地です。南から北へと3つのゾーンが連なっています。ファストトラベルはなく、その旅路こそが冒険の一部です。",
+      "intro": "World of ClaudeCraftは、徒歩で渡っていく、ひと続きの大地です。古い街道は南から北へ、始まりの谷、湿地、山嶺を貫き、その先の窪地と地図の北端の雪国へと登り続けます。その街道からは西へ高位の領邦がひと連なり、東にもうひと連なり開けており、ヴェイルの東岸沖には島が浮かんでいます。高速移動はなく、飛行路も馬車もありません。どの道のりも歩くか騎乗するかで進むので、たどり着くことそのものが冒険の一部です。\n\n大地は時も刻みます。昼夜の周期は、あなたのワールドにいる全員が共有する実際の時計で進むので、空は皆にとって同時に夜明けから正午、そして黄昏と闇へと移り変わり、月は満ち欠けを巡り、地上の光もそれにつれて変わります。ミニマップを囲む文字盤が、時刻を読み取る場所です。",
       "hub": "拠点",
-      "mapHeading": "北への道",
-      "mapSub": "南から北へ三つのゾーンが並び、それぞれレベルが一段ずつ上がります。クエストの道筋をたどれば、土地が谷から峰々へとあなたを運んでいきます。",
+      "mapHeading": "街道と、その先の領邦",
+      "mapSub": "クエストの道筋は地図の中央を南から北へ走ります。谷、湿地、山嶺、そしてその先の窪地と雪へ。ほかの領邦はその街道の先ではなく、街道沿いに開けており、湿地道の東と西の門を通って行けます。ファーショア島へはヴェイルの東岸から渡ります。遠方の領邦から遠ざけているのは道のりではなくレベル帯です。うち五つは最上のレベル帯を分け合っているので、支度が整えば好きな順で挑めます。ファーショアは例外で、早いうちに訪ねられる低レベルの土地です。",
       "places": "注目の場所",
       "residents": "出会う者たち",
       "valeBlurb": "緑あふれる始まりの谷。新たな英雄たちが、イーストブルックの町の周りでオオカミや盗賊を相手に腕を磨く場所です。",
       "marshBlurb": "霧と廃墟に沈んだ国。浅瀬にはマッドフィンが群れ、水の底ではより古き何かがうごめいています。橋の町フェンブリッジから見張られています。",
-      "peaksBlurb": "風に削られた尾根と古い鉱山跡。この地で最も寒く、最も高所にある危険へと続いており、前哨地ハイウォッチが守っています。",
+      "peaksBlurb": "風に削られた尾根と古い坑道が、始まりの街道で最も過酷な危険へと登っていきます。ハイウォッチの前哨が守っています。",
       "duskBlurb": "エルダーグリームの大樹の下に広がる、永遠の黄昏に沈む谷。水晶の遺跡が輝き、大気は古の魔力に満ちて震えています。",
       "emberBlurb": "嵐の光に照らされた灰と血硝子の荒れ地。カルデラの上空をドレイクが旋回し、砂丘のあいだにはトロルの篝火が燃えています。門の町ワームウォッチから見張られています。",
       "frostBlurb": "オーロラの下、雪と暗い松の森が静まり返る地。寒さそのものが目覚めているかのようで、アイスマントルは絶やさず火を焚き続けています。",
@@ -4758,7 +5092,7 @@ export const ja_JP: EnTranslations = {
       "heading": "クエスト",
       "intro": "クエストはこの世界の中心であり、最も早くレベルを上げる手段です。その仕組みを紹介します。",
       "acceptTitle": "探し方と受注",
-      "acceptBody": "頭の上にマークが付いた人物が、あなたに依頼を持っています。話しかけてクエストを受注しましょう。イーストブルックでは、受注できる最初のクエストの一つ「門前の狼」を持って、レッドブルック隊長が待っています。",
+      "acceptBody": "頭上に印のある人は、あなたに仕事があります。印はその種類も教えてくれます。金の感嘆符は今すぐ受けられるクエスト、金の疑問符は完了して納品できるクエストを表します。ネームプレートには灰色の疑問符も現れます。そのクエストを受けてはいるが、まだ終わっていないという意味です。繰り返しの仕事は同じ印を青で使います。明るい青の感嘆符は前にやったことがあり再び受けられる依頼で、同じ印がくすんでいれば、まだ待ち時間の中にあるものです。灰色以外のすべての印はネームプレート、ミニマップ、ワールドマップに表示されるので、町の向こう側からでも仕事を見つけられます。イーストブルックでは、レッドブルック元帥が「門前の狼」を携えて待っています。最初に受けられるクエストの一つです。",
       "objectivesTitle": "目標",
       "objectivesBody": "特定の敵を倒したり、アイテムを集めたり、世界の何かと対話したり。画面上のトラッカーが、進行に合わせて進捗を数えてくれます。気が変わったら、クエストログからクエストを破棄し、後でその発注者から再び受けることができます。",
       "turninTitle": "報告",
@@ -4771,11 +5105,11 @@ export const ja_JP: EnTranslations = {
       "typesTitle": "目にすることになるクエストの種類",
       "typesBody": "ほとんどのクエストは、おなじみのいくつかの型のどれかです。画面上のトラッカーが、それぞれ何を求めているかを正確に示してくれるので、迷うことはありません。",
       "typeSlayTitle": "討伐",
-      "typeSlayBody": "獣の群れを間引いたり、指定された数の標的の敵を倒してカルトの支配を打ち砕いたりします。最初のクエストの一つ、イーストブルックの道から狼を排除するものも、その一つです。",
+      "typeSlayBody": "印のついた敵を定められた数だけ倒して、獣の群れを間引いたり、教団の支配を打ち砕いたりします。最初のクエストの一つ、イーストブルックの街道から狼を片づける依頼がこれにあたります。ときおりクエストが自らの標的を目覚めさせます。前を通ったときは背景にしか見えなかったものが、それに関わるクエストを持った途端にネームプレートを得て、殴れる相手になるので、戻ってもう一度見てみてください。",
       "typeGatherTitle": "収集",
-      "typeGatherBody": "世界から、あるいは敵が落とすものからアイテムを集めます。薬草、鉱石、カルトの不吉な試薬など。特定の敵からしか落ちないものもあるので、狩りと収集は表裏一体です。",
+      "typeGatherBody": "世界から、あるいは敵が落とすものから品を集めます。薬草、鉱石、教団の陰気な試薬など。特定の敵からしか落ちない部品もあるので、狩りと収穫は一続きです。地面にあるクエストの品は、実際にそのクエストを受けている間だけ手に入ります。受けていないときや、すでに足りているときは、その旨を教えてくれます。受注時に道具を渡すクエストもあります。バッグに気を配り、クエスト文の説明どおりに使ってください。前の段階で渡された道具をクエストが必要とする場合、手元になければ受注時に渡し直されるので、道具を失っても連鎖が行き止まりになることはありません。",
       "typeInteractTitle": "対話",
-      "typeInteractBody": "世界に固定された何かを使う、浄化する、あるいは読み取ります。汚された墓、岸の岩に刻まれた警告、封じられた地下墓所の扉など。目印に歩み寄り、それに働きかけましょう。",
+      "typeInteractBody": "世界に据えられた何かを使う、清める、あるいは読みます。汚された墓、岸辺の岩に刻まれた警告、封じられた霊廟の扉など。印まで歩いて、それに働きかけてください。クエストが複数を求めるときは、複数の別々のものを指しています。各対象があなたに算入されるのは一度きりなので、同じものを二度使うのではなく次を探してください。働きかけても対象は消費されないので、パーティの誰もがそこから各自の算入を得られます。",
       "typeMusterTitle": "守りを結集する",
       "typeMusterBody": "いくつかのクエストでは、北へ攻め込む前に町を結集させます。門に迫る脅威を間引き、守り手が必要とするものを集めるのです。これらは、あなたがその物語の一員である人々のために行う討伐と収集の目標であり、彼らと共に動き続けさせてくれます。",
       "typeGroupTitle": "グループでのフィナーレ",
@@ -4813,8 +5147,8 @@ export const ja_JP: EnTranslations = {
     "dungeonsPage": {
       "heading": "ダンジョンとレイド",
       "intro": "オープンワールドだけでは物足りなくなったら、パーティを組んでインスタンスへ踏み込みましょう。インスタンスとは、あなたのグループだけのために用意されたダンジョンの専用コピーです。",
-      "party": "ダンジョンは5人パーティ向けに作られています。エンドコンテンツのレイドは10人用です。",
-      "soloLead": "どのダンジョンも、ソロで進められる導入クエストから始まります。だから、なぜそこへ向かうのかが常にわかります。",
+      "party": "ダンジョンは五人のパーティ向けに造られています。エンドゲームのレイドは十人用です。手近に四人の友人がいなくても、ダンジョンファインダーが待機列に載せた周回のためにグループを組んでくれます。下の各カードにあるレベル帯は、その周回が想定するレベルであって扉の錠ではありません。早めに入るのも後から来るのも妨げられませんが、ダンジョンファインダーが座らせてくれるのは、自分のレベルに合った周回だけです。",
+      "soloLead": "出かける前に近くの町で聞いて回ってください。町のクエスト提供者は、この広間で終わる連鎖を配っています。一つ携えて入れば、その周回は二重に報われます。",
       "levelExact": "レベル{n}",
       "levelBand": "レベル{min}から{max}",
       "partySize": "{n}人",
@@ -4833,12 +5167,12 @@ export const ja_JP: EnTranslations = {
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
       "heroicBody": "すべての5人用ダンジョンと、レイドそのものにも、レベル上限の先にヒロイック版が待っています。同じ回廊が、装備の整ったエンドゲームパーティのために作り直されています。あらゆる攻撃はより重く、徒歩で振り切れるものは何もなく、ボスはスタンや減速を完全に払いのけます。まずはノーマル版を卒業しましょう。ヒロイックは、それを前提に組まれています。",
-      "heroicHowBody": "難易度は、グループがインスタンスを確保する前に選びます。/dungeon heroic と入力するか、パーティメニューのダンジョン難易度の切り替えを使いましょう。選択はパーティ全体で共有され、扉のところで固定されるので、ランは確保されたときの難易度のまま最後まで進みます。",
+      "heroicHowBody": "パーティがインスタンスを確保する前に難易度を選んでください。/dungeon heroic と入力するか、自分の肖像メニューから「ダンジョンの難易度を設定」を選びます。単独なら自分で設定し、パーティではリーダーだけが設定できます。その選択は全員に及び、扉で確定するので、周回は確保されたときの姿のままです。",
       "heroicRewardsTitle": "英雄の証と強化された戦利品",
-      "heroicRewardsBody": "ヒロイックのボスは、おなじみの戦利品を強化し、ツールチップにヒロイックの表記を添えて落とします。さらに各ランの最後のボスは、ほかでは見つからないエピックを加えてくれます。その最後の討伐は、参加者全員に英雄の証も残します。ハイウォッチの補給係ヴェックスのもとで使う通貨で、彼の扱う指輪と首飾りは、このレルムで手に入る唯一の装身具です。",
-      "heroicLockoutBody": "ノーマルのダンジョンは一日中回れます。ヒロイックは辛抱を求めます。各ダンジョンが報酬を出すヒロイッククリアは一日に一度で、レイドは難易度ごとに一日のロックアウトを保ちます。クリア済みのランはそのパーティに常に開かれたままなので、勝ち取った戦利品から締め出される者はいません。",
+      "heroicRewardsBody": "ヒロイックのボスは見知った戦利品を落としますが、強化されており、ツールチップには「ヒロイック」と記されます。さらに各周回の最終ボスは、他では手に入らないエピックを加えます。その最後の一撃は参加者全員にヒロイックの刻印も残します。ハイウォッチの補給官ヴェックスのもとで使う通貨で、彼のカウンターは指輪と首飾りの棚であり、ヒロイックの深みの証以外では何も買えません。",
+      "heroicLockoutBody": "通常のダンジョンは一日中回れます。ヒロイックは辛抱を求めます。最終ボスの討伐は、その周回にいた全員をそのダンジョンの一日一回のヒロイック攻略に縛り、レイドは難易度ごとに日次のロックアウトを持ちます。稼働中のワールドでは日次のロックアウトはすべて、そのワールド自身の夜間リセット時刻に一斉に解けるので、その時刻の直前に取った攻略と直後に取った攻略は別々の日に落ちます。代わりにブラウザでオフラインで遊べば、ロックアウトは自分の討伐から一日後に切れるだけです。攻略済みの五人周回は、亡骸への走りと戦利品のために、そのパーティ自身には開かれたままなので、そこで得たものから締め出される人はいません。レイドはより厳格です。その討伐に一度縛られると、扉はリセットまで閉じたままで、中へ戻る唯一の道は、まさにその周回で倒れた者による亡骸への走りだけです。ですから生きて外に出たレイダーは、その日は外に出たままです。アリーナを去る前に戦利品を集めてください。これらのロックアウトはいずれもそれを得たキャラクターのものなので、主力での攻略が他のキャラクターを縛ることはありません。",
       "resetTitle": "インスタンスのリセット",
-      "resetBody": "グループがインスタンスを確保したまま難易度を切り替えると、古い確保はしばらく残ってから自然に消えます。パーティリーダーならすぐに手放すこともできます。自分のポートレートメニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力しましょう。リセットできるのは難易度を実際に変更したあとだけで、生死を問わず誰もインスタンス内に残っていないことが条件になり、リセットとリセットのあいだには短いクールダウンが挟まります。間違った難易度のまま扉に着けば、ランが始まる前にゲームがそう告げてくれます。レイドはこの方法ではリセットされません。レイドには独自のロックアウトのルールがあります。",
+      "resetBody": "パーティがまだ確保した周回を抱えたまま難易度を切り替えると、古い確保はしばらく居座ってから自然に解けます。パーティリーダーは代わりに一度に手放せます。自分の肖像メニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力してください。リセットが働くのは、難易度が実際に変更された後だけ、中に誰も、生者も倒れた者も残っていない間だけ、そして中の亡骸がすべて拾い尽くされた後だけで、リセットの間には短いクールダウンが挟まります。誤った難易度で扉に着けば、周回が始まる前にゲームが知らせます。レイドはこのやり方では決してリセットされません。レイド自身のロックアウト規則が働きます。",
       "templeLoreTitle": "水没の神殿、もう少し深く",
       "templeLoreBody": "神殿には、あなたが他所で追うカルトよりも古い、それ自身の伝説があります。月明かりを飲み込み、溺れた者を返すという山上の湖グリマーミアの岸辺で、一人の見張り役が淡い光の門を守っています。水面の下には、そこへ続く冷たい石の階段が伸びています。そこに沈んだ者たちは不運で溺れたのではありません。彼らは礼拝のうちに沈み、決して歌うのをやめなかった蒼白の聖歌隊でした。古き守り人たちは水に呑まれる前に、岩へただ一つの警告を刻みました。彼らが溺れし月と呼ぶものへの祈りです。そしてその下に、より落ち着いた手が二つの言葉を書き添えていました。それはただ眠っているだけだ、と。",
       "cryptLeadTitle": "死者が閉ざしておくべきだった扉",
@@ -4859,7 +5193,7 @@ export const ja_JP: EnTranslations = {
       "openBody": "リフトが裂け開くのは、始まりの谷ではなくレルムの広いゾーンの側です。そして開いた瞬間、レルム全体がそれを知ります。チャットに一行流れ、ランクとゾーンが告げられるのです。対象となる各ゾーンには、およそ一時間に一度リフトの順番が回ってきます。すでにリフトが立っているゾーンは、二つめを開かずに順番を待ちます。誰も閉じないままのリフトは数時間で自ら崩れ落ち、そのこともレルムに伝わります。リフトが封印されたゾーンは次の順番が回ってくるまで静かなままなので、告知は新しいうちに向かう価値があります。",
       "ranksHeading": "四つのランク",
       "ranksBody": "リフトにはC、B、A、Sのいずれかのランクがつき、そのランクは告知にも乗るので、町を出る前に自分が何へ向かうのかがわかります。Cが最もおだやかで、BとAはそこから登り、Sはリフトが取りうる最も厳しいものです。調整のつまみはランクだけです。フロアの厳しさを決めるのはランクであり、それ以外の何ものでもありません。ですからCランクのリフトは小さいリフトではなく、同じかたちの挑戦を軽い手つきでなぞったものなのです。",
-      "rankFmt": "Rank {rank}",
+      "rankFmt": "ランク{rank}",
       "groupHeading": "誰が入るのか",
       "groupBody": "グループで挑みましょう。人数が少ないからといってリフトが手加減してくれることはありません。中にいるものは誰も人数を数えていないので、ポータルに記されたランクがそのまま相手の強さです。五人でも一人でも同じです。入口はひとりでも通してくれますし、実際に試す人もいますが、リフトはどのランクでもグループ向けの内容で、最初の部屋からそのことを正直に突きつけてきます。パーティにはリフトの写しがひとつ与えられるので、他のグループがあなたの挑戦に紛れ込むことはありません。倒れてしまっても、ゴーストのまま歩いて戻り、中の戦いが収まったところで身を起こせます。",
       "levelNote": "リフトはエンドゲームの内容です。どのランクであっても、くぐるにはレベル上限、すなわちレベル{n}に達している必要があります。",
@@ -4886,7 +5220,7 @@ export const ja_JP: EnTranslations = {
       "tiersLabel": "難易度",
       "affixesLabel": "発生しうる修飾効果",
       "whatHeading": "デルヴとは",
-      "whatBody": "デルヴは、あなたと最大1人の味方だけのために用意された、小さなインスタンスダンジョンです。誰にも邪魔されない専用のコピーです。フィールドにいるデルヴの番人が管理するボードから開始し、中へ降りて、いくつかの部屋を戦い抜き、最後に1体の守護者で締めくくります。ランは手早く、繰り返し遊べるように作られているので、オープンワールドでやることが尽きたときにも、デルヴは着実な成長の手段になります。",
+      "whatBody": "デルヴは、あなたと最大一人の味方のためだけに作られる小さなインスタンスダンジョンで、邪魔されることのない専用の複製です。世界に立つデルヴの守り手が管理する掲示板から始め、降りていき、いくつかの部屋を戦い抜き、ただ一体の守護者で締めくくります。その守護者の先に何が待つかはデルヴごとに異なり、あるものは戦利品を錠の向こうに封じ、あるものはあなたに儀式を求めます。周回は短く、繰り返すことを前提としているので、オープンワールドが枯れたときにはいつでも、デルヴが頼れる前進になります。",
       "howHeading": "ランの流れ",
       "howBody": "番人に話しかけてボードを開き、難易度を選んで潜行しましょう。各ランはいくつかの短い部屋がつながっており、最後の守護者で締めくくられます。これを倒せば報酬を受け取り、地上へ戻れます。仲間がいるなら連れていき、いないなら相棒の仲間を頼りましょう。",
       "companionHeading": "あなたの仲間",
@@ -4898,7 +5232,7 @@ export const ja_JP: EnTranslations = {
       "affixesHeading": "ランの修飾効果",
       "affixesBody": "より高難易度のランでは、潜行の流れを変える修飾効果が抽選されます。安らげぬ死者から淀んだ空気、崩れかけた天井まで、その内容はさまざまです。修飾効果は危険と報酬をともに高めます。各デルヴは、そのテーマに合った修飾効果の中から抽選します。レルム全体で見ると、その顔ぶれは次の通りです:",
       "marksHeading": "デルヴの刻印",
-      "marksBody": "デルヴを攻略するとデルヴの刻印が手に入ります。これは所持金とは別に管理される通貨です。番人のもとで使えば、仲間を強化したり、ほかでは手に入らない装備を入手したりできます。",
+      "marksBody": "デルヴを踏破するとデルヴの刻印が手に入ります。所持金とは別に管理される通貨です。守り手のもとで使えば、供を強くし、他では見つからない装備を手に入れられます。\n\n刻印はその日の最初の周回に最も厚く報います。毎日最初の三回の踏破は満額で支払われ、それ以降もデルヴは報いを与えますが、確実さは落ちます。難しいほうの段のほうが、易しいほうよりよく持ちこたえます。回数は日ごとに切り替わるので、一つのデルヴを底まで搾る必要はありません。明日また来れば、良い率が待っています。",
       "whereHeading": "どこにあるか",
       "whereBody": "最初のデルヴ「崩れた聖遺物庫」は、始まりの谷イーストブルック渓谷の聖遺物庫の丘で開かれます。ボードを管理しているのはハルヴェン修道士で、準備が整えばあなたを下へ送り出してくれます。彼の受け持ちはそこで終わりません。マイアフェン湿地の北の端、トロルの塚を越えた先では、同じ番人が、足場を固めた潜行者のために溺れし連祷を開いています。",
       "lockpickAnteBody": "錠前に触れる前に、まず条件を決めます。開錠具を3本取れば失敗の余地がありますが、宝箱が払うのは最も素朴な賞品です。2本なら中程度の取引、1本なら一発で解いたときに最も豊かな報酬が返ってきます。手にする開錠具が少ないほど、次の一手を考える時間も短くなります。そして最後の1本が折れると錠前は永久に固まり、その宝箱はデルヴをもう一度攻略するまで失われます。",
@@ -4909,16 +5243,17 @@ export const ja_JP: EnTranslations = {
       "heading": "タレントとスペシャライゼーション",
       "intro": "タレントは、クラスを自分らしくするための手段です。任意で、寛容で、変更も簡単なので、恐れずに試せます。",
       "whatHeading": "タレントの役割",
-      "whatBody": "レベルが上がると、アビリティやステータスへの小さく永続的な強化に振るタレントポイントを獲得します。これがクラスの感触を形作り、より高いダメージ、より硬い防御、より強い回復へと傾けていきます。",
+      "whatBody": "あなたのタレントは、点数の山ではなく短い選択の階段です。開いた段はそれぞれ三つの選択肢を差し出し、あなたはちょうど一つを取ります。それがクラスの手触りを形づくり、より高い火力、より硬い防御、より強い回復へと傾けます。",
       "howHeading": "仕組み",
-      "howBody": "タレントはレベル10で解放され、上限まで上がる間ポイントを稼ぎ続けます。ポイントはクラスのタレントパネルで振り、投資とレベルアップに応じてより深い段が開いていきます。複数の配分を保存して、ビルドを切り替えることもできます。",
+      "howBody": "タレントはレベル5で開きます。専門化を選ぶのと同じレベルです。上がるにつれてさらに五つの段が続き、レベル8、11、14、17、20にそれぞれ一つずつあるので、最後の段はちょうどレベル上限に落ちます。選択はクラスのタレントパネル、「専門化」タブの隣にある「選択」タブで行います。",
       "shareNote": "完成したビルドは短い共有コードにコピーして、フレンドに渡せます。受け取った相手は、自分のタレントパネルにそのまま貼り付けるだけで読み込めます。",
-      "choiceNote": "どのツリーにもいくつか、単なる取得ではなく分かれ道となるポイントがあります。そのノードは2つか3つの選択肢を差し出し、あなたはその一つに身を委ねます。ツリーの他のすべてと同じように、次のリセットでその選択もまた開き直されます。",
+      "choiceNote": "どの段も分かれ道です。三つの選択肢を差し出し、あなたはそのうち一つに身を委ねます。次の振り直しが、その選択のひとつひとつを改めて開き直します。",
       "resetTitle": "決定的なものは何もない",
-      "resetNote": "タレントは、戦闘の外でアリーナの試合中でなければ、いつでもリセットできるので、序盤の選択が落とし穴になることはありません。いろいろ試し、好みを見つけ、自由に考えを変えましょう。",
+      "resetNote": "戦闘外かつアリーナの試合中でなければ、タレントはいつでも振り直せるので、序盤の選択が罠になることはありません。振り直しは各段の選択を消すだけで費用はかからず、専門化はそのまま残るので、周回の途中で役割を奪われることは決してありません。戦場は例外で、そこでは戦いと戦いの間にビルドを変えられます。いろいろ試し、気に入るものを見つけ、気兼ねなく考えを変えてください。",
       "specsHeading": "クラス別のスペシャライゼーション",
-      "specsBody": "どのクラスにもいくつかのスペシャライゼーションがあり、それぞれに固有のロールと特徴的な軸があります。タレントパネルで一つを選ぶと、象徴的なアビリティと、それ自身の恒久的なマスタリーが与えられます。ここではそのすべての概要を示します。全アビリティはクラスを開いて確認してください。",
-      "loadoutNote": "ビルドを一つに決めてしまう必要はありません。パネルで名前をつけた構成を保存すると、タレントの選択とアクションバーの両方が記憶されるので、別の構成へ移るのはクリック一回です。条件は振り直しと同じで、戦闘外であること、そしてアリーナの試合や戦場の最中でないことです。"
+      "specsBody": "どのクラスにもいくつかの専門化があり、それぞれに固有の役割と象徴的な軸があります。レベル5でタレントパネルから一つを選びます。象徴的なアビリティと長く続く熟達を授け、多くはその役割に合った常時効果を加え、さらにダンジョンファインダーで申し込む際の役割にもなります。以下がそのすべての姿です。クラスを開けば全容が見られます。",
+      "loadoutNote": "ビルドを一つに決めてしまう必要はありません。パネルで名前をつけた構成を保存すると、タレントの選択とアクションバーの両方が記憶されるので、別の構成へ移るのはクリック一回です。条件は振り直しと同じで、戦闘外であること、そしてアリーナの試合の最中でないことです。",
+      "loadoutGearNote": "レイアウトは装備も一緒に覚えられます。保存するときに装備も残す項目を選べば、そのとき着ていた装備も記録されるので、PvP用の一式とダンジョン用の一式の切り替えが十六回ではなく一回のクリックで済みます。覚えるのは名前だけでなくその現物なので、エンチャントした指輪がバッグに並んだ素の同名品と黙って入れ替わることはありません。戻すときに見つからない部位はそのままにして知らせるだけなので、一部を銀行や市場に出した一式でも残りはきちんと装備されます。"
     },
     "arenaPage": {
       "heading": "アリーナとPvP",
@@ -4926,7 +5261,7 @@ export const ja_JP: EnTranslations = {
       "duelsHeading": "決闘",
       "duelsBody": "出会った相手なら誰でも友好的な決闘に挑めます。賭けるのはプライドだけなので、相性を学んだり仲間内の言い争いに決着をつけたりするのに一番手軽な方法です。",
       "coliseumHeading": "灰のコロシアム",
-      "coliseumBody": "灰の闘技場はレルムのアリーナで、ランクマッチで他のプレイヤーと対戦します。一対一、あるいは二対二です。各ブラケットはそれぞれ独自の順位を保つので、勝てばそのラダーを駆け上がり、レルム全体に見てもらえます。アリーナのウィンドウを開き、一人で、あるいはパートナーとブラケットに登録しましょう。",
+      "coliseumBody": "コロシアムはワールドのアリーナで、そこでほかのプレイヤーとレート戦を、一対一または二対二で戦います。区分ごとに順位を別々に持つので、勝てばその梯子をワールド全体の目の前で登ることになります。レート戦はレベル15で開き、これは相方にも当てはまります。どちらかが下回っていれば、二人とも条件を満たすまで待機列は閉じたままです。プレイヤー対プレイヤーはすべて、PvPと記された一つのボタンの向こうにあります。開いてタブを選んでください。ソーンホロウ平原、一対一、二対二です。そのうえで一人で、あるいは相方と申し込みます。待機列にいる間や試合中は他のタブが施錠されるので、二つの待機列に同時に並ぶことはできません。",
       "ladderHeading": "ラダーを駆け上がる",
       "ladderBody": "ランクプレイでは時間をかけて順位を記録します。リーダーボードを確認すれば、自分の位置やレルムの頂点に立つのが誰かが分かります。",
       "rewardsHeading": "ランクプレイの実入り",
@@ -4943,7 +5278,7 @@ export const ja_JP: EnTranslations = {
       "heading": "ソーンホロウ平原",
       "intro": "ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。",
       "queueHeading": "キューへの参加",
-      "queueBody": "ソーンホロウ平原パネルを開けばソロで参加できるほか、最大5人のパーティで一緒に並べます。パーティは必ず同じチームに配置され、残りの席はソロの勇者で埋まります。10人が揃うと両チームが砦に配置され、短い整列ののち旗が有効になります。",
+      "queueBody": "ソーンホロウ平原はレベル20で開き、パーティが申し込むには全員がそれに達している必要があります。PvPボタンを開いてソーンホロウ平原タブを選んでください。そもそも最初に開くタブです。そのうえで一人で待機列に入るか、五人までのパーティを連れて一緒に申し込みます。パーティは常に同じチームにまとめられ、残りの席は単独の勇者で埋まります。十人が揃うと、旗が動き出す前に短い整列のため、試合が両チームをそれぞれの砦へ配置します。四人や五人のパーティが、そのままでは単独申込者ばかりを相手にすることになる場合、組み合わせは第二のパーティが現れるかを見るため試合を少しだけ引き留めます。その規模のパーティは門が開くまで数瞬長く待つことがあります。その待ちは短く、最後には必ず折れるので、そのせいで待機列に取り残される人はいません。",
       "fieldHeading": "戦場",
       "fieldBody": "壁に囲まれた野外の戦場は、3つの区画に分かれています。両チームそれぞれの前庭と、その間に挟まれた「廃墟の中庭」です。全幅を貫く2枚の隔壁が境界となり、区画間の移動は必ず争奪点を通ります。広い正門と、隔壁をまたぐ門楼です。門楼の2つの扉は互い違いに開いており、伏撃の角を回り込む必要があります。各砦は正面口以外が完全に封じられているため、旗をめぐる出入りは必ず同じ開口部を通ります。その正面口には低いバリケードが立ち、まっすぐな突撃を阻みます。中庭には空洞の中心遺跡と側翼の2つのスプリントルーンがあり、残る2つは旗への進路に待っています。さらに各正門の中庭側入口にはバトルルーンまたはウォードルーン(短時間、与ダメージ増加か被ダメージ軽減)が待機:両方の台は同じ面で試合を開始し、取得のたびに面が切り替わります。",
       "flagsHeading": "旗",
@@ -4953,8 +5288,11 @@ export const ja_JP: EnTranslations = {
       "respawnBody": "死は古典の儀式のまま:遺体はあなた自身が解放するまでその場に残り、魂は自陣キープの傍らの柵に囲まれた墓地に現れ、次のチーム復活ウェーブまでそこに縛られます。ウェーブは待機中の霊体を全員同時に蘇らせます。両チームのウェーブは意図的にずらされており、戦いが同時に完全リセットされることはありません。遺体走りも、スピリットヒーラーとの取引もありません:解放し、ウェーブを待ち、戦うのみ。",
       "carrierHeading": "旗の運搬",
       "carrierBody": "敵の旗を長く持ちすぎた運び手はどんどん脆くなり、旗がキャプチャー、ドロップ、返還されるまで被ダメージが増え続けます。旗を抱えて隠れるのは負け筋。持ち帰るのが勝ち筋です。",
+      "leavingHeading": "途中で抜けること、そして空席を埋めること",
+      "leavingBody": "進行中の試合を抜けることは離脱にあたり、レーティングのかかった仕組みで負けている最中に接続を切る行為に報いるわけにはいきません。離脱した者はその場で敗北と、それに伴うレーティングの下落を負い、旗を運んでいたなら旗を落とし、その味方は一人欠けたまま戦い続けます。この最後の点こそ、空席が用意される理由です。試合が人数不足の間、待機列はその席を待っている誰かに差し出すことができますが、これは常に受けるか断るかを選べる誘いであって、勝手に転送されるわけではありません。断っても何の損もなく、席は次の人へ回ります。声がかかるのは単独で並んでいる人だけなので、一緒に並んだパーティーが穴埋めのために引き離されることはありません。",
+      "backfillNote": "補充の席は意図的に危険のないものになっています。あなたが飛び込むのは自分が関わっていない戦況なので、勝っても負けてもこの試合があなたの戦場レーティングに触れることはなく、途中で抜けても何も負いません。試合が終わりに近づき、来たところで結果を変えられない頃合いになると誘い自体が届かなくなるので、他人の幕引きに座らされることはありません。",
       "ladderHeading": "ラダー",
-      "ladderBody": "勝っても負けても、毎試合キャラクターごとの戦場レーティングが動き、歴代ランキングがレルムの王者を記録します。勝利と最後まで戦い抜いた敗北にはウォーフェアシステムを通じて名誉も支払われます。",
+      "ladderBody": "どの試合も、キャラクターに結び付いた戦場レートを勝敗にかかわらず動かし、歴代の表がワールドの勇者たちを順に並べます。",
       "rewardsHeading": "試合が支払うもの",
       "rewardsBody": "試合を最後まで戦えば、必ず名誉が支払われます。勝てば多く、敗北や引き分けでも慰めの分があり、さらに自分が決めた止めの一撃と、助太刀した撃破のそれぞれにわずかな上乗せがつくので、旗から離れた場所で戦うことにも意味があります。その日の初勝利にはさらにボーナスが加わり、そのボーナスがまだ残っているあいだはパネルが教えてくれます。この一日は名誉が持つ独自のもので、レルムのインスタンスリセットとは別の時計で切り替わります。同じ相手と何度も当たると、初回のあとは試合そのものの支払いが減りますが、すぐに下限で落ち着き、まったくのゼロまで落ちることはありません。放棄した試合には何も支払われません。稼いだものは、どちらのウォーフェア補給官のもとでも使えます。"
     },
@@ -4993,11 +5331,11 @@ export const ja_JP: EnTranslations = {
       "howHeading": "功績の仕組み",
       "howBody": "功績は一人のキャラクターごとに獲得し、そのまま保たれます。ですから、あなたが遊ぶどの英雄も、それぞれ自分だけの功績の書を築いていきます。あなたのすべてのキャラクターにまたがって名声をまとめるのはレルムのリーダーボードだけで、そこでは各功績が一度だけ数えられます。それぞれの功績が何を求めているかは、ゲーム内の功績の書にはっきりと記されているので、次に何を追うべきかはいつでも分かります。狙っている功績には追跡を設定して、遊んでいる間もずっと視界に入れておけます。ごく一部の功績は秘密のままで、獲得して初めて姿を現します。功績の書はまた、自らに正直であり続けます。あなたの過去の記録で証明できるものはその場で認められるので、歴戦の者が開いたページが白紙ということはありません。数を刻む功績だけが、その集計を新たに始めます。",
       "renownHeading": "名声",
-      "renownBody": "名声は功績の書を支える点数です。獲得した功績はそれぞれ定められた点数を持ち、合計は増える一方なので、静かな一週間があっても築いたものが減ることはありません。一部の功績は技量ではなく運によるもので、偉業はそれ自体が誉れであるため、そのどちらも名声を一切もたらしません。名声を持たない功績も功績の書の達成数には数えられますが、点数になることはありません。",
+      "renownBody": "名声は功績の書の背後にある点数です。得た功績にはそれぞれ定まった値があり、合計は上がる一方なので、静かな一週間が足場を奪うことはありません。ひと握りは腕前より運によるもので、ほかの収集の功績はそれ自体が報いであり、偉業はまた別の栄誉なので、そのいずれも名声にはなりません。名声のない功績も、あなたの書の達成には数えられます。ただ得点にならないだけです。偉業だけが唯一の例外で、数のまったく外に置かれています。",
       "rewardsHeading": "称号と枠飾り",
-      "rewardsBody": "報酬はすべて見せびらかすためのもので、それこそが狙いです。一部の功績は、身につけられる称号や、名前を彩る枠飾りを授けますが、英雄を強くするものは決して与えません。功績の書で好きな称号を選べば、それはネームプレート、チャット、そして順位表にも添えられ、誰の目にも映ります。",
+      "rewardsBody": "報酬はすべて見せびらかすためのもので、それこそが狙いです。一部の功績は、身につけられる称号や、名前を彩る枠飾りを授けますが、英雄を強くするものは決して与えません。功績の書で好きな称号と枠飾りを選べば、称号はネームプレート、チャット、そして順位表にも添えられて誰の目にも映り、枠飾りはネームプレートと肖像を自らの色で縁取ります。",
       "chroniclesHeading": "年代記",
-      "chroniclesBody": "各地方はそれぞれの年代記を保っています。これは、通り過ぎるすべての旅人を記録しようと自ら買って出た土地の記録者が集めた功績の一群です。イーストブルック渓谷のSaulがその最初の一人です。年代記はいくつかの章に分かれており、どの順で進めても構いません。",
+      "chroniclesBody": "どのゾーンにも独自の年代記があります。通り過ぎる旅人をひとり残らず書き留めることを自らの務めとした、土地の記録者が集めた功績の束です。イーストブルック・ヴェイルのソウルがその最初のひとりで、オズリック・フェンはマイアフェンの奥、フェンブリッジで湿地の年代記を守り、ゼンジーはハイウォッチの高みで山嶺の年代記を記します。年代記は章に分かれており、自分に合う順で進めてかまいません。",
       "featsHeading": "偉業",
       "featsBody": "偉業は別格の棚です。それは伝承と世界初の記録であり、過ぎ去った時代に結びついた功績や、二度と起こらない一瞬の功績です。名声はなく、達成率にも数えられず、成し遂げられたことの記憶として永遠に残されます。",
       "catalogHeading": "功績の全目録",
@@ -5022,9 +5360,29 @@ export const ja_JP: EnTranslations = {
         "feat": "偉業"
       },
       "bookHeading": "功績の書の中身",
-      "bookBody": "功績の書は、すべての功績を切り替え可能なカテゴリに分けて並べます。検索欄と、全件、獲得済み、未獲得、あと少しで達成できるもの、という絞り込みがあります。上部の「最近」の帯には最新の解除が並び、クリックするとそのカードへ直接飛べます。チャットに投稿された功績名をクリックしたときも同じです。その隣の「あと少し」は、達成が近いいくつかを教えてくれます。レルムでは各功績にレアリティ、つまりそれを獲得した冒険者の割合も表示されるので、ありふれたものと本物の難関がひと目で分かります。オフラインのワールドには数えるべき人口がないので、そこでは表示されません。レールの末尾には称号の棚があり、身につける称号をそこで選びます。",
+      "bookBody": "功績の書は、すべての功績を切り替え可能なカテゴリに分けて並べます。検索欄と、全件、獲得済み、未獲得、あと少しで達成できるもの、という絞り込みがあります。上部の「最近」の帯には最新の解除が並び、クリックするとそのカードへ直接飛べます。チャットに投稿された功績名をクリックしたときも同じです。その隣の「あと少し」は、達成が近いいくつかを教えてくれます。レルムでは各功績にレアリティ、つまりそれを獲得した冒険者の割合も表示されるので、ありふれたものと本物の難関がひと目で分かります。オフラインのワールドには数えるべき人口がないので、そこでは表示されません。レールの末尾には称号と枠飾りの棚があり、選択欄が二つ並びます。一方で身につける称号を、もう一方でネームプレートを縁取る枠飾りを選べます。",
       "platformHeading": "SteamとEpicの実績",
       "platformBody": "デスクトップ版アプリからSteamまたはEpic Gamesのアカウントを連携すると、獲得した功績が、そのアカウントの実績として外側にも映し出されます。あくまでゲーム世界が本体です。功績はここで獲得され、あなたのキャラクターに記録され、実績はそのあとについてきます。すべての功績に対応する実績があるわけではありませんし、すぐに届かなかった場合も、次にログインしたときに追いつきます。連携はどこまでも連携であって、サインインの手段になることは決してありません。"
+    },
+    "reliquaryPage": {
+      "intro": "聖遺物庫は、カタログに載せたユニークな戦利品の博物館です。ダンジョンの追撃装備、職業のトロフィー、マウント、武器スキン、称号。功績の書に対して、トロフィー室と実績帳のような関係です。",
+      "howHeading": "コレクションの仕組み",
+      "howBody": "ゲーム内で聖遺物庫を開きます（既定は Shift+X）。各棚にユニークな聖遺物のページがあります。キャラクターが初めてその品を得るとシルエットが埋まり、ページ上のすべてが埋まると点灯します。「絶版」や「専用」と表示される一部のページは達成の対象外で、棚や全体の完成を妨げることはありません。ライブの発見はトーストと開いているウィンドウの更新になります。進捗はキャラクター単位で、武器スキンだけはアカウントの見た目です。",
+      "ranksHeading": "キュレーターランク",
+      "ranksBody": "キュレーターランクはカタログに載せたユニーク埋めで上がり、装飾の称号と枠だけを与えます。戦闘力、ドロップ率、天井はありません。アカウントの武器スキンはキュレーターランクに数えず、名声はキャラクターに残ります。絶版や専用ページの聖遺物も同様にランクへは数えません。",
+      "retiredTag": "絶版",
+      "personalTag": "専用",
+      "retiredNote": "これらの聖遺物はもう入手できません。このページは持ち続ける古参を称えるもので、達成やキュレーターランクには数えません。",
+      "personalNote": "各キャラクターは自分のものしか持てません。このページは達成やキュレーターランクには数えません。",
+      "catalogHeading": "ページ一覧",
+      "catalogBody": "著された聖遺物庫の全ページと、そこに載る聖遺物の名前。防ネタバレの名前だけです。自分の進捗、クリア数、シルエットはゲーム内の聖遺物庫で確認してください。",
+      "spoilerNote": "個人の初発見履歴、クリア数、所持／未所持の状態はゲームクライアントに残ります。ウィキはプレイヤーのコレクションを公開しません。",
+      "shelfHeading": "{label}（{count}）",
+      "shelf": {
+        "conquerors": "征服者",
+        "professions": "専門技能",
+        "horizons": "地平"
+      }
     },
     "wishPage": {
       "heading": "知っておきたかったこと",
@@ -5034,7 +5392,7 @@ export const ja_JP: EnTranslations = {
       "i2Title": "死んでもほとんど痛手はない",
       "i2Body": "倒れると、最寄りの墓地で亡霊として起き上がります。亡骸まで走って戻れば無償で復活でき、霊魂の癒し手のその場での蘇生を選べば、その手軽さと引き換えに短い衰弱を背負います。経験値、装備、コインは決して失われないので、安心してリスクを取り、学べます。",
       "i3Title": "タレントは落とし穴ではない",
-      "i3Body": "タレントはレベル10で解放され、戦闘の外なら好きなときにリセットできるので、序盤の選択が永続することはありません。",
+      "i3Body": "最初のタレントはレベル5で手に入り、六つの段はどれも三つから一つを選ぶだけなので、ビルドはひと目で見渡せるいくつかの決断にすぎません。戦闘外かつアリーナの試合中でなければいつでも振り直せるので、早くに選んだものがあなたを縛ることはありません。",
       "i4Title": "クエストの道筋をたどる",
       "i4Body": "クエストは最も速いレベリング手段で、ワールド中へとあなたを導きます。どこへ行けばよいか分からないときは、次のマーカーを探しましょう。",
       "i5Title": "装備を最新に保つ",
@@ -5106,7 +5464,7 @@ export const ja_JP: EnTranslations = {
     "gear": {
       "intro": "ギアとは、あなたのキャラクターが身につける装備や持ち歩くアイテムのことです。より良いギアこそが強くなる最も着実な道であり、そのほとんどは遊んでいるだけで手に入ります。",
       "slotsTitle": "装備できるもの",
-      "slotsBody": "武器スロットが一つ、防具スロットが七つ、そして装身具スロットが三つ、首が一つと指が二つあります。各クラスは特定の武器しか扱えず、自分の重さまでの防具、クロス、レザー、またはメイルを着用します。だからあなたに合うアップグレードは、あなたのクラスのために作られたものです。装身具には重さの区別がまったくなく、どのクラスも手に入れたものを自由に身につけられます。その範囲内で、見つけた最良の品ですべてのスロットを埋めましょう。",
+      "slotsBody": "メインハンドの武器スロットが一つ、オフハンドのスロットが一つ、防具スロットが七つ、装飾品のスロットが三つ、首と指二本があります。クラスごとに扱える武器は限られ、防具も自分の重さまで、布、革、メイルのいずれかまでを着るので、あなたに合う強化はあなたのクラスのために作られたものです。装飾品には重さの区別がまったくなく、どのクラスも得たものを身に着けられます。その範囲の中で、見つけた中の最良の品で各スロットを埋めてください。",
       "slotMainhand": "武器",
       "slotHelmet": "頭",
       "slotNeck": "首",
@@ -5118,7 +5476,7 @@ export const ja_JP: EnTranslations = {
       "slotFeet": "足",
       "slotFinger": "指",
       "bagsTitle": "バッグと収納容量",
-      "bagsBody": "拾ったものはすべて一つの共有バッグに入り、バッグを装備することで容量を増やせます。バッグウィンドウには四つのバッグスロットがあり、共有バッグの中のバッグをクリックすると空いているスロットに装着でき、身に着けたバッグの分だけ収納が増えます。簡素なバッグは商人で安く買え、より大きなものは獣から手に入り、最も上等なものはダンジョンのボスから得られます。こうして装備の充実とともに、持ち運べる容量も広がっていきます。",
+      "bagsBody": "拾ったものはすべて一つの共通の背嚢に入り、バッグを装備することでそれを広げます。バッグウィンドウにはバッグスロットが四つあります。背嚢の中のバッグをクリックすれば空きスロットに差し込めますし、身に着けたバッグはそれぞれ自分の収納を足します。素朴なバッグは安価な商人の品で、より広いものは獣が落とし、最上のものはダンジョンのボスから来るので、持てる量は装備と歩調を合わせて育ちます。積み重ねられる品はどれも、一つのスロットに何個入るかをツールチップに記しているので、ちょっとしたポーションの買い出しがスロット二つ分になることを前もって知ることができます。",
       "qualityTitle": "品質をひと目で",
       "qualityBody": "どのアイテムにも品質があり、その名前は品質に合わせて色付けされているので、ひと目で価値が読み取れます。最もありふれたものから最も値打ちのあるものまで、順に並べると次の通りです。",
       "qualityPoor": "ジャンク",
@@ -5132,18 +5490,18 @@ export const ja_JP: EnTranslations = {
       "upgradeBody": "古い一品を新たなアップグレードに替えるほうが、もう手に余る装備で完璧に立ち回るより効果があります。より良いものがドロップしたり、クエストで提示されたりしたら、受け取りましょう。良いアイテムを後のために取っておいてはいけません。",
       "itemLevelBody": "2つの装備を手早く比べたいときは、オプションで「アイテムレベルを表示」をオンにしましょう。敵やクエスト、生産職といった入手元がはっきりしている装備にはアイテムレベルが表示されます。これは入手元をもとに、その装備のおおよその強さを一つの数値で示したものです。スロットが違っていても、どちらの方が大きく性能を底上げするか、ひと目で見分けられます。商人で売っている素の基本装備や初期装備のように、そうした入手元を持たない品にはアイテムレベルが表示されません。数値がないのは異常ではなく、正常なことです。",
       "sourcesTitle": "ギアの入手先",
-      "sourcesBody": "序盤のアップグレードのほとんどはクエスト報酬なので、稼ぎ作業よりクエストを終わらせるほうが得です。敵は倒されると装備を落とし、町の商人は手堅い基本装備を売り、職人は採集した素材を身につけられる品へと変え、プレイヤーマーケットでは他の冒険者から買えます。そして頂の上では、二つの刻印通貨が、ほかでは見つからない装備を買わせてくれます。デルヴの番人のもとではデルヴの刻印、英雄補給係のもとでは英雄の証です。",
+      "sourcesBody": "序盤の強化のほとんどはクエスト報酬なので、狩り続けるよりクエストを終わらせるほうが得です。敵は倒すと装備を落とし、町の商人は堅実な基本の品を売り、職人は集めた材料を着られる品に変え、プレイヤー市場では他の冒険者から買えます。丘の頂では、他では手に入らない装備を三つの稼いだ通貨が購います。デルヴの守り手のデルヴの刻印、ヒロイックの補給官のヒロイックの刻印、そして名誉の補給官の名誉です。",
       "soulboundTitle": "魂縛：あなただけのもの",
       "soulboundBody": "価値ある品の多くは魂縛、つまり入手した瞬間からあなたのキャラクターに縛られています。魂縛のアイテムは取引にも郵送にも出せず、商人に売ることも、マーケットに出品することもできません。それはもうあなたの物語の一部であり、ほかの誰かが代わりに持ち運ぶことはできないのです。",
       "uniqueTitle": "装備ユニーク：同じレジェンダリーは1つだけ",
       "uniqueBody": "レジェンダリーアイテムは装備ユニークです。キャラクターは同じレジェンダリーを同時に1つしか装備できず、そのヒロイック版も同じアイテムとして扱われます。2つ目はバッグや銀行、マーケットに置けますが、両方を同時に装備しようとすると拒否されます。ツールチップには金色の「装備ユニーク」タグが表示されるので、2つ持ちのビルドを計画する前にこのルールを確認できます。",
       "setsTitle": "セットとセットボーナス",
-      "setsBody": "一部の防具は、見た目も戦いぶりもひと揃いになるよう仕立てられた、おそろいのシリーズで手に入ります。同じシリーズを一定数まとめて装備するとセットが目を覚まし、各部位そのもののステータスに加えてボーナスを与え、装備する部位が多いほど効果は強まります。そうしたシリーズのいくつかは、レベリング中の貴重なドロップとしても現れます。最も偉大なものはレベル上限近くの最も手強いグループコンテンツから手に入るので、フルセットを追い求めることは古典的なエンドゲームの目標になっています。",
+      "setsBody": "防具の中には揃いの一族として現れるものがあり、見た目も戦いぶりも一つになるよう仕立てられた複数の部位から成ります。一族の部位を十分な数だけ同時に着ければセットが目を覚まし、各部位自身の性能の上に効果を授けます。着ける部位が多いほど強くなります。そうした一族のいくつかはレベルを上げる道中で望まれる戦利品として現れ、最上のものはレベル上限近くの最も厳しいグループ内容から来るので、一式を追い求めるのは古典的なエンドゲームの目標です。他のプレイヤーとの戦いにも揃いの一族があり、名誉で一部位ずつ買えます。それらが目を覚ます部位数は戦利品の一族とは異なり、その効果は敵が他のプレイヤーであるときにだけ応えます。",
       "consumablesTitle": "消耗品",
       "consumablesIntro": "一度きりで手早く効くアイテムもあります。安価な保険なので、いくつか手元に持っておきましょう。",
-      "consumablesPotions": "ポーションは使った瞬間に、戦闘中でさえ体力やマナを回復してくれるので、プルがしくじったときの土壇場での救いになります。短いクールダウンを共有するため、ここぞという好機を一度見極めて使いましょう。",
+      "consumablesPotions": "ポーションは使ったその瞬間に体力やマナを戻します。戦いの真っ只中でもそうなので、プルが崩れたときの決め手の救いになります。すべてのポーションは数分ほどの一つのクールダウンを共有するので、連打ではなく戦いごとに一度の良い機会が得られます。座って食べたり飲んだりするより戻る量は少なく、それが座らないことの代償です。ポーションは世界の各区間に合わせて段があるので、自分のレベルのために作られた段を携えてください。古い低い段のポーションは、育ったキャラクターにはひとかけらにすぎません。",
       "consumablesFood": "食べ物と飲み物は、戦いの合間に座って休む間にあなたを回復させます。食べれば体力が、飲めばマナが戻り、こうした休息は無料です。厳しい戦いのあとは、半分の体力で次へ駆け込むのではなく、数秒間座りましょう。",
-      "consumablesElixirs": "エリクサーは冒険中、一時的なバフを与えてくれます。もう一歩踏み込みたいときに効く、ささやかな後押しです。",
+      "consumablesElixirs": "エリクサーは冒険の間だけ続く強化を授けます。もう少し先まで押し込みたいときに効く、ささやかな利です。ポーションのクールダウンとは別なので、一本飲んでも回復ポーションを控えに残せます。同じ能力値のエリクサーは二本重ならず、最後に飲んだものが残ります。",
       "fishingTitle": "釣り",
       "fishingBody": "釣りは心安らぐ気分転換です。釣り竿を装備し、開けた水面に竿を投げ入れ、食いついたものを釣り上げます。主にそのまま食べられる食料の魚、数コインで売れる細々としたがらくた、そしてときおり値打ちのあるレアな獲物が釣れます。何が手に入るかは、釣る水によって変わります。",
       "fishingFood": "釣り上げた魚は食べ物です。座って休んでいる間に一匹食べれば体力が回復し、より滋養のある魚は北の、より冷たく深い水から獲れます。湖に糸を垂らすのは、戦いの合間にバッグを蓄えておく静かな手段です。",
@@ -5151,10 +5509,10 @@ export const ja_JP: EnTranslations = {
       "cosmeticsTitle": "見た目と装飾",
       "cosmeticsBody": "見た目だけを変え、強さには一切影響しない報酬もあります。こうした装飾スキンは、ゲームに影響を与えることなく自分を際立たせてくれるので、好きなものを身につけましょう。",
       "cosmeticsRanks": "装飾品にもそれ自身のレアリティ段階があり、希少なものは追い求めると楽しいものです。上位の段階を手に入れると、それより下の見た目も解放されます。",
-      "cosmeticsSkins": "集められる装飾の系統は二つあります。ほとんどのクラスには、そのクラスならではのいくつかの別バージョンの外見があり、あなただけが身につけられる新たな装いです。それと並ぶのがクロマ。見た目を丸ごと塗り替える、名前付きのツートーンのカラースキームで、渋い金属色から鮮やかな帝国色まで揃っています。",
+      "cosmeticsSkins": "キャラクターの見た目には二つの系統があります。ほとんどのクラスに別の見た目がいくつかあり、クラスの装いを新たに読み解いたもので、あなたが着るためのものです。その隣に並ぶのがクロマです。名前の付いた二色の配色で、見た目を丸ごと塗り替えます。落ち着いた金属色から鮮やかな帝国色まで揃っています。",
       "cosmeticsCache": "その一部は謎めいた装飾キャッシュから手に入ります。封じられた賞品で、開けると三段階の品質のいずれかが抽選され、それに見合った外見が与えられます。純粋に見た目のためのもので、中身であなたが強くなることはなく、ただ見栄えが良くなるだけです。",
       "cosmeticsApply": "キャラクター画面の外見の項目から、いま使う見た目を設定できます。アンロック済みのものなら、いつでも自由に切り替えられます。",
-      "slotOffhand": "Off Hand",
+      "slotOffhand": "オフハンド",
       "offhandBody": "オフハンドに何を持てるかはクラスによります。盾はそこに入り、宝珠や書物といった手持ちの触媒、ハンターの矢筒も同じです。二刀流ができるクラスは、代わりに二本目の武器を持ちます。両手武器は通常、両手をふさぐので、装備するとオフハンドに持っていたものは外れます。ただし、両手武器を二本同時に扱える珍しいスペシャライゼーションであれば別です。",
       "bagsSort": "バッグが散らかってきたら、バッグウィンドウの「整理」ボタンがひと押しで片付けてくれます。同じ品の半端なスタックはまとめられ、すべてが読みやすい順に並べ直されます。まず武器と防具、次にバッグ、消耗品、道具、マウント、続いて製作素材が上質な等級とその素の版を隣り合わせで、その後にクエストアイテム、そして灰色のがらくたが最後に来るので、何を売ればよいかがひと目で分かります。何かが生まれたり失われたりすることはなく、並べ替えるだけなので、いつ押しても安全です。",
       "requiredLevelBody": "一部の装備には必要レベルも設定されていて、ツールチップに表示されます。そうした品はどのレベルでも拾ったり、買ったり、譲り受けたりできますが、そのレベルに達するまで身につけられません。この条件は色だけでなく、その品がどこから来たかに従います。ですから自分のレベルで手に入れたレアはたいていすぐ着られますが、はるかに格上のところから譲られた品は、追いつくまでバッグの中で待つことになります。",
@@ -5411,7 +5769,7 @@ export const ja_JP: EnTranslations = {
         "startBody": "Simple Fishing PoleはEastbrookのFisherman Brandtが20銅で売っています（町の東端でMirror Lakeを睨む老練の釣り師です）。Tinker Gizzel、FenbridgeのProvisioner Hale、HighwatchのQuartermaster Breeにも在庫があります。前方約24ヤード以内の十分に深い水面に向かって竿を使えば、浮きが飛んでいきます。戦闘中、泳いでいる間、死亡中は投げられません。岸から釣るのが本来の姿で、どの地方の釣れる水域でも構いません。",
         "biteHeading": "アタリとリール",
         "biteBody": "キャストから{min}から{max}秒でアタリが来ます（良い竿は待ちを最大{rod}秒縮めます）。リールの猶予は{reel}秒に竿がティア1つ上がるごとに{reelRod}秒加わり、1回のセッションは最長{cap}秒です。",
-        "earlyReelNote": "せっかちな指への注意：アタリが来る前にもう一度竿を使うと空の糸を巻き上げ、そのキャストは終わります（キャスト直後のわずかな猶予がうっかりの二度押しを許してくれます）。釣りは我慢がすべて。アタリを待って、それから合わせましょう。",
+        "earlyReelNote": "せっかちな指へひとつ注意を。何かが食いつく前にもう一度竿を押すと、空の糸を巻き上げてその一投は終わります。糸が落ちてからの最初の一秒は大目に見られるので、うっかり二度押しても損はありません。それを過ぎたら、早すぎる一押しは無駄にした一投です。辛抱こそがこの遊びのすべてです。当たりを待ち、それから合わせてください。",
         "scheduleHeading": "熟練度成長",
         "scheduleNote": "釣りの成長は熟練度ごとの固定スケジュールに従い、{cutoff}からはガラクタを釣っても何も学べません。",
         "colProficiency": "熟練度",
@@ -5509,7 +5867,7 @@ export const ja_JP: EnTranslations = {
       "coinBody": "お金は三種類のコインで成り立っています。100カッパーで1シルバー、100シルバーで1ゴールドになり、財布は一番小さなコインから満たされていきます。クエスト報酬、倒した敵からの戦利品、そして不要になったものを売ることで手に入ります。",
       "vendorsTitle": "ベンダーと取り扱い品",
       "vendorsBody": "町や前哨地には商人が点在し、それぞれ専門の商いを持っています。糧食商は食べ物と飲み物を、武器鍛冶や防具師は装備を、需品係は実用的な旅の道具を取り揃えています。歩み寄れば、その品揃えを見られます。",
-      "marksTitle": "刻印と証: コインの先にある通貨",
+      "marksTitle": "刻印と名誉：金銭の外の通貨",
       "marksBody": "貯められるのは所持金だけではありません。デルヴではデルヴの刻印が支払われます。デルヴの番人のもとでのみ使える通貨で、仲間の強化や、ほかでは見つからない装備に充てられます。ヒロイックダンジョンのランでは、最後のボスが英雄の証を残します。こちらはハイウォッチの英雄補給係のもとで、レルムのほかのどこにも売っていない装身具に使えます。どちらも所持金と混ざることはありません。",
       "bankTitle": "銀行",
       "bankBody": "各拠点の町には、この地の銀行商会である金張りの金庫の支店があります。そこの出納官に話しかけると自分の金庫が開きます。バッグとは別の私的な収納で、キャラクターが生涯持ち続けるものです。預けた品は、次にどの支店を訪れてもそのまま安全に待っています。",
@@ -5529,8 +5887,8 @@ export const ja_JP: EnTranslations = {
       "marketTitle": "ワールドマーケット",
       "marketBody": "商人はワールドマーケットを運営しています。これは会うことのないかもしれない相手とも売買できる、プレイヤー主導の取引所です。イーストブルックの商人、あるいはハイウォッチの競売人ヴォスに話しかけると開けます。どちらの管理人も同じ一つの共有マーケットを扱っています。商人は自らの品も常に在庫として出品しているので、他のプレイヤーが何も出していないときでも、いつでも買えるものがあります。",
       "marketBrowse": "閲覧：出品を一覧でスクロールするか、名前で検索して売り物を探します。各出品には品物、出品者、そしてスタック全体の希望価格が表示されます。",
-      "marketPost": "出品：バッグからスタックを選び、価格を決めて出品します。品物は誰かが買うまで商人が預かります。売れ残った出品はしばらくすると手元に戻り、気が変われば早めに引き取ることもできます。",
-      "marketCollect": "受け取り：品物が売れると、その代金は商人のもとで待っています。戻ってコインを受け取りましょう。売れ残って戻ってきたものも一緒です。商人は成立した売却ごとにわずかな手数料を取ります。",
+      "marketPost": "出品：バッグから一山を選び、値を決めて出します。品は誰かが買うまで商人が預かります。売れ残った出品はしばらくすると戻ってきますし、気が変われば早めに取り下げることもできます。出品そのものは無料なので、強気の値付けにかかるのは時間だけです。",
+      "marketCollect": "受け取り：品が売れると、売上は商人のもとであなたを待ちます。戻って硬貨を受け取ってください。売れずに返ってきたものも一緒です。商人は成立した売買ごとにわずかな分け前を取ります。「受け取り」タブは待っているものを一件ずつ並べ、成立した売買ごとに品、買い手、あなたの取り分を一行で示すので、硬貨を受け取る前に何が売れたかを正確に確かめられます。",
       "marketPricing": "値付けはあなた次第です。他より少し安く出品すると早く売れる傾向があり、高すぎる値はそのまま放置されがちです。出品する前にまず閲覧して、相場がどうなっているか確かめましょう。",
       "honorBody": "ほかのプレイヤーと戦うと、第三の通貨である名誉が手に入ります。ランク制アリーナの勝利で得られ、ソーンホロウ平原の試合は最後まで戦い抜けば勝敗にかかわらず支払われるので、激戦の末の敗北も決して無駄にはなりません。名誉はキャラクターシートに貯まり、所持金と混ざることはありません。使い先は名誉の需品係、イーストブルックのFURYとハイウォッチの戦元帥ドレイヴン・コールで、二人は同じ在庫を共有しています。ウォーフェアの防具系統、装身具、そして名誉でしか買えない武器がそこに並びます。これらの買い物は取り消せず、購入した瞬間に装備はあなたにバインドされるので、確定する前に品物をよく読みましょう。名誉の稼ぎ方についてはアリーナのページで説明しています。",
       "guildBankNote": "自分の金庫と並んで、ギルドもまた独自の金庫を持っています。同じ出納官のところで開設でき、同じウィンドウのタブから利用できる、共有の資金と物資の保管庫です。メンバーは誰でも中を見られますが、出し入れができるのは士官だけです。詳しくは交流のページをご覧ください。"
@@ -5538,7 +5896,7 @@ export const ja_JP: EnTranslations = {
     "social": {
       "intro": "世界のほとんどはソロで進められますが、このゲームは他の人々と共に遊ぶように作られています。ここでは、話し、力を合わせ、仲間を見つける方法を紹介します。",
       "chatHeading": "チャットチャンネル",
-      "chatBody": "チャットはチャンネルに分かれており、それぞれが独自のタブに表示されます。メッセージを打てば現在のチャンネルで送られ、スラッシュコマンドを使えば一行だけ別の場所へ向けられます。話せるチャンネルは次の通りです。",
+      "chatBody": "チャットウィンドウは、常にある二つの表示から始まります。語られたことをまとめた記録と、戦闘の記録です。それ以外は、プラスボタンで好きなタブを、チャンネルごとに一つずつ足していきます。デスクトップなら好きな順に並べ替えられます（Altと左右の矢印キーで、選択中のタブをキーボードから動かせます）。タブを右クリックすれば閉じられますし、並びはセッションをまたいで覚えられます。チャンネルのタブで打てばそのチャンネルへ送られ、スラッシュコマンドならタブを変えずに一行だけ他所へ送れます。ささやきタブもあり、送受信したささやきを一か所に集めます。そこで打てば、最後に書いてきた相手にそのまま返します。以下が話せるチャンネルです：",
       "chanSay": "セイ。",
       "chanSayBody": "あなたの標準の声。近くにいるプレイヤーに届き、肩を並べてクエストを進めるときに使うものです。",
       "chanYell": "イェル。",
@@ -5547,6 +5905,8 @@ export const ja_JP: EnTranslations = {
       "chanWhisperBody": "名前を指定して一人のプレイヤーへ、どこにいても送れるプライベートなメッセージ。内緒話に使いましょう。",
       "chanParty": "パーティ。",
       "chanPartyBody": "どれだけ離れていても、グループの全員に話しかけられます。",
+      "chanBattleground": "戦場。",
+      "chanBattlegroundBody": "戦場にいるすべての戦士と、敵味方を問わず話せます。試合中のみ利用できます。",
       "chanGeneral": "一般。",
       "chanGeneralBody": "オンラインの全員に届く、常時オンのレルム全体のチャンネル。質問したり雑談したりするのに向いています。WorldやLooking for Groupとは違い、参加を選ぶ必要は一切ありません。",
       "chanWorld": "ワールド。",
@@ -5569,25 +5929,25 @@ export const ja_JP: EnTranslations = {
       "lootRollBody": "アイテムがロールにかけられると、対象となる各メンバーは、欲しければニード、余りなら受け取る程度ならグリード、辞退するならパスを選びます。最も高い出目が勝ちます。",
       "lootMasterTitle": "マスタールーター。",
       "lootMasterBody": "リーダーが代わりに上位の戦利品を管理し、受け取るべきメンバーへ一つずつ配ることもできます。組織立ったグループがダンジョンを攻略するときのように、貴重な装備が思わぬロールで流れてしまうのを防げます。",
-      "friendsHeading": "フレンドと無視",
+      "friendsHeading": "フレンド、無視、ブロック",
       "friendsBody": "プレイヤーをフレンドリストに追加すると、いつオンラインで、どこにいるかがわかるので、彼らがログインした瞬間にグループを組めます。",
-      "ignoreBody": "誰かに迷惑をかけられているなら、無視リストに追加すれば、その人のチャットは見えなくなります。",
+      "ignoreBody": "誰かの雑談が過ぎると感じたら、無視リストに加えてください。その人の公開の発言は届かなくなります。無視はチャットの設定にすぎず、フレンドリストから誰かを外すことは決してありません。",
       "guildHeading": "ギルド",
-      "guildBody": "ギルドは、セッションをまたいで所属できる、長く続くプレイヤーの集まりです。自分で作るか、招待を受けて参加でき、同時に所属できるギルドは一つです。メンバーはランクを持ちます。リーダー、オフィサー、そしてメンバーです。",
-      "guildChatBody": "ギルドに所属すると、専用のギルドチャットチャンネルが使え、共有の名簿にギルドメイトが表示されるので、オンラインにはいつも見知った顔があります。",
+      "guildBody": "ギルドは、セッションをまたいで所属し続けるプレイヤーの集まりです。設立には創設者に一度きりの1ゴールドの費用がかかりますが、招待を受けて加わるだけでもかまいません。所属できるギルドは同時に一つです。メンバーには階級があります。ギルドマスター、オフィサー、そしてメンバーです。",
+      "guildChatBody": "ギルドに属すると、専用のギルドチャットチャンネルと、ギルド仲間の共有名簿が手に入ります。新しいメンバーは「新兵」、長く在籍するメンバーは「古参」の札を、素っ気ないメンバー表示の代わりに帯び、オフィサーとギルドマスターは常に階級を示します。今いる人だけを見たいときは、オフラインの名前を隠せます。オフィサーとギルドマスターは、ギルドタブの先頭に短い掲示を留めておくこともできます。それは次にログインしたときチャットの記録で読み上げられ、たいていのギルドはそうやってその週の予定を告げます。",
       "communityHeading": "コミュニティ全体への呼びかけ",
       "communityBody": "チャット行を感嘆符で始めると、コミュニティコールを発信できます。!lfg でグループ募集、!wts と !wtb で売買、!recruit でギルド勧誘、!event でレイドや集会の告知、!help で助けを求められます。感嘆符を打った瞬間に、コールの一覧メニューが現れます。各コールは世界に発信されると同時にコミュニティのDiscordにも転送されるので、ログインしていないプレイヤーにも届きます。コミュニティコールはオンラインプレイの一部です。",
       "slashHeading": "便利なスラッシュコマンド",
       "slashBody": "日々使う便利なコマンドをいくつか覚えておくとよいでしょう。/w 名前 でウィスパーを送り、/r で最後に受け取ったウィスパーに返信します。/invite で誰かをパーティに誘い、/follow で仲間の後ろについて歩き、/roll でグループの全員に見えるサイコロを振り、/who でオンラインの相手を確認し、/afk で離席中を示します。全一覧はゲーム内で /help と打てば見られます。",
       "emotesBody": "キャラクターは言葉を使わずに気持ちを伝えることもできます。/wave、/dance、/cheer、/bow といったエモートを打ち込みましょう。先に相手をターゲットしておけば、その相手に向けて行えます。あるいはXキーを長押しするとエモートホイールが開き、頭上に手早く感情を表せます。",
       "calendarHeading": "イベントカレンダー",
-      "calendarBody": "Iキーを押すとイベントカレンダーが開きます。週次のレイド招集からフィエスタの夜まで、計画を立てる価値のあるレルムの予定が記されており、ギルドが日程を管理する場所でもあります。ギルドリーダーとオフィサーはここにイベントを登録でき、すべてのメンバーが同じページでそれを確認できます。",
+      "calendarBody": "Iを押すとイベントカレンダーが開きます。予定を立てる価値のあるワールドの日々、毎週のレイド招集、市の日、アリーナ大会、釣り大会、それに毎月のデルヴの日と月門の交わりを記します。ギルドが予定を管理するのもここです。ギルドマスターとオフィサーがイベントを書き込め、全メンバーが同じページでそれを見られます。ワールドの日々は集うための呼びかけであって恩恵ではありません。日が記されているからといって、キャラクターに何かが変わることはありません。",
       "readyHeading": "準備確認",
       "readyBody": "大きなプルの前に、グループリーダーは /ready と入力してみんなに問いかけられます。他の全員に準備完了か準備未完了かを尋ねる確認が表示され、全員が答えるか30秒が経つと、グループ全体にその集計だけがひとつ表示されます。誰かが名指しされることはありません。大事なのは数であって、犯人捜しではないのです。",
       "markersHeading": "ターゲットマーカー",
       "markersBody": "パーティ中は、敵対的なクリーチャーを右クリックすると、8種類のレイドシンボルのひとつをその頭上に冠せられます。マークは誰でも付けられ、各シンボルが付くのは一度にひとつのターゲットだけで、同じターゲットに同じシンボルを付け直すと外れます。討伐順も、群衆制御の割り当ても、ただの「まずこいつ」も、文章よりシンボルの方が速く伝わります。",
       "etiquetteHeading": "グループの礼儀",
-      "etiquetteBody": "グループを組むのは選択であって、義務ではありません。参加したら挨拶し、ニードを選ぶのは実際に使う装備だけにし、抜ける前にはグループに一言添えましょう。ちょっとした礼儀が大きな違いを生み、たいていのプレイヤーは仲間がいることを喜びます。モデレーターが秩序を保っており、他の人がゲームを楽しむのを妨げ続けるプレイヤーは、モデレーターが出してくれるまで牢に入れられることがあります。",
+      "etiquetteBody": "グループを組むのは選択であって義務ではありません。加わったら挨拶し、実際に使う装備にだけ「必要」を振り、離れる前にはグループへ一声かけてください。ちょっとした礼儀は遠くまで届きますし、たいていのプレイヤーは道連れを喜びます。",
       "realmsHeading": "ワールド",
       "realmsBody": "オンラインプレイはワールド単位で動いており、それぞれのワールドは独自のプレイヤーを抱えた別々の場所です。遊ぶ前にワールドリストから一つを選びます。各行には、そのワールドが今どれだけ賑わっているかが「低」「中」「高」「満員」、あるいは現在稼働していないワールドなら「オフライン」として表示されます。「低」なら余裕たっぷり、「高」なら人がたっぷり、上限に達したワールドは「満員」となり、誰かがログアウトするまで新しいログインを断ります。ですから、友達がいる場所か、空きのある場所を選びましょう。",
       "realmsScopeBody": "あなたの積み重ねは、選んだワールドの中に留まります。キャラクター、フレンドリスト、ギルド、そして世界市場はすべてそこにあり、ゲーム内で開くギルドとプレイヤーのボードもそのワールドだけを順位づけます。一方、ウェブサイトのボードはすべてのワールドをまとめて集計します。レイドのデイリーリセットも、各ワールドがそれぞれの現地時間で持っています。",
@@ -5620,7 +5980,7 @@ export const ja_JP: EnTranslations = {
       "intTitle": "知力",
       "intBody": "知力はスペルキャスターのマナのプールを増やし、スペルパワーを高めて呪文の威力を上げ、呪文のクリティカル率を高めます。マナで詠唱するクラスには重要ですが、レイジやエナジーのクラスにはほとんど効きません。",
       "spiTitle": "精神力",
-      "spiBody": "精神力は、キャスターが詠唱を止めているあいだ、つまり戦闘の合間のほとんどの時間に、マナがどれだけ速く戻るかを左右します。知力と同じく、マナのクラスに役立ち、他のクラスにはほとんど意味がありません。",
+      "spiBody": "精神力は術者のマナが戻る速さを司ります。数秒のあいだ何も消費しなかったときにはじめて満額で働き、その一部は詠唱の最中でも流れ続けるので、戦いの中で精神力が死に重りになることはありません。とはいえ、休みなく撃ち続ける術者はやはり干上がります。ひと息つくために手を止めるのは、戦いのあいだでも戦いの合間と同じく、れっきとしたマナの判断です。知力と同じく、精神力はマナを使うクラスに仕え、ほかのクラスにはあまり意味を持ちません。",
       "armorTitle": "アーマー",
       "armorBody": "アーマーは受ける物理ダメージを軽減します。その多くは身につけているものから得られ、重装のクラスほどはるかに多くを備えます。自分のレベルに近い相手に対してアーマーが多いほど、その一撃一撃が柔らかく当たります。",
       "apTitle": "アタックパワー",
@@ -5649,14 +6009,14 @@ export const ja_JP: EnTranslations = {
     "progression": {
       "intro": "あらゆる戦い、クエスト、北へ進む一歩が、あなたの英雄を強くします。ここでは、レベリングの仕組みと、頂点に達した後も成長を続けさせるものを紹介します。",
       "xpTitle": "経験値の稼ぎ方",
-      "xpBody": "経験値は、クエストの達成、敵の討伐、そしてデルヴの攻略で得られます。クエストが断然多くを与えてくれるので、クエストの道筋をたどるのが最も早く登る方法です。道すがらの討伐やデルヴの攻略が、残りを埋めてくれます。",
+      "xpBody": "経験は、クエストを終わらせ、敵を倒し、デルヴを踏破し、そして専門技能を営むことで得られます。採取と製作は、その仕事がまだ何かを教えてくれるかぎり、授けてくれる技能に加えてキャラクターの経験も支払います。クエストが群を抜いて多くを与えるので、クエストの道筋をたどるのが最も速い登り道です。討伐、デルヴ、そして道中の採取が残りを埋めます。",
       "capBody": "レベルが上がるたびに頑丈になり、新たなアビリティが手に入ります。それはレベル上限{cap}まで続きます。",
       "journeyTitle": "北への旅路",
       "journeyBody": "世界は一続きの大地で、南から北へと三つのゾーンが並び、それぞれがレベルの一段上にあたります。緑の谷から始まり、湿地を突き進み、寒く高い峰々で終わります。クエストの道筋をたどれば、大地があなたを次から次へと運んでくれます。",
       "journeyBodyCount": "世界は一続きの大地で、ゾーンは全部で{zones}あります。そのうち三つが、あなたがレベルを上げながら進む道であり、南から北へと並んでいます。緑の谷から始まり、湿地を突き進み、寒く高い峰々で終わります。クエストの道筋をたどれば、大地があなたを次から次へと運んでくれます。谷の沖には低いレベルのうちに訪れる島があり、残りのレルムはいずれもその同じ道の脇から開けていて、すでにこの登りを終えた者のために造られています。",
       "bandLabel": "レベル{min}から{max}",
       "restedTitle": "休息経験値",
-      "restedBody": "宿屋に入り、戦闘の外にいれば、待っている間にキャラクターは休息経験値を蓄えます。どの町にも宿屋があります。次に外へ出て戦うとき、その蓄えが尽きるまで討伐に追加のボーナスがかかります。宿屋での一休みは決して無駄な時間ではなく、次のレベリングの区間を早めてくれます。",
+      "restedBody": "宿に入って戦闘外でいると、待っているあいだにキャラクターは休息経験を蓄えます。どの町にも宿はあります。次に外へ出て戦うとき、その蓄えは尽きるまで討伐に上乗せしてくれます。宿での小休止が無駄な時間になることはありません。次のレベル上げの区間を早めてくれます。蓄えには上限があるので、ひと晩泊まっても、とても長く滞在してもおおよそ同じだけしか貯まりませんし、レベル上限に達すれば埋めるレベルバーがなくなるので、休息経験も貯まらなくなります。",
       "capTitle": "レベル{cap}に到達する",
       "capJourneyBody": "レベル{cap}が上限、レベリングの終わりですが、成長の終わりではありません。そこからはダンジョンとレイドにノーマルとヒロイックで挑み、ワールドボスが現れれば立ち向かい、より良いギアを追い、アリーナで己を試します。",
       "capEndgameBody": "上限そのものを待って開くものは、リフトだけです。リフトはレルムのあちこちで自らの周期に従って裂け開き、CからSまでのランクを持ち、世界中のどのパーティも、それを最初に封じる一組になろうと競い合います。デルヴの掲示板もそのまま続いており、装備が追いついた頃には、その上の難度をもう一度覗いてみる価値があります。",
@@ -7393,7 +7753,8 @@ export const ja_JP: EnTranslations = {
       "guilds": "ヒント：ギルドに加入すると専用のチャットチャンネルとギルドメンバーの名簿が使えるようになります。",
       "professions": "ヒント：採集や製作の生産系スキルは、戦闘クラスと並行して育てられます。",
       "loadouts": "ヒント：複数の特性ロードアウトを保存しておけば、ポイントを使い直さずにビルドを切り替えられます。",
-      "pvp": "ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。"
+      "pvp": "ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。",
+      "reliquary": "ヒント：聖遺物庫は集めたユニークな戦利品を棚ごとに記録します。"
     }
   },
   "errors": {
@@ -7516,7 +7877,12 @@ export const ja_JP: EnTranslations = {
     "sortLevel": "レベル",
     "sortName": "名前",
     "sortRecent": "最近プレイ",
-    "sortPlaytime": "プレイ時間"
+    "sortPlaytime": "プレイ時間",
+    "redesign": "再デザイン",
+    "redesignHint": "このキャラクターは新しいキャラクターエディター以前に作成されました。無料の再デザインが1回できます。保存すると消費されます。",
+    "redesignTitle": "{name}を再デザイン",
+    "redesignSave": "新しい外見を保存",
+    "redesignCancel": "現在の外見を保持"
   },
   "deleteCharacter": {
     "title": "キャラクターを削除",
@@ -7544,7 +7910,8 @@ export const ja_JP: EnTranslations = {
     "resources": {
       "mana": "マナ",
       "energy": "エネルギー",
-      "rage": "怒り"
+      "rage": "怒り",
+      "focus": "集中値"
     },
     "roles": {
       "warrior": "タンク / 近接DPS",
@@ -7647,6 +8014,7 @@ export const ja_JP: EnTranslations = {
           "say": "発言",
           "yell": "叫び",
           "party": "パーティ",
+          "battleground": "戦場",
           "general": "一般",
           "world": "ワールド",
           "lfg": "仲間募集",
@@ -7673,7 +8041,111 @@ export const ja_JP: EnTranslations = {
       "zoomIn": "ズームイン",
       "zoomOut": "ズームアウト",
       "mapCanvasLabel": "マップ",
-      "mapSummary": "{zone}のマップ。"
+      "mapSummary": "{zone}のマップ。",
+      "mapMarkerDescription": "{area}。{markers}",
+      "mapMarkerEmpty": "重要なマーカーは表示されていません。",
+      "mapMarkerLocated": "{marker}：{direction}、{distance}。",
+      "mapMarkerLocatedCount": "{marker}：{count}件、{direction}、{distance}。",
+      "mapMarkerMore": "ほかに{count}件のマーカー。",
+      "mapMarkerDirections": {
+        "center": "中央",
+        "north": "北",
+        "northeast": "北東",
+        "east": "東",
+        "southeast": "南東",
+        "south": "南",
+        "southwest": "南西",
+        "west": "西",
+        "northwest": "北西"
+      },
+      "mapMarkerDistances": {
+        "near": "近く",
+        "medium": "中距離",
+        "far": "遠く"
+      },
+      "mapMarkerLabels": {
+        "you": "自分",
+        "availableQuest": "受注可能なクエスト",
+        "readyQuest": "報告可能なクエスト",
+        "repeatQuest": "繰り返し可能なクエスト",
+        "cooldownQuest": "再受注待ちのクエスト",
+        "questObjective": "クエスト目標エリア",
+        "readyOre": "採掘可能な鉱脈",
+        "readyWood": "採集可能な木材",
+        "readyHerb": "採集可能な薬草",
+        "readyLockedOre": "採掘可能な鉱脈、道具未解放",
+        "readyLockedWood": "採集可能な木材、道具未解放",
+        "readyLockedHerb": "採集可能な薬草、道具未解放",
+        "cooldownOre": "枯渇した鉱脈",
+        "cooldownWood": "枯渇した木材",
+        "cooldownHerb": "枯渇した薬草",
+        "cooldownLockedOre": "枯渇した鉱脈、道具未解放",
+        "cooldownLockedWood": "枯渇した木材、道具未解放",
+        "cooldownLockedHerb": "枯渇した薬草、道具未解放",
+        "station": "製作設備：{name}",
+        "service": "施設：{name}",
+        "partyMember": "パーティメンバー：{name}",
+        "deadPartyMember": "死亡したパーティメンバー：{name}",
+        "partyMemberGeneric": "パーティメンバー",
+        "deadPartyMemberGeneric": "死亡したパーティメンバー",
+        "friend": "フレンド：{name}",
+        "guildMember": "ギルドメンバー：{name}",
+        "pointOfInterest": "注目地点：{name}",
+        "dungeonEntrance": "ダンジョン入口：{name}",
+        "dungeonExit": "ダンジョン出口",
+        "delveEntrance": "デルヴ入口：{name}",
+        "worldPassage": "{zone}への通路",
+        "riftEntrance": "リフト入口：{name}",
+        "hostileEnemy": "敵対対象",
+        "aggressiveEnemy": "あなたを攻撃中の敵",
+        "lootableEnemy": "戦利品を回収できる敵",
+        "corpse": "自分の死体",
+        "deathZone": "危険地帯",
+        "teammate": "味方",
+        "deadTeammate": "死亡した味方",
+        "flagCarrier": "旗を運んでいる味方",
+        "ownFlagStand": "自軍の旗台",
+        "enemyFlagStand": "敵軍の旗台",
+        "riftDescent": "リフト下降口",
+        "riftReturnBeacon": "帰還ビーコン",
+        "riftReturnExit": "帰還出口",
+        "ranked": "{marker}、ランク{rank}",
+        "riftTreasureAvailable": "入手可能な宝",
+        "riftTreasureLocked": "施錠された宝",
+        "riftTreasureOpened": "開封済みの宝",
+        "riftTreasureJammed": "作動不良の宝",
+        "riftCacheAvailable": "入手可能なリフトの物資箱",
+        "riftCacheLocked": "施錠された物資箱",
+        "riftCacheOpened": "開封済みの物資箱",
+        "riftCacheJammed": "作動不良の物資箱",
+        "pylonUnlit": "消灯した塔",
+        "pylonLit": "点灯した塔",
+        "sequenceRuneUnlit": "消灯した順序のルーン",
+        "sequenceRuneLit": "点灯した順序のルーン",
+        "iceGoal": "氷の目標地点",
+        "boulderPad": "岩の目標地点",
+        "boulderMovable": "移動可能な岩",
+        "boulderPlaced": "配置済みの岩",
+        "gateSealed": "封印された門",
+        "gateOpen": "開いた門",
+        "switchReady": "使用可能なスイッチ",
+        "switchOn": "作動中のスイッチ",
+        "orbDormant": "休眠中のオーブ",
+        "orbActive": "作動中のオーブ",
+        "rollerHazard": "ローラーの危険物",
+        "delvePassageSealed": "封鎖された通路",
+        "delvePassageOpen": "開いた通路",
+        "delveSurfaceExit": "地上出口",
+        "delveCacheLocked": "施錠されたデルヴの物資箱",
+        "delveCacheReady": "準備完了のデルヴの物資箱",
+        "delveCacheActive": "作動中のデルヴの物資箱",
+        "delveCacheOpened": "開封済みのデルヴの物資箱",
+        "delveReliquaryLocked": "施錠された聖遺物匣",
+        "delveReliquaryReady": "準備完了の聖遺物匣",
+        "delveReliquaryActive": "儀式中の聖遺物匣",
+        "delveReliquaryOpened": "開封済みの聖遺物匣",
+        "bountiful": "豊穣な{marker}"
+      }
     },
     "options": {
       "gameMenu": "ゲームメニュー",
@@ -7808,6 +8280,7 @@ export const ja_JP: EnTranslations = {
     "chat": {
       "rightClickName": "{name}を右クリック",
       "templates": {
+        "battleground": "[戦場] {name}: {message}",
         "party": "[パーティ] {name}: {message}",
         "yell": "{name}の叫び: {message}",
         "whisper": "{name}のささやき: {message}",
@@ -7951,6 +8424,7 @@ export const ja_JP: EnTranslations = {
       "notEnoughRage": "怒りが足りません！",
       "notEnoughEnergy": "エネルギーが足りません！",
       "notEnoughMana": "マナが足りません！",
+      "notEnoughDevotion": "献身が足りない！",
       "notEnoughResource": "{resource}が足りません！",
       "notEnoughHealth": "体力が足りません。",
       "targetMustDodge": "対象が先に回避する必要があります。",
@@ -8079,6 +8553,10 @@ export const ja_JP: EnTranslations = {
     "pet": {
       "attack": "攻撃",
       "waterJet": "ウォータージェット",
+      "felbolt": "フェルボルト",
+      "abyssalChain": "深淵の鎖",
+      "autocastOn": "自動発動オン。右クリック、タッチ長押し、またはShift+Enterでオフにします。",
+      "autocastOff": "自動発動オフ。右クリック、タッチ長押し、またはShift+Enterでオンにします。",
       "taunt": "挑発",
       "healDemon": "悪魔を治癒",
       "healPet": "ペットを治癒",
@@ -8089,6 +8567,10 @@ export const ja_JP: EnTranslations = {
       "petAttackDesc": "現在の敵対対象を攻撃するようペットに命令します。",
       "waterJetTitle": "ウォータージェット",
       "waterJetDesc": "ウォーターエレメンタルに、3秒間敵を減速させる水流を放つよう命令します。クールダウン8秒。右クリックすると、使用可能になるたびに自動で発動します。",
+      "felboltTitle": "フェルボルト",
+      "felboltDesc": "エンバーキンに、対象へ追加の邪悪な弾を放つよう命令します。クールダウン8秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。",
+      "abyssalChainTitle": "深淵の鎖",
+      "abyssalChainDesc": "グルームシェイドに、8ヤードより遠く20ヤードまでの通常の敵を自分の元へ引き寄せるよう命令します。ボスは引き寄せられません。クールダウン15秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。",
       "petTauntTitle": "ペット挑発",
       "petTauntDesc": "ペットに交戦を命じ、射程内でグロウルを使わせます。クールダウン10秒。",
       "healDemonDesc": "マナを消費し、5秒かけて悪魔へ治癒をチャネルします。",
@@ -8244,6 +8726,7 @@ export const ja_JP: EnTranslations = {
     "tooltip": {
       "rank": "ランク{rank}",
       "cost": "{resource} {cost}",
+      "ruinCost": "破滅 {cost}",
       "range": "射程{range}ヤード",
       "rangeWithMin": "射程{min}-{max}ヤード",
       "instant": "即時",
@@ -8255,6 +8738,7 @@ export const ja_JP: EnTranslations = {
       "requiresLevel": "レベル{level}が必要",
       "requiresForm": "{form}フォームが必要",
       "requiresStealth": "ステルスが必要",
+      "requiresStealthSkulduggery": "ステルスが必要（薄闇の蓄えが3段階のとき、またはヴェールストライク中は不要）",
       "requiresCombo": "コンボポイントを消費",
       "requiresTargetHealthBelow": "対象の体力が{percent}%未満である必要があります",
       "requiresDodge": "対象が回避した後にのみ使用可能",
@@ -8270,7 +8754,9 @@ export const ja_JP: EnTranslations = {
     "resources": {
       "mana": "マナ",
       "rage": "怒り",
-      "energy": "エネルギー"
+      "energy": "エネルギー",
+      "focus": "集中値",
+      "devotion": "献身"
     },
     "forms": {
       "bear": "熊",
@@ -8472,6 +8958,7 @@ export const ja_JP: EnTranslations = {
       "clickDestroy": "クリックして破棄",
       "useFishing": "使用: 近くの水辺で釣りをします。",
       "useHealingPotion": "使用: 即座に体力を{amount}回復します。戦闘中に使用可能。クールダウン1分。",
+      "useHealingPotionPct": "使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン2分。",
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
@@ -8575,6 +9062,9 @@ export const ja_JP: EnTranslations = {
       "filterPrimaryStatAll": "すべてのメイン能力値",
       "filterRarity": "レア度",
       "filterRarityAll": "すべてのレア度",
+      "filterSort": "並べ替え",
+      "sortName": "名前 (A-Z)",
+      "sortPriceAsc": "価格: 安い順",
       "weaponSword": "剣",
       "weaponDagger": "短剣",
       "weaponStaff": "杖",
@@ -8703,19 +9193,71 @@ export const ja_JP: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "火炎の雨",
-        "description": "対象地点に4秒間、火の雨を降らせ、敵を焼いて毎秒{damage}の火炎ダメージを与えます。"
+        "description": "破滅的猛攻を3消費して対象範囲に炎の雨を降らせ、4秒間、毎秒{damage}の火炎ダメージを与えます。ランク2では6秒に延びます。破滅は最初の一波を即座に落とします。"
       },
       "volley": {
         "name": "乱射",
-        "description": "対象地点に3秒間、矢を降らせ、範囲内の敵に0.5秒ごとに{damage}のダメージを与えます。"
+        "description": "8ヤードの範囲へ3秒間、矢を降らせます。範囲内の敵は0.5秒ごとに{damage}の物理ダメージを受けます。ダメージは遠隔攻撃力とともに上がります。"
+      },
+      "pack_command": {
+        "name": "群れの指令",
+        "description": "生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。"
+      },
+      "stampede": {
+        "name": "獣群突撃",
+        "description": "獣を3体、12秒間召喚する。各獣は2秒ごとに攻撃し、{damage}の物理ダメージを与える。表示ダメージには遠隔攻撃力の8%が含まれるが、ペットダメージボーナスは含まれない。獣は召喚時の群れの獰猛さを記録し、1スタックごとにダメージが10%増加する。獣群突撃がクールダウン中、群れの指令の命中は20%の確率でクールダウンをリセットし、5回連続で失敗すると必ず発動する。獣が活動中はリセットされない。（群れの王）"
+      },
+      "unleash_beast": {
+        "name": "獣の解放",
+        "description": "最大まで高まった群れの獰猛さを解放し、主対象を強打して周囲も叩きます。その後、ペットを短時間の範囲攻撃狂乱に駆り立てます。"
+      },
+      "measured_shot": {
+        "name": "精密射撃",
+        "description": "慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。"
+      },
+      "cold_focus": {
+        "name": "冷徹集中",
+        "description": "12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）"
+      },
+      "bloodhook": {
+        "name": "血鉤",
+        "description": "8から25ヤード離れた敵へ突進して主傷口を開き、12秒間で24の出血ダメージを与えます。（野戦術のシグネチャ）"
+      },
+      "shrapnel_charge": {
+        "name": "榴散弾装薬",
+        "description": "対象と周囲の敵を榴散弾で吹き飛ばし、主対象から短時間の出血を広げます。"
+      },
+      "bloodtrail_assault": {
+        "name": "血跡強襲",
+        "description": "12秒間、血鉤、裂傷、榴散弾装薬、そしてペットの追撃を強化します。"
+      },
+      "trailbreak": {
+        "name": "離脱跳躍",
+        "description": "専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。"
+      },
+      "wildheart": {
+        "name": "野生の心",
+        "description": "最大体力の30%を即座に回復します。"
+      },
+      "shellskin": {
+        "name": "甲殻の皮膚",
+        "description": "8秒間、受けるダメージを60%軽減しますが、効果中は攻撃できません。"
+      },
+      "frostjaw_trap": {
+        "name": "霜顎の罠",
+        "description": "選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。"
+      },
+      "pack_rally": {
+        "name": "群れの結集",
+        "description": "駿馬の相をまとい、周囲の味方を鼓舞します。10秒間、移動速度を30%、攻撃速度と詠唱速度を10%上昇させます。"
       },
       "hurricane": {
         "name": "ハリケーン",
         "description": "対象地点に6秒間、ハリケーンを呼び起こし、敵を打ちのめして毎秒{damage}の自然ダメージを与えます。"
       },
       "earthquake": {
-        "name": "地震",
-        "description": "対象地点を6秒間揺るがし、敵を打ちのめして1.5秒ごとに{damage}の自然ダメージを与えます。"
+        "name": "断層の目覚め",
+        "description": "8ヤードの範囲を6秒間揺らし、1.5秒ごとに{damage}の自然ダメージを与えます。ダメージは呪文威力とともに上がります。エレメンタル：雷5でダメージが100%増え、雷をすべて消費します。"
       },
       "heroic_strike": {
         "name": "略奪者の一撃",
@@ -8923,15 +9465,20 @@ export const ja_JP: EnTranslations = {
       },
       "sinister_strike": {
         "name": "邪悪な斬撃",
-        "description": "武器ダメージに {damage} を加えた即時攻撃です。コンボポイントを1獲得します。"
+        "description": "武器ダメージに {damage} を加えた即時攻撃です。コンボポイントを1獲得します。",
+        "specNote_assassination": "毒の儀式を1段階進める（最大6）。",
+        "specNote_combat": "レッドライン中、このボタンはヘイメーカーに変化する：武器ダメージの130%に10を加えたダメージを与え、コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。"
       },
       "eviscerate": {
         "name": "永の眠り",
-        "description": "{damage}を与えるフィニッシュムーブです。"
+        "description": "{damage}を与えるフィニッシュムーブです。",
+        "specNote_assassination": "毒の儀式が6段階のとき、このボタンは毒裂きに変化する：出血効果が与えるはずだった残りダメージを即座にすべて与え、新しい毒の傷を刻み、エナジーを20回復する一撃。",
+        "specNote_combat": "コンボポイント4以上で命中させると8秒間のレッドラインが始まる：邪悪な斬撃はヘイメーカーに、このボタンは消灯に変化する（45にコンボポイントごとに35を加えたダメージ、蓄えたレッドラインのピップごとに25%強化、エナジーを25回復）。レッドラインが終わる前に使うこと。"
       },
       "backstab": {
         "name": "卑劣な突き",
-        "description": "対象を背後から刺し、武器ダメージの150%に {damage} を加えたダメージを与えます。対象の背後にいる必要があります。ダガーが必要です。コンボポイントを1獲得します。"
+        "description": "対象を背後から刺し、武器ダメージの150%に {damage} を加えたダメージを与えます。対象の背後にいる必要があります。ダガーが必要です。コンボポイントを1獲得します。",
+        "specNote_assassination": "攻撃ごとに毒の儀式を1段階進め（最大6）、エナジーを15回復する。毒の儀式が6段階のとき、永の眠りは毒裂きに変化する（出血の残りダメージを一度にすべて与える）。"
       },
       "gouge": {
         "name": "目潰し",
@@ -8943,7 +9490,7 @@ export const ja_JP: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "残忍な速攻",
-        "description": "近接攻撃速度を30%増加させるフィニッシュムーブです。コンボポイントごとに持続時間が延びます。"
+        "description": "近接攻撃速度を30%高めるフィニッシュ技。12秒に加えコンボポイント1つにつき4秒続きます（コンボポイント5：32秒）。"
       },
       "sprint": {
         "name": "駿足",
@@ -8951,15 +9498,17 @@ export const ja_JP: EnTranslations = {
       },
       "kidney_shot": {
         "name": "急所打ち",
-        "description": "対象をスタンさせるフィニッシュムーブです。コンボポイントごとに1秒長く続きます。"
+        "description": "対象を1秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：6秒）。"
       },
       "ambush": {
         "name": "潜伏者の一撃",
-        "description": "ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。"
+        "description": "ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。",
+        "specNote_subtlety": "ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで、どの角度からでも使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始し、2倍のダメージを与える。"
       },
       "stealth": {
         "name": "ダスクヴェール",
-        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。"
+        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。",
+        "specNote_subtlety": "ダスクヴェールから使う先制技ごとに薄闇の蓄えが1段階進む（最大3）。"
       },
       "adrenaline_rush": {
         "name": "滾る血潮",
@@ -8967,11 +9516,13 @@ export const ja_JP: EnTranslations = {
       },
       "garrote": {
         "name": "喉絞めの弦",
-        "description": "敵を絞め、即座に{damage}ダメージを与えるとともに、18秒かけて{overTime}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。"
+        "description": "敵を絞め、即座に{damage}ダメージを与えるとともに、18秒かけて{overTime}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。",
+        "specNote_subtlety": "ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始する。"
       },
       "cheap_shot": {
         "name": "みぞおち強打",
-        "description": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。"
+        "description": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。",
+        "specNote_subtlety": "ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始する。"
       },
       "sap": {
         "name": "サップ",
@@ -8983,11 +9534,11 @@ export const ja_JP: EnTranslations = {
       },
       "expose_armor": {
         "name": "装甲破り",
-        "description": "対象の防御を崩し、30秒間アーマーを{damage}低下させるフィニッシュムーブです。"
+        "description": "対象の守りを30秒間暴くフィニッシュ技。消費したコンボポイント1つにつき防御力を2%下げます（コンボポイント5：{damage}%）。"
       },
       "rupture": {
         "name": "止まらぬ出血",
-        "description": "対象に傷を負わせ、16秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。"
+        "description": "対象を裂くフィニッシュ技。2秒ごとに出血し、6秒に加えコンボポイント1つにつき2秒続きます（コンボポイント5：16秒、合計{damage}ダメージ）。"
       },
       "vanish": {
         "name": "煙隠れ",
@@ -9007,19 +9558,131 @@ export const ja_JP: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "誓いの烙印",
-        "description": "30秒間、聖なる力で満たされ、近接攻撃ごとに{damage}の追加神聖ダメージを与えます。ヴァーディクトで解放します。"
-      },
-      "holy_light": {
-        "name": "癒しの光",
-        "description": "味方対象の体力を {damage} 回復します。"
-      },
-      "devotion_aura": {
-        "name": "不動のオーラ",
-        "description": "30分間、アーマーが{buff}増加します。"
+        "description": "30秒間、神聖なる力で満たし、近接の一振りごとに{damage}の追加神聖ダメージを与えます。"
       },
       "judgement": {
         "name": "ヴァーディクト",
         "description": "有効なシールを敵に解放し、消費して蓄えた神聖ダメージを与えます。"
+      },
+      "holy_light": {
+        "name": "癒しの光",
+        "description": "味方の対象を素早く{damage}回復します。体力を戻すと、専門化がなくても献身が1得られます。光輝の共鳴か太陽の報復があれば即時発動になります。"
+      },
+      "divine_ascension": {
+        "name": "神聖なる昇天",
+        "description": "献身を20消費し、最大45秒間持続する昇天のチャージを5獲得する。対象となる能力はチャージを1消費し、追加効果を得る。"
+      },
+      "aura_mastery": {
+        "name": "聖なる調和",
+        "description": "8秒間、グループ内で有効なすべての献身と報復のオーラを強化する。砦の献身はダメージを15%減少させ、報復は15の神聖ダメージを与える。複数回使用しても重複せず、持続時間が更新される。"
+      },
+      "devotion_ward": {
+        "name": "砦の献身",
+        "description": "自身とパーティメンバーが受けるダメージを、死亡または置き換えられるまで5%減少させる。このオーラと報復のオーラだけが互いに置き換わり、光輝、暁、恩寵の献身とは共存する。"
+      },
+      "hammer_of_grace": {
+        "name": "恩寵の槌",
+        "description": "20メートル以内の敵に聖なる槌を即座に投げ、{damage}ダメージを与える。マナを70回復し、与えたダメージの50%だけ自身を回復して、命中時に献身を1生成する。太陽の報復により、恩寵の槌はクールダウンを無視し、与えたダメージの100%だけ自身を回復する。"
+      },
+      "hushbrand": {
+        "name": "静寂の烙印",
+        "description": "呪文の詠唱を中断し、同系統の呪文を4秒間使用不能にする。"
+      },
+      "guardian_covenant": {
+        "name": "守護の契約",
+        "description": "味方1人と自身を守り、8秒間、受けるダメージを20%減少させる。味方を選択していない場合は自身に使用する。"
+      },
+      "solar_step": {
+        "name": "陽光の歩み",
+        "description": "2秒間、移動速度を150%増加させる。"
+      },
+      "solar_invocation": {
+        "name": "太陽の祈願",
+        "description": "味方1人の体力を即座に{damage}回復するか、敵1体に中程度の神聖ダメージを与える。どちらも献身を1生成する。昇天中に回復として使用すると、対象から10メートル以内の味方プレイヤーも半分の量だけ回復する。"
+      },
+      "radiant_devotion": {
+        "name": "光輝の献身",
+        "description": "30分間、自身とパーティメンバーの呪文威力を20増加させる。自身の暁または恩寵の献身を置き換えるが、他のパラディンの献身とは共存する。"
+      },
+      "dawn_devotion": {
+        "name": "暁の献身",
+        "description": "30分間、自身とパーティメンバーの攻撃力を40増加させる。自身の光輝または恩寵の献身を置き換えるが、他のパラディンの献身やウォリアーの雄叫びとは共存する。"
+      },
+      "grace_devotion": {
+        "name": "恩寵の献身",
+        "description": "30分間、自身とパーティメンバーは5秒ごとにマナを15回復し、マナ消費が3%減少する。自身の光輝または暁の献身を置き換えるが、他のパラディンの献身とは共存する。"
+      },
+      "recall_the_fallen": {
+        "name": "倒れし者の呼び戻し",
+        "description": "死亡したグループメンバーを、体力とマナが35%の状態で蘇生する。"
+      },
+      "beacon_of_light": {
+        "name": "光の標",
+        "description": "グループメンバー1人を光の標に指定する。60メートル以内にいる別のグループメンバーへの有効な直接回復の50%が、光の標も回復する。範囲回復と継続回復は転送されない。どちらかが死亡するまで持続する。"
+      },
+      "final_edict": {
+        "name": "最後の勅令",
+        "description": "強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に神聖な爆発も放つ。"
+      },
+      "dawnfall": {
+        "name": "暁落とし",
+        "description": "周囲の敵に{damage}の神聖ダメージを与え、献身を1生成する。1体以上に命中すると、最後の勅令の残りクールダウンが2秒短縮される。昇天中はダメージと範囲が増加する。"
+      },
+      "sun_gods_verdict": {
+        "name": "太陽神の裁決",
+        "description": "敵1体に30秒間、太陽神の裁決を下す。最後の勅令と暁落としが命中するたび、刻印が1つ付与される。3つ目の刻印を付与した能力が刑を決める。最後の勅令は罪人に壊滅的なダメージを与え、暁落としは裁決を爆発させて周囲の敵にダメージを与え、1.5秒間スタンさせる。"
+      },
+      "valkyrs_calling": {
+        "name": "ヴァルキュリアの召命",
+        "description": "空へ昇り、敵へ飛行する間はダメージを受けなくなる。2秒後、対象地点へ降下して{damage}の神聖ダメージを与え、献身を1生成する。昇天中は着地ダメージが50%増加し、チャージを1消費する。"
+      },
+      "faithforged_guard": {
+        "name": "聖光の負債",
+        "description": "8秒間、次に受ける敵の攻撃に報いる。最大{buff}のダメージを打ち消し、同量を神聖ダメージとして攻撃者に返し、信仰を1得る。報いるのは1撃のみ。昇天は報いられる量を50%増加させる。"
+      },
+      "mercy_lance": {
+        "name": "慈悲の槍",
+        "description": "敵1体に{damage}の神聖ダメージを与え、命中時に献身を1生成する。昇天中はチャージを1消費し、必ずクリティカルヒットになる。"
+      },
+      "sacred_form": {
+        "name": "聖なる姿",
+        "description": "死亡するまで聖なる状態となり、回復量が10%、呪文のクリティカル率が5%増加し、生成する脅威が50%減少する。サンメンダー専用。"
+      },
+      "dawns_embrace": {
+        "name": "暁の抱擁",
+        "description": "強力な回復を与え、献身を1生成する。光輝の共鳴により、マナ消費が50%減少し、詠唱時間が1.5秒になる。昇天中は即時発動になり、回復量が35%増加する。"
+      },
+      "radiant_chorus": {
+        "name": "光輝の合唱",
+        "description": "周囲の味方を{damage}回復し、献身を1生成する。2人以上の味方を有効に回復すると光輝の共鳴を得る。次の癒やしの光が即時発動になるか、次の暁の抱擁のマナ消費が50%減少し、詠唱時間が1.5秒になる。昇天中は光輝の合唱の回復量と範囲が増加する。"
+      },
+      "life_covenant": {
+        "name": "生命の契約",
+        "description": "味方1人が受けるダメージを6秒間40%減少させる。昇天中はチャージを消費せず、さらに120ポイントの盾を付与する。"
+      },
+      "aegis_first_dawn": {
+        "name": "始暁の大盾",
+        "description": "5秒間詠唱し、半径10メートルの聖なるドームを作る。内部の味方は毎秒回復し、受けるダメージが50%減少する。詠唱を完了すると最後の回復を放ち、4秒間、移動速度を30%増加させる。"
+      },
+      "vowkeeper_strike": {
+        "name": "誓守の一撃",
+        "description": "高い脅威を与える一撃を放ち、献身を1生成する。命中時に20%の確率で8秒間、太陽の報復を得る。ブロック成功時にも25%の確率で得る。太陽の報復は次の陽光の円盤、恩寵の槌、癒やしの光のいずれかを強化する。昇天中は小さな吸収盾も付与する。"
+      },
+      "bastion_rite": {
+        "name": "砦の儀式",
+        "description": "6秒間、受ける物理ダメージを20%減少させ、ブロック率を20%増加させる。昇天中は持続時間が10秒になる。"
+      },
+      "sunward_disc": {
+        "name": "陽光の円盤",
+        "description": "盾が必要。輝く円盤を投げ、命中後に周囲の敵へ跳ね返らせる。ダメージを与えるたびに献身を1生成する。太陽の報復により、陽光の円盤はマナを消費せず、クールダウンを無視し、ダメージが20%増加する。昇天中は5回跳ね返る。"
+      },
+      "sacred_challenge": {
+        "name": "聖なる挑発",
+        "description": "敵1体に自身を攻撃させる。昇天中はチャージを消費せず、さらに4秒間、受けるすべてのダメージを15%減少させる。"
+      },
+      "devotion_aura": {
+        "name": "不動のオーラ",
+        "description": "30分間、アーマーが{buff}増加します。"
       },
       "blessing_of_might": {
         "name": "鉄の誓い",
@@ -9027,7 +9690,7 @@ export const ja_JP: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰の守り",
-        "description": "守りの結界が10秒間{damage}ダメージを吸収します。"
+        "description": "神聖なる結界が最大HPの{damage}%を{duration}秒間吸収する。不朽の加護が結界を強化する。"
       },
       "hammer_of_justice": {
         "name": "断裂の裁き槌",
@@ -9035,7 +9698,7 @@ export const ja_JP: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "最後の秘跡",
-        "description": "大きな癒やしの波で体力を{damage}回復します。クールダウン10分。"
+        "description": "最大体力の{damage}%を戻す大いなる奔流。体力を戻したときに献身を1生みます。クールダウン10分。"
       },
       "holy_taunt": {
         "name": "聖なる挑発",
@@ -9043,7 +9706,7 @@ export const ja_JP: EnTranslations = {
       },
       "flash_of_light": {
         "name": "光の癒し",
-        "description": "素早く効率的な光の迸りで味方対象の体力を {damage} 回復します。"
+        "description": "素早く無駄のない光の閃きで、味方の対象を{damage}回復します。体力を戻すと、専門化がなくても献身が1得られます。"
       },
       "exorcism": {
         "name": "追放の儀式",
@@ -9051,15 +9714,31 @@ export const ja_JP: EnTranslations = {
       },
       "consecration": {
         "name": "聖なる大地",
-        "description": "足元の地面を聖別し、10秒間、周囲の敵を焼いて2秒ごとに{damage}の神聖ダメージを与えます。"
+        "description": "足元の地を9秒間清め、毎秒{damage}の神聖ダメージを高い脅威度とともに与えます。最初の一撃は献身を1生みます。信仰の守護者はその中に立つ間、受けるダメージが10%減ります。昇天はそのダメージを高めます。"
+      },
+      "bastion_sweep": {
+        "name": "砦の薙ぎ払い",
+        "description": "装備中の盾で前方180度の敵を薙ぎ払い、{damage}の神聖ダメージと高い脅威を与え、献身を1生成する。昇天中はダメージが30%増加し、半径が8メートルになる。"
+      },
+      "oath_chain": {
+        "name": "誓いの鎖",
+        "description": "遠くの敵を聖なる鎖で即座に縛る。敵は秒速18メートルで自身へ引き寄せられ、3メートルまで近づくと4秒間、移動速度が50%低下する。昇天中は周囲の敵をもう1体縛る。"
+      },
+      "veilbound_march": {
+        "name": "帳縛りの行進",
+        "description": "4秒間、霊体となって移動速度が40%、防御力が30%増加し、移動不能、減速、強制移動を無効化する。すり抜けた敵には6秒間、帳の印が付与され、毎秒神聖ダメージを受け、自身へのダメージが20%減少し、自身に対する脅威が増加する。最初の印は献身を1生成する。行進終了時、周囲の印を付けた敵に最後の爆発を与える。昇天中は爆発のダメージが50%増加し、敵をわずかに引き寄せる。"
+      },
+      "veilbound_mark": {
+        "name": "帳の刻印",
+        "description": "毎秒神聖ダメージを受け、印を付けたパラディンへのダメージが20%減少し、そのパラディンに対する脅威が増加する。"
       },
       "righteous_fury": {
         "name": "バーニングオース",
-        "description": "30分間、あなたの神聖ダメージが生成する脅威が60%増加します。タンク役パラディンの要です。"
+        "description": "神聖ダメージが生む脅威度を常時60%高めます。信仰の守護者専用。"
       },
       "retribution_aura": {
         "name": "報復のオーラ",
-        "description": "30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。"
+        "description": "死亡するか置き換えられるまで、自身とパーティを神聖なる力で包む。影響下の味方を近接攻撃した敵は{buff}の神聖ダメージを受け、影響下の味方の通常攻撃は{buff}の神聖ダメージを追加で与える。自身の砦の献身と置き換わる。他のパラディンが報復のオーラを唱えた場合、重複せず更新される。"
       },
       "tame_beast": {
         "name": "野生の絆",
@@ -9071,119 +9750,131 @@ export const ja_JP: EnTranslations = {
       },
       "raptor_strike": {
         "name": "腹裂きの一撃",
-        "description": "強力な近接攻撃でダメージを{damage}増加させます。次のスイングで発動します。"
+        "description": "武器ダメージの10%に{damage}を加えて打ちます。命中するとフォーカスが15戻り、狩猟の勢いが1得られます。ダメージは武器ダメージを通じて攻撃力とともに上がります。"
       },
       "aspect_of_the_hawk": {
         "name": "猛禽の相",
-        "description": "猛禽の相をまとい、30分間、攻撃力を{buff}増加させます。"
+        "description": "チュウヒの姿をまとい、攻撃力を30分間{buff}高めます。"
       },
       "serpent_sting": {
         "name": "毒の棘",
-        "description": "対象を刺し、15秒間で {damage} の自然ダメージを与えます。"
+        "description": "15秒かけて合計{damage}の自然ダメージを、3秒ごとに1回与えます。ダメージは遠隔攻撃力とともに上がります。"
       },
       "arcane_shot": {
         "name": "凶弾",
-        "description": "{damage} の秘術ダメージを与える即時射撃です。"
+        "description": "対象を撃ち、{damage}の秘術ダメージを与えます。ダメージは遠隔攻撃力とともに上がります。"
       },
       "concussive_shot": {
         "name": "動揺の射撃",
-        "description": "対象を朦朧とさせて{damage}ダメージを与え、4秒間、移動速度を50%低下させます。"
+        "description": "対象を撃って{damage}の物理ダメージを与え、4秒間50%減速させます。ダメージは遠隔攻撃力とともに上がります。"
       },
       "mongoose_bite": {
-        "name": "反撃の牙",
-        "description": "対象が回避した後に反撃し、武器ダメージに{damage}を加えたダメージを与えます。回避されません。"
+        "name": "傷裂き",
+        "description": "武器ダメージの45%に{damage}を加えて打ちます。対象に自分の血鉤の傷があれば、傷のダメージを1回直ちに与え、傷を12秒に更新します。ダメージは武器ダメージを通じて攻撃力とともに上がります。"
+      },
+      "hunting_momentum": {
+        "name": "狩猟の勢い",
+        "description": "パッシブ：腹裂きの一撃で狩猟の勢いを1スタック獲得します。8秒間持続し、最大3スタックです。3スタック時、反撃の牙の打撃ダメージが45%増加し、全スタックを消費します。（野戦術）"
+      },
+      "fieldcraft_reentry": {
+        "name": "再突入準備",
+        "description": "パッシブ：離脱跳躍は狩猟の勢いを更新し、12秒以内の次の腹裂きの一撃または血鉤を強化します。腹裂きの一撃は1スタックごとに15%の追加ダメージを与えます。血鉤は18から24の追加物理ダメージを与え、1スタックごとに15%増加し、遠隔攻撃力でも増加します。3スタック時はいずれの攻撃も狩猟の勢いを消費します。（野戦術）"
       },
       "wing_clip": {
         "name": "足枷斬り",
-        "description": "傷を負わせて{damage}ダメージを与え、10秒間、敵の移動速度を40%低下させます。"
+        "description": "対象を斬りつけて{damage}の物理ダメージを与え、10秒間40%減速させます。ダメージは攻撃力とともに上がります。"
       },
       "aspect_of_the_monkey": {
         "name": "テンの相",
-        "description": "テンの相をまとい、30分間、回避率を8%増加させます。"
+        "description": "テンの姿をまとい、回避率を30分間8%高めます。"
       },
       "aspect_of_the_cheetah": {
         "name": "駿馬の相",
-        "description": "駿馬の相をまとい、30分間、移動速度を30%増加させます。"
+        "description": "駿馬の姿をまとい、移動速度を30分間30%高めます。"
       },
       "aimed_shot": {
         "name": "引き絞り",
-        "description": "慎重に引き絞った射撃で {damage} のダメージを与えます。"
+        "description": "対象を撃ち、{damage}の物理ダメージを与えます。ダメージは遠隔攻撃力とともに上がります。"
       },
       "rapid_fire": {
         "name": "熱狂の速射",
-        "description": "15秒間、攻撃速度が40%増加します。"
+        "description": "移動しながら2.4秒間に6発の射撃を行う。1発ごとに{damage}の物理ダメージを与え、遠隔攻撃力で上昇する。"
       },
       "smite": {
-        "name": "スマイト",
-        "description": "敵に {damage} の神聖ダメージを与えます。"
+        "name": "浄めの聖歌",
+        "description": "{damage}の神聖ダメージを与えます。ダメージは呪文威力とともに上がります。ディシプリン：結ばれた味方をそれぞれダメージの30%だけ回復します。結ばれた味方がいなければ、体力が最も低いパーティメンバーを15%回復します。"
       },
       "lesser_heal": {
         "name": "囁きの祈り",
-        "description": "味方対象の体力を {damage} 回復します。"
+        "description": "味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。"
       },
       "power_word_fortitude": {
         "name": "決意の連祷",
-        "description": "30分間、対象のスタミナを{buff}増加させます。"
+        "description": "パーティ全員の体力を30分間{buff}%高めます。"
       },
       "shadow_word_pain": {
         "name": "腐朽の葬送歌",
-        "description": "闇の言葉で18秒間に {damage} の暗黒ダメージを与えます。"
+        "description": "18秒かけて合計{damage}の影ダメージを、3秒ごとに1回与えます。ダメージは呪文威力とともに上がります。影：ダメージが10%増え、自分の依代への刻みごとに幽冥の貢ぎが1得られます。"
       },
       "power_word_shield": {
         "name": "守りの聖歌",
-        "description": "対象を守り、30秒間{damage}ダメージを吸収します。"
+        "description": "味方の対象を護り、30秒間{damage}のダメージを吸収します。ディシプリンはさらに、その対象を30秒間あなたの神聖ダメージと結びます。"
       },
       "renew": {
         "name": "留まる恩寵",
-        "description": "15秒間で対象の体力を {damage} 回復します。"
+        "description": "15秒かけて対象を{damage}回復します。3秒ごとに1回です。回復量は呪文威力とともに上がります。"
       },
       "mind_blast": {
         "name": "精神粉砕",
-        "description": "対象の精神を打ち、{damage} の暗黒ダメージを与えます。"
+        "description": "{damage}の影ダメージを与えます。ダメージは呪文威力とともに上がります。影は自分の腐朽の葬送歌で対象をその依代として結び、幽冥の貢ぎを1与え、ダメージの30%を、自分の葬送歌を帯びた他の敵最大3体へ響かせます。"
       },
       "heal": {
         "name": "厳かな祈り",
-        "description": "遅いが強力な祈りで、味方対象の体力を {damage} 回復します。"
+        "description": "味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。"
       },
       "mind_flay": {
         "name": "嘆きの連祷",
-        "description": "暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。"
+        "description": "3秒間詠唱を維持し、毎秒{damage}の影ダメージを与えます。ダメージは呪文威力とともに上がります。"
       },
       "flash_heal": {
         "name": "緊急の祈り",
-        "description": "素早い祈りで味方対象の体力を {damage} 回復します。"
+        "description": "味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。"
       },
       "lightning_bolt": {
         "name": "電弧の矢",
-        "description": "稲妻の矢を放ち、{damage} の自然ダメージを与えます。"
+        "description": "{damage}の自然ダメージを与えます。ダメージは呪文威力とともに上がります。エレメンタル：命中すると雷が1得られます。"
+      },
+      "thunder_reservoir": {
+        "name": "雷鳴の貯蔵",
+        "description": "パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）"
       },
       "rockbiter_weapon": {
         "name": "石縛の武器",
-        "description": "石の怒りを武器に込めます。5分間、各スイングが{damage}の追加ダメージを与えます。"
+        "description": "武器に30分間力を宿します。一振りごとに{damage}の追加ダメージを与えます。エンハンスメントはさらに防御力を30%得て、受けるダメージが10%減り、脅威度を二倍生みます。大地の衝撃はその対象に3秒間あなたを攻撃させ、雷の守りは3秒間10%のダメージ軽減を与えます。"
       },
       "healing_wave": {
         "name": "癒しの水流",
-        "description": "味方対象の体力を {damage} 回復します。"
+        "description": "味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。回復：過剰回復になる前に満額回復の50%を12秒間、癒しの流れとして蓄えます。上限は対象の最大体力の30%です。"
       },
       "earth_shock": {
         "name": "大地の衝撃",
-        "description": "衝撃の力で対象を即座に打ち、{damage} の自然ダメージを与えます。"
+        "description": "{damage}の自然ダメージを与えます。ダメージは呪文威力とともに上がります。エレメンタル：雷5でダメージが125%増え、雷をすべて消費します。岩結び：対象に3秒間あなたを攻撃させます。"
       },
       "lightning_shield": {
         "name": "雷の守り",
-        "description": "弾ける稲妻で身を包みます。近接攻撃者は{buff}の自然ダメージを受けます。最大3チャージで、発動は5秒に1回までです。"
+        "description": "10分間、稲妻をまといます。次にあなたへ向かう近接攻撃3回は、攻撃者に{buff}の自然ダメージを与えます。最短で5秒に1回です。"
       },
       "flame_shock": {
         "name": "灰燼の衝撃",
-        "description": "対象を炎で焼き、{damage}ダメージに加えて12秒間で{overTime}のダメージを与えます。"
+        "description": "{damage}の火炎ダメージを与え、続けて12秒かけて{overTime}の火炎ダメージを与えます。最初の命中は呪文威力とともに上がります。"
       },
       "flametongue_weapon": {
         "name": "火焔烙印の武器",
-        "description": "元素の炎を武器に込めます。5分間、各スイングが{damage}の追加火炎ダメージを与えます。"
+        "description": "武器に30分間力を宿します。一振りごとに{damage}の追加火炎ダメージを与えます。"
       },
       "frost_shock": {
         "name": "霧氷の衝撃",
-        "description": "対象を冷気で即座に打ち、{damage} の冷気ダメージを与え、8秒間、移動速度を50%低下させます。"
+        "description": "{damage}の氷結ダメージを与え、対象を8秒間50%減速させます。ダメージは呪文威力とともに上がります。"
       },
       "frostbrand_weapon": {
         "name": "霧氷縛の武器",
@@ -9191,11 +9882,11 @@ export const ja_JP: EnTranslations = {
       },
       "ghost_wolf": {
         "name": "シェイドウルフ",
-        "description": "シェイドウルフに変身し、10分間、移動速度が40%増加します。"
+        "description": "シェイドウルフとなり、40%速く動きます。もう一度使えば元の姿に戻ります。"
       },
       "stormstrike": {
         "name": "祖霊の一撃",
-        "description": "武器に嵐を流し込み、即座に武器ダメージに {damage} を加えたダメージを与えます。"
+        "description": "武器ダメージに{damage}を加えて打ち、戦霊の律動を2段進めます。ダメージは武器ダメージを通じて攻撃力とともに上がります。"
       },
       "shadow_bolt": {
         "name": "暗鬱の矢",
@@ -9213,9 +9904,29 @@ export const ja_JP: EnTranslations = {
         "name": "黒腐れ",
         "description": "対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。"
       },
+      "evil_eye": {
+        "name": "邪眼",
+        "description": "敵一体を呪いの焦点として指定します。邪眼を移しても断罪は維持されますが、20秒の有効時間は更新されません。"
+      },
+      "maledict_gaze": {
+        "name": "呪眼の凝視",
+        "description": "呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。"
+      },
+      "needle_of_fate": {
+        "name": "運命の針",
+        "description": "敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を5生成し、邪眼がなければ先に対象を指定します。"
+      },
+      "sentence": {
+        "name": "宣告",
+        "description": "断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。"
+      },
       "life_tap": {
         "name": "過酷な取引",
         "description": "体力{damage}をマナ{damage}に変換します。"
+      },
+      "cursed_accomplice": {
+        "name": "呪われた共犯者",
+        "description": "味方プレイヤーを選択していない場合は呪眼と結び、その凝視で断罪を2生成します。味方と結ぶと、その味方が邪眼対象へ与えるダメージで3生成します。発動は2秒に1回までです。"
       },
       "curse_of_agony": {
         "name": "苦悶の呪い",
@@ -9223,7 +9934,47 @@ export const ja_JP: EnTranslations = {
       },
       "drain_life": {
         "name": "喰らう",
-        "description": "対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。"
+        "description": "対象の生命力を貪り、毎秒{damage}の影ダメージを与え、その70%を体力としてあなたへ移します。苦痛はその全てを移します。主たる邪眼へ詠唱を維持すると、開始時に運命の糸をすべて消費し、糸1本ごとに刻みあたり追加で断罪が1得られます。"
+      },
+      "litany_of_guilt": {
+        "name": "罪責の連祷",
+        "description": "主要な邪眼を8秒間呪います。断罪を獲得するたびに波動を放ち、8ヤード以内にいる他の敵最大4体にダメージを与えます。発動は1秒に1回までです。"
+      },
+      "cinderhide": {
+        "name": "燼皮",
+        "description": "皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。"
+      },
+      "umbral_anchor": {
+        "name": "影の錨",
+        "description": "初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。"
+      },
+      "soulwell": {
+        "name": "魂の泉",
+        "description": "魂の泉を3分間召喚します。戦闘外であれば、グループメンバーは魂の石を3個まで補充できます。魂の石は最大体力の25%を回復し、ポーションとクールダウンを共有します。"
+      },
+      "hex_of_violence": {
+        "name": "暴虐の呪い",
+        "description": "敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、22の影ダメージで反撃します。"
+      },
+      "cruel_pact": {
+        "name": "残酷な契約",
+        "description": "最大体力の12%を捧げて断罪を20生成します。体力が15%以下では使用できません。"
+      },
+      "vicarious_suffering": {
+        "name": "苦痛の肩代わり",
+        "description": "8秒間苦痛を結び、敵の攻撃から最大15の断罪を生成します。自分に使うと受けるダメージが20%減少します。味方に使うと、そのダメージの最大20%を自分へ移しますが、体力が15%未満になることはありません。"
+      },
+      "possess_evil_eye": {
+        "name": "邪眼憑依",
+        "description": "呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えます。遅延反響は60%のダメージを与え、レベル17から20にかけて30%まで低下します。"
+      },
+      "hour_of_judgment": {
+        "name": "審判の刻",
+        "description": "主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。"
+      },
+      "coven": {
+        "name": "魔女盟約",
+        "description": "周囲の敵最大4体に15秒間持続する副次的な邪眼を作ります。断罪の共有量へ50%の効率で加算し、宣告の35%分の反響ダメージを受けます。"
       },
       "fear": {
         "name": "責め苦",
@@ -9235,11 +9986,16 @@ export const ja_JP: EnTranslations = {
       },
       "shadowburn": {
         "name": "黄昏の火",
-        "description": "対象に灼ける影を即座に叩き込み、{damage} の暗黒ダメージを与えます。"
+        "description": "破滅的猛攻を1消費し、体力20%未満の敵を{damage}の影ダメージで仕留めます。狙った対象が5秒以内に倒れれば、その破滅的猛攻は返ります。"
+      },
+      "ruinous_brand": {
+        "name": "破滅の烙印",
+        "description": "敵に15秒間の烙印を刻みます。次の3回の直接呪文は、烙印のついた敵に対して25%のダメージで反響し、別の対象に使用した場合はその敵へ50%のダメージを複製します。"
       },
       "wrath": {
         "name": "野生の稲妻",
-        "description": "自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。"
+        "description": "自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。",
+        "specNote_balance": "月翼形態では、詠唱を完了するたびに月潮が1段階進む（最大3）。月潮が3段階のとき、月の種はムーンサージに、天墜は陽醒に変化する。"
       },
       "healing_touch": {
         "name": "野生の癒し",
@@ -9251,11 +10007,17 @@ export const ja_JP: EnTranslations = {
       },
       "moonfire": {
         "name": "月の嵐",
-        "description": "月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。"
+        "description": "月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。",
+        "specNote_balance": "燃やし続けること：月の種が効果を6秒延長する。"
+      },
+      "moonseed": {
+        "name": "月の種",
+        "description": "月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め（最大3）、月の嵐を6秒延長する（1回の付与につき最大6秒）。月潮が3段階のとき、このボタンはムーンサージに変化する：3段階すべてを消費し、240から285の秘術ダメージを与える即時攻撃。"
       },
       "rejuvenation": {
         "name": "野生の芽吹き",
-        "description": "12秒間で対象の体力を {damage} 回復します。"
+        "description": "12秒間で対象の体力を {damage} 回復します。",
+        "specNote_restoration": "新しい花を植えると翠成が1段階進む（最大5）。翠成が5段階のとき、スウィフトメンドは満開に変化する。"
       },
       "thorns": {
         "name": "茨の守り",
@@ -9271,7 +10033,8 @@ export const ja_JP: EnTranslations = {
       },
       "maul": {
         "name": "骨砕き",
-        "description": "近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。次のスイングで発動します。ブルーインフォーム専用。"
+        "description": "近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。次のスイングで発動します。ブルーインフォーム専用。",
+        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：78から96のダメージを与える高脅威の一撃。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を得て、怒りを15回復する。"
       },
       "growl": {
         "name": "威嚇",
@@ -9279,23 +10042,27 @@ export const ja_JP: EnTranslations = {
       },
       "cat_form": {
         "name": "ウルフフォーム",
-        "description": "狼に変身します。攻撃力はレベルに応じて上昇し、攻撃はエネルギーとコンボポイントを使い、脅威生成が29%低下します。再度使用すると術者形態に戻ります。"
+        "description": "狼へ変身します。敏捷性がレベルとともに上がり、攻撃力は+8にレベルごとの2を加え、攻撃はエネルギーとコンボポイントを使い、生む脅威度が29%減ります。もう一度使えば術者の姿に戻ります。"
       },
       "claw": {
-        "name": "クロー",
-        "description": "敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ウルフフォーム専用。"
+        "name": "裂爪",
+        "description": "敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ウルフフォーム専用。",
+        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
       },
       "ferocious_bite": {
         "name": "血噛み",
-        "description": "{damage}を与えるフィニッシュムーブです。ウルフフォーム専用。"
+        "description": "{damage}を与えるフィニッシュムーブです。ウルフフォーム専用。",
+        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：91にコンボポイントごとに55を加えたダメージの噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを30回復する。"
       },
       "swipe": {
         "name": "薙ぎ払う爪",
-        "description": "周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ブルーインフォーム専用。"
+        "description": "周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ブルーインフォーム専用。",
+        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
       },
       "regrowth": {
         "name": "二度目の開花",
-        "description": "味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。"
+        "description": "味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。",
+        "specNote_restoration": "新しい花を植えると翠成が1段階進む（最大5）。"
       },
       "barkskin": {
         "name": "樫の肌",
@@ -9311,7 +10078,8 @@ export const ja_JP: EnTranslations = {
       },
       "starfire": {
         "name": "天墜",
-        "description": "星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。"
+        "description": "星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。",
+        "specNote_balance": "月翼形態では、詠唱を完了するたびに月潮が1段階進む（最大3）。月潮が3段階のとき、このボタンは陽醒に変化する：160から190の自然ダメージに加え、9秒かけて75の炎上ダメージを与え、マナを35回復し、3段階すべてを消費する即時攻撃。"
       },
       "travel_form": {
         "name": "フリートフォーム",
@@ -9327,7 +10095,7 @@ export const ja_JP: EnTranslations = {
       },
       "faerie_fire": {
         "name": "魔女火",
-        "description": "対象のアーマーを40秒間{damage}%低下させます。装甲切断とは重複しません。"
+        "description": "対象の防御力を40秒間{damage}%下げます。"
       },
       "hibernate": {
         "name": "微睡み",
@@ -9350,8 +10118,9 @@ export const ja_JP: EnTranslations = {
         "description": "攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。"
       },
       "rip": {
-        "name": "リップ",
-        "description": "12秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。"
+        "name": "血裂",
+        "description": "対象を24秒間、2秒ごとに出血させるフィニッシュ技。36ダメージに加え、消費したコンボポイント1つにつき24（コンボポイント5：合計{damage}）。狼の姿専用。",
+        "specNote_feral": "命中した一撃が古き血を1蓄える（最大3）。"
       },
       "mortal_strike": {
         "name": "重傷の一撃",
@@ -9378,32 +10147,120 @@ export const ja_JP: EnTranslations = {
         "description": "対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）"
       },
       "chain_heal": {
-        "name": "チェインヒール",
-        "description": "味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）"
+        "name": "連なる癒し",
+        "description": "味方1体を{damage}回復し、12ヤード以内の最大2体の味方へ連鎖する。連鎖ごとに回復量は前の対象の50%になる。連鎖した味方は残っている治癒の奔流を消費し、消費量の125%を即座に回復する。初回の回復量はスペルパワーで上昇する。（回復スペシャライゼーション）"
+      },
+      "galeheart_weapon": {
+        "name": "疾風の武器",
+        "description": "武器に疾風を宿します。3回目の命中ごとに武器攻撃が2度反響し、ストームキャストを発動します。"
+      },
+      "warspirit_cadence": {
+        "name": "戦霊の律動",
+        "description": "パッシブ：武器攻撃が3回命中するたび、50%の自然ダメージを与えるゲイルハートエコーが2回発動し、12秒間ストームキャストを得る。ストームキャストは次のアークボルト、ジョルト、またはメンディングウォーターを即時発動かつ消費マナ半減にする。アンセストラルストライクは2回分として数える。（ウォースピリット）"
+      },
+      "stormsurge": {
+        "name": "ストームサージ",
+        "description": "パッシブ：アンセストラルストライクのクールダウン中にストームキャストを消費すると、25%の確率でクールダウンをリセットする。4回失敗すると次は必ず発動する。（ウォースピリット）"
+      },
+      "lifespring_weapon": {
+        "name": "命泉の武器",
+        "description": "武器に生命の水を宿し、癒しの水流への蓄積量を20%増加させます。"
+      },
+      "unleash_weapon": {
+        "name": "武器解放",
+        "description": "有効な武器付与を解放する。火焔烙印は54から64の火炎ダメージを与え、魔力の30%が加算され、雷鳴を2得る。疾風は武器で攻撃し、戦霊の律動を進め、6秒間攻撃速度を20%上昇させる。石縛は武器ダメージの75%を与え、対象を強制的に自分へ攻撃させ、4秒間受けるダメージを20%軽減する。命泉は癒しの水流を消費し、残りの回復量の125%を即時に回復し、8秒以内の次の一撃を実際の回復量の50%分軽減する。"
+      },
+      "elemental_trance": {
+        "name": "エレメンタルトランス",
+        "description": "15秒間エレメンタルトランス状態に入り、受けるダメージを30%軽減し、与えた全ダメージの20%をマナに変換する。（ウォースピリット固有能力）"
+      },
+      "primal_exaltation": {
+        "name": "原初の高揚",
+        "description": "専門分野の力を12秒間解放し、通常のローテーションを強化します。（シャーマンのタレント）"
+      },
+      "stoneward": {
+        "name": "石の守り",
+        "description": "味方1体を6チャージで60秒間守ります。ダメージを受けると1チャージを消費し、3秒に1回、最大体力の5%を回復します。（シャーマンのタレント）"
+      },
+      "tidecall": {
+        "name": "潮呼び",
+        "description": "味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。"
+      },
+      "soul_harvest": {
+        "name": "霊魂刈り",
+        "description": "敵の魂を切り裂いて{damage}のシャドウダメージを与え、魂の欠片を1個生成する。最大5個。"
+      },
+      "soul_lance": {
+        "name": "魂の槍",
+        "description": "幽体の槍を投げ、{damage}のシャドウダメージを与える。納骨の印がついた対象には、そのダメージの50%が印へ蓄積される。"
+      },
+      "raise_graveguard": {
+        "name": "墓守の召喚",
+        "description": "永続する防御型の相棒を呼び起こす。墓守は自動で挑発し、墓所の支配であなたへのダメージの20%を肩代わりする。リーピング・コマンドでは挑発し、4秒間受けるダメージが30%減少する。"
+      },
+      "raise_skeletal_warrior": {
+        "name": "骸骨戦士の召喚",
+        "description": "魂の欠片を1個消費し、永続する骸骨戦士を2枠のドミニオンに加える。同時に従えるのは1体まで。6秒ごとに周囲へ45%の薙ぎ払いダメージを与え、リーピング・コマンドでは対象を4秒間40%減速させる。"
+      },
+      "raise_bone_mage": {
+        "name": "骨魔導士の召喚",
+        "description": "魂の欠片を2個消費し、永続する遠隔型の骨魔導士を2枠のドミニオンに加える。同時に従えるのは1体まで。攻撃は6秒間受ける魔法ダメージを5%増加させ、リーピング・コマンドでは8%に強化する。"
+      },
+      "bone_armor": {
+        "name": "骨の鎧",
+        "description": "骨で身を包み、最大体力の20%に相当するダメージを吸収する。"
+      },
+      "corpse_explosion": {
+        "name": "骸の爆裂",
+        "description": "まずボーン・メイジ、次にスケルタル・ウォリアーを生贄にし、グレイヴウィングは最後の手段としてのみ選ぶ。同系統が複数いる場合は残り時間が最も短いもの、次に最も弱いものを選び、指定地点の敵に{damage}のシャドウダメージを与える。"
+      },
+      "funeral_harvest": {
+        "name": "葬送の収穫",
+        "description": "自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。"
+      },
+      "ossuary_mark": {
+        "name": "納骨の印",
+        "description": "敵に12秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。"
+      },
+      "unholy_command": {
+        "name": "不浄の号令",
+        "description": "魂の欠片を3個消費してすべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。"
+      },
+      "reaping_command": {
+        "name": "刈り取りの号令",
+        "description": "魂の欠片を2個消費し、すべてのアンデッドの従者に一斉攻撃させる。墓守は挑発して身を固め、骸骨戦士は足止めし、骨魔導士は魔法防御を暴き、墓翼は命中した全敵を引き裂く。"
+      },
+      "sacrifice_undead": {
+        "name": "亡者の生贄",
+        "description": "ドミニオンの従者を1体破壊し、最大体力の25%を回復する。"
+      },
+      "raise_gravewing": {
+        "name": "墓翼の召喚",
+        "description": "魂の欠片を2個消費し、永続する墓翼を2枠のドミニオンに加える。同時に従えるのは1体まで。5秒ごとに周囲へ65%の薙ぎ払いダメージを与え、リーピング・コマンドでは命中した全敵の受けるダメージを5秒間8%増加させる。"
+      },
+      "army_of_the_dead": {
+        "name": "亡者の軍勢",
+        "description": "墓所の門を開き、選んだドミニオンの従者に加えて、スケルタル・ウォリアー、ボーン・メイジ、グレイヴウィングを20秒間召喚する。"
       },
       "metamorphosis": {
-        "name": "悪魔変身",
-        "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）"
+        "name": "リッチの姿",
+        "description": "20秒間リッチとなり、魂の欠片を3つ生み出し、呪文ダメージと詠唱速度を20%高めます。あなたのアンデッドは50%多くダメージを与え、20%速く動き、魂の槍は対象を貫いて近くの敵最大2体にそのダメージの50%を与えます。（死霊術の象徴）"
       },
       "holy_shock": {
         "name": "ホーリーショック",
         "description": "聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）"
       },
-      "aura_surge": {
-        "name": "曙光の跳弾",
-        "description": "曙光で鍛えた盾を投げて{damage}の聖属性ダメージを与え、最初の対象を2秒間沈黙させる。その後、10ヤード以内の追加の敵最大2体へ跳ね返り、1回ごとに75%のダメージを与える。（パラディンのタレント）"
-      },
       "holy_shield": {
         "name": "ホーリーシールド",
-        "description": "10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）"
+        "description": "ブロック率が30%上昇し、最大HPの{damage}%を吸収するシールドを{duration}秒間獲得、ヘイトの波動を放つ。神聖なる昇天がこの防御を強化・延長する。"
       },
       "bestial_wrath": {
         "name": "野獣の怒り",
-        "description": "野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）"
+        "description": "群れの獰猛を3与えます。20秒以内の次の獣の解放は、打撃と叩きのダメージが50%増え、その狂乱は8秒ではなく12秒続きます。（野獣熟達の象徴）"
       },
       "trueshot_aura": {
         "name": "トゥルーショットオーラ",
-        "description": "近くの味方を鼓舞し、5分間攻撃力を35上げます。（マークスマンシップ特性のシグネチャ）"
+        "description": "30ヤード以内の味方の攻撃力を30分間10%高めます。（射撃の象徴）"
       },
       "wyvern_sting": {
         "name": "ワイバーンスティング",
@@ -9423,31 +10280,31 @@ export const ja_JP: EnTranslations = {
       },
       "cold_blood": {
         "name": "コールドブラッド",
-        "description": "殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）"
+        "description": "殺意を研ぎ澄まし、次の攻撃を必ずクリティカルにします。（暗殺の象徴）"
       },
       "blade_flurry": {
         "name": "ブレードフラリー",
-        "description": "刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）"
+        "description": "刃の乱舞を放ち、攻撃速度を12秒間20%高めます。（コンバットの象徴）"
       },
       "hemorrhage": {
         "name": "ヘモリッジ",
-        "description": "敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）"
+        "description": "武器ダメージに{damage}を加えて敵を打ち、12秒間の出血ダメージを与え、対象が受ける出血ダメージを40%高めます。コンボポイントを1与えます。2回使うごとに幽冥を1加えます（最大3）。（隠密の象徴）"
       },
       "power_infusion": {
         "name": "パワーインフュージョン",
-        "description": "味方に力を注ぎ、15秒間呪文力を28上げます。（ディシプリン特性のシグネチャ）"
+        "description": "味方の対象に聖油を注ぎ、15秒間ダメージ、回復量、詠唱速度を20%高めます。"
       },
       "holy_nova": {
-        "name": "ホーリーノヴァ",
-        "description": "聖なる光を爆発させ、近くの味方を{damage}回復し、近くの敵にダメージを与えます。（ホーリー特性のシグネチャ）"
+        "name": "旭日の聖詠",
+        "description": "10ヤード以内の味方を{damage}回復し、同じ範囲の敵に24から30の神聖ダメージを与えます。どちらも呪文威力とともに上がります。（聖なる基本）"
       },
       "shadowform": {
-        "name": "シャドウフォーム",
-        "description": "シャドウフォームになり、戻るまで影の魔法を強化します。再び唱えると通常形態に戻ります。（シャドウ特性のシグネチャ）"
+        "name": "黄昏の帳",
+        "description": "黄昏の帳に入り、影ダメージを25%高めます。もう一度使えば黄昏の帳を離れます。（影の象徴）"
       },
       "elemental_mastery": {
         "name": "エレメンタルマスタリー",
-        "description": "元素の熟達を呼び、次の呪文を即時発動にします。（エレメンタル特性のシグネチャ）"
+        "description": "12秒間、電弧の矢が雷を2与えます。次の電弧の矢か枝分かれの稲妻は即時発動になり、次の満額の雷の払い出しはダメージが25%増えます。（エレメンタルの象徴）"
       },
       "siphon_life": {
         "name": "サイフォンライフ",
@@ -9455,7 +10312,7 @@ export const ja_JP: EnTranslations = {
       },
       "conflagrate": {
         "name": "コンフラグレート",
-        "description": "敵にかかったイモレートを消費して燃え上がらせ、{damage}のファイアダメージを与えます。（デストラクション特性のシグネチャ）"
+        "description": "灼熱の契約の先の刻みを一つ手前へ引き、続けて対象を燃やして{damage}の火炎ダメージを与えます。破滅的猛攻を1と破滅を1生みます。チャージを2つ持ちます。（破壊の象徴）"
       },
       "moonkin_form": {
         "name": "ムーンキンフォーム",
@@ -9467,15 +10324,35 @@ export const ja_JP: EnTranslations = {
       },
       "swiftmend": {
         "name": "スウィフトメンド",
-        "description": "味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）"
+        "description": "味方の対象にかかった継続回復効果を消費し、{damage}回復します。野生の芽吹きと二度目の開花の植え付けは青翠を貯め、青翠5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）"
+      },
+      "moonlash": {
+        "name": "ムーンサージ",
+        "description": "月潮を3消費し、{damage}の秘術ダメージの強撃を放つ、ダメージ重視の選択肢。陽醒も同じ月潮3を消費するため、どちらか一方を選ぶこと。"
+      },
+      "sunlance": {
+        "name": "陽醒",
+        "description": "月潮を3消費し、{damage}の自然ダメージと、9秒かけて{overTime}の炎上ダメージを与え、マナを35回復する、マナ重視の選択肢。ムーンサージも同じ月潮3を消費するため、どちらか一方を選ぶこと。"
+      },
+      "redharvest": {
+        "name": "血の収穫",
+        "description": "古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを30回復する。コンボポイントが0でも使用できる。"
+      },
+      "marrowbreak": {
+        "name": "骨髄砕き",
+        "description": "古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を8秒間得て、怒りを15回復する。"
+      },
+      "overbloom": {
+        "name": "満開",
+        "description": "翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の60%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。"
       },
       "summon_imp": {
         "name": "エンバーキンの召喚",
-        "description": "ウォーロックの命令に従うエンバーキンを召喚します。エンバーキンは遠くから敵にアッシュボルトを放ちます。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
+        "description": "ウォーロックの命に従うエンバーキンを召喚します。エンバーキンは遠くから敵へフェルボルトを放ちます。新たなデーモンを召喚すると今のデーモンは去ります。デーモンは一度に一体だけです。"
       },
       "summon_voidwalker": {
         "name": "グルームシェイドの召喚",
-        "description": "ウォーロックの命令に従うグルームシェイドを召喚します。グルームシェイドは敵を挑発し攻撃を受け止める頑強な悪魔です。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
+        "description": "ウォーロックの命に従うグルームシェイドを召喚します。この頑丈なデーモンは敵を挑発し、深淵の鎖で遠くの通常の敵を間合いへ引き戻します。ボスは引き寄せられません。新たなデーモンを召喚すると今のデーモンは去ります。デーモンは一度に一体だけです。"
       },
       "summon_succubus": {
         "name": "ダスクボーンの召喚",
@@ -9491,7 +10368,7 @@ export const ja_JP: EnTranslations = {
       },
       "summon_infernal": {
         "name": "パイアコロッサスの召喚",
-        "description": "パイアコロッサスを意のままに束縛します。圧倒的な近接攻撃と、あらゆる悪魔の中で最も深い生命力と防御力を備えた巨大な破壊兵器です。長い再使用時間がその純然たる力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
+        "description": "対象範囲へパイアコロッサスを落とし、着弾時に58-72の火炎ダメージを与えます。デーモンを置き換えることなく30秒間戦い、2秒ごとに近くの敵を焼き、1秒ごとに破滅的猛攻を1生みます。"
       },
       "summon_doomguard": {
         "name": "レイスボーンの召喚",
@@ -9603,7 +10480,7 @@ export const ja_JP: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "威圧の雄叫び",
-        "description": "恐ろしい叫びを上げ、8yd以内の最大5体の敵を8秒間、恐怖で逃げ惑わせます。ダメージを受けると効果が解除されることがあります。"
+        "description": "8ヤード以内の敵最大5体を4秒間、恐怖で逃げ惑わせる恐ろしい叫び。ダメージで効果が解けることがあります。"
       },
       "revenge": {
         "name": "意趣返し",
@@ -9626,8 +10503,8 @@ export const ja_JP: EnTranslations = {
         "description": "20秒間コロッサスに変身し、あらゆる行動妨害を解除し、与えるダメージが20%増加します。"
       },
       "avenging_wrath": {
-        "name": "復讐の翼",
-        "description": "復讐の力を呼び起こし、攻撃力を60、魔力を30上昇させる。効果時間20秒。（パラディンのタレント）"
+        "name": "アヴェンジング・ラース",
+        "description": "黄金の神聖なる力でできた実体の翼を広げ、献身を10得て、15秒間あなたのアビリティが生む献身を二倍にします。さらに与えるダメージと回復量を20%高めます。暁の刈り手：ヘイマー・オヴ・ラースをあらゆる対象へ使えるようにします。"
       },
       "berserk": {
         "name": "赤き霞",
@@ -9643,19 +10520,23 @@ export const ja_JP: EnTranslations = {
       },
       "bloodlust": {
         "name": "戦の太鼓",
-        "description": "30ヤード以内の味方を狂乱させ、攻撃速度を30%上昇させる。効果時間15秒。（シャーマンのタレント）"
+        "description": "30ヤード以内のパーティまたはレイドの味方の攻撃速度、詠唱速度、維持詠唱速度を15秒間30%高めます。効果を受けた味方は10分間、戦の太鼓や時間加速の恩恵を再び受けられません。（シャーマンのタレント）"
       },
       "chain_lightning": {
         "name": "枝分かれの稲妻",
-        "description": "対象地点へ雷を放ち、周囲の敵に{damage}のダメージを与える。（シャーマンのタレント）"
+        "description": "10ヤード以内の敵最大3体にそれぞれ{damage}の自然ダメージを与えます。エレメンタル：命中すると雷が1得られます。ダメージは呪文威力とともに上がります。"
+      },
+      "abyssal_rift": {
+        "name": "深淵の裂け目",
+        "description": "選択した地点に裂け目を開き、8ヤード以内の敵を中心へ引き寄せて{damage}の影ダメージを与え、2秒間スタンさせます。ボスはダメージを受けますが、引き寄せとスタンには抵抗します。"
       },
       "chaos_bolt": {
         "name": "破滅の矢",
-        "description": "混沌の炎を放ち、{damage}の火属性ダメージを与える。（ウォーロックのタレント）"
+        "description": "破滅的猛攻を3消費し、混沌の炎の重い矢を放って{damage}の火炎ダメージを与えます。破滅はその詠唱を30%短くします。"
       },
-      "cleansing_verdict": {
-        "name": "浄化の裁定",
-        "description": "味方1体の有害な魔法効果を解除し、{damage}の体力を回復する。"
+      "dark_pact": {
+        "name": "血の盟約",
+        "description": "現在の体力の10%を捧げ、8秒間、最大体力の30%に相当するダメージを吸収します。"
       },
       "cloak_of_shadows": {
         "name": "影まとい",
@@ -9683,23 +10564,23 @@ export const ja_JP: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "最後の祈り",
-        "description": "自分の体力を即座に{damage}回復する。（プリーストのタレント）"
+        "description": "最大HPの30%を即座に回復する。"
       },
       "deterrence": {
         "name": "針毛の守り",
         "description": "回避率を50パーセントポイント上昇させる。効果時間10秒。（ハンターのタレント）"
       },
-      "divine_shield": {
-        "name": "光の護り",
-        "description": "聖なる力で身を守り、8秒間に900のダメージを吸収する。（パラディンのタレント）"
-      },
       "earthbind": {
         "name": "大地の縛り",
-        "description": "周囲の敵を大地に縛り、2秒間移動不能にする。（シャーマンのタレント）"
+        "description": "対象地点から4ヤード以内の敵を2秒間その場に縛り、続けて6秒間40%減速させます。（シャーマンのタレント）"
       },
       "evocation": {
         "name": "エーテルの井戸",
         "description": "マナを急速に回復する。（メイジタレント）"
+      },
+      "flurry_of_knives": {
+        "name": "短剣乱舞",
+        "description": "投げナイフで6ヤード以内のすべての敵を切り裂き、{damage}の物理ダメージを与え、コンボポイントを2獲得する。（ローグのタレント）"
       },
       "frenzied_regeneration": {
         "name": "野生の癒し",
@@ -9711,19 +10592,15 @@ export const ja_JP: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "亡霊の一撃",
-        "description": "敵に武器ダメージと{damage}の追加ダメージを与え、短時間、回避率を上昇させる。コンボポイントを1獲得する。（ローグのタレント）"
+        "description": "武器ダメージに{damage}を加えて敵を打ち、回避率を7秒間15%高めます。コンボポイントを1与えます。（ローグのタレント）"
       },
       "hammer_of_wrath": {
-        "name": "鐘鳴りの槌",
-        "description": "傷ついた敵に聖なるハンマーを投げ、{damage}の聖属性ダメージを与える。体力が20%未満の対象にのみ使用可能。（パラディンのタレント）"
+        "name": "ヘイマー・オヴ・ラース",
+        "description": "神聖な鎚を投げて{damage}のダメージを与え、献身を1生みます。体力20%未満のとき、あるいは神聖なる昇天かアヴェンジング・ラースの最中に使えます。暁の憤怒はあらゆる対象への追加の一撃を与え、それは進行中のクールダウンを無視し、20%多くダメージを与えます。昇天はそのダメージを30%高めます。"
       },
       "healing_stream": {
         "name": "湧き水",
         "description": "味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）"
-      },
-      "holy_wrath": {
-        "name": "聖者の怒り",
-        "description": "聖なる力を解き放ち、周囲の敵に{damage}のダメージを与える。（パラディンのタレント）"
       },
       "howl_of_terror": {
         "name": "恐怖の遠吠え",
@@ -9735,7 +10612,7 @@ export const ja_JP: EnTranslations = {
       },
       "inner_focus": {
         "name": "静まる心",
-        "description": "次に使用するスペルの消費をなくす。効果時間60秒。（プリーストのタレント）"
+        "description": "次のプリーストの呪文を無償かつ中断されないものにします。60秒続きます。"
       },
       "innervate": {
         "name": "生命の樹液",
@@ -9781,6 +10658,10 @@ export const ja_JP: EnTranslations = {
         "name": "集団逆行",
         "description": "グループまたはレイドの死亡した全メンバーの時間軸を巻き戻し、遺体のそばで体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）"
       },
+      "ancestor_return": {
+        "name": "祖霊の帰還",
+        "description": "グループまたはレイドの倒れたメンバー全員を遺体の場所で蘇生し、体力とマナを30%回復させる。戦闘中は使用できない。（霊癒）"
+      },
       "temporal_rewind": {
         "name": "巻き戻し",
         "description": "パーティまたはレイドに秘術の波を送り、時間を巻き戻します。40ヤード以内の各味方が過去5秒間に受けたダメージの30%を回復します（最大体力の35%まで）。この効果はクリティカルになりません。（クロノマンシー）"
@@ -9803,7 +10684,7 @@ export const ja_JP: EnTranslations = {
       },
       "mind_sear": {
         "name": "思念焼き",
-        "description": "対象地点へ闇のエネルギーをチャネリングし、周囲の敵に毎秒{damage}のダメージを与える。（プリーストのタレント）"
+        "description": "3秒間詠唱を維持し、対象範囲から8ヤード以内の敵へ毎秒{damage}の影ダメージを与えます。ダメージは呪文威力とともに上がります。（プリーストのタレント）"
       },
       "multi_shot": {
         "name": "分裂射撃",
@@ -9811,7 +10692,7 @@ export const ja_JP: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "聖歌の癒し",
-        "description": "周囲の味方の体力を{damage}回復する。（プリーストのタレント）"
+        "description": "30ヤード以内の味方を{damage}回復します。回復量は呪文威力とともに上がります。（聖なる）"
       },
       "preparation": {
         "name": "備え",
@@ -9823,11 +10704,11 @@ export const ja_JP: EnTranslations = {
       },
       "psychic_scream": {
         "name": "精神の絶叫",
-        "description": "周囲の敵を最大4秒間恐怖状態にする。ダメージを受けると解除されることがある。（プリーストのタレント）"
+        "description": "8ヤード以内の敵を最大4秒間おののかせます。ダメージで効果が解けることがあります。"
       },
       "counter_shot": {
         "name": "沈黙の一射",
-        "description": "素早い一射で対象の詠唱を中断し、4秒間その系統を封じる。"
+        "description": "対象を中断し、4秒間その系統の呪文を使えなくします。"
       },
       "rebuke": {
         "name": "叱咤",
@@ -9845,6 +10726,10 @@ export const ja_JP: EnTranslations = {
         "name": "スモークスクリーン",
         "description": "煙幕に紛れ、8秒間、回避率を30%上昇させる。"
       },
+      "sacrilegious_march": {
+        "name": "冒涜の行軍",
+        "description": "移動速度が35%上昇しますが、毎秒、最大体力の2%を失います。もう一度使用すると解除されます。体力が20%になると自動的に切れます。"
+      },
       "spellsteal": {
         "name": "魔法奪取",
         "description": "敵の有益な魔法効果を1つ奪い、自分へ移す。"
@@ -9858,12 +10743,37 @@ export const ja_JP: EnTranslations = {
         "description": "突進する頭突きで対象の詠唱を中断し、4秒間その系統を封じる。"
       },
       "spell_lock": {
-        "name": "猿轡",
-        "description": "詠唱中の対象を沈黙させ、5秒間その系統の呪文を封じる。"
+        "name": "深淵の猿轡",
+        "description": "敵の詠唱を中断し、4秒間その系統の呪文を使えなくします。"
+      },
+      "thieves_chorus": {
+        "name": "盗賊の合唱",
+        "description": "口笛の合図でグループを鼓舞し、10秒間、攻撃・詠唱・チャネリング速度を10%上昇させる。最近グループ速度上昇を受けた味方は疲労しており、効果を受けられない。（ローグのタレント）"
       },
       "tranquility": {
         "name": "木立の歌",
         "description": "4秒間、回復エネルギーをチャネリングし、30ヤード以内の味方の体力を毎秒42から52回復する。（ドルイドのタレント）"
+      },
+      "venom_dart": {
+        "name": "毒針",
+        "description": "毒針を弾き飛ばし、{damage}の自然ダメージを与える。コンボポイントを1獲得する。",
+        "specNote_assassination": "毒の儀式を1段階進め、毒の傷を6秒延長する（傷の残り時間は20秒を超えない）。"
+      },
+      "body_blow": {
+        "name": "ヘイメーカー",
+        "description": "武器ダメージの130%に10を加えた重い一撃。コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。（コンバット）"
+      },
+      "knockout_blow": {
+        "name": "消灯",
+        "description": "ノックアウトでレッドラインを締めくくる：45にコンボポイントごとに35を加えたダメージを与え、蓄えたレッドラインのピップごとに25%強化され、エナジーを25回復する。レッドラインが終わる前に使わなければノックアウトは失われる。（コンバット）"
+      },
+      "veilstrike": {
+        "name": "ヴェールストライク",
+        "description": "6秒間：ダスクヴェールの先制技がステルスなしでどの角度からでも使用でき、与ダメージが10%増加し、効果中最初の潜伏者の一撃は2倍のダメージを与える。（スカルダガリー）"
+      },
+      "venomrend": {
+        "name": "毒裂き",
+        "description": "毒の儀式を6段階消費する：100にコンボポイントごとに55を加えたダメージを与え、出血効果が与えるはずだった残りダメージを即座にすべて与え、その後新しい毒の傷を与える（20秒かけて120ダメージ）。エナジーを20回復する。（ナイフワーク）"
       },
       "typhoon": {
         "name": "タイフーン",
@@ -9872,6 +10782,30 @@ export const ja_JP: EnTranslations = {
       "voidfeast": {
         "name": "虚無の饗宴",
         "description": "魔法効果（敵の有益効果または味方の有害効果）を貪り、自分の最大体力の6%を回復する。"
+      },
+      "veilstep": {
+        "name": "ヴェイルステップ",
+        "description": "向いている方向へ帷をすり抜ける。"
+      },
+      "scouring_mercy": {
+        "name": "浄罪の慈悲",
+        "description": "敵を聖なる力で浄化するか、味方1体を即座に癒す。ドクトリン固有能力。"
+      },
+      "seraphic_vigil": {
+        "name": "熾天使の見守り",
+        "description": "味方1体に見守りの祝福を与え、危機に陥った時に体力を回復する。ベネディクション固有能力。"
+      },
+      "summon_tithefiend": {
+        "name": "タイスフィーンド招来",
+        "description": "グルームタイスを消費し、あなたのエフィジーを狙う一時的なタイスフィーンドを呼び出す。ヴェスパー固有能力。"
+      },
+      "martyrs_aegis": {
+        "name": "殉教者の盾",
+        "description": "味方1体が受けるダメージを8秒間40%軽減する。"
+      },
+      "choir_of_deliverance": {
+        "name": "救済の聖歌隊",
+        "description": "6秒間チャネルし、30ヤード以内のパーティメンバーを2秒ごとに{damage}回復します。回復量はスペルパワーで増加します。"
       },
       "bear_charge": {
         "name": "ブルーインラッシュ",
@@ -9887,7 +10821,8 @@ export const ja_JP: EnTranslations = {
       },
       "rake": {
         "name": "皮剥ぎ",
-        "description": "ステルス状態からの先制攻撃で、武器ダメージに加えて{damage}のダメージを与え、9秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム時のみ使用可能。"
+        "description": "敵を切り裂いて武器ダメージに{damage}を加え、18秒間の出血ダメージを与えます。コンボポイントを1与えます。狼の姿専用。",
+        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
       },
       "revive_pet": {
         "name": "応急処置",
@@ -11404,6 +12339,18 @@ export const ja_JP: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
       },
+      "rimefang": {
+        "name": "霜牙"
+      },
+      "marrowpoint": {
+        "name": "髄穿ち"
+      },
+      "duskwhisper": {
+        "name": "夕闇の囁き"
+      },
+      "boneglass_shiv": {
+        "name": "骨硝子の小刀"
+      },
       "moggers_hide_quiver": {
         "name": "モガーの革の矢筒"
       },
@@ -11547,6 +12494,9 @@ export const ja_JP: EnTranslations = {
       },
       "conjured_bread4": {
         "name": "魔法の祝宴パン"
+      },
+      "soul_stone": {
+        "name": "魂の石"
       },
       "bristleback_maul": {
         "name": "ギャロウグラスの大槌"
@@ -12933,9 +13883,6 @@ export const ja_JP: EnTranslations = {
       "gloomshade": {
         "name": "グルームシェイド"
       },
-      "duskborn": {
-        "name": "ダスクボーン"
-      },
       "grix_the_tunnelking": {
         "name": "トンネルキングのグリックス"
       },
@@ -12957,17 +13904,8 @@ export const ja_JP: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "魂縛りマルドレク"
       },
-      "spellhound": {
-        "name": "スペルハウンド"
-      },
-      "warfiend": {
-        "name": "ウォーフィーンド"
-      },
       "pyre_colossus": {
         "name": "パイアコロッサス"
-      },
-      "wraithborn": {
-        "name": "レイスボーン"
       },
       "choirmother_selthe": {
         "name": "聖歌母セルセ"
@@ -13007,6 +13945,18 @@ export const ja_JP: EnTranslations = {
       },
       "water_elemental": {
         "name": "ウォーターエレメンタル"
+      },
+      "graveguard": {
+        "name": "墓守"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "骸骨戦士"
+      },
+      "necromancy_bone_mage": {
+        "name": "骨魔導士"
+      },
+      "necromancy_gravewing": {
+        "name": "墓翼"
       }
     },
     "npcs": {
@@ -13633,6 +14583,16 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "暁縛りの聖典",
+        "text": "光はあなたの中で静かに眠ってはいない、{playerName}。あなたが死者を安らかに眠らせる姿を見てきた。今こそ、ほとんどのパラディンが学ぶことのない秘儀を授けよう。倒れた魂を現世へ呼び戻す、呼び戻しの儀式だ。その言葉は、私が預かる暁縛りの聖典に記されている。だが、この地を彷徨う死者がいる限り、本は祝福とはならない。さまよう骸骨をあと6体、土へ還しなさい。そうすれば教えを始めよう。",
+        "completion": "礼拝堂の庭は静かになった。{playerName}、あなたは言葉を学ぶ準備ができている。しかし呼び戻しの儀式は、暖かな礼拝堂で唱えるものではない。生と死の帳が薄くなった場所で歌わねばならない。私は聖典を北のミアフェン湿地へ運ぶ。そこで合流し、最後までやり遂げよう。",
+        "objectives": {
+          "0": {
+            "label": "安らかにしたさまよう骸骨"
+          }
+        }
+      },
       "q_bandits": {
         "title": "谷の盗賊",
         "text": "南西の丘に盗賊団がいます。今週だけで荷車を三台襲いました。谷の盗賊を10人倒してください。",
@@ -13786,6 +14746,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "溺れ死者を安息させる"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "呼び戻しの儀式",
+        "text": "沼地までついてきたか、{playerName}。よろしい。暁縛りの聖典はここにある。この水没した地こそ、その言葉にふさわしい。死者が埋葬されたままでいられない場所ほど、生と死の帳が薄い場所はない。だが水没した死者は、詠唱の途中であなたの声を沈めようとするだろう。儀式にふさわしい場所を確保しなさい。水没した死者を8体眠らせ、共に聖別しよう。",
+        "completion": "ひざまずき、{playerName}、言葉を声に出して読みなさい。そうだ。感じるか？ あなたの手の光は、もはや生者を癒やすだけではない。彼岸へ渡った者を呼び戻すこともできる。賢明に使いなさい。絶望的な戦いへ魂を呼び戻すことは、慈悲ではなく残酷だ。立ちなさい、救済者よ。",
+        "objectives": {
+          "0": {
+            "label": "安らかにした水没した死者"
           }
         }
       },
@@ -16254,33 +17224,33 @@ export const ja_JP: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "アッシュストーカーの装備",
-        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
-        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
-        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。敵対プレイヤーを撃破すると「アッシェンステップ」が発動し、6秒間、移動速度が40%上昇します。"
+        "bonus2": "ウォーフェア防御レーティングが40上がります。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。",
+        "bonus7": "ウォーフェア攻撃・防御レーティングが80上がります。敵対プレイヤーを倒すと灰の歩みを得て、移動速度が6秒間40%上がります。"
       },
       "warfare_cinderweave": {
         "name": "シンダーウィーヴの法衣",
-        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
-        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
-        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。"
+        "bonus2": "ウォーフェア防御レーティングが40上がります。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。",
+        "bonus7": "ウォーフェア攻撃・防御レーティングが80上がります。呪文に15%の確率で燠火の守りが宿り、8秒間120のダメージを吸収します。"
       },
       "warfare_furyforged": {
         "name": "フューリーフォージの戦装束",
-        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
-        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
-        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。敵対プレイヤーを撃破すると「アンブロークンオース」が発動し、10秒間200ダメージを吸収します。"
+        "bonus2": "ウォーフェア防御レーティングが40上がります。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。",
+        "bonus7": "ウォーフェア攻撃・防御レーティングが80上がります。敵対プレイヤーを倒すと不断の誓いを得て、10秒間200のダメージを吸収します。"
       },
       "warfare_stormbound": {
         "name": "ストームバウンドの法衣",
-        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
-        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
-        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。"
+        "bonus2": "ウォーフェア防御レーティングが40上がります。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。",
+        "bonus7": "ウォーフェア攻撃・防御レーティングが80上がります。呪文に15%の確率で燠火の守りが宿り、8秒間120のダメージを吸収します。"
       },
       "warfare_thornhide": {
         "name": "ソーンハイドの装束",
-        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
-        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
-        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「ソーンガード」が発動し、6秒間、回避率が15%上昇します。"
+        "bonus2": "ウォーフェア防御レーティングが40上がります。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。",
+        "bonus7": "ウォーフェア攻撃・防御レーティングが80上がります。呪文に15%の確率で棘の守りが宿り、回避が6秒間15%上がります。"
       },
       "wyrmshadow": {
         "name": "ナイトファングの装束",

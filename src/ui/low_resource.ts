@@ -7,6 +7,7 @@
 // tested directly, mirroring xp_bar.ts. All display strings route through t().
 
 import type { ResourceType } from '../sim/types';
+import { clamp01 } from './clamp';
 import { t } from './i18n';
 
 export interface LowResourceInput {
@@ -40,8 +41,11 @@ export function lowResourceViewInto(
   maxResource: number,
   resourceType: ResourceType | null,
 ): LowResourceView {
-  // Only mana/energy warn; rage and resource-less/degenerate frames are silent.
-  if (maxResource <= 0 || (resourceType !== 'mana' && resourceType !== 'energy')) {
+  // Mana, energy, and Focus warn; rage and resource-less frames are silent.
+  if (
+    maxResource <= 0 ||
+    (resourceType !== 'mana' && resourceType !== 'energy' && resourceType !== 'focus')
+  ) {
     out.active = false;
     out.opacity = 0;
     out.pulseSeconds = 0;
@@ -64,14 +68,15 @@ export function lowResourceViewInto(
   const opacity = 0.4 + tt ** 0.8 * 0.55;
   // Breathe slowly when just-low (~1.4s), urgently when near-empty (~0.5s).
   const pulseSeconds = 1.4 - tt * 0.9;
-  const label = resourceType === 'mana' ? t('game.hud.lowMana') : t('game.hud.lowEnergy');
+  const label =
+    resourceType === 'mana'
+      ? t('game.hud.lowMana')
+      : resourceType === 'focus'
+        ? t('game.hud.lowFocus')
+        : t('game.hud.lowEnergy');
   out.active = true;
   out.opacity = opacity;
   out.pulseSeconds = pulseSeconds;
   out.label = label;
   return out;
-}
-
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
 }

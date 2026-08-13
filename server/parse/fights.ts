@@ -64,6 +64,10 @@ export class OpenFight {
   readonly startedTick: number;
   /** Hostile npc ids seen fighting the participants (for boss-cast tracking). */
   readonly mobIds = new Set<number>();
+  /** Display names for tracked non-participant actors, shipped on close so
+   * the dashboard labels mob entity ids. Bounded by the mobIds tracking cap:
+   * names are only noted for ids admitted into mobIds. */
+  private readonly actorNames = new Map<number, string>();
   /** The encounter's boss entity, for kill/reset classification; null = trash. */
   primaryBossId: number | null = null;
   /** Tick of the last event routed here; drives trash-segment quiet closes. */
@@ -183,6 +187,17 @@ export class OpenFight {
     this.counters.recordsEmitted++;
   }
 
+  /**
+   * A sampled continuous stream (contract `SampleRecord`). Deliberately NOT
+   * counted against MAX_RAW_EVENTS_PER_FIGHT: samples are a fixed low rate per
+   * second, so a long fight that truncates its raw event lines still keeps a
+   * complete sampled series.
+   */
+  recordSample(tick: number, kind: 'pos' | 'res' | 'threat', data: unknown[]): void {
+    this.sink.enqueue({ t: 'sample', fightId: this.fightId, tick, kind, data });
+    this.counters.recordsEmitted++;
+  }
+
   // Rollup accumulation. The recorder calls these for every routed event even
   // past the raw-line cap, so fight_close totals stay complete.
 
@@ -246,9 +261,17 @@ export class OpenFight {
       outcome,
       truncated: this.truncated,
       rollup: { perParticipant },
+      ...(this.actorNames.size > 0
+        ? { actors: [...this.actorNames].map(([id, name]) => ({ id, name })) }
+        : {}),
     });
     this.counters.recordsEmitted++;
     this.counters.fightsClosed++;
+  }
+
+  /** Note a tracked non-participant actor's display name for the close roster. */
+  noteActor(entityId: number, name: string): void {
+    if (!this.actorNames.has(entityId)) this.actorNames.set(entityId, name);
   }
 
   private track(p: FightParticipant): void {

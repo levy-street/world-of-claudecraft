@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "9ff362cf",
+      "state": "7916fd78",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -91,6 +91,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -167,7 +171,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "da17cafe",
+      "state": "66b7e04f",
       "events": "a005f741",
       "rng": {
         "draws": 0,
@@ -233,6 +237,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -309,8 +317,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "f8c7c7a9",
-      "events": "da42f643",
+      "state": "46e93ffb",
+      "events": "f03ad83d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -382,6 +390,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -458,7 +477,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "a357a41c",
+      "state": "4b520a6a",
       "events": "67742213",
       "rng": {
         "draws": 0,
@@ -531,6 +550,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -607,7 +637,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "827332e8",
+      "state": "c0247906",
       "events": "5ae2a56a",
       "rng": {
         "draws": 0,
@@ -683,6 +713,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -759,7 +800,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "f1c73818",
+      "state": "99b47b56",
       "events": "6024a757",
       "rng": {
         "draws": 0,
@@ -835,6 +876,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -924,7 +976,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "79d4bbcf",
+      "state": "076068ad",
       "events": "bf90a36a",
       "rng": {
         "draws": 0,
@@ -996,6 +1048,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -1085,7 +1148,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "b001472c",
+      "state": "932cbbda",
       "events": "cb1a432d",
       "rng": {
         "draws": 0,
@@ -1158,6 +1221,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -1257,7 +1331,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "762e1d63",
+      "state": "7cd245f1",
       "events": "ff257c49",
       "rng": {
         "draws": 0,
@@ -1334,6 +1408,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -1433,7 +1518,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "3e91ea1a",
+      "state": "89b4c2fc",
       "events": "cd1eb7e0",
       "rng": {
         "draws": 0,
@@ -1515,6 +1600,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -1614,7 +1710,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "2af1a267",
+      "state": "0db969e1",
       "events": "c9308034",
       "rng": {
         "draws": 0,
@@ -1696,6 +1792,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -1801,7 +1908,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "915f6eb2",
+      "state": "705fbd2c",
       "events": "0dc07402",
       "rng": {
         "draws": 0,
@@ -1884,6 +1991,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -1993,7 +2111,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "2c56c891",
+      "state": "a96d2d9f",
       "events": "54f870b1",
       "rng": {
         "draws": 0,
@@ -2076,6 +2194,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -2181,7 +2310,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "2c56c891",
+      "state": "a96d2d9f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2264,6 +2393,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
+            "firstFind": {
+              "cryptbone_helm": {}
+            },
+            "recent": [
+              "cryptbone_helm"
+            ]
+          },
           "talents": {
             "rows": {}
           },

@@ -114,6 +114,10 @@ describe('weapon type classification', () => {
   it('stays in lockstep with the render variant family for mapped items', () => {
     const familyOf = (variant: string): string | null => {
       if (/^(adv_)?sword/.test(variant)) return 'sword';
+      // The bespoke dagger skins carry thematic names; assets.ts tags each of
+      // these variants VAR_DAGGER, which is the render-side family authority.
+      if (/^(ice_fang|redskull_dagger|purple_dagger|whittler_s_knife)$/.test(variant))
+        return 'dagger';
       if (/^(adv_)?dagger/.test(variant)) return 'dagger';
       if (/^(adv_)?(druid_)?staff|^adv_druid_staff/.test(variant)) return 'staff';
       if (/^hammer/.test(variant)) return 'mace';

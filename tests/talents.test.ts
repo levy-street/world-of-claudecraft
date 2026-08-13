@@ -32,7 +32,7 @@ import {
 } from '../src/sim/content/talents';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass, type SimEvent } from '../src/sim/types';
-import { talentRowOptionIconRef } from '../src/ui/talent_icons';
+import { PALADIN_TALENT_IMAGE_IDS, talentRowOptionIconRef } from '../src/ui/talent_icons';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // 'personal_barrier' is the shieldConsumed SLOT sentinel (combat/talent_procs.ts):
@@ -157,13 +157,21 @@ describe('Talents V2 registry and reachability', () => {
     }
   });
 
-  it('derives an ability or procedural crest icon for every active option', () => {
+  it('derives a painted image, ability, or procedural crest icon for every active option', () => {
     for (const cls of ALL_CLASSES) {
       for (const row of requiredTree(cls)) {
         for (const option of row.options) {
           const icon = talentRowOptionIconRef(option);
-          expect(icon.kind, `${cls}:${option.id}`).toMatch(/^(ability|crest)$/);
-          expect(icon.id, `${cls}:${option.id}`).toMatch(/^[a-z0-9_]+$/);
+          expect(icon.kind, `${cls}:${option.id}`).toMatch(/^(image|ability|crest)$/);
+          if (icon.kind === 'image') {
+            expect(cls, option.id).toBe('paladin');
+            expect(PALADIN_TALENT_IMAGE_IDS.has(option.icon ?? ''), option.id).toBe(true);
+            expect(icon.url, `${cls}:${option.id}`).toMatch(
+              /^\/ui\/skills\/[a-z_]+\/[a-z0-9_]+\.webp$/,
+            );
+          } else {
+            expect(icon.id, `${cls}:${option.id}`).toMatch(/^[a-z0-9_]+$/);
+          }
         }
       }
     }
@@ -305,8 +313,21 @@ describe('modifier bake and known-ability resolution', () => {
     expect(prot.stats).toMatchObject({ armorPct: 0.1, staPct: 0.4, armorFromStrPct: 0.7 });
   });
 
+  // The paladin is the one class that does NOT hand its signature over at spec
+  // choice. Its overhauled kit authors its own progression (the paladinBaseKitGrant
+  // branch in abilitiesKnownAt keeps these levels authoritative instead of letting
+  // the generic signature grant reveal them early), so specializing is the promise
+  // and the signature is the payoff a few levels later. Pinned by level rather than
+  // skipped, so drifting one of them still reddens.
+  const PALADIN_SIGNATURE_LEVELS: Record<string, number> = {
+    holy: 8, // Mercy Lance
+    protection: 10, // Sunward Disc
+    retribution: 8, // Final Edict
+  };
+
   it('makes every spec signature known at the first unlock level', () => {
     for (const cls of ALL_CLASSES) {
+      if (cls === 'paladin') continue;
       for (const spec of requiredTalents(cls).specs) {
         const known = abilitiesKnownAt(
           cls,
@@ -318,6 +339,34 @@ describe('modifier bake and known-ability resolution', () => {
           `${cls}:${spec.id}:${spec.signature}`,
         ).toBe(true);
       }
+    }
+  });
+
+  it('gives the paladin its signatures at its own authored levels, not at spec choice', () => {
+    for (const spec of requiredTalents('paladin').specs) {
+      const level = PALADIN_SIGNATURE_LEVELS[spec.id];
+      expect(level, `paladin:${spec.id} has no pinned signature level`).toBeDefined();
+      expect(level).toBeGreaterThan(FIRST_TALENT_LEVEL);
+
+      const knownAtSpecChoice = abilitiesKnownAt(
+        'paladin',
+        FIRST_TALENT_LEVEL,
+        computeTalentModifiers('paladin', allocation(spec.id), FIRST_TALENT_LEVEL),
+      );
+      expect(
+        knownAtSpecChoice.some((ability) => ability.def.id === spec.signature),
+        `paladin:${spec.id}:${spec.signature} must not arrive at spec choice`,
+      ).toBe(false);
+
+      const knownAtLevel = abilitiesKnownAt(
+        'paladin',
+        level,
+        computeTalentModifiers('paladin', allocation(spec.id), level),
+      );
+      expect(
+        knownAtLevel.some((ability) => ability.def.id === spec.signature),
+        `paladin:${spec.id}:${spec.signature} at level ${level}`,
+      ).toBe(true);
     }
   });
 

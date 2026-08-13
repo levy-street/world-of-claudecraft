@@ -7,9 +7,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createDeedRuntime } from '../src/sim/deeds';
 import { createMob } from '../src/sim/entity';
-import type { DelayedEvent } from '../src/sim/entity_roster';
 import {
   addEntityToRoster,
+  type DelayedEvent,
   drainDelayedEvents,
   dropEntityFromRoster,
   type GroundAoE,
@@ -21,6 +21,7 @@ import {
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import type { PendingProjectile } from '../src/sim/projectile_travel';
 import { Rng } from '../src/sim/rng';
+import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { createVcState } from '../src/sim/social/vale_cup';
 import { SpatialGrid } from '../src/sim/spatial';
@@ -557,6 +558,20 @@ describe('entity_roster: delayed-event drain (isolated ctx)', () => {
     expect(t.delayed()).toEqual([{ at: 100, event: { type: 'respawn', pid: 4 } }]);
   });
 
+  it('runs a due deterministic callback once without emitting a wire event', () => {
+    const t = makeCtx();
+    const resolve = vi.fn();
+    t.clock.time = 10;
+    t.ctx.delayedEvents = [{ at: 10, resolve }];
+
+    drainDelayedEvents(t.ctx);
+    drainDelayedEvents(t.ctx);
+
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(t.emit).not.toHaveBeenCalled();
+    expect(t.delayed()).toEqual([]);
+  });
+
   it('is a no-op (no allocation churn) when there are no delayed events', () => {
     const t = makeCtx();
     drainDelayedEvents(t.ctx);
@@ -609,3 +624,49 @@ describe('entity_roster: graveyardReadout (pure)', () => {
 
 // The release-spirit / ghost-loop tests moved to tests/spirit.test.ts (the flow now
 // lives in src/sim/spirit.ts). graveyardReadout (above) stays here with the roster.
+
+// The despawn prologue's paladin gate (review 3050): the three paladin-sourced
+// cleanups walk the full roster, so dropEntityFromRoster runs them only for a
+// despawning paladin player. Pinned both ways against a real Sim: a non-paladin
+// despawn must not disturb a live paladin's devotion, and a paladin despawn
+// must still strip every aura it sourced.
+describe('paladin-sourced despawn cleanup gate', () => {
+  function plantDevotion(target: Entity, sourceId: number): void {
+    target.auras.push({
+      id: 'devotion_ward',
+      name: 'Bastion Devotion',
+      kind: 'buff_dr',
+      remaining: 999,
+      duration: 999,
+      permanent: true,
+      value: 0.05,
+      sourceId,
+      school: 'holy',
+    });
+  }
+
+  it('leaves a live paladin devotion intact when a non-paladin despawns', () => {
+    const sim = new Sim({ seed: 4242, playerClass: 'paladin', autoEquip: true });
+    const ctx = (sim as unknown as { ctx: Parameters<typeof dropEntityFromRoster>[0] }).ctx;
+    plantDevotion(sim.player, sim.player.id);
+
+    const bystander = createMob(880001, MOBS.ridge_stalker, 3, { x: 4, y: 0, z: 4 });
+    addEntityToRoster(ctx, bystander);
+    dropEntityFromRoster(ctx, bystander.id);
+
+    expect(sim.player.auras.some((a) => a.id === 'devotion_ward')).toBe(true);
+  });
+
+  it('still strips every sourced devotion when the paladin despawns', () => {
+    const sim = new Sim({ seed: 4243, playerClass: 'paladin', autoEquip: true });
+    const ctx = (sim as unknown as { ctx: Parameters<typeof dropEntityFromRoster>[0] }).ctx;
+    const allyId = sim.addPlayer('priest', 'Vera');
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('missing ally');
+    plantDevotion(ally, sim.player.id);
+
+    dropEntityFromRoster(ctx, sim.player.id);
+
+    expect(ally.auras.some((a) => a.id === 'devotion_ward')).toBe(false);
+  });
+});

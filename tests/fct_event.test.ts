@@ -107,6 +107,24 @@ describe('fctSpawnShape: landed hit (damage-done vs damage-taken vs none)', () =
       }),
     ).toBeNull();
   });
+
+  it('an owned guardian hit floats as player damage', () => {
+    expect(
+      fctSpawnShape({
+        type: 'damage',
+        damageKind: 'hit',
+        ability: true,
+        crit: false,
+        isPlayerSource: false,
+        isPlayerTarget: false,
+        isPlayerOwnedSource: true,
+      } as Parameters<typeof fctSpawnShape>[0]),
+    ).toEqual<FctSpawnShape>({
+      kind: 'damage-done-ability',
+      isSelf: false,
+      crit: false,
+    });
+  });
 });
 
 describe('fctSpawnShape: shield block (a landed hit, distinct from a plain hit)', () => {

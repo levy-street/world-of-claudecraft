@@ -77,13 +77,36 @@ class FakeEl {
   dataset: Record<string, string> = {};
   disabled = false;
   textContent = '';
+  alt = '';
+  complete = false;
+  naturalWidth = 0;
+  srcAssignments = 0;
+  private srcValue = '';
+  private classes = new Set<string>();
   private listeners: Record<string, Array<(e: unknown) => void>> = {};
+  classList = {
+    add: (...names: string[]): void => {
+      for (const name of names) this.classes.add(name);
+    },
+    remove: (...names: string[]): void => {
+      for (const name of names) this.classes.delete(name);
+    },
+    contains: (name: string): boolean => this.classes.has(name),
+  };
   constructor(
-    public kind: 'figure' | 'button' | 'stage' | 'status',
+    public kind: 'figure' | 'button' | 'stage' | 'status' | 'poster',
     private button?: FakeEl,
     private stage?: FakeEl,
     private status?: FakeEl,
+    private poster?: FakeEl,
   ) {}
+  get src(): string {
+    return this.srcValue;
+  }
+  set src(value: string) {
+    this.srcValue = value;
+    this.srcAssignments++;
+  }
   addEventListener(type: string, fn: (e: unknown) => void): void {
     this.listeners[type] = this.listeners[type] ?? [];
     this.listeners[type].push(fn);
@@ -99,6 +122,7 @@ class FakeEl {
     if (sel.includes('guide-viewer-load')) return this.button ?? null;
     if (sel.includes('guide-viewer-stage')) return this.stage ?? null;
     if (sel.includes('guide-viewer-status')) return this.status ?? null;
+    if (sel.includes('guide-viewer-poster')) return this.poster ?? null;
     return null;
   }
 }
@@ -108,15 +132,37 @@ interface Fig {
   btn: FakeEl;
   stage: FakeEl;
   status: FakeEl;
+  poster: FakeEl | null;
 }
-function makeFigure(model: string, opts: { autoplay?: boolean } = {}): Fig {
+function makeFigure(
+  model: string,
+  opts: {
+    autoplay?: boolean;
+    poster?: {
+      src: string;
+      fallback: string;
+      alt: string;
+      complete?: boolean;
+      naturalWidth?: number;
+    };
+  } = {},
+): Fig {
   const btn = new FakeEl('button');
   const stage = new FakeEl('stage');
   const status = new FakeEl('status');
-  const fig = new FakeEl('figure', btn, stage, status);
+  const poster = opts.poster ? new FakeEl('poster') : null;
+  if (poster && opts.poster) {
+    poster.src = opts.poster.src;
+    poster.dataset.posterFallback = opts.poster.fallback;
+    poster.alt = opts.poster.alt;
+    poster.complete = opts.poster.complete ?? false;
+    poster.naturalWidth = opts.poster.naturalWidth ?? 0;
+    poster.classList.add('guide-viewer-poster-still');
+  }
+  const fig = new FakeEl('figure', btn, stage, status, poster ?? undefined);
   fig.dataset = { model, name: model, state: 'idle' };
   if (opts.autoplay) fig.dataset.autoplay = 'true';
-  return { fig, btn, stage, status };
+  return { fig, btn, stage, status, poster };
 }
 // Returns HTMLElement (the public wireModelViewers param type); the fake only models the
 // surface mount.ts actually touches.
@@ -231,12 +277,66 @@ describe('wireModelViewers', () => {
   it('does not build any viewer when WebGL is unavailable (poster-only fallback)', async () => {
     webglOk = false;
     const { wireModelViewers } = await import('../src/guide/viewer/mount');
-    const figs = [makeFigure('wolf')];
+    const figs = [
+      makeFigure('wolf', {
+        poster: {
+          src: '/guide-stills/wolf.webp',
+          fallback: '/ui/crests/wolf.webp',
+          alt: 'Forest Wolf',
+        },
+      }),
+    ];
     const cleanup = wireModelViewers(makeRoot(figs));
+    figs[0].poster?.fire('error');
     figs[0].btn.fire('click');
     await flush();
     expect(h.instances).toHaveLength(0);
     expect(figs[0].fig.dataset.state).toBe('nowebgl');
+    expect(figs[0].poster?.src).toBe('/ui/crests/wolf.webp');
+    cleanup();
+  });
+
+  it('keeps a successfully decoded still and its descriptive alternative text', async () => {
+    const { wireModelViewers } = await import('../src/guide/viewer/mount');
+    const figs = [
+      makeFigure('wolf', {
+        poster: {
+          src: '/guide-stills/wolf.webp',
+          fallback: '/ui/crests/wolf.webp',
+          alt: 'Forest Wolf',
+          complete: true,
+          naturalWidth: 256,
+        },
+      }),
+    ];
+    const cleanup = wireModelViewers(makeRoot(figs));
+    const poster = figs[0].poster;
+    expect(poster?.src).toBe('/guide-stills/wolf.webp');
+    expect(poster?.alt).toBe('Forest Wolf');
+    expect(poster?.classList.contains('guide-viewer-poster-still')).toBe(true);
+    cleanup();
+  });
+
+  it('replaces an errored still with its decorative poster fallback exactly once', async () => {
+    const { wireModelViewers } = await import('../src/guide/viewer/mount');
+    const figs = [
+      makeFigure('wolf', {
+        poster: {
+          src: '/guide-stills/wolf.webp',
+          fallback: '/ui/crests/wolf.webp',
+          alt: 'Forest Wolf',
+        },
+      }),
+    ];
+    const cleanup = wireModelViewers(makeRoot(figs));
+    const poster = figs[0].poster;
+    poster?.fire('error');
+    expect(poster?.src).toBe('/ui/crests/wolf.webp');
+    expect(poster?.alt).toBe('');
+    expect(poster?.classList.contains('guide-viewer-poster-still')).toBe(false);
+    const assignmentsAfterFallback = poster?.srcAssignments;
+    poster?.fire('error');
+    expect(poster?.srcAssignments).toBe(assignmentsAfterFallback);
     cleanup();
   });
 

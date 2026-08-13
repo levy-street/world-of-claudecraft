@@ -218,6 +218,7 @@ describe('compatibleFinderRoles', () => {
     expect(compatibleFinderRoles('warrior', 5, 'tank')).toEqual(['tank']);
     expect(compatibleFinderRoles('warrior', 10, 'tank')).toEqual(['tank']);
     expect(compatibleFinderRoles('druid', 20, 'healer')).toEqual(['healer']);
+    expect(compatibleFinderRoles('druid', 20, 'tank')).toEqual(['tank', 'dps']);
     expect(compatibleFinderRoles('mage', 20, 'dps')).toEqual(['dps']);
   });
 

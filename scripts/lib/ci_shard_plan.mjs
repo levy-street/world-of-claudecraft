@@ -17,14 +17,16 @@
 //               already run by then. The related leg is deliberately NOT
 //               lane-filtered: a lane file it reaches re-runs there, which
 //               duplicates work but never opens a gap.
-//   lane        the "PR gate (long sims)" job (buildLanePlan): the collected
-//               CI_LONG_SUITES files, all of them in full mode and on any
-//               unprovable input, only the floor/changed members in selective
-//               mode. Both sides fail closed toward their own half, so mode
-//               for mode the shards plus the lane run exactly what the
-//               pre-lane shard plan would have run (selective mode still
-//               skips the outside-floor remainder by design; the audit lines
-//               and docs/qa-gate.md carry that accounting).
+//   lane        the "PR gate (long sims A)" / "PR gate (long sims B)" jobs
+//               (buildLanePlan, one CI_LONG_SUITE_HALVES half each): the
+//               half's collected CI_LONG_SUITES files, all of them in full
+//               mode and on any unprovable input, only the floor/changed
+//               members in selective mode. Both sides fail closed toward
+//               their own files, so mode for mode the shards plus the two
+//               lanes run exactly what the pre-lane shard plan would have
+//               run (selective mode still skips the outside-floor remainder
+//               by design; the audit lines and docs/qa-gate.md carry that
+//               accounting).
 //
 // THE FLOOR. Selection's failure mode is silent (a skipped test does not
 // error), so the floor is a union of three sets, each guarding a different way
@@ -63,8 +65,9 @@ export const CI_GUARD_SUITES = Object.freeze([
 export const CI_GUARD_PREFIXES = Object.freeze(['tests/parity/']);
 
 /**
- * Long rotation sims the PR tier runs in the dedicated lane job
- * ("PR gate (long sims)" in ci.yml) instead of inside the shard matrix, so a
+ * Long rotation sims the PR tier runs in the dedicated lane jobs
+ * ("PR gate (long sims A)" / "PR gate (long sims B)" in ci.yml, one
+ * CI_LONG_SUITE_HALVES half each) instead of inside the shard matrix, so a
  * single multi-minute file stops setting the slowest shard's wall clock.
  * Membership is measured, not automated: a file joins when it costs more than
  * the 90 second threshold inside a full-mode CI shard, and the next-longest
@@ -83,8 +86,48 @@ export const CI_LONG_SUITES = Object.freeze([
   'tests/audit_conservation_property.test.ts',
   'tests/battleground.test.ts',
   'tests/chronomancy_balance.test.ts',
+  // The five-class-overhauls balance harnesses (review 3050): the owned-class
+  // matrices grew to 8 specs and the raid loop to ~510s, pushing shards 1 and
+  // 4 past the then-20-minute pr-gate shard budget; they are exactly what this
+  // lane is for. Their cost kept growing after that: see the ci.yml bounds,
+  // where the same harnesses later outgrew the release-gate and lane bounds
+  // too and forced both to be re-sized from measured slow-runner ratios.
+  'tests/druid_balance_probe.test.ts',
   'tests/eastbrook_gameplay_integration.test.ts',
+  'tests/hunter_dps_balance.test.ts',
+  'tests/nythraxis_matrix.test.ts',
+  'tests/owned_class_balance_harness.test.ts',
+  'tests/owned_class_raid_balance_harness.test.ts',
 ]);
+
+/**
+ * The two parallel lane jobs ("PR gate (long sims A)" / "PR gate (long sims
+ * B)" in ci.yml): a literal partition of CI_LONG_SUITES, so the pair's wall
+ * clock is roughly half of the single-job lane's. Halves are balanced by
+ * MEASURED post-diet suite duration, not file count: half A is the level-20
+ * owned-class harness (the single longest suite) plus the shortest members,
+ * half B carries everything else (the balance is recorded in the lane-diet
+ * PR and re-derived from the lane job logs whenever a member's cost moves).
+ * The shard legs keep excluding the full CI_LONG_SUITES union, so the a/b
+ * assignment can rebalance freely without touching the shard side.
+ * tests/ci_shard_plan.test.ts pins the halves as an exact partition of
+ * CI_LONG_SUITES.
+ */
+export const CI_LONG_SUITE_HALVES = Object.freeze({
+  a: Object.freeze([
+    'tests/battleground.test.ts',
+    'tests/chronomancy_balance.test.ts',
+    'tests/owned_class_balance_harness.test.ts',
+  ]),
+  b: Object.freeze([
+    'tests/audit_conservation_property.test.ts',
+    'tests/druid_balance_probe.test.ts',
+    'tests/eastbrook_gameplay_integration.test.ts',
+    'tests/hunter_dps_balance.test.ts',
+    'tests/nythraxis_matrix.test.ts',
+    'tests/owned_class_raid_balance_harness.test.ts',
+  ]),
+});
 
 /**
  * The lane files this tree actually collects. Filtering on the collected set
@@ -93,12 +136,12 @@ export const CI_LONG_SUITES = Object.freeze([
  * shards (coverage keeps, latency loses), and the real-tree pin in
  * tests/ci_shard_plan.test.ts makes the drift loud.
  *
- * @param {{ testFiles: string[], exists: (p: string) => boolean }} opts
+ * @param {{ testFiles: string[], exists: (p: string) => boolean, suites?: readonly string[] }} opts
  * @returns {string[]}
  */
-export function collectedLaneFiles({ testFiles, exists }) {
+export function collectedLaneFiles({ testFiles, exists, suites = CI_LONG_SUITES }) {
   const collected = new Set(testFiles ?? []);
-  return CI_LONG_SUITES.filter((f) => collected.has(f) && exists(f));
+  return suites.filter((f) => collected.has(f) && exists(f));
 }
 
 /**
@@ -346,15 +389,16 @@ export function buildShardPlan({
 }
 
 /**
- * Build the legs the long-sims lane job ("PR gate (long sims)") executes.
+ * Build the legs one long-sims lane job ("PR gate (long sims A)" or
+ * "PR gate (long sims B)") executes over its CI_LONG_SUITE_HALVES half.
  *
  * Mirror image of buildShardPlan over the SAME inputs: full mode and every
- * unprovable input run every collected lane file; selective mode runs exactly
- * the lane files the floor (blind/partial membership, guard suites, or the
- * PR's own changed tests) would have carried, so selective coverage is
- * unchanged from the pre-lane layout. An empty selective lane is a valid
- * plan with zero legs, never a spawn of `npm test` with no file arguments
- * (which would run the whole suite).
+ * unprovable input run every collected lane file of this half; selective mode
+ * runs exactly the half's lane files the floor (blind/partial membership,
+ * guard suites, or the PR's own changed tests) would have carried, so the two
+ * halves together keep selective coverage unchanged from the pre-lane layout.
+ * An empty selective lane is a valid plan with zero legs, never a spawn of
+ * `npm test` with no file arguments (which would run the whole suite).
  *
  * @param {{
  *   mode: string,
@@ -363,18 +407,28 @@ export function buildShardPlan({
  *   testFiles: string[],
  *   workers: number,
  *   exists: (p: string) => boolean,
+ *   half: 'a' | 'b',
  * }} opts
  * @returns {{ mode: 'full' | 'selective', reason: string, legs: ShardLeg[], laneFiles: string[] }}
  */
-export function buildLanePlan({ mode, changedPaths, alwaysRun, testFiles, workers, exists }) {
+export function buildLanePlan({ mode, changedPaths, alwaysRun, testFiles, workers, exists, half }) {
+  // Own-property lookup, not a bare index: a prototype-chain key like
+  // 'constructor' is truthy and would sail past a null check into an opaque
+  // downstream TypeError instead of this loud message.
+  const suites = Object.hasOwn(CI_LONG_SUITE_HALVES, half) ? CI_LONG_SUITE_HALVES[half] : undefined;
+  if (!suites) {
+    // A bad half is a wiring bug (the entry validates its --lane flag before
+    // planning), not a fail-closed input: throw loud, never guess a half.
+    throw new Error(`unknown long-sims lane half: ${JSON.stringify(half)}`);
+  }
   const workersArg = `--maxWorkers=${workers}`;
-  const collected = collectedLaneFiles({ testFiles, exists });
+  const collected = collectedLaneFiles({ testFiles, exists, suites });
   const legsFor = (files) =>
     files.length === 0
       ? []
       : [
           {
-            name: `npm test (long-sims lane, ${files.length} file(s))`,
+            name: `npm test (long-sims-${half} lane, ${files.length} file(s))`,
             cmd: 'npm',
             args: ['test', '--', ...files, workersArg],
           },

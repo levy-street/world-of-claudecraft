@@ -28,8 +28,8 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 966,
-      "state": "ebf29f7d",
-      "events": "1bad28d0",
+      "state": "f63b6859",
+      "events": "3b970d94",
       "rng": {
         "draws": 2,
         "digest": "6f587c5e"
@@ -91,6 +91,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 5,
           "talents": {
             "rows": {}
@@ -160,6 +164,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "greyjaw_hide_boots": 1
+            },
+            "firstFind": {
+              "greyjaw_hide_boots": {}
+            },
+            "recent": [
+              "greyjaw_hide_boots"
+            ]
+          },
           "renown": 5,
           "talents": {
             "rows": {}

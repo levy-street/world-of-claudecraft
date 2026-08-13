@@ -30,6 +30,7 @@ function masteryOnly(cls: PlayerClass, specId: string) {
 
 function known(cls: PlayerClass, id: string, spec?: string): KnownAbility {
   const mods = spec ? masteryOnly(cls, spec) : undefined;
+  if (mods && spec) mods.spec = spec;
   const ability = abilitiesKnownAt(cls, 20, mods).find((a) => a.def.id === id);
   if (!ability) throw new Error(`missing ${cls} ability ${id}`);
   return ability;
@@ -68,8 +69,16 @@ describe('spec masteries', () => {
         { ability: 'healing_wave', costPct: -0.2 },
       ],
     });
-    expect(TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery.effect).toEqual({
-      global: { dotDmgPct: 0.2 },
+    const afflictionMastery = TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery;
+    expect(afflictionMastery?.name).toBe('Sentence');
+    expect(afflictionMastery?.effect).toEqual({
+      ability: [
+        { ability: 'needle_of_fate', dmgPct: 0.1 },
+        { ability: 'sentence', dmgPct: 0.1 },
+        // Owner ruling 2026-08-08: the viability pass authored Litany's ranks
+        // expecting the mastery on top; the wiring was missed when it landed.
+        { ability: 'litany_of_guilt', dmgPct: 0.1 },
+      ],
     });
     // Mage rework (owner leveling pass 2026-07-14): Fire's mastery is Ignition, a
     // crit-triggered burn (ignitionPct) plus a static +2% crit chance, not the old
@@ -88,7 +97,7 @@ describe('spec masteries', () => {
       stats: { armorPct: 0.1 },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'beast_mastery')?.mastery.effect).toEqual({
-      global: { petDmgPct: 0.35 },
+      global: { petDmgPct: 0.25 },
       stats: { maxHpPct: 0.08 },
     });
     // Balance pass: the penalty is gone; the Sword Specialization extra-attack
@@ -97,21 +106,25 @@ describe('spec masteries', () => {
       global: { meleeHastePct: 0.1, extraAttackPct: 0.05 },
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'demonology')?.mastery.effect).toEqual({
-      global: { petDmgSharePct: 0.2 },
+      global: { petDmgPct: 0.2, petDmgSharePct: 0.2 },
       stats: { staPct: 0.1 },
     });
   });
 
   it('authors the all-27 extension mastery effects exactly', () => {
+    // staPct carries the tank-parity floor that used to live in SPEC_BASELINES:
+    // an overhauled class keeps its passive floor on the mastery (see Recompense
+    // on the warrior), and without a stamina multiplier Faithwarden sat at 76% of
+    // the prot warrior's effective HP.
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'protection')?.mastery.effect).toEqual({
       global: { threatPct: 0.5 },
-      stats: { armorPct: 0.2 },
+      stats: { armorPct: 0.2, staPct: 0.35 },
     });
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'retribution')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'marksmanship')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.2 },
+      global: { meleeDmgPct: 0.12 },
       stats: { crit: 0.03 },
     });
     // Balance pass: Quickblood is the evasive-skirmisher mastery.
@@ -147,6 +160,9 @@ describe('spec masteries', () => {
     expect(TALENTS.priest?.specs.find((s) => s.id === 'shadow')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.15, spellDmgPct: 0.1 },
     });
+    expect(TALENTS.shaman?.specs.find((s) => s.id === 'elemental')?.mastery.effect).toEqual({
+      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+    });
     expect(TALENTS.shaman?.specs.find((s) => s.id === 'enhancement')?.mastery.effect).toEqual({
       global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 },
     });
@@ -154,23 +170,27 @@ describe('spec masteries', () => {
       global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
+      global: { meleeDmgPct: 0.5, dotDmgPct: 0.5, threatPct: 0.2 },
       // The v0.27 Dire Bruin retune rides the mastery now that the old
       // feral_choice_bear node is retired.
       stats: { armorPct: 0.15 },
     });
-    // Balance pass (maintainer sheet): the scoped Ruinbolt/Gloom Bolt amp.
-    expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({
-      ability: [
-        { ability: 'chaos_bolt', dmgPct: 0.2 },
-        { ability: 'shadow_bolt', dmgPct: 0.2 },
-      ],
-    });
+    // Destruction's mastery is now the rotational Desolation mechanic, owned
+    // by combat/destruction.ts rather than a flat TalentEffect modifier.
+    expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({});
   });
 
   it('bakes DoT, HoT, absorb, cost, and melee damage mastery fields into abilities', () => {
     expect(effect(known('warlock', 'corruption'), 'dot').total).toBe(85);
-    expect(effect(known('warlock', 'corruption', 'affliction'), 'dot').total).toBe(102);
+    // 2026-08-09 120s band round re-pin: needle rank-3 base stepped 45-53 to
+    // 41-49 in the Hexcraft trim (41/49 times the affliction mastery rider).
+    expect(effect(known('warlock', 'needle_of_fate', 'affliction'), 'directDamage')).toMatchObject({
+      min: 45,
+      max: 54,
+    });
+    expect(effect(known('warlock', 'sentence', 'affliction'), 'afflictionSentence')).toMatchObject({
+      damageMult: 1.1,
+    });
 
     expect(effect(known('druid', 'rejuvenation'), 'hot').total).toBe(168);
     expect(effect(known('druid', 'rejuvenation', 'restoration'), 'hot').total).toBe(210);
@@ -187,30 +207,12 @@ describe('spec masteries', () => {
     expect(effect(known('rogue', 'sinister_strike', 'combat'), 'weaponStrike').bonus).toBe(18);
   });
 
-  it('Iron Aim (Marksmanship mastery) reaches Arcane Shot, not just physical-school shots', () => {
-    // Iron Aim's tooltip promises "ranged ability damage" (not "physical"), and Hunter is
-    // the only class whose ranged-AP kit spans magic schools: Aimed Shot is school:'physical'
-    // but Arcane Shot is school:'arcane' (both scalesWith:'ranged'). applyTalentMods used to
-    // gate the mastery's global meleeDmgPct on entry.def.school === 'physical', so Arcane Shot
-    // silently never received it. masteryOnly() isolates the mastery's global meleeDmgPct=0.2
-    // from the ability-scoped spec-baseline dmgPct in spec_baselines.ts, pinning the mastery
-    // bonus alone on both shots.
-    const aimedBase = effect(known('hunter', 'aimed_shot'), 'directDamage');
-    const aimedSpecced = effect(known('hunter', 'aimed_shot', 'marksmanship'), 'directDamage');
-    expect(aimedSpecced.min).toBe(Math.round(aimedBase.min * 1.2));
-    expect(aimedSpecced.max).toBe(Math.round(aimedBase.max * 1.2));
-
-    const arcaneBase = effect(known('hunter', 'arcane_shot'), 'directDamage');
-    const arcaneSpecced = effect(known('hunter', 'arcane_shot', 'marksmanship'), 'directDamage');
-    expect(arcaneSpecced.min).toBe(Math.round(arcaneBase.min * 1.2));
-    expect(arcaneSpecced.max).toBe(Math.round(arcaneBase.max * 1.2));
-  });
-
   it('applies petDmgPct at BOTH the melee and ranged pet damage sites, not only the helper', () => {
     // Drive the actual damage sites (a regression that drops `dmg *= petDamageMult` at
     // either would still pass a helper-only assertion). A fixed attack-site RNG + an
-    // identical dummy (armor cancels in the ratio) isolate the multiplier: BM's Packbond (petDmgPct 0.35)
-    // must deal exactly 1.35x what a no-pet-mastery spec's identical pet deals.
+    // identical dummy (armor cancels in the ratio) isolate the multiplier: Packlord's
+    // Packbond (petDmgPct 0.25) must deal exactly 1.25x what a no-pet-mastery spec's
+    // identical pet deals.
     const setup = (spec: string) => {
       const sim = new Sim({ seed: 11, playerClass: 'hunter', autoEquip: true });
       sim.setPlayerLevel(20);
@@ -258,40 +260,24 @@ describe('spec masteries', () => {
     const meleeBm = dealtMelee('beast_mastery');
     const meleeNone = dealtMelee('marksmanship');
     expect(meleeNone).toBeGreaterThan(0);
-    expect(meleeBm / meleeNone).toBeCloseTo(1.35, 2);
+    expect(meleeBm / meleeNone).toBeCloseTo(1.25, 2);
 
     const rangedBm = dealtRanged('beast_mastery');
     const rangedNone = dealtRanged('marksmanship');
     expect(rangedNone).toBeGreaterThan(0);
-    expect(rangedBm / rangedNone).toBeCloseTo(1.35, 2);
+    expect(rangedBm / rangedNone).toBeCloseTo(1.25, 2);
   });
 
-  it('Veinleech (siphon_life) leeches: the affliction dot tick heals the caster', () => {
+  it('replaces Veinleech with the Evil Eye Condemnation signature', () => {
     const sim = new Sim({ seed: 12, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(20);
-    sim.setSpec('affliction'); // grants the Veinleech signature (siphon_life)
-    const caster = sim.player;
-    caster.hp = Math.round(caster.maxHp * 0.5); // leave room for the leech to heal
-    const target = createMob(9201, MOBS.forest_wolf, 20, {
-      x: caster.pos.x,
-      y: caster.pos.y,
-      z: caster.pos.z + 3,
-    });
-    target.hostile = true;
-    target.maxHp = target.hp = 100000;
-    (sim as unknown as { addEntity(e: Entity): void }).addEntity(target);
-    sim.targetEntity(target.id);
-    caster.facing = Math.atan2(target.pos.x - caster.pos.x, target.pos.z - caster.pos.z);
-    sim.castAbility('siphon_life');
+    sim.setSpec('affliction');
+    const knownIds = sim.players.get(sim.playerId)?.known.map((ability) => ability.def.id);
 
-    // Tick until a dot tick lands; the leech emits a heal2 whose target is the caster.
-    let selfHeal = false;
-    for (let i = 0; i < 20 * 6 && !selfHeal; i++) {
-      for (const ev of sim.tick()) {
-        if (ev.type === 'heal2' && ev.targetId === caster.id && ev.amount > 0) selfHeal = true;
-      }
-    }
-    expect(selfHeal).toBe(true);
+    expect(knownIds).toEqual(
+      expect.arrayContaining(['evil_eye', 'needle_of_fate', 'sentence', 'drain_life']),
+    );
+    expect(knownIds).not.toContain('siphon_life');
   });
 
   it('applies passive stat, pet damage, damage-share, and heal-crit masteries at runtime', () => {
@@ -307,7 +293,7 @@ describe('spec masteries', () => {
     hunterPet.ownerId = hunter.player.id;
     expect(
       (hunter as unknown as { petDamageMult(e: Entity): number }).petDamageMult(hunterPet),
-    ).toBeCloseTo(1.35);
+    ).toBeCloseTo(1.25);
 
     const paladin = new Sim({ seed: 6, playerClass: 'paladin', autoEquip: true });
     paladin.setPlayerLevel(20);
@@ -427,8 +413,8 @@ describe('spec masteries', () => {
         retribution: { global: 'meleeDmgPct', value: 0.2 },
       },
       hunter: {
-        beast_mastery: { global: 'petDmgPct', value: 0.35 },
-        marksmanship: { global: 'meleeDmgPct', value: 0.2 },
+        beast_mastery: { global: 'petDmgPct', value: 0.25 },
+        marksmanship: { global: 'meleeDmgPct', value: 0.12 },
         survival: { stat: 'agiPct', value: 0.15 },
       },
       mage: {
@@ -453,13 +439,12 @@ describe('spec masteries', () => {
         restoration: { abilities: ['chain_heal', 'healing_wave'], costPct: -0.2 },
       },
       warlock: {
-        affliction: { global: 'dotDmgPct', value: 0.2 },
+        affliction: { abilities: ['needle_of_fate', 'sentence'], dmgPct: 0.1 },
         demonology: { global: 'petDmgSharePct', value: 0.2 },
-        destruction: { abilities: ['chaos_bolt', 'shadow_bolt'], dmgPct: 0.2 },
       },
       druid: {
         balance: { global: 'spellDmgPct', value: 0.15 },
-        feral: { global: 'meleeDmgPct', value: 0.15 },
+        feral: { global: 'meleeDmgPct', value: 0.5 },
         restoration: { global: 'hotHealPct', value: 0.25 },
       },
     };

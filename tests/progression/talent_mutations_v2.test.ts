@@ -3,9 +3,15 @@ import { updateTimers } from '../../src/sim/combat/auras';
 import { onCastCompleted } from '../../src/sim/combat/talent_procs';
 import { rowForLevel, talentsFor } from '../../src/sim/content/talents';
 import { Sim } from '../../src/sim/sim';
+import { EMPTY_TEST_WORLD } from '../sim_shared';
 
 function maxLevelWarrior(): Sim {
-  const sim = new Sim({ seed: 71, playerClass: 'warrior', autoEquip: false });
+  const sim = new Sim({
+    seed: 71,
+    playerClass: 'warrior',
+    autoEquip: false,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.setPlayerLevel(20);
   return sim;
 }
@@ -68,7 +74,12 @@ describe('canonical Talent V2 live mutations', () => {
     expect(source.selectTalentRow(5, option.id)).toBe(true);
     const state = source.serializeCharacter(source.player.id)!;
 
-    const restored = new Sim({ seed: 72, playerClass: 'warrior', noPlayer: true });
+    const restored = new Sim({
+      seed: 72,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = restored.addPlayer('warrior', 'Restored', { state });
     const meta = restored.meta(pid)!;
     const events = restored.tick();
@@ -112,38 +123,57 @@ describe('canonical Talent V2 live mutations', () => {
   });
 
   it('normalizes spent talent charges when a row is cleared without touching native charges', () => {
-    const rogue = new Sim({ seed: 73, playerClass: 'rogue', autoEquip: false });
-    rogue.setPlayerLevel(20);
-    expect(rogue.selectTalentRow(11, 'rog_r11_endurance')).toBe(true);
-    rogue.castAbility('sprint');
-    rogue.castAbility('sprint');
-    expect(rogue.player.abilityCharges?.sprint?.charges).toBe(0); // both stored uses spent
-    expect(rogue.player.abilityCharges?.sprint?.maxCharges).toBe(2);
+    // The rogue v0.29 redesign removed the rogue charge-model row, so the
+    // mage Twin Icebind option (frost_nova bonusCharges) carries this test.
+    const mage = new Sim({
+      seed: 73,
+      playerClass: 'mage',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
+    mage.setPlayerLevel(20);
+    expect(mage.selectTalentRow(11, 'mag_r11_twin_nova')).toBe(true);
+    mage.player.resource = mage.player.maxResource;
+    mage.castAbility('frost_nova');
+    for (let tick = 0; tick < 40; tick++) mage.tick(); // clear the gcd, not the recharge
+    mage.player.resource = mage.player.maxResource;
+    mage.castAbility('frost_nova');
+    expect(mage.player.abilityCharges?.frost_nova?.charges).toBe(0); // both stored uses spent
+    expect(mage.player.abilityCharges?.frost_nova?.maxCharges).toBe(2);
 
     // Clearing the row collapses the cap to 1: the pool bookkeeping drops and
     // the still-owed recharge keeps running as a plain cooldown (no free reset).
-    expect(rogue.selectTalentRow(11, null)).toBe(true);
-    expect(rogue.resolvedAbility('sprint')?.charges).toBeUndefined();
-    expect(rogue.player.abilityCharges?.sprint).toBeUndefined();
-    expect(rogue.player.cooldowns.has('sprint')).toBe(true);
-    for (let tick = 0; tick < 6_001; tick++) updateTimers(rogue.player);
-    expect(rogue.player.cooldowns.has('sprint')).toBe(false);
+    expect(mage.selectTalentRow(11, null)).toBe(true);
+    expect(mage.resolvedAbility('frost_nova')?.charges).toBeUndefined();
+    expect(mage.player.abilityCharges?.frost_nova).toBeUndefined();
+    expect(mage.player.cooldowns.has('frost_nova')).toBe(true);
+    for (let tick = 0; tick < 441; tick++) updateTimers(mage.player);
+    expect(mage.player.cooldowns.has('frost_nova')).toBe(false);
 
     // Picking the row while the ability sits on a plain cooldown converts that
     // cooldown into a recharge with ONE use spent: the new extra use is stored
     // and castable, the running timer is neither wiped nor reset.
-    const adding = new Sim({ seed: 75, playerClass: 'rogue', autoEquip: false });
+    const adding = new Sim({
+      seed: 75,
+      playerClass: 'mage',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
     adding.setPlayerLevel(20);
-    adding.castAbility('sprint');
-    expect(adding.player.cooldowns.has('sprint')).toBe(true);
+    adding.player.resource = adding.player.maxResource;
+    adding.castAbility('frost_nova');
+    expect(adding.player.cooldowns.has('frost_nova')).toBe(true);
     expect(adding.player.abilityCharges).toBeUndefined();
-    expect(adding.selectTalentRow(11, 'rog_r11_endurance')).toBe(true);
-    expect(adding.player.abilityCharges?.sprint?.charges).toBe(1);
-    expect(adding.player.abilityCharges?.sprint?.maxCharges).toBe(2);
-    expect(adding.player.cooldowns.has('sprint')).toBe(false); // a use is stored, pool open
-    adding.castAbility('sprint');
-    adding.castAbility('sprint'); // blocked: the pool is empty
-    expect(adding.player.abilityCharges?.sprint?.charges).toBe(0);
+    expect(adding.selectTalentRow(11, 'mag_r11_twin_nova')).toBe(true);
+    expect(adding.player.abilityCharges?.frost_nova?.charges).toBe(1);
+    expect(adding.player.abilityCharges?.frost_nova?.maxCharges).toBe(2);
+    expect(adding.player.cooldowns.has('frost_nova')).toBe(false); // a use is stored, pool open
+    adding.player.resource = adding.player.maxResource;
+    adding.castAbility('frost_nova');
+    for (let tick = 0; tick < 40; tick++) adding.tick();
+    adding.player.resource = adding.player.maxResource;
+    adding.castAbility('frost_nova'); // blocked: the pool is empty
+    expect(adding.player.abilityCharges?.frost_nova?.charges).toBe(0);
 
     // An unrelated row pick leaves a native charge-limited pool (Twinstrike) alone.
     const warrior = maxLevelWarrior();
@@ -196,23 +226,28 @@ describe('canonical Talent V2 live mutations', () => {
   });
 
   it('cleans removed proc payoffs and partial counters at the recompute choke point', () => {
-    const rogue = new Sim({ seed: 74, playerClass: 'rogue', autoEquip: false });
+    const rogue = new Sim({
+      seed: 74,
+      playerClass: 'rogue',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
     rogue.setPlayerLevel(20);
-    expect(rogue.selectTalentRow(8, 'rog_r8_improved_gouge')).toBe(true);
-    onCastCompleted(rogue.ctx, rogue.player, 'gouge', rogue.player);
-    expect(rogue.player.auras.some((aura) => aura.id === 'rog_blindside_opening')).toBe(true);
-    rogue.player.procState!.icds.rog_blindside_opening = 5;
+    expect(rogue.selectTalentRow(17, 'rog_r17_ghostfoot_gambit')).toBe(true);
+    onCastCompleted(rogue.ctx, rogue.player, 'evasion', rogue.player);
+    expect(rogue.player.auras.some((aura) => aura.id === 'rog_improved_evasion')).toBe(true);
+    rogue.player.procState!.icds.rog_improved_evasion = 5;
 
-    expect(rogue.selectTalentRow(8, 'rog_r8_smoke_screen')).toBe(true);
-    expect(rogue.player.auras.some((aura) => aura.id === 'rog_blindside_opening')).toBe(false);
-    expect(rogue.player.procState?.counters.rog_blindside_opening).toBeUndefined();
-    expect(rogue.player.procState?.icds.rog_blindside_opening).toBeUndefined();
+    expect(rogue.selectTalentRow(17, 'rog_r17_flurry_of_knives')).toBe(true);
+    expect(rogue.player.auras.some((aura) => aura.id === 'rog_improved_evasion')).toBe(false);
+    expect(rogue.player.procState?.counters.rog_improved_evasion).toBeUndefined();
+    expect(rogue.player.procState?.icds.rog_improved_evasion).toBeUndefined();
 
-    expect(rogue.selectTalentRow(5, 'rog_r5_relentless_strikes')).toBe(true);
+    expect(rogue.selectTalentRow(14, 'rog_r14_ceaseless_cuts')).toBe(true);
     onCastCompleted(rogue.ctx, rogue.player, 'sinister_strike');
     onCastCompleted(rogue.ctx, rogue.player, 'sinister_strike');
     expect(rogue.player.procState?.counters.rog_ceaseless_cuts).toBe(2);
-    expect(rogue.selectTalentRow(5, 'rog_r5_opportunist')).toBe(true);
+    expect(rogue.selectTalentRow(14, 'rog_r14_venom_dividend')).toBe(true);
     expect(rogue.player.procState?.counters.rog_ceaseless_cuts).toBeUndefined();
   });
 });

@@ -24,7 +24,11 @@ import { type AuraInput, type AurasDeps, createAurasView } from './auras_view';
 import { setCrestImageWithFallback } from './crest_image_fallback';
 import { t } from './i18n';
 import type { PainterHostWriters } from './painter_host';
-import { type PartyFrameMember, partyFrameAuraIsRelevant } from './party_frames';
+import {
+  type PartyFrameMember,
+  partyFrameAuraIsRelevant,
+  prioritizePartyFrameAuras,
+} from './party_frames';
 import { svgIcon } from './ui_icons';
 import { UnitFramePainter } from './unit_frame_painter';
 
@@ -303,7 +307,7 @@ export function createPartyRow(
   const aurasEntity = { auras: auraInputs };
   const paintAuras = (auras: readonly PartyMemberAura[]): void => {
     auraInputs.length = 0;
-    for (const a of auras) {
+    for (const a of prioritizePartyFrameAuras(auras)) {
       if (!partyFrameAuraIsRelevant(a)) continue;
       auraInputs.push({
         id: a.id,
@@ -311,6 +315,7 @@ export function createPartyRow(
         kind: a.kind,
         remaining: a.remaining ?? Number.POSITIVE_INFINITY,
         value: a.neg ? -1 : 1,
+        poolPct: a.poolPct,
       });
     }
     aurasPainter.paint(aurasView.tick(aurasEntity));

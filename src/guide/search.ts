@@ -14,6 +14,7 @@ import {
   GUIDE_FAMILIES,
   GUIDE_PROF_CRAFTS,
   GUIDE_PROF_GATHERING,
+  GUIDE_RELIQUARY,
   GUIDE_ZONES,
 } from './content.generated';
 import { GLOSSARY_TERMS } from './pages/glossary';
@@ -101,6 +102,19 @@ export function buildIndex(): SearchEntry[] {
   for (const d of GUIDE_DEEDS) {
     add(d.name, t('guide.search.typeDeed'), `${hrefFor('deeds')}#deed-cat-${d.category}`);
   }
+  // Reliquary pages and the relics they collect (GUIDE_RELIQUARY is already
+  // spoiler-filtered), both deep-linked to the page's section of the catalog since
+  // relics have no anchor of their own. Relic names are English proper nouns from the
+  // sim, like ability and creature names; the page name rides along as extra, the way a
+  // signature ability carries its class, so a page query also surfaces its relics. A
+  // relic listed on two pages is indexed once per page, one entry per destination.
+  for (const p of GUIDE_RELIQUARY) {
+    const href = `${hrefFor('reliquary')}#reliquary-${p.id}`;
+    add(p.name, t('guide.search.typeReliquaryPage'), href);
+    for (const r of p.relics) {
+      add(r.name, t('guide.search.typeRelic'), href, p.name);
+    }
+  }
   return entries;
 }
 
@@ -125,7 +139,13 @@ export function rank(index: SearchEntry[], query: string): SearchEntry[] {
   if (!q) return [];
   const tokens = q.split(/\s+/).filter(Boolean);
   const hits = index.map((e) => ({ e, score: scoreEntry(e, tokens) })).filter((h) => h.score >= 0);
-  hits.sort((a, b) => b.score - a.score || a.e.label.localeCompare(b.e.label));
+  // The tie-break collates in the active locale, same as fold() above: an
+  // untagged localeCompare follows the host runtime's default locale, so the
+  // same query could order equal-score rows differently per machine. The tag
+  // is hoisted: rank() runs per keystroke and ties dominate broad queries, so
+  // the comparator must not re-derive it per comparison.
+  const tag = languageTag(getLanguage());
+  hits.sort((a, b) => b.score - a.score || a.e.label.localeCompare(b.e.label, tag));
   return hits.slice(0, MAX_RESULTS).map((h) => h.e);
 }
 

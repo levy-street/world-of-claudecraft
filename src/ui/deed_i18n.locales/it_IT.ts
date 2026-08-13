@@ -1019,4 +1019,48 @@ export const table: DeedLocaleTable = {
     name: 'Placcato alla perfezione',
     desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armature.',
   },
+  col_reliquary_rank_2: {
+    name: 'Custode dei bottini',
+    desc: 'Raggiungi il grado di Curatore 2 nel Reliquiario (10 reliquie uniche catalogate).',
+    title: 'Custode dei bottini',
+  },
+  col_reliquary_rank_3: {
+    name: 'Il Catalogatore',
+    desc: 'Raggiungi il grado di Curatore 3 nel Reliquiario (25 reliquie uniche catalogate).',
+    title: 'il Catalogatore',
+  },
+  col_reliquary_rank_4: {
+    name: 'Arcicuratore',
+    desc: 'Raggiungi il grado di Curatore 4 nel Reliquiario (50 reliquie uniche catalogate).',
+    title: 'Arcicuratore',
+  },
+  col_reliquary_rank_5: {
+    name: 'Bottini Eterni',
+    desc: 'Raggiungi il grado di Curatore 5 nel Reliquiario (100 reliquie uniche catalogate).',
+  },
+  col_reliquary_complete: {
+    name: 'Il Grande Reliquiario',
+    desc: 'Cataloga ogni reliquia del Reliquiario che un personaggio possa conservare. Se il catalogo cresce in seguito, non te lo toglie mai.',
+    title: 'Curatore della Camera del Tesoro',
+  },
+  col_reliquary_conquerors: {
+    name: 'Scaffale dei Conquistatori',
+    desc: 'Cataloga ogni reliquia dello scaffale Conquistatori del Reliquiario. Se il catalogo cresce in seguito, non te lo toglie mai.',
+    title: 'Sfondacamere',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis miniata',
+    desc: 'Minia la pagina Eroico: Raid di Nythraxis del Reliquiario.',
+    title: 'Luce di Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr miniata',
+    desc: 'Minia la pagina Thunzharr, il Picco Risvegliato del Reliquiario.',
+    title: 'Luce di Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Santuario miniato',
+    desc: 'Minia la pagina Eroico: Santuario del Gravewyrm del Reliquiario.',
+    title: 'Luce del Santuario',
+  },
 };

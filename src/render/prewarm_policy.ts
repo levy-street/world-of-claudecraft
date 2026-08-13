@@ -58,6 +58,7 @@ export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primi
 export const BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE: readonly string[] = [
   'world.settle-state',
   'world.initial-frame',
+  'programs.compile-submit',
   'programs.compile',
   'programs.budget-variants',
   'sky.current-zone',
@@ -218,8 +219,8 @@ export function resolvePrewarmEntryStatus(
  * prefetch (fetch + worker decode, started at prewarm begin) before deferring
  * the remaining uploads to the background lane. The tail entries
  * (world.initial-frame, programs.compile) are deadlineExempt on the async
- * desktop arm and start regardless; what the reserve actually buys is compile
- * RUN time before prewarmCompileUnitDeadline stops the unit loop: a slow
+ * desktop arm and start regardless; what the reserve actually buys is
+ * submission-and-link time for the compile lane behind the cover: a slow
  * network must never starve that window the way the old inline await did
  * (measured 11.5s of a 12s boot budget).
  * finishFullManifestBeforeReveal (desktop Insane) waits without bound: that
@@ -267,6 +268,74 @@ export function prewarmEntryShouldDefer(
 ): boolean {
   if (entryStartedMs >= hardDeadlineMs) return true;
   return entryStartedMs >= deadlineMs && !deadlineExempt && !finishFullManifestBeforeReveal;
+}
+
+/**
+ * True when the compile-submit loop must stop submitting units and leave the
+ * remainder to the compile entry or the resume lane. Each unit's compileAsync
+ * prologue is synchronous main-thread work, and one uninterrupted loop
+ * measured 22 s in production against the 15 s hard deadline, which dropped
+ * every entry behind it, the deadline-exempt debt payers included
+ * (hitch-hunt S1/S2). The check runs BETWEEN units, never preemptively, and
+ * the Insane finish-full-manifest arm keeps submitting without bound: its
+ * contract is a complete manifest behind the cover.
+ */
+export function prewarmSubmitShouldStop(
+  nowMs: number,
+  gpuSubmitDeadlineMs: number,
+  finishFullManifestBeforeReveal: boolean,
+): boolean {
+  if (finishFullManifestBeforeReveal) return false;
+  return nowMs >= gpuSubmitDeadlineMs;
+}
+
+/**
+ * Manifest entries whose dropped remainder is the BULK link/upload debt of
+ * the INITIAL SCENE: hundreds of programs and whole-scene textures that,
+ * left unpaid, make ordinary first draws stall in live frames (the login
+ * storm's blocking reflection and texture-decode hitches). Their resume
+ * units run at BOOT_DEBT priority so cosmetic background warming (the
+ * char/armory preview lane at BACKGROUND) cannot starve them, which
+ * production measured as minutes of unpaid debt after the reveal.
+ *
+ * Deliberately NOT in the set: the per-family VFX warmers
+ * (props.ghost-fade-variants, vfx.weapon-skins, vfx.ability-primitives).
+ * They also carry compile/upload units, but a handful per family whose first
+ * use is a specific event (a school's first impact, a skin's first draw),
+ * not the ambient scene: they stay on the cosmetic BOOT_RESUME arm below
+ * the preview lane, the pre-change behavior.
+ * `programs.compile-submit` here names the SYNTHETIC dropped entry the
+ * deferred-submit hand-off pushes (the manifest entry of that id declares no
+ * resumeUnits, so no other resume entry can carry it).
+ */
+const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
+  'programs.compile',
+  'programs.compile-submit',
+  'textures.scene',
+  'surface-detail.textures',
+]);
+
+/** True when a dropped entry's resume units are hitch-causing debt. */
+export function prewarmResumeIsDebt(entryId: string): boolean {
+  return PREWARM_DEBT_RESUME_IDS.has(entryId);
+}
+
+/**
+ * Stable debt-first ordering for the dropped-entry resume lane. The lane is
+ * strictly serial in array order (resumeDroppedPrewarmEntries), so the
+ * BOOT_DEBT queue priority alone cannot reorder it: in manifest order the
+ * cosmetic entries, which resume at BOOT_RESUME below the preview lane, sit
+ * ahead of the link/upload debt and the debt drains last, the production
+ * starvation this family exists to fix. Relative order inside each class is
+ * preserved.
+ */
+export function orderPrewarmResumeEntries<T extends { id: string }>(entries: readonly T[]): T[] {
+  const debt: T[] = [];
+  const cosmetic: T[] = [];
+  for (const entry of entries) {
+    (prewarmResumeIsDebt(entry.id) ? debt : cosmetic).push(entry);
+  }
+  return [...debt, ...cosmetic];
 }
 
 /** The mesh-shape bits three folds into a program's cache key, structurally
@@ -322,19 +391,129 @@ export function prewarmProgramContentKeys(
   return materialIds.map((id) => `${token}:${id}`);
 }
 
-/** Where the programs.compile unit loop must stop so world.initial-frame (the
- * one uninterruptible whole-scene submit that links whatever compile did not
- * reach) always has room before the GPU-submit guard. Without the reserve, an
- * exempt compile that lawfully consumed the whole soft budget left the frame
- * starting past the deadline, cancelled outright, and the initial scene's
- * programs linked at first LIVE draw instead (measured: 102-318 ms submit
- * stalls, 17 programs in one frame). Mirrors prewarmBuildDeadline's reserve,
- * one pipeline stage later. */
-export function prewarmCompileUnitDeadline(
-  gpuSubmitDeadlineMs: number,
-  frameReserveMs: number,
-): number {
-  return gpuSubmitDeadlineMs - Math.max(0, frameReserveMs);
+/** The material half of a program-content key. A program SIGNATURE, not the
+ * material uuid: distinct GLB materials by the hundred share the same linked
+ * program (same type, same shader hooks, same map-presence defines), and an
+ * uuid key kept ~2,725 compile roots alive for ~500 unique programs, so the
+ * mass submission paid ~5,450 compileAsync prologues (~2.3 ms each, a
+ * measured 12.4 s behind the loading cover). The signature folds exactly the
+ * inputs three keys program defines on that the mesh-shape token does not
+ * already carry: material type, hook identity (customProgramCacheKey, whose
+ * three default is onBeforeCompile source), custom vertex/fragment source,
+ * defines, the texture-channel presence bits, blending/alpha-test, vertex
+ * colors, flat shading, fog opt-out and side. An imperfect signature is
+ * fail-soft: world.initial-frame's own
+ * guaranteed submit (its start is bounded ahead of the hard deadline by
+ * prewarmCompileAwaitDeadline) links any residue behind the loading cover
+ * there, instead of at first live draw. */
+export function materialProgramSignature(material: {
+  type?: string;
+  customProgramCacheKey?: () => string;
+  vertexShader?: string;
+  fragmentShader?: string;
+  defines?: Record<string, unknown>;
+  map?: unknown;
+  normalMap?: unknown;
+  bumpMap?: unknown;
+  roughnessMap?: unknown;
+  metalnessMap?: unknown;
+  aoMap?: unknown;
+  emissiveMap?: unknown;
+  alphaMap?: unknown;
+  envMap?: unknown;
+  lightMap?: unknown;
+  displacementMap?: unknown;
+  specularMap?: unknown;
+  gradientMap?: unknown;
+  transparent?: boolean;
+  alphaTest?: number;
+  vertexColors?: boolean;
+  flatShading?: boolean;
+  fog?: boolean;
+  side?: number;
+}): string {
+  const bit = (value: unknown): string => (value ? '1' : '0');
+  const source = (value: string | undefined): string =>
+    value === undefined ? '' : `${value.length}:${value}`;
+  const hook =
+    typeof material.customProgramCacheKey === 'function' ? material.customProgramCacheKey() : '';
+  const defineEntries = Object.entries(material.defines ?? {});
+  const defines = defineEntries.length > 0 ? JSON.stringify(defineEntries) : '';
+  return [
+    material.type ?? '',
+    hook,
+    source(material.vertexShader),
+    source(material.fragmentShader),
+    defines,
+    bit(material.map),
+    bit(material.normalMap),
+    bit(material.bumpMap),
+    bit(material.roughnessMap),
+    bit(material.metalnessMap),
+    bit(material.aoMap),
+    bit(material.emissiveMap),
+    bit(material.alphaMap),
+    bit(material.envMap),
+    bit(material.lightMap),
+    bit(material.displacementMap),
+    bit(material.specularMap),
+    bit(material.gradientMap),
+    bit(material.transparent),
+    bit((material.alphaTest ?? 0) > 0),
+    bit(material.vertexColors),
+    bit(material.flatShading),
+    bit(material.fog !== false),
+    String(material.side ?? 0),
+  ].join('|');
+}
+
+/** Which compile groups ONE submission call collects, and which of them it
+ * may mark as covered afterwards. The two rules that earn this a pure,
+ * pinned home:
+ * - A group whose THREE.Group does not EXIST yet must not be collected and,
+ *   crucially, must not be MARKED: marking it would make every later
+ *   submission skip it forever, and its programs would link synchronously
+ *   inside world.initial-frame (the Mirefen landmark group stages two
+ *   entries after the early submission).
+ * - A group in `recollect` (the live scene) is collected on every eligible
+ *   call and never marked: content keeps arriving between the early
+ *   submission and the compile entry (world.settle-state builds terrain and
+ *   water lazily), and the caller's shared dedupe store makes a
+ *   re-collection resubmit only what is genuinely new. */
+export function planCompileSubmission(input: {
+  groups: readonly { id: string; exists: boolean }[];
+  submitted: ReadonlySet<string>;
+  late: ReadonlySet<string>;
+  recollect: ReadonlySet<string>;
+  includeLate: boolean;
+}): { collect: string[]; mark: string[] } {
+  const collect: string[] = [];
+  const mark: string[] = [];
+  for (const { id, exists } of input.groups) {
+    if (!exists) continue;
+    if (!input.includeLate && input.late.has(id)) continue;
+    if (input.submitted.has(id)) continue;
+    collect.push(id);
+    if (!input.recollect.has(id)) mark.push(id);
+  }
+  return { collect, mark };
+}
+
+/** Where the programs.compile entry's await-all must give up waiting so
+ * world.initial-frame (which compileBeforeFirstFrame reorders to run
+ * immediately after this entry) always STARTS before the hard deadline.
+ * prewarmEntryShouldDefer defers ANY entry, even a deadlineExempt one, the
+ * instant its start time reaches hardDeadlineMs, so an unbounded await here
+ * risked pushing world.initial-frame's own start past that wall: the entry
+ * would then be skipped outright (it has no resumeUnits) and the initial
+ * scene's programs would link at first LIVE draw instead, the exact stall
+ * class this lane exists to prevent. reserveMs is the room the initial
+ * frame's own submit needs to start and run before the wall; it does not
+ * bound the compile itself, which keeps linking off-thread after a timeout
+ * (resubmitting in-flight compileAsync calls would double-submit them).
+ * Mirrors prewarmBuildDeadline's reserve, one pipeline stage later. */
+export function prewarmCompileAwaitDeadline(hardDeadlineMs: number, reserveMs: number): number {
+  return hardDeadlineMs - Math.max(0, reserveMs);
 }
 
 /** Build cutoff paired with the entry policy. Full Insane prewarm may use the

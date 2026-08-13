@@ -37,6 +37,7 @@ import {
   farRenderedCellHeight,
   farVertexClearance,
 } from './far_surface_core';
+import { clamp01 } from './num_clamp';
 import {
   makeShoreProbe,
   SHORE_BAND_HEIGHT,
@@ -356,8 +357,6 @@ export function farGridIndices(side: number): Uint16Array {
 // are deliberately dropped: they are narrower than one far-mesh cell and the
 // near terrain owns everything inside the detail envelope anyway.
 // ---------------------------------------------------------------------------
-
-const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
 type Triple = [number, number, number];
 

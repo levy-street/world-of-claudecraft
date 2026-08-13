@@ -127,6 +127,10 @@ export const tr_TR: EnTranslations = {
         "label": "Taze 20 takımını kuşan",
         "description": "Uzmanlık için Sanctum öncesi 20. seviye setini kuşandır, önce çantalara. Yalnızca teçhizat."
       },
+      "biskit": {
+        "label": "BIS-20 takımını kuşan",
+        "description": "Uzmanlık için her yuvada en iyi epik seti kuşandır. Yalnızca teçhizat."
+      },
       "gold": {
         "label": "Altın ekle",
         "description": "Mevcut keseye altın ekle."
@@ -240,7 +244,8 @@ export const tr_TR: EnTranslations = {
     },
     "hud": {
       "lowMana": "Düşük Mana",
-      "lowEnergy": "Düşük Enerji"
+      "lowEnergy": "Düşük Enerji",
+      "lowFocus": "Düşük odak"
     },
     "talents": {
       "title": "Yetenekler",
@@ -316,6 +321,25 @@ export const tr_TR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Mahkûmiyet",
+      "fateThreadsLabel": "Kader İplikleri",
+      "doomMeterUnlock": "Istırap kaynak çubuğunu taşı",
+      "doomMeterLock": "Istırap kaynak çubuğunu kilitle",
+      "doomEmptyStatus": "{value} / {max} Mahkûmiyet.",
+      "doomStatus": "{value} / {max} Mahkûmiyet; {remaining}.",
+      "fateThreadsStatus": "{value} / {max} Kader İpliği.",
+      "fateThreadsConsumeReady": "Üç Kader İpliği: Tüketme onları ek Mahkûmiyete dönüştürebilir.",
+      "fateThreadsSentenceReady": "Üç Kader İpliği: Hüküm onları %18 artan hasar için tüketebilir."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Ruh Parçaları",
+      "ruinMeter": "Harabiyet",
+      "ruinStatus": "{value} / {max} Harabiyet"
+    },
+    "comboMeter": {
+      "label": "KP"
+    },
     "spectate": {
       "banner": "{name} izleniyor"
     },
@@ -337,10 +361,10 @@ export const tr_TR: EnTranslations = {
       "healerConfirmCancel": "İptal etmek"
     },
     "wiki": {
-      "confirmTitle": "Open the Wiki?",
-      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
-      "confirmOpen": "Open Wiki",
-      "confirmCancel": "Cancel"
+      "confirmTitle": "Wiki Açılsın mı?",
+      "confirmBody": "Bu, World of ClaudeCraft Wiki'sini tarayıcında açar. Oyun çalışmaya devam eder.",
+      "confirmOpen": "Wiki'yi Aç",
+      "confirmCancel": "İptal"
     },
     "unstuck": {
       "menuButton": "Kurtulma",
@@ -373,7 +397,7 @@ export const tr_TR: EnTranslations = {
       "unavailable": "Kurtulma mevcut durumunda kullanılamaz."
     },
     "fct": {
-      "absorbed": "{amount} soğuruldu",
+      "absorbed": "Emildi ({amount})",
       "cheap": "Daha ucuz!"
     },
     "emotes": {
@@ -777,6 +801,11 @@ export const tr_TR: EnTranslations = {
       "resetAction": "Sıfırla",
       "note": "Pencereyi taşımak için sohbet sekme şeridini, yeniden boyutlandırmak için köşe tutamacını sürükleyin. Sıfırla, onu varsayılan konum ve boyutuna döndürür."
     },
+    "chatQuota": {
+      "limitReached": "Genel sohbet sınırına ulaşıldı. {seconds} içinde tekrar dene.",
+      "pending": "Önceki Genel sohbet mesajın hâlâ gönderiliyor. Birazdan tekrar dene.",
+      "unavailable": "Genel sohbet geçici olarak kullanılamıyor. Kısa süre sonra tekrar dene."
+    },
     "swing": {
       "ready": "Vuruş",
       "seconds": "{seconds}sn"
@@ -787,6 +816,14 @@ export const tr_TR: EnTranslations = {
     },
     "rest": {
       "resting": "Dinleniyor"
+    },
+    "paladin": {
+      "devotion": "Adanmışlık",
+      "devotionValue": "Adanmışlık {value} / {max}",
+      "devotionAscensionCharges": "Adanmışlık {value} / {max}. Yüceliş: {charges} şarj.",
+      "devotionAscensionLast": "Adanmışlık {value} / {max}. Yüceliş: son şarj.",
+      "ascensionLastAnnouncement": "Yüceliş: son şarj",
+      "ascensionSpenderAria": "Eylem yuvası {slot}: {ability}. Bir Yüceliş şarjı tüketir."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -819,6 +856,7 @@ export const tr_TR: EnTranslations = {
       "deeds": "Yiğitlikler",
       "mounts": "Binekler",
       "professions": "Meslekler",
+      "reliquary": "Yadigârlık",
       "nameplates": "İsimler",
       "haptics": "Dokunsal Geri Bildirim",
       "hapticsOff": "Dokunsal Kapalı",
@@ -859,6 +897,14 @@ export const tr_TR: EnTranslations = {
       "bodyWithVersion": "World of ClaudeCraft'ın {version} sürümü mevcut. En son düzeltmeler ve iyileştirmeler için şimdi güncelle.",
       "notNow": "Şimdi Değil",
       "update": "Güncelle"
+    },
+    "otaUpdate": {
+      "title": "Oyun Güncellemesi",
+      "downloading": "Güncelleme indiriliyor: {percent}",
+      "applying": "Güncelleme indirildi. Uygulamak için oyun yeniden başlatılıyor.",
+      "incompatible": "Oynamak için bir güncelleme gerekiyor. İndirme tamamlanır tamamlanmaz uygulanacak.",
+      "continueAnyway": "Güncelleme yapmadan devam et",
+      "progressLabel": "Güncelleme indirme ilerlemesi"
     },
     "cameraPrompt": {
       "title": "Kamera Modunu Seç",
@@ -961,6 +1007,7 @@ export const tr_TR: EnTranslations = {
       "emoteWheel": "İfade Çarkı",
       "targetFriendly": "En Yakın Dostu Hedefle",
       "targetFriendlyNext": "Dost Hedefler Arasında Geç",
+      "targetPrev": "Hedefler Arasında Geri Geç",
       "discord": "Discord",
       "valecup": "Vadi Kupası",
       "bgFlag": "Savaş Alanı Sancak Eylemi",
@@ -1319,7 +1366,7 @@ export const tr_TR: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Kamerayı döndürmek için sürüklerken fare imlecini pencerenin içinde tutar, böylece ekran kenarına ulaşamaz veya başka bir monitöre geçemez. Serbest imleç tercih ediyorsanız kapatın.",
       "showWalletOnCharacterScreen": "Cüzdanı Karakter Ekranında Göster",
       "showWalletOnPlayerCard": "Cüzdanı Oyuncu Kartında Göster",
-      "showPlaytime": "Show Time Played on Character Screen",
+      "showPlaytime": "Karakter Ekranında Oynama Süresini Göster",
       "showDevBadges": "Geliştirici Rozetlerini Göster",
       "showOwnNameplate": "Kendi İsim Etiketimi Göster",
       "showPlayerNameplates": "Oyuncu İsim Etiketlerini Göster",
@@ -1456,169 +1503,169 @@ export const tr_TR: EnTranslations = {
         "offline": "Çevrimdışı"
       },
       "diagnostics": {
-        "panelAria": "World of ClaudeCraft performance diagnostics",
-        "title": "ClaudeCraft Performance Doctor",
-        "subtitle": "A game-specific scan with evidence and code-level fixes.",
+        "panelAria": "World of ClaudeCraft performans tanılama paneli",
+        "title": "ClaudeCraft Performans Doktoru",
+        "subtitle": "Kanıt ve kod düzeyinde düzeltmeler sunan, oyuna özgü bir tarama.",
         "aria": {
-          "liveMeasurements": "Live performance measurements",
-          "scanProgress": "Diagnostic scan progress",
-          "findings": "Ranked diagnostic findings"
+          "liveMeasurements": "Canlı performans ölçümleri",
+          "scanProgress": "Tanı taraması ilerlemesi",
+          "findings": "Sıralanmış tanı bulguları"
         },
         "controls": {
-          "minimize": "Minimize",
-          "expand": "Expand",
-          "start": "Start 15-second scan",
-          "refreshCensus": "Refresh scene census",
-          "copyReport": "Copy clear report",
-          "downloadReport": "Download report",
-          "scanning": "Scanning...",
-          "scanAnother": "Scan another area",
-          "reportLogged": "Report logged to console",
-          "copied": "Copied",
-          "copyBlocked": "Copy blocked: report logged",
-          "retestLowGraphics": "Retest on Low graphics"
+          "minimize": "Küçült",
+          "expand": "Genişlet",
+          "start": "15 saniyelik taramayı başlat",
+          "refreshCensus": "Sahne sayımını yenile",
+          "copyReport": "Okunabilir raporu kopyala",
+          "downloadReport": "Raporu indir",
+          "scanning": "Taranıyor...",
+          "scanAnother": "Başka bir alanı tara",
+          "reportLogged": "Rapor konsola kaydedildi",
+          "copied": "Kopyalandı",
+          "copyBlocked": "Kopyalama engellendi: rapor konsola kaydedildi",
+          "retestLowGraphics": "Düşük grafikte yeniden test et"
         },
-        "instruction": "For the best signal, enter Play Offline, move through the slow area, rotate the camera, and trigger the effect that stutters while the scan is running.",
+        "instruction": "En iyi sinyal için Çevrimdışı Oyna'ya gir, yavaş alanın içinden geç, kamerayı döndür ve tarama çalışırken kekeleyen efekti tetikle.",
         "status": {
-          "pausedHiddenRestart": "Scan paused while this tab is hidden. It will restart when you return.",
-          "restoredRestart": "Tab restored. Restarting a clean 15-second active-gameplay capture.",
-          "worldLoaded": "World loaded. Waiting for the first playable frame.",
-          "pausedHiddenContinue": "Scan paused while this tab is hidden. Return to the game to continue.",
+          "pausedHiddenRestart": "Bu sekme gizliyken tarama duraklatıldı. Döndüğünde yeniden başlayacak.",
+          "restoredRestart": "Sekme geri yüklendi. Temiz bir 15 saniyelik aktif oynanış yakalaması yeniden başlatılıyor.",
+          "worldLoaded": "Dünya yüklendi. İlk oynanabilir kare bekleniyor.",
+          "pausedHiddenContinue": "Bu sekme gizliyken tarama duraklatıldı. Devam etmek için oyuna dön.",
           "collectingRemaining": {
-            "one": "Collecting active gameplay: {seconds} second remaining",
-            "other": "Collecting active gameplay: {seconds} seconds remaining"
+            "one": "Aktif oynanış toplanıyor: {seconds} saniye kaldı",
+            "other": "Aktif oynanış toplanıyor: {seconds} saniye kaldı"
           },
-          "waitingFrames": "Waiting for representative gameplay frames: {current}/{minimum}",
-          "collectingNow": "Collecting active gameplay: move through the problem area now.",
-          "ready": "Ready to scan. Press Start and reproduce the slowdown.",
-          "waitingWorld": "Waiting for the game world. Choose Play Offline or enter an online character."
+          "waitingFrames": "Temsili oynanış kareleri bekleniyor: {current}/{minimum}",
+          "collectingNow": "Aktif oynanış toplanıyor: şimdi sorunlu alanın içinden geç.",
+          "ready": "Taramaya hazır. Başlat'a bas ve yavaşlamayı yeniden oluştur.",
+          "waitingWorld": "Oyun dünyası bekleniyor. Çevrimdışı Oyna'yı seç ya da çevrimiçi bir karakterle gir."
         },
         "metrics": {
-          "waitingRenderer": "renderer: waiting",
-          "waitingCensus": "scene census: waiting",
-          "waitingHitch": "hitch attribution: armed on world entry",
-          "recent": "recent  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}",
-          "render": "render  submit {submit} ms | world {world} ms | entities {entities} ms",
-          "scene": "scene   {calls} calls | {triangles} tris | {views} views",
-          "hitches": "hitches {hitches} | shaders {shaders} | uploads {uploads} | views {views}",
+          "waitingRenderer": "işleyici: bekleniyor",
+          "waitingCensus": "sahne sayımı: bekleniyor",
+          "waitingHitch": "takılma atfı: dünyaya girişte devreye alındı",
+          "recent": "güncel  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}",
+          "render": "işleme  gönderim {submit} ms | dünya {world} ms | varlık {entities} ms",
+          "scene": "sahne   {calls} çağrı | {triangles} üçgen | {views} görünüm",
+          "hitches": "takılma {hitches} | gölgelendirici {shaders} | yükleme {uploads} | görünüm {views}",
           "gpu": "GPU     {renderer}",
-          "waitingValue": "waiting"
+          "waitingValue": "bekleniyor"
         },
         "scoreHeadline": "{score}/100: {headline}",
-        "healthyNoFindings": "No actionable threshold fired. If a short hitch still bothers you, rerun the scan along the exact movement path that triggers it.",
-        "findingMeta": "{severity} | {confidence} confidence",
+        "healthyNoFindings": "Eyleme dönüştürülebilir bir eşik tetiklenmedi. Kısa bir takılma hâlâ seni rahatsız ediyorsa, onu tetikleyen tam hareket yolu boyunca taramayı yeniden çalıştır.",
+        "findingMeta": "{severity} | {confidence} güven",
         "sections": {
-          "evidence": "Evidence",
-          "tryNow": "Try now",
-          "codeFix": "Code fix",
-          "source": "Relevant source"
+          "evidence": "Kanıt",
+          "tryNow": "Şimdi dene",
+          "codeFix": "Kod düzeltmesi",
+          "source": "İlgili kaynak"
         },
         "severity": {
-          "critical": "CRITICAL",
-          "warning": "WARNING",
-          "info": "INFO"
+          "critical": "KRİTİK",
+          "warning": "UYARI",
+          "info": "BİLGİ"
         },
         "confidence": {
-          "high": "high",
-          "medium": "medium",
-          "low": "low"
+          "high": "yüksek",
+          "medium": "orta",
+          "low": "düşük"
         },
         "diagnosis": {
-          "noProblemTitle": "No material performance problem detected",
+          "noProblemTitle": "Önemli bir performans sorunu tespit edilmedi",
           "summary": {
             "findings": {
-              "one": "{findings} actionable finding from the last 10 seconds at {fps} FPS and {p95} frame p95.",
-              "other": "{findings} actionable findings from the last 10 seconds at {fps} FPS and {p95} frame p95."
+              "one": "Son 10 saniyede {fps} FPS ve {p95} kare p95'inde {findings} eyleme dönüştürülebilir bulgu.",
+              "other": "Son 10 saniyede {fps} FPS ve {p95} kare p95'inde {findings} eyleme dönüştürülebilir bulgu."
             },
-            "healthy": "The last 10 seconds held {fps} FPS with a {p95} frame p95. No game, browser, GPU, memory, asset, or network threshold fired."
+            "healthy": "Son 10 saniye, {fps} FPS ve {p95} kare p95'ini korudu. Hiçbir oyun, tarayıcı, GPU, bellek, varlık ya da ağ eşiği tetiklenmedi."
           },
           "titles": {
-            "hardwareAcceleration": "Software rendering is active",
-            "integratedGpu": "The game is using the integrated GPU",
-            "highDpi": "High resolution rendering is expensive here",
-            "forcedHighGraphics": "Forced high graphics is reducing performance",
-            "lowMemory": "Available device memory is low",
-            "browserStalls": "Browser or extension stalls were detected",
-            "heapPressure": "Browser memory pressure was detected",
-            "contextLoss": "The graphics context was reset",
-            "gpuSubmit": "GPU submission is the main frame bottleneck",
-            "sceneDraw": "Scene draw cost exceeds the active graphics budget",
-            "shadowPass": "The shadow pass uses a large share of draw calls",
-            "rendererWorld": "World renderer updates are CPU-bound",
-            "rendererEntities": "Entity view updates are CPU-bound",
-            "rendererNameplates": "Nameplate painting is expensive",
-            "simCpu": "Simulation work is consuming the frame",
-            "hudCpu": "HUD updates are consuming the frame",
-            "eventCpu": "Event processing is consuming the frame",
-            "shaderCompile": "Shaders are compiling during gameplay",
-            "textureUpload": "Texture uploads are causing gameplay hitches",
-            "viewCreate": "Entity view creation is causing hitches",
-            "otherHitch": "Unattributed long frames remain",
-            "assetStartup": "Game startup is delayed by asset work",
-            "longTasks": "Long browser tasks are blocking frames",
-            "networkLatency": "Network delivery is delaying visible response",
-            "snapshotApply": "Snapshot processing is blocking the client",
-            "generic": "Performance rule {rule} needs attention"
+            "hardwareAcceleration": "Yazılımsal işleme etkin",
+            "integratedGpu": "Oyun entegre GPU kullanıyor",
+            "highDpi": "Burada yüksek çözünürlüklü işleme maliyetli",
+            "forcedHighGraphics": "Zorunlu yüksek grafik performansı düşürüyor",
+            "lowMemory": "Kullanılabilir cihaz belleği düşük",
+            "browserStalls": "Tarayıcı ya da eklenti takılmaları tespit edildi",
+            "heapPressure": "Tarayıcı bellek baskısı tespit edildi",
+            "contextLoss": "Grafik bağlamı sıfırlandı",
+            "gpuSubmit": "GPU gönderimi ana kare darboğazı",
+            "sceneDraw": "Sahne çizim maliyeti etkin grafik bütçesini aşıyor",
+            "shadowPass": "Gölge geçişi, çizim çağrılarının büyük bir payını kullanıyor",
+            "rendererWorld": "Dünya işleyicisinin güncellemeleri CPU'ya bağlı",
+            "rendererEntities": "Varlık görünümü güncellemeleri CPU'ya bağlı",
+            "rendererNameplates": "İsim etiketi çizimi maliyetli",
+            "simCpu": "Simülasyon işi kareyi tüketiyor",
+            "hudCpu": "HUD güncellemeleri kareyi tüketiyor",
+            "eventCpu": "Olay işleme kareyi tüketiyor",
+            "shaderCompile": "Gölgelendiriciler oynanış sırasında derleniyor",
+            "textureUpload": "Doku yüklemeleri oynanış takılmalarına neden oluyor",
+            "viewCreate": "Varlık görünümü oluşturma takılmalara neden oluyor",
+            "otherHitch": "Nedeni belirlenemeyen uzun kareler kalıyor",
+            "assetStartup": "Oyun başlangıcı varlık işi tarafından geciktiriliyor",
+            "longTasks": "Uzun tarayıcı görevleri kareleri engelliyor",
+            "networkLatency": "Ağ teslimatı görünür yanıtı geciktiriyor",
+            "snapshotApply": "Anlık görüntü işleme istemciyi bloke ediyor",
+            "generic": "{rule} performans kuralı dikkat gerektiriyor"
           },
           "causes": {
-            "environment": "A detected browser, GPU, memory, or device setting can limit performance before the game renders a frame.",
-            "graphics": "Measured graphics work is above the active frame or scene budget for this capture.",
-            "cpu": "A measured CPU phase is taking enough main-thread time to miss the frame budget.",
-            "loading": "Resource preparation or first-use work happened on a visible gameplay or startup path.",
-            "network": "Network delivery or client snapshot processing is delaying the latest playable state."
+            "environment": "Tespit edilen bir tarayıcı, GPU, bellek ya da cihaz ayarı, oyun bir kare işlemeden önce performansı sınırlayabilir.",
+            "graphics": "Ölçülen grafik işi, bu yakalama için etkin kare ya da sahne bütçesinin üzerinde.",
+            "cpu": "Ölçülen bir CPU aşaması, kare bütçesini kaçıracak kadar ana iş parçacığı süresi harcıyor.",
+            "loading": "Kaynak hazırlığı ya da ilk kullanım işi, görünür bir oynanış ya da başlangıç aşamasında gerçekleşti.",
+            "network": "Ağ teslimatı ya da istemci anlık görüntü işlemesi, en güncel oynanabilir durumu geciktiriyor."
           },
           "evidence": {
-            "environment": "The environment rule {rule} matched this device and browser.",
-            "gpuSubmit": "WebGL submission p95 is {submit}, or {share} of renderer p95.",
-            "frame": "The recent window measured {fps} FPS with a {p95} frame p95.",
-            "sceneCalls": "The scene uses {calls} draw calls against a target of {target}.",
-            "sceneTriangles": "The scene submits {triangles} triangles against a target of {target}.",
-            "sceneCategory": "Scene category {category} contributes {calls} calls and {triangles} measured triangles.",
-            "censusNeeded": "Refresh the scene census to identify the leading render category.",
-            "shadow": "The shadow pass submits {calls} calls, {share} of the baseline, and {triangles} triangles.",
-            "cpuPhase": "Measured phase {phase} has a p95 of {p95}.",
-            "hitch": "{count} of {total} recorded hitches matched cause {cause}.",
-            "assets": "The preload gate waited {wait} for {tasks} registered tasks.",
-            "failedAssets": "Failed asset groups: {groups}.",
-            "longTasks": "{count} long tasks were measured, with p95 {p95} and maximum {max}.",
-            "network": "Snapshot interval is {interval}, latest age is {age}, and input echo p95 is {echo}.",
-            "snapshot": "Snapshot parse and apply p95 is {work}; network gap p95 is {gap}.",
-            "generic": "Diagnostic rule {rule} matched this capture."
+            "environment": "{rule} ortam kuralı bu cihaz ve tarayıcıyla eşleşti.",
+            "gpuSubmit": "WebGL gönderimi p95'i {submit}, yani işleyici p95'inin {share}'i.",
+            "frame": "Son pencerede {fps} FPS ve {p95} kare p95'i ölçüldü.",
+            "sceneCalls": "Sahne, {target} hedefine karşı {calls} çizim çağrısı kullanıyor.",
+            "sceneTriangles": "Sahne, {target} hedefine karşı {triangles} üçgen gönderiyor.",
+            "sceneCategory": "{category} sahne kategorisi {calls} çağrı ve {triangles} ölçülen üçgen katkısında bulunuyor.",
+            "censusNeeded": "Önde gelen işleme kategorisini belirlemek için sahne sayımını yenile.",
+            "shadow": "Gölge geçişi {calls} çağrı, temel değerin {share}'i ve {triangles} üçgen gönderiyor.",
+            "cpuPhase": "Ölçülen {phase} aşamasının p95'i {p95}.",
+            "hitch": "Kaydedilen {total} takılmadan {count} tanesi {cause} nedeniyle eşleşti.",
+            "assets": "Ön yükleme eşiği, kayıtlı {tasks} görev için {wait} bekledi.",
+            "failedAssets": "Başarısız varlık grupları: {groups}.",
+            "longTasks": "{count} uzun görev ölçüldü; p95 {p95}, en yüksek değer {max}.",
+            "network": "Anlık görüntü aralığı {interval}, en son yaşı {age} ve giriş yankısı p95'i {echo}.",
+            "snapshot": "Anlık görüntü ayrıştırma ve uygulama p95'i {work}; ağ boşluğu p95'i {gap}.",
+            "generic": "{rule} tanı kuralı bu yakalamayla eşleşti."
           },
           "tryNow": {
-            "environment": "Correct the detected environment setting, restart, and repeat the same scan.",
-            "graphics": "Retest the same camera path on Low graphics to confirm graphics pressure.",
-            "cpu": "Repeat the scan while idle and while moving to isolate the CPU phase.",
-            "loading": "Repeat the same route or first-use action to confirm when the hitch occurs.",
-            "network": "Compare Play Offline with the same movement and camera path."
+            "environment": "Tespit edilen ortam ayarını düzelt, yeniden başlat ve aynı taramayı tekrarla.",
+            "graphics": "Grafik baskısını doğrulamak için aynı kamera yolunu Düşük grafikte yeniden test et.",
+            "cpu": "CPU aşamasını izole etmek için taramayı hem hareketsizken hem hareket ederken tekrarla.",
+            "loading": "Takılmanın ne zaman oluştuğunu doğrulamak için aynı rotayı ya da ilk kullanım eylemini tekrarla.",
+            "network": "Aynı hareket ve kamera yoluyla Çevrimdışı Oyna'yı karşılaştır."
           },
           "codeFix": {
-            "environment": "Keep the detected fallback path within the shared graphics and memory budgets.",
-            "graphics": "Use the existing render budget, instancing, material sharing, LOD, and hidden-work skips.",
-            "cpu": "Profile the named phase, remove repeated work and allocations, and preserve gameplay behavior.",
-            "loading": "Preload, pool, or spread the identified first-use work through the existing startup and streaming budgets.",
-            "network": "Reduce delivery or snapshot processing cost without weakening the authoritative server model."
+            "environment": "Tespit edilen yedek yolu, paylaşılan grafik ve bellek bütçeleri içinde tut.",
+            "graphics": "Mevcut işleme bütçesini, instancing'i, malzeme paylaşımını, LOD'u ve görünmeyen iş atlamalarını kullan.",
+            "cpu": "Adı geçen aşamayı profille, tekrar eden işleri ve bellek ayırmalarını kaldır, oynanış davranışını koru.",
+            "loading": "Belirlenen ilk kullanım işini, mevcut başlangıç ve akış bütçeleri üzerinden ön yükle, havuzla ya da yay.",
+            "network": "Yetkili sunucu modelini zayıflatmadan teslimat ya da anlık görüntü işleme maliyetini azalt."
           }
         },
         "report": {
-          "title": "World of ClaudeCraft performance diagnosis",
-          "statusLine": "Status: {status} ({score}/100)",
-          "capturedLine": "Captured: {captured}",
-          "topFindingLine": "Top finding: {finding}",
-          "summaryLine": "Summary: {summary}",
+          "title": "World of ClaudeCraft performans tanısı",
+          "statusLine": "Durum: {status} ({score}/100)",
+          "capturedLine": "Yakalandı: {captured}",
+          "topFindingLine": "En önemli bulgu: {finding}",
+          "summaryLine": "Özet: {summary}",
           "gpuLine": "GPU: {gpu}",
-          "graphicsLine": "Graphics: {tier}, render scale {scale}",
-          "recentLine": "Recent: {fps} FPS, p95 {p95}, {longFrames} frames over 50 ms, {frames} measured frames",
-          "resultHeading": "Result",
-          "noThreshold": "No actionable threshold fired in this capture.",
+          "graphicsLine": "Grafik: {tier}, işleme ölçeği {scale}",
+          "recentLine": "Güncel: {fps} FPS, p95 {p95}, 50 ms üzerinde {longFrames} kare, ölçülen {frames} kare",
+          "resultHeading": "Sonuç",
+          "noThreshold": "Bu yakalamada eyleme dönüştürülebilir bir eşik tetiklenmedi.",
           "findingHeading": "{index}. {title}",
-          "findingMeta": "Severity: {severity}. Confidence: {confidence}.",
-          "rawSnapshotHeading": "Raw snapshot",
-          "notAvailable": "not available",
+          "findingMeta": "Önem: {severity}. Güven: {confidence}.",
+          "rawSnapshotHeading": "Ham anlık görüntü",
+          "notAvailable": "mevcut değil",
           "status": {
-            "critical": "critical",
-            "needsAttention": "needs attention",
-            "healthy": "healthy"
+            "critical": "kritik",
+            "needsAttention": "dikkat gerektiriyor",
+            "healthy": "sağlıklı"
           }
         }
       }
@@ -1720,12 +1767,12 @@ export const tr_TR: EnTranslations = {
     "charSheet": {
       "offense": "Saldırı",
       "defense": "Savunma",
-      "playtimeLabel": "Time Played",
+      "playtimeLabel": "Oynama Süresi",
       "playtimeParts": "{major}, {minor}",
-      "playtimeUnderMinute": "Less than a minute",
-      "playtimeHidden": "Hidden",
-      "showPlaytimeAria": "Show time played",
-      "hidePlaytimeAria": "Hide time played"
+      "playtimeUnderMinute": "Bir dakikadan az",
+      "playtimeHidden": "Gizli",
+      "showPlaytimeAria": "Oynama süresini göster",
+      "hidePlaytimeAria": "Oynama süresini gizle"
     },
     "statInfo": {
       "fromYour": "{value} {stat} değerinden:",
@@ -1743,7 +1790,7 @@ export const tr_TR: EnTranslations = {
         "agi": "Reflekslerini ve nişan alma yeteneğini keskinleştirir, birçok savaş istatistiğini geliştirir.",
         "sta": "Bedenini güçlendirir, azami canını ve dinlenirken can yenileme hızını yükseltir.",
         "int": "Bir büyücünün mana havuzunu genişletir ve büyü kritik vuruş şansını artırır.",
-        "spi": "Bir büyücünün savaş dışında dinlenirken manasının ne kadar hızlı dolduğunu artırır.",
+        "spi": "Bir büyücünün manasının ne kadar hızlı geri geldiğini artırır. Çoğu, savaş dışında dinlenirken akar ve bir kısmı savaşta bile geri gelmeyi sürdürür.",
         "armor": "Gelen fiziksel darbeleri yumuşatır. Azalma, daha düşük seviyeli saldırganlara karşı daha büyüktür ve en fazla %75 ile sınırlıdır.",
         "attackPower": "Silah saldırılarına güç katar. Her 14 saldırı gücü, saniye başına 1 hasar ekler.",
         "spellPower": "Büyülerinin hasarını ve iyileştirmelerinin gücünü artırır. Her Zeka puanı, teçhizat veya güçlendirmelerden gelenlere ek olarak biraz Büyü Gücü sağlar.",
@@ -1767,6 +1814,7 @@ export const tr_TR: EnTranslations = {
         "spellCritPct": "+%{value} Büyü Kritik Vuruşu",
         "healthRegen": "Dinlenirken her 5 saniyede yaklaşık {value} can",
         "manaRegen": "Dinlenirken her 5 saniyede yaklaşık {value} mana",
+        "manaRegenCombat": "Savaşta her 5 saniyede yaklaşık {value} mana",
         "damageReduction": "{level}. seviye bir saldırgana karşı hasar azaltma: %{value}",
         "dpsFromAp": "Saldırılarına saniye başına {value} hasar ekler"
       },
@@ -1787,11 +1835,11 @@ export const tr_TR: EnTranslations = {
     },
     "talents": {
       "defaultBuildName": "Yapı {n}",
-      "newBuildWithGear": "New Build (save gear too)",
-      "gearRestored": "Restored {n} gear pieces from this build.",
-      "gearNotHeld": "You no longer have {n} of this build's saved pieces.",
-      "gearCopyGone": "{n} saved pieces were not the copy this build pinned.",
-      "gearTakenByOtherSlot": "{n} saved pieces need another copy you do not have."
+      "newBuildWithGear": "Yeni Yapı (teçhizatı da kaydet)",
+      "gearRestored": "Bu yapıdan {n} teçhizat parçası geri yüklendi.",
+      "gearNotHeld": "Artık bu yapının kaydedilmiş parçalarından {n} tanesine sahip değilsin.",
+      "gearCopyGone": "{n} kaydedilmiş parça, bu yapının sabitlediği kopya değildi.",
+      "gearTakenByOtherSlot": "{n} kaydedilmiş parça, sahip olmadığın başka bir kopyaya ihtiyaç duyuyor."
     },
     "tips": {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
@@ -1853,22 +1901,22 @@ export const tr_TR: EnTranslations = {
         "other": "{count} saniye kaldı"
       },
       "playtimeDays": {
-        "one": "{count} day",
-        "few": "{count} days",
-        "many": "{count} days",
-        "other": "{count} days"
+        "one": "{count} gün",
+        "few": "{count} gün",
+        "many": "{count} gün",
+        "other": "{count} gün"
       },
       "playtimeHours": {
-        "one": "{count} hour",
-        "few": "{count} hours",
-        "many": "{count} hours",
-        "other": "{count} hours"
+        "one": "{count} saat",
+        "few": "{count} saat",
+        "many": "{count} saat",
+        "other": "{count} saat"
       },
       "playtimeMinutes": {
-        "one": "{count} minute",
-        "few": "{count} minutes",
-        "many": "{count} minutes",
-        "other": "{count} minutes"
+        "one": "{count} dakika",
+        "few": "{count} dakika",
+        "many": "{count} dakika",
+        "other": "{count} dakika"
       },
       "playersOnline": {
         "one": "Kimler: {realm} sunucusunda {count} oyuncu çevrimiçi.",
@@ -1881,6 +1929,48 @@ export const tr_TR: EnTranslations = {
         "few": "Kim: {realm} sunucusunda \"{query}\" ile eşleşen {count} oyuncu.",
         "many": "Kim: {realm} sunucusunda \"{query}\" ile eşleşen {count} oyuncu.",
         "other": "Kim: {realm} sunucusunda \"{query}\" ile eşleşen {count} oyuncu."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Yadigârlığın güncelleniyor: {count} yadigâr kataloglandı.",
+        "few": "Yadigârlığın güncelleniyor: {count} yadigâr kataloglandı.",
+        "many": "Yadigârlığın güncelleniyor: {count} yadigâr kataloglandı.",
+        "other": "Yadigârlığın güncelleniyor: {count} yadigâr kataloglandı."
+      },
+      "reliquarySearchResults": {
+        "one": "{count} sonuç.",
+        "few": "{count} sonuç.",
+        "many": "{count} sonuç.",
+        "other": "{count} sonuç."
+      },
+      "reliquaryToGo": {
+        "one": "{count} kaldı",
+        "few": "{count} kaldı",
+        "many": "{count} kaldı",
+        "other": "{count} kaldı"
+      },
+      "reliquaryObtainedTimes": {
+        "one": "{count} kez elde edildi",
+        "few": "{count} kez elde edildi",
+        "many": "{count} kez elde edildi",
+        "other": "{count} kez elde edildi"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}, kataloglandı, {count} kez elde edildi",
+        "few": "{name}, kataloglandı, {count} kez elde edildi",
+        "many": "{name}, kataloglandı, {count} kez elde edildi",
+        "other": "{name}, kataloglandı, {count} kez elde edildi"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}, kataloglandı, ilk kez {clears}. tamamlamada bulundu, {count} kez elde edildi",
+        "few": "{name}, kataloglandı, ilk kez {clears}. tamamlamada bulundu, {count} kez elde edildi",
+        "many": "{name}, kataloglandı, ilk kez {clears}. tamamlamada bulundu, {count} kez elde edildi",
+        "other": "{name}, kataloglandı, ilk kez {clears}. tamamlamada bulundu, {count} kez elde edildi"
+      },
+      "deedsRetroSummary": {
+        "one": "Vakayinamen güncelleniyor: {count} yiğitlik kaydedildi.",
+        "few": "Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi.",
+        "many": "Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi.",
+        "other": "Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi."
       }
     },
     "bugReport": {
@@ -2109,6 +2199,10 @@ export const tr_TR: EnTranslations = {
       "itemAriaBound": "{item}, adet {count}, bağlı kopya",
       "itemAriaMasterwork": "{item}, adet {count}, şaheser",
       "itemAriaQuest": "{item}, adet {count}, görev eşyası",
+      "itemAriaLocked": "{item}, adet {count}, kilitli",
+      "itemLockedLine": "Kilitli",
+      "lockItem": "Eşyayı Kilitle",
+      "unlockItem": "Eşyanın Kilidini Aç",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
       "filterWeapon": "Silahlar",
@@ -2123,9 +2217,9 @@ export const tr_TR: EnTranslations = {
       "sortRecent": "En son",
       "sortQuality": "Kalite",
       "sortName": "Ad",
-      "sortButton": "Sort",
-      "sortButtonAria": "Sort your bags",
-      "sortButtonHint": "Combine stacks and group items by type",
+      "sortButton": "Sırala",
+      "sortButtonAria": "Çantalarını sırala",
+      "sortButtonHint": "Yığınları birleştir ve ögeleri türe göre grupla",
       "searchPlaceholder": "Öge ara",
       "searchAria": "Çanta ögelerini ada göre ara",
       "noMatch": "Filtrelerinizle eşleşen öge yok.",
@@ -2151,18 +2245,36 @@ export const tr_TR: EnTranslations = {
     "auraEffect": {
       "dot": "Her {interval} sn {value} {school} hasarı verir",
       "hot": "Her {interval} sn {value} sağlık yeniler",
+      "mendingCurrent": "{value} iyileştirme biriktirir; zamanla salınır veya Şelale Onarımı tarafından tüketilir",
+      "mendingCurrentPercent": "Şelale Onarımı için azami canın {pct}% kadar iyileştirme biriktirir",
       "absorb": "{value} hasar emer",
       "healAbsorb": "Gelen iyileştirmenin {value} kadarını emer",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
+      "stasis": "Bağışık ve hareket edemez",
       "slow": "Reduce la velocidad de movimiento un {pct}%",
       "speed": "Aumenta la velocidad de movimiento un {pct}%",
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
+      "imbueRange": "Silah güçlendirildi: Hukum ile {min} ila {max} bonus hasar",
+      "petDamage": "Evcil hayvan hasarını {pct}% artırır",
+      "petHaste": "Evcil hayvan eylem hızını {pct}% artırır",
+      "spellDamage": "Büyü hasarını {pct}% artırır",
+      "spellHaste": "Büyü okuma hızını {pct}% artırır",
+      "sated": "Başka bir grup hız etkisinden yararlanamaz",
+      "cauterizeFatigue": "Dağlama başka bir öldürücü darbeyi henüz engelleyemez",
+      "castShield": "Büyü okuma hasarla kesilemez veya geciktirilemez",
       "dmgDone": "Verilen hasarı {pct}% artırır",
       "dmgDoneReduce": "Verilen hasarı {pct}% azaltır",
       "heatingUp": "Bir sonraki ardışık Ateş kurucu kritik vuruşun Sıcak Seri kazandırır; kritik olmayan bir kurucu Isınıyor'u kaldırır",
       "elementalConvergencePrimed": "Diğer element okulundan bir sonraki büyün Element Yakınsaması kazandırır",
+      "hunterFerocity": "{stacks} Sürü Vahşeti: evcil hayvanın {pct}% daha fazla hasar verir",
+      "cooldownCap": "Bu pencerede {used} / {cap} sn bekleme süresi azaltımı kullanıldı",
+      "funeralHarvestLock": "Cenaze Hasadı henüz başka bir Ruh Parçası oluşturamaz",
+      "leadenHexLock": "Kurşun Büyüsü bu hedefi henüz yeniden kökleyemez",
+      "forbiddenReflectionReady": "Uygun bir sonraki Karabüyücü bekleme süren yeniden kullanılabilir",
+      "forbiddenReflectionLock": "Yasak Yansıma henüz yeniden hazırlanamaz",
+      "internalCooldown": "Bu etki, süre dolana kadar yeniden tetiklenemez",
       "carriedFlag": "Düşman sancağını taşıyorsun. Onu bırakmak için bu güçlendirmeyi iptal et.",
       "battleStance": "Savaş Duruşu: %10 daha fazla öfke üretimi",
       "berserkerStance": "Berserker Duruşu: kritikler %3 daha sık gerçekleşir ve %3 daha sert vurur",
@@ -2177,6 +2289,13 @@ export const tr_TR: EnTranslations = {
       "revengeFree": "Bir sonraki İntikam hiç Öfkeye mal olmaz",
       "victoryRush": "Zafer Atılımı hazır",
       "maxHpPct": "Azami canı %{pct} artırır",
+      "enrage": "Verilen hasar {damagePct}%, saldırı hızı {hastePct}% ve hareket hızı {movePct}% artar",
+      "suddenDeath": "Bir sonraki Erken Mezar'ın hiç Öfkeye mal olmaz ve can şartını yok sayar",
+      "aoeEcho": "{charges} yankı kaldı: tek hedefli yetenekler yakındaki en fazla {targets} düşmana {pct}% hasar verir",
+      "sureCrit": "{charges} hasar veren yetenek kullanımı garanti kritik vuruş olur",
+      "temporalEcho": "Büyücünün Gizemli hasarı seni tek hedef hasarının {singlePct}%'i ya da alan hasarının {areaPct}%'i kadar iyileştirir",
+      "arcaneCharge": "{stacks} Gizemli Yük: Aether Dalgası {damagePct}% daha fazla hasar verir, {castPct}% daha hızlı okunur ve {costMult}x mana harcar",
+      "physicalReduction": "Alınan Fiziksel hasarı {pct}% azaltır",
       "temporalHourglass": "Bağışık ve eylem yapamaz; canı yeniler ve bekleme süresi iyileşmesini hızlandırır. İptal etmek için sağ tıkla.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Ateş büyülerin her zaman kritik vurur",
@@ -2186,6 +2305,22 @@ export const tr_TR: EnTranslations = {
       "freeCast": "Bir sonraki büyün hiçbir şeye mal olmaz",
       "instantCast": "Çeviri süresi olan bir sonraki büyün anlık olur",
       "cheapCast": "Bir sonraki büyün {pct}% daha az mana harcar",
+      "radiantResonance": "Sonraki Onaran Işığın anında olur veya sonraki Şafağın Kucaklaması {pct}% daha az mana harcar ve {castTime} sn içinde okunur",
+      "solarReprisal": "Sonraki Güneş Diskin mana harcamaz, bekleme süresini yok sayar ve {pct}% daha fazla hasar verir; Lütuf Çekici bekleme süresini yok sayar ve verdiği hasarın 100% kadarını sana iyileştirir; ya da Onaran Işık anında olur",
+      "dawnsWrath": "GÇ: her can · +1 kullanım · Bekleme 0 · +{pct}% hasar",
+      "venomRitual": "Zehir Ayini: aşama {stacks} / {max}. Biriktiren vuruşlar aşama ekler; {max} olduğunda Toprak Uykusu Zehir Yırtığına dönüşür",
+      "gloam": "Alacakaranlık: aşama {stacks} / {max}. {max} olduğunda Alacakaranlık Perdesi açılışların açık alanda kullanılabilir olur ve atılan bir sonraki BEDAVA olup birikimi gölge perdesine patlatır",
+      "redline": "Kırmızı Çizgi: çentik {stacks} / {max}. Gövde Vuruşları çentik ekler; Merhamet Darbesi çentik başına {pct}% daha sert vurur ve pencereyi kapatır. Önce sona ererse kaybedilir",
+      "veilstrikeWindow": "Gölge Perdesi: Alacakaranlık Perdesi açılışların açık alanda her açıdan kullanılabilir ve verdiğin hasar {pct}% artar",
+      "veiledEdge": "Sonraki Pusucu Vuruşun iki kat sert vurur",
+      "duskEconomy": "Yetenekler {pct}% daha az enerji harcar",
+      "moontide": "Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar",
+      "oldBlood": "Kadim Kan: aşama {stacks} / {max}. İsabet eden Kurt ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür",
+      "verdance": "Yeşillik: aşama {stacks} / {max}. Tamamlanan Yaban Çiçeği ve İkinci Çiçeklenme büyüleri onu doldurur; {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
+      "freeExecute": "Uygun bir sonraki infaz yeteneğin hiçbir şeye mal olmaz",
+      "resourceSap": "Her {interval} sn'de mevcut kaynağının {value} kadarını geri kazandırır",
+      "nextAttackCrit": "Bir sonraki saldırın garanti kritik vurur",
+      "healEcho": "Canın {threshold}%'in altına düşmesi {value} can geri kazandırır",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Büyü gücünü {value} artırır",
@@ -2224,6 +2359,8 @@ export const tr_TR: EnTranslations = {
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
+      "bleedVuln": "Alınan kanama hasarını {pct}% artırır",
+      "sourceVuln": "Bu etkiyi uygulayan büyücüden {pct}% daha fazla hasar alır",
       "spellVuln": "Aumenta el daño mágico recibido un {pct}%",
       "critVuln": "Aumenta la probabilidad de recibir golpes críticos un {pct}%",
       "costTax": "Aumenta los costes de habilidades un {pct}%",
@@ -2237,14 +2374,46 @@ export const tr_TR: EnTranslations = {
       "disarm": "Desarmado: no puede usar ataques con arma",
       "lockout": "Escuela de hechizos bloqueada",
       "imbue": "Arma imbuida con efectos adicionales",
-      "imbueRange": "Silah güçlendirildi: Hukum ile {min} ila {max} bonus hasar",
+      "galeheartWeapon": "{steps} vuruşluk Warspirit ritmini tamamlamak, vuruşu hasarının {pct}%'i kadar Doğa hasarıyla {count} kez yankılar",
+      "elementalTrance": "Alınan hasar {pct}% azalır. Verdiğin tüm hasarın {mana}%'i manaya dönüşür",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Bruin Formu: can ve zırh artışı",
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Fleet Formu: hareket hızı %{pct} artar",
       "formFireball": "Kor Formu: hareket hızı {pct}% artırıldı; saldırılar ve büyüler devre dışı",
+      "formMoonkin": "Aykuşu Formu: büyü hasarı {pct}% ve zırh {armorPct}% artar",
+      "formShadow": "Gölgeperde Formu: Gölge hasarı {pct}% artar",
+      "resourceCount": "{value} / {max}",
+      "formLich": "Ruh Mızrağı ayrıca yakındaki en fazla {targets} düşmana {pct}% hasarla vurur",
+      "afflictionEye": "Kem Bakış her {interval} sn'de bir saldırır; bu Göz'deki etkiler {pct}% Mahkûmiyet üretir",
+      "afflictionEyeSecondary": "Bu Göz'deki etkiler {doomPct}% Mahkûmiyet üretir; Hüküm buraya {echoPct}% hasarla yankılanır",
+      "afflictionAccomplice": "Uygun hasar {value} Mahkûmiyet kazandırır, en fazla {interval} sn'de bir",
+      "afflictionViolence": "{charges} misilleme kaldı; bir düşman saldırısı {doom} Mahkûmiyet kazandırır ve karşılığında {damage} Gölge hasarı verir",
+      "afflictionVicarious": "Gelen hasarın {pct}%'ini yönlendirir ya da azaltır ve en fazla {max} Mahkûmiyet üretebilir",
+      "afflictionPossession": "Kader İğnesi'ni, Tüketme'yi, Kem Bakış'ı ve Hüküm'ü güçlendirir",
+      "afflictionJudgment": "Birincil Göz {eyePct}% daha fazla Mahkûmiyet üretir; Hüküm {sentencePct}% daha fazla hasar verir ve ilki {refund} Mahkûmiyet geri kazandırır",
+      "afflictionLitany": "Mahkûmiyet kazançları, {radius} yarda içindeki en fazla {targets} düşmana saniyede bir {damage} Gölge hasarı verir",
+      "afflictionFateThreads": "{stacks} Kader İpliği: Hüküm {sentencePct}% daha fazla hasar verir, ya da Tüketme tur başına {doom} ekstra Mahkûmiyet kazanır",
+      "afflictionConsumeThreads": "Tüketme, tur başına {doom} ekstra Mahkûmiyet için {stacks} Kader İpliğini tüketiyor",
+      "necromancyHarvestMark": "Ölüm 1 Ruh Parçası oluşturabilir",
+      "necromancyOssuaryMark": "Senin ve ölülerinin hasarının {storedPct}%'ini, artı Ruh Mızrağı hasarının {lancePct}%'ini depolar; patlatmak için yeniden oku. Ölüm {radius} yarda içinde patlar ve 1 Ruh Parçası oluşturur",
+      "necromancyDeathEcho": "Eski Ölüm Yankısı; hiçbir mevcut yetenek onu tüketmiyor",
+      "warlockAnchor": "Buraya dönmek ve çapayı tüketmek için {range} yarda içinde yeniden oku",
+      "formMetamorph": "İblis formu: beden boyutu {pct}% artar; diğer bonuslar ayrı güçlendirmelere bağlıdır",
+      "energyRegen": "Enerji yenilenmesini {pct}% artırır",
       "defensiveStance": "Korumali Durus: alınan hasar azalır, daha fazla tehdit",
       "righteousFury": "Yanan Yemin: Kutsal hasardan gelen tehdit büyük ölçüde artar",
+      "overpowerCharge": "{stacks} yük: bir sonraki Sakatlayan Darben {pct}% daha fazla hasar verir",
+      "sweepingStrikes": "Tek hedefli vuruşlar yakındaki {targets} düşmana da {pct}% hasarla vurur",
+      "fingersOfFrost": "{charges} yük: Buz Mızrağı hedefini donmuş sayar ve {pct}% donmuş hasarı verir",
+      "brainFreeze": "Bir sonraki Kış Kırbacı'n anında olur ve bekleme süresini yok sayar",
+      "wintersChill": "{charges} yük: uyumlu büyüler bu hedefi donmuş sayar",
+      "icicles": "{value} / {max} Buz Saçağı; {max} olduğunda Buzul Dikeni okunabilir",
+      "desolation": "{charges} yük: bir sonraki Yıkım Okun {castPct}% daha hızlı okunur ya da bir sonraki Ateş Yağmurun anında iner",
+      "ruinousBrand": "{charges} kopya kaldı: doğrudan büyüler buraya {otherPct}% hasar kopyalar, ya da hedefleri bu olduğunda {selfPct}%",
+      "duskfireClaim": "{value} Harabiyet kazandıran ölüm",
+      "pyreGuardian": "Her {ruinInterval} sn'de {ruin} Harabiyet üretir ve her {damageInterval} sn'de {radius} yarda içinde {damage} Ateş hasarı verir",
+      "perfectMoment": "Aether Okları Gizemli Yük tüketmez",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -3047,11 +3216,11 @@ export const tr_TR: EnTranslations = {
       "toolEffectRechargeFull": "{effect} zaten tam şarjlı.",
       "toolEffectRechargeToolCapped": "{effect} etkisini daha fazla şarj etmek için daha iyi bir {profession} aleti taşıyın.",
       "toolEffectRechargeMaterials": "{effect} şarjı için {material} x{count} gerekir.",
-      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
-      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
-      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
-      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
-      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
+      "craftingProgress": "Üretim yapıyorsun: {total}sn üzerinden {remaining}sn kaldı.",
+      "disenchantingProgress": "Büyü bozuyorsun: {total}sn üzerinden {remaining}sn kaldı.",
+      "enchantingProgress": "Büyülüyorsun: {total}sn üzerinden {remaining}sn kaldı.",
+      "salvagingProgress": "Parçalıyorsun: {total}sn üzerinden {remaining}sn kaldı.",
+      "rechargingToolEffectProgress": "Bir alet etkisini şarj ediyorsun: {total}sn üzerinden {remaining}sn kaldı.",
       "tierPipAria": "Seviye {tier}",
       "nextUnlockTier": "{points} bir sonraki aşamaya işaret ediyor: şaheser olma ihtimali artıyor",
       "nextUnlockSpecialized": "{points} Uzmanlaşmış'a işaret ediyor: malzeme maliyetlerinde düşüş",
@@ -3102,6 +3271,7 @@ export const tr_TR: EnTranslations = {
       "craftedToast": "Hazırlanma Tarihi: {name}",
       "craftedToastQty": "Hazırlandı: {name} x{qty}",
       "insufficientMaterials": "Bunun için malzemeleriniz yok.",
+      "reagentLocked": "Bunun için gereken bir reaktif kilitli.",
       "unknownRecipe": "O tarif mevcut değil.",
       "comboRequirementUnmet": "O tarif için gereken iki zanaata da gereken kademede sahip değilsin.",
       "comboRequires": "Uyum: {craftA} + {craftB}, kademe {tier}.",
@@ -3208,6 +3378,7 @@ export const tr_TR: EnTranslations = {
       "notHeld": "O eşya elinizde yok.",
       "notDisenchantable": "Bunun büyüsünü bozamazsınız.",
       "notSalvageable": "Bunu parçalayamazsınız.",
+      "salvageLocked": "O eşya kilitli.",
       "disenchantBusy": "Meşgulsün.",
       "salvageBusy": "Meşgulsün.",
       "enchantBusy": "Meşgulsün.",
@@ -3348,14 +3519,14 @@ export const tr_TR: EnTranslations = {
       "denyNoSpace": "İsteyen kişinin çantalarında yer yok."
     },
     "bgOffer": {
-      "title": "Thornhollow Fields is ready",
-      "backfillTitle": "Thornhollow Fields needs a fighter",
-      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
-      "accepted": "{accepted} of {size} ready",
-      "remaining": "{seconds}s to answer",
-      "accept": "Accept",
-      "decline": "Decline",
-      "acceptedWait": "Waiting for the others..."
+      "title": "Dikenvadi Ovası hazır",
+      "backfillTitle": "Dikenvadi Ovası'nın bir savaşçıya ihtiyacı var",
+      "backfillBody": "Bu savaş zaten sürüyor. Eksik olan tarafa katılacaksın ve bu maç savaş alanı dereceni değiştirmeyecek.",
+      "accepted": "{size} kişiden {accepted} tanesi hazır",
+      "remaining": "Yanıt için {seconds}sn",
+      "accept": "Kabul Et",
+      "decline": "Reddet",
+      "acceptedWait": "Diğerleri bekleniyor..."
     },
     "finder": {
       "title": "Zindan Bulucu",
@@ -3459,6 +3630,135 @@ export const tr_TR: EnTranslations = {
         "dread_curse": "Dehşet Laneti (yalnızca kahramanlık, tank değişimi için biriken zayıflatma)"
       }
     },
+    "reliquary": {
+      "title": "Yadigârlık",
+      "close": "Yadigârlık'ı kapat",
+      "countLabel": "{owned}/{total} yadigâr",
+      "completionAria": "Dolan yadigârlar: {total} içinde {owned}",
+      "curatorRank": "Küratör derecesi {rank}",
+      "curatorUnranked": "Derecesiz Küratör",
+      "curatorRankName1": "Çırak Küratör",
+      "curatorRankName2": "Ganimet Bekçisi",
+      "curatorRankName3": "Usta Küratör",
+      "curatorRankName4": "Baş Küratör",
+      "curatorRankName5": "Ebedi Küratör",
+      "rankUpBanner": "Küratör derecesi {rank}: {name}",
+      "rankUpToast": "Küratör derecesi {rank} kazanıldı: {name}",
+      "borderWearableNote": "{name} çerçevesi Yiğitlikler Kitabı'ndan takılabilir.",
+      "sigilCaption": "Küratör mührü",
+      "recentLabel": "Son bulunanlar:",
+      "nearlyLabel": "Neredeyse tam:",
+      "nearlyJumpAria": "{name} sayfasını aç, {total} içinde {owned} doldu",
+      "progressText": "{owned}/{total}",
+      "shelvesAria": "Yadigârlık rafları",
+      "navOverview": "Genel bakış",
+      "navConquerors": "Fatihler",
+      "navProfessions": "Meslekler",
+      "navHorizons": "Ufuklar",
+      "navCountAria": "{shelf}: {total} yadigârdan {owned} tanesi doldu",
+      "shelfEmpty": "Bu rafta henüz sayfa yok.",
+      "pageComplete": "Tezhipli",
+      "clearsLabel": "{count} tamamlama",
+      "srankClearsLabel": "{count} adet S derecesi tamamlama",
+      "retiredLabel": "Kaldırıldı",
+      "personalLabel": "Kişisel",
+      "backToShelf": "Rafa dön",
+      "gridAria": "{name} sayfasındaki yadigârlar",
+      "pageProgressAria": "Sayfa ilerlemesi: {total} yadigârdan {owned} tanesi doldu",
+      "cellOwnedAria": "{name}, kataloglandı",
+      "cellMissingAria": "{name}, henüz bulunmadı",
+      "ownedTooltipStatus": "Yadigârlık'ta kataloglandı",
+      "missingTooltipStatus": "Henüz bulunmadı",
+      "firstFindClears": "İlk kez {count}. tamamlamada bulundu",
+      "unlockToast": "Yadigâr kataloglandı: {name}",
+      "illuminateBanner": "Sayfa tezhiplendi: {name}",
+      "illuminateToast": "{name} sayfasındaki her yadigâr doldu.",
+      "illuminationBroadcastLine": "{name} bir Yadigârlık sayfasını tezhipledi: {page}",
+      "markFind": {
+        "masterwork_first": "İlk Şaheser",
+        "masterwork_weaponcrafting": "Silah Yapımı Şaheseri",
+        "masterwork_armorcrafting": "Zırh Yapımı Şaheseri",
+        "masterwork_tailoring": "Terzilik Şaheseri",
+        "masterwork_leatherworking": "Deri İşleme Şaheseri",
+        "masterwork_engineering": "Mühendislik Şaheseri",
+        "gather_event_pristine_vein": "El Değmemiş Damar",
+        "gather_event_ancient_heartwood": "Kadim Öz Odun",
+        "gather_event_moonlit_bloom": "Ay Işığında Açan Çiçek",
+        "gather_event_perfect_specimen": "Kusursuz Örnek",
+        "slain_old_greyjaw": "Öldürüldü: İhtiyar Greyjaw",
+        "slain_mogger": "Öldürüldü: Mogger",
+        "slain_grix_the_tunnelking": "Öldürüldü: Tünelkral Grix",
+        "slain_captain_verlan": "Öldürüldü: Kaptan Verlan",
+        "slain_wraithbinder_maldrec": "Öldürüldü: Hayaletbağlayan Maldrec",
+        "slain_mirejaw_the_ravenous": "Öldürüldü: Doymak Bilmez Mirejaw",
+        "slain_sloomtooth_the_drowned": "Öldürüldü: Boğulmuş Sloomtooth",
+        "slain_sister_nhalia": "Öldürüldü: Rahibe Nhalia",
+        "slain_grubjaw": "Öldürüldü: Obur Grubjaw",
+        "slain_ironvein_foreman": "Öldürüldü: Demirdamar Ustabaşı",
+        "slain_brutok_skullsmasher": "Öldürüldü: Brutok Kafataşıezen",
+        "slain_voskar_emberwing": "Öldürüldü: Korkanat Voskar",
+        "slain_marrowlord_varkas": "Öldürüldü: İlikbeyi Varkas",
+        "slain_old_cragmaw": "Öldürüldü: İhtiyar Cragmaw",
+        "slain_shardlord_kazzix": "Öldürüldü: Parçabeyi Kazzix",
+        "slain_gleamstag": "Öldürüldü: Parıltılı Geyik",
+        "slain_old_marrowshell": "Öldürüldü: Yaşlı İlikkabuk",
+        "slain_aurelhorn": "Öldürüldü: Aurelhorn, Sürünün İlki",
+        "slain_drakemaw_broodlord": "Öldürüldü: Ejder Ağzı Yuva Lordu"
+      },
+      "accountScopeBadge": "Hesap",
+      "accountScopeNote": "Hesap koleksiyonu: bu hesaptaki her karakterde açık.",
+      "unknownRelic": "Kaydı olmayan yadigâr",
+      "sourceBossDungeon": "{dungeon} içindeki {boss} düşürür",
+      "sourceBoss": "{boss} düşürür",
+      "sourceZone": "{zone} bölgesinde bulunur",
+      "sourceProfession": "{profession} yoluyla kazanılır",
+      "sourceDeed": "{deed} yiğitliğiyle verilir",
+      "sourceVendor": "{vendor} satar",
+      "sourceBossZone": "{zone} bölgesindeki {boss} düşürür",
+      "sourceDelve": "{delve} mağara seferinde bulunur",
+      "sourceRift": "{rank} derecesindeki Yarık tamamlamalarından düşer",
+      "sourceQuest": "{quest} görevinin ödülü",
+      "sourceStore": "WOC Mağazası'ndan satın alınır",
+      "sourceActivityCorpseHarvest": "Yaratık leşlerini işlerken elde edilir",
+      "sourceActivityMasterworkCraft": "Bir şaheser üreterek kazanılır",
+      "sourceActivityRiftFirstClear": "Dereceli bir Yarık'ın ilk tamamlamasını kazanan grubun her üyesine verilir",
+      "cellMissingSourceAria": "{name}, henüz bulunmadı, {source}",
+      "cellOwnedClearsAria": "{name}, kataloglandı, ilk kez {count}. tamamlamada bulundu",
+      "searchPlaceholder": "Yadigâr ara",
+      "searchAria": "Yadigârlık'ta ada göre ara",
+      "searchEmpty": "Bu aramaya uyan yadigâr yok.",
+      "filterEmpty": "Bu süzgece uyan yadigâr yok.",
+      "filterGroupAria": "Yadigârları bulup bulmadığına göre süz",
+      "gridKeyboardHint": "Yadigârlar arasında gezinmek için ok tuşlarını, uçlara gitmek için Home ve End tuşlarını kullan.",
+      "filterAll": "Tümü",
+      "filterOwned": "Kataloglanmış",
+      "filterMissing": "Eksik",
+      "recentJumpAria": "{name} için sayfayı aç",
+      "recentEmpty": "Henüz bulunan yok. Bundan sonra kataloğa geçirdiğin yadigârlar buraya düşer.",
+      "nearlyEmpty": "Tamamlanmaya yaklaşan sayfalar burada toplanır.",
+      "stripNoMatch": "Burada aramana uyan bir şey yok.",
+      "shelfRecent": "Son bulunan: {name}",
+      "shelfNoFinds": "Bu rafta henüz kataloglanmış bir şey yok.",
+      "shelfOpenAria": "{name} rafını aç, {total} içinde {owned} doldu",
+      "sharedUniquesNote": "Genel toplamın her yadigârı yalnızca bir kez sayar; raf ve sayfa sayıları her yuvayı listeler, bu yüzden birden fazla sayfada görünen bir yadigâr her birinde ayrı ayrı sayılır.",
+      "charCompletionLabel": "Yadigârlık",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "Küratör",
+      "charOpen": "Yadigârlık",
+      "trackerLabel": "Yadigârlık",
+      "collapseHint": "Yadigârlık takipçisini daralt",
+      "expandHint": "Yadigârlık takipçisini genişlet",
+      "openWindowHint": "Yadigârlık'ı aç",
+      "pin": "Sabitle",
+      "unpin": "Sabitlemeyi kaldır",
+      "pinFull": "Takipçi dolu (en çok {cap} sayfa)",
+      "pinAria": "{name} sayfasını arayüz takipçisine sabitle",
+      "unpinAria": "{name} sabitlemesini kaldır",
+      "rarityLine": "Koleksiyoncuların {percent} kadarı buldu",
+      "pageRarityLine": "Koleksiyoncuların {percent} kadarı tezhipledi",
+      "cellAriaWithRarity": "{base}, {rarity}",
+      "cellAriaWithAccountScope": "{base}, {scope}"
+    },
     "deeds": {
       "title": "Yiğitlikler Kitabı",
       "close": "Yiğitlikler Kitabı'nı kapat",
@@ -3495,18 +3795,23 @@ export const tr_TR: EnTranslations = {
       "featRibbon": "Destan",
       "hiddenBadge": "Gizli",
       "titleChip": "Unvan ödülü",
+      "borderChip": "Çerçeve ödülü",
       "watch": "Takip Et",
       "unwatch": "Takibi Bırak",
       "watchFull": "Takip listesi dolu (en fazla {cap})",
       "watchAria": "{name} yiğitliğini ekrandaki takipçide takibe al",
       "unwatchAria": "{name} yiğitliğinin takibini bırak",
+      "cosmeticsSection": "Unvanlar ve çerçeveler",
       "titlesSection": "Unvanlar",
       "titlesAria": "Gösterilecek unvanını seç",
       "titlesNone": "Unvansız",
       "titlesEmpty": "Bu rafın kilidini açmak için unvan kazandıran bir yiğitliğe imza at.",
+      "bordersSection": "Çerçeveler",
+      "bordersNone": "Çerçeve yok",
+      "bordersEmpty": "Bu rafı açmak için çerçeve veren bir yiğitlik başar.",
       "unlockedBanner": "Yiğitlik kazanıldı: {name}",
       "unlockedTitleHint": "Yeni unvan kazanıldı: {title}. Yiğitlikler Kitabı'ndan seçebilirsin.",
-      "retroSummary": "Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi.",
+      "unlockedBorderHint": "Yeni çerçeve kazanıldı: {name}. Yiğitlikler Kitabı'ndan tak.",
       "broadcastLine": "{name} bir yiğitliğe imza attı: {deed}",
       "rarityLine": "Maceracıların {percent} kadarı kazandı",
       "trackerLabel": "Yiğitlikler",
@@ -3516,6 +3821,7 @@ export const tr_TR: EnTranslations = {
       "charTitleLabel": "Unvan",
       "charTitleNone": "Unvan seçilmedi",
       "charOpenBook": "Yiğitlikler Kitabı",
+      "charBorderWorn": "{name} (takılı)",
       "lbTab": "Ün",
       "lbTitleCol": "Unvan",
       "lbScopeNote": "Hesaplar ömür boyu kazandıkları Ün'e göre sıralanır. Her yiğitlik bir hesaptaki tüm karakterlerde bir kez sayılır.",
@@ -3534,7 +3840,7 @@ export const tr_TR: EnTranslations = {
       "levels": "Seviye {min} ile {max} arası"
     },
     "arenaGate": {
-      "minLevelNote": "Requires level {level}"
+      "minLevelNote": "Seviye {level} gerektirir"
     }
   },
   "gatherEvent": {
@@ -3598,7 +3904,9 @@ export const tr_TR: EnTranslations = {
       "delete_confirm": "Silmeyi onaylamak için karakter adını yazın.",
       "already_in_world": "Karakter zaten dünyada.",
       "taken_over": "Karakteriniz başka bir oturum tarafından devralındı.",
-      "rename_required": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır."
+      "rename_required": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.",
+      "invalid_appearance": "Bu görünüm kaydedilemedi. Tasarımı düzenleyip tekrar deneyin.",
+      "reroll_unavailable": "Bu karakterin kullanılabilir bir ücretsiz yeniden tasarım hakkı yok."
     },
     "moderation": {
       "suspended_until": "Bu hesap {date} tarihine kadar askıya alındı.",
@@ -3690,13 +3998,13 @@ export const tr_TR: EnTranslations = {
       "quests": "Görevler",
       "dungeons": "Zindanlar ve Akınlar",
       "delves": "Mağara Seferleri",
-      "rifts": "Rifts",
-      "mounts": "Mounts & Riding",
+      "rifts": "Yarıklar",
+      "mounts": "Binekler ve Binicilik",
       "reference": "Başvuru",
       "controls": "Denetimler",
-      "commands": "Slash Commands",
-      "interface": "Interface & HUD",
-      "editor": "World Editor",
+      "commands": "Eğik Çizgi Komutları",
+      "interface": "Arayüz ve HUD",
+      "editor": "Harita Editörü",
       "settings": "Ayarlar ve Performans",
       "combat": "Savaş",
       "talents": "Yetenekler",
@@ -3704,6 +4012,7 @@ export const tr_TR: EnTranslations = {
       "valeCup": "Vadi Kupası",
       "thornhollow": "Dikenvadi Ovası",
       "deeds": "Yiğitlikler Kitabı",
+      "reliquary": "Yadigârlık",
       "glossary": "Sözlük",
       "wishIKnew": "Keşke Bilseydim Dediklerim",
       "faq": "SSS",
@@ -3719,10 +4028,10 @@ export const tr_TR: EnTranslations = {
     "groups": {
       "start": "Başla",
       "compendium": "Derleme",
-      "world": "The World",
-      "character": "Your Character",
-      "endgame": "Group Content",
-      "compete": "Player versus Player",
+      "world": "Dünya",
+      "character": "Karakterin",
+      "endgame": "Grup İçeriği",
+      "compete": "Oyuncuya Karşı Oyuncu",
       "reference": "Başvuru"
     },
     "breadcrumb": {
@@ -3762,7 +4071,9 @@ export const tr_TR: EnTranslations = {
       "typeDelve": "Mağara Seferi",
       "typeTerm": "Terim",
       "typeAbility": "Yetenek",
-      "typeDeed": "Yiğitlik"
+      "typeDeed": "Yiğitlik",
+      "typeReliquaryPage": "Yadigârlık Sayfası",
+      "typeRelic": "Yadigâr"
     },
     "home": {
       "eyebrow": "Klasik tarz tarayıcı MMO'su",
@@ -3772,8 +4083,8 @@ export const tr_TR: EnTranslations = {
       "ctaLearn": "Nasıl Oynanır",
       "what": {
         "heading": "Klasik bir MMO, hemen başlanacak biçimde",
-        "pillarPlayTitle": "Tarayıcında oyna",
-        "pillarPlayBody": "İndirme yok, başlatıcı yok. Bir karakter yarat ve masaüstünde ya da telefonunda saniyeler içinde dünyaya gir.",
+        "pillarPlayTitle": "Siteyi aç ve oyna",
+        "pillarPlayBody": "İndirme yok, başlatıcı yok. Bir karakter yarat, saniyeler içinde dünyadasın, masaüstünde ya da telefonda. İstersen yerel uygulamalar da var.",
         "pillarClassesTitle": "Dokuz sınıf, üç rol",
         "pillarClassesBody": "Tankla, iyileştir ya da hasarı sen ver. Her sınıf, arketipine yakışan biçimde oynanır ve onu kendine özgü kılacak yetenekler sunar.",
         "pillarOpenTitle": "Ücretsiz ve açık kaynak",
@@ -3787,7 +4098,7 @@ export const tr_TR: EnTranslations = {
       "world": {
         "heading": "Dünyayı keşfet",
         "sub": "Tek bir kesintisiz toprak, üç bölge; sakin vadilerden donmuş zirvelere.",
-        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
+        "subCount": "Sakin vadilerden batık bataklıklara, kül çöllerinden donmuş yüksekliklere ve çit labirenti bahçelere uzanan, {zones} bölgeden oluşan tek bir kesintisiz toprak.",
         "levels": "Seviye {min} - {max}",
         "cta": "Dünyayı gör",
         "valeName": "Doğudere Vadisi",
@@ -3806,19 +4117,19 @@ export const tr_TR: EnTranslations = {
         "amberBlurb": "Batı uçurumlarının ardında hiç bitmeyen bir sonbahar ve altın rengi bir gölün üzerinde fenerler var.",
         "fenName": "Söğüt Bataklığı",
         "fenBlurb": "Sonbahar tacının ötesinde, söğütlerle ve durgun suyla dolu aydınlık bir bataklık ve bir hendeğin ardında bir kasaba var.",
-        "farshoreName": "The Farshore",
-        "farshoreBlurb": "An island across the sandbar, where the sky tears open over the Riftfields and Gullhaven rings its bell for every breach.",
-        "nightName": "The Nightbloom",
-        "nightBlurb": "A country of starry midnight where the flowers light the paths and Moonrest keeps its vigil.",
-        "hauntName": "The Wraithwood",
-        "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gallowmere are the only honest light on the road.",
-        "jungleName": "The Palmreach",
-        "jungleBlurb": "Palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.",
-        "gardenName": "The Evergarden",
-        "gardenBlurb": "A hedge-maze realm still trimmed by no gardener anyone has seen, entered past Hedgewick and its fountain courts.",
-        "galeName": "The Galecrest",
-        "galeBlurb": "Sea-cliffs and howling downs where the wind never rests and Wickharbor shuts its doors tight.",
-        "levelsCap": "Level {level}"
+        "farshoreName": "Uzak Kıyı",
+        "farshoreBlurb": "Kum setinin ötesindeki bir ada; gökyüzü Yarık Tarlaları'nın üzerinde yırtılır ve Gullhaven her gedik için çanını çalar.",
+        "nightName": "Gece Çiçeği",
+        "nightBlurb": "Çiçeklerin patikaları aydınlattığı ve Moonrest'in nöbetini tuttuğu, yıldızlı gece yarısı ülkesi.",
+        "hauntName": "Hayalet Ormanı",
+        "hauntBlurb": "Devasa ağaç tepelerinin altında lanetli bir orman; yolda tek dürüst ışık Gallowmere'in fenerleridir.",
+        "jungleName": "Palmiye Kıyısı",
+        "jungleBlurb": "Palmiyeler, beyaz kum ve gürültücü kuşlar; sahil kasabası Drifthaven kıyıda bir ateşi yanık tutar.",
+        "gardenName": "Sonsuz Bahçe",
+        "gardenBlurb": "Kimsenin görmediği bir bahçıvan tarafından hâlâ budanan bir çit labirenti diyarı; Hedgewick'in ve onun çeşme avlularının ardından girilir.",
+        "galeName": "Fırtına Sırtı",
+        "galeBlurb": "Rüzgârın hiç dinmediği ve Wickharbor'un kapılarını sıkı sıkı kapattığı deniz kayalıkları ve uluyan bozkırlar.",
+        "levelsCap": "Seviye {level}"
       },
       "group": {
         "heading": "Zorlu kısımlar için grup kur",
@@ -3841,7 +4152,7 @@ export const tr_TR: EnTranslations = {
         "a3": "Evet. Tarayıcında anında başlayan bir tek oyunculu mod, ayrıca paylaşılan çevrim içi dünya var.",
         "q4": "Azami seviyeye ulaşmak ne kadar sürer?",
         "a4": "Sınır, üç bölge boyunca görevler, zindanlar ve keşifle ulaşılan {cap}. seviyedir.",
-        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
+        "a4Count": "Sınır, görevler, zindanlar ve keşifle ulaşılan {cap}. seviyedir. Toplam {zones} bölge vardır ve en uzaktakiler zaten sınırdaki karakterler için tasarlanmıştır."
       },
       "community": {
         "heading": "Dünyaya katıl",
@@ -3874,26 +4185,26 @@ export const tr_TR: EnTranslations = {
       "questsTitle": "Görevler",
       "questsBody": "Başının üzerinde işaret olan kişilerden görev al, amacı tamamla ve deneyim, altın ve teçhizat için geri teslim et. Ekrandaki takipçi, hedeflerini göz önünde tutar.",
       "deathTitle": "Ölüm son değildir",
-      "deathBody": "Düşersen, bedenin düştüğü yerde kalır ve en yakın mezarlıkta bir hayalet olarak yükselirsin. Ruhunu bedenine geri koştur, olduğun yerde, cezasız biçimde diril; ya da mezarlıktaki Solgun Bekçi'yi kabul et ve geçici bir güçsüzlük pahasına anında dirilme. Yepyeni kahramanlar bu güçsüzlükten büsbütün muaftır ve sahip olduğun ya da kazandığın hiçbir şey asla kaybolmaz.",
+      "deathBody": "Düşersen bedenin düştüğü yerde kalır ve en yakın mezarlıkta hayalet olarak doğrulursun. Ruhunu bedenine geri koştur ve cezasız biçimde yerinde diril, ya da mezarlıktaki Solgun Bekçi'yi kabul et ve geçici bir zayıflık pahasına anında ayağa kalk. Yepyeni kahramanlar bu zayıflıktan tamamen muaftır ve sahip olduğun ya da kazandığın hiçbir şey asla kaybolmaz. Oyun sana bunu neyin yaptığını da söyler: sohbetindeki bir satır öldürücü darbeyi indireni adlandırır ve bu genellikle neyin ters gittiğini anlamanın en hızlı yoludur.",
       "groupingTitle": "Birlikte oynamak",
       "groupingBody": "Görev hakkını paylaşmak ve zindanlara girişmek için başkalarını gruba davet et. Dünyanın çoğu tek başına aşılabilir, yani gruplaşmak bir zorunluluk değil, bir tercihtir.",
       "onlineTitle": "Çevrim içi ya da çevrim dışı",
       "onlineBody": "Herkesle birlikte paylaşılan çevrim içi dünyada oyna ya da ipuçlarını öğrenmek için tarayıcında anında bir çevrim dışı dünya başlat.",
-      "reassure": "Yetenekler 10. seviyede açılır ve dövüş dışında olduğun her an sıfırlanabilir, bu yüzden erken seçimlerin asla kalıcı değildir. Gönlünce dene.",
+      "reassure": "Yetenekler 5. seviyede başlar ve toplamda altı sıra vardır, her biri 5, 8, 11, 14, 17 ve 20. seviyelerde birer tane. Her sıra üç seçenek arasından tek bir tercihtir ve dövüş dışındayken ve arena maçında değilken istediğin zaman sıfırlayabilirsin, dolayısıyla erken tercihlerin asla kalıcı değildir. Gönlünce dene.",
       "controlsLink": "Tam denetim başvurusunu gör",
-      "step0Title": "Get in",
-      "step0Body": "Offline play asks for nothing: choose Offline on the start screen and press Play. To play with everyone else, make a free account (a username, a password, and an email address for recovery) or sign in to the one you have, then pick a world from the World List.",
-      "worldsTitle": "Choosing a world",
-      "worldsBody": "Online play happens on worlds, and each one is a full copy of the game with its own players, its own World Market, and its own standings. The World List shows how busy each world is, from Low to Full, so pick a quiet one for elbow room or a busy one for company. Your characters live on the world you made them on, and you can keep characters on more than one.",
-      "charactersTitle": "Your characters",
-      "charactersBody": "One account can keep up to ten characters on each world, so there is room to try several classes without giving anything up. Deleting one is deliberate: the character has to be out of the world, and the game asks you to type its name before it will go. A deleted character is gone for good, and its World Market listings and Ravenpost mail go with it.\n\nOnce you have picked a class you get to decide what your hero looks like. A tabbed panel holds Body, Face, Hair, and Style: pick male or female, work the face over with a set of sliders and a choice of eyes, then choose a hair style and color and a skin tone, either from the named presets or from the color wheel behind them. A randomize button rolls a whole look if you would rather be surprised, and a reset puts your character back to the standard face for the body you chose. None of it touches how your character plays.",
-      "namesTitle": "Naming your hero",
-      "namesBody": "A name is 2 to 16 letters long, starts with a letter, and can hold spaces, hyphens, and apostrophes. No two characters on the same world can share one, and capitalization does not make a name free: if Ashwind is taken, ashwind is taken too. Your own spelling is kept exactly as you typed it. Pick a name you will be happy with, because it stays with the character.",
-      "connectionTitle": "If your connection drops",
-      "connectionBody": "A lost signal, a closed lid, or a page reload does not log you out. Your character is held in the world for about five minutes while the game reconnects on its own, and you come back to the same spot in the same session. That also means dropping out is not a way to leave a fight: your character is still standing there. Logging out from the game menu leaves at once instead of waiting, and so does signing in on another character on the same account."
+      "step0Title": "Oyuna gir",
+      "step0Body": "Çevrim dışı oynamak hiçbir şey istemez: başlangıç ekranında Çevrim Dışı'yı seç ve Oyna'ya bas. Herkesle birlikte oynamak için ücretsiz bir hesap oluştur (bir kullanıcı adı, bir parola ve kurtarma için bir e-posta adresi) ya da sahip olduğun hesaba giriş yap, sonra Dünya Listesi'nden bir dünya seç.",
+      "worldsTitle": "Bir dünya seçmek",
+      "worldsBody": "Çevrim içi oyun dünyalarda geçer ve her biri kendi oyuncuları, kendi Dünya Pazarı'yla ve kendi sıralamalarıyla oyunun tam bir kopyasıdır. Dünya Listesi her dünyanın ne kadar dolu olduğunu, Düşük'ten Dolu'ya kadar gösterir; rahat hareket etmek için sakin birini ya da eşlik için kalabalık birini seç. Karakterlerin, onları yarattığın dünyada yaşar ve birden fazla dünyada karakter tutabilirsin.",
+      "charactersTitle": "Karakterlerin",
+      "charactersBody": "Bir hesap her dünyada en fazla on karakter tutabilir, bu yüzden hiçbir şeyden vazgeçmeden birkaç sınıfı denemeye yer vardır. Bir karakteri silmek bilinçli bir eylemdir: karakterin dünyanın dışında olması gerekir ve oyun gitmeden önce adını yazmanı ister. Silinen bir karakter sonsuza dek gider ve Dünya Pazarı ilanları ile Kuzgun Postası mektupları da onunla birlikte gider.\n\nBir sınıf seçtikten sonra kahramanının nasıl göründüğüne karar verirsin. Sekmeli bir panel Vücut, Yüz, Saç ve Stil'i tutar: erkek ya da kadın seç, yüzü bir dizi kaydırıcı ve göz seçeneğiyle şekillendir, ardından bir saç stili ve rengi ile bir ten rengi seç, ister adlandırılmış hazır ayarlardan ister arkalarındaki renk çarkından. Şaşırmayı yeğlersen bir rastgele düğmesi bütün bir görünümü zar atar, bir sıfırlama ise karakterini seçtiğin vücut için standart yüze geri döndürür. Bunların hiçbiri karakterinin nasıl oynadığına dokunmaz.",
+      "namesTitle": "Kahramanına ad verme",
+      "namesBody": "Bir ad 2 ile 16 harf arasındadır, bir harfle başlar ve boşluk, tire ve kesme işareti içerebilir. Aynı dünyada iki karakter aynı adı paylaşamaz ve büyük-küçük harf bir adı boşa çıkarmaz: Ashwind alınmışsa ashwind de alınmıştır. Kendi yazımın tam olarak yazdığın gibi korunur. Memnun kalacağın bir ad seç, çünkü karakterle birlikte kalır.",
+      "connectionTitle": "Bağlantın koparsa",
+      "connectionBody": "Kaybolan bir sinyal, kapanan bir kapak ya da sayfa yenileme seni oturumdan atmaz. Oyun kendiliğinden yeniden bağlanırken karakterin dünyada yaklaşık beş dakika tutulur ve aynı oturumda aynı noktaya geri dönersin. Bu aynı zamanda bağlantının kopmasının bir dövüşten çıkmanın yolu olmadığı anlamına gelir: karakterin hâlâ orada durur. Oyun menüsünden çıkış yapmak beklemek yerine anında ayrılır, aynı hesapta başka bir karaktere giriş yapmak da öyle."
     },
     "controls": {
-      "intro": "Masaüstü için varsayılan tuşlar. Esc dışında her atama oyunun seçenekler menüsünden değiştirilebilir; Esc ise her zaman oyun menüsünü açar. Bir atama Shift+Z gibi bir değiştirici kombinasyonu da olabilir.",
+      "intro": "Masaüstü için varsayılan tuşlar. Buradaki her atama, oyun menüsündeki Tuş Atamaları panelinden değiştirilebilir; tek istisna, her zaman o menüyü açan Esc'tir. Her eylem en fazla iki tuş taşır, bir ana ve bir alternatif, ve bir atama Shift+Z gibi bir değiştirici bileşimi olabilir. Fare düğmesi de olabilir: orta düğme M3, başparmak düğmeleri M4 ve M5'tir, sonraki düğmeler oradan yukarı sayılır. Sol ve sağ tık kameraya, tıklayarak harekete ve dünyadaki şeylere tıklamaya ayrılmış kalır.",
       "keyHeader": "Tuş",
       "actionHeader": "Aksiyon",
       "groupMovement": "Hareket",
@@ -3902,9 +4213,10 @@ export const tr_TR: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Yetenekler",
       "professions": "Meslekler",
-      "arena": "Arena",
+      "arena": "PvP penceresi (arenalar ve Dikenvadi Ovası)",
       "leaderboard": "Lider Tablosu",
       "deeds": "Yiğitlikler Kitabı",
+      "reliquary": "Yadigârlık",
       "sheathe": "Silahı Kın'a Tak / Çıkar",
       "crafting": "Üretim",
       "valeCup": "Vadi Kupası",
@@ -3913,6 +4225,7 @@ export const tr_TR: EnTranslations = {
       "dungeonFinder": "Zindan Bulucu",
       "discord": "Discord",
       "abilities": "Eylem çubuğu yeteneklerini kullan (rakam sırası; ikinci bir çubuk sayı tuş takımında yer alır)",
+      "targetPrev": "Hedefler arasında geri geç",
       "targetFriendly": "En yakın dostu hedefle",
       "cycleFriendly": "Dost hedefler arasında geç",
       "targetAuras": "Hedefin güçlendirme ve zayıflatmaları",
@@ -3922,42 +4235,42 @@ export const tr_TR: EnTranslations = {
       "arrowKeys": "Ok Tuşları",
       "groupPet": "Evcil komutları",
       "petBar": "Evcil çubuğu: Saldır, Dur, Tahrik, Savunmacı, Saldırgan (bir Avcı ya da Karabüyücü evcili çıkınca)",
-      "attackMoveNote": "Bir tane daha, varsayılan olarak kapalı: seçeneklerden Saldır-Yürü'yü etkinleştirerek bir tuş ayırın (seçenek açıkken A); bu tuş sizi imlecinize doğru yürütür ve altındaki düşmana ya da yol boyunca karşılaşılan ilki üzerine saldırıya geçer.",
+      "attackMoveNote": "Saldırı hareketi sen açana kadar kapalı kalır: Tuş Atamaları panelini aç, aç düğmesine bas, ve yukarıdaki A satırı çalışmaya başlar. İmleç oyun dünyasının üzerindeyken seni imlece doğru yürütür ve altındaki düşmana ya da yolda karşılaştığın ilk düşmana ateş açtırır. Seçenek açıkken A sola dönmek yerine bu saldırı hareketini yapar, o yüzden sol ok tuşuyla dön; Sola dön varsayılan olarak onu da taşır, ya da Sola dön için kendi tuşunu ata.",
       "mobileHeading": "Mobilde",
       "mobileBody": "Dokunmatik kontroller telefonlarda ve tabletlerde otomatik olarak belirir: solda bir hareket çubuğu, bakmak için başka herhangi bir yere sürükleme, kamerayı yakınlaştırmak için iki parmakla kıstırma ve yetenekleriniz ile menüleriniz için ekran üstü düğmeler. Sol üst köşedeki küçük bir ok menü düğmelerini gösterir ya da gizler ve oradaki Daha Fazla düğmesi pencerelerinizin geri kalanını tutar.",
       "controllerHeading": "Oyun kumandasıyla",
       "controllerBody": "Oyun kumandaları da çalışır ve kumanda desteği varsayılan olarak açıktır. Sol çubuk hareket ettirir, sağ çubuk kamerayı yöneltir, yüz ve omuz düğmeleri ise yeteneklerinizi, zıplamayı ve etkileşimi karşılar. Çantalarınız gibi bir pencere açtığınızda ekran üstü bir işaretçi belirir ve oyun menüsü doğrudan yön tuşları ve yüz düğmeleriyle gezinir. Düğmeleri yeniden atayabilir ve çubuk ölü bölgesini, kamera hızını, titreşimi ve ters bakışı seçeneklerdeki kumanda ayarlarından düzenleyebilirsiniz.",
-      "moveAlt": "Move and turn (the same four actions, on their second key)",
-      "jumpSwim": "Jump, and swim up while you are in the water",
-      "swimDown": "Swim down while you are in the water (hold)",
-      "swimNote": "Swimming uses two keys: hold Space to rise and LCtrl to sink. Aiming the camera down while you swim forward dives as well, so you can steer your depth with the view. LCtrl is the one default that is a modifier key on its own, and a lone modifier press is ignored while you are binding, so pick a key that is not a modifier if you rebind Swim Down.",
-      "bgFlag": "Take the enemy flag in Thornhollow Fields",
-      "attackMove": "Attack Move (only once you switch the option on)",
-      "meters": "Damage meters (damage, healing, and threat)",
-      "petMark": "Pet: Mark, select your own pet (the same as clicking its frame)",
-      "onBarBinding": "You can also bind straight from the bar: choose Edit action bar keys in the Key Bindings panel, then click a slot on the live bar and press the key you want. Click Done when you are finished. This one is desktop only, since it needs a physical keyboard.",
-      "clickMoveNote": "Click to Move is off until you switch it on: open the Key Bindings panel in the game menu, turn on Click to Move, then use the Click Move Button row under it to choose which mouse button does the walking (Left Click by default, or Right Click). Once it is on, clicking a spot on the ground sends you walking there, with a marker on the ground showing where you are headed. Clicking a creature or another player walks you over to them and stops in range, while that click still does its usual job of targeting or interacting; if you are already close enough to reach what you clicked, you simply interact and stay where you are. Any of the movement keys takes control straight back and ends the trip, and so does holding the mouse button to look around. Jumping does not, so you keep travelling through the hop, and opening the game menu only pauses the trip, which carries on when you close the menu."
+      "moveAlt": "Hareket et ve dön (aynı dört eylem, ikinci tuşlarında)",
+      "jumpSwim": "Zıpla, ve suyun içindeyken yüzerek yüksel",
+      "swimDown": "Suyun içindeyken aşağı yüz (basılı tut)",
+      "swimNote": "Yüzmek iki tuş kullanır: yükselmek için Space’i, dalmak için LCtrl’yi basılı tutun. İleri yüzerken kamerayı aşağı doğrultmak da dalmanızı sağlar, böylece derinliğinizi görüşünüzle yönlendirebilirsiniz. LCtrl, tek başına bir değiştirici tuş olan tek varsayılandır, ve atama yaparken tek başına bir değiştirici basışı yok sayılır, bu yüzden Aşağı Yüz’ü yeniden atarsanız değiştirici olmayan bir tuş seçin.",
+      "bgFlag": "Dikenvadi Ovası'nda düşman sancağını al",
+      "attackMove": "Saldır-Yürü (yalnızca seçenek açıkken)",
+      "meters": "Hasar sayaçları (hasar, iyileştirme ve tehdit)",
+      "petMark": "Yoldaş: Hedefle, kendi yoldaşını seç (çerçevesine tıklamakla aynı)",
+      "onBarBinding": "Doğrudan çubuktan da atama yapabilirsiniz: Tuş Atamaları panelinde Eylem çubuğu tuşlarını düzenle’yi seçin, ardından canlı çubukta bir yuvaya tıklayıp istediğiniz tuşa basın. Bitirdiğinizde Bitti’ye tıklayın. Bu, fiziksel bir klavye gerektirdiğinden yalnızca masaüstünde kullanılabilir.",
+      "clickMoveNote": "Tıklayarak Hareket, siz açana kadar kapalıdır: oyun menüsündeki Tuş Atamaları panelini açın, Tıklayarak Hareket’i açın, ardından hangi fare düğmesinin yürüteceğini seçmek için altındaki Tıkla-Hareket Et Düğmesi satırını kullanın (varsayılan olarak Sol Tık, ya da Sağ Tık). Açık olduğunda, yerdeki bir noktaya tıklamak sizi oraya doğru yürütür ve yerde nereye gittiğinizi gösteren bir işaretçi belirir. Bir yaratığa ya da başka bir oyuncuya tıklamak sizi onlara doğru yürütüp menzilde durdurur, ve bu tıklama yine de hedefleme ya da etkileşim gibi olağan işini yapar; tıkladığınız şeye zaten yeterince yakınsanız, sadece etkileşime girer ve olduğunuz yerde kalırsınız. Hareket tuşlarından herhangi biri kontrolü doğrudan geri alır ve yolculuğu sonlandırır, etrafa bakmak için fare düğmesini basılı tutmak da öyle. Zıplamak bunu yapmaz, bu yüzden sıçrama boyunca yolculuğa devam edersiniz, ve oyun menüsünü açmak yalnızca yolculuğu duraklatır, menüyü kapattığınızda ise devam eder."
     },
     "settingsPage": {
       "heading": "Ayarlar ve Performans",
       "intro": "Oyunun en iyi şekilde görünmesini sağlayın veya en hızlı şekilde çalıştırın. Üç hazır ekipman ve ayrıca her grafik seçeneğinin gerçekte yaptığı şey.",
-      "wherePath": "Bu sayfadaki her şey oyunun içindedir: seçenekleri açmak için Esc tuşuna basın. Menü, sabitlenmiş temel ayarların bir Genel Bakış ekranıyla açılır ve kategoriler onun yanındaki bir rayda yer alır: aşağıdaki ayarlar Ekran grubundaki Grafikler, Arayüz ve Erişilebilirlik başlıkları altında, Performans Arayüzü ise Sistem altında bulunur. Daha da hızlısı, üstteki arama kutusuna bir ad yazıp doğrudan ona atlayın.",
+      "wherePath": "Bu sayfadaki her şey oyunun içinde yaşar: oyun menüsünü açmak için Esc'e bas. Panelleri düğmeler halinde sıralar: Tuş Atamaları, Oyun Kolu, Grafikler, Arayüz, Auralar, Ses ve Performans Kaplaması; altlarında Wiki, Kurtul, Çıkış Yap ve Oyuna Dön bulunur, çevrimiçi oynarken listeye Hata Bildir de katılır. Grafikler ve Arayüz burada anlatılanların neredeyse hepsini barındırır.",
       "fairnessTitle": "Tasarım gereği fuar",
-      "fairnessBody": "Burada güzelliği güçle takas eden hiçbir seçenek yok. Lower ayarları yalnızca kozmetik cilayı değiştirir, asla savaştığınız bilgileri değiştirmez: debuff'larınız, kullanım çubuklarınız, grup sağlığınız ve hasar numaralarınız Low ile Ultra arasında aynıdır. Mütevazı bir makinede oynamak asla bir dezavantaj değildir.",
+      "fairnessBody": "Buradaki hiçbir seçenek güzelliği güce takas etmez. Daha düşük ayarlar yalnızca kozmetik cilayı bırakır, savaşırken kullandığın bilgiyi asla: zayıflatmaların, büyü çubukların, grup canı ve hasar sayıların Low'dan Insane'e kadar aynıdır. Mütevazı bir makinede oynamak asla bir dezavantaj değildir.",
       "loadoutsHeading": "Üç hazır yükleme",
       "loadoutsIntro": "Makinenize benzeyen ekipmanla başlayın, ardından size doğru gelene kadar her seferinde bir seçeneği ayarlayın.",
       "recommended": "Tavsiye edilen",
       "whyLabel": "Neden işe yarıyor:",
-      "tagReload": "yeniden yükledikten sonra",
+      "tagReload": "Uygula'ya bas",
       "fpsTitle": "En iyi FPS",
       "fpsTagline": "Daha eski dizüstü bilgisayarlar, entegre grafikler ve pille çalışma için.",
       "fpsWhy": "Grafik Kalitesi ana anahtardır ve İşleme Kalitesi en güçlü kaydırıcıdır: %70'te dünya piksellerin kabaca yarısını çekerken arayüz mükemmel derecede keskin kalır.",
       "balancedTitle": "Dengeli",
       "balancedTagline": "Çoğu makine için en uygun nokta ve varsayılan tavsiyemiz.",
-      "balancedWhy": "Medium gerçek gölgeler ve dolu materyaller getiriyor; High ortam tıkanıklığını ve çiçeklenmeyi ekler. Ultra'ün altında yerleşik bir güvenlik ağı, yoğun kavgalarda ani düşüşleri emer, böylece Dengeli, bebek bakıcılığı gerektirmeden sorunsuz kalır.",
+      "balancedWhy": "Medium gerçek gölgeleri ve tam malzemeleri getirir, High ise üstüne ortam örtüşmesi ve bloom ekler. Yerleşik güvenlik ağı her kademede kurulu kalır, böylece Balanced yoğun bir dövüşü sen başında beklemeden atlatır.",
       "visualsTitle": "En İyi Görseller",
       "visualsTagline": "Güçlü masaüstü makineler için ekran görüntüsü modu.",
-      "visualsWhy": "Ultra, ekranınızın sunduğu en zengin ışıklandırmayla en yüksek çözünürlükte oluşturulur. Ayrıca güvenlik ağını da kapatır ve yalnızca masaüstünde kullanılabilir: telefonlar ve uygulama High'de zirveye çıkar.",
+      "visualsWhy": "Ultra, ekranının sunduğu en yüksek çözünürlükte ve en zengin ışıklandırmayla işler. Onun üstünde her şeyin açık olduğu vitrin olan Insane durur: onu elle seçmen gerekir, çünkü makinen ne kadar güçlü olursa olsun oyun onu senin yerine asla seçmez.",
       "value50to70": "%50 ila %70",
       "value90to100": "%90 - %100",
       "value100": "%100",
@@ -3965,16 +4278,16 @@ export const tr_TR: EnTranslations = {
       "valueOnOptional": "Açık (isteğe bağlı)",
       "howHeading": "Seçeneklerin nasıl davrandığı",
       "factDetectTitle": "Oyun önce kendini ayarlar",
-      "factDetectBody": "İlk başlatışınızda oyun cihazınızı okur ve mütevazı bir telefondaki Low'dan güçlü bir masaüstündeki Ultra'e kadar mantıklı bir katman seçer. Kendi yaptığınız herhangi bir seçim her zaman kazanır.",
+      "factDetectBody": "İlk açılışta oyun cihazını okur ve senin için makul bir kademe saklar. Her telefon ve tablet Low'da başlar ki doğrudan dünyaya girebilesin; eski ya da yazılım tabanlı bir ekran kartı da öyle. Güçlü bir masaüstü Ultra'da başlar, makine bellek açısından dar görünüyorsa High'da. Oyunun yerleştiremediği her şey Medium'da kalır. Kendi yaptığın her seçim daima kazanır ve öyle kalır.",
       "factReloadTitle": "İki çeşit seçenek",
-      "factReloadBody": "Grafik Kalitesi ve Gelişmiş seçiciler, yeniden yükleme sonrasında devreye girer ve gerektiğinde panelde Şimdi Yeniden Yükle düğmesi sunulur. Diğer tüm seçenekler, değiştirdiğiniz anda geçerli olur.",
+      "factReloadBody": "Grafikler paneli bir taslağı düzenler. Grafik Kalitesi'ni ya da ayrıntı düğmelerinden birini değiştir, sonra Uygula'ya bas; oyun dünyayı durduğun yerde, yeniden yükleme olmadan kurar. Düğmenin yanındaki satır ne zaman tamamlandığını söyler. Diğer her seçenek, o panelde ve başka her yerde, değiştirdiğin anda geçerli olur ve yalnızca tümüyle başarısız olan bir yeniden kurulum sana onun yerine bir yeniden yükleme düğmesi sunar.",
       "factGovernorTitle": "Yerleşik bir güvenlik ağı",
-      "factGovernorBody": "Ultra'ün altındaki her kademede oyun, büyük bir kavganın arttığı an için çimleri, efektleri ve ışıklandırmayı sessizce inceltiyor ve ardından bunları yeniden canlandırıyor. Ultra'ü seçmek her ayrıntıyı saklamayı tercih ettiğinizi gösterir.",
-      "factSearchTitle": "Önce arama bulur",
-      "factSearchBody": "Bir seçeneğin nerede olduğundan emin değil misiniz? Menünün üstündeki arama kutusuna yazın. Yaygın ifadeleri de anlar, örneğin fps yazınca FPS göstergesini bulur ve bir sonucu seçmek sizi doğrudan o ayara götürüp onu vurgulu bırakır.",
-      "advancedHeading": "Gelişmiş ön ayar: kendinizinkini karıştırın",
-      "advancedBody": "Gelişmiş, High seviyesinden başlar ve dört ekstra seçicinin kilidini açar, böylece karelerinizi gerçekten fark ettiğiniz yerde geçirebilirsiniz: Arazi Detayı, Yeşillik Yoğunluğu, Efektler ve Aydınlatma ve Gölge Kalitesi. Grafik Kalitesi gibi, yeniden yükleme sonrasında uygulanırlar.",
-      "advancedMixes": "En sevdiğiniz iki karışım: Gölge Kalitesini High'de tutun ve ışık veren net, parlamayan bir görünüm için Efektler ve Aydınlatma'yı Low olarak ayarlayın veya çiçeklenmeyi korumak ve gölgeleri yumuşatmak için tam tersini yapın.",
+      "factGovernorBody": "Her kademe kurulu bir güvenlik ağı tutar: büyük bir dövüş sıçradığında oyun sessizce çimeni, efektleri ve ışıklandırmayı bir an seyreltir, sonra geri getirir. Ultra ve Insane bunu yapmadan önce yalnızca çok daha uzun bekler, böylece üst düzey bir ön ayar tek bir yavaş kareden asla rahatsız olmaz.",
+      "factSearchTitle": "Bir ayarın yeri",
+      "factSearchBody": "Arama kutusu yok, bu yüzden menünün biçimini bilmek işe yarar. Grafikler kartlar halinde düzenlenmiştir: Kalite, Dünya Ayrıntısı, Işıklandırma ve Efektler, Kamera, Ekran ve Sistem, dokunmatik ekranda ayrıca Dokunmatik Kontroller. Arayüz dört sekmeye bölünmüştür: Genel, Pencereler, Sohbet ve Dövüş. Bir ayar dünyanın nasıl çizildiğini değiştiriyorsa Grafikler'dedir, arayüzün sana ne gösterdiğini değiştiriyorsa Arayüz'dedir.",
+      "advancedHeading": "Ayrıntı düğmeleri ve Advanced karışımı",
+      "advancedBody": "Ayrıntı düğmelerini görmek için Advanced seçmen gerekmez. Grafikler paneli onları her zaman iki kartta gösterir: Dünya Ayrıntısı; Arazi Ayrıntısı, Yaprak Yoğunluğu, Yüzey Ayrıntısı, Görüş Mesafesi, Su Kalitesi ve Karakter Ayrıntısı'nı, Işıklandırma ve Efektler ise Efektler ve Işıklandırma, Gölge Kalitesi, Ortam Örtüşmesi, Bloom, Kenar Yumuşatma, Dinamik Işıklar ve Parçacık Efektleri'ni barındırır. Sabit bir ön ayar altında her düğme o ön ayarın kabaca nerede durduğunu gösterir.",
+      "advancedMixes": "İki gözde karışım: Gölge Kalitesi'ni yüksek tut ve Efektler ve Işıklandırma'yı Low'a al; hafif çalışan, keskin ve parıltısız bir görünüm elde edersin, ya da tersini yap ve bloom'u koruyup gölgeleri yumuşat. Karıştırmadan önce bilinmesi gereken bir şey: Ortam Örtüşmesi, Bloom ve Kenar Yumuşatma, Efektler ve Işıklandırma ile aynı zincire asılıdır, dolayısıyla o düğme Low'dayken üzerinde çalışacakları bir şey kalmaz.",
       "tableHeading": "Her grafik seçeneği açıklandı",
       "colSetting": "Ayar",
       "colDoes": "Ne işe yarar",
@@ -3991,286 +4304,286 @@ export const tr_TR: EnTranslations = {
       "rowBrowserEffects": "Arayüzün kendisinin ne kadar süslü olmasına izin veriliyor: cam bulanıklığı, parıltı, animasyonlu menüler. Otomatik olarak tarayıcınızla eşleşir; 3D dünyasına her iki durumda da dokunulmaz.",
       "rowTerrainDetail": "Daha basit, daha hızlı bir arazi görünümüne karşı zengin, harmanlanmış zemin dokuları.",
       "rowFoliageDensity": "Karakterinizin etrafındaki çimlerin ne kadar uzağa ve ne kadar kalın büyüdüğü.",
-      "rowEffectsQuality": "Bloom, ortamın kapanması ve kaç tane meşale ve büyünün gerçek ışık saçtığı. Gelişmiş toplayıcılar arasında en büyük tasarruf.",
+      "rowEffectsQuality": "Bloom, ortam örtüşmesi ve kaç meşale ile büyünün gerçek ışık saçtığı. Ayrıntı düğmeleri arasındaki tek başına en büyük tasarruf ve diğer ışıklandırma düğmelerinin bağlı olduğu anahtar.",
       "rowShadowQuality": "Gölge netliği. Low gölgeleri korur ancak kenarlarını yumuşatır.",
       "rowFrostedPanels": "Pencerelerin arkasında buzlu cam bulanıklığı. Güzel ve tam olarak daha zayıf bir tarayıcının hissettiği türden bir etki; Klasik net görünüm için onu bırakın.",
       "rowReduceMotion": "Pencerelerin anında görünmesi için arayüz animasyonlarını kaldırır. Öncelikle küçük bir performans bonusuyla erişilebilirlik seçeneği.",
       "rowPerfOverlay": "FPS, kare süresi ve daha fazlasının ekrandan okunması. Bu sayfayı ayarlarken açın, ardından tekrar gizleyin.",
-      "tableFoot": "Bir çekme mesafesi kaydırıcısı veya FPS başlığı mı arıyorsunuz? Aranacak hiçbir şey yok: Görüş mesafesi her kalite katmanının bir parçasıdır ve çerçeve ilerleme hızı ekranınızı takip eder.",
+      "tableFoot": "FPS sınırı mı arıyorsun? Aranacak bir şey yok: kare temposu ekranını izler. Çizim mesafesi, Dünya Ayrıntısı kartındaki Görüş Mesafesi adlı kendi düğmesidir ve sen onu oynatana kadar her ön ayar onu senin için belirler.",
       "mobileTitle": "Telefonlarda ve tabletlerde",
-      "mobileBody": "Mobil sizin için daha fazlasını yönetir: Oyun katmanı seçer, pili ve ısıyı korumak için çözünürlüğü bir dokunuş daha düşük tutar ve en yüksek katmanları yalnızca masaüstünde tutar. Yukarıdaki yüklemeler hala geçerlidir; telefonlar High'de doruğa ulaşır.",
-      "touchBody": "Dokunmatik ekranda seçenekler kendine ait bir konfor kümesi de kazanır: oyun çubuğu boyutu ve duyarlılığı, ekran üstü düğme boyutu ve saydamlığı, solaklar için aynalanmış bir yerleşim, isteğe bağlı bir kamera çubuğu ve ters dokunmatik bakış; böylece ekran, tersi yerine ellerinize uyar.",
+      "mobileBody": "Telefon ya da tablette oyun seni Low'da başlatır. Her dokunmatik cihaz ilk açılışta bilerek oraya iner ki dünyaya girip oynayabilesin; istediğin zaman Grafikler panelinden kendin yükselt. Android tarayıcısında merdivenin tamamı sana açıktır ve seçimin kalıcıdır. iPhone ve iPad'de en üst ön ayarları yine seçebilirsin ve Uygula'ya basar basmaz tutarlar, ancak oyun bir sonraki açılışta seni High'a geri alır, çünkü iOS bu büyüklükte bir sahne kurulurken sekmeyi sonlandırabilir. İndirilen uygulama daha da dardır: ön ayar listesi High'da biter ve tek tek sistem düğmeleri gizlidir, çünkü uygulama onları kendisi yönetir.",
+      "touchBody": "Dokunmatik ekranda Grafikler paneli kendine ait bir Dokunmatik Kontroller kartı kazanır: joystick boyutu ve ölü bölgesi, ekran düğmelerinin boyutu, kontrollerin saydamlığı, isteğe bağlı bir kamera çubuğu, solaklar için aynalanmış bir yerleşim ve ters dokunmatik bakış; böylece ekran senin ellerine uyar, tersi değil.",
       "audioTitle": "Ses ve dil",
-      "audioBody": "Seçenekler penceresi sadece piksellerden ibaret değildir. Bir Ses kategorisi efektler, müzik ve konuşma için ayrı ses düzeyi denetimleri tutar; Arayüz kategorisi ise tüm arayüzü anında, yeniden yükleme gerekmeden yeniden yerelleştiren bir dil seçici ve pencere görünümü için bir tema seçici barındırır. Dil ayrıca Genel Bakış'ta ilk sıraya sabitlenmiştir, böylece menüyü açmaktan hep bir adım ötededir.",
-      "autolootBody": "Her cesede tıklamamayı mı yeğlersiniz? Varsayılan olarak kapalı bir arayüz seçeneği, kendi öldürdüklerinizin ganimetini yanlarından geçerken toplayıverir.",
-      "panelsMoreBody": "The two panels this page does not table are worth a look anyway. Auras is where you shape the big on-screen alerts that fire when one of your class procs comes up: which ones show, their size, color, opacity, and where they sit on screen. Performance Overlay is the readout you turn on while you tune this page, then hide again.",
-      "valueUltraOrInsane": "Ultra, or Insane if you want everything",
-      "advancedLadder": "Move any one of them and the quality preset switches to Advanced, seeded from exactly the levels you were looking at, so your custom mix starts from what you already saw rather than from scratch. Press Apply when you like it. Advanced sits at the end of the preset list for that reason: it is the expert profile where your own mix lives.",
-      "rowSurfaceDetail": "The worn detail layer on stone and paving, from off to a full parallax finish. It is the town-street dial: the more of it you keep, the busier a paved street is to draw.",
-      "rowViewDistance": "How far into the distance the world is drawn before it fades out. Each preset sets it for you until you move it yourself.",
-      "rowWaterQuality": "How lakes, rivers, and the open sea are shaded, from flat and cheap to fully reflective.",
-      "rowCharacterDetail": "How far away other characters keep their full animated rig before they drop to a simpler one. Higher is kinder to the eye in a crowded hub, and heavier.",
-      "rowAmbientOcclusion": "The soft contact shadow where surfaces meet. Off, half resolution, or full.",
-      "rowBloom": "The gentle glow around bright light, fire, and spell effects.",
-      "rowAntiAliasing": "Smooths the jagged edges of distant geometry. Cheap, and worth keeping on most machines.",
-      "rowDynamicLights": "How many torches, campfires, and spells cast real light into the scene around them.",
-      "rowParticleEffects": "How thick the spell, weather, and ambient particle work is allowed to get.",
-      "rowCameraSpeed": "How quickly the camera swings when you look around with the mouse.",
-      "rowTouchLookSpeed": "The same thing for swipe-look, and it only appears when you are on a touchscreen.",
-      "rowFullscreen": "Fills the whole screen with the game.",
-      "rowWaterRipples": "Wakes and ripples that spread out behind you as you swim. Off by default, and the one water effect that costs real frames; splashes and bubbles are unaffected either way.",
-      "rowOverflowXp": "At maximum level, whether your bar keeps filling with overflow experience or shows the classic static max-level text instead.",
-      "rowInterfaceMode": "Whether you get the desktop interface or the on-screen touch controls. Auto reads your device, and you can force either one: a tablet with a keyboard can take the desktop layout, and a touchscreen laptop can take the touch controls.",
-      "interfaceHeading": "The Interface panel",
-      "interfaceIntro": "Interface is the biggest panel in the game, and it is split into four tabs. Nothing in here changes what the world can do to you: it changes what you are shown and how large it is. These are the rows most worth knowing about.",
-      "interfaceFoot": "That is not all of them. Every tab carries more sliders and switches than are worth tabling here, so open it once and read down the list. It is five minutes well spent.",
-      "ifGeneralIntro": "Scale, contrast, and what the interface shows about you. The language and theme pickers sit at the top of this tab too.",
-      "ifFramesIntro": "Your own frame, your target frame, and the whole party layout. The party cluster also carries scale, width, height, spacing, and column sliders so a raid grid fits your screen, and a Reset button at the foot of the tab puts every frame back where it started.",
-      "ifChatIntro": "How the chat window reads. A reset for the chat windows themselves lives here as well.",
-      "ifCombatIntro": "How your bars behave and what combat puts on screen.",
-      "ifUiScale": "Scales the whole interface at once. It lands when you let go of the slider, so the window under your cursor does not move while you drag it.",
-      "ifHudOpacity": "How solid the HUD panels are over the world behind them.",
-      "ifTooltipScale": "Tooltip text size, handy on a small screen or a very large one.",
-      "ifHighContrastText": "Heavier, higher-contrast interface text. An accessibility option first, and a good one on a bright screen.",
-      "ifHighContrastBackground": "A plainer, higher-contrast background behind the start and character screens.",
-      "ifInvertLookY": "Flips the up and down direction of mouse look.",
-      "ifShowItemLevel": "Adds an item level line to every item tooltip. Off by default, which keeps the classic stat-only tooltip.",
-      "ifShowPlaytime": "Shows your lifetime time played on the character sheet. On by default, and the sheet has an eye button that flips it per device, which is handy if you stream or take screenshots. The total keeps counting either way.",
-      "ifShowOwnNameplate": "Draws your own overhead nameplate exactly as other players see it, flair and all. Turn it off for the classic view.",
-      "ifShowPlayerNameplates": "Draws other players nameplates. Off declutters a crowded hub, and your current target stays readable either way.",
-      "ifWallet": "Whether your wallet is shown on the character screen. There is a matching switch for the player card.",
-      "ifDailyChest": "Whether the daily rewards chest sits on your HUD.",
-      "ifPlayerFrameScale": "The size of your own unit frame.",
-      "ifTargetFrameScale": "The size of your target frame.",
-      "ifPartyStyle": "The party layout: Automatic follows your group size, Classic is the traditional stack, and Raid packs everyone into the compact grid.",
-      "ifPartyHealthText": "What the party bars print: nothing, a percentage, current health, or current and maximum.",
-      "ifPartySort": "The order party members are listed in: group order, role, or name.",
-      "ifPartyShowAuras": "Whether buffs and debuffs show on the party frames. Matching switches cover resource bars, absorbs, pets, and whether you appear in your own party list.",
-      "ifAurasOnPlayerFrame": "Puts your buffs and debuffs on your own unit frame as well as the aura bar.",
-      "ifTargetOfTarget": "Shows who your target is targeting, the classic way to tell whether the tank still has it.",
-      "ifPetFrame": "Shows a frame for your pet.",
-      "ifChatFontScale": "Chat text size.",
-      "ifChatOpacity": "How solid the chat background is.",
-      "ifCompactChat": "Tightens the chat lines so more of them fit.",
-      "ifChatTimestamps": "Adds a time to each chat line, in 12-hour or 24-hour form.",
-      "ifStartAttack": "Whether using an ability also starts your auto-attack. On by default, and the classic behavior most players expect.",
-      "ifStopAutoAttack": "Whether switching targets stops your swing. Off by default, so your attack carries over to the new target.",
-      "ifShowAttackButton": "Puts an explicit Attack button on your action bar.",
-      "ifWalkByAutoloot": "Scoops the loot from your own kills as you walk past them. Off by default.",
-      "ifGroundReticle": "Shows the ground circle while you are aiming a placed spell.",
-      "ifMouseoverCast": "Lets a heal or a friendly spell land on the party frame you are hovering, without changing your target.",
-      "ifStickyTarget": "Keeps your current target when you click on empty ground, instead of clearing it.",
-      "ifFctScale": "The size of the damage and healing numbers that float off your target.",
-      "ifExtraBars": "Reveals a second action bar row, and a third once the second is on. The slots stay reachable by their keybinds even while the rows are hidden.",
-      "ifHideUnused": "Hides empty action slots so only the buttons you actually use are drawn.",
-      "ifLockBars": "Locks your bars so you cannot drag an ability out of a slot by accident.",
-      "keybindsHeading": "The Key Bindings panel",
-      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, the left-handed touch layout, and the profanity filter for chat.",
-      "keybindsMouseBody": "Two things there are easy to miss. Mouse buttons bind like keys, so the wheel click and the thumb buttons can carry abilities, while left and right click stay reserved for the camera and for clicking on the world. And you can bind straight from the action bar: turn on the on-bar binding mode here, then click a slot and press the key you want."
+      "audioBody": "Seçenekler penceresi yalnızca piksellerden ibaret değildir. Ses; ses efektleri, müzik ve konuşma için üç ses kaydırıcısı, ayrıca bir müzik açma kapama düğmesi ve en çabuk bıktıran sesler için dört düğme barındırır: NPC sesleri, ayak sesleri, arayüz sesleri ve tık geri bildirimi. Arayüz panelinin Genel sekmesi, tüm arayüzü yeniden yükleme olmadan anında yerelleştiren bir dil seçicisi ve pencere giydirmesi için bir tema seçicisi taşır.",
+      "autolootBody": "Her cesede tıklamayı sevmiyor musun? Arayüz panelinin Dövüş sekmesindeki ve varsayılan olarak kapalı olan Geçerken Otomatik Yağma, yanlarından geçerken kendi avlarının ganimetini toplar.",
+      "panelsMoreBody": "Bu sayfanın listelemediği iki panele de yine de göz atmaya değer. Auralar, sınıfınızın proc'larından biri tetiklendiğinde ekranda beliren büyük uyarıları biçimlendirdiğiniz yerdir: hangilerinin gösterileceği, boyutları, rengi, saydamlığı ve ekranda nerede duracakları. Performans Katmanı ise bu sayfayı ayarlarken açıp sonra tekrar gizlediğiniz göstergedir.",
+      "valueUltraOrInsane": "Ultra, ya da her şeyi istiyorsanız Insane",
+      "advancedLadder": "Bunlardan herhangi birini oynatırsanız kalite ön ayarı, tam olarak baktığınız düzeylerden türetilerek Gelişmiş'e geçer, böylece kendi karışımınız sıfırdan değil zaten gördüğünüz yerden başlar. Beğendiğinizde Uygula'ya basın. Gelişmiş, tam da bu yüzden ön ayar listesinin sonunda yer alır: kendi karışımınızın yaşadığı uzman profildir.",
+      "rowSurfaceDetail": "Taş ve kaldırım üzerindeki yıpranmış detay katmanı; kapalıdan tam bir paralaks bitişe kadar. Bu, kasaba sokağı kadranıdır: ne kadar yükseğe ayarlanırsa, taşlı bir sokağın çizilmesi o kadar yoğunlaşır.",
+      "rowViewDistance": "Dünyanın solmadan önce ne kadar uzağa kadar çizildiği. Siz kendiniz değiştirene dek her ön ayar bunu sizin için belirler.",
+      "rowWaterQuality": "Göllerin, nehirlerin ve açık denizin nasıl gölgelendirildiği; düz ve ucuzdan tam yansıtıcıya kadar.",
+      "rowCharacterDetail": "Diğer karakterlerin, daha basit bir görünüme düşmeden önce tam animasyonlu iskeletlerini ne kadar uzağa kadar koruduğu. Daha yüksek değer kalabalık bir merkezde göze daha kolay gelir, ama daha ağırdır.",
+      "rowAmbientOcclusion": "Yüzeylerin birleştiği yerdeki yumuşak temas gölgesi. Kapalı, yarı çözünürlük ya da tam.",
+      "rowBloom": "Parlak ışığın, ateşin ve büyü efektlerinin çevresindeki yumuşak parıltı.",
+      "rowAntiAliasing": "Uzaktaki geometrinin pürüzlü kenarlarını yumuşatır. Ucuzdur ve çoğu makinede açık tutmaya değer.",
+      "rowDynamicLights": "Kaç meşalenin, kamp ateşinin ve büyünün çevresine gerçek ışık saçtığı.",
+      "rowParticleEffects": "Büyü, hava durumu ve ortam parçacık efektlerinin ne kadar yoğun olabileceği.",
+      "rowCameraSpeed": "Fareyle etrafa bakıldığında kameranın ne kadar hızlı döndüğü.",
+      "rowTouchLookSpeed": "Kaydırarak bakma için de aynı şey geçerlidir; yalnızca dokunmatik bir ekrandaysanız görünür.",
+      "rowFullscreen": "Oyunu tüm ekranı kaplayacak şekilde gösterir.",
+      "rowWaterRipples": "Yüzerken arkanızda yayılan iz ve dalgacıklar. Varsayılan olarak kapalıdır ve gerçek kareye mal olan tek su efektidir; sıçramalar ve kabarcıklar her iki durumda da etkilenmez.",
+      "rowOverflowXp": "Maksimum seviyedeyken çubuğunuzun taşan deneyimle dolmaya devam edip etmeyeceği, ya da bunun yerine klasik, sabit maksimum seviye metnini gösterip göstermeyeceği.",
+      "rowInterfaceMode": "Masaüstü arayüzünü mü yoksa ekran üstü dokunmatik denetimleri mi kullanacağınız. Otomatik, cihazınızı okur; ikisinden birini de zorlayabilirsiniz: klavyeli bir tablet masaüstü düzenini alabilir, dokunmatik ekranlı bir dizüstü bilgisayar da dokunmatik denetimleri alabilir.",
+      "interfaceHeading": "Arayüz paneli",
+      "interfaceIntro": "Arayüz, oyundaki en büyük paneldir ve dört sekmeye ayrılmıştır. Buradaki hiçbir şey dünyanın size yapabileceklerini değiştirmez: yalnızca size neyin gösterildiğini ve ne kadar büyük gösterildiğini değiştirir. İşte bilinmeye en çok değen satırlar.",
+      "interfaceFoot": "Bunların hepsi bu kadar değil. Her sekme burada listelemeye değecek sayıdan daha fazla kaydırıcı ve anahtar taşır, o yüzden bir kez açıp listeyi baştan sona okuyun. Beş dakikanızı almaya değer.",
+      "ifGeneralIntro": "Ölçek, kontrast ve arayüzün sizin hakkınızda ne gösterdiği. Dil ve tema seçicileri de bu sekmenin en üstünde yer alır.",
+      "ifFramesIntro": "Kendi çerçeveniz, hedef çerçeveniz ve tüm grup düzeni. Grup kümesi ayrıca bir akın ızgarasının ekranınıza sığması için ölçek, genişlik, yükseklik, boşluk ve sütun kaydırıcıları taşır; sekmenin altındaki bir Sıfırla düğmesi de her çerçeveyi başladığı yere geri koyar.",
+      "ifChatIntro": "Sohbet penceresinin nasıl göründüğü. Sohbet pencerelerinin kendisi için bir sıfırlama seçeneği de burada bulunur.",
+      "ifCombatIntro": "Çubuklarınızın nasıl davrandığı ve dövüşün ekrana ne koyduğu.",
+      "ifUiScale": "Tüm arayüzü tek seferde ölçekler. Kaydırıcıyı bıraktığınızda uygulanır, böylece sürüklerken imlecinizin altındaki pencere yerinden oynamaz.",
+      "ifHudOpacity": "HUD panellerinin arkalarındaki dünyanın üzerinde ne kadar dolgun göründüğü.",
+      "ifTooltipScale": "İpucu metni boyutu; küçük bir ekranda ya da çok büyük bir ekranda işe yarar.",
+      "ifHighContrastText": "Daha kalın, daha yüksek kontrastlı arayüz metni. Öncelikle bir erişilebilirlik seçeneğidir, parlak bir ekranda da işe yarar.",
+      "ifHighContrastBackground": "Başlangıç ve karakter ekranlarının arkasında daha sade, daha yüksek kontrastlı bir arka plan.",
+      "ifInvertLookY": "Fare bakışının yukarı ve aşağı yönünü ters çevirir.",
+      "ifShowItemLevel": "Her eşya ipucuna bir eşya seviyesi satırı ekler. Varsayılan olarak kapalıdır, bu da klasik, yalnızca istatistik gösteren ipucunu korur.",
+      "ifShowPlaytime": "Karakter sayfanızda ömür boyu oynama sürenizi gösterir. Varsayılan olarak açıktır ve sayfada, cihaz başına bunu değiştiren bir göz düğmesi vardır; yayın yapıyorsanız ya da ekran görüntüsü alıyorsanız işinize yarar. Toplam her iki durumda da sayılmaya devam eder.",
+      "ifShowOwnNameplate": "Kendi baş üstü ad levhanızı, tüm süslemeleriyle birlikte diğer oyuncuların gördüğü şekilde çizer. Klasik görünüm için kapatın.",
+      "ifShowPlayerNameplates": "Diğer oyuncuların ad levhalarını çizer. Kapatmak kalabalık bir merkezi sadeleştirir, mevcut hedefiniz ise her iki durumda da okunaklı kalır.",
+      "ifWallet": "Cüzdanınızın karakter ekranında gösterilip gösterilmeyeceği. Oyuncu kartı için de eşleşen bir anahtar vardır.",
+      "ifDailyChest": "Günlük ödül sandığının HUD'unuzda görünüp görünmeyeceği.",
+      "ifPlayerFrameScale": "Kendi birim çerçevenizin boyutu.",
+      "ifTargetFrameScale": "Hedef çerçevenizin boyutu.",
+      "ifPartyStyle": "Grup düzeni: Otomatik grup boyutunu takip eder, Klasik geleneksel yığındır ve Akın herkesi kompakt ızgaraya sıkıştırır.",
+      "ifPartyHealthText": "Grup çubuklarının ne yazdığı: hiçbir şey, bir yüzde, mevcut can ya da mevcut ve maksimum can.",
+      "ifPartySort": "Grup üyelerinin listelenme sırası: grup sırası, rol ya da ad.",
+      "ifPartyShowAuras": "Güçlendirmelerin ve zayıflatmaların grup çerçevelerinde gösterilip gösterilmeyeceği. Eşleşen anahtarlar kaynak çubuklarını, emilimleri, evcil hayvanları ve kendi grup listenizde görünüp görünmeyeceğinizi de kapsar.",
+      "ifAurasOnPlayerFrame": "Güçlendirmelerinizi ve zayıflatmalarınızı, aura çubuğunun yanı sıra kendi birim çerçevenize de yerleştirir.",
+      "ifTargetOfTarget": "Hedefinizin kimi hedeflediğini gösterir; tankın canavarı hâlâ tutup tutmadığını anlamanın klasik yolu.",
+      "ifPetFrame": "Evcil hayvanınız için bir çerçeve gösterir.",
+      "ifChatFontScale": "Sohbet metni boyutu.",
+      "ifChatOpacity": "Sohbet arka planının ne kadar dolgun olduğu.",
+      "ifCompactChat": "Sohbet satırlarını sıkılaştırarak daha fazlasının sığmasını sağlar.",
+      "ifChatTimestamps": "Her sohbet satırına 12 saatlik ya da 24 saatlik biçimde bir zaman ekler.",
+      "ifStartAttack": "Bir yetenek kullanmanın otomatik saldırınızı da başlatıp başlatmayacağı. Varsayılan olarak açıktır ve çoğu oyuncunun beklediği klasik davranıştır.",
+      "ifStopAutoAttack": "Hedef değiştirmenin savuruşunuzu durdurup durdurmayacağı. Varsayılan olarak kapalıdır, bu yüzden saldırınız yeni hedefe taşınır.",
+      "ifShowAttackButton": "Eylem çubuğuna belirgin bir Saldır düğmesi ekler.",
+      "ifWalkByAutoloot": "Kendi öldürdüklerinizin ganimetini yanlarından geçerken toplar. Varsayılan olarak kapalıdır.",
+      "ifGroundReticle": "Yerleştirilen bir büyü hedeflenirken zemin çemberini gösterir.",
+      "ifMouseoverCast": "Hedefinizi değiştirmeden, üzerine geldiğiniz grup çerçevesine bir iyileştirme ya da dostane bir büyünün inmesini sağlar.",
+      "ifStickyTarget": "Boş zemine tıkladığınızda hedefinizi temizlemek yerine mevcut hedefinizi korur.",
+      "ifFctScale": "Hedefinizden yükselen hasar ve iyileştirme sayılarının boyutu.",
+      "ifExtraBars": "İkinci bir eylem çubuğu sırası ortaya çıkarır, ikincisi açıldığında ise üçüncüsünü açar. Sıralar gizliyken bile yuvalara kısayol tuşlarıyla erişilebilir.",
+      "ifHideUnused": "Boş eylem yuvalarını gizler, böylece yalnızca gerçekten kullanılan düğmeler çizilir.",
+      "ifLockBars": "Çubukları kilitler, böylece bir yetenek yanlışlıkla bir yuvadan sürüklenip çıkarılamaz.",
+      "keybindsHeading": "Tuş Atamaları paneli",
+      "keybindsBody": "Tuş listesi o panelin yalnızca yarısıdır. Üstünde, farenizin oyunu nasıl yönettiğine karar veren anahtarlar bulunur: fare kamerası, döndürürken imlecin kilitlenip kilitlenmeyeceği, tıklayarak hareket ve bunu hangi fare düğmesinin tetiklediği, saldırı hareketi, solaklar için dokunmatik yerleşim ve sohbet için küfür filtresi.",
+      "keybindsMouseBody": "Orada gözden kaçması kolay iki şey var. Fare düğmeleri tuşlar gibi atanır, bu yüzden tekerlek tıklaması ve baş parmak düğmeleri yetenek taşıyabilir; sol ve sağ tık ise kamera ve dünyaya tıklamak için ayrılmış kalır. Ayrıca doğrudan eylem çubuğundan da atama yapabilirsiniz: buradan çubuk üzerinden atama kipini açın, ardından bir yuvaya tıklayıp istediğiniz tuşa basın."
     },
     "combat": {
       "intro": "Dövüş, tanıdık klasik MMO kurallarını izler. İyi oynamak için bunların hiçbirini incelemen gerekmez, bu yalnızca dövüşlerin nasıl işlediğinin şeklidir.",
       "hitTitle": "Her darbe isabet etmez",
-      "hitBody": "Saldırılar ıskalayabilir ya da savuşturulabilir, düşmanınki de öyle; büyülere ise büsbütün direnilebilir. Darbelerini isabet ettiren şey, kendi seviyene yakın dövüşmektir; seviye farkı ne kadar büyükse, o kadar çok boşa savurursun.",
+      "hitBody": "Saldırılar ıskalayabilir ve savuşturulabilir, düşmanınkiler de öyle. İki yanıt daha yalnızca oyunculara aittir: bir savaşçı darbeyi bir parade ile saptırabilir, kalkan taşıyan bir savaşçı ya da paladin ise onu bir bloğa yumuşatabilir; ikisi de yalnızca önden gelene karşı. Dünyanın yaratıkları bunların hiçbirini yapmaz, dolayısıyla bir canavara savrulan darbe ya isabet eder, ya ıskalar, ya da savuşturulur. Büyüler kendi kuralına uyar ve asla ıskalamaz: onlara bunun yerine direnilir. Kendi seviyene yakın dövüşmek, vuruşlarını isabet ettiren şeydir; seviye farkı ne kadar büyükse o kadar sık boşluğa savurursun.",
       "mitigationTitle": "Zırh ve can seni ayakta tutar",
       "mitigationBody": "Zırh fiziksel darbeleri yumuşatır, bu yüzden daha iyi zırh, yakın dövüşteki ana dayanıklılık kaynağındır. Büyü başka bir mesele: büyülere zırhla değil, daha derin bir can havuzu ve birine büsbütün direnme şansıyla göğüs gerersin. Daha ağır zırh sınıfları daha fazlasını savuşturur, ama hiçbir şey seni dokunulmaz kılmaz.",
       "resourcesTitle": "Her sınıfın kendi ritmi vardır",
       "resourcesBody": "Savaşçılar dövüşün göbeğinde Öfke biriktirir, hırsızlar istikrarlı geri dönen Enerji harcar ve büyücüler bir Mana havuzunu yönetir. Kaynağını öğrenmek, sınıfını iyi oynamanın yarısıdır.",
       "growTitle": "Her seviyede daha güçlenirsin",
-      "growBody": "Her seviye seni daha dayanıklı kılar ve yeni yetenekler açar, ta seviye {cap} sınırına kadar. Yukarı çıkmanın en hızlı yolu görevlerdir; avlanmak, zindan seferleri ve mağara seferleri geri kalanı tamamlar.",
+      "growBody": "Her seviye seni daha dayanıklı kılar ve yeni yetenekler açar, ta {cap}. seviyedeki tavana kadar. Görevler yukarı çıkmanın en hızlı yoludur; avlanma, zindanlar, mağara inişleri ve yolda icra ettiğin meslekler gerisini tamamlar.",
       "effectsTitle": "Güçlendirmeler, zayıflatmalar ve kalabalık kontrolü",
       "effectsBody": "Birçok yetenek, süren bir etki uygular. Faydalı olanlar (güçlendirmeler) istatistiklerini yükseltir, seni kalkanla korur ya da azar azar iyileştirir; zararlı olanlar (zayıflatmalar) zamanla hasarla canını tüketir ya da seni zayıflatır. Üzerinde ne olduğunu ve ne kadar süreceğini görmek için ekranın üst köşesindeki, mini haritanın yanındaki küçük simgeleri izle.",
-      "ccBody": "Kalabalık kontrolü, bir hedefin yapabileceklerini sınırlayan özel bir tür zayıflatmadır: sersemletmeler, kökler ve yavaşlatmalar, büyü okumayı durduran susturmalar, silahsızlandırmalar, korkutmalar ve bir düşmanı bir anlığına zararsız kılan dönüştürmeler. Diğer oyunculara karşı kontrol tekrarla aşınır: aynı tür çok hızlı yeniden uygulanınca önce zayıflar, sonra büsbütün etkisiz kalır; gizlilikten açılan bir sersemletme ise onu izleyen sersemletmelerden ayrı sayılır, böylece hiç kimse sonsuza dek çaresiz zincirlenemez. Dünyanın yaratıkları böyle bir kin gütmez: kontrol tekrarla onların üzerinde asla zayıflamaz; yine de en güçlü düşmanların çoğu, adlı seçkinler ve aralarındaki en güçlü şefler, hiç kontrol edilemez.",
+      "ccBody": "Kalabalık kontrolü, bir hedefin ne yapabileceğini kısıtlayan özel bir zayıflatma türüdür: sersemletmeler, köklemeler ve yavaşlatmalar, büyü yapmayı durduran susturmalar, silahsızlandırmalar, korkular ve bir düşmanı bir anlığına zararsız kılan dönüşümler. Diğer oyunculara karşı kontrolün çoğu tekrarla aşınır: çok hızlı yeniden uygulanan korkular, dönüşümler, köklemeler ve okul kilitleri kısalır, sonra tümüyle başarısız olur, böylece kimse sonsuza dek çaresiz tutulamaz. Sersemletmeler kasıtlı istisnadır, çünkü zaten kısadırlar ve gerçek bekleme sürelerine yaslanırlar, dolayısıyla tekrar onları asla kısaltmaz, gerçi kontrol sürelerini kırpan ekipman onları yine de budar. Dünyanın yaratıkları böyle bir kin gütmez: onlara karşı kontrol tekrarla asla zayıflamaz, gerçi en güçlü düşmanların birçoğu, adlandırılmış elitler ve aralarındaki en güçlü patronlar, hiç kontrol edilemez.",
       "metersBody": "Bir dövüşün nasıl geçtiğini merak mı ediyorsun? Shift+H'ye basıp grup sayaçlarını aç; bunlar grubunun hasarını, iyileştirmesini ve tehdidini karşılaşma karşılaşma toplar.",
       "queueTitle": "Bir sonraki hamlen çoktan hazır",
       "queueBody": "Basışlarını kareye göre zamanlamak zorunda değilsin. Bir sonraki yeteneğine mevcut büyünün son anlarında bas; sıraya alınır ve büyü biter bitmez tetiklenir, böylece pratikli oyun boşluksuz akar. Çok erken bir basış ise basitçe reddedilir, dolayısıyla hiçbir şey boşa gitmez. Bazı yakın dövüş darbeleri de aynı şekilde çalışır, bir sonraki silah savuruşunla birlikte çıkar.",
       "deathTitle": "Düştüğünde",
       "deathBody": "Canın sıfıra ulaşırsa olduğun yerde devrilirsin ve bedenin orada kalır. Ruhunu serbest bırak, en yakın mezarlıkta bir hayalet olarak yüksel: yaşayanlardan daha hızlı adımlarsın, düşmanlarının erişemeyeceği yerdesin, ama dövüşemez, yağmalayamaz ya da taşların üzerinde süzülen Solgun Bekçi dışında kimseyle konuşamazsın. Bundan sonrası senin seçimin. Hayaletini bedenine geri koştur, canının ve mananın bir kısmı geri gelmiş olarak, hiçbir ceza olmadan olduğun yerde dirilirsin. Ya da Solgun Bekçi'nin sunduğu anında dirilişi kabul et ve olduğun yerde kalk; bunun bedeli Bekçinin Bedeli'dir: ne kadar deneyimliysen o kadar uzun süren, tüm varlığını geçici olarak zayıflatan ve yepyeni karakterleri büsbütün muaf tutan bir güçsüzlük. Bir zindanın içinde düşersen ruhun dışarıdaki mezarlıkta bekler; hayaletini kapıdan geri yürüt, girişte dirilirsin. Mağara seferleri istisnadır: orada düşersen basitçe seferin girişinde ayağa kaldırılırsın, ancak ikinci bir düşüş seferi sona erdirir. Hangi yolu seçersen seç, ne deneyim, ne teçhizat, ne de para kaybedersin. Dövüşler arasında oturup yemek ye ve iç, böylece bir sonrakine tam güçle başlarsın.",
-      "threatTitle": "Who the enemy hits",
-      "threatBody": "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Wolf Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
-      "hazardsTitle": "The water can kill you",
-      "breathBody": "Deep water is swimmable, and you can dive under it. While your head is under, a blue breath bar appears near the top of the screen and drains; break the surface and it refills far faster than it emptied. Let it empty while you are still under and you begin to drown, losing a chunk of your health every second until you reach air, so keep an eye on the bar on a long dive. Death clears it, so a corpse run always starts with a full lungful.",
-      "fatigueBody": "The sea has no wall. The crossings the world means you to swim, the straits and meres between one stretch of land and the next, and the inland lakes, are safe to cross however long they take. Strike out past the shore into genuinely open water instead and it starts to sap your strength: a warning appears, you get a real window to turn around, and after that the sea deals steadily heavier damage that nothing can prevent until you head back toward land. Drown or wear yourself out that far from shore and you release like any other death, so treat the horizon as scenery rather than a destination.",
-      "allyRezTitle": "When an ally can raise you",
-      "allyRezBody": "You do not always have to walk back. An ally with a resurrection spell can raise you instead, and it comes to you as a prompt you accept or decline; leave it sitting and it expires, so answer it while it is there. Accept and you rise beside the friend who cast it with part of your health and mana back. Some healers can offer the whole downed party at once, though each of you still answers your own prompt. Thornhollow Fields is the exception: no resurrection spell reaches you there, and you wait for your team's next wave.",
-      "unstuckTitle": "When you are truly stuck",
-      "unstuckBody": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
-      "climbTitle": "Pulling yourself up a ledge",
-      "climbBody": "Ledges are not walls. Jump at something too tall to step onto and your character catches the lip near the top of the jump and hauls up onto it, with no key of its own to press. Anything low enough to clear on your own goes by without ceremony; the full pull-up is saved for lips above your head. It is brief, and it takes the reins while it runs, so you cannot steer out of it partway. A stun catches you mid-pull and you let go and fall, measured from where the jump left the ground, and a stun or a root stops a climb starting at all, which is worth remembering when you are trying to get out of a bad spot in a fight."
+      "threatTitle": "Düşman kime vurur",
+      "threatBody": "Her düşman, kendisini en çok kimin sinirlendirdiğine dair özel bir hesap tutar. Hasar bu hesaba eklenir, iyileştirme de öyle: bir iyileştirme, iyileştirdiğin kişiyle zaten dövüşen düşmanların üzerine, aralarında paylaştırılmış şekilde tehdit koyar, bu yüzden en güvenli iyileştirme tankın zaten tuttuğu birine yapılandır. Tanklar, ürettikleri her şeyi katlayan bir koruma duruşu ya da koruyucu bir form açar, druidin Kurt Formu ise bunun yerine tehdidi düşürür, ve bir tahrik, büyüyü okuyanı hesabın tepesine dosdoğru çıkarıp düşmanı birkaç saniyeliğine ona kilitler. Biri tankı geçtiği anda düşmanlar hemen hedef değiştirmez: birini çekmek net bir fark gerektirir, ve bu fark menzilde yakın dövüşe göre daha büyüktür, bu yüzden bir çekişin başında biraz sabır dövüşü olması gereken yerde tutar.",
+      "hazardsTitle": "Su seni öldürebilir",
+      "breathBody": "Derin sular yüzülebilir, ve altına dalabilirsin. Başın su altındayken ekranın üst kısmına yakın mavi bir nefes çubuğu belirir ve azalır; yüzeye çıktığında ise boşaldığından çok daha hızlı dolar. Hâlâ su altındayken boşalmasına izin verirsen boğulmaya başlarsın ve havaya ulaşana kadar her saniye canından önemli bir parça kaybedersin, o yüzden uzun bir dalışta çubuğu göz önünde tut. Ölüm onu sıfırlar, bu yüzden bir ceset koşusu her zaman tam dolu ciğerlerle başlar.",
+      "fatigueBody": "Denizin duvarı yoktur. Dünyanın yüzerek geçmeni istediği geçitler, bir kara parçası ile bir diğeri arasındaki boğazlar ve göllük sular, ayrıca iç göller, ne kadar sürerse sürsün güvenle geçilir. Bunun yerine kıyıyı geride bırakıp gerçek anlamda açık sulara çıkarsan gücün tükenmeye başlar: bir uyarı belirir, dönmen için gerçek bir pencere tanınır, ve bundan sonra deniz, kıyıya dönene kadar hiçbir şeyin engelleyemeyeceği, giderek ağırlaşan bir hasar verir. Kıyıdan bu kadar uzakta boğulur ya da bitkin düşersen, herhangi bir ölüm gibi serbest kalırsın, o yüzden ufku bir varış noktası değil, bir manzara olarak gör.",
+      "allyRezTitle": "Bir müttefiğin seni diriltebileceği zaman",
+      "allyRezBody": "Her zaman geri yürümek zorunda değilsin. Bir diriltme büyüsüne sahip bir müttefik seni onun yerine diriltebilir; bu sana kabul edebileceğin ya da reddedebileceğin bir istek olarak gelir: onu öylece bırakırsan süresi dolar, o yüzden oradayken yanıtla. Kabul edersen, canının ve mananın bir kısmı geri gelmiş halde büyüyü okuyan arkadaşının yanında kalkarsın. Bazı şifacılar düşmüş partinin tamamına aynı anda teklif sunabilir, gerçi her biriniz yine de kendi isteğinizi yanıtlar. Dikenvadi Ovası istisnadır: orada hiçbir diriltme büyüsü sana ulaşmaz, ve takımının bir sonraki dalgasını beklersin.",
+      "unstuckTitle": "Gerçekten sıkıştığında",
+      "unstuckBody": "Dünya seni çıkamayacağın bir yere hapsederse /unstuck yaz. Dövüş dışında ve hareketsiz durman gerekir, bir sersemletme ya da kök tarafından tutulmaman, ve bir düelloda ya da arena maçında olmaman gerekir: kısa bir geri sayım başlar, hareket etmek ya da hasar almak onu iptal eder. Bittiğinde en yakın mezarlığa bırakılırsın. Seni asla öldürmez ve geride bir ceset bırakmaz, ve zaten düşmüşsen seni orada diriltir. Bedeli Kurtulma Hastalığı’dır: tüm varlığını geçici olarak zayıflatan ve komutu tekrar kullanabileceğin zamana kadar geçmiş olan bir güçsüzlük; ve Bekçinin Bedeli gibi, o da yepyeni karakterleri büsbütün muaf tutar.",
+      "climbTitle": "Bir çıkıntıya tırmanmak",
+      "climbBody": "Çıkıntılar duvar değildir. Üstüne çıkamayacağın kadar yüksek bir şeye zıplarsan, karakterin zıplamanın tepe noktasına yakın kenarı yakalar ve kendini yukarı çeker; bunun için basılacak ayrı bir tuş yoktur. Kendi başına aşabileceğin kadar alçak her şey törensiz geçilir; tam çekiş yalnızca başının üstündeki kenarlar için ayrılmıştır. Kısa sürer ve çalıştığı süre boyunca dizginleri eline alır, bu yüzden ortasında yönünü değiştiremezsin. Bir sersemletme seni çekiş ortasında yakalarsa bırakır ve düşersin, zıplamanın yerden ayrıldığı noktadan ölçülerek; bir sersemletme ya da kök ise bir tırmanışın başlamasını tamamen engeller, bu da bir dövüşte kötü bir durumdan kurtulmaya çalışırken hatırlaman gereken bir şeydir."
     },
     "interfacePage": {
-      "intro": "A map of the screen: what every frame, bar, and button on your interface does, and which window each key opens.",
-      "scopeTitle": "Keys, and where to change them",
-      "scopeBody": "Every key named on this page is the default, and every one of them can be rebound. The full key table lives on the Controls page, and the options that change how the interface looks and behaves live on the Settings page. Esc closes whatever window is on top, and opens the game menu when nothing is open.",
-      "glanceTitle": "The screen at a glance",
-      "glanceBody": "The interface lives around the edges of the screen and leaves the middle clear for the world. Your own frame, your action bars, and your experience bar sit along the bottom. Your target and your party sit in the top left. The minimap and the zone name sit in the top right, with your trackers running down the right side below them. The chat box sits in the bottom left corner, and a rail of small square buttons sits in the bottom right.\n\nEverything else is a window you open and close. Most windows have a key of their own, most also have a button in that rail in the bottom right, and every one of them closes with its own key again or with Esc.",
-      "framesTitle": "Unit frames",
-      "framesBody": "A unit frame is a portrait with bars beside it: a health bar always, a resource bar when the unit has one, and a name and a level chip. A damage shield paints as a lighter segment laid over the top of the health bar, so you can watch the shield spend itself before the health starts to move. It shows on your own frame, on your target, and on your party rows; the two small frames, your pet and your target's target, carry no shield overlay.",
-      "frameSelfTitle": "Your own frame",
-      "frameSelfBody": "Bottom center, next to your action bars. Portrait, level, health, and your resource, with a mark while you are in combat, a resting mark while you are resting, and a row of combo points for the classes that build them. Clicking the frame targets yourself.",
-      "frameTargetTitle": "Your target",
-      "frameTargetBody": "Top left, appearing the moment you select something and gone again when you drop it. The same portrait and bars, plus an Elite tag on the tougher enemies, a cast bar showing what your target is casting, and a strip of the effects that are on it.",
-      "frameTotTitle": "Your target's target",
-      "frameTotBody": "A small frame beside your target frame showing who your target is currently on. It is the quickest way to tell whether a monster is fighting your tank or coming for you. It stays hidden until you switch it on in the options.",
-      "framePartyTitle": "Your party",
-      "framePartyBody": "Party members stack under your target frame on the left, one row each. A row dims when that member walks out of range, shows the effects worth reacting to, and can show their pet beside them. How much health text a row carries is up to you: none, a percentage, the numbers, or both.",
-      "framePetTitle": "Your pet",
-      "framePetBody": "Hunters, warlocks, and anyone else with a pet out get a small frame for it beside their own, with its name, level, and health. Clicking that frame selects your pet, and Ctrl+6 does the same from the keyboard.",
-      "framesMoveBody": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. If they end up somewhere you regret, Reset Frame Positions in the options snaps them all back to where they started.",
-      "barsTitle": "Bars, timers, and combat text",
-      "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
-      "aurasTitle": "Buffs and debuffs",
-      "aurasBody": "Your own buffs show as a row of small icons in the top right corner beside the minimap, each counting down the time it has left, with your debuffs in a row below them. Right-clicking one of your own buffs drops it, as long as it is one you are allowed to drop; debuffs never are, and your target's strip is read-only.\n\nBuffs on the Player Frame, an option that is off to begin with, moves your buff row onto your own unit frame and leaves the whole corner to your debuffs. It is a desktop setting: the phone and tablet layout places your auras for you.\n\nYour target's buffs and debuffs sit together in a strip under its frame. When you want more room for them, Shift+J opens a separate Target Buffs and Debuffs window that you can move, filter down to just buffs or just debuffs, and leave open.",
-      "actionBarsTitle": "Your action bars",
-      "actionBarsBody": "Three rows of eleven ability slots sit above your experience bar, with a dedicated attack button at the head of the first row. Only the first row is there to begin with: the second and third are switched on in the options when you want the room, and the third needs the second. The number row across the top of your keyboard fires the first bar, and the extra bars default to the numpad.\n\nAbilities come from your spellbook (P): drag one out of the book onto a slot, or use the toggle on its row to put it on the first free one. Items work the same way, so a stack of potions or a bandage can live on a slot and be used with a key.\n\nOnce a bar is arranged the way you like it, you can lock it. Locking refuses drags, drops, and clears while leaving the abilities themselves as usable as ever, so a fumbled click in a fight cannot rearrange your buttons.\n\nTwo smaller bars join the row when they apply: the pet bar, with Attack, Stop, Taunt, Defensive, and Aggressive on Ctrl plus 1 through 5, and a stance bar for the classes that change stance or form.",
-      "minimapTitle": "The minimap",
-      "minimapBody": "Top right: a round minimap with the zone name above it and your coordinates below, ringed by a dial that paints the time of day.\n\nThe disc carries more than terrain. Your own arrow sits at the center, pointing the way you face, with your party around you as class-colored dots and an edge arrow for anyone who has wandered off it. Quest givers wear the same marks there as they do in the world, and you will also pick out gathering nodes and crafting stations, travel portals, lootable bodies and containers, any hostile that has taken an interest in you, friends and guildmates who are nearby, and your own body while you are running back as a ghost.\n\nSmall indicators appear on it when they have something to say: an envelope while unread letters are waiting for you, a coin while sale proceeds or returned goods are waiting at the Merchant, and a button listing your raid lockouts.",
-      "mapTitle": "The world map and your trackers",
-      "mapBody": "M opens the world map: the continent drawn out, with your own arrow on it, the zones and their names, the points of interest around you, the travel portals, and the gathering nodes you have found. Your party shows on it too. Inside a delve the map switches to a schematic of the rooms you have explored so far.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
-      "chatTitle": "The chat box",
-      "chatBody": "Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.",
-      "keyWindowsTitle": "Windows you open with a key",
-      "keyWindowsBody": "Each of these has a default key and a button in the rail in the bottom right corner. Press the key again, or Esc, to close it.",
-      "winCharTitle": "Character sheet (C)",
-      "winCharBody": "Your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. It also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and the button that composes your player card.",
-      "winBagsTitle": "Bags (B)",
-      "winBagsBody": "Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag.",
-      "winSpellbookTitle": "Spellbook (P)",
-      "winSpellbookBody": "Every ability your class has, learned and still to come, in order. This is where you drag abilities onto your action bars.",
-      "winTalentsTitle": "Talents (N)",
-      "winTalentsBody": "Where you choose your specialization, and your six talent rows with the three options each one offers and what every option does. Rows you have not reached yet are shown beside the ones you can pick now.",
-      "winProfessionsTitle": "Professions (Shift+P)",
-      "winProfessionsBody": "What you have learned, how skilled you are at each, and how far each one can still go.",
-      "winCraftingTitle": "Crafting (T)",
-      "winCraftingBody": "Your recipes, what each one needs, and what you can make right now with what you are carrying.",
-      "winQuestLogTitle": "Quest log (L)",
-      "winQuestLogBody": "Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows.",
-      "winDeedsTitle": "Book of Deeds (Shift+Z)",
-      "winDeedsBody": "The record of what you have done, the titles and Renown it has paid you, and what is still open.",
-      "winSocialTitle": "Friends and Guild (O)",
-      "winSocialBody": "Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked.",
-      "winFinderTitle": "Dungeon Finder (Shift+I)",
-      "winFinderBody": "The catalogue of group content you can queue for. Tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together.",
-      "winMetersTitle": "Damage meters (Shift+H)",
-      "winMetersBody": "Damage, healing, and threat for you and everyone with you, kept in segments so you can look back at the fight before last. The healing and threat panels can be pulled out to stand on their own.",
-      "winMoreTitle": "And a few more",
-      "winMoreBody": "The world map (M), the PvP window (G), the Vale Cup (Y), the leaderboard (K), the event calendar (I), and the emote wheel (X) all work the same way. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, and one for the daily standings.\n\nRight-click another player, on their nameplate or on their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more, and it needs them to be close enough to see.",
-      "worldWindowsTitle": "Windows the world opens for you",
-      "worldWindowsBody": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback tab holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. A class trainer opens the list of what you can learn now and what is still ahead of you.\n\nA banker opens your vault, the strongbox of extra slots you can buy more of. If your guild has opened a bank, a second tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market at the Merchant has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
-      "lootTitle": "Loot and rolls",
-      "lootBody": "Interact with a body you have earned and the loot window opens, listing what dropped. Click a line to take it.\n\nIn a group, a good drop under the group's loot rules puts a roll prompt on your screen instead: Need if you want it for yourself, Greed if you would take it to sell, or Pass to leave it to someone else. A small panel then shows who has rolled and what they chose while the timer runs down.\n\nThe loot rules themselves live in a small window of their own. The group leader can change them there, and everyone else sees the same window read-only, so the rules are never a secret.\n\nSome bodies can also be harvested for their parts. When they can, a Harvest section appears at the foot of the loot window with a box to tick for each component you want.",
-      "playerCardTitle": "Your player card",
-      "playerCardBody": "A button on your character sheet composes a player card: a picture with a close-up of your character, the gear you are wearing, and your stats, ready to save or share. It is a snapshot for showing off a new set, and it changes nothing in the game.",
-      "wikiTitle": "The Wiki button",
-      "wikiBody": "This wiki is one click away in game. A button for it sits with the others in the rail in the bottom right corner, there is a row for it in the Esc game menu, and on a phone it lives in the More tray. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.",
-      "mobileTitle": "On a phone or a tablet",
-      "mobileBody": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with five action buttons beside it, and a page toggle that swaps the ring through the rest of your slots, up to seven pages once you have all three action bars switched on. Around them sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping, plus a pull-out row of your consumables that fills itself from what you are carrying.\n\nAlong the bottom edge are Chat, Social, Quests, Settings, and More. More opens a tray holding the rest of your windows, including your character, the Dungeon Finder, PvP, the Vale Cup, emotes, and the wiki. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
-      "railTitle": "The button rail",
-      "railBody": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons, one per window, arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, spellbook, talents, quest log, Book of Deeds, professions, world map, bags, and crafting. The second opens with the WOC Store and runs on through PvP, the Dungeon Finder, the Vale Cup, Card Duel, the leaderboard, emotes, music, friends and guild, this wiki, and the game menu. A few more join them only when they apply."
+      "intro": "Ekranın bir haritası: arayüzündeki her çerçevenin, çubuğun ve düğmenin ne yaptığı, her tuşun hangi pencereyi açtığı.",
+      "scopeTitle": "Tuşlar ve onları nerede değiştireceğin",
+      "scopeBody": "Bu sayfada adı geçen her tuş varsayılandır ve her biri yeniden atanabilir. Tam tuş tablosu Denetimler sayfasında, arayüzün görünüşünü ve davranışını değiştiren seçenekler ise Ayarlar sayfasında yaşar. Esc, en üstteki hangi pencere ise onu kapatır ve hiçbir şey açık değilken oyun menüsünü açar.",
+      "glanceTitle": "Ekrana bir bakış",
+      "glanceBody": "Arayüz ekranın kenarları boyunca yaşar ve ortayı dünya için boş bırakır. Kendi çerçeven, eylem çubukların ve tecrübe çubuğun alt kısımda durur. Hedefin ve grubun sol üstte durur. Mini harita ve bölge adı sağ üstte durur, takipçilerin de onların altında sağ tarafta aşağı doğru uzanır. Sohbet kutusu sol alt köşede durur ve küçük kare düğmelerden oluşan bir ray sağ altta durur.\n\nGeri kalan her şey açıp kapattığın bir penceredir. Çoğu pencerenin kendi tuşu vardır, çoğunun sağ alttaki o rayda da bir düğmesi vardır ve her biri yine kendi tuşuyla ya da Esc ile kapanır.",
+      "framesTitle": "Birim çerçeveleri",
+      "framesBody": "Bir birim çerçevesi, yanında çubuklar bulunan bir portredir: her zaman bir can çubuğu, birimin bir kaynağı varsa bir kaynak çubuğu, bir ad ve bir seviye rozeti. Bir hasar kalkanı, can çubuğunun üzerine bindirilmiş daha açık bir bölüm olarak boyanır, böylece can hareket etmeye başlamadan önce kalkanın kendini tükettiğini izleyebilirsin. Kendi çerçevende, hedefinde ve grup sıralarında görünür; iki küçük çerçeve olan evcilin ve hedefinin hedefi hiçbir kalkan katmanı taşımaz.",
+      "frameSelfTitle": "Kendi çerçeven",
+      "frameSelfBody": "Alt orta, eylem çubuklarının yanında. Portre, seviye, can ve kaynağın; dövüşteyken bir işaret, dinlenirken bir dinlenme işareti ve kombo puanı biriktiren sınıflar için bir sıra kombo puanıyla birlikte. Çerçeveye tıklamak kendini hedefler.",
+      "frameTargetTitle": "Hedefin",
+      "frameTargetBody": "Sol üst, bir şeyi seçtiğin anda beliren ve bıraktığında yeniden kaybolan. Aynı portre ve çubuklar, buna ek olarak daha güçlü düşmanlarda bir Seçkin etiketi, hedefinin ne büyüsü okuduğunu gösteren bir büyü çubuğu ve üzerindeki etkilerin bir şeridi.",
+      "frameTotTitle": "Hedefinin hedefi",
+      "frameTotBody": "Hedef çerçevenin yanında, hedefinin şu anda kimin üzerinde olduğunu gösteren küçük bir çerçeve. Bir canavarın tankınla mı dövüştüğünü yoksa sana mı geldiğini anlamanın en hızlı yoludur. Seçeneklerden açana kadar gizli kalır.",
+      "framePartyTitle": "Grubun",
+      "framePartyBody": "Grup üyeleri sol tarafta hedef çerçevenin altında, her biri bir sıra olacak şekilde istiflenir. O üye menzilin dışına çıktığında sırası solar, tepki vermeye değer etkileri gösterir ve yanında evcilini gösterebilir. Bir sıranın ne kadar can metni taşıyacağı sana kalmıştır: hiçbiri, bir yüzde, sayılar ya da ikisi birden.",
+      "framePetTitle": "Evcilin",
+      "framePetBody": "Avcılar, Karabüyücüler ve dışarıda bir evcili olan herkes, kendi çerçevesinin yanında evcili için adı, seviyesi ve canıyla küçük bir çerçeve alır. O çerçeveye tıklamak evcilini seçer, klavyeden Ctrl+6 de aynısını yapar.",
+      "framesMoveBody": "Çerçeven, hedef çerçeven ve grup çerçevelerinin hepsi taşınabilir. Her biri köşesinde küçük bir taşıma düğmesi taşır: kilidini aç, çerçeveyi istediğin yere sürükle ve başıboş bir tıklamanın onu kaydırmaması için tekrar kilitle. Pişman olacağın bir yerde son bulurlarsa, seçeneklerdeki Çerçeve Konumlarını Sıfırla hepsini başladıkları yere geri döndürür.",
+      "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
+      "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
+      "aurasTitle": "Takviyeler ve zayıflatmalar",
+      "aurasBody": "Kendi takviyelerin, mini haritanın yanındaki sağ üst köşede küçük simgelerden oluşan bir sıra halinde görünür, her biri kalan süresini geri sayar; zayıflatmaların ise onların altındaki bir sırada durur. Kendi takviyelerinden birine sağ tıklamak, bırakmana izin verilen bir takviyeyse onu düşürür; zayıflatmalar asla düşürülemez ve hedefinin şeridi salt okunurdur.\n\nOyuncu Çerçevesinde Güçlendirmeler, başlangıçta kapalı bir seçenek, takviye sıranı kendi birim çerçevene taşır ve köşenin tamamını zayıflatmalarına bırakır. Bu masaüstüne özgü bir ayardır: telefon ve tablet düzeni auralarını senin için kendisi yerleştirir.\n\nHedefinin takviyeleri ve zayıflatmaları çerçevesinin altındaki bir şeritte birlikte durur. Onlara daha fazla yer istediğinde, Shift+J taşıyabileceğin, yalnızca takviyelere ya da yalnızca zayıflatmalara filtreleyebileceğin ve açık bırakabileceğin ayrı bir Hedefin Takviyeleri ve Zayıflatmaları penceresi açar.",
+      "actionBarsTitle": "Eylem çubukların",
+      "actionBarsBody": "Tecrübe çubuğunun üzerinde, ilk sıranın başında özel bir saldırı düğmesiyle birlikte on birer yetenek yuvasından oluşan üç sıra bulunur. Başlangıçta yalnızca ilk sıra oradadır: ikinci ve üçüncüsü, yere ihtiyaç duyduğunda seçeneklerden açılır ve üçüncüsü ikincisini gerektirir. Klavyenin üstündeki sayı sırası ilk çubuğu ateşler, ek çubuklar ise varsayılan olarak sayısal tuş takımına atanır.\n\nYetenekler büyü kitabından (P) gelir: birini kitaptan bir yuvaya sürükle ya da sırasındaki geçişi kullanarak onu ilk boş yuvaya koy. Eşyalar da aynı şekilde çalışır, yani bir yığın iksir ya da bir bandaj bir yuvada durabilir ve bir tuşla kullanılabilir.\n\nBir çubuğu istediğin gibi düzenledikten sonra kilitleyebilirsin. Kilitlemek sürüklemeyi, bırakmayı ve temizlemeyi reddederken yeteneklerin kendisini her zamanki gibi kullanılabilir bırakır, böylece bir dövüşteki yanlış tıklama düğmelerini yeniden düzenleyemez.\n\nUygun oldukları zaman sıraya iki daha küçük çubuk katılır: Ctrl artı 1'den 5'e kadar Saldır, Dur, Tahrik, Savunmacı ve Saldırgan komutlarını taşıyan evcil çubuğu ve duruş ya da form değiştiren sınıflar için bir duruş çubuğu.",
+      "minimapTitle": "Mini harita",
+      "minimapBody": "Sağ üst: üzerinde bölge adı, altında koordinatların bulunan ve günün saatini boyayan bir kadranla çevrili yuvarlak bir mini harita.\n\nDisk, arazi çiziminden fazlasını taşır. Kendi okun merkezde durur ve baktığın yönü gösterir; etrafında grubun sınıf renkli noktalar olarak ve haritanın dışına sarkmış olanlar için bir kenar oku vardır. Görev verenler orada da dünyadakiyle aynı işaretleri taşır ve ayrıca toplama düğümlerini ve zanaat istasyonlarını, seyahat portallarını, yağmalanabilir cesetleri ve kasaları, ilgisini çekmiş herhangi bir düşmanı, yakınlardaki arkadaşlarını ve lonca üyelerini, bir de hayalet olarak geri koşarken kendi bedenini seçebilirsin.\n\nSöyleyecek bir şeyleri olduğunda üzerinde küçük göstergeler belirir: okunmamış mektupların beklerken bir zarf, Tüccar'da satış geliri ya da iade edilen mallar beklerken bir sikke ve akın kilitlerini listeleyen bir düğme.",
+      "mapTitle": "Dünya haritası ve takipçilerin",
+      "mapBody": "M, dünya haritasını açar: kıtanın tamamı çizilmiş halde, üzerinde kendi okun, bölgeler ve adları, çevrendeki ilgi noktaları, seyahat portalları ve bulduğun toplama düğümleriyle birlikte. Grubun da üzerinde görünür. Bir mağara seferinin içindeyken harita, şimdiye kadar keşfettiğin odaların bir şemasına döner.\n\nSağ tarafta, mini haritanın altında, hiçbir şey açmadan güncel işlerini gözünün önünde tutan bir yığın takipçi bulunur: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, içinde bulunduğun mağara seferi ve katıldığın herhangi bir yarık. Görev takipçisi, ekranı geri istediğinde daralır.",
+      "chatTitle": "Sohbet kutusu",
+      "chatBody": "Sol alt köşe. Yazmaya başlamak için Enter'a, göndermek için tekrar Enter'a bas.\n\nHer zaman iki sekme vardır: çevrende söylenen her şeyin birleşik kaydı olan Sohbet ve dövüşünün yazılı kaydı olan Savaş. Artı düğmesi kanal başına bir tane olmak üzere daha fazlasını ekler: Söyle, Bağır, Grup, Genel, Dünya, LFG, Lonca ve Subay; ayrıca gönderdiğin ve aldığın her fısıltıyı tek bir yerde toplayan bir Fısıltı sekmesi. Bir kanal sekmesinde yazmak, komutu yeniden yazmana gerek kalmadan o kanala gönderir.\n\nKutunun tamamı başka bir yere sürüklenebilir ve yeniden boyutlandırılabilir, bıraktığın yeri hatırlar.",
+      "keyWindowsTitle": "Bir tuşla açtığın pencereler",
+      "keyWindowsBody": "Bunların her birinin varsayılan bir tuşu ve sağ alt köşedeki rayda bir düğmesi vardır. Kapatmak için tuşa tekrar bas ya da Esc'e bas.",
+      "winCharTitle": "Karakter sayfası (C)",
+      "winCharBody": "Bir yanda kuşandığın teçhizat, diğer yanda niteliklerin ve besledikleri istatistikler; her değerin sınıfın için ne yaptığını söyleyen bir ipucu kutusuyla birlikte. Ayrıca ömür boyu Oynama Süreni taşır, göstermek istemediğinde sayıyı gizleyen küçük bir göz simgesiyle birlikte, bir de oyuncu kartını oluşturan düğmeyi.",
+      "winBagsTitle": "Çantalar (B)",
+      "winBagsBody": "Taşıdığın her şey, dört çanta yuvası olan tek bir pakette. Üstteki kategori etiketleri onu silahlara, zırha, sarf malzemelerine, malzemelere, aletlere, görev eşyalarına ya da bineklere daraltır ve bir arama kutusu ada göre filtreler. Bir sıralama açılır menüsü, baktığını en sona eklenen, kalite ya da ada göre yeniden sıralar ve bu tercih oturumlar arasında hatırlanır. Ayrı bir Sırala düğmesi, etiketleri ve aramayı temizleyerek paketin gerçek hücrelerini tek bir basışla düzenler, böylece tüm düzenlenmiş çantayı görürsün.",
+      "winSpellbookTitle": "Büyü kitabı (P)",
+      "winSpellbookBody": "Sınıfının sahip olduğu, öğrenilmiş ve henüz gelecek olan her yetenek, sırasıyla. Yetenekleri eylem çubuklarına buradan sürüklersin.",
+      "winTalentsTitle": "Yetenekler (N)",
+      "winTalentsBody": "Uzmanlığınızı seçtiğiniz ve altı yetenek sıranızın her birinin sunduğu üç seçenekle bunların ne işe yaradığını gördüğünüz yer. Henüz ulaşmadığınız sıralar, şu an seçebildiklerinizin yanında gösterilir.",
+      "winProfessionsTitle": "Meslekler (Shift+P)",
+      "winProfessionsBody": "Neler öğrendiğin, her birinde ne kadar becerikli olduğun ve her birinin daha ne kadar ilerleyebileceği.",
+      "winCraftingTitle": "Üretim (T)",
+      "winCraftingBody": "Tariflerin, her birinin neye ihtiyaç duyduğu ve taşıdıklarınla şu anda ne üretebileceğin.",
+      "winQuestLogTitle": "Görev günlüğü (L)",
+      "winQuestLogBody": "Aldığın her görev, hikayesi, hedefleri ve ilerlemenle birlikte; herhangi birini haritada gösterme ve takipçinin hangi görevleri izleyeceğini seçme yoluyla.",
+      "winDeedsTitle": "Yiğitlikler Kitabı (Shift+Z)",
+      "winDeedsBody": "Yaptıklarının kaydı, sana ödediği unvanlar ve Ün, ve hâlâ açık olanlar.",
+      "winSocialTitle": "Arkadaşlar ve Lonca (O)",
+      "winSocialBody": "Arkadaşların, loncan ve üye listesi, akının, ve yok saydığın ya da engellediğin oyuncular için sekmeler.",
+      "winFinderTitle": "Zindan Bulucu (Shift+I)",
+      "winFinderBody": "Sıraya girebileceğin grup içeriğinin kataloğu. İstediğin etkinlikleri işaretle, tek başına bir sıraya katıl ya da kendi grubun için bir ilan ver ve bir grup bir araya geldiğinde kabul et.",
+      "winMetersTitle": "Hasar sayaçları (Shift+H)",
+      "winMetersBody": "Senin ve yanındaki herkesin hasarı, iyileştirmesi ve tehdidi, bir önceki dövüşe bile dönüp bakabilmen için dilimler halinde tutulur. İyileştirme ve tehdit panelleri kendi başlarına durmaları için dışarı çekilebilir.",
+      "winMoreTitle": "Ve birkaçı daha",
+      "winMoreBody": "Dünya haritası (M), PvP penceresi (G), Vadi Kupası (Y), lider tablosu (K), etkinlik takvimi (I) ve ifade çarkı (X) hepsi aynı şekilde çalışır. Lider tablosu ilk ziyaretinde bir an ayırmaya değer: oyuncular için bir sekme, loncalar için bir sekme, tüm hesapları Yiğitlikler Kitabı'ndaki Ün'e göre sıralayan bir sekme ve günlük sıralama için bir sekme tutar.\n\nBaşka bir oyuncuya, isim etiketinde ya da sohbette adının üzerinde sağ tıkla; Oyuncu Bilgisi onun hakkında bir kart açar: ipucu kutularıyla birlikte kuşandığı teçhizat ve karakterinin herkese açık ayrıntıları. Bu yalnızca bir bakıştır, başka bir şey değildir ve görebilmen için onun yeterince yakında olması gerekir.",
+      "worldWindowsTitle": "Dünyanın sizin için açtığı pencereler",
+      "worldWindowsBody": "Bazı pencereler için hiçbir tuşa basmazsınız: doğru kişiyle konuştuğunuzda ya da doğru şeye tıkladığınızda kendiliğinden açılırlar.\n\nBir tüccar, satın alınabilecek stokla birlikte, yanlışlıkla sattığınız eşyaları tutan bir geri alım sekmesiyle Tüccar penceresini açar. Stokla birlikte bir dizi miktar düğmesi durur, böylece bir yığın malzeme on kez basmak yerine beşer ya da onar basışla alınır; ikisi de uymadığında özel bir miktar seçeneği de vardır. Bir sınıf eğitmeni, şu anda öğrenebilecekleriniz ile önünüzde bekleyenlerin listesini açar.\n\nBir bankacı kasanızı açar: satın alarak genişletebileceğiniz ekstra yuvaların bulunduğu o kasayı. Loncanız bir banka açtıysa oradaki ikinci bir sekme onu gösterir: bir şey çıkarma izni olmasa da her üye içine bakabilir, böylece kimse loncanın ne tuttuğunu sormak zorunda kalmaz; kimin para yatırıp çekebileceğine ve lonca parasını taşıyabileceğine rütbeler karar verir, bir günlük de her hareketi kaydeder.\n\nBir Kuzgun Postası kutusu mektuplarınızı açar: gelenler bir sekmede, ekleriyle birlikte gönderme formu bir başka sekmede. Tüccar'daki Dünya Pazarı'nın kendi penceresi vardır: bir sekmesinde göz atıp satın alırsınız, bir başkasında kendi mallarınızı listelersiniz, üçüncüsünde satılanları toplarsınız. Başka bir oyuncuyla yüz yüze takas yapmak, her biri için bir tarafı olan bir takas penceresi açar.",
+      "lootTitle": "Ganimet ve zar atışları",
+      "lootBody": "Hakkını kazandığın bir cesetle etkileşime gir, ganimet penceresi açılır ve neyin düştüğünü listeler. Almak için bir satıra tıkla.\n\nBir grupta, grubun ganimet kurallarına göre iyi bir düşüş bunun yerine ekranına bir zar atışı istemi koyar: kendin istiyorsan İhtiyaç, satmak için alacaksan Açgözlülük ya da başkasına bırakmak için Pas. Küçük bir panel, sayaç azalırken kimin zar attığını ve ne seçtiğini gösterir.\n\nGanimet kurallarının kendisi küçük bir pencerede yaşar. Grup lideri onları orada değiştirebilir, geri kalan herkes ise aynı pencereyi salt okunur görür, böylece kurallar asla bir sır olmaz.\n\nBazı cesetler parçaları için de toplanabilir. Bu mümkün olduğunda, ganimet penceresinin altında istediğin her bileşen için işaretlenecek bir kutuyla bir Toplama bölümü belirir.",
+      "playerCardTitle": "Oyuncu kartın",
+      "playerCardBody": "Karakter sayfandaki bir düğme bir oyuncu kartı oluşturur: karakterinin bir yakın çekimi, kuşandığın teçhizat ve istatistiklerinle birlikte, kaydetmeye ya da paylaşmaya hazır bir görsel. Yeni bir seti göstermek için bir anlık görüntüdür ve oyunda hiçbir şeyi değiştirmez.",
+      "wikiTitle": "Wiki düğmesi",
+      "wikiBody": "Bu wiki oyunun içinden tek bir tıklama uzaklıktadır. Bir düğmesi sağ alt köşedeki raydaki diğerleriyle birlikte durur, Esc oyun menüsünde bir sırası vardır ve telefonda Daha Fazla tepsisinde yaşar. Açmak seni tarayıcına devrettiği için düğme her zaman önce onay ister, böylece bir dövüşteki kazara bir dokunuş seni asla dışarı çıkaramaz. Oyun arkasında çalışmaya devam eder.",
+      "mobileTitle": "Telefonda ya da tablette",
+      "mobileBody": "Dokunmatik denetimler kendiliğinden belirir ve düzen kendini ekranına göre boyutlandırır: küçük bir telefonda kompakt bir düzen, daha büyük bir telefonda standart bir düzen ve bir tablette daha ferah bir düzen.\n\nYeteneklerin bir sayı sırası yerine bir halkada durur: yanında beş eylem düğmesi olan saldırı düğmesi ve halkayı geri kalan yuvaların arasında değiştiren bir sayfa geçişi, üç eylem çubuğunun tamamını açtığında yedi sayfaya kadar. Etraflarında dokunmatik bir oyuncunun en çok başvurduğu düğmeler durur: hedef değiştirme, önündekini kullanma ve zıplama, ayrıca taşıdıklarından kendiliğinden dolan, dışarı çekilebilen bir sarf malzemesi sırası.\n\nAlt kenar boyunca Sohbet, Sosyal, Görevler, Ayarlar ve Daha Fazla bulunur. Daha Fazla, karakterin, Zindan Bulucu, PvP, Vadi Kupası, ifadeler ve wiki dahil geri kalan pencerelerini tutan bir tepsi açar. Pencereler burada üzerine yüzmek yerine ekranı doldurur.\n\nBirim çerçevelerini taşımak masaüstüne özgü bir şeydir: dokunmatikte düzen onları senin için yerleştirir.",
+      "railTitle": "Düğme rayı",
+      "railBody": "Ekranın sağ alt köşesinde, mini haritadan epey uzakta, pencere başına bir tane olmak üzere, yan yana iki kısa sütun halinde düzenlenmiş küçük kare düğmelerden oluşan bir ray durur. Çoğunun üzerinde varsayılan tuşu yazılıdır.\n\nİlk sütun karakterini, büyü kitabını, yeteneklerini, görev günlüğünü, Yiğitlikler Kitabı'nı, mesleklerini, dünya haritanı, çantalarını ve üretimi kapsar. İkincisi WOC Mağazası ile açılır ve PvP, Zindan Bulucu, Vadi Kupası, Kart Düellosu, lider tablosu, ifadeler, müzik, arkadaşlar ve lonca, bu wiki ve oyun menüsüyle devam eder. Yalnızca geçerli olduklarında birkaçı daha onlara katılır."
     },
     "commandsPage": {
-      "intro": "Every command you can type into chat, grouped by what it is for, with its short forms.",
-      "slashBody": "Anything you type in the chat box that starts with a slash is a command rather than something you say out loud. Press Enter and it either acts (you follow someone, you invite them, you roll) or it prints a private line only you can see.",
-      "aliasBody": "Most commands have short forms, and every form listed in a row does exactly the same thing: /w, /t and /tell are one command. Words in angle brackets are required, words in square brackets are optional, and the capitalization of the command itself never matters.",
-      "helpTipTitle": "The game knows the list too",
-      "helpTipBody": "Type /help in game, or /commands, or just /?, and the whole command list prints into your chat. Mistype a command and the game tells you it did not recognize it, and points you back at /help.",
-      "cmdHeader": "Command",
-      "doesHeader": "What it does",
-      "groupTalking": "Talking",
-      "say": "Speak to the players standing near you. A plain line with no slash goes to whichever chat tab you have selected, and Say is the one you start on.",
-      "yell": "Shout, so players much further away than say range hear you.",
-      "whisper": "Send a private message to one player who is online. Their name matches whatever capitalization you type, as long as only one player could be meant.",
-      "reply": "Answer whoever whispered you last, without typing their name again.",
-      "me": "Freeform action text in the third person, so \"/me ponders the fountain\" reads as your name followed by the action. Everyone near you sees it.",
-      "partyChat": "Talk to everyone in your party or raid.",
-      "groupChannels": "Channels",
-      "channelsIntro": "General reaches the whole realm and you are in it from the moment you log in. World and LFG are opt in: join one first, then you can read and talk in it.",
-      "general": "The realm-wide General channel.",
-      "gAlias": "A short form with two meanings, so it is worth knowing: offline it sends to General, but online it is your guild channel. Type /general or /1 when you definitely mean General.",
-      "guild": "Talk to your guild. Online play only, and you need to be in a guild.",
-      "officer": "The officer channel of your guild, open to officers and the Guild Master. Online play only.",
-      "join": "Join or leave an optional channel. The two you can join are world and lfg, and typing /join on its own lists them. Opening a chat tab for one of them joins it for you.",
-      "world": "Talk in the World channel, once you have joined it.",
-      "lfg": "Talk in the LFG channel, where people look for groups. Join it first.",
-      "groupParty": "Party and group",
-      "invite": "Invite an online player to your party by name, however far away they are standing.",
-      "partyRoster": "With no message after it, this prints your party roster instead: every member with their level, class and health, and the leader marked.",
-      "ready": "The party or raid leader starts a ready check, and everyone else gets a prompt to answer yes or no.",
-      "assist": "Target whatever the named player is targeting. With no name it assists the player you have targeted. It reaches your party and raid anywhere in the world, and anyone else close enough for you to see.",
-      "follow": "Trail another player automatically. With no name it follows your current target. Moving, casting, fighting, picking a new target, or the other player pulling away all end it, and you cannot start it in combat.",
-      "unfollow": "Stop following.",
-      "roll": "Roll a random number, from 1 to 100 unless you name a limit or a range. Your party sees the result, or everyone nearby when you are not in one. The roll is made by the server, so nobody can fake one.",
-      "groupPeople": "Other players",
-      "who": "List the players online. Add text to narrow it to names or zones containing that text.",
-      "inspect": "Look up an online player's level, class and health.",
-      "ignore": "Hide a player's public chat and their overhead chat bubbles from you. Their whispers, rolls, invites and mail still arrive. The list form prints who you are ignoring.",
-      "block": "The stronger version: it also stops their whispers, invites and mail, and hides the two of you from each other in /who. The list form prints who you have blocked.",
-      "peopleNote": "The /who roster and your ignore and block lists are kept by the server, so those work in online play only.",
-      "groupSelf": "Your character",
-      "selfIntro": "These print a private line into your chat that nobody else sees. Nothing is broadcast, so they are safe to use in the middle of a fight.",
-      "played": "How long this character has been in the world during this session.",
-      "playtime": "How long this character has been played in total, across every session.",
-      "xp": "Your level and how far through it you are.",
-      "gold": "What is in your purse.",
-      "stats": "A one-line character summary: level, class, health, your resource, attack power, crit chance and armor.",
-      "gear": "Everything you have equipped, slot by slot, so the empty slots stand out.",
-      "bags": "What you are carrying, best quality first, with your money at the end.",
-      "abilities": "The abilities you have learned.",
-      "talents": "Your specialization, and how many of your six talent rows you have chosen so far.",
-      "quests": "Your active quest log, with the progress on each objective.",
-      "completed": "The quests you have already turned in, in the order you finished them.",
-      "session": "What you have done since you logged in: kills, deaths, damage and experience.",
-      "arena": "Your Ashen Coliseum standing in both brackets: rating, wins, losses and win rate for 1v1 and for 2v2.",
-      "listings": "Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.",
-      "buyback": "What you sold to a vendor recently and could still buy back.",
-      "groupState": "How you are right now",
-      "buffs": "The buffs and debuffs on you, with the time left on each.",
-      "cooldowns": "Which of your abilities are cooling down, soonest ready first.",
-      "pet": "Your pet's name, level, family and health.",
-      "petTaunt": "Your pet's taunt cooldown, and whether it is set to cast it on its own.",
-      "speed": "How fast you are moving compared to a normal run, and whether something has you rooted.",
-      "form": "The shapeshift form or combat stance you are in.",
-      "manaRegen": "For mana users: whether your out-of-combat mana regeneration has started ticking again.",
-      "savedMana": "For a mana user who is shapeshifted: the mana parked while you are shifted, which comes back when you shift out.",
-      "combo": "How many combo points you are holding.",
-      "consumable": "The food and drink working on you right now, and how long each has left.",
-      "potion": "The shared combat potion cooldown, which is separate from your ability cooldowns.",
-      "falling": "Whether you are airborne, how far above the ground you are, and whether the landing is going to hurt.",
-      "groupCombat": "In a fight",
-      "target": "Your current target: name, level, what it is, and health.",
-      "targetBuffs": "The auras on your target, each tagged as a buff or a debuff.",
-      "range": "How far away your target is, and whether that is inside melee range.",
-      "attack": "Whether auto attack is running, on what, and how long your swing takes.",
-      "casting": "What you are casting or channeling, and how long is left.",
-      "combat": "Whether you are in combat, and when you are due to drop out of it.",
-      "threat": "Who the enemies fighting you are currently focused on.",
-      "consider": "How dangerous your target's level makes it, compared to yours.",
-      "queued": "The ability armed to go off on your next melee swing.",
-      "overpower": "For warriors: whether the Overpower window that an enemy dodge opens is still available.",
-      "groupWorld": "World and travel",
-      "where": "The zone you are standing in, its level range, and your coordinates.",
-      "zones": "Every zone in travel order with its level range, and the one you are in marked.",
-      "nearby": "The living things closest to you, nearest first.",
-      "pois": "The landmarks of your current zone, nearest first, with the distance to each.",
-      "graveyard": "Where your spirit would return to if you fell here.",
-      "dungeons": "Every dungeon with the zone its door sits in and the party size it is built for, plus the difficulty you are currently set to.",
-      "dungeonMode": "Switch your dungeons between the normal and heroic difficulty.",
-      "dungeonReset": "Abandon your own empty instances, which is what you do after changing difficulty.",
-      "groupRecovery": "Recovery and presence",
-      "unstuck": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. It leaves you weakened by Unstuck Sickness for a while afterwards, so it is a last resort rather than a shortcut.",
-      "afk": "Mark yourself Away From Keyboard, with an optional message that anyone who whispers you gets as an automatic reply. Repeat it with no message to clear it; any other chat clears it too.",
-      "dnd": "Do Not Disturb: like away, except whispers sent to you are held back instead of delivered.",
-      "sit": "Sit down where you are, and stand back up. You stand automatically the moment you move, cast, or take a hit.",
-      "help": "Print the command list into your chat.",
-      "emotesHeading": "Emotes",
-      "emotesBody": "The social emotes are commands too: /wave, /bow, /cheer, /dance, /laugh and the rest, each shown to everyone in say range. Add a name to aim one at somebody, as in \"/wave Aleph\", and /me covers anything the list does not.",
-      "emotesMore": "More about emotes and playing together",
-      "bangHeading": "Community commands",
-      "bangBody": "A few commands start with an exclamation mark instead of a slash. They announce something to the realm and post it to the community Discord at the same time, so people who are not logged in see it too. They are part of online play.",
-      "bangList": "The set is !lfg for looking for a group, !wts and !wtb for selling and buying, !recruit for guild recruitment, !event for a raid or a meetup, and !help when you are stuck. Type the command, then your message.",
-      "unknownHeading": "If a command does not work",
-      "unknownBody": "A command the game does not recognize comes back as an unknown-command notice, and nothing is said out loud, so a typo never lands in the channel you were talking in. Commands sent too quickly in a row are throttled: slow down for a moment and they go through again. Some need something to act on, so /follow with nobody targeted, or /reply when nobody has whispered you, will tell you so.",
-      "stickyBody": "Which chat tab you have selected decides where a plain line with no slash goes. Select the World tab and your next untagged line goes to World, so glance at the tab before you type. A slash command always wins over the tab, so /w Bob hi whispers Bob whichever tab is up, and on the whisper tab a plain line answers whoever whispered you last."
+      "intro": "Sohbete yazabileceğin her komut, ne işe yaradığına göre gruplanmış, kısa biçimleriyle birlikte.",
+      "slashBody": "Sohbet kutusuna yazdığın eğik çizgiyle başlayan her şey, yüksek sesle söylediğin bir şey değil, bir komuttur. Enter’a bas, ya bir şey yapar (birini takip edersin, onu davet edersin, zar atarsın) ya da yalnızca senin görebileceğin özel bir satır yazdırır.",
+      "aliasBody": "Çoğu komutun kısa biçimleri vardır ve bir satırda listelenen her biçim tam olarak aynı şeyi yapar: /w, /t ve /tell tek bir komuttur. Açılı ayraç içindeki sözcükler zorunludur, köşeli ayraç içindekiler isteğe bağlıdır, ve komutun kendisinin büyük/küçük harfi hiçbir zaman önemli değildir.",
+      "helpTipTitle": "Oyun da listeyi biliyor",
+      "helpTipBody": "Oyun içinde /help, /commands ya da yalnızca /? yaz, komut listesinin tamamı sohbetine yazdırılır. Bir komutu yanlış yazarsan oyun onu tanımadığını söyler ve seni tekrar /help’e yönlendirir.",
+      "cmdHeader": "Komut",
+      "doesHeader": "Ne yaptığı",
+      "groupTalking": "Konuşma",
+      "say": "Yakınında duran oyunculara konuş. Eğik çizgisiz düz bir satır, seçili olan sohbet sekmesine gider, ve başlangıçta bulunduğun sekme Söyle’dir.",
+      "yell": "Bağır, böylece Söyle menzilinden çok daha uzaktaki oyuncular seni duyar.",
+      "whisper": "Çevrimiçi olan bir oyuncuya özel mesaj gönder. Yalnızca tek bir oyuncu kastedilebiliyorsa, adı yazdığın her türlü büyük/küçük harfle eşleşir.",
+      "reply": "Adını tekrar yazmadan, sana en son fısıldayan kişiyi yanıtla.",
+      "me": "Üçüncü şahıs ağzından serbest biçimli eylem metni, böylece \"/me çeşmeyi düşünüyor\" adının ardından eylemin geldiği şekilde okunur. Yakınındaki herkes bunu görür.",
+      "partyChat": "Grubundaki ya da akınındaki herkesle konuş.",
+      "groupChannels": "Kanallar",
+      "channelsIntro": "Genel, tüm diyara ulaşır ve giriş yaptığın andan itibaren içindesindir. Dünya ve LFG isteğe bağlıdır: önce birine katıl, sonra içinde okuyup konuşabilirsin.",
+      "general": "Diyar çapındaki Genel kanalı.",
+      "gAlias": "İki anlamı olan bir kısa biçim, bu yüzden bilmeye değer: çevrimdışıyken Genel’e gönderir, ama çevrimiçiyken lonca kanalındır. Kesinlikle Genel’i kastediyorsan /general ya da /1 yaz.",
+      "guild": "Loncanla konuş. Yalnızca çevrimiçi oyunda, ve bir loncada olman gerekir.",
+      "officer": "Loncanın subay kanalı, subaylara ve Lonca Üstadına açıktır. Yalnızca çevrimiçi oyunda.",
+      "join": "İsteğe bağlı bir kanala katıl ya da ondan ayrıl. Katılabileceğin iki kanal world ve lfg’dir, ve tek başına /join yazmak onları listeler. Onlardan biri için bir sohbet sekmesi açmak seni otomatik olarak katılmış yapar.",
+      "world": "Ona katıldıktan sonra Dünya kanalında konuş.",
+      "lfg": "İnsanların grup aradığı LFG kanalında konuş. Önce ona katıl.",
+      "groupParty": "Grup ve takım",
+      "invite": "Çevrimiçi bir oyuncuyu, ne kadar uzakta dursa da, adıyla grubuna davet et.",
+      "partyRoster": "Ardında mesaj olmadan bu, bunun yerine grup listeni yazdırır: her üye seviyesi, sınıfı ve canıyla birlikte, lider işaretlenmiş olarak.",
+      "ready": "Grup ya da akın lideri bir hazırlık yoklaması başlatır, ve herkese evet ya da hayır yanıtlayacağı bir istem gelir.",
+      "assist": "Adı verilen oyuncunun hedeflediği şeyi hedefle. İsim verilmezse, hedeflediğin oyuncuyla aynı hedefi seçer. Dünyanın her yerindeki grubuna ve akınına, ayrıca görebilecek kadar yakınındaki herkese ulaşır.",
+      "follow": "Başka bir oyuncuyu otomatik olarak takip et. İsim yoksa, mevcut hedefini takip eder. Hareket etmek, büyü okumak, dövüşmek, yeni bir hedef seçmek ya da diğer oyuncunun uzaklaşması hepsi onu sonlandırır, ve onu savaştayken başlatamazsın.",
+      "unfollow": "Takip etmeyi durdur.",
+      "roll": "Bir limit ya da aralık belirtmedikçe 1 ile 100 arasında rastgele bir sayı için zar at. Grubun sonucu görür, ya da bir grupta değilsen yakındaki herkes görür. Zar sunucu tarafından atılır, bu yüzden kimse sahtesini yapamaz.",
+      "groupPeople": "Diğer oyuncular",
+      "who": "Çevrimiçi oyuncuları listele. O metni içeren adlara ya da bölgelere daraltmak için metin ekle.",
+      "inspect": "Çevrimiçi bir oyuncunun seviyesine, sınıfına ve canına bak.",
+      "ignore": "Bir oyuncunun genel sohbetini ve baş üstü sohbet balonlarını senden gizle. Fısıltıları, zar atışları, davetleri ve postaları yine de ulaşır. Liste biçimi kimi görmezden geldiğini yazdırır.",
+      "block": "Daha güçlü sürüm: fısıltılarını, davetlerini ve postalarını da durdurur, ve ikinizi /who içinde birbirinize gizler. Liste biçimi kimi engellediğini yazdırır.",
+      "peopleNote": "/who listesi ile görmezden gelme ve engelleme listelerin sunucu tarafından tutulur, bu yüzden bunlar yalnızca çevrimiçi oyunda çalışır.",
+      "groupSelf": "Karakterin",
+      "selfIntro": "Bunlar sohbetine, başka kimsenin görmediği özel bir satır yazdırır. Hiçbir şey yayınlanmaz, bu yüzden bir dövüşün ortasında kullanmak güvenlidir.",
+      "played": "Bu karakterin bu oturum boyunca dünyada ne kadar süredir olduğu.",
+      "playtime": "Bu karakterin toplamda, her oturum boyunca ne kadar süre oynandığı.",
+      "xp": "Seviyen ve onun ne kadarını tamamladığın.",
+      "gold": "Kesende ne olduğu.",
+      "stats": "Tek satırlık bir karakter özeti: seviye, sınıf, can, kaynağın, saldırı gücü, kritik şansı ve zırh.",
+      "gear": "Kuşandığın her şey, yuva yuva, böylece boş yuvalar göze çarpar.",
+      "bags": "En iyi kaliteden başlayarak taşıdıkların, sonunda da paran.",
+      "abilities": "Öğrendiğin yetenekler.",
+      "talents": "Uzmanlığın, ve altı yetenek sırandan şu ana kadar kaçını seçtiğin.",
+      "quests": "Aktif görev günlüğün, her hedefteki ilerlemeyle birlikte.",
+      "completed": "Zaten teslim ettiğin görevler, bitirdiğin sırayla.",
+      "session": "Giriş yaptığından beri yaptıkların: öldürmeler, ölümler, hasar ve deneyim.",
+      "arena": "Kül Kolezyumu’ndaki her iki kademedeki durumun: puan, galibiyet, mağlubiyet ve 1v1 ile 2v2 için galibiyet oranı.",
+      "listings": "Dünya Pazarı’ndaki kendi ilanların, istenen fiyat, her birinde kalan süre ve daha fazlası için ne kadar yerin olduğuyla birlikte.",
+      "buyback": "Yakın zamanda bir satıcıya sattığın ve hâlâ geri alabileceğin şeyler.",
+      "groupState": "Şu anda nasıl olduğun",
+      "buffs": "Üzerindeki güçlendirmeler ve zayıflatmalar, her birinde kalan süreyle birlikte.",
+      "cooldowns": "Yeteneklerinden hangilerinin bekleme süresinde olduğu, en yakında hazır olacaklar önce.",
+      "pet": "Evcil hayvanının adı, seviyesi, ailesi ve canı.",
+      "petTaunt": "Evcil hayvanının tahrik bekleme süresi, ve onu kendiliğinden kullanacak şekilde ayarlı olup olmadığı.",
+      "speed": "Normal bir koşuya kıyasla ne kadar hızlı hareket ettiğin, ve bir şeyin seni köklemiş olup olmadığı.",
+      "form": "İçinde bulunduğun şekil değiştirme formu ya da savaş duruşu.",
+      "manaRegen": "Mana kullanıcıları için: savaş dışı mana yenilenmenin tekrar işlemeye başlayıp başlamadığı.",
+      "savedMana": "Şekil değiştirmiş bir mana kullanıcısı için: şekildeyken bir kenarda tutulan ve şekilden çıktığında geri gelen mana.",
+      "combo": "Kaç kombo puanı taşıdığın.",
+      "consumable": "Şu anda üzerinde etkili olan yiyecek ve içecekler, ve her birinde kalan süre.",
+      "potion": "Yetenek bekleme sürelerinden ayrı olan, paylaşılan savaş iksiri bekleme süresi.",
+      "falling": "Havada olup olmadığın, yerden ne kadar yüksekte olduğun, ve inişin acıtıp acıtmayacağı.",
+      "groupCombat": "Bir dövüşte",
+      "target": "Şu anki hedefin: adı, seviyesi, ne olduğu ve canı.",
+      "targetBuffs": "Hedefindeki etkiler, her biri güçlendirme ya da zayıflatma olarak etiketlenmiş.",
+      "range": "Hedefinin ne kadar uzakta olduğu, ve bunun yakın dövüş menzili içinde olup olmadığı.",
+      "attack": "Otomatik saldırının çalışıp çalışmadığı, neye çalıştığı ve vuruşunun ne kadar sürdüğü.",
+      "casting": "Ne büyü okuduğunu ya da kanalize ettiğini, ve ne kadar süre kaldığını.",
+      "combat": "Savaşta olup olmadığın, ve ne zaman savaştan çıkman gerektiği.",
+      "threat": "Seninle dövüşen düşmanların şu anda kime odaklandığı.",
+      "consider": "Hedefinin seviyesinin, seninkine kıyasla onu ne kadar tehlikeli kıldığı.",
+      "queued": "Bir sonraki yakın dövüş vuruşunda patlamaya hazır bekleyen yetenek.",
+      "overpower": "Savaşçılar için: bir düşman kaçınmasının açtığı Kızıl El Güçlendirmesi penceresinin hâlâ kullanılabilir olup olmadığı.",
+      "groupWorld": "Dünya ve yolculuk",
+      "where": "İçinde durduğun bölge, seviye aralığı ve koordinatların.",
+      "zones": "Seyahat sırasına göre seviye aralığıyla birlikte her bölge, ve içinde bulunduğun işaretlenmiş.",
+      "nearby": "Sana en yakın canlılar, en yakın önce.",
+      "pois": "Şu anki bölgenin önemli noktaları, en yakın önce, her birine olan mesafeyle birlikte.",
+      "graveyard": "Burada düşersen ruhunun döneceği yer.",
+      "dungeons": "Kapısının bulunduğu bölge ve tasarlandığı grup boyutuyla birlikte her zindan, artı şu anda ayarlı olduğun zorluk.",
+      "dungeonMode": "Zindanlarını Normal ve Kahramanca zorluk arasında değiştir.",
+      "dungeonReset": "Kendi boş örneklerinden vazgeç, zorluğu değiştirdikten sonra yapılması gereken de budur.",
+      "groupRecovery": "Toparlanma ve durum",
+      "unstuck": "Dünya seni hapsettiğinde çıkış yolu. Kısa bir geri sayım boyunca hareketsiz dur, en yakın mezarlığa taşınırsın, ve zaten düşmüşsen orada diriltilirsin. Ardından bir süre seni Kurtulma Hastalığı ile zayıflatır, bu yüzden bir kestirme değil, son çare olarak kullanılır.",
+      "afk": "Kendini Uzakta olarak işaretle; isteğe bağlı bir mesaj eklersen, sana fısıldayan herkes onu otomatik bir yanıt olarak alır. Mesajsız tekrarlamak bunu temizler; başka herhangi bir sohbet de temizler.",
+      "dnd": "Rahatsız Etmeyin: uzakta gibidir, yalnızca sana gönderilen fısıltılar iletilmek yerine bekletilir.",
+      "sit": "Bulunduğun yerde otur, ve tekrar ayağa kalk. Hareket ettiğin, büyü okuduğun ya da bir darbe aldığın an otomatik olarak ayağa kalkarsın.",
+      "help": "Komut listesini sohbetine yazdır.",
+      "emotesHeading": "İfadeler",
+      "emotesBody": "Sosyal ifadeler de birer komuttur: /wave, /bow, /cheer, /dance, /laugh ve gerisi, her biri Söyle menzilindeki herkese gösterilir. Birine yöneltmek için bir isim ekle, \"/wave Aleph\" gibi, ve /me listenin kapsamadığı her şeyi karşılar.",
+      "emotesMore": "İfadeler ve birlikte oynamak hakkında daha fazlası",
+      "bangHeading": "Topluluk komutları",
+      "bangBody": "Birkaç komut eğik çizgi yerine ünlem işaretiyle başlar. Bunlar diyara bir şey duyurur ve aynı anda topluluk Discord’una da gönderir, böylece giriş yapmamış kişiler de görür. Çevrimiçi oynanışın bir parçasıdırlar.",
+      "bangList": "Küme şöyle: grup aramak için !lfg, satmak ve almak için !wts ile !wtb, lonca üyesi bulmak için !recruit, bir akın ya da buluşma için !event, ve sıkıştığında !help. Komutu yaz, ardından mesajını.",
+      "unknownHeading": "Bir komut çalışmıyorsa",
+      "unknownBody": "Oyunun tanımadığı bir komut, bilinmeyen komut bildirimi olarak geri döner ve hiçbir şey yüksek sesle söylenmez, bu yüzden bir yazım hatası hiçbir zaman konuştuğun kanala düşmez. Art arda çok hızlı gönderilen komutlar kısıtlanır: bir an yavaşla, tekrar geçerler. Bazıları üzerinde işlem yapacak bir şeye ihtiyaç duyar, bu yüzden kimse hedeflenmemişken /follow, ya da kimse sana fısıldamamışken /reply, sana bunu söyler.",
+      "stickyBody": "Hangi sohbet sekmesini seçtiğin, eğik çizgisiz düz bir satırın nereye gideceğine karar verir. World sekmesini seç, bir sonraki etiketsiz satırın Dünya’ya gider, bu yüzden yazmadan önce sekmeye göz at. Bir eğik çizgi komutu her zaman sekmeye üstün gelir, bu yüzden /w Bob hi hangi sekme açık olursa olsun Bob’a fısıldar, ve fısıltı sekmesindeyken düz bir satır sana en son fısıldayan kişiyi yanıtlar."
     },
     "glossary": {
       "intro": "Bu rehber boyunca ve sohbette kullanılan terimler için hızlı bir başvuru.",
@@ -4303,7 +4616,7 @@ export const tr_TR: EnTranslations = {
       "healerTerm": "İyileştirici",
       "healerDef": "Herkesi iyileştirme büyüleriyle hayatta tutan grup üyesi.",
       "specTerm": "Uzmanlık (Spec)",
-      "specDef": "Uzmanlık: yetenek puanı harcadıkça sınıfını iyileştirme ya da hasar gibi bir yöne eğdiğin yol.",
+      "specDef": "Uzmanlık: sınıfın için 5. seviyede seçtiğin yol, şifa ya da hasar gibi. Rolünü belirler, imzalık bir yetenek ve kalıcı bir ustalık verir ve yeteneklerini sıfırlasan bile seninle kalır.",
       "pullTerm": "Çekme (Pull)",
       "pullDef": "Bir düşmanı ya da grubu savaşa çekmek; genellikle bilerek ve birer birer.",
       "instanceTerm": "Kopya alan",
@@ -4331,7 +4644,7 @@ export const tr_TR: EnTranslations = {
       "targetMarkerTerm": "Hedef işareti",
       "targetMarkerDef": "Herhangi bir grup ya da akın üyesinin bir hedefin üzerine iğneleyebildiği bir simge; böylece herkes aynı hedefe yönelir ya da ondan kaçınır. Sekiz simge, simge başına bir hedef.",
       "loadoutTerm": "Düzen",
-      "loadoutDef": "Kaydedilmiş bir yetenek düzeni. Birkaç tane tut ve puanlarını tek tek yeniden harcamadan yapıların arasında geçiş yap.",
+      "loadoutDef": "Kaydedilmiş bir yetenek düzeni, en fazla on tane. Her biri sıra tercihlerini ve eylem çubuğunu hatırlar, ayrıca üzerindeki ekipmanı da hatırlayabilir, böylece yapı değiştirmek her sırayı yeniden kurmak yerine tek bir tıktır.",
       "readyCheckTerm": "Hazırlık yoklaması",
       "readyCheckDef": "Bir grup liderinin grubu ya da akını yoklamak için /ready yazması: herkes Hazır ya da Hazır Değil olduğunu onaylar ve grup sayıları görür.",
       "soulboundTerm": "Ruha Bağlı",
@@ -4340,54 +4653,54 @@ export const tr_TR: EnTranslations = {
       "spiritHealerDef": "Diyarın ruh şifacısı, her mezarlığın üzerinde süzülür: geçici bir güçsüzlük pahasına hayaletini olduğun yerde diriltebilir.",
       "worldBossTerm": "Dünya şefi",
       "worldBossDef": "Açık dünyada düzenli bir ritimle yükselen, akın gücünde bir şef; sabit bir grup yerine, çağrıya toplanan herkesçe dövüşülür.",
-      "fiveSecondTerm": "The five-second rule",
-      "fiveSecondDef": "Your mana only starts refilling on its own once five seconds have passed since you last spent any. It is why casters pace themselves instead of casting flat out.",
-      "talentRowTerm": "Talent row",
-      "talentRowDef": "Talents arrive as six rows, one at each of levels 5, 8, 11, 14, 17 and 20. Every row offers three options and you take one of them, so there are no points to save up or spend.",
-      "riftTerm": "Rift",
-      "riftDef": "A tear that opens on its own out in the zones, leading down through floors of an instance built fresh from that rift's own seed. Rifts are ranked C, B, A or S. The entrance closes to new parties after a while, and only the first party in the realm to reach the bottom seals it.",
-      "riftRankTerm": "Rank (rifts)",
-      "riftRankDef": "The letter on a rift, C, B, A or S, and the only thing that sets how hard it is. A rift never scales to the size of your group, so the rank is the whole difficulty ladder: C is the gentlest and S the fiercest, and every rank is meant for a group.",
-      "finderTerm": "Dungeon Finder",
-      "finderDef": "The window that catalogues the dungeons and raids, queues you for a quick match, and lists the premade groups looking for people. Shift+I opens it by default.",
-      "premadeTerm": "Premade",
-      "premadeDef": "A group a player put together by hand and listed on the Dungeon Finder board, rather than one the quick match queue assembled for you.",
-      "chronicleTerm": "Chronicle",
-      "chronicleDef": "A zone's own collection of deeds, gathered into chapters by a local Chronicler. You can work through the chapters in whatever order suits you.",
-      "marksTerm": "Delve Marks and Heroic Marks",
-      "marksDef": "The two rewards the repeatable endgame pays besides loot. Delves pay Delve Marks, which buy gear from the delve shop and upgrade your companion; heroic dungeons pay Heroic Marks, which buy gear from the heroic quartermaster.",
-      "honorTerm": "Honor",
-      "honorDef": "What fighting other players pays out: arena victories, Thornhollow Fields wins, and honorable kills all add to it. You spend it on the Warfare sets.",
-      "warfareTerm": "Warfare",
-      "warfareDef": "The gear side of player-versus-player. A quartermaster sells sets of Warfare armor for Honor, and the Warfare rating they carry counts only in fights against other players.",
-      "fatigueTerm": "Fatigue",
-      "fatigueDef": "Swim far enough out into open sea and the water begins to sap you: a warning comes first, then rising damage until you turn back toward land.",
-      "unstuckTerm": "Unstuck Sickness",
-      "unstuckDef": "The price of using Unstuck from the game menu. Stand still through the countdown and it sets you down at the nearest graveyard, and you carry a temporary weakness for a while afterwards.",
-      "itemLevelTerm": "Item level",
-      "itemLevelDef": "One number summing up how strong a piece of gear is, handy when you want to compare two pieces quickly. Turn on Show Item Level in the options to see it on tooltips. Only gear with a known source carries one, so plain vendor basics and starter gear show nothing, and a missing figure is normal rather than a fault.",
-      "requiredLevelTerm": "Required level",
-      "requiredLevelDef": "The level you have to reach before you can wear or wield a piece of gear. The tooltip shows it in red while you are still under it.",
-      "offHandTerm": "Off hand",
-      "offHandDef": "The second hand slot. It holds a shield or a held item such as a lantern or a quiver, and a second weapon only if your class and specialization can dual wield.",
-      "setBonusTerm": "Set bonus",
-      "setBonusDef": "An extra reward for wearing several pieces of the same armor family at once. The tooltip counts how many pieces of the set you have on, and more pieces unlock more of the bonus.",
-      "commissionTerm": "Commission and the Maker's Bond",
-      "commissionDef": "A craft made for someone else. The crafter flags the piece as a commission, and it binds to whoever receives it in a trade; a station master will unbind it again later for a fee.",
-      "masterworkTerm": "Masterwork",
-      "masterworkDef": "The finest version of a craft, which a skilled crafter turns out now and then in place of a plain copy. A masterwork always carries its maker's name.",
-      "toolCharmTerm": "Tool charm",
-      "toolCharmDef": "A crafted charm you slot onto a mining, logging, or herbalism tool from the Professions window to improve what it brings back. Slotting consumes the charm, and the effect lasts for a set number of charges. When those run out you recharge the slot with materials rather than crafting a new charm.",
-      "mountTerm": "Mount",
-      "mountDef": "A creature you ride to cross the land faster. Almost anything else you do takes you off it: swimming, entering combat, gathering, and crafting all put you back on your feet.",
-      "ridingTerm": "Riding",
-      "ridingDef": "The skill that lets you ride at all. You buy it once from a stablemaster at level 20, and after that it stays with your character for good.",
-      "reinsTerm": "Reins",
-      "reinsDef": "The item that is a mount. Keep a pair in your bags or your bank and that mount is yours; use them to ride. Reins can be traded, mailed, and sold to other players.",
+      "fiveSecondTerm": "Beş saniye kuralı",
+      "fiveSecondDef": "Manan, en son harcamandan bu yana beş saniye geçmeden tam hızıyla dolmaya başlamaz. O ana kadar da büsbütün durmaz, düşük bir hızla dolmayı sürdürür. Büyücülerin dört bir yandan büyü yağdırmak yerine kendilerini ayarlamalarının nedeni budur.",
+      "talentRowTerm": "Yetenek sırası",
+      "talentRowDef": "Yetenekler altı sıra halinde gelir, biri 5, 8, 11, 14, 17 ve 20. seviyelerin her birinde. Her sıra üç seçenek sunar ve sen bunlardan birini alırsın, yani biriktirilecek ya da harcanacak puan yoktur.",
+      "riftTerm": "Yarık",
+      "riftDef": "Bölgelerde kendiliğinden açılan bir yarık; o yarığın kendi tohumundan taze inşa edilmiş bir kopya alanın katlarından aşağı iner. Yarıklar C, B, A ya da S olarak derecelendirilir. Girişi bir süre sonra yeni gruplara kapanır ve diyarda dibe ilk ulaşan grup onu mühürler.",
+      "riftRankTerm": "Derece (yarıklar)",
+      "riftRankDef": "Bir yarığın üzerindeki harf, C, B, A ya da S; onun ne kadar zor olduğunu belirleyen tek şey budur. Bir yarık asla grubunun büyüklüğüne göre ölçeklenmez, bu yüzden derece zorluk merdiveninin tamamıdır: C en yumuşağı, S en amansızıdır ve her derece bir grup için tasarlanmıştır.",
+      "finderTerm": "Zindan Bulucu",
+      "finderDef": "Zindanları ve akınları kataloglayan, seni hızlı bir eşleşme için sıraya sokan ve insan arayan hazır grupları listeleyen pencere. Varsayılan olarak Shift+I ile açılır.",
+      "premadeTerm": "Hazır Grup",
+      "premadeDef": "Hızlı eşleştirme kuyruğunun senin için bir araya getirdiği değil, bir oyuncunun elle kurup Zindan Bulucu panosuna astığı bir grup.",
+      "chronicleTerm": "Vakayiname",
+      "chronicleDef": "Bir bölgenin kendi yiğitlik koleksiyonu, yerel bir Vakanüvis tarafından bölümlere ayrılmış. Bölümleri sana uyan sırayla çalışabilirsin.",
+      "marksTerm": "Mağara Nişanları ve Kahramanca Nişanları",
+      "marksDef": "Tekrarlanabilir son oyunun ganimetin yanında ödediği iki ödül. Mağara seferleri, mağara seferi dükkanından teçhizat alan ve yoldaşını geliştiren Mağara Nişanları öder; kahramanca zindanlar ise Kahramanca Levazımcı'dan teçhizat alan Kahramanca Nişanları öder.",
+      "honorTerm": "Onur",
+      "honorDef": "Diğer oyuncularla dövüşmenin karşılığı: arena zaferleri, Dikenvadi Ovası galibiyetleri ve onurlu öldürmelerin hepsi buna eklenir. Onu Harp takımlarına harcarsın.",
+      "warfareTerm": "Harp",
+      "warfareDef": "Oyuncuya karşı oyuncu dövüşünün teçhizat tarafı. Bir levazımcı, Onur karşılığında Harp zırhı setleri satar ve bunların taşıdığı Harp Derecesi yalnızca diğer oyunculara karşı dövüşlerde sayılır.",
+      "fatigueTerm": "Yorgunluk",
+      "fatigueDef": "Açık denizde yeterince uzağa yüz ve su seni tüketmeye başlar: önce bir uyarı gelir, sonra karaya dönene dek artan hasar.",
+      "unstuckTerm": "Kurtulma Hastalığı",
+      "unstuckDef": "Oyun menüsündeki Kurtulma'yı kullanmanın bedeli. Geri sayım boyunca hareketsiz durursan seni en yakın mezarlığa bırakır ve ardından bir süre geçici bir güçsüzlük taşırsın.",
+      "itemLevelTerm": "Eşya seviyesi",
+      "itemLevelDef": "Bir teçhizat parçasının ne kadar güçlü olduğunu özetleyen tek bir sayı, iki parçayı hızlıca karşılaştırmak istediğinde işe yarar. İpucu kutularında görmek için seçeneklerden Eşya Seviyesini Göster'i aç. Yalnızca bilinen bir kaynağı olan teçhizat bir tane taşır, bu yüzden düz satıcı temelleri ve başlangıç teçhizatı hiçbir şey göstermez; eksik bir rakam bir hata değil, normaldir.",
+      "requiredLevelTerm": "Gerekli seviye",
+      "requiredLevelDef": "Bir teçhizat parçasını kuşanabilmen ya da kullanabilmen için ulaşman gereken seviye. Henüz altındayken ipucu kutusu bunu kırmızı gösterir.",
+      "offHandTerm": "Yardımcı El",
+      "offHandDef": "İkinci el yuvası. Bir kalkan ya da bir fener veya sadak gibi elde tutulan bir eşya taşır, ikinci bir silahı ise yalnızca sınıfın ve uzmanlığın çift silah kuşanabiliyorsa taşır.",
+      "setBonusTerm": "Set bonusu",
+      "setBonusDef": "Aynı zırh ailesinden birden çok parçayı aynı anda kuşanmanın getirdiği ekstra ödül. İpucu kutusu setten kaç parça taktığını sayar ve daha çok parça bonusun daha büyük bir bölümünü açar.",
+      "commissionTerm": "Komisyon ve Ustanın Bağı",
+      "commissionDef": "Başkası için yapılmış bir üretim. Üretici parçayı bir komisyon olarak işaretler ve parça, takasta onu alan kişiye bağlanır; bir tezgah ustası daha sonra bir ücret karşılığında bağını yeniden çözebilir.",
+      "masterworkTerm": "Şaheser",
+      "masterworkDef": "Bir üretimin en iyi hali, yetenekli bir üreticinin arada bir sade bir kopya yerine ortaya çıkardığı. Bir şaheser her zaman ustasının adını taşır.",
+      "toolCharmTerm": "Alet tılsımı",
+      "toolCharmDef": "Meslekler penceresinden bir madencilik, oduncu ya da bitkicilik aletine yuvaladığın, aletin getirdiklerini iyileştiren üretilmiş bir tılsım. Yuvalamak tılsımı tüketir ve etki belirli sayıda şarj boyunca sürer. Bunlar tükendiğinde yeni bir tılsım üretmek yerine yuvayı malzemelerle yeniden doldurursun.",
+      "mountTerm": "Binek",
+      "mountDef": "Araziyi daha hızlı geçmek için bindiğin bir yaratık. Yaptığın hemen her şey seni ondan indirir: yüzmek, savaşa girmek, toplamak ve üretmek, hepsi seni yeniden ayaklarının üzerine koyar.",
+      "ridingTerm": "Binicilik",
+      "ridingDef": "Binmeni mümkün kılan beceri. Onu 20. seviyede bir Ahır Ustasından bir kez satın alırsın, ondan sonra karakterinde temelli kalır.",
+      "reinsTerm": "Dizgin",
+      "reinsDef": "Bir bineğin karşılığı olan eşya. Çantanda ya da bankanda bir çift dizgin tut, o binek artık senindir; binmek için onları kullan. Dizginler diğer oyuncularla takas edilebilir, postalanabilir ve satılabilir.",
       "claudiumTerm": "Claudium",
-      "claudiumDef": "The currency of the WOC Store, spent on cosmetics and nothing else. It never buys power or progression.",
-      "worldTerm": "World",
-      "worldDef": "One shared copy of the online game, with its own players, market, and standings. This guide also calls it a realm, and your character lives on the world you made it on."
+      "claudiumDef": "WOC Mağazası'nın para birimi, yalnızca kozmetiklere harcanır, başka hiçbir şeye değil. Asla güç ya da ilerleme satın almaz.",
+      "worldTerm": "Dünya",
+      "worldDef": "Çevrim içi oyunun, kendi oyuncuları, pazarı ve sıralamalarıyla paylaşılan tek bir kopyası. Bu rehber ona diyar da der ve karakterin, onu yarattığın dünyada yaşar."
     },
     "faqPage": {
       "intro": "Yeni oyuncuların en sık sorduğu sorular.",
@@ -4396,14 +4709,14 @@ export const tr_TR: EnTranslations = {
       "q2": "Kripto cüzdanına ya da herhangi bir jetona ihtiyacım var mı?",
       "a2": "Hayır. Oyun böyle bir şey olmadan tamamen oynanabilir. İsteğe bağlı topluluk jetonu yalnızca kozmetik gösteriş ve günlük ödül havuzundan bir pay ekler; gücü ya da ilerlemeyi asla etkilemez.",
       "q3": "Telefonumda oynayabilir miyim?",
-      "a3": "Evet. Oyun dokunmatik kontrollerle bir mobil tarayıcıda çalışır ve ayrıca bir masaüstü başlatıcısı da vardır.",
+      "a3": "Evet. Oyun dokunmatik kontrollerle her modern mobil tarayıcıda çalışır, ayrıca uygulamalar da var: iOS ve Android sürümleri ile kendini güncel tutan, Windows, macOS ve Linux için bir masaüstü uygulaması.",
       "q4": "Çevrimdışı ya da tek başıma oynayabilir miyim?",
       "a4": "Evet. Anında bir tek oyunculu çevrimdışı mod vardır ve çevrimiçi dünya; zindanlar, akın ve dünya şefi dışında tamamen tek başına oynanabilir.",
       "q5": "Kaç sınıf var?",
       "a5": "Dokuz; klasik tank, şifacı ve hasar rollerini kapsar, her biri bir kaynak sistemine (öfke, mana ya da enerji) ve kendi imza yeteneklerine sahiptir.",
       "q6": "Seviye sınırı nedir?",
       "a6": "Görevler, zindanlar ve keşiflerle dolu, birbirine bağlı üç bölgede ulaşılan seviye {cap}.",
-      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
+      "a6Count": "Görevler, zindanlar ve keşiflerle dolu bölgeler boyunca ulaşılan seviye {cap}. Başlangıç vadisinden zaten sınırdaki karakterler için inşa edilmiş bölgelere kadar, toplam {zones} bölge vardır.",
       "q7": "Karakterim kaydedilecek mi?",
       "a7": "Çevrimiçi karakterler sunucuda otomatik olarak kaydedilir. Çevrimdışı karakterler hızlı oturumlar ve testler için tarayıcınızda yaşar.",
       "q8": "Kendi kopyamı barındırabilir miyim?",
@@ -4411,27 +4724,27 @@ export const tr_TR: EnTranslations = {
       "q9": "PvP var mı?",
       "a9": "Evet. Eğlence için herkese düello açın ya da diğer oyuncularla savaşmak için Küllü Kolezyum'a adım atın. PvP isteğe bağlıdır, dolayısıyla asla zorlanmazsınız.",
       "q10": "Azami seviyede yapılacak ne var?",
-      "a10": "Sınır seviye {cap}. Oradan itibaren beş oyunculu zindanları ve on oyunculu akını koşar, yükseltilmiş ganimet için onları bir de kahramanca modda alır, yükseldiğinde dünya şefiyle yüzleşir, kendini arenada sınar, yanında bir yoldaşla mağara seferlerine iner ve diyar sıralamalarında yükselmek için Yiğitlikler Kitabı'ndaki yiğitliklerin peşine düşersin.",
+      "a10": "Tavan {cap}. seviyedir. Oradan beş kişilik zindanları ve on kişilik akını gezersin, yükseltilmiş ganimet için onları kahramanca modda yeniden ele alırsın, yarıklara kat kat inersin, ayağa kalktığında dünya patronuyla yüzleşirsin, arenada ya da Dikenvadi Ovası savaş alanında kendini sınarsın, bir Vadi Kupası sezonu oynarsın, yanında bir yoldaşla mağara inişlerine dalarsın, bir mesleği başyapıt zanaatına kadar götürürsün, binekler toplarsın ve sıralamalarda tırmanmak için Yiğitlikler Kitabı'ndaki yiğitliklerin peşine düşersin.",
       "q11": "Nasıl grup bulurum?",
       "a11": "Karşılaştığınız herkesi bir gruba davet edin, sohbette sorun ya da bir zindanda takım kurun. Dünyanın çoğu tek başına oynanabilir, bu yüzden gruplaşmak bir tercihtir, zorunluluk değil.",
-      "q12": "Is there a cash shop?",
-      "a12": "There is an optional cosmetic store. It sells looks: the Season 1 Armory weapon skins, bought with Claudium, the store currency. Nothing in it adds stats, power, or progression, and a skin never changes how your weapon hits, so every piece of gear that matters still comes from playing.",
-      "q13": "Where can I get the app?",
-      "a13": "The browser version needs nothing at all: open the site and play. If you would rather have an app, the desktop download for Windows, macOS, and Linux is on the Download page of the game site. Native iOS and Android apps are in the works, and until they land a phone or tablet plays the browser version with full touch controls. Every version signs in to the same account and the same worlds, so your characters follow you.",
-      "q14": "What do I need to run it?",
-      "a14": "A recent browser on a laptop, desktop, phone, or tablet. On your first launch the game reads your device and picks a graphics tier to match, from Low to Ultra, and any choice you make yourself always wins. Mouse and keyboard, touch, and a game controller all work. The settings and controls pages have the detail.",
-      "q15": "Do I need an account?",
-      "a15": "Only to play online. The offline world asks for nothing: choose Offline on the start screen and press Play. An online account is free, takes a username, a password, and an email address for account recovery, and keeps your characters saved on the server. Once you have one you can turn on two-factor authentication from the options.",
-      "q16": "What is a world?",
-      "a16": "Online play happens on worlds, and each one is a full copy of the game with its own players, its own World Market, and its own standings. When you sign in, the World List shows how busy each world is, from Low to Full, so you can pick a quiet one for elbow room or a busy one for company. Your characters live on the world you made them on, and you can keep characters on more than one.",
-      "q17": "How many characters can I have, and can I delete one?",
-      "a17": "Up to ten characters per world on one account, and you can have characters on more than one world. To remove one, delete it from the character list: the character must not be in the world, and you have to type its name to confirm, which is why a slip of the finger cannot cost you a hero. Deleting is permanent. That character's belongings go with it, its World Market listings are pulled from the market, and its Ravenpost mailbox is cleared.",
-      "q18": "Can I change my character's name?",
-      "a18": "Not by yourself, so choose one you like. Names are 2 to 16 letters, start with a letter, and allow spaces, hyphens, and apostrophes, and each one is unique on its world no matter how it is capitalized. Names that break the rules of conduct are refused. The one time you are asked to rename is when a moderator requires it. Closing your account can release its names for other players, and merely not playing for a while never does: an inactive account keeps its names.",
-      "q19": "What happens if I get disconnected?",
-      "a19": "Your character stays in the world for about five minutes and the game tries to reconnect on its own, so a dropped signal, a shut laptop, or a reload usually puts you right back where you were, in the same session. Because your character really is still standing there, disconnecting is not a way to escape a fight. Choosing Logout from the game menu leaves immediately rather than waiting out that window.",
-      "q20": "I found a bug. How do I report it?",
-      "a20": "From inside the online game, open the menu with Esc and choose Report a Bug. Describe what happened and send it: your world, your character, and where you were standing ride along automatically, together with your version and device details, and you can tick Include Screenshot to attach a picture of what you were looking at. If you send several in a row you may be asked to wait a moment before the next one."
+      "q12": "Mağazadan gerçek parayla satın alma yapılabilir mi?",
+      "a12": "İsteğe bağlı bir kozmetik mağaza var. Yalnızca görünüm satar: mağazanın para birimi Claudium ile satın alınan 1. Sezon Cephaneliği silah görünümleri. İçindeki hiçbir şey nitelik, güç ya da ilerleme eklemez ve bir görünüm silahınızın nasıl vurduğunu asla değiştirmez, bu yüzden önemli olan her teçhizat parçası yine de oynamaktan gelir.",
+      "q13": "Uygulamayı nereden edinebilirim?",
+      "a13": "Tarayıcı sürümü hiçbir şeye ihtiyaç duymaz: siteyi açın ve oynayın. Bir uygulamayı tercih ederseniz, Windows, macOS ve Linux için masaüstü indirmesi oyun sitesinin İndir sayfasındadır. Yerel iOS ve Android uygulamaları hazırlanıyor ve onlar gelene dek bir telefon ya da tablet tarayıcı sürümünü tam dokunmatik kontrollerle oynar. Her sürüm aynı hesaba ve aynı dünyalara giriş yapar, bu yüzden karakterleriniz sizi takip eder.",
+      "q14": "Çalıştırmak için neye ihtiyacım var?",
+      "a14": "Bir dizüstü, masaüstü, telefon ya da tablette güncel bir tarayıcı. İlk başlatışınızda oyun cihazınızı okur ve Düşük'ten Ultra'ya kadar buna uyan bir grafik seviyesi seçer; kendi yaptığınız herhangi bir seçim ise her zaman kazanır. Fare ve klavye, dokunmatik ve bir oyun kumandası hepsi çalışır. Ayrıntılar ayarlar ve kontroller sayfalarındadır.",
+      "q15": "Bir hesaba ihtiyacım var mı?",
+      "a15": "Yalnızca çevrimiçi oynamak için gerekir. Çevrimdışı dünya hiçbir şey istemez: başlangıç ekranında Çevrimdışı'nı seçin ve Oyna'ya basın. Çevrimiçi bir hesap ücretsizdir, bir kullanıcı adı, bir parola ve hesap kurtarma için bir e-posta adresi ister ve karakterlerinizi sunucuda kayıtlı tutar. Bir hesabınız olduğunda, seçeneklerden iki adımlı kimlik doğrulamayı açabilirsiniz.",
+      "q16": "Dünya nedir?",
+      "a16": "Çevrimiçi oyun dünyalarda geçer ve her biri kendi oyuncularına, kendi Dünya Pazarı'na ve kendi sıralamalarına sahip, oyunun eksiksiz bir kopyasıdır. Giriş yaptığınızda, Dünya Listesi her dünyanın ne kadar dolu olduğunu, Az'dan Dolu'ya kadar gösterir, böylece geniş bir alan için sakin birini ya da arkadaşlık için kalabalık birini seçebilirsiniz. Karakterleriniz, onları yarattığınız dünyada yaşar ve birden fazla dünyada karakter tutabilirsiniz.",
+      "q17": "Kaç karakterim olabilir ve birini silebilir miyim?",
+      "a17": "Bir hesapta dünya başına en fazla on karakter olur ve birden fazla dünyada karakterleriniz olabilir. Birini kaldırmak için karakter listesinden silin: karakterin dünyada olmaması gerekir ve onaylamak için adını yazmanız gerekir, bu yüzden bir parmak kayması size bir kahramana mal olamaz. Silmek kalıcıdır. O karakterin eşyaları onunla birlikte gider, Dünya Pazarı ilanları pazardan çekilir ve Kuzgun Postası posta kutusu boşaltılır.",
+      "q18": "Karakterimin adını değiştirebilir miyim?",
+      "a18": "Kendi başınıza değil, bu yüzden beğendiğiniz bir isim seçin. İsimler 2 ila 16 harf arasındadır, bir harfle başlar, boşluklara, kısa çizgilere ve kesme işaretlerine izin verir ve nasıl büyük harfle yazıldığına bakılmaksızın kendi dünyasında benzersizdir. Davranış kurallarını ihlal eden isimler reddedilir. Yeniden adlandırmanız istenen tek zaman, bir moderatörün bunu gerektirdiği zamandır. Hesabınızı kapatmak isimlerini diğer oyuncular için serbest bırakabilir, ama bir süre oynamamak bunu asla yapmaz: etkin olmayan bir hesap isimlerini korur.",
+      "q19": "Bağlantım koparsa ne olur?",
+      "a19": "Karakteriniz dünyada yaklaşık beş dakika kalır ve oyun kendiliğinden yeniden bağlanmayı dener, bu yüzden kesilen bir sinyal, kapanan bir dizüstü ya da bir yeniden yükleme genellikle sizi aynı oturumda tam olduğunuz yere geri koyar. Karakteriniz gerçekten hâlâ orada durduğu için, bağlantıyı kesmek bir dövüşten kaçmanın yolu değildir. Oyun menüsünden Çıkış Yap'ı seçmek, o pencereyi beklemek yerine hemen ayrılır.",
+      "q20": "Bir hata buldum. Nasıl bildiririm?",
+      "a20": "Çevrimiçi oyunun içinden, Esc ile menüyü açın ve Hata Bildir'i seçin. Ne olduğunu anlatın ve gönderin: dünyanız, karakteriniz ve durduğunuz yer, sürüm ve cihaz bilgilerinizle birlikte otomatik olarak eklenir ve baktığınız şeyin bir resmini eklemek için Ekran Görüntüsü Ekle'yi işaretleyebilirsiniz. Art arda birkaç tane gönderirseniz, bir sonrakinden önce biraz beklemeniz istenebilir."
     },
     "classList": {
       "heading": "Dokuz sınıf",
@@ -4445,7 +4758,8 @@ export const tr_TR: EnTranslations = {
     "resourceName": {
       "rage": "Öfke",
       "mana": "Mana",
-      "energy": "Enerji"
+      "energy": "Enerji",
+      "focus": "Odak"
     },
     "classPage": {
       "back": "Tüm sınıflar",
@@ -4459,23 +4773,23 @@ export const tr_TR: EnTranslations = {
       "fullKitNote": "Bu sınıfın seviye atladıkça öğrendiği donanım, açıldığı sırayla. Yetenekler birkaç ek beceri daha kazandırır ve hangilerinin kurgunu taşıyacağına karar verir.",
       "petsHeading": "İblisler",
       "petsNote": "Karabüyücüler yanlarında dövüşmek için iblisler çağırır, her biri farklı bir işe uygundur.",
-      "mageLore": "Mages bend Fire and Frost to destroy enemies, summon a Water Elemental, freeze threats in place, or bend time itself to shield and mend their allies.",
-      "mageEleHeading": "Water Elemental",
-      "mageEleNote": "A Frost mage learns to summon a Water Elemental, a ranged companion that throws Waterbolts at your target on its own. It answers the pet bar like a hunter beast or a warlock demon, though it is not built to hold a target for you.",
-      "mageEleJet": "Water Jet sits on the pet bar as a button of its own: click it to lock a chilling beam onto one enemy, or right-click it (touch and hold on mobile) to let the elemental fire it on its own whenever it is ready.",
-      "formsHeading": "Shapeshifting",
-      "formsNote": "A druid fights by changing shape. Most druid abilities belong to one shape, so the form you are in decides what you can cast, and shifting costs a little mana. You can shift in or out of combat, as often as you like.",
-      "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.",
+      "mageLore": "Büyücüler düşmanları yok etmek için Ateş’i ve Ayaz’ı büker, bir Su Elementali çağırır, tehditleri oldukları yerde dondurur ya da müttefiklerini korumak ve iyileştirmek için zamanın kendisini büker.",
+      "mageEleHeading": "Su Elementali",
+      "mageEleNote": "Bir Ayaz büyücü, hedefine kendiliğinden Su Okları fırlatan uzaktan saldıran bir yoldaş olan Su Elementali çağırmayı öğrenir. Bir avcı canavarı ya da bir karabüyücü iblisi gibi evcil çubuğuna yanıt verir, ama senin için hedef tutmak üzere yapılmamıştır.",
+      "mageEleJet": "Su Jeti, evcil çubuğunda kendi düğmesiyle durur: bir düşmana dondurucu bir ışın kilitlemek için tıkla, ya da elementalin onu hazır olduğunda kendiliğinden ateşlemesine izin vermek için sağ tıkla (mobilde dokunup basılı tut).",
+      "formsHeading": "Şekil Değiştirme",
+      "formsNote": "Bir druid, şekil değiştirerek dövüşür. Çoğu druid yeteneği tek bir şekle aittir, bu yüzden içinde bulunduğun form neyi büyüleyebileceğine karar verir, ve şekil değiştirmek biraz mana harcar. İstediğin kadar sık, dövüş içinde ya da dışında şekil değiştirebilirsin.",
+      "formsMoonwing": "Bir Denge druidi bir şekil daha kazanır: Aykuşu Formu, bu uzmanlığın dövüştüğü büyücü şeklidir. Büyülerini koruyan tek hayvan şeklidir ve değneğin yalnızca bu şekilde ya da normal büyücü şeklinde çalışır.",
       "formLine": {
-        "form_bear": "The tanking shape: a heavy hide, rage instead of mana, and extra threat so enemies keep swinging at you.",
-        "form_cat": "The melee damage shape: energy and combo points, like a rogue, and much less threat.",
-        "form_travel": "The travelling shape: far quicker across the ground, but no other abilities until you shift out."
+        "form_bear": "Tank şekli: ağır bir post, mana yerine öfke ve düşmanların sana vurmaya devam etmesini sağlayan ekstra tehdit.",
+        "form_cat": "Yakın dövüş hasarı şekli: bir hırsız gibi enerji ve kombo puanları, ve çok daha az tehdit.",
+        "form_travel": "Yolculuk şekli: yerde çok daha hızlı, ama şekilden çıkana kadar başka bir yeteneğin yok."
       },
-      "mageEleSummon": "A Frost spell that calls the elemental to your side and sets it on your target.",
+      "mageEleSummon": "Elementali yanına çağıran ve onu hedefine yönlendiren bir Ayaz büyüsü.",
       "formName": {
-        "form_bear": "Bruin Form",
-        "form_cat": "Wolf Form",
-        "form_travel": "Fleet Form"
+        "form_bear": "Bruin Formu",
+        "form_cat": "Kurt Formu",
+        "form_travel": "Fleet Formu"
       }
     },
     "classHook": {
@@ -4514,19 +4828,32 @@ export const tr_TR: EnTranslations = {
       "none": "Hiçbir sınıf her filtreye uymuyor. Daha fazlasını görmek için birini temizle."
     },
     "abilityHook": {
+      "evil_eye": "Eylemleri ve ıstırabı Mahkûmiyetini besleyecek düşmanı adlandırır.",
       "heroic_strike": "Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.",
       "revenge": "Önündeki düşmanları biçer ve bir kaçınma veya savuşturmadan sonra ücretsiz olabilir.",
       "hamstring": "Bir düşmanın hareketini sakatlayarak kaçmasını engeller.",
       "battle_shout": "Grubun saldırı gücünü yükselten coşturucu bir nara.",
       "charge": "Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.",
       "thunder_clap": "Çevrendeki her şeye vurur ve saldırılarını yavaşlatır.",
-      "seal_of_righteousness": "Savuruşlarını Kutsal hasarla güçlendirir, sonra onu Verdict ile harca.",
+      "seal_of_righteousness": "Yakın dövüş savurmalarına ek Kutsal hasar işler.",
       "holy_light": "Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.",
       "devotion_aura": "Zırhı yükselten kalıcı bir öz güçlendirmesi, böylece darbeler daha hafif gelir.",
       "judgement": "Aktif Mührünü harcayarak kısa menzilden bir düşmana vurur.",
+      "hammer_of_wrath": "Yaralı bir düşmanı uzaktan infaz eder, ya da kanatların etkinken herhangi bir düşmanı.",
+      "avenging_wrath": "10 Adanmışlık verir, ardından on beş saniye boyunca yeteneklerin ürettiği Adanmışlığı ikiye katlar.",
+      "bastion_sweep": "Tehdidi kapmak ve Adanmışlık biriktirmek için kalkanını bir grubun içinden savurur.",
+      "oath_chain": "Uzaktaki bir düşmanı sürünün içine sürükler ve kaçışını yavaşlatır.",
+      "veilbound_march": "Bir grubun içinden geçerek onu damgala, sana verdiği hasarı köreltir ve tehdidi sabitle.",
+      "holy_shield": "Adanmışlığı etkin bir blok penceresine, emilime ve bir tehdit darbesine harcar.",
+      "consecration": "Çevrendeki toprağı sürekli Kutsal hasar ve tehditle sahiplenir.",
+      "hammer_of_justice": "Bir düşmanı kısa ve güvenilir bir sersemletmeyle durdurur.",
+      "lay_on_hands": "Bir müttefik düşmek üzereyken büyük miktarda can geri kazandırır.",
       "blessing_of_might": "Dost bir hedefin saldırı gücünü yükseltir, akından önce kullanmak iyidir.",
       "divine_protection": "İşler kızıştığında hasarı emmek için hızlı bir koruyucu siper.",
       "raptor_strike": "Bir şey aradaki mesafeyi kapattığında kullanılacak sert bir yakın dövüş savruşu.",
+      "pack_command": "Yoldaşına vurmasını ve Sürü Vahşeti biriktirmesini emreder. Her katman, Canavarı Salıver katmanları harcayana dek evcil hayvanının 10% daha fazla, en çok 30% hasar vermesini sağlar.",
+      "stampede": "Üç canavarı 12 saniye saldırmaya çağırır. Tüm çağrı boyunca azami hasar bonusunu korumaları için tam Sürü Vahşetiyle kullan.",
+      "measured_shot": "Daha ağır saldırıların için odak geri kazandıran, ölçülü bir menzilli atış.",
       "aspect_of_the_hawk": "Menzilli saldırı gücünü keskinleştirmek için sürekli açık tuttuğun bir suret.",
       "serpent_sting": "Zamanla doğa hasarı kanatan bir zehir bulaştırır.",
       "arcane_shot": "Hızlı ek hasar için menzilden ani bir atış.",
@@ -4545,11 +4872,21 @@ export const tr_TR: EnTranslations = {
       "power_word_shield": "Bir dostu, darbeler isabet etmeden onları emen bir kalkanla sarar.",
       "renew": "Zamanla hasar veren bir iyileştirme; okuyup hareket etmeye devam etmek iyidir.",
       "lightning_bolt": "Menzilli bir Doğa hasarı okuması; uzaktan başvuru becerin.",
+      "chain_lightning": "Bir hedefe vurur ve yakındaki iki düşmana sıçrar, tüm okuma için bir Gök Gürültüsü biriktirir.",
+      "thunder_reservoir": "Toprak Sarsıntısı ya da Deprem tam güçte bir ödül salana dek yıldırım biriktirir.",
       "rockbiter_weapon": "Silahını güçlendirir, böylece yakın dövüşte her savruş daha sert iner.",
       "healing_wave": "Ana iyileştirmen; kendin ya da bir dostun için doğrudan bir tedavi.",
       "earth_shock": "Şimdi gerektiğinde hızlı Doğa hasarı için ani bir şok.",
       "lightning_shield": "Seni yükler, böylece sana vuran saldırganlar Doğa hasarı alır.",
       "flame_shock": "Önden vuran ve zamanla yakmayı sürdüren ani bir yanış.",
+      "galeheart_weapon": "İki silahı da fırtına rüzgârlarıyla doldurur ve düzenli saldırı ritmini ödüllendirir.",
+      "warspirit_cadence": "İstikrarlı bir silah ritmini Fırtına Yüreği Yankılarına ve anlık bir büyü fırsatına dönüştürür.",
+      "stormsurge": "Bir Fırtına Alameti fırsatını harcadıktan sonra Ata Vuruşunu bazen erken geri getirir.",
+      "lifespring_weapon": "Silahını onarıcı suyla doldurur ve devamlı iyileştirme akışını güçlendirir.",
+      "tidecall": "Gelgiti çağırır ve sıradaki iyileştirme büyüsü dizisini güçlendirir.",
+      "ancestor_return": "Savaş dışında uzun bir okumanın ardından grubun ya da akının düşmüş her üyesini yaşama döndürür.",
+      "stoneward": "Alınan hasarı iyileştirmeye çeviren yüklü bir taş kalkan yükseltir.",
+      "primal_exaltation": "Uzmanlığına özgü element gücünü kısa süreliğine serbest bırakır.",
       "fireball": "Ana ateş bombası; bir darbe indirir ve hedefi yanar halde bırakır.",
       "fireball_form": "Açık arazide yüksek hızda hareket etmek için yaşayan bir kora dönüş.",
       "frost_armor": "Dövüşten önce zırhını sertleştiren kalıcı bir öz güçlendirmesi.",
@@ -4566,7 +4903,7 @@ export const tr_TR: EnTranslations = {
       "conjure_water": "Mana yenileyen içecekler çağırır, böylece akınlar arasında dolum yapabilirsin.",
       "conjure_food": "Oturup yediğinde can yenileyen yiyecek çağırır.",
       "shadow_bolt": "Bir hedefe okuduğun bir gölge oku; başvuru bombasın.",
-      "summon_imp": "Düşmanlara menzilden ateş okları fırlatan bir Emberkin çağırır.",
+      "summon_imp": "Düşmanlara uzaktan Kül Oku savuran bir Emberkin çağırır.",
       "demon_skin": "Derini sertleştirip zırh ekleyen kalıcı bir öz güçlendirmesi.",
       "immolate": "Bir hedefi tutuşturur; açılış darbesi ve sonra süren bir yanış verir.",
       "corruption": "Bir hedefi gölgeyle çürütür ve sen başka işler yaparken hasar verir.",
@@ -4575,17 +4912,14 @@ export const tr_TR: EnTranslations = {
       "healing_touch": "Uzun süreli, birini tam dolduran büyük tek hedefli bir iyileştirme.",
       "mark_of_the_wild": "Dövüşten önce kendine ya da bir dosta koyduğun kalıcı bir kutsama.",
       "moonfire": "Anında vurur ve hedefi yanar halde bırakır, hareket halindeyken iyidir.",
+      "moonseed": "Aykuşu Formundayken bir Ay Gelgiti aşaması ekler ve Ay Fırtınasını uzatır.",
       "rejuvenation": "Anında okunur ve bir dostu zamanla iyileştirir, böylece harekete devam edebilirsin.",
       "thorns": "Bir dostu korur, böylece yakın dövüş saldırganları vurdukları için kendilerine zarar verir."
     },
     "petHook": {
-      "emberkin": "Düşmanları güvenli bir mesafeden ateş oklarıyla hırpalayan menzilli bir iblis.",
-      "gloomshade": "Kışkırtıp darbeleri üzerine çeken sağlam bir iblis, böylece rahatça büyü yapabilirsin.",
-      "duskborn": "Sert vuran ama baskı altında çabuk dağılan hızlı bir yakın dövüş iblisi.",
-      "spellhound": "Düşman büyücülerin peşine düşen bir gölge akıncısı.",
-      "warfiend": "Dayanıklı bir yakın dövüş kabadayısı; onu çağırabildiğin andan itibaren her işe yarayan bir yoldaş.",
-      "pyre_colossus": "Ezici yakın dövüşüyle iri yarı bir devasa güç, çiğ kuvvet için çağrılır.",
-      "wraithborn": "Uzaktan ağır gölge yağdıran seçkin bir büyücü."
+      "emberkin": "İmzalık Kül Oku ile düşmanları güvenli mesafeden yontan uzak menzilli bir iblis.",
+      "gloomshade": "Alay eden ve Uçurum Zinciri ile kaçan sıradan düşmanları menzile geri sürükleyen dayanıklı bir tank iblisi; patronlar çekişe direnir.",
+      "pyre_colossus": "Ezici yakın dövüşüyle iri yarı bir devasa güç, çiğ kuvvet için çağrılır."
     },
     "bestiary": {
       "heading": "Yaratıklar Kitabı",
@@ -4654,40 +4988,40 @@ export const tr_TR: EnTranslations = {
       }
     },
     "mountsPage": {
-      "heading": "Mounts and riding",
-      "intro": "A mount is a faster way across the world, and that is all it is. You learn to ride at the stables, buy your first set of reins, and every road after that is shorter.",
-      "whatHeading": "What a mount is",
-      "whatBody": "A mount is a beast you ride, and what it gives you is speed. No armor, no damage, no stats: it carries you over the ground faster, and springs a little higher when you jump, and that is the whole of the bargain. Every mount in the game is a ground mount, so there is no flying, and none of them swim.",
-      "learnHeading": "Learning to ride",
-      "learnBody": "Riding is a skill you buy once, and it opens at level {level}. Marla Hitchen, the stablemaster, keeps the Galecrest Stables out on the downs, and she sells Riding Training for 80 gold. That one purchase is what lets you sit a mount at all, and it stays with you for good.\n\nOnce you have it, Marla has a quest for you: Riding Lessons. Take it, follow the marker to the glowing square behind the start arch, and press Start Race. She lends you a training Valorsteed for the lesson, so the lesson itself costs you nothing. Ride the course, finish it, and go back to her for your coin and experience. The lent steed goes back in the barn afterward, so the lesson teaches you the seat rather than handing you a horse.",
-      "whereHeading": "Where to find her",
-      "whereBody": "The Galecrest Stables are marked on the map of The Galecrest, out on the downs between the Shear and the Wreckfields. Marla stands beside the barn, facing the race yard.",
-      "firstHeading": "Your first mount",
-      "firstBody": "The Valorsteed is the only mount sold anywhere in the world. Once you have learned Riding, Marla will sell you the Reins of the Valorsteed for 10 gold, and those reins are yours to keep. Every other mount is earned out in the world, so the horse is where nearly every rider starts.",
-      "rideHeading": "Getting on and getting off",
-      "rideBody": "There is no mount window and no favorite to set, because the reins are the mount. Use a set of reins from your bags or from an action bar slot and you ride that mount. Summoning takes a moment, a short call rather than an instant one, so it will not save you from a bad pull. Getting off is instant and never blocked.\n\nUse the reins you are already riding and you put that mount away. Use a different set while mounted and you swap straight to it, with nothing to summon in between. The Mount and Dismount key, the backquote key by default, only ever gets you off: it is the way down, not the way up. The one exception is the riding lesson, where that same key calls the steed Marla lends you, since a borrowed horse has no reins to click. On a phone or tablet, the Mount button in the More tray works both ways, though it calls the first set of reins sitting in your bags rather than one you pick, so tap the reins themselves when you want a particular mount.",
-      "breaksHeading": "What puts you back on your feet",
-      "breaksBody": "Water always wins. Ride into anything deep enough to swim in and you are down at once, because no ground mount swims, and dying drops you where you fall. You cannot call one while you are in combat, while you are dead or making your way back as a spirit, or at any point during a Thornhollow Fields match, which is fought on foot from the form-up to the final hold: if you were riding while you waited, being seated into the match puts you down with it. Walking into combat or into water partway through a summon cancels it as well.\n\nMost of what you do puts you down too. Swinging at something, starting a cast, harvesting a node, fishing, crafting, enchanting, salvaging, and recharging a profession tool all dismount you the moment you start, so expect to hop off at every vein. Calling a mount also drops any shapeshift form you are holding: you are never both shifted and mounted.",
-      "speedHeading": "Speed and tiers",
-      "speedBody": "Speed is the only thing that separates one mount from another. The Valorsteed you buy from Marla sets the base pace, and the mounts you collect out in the world ride above it: the rarer the reins, the quicker the ride, in a few clear steps rather than a smooth slide. There is no second rank of riding to train and no upgrade to buy afterward. You pay for Riding once, and from then on the reins you used decide how fast you travel.",
-      "collectHeading": "Where the rarer mounts come from",
-      "collectBody": "Beyond Marla's counter, reins are found rather than bought. They come off the last bosses of the five-player dungeons and the raid on heroic, and out of rift clears, where the harder the rift you finish the rarer the reins it can leave behind. They are rare finds by design and no run promises one, so the kind way to hunt a mount is to bring the hunt along on the runs you were making anyway. This page will not tell you which mount hangs on which boss: that part is yours to find out.",
-      "raceHeading": "The stables race",
-      "raceBody": "The show-jumping course in Marla's paddock is open to anyone, any time, not only during the lesson. Sit a mount, stand on the glowing square behind the arch, and press Start Race. A countdown holds you still, then the clock runs: clear all seven jumps and ride back out through the arch before it runs down.\n\nA jump only counts if you are genuinely in the air over the bar, so an easy ride-through clears nothing. You may take them in any order and from either side, and a missed one is not the end of the world: circle back and take it again. Dying, getting off, or leaving the paddock ends the attempt, and so does letting the clock run out, which sets you down out of the saddle where you stand; cancelling it yourself just stops the clock. Nothing stops you starting another. There is no fee, no cooldown, and no prize beyond the time itself, and any number of riders can run the course at once without getting in each other's way.",
-      "goodsHeading": "Reins are ordinary goods",
-      "goodsBody": "A mount is an item, which makes it something the economy can move. You own a mount for as long as its reins sit in your bags or your bank, though banked reins keep the mount yours without letting you ride it: to call the beast you have to be carrying the reins. Player reins carry no soulbind, so they trade, travel by mail, and list on the World Market like any other find, unless the item itself says otherwise. Two things are worth knowing before you part with one: no merchant will ever buy a set of reins back, so a mount is a purchase you keep or pass on rather than cash out, and if the reins leave your bags and your bank both while you are riding, traded away, mailed off, or sold on the market, the mount goes with them and you are set down where you stand."
+      "heading": "Binekler ve binicilik",
+      "intro": "Bir binek, dünyada daha hızlı ilerlemenin bir yoludur, hepsi bu kadar. Binmeyi ahırda öğrenirsin, ilk dizginlerini satın alırsın, ve ondan sonraki her yol kısalır.",
+      "whatHeading": "Bir binek nedir",
+      "whatBody": "Bir binek, üzerine bindiğin bir yaratıktır ve sana verdiği tek şey hızdır. Zırh yok, hasar yok, nitelik yok: seni yerde daha hızlı taşır, zıpladığında biraz daha yükseğe sıçratır, ve anlaşmanın tamamı budur. Oyundaki her binek bir kara bineğidir, bu yüzden uçma yoktur ve hiçbiri yüzmez.",
+      "learnHeading": "Binmeyi öğrenmek",
+      "learnBody": "Binicilik bir kez satın aldığın bir yetenektir ve seviye {level}'de açılır. Ahır Ustası Marla Hitchen, kırlardaki Fırtına Sırtı Ahırları'nı işletir ve Binicilik Eğitimi'ni 80 altına satar. Seni bir bineğe oturtan tek satın alma budur ve kalıcı olarak seninle kalır.\n\nOna sahip olduğunda Marla'nın senin için bir görevi vardır: Binicilik Dersleri. Görevi al, işareti başlangıç kemerinin arkasındaki parlayan kareye kadar takip et ve Yarışı Başlat'a bas. Ders için sana eğitim amaçlı bir Yiğit Küheylan ödünç verir, bu yüzden dersin kendisi sana hiçbir şeye mal olmaz. Parkuru koş, bitir ve altınların ile tecrüben için ona geri dön. Ödünç verilen küheylan dersten sonra ahıra geri döner, bu yüzden ders sana bir at vermek yerine eyerde durmayı öğretir.",
+      "whereHeading": "Onu nerede bulabilirsin",
+      "whereBody": "Fırtına Sırtı Ahırları, Fırtına Sırtı haritasında, Uçurum ile Enkaz Tarlaları arasındaki kırlarda işaretlidir. Marla ahırın yanında, yarış sahasına bakar şekilde durur.",
+      "firstHeading": "İlk bineğin",
+      "firstBody": "Yiğit Küheylan, dünyada herhangi bir yerde satılan tek binektir. Binicilik'i öğrendikten sonra Marla sana Yiğit Küheylan'ın dizginlerini 10 altına satar ve o dizginler senin olarak kalır. Diğer her binek dünyada kazanılır, bu yüzden neredeyse her binicinin başladığı yer bu attır.",
+      "rideHeading": "Binmek ve inmek",
+      "rideBody": "Bir binek penceresi ya da ayarlanacak bir favori yoktur, çünkü binek dizginlerin kendisidir. Çantalarındaki ya da bir eylem çubuğu yuvasındaki bir dizgin takımını kullan, o bineğe binersin. Çağırma bir an sürer, anında değil kısa bir çağrıdır, bu yüzden seni kötü bir çekmeden kurtarmaz. İnmek ise anındadır ve hiçbir zaman engellenmez.\n\nZaten bindiğin dizginleri kullanırsan o bineği geri koyarsın. Binekliyken farklı bir takım kullanırsan arada hiçbir şey çağırmadan doğrudan ona geçersin. Bin / İn tuşu, varsayılan olarak ters tırnak (`) tuşu, seni yalnızca indirir: bu aşağı inme yoludur, yukarı çıkma yolu değil. Tek istisna binicilik dersidir; orada aynı tuş, Marla'nın sana ödünç verdiği küheylanı çağırır, çünkü ödünç bir atın tıklanacak dizgini yoktur. Telefon ya da tablette, Daha Fazla tepsisindeki Bin düğmesi her iki yönde de çalışır, ama seçtiğin bir dizgin yerine çantandaki ilk dizgin takımını çağırır, bu yüzden belirli bir bineği istediğinde dizginlerin kendisine dokun.",
+      "breaksHeading": "Seni yeniden ayağa kaldıran şeyler",
+      "breaksBody": "Su her zaman kazanır. Yüzülebilecek kadar derin herhangi bir şeye binerek girersin ve anında inersin, çünkü hiçbir kara bineği yüzmez, ve ölmek seni düştüğün yere bırakır. Dövüşteyken, ölüyken ya da bir ruh olarak geri dönerken, ya da bir Dikenvadi Ovası maçının herhangi bir anında bir binek çağıramazsın; bu maç toplanmadan son direnişe kadar yaya oynanır: beklerken binekliysen, maça oturtulman seni de bineğinden indirir. Çağrı sürerken savaşa ya da suya yürümek de onu iptal eder.\n\nYaptığın çoğu şey de seni indirir. Bir şeye vurmak, bir büyü başlatmak, bir düğümü toplamak, balık tutmak, üretmek, büyülemek, hurdaya ayırmak ve bir meslek aletini şarj etmek, başladığın an seni bineğinden indirir, bu yüzden her damarda inmeyi bekle. Bir binek çağırmak ayrıca elindeki herhangi bir şekil değiştirme formunu da bırakır: asla hem şekil değiştirmiş hem binekli olamazsın.",
+      "speedHeading": "Hız ve kademeler",
+      "speedBody": "Hız, bir bineği diğerinden ayıran tek şeydir. Marla'dan satın aldığın Yiğit Küheylan temel hızı belirler, dünyada topladığın binekler ise onun üzerine çıkar: dizginler ne kadar nadirse, biniş o kadar hızlıdır, düz bir kayma yerine birkaç belirgin basamakla. Eğitilecek ikinci bir binicilik rütbesi yoktur ve sonradan satın alınacak bir yükseltme de yoktur. Binicilik için yalnızca bir kez ödersin, ondan sonra kullandığın dizginler ne kadar hızlı seyahat ettiğine karar verir.",
+      "collectHeading": "Daha nadir binekler nereden gelir",
+      "collectBody": "Marla'nın tezgahının ötesinde dizginler satın alınmaz, bulunur. Beş oyunculu zindanların ve kahramanca akının son patronlarından, ayrıca yarık temizlemelerinden düşerler; tamamladığın yarık ne kadar zorluysa bırakabileceği dizginler de o kadar nadirdir. Tasarım gereği nadir bulgulardır ve hiçbir koşu bir tane söz vermez, bu yüzden bir binek avlamanın nazik yolu, avı zaten yaptığın koşulara katmaktır. Bu sayfa sana hangi bineğin hangi patrona asılı olduğunu söylemeyecek: o kısmı kendin keşfedeceksin.",
+      "raceHeading": "Ahır yarışı",
+      "raceBody": "Marla'nın padoğundaki engel atlama parkuru, yalnızca ders sırasında değil, herkese her zaman açıktır. Bir bineğe bin, kemerin arkasındaki parlayan karenin üzerinde dur ve Yarışı Başlat'a bas. Bir geri sayım seni sabit tutar, sonra saat işlemeye başlar: yedi atlayışın hepsini geç ve süre dolmadan kemerden geri çık.\n\nBir atlayış yalnızca gerçekten çitin üzerinde havadaysan sayılır, bu yüzden kolay bir geçiş hiçbir şey saydırmaz. Onları istediğin sırayla ve her iki yandan da alabilirsin, ve kaçırdığın biri dünyanın sonu değildir: geri dön ve tekrar dene. Ölmek, inmek ya da padoktan ayrılmak denemeyi bitirir, süresinin dolmasına izin vermek de öyle; bu seni bulunduğun yerde eyerden indirir, kendin iptal etmek ise yalnızca saati durdurur. Hiçbir şey yeni bir tane başlatmanı engellemez. Ne ücret, ne bekleme süresi, ne de sürenin kendisi dışında bir ödül vardır, ve istediğin kadar binici parkuru aynı anda birbirinin yoluna çıkmadan koşabilir.",
+      "goodsHeading": "Dizginler sıradan bir maldır",
+      "goodsBody": "Bir binek bir eşyadır, bu da onu ekonominin taşıyabileceği bir şey yapar. Dizginleri çantalarında ya da bankanda durduğu sürece bir bineğe sahip olursun; bankadaki dizginler ise bineği senin yapmaya devam eder ama binmene izin vermez: yaratığı çağırmak için dizginleri üzerinde taşıman gerekir. Oyuncu dizginleri ruha bağlı değildir, bu yüzden eşyanın kendisi aksini söylemedikçe diğer her bulgu gibi takas edilir, postayla gönderilir ve Dünya Pazarı'nda listelenir. Bir bineği elden çıkarmadan önce bilinmeye değer iki şey vardır: hiçbir tüccar bir dizgin takımını asla geri satın almaz, bu yüzden bir binek nakde çevrilen değil, sakladığın ya da devrettiğin bir satın almadır; ve dizginler binekliyken hem çantalarından hem bankandan ayrılırsa, takas edilir, postalanır ya da pazarda satılırsa, binek de onlarla birlikte gider ve durduğun yerde inersin."
     },
     "worldPage": {
       "heading": "Dünya",
-      "intro": "World of ClaudeCraft, yürüyerek aştığınız tek ve kesintisiz bir diyardır; güneyden kuzeye dizilmiş üç bölge. Hızlı seyahat yoktur, bu yüzden yolculuğun kendisi maceranın bir parçasıdır.",
+      "intro": "World of ClaudeCraft, yaya olarak geçtiğin tek parça bir ülkedir. Eski yol güneyden kuzeye, başlangıç vadisi, bataklık ve zirveler boyunca uzanır ve onların ötesine, arkadaki çukura ve haritanın tepesindeki kar ülkesine tırmanmayı sürdürür. Bu yoldan batıya bir üst diyarlar dizisi, doğuya da bir başkası açılır ve Vadi'nin doğu kıyısı açıklarında bir ada bulunur. Hızlı yolculuk yok, uçuş hatları yok, arabalar yok: her yolculuk yürünür ya da at sırtında yapılır, dolayısıyla varmak macerasının bir parçasıdır.\n\nÜlke zamanı da tutar. Bir gündüz gece döngüsü, dünyandaki herkesin paylaştığı gerçek bir saat üzerinde işler; böylece gökyüzü hepiniz için aynı anda şafaktan öğleye, oradan alacakaranlığa ve karanlığa geçer, ay evrelerinden geçerek gelir gider ve yerdeki ışık onunla değişir. Küçük haritanın çevresindeki kadran, saati okuduğun yerdir.",
       "hub": "Ana üs",
-      "mapHeading": "Kuzeye giden yol",
-      "mapSub": "Güneyden kuzeye üç bölge, her biri seviye olarak bir basamak daha yüksek. Görev izini takip edin, diyar sizi vadiden zirvelere taşır.",
+      "mapHeading": "Yol ve ötesindeki diyarlar",
+      "mapSub": "Görev izi haritanın ortasından güneyden kuzeye uzanır: vadi, bataklık, zirveler ve onların ötesinde çukur ile kar. Diğer diyarlar bu yolun ardından değil, boyunca açılır; bataklık yolunun doğusundaki ve batısındaki kapılardan, Farshore adasına ise Vadi'nin doğu kıyısından ulaşılır. Seni uzak diyarlardan uzak tutan şey yürüyüş değil, onların seviye kuşaklarıdır: beşi en üst kuşağı paylaşır, dolayısıyla hazır olduğunda onları istediğin sırayla ele alabilirsin. Farshore istisnadır, erken ziyaret edebileceğin düşük seviyeli bir ülke.",
       "places": "Görülmeye değer yerler",
       "residents": "Karşılaşacağınız kişiler",
       "valeBlurb": "Yeni kahramanların Eastbrook kasabası çevresinde kurtlar ve haydutlarla dişlerini biledikleri yemyeşil başlangıç vadisi.",
       "marshBlurb": "Sis ve harabelerle dolu, suya gömülmüş bir ülke. Mudfinler sığlıkları sarar ve suyun altında daha eski bir şey kıpırdanır, köprü-kasabası Fenbridge'den izlenir.",
-      "peaksBlurb": "Rüzgarın aşındırdığı sırtlar ve eski maden ocakları, diyarın en soğuk, en yüksek tehlikelerine doğru tırmanır; ileri karakol Highwatch tarafından tutulur.",
+      "peaksBlurb": "Rüzgârın yonttuğu sırtlar ve başlangıç yolunun en çetin tehlikelerine tırmanan eski maden işleri, Highwatch karakolunca tutulur.",
       "duskBlurb": "Eldergleam'ın büyük ağacının altında kalıcı bir alacakaranlığın hüküm sürdüğü, kristal kalıntıların parıldadığı ve havanın eski bir büyüyle uğuldadığı bir vadi.",
       "emberBlurb": "Ejderlerin kaldera üzerinde daireler çizdiği ve trol ateşlerinin kumullar arasında yandığı, kapı kasabası Wyrmwatch'tan gözlenen, fırtınayla aydınlanan kül ve kan camı çorak toprakları.",
       "frostBlurb": "Kutup ışığının altında kar ve karanlık çamların sessizliği, soğuğun kendisinin uyanık hissettiği ve Icemantle'ın ateşlerini yanık tuttuğu bir yer.",
@@ -4741,24 +5075,24 @@ export const tr_TR: EnTranslations = {
       "gladeBody": "Vale'deki her hikaye ölülerle ilgili değildir. Kuzeyde, Brightwood Glade adlı güneşli bir koru, dalların altındaki sessiz patikaları ve benek benek ışığıyla kendi daha yumuşak ritmini korur. Takip ettiğiniz izin yumuşak bir karşı sesidir ve yol başıboş dolaşmanıza imkan verdiğinde görmeye değer.",
       "worldBossTitle": "Zirve uyandığında: dünya şefi",
       "worldBossBody": "Dikenzirve'nin yükseklerinde, Fırtınakaya'nın üzerindeki fırtına bazen bir biçim toplar. Uyanan Zirve Thunzharr orada düzenli bir ritimle yükselir; açık dünyada, çağrıya yanıt veren herkesçe dövüşülen, akın gücünde bir elemental ve karşısına ne kadar çok meydan okuyan dikilirse o kadar güçlenir. Dövüşe katılan herkes, akın kilidi koşullarında saygı gören kendi ganimet payını kazanır ve düşüşü, devrilenlerin geri koşup hakkını almasına yetecek kadar sürer. İhtiyacın olduğunu düşündüğünden daha fazla kılıç topla.",
-      "farshoreBlurb": "An island of gull-cry and salt wind off the Vale's east coast, where rifts tear open without warning and the fishing town of Gullhaven holds its shore.",
-      "farshoreGreeting": "You came over the Ferrywalk? Then you are the first in a week, and the Warden will want to look you over.",
-      "farshoreGreeter": "Bellkeeper Tam, the Landing",
-      "farshorePlaceNotes": "Gullhaven is the island's only town and its redoubt. The Landing is where the Ferrywalk comes ashore, with a watchbell standing over the point; the Watch Meadow keeps the high ground southeast of town, where a riftwatcher listens for the next break; the Sundered Cliffs crack open at the island's southern end; and the Riftfields are the wracked grain rows east of Gullhaven, still crawling with what came through the break there.",
-      "travelTitle": "Getting around",
-      "travelBody": "Every road in the realm is walked or ridden. There are no flight paths, no taxis, and no teleport network: the map is one connected landmass, and every connection is something you can stand on. Ridges divide one realm from the next, and where two realms share a ridge the road climbs through a pass. Not every border works that way, though. In the north a long causeway carries the road out over the water from the Veiled Hollow into the snow country beyond, and back south a thin natural sandbar called the Ferrywalk runs east from the Vale's coast to the Landing on the island of the Farshore, which has no land border at all. And there is exactly one true doorway in the whole overworld: a veil of dusk high on Thornpeak that opens into the Veiled Hollow. The Hollow's southern ridge is sealed with no pass through it, so that veil is how you first get in, and it closes behind you on the way back.\n\nWherever you fall, the walk back is a short one. Every zone keeps at least one graveyard with a Pale Keeper hovering over the stones, and a released spirit rises at the nearest of them.\n\nThe map does not end in an invisible wall. The land runs out into beaches and headlands, and then into open water. The crossings the world means you to swim, the straits and meres between one realm and the next, are calm and safe to cross. Strike out for the open sea instead and the distance itself turns you back: you are warned, and warned again, and if you keep swimming the sea wears you down until it kills you. Diving has its own limit, since your breath runs out under the surface, so come up for air and turn around when the water tells you to.",
-      "mountsTitle": "Mounts",
-      "mountsBody": "Riding is the one thing that makes the world smaller, and it is a lesson before it is a horse. At level 20 the stablemaster, Marla, will take you on: you buy the riding skill from her, and the riding lesson itself is free, a jumping course you ride around her paddock on a lent steed. Pass it, turn the lesson in, and your first Valorsteed is yours, and from then on you cross the realm noticeably faster on horseback. Speed is the only thing a mount gives you: the rarer ones, which come from the hardest content, are faster still, but none of them change your power in a fight. Mount and dismount with the key bound in your controls. You cannot climb on while you are in combat, and swinging a weapon, casting a spell, wading into water, or falling in battle all put you back on your feet.",
-      "mountsMore": "Everything about mounts",
-      "riftTitle": "Rift portals",
-      "riftBody": "Something keeps tearing holes in the realm. Rift portals open by themselves out in the world, never on the three zones of the starting road but across every realm beyond them and out on the Farshore, and the whole realm hears the news when one tears open. Each portal carries a rank, and a higher rank means a harder, richer descent. A portal is a shared event: any group can step through and gets its own run inside, but only one group ever takes the first clear, so a fresh rift is worth hurrying to. You need to be level 20 to enter one, and if nobody answers in time the rift collapses on its own.",
-      "riftMore": "Everything about rifts"
+      "farshoreBlurb": "Doğudere Vadisi'nin doğu kıyısının açığında, martı çığlıklarının ve tuzlu rüzgârın hüküm sürdüğü bir ada; burada gedikler uyarı vermeden açılır ve balıkçı kasabası Gullhaven kıyısını korur.",
+      "farshoreGreeting": "Feribot Yolu'ndan mı geçtin? O zaman bir haftadır ilk gelensin, ve Bekçi seni incelemek isteyecektir.",
+      "farshoreGreeter": "Çan Bekçisi Tam, İskele",
+      "farshorePlaceNotes": "Gullhaven, adanın tek kasabası ve tabyasıdır. İskele, üzerinde bir nöbet çanının dikildiği, Feribot Yolu'nun karaya vurduğu yerdir; Nöbet Çayırı, bir yarık nöbetçisinin bir sonraki gediği dinlediği, kasabanın güneydoğusundaki yüksek zemini tutar; Yarılmış Kayalıklar adanın güney ucunda açılır; ve Yarık Tarlaları, Gullhaven'ın doğusundaki harap tahıl sıralarıdır, hâlâ oradaki gedikten geçenlerle kaynamaktadır.",
+      "travelTitle": "Etrafta gezinme",
+      "travelBody": "Diyardaki her yol, yürünerek ya da atla kat edilir. Uçuş rotası, taksi ya da ışınlanma ağı yoktur: harita tek parça, bağlantılı bir kara parçasıdır ve her bağlantı üzerinde durabileceğiniz bir şeydir. Sırtlar bir bölgeyi bir sonrakinden ayırır ve iki bölgenin bir sırtı paylaştığı yerde yol bir geçitten tırmanır. Ancak her sınır böyle işlemez. Kuzeyde uzun bir geçit yolu, Örtülü Vadi'den suyun üzerinden ötesindeki karlı ülkeye kadar yolu taşır; güneyde ise Feribot Yolu adında ince, doğal bir kum seti, Doğudere Vadisi'nin kıyısından doğuya, hiç kara sınırı olmayan Uzak Kıyı adasındaki İskele'ye kadar uzanır. Ve bütün açık dünyada tam olarak bir gerçek kapı vardır: Dikenzirve'nin yükseklerinde, Örtülü Vadi'ye açılan bir alacakaranlık örtüsü. Örtülü Vadi'nin güney sırtı mühürlüdür ve içinden geçit yoktur, bu yüzden içeri ilk kez o örtüden girersiniz ve dönüş yolunda arkanızdan kapanır.\n\nNerede düşerseniz düşün, geri dönüş kısa bir yürüyüştür. Her bölge, mezar taşlarının üzerinde süzülen bir Solgun Bekçi'nin beklediği en az bir mezarlık barındırır ve serbest bırakılan ruh, en yakınındakinde yükselir.\n\nHarita görünmez bir duvarda bitmez. Kara, plajlara ve burunlara, ardından açık suya çıkar. Dünyanın yüzmenizi istediği geçişler, bir bölgeyle bir sonraki arasındaki boğazlar ve göller, sakin ve geçmesi güvenlidir. Bunun yerine açık denize doğru yol alırsanız mesafenin kendisi sizi geri çevirir: uyarılırsınız, tekrar uyarılırsınız ve yüzmeye devam ederseniz deniz sizi öldürene dek yıpratır. Dalışın kendi sınırı vardır, çünkü nefesiniz yüzeyin altında tükenir, bu yüzden su size söylediğinde hava almak için yüzeye çıkın ve geri dönün.",
+      "mountsTitle": "Binekler",
+      "mountsBody": "Binicilik, dünyayı küçülten tek şeydir ve bir at olmadan önce bir derstir. 20. seviyede ahır ustası Marla sizi yanına alır: ondan binicilik becerisini satın alırsınız, dersin kendisi ise ücretsizdir, ödünç bir binek üzerinde onun padokunun etrafında koştuğunuz bir atlama parkuru. Bunu geçin, dersi teslim edin ve ilk Valorsteed'iniz sizindir; o andan sonra diyarı at sırtında belirgin şekilde daha hızlı geçersiniz. Hız, bir bineğin size verdiği tek şeydir: en zorlu içerikten gelen daha nadir binekler daha da hızlıdır, ama hiçbiri dövüşteki gücünüzü değiştirmez. Kontrollerinizde atanmış tuşla binin ve inin. Savaştayken bineğinize binemezsiniz ve bir silah sallamak, bir büyü yapmak, suya girmek ya da savaşta düşmek sizi yeniden ayaklarınızın üzerine koyar.",
+      "mountsMore": "Binekler hakkında her şey",
+      "riftTitle": "Yarık kapıları",
+      "riftBody": "Diyarda bir şey durmadan delikler açıyor. Yarık kapıları dünyada kendiliğinden açılır: başlangıç yolunun üç bölgesinde asla değil, ama onların ötesindeki her bölgede ve Uzak Kıyı'da açılabilirler, ve biri yırtıldığında koca diyar bunu duyar. Her Yarık bir derece taşır ve daha yüksek bir derece, daha zorlu, daha zengin bir iniş demektir. Bir Yarık paylaşılan bir olaydır: herhangi bir grup içine girip kendi koşusunu yaşayabilir, ama ilk temizlemeyi yalnızca bir grup alır, bu yüzden taze bir Yarığa koşmaya değer. Birine girmek için 20. seviyede olmanız gerekir, ve kimse zamanında yanıt vermezse Yarık kendiliğinden çöker.",
+      "riftMore": "Yarıklar hakkında her şey"
     },
     "questsPage": {
       "heading": "Görevler",
       "intro": "Görevler dünyanın kalbidir ve seviye atlamanın en hızlı yoludur. İşte nasıl işledikleri.",
       "acceptTitle": "Bulmak ve kabul etmek",
-      "acceptBody": "Başının üzerinde bir işaret olan kişilerin sana işi vardır. Bir görev kabul etmek için onlarla konuş. Doğudere'de Mareşal Redbrook, alabileceğin ilk görevlerden biri olan Kapıdaki Kurtlar'la bekliyor.",
+      "acceptBody": "Başının üstünde bir işaret olan kişilerin sana işi vardır ve işaret hangi tür olduğunu söyler. Altın bir ünlem işareti hemen alabileceğin bir görev, altın bir soru işareti ise bitirdiğin ve teslim edebileceğin bir görev demektir. Bir isim levhasında ayrıca gri bir soru işareti görürsün; bu, o görevin üzerinde olduğun ama henüz bitirmediğin anlamına gelir. Tekrarlanabilir iş aynı işaretleri mavi olarak kullanır: parlak mavi bir ünlem işareti daha önce yaptığın ve yeniden alabileceğin bir iştir, aynı işaretin sönük hali ise hâlâ bekleme süresinde olan bir iştir. Gri olan dışındaki her işaret isim levhalarında, küçük haritada ve dünya haritasında görünür, böylece işi kasabanın öbür ucundan fark edebilirsin. Eastbrook'ta Mareşal Redbrook, alabileceğin ilk görevlerden biri olan Kapıdaki Kurtlar ile bekliyor.",
       "objectivesTitle": "Hedefler",
       "objectivesBody": "Belirli düşmanları öldür, eşyalar topla ya da dünyadaki bir şeyle etkileşime gir. Ekrandaki takipçi sen ilerledikçe ilerlemeni sayar. Fikrini değiştirirsen, bir görevi görev günlüğünden bırakabilir ve daha sonra onu veren kişiden tekrar alabilirsin.",
       "turninTitle": "Teslim etmek",
@@ -4771,11 +5105,11 @@ export const tr_TR: EnTranslations = {
       "typesTitle": "Karşılaşacağın görev türleri",
       "typesBody": "Çoğu görev birkaç tanıdık biçimden biridir. Ekrandaki takipçi her birinin tam olarak ne istediğini açıkça yazar, böylece asla tahmin yürütmek zorunda kalmazsın.",
       "typeSlayTitle": "Öldür",
-      "typeSlayBody": "Bir hayvan sürüsünü seyrelt ya da işaretli bir düşmandan belirli sayıda yenerek bir tarikatın elini kır. İlk görevlerinden biri, Doğudere yolundan kurtları temizlemek, bunlardan biridir.",
+      "typeSlayBody": "Bir canavar sürüsünü seyrelt ya da işaretli bir düşmandan belirli sayıda yenerek bir tarikatın tutuşunu kır. İlk görevlerinden biri, Eastbrook yolundaki kurtları temizlemek, bunlardan biridir. Arada bir görev kendi hedeflerini uyandırır: son geçişinde dekor gibi duran bir şey isim levhası kazanır ve onu ilgilendiren görevi taşıdığın anda vurabileceğin bir şeye dönüşür, o yüzden geri dön ve bir daha bak.",
       "typeGatherTitle": "Topla",
-      "typeGatherBody": "Dünyadan ya da düşmanların düşürdüklerinden eşyalar topla: otlar, cevher, bir tarikatın iç karartıcı bileşenleri. Bazı parçalar yalnızca belirli bir düşmandan düşer, bu yüzden av ile ganimet bir arada gider.",
+      "typeGatherBody": "Dünyadan ya da düşmanların düşürdüklerinden eşya topla: otlar, cevher, bir tarikatın kasvetli reaktifleri. Bazı parçalar yalnızca belirli bir düşmandan düşer, dolayısıyla av ile hasat birlikte yürür. Yerdeki bir göreve ait şeyler, yalnızca o görevi gerçekten üstlenmişken kendilerini verir ve üstlenmemişsen ya da zaten yeterince varsa bunu sana söylerler. Bazı görevler kabul ettiğinde sana bir alet de verir: çantalarına göz kulak ol ve onu görev metninin anlattığı gibi kullan. Bir görev, önceki bir adımın sana verdiği alete ihtiyaç duyuyorsa, görevi almak artık sende olmadığında onu geri verir, dolayısıyla kaybolan bir alet zinciri çıkmaza sokamaz.",
       "typeInteractTitle": "Etkileşim",
-      "typeInteractBody": "Dünyada sabit duran bir şeyi kullan, arındır ya da oku: kirletilmiş bir mezar, kıyı kayasına oyulmuş bir uyarı, mühürlü bir mezar kapısı. İşaretin yanına yürü ve üzerinde harekete geç.",
+      "typeInteractBody": "Dünyada sabit duran bir şeyi kullan, arındır ya da oku: kirletilmiş bir mezar, kıyı kayasına kazınmış bir uyarı, mühürlü bir mahzen kapısı. İşarete yürü ve üzerinde işlem yap. Bir görev birkaç tane istediğinde birkaç farklı tane kastediyordur: her nesne sana yalnızca bir kez sayılır, o yüzden aynısını iki kez kullanmak yerine bir sonrakini bul. Nesne üzerinde işlem yaptığında tükenmez, dolayısıyla grubundaki herkes ondan kendi payını alabilir.",
       "typeMusterTitle": "Savunmayı seferber et",
       "typeMusterBody": "Bazı görevler, kuzeye bir hamleden önce bir kasabayı toparlamanı ister: kapılardaki tehdidi azalt ve savunucuların ihtiyaç duyduğu şeyleri topla. Bunlar, hikayesinde bulunduğun insanların hizmetinde öldürme ve toplama hedefleridir ve seni onlarla birlikte hareket halinde tutar.",
       "typeGroupTitle": "Grup finalleri",
@@ -4795,12 +5129,12 @@ export const tr_TR: EnTranslations = {
       "sideCryptBody": "Zirvelerin yükseğinde daha sessiz bir gizem uzanır: hiçbir kaydın hatırlamadığı bir taçla işaretlenmiş eski mezarlar. Ölüleri oku, korudukları şeyi topla ve kapalı kalması gereken bir mezarın mührünü aç. Bu, diyarın on oyunculu son oyun akınına giden yolu açan bir dedektif izidir.",
       "sideTempleTitle": "Boğulmuş tapınak",
       "sideTempleBody": "Zirvelerdeki yüksek bir dağ gölünün üzerindeki solgun ışıktan bir geçit, boğulmuş bir tarikatın hâlâ şarkı söylediği batık bir mabede açılır. Kısa zinciri ana hikâyeden ayrı durur; kıyıya tırmanan, kayalara kazınmış uyarıları okuyan ve onların ne için olduğunu görmek için aşağı inen herkes için kendi içinde bir gizem.",
-      "availableTitle": "Why an NPC has nothing for you",
-      "availableBody": "Quests come in chains. Most are offered only once you have turned in the one before them, and many also ask for a minimum level, so an NPC with nothing for you today may have plenty after your next few levels or once you close the quest you are already carrying. A few have a condition of their own, such as the riding lessons, which open only after you have bought the riding skill. Group quests say so up front by listing how many players they suggest you bring. Some jobs are repeatable: you can take them again after a wait, and the marker over the giver tells you when one has come back around.",
-      "typeEscortTitle": "Escort",
-      "typeEscortBody": "Someone needs walking somewhere dangerous. Take the quest, find the person waiting at the start of the road, and speak to them to set off. They walk their own path while you keep pace, and the trouble that lives along it comes for them, not always for you. Stay close: enemies ambush the walk in waves, and the walk only resumes once a wave is down. You cannot attack the person you are escorting, but you can heal them, and if they fall the run simply resets so you can try again. Reach the far end with them alive and you beside them, and the quest credits.",
-      "cardMasterTitle": "Not every NPC has a quest: the Card Master",
-      "cardMasterBody": "One NPC in Eastbrook deals cards instead of errands. Talk to the Card Master, pick the Card Duel line out of his menu, and you join a queue that pairs you with the next player waiting. Any class can sit down, and nothing about your level or your gear comes into it. You each play from your own deck of twenty cards, values one to ten, holding four of them at a time and drawing a fresh one each round: the higher card takes the round, and two matching cards are a push that scores for neither of you. First to two rounds takes the match, so a duel is best of three. Rounds run on a clock, so leave your card unplayed for ninety seconds and the match goes to the other side, unless no round has been scored yet, in which case it is simply thrown out with no winner. The same is true if you walk away from a duel yourself. You have to be standing with the Card Master to join the queue, but once you are matched the board opens itself and you can play from anywhere. It takes two, so the offline world never offers it."
+      "availableTitle": "Bir NPC'nin sana neden hiçbir görevi yok",
+      "availableBody": "Görevler zincirler halinde gelir. Çoğu ancak kendinden öncekini teslim ettikten sonra sunulur, ve birçoğu ayrıca bir asgari seviye ister, bu yüzden bugün sana verecek bir şeyi olmayan bir NPC'nin birkaç seviye sonra ya da zaten taşıdığın görevi kapattığında bolca işi olabilir. Birkaçının, binicilik becerisini satın aldıktan sonra ancak açılan binicilik dersleri gibi kendi koşulu vardır. Grup görevleri, kaç oyuncu getirmeni önerdiklerini baştan listeleyerek bunu belirtir. Bazı işler tekrarlanabilir: bir bekleyişten sonra onları yeniden alabilirsin, ve verenin üzerindeki işaret bir tanesinin ne zaman geri geldiğini gösterir.",
+      "typeEscortTitle": "Eşlik",
+      "typeEscortBody": "Birinin tehlikeli bir yere kadar yürütülmesi gerekiyor. Görevi al, yolun başında bekleyen kişiyi bul ve yola çıkmak için onunla konuş. O kendi rotasında yürürken sen ona ayak uydurursun, ve yol boyunca pusuda bekleyen bela ona gelir, her zaman sana değil. Yakınında kal: düşmanlar yürüyüşü dalgalar halinde pusuya düşürür ve yürüyüş ancak bir dalga temizlendiğinde devam eder. Eşlik ettiğin kişiye saldıramazsın, ama onu iyileştirebilirsin; düşerse koşu basitçe sıfırlanır ve yeniden denersin. Yolun sonuna onunla birlikte, sağ salim ve yanında ulaş, görev tamamlanır.",
+      "cardMasterTitle": "Her NPC'nin bir görevi yoktur: Kart Ustası",
+      "cardMasterBody": "Doğudere'deki bir NPC, angarya yerine kart dağıtıyor. Kart Ustası'yla konuş, menüsünden Kart Düellosu seçeneğini seç ve seni bekleyen bir sonraki oyuncuyla eşleştiren bir sıraya katıl. Her sınıf oturabilir, seviyenin ya da teçhizatının hiçbir önemi yoktur. Her biriniz birden ona kadar değerlere sahip, yirmi kartlık kendi destenizden oynarsınız; aynı anda dördünü elinizde tutar ve her turda yeni bir kart çekersiniz: daha yüksek kart turu kazanır, eşit iki kart ise hiçbirinize puan kazandırmayan bir berabere sayılır. İki turu ilk kazanan maçı alır, yani bir düello üçte iki üzerinden oynanır. Turlar bir saate bağlıdır; kartını doksan saniye boyunca oynamadan bırakırsan maç karşı tarafa geçer, tabii henüz hiçbir tur puanlanmadıysa maç kazananı olmadan iptal edilir. Düellodan kendin uzaklaşırsan da aynısı geçerlidir. Sıraya girmek için Kart Ustası'nın yanında durman gerekir, ama eşleştikten sonra tahta kendiliğinden açılır ve herhangi bir yerden oynayabilirsin. İki kişi gerektirdiğinden çevrimdışı dünya onu hiçbir zaman sunmaz."
     },
     "lore": {
       "figuresTitle": "Tanışacağın yüzler",
@@ -4813,8 +5147,8 @@ export const tr_TR: EnTranslations = {
     "dungeonsPage": {
       "heading": "Zindanlar ve Akınlar",
       "intro": "Açık dünya yetmediğinde, bir grup toplayıp bir örneğe adım atın: yalnızca sizin grubunuz için yapılmış özel bir zindan kopyası.",
-      "party": "Zindanlar beş kişilik bir grup için tasarlanmıştır. Son oyun akını ise on kişiliktir.",
-      "soloLead": "Her zindan tek başına tamamlanabilen bir giriş göreviyle açılır, böylece içeri neden girdiğinizi her zaman bilirsiniz.",
+      "party": "Zindanlar beş kişilik bir grup için tasarlanmıştır. Oyun sonu akını on kişiliktir. Elinin altında dört arkadaşın yoksa Zindan Bulucu, sıraya koyduğu seferler için bir grup kurar. Aşağıdaki her karttaki seviye kuşağı, seferin yazıldığı seviyedir, kapıdaki bir kilit değil: erken girmeni ya da sonra dönmeni hiçbir şey engellemez, gerçi Zindan Bulucu seni yalnızca seviyene uyan bir sefere oturtur.",
+      "soloLead": "Gitmeden önce yakındaki kasabalarda etrafa sor: görev verenleri bu salonlarda biten zincirler dağıtır ve içeriye bir tane taşımak seferin iki kat kazandırması demektir.",
       "levelExact": "Seviye {n}",
       "levelBand": "Seviye {min} - {max}",
       "partySize": "{n} oyuncu",
@@ -4833,46 +5167,46 @@ export const tr_TR: EnTranslations = {
       "raidBody": "Mühürlü bir kraliyet kapısının ardında on oyunculu bir sınav bekler: çok aşamalı bir savaş ve tüm akının birlikte durdurması gereken, ölümsüz bir güç. İçeri girme hakkını kazanın, sonra dokuz arkadaşınızı getirin.",
       "heroicTitle": "Kahramanca mod",
       "heroicBody": "Her beş oyunculu zindanın ve akının kendisinin, seviye tavanının ötesinde bekleyen bir kahramanca sürümü vardır. Aynı koridorlar, donanımlı bir son oyun grubu için yeniden yapılmış: her şey daha sert vurur, hiçbir şeyden yürüyerek kaçılamaz ve şefler sersemletmelere ve engellemelere hiç aldırmaz. Önce normal sürümleri geride bırak; kahramanca, bıraktığını varsayar.",
-      "heroicHowBody": "Zorluğu grubun örneği sahiplenmeden önce seç: /dungeon heroic yaz ya da grup menüsündeki Zindan Zorluğu anahtarını değiştir. Seçim tüm grup tarafından paylaşılır ve kapıda kilitlenir, böylece bir sefer neyle başlatıldıysa o olarak kalır.",
+      "heroicHowBody": "Grubun instance'ı üstlenmeden önce zorluğu seç: /dungeon heroic yaz ya da kendi portre menünden Zindan Zorluğunu Ayarla'yı seç. Tek başınayken onu sen ayarlarsın; grupta bunu yalnızca lider yapabilir ve seçim herkesi kapsar ve kapıda kilitlenir, böylece bir sefer neyle üstlenildiyse o olarak kalır.",
       "heroicRewardsTitle": "Kahramanca Nişanları ve yükseltilmiş ganimetler",
-      "heroicRewardsBody": "Kahramanca şefler bildiğin ganimeti düşürür, yükseltilmiş ve ipucunda Kahramanca olarak etiketlenmiş halde; her seferin son şefi ise başka hiçbir yerde bulunmayan epikler ekler. O son öldürme, katılan herkese Kahramanca Nişanları da bırakır: Highwatch'taki Levazımcı Vex ile harcanan bir para birimi; onun yüzük ve kolye stoğu diyardaki tek mücevherdir.",
-      "heroicLockoutBody": "Normal zindanlar gün boyu koşulabilir. Kahramanca ise sabır ister: son şefin öldürülmesi, seferdeki herkesi o zindanın günde bir kahramanca temizlemesiyle kilitler ve akın her zorluk için ayrı bir günlük kilit tutar. Temizlenmiş beş oyunculu bir sefer, ceset koşuları ve ganimet için kendi grubuna açık kalır, böylece kimse orada kazandığından mahrum bırakılmaz. Akın daha katıdır: bir kez öldürmesi seni kilitledi mi, kapı günlük sıfırlanmaya dek kapalı kalır, o yüzden arenayı terk etmeden ganimetlerini topla.",
+      "heroicRewardsBody": "Kahramanca patronlar bildiğin ganimeti düşürür, yükseltilmiş ve ipucunda Kahramanca olarak işaretli, ve her seferin son patronu başka hiçbir yerde bulunmayan epikler ekler. O son öldürüş ayrıca her katılımcıya Kahramanca Nişan bırakır: Highwatch'ta levazımcı Vex'te harcanan bir para birimi; onun tezgâhı, kahramanca derinliklerin kanıtından başka hiçbir şeyin satın alamayacağı yüzükler ve kolye uçlarıyla dolu bir raftır.",
+      "heroicLockoutBody": "Normal zindanlar gün boyu gezilebilir. Kahramanca sabır ister: son patronun ölümü seferdeki herkesi o zindanın günde tek bir kahramanca temizliğiyle sınırlar ve akın her zorluk için ayrı bir günlük kilit tutar. Canlı bir diyarda tüm günlük kilitler diyarın kendi gecelik sıfırlama saatinde birlikte düşer, dolayısıyla o saatten hemen önce alınan bir temizlik ile hemen sonra alınan biri iki ayrı güne düşer; bunun yerine tarayıcında çevrimdışı oyna, kilit basitçe kendi öldürüşünden bir gün sonra sona erer. Halihazırda temizlenmiş beş kişilik bir sefer, kendi grubuna ceset koşuları ve ganimet için açık kalır, böylece kimse orada kazandığından mahrum kalmaz. Akın daha katıdır: öldürüşü seni bir kez kilitledi mi kapı sıfırlamaya dek kapalı kalır ve içeri dönmenin tek yolu, tam da kendisini kilitleyen o seferde düşmüş birinin ceset koşusudur, dolayısıyla dışarı çıkan canlı bir akıncı o gün için dışarı çıkmıştır. Arenayı terk etmeden önce ganimetini topla. Bu kilitlerin her biri onu kazanan karaktere aittir, dolayısıyla ana karakterindeki bir temizlik diğer karakterlerini serbest bırakır.",
       "resetTitle": "Örneklerini sıfırlama",
-      "resetBody": "Grubun sahiplenilmiş koşuları tutarken zorluğu değiştirirsen eski haklar kendiliğinden silinmeden önce bir süre kalır. Grup lideri kendi portre menüsünden Tüm Örnekleri Sıfırla seçeneğini seçerek veya /dungeon reset yazarak bunları hemen bırakabilir. Zorluk gerçekten değiştirilmiş olmalı, içeride canlı ya da düşmüş hiç kimse kalmamalı ve sıfırlamalar arasında kısa bir bekleme süresi vardır. Kapıya yanlış zorlukta gelirsen oyun başlamadan önce uyarır. Baskın bu şekilde asla sıfırlanmaz; kendi kilit kuralları geçerlidir.",
+      "resetBody": "Grubun hâlâ üstlenilmiş seferler tutarken zorluğu değiştir, eski üstlenmeler kendiliğinden bırakılmadan önce bir süre asılı kalır. Grup lideri bunun yerine hepsini bir anda bırakabilir: kendi portre menüsünden Tüm Instance'ları Sıfırla'yı seçin ya da /dungeon reset yazın. Sıfırlama yalnızca zorluk gerçekten değiştirildikten sonra, yalnızca içeride canlı ya da düşmüş kimse kalmadığı sürece, yalnızca içerideki her ceset tertemiz yağmalandıktan sonra çalışır ve bir sıfırlamayı diğerinden kısa bir bekleme süresi ayırır. Kapıya yanlış zorlukla gelirseniz oyun bunu sefer başlamadan söyler. Akın bu şekilde asla sıfırlanmaz; kendi kilit kuralları geçerlidir.",
       "templeLoreTitle": "Boğulmuş Tapınak, biraz daha derinde",
       "templeLoreBody": "Tapınağın, başka yerlerde peşine düştüğünüz tarikattan daha eski, kendi efsanesi vardır. Ay ışığını içip boğulmuşları geri veren bir gölet olan Işıltıgöl'ün kıyısında, yalnız bir gözcü solgun ışıktan bir geçidi korur. Yüzeyin altında, soğuk taştan bir merdiven ona doğru iner. Oraya batan halk bir kazayla boğulmadı: ibadet ederek suya gömülen ve şarkı söylemeyi hiç bırakmayan Solgun Koro'ydu onlar. Eski muhafızlar, sular onları almadan önce kayalara tek bir uyarı kazıdılar, Boğulmuş Ay dedikleri bir şeye bir dua; daha sağlam bir el de altına iki kelime ekledi: yalnızca uyuyor.",
       "cryptLeadTitle": "Ölülerin kapalı tutması gereken bir kapı",
       "cryptLeadBody": "Zirvelerin yükseklerinde, ana savaştan uzakta, daha soğuk bir gizem yatar. Eski mezarlar hiçbir kaydın hatırlamadığı bir tacı taşır ve onları koruyan ölüler bir zamanlar unutulmuş bir krala hizmet etmiştir. Taşlarını okuyun, sakladıkları kilit taşlarını toplayın; böylece üç sadık ruhun kapalı tutmak için canını verdiği bir mezarın mührünü açabilirsiniz. Bu, ipuçlarını sonuna kadar takip edenler için diyarı on oyunculu akınına açan isteğe bağlı sınavdır.",
-      "formatsNote": "Dungeons and the raid are one of three instanced formats. Delves are the short descents for one or two, and rifts are the tears that open out in the world and drop a group into a dungeon built fresh every time.",
-      "finderTitle": "Finding a group",
-      "finderBody": "You do not have to shout in chat to fill a party. Open the Dungeon Finder to see the runs it queues for, pick the ones you would go to, choose the role you will play, and join the queue. The finder builds a full group with the right mix of tank, healer, and damage, then offers it to everyone at once, and you are grouped the moment the party accepts. The list is not only five-player runs: the ten-player raid queues here too, at both difficulties, though the finder never checks whether you have earned your way in, so the door itself can still turn you back. Not every run in the realm is on its list, so glance at it before you count on it for a particular dungeon. One thing it does not do is move you: the finder forms the group and points you at the entrance, and everybody still travels to the door on their own feet.",
-      "finderRolesBody": "Your role choices come from your class before you specialize, and from your active specialization once you have one, so a healer queues as a healer. Past the level talents open at, the finder wants you to have chosen a specialization before it will give you a role at all. Each run on the list also carries its own level band, tighter than the door itself, and every member of a queued party has to sit inside it: the finder will not seat a character the group would have to carry.",
-      "finderOfferBody": "A formed group is offered for a short window, so answer promptly. Let the offer lapse or turn it down and the finder holds you out of the queue for a moment before you can rejoin, which keeps a half-answered group from stalling everyone else.",
-      "finderBoardBody": "Prefer to pick your own company? A party leader can post the group on the premade board instead, tagged with what the run is for: a first run, a quest run, a full clear, a learning run, or a fast one. Other players apply and the leader decides who comes along. There is no free-form advertisement text, only the tags, and one entry on the list is board-only, offered for a posting rather than an automatic queue."
+      "formatsNote": "Zindanlar ve akın, kopya alanlı üç formattan biridir. Mağara seferleri bir ya da iki kişilik kısa inişlerdir, yarıklar ise dünyada açılan ve bir grubu her seferinde yepyeni kurulan bir zindana düşüren gediklerdir.",
+      "finderTitle": "Bir grup bulmak",
+      "finderBody": "Bir grubu doldurmak için sohbette bağırmana gerek yok. Zindan Bulucu'yu aç, sıraya girdiği koşuları gör, gitmek istediklerini seç, oynayacağın rolü belirle ve sıraya gir. Bulucu, doğru tank, iyileştirici ve hasar karışımıyla eksiksiz bir grup kurar, sonra onu herkese aynı anda sunar ve grup kabul eder etmez gruplanmış olursun. Liste yalnızca beş oyunculu koşulardan ibaret değildir: on oyunculu akın da her iki zorlukta burada sıraya girer, gerçi bulucu içeri girme hakkını kazanıp kazanmadığını hiçbir zaman kontrol etmez, bu yüzden kapının kendisi seni yine de geri çevirebilir. Diyardaki her koşu listesinde değildir, bu yüzden belirli bir zindan için ona güvenmeden önce göz at. Yapmadığı bir şey de seni taşımaktır: bulucu grubu kurar ve seni girişe yönlendirir, ama herkes yine de kapıya kendi ayaklarıyla gider.",
+      "finderRolesBody": "Rol seçeneklerin, uzmanlaşmadan önce sınıfından, bir uzmanlığın olduktan sonra ise etkin uzmanlığından gelir, bu yüzden bir iyileştirici iyileştirici olarak sıraya girer. Yeteneklerin açıldığı seviyeden sonra, bulucu sana bir rol verebilmek için önce bir uzmanlık seçmiş olmanı ister. Listedeki her koşu ayrıca kapının kendisinden daha dar kendi seviye aralığını taşır ve sıraya giren bir grubun her üyesi bunun içinde olmalıdır: bulucu, grubun taşımak zorunda kalacağı bir karakteri gruba oturtmaz.",
+      "finderOfferBody": "Kurulan bir grup kısa bir pencere için sunulur, bu yüzden hemen yanıt ver. Teklifi süresi dolmaya bırakır ya da reddedersen, bulucu tekrar katılabilmeden önce seni bir süreliğine sıranın dışında tutar; bu da yarım kalmış bir yanıtın herkesi bekletmesini önler.",
+      "finderBoardBody": "Kendi arkadaşlığını seçmeyi mi tercih ediyorsun? Bunun yerine bir grup lideri grubu, koşunun ne için olduğunu belirten bir etiketle Hazır Gruplar panosunda yayımlayabilir: bir ilk koşu, bir görev koşusu, bir tam temizlik, yeni başlayanlar için bir koşu ya da hızlı bir koşu. Diğer oyuncular başvurur ve kimin katılacağına lider karar verir. Serbest metinli bir ilan yoktur, yalnızca etiketler vardır ve listedeki bir giriş yalnızca panoda bulunur, otomatik bir sıra yerine bir ilanla sunulur."
     },
     "riftsPage": {
-      "heading": "Rifts",
-      "intro": "A rift is a tear in the world itself, not a door you walk to. Step through one and you get a descent nobody has run before: the floors, the monsters, and the thing waiting at the bottom are all built fresh for that rift alone, so the same rank never plays out the same way twice.",
-      "whatHeading": "What a rift is",
-      "whatBody": "Dungeons are places. They sit where they have always sat, and you learn them until you know every corner. A delve is a short private descent you start from a board, cut for one or two. A rift is neither: it opens on its own, out in the world, with no warning, and everything inside it is generated the moment it does. Nobody has a route to hand you, because nobody has been down this one. It is instanced like the other two, so what you find inside belongs to you and your group alone, but it is the only instanced content in the game that comes looking for you rather than waiting to be found.",
-      "openHeading": "Where rifts open, and how often",
-      "openBody": "Rifts tear open out in the wider zones of the realm rather than in the early valley, and the whole realm hears about it: a line in your chat names the rank and the zone the moment one appears. Each eligible zone comes up for a rift about once an hour, and a zone that already has one standing waits its turn rather than opening a second. A rift nobody closes collapses on its own after a couple of hours, and the realm hears that too. A zone whose rift was sealed stays quiet until its next turn comes around, so an announcement is worth walking toward while it is fresh.",
-      "ranksHeading": "The four ranks",
-      "ranksBody": "Every rift is ranked C, B, A, or S, and the rank rides in the announcement, so you know what you are walking toward before you leave town. C is the gentlest, B and A climb from there, and S is the hardest thing a rift can be. Rank is the dial that decides how mean the floors are, and the harder ranks pay accordingly, so take the one your group can actually hold.",
-      "rankFmt": "Rank {rank}",
-      "groupHeading": "Who goes in",
-      "groupBody": "Bring a group. A rift does not soften because fewer of you walked through it: nothing inside counts how many are standing there, so the rank on the portal is the rank you fight, whether that is five of you or one. The doorway will let you in alone, and people do try it, but a rift is group content at every rank and it is honest about that from the first room. Your party gets its own copy of the rift, so no other group can spill into your run. If you fall, you can walk back in as a ghost and collect yourself once the fighting inside has stopped.",
-      "levelNote": "Rifts are endgame content. You have to be at the level cap, level {n}, to step through one, at any rank.",
-      "floorsHeading": "Down through the floors",
-      "floorsBody": "A rift runs a handful of floors, each one built fresh, and the way down does not open until the floor is finished with you: clear what is living on it, solve whatever it has locked across your path, and the descent tears open. The last floor ends on a boss. Every floor takes a character of its own, so a single run can carry you out of the frost and into the embers, and your chat names each floor as you arrive on it. The tracker on your screen is where you learn how many floors this one has. A few rifts open onto a hand-built set piece instead of a generated descent, which runs to its own fixed length.",
-      "boundHeading": "Once you draw blood",
-      "boundBody": "The first kill your group takes inside a rift settles the run, and so does the first off-path cache you crack open. From that moment you are bound to that copy of it: step out for any reason and coming back puts you in the run you left, never in another group's and never in a fresh one, for as long as the entrance out in the world is still standing. Before that first kill, and before that first cache, nothing is settled, so a group that is still gathering can regroup and walk in together without stranding half-started copies behind them.",
-      "raceHeading": "The race for the first clear",
-      "raceBody": "Every group in the realm can attack the same rift at once, each in its own copy, and only the first to bring down the thing at the bottom seals it. When a group wins, the realm hears their names and their time, and the way in closes behind them. Losing the race does not end your run: your copy stays open, the thing at the bottom still falls to you, and you still walk out under your own power. What it costs you is everything that clearing it would have paid. The boss leaves nothing behind for the group that came second, so what you carry home is what dropped off the mobs on the way down, and nothing more. The Book of Deeds still counts the clear, because you did put the thing down. It is the only race in the game you can lose without ever laying eyes on the people who beat you.",
-      "rewardsHeading": "What you carry out",
-      "rewardsBody": "Sealing a rift, not merely surviving one, is what pays. Bring the rift down first and it pays like the instanced content its rank stands beside, so the harder ranks are worth the harder run. Sealing also puts a Riftbound band in the hands of everyone who was there, cut to your class's role and personal to you, and leaves Rift Essence in your bags besides, with rift gems on top of it at the harder ranks. Beside the way home, the thing at the bottom leaves a sealed cache your group can pick open for extra spoils, using the same Tumbler's Path lockpicking you know from delve chests, so a clean, patient job pays better than a rushed one. None of that reaches a group that came second: a lost race leaves you only what dropped off the mobs on the way down. The Book of Deeds is the exception, and it counts your clear either way, with a deed for closing your first rift and another for taking down an S-rank one.",
-      "trackerHeading": "The tracker on your screen",
-      "trackerBody": "While you are inside, a small strip on your screen keeps you oriented: which floor you are on out of how many, and a live countdown. Read that countdown carefully, because it is not your run running out. It is the entrance back in the world closing. Once you are through, your group plays the rift out at its own pace, however long that takes, but when that clock reaches zero the way in is gone for everybody, so think twice about stepping outside near the end of it."
+      "heading": "Yarıklar",
+      "intro": "Bir Yarık, yürüyerek gidebileceğin bir kapı değil, dünyanın kendisindeki bir yırtıktır. Birinden geçtiğinde daha önce kimsenin koşmadığı bir iniş elde edersin: katlar, canavarlar ve dipte bekleyen şey, yalnızca o Yarık için sıfırdan inşa edilmiştir, bu yüzden aynı derece hiçbir zaman iki kez aynı şekilde geçmez.",
+      "whatHeading": "Bir Yarık nedir",
+      "whatBody": "Zindanlar birer yerdir. Hep durdukları yerde dururlar ve sen onları her köşesini tanıyana dek öğrenirsin. Bir mağara seferi, bir panodan başlattığın, bir ya da iki kişi için kısa ve özel bir iniştir. Bir Yarık ise ikisi de değildir: kendiliğinden, dünyanın içinde, hiçbir uyarı olmadan açılır ve içindeki her şey açıldığı anda oluşturulur. Kimsenin sana verecek bir rotası yoktur, çünkü kimse bu Yarıktan aşağı inmemiştir. Diğer ikisi gibi kopya alanlıdır, bu yüzden içinde bulduğun şey yalnızca sana ve grubuna aittir, ama oyundaki bulunmayı bekleyen değil seni arayıp bulan tek kopya alanlı içeriktir.",
+      "openHeading": "Yarıklar nerede açılır, ne sıklıkla",
+      "openBody": "Yarıklar, ilk vadide değil, diyarın daha geniş bölgelerinde yırtılarak açılır ve bütün diyar bunu duyar: biri belirdiği anda sohbetindeki bir satır dereceyi ve bölgeyi adlandırır. Uygun her bölge, aşağı yukarı saatte bir Yarık sırasına girer ve zaten bir tanesi açık olan bölge, ikincisini açmak yerine sırasını bekler. Kimsenin kapatmadığı bir Yarık birkaç saat sonra kendiliğinden çöker, ve diyar bunu da duyar. Yarığı mühürlenmiş bir bölge, bir sonraki sırası gelene dek sessiz kalır, bu yüzden bir duyuru, taze olduğu sürece yürüyüp gitmeye değer.",
+      "ranksHeading": "Dört derece",
+      "ranksBody": "Her Yarık C, B, A ya da S derecesine sahiptir ve derece duyuruda yer alır, böylece kasabadan çıkmadan önce neye doğru yürüdüğünü bilirsin. C en yumuşağıdır, B ve A oradan yükselir, S ise bir Yarığın olabileceği en zorlu haldir. Derece, katların ne kadar acımasız olacağına karar veren kadrandır ve daha zor dereceler buna göre öder, bu yüzden grubunun gerçekten kaldırabileceği olanı seç.",
+      "rankFmt": "Derece {rank}",
+      "groupHeading": "İçeri kim girer",
+      "groupBody": "Bir grup getir. Bir Yarık, içinden daha az kişi geçti diye yumuşamaz: içerideki hiçbir şey orada kaç kişi durduğunu saymaz, bu yüzden portaldaki derece, ister beş kişi ister tek başına ol, karşına çıkan derecedir. Kapı seni tek başına da içeri alır, ve bunu deneyen insanlar gerçekten var, ama bir Yarık her derecede grup içeriğidir ve bunu ilk odadan itibaren dürüstçe belli eder. Grubun, Yarığın kendi kopyasını alır, bu yüzden başka hiçbir grup senin koşuna sızamaz. Düşersen, içerideki dövüş durduktan sonra bir hayalet olarak geri yürüyüp kendini toparlayabilirsin.",
+      "levelNote": "Yarıklar son oyun içeriğidir. Herhangi bir derecede birinden geçebilmek için seviye tavanında, yani {n}. seviyede olman gerekir.",
+      "floorsHeading": "Katlar boyunca aşağı",
+      "floorsBody": "Bir Yarık, her biri sıfırdan inşa edilmiş bir avuç kattan oluşur ve aşağı inen yol, kat seninle işini bitirmeden açılmaz: üzerinde yaşayanları temizle, yoluna kilitlediği her şeyi çöz, ardından iniş yırtılarak açılır. Son kat bir patronla biter. Her kat kendi karakterini taşır, bu yüzden tek bir koşu seni dondan çıkarıp korlara sokabilir, ve sohbetin her katı vardığın anda adlandırır. Ekranındaki takipçi, bu Yarığın kaç katı olduğunu öğrendiğin yerdir. Birkaç Yarık, oluşturulmuş bir inişin yerine, kendi sabit uzunluğunda çalışan elle inşa edilmiş bir sahneye açılır.",
+      "boundHeading": "Kan döktüğün an",
+      "boundBody": "Grubunun bir Yarığın içinde aldığı ilk öldürme, koşuyu kesinleştirir; açtığın ilk yoldan sapan zula da öyle. O andan itibaren o kopyasına bağlanırsın: herhangi bir nedenle dışarı çıkıp geri döndüğünde, dışarıdaki giriş hâlâ ayaktaysa, seni her zaman bıraktığın koşuya koyar, asla başka bir grubun koşusuna ya da yepyeni bir koşuya değil. O ilk öldürmeden ve o ilk zuladan önce hiçbir şey kesinleşmemiştir, bu yüzden hâlâ toplanmakta olan bir grup yeniden bir araya gelip yarım kalmış kopyalar bırakmadan birlikte içeri girebilir.",
+      "raceHeading": "İlk temizlik için yarış",
+      "raceBody": "Diyardaki her grup aynı Yarığa aynı anda saldırabilir, her biri kendi kopyasında, ve yalnızca diptekini ilk deviren onu mühürler. Bir grup kazandığında diyar onların adlarını ve sürelerini duyar, ve giriş yolu ardlarından kapanır. Yarışı kaybetmek koşunu bitirmez: kopyan açık kalır, diptekini yine de sen devirirsin ve yine de kendi gücünle dışarı yürürsün. Sana mal olan şey, onu temizlemenin ödeyeceği her şeydir. Patron, ikinci gelen grup için hiçbir şey bırakmaz, bu yüzden eve taşıdığın şey yalnızca inişte canavarlardan düşenlerdir, ondan fazlası değil. Yiğitlikler Kitabı temizliği yine de sayar, çünkü diptekini gerçekten sen devirdin. Bu, seni yenen insanların yüzünü hiç görmeden kaybedebileceğin oyundaki tek yarıştır.",
+      "rewardsHeading": "Dışarı ne çıkarırsın",
+      "rewardsBody": "Ödeyen şey bir Yarığı yalnızca atlatmak değil, onu mühürlemektir. Yarığı ilk sen devirirsen, derecesinin yanında durduğu kopya alanlı içerik gibi öder, bu yüzden daha zor dereceler daha zor koşuya değer. Mühürlemek ayrıca orada bulunan herkesin eline, sınıfının rolüne göre kesilmiş ve sana özel bir Yarık Bağlı halka koyar, çantalarına da üstüne Yarık Özü bırakır, daha zor derecelerde bunun üstüne Yarık Mücevherleri de eklenir. Eve giden yolun yanı sıra, diptekinin bıraktığı mühürlü bir zulayı grubun, mağara sandıklarından bildiğin aynı Maşa Yolu kilit açma yöntemiyle ekstra ganimet için açabilir, bu yüzden temiz ve sabırlı bir iş, acele edilmiş birinden daha iyi öder. Bunların hiçbiri ikinci gelen bir gruba ulaşmaz: kaybedilen bir yarış sana yalnızca inişte canavarlardan düşenleri bırakır. Yiğitlikler Kitabı bir istisnadır ve temizliğini her hâlükârda sayar; ilk Yarığını kapatman için bir yiğitlik, bir S dereceli olanı devirmen için bir başkası vardır.",
+      "trackerHeading": "Ekranındaki takipçi",
+      "trackerBody": "İçerideyken, ekranındaki küçük bir şerit seni yönlendirir: kaç kattan hangisinde olduğunu ve canlı bir geri sayımı gösterir. O geri sayımı dikkatle oku, çünkü tükenen şey koşun değildir. Tükenen, dünyadaki dönüş girişidir. Bir kez içeri girdikten sonra, grubun Yarığı ne kadar sürerse sürsün kendi hızında oynar, ama o saat sıfıra ulaştığında giriş yolu herkes için kaybolur, bu yüzden süre bitimine yakın dışarı adım atmayı iki kez düşün."
     },
     "delvesPage": {
       "heading": "Mağara Seferleri",
@@ -4886,7 +5220,7 @@ export const tr_TR: EnTranslations = {
       "tiersLabel": "Zorluk seviyeleri",
       "affixesLabel": "Olası değiştiriciler",
       "whatHeading": "Mağara seferi nedir",
-      "whatBody": "Bir mağara seferi, yalnızca sizin ve en fazla bir müttefikiniz için oluşturulmuş küçük, kopya alanlı bir zindandır; rahatsız edilemeyeceğiniz özel bir kopya. Onu, dünyada bir mağara seferi bekçisinin tuttuğu bir panodan başlatır, içeri dalar, bir avuç odanın içinden savaşarak iner ve tek bir muhafızda bitirirsiniz. Seferler hızlıdır ve tekrarlanmak için tasarlanmıştır, bu yüzden açık dünya kuruduğunda bir mağara seferi güvenilir bir ilerleme parçasıdır.",
+      "whatBody": "Mağara inişi, yalnızca sana ve en fazla bir müttefikine yapılmış küçük bir instance zindandır, rahatsız edilemeyeceğin özel bir kopya. Onu dünyada bir mağara bekçisinin tuttuğu bir panodan başlatırsın, aşağı inersin, bir avuç odayı döverek geçersin ve tek bir muhafızla bitirirsin. O muhafızın ötesinde neyin beklediği mağaradan mağaraya değişir: biri ganimetini bir kilidin ardına mühürler, bir diğeri senden bir ayin ister. Seferler hızlıdır ve tekrarlanmak üzere tasarlanmıştır, dolayısıyla mağara inişi, açık dünya kuruduğunda güvenilir bir ilerleme parçasıdır.",
       "howHeading": "Bir sefer nasıl işler",
       "howBody": "Panoyu açmak için bekçiyle konuşun, bir zorluk seçin ve aşağı inin. Her sefer birkaç kısa odayı art arda dizer ve muhafızında sona erer; ödülünüzü almak ve yüzeye dönmek için onu temizleyin. Varsa bir arkadaş getirin, yoksa yoldaşınıza güvenin.",
       "companionHeading": "Yoldaşınız",
@@ -4898,27 +5232,28 @@ export const tr_TR: EnTranslations = {
       "affixesHeading": "Sefer değiştiricileri",
       "affixesBody": "Daha zorlu seferler, inişin nasıl oynandığını değiştiren bir değiştirici atar: huzursuz ölülerden kötü havaya, çökmeye yüz tutmuş tavan işçiliğine kadar. Tehlikeyi ve ödülü birlikte yükseltirler. Her mağara seferi kendi temasına uyan değiştiricilerden çeker; diyar genelinde havuz şöyle görünür:",
       "marksHeading": "Mağara Nişanları",
-      "marksBody": "Mağara seferlerini temizlemek, paranızdan ayrı tutulan bir para birimi olan Mağara Nişanları kazandırır. Yoldaşınızı güçlendirmek ve başka hiçbir yerde bulamayacağınız teçhizatı edinmek için onları bekçide harcayın.",
+      "marksBody": "Mağaraları temizlemek, paranın dışında tutulan bir para birimi olan Mağara Nişanları kazandırır. Onları bekçide harca; yoldaşını güçlendir ve başka hiçbir yerde bulamayacağın ekipmanı al.\n\nNişanlar en çok günün ilk seferlerini ödüllendirir. Her günün ilk üç temizliği tam öder, ondan sonra bir mağara yine öder, yalnızca daha az güvenilir biçimde; zor kademe kolay olandan daha iyi dayanır. Sayım her gün yenilenir, dolayısıyla bir mağarayı posasını çıkarana kadar ezmeye gerek yok: yarın gel, iyi tarife seni bekliyor olacak.",
       "whereHeading": "Nerede bulunur",
       "whereBody": "İlk mağara seferi olan Çökmüş Emanetlik, Doğudere Vadisi'nin başlangıç vadisindeki Emanetlik Tepesi'nde açılır. Panoyu orada Birader Halven tutar ve hazır olduğunuzda sizi aşağı gönderir. Turları orada bitmez: Mirefen Bataklığı'nın kuzey kıyısındaki Trol Höyükleri'nin ötesinde, aynı bekçi ayaklarının üzerinde durmayı öğrenmiş seferciler için Boğulmuş Litanya'yı açar.",
-      "lockpickAnteBody": "You settle the terms before you touch the lock. Take three picks and you have room to fumble, but the chest pays its plainest prize; take two for the middle bargain; take one and a clean solve pays the richest of all. The fewer picks you hold, the less time you have to think between moves, and if the last one snaps the lock jams for good: that chest is lost until you clear the delve again.",
-      "riteHeading": "When a delve ends in a rite",
-      "riteBody": "Not every delve ends at a lock. The Drowned Litany closes on a rite instead: once its guardian falls, the shrines around the reliquary light in an order and ask you to answer it back. You choose how hard to make it before it begins, the same bargain the picks ask for. The gentle setting replays the sequence for you more than once and gives you more than one attempt, but it caps what the reliquary will pay; the sternest shows the order a single time, gives you a single attempt, and is the only way to the richest prize."
+      "lockpickAnteBody": "Kilide dokunmadan önce şartları siz belirlersiniz. Üç maşa alın, hata payınız olur ama sandık en sade ödülünü öder; ortadaki pazarlık için iki alın; bir tane alın ve temiz bir çözüm hepsinin en zengin olanını öder. Elinizdeki maşa sayısı azaldıkça hamleler arasında düşünecek vaktiniz de azalır ve sonuncusu kırılırsa kilit tamamen sıkışır: o sandık, mağara seferini yeniden temizleyene dek kaybolur.",
+      "riteHeading": "Bir mağara seferi bir ayinle bittiğinde",
+      "riteBody": "Her mağara seferi bir kilitte bitmez. Boğulmuş Litanya bunun yerine bir ayinle kapanır: muhafızı düştüğünde, emanetliğin çevresindeki sunaklar bir sırayla yanar ve sizden aynı sırayı geri vermenizi ister. Başlamadan önce ne kadar zorlaştıracağınızı siz seçersiniz, tıpkı maşaların istediği aynı pazarlık gibi. Yumuşak ayar sırayı sizin için birden fazla kez tekrarlar ve size birden fazla deneme hakkı verir, ama emanetliğin ödeyeceğinin bir sınırı olur; en sert ayar ise sırayı yalnızca bir kez gösterir, size tek bir deneme hakkı tanır ve en zengin ödüle giden tek yoldur."
     },
     "talentsPage": {
       "heading": "Yetenekler ve uzmanlıklar",
       "intro": "Yetenekler, bir sınıfı kendinize özgü hale getirme yolunuzdur. İsteğe bağlı, hoşgörülü ve değiştirmesi kolaydır, bu yüzden korkmadan denemeler yapabilirsiniz.",
       "whatHeading": "Yetenekler ne işe yarar",
-      "whatBody": "Seviye atladıkça, yeteneklerinize ve özelliklerinize küçük, kalıcı geliştirmeler yapmak için yetenek puanları kazanırsınız. Bunlar bir sınıfın hissini şekillendirir; onu daha fazla hasara, daha sağlam savunmaya ya da daha güçlü iyileştirmeye yöneltir.",
+      "whatBody": "Yeteneklerin bir puan yığını değil, kısa bir tercihler merdivenidir. Açılan her sıra üç seçenek sunar ve sen tam olarak birini alırsın. Bir sınıfın nasıl hissettirdiğini biçimlendirir, onu daha çok hasara, daha sağlam savunmaya ya da daha güçlü şifaya yatırırlar.",
       "howHeading": "Nasıl çalışırlar",
-      "howBody": "Yetenekler 10. seviyede açılır ve tavana tırmandıkça puan kazanmaya devam edersiniz. Bunları sınıfınızın yetenek panelinde harcarsınız; yatırım yaptıkça ve seviye atladıkça daha derin sıralar açılır ve yapılarınız arasında geçmek için birden fazla düzen kaydedebilirsiniz.",
+      "howBody": "Yetenekler 5. seviyede açılır, uzmanlığını seçtiğin seviyenin aynısında. Sen yükseldikçe beş sıra daha gelir, her biri 8, 11, 14, 17 ve 20. seviyelerde birer tane, böylece sonuncusu seviye tavanına iner. Tercihlerini sınıfının yetenek panelinde, Uzmanlık sekmesinin yanındaki Tercihler sekmesinde yaparsın.",
       "shareNote": "Tamamlanmış bir kurgu, paylaşılabilir kısa bir koda kopyalanıp bir arkadaşa verilebilir; o da onu yüklemek için doğrudan kendi yetenek paneline yapıştırır.",
-      "choiceNote": "Her ağaçtaki birkaç puan, bir satın alma değil, bir yol ayrımıdır: düğüm iki ya da üç seçenek sunar ve siz bunlardan birine bağlanırsınız. Bir sonraki sıfırlamanız, ağaçtaki her şey gibi bu seçimi de yeniden açar.",
+      "choiceNote": "Her sıra bir yol ayrımıdır: üç seçenek sunar ve sen birine bağlanırsın. Bir sonraki sıfırlaman o tercihlerin her birini yeniden açar.",
       "resetTitle": "Hiçbir şey kalıcı değildir",
-      "resetNote": "Yeteneklerinizi, dövüş dışında olduğunuz ve bir arena maçında olmadığınız her an sıfırlayabilirsiniz, bu yüzden erken bir seçim asla bir tuzak değildir. Bir şeyler deneyin, neyi sevdiğinizi görün ve fikrinizi serbestçe değiştirin.",
+      "resetNote": "Yeteneklerini dövüş dışındayken ve arena maçında değilken istediğin an sıfırlayabilirsin, dolayısıyla erken bir tercih asla bir tuzak değildir. Sıfırlama sıra tercihlerini temizler ve hiçbir şeye mal olmaz, uzmanlığın da olduğu gibi kalır, böylece sıfırlamak sefer ortasında rolünü asla elinden almaz. Savaş alanı istisnadır ve orada yapını dövüşler arasında değiştirebilirsin. Bir şeyler dene, neyi sevdiğine bak ve gönlünce fikrini değiştir.",
       "specsHeading": "Sınıfa göre uzmanlıklar",
-      "specsBody": "Her sınıfın, her biri kendi rolüne ve kendine özgü bir odağına sahip birkaç uzmanlığı vardır. Yetenek panelinde birini seçmek, ona özgü bir imza yeteneği ve kalıcı bir ustalık kazandırır. İşte hepsinin genel görünümü. Tam donanımı için bir sınıfı açın.",
-      "loadoutNote": "You do not have to settle on one build. Save a named layout in the panel and it remembers both its picks and your action bar, so switching to another one is a single click, under the same rule as a reset: out of combat, and not in an arena match or a battleground."
+      "specsBody": "Her sınıfın bir avuç uzmanlığı vardır, her biri kendi rolü ve imzalık bir odağıyla. Birini 5. seviyede yetenek panelinde seçersin. İmzalık bir yetenek ve kalıcı bir ustalık verir, çoğu role uyan pasif bonuslar ekler ve aynı zamanda Zindan Bulucu'da kaydolduğun roldür. İşte hepsinin biçimi. Tam donanımı için bir sınıf aç.",
+      "loadoutNote": "Tek bir yapıda karar kılmak zorunda değilsiniz. Panelde adlandırılmış bir düzen kaydedin: hem seçimlerinizi hem de eylem çubuğunuzu hatırlar, böylece bir başkasına geçmek tek bir tıklamadır, tıpkı bir sıfırlamadaki gibi aynı kurala bağlı olarak: dövüş dışında olmanız ve bir arena maçında bulunmamanız gerekir.",
+      "loadoutGearNote": "Bir düzen ekipmanını da taşıyabilir. Onu, ekipmanını da saklamayı öneren girdiyle kaydet, üzerindekini de kaydeder; bir PvP setiyle bir zindan setini on altı tık yerine tek tık aralığına getiren şey budur. Yalnızca adını değil, tam olarak o parçayı hatırlar, dolayısıyla büyülenmiş bir yüzük çantalarında yanında duran sade ikiziyle asla sessizce değiştirilmez. Geri geçtiğinde bulamadığı şeye dokunmaz ve sana bildirir, böylece bir parçasını bankaya ya da pazara kaptırmış bir set yine de geri kalan her şeyi kuşanır."
     },
     "arenaPage": {
       "heading": "Arena ve PvP",
@@ -4926,24 +5261,24 @@ export const tr_TR: EnTranslations = {
       "duelsHeading": "Düellolar",
       "duelsBody": "Karşılaştığın herhangi bir oyuncuyu dostane bir düelloya davet et. Gururdan başka kaybedilecek bir şey yok, bu yüzden bir eşleşmeyi öğrenmenin ya da dostça bir tartışmayı çözmenin en kolay yoludur.",
       "coliseumHeading": "Kül Kolezyumu",
-      "coliseumBody": "Coliseum, diyarın arenasıdır; burada dereceli maçlarda diğer oyuncularla, bire bir ya da ikiye iki karşı karşıya gelirsin. Her kademe kendi sıralamasını tutar, bu yüzden bir galibiyet seni o merdivende, tüm diyarın görmesi için yukarı taşır. Bir kademeye tek başına ya da eşinle kaydolmak için Arena penceresini aç.",
+      "coliseumBody": "Kolezyum diyarın arenasıdır; orada diğer oyuncularla dereceli maçlarda, birebir ya da ikiye iki karşılaşırsın. Her kategori kendi sıralamasını tutar, dolayısıyla bir galibiyet seni tüm diyarın gözü önünde o merdivende yükseltir. Dereceli oyun 15. seviyede açılır ve bu partnerin için de geçerlidir: ikinizden biri altındaysa, ikiniz de yeterli olana dek sıra kapalı kalır. Tüm oyuncuya karşı oyuncu, PvP işaretli tek bir düğmenin ardında yaşar: onu aç ve bir sekme seç, Dikenvadi Ovası, birebir ya da ikiye iki, sonra tek başına ya da partnerinle kaydol. Sırada ya da bir maçtayken diğer sekmeler kilitli kalır, böylece asla aynı anda iki sırada bulunamazsın.",
       "ladderHeading": "Merdiveni tırmanmak",
       "ladderBody": "Dereceli oyun, konumunu zaman içinde takip eder. Nerede durduğunu ve diyarın zirvesini kimin tuttuğunu görmek için lider tablosuna bak.",
-      "rewardsHeading": "What ranked play pays",
-      "rewardsBody": "A ranked win pays Honor, the player versus player currency, and a loss costs you nothing but rating. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further, a long winning day pays a little less per win as it goes on, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset.",
-      "honorHeading": "Honor",
-      "honorBody": "Honor is the currency of fighting other players. You earn it in the Coliseum and out on Thornhollow Fields, it is kept apart from your coin and never mixes with it, and your character sheet shows how much you are holding. There is exactly one thing to spend it on: Warfare gear.",
-      "quartermastersBody": "Two quartermasters keep the same shelves, so trade with whichever is nearer. FURY, the Honor Quartermaster, stands in Eastbrook Vale, and Warmarshal Draven Kole, Master of the Warfare Stores, keeps the counter in Highwatch. Their stock is the Warfare tier: five armor families, plus necks, rings, and weapons shared across all of them.",
-      "honorFinalNote": "Honor purchases are final. A coin purchase can be undone from a vendor's buyback list, but an Honor purchase never lands there, and Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything. The shop asks you to confirm for that reason: read the piece before you press it.",
-      "warfareHeading": "Warfare gear",
-      "warfareBody": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit is worth nothing on a dungeon boss.",
-      "warfareTradeBody": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and everything it does bring is spent on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons."
+      "rewardsHeading": "Dereceli oyun ne öder",
+      "rewardsBody": "Dereceli bir galibiyet, oyuncuya karşı oyuncu para birimi olan Onur öder, bir mağlubiyet ise sana puandan başka bir şey kaybettirmez. Onur, gerçek maçları ödüllendirmek için tasarlanmıştır: aynı gün aynı rakibi ya da aynı takımı tekrar yenmek artık hiçbir şey ödemez, uzun bir galibiyet günü ilerledikçe galibiyet başına biraz daha az öder, ve rakibinin çekildiği bir maç puanını yine de değiştirir ama hiç Onur ödemez. O gün Onur’un kendi günüdür ve diyarın örnek sıfırlamasıyla değil, kendi saatiyle yenilenir.",
+      "honorHeading": "Onur",
+      "honorBody": "Onur, diğer oyunculara karşı dövüşmenin para birimidir. Onu Kül Kolezyumu’nda ve Dikenvadi Ovası’nda kazanırsın; parandan ayrı tutulur ve onunla hiç karışmaz, karakter sayfan ne kadar tuttuğunu gösterir. Harcayabileceğin tam olarak tek bir şey vardır: Harp teçhizatı.",
+      "quartermastersBody": "İki levazımcı aynı rafları tutar, o yüzden hangisi daha yakınsa onunla alışveriş yap. Onur Malzeme Sorumlusu ÖFKE, Doğudere Vadisi’nde durur; Harp Depolarının Ustası Savaş Mareşali Draven Kole ise tezgahı Yükseknöbet’te tutar. Stoklarında Harp kademesi bulunur: beş zırh ailesi, artı hepsinde ortak kolyeler, yüzükler ve silahlar.",
+      "honorFinalNote": "Onur ile yapılan alımlar kesindir. Bir para alımı satıcının Geri Alım listesinden geri alınabilir, ama bir Onur alımı hiçbir zaman oraya düşmez ve Harp teçhizatı satın aldığın an ruha bağlanır; bu yüzden hiçbir şekilde takas edilemez, postalanamaz ya da geri satılamaz. Dükkan bu yüzden onay ister: parçaya basmadan önce oku.",
+      "warfareHeading": "Harp teçhizatı",
+      "warfareBody": "Her Harp parçası Harp Saldırı Puanı ve Harp Savunma Puanı taşır, ve bu iki puan canavarlara karşı hiçbir işe yaramaz. Yalnızca başka bir oyuncuyla dövüştüğünde, bir düelloda, arenada ya da savaş alanında işler; burada Saldırı verdiğin hasara eklenir, Savunma ise aldığın hasarı azaltır, her biri kendi tavanına kadar. Her zırh ailesi aynı zamanda bir takımdır, ve takım bonusları da benzer şekilde Harp puanı ya da yalnızca oyunculara karşı işleyen etkilerdir, bu yüzden tam bir onur kiti bir zindan patronunda hiçbir işe yaramaz.",
+      "warfareTradeBody": "Bu bilinçli bir değiş tokuştur. Harp teçhizatı oyuncularla dövüşmek için yapılmıştır, zindan kademelerini atlamanın bir kestirmesi değildir: bir Harp parçası aynı yuvadaki destansı bir zindan parçasının taşıdığı savaş puanlarını asla taşımaz, ve getirdiği her şey diğer oyunculara harcanır. Arenada kendini tutmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlarda kazan."
     },
     "thornhollowPage": {
       "heading": "Dikenvadi Ovası",
       "intro": "Dikenzirve'nin altındaki eski ormanda, surlarla çevrili bir vadide oynanan, dereceli 5v5 sancak kapma savaş alanı; burada iki yıkık kale bir vadinin boyunca karşı karşıya durur ve ikisinin arasında hiçbirinin hiç ele geçiremediği daha eski bir avlu bulunur. Beşer kişilik iki takım, iki kale, tek hedef: düşman sancağını çal ve seninkini çalmadan onu eve taşı.",
       "queueHeading": "Sıraya girmek",
-      "queueBody": "Dikenvadi Ovası panelini aç ve tek başına sıraya gir, ya da beş kişiye kadar bir grup getirip birlikte sıraya girin: gruplar her zaman aynı takımda tutulur ve kalan koltuklar tek başına giren şampiyonlarla doldurulur. On kişi hazır olduğunda maç, sancaklar devreye girmeden önce kısa bir toplanma için her iki takımı da kendi kalelerine yerleştirir.",
+      "queueBody": "Dikenvadi Ovası 20. seviyede açılır ve grup kaydolabilmeden önce grubun her üyesinin bunu karşılaması gerekir. PvP düğmesini aç ve zaten üzerinde açıldığı Dikenvadi Ovası sekmesini seç, sonra tek başına sıraya gir ya da en fazla beş kişilik bir grup getirip birlikte kaydolun: gruplar her zaman aynı takımda tutulur ve kalan yerler tek başına gelen şampiyonlarla dolar. On kişi hazır olduğunda maç, bayraklar devreye girmeden önce kısa bir toplanma için iki takımı da kalelerine yerleştirir. Dört ya da beş kişilik bir grup aksi halde yalnızca tek başına kaydolanlarla karşılaşacaksa, eşleştirme ikinci bir grubun çıkıp çıkmayacağını görmek için maçı kısaca bekletir, dolayısıyla bu büyüklükte bir grup kapılar açılmadan önce bazen birkaç an daha bekler. O bekleyiş kısadır ve sonunda daima geri adım atar, böylece kimse onun yüzünden sırada takılı kalmaz.",
       "fieldHeading": "Saha",
       "fieldBody": "Üç bölmeye ayrılmış, surlarla çevrili, açık havada bir saha: her takımın kendi kalesinin önünde kendi sahası vardır ve surlarla çevrili Yıkık Avlu ikisinin arasında yer alır. İki sur sahanın tüm genişliğini kaplar ve bölmeler arasındaki her geçiş, tartışmalı bir geçit noktasından yapılır: geniş ana kapı ya da kapı kulesi, surun üzerine kurulu ve kaydırılmış kapılarıyla bir pusu köşesinin yanından dolanmayı zorunlu kılan küçük bir oda. Her kale, ağzı dışında kapalıdır, bu yüzden her sancak koşusu aynı açıklıktan başlar ve biter; alçak bir barikat da içine doğrudan hücumu böler. Avlu, boş kalpli harabeyi ve iki yandaki Koşu Rünü'nü barındırır; diğer iki Koşu Rünü ise sancak yaklaşımlarında bekler. Her ana kapının avluya açılan ağzında bir Savaş ya da Siper Rünü (birkaç saniye boyunca daha fazla hasar verme ya da daha az hasar alma) bekler: ikisi de maça aynı yüzle başlar ve her ele geçirmede taraf değiştirir.",
       "flagsHeading": "Sancaklar",
@@ -4953,10 +5288,13 @@ export const tr_TR: EnTranslations = {
       "respawnBody": "Ölüm klasik töreni korur: bedenin, SEN serbest bırakana kadar düştüğü yerde kalır ve ruh, kalenin yanındaki çevrili mezarlıkta yükselir; orada takımının bir sonraki diriliş dalgasına kadar korunursun. Dalga bekleyen her ruhu birlikte diriltir ve iki takımın dalgaları kasıtlı olarak kaydırılmıştır, böylece dövüş asla bir anda tamamen sıfırlanmaz. Ceset koşusu ya da Ruh Şifacısı pazarlığı yoktur: serbest bırak, dalgayı bekle, dövüş.",
       "carrierHeading": "Sancağı taşımak",
       "carrierBody": "Düşman sancağını çok uzun süre taşıyan bir taşıyıcı gittikçe daha savunmasız hale gelir; sancak ele geçirilene, bırakılana ya da geri dönene kadar giderek artan hasar alır. Sancakla saklanmak kaybettiren bir plandır; onu eve koşturmak ise kazandıran plandır.",
+      "leavingHeading": "Erken ayrılmak ve boş bir yeri doldurmak",
+      "leavingBody": "Süren bir maçı terk etmek ondan firar etmektir ve dereceli bir merdiven kaybedilen bir skorda fişi çekmeyi ödüllendiremez: firari, yenilgiyi ve beraberindeki dereceyi orada ve o anda üstlenir, taşıyorsa bayrağı düşürür ve takımı bir oyuncu eksik dövüşmeye devam eder. İşte boş yer tam da bunun içindir. Bir maçın bir dövüşçüsü eksik olduğu sürece sıra, koltuğu bekleyen birine önerebilir ve bu her zaman kabul ettiğin ya da reddettiğin bir tekliftir, başına gelen bir ışınlanma değil; reddetmek sana hiçbir şeye mal olmaz ve teklifi sıradaki kişiye geçirir. Yalnızca tek başına kaydolanlara sorulur, dolayısıyla birlikte kaydolmuş bir grup bir boşluğu doldurmak için asla ayrılmaz.",
+      "backfillNote": "Bir yedek yerini almak bilerek risksizdir: hiç payının olmadığı bir skora dahil olursun, dolayısıyla maç derecene hiçbir yönde dokunmaz, kazan ya da kaybet, ve böyle bir yerden ayrılmanın da bir bedeli yoktur. Ayrıca bir maç, bir katılımın onu değiştiremeyeceği kadar sona yaklaştığında teklif gelmeyi bırakır, böylece asla bir başkasının finaline oturtulmazsın.",
       "ladderHeading": "Merdiven",
-      "ladderBody": "Her maç, kazan ya da kaybet, kalıcı bir karakter başı savaş alanı derecesini değiştirir ve tüm zamanlar tablosu diyar şampiyonlarını sıralar. Galibiyetler ve zorlu mağlubiyetler de Harp sistemi üzerinden Onur öder.",
-      "rewardsHeading": "What a match pays",
-      "rewardsBody": "Every finished match pays Honor: more for a win, a consolation for a loss or a draw, plus a small amount for every killing blow you land and every one you help with, so fighting away from the flags is still worth doing. Your first win of each day pays a bonus on top, and the panel tells you while that bonus is still waiting for you. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset. Meeting the same team over and over pays less for the match itself after the first, quickly settling at a floor instead of falling away to nothing, and a forfeited match pays nothing at all. Spend what you earn at either Warfare quartermaster."
+      "ladderBody": "Her maç, karaktere bağlı kalıcı bir savaş alanı derecesini kazanç ya da kayıpla oynatır ve tüm zamanların tablosu diyarın şampiyonlarını sıralar.",
+      "rewardsHeading": "Bir maçın ödülleri",
+      "rewardsBody": "Tamamlanan her maç Onur öder: bir galibiyet için daha fazlasını, bir mağlubiyet ya da beraberlik için bir teselli ödülünü, üstüne indirdiğiniz her öldürücü darbe ve yardım ettiğiniz her biri için küçük bir miktarı; bu yüzden sancaklardan uzakta dövüşmek de yine değerlidir. Her günün ilk galibiyeti üstüne bir bonus öder ve panel, bu bonus hâlâ sizi beklerken bunu bildirir. O gün Onur'un kendi günüdür ve diyarın örnek sıfırlamasıyla değil, kendi saatiyle yenilenir. Aynı takımla tekrar tekrar karşılaşmak, ilkinden sonra maçın kendisi için daha az öder; hızla sıfıra düşmek yerine bir tabanda kararlı hale gelir, hükmen sonuçlanan bir maç ise hiçbir şey ödemez. Kazandıklarınızı iki Harp levazımcısından herhangi birinde harcayabilirsiniz."
     },
     "valeCupPage": {
       "heading": "Vadi Kupası",
@@ -4993,11 +5331,11 @@ export const tr_TR: EnTranslations = {
       "howHeading": "Yiğitlikler nasıl işler",
       "howBody": "Yiğitlikler her seferinde tek bir karakterle kazanılır ve o karakterde saklanır; yani oynadığın her kahraman kendi Kitabını oluşturur. Ününü oynadığın tüm karakterler boyunca yalnızca diyarın Lider Tablosu bir araya getirir ve her yiğitliği yalnızca bir kez sayar. Her yiğitlik senden ne istediğini oyun içindeki Yiğitlikler Kitabı'nda açık açık yazar, böylece neyin peşine düşeceğini her zaman bilirsin; üstelik peşinde olduklarını takibe alarak oynarken gözünün önünde tutabilirsin. Küçük bir kısmı ise gizli kalır ve kendini ancak sen kazandıktan sonra gösterir. Kitap kendini dürüst de tutar: geçmiş sicilinin kanıtlayabildiği ne varsa anında hanene yazar, böylece bir kıdemli onu asla boş bir sayfayla açmaz; yalnızca sayım yapan yiğitlikler tutanaklarına sıfırdan başlar.",
       "renownHeading": "Ün",
-      "renownBody": "Ün, Kitabın arkasındaki puandır. Kazandığın her yiğitlik belirli bir miktar eder ve toplamın yalnızca artar; sakin bir hafta seni hiç geri düşürmez. Birkaç yiğitlik beceri yerine şansa dayalıdır ve Destanlar kendi başına bir onurdur, bu nedenle her ikisi de Ün kazandırmaz. Ünsüz yiğitlikler Kitabındaki tamamlanmışlık sayısına yine de dahildir; yalnızca hiç puan vermezler.",
+      "renownBody": "Ün, Kitap'ın ardındaki puandır. Kazandığın her yiğitlik belirli bir değer taşır ve toplamın yalnızca yükselir, dolayısıyla sakin bir hafta sana asla zemin kaybettirmez. Bir avuç yiğitlik beceriden çok şansa dayanır, başka koleksiyon yiğitlikleri kendi ödülüdür ve Marifetler ayrı bir şereftir, dolayısıyla bunların hiçbiri Ün taşımaz. Ün taşımayan yiğitlikler Kitap'ının tamamlanmasına yine de sayılır; yalnızca asla puan vermezler. Marifetler tek istisnadır, sayımın tümüyle dışında tutulur.",
       "rewardsHeading": "Unvanlar ve çerçeveler",
-      "rewardsBody": "Ödüllerin hepsi gösteriş içindir ve mesele de zaten budur. Bazı yiğitlikler taşıyabileceğin bir unvan ya da adını kuşatan bir çerçeve verir; kahramanını güçlendiren hiçbir şey vermez. İstediğin unvanı Yiğitlikler Kitabı'ndan seç; o da isim levhanda, sohbette ve lider tablolarında herkesin göreceği biçimde seninle gezsin.",
+      "rewardsBody": "Ödüllerin tamamı gösteriş içindir, asıl amaç da budur. Bazı yiğitlikler takabileceğin bir unvan ya da adını çerçeveleyecek bir çerçeve verir, kahramanını güçlendirecek hiçbir şey vermez. İstediğin unvanı ve çerçeveyi Yiğitlikler Kitabı'ndan seç: unvan isim levhanda, sohbette ve herkesin görmesi için sıralama tablolarında seninle gezer, çerçeve ise kendi renklerini isim levhanın ve portrenin çevresine çizer.",
       "chroniclesHeading": "Vakayinameler",
-      "chroniclesBody": "Her bölge kendi Vakayinamesini tutar: oradan geçen her yolcuyu kaydetmeyi kendine görev edinmiş yerel bir Vakanüvisin bir araya getirdiği bir yiğitlik derlemesi. Doğudere Vadisi'nden Saul bunların ilkidir. Bir Vakayiname bölümlere ayrılır ve onları hangi sırayla işleyeceğin tamamen sana kalmıştır.",
+      "chroniclesBody": "Her bölge kendi Vakayinamesi'ni tutar; oradan geçen her yolcuyu kaydetmeyi kendine iş edinmiş yerel bir vakanüvis tarafından derlenmiş bir yiğitlikler kümesi. Eastbrook Vadisi'nden Saul onların ilkidir, Osric Fenn Mirefen'deki Fenbridge'de Bataklık Vakayinamesi'ni tutar ve Zenzie yukarıda Highwatch'ta Zirveler Vakayinamesi'ni kaydeder. Bir Vakayiname bölümlere ayrılmıştır ve onları sana uyan sırayla ilerletmekte özgürsün.",
       "featsHeading": "Destanlar",
       "featsBody": "Destanlar ayrı bir raftır: mirasın ve dünya ilklerinin kayıtları, kapanmış bir çağa ya da yalnızca bir kez yaşanacak bir âna bağlı yiğitlikler. Ün getirmezler ve tamamlama sayısının dışında dururlar; yapılanların hatırası olarak sonsuza dek saklanırlar.",
       "catalogHeading": "Yiğitliklerin tam sicili",
@@ -5021,10 +5359,30 @@ export const tr_TR: EnTranslations = {
         "exploration": "Keşif",
         "feat": "Destanlar"
       },
-      "bookHeading": "Inside the Book",
-      "bookBody": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles shelf, where you choose the one you wear.",
-      "platformHeading": "Steam and Epic achievements",
-      "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
+      "bookHeading": "Kitabın içinde",
+      "bookBody": "Kitap, her yiğitliği aralarında geçiş yapabileceğin kategorilere ayırır; her şey için, kazandıkların için, kazanmadıkların için ve bitirmene ramak kalanlar için bir arama kutusu ve filtreler sunar. Üstte bir En Son şeridi en yeni açtıklarını tutar; birine tıklamak doğrudan kartına götürür, tıpkı birinin sohbette paylaştığı bir yiğitlik adına tıklamak gibi. Yanında, Az Kaldı seni bitirmene en yakın olduğun avuç dolusu yiğitliğe yönlendirir. Bir diyarda her yiğitlik ayrıca kendi enderliğini, onu kazanan maceracıların payını taşır, böylece hangilerinin yaygın hangilerinin gerçek bir tırmanış olduğunu bir bakışta görürsün; çevrimdışı dünyanın sayacak bir nüfusu olmadığından orada hiçbir şey göstermez. Rafın sonunda, takacağın unvanı seçtiğin Unvanlar rafı bulunur.",
+      "platformHeading": "Steam ve Epic başarımları",
+      "platformBody": "Masaüstü uygulamasından bir Steam ya da Epic Games hesabı bağlarsan, kazandığın yiğitlikler o hesapta başarım olarak dışa yansıtılır. Oyun dünyası yetkeyi elinde tutmaya devam eder: yiğitliği burada kazanırsın, karakterine kaydedilir ve başarım daha sonra onu izler. Her yiğitliğin karşılığı bir başarım yoktur ve biri hemen gelmezse bir sonraki girişinde yetişir. Bağlamak yalnızca bir bağlantıdır, asla giriş yapmanın bir yolu değildir."
+    },
+    "reliquaryPage": {
+      "intro": "Yadigârlık, kataloğuna geçirdiğin benzersiz ganimetlerin müzesidir: zindanların peşine düşülen parçaları, meslek ödülleri, binekler, silah görünümleri ve unvanlar. Bir ödül salonu bir başarı kitabıyla nasıl eşleşirse, o da Yiğitlikler Kitabı'yla öyle eşleşir.",
+      "howHeading": "Koleksiyon nasıl işler",
+      "howBody": "Yadigârlık'ı oyun içinde aç (varsayılan Shift+X). Her raf, benzersiz yadigârlardan oluşan sayfalar barındırır. O parçayı bu karakterde ilk kez elde ettiğinde bir silueti doldurursun, sayfadaki her yadigâr dolduğunda ise sayfayı tezhiplersin. Birkaç sayfa Kaldırıldı ya da Kişisel olarak etiketlidir: bunlar tamamlamanın dışında durur, bu yüzden hiçbir rafı ya da katalogun tamamını kilitlemez. Anlık bulunanlar bir bildirim çıkarır ve açık pencereyi tazeler; ilerleme karaktere özeldir, hesap kozmetiği olan silah görünümleri bunun dışındadır.",
+      "ranksHeading": "Küratör dereceleri",
+      "ranksBody": "Küratör dereceleri kataloğa giren her benzersiz yadigârla yükselir ve yalnızca kozmetik unvanlar ile çerçeveler verir. Asla savaş gücü, ganimet şansı ya da şanssızlık telafisi vermez. Hesaba bağlı silah görünümleri Küratör derecesine puan yazmaz, böylece itibar karaktere bağlı kalır; Kaldırıldı ya da Kişisel sayfalardaki yadigârlar da bu dereceye hiçbir puan yazmaz.",
+      "retiredTag": "Kaldırıldı",
+      "personalTag": "Kişisel",
+      "retiredNote": "Bu yadigârlar artık kazanılamaz. Sayfa, onları saklayan kıdemlileri onurlandırır ve ne tamamlamaya ne de Küratör derecesine sayılır.",
+      "personalNote": "Her karakter yalnızca kendisininkini taşıyabilir. Bu sayfa ne tamamlamaya ne de Küratör derecesine sayılır.",
+      "catalogHeading": "Sayfa kataloğu",
+      "catalogBody": "Yazılmış her Yadigârlık sayfası ve barındırdığı yadigâr adları. Bu liste yalnızca sürprizi bozmayan adlardan oluşur: kendi ilerlemeni, tamamlama sayılarını ve siluetleri görmek için Yadigârlık'ı oyun içinde aç.",
+      "spoilerNote": "Kişisel ilk buluş geçmişi, tamamlama sayıları ve eksik ile sahip olunan durumu oyun istemcisinde kalır. Wiki hiçbir zaman bir oyuncunun koleksiyonunu yayımlamaz.",
+      "shelfHeading": "{label} ({count})",
+      "shelf": {
+        "conquerors": "Fatihler",
+        "professions": "Meslekler",
+        "horizons": "Ufuklar"
+      }
     },
     "wishPage": {
       "heading": "Keşke önceden bilseydim dediklerim",
@@ -5034,7 +5392,7 @@ export const tr_TR: EnTranslations = {
       "i2Title": "Ölmenin size pek bir bedeli yok",
       "i2Body": "Düştüğünüzde en yakın mezarlıkta bir hayalet olarak yükselirsiniz. Bedavaya dirilmek için bedeninize geri koşun ya da Solgun Bekçi'nin anında dirilişini kabul edip bu kolaylık uğruna kısa ömürlü bir güçsüzlük taşıyın. Ne deneyim, ne teçhizat, ne de para asla kaybolmaz, bu yüzden risk almak ve öğrenmek güvenlidir.",
       "i3Title": "Yetenekler bir tuzak değildir",
-      "i3Body": "10. seviyede açılırlar ve dövüş dışında olduğunuz sürece istediğiniz zaman sıfırlanırlar, bu yüzden erken seçimleriniz asla kalıcı değildir.",
+      "i3Body": "İlk yeteneğin 5. seviyede gelir ve altı sıranın her biri üç seçenek arasından tek bir tercihtir, dolayısıyla bir yapı, bir bakışta kavradığın bir avuç karardır. Dövüş dışındayken ve arena maçında değilken sıfırlayabilirsin, dolayısıyla erken seçtiğin hiçbir şey seni kilitlemez.",
       "i4Title": "Görev izini takip edin",
       "i4Body": "Görevler seviye atlamanın en hızlı yoludur ve sizi dünyanın bir ucundan diğerine taşır. Nereye gideceğinizden emin olmadığınızda bir sonraki işaretçiyi bulun.",
       "i5Title": "Teçhizatınızı güncel tutun",
@@ -5056,37 +5414,37 @@ export const tr_TR: EnTranslations = {
       "posterAlt": "{name}"
     },
     "editorPage": {
-      "intro": "A map editor of your own, in the browser. Shape the land, plant props and camps, then drop into the result and walk around it.",
-      "whereTitle": "Where to find it",
-      "whereBody": "The editor is a page of its own at /editor, apart from the game. It opens on a fresh, untitled map built from the world you already know, so you always start with real ground under your feet. A short guided tour runs the first time you visit, and Help in the top bar can run it again.",
-      "buildTitle": "What you can build",
-      "buildBody": "Tools live on the rail down the left, each with a single-letter shortcut shown on its button. Pick one and work straight on the map in front of you. Ctrl+Z undoes and Ctrl+Y redoes, so nothing you try is permanent.",
-      "toolLandTitle": "Shape the land",
-      "toolLandBody": "Raise, lower, smooth, and flatten the ground under a brush whose size you set as you go, with a strength dial on the raising, lowering, and smoothing passes.",
-      "toolSurfaceTitle": "Paint and flood",
-      "toolSurfaceBody": "Paint biome ground cover over a zone default, and set the one water level that every lake the map declares rises or falls to.",
-      "toolPlaceTitle": "Place props",
-      "toolPlaceBody": "Drop pieces from the built-in asset catalog onto the ground. The select tool, the first button on the rail, picks a placed piece back up so you can move, rotate, scale, or duplicate it, and the erase tool lifts one off the map when you change your mind. A placement can be given collision so a player walks around it instead of through it. For the broad strokes, a procedural panel sits under the same tool: scatter a whole category of assets across an area in one go, or raise a run of hills, both worked from the map seed, so the same settings always give you the same result.",
-      "toolCampTitle": "Camps and a spawn point",
-      "toolCampBody": "Lay out mob camps that come alive in playtest, and set the spot where a playtest drops the player in.",
-      "toolBlockerTitle": "Invisible walls",
-      "toolBlockerBody": "Drag blocker walls that stop movement without showing anything, for an edge you want quietly closed off.",
-      "toolRegionTitle": "Copy a whole area",
-      "toolRegionBody": "Box-select terrain and placed assets with the region tool, then paste that selection somewhere else on the map.",
-      "viewsTitle": "Two views of the same map",
-      "viewsBody": "The 3D viewport draws your map with the real game renderer, so what you see is what you get: drag to orbit, scroll to zoom. The 2D overhead map is the plan view, better for moving zone markers such as hubs, graveyards, and points of interest, and for framing a large area before you sculpt it. The toggle sits in the top bar.",
-      "playtestTitle": "Play your map",
-      "playtestBody": "Playtest hands the map to the game and drops you into it as a warrior. Everything you made is underfoot: camps spawn, blocker walls hold, and placements with collision push you around them. When you have seen enough, come back to the editor and keep working.",
-      "sandboxTitle": "A sandbox, not the live world",
-      "sandboxBody": "Custom maps never change the game everyone else is playing. A playtest runs offline in your own browser and never talks to the server, so nothing that happens in it reaches your characters or the shared world.",
-      "saveTitle": "Saving your work",
-      "saveBody": "Ctrl+S saves, and while there are unsaved edits a dot sits beside the map name and the Save button calls for your attention. Without an account the editor still works: maps are kept in your own browser, an autosave can be switched on, and Export writes a map out as a plain JSON file that Import reads straight back.\n\nSigned in with your game account, a save also goes to the server, so your maps follow you to another machine. The Open window has one tab for the drafts in this browser and another for the maps saved to your account. If the editor shows an offline badge, sign in to the game in another tab, then reload the editor.",
-      "shareTitle": "Publishing and forking",
-      "shareBody": "Maps saved to your account start private. From the Open window you can publish one, which lists it for anyone to browse, and unpublish it again at any time. The Public tab in that same window browses everything other players have published: Open loads one so you can look around how it was made, and Fork drops a private copy into your own list to change however you like. A copy is a new map: editing it never touches the original.\n\nThere is a limit on how many maps one account may keep, so tidy up the experiments you are done with.",
-      "uploadTitle": "Bringing your own models",
-      "uploadBody": "Signed in, the Upload button takes a GLB model of your own and adds it to the asset browser beside the built-in catalog, ready to place like any other prop. Uploads are stored on your account, count against a size and storage limit, and can be deleted from the asset browser when you no longer want them.",
-      "helpTitle": "Learning the tools",
-      "helpBody": "Help in the top bar opens a reference covering every tool, the keyboard shortcuts, and the mouse moves, and it can restart the guided tour at any time. The rest is poking at things: undo is always a keystroke away, and Export gives you a copy of a map you can always come back to."
+      "intro": "Tamamen kendine ait bir Harita Editörü, tarayıcıda. Araziyi şekillendir, varlıklar ve kamplar yerleştir, sonra sonucun içine düş ve etrafında yürü.",
+      "whereTitle": "Nerede bulunur",
+      "whereBody": "Editör, oyundan ayrı olarak /editor adresinde kendi başına bir sayfadır. Zaten bildiğin dünyadan inşa edilmiş, taze, adsız bir haritayla açılır, böylece her zaman ayaklarının altında gerçek bir zeminle başlarsın. İlk ziyaretinde kısa bir öğretici çalışır ve üst çubuktaki Yardım onu yeniden çalıştırabilir.",
+      "buildTitle": "Neler inşa edebilirsin",
+      "buildBody": "Araçlar solda aşağı inen araç çubuğunda yaşar; her aracın, düğmesinde gösterilen tek harfli bir kısayolu vardır. Birini seç ve önündeki harita üzerinde doğrudan çalış. Ctrl+Z geri alır, Ctrl+Y yineler, bu yüzden denediğin hiçbir şey kalıcı değildir.",
+      "toolLandTitle": "Araziyi şekillendir",
+      "toolLandBody": "İlerledikçe boyutunu kendin belirlediğin bir Fırçanın altındaki zemini yükselt, alçalt, yumuşat ve düzleştir; yükseltme, alçaltma ve yumuşatma geçişlerinde bir Güç kadranı bulunur.",
+      "toolSurfaceTitle": "Boya ve su bas",
+      "toolSurfaceBody": "Bir bölgenin varsayılanı üzerine biyom zemin örtüsü boya ve haritanın bildirdiği her gölün yükseleceği ya da alçalacağı tek Su Seviyesini belirle.",
+      "toolPlaceTitle": "Varlık yerleştir",
+      "toolPlaceBody": "Yerleşik Varlık Tarayıcısı'ndan parçaları zemine bırak. Araç çubuğundaki ilk düğme olan Seç aracı, yerleştirilmiş bir parçayı taşıyabilmen, döndürebilmen, ölçekleyebilmen ya da çoğaltabilmen için geri alır; Sil aracı ise fikrini değiştirdiğinde bir parçayı haritadan kaldırır. Bir yerleşime, bir oyuncunun içinden değil etrafından yürümesi için çarpışma verilebilir. Geniş fırça darbeleri için aynı aracın altında bir Prosedürel panel bulunur: bir varlık kategorisinin tamamını tek seferde bir alana serpiştir ya da inişli çıkışlı bir dizi tepe oluştur; ikisi de harita tohumundan işler, bu yüzden aynı ayarlar sana her zaman aynı sonucu verir.",
+      "toolCampTitle": "Kamplar ve bir doğuş noktası",
+      "toolCampBody": "Oyun Testinde beliren yaratık kamplarını yerleştir ve bir Oyun Testinin oyuncuyu bırakacağı noktayı ayarla.",
+      "toolBlockerTitle": "Görünmez duvarlar",
+      "toolBlockerBody": "Sessizce kapatmak istediğin bir kenar için, hiçbir şey göstermeden hareketi durduran Engel Duvarları'nı sürükle.",
+      "toolRegionTitle": "Bütün bir alanı kopyala",
+      "toolRegionBody": "Bölge aracıyla araziyi ve yerleştirilmiş varlıkları bir kutuyla seç, sonra o seçimi haritanın başka bir yerine yapıştır.",
+      "viewsTitle": "Aynı haritanın iki görünümü",
+      "viewsBody": "3D görünüm haritanı gerçek oyun render motoruyla çizer, yani gördüğün şey aldığın şeydir: yörüngede dönmek için sürükle, yakınlaştırmak için kaydır. 2D kuş bakışı harita ise plan görünümüdür; merkezler, mezarlıklar ve önemli noktalar gibi bölge işaretçilerini taşımak ve şekillendirmeden önce geniş bir alanı çerçevelemek için daha iyidir. Geçiş üst çubukta bulunur.",
+      "playtestTitle": "Haritanı oyna",
+      "playtestBody": "Oyun Testi haritayı oyuna teslim eder ve seni bir savaşçı olarak içine düşürür. Yaptığın her şey ayaklarının altındadır: kamplar canlanır, engel duvarları tutar ve çarpışması olan yerleşimler seni etraflarından iter. Yeterince gördüğünde editöre geri dön ve çalışmaya devam et.",
+      "sandboxTitle": "Bir kum havuzu, canlı dünya değil",
+      "sandboxBody": "Özel haritalar, herkesin oynadığı oyunu asla değiştirmez. Bir Oyun Testi kendi tarayıcında çevrimdışı çalışır ve sunucuyla asla konuşmaz, bu yüzden içinde olan hiçbir şey karakterlerine ya da paylaşılan dünyaya ulaşmaz.",
+      "saveTitle": "Çalışmanı kaydetmek",
+      "saveBody": "Ctrl+S kaydeder ve kaydedilmemiş değişiklikler varken harita adının yanında bir nokta durur, Kaydet düğmesi de dikkatini ister. Bir hesap olmadan da editör çalışır: haritalar kendi tarayıcında tutulur, bir Otomatik Kayıt açılabilir ve Dışa Aktar bir haritayı, İçe Aktar'ın doğrudan geri okuyabildiği düz bir JSON dosyası olarak yazar.\n\nOyun hesabınla giriş yapmışken bir kayıt sunucuya da gider, böylece haritaların seni başka bir makineye kadar izler. Harita Aç penceresinde bu tarayıcıdaki taslaklar için Bu Tarayıcı sekmesi, hesabına kaydedilen haritalar için de bir başka sekme bulunur. Editör Çevrimdışı rozeti gösteriyorsa, başka bir sekmede oyuna giriş yap, sonra editörü yeniden yükle.",
+      "shareTitle": "Yayımlamak ve çatallamak",
+      "shareBody": "Hesabına kaydedilen haritalar özel başlar. Harita Aç penceresinden birini Yayımla ile yayımlayabilirsin, bu onu herkesin göz atabileceği şekilde listeler, ve istediğin zaman Yayımdan Kaldır ile yeniden kaldırabilirsin. Aynı penceredeki Herkese Açık Haritalar sekmesi diğer oyuncuların yayımladığı her şeye göz atar: Aç, nasıl yapıldığına bakabilmen için birini yükler, Çatalla ise istediğin gibi değiştirmen için kendi listene özel bir kopya bırakır. Bir kopya yeni bir haritadır: onu düzenlemek özgün olana asla dokunmaz.\n\nBir hesabın tutabileceği harita sayısında bir sınır vardır, bu yüzden işi biten denemeleri temizle.",
+      "uploadTitle": "Kendi modellerini getirmek",
+      "uploadBody": "Giriş yapmışken, Varlık Yükle düğmesi kendi GLB modelini alır ve onu Varlık Tarayıcısı'na, yerleşik kataloğun yanına ekler; artık başka herhangi bir varlık gibi yerleştirmeye hazırdır. Yüklemeler hesabında saklanır, bir boyut ve depolama sınırına sayılır ve artık istemediğinde Varlık Tarayıcısı'ndan silinebilir.",
+      "helpTitle": "Araçları öğrenmek",
+      "helpBody": "Üst çubuktaki Yardım, her aracı, klavye kısayollarını ve fare hareketlerini kapsayan bir kılavuz açar ve öğreticiyi istediğin zaman yeniden başlatabilir. Gerisi bir şeyleri dürtüklemektir: geri alma her zaman bir tuş vuruşu uzaklıktadır ve Dışa Aktar sana her zaman dönebileceğin bir harita kopyası verir."
     },
     "models": {
       "title": "3B Model Görüntüleyici",
@@ -5106,7 +5464,7 @@ export const tr_TR: EnTranslations = {
     "gear": {
       "intro": "Teçhizat, karakterinizin giydiği donanım ve taşıdığınız eşyalardır. Daha iyi teçhizat, güçlenmenin en istikrarlı yoludur ve çoğunu sadece oynayarak edinirsiniz.",
       "slotsTitle": "Neler kuşanabilirsiniz",
-      "slotsBody": "Bir silah yuvanız, yedi zırh yuvanız ve üç takı yuvanız var: bir boyun ve iki parmak. Her sınıf yalnızca belirli silahları kullanabilir ve kendi ağırlığına kadar zırh giyer (kumaş, deri ya da zincir), bu yüzden size uyan yükseltmeler, sınıfınız için yapılmış olanlardır. Takılar hiç ağırlık taşımaz: her sınıf kazandığı takıyı takar. Bunun içinde, her yuvayı bulduğunuz en iyi parçayla doldurun.",
+      "slotsBody": "Bir ana el silahı yuvan, bir yardımcı el yuvan, yedi zırh yuvan ve üç takı yuvan var: bir boyun ve iki parmak. Her sınıf yalnızca belirli silahları kullanabilir ve kendi ağırlığına kadar zırh giyer, kumaş, deri ya da zincir, dolayısıyla sana uyan yükseltmeler sınıfın için yapılmış olanlardır. Takının hiç ağırlığı yoktur: her sınıf kazandığını takar. Bunun içinde her yuvayı bulduğun en iyi parçayla doldur.",
       "slotMainhand": "Silah",
       "slotHelmet": "Baş",
       "slotNeck": "Boyun",
@@ -5118,7 +5476,7 @@ export const tr_TR: EnTranslations = {
       "slotFeet": "Ayaklar",
       "slotFinger": "Parmak",
       "bagsTitle": "Çantalar ve taşıma alanı",
-      "bagsBody": "Aldığınız her şey tek bir ortak çıkında taşınır ve onu çanta kuşanarak büyütürsünüz. Çantalar pencereniz dört çanta yuvası tutar: çıkınınızdaki bir çantaya tıklayarak onu boş bir yuvaya yerleştirin; kuşandığınız her çanta kendi yerini ekler. Basit çantalar ucuz satıcı mallarıdır, daha ferahları hayvanlardan düşer ve en iyileri zindan şeflerinden gelir, böylece taşıma alanınız tam da teçhizatınızla birlikte büyür.",
+      "bagsBody": "Aldığın her şey tek bir ortak sırt çantasında taşınır ve onu çanta takarak büyütürsün. Çanta pencerende dört çanta yuvası var: sırt çantandaki bir çantaya tıklayarak onu boş bir yuvaya tak, taktığın her çanta kendi yerini ekler. Basit çantalar ucuz satıcı malıdır, daha geniş olanlar canavarlardan düşer, en iyileri ise zindan patronlarından gelir, böylece taşıma alanın ekipmanınla birlikte büyür. İstiflenen her şey ipucunda tek bir yuvanın kaçını alacağını söyler, önemli bir iksir alışverişinin sana iki yuvaya mal olacağını böyle önceden bilirsin.",
       "qualityTitle": "Bir bakışta kalite",
       "qualityBody": "Her eşyanın bir kalitesi vardır ve değerini bir bakışta okuyabilmeniz için ismi buna uygun renklendirilir. En yaygından en değerliye:",
       "qualityPoor": "Zayıf",
@@ -5132,18 +5490,18 @@ export const tr_TR: EnTranslations = {
       "upgradeBody": "Eski bir parçayı taze bir yükseltmeyle değiştirmek, geride bıraktığınız teçhizatla kusursuz oynamaktan size daha çok şey kazandırır. Daha iyi bir şey düştüğünde ya da bir görev onu sunduğunda, alın. İyi eşyalarınızı sonraya saklamayın.",
       "itemLevelBody": "İki parçayı hızlıca karşılaştırmak için seçeneklerden Eşya Seviyesini Göster’i aç. Düşmanlardan, görevlerden ve üretim mesleklerinden gelen, kaynağı bilinen teçhizat bir eşya seviyesi gösterir: kaynağına göre gücünü yaklaşık belirten tek bir sayı, farklı yuvalar arasında bile hangi yükseltmenin daha etkili olduğunu gösterir. Basit satıcı eşyaları ve başlangıç teçhizatı gibi böyle bir kaynağı olmayan parçalarda seviye görünmez; sayının olmaması normaldir.",
       "sourcesTitle": "Teçhizat nereden gelir",
-      "sourcesBody": "Erken dönem yükseltmelerinizin çoğu görev ödülleridir, bu yüzden grindlemek yerine görevleri bitirmek işe yarar. Düşmanlar yendiğinizde teçhizat düşürür, kasabadaki satıcılar sağlam temel parçalar satar, zanaatkârlar toplanan malzemeleri giyilebilir parçalara dönüştürür ve oyuncu pazarı diğer maceracılardan alışveriş yapmanızı sağlar. Tepenin zirvesinde, başka hiçbir yerde bulunmayan teçhizatı iki nişan para birimi satın alır: mağara seferi bekçisindeki Mağara Nişanları ve Kahramanca Levazımcı'daki Kahramanca Nişanlar.",
+      "sourcesBody": "Erken yükseltmelerinin çoğu görev ödülüdür, dolayısıyla grind yapmaktansa görevleri bitirmek işe yarar. Düşmanlar yendiğinde ekipman düşürür, kasabadaki satıcılar sağlam temel eşyalar satar, zanaatkârlar toplanan malzemeleri giyilebilir parçalara çevirir ve oyuncu pazarı diğer maceracılardan almanı sağlar. Tepenin en üstünde, başka hiçbir yerde bulunmayan ekipmanı üç kazanılmış para birimi satın alır: mağara bekçisinde Mağara Nişanları, kahramanca levazımcıda Kahramanca Nişanlar ve onur levazımcılarında Onur.",
       "soulboundTitle": "Ruha bağlı: yalnızca ve yalnızca sizin",
       "soulboundBody": "Birkaç özel ödül ruha bağlıdır, onları kazandığınız andan itibaren karakterinize bağlanır. Ruha bağlı bir eşya takas edilemez, postalanamaz, bir satıcıya satılamaz ya da pazara ilan edilemez; yalnızca ve yalnızca sizindir. Bugün bu koruma, Kahramanca Nişanları gibi ödül jetonlarını gözetir; kazandığınız teçhizat ise takas etmek, satmak ya da özgürce paylaşmak üzere sizindir.",
       "uniqueTitle": "Eşsiz Kuşanım: türünden yalnızca bir efsanevi",
       "uniqueBody": "Efsanevi eşyalar eşsiz kuşanımdır: karakterin, belirli bir efsanevi eşyanın aynı anda yalnızca bir kopyasını kuşanabilir ve onun kahramanca sürümü de aynı eşya sayılır. İkinci bir kopya çantalarında, bankada ya da pazarda durabilir, ama ikisini birden kuşanmaya çalışmak reddedilir; eşyanın bilgi kutusunda da altın renkli bir Eşsiz Kuşanım etiketi bulunur, böylece ikisi etrafında bir yapı kurmadan önce kuralı görebilirsin.",
       "setsTitle": "Takımlar ve takım bonusları",
-      "setsBody": "Bazı zırhlar, birlikte görünmek ve dövüşmek üzere biçilmiş birkaç parçadan oluşan uyumlu ailelerle gelir. Bir aileden yeterince parçayı aynı anda giyin, takım uyanır ve her parçanın kendi istatistiklerinin üstüne bonuslar verir; giydiğiniz parça arttıkça da güçlenir. Böyle ailelerden birkaçı, seviye atlarken değerli düşüşler olarak ortaya çıkar; en büyükleri ise seviye tavanına yakın en çetin grup içeriğinden gelir, bu yüzden tam bir takımın peşine düşmek klasik bir son oyun hedefidir.",
+      "setsBody": "Bazı zırhlar eşleşen ailelerle gelir; tek bir bütün gibi görünmek ve dövüşmek üzere biçilmiş birkaç parça. Bir ailenin yeterince parçasını aynı anda giy, set uyanır ve her parçanın kendi değerlerinin üstüne bonuslar verir, ne kadar çok parça giyersen o kadar güçlenir. Böyle ailelerden birkaçı sen seviye atlarken imrenilen ganimet olarak ortaya çıkar, en büyükleri ise seviye tavanına yakın en çetin grup içeriğinden gelir, dolayısıyla tam bir setin peşine düşmek klasik bir oyun sonu hedefidir. Diğer oyunculara karşı dövüşün kendi eşleşen aileleri vardır, Onur ile parça parça satın alınır; ganimet ailelerinden farklı parça sayılarında uyanırlar ve bonusları yalnızca düşman başka bir oyuncuyken karşılık verir.",
       "consumablesTitle": "Sarf Malzemeleri",
       "consumablesIntro": "Bazı eşyalar hızlı bir fayda için bir kez kullanılır. Ucuz bir güvencedir, bu yüzden elinizin altında birkaç tane bulundurun.",
-      "consumablesPotions": "İksir şişeleri, savaşın ortasında bile kullandığınız an sağlığı ya da manayı geri kazandırır, bu da bir çekim ters gittiğinde can kurtaran bir hamle olmalarını sağlar. Kısa bir ortak bekleme süresini paylaşırlar, bu yüzden onları kullanmak için iyi bir an planlayın.",
+      "consumablesPotions": "İksirler kullandığın anda can ya da mana yeniler, dövüşün tam ortasında bile, bu da bir çekiş ters gittiğinde onları can kurtaran kılar. Tüm iksirler birkaç dakikalık tek bir bekleme süresini paylaşır, dolayısıyla bir zincir yerine dövüş başına bir iyi an elde edersin. Ayrıca oturup yemekten ya da içmekten daha az yenilerler, oturmamanın bedeli budur. İksirler dünyanın her kesitine göre biçilmiş kademelerle gelir, o yüzden seviyene göre yapılmış kademeyi taşı: eski, düşük kademeli bir iksir yetişkin bir karakterde bir kırıntıdır.",
       "consumablesFood": "Yiyecek ve içecek, savaşlar arasında oturup dinlenirken sizi tazeler. Yemek sağlığı, içmek manayı geri kazandırır ve bu şekilde dinlenmek ücretsizdir. Çetin bir savaştan sonra yarı iyileşmiş hâlde bir sonrakine koşmak yerine birkaç saniye oturun.",
-      "consumablesElixirs": "İksirler, macera sırasında geçici bir takviye sağlar; biraz daha ileri gitmek istediğinizde işe yarayan küçük bir avantaj.",
+      "consumablesElixirs": "İksirli şuruplar maceradayken geçici bir güçlenme verir, biraz daha ileri gitmek istediğinde yardımı dokunan küçük bir üstünlük. İksirlerin bekleme süresini paylaşmazlar, dolayısıyla birini içip yine de yedekte bir şifa iksiri tutabilirsin. Aynı özelliğe ait iki şurup birikmez ve en son içtiğin, sende kalan olur.",
       "fishingTitle": "Balık Tutma",
       "fishingBody": "Balık tutmak, ritimde sakin bir değişikliktir. Bir olta taşıyın, açık suyun kenarında kullanın ve takılanı çekin. Çoğunlukla yiyebileceğiniz birer yiyecek olan balıklar, birkaç bakıra satılacak ara sıra hurdalar ve arada bir değerli bir ender av yakalarsınız. Bulduğunuz şey, balık tuttuğunuz suya bağlıdır.",
       "fishingFood": "Çektiğiniz balıklar birer yiyecektir: dinlenmek için otururken birini yiyin, can yeniler; daha doyurucu balıklar ise kuzeydeki daha soğuk, daha derin sulardan gelir. Göle atılan bir olta, savaşlar arasında çantanızı dolu tutmanın sessiz bir yoludur.",
@@ -5151,18 +5509,18 @@ export const tr_TR: EnTranslations = {
       "cosmeticsTitle": "Görünümler ve kozmetikler",
       "cosmeticsBody": "Bazı ödüller yalnızca karakterinizin görünüşünü değiştirir, ne kadar güçlü olduğunuzu asla. Bu kozmetik görünümler, oyunu etkilemeden öne çıkmanızı sağlar, bu yüzden hangisini isterseniz onu giyin.",
       "cosmeticsRanks": "Kozmetikler kendi enderlik kademelerinde gelir ve daha enderleri peşine düşülecek eğlenceli şeylerdir. Daha yüksek bir kademe kazanmak, altındaki görünümlerin de kilidini açar.",
-      "cosmeticsSkins": "Toplanacak iki kozmetik hat vardır. Çoğu sınıfın birkaç alternatif görünümü vardır; sınıf görünümüne, yalnızca size ait giyebileceğiniz taze bir bakış. Onların yanında kromalar yer alır: bir görünümü, ağırbaşlı metallerden parlak imparatorluk renklerine kadar baştan boyayan, isimli iki tonlu renk şemaları.",
+      "cosmeticsSkins": "Karakterinin görünüşü iki hatta gelir. Çoğu sınıfın birkaç alternatif görünüşü vardır, sınıf görünümünün taşıman için sana ait taze bir okuması. Onların yanında chroma'lar durur: bir görünümü tümüyle yeniden boyayan, adlandırılmış iki tonlu renk şemaları, ağırbaşlı metallerden parlak imparatorluk renklerine.",
       "cosmeticsCache": "Bunların birkaçı, açtığınızda üç kalite kademesinden birini atan ve ona uygun görünümü veren mühürlü bir ödül olan gizemli bir kozmetik sandıktan gelir. Tamamen görünüm içindir: içindeki hiçbir şey sizi güçlendirmez, yalnızca bakılması daha hoş kılar.",
       "cosmeticsApply": "Aktif görünümünüzü karakter ekranınızdaki görünüş satırından belirleyin ve açtığınız her şey arasında özgürce geçiş yapın.",
-      "slotOffhand": "Off Hand",
-      "offhandBody": "What the off hand takes depends on your class. A shield goes there, and so does a held focus such as an orb or a tome, or a quiver for a hunter. Classes that can dual wield put a second weapon in it instead, at a price worth knowing: fighting with a weapon in each hand makes your ordinary swings miss noticeably more often, though it leaves your abilities alone. A two-handed weapon normally needs both hands, so equipping one benches whatever the off hand was holding, unless your specialization is one of the rare ones that can carry two of them at once.",
-      "bagsSort": "When the pack gets messy, the Sort button in the bags window tidies it in one press. Partial stacks of the same thing are merged together, and everything is laid back out in a readable order: weapons and armor first, then bags, consumables, tools, and mounts, then crafting materials with each fine grade sitting beside its plain version, then quest items, with grey junk last so you can see at a glance what to sell. Nothing is ever created or lost, only rearranged, so it is always safe to press.",
-      "requiredLevelBody": "Some pieces also carry a required level, shown on the tooltip. You can loot, buy, or be handed such a piece at any level, but you cannot wear it until you get there. The requirement follows where the piece came from rather than its color alone, so a rare you win at your own level is usually wearable straight away, while a hand-me-down from far above you waits in your bags until you catch up.",
-      "sourcesHonor": "Honor is what fighting other players pays, and the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, keep the Warfare stores that Honor alone buys: whole armor families, jewelry, and weapons no coin merchant carries. The arena page covers how the Honor itself is earned.",
-      "sourcesRifts": "Rifts add one more source once you are at the level cap, and a rift is a race: the group that clears one first wins its rewards. That first clear pays gear on top of everything else the run leaves behind, including a Riftbound band cut to your class role, a ring you will not find anywhere else in the world. A group that finishes second still finishes its own run and keeps the credit for the clear; what it forfeits are the first-clear rewards. The rifts page covers the race itself.",
-      "bindOnTradeBody": "A softer version of the same idea also exists: some things bind on trade, meaning they can change hands exactly once and then belong to whoever received them. A crafted piece made on commission binds when the crafter hands it over. A copy under that rule never rides the market or the post, which are anonymous; it passes face to face or not at all, and once it has passed, it is bound. The tooltip says which rule a piece follows, so check before you plan to resell it.",
-      "cosmeticsWeapons": "Weapon skins are a third line, and they change what you carry rather than who carries it. A skin repaints a weapon type, so the look follows whichever sword, staff, or bow you have equipped, and it never touches the weapon's stats, reach, or speed. Skins unlock for your whole account rather than one character, and they come in collections with rarity tiers like everything else. They are offered in the Armory's seasonal collections rather than found out in the world, and the Armory is also where you set them, one per weapon type, rather than from the appearance row. Everyone standing near you sees the skin you are wearing.",
-      "soulboundBodyBound": "A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. That guards prize tokens such as Heroic Marks, and it covers every piece of Warfare gear bought with Honor, so a player-versus-player kit is worn only by the character who earned it. Most of the gear you win from the world is still yours to trade, sell, or share freely."
+      "slotOffhand": "Yardımcı El",
+      "offhandBody": "Yardımcı Elin ne taşıdığı sınıfınıza bağlıdır. Oraya bir kalkan gider, aynı şekilde bir küre ya da kutsal bir kitap gibi elde tutulan bir odak nesnesi ya da bir avcı için bir sadak da gider. Çift silah kuşanabilen sınıflar ise oraya bunun yerine ikinci bir silah koyar, bilinmeye değer bir bedelle: her iki elinizde de bir silahla dövüşmek, sıradan vuruşlarınızın gözle görülür şekilde daha sık ıskalamasına yol açar, gerçi yeteneklerinize dokunmaz. Bir Çift El silahı normalde iki eli birden ister, bu yüzden birini kuşanmak Yardımcı Elin tuttuğu her neyse onu kenara koyar; tabii uzmanlığınız aynı anda ikisini birden taşıyabilen nadir uzmanlıklardan biri değilse.",
+      "bagsSort": "Çıkın dağıldığında, çanta penceresindeki Sırala düğmesi onu tek basışta toparlar. Aynı şeyin yarım yığınları birleştirilir ve her şey okunabilir bir düzende yeniden dizilir: önce silahlar ve zırhlar, sonra çantalar, sarf malzemeleri, aletler ve binekler, ardından her ince kademenin sade versiyonunun yanına oturduğu üretim malzemeleri, sonra görev eşyaları, en sonda ise ne satacağınızı bir bakışta görebilmeniz için gri hurdalar. Hiçbir şey asla yaratılmaz ya da kaybolmaz, yalnızca yeniden düzenlenir, bu yüzden basmak her zaman güvenlidir.",
+      "requiredLevelBody": "Bazı parçalar ayrıca ipucu kutusunda gösterilen bir gerekli seviye taşır. Böyle bir parçayı herhangi bir seviyede yağmalayabilir, satın alabilir ya da elinize verilebilir, ama oraya ulaşana kadar kuşanamazsınız. Gereklilik yalnızca rengine değil, parçanın nereden geldiğine bağlıdır, bu yüzden kendi seviyenizde kazandığınız bir ender parça genellikle hemen kuşanılabilirken, çok daha yukarıdan gelen bir armağan siz yetişene kadar çantalarınızda bekler.",
+      "sourcesHonor": "Onur, diğer oyuncularla dövüşmenin karşılığıdır ve onur levazımcıları, Doğudere'deki ÖFKE ile Highwatch'taki Savaş Mareşali Draven Kole, yalnızca Onur'un satın alabildiği Harp mağazalarını tutar: hiçbir para tüccarının taşımadığı bütün zırh aileleri, takılar ve silahlar. Onurun kendisinin nasıl kazanıldığını Arena sayfası anlatır.",
+      "sourcesRifts": "Seviye sınırına ulaştığınızda yarıklar bir kaynak daha ekler ve bir yarık bir yarıştır: onu ilk temizleyen grup ödüllerini kazanır. O ilk temizlik, koşunun geride bıraktığı her şeyin üzerine, sınıf rolünüze göre kesilmiş bir Yarık Bağlı halka, dünyada başka hiçbir yerde bulamayacağınız bir yüzük dahil, teçhizat da öder. İkinci biten bir grup yine de kendi koşusunu bitirir ve temizliğin hakkını korur; kaybettiği yalnızca ilk temizlik ödülleridir. Yarışın kendisini Yarıklar sayfası anlatır.",
+      "bindOnTradeBody": "Aynı fikrin daha yumuşak bir hali de vardır: bazı şeyler takasla bağlanır, yani tam olarak bir kez el değiştirebilir ve sonra onu alan kişiye ait olur. Komisyonla yapılmış üretilmiş bir parça, üretici onu teslim ettiğinde bağlanır. Bu kurala tabi bir kopya asla pazara ya da postaya, yani anonim olan yerlere binmez; yalnızca yüz yüze geçer ya da hiç geçmez, ve bir kez geçtiğinde bağlanmış olur. İpucu kutusu bir parçanın hangi kuralı izlediğini söyler, bu yüzden yeniden satmayı planlamadan önce kontrol edin.",
+      "cosmeticsWeapons": "Silah görünümleri üçüncü bir hattır ve neyi taşıdığınızı değiştirir, onu kim taşıdığını değil. Bir görünüm bir silah türünü yeniden boyar, böylece görünüm kuşandığınız kılıç, asa ya da yay hangisiyse onu izler ve silahın niteliklerine, menziline ya da hızına asla dokunmaz. Görünümler tek bir karakter yerine tüm hesabınız için açılır ve her şey gibi kendi enderlik kademeleriyle gelen koleksiyonlar hâlinde bulunur. Dünyada bulunmak yerine Cephanelik'in sezonluk koleksiyonlarında sunulurlar ve onları görünüş satırından değil, yine silah türü başına bir tane olmak üzere Cephanelik'ten ayarlarsınız. Yanınızda duran herkes kuşandığınız görünümü görür.",
+      "soulboundBodyBound": "Birkaç özel ödül ruha bağlıdır, onları kazandığınız andan itibaren karakterinize bağlanır. Ruha bağlı bir eşya takas edilemez, postalanamaz, bir satıcıya satılamaz ya da pazara ilan edilemez; yalnızca ve yalnızca sizindir. Bu, Kahramanca Nişanları gibi ödül jetonlarını korur ve Onur ile satın alınan her Harp teçhizatı parçasını kapsar, bu yüzden oyuncuya karşı oyuncu bir kit yalnızca onu kazanan karakter tarafından giyilir. Dünyadan kazandığınız teçhizatın çoğu ise hâlâ serbestçe takas etmeniz, satmanız ya da paylaşmanız için sizindir."
     },
     "professions": {
       "intro": "Dünya seni savaşın ve görevlerin ötesinde, toprağı ve ocağı işlediğin için de ödüllendirir: ham madde toplamak, on ayrı zanaat kolunda onları teçhizata ve mallara dönüştürmek ve bu zanaatların temsil ettiği on arketipten birinin kimliğine yerleşmek.",
@@ -5202,10 +5560,10 @@ export const tr_TR: EnTranslations = {
       "colHub": "Merkez",
       "colMaster": "Usta",
       "masterCellFmt": "{name}, {title}",
-      "harvestBodyFamilies": "Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, claws, tusks, silk, venom, cloth, and meat, straight from the corpse alongside its ordinary loot; one press opens both. Where a beast carries more than one workable component, the choice is yours: take everything it can give, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, Pristine Claw, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.",
-      "focusBodyTiers": "Every hub town keeps a Town Focus panel for visiting harvesters: stand in town, open it from beside the minimap, and spread a budget of 10 focus points across the component types you care about. Every 5 points on a component raises its harvest grade one step (two steps at most), and each point adds 10 percent to its yield; unfocused components are never made worse.\n\nYour allocation follows your character everywhere and can be re-aimed on any later visit to town, at a pace you choose. Taking your time is free: the re-aim runs for 1 minute per point you move. Paying a little speeds it up, 15 seconds per point plus 5 copper and 1 Chime Dust per point, and paying in full makes it instant for 25 copper and 5 Chime Dust per point. Only the points you actually move are counted, so nudging a single point is cheap, and a panel you open and close unchanged costs nothing at any tier.",
-      "toolEffectsHeading": "Tool effects",
-      "toolEffectsBody": "A gathering tool has a slot in it, and an enchanter's charm is what goes in. A Gatherer's Cache adds a unit to what a harvest yields; an Artisan's Eye raises the grade of what it pulls up. Tinker Gizzel, Master of the Toolworks in Eastbrook, teaches both to enchanters who have reached 25 skill in the craft, and both are made at his toolworks.\\n\\nA freshly slotted charm carries 20 charges on a common tool and 10 more for every rarity rung above common, so the same charm slotted on an epic pick starts at 50. A charge is spent only when the charm actually changed the outcome, never on a harvest it did not improve, and a slot can be set to ask each use, so the charm waits until you say Use a Charge. Slotting a fresh charm re-mints the slot around the tool you are carrying at that moment, so it fills to what that tool can hold rather than back to some earlier high mark, and a re-slot that would change nothing at all is turned away instead of eating the charm.\\n\\nRunning out of charges does not destroy the charm: the tool's owner refills the slot, 10 charges for each arcane material spent, and which material it asks for follows the better of the tool you are carrying and the best tool that slot has ever been filled by, Chime Dust for a common or uncommon tool, Chime Essence for a rare one, and a Chime Shard for an epic. Leaving the good tool in the bank does not buy a cheaper refill, only a smaller one at the same price; the honest way down to a cheaper rung is to slot a fresh charm while carrying the lesser tool, which re-mints the slot there. If the slot's ceiling sits above what your current tool can fill, the refill stops where that tool stops and tells you to carry the better one. The refill costs half the materials when you are the enchanter who signed the charm, and less again if you are specialized in Enchanting; anyone else pays the full rate. A refill is a short cast, like the rest of the craft family."
+      "harvestBodyFamilies": "Toplama düğümlerde durmaz. Öldürülen pek çok canavardan birer kez hasat yapılabilir, ilk gelen alır; post, diş, pençe, azı dişi, ipek, zehir, kumaş ve et, cesedin olağan ganimetiyle birlikte doğrudan cesetten elde edilir; tek bir basışla her ikisi de açılır. Bir canavar birden fazla işlenebilir bileşen taşıyorsa seçim sizindir: verebileceği her şeyi alın ya da daha az bileşene odaklanın ve aldığınız şeyin ölçülebilir biçimde daha kaliteli bir derecesini kazanın.\n\nÖrnek taşıyan bir ailede nadir veya daha iyi bir hasat turu, olağan verimin üstüne imzalı mükemmel bir örnek de kazandırır (Bozulmamış Post, Bozulmamış İpek, Bozulmamış Zehir Bezi, Kusursuz Pençe ya da Birinci Kalite Et) ve Yiğitlikler Kitabınıza Mükemmel Örnek kaydeder. Her karakter hasat yapabilir, eğitim gerekmez; sahip olduğunuz herhangi bir toplama aleti, hangi zanaata ait olursa olsun premium kolu sayılır.",
+      "focusBodyTiers": "Her merkez kasaba, uğrayan toplayıcılar için bir Kasaba Odağı paneli tutar: kasabada dur, onu mini haritanın yanından aç ve 10 odak puanından oluşan bir bütçeyi önemsediğin bileşen türlerine yay. Bir bileşendeki her 5 puan, hasat derecesini bir adım yükseltir (en fazla iki adım), ve her puan verimine yüzde 10 ekler; odaklanılmayan bileşenler asla kötüleşmez.\n\nDağılımın karakterini her yere takip eder ve kasabaya sonraki her uğrayışında, kendi seçtiğin bir hızda yeniden yönlendirilebilir. Acele etmemek ücretsizdir: yeniden yönlendirme, taşıdığın her puan için 1 dakika sürer. Biraz ödemek onu hızlandırır, puan başına 15 saniye artı 5 bakır ve 1 Çan Tozu, tam ödeme ise puan başına 25 bakır ve 5 Çan Tozu karşılığında anında yapar. Yalnızca gerçekten taşıdığın puanlar sayılır, bu yüzden tek bir puanı kıpırdatmak ucuzdur, ve değiştirmeden açıp kapattığın bir panel hiçbir kademede hiçbir şeye mal olmaz.",
+      "toolEffectsHeading": "Alet etkileri",
+      "toolEffectsBody": "Bir toplama aletinde bir yuva vardır ve içine giren şey bir büyücü tılsımıdır. Toplayıcının Zulası bir hasadın verdiğine bir birim ekler; Zanaatkârın Gözü çıkardığının derecesini yükseltir. Doğudere'deki alet atölyesinin ustası Tamirci Gizzel, zanaatta 25 beceriye ulaşan büyücülere ikisini de öğretir, ve ikisi de onun atölyesinde yapılır.\\n\\nYeni takılmış bir tılsım sıradan bir alette 20 şarj taşır ve sıradanın üzerindeki her nadirlik kademesi için 10 daha fazlasını taşır, bu yüzden destansı bir kazmaya takılan aynı tılsım 50'den başlar. Bir şarj yalnızca tılsım sonucu gerçekten değiştirdiğinde harcanır, iyileştirmediği bir hasatta asla, ve bir yuva her kullanımda sormaya ayarlanabilir, böylece tılsım siz Şarj Kullan diyene kadar bekler. Taze bir tılsım takmak, yuvayı o an taşıdığınız aletin çevresinde yeniden basar, böylece daha önceki bir üst sınıra değil, o aletin tutabileceği kadarına dolar, ve hiçbir şeyi değiştirmeyecek bir yeniden takma, tılsımı yemek yerine geri çevrilir.\\n\\nŞarjların tükenmesi tılsımı yok etmez: aletin sahibi yuvayı, harcanan her arkanik malzeme için 10 şarj olacak şekilde yeniden doldurur, ve hangi malzemeyi istediği, taşıdığınız aletin ve o yuvanın şimdiye kadar doldurduğu en iyi aletin daha iyisini izler; sıradan ya da sıradan dışı bir alet için Çan Tozu, nadir biri için Çan Özü, destansı biri için bir Çan Kırığı. İyi aleti bankada bırakmak daha ucuz bir yeniden dolum satın almaz, yalnızca aynı fiyata daha küçük bir tane satın alır; daha ucuz bir kademeye dürüstçe inmenin yolu, daha zayıf aleti taşırken taze bir tılsım takmaktır, ki bu orada yuvayı yeniden basar. Yuvanın tavanı mevcut aletinizin doldurabileceğinin üzerindeyse, yeniden dolum o aletin durduğu yerde durur ve size daha iyisini taşımanızı söyler. Yeniden dolum, tılsımı imzalayan büyücüyseniz malzemelerin yarısına mal olur, Büyülemede uzmansanız daha da azına; başka herkes tam oranı öder. Bir yeniden dolum, zanaat ailesinin geri kalanı gibi kısa bir büyüdür."
     },
     "profPages": {
       "back": "Mesleklere Dön",
@@ -5363,9 +5721,9 @@ export const tr_TR: EnTranslations = {
         "salvageHeading": "Hurda toplama",
         "salvageNote": "Hurda toplama, büyü bozumunun herkese açık kuzenidir: aynı silahlar ve zırhlar, beceri gerekmez ve kazanılmaz, bunun yerine arkanik bir şey değil kaliteye göre düz zanaat hurdası döner. Herkes yapabilir, büyücü olup olmak fark etmez. Bozulmaya değer bir parça tuttuğunuzda seçim basittir: nadir ve üzeri için büyü bozumu kesinlikle daha iyi bir anlaşmadır; sıradan kalitede ise ikisinin de satıcıya verdiği değer yaklaşık aynıdır, dolayısıyla gerçekten hangi malzemeye ihtiyacınız varsa onu gözetecek şekilde bozun.",
         "bonusFmt": "+{value} {stat}",
-        "enchantsNoteOffhand": "Enchants come in three tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed two more sinks besides, the two charm recipes at five apiece and the top rung of tool-effect recharges, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.",
-        "charmsHeading": "Charms for a gatherer's tools",
-        "charmsBody": "Enchanting is also where a gatherer's charms come from. Tinker Gizzel teaches both at the Eastbrook toolworks once your Enchanting reaches 25: the Gatherer's Cache, which adds a unit to a harvest, and the Artisan's Eye, which raises the grade of what comes up. Each is crafted once, then slotted into a pick, axe, or sickle, where it spends a charge only on the harvests it actually improves.\n\nThe refill is where the trade keeps earning. Charges are restored by whoever owns the tool, not by a visiting enchanter, and the refill costs half the materials when that owner is the enchanter who signed the charm, less again with an Enchanting specialization. So a charm sold across the counter is a single sale, while the charms riding your own tools are the cheap ones to keep running. The full charge and material ladder is on any gathering profession page, under Tool effects."
+        "enchantsNoteOffhand": "Büyüler üç kademede gelir. Temel kademe Çan Tozu ile çalışır (üst uçta biraz da Öz ister) ve silah yuvasını, yardımcı eli ve her zırh yuvasını kapsar; istatistik eksenlerinde her yapının her yuva için bir şey bulacağı kadar seçenek vardır: kalkanlar ve tutulan büyücü yardımcı el eşyaları kendilerine ait bir Dayanıklılık büyüsü alır, bu yüzden hiçbir kuşanılmış yuva büyüsüz kalmaz. Daha İyi kademe bir Çan Kırığı artı Öz'e mal olur: en yüksek etkili yuvalarda daha güçlü bonuslar. Kırıklar bunun ötesinde iki rezerv daha besler, beşer taneden iki tılsım tarifi ve alet etkisi yeniden dolumlarının en üst basamağı; bu yüzden harcamadan önce birkaç tane biriktirin.\n\nİkisinin arasında beş Runlu büyü durur, her yazılan ikincil için bir tüketici; böylece öğüttüğünüz hiçbir şey çıkmaz sokak olmaz: Runlu Ağız (silah, Güç, Rezonant Çelik tüketir), Runlu Mühür (silah, Zeka, Rezonant Kereste), Runlu Doku (göğüslük, Ruh, Rezonant İplik), Runlu Post (bacaklar, Çeviklik, Rezonant Deri) ve Runlu Halkalar (miğfer, Dayanıklılık, Rezonant Halkalar). Her biri ayrıca iki Çan Özü ister; bir yuva ile istatistiğin hem temel hem Daha İyi büyüsünün bulunduğu yerde Runlu bonus tam ikisinin arasına düşer, buna karşılık Runlu Doku açık ara en güçlü göğüslük Ruh büyüsüdür ve Runlu Post bacaklar için var olan tek Çeviklik büyüsüdür. Kesin bonusların hepsi aşağıdaki tabloda.",
+        "charmsHeading": "Toplayıcı aletleri için tılsımlar",
+        "charmsBody": "Büyüleme aynı zamanda bir toplayıcının tılsımlarının da kaynağıdır. Büyülemeniz 25'e ulaştığında Tamirci Gizzel, Doğudere'deki alet atölyesinde ikisini de öğretir: bir hasada bir birim ekleyen Toplayıcının Zulası'nı ve çıkanın derecesini yükselten Zanaatkârın Gözü'nü. Her biri bir kez üretilir, sonra bir kazmaya, baltaya ya da orağa takılır; orada yalnızca gerçekten iyileştirdiği hasatlarda bir şarj harcar.\n\nZanaatın kazanmaya devam ettiği yer yeniden doldurmadır. Şarjlar, ziyaret eden bir büyücü tarafından değil, aletin sahibi tarafından geri kazandırılır, ve o sahip tılsımı imzalayan büyücüyse yeniden doldurma malzemelerin yarısına mal olur, Büyülemede uzmanlaşmışsa daha da ucuza. Yani tezgahtan satılan bir tılsım tek bir satıştır, kendi aletlerinizde taşıdığınız tılsımlar ise çalıştırmaya devam etmesi ucuz olanlardır. Tam şarj ve malzeme merdiveni, herhangi bir toplama mesleği sayfasında, Alet etkileri başlığı altındadır."
       },
       "gatherIntro": {
         "mining": "Madencilik cevheri doğrudan dünyanın kayasından söker: Doğudere Vadisi'nde bakır, Mirefen Bataklığı'nda demir ve yukarıda Dikenzirve Tepeleri'nde osmiyum; bunların ötesindeki her genç bölgeye de başlangıç damarları serpiştirilmiştir ve hepsi ocak zanaatlarını besler. 1. seviyeden itibaren herkese açıktır: Doğudere, Fenbridge ya da Highwatch tezgahından alınan 20 bakırlık bir madenci kazması her başlangıç damarını açar, kazma merdiveninin üst basamakları ise kendi sayacınız onları hak ettikçe uyanır. 100 tavanına kadar kendi sayacında izlenir.",
@@ -5411,7 +5769,7 @@ export const tr_TR: EnTranslations = {
         "startBody": "Basit Olta, Doğudere'deki Balıkçı Brandt'ten 20 bakıra alınır (Eski Denizci'yi kasabanın doğu ucunda, Ayna Gölü'ne giden yolun kenarında arayın); Tamirci Gizzel, Fenbridge'deki Levazımcı Hale ve Highwatch'taki Donatım Subayı Bree de olta bulundurur. Oltayı, balık tutacak kadar derin bir suya dönükken, önünüzde yaklaşık 24 yardaya kadar kullanın; şamandıranız süzülüp gider.\n\nDövüşteyken, yüzerken ya da ölüyken olta atamazsınız: amaçlanan duruş kıyıdan atmaktır. Ne var ki sular da kara gibi sertleşir: bataklık en az kademe 2 Demir Makaralı Olta'yı, zirveler ise kademe 3 Gümüş Dere Oltası'nı ister ve o suyun istediği olta olmadan atılan misina elinizden hiç çıkmaz. Bunların üzerinde iki olta daha durur, Fırtına Makarası ve Gelgit Dövmesi: mühendisler bunları alet atölyesinde, misinanın sudan çıkardıklarıyla üretir; Boğulmuş Litanya'nın sefer tezgahı da temizleme kapılarının ardında Mağara Nişanı karşılığında satar, ama asla sikke karşılığında değil. Hiçbir su bunları istemez, dolayısıyla erişim yerine daha kısa bir bekleyiş ve daha geniş bir çekme penceresi satın alırlar; en üst basamakta bu, tam üç saniyede gelen bir ısırık demektir.",
         "biteHeading": "Isırma ve çekme",
         "biteBody": "Oltayı attıktan sonra ısırık, {min} ile {max} saniye arasında gizli bir anda gelir; gecikme misina suya değdiğinde belirlenir, bu yüzden hiçbir atış bir diğerine tam olarak benzemez. Şamandıra vurduğunda, oltaya tekrar basıp çekmek için {reel} saniyelik bir pencereniz olur: bu pencerenin içinde çekerseniz av elinizde kalır, geçirirseniz balık gösterecek hiçbir şey bırakmadan kaçar. Bütün bir seans {cap} saniyeyle sınırlıdır, bu yüzden sessiz bir atış bile çabuk sonuçlanır.\n\nDaha iyi oltalar mini oyunun her iki ucunu da keskinleştirir: ilkinin üzerindeki her olta kademesi, en üst oltanın hâlihazırda sıyırdığı üç saniyelik tabanın altına asla inmeden, mümkün olan en uzun bekleyişten {rod} saniye kırpar ve çekme penceresine {reelRod} saniye ekler; böylece Demir Makaralı Olta en kötü bekleyişi 3,25 saniyelik bir pencereyle 6,5 saniyeye, Gümüş Dere Oltası ise 4'ü aşan bir pencereyle 5 saniyeye indirir, nadirliği çekme süresini kademenin tek başına ödediğinin biraz ötesine genişletir. En hızlı ısırıklar elinizde ne olursa olsun hiç değişmez ve bir oltanın sayılması için yalnızca çantanızda olması yeterlidir.",
-        "earlyReelNote": "Sabırsız parmaklar için bir uyarı: bir şey ısırmadan önce oltaya tekrar basarsan boş bir misina çekersin ve atış sona erer (atıştan hemen sonraki kısa bir an, yanlışlıkla iki kez basmayı bağışlar). Sabır oyunun tamamıdır: ısırmayı bekle, sonra vur.",
+        "earlyReelNote": "Hevesli parmaklar için bir uyarı: bir şey vurmadan önce oltaya yeniden basarsan boş misina toplarsın ve atış biter. Misina suya değdikten sonraki ilk saniye bağışlanır, dolayısıyla kazara çift basış sana hiçbir şeye mal olmaz; ondan sonrası için erken basmak boşa gitmiş bir atıştır. Sabır oyunun tamamıdır: vuruşu bekle, sonra çek.",
         "scheduleHeading": "Yetkinlik kazanımı",
         "scheduleNote": "Balıkçılık kazanımı zar atmayan sabit bir çizelgeyi izler: yetkinlik 50'nin altında av başına tam bir puan, 100'ün altında yarım puan, 150'nin altında onda bir ve 150'den 200'e yavaş bir 0,02'lik sızıntı. O son etap kasten binlerce avlık bir yolculuktur: 200 bir beyandır, başka bir şeye giderken uğranan bir durak değil.\n\nDöküntü, {cutoff} değerinde tamamen öğretmeyi bırakır: oradan sonra yosunlar ve çizmeler sadece yosun ve çizmedir. Suyun kendisi de dersi sınırlar: Vadi'nin kademe 1 suları (ve ana bölgelerin ötesindeki her genç kıyı) 100'ün ötesinde hiçbir şey öğretmez, bataklığınkiler 150'de durur ve bir balıkçıyı 200'e kadar yalnızca Dikenzirve'ninkiler okutur. Bunun dışında karaya çıkarılan her av çizelgedeki oranda kazandırır, yani sayaç durduğunda çizelge size daha derin su aramanızı söylüyordur.",
         "colProficiency": "Yetkinlik",
@@ -5472,9 +5830,9 @@ export const tr_TR: EnTranslations = {
         "castPaceBatch": "Toplu üretim: tek seferde {count} adete kadar, her biri bir okuma",
         "doctrineHeading": "Oyuncular oyuncularla alışveriş yapar",
         "doctrineBody": "Zanaat ekonomisi tek bir fikir üzerine inşa edilmiştir: oyuncular oyunculara tedarik eder. Toplayıcılar ustaları besler, ustalar görev yapan ve baskın düzenleyenleri besler, bozucular büyücüleri besler; satıcılar ve tezgah ustaları ise kenar bölgede çöp ve madeni para emmek için durur, sizinle rekabet etmek için değil. Bir meslekten para kazanmak istiyorsanız, müşteriniz bir insandır: diğer oyuncuların ne tükettiğini öğrenin, Dünya Pazarı'na göre fiyat belirleyin ve NPC sistemlerini fiyatlarınızın tabanı olarak değerlendirin, pazar olarak değil.\n\nZanaatla yapılan teçhizat baskın tabanının altına oturacak şekilde ayarlanmıştır: bir şaheser bile tarifinin yalnızca bir kalite katı üzerindedir, asla efsanevi ötesine geçemez ve istatistik bütçesi baskın ganimet bandının altında kalır. Demirhanesi sizi en zorlu içeriklere hazırlar; onun yerini almaz. Bu, ustalar, baskın düzenleyenler ve pazar arasındaki istikrarlı üçgeni korur: baskın düşen ganimet hep çekici kalır ve zanaatla yapılan parçalar gerçekten parayla satın alınabilecek en iyi teçhizat olur.",
-        "orderBoardHeading": "The commission board",
-        "orderBoardBody": "You do not have to find a crafter in chat. Open your crafting window and the commission board is one click away in its header. Anyone can post an order there: name the recipe you want made, then either leave it open for any crafter to take, or aim it at one named crafter, who is then the only person who can pick it up. A crafter browsing the board accepts an order, and accepting commits them, so a job is only ever worked by one person at a time.\n\nNothing is held back when you post: an order reserves no coin and no materials, so the price and who supplies the reagents stay between the two of you, agreed the way any commission is agreed. You can cancel your own order while it is still open, and an order nobody accepts expires by itself after a day. Once a crafter has accepted, delivery is what closes it.\n\nDelivery happens face to face. The crafter makes the piece as a commission, comes to you, and hands it over, so keep a bag slot free to receive it. What arrives follows the ordinary commission rules below, binding to you through the Maker's Bond.",
-        "commissionsBoardNote": "There are two ways into a commission: an order you post on the board above, which brings the work to a crafter, and a crafter simply choosing to make a piece for you. Both end in the same bond."
+        "orderBoardHeading": "Komisyon sipariş panosu",
+        "orderBoardBody": "Sohbette bir üretici bulmak zorunda değilsiniz. Üretim penceresini açın, komisyon panosu başlığında tek bir tıkla uzaktadır. Herkes oraya bir sipariş verebilir: yapılmasını istediğiniz tarifi belirtin, sonra ya herhangi bir üreticinin alması için açık bırakın ya da adını verdiğiniz tek bir üreticiyi hedefleyin, ki bu durumda onu yalnızca o alabilir. Panoya bakan bir üretici bir siparişi kabul eder, ve kabul etmek onu bu işe bağlar, bu yüzden bir iş her zaman aynı anda yalnızca bir kişi tarafından yürütülür.\n\nSipariş verdiğinizde hiçbir şey alıkonmaz: bir sipariş ne para ne de malzeme ayırır, bu yüzden fiyat ve malzemeleri kimin sağlayacağı, herhangi bir komisyonun anlaşıldığı şekilde ikinizin arasında kalır. Sipariş hâlâ açıkken kendi siparişinizi iptal edebilirsiniz, ve kimsenin kabul etmediği bir sipariş bir gün sonra kendiliğinden sona erer. Bir üretici kabul ettikten sonra onu kapatan şey teslimattır.\n\nTeslimat yüz yüze gerçekleşir. Üretici parçayı bir komisyon olarak yapar, yanınıza gelir ve onu size verir, bu yüzden onu almak için bir çanta yuvası boş tutun. Gelen parça aşağıdaki olağan komisyon kurallarını izler ve Ustanın Bağı aracılığıyla size bağlanır.",
+        "commissionsBoardNote": "Bir komisyona giden iki yol vardır: yukarıdaki panoya verdiğiniz ve işi bir üreticiye getiren bir sipariş, ya da bir üreticinin sizin için bir parça yapmayı kendiliğinden seçmesi. İkisi de aynı bağla sonuçlanır."
       },
       "faq": {
         "title": "Meslekler SSS",
@@ -5495,13 +5853,13 @@ export const tr_TR: EnTranslations = {
         "a7": "Toplama yayı 2,5 saniyeden başlar ve iki şekilde kısalır: taşıdığınız ve kullanabildiğiniz, düğümün kendi kademesinin üzerindeki her alet kademesi için 0,4 saniye ve mesleğinizin sayacı 100 bandını geçtiğinde 0,15 saniye; 1,5 saniyelik bir taban vardır. Kademe 1 düğümlerden kademe 3 düğümlere geçin, fazlanız buharlaşır ve aynı kazma yeniden daha yavaş sallanır. Tam olarak gereken kademeyi elde tutmak hız satın almaz; yalnızca düğümü açar.\n\nBeceri kazanımı, üretimde olduğu gibi solar: yetkinliğiniz bir düğümün kademesini aştıkça o düğüm grileşir (kademe 1 düğümler yetkinlik 75'ten itibaren hiçbir şey öğretmez), dolayısıyla yavaş kazanımın cevabı daha yüksek kademeli düğümlerdir. Bunlar çantanızda en az kendi kademelerinde bir alet ister (hiçbir düğüm çıplak elle işlenmez, kademe 1 dahil) ve kademe 1'in üzerindeki bir kara aleti önce kendi kullanım işaretini de ister: kademe 2'den 5'e kadar kendi mesleğinde 40/70/85/100. Balıkçılık kendi azalma çizelgesini izler: yetkinlik 50'nin altında tam kazanım, 100'ün altında yarım, 150'nin altında 0,1'lik bir sızıntı ve 200'ün altında 0,02; döküntü avlar 100'den itibaren hiçbir şey öğretmez ve suyun kendisi de dersi sınırlar (kademe 1 suları 100'de, bataklık 150'de öğretmeyi bırakır), yani duran bir sayaç, suyu aştığınız anlamına da gelebilir.",
         "q8": "Kasabadan uzakta zanaat yapabilir miyim?",
         "a8": "Kısmen. Dokuz sıradan alan tarifi (başlangıç silahı, zırhı, yiyeceği ve iksiri gibi temel işler) her yerde, her zaman üretilir; yemin edilmiş çiftlerin üç kombinasyon tarifi de öyle. Bunların üzerindeki her şey bir istasyon türüne bağlıdır: demirhane, mutfaklar, eczane, tabakhane, dokuma tezgahı ya da alet atölyesi; ve üretimin gerçekleşmesi için istasyona 20 yarda mesafede olmanız gerekir.\n\nBir zanaatta beceri 75'te uzmanlaşırsınız ve yüzde 20 malzeme indiriminin yanında bir de mobil istasyon kazanırsınız: sahaya kurun, 10 dakika ayakta kalır ve gerçeğinin başındaymışsınız gibi o zanaatın tariflerine hizmet eder. Mobil istasyon yalnızca üretim içindir: tarif öğrenmek ve sipariş parçalarını bağdan kurtarmak her zaman kasabadaki gerçek istasyonu gerektirir.",
-        "q9": "How do I get something crafted for me?",
-        "a9": "Post it on the commission board. Open the crafting window, open the board from its header, and name the recipe you want made: leave the order open for any crafter to accept, or aim it at one crafter you already know. Accepting commits that crafter to the job, and an order is only ever held by one person at a time.\n\nNo coin and no materials are held when you post, so agree the price and who brings the reagents between yourselves, the way commissions have always been arranged. You can cancel your own order while it is still open, and an order nobody accepts expires after a day. Delivery is in person: stand near your crafter with a free bag slot when the piece is ready. It arrives bound to you through the Maker's Bond, which any station master will undo for the usual fee.",
-        "q10": "What is a charm, and what happens when it runs out?",
-        "a10": "A charm is a slotted tool effect: an enchanter's work that sits in a gathering tool and improves what it brings up. A Gatherer's Cache adds a unit to a harvest, an Artisan's Eye raises its grade, and Tinker Gizzel teaches both at the Eastbrook toolworks at 25 Enchanting. A charge is spent only when the charm actually changed the outcome, so a harvest it could not improve costs you nothing, and a slot can be set to ask each use if you would rather decide charge by charge.\\n\\nA fresh charm carries 20 charges on a common tool and 10 more for each rarity rung above it, so an epic tool starts at 50. Running out does not destroy the charm: the tool's owner refills the slot, 10 charges per arcane material, with the material following the better of the tool they are carrying and the best tool that slot has ever been filled by (Chime Dust for a common or uncommon tool, Chime Essence for a rare one, a Chime Shard for an epic). Banking the good tool before a refill never makes it cheaper, only smaller at the same price, and slotting a fresh charm while carrying the lesser tool is the way back down to a cheaper rung. The enchanter who signed the charm pays half to refill their own, and less again with an Enchanting specialization."
+        "q9": "Benim için bir eşyayı nasıl ürettirebilirim?",
+        "a9": "Komisyon panosuna verin. Üretim penceresini açın, başlığından panoyu açın ve yapılmasını istediğiniz tarifi belirtin: siparişi herhangi bir üreticinin kabul etmesi için açık bırakın ya da zaten tanıdığınız bir üreticiyi hedefleyin. Kabul etmek o üreticiyi işe bağlar, ve bir sipariş her zaman aynı anda yalnızca bir kişi tarafından tutulur.\n\nSipariş verdiğinizde ne para ne de malzeme tutulur, bu yüzden fiyatı ve malzemeleri kimin getireceğini, komisyonların her zaman anlaşıldığı gibi kendi aranızda kararlaştırın. Sipariş hâlâ açıkken kendi siparişinizi iptal edebilirsiniz, ve kimsenin kabul etmediği bir sipariş bir gün sonra sona erer. Teslimat yüz yüzedir: parça hazır olduğunda üreticinizin yanında boş bir çanta yuvasıyla durun. Parça, herhangi bir istasyon ustasının olağan ücret karşılığında çözebileceği Ustanın Bağı ile size bağlı gelir.",
+        "q10": "Bir tılsım nedir ve tükendiğinde ne olur?",
+        "a10": "Bir tılsım, yuvaya takılan bir alet etkisidir: bir toplama aletine yerleşip çıkardığı şeyi iyileştiren bir büyücü işi. Toplayıcının Zulası bir hasada bir birim ekler, Zanaatkârın Gözü derecesini yükseltir, ve Tamirci Gizzel ikisini de Büyülemeniz 25'e ulaştığında Doğudere'deki alet atölyesinde öğretir. Bir şarj yalnızca tılsım sonucu gerçekten değiştirdiğinde harcanır, bu yüzden iyileştiremediği bir hasat size hiçbir şeye mal olmaz, ve şarj şarj karar vermeyi tercih ederseniz bir yuva her kullanımda sormak üzere ayarlanabilir.\\n\\nTaze bir tılsım sıradan bir alette 20 şarjla başlar ve üzerindeki her nadirlik kademesi için 10 daha fazlasını taşır, bu yüzden destansı bir alet 50'den başlar. Tükenmek tılsımı yok etmez: aletin sahibi yuvayı, her arkanik malzeme için 10 şarj olacak şekilde yeniden doldurur; hangi malzemeyi istediği, taşıdığınız aletin ve o yuvanın şimdiye kadar doldurduğu en iyi aletin daha iyisini izler (sıradan ya da sıradan dışı bir alet için Çan Tozu, nadir biri için Çan Özü, destansı biri için bir Çan Kırığı). İyi aleti bir yeniden doldurmadan önce bankaya koymak onu asla daha ucuz yapmaz, yalnızca aynı fiyata daha küçük yapar, ve daha zayıf aleti taşırken taze bir tılsım takmak daha ucuz bir kademeye geri dönmenin yoludur. Tılsımı imzalayan büyücü kendi tılsımını yeniden doldurmak için yarısını öder, Büyülemede uzmanlaşmışsa daha da azını."
       },
-      "findingNodesNote": "You do not have to find these by eye. Every node in the zone is drawn on the zone map wherever the map is showing that ground, and on the minimap as you pass it, so a farming loop can be planned from the map screen before you set out. A node your tools cannot work yet is marked rather than hidden: it keeps its place with a struck, dimmed mark, so you can see the ground you are training toward. On desktop, hovering a vein, stand, or patch in the world names it, tells you the tool it wants, and, once you have worked it, counts your own respawn down to the second. On touch there is nothing to hover, so the minimap marks tell the same story.",
-      "specimenBodyFamilies": "Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, claw, meat) keeps its ordinary yield plain and mints the signed specimen beside it; the other three, fang, cloth, and tusk, sign the yield itself."
+      "findingNodesNote": "Bunları gözle bulmak zorunda değilsiniz. Bölgedeki her düğüm, haritanın o zemini gösterdiği her yerde bölge haritasında çizilidir, ve yanından geçtiğinizde minimapta da görünür, bu yüzden bir toplama turu yola çıkmadan önce harita ekranından planlanabilir. Aletlerinizin henüz işleyemediği bir düğüm gizlenmek yerine işaretlenir: üzeri çizili, soluk bir işaretle yerini korur, böylece hangi zemine doğru geliştiğinizi görebilirsiniz. Masaüstünde, dünyadaki bir damarın, ağaç kümesinin ya da ot öbeğinin üzerine gelmek onu adlandırır, istediği aleti söyler, ve onu işledikten sonra kendi yeniden oluşma sürenizi saniyesine kadar sayar. Dokunmatikte üzerine gelinecek bir şey olmadığından, minimap işaretleri aynı hikayeyi anlatır.",
+      "specimenBodyFamilies": "Toplayıcılık yaparken çantanızda biraz yer boş bırakın: imzalı bir talih vurgunu, inecek kendi yerini ya da eşleşen imzalı bir yığın ister; hiçbiri sığmazsa verim yine gelir ama imza kaybolur. Ceset hasatının da kendi ikramiye kolu vardır: hasat edilen her bileşenin yaklaşık {pct}%'i nadir veya üzeri çıkar. Verecek mükemmel bir numunesi olan bir aile (post, ipek, zehir, pençe, et) sıradan verimini sade tutar ve imzalı numuneyi onun yanında basar; diğer üçü, diş, kumaş ve azı dişi, verimin kendisini imzalar."
     },
     "economy": {
       "intro": "Para tüm dünyayı çevirir: teçhizatınızı, erzakınızı ve yolculuk gereçlerinizi alır, oyuncular arasında el değiştirir. Bütün bunları sadece oynayarak öğrenirsiniz, bu yüzden bu sayfayı paranızın nereden gelip nereye gittiğinin bir haritası olarak düşünün.",
@@ -5509,7 +5867,7 @@ export const tr_TR: EnTranslations = {
       "coinBody": "Para üç sikkeyle gelir. Yüz bakır bir gümüş, yüz gümüş bir altın eder; böylece keseniz önce en küçük sikkeden dolar. Bunu görev ödüllerinden, düşen düşmanları yağmalamaktan ve artık ihtiyacınız olmayanı satmaktan kazanırsınız.",
       "vendorsTitle": "Satıcılar ve sattıkları",
       "vendorsBody": "Kasabalar ve karakollar, her biri kendi alanında uzman tüccarlarla doludur. Erzakçılar yiyecek ve içecek satar, silah ustaları ve zırhçılar teçhizat taşır ve bir levazımcı pratik yolculuk gereçleri bulundurur. Ne sattıklarını görmek için birinin yanına gidin.",
-      "marksTitle": "Nişanlar: paranın ötesindeki para birimleri",
+      "marksTitle": "Nişanlar ve Onur: paranın ötesindeki birimler",
       "marksBody": "Biriktirdiğiniz tek şey para değildir. Mağara seferleri Mağara Nişanları öder; bunlar yalnızca mağara seferi bekçisinde, yoldaş geliştirmelerine ve başka yerde bulamayacağınız teçhizata harcanır. Kahramanca zindan seferleri, sondaki kötü adamın üzerinde Kahramanca Nişanlar bırakır; bunlar Highwatch'taki Kahramanca Levazımcı'yla, diyarın başka hiçbir köşesinin satmadığı takılara harcanır. Hiçbiri paranıza karışmaz.",
       "bankTitle": "Banka",
       "bankBody": "Her merkez kasabada diyarın bankacılık müessesesi olan Yaldızlı Kasa'nın bir şubesi bulunur. Oradaki veznedarla konuşarak kasanı aç: çantalarının ötesinde, karakterinin ömür boyu elinde tuttuğu özel bir depo. Oraya bıraktığın her şey, bir sonraki sefer hangi şubeye uğrarsan uğra, güvenle bekler.",
@@ -5529,16 +5887,16 @@ export const tr_TR: EnTranslations = {
       "marketTitle": "Dünya Pazarı",
       "marketBody": "Tüccar, asla karşılaşmayabileceğiniz insanlarla alıp satabileceğiniz, oyuncuların yürüttüğü bir takas olan Dünya Pazarı'nı işletir. Açmak için Doğudere'deki Tüccar'la ya da Highwatch'taki Müzayedeci Voss ile konuşun: iki görevli de aynı ortak pazara hizmet eder. Tüccar ayrıca orada kendi mallarından sürekli bir stok bulundurur, böylece başka hiçbir oyuncu ilan vermemişken bile satın alınacak her zaman bir şey vardır.",
       "marketBrowse": "Göz atma: satışta neyin olduğunu bulmak için ilanları kaydırın ya da isme göre arayın. Her ilan malları, satıcıyı ve tüm yığın için istenen fiyatı gösterir.",
-      "marketPost": "İlan verme: çantalarınızdan bir yığın seçin, fiyatınızı belirleyin ve listeleyin. Mallar biri satın alana dek Tüccar tarafından tutulur. Satılmayan ilanlar bir süre sonra size geri döner ve fikrinizi değiştirirseniz birini erkenden geri alabilirsiniz.",
-      "marketCollect": "Toplama: mallarınız satıldığında, geliriniz Tüccar'da sizi bekler. Satılmadan geri gelen her şeyle birlikte altını toplamak için geri dönün. Tüccar tamamlanan her satıştan küçük bir pay alır.",
+      "marketPost": "İlan verme: çantalarından bir yığın seç, fiyatını belirle ve ilana çıkar. Mal, birisi satın alana dek Tüccar tarafından tutulur. Satılmayan ilanlar bir süre sonra sana döner ve fikrini değiştirirsen birini erken geri alabilirsin. İlan vermenin kendisi ücretsizdir, dolayısıyla iyimser bir fiyat sana zamandan başka bir şeye mal olmaz.",
+      "marketCollect": "Tahsil etme: malın satıldığında kazancın Tüccar'da seni bekler. Satılmadan dönen her şeyle birlikte sikkeleri almaya dön. Tüccar tamamlanan her satıştan küçük bir pay alır. Tahsil sekmesi bekleyenleri kalem kalem gösterir, tamamlanan her satış için mal, alıcı ve kazancınla bir satır, böylece sikkeleri almadan önce tam olarak neyin satıldığını görürsün.",
       "marketPricing": "Fiyatlama size kalmış. Başkalarının istediğinden biraz daha düşüğe listelemek genellikle daha hızlı satar, fahiş bir fiyat ise el sürülmeden kalabilir. İlan vermeden önce piyasanın nasıl olduğunu görmek için önce göz atın.",
-      "honorBody": "Fighting other players pays a third currency, Honor. Winning a ranked arena bout pays it, and a played-out match on Thornhollow Fields pays it whether you win or lose, so a hard-fought loss on the Fields is never a wasted match. Honor collects on your character sheet without ever mixing with your coin. You spend it with the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, who share one stock between them: the Warfare armor families, jewelry, and weapons that Honor alone buys. Those purchases are final, and the gear binds to you the moment you buy it, so read a piece before you confirm it. The arena page covers how Honor is earned.",
-      "guildBankNote": "Your guild keeps a vault of its own alongside your personal one, opened at the same bursar and reached from a tab in the same window: a shared treasury of coin and a pooled store of goods. Every member can look at it, and officers are the ones who may move things in and out. The social page has the details."
+      "honorBody": "Diğer oyuncularla dövüşmek üçüncü bir para birimi olan Onur'u öder. Dereceli bir arena maçını kazanmak Onur öder ve Dikenvadi Ovası'nda oynanmış bir maç, kazan ya da kaybet, yine Onur öder; bu yüzden Ovada çetin geçen bir yenilgi asla boşa gitmiş bir maç değildir. Onur, hiçbir zaman paranla karışmadan karakter sayfanda birikir. Onu, tek bir stoğu paylaşan onur levazımcılarında, Doğudere'deki ÖFKE ve Highwatch'taki Savaş Mareşali Draven Kole'de harcarsın: yalnızca Onur'un satın alabildiği Harp zırh aileleri, takılar ve silahlar. Bu satın alımlar kesindir ve teçhizat satın aldığın an sana bağlanır, bu yüzden onaylamadan önce parçayı oku. Onurun nasıl kazanıldığını Arena sayfası anlatır.",
+      "guildBankNote": "Loncan, kişisel kasanın yanı sıra kendi kasasını da tutar; aynı veznedarda açılır ve aynı penceredeki bir sekmeden ulaşılır: ortak bir para hazinesi ve ortak bir eşya deposu. Her üye ona bakabilir, içindekileri taşıma yetkisi ise yalnızca subaylardadır. Ayrıntılar Sosyal sayfasında."
     },
     "social": {
       "intro": "Dünyanın çoğu tek başına yapılabilir, ama oyun başka insanlarla oynanmak üzere kurulmuştur. İşte nasıl konuşulur, takım kurulur ve kendi çevreni bulursun.",
       "chatHeading": "Sohbet kanalları",
-      "chatBody": "Sohbet kanallara bölünmüştür, her biri kendi sekmesinde gösterilir. Etkin kanalda göndermek için bir mesaj yaz ya da tek bir satırı başka yere yönlendirmek için bir eğik çizgi komutu kullan. Konuşabileceğin kanallar şunlardır:",
+      "chatBody": "Sohbet penceresi her zaman orada olan iki görünümle başlar, söylenen her şeyin birleşik bir kaydı ve bir dövüş kaydı. Bunların ötesinde artı düğmesiyle istediğin sekmeleri eklersin, kanal başına bir tane, ve masaüstünde onları istediğin sıraya sürükleyebilirsin (sol ya da sağ ok ile Alt, odaklanmış sekmeyi klavyeden taşır); bir sekmeyi kapatmak için sağ tıkla, düzenin oturumlar arasında hatırlanır. Bir kanal sekmesinde yazmak o kanala gönderir, eğik çizgi komutu ise sekme değiştirmeden tek bir satırı başka yere gönderir. Ayrıca gönderdiğin ve aldığın her fısıltıyı tek bir yerde toplayan ve yazmanın sana en son yazana yanıt verdiği bir fısıltı sekmesi vardır. Konuşabileceğin kanallar şunlardır:",
       "chanSay": "Söyle.",
       "chanSayBody": "Varsayılan sesin. Sana yakın oyunculara ulaşır ve yan yana görev yaparken kullanılacak olandır.",
       "chanYell": "Bağır.",
@@ -5547,6 +5905,8 @@ export const tr_TR: EnTranslations = {
       "chanWhisperBody": "Nerede olursa olsun, isimle tek bir oyuncuya özel bir mesaj. Sessiz bir çift söz için kullan.",
       "chanParty": "Grup.",
       "chanPartyBody": "Ne kadar dağılmış olursanız olun, grubundaki herkesle konuş.",
+      "chanBattleground": "Savaş Alanı.",
+      "chanBattlegroundBody": "Savaş alanındaki iki taraftan da tüm dövüşçülerle konuş. Yalnızca bir maç sürerken işler.",
       "chanGeneral": "Genel.",
       "chanGeneralBody": "Çevrimiçi herkese ulaşan, her zaman açık, diyar çapında bir kanal; bir soru sormak ya da genel sohbet için iyidir. World ve Looking for Group'un aksine, asla katılmayı seçmek zorunda değilsin.",
       "chanWorld": "Dünya.",
@@ -5569,43 +5929,43 @@ export const tr_TR: EnTranslations = {
       "lootRollBody": "Bir eşya zar atışına gittiğinde, uygun her üye onu istiyorsa İhtiyaç, yalnızca yedek olarak alırsa Açgözlülük ya da çekilmek için Geç seçer. En yüksek zar kazanır.",
       "lootMasterTitle": "Ganimet sorumlusu.",
       "lootMasterBody": "Lider, bunun yerine daha iyi ganimetlerin sorumluluğunu üstlenip her birini almasına gereken üyeye verebilir. Bu, örgütlü bir grubun bir zindanı koşturduğu gibi, değerli teçhizatın başıboş bir zar atışına gitmesini önler.",
-      "friendsHeading": "Arkadaşlar ve görmezden gelme",
+      "friendsHeading": "Arkadaşlar, yok sayma ve engelleme",
       "friendsBody": "Çevrimiçi olduklarını ve nerede olduklarını görmek için oyuncuları arkadaş listene ekle, böylece giriş yaptıkları an gruplaşabilirsin.",
-      "ignoreBody": "Biri seni rahatsız ediyorsa, onu görmezden gelme listene ekle, sohbetini artık görmezsin.",
+      "ignoreBody": "Biri istediğinden fazla gevezelik ediyorsa onu yok sayma listene ekle, açık sohbeti sana ulaşmayı bırakır. Yok saymak yalnızca bir sohbet ayarıdır ve kimseyi asla arkadaş listenden çıkarmaz.",
       "guildHeading": "Loncalar",
-      "guildBody": "Lonca, oturumlar arasında ait olduğun kalıcı bir oyuncu grubudur. Bir tane kur ya da katılmak için bir davet kabul et; aynı anda yalnızca bir loncada olabilirsin. Üyeler bir rütbe taşır: bir lider, subaylar ve üyeler.",
-      "guildChatBody": "Bir loncaya ait olmak sana özel bir lonca sohbet kanalı verir ve lonca arkadaşlarını ortak bir listede gösterir, böylece çevrimiçi her zaman tanıdık yüzler olur.",
+      "guildBody": "Lonca, oturumlar arasında ait olduğun kalıcı bir oyuncu topluluğudur. Bir lonca kurmak kurucuya 1 altınlık tek seferlik bir ücrete mal olur, ya da katılmak için basitçe bir davet kabul edebilirsin ve aynı anda tek bir loncada olabilirsin. Üyeler bir rütbe taşır: bir lider, subaylar ve üyeler.",
+      "guildChatBody": "Bir loncaya ait olmak sana özel bir lonca sohbet kanalı ve lonca arkadaşlarının paylaşılan bir listesini verir. Daha yeni üyeler sade üye etiketi yerine Acemi rozeti, uzun süredir bulunanlar ise Kıdemli rozeti taşır; subaylar ve lonca lideri ise rütbelerini daima gösterir ve yalnızca şu anda kimin burada olduğunu görmek istediğinde çevrimdışı adları gizleyebilirsin. Subaylar ve lonca lideri ayrıca Lonca sekmesinin en üstüne kısa bir duyuru iletisi tutturabilir; bu ileti bir sonraki girişinde sohbet kaydında sana okunur ve çoğu lonca haftanın planlarını böyle duyurur.",
       "communityHeading": "Tüm topluluğa seslenmek",
       "communityBody": "Bir topluluk çağrısı yapmak için bir sohbet satırına ünlem işaretiyle başla: grup aramak için !lfg, ticaret için !wts ve !wtb, loncan için !recruit, bir akın ya da buluşma duyurmak için !event ve yardım istemek için !help. İşareti yazdığın an çağrıların bir menüsü beliriverir. Her çağrı dünyada yayınlanır ve topluluk Discord'una yansıtılır, böylece giriş bile yapmamış oyunculara ulaşır. Topluluk çağrıları çevrimiçi oyunun bir parçasıdır.",
       "slashHeading": "Kullanışlı eğik çizgi komutları",
       "slashBody": "Birkaç günlük komutu ezberlemeye değer: /w İsim bir fısıltı gönderir ve /r aldığın sonuncuyu yanıtlar, /invite birini grubuna çağırır, /follow bir arkadaşın peşine takılır, /roll grubun görmesi için zar atar, /who kimin çevrimiçi olduğunu gösterir ve /afk seni uzakta olarak işaretler. Tam liste için oyunda /help yaz.",
       "emotesBody": "Karakterin sözcükler olmadan da konuşabilir: /wave, /dance, /cheer ya da /bow gibi bir ifade yaz, ona yöneltmek için önce bir arkadaşı hedefle ya da baş üstünde hızlı bir ifade için X'e basılı tutup ifade tekerini aç.",
       "calendarHeading": "Etkinlik takvimi",
-      "calendarBody": "Etkinlik takvimini açmak için I'ya bas. Haftalık akın çağrısından fiesta gecesine dek, çevresinde plan yapmaya değer diyar günlerini işaretler ve loncaların programlarını tuttuğu yerdir: lonca lideri ve subaylar üzerine etkinlik ekleyebilir, her üye de bunları aynı sayfada görür.",
+      "calendarBody": "Etkinlik takvimini açmak için I'ya bas. Çevresinde plan yapmaya değer diyar günlerini işaretler: haftalık Akın Çağrısı, Pazar Günü, Arena Kapışması ve Balık Yarışması, ayrıca aylık Mağara Günü ve Ay Kapısı Ayini; ve loncaların takvimlerini tuttukları yer de burasıdır: lonca lideri ve subaylar üzerine etkinlik kaydedebilir ve her üye onları aynı sayfada görür. Diyar günleri bir araya gelmek için bir çağrıdır, bonus değil; bir gün işaretli diye karakterinde hiçbir şey değişmez.",
       "readyHeading": "Hazırlık yoklamaları",
       "readyBody": "Büyük bir çekişten önce, grup lideri odayı yoklamak için /ready yazabilir: herkese Hazır ya da Hazır Değil istemi gelir ve herkes yanıtladığında ya da 30 saniye dolduğunda, tüm grup sayıların tek bir özetini görür. Kimse tek tek işaret edilmez; mesele sayıdır, suçlu değil.",
       "markersHeading": "Hedef işaretleri",
       "markersBody": "Bir grupta, düşman bir yaratığı hedefle ve onu sekiz akın simgesinden biriyle taçlandırmak için hedef çerçevesindeki portresine sağ tıkla (dokunmatikte uzun bas). Herhangi bir üye işaretleyebilir, her simge bir seferde tek bir hedefte durur ve bir simgeyi kendi hedefine yeniden uygulamak onu temizler. Öldürme sırası, kalabalık kontrolü görevleri ya da düpedüz 'önce bu', bir cümleden çok daha hızlı gider bir simge olarak.",
       "etiquetteHeading": "Gruplaşma adabı",
-      "etiquetteBody": "Gruplaşmak bir tercihtir, bir angarya değil. Katıldığında selam ver, İhtiyaç'ı yalnızca gerçekten kullanacağın teçhizat için at ve ayrılmadan önce gruba haber ver. Biraz nezaket çok yol aldırır ve çoğu oyuncu arkadaşlıktan memnun olur. Moderatörler huzuru korur ve başkalarının oyunun tadını çıkarmasına izin vermeyen bir oyuncu, bir moderatör salıverene dek bir hücreye taşınabilir.",
-      "realmsHeading": "Worlds",
-      "realmsBody": "Online play runs on worlds, and each world is a separate place with its own players. You pick one from the World List before you play, and every row shows how busy that world is right now, from Low through Medium and High up to Full, or Offline for a world that is not currently up. Low means plenty of room, High means plenty of company, and a world that has reached its limit shows Full and turns new logins away until someone logs out, so pick where your friends are or where there is space.",
-      "realmsScopeBody": "What you do stays on the world you chose: your characters, your friends list, your guild, and the Market all live there, and the guild and player boards you open in game rank that world alone, while the board on the website gathers every world together. Each world also keeps its own daily raid reset, on its own local time.",
-      "finderHeading": "Finding a group",
-      "finderBody": "You do not have to shout in Looking for Group to fill a run. Open the Dungeon Finder, choose the run you want and the roles you are willing to fill, and join the queue on your own or with the party you already have. The finder waits until it has a full set of roles, then offers the group to everyone at once: a popup asks each of you to accept, and the party forms the moment the last person says yes. Turning an offer down, or letting it run out, puts you on a short cooldown before the queue offers you another, so the line keeps moving.",
-      "finderBoardBody": "The finder also keeps a board of premade groups. A leader posts a listing with tags saying what the run is for, from a first visit to a straight full clear, and you apply to it for the leader to approve. The automatic queue fills the dungeons and the endgame raid, each at normal and heroic, while the board can also carry the solo attunement run, which the queue never fills for you; delves and open-world outings are yours to arrange. Either way the finder only builds the group: walking to the door, setting the difficulty, and agreeing the loot rules are still yours.",
-      "finderMore": "See what is inside each dungeon",
-      "blockBody": "Block is the heavier tool, for a player who will not leave you alone. A block cuts their invites, their whispers, and their mail as well as their chat, makes the two of you invisible to each other in /who, and drops them from your friends list if they were on it. Block from the right-click menu on their name or with /block, /unblock lifts it again, and /blocklist shows who is on it.",
-      "guildBoardBody": "Guilds are ranked too. The Leaderboard window keeps a Guilds board beside the player boards, ranking guilds on what their members have earned together, so a busy guild can see where it stands.",
-      "guildBankHeading": "The guild bank",
-      "guildBankBody": "A guild also keeps a vault of its own. Step up to a banker in one of the hub towns, open your bank, and switch to the Guild tab: there you will find a treasury of coin and a pooled store of items the guild owns together. Every member can open it and look at what is inside, and the pane says plainly who can do more. Only the guild leader and officers can act, putting coin and goods in and handing them back out, and every deposit and withdrawal is written into a log the guild can read, so nothing moves without a record.",
-      "guildBankRulesBody": "The item store starts closed. An officer opens it out of their own pocket, and the guild can pay from the treasury to widen it later. Quest items, anything soulbound, and gear the Market will not take stay out of it, the same as the mail and the Market, so the bank is for goods that can still change hands.",
-      "discordLinkBody": "The Discord panel in game goes the other way too. Link your Discord account to it and the community roles you hold there follow you into the world: a colored name over your head, and a tag on the chat lines of the staff roles, so you can always tell a real moderator from someone borrowing the name. Linking also tracks a status that climbs as you take part. None of it grants any power in the game.",
-      "moderationHeading": "Reporting a player",
-      "moderationBody": "If a player is out of line, right-click their name and choose Report Player. Pick a reason, from harassment to spam to cheating, add a line about what happened, and send it: the report goes to the moderators to read. A report is a note to them, not a punishment in itself. Sending one does not silence, kick, or jail anyone, and no reply comes back telling you what was decided. Blocking them stops the bother while you wait.",
-      "jailBody": "Moderators keep the peace, and a player who will not let others enjoy the game can be moved to a jail cell. A sentence always has a set length, though a moderator can end it early, and it runs on the clock whether or not you stay logged in.",
-      "chatMore": "More on the chat window and the rest of the interface",
-      "jailHeading": "Moderators and the jail"
+      "etiquetteBody": "Gruplaşmak bir tercihtir, angarya değil. Katıldığında selam ver, yalnızca gerçekten kullanacağın ekipmana İhtiyaç at ve yola koyulmadan önce gruba haber ver. Biraz nezaket çok yol alır ve çoğu oyuncu arkadaşlıktan memnun olur.",
+      "realmsHeading": "Dünyalar",
+      "realmsBody": "Çevrimiçi oyun dünyalar üzerinde işler ve her dünya kendi oyuncularıyla ayrı bir yerdir. Oynamadan önce Dünya Listesi'nden bir tane seçersin, ve her satır o dünyanın şu anda ne kadar hareketli olduğunu gösterir: Düşük'ten Orta ve Yüksek'e, oradan da Dolu'ya kadar, ya da şu anda ayakta olmayan bir dünya için Çevrimdışı. Düşük bol yer demektir, Yüksek ise bol arkadaşlık demektir, ve sınırına ulaşmış bir dünya Dolu gösterir ve biri çıkış yapana dek yeni girişleri geri çevirir; bu yüzden arkadaşlarının olduğu ya da yer olan dünyayı seç.",
+      "realmsScopeBody": "Yaptıkların, seçtiğin dünyada kalır: karakterlerin, arkadaş listen, loncan ve Pazar hepsi orada yaşar, ve oyun içinde açtığın lonca ve oyuncu tabloları yalnızca o dünyayı sıralar; web sitesindeki tablo ise tüm dünyaları bir araya toplar. Her dünya ayrıca kendi yerel saatinde işleyen kendi günlük akın sıfırlamasını tutar.",
+      "finderHeading": "Grup bulmak",
+      "finderBody": "Bir koşuyu doldurmak için Grup Arıyor'da bağırman gerekmez. Zindan Bulucu'yu aç, istediğin koşuyu ve doldurmaya razı olduğun rolleri seç, ardından tek başına ya da elindeki grupla sıraya gir. Bulucu, tam bir rol seti toplayana dek bekler, sonra grubu herkese aynı anda sunar: bir açılır pencere her birinizden kabul etmenizi ister ve son kişi evet dediği anda grup kurulur. Bir teklifi reddetmek ya da süresinin dolmasına izin vermek, sıra sana bir başkasını sunmadan önce kısa bir bekleme süresine sokar, böylece sıra akmaya devam eder.",
+      "finderBoardBody": "Bulucu ayrıca hazır grupların bulunduğu bir pano da tutar. Bir lider, koşunun ne için olduğunu söyleyen etiketlerle (ilk koşudan düpedüz tam temizliğe kadar) bir ilan yayımlar, sen de liderin onaylaması için ona başvurursun. Otomatik sıra, normal ve kahramanca olmak üzere zindanları ve son oyun akınını doldururken, pano sıranın senin için asla doldurmadığı yalnız uyum koşusunu da taşıyabilir; mağara seferleri ve açık dünya gezileri kendi ayarlayacağın şeylerdir. Her iki durumda da bulucu yalnızca grubu kurar: kapıya yürümek, zorluğu ayarlamak ve ganimet kurallarında anlaşmak yine sana kalır.",
+      "finderMore": "Her zindanın içinde neler olduğunu gör",
+      "blockBody": "Engelle, seni rahat bırakmayacak bir oyuncu için daha ağır araçtır. Bir engelleme, sohbetinin yanı sıra davetlerini, fısıltılarını ve postalarını da keser, ikinizi /who içinde birbirinize görünmez yapar ve arkadaş listendeyse oradan da düşürür. Adının üzerindeki sağ tık menüsünden ya da /block ile engelle, /unblock engeli tekrar kaldırır ve /blocklist kimin listede olduğunu gösterir.",
+      "guildBoardBody": "Loncalar da sıralanır. Lider Tablosu penceresi, oyuncu tablolarının yanında bir Loncalar tablosu tutar; loncaları üyelerinin birlikte kazandıklarına göre sıralar, böylece hareketli bir lonca nerede durduğunu görebilir.",
+      "guildBankHeading": "Lonca bankası",
+      "guildBankBody": "Bir loncanın da kendine ait bir kasası vardır. Merkez kasabalardan birindeki bir bankacının yanına git, bankanı aç ve Lonca sekmesine geç: orada bir para hazinesi ve loncanın ortaklaşa sahip olduğu, ortak bir eşya deposu bulursun. Her üye onu açıp içinde ne olduğuna bakabilir ve panel kimin daha fazlasını yapabileceğini açıkça belirtir. Yalnızca lonca lideri ve subaylar işlem yapabilir, para ve mal koyup çıkarabilir; her yatırma ve çekme işlemi loncanın okuyabileceği bir günlüğe yazılır, böylece hiçbir şey kayıt dışı hareket etmez.",
+      "guildBankRulesBody": "Eşya deposu kapalı başlar. Bir subay onu kendi cebinden açar ve lonca daha sonra hazineden ödeyerek genişletebilir. Görev eşyaları, ruha bağlı herhangi bir şey ve Pazar'ın kabul etmeyeceği teçhizat, tıpkı posta ve Pazar'da olduğu gibi, deponun dışında kalır; yani banka hâlâ el değiştirebilen mallar içindir.",
+      "discordLinkBody": "Oyun içindeki Discord paneli ters yönde de işler. Discord hesabını ona bağla ve orada taşıdığın topluluk rolleri seninle dünyaya kadar gelir: başının üzerinde renkli bir isim ve personel rollerinin sohbet satırlarında bir etiket, böylece gerçek bir moderatörü adını ödünç alan birinden her zaman ayırt edebilirsin. Bağlamak ayrıca katıldıkça yükselen bir statüyü de takip eder. Hiçbiri oyunda herhangi bir güç vermez.",
+      "moderationHeading": "Bir oyuncuyu bildirmek",
+      "moderationBody": "Bir oyuncu çizgiyi aşarsa, adının üzerine sağ tıklayıp Oyuncuyu Bildir'i seç. Tacizden istenmeyen iletiye, hileye kadar bir neden seç, ne olduğuyla ilgili bir satır ekle ve gönder: bildirim moderatörlere okumaları için gider. Bir bildirim onlara bir nottur, kendi başına bir ceza değildir. Birini bildirmek kimseyi susturmaz, atmaz ya da hücreye koymaz, ve neye karar verildiğini söyleyen bir yanıt da gelmez. Beklerken rahatsızlığı durdurmak için onu engelle.",
+      "jailBody": "Moderatörler huzuru korur ve başkalarının oyunun tadını çıkarmasına izin vermeyen bir oyuncu bir hücreye taşınabilir. Bir cezanın her zaman belirli bir süresi vardır, gerçi bir moderatör onu erken bitirebilir, ve süre, oturum açık tutulsun ya da tutulmasın işlemeye devam eder.",
+      "chatMore": "Sohbet penceresi ve arayüzün geri kalanı hakkında daha fazlası",
+      "jailHeading": "Moderatörler ve hücre"
     },
     "stats": {
       "intro": "Karakterin bir avuç nitelikle tanımlanır. İyi oynamak için onları ezberlemek zorunda değilsin, ama her birinin kabaca ne yaptığını bilmek karakter sayfanı okumana ve doğru yükseltmeleri seçmene yardımcı olur.",
@@ -5620,7 +5980,7 @@ export const tr_TR: EnTranslations = {
       "intTitle": "Zeka",
       "intBody": "Zeka, bir büyücünün mana havuzunu büyütür, büyü gücünü yükselterek büyülerinin daha sert vurmasını sağlar ve büyülerinin kritik yapma şansını iyileştirir. Manadan büyü yapan sınıflar için önemlidir; bir Öfke ya da Enerji sınıfı için pek bir şey yapmaz.",
       "spiTitle": "Ruh",
-      "spiBody": "Ruh, bir büyücünün büyü okumaya ara verdiğinde manasının ne kadar hızlı geri döndüğünü yönetir; ki bu, dövüşler arasında çoğu zamandır. Zeka gibi, mana sınıflarına hizmet eder ve diğerleri için pek bir şey ifade etmez.",
+      "spiBody": "Ruh, bir büyücünün manasının ne kadar hızlı geri geldiğini yönetir. Tam karşılığını ancak birkaç saniye hiçbir şey harcanmadığında öder ve bir kısmı büyü yaparken bile akmayı sürdürür, dolayısıyla Ruh bir dövüşte asla ölü ağırlık değildir; gerçi durmadan ateş püskürten bir büyücü yine de kurur. Nefeslenmek için durmak, dövüşler arasında olduğu kadar dövüşün içinde de gerçek bir mana kararıdır. Zeka gibi, Ruh da mana sınıflarına hizmet eder ve diğerleri için az şey ifade eder.",
       "armorTitle": "Zırh",
       "armorBody": "Zırh aldığın fiziksel hasarı azaltır. Çoğunlukla üzerine giydiklerinden gelir ve daha ağır zırh sınıfları bundan çok daha fazlasını taşır. Seviyene yakın bir düşmana karşı daha fazla zırh, onun her vuruşunun daha hafif gelmesi demektir.",
       "apTitle": "Saldırı gücü",
@@ -5639,31 +5999,31 @@ export const tr_TR: EnTranslations = {
       "sheetBody": "Bütün bunları tek bir yerde görmek için oyunda karakter penceresini aç: bir yanda beş niteliğin, diğer yanda besledikleri istatistikler. Herhangi bir değerin üzerine geldiğinde bir araç ipucu onun sınıfın için ne yaptığını ayrıntılandırır, böylece bir yükseltmenin gerçekte hangi sayıları değiştirdiğini bir bakışta görebilirsin.",
       "growHeading": "İstatistiklerin nasıl gelişir",
       "growBody": "İki şey istatistiklerini yükseltir. Her seviye, sınıfına uygun her nitelikten sabit bir miktar ekler ve kuşandığın teçhizat üstüne daha fazlasını ekler. Teçhizatını güncel tutmak, seviye tavanına kadar tüm yol boyunca daha güçlü olmanın en istikrarlı yoludur.",
-      "hitTitle": "Hit rating",
-      "hitBody": "Hit rating comes from your gear and its set bonuses. It makes your attacks miss less often and your spells resisted less often, and it earns its keep against enemies above your own level, where misses pile up fastest. Your sheet shows it as Hit Rating.",
-      "parryTitle": "Parry",
-      "parryBody": "Parry is the warrior's own defense: a chance to turn a melee blow aside entirely and take no damage, and it grows with Strength. Only an attack coming at your front can be parried, which is one more reason to keep facing whatever is hitting you. Other classes see the row on their sheet sitting at zero.",
-      "warfareTitle": "Warfare",
-      "warfareBody": "Warfare is the one stat that counts only against other players: it raises the damage you deal to them and lowers the damage you take from them, and your sheet shows both halves on one line. Against creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "hitTitle": "İsabetlilik puanı",
+      "hitBody": "İsabetlilik puanı, teçhizatından ve onun set bonuslarından gelir. Saldırılarının daha az ıskalamasını ve büyülerine daha az direnilmesini sağlar, ve ıskalamaların en hızlı biriktiği yer olan kendi seviyenin üzerindeki düşmanlara karşı asıl değerini gösterir. Karakter sayfan onu İsabetlilik Puanı olarak gösterir.",
+      "parryTitle": "Savuşturma",
+      "parryBody": "Savuşturma, savaşçının kendine özgü savunmasıdır: bir yakın dövüş darbesini tamamen bir kenara savurup hiç hasar almama şansıdır ve Güç ile birlikte büyür. Yalnızca önünden gelen bir saldırı savuşturulabilir, bu da seni vuran şeye dönük kalman için bir sebep daha. Diğer sınıflar kendi sayfalarında bu satırın sıfırda oturduğunu görür.",
+      "warfareTitle": "Harp",
+      "warfareBody": "Harp, yalnızca diğer oyunculara karşı sayılan tek istatistiktir: onlara verdiğin hasarı yükseltir ve onlardan aldığın hasarı düşürür, ve karakter sayfan bu iki yarıyı tek bir satırda gösterir. Yaratıklara karşı hiçbir şey yapmaz. Onur karşılığında satın aldığın Harp teçhizatından gelir, bu yüzden seviye atlarken peşinde koşulacak bir şeyden çok, PvP oynamanın bir ödülüdür."
     },
     "progression": {
       "intro": "Her dövüş, her görev ve kuzeye atılan her adım kahramanını daha güçlü yapar. İşte seviye atlamanın nasıl işlediği ve zirveye vardığında seni nelerin geliştirmeye devam ettiği.",
       "xpTitle": "Tecrübeyi nasıl kazanırsın",
-      "xpBody": "Tecrübeyi görevleri tamamlayarak, düşmanları yenerek ve mağara seferlerini temizleyerek kazanırsın. Görevler açık ara en çoğunu verir, bu yüzden görev izini takip etmek tırmanmanın en hızlı yoludur. Yol boyunca öldürdüklerin ve mağara seferleri geri kalanı tamamlar.",
+      "xpBody": "Deneyimi görevleri bitirerek, düşmanları yenerek, mağaraları temizleyerek ve bir mesleği icra ederek kazanırsın: toplama ve üretim, öğrettikleri zanaat becerisinin üstüne karakter deneyimi öder, iş sana hâlâ bir şey öğrettiği sürece. Görevler açık ara en fazlasını verir, dolayısıyla görev izini takip etmek yukarı çıkmanın en hızlı yoludur; öldürüşler, mağara seferleri ve yolda yaptığın toplama ise gerisini doldurur.",
       "capBody": "Her seviye seni daha güçlü kılar ve yeni yetenekler getirir, ta ki seviye {cap} olan tavana kadar.",
       "journeyTitle": "Kuzeye yolculuk",
       "journeyBody": "Dünya tek bir kesintisiz topraktır, güneyden kuzeye uzanan üç bölge, her biri seviye olarak bir basamak daha yüksek. Yeşil vadide başlar, bataklığı aşarak ilerler ve soğuk yüce zirvelerde sona erersin. Görev izini takip et, toprak seni birinden diğerine taşır.",
-      "journeyBodyCount": "The world is one continuous land of {zones} zones. Three of them are the road you level on, laid south to north: you start in the green valley, press on through the marsh, and finish in the cold high peaks. Follow the quest trail and the land carries you from one to the next. An island sits off the valley coast for the early levels, and the rest of the realms open off that same road, built for characters who have already made the climb.",
+      "journeyBodyCount": "Dünya, {zones} bölgeden oluşan tek bir kesintisiz topraktır. Bunlardan üçü, güneyden kuzeye uzanan, seviye atladığın yoldur, her biri bir basamak daha yüksektir: yeşil vadide başlar, bataklığı aşarak ilerler ve soğuk yüce zirvelerde bitirirsin. Görev izini takip et, toprak seni birinden diğerine taşır. Vadi kıyısının açığında erken seviyeler için bir ada durur, ve diyarların geri kalanı aynı yoldan açılır, zaten bu tırmanışı tamamlamış karakterler için inşa edilmiştir.",
       "bandLabel": "Seviye {min} ile {max} arası",
       "restedTitle": "Dinlenmiş tecrübe",
-      "restedBody": "Bir hana gir ve dövüş dışında kal; beklerken karakterin dinlenmiş tecrübe biriktirir. Her kasabada bir tane vardır. Bir sonraki sefer dışarı çıkıp dövüştüğünde, o havuz tükenene kadar öldürdüklerine ekstra bir destek verir. Handa verilen bir mola asla boşa geçen zaman değildir; bir sonraki seviye atlama dilimini hızlandırır.",
+      "restedBody": "Bir hana gir ve dövüş dışında kal, karakterin sen beklerken dinlenmiş deneyim biriktirir. Her kasabada bir tane vardır. Bir dahaki sefere dışarı çıkıp dövüştüğünde o havuz, tükenene dek öldürüşlerine fazladan bir destek verir. Handa bir mola asla boşa geçmiş zaman değildir; bir sonraki seviye tırmanışını hızlandırır. Havuzun bir tavanı vardır, dolayısıyla bir gecelik konaklama çok uzun bir konaklamayla aşağı yukarı aynı miktarı biriktirir ve seviye tavanına ulaştığında doldurulacak bir seviye çubuğu kalmaz, dolayısıyla dinlenmiş deneyim birikmeyi bırakır.",
       "capTitle": "Seviye {cap} seviyesine ulaşmak",
       "capJourneyBody": "Seviye {cap} tavandır, seviye atlamanın sonu ama gelişmenin değil. Oradan itibaren zindanları ve akını normal ve kahramanca modda koşar, yükseldiğinde dünya şefiyle yüzleşir, daha iyi teçhizatın peşine düşer ve kendini arenada sınarsın.",
-      "capEndgameBody": "Rifts are the one thing that waits for the cap itself. They tear open out in the realms on their own schedule, ranked from C to S, and every group in the world races to be the one that closes each of them. The delve boards keep going too, and their harder tier is worth another look once your gear has caught up.",
+      "capEndgameBody": "Yarıklar, tavanın kendisini bekleyen tek şeydir. Diyarlarda kendi programlarına göre yırtılıp açılırlar, C'den S'ye kadar derecelendirilirler, ve dünyadaki her grup her birini kapatan taraf olmak için yarışır. Mağara panoları da işlemeye devam eder, ve teçhizatın yetiştiğinde onların daha zor kademesine bir kez daha bakmaya değer.",
       "prestigeBody": "Tecrübe, tavandan sonra bile sayılmaya devam eder. Kozmetik bir sanal seviyeyi besler, böylece tecrübe çubuğun tırmanmaya devam eder; ayrıca oraya ulaştığında karakter sayfandan talep edebileceğin uzun vadeli bir prestij rütbesi sağlar. Büyük ömür boyu tecrübe kilometre taşlarını geçmek, Yiğitlikler Kitabı'nda yiğitlikler de kazandırır; karakter sayfanda görünen kozmetik unvanlar ve isim levhası çerçeveleriyle birlikte. Bütün bunlar tamamen isteğe bağlıdır ve asla güç vermez, sadece yürüdüğün yolun bir nişanesidir.",
       "noRush": "Acele etmene gerek yok. Dünya kendi tempoda keyfini çıkarman için orada, o yüzden gez dolaş, gözüne çarpan görevleri al ve kahramanın yol boyunca gelişsin.",
-      "ridingTitle": "Learning to ride",
-      "ridingBody": "Riding is one of the things waiting at the end of the climb. At level {level} a stablemaster will teach you the skill for a serious sum of gold, and a lesson out on the training course earns you your first set of reins. A mount grants no power at all; it simply makes the world smaller, which after a long walk north is its own kind of reward."
+      "ridingTitle": "Binmeyi öğrenmek",
+      "ridingBody": "Binicilik, tırmanışın sonunda seni bekleyen şeylerden biridir. Seviye {level}'de bir ahır ustası sana bu yeteneği ciddi bir miktar altın karşılığında öğretir, ve eğitim parkurundaki bir ders sana ilk dizginlerini kazandırır. Bir binek hiçbir güç vermez; sadece dünyayı küçültür, ki bu da kuzeye uzun bir yürüyüşten sonra kendi başına bir ödüldür."
     },
     "placeholder": {
       "note": "Rehberin bu bölümü yolda, yakında geliyor."
@@ -6406,7 +6766,7 @@ export const tr_TR: EnTranslations = {
     "browSoft": "Yumuşak",
     "browThick": "Kalın",
     "browAngled": "Açılı",
-    "earrings": "Küpeler",
+    "earrings": "Piercingler",
     "jewelMaterial": "Takı Malzemesi",
     "jewelDefault": "Dövüldüğü Gibi",
     "jewelGold": "Altın",
@@ -7393,7 +7753,8 @@ export const tr_TR: EnTranslations = {
       "guilds": "İpucu: bir loncaya katılmak sana özel bir sohbet kanalı ve lonca arkadaşlarınla ortak bir üye listesi verir.",
       "professions": "İpucu: toplama ve üretim mesleklerini savaş sınıfının yanında geliştirebilirsin.",
       "loadouts": "İpucu: puanları iki kez harcamadan farklı dizilimler arasında geçmek için birden fazla yetenek düzeni kaydet.",
-      "pvp": "İpucu: dizilimini sınamak için başka bir oyuncuya dostça düello teklif et veya Kül Koliseumu arenası sırasına gir."
+      "pvp": "İpucu: dizilimini sınamak için başka bir oyuncuya dostça düello teklif et veya Kül Koliseumu arenası sırasına gir.",
+      "reliquary": "İpucu: Yadigârlık, topladığın benzersiz ganimetleri raf raf takip eder."
     }
   },
   "errors": {
@@ -7458,9 +7819,9 @@ export const tr_TR: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca Ayarlar > Sistem > Ekran > Grafikler altında oyunu Yüksek performans olarak ayarla.",
     "bodyWeb": "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Tarayıcı ayarlarından donanım hızlandırmayı etkinleştir, grafik sürücülerini güncelleyip tarayıcını yeniden başlat.",
-    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
-    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
-    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyWindows": "Bu oturum, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda ayrıca ayrık bir oyun GPU’su varsa tarayıcını Ayarlar > Sistem > Ekran > Grafikler altında Yüksek performans olarak ayarla, ardından yeniden başlat. Masaüstü uygulaması ayrık GPU’yu otomatik olarak seçer.",
+    "hybridBodyLinux": "Bu oturum, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda ayrıca ayrık bir oyun GPU’su varsa tarayıcın veya grafik sürücün kendi GPU seçim ayarını sunabilir, ya da dağıtımın PRIME veya optimus-manager gibi bir GPU değiştirme aracı sağlayabilir. Masaüstü uygulaması ayrık GPU’yu otomatik olarak seçer.",
+    "hybridBodyOther": "Bu oturum, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda ayrıca ayrık bir oyun GPU’su varsa onu etkinleştirmek için tarayıcının ve işletim sisteminin grafik ayarlarını kontrol et. Masaüstü uygulaması ayrık GPU’yu otomatik olarak seçer.",
     "dismiss": "Kapat"
   },
   "perfNudge": {
@@ -7516,7 +7877,12 @@ export const tr_TR: EnTranslations = {
     "sortLevel": "Seviye",
     "sortName": "Ad",
     "sortRecent": "Son Oynanan",
-    "sortPlaytime": "Oynama Süresi"
+    "sortPlaytime": "Oynama Süresi",
+    "redesign": "Yeniden Tasarla",
+    "redesignHint": "Bu karakter yeni karakter oluşturucudan önce yaratıldı. Bir ücretsiz yeniden tasarım hakkınız var; kaydettiğinizde kullanılır.",
+    "redesignTitle": "{name} karakterini yeniden tasarla",
+    "redesignSave": "Yeni Görünümü Kaydet",
+    "redesignCancel": "Mevcut Görünümü Koru"
   },
   "deleteCharacter": {
     "title": "Karakteri Sil",
@@ -7544,7 +7910,8 @@ export const tr_TR: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Enerji",
-      "rage": "Öfke"
+      "rage": "Öfke",
+      "focus": "Odak"
     },
     "roles": {
       "warrior": "Tank / Yakın DPS",
@@ -7647,6 +8014,7 @@ export const tr_TR: EnTranslations = {
           "say": "Söyle",
           "yell": "Bağır",
           "party": "Grup",
+          "battleground": "Savaş Alanı",
           "general": "Genel",
           "world": "Dünya",
           "lfg": "LFG",
@@ -7673,7 +8041,111 @@ export const tr_TR: EnTranslations = {
       "zoomIn": "Yakınlaştır",
       "zoomOut": "Uzaklaştır",
       "mapCanvasLabel": "Harita",
-      "mapSummary": "{zone} haritası."
+      "mapSummary": "{zone} haritası.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Görünen önemli bir işaret yok.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "{count} işaret daha.",
+      "mapMarkerDirections": {
+        "center": "merkezde",
+        "north": "kuzeyde",
+        "northeast": "kuzeydoğuda",
+        "east": "doğuda",
+        "southeast": "güneydoğuda",
+        "south": "güneyde",
+        "southwest": "güneybatıda",
+        "west": "batıda",
+        "northwest": "kuzeybatıda"
+      },
+      "mapMarkerDistances": {
+        "near": "yakında",
+        "medium": "orta mesafede",
+        "far": "uzakta"
+      },
+      "mapMarkerLabels": {
+        "you": "Sen",
+        "availableQuest": "Mevcut görev",
+        "readyQuest": "Teslim edilmeye hazır görev",
+        "repeatQuest": "Tekrarlanabilir görev",
+        "cooldownQuest": "Bekleme süresindeki görev",
+        "questObjective": "Görev hedefi alanı",
+        "readyOre": "Toplanmaya hazır cevher damarı",
+        "readyWood": "Kesilmeye hazır ağaç kümesi",
+        "readyHerb": "Toplanmaya hazır ot öbeği",
+        "readyLockedOre": "Toplanmaya hazır cevher damarı, alet kullanılamıyor",
+        "readyLockedWood": "Kesilmeye hazır ağaç kümesi, alet kullanılamıyor",
+        "readyLockedHerb": "Toplanmaya hazır ot öbeği, alet kullanılamıyor",
+        "cooldownOre": "Tükenmiş cevher damarı",
+        "cooldownWood": "Kesilmiş ağaç kümesi",
+        "cooldownHerb": "Toplanmış ot öbeği",
+        "cooldownLockedOre": "Tükenmiş cevher damarı, alet kullanılamıyor",
+        "cooldownLockedWood": "Kesilmiş ağaç kümesi, alet kullanılamıyor",
+        "cooldownLockedHerb": "Toplanmış ot öbeği, alet kullanılamıyor",
+        "station": "Zanaat istasyonu: {name}",
+        "service": "Hizmet: {name}",
+        "partyMember": "Grup üyesi: {name}",
+        "deadPartyMember": "Ölü grup üyesi: {name}",
+        "partyMemberGeneric": "Grup üyesi",
+        "deadPartyMemberGeneric": "Ölü grup üyesi",
+        "friend": "Arkadaş: {name}",
+        "guildMember": "Lonca üyesi: {name}",
+        "pointOfInterest": "İlgi noktası: {name}",
+        "dungeonEntrance": "Zindan girişi: {name}",
+        "dungeonExit": "Zindan çıkışı",
+        "delveEntrance": "Mağara seferi girişi: {name}",
+        "worldPassage": "{zone} bölgesine geçit",
+        "riftEntrance": "Yarık girişi: {name}",
+        "hostileEnemy": "Düşman",
+        "aggressiveEnemy": "Sana saldıran düşman",
+        "lootableEnemy": "Yağmalanabilir düşman",
+        "corpse": "Cesedin",
+        "deathZone": "Tehlikeli bölge",
+        "teammate": "Takım arkadaşı",
+        "deadTeammate": "Ölü takım arkadaşı",
+        "flagCarrier": "Sancağı taşıyan takım arkadaşı",
+        "ownFlagStand": "Sancağının direği",
+        "enemyFlagStand": "Düşman sancağının direği",
+        "riftDescent": "Yarığa iniş",
+        "riftReturnBeacon": "Dönüş feneri",
+        "riftReturnExit": "Dönüş çıkışı",
+        "ranked": "{marker}, {rank} derecesi",
+        "riftTreasureAvailable": "Hazine hazır",
+        "riftTreasureLocked": "Hazine kilitli",
+        "riftTreasureOpened": "Hazine açılmış",
+        "riftTreasureJammed": "Hazine kilidi sıkışmış",
+        "riftCacheAvailable": "Yarık zulası hazır",
+        "riftCacheLocked": "Zula kilitli",
+        "riftCacheOpened": "Zula açılmış",
+        "riftCacheJammed": "Zulanın kilidi sıkışmış",
+        "pylonUnlit": "Sönük rün sütunu",
+        "pylonLit": "Yanan rün sütunu",
+        "sequenceRuneUnlit": "Sönük sıra rünü",
+        "sequenceRuneLit": "Yanan sıra rünü",
+        "iceGoal": "Buz hedefi",
+        "boulderPad": "Kaya hedefi",
+        "boulderMovable": "Hareket ettirilebilir kaya",
+        "boulderPlaced": "Yerleştirilmiş kaya",
+        "gateSealed": "Mühürlü kapı",
+        "gateOpen": "Açık kapı",
+        "switchReady": "Hazır şalter",
+        "switchOn": "Etkinleştirilmiş şalter",
+        "orbDormant": "Uyuyan küre",
+        "orbActive": "Etkin küre",
+        "rollerHazard": "Tehlikeli yuvarlanan kaya",
+        "delvePassageSealed": "Mühürlü geçit",
+        "delvePassageOpen": "Açık geçit",
+        "delveSurfaceExit": "Yüzeye çıkış",
+        "delveCacheLocked": "Kilitli mağara seferi sandığı",
+        "delveCacheReady": "Mağara seferi sandığı hazır",
+        "delveCacheActive": "Mağara seferi sandığı etkin",
+        "delveCacheOpened": "Mağara seferi sandığı açılmış",
+        "delveReliquaryLocked": "Kilitli emanetlik",
+        "delveReliquaryReady": "Emanetlik hazır",
+        "delveReliquaryActive": "Emanetlik ayini etkin",
+        "delveReliquaryOpened": "Emanetlik açılmış",
+        "bountiful": "Bol ödüllü {marker}"
+      }
     },
     "options": {
       "gameMenu": "Oyun Menüsü",
@@ -7808,6 +8280,7 @@ export const tr_TR: EnTranslations = {
     "chat": {
       "rightClickName": "{name} oyuncusuna sağ tıkla",
       "templates": {
+        "battleground": "[Savaş Alanı] {name}: {message}",
         "party": "[Grup] {name}: {message}",
         "yell": "{name} bağırıyor: {message}",
         "whisper": "{name} fısıldıyor: {message}",
@@ -7922,7 +8395,7 @@ export const tr_TR: EnTranslations = {
       "deathRecapAbility": "Öldün. {ability} tarafından öldürüldün.",
       "deathRecapFalling": "Öldün. Düşerek can verdin.",
       "deathRecapDrowned": "Öldün. Boğuldun.",
-      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
+      "deathRecapCauterized": "Öldün. Dağlama'nın yanığı seni alt etti.",
       "respawn": "Kendini dinlenmiş ve yeniden sapasağlam hissediyorsun.",
       "ignoringChat": "{name} oyuncusunun sohbeti görmezden geliniyor.",
       "noLongerIgnoring": "{name} artık görmezden gelinmiyor.",
@@ -7951,6 +8424,7 @@ export const tr_TR: EnTranslations = {
       "notEnoughRage": "Yeterli öfke yok!",
       "notEnoughEnergy": "Yeterli enerji yok!",
       "notEnoughMana": "Yeterli mana yok!",
+      "notEnoughDevotion": "Yeterli Adanmışlık yok!",
       "notEnoughResource": "Yeterli {resource} yok!",
       "notEnoughHealth": "Yeterli can yok.",
       "targetMustDodge": "Önce hedefinin sıyrılması gerekir.",
@@ -7966,7 +8440,7 @@ export const tr_TR: EnTranslations = {
       "outOfRange": "Menzil dışında.",
       "noTarget": "Hiçbir hedefin yok.",
       "tooClose": "Çok yakın!",
-      "mustTargetAlly": "You must target an ally.",
+      "mustTargetAlly": "Bir müttefik hedeflemelisin.",
       "facing": "Hedefine dönük olmalısın.",
       "targetHealthBelow": "O yetenek, hedefin canının %{percent} altında olmasını gerektirir.",
       "dagger": "Bir hançer kuşanmalısın.",
@@ -8079,6 +8553,10 @@ export const tr_TR: EnTranslations = {
     "pet": {
       "attack": "Saldır",
       "waterJet": "Su Jeti",
+      "felbolt": "Kül Oku",
+      "abyssalChain": "Uçurum Zinciri",
+      "autocastOn": "Otomatik büyü açık. Kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
+      "autocastOff": "Otomatik büyü kapalı. Açmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
       "taunt": "Kışkırt",
       "healDemon": "Şeytanı İyileştir",
       "healPet": "Evcili İyileştir",
@@ -8089,6 +8567,10 @@ export const tr_TR: EnTranslations = {
       "petAttackDesc": "Evciline mevcut düşman hedefine saldırmasını emret.",
       "waterJetTitle": "Su Jeti",
       "waterJetDesc": "Su Elementalinize 3 saniye boyunca yavaşlatıcı bir akıntı kanalize etmesini emredin. 8 saniyelik bekleme süresi. Bekleme süresi dolduğunda otomatik aktif etmek için sağ tıklayın.",
+      "felboltTitle": "Kül Oku",
+      "felboltDesc": "Emberkin'e hedefine ekstra bir kül oku fırlatmasını emret. 8 saniyelik bekleme süresi. Otomatik büyüyü açıp kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
+      "abyssalChainTitle": "Uçurum Zinciri",
+      "abyssalChainDesc": "Gloomshade'e, 8 yardadan fazla ve 20 yardaya kadar uzaktaki normal bir düşmanı kendine doğru çekmesini emret. Patronlar çekilemez. 15 saniyelik bekleme süresi. Otomatik büyüyü açıp kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
       "petTauntTitle": "Evcil Kışkırtması",
       "petTauntDesc": "Evciline saldırıya geçmesini ve menzile girince Hırlamasını emret. 10 saniyelik bekleme süresi.",
       "healDemonDesc": "5 saniye boyunca şeytanına iyileştirme kanalize etmek için mana harca.",
@@ -8244,6 +8726,7 @@ export const tr_TR: EnTranslations = {
     "tooltip": {
       "rank": "Kademe {rank}",
       "cost": "{cost} {resource}",
+      "ruinCost": "{cost} Harabiyet",
       "range": "{range} metre menzil",
       "rangeWithMin": "{min}-{max} metre menzil",
       "instant": "Anında",
@@ -8254,7 +8737,8 @@ export const tr_TR: EnTranslations = {
       "unavailable": "Kullanılamaz",
       "requiresLevel": "{level}. seviye gerektirir",
       "requiresForm": "{form} Formu gerektirir",
-      "requiresStealth": "Gizlenme gerektirir",
+      "requiresStealth": "Gizlilik gerektirir",
+      "requiresStealthSkulduggery": "Gizlilik gerektirir (3 Alacakaranlıkta veya Gölge Perdesi sırasında gerekmez)",
       "requiresCombo": "Kombo puanı tüketir",
       "requiresTargetHealthBelow": "Hedefin canının %{percent} altında olmasını gerektirir",
       "requiresDodge": "Yalnızca hedef sıyrıldıktan sonra kullanılabilir",
@@ -8270,7 +8754,9 @@ export const tr_TR: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Öfke",
-      "energy": "Enerji"
+      "energy": "Enerji",
+      "focus": "odak",
+      "devotion": "Adanmışlık"
     },
     "forms": {
       "bear": "Ayı",
@@ -8472,6 +8958,7 @@ export const tr_TR: EnTranslations = {
       "clickDestroy": "Yok etmek için tıkla",
       "useFishing": "Kullanım: Yakındaki sularda balık tut.",
       "useHealingPotion": "Kullanım: Anında {amount} can yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
+      "useHealingPotionPct": "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 2 dakika bekleme süresi.",
       "useManaPotion": "Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
@@ -8575,6 +9062,9 @@ export const tr_TR: EnTranslations = {
       "filterPrimaryStatAll": "Herhangi bir birincil nitelik",
       "filterRarity": "Nadirlik",
       "filterRarityAll": "Tüm nadirlikler",
+      "filterSort": "Sırala",
+      "sortName": "Ad (A-Z)",
+      "sortPriceAsc": "Fiyat: düşükten yükseğe",
       "weaponSword": "Kılıçlar",
       "weaponDagger": "Hançerler",
       "weaponStaff": "Asalar",
@@ -8703,19 +9193,71 @@ export const tr_TR: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Ateş Yağmuru",
-        "description": "Hedef alana 4 saniye boyunca ateş yağdırır ve düşmanları her saniye {damage} Ateş hasarıyla yakar."
+        "description": "3 Tahribat harcayarak hedef alana ateş yağdırır, 4 sn boyunca her saniye {damage} Ateş hasarı verir, 2. rütbede 6 sn'ye uzar. Harabiyet ilk dalgayı anında indirir."
       },
       "volley": {
         "name": "Ok Yağmuru",
-        "description": "Hedef alana 3 saniye boyunca ok yağdırır ve içindeki düşmanlara her 0.5 saniyede bir {damage} hasar verir."
+        "description": "3 sn boyunca 8 m'lik bir alana ok yağdırır. Alandaki düşmanlar her 0.5 sn'de {damage} Fiziksel hasar alır. Hasar menzilli saldırı gücüyle artar."
+      },
+      "pack_command": {
+        "name": "Sürü Emri",
+        "description": "Yaşayan evcil hayvanına 36 ila 48 Fiziksel hasar vurması için emir verir. Hasar evcil hayvanın saldırı gücüyle artar. İsabet 20 odak geri kazandırır ve 30 sn boyunca 1 Sürü Vahşeti verir, en fazla 3. Her katman evcil hayvanının verdiği tüm hasarı 10% artırır. Bu vuruş, isabetten önceki katmanlarını kullanır."
+      },
+      "stampede": {
+        "name": "İzdiham",
+        "description": "12 sn boyunca 3 canavar çağırır. Her biri 2 sn arayla {damage} Fiziksel hasar verir. Gösterilen hasar, evcil hayvan hasar bonuslarından önce menzilli saldırı gücünün 8% kadarını içerir. Canavarlar çağrıldıklarında Sürü Vahşetini sabitler ve katman başına 10% hasar kazanır. İzdiham beklemedeyken başarılı Sürü Emirlerinin onu sıfırlama ihtimali 20%, 5 başarısız denemeden sonra garantidir. Canavarlar etkinken sıfırlanamaz. (Sürü Efendisi)"
+      },
+      "unleash_beast": {
+        "name": "Canavarı Salıver",
+        "description": "Evcil hayvanın 83 ila 105 Fiziksel hasar vurup 6 metre içindeki her düşmanı 26 ila 34 sarsmasının ardından 3 Sürü Vahşeti tüketir. Vuruş ve sarsıntı, Sürü Vahşetinin tam 30% evcil hayvan hasar bonusunu kullanır ve evcil hayvanın saldırı gücüyle artar. Sonraki 8 sn boyunca evcil hayvan 25% daha fazla hasar verir, 35% daha hızlı saldırır ve Uğursuz Atışın yakındaki en fazla 2 düşmanı biçmesini sağlar."
+      },
+      "measured_shot": {
+        "name": "Ölçülü Atış",
+        "description": "Hedefe {damage} Fiziksel hasar verecek şekilde ateş eder. İsabet 20 odak geri kazandırır. Hasar menzilli saldırı gücüyle artar."
+      },
+      "cold_focus": {
+        "name": "Soğuk Odak",
+        "description": "12 sn boyunca Ölçülü Atış 50% daha fazla odak geri kazandırır, Uzun Çekiş ise 25% daha az harcar ve 30% daha hızlı okunur. (Soğuk Bakış imzası)"
+      },
+      "bloodhook": {
+        "name": "Kanlı Çengel",
+        "description": "Bir düşmana atılır ve Kanlı Çengel Yarası uygular; 12 sn boyunca 4 vuruşta 34 temel Fiziksel hasar artı menzilli saldırı gücünün 26% kadarını verir. (Saha Ustalığı imzası)"
+      },
+      "shrapnel_charge": {
+        "name": "Şarapnel Yükü",
+        "description": "Hedefe 24 ila 30 Fiziksel hasar, 6 metre içindeki en fazla 4 düşmana ise 13 ila 17 hasar vurur. Diğer hedefler ayrıca 6 sn boyunca 12 hasarla kanar. Ana hedef Kanlı Çengel Yaranı taşıyorsa anında 1 yara vuruşu uygulanır. Doğrudan hasar menzilli saldırı gücüyle artar."
+      },
+      "bloodtrail_assault": {
+        "name": "Kan İzi Saldırısı",
+        "description": "12 sn boyunca Kanlı Çengel, 60% güçte bir yarayı yakındaki en fazla 2 düşmana yayar, Yara Yırtma 18 hasarlık bir evcil hayvan saldırısı emreder ve Şarapnel Yükü 2 metre kazanır, ana hedefine 25% daha fazla temel hasar verir ve 50% daha fazla yara hasarı tetikler."
+      },
+      "trailbreak": {
+        "name": "İz Kırma",
+        "description": "12 metre geriye sıçrar. Av İvmen varsa tazelenir ve Dönüşü 12 sn hazırlar."
+      },
+      "wildheart": {
+        "name": "Yaban Yürek",
+        "description": "Azami canının 30% kadarını anında geri kazandırır."
+      },
+      "shellskin": {
+        "name": "Kabuk Deri",
+        "description": "Alınan hasarı 8 sn boyunca 60% azaltır, ancak etkinken saldırmayı engeller."
+      },
+      "frostjaw_trap": {
+        "name": "Buzçene Tuzağı",
+        "description": "Seçili düşmana veya ayaklarının dibine bir tuzak yerleştirir. 0,75 sn sonra kurulur ve 30 sn sürer. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar."
+      },
+      "pack_rally": {
+        "name": "Sürü Toplanması",
+        "description": "Küheylan Suretine bürünür ve yakındaki müttefikleri 10 sn boyunca 30% hareket hızı ile 10% saldırı ve okuma hızıyla toplar."
       },
       "hurricane": {
         "name": "Kasırga",
         "description": "Hedef alana 6 saniye boyunca bir kasırga indirir ve düşmanlara her saniye {damage} Doğa hasarı verir."
       },
       "earthquake": {
-        "name": "Deprem",
-        "description": "Hedef alanı 6 saniye boyunca sarsar ve düşmanları her 1.5 saniyede bir {damage} Doğa hasarıyla hırpalar."
+        "name": "Fay Uyanışı",
+        "description": "8 m'lik bir alanı 6 sn sarsar ve her 1.5 sn'de {damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: 5 Gök Gürültüsü'nde %100 daha fazla hasar verir ve tüm Gök Gürültüsü'nü tüketir."
       },
       "heroic_strike": {
         "name": "Yağmacı Darbesi",
@@ -8923,15 +9465,20 @@ export const tr_TR: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Kötücül Kesik",
-        "description": "Silah hasarı artı {damage} için anlık bir vuruş. 1 kombo puanı kazandırır."
+        "description": "Silah hasarı artı {damage} veren anlık bir vuruş. 1 kombo puanı kazandırır.",
+        "specNote_assassination": "1 Zehir Ayini ekler (en fazla 6).",
+        "specNote_combat": "Redline etkinken, bu düğme Gövde Darbesine dönüşür: silah hasarının %130'u artı 10, 2 kombo puanı kazandırır ve 1 Redline ekler (en fazla 4)."
       },
       "eviscerate": {
         "name": "Toprak Uykusu",
-        "description": "{damage} veren bitirici hamle."
+        "description": "{damage} veren bitirici hamle.",
+        "specNote_assassination": "6 Zehir Ayininde bu düğme Zehir Yarığına dönüşür: kanamalarının kalan tüm hasarını anında veren, taze bir zehir yarası açan ve 20 enerji geri kazandıran bir vuruş.",
+        "specNote_combat": "Bunu 4 veya daha fazla kombo puanıyla vurmak 8 sn boyunca Redline'ı başlatır: Kötücül Kesik Gövde Darbesine dönüşür ve bu düğme Nakavt Darbesine dönüşür (45 artı kombo puanı başına 35, biriktirilen her Redline kademesinde %25 daha sert vurur, 25 enerji geri kazandırır). Redline bitmeden harca."
       },
       "backstab": {
         "name": "Korkakça Saplama",
-        "description": "Hedefe %150 silah hasarı artı {damage} ile sırttan bıçakla. Hedefin arkasında olmalısın. Bir hançer gerektirir. 1 kombo puanı kazandırır."
+        "description": "Hançerini hedefin sırtına sapla: silah hasarının %150'si artı {damage}. Hedefin arkasında olmalısın. Hançer gerektirir. 1 kombo puanı kazandırır.",
+        "specNote_assassination": "Her vuruş 1 Zehir Ayini ekler (en fazla 6) ve 15 enerji geri kazandırır. 6 Zehir Ayininde, Toprak Uykusu Zehir Yarığına dönüşür (kalan tüm kanama hasarını tek seferde verir)."
       },
       "gouge": {
         "name": "Göz Dürtme",
@@ -8943,7 +9490,7 @@ export const tr_TR: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Gaddar Tempo",
-        "description": "Yakın dövüş saldırı hızını %30 artıran bitirici hamle. Kombo puanı başına daha uzun sürer."
+        "description": "Yakın dövüş saldırı hızını 12 sn artı kombo puanı başına 4 sn boyunca %30 artıran bitirici hamle (5 kombo puanı: 32 sn)."
       },
       "sprint": {
         "name": "Çevik Topuklar",
@@ -8951,15 +9498,17 @@ export const tr_TR: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Aşağılık Darbe",
-        "description": "Hedefi sersemleten bitirici hamle. Her kombo puanı başına 1 saniye daha uzun sürer."
+        "description": "Hedefi 1 sn artı kombo puanı başına 1 sn sersemleten bitirici hamle (5 kombo puanı: 6 sn)."
       },
       "ambush": {
         "name": "Pusucunun Darbesi",
-        "description": "Hedefe %250 silah hasarı artı {damage} ile pusu kur. Gizlenmiş ve hedefin arkasında olmalısın. Bir hançer gerektirir. 1 kombo puanı kazandırır."
+        "description": "Gölgelerden saldırarak silah hasarının %250'si artı {damage} vur. Gizlenmiş ve hedefin arkasında olmalısın. Hançer gerektirir. 1 kombo puanı kazandırır.",
+        "specNote_subtlety": "Alacakaranlık Perdesinden kullanıldığında 1 Alacakaranlık ekler (en fazla 3). 3 Alacakaranlıkta gizlilik OLMADAN ve her açıdan kullanabilirsin: bu kullanım hiçbir şeye mal olmaz, 3 Alacakaranlığın tümünü harcar, 6 sn'lik Gölge Perdesini başlatır ve iki kat hasar verir."
       },
       "stealth": {
         "name": "Alaca Örtüsü",
-        "description": "Seni gölgelerde gizler: düşmanlar seni güçlükle fark eder, ancak %50 daha yavaş hareket edersin. Saldırmak ya da hasar almak Duskveil'i bozar. Çıkmak için tekrar kullan."
+        "description": "Seni gölgelerde gizler: düşmanlar seni zar zor fark eder, ama %50 daha yavaş hareket edersin. Saldırmak ya da hasar almak Alacakaranlık Perdesini bozar. Çıkmak için tekrar oku.",
+        "specNote_subtlety": "Alacakaranlık Perdesinden kullandığın her açılış 1 Alacakaranlık ekler (en fazla 3)."
       },
       "adrenaline_rush": {
         "name": "Hızlanan Kan",
@@ -8967,11 +9516,13 @@ export const tr_TR: EnTranslations = {
       },
       "garrote": {
         "name": "Boğaz Teli",
-        "description": "Düşmanı boğarak anında {damage} hasar verir ve 18 saniye boyunca {overTime} kanama yaratır. Gizlenmiş olmalısın. 1 kombo puanı kazandırır."
+        "description": "Düşmanın boğazına bir tel dola: hemen {damage} hasar verir ve 18 sn boyunca {overTime} kanama hasarı verir. Gizlenmiş olmalısın. 1 kombo puanı kazandırır.",
+        "specNote_subtlety": "Alacakaranlık Perdesinden kullanıldığında 1 Alacakaranlık ekler (en fazla 3). 3 Alacakaranlıkta gizlilik OLMADAN kullanabilirsin: bu kullanım hiçbir şeye mal olmaz, 3 Alacakaranlığın tümünü harcar ve 6 sn'lik Gölge Perdesini başlatır."
       },
       "cheap_shot": {
         "name": "Mide Yumruğu",
-        "description": "Hedefe {damage} hasar vererek onu 4 saniye sersemletir. Gizlenmiş olmalısın. 2 kombo puanı kazandırır."
+        "description": "Hedefe {damage} hasar vererek onu 4 sn sersemlet. Gizlenmiş olmalısın. 2 kombo puanı kazandırır.",
+        "specNote_subtlety": "Alacakaranlık Perdesinden kullanıldığında 1 Alacakaranlık ekler (en fazla 3). 3 Alacakaranlıkta gizlilik OLMADAN kullanabilirsin: bu kullanım hiçbir şeye mal olmaz, 3 Alacakaranlığın tümünü harcar ve 6 sn'lik Gölge Perdesini başlatır."
       },
       "sap": {
         "name": "Bayıltma",
@@ -8983,11 +9534,11 @@ export const tr_TR: EnTranslations = {
       },
       "expose_armor": {
         "name": "Zırh Gediği",
-        "description": "Hedefi açığa düşüren, zırhını 30 saniye boyunca {damage} azaltan bitirici hamle."
+        "description": "Hedefi 30 sn boyunca açığa çıkaran bitirici hamle: harcanan her kombo puanı zırhını %2 azaltır (5 kombo puanı: %{damage})."
       },
       "rupture": {
         "name": "Kan Kaybı",
-        "description": "Hedefi yaralayan bitirici hamle; 16 saniye boyunca {damage} kanama hasarı vermesine yol açar."
+        "description": "Hedefi yaralayan bitirici hamle: 6 sn artı kombo puanı başına 2 sn boyunca her 2 sn'de kanar (5 kombo puanı: 16 sn ve toplam {damage} hasar)."
       },
       "vanish": {
         "name": "Duman Adımı",
@@ -9007,19 +9558,131 @@ export const tr_TR: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Yemin Damgası",
-        "description": "Seni 30 saniye boyunca Kutsal güçle doldurur; her yakın dövüş vuruşunun {damage} ek Kutsal hasar vermesini sağlar. Verdict ile açığa çıkar."
-      },
-      "holy_light": {
-        "name": "Onaran Işık",
-        "description": "Dost bir hedefi {damage} iyileştirir."
-      },
-      "devotion_aura": {
-        "name": "Sarsılmaz Aura",
-        "description": "Zırhını 30 dakika boyunca {buff} artırır."
+        "description": "Seni 30 sn boyunca Kutsal güçle doldurur, böylece her yakın dövüş savurman {damage} ek Kutsal hasar verir."
       },
       "judgement": {
         "name": "Hukum",
         "description": "Aktif Mührünü düşmanın üzerine salar ve onu tüketerek depoladığı Kutsal hasarı verir."
+      },
+      "holy_light": {
+        "name": "Onaran Işık",
+        "description": "Dost bir hedefi hızla {damage} iyileştirir. Can yenilemek uzmanlık olmadan bile 1 Adanmışlık üretir. Işıltılı Rezonans ya da Güneş Misillemesi onu anında kılar."
+      },
+      "divine_ascension": {
+        "name": "Kutsal Yüceliş",
+        "description": "20 Adanmışlık tüketerek en fazla 45 sn boyunca 5 Yüceliş şarjı kazandırır. İşaretli yetenekler bir şarj tüketir ve ek bir etki kazanır."
+      },
+      "aura_mastery": {
+        "name": "Kutsal Uyum",
+        "description": "8 sn boyunca grubundaki her etkin Adanmışlığı ve Kısas Aurasını güçlendirir. Burç Adanmışlığı hasarı 15% azaltır; Kısas 15 Kutsal hasar verir. Birden fazla kullanım birikmek yerine yeniler."
+      },
+      "devotion_ward": {
+        "name": "Burç Adanmışlığı",
+        "description": "Senin ve grup üyelerinin aldığı hasarı ölüme veya değiştirilmeye dek 5% azaltır. Yalnızca bu aura ile Kısas Aurası birbirinin yerini alır; Işıyan, Şafak ve Lütuf Adanmışlığı birlikte var olur."
+      },
+      "hammer_of_grace": {
+        "name": "Lütuf Çekici",
+        "description": "20 m içindeki bir düşmana anında kutsal bir çekiç fırlatarak {damage} hasar verir, 70 mana geri kazandırır, verdiği hasarın 50% kadarını sana iyileştirir ve hasar verdiğinde 1 Adanmışlık üretir. Güneş Kısası, Lütuf Çekicinin bekleme süresini yok saymasını ve verdiği hasarın 100% kadarını sana iyileştirmesini sağlar."
+      },
+      "hushbrand": {
+        "name": "Suskunluk Damgası",
+        "description": "Büyü okumayı keser ve o okuldan büyüleri 4 sn engeller."
+      },
+      "guardian_covenant": {
+        "name": "Koruyucu Ahdi",
+        "description": "Dost bir hedefi ve kendini korur, alınan hasarı 8 sn boyunca 20% azaltır. Dost hedef seçili değilse varsayılan olarak seni seçer."
+      },
+      "solar_step": {
+        "name": "Güneş Adımı",
+        "description": "Hareket hızını 2 sn boyunca 150% artırır."
+      },
+      "solar_invocation": {
+        "name": "Güneş Çağrısı",
+        "description": "Bir müttefiki anında {damage} iyileştirir ya da bir düşmana orta düzeyde Kutsal hasar verir. Her iki kullanım da 1 Adanmışlık üretir. Yüceliş sırasında iyileştirme okuması hedefin 10 m yakınındaki dost oyuncuları da yarısı kadar iyileştirir."
+      },
+      "radiant_devotion": {
+        "name": "Işıyan Adanmışlık",
+        "description": "Senin ve grup üyelerinin büyü gücünü 30 dk boyunca 20 artırır. Kendi Şafak veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur."
+      },
+      "dawn_devotion": {
+        "name": "Şafak Adanmışlığı",
+        "description": "Senin ve grup üyelerinin saldırı gücünü 30 dk boyunca 40 artırır. Kendi Işıyan veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıkları ve savaşçı naralarıyla birlikte var olur."
+      },
+      "grace_devotion": {
+        "name": "Lütuf Adanmışlığı",
+        "description": "Sen ve grup üyeleri her 5 sn 15 mana geri kazanır ve 30 dk boyunca 3% daha az mana harcarsınız. Kendi Işıyan veya Şafak Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur."
+      },
+      "recall_the_fallen": {
+        "name": "Düşenleri Çağır",
+        "description": "Ölü bir grup üyesini 35% can ve manayla yaşama döndürür. 16. seviye ya da üzeri bir Güneş Şifacısı bunun yerine grubun düşmüş tüm üyelerini geri çağırır."
+      },
+      "beacon_of_light": {
+        "name": "Işık Feneri",
+        "description": "Bir grup üyesini Işık Fenerin olarak işaretler. 60 m içindeki başka bir grup üyesine yaptığın etkili doğrudan iyileştirmenin 50% kadarı Feneri de iyileştirir. Alan ve süreli iyileştirme aktarılmaz. Biriniz ölene dek sürer."
+      },
+      "final_edict": {
+        "name": "Son Ferman",
+        "description": "Ezici bir silah vuruşu indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşlarının 15% ihtimalle 8 sn boyunca Şafağın Gazabını verme şansı vardır. Yüceliş ayrıca çevrende Kutsal bir patlama salar."
+      },
+      "dawnfall": {
+        "name": "Şafak Düşüşü",
+        "description": "Yakındaki düşmanlara {damage} Kutsal hasar verir ve 1 Adanmışlık üretir. En az bir düşmanı vurmak Son Fermanın kalan bekleme süresini 2 sn kısaltır. Yüceliş hasarını ve yarıçapını artırır."
+      },
+      "sun_gods_verdict": {
+        "name": "Güneş Tanrısının Hükmü",
+        "description": "Bir düşmanı 30 sn boyunca Güneş Tanrısının Hükmü altında yargılar. Son Ferman ve Şafak Düşüşü başarılı vuruşta birer şarj işler. Üçüncü şarjı koyan yetenek cezayı belirler: Son Ferman mahkûma yıkıcı hasar salar; Şafak Düşüşü hükmü patlatarak yakındaki düşmanlara hasar verir ve onları 1,5 sn sersemletir."
+      },
+      "valkyrs_calling": {
+        "name": "Valkyrie Çağrısı",
+        "description": "Havaya yükselir, düşmana doğru uçarken hasara karşı bağışık olursun. 2 sn sonra hedef alana inerek {damage} Kutsal hasar verir ve 1 Adanmışlık üretirsin. Yüceliş çarpma hasarını 50% artırır ve 1 şarj tüketir."
+      },
+      "faithforged_guard": {
+        "name": "Işığın Borcu",
+        "description": "8 sn boyunca sana gelen bir sonraki düşman vuruşu yanıtlanır: {buff} kadar hasar reddedilir ve saldırgana Kutsal hasar olarak döndürülür, sen de 1 Adanmışlık kazanırsın. Yalnızca tek bir darbe yanıtlanır. Yüceliş yanıtlayabildiği miktarı 50% artırır."
+      },
+      "mercy_lance": {
+        "name": "Merhamet Mızrağı",
+        "description": "Bir düşmana {damage} Kutsal hasar verir ve hasar verdiğinde 1 Adanmışlık üretir. Yüceliş sırasında kritik vuruşu garantilemek için 1 şarj tüketir."
+      },
+      "sacred_form": {
+        "name": "Kutsal Suret",
+        "description": "Ölüme dek kutsal bir hale girer; iyileştirmeyi 10%, büyü kritik şansını 5% artırır ve üretilen tehdidi 50% azaltır. Yalnızca Güneş Şifacıları için."
+      },
+      "dawns_embrace": {
+        "name": "Şafağın Kucaklaması",
+        "description": "Güçlü bir iyileştirme salar ve 1 Adanmışlık üretir. Işıyan Rezonans mana maliyetini 50%, okuma süresini 1,5 sn yapar. Yüceliş onu anında yapar ve iyileştirmesini 35% artırır."
+      },
+      "radiant_chorus": {
+        "name": "Işıyan Koro",
+        "description": "Yakındaki müttefikleri {damage} iyileştirir ve 1 Adanmışlık üretir. En az 2 müttefiki etkili biçimde iyileştirmek Işıyan Rezonans verir: sonraki Onaran Işığın anında olur veya sonraki Şafağın Kucaklaması 50% daha az mana harcar ve 1,5 sn içinde okunur. Yüceliş Işıyan Koronun iyileştirmesini ve yarıçapını artırır."
+      },
+      "life_covenant": {
+        "name": "Yaşam Ahdi",
+        "description": "Bir müttefikin aldığı hasarı 6 sn boyunca 40% azaltır. Yüceliş sırasında ayrıca şarj tüketmeden 120 puanlık bir kalkan verir."
+      },
+      "aegis_first_dawn": {
+        "name": "İlk Şafağın Kalkanı",
+        "description": "5 sn kanalize ederek 10 metrelik kutsal bir kubbe oluşturur. İçindeki müttefikler her saniye iyileşir ve 50% daha az hasar alır. Kanalizasyonu tamamlamak son bir iyileştirme salar ve 4 sn boyunca 30% hareket hızı verir."
+      },
+      "vowkeeper_strike": {
+        "name": "Yemin Bekçisi Vuruşu",
+        "description": "Yüksek tehditle vurur ve 1 Adanmışlık üretir. Başarılı bir vuruşun 8 sn boyunca Güneş Kısası verme ihtimali 20%; her başarılı blokun 25%. Güneş Kısası sonraki Güneş Diskini, Lütuf Çekicini veya Onaran Işığını güçlendirir. Yüceliş ayrıca küçük bir emici kalkan verir."
+      },
+      "bastion_rite": {
+        "name": "Burç Ayini",
+        "description": "Alınan fiziksel hasarı 20% azaltır ve blok şansını 6 sn boyunca 20% artırır. Yüceliş süreyi 10 sn yapar."
+      },
+      "sunward_disc": {
+        "name": "Güneş Diski",
+        "description": "Kalkan gerektirir. Vurup ardından yakındaki düşmanlar arasında seken ışıyan bir disk fırlatır. Hasar veren her çarpma 1 Adanmışlık üretir. Güneş Kısası Güneş Diskinin mana harcamamasını, bekleme süresini yok saymasını ve 20% daha fazla hasar vermesini sağlar. Yüceliş 5 sekmeyi güçlendirir."
+      },
+      "sacred_challenge": {
+        "name": "Kutsal Dürtü",
+        "description": "Bir düşmanı sana saldırmaya zorlar. Yüceliş sırasında ayrıca şarj tüketmeden alınan tüm hasarı 4 sn boyunca 15% azaltır."
+      },
+      "devotion_aura": {
+        "name": "Sarsılmaz Aura",
+        "description": "Zırhını 30 dakika boyunca {buff} artırır."
       },
       "blessing_of_might": {
         "name": "Demir Yemini",
@@ -9027,7 +9690,7 @@ export const tr_TR: EnTranslations = {
       },
       "divine_protection": {
         "name": "İnanç Siperi",
-        "description": "Koruyucu bir siper 10 saniye boyunca {damage} hasarı emer."
+        "description": "Kutsal bir kalkan {duration} saniye boyunca azami canının %{damage} kadarını emer."
       },
       "hammer_of_justice": {
         "name": "Parçalayan Tokmak",
@@ -9035,7 +9698,7 @@ export const tr_TR: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Son Ayin",
-        "description": "Devasa bir iyileştirme dalgası: {damage} can geri kazandırır. 10 dakika bekleme süresi."
+        "description": "Devasa bir iyileştirme dalgası azami canının %{damage} kadarını geri kazandırır. 10 dakika bekleme süresi."
       },
       "holy_taunt": {
         "name": "Kutsal Tahrik",
@@ -9043,7 +9706,7 @@ export const tr_TR: EnTranslations = {
       },
       "flash_of_light": {
         "name": "Işık Şifası",
-        "description": "Dost bir hedefi {damage} iyileştiren hızlı ve verimli bir Işık patlaması."
+        "description": "Dost bir hedefi {damage} iyileştiren hızlı ve verimli bir Işık patlaması. Can yenilemek uzmanlık olmadan bile 1 Adanmışlık üretir."
       },
       "exorcism": {
         "name": "Kovma Ayini",
@@ -9051,15 +9714,31 @@ export const tr_TR: EnTranslations = {
       },
       "consecration": {
         "name": "Kutsal Toprak",
-        "description": "Altındaki zemini kutsar, yakındaki düşmanları 10 saniye boyunca her 2 saniyede bir {damage} Kutsal hasarla dağlar."
+        "description": "Zemini 9 saniyeliğine kutsar ve her saniye {damage} Kutsal hasar verir. İnanç Muhafızları içerideyken %10 daha az hasar alır."
+      },
+      "bastion_sweep": {
+        "name": "Burç Savurması",
+        "description": "Kuşandığın kalkanı 180 derecelik ön yayda düşmanların arasından savurarak {damage} Kutsal hasar verir, yüksek tehdit oluşturur ve 1 Adanmışlık üretir. Yüceliş hasarı 30%, yarıçapı 8 m yapar."
+      },
+      "oath_chain": {
+        "name": "Yemin Zinciri",
+        "description": "Uzaktaki bir düşmanı anında kutsal bir zincirle bağlar. Düşman saniyede 18 m hızla 3 m mesafeye gelene dek sana doğru ilerler, ardından 4 sn boyunca 50% yavaşlar. Yüceliş sırasında yakındaki ikinci bir düşmanı da bağlar."
+      },
+      "veilbound_march": {
+        "name": "Perde Yürüyüşü",
+        "description": "4 sn boyunca eterik olursun; 40% hareket hızı ve 30% zırh kazanır, köklenmeye, yavaşlamaya ve yer değiştirmeye karşı bağışık olursun. İçinden geçtiğin düşmanlar 6 sn boyunca Perde Damgası alır: her saniye Kutsal hasar alır, sana 20% daha az hasar verir ve ek tehdit üretirler. İlk damga 1 Adanmışlık verir. Yürüyüş bittiğinde yakındaki damgalı düşmanlar son bir patlama alır. Yüceliş patlamayı 50% artırır ve onları hafifçe sana çeker."
+      },
+      "veilbound_mark": {
+        "name": "Perde Damgası",
+        "description": "Her saniye Kutsal hasar alır, damgayı basan paladine 20% daha az hasar verir ve o paladine karşı ek tehdit üretir."
       },
       "righteous_fury": {
         "name": "Yanan Yemin",
-        "description": "Kutsal hasarının ürettiği tehdidi 30 dakika boyunca %60 artırır. Tank paladinin temel taşı."
+        "description": "Kutsal hasarının ürettiği tehdidi pasif olarak %60 artırır. Yalnızca İnanç muhafızı."
       },
       "retribution_aura": {
         "name": "Karşılık Aurası",
-        "description": "Seni 30 dakika boyunca kutsal enerjiyle sarar; yakın dövüşte sana vuran her düşmana 5 Kutsal hasar verir."
+        "description": "Seni ve grubunu ölüme ya da değiştirilene kadar kutsal enerjiyle sarar. Etkilenen bir müttefike yakın dövüşte vuran düşmanlar {buff} Kutsal hasar alır ve etkilenen müttefikler otomatik saldırılarıyla {buff} ek Kutsal hasar verir."
       },
       "tame_beast": {
         "name": "Yaban Bağı",
@@ -9071,7 +9750,7 @@ export const tr_TR: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Deşen Darbe",
-        "description": "Hasarı {damage} artıran güçlü bir yakın dövüş saldırısı. Bir sonraki vuruşunda etkinleşir."
+        "description": "Silah hasarının %10'u artı {damage} vurur. İsabet 15 Odak yeniler ve 1 Av İvmesi verir. Hasar, silah hasarı üzerinden saldırı gücüyle artar."
       },
       "aspect_of_the_hawk": {
         "name": "Delice Sureti",
@@ -9079,23 +9758,31 @@ export const tr_TR: EnTranslations = {
       },
       "serpent_sting": {
         "name": "Zehir Dikeni",
-        "description": "Hedefi sokar ve 15 saniye boyunca {damage} Doğa hasarı verir."
+        "description": "15 sn boyunca toplam {damage} Doğa hasarı verir, her 3 sn'de bir kez. Hasar menzilli saldırı gücüyle artar."
       },
       "arcane_shot": {
         "name": "Uğursuz Atış",
-        "description": "{damage} Gizemli hasar veren anlık bir atış."
+        "description": "Hedefi {damage} Arkane hasar için vurur. Hasar menzilli saldırı gücüyle artar."
       },
       "concussive_shot": {
         "name": "Sarsıcı Atış",
-        "description": "Hedefi {damage} hasarla sersemletir, hareketini 4 saniye boyunca %50 yavaşlatır."
+        "description": "Hedefi {damage} Fiziksel hasar için vurur ve 4 sn boyunca %50 yavaşlatır. Hasar menzilli saldırı gücüyle artar."
       },
       "mongoose_bite": {
-        "name": "Karşı Diş",
-        "description": "Hedef sıyırma yaptıktan sonra silah hasarı artı {damage} ile karşı saldırı. Sıyrılamaz."
+        "name": "Yara Yırtışı",
+        "description": "Silah hasarının %45'i artı {damage} vurur. Hedef Kanlı Kanca Yaran'ı taşıyorsa anında 1 yara tıkı verir ve yarayı 12 sn'ye tazeler. Hasar, silah hasarı üzerinden saldırı gücüyle artar."
+      },
+      "hunting_momentum": {
+        "name": "Av İvmesi",
+        "description": "Pasif: Deşen Vuruş 8 sn boyunca 1 Av İvmesi verir, en fazla 3. 3 katmanda Yara Yırtma 45% daha fazla vuruş hasarı verir ve katmanları tüketir. (Saha Ustalığı)"
+      },
+      "fieldcraft_reentry": {
+        "name": "Silahlı Dönüş",
+        "description": "Pasif: İz Kırma, Av İvmesini tazeler ve sonraki Deşen Vuruşunu veya Kanlı Çengelini 12 sn hazırlar. Deşen Vuruş katman başına 15% daha fazla hasar verir. Kanlı Çengel 18 ila 24 ek Fiziksel hasar verir; bu, katman başına 15% ve menzilli saldırı gücünle artar. 3 katmanda iki saldırıdan biri Av İvmesini tüketir. (Saha Ustalığı)"
       },
       "wing_clip": {
         "name": "Prangalayan Kesik",
-        "description": "Düşmanı {damage} hasarla yaralar, 10 saniye boyunca %40 yavaşlatır."
+        "description": "Hedefi {damage} Fiziksel hasar için biçer ve 10 sn boyunca %40 yavaşlatır. Hasar saldırı gücüyle artar."
       },
       "aspect_of_the_monkey": {
         "name": "Sansar Sureti",
@@ -9103,87 +9790,91 @@ export const tr_TR: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Küheylan Sureti",
-        "description": "Küheylan suretine bürünerek hareket hızını 30 dakika boyunca %30 artırırsın."
+        "description": "Rahvan suretine bürünerek hareket hızını 30 dakika boyunca %30 artırırsın."
       },
       "aimed_shot": {
         "name": "Uzun Çekiş",
-        "description": "{damage} hasar veren, dikkatle çekilmiş bir atış."
+        "description": "Hedefi {damage} Fiziksel hasar için vurur. Hasar menzilli saldırı gücüyle artar."
       },
       "rapid_fire": {
         "name": "Hummalı Çekiş",
-        "description": "Saldırı hızını 15 saniye boyunca %40 artırır."
+        "description": "Hareket ederken 2,4 saniye boyunca altı hızlı atış yapar. Her atış {damage} fiziksel hasar verir."
       },
       "smite": {
-        "name": "Cezalandırma",
-        "description": "Düşmanı {damage} Kutsal hasarla cezalandırır."
+        "name": "Arındıran İlahi",
+        "description": "{damage} Kutsal hasar verir. Hasar Büyü Gücü ile artar. Disiplin: bağlı her müttefiki hasarın %30'u kadar iyileştirir. Bağlı müttefik yoksa canı en düşük grup üyesini %15 iyileştirir."
       },
       "lesser_heal": {
         "name": "Fısıldanan Dua",
-        "description": "Dost bir hedefi {damage} iyileştirir."
+        "description": "Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar."
       },
       "power_word_fortitude": {
         "name": "Azim Yakarışı",
-        "description": "Hedefin Dayanıklılığını 30 dakika boyunca {buff} artırır."
+        "description": "Her grup üyesinin Dayanıklılığını 30 dakika boyunca %{buff} artırır."
       },
       "shadow_word_pain": {
         "name": "Çürüme Ağıdı",
-        "description": "Bir karanlık sözü 18 saniye boyunca {damage} Gölge hasarı verir."
+        "description": "18 sn boyunca toplam {damage} Gölge hasarı verir, her 3 sn'de bir kez. Hasar Büyü Gücü ile artar. Gölge: %10 daha fazla hasar verir ve Tasvirin üzerindeki her tık 1 Kasvet Öşürü verir."
       },
       "power_word_shield": {
         "name": "Koruma Mezmuru",
-        "description": "Hedefi kalkanlar ve 30 saniye boyunca {damage} hasarı emer."
+        "description": "Dost bir hedefi kalkanlar ve 30 sn boyunca {damage} hasar emer. Disiplin ayrıca hedefi 30 sn boyunca Kutsal hasarına bağlar."
       },
       "renew": {
         "name": "Kalıcı Lütuf",
-        "description": "Hedefi 15 saniye boyunca {damage} iyileştirir."
+        "description": "Hedefi 15 sn boyunca {damage} iyileştirir, her 3 sn'de bir kez. İyileştirme Büyü Gücü ile artar."
       },
       "mind_blast": {
         "name": "Zihin Kırılması",
-        "description": "Hedefin zihnini {damage} Gölge hasarıyla patlatır."
+        "description": "{damage} Gölge hasarı verir. Hasar Büyü Gücü ile artar. Gölge, bir hedefi Çürüme Ağıdın ile onun Tasviri olarak bağlar, 1 Kasvet Öşürü verir ve hasarın %30'unu Ağıdını taşıyan en fazla 3 başka düşmana yankılar."
       },
       "heal": {
         "name": "Vakur Dua",
-        "description": "Dost bir hedefi {damage} iyileştiren yavaş ama güçlü bir dua."
+        "description": "Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar."
       },
       "mind_flay": {
         "name": "Keder Yakarışı",
-        "description": "Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye {damage} hasar verir."
+        "description": "3 sn kanalize eder ve her saniye {damage} Gölge hasarı verir. Hasar Büyü Gücü ile artar."
       },
       "flash_heal": {
         "name": "Acil Dua",
-        "description": "Dost bir hedefi {damage} iyileştiren hızlı bir dua."
+        "description": "Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar."
       },
       "lightning_bolt": {
         "name": "Ark Oku",
-        "description": "Bir yıldırım oku fırlatarak {damage} Doğa hasarı verir."
+        "description": "{damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: isabet 1 Gök Gürültüsü verir."
+      },
+      "thunder_reservoir": {
+        "name": "Gök Gürültüsü Haznesi",
+        "description": "Pasif: Ark Oku ve Çatallı Yıldırım Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)"
       },
       "rockbiter_weapon": {
         "name": "Stonebound Silahı",
-        "description": "Silahına taşın gazabını işler: her vuruş 5 dakika boyunca {damage} ek hasar verir."
+        "description": "Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %30 zırh kazanır, %10 daha az hasar alır ve iki katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir."
       },
       "healing_wave": {
         "name": "Onaran Sular",
-        "description": "Dost bir hedefi {damage} iyileştirir."
+        "description": "Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar. Onarım: tam iyileştirmenin %50'sini aşırı iyileştirmeden önce 12 sn boyunca Onaran Akım olarak saklar, hedefin azami canının %30'una kadar."
       },
       "earth_shock": {
         "name": "Toprak Sarsıntısı",
-        "description": "Hedefi sersemletici bir kuvvetle anında şoklar ve {damage} Doğa hasarı verir."
+        "description": "{damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: 5 Gök Gürültüsü'nde %125 daha fazla hasar verir ve tüm Gök Gürültüsü'nü tüketir. Taşa Bağlı: hedefi 3 sn boyunca sana saldırmaya zorlar."
       },
       "lightning_shield": {
         "name": "Gök Gürültüsü Siperi",
-        "description": "Seni çatırdayan yıldırımla sarar: yakın dövüş saldırganları {buff} Doğa hasarı alır, en fazla 3 yük ve en fazla 5 saniyede bir kez."
+        "description": "Seni 10 dakika boyunca yıldırımlarla sarar. Sana yönelen sonraki 3 yakın dövüş saldırısı saldırgana {buff} Doğa hasarı verir, en fazla her 5 sn'de bir kez."
       },
       "flame_shock": {
         "name": "Köz Sarsıntısı",
-        "description": "Hedefi ateşle dağlar: {damage} hasar artı 12 saniye boyunca {overTime}."
+        "description": "{damage} Ateş hasarı, ardından 12 sn boyunca {overTime} Ateş hasarı verir. İlk isabet Büyü Gücü ile artar."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand Silahı",
-        "description": "Silahını element ateşiyle güçlendirir: her vuruş 5 dakika boyunca {damage} ek Ateş hasarı verir."
+        "description": "Silahına 30 dakika boyunca işler. Her savurma {damage} ek Ateş hasarı verir."
       },
       "frost_shock": {
         "name": "Ayaz Sarsıntısı",
-        "description": "Hedefi ayazla anında şoklar, {damage} Ayaz hasarı verir ve hareketini 8 saniye boyunca %50 yavaşlatır."
+        "description": "{damage} Buz hasarı verir ve hedefi 8 sn boyunca %50 yavaşlatır. Hasar Büyü Gücü ile artar."
       },
       "frostbrand_weapon": {
         "name": "Rimebound Silahı",
@@ -9191,11 +9882,11 @@ export const tr_TR: EnTranslations = {
       },
       "ghost_wolf": {
         "name": "Gölge Kurdu",
-        "description": "Seni bir Shadewolf'a dönüştürür ve hareket hızını 10 dakika boyunca %40 artırır."
+        "description": "Bir Shadewolf olur ve %40 daha hızlı hareket edersin. Olağan biçimine dönmek için yeniden kullan."
       },
       "stormstrike": {
         "name": "Atalar Darbesi",
-        "description": "Fırtınayı silahından geçirir ve silah hasarı artı {damage} için anında vurur."
+        "description": "Silah hasarı artı {damage} vurur ve Savaş Ruhu Ritmi'ni 2 adım ilerletir. Hasar, silah hasarı üzerinden saldırı gücüyle artar."
       },
       "shadow_bolt": {
         "name": "Kasvet Oku",
@@ -9213,9 +9904,29 @@ export const tr_TR: EnTranslations = {
         "name": "Kara Çürüme",
         "description": "Hedefi yozlaştırır, 18 saniye boyunca {damage} Gölge hasarı verir."
       },
+      "evil_eye": {
+        "name": "Kem Göz",
+        "description": "Bir düşmanı lanetlerinin odağı olarak işaretler. Gözü taşımak Mahkûmiyeti korur ama 20 sn'lik süresini yenilemez."
+      },
+      "maledict_gaze": {
+        "name": "Kem Bakış",
+        "description": "Kem Bakışın, seçili birincil Kem Gözüne her 2,5 sn'de bir Gölge hasarıyla saldırır. Kem Gözü Ele Geçir onun saldırı hızını ikiye katlar."
+      },
+      "needle_of_fate": {
+        "name": "Kader İğnesi",
+        "description": "Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa 5 Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler."
+      },
+      "sentence": {
+        "name": "Hüküm",
+        "description": "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir."
+      },
       "life_tap": {
         "name": "Ağır Pazarlık",
         "description": "{damage} canı {damage} manaya dönüştürür."
+      },
+      "cursed_accomplice": {
+        "name": "Lanetli Suç Ortağı",
+        "description": "Hiçbir müttefik seçili değilken Kem Gözünü bağlar, böylece onun Bakışı 2 Mahkûmiyet üretir. Seçili tek bir grup üyesini bağlamak yalnızca onların Kem Gözüne verdiği hasarın 3 üretmesini sağlar. Yeni bir bağ öncekinin yerini alır ve en fazla 2 sn'de bir tetiklenebilir."
       },
       "curse_of_agony": {
         "name": "Izdırap Büyüsü",
@@ -9223,7 +9934,47 @@ export const tr_TR: EnTranslations = {
       },
       "drain_life": {
         "name": "Tüketme",
-        "description": "Hedefin canını emer; 5 saniye boyunca her saniye sana {damage} can aktarır."
+        "description": "Hedefin canlılığını tüketir, her saniye {damage} Gölge hasarı verir ve bunun %70'ini can olarak sana aktarır. Izdırap bunun yerine tamamını aktarır. Birincil Kem Göz'üne kanalize edildiğinde başlangıçta tüm Kader İpliklerini tüketir ve her İplik tık başına 1 fazladan Mahkûmiyet üretir."
+      },
+      "litany_of_guilt": {
+        "name": "Suç Yakarışı",
+        "description": "Birincil Kem Gözünü 6 sn boyunca lanetler. Mahkûmiyet kazançları, 8 yarda içindeki en fazla 2 başka düşmana hasar veren bir dalga salar, en fazla saniyede bir. Kademe 2 bunu 8 sn'ye ve 4 düşmana çıkarır."
+      },
+      "cinderhide": {
+        "name": "Kor Deri",
+        "description": "Derini 10 sn boyunca soğuyan cürufa dönüştürür, alınan tüm hasarı %25 azaltır."
+      },
+      "umbral_anchor": {
+        "name": "Gölge Çapası",
+        "description": "İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu çapayı tüketir ve 45 saniyelik bekleme süresini başlatır."
+      },
+      "soulwell": {
+        "name": "Ruh Kuyusu",
+        "description": "3 dakika süreyle bir Ruh Kuyusu çağırır. Dövüş dışındayken, grup üyeleri Ruh Taşlarını en fazla 3'e kadar doldurabilir. Bir Ruh Taşı azami canın %25'ini geri kazandırır ve iksir bekleme süresini paylaşır."
+      },
+      "hex_of_violence": {
+        "name": "Şiddet Büyüsü",
+        "description": "Düşmanı 8 sn boyunca büyüler. Sonraki 3 hasar veren eylemi her seferinde 7 Mahkûmiyet üretir ve ona 16 Gölge hasarı vurur."
+      },
+      "cruel_pact": {
+        "name": "Zalim Ahit",
+        "description": "Azami canının %12'sini feda ederek azami manasının %1,5'ini geri kazandırır ve 20 Mahkûmiyet üretir. Can %20 veya altındayken kullanılamaz."
+      },
+      "vicarious_suffering": {
+        "name": "Dolaylı Istırap",
+        "description": "Istırabını 8 sn boyunca bağlar ve düşman vuruşlarından en fazla 15 Mahkûmiyet üretir. Kendi üzerinde, alınan hasarı %20 azaltır. Bir müttefik üzerinde, seni %15 canın altına düşürmeden hasarın en fazla %20'sini sana yönlendirir."
+      },
+      "possess_evil_eye": {
+        "name": "Kem Gözü Ele Geçir",
+        "description": "Lanetkâr, birincil Kem Gözünü 15 sn boyunca ele geçirir ve 35 Mahkûmiyet üretir. Kader İğnesi 1 sn'de okunur ve 2 ekstra Mahkûmiyet üretir, Tüketme hareket halindeyken kanalize edilebilir, Hüküm ise %25 daha fazla hasar verir ve %60 hasarla gecikmeli bir yankı salar, bu oran seviye 17-20 arasında %30'a geriler."
+      },
+      "hour_of_judgment": {
+        "name": "Yargı Saati",
+        "description": "Birincil Kem Gözüne 15 sn süreyle yargı çağırır: 40 Mahkûmiyet ve 3 Kader İpliği kazandırır, Ele Geçirmeyi etkinleştirir, birincil Gözden üretilen Mahkûmiyeti ikiye katlar ve Hüküm hasarını %20 artırır. İlk Hüküm 50 Mahkûmiyet geri kazandırır."
+      },
+      "coven": {
+        "name": "Cadı Meclisi",
+        "description": "Yakındaki en fazla 4 düşman üzerinde 15 sn süreyle ikincil Kem Gözler oluşturur. Bunlar ortak Mahkûmiyet havuzunu %50 oranında besler ve Hüküm onlara %35 hasarla yankılanır."
       },
       "fear": {
         "name": "Dehşet",
@@ -9235,11 +9986,16 @@ export const tr_TR: EnTranslations = {
       },
       "shadowburn": {
         "name": "Alaca Ateşi",
-        "description": "Hedefi anında dağlayan gölge ile vurarak {damage} Gölge hasarı verir."
+        "description": "1 Tahribat harcayarak canı %20'nin altındaki bir düşmanı {damage} Gölge hasarıyla infaz eder. İşaretlenen hedef 5 sn içinde ölürse Tahribatını geri öder."
+      },
+      "ruinous_brand": {
+        "name": "Yıkıcı Damga",
+        "description": "Bir düşmanı 15 sn süreyle damgalar. Sonraki 3 doğrudan büyün, damgalı düşmana karşı %25 hasarla yankılanır ya da başka bir hedefe atıldığında ona %50 hasar kopyalar."
       },
       "wrath": {
         "name": "Yaban Oku",
-        "description": "{damage} Doğa hasarı için bir doğa enerjisi oku fırlatır."
+        "description": "Bir doğa enerjisi yıldırımı fırlatarak {damage} Doğa hasarı verir.",
+        "specNote_balance": "Aykuşu Formundayken, tamamlanan her okuma 1 Ay Gelgiti ekler (en fazla 3). 3 Ay Gelgitinde, Ay Tohumu Ay Kabarışına, Gök Düşüşü ise Güneş İzine dönüşür."
       },
       "healing_touch": {
         "name": "Yaban Şifası",
@@ -9251,11 +10007,17 @@ export const tr_TR: EnTranslations = {
       },
       "moonfire": {
         "name": "Ay Fırtınası",
-        "description": "Düşmanı ay ateşiyle {damage} Gizemli hasar ve zamana yayılı hasar ile yakar."
+        "description": "Düşmanı ay ateşiyle yakarak {damage} Gizemli hasar artı zamana yayılı hasar verir.",
+        "specNote_balance": "Yanmaya devam ettir: Ay Tohumu süresini 6 sn uzatır."
+      },
+      "moonseed": {
+        "name": "Ay Tohumu",
+        "description": "Yalnızca Aykuşu Formunda. {damage} Gizem hasarı vurur, bir Ay Gelgiti aşaması ekler ve Ay Fırtınanı 6 sn uzatır, uygulama başına en fazla 6 sn. Ay Gelgiti doluyken Ay Tohumu, Ay Kabarışına dönüşür."
       },
       "rejuvenation": {
         "name": "Yaban Çiçeği",
-        "description": "Hedefi 12 saniye boyunca {damage} iyileştirir."
+        "description": "Hedefi 12 sn boyunca {damage} iyileştirir.",
+        "specNote_restoration": "YENİ bir çiçek dikmek 1 Yeşillik ekler (en fazla 5). 5 Yeşillikte, Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür."
       },
       "thorns": {
         "name": "Diken Muhafızı",
@@ -9271,7 +10033,8 @@ export const tr_TR: EnTranslations = {
       },
       "maul": {
         "name": "Kemik Kıran",
-        "description": "Yakın dövüş hasarını {damage} artıran ve yüksek miktarda tehdit yaratan hırpalayıcı bir saldırı. Bir sonraki vuruşunda etkinleşir. Yalnızca Bruin Formu."
+        "description": "Yakın dövüş hasarını {damage} artıran ve yüksek miktarda tehdit yaratan bir parçalama saldırısı. Bir sonraki vuruşunda etkinleşir. Yalnızca Bruin Formu.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme İlik Kırana dönüşür: yüksek tehditle 78 ila 96 hasar veren bir vuruş; can yarısının altındayken bunun yerine azami canının %18'i kadar seni kalkanlar ve 15 öfke geri kazandırır."
       },
       "growl": {
         "name": "Gözdağı",
@@ -9279,23 +10042,27 @@ export const tr_TR: EnTranslations = {
       },
       "cat_form": {
         "name": "Kurt Formu",
-        "description": "Bir kurda dönüş: saldırı gücü seviyenle yükselir, saldırıların enerji ve kombo puanı kullanır ve %29 daha az tehdit üretirsin. Büyücü formuna dönmek için tekrar kullan."
+        "description": "Seni bir kurda dönüştürür: çeviklik seviyenle yükselir, saldırı gücü +8 artı seviye başına 2, saldırıların enerji ve kombo puanı kullanır ve %29 daha az tehdit üretirsin. Büyücü biçimine dönmek için yeniden kullan."
       },
       "claw": {
-        "name": "Pençe",
-        "description": "Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kurt Formu."
+        "name": "Yırtan Pençe",
+        "description": "Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "ferocious_bite": {
         "name": "Kanlı Isırık",
-        "description": "{damage} veren bitirici hamle. Yalnızca Kurt Formu."
+        "description": "{damage} veren bitirici hamle. Yalnızca Kurt Formu.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: kombo puanı başına 70 artı 43 hasar veren, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vuran ve 30 enerji geri kazandıran bir ısırık."
       },
       "swipe": {
         "name": "Süpüren Pençeler",
-        "description": "Yakındaki düşmanları {damage} hasar için savurur. Ekstra tehdit üretir. Yalnızca Bruin Formu."
+        "description": "Pençelerini yakındaki düşmanların arasından geçirerek {damage} hasar ver. Ekstra tehdit yaratır. Yalnızca Bruin Formu.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "regrowth": {
         "name": "İkinci Çiçeklenme",
-        "description": "Dost bir hedefi {damage} ve 21 saniye boyunca ek bir miktar iyileştirir."
+        "description": "Dost bir hedefi {damage} ve 21 sn boyunca ek bir miktar iyileştirir.",
+        "specNote_restoration": "YENİ bir çiçek dikmek 1 Yeşillik ekler (en fazla 5)."
       },
       "barkskin": {
         "name": "Meşe Derisi",
@@ -9311,7 +10078,8 @@ export const tr_TR: EnTranslations = {
       },
       "starfire": {
         "name": "Gök Düşüşü",
-        "description": "Yıldız ateşinden bir ok indirir ve {damage} Gizemli hasar verir."
+        "description": "Yıldız ateşinden bir yıldırım çağırarak {damage} Gizemli hasar verir.",
+        "specNote_balance": "Aykuşu Formundayken, tamamlanan her okuma 1 Ay Gelgiti ekler (en fazla 3). 3 Ay Gelgitinde, bu düğme Güneş İzine dönüşür: 80 ila 100 Doğa hasarı artı 9 sn boyunca 45 yanık hasarı veren, 35 mana geri kazandıran ve tüm 3'ünü harcayan anlık bir vuruş."
       },
       "travel_form": {
         "name": "Fleet Formu",
@@ -9327,7 +10095,7 @@ export const tr_TR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Cadı Işığı",
-        "description": "Hedefin zırhını 40 saniye boyunca %{damage} azaltır. Zırh Kesme ile birlikte istiflenmez."
+        "description": "Hedefin zırhını 40 sn boyunca %{damage} azaltır."
       },
       "hibernate": {
         "name": "Derin Uyku",
@@ -9350,8 +10118,9 @@ export const tr_TR: EnTranslations = {
         "description": "Saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu."
       },
       "rip": {
-        "name": "Parçalama",
-        "description": "12 saniye boyunca {damage} Kanama hasarı veren bitirici hamle. Kombo puanlarını tüketir. Yalnızca Kurt Formu."
+        "name": "Kanlı Yarık",
+        "description": "Hedefi 24 sn boyunca her 2 sn'de kanatan bitirici hamle: 36 hasar artı harcanan kombo puanı başına 24 (5 kombo puanı: toplam {damage}). Yalnızca Kurt Formu.",
+        "specNote_feral": "İsabet eden vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "mortal_strike": {
         "name": "Sakatlayan Darbe",
@@ -9378,32 +10147,120 @@ export const tr_TR: EnTranslations = {
         "description": "Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)"
       },
       "chain_heal": {
-        "name": "Zincirleme İyileştirme",
-        "description": "Bir müttefiki büyük miktarda iyileştirir, ardından yakındaki en fazla 2 müttefike sıçrar ve her sıçramada %50 daha az iyileştirir. (Restorasyonun simge yeteneği)"
+        "name": "Şelale Şifası",
+        "description": "Dost bir hedefi {damage} kadar iyileştirir, ardından 12 metre içindeki en fazla 2 müttefike sıçrar. Her sıçrama önceki hedefin 50% kadarıyla iyileştirir. Ulaşılan her müttefik kalan Onarım Akıntını tüketir ve tüketilen miktarın 125% kadarıyla anında iyileştirir. İlk iyileştirme büyü gücüyle artar. (Onarım imzası)"
+      },
+      "galeheart_weapon": {
+        "name": "Fırtına Yüreği Silahı",
+        "description": "Her iki silahı 30 dk büyüler ve Savaş Ruhu Ritmini etkinleştirir."
+      },
+      "warspirit_cadence": {
+        "name": "Savaş Ruhu Ritmi",
+        "description": "Pasif: isabet eden her 3. silah saldırısı 50% Doğa hasarıyla 2 Fırtına Yüreği Yankısı tetikler ve 12 sn boyunca Fırtına Alameti verir. Fırtına Alameti sonraki Ark Okunu, Sarsıntını veya Onaran Sularını anında yapar ve mana maliyetini 50% düşürür. Ata Vuruşu 2 saldırı sayılır. (Savaş Ruhu)"
+      },
+      "stormsurge": {
+        "name": "Fırtına Kabarması",
+        "description": "Pasif: Ata Vuruşu beklemedeyken bir Fırtına Alameti tüketmenin onu sıfırlama ihtimali 25%. İlk 3 şans başarısız olursa 4.'sü her zaman sıfırlar. (Savaş Ruhu)"
+      },
+      "lifespring_weapon": {
+        "name": "Yaşam Pınarı Silahı",
+        "description": "Silahını 30 dk büyüler. Onaran Sular ve Gelgit Çağrısı, Onarım Akıntısına 20% daha fazla iyileştirme ekler."
+      },
+      "unleash_weapon": {
+        "name": "Silahı Salıver",
+        "description": "Silahının etkin büyüsünü salıverir. Ateş Damgası 54 ila 64 Ateş hasarı verir, büyü gücünün 30% kadarını kazanır ve 2 Gök Gürültüsü verir. Fırtına Yüreği silahınla vurur, Savaş Ruhu Ritmini ilerletir ve 6 sn boyunca 20% saldırı hızı verir. Taş Bağı silah hasarının 75% kadarıyla vurur, hedefi sana saldırmaya zorlar ve alınan hasarı 4 sn boyunca 20% azaltır. Yaşam Pınarı, Onarım Akıntını tüketir, kalan iyileştirmesinin 125% kadarını iyileştirir ve 8 sn içindeki sonraki vuruşu geri kazandırılan canın 50% kadarı azaltır."
+      },
+      "elemental_trance": {
+        "name": "Element Transı",
+        "description": "15 sn süren bir element transına gir, alınan hasarı %30 azalt ve verdiğin tüm hasarın %20'sini manaya dönüştür. (Warspirit motoru)"
+      },
+      "primal_exaltation": {
+        "name": "İlksel Yüceltme",
+        "description": "12 sn boyunca Gök Gürültüsü Çağrısının Ark Oku ve Çatallı Yıldırımı 50% daha hızlı okunur ve Ark Oku 2 Gök Gürültüsü verir; Savaş Ruhu her 2 silah isabetinde ritmini tetikler; Ruh Onarımı, Onarım Akıntısına 50% daha fazla iyileştirme ekler. (Şaman yeteneği)"
+      },
+      "stoneward": {
+        "name": "Taş Muhafız",
+        "description": "Bir müttefiki 60 sn boyunca 6 şarjla korur. Hasar bir şarj tüketerek azami canın 5% kadarını iyileştirir, 3 snde bir. (Şaman yeteneği)"
+      },
+      "tidecall": {
+        "name": "Gelgit Çağrısı",
+        "description": "Dost bir hedefi {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar. Taşma öncesi tam iyileştirmeyi, hedefin azami canının 30% kadarına dek Onarım Akıntısına ekler."
+      },
+      "soul_harvest": {
+        "name": "Öz Hasadı",
+        "description": "Düşmanın ruhunu {damage} Gölge hasarıyla parçalar ve 1 Ruh Parçası oluşturur, en fazla 5."
+      },
+      "soul_lance": {
+        "name": "Ruh Mızrağı",
+        "description": "{damage} Gölge hasarı veren hayaletimsi bir mızrak fırlatır. Kemik Damgana karşı kullanılırsa, hasarının %50'si damgaya eklenir."
+      },
+      "raise_graveguard": {
+        "name": "Mezar Muhafızı Diriltme",
+        "description": "Kalıcı, savunma amaçlı bir yoldaş diriltir. Mezar Muhafızı otomatik olarak kışkırtır, Mezar Hükümranlığı aracılığıyla hasarının %20'sini üstlenir ve Hasat Emri onu kışkırtmaya zorlar ve 4 sn boyunca %30 daha az hasar almasını sağlar."
+      },
+      "raise_skeletal_warrior": {
+        "name": "İskelet Savaşçı Diriltme",
+        "description": "1 Ruh Parçası harcayarak 2 kişilik Hükümranlığına kalıcı bir İskelet Savaşçı ekler. Sana yalnızca bir tanesi hizmet edebilir. Her 6 sn'de bir yakındaki düşmanları %45 hasarla biçer ve Hasat Emri hedefini 4 sn boyunca %40 yavaşlatarak sabitler."
+      },
+      "raise_bone_mage": {
+        "name": "Kemik Büyücü Diriltme",
+        "description": "2 Ruh Parçası harcayarak 2 kişilik Hükümranlığına kalıcı bir menzilli Kemik Büyücü ekler. Sana yalnızca bir tanesi hizmet edebilir. Saldırıları hedefi 6 sn boyunca %5 daha fazla büyü hasarına açık bırakır ve Hasat Emri bu zayıflığı %8'e çıkarır."
+      },
+      "bone_armor": {
+        "name": "Kemik Zırhı",
+        "description": "Seni kemiklerle sarar, azami canının %20'si kadar hasarı emer."
+      },
+      "corpse_explosion": {
+        "name": "Ceset Patlaması",
+        "description": "Önce bir Kemik Büyücüyü, sonra bir İskelet Savaşçıyı, bir Mezar Kanadını ise yalnızca son çare olarak feda eder. Kopyalar arasında önce en az kalan süreye, sonra en zayıfa sahip olanı seçer ve seçilen konumda {damage} Gölge hasarı verir."
+      },
+      "funeral_harvest": {
+        "name": "Cenaze Hasadı",
+        "description": "Senin ya da ölülerinin yakın zamanda hasar verdiği bir düşman öldüğünde, 1 Ruh Parçası kazanırsın. Bu en fazla 3 sn'de bir gerçekleşebilir."
+      },
+      "ossuary_mark": {
+        "name": "Kemik Damgası",
+        "description": "Bir düşmanı 12 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur."
+      },
+      "unholy_command": {
+        "name": "Kutsuz Emir",
+        "description": "3 Ruh Parçası harcayarak tüm ölülerine 12 sn boyunca %25 daha fazla hasar vermelerini ve %20 daha hızlı hareket etmelerini emreder."
+      },
+      "reaping_command": {
+        "name": "Hasat Emri",
+        "description": "2 Ruh Parçası harcayarak tüm ölü hizmetkarlara birlikte vurma emri verir. Mezar Muhafızları kışkırtır ve hazırlanır, Savaşçılar sabitler, Kemik Büyücüler büyü savunmalarını açığa çıkarır ve Mezar Kanadı vurduğu tüm düşmanları parçalar."
+      },
+      "sacrifice_undead": {
+        "name": "Ölüyü Feda Et",
+        "description": "Azami canının %25'ini geri kazanmak için bir Hükümranlık hizmetkarını yok eder."
+      },
+      "raise_gravewing": {
+        "name": "Mezar Kanadı Diriltme",
+        "description": "2 Ruh Parçası harcayarak 2 kişilik Hükümranlığına kalıcı bir Mezar Kanadı ekler. Sana yalnızca bir tanesi hizmet edebilir. Her 5 sn'de bir yakındaki düşmanları %65 hasarla biçer ve Hasat Emri vurulan her düşmanın 5 sn boyunca %8 daha fazla hasar almasını sağlar."
+      },
+      "army_of_the_dead": {
+        "name": "Ölüler Ordusu",
+        "description": "Geçici bir İskelet Savaşçı, Kemik Büyücü ve Mezar Kanadı diriltmek için 20 sn süreyle bir mezar portalı açar; kalıcı Hükümranlık hizmetkarlarının boş bıraktığı yerleri doldurur."
       },
       "metamorphosis": {
-        "name": "Metamorfoz",
-        "description": "İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)"
+        "name": "Lich Biçimi",
+        "description": "20 sn boyunca bir lich olursun, 3 Ruh Parçası yaratır ve büyü hasarın ile büyü hızını %20 artırırsın. Ölüsüzlerin %50 daha fazla hasar verir ve %20 daha hızlı davranır, Ruh Mızrağı ise hedefini delip geçerek yakındaki en fazla 2 düşmana hasarının %50'si kadar vurur. (Nekromansi imzası)"
       },
       "holy_shock": {
         "name": "Kutsal Şok",
         "description": "Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)"
       },
-      "aura_surge": {
-        "name": "Şafak Sekmesi",
-        "description": "Şafakta dövülmüş bir kalkan fırlatarak {damage} Kutsal hasar verir, ana hedefi 2 sn susturur ve ardından 10 metre içindeki en fazla 2 ek düşmana sekerek her sekmede %75 hasar verir. (Paladin yeteneği)"
-      },
       "holy_shield": {
         "name": "Kutsal Kalkan",
-        "description": "Seni 10 sn boyunca Kutsal güçle korur, zırhı 90 artırır ve yakın dövüş saldırganlarına 12 Kutsal hasar verir. (Koruma imzası)"
+        "description": "Engellemeyi %30 artırır ve {duration} saniye boyunca azami canının %{damage} kadarına eşit kalkan verir. Yükseliş savunmayı güçlendirir."
       },
       "bestial_wrath": {
         "name": "Vahşi Gazap",
-        "description": "Seni vahşi bir öfkeye sokar, saldırı gücünü 15 sn boyunca 55 artırır. (Canavar Ustalığı imzası)"
+        "description": "3 Sürü Vahşeti verir. 20 sn içindeki bir sonraki Canavarı Salıver'in %50 daha fazla vuruş ve pençe hasarı verir ve çılgınlığı 8 yerine 12 sn sürer. (Canavar Hakimiyeti imzası)"
       },
       "trueshot_aura": {
         "name": "Keskin Nişan Aurası",
-        "description": "Yakındaki müttefiklere ilham verir, saldırı gücünü 5 dk boyunca 35 artırır. (Nişancılık imzası)"
+        "description": "30 m içindeki müttefiklerin saldırı gücünü 30 dakika boyunca %10 artırır. (Keskin Nişancılık imzası)"
       },
       "wyvern_sting": {
         "name": "Viverna Sokması",
@@ -9423,31 +10280,31 @@ export const tr_TR: EnTranslations = {
       },
       "cold_blood": {
         "name": "Soğukkanlılık",
-        "description": "Öldürme niyetini odaklar, böylece sonraki saldırın kritik vuruş olur. (Suikast imzası)"
+        "description": "Öldürme niyetini odaklar, böylece bir sonraki saldırın kritik vuruş olur. (Knifework motoru)"
       },
       "blade_flurry": {
         "name": "Bıçak Yağmuru",
-        "description": "Bir bıçak yağmuru salar, saldırı hızını 12 sn boyunca 20% artırır. (Çarpışma imzası)"
+        "description": "Bir bıçak fırtınası salar, saldırı hızını 12 sn boyunca %20 artırır. (Thuggery motoru)"
       },
       "hemorrhage": {
         "name": "Kanama",
-        "description": "Düşmana silah hasarı artı {damage} vurur ve 12 sn boyunca kanama hasarı verir. 1 kombo puanı kazandırır. (İncelik imzası)"
+        "description": "Düşmana silah hasarı artı {damage} ile vurur, 12 sn boyunca kanama hasarı verir ve alınan kanama hasarını %40 artırır. 1 kombo puanı kazandırır. Her 2. kullanım 1 Alacakaranlık ekler (en fazla 3). (Skulduggery motoru)"
       },
       "power_infusion": {
         "name": "Güç Aşılaması",
-        "description": "Dost bir hedefe güç aşılar, büyü gücünü 15 sn boyunca 28 artırır. (Disiplin imzası)"
+        "description": "Dost bir hedefi kutsar, hasarı, iyileştirmeyi ve büyü hızını 15 sn boyunca %20 artırır."
       },
       "holy_nova": {
-        "name": "Kutsal Nova",
-        "description": "Kutsal ışık patlaması yaratır, yakındaki müttefikleri {damage} kadar iyileştirir ve yakındaki düşmanlara hasar verir. (Kutsal imza)"
+        "name": "Güneş İlahisi",
+        "description": "10 m içindeki müttefikleri {damage} iyileştirir ve aynı alandaki düşmanlara 24 ila 30 Kutsal hasar verir. Her iki miktar da Büyü Gücü ile artar. (Kutsal temeli)"
       },
       "shadowform": {
-        "name": "Gölge Formu",
-        "description": "Gölge formuna girer, geri dönene kadar gölge büyüsünü güçlendirirsin. Normal forma dönmek için tekrar kullan. (Gölge imzası)"
+        "name": "Alacakaranlık Perdesi",
+        "description": "Alacakaranlık Perdesi'ne girersin ve Gölge hasarını %25 artırırsın. Alacakaranlık Perdesi'nden çıkmak için yeniden kullan. (Gölge imzası)"
       },
       "elemental_mastery": {
         "name": "Element Ustalığı",
-        "description": "Element ustalığını çağırır, sonraki büyünü anında yapar. (Element imzası)"
+        "description": "12 sn boyunca Ark Oku 2 Gök Gürültüsü verir. Bir sonraki Ark Oku ya da Çatallı Yıldırım'ın anındadır ve bir sonraki tam Gök Gürültüsü ödemen %25 daha fazla hasar verir. (Elementsel imzası)"
       },
       "siphon_life": {
         "name": "Can Sömürüsü",
@@ -9455,7 +10312,7 @@ export const tr_TR: EnTranslations = {
       },
       "conflagrate": {
         "name": "Tutuşturma",
-        "description": "Düşmandaki Yakma etkini tüketerek onu {damage} Ateş hasarıyla tutuşturur. (Yıkım imzası)"
+        "description": "Yanan Ahdinin gelecek bir tıkını öne alır, ardından hedefi {damage} Ateş hasarı için tutuşturur. 1 Tahribat ve 1 Harabiyet üretir. 2 şarj tutar. (Yıkım imzası)"
       },
       "moonkin_form": {
         "name": "Aykuşu Formu",
@@ -9467,15 +10324,35 @@ export const tr_TR: EnTranslations = {
       },
       "swiftmend": {
         "name": "Hızlı İyileştirme",
-        "description": "Dost bir hedefteki zamanla iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. (Restorasyon imzası)"
+        "description": "Dost bir hedefteki zamana yayılı bir iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. Yaban Çiçeği ve İkinci Çiçeklenme dikimleri Yeşillik ekler; 5 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılı iyileştirme etkilerini taşıyan her müttefiki, o etkilerin kalanının %60'ı kadar anında iyileştirir. (Groveheart motoru)"
+      },
+      "moonlash": {
+        "name": "Ay Kabarışı",
+        "description": "3 Ay Gelgitini {damage} Gizem hasarı veren ağır bir vuruş için tüketir: hasar seçimi. Güneş İzi de aynı 3 Ay Gelgitini tüketir, o yüzden birini seç."
+      },
+      "sunlance": {
+        "name": "Güneş İzi",
+        "description": "3 Ay Gelgitini, {damage} Doğa hasarı ve 9 saniyede {overTime} yanık veren bir vuruş için tüketir ve 35 mana geri kazandırır: mana seçimi. Ay Kabarışı da aynı 3 Ay Gelgitini tüketir, o yüzden birini seç."
+      },
+      "redharvest": {
+        "name": "Kızıl Hasat",
+        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve 30 enerji geri kazandırır. Sıfır combo puanıyla da çalışır."
+      },
+      "marrowbreak": {
+        "name": "İlik Kıran",
+        "description": "3 Kadim Kanı yüksek tehditli, {damage} hasar veren ağır bir vuruş için tüketir. Canın yarısının altındayken bunun yerine 8 sn boyunca azami canının %18 kadarı değerinde bir kalkanla seni korur ve 15 öfke iade eder."
+      },
+      "overbloom": {
+        "name": "Taşkın Çiçeklenme",
+        "description": "5 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin 60% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Yaban Çiçeği eker."
       },
       "summon_imp": {
         "name": "Emberkin Çağırma",
-        "description": "Karabüyücünün komutası altında bir Emberkin çağırır. Emberkin, düşmanlarına uzaktan Kül Okları fırlatır. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir."
+        "description": "Büyücünün emrine bir Emberkin çağırır. Emberkin, düşmanlarına uzaktan Kül Oku savurur. Yeni bir iblis çağırmak mevcut olanı gönderir. Aynı anda tek bir iblisin olabilir."
       },
       "summon_voidwalker": {
         "name": "Gloomshade Çağırma",
-        "description": "Karabüyücünün komutası altında bir Gloomshade çağırır. Gloomshade, düşmanlarını kışkırtan ve cezayı üstüne çeken sağlam bir iblistir. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir."
+        "description": "Büyücünün emrine bir Gloomshade çağırır. Bu dayanıklı iblis düşmanlarla alay eder ve uzaktaki sıradan düşmanları menzile geri sürüklemek için Uçurum Zinciri kullanır. Patronlar çekilemez. Yeni bir iblis çağırmak mevcut olanı gönderir. Aynı anda tek bir iblisin olabilir."
       },
       "summon_succubus": {
         "name": "Duskborn Çağırma",
@@ -9491,7 +10368,7 @@ export const tr_TR: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Pyre Colossus Çağırma",
-        "description": "Bir Pyre Colossus'u iradene bağlar: ezici yakın dövüşe ve herhangi bir iblisin en derin canına ve zırhına sahip hantal bir devasa güç. Uzun bir bekleme süresi ham gücünü dizginler. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir."
+        "description": "Hedef alana bir Pyre Colossus indirerek çarpma anında 58-72 Ateş hasarı verir. İblisinin yerini almadan 30 sn. savaşır, yakındaki düşmanları 2 sn.'de bir yakar ve her saniye 1 Ruin üretir."
       },
       "summon_doomguard": {
         "name": "Wraithborn Çağırma",
@@ -9586,8 +10463,8 @@ export const tr_TR: EnTranslations = {
         "description": "Savunma yeteneği: 8 sn boyunca %30 daha az hasar alır ve saldırıları çok daha sık savuşturursun."
       },
       "intervene": {
-        "name": "Intervene",
-        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
+        "name": "Müdahale",
+        "description": "Dost bir oyuncuya atılarak onu kalkanlar ve 6 saniye boyunca {damage} hasarı emer."
       },
       "recklessness": {
         "name": "Pervasızlık",
@@ -9603,7 +10480,7 @@ export const tr_TR: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Gözdağı Narası",
-        "description": "8 yarda içindeki en fazla 5 düşmanı 8 sn boyunca korku içinde kaçırtan dehşet verici bir nara. Hasar etkiyi bozabilir."
+        "description": "8 m içindeki en fazla 5 düşmanı 4 sn boyunca korkuyla kaçırtan dehşet verici bir haykırış. Hasar etkiyi bozabilir."
       },
       "revenge": {
         "name": "İntikam",
@@ -9626,8 +10503,8 @@ export const tr_TR: EnTranslations = {
         "description": "20 sn boyunca bir devcüsseye dönüşür, üzerindeki tüm kontrol etkilerini kırar ve verdiğin hasarı %20 artırırsın."
       },
       "avenging_wrath": {
-        "name": "İntikam Kanadı",
-        "description": "İntikam gücünü çağırır, saldırı gücünü 20 sn. boyunca 60 ve büyü gücünü 30 artırır. (Paladin yeteneği)"
+        "name": "İntikam Gazabı",
+        "description": "Altın kutsal güçten cismani kanatlar açar, 10 Adanmışlık kazanır ve 15 sn boyunca yeteneklerinin ürettiği Adanmışlığı ikiye katlar. Ayrıca verdiğin hasarı ve iyileştirmeyi %20 artırır. Şafak biçicisi: Gazap Çekici'ni herhangi bir hedefe karşı mümkün kılar."
       },
       "berserk": {
         "name": "Kızıl Sis",
@@ -9643,19 +10520,23 @@ export const tr_TR: EnTranslations = {
       },
       "bloodlust": {
         "name": "Savaş Davulları",
-        "description": "30 m içindeki müttefikleri çılgınlığa sürükler ve saldırı hızlarını 15 sn. boyunca %30 artırır. (Şaman yeteneği)"
+        "description": "30 m içindeki grup ya da akın müttefiklerinin saldırı, büyü ve kanalize hızını 15 sn boyunca %30 artırır. Etkilenen müttefikler 10 dakika boyunca Savaş Davulları ya da Zamansal Hızlanma'dan yeniden yararlanamaz. (Şaman yeteneği)"
       },
       "chain_lightning": {
         "name": "Çatallı Yıldırım",
-        "description": "Hedef alana yıldırım savurarak yakındaki düşmanlara {damage} hasar verir. (Şaman yeteneği)"
+        "description": "10 m içindeki en fazla 3 düşmana her birine {damage} Doğa hasarı vurur. Elementsel: isabet 1 Gök Gürültüsü verir. Hasar Büyü Gücü ile artar."
+      },
+      "abyssal_rift": {
+        "name": "Uçurum Yarığı",
+        "description": "Seçilen konumda bir yarık açar, 8 yarda içindeki düşmanları merkezine çeker, {damage} Gölge hasarı verir ve onları 2 sn sersemletir. Patronlar hasar alır ama çekilmeye ve sersemlemeye direnir."
       },
       "chaos_bolt": {
         "name": "Yıkım Oku",
-        "description": "{damage} Ateş hasarı veren kaotik bir ateş oku fırlatır. (Karabüyücü yeteneği)"
+        "description": "3 Tahribat harcayarak {damage} Ateş hasarı veren ağır bir kaotik ateş oku savurur. Harabiyet büyü süresini %30 kısaltır."
       },
-      "cleansing_verdict": {
-        "name": "Arındırıcı Hüküm",
-        "description": "Dost bir hedeften zararlı bir büyü etkisini kaldırır ve onu {damage} Kutsal iyileştirir."
+      "dark_pact": {
+        "name": "Kanlı Ahit",
+        "description": "Mevcut canının %10'unu feda ederek 8 sn boyunca azami canının %30'u kadar hasarı emer."
       },
       "cloak_of_shadows": {
         "name": "Gölge Pelerini",
@@ -9683,23 +10564,23 @@ export const tr_TR: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Son Dua",
-        "description": "Seni anında {damage} iyileştirir. (Rahip yeteneği)"
+        "description": "Seni azami canının 30% kadarıyla anında iyileştirir."
       },
       "deterrence": {
         "name": "Diken Muhafızı",
         "description": "Kaçınma şansını 10 sn. boyunca 50 yüzde puan artırır. (Avcı yeteneği)"
       },
-      "divine_shield": {
-        "name": "Işık Siperi",
-        "description": "Seni kutsal güçle korur ve 8 sn. boyunca 900 hasar soğurur. (Paladin yeteneği)"
-      },
       "earthbind": {
         "name": "Kavrayan Toprak",
-        "description": "Yakındaki düşmanları toprağa bağlar ve 2 sn. boyunca kökler. (Şaman yeteneği)"
+        "description": "Hedef noktanın 4 m çevresindeki düşmanları 2 sn kökler, ardından 6 sn boyunca %40 yavaşlatır. (Şaman yeteneği)"
       },
       "evocation": {
         "name": "Eter Kuyusu",
         "description": "Restaura manayı rápidamente. (büyücü yeteneği)"
+      },
+      "flurry_of_knives": {
+        "name": "Bıçak Sağanağı",
+        "description": "Fırlatma bıçaklarıyla 6 m içindeki tüm düşmanları biçer, {damage} fiziksel hasar verir ve 2 kombo puanı kazandırır. (Haydut yeteneği)"
       },
       "frenzied_regeneration": {
         "name": "Yaban Onarımı",
@@ -9711,19 +10592,15 @@ export const tr_TR: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Hayalet Vuruş",
-        "description": "Düşmana silah hasarı artı {damage} vurur, kaçınmayı kısa süreliğine artırır ve 1 kombo puanı kazandırır. (Haydut yeteneği)"
+        "description": "Düşmana silah hasarı artı {damage} ile vurur ve 7 sn boyunca kaçınma şansını %15 artırır. 1 kombo puanı kazandırır. (Haydut yeteneği)"
       },
       "hammer_of_wrath": {
-        "name": "Çınlayan Çekiç",
-        "description": "Yaralı bir düşmana kutsal çekiç fırlatarak {damage} Kutsal hasar verir. Yalnızca %20 sağlığın altında kullanılabilir. (Paladin yeteneği)"
+        "name": "Gazap Çekici",
+        "description": "{damage} hasar için kutsal bir çekiç savurur ve 1 Adanmışlık üretir. Canın %20'nin altındayken ya da Kutsal Yüceliş veya İntikam Gazabı sırasında kullanılabilir. Şafağın Gazabı, herhangi bir hedefe karşı, süregelen bekleme süresini yok sayan ve %20 daha fazla hasar veren fazladan bir kullanım verir. Yüceliş hasarını %30 artırır."
       },
       "healing_stream": {
         "name": "Kaynak Kuyusu",
         "description": "Bir müttefik hedefe 12 sn. boyunca 120 sağlık yeniler. (Şaman yeteneği)"
-      },
-      "holy_wrath": {
-        "name": "Aziz Hiddeti",
-        "description": "Kutsal güç salarak yakındaki düşmanlara {damage} hasar verir. (Paladin yeteneği)"
       },
       "howl_of_terror": {
         "name": "Dehşet Uluması",
@@ -9735,7 +10612,7 @@ export const tr_TR: EnTranslations = {
       },
       "inner_focus": {
         "name": "Dingin Zihin",
-        "description": "Bir sonraki büyünü ücretsiz yapar. 60 sn. sürer. (Rahip yeteneği)"
+        "description": "Bir sonraki rahip büyünü bedava ve kesintiye uğratılamaz kılar. 60 sn sürer."
       },
       "innervate": {
         "name": "Yaşam Özsuyu",
@@ -9781,6 +10658,10 @@ export const tr_TR: EnTranslations = {
         "name": "Toplu Geri Sarım",
         "description": "Grubunuzdaki veya baskınınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları bedenlerinin yanında %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)"
       },
+      "ancestor_return": {
+        "name": "Ataların Dönüşü",
+        "description": "Grubunun ya da akınının düşmüş her üyesini bedeninin başında 30% can ve manayla yaşama döndürür. Savaşta okunamaz. (Ruh Onarımı)"
+      },
       "temporal_rewind": {
         "name": "Geri Sar",
         "description": "Grup veya akın içinden bir gizemli dalga geçirerek 40 yarda yakınındaki her müttefikin son 5 saniyede aldığı hasarın %30'unu geri sarar (azami canlarının %35'ine kadar). Kritik etki olamaz. (Kronomansi)"
@@ -9803,7 +10684,7 @@ export const tr_TR: EnTranslations = {
       },
       "mind_sear": {
         "name": "Düşünce Yanığı",
-        "description": "Hedef alana Gölge enerjisi yönlendirerek yakındaki düşmanlara her saniye {damage} hasar verir. (Rahip yeteneği)"
+        "description": "3 sn kanalize eder ve hedef alanın 8 m çevresindeki düşmanlara her saniye {damage} Gölge hasarı verir. Hasar Büyü Gücü ile artar. (Rahip yeteneği)"
       },
       "multi_shot": {
         "name": "Bölük Atış",
@@ -9811,7 +10692,7 @@ export const tr_TR: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Koro Şifası",
-        "description": "Yakındaki müttefikleri {damage} iyileştirir. (Rahip yeteneği)"
+        "description": "30 m içindeki müttefikleri {damage} iyileştirir. İyileştirme Büyü Gücü ile artar. (Kutsal)"
       },
       "preparation": {
         "name": "Acil Plan",
@@ -9823,11 +10704,11 @@ export const tr_TR: EnTranslations = {
       },
       "psychic_scream": {
         "name": "Psişik Çığlık",
-        "description": "Yakındaki düşmanları 4 sn. kadar korkutur. Hasar etkiyi bozabilir. (Rahip yeteneği)"
+        "description": "8 m içindeki düşmanları en fazla 4 sn korkutur. Hasar etkiyi bozabilir."
       },
       "counter_shot": {
         "name": "Karşı Atış",
-        "description": "Hedefin büyüsünü kesintiye uğratan ve okulu 4 saniyeliğine kilitleyen anlık atış."
+        "description": "Hedefi keser ve 4 sn boyunca o okuldan büyü yapmasını engeller."
       },
       "rebuke": {
         "name": "Azar",
@@ -9845,6 +10726,10 @@ export const tr_TR: EnTranslations = {
         "name": "Duman Perdesi",
         "description": "Bir duman bulutunda kaybolur ve 8 sn. boyunca kaçınma şansını %30 artırırsın."
       },
+      "sacrilegious_march": {
+        "name": "Günahkâr Yürüyüş",
+        "description": "Hareket hızını %35 artırır, ama her saniye azami canının %2'sini feda eder. İptal etmek için tekrar oku. %20 canda kendiliğinden kapanır."
+      },
       "spellsteal": {
         "name": "Büyü Çalma",
         "description": "Bir düşmandan faydalı bir büyü etkisi çalar ve sana aktarır."
@@ -9858,12 +10743,37 @@ export const tr_TR: EnTranslations = {
         "description": "Hedefin büyüsünü kesintiye uğratan ve okulu 4 saniyeliğine kilitleyen bir kafa vuruşu."
       },
       "spell_lock": {
-        "name": "Büyü Kilidi",
-        "description": "Hedefi kullanım sırasında susturur ve 5 saniye boyunca o okuldan atış yapılmasını engeller."
+        "name": "Uçurum Tıkacı",
+        "description": "Düşmanın büyü yapmasını keser ve 4 sn boyunca o okuldan büyü yapmasını engeller."
+      },
+      "thieves_chorus": {
+        "name": "Hırsızlar Korosu",
+        "description": "Islıkla verilen işaret grubu coşturur: saldırı, büyü ve kanal hızı 10 sn boyunca %10 artar. Yakın zamanda grup hızlandırması alan müttefikler yararlanamayacak kadar bitkindir. (Haydut yeteneği)"
       },
       "tranquility": {
         "name": "Koru Şarkısı",
         "description": "4 sn. boyunca iyileştirici enerji yönlendirir ve 30 m içindeki müttefikleri her saniye 42 ile 52 iyileştirir. (Druid yeteneği)"
+      },
+      "venom_dart": {
+        "name": "Zehirli Dart",
+        "description": "Zehirli bir dart fırlatarak {damage} doğa hasarı verir. 1 kombo puanı kazandırır. Knifework: Zehir Yarığı yaranızı 6 sn uzatır, en fazla 20 sn.",
+        "specNote_assassination": "1 Zehir Ayini ekler ve zehir yaranı 6 sn uzatır (yara asla 20 sn'nin üzerine çıkmaz)."
+      },
+      "body_blow": {
+        "name": "Gövde Darbesi",
+        "description": "Silah hasarının %130’u artı 10 vuran, 2 kombo puanı kazandıran ve Redline’ı bir kademe derinleştiren ağır bir darbe. (Thuggery motoru)"
+      },
+      "knockout_blow": {
+        "name": "Nakavt Darbesi",
+        "description": "Redline’ı nakavtla bitirir: 45 artı kombo puanı başına 35 vurur, her Redline kademesinde %25 daha sert olur ve 25 enerji geri kazandırır. (Thuggery motoru)"
+      },
+      "veilstrike": {
+        "name": "Perde Vuruşu",
+        "description": "Alacakaranlık birikimini tüketerek 6 sn boyunca gölgeye bürünürsün: gizlilik açılışların açıkta çalışır ve %25 daha fazla hasar verirsin. (Skulduggery motoru)"
+      },
+      "venomrend": {
+        "name": "Zehir Yarığı",
+        "description": "Zehir Ayinini tüketir: 22 artı kombo puanı başına 26 hasar vurur, kanamalarının kalan hasarını patlatır ve 25 enerji yeniler. (Knifework motoru)"
       },
       "typhoon": {
         "name": "Tayfun",
@@ -9872,6 +10782,30 @@ export const tr_TR: EnTranslations = {
       "voidfeast": {
         "name": "Hiçlik Ziyafeti",
         "description": "Bir büyü etkisini (düşmandaki faydalı etkiyi veya müttefikteki zararlı etkiyi) yutar ve azami sağlığının %6’sını iyileştirir."
+      },
+      "veilstep": {
+        "name": "Perde Adımı",
+        "description": "Baktığın yönde perdenin içinden geçer."
+      },
+      "scouring_mercy": {
+        "name": "Arındıran Merhamet",
+        "description": "Bir düşmana 72 ila 84 Kutsal hasar verir ya da dost bir hedefi 130 ila 155 iyileştirir. Her iki değer de büyü gücüyle artar. Hasar ayrıca Öğreti ile bağlı her müttefiki 30%, hiç bağlı müttefik yoksa en düşük canlı grup üyesini 15% iyileştirir. (Öğreti imzası)"
+      },
+      "seraphic_vigil": {
+        "name": "Serafik Nöbet",
+        "description": "Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu 180 iyileştirir. (Lütuf imzası)"
+      },
+      "summon_tithefiend": {
+        "name": "Öşür İfriti Çağır",
+        "description": "Tüm Kasvet Öşürünü tüketerek 1 ila 5 katmanda 6, 8, 10, 12 veya 15 sn boyunca bir Öşür İfriti çağırır. 2 sn arayla 20 ila 24 Gölge hasarı, artı her ek katman için 8 hasar verir. Beş katmanda büyür ve hasarı 25% artar. Hasarı büyü gücünle artar. Kuklanı tercih eder. Her isabet azami mananın 1% kadarını geri kazandırır ve Çürüme Ağıdını taşıyan en fazla 3 başka düşmana hasarın 15% kadarını yansıtır. (Akşam Duası imzası)"
+      },
+      "martyrs_aegis": {
+        "name": "Şehidin Kalkanı",
+        "description": "Bir müttefikin aldığı hasarı 8 sn boyunca 40% azaltır."
+      },
+      "choir_of_deliverance": {
+        "name": "Kurtuluş Korosu",
+        "description": "6 sn kanalize eder, 30 metre içindeki grup üyelerini her 2 saniyede {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar."
       },
       "bear_charge": {
         "name": "Bruin Hücumu",
@@ -9887,7 +10821,8 @@ export const tr_TR: EnTranslations = {
       },
       "rake": {
         "name": "Deri Yüzme",
-        "description": "Düşmanı silah hasarı artı {damage} ile tırmalayan ve 9 saniye boyunca kanama hasarı yaratan gizlilik açılışı. 1 kombo puanı kazandırır. Yalnızca Kurt Formu."
+        "description": "Düşmanın derisini silah hasarı artı {damage} ile yüz, 18 sn boyunca kanatır. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "revive_pet": {
         "name": "Yarasını Sar",
@@ -11404,6 +12339,18 @@ export const tr_TR: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"
       },
+      "rimefang": {
+        "name": "Kırağı Dişi"
+      },
+      "marrowpoint": {
+        "name": "İlik Ucu"
+      },
+      "duskwhisper": {
+        "name": "Alacakaranlık Fısıltısı"
+      },
+      "boneglass_shiv": {
+        "name": "Kemikcam Şişi"
+      },
       "moggers_hide_quiver": {
         "name": "Mogger'ın Deri Sadağı"
       },
@@ -11547,6 +12494,9 @@ export const tr_TR: EnTranslations = {
       },
       "conjured_bread4": {
         "name": "Sihirle Yaratılmış Ziyafet Somunu"
+      },
+      "soul_stone": {
+        "name": "Ruh Taşı"
       },
       "bristleback_maul": {
         "name": "Gallowglass Balyozu"
@@ -12933,9 +13883,6 @@ export const tr_TR: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Tünelkral Grix"
       },
@@ -12957,17 +13904,8 @@ export const tr_TR: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Hayaletbağlayan Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Koroana Selthe"
@@ -13007,6 +13945,18 @@ export const tr_TR: EnTranslations = {
       },
       "water_elemental": {
         "name": "Su Elementali"
+      },
+      "graveguard": {
+        "name": "Mezar Muhafızı"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "İskelet Savaşçı"
+      },
+      "necromancy_bone_mage": {
+        "name": "Kemik Büyücü"
+      },
+      "necromancy_gravewing": {
+        "name": "Mezar Kanadı"
       }
     },
     "npcs": {
@@ -13633,6 +14583,16 @@ export const tr_TR: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "Şafağa Bağlı Cilt",
+        "text": "Işık içinde sessizce durmuyor, {playerName}. Ölülere huzur verişini gördüm ve çok az paladine öğretilen şeye hazır olduğuna inanıyorum: düşmüş bir ruhun yaşayanlara geri çağrıldığı Çağrı Ayini. Sözleri, burada benim korumamdaki Şafağa Bağlı Ciltte saklıdır; ama huzursuz ölüler hâlâ bu toprakta yürürken bir kitap hiçbir lütuf değildir. Toprağa 6 Huzursuz Kemik daha geri ver, öğretmeye başlayayım.",
+        "completion": "Şapel avlusu sessizleşiyor. Sözlere hazırsın, {playerName}, ama Çağrı Ayini ılık bir şapelde söylenemez. Yaşamla ölüm arasındaki perdenin inceldiği yerde okunmalıdır. Cildi kuzeye, Mirefen Bataklığına götürmeye niyetliyim. Beni oraya izle, bunu bitirelim.",
+        "objectives": {
+          "0": {
+            "label": "Huzursuz Kemikler huzura kavuşturuldu"
+          }
+        }
+      },
       "q_bandits": {
         "title": "Vadinin Haydutları",
         "text": "Bir grup kesik boğaz güneybatı tepelerinde kamp kurmuş. Bu hafta üç vagon soydular. Onları sür çıkar, 10 Vadi Haydudu öldür.",
@@ -13786,6 +14746,16 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Boğulmuş Ölü huzura kavuşturuldu"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "Çağrı Ayini",
+        "text": "Demek beni bataklığa dek izledin, {playerName}. Güzel. Şafağa Bağlı Cilt yanımda ve bu boğulmuş toprak, sözlerinin ait olduğu yer: ölülerin gömülü kalmadığı bir yerden başka hiçbir yerde yaşamla ölüm arasındaki perde bu kadar ince değildir. Ama boğulmuşlar sesini dizenin ortasında aşağı çekerdi. Ayine yaraşır bir alan aç: Boğulmuş Ölülerden 8 tanesini huzura kavuştur, birlikte kutsayalım.",
+        "completion": "Diz çök, {playerName}, ve sözleri yüksek sesle oku. İşte. Hissediyor musun? Işık artık ellerinde yalnızca yaşayanları onarmıyor, öteye geçenleri de geri çağırabiliyor. Onu bilgece kullan. Umutsuz bir savaşa geri çağrılan bir ruh merhamet değil, zulümdür. Kalk, Kurtarıcı.",
+        "objectives": {
+          "0": {
+            "label": "Boğulmuş Ölüler huzura kavuşturuldu"
           }
         }
       },
@@ -16254,33 +17224,33 @@ export const tr_TR: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Ashstalker Takımı",
-        "bonus2": "HARP Savunma Puanını 40 artırır.",
-        "bonus4": "HARP Saldırı Puanını 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
-        "bonus7": "HARP Saldırı ve Savunma Puanını 80 artırır. Düşman bir oyuncuyu öldürmek Kül Adım'ı bahşeder ve hareket hızını 6 saniye boyunca %40 artırır."
+        "bonus2": "Harp Savunma Derecesini 40 artırır.",
+        "bonus4": "Harp Saldırı Derecesini 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
+        "bonus7": "Harp Saldırı ve Savunma Derecesini 80 artırır. Düşman bir oyuncuyu öldürmek Kül Adımı verir, bu da hareket hızını 6 sn boyunca %40 artırır."
       },
       "warfare_cinderweave": {
         "name": "Cinderweave Kıyafetleri",
-        "bonus2": "HARP Savunma Puanını 40 artırır.",
-        "bonus4": "HARP Saldırı Puanını 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
-        "bonus7": "HARP Saldırı ve Savunma Puanını 80 artırır. Büyülerinin, 8 saniye boyunca 120 hasar emen Kor Siperi bahşetme ihtimali %15'tir."
+        "bonus2": "Harp Savunma Derecesini 40 artırır.",
+        "bonus4": "Harp Saldırı Derecesini 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
+        "bonus7": "Harp Saldırı ve Savunma Derecesini 80 artırır. Büyülerinin %15 ihtimalle Köz Muhafızı verme şansı vardır, bu da 8 sn boyunca 120 hasar emer."
       },
       "warfare_furyforged": {
         "name": "Furyforged Savaş Takımı",
-        "bonus2": "HARP Savunma Puanını 40 artırır.",
-        "bonus4": "HARP Saldırı Puanını 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
-        "bonus7": "HARP Saldırı ve Savunma Puanını 80 artırır. Düşman bir oyuncuyu öldürmek, 10 saniye boyunca 200 hasar emen Kırılmaz Yemin'i bahşeder."
+        "bonus2": "Harp Savunma Derecesini 40 artırır.",
+        "bonus4": "Harp Saldırı Derecesini 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
+        "bonus7": "Harp Saldırı ve Savunma Derecesini 80 artırır. Düşman bir oyuncuyu öldürmek Kırılmamış Yemin verir, bu da 10 sn boyunca 200 hasar emer."
       },
       "warfare_stormbound": {
         "name": "Stormbound Cübbeleri",
-        "bonus2": "HARP Savunma Puanını 40 artırır.",
-        "bonus4": "HARP Saldırı Puanını 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
-        "bonus7": "HARP Saldırı ve Savunma Puanını 80 artırır. Büyülerinin, 8 saniye boyunca 120 hasar emen Kor Siperi bahşetme ihtimali %15'tir."
+        "bonus2": "Harp Savunma Derecesini 40 artırır.",
+        "bonus4": "Harp Saldırı Derecesini 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
+        "bonus7": "Harp Saldırı ve Savunma Derecesini 80 artırır. Büyülerinin %15 ihtimalle Köz Muhafızı verme şansı vardır, bu da 8 sn boyunca 120 hasar emer."
       },
       "warfare_thornhide": {
         "name": "Thornhide Giysisi",
-        "bonus2": "HARP Savunma Puanını 40 artırır.",
-        "bonus4": "HARP Saldırı Puanını 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
-        "bonus7": "HARP Saldırı ve Savunma Puanını 80 artırır. Büyülerinin, 6 saniye boyunca sıyırma şansını %15 artıran Diken Gardı'nı bahşetme ihtimali %15'tir."
+        "bonus2": "Harp Savunma Derecesini 40 artırır.",
+        "bonus4": "Harp Saldırı Derecesini 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
+        "bonus7": "Harp Saldırı ve Savunma Derecesini 80 artırır. Büyülerinin %15 ihtimalle Diken Muhafızı verme şansı vardır, bu da kaçınmayı 6 sn boyunca %15 artırır."
       },
       "wyrmshadow": {
         "name": "Nightfang Cübbeleri",

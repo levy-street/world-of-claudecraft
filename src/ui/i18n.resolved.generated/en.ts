@@ -127,6 +127,10 @@ export const en: EnTranslations = {
         "label": "Equip fresh-20 kit",
         "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
+      "biskit": {
+        "label": "Equip BIS-20 kit",
+        "description": "Wear the best-in-slot epic set for a spec across every slot. Gear only."
+      },
       "gold": {
         "label": "Add gold",
         "description": "Add gold to the current purse."
@@ -240,7 +244,8 @@ export const en: EnTranslations = {
     },
     "hud": {
       "lowMana": "Low Mana",
-      "lowEnergy": "Low Energy"
+      "lowEnergy": "Low Energy",
+      "lowFocus": "Low Focus"
     },
     "talents": {
       "title": "Talents",
@@ -316,6 +321,25 @@ export const en: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Condemnation",
+      "fateThreadsLabel": "Fate Threads",
+      "doomMeterUnlock": "Move Affliction resource bar",
+      "doomMeterLock": "Lock Affliction resource bar",
+      "doomEmptyStatus": "{value} of {max} Condemnation.",
+      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Fate Threads.",
+      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
+      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Soul Fragments",
+      "ruinMeter": "Wrack",
+      "ruinStatus": "{value} of {max} Wrack"
+    },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Spectating {name}"
     },
@@ -777,6 +801,11 @@ export const en: EnTranslations = {
       "resetAction": "Reset",
       "note": "Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Swing",
       "seconds": "{seconds}s"
@@ -787,6 +816,14 @@ export const en: EnTranslations = {
     },
     "rest": {
       "resting": "Resting"
+    },
+    "paladin": {
+      "devotion": "Devotion",
+      "devotionValue": "Devotion {value} of {max}",
+      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
+      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
+      "ascensionLastAnnouncement": "Ascension final charge",
+      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -819,6 +856,7 @@ export const en: EnTranslations = {
       "deeds": "Deeds",
       "mounts": "Mounts",
       "professions": "Professions",
+      "reliquary": "Reliquary",
       "nameplates": "Names",
       "haptics": "Haptics",
       "hapticsOff": "Haptics Off",
@@ -859,6 +897,14 @@ export const en: EnTranslations = {
       "bodyWithVersion": "Version {version} of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
       "notNow": "Not now",
       "update": "Update"
+    },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
     },
     "cameraPrompt": {
       "title": "Choose Your Camera",
@@ -961,6 +1007,7 @@ export const en: EnTranslations = {
       "emoteWheel": "Emote Wheel",
       "targetFriendly": "Target Nearest Friendly",
       "targetFriendlyNext": "Cycle Friendly Target",
+      "targetPrev": "Cycle Target Backward",
       "discord": "Discord",
       "valecup": "Vale Cup",
       "bgFlag": "Battleground Flag Action",
@@ -1743,7 +1790,7 @@ export const en: EnTranslations = {
         "agi": "Sharpens your reflexes and aim, improving several of your combat stats.",
         "sta": "Toughens your body, raising your maximum health and how quickly you recover health while resting.",
         "int": "Expands a spellcaster's mana pool and improves their chance to land a spell critical strike.",
-        "spi": "Quickens how fast a spellcaster's mana returns while resting, out of combat.",
+        "spi": "Quickens how fast a spellcaster's mana returns. Most of it flows while resting, out of combat, and a portion keeps returning even in combat.",
         "armor": "Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.",
         "attackPower": "Powers your weapon attacks. Every 14 attack power adds 1 damage per second.",
         "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
@@ -1767,6 +1814,7 @@ export const en: EnTranslations = {
         "spellCritPct": "+{value}% Spell Critical Strike",
         "healthRegen": "About {value} health every 5 sec while resting",
         "manaRegen": "About {value} mana every 5 sec while resting",
+        "manaRegenCombat": "About {value} mana every 5 sec in combat",
         "damageReduction": "Damage reduction against a level {level} attacker: {value}%",
         "dpsFromAp": "Adds {value} damage per second to your attacks"
       },
@@ -1881,6 +1929,48 @@ export const en: EnTranslations = {
         "few": "Who: {count} players matching \"{query}\" on {realm}.",
         "many": "Who: {count} players matching \"{query}\" on {realm}.",
         "other": "Who: {count} players matching \"{query}\" on {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "reliquarySearchResults": {
+        "one": "{count} result.",
+        "few": "{count} results.",
+        "many": "{count} results.",
+        "other": "{count} results."
+      },
+      "reliquaryToGo": {
+        "one": "{count} to go",
+        "few": "{count} to go",
+        "many": "{count} to go",
+        "other": "{count} to go"
+      },
+      "reliquaryObtainedTimes": {
+        "one": "Obtained {count} time",
+        "few": "Obtained {count} times",
+        "many": "Obtained {count} times",
+        "other": "Obtained {count} times"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}, catalogued, obtained {count} time",
+        "few": "{name}, catalogued, obtained {count} times",
+        "many": "{name}, catalogued, obtained {count} times",
+        "other": "{name}, catalogued, obtained {count} times"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}, catalogued, first found on clear {clears}, obtained {count} time",
+        "few": "{name}, catalogued, first found on clear {clears}, obtained {count} times",
+        "many": "{name}, catalogued, first found on clear {clears}, obtained {count} times",
+        "other": "{name}, catalogued, first found on clear {clears}, obtained {count} times"
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Your chronicle catches up: {count} deeds recorded.",
+        "many": "Your chronicle catches up: {count} deeds recorded.",
+        "other": "Your chronicle catches up: {count} deeds recorded."
       }
     },
     "bugReport": {
@@ -2109,6 +2199,10 @@ export const en: EnTranslations = {
       "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, quantity {count}, masterwork",
       "itemAriaQuest": "{item}, quantity {count}, quest item",
+      "itemAriaLocked": "{item}, quantity {count}, locked",
+      "itemLockedLine": "Locked",
+      "lockItem": "Lock Item",
+      "unlockItem": "Unlock Item",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",
@@ -2151,18 +2245,36 @@ export const en: EnTranslations = {
     "auraEffect": {
       "dot": "Deals {value} {school} damage every {interval} sec",
       "hot": "Restores {value} health every {interval} sec",
+      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
+      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
       "absorb": "Absorbs {value} damage",
       "healAbsorb": "Absorbs {value} incoming healing",
       "thorns": "Deals {value} {school} damage to attackers",
+      "stasis": "Immune and unable to act",
       "slow": "Reduces movement speed by {pct}%",
       "speed": "Increases movement speed by {pct}%",
       "attackSpeedSlow": "Slows attack speed by {pct}%",
       "attackSpeedFast": "Increases attack speed by {pct}%",
       "haste": "Increases attack and casting speed by {pct}%",
+      "imbueRange": "Weapon imbued: {min} to {max} bonus damage on Verdict",
+      "petDamage": "Increases pet damage by {pct}%",
+      "petHaste": "Increases pet action speed by {pct}%",
+      "spellDamage": "Increases spell damage by {pct}%",
+      "spellHaste": "Increases spell casting speed by {pct}%",
+      "sated": "Cannot benefit from another group haste effect",
+      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
+      "castShield": "Casting cannot be interrupted or delayed by damage",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "elementalConvergencePrimed": "Your next spell from the other elemental school grants Elemental Convergence",
+      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
+      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
+      "leadenHexLock": "Leaden Hex cannot root this target again yet",
+      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
+      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
+      "internalCooldown": "This effect cannot trigger again until the timer expires",
       "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Battle Stance: 10% more rage generation",
       "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
@@ -2177,6 +2289,13 @@ export const en: EnTranslations = {
       "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
+      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
+      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
+      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
+      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
+      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
+      "physicalReduction": "Reduces Physical damage taken by {pct}%",
       "temporalHourglass": "Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.",
       "tongues": "Increases casting time by {pct}%",
       "combustionCrit": "Your Fire spells always critically strike",
@@ -2186,6 +2305,22 @@ export const en: EnTranslations = {
       "freeCast": "Your next cast costs nothing",
       "instantCast": "Your next spell with a cast time is instant",
       "cheapCast": "Your next spell costs {pct}% less",
+      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
+      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
+      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
+      "venomRitual": "Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil",
+      "redline": "Redline {stacks}/{max}. Each Haymaker adds 1. Lights Out hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
+      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
+      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
+      "freeExecute": "Your next eligible execute ability costs nothing",
+      "resourceSap": "Restores {value} of your current resource every {interval} sec",
+      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
+      "healEcho": "Falling below {threshold}% health restores {value} health",
       "increase": {
         "ap": "Increases attack power by {value}",
         "sp": "Increases spell power by {value}",
@@ -2224,6 +2359,8 @@ export const en: EnTranslations = {
       "mortalWound": "Reduces healing received by {pct}%",
       "vulnerability": "Increases damage taken by {pct}%",
       "physVuln": "Increases physical damage taken by {pct}%",
+      "bleedVuln": "Increases bleed damage taken by {pct}%",
+      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
       "spellVuln": "Increases magic damage taken by {pct}%",
       "critVuln": "Increases chance to be critically hit by {pct}%",
       "costTax": "Increases ability costs by {pct}%",
@@ -2237,14 +2374,46 @@ export const en: EnTranslations = {
       "disarm": "Disarmed: cannot use weapon attacks",
       "lockout": "Spell school locked out",
       "imbue": "Weapon imbued with bonus effects",
-      "imbueRange": "Weapon imbued: {min} to {max} bonus damage on Verdict",
+      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
+      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
       "stealth": "Concealed; movement speed reduced by {pct}%",
       "formBear": "Bruin Form: increased health and armor",
       "formCat": "Wolf Form: melee damage and energy",
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
+      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
+      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
+      "resourceCount": "{value} of {max}",
+      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
+      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
+      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
+      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
+      "afflictionPossession": "Empowers Needle of Fate, Consume, Maledict Gaze, and Sentence",
+      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
+      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Consume gains {doom} extra Condemnation per tick",
+      "afflictionConsumeThreads": "Consume is devouring {stacks} Fate Threads for {doom} extra Condemnation per tick",
+      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
+      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
+      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
+      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
+      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
+      "energyRegen": "Increases Energy regeneration by {pct}%",
       "defensiveStance": "Guarded Stance: reduced damage taken, more threat",
       "righteousFury": "Burning Oath: greatly increased threat from Holy damage",
+      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
+      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
+      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
+      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
+      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
+      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
+      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
+      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
+      "duskfireClaim": "Death grants {value} Wrack",
+      "pyreGuardian": "Generates {ruin} Wrack every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
+      "perfectMoment": "Aether Darts does not consume Arcane Charges",
       "scale": "Size increased by {pct}%",
       "jump": "Jump height increased by {pct}%",
       "school": {
@@ -3102,6 +3271,7 @@ export const en: EnTranslations = {
       "craftedToast": "Crafted: {name}",
       "craftedToastQty": "Crafted: {name} x{qty}",
       "insufficientMaterials": "You do not have the materials for that.",
+      "reagentLocked": "A reagent for that is locked.",
       "unknownRecipe": "That recipe does not exist.",
       "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe.",
       "comboRequires": "Attunement: {craftA} + {craftB}, tier {tier}.",
@@ -3208,6 +3378,7 @@ export const en: EnTranslations = {
       "notHeld": "You do not have that item.",
       "notDisenchantable": "You cannot disenchant that.",
       "notSalvageable": "You cannot salvage that.",
+      "salvageLocked": "That item is locked.",
       "disenchantBusy": "You are busy.",
       "salvageBusy": "You are busy.",
       "enchantBusy": "You are busy.",
@@ -3459,6 +3630,135 @@ export const en: EnTranslations = {
         "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
+    "reliquary": {
+      "title": "The Reliquary",
+      "close": "Close The Reliquary",
+      "countLabel": "{owned}/{total} relics",
+      "completionAria": "Relics filled: {owned} of {total}",
+      "curatorRank": "Curator rank {rank}",
+      "curatorUnranked": "Unranked Curator",
+      "curatorRankName1": "Apprentice Curator",
+      "curatorRankName2": "Spoilskeeper",
+      "curatorRankName3": "Master Curator",
+      "curatorRankName4": "Grand Curator",
+      "curatorRankName5": "Eternal Curator",
+      "rankUpBanner": "Curator rank {rank}: {name}",
+      "rankUpToast": "Curator rank {rank} reached: {name}",
+      "borderWearableNote": "The {name} border can be worn from the Book of Deeds.",
+      "sigilCaption": "Curator sigil",
+      "recentLabel": "Recent finds:",
+      "nearlyLabel": "Nearly complete:",
+      "nearlyJumpAria": "Open {name}, {owned} of {total} filled",
+      "progressText": "{owned}/{total}",
+      "shelvesAria": "Reliquary shelves",
+      "navOverview": "Overview",
+      "navConquerors": "Conquerors",
+      "navProfessions": "Professions",
+      "navHorizons": "Horizons",
+      "navCountAria": "{shelf}: {owned} of {total} relics filled",
+      "shelfEmpty": "No pages on this shelf yet.",
+      "pageComplete": "Illuminated",
+      "clearsLabel": "{count} clears",
+      "srankClearsLabel": "{count} S-rank clears",
+      "retiredLabel": "Retired",
+      "personalLabel": "Personal",
+      "backToShelf": "Back to shelf",
+      "gridAria": "Relics on {name}",
+      "pageProgressAria": "Page progress: {owned} of {total} relics filled",
+      "cellOwnedAria": "{name}, catalogued",
+      "cellMissingAria": "{name}, not yet found",
+      "ownedTooltipStatus": "Catalogued in The Reliquary",
+      "missingTooltipStatus": "Not yet found",
+      "firstFindClears": "First found on clear {count}",
+      "unlockToast": "Relic catalogued: {name}",
+      "illuminateBanner": "Page illuminated: {name}",
+      "illuminateToast": "Every relic on {name} is filled.",
+      "illuminationBroadcastLine": "{name} has illuminated a Reliquary page: {page}",
+      "markFind": {
+        "masterwork_first": "First Masterwork",
+        "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
+        "masterwork_armorcrafting": "Armorcrafting Masterwork",
+        "masterwork_tailoring": "Tailoring Masterwork",
+        "masterwork_leatherworking": "Leatherworking Masterwork",
+        "masterwork_engineering": "Engineering Masterwork",
+        "gather_event_pristine_vein": "Pristine Vein",
+        "gather_event_ancient_heartwood": "Ancient Heartwood",
+        "gather_event_moonlit_bloom": "Moonlit Bloom",
+        "gather_event_perfect_specimen": "Perfect Specimen",
+        "slain_old_greyjaw": "Slain: Old Greyjaw",
+        "slain_mogger": "Slain: Mogger",
+        "slain_grix_the_tunnelking": "Slain: Grix the Tunnelking",
+        "slain_captain_verlan": "Slain: Captain Verlan",
+        "slain_wraithbinder_maldrec": "Slain: Wraithbinder Maldrec",
+        "slain_mirejaw_the_ravenous": "Slain: Mirejaw the Ravenous",
+        "slain_sloomtooth_the_drowned": "Slain: Sloomtooth the Drowned",
+        "slain_sister_nhalia": "Slain: Sister Nhalia",
+        "slain_grubjaw": "Slain: Grubjaw the Glutton",
+        "slain_ironvein_foreman": "Slain: Ironvein Foreman",
+        "slain_brutok_skullsmasher": "Slain: Brutok Skullsmasher",
+        "slain_voskar_emberwing": "Slain: Voskar the Emberwing",
+        "slain_marrowlord_varkas": "Slain: Marrowlord Varkas",
+        "slain_old_cragmaw": "Slain: Old Cragmaw",
+        "slain_shardlord_kazzix": "Slain: Shardlord Kazzix",
+        "slain_gleamstag": "Slain: The Gleamstag",
+        "slain_old_marrowshell": "Slain: Old Marrowshell",
+        "slain_aurelhorn": "Slain: Aurelhorn, First of the Herd",
+        "slain_drakemaw_broodlord": "Slain: Drakemaw Broodlord"
+      },
+      "accountScopeBadge": "Account",
+      "accountScopeNote": "Account collection: unlocked across every character on this account.",
+      "unknownRelic": "Unrecorded relic",
+      "sourceBossDungeon": "Drops from {boss} in {dungeon}",
+      "sourceBoss": "Drops from {boss}",
+      "sourceZone": "Found in {zone}",
+      "sourceProfession": "Earned through {profession}",
+      "sourceDeed": "Awarded by the deed {deed}",
+      "sourceVendor": "Sold by {vendor}",
+      "sourceBossZone": "Drops from {boss} in {zone}",
+      "sourceDelve": "Found in the delve {delve}",
+      "sourceRift": "Drops from {rank}-rank Rift clears",
+      "sourceQuest": "Reward from the quest {quest}",
+      "sourceStore": "Purchased from the WOC Store",
+      "sourceActivityCorpseHarvest": "Recovered while harvesting creature corpses",
+      "sourceActivityMasterworkCraft": "Earned by crafting a masterwork",
+      "sourceActivityRiftFirstClear": "Awarded to every member of the party that wins a ranked Rift's first clear",
+      "cellMissingSourceAria": "{name}, not yet found, {source}",
+      "cellOwnedClearsAria": "{name}, catalogued, first found on clear {count}",
+      "searchPlaceholder": "Search relics",
+      "searchAria": "Search The Reliquary by name",
+      "searchEmpty": "No relics match that search.",
+      "filterEmpty": "No relics match this filter.",
+      "filterGroupAria": "Filter relics by whether you have found them",
+      "gridKeyboardHint": "Use the arrow keys to move between relics, Home and End for the ends.",
+      "filterAll": "All",
+      "filterOwned": "Catalogued",
+      "filterMissing": "Missing",
+      "recentJumpAria": "Open the page for {name}",
+      "recentEmpty": "No finds yet. Relics you catalogue from now on land here.",
+      "nearlyEmpty": "Pages within reach of completion gather here.",
+      "stripNoMatch": "Nothing here matches your search.",
+      "shelfRecent": "Latest find: {name}",
+      "shelfNoFinds": "Nothing catalogued on this shelf yet.",
+      "shelfOpenAria": "Open the {name} shelf, {owned} of {total} filled",
+      "sharedUniquesNote": "Your overall total counts each relic once; shelf and page counts list every slot, so a relic shown on more than one page is counted by each of them.",
+      "charCompletionLabel": "Reliquary",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "Curator",
+      "charOpen": "The Reliquary",
+      "trackerLabel": "Reliquary",
+      "collapseHint": "Collapse Reliquary tracker",
+      "expandHint": "Expand Reliquary tracker",
+      "openWindowHint": "Open The Reliquary",
+      "pin": "Pin",
+      "unpin": "Unpin",
+      "pinFull": "The tracker is full (up to {cap} pages)",
+      "pinAria": "Pin {name} to the HUD tracker",
+      "unpinAria": "Unpin {name}",
+      "rarityLine": "Found by {percent} of collectors",
+      "pageRarityLine": "Illuminated by {percent} of collectors",
+      "cellAriaWithRarity": "{base}, {rarity}",
+      "cellAriaWithAccountScope": "{base}, {scope}"
+    },
     "deeds": {
       "title": "Book of Deeds",
       "close": "Close the Book of Deeds",
@@ -3495,18 +3795,23 @@ export const en: EnTranslations = {
       "featRibbon": "Feat",
       "hiddenBadge": "Hidden",
       "titleChip": "Title reward",
+      "borderChip": "Border reward",
       "watch": "Watch",
       "unwatch": "Unwatch",
       "watchFull": "Watchlist full ({cap} max)",
       "watchAria": "Watch {name} on the HUD tracker",
       "unwatchAria": "Stop watching {name}",
+      "cosmeticsSection": "Titles and Borders",
       "titlesSection": "Titles",
       "titlesAria": "Choose your displayed title",
       "titlesNone": "No Title",
       "titlesEmpty": "Earn a title-bearing deed to unlock this shelf.",
+      "bordersSection": "Borders",
+      "bordersNone": "No Border",
+      "bordersEmpty": "Earn a border-bearing deed to unlock this shelf.",
       "unlockedBanner": "Deed accomplished: {name}",
       "unlockedTitleHint": "New title earned: {title}. Choose it in the Book of Deeds.",
-      "retroSummary": "Your chronicle catches up: {count} deeds recorded.",
+      "unlockedBorderHint": "New border earned: {name}. Wear it from the Book of Deeds.",
       "broadcastLine": "{name} has accomplished a deed: {deed}",
       "rarityLine": "Earned by {percent} of adventurers",
       "trackerLabel": "Deeds",
@@ -3516,6 +3821,7 @@ export const en: EnTranslations = {
       "charTitleLabel": "Title",
       "charTitleNone": "No title chosen",
       "charOpenBook": "Book of Deeds",
+      "charBorderWorn": "{name} (worn)",
       "lbTab": "Renown",
       "lbTitleCol": "Title",
       "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
@@ -3598,7 +3904,9 @@ export const en: EnTranslations = {
       "delete_confirm": "Type the character name to confirm deletion.",
       "already_in_world": "Character is already in world.",
       "taken_over": "Your character was taken over by another session.",
-      "rename_required": "This character must be renamed before entering the world."
+      "rename_required": "This character must be renamed before entering the world.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "This account is suspended until {date}.",
@@ -3704,6 +4012,7 @@ export const en: EnTranslations = {
       "valeCup": "Vale Cup",
       "thornhollow": "Thornhollow Fields",
       "deeds": "Book of Deeds",
+      "reliquary": "The Reliquary",
       "glossary": "Glossary",
       "wishIKnew": "Things I Wish I Knew",
       "faq": "FAQ",
@@ -3762,7 +4071,9 @@ export const en: EnTranslations = {
       "typeDelve": "Delve",
       "typeTerm": "Term",
       "typeAbility": "Ability",
-      "typeDeed": "Deed"
+      "typeDeed": "Deed",
+      "typeReliquaryPage": "Reliquary Page",
+      "typeRelic": "Relic"
     },
     "home": {
       "eyebrow": "Classic-style browser MMO",
@@ -3879,7 +4190,7 @@ export const en: EnTranslations = {
       "groupingBody": "Invite others to a party to share quest credit and take on dungeons. Most of the world is soloable, so grouping is a choice, not a chore.",
       "onlineTitle": "Online or offline",
       "onlineBody": "Play the shared online world with everyone else, or start an instant offline world in your browser to learn the ropes.",
-      "reassure": "Talents start at level 5, and there are six rows in all, one each at levels 5, 8, 11, 14, 17, and 20. Every row is a single pick of three, and you can reset whenever you are out of combat and not in an arena or battleground match, so your early choices are never permanent. Experiment freely.",
+      "reassure": "Talents start at level 5, and there are six rows in all, one each at levels 5, 8, 11, 14, 17, and 20. Every row is a single pick of three, and you can reset whenever you are out of combat and not in an arena match, so your early choices are never permanent. Experiment freely.",
       "controlsLink": "See the full controls reference",
       "step0Title": "Get in",
       "step0Body": "Offline play asks for nothing: choose Offline on the start screen and press Play. To play with everyone else, make a free account (a username, a password, and an email address for recovery) or sign in to the one you have, then pick a world from the World List.",
@@ -3905,6 +4216,7 @@ export const en: EnTranslations = {
       "arena": "PvP window (the arenas and Thornhollow Fields)",
       "leaderboard": "Leaderboard",
       "deeds": "Book of Deeds",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Crafting",
       "valeCup": "Vale Cup",
@@ -3913,6 +4225,7 @@ export const en: EnTranslations = {
       "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Use action bar abilities (the number row; a second bar sits on the numpad)",
+      "targetPrev": "Cycle target backward",
       "targetFriendly": "Target nearest friendly",
       "cycleFriendly": "Cycle friendly target",
       "targetAuras": "Target buffs and debuffs",
@@ -4331,7 +4644,7 @@ export const en: EnTranslations = {
       "targetMarkerTerm": "Target marker",
       "targetMarkerDef": "A symbol any party or raid member can pin over a target so everyone focuses, or avoids, the same one. Eight symbols, one target per symbol.",
       "loadoutTerm": "Loadout",
-      "loadoutDef": "A saved talent layout, up to ten of them. Each one remembers its row picks and its action bar, so swapping builds is one click instead of redoing every row.",
+      "loadoutDef": "A saved talent layout, up to ten of them. Each one remembers its row picks and its action bar, and can remember the gear you were wearing too, so swapping builds is one click instead of redoing every row.",
       "readyCheckTerm": "Ready check",
       "readyCheckDef": "A group leader typing /ready to poll the party or raid: everyone confirms Ready or Not Ready, and the group sees the counts.",
       "soulboundTerm": "Soulbound",
@@ -4341,7 +4654,7 @@ export const en: EnTranslations = {
       "worldBossTerm": "World boss",
       "worldBossDef": "A raid-strength boss that rises in the open world on a steady rhythm, fought by whoever gathers to answer rather than a fixed party.",
       "fiveSecondTerm": "The five-second rule",
-      "fiveSecondDef": "Your mana only starts refilling on its own once five seconds have passed since you last spent any. It is why casters pace themselves instead of casting flat out.",
+      "fiveSecondDef": "Your mana comes back at full speed only once five seconds have passed since you last spent any. Until then it still trickles in at a reduced rate rather than stopping outright, which is why casters pace themselves instead of casting flat out.",
       "talentRowTerm": "Talent row",
       "talentRowDef": "Talents arrive as six rows, one at each of levels 5, 8, 11, 14, 17 and 20. Every row offers three options and you take one of them, so there are no points to save up or spend.",
       "riftTerm": "Rift",
@@ -4445,7 +4758,8 @@ export const en: EnTranslations = {
     "resourceName": {
       "rage": "Rage",
       "mana": "Mana",
-      "energy": "Energy"
+      "energy": "Energy",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "All classes",
@@ -4514,19 +4828,32 @@ export const en: EnTranslations = {
       "none": "No class matches every filter. Clear one to see more."
     },
     "abilityHook": {
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
       "heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "A rallying cry that raises attack power for the party.",
       "charge": "Rushes a distant enemy to open the fight with a brief stun.",
       "thunder_clap": "Hits everything around you and slows their attacks.",
-      "seal_of_righteousness": "Imbues your swings with Holy damage, then spend it with Verdict.",
+      "seal_of_righteousness": "Imbues your melee swings with additional Holy damage.",
       "holy_light": "A steady, sizable heal for topping off an ally or yourself.",
       "devotion_aura": "A lasting self-buff that raises armor so hits land softer.",
       "judgement": "Spends your active Seal to strike an enemy from short range.",
+      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
+      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
+      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
+      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
+      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
+      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
+      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
+      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
+      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
       "blessing_of_might": "Raises a friendly target's attack power, good to cast before a pull.",
       "divine_protection": "A quick protective ward to soak damage when things get rough.",
       "raptor_strike": "A hard melee swing for when something closes the gap on you.",
+      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
+      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
+      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
       "aspect_of_the_hawk": "A stance you keep up to sharpen your ranged attack power.",
       "serpent_sting": "Lands a venom that bleeds nature damage over time.",
       "arcane_shot": "An instant shot from range for quick extra damage.",
@@ -4545,11 +4872,21 @@ export const en: EnTranslations = {
       "power_word_shield": "Wraps an ally in a shield that soaks hits before they land.",
       "renew": "A heal that ticks over time, good to cast and keep moving.",
       "lightning_bolt": "A ranged cast of Nature damage, your go-to from afar.",
+      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
+      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
       "rockbiter_weapon": "Imbues your weapon so each swing lands harder in melee.",
       "healing_wave": "Your main heal, a direct mend for yourself or an ally.",
       "earth_shock": "An instant shock for quick Nature damage when you need it now.",
       "lightning_shield": "Charges you so attackers take Nature damage when they hit you.",
       "flame_shock": "An instant burn that hits up front and keeps searing over time.",
+      "galeheart_weapon": "Imbues both weapons with storm winds that reward a steady dual-wield rhythm.",
+      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
+      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "lifespring_weapon": "Imbues your weapon with restorative water that strengthens your healing flow.",
+      "tidecall": "Immediately heals an ally and deposits a full Mending Current pool.",
+      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "stoneward": "Raises a charged stone shield that turns incoming damage into recovery.",
+      "primal_exaltation": "Unleashes a short specialization-specific surge of elemental power.",
       "fireball": "Your main fire nuke, lands a hit and leaves the target burning.",
       "fireball_form": "Become a living ember to cross open ground at high speed.",
       "frost_armor": "A lasting self-buff that hardens your armor before a fight.",
@@ -4566,7 +4903,7 @@ export const en: EnTranslations = {
       "conjure_water": "Conjures drinks that restore mana, so you can refill between pulls.",
       "conjure_food": "Conjures food that restores health when you sit down to eat.",
       "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
-      "summon_imp": "Calls up an Emberkin that flings firebolts at enemies from range.",
+      "summon_imp": "Calls up an Emberkin that casts Felbolt at enemies from range.",
       "demon_skin": "A lasting self-buff that toughens your skin and adds armor.",
       "immolate": "Sets a target alight for an opening hit and a burn that lingers.",
       "corruption": "Rots a target with shadow that ticks while you do other things.",
@@ -4575,17 +4912,14 @@ export const en: EnTranslations = {
       "healing_touch": "A big single-target heal with a long cast, for topping someone off.",
       "mark_of_the_wild": "A lasting blessing you put on yourself or an ally before a fight.",
       "moonfire": "Hits instantly and leaves the target burning, good while moving.",
+      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
       "rejuvenation": "Casts instantly and heals an ally over time, so you can keep acting.",
       "thorns": "Wards an ally so melee attackers hurt themselves for striking."
     },
     "petHook": {
-      "emberkin": "A ranged firebolt demon that chips at enemies from a safe distance.",
-      "gloomshade": "A sturdy demon that taunts and soaks hits so you can cast in peace.",
-      "duskborn": "A fast melee demon that hits hard but folds under pressure.",
-      "spellhound": "A shadow skirmisher that hounds enemy casters.",
-      "warfiend": "A durable melee bruiser, the all-rounder once you can summon it.",
-      "pyre_colossus": "A hulking juggernaut with crushing melee, summoned for raw power.",
-      "wraithborn": "An elite caster that rains heavy shadow from afar."
+      "emberkin": "A ranged demon whose signature Felbolt chips at enemies from a safe distance.",
+      "gloomshade": "A sturdy tank demon that taunts and uses Abyssal Chain to pull fleeing normal enemies back into reach; bosses resist the pull.",
+      "pyre_colossus": "A hulking juggernaut with crushing melee, summoned for raw power."
     },
     "bestiary": {
       "heading": "Bestiary",
@@ -4915,10 +5249,11 @@ export const en: EnTranslations = {
       "shareNote": "A finished build can be copied to a short shareable code and handed to a friend, who pastes it straight into their own talent panel to load it.",
       "choiceNote": "Every row is a crossroads: it offers three options and you commit to one of them. Your next reset reopens every one of those choices.",
       "resetTitle": "Nothing is permanent",
-      "resetNote": "You can reset your talents any time you are out of combat and not in an arena match or a battleground, so an early pick is never a trap. A reset clears your row picks and costs nothing, and your specialization stays as it is, so resetting never takes your role away mid-run. Try things, see what you like, and change your mind freely.",
+      "resetNote": "You can reset your talents any time you are out of combat and not in an arena match, so an early pick is never a trap. A reset clears your row picks and costs nothing, and your specialization stays as it is, so resetting never takes your role away mid-run. A battleground is the exception, and you can change your build there between fights. Try things, see what you like, and change your mind freely.",
       "specsHeading": "Specializations by class",
       "specsBody": "Every class has a handful of specializations, each with its own role and a signature focus. You pick one in the talent panel at level 5. It grants a signature ability and a lasting mastery, most of them add passive bonuses that suit the role, and it is also the role you queue as in the Dungeon Finder. Here is the shape of all of them. Open a class for its full kit.",
-      "loadoutNote": "You do not have to settle on one build. Save a named layout in the panel and it remembers both its picks and your action bar, so switching to another one is a single click, under the same rule as a reset: out of combat, and not in an arena match or a battleground."
+      "loadoutNote": "You do not have to settle on one build. Save a named layout in the panel and it remembers both its picks and your action bar, so switching to another one is a single click, under the same rule as a reset: out of combat, and not in an arena match.",
+      "loadoutGearNote": "A layout can carry your gear as well. Save it with the entry that offers to keep your gear too and it also records what you were wearing, which is what makes a PvP set and a dungeon set one click apart instead of sixteen. It remembers the exact piece rather than merely its name, so an enchanted ring is never quietly swapped for the plain twin sitting beside it in your bags. Anything it cannot find when you switch back is simply left alone and reported, so a set that lost a piece to the bank or the market still equips everything else."
     },
     "arenaPage": {
       "heading": "Arena and PvP",
@@ -4953,6 +5288,9 @@ export const en: EnTranslations = {
       "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
       "carrierHeading": "Carrying the flag",
       "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "leavingHeading": "Leaving early, and filling an empty seat",
+      "leavingBody": "Quitting a match under way is deserting it, and a rated ladder cannot reward pulling the plug on a losing scoreline: a deserter takes the loss and the rating that goes with it there and then, drops the flag if they were carrying it, and their team fights on a player short. That last part is what the empty seat is for. While a match is short a fighter, the queue can offer the chair to somebody waiting, and it is always an offer you accept or decline rather than a teleport that happens to you; declining costs you nothing and passes it to the next in line. Only solo queuers are asked, so a party that queued together is never split up to fill a hole.",
+      "backfillNote": "Taking a backfill seat is deliberately free of risk: you drop into a scoreline you had no hand in, so the match does not touch your rating either way, win or lose, and leaving one owes nothing. The offer also stops coming once a match is close enough to finished that an arrival could not change it, so you are never seated into somebody else's ending.",
       "ladderHeading": "The ladder",
       "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions.",
       "rewardsHeading": "What a match pays",
@@ -4995,7 +5333,7 @@ export const en: EnTranslations = {
       "renownHeading": "Renown",
       "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful turn on luck rather than skill, other collection deeds are their own reward, and Feats are an honor apart, so none of those are worth any Renown. Deeds without Renown still count toward completion in your Book; they simply never score. Feats are the one exception, kept outside the count entirely.",
       "rewardsHeading": "Titles and borders",
-      "rewardsBody": "The rewards are all for show, and that is the point. Some deeds grant a title you can wear or a border to frame your name, and never anything that makes your hero stronger. Choose the title you want from the Book of Deeds and it rides along on your nameplate, in chat, and on the boards for everyone to see.",
+      "rewardsBody": "The rewards are all for show, and that is the point. Some deeds grant a title you can wear or a border to frame your name, and never anything that makes your hero stronger. Choose the title and the border you want from the Book of Deeds: the title rides along on your nameplate, in chat, and on the boards for everyone to see, and the border draws its own colors around your nameplate and your portrait.",
       "chroniclesHeading": "Chronicles",
       "chroniclesBody": "Each zone keeps its own Chronicle, a set of deeds gathered by a local Chronicler who has taken it upon themselves to record every traveler who passes through. Saul of Eastbrook Vale is the first of them, Osric Fenn keeps the Marsh Chronicle at Fenbridge out in the Mirefen, and Zenzie records the Peaks Chronicle up at Highwatch. A Chronicle is split into chapters, and you are free to work through them in whatever order suits you.",
       "featsHeading": "Feats",
@@ -5022,9 +5360,29 @@ export const en: EnTranslations = {
         "feat": "Feats"
       },
       "bookHeading": "Inside the Book",
-      "bookBody": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles shelf, where you choose the one you wear.",
+      "bookBody": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles and Borders shelf, with a picker for each: one for the title you wear, one for the border that frames your nameplate.",
       "platformHeading": "Steam and Epic achievements",
       "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
+    },
+    "reliquaryPage": {
+      "intro": "The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.",
+      "howHeading": "How the collection works",
+      "howBody": "Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when you obtain that piece for the first time on the character, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is character-scoped except weapon skins, which are account cosmetics.",
+      "ranksHeading": "Curator ranks",
+      "ranksBody": "Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable, and relics on Retired or Personal pages score nothing toward it either.",
+      "retiredTag": "Retired",
+      "personalTag": "Personal",
+      "retiredNote": "These relics can no longer be won. The page honors the veterans who keep them and does not count toward completion or Curator rank.",
+      "personalNote": "Each character can only ever hold their own. The page does not count toward completion or Curator rank.",
+      "catalogHeading": "Catalog of pages",
+      "catalogBody": "Every authored Reliquary page and the relic names it holds. This list is spoiler-safe names only: open The Reliquary in game to see your own progress, clear counts, and silhouettes.",
+      "spoilerNote": "Personal first-find history, clear numbers, and missing-versus-owned state stay in the game client. The wiki never publishes a player collection.",
+      "shelfHeading": "{label} ({count})",
+      "shelf": {
+        "conquerors": "Conquerors",
+        "professions": "Professions",
+        "horizons": "Horizons"
+      }
     },
     "wishPage": {
       "heading": "Things I wish I knew",
@@ -5034,7 +5392,7 @@ export const en: EnTranslations = {
       "i2Title": "Dying barely costs you",
       "i2Body": "When you fall you rise as a ghost at the nearest graveyard. Run back to your body to revive free, or take the Pale Keeper's instant raise and carry a short-lived weakness for the convenience. No experience, gear, or coin is ever lost, so it is safe to take risks and learn.",
       "i3Title": "Talents are not a trap",
-      "i3Body": "Your first talent comes at level 5, and each of the six rows is a single pick of three, so a build is a handful of choices you can see at a glance. You can reset whenever you are out of combat and not in an arena or battleground match, so nothing you choose early locks you in.",
+      "i3Body": "Your first talent comes at level 5, and each of the six rows is a single pick of three, so a build is a handful of choices you can see at a glance. You can reset whenever you are out of combat and not in an arena match, so nothing you choose early locks you in.",
       "i4Title": "Follow the quest trail",
       "i4Body": "Quests are the fastest way to level and they lead you across the world. When you are unsure where to go, find the next marker.",
       "i5Title": "Keep your gear current",
@@ -5547,6 +5905,8 @@ export const en: EnTranslations = {
       "chanWhisperBody": "A private message to one player by name, wherever they are. Use it for a quiet word.",
       "chanParty": "Party.",
       "chanPartyBody": "Talk to everyone in your group, no matter how spread out you are.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "General.",
       "chanGeneralBody": "An always-on realm-wide channel that reaches everyone online, good for asking a question or general chatter. Unlike World and Looking for Group, you never have to opt in.",
       "chanWorld": "World.",
@@ -5620,7 +5980,7 @@ export const en: EnTranslations = {
       "intTitle": "Intellect",
       "intBody": "Intellect grows a spellcaster's mana pool, raises their spell power so their spells hit harder, and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
       "spiTitle": "Spirit",
-      "spiBody": "Spirit governs how quickly a caster's mana returns, but only once they have gone a few seconds without spending any, so a caster who never stops casting never regenerates. Pausing for a breath is a real mana decision, in a fight as much as between them. Like Intellect, Spirit serves the mana classes and means little to the others.",
+      "spiBody": "Spirit governs how quickly a caster's mana returns. It pays in full only once they have gone a few seconds without spending any, and a share of it keeps flowing even mid-cast, so Spirit is never dead weight in a fight, though a caster nuking flat out will still run dry. Pausing for a breath is a real mana decision, in a fight as much as between them. Like Intellect, Spirit serves the mana classes and means little to the others.",
       "armorTitle": "Armor",
       "armorBody": "Armor reduces the physical damage you take. It comes mostly from what you wear, and the heavier armor classes carry far more of it. More armor against a foe near your level means each of its hits lands softer.",
       "apTitle": "Attack power",
@@ -6406,7 +6766,7 @@ export const en: EnTranslations = {
     "browSoft": "Soft",
     "browThick": "Thick",
     "browAngled": "Angled",
-    "earrings": "Earrings",
+    "earrings": "Piercings",
     "jewelMaterial": "Jewellery Material",
     "jewelDefault": "As Forged",
     "jewelGold": "Gold",
@@ -7393,7 +7753,8 @@ export const en: EnTranslations = {
       "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
       "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
       "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
-      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build.",
+      "reliquary": "Tip: the Reliquary tracks the unique spoils you collect, shelf by shelf."
     }
   },
   "errors": {
@@ -7516,7 +7877,12 @@ export const en: EnTranslations = {
     "sortLevel": "Level",
     "sortName": "Name",
     "sortRecent": "Recently Played",
-    "sortPlaytime": "Playtime"
+    "sortPlaytime": "Playtime",
+    "redesign": "Redesign",
+    "redesignHint": "This character predates the new character creator. You get one free redesign; it is used when you save.",
+    "redesignTitle": "Redesign {name}",
+    "redesignSave": "Save New Look",
+    "redesignCancel": "Keep Current Look"
   },
   "deleteCharacter": {
     "title": "Delete Character",
@@ -7544,7 +7910,8 @@ export const en: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energy",
-      "rage": "Rage"
+      "rage": "Rage",
+      "focus": "Focus"
     },
     "roles": {
       "warrior": "Tank / Melee DPS",
@@ -7647,6 +8014,7 @@ export const en: EnTranslations = {
           "say": "Say",
           "yell": "Yell",
           "party": "Party",
+          "battleground": "Battleground",
           "general": "General",
           "world": "World",
           "lfg": "LFG",
@@ -7673,7 +8041,111 @@ export const en: EnTranslations = {
       "zoomIn": "Zoom in",
       "zoomOut": "Zoom out",
       "mapCanvasLabel": "Map",
-      "mapSummary": "Map of {zone}."
+      "mapSummary": "Map of {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "No meaningful markers are visible.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Additional markers: {count}.",
+      "mapMarkerDirections": {
+        "center": "center",
+        "north": "north",
+        "northeast": "northeast",
+        "east": "east",
+        "southeast": "southeast",
+        "south": "south",
+        "southwest": "southwest",
+        "west": "west",
+        "northwest": "northwest"
+      },
+      "mapMarkerDistances": {
+        "near": "near",
+        "medium": "medium distance",
+        "far": "far"
+      },
+      "mapMarkerLabels": {
+        "you": "You",
+        "availableQuest": "Available quest",
+        "readyQuest": "Quest ready to turn in",
+        "repeatQuest": "Repeatable quest",
+        "cooldownQuest": "Quest on cooldown",
+        "questObjective": "Quest objective area",
+        "readyOre": "Ready ore node",
+        "readyWood": "Ready wood node",
+        "readyHerb": "Ready herb node",
+        "readyLockedOre": "Ready ore node, tool locked",
+        "readyLockedWood": "Ready wood node, tool locked",
+        "readyLockedHerb": "Ready herb node, tool locked",
+        "cooldownOre": "Depleted ore node",
+        "cooldownWood": "Depleted wood node",
+        "cooldownHerb": "Depleted herb node",
+        "cooldownLockedOre": "Depleted ore node, tool locked",
+        "cooldownLockedWood": "Depleted wood node, tool locked",
+        "cooldownLockedHerb": "Depleted herb node, tool locked",
+        "station": "Crafting station: {name}",
+        "service": "Service: {name}",
+        "partyMember": "Party member: {name}",
+        "deadPartyMember": "Dead party member: {name}",
+        "partyMemberGeneric": "Party member",
+        "deadPartyMemberGeneric": "Dead party member",
+        "friend": "Friend: {name}",
+        "guildMember": "Guild member: {name}",
+        "pointOfInterest": "Point of interest: {name}",
+        "dungeonEntrance": "Dungeon entrance: {name}",
+        "dungeonExit": "Dungeon exit",
+        "delveEntrance": "Delve entrance: {name}",
+        "worldPassage": "Passage to {zone}",
+        "riftEntrance": "Rift entrance: {name}",
+        "hostileEnemy": "Hostile enemy",
+        "aggressiveEnemy": "Enemy attacking you",
+        "lootableEnemy": "Lootable enemy",
+        "corpse": "Your corpse",
+        "deathZone": "Danger zone",
+        "teammate": "Teammate",
+        "deadTeammate": "Dead teammate",
+        "flagCarrier": "Teammate carrying the flag",
+        "ownFlagStand": "Your flag stand",
+        "enemyFlagStand": "Enemy flag stand",
+        "riftDescent": "Rift descent",
+        "riftReturnBeacon": "Return beacon",
+        "riftReturnExit": "Return exit",
+        "ranked": "{marker}, rank {rank}",
+        "riftTreasureAvailable": "Treasure available",
+        "riftTreasureLocked": "Treasure locked",
+        "riftTreasureOpened": "Treasure opened",
+        "riftTreasureJammed": "Treasure jammed",
+        "riftCacheAvailable": "Rift cache available",
+        "riftCacheLocked": "Locked cache",
+        "riftCacheOpened": "Cache opened",
+        "riftCacheJammed": "Jammed cache",
+        "pylonUnlit": "Unlit pylon",
+        "pylonLit": "Lit pylon",
+        "sequenceRuneUnlit": "Unlit sequence rune",
+        "sequenceRuneLit": "Lit sequence rune",
+        "iceGoal": "Ice target",
+        "boulderPad": "Boulder target",
+        "boulderMovable": "Movable boulder",
+        "boulderPlaced": "Placed boulder",
+        "gateSealed": "Sealed gate",
+        "gateOpen": "Open gate",
+        "switchReady": "Ready switch",
+        "switchOn": "Activated switch",
+        "orbDormant": "Dormant orb",
+        "orbActive": "Active orb",
+        "rollerHazard": "Roller hazard",
+        "delvePassageSealed": "Sealed passage",
+        "delvePassageOpen": "Open passage",
+        "delveSurfaceExit": "Surface exit",
+        "delveCacheLocked": "Locked delve cache",
+        "delveCacheReady": "Delve cache ready",
+        "delveCacheActive": "Delve cache active",
+        "delveCacheOpened": "Opened delve cache",
+        "delveReliquaryLocked": "Locked reliquary",
+        "delveReliquaryReady": "Reliquary ready",
+        "delveReliquaryActive": "Reliquary rite active",
+        "delveReliquaryOpened": "Reliquary opened",
+        "bountiful": "Bountiful {marker}"
+      }
     },
     "options": {
       "gameMenu": "Game Menu",
@@ -7808,6 +8280,7 @@ export const en: EnTranslations = {
     "chat": {
       "rightClickName": "Right-click {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Party] {name}: {message}",
         "yell": "{name} yells: {message}",
         "whisper": "{name} whispers: {message}",
@@ -7951,6 +8424,7 @@ export const en: EnTranslations = {
       "notEnoughRage": "Not enough rage!",
       "notEnoughEnergy": "Not enough energy!",
       "notEnoughMana": "Not enough mana!",
+      "notEnoughDevotion": "Not enough Devotion!",
       "notEnoughResource": "Not enough {resource}!",
       "notEnoughHealth": "Not enough health.",
       "targetMustDodge": "Your target must dodge first.",
@@ -8079,6 +8553,10 @@ export const en: EnTranslations = {
     "pet": {
       "attack": "Attack",
       "waterJet": "Water Jet",
+      "felbolt": "Felbolt",
+      "abyssalChain": "Abyssal Chain",
+      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
+      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
       "taunt": "Taunt",
       "healDemon": "Heal Demon",
       "healPet": "Feed Pet",
@@ -8089,6 +8567,10 @@ export const en: EnTranslations = {
       "petAttackDesc": "Command your pet to attack your current hostile target.",
       "waterJetTitle": "Water Jet",
       "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
+      "felboltTitle": "Felbolt",
+      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "abyssalChainTitle": "Abyssal Chain",
+      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
       "petTauntTitle": "Pet Taunt",
       "petTauntDesc": "Command your pet to engage and Growl when in range. 10 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "healDemonDesc": "Spend mana to channel healing into your demon over 5 seconds.",
@@ -8244,6 +8726,7 @@ export const en: EnTranslations = {
     "tooltip": {
       "rank": "Rank {rank}",
       "cost": "{cost} {resource}",
+      "ruinCost": "{cost} Wrack",
       "range": "{range} yd range",
       "rangeWithMin": "{min}-{max} yd range",
       "instant": "Instant",
@@ -8255,6 +8738,7 @@ export const en: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "requiresForm": "Requires {form} Form",
       "requiresStealth": "Requires stealth",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Consumes combo points",
       "requiresTargetHealthBelow": "Requires target below {percent}% health",
       "requiresDodge": "Only usable after the target dodges",
@@ -8270,7 +8754,9 @@ export const en: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Rage",
-      "energy": "Energy"
+      "energy": "Energy",
+      "focus": "Focus",
+      "devotion": "Devotion"
     },
     "forms": {
       "bear": "Bear",
@@ -8472,6 +8958,7 @@ export const en: EnTranslations = {
       "clickDestroy": "Click to destroy",
       "useFishing": "Use: Fish in nearby waters.",
       "useHealingPotion": "Use: Instantly restores {amount} health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
       "useManaPotion": "Use: Instantly restores {amount} mana. Usable in combat. 2 min cooldown.",
       "clickUseInstant": "Click to use instantly in combat",
       "clickUse": "Click to use",
@@ -8575,6 +9062,9 @@ export const en: EnTranslations = {
       "filterPrimaryStatAll": "Any primary stat",
       "filterRarity": "Rarity",
       "filterRarityAll": "All rarities",
+      "filterSort": "Sort",
+      "sortName": "Name (A-Z)",
+      "sortPriceAsc": "Price: Low to High",
       "weaponSword": "Swords",
       "weaponDagger": "Daggers",
       "weaponStaff": "Staves",
@@ -8703,19 +9193,71 @@ export const en: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Rain of Fire",
-        "description": "Calls a rain of fire onto the target area for 4 sec, burning enemies for {damage} Fire damage each second."
+        "description": "Spends 3 Wrack to rain fire over the target area for {damage} Fire damage each second for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately."
       },
       "volley": {
         "name": "Volley",
-        "description": "Rains arrows on the target area for 3 sec, dealing {damage} damage every 0.5 sec to enemies caught in it."
+        "description": "Rain arrows over an 8-yard area for 3 sec. Enemies in the area take {damage} Physical damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
+      "pack_command": {
+        "name": "Pack Command",
+        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
+      },
+      "stampede": {
+        "name": "Stampede",
+        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+      },
+      "unleash_beast": {
+        "name": "Unleash Beast",
+        "description": "Consume 3 Pack Ferocity after your pet strikes for 42 to 53 Physical damage and claps every enemy within 6 yards for 57 to 75. The clap deals 50% more damage to enemies other than the main target. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 enemies within 5 yards of the target."
+      },
+      "measured_shot": {
+        "name": "Measured Shot",
+        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
+      },
+      "cold_focus": {
+        "name": "Cold Focus",
+        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+      },
+      "bloodhook": {
+        "name": "Bloodhook",
+        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+      },
+      "shrapnel_charge": {
+        "name": "Shrapnel Charge",
+        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+      },
+      "bloodtrail_assault": {
+        "name": "Bloodtrail Assault",
+        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards of radius, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+      },
+      "trailbreak": {
+        "name": "Trailbreak",
+        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+      },
+      "wildheart": {
+        "name": "Wildheart",
+        "description": "Immediately restore 30% of your maximum health."
+      },
+      "shellskin": {
+        "name": "Shellskin",
+        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+      },
+      "frostjaw_trap": {
+        "name": "Frostjaw Trap",
+        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+      },
+      "pack_rally": {
+        "name": "Pack Rally",
+        "description": "Adopt Courser's Guise. You, your companion, and group or raid allies within 30 yards gain 30% movement speed and 10% attack, casting, and channeling speed for 10 sec."
       },
       "hurricane": {
         "name": "Galeheart",
         "description": "Calls a hurricane onto the target area for 6 sec, battering enemies for {damage} Nature damage each second."
       },
       "earthquake": {
-        "name": "Earthquake",
-        "description": "Shakes the target area for 6 sec, battering enemies for {damage} Nature damage every 1.5 sec."
+        "name": "Faultwake",
+        "description": "Shake an 8-yard area for 6 sec, dealing {damage} Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 100% more damage and consume all Thunder."
       },
       "heroic_strike": {
         "name": "Reaver Strike",
@@ -8923,15 +9465,20 @@ export const en: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Wicked Slash",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point."
+        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
+        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
+        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
       },
       "eviscerate": {
         "name": "Dirt Nap",
-        "description": "Finishing move that causes {damage}."
+        "description": "Finishing move that causes {damage}.",
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
       },
       "backstab": {
         "name": "Craven Thrust",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point."
+        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
         "name": "Eye Jab",
@@ -8943,7 +9490,7 @@ export const en: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Cutthroat Tempo",
-        "description": "Finishing move that increases melee attack speed by 30%. Lasts longer per combo point."
+        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
       },
       "sprint": {
         "name": "Swift Heels",
@@ -8951,15 +9498,17 @@ export const en: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Low Blow",
-        "description": "Finishing move that stuns the target. Lasts 1 sec longer per combo point."
+        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
       },
       "ambush": {
         "name": "Lurker's Strike",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point."
+        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "Duskveil",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out."
+        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
+        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
         "name": "Quickened Blood",
@@ -8967,11 +9516,13 @@ export const en: EnTranslations = {
       },
       "garrote": {
         "name": "Throat Wire",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point."
+        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "Gut Punch",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points."
+        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
         "name": "Sap",
@@ -8983,11 +9534,11 @@ export const en: EnTranslations = {
       },
       "expose_armor": {
         "name": "Armor Breach",
-        "description": "Finishing move that exposes the target, reducing its armor by {damage}% for 30 sec."
+        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
       },
       "rupture": {
         "name": "Bleed Out",
-        "description": "Finishing move that wounds the target, causing it to bleed for {damage} over 16 sec."
+        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
       },
       "vanish": {
         "name": "Smokestep",
@@ -9007,19 +9558,131 @@ export const en: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Oathbrand",
-        "description": "Fills you with Holy power for 30 sec, causing each of your melee swings to deal {damage} additional Holy damage. Unleash with Verdict."
-      },
-      "holy_light": {
-        "name": "Mending Light",
-        "description": "Heals a friendly target for {damage}."
-      },
-      "devotion_aura": {
-        "name": "Steadfast Aura",
-        "description": "Increases the armor of all party members by {buff}% for 30 min."
+        "description": "Fills you with Holy power for 30 sec, causing each of your melee swings to deal {damage} additional Holy damage."
       },
       "judgement": {
         "name": "Verdict",
         "description": "Unleashes your active Seal upon the enemy, consuming it to deal its stored Holy damage."
+      },
+      "holy_light": {
+        "name": "Mending Light",
+        "description": "Quickly heals a friendly target for {damage}. Restoring health generates 1 Devotion, even without a specialization. Radiant Resonance or Solar Reprisal makes it instant."
+      },
+      "divine_ascension": {
+        "name": "Divine Ascension",
+        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
+      },
+      "aura_mastery": {
+        "name": "Sacred Concord",
+        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
+      },
+      "devotion_ward": {
+        "name": "Bastion Devotion",
+        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Replaces your own Requital Aura. Another Paladin casting Bastion Devotion refreshes it instead of stacking; Radiant, Dawn, and Grace Devotion coexist."
+      },
+      "hammer_of_grace": {
+        "name": "Hammer of Grace",
+        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
+      },
+      "hushbrand": {
+        "name": "Hushbrand",
+        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
+      },
+      "guardian_covenant": {
+        "name": "Guardian Covenant",
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
+      },
+      "solar_step": {
+        "name": "Solar Step",
+        "description": "Increase your movement speed by 150% for 2 sec."
+      },
+      "solar_invocation": {
+        "name": "Solar Invocation",
+        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+      },
+      "radiant_devotion": {
+        "name": "Radiant Devotion",
+        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion. Another Paladin casting Radiant Devotion refreshes it instead of stacking; a different Devotion coexists."
+      },
+      "dawn_devotion": {
+        "name": "Dawn Devotion",
+        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion. Another Paladin casting Dawn Devotion refreshes it instead of stacking; a different Devotion, and Warrior shouts, coexist."
+      },
+      "grace_devotion": {
+        "name": "Grace Devotion",
+        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion. Another Paladin casting Grace Devotion refreshes it instead of stacking; a different Devotion coexists."
+      },
+      "recall_the_fallen": {
+        "name": "Recall the Fallen",
+        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+      },
+      "beacon_of_light": {
+        "name": "Beacon of Light",
+        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
+      },
+      "final_edict": {
+        "name": "Final Edict",
+        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
+      },
+      "dawnfall": {
+        "name": "Dawnfall",
+        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
+      },
+      "sun_gods_verdict": {
+        "name": "Verdict of the Sun God",
+        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
+      },
+      "valkyrs_calling": {
+        "name": "Valkyr's Calling",
+        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
+      },
+      "faithforged_guard": {
+        "name": "Debt of Light",
+        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
+      },
+      "mercy_lance": {
+        "name": "Mercy Lance",
+        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
+      },
+      "sacred_form": {
+        "name": "Sacred Form",
+        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
+      },
+      "dawns_embrace": {
+        "name": "Dawn's Embrace",
+        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
+      },
+      "radiant_chorus": {
+        "name": "Radiant Chorus",
+        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
+      },
+      "life_covenant": {
+        "name": "Life Covenant",
+        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
+      },
+      "aegis_first_dawn": {
+        "name": "Aegis of the First Dawn",
+        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
+      },
+      "vowkeeper_strike": {
+        "name": "Vowkeeper Strike",
+        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
+      },
+      "bastion_rite": {
+        "name": "Bastion Rite",
+        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
+      },
+      "sunward_disc": {
+        "name": "Sunward Disc",
+        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
+      },
+      "sacred_challenge": {
+        "name": "Sacred Goad",
+        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
+      },
+      "devotion_aura": {
+        "name": "Steadfast Aura",
+        "description": "Increases the armor of all party members by {buff}% for 30 min."
       },
       "blessing_of_might": {
         "name": "Oath of Iron",
@@ -9027,7 +9690,7 @@ export const en: EnTranslations = {
       },
       "divine_protection": {
         "name": "Ward of Faith",
-        "description": "A protective ward absorbs {damage} damage for 10 sec."
+        "description": "A sacred ward absorbs {damage}% of your maximum health for {duration} sec. Enduring Protection increases the ward."
       },
       "hammer_of_justice": {
         "name": "Sundering Gavel",
@@ -9035,7 +9698,7 @@ export const en: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Last Rite",
-        "description": "A massive surge of healing: restores {damage} health. 10 min cooldown."
+        "description": "A massive surge that restores {damage}% of your maximum health and generates 1 Devotion when it restores health. 10 min cooldown."
       },
       "holy_taunt": {
         "name": "Sacred Goad",
@@ -9043,7 +9706,7 @@ export const en: EnTranslations = {
       },
       "flash_of_light": {
         "name": "Lightmend",
-        "description": "A quick, efficient burst of Light that heals a friendly target for {damage}."
+        "description": "A quick, efficient burst of Light that heals a friendly target for {damage}. Restoring health generates 1 Devotion, even without a specialization."
       },
       "exorcism": {
         "name": "Rite of Expulsion",
@@ -9051,15 +9714,31 @@ export const en: EnTranslations = {
       },
       "consecration": {
         "name": "Holy Ground",
-        "description": "Consecrates the ground beneath you, searing nearby enemies for {damage} Holy damage every 2 sec for 10 sec."
+        "description": "Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 10% less damage while standing inside. Ascension increases its damage."
+      },
+      "bastion_sweep": {
+        "name": "Bastion Sweep",
+        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+      },
+      "oath_chain": {
+        "name": "Oath Chain",
+        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
+      },
+      "veilbound_march": {
+        "name": "Veilbound March",
+        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
+      },
+      "veilbound_mark": {
+        "name": "Veil Mark",
+        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
       },
       "righteous_fury": {
         "name": "Burning Oath",
-        "description": "Increases the threat generated by your Holy damage by 60% for 30 min. The tanking paladin's cornerstone."
+        "description": "Passively increases the threat generated by your Holy damage by 60%. Faithwarden only."
       },
       "retribution_aura": {
         "name": "Requital Aura",
-        "description": "Surrounds you with holy energy for 30 min, dealing 5 Holy damage to any enemy that strikes you in melee."
+        "description": "Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take {buff} Holy damage, and affected allies deal {buff} additional Holy damage with auto-attacks. Replaces your own Bastion Devotion. Another Paladin casting Requital Aura refreshes it instead of stacking."
       },
       "tame_beast": {
         "name": "Wildbond",
@@ -9071,119 +9750,131 @@ export const en: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Gutting Strike",
-        "description": "A strong melee attack that increases damage by {damage}. Activates on your next swing."
+        "description": "Strike for 10% weapon damage plus {damage}. A hit restores 15 Focus and grants 1 Hunting Momentum. Damage increases with Attack Power through weapon damage."
       },
       "aspect_of_the_hawk": {
         "name": "Harrier's Guise",
-        "description": "Take on the harrier's guise, increasing attack power by {buff} for 30 min."
+        "description": "Adopt Harrier's Guise, increasing your Attack Power by {buff} for 30 min."
       },
       "serpent_sting": {
         "name": "Venom Barb",
-        "description": "Stings the target, dealing {damage} Nature damage over 15 sec."
+        "description": "Deal {damage} total Nature damage over 15 sec, once every 3 sec. Damage increases with Ranged Attack Power."
       },
       "arcane_shot": {
         "name": "Fell Shot",
-        "description": "An instant shot that deals {damage} Arcane damage."
+        "description": "Shoot the target for {damage} Arcane damage. Damage increases with Ranged Attack Power."
       },
       "concussive_shot": {
         "name": "Rattling Shot",
-        "description": "Dazes the target for {damage} damage, slowing movement by 50% for 4 sec."
+        "description": "Shoot the target for {damage} Physical damage and slow it by 50% for 4 sec. Damage increases with Ranged Attack Power."
       },
       "mongoose_bite": {
-        "name": "Counterfang",
-        "description": "Counterattack after the target dodges for weapon damage plus {damage}. Cannot be dodged."
+        "name": "Woundrend",
+        "description": "Strike for 45% weapon damage plus {damage}. If the target has your Bloodhook Wound, deal 1 wound tick immediately and refresh the wound to 12 sec. Damage increases with Attack Power through weapon damage."
+      },
+      "hunting_momentum": {
+        "name": "Hunting Momentum",
+        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+      },
+      "fieldcraft_reentry": {
+        "name": "Armed Re-entry",
+        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
       },
       "wing_clip": {
         "name": "Fettering Slash",
-        "description": "Inflicts a wound for {damage} damage, slowing the enemy by 40% for 10 sec."
+        "description": "Slash the target for {damage} Physical damage and slow it by 40% for 10 sec. Damage increases with Attack Power."
       },
       "aspect_of_the_monkey": {
         "name": "Marten's Guise",
-        "description": "Take on the marten's guise, increasing your dodge chance by 8% for 30 min."
+        "description": "Adopt Marten's Guise, increasing your dodge chance by 8% for 30 min."
       },
       "aspect_of_the_cheetah": {
         "name": "Courser's Guise",
-        "description": "Take on the courser's guise, increasing movement speed by 30% for 30 min."
+        "description": "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min."
       },
       "aimed_shot": {
         "name": "Long Draw",
-        "description": "A carefully drawn shot that deals {damage} damage."
+        "description": "Shoot the target for {damage} Physical damage. Damage increases with Ranged Attack Power."
       },
       "rapid_fire": {
         "name": "Fevered Draw",
-        "description": "Increases your attack speed by 40% for 15 sec."
+        "description": "Fire 6 shots over 2.4 sec while moving. Each shot deals {damage} Physical damage and increases with Ranged Attack Power."
       },
       "smite": {
-        "name": "Smite",
-        "description": "Smites the enemy for {damage} Holy damage."
+        "name": "Scouring Hymn",
+        "description": "Deal {damage} Holy damage. Damage increases with Spell Power. Doctrine: heal each linked ally for 30% of the damage. If no ally is linked, heal the lowest-health party member for 15%."
       },
       "lesser_heal": {
         "name": "Whispered Prayer",
-        "description": "Heals a friendly target for {damage}."
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power."
       },
       "power_word_fortitude": {
         "name": "Litany of Resolve",
-        "description": "Increases the Stamina of all party members by {buff}% for 30 min."
+        "description": "Increase the Stamina of every party member by {buff}% for 30 min."
       },
       "shadow_word_pain": {
         "name": "Dirge of Decay",
-        "description": "A word of darkness causes {damage} Shadow damage over 18 sec."
+        "description": "Deal {damage} total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers: deal 10% more damage, and each tick on your Effigy grants 1 Gloomtithe."
       },
       "power_word_shield": {
         "name": "Psalm of Warding",
-        "description": "Shields the target, absorbing {damage} damage for 30 sec."
+        "description": "Shield a friendly target, absorbing {damage} damage for 30 sec. Doctrine also links the target to your Holy damage for 30 sec."
       },
       "renew": {
         "name": "Lingering Grace",
-        "description": "Heals the target for {damage} over 15 sec."
+        "description": "Heal the target for {damage} over 15 sec, once every 3 sec. Healing increases with Spell Power."
       },
       "mind_blast": {
         "name": "Mindfracture",
-        "description": "Blasts the target's mind for {damage} Shadow damage."
+        "description": "Deal {damage} Shadow damage. Damage increases with Spell Power. Vespers binds a target with your Dirge of Decay as its Effigy, grants 1 Gloomtithe, and echoes 30% of the damage to up to 3 other enemies with your Dirge."
       },
       "heal": {
         "name": "Solemn Prayer",
-        "description": "A slow but powerful prayer that heals a friendly target for {damage}."
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power."
       },
       "mind_flay": {
         "name": "Litany of Woe",
-        "description": "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec."
+        "description": "Channel for 3 sec, dealing {damage} Shadow damage each second. Damage increases with Spell Power."
       },
       "flash_heal": {
         "name": "Urgent Prayer",
-        "description": "A fast prayer that heals a friendly target for {damage}."
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power."
       },
       "lightning_bolt": {
         "name": "Arc Bolt",
-        "description": "Hurls a bolt of lightning for {damage} Nature damage."
+        "description": "Deal {damage} Nature damage. Damage increases with Spell Power. Thundercall: a hit grants 1 Thunder."
+      },
+      "thunder_reservoir": {
+        "name": "Thunder Reservoir",
+        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
       },
       "rockbiter_weapon": {
         "name": "Stonebound Weapon",
-        "description": "Imbues your weapon with the fury of stone: each swing deals {damage} additional damage for 5 min."
+        "description": "Imbue your weapon for 30 min. Each swing deals {damage} extra damage. Warspirit also gains 30% armor, takes 10% less damage, and generates twice as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec."
       },
       "healing_wave": {
         "name": "Mending Waters",
-        "description": "Heals a friendly target for {damage}."
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power. Spiritmend: store 50% of the full heal before overhealing as Mending Current for 12 sec, up to 30% of the target's maximum health."
       },
       "earth_shock": {
         "name": "Earthen Jolt",
-        "description": "Instantly shocks the target with concussive force for {damage} Nature damage."
+        "description": "Deal {damage} Nature damage. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 125% more damage and consume all Thunder. Stonebound: force the target to attack you for 3 sec."
       },
       "lightning_shield": {
         "name": "Thunder Ward",
-        "description": "Surrounds you with crackling lightning: melee attackers take {buff} Nature damage, up to 3 charges and at most once every 5 seconds."
+        "description": "Surround yourself with lightning for 10 min. The next 3 melee attacks against you deal {buff} Nature damage to the attacker, at most once every 5 sec."
       },
       "flame_shock": {
         "name": "Cinder Jolt",
-        "description": "Sears the target with fire for {damage} damage plus {overTime} over 12 sec."
+        "description": "Deal {damage} Fire damage, then {overTime} Fire damage over 12 sec. The initial hit increases with Spell Power."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand Weapon",
-        "description": "Imbues your weapon with elemental fire: each swing deals {damage} additional Fire damage for 5 min."
+        "description": "Imbues your weapon for 30 min. Each swing deals {damage} additional Fire damage."
       },
       "frost_shock": {
         "name": "Rime Jolt",
-        "description": "Instantly shocks the target with frost for {damage} Frost damage and slows its movement by 50% for 8 sec."
+        "description": "Deal {damage} Frost damage and slow the target by 50% for 8 sec. Damage increases with Spell Power."
       },
       "frostbrand_weapon": {
         "name": "Rimebound Weapon",
@@ -9191,11 +9882,11 @@ export const en: EnTranslations = {
       },
       "ghost_wolf": {
         "name": "Shadewolf",
-        "description": "Turns you into a Shadewolf, increasing movement speed by 40% for 10 min."
+        "description": "Become a Shadewolf and move 40% faster. Cast again to return to your normal form."
       },
       "stormstrike": {
         "name": "Ancestral Strike",
-        "description": "Channels the storm through your weapon, instantly striking for weapon damage plus {damage}."
+        "description": "Strike for weapon damage plus {damage} and advance Warspirit Cadence by 2 steps. Damage increases with Attack Power through weapon damage."
       },
       "shadow_bolt": {
         "name": "Gloom Bolt",
@@ -9213,9 +9904,29 @@ export const en: EnTranslations = {
         "name": "Blackrot",
         "description": "Corrupts the target, causing {damage} Shadow damage over 18 sec."
       },
+      "evil_eye": {
+        "name": "Evil Eye",
+        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+      },
+      "maledict_gaze": {
+        "name": "Maledict Gaze",
+        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
+      },
+      "needle_of_fate": {
+        "name": "Needle of Fate",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+      },
+      "sentence": {
+        "name": "Sentence",
+        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
+      },
       "life_tap": {
         "name": "Hard Bargain",
         "description": "Converts {damage} health into {damage} mana."
+      },
+      "cursed_accomplice": {
+        "name": "Cursed Accomplice",
+        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
       },
       "curse_of_agony": {
         "name": "Hex of Anguish",
@@ -9223,7 +9934,47 @@ export const en: EnTranslations = {
       },
       "drain_life": {
         "name": "Consume",
-        "description": "Drains the target's life, transferring {damage} health to you each second for 5 sec."
+        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Affliction transfers all of it instead. When channeled on your primary Evil Eye, it consumes all Fate Threads at the start, and each Thread generates 1 extra Condemnation per tick."
+      },
+      "litany_of_guilt": {
+        "name": "Litany of Guilt",
+        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+      },
+      "cinderhide": {
+        "name": "Cinderhide",
+        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
+      },
+      "umbral_anchor": {
+        "name": "Umbral Anchor",
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+      },
+      "hex_of_violence": {
+        "name": "Hex of Violence",
+        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
+      },
+      "cruel_pact": {
+        "name": "Cruel Pact",
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
+      },
+      "vicarious_suffering": {
+        "name": "Vicarious Suffering",
+        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
+      },
+      "possess_evil_eye": {
+        "name": "Possess the Evil Eye",
+        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+      },
+      "hour_of_judgment": {
+        "name": "Hour of Judgment",
+        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
+      },
+      "coven": {
+        "name": "Coven",
+        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
       },
       "fear": {
         "name": "Harrow",
@@ -9235,11 +9986,16 @@ export const en: EnTranslations = {
       },
       "shadowburn": {
         "name": "Duskfire",
-        "description": "Instantly blasts the target with searing shadow for {damage} Shadow damage."
+        "description": "Spends 1 Wrack to execute an enemy below 20% health for {damage} Shadow damage. Refunds its Wrack if the claimed target dies within 5 sec."
+      },
+      "ruinous_brand": {
+        "name": "Ruinous Brand",
+        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
       },
       "wrath": {
         "name": "Wildbolt",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage."
+        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "Wildmend",
@@ -9251,11 +10007,17 @@ export const en: EnTranslations = {
       },
       "moonfire": {
         "name": "Lunar Tempest",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time."
+        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
+        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+      },
+      "moonseed": {
+        "name": "Moonseed",
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3."
       },
       "rejuvenation": {
         "name": "Wildbloom",
-        "description": "Heals the target for {damage} over 12 sec."
+        "description": "Heals the target for {damage} over 12 sec.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "Briarguard",
@@ -9271,7 +10033,8 @@ export const en: EnTranslations = {
       },
       "maul": {
         "name": "Bonecrush",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only."
+        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
       },
       "growl": {
         "name": "Menace",
@@ -9279,23 +10042,27 @@ export const en: EnTranslations = {
       },
       "cat_form": {
         "name": "Wolf Form",
-        "description": "Shapeshift into a wolf: attack power rises with your level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form."
+        "description": "Shapeshift into a wolf: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form."
       },
       "claw": {
-        "name": "Claw",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only."
+        "name": "Rendclaw",
+        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "Gorebite",
-        "description": "Finishing move that causes {damage}. Wolf Form only."
+        "description": "Finishing move that causes {damage}. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
       },
       "swipe": {
         "name": "Sweeping Claws",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only."
+        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "Second Bloom",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec."
+        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
         "name": "Oakhide",
@@ -9311,7 +10078,8 @@ export const en: EnTranslations = {
       },
       "starfire": {
         "name": "Skyfall",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage."
+        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
       },
       "travel_form": {
         "name": "Fleet Form",
@@ -9327,7 +10095,7 @@ export const en: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Armor Shear."
+        "description": "Decreases the target's armor by {damage}% for 40 sec."
       },
       "hibernate": {
         "name": "Slumber",
@@ -9350,8 +10118,9 @@ export const en: EnTranslations = {
         "description": "Increases attack power by {buff} for {duration} sec. Wolf Form only."
       },
       "rip": {
-        "name": "Rip",
-        "description": "Finishing move that causes {damage} Bleed damage over 12 sec. Consumes combo points. Wolf Form only."
+        "name": "Bloodrift",
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
+        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
         "name": "Maiming Strike",
@@ -9378,32 +10147,120 @@ export const en: EnTranslations = {
         "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
+        "name": "Cascading Mend",
+        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+      },
+      "galeheart_weapon": {
+        "name": "Galeheart Weapon",
+        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+      },
+      "warspirit_cadence": {
+        "name": "Warspirit Cadence",
+        "description": "Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+      },
+      "stormsurge": {
+        "name": "Stormsurge",
+        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
+      },
+      "lifespring_weapon": {
+        "name": "Lifespring Weapon",
+        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
+      },
+      "unleash_weapon": {
+        "name": "Unleash Weapon",
+        "description": "Trigger your active weapon enchant. Pyrebrand: deal 54 to 64 Fire damage plus 30% of your Spell Power and gain 2 Thunder. Galeheart: strike with your weapon, advance Warspirit Cadence, and gain 20% attack speed for 6 sec. Stonebound: strike for 75% weapon damage, force the target to attack you for 3 sec, and take 20% less damage for 4 sec. Lifespring: consume Mending Current, heal for 125% of its remaining healing, and reduce the next hit within 8 sec by 50% of the health restored."
+      },
+      "elemental_trance": {
+        "name": "Elemental Trance",
+        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
+      },
+      "primal_exaltation": {
+        "name": "Primal Exaltation",
+        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+      },
+      "stoneward": {
+        "name": "Stoneward",
+        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+      },
+      "tidecall": {
+        "name": "Tidecall",
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power. Add the full heal before overhealing to Mending Current, up to 30% of the target's maximum health."
+      },
+      "soul_harvest": {
+        "name": "Essence Reap",
+        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+      },
+      "raise_graveguard": {
+        "name": "Raise Graveguard",
+        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
+      },
+      "raise_skeletal_warrior": {
+        "name": "Raise Skeletal Warrior",
+        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
+      },
+      "raise_bone_mage": {
+        "name": "Raise Bone Mage",
+        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
+      },
+      "bone_armor": {
+        "name": "Bone Armor",
+        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
+      },
+      "corpse_explosion": {
+        "name": "Corpse Explosion",
+        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
+      },
+      "funeral_harvest": {
+        "name": "Funeral Harvest",
+        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+      },
+      "unholy_command": {
+        "name": "Unholy Command",
+        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+      },
+      "reaping_command": {
+        "name": "Reaping Command",
+        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+      },
+      "sacrifice_undead": {
+        "name": "Sacrifice Undead",
+        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+      },
+      "raise_gravewing": {
+        "name": "Raise Gravewing",
+        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
+      },
+      "army_of_the_dead": {
+        "name": "Army of the Dead",
+        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
       },
       "metamorphosis": {
-        "name": "Dread Aspect",
-        "description": "Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)"
+        "name": "Lich Form",
+        "description": "Become a Lich for 20 sec, creating 3 Soul Fragments and increasing your spell damage and casting speed by 20%. Your undead deal 50% more damage and act 20% faster, and Soul Lance pierces through its target to strike up to 2 nearby enemies for 50% of its damage. (Necromancy signature)"
       },
       "holy_shock": {
         "name": "Holy Shock",
         "description": "Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)"
       },
-      "aura_surge": {
-        "name": "Dawnward Ricochet",
-        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
-      },
       "holy_shield": {
         "name": "Hallowed Wall",
-        "description": "Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)"
+        "description": "Gain 30% block and a shield that absorbs {damage}% of your maximum health for {duration} sec, releasing a pulse of threat. Ascension strengthens and extends the defense."
       },
       "bestial_wrath": {
         "name": "Howling Rage",
-        "description": "Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)"
+        "description": "Grant 3 Pack Ferocity. Your next Unleash Beast within 20 sec deals 50% more strike and clap damage, and its frenzy lasts 12 sec instead of 8. (Packlord signature)"
       },
       "trueshot_aura": {
         "name": "Sureflight Aura",
-        "description": "Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)"
+        "description": "Increase the Attack Power of allies within 30 yards by 10% for 30 min. (Marksmanship signature)"
       },
       "wyvern_sting": {
         "name": "Wyvern Sting",
@@ -9423,31 +10280,31 @@ export const en: EnTranslations = {
       },
       "cold_blood": {
         "name": "Killer's Calm",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Assassination signature)"
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
       },
       "blade_flurry": {
         "name": "Mirrored Blades",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
       },
       "hemorrhage": {
         "name": "Red Ribbon",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)"
+        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
       },
       "power_infusion": {
         "name": "Anointing",
-        "description": "Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)"
+        "description": "Anoints a friendly target, increasing damage, healing, and casting speed by 20% for 15 sec."
       },
       "holy_nova": {
-        "name": "Holy Nova",
-        "description": "Causes an explosion of holy radiance, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
+        "name": "Sunburst Canticle",
+        "description": "Heal allies within 10 yards for {damage} and deal 24 to 30 Holy damage to enemies in the same area. Both amounts increase with Spell Power. (Benison baseline)"
       },
       "shadowform": {
-        "name": "Gloamveil Form",
-        "description": "Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+        "name": "Gloamveil",
+        "description": "Enter Gloamveil, increasing your Shadow damage by 25%. Cast it again to leave Gloamveil. (Vespers signature)"
       },
       "elemental_mastery": {
         "name": "Primal Mastery",
-        "description": "Calls on the storm, making your next spell instant. (Elemental signature)"
+        "description": "For 12 sec, Arc Bolt grants 2 Thunder. Your next Arc Bolt or Skybranch is instant, and your next full Thunder payoff deals 25% more damage. (Thundercall signature)"
       },
       "siphon_life": {
         "name": "Veinleech",
@@ -9455,7 +10312,7 @@ export const en: EnTranslations = {
       },
       "conflagrate": {
         "name": "Conflagrate",
-        "description": "Consumes your Burning Pact on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
+        "description": "Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation. Holds 2 charges. (Destruction signature)"
       },
       "moonkin_form": {
         "name": "Moonwing Form",
@@ -9467,15 +10324,35 @@ export const en: EnTranslations = {
       },
       "swiftmend": {
         "name": "Swiftmend",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+      },
+      "moonlash": {
+        "name": "Moonsurge",
+        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
+      },
+      "sunlance": {
+        "name": "Sunwake",
+        "description": "Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
+      },
+      "redharvest": {
+        "name": "Redharvest",
+        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points."
+      },
+      "marrowbreak": {
+        "name": "Marrowbreak",
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
+      },
+      "overbloom": {
+        "name": "Overbloom",
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
       },
       "summon_imp": {
         "name": "Summon Emberkin",
-        "description": "Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time."
+        "description": "Summons an Emberkin under the command of the Warlock. The Emberkin casts Felbolt at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time."
       },
       "summon_voidwalker": {
         "name": "Summon Gloomshade",
-        "description": "Summons a Gloomshade under the command of the Warlock. The Gloomshade is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time."
+        "description": "Summons a Gloomshade under the command of the Warlock. This sturdy demon taunts enemies and uses Abyssal Chain to drag distant normal enemies back into reach. Bosses cannot be pulled. Summoning a new demon dismisses your current one. You may have one demon at a time."
       },
       "summon_succubus": {
         "name": "Summon Duskborn",
@@ -9491,7 +10368,7 @@ export const en: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Summon Pyre Colossus",
-        "description": "Binds a Pyre Colossus to your will — a hulking juggernaut with crushing melee and the deepest health and armor of any demon. A long cooldown gates its raw power. Summoning a new demon dismisses your current one. You may have one demon at a time."
+        "description": "Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec."
       },
       "summon_doomguard": {
         "name": "Summon Wraithborn",
@@ -9626,8 +10503,8 @@ export const en: EnTranslations = {
         "description": "Transform into a colossus for 20 sec, breaking enemy control effects on you (boss control is unaffected) and increasing your damage dealt by 20%."
       },
       "avenging_wrath": {
-        "name": "Wrathwing",
-        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
+        "name": "Avenging Wrath",
+        "description": "Unfurl physical wings of golden holy power, gaining 10 Devotion and doubling Devotion generated by your abilities for 15 sec. Also increases damage and healing done by 20%. Dawnreaver: enables Hammer of Wrath against any target."
       },
       "berserk": {
         "name": "Red Haze",
@@ -9643,19 +10520,23 @@ export const en: EnTranslations = {
       },
       "bloodlust": {
         "name": "Storm Chorus",
-        "description": "Whips your group or raid into a frenzy, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Storm Chorus or Temporal Acceleration are too exhausted to benefit. (Shaman talent)"
+        "description": "Increase the attack, casting, and channeling speed of group or raid allies within 30 yards by 30% for 15 sec. Affected allies cannot benefit from Storm Chorus or Temporal Acceleration again for 10 min. (Shaman talent)"
       },
       "chain_lightning": {
         "name": "Skybranch",
-        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+        "description": "Strike up to 3 enemies within 10 yards for {damage} Nature damage each. Thundercall: a hit grants 1 Thunder. Damage increases with Spell Power."
+      },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
       },
       "chaos_bolt": {
         "name": "Ruinbolt",
-        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+        "description": "Spends 3 Wrack to hurl a heavy bolt of chaotic fire for {damage} Fire damage. Desolation shortens its cast by 30%."
       },
-      "cleansing_verdict": {
-        "name": "Cleansing Verdict",
-        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
       },
       "cloak_of_shadows": {
         "name": "Shadecloak",
@@ -9683,23 +10564,23 @@ export const en: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Last Prayer",
-        "description": "Instantly heals you for {damage}. (Priest talent)"
+        "description": "Instantly heals you for 30% of maximum health."
       },
       "deterrence": {
         "name": "Bristleguard",
         "description": "Increases your dodge chance by 25 percentage points and reduces all damage taken by 30% for 10 sec. (Hunter talent)"
       },
-      "divine_shield": {
-        "name": "Lightward",
-        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
-      },
       "earthbind": {
         "name": "Gripping Earth",
-        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+        "description": "Roots enemies within 4 yd of the target point for 2 sec, then slows them by 40% for 6 sec. (Shaman talent)"
       },
       "evocation": {
         "name": "Aetherwell",
         "description": "Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)"
+      },
+      "flurry_of_knives": {
+        "name": "Flurry of Knives",
+        "description": "Lash every enemy within 6 yd with thrown knives for {damage} Physical damage and gain 2 combo points. (Rogue talent)"
       },
       "frenzied_regeneration": {
         "name": "Savage Mending",
@@ -9711,19 +10592,15 @@ export const en: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Wraith Strike",
-        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
-        "name": "Tolling Hammer",
-        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
+        "name": "Hammer of Wrath",
+        "description": "Hurl a holy hammer for {damage} damage and generate 1 Devotion. Usable below 20% health, or during Divine Ascension or Avenging Wrath. Dawn's Wrath grants an additional cast against any target that ignores its current cooldown and deals 20% more damage. Ascension increases its damage by 30%."
       },
       "healing_stream": {
         "name": "Springwell",
         "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
-      },
-      "holy_wrath": {
-        "name": "Saint's Ire",
-        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
       },
       "howl_of_terror": {
         "name": "Dread Chorus",
@@ -9735,7 +10612,7 @@ export const en: EnTranslations = {
       },
       "inner_focus": {
         "name": "Stilled Mind",
-        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+        "description": "Makes your next Priest spell free and uninterruptible. Lasts 60 sec."
       },
       "innervate": {
         "name": "Lifesap",
@@ -9781,6 +10658,10 @@ export const en: EnTranslations = {
         "name": "Collective Reversal",
         "description": "Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)"
       },
+      "ancestor_return": {
+        "name": "Ancestors' Return",
+        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+      },
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
@@ -9803,7 +10684,7 @@ export const en: EnTranslations = {
       },
       "mind_sear": {
         "name": "Thoughtburn",
-        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
+        "description": "Channel for 3 sec, dealing {damage} Shadow damage each second to enemies within 8 yards of the target area. Damage increases with Spell Power. (Priest talent)"
       },
       "multi_shot": {
         "name": "Splitshot",
@@ -9811,7 +10692,7 @@ export const en: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Choirmend",
-        "description": "Heals nearby allies for {damage}. (Priest talent)"
+        "description": "Heal allies within 30 yards for {damage}. Healing increases with Spell Power. (Benison)"
       },
       "preparation": {
         "name": "Contingency",
@@ -9823,11 +10704,11 @@ export const en: EnTranslations = {
       },
       "psychic_scream": {
         "name": "Terror Canticle",
-        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+        "description": "Frighten enemies within 8 yards for up to 4 sec. Damage may break the effect."
       },
       "counter_shot": {
         "name": "Hushing Shot",
-        "description": "A snap shot that interrupts the target's spellcast and locks that school for 4 sec."
+        "description": "Interrupt the target and prevent spells from that school for 4 sec."
       },
       "rebuke": {
         "name": "Reproach",
@@ -9845,6 +10726,10 @@ export const en: EnTranslations = {
         "name": "Smoke Screen",
         "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
       },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+      },
       "spellsteal": {
         "name": "Spellsteal",
         "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
@@ -9858,12 +10743,37 @@ export const en: EnTranslations = {
         "description": "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec."
       },
       "spell_lock": {
-        "name": "Gag Order",
-        "description": "Silences the target mid-cast and prevents casting from that school for 5 sec."
+        "name": "Abyssal Gag",
+        "description": "Interrupts enemy spellcasting and prevents casting from that school for 4 sec."
+      },
+      "thieves_chorus": {
+        "name": "Thieves' Chorus",
+        "description": "A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec. Allies recently affected by a group haste burst are too exhausted to benefit. (Rogue talent)"
       },
       "tranquility": {
         "name": "Gladesong",
         "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
+      },
+      "venom_dart": {
+        "name": "Venom Dart",
+        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point.",
+        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
+      },
+      "body_blow": {
+        "name": "Haymaker",
+        "description": "A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Lights Out",
+        "description": "Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Shadow Veil",
+        "description": "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Venomrend",
+        "description": "Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)"
       },
       "typhoon": {
         "name": "Typhoon",
@@ -9872,6 +10782,30 @@ export const en: EnTranslations = {
       "voidfeast": {
         "name": "Voidfeast",
         "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health. Only usable when there is an effect to devour."
+      },
+      "veilstep": {
+        "name": "Veilstep",
+        "description": "Step 10 yards forward through the veil."
+      },
+      "scouring_mercy": {
+        "name": "Scouring Mercy",
+        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
+      },
+      "seraphic_vigil": {
+        "name": "Seraphic Vigil",
+        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
+      },
+      "summon_tithefiend": {
+        "name": "Call Tithefiend",
+        "description": "Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+      },
+      "martyrs_aegis": {
+        "name": "Martyr's Aegis",
+        "description": "Reduce one ally's incoming damage by 40% for 8 sec."
+      },
+      "choir_of_deliverance": {
+        "name": "Choir of Deliverance",
+        "description": "Channel for 6 sec, healing party members within 30 yards for {damage} every 2 sec. Healing increases with Spell Power."
       },
       "bear_charge": {
         "name": "Bruin Rush",
@@ -9887,7 +10821,8 @@ export const en: EnTranslations = {
       },
       "rake": {
         "name": "Flense",
-        "description": "A stealth opener that rakes the enemy for weapon damage plus {damage} and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only."
+        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "Patch Up",
@@ -11404,6 +12339,18 @@ export const en: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Reins of the Drakemaw Raptor"
       },
+      "rimefang": {
+        "name": "Rimefang"
+      },
+      "marrowpoint": {
+        "name": "Marrowpoint"
+      },
+      "duskwhisper": {
+        "name": "Duskwhisper"
+      },
+      "boneglass_shiv": {
+        "name": "Boneglass Shiv"
+      },
       "moggers_hide_quiver": {
         "name": "Mogger's Hide Quiver"
       },
@@ -11547,6 +12494,9 @@ export const en: EnTranslations = {
       },
       "conjured_bread4": {
         "name": "Conjured Feastloaf"
+      },
+      "soul_stone": {
+        "name": "Soul Stone"
       },
       "bristleback_maul": {
         "name": "Gallowglass Hammer"
@@ -12933,9 +13883,6 @@ export const en: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix the Tunnelking"
       },
@@ -12957,17 +13904,8 @@ export const en: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Wraithbinder Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Choirmother Selthe"
@@ -13007,6 +13945,18 @@ export const en: EnTranslations = {
       },
       "water_elemental": {
         "name": "Water Elemental"
+      },
+      "graveguard": {
+        "name": "Graveguard"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "Skeletal Warrior"
+      },
+      "necromancy_bone_mage": {
+        "name": "Bone Mage"
+      },
+      "necromancy_gravewing": {
+        "name": "Gravewing"
       }
     },
     "npcs": {
@@ -13633,6 +14583,16 @@ export const en: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "The Dawnbound Tome",
+        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
+        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
+        "objectives": {
+          "0": {
+            "label": "Restless Bones laid to rest"
+          }
+        }
+      },
       "q_bandits": {
         "title": "Bandits of the Vale",
         "text": "A pack of cutthroats has made camp in the southwest hills. They have robbed three wagons this week. Drive them out - slay 10 Vale Bandits.",
@@ -13786,6 +14746,16 @@ export const en: EnTranslations = {
         "objectives": {
           "0": {
             "label": "The Drowned Warlord slain"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "The Rite of Recall",
+        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
+        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
+        "objectives": {
+          "0": {
+            "label": "Drowned Dead laid to rest"
           }
         }
       },

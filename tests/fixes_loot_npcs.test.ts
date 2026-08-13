@@ -23,12 +23,52 @@ import { groundHeight } from '../src/sim/world';
 import {
   faceTarget,
   formRaid,
+  LOOT_TEST_WORLD,
   makeRitualSim,
-  makeSim,
+  type makeSim,
   placeEntity,
   SEED,
   teleportTo,
 } from './fixes_shared';
+
+// Only this named slice of the Nythraxis quest chain is ever touched by the
+// 'quest npc roles' tests below: the crypt/grave quest-giver NPCs plus the
+// two ground objects (the ritual circle, Sir Aldren's grave) they interact
+// with. The bound_guardian/varkas_boneguard adds are summoned by the quest
+// scripting (encounters/nythraxis.ts), not by camps, so camps stay empty.
+const NYTHRAXIS_QUEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {
+    warden_fenwick: NPCS.warden_fenwick,
+    brother_aldric: NPCS.brother_aldric,
+    brother_aldric_fen: NPCS.brother_aldric_fen,
+    brother_aldric_highwatch: NPCS.brother_aldric_highwatch,
+    marshal_redbrook: NPCS.marshal_redbrook,
+  },
+  groundObjects: BUILTIN_WORLD.groundObjects.filter(
+    (object) => object.itemId === 'crypt_ritual_circle' || object.itemId === 'grave_sir_aldren',
+  ),
+};
+
+function makeNythraxisSim(cls: 'warrior' | 'mage' | 'hunter' = 'warrior') {
+  return new Sim({ seed: SEED, playerClass: cls, world: NYTHRAXIS_QUEST_WORLD });
+}
+
+// Only forest_wolf mobs are ever touched by warrior charge, mob tap rights,
+// aoe-vs-armor, spell visuals, RL observation encoding, pet heel warp, ranged
+// crit suppression, and the moving-target orbit tests below: a wolves-only
+// world keeps Sim construction cheap across all of them.
+const WOLF_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === 'forest_wolf'),
+  npcs: {},
+  groundObjects: [],
+};
+
+function makeWolfSim(cls: 'warrior' | 'mage' | 'hunter' = 'warrior') {
+  return new Sim({ seed: SEED, playerClass: cls, world: WOLF_TEST_WORLD });
+}
 
 describe('quest npc roles', () => {
   it('every quest is listed in the questIds of its giver and turn-in NPCs', () => {
@@ -53,7 +93,7 @@ describe('quest npc roles', () => {
   });
 
   it('interacting with the turn-in NPC does not auto-accept an available quest', () => {
-    const sim = makeSim();
+    const sim = makeNythraxisSim();
     (sim as any).grantXp(99999); // well past minLevel 6 for q_fenbridge_muster
     expect(sim.questState('q_fenbridge_muster')).toBe('available');
     const warden = [...sim.entities.values()].find((e) => e.templateId === 'warden_fenwick')!;
@@ -79,7 +119,7 @@ describe('quest npc roles', () => {
   });
 
   it('restores the Crypt Keystone when reaccepting the Bound Guardian quest', () => {
-    const sim = makeSim();
+    const sim = makeNythraxisSim();
     sim.player.level = 20;
     const aldric = [...sim.entities.values()].find(
       (e) => e.templateId === 'brother_aldric_highwatch',
@@ -106,7 +146,7 @@ describe('quest npc roles', () => {
   });
 
   it('gates the sealed crypt and grave visions behind Nythraxis quests', () => {
-    const sim = makeSim();
+    const sim = makeNythraxisSim();
     const crypt = DUNGEON_LIST.find((d) => d.id === 'nythraxis_crypt')!;
     const bossArena = DUNGEON_LIST.find((d) => d.id === 'nythraxis_boss_arena')!;
 
@@ -167,7 +207,7 @@ describe('quest npc roles', () => {
   });
 
   it('shares Nythraxis grave progress and dialogue with nearby party members', () => {
-    const sim = makeSim();
+    const sim = makeNythraxisSim();
     const allyPid = sim.addPlayer('mage', 'Ally');
     sim.partyInvite(allyPid);
     sim.partyAccept(allyPid);
@@ -203,7 +243,7 @@ describe('quest npc roles', () => {
   });
 
   it('immediately aggros Nythraxis quest summons on the summoning player', () => {
-    const sim = makeSim();
+    const sim = makeNythraxisSim();
     const ritual = [...sim.entities.values()].find(
       (e) => e.kind === 'object' && e.objectItemId === 'crypt_ritual_circle',
     )!;
@@ -342,7 +382,7 @@ describe('quest npc roles', () => {
   });
 
   it('re-summons the Bound Guardian at the ritual circle after the first one despawns unkilled', () => {
-    const sim = makeSim();
+    const sim = makeNythraxisSim();
     const ritual = [...sim.entities.values()].find(
       (e) => e.kind === 'object' && e.objectItemId === 'crypt_ritual_circle',
     )!;
@@ -383,7 +423,7 @@ describe('quest npc roles', () => {
   });
 
   it('does not re-summon the Bound Guardian once the kill objective is complete', () => {
-    const sim = makeSim();
+    const sim = makeNythraxisSim();
     const ritual = [...sim.entities.values()].find(
       (e) => e.kind === 'object' && e.objectItemId === 'crypt_ritual_circle',
     )!;
@@ -402,7 +442,7 @@ describe('quest npc roles', () => {
   });
 
   it('shares Nythraxis ritual circle progress with nearby party members', () => {
-    const sim = makeSim();
+    const sim = makeNythraxisSim();
     const allyPid = sim.addPlayer('mage', 'Ally');
     sim.partyInvite(allyPid);
     sim.partyAccept(allyPid);
@@ -430,7 +470,7 @@ describe('quest npc roles', () => {
   });
 
   it('cleanses hostile control auras from quest NPCs', () => {
-    const sim = makeSim('mage');
+    const sim = makeNythraxisSim('mage');
     const redbrook = [...sim.entities.values()].find((e) => e.templateId === 'marshal_redbrook')!;
     redbrook.auras.push({
       id: 'polymorph',
@@ -464,7 +504,7 @@ describe('quest npc roles', () => {
 
 describe('warrior charge', () => {
   function chargeSetup() {
-    const sim = makeSim();
+    const sim = makeWolfSim();
     (sim as any).grantXp(99999); // learn charge (level 4)
     const p = sim.player;
     const wolf = [...sim.entities.values()].find(
@@ -573,7 +613,7 @@ describe('mob tap rights', () => {
   }
 
   it('a hit that deals real damage claims the mob', () => {
-    const sim = makeSim('mage');
+    const sim = makeWolfSim('mage');
     const m = wolf(sim);
     expect(m.tappedById).toBeNull();
     (sim as any).dealDamage(sim.player, m, 7, false, 'fire', 'test', 'hit');
@@ -581,7 +621,7 @@ describe('mob tap rights', () => {
   });
 
   it('a fully absorbed (zero-damage) hit does not claim the mob', () => {
-    const sim = makeSim('mage');
+    const sim = makeWolfSim('mage');
     const m = wolf(sim);
     // a shield that soaks the whole hit; the mob takes no real damage
     m.auras.push({
@@ -603,7 +643,7 @@ describe('mob tap rights', () => {
 
 describe('pet heel warp', () => {
   it('keeps the spatial grid exact when a pet warps to its owner', () => {
-    const sim = makeSim();
+    const sim = makeWolfSim();
     const p = sim.player;
     // park the owner behind the spawn building, far enough that no heel route
     // exists: the gap (87yd) exceeds the pet's A* search window and the building
@@ -639,7 +679,7 @@ describe('aoe damage vs armor', () => {
   // (Arcane Explosion, Consecration) ignore the target's armor like every
   // other spell in the game.
   function aoeSetup(ability: string) {
-    const sim = makeSim('mage');
+    const sim = makeWolfSim('mage');
     sim.setPlayerLevel(20);
     expect(sim.setSpec('arcane')).toBe(true);
     const p = sim.player;
@@ -676,7 +716,7 @@ describe('RL observation encoding', () => {
   const TARGET_DIST_INDEX = 16 + ABILITY_SLOTS * 2 + 3;
 
   it('encodes target distance on the same 1.5 scale as nearby mobs', () => {
-    const sim = makeSim();
+    const sim = makeWolfSim();
     const p = sim.player;
     teleportTo(sim, 0, -40); // open road
     const mob = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
@@ -715,7 +755,7 @@ describe('ranged auto-attack crit suppression', () => {
   }
 
   function setup(level: number, targetLevel: number) {
-    const sim = new Sim({ seed: SEED, playerClass: 'hunter' });
+    const sim = makeWolfSim('hunter');
     const hunter = sim.player;
     if (level > 1) sim.setPlayerLevel(level);
     hunter.critChance = 0.5;
@@ -751,7 +791,7 @@ describe('ranged auto-attack crit suppression', () => {
 
 describe('spell visuals', () => {
   it('hostile casts emit projectile spellfx events', () => {
-    const sim = makeSim('mage');
+    const sim = makeWolfSim('mage');
     const p = sim.player;
     const wolf = [...sim.entities.values()].find(
       (e) => e.kind === 'mob' && e.templateId === 'forest_wolf',
@@ -769,7 +809,7 @@ describe('spell visuals', () => {
   });
 
   it('hostile targeted spells cannot start through dungeon walls', () => {
-    const sim = makeSim('mage');
+    const sim = makeWolfSim('mage');
     const origin = instanceOrigin(2, 0);
     const p = sim.player;
     const mob = createMob(990200, MOBS.sanctum_boneguard, 19, {
@@ -792,7 +832,7 @@ describe('spell visuals', () => {
   });
 
   it('hostile targeted spells can start through the open dungeon passage', () => {
-    const sim = makeSim('mage');
+    const sim = makeWolfSim('mage');
     const origin = instanceOrigin(2, 0);
     const p = sim.player;
     const mob = createMob(990201, MOBS.sanctum_boneguard, 19, {
@@ -814,7 +854,7 @@ describe('spell visuals', () => {
   });
 
   it('a LOW prop (campfire) no longer blocks spell line of sight, buildings still do', () => {
-    const sim = makeSim('mage');
+    const sim = makeWolfSim('mage');
     const seed = sim.cfg.seed;
     // Straddle a world campfire: its collider sits on the ray (it still blocks
     // MOVEMENT below), but its visual top (1.45) is under the eye line (1.6),
@@ -835,7 +875,7 @@ describe('spell visuals', () => {
   });
 
   it('a LOW fence no longer blocks spell line of sight, tall walls still do (#1668)', () => {
-    const sim = makeSim('mage');
+    const sim = makeWolfSim('mage');
     const seed = sim.cfg.seed;
     const fence = PROPS.fences[0];
     const mx = (fence.x1 + fence.x2) / 2;
@@ -862,7 +902,7 @@ describe('spell visuals', () => {
   });
 
   it('ranged auto shot does not fire through dungeon walls', () => {
-    const sim = makeSim('hunter');
+    const sim = makeWolfSim('hunter');
     const origin = instanceOrigin(2, 0);
     const p = sim.player;
     const mob = createMob(990202, MOBS.sanctum_boneguard, 19, {
@@ -886,18 +926,9 @@ describe('spell visuals', () => {
 });
 
 describe('mob auto attacks against moving targets', () => {
-  // Only the orbited forest_wolf matters here; run on a wolves-only world so
-  // the two 400-tick orbit windows stay cheap.
-  const WOLF_TEST_WORLD: WorldContent = {
-    ...BUILTIN_WORLD,
-    camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === 'forest_wolf'),
-    npcs: {},
-    groundObjects: [],
-  };
-
-  function makeWolfSim() {
-    return new Sim({ seed: SEED, playerClass: 'warrior', world: WOLF_TEST_WORLD });
-  }
+  // Only the orbited forest_wolf matters here; run on the wolves-only world
+  // (hoisted to file scope, reused by the other blocks above) so the two
+  // 400-tick orbit windows stay cheap.
 
   function damageTimesFrom(events: SimEvent[], sourceId: number, targetId: number): boolean {
     return events.some(
@@ -971,7 +1002,12 @@ describe('mob auto attacks against moving targets', () => {
 
 describe('trade and duel invites validate availability at accept time', () => {
   it('a second invitee cannot hijack the inviter who is already trading', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: LOOT_TEST_WORLD,
+    });
     const a = sim.addPlayer('warrior', 'Anna');
     const b = sim.addPlayer('mage', 'Bert');
     const c = sim.addPlayer('warrior', 'Cara');
@@ -998,7 +1034,12 @@ describe('trade and duel invites validate availability at accept time', () => {
   });
 
   it('a second challenger acceptance cannot hijack a duelist mid-duel', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: LOOT_TEST_WORLD,
+    });
     const a = sim.addPlayer('warrior', 'Anna');
     const b = sim.addPlayer('mage', 'Bert');
     const c = sim.addPlayer('warrior', 'Cara');

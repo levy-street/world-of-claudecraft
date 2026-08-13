@@ -51,8 +51,10 @@ export function modelViewerEmbed(opts: ModelEmbedOptions): string {
     !opts.still && opts.posterCrestId
       ? ` ${crestImageFallbackAttributes(opts.posterCrestId, size)}`
       : '';
+  const stillFallback =
+    opts.still && opts.poster ? ` data-poster-fallback="${esc(opts.poster)}"` : '';
   const poster = posterSrc
-    ? `<img class="guide-viewer-poster${opts.still ? ' guide-viewer-poster-still' : ''}" src="${esc(posterSrc)}"${posterFallback} alt="${esc(posterAlt)}" width="${size}" height="${size}" loading="lazy" decoding="async" />`
+    ? `<img class="guide-viewer-poster${opts.still ? ' guide-viewer-poster-still' : ''}" src="${esc(posterSrc)}"${posterFallback}${stillFallback} alt="${esc(posterAlt)}" width="${size}" height="${size}" loading="lazy" decoding="async" />`
     : '';
   // The status line is an empty ARIA live region. mount.ts writes guide.viewer.loading /
   // guide.viewer.error into it on each state transition, because aria-live announces a text

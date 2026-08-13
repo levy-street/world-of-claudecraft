@@ -26,6 +26,38 @@ const gameService = compose.slice(
   compose.indexOf('\n  discord-bot:'),
 );
 
+// The `postgres:` service block alone, scoped the same way as gameService above so a
+// stray edit cannot land on the wrong service and still pass.
+const postgresService = compose.slice(
+  compose.indexOf('\n  postgres:'),
+  compose.indexOf('\n  game:'),
+);
+
+describe('Postgres container healthcheck cadence contract', () => {
+  // Pinned as one contiguous block, matching the game/discord-bot pin style above.
+  // start_period + start_interval give the fast 1s probe ONLY during a cold boot
+  // (failures inside start_period do not spend the retry budget), while
+  // interval/timeout/retries carry the steady-state values that also set the ~50s
+  // (retries x interval) outer ceiling for a genuinely cold initdb: losing
+  // start_period/start_interval would pay the 1Hz probe cost forever in production
+  // (this compose file also drives the production deploy, see DEPLOY.md); losing or
+  // shrinking retries/interval would shrink that ceiling and risk killing a slow cold
+  // boot before postgres finishes initializing.
+  it('pins the healthcheck cadence, including the cold-boot start_period/start_interval', () => {
+    expect(postgresService).toContain(
+      [
+        '    healthcheck:',
+        '      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U eastbrook -d eastbrook"]',
+        '      interval: 5s',
+        '      timeout: 3s',
+        '      retries: 10',
+        '      start_period: 60s',
+        '      start_interval: 1s',
+      ].join('\n'),
+    );
+  });
+});
+
 describe('Game container health and resource deploy contract', () => {
   // The whole point of gameService is to scope the knob assertions below to the game
   // block alone (discord-bot runs the SAME image). If either boundary marker is missing,

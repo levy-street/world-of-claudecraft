@@ -18,12 +18,48 @@ import { describe, expect, it, vi } from 'vitest';
 // alternate skin at index 1, matching the production data this bug hit.
 const VISUAL_KEY = 'player_paladin';
 
+// The bones both paladin synthesis factories validate on their source clip
+// (ROTATION_OFFSETS in paladin_templars_verdict_clip.ts / _bastion_sweep_).
+const SYNTH_SOURCE_BONES = [
+  'hips',
+  'spine',
+  'chest',
+  'head',
+  'upperarmr',
+  'lowerarmr',
+  'upperarml',
+  'lowerarml',
+  'upperlegr',
+  'lowerlegr',
+  'upperlegl',
+  'lowerlegl',
+];
+
+function stubSourceClip(name: string): THREE.AnimationClip {
+  const tracks = SYNTH_SOURCE_BONES.map(
+    (bone) =>
+      new THREE.QuaternionKeyframeTrack(`${bone}.quaternion`, [0, 1], [0, 0, 0, 1, 0, 0, 0, 1]),
+  );
+  return new THREE.AnimationClip(name, 1, tracks);
+}
+
 function stubGltf() {
   const scene = new THREE.Group();
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
   mesh.name = 'body';
   scene.add(mesh);
-  return { scene, animations: [new THREE.AnimationClip('Idle', 1, [])] };
+  return {
+    scene,
+    animations: [
+      new THREE.AnimationClip('Idle', 1, []),
+      // prepareVisual synthesizes the paladin Verdict/Sweep clips from these
+      // two sources and fails closed when either is missing or lacks the
+      // per-bone quaternion tracks, so the stub rig must carry both like the
+      // shipped paladin GLB does.
+      stubSourceClip('2H_Melee_Attack_Chop'),
+      stubSourceClip('1H_Melee_Attack_Slice_Diagonal'),
+    ],
+  };
 }
 
 describe('far-LOD mesh follows the selected body skin', () => {

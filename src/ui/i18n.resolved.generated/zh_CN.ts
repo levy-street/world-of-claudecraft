@@ -127,6 +127,10 @@ export const zh_CN: EnTranslations = {
         "label": "装备新晋20级预设",
         "description": "为该专精穿上圣所前20级预设装备，背包优先。仅限装备。"
       },
+      "biskit": {
+        "label": "装备20级最佳配装",
+        "description": "为该专精在所有槽位穿上最佳史诗装备。仅限装备。"
+      },
       "gold": {
         "label": "添加金币",
         "description": "向当前钱袋添加金币。"
@@ -240,7 +244,8 @@ export const zh_CN: EnTranslations = {
     },
     "hud": {
       "lowMana": "法力不足",
-      "lowEnergy": "能量不足"
+      "lowEnergy": "能量不足",
+      "lowFocus": "集中值不足"
     },
     "talents": {
       "title": "天赋",
@@ -316,6 +321,25 @@ export const zh_CN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "谴罪",
+      "fateThreadsLabel": "命运丝线",
+      "doomMeterUnlock": "移动痛苦资源条",
+      "doomMeterLock": "锁定痛苦资源条",
+      "doomEmptyStatus": "{value}/{max} 谴罪。",
+      "doomStatus": "{value}/{max} 谴罪；剩余 {remaining}。",
+      "fateThreadsStatus": "{value}/{max} 命运丝线。",
+      "fateThreadsConsumeReady": "三层命运丝线：吞噬可将其编织为额外的谴罪。",
+      "fateThreadsSentenceReady": "三层命运丝线：裁决可消耗它们以提高18%的伤害。"
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "灵魂碎片",
+      "ruinMeter": "毁灭",
+      "ruinStatus": "毁灭 {value}/{max}"
+    },
+    "comboMeter": {
+      "label": "连击点"
+    },
     "spectate": {
       "banner": "正在观察 {name}"
     },
@@ -373,7 +397,7 @@ export const zh_CN: EnTranslations = {
       "unavailable": "当前状态下无法使用脱困。"
     },
     "fct": {
-      "absorbed": "吸收 {amount}",
+      "absorbed": "已吸收（{amount}）",
       "cheap": "费用降低!"
     },
     "emotes": {
@@ -777,6 +801,11 @@ export const zh_CN: EnTranslations = {
       "resetAction": "重置",
       "note": "拖动聊天标签栏可移动窗口，拖动右下角手柄可调整大小。重置可恢复到默认位置和大小。"
     },
+    "chatQuota": {
+      "limitReached": "综合聊天已达到限额。请在 {seconds} 后重试。",
+      "pending": "上一条综合聊天消息仍在发送中。请稍候再试。",
+      "unavailable": "综合聊天暂时不可用。请稍后再试。"
+    },
     "swing": {
       "ready": "挥击",
       "seconds": "{seconds}秒"
@@ -787,6 +816,14 @@ export const zh_CN: EnTranslations = {
     },
     "rest": {
       "resting": "休息中"
+    },
+    "paladin": {
+      "devotion": "虔诚",
+      "devotionValue": "虔诚值 {value}/{max}",
+      "devotionAscensionCharges": "虔诚值 {value}/{max}。升华充能：{charges}。",
+      "devotionAscensionLast": "虔诚值 {value}/{max}。升华的最后一次充能。",
+      "ascensionLastAnnouncement": "升华的最后一次充能",
+      "ascensionSpenderAria": "动作栏第 {slot} 格：{ability}。消耗一次升华充能。"
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -819,6 +856,7 @@ export const zh_CN: EnTranslations = {
       "deeds": "功绩",
       "mounts": "坐骑",
       "professions": "专业",
+      "reliquary": "圣物库",
       "nameplates": "姓名板",
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
@@ -859,6 +897,14 @@ export const zh_CN: EnTranslations = {
       "bodyWithVersion": "World of ClaudeCraft {version} 版本已可用。立即更新以获取最新修复和改进。",
       "notNow": "暂不",
       "update": "更新"
+    },
+    "otaUpdate": {
+      "title": "游戏更新",
+      "downloading": "正在下载更新：{percent}",
+      "applying": "更新已下载。正在重新启动游戏以应用更新。",
+      "incompatible": "需要更新后才能进行游戏。下载完成后将立即应用。",
+      "continueAnyway": "暂不更新，继续游戏",
+      "progressLabel": "更新下载进度"
     },
     "cameraPrompt": {
       "title": "选择你的镜头",
@@ -961,6 +1007,7 @@ export const zh_CN: EnTranslations = {
       "emoteWheel": "表情轮盘",
       "targetFriendly": "选中最近友方",
       "targetFriendlyNext": "切换友方目标",
+      "targetPrev": "反向切换目标",
       "discord": "Discord",
       "valecup": "溪谷杯",
       "bgFlag": "战场夺旗动作",
@@ -1743,7 +1790,7 @@ export const zh_CN: EnTranslations = {
         "agi": "提高你的反应和准度，强化你的多项战斗属性。",
         "sta": "强健你的体魄，提高你的最大生命值以及休息时恢复生命值的速度。",
         "int": "扩大施法者的法力值上限，并提高其造成法术暴击的几率。",
-        "spi": "加快施法者在脱离战斗、休息时恢复法力值的速度。",
+        "spi": "加快施法者法力回复的速度。大部分在脱离战斗休息时流回，还有一部分即使在战斗中也会持续回复。",
         "armor": "减轻受到的物理打击。对等级较低的攻击者减伤效果更强，最高减伤上限为75%。",
         "attackPower": "强化你的武器攻击。每14点攻击强度可提高1点每秒伤害。",
         "spellPower": "提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。",
@@ -1767,6 +1814,7 @@ export const zh_CN: EnTranslations = {
         "spellCritPct": "+{value}% 法术暴击",
         "healthRegen": "休息时每5秒约恢复 {value} 点生命值",
         "manaRegen": "休息时每5秒约恢复 {value} 点法力",
+        "manaRegenCombat": "战斗中每5秒约恢复 {value} 点法力",
         "damageReduction": "对{level}级攻击者的伤害减免：{value}%",
         "dpsFromAp": "为你的攻击增加 {value} 点每秒伤害"
       },
@@ -1881,6 +1929,48 @@ export const zh_CN: EnTranslations = {
         "few": "查询：{realm}上有{count}名玩家匹配“{query}”。",
         "many": "查询：{realm}上有{count}名玩家匹配“{query}”。",
         "other": "查询：{realm}上有{count}名玩家匹配“{query}”。"
+      },
+      "reliquaryRetroSummary": {
+        "one": "你的圣物库已更新：补录 {count} 件圣物。",
+        "few": "你的圣物库已更新：补录 {count} 件圣物。",
+        "many": "你的圣物库已更新：补录 {count} 件圣物。",
+        "other": "你的圣物库已更新：补录 {count} 件圣物。"
+      },
+      "reliquarySearchResults": {
+        "one": "共 {count} 条结果。",
+        "few": "共 {count} 条结果。",
+        "many": "共 {count} 条结果。",
+        "other": "共 {count} 条结果。"
+      },
+      "reliquaryToGo": {
+        "one": "还差 {count} 件",
+        "few": "还差 {count} 件",
+        "many": "还差 {count} 件",
+        "other": "还差 {count} 件"
+      },
+      "reliquaryObtainedTimes": {
+        "one": "已获得 {count} 次",
+        "few": "已获得 {count} 次",
+        "many": "已获得 {count} 次",
+        "other": "已获得 {count} 次"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}，已收录，已获得 {count} 次",
+        "few": "{name}，已收录，已获得 {count} 次",
+        "many": "{name}，已收录，已获得 {count} 次",
+        "other": "{name}，已收录，已获得 {count} 次"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次",
+        "few": "{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次",
+        "many": "{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次",
+        "other": "{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次"
+      },
+      "deedsRetroSummary": {
+        "one": "你的编年史已更新：补录 {count} 项功绩。",
+        "few": "你的编年史已更新：补录 {count} 项功绩。",
+        "many": "你的编年史已更新：补录 {count} 项功绩。",
+        "other": "你的编年史已更新：补录 {count} 项功绩。"
       }
     },
     "bugReport": {
@@ -2109,6 +2199,10 @@ export const zh_CN: EnTranslations = {
       "itemAriaBound": "{item}，数量 {count}，已绑定的副本",
       "itemAriaMasterwork": "{item}，数量 {count}，杰作",
       "itemAriaQuest": "{item}，数量 {count}，任务物品",
+      "itemAriaLocked": "{item}，数量 {count}，已锁定",
+      "itemLockedLine": "已锁定",
+      "lockItem": "锁定物品",
+      "unlockItem": "解锁物品",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -2151,18 +2245,36 @@ export const zh_CN: EnTranslations = {
     "auraEffect": {
       "dot": "每 {interval} 秒造成 {value} 点{school}伤害",
       "hot": "每 {interval} 秒恢复 {value} 点生命值",
+      "mendingCurrent": "储存 {value} 点治疗量，随时间释放或由湍流愈合消耗",
+      "mendingCurrentPercent": "储存相当于最大生命值 {pct}% 的治疗量，供湍流愈合消耗",
       "absorb": "吸收 {value} 点伤害",
       "healAbsorb": "吸收 {value} 点受到的治疗",
       "thorns": "对攻击者造成 {value} 点{school}伤害",
+      "stasis": "免疫所有效果且无法行动",
       "slow": "移动速度降低 {pct}%",
       "speed": "移动速度提高 {pct}%",
       "attackSpeedSlow": "攻击速度减慢 {pct}%",
       "attackSpeedFast": "攻击速度提高 {pct}%",
       "haste": "攻击速度和施法速度提高 {pct}%",
+      "imbueRange": "武器已附魔：裁决时附加 {min} 到 {max} 点额外伤害",
+      "petDamage": "宠物造成的伤害提高 {pct}%",
+      "petHaste": "宠物的行动速度提高 {pct}%",
+      "spellDamage": "法术伤害提高 {pct}%",
+      "spellHaste": "施法速度提高 {pct}%",
+      "sated": "无法再获得团队急速效果",
+      "cauterizeFatigue": "灸灼无法再次阻止致命伤害",
+      "castShield": "施法不会因受到伤害而中断或延迟",
       "dmgDone": "造成的伤害提高 {pct}%",
       "dmgDoneReduce": "造成的伤害降低 {pct}%",
       "heatingUp": "你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发",
       "elementalConvergencePrimed": "你的下一个不同元素学派法术将触发元素汇聚",
+      "hunterFerocity": "{stacks} 层兽群凶性：你的宠物造成的伤害提高 {pct}%",
+      "cooldownCap": "此时间窗已使用 {used}/{cap} 秒冷却缩减",
+      "funeralHarvestLock": "葬礼收割暂时无法再次生成灵魂碎片",
+      "leadenHexLock": "铅沉妖术暂时无法再次定身此目标",
+      "forbiddenReflectionReady": "下一个符合条件的术士冷却技能可再次施放",
+      "forbiddenReflectionLock": "禁忌映像暂时无法再次准备",
+      "internalCooldown": "计时结束前此效果无法再次触发",
       "carriedFlag": "你正携带敌方旗帜。取消该增益即可丢下旗帜。",
       "battleStance": "战斗姿态：怒气产生提高 10%",
       "berserkerStance": "狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%",
@@ -2177,6 +2289,13 @@ export const zh_CN: EnTranslations = {
       "revengeFree": "你的下一次复仇不消耗怒气",
       "victoryRush": "乘胜追击已就绪",
       "maxHpPct": "最大生命值提高 {pct}%",
+      "enrage": "造成的伤害提高 {damagePct}%，攻击速度提高 {hastePct}%，移动速度提高 {movePct}%",
+      "suddenDeath": "下一次斩杀不消耗怒气并无视生命值要求",
+      "aoeEcho": "剩余 {charges} 次回响：单体技能对附近最多 {targets} 个敌人造成 {pct}% 伤害",
+      "sureCrit": "接下来 {charges} 个伤害技能必定暴击",
+      "temporalEcho": "施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%",
+      "arcaneCharge": "{stacks} 层奥术充能：以太涌动伤害提高 {damagePct}%，施法加快 {castPct}%，法力消耗变为 {costMult} 倍",
+      "physicalReduction": "受到的物理伤害降低 {pct}%",
       "temporalHourglass": "免疫伤害且无法行动；恢复生命并加速冷却。右键点击可取消。",
       "tongues": "施法时间延长 {pct}%",
       "combustionCrit": "你的火焰法术必定造成致命一击",
@@ -2186,6 +2305,22 @@ export const zh_CN: EnTranslations = {
       "freeCast": "下一次施法不消耗任何资源",
       "instantCast": "下一个有施法时间的法术变为瞬发",
       "cheapCast": "下一个法术消耗降低{pct}%",
+      "radiantResonance": "你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 {pct}%，施法时间缩短至 {castTime} 秒",
+      "solarReprisal": "你的下一次向阳飞盾不消耗法力、无视冷却时间且伤害提高 {pct}%；恩典之锤无视冷却时间并为你恢复相当于伤害量 100% 的生命值；或使治愈之光变为瞬发",
+      "dawnsWrath": "制裁之锤：无生命限制 · +1次 · 冷却0 · 伤害+{pct}%",
+      "venomRitual": "毒祭：第{stacks}/{max}层。卑劣突刺、邪恶斩击与毒镖各累积1层。达到{max}层时，长眠变为蚀毒撕裂",
+      "gloam": "幽暝：第{stacks}/{max}层。从暮帷中使用的先制技各累积1层。达到{max}层时，你的先制技无需潜行即可使用，下一次先制技免费施放，消耗全部3层并开启暗影缠身",
+      "redline": "红线：第{stacks}/{max}格。每次大摆拳增加1格。眼前一黑每格伤害提高{pct}%，使用后结束红线。若计时先行结束，这记击倒就会作废",
+      "veilstrikeWindow": "暗影缠身：你的暮帷先制技可在明处以任意角度使用，造成的伤害提高{pct}%",
+      "veiledEdge": "你的下一次潜伏突袭造成双倍伤害",
+      "duskEconomy": "技能的能量消耗降低{pct}%",
+      "moontide": "月潮：第{stacks}/{max}层。月翼形态下，野性弹、天陨与月种的施法各累积1层。达到{max}层时：月种变为月涌，天陨变为日醒，使用任意一个都会消耗全部3层",
+      "oldBlood": "古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：狼形态下血噬变为血收，巨熊形态下碎骨击变为碎髓",
+      "verdance": "繁茂：第{stacks}/{max}层。每种下一个新的野性绽放或二度绽放累积1层。达到{max}层时，迅捷治愈变为盛放",
+      "freeExecute": "下一个符合条件的斩杀技能不消耗资源",
+      "resourceSap": "每 {interval} 秒恢复 {value} 点当前资源",
+      "nextAttackCrit": "下一次攻击必定暴击",
+      "healEcho": "生命值低于 {threshold}% 时恢复 {value} 点生命值",
       "increase": {
         "ap": "攻击强度提高 {value}",
         "sp": "法术强度提高 {value}",
@@ -2224,6 +2359,8 @@ export const zh_CN: EnTranslations = {
       "mortalWound": "受到的治疗降低 {pct}%",
       "vulnerability": "受到的伤害提高 {pct}%",
       "physVuln": "受到的物理伤害提高 {pct}%",
+      "bleedVuln": "受到的流血伤害提高 {pct}%",
+      "sourceVuln": "受到施加此效果的施法者造成的伤害提高 {pct}%",
       "spellVuln": "受到的魔法伤害提高 {pct}%",
       "critVuln": "受到致命一击的几率提高 {pct}%",
       "costTax": "技能消耗提高 {pct}%",
@@ -2237,14 +2374,46 @@ export const zh_CN: EnTranslations = {
       "disarm": "已缴械：无法使用武器攻击",
       "lockout": "法术学派被锁定",
       "imbue": "武器附有额外效果",
-      "imbueRange": "武器已附魔：裁决时附加 {min} 到 {max} 点额外伤害",
+      "galeheartWeapon": "完成战魂的{steps}连击节奏后，该次打击回响{count}次，每次造成其伤害{pct}%的自然伤害",
+      "elementalTrance": "受到的伤害降低{pct}%。你造成的所有伤害的{mana}%转化为法力值",
       "stealth": "已隐匿；移动速度降低 {pct}%",
       "formBear": "巨熊形态：生命值和护甲提高",
       "formCat": "猫形态：近战伤害与能量",
       "formTravel": "迅捷形态：移动速度提高 {pct}%",
       "formFireball": "火球形态：移动速度提高 {pct}%；无法攻击或施法",
+      "formMoonkin": "月翼形态：法术伤害提高 {pct}%，护甲提高 {armorPct}%",
+      "formShadow": "幽幕形态：暗影伤害提高 {pct}%",
+      "resourceCount": "{value}/{max}",
+      "formLich": "灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害",
+      "afflictionEye": "恶咒凝视每 {interval} 秒攻击一次；此邪眼上的效果产生 {pct}% 的定罪值",
+      "afflictionEyeSecondary": "此邪眼上的效果产生 {doomPct}% 的定罪值；宣判在此回响并造成 {echoPct}% 伤害",
+      "afflictionAccomplice": "符合条件的伤害产生 {value} 点定罪值，每 {interval} 秒最多一次",
+      "afflictionViolence": "剩余 {charges} 次报复；敌人攻击会产生 {doom} 点定罪值并反击 {damage} 点暗影伤害",
+      "afflictionVicarious": "转移或降低 {pct}% 的受到伤害，并可产生最多 {max} 点定罪值",
+      "afflictionPossession": "强化命运之针、吸取生命、恶咒凝视和宣判",
+      "afflictionJudgment": "主邪眼产生的定罪值提高 {eyePct}%；宣判伤害提高 {sentencePct}%，第一次返还 {refund} 点定罪值",
+      "afflictionLitany": "获得定罪值时，对 {radius} 码内最多 {targets} 个敌人造成 {damage} 点暗影伤害，每秒最多一次",
+      "afflictionFateThreads": "{stacks} 层命运丝线：宣判伤害提高 {sentencePct}%，或使吸取生命每跳额外产生 {doom} 点定罪值",
+      "afflictionConsumeThreads": "吸取生命正在消耗 {stacks} 层命运丝线，每跳额外产生 {doom} 点定罪值",
+      "necromancyHarvestMark": "目标死亡时可生成 1 个灵魂碎片",
+      "necromancyOssuaryMark": "储存你和亡灵造成伤害的 {storedPct}%，并额外储存灵魂长枪伤害的 {lancePct}%；再次施放引爆。目标死亡时在 {radius} 码内爆炸并生成 1 个灵魂碎片",
+      "necromancyDeathEcho": "旧版本遗留的死亡回响；当前没有技能会消耗它",
+      "warlockAnchor": "在 {range} 码内再次施放可返回此处并消耗锚点",
+      "formMetamorph": "恶魔形态：体型增大 {pct}%；其他加成由独立增益提供",
+      "energyRegen": "能量恢复速度提高 {pct}%",
       "defensiveStance": "戒备姿态：受到的伤害降低，威胁值提高",
       "righteousFury": "炽燃誓约：神圣伤害产生的威胁值大幅提高",
+      "overpowerCharge": "{stacks} 层充能：下一次致残打击伤害提高 {pct}%",
+      "sweepingStrikes": "单体攻击还会对附近 {targets} 个敌人造成 {pct}% 伤害",
+      "fingersOfFrost": "剩余 {charges} 层：冰枪术视目标为冻结状态，并造成 {pct}% 的冻结伤害",
+      "brainFreeze": "下一次冰风暴瞬发且无视冷却时间",
+      "wintersChill": "剩余 {charges} 层：符合条件的法术视此目标为冻结状态",
+      "icicles": "{value}/{max} 根冰刺；达到 {max} 根时可施放冰川尖刺",
+      "desolation": "剩余 {charges} 层：下一次混乱箭施法加快 {castPct}%，或下一次火焰之雨立即落下",
+      "ruinousBrand": "剩余 {charges} 次复制：直接法术在此复制 {otherPct}% 伤害；若此目标也是主目标则复制 {selfPct}%",
+      "duskfireClaim": "目标死亡时获得 {value} 点毁灭",
+      "pyreGuardian": "每 {ruinInterval} 秒产生 {ruin} 点毁灭，并每 {damageInterval} 秒对 {radius} 码内敌人造成 {damage} 点火焰伤害",
+      "perfectMoment": "以太飞弹不会消耗奥术充能",
       "scale": "体型增大 {pct}%",
       "jump": "跳跃高度提高 {pct}%",
       "school": {
@@ -3102,6 +3271,7 @@ export const zh_CN: EnTranslations = {
       "craftedToast": "已制作:{name}",
       "craftedToastQty": "已制作:{name} x{qty}",
       "insufficientMaterials": "你没有足够的材料。",
+      "reagentLocked": "该配方所需的材料已锁定。",
       "unknownRecipe": "该配方不存在。",
       "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。",
       "comboRequires": "调谐要求：{craftA} + {craftB}，阶级 {tier}。",
@@ -3208,6 +3378,7 @@ export const zh_CN: EnTranslations = {
       "notHeld": "你没有那件物品。",
       "notDisenchantable": "你无法分解那件物品。",
       "notSalvageable": "你无法拆解那件物品。",
+      "salvageLocked": "该物品已锁定。",
       "disenchantBusy": "你正忙着。",
       "salvageBusy": "你正忙着。",
       "enchantBusy": "你正忙着。",
@@ -3459,6 +3630,135 @@ export const zh_CN: EnTranslations = {
         "dread_curse": "恐惧诅咒（仅英雄难度，累加坦克轮换减益）"
       }
     },
+    "reliquary": {
+      "title": "圣物库",
+      "close": "关闭圣物库",
+      "countLabel": "{owned}/{total} 件圣物",
+      "completionAria": "已填入圣物：{owned}/{total}",
+      "curatorRank": "策展人等级 {rank}",
+      "curatorUnranked": "未评级策展人",
+      "curatorRankName1": "见习策展人",
+      "curatorRankName2": "战利品保管者",
+      "curatorRankName3": "大师策展人",
+      "curatorRankName4": "大策展人",
+      "curatorRankName5": "永恒策展人",
+      "rankUpBanner": "策展人等级 {rank}：{name}",
+      "rankUpToast": "已达到策展人等级 {rank}：{name}",
+      "borderWearableNote": "可在功绩之书中佩戴 {name} 边框。",
+      "sigilCaption": "策展人印记",
+      "recentLabel": "最近发现：",
+      "nearlyLabel": "即将完成：",
+      "nearlyJumpAria": "打开{name}，已填入 {owned}/{total}",
+      "progressText": "{owned}/{total}",
+      "shelvesAria": "圣物库书架",
+      "navOverview": "总览",
+      "navConquerors": "征服者",
+      "navProfessions": "专业",
+      "navHorizons": "远景",
+      "navCountAria": "{shelf}：已填入 {owned}/{total} 件圣物",
+      "shelfEmpty": "此书架尚无页面。",
+      "pageComplete": "已点亮",
+      "clearsLabel": "{count} 次通关",
+      "srankClearsLabel": "{count} 次S级通关",
+      "retiredLabel": "绝版",
+      "personalLabel": "专属",
+      "backToShelf": "返回书架",
+      "gridAria": "{name} 的圣物",
+      "pageProgressAria": "页面进度：已填入 {owned}/{total} 件圣物",
+      "cellOwnedAria": "{name}，已收录",
+      "cellMissingAria": "{name}，尚未获得",
+      "ownedTooltipStatus": "已收录于圣物库",
+      "missingTooltipStatus": "尚未获得",
+      "firstFindClears": "首次获得于第 {count} 次通关",
+      "unlockToast": "圣物已收录：{name}",
+      "illuminateBanner": "页面已点亮：{name}",
+      "illuminateToast": "{name} 上的每一件圣物均已填满。",
+      "illuminationBroadcastLine": "{name} 点亮了圣物库页面：{page}",
+      "markFind": {
+        "masterwork_first": "首件杰作",
+        "masterwork_weaponcrafting": "武器锻造杰作",
+        "masterwork_armorcrafting": "护甲锻造杰作",
+        "masterwork_tailoring": "裁缝杰作",
+        "masterwork_leatherworking": "制皮杰作",
+        "masterwork_engineering": "工程学杰作",
+        "gather_event_pristine_vein": "完美矿脉",
+        "gather_event_ancient_heartwood": "古木心材",
+        "gather_event_moonlit_bloom": "月华花蕾",
+        "gather_event_perfect_specimen": "完美标本",
+        "slain_old_greyjaw": "斩杀：老灰颚",
+        "slain_mogger": "斩杀：莫格",
+        "slain_grix_the_tunnelking": "斩杀：隧道之王格里克斯",
+        "slain_captain_verlan": "斩杀：维尔兰队长",
+        "slain_wraithbinder_maldrec": "斩杀：缚魂者玛尔德雷克",
+        "slain_mirejaw_the_ravenous": "斩杀：贪食者泥颚",
+        "slain_sloomtooth_the_drowned": "斩杀：溺亡者涝牙",
+        "slain_sister_nhalia": "斩杀：娜莉娅修女",
+        "slain_grubjaw": "斩杀：贪食者格鲁布颚",
+        "slain_ironvein_foreman": "斩杀：铁脉工头",
+        "slain_brutok_skullsmasher": "斩杀：碎颅者布鲁托克",
+        "slain_voskar_emberwing": "斩杀：炽翼沃斯卡",
+        "slain_marrowlord_varkas": "斩杀：髓王瓦尔卡斯",
+        "slain_old_cragmaw": "斩杀：老裂颚",
+        "slain_shardlord_kazzix": "斩杀：碎片领主卡兹克斯",
+        "slain_gleamstag": "斩杀：辉光雄鹿",
+        "slain_old_marrowshell": "斩杀：老甲髓",
+        "slain_aurelhorn": "斩杀：金角，鹿群之首",
+        "slain_drakemaw_broodlord": "斩杀：龙喉巢主"
+      },
+      "accountScopeBadge": "账号",
+      "accountScopeNote": "账号收藏：此账号下所有角色均可解锁。",
+      "unknownRelic": "未记录的圣物",
+      "sourceBossDungeon": "由{dungeon}的{boss}掉落",
+      "sourceBoss": "由{boss}掉落",
+      "sourceZone": "在{zone}获得",
+      "sourceProfession": "通过{profession}获得",
+      "sourceDeed": "功绩“{deed}”奖励",
+      "sourceVendor": "由{vendor}出售",
+      "sourceBossZone": "由{zone}的{boss}掉落",
+      "sourceDelve": "在探秘“{delve}”中获得",
+      "sourceRift": "通关{rank}级裂隙时掉落",
+      "sourceQuest": "任务“{quest}”奖励",
+      "sourceStore": "在 WOC 商店购买",
+      "sourceActivityCorpseHarvest": "采集生物尸体时获得",
+      "sourceActivityMasterworkCraft": "制作杰作时获得",
+      "sourceActivityRiftFirstClear": "授予率先通关分级裂隙的队伍全体成员",
+      "cellMissingSourceAria": "{name}，尚未获得，{source}",
+      "cellOwnedClearsAria": "{name}，已收录，首次获得于第 {count} 次通关",
+      "searchPlaceholder": "搜索圣物",
+      "searchAria": "按名称搜索圣物库",
+      "searchEmpty": "没有符合搜索条件的圣物。",
+      "filterEmpty": "没有符合此筛选条件的圣物。",
+      "filterGroupAria": "按获得情况筛选圣物",
+      "gridKeyboardHint": "使用方向键在圣物之间移动，Home 键和 End 键跳到首尾。",
+      "filterAll": "全部",
+      "filterOwned": "已收录",
+      "filterMissing": "尚未获得",
+      "recentJumpAria": "打开{name}所在的页面",
+      "recentEmpty": "尚无发现。此后收录的圣物都会出现在这里。",
+      "nearlyEmpty": "即将完成的页面会汇集于此。",
+      "stripNoMatch": "此处没有符合搜索条件的内容。",
+      "shelfRecent": "最新发现：{name}",
+      "shelfNoFinds": "此书架尚未收录任何圣物。",
+      "shelfOpenAria": "打开{name}书架，已填入 {owned}/{total}",
+      "sharedUniquesNote": "总计中每件圣物只计一次；书架与页面的数字按格位统计，出现在多个页面上的圣物会被每个页面分别计入。",
+      "charCompletionLabel": "圣物库",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "策展人",
+      "charOpen": "圣物库",
+      "trackerLabel": "圣物库",
+      "collapseHint": "折叠圣物库追踪器",
+      "expandHint": "展开圣物库追踪器",
+      "openWindowHint": "打开圣物库",
+      "pin": "固定",
+      "unpin": "取消固定",
+      "pinFull": "追踪器已满（最多 {cap} 个页面）",
+      "pinAria": "将{name}固定到界面追踪器",
+      "unpinAria": "取消固定{name}",
+      "rarityLine": "{percent} 的收藏家已发现",
+      "pageRarityLine": "{percent} 的收藏家已点亮",
+      "cellAriaWithRarity": "{base}，{rarity}",
+      "cellAriaWithAccountScope": "{base}，{scope}"
+    },
     "deeds": {
       "title": "功绩之书",
       "close": "关闭功绩之书",
@@ -3495,18 +3795,23 @@ export const zh_CN: EnTranslations = {
       "featRibbon": "壮举",
       "hiddenBadge": "隐藏",
       "titleChip": "头衔奖励",
+      "borderChip": "边框奖励",
       "watch": "追踪",
       "unwatch": "取消追踪",
       "watchFull": "追踪列表已满（最多 {cap} 项）",
       "watchAria": "在界面追踪器中追踪{name}",
       "unwatchAria": "停止追踪{name}",
+      "cosmeticsSection": "头衔与边框",
       "titlesSection": "头衔",
       "titlesAria": "选择要展示的头衔",
       "titlesNone": "无头衔",
       "titlesEmpty": "获得带头衔的功绩后即可解锁此栏。",
+      "bordersSection": "边框",
+      "bordersNone": "无边框",
+      "bordersEmpty": "获得带边框的功绩后即可解锁此栏。",
       "unlockedBanner": "达成功绩：{name}",
       "unlockedTitleHint": "获得新头衔：{title}。可在功绩之书中选用。",
-      "retroSummary": "你的编年史已更新：补录 {count} 项功绩。",
+      "unlockedBorderHint": "获得新边框：{name}。可在功绩之书中佩戴。",
       "broadcastLine": "{name} 达成了功绩：{deed}",
       "rarityLine": "{percent} 的冒险者已达成",
       "trackerLabel": "功绩",
@@ -3516,6 +3821,7 @@ export const zh_CN: EnTranslations = {
       "charTitleLabel": "头衔",
       "charTitleNone": "未选择头衔",
       "charOpenBook": "功绩之书",
+      "charBorderWorn": "{name}（佩戴中）",
       "lbTab": "名望",
       "lbTitleCol": "头衔",
       "lbScopeNote": "排行榜按账号的累计名望排名。每个功绩在一个账号的所有角色中只计一次。",
@@ -3598,7 +3904,9 @@ export const zh_CN: EnTranslations = {
       "delete_confirm": "输入角色名称以确认删除。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一个会话接管。",
-      "rename_required": "此角色必须先改名才能进入世界。"
+      "rename_required": "此角色必须先改名才能进入世界。",
+      "invalid_appearance": "无法保存该外观。请调整设计后重试。",
+      "reroll_unavailable": "此角色没有可用的免费重新设计。"
     },
     "moderation": {
       "suspended_until": "此账号被停用至 {date}。",
@@ -3704,6 +4012,7 @@ export const zh_CN: EnTranslations = {
       "valeCup": "溪谷杯",
       "thornhollow": "荆谷原野",
       "deeds": "功绩之书",
+      "reliquary": "圣物库",
       "glossary": "术语表",
       "wishIKnew": "我希望早点知道的事",
       "faq": "常见问题",
@@ -3762,7 +4071,9 @@ export const zh_CN: EnTranslations = {
       "typeDelve": "探秘",
       "typeTerm": "术语",
       "typeAbility": "技能",
-      "typeDeed": "功绩"
+      "typeDeed": "功绩",
+      "typeReliquaryPage": "圣物库页面",
+      "typeRelic": "圣物"
     },
     "home": {
       "eyebrow": "经典风格浏览器 MMO",
@@ -3772,8 +4083,8 @@ export const zh_CN: EnTranslations = {
       "ctaLearn": "游戏入门",
       "what": {
         "heading": "易于上手的经典 MMO",
-        "pillarPlayTitle": "在浏览器中畅玩",
-        "pillarPlayBody": "无需下载,无需启动器。创建一个角色,几秒钟内便能进入游戏世界,电脑和手机皆可。",
+        "pillarPlayTitle": "打开网站即可开玩",
+        "pillarPlayBody": "无需下载，无需启动器。创建一个角色，几秒之内你就置身世界之中，无论是在电脑还是手机上。如果你想要，也有原生应用可用。",
         "pillarClassesTitle": "九大职业,三种定位",
         "pillarClassesBody": "坦克、治疗,还是输出,任你选择。每个职业都贴合自身的原型设计,还能用天赋打造出专属于你的玩法。",
         "pillarOpenTitle": "免费且开源",
@@ -3874,14 +4185,14 @@ export const zh_CN: EnTranslations = {
       "questsTitle": "任务",
       "questsBody": "从头顶带有标记的人物处接取任务,完成目标,再交还任务以获得经验、金币和装备。屏幕上的任务追踪器会让你随时看清目标。",
       "deathTitle": "死亡并非终点",
-      "deathBody": "若你倒下，你的身体会留在倒下之处，而你会化作鬼魂在最近的墓地复起。让灵魂跑回你的身体旁，即可就地复活、毫无惩罚；也可以接受墓地的灵魂医者，以一阵短暂的虚弱为代价立即复生。全新的英雄可以完全免除这份虚弱，而你所拥有或挣得的一切，永远不会失去。",
+      "deathBody": "若你倒下，尸体会留在倒下的地方，而你会在最近的墓地化为幽魂站起。让灵魂跑回自己的尸体，就能原地复活且毫无惩罚；或者接受墓地的苍白守护者，立刻复活，代价是一段短暂的虚弱。全新的英雄完全免受这份虚弱，而你拥有或赢得的一切从不会失去。游戏还会告诉你死于什么：聊天栏中的一行会点出是谁打出了致命一击，这通常是弄清哪里出了问题的最快途径。",
       "groupingTitle": "携手同行",
       "groupingBody": "邀请他人组队,即可共享任务进度并挑战地下城。世界中的大部分内容都可单人完成,因此组队是一种选择,而非负担。",
       "onlineTitle": "在线或离线",
       "onlineBody": "在共享的在线世界与其他所有人一同游玩，或在浏览器中开启一个即开即玩的离线世界来熟悉门道。",
-      "reassure": "天赋在 10 级解锁，只要脱离战斗便可随时重置，所以你早期的选择绝非一成不变。放心大胆地尝试吧。",
+      "reassure": "天赋从 5 级开始，一共六排，分别在 5、8、11、14、17 和 20 级各开一排。每一排都是三选一，只要脱离战斗且不在竞技场比赛中，你随时可以重置，所以早期的选择绝非一成不变。放心大胆地尝试吧。",
       "controlsLink": "查看完整操作键参考",
-      "step0Title": "Get in",
+      "step0Title": "进入游戏",
       "step0Body": "离线游玩什么都不需要：在开始界面选择“离线”，再按“开始游戏”。想和大家一起玩，就注册一个免费账号（一个用户名、一个密码，以及一个用于找回账号的邮箱），或登录你已有的账号，然后从服务器列表里挑一个服务器。",
       "worldsTitle": "选择服务器",
       "worldsBody": "在线游玩发生在各个服务器上，每个服务器都是一份完整的游戏副本，有自己的玩家、自己的世界市场，也有自己的排名。服务器列表会显示每个服务器有多繁忙，从“低”到“已满”，所以你可以挑一个清静的落得宽敞，也可以挑一个热闹的不缺同伴。你的角色属于你创建它的那个服务器，而你可以在不止一个服务器上保留角色。",
@@ -3893,7 +4204,7 @@ export const zh_CN: EnTranslations = {
       "connectionBody": "信号中断、合上屏幕或刷新页面，都不会把你踢下线。你的角色会在世界中被保留大约五分钟，游戏则自行重连，你会回到同一场对局的同一个地方。这也意味着掉线并不是脱离战斗的办法：你的角色仍然站在那里。从游戏菜单退出登录会立刻离开，不必等待；在同一个账号上登录另一个角色也是一样。"
     },
     "controls": {
-      "intro": "电脑端的默认按键。除了始终用于打开游戏菜单的 Esc 之外，每一项绑定都可以在游戏选项中更改，而且一项绑定可以是像 Shift+Z 这样的修饰键组合。",
+      "intro": "桌面端的默认按键。这里的每一项绑定都可以在游戏菜单的“按键绑定”面板中修改，只有 Esc 例外，它始终用来打开该菜单。每个操作最多可容纳两个按键，一个主键和一个备用键，绑定也可以是像 Shift+Z 这样的组合键。它还可以是鼠标按键：中键是 M3，拇指键是 M4 和 M5，更多按键依次往上排。左键和右键仍保留给镜头、点击移动以及点击世界中的物件。",
       "keyHeader": "按键",
       "actionHeader": "操作",
       "groupMovement": "移动",
@@ -3902,9 +4213,10 @@ export const zh_CN: EnTranslations = {
       "groupCamera": "镜头",
       "talents": "天赋",
       "professions": "专业",
-      "arena": "竞技场",
+      "arena": "PvP 窗口（竞技场与荆谷原野）",
       "leaderboard": "排行榜",
       "deeds": "功绩之书",
+      "reliquary": "圣物库",
       "sheathe": "收起/拔出武器",
       "crafting": "制作",
       "valeCup": "溪谷杯",
@@ -3913,6 +4225,7 @@ export const zh_CN: EnTranslations = {
       "dungeonFinder": "地下城查找器",
       "discord": "Discord",
       "abilities": "使用动作条技能（数字键行；第二条动作条位于小键盘）",
+      "targetPrev": "反向切换目标",
       "targetFriendly": "选中最近的友方",
       "cycleFriendly": "循环选择友方目标",
       "targetAuras": "目标增益和减益效果",
@@ -3922,7 +4235,7 @@ export const zh_CN: EnTranslations = {
       "arrowKeys": "方向键",
       "groupPet": "宠物指令",
       "petBar": "宠物栏：攻击、停止、嘲讽、防御、攻击性（猎人或术士的宠物在场时可用）",
-      "attackMoveNote": "还有一项默认关闭的功能：在选项中启用攻击移动后，会保留一个按键（选项开启时为 A），按下它便会朝你的光标走去，并对光标下的敌人，或途中遇到的第一个敌人展开攻击。",
+      "attackMoveNote": "攻击移动在你开启之前一直处于关闭状态：打开“按键绑定”面板，把它打开，上方的 A 一行便开始生效。当光标位于游戏世界上方时，它会让你朝光标走去，并向光标下的敌人开火，或者向沿途遇到的第一个敌对目标开火。该选项开启期间，A 执行的是这一攻击移动而不是向左转，所以请改用左方向键转向，“向左转”默认也带着这个键，或者给“向左转”另外指定一个你自己的按键。",
       "mobileHeading": "移动端操作",
       "mobileBody": "在手机和平板上会自动出现触控操作：左侧是移动摇杆，在其他任意位置拖动即可环顾四周，用两根手指捏合可缩放镜头，屏幕上还有用于使用技能和打开菜单的按钮。左上角的一个小箭头可以显示或隐藏菜单按钮，那里的“更多”按钮则收纳着你其余的窗口。",
       "controllerHeading": "使用手柄",
@@ -3941,23 +4254,23 @@ export const zh_CN: EnTranslations = {
     "settingsPage": {
       "heading": "设置和性能",
       "intro": "把画面调到最美，或把帧数拉到最高。三套现成方案，外加每个图形选项的真实作用。",
-      "wherePath": "本页的一切都在游戏里：按 Esc 打开选项。菜单会以一个汇集要点的概览页打开，各个类别列在旁边的导轨上：下面提到的设置位于“显示”组中的“图形”、“界面”和“辅助功能”之下，而“性能监视器”则在“系统”之下。更快的办法是，在顶部的搜索框中输入名称，直接跳转过去。",
+      "wherePath": "本页所述的一切都在游戏里：按 Esc 打开游戏菜单。它以按钮形式列出各个面板：按键绑定、手柄、图形、界面、光环、音频和性能浮层，下方还有维基、脱困、登出和返回游戏，联机游玩时“报告缺陷”也会加入这份列表。图形与界面涵盖了这里描述的几乎全部内容。",
       "fairnessTitle": "公平源自设计",
-      "fairnessBody": "这里没有任何选项会拿画面换战力。调低设置只会舍弃视觉上的修饰，绝不会砍掉你作战所需的信息：从“低”到“超高”，你的减益效果、施法条、队伍血量和伤害数字完全一致。用配置一般的机器游玩，绝不会吃亏。",
+      "fairnessBody": "这里没有任何选项拿美观去换取实力。较低的设置只会舍弃外观上的润色，绝不会舍弃你赖以战斗的信息：你的减益、施法条、小队生命值和伤害数字，从 Low 到 Insane 完全一致。用一台普通的机器游玩从来不是劣势。",
       "loadoutsHeading": "三套现成方案",
       "loadoutsIntro": "先从最像你设备的那套方案开始，然后每次只调一个选项，直到感觉合适为止。",
       "recommended": "推荐",
       "whyLabel": "推荐理由：",
-      "tagReload": "需重新加载",
+      "tagReload": "按“应用”",
       "fpsTitle": "帧数优先",
       "fpsTagline": "适合较老的笔记本、核显设备，以及用电池游玩的场合。",
       "fpsWhy": "图形质量是总开关，渲染质量则是效果最猛的滑块：调到 70% 时，世界只需绘制大约一半的像素，而界面依旧清晰锐利。",
       "balancedTitle": "均衡",
       "balancedTagline": "大多数设备的最佳平衡点，也是我们的默认建议。",
-      "balancedWhy": "“中”档就有真实的阴影和完整的材质，“高”档再加上环境光遮蔽和泛光。只要低于“超高”，内置保护机制就会在激烈战斗掉帧时自动兜底，所以均衡方案不必时刻盯着，也能一直流畅。",
+      "balancedWhy": "Medium 带来真实的阴影和完整的材质，High 又在其上加入环境光遮蔽与泛光。内建的安全网在每一档都保持张开，因此 Balanced 无需你照看便能扛过一场热闹的战斗。",
       "visualsTitle": "极致画质",
       "visualsTagline": "为高性能台式机准备的截图模式。",
-      "visualsWhy": "“超高”会以显示器支持的最高分辨率渲染，并启用最丰富的光照。它还会关闭内置保护机制，而且仅限桌面端：手机和应用端最高到“高”为止。",
+      "visualsWhy": "Ultra 会以你显示器所能提供的最高分辨率、最丰富的光照进行渲染。其上还有 Insane，那是全部开满的展示档：这一档必须你亲手选择，因为无论你的机器多强，游戏都不会替你选它。",
       "value50to70": "50% 到 70%",
       "value90to100": "90% 到 100%",
       "value100": "100%",
@@ -3965,16 +4278,16 @@ export const zh_CN: EnTranslations = {
       "valueOnOptional": "开启（可选）",
       "howHeading": "这些选项如何生效",
       "factDetectTitle": "游戏会先自动调校",
-      "factDetectBody": "首次启动时，游戏会检测你的设备并选好合适的档位：性能一般的手机是“低”，强力台式机则是“超高”。你自己做出的任何选择永远优先。",
+      "factDetectBody": "首次启动时，游戏会读取你的设备并为你存下一个合理的档位。所有手机和平板都从 Low 起步，好让你直接进入世界，老旧或软件渲染的显卡同样如此。强劲的台式机从 Ultra 起步，若这台机器看起来显存吃紧则从 High 起步。游戏无法判定的一律停在 Medium。你自己做出的任何选择永远优先，并且会保留下来。",
       "factReloadTitle": "两类选项",
-      "factReloadBody": "图形质量和“高级”下的各个选项要在重新加载后才会生效，需要时面板会提供“立即重新加载”按钮。其余选项在你改动的那一刻立即生效。",
+      "factReloadBody": "图形面板编辑的是一份草稿。更改“图形质量”或任意细节旋钮，然后按“应用”，游戏就会在你所站之处重建世界，无需重新加载。按钮旁的那行字会告诉你何时完成。其他所有选项，无论在该面板还是别处，都在你更改的那一刻生效，只有彻底失败的重建才会转而向你提供一个重新加载按钮。",
       "factGovernorTitle": "内置保护机制",
-      "factGovernorBody": "在“超高”以下的所有档位，大型战斗骤然吃紧时，游戏会悄悄暂时精简草地、特效和光照，随后再恢复原样。选择“超高”，就等于告诉游戏你宁可保留每一处细节。",
-      "factSearchTitle": "搜索一找即得",
-      "factSearchBody": "不确定某个选项在哪里？在菜单顶部的搜索框中输入即可。它也能理解常见的说法，因此输入 fps 就能找到 FPS 显示，选中一条结果便会直接跳转到该设置并将其高亮。",
-      "advancedHeading": "“高级”预设：自由搭配",
-      "advancedBody": "“高级”以“高”档位为起点，额外解锁四个独立选项，让你把帧数花在真正看得出差别的地方：地形细节、植被密度、特效和光照，以及阴影质量。这些选项和图形质量一样，重新加载后才会生效。",
-      "advancedMixes": "两套人气搭配：把阴影质量保持在“高”、特效和光照调到“低”，画面干净利落、没有泛光，跑起来也轻快；或者反过来，保留泛光，让阴影更柔和。",
+      "factGovernorBody": "每一档都保持安全网张开：当一场大战陡然升温时，游戏会悄悄稀疏草地、特效和光照片刻，随后再将它们复原。Ultra 与 Insane 只是会等得久得多才这么做，所以高端预设绝不会因为单独一帧变慢而受到打扰。",
+      "factSearchTitle": "某项设置的所在之处",
+      "factSearchBody": "这里没有搜索框，因此了解菜单的结构会很有帮助。图形以卡片排布：质量、世界细节、光照与特效、镜头、显示和系统，触屏设备上还有触控操作。界面则分为四个标签页：常规、窗口、聊天和战斗。若某项设置改变的是世界如何绘制，它就在图形里；若改变的是界面向你展示什么，它就在界面里。",
+      "advancedHeading": "细节旋钮与 Advanced 混搭",
+      "advancedBody": "你不必选择 Advanced 才能看到细节旋钮。图形面板始终以两张卡片展示它们：世界细节包含地形细节、植被密度、表面细节、视野距离、水面质量和角色细节，光照与特效包含特效与光照、阴影质量、环境光遮蔽、泛光、抗锯齿、动态光源和粒子效果。在固定预设之下，每个旋钮都会大致显示该预设所处的位置。",
+      "advancedMixes": "两种常用混搭：把阴影质量保持在高，并把特效与光照调到 Low，可得到清爽无光晕、运行轻快的画面；或者反过来，保留泛光并柔化阴影。混搭之前有一点需要知道：环境光遮蔽、泛光和抗锯齿与特效与光照挂在同一条链上，因此那个旋钮处于 Low 时，它们便无从运作。",
       "tableHeading": "每个图形选项，逐一说明",
       "colSetting": "选项",
       "colDoes": "作用",
@@ -3991,18 +4304,18 @@ export const zh_CN: EnTranslations = {
       "rowBrowserEffects": "决定界面本身可以多华丽：玻璃模糊、辉光、菜单动画。“自动”会根据你的浏览器自行匹配；无论怎么选，3D 世界都不受影响。",
       "rowTerrainDetail": "细腻混合的地表纹理，或更简洁、更省性能的地形外观，二选一。",
       "rowFoliageDensity": "决定角色周围的草地长多远、长多密。",
-      "rowEffectsQuality": "控制泛光、环境光遮蔽，以及有多少火把和法术能投射真实光照。在“高级”各选项中，这一项省下的性能最多。",
+      "rowEffectsQuality": "泛光、环境光遮蔽，以及有多少火把和法术投出真实光照。细节旋钮中单项节省最大的一个，也是其余光照旋钮所依赖的那个开关。",
       "rowShadowQuality": "决定阴影的锐利程度。“低”仍保留阴影，只是边缘更柔和。",
       "rowFrostedPanels": "在窗口背后加一层毛玻璃模糊。效果漂亮，但也正是性能较弱的浏览器最吃力的那类特效；想要经典的清爽外观就保持关闭。",
       "rowReduceMotion": "移除界面动画，让窗口即刻显示。它首先是一项无障碍选项，顺带还有一点性能收益。",
       "rowPerfOverlay": "在屏幕上实时显示 FPS、帧时间等数据。调校本页选项时先打开它，调完再隐藏。",
-      "tableFoot": "在找视距滑块或 FPS 上限？不用找了：可视距离已包含在各画质档位里，帧率则与你的显示器保持同步。",
+      "tableFoot": "在找帧数上限？没什么可找的：帧的节奏跟随你的显示器。绘制距离是一个单独的旋钮，即世界细节卡片中的“视野距离”，每个预设都会替你设定它，直到你亲自调动为止。",
       "mobileTitle": "手机与平板",
-      "mobileBody": "移动端会替你多打理一些：游戏自动选择档位，把分辨率稍微压低以兼顾电量和发热，最高的几个档位也仅在桌面端开放。上面的方案依然适用，只是手机最高到“高”为止。",
-      "touchBody": "在触屏设备上，选项还会多出一组专属的舒适度设置：摇杆大小与灵敏度、屏幕按钮的大小与不透明度、左手镜像布局、可选的镜头摇杆，以及反转触控视角，让屏幕来适应你的双手，而不是反过来。",
+      "mobileBody": "在手机或平板上，游戏会让你从 Low 起步。所有触屏设备首次启动时都会落在这一档，这是刻意为之，好让你进入世界开始游玩；随时可以在图形面板中自行调高。在安卓浏览器上整条阶梯都向你敞开，你的选择也会保留。在 iPhone 和 iPad 上你依然可以选择最高的几档预设，按下“应用”后它们会立即生效，但游戏会在你下次启动时把你退回 High，因为 iOS 可能在构建这么大的场景时终止标签页。下载的应用更为收紧：它的预设列表止于 High，各项系统旋钮也被隐藏，因为应用会自行管理它们。",
+      "touchBody": "在触屏上，图形面板会多出一张专属的触控操作卡片：摇杆大小与死区、屏幕按键大小、操作控件的不透明度、可选的镜头摇杆、供左手玩家使用的镜像布局，以及反转的触控视角，好让屏幕迁就你的双手，而不是反过来。",
       "audioTitle": "声音与语言",
-      "audioBody": "选项窗口并不只关乎画面。音频标签页为音效、音乐和语音提供各自独立的音量控制，界面部分则带有一个语言选择器，可以当场重新本地化整个界面，无需重新加载。",
-      "autolootBody": "不想逐个点击尸体？有一个默认关闭的界面选项，会在你路过自己击杀的目标时自动拾取它们身上的战利品。",
+      "audioBody": "选项窗口并非只有画面。音频中有三个音量滑块，分别对应音效、音乐和语音，此外还有一个音乐开关，以及四个针对最容易听腻的声音的开关：NPC 语音、脚步声、界面音效和点击反馈。界面面板的“常规”标签页带有语言选择器，可当场重新本地化整个界面，无需重新加载，还有为窗口装饰准备的主题选择器。",
+      "autolootBody": "不想逐个点击尸体？界面面板“战斗”标签页中默认关闭的“路过自动拾取”，会在你从自己击杀的目标旁走过时把战利品一并收走。",
       "panelsMoreBody": "本页没有列表说明的那两个面板，同样值得一看。“光环”是你调整那些大幅屏幕提示的地方，它们会在你职业的触发效果就绪时亮起：哪些要显示、大小、颜色、不透明度，以及摆在屏幕的什么位置。“性能监视器”则是你调校本页选项时打开、调完再隐藏的那个读数。",
       "valueUltraOrInsane": "“超高”，想要全都要就选“极致”",
       "advancedLadder": "只要动了其中任何一个，画质预设就会切换到“高级”，并以你当时正看着的那些档位为起点，因此你的自定义搭配是从你已经看到的样子开始，而不是从零开始。调得满意了，按“应用”。“高级”排在预设列表的最后正是这个道理：它是专家档，你自己的那套搭配就住在那里。",
@@ -4071,16 +4384,16 @@ export const zh_CN: EnTranslations = {
     "combat": {
       "intro": "战斗遵循经典 MMO 中熟悉的规则。你完全不必钻研这些就能玩得很好,这里只是介绍一下战斗大致的运作方式。",
       "hitTitle": "并非每次攻击都能命中",
-      "hitBody": "攻击可能未命中，也可能被躲闪，敌人的攻击同样如此；而法术则可能被彻底抵抗。与等级相近的敌人作战，才能让你的攻击稳稳命中；等级差距越大，你就越常挥向空气。",
+      "hitBody": "攻击可能落空，也可能被闪避，敌人的攻击同样如此。另有两种应对只属于玩家：战士可以用招架卸开一击，持盾的战士或圣骑士可以将其化作格挡，两者都只对来自正面的攻击有效。世界中的生物两者皆不会，所以挥向怪物的一击要么命中，要么落空，要么被闪避。法术自有其规则，从不落空：它们会被抵抗。与自己等级相近的敌人战斗，才是让你的攻击落到实处的关键；等级差距越大，你挥空的次数就越多。",
       "mitigationTitle": "护甲与生命值让你屹立不倒",
       "mitigationBody": "护甲能减轻物理打击，因此更好的护甲是你近战续航能力的主要来源。魔法则是另一回事：你要靠更深厚的生命值池与彻底抵抗法术的几率来扛过法术，而非依靠护甲。重甲职业能卸去更多打击，但没有什么能让你刀枪不入。",
       "resourcesTitle": "每个职业都有自己的节奏",
       "resourcesBody": "战士在激战中积攒怒气,潜行者消耗稳步回复的能量,施法者则管理着一池法力。掌握自己的资源,便是玩好职业的一半。",
       "growTitle": "你每升一级都会变得更强",
-      "growBody": "每次升级都会让你更加坚韧，并解锁新的技能，一路直至 {cap} 级的等级上限。做任务是升级最快的途径；狩猎、地下城与探秘则能加以补充。",
+      "growBody": "每一级都会让你更耐打，并解锁新的技能，一路直到 {cap} 级的上限。任务是向上攀升最快的途径；狩猎、地下城、探秘，以及你一路上经营的专业，则补足其余。",
       "effectsTitle": "增益、减益与控制",
       "effectsBody": "许多技能会施加持续存在的效果。有益的（增益）会提升你的属性、为你护盾，或一点点地治疗你；有害的（减益）则以持续伤害消耗你的生命，或削弱你。留意屏幕顶角、小地图旁的那些小图标，便能看清你身上有哪些效果、还能持续多久。",
-      "ccBody": "控制是一类特殊的减益，会限制目标能做的事：眩晕、定身与减速，让人无法施法的沉默，缴械，恐惧，以及能让敌人暂时无害的变形。对其他玩家使用时，控制会随着重复而失去锋芒：同一类控制若重复施加得太快，效果会先减弱、继而彻底失效；而从潜行中打出的开场眩晕，会与其后的眩晕分开计算，因此没有人能被无休止地连控。这个世界的生物则没有这般记性：控制落在它们身上，每一次都是十足威力；不过许多最强大的敌人，包括有名的精英和其中最强的首领，则根本无法被控制。",
+      "ccBody": "控制是一类特殊的减益，它限制目标能做的事：昏迷、定身和减速、打断施法的沉默、缴械、恐惧，以及让对手片刻之间无害的变形。对上其他玩家时，大多数控制会因重复而递减：恐惧、变形、定身和法术学派封锁若过快地再次施加，持续时间会缩短，随后彻底失效，因此没有人会被永远压制。昏迷是刻意的例外，因为它本就短暂且背后有实打实的冷却，所以重复施加从不会缩短它，尽管缩减控制时长的装备依然会削减它。世界中的生物并无这般记仇：对它们而言，控制从不会因重复而减弱，不过许多最强大的敌人，其中有名的精英和最强的首领，根本无法被控制。",
       "metersBody": "想知道一场战斗打得如何？按 Shift+H 打开小队仪表盘，它会逐场统计你队伍的伤害、治疗与威胁。",
       "queueTitle": "你的下一招已经就绪",
       "queueBody": "你不必把按键时机掐到毫厘。当前技能还在施放时按下下一个技能，它便会进入队列，在施法完成的那一刻立即发动，让娴熟的操作行云流水、毫无间隙。一些近战打击也是同理，会随你的下一次武器挥击一并打出。",
@@ -4114,7 +4427,7 @@ export const zh_CN: EnTranslations = {
       "frameTotBody": "目标框体旁的一个小框体，显示你的目标此刻正打着谁。要分辨一只怪物是在打你的坦克还是冲你来了，这是最快的办法。它默认隐藏，需要你在选项里开启。",
       "framePartyTitle": "你的队伍",
       "framePartyBody": "队伍成员在左侧、你的目标框体下方逐行排列，每人一行。某位成员走出距离时，他那一行会变暗；行上会显示值得你反应的效果，还可以在旁边显示他的宠物。每一行带多少生命值文字由你决定：不显示、百分比、具体数值，或者两者都要。",
-      "framePetTitle": "Your pet",
+      "framePetTitle": "你的宠物",
       "framePetBody": "猎人、术士，以及任何放出了宠物的人，都会在自己的框体旁得到一个小框体，显示宠物的名字、等级和生命值。点击那个框体即可选中你的宠物，用键盘按 Ctrl+6 也是一样。",
       "framesMoveBody": "你的框体、目标框体和队伍框体都可以移动。每个框体角上都有一个小小的移动按钮：解开它，把框体拖到你想要的位置，再锁上，这样一次误点就挪不动它。如果挪到了让你后悔的地方，选项里的“重置框体位置”会把它们统统弹回最初的位置。",
       "barsTitle": "各类条、计时与战斗文字",
@@ -4133,7 +4446,7 @@ export const zh_CN: EnTranslations = {
       "keyWindowsBody": "下面每一个都有自己的默认按键，并在右下角那排按钮里有一个按钮。再按一次该按键，或者按 Esc，即可关闭。",
       "winCharTitle": "角色属性面板（C）",
       "winCharBody": "一侧是你已装备的装备，另一侧是你的属性以及它们所支撑的数值，每个数值上都有提示，说明它对你的职业有什么用。这里还带着你的终身游戏时长，旁边有一只小眼睛，在你不愿示人时可以把这个数字藏起来；生成玩家名片的按钮也在这里。",
-      "winBagsTitle": "Bags (B)",
+      "winBagsTitle": "背包（B）",
       "winBagsBody": "你带着的一切，装在一个有四个背包插槽的包里。顶部的分类标签可以把它收窄到武器、护甲、消耗品、材料、工具、任务物品或坐骑，搜索框则按名称过滤。排序下拉菜单会按最近获得、品质或名称重排你正在看的东西，这个选择会在会话之间记住。另有一个单独的“整理”按钮，一按就把包里真正的格子理顺，并清掉分类标签和搜索，让你看到整理好的整个背包。",
       "winSpellbookTitle": "法术书（P）",
       "winSpellbookBody": "你职业的每一个技能，已学会的和还没到的，按顺序排开。你正是在这里把技能拖到动作条上的。",
@@ -4303,7 +4616,7 @@ export const zh_CN: EnTranslations = {
       "healerTerm": "治疗者",
       "healerDef": "用治疗法术让所有人保持存活的队伍成员。",
       "specTerm": "专精",
-      "specDef": "专精：随着你投入天赋，你让职业倾向的方向，比如治疗或输出。",
+      "specDef": "专精：你在 5 级为自己的职业选定的道路，例如治疗或输出。它确定你的定位，授予一个标志性技能和一份持久的精通，并且即使你重置天赋，它也会一直留在你身上。",
       "pullTerm": "引怪",
       "pullDef": "将一个敌人或一群敌人引入战斗,通常是有意为之,一次引一批。",
       "instanceTerm": "副本",
@@ -4331,7 +4644,7 @@ export const zh_CN: EnTranslations = {
       "targetMarkerTerm": "目标标记",
       "targetMarkerDef": "任何小队或团队成员都能标在目标头上的符号，让所有人集火或避开同一个目标。共八种符号，每种符号对应一个目标。",
       "loadoutTerm": "配置",
-      "loadoutDef": "一套保存下来的天赋布局。多存几套，便能在不同构筑之间切换，而不必一点一点地重新投入天赋点。",
+      "loadoutDef": "一套已保存的天赋配置，最多可存十套。每一套都会记住它的各排选择和它的动作条，也可以记住你当时穿着的装备，因此切换构筑只需一次点击，而不必逐排重做。",
       "readyCheckTerm": "准备确认",
       "readyCheckDef": "队长输入 /ready 对小队或团队发起的确认：每个人选择“准备就绪”或“未准备”，全队都会看到统计结果。",
       "soulboundTerm": "灵魂绑定",
@@ -4341,10 +4654,10 @@ export const zh_CN: EnTranslations = {
       "worldBossTerm": "世界首领",
       "worldBossDef": "一个以稳定节奏在开放世界中崛起的团队级首领，由闻讯聚集而来的所有人共同讨伐，而非一支固定的队伍。",
       "fiveSecondTerm": "五秒规则",
-      "fiveSecondDef": "自你上一次消耗法力算起满五秒，法力才会开始自行回复。正因如此，施法者会控制自己的节奏，而不是一味地全力倾泻。",
+      "fiveSecondDef": "自你上一次消耗法力算起满五秒，法力才会以完整速度回复。在那之前它并不会完全停下，而是以较慢的速度继续回复。正因如此，施法者会控制自己的节奏，而不是一味地全力倾泻。",
       "talentRowTerm": "天赋行",
       "talentRowDef": "天赋分六行到来，分别在 5、8、11、14、17 和 20 级各开一行。每一行给出三个选项，你从中挑走一个，因此没有需要攒起来或花出去的点数。",
-      "riftTerm": "Rift",
+      "riftTerm": "裂隙",
       "riftDef": "在各个区域中自行撕开的一道裂口，向下通往一处按这道裂隙自己的种子全新生成的副本，一层接着一层。裂隙分为 C、B、A、S 四个等级。入口过一阵子便不再接纳新的队伍，而全服第一支抵达最底层的队伍，才是唯一能将它封上的那一支。",
       "riftRankTerm": "等级（裂隙）",
       "riftRankDef": "裂隙身上的那个字母，C、B、A 或 S，也是决定它有多难的唯一因素。裂隙绝不会随你队伍的人数缩放，因此等级本身就是全部的难度阶梯：C 最温和，S 最凶险，而每一个等级都是为一支队伍准备的。",
@@ -4396,7 +4709,7 @@ export const zh_CN: EnTranslations = {
       "q2": "我需要加密货币钱包或任何代币吗?",
       "a2": "不需要。没有它也能完整畅玩游戏。可选的社区代币仅增添外观装饰，以及每日奖励奖池的一份分成，绝不影响战力或进度。",
       "q3": "可以在手机上玩吗?",
-      "a3": "可以。游戏可在移动端浏览器中通过触控操作运行,同时也提供桌面端启动器。",
+      "a3": "可以。游戏能在任何现代移动浏览器中以触控操作运行，也有应用：iOS 与安卓版本，以及一款会自行保持更新的 Windows、macOS 和 Linux 桌面应用。",
       "q4": "可以离线或单人游玩吗?",
       "a4": "可以。有即开即玩的单人离线模式，而除地下城、团队副本和世界首领之外，在线世界也完全可以单人通关。",
       "q5": "一共有多少个职业?",
@@ -4411,7 +4724,7 @@ export const zh_CN: EnTranslations = {
       "q9": "有 PvP 吗？",
       "a9": "有。可以与任何人决斗取乐，也可以踏入灰烬角斗场与其他玩家交锋。PvP 是自愿参与的，你绝不会被强迫卷入。",
       "q10": "满级之后有什么可做的？",
-      "a10": "等级上限为 {cap} 级。从那时起，你可以打五人地下城和十人团队副本，再以英雄模式重新挑战它们以换取升级版战利品，在世界首领崛起时与他一战，在竞技场中检验自己，带着一位伙伴一同深入探秘，并在功绩之书中追逐功绩，以攀升王国的排名。",
+      "a10": "上限是 {cap} 级。从那里开始，你可以跑五人地下城和十人团队副本，以英雄模式再度挑战以获取升级过的战利品，沿着裂隙一层层深入，在世界首领现身时与之一战，在竞技场或荆谷原野战场上检验自己，打一个赛季的谷地杯，带上一名同伴潜入探秘，把一门专业一路做到杰作制作，收集坐骑，并在功绩之书中追逐功绩以攀升排行榜。",
       "q11": "我该如何找队伍？",
       "a11": "邀请你遇到的任何人组队，在聊天中询问，或在地下城门口组队。世界的大部分内容都可以单人完成，所以组队是一种选择，而非要求。",
       "q12": "有内购商店吗？",
@@ -4445,7 +4758,8 @@ export const zh_CN: EnTranslations = {
     "resourceName": {
       "rage": "怒气",
       "mana": "法力",
-      "energy": "能量"
+      "energy": "能量",
+      "focus": "集中"
     },
     "classPage": {
       "back": "所有职业",
@@ -4474,7 +4788,7 @@ export const zh_CN: EnTranslations = {
       "mageEleSummon": "一个冰霜法术，把水元素召唤到你身边，并让它扑向你的目标。",
       "formName": {
         "form_bear": "巨熊形态",
-        "form_cat": "Wolf Form",
+        "form_cat": "狼形态",
         "form_travel": "迅捷形态"
       }
     },
@@ -4514,19 +4828,32 @@ export const zh_CN: EnTranslations = {
       "none": "没有职业符合所有筛选条件。清除一项以查看更多。"
     },
     "abilityHook": {
+      "evil_eye": "标记一个敌人，使其行动与承受的苦难为你积累谴罪。",
       "heroic_strike": "预备一次更重的挥击，在下次攻击时消耗怒气。",
       "revenge": "横扫你前方的敌人，并可能在躲闪或招架后不消耗资源。",
       "hamstring": "妨碍敌人的移动，使其无法逃脱。",
       "battle_shout": "一声号召呐喊，提升全队的攻击强度。",
       "charge": "冲向远处的敌人，以一次短暂的昏迷开场。",
       "thunder_clap": "打击你周围的一切，并减缓它们的攻击速度。",
-      "seal_of_righteousness": "为你的挥击附加神圣伤害，再用裁决将其释放出去。",
+      "seal_of_righteousness": "为你的近战挥击附上额外的神圣伤害。",
       "holy_light": "稳健而可观的治疗，用于把盟友或自己奶满。",
       "devotion_aura": "持续的自我增益，提升护甲让攻击伤害更低。",
       "judgement": "消耗你激活的圣印，从近距离打击敌人。",
+      "hammer_of_wrath": "从远处处决一名受伤的敌人，或在圣翼激活时处决任意敌人。",
+      "avenging_wrath": "获得 10 点虔诚，并在接下来的十五秒内使技能产生的虔诚值翻倍。",
+      "bastion_sweep": "用盾牌横扫一群敌人，夺取仇恨并积累虔诚。",
+      "oath_chain": "将远处的敌人拉入队伍并减缓其逃离速度。",
+      "veilbound_march": "穿过敌群并留下印记，削弱其对你造成的伤害并牢牢锁定仇恨。",
+      "holy_shield": "消耗虔诚，获得主动格挡时段、吸收护盾和仇恨脉冲。",
+      "consecration": "以持续的神圣伤害和仇恨占据周围地面。",
+      "hammer_of_justice": "以短暂而可靠的昏迷阻止一名敌人。",
+      "lay_on_hands": "在盟友濒临倒下时为其恢复大量生命值。",
       "blessing_of_might": "提升友方目标的攻击强度，开怪前施放正合适。",
       "divine_protection": "一道快速的守护结界，在局势吃紧时吸收伤害。",
       "raptor_strike": "一记沉重的近战挥击，用于有东西贴近你时。",
+      "pack_command": "命令你的伙伴发动攻击，并积攒凶性以释放野兽。",
+      "stampede": "召唤三只野兽攻击12秒。叠满兽群凶性后使用，可让它们在整个召唤期间保持最高伤害加成。",
+      "measured_shot": "一记从容瞄准的远程射击，为你的强力攻击恢复集中值。",
       "aspect_of_the_hawk": "持续保持的姿态，强化你的远程攻击强度。",
       "serpent_sting": "施加一道毒液，随时间造成自然流血伤害。",
       "arcane_shot": "一次远程的瞬发射击，迅速打出额外伤害。",
@@ -4545,11 +4872,21 @@ export const zh_CN: EnTranslations = {
       "power_word_shield": "为盟友裹上一层护盾，在伤害落地前先吸收。",
       "renew": "随时间持续跳动的治疗，适合施放后继续移动。",
       "lightning_bolt": "一次远程施法的自然伤害，是你远距离的常用手段。",
+      "chain_lightning": "攻击一个目标并跳向附近两名敌人，整次施法产生一层雷霆。",
+      "thunder_reservoir": "积蓄雷电，直到大地震击或断层震荡能释放满额威力。",
       "rockbiter_weapon": "为你的武器附魔，让每一次近战挥击更重。",
       "healing_wave": "你的主力治疗，为自己或盟友直接补血。",
       "earth_shock": "瞬发的震击，在你急需时打出快速的自然伤害。",
       "lightning_shield": "为你充能，让攻击者打中你时受到自然伤害。",
       "flame_shock": "瞬发的灼烧，先打出一记，并持续灼烧目标。",
+      "galeheart_weapon": "为双持武器灌注风暴之风，以稳定的攻击节奏获取回报。",
+      "warspirit_cadence": "将稳定的武器节奏转化为风心回响和一次瞬发法术机会。",
+      "stormsurge": "消耗风暴施法机会后，有时会提前恢复先祖打击。",
+      "lifespring_weapon": "为武器灌注复苏之水，强化持续的治疗节奏。",
+      "tidecall": "立即治疗一名盟友，并注入满额愈合水流。",
+      "ancestor_return": "在战斗外长时间施法后，使所有阵亡的小队或团队成员复活。",
+      "stoneward": "升起充能石盾，将受到的伤害转化为恢复。",
+      "primal_exaltation": "短暂释放与你专精相符的元素力量。",
       "fireball": "你的主力火焰输出，命中后让目标持续燃烧。",
       "fireball_form": "化身为活体火球，高速穿越开阔地带。",
       "frost_armor": "持续的自我增益，开战前先硬化你的护甲。",
@@ -4566,7 +4903,7 @@ export const zh_CN: EnTranslations = {
       "conjure_water": "制造饮品以恢复法力，让你在两次开怪之间补给。",
       "conjure_food": "制造食物，坐下进食时可以恢复生命值。",
       "shadow_bolt": "向目标施放一道暗影箭，是你的常用输出。",
-      "summon_imp": "召唤一只烬裔，从远处向敌人投掷火焰箭。",
+      "summon_imp": "召来一只烬裔，从远处向敌人施放邪能箭。",
       "demon_skin": "持续的自我增益，强化皮肤并提升护甲。",
       "immolate": "点燃目标，打出一记起手伤害并留下持续燃烧。",
       "corruption": "用暗影腐蚀目标，在你做别的事时持续造成伤害。",
@@ -4575,17 +4912,14 @@ export const zh_CN: EnTranslations = {
       "healing_touch": "一记施法时间较长的单体大治疗，用于把人奶满。",
       "mark_of_the_wild": "开战前为自己或盟友施加的持续祝福。",
       "moonfire": "瞬间命中并让目标持续燃烧，移动时也很好用。",
+      "moonseed": "在月翼形态下，推进一层月潮并延长月光风暴。",
       "rejuvenation": "瞬发施放，持续治疗盟友，让你可以继续行动。",
       "thorns": "守护盟友，让近战攻击者在打击时反伤自己。"
     },
     "petHook": {
-      "emberkin": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
-      "gloomshade": "一只结实的恶魔，能嘲讽并吸收伤害，让你安心施法。",
-      "duskborn": "一只快速的近战恶魔，输出凶猛，但承压能力很差。",
-      "spellhound": "一名暗影游击手，专门纠缠敌方施法者。",
-      "warfiend": "一名耐打的近战猛士，能召唤它之后就是全能的选择。",
-      "pyre_colossus": "一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。",
-      "wraithborn": "一只精英施法者，从远处倾泻沉重的暗影伤害。"
+      "emberkin": "一只远程恶魔，其标志性的邪能箭能从安全距离消磨敌人。",
+      "gloomshade": "一只结实的坦克恶魔，会嘲讽，并用深渊锁链把逃跑的普通敌人拽回攻击范围；首领会抵抗这一拉扯。",
+      "pyre_colossus": "一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。"
     },
     "bestiary": {
       "heading": "怪物图鉴",
@@ -4679,15 +5013,15 @@ export const zh_CN: EnTranslations = {
     },
     "worldPage": {
       "heading": "世界",
-      "intro": "World of ClaudeCraft 是一片连绵不绝、需你徒步穿越的大陆，三大区域由南向北依次铺展。这里没有快速旅行，因此旅途本身便是冒险的一部分。",
+      "intro": "World of ClaudeCraft 是一片你要靠双脚走遍的连续大陆。古道自南向北穿过起始山谷、沼泽和山峰，并越过它们继续攀升，通向其后的洼地以及地图顶端的雪境。自那条路向西展开一列更高等级的国度，向东另有一列，谷地东岸外还有一座岛屿。这里没有快速旅行，没有飞行路线，也没有马车：每一段路程都靠步行或骑乘完成，所以抵达本身就是冒险的一部分。\n\n这片大地也记录着时间。昼夜循环依照一只你所在世界人人共享的真实时钟运转，因此天空会为你们所有人同时从黎明经正午走向黄昏与夜色，月亮循着盈亏来去，地面上的光影也随之变化。小地图周围的表盘，就是你读取时辰的地方。",
       "hub": "大本营",
-      "mapHeading": "向北之路",
-      "mapSub": "三片区域，自南向北，每一片的等级都更高一级。跟着任务线走，这片土地便会带你从山谷一路抵达群峰。",
+      "mapHeading": "这条路与路那头的国度",
+      "mapSub": "任务路线自南向北纵贯地图中部：山谷、沼泽、山峰，再越过它们通向洼地与雪境。其余国度是沿着这条路展开，而非在它之后，经由沼泽路东西两侧的传送门抵达，远岸岛则从谷地东岸前往。把你挡在远方国度之外的是它们的等级区间，而不是路途：其中五处共享最高的区间，因此一旦你准备就绪，便可按任意顺序逐一挑战。远岸岛是例外，那是一片你可以早早造访的低等级土地。",
       "places": "值得一看的地点",
       "residents": "你将遇见的人",
       "valeBlurb": "青翠的起始山谷，新英雄在东溪镇周边的野狼与盗匪身上磨砺技艺。",
       "marshBlurb": "一片被洪水淹没、迷雾与废墟交织的国度。泥鳍涌入浅滩，水下有更古老之物蠢蠢欲动，由桥镇芬桥镇守望着。",
-      "peaksBlurb": "风蚀的山脊与古老的矿坑向上攀升，通往这片王国中最寒冷、最高处的危险之地，由高守哨站镇守。",
+      "peaksBlurb": "被风削蚀的山脊和古老的矿场向上攀升，直抵起始之路上最严酷的危险，由高瞭前哨据守。",
       "duskBlurb": "一座笼罩在永恒暮色中的山谷，坐落于古辉巨树之下，水晶废墟泛着微光，空气中回荡着古老的魔力。",
       "emberBlurb": "一片被风暴照亮、遍布灰烬与血玻璃的荒漠，巨龙在火山口上空盘旋，巨魔的篝火在沙丘间燃烧，由门镇望龙哨守望着。",
       "frostBlurb": "极光之下，白雪与黑松一片静谧，寒冷本身仿佛苏醒了，唯有冰幔镇的炉火长燃不熄。",
@@ -4758,7 +5092,7 @@ export const zh_CN: EnTranslations = {
       "heading": "任务",
       "intro": "任务是这个世界的核心，也是升级最快的途径。下面介绍它们的运作方式。",
       "acceptTitle": "寻找与接受",
-      "acceptBody": "头顶带有标记的人物有活儿要交给你。与他们对话即可接受任务。在东溪镇，红溪元帅正等着交付《门前之狼》，这是你最早能接取的任务之一。",
+      "acceptBody": "头顶带有标记的人有活儿要交给你，而标记会告诉你是哪一类。金色感叹号表示一个你现在就能接下的任务，金色问号表示一个你已完成、可以交付的任务。在姓名牌上你还会看到灰色问号，它表示你正在做那个任务但尚未完成。可重复的活计使用同样的标记，只是呈蓝色：亮蓝色感叹号是你做过、可以再接的差事，同样的标记若显得黯淡，则表示它仍在等待期内。除灰色之外的每一种标记都会显示在姓名牌、小地图和世界地图上，因此你能隔着半座城发现活儿。在东溪镇，红溪元帅正带着“门前之狼”等着你，那是你最早能接的任务之一。",
       "objectivesTitle": "目标",
       "objectivesBody": "击杀特定敌人、收集物品，或与世界中的某物互动。屏幕上的追踪器会随你的行动记录进度。若你改变主意，可以从任务日志中放弃一个任务，之后再从其发布者处重新接取。",
       "turninTitle": "交还任务",
@@ -4771,11 +5105,11 @@ export const zh_CN: EnTranslations = {
       "typesTitle": "你将遇到的任务种类",
       "typesBody": "大多数任务都属于几种熟悉的样式之一。屏幕上的追踪器会清楚地说明每个任务的要求，让你绝不会一头雾水。",
       "typeSlayTitle": "讨伐",
-      "typeSlayBody": "击败一定数量的指定敌人，以此疏散一群野兽，或瓦解一个邪教的盘踞。你最早的任务之一，清除东溪路上的野狼，便属于此类。",
+      "typeSlayBody": "通过击败指定数量的标记敌人来削减一群野兽，或打破某个教派的掌控。你最早的任务之一，清理东溪镇道路上的狼群，就属于这一类。时不时地，某个任务会唤醒它自己的目标：上次经过时看着只是布景的东西，会在你接下相关任务后长出姓名牌，成为可以攻击的对象，所以不妨回头再看一眼。",
       "typeGatherTitle": "采集",
-      "typeGatherBody": "从世界中或敌人的掉落里收集物品：草药、矿石、邪教阴森的材料。有些物件只会从特定的敌人身上掉落，所以狩猎与搜罗总是相伴而行。",
+      "typeGatherBody": "从世界中或敌人掉落之物里收集物品：草药、矿石、某个教派阴森的试剂。有些部件只会从特定敌人身上掉落，因此狩猎与收获是一体的。地上属于某个任务的东西，只有在你确实接了那个任务时才会交给你；若你没接，或者你已经够数了，它们也会如实相告。有些任务在你接取时还会交给你一件工具：留意背包，并按任务文本所述来使用它。若某个任务需要更早一步给过你的工具，那么在你不再持有时接取它便会重新发给你，因此丢失工具不会让整条任务链走进死胡同。",
       "typeInteractTitle": "互动",
-      "typeInteractBody": "使用、净化或读取世界中某个固定之物：一座被玷污的坟墓、一块刻在岸边岩石上的警示、一扇封印的地穴之门。走到标记处，对它采取行动。",
+      "typeInteractBody": "使用、净化或阅读世界中某个固定的东西：一座被亵渎的坟墓、刻在岸边岩石上的警告、一扇封死的墓室门。走到标记旁并对它进行操作。当一个任务要求若干个时，它指的是若干个不同的：每个物件只会为你记录一次，因此请去找下一个，而不要对同一个用两次。你对物件进行操作时它并不会被消耗，因此你队伍里的每个人都能从它那里各自取得自己的进度。",
       "typeMusterTitle": "召集防御",
       "typeMusterBody": "有些任务会让你在向北推进前召集一座城镇：削弱城门处的威胁，并收集守卫者所需之物。这些都是击杀与收集类目标，服务于你身处其故事之中的人们，让你与他们一同前行。",
       "typeGroupTitle": "组队收尾",
@@ -4813,8 +5147,8 @@ export const zh_CN: EnTranslations = {
     "dungeonsPage": {
       "heading": "地下城与团队副本",
       "intro": "当开放世界已不能满足你时，召集一支队伍，踏入副本：一份专为你的队伍生成的地下城私有副本。",
-      "party": "地下城专为五人小队打造。终局团队副本则容纳十人。",
-      "soloLead": "每座地下城都配有一段可单人完成的前置引导任务，让你始终清楚自己为何而来。",
+      "party": "地下城是为五人小队设计的。终局团队副本则是十人。如果你手边凑不齐四位朋友，地下城查找器会为它排队的那些副本组建队伍。下方每张卡片上的等级区间，是这段副本所面向的等级，而不是门上的锁：没有什么能阻止你提前进入或稍后再来，只不过地下城查找器只会把你安排进与你等级相称的副本。",
+      "soloLead": "动身之前先在附近的城镇打听打听：那里的任务发布者会派发终点就在这些厅堂之中的任务链，带着一条进去，意味着这趟副本收益翻倍。",
       "levelExact": "{n} 级",
       "levelBand": "{min} 至 {max} 级",
       "partySize": "{n} 名玩家",
@@ -4833,12 +5167,12 @@ export const zh_CN: EnTranslations = {
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
       "heroicTitle": "英雄模式",
       "heroicBody": "每座五人地下城，连同团队副本本身，都有一个等在等级上限之后的英雄版本。同样的厅堂，为装备精良的终局队伍重新打造：一切都打得更疼，没有什么能靠双腿甩开，首领更是对眩晕与减速完全免疫。先超越普通版本再来；英雄难度默认你已经做到了。",
-      "heroicHowBody": "在你的队伍占据副本之前先选好难度：输入 /dungeon heroic，或在小队菜单上切换地下城难度开关。这一选择由全队共享，并在门口锁定，因此一次挑战会一直保持它开启时的难度。",
+      "heroicHowBody": "在队伍占用副本之前先选好难度：输入 /dungeon heroic，或在自己的头像菜单中选择“设置地下城难度”。独自一人时由你自己设定；在队伍中只有队长可以设定，而这一选择对所有人生效并在门口锁定，因此一段副本会始终保持它被占用时的样子。",
       "heroicRewardsTitle": "英雄徽记与升级版战利品",
-      "heroicRewardsBody": "英雄难度的首领掉落你熟悉的战利品，但经过升级，并在提示框中标注“英雄”；每次挑战的最终首领还会额外掉落别处找不到的史诗装备。最后这一击也会为每位参与者留下英雄徽记：一种在高守哨站的军需官维克斯处花费的货币，他所备的戒指和吊坠是这个王国里仅有的珠宝。",
-      "heroicLockoutBody": "普通地下城一天想刷多少都行。英雄难度则需要耐心：每座地下城每天只奖励一次英雄通关，团队副本也按难度各自保留每日锁定。已经通关的副本对它自己的队伍始终开放，因此没有人会被挡在自己挣得的战利品之外。",
+      "heroicRewardsBody": "英雄难度的首领掉落你熟悉的战利品，只是经过升级并在提示中标注为“英雄”，而每段副本的最终首领还会额外掉落别处找不到的史诗物品。那最后一次击杀也会为每位参与者留下英雄印记：一种在高瞭的军需官维克斯处使用的货币，他的柜台是一排戒指和吊坠，除了来自英雄深处的证明之外，别无他物能够购得。",
+      "heroicLockoutBody": "普通地下城可以整天地跑。英雄难度则要求耐心：最终首领的击杀会把这趟副本中的所有人限制为该地下城每天一次英雄通关，而团队副本对每种难度各保有一份每日锁定。在联机的国度上，所有每日锁定都会在该国度自己的夜间重置时刻一并解除，因此在那个时刻之前不久完成的一趟，与刚过之后完成的一趟，会落在两个不同的日子里；若改在浏览器中离线游玩，锁定则只是在你自己击杀之后一天到期。已经通关的五人副本仍对它自己的队伍开放，可用于跑尸和拾取，因此没有人会被挡在自己在那里挣得的收获之外。团队副本更为严格：一旦它的击杀锁定了你，门便会关闭直到重置，而唯一回到里面的途径，是由恰好在那趟锁定他们的副本中倒下的人跑尸带入，因此活着走出去的团队成员，就是这一天都走出去了。离开竞技场之前请收齐你的战利品。这些锁定各自属于挣得它的那个角色，因此在主力角色上的一次通关，并不妨碍你其他角色的自由。",
       "resetTitle": "重置你的副本",
-      "resetBody": "在队伍仍持有已认领副本时切换难度，旧的认领会保留一段时间后自行清除。队长也可以立即放弃它们：在自己的头像菜单中选择“重置所有副本”，或输入 /dungeon reset。重置只有在难度确实更改之后才能进行，且副本内不能有任何人（无论生死）留守，两次重置之间还隔着一段短暂的冷却。带着错误的难度来到门口，游戏会在开打之前直接提醒你。团队副本永远不会以这种方式重置；它遵循自己的锁定规则。",
+      "resetBody": "在队伍仍占用着副本时切换难度，旧的占用会滞留一阵，然后自行释放。队长也可以让它们一次性释放：在自己的头像菜单中选择“重置所有副本”，或输入 /dungeon reset。重置只有在难度确实更改之后才生效，只有在里面不再有任何人（无论活着还是倒下）时才生效，只有在里面每具尸体都被拾取干净之后才生效，而且两次重置之间隔着一段短暂的冷却。若你们带着错误的难度来到门口，游戏会在副本开始前告知。团队副本从不以这种方式重置；适用的是它自己的锁定规则。",
       "templeLoreTitle": "沉没神殿，更深一层",
       "templeLoreBody": "这座神殿有着自己的传说，比你在别处追查的邪教更为古老。在饮月之池的岸边，那是一汪饮尽月光、又交还溺亡者的小湖，一名孤独的守望者把守着一道苍白的光之门。水面之下，一道冰冷的石阶通向那里。沉入此处的人并非死于意外：他们是苍白唱诗班，在虔诚的礼拜中没入水底，从未停止歌唱。在湖水将他们吞没之前，古老的守护者在岩石上刻下了唯一一句警示，那是献给一个他们称之为溺月之物的祷词，又有一只更沉稳的手在其下添上了两个字：它只是沉睡。",
       "cryptLeadTitle": "一扇死者本该让它紧闭的门",
@@ -4859,7 +5193,7 @@ export const zh_CN: EnTranslations = {
       "openBody": "裂隙撕开的地方，是王国更外围的那些区域，而不是初始的山谷，而且整个王国都会听到消息：一道裂隙出现的那一刻，聊天栏就会有一行字报出它的等级和所在的区域。每个符合条件的区域大约每小时轮到一次裂隙，已经立着一道裂隙的区域会先等着，而不是再开第二道。没人去封的裂隙，会在几个小时后自行坍塌，这件事王国同样会听说。裂隙被封印过的区域会安静下来，直到下一轮轮到它，所以看到通报时，趁消息还新鲜就动身，是值得的。",
       "ranksHeading": "四个等级",
       "ranksBody": "每一道裂隙都有 C、B、A 或 S 的等级，等级会写在通报里，所以你还没出城就知道自己要去面对什么。C 最温和，B 和 A 逐级攀升，而 S 是一道裂隙所能达到的最难。等级是唯一的旋钮。它决定各层有多凶狠，除此之外再没有别的东西由它决定，所以 C 级裂隙并不是一道更小的裂隙，而是同样形状的一趟路，只是手下留了情。",
-      "rankFmt": "Rank {rank}",
+      "rankFmt": "{rank} 级",
       "groupHeading": "谁该进去",
       "groupBody": "带上一支队伍。裂隙不会因为进去的人少就手下留情：里面没有任何东西会去数你们站着几个人，所以传送门上写的是什么等级，你打的就是什么等级，无论你们是五个人还是一个人。门口确实会放你独自进去，也确实有人这么试过，但裂隙在每一个等级上都是团队内容，而且从第一个房间起它就诚实地告诉你这一点。你的小队会拿到属于自己的一份副本，别的队伍不会闯进你的这一趟。若是倒下了，你可以化作鬼魂走回来，等里面的战斗停下再收拾自己。",
       "levelNote": "裂隙属于终局内容。无论哪个等级的裂隙，你都必须达到等级上限，也就是 {n} 级，才能踏进去。",
@@ -4886,7 +5220,7 @@ export const zh_CN: EnTranslations = {
       "tiersLabel": "难度",
       "affixesLabel": "可能出现的词缀",
       "whatHeading": "探秘是什么",
-      "whatBody": "探秘是一座专为你以及至多一名盟友打造的小型副本，一份不会被打扰的私人副本。你从世界中由探秘看守人看守的面板处开启它，潜入其中，一路打穿几间房间，最后在唯一的守护者处收尾。每次探秘都很短，本就是为反复挑战而设，因此每当开放世界没什么可做时，探秘都是一份稳定的进度来源。",
+      "whatBody": "探秘是一处小型的独立地下城，只为你和至多一位盟友而生成，是一份不会被人打扰的私人副本。你从世界中由探秘守护者看管的告示板启动它，往下潜入，一路打穿几间屋子，最后终结于唯一一名守卫。那名守卫之后等着什么，各处探秘并不相同：有的把战利品封在一把锁后面，有的则要你完成一场仪式。每趟都很快，而且本就为重复而设，因此每当开放世界枯竭时，探秘都是一份可靠的进展。",
       "howHeading": "一次探秘如何进行",
       "howBody": "与看守人交谈以打开面板，选择一档难度，然后下潜。每次探秘会把几间短小的厅室串接起来，并在守护者处收尾；击败它即可领取奖励，返回地面。有伙伴就带上一位，没有就依靠你的同伴。",
       "companionHeading": "你的同伴",
@@ -4898,7 +5232,7 @@ export const zh_CN: EnTranslations = {
       "affixesHeading": "探秘词缀",
       "affixesBody": "难度更高的探秘会随机附带一种词缀，改变下潜的玩法走向，从不安的亡者，到污浊的浊气，再到摇摇欲坠的顶棚。它们会让危险与回报一同提升。每座探秘只从契合自身主题的词缀中抽取；就整个王国而言，词缀池如下：",
       "marksHeading": "探秘印记",
-      "marksBody": "完成探秘会获得探秘印记，这是一种与你的钱币分开存放的货币。在看守人处花费它们，即可强化你的同伴，并取得别处遍寻不见的装备。",
+      "marksBody": "清理探秘可获得探秘印记，这是一种与你的金钱分开保管的货币。把它们花在守护者那里，用以强化你的同伴，并换取别处找不到的装备。\n\n印记对你一天中最初的几趟给予最多回报。每天前三次通关全额支付，此后探秘依然给予回报，只是不那么稳定，其中较难的层级比较容易的层级更能维持。这个计数每天翻新，所以没必要把一处探秘刷到榨干：明天再来，好的回报率依旧等着你。",
       "whereHeading": "在哪里找到探秘",
       "whereBody": "第一座探秘，坍塌的圣物库，位于东溪谷地起始山谷的圣物库山丘。哈尔文修士在那里看守面板，只要你准备好了，他便会送你下去。他的巡守并未止步于此：越过泥沼湿地北缘的巨魔土丘，这位看守人又为已经站稳脚跟的探秘者开放了溺亡连祷。",
       "lockpickAnteBody": "在碰到锁之前，你先定下条件。取三根撬锁针，便留有失手的余地，但箱子只付出最朴素的奖赏；取两根，是折中的交易；只取一根，一次干净利落的开锁将付出最丰厚的回报。手上的撬锁针越少，每一步之间可供思考的时间就越短；而若最后一根也折断，锁便彻底卡死：那口箱子就此失去，直到你再通关一次这处探秘为止。",
@@ -4909,16 +5243,17 @@ export const zh_CN: EnTranslations = {
       "heading": "天赋与专精",
       "intro": "天赋是你让职业成为自己专属的方式。它们是可选的、宽容的，也很容易更改，所以你可以放心地尝试。",
       "whatHeading": "天赋的作用",
-      "whatBody": "随着你升级，你会获得天赋点，用于为技能和属性投入细小而永久的强化。它们塑造一个职业的手感，使其倾向于更高的输出、更坚实的防御，或更强的治疗。",
+      "whatBody": "你的天赋是一段简短的抉择阶梯，而不是一堆点数。每一排开启时会提供三个选项，而你恰好取其一。它们塑造一个职业的手感，使其偏向更高的伤害、更坚实的防御或更强的治疗。",
       "howHeading": "它们如何运作",
-      "howBody": "天赋在 10 级开放，随着你向等级上限攀升，会持续获得天赋点。你在职业的天赋面板中分配它们，越深的层级会随着你的投入和升级而解锁，你还可以保存多套配置，在不同构筑之间切换。",
+      "howBody": "天赋在 5 级开启，正是你选择专精的那一级。随着你升级，还会陆续开启五排，分别在 8、11、14、17 和 20 级各一排，因此最后一排恰好落在等级上限。你在职业的天赋面板中做出选择，位置在“专精”标签页旁边的“抉择”标签页。",
       "shareNote": "一套完成的构筑可以复制为一段简短、可分享的代码交给朋友，对方将其直接粘贴进自己的天赋面板即可载入。",
-      "choiceNote": "每棵天赋树上都有那么几点是一个岔路口，而非单纯的买入：节点会给出两三个选项，由你择一而定。下一次重置会重新打开这个选择，就像树上的其他一切一样。",
+      "choiceNote": "每一排都是一个岔路口：它提供三个选项，而你要在其中择一而定。你下一次重置会重新打开这些选择中的每一个。",
       "resetTitle": "一切都不是永久的",
-      "resetNote": "只要脱离战斗、且不在竞技场比赛中，你随时都可以重置天赋，所以早期的选择绝不会成为陷阱。尽管尝试，看看你喜欢什么，随心改主意。",
+      "resetNote": "只要你脱离战斗且不在竞技场比赛中，随时都可以重置天赋，所以早期的选择绝不会成为陷阱。重置会清空你的各排选择且分文不取，而你的专精保持原样，因此重置绝不会在副本进行到一半时夺走你的定位。战场是例外，在那里你可以在两场战斗之间更改构筑。尽管去尝试，看看自己喜欢什么，也尽可放心改变主意。",
       "specsHeading": "各职业的专精",
-      "specsBody": "每个职业都有几种专精，各有自己的定位和标志性的侧重。在天赋面板中选择其一，会授予一项标志性技能，以及一份属于它自己的持久精通。这里是它们全部的大致面貌。打开某个职业可查看其全部技能。",
-      "loadoutNote": "你不必只认准一套配点。在面板里保存一套具名的配置，它会连同天赋选择和你的动作条一起记住，因此切换到另一套只需点一下，遵循的规则与重置相同：脱离战斗，且不在竞技场比赛或战场之中。"
+      "specsBody": "每个职业都有若干专精，各有各的定位和标志性侧重。你在 5 级于天赋面板中选定其一。它授予一个标志性技能和一份持久的精通，其中大多数还会加上契合该定位的被动加成，同时它也是你在地下城查找器中报名的定位。以下是它们全部的概貌。打开某个职业即可查看其完整技能组。",
+      "loadoutNote": "你不必只认准一套配点。在面板里保存一套具名的配置，它会连同天赋选择和你的动作条一起记住，因此切换到另一套只需点一下，遵循的规则与重置相同：脱离战斗，且不在竞技场比赛之中。",
+      "loadoutGearNote": "一套布局还能连装备一起记住。保存时选择同时保存装备的那一项，它便会记录你当时穿戴的装备，于是 PvP 套装与地下城套装之间只隔一次点击，而不是十六次。它记住的是那件具体的物品，而非仅仅名称，因此附魔过的戒指绝不会被背包里挨着的普通同名戒指悄悄顶替。切换回来时找不到的部件会被原样跳过并告知你，所以哪怕有一件已存入银行或挂上市场，其余装备照样会穿戴上身。"
     },
     "arenaPage": {
       "heading": "竞技场与 PvP",
@@ -4926,7 +5261,7 @@ export const zh_CN: EnTranslations = {
       "duelsHeading": "决斗",
       "duelsBody": "可以向你遇到的任何玩家发起一场友好的决斗。除了荣誉，没有任何东西被押上，因此这是了解某种对局，或友好地一较高下的最简单方式。",
       "coliseumHeading": "灰烬角斗场",
-      "coliseumBody": "斗技场是王国的竞技场，你将在排名赛中对阵其他玩家，一对一或二对二皆可。每个组别都各自记录排名，因此一场胜利便能让你在那条天梯上攀升，让全王国的人都看得见。打开竞技场窗口，即可独自或与你的搭档一同报名参加某个组别。",
+      "coliseumBody": "斗兽场是国度的竞技场，你在那里与其他玩家进行评级比赛，一对一或二对二。每个组别各自保有自己的排名，因此一场胜利会让你在那道阶梯上攀升，供整个国度观看。评级玩法在 15 级开启，这一条对你的搭档同样适用：只要你们其中一人未达标，队列就保持关闭，直到你们两人都符合条件为止。整个玩家对战玩家都藏在一个标着 PvP 的按钮之后：打开它并选一个标签页，荆谷原野、一对一或二对二，然后独自或与搭档一同报名。你在排队或比赛期间，其余标签页都保持锁定，因此你绝不可能同时身处两个队列。",
       "ladderHeading": "攀登天梯",
       "ladderBody": "排名对战会长期追踪你的排名。查看排行榜，看看你身处何处，以及谁占据着这片位面的榜首。",
       "rewardsHeading": "排位对战能带来什么",
@@ -4943,7 +5278,7 @@ export const zh_CN: EnTranslations = {
       "heading": "荆谷原野",
       "intro": "一场排位 5v5 夺旗战场，战场位于棘峰之下老林中的围墙山谷：两座废弃要塞沿着峡谷两端遥遥相对，中间是一座更古老的庭院，谁都不曾真正占据。每方五人，两座要塞，一个目标：夺走敌方战旗并抢在对方之前带回家。",
       "queueHeading": "排队参战",
-      "queueBody": "打开荆谷原野面板即可单人排队,也可以组一支最多五人的小队一同排队:小队总在同一边,空位由单人勇士补齐。十人就位后,比赛会把双方安置在各自要塞,短暂列队后旗帜生效。",
+      "queueBody": "荆谷原野在 20 级开启，且队伍中每位成员都必须达到该等级，队伍才能报名。打开 PvP 按钮并选择荆谷原野标签页，也就是它默认打开的那一页，然后独自进入队列，或者带上至多五人的队伍一同报名：队伍始终会被安排在同一方，其余席位则由独自报名的勇士补满。当十人就绪时，比赛会把双方安置在各自的堡垒进行短暂集结，随后旗帜才会启用。若一支四人或五人的队伍原本只会遇上清一色的独行报名者，配对会把这场比赛稍作保留，看看是否会有第二支队伍出现，因此这种规模的队伍有时要多等片刻，大门才会开启。那点等待很短，并且最终总会让步，所以没有人会因此卡在队列里。",
       "fieldHeading": "战场地形",
       "fieldBody": "一片有围墙的露天战场,被隔成三个区域:两队各自的前场,以及夹在中间的废墟中庭。两道横贯全场的隔墙划出边界,穿行区域之间必须经过争夺点:宽阔的正门,或是骑跨在隔墙上的门楼小屋,其错位的两扇门逼你绕过伏击死角。每座要塞除正门外全部封死,夺旗进出只有这一个口;正门前还有一道矮壁垒挡住直冲的路线。中庭里有空心的中央废墟与两枚侧翼疾行符文,另外两枚守在两旗的接近路上。每个正门的中庭入口处还有一枚战斗或守护符文(短时间内提升伤害或减免伤害):两个符文台开局同面,每次拾取后翻面。",
       "flagsHeading": "旗帜",
@@ -4953,8 +5288,11 @@ export const zh_CN: EnTranslations = {
       "respawnBody": "死亡保留经典仪式:尸体停在原地,直到你亲自释放灵魂;灵魂会在你方主堡旁的围栏墓地中升起,并被结界束缚,直到你方下一波复活潮。复活潮会同时唤起所有等待的灵魂;两队的复活潮刻意错开,战斗永远不会同时完全重置。这里没有跑尸,也没有灵魂医者的交易:释放、等潮、再战。",
       "carrierHeading": "扛旗",
       "carrierBody": "扛着敌旗太久的旗手会越来越脆弱,承受的伤害持续增加,直到旗帜被夺回、掉落或归还。抱旗躲藏是败招;把旗送回家才是胜途。",
+      "leavingHeading": "中途离场，以及补位",
+      "leavingBody": "比赛进行中退出即为逃跑，而排名阶梯不能奖励在落后时拔掉插头的人：逃跑者当场记下这场失利与随之而来的评分损失，若正携旗则将旗帜掉落，其队伍则少一人继续作战。最后这一点正是空位的由来。当一场比赛缺人时，队列可以把这个位置让给正在等待的人，而这始终是一份你可以接受或拒绝的邀请，而不是径直把你传送过去；拒绝不需付出任何代价，位置会顺延给下一位。只有单人排队者会被询问，因此一同排队的小队绝不会被拆散去填补空缺。",
+      "backfillNote": "接下补位的席位是刻意不带风险的：你落入的是一份与你无关的比分，因此无论胜负，这场比赛都不会触动你的战场评分，中途离开也不欠任何代价。当一场比赛已接近尾声、新来者再也无法改变结果时，邀请也就不再发出，所以你绝不会被安置进别人的结局里。",
       "ladderHeading": "天梯",
-      "ladderBody": "每场比赛无论胜负都会移动角色的战场评分,历史总榜记录王国的冠军。胜利与鏖战到底的失利也会通过战争体系发放荣誉。",
+      "ladderBody": "每场比赛都会牵动一份与角色绑定的持久战场评级，无论胜负，而历代榜单则为国度的勇士们排定名次。",
       "rewardsHeading": "一场比赛给什么",
       "rewardsBody": "每一场打完的比赛都会给荣誉：获胜给得更多，落败或平局也有一份安慰；此外你每拿下一个击杀、每协助一次，都会额外得到少量荣誉，所以在远离旗帜的地方厮杀同样值得。每天的首胜还会额外给一份奖励，只要这份奖励还等着你，面板就会告诉你。这个“每天”属于荣誉自己，它按自己的时钟翻篇，而不跟着王国的副本重置走。反复遇上同一支队伍，从第二次起比赛本身给的荣誉会减少，但很快就会稳定在一个下限，而不会一路跌到零；被判弃权的比赛则一点都不给。赚到的荣誉可以在任意一位战争军需官处消费。"
     },
@@ -4993,11 +5331,11 @@ export const zh_CN: EnTranslations = {
       "howHeading": "功绩如何运作",
       "howBody": "功绩以单个角色为单位逐一赢得并留存，因此你所扮演的每一位英雄都会各自积累自己的功绩之书；只有王国的排行榜才会汇总你所扮演的所有角色的名望，且每个功绩只计一次。每个功绩都在游戏内的功绩之书中清楚写明它的要求，让你始终知道该追求什么；你还可以对心仪的功绩设置追踪，让它们在你游玩时时刻不离视线。少数功绩会保持隐秘，只有在你赢得它们之后才会揭晓。这本书还讲求诚实：凡是你过往的记录足以证明的，它都会当场记上，因此老玩家绝不会翻开一页空白；只有计数类的功绩才从零开始累计。",
       "renownHeading": "名望",
-      "renownBody": "名望是功绩之书背后的分数。你赢得的每个功绩都价值固定的点数，而你的总分只增不减，因此清闲的一周绝不会让你失去已有的成绩。少数功绩取决于运气而非技巧，而壮举则自成一份荣誉，因此这两者都不提供任何名望。不带名望的功绩仍会计入功绩之书的完成度，只是从不计分。",
+      "renownBody": "名望是功绩之书背后的分数。你所获得的每一项功绩都值一个固定的数额，而你的总数只会上升，因此清闲的一周绝不会让你失去阵地。其中少数靠的是运气而非本事，另一些收藏类功绩本身即是回报，而壮举则是另一种荣誉，所以这几类都不值任何名望。没有名望的功绩仍计入你这本书的完成度；它们只是从不计分。壮举是唯一的例外，被完全排除在计数之外。",
       "rewardsHeading": "头衔与边框",
-      "rewardsBody": "这些奖励纯粹是为了炫耀，而这正是它们的意义所在。有些功绩会授予你可佩戴的头衔，或是为你的名字增添装饰的边框，绝不会给出任何让你的英雄变强的东西。在功绩之书中选择你想要的头衔，它便会显示在你的铭牌上、聊天中和排行榜上，供所有人观看。",
+      "rewardsBody": "这些奖励纯粹是为了炫耀，而这正是它们的意义所在。有些功绩会授予你可佩戴的头衔，或是为你的名字增添装饰的边框，绝不会给出任何让你的英雄变强的东西。在功绩之书中选择你想要的头衔与边框：头衔会显示在你的铭牌上、聊天中和排行榜上，供所有人观看，而边框会以自己的颜色环绕你的铭牌与头像。",
       "chroniclesHeading": "编年史",
-      "chroniclesBody": "每个区域都保有自己的编年史，这是一组由当地记录者收集的功绩，他们自愿承担起记录每一位过路旅人的责任。东溪谷的Saul是其中的第一位。一部编年史分为若干章节，你可以按任意顺序来完成它们。",
+      "chroniclesBody": "每个区域都保有自己的编年史，那是一位本地编年史家汇集的一批功绩，他自愿担起记录每一位途经旅人的职责。东溪谷地的索尔是其中第一位，奥斯里克·芬恩在迷沼深处的芬桥保管沼泽编年史，而岑姿则在高瞭之上记录山峰编年史。一部编年史分为若干章节，你可以按任何适合自己的顺序逐一推进。",
       "featsHeading": "壮举",
       "featsBody": "壮举自成一类：它们是传承与世界首创的记录，是那些与逝去纪元相关、或只会发生一次的功绩。它们不带来任何名望，也不计入完成度，将作为对往昔功业的纪念被永久保存。",
       "catalogHeading": "功绩全录",
@@ -5022,9 +5360,29 @@ export const zh_CN: EnTranslations = {
         "feat": "壮举"
       },
       "bookHeading": "走进功绩之书",
-      "bookBody": "功绩之书把每一个功绩归入可以随手切换的类别，并配有搜索框，以及“全部”“已获得”“未获得”和“即将完成”几种筛选。靠近顶部的“最近”一栏收着你最新解锁的功绩，点击其中一条便会直接跳到它的卡片；点击别人发在聊天里的功绩名，同样如此。它旁边的“即将完成”会指出你最接近达成的那寥寥几个。在线上世界里，每个功绩还带着自己的稀有度，也就是已经获得它的冒险者比例，让你一眼看出哪些寻常、哪些是真正的攀登；离线世界没有可供统计的人口，因此不显示稀有度。侧栏的末尾是头衔架，你在那里挑选自己佩戴的那一个。",
+      "bookBody": "功绩之书把每一个功绩归入可以随手切换的类别，并配有搜索框，以及“全部”“已获得”“未获得”和“即将完成”几种筛选。靠近顶部的“最近”一栏收着你最新解锁的功绩，点击其中一条便会直接跳到它的卡片；点击别人发在聊天里的功绩名，同样如此。它旁边的“即将完成”会指出你最接近达成的那寥寥几个。在线上世界里，每个功绩还带着自己的稀有度，也就是已经获得它的冒险者比例，让你一眼看出哪些寻常、哪些是真正的攀登；离线世界没有可供统计的人口，因此不显示稀有度。侧栏的末尾是头衔与边框的架子，那里有两个挑选栏：一个选你佩戴的头衔，一个选环绕你铭牌的边框。",
       "platformHeading": "Steam 与 Epic 成就",
       "platformBody": "如果你在桌面客户端中关联了 Steam 或 Epic Games 账号，你所获得的功绩会向外同步为该账号上的成就。游戏世界始终是准绳：功绩在这里挣得，记录在你的角色身上，成就随后跟上。并非每一项功绩都有对应的成就；若某个成就没有立刻到账，它会在你下次登录时补上。关联永远只是关联，绝不是一种登录方式。"
+    },
+    "reliquaryPage": {
+      "intro": "圣物库是你已收录的独特战利品博物馆：地下城追逐装备、专业奖杯、坐骑、武器外观与头衔。它与功绩之书的关系，就像奖杯厅与成就簿的关系。",
+      "howHeading": "收藏如何运作",
+      "howBody": "在游戏中打开圣物库（默认 Shift+X）。每个架上有多页独特圣物。角色首次获得该件时填满剪影；一页上的圣物全部填满时点亮该页。少数页面标注“绝版”或“专属”：它们不计入达成，不会阻碍书架或全库的完成。实时发现会弹出提示并刷新已打开的窗口；进度按角色计算，武器外观除外（账号外观）。",
+      "ranksHeading": "策展人等级",
+      "ranksBody": "策展人等级随已收录的独特圣物上升，仅授予装饰性头衔与边框。不会提供战斗强度、掉落率或保底。账号武器外观不计策展人等级，因此声望保持角色持久。绝版与专属页面上的圣物同样不计入等级。",
+      "retiredTag": "绝版",
+      "personalTag": "专属",
+      "retiredNote": "这些圣物已无法再获得。此页致敬仍持有它们的老兵，不计入达成或策展人等级。",
+      "personalNote": "每个角色只能持有自己的一件。此页不计入达成或策展人等级。",
+      "catalogHeading": "页面目录",
+      "catalogBody": "每一页已编写的圣物库页面及其圣物名称。此列表仅含防剧透名称：请在游戏中打开圣物库查看你的进度、通关次数与剪影。",
+      "spoilerNote": "个人首次发现记录、通关次数以及已有/未有状态保留在游戏客户端。维基从不发布玩家收藏。",
+      "shelfHeading": "{label}（{count}）",
+      "shelf": {
+        "conquerors": "征服者",
+        "professions": "专业",
+        "horizons": "远景"
+      }
     },
     "wishPage": {
       "heading": "我希望早点知道的事",
@@ -5034,7 +5392,7 @@ export const zh_CN: EnTranslations = {
       "i2Title": "死亡几乎不会让你付出代价",
       "i2Body": "当你倒下时，你会化作鬼魂在最近的墓地复起。跑回你的身体旁即可免费复活，或者接受灵魂医者的立即复生，以一阵短暂的虚弱换取这份便利。经验、装备和钱币都绝不会损失，所以放心去冒险、去学习。",
       "i3Title": "天赋不是陷阱",
-      "i3Body": "它们在 10 级解锁，只要脱离战斗便可随时重置，所以你早期的选择绝不是永久的。",
+      "i3Body": "你的第一个天赋在 5 级到来，而六排中的每一排都是三选一，因此一套构筑不过是一眼便能尽收的几个决定。只要你脱离战斗且不在竞技场比赛中，随时都可以重置，所以早早做出的选择不会把你锁死。",
       "i4Title": "跟着任务线走",
       "i4Body": "任务是升级最快的途径，还会带你走遍整个世界。当你不确定该去哪里时，找到下一个标记。",
       "i5Title": "保持装备常新",
@@ -5106,7 +5464,7 @@ export const zh_CN: EnTranslations = {
     "gear": {
       "intro": "装备是你角色身上穿戴的行头，以及你随身携带的物品。更好的装备是变强最稳妥的途径，而其中大部分只需游玩便能到手。",
       "slotsTitle": "你能装备什么",
-      "slotsBody": "你有一个武器栏、七个护甲栏和三个珠宝栏：一个颈部和两个手指。每个职业只能使用特定的武器，并穿戴不超过其自身重量级别的护甲，即布甲、皮甲或锁甲，因此适合你的升级装备，正是为你的职业打造的那些。珠宝则完全没有重量之分：任何职业都能佩戴自己挣得的任何珠宝。在此之内，用你找到的最好物件填满每一个栏位。",
+      "slotsBody": "你有一个主手武器栏位、一个副手栏位、七个护甲栏位和三个饰品栏位：颈部和两根手指。每个职业只能使用特定的武器，并且只穿到自身重量级别的护甲，布甲、皮甲或锁甲，因此适合你的升级正是为你的职业打造的那些。饰品全无重量之分：任何职业都能戴上自己挣来的饰品。在此范围之内，用你能找到的最好的部件填满每一个栏位。",
       "slotMainhand": "武器",
       "slotHelmet": "头部",
       "slotNeck": "颈部",
@@ -5118,7 +5476,7 @@ export const zh_CN: EnTranslations = {
       "slotFeet": "脚部",
       "slotFinger": "手指",
       "bagsTitle": "包袋与负重空间",
-      "bagsBody": "你拾取的一切都装在一个共用的背包里，你可以通过装备包袋来扩充它。你的背包窗口设有四个包袋插槽：点击背包中的一个包袋，将它塞入空闲插槽，每个佩戴的包袋都会增加各自的容量。简易包袋是廉价的商人货，更宽敞的会从野兽身上掉落，而最上乘的出自地下城首领，因此你的负重空间会随着装备一同增长。",
+      "bagsBody": "你捡到的一切都装在同一个背囊里，而你通过装备背包来扩充它。你的背包窗口有四个背包栏位：点击背囊中的一个背包，即可把它塞进空着的栏位，你所背的每个背包都会加上它自己的空间。简朴的背包是廉价的商人货，更宽敞的从野兽身上掉落，最精良的则来自地下城首领，因此你的负重空间会与装备同步成长。任何可堆叠之物都会在提示中标明一个栏位能放多少，你正是借此提前知道，一次像样的药水采买将会占去你两个栏位。",
       "qualityTitle": "品质一览",
       "qualityBody": "每件物品都有其品质，名称也以相应的颜色标示，让你一眼便能看出它的价值。从最常见到最珍贵：",
       "qualityPoor": "粗糙",
@@ -5132,18 +5490,18 @@ export const zh_CN: EnTranslations = {
       "upgradeBody": "用一件全新的升级换下旧装备，比你穿着已经过时的行头打得再完美都更有意义。当有更好的东西掉落或任务给予时，拿下它。别把好物品留到以后。",
       "itemLevelBody": "如果你想快速比较两件装备，可以在选项中开启“显示物品等级”。有明确来源的装备，无论来自敌人、任务还是制作专业，都会显示一个物品等级，一个根据其来源大致衡量强度的单一数值，让你一眼就能看出哪件升级更有分量，即便是不同部位之间也能比较。没有这类来源的物品，比如普通的商人基础货和新手装备，则不显示物品等级，因此没有数值是正常现象，并非缺陷。",
       "sourcesTitle": "装备从何而来",
-      "sourcesBody": "早期的升级大多来自任务奖励，所以与其刷怪，不如完成任务更划算。敌人被击败时会掉落装备，城镇里的商人贩售扎实的基础货色，制作者能把采集来的材料打造成可穿戴的装备，玩家市场则让你能从其他冒险者那里买东西。而在山顶，两种特殊货币能买到别处绝无仅有的装备：探秘看守人处的探秘印记，以及英雄军需官处的英雄徽记。",
+      "sourcesBody": "你早期的升级大多来自任务奖励，所以完成任务比刷怪更划算。敌人被你击败时会掉落装备，城镇中的商人售卖扎实的基础货色，工匠把采集来的材料做成可穿戴的部件，而玩家市场让你能从其他冒险者那里购买。在山顶之上，有三种靠付出挣来的货币能买到别处找不到的装备：探秘守护者处的探秘印记、英雄军需官处的英雄印记，以及荣誉军需官处的荣誉。",
       "soulboundTitle": "灵魂绑定：唯你独有",
       "soulboundBody": "许多珍贵的装备都是灵魂绑定的，从你获得的那一刻起便与你的角色绑定。灵魂绑定的物品无法交易、无法邮寄、无法卖给商人，也无法在市场上挂单；它如今是你故事的一部分，无人能替你携带。",
       "uniqueTitle": "装备唯一：同一件传说只能穿一件",
       "uniqueBody": "传说物品是装备唯一的：你的角色同一时间只能穿戴某件传说物品的一份，其英雄版本也算作同一件物品。第二份可以放在背包、银行或市场里，但试图同时穿戴两份会被拒绝。物品提示上还带有金色的\"装备唯一\"标签，让你在围绕两件传说规划配装之前就能看到这条规则。",
       "setsTitle": "套装与套装效果",
-      "setsBody": "有些护甲成套出现，数件装备在外观与战斗风格上浑然一体。同时穿戴足够多的同套部件，套装便会苏醒，在每件单品自身属性之外额外授予加成，而你穿的部件越多，加成就越强。少数这样的套系会在你升级途中作为珍贵掉落现身；其中最了不起的那些则来自接近等级上限的最高难度组队内容，因此凑齐一整套是经典的终局目标。",
+      "setsBody": "有些护甲成套出现，几件部件被裁制得看上去与战斗起来浑然一体。同时穿上一套中足够多的部件，套装便会苏醒，在每件部件自身属性之上再授予加成，而你穿得越多它就越强。少数这样的套装会在你升级途中作为令人垂涎的战利品出现，而其中最上乘的来自接近等级上限的最艰难的团队内容，因此凑齐一整套是经典的终局目标。与其他玩家的战斗也有自己成套的系列，用荣誉一件一件购得；它们苏醒所需的件数与掉落套装不同，而且它们的加成只在敌人是另一名玩家时才会响应。",
       "consumablesTitle": "消耗品",
       "consumablesIntro": "有些物品一次性使用，换来即时的好处。它们是廉价的保险，不妨随身备上几个。",
-      "consumablesPotions": "药水在你使用的那一刻便能恢复生命或法力，即便在激战中也可以，这让它们成为开怪失误时的救命稻草。它们共享一段较短的冷却，所以要选好一个绝佳时机来用。",
+      "consumablesPotions": "药水在你使用的那一刻恢复生命或法力，即便身处战斗之中也是如此，因此当一次拉怪出了岔子时，它们便是关键的救命手段。所有药水共享同一段长约数分钟的冷却，因此每场战斗你只有一个好时机，而不是一连串。它们恢复的量也少于坐下进食或饮水，这正是不坐下所付出的代价。药水按世界的每一段路程分级，所以请带上为你这个等级打造的那一级：一瓶低级的旧药水，在长成的角色身上不过是一星半点。",
       "consumablesFood": "食物与饮品会在你坐下休息、于两战之间恢复时为你回血回蓝。进食恢复生命，饮水恢复法力，如此休息分文不取。打完一场硬仗后先坐下几秒钟，别带着半残的血量冲进下一场。",
-      "consumablesElixirs": "合剂会在你冒险时给予一段临时增益，是想再多拼一把时的一点小优势。",
+      "consumablesElixirs": "合剂在你冒险途中授予一段临时的强化，是当你想再往前推进一点时能帮上忙的一点优势。它们不与药水共享冷却，因此你可以喝下一瓶，同时仍留着一瓶治疗药水备用。同一属性的两瓶合剂不会叠加，最后喝下的那瓶才是留下的那瓶。",
       "fishingTitle": "钓鱼",
       "fishingBody": "钓鱼是一种悠闲的调剂。装备好钓竿，向开阔的水域抛竿，再把上钩之物收线钓起。你大多会钓到可以直接食用的鱼，偶尔有几件能卖几个铜板的杂物，时不时还会有一条珍贵的稀有渔获。你能钓到什么，取决于你垂钓的水域。",
       "fishingFood": "你钓上来的鱼本身就是食物：坐下休息时吃上一条便能回复生命值，越肥美的鱼来自北方越寒冷、越深的水域。在湖边垂下一竿，是于两战之间静静充实背包的好法子。",
@@ -5151,10 +5509,10 @@ export const zh_CN: EnTranslations = {
       "cosmeticsTitle": "外观与装饰",
       "cosmeticsBody": "有些奖励只改变你角色的外观，绝不影响你的强弱。这些外观皮肤能让你与众不同，又不会左右游戏，所以喜欢哪款就穿哪款。",
       "cosmeticsRanks": "外观也有自己的稀有度层级，越稀有的越值得一追。赢得更高的层级也会解锁它之下的那些外观。",
-      "cosmeticsSkins": "有两条外观线可供收集。大多数职业都有几款备选外观，是对该职业造型的全新演绎，专属于你、可供穿戴。与之相伴的还有炫彩：那是一组组带名号的双色配色方案，能将外观彻底重涂，从素雅的金属色到明艳的帝王色，应有尽有。",
+      "cosmeticsSkins": "你角色的外观分为两条线。大多数职业都有数种备选外观，那是对职业造型的一番全新演绎，供你穿戴。与之并列的是配色：一组组有名有姓的双色方案，能把一副造型彻底重涂，从沉稳的金属色直到明亮的帝国色调。",
       "cosmeticsCache": "其中少数来自一个神秘的外观宝箱，那是一份封缄的奖励，开启时会随机滚出三种品质等级中的一种，并授予与之匹配的外观。它纯粹为了好看：里面没有任何东西能让你变强，只会让你更赏心悦目。",
       "cosmeticsApply": "在角色界面的外观一栏设置你当前的造型，并在已解锁的所有外观之间自由切换。",
-      "slotOffhand": "Off Hand",
+      "slotOffhand": "副手",
       "offhandBody": "副手能拿什么，取决于你的职业。盾牌放在那里，宝珠或典籍之类的手持法器也放在那里，猎人的箭袋同样如此。能够双持的职业则会在副手放上第二把武器。双手武器通常要占去两只手，所以装备一把双手武器会让副手原本拿着的东西下场，除非你的专精正是少数几个能同时挥舞两把双手武器的那种。",
       "bagsSort": "背包乱起来的时候，背包窗口里的“整理”按钮一按就能收拾妥当。同一种东西的零散堆叠会被合并到一起，所有物品也会按一个好读的顺序重新排开：先是武器与护甲，然后是背包、消耗品、工具与坐骑，接着是制作材料，每一种精细品级都紧挨着它的普通版本，再往后是任务物品，灰色废品排在最末，好让你一眼看清哪些该卖。整理绝不会凭空造出或弄丢任何东西，只是重新排列，所以任何时候按下去都是安全的。",
       "requiredLevelBody": "有些装备还带着一个需求等级，写在提示上。任何等级的你都可以拾取、买下或收下这样一件装备，但在达到那个等级之前都穿不上它。这个要求跟着装备的来源走，而不只看它的颜色，所以在自己等级上赢来的一件稀有装备通常立刻就能穿；而来自远高于你等级之处的转手货，则要在你的背包里等你追上它。",
@@ -5411,7 +5769,7 @@ export const zh_CN: EnTranslations = {
         "startBody": "一根Simple Fishing Pole在Eastbrook的Fisherman Brandt处只卖20铜（他在镇东缘望着Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存货。面向前方约24码内足够深的水面使用鱼竿即可抛竿。战斗中、游泳时或死亡时无法抛竿：站在岸上钓才是正途，任何区域的可钓水域都行。",
         "biteHeading": "咬钩与收线",
         "biteBody": "抛竿后{min}到{max}秒之间鱼会咬钩（更好的鱼竿最多缩短{rod}秒等待），收线窗口持续{reel}秒、鱼竿每高一阶再加{reelRod}秒，单次垂钓最长{cap}秒。",
-        "earlyReelNote": "心急的钓手注意：鱼咬钩之前再按鱼竿，只会收回空线并结束这次垂钓（抛竿后的短暂宽限会原谅误触的连点）。耐心就是钓鱼的全部：等咬钩，再收线。",
+        "earlyReelNote": "给性急的手指一个提醒：若在有东西咬钩之前再次按下鱼竿，你就会收回一条空线，这一竿也就此结束。鱼线落水后的第一秒是被宽宥的，因此不慎按了两下并不会让你付出什么代价；过了这一秒，过早按下便是白白浪费一竿。耐心就是这整个玩法：等到咬钩，然后提竿。",
         "scheduleHeading": "熟练度成长",
         "scheduleNote": "钓鱼成长按熟练度遵循固定档位，且从{cutoff}起，钓上杂物不再有任何成长。",
         "colProficiency": "熟练度",
@@ -5509,7 +5867,7 @@ export const zh_CN: EnTranslations = {
       "coinBody": "货币分为三种。一百铜币兑换一银币，一百银币兑换一金币，因此你的钱袋会从最小的铜币开始往上累积。你可以从任务奖励、击杀敌人后的拾取，以及变卖闲置之物中赚取它们。",
       "vendorsTitle": "商人与他们的存货",
       "vendorsBody": "城镇与哨站里星罗棋布地分布着商人，各有各的营生。补给商贩备有食物与饮品，武器匠与护甲匠经营装备，军需官则备有实用的旅行用具。走到其中一位面前，便能看到他们出售的东西。",
-      "marksTitle": "印记与徽记：钱币之外的货币",
+      "marksTitle": "印记与荣誉：金钱之外的货币",
       "marksBody": "你存下的不只有钱币。探秘会产出探秘印记，只能在探秘看守人处花费，用于同伴升级和别处找不到的装备。英雄难度的地下城则会在最终首领身上留下英雄徽记，在高守哨站的英雄军需官处花费，换取这个王国其他任何角落都买不到的珠宝。这两者都绝不会与你的钱币混在一起。",
       "bankTitle": "银行",
       "bankBody": "每座主城都设有镀金保险箱的分号，它是这片大陆的银行商号。与那里的司库交谈即可打开你的保险库：一处背包之外的私人储物空间，伴随角色终身。无论你下次造访哪家分号，寄存的物品都会安然等候。",
@@ -5529,8 +5887,8 @@ export const zh_CN: EnTranslations = {
       "marketTitle": "世界市场",
       "marketBody": "商人经营着世界市场，这是一个由玩家驱动的交易所，你可以在此与素未谋面的人买卖。与东溪镇的商人交谈，或与高守哨站上的拍卖师沃斯交谈，即可将它打开：两位管理者服务于同一个共享市场。商人还会在那里长期挂售自己的一批货物，因此即便没有其他玩家上架，也总有东西可买。",
       "marketBrowse": "浏览：翻看列表或按名称搜索，找到正在出售的商品。每条挂单都会显示货物、卖家，以及整组货物的要价。",
-      "marketPost": "挂单：从背包中选一组货物，定下价格并挂出。在有人买下之前，货物会由商人代为保管。未售出的挂单过一段时间后会退还给你，若你改变主意，也可以提前取回其中一件。",
-      "marketCollect": "收取：当你的货物售出后，所得钱款会在商人处等你领取。回去收取钱币，连同任何未售出而退回的货物。商人会从每笔成交中抽取少许佣金。",
+      "marketPost": "上架：从背包中挑出一摞，定下你的价格，然后挂上去。货物由商人保管，直到有人买下为止。未售出的挂单过一阵会回到你手上，若你改变主意，也可以提前取回其中一件。上架本身是免费的，因此一个乐观的价格只会花掉你一点时间。",
+      "marketCollect": "收取：当你的货物售出时，收益会在商人处等着你。回去领取金币，连同任何未售出而退回的东西。商人会从每笔完成的交易中抽取一小部分。“收取”标签页会逐项列出等着你的东西，每笔完成的交易一行，写明货物、买家以及你赚到的数目，因此在你取走金币之前，就能确切看到卖出了什么。",
       "marketPricing": "定价由你说了算。比别人略低一点往往卖得更快，而要价过高则可能无人问津。挂单前不妨先浏览一番，看看当下的行情如何。",
       "honorBody": "与其他玩家作战会带来第三种货币：荣誉。赢下一场排位竞技场对决可以获得荣誉，而在荆谷原野打满一整场比赛，无论胜负都会发放荣誉，所以原野上的一场苦战永远不算白打。荣誉积攒在你的角色面板上，绝不与你的钱币混在一起。你可以在荣誉军需官处花掉它，也就是东溪镇的 FURY 与高守哨站的 Warmarshal Draven Kole，两人共用同一批存货：整套战争护甲系列、饰品与武器，都只有荣誉买得到。这些购买是最终的，装备在你买下的那一刻便绑定于你，所以确认之前先把它读清楚。竞技场页面讲的是荣誉本身如何挣得。",
       "guildBankNote": "在你个人的银行之外，公会还守着一座自己的金库，在同一位司库处开启，并从同一个窗口的一个标签页进入：一份共享的钱币储备，加上一处集中存放货物的仓库。每位成员都可以查看它，而能把东西存进取出的只有官员。社交页面有更详细的说明。"
@@ -5538,7 +5896,7 @@ export const zh_CN: EnTranslations = {
     "social": {
       "intro": "世界的大部分内容都可单人完成，但这款游戏生来就是为了与他人同玩。这里讲的是如何交谈、组队，以及找到属于你的伙伴。",
       "chatHeading": "聊天频道",
-      "chatBody": "聊天分为若干频道，各自显示在自己的标签页上。输入一条消息即可在当前频道发送，或用斜杠命令把某一句引向别处。以下是你可以发言的频道：",
+      "chatBody": "聊天窗口一开始有两个始终存在的视图，一个是汇总所有发言的记录，另一个是战斗记录。除此之外，你可以用加号按钮添加自己想要的标签页，每个频道一个，在电脑上还可以把它们拖成任意顺序（用 Alt 加左右方向键可以从键盘移动当前标签页）；右键点击某个标签页即可再次关闭它，而你的排列会在多次登录之间被记住。在频道标签页中输入会发往该频道，而斜杠命令则可以在不切换标签页的情况下把一行发往别处。此外还有一个密语标签页，把你发出和收到的每一条密语汇集在一处，在那里输入就等于回复最后写给你的那个人。以下是你可以发言的频道：",
       "chanSay": "说。",
       "chanSayBody": "你的默认嗓音。它能触及靠近你的玩家，是并肩做任务时该用的那个。",
       "chanYell": "喊话。",
@@ -5547,6 +5905,8 @@ export const zh_CN: EnTranslations = {
       "chanWhisperBody": "按名字发给某一位玩家的私人消息，无论他们身在何处。用它来说几句悄悄话。",
       "chanParty": "小队。",
       "chanPartyBody": "与你队伍中的每一个人交谈，无论你们相隔多远。",
+      "chanBattleground": "战场。",
+      "chanBattlegroundBody": "与战场中的所有战士交谈，双方阵营都能看到。仅在比赛进行时可用。",
       "chanGeneral": "综合。",
       "chanGeneralBody": "一个始终开启、覆盖全位面的频道，能触及所有在线玩家，适合提问或闲聊。与世界频道和寻求组队频道不同，你无需手动加入便能使用。",
       "chanWorld": "世界。",
@@ -5569,25 +5929,25 @@ export const zh_CN: EnTranslations = {
       "lootRollBody": "当一件物品进入掷骰时，每位有资格的成员若想要它便选“需求”，若只是顺手收着便选“贪婪”，不想要则选“放弃”退出。点数最高者胜出。",
       "lootMasterTitle": "队长分配。",
       "lootMasterBody": "队长也可以转而亲自掌管较好的掉落，把每一件分发给应得的成员。这能避免珍贵装备被一次随机的掷点拿走，正如一支有组织的队伍打地下城时所做的那样。",
-      "friendsHeading": "好友与屏蔽",
+      "friendsHeading": "好友、屏蔽与拉黑",
       "friendsBody": "把玩家加入好友列表，便能看到他们何时在线、身在何处，这样他们一登入你就能立刻组队。",
-      "ignoreBody": "若有人骚扰你，把他们加入屏蔽列表，你便不会再看到他们的聊天。",
+      "ignoreBody": "如果有人絮叨得超出你的意愿，把他加入屏蔽列表，他的公开发言便不会再传到你这里。屏蔽只是一项聊天设置，它绝不会把任何人从你的好友列表中移除。",
       "guildHeading": "公会",
-      "guildBody": "公会是一个跨越登录会话、你所归属的长久玩家团体。创建一个公会，或接受邀请加入，你同一时间只能身处一个公会。成员各持一种等级：一位会长、若干官员，以及成员。",
-      "guildChatBody": "归属于一个公会会给你一个私密的公会聊天频道，并将你的公会伙伴显示在一份共享的名册上，所以线上总有熟悉的面孔。",
+      "guildBody": "公会是一个跨越多次登录、你所归属的长久玩家群体。创建公会需要创建者一次性支付 1 金的费用，或者你也可以直接接受邀请加入，而你同一时间只能身处一个公会。成员各有职衔：会长、干事以及成员。",
+      "guildChatBody": "身属一个公会会给你一条私密的公会聊天频道，以及一份共享的会员名册。较新的成员会佩戴“新兵”标记，资历长久的则佩戴“老兵”标记，用以取代朴素的成员标签，而干事和会长则始终显示自己的职衔；当你只想看看此刻谁在线时，也可以隐藏离线的名字。干事和会长还可以把一条简短的公告置顶在公会标签页的顶端，它会在你下次登录时在聊天记录中念给你听，大多数公会正是这样发布本周的安排。",
       "communityHeading": "呼叫整个社区",
       "communityBody": "以感叹号开头输入一行聊天，即可发起一次社区呼叫：!lfg 寻找队伍，!wts 与 !wtb 进行交易，!recruit 为你的公会招人，!event 宣告一场团队副本或聚会，!help 请求援手。你一输入这个符号，就会弹出一份呼叫菜单。每次呼叫都会在世界中广播，并同步到社区 Discord，因此它能触及那些甚至尚未登录的玩家。社区呼叫是在线游玩的一部分。",
       "slashHeading": "实用的斜杠命令",
       "slashBody": "有几条日常命令值得记住：/w 名字 发送密语，/r 回复你最近收到的一条，/invite 邀请某人加入你的小队，/follow 跟随一位好友的脚步，/roll 为全队掷骰，/who 显示谁在线，/afk 将你标记为离开。在游戏中输入 /help 可查看完整列表。",
       "emotesBody": "你的角色也能不用言语来表达：输入像 /wave、/dance、/cheer 或 /bow 这样的表情动作，先选中一位好友即可将它指向对方，或者按住 X 打开表情轮盘，快速做出一个头顶表情。",
       "calendarHeading": "活动日历",
-      "calendarBody": "按 I 打开活动日历。它会标出王国中值得围绕安排的日子，从每周的团队副本召集到嘉年华之夜，也是公会安排日程之处：会长和官员可以在上面预定活动，每位成员都能在同一页面上看到它们。",
+      "calendarBody": "按 I 打开活动日历。它标出值得围绕其安排计划的国度日程，每周的团队集结、集市日、竞技场对抗和钓鱼大赛，以及每月的探秘日和月门共祷，那里也是公会保管日程的地方：会长和干事可以在上面登记活动，而每位成员都会在同一页上看到它们。国度日程是聚在一起的号召，而不是加成；不会因为某一天被标出，你的角色就有任何变化。",
       "readyHeading": "准备确认",
       "readyBody": "在一次关键开怪之前，队长可以输入 /ready 询问全场：其他每个人都会收到“准备就绪”或“未准备”的提示，等所有人作答，或 30 秒耗尽后，全队会看到一份统一的人数汇总。没有人会被单独点名；重点在于人数，而不是揪出谁没准备好。",
       "markersHeading": "目标标记",
       "markersBody": "组队时，右键点击一个敌对生物，即可为它戴上八种团队标记之一。任何队员都可以做标记，每个标记同一时间只落在一个目标上，对同一目标再次使用同一标记则会将其清除。击杀顺序、控场分工，或者一句简单的“先打这个”，化作一个标记，都比一句话传达得更快。",
       "etiquetteHeading": "组队礼仪",
-      "etiquetteBody": "组队是一种选择，而非负担。加入时打声招呼，只对你真正会用的装备掷“需求”，离开前先知会队伍一声。一点点礼貌大有裨益，而且大多数玩家都乐于有伴同行。管理员会维持秩序，而不肯让他人好好享受游戏的玩家，可能会被关进牢房，直到管理员放他出来。",
+      "etiquetteBody": "组队是一种选择，而不是苦差。加入时打声招呼，只对你确实会用的装备投“需求”，动身离开之前先告知队伍。一点点礼貌能走得很远，而大多数玩家也乐于有人作伴。",
       "realmsHeading": "服务器",
       "realmsBody": "联机游玩运行在一个个服务器上，每个服务器都是各自独立的地方，有各自的玩家。开玩之前你要从服务器列表里挑一个，每一行都会显示这个服务器此刻有多热闹，从“低”“中”“高”一直到“已满”，当前没有开启的服务器则显示“离线”。“低”意味着空间充裕，“高”意味着人气十足；达到上限的服务器会显示“已满”，并在有人退出之前拒绝新的登录，所以挑一个朋友所在的、或者还有空位的地方吧。",
       "realmsScopeBody": "你做的一切都留在你选定的那个服务器上：你的角色、好友列表、公会和世界市场都在那里，你在游戏内打开的公会榜与玩家榜也只统计这一个服务器，而网站上的榜单则会把所有服务器汇总起来。每个服务器还有自己的每日团队副本重置，按各自的本地时间进行。",
@@ -5620,7 +5980,7 @@ export const zh_CN: EnTranslations = {
       "intTitle": "智力",
       "intBody": "智力会扩大施法者的法力池，提升其法术强度从而让法术打得更狠，还会提高其法术暴击的几率。它对那些消耗法力施法的职业至关重要；对怒气或能量职业来说则作用甚微。",
       "spiTitle": "精神",
-      "spiBody": "精神主宰施法者在停下施法时（也就是战斗间隙的大部分时间）法力回复的快慢。与智力一样，它服务于法力职业，对其他职业则意义不大。",
+      "spiBody": "精神主宰施法者法力回复的快慢。只有在几秒钟未曾消耗之后，它才会足额支付，而其中一部分即使在施法途中也会持续流动，因此精神在战斗中从来不是死重，尽管一位全力倾泻的施法者终究还是会见底。停下来喘口气是一个真真切切的法力抉择，战斗之中与战斗之间同样如此。与智力一样，精神服务于用法力的职业，对其余职业则意义不大。",
       "armorTitle": "护甲",
       "armorBody": "护甲能减轻你受到的物理伤害。它大多来自你身上的穿戴，越重甲的职业携带得越多。面对一个与你等级相近的敌人时，护甲越高，它的每一次打击落下时就越轻。",
       "apTitle": "攻击强度",
@@ -5649,14 +6009,14 @@ export const zh_CN: EnTranslations = {
     "progression": {
       "intro": "每一场战斗、每一个任务、每一步北行，都会让你的英雄更强。这里讲的是升级如何运作，以及登顶之后是什么让你持续成长。",
       "xpTitle": "如何获得经验",
-      "xpBody": "你通过完成任务、击败敌人以及通关探秘来赚取经验。任务给的经验远多于其他途径，所以循着任务指引走是升级最快的方式。沿途的击杀与探秘则补足其余部分。",
+      "xpBody": "你通过完成任务、击败敌人、清理探秘以及经营一门专业来获得经验：只要这份活计仍在教给你东西，采集与制作就会在它们所传授的手艺技能之外，另行支付角色经验。任务给予的远多于其他一切，因此沿着任务路线走是向上攀升最快的途径，而一路上的击杀、探秘和采集则补足其余。",
       "capBody": "每升一级都会让你更加坚韧，并带来新的技能，一路直至 {cap} 级的等级上限。",
       "journeyTitle": "北行之旅",
       "journeyBody": "整个世界是一片连绵不绝的大陆，三大区域由南向北铺展，每一处的等级都更高一层。你从翠绿的山谷启程，一路穿过湿地，最终止步于寒冷的高耸峰巅。循着任务指引而行，这片土地便会带你从一处走向下一处。",
       "journeyBodyCount": "整个世界是一片连绵不绝的大陆，共有 {zones} 个区域。其中三个是你升级时走的那条路，由南向北铺展：你从翠绿的山谷启程，一路穿过湿地，最终止步于寒冷的高耸峰巅。循着任务指引而行，这片土地便会带你从一处走向下一处。山谷海岸之外还有一座小岛，供低等级时前往；其余的国度都自那同一条路旁展开，是为已经走完这段攀登的角色准备的。",
       "bandLabel": "{min} 至 {max} 级",
       "restedTitle": "充分休息的经验",
-      "restedBody": "走进客栈并保持脱离战斗，你的角色便会在等待时积攒充分休息的经验。每座城镇都有一间客栈。下次你外出作战时，那一池经验会为你的击杀带来额外加成，直至耗尽。在客栈里稍作停留从来都不是浪费时间，它会加快你接下来一段的升级。",
+      "restedBody": "走进一家旅店并保持脱离战斗，你的角色便会在等待期间积累充分休息的经验。每座城镇都有一家。下次你外出作战时，这份积蓄会为你的击杀额外加成，直到用尽为止。在旅店中的一段停歇从来不是虚度的光阴；它会加快你下一段升级的路程。这份积蓄有上限，因此过上一夜所积攒的与住上很久大致相当，而一旦你抵达等级上限，便再没有等级条可填，充分休息的经验也就不再积累。",
       "capTitle": "抵达 {cap} 级",
       "capJourneyBody": "{cap} 级是上限，是升级的终点，却非成长的尽头。从那时起，你可以打普通与英雄难度的地下城和团队副本，在世界首领崛起时与他一战，追逐更好的装备，并在竞技场中检验自己。",
       "capEndgameBody": "裂隙是唯一真正等到满级才开放的内容。它们按自己的节奏在各处国度中撕裂开来，分为 C 到 S 的等阶，而全服的每一支队伍都在争当率先封印它的那一队。探秘的告示板同样一直都在，等你的装备跟上之后，它更高的难度也值得再走一趟。",
@@ -6406,7 +6766,7 @@ export const zh_CN: EnTranslations = {
     "browSoft": "柔和",
     "browThick": "浓密",
     "browAngled": "上扬",
-    "earrings": "耳环",
+    "earrings": "穿孔饰品",
     "jewelMaterial": "首饰材质",
     "jewelDefault": "原样",
     "jewelGold": "黄金",
@@ -7393,7 +7753,8 @@ export const zh_CN: EnTranslations = {
       "guilds": "提示：加入公会可获得专属聊天频道和公会成员名单。",
       "professions": "提示：采集与制造类生活技能可以与你的战斗职业同时培养。",
       "loadouts": "提示：保存多套天赋配置，即可在不同 build 间切换而无需重新分配天赋点。",
-      "pvp": "提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。"
+      "pvp": "提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。",
+      "reliquary": "提示：圣物库逐架记录你收集的独特战利品。"
     }
   },
   "errors": {
@@ -7516,7 +7877,12 @@ export const zh_CN: EnTranslations = {
     "sortLevel": "等级",
     "sortName": "名称",
     "sortRecent": "最近游玩",
-    "sortPlaytime": "游戏时长"
+    "sortPlaytime": "游戏时长",
+    "redesign": "重新设计",
+    "redesignHint": "该角色创建于新角色编辑器之前。你有一次免费重新设计的机会，保存时即会消耗。",
+    "redesignTitle": "重新设计{name}",
+    "redesignSave": "保存新外观",
+    "redesignCancel": "保留当前外观"
   },
   "deleteCharacter": {
     "title": "删除角色",
@@ -7544,7 +7910,8 @@ export const zh_CN: EnTranslations = {
     "resources": {
       "mana": "法力",
       "energy": "能量",
-      "rage": "怒气"
+      "rage": "怒气",
+      "focus": "集中值"
     },
     "roles": {
       "warrior": "坦克 / 近战 DPS",
@@ -7647,6 +8014,7 @@ export const zh_CN: EnTranslations = {
           "say": "说话",
           "yell": "大喊",
           "party": "小队",
+          "battleground": "战场",
           "general": "综合",
           "world": "世界",
           "lfg": "组队",
@@ -7673,7 +8041,111 @@ export const zh_CN: EnTranslations = {
       "zoomIn": "放大",
       "zoomOut": "缩小",
       "mapCanvasLabel": "地图",
-      "mapSummary": "{zone}的地图。"
+      "mapSummary": "{zone}的地图。",
+      "mapMarkerDescription": "{area}。{markers}",
+      "mapMarkerEmpty": "没有可见的重要标记。",
+      "mapMarkerLocated": "{marker}：{direction}，{distance}。",
+      "mapMarkerLocatedCount": "{marker}：{count}个；{direction}，{distance}。",
+      "mapMarkerMore": "另有 {count} 个标记。",
+      "mapMarkerDirections": {
+        "center": "中央",
+        "north": "北方",
+        "northeast": "东北方",
+        "east": "东方",
+        "southeast": "东南方",
+        "south": "南方",
+        "southwest": "西南方",
+        "west": "西方",
+        "northwest": "西北方"
+      },
+      "mapMarkerDistances": {
+        "near": "附近",
+        "medium": "中等距离",
+        "far": "远处"
+      },
+      "mapMarkerLabels": {
+        "you": "你",
+        "availableQuest": "可接任务",
+        "readyQuest": "可交任务",
+        "repeatQuest": "可重复任务",
+        "cooldownQuest": "冷却中的任务",
+        "questObjective": "任务目标区域",
+        "readyOre": "可采集矿点",
+        "readyWood": "可采伐木材点",
+        "readyHerb": "可采集草药点",
+        "readyLockedOre": "可采集矿点，工具未解锁",
+        "readyLockedWood": "可采伐木材点，工具未解锁",
+        "readyLockedHerb": "可采集草药点，工具未解锁",
+        "cooldownOre": "已枯竭的矿点",
+        "cooldownWood": "已枯竭的木材点",
+        "cooldownHerb": "已枯竭的草药点",
+        "cooldownLockedOre": "已枯竭的矿点，工具未解锁",
+        "cooldownLockedWood": "已枯竭的木材点，工具未解锁",
+        "cooldownLockedHerb": "已枯竭的草药点，工具未解锁",
+        "station": "制作站：{name}",
+        "service": "服务：{name}",
+        "partyMember": "队伍成员：{name}",
+        "deadPartyMember": "已死亡的队伍成员：{name}",
+        "partyMemberGeneric": "队伍成员",
+        "deadPartyMemberGeneric": "已死亡的队伍成员",
+        "friend": "好友：{name}",
+        "guildMember": "公会成员：{name}",
+        "pointOfInterest": "地标：{name}",
+        "dungeonEntrance": "地下城入口：{name}",
+        "dungeonExit": "地下城出口",
+        "delveEntrance": "探秘入口：{name}",
+        "worldPassage": "通往{zone}的通道",
+        "riftEntrance": "裂隙入口：{name}",
+        "hostileEnemy": "敌对目标",
+        "aggressiveEnemy": "正在攻击你的敌人",
+        "lootableEnemy": "可拾取战利品的敌人",
+        "corpse": "你的尸体",
+        "deathZone": "危险区域",
+        "teammate": "队友",
+        "deadTeammate": "已死亡的队友",
+        "flagCarrier": "携带旗帜的队友",
+        "ownFlagStand": "己方旗座",
+        "enemyFlagStand": "敌方旗座",
+        "riftDescent": "裂隙下行通道",
+        "riftReturnBeacon": "返回信标",
+        "riftReturnExit": "返回出口",
+        "ranked": "{marker}，阶级 {rank}",
+        "riftTreasureAvailable": "可开启的宝藏",
+        "riftTreasureLocked": "已上锁的宝藏",
+        "riftTreasureOpened": "已开启的宝藏",
+        "riftTreasureJammed": "已卡住的宝藏",
+        "riftCacheAvailable": "可开启的裂隙宝箱",
+        "riftCacheLocked": "已上锁的宝箱",
+        "riftCacheOpened": "已开启的宝箱",
+        "riftCacheJammed": "已卡住的宝箱",
+        "pylonUnlit": "未点亮的塔柱",
+        "pylonLit": "已点亮的塔柱",
+        "sequenceRuneUnlit": "未点亮的序列符文",
+        "sequenceRuneLit": "已点亮的序列符文",
+        "iceGoal": "冰面目标",
+        "boulderPad": "巨石目标点",
+        "boulderMovable": "可移动的巨石",
+        "boulderPlaced": "已就位的巨石",
+        "gateSealed": "封闭的大门",
+        "gateOpen": "开启的大门",
+        "switchReady": "可用的开关",
+        "switchOn": "已启动的开关",
+        "orbDormant": "休眠的法球",
+        "orbActive": "已激活的法球",
+        "rollerHazard": "滚轮陷阱",
+        "delvePassageSealed": "封闭的通道",
+        "delvePassageOpen": "开启的通道",
+        "delveSurfaceExit": "地表出口",
+        "delveCacheLocked": "已上锁的探秘宝箱",
+        "delveCacheReady": "探秘宝箱已就绪",
+        "delveCacheActive": "探秘宝箱已激活",
+        "delveCacheOpened": "已开启的探秘宝箱",
+        "delveReliquaryLocked": "已上锁的圣物匣",
+        "delveReliquaryReady": "圣物匣已就绪",
+        "delveReliquaryActive": "圣物匣仪式进行中",
+        "delveReliquaryOpened": "已开启的圣物匣",
+        "bountiful": "丰裕的{marker}"
+      }
     },
     "options": {
       "gameMenu": "游戏菜单",
@@ -7808,6 +8280,7 @@ export const zh_CN: EnTranslations = {
     "chat": {
       "rightClickName": "右键点击 {name}",
       "templates": {
+        "battleground": "[战场] {name}：{message}",
         "party": "[队伍] {name}：{message}",
         "yell": "{name}大喊：{message}",
         "whisper": "{name}悄悄说：{message}",
@@ -7951,6 +8424,7 @@ export const zh_CN: EnTranslations = {
       "notEnoughRage": "怒气不足！",
       "notEnoughEnergy": "能量不足！",
       "notEnoughMana": "法力不足！",
+      "notEnoughDevotion": "虔诚值不足！",
       "notEnoughResource": "{resource}不足！",
       "notEnoughHealth": "生命值不足。",
       "targetMustDodge": "你的目标必须先闪避。",
@@ -8079,6 +8553,10 @@ export const zh_CN: EnTranslations = {
     "pet": {
       "attack": "攻击",
       "waterJet": "水流喷射",
+      "felbolt": "邪能箭",
+      "abyssalChain": "深渊锁链",
+      "autocastOn": "自动施放已开启。右键点击、长按或按 Shift+Enter 可关闭。",
+      "autocastOff": "自动施放已关闭。右键点击、长按或按 Shift+Enter 可开启。",
       "taunt": "嘲讽",
       "healDemon": "治疗恶魔",
       "healPet": "治疗宠物",
@@ -8089,6 +8567,10 @@ export const zh_CN: EnTranslations = {
       "petAttackDesc": "命令你的宠物攻击当前敌对目标。",
       "waterJetTitle": "水流喷射",
       "waterJetDesc": "命令你的水元素引导减速水流，持续 3 秒。冷却时间 8 秒。右键点击可在冷却结束后自动施放。",
+      "felboltTitle": "邪能箭",
+      "felboltDesc": "命令烬裔向你的目标额外发射一枚邪能弹。冷却时间 8 秒。右键点击、长按或按 Shift+Enter 可切换自动施放。",
+      "abyssalChainTitle": "深渊锁链",
+      "abyssalChainDesc": "命令幽影将 8 码以外、20 码以内的普通敌人拖回自己身边。首领无法被拖拽。冷却时间 15 秒。右键点击、长按或按 Shift+Enter 可切换自动施放。",
       "petTauntTitle": "宠物嘲讽",
       "petTauntDesc": "命令你的宠物接战，并在进入范围时使用低吼。10 秒冷却。",
       "healDemonDesc": "消耗法力，在 5 秒内向你的恶魔引导治疗。",
@@ -8244,6 +8726,7 @@ export const zh_CN: EnTranslations = {
     "tooltip": {
       "rank": "等级 {rank}",
       "cost": "{cost} 点{resource}",
+      "ruinCost": "{cost} 点毁灭",
       "range": "{range} 码范围",
       "rangeWithMin": "{min}-{max} 码范围",
       "instant": "瞬发",
@@ -8255,6 +8738,7 @@ export const zh_CN: EnTranslations = {
       "requiresLevel": "需要等级 {level}",
       "requiresForm": "需要{form}形态",
       "requiresStealth": "需要潜行",
+      "requiresStealthSkulduggery": "需要潜行（幽暝达到3层或暗影缠身期间无需潜行）",
       "requiresCombo": "消耗连击点",
       "requiresTargetHealthBelow": "需要目标生命值低于 {percent}%",
       "requiresDodge": "只能在目标闪避后使用",
@@ -8270,7 +8754,9 @@ export const zh_CN: EnTranslations = {
     "resources": {
       "mana": "法力",
       "rage": "怒气",
-      "energy": "能量"
+      "energy": "能量",
+      "focus": "集中值",
+      "devotion": "虔诚"
     },
     "forms": {
       "bear": "熊",
@@ -8472,6 +8958,7 @@ export const zh_CN: EnTranslations = {
       "clickDestroy": "点击摧毁",
       "useFishing": "使用：在附近水域钓鱼。",
       "useHealingPotion": "使用：立即恢复 {amount} 点生命值。战斗中可用。1 分钟冷却。",
+      "useHealingPotionPct": "使用：立即恢复最大生命值的 {percent}%。战斗中可用。2 分钟冷却。",
       "useManaPotion": "使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。",
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
@@ -8575,6 +9062,9 @@ export const zh_CN: EnTranslations = {
       "filterPrimaryStatAll": "任意主属性",
       "filterRarity": "稀有度",
       "filterRarityAll": "全部稀有度",
+      "filterSort": "排序",
+      "sortName": "名称 (A-Z)",
+      "sortPriceAsc": "价格：从低到高",
       "weaponSword": "剑",
       "weaponDagger": "匕首",
       "weaponStaff": "法杖",
@@ -8703,19 +9193,71 @@ export const zh_CN: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "烈火之雨",
-        "description": "在目标区域降下烈火之雨，持续 4 秒，每秒灼烧敌人并造成 {damage} 点火焰伤害。"
+        "description": "消耗 3 点毁坏，向目标区域降下火雨，在 4 秒内每秒造成 {damage} 点火焰伤害，2 级时延长至 6 秒。毁灭性会让第一波立刻落下。"
       },
       "volley": {
         "name": "乱射",
-        "description": "向目标区域射出箭雨，持续 3 秒，每 0.5 秒对其中的敌人造成 {damage} 点伤害。"
+        "description": "向一片 8 米的区域降下箭雨，持续 3 秒。区域内的敌人每 0.5 秒受到 {damage} 点物理伤害。伤害随远程攻击强度提升。"
+      },
+      "pack_command": {
+        "name": "兽群号令",
+        "description": "命令你的活体宠物发动攻击。命中后产生 20 点集中值和一层兽群凶性。"
+      },
+      "stampede": {
+        "name": "兽群奔袭",
+        "description": "召唤3只野兽，持续12秒。每只野兽每2秒攻击一次，造成{damage}点物理伤害。显示的伤害已计入你远程攻击强度的8%，但尚未计入宠物伤害加成。野兽在召唤时会锁定兽群凶性层数，每层使其伤害提高10%。兽群奔袭处于冷却时，成功施放兽群号令有20%几率重置其冷却；连续5次未触发后必定重置。野兽存在期间无法重置。（兽群之主）"
+      },
+      "unleash_beast": {
+        "name": "释放野兽",
+        "description": "释放满层兽群凶性，对主要目标发动重击并拍击周围敌人，随后使宠物短暂进入顺劈狂乱。"
+      },
+      "measured_shot": {
+        "name": "审慎射击",
+        "description": "一记从容瞄准的射击，造成 {damage} 点物理伤害，并在命中时产生 20 点集中值。"
+      },
+      "cold_focus": {
+        "name": "冷静专注",
+        "description": "持续 12 秒，审慎射击产生更多集中值，蓄力长射的速度更快、消耗更低。（冷视招牌技能）"
+      },
+      "bloodhook": {
+        "name": "血钩",
+        "description": "冲向 8 至 25 码外的敌人，撕开一道主要伤口，在 12 秒内造成 24 点流血伤害。（野战技艺招牌技能）"
+      },
+      "shrapnel_charge": {
+        "name": "榴片炸弹",
+        "description": "用榴片轰击目标及其附近敌人，随后从主要目标扩散一道短暂的流血。"
+      },
+      "bloodtrail_assault": {
+        "name": "血迹突袭",
+        "description": "持续 12 秒，强化血钩、撕伤、榴片炸弹以及宠物的后续攻击。"
+      },
+      "trailbreak": {
+        "name": "断迹",
+        "description": "向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。"
+      },
+      "wildheart": {
+        "name": "野性之心",
+        "description": "立即恢复最大生命值的 30%。"
+      },
+      "shellskin": {
+        "name": "甲壳之肤",
+        "description": "受到的伤害降低 60%，持续 8 秒，但生效期间无法攻击。"
+      },
+      "frostjaw_trap": {
+        "name": "霜颚陷阱",
+        "description": "在选中的敌人处或脚下放置已启动的陷阱。它会定身第一个触发的敌人，并减速附近敌人。"
+      },
+      "pack_rally": {
+        "name": "兽群集结",
+        "description": "进入骏马之姿，并激励附近盟友，使其移动速度提高 30%、攻击与施法速度提高 10%，持续 10 秒。"
       },
       "hurricane": {
         "name": "飓风",
         "description": "在目标区域召唤飓风，持续 6 秒，每秒重击敌人并造成 {damage} 点自然伤害。"
       },
       "earthquake": {
-        "name": "地震",
-        "description": "撼动目标区域，持续 6 秒，每 1.5 秒重击敌人并造成 {damage} 点自然伤害。"
+        "name": "断层苏醒",
+        "description": "撼动一片 8 米的区域，持续 6 秒，每 1.5 秒造成 {damage} 点自然伤害。伤害随法术强度提升。元素：在 5 点雷霆时，伤害提高 100% 并消耗全部雷霆。"
       },
       "heroic_strike": {
         "name": "劫掠打击",
@@ -8923,15 +9465,20 @@ export const zh_CN: EnTranslations = {
       },
       "sinister_strike": {
         "name": "邪恶斩击",
-        "description": "立即攻击，造成武器伤害加 {damage}。奖励 1 个连击点。"
+        "description": "立即攻击，造成武器伤害加 {damage}。奖励 1 个连击点。",
+        "specNote_assassination": "累积1层毒祭（最多6层）。",
+        "specNote_combat": "红线期间，此按钮变为大摆拳：造成130%武器伤害外加10点，奖励2个连击点，并使红线加深1格（最多4格）。"
       },
       "eviscerate": {
         "name": "长眠",
-        "description": "终结技，造成 {damage}。"
+        "description": "终结技，造成 {damage}。",
+        "specNote_assassination": "毒祭达到6层时，此按钮变为蚀毒撕裂：这次打击立即引爆你的流血效果的全部剩余伤害，施加一个新的蚀毒伤口，并恢复20点能量。",
+        "specNote_combat": "以4个或更多连击点命中会开启红线，持续8秒：邪恶斩击变为大摆拳，此按钮变为眼前一黑（造成45点伤害，每个连击点额外造成35点，你累积的每格红线使伤害提高25%，并恢复25点能量）。在红线结束前将其打出。"
       },
       "backstab": {
         "name": "卑劣突刺",
-        "description": "背刺目标，造成 150% 武器伤害加 {damage}。必须位于目标背后。需要匕首。奖励 1 个连击点。"
+        "description": "背刺目标，造成 150% 武器伤害加 {damage}。必须位于目标背后。需要匕首。奖励 1 个连击点。",
+        "specNote_assassination": "每次打击累积1层毒祭（最多6层）并返还15点能量。毒祭达到6层时，长眠变为蚀毒撕裂（一次性造成你的流血效果的全部剩余伤害）。"
       },
       "gouge": {
         "name": "戳眼",
@@ -8943,7 +9490,7 @@ export const zh_CN: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "割喉节奏",
-        "description": "终结技，使近战攻击速度提高 30%。每个连击点都会延长持续时间。"
+        "description": "终结技，将近战攻击速度提高 30%，持续 12 秒外加每点连击点 4 秒（5 点连击点：32 秒）。"
       },
       "sprint": {
         "name": "疾足",
@@ -8951,15 +9498,17 @@ export const zh_CN: EnTranslations = {
       },
       "kidney_shot": {
         "name": "下作一击",
-        "description": "终结技，使目标昏迷。每个连击点使持续时间延长 1 秒。"
+        "description": "终结技，昏迷目标 1 秒外加每点连击点 1 秒（5 点连击点：6 秒）。"
       },
       "ambush": {
         "name": "潜伏突袭",
-        "description": "伏击目标，造成 250% 武器伤害加 {damage}。必须处于潜行并位于目标背后。需要匕首。奖励 1 个连击点。"
+        "description": "伏击目标，造成 250% 武器伤害加 {damage}。必须处于潜行并位于目标背后。需要匕首。奖励 1 个连击点。",
+        "specNote_subtlety": "从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可从任意角度使用：该次使用不消耗能量，消耗全部3层幽暝，开启持续6秒的暗影缠身，并造成双倍伤害。"
       },
       "stealth": {
         "name": "暮帷",
-        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破暮帷。再次施放可现身。"
+        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破暮帷。再次施放可现身。",
+        "specNote_subtlety": "你从暮帷中使用的每个先制技累积1层幽暝（最多3层）。"
       },
       "adrenaline_rush": {
         "name": "血脉疾涌",
@@ -8967,11 +9516,13 @@ export const zh_CN: EnTranslations = {
       },
       "garrote": {
         "name": "绞喉线",
-        "description": "勒住敌人的喉咙，立即造成 {damage} 点伤害，并使其流血，在 18 秒内受到 {overTime} 点伤害。必须处于潜行状态。奖励 1 个连击点。"
+        "description": "勒住敌人的喉咙，立即造成 {damage} 点伤害，并使其流血，在 18 秒内受到 {overTime} 点伤害。必须处于潜行状态。奖励 1 个连击点。",
+        "specNote_subtlety": "从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可使用：该次使用不消耗能量，消耗全部3层幽暝，并开启持续6秒的暗影缠身。"
       },
       "cheap_shot": {
         "name": "击腹拳",
-        "description": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。"
+        "description": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。",
+        "specNote_subtlety": "从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可使用：该次使用不消耗能量，消耗全部3层幽暝，并开启持续6秒的暗影缠身。"
       },
       "sap": {
         "name": "闷棍",
@@ -8983,11 +9534,11 @@ export const zh_CN: EnTranslations = {
       },
       "expose_armor": {
         "name": "护甲突破",
-        "description": "终结技，暴露目标，使其护甲降低 {damage}，持续 30 秒。"
+        "description": "终结技，破开目标的防护 30 秒：每消耗 1 点连击点使其护甲降低 2%（5 点连击点：{damage}%）。"
       },
       "rupture": {
         "name": "血流不止",
-        "description": "终结技，撕裂目标，使其流血，在 16 秒内受到 {damage} 点伤害。"
+        "description": "终结技，撕裂目标：其每 2 秒流血一次，持续 6 秒外加每点连击点 2 秒（5 点连击点：16 秒，共 {damage} 点伤害）。"
       },
       "vanish": {
         "name": "烟遁",
@@ -9007,19 +9558,131 @@ export const zh_CN: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "誓约烙印",
-        "description": "使你充满神圣能量，持续 30 秒，使每次近战挥击造成 {damage} 点额外神圣伤害。可用裁决释放。"
-      },
-      "holy_light": {
-        "name": "愈疗之光",
-        "description": "为一个友方目标恢复 {damage} 点生命值。"
-      },
-      "devotion_aura": {
-        "name": "坚定光环",
-        "description": "使你的护甲提高 {buff}，持续 30 分钟。"
+        "description": "以神圣之力充盈你 30 秒，使你的每一次近战挥击额外造成 {damage} 点神圣伤害。"
       },
       "judgement": {
         "name": "裁决",
         "description": "对敌人释放你当前的圣印，将其消耗以造成它所储存的神圣伤害。"
+      },
+      "holy_light": {
+        "name": "愈疗之光",
+        "description": "迅速治疗一个友方目标 {damage} 点生命。恢复生命会产生 1 点虔诚，即便没有专精也是如此。辉光共鸣或烈日回击会让它变为瞬发。"
+      },
+      "divine_ascension": {
+        "name": "神圣升华",
+        "description": "消耗 20 点虔诚，获得 5 次升华充能，最多持续 45 秒。标记的技能会消耗一次充能并获得额外效果。"
+      },
+      "aura_mastery": {
+        "name": "神圣协律",
+        "description": "持续 8 秒，强化小队中所有激活的虔诚光环和报偿光环。壁垒虔诚使伤害降低 15%；报偿造成 15 点神圣伤害。多次使用只会刷新效果，不会叠加。"
+      },
+      "devotion_ward": {
+        "name": "壁垒虔诚",
+        "description": "使你和小队成员受到的伤害降低 5%，持续至死亡或被替换。只有此光环与报偿光环会彼此替换；辉光、黎明和恩典虔诚可以共存。"
+      },
+      "hammer_of_grace": {
+        "name": "恩典之锤",
+        "description": "立即向 20 米内的敌人掷出圣锤，造成 {damage} 点伤害，恢复 70 点法力，为自己恢复相当于伤害量 50% 的生命值，并在造成伤害时产生 1 点虔诚。烈阳反击会使恩典之锤无视冷却时间，并为你恢复相当于伤害量 100% 的生命值。"
+      },
+      "hushbrand": {
+        "name": "寂静烙印",
+        "description": "打断施法，并使目标在 4 秒内无法施放该系法术。"
+      },
+      "guardian_covenant": {
+        "name": "守护契约",
+        "description": "保护一名友方目标和你自己，使受到的伤害降低20%，持续8秒。未选中友方目标时，默认对你自己施放。"
+      },
+      "solar_step": {
+        "name": "烈阳步",
+        "description": "使你的移动速度提高 150%，持续 2 秒。"
+      },
+      "solar_invocation": {
+        "name": "烈阳祈唤",
+        "description": "立即为一名盟友恢复 {damage} 点生命值，或对一名敌人造成中等神圣伤害。任一用途都会产生 1 点虔诚。升华期间，治疗施法还会治疗目标 10 米内的友方玩家，治疗量为原来的一半。"
+      },
+      "radiant_devotion": {
+        "name": "辉光虔诚",
+        "description": "使你和小队成员的法术强度提高 20 点，持续 30 分钟。会替换你自己的黎明或恩典虔诚，但可与其他圣骑士的虔诚共存。"
+      },
+      "dawn_devotion": {
+        "name": "黎明虔诚",
+        "description": "使你和小队成员的攻击强度提高 40 点，持续 30 分钟。会替换你自己的辉光或恩典虔诚，但可与其他圣骑士的虔诚及战士的战吼共存。"
+      },
+      "grace_devotion": {
+        "name": "恩典虔诚",
+        "description": "你和小队成员每 5 秒恢复 15 点法力，且法力消耗降低 3%，持续 30 分钟。会替换你自己的辉光或黎明虔诚，但可与其他圣骑士的虔诚共存。"
+      },
+      "recall_the_fallen": {
+        "name": "唤回逝者",
+        "description": "使一名死亡的小队成员复活，并恢复 35% 的生命值和法力值。"
+      },
+      "beacon_of_light": {
+        "name": "圣光道标",
+        "description": "将一名小队成员标记为你的圣光道标。你对 60 米内另一名小队成员造成的有效直接治疗，有 50% 也会治疗道标目标。范围治疗和周期性治疗不会传递。持续至你或目标死亡。"
+      },
+      "final_edict": {
+        "name": "终末敕令",
+        "description": "发动一次沉重的武器攻击，并在造成伤害时产生 1 点虔诚。命中后使黎明坠击的剩余冷却时间缩短 2 秒。成功的自动攻击和终末敕令命中有 15% 几率获得持续 8 秒的黎明之怒。升华还会在你周围释放神圣爆炸。"
+      },
+      "dawnfall": {
+        "name": "黎明坠击",
+        "description": "对附近敌人造成 {damage} 点神圣伤害并产生 1 点虔诚。命中至少一个敌人会使终末敕令的剩余冷却时间缩短 2 秒。升华会提高其伤害和作用半径。"
+      },
+      "sun_gods_verdict": {
+        "name": "太阳神裁决",
+        "description": "以太阳神裁决审判一名敌人，持续 30 秒。终末敕令和黎明坠击成功命中时会刻下一层印记。施加第三层印记的技能决定判决：终末敕令对罪人释放毁灭性伤害；黎明坠击引爆裁决，对附近敌人造成伤害并使其昏迷 1.5 秒。"
+      },
+      "valkyrs_calling": {
+        "name": "瓦尔基里的召唤",
+        "description": "升上空中，在飞向敌人期间免疫伤害。2 秒后降临目标区域，造成 {damage} 点神圣伤害并产生 1 点虔诚。升华会使冲击伤害提高 50% 并消耗 1 次充能。"
+      },
+      "faithforged_guard": {
+        "name": "圣光之债",
+        "description": "在 8 秒内，你受到的下一次敌人攻击将被回敬：至多抵消 {buff} 点伤害，并以等量神圣伤害返还给攻击者，同时你获得 1 点虔诚。只回敬一次攻击。升华使可回敬的数值提高 50%。"
+      },
+      "mercy_lance": {
+        "name": "慈悲圣枪",
+        "description": "对一名敌人造成 {damage} 点神圣伤害，并在造成伤害时产生 1 点虔诚。升华期间消耗 1 次充能，使其必定暴击。"
+      },
+      "sacred_form": {
+        "name": "神圣形态",
+        "description": "进入持续至死亡的神圣状态，使治疗效果提高 10%、法术暴击几率提高 5%，产生的仇恨降低 50%。仅限黎明愈者。"
+      },
+      "dawns_embrace": {
+        "name": "黎明之拥",
+        "description": "施放一次强力治疗并产生 1 点虔诚。辉光共鸣使其法力消耗降低 50%，施法时间缩短至 1.5 秒。升华使其变为瞬发，且治疗量提高 35%。"
+      },
+      "radiant_chorus": {
+        "name": "辉光圣歌",
+        "description": "为附近盟友恢复 {damage} 点生命值并产生 1 点虔诚。有效治疗至少 2 名盟友会获得辉光共鸣：你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 50%，施法时间缩短至 1.5 秒。升华会提高辉光圣歌的治疗量和作用半径。"
+      },
+      "life_covenant": {
+        "name": "生命契约",
+        "description": "使一名盟友受到的伤害降低 40%，持续 6 秒。升华期间还会给予一个可吸收 120 点伤害的护盾，且不消耗充能。"
+      },
+      "aegis_first_dawn": {
+        "name": "初曙圣盾",
+        "description": "引导 5 秒，创造一个半径 10 米的神圣穹顶。穹顶内的盟友每秒受到治疗，且受到的伤害降低 50%。完成引导时释放最终治疗，并使移动速度提高 30%，持续 4 秒。"
+      },
+      "vowkeeper_strike": {
+        "name": "守誓者打击",
+        "description": "发动高仇恨攻击并产生 1 点虔诚。成功命中有 20% 几率获得持续 8 秒的烈阳反击；每次成功格挡有 25% 几率触发。烈阳反击会强化你的下一次向阳飞盾、恩典之锤或治愈之光。升华还会给予一个小型吸收护盾。"
+      },
+      "bastion_rite": {
+        "name": "壁垒仪式",
+        "description": "使受到的物理伤害降低 20%，格挡几率提高 20%，持续 6 秒。升华将持续时间延长至 10 秒。"
+      },
+      "sunward_disc": {
+        "name": "向阳飞盾",
+        "description": "需要盾牌。掷出一面辉光飞盾，命中后在附近敌人之间弹射。每次造成伤害都会产生 1 点虔诚。烈阳反击使向阳飞盾不消耗法力、无视冷却时间且伤害提高 20%。升华会强化 5 次弹射。"
+      },
+      "sacred_challenge": {
+        "name": "神圣挑衅",
+        "description": "迫使一名敌人攻击你。升华期间还会使你受到的所有伤害降低 15%，持续 4 秒，且不消耗充能。"
+      },
+      "devotion_aura": {
+        "name": "坚定光环",
+        "description": "使你的护甲提高 {buff}，持续 30 分钟。"
       },
       "blessing_of_might": {
         "name": "钢铁誓约",
@@ -9027,7 +9690,7 @@ export const zh_CN: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰守护",
-        "description": "一道守护结界吸收 {damage} 点伤害，持续 10 秒。"
+        "description": "神圣结界吸收最大生命值的{damage}%伤害，持续{duration}秒。持久守护会提高结界吸收量。"
       },
       "hammer_of_justice": {
         "name": "碎裂法槌",
@@ -9035,7 +9698,7 @@ export const zh_CN: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "临终圣礼",
-        "description": "巨大的治疗涌流：恢复 {damage} 点生命值。10 分钟冷却时间。"
+        "description": "一股磅礴的涌流，恢复你最大生命值的 {damage}%，并在恢复生命时产生 1 点虔诚。冷却 10 分钟。"
       },
       "holy_taunt": {
         "name": "神圣挑衅",
@@ -9043,7 +9706,7 @@ export const zh_CN: EnTranslations = {
       },
       "flash_of_light": {
         "name": "圣光愈合",
-        "description": "一道快速而高效的圣光爆发，为一个友方目标恢复 {damage} 点生命值。"
+        "description": "一道迅捷而高效的圣光，治疗一个友方目标 {damage} 点生命。恢复生命会产生 1 点虔诚，即便没有专精也是如此。"
       },
       "exorcism": {
         "name": "驱逐仪式",
@@ -9051,15 +9714,31 @@ export const zh_CN: EnTranslations = {
       },
       "consecration": {
         "name": "神圣领域",
-        "description": "奉献你脚下的土地，持续 10 秒，每 2 秒灼烧附近敌人并造成 {damage} 点神圣伤害。"
+        "description": "净化你脚下的土地，持续 9 秒，每秒造成 {damage} 点神圣伤害并产生高额威胁。首次命中产生 1 点虔诚。信仰守卫站在其中时受到的伤害降低 10%。升华会提高其伤害。"
+      },
+      "bastion_sweep": {
+        "name": "壁垒横扫",
+        "description": "用装备的盾牌横扫前方 180 度范围内的敌人，造成 {damage} 点高仇恨神圣伤害并产生 1 点虔诚。升华使伤害提高 30%，半径扩大至 8 米。"
+      },
+      "oath_chain": {
+        "name": "誓约锁链",
+        "description": "立即用神圣锁链束缚一名远处敌人。敌人以每秒 18 米的速度向你移动，直至距离 3 米，随后移动速度降低 50%，持续 4 秒。升华期间还会束缚附近的第二名敌人。"
+      },
+      "veilbound_march": {
+        "name": "帷幕行军",
+        "description": "进入灵体状态 4 秒，移动速度提高 40%，护甲提高 30%，并免疫定身、减速和位移。你穿过的敌人会获得持续 6 秒的帷幕印记，每秒受到神圣伤害，对你造成的伤害降低 20%，并对你产生额外仇恨。第一个印记会产生 1 点虔诚。行军结束时，附近带有印记的敌人会受到最终爆发伤害。升华使爆发伤害提高 50%，并将他们轻微拉向你。"
+      },
+      "veilbound_mark": {
+        "name": "帷幕印记",
+        "description": "每秒受到神圣伤害，对施加印记的圣骑士造成的伤害降低 20%，并对该圣骑士产生额外仇恨。"
       },
       "righteous_fury": {
         "name": "炽燃誓约",
-        "description": "使你的神圣伤害产生的威胁值提高 60%，持续 30 分钟。防护圣骑士的核心技能。"
+        "description": "被动地将你的神圣伤害所产生的威胁提高 60%。仅限信仰守卫。"
       },
       "retribution_aura": {
         "name": "报偿光环",
-        "description": "以神圣能量环绕自身，持续 30 分钟，对任何近战攻击你的敌人造成 5 点神圣伤害。"
+        "description": "以神圣能量环绕你和队伍成员，直到死亡或被替换。近战攻击受影响盟友的敌人将受到{buff}点神圣伤害，受影响的盟友普通攻击额外造成{buff}点神圣伤害。替换你自己的壁垒坚定。另一名圣骑士施放报偿光环时将刷新而非叠加。"
       },
       "tame_beast": {
         "name": "野性羁绊",
@@ -9071,119 +9750,131 @@ export const zh_CN: EnTranslations = {
       },
       "raptor_strike": {
         "name": "剖膛一击",
-        "description": "一次强力近战攻击，使伤害提高 {damage}。在你的下一次挥击时触发。"
+        "description": "以 10% 武器伤害外加 {damage} 点进行打击。命中可恢复 15 点集中，并给予 1 层狩猎势能。伤害通过武器伤害随攻击强度提升。"
       },
       "aspect_of_the_hawk": {
         "name": "鹞鹰之姿",
-        "description": "化为鹞鹰之姿，使攻击强度提高 {buff}，持续 30 分钟。"
+        "description": "化身为鹞的形态，将你的攻击强度提高 {buff}，持续 30 分钟。"
       },
       "serpent_sting": {
         "name": "毒液倒刺",
-        "description": "钉刺目标，在 15 秒内造成 {damage} 点自然伤害。"
+        "description": "在 15 秒内共造成 {damage} 点自然伤害，每 3 秒一次。伤害随远程攻击强度提升。"
       },
       "arcane_shot": {
         "name": "凶邪射击",
-        "description": "瞬发射击，造成 {damage} 点奥术伤害。"
+        "description": "射击目标，造成 {damage} 点奥术伤害。伤害随远程攻击强度提升。"
       },
       "concussive_shot": {
         "name": "震颤射击",
-        "description": "使目标眩晕迟缓，造成 {damage} 点伤害，并使移动速度降低 50%，持续 4 秒。"
+        "description": "射击目标，造成 {damage} 点物理伤害并使其减速 50%，持续 4 秒。伤害随远程攻击强度提升。"
       },
       "mongoose_bite": {
-        "name": "反噬獠牙",
-        "description": "在目标躲闪后反击，造成武器伤害加 {damage}。无法被躲闪。"
+        "name": "裂创",
+        "description": "以 45% 武器伤害外加 {damage} 点进行打击。若目标身上带有你的血钩之伤，则立即造成 1 跳伤口伤害，并将该伤口刷新至 12 秒。伤害通过武器伤害随攻击强度提升。"
+      },
+      "hunting_momentum": {
+        "name": "狩猎势能",
+        "description": "被动：剖膛一击会获得1层狩猎势能，持续8秒，最多3层。达到3层时，反噬獠牙的打击伤害提高45%，并消耗所有层数。（野战技艺）"
+      },
+      "fieldcraft_reentry": {
+        "name": "蓄势返场",
+        "description": "被动：断迹会刷新狩猎势能，并使你在12秒内的下一次剖膛一击或血钩获得返场强化。剖膛一击每层造成15%额外伤害。血钩造成18至24点额外物理伤害，每层再提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（野战技艺）"
       },
       "wing_clip": {
         "name": "束缚斩",
-        "description": "造成伤口，造成 {damage} 点伤害，并使敌人移动速度降低 40%，持续 10 秒。"
+        "description": "劈砍目标，造成 {damage} 点物理伤害并使其减速 40%，持续 10 秒。伤害随攻击强度提升。"
       },
       "aspect_of_the_monkey": {
         "name": "松貂之姿",
-        "description": "化为松貂之姿，使躲闪几率提高 8%，持续 30 分钟。"
+        "description": "化身为貂的形态，将你的躲闪几率提高 8%，持续 30 分钟。"
       },
       "aspect_of_the_cheetah": {
         "name": "骏马之姿",
-        "description": "化为骏马之姿，使移动速度提高 30%，持续 30 分钟。"
+        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。"
       },
       "aimed_shot": {
         "name": "引弓长射",
-        "description": "一次精心引弓的射击，造成 {damage} 点伤害。"
+        "description": "射击目标，造成 {damage} 点物理伤害。伤害随远程攻击强度提升。"
       },
       "rapid_fire": {
         "name": "狂热引弓",
-        "description": "使你的攻击速度提高 40%，持续 15 秒。"
+        "description": "在2.4秒内射出6发箭矢，期间可以移动。每发造成{damage}点物理伤害，并随远程攻击强度提高。"
       },
       "smite": {
-        "name": "惩击",
-        "description": "惩击敌人，造成 {damage} 点神圣伤害。"
+        "name": "涤净圣歌",
+        "description": "造成 {damage} 点神圣伤害。伤害随法术强度提升。戒律：为每一名相连的盟友治疗相当于伤害 30% 的生命。若没有盟友相连，则为生命最低的小队成员治疗 15%。"
       },
       "lesser_heal": {
         "name": "低语祈祷",
-        "description": "为一个友方目标恢复 {damage} 点生命值。"
+        "description": "治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。"
       },
       "power_word_fortitude": {
         "name": "坚毅连祷",
-        "description": "使目标的耐力提高 {buff}，持续 30 分钟。"
+        "description": "将每位小队成员的耐力提高 {buff}%，持续 30 分钟。"
       },
       "shadow_word_pain": {
         "name": "腐朽挽歌",
-        "description": "黑暗之语在 18 秒内造成 {damage} 点暗影伤害。"
+        "description": "在 18 秒内共造成 {damage} 点暗影伤害，每 3 秒一次。伤害随法术强度提升。暗影：伤害提高 10%，且你的塑像上每跳都会给予 1 点幽暗贡赋。"
       },
       "power_word_shield": {
         "name": "守护圣咏",
-        "description": "保护目标，吸收 {damage} 点伤害，持续 30 秒。"
+        "description": "为一个友方目标护盾，在 30 秒内吸收 {damage} 点伤害。戒律还会将该目标与你的神圣伤害相连，持续 30 秒。"
       },
       "renew": {
         "name": "萦绕恩泽",
-        "description": "在 15 秒内为目标恢复 {damage} 点生命值。"
+        "description": "在 15 秒内治疗目标 {damage} 点生命，每 3 秒一次。治疗量随法术强度提升。"
       },
       "mind_blast": {
         "name": "碎心术",
-        "description": "震击目标的心灵，造成 {damage} 点暗影伤害。"
+        "description": "造成 {damage} 点暗影伤害。伤害随法术强度提升。暗影会以你的腐朽挽歌把一个目标绑定为它的塑像，给予 1 点幽暗贡赋，并将 30% 的伤害回响至至多 3 名其他带有你腐朽挽歌的敌人。"
       },
       "heal": {
         "name": "庄严祈祷",
-        "description": "缓慢但强大的祈祷，为一个友方目标恢复 {damage} 点生命值。"
+        "description": "治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。"
       },
       "mind_flay": {
         "name": "悲苦连祷",
-        "description": "用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 {damage} 点伤害。"
+        "description": "引导 3 秒，每秒造成 {damage} 点暗影伤害。伤害随法术强度提升。"
       },
       "flash_heal": {
         "name": "紧急祈祷",
-        "description": "快速祈祷，为一个友方目标恢复 {damage} 点生命值。"
+        "description": "治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。"
       },
       "lightning_bolt": {
         "name": "电弧箭",
-        "description": "投掷一道闪电，造成 {damage} 点自然伤害。"
+        "description": "造成 {damage} 点自然伤害。伤害随法术强度提升。元素：命中可给予 1 点雷霆。"
+      },
+      "thunder_reservoir": {
+        "name": "雷霆蓄能",
+        "description": "被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）"
       },
       "rockbiter_weapon": {
         "name": "缚石武器",
-        "description": "以大地之怒灌注你的武器：每次挥击额外造成 {damage} 点伤害，持续 5 分钟。"
+        "description": "为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点伤害。增强还会获得 30% 护甲，受到的伤害降低 10%，并产生两倍的威胁。大地震击迫使其目标攻击你 3 秒，而雷霆护罩则给予 3 秒 10% 的伤害减免。"
       },
       "healing_wave": {
         "name": "治愈之水",
-        "description": "为一个友方目标恢复 {damage} 点生命值。"
+        "description": "治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。恢复：将完整治疗量的 50% 在过量治疗之前存为治愈涌流，持续 12 秒，至多为目标最大生命值的 30%。"
       },
       "earth_shock": {
         "name": "大地震击",
-        "description": "立即以震荡之力冲击目标，造成 {damage} 点自然伤害。"
+        "description": "造成 {damage} 点自然伤害。伤害随法术强度提升。元素：在 5 点雷霆时，伤害提高 125% 并消耗全部雷霆。磐岩之缚：迫使目标攻击你 3 秒。"
       },
       "lightning_shield": {
         "name": "雷霆护罩",
-        "description": "以爆裂闪电环绕自身：近战攻击者会受到 {buff} 点自然伤害，最多 3 次充能且每 5 秒最多触发一次。"
+        "description": "以闪电环绕你 10 分钟。接下来针对你的 3 次近战攻击会对攻击者造成 {buff} 点自然伤害，最多每 5 秒一次。"
       },
       "flame_shock": {
         "name": "余烬震击",
-        "description": "用火焰灼烧目标，造成 {damage} 点伤害，并在 12 秒内额外造成 {overTime}。"
+        "description": "造成 {damage} 点火焰伤害，随后在 12 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。"
       },
       "flametongue_weapon": {
         "name": "焰烙武器",
-        "description": "用元素之火灌注你的武器：每次挥击额外造成 {damage} 点火焰伤害，持续 5 分钟。"
+        "description": "为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点火焰伤害。"
       },
       "frost_shock": {
         "name": "凛霜震击",
-        "description": "立即以冰霜冲击目标，造成 {damage} 点冰霜伤害，并使其移动速度降低 50%，持续 8 秒。"
+        "description": "造成 {damage} 点冰霜伤害并使目标减速 50%，持续 8 秒。伤害随法术强度提升。"
       },
       "frostbrand_weapon": {
         "name": "缚霜武器",
@@ -9191,11 +9882,11 @@ export const zh_CN: EnTranslations = {
       },
       "ghost_wolf": {
         "name": "影狼",
-        "description": "化身为影狼，使移动速度提高 40%，持续 10 分钟。"
+        "description": "化为影狼，移动速度提高 40%。再次施放即可变回你平常的形态。"
       },
       "stormstrike": {
         "name": "先祖打击",
-        "description": "将风暴导入武器，立即攻击并造成武器伤害加 {damage}。"
+        "description": "以武器伤害外加 {damage} 点进行打击，并将战魂节律推进 2 段。伤害通过武器伤害随攻击强度提升。"
       },
       "shadow_bolt": {
         "name": "幽暗箭",
@@ -9213,9 +9904,29 @@ export const zh_CN: EnTranslations = {
         "name": "黑腐术",
         "description": "腐蚀目标，在 18 秒内造成 {damage} 点暗影伤害。"
       },
+      "evil_eye": {
+        "name": "邪眼",
+        "description": "将一名敌人标记为诅咒焦点。移动邪眼会保留谴罪，但不会刷新其20秒的持续时间。"
+      },
+      "maledict_gaze": {
+        "name": "咒眼凝视",
+        "description": "你的咒眼每2.5秒攻击所选的主要邪眼目标，造成暗影伤害。附身邪眼会使其攻击速度加倍。"
+      },
+      "needle_of_fate": {
+        "name": "命运之针",
+        "description": "刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成5点谴罪；若不存在邪眼，则先标记目标。"
+      },
+      "sentence": {
+        "name": "裁决",
+        "description": "消耗全部谴罪与命运丝线裁决敌人。每条丝线使伤害提高6%，附加效果会在20、50、80和100点谴罪时提升。16级后伤害成长趋于平缓。"
+      },
       "life_tap": {
         "name": "苛酷交易",
         "description": "将 {damage} 点生命值转化为 {damage} 点法力值。"
+      },
+      "cursed_accomplice": {
+        "name": "受咒同谋",
+        "description": "未选择友方玩家时连接你的咒眼，使其凝视生成2点谴罪；连接友方玩家时，该玩家对邪眼目标造成伤害会生成3点。每2秒最多触发一次。"
       },
       "curse_of_agony": {
         "name": "苦楚妖术",
@@ -9223,7 +9934,47 @@ export const zh_CN: EnTranslations = {
       },
       "drain_life": {
         "name": "吞噬",
-        "description": "吸取目标的生命，持续 5 秒，每秒向你转移 {damage} 点生命值。"
+        "description": "吞噬目标的生命力，每秒造成 {damage} 点暗影伤害，并将其中的 70% 转化为生命传给你。痛苦则改为全部转化。当引导在你的主邪眼之上时，它会在开始时消耗全部命运丝线，而每一根丝线都会让每一跳额外产生 1 点谴罪。"
+      },
+      "litany_of_guilt": {
+        "name": "罪责祷文",
+        "description": "诅咒你的主要邪眼8秒。每次获得谴罪时会释放冲击波，对8码内最多4名其他敌人造成伤害，每秒最多触发一次。"
+      },
+      "cinderhide": {
+        "name": "熔渣皮肤",
+        "description": "使皮肤硬化为冷却的熔渣，持续10秒，受到的所有伤害降低25%。"
+      },
+      "umbral_anchor": {
+        "name": "暗影锚",
+        "description": "首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。"
+      },
+      "soulwell": {
+        "name": "灵魂之井",
+        "description": "召唤一口灵魂之井，持续3分钟。脱离战斗时，小队成员最多可补充3枚灵魂石。灵魂石可恢复最大生命值的25%，并与药水共享冷却。"
+      },
+      "hex_of_violence": {
+        "name": "暴行咒",
+        "description": "诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬22点暗影伤害。"
+      },
+      "cruel_pact": {
+        "name": "残酷契约",
+        "description": "牺牲最大生命值的12%以生成20点谴罪。生命值不高于15%时无法使用。"
+      },
+      "vicarious_suffering": {
+        "name": "苦痛转承",
+        "description": "连接苦痛8秒，受到敌对攻击时最多生成15点谴罪。对自己使用时受到的伤害降低20%；对盟友使用时最多将20%的伤害转移给你，但不会使你的生命值降至15%以下。"
+      },
+      "possess_evil_eye": {
+        "name": "附身邪眼",
+        "description": "咒术者附身你的主要邪眼15秒，并生成35点谴罪。命运之针施法时间变为1秒并额外生成2点谴罪；吞噬可在移动中引导；裁决造成的伤害提高25%。延迟回响造成60%的伤害，并在17至20级间逐步降至30%。"
+      },
+      "hour_of_judgment": {
+        "name": "审判时刻",
+        "description": "对你的主要邪眼降下持续15秒的审判，获得40点谴罪和3层命运丝线，激活附身，使通过主要邪眼生成的谴罪翻倍，并使裁决伤害提高20%。第一次裁决返还50点谴罪。"
+      },
+      "coven": {
+        "name": "巫契",
+        "description": "在最多4名附近敌人身上制造持续15秒的次级邪眼。它们以50%的效率补充共享谴罪池，并承受裁决35%的回响伤害。"
       },
       "fear": {
         "name": "惊惧",
@@ -9235,11 +9986,16 @@ export const zh_CN: EnTranslations = {
       },
       "shadowburn": {
         "name": "暮火",
-        "description": "立即以灼热暗影轰击目标，造成 {damage} 点暗影伤害。"
+        "description": "消耗 1 点毁坏，对生命值低于 20% 的敌人施以处决，造成 {damage} 点暗影伤害。若被标记的目标在 5 秒内死亡，则返还其毁坏。"
+      },
+      "ruinous_brand": {
+        "name": "毁灭烙印",
+        "description": "为敌人烙印15秒。你接下来的3个直接法术会对被烙印的敌人回响25%的伤害；若对其他目标施放，则会向其复制50%的伤害。"
       },
       "wrath": {
         "name": "野性弹",
-        "description": "投掷一道自然能量箭，造成 {damage} 点自然伤害。"
+        "description": "投掷一道自然能量箭，造成 {damage} 点自然伤害。",
+        "specNote_balance": "月翼形态下，每次完成施法累积1层月潮（最多3层）。月潮达到3层时，月种变为月涌，天陨变为日醒。"
       },
       "healing_touch": {
         "name": "野性愈合",
@@ -9251,11 +10007,17 @@ export const zh_CN: EnTranslations = {
       },
       "moonfire": {
         "name": "月光风暴",
-        "description": "以月火灼烧敌人，造成 {damage} 点奥术伤害，并附加持续伤害。"
+        "description": "以月火灼烧敌人，造成 {damage} 点奥术伤害，并附加持续伤害。",
+        "specNote_balance": "让它持续燃烧：月种可将其延长6秒。"
+      },
+      "moonseed": {
+        "name": "月种",
+        "description": "仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长6秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。"
       },
       "rejuvenation": {
         "name": "野性绽放",
-        "description": "在 12 秒内为目标恢复 {damage} 点生命值。"
+        "description": "在 12 秒内为目标恢复 {damage} 点生命值。",
+        "specNote_restoration": "种下新的绽放会累积1层繁茂（最多5层）。繁茂达到5层时，迅捷治愈变为盛放。"
       },
       "thorns": {
         "name": "荆棘守护",
@@ -9271,7 +10033,8 @@ export const zh_CN: EnTranslations = {
       },
       "maul": {
         "name": "碎骨击",
-        "description": "一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。"
+        "description": "一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。",
+        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为碎髓：一次高威胁打击，造成78至96点伤害；生命值低于一半时，改为吸收相当于你最大生命值18%的伤害，并返还15点怒气。"
       },
       "growl": {
         "name": "威吓",
@@ -9279,23 +10042,27 @@ export const zh_CN: EnTranslations = {
       },
       "cat_form": {
         "name": "狼形态",
-        "description": "变形为狼：攻击强度随等级提高，攻击使用能量和连击点，产生的威胁值降低 29%。再次施放可返回施法者形态。"
+        "description": "将你化为一头狼：敏捷随你的等级提升，攻击强度 +8 外加每级 2 点，你的攻击消耗能量与连击点，并且你产生的威胁降低 29%。再次施放即可变回施法形态。"
       },
       "claw": {
-        "name": "爪击",
-        "description": "用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限狼形态。"
+        "name": "裂爪",
+        "description": "用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限狼形态。",
+        "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
       "ferocious_bite": {
         "name": "血噬",
-        "description": "终结技，造成 {damage}。仅限狼形态。"
+        "description": "终结技，造成 {damage}。仅限狼形态。",
+        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为血收：一次撕咬，造成91点伤害，每个连击点额外造成55点，并立即引爆你的剐削与血裂的全部剩余伤害，同时恢复30点能量。"
       },
       "swipe": {
         "name": "横扫利爪",
-        "description": "横扫附近敌人，造成 {damage} 点伤害。造成额外威胁值。仅限巨熊形态。"
+        "description": "横扫附近敌人，造成 {damage} 点伤害。造成额外威胁值。仅限巨熊形态。",
+        "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
       "regrowth": {
         "name": "二度绽放",
-        "description": "为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。"
+        "description": "为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。",
+        "specNote_restoration": "种下新的绽放会累积1层繁茂（最多5层）。"
       },
       "barkskin": {
         "name": "橡树皮",
@@ -9311,7 +10078,8 @@ export const zh_CN: EnTranslations = {
       },
       "starfire": {
         "name": "天陨",
-        "description": "召下一道星辰之火，造成 {damage} 点奥术伤害。"
+        "description": "召下一道星辰之火，造成 {damage} 点奥术伤害。",
+        "specNote_balance": "月翼形态下，每次完成施法累积1层月潮（最多3层）。月潮达到3层时，此按钮变为日醒：瞬发打击，造成160至190点自然伤害，并在9秒内额外灼烧75点，恢复35点法力并消耗全部3层。"
       },
       "travel_form": {
         "name": "迅捷形态",
@@ -9327,7 +10095,7 @@ export const zh_CN: EnTranslations = {
       },
       "faerie_fire": {
         "name": "巫光",
-        "description": "使目标的护甲降低 {damage}%，持续 40 秒。无法与削甲叠加。"
+        "description": "将目标的护甲降低 {damage}%，持续 40 秒。"
       },
       "hibernate": {
         "name": "沉眠",
@@ -9350,8 +10118,9 @@ export const zh_CN: EnTranslations = {
         "description": "使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。"
       },
       "rip": {
-        "name": "割裂",
-        "description": "终结技，在 12 秒内造成 {damage} 点流血伤害。消耗连击点。仅限狼形态。"
+        "name": "血隙",
+        "description": "终结技，使目标每 2 秒流血一次，持续 24 秒：36 点伤害外加每消耗 1 点连击点 24 点（5 点连击点：共 {damage} 点）。仅限狼形态。",
+        "specNote_feral": "命中的这一击累积1层古血（最多3层）。"
       },
       "mortal_strike": {
         "name": "致残打击",
@@ -9378,32 +10147,120 @@ export const zh_CN: EnTranslations = {
         "description": "打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）"
       },
       "chain_heal": {
-        "name": "治疗链",
-        "description": "大量治疗一个友方目标，然后跳跃至多2个附近的盟友，每次跳跃的治疗量降低50%。（恢复专精招牌）"
+        "name": "层叠治愈",
+        "description": "治疗一个友方目标{damage}点，随后跳跃至多2名12码内的盟友，每次跳跃治疗量为上一目标的50%。每名被跳跃到的盟友会消耗你剩余的治愈湍流，并立即治疗其消耗量的125%。初始治疗量随法术强度提高。（恢复专精招牌）"
+      },
+      "galeheart_weapon": {
+        "name": "风心武器",
+        "description": "为武器灌注疾风。每第三次命中的武器攻击会回响两次，并触发风暴施法。"
+      },
+      "warspirit_cadence": {
+        "name": "战魂节律",
+        "description": "被动：每第3次命中的武器攻击会触发2次裂风回响，各造成50%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）"
+      },
+      "stormsurge": {
+        "name": "风暴涌动",
+        "description": "被动：先祖打击冷却时，消耗风暴施法有25%几率重置其冷却。连续失败4次后必定重置。（战魂）"
+      },
+      "lifespring_weapon": {
+        "name": "活泉武器",
+        "description": "为武器灌注生命之水，使愈合水流的注入量提高20%。"
+      },
+      "unleash_weapon": {
+        "name": "释放武器",
+        "description": "释放当前的武器灌注。焰烙造成54至64点火焰伤害，获得30%法术强度加成，并获得2层雷霆。风心用武器攻击，推进战魂节律，并使攻击速度提高20%，持续6秒。缚石造成75%武器伤害，迫使目标攻击你，并使你受到的伤害降低20%，持续4秒。活泉消耗目标身上的愈合水流，立即治疗其剩余治疗量的125%，并使8秒内下一次受到的伤害降低，降低量等于实际恢复生命值的50%。"
+      },
+      "elemental_trance": {
+        "name": "元素恍惚",
+        "description": "进入元素恍惚状态，持续15秒：受到的伤害降低30%，你造成的所有伤害的20%转化为法力值。（战魂特色技能）"
+      },
+      "primal_exaltation": {
+        "name": "原初升华",
+        "description": "解放你的专精力量，持续12秒，强化其常规循环。（萨满祭司天赋）"
+      },
+      "stoneward": {
+        "name": "石之守护",
+        "description": "使一名盟友获得6层、持续60秒的保护。受到伤害时消耗一层，恢复5%最大生命值，每3秒最多触发一次。（萨满祭司天赋）"
+      },
+      "tidecall": {
+        "name": "潮汐召唤",
+        "description": "为一个友方目标恢复{damage}点生命值。治疗量随法术强度提高。将过量治疗前的完整治疗量加入愈合水流，最多为目标最大生命值的30%。"
+      },
+      "soul_harvest": {
+        "name": "精华收割",
+        "description": "撕扯敌人的灵魂，造成 {damage} 点暗影伤害，并生成 1 枚灵魂碎片，最多 5 枚。"
+      },
+      "soul_lance": {
+        "name": "灵魂之枪",
+        "description": "掷出一柄幽魂之枪，造成 {damage} 点暗影伤害。对带有你的骸骨印记的目标，其中50%的伤害会累积至印记。"
+      },
+      "raise_graveguard": {
+        "name": "唤醒墓卫",
+        "description": "唤醒一名永久的防御型伙伴。墓卫会自动嘲讽，通过墓域为你拦截20%的伤害；收割号令会使其嘲讽并在4秒内受到的伤害降低30%。"
+      },
+      "raise_skeletal_warrior": {
+        "name": "唤醒骷髅战士",
+        "description": "消耗1枚灵魂碎片，将一名永久骷髅战士加入你的2槽统御。只能有一名为你效命。它每6秒对附近敌人造成45%的顺劈伤害，收割号令会使目标减速40%，持续4秒。"
+      },
+      "raise_bone_mage": {
+        "name": "唤醒骸骨法师",
+        "description": "消耗2枚灵魂碎片，将一名永久远程骸骨法师加入你的2槽统御。只能有一名为你效命。它的攻击使目标受到的魔法伤害提高5%，持续6秒；收割号令将此弱点提高至8%。"
+      },
+      "bone_armor": {
+        "name": "骸骨护甲",
+        "description": "以骸骨环绕自身，吸收相当于最大生命值 20% 的伤害。"
+      },
+      "corpse_explosion": {
+        "name": "尸骸爆裂",
+        "description": "优先牺牲骸骨法师，其次是骷髅战士，只有在别无选择时才牺牲墓翼。同类仆从中先选择剩余持续时间最短者，再选择最虚弱者，对目标地点的敌人造成 {damage} 点暗影伤害。"
+      },
+      "funeral_harvest": {
+        "name": "葬魂收割",
+        "description": "当一个近期被你或你的亡灵伤害过的敌人死亡时，你获得1枚灵魂碎片。每3秒最多触发一次。"
+      },
+      "ossuary_mark": {
+        "name": "骸骨印记",
+        "description": "为敌人标记12秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。"
+      },
+      "unholy_command": {
+        "name": "邪秽号令",
+        "description": "消耗 3 枚灵魂碎片号令所有亡灵，使其伤害提高 25%、行动速度提高 20%，持续 12 秒。"
+      },
+      "reaping_command": {
+        "name": "收割号令",
+        "description": "消耗2枚灵魂碎片，命令所有亡灵仆从同时攻击。墓卫嘲讽并防御，骷髅战士牵制目标，骸骨法师暴露魔法防御，墓翼撕裂所有被击中的敌人。"
+      },
+      "sacrifice_undead": {
+        "name": "献祭亡灵",
+        "description": "摧毁一名统御仆从，恢复最大生命值的 25%。"
+      },
+      "raise_gravewing": {
+        "name": "唤醒墓翼",
+        "description": "消耗2枚灵魂碎片，将一只永久墓翼加入你的2槽统御。只能有一只为你效命。它每5秒对附近敌人造成65%的顺劈伤害，收割号令使所有被击中的敌人在5秒内受到的伤害提高8%。"
+      },
+      "army_of_the_dead": {
+        "name": "亡者军团",
+        "description": "开启墓穴传送门，在你选择的统御仆从之外额外召唤一名骷髅战士、骸骨法师和墓翼，持续 20 秒。"
       },
       "metamorphosis": {
-        "name": "恶魔变形",
-        "description": "化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）"
+        "name": "巫妖形态",
+        "description": "化为一具巫妖，持续 20 秒，生成 3 块灵魂碎片，并将你的法术伤害与施法速度提高 20%。你的亡灵造成的伤害提高 50%，行动速度加快 20%，而灵魂之枪会贯穿其目标，以其伤害的 50% 击中至多 2 名附近的敌人。（死灵术标志技能）"
       },
       "holy_shock": {
         "name": "神圣震击",
         "description": "以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）"
       },
-      "aura_surge": {
-        "name": "曙光弹射",
-        "description": "掷出曙光铸造的盾牌，造成{damage}点神圣伤害并使首要目标沉默2秒，随后弹射至10码内最多2个额外敌人，每次弹射造成75%伤害。（圣骑士天赋）"
-      },
       "holy_shield": {
         "name": "神圣之盾",
-        "description": "以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）"
+        "description": "获得30%格挡，并获得一层吸收护盾，吸收量为最大生命值的{damage}%，持续{duration}秒，同时释放一股威胁脉冲。神圣升华会强化并延长这层防御。"
       },
       "bestial_wrath": {
         "name": "狂野怒火",
-        "description": "使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）"
+        "description": "给予 3 层兽群凶性。你在 20 秒内的下一次释放野兽，其击打与拍击伤害提高 50%，且其狂乱持续 12 秒而非 8 秒。（野兽控制标志技能）"
       },
       "trueshot_aura": {
         "name": "强击光环",
-        "description": "鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）"
+        "description": "将 30 米内盟友的攻击强度提高 10%，持续 30 分钟。（射击标志技能）"
       },
       "wyvern_sting": {
         "name": "翼龙钉刺",
@@ -9423,31 +10280,31 @@ export const zh_CN: EnTranslations = {
       },
       "cold_blood": {
         "name": "冷血",
-        "description": "集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）"
+        "description": "凝聚你的杀意，使你的下一次攻击必定爆击。（刺杀标志技能）"
       },
       "blade_flurry": {
         "name": "剑刃乱舞",
-        "description": "释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）"
+        "description": "掀起一阵刀刃的乱舞，将攻击速度提高 20%，持续 12 秒。（战斗标志技能）"
       },
       "hemorrhage": {
         "name": "出血",
-        "description": "攻击敌人，造成武器伤害加{damage}点伤害，并在12秒内造成流血伤害。奖励1个连击点。（敏锐专精招牌）"
+        "description": "以武器伤害外加 {damage} 点击打敌人，造成持续 12 秒的流血伤害，并使其所受的流血伤害提高 40%。给予 1 点连击点。每第 2 次使用增加 1 层幽暗（最多 3 层）。（敏锐标志技能）"
       },
       "power_infusion": {
         "name": "能量灌注",
-        "description": "向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）"
+        "description": "为一个友方目标涂敷圣油，将伤害、治疗与施法速度提高 20%，持续 15 秒。"
       },
       "holy_nova": {
-        "name": "神圣新星",
-        "description": "引发神圣之光爆炸，为附近盟友恢复{damage}点生命值并伤害附近敌人。（神圣专精招牌）"
+        "name": "旭日圣咏",
+        "description": "治疗 10 米内的盟友 {damage} 点生命，并对同一区域内的敌人造成 24 至 30 点神圣伤害。两者皆随法术强度提升。（神圣基础技能）"
       },
       "shadowform": {
-        "name": "暗影形态",
-        "description": "进入暗影形态，强化暗影魔法直到你切换回来。再次施放可返回普通形态。（暗影专精招牌）"
+        "name": "暮色帷幕",
+        "description": "进入暮色帷幕，将你的暗影伤害提高 25%。再次施放即可离开暮色帷幕。（暗影标志技能）"
       },
       "elemental_mastery": {
         "name": "元素掌握",
-        "description": "呼唤元素掌握，使你的下一个法术变为瞬发。（元素专精招牌）"
+        "description": "在 12 秒内，电弧箭给予 2 点雷霆。你的下一次电弧箭或叉状闪电为瞬发，而你下一次完整的雷霆兑现伤害提高 25%。（元素标志技能）"
       },
       "siphon_life": {
         "name": "生命虹吸",
@@ -9455,7 +10312,7 @@ export const zh_CN: EnTranslations = {
       },
       "conflagrate": {
         "name": "燃尽",
-        "description": "吞噬敌人身上的献祭，将其点燃并造成{damage}点火焰伤害。（毁灭专精招牌）"
+        "description": "将你燃烧契约未来的一跳提前，随后点燃目标，造成 {damage} 点火焰伤害。产生 1 点毁坏和 1 点毁灭性。可存 2 层充能。（毁灭标志技能）"
       },
       "moonkin_form": {
         "name": "枭兽形态",
@@ -9467,15 +10324,35 @@ export const zh_CN: EnTranslations = {
       },
       "swiftmend": {
         "name": "迅捷治愈",
-        "description": "吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）"
+        "description": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。野性绽放与二度绽放的播撒会累加青翠；在 5 层青翠时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）"
+      },
+      "moonlash": {
+        "name": "月涌",
+        "description": "消耗3层月潮，造成{damage}点奥术伤害的强力打击：伤害之选。与日醒消耗同一份月潮，二者只能选其一。"
+      },
+      "sunlance": {
+        "name": "日醒",
+        "description": "消耗3层月潮，造成{damage}点自然伤害，并在9秒内额外灼烧{overTime}点，同时恢复35点法力：法力之选。与月涌消耗同一份月潮，二者只能选其一。"
+      },
+      "redharvest": {
+        "name": "血收",
+        "description": "消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复30点能量。无需连击点也可使用。"
+      },
+      "marrowbreak": {
+        "name": "碎髓",
+        "description": "消耗你的3层古血，造成{damage}点伤害的高威胁重击。生命值低于一半时，改为吸收相当于最大生命值18%的伤害，持续8秒，并返还15点怒气。"
+      },
+      "overbloom": {
+        "name": "盛放",
+        "description": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的60%，这些效果随之移除，并为目标种下一个新的野性绽放。"
       },
       "summon_imp": {
         "name": "召唤烬裔",
-        "description": "召唤一只听从术士命令的烬裔。烬裔会从远处向你的敌人投掷灰烬箭。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
+        "description": "召唤一只听从术士号令的烬裔。烬裔会从远处向你的敌人施放邪能箭。召唤新的恶魔会遣散你当前的恶魔。你同一时间只能拥有一只恶魔。"
       },
       "summon_voidwalker": {
         "name": "召唤幽影",
-        "description": "召唤一只听从术士命令的幽影。幽影是一种坚韧的恶魔，会嘲讽你的敌人并承受打击。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
+        "description": "召唤一只听从术士号令的幽影。这只结实的恶魔会嘲讽敌人，并用深渊锁链把远处的普通敌人拽回攻击范围。首领无法被拉扯。召唤新的恶魔会遣散你当前的恶魔。你同一时间只能拥有一只恶魔。"
       },
       "summon_succubus": {
         "name": "召唤暮裔",
@@ -9491,7 +10368,7 @@ export const zh_CN: EnTranslations = {
       },
       "summon_infernal": {
         "name": "召唤焚炎巨像",
-        "description": "将一只焚炎巨像束缚于你的意志之下，这是一头庞大的破坏巨兽，拥有毁灭性的近战能力，以及所有恶魔中最深厚的生命与护甲。漫长的冷却时间限制了它的原始威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
+        "description": "将一尊焚炎巨像召至目标区域，落地时造成 58-72 点火焰伤害。它会战斗 30 秒且不会取代你的恶魔，每 2 秒灼烧附近的敌人，并每 1 秒产生 1 点毁坏。"
       },
       "summon_doomguard": {
         "name": "召唤亡魂裔",
@@ -9603,7 +10480,7 @@ export const zh_CN: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "破胆怒吼",
-        "description": "一声骇人的怒吼，使 8 码内至多 5 个敌人恐惧逃散 8 秒。伤害可能打破效果。"
+        "description": "一声骇人的怒吼，使 8 米内至多 5 名敌人在恐惧中逃窜 4 秒。伤害可能打断该效果。"
       },
       "revenge": {
         "name": "复仇",
@@ -9626,8 +10503,8 @@ export const zh_CN: EnTranslations = {
         "description": "化身为巨像，持续 20 秒，解除你身上的所有控制效果，并使你造成的伤害提高 20%。"
       },
       "avenging_wrath": {
-        "name": "复仇之翼",
-        "description": "召唤复仇之力，使你的攻击强度提高60、法术强度提高30，持续20秒。（圣骑士天赋）"
+        "name": "复仇之怒",
+        "description": "展开由金色神圣之力凝成的实体羽翼，获得 10 点虔诚，并在 15 秒内使你的技能所产生的虔诚翻倍。同时将你造成的伤害与治疗提高 20%。破晓者：使愤怒之锤可对任何目标使用。"
       },
       "berserk": {
         "name": "赤红迷雾",
@@ -9643,19 +10520,23 @@ export const zh_CN: EnTranslations = {
       },
       "bloodlust": {
         "name": "战鼓",
-        "description": "使30码内的盟友陷入狂乱，攻击速度提高30%，持续15秒。（萨满天赋）"
+        "description": "将 30 米内小队或团队盟友的攻击、施法与引导速度提高 30%，持续 15 秒。受影响的盟友在 10 分钟内无法再次从战鼓或时间加速中获益。（萨满天赋）"
       },
       "chain_lightning": {
         "name": "叉状闪电",
-        "description": "向目标区域投掷闪电，对附近的敌人造成{damage}点伤害。（萨满天赋）"
+        "description": "击中 10 米内至多 3 名敌人，每名造成 {damage} 点自然伤害。元素：命中可给予 1 点雷霆。伤害随法术强度提升。"
+      },
+      "abyssal_rift": {
+        "name": "深渊裂隙",
+        "description": "在选定地点撕开一道裂隙，将8码内的敌人拉向其中心，造成{damage}点暗影伤害，并使其昏迷2秒。首领会受到伤害，但可抵抗拉扯与昏迷。"
       },
       "chaos_bolt": {
         "name": "毁灭箭",
-        "description": "投掷一枚混沌火焰弹，造成{damage}点火焰伤害。（术士天赋）"
+        "description": "消耗 3 点毁坏，掷出一发沉重的混乱之火，造成 {damage} 点火焰伤害。毁灭性使其施法时间缩短 30%。"
       },
-      "cleansing_verdict": {
-        "name": "净化裁决",
-        "description": "净化一个友方目标身上的有害魔法效果，并为其恢复{damage}点生命值。"
+      "dark_pact": {
+        "name": "血契",
+        "description": "牺牲当前生命值的10%，在8秒内吸收相当于最大生命值30%的伤害。"
       },
       "cloak_of_shadows": {
         "name": "暗影斗篷",
@@ -9683,23 +10564,23 @@ export const zh_CN: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "最后祈祷",
-        "description": "立即为你恢复{damage}点生命值。（牧师天赋）"
+        "description": "立即为自己治疗最大生命值的30%。"
       },
       "deterrence": {
         "name": "鬃刺守卫",
         "description": "使你的躲闪几率提高50个百分点，持续10秒。（猎人天赋）"
       },
-      "divine_shield": {
-        "name": "圣光守护",
-        "description": "以神圣之力保护你，在8秒内吸收900点伤害。（圣骑士天赋）"
-      },
       "earthbind": {
         "name": "攫握大地",
-        "description": "将附近的敌人束缚于大地，使其定身2秒。（萨满天赋）"
+        "description": "将目标点 4 米内的敌人定身 2 秒，随后使其减速 40%，持续 6 秒。（萨满天赋）"
       },
       "evocation": {
         "name": "以太之井",
         "description": "快速恢复法力。（法师天赋）"
+      },
+      "flurry_of_knives": {
+        "name": "刀刃乱舞",
+        "description": "掷出飞刀鞭笞6码内的所有敌人，造成{damage}点物理伤害，并获得2个连击点。（潜行者天赋）"
       },
       "frenzied_regeneration": {
         "name": "野性愈合",
@@ -9711,19 +10592,15 @@ export const zh_CN: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "幽魂打击",
-        "description": "攻击敌人，造成武器伤害加{damage}点伤害，短暂提高躲闪并获得1个连击点。（潜行者天赋）"
+        "description": "以武器伤害外加 {damage} 点击打敌人，并将你的躲闪几率提高 15%，持续 7 秒。给予 1 点连击点。（潜行者天赋）"
       },
       "hammer_of_wrath": {
-        "name": "鸣钟之锤",
-        "description": "向受伤的敌人投掷神圣之锤，造成{damage}点神圣伤害。只能对生命值低于20%的目标使用。（圣骑士天赋）"
+        "name": "愤怒之锤",
+        "description": "掷出一柄神圣之锤，造成 {damage} 点伤害并产生 1 点虔诚。可在目标生命值低于 20% 时使用，或在神圣升华或复仇之怒期间使用。破晓之怒会额外给予一次可对任何目标使用的施放，它无视当前的冷却，且伤害提高 20%。升华使其伤害提高 30%。"
       },
       "healing_stream": {
         "name": "泉涌",
         "description": "在12秒内为一个友方目标恢复120点生命值。（萨满天赋）"
-      },
-      "holy_wrath": {
-        "name": "圣徒之怒",
-        "description": "释放神圣之力，对附近的敌人造成{damage}点伤害。（圣骑士天赋）"
       },
       "howl_of_terror": {
         "name": "恐惧嚎叫",
@@ -9735,7 +10612,7 @@ export const zh_CN: EnTranslations = {
       },
       "inner_focus": {
         "name": "静心",
-        "description": "使你的下一个法术不消耗资源。持续60秒。（牧师天赋）"
+        "description": "使你的下一个牧师法术免费且无法被打断。持续 60 秒。"
       },
       "innervate": {
         "name": "生命树液",
@@ -9781,6 +10658,10 @@ export const zh_CN: EnTranslations = {
         "name": "集体逆转",
         "description": "倒转队伍或团队中每位阵亡成员的时间线，使其在遗体旁以30%生命值和法力值复活。无法在战斗中施放。（时空魔法）"
       },
+      "ancestor_return": {
+        "name": "先祖归来",
+        "description": "呼唤小队或团队中所有阵亡成员，使其在尸体处复活并恢复30%生命值和法力值。战斗中无法施放。（灵愈）"
+      },
       "temporal_rewind": {
         "name": "回溯",
         "description": "向队伍或团队发出一道奥术波，回溯时间，为 40 码内每名盟友恢复其过去 5 秒所受伤害的 30%（最多为其最大生命值的 35%）。此效果无法暴击。（时光术）"
@@ -9803,7 +10684,7 @@ export const zh_CN: EnTranslations = {
       },
       "mind_sear": {
         "name": "灼思",
-        "description": "在目标区域引导暗影能量，每秒对附近的敌人造成{damage}点伤害。（牧师天赋）"
+        "description": "引导 3 秒，每秒对目标区域 8 米内的敌人造成 {damage} 点暗影伤害。伤害随法术强度提升。（牧师天赋）"
       },
       "multi_shot": {
         "name": "分裂射击",
@@ -9811,7 +10692,7 @@ export const zh_CN: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "圣歌愈疗",
-        "description": "为附近的盟友恢复{damage}点生命值。（牧师天赋）"
+        "description": "治疗 30 米内的盟友 {damage} 点生命。治疗量随法术强度提升。（神圣）"
       },
       "preparation": {
         "name": "应变",
@@ -9823,11 +10704,11 @@ export const zh_CN: EnTranslations = {
       },
       "psychic_scream": {
         "name": "心灵尖啸",
-        "description": "使附近的敌人恐惧，最多持续4秒。受到伤害可能打破该效果。（牧师天赋）"
+        "description": "使 8 米内的敌人陷入恐惧，最多持续 4 秒。伤害可能打断该效果。"
       },
       "counter_shot": {
         "name": "静默射击",
-        "description": "一记快射，打断目标的施法，并在4秒内封锁该学派。"
+        "description": "打断目标，并使其在 4 秒内无法施放该系法术。"
       },
       "rebuke": {
         "name": "谴喝",
@@ -9845,6 +10726,10 @@ export const zh_CN: EnTranslations = {
         "name": "烟幕",
         "description": "遁入烟雾之中，使你的躲闪几率提高30%，持续8秒。"
       },
+      "sacrilegious_march": {
+        "name": "亵渎行军",
+        "description": "移动速度提高35%，但每秒牺牲最大生命值的2%。再次施放可取消。生命值降至20%时会自动关闭。"
+      },
       "spellsteal": {
         "name": "夺法",
         "description": "从敌人身上窃取一个有益魔法效果并转移到自己身上。"
@@ -9858,12 +10743,37 @@ export const zh_CN: EnTranslations = {
         "description": "猛然头槌，打断目标的施法，并在4秒内封锁该学派。"
       },
       "spell_lock": {
-        "name": "封口令",
-        "description": "在施法中沉默目标，并在5秒内封锁该法术学派。"
+        "name": "深渊封口",
+        "description": "打断敌人的施法，并使其在 4 秒内无法施放该系法术。"
+      },
+      "thieves_chorus": {
+        "name": "盗贼合唱",
+        "description": "一声呼哨激励你的队伍，使攻击、施法和引导速度提高10%，持续10秒。近期受过群体加速激励的盟友过于疲惫，无法受益。（潜行者天赋）"
       },
       "tranquility": {
         "name": "林地之歌",
         "description": "引导恢复能量4秒，每秒为30码内的盟友恢复42至52点生命值。（德鲁伊天赋）"
+      },
+      "venom_dart": {
+        "name": "毒镖",
+        "description": "弹出一枚毒镖，造成{damage}点自然伤害。获得1个连击点。",
+        "specNote_assassination": "累积1层毒祭，并使你的蚀毒伤口延长6秒（伤口持续时间不会超过20秒）。"
+      },
+      "body_blow": {
+        "name": "大摆拳",
+        "description": "沉重的一击，造成130%武器伤害外加10点。奖励2个连击点，并使红线加深1格（最多4格）。（战斗专精）"
+      },
+      "knockout_blow": {
+        "name": "眼前一黑",
+        "description": "以一记击倒终结红线：造成45点伤害，每个连击点额外造成35点，你累积的每格红线使伤害提高25%，并恢复25点能量。在红线耗尽前使用，否则这记击倒就会作废。（战斗专精）"
+      },
+      "veilstrike": {
+        "name": "罩影突袭",
+        "description": "持续6秒：你的暮帷先制技无需潜行即可从任意角度使用，你造成的伤害提高10%，且期间的第一次潜伏突袭造成双倍伤害。（敏锐专精）"
+      },
+      "venomrend": {
+        "name": "蚀毒撕裂",
+        "description": "消耗你的6层毒祭：造成100点伤害，每个连击点额外造成55点，立即引爆你的流血效果的全部剩余伤害，随后施加一个新的蚀毒伤口（20秒内造成120点伤害）。恢复20点能量。（刺杀专精）"
       },
       "typhoon": {
         "name": "台风",
@@ -9872,6 +10782,30 @@ export const zh_CN: EnTranslations = {
       "voidfeast": {
         "name": "虚空盛宴",
         "description": "吞噬一个魔法效果（敌人的增益或盟友的减益），并恢复你最大生命值的6%。"
+      },
+      "veilstep": {
+        "name": "帷幕步",
+        "description": "朝面向的方向穿越帷幕。"
+      },
+      "scouring_mercy": {
+        "name": "涤罪慈悲",
+        "description": "以神圣之力净化一名敌人，或立即救治一名友方目标。教义专属技能。"
+      },
+      "seraphic_vigil": {
+        "name": "炽天使守望",
+        "description": "为一名盟友施加守望祝福，在其陷入危险时恢复生命值。赐福专属技能。"
+      },
+      "summon_tithefiend": {
+        "name": "召唤什一魔",
+        "description": "消耗幽暗什一来召唤一只临时存在的什一魔，追猎你的塑像。晚祷专属技能。"
+      },
+      "martyrs_aegis": {
+        "name": "殉道者圣盾",
+        "description": "使一名盟友受到的伤害降低 40%，持续 8 秒。"
+      },
+      "choir_of_deliverance": {
+        "name": "救赎圣咏团",
+        "description": "引导6秒，每2秒为30码内的队伍成员恢复{damage}点生命值。治疗量随法术强度提高。"
       },
       "bear_charge": {
         "name": "巨熊冲锋",
@@ -9887,7 +10821,8 @@ export const zh_CN: EnTranslations = {
       },
       "rake": {
         "name": "剐削",
-        "description": "一记潜行起手技，以武器伤害外加{damage}撕抓敌人，并造成持续9秒的流血伤害。获得1点连击点数。仅限狼形态使用。"
+        "description": "撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限狼形态。",
+        "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
       "revive_pet": {
         "name": "修补",
@@ -11404,6 +12339,18 @@ export const zh_CN: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "龙喉迅猛龙的缰绳"
       },
+      "rimefang": {
+        "name": "霜牙"
+      },
+      "marrowpoint": {
+        "name": "穿髓尖刃"
+      },
+      "duskwhisper": {
+        "name": "黄昏低语"
+      },
+      "boneglass_shiv": {
+        "name": "骨璃小刀"
+      },
       "moggers_hide_quiver": {
         "name": "莫格的兽皮箭袋"
       },
@@ -11547,6 +12494,9 @@ export const zh_CN: EnTranslations = {
       },
       "conjured_bread4": {
         "name": "魔法盛宴面包"
+      },
+      "soul_stone": {
+        "name": "灵魂石"
       },
       "bristleback_maul": {
         "name": "加洛格拉斯之锤"
@@ -12933,9 +13883,6 @@ export const zh_CN: EnTranslations = {
       "gloomshade": {
         "name": "幽影"
       },
-      "duskborn": {
-        "name": "暮裔"
-      },
       "grix_the_tunnelking": {
         "name": "隧道之王格里克斯"
       },
@@ -12957,17 +13904,8 @@ export const zh_CN: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "缚魂者玛尔德雷克"
       },
-      "spellhound": {
-        "name": "噬法猎犬"
-      },
-      "warfiend": {
-        "name": "战魔"
-      },
       "pyre_colossus": {
         "name": "焚炎巨像"
-      },
-      "wraithborn": {
-        "name": "亡魂裔"
       },
       "choirmother_selthe": {
         "name": "唱诗母塞尔瑟"
@@ -13007,6 +13945,18 @@ export const zh_CN: EnTranslations = {
       },
       "water_elemental": {
         "name": "水元素"
+      },
+      "graveguard": {
+        "name": "墓卫"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "骷髅战士"
+      },
+      "necromancy_bone_mage": {
+        "name": "骸骨法师"
+      },
+      "necromancy_gravewing": {
+        "name": "墓翼"
       }
     },
     "npcs": {
@@ -13633,6 +14583,16 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "缚晓圣典",
+        "text": "圣光在你体内并非静默不语，{playerName}。我看着你让亡者安息，也相信你已经准备好学习极少有圣骑士能够掌握的仪式：唤回仪式，以此将逝去的灵魂召回人世。仪式经文记载在我保管的缚晓圣典中，但只要躁动的亡者仍在这片土地上游荡，书本便带不来祝福。再让 6 具躁动骸骨归于尘土，我便开始教你。",
+        "completion": "礼拜堂庭院终于安静下来。你已经可以学习经文了，{playerName}，但唤回仪式不能在温暖的礼拜堂中吟诵。必须前往生死帷幕薄弱之处。我会把圣典带到北方的泥沼沼泽。到那里来找我，我们将完成这场仪式。",
+        "objectives": {
+          "0": {
+            "label": "让躁动骸骨安息"
+          }
+        }
+      },
       "q_bandits": {
         "title": "谷地强盗",
         "text": "一群割喉强盗在西南山丘扎营，本周已经抢了三辆货车。击杀10名谷地强盗。",
@@ -13783,6 +14743,16 @@ export const zh_CN: EnTranslations = {
         "title": "芦苇中不得安息",
         "text": "香炉上的仪式会让溺亡者复起，如今它已唤起一个强大到足以统领他们的存在。守望者称他为溺亡督军，只要他还占据沉没的礼拜堂，死者便阵列不散。打倒他，{playerName}，其余的自会溃散回泥沼。",
         "completion": "你给了死者比他们主人更多的怜悯。拿着，你早已应得。",
+        "objectives": {
+          "0": {
+            "label": "让溺亡死者安息"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "唤回仪式",
+        "text": "你果然跟随我进入了沼泽，{playerName}。很好。缚晓圣典就在这里，而这片积水之地正适合吟诵其中的经文：没有哪里比亡者不肯长眠之处更接近生死之间的帷幕。但那些溺亡者会在吟诵中途把你的声音拖入水底。先清理出适合仪式的地方：让 8 名溺亡死者安息，然后我们一同将此地圣化。",
+        "completion": "跪下，{playerName}，大声念出经文。就是这样。你感觉到了吗？你手中的圣光不再只能治愈生者，也能召回已经离世的人。请明智地使用它。将灵魂召回一场毫无希望的战斗是残忍，而非仁慈。起身吧，救赎者。",
         "objectives": {
           "0": {
             "label": "让溺亡死者安息"
@@ -16254,33 +17224,33 @@ export const zh_CN: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "灰烬追猎者装备",
-        "bonus2": "战争防御等级提高 40 点。",
-        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
-        "bonus7": "战争攻击等级和防御等级提高 80 点。击杀敌对玩家会触发“灰烬疾行”，使移动速度提高 40%，持续 6 秒。"
+        "bonus2": "战争防御等级提高 40。",
+        "bonus4": "战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击与防御等级提高 80。击杀敌对玩家可获得灰烬之步，使移动速度提高 40%，持续 6 秒。"
       },
       "warfare_cinderweave": {
         "name": "烬织法衣",
-        "bonus2": "战争防御等级提高 40 点。",
-        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
-        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。"
+        "bonus2": "战争防御等级提高 40。",
+        "bonus4": "战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击与防御等级提高 80。你的法术有 15% 的几率给予余烬守护，在 8 秒内吸收 120 点伤害。"
       },
       "warfare_furyforged": {
         "name": "怒铸战装",
-        "bonus2": "战争防御等级提高 40 点。",
-        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
-        "bonus7": "战争攻击等级和防御等级提高 80 点。击杀敌对玩家会触发“不破誓约”，吸收 200 点伤害，持续 10 秒。"
+        "bonus2": "战争防御等级提高 40。",
+        "bonus4": "战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击与防御等级提高 80。击杀敌对玩家可获得不破之誓，在 10 秒内吸收 200 点伤害。"
       },
       "warfare_stormbound": {
         "name": "缚雷法衣",
-        "bonus2": "战争防御等级提高 40 点。",
-        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
-        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。"
+        "bonus2": "战争防御等级提高 40。",
+        "bonus4": "战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击与防御等级提高 80。你的法术有 15% 的几率给予余烬守护，在 8 秒内吸收 120 点伤害。"
       },
       "warfare_thornhide": {
         "name": "荆棘皮甲",
-        "bonus2": "战争防御等级提高 40 点。",
-        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
-        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“棘刺护身”，躲闪几率提高 15%，持续 6 秒。"
+        "bonus2": "战争防御等级提高 40。",
+        "bonus4": "战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击与防御等级提高 80。你的法术有 15% 的几率给予荆棘守护，使躲闪提高 15%，持续 6 秒。"
       },
       "wyrmshadow": {
         "name": "夜牙法衣",

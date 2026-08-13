@@ -35,6 +35,8 @@
 // state routes through the seam.
 
 import { lineOfSightClear } from '../colliders';
+import { packlordPetHasteMultiplier } from '../combat/hunter_packlord';
+import { hunterPetFerocityDamageMultiplier } from '../combat/hunter_shared';
 import { isMobSpellResisted } from '../combat/spell_resist';
 import { MOBS } from '../data';
 import { pctValue } from '../entity';
@@ -45,6 +47,7 @@ import type { SimContext } from '../sim_context';
 import { canDetectStealthedTarget } from '../threat';
 import {
   type Aura,
+  armorReduction,
   DT,
   dist2d,
   type Entity,
@@ -56,6 +59,7 @@ import {
 } from '../types';
 import { isTameableFamily, petHeelSpeed, petOwnerScaling } from './pet_scaling';
 import { petCanForceTaunt } from './pet_taunt_gate';
+import { tryUseWarlockPetSkill } from './warlock_pet_skills';
 
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
 const PET_LEASH = 40; // yards from the owner before a pet gives up its target
@@ -84,7 +88,15 @@ const PET_OWNER_IDLE_TICKS = 1200;
 export function updatePet(ctx: SimContext, pet: Entity): void {
   const owner = pet.ownerId !== null ? ctx.entities.get(pet.ownerId) : null;
   if (owner?.kind !== 'player' || !ctx.players.has(owner.id)) {
-    ctx.despawnPersistentPet(pet);
+    if (pet.templateId === 'pyre_colossus') ctx.despawnPet(pet);
+    else ctx.despawnPersistentPet(pet);
+    return;
+  }
+  if (
+    pet.templateId === 'pyre_colossus' &&
+    (owner.dead || !pet.auras.some((aura) => aura.id === 'pyre_guardian'))
+  ) {
+    ctx.despawnPet(pet);
     return;
   }
   // Ahead of the channel/stun early-outs so a gear swap reaches the pet on the very
@@ -95,6 +107,10 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   if (ctx.isStunned(pet)) return;
   ctx.syncPetAspect(pet, owner);
   pet.petTauntTimer = Math.max(0, pet.petTauntTimer - DT);
+  if (pet.petSkillTimer !== undefined) {
+    pet.petSkillTimer = Math.max(0, pet.petSkillTimer - DT);
+    if (pet.petSkillTimer < 1e-6) pet.petSkillTimer = 0;
+  }
   if (!pet.inCombat && ctx.tickCount % 40 === 0 && pet.hp < pet.maxHp) {
     pet.hp = Math.min(pet.maxHp, pet.hp + Math.max(1, Math.round(pet.maxHp * 0.02)));
   }
@@ -135,6 +151,7 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     }
     const reach = ranged ? ranged.range : MELEE_RANGE * 0.8;
     const d = dist2d(pet.pos, target.pos);
+    if (tryUseWarlockPetSkill(ctx, pet, target, petRangedAttack)) return;
     if (d > reach) {
       if (!ctx.isRooted(pet))
         ctx.moveToward(pet, target.pos, pet.moveSpeed * ctx.moveSpeedMult(pet));
@@ -162,9 +179,17 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
       pet.swingTimer -= DT;
       if (pet.swingTimer <= 0) {
         if (ranged) petRangedAttack(ctx, pet, target, ranged);
-        else ctx.mobSwing(pet, target);
+        else {
+          ctx.mobSwing(pet, target);
+          if (template?.petCleave && pet.petTauntTimer <= 0) {
+            petCleaveAttack(ctx, pet, target, template.petCleave);
+            pet.petTauntTimer = template.petCleave.cooldown;
+          }
+        }
         // pet_spellhaste (Metamorphosis) speeds the demon's attack/cast cadence.
-        pet.swingTimer = (pet.weapon.speed * ctx.swingIntervalMult(pet)) / petHasteMult(pet);
+        pet.swingTimer =
+          (pet.weapon.speed * ctx.swingIntervalMult(pet)) /
+          (petHasteMult(pet) * packlordPetHasteMultiplier(ctx, pet));
       }
     }
     return;
@@ -376,7 +401,7 @@ export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
   pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, pet.hp + Math.max(0, gained)));
 }
 
-function petDamageMult(ctx: SimContext, pet: Entity): number {
+export function petDamageMult(ctx: SimContext, pet: Entity): number {
   if (pet.ownerId === null) return 1;
   let mult = 1;
   for (const a of pet.auras) {
@@ -384,7 +409,32 @@ function petDamageMult(ctx: SimContext, pet: Entity): number {
   }
   const ownerMeta = ctx.players.get(pet.ownerId);
   if (ownerMeta) mult *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
+  mult *= hunterPetFerocityDamageMultiplier(ctx, pet);
   return mult;
+}
+
+export function petCleaveAttack(
+  ctx: SimContext,
+  pet: Entity,
+  primaryTarget: Entity,
+  cleave: { radius: number; mult: number; cooldown: number },
+): void {
+  const secondaryTargets = ctx
+    .hostilesInRadius(pet, primaryTarget.pos, cleave.radius)
+    .filter(
+      (target) =>
+        target.id !== primaryTarget.id && target.id !== pet.id && ctx.hasLineOfSight(pet, target),
+    );
+  if (secondaryTargets.length === 0) return;
+  const raw =
+    (ctx.rng.range(pet.weapon.min, pet.weapon.max) +
+      (ctx.effectiveAttackPower(pet) / 14) * pet.weapon.speed) *
+    petDamageMult(ctx, pet) *
+    cleave.mult;
+  for (const target of secondaryTargets) {
+    const damage = raw * (1 - armorReduction(ctx.effectiveArmor(target), pet.level));
+    ctx.dealDamage(pet, target, Math.max(1, Math.round(damage)), false, 'physical', null, 'hit');
+  }
 }
 
 // Pet attack/cast speed multiplier from pet_spellhaste auras (Metamorphosis: +20% cast
@@ -409,6 +459,12 @@ export function petRangedAttack(
   ranged: {
     range: number;
     school: Aura['school'];
+    ability?: string;
+    name?: string;
+    spellVuln?: {
+      amp: number;
+      duration: number;
+    };
     jet?: {
       total: number;
       duration: number;
@@ -424,6 +480,7 @@ export function petRangedAttack(
     targetId: target.id,
     school: ranged.school,
     fx: 'projectile',
+    ability: ranged.ability,
   });
   // The imp's bolt resolves on arrival (projectile_travel), not the tick it is hurled;
   // it fizzles if the pet or its target dies before impact.
@@ -436,7 +493,7 @@ export function petRangedAttack(
         amount: 0,
         crit: false,
         school: ranged.school,
-        ability: null,
+        ability: ranged.name ?? null,
         kind: 'resist',
       });
       ctx.enterCombat(src, tgt);
@@ -448,7 +505,33 @@ export function petRangedAttack(
       (ctx.effectiveAttackPower(src) / 14) * src.weapon.speed;
     if (crit) dmg *= 2;
     dmg *= petDamageMult(ctx, src);
-    ctx.dealDamage(src, tgt, Math.max(1, Math.round(dmg)), crit, ranged.school, null, 'hit');
+    ctx.dealDamage(
+      src,
+      tgt,
+      Math.max(1, Math.round(dmg)),
+      crit,
+      ranged.school,
+      ranged.name ?? null,
+      'hit',
+      false,
+      undefined,
+      true,
+      false,
+      false,
+      ranged.ability ?? null,
+    );
+    if (ranged.spellVuln && src.ownerId !== null && !tgt.dead) {
+      ctx.applyAura(tgt, {
+        id: 'raise_bone_mage',
+        name: 'Raise Bone Mage',
+        kind: 'spellvuln',
+        remaining: ranged.spellVuln.duration,
+        duration: ranged.spellVuln.duration,
+        value: ranged.spellVuln.amp,
+        sourceId: src.ownerId,
+        school: 'shadow',
+      });
+    }
   });
 }
 

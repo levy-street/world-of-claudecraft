@@ -56,11 +56,18 @@ import {
   recordDeedUnlock,
   recordDeedUnlocks,
 } from '../server/deeds_records';
+import { drainActivity } from '../server/discord_activity';
 import { onDeedRecorded as onEpicDeedRecorded } from '../server/epic/mirror';
 import { GameServer } from '../server/game';
 import { onDeedRecorded as onSteamDeedRecorded } from '../server/steam/mirror';
 import { DEEDS } from '../src/sim/content/deeds';
+import { RELIQUARY_MARK_IDS, RELIQUARY_PAGES } from '../src/sim/content/reliquary';
+import { grantDeed, markItemDiscovered } from '../src/sim/deeds';
+import { mountItemId } from '../src/sim/mounts';
 import { announceAttunement } from '../src/sim/professions/attunement_events';
+import { noteReliquaryMark, RELIQUARY_COMPLETION_DEED_IDS } from '../src/sim/reliquary';
+import type { CharacterState } from '../src/sim/sim';
+import { Sim } from '../src/sim/sim';
 import type { DeedDef } from '../src/sim/types';
 
 const insertMock = vi.mocked(insertCharacterDeed);
@@ -995,5 +1002,384 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
     expect(insertMock.mock.calls.map((c) => c[0].deedId)).toContain('prog_first_steps');
     expect(broadcastsFlagMock).not.toHaveBeenCalled();
     expect(broadcastSpy).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 18: the reliquaryUnlock illumination arm in detectActivity (marquee
+// only, first-ever only, fail-closed, behind the one deed-broadcasts consent
+// read), plus the completion-ladder acceptance drive through the REAL grant
+// path (sim fill -> deedUnlocked -> observer -> record + feed + marquee).
+// ---------------------------------------------------------------------------
+
+describe('reliquaryUnlock illumination fan-out through GameServer.detectActivity', () => {
+  let server: GameServer;
+
+  function fakeWs() {
+    const fc = {
+      sent: [] as unknown[],
+      ws: { readyState: 1, send: (p: string) => fc.sent.push(JSON.parse(p)) },
+    };
+    return fc;
+  }
+
+  const PAGE_ID = 'conquerors_hollow_crypt';
+
+  beforeEach(() => {
+    server = new GameServer();
+    drainActivity(); // the activity queue is module-global; start each test empty
+  });
+
+  function detect(events: unknown[]): void {
+    (server as unknown as { detectActivity(events: unknown[]): void }).detectActivity(events);
+  }
+
+  function joinAt(
+    accountId: number,
+    characterId: number,
+    name: string,
+    state: CharacterState | null = null,
+  ) {
+    const session = server.join(
+      fakeWs().ws as never,
+      accountId,
+      characterId,
+      name,
+      'warrior',
+      state,
+    );
+    if ('error' in session) throw new Error(session.error);
+    return session;
+  }
+
+  /** Every relic of an all-item page, in catalog order. Throws rather than
+   *  filtering on a mixed-kind page: the retro rig below fills a page purely
+   *  through bags, which only an all-item page can complete. */
+  function relicItemIds(pageId: string): string[] {
+    const page = RELIQUARY_PAGES.find((p) => p.id === pageId);
+    if (!page) throw new Error(`unknown reliquary page ${pageId}`);
+    return page.relics.map((relic) => {
+      if (relic.kind !== 'item') throw new Error(`${pageId} is not an all-item page`);
+      return relic.itemId;
+    });
+  }
+
+  /** A pre-Phase-18 veteran save: bags already hold every relic of `pageId`,
+   *  but the blob predates BOTH the discovery ledger and the illuminatedPages
+   *  set, so the join seed pass re-discovers the whole page and completes it
+   *  retro. Built on a throwaway sim so the live fills that stock the bags
+   *  never reach the rig's own server. */
+  function veteranStateFor(pageId: string): CharacterState {
+    const seed = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const pid = seed.addPlayer('warrior', 'Seeded');
+    for (const itemId of relicItemIds(pageId)) seed.addItem(itemId, 1, pid);
+    const state = seed.serializeCharacter(pid) as
+      | (CharacterState & { deedStats?: unknown; reliquary?: unknown })
+      | null;
+    if (!state) throw new Error('the seeded character serialized to null');
+    state.deedStats = undefined;
+    state.reliquary = undefined;
+    return state;
+  }
+
+  /** A synthetic first-ever illumination event, the sim's Phase 18 shape. */
+  function illumEvent(pid: number, overrides: Record<string, unknown> = {}) {
+    return {
+      type: 'reliquaryUnlock',
+      pid,
+      itemId: 'cryptbone_helm',
+      pageIds: [PAGE_ID],
+      illuminatedPageId: PAGE_ID,
+      ...overrides,
+    };
+  }
+
+  it('a first-ever non-retro illumination broadcasts the marquee behind ONE opt-out read', async () => {
+    const session = joinAt(21, 84, 'Lumina');
+    const illumSpy = vi.spyOn(server.social, 'broadcastIllumination').mockResolvedValue(undefined);
+    broadcastsFlagMock.mockClear();
+    detect([illumEvent(session.pid)]);
+    await settle();
+    expect(illumSpy).toHaveBeenCalledTimes(1);
+    expect(illumSpy).toHaveBeenCalledWith({ characterId: 84, name: 'Lumina' }, PAGE_ID);
+    expect(broadcastsFlagMock).toHaveBeenCalledTimes(1);
+    expect(broadcastsFlagMock).toHaveBeenCalledWith(21);
+    // Marquee only: no Discord feed card and no character_deeds write ride
+    // this arm (illumination is not a deed unlock).
+    expect(drainActivity()).toHaveLength(0);
+    expect(insertMock).not.toHaveBeenCalled();
+    expect(insertDeedsMock).not.toHaveBeenCalled();
+  });
+
+  it('a RETRO illumination produces zero traffic and zero opt-out reads', async () => {
+    // The on-join seed pass re-emits with retro: true; a veteran's first
+    // login after catalog growth must never marquee (the deedUnlocked rule),
+    // and the gate must sit BEFORE the consent read (the login-storm rule).
+    const session = joinAt(22, 85, 'Veterana');
+    const illumSpy = vi.spyOn(server.social, 'broadcastIllumination').mockResolvedValue(undefined);
+    broadcastsFlagMock.mockClear();
+    detect([illumEvent(session.pid, { retro: true })]);
+    await settle();
+    expect(illumSpy).not.toHaveBeenCalled();
+    expect(broadcastsFlagMock).not.toHaveBeenCalled();
+    // Decisive contrast: the same event without retro fires through the same
+    // spy, so the zeroes above cannot come from a drifted spy target.
+    detect([illumEvent(session.pid)]);
+    await settle();
+    expect(illumSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('a reliquaryUnlock with no illuminatedPageId produces zero traffic', async () => {
+    // The common case: a fill that completes nothing, or (Phase 18 semantics)
+    // a repeat completion of a page the sticky set already records.
+    const session = joinAt(23, 86, 'Filler');
+    const illumSpy = vi.spyOn(server.social, 'broadcastIllumination').mockResolvedValue(undefined);
+    broadcastsFlagMock.mockClear();
+    detect([illumEvent(session.pid, { illuminatedPageId: undefined })]);
+    await settle();
+    expect(illumSpy).not.toHaveBeenCalled();
+    expect(broadcastsFlagMock).not.toHaveBeenCalled();
+    detect([illumEvent(session.pid)]);
+    await settle();
+    expect(illumSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('an unknown page id fails CLOSED: zero traffic, zero opt-out reads', async () => {
+    // Production runs a mixed-version fleet: a NEWER page's id can reach an
+    // older process, and broadcasting it would hand viewers an id their
+    // catalog cannot place (the isPubliclyListableDeedId reasoning).
+    const session = joinAt(24, 87, 'Drifted');
+    const illumSpy = vi.spyOn(server.social, 'broadcastIllumination').mockResolvedValue(undefined);
+    broadcastsFlagMock.mockClear();
+    detect([
+      illumEvent(session.pid, {
+        pageIds: ['page_from_a_newer_build'],
+        illuminatedPageId: 'page_from_a_newer_build',
+      }),
+    ]);
+    await settle();
+    expect(illumSpy).not.toHaveBeenCalled();
+    expect(broadcastsFlagMock).not.toHaveBeenCalled();
+    // A prototype key never reads as a live page (Object.hasOwn, not `in`).
+    detect([
+      illumEvent(session.pid, { pageIds: ['constructor'], illuminatedPageId: 'constructor' }),
+    ]);
+    await settle();
+    expect(illumSpy).not.toHaveBeenCalled();
+    detect([illumEvent(session.pid)]);
+    await settle();
+    expect(illumSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('the account opt-out suppresses the illumination broadcast', async () => {
+    const session = joinAt(25, 88, 'Privata');
+    const illumSpy = vi.spyOn(server.social, 'broadcastIllumination').mockResolvedValue(undefined);
+    broadcastsFlagMock.mockClear();
+    broadcastsFlagMock.mockResolvedValue(false);
+    detect([illumEvent(session.pid)]);
+    await settle();
+    expect(broadcastsFlagMock).toHaveBeenCalledWith(25);
+    expect(illumSpy).not.toHaveBeenCalled();
+  });
+
+  it('an event with no pid produces zero traffic and zero opt-out reads', async () => {
+    // pid is optional on the wire shape, so an event from a pid-less emit path
+    // must fall out BEFORE the session lookup rather than resolving a session
+    // from `undefined` (Map.get(undefined) is a miss today, but the pid guard
+    // is what keeps that true) and before the consent read.
+    const session = joinAt(26, 89, 'Anonyma');
+    const illumSpy = vi.spyOn(server.social, 'broadcastIllumination').mockResolvedValue(undefined);
+    broadcastsFlagMock.mockClear();
+    detect([illumEvent(session.pid, { pid: undefined })]);
+    await settle();
+    expect(illumSpy).not.toHaveBeenCalled();
+    expect(broadcastsFlagMock).not.toHaveBeenCalled();
+    // Decisive contrast: the same event WITH the pid fires through the same
+    // spy, so the zeroes above cannot come from a drifted spy target.
+    detect([illumEvent(session.pid)]);
+    await settle();
+    expect(illumSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('a pid with no connected session produces zero traffic and zero opt-out reads', async () => {
+    // Bots and already-departed characters keep emitting into the same tick
+    // stream; this.clients.get filters them, and the filter must sit ahead of
+    // the consent read so a departed player never costs a DB round trip.
+    const session = joinAt(27, 90, 'Ghosted');
+    const illumSpy = vi.spyOn(server.social, 'broadcastIllumination').mockResolvedValue(undefined);
+    broadcastsFlagMock.mockClear();
+    detect([illumEvent(session.pid + 1000)]); // no session was ever opened at this pid
+    await settle();
+    expect(illumSpy).not.toHaveBeenCalled();
+    expect(broadcastsFlagMock).not.toHaveBeenCalled();
+    detect([illumEvent(session.pid)]);
+    await settle();
+    expect(illumSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('a retro JOIN that completes a page stays silent end to end, then a live fill marquees', async () => {
+    // The real seed-pass shape rather than a synthetic event: a veteran whose
+    // bags already hold the whole page and whose blob predates
+    // illuminatedPages re-discovers every relic at join, so the completing
+    // fill carries retro: true and must never announce a back-catalog
+    // illumination (nor pay a consent read for one).
+    const illumSpy = vi.spyOn(server.social, 'broadcastIllumination').mockResolvedValue(undefined);
+    vi.spyOn(server.social, 'broadcastDeedUnlock').mockResolvedValue(undefined);
+    broadcastsFlagMock.mockClear();
+    const session = joinAt(32, 94, 'Retrograde', veteranStateFor(PAGE_ID));
+    const meta = server.sim.meta(session.pid);
+    if (!meta) throw new Error('no live meta for the joined session');
+    const joinEvents = server.sim.tick();
+    detect(joinEvents);
+    await settle();
+    // The join really did illuminate the page AND really did hand
+    // detectActivity a retro-flagged event naming it, so the silence below is
+    // the retro gate and not a page that never completed.
+    expect(meta.reliquary.illuminatedPages.has(PAGE_ID)).toBe(true);
+    expect(joinEvents).toContainEqual(
+      expect.objectContaining({
+        type: 'reliquaryUnlock',
+        pid: session.pid,
+        illuminatedPageId: PAGE_ID,
+        retro: true,
+      }),
+    );
+    expect(illumSpy).not.toHaveBeenCalled();
+    expect(broadcastsFlagMock).not.toHaveBeenCalled();
+
+    // Contrast down the same REAL path: a second page filled live after the
+    // join marquees, which no retro flag can be responsible for.
+    const LIVE_PAGE_ID = 'conquerors_hollow_crypt_heroic';
+    for (const itemId of relicItemIds(LIVE_PAGE_ID)) server.sim.addItem(itemId, 1, session.pid);
+    detect(server.sim.tick());
+    await settle();
+    expect(illumSpy).toHaveBeenCalledTimes(1);
+    expect(illumSpy).toHaveBeenCalledWith({ characterId: 94, name: 'Retrograde' }, LIVE_PAGE_ID);
+  });
+
+  it('the completion ladder lands end to end off the last real fill: record, feed cards, marquees, wearable titles', async () => {
+    const session = joinAt(31, 93, 'Curator');
+    const broadcastSpy = vi
+      .spyOn(server.social, 'broadcastDeedUnlock')
+      .mockResolvedValue(undefined);
+    const illumSpy = vi.spyOn(server.social, 'broadcastIllumination').mockResolvedValue(undefined);
+    const sim = server.sim;
+    const meta = sim.meta(session.pid);
+    if (!meta) throw new Error('no live meta for the joined session');
+
+    function tickAndDetect(): void {
+      const events = sim.tick();
+      (server as unknown as { detectActivity(events: unknown[]): void }).detectActivity(events);
+    }
+
+    // Every character-durable catalog slot, split by surface (the
+    // reliquary_state rig's CATALOG_SLOTS shape).
+    const itemIds = new Set<string>();
+    const mountIds = new Set<string>();
+    const titleIds = new Set<string>();
+    for (const page of RELIQUARY_PAGES) {
+      for (const relic of page.relics) {
+        if (relic.kind === 'item') itemIds.add(relic.itemId);
+        else if (relic.kind === 'mount') mountIds.add(relic.mountId);
+        else if (relic.kind === 'title') titleIds.add(relic.deedId);
+      }
+    }
+    const LAST_RELIC = 'cryptbone_helm'; // a conquerors_hollow_crypt slot
+    expect(itemIds.has(LAST_RELIC)).toBe(true);
+
+    // Reach owned === total-1 directly on the sim (the sanctioned test
+    // route): every item but the last, every mark (masterwork:engineering's
+    // live write site is pended, direct mark grants are the test route),
+    // every mount's reins through bags, and every non-ladder catalog title.
+    // The ladder titles are never granted by hand: the completion sync is
+    // their only legitimate writer, and hand-granting them would
+    // vacuous-green the final assertions.
+    const ladder = new Set<string>(RELIQUARY_COMPLETION_DEED_IDS);
+    for (const itemId of itemIds) {
+      if (itemId !== LAST_RELIC) markItemDiscovered(sim.ctx, meta, itemId);
+    }
+    for (const markId of RELIQUARY_MARK_IDS) {
+      expect(noteReliquaryMark(sim.ctx, meta, markId)).toBe(true);
+    }
+    for (const mountId of mountIds) {
+      const reins = mountItemId(mountId);
+      expect(reins, mountId).toBeTruthy();
+      sim.addItem(reins as string, 1, session.pid);
+    }
+    for (const deedId of titleIds) {
+      if (!ladder.has(deedId)) grantDeed(sim.ctx, meta, deedId);
+    }
+    tickAndDetect(); // flush the pre-fill grants (the Illumination deeds land here)
+    await settle();
+    // At total-1 the flagship Illumination deeds are already earned; the
+    // shelf and catalog deeds still wait on the one Hollow Crypt relic.
+    expect(meta.deedsEarned.has('col_reliquary_illum_thunzharr')).toBe(true);
+    expect(meta.deedsEarned.has('col_reliquary_conquerors')).toBe(false);
+    expect(meta.deedsEarned.has('col_reliquary_complete')).toBe(false);
+    insertMock.mockClear();
+    insertDeedsMock.mockClear();
+    broadcastSpy.mockClear();
+    illumSpy.mockClear();
+    broadcastsFlagMock.mockClear();
+    drainActivity();
+
+    // The REAL grant path: the last relic lands in bags, the discovery hub
+    // fires, the completion ladder grants shelf then catalog in ONE pass, and
+    // the authoritative tick hands the events to the one observer pass.
+    sim.addItem(LAST_RELIC, 1, session.pid);
+    tickAndDetect();
+    await settle();
+
+    expect(meta.deedsEarned.has('col_reliquary_conquerors')).toBe(true);
+    expect(meta.deedsEarned.has('col_reliquary_complete')).toBe(true);
+    // The observer mirrored both unlocks into character_deeds behind the save.
+    const recorded = [
+      ...insertMock.mock.calls.map((c) => c[0].deedId),
+      ...insertDeedsMock.mock.calls.flatMap((c) => [...c[1]]),
+    ];
+    expect(recorded).toContain('col_reliquary_conquerors');
+    expect(recorded).toContain('col_reliquary_complete');
+    // The Discord feed got both title cards, name + title text intact.
+    const cards = drainActivity();
+    const conqCard = cards.find((c) => c.deedId === 'col_reliquary_conquerors');
+    const compCard = cards.find((c) => c.deedId === 'col_reliquary_complete');
+    expect(conqCard).toMatchObject({
+      kind: 'deed',
+      accountIds: [31],
+      names: ['Curator'],
+      deedName: 'Shelf of Conquerors',
+      deedTitle: 'Vaultbreaker',
+    });
+    expect(compCard).toMatchObject({
+      kind: 'deed',
+      deedName: 'The Grand Reliquary',
+      deedTitle: 'Curator of the Vault',
+    });
+    // Both marquee'd with the session actor, and the completing fill's
+    // first-ever Illumination rode the REAL path into the marquee too.
+    expect(broadcastSpy).toHaveBeenCalledWith(
+      { characterId: 93, name: 'Curator' },
+      'col_reliquary_conquerors',
+    );
+    expect(broadcastSpy).toHaveBeenCalledWith(
+      { characterId: 93, name: 'Curator' },
+      'col_reliquary_complete',
+    );
+    expect(illumSpy).toHaveBeenCalledWith(
+      { characterId: 93, name: 'Curator' },
+      'conquerors_hollow_crypt',
+    );
+
+    // Both titles are wearable afterward (the deed grant is what makes
+    // setActiveTitle accept them).
+    sim.setActiveTitle('col_reliquary_complete', session.pid);
+    expect(meta.activeTitle).toBe('col_reliquary_complete');
+    expect(DEEDS.col_reliquary_complete.reward).toEqual({
+      kind: 'title',
+      text: 'Curator of the Vault',
+    });
+    sim.setActiveTitle('col_reliquary_conquerors', session.pid);
+    expect(meta.activeTitle).toBe('col_reliquary_conquerors');
+    expect(DEEDS.col_reliquary_conquerors.reward).toEqual({ kind: 'title', text: 'Vaultbreaker' });
   });
 });

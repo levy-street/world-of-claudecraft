@@ -27,11 +27,9 @@
 // same as 1 (no stacks badge), and a Sim-shaped aura {stacks:1} and a ClientWorld
 // mirror aura {stacks:undefined} derive identical output.
 
-import {
-  isDebuffAura as classifyDebuffAura,
-  DEBUFF_AURA_KINDS,
-  isPlayerRemovableAura,
-} from '../sim/aura_classify';
+import { isDebuffAura as classifyDebuffAura, DEBUFF_AURA_KINDS } from '../sim/aura_classify';
+import { isCancelableAura } from '../sim/combat/aura_cancel';
+import { isPersistentEngineAura } from '../sim/persistent_aura';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
 
@@ -69,7 +67,11 @@ export const CARRIED_FLAG_AURA_ID = 'bg_carried_flag';
 // you do not, and the sim only backs it with a longer-than-any-match duration so
 // nothing can expire it out from under the carry. A countdown under either would
 // be a lie the player reads as "this is about to leave me".
-const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf', CARRIED_FLAG_AURA_ID]);
+const TOGGLE_IDS: ReadonlySet<string> = new Set([
+  'ghost_wolf',
+  'beacon_of_light',
+  CARRIED_FLAG_AURA_ID,
+]);
 // Auras the low graphics tier's buff cap may NEVER shed (auras_painter.ts).
 // The cap's fairness rule is "spend the budget on buffs, a debuff always
 // renders", which rests on buffs being cosmetic. That is false for an aura whose
@@ -132,12 +134,15 @@ export interface AuraInput {
   value: number;
   // Optional effect-descriptor inputs (DoT/HoT tick interval, secondary values, magic
   // school). Present on the offline Sim aura; the online ClientWorld mirror may omit
-  // them, in which case auraEffectDescriptor falls back to its defaults.
+  // them, in which case auraEffectDescriptor falls back to its defaults. A newer
+  // server's unknown AuraKind safely omits the effect line until this client knows it.
   value2?: number;
   value3?: number;
   tickInterval?: number;
   school?: AuraSchool;
   stacks?: number;
+  /** Party-frame-only relative pool badge for Mending Current. */
+  poolPct?: number;
   // Remaining charges on a charge-limited aura (e.g. Lightning Shield's 3 reflects). Present
   // on the offline Sim aura and mirrored over the wire; undefined for ordinary auras. When
   // present it drives the badge overlay INSTEAD of stacks (a charge count, not a stack count),
@@ -178,9 +183,9 @@ export interface AurasDeps {
   auraName(aura: AuraInput): string;
   /** The formatted stack count (host: `formatNumber(stacks, {maximumFractionDigits:0})`). */
   formatStacks(stacks: number): string;
-  /** The one-line aura effect-summary HTML the tooltip prepends (or '' when the aura has
-   *  no descriptor). Injected so the i18n-free core never calls t(): the host builds the
-   *  localized, esc'd HTML from the pure aura_effect descriptor. */
+  /** The localized, escaped tooltip body the tooltip prepends (or '' when unavailable).
+   *  The host may include the source ability description plus the one-line runtime
+   *  aura-effect summary; the i18n-free core never calls t(). */
   auraEffectHtml(aura: AuraInput): string;
   /** The localized single-letter duration unit suffixes the compact label appends
    *  (host: `t('hudChrome.unitFrame.durationUnitSeconds'/'...Minutes'/'...Hours'/
@@ -390,7 +395,9 @@ export function createAurasView(
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
         slot.school = debuff ? (a.school ?? 'physical') : '';
-        const toggle = (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)) && !TIMED_IDS.has(a.id);
+        const toggle =
+          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id) || isPersistentEngineAura(a.id)) &&
+          !TIMED_IDS.has(a.id);
         slot.durationText = toggle ? '' : compactAuraDuration(a.remaining, units);
         // Toggles show no countdown, so they never blink either.
         slot.expiring = !toggle && isAuraExpiring(a.remaining, a.duration);
@@ -399,11 +406,13 @@ export function createAurasView(
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
         // badge shows a stack count, and only when it stacks past 1.
         slot.stacksText =
-          a.charges !== undefined
-            ? deps.formatStacks(a.charges)
-            : a.stacks && a.stacks > 1
-              ? deps.formatStacks(a.stacks)
-              : '';
+          a.poolPct !== undefined
+            ? deps.formatStacks(a.poolPct)
+            : a.charges !== undefined
+              ? deps.formatStacks(a.charges)
+              : a.stacks !== undefined && (a.stacks > 1 || isPersistentEngineAura(a.id))
+                ? deps.formatStacks(a.stacks)
+                : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
         slot.duration = a.duration;
@@ -411,11 +420,12 @@ export function createAurasView(
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
         // a helpful buff is cancelable, a debuff never. The target debuff strip
         // (mode 'debuffs') is read-only, so nothing there is cancelable. The
-        // removability term is isPlayerRemovableAura, the same predicate the sim's
-        // cancel path answers to (combat/aura_cancel.ts), so the affordance can never
-        // offer a cancel the server would refuse: both the encounter-control and the
-        // undispellable arms ride the wire (ub / und) for exactly this reader.
-        slot.cancelable = mode === 'buffs' && !debuff && isPlayerRemovableAura(a);
+        // removability term routes through isCancelableAura, the same predicate the
+        // sim's cancel path answers to (combat/aura_cancel.ts, which folds in
+        // isPlayerRemovableAura), so the affordance can never offer a cancel the
+        // server would refuse: the encounter-control and undispellable arms ride
+        // the wire (ub / und) for exactly this reader.
+        slot.cancelable = mode === 'buffs' && isCancelableAura(a);
         const cachedEffect = effectHtmlCache[count];
         if (
           !effectHtmlCacheVersion ||

@@ -21,7 +21,7 @@ import {
 /**
  * Vitest's own default include is `**\/*.{test,spec}.?(c|m)[jt]s?(x)`, and
  * vite.config.ts excludes node_modules, dist, the agent-runtime dirs, .worktrees,
- * .venv, tmp/, tests/browser/, and *.browser.test.ts. Discovery MUST match, or
+ * .wt, .venv, tmp/, tests/browser/, and *.browser.test.ts. Discovery MUST match, or
  * the always-run set silently omits files the full suite runs: the first cut
  * matched only `.test.ts` and skipped every directory named `helpers`, hiding 20
  * collected files (5 `.test.mjs`, 15 under `helpers/`), 8 of which classify as
@@ -38,6 +38,7 @@ export const SKIP_DIRS = Object.freeze([
   '.codex',
   '.agents',
   '.worktrees',
+  '.wt',
   '.venv',
   'tmp',
   'browser',

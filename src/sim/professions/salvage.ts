@@ -20,6 +20,7 @@ import { RIFT_ESSENCE_ITEM_ID } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { requiredLevelFor } from '../item_level_req';
+import { isItemLocked } from '../item_lock';
 import { removePreferFungible } from '../items';
 import { forceDismount } from '../mounts';
 import { riftSalvageYield } from '../rift/progression';
@@ -107,7 +108,14 @@ export interface SalvageResult {
   /** True when the command admitted and started a SALVAGE_CAST_ID cast
    *  (no materials granted yet). Absent on complete resolves and denials. */
   casting?: boolean;
-  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space' | 'busy';
+  reason?:
+    | 'unknown_item'
+    | 'not_salvageable'
+    | 'not_held'
+    | 'throttled'
+    | 'no_bag_space'
+    | 'busy'
+    | 'locked';
 }
 
 /**
@@ -149,6 +157,7 @@ export function resolveSalvage(
       selectedVictim === undefined
         ? consumeOneScratch(scratch, itemId)
         : (selectedVictim.instance ?? undefined);
+    if (isItemLocked(victim)) return { ok: false, itemId, reason: 'locked' };
     const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
     const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
     if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {
@@ -225,6 +234,7 @@ export function evaluateSalvageAdmission(
   const selected = consumeSelectedInventorySlot(scratch, itemId, slotIndex);
   if (selected === null) return { ok: false, itemId, reason: 'not_held' };
   const victim = selected === undefined ? consumeOneScratch(scratch, itemId) : selected.instance;
+  if (isItemLocked(victim)) return { ok: false, itemId, reason: 'locked' };
   const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
   const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
   if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {

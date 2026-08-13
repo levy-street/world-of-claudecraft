@@ -23,9 +23,26 @@ import { DELVE_MODULE_LAYOUTS, type DelveModuleId } from '../../../sim/delve_lay
 import type { DelveRunInfo, IWorld } from '../../../world_api';
 import { tEntity } from '../../entity_i18n';
 import { type TranslationKey, t } from '../../i18n';
-import type { PainterHostWriters } from '../../painter_host';
+import { isLiveMapEntityDisclosed } from '../../map_entity_disclosure_core';
 import {
+  EMPTY_MAP_MARKER_ART,
+  MAP_MARKER_SIZES,
+  type MapMarkerArt,
+  mapMarkerSizeForSemantic,
+  semanticMapMarkerArt,
+} from '../../map_marker_icon_art';
+import type { MapMarkerProfile } from '../../map_marker_profile_core';
+import {
+  classifyMapObjectMarker,
+  type MapMarkerSemantic,
+  mapMarkerSemanticLayer,
+} from '../../map_marker_semantics_core';
+import type { PainterHostWriters } from '../../painter_host';
+import { TextSpriteCache } from '../../text_sprite_cache';
+import {
+  type DelveMapFit,
   delveAreaLabel,
+  delveCurrentModuleOrigin,
   delveLocalToCanvas,
   delveSchematicPlayer,
   delveSchematicStatic,
@@ -46,23 +63,74 @@ const SCHEMATIC_TEXT_OUTLINE_WIDTH = 2;
 const ARROW_HALF_WIDTH_RATIO = 0.6;
 const ARROW_BASE_RATIO = 0.8;
 
-// Minimap surface: a fixed 162px circular minimap.
-const MINIMAP_PAD = 8;
+// Minimap surface: a fixed 162px circular minimap. Padding protects the full
+// largest compact route/reward raster at an accessible module corner.
 const MINIMAP_CLIP_INSET = 2; // clip radius = size / 2 - inset
-const MINIMAP_MOB_SIZE = 3; // square marker side, px
-const MINIMAP_PARTY_RADIUS = 4;
-const MINIMAP_PARTY_OUTLINE_WIDTH = 1.5;
-const MINIMAP_ARROW_OUTLINE_WIDTH = 1.5;
+const MINIMAP_MAX_MARKER_HALF = MAP_MARKER_SIZES.minimapNavigationCompact / 2;
+const MINIMAP_PAD = MINIMAP_CLIP_INSET + Math.ceil(MINIMAP_MAX_MARKER_HALF * Math.SQRT2);
 
 // World-map surface: the dynamically-sized rectangular map canvas.
 const WORLD_MAP_PAD_RATIO = 0.06;
-const WORLD_MAP_MOB_SIZE = 4;
-const WORLD_MAP_PARTY_RADIUS = 5;
-const WORLD_MAP_PARTY_OUTLINE_WIDTH = 2;
-const WORLD_MAP_ARROW_OUTLINE_WIDTH = 2;
-const WORLD_MAP_TITLE_FONT = 'bold 14px Georgia';
-const WORLD_MAP_TITLE_TOP = 6; // px from the canvas top
-const WORLD_MAP_TITLE_OUTLINE_WIDTH = 3;
+
+interface DelveDynamicGeometry {
+  readonly mobSize: number;
+  readonly objectRadius: number;
+  readonly partyRadius: number;
+  readonly partyOutlineWidth: number;
+  readonly arrowScale: number;
+  readonly arrowOutlineWidth: number;
+}
+
+/** Frozen backing-space geometry selected once per redraw. Compact touch HUDs
+ * scale the canvas down in CSS, so live markers need the same compensation as
+ * their exact-size art counterparts. */
+const DELVE_DYNAMIC_GEOMETRY = Object.freeze({
+  minimap: Object.freeze({
+    standard: Object.freeze({
+      mobSize: 3,
+      objectRadius: 6,
+      partyRadius: 4,
+      partyOutlineWidth: 1.5,
+      arrowScale: 1,
+      arrowOutlineWidth: 1.5,
+    }),
+    compact: Object.freeze({
+      mobSize: 4.5,
+      objectRadius: 8,
+      partyRadius: 5.5,
+      partyOutlineWidth: 2,
+      arrowScale: 1.35,
+      arrowOutlineWidth: 2,
+    }),
+  }),
+  map: Object.freeze({
+    standard: Object.freeze({
+      mobSize: 4,
+      objectRadius: 8,
+      partyRadius: 5,
+      partyOutlineWidth: 2,
+      arrowScale: 1,
+      arrowOutlineWidth: 2,
+    }),
+    compact: Object.freeze({
+      mobSize: 6,
+      objectRadius: 11,
+      partyRadius: 7,
+      partyOutlineWidth: 3,
+      arrowScale: 1.35,
+      arrowOutlineWidth: 3,
+    }),
+  }),
+} as const satisfies Readonly<
+  Record<'minimap' | 'map', Readonly<Record<MapMarkerProfile, Readonly<DelveDynamicGeometry>>>>
+>);
+
+const DELVE_MAP_TEXT_STYLE = Object.freeze({
+  standard: Object.freeze({ font: 'bold 14px Georgia', baselineY: 18, outlineWidth: 3 }),
+  compact: Object.freeze({ font: 'bold 21px Georgia', baselineY: 27, outlineWidth: 4.5 }),
+} as const satisfies Readonly<
+  Record<MapMarkerProfile, Readonly<{ font: string; baselineY: number; outlineWidth: number }>>
+>);
 
 // The `--color-delve-*` design tokens the painter resolves once per redraw. These
 // mirror the colors the two inline delve render sites used verbatim.
@@ -100,16 +168,32 @@ export interface DelvePartyMarker {
   cls: string;
 }
 
+export type DelveMapSemantic = Extract<
+  MapMarkerSemantic,
+  { kind: 'delve-passage' | 'delve-surface' | 'delve-reward' }
+>;
+
+/** One live delve reward/navigation object projected into schematic space. */
+export interface DelveObjectMarker {
+  cx: number;
+  cy: number;
+  semantic: DelveMapSemantic;
+}
+
 /** Everything the painter draws for one delve frame, derived purely from IWorld.
  *  No DOM, no i18n, no color resolution: positions + the static schematic + the
  *  composed area label, so a Vitest can drive it directly and assert parity. */
 export interface DelveDrawModel {
   /** Module layout id, the static-background cache key. */
   layoutId: string;
-  /** Static room schematic (floor / pillars / tombs / dais / exit + 'N' glyph). */
+  /** Static room geometry. Navigation is exclusively a live object overlay. */
   schematic: SchematicPrimitive[];
   /** Hostile mob dots inside the canvas bounds. */
   mobs: DelveMobMarker[];
+  /** Reward objects, painted after ordinary dynamics. */
+  rewards: DelveObjectMarker[];
+  /** Passage and surface routes, painted above rewards. */
+  navigation: DelveObjectMarker[];
   /** Party member discs inside the canvas bounds (excluding the local player). */
   party: DelvePartyMarker[];
   /** The local player's facing arrow. */
@@ -132,6 +216,7 @@ export function delveDrawModel(
   delveName: string,
   moduleName: string,
   northLabel = 'N',
+  fit: DelveMapFit = 'rect',
 ): DelveDrawModel | null {
   const run = world.delveRun;
   if (!run) return null;
@@ -139,22 +224,46 @@ export function delveDrawModel(
   const modId = run.modules[run.moduleIndex];
   const layoutId = (modId ?? DEFAULT_DELVE_MODULE) as DelveModuleId;
   const layout = DELVE_MODULE_LAYOUTS[layoutId] ?? DELVE_MODULE_LAYOUTS[DEFAULT_DELVE_MODULE];
+  const moduleOrigin = delveCurrentModuleOrigin(run);
 
-  const schematic = delveSchematicStatic(layout, canvasSize, pad, northLabel);
+  const schematic = delveSchematicStatic(layout, canvasSize, pad, northLabel, fit);
 
   const mobs: DelveMobMarker[] = [];
+  const rewards: DelveObjectMarker[] = [];
+  const navigation: DelveObjectMarker[] = [];
+  const companionId = world.companionState?.entityId;
   for (const e of world.entities.values()) {
-    if (e.id === p.id) continue;
-    if (e.kind !== 'mob' || e.dead) continue;
+    if (e.id === p.id || e.id === companionId) continue;
+    if (!isLiveMapEntityDisclosed(p.pos.x, p.pos.z, e.pos.x, e.pos.z)) continue;
+    let semantic: DelveObjectMarker['semantic'] | null = null;
+    if (e.kind === 'object') {
+      const classified = classifyMapObjectMarker(e, { delveRun: run });
+      if (
+        classified &&
+        (classified.kind === 'delve-passage' ||
+          classified.kind === 'delve-surface' ||
+          classified.kind === 'delve-reward')
+      )
+        semantic = classified;
+      else continue;
+    } else if (!(e.kind === 'mob' && e.hostile && !e.dead)) {
+      continue;
+    }
     const { cx, cy } = delveLocalToCanvas(
-      e.pos.x - run.origin.x,
-      e.pos.z - run.origin.z,
+      e.pos.x - moduleOrigin.x,
+      e.pos.z - moduleOrigin.z,
       layout,
       canvasSize,
       pad,
+      fit,
     );
     if (cx < 0 || cx > canvasSize || cy < 0 || cy > canvasSize) continue;
-    mobs.push({ cx, cy, aggro: e.aggroTargetId === p.id });
+    if (!semantic) mobs.push({ cx, cy, aggro: e.aggroTargetId === p.id });
+    else {
+      const marker: DelveObjectMarker = { cx, cy, semantic };
+      if (mapMarkerSemanticLayer(semantic) === 'reward') rewards.push(marker);
+      else navigation.push(marker);
+    }
   }
 
   const party: DelvePartyMarker[] = [];
@@ -163,24 +272,27 @@ export function delveDrawModel(
     for (const m of partyInfo.members) {
       if (m.pid === p.id) continue;
       const { cx, cy } = delveLocalToCanvas(
-        m.x - run.origin.x,
-        m.z - run.origin.z,
+        m.x - moduleOrigin.x,
+        m.z - moduleOrigin.z,
         layout,
         canvasSize,
         pad,
+        fit,
       );
       if (cx < 0 || cx > canvasSize || cy < 0 || cy > canvasSize) continue;
       party.push({ cx, cy, dead: m.dead, cls: m.cls });
     }
   }
 
-  const { localX, localZ } = playerDelveLocal(p.pos.x, p.pos.z, run.origin);
-  const player = delveSchematicPlayer(localX, localZ, p.facing, layout, canvasSize, pad);
+  const { localX, localZ } = playerDelveLocal(p.pos.x, p.pos.z, moduleOrigin);
+  const player = delveSchematicPlayer(localX, localZ, p.facing, layout, canvasSize, pad, fit);
 
   return {
     layoutId,
     schematic,
     mobs,
+    rewards,
+    navigation,
     party,
     player,
     areaLabel: delveAreaLabel(delveName, moduleName),
@@ -197,13 +309,16 @@ export class DelveMapPainter {
   // Static-schematic backgrounds, one per surface (they size + pad differently),
   // rebuilt only when the player crosses into a different delve module.
   private minimapBg: HTMLCanvasElement | null = null;
-  private minimapBgModuleId = '';
+  private minimapBgKey = '';
   private worldMapBg: HTMLCanvasElement | null = null;
-  private worldMapBgModuleId = '';
+  private worldMapBgKey = '';
+  private readonly titleSprites = new TextSpriteCache(8);
 
   constructor(
     private readonly writers: PainterHostWriters,
     private readonly classColor: (cls: string) => string,
+    private readonly markerArt: MapMarkerArt = EMPTY_MAP_MARKER_ART,
+    private readonly markerProfile: () => MapMarkerProfile = () => 'standard',
   ) {}
 
   /** Drop the cached static-schematic backgrounds on a language switch: the
@@ -216,9 +331,10 @@ export class DelveMapPainter {
    *  mapPainter.relocalize(). */
   relocalize(): void {
     this.minimapBg = null;
-    this.minimapBgModuleId = '';
+    this.minimapBgKey = '';
     this.worldMapBg = null;
-    this.worldMapBgModuleId = '';
+    this.worldMapBgKey = '';
+    this.titleSprites.clear();
   }
 
   /** Resolve the player-facing delve + module names (the only i18n the painter
@@ -352,6 +468,168 @@ export class DelveMapPainter {
     }
   }
 
+  /** Generated markers use the same Hud-owned bounded cache as the overworld
+   * painters. A successful path is one lookup and one whole-pixel blit. */
+  private drawSemanticArt(
+    ctx: CanvasRenderingContext2D,
+    marker: DelveObjectMarker,
+    surface: 'minimap' | 'map',
+    compact: boolean,
+  ): boolean {
+    const art = semanticMapMarkerArt(marker.semantic);
+    if (!art) return false;
+    const sizeId = mapMarkerSizeForSemantic(surface, compact, art);
+    const sprite = this.markerArt.sprite(art.id, sizeId);
+    if (!sprite) return false;
+    const size = MAP_MARKER_SIZES[sizeId];
+    ctx.drawImage(sprite, Math.round(marker.cx - size / 2), Math.round(marker.cy - size / 2));
+    return true;
+  }
+
+  /** Allocation-free procedural reward fallbacks. Cache and reliquary keep
+   * different silhouettes; the centre mark carries state independently of hue. */
+  private drawRewards(
+    ctx: CanvasRenderingContext2D,
+    rewards: DelveObjectMarker[],
+    radius: number,
+    outlineWidth: number,
+    colors: DelveColors,
+    surface: 'minimap' | 'map',
+    compact: boolean,
+  ): void {
+    for (const marker of rewards) {
+      if (this.drawSemanticArt(ctx, marker, surface, compact)) continue;
+      const semantic = marker.semantic;
+      if (semantic.kind !== 'delve-reward') continue;
+      const opened = semantic.state === 'opened';
+      ctx.fillStyle = opened
+        ? colors.partyDead
+        : semantic.state === 'active'
+          ? colors.mobAggro
+          : colors.label;
+      ctx.strokeStyle = colors.outline;
+      ctx.lineWidth = outlineWidth;
+      ctx.beginPath();
+      if (semantic.reward === 'reliquary') {
+        ctx.moveTo(marker.cx, marker.cy - radius);
+        ctx.lineTo(marker.cx + radius, marker.cy);
+        ctx.lineTo(marker.cx, marker.cy + radius);
+        ctx.lineTo(marker.cx - radius, marker.cy);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      } else {
+        ctx.fillRect(marker.cx - radius, marker.cy - radius, radius * 2, radius * 2);
+        ctx.strokeRect(marker.cx - radius, marker.cy - radius, radius * 2, radius * 2);
+      }
+      // Bountiful is an outer halo, never a fill-color-only distinction.
+      if (semantic.bountiful) {
+        ctx.beginPath();
+        ctx.arc(marker.cx, marker.cy, radius + outlineWidth * 2, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = colors.outline;
+      if (semantic.state === 'locked') {
+        const lockHalf = radius * 0.32;
+        ctx.beginPath();
+        ctx.arc(marker.cx, marker.cy - lockHalf * 0.45, lockHalf, Math.PI, 0);
+        ctx.stroke();
+        ctx.fillStyle = colors.outline;
+        ctx.fillRect(
+          marker.cx - lockHalf,
+          marker.cy - lockHalf * 0.1,
+          lockHalf * 2,
+          lockHalf * 1.5,
+        );
+      } else if (semantic.state === 'opened') {
+        ctx.beginPath();
+        ctx.moveTo(marker.cx - radius * 0.45, marker.cy);
+        ctx.lineTo(marker.cx - radius * 0.1, marker.cy + radius * 0.35);
+        ctx.lineTo(marker.cx + radius * 0.5, marker.cy - radius * 0.4);
+        ctx.stroke();
+      } else if (semantic.state === 'ready') {
+        ctx.beginPath();
+        ctx.moveTo(marker.cx, marker.cy - radius * 0.55);
+        ctx.lineTo(marker.cx, marker.cy + radius * 0.55);
+        ctx.moveTo(marker.cx - radius * 0.55, marker.cy);
+        ctx.lineTo(marker.cx + radius * 0.55, marker.cy);
+        ctx.stroke();
+      } else {
+        // Active rite: opposing chevrons read as a sequence in progress.
+        ctx.beginPath();
+        ctx.moveTo(marker.cx - radius * 0.35, marker.cy - radius * 0.45);
+        ctx.lineTo(marker.cx + radius * 0.35, marker.cy);
+        ctx.lineTo(marker.cx - radius * 0.35, marker.cy + radius * 0.45);
+        ctx.stroke();
+      }
+    }
+  }
+
+  /** Allocation-free navigation fallbacks. Sealed passages carry an X; open
+   * passages carry a forward arrow, and surface stairs use their own silhouette. */
+  private drawNavigation(
+    ctx: CanvasRenderingContext2D,
+    navigation: DelveObjectMarker[],
+    radius: number,
+    outlineWidth: number,
+    colors: DelveColors,
+    surface: 'minimap' | 'map',
+    compact: boolean,
+  ): void {
+    ctx.strokeStyle = colors.outline;
+    ctx.lineWidth = outlineWidth;
+    for (const marker of navigation) {
+      if (this.drawSemanticArt(ctx, marker, surface, compact)) continue;
+      const semantic = marker.semantic;
+      ctx.fillStyle =
+        semantic.kind === 'delve-passage' && semantic.state === 'sealed'
+          ? colors.partyDead
+          : colors.label;
+      if (semantic.kind === 'delve-surface') {
+        // Three stair treads plus an upward arrow.
+        ctx.beginPath();
+        ctx.moveTo(marker.cx - radius, marker.cy + radius * 0.65);
+        ctx.lineTo(marker.cx + radius, marker.cy + radius * 0.65);
+        ctx.moveTo(marker.cx - radius * 0.7, marker.cy + radius * 0.25);
+        ctx.lineTo(marker.cx + radius * 0.7, marker.cy + radius * 0.25);
+        ctx.moveTo(marker.cx - radius * 0.4, marker.cy - radius * 0.15);
+        ctx.lineTo(marker.cx + radius * 0.4, marker.cy - radius * 0.15);
+        ctx.moveTo(marker.cx, marker.cy - radius);
+        ctx.lineTo(marker.cx, marker.cy - radius * 0.15);
+        ctx.moveTo(marker.cx, marker.cy - radius);
+        ctx.lineTo(marker.cx - radius * 0.32, marker.cy - radius * 0.62);
+        ctx.moveTo(marker.cx, marker.cy - radius);
+        ctx.lineTo(marker.cx + radius * 0.32, marker.cy - radius * 0.62);
+        ctx.stroke();
+        continue;
+      }
+      // Passage arch silhouette.
+      ctx.beginPath();
+      ctx.arc(marker.cx, marker.cy, radius, Math.PI, 0);
+      ctx.lineTo(marker.cx + radius, marker.cy + radius);
+      ctx.lineTo(marker.cx - radius, marker.cy + radius);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      if (semantic.state === 'sealed') {
+        ctx.beginPath();
+        ctx.moveTo(marker.cx - radius * 0.45, marker.cy - radius * 0.3);
+        ctx.lineTo(marker.cx + radius * 0.45, marker.cy + radius * 0.5);
+        ctx.moveTo(marker.cx + radius * 0.45, marker.cy - radius * 0.3);
+        ctx.lineTo(marker.cx - radius * 0.45, marker.cy + radius * 0.5);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = colors.outline;
+        ctx.beginPath();
+        ctx.moveTo(marker.cx, marker.cy - radius * 0.45);
+        ctx.lineTo(marker.cx + radius * 0.4, marker.cy + radius * 0.3);
+        ctx.lineTo(marker.cx - radius * 0.4, marker.cy + radius * 0.3);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+  }
+
   private drawParty(
     ctx: CanvasRenderingContext2D,
     party: DelvePartyMarker[],
@@ -374,7 +652,9 @@ export class DelveMapPainter {
     ctx: CanvasRenderingContext2D,
     arrow: SchematicArrow,
     outlineWidth: number,
+    scale: number,
   ): void {
+    const size = arrow.size * scale;
     ctx.save();
     ctx.translate(arrow.cx, arrow.cy);
     ctx.rotate(arrow.angle);
@@ -382,9 +662,9 @@ export class DelveMapPainter {
     ctx.strokeStyle = arrow.stroke;
     ctx.lineWidth = outlineWidth;
     ctx.beginPath();
-    ctx.moveTo(0, -arrow.size);
-    ctx.lineTo(arrow.size * ARROW_HALF_WIDTH_RATIO, arrow.size * ARROW_BASE_RATIO);
-    ctx.lineTo(-arrow.size * ARROW_HALF_WIDTH_RATIO, arrow.size * ARROW_BASE_RATIO);
+    ctx.moveTo(0, -size);
+    ctx.lineTo(size * ARROW_HALF_WIDTH_RATIO, size * ARROW_BASE_RATIO);
+    ctx.lineTo(-size * ARROW_HALF_WIDTH_RATIO, size * ARROW_BASE_RATIO);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
@@ -411,15 +691,20 @@ export class DelveMapPainter {
       delveName,
       moduleName,
       t('hudChrome.compass.N'),
+      'circle',
     );
     if (!model) return;
     // The one DOM write this Canvas pilot routes through the write-elision facet.
     this.writers.setText(zoneLabelEl, model.areaLabel);
     const colors = this.resolveColors();
+    const profile = this.markerProfile();
+    const geometry = DELVE_DYNAMIC_GEOMETRY.minimap[profile];
+    const compact = profile === 'compact';
 
-    if (!this.minimapBg || this.minimapBgModuleId !== model.layoutId) {
+    const bgKey = `${model.layoutId}:${size}:${MINIMAP_PAD}:circle`;
+    if (!this.minimapBg || this.minimapBgKey !== bgKey) {
       this.minimapBg = this.buildSchematicBg(model.schematic, size, colors);
-      this.minimapBgModuleId = model.layoutId;
+      this.minimapBgKey = bgKey;
     }
 
     ctx.clearRect(0, 0, size, size);
@@ -429,44 +714,89 @@ export class DelveMapPainter {
     ctx.clip();
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(this.minimapBg, 0, 0);
-    this.drawMobs(ctx, model.mobs, MINIMAP_MOB_SIZE, colors);
-    this.drawParty(ctx, model.party, MINIMAP_PARTY_RADIUS, MINIMAP_PARTY_OUTLINE_WIDTH, colors);
-    this.drawPlayerArrow(ctx, model.player, MINIMAP_ARROW_OUTLINE_WIDTH);
+    this.drawMobs(ctx, model.mobs, geometry.mobSize, colors);
+    this.drawRewards(
+      ctx,
+      model.rewards,
+      geometry.objectRadius,
+      geometry.partyOutlineWidth,
+      colors,
+      'minimap',
+      compact,
+    );
+    this.drawNavigation(
+      ctx,
+      model.navigation,
+      geometry.objectRadius,
+      geometry.partyOutlineWidth,
+      colors,
+      'minimap',
+      compact,
+    );
+    this.drawParty(ctx, model.party, geometry.partyRadius, geometry.partyOutlineWidth, colors);
+    this.drawPlayerArrow(ctx, model.player, geometry.arrowOutlineWidth, geometry.arrowScale);
     ctx.restore();
   }
 
   /** World-map delve render: the same static schematic + overlay, painted into the
    *  rectangular map canvas, with the area label drawn ON the canvas (no DOM
    *  label). Caller passes the map ctx, the world, and the canvas size. */
-  paintWorldMapDelve(ctx: CanvasRenderingContext2D, world: IWorld, size: number): void {
+  paintWorldMapDelve(
+    ctx: CanvasRenderingContext2D,
+    world: IWorld,
+    size: number,
+  ): DelveDrawModel | null {
     const run = world.delveRun;
-    if (!run) return;
+    if (!run) return null;
     const { delveName, moduleName } = this.resolveNames(run);
     const pad = Math.round(size * WORLD_MAP_PAD_RATIO);
     const model = delveDrawModel(world, size, pad, delveName, moduleName, t('hudChrome.compass.N'));
-    if (!model) return;
+    if (!model) return null;
     const colors = this.resolveColors();
+    const profile = this.markerProfile();
+    const geometry = DELVE_DYNAMIC_GEOMETRY.map[profile];
+    const textStyle = DELVE_MAP_TEXT_STYLE[profile];
+    const compact = profile === 'compact';
 
-    if (!this.worldMapBg || this.worldMapBgModuleId !== model.layoutId) {
+    const bgKey = `${model.layoutId}:${size}:${pad}:rect`;
+    if (!this.worldMapBg || this.worldMapBgKey !== bgKey) {
       this.worldMapBg = this.buildSchematicBg(model.schematic, size, colors);
-      this.worldMapBgModuleId = model.layoutId;
+      this.worldMapBgKey = bgKey;
     }
 
     ctx.clearRect(0, 0, size, size);
     ctx.drawImage(this.worldMapBg, 0, 0);
-    this.drawMobs(ctx, model.mobs, WORLD_MAP_MOB_SIZE, colors);
-    this.drawParty(ctx, model.party, WORLD_MAP_PARTY_RADIUS, WORLD_MAP_PARTY_OUTLINE_WIDTH, colors);
-    this.drawPlayerArrow(ctx, model.player, WORLD_MAP_ARROW_OUTLINE_WIDTH);
+    this.drawMobs(ctx, model.mobs, geometry.mobSize, colors);
+    this.drawRewards(
+      ctx,
+      model.rewards,
+      geometry.objectRadius,
+      geometry.partyOutlineWidth,
+      colors,
+      'map',
+      compact,
+    );
+    this.drawNavigation(
+      ctx,
+      model.navigation,
+      geometry.objectRadius,
+      geometry.partyOutlineWidth,
+      colors,
+      'map',
+      compact,
+    );
+    this.drawParty(ctx, model.party, geometry.partyRadius, geometry.partyOutlineWidth, colors);
+    this.drawPlayerArrow(ctx, model.player, geometry.arrowOutlineWidth, geometry.arrowScale);
 
-    // The world map has no DOM zone label, so the area title is drawn on-canvas.
-    ctx.font = WORLD_MAP_TITLE_FONT;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.strokeStyle = colors.outline;
-    ctx.lineWidth = WORLD_MAP_TITLE_OUTLINE_WIDTH;
-    ctx.fillStyle = colors.label;
-    ctx.strokeText(model.areaLabel, size / 2, WORLD_MAP_TITLE_TOP);
-    ctx.fillText(model.areaLabel, size / 2, WORLD_MAP_TITLE_TOP);
-    ctx.textBaseline = 'alphabetic';
+    // The world map has no DOM zone label. Rasterize this localized title once,
+    // then use a single whole-pixel blit on every drag/pinch redraw.
+    this.titleSprites.beginRedraw();
+    this.titleSprites.draw(ctx, model.areaLabel, size / 2, textStyle.baselineY, {
+      font: textStyle.font,
+      fill: colors.label,
+      stroke: colors.outline,
+      lineWidth: textStyle.outlineWidth,
+    });
+    return model;
   }
 }

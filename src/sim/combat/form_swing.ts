@@ -11,7 +11,7 @@
 // content tables, so it stays deterministic and host-agnostic.
 
 import { CLASSES, ITEMS } from '../data';
-import type { Entity, PlayerClass } from '../types';
+import type { Entity, PlayerClass, WeaponInfo } from '../types';
 
 // The rogue's baseline weapon speed (its starting dagger). Sourcing it from the
 // content tables keeps Wolf Form genuinely "same as rogue" even if the rogue's
@@ -24,6 +24,19 @@ export const ROGUE_BASE_SWING_SPEED: number = ITEMS[CLASSES.rogue.startWeapon].w
 export function baseSwingSpeed(e: Entity): number {
   for (const a of e.auras) if (a.kind === 'form_cat') return ROGUE_BASE_SWING_SPEED;
   return e.weapon.speed;
+}
+
+// Classic instant-attack normalization speeds (seconds), by weapon class. An
+// instant special attack that opts into normalization computes its weapon
+// damage as if the weapon swung at this fixed speed, not its real speed, so a
+// slow high-per-hit weapon cannot inflate an energy-gated instant. Daggers
+// normalize to 1.7 and every other one-hander to 2.4, exactly like the
+// classic era; this repo's rogues only ever wield one of the two.
+export const DAGGER_NORMALIZED_SPEED = 1.7;
+export const ONE_HAND_NORMALIZED_SPEED = 2.4;
+
+export function normalizedInstantSpeed(weapon: WeaponInfo): number {
+  return weapon.dagger ? DAGGER_NORMALIZED_SPEED : ONE_HAND_NORMALIZED_SPEED;
 }
 
 // The druid shapeshifts that fight with claws (or hooves): while one is active

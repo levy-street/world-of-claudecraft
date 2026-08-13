@@ -15,8 +15,8 @@
     "cancelCast fishing arm via dealDamage (FISHING_CAST_ID, not pushback)",
     "multi-class casters: mage/priest/warlock"
   ],
-  "draws": 2043,
-  "drawDigest": "facf02cd",
+  "draws": 2040,
+  "drawDigest": "20934749",
   "frames": [
     {
       "tick": 0,
@@ -36,7 +36,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "fa75482c",
+      "state": "0e9effc9",
       "events": "cab88987",
       "rng": {
         "draws": 2,
@@ -111,6 +111,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -182,6 +186,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -253,6 +261,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -482,7 +494,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 967,
-      "state": "434bc343",
+      "state": "5237ec44",
       "events": "68aa6876",
       "rng": {
         "draws": 3,
@@ -493,7 +505,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 967,
-      "state": "ccbfdf50",
+      "state": "9a4cae1d",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -504,7 +516,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 967,
-      "state": "3a34b980",
+      "state": "8684fbed",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -515,7 +527,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 967,
-      "state": "8fc3f25b",
+      "state": "fa261f52",
       "events": "cfe186a4",
       "rng": {
         "draws": 3,
@@ -526,7 +538,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 967,
-      "state": "273f8a14",
+      "state": "66f9d1a3",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -537,7 +549,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 967,
-      "state": "e9beb4e9",
+      "state": "a1874e18",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -548,7 +560,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 967,
-      "state": "e859b3cc",
+      "state": "6e3ef1fb",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -559,7 +571,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 967,
-      "state": "60ec2e11",
+      "state": "7019fd00",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -570,7 +582,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 967,
-      "state": "b6855578",
+      "state": "04372377",
       "events": "ea26640b",
       "rng": {
         "draws": 42,
@@ -581,7 +593,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 967,
-      "state": "3910745c",
+      "state": "7dc5fe6b",
       "events": "741638a5",
       "rng": {
         "draws": 84,
@@ -592,7 +604,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 967,
-      "state": "e9a28c44",
+      "state": "188ad3b3",
       "events": "741638a5",
       "rng": {
         "draws": 122,
@@ -603,7 +615,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 967,
-      "state": "bcef9699",
+      "state": "f9a3a928",
       "events": "741638a5",
       "rng": {
         "draws": 157,
@@ -614,7 +626,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 967,
-      "state": "eca0b897",
+      "state": "9a5b1eee",
       "events": "741638a5",
       "rng": {
         "draws": 192,
@@ -625,7 +637,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 967,
-      "state": "1fc307a4",
+      "state": "c33c1ad3",
       "events": "f6215bc0",
       "rng": {
         "draws": 232,
@@ -636,7 +648,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 967,
-      "state": "181b6fa3",
+      "state": "c2a58a7a",
       "events": "11f870ff",
       "rng": {
         "draws": 271,
@@ -647,7 +659,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 967,
-      "state": "b1352ead",
+      "state": "3454daa9",
       "events": "741638a5",
       "rng": {
         "draws": 295,
@@ -658,7 +670,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 967,
-      "state": "47062c87",
+      "state": "f7682b3f",
       "events": "576d52cd",
       "rng": {
         "draws": 344,
@@ -669,7 +681,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 967,
-      "state": "fcc903d2",
+      "state": "a88db750",
       "events": "741638a5",
       "rng": {
         "draws": 394,
@@ -680,7 +692,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 967,
-      "state": "86b033c2",
+      "state": "f7e447c0",
       "events": "741638a5",
       "rng": {
         "draws": 470,
@@ -691,7 +703,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "c51a4612",
+      "state": "ea3729d8",
       "events": "741638a5",
       "rng": {
         "draws": 510,
@@ -702,7 +714,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 967,
-      "state": "87c24d31",
+      "state": "d85cd099",
       "events": "741638a5",
       "rng": {
         "draws": 552,
@@ -713,7 +725,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 967,
-      "state": "d0aac898",
+      "state": "5a6b19be",
       "events": "741638a5",
       "rng": {
         "draws": 602,
@@ -724,7 +736,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 967,
-      "state": "fb45475c",
+      "state": "73481ab6",
       "events": "3443e012",
       "rng": {
         "draws": 660,
@@ -735,7 +747,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 967,
-      "state": "a43eb39a",
+      "state": "f42c9cb6",
       "events": "741638a5",
       "rng": {
         "draws": 732,
@@ -746,7 +758,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 967,
-      "state": "9ecba8ce",
+      "state": "9db12115",
       "events": "aedacb4b",
       "rng": {
         "draws": 795,
@@ -757,7 +769,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 967,
-      "state": "2fe59883",
+      "state": "c302fd9a",
       "events": "741638a5",
       "rng": {
         "draws": 848,
@@ -768,7 +780,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 967,
-      "state": "faab4554",
+      "state": "bff9e263",
       "events": "741638a5",
       "rng": {
         "draws": 906,
@@ -779,7 +791,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 967,
-      "state": "18a99872",
+      "state": "84156d49",
       "events": "741638a5",
       "rng": {
         "draws": 952,
@@ -790,7 +802,7 @@
       "tick": 145,
       "time": 7.25,
       "nextId": 967,
-      "state": "98e84f62",
+      "state": "8067f599",
       "events": "741638a5",
       "rng": {
         "draws": 999,
@@ -801,7 +813,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 967,
-      "state": "7f6778d9",
+      "state": "ec8b52e8",
       "events": "741638a5",
       "rng": {
         "draws": 1065,
@@ -812,7 +824,7 @@
       "tick": 155,
       "time": 7.75,
       "nextId": 967,
-      "state": "53c5d58f",
+      "state": "08753ba6",
       "events": "3443e012",
       "rng": {
         "draws": 1125,
@@ -823,7 +835,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 967,
-      "state": "111515b5",
+      "state": "f243fa74",
       "events": "741638a5",
       "rng": {
         "draws": 1172,
@@ -834,7 +846,7 @@
       "tick": 165,
       "time": 8.25,
       "nextId": 967,
-      "state": "1e33cccd",
+      "state": "d4d6a52c",
       "events": "576d52cd",
       "rng": {
         "draws": 1249,
@@ -845,7 +857,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 967,
-      "state": "1c0192f0",
+      "state": "5ee49c2f",
       "events": "741638a5",
       "rng": {
         "draws": 1311,
@@ -856,7 +868,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 967,
-      "state": "d0a7e5a0",
+      "state": "c719f0bf",
       "events": "741638a5",
       "rng": {
         "draws": 1369,
@@ -867,7 +879,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 967,
-      "state": "c05ec2f6",
+      "state": "58a241dd",
       "events": "741638a5",
       "rng": {
         "draws": 1443,
@@ -878,7 +890,7 @@
       "tick": 184,
       "time": 9.2,
       "nextId": 967,
-      "state": "16531c72",
+      "state": "f8499949",
       "events": "741638a5",
       "rng": {
         "draws": 1489,
@@ -959,6 +971,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -1033,6 +1049,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -1107,6 +1127,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -1354,7 +1378,7 @@
       "tick": 185,
       "time": 9.25,
       "nextId": 967,
-      "state": "e75f90c7",
+      "state": "c6d7be7e",
       "events": "741638a5",
       "rng": {
         "draws": 1495,
@@ -1365,7 +1389,7 @@
       "tick": 190,
       "time": 9.5,
       "nextId": 967,
-      "state": "52936e78",
+      "state": "58de1677",
       "events": "741638a5",
       "rng": {
         "draws": 1559,
@@ -1376,7 +1400,7 @@
       "tick": 195,
       "time": 9.75,
       "nextId": 967,
-      "state": "4638a6af",
+      "state": "bae81706",
       "events": "53d9a7fe",
       "rng": {
         "draws": 1642,
@@ -1387,7 +1411,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 967,
-      "state": "25abb1d5",
+      "state": "087b0841",
       "events": "741638a5",
       "rng": {
         "draws": 1697,
@@ -1398,7 +1422,7 @@
       "tick": 205,
       "time": 10.25,
       "nextId": 967,
-      "state": "cbd761ff",
+      "state": "f99f16c9",
       "events": "2c687991",
       "rng": {
         "draws": 1734,
@@ -1409,7 +1433,7 @@
       "tick": 206,
       "time": 10.3,
       "nextId": 967,
-      "state": "73cfad71",
+      "state": "7e8b4e41",
       "events": "ceb1c2e3",
       "rng": {
         "draws": 1743,
@@ -1490,6 +1514,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -1564,6 +1592,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -1638,6 +1670,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -1680,7 +1716,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 889,
+          "resource": 895,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -1898,8 +1934,8 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 967,
-      "state": "0541c8fc",
-      "events": "676f8933",
+      "state": "b9d9a696",
+      "events": "8f3dd3bf",
       "rng": {
         "draws": 1779,
         "digest": "c0ac3000"
@@ -1909,41 +1945,41 @@
       "tick": 215,
       "time": 10.75,
       "nextId": 967,
-      "state": "1ea77f75",
-      "events": "741638a5",
+      "state": "5f75f40c",
+      "events": "5ebb48f3",
       "rng": {
-        "draws": 1814,
-        "digest": "72c0a488"
+        "draws": 1815,
+        "digest": "7d5d4d6b"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 967,
-      "state": "78a3176e",
+      "state": "e2e0c67a",
       "events": "741638a5",
       "rng": {
-        "draws": 1855,
-        "digest": "b9710d9b"
+        "draws": 1856,
+        "digest": "48b376ae"
       }
     },
     {
       "tick": 225,
       "time": 11.25,
       "nextId": 967,
-      "state": "ed985af2",
+      "state": "f83727f0",
       "events": "741638a5",
       "rng": {
-        "draws": 1894,
-        "digest": "bf466b6b"
+        "draws": 1895,
+        "digest": "1a5ed75c"
       }
     },
     {
       "tick": 228,
       "time": 11.4,
       "nextId": 967,
-      "state": "b2df8bae",
-      "events": "23258779",
+      "state": "5f76509c",
+      "events": "2c8ef3be",
       "rng": {
         "draws": 1912,
         "digest": "0017e681"
@@ -2023,6 +2059,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2097,6 +2137,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2119,11 +2163,14 @@
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {
+            "damageDealt": 15,
             "damageTaken": 40
           },
           "craftSkills": {},
           "deedStats": {
-            "counters": {},
+            "counters": {
+              "damageDealt": 15
+            },
             "dungeonClears": {},
             "itemsDiscovered": [
               "apprentice_robe",
@@ -2173,6 +2220,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2214,7 +2265,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 889,
+          "resource": 895,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -2303,13 +2354,13 @@
         {
           "aiState": "idle",
           "attackPower": 11,
-          "castRemaining": 2.65,
+          "castRemaining": 1.15,
           "castTargetId": 966,
-          "castTotal": 5,
+          "castTotal": 3,
           "castingAbility": "drain_life",
           "channelTickEvery": 1,
-          "channelTickTimer": 0.9,
-          "channelTicksLeft": 4,
+          "channelTickTimer": 0.95,
+          "channelTicksLeft": 1,
           "channeling": true,
           "comboUntil": -1,
           "critChance": 0.056,
@@ -2319,7 +2370,7 @@
           "fallStartY": -1.115178,
           "fiveSecondRule": 1.1,
           "gcdRemaining": 0.4,
-          "hp": 19460,
+          "hp": 19471,
           "id": 965,
           "inCombat": true,
           "kind": "player",
@@ -2337,7 +2388,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 890,
+          "resource": 900,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -2386,7 +2437,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199863,
+          "hp": 199848,
           "id": 966,
           "inCombat": true,
           "kind": "mob",
@@ -2422,6 +2473,10 @@
             [
               963,
               138
+            ],
+            [
+              965,
+              20.5
             ]
           ],
           "wanderTarget": {
@@ -2442,19 +2497,19 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 967,
-      "state": "4db07095",
+      "state": "fb9e9ffb",
       "events": "741638a5",
       "rng": {
-        "draws": 1936,
-        "digest": "bbe9c9b0"
+        "draws": 1934,
+        "digest": "1b4db02c"
       }
     },
     {
       "tick": 235,
       "time": 11.75,
       "nextId": 967,
-      "state": "06b15a68",
-      "events": "7b1ee0e4",
+      "state": "bdc5a2b1",
+      "events": "fb0dbe78",
       "rng": {
         "draws": 1989,
         "digest": "10c2c909"
@@ -2464,11 +2519,11 @@
       "tick": 236,
       "time": 11.8,
       "nextId": 967,
-      "state": "3ae44179",
+      "state": "3e39782c",
       "events": "c6a14623",
       "rng": {
-        "draws": 2000,
-        "digest": "06c0ded7"
+        "draws": 1999,
+        "digest": "40b2b478"
       },
       "label": "warlock-fishing-cancel",
       "players": [
@@ -2545,6 +2600,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2619,6 +2678,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2641,13 +2704,13 @@
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 13,
+            "damageDealt": 30,
             "damageTaken": 60
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 13
+              "damageDealt": 30
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2698,6 +2761,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2739,7 +2806,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 889,
+          "resource": 895,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -2829,7 +2896,7 @@
           "attackPower": 11,
           "castTotal": 5,
           "channelTickEvery": 1,
-          "channelTickTimer": 0.5,
+          "channelTickTimer": 0.55,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -2837,7 +2904,7 @@
           "facing": -0.911882,
           "fallStartY": -1.115178,
           "fiveSecondRule": 1.5,
-          "hp": 19453,
+          "hp": 19462,
           "id": 965,
           "inCombat": true,
           "kind": "player",
@@ -2855,7 +2922,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 890,
+          "resource": 900,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -2904,7 +2971,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199848,
+          "hp": 199831,
           "id": 966,
           "inCombat": true,
           "kind": "mob",
@@ -2943,7 +3010,7 @@
             ],
             [
               965,
-              19.5
+              41
             ]
           ],
           "wanderTarget": {
@@ -2964,22 +3031,22 @@
       "tick": 240,
       "time": 12,
       "nextId": 967,
-      "state": "b8a41ba0",
+      "state": "29aab4cd",
       "events": "741638a5",
       "rng": {
-        "draws": 2036,
-        "digest": "97e017e0"
+        "draws": 2033,
+        "digest": "655bb8a9"
       }
     },
     {
       "tick": 241,
       "time": 12.05,
       "nextId": 967,
-      "state": "5f98d42c",
+      "state": "d1db9e81",
       "events": "741638a5",
       "rng": {
-        "draws": 2043,
-        "digest": "facf02cd"
+        "draws": 2040,
+        "digest": "20934749"
       },
       "label": "final",
       "players": [
@@ -3056,6 +3123,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -3130,6 +3201,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -3152,13 +3227,13 @@
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 13,
+            "damageDealt": 30,
             "damageTaken": 60
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 13
+              "damageDealt": 30
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3209,6 +3284,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -3250,7 +3329,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 889,
+          "resource": 901,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -3340,7 +3419,7 @@
           "attackPower": 11,
           "castTotal": 5,
           "channelTickEvery": 1,
-          "channelTickTimer": 0.5,
+          "channelTickTimer": 0.55,
           "combatTimer": 0.25,
           "comboUntil": -1,
           "critChance": 0.056,
@@ -3349,7 +3428,7 @@
           "facing": -0.911882,
           "fallStartY": -1.115178,
           "fiveSecondRule": 1.75,
-          "hp": 19453,
+          "hp": 19462,
           "id": 965,
           "inCombat": true,
           "kind": "player",
@@ -3367,7 +3446,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 890,
+          "resource": 906,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -3417,7 +3496,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199848,
+          "hp": 199831,
           "id": 966,
           "inCombat": true,
           "kind": "mob",
@@ -3456,7 +3535,7 @@
             ],
             [
               965,
-              19.5
+              41
             ]
           ],
           "wanderTarget": {

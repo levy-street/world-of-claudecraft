@@ -58,7 +58,12 @@ import { paintBgFieldAtlas } from '../../bg_field_relief_core';
 import { getI18nRevision, type TranslationKey, t } from '../../i18n';
 import { drawBgAtlasMarks, drawBgBackdropCrowns } from './battleground_atlas_marks_painter';
 import { type BgAtlasLabelId, type BgAtlasMark, bgAtlasLabels } from './battleground_atlas_view';
-import type { BgMapModel } from './battleground_map_view';
+import {
+  type BgMapModel,
+  bgMapCanvasX,
+  bgMapCanvasY,
+  bgMapFitScale,
+} from './battleground_map_view';
 
 // REQUIRED tokens: the plan does not draw until every one of them resolves (an
 // unstyled first frame would paint the team marks in the wrong hue, which is the
@@ -107,7 +112,6 @@ const WALL_FILL = '#333a48';
 const SURROUND_FILL = '#3d4a33';
 const LABEL_HALO = '#efe6cf';
 
-const FIELD_PAD_PX = 18;
 // The wooded surround's edge vignette (ink token; alphas compound with it).
 const VIGNETTE_ALPHA = 0.16;
 const VIGNETTE_DEPTH_FRAC = 0.14;
@@ -213,18 +217,15 @@ export class BattlegroundMapPainter {
     if (!model.active || !colors) return;
     // Fit the tall field (2*halfX wide, 2*halfZ deep) into the square canvas;
     // +z (the away half) points UP, so map y = -z.
-    const s = Math.min(
-      (canvasSize - FIELD_PAD_PX * 2) / (model.halfX * 2),
-      (canvasSize - FIELD_PAD_PX * 2) / (model.halfZ * 2),
-    );
+    const s = bgMapFitScale(canvasSize, model.halfX, model.halfZ);
     const cx = canvasSize / 2;
     const cy = canvasSize / 2;
     // World-to-screen follows the minimap/world-map convention: +z (the away
     // half) points UP, and the world's east is -x, so +x maps LEFT (px
     // negates). Without the negation the plan mirrors east-west against the
     // field the player is standing in (the playtest bug).
-    const px = (x: number): number => cx - x * s;
-    const py = (z: number): number => cy - z * s;
+    const px = (x: number): number => bgMapCanvasX(x, canvasSize, s);
+    const py = (z: number): number => bgMapCanvasY(z, canvasSize, s);
     const flip = model.myTeam === 0 ? 1 : -1;
     const fieldW = Math.round(model.halfX * 2 * s);
     const fieldH = Math.round(model.halfZ * 2 * s);

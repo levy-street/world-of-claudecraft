@@ -13,7 +13,8 @@ to the existing KayKit/Quaternius-style set without looking imported.
 
 Run: `node scripts/asset_pipeline/pipeline.mjs <command> [options]` (`--help` prints usage).
 Commands: `weapon`, `prop`, `creature`, `skin`, `skinset`, `skinmodel`, `rig-manual`, `library`,
-`qa`, `validate`, `preview`, `preview-held`, `status`, `balance`, `inspect`, `inplace-check`.
+`fit`, `qa`, `validate`, `preview`, `preview-held`, `status`, `balance`, `inspect`,
+`inplace-check`.
 
 **`qa --job <id>` is the mandatory last step for every generated asset.** It re-verifies
 the finished job structurally (lane-aware: rig + required clips, grip convention + model preview
@@ -38,7 +39,7 @@ so animation style matches the shipped set by construction.
   repaint. Without it, concepts fall back to Tripo text-to-image.
 - Never commit keys or `.env` (root invariant). Keys are never logged.
 
-## The four lanes
+## The lanes
 
 ### 1. weapon
 ```
@@ -177,9 +178,9 @@ job keeps its `raw.glb`) is transformed into the reference rig's BIND space
 wrist line, feet on the bind ground) and skin weights are computed locally
 (`lib/manual_rig.mjs`: distance-to-bone-segment, K=4, 1/d^4 falloff, laterality
 guard). The output carries the reference model's ENTIRE clip library natively
-(all 22 KayKit clips for the knight, including Block/strafes/Walking_Backwards
-that the Tripo preset library cannot provide) plus the REAL handslot.r/.l
-bones, for $0.00 vs ~$1.65 of rig + retargets. Two constraints, both verified:
+(including Block/strafes/Walking_Backwards that the Tripo preset library cannot
+provide) plus the REAL handslot.r/.l bones, for $0.00 vs ~$1.65 of rig +
+retargets. Two constraints, both verified:
 vertices must be authored in the space of inverse(IBM) (the rig's REST pose is
 NOT its bind pose; using rest-world coordinates shreds every animated frame),
 and the raw mesh must be a T-pose. Best on humanoids whose proportions are
@@ -191,170 +192,83 @@ review the clip previews for weight bleed on outlier silhouettes. Run `qa
 ```
 node scripts/asset_pipeline/pipeline.mjs fit [--port 5184] [--no-open]
 ```
-A full studio app over the modular character. Server: `lib/fit_studio.mjs` (cached at start,
+A studio app over the modular character. Server: `lib/fit_studio.mjs` (cached at start,
 restart after editing IT; walks the port forward if 5184 is taken and prints the real URL).
-Page: `fit_studio/`, plain ES modules read per request, so edits show on a reload:
-`index.html` + `style.css` (design system), `main.js` (shell/orchestration), `ui.js`
-(widgets: drag-scrub number fields, sliders, swatch grids, toasts, sections, prefs in
-localStorage), `history.js` (undo/redo), `viewport.js` (renderer/lights/camera),
-`character.js` (GLB, worn state, morphs, appearance), `anchors.js` (gizmo + save),
-`sculpt.js` (body brushes), `hairbrush.js` (shape brushes over the selected
-hair sculpt).
-
-Layout: library rail (search box; hair sculpts from `tmp/modular/hair_src/`, `E2_` jewellery
-sets from the GLB, body sculpt; green dot = anchored, amber = unsaved edits) · viewport
-(view pills 1 to 6/F, ghost/grid/wireframe/turntable/screenshot toggles, live TRS readout,
-double-click = orbit focus) · inspector tabs **Fit / Character / Scene** · top bar (G/R/S
-gizmo modes, X space, snap, uniform scale, undo/redo, Save `⌘S` with dirty state) · status
-bar (anchored counts, sculpt delta count, GLB tag, fps). `?` opens the shortcut sheet.
-
-**Fit tab**: numeric TRS fields (drag to scrub, click to type, ⇧ fine), arrow-key nudges
-(X/Y, ⌥=Z, ⇧ fine), copy/paste a placement between styles of the same kind, "Saved" reloads
-the saved anchor, Remove anchor returns the style to the solver. Sway segmented control
-(auto/on/off) per hair style; jewellery gets the material preset swatch grid + hue/light
-tint (twinned with `JEWEL_MATERIALS` in `tmp/modular/jewel.py` and the allowlist in
-`lib/fit_studio.mjs`, keep all three in sync). While a hair sculpt is selected its BUILT
-style is hidden outright (no translucent ghost, Troy, 2026-08-05); the ghost treatment
-remains for jewellery. The UNDERHAIR picker chooses the scalp pattern worn under the
-style, none, the buzz/crew clippers, solid washes (low/high line), widow's peak,
-receded temples, low/high fades, sparse, horseshoe, previewed live with the game's own
-decal and SAVED WITH THE ANCHOR (`underhair` in anchors.json; only non-buzz values are
-written). On every hair save/reset the server regenerates
-`src/render/characters/underhair.generated.ts`, the table `baseScalpDecal` reads at
-runtime, so the choice ships to the game with no rebuild. Pattern names are twinned in
-three places: `UNDERHAIR_STYLES` in modular.ts (the compiler holds stubble.ts's
-SCALP_CUTS/SCALP_SPECS Records complete against it), the `UNDERHAIR_NAMES` allowlist in
-lib/fit_studio.mjs, and `UNDERHAIR_OPTIONS` in fit_studio/anchors.js. Hairline shape
-fields on SCALP_CUTS: `peak` (widow's point down at centre), `temple` (negative lifts
-the line at ±35°, the M shape), `band` (bald crown above, the horseshoe), `taper`
-(fade width); `floor: 1` in SCALP_SPECS = a solid wash. **Everything is undoable** (`⌘Z`): gizmo drags, field scrubs,
-nudges, pastes, material picks, morph slider moves, sculpt strokes, undo re-selects the
-right style before restoring its matrix.
-
-**Sculpt shape** (Fit tab, hair only): grab + smooth brushes over the SELECTED sculpt,
-mirrored across the sculpt's own local x=0 midline (every sculpt in the set mirrors there
-measured in hairimp.py). "Edit shape" borrows the pointer from the gizmo and gives it
-back on Done; each stroke is one undo step, and unsaved shape edits survive switching
-styles. Save commits seat AND shape together: rows of `[restPos, delta]` in the sculpt's
-own local glTF axes go to `tmp/modular/hair_sculpt.json`, and `apply_hair_sculpt` in
-hairimp.py reshapes the imported sculpt right after `import_sculpt`, before is_blade,
-the seat, and the cut, so every downstream measurement sees the tweaked shape. Reset
-shape empties the style's entry and restores the raw sculpt.
-
-**Save writes `tmp/modular/anchors.json`, and that file IS the seat**: `hairimp.py` applies
-a saved hair anchor verbatim (cut/snap/clamp/close still run), `jewel.py` applies a saved
-jewellery matrix as a side-aware delta (right half verbatim, left half X-mirrored, midline
-blended, the browser previews exactly that with a live mirror; E2 geometry sits at its
-authored "rack" spot until placed, so identity = untouched). Matrices are stored in glTF
-Y-up axes exactly as the gizmo produced them; the Blender-side `C @ M @ C^-1` conjugation
-lives in `hairimp.anchor_matrix`, so never pre-convert. The first save of a server run
-snapshots the prior file to `anchors.json.bak`. Format unchanged, extra JSON keys would be
-ignored by the Python side, but don't add any without need.
-
-**Character tab** (the fit-in-context controls): gender, armor set + helm, underclothes,
-beard (`B2_*`), built hair (`H2_*`, context while placing earrings), face parts
-(ear/brow/eye/mouth variants + lash toggle; picking an ear style also drives the matching
-`ear_*` morph so piercings follow, the jewel.py morph gate), animation clip + speed + pause,
-during playback the fitted piece rides the head bone via a `follow` group
-(headWorld · headRest⁻¹), so authoring stays in REST space and stopping restores the rest
-pose exactly. Locomotion clips also drive HAIR SWAY: the game's own `HairSwayDriver`
-(bundled from `src/render/characters/hair_sway.ts`) runs the built styles' sway morphs
-from a synthetic gait (clip name → yd/s), and a twin of its spring feeds `swaySignal`,
-which bends the RAW sculpt being fitted per-vertex (`tickHairSway` in hairbrush.js):
-zero above character height 1.52, ramping to the tips (weight^1.8), gated to styles with
-enough hanging length (≥24 verts below 1.34, the game's own sway rule), with guard
-spheres (skull/face/torso) that forbid any vertex ending up deeper inside than it
-started, so sway never clips through the character. A rigid crown-pivot wobble shipped
-first and read as a tilting helmet (Troy, 2026-08-05), do not bring it back. The bend
-is display-only: it settles bit-exact when the clip stops, saves settle first so sway
-never bakes into shape rows, and brushing is blocked while a clip plays. Stopping hands
-the sway morphs back to the panel sliders. The character also wears the game's SCALP STUBBLE decal (`buildStubbleDecal`
-from stubble.ts, bundled; material `mod_stubble`, tinted by the hair wheel) under every
-fitted style, toggle in the Body section; the buzz density itself lives in
-`SCALP_SPECS` in stubble.ts. APPEARANCE = the game's HSL wheels (defaults from `DEFAULT_APPEARANCE` in
-`src/render/characters/modular.ts`), tinting materials BY NAME across the scene,
-`mod_skin`+`mod_skin_detail`, `mod_hair` (hair, brows, beards, and the sculpt preview all
-follow), `mod_eye`, `mod_lash`, so ghost clones recolour too. MORPHS: every pair the GLB
-carries as one −1..1 slider (face: ears/jaw/cheeks/chin/brow/nose/eyes/smirk; body:
-shoulders/chest/hips/hands/elbows/knees/feet), 0..1 expressions (`mouth_*`), and the
-`hair_sway_l/r/b` morphs for previewing sway extremes on a built style.
-
-**Scene tab**: lighting presets (Studio/Game/Soft/Rim, Game = no env + no tone mapping,
-the in-game look) with key intensity/angle/height, environment (PMREM RoomEnvironment,
-without it metal presets read black), rim, exposure; backdrop (dark/flat/light/chroma);
-ghost visibility + opacity; grid; wireframe; turntable; camera view buttons + reset.
-Camera, lighting, appearance, ghost prefs, and panel collapse states persist in
-localStorage (`fitstudio.prefs.v2`).
-
-**Body sculpt** (`B` key or the library item): grab (camera-plane drag), inflate (drag up =
-out, down = in, along stroke-start normals), smooth (relax toward neighbours, adjacency is
-built by welding split verts by position), radius/strength, Mirror X toggle (midline-safe
-blending), a brush ring cursor, and one undo step per stroke. Save diffs against the loaded
-rest positions and writes `tmp/modular/body_sculpt.json` rows of `[restPos, delta]` in glTF
-axes, which `bodysculpt.py` re-applies in the rebuild by POSITION match (survives exporter
-vertex reorder/splits; runs before `bodykeys.py` adds shape keys, since edits under a live
-key reach nothing).
-
-The page exposes `window.__fit`, the stable e2e surface (selectHair/selectJewel/
-enterSculpt/effectiveMatrix/setEffectiveMatrix/save/state/current/renderOnce, same names as
-v1) plus the live modules (`history`, `character`, `anchors`, `sculpt`, `viewport`) for
-deeper probes. Anchors survive rebuilds; Reset removes one and the solver takes that style
-back over.
+Page: `fit_studio/`, plain ES modules read per request, so edits show on a reload. The UI
+itself (library rail, gizmo, inspector tabs, shortcut sheet) is discoverable by running it;
+the contracts below are not.
+- **`tmp/modular/anchors.json` IS the seat.** Matrices are stored in glTF Y-up axes exactly
+  as the gizmo produced them; the Blender-side conjugation lives on the CONSUMER side, so
+  never pre-convert. Jewellery applies side-aware: the right half verbatim, the left half
+  X-mirrored, the midline blended (the browser previews exactly that with a live mirror).
+  The first save of a server run snapshots the prior file to `anchors.json.bak`. Extra JSON
+  keys would be ignored by the consumers; do not add any without need.
+- **The Python consumers are maintainer-local.** `tmp/` is gitignored: the Blender-side
+  rebuild tooling that reads the anchors and sculpt rows (`hairimp.py`, `jewel.py`,
+  `bodysculpt.py`, `bodykeys.py`, the raw hair sculpts in `tmp/modular/hair_src/`) exists
+  only in the maintainer's local workspace and cannot be verified from a fresh clone; treat
+  those contracts as maintainer-local. The in-tree halves CAN be checked: the jewellery
+  material allowlist `JEWEL_MATERIAL_NAMES` in `lib/fit_studio.mjs` (twinned with the
+  Python `JEWEL_MATERIALS` and the preset table in `fit_studio/anchors.js`), and the
+  underhair triple below.
+- **Underhair pattern names are twinned in three places**: `UNDERHAIR_STYLES`
+  (`src/render/characters/modular.ts`), the `UNDERHAIR_NAMES` allowlist
+  (`lib/fit_studio.mjs`), and `UNDERHAIR_OPTIONS` (`fit_studio/anchors.js`); keep all three
+  in sync. The picked pattern is saved WITH the anchor (`underhair` in anchors.json), and
+  every hair save/reset regenerates `src/render/characters/underhair.generated.ts`, the
+  table `baseScalpDecal` reads at runtime, so the choice ships to the game with no rebuild.
+- **Sway is display-only and settles before save.** Locomotion clips drive the game's own
+  `HairSwayDriver` (bundled from `src/render/characters/hair_sway.ts`) on built styles and
+  a per-vertex bend on the raw sculpt being fitted; the bend settles bit-exact when the
+  clip stops, saves settle first so sway never bakes into shape rows, and brushing is
+  blocked while a clip plays. (A rigid crown-pivot wobble shipped first and read as a
+  tilting helmet; do not bring it back.)
+- **Undo granularity**: everything is undoable; each brush stroke is ONE undo step, and
+  undo re-selects the right style before restoring its matrix. Shape/body saves write rows
+  of `[restPos, delta]` in the sculpt's own local glTF axes, matched by POSITION on the
+  consumer side so they survive exporter vertex reorder/splits.
+- `window.__fit` is the stable e2e surface (selectHair/selectJewel/enterSculpt/
+  effectiveMatrix/setEffectiveMatrix/save/state/current/renderOnce) plus the live modules
+  (`history`, `character`, `anchors`, `sculpt`, `viewport`) for deeper probes. Anchors
+  survive rebuilds; Reset removes one and the solver takes that style back over.
 
 ## Asset library (viewer + inspector, static OR live 3D)
 ```
 node scripts/asset_pipeline/pipeline.mjs library [--full] [--category weapons,skins] [--open]
 ```
-Builds a self-contained static viewer at `tmp/asset_pipeline/library/index.html` (open it in
-any browser; `--open` does it for you). It inventories every GLB under `public/models/`, every
-class-skin atlas (`public/textures/skins/`, rendered ON its class model with the game's
-texture-swap semantics), every Combat Mech chroma, and every pipeline job under
-`tmp/asset_pipeline/`. Each entry carries the full structural inspection (tris, verts,
-materials, texture table, animation clips + durations, rig joints, bounds) plus its
-REGISTRATION status cross-referenced from the real registries: weapons show their grip family,
-mapped item ids, and HUD icon; models show their `VISUALS` keys; skins show their
-`SKINS`/`SKIN_COUNTS` slot; chromas their `MECH_CHROMAS` rank; generated jobs their lane,
-step ledger, validation result, and Tripo task ids. Unreferenced files are flagged (amber dot)
-so orphans are visible at a glance. Weapons include the in-hand composite; every rigged model
-gets a per-clip pose frame for ALL its animations (so the static viewer shows all animations).
-Thumbnails are content-hash cached under `library/thumbs/`, so the first run renders everything
-(a few minutes) and later runs only render new or changed files. The registry parsers are
-read-only regex over the pure data registries and are guarded by `tests/asset_pipeline.test.ts`.
+Builds a self-contained static viewer at `tmp/asset_pipeline/library/index.html` covering
+every GLB under `public/models/`, every class-skin atlas (rendered ON its class model with
+the game's texture-swap semantics), every Combat Mech chroma, and every pipeline job, each
+with its full structural inspection AND its REGISTRATION status cross-referenced from the
+real registries (unreferenced files are flagged, so orphans are visible at a glance). The
+registry parsers are read-only regex over the pure data registries and are guarded by
+`tests/asset_pipeline.test.ts`. Thumbnails are content-hash cached under `library/thumbs/`:
+the first run renders everything, later runs only new or changed files.
 
-### Live 3D viewer (`--serve`)
-```
-node scripts/asset_pipeline/pipeline.mjs library --serve [--port 5180]
-```
-Builds the library, then starts a local http server and opens the browser to a LIVE viewer:
-clicking any asset renders the REAL GLB in 3D on a ground plane with orbit controls (drag to
-rotate, scroll to zoom), a per-animation clip dropdown that plays each clip, and a "vs player"
-toggle that drops the knight in beside the asset at true in-game heights for scale. Skin assets
-load their class model with the atlas applied live (all 22 KayKit clips). Static open of the
-file (`open tmp/asset_pipeline/library/index.html`) still works via the rendered clip-frame
-strip; `--serve` upgrades it to live rendering.
-
-When a weapon is held by a character, a "grip fit" bar exposes per-weapon move (x/y/z), rotate
-(x/y/z degrees), and scale sliders that update the in-hand transform live. These layer ON TOP
-of the family variant grip (lift + shrink clamp + hand flip) via `WEAPON_GRIP_OVERRIDES` in
-`src/render/characters/weapon_grip.ts` (the pure `variantGripTransform` the engine's
-`applyVariantGrip` uses; the viewer mirrors the same math). "Save" POSTs to `/api/grip/save`
-(`integrate.saveGripOverride`, an anchored numeric upsert keyed by weapon model basename, so no
-free text reaches the source); "Reset" restores the family default (an identity override removes
-the key). Save is enabled only for APPLIED weapons (`public/models/weapons`, which have a stable
-registry key); generate + `--apply` a weapon first, then tune. After saving, restart/HMR the
-game client to pick up the new grip.
-
-For a weapon in an Armory Codex VFX tier, the "fx tuning" bar's sliders seed from what the GAME
-currently shows for that weapon: its saved row in `WEAPON_VFX_TUNING`
-(`src/render/weapon_vfx_tuning.ts`) when one exists, else the tier's `WORLD_TUNING` baseline
-(`src/render/weapon_vfx.ts`; twinned in `weapon_vfx.js`, keep the values in sync). "Save VFX"
-POSTs the current sliders to `/api/vfx/save` (`integrate.saveVfxTuning`, the same anchored
-numeric upsert), writing the row the world renderer and the armory inspect preview then use; a
-saved row REPLACES the tier baseline for that weapon. All-1.0 sliders remove the row (back to
-the tier default). The game dev client hot-reloads the file on save. Mechanics: `three_bundle_entry.js` is
-esbuild-bundled to `/three.bundle.js`, `viewer_live.js` is the browser module, and a guarded
-`/repo/*` route serves GLBs/atlases from `public/` and `tmp/asset_pipeline/` only (never `.env`
-or `src/`). The server runs until Ctrl-C.
+`library --serve [--port 5180]` upgrades it to a LIVE 3D viewer (real GLB rendering, clip
+playback, a "vs player" scale toggle). What the viewer displays is discoverable by running
+it; the save-route contracts are not:
+- **Grip fit** (weapon held by a character): per-weapon move/rotate/scale sliders layer ON
+  TOP of the family variant grip via `WEAPON_GRIP_OVERRIDES` in
+  `src/render/characters/weapon_grip.ts` (the pure `variantGripTransform` the engine's
+  `applyVariantGrip` uses; the viewer mirrors the same math). "Save" POSTs to
+  `/api/grip/save` (`integrate.saveGripOverride`, an anchored numeric upsert keyed by
+  weapon model basename, so no free text reaches the source); an identity override removes
+  the key. Save is enabled only for APPLIED weapons (which have a stable registry key):
+  generate + `--apply` first, then tune; restart/HMR the game client to pick up a new grip.
+- **FX tuning** (Armory Codex VFX tiers): sliders seed from the weapon's saved row in
+  `WEAPON_VFX_TUNING` (`src/render/weapon_vfx_tuning.ts`) when one exists, else the tier's
+  `WORLD_TUNING` baseline (`src/render/weapon_vfx.ts`; twinned in this directory's
+  `weapon_vfx.js`, keep the values in sync). "Save VFX" POSTs to `/api/vfx/save`
+  (`integrate.saveVfxTuning`, the same anchored numeric upsert); a saved row REPLACES the
+  tier baseline for that weapon, and all-1.0 sliders remove it. The dev client hot-reloads
+  the file on save. Authoring a NEW rarity-tier VFX collection is a separate batch loop:
+  `WEAPON_VFX_GEN.md` in this directory is the authoritative prompt + contract playbook for
+  that; the fx-tuning bar only tunes per-weapon rows on top of what it produced.
+- Mechanics: `three_bundle_entry.js` is esbuild-bundled to `/three.bundle.js`,
+  `viewer_live.js` is the browser module, and a guarded `/repo/*` route serves GLBs/atlases
+  from `public/` and `tmp/asset_pipeline/` only (never `.env` or `src/`). The server runs
+  until Ctrl-C.
 
 ### Web creation wizard (`--serve`, human-in-the-loop)
 The live viewer also hosts a step-by-step asset CREATOR so an operator can generate an asset
@@ -401,6 +315,16 @@ Mechanics:
   the texture task id. `--redo generate` cascades over texture, so a regenerated model starts
   clean; wizardStatus only surfaces `textured.glb` when the LEDGER says the texture step is done
   (a leftover file from a cleared round must not mask a fresh model).
+- Status decisions are pure and shared: `wizard_status.mjs` (imported by both `wizard_ui.js`
+  and the server, pinned by `tests/asset_pipeline.test.ts`). A stopped child is NOT success:
+  the durable job ledger is the source of truth, and a failed step must return the operator
+  to an error screen rather than exposing review actions for artifacts that do not exist.
+- The wizard's export action (`compressExport` in `lib/wizard.mjs`) writes a compressed
+  handoff GLB OUTSIDE the repo (`~/Documents/WOC Assets`) plus a `.usdz` companion via
+  `lib/usdz.mjs` + `usdz_entry.js` (three.js `USDZExporter` inside headless Chrome, the
+  same puppeteer + swiftshader approach as `preview.mjs`), because macOS Quick Look renders
+  GLB textures as bare chrome but USDZ natively. USDZ failure is non-fatal: the GLB is the
+  real handoff file.
 
 ## Utility commands
 - `validate --file x.glb --kind weapon|prop|creature [--family sword] [--height n] [--clips ...]`

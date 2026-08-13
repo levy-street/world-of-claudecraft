@@ -75,6 +75,10 @@ import type {
   Vec3,
 } from './types';
 
+export interface DamageResolution {
+  landedHpLoss: number;
+}
+
 // Live primitive views onto the running Sim. These are GETTERS, not snapshots:
 // `time`/`tickCount` advance every tick, and the `rng`/`entities` identities are
 // shared so a consumer observes the same mutable world the Sim does (the engine
@@ -405,6 +409,12 @@ export interface SimContextCallbacks {
     // the Chronomancy Temporal Echo conversion; area Arcane damage heals the
     // marked ally at a reduced rate. Defaults false.
     aoe?: boolean,
+    // Optional out-parameter for consumers that must copy the exact landed HP
+    // loss before reactive healing runs later in the damage pipeline.
+    resolution?: DamageResolution,
+    // The amount is already an exact landed-HP-loss copy. Preserve immunities
+    // and lethal handling, but do not apply target modifiers, absorbs, or redirects again.
+    resolvedHpLoss?: boolean,
   ): number;
   handleDeath(entity: Entity, killer: Entity | null, killerAbility?: string | null): void;
   cancelCast(entity: Entity): void;
@@ -464,7 +474,7 @@ export interface SimContextCallbacks {
     ability: string | null,
     kind: DamageEventKind,
     attackAnimationStarted?: boolean,
-  ): void;
+  ): number;
   cleanupYumiMatch(match: ArenaMatch): void;
   rollLoot(
     mob: Entity,
@@ -487,6 +497,10 @@ export interface SimContextCallbacks {
     abilityId?: string | null,
     canCrit?: boolean,
     canTriggerWeaponProcs?: boolean,
+    beaconTransferEligible?: boolean,
+    alreadyResolved?: boolean,
+    // Out-param, last so the two boolean flags above keep their positions.
+    resolution?: { resolved: number },
   ): number;
   // Spell crit chance from intellect. STAYS on Sim (shared: the casting/ability
   // paths read it too); exposed here so the extracted heal core can draw its crit.
@@ -753,11 +767,19 @@ export interface SimContextCallbacks {
   // opts.silent / opts.callerLogs: see Sim.addItem's matching params, same
   // contract (suppress the client's default loot audio cue, and its default
   // "You receive:" text line when the caller owns the line for this grant).
+  // opts.movement: also Sim.addItem's, same contract (this grant relocates or
+  // re-mints copies somebody already held, so it never bumps a Reliquary
+  // obtain count; discovery still fires).
   addItem(
     itemId: string,
     count: number,
     pid?: number,
-    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+    opts?: Readonly<{
+      silent?: boolean;
+      callerLogs?: boolean;
+      craftedRecipeId?: string;
+      movement?: boolean;
+    }>,
   ): void;
   // Equip passthroughs for the /dev kit presets (src/sim/dev_kit.ts), which equip
   // bags before gear so pooled bag capacity exists before the pieces land. Plain
@@ -775,7 +797,12 @@ export interface SimContextCallbacks {
     instance: ItemInstancePayload,
     pid?: number,
     count?: number,
-    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+    opts?: Readonly<{
+      silent?: boolean;
+      callerLogs?: boolean;
+      craftedRecipeId?: string;
+      movement?: boolean;
+    }>,
   ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
@@ -860,12 +887,14 @@ export interface SimContextCallbacks {
     abilityName: string | null,
     opts: {
       cannotBeDodged?: boolean;
+      normalizedInstant?: boolean;
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;
       forceCrit?: boolean;
       critBonus?: number;
       onDealt?: (amount: number) => void;
+      onEffectiveDamage?: (amount: number) => void;
       abilityId?: string | null;
     },
   ): boolean;
@@ -1005,6 +1034,19 @@ export interface SimContextCallbacks {
   // lifetime-XP accrual, and similar); grantDeed is the idempotent unlock
   // every path shares (the evaluator and the bespoke manual-deed sites).
   bumpDeedStat(meta: PlayerMeta, stat: DeedStatKey, delta: number): void;
+  // No retro opts here on purpose: the join-time seed pass calls the deeds
+  // module function directly (deeds.ts seedItemDiscovery), so a future caller
+  // reaching through this seam cannot ask for a silent fill and gets live
+  // find semantics, which is the safe default for a live acquisition site.
+  // Same rule for movement provenance: a site that must flag a discovery as a
+  // relocation (vendor buyback, items.ts BUYBACK_MOVEMENT) imports the deeds
+  // module function, which carries the opts bag; this seam stays opts-free.
+  // As of Phase 17 the grant hubs also call the module function, so this
+  // member has NO production caller left; it stays because callbacks are
+  // append-only, but new call sites should use the module function. The two
+  // tests/deeds.test.ts arms are now the ONLY exercisers of the delegate,
+  // so a drift between the seam default and the module default shows up
+  // there and nowhere on a production path.
   markItemDiscovered(meta: PlayerMeta, itemId: string, rolledQuality?: string): void;
   markVisited(meta: PlayerMeta, markId: string): void;
   markDeedsDirty(pid: number): void;
