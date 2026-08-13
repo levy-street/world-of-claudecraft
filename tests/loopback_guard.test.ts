@@ -163,7 +163,12 @@ const GUARDED_SCRIPTS = [
 // Scripts that drive /dev cheats over the wire but never open Postgres: they
 // guard the server target only. A script that grows a pg import graduates to
 // GUARDED_SCRIPTS (the discovery arm below reddens until it does).
-const URL_GUARDED_SCRIPTS = ['scripts/crowd_fps_bench.mjs'] as const;
+const URL_GUARDED_SCRIPTS = [
+  // Mints an admin bearer and posts a tuning document over HTTP; it never
+  // opens a connection, so it has no DATABASE_URL to guard.
+  'scripts/class_tuner_shots.mjs',
+  'scripts/crowd_fps_bench.mjs',
+] as const;
 
 // Full-line // comments are stripped before the scan: this file's own subject
 // matter means the phrase "assertLoopbackUrl" appears in prose inside these

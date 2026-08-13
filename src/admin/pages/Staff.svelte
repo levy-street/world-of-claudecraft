@@ -19,7 +19,7 @@
   let addRoles = $state<string[]>([]);
   let saving = $state(false);
 
-  const KNOWN_ROLE_KEYS = new Set(['superadmin', 'admin', 'moderator', 'viewer']);
+  const KNOWN_ROLE_KEYS = new Set(['superadmin', 'admin', 'tuner', 'moderator', 'viewer']);
 
   function roleLabel(role: string): string {
     return KNOWN_ROLE_KEYS.has(role) ? t(`staff.role.${role}`) : role;

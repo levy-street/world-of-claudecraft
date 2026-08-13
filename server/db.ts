@@ -21,6 +21,7 @@ import {
 } from './character_rank_cache';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
+import { CLASS_TUNING_SCHEMA } from './class_tuning_db';
 import {
   buildCommunityTestCharacters,
   communityTestAccountsEnabled,
@@ -1292,6 +1293,11 @@ export async function ensureSchema(): Promise<void> {
     // block, unblock). FK-references accounts(id), so it runs after SCHEMA.
     // Applied unconditionally (idempotent), like the other schema modules.
     await client.query(CONTENT_MODERATION_SCHEMA);
+    // Class power tuner: the per-realm ability tuning document plus its
+    // append-only change trail. FK-references accounts(id), so it runs after
+    // SCHEMA. Applied unconditionally (idempotent), like the other schema
+    // modules; an untuned realm simply has no row.
+    await client.query(CLASS_TUNING_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);

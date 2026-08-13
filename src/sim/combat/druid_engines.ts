@@ -6,7 +6,7 @@
 
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { hotTickBonus } from '../spell_scaling';
+import { abilityPowerCoeffMult, hotTickBonus } from '../spell_scaling';
 import type { Aura, AuraKind, Entity } from '../types';
 
 export const MOONTIDE_ID = 'moontide';
@@ -297,7 +297,13 @@ function replantWildbloom(ctx: SimContext, player: Entity, target: Entity): void
   if (!resolved || !hot || hot.type !== 'hot') return;
   const tickValue =
     Math.max(1, Math.round(hot.total / (hot.duration / hot.interval))) +
-    hotTickBonus(player.spellPower, hot.duration, hot.interval);
+    hotTickBonus(
+      player.spellPower,
+      hot.duration,
+      hot.interval,
+      1,
+      abilityPowerCoeffMult(resolved.def),
+    );
   ctx.applyAura(target, {
     id: 'rejuvenation',
     name: resolved.def.name,

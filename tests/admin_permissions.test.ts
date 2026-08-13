@@ -67,8 +67,10 @@ describe('admin permission vocabulary', () => {
 
   it('gives viewer the general read permissions, excluding the restricted ones', () => {
     // Reads that are NOT part of the general viewer bundle: anti-bot internals
-    // and Operations/Usage are admin/superadmin only.
-    const restricted = ['botdetector.read', 'ops_usage.read'];
+    // and Operations/Usage are admin/superadmin only, and the class power tuner
+    // is scoped to the `tuner` designation (the whole point of that role is that
+    // the balance surface reaches a few named people, not every read-only seat).
+    const restricted = ['botdetector.read', 'ops_usage.read', 'tuning.read'];
     const reads = ADMIN_PERMISSIONS.filter(
       (permission) => permission.endsWith('.read') && !restricted.includes(permission),
     );

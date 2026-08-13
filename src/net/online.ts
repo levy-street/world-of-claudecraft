@@ -63,6 +63,7 @@ import {
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
+import { installClassTuning, uninstallClassTuning } from '../sim/tuning';
 import {
   type Aura,
   cloneItemInstancePayload,
@@ -2147,6 +2148,12 @@ export class ClientWorld implements IWorld {
     // lost to a deliberate logout within the debounce window.
     this.flushActionBarLayoutSave();
     this.sessionEnded = true;
+    // Hand the realm's class tuning back: the ability table is process-wide, so
+    // without this a tab that leaves a tuned realm keeps its numbers for
+    // anything that runs without a later `hello`. Deliberately NOT on a
+    // transient socket close, where the auto-reconnect re-installs the same
+    // document from the next hello frame.
+    uninstallClassTuning();
     this.failPendingCommandOutcomes();
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
@@ -2402,6 +2409,12 @@ export class ClientWorld implements IWorld {
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
       if (typeof msg.realm === 'string') this.realm = msg.realm;
+      // The realm's class power tuning (src/sim/tuning/). Installed before any
+      // known-ability list or tooltip is computed, so the client's cooldowns,
+      // costs and damage readouts describe the numbers this server actually
+      // resolves. Absent or empty on an untuned realm, which restores the
+      // shipped table; sanitizing happens inside installClassTuning.
+      installClassTuning(msg.classTuning);
       this.accountAdmin = msg.admin === true;
       if (Array.isArray(msg.softWords)) {
         this.profanityWords = msg.softWords.filter(

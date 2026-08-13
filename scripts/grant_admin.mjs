@@ -5,8 +5,8 @@
 //   node scripts/grant_admin.mjs <username> --roles moderator,viewer grant an explicit role set
 //   node scripts/grant_admin.mjs <username> --revoke            revoke all roles
 //
-// Roles (see server/admin_permissions.ts): superadmin, admin, moderator,
-// viewer. superadmin (the only role with staff.manage) is
+// Roles (see server/admin_permissions.ts): superadmin, admin, tuner,
+// moderator, viewer. superadmin (the only role with staff.manage) is
 // grantable ONLY here (or via SQL), never from the dashboard staff page.
 //
 // Uses DATABASE_URL. For local dev, copy .env.example to .env first.
@@ -28,7 +28,7 @@ try {
 
 // Keep in sync with ADMIN_ROLES in server/admin_permissions.ts (this script is
 // plain Node and never imports TS sources; see scripts/CLAUDE.md).
-const KNOWN_ROLES = ['superadmin', 'admin', 'moderator', 'viewer'];
+const KNOWN_ROLES = ['superadmin', 'admin', 'tuner', 'moderator', 'viewer'];
 
 const args = process.argv.slice(2);
 const username = args[0];

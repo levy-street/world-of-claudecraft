@@ -30,6 +30,7 @@
   import SuspiciousPlayers from './pages/SuspiciousPlayers.svelte';
   import DetectionCalibration from './pages/DetectionCalibration.svelte';
   import AntibotConfig from './pages/AntibotConfig.svelte';
+  import ClassTuning from './pages/ClassTuning.svelte';
   import SharedIps from './pages/SharedIps.svelte';
   import ChatFilter from './pages/ChatFilter.svelte';
   import BlockedIps from './pages/BlockedIps.svelte';
@@ -56,6 +57,7 @@
     'suspicious-players': SuspiciousPlayers,
     'detection-calibration': DetectionCalibration,
     'antibot-config': AntibotConfig,
+    'class-tuning': ClassTuning,
     'shared-ips': SharedIps,
     'chat-filter': ChatFilter,
     'blocked-ips': BlockedIps,

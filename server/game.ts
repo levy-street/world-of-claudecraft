@@ -88,6 +88,7 @@ import {
   parseTalentRowLevel,
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
+import { activeClassTuning } from '../src/sim/tuning';
 import {
   type Aura,
   DT,
@@ -4016,6 +4017,12 @@ export class GameServer {
       // Epoch ms of an active chat mute, or null. Lets the client show status
       // at login; sending is still gated server-side regardless.
       chatMutedUntil: session.chatMutedUntil ?? null,
+      // The realm's installed class power tuning (src/sim/tuning/). The client
+      // recomputes known abilities and every tooltip number locally, so it must
+      // install the SAME document or its cooldowns, costs and damage readouts
+      // would describe the shipped numbers while the server resolves the tuned
+      // ones. Empty on an untuned realm.
+      classTuning: activeClassTuning(),
     });
     // Only the entering player sees their own world-entry notice; we don't
     // broadcast it to everyone (and likewise don't broadcast departures below).
@@ -4162,6 +4169,7 @@ export class GameServer {
       admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
+      classTuning: activeClassTuning(),
     });
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence

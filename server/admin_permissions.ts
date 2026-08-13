@@ -26,6 +26,13 @@ export const ADMIN_PERMISSIONS = [
   // SUPERADMIN_ONLY_PERMISSIONS below), so no dashboard-grantable role reaches
   // it, which is the conservative default for an irreversible action.
   'guildbank.purge',
+  // Class power tuner (the Balance section): READ sees the per-ability sliders
+  // and the change history, WRITE saves a new tuning document. Split from the
+  // start because the read is a useful, harmless view for anyone reasoning
+  // about balance, while the write moves every player's damage on the next
+  // restart and belongs to the few accounts designated as tuners.
+  'tuning.read',
+  'tuning.write',
   'staff.manage',
 ] as const;
 
@@ -43,7 +50,11 @@ export const SUPERADMIN_ONLY_PERMISSIONS: readonly AdminPermission[] = [
   'staff.manage',
 ];
 
-export const ADMIN_ROLES = ['superadmin', 'admin', 'moderator', 'viewer'] as const;
+// `tuner` is the class-balance designation: the small set of people trusted to
+// move the per-ability power sliders. It is deliberately NARROW (it carries no
+// moderation, account, or ops permission at all) so the designation can be
+// handed to a class owner without also handing them the rest of the dashboard.
+export const ADMIN_ROLES = ['superadmin', 'admin', 'tuner', 'moderator', 'viewer'] as const;
 
 export type AdminRole = (typeof ADMIN_ROLES)[number];
 
@@ -63,6 +74,10 @@ export const ROLE_PERMISSIONS: Record<AdminRole, readonly AdminPermission[]> = {
   admin: ADMIN_PERMISSIONS.filter(
     (permission) => !SUPERADMIN_ONLY_PERMISSIONS.includes(permission),
   ),
+  // The class-balance designation. Read plus write on the tuner and nothing
+  // else: a tuner cannot see accounts, act on players, or read the anti-bot
+  // internals. Compose it alongside `viewer` when someone needs both.
+  tuner: ['tuning.read', 'tuning.write'],
   moderator: [
     'analytics.read',
     'accounts.read',

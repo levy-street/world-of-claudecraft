@@ -3253,6 +3253,11 @@ export interface AbilityDef {
   // Optional ceiling on a spendsAllResource bill: the ability spends at most this
   // much resource (Iron Resolve caps at 40 rage), keeping the effect it feeds bounded.
   spendResourceCap?: number;
+  // Class power tuner (src/sim/tuning/): a multiplier on this ability's Spell
+  // Power / Attack Power coefficient, applied by sim/spell_scaling.ts. Never
+  // authored in content, only written by `installClassTuning` at boot on the
+  // hosts that carry a realm tuning document; absent means the shipped 1.
+  powerCoeffMult?: number;
   learnLevel: number;
   // Quest-gated ability: even at or above learnLevel the ability stays hidden from
   // the class kit until this quest id is in the player's questsDone. A talent/spec

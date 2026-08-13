@@ -163,5 +163,25 @@
     button.btn-sm {
       min-height: 40px;
     }
+
+    /* Range sliders (the Class Power Tuner is the first tenant): the native
+       track is ~20px tall and the thumb ~16px, both under the 40px touch
+       floor the buttons above get. Tapping anywhere on the input moves the
+       thumb, so the input's own height IS the touch target; the thumb is
+       enlarged too so it reads as grabbable. Vendor selectors must stay in
+       separate rules: one unknown selector invalidates a shared group. */
+    input[type="range"] {
+      min-height: 40px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      height: 28px;
+      width: 28px;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      height: 28px;
+      width: 28px;
+    }
   }
 }

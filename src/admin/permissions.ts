@@ -20,6 +20,8 @@ export const ADMIN_PERMISSIONS = [
   'botdetector.read',
   'botdetector.configure',
   'guildbank.purge',
+  'tuning.read',
+  'tuning.write',
   'staff.manage',
 ] as const;
 

@@ -1,6 +1,6 @@
 import type { ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
-import { channelTickBonus, directHealBonus } from '../spell_scaling';
+import { abilityPowerCoeffMult, channelTickBonus, directHealBonus } from '../spell_scaling';
 import type { AbilityEffect, Entity } from '../types';
 
 export const PALADIN_AEGIS_ID = 'aegis_first_dawn';
@@ -105,7 +105,7 @@ export function completePaladinAegis(
   const effect = effectOf(res);
   if (!effect) return false;
 
-  const finalBonus = directHealBonus(caster.spellPower, 0, true);
+  const finalBonus = directHealBonus(caster.spellPower, 0, true, 1, abilityPowerCoeffMult(res.def));
   for (const ally of eligibleAllies(ctx, caster, effect.radius)) {
     const amount = ctx.rng.range(effect.finalMin, effect.finalMax) + finalBonus;
     ctx.applyHeal(caster, ally, amount, res.def.name, res.def.id);

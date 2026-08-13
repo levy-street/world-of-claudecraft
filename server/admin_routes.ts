@@ -132,6 +132,12 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   },
   { method: 'POST', pattern: '/admin/api/antibot-config', permission: 'botdetector.configure' },
 
+  // Class power tuner. The read is scoped to the `tuner` designation rather than
+  // riding analytics.read: the balance surface is deliberately narrow.
+  { method: 'GET', pattern: '/admin/api/class-tuning', permission: 'tuning.read' },
+  { method: 'GET', pattern: '/admin/api/class-tuning/history', permission: 'tuning.read' },
+  { method: 'POST', pattern: '/admin/api/class-tuning', permission: 'tuning.write' },
+
   { method: 'GET', pattern: '/admin/api/maps', permission: 'content.moderate' },
   { method: 'GET', pattern: '/admin/api/user-assets', permission: 'content.moderate' },
 

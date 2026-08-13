@@ -758,3 +758,114 @@ export interface PerfCaptureStatus {
   endsAt: number | null; // epoch ms the in-flight capture closes
   last: PerfCaptureResult | null;
 }
+
+// ---------------------------------------------------------------------------
+// Class Power Tuner (GET/POST /admin/api/class-tuning). The server derives the
+// whole catalog from the live content tables (src/sim/tuning/catalog.ts) and
+// ships it as data: this bundle never imports src/sim. Ability and spec NAMES
+// are therefore server data and render as-is, exactly like the antibot field
+// labels above; all page chrome goes through t().
+// ---------------------------------------------------------------------------
+
+/** How one authored number responds to a slider (mirrors the sim's TuningValueKind). */
+export type TuningValueKind = 'linear' | 'deviation' | 'fraction' | 'multiplier';
+
+/** Why a spec can cast an ability (mirrors the sim's TunerAbilitySource). */
+export type TunerAbilitySource = 'base' | 'spec' | 'signature' | 'row' | 'unspecced';
+
+export interface TunerChannelSite {
+  path: string;
+  value: number;
+  kind: TuningValueKind;
+}
+
+export interface TunerChannelInfo {
+  channel: string;
+  sites: TunerChannelSite[];
+}
+
+export interface TunerAbilityInfo {
+  id: string;
+  name: string;
+  class: string;
+  school: string;
+  learnLevel: number;
+  /** Empty when every spec excludes it (source 'unspecced'). */
+  specs: string[];
+  source: TunerAbilitySource;
+  passive: boolean;
+  ranks: number;
+  channels: TunerChannelInfo[];
+}
+
+export interface TunerSpecInfo {
+  id: string;
+  name: string;
+  role: string;
+}
+
+export interface TunerClassInfo {
+  id: string;
+  name: string;
+  specs: TunerSpecInfo[];
+  abilities: TunerAbilityInfo[];
+}
+
+/** One auto-attack ("white") profile: a weapon item, or a class's ranged kit. */
+export interface TunerWeaponInfo {
+  id: string;
+  name: string;
+  kind: 'item' | 'classRanged';
+  class?: string;
+  hand: string;
+  dagger: boolean;
+  min: number;
+  max: number;
+  speed: number;
+  dps: number;
+  channels: TunerChannelInfo[];
+}
+
+export interface ClassTuningCatalog {
+  classes: TunerClassInfo[];
+  weapons: TunerWeaponInfo[];
+}
+
+export interface ClassTuningDocumentData {
+  version: number;
+  abilities: Record<string, Record<string, number>>;
+  weapons: Record<string, Record<string, number>>;
+}
+
+export interface ClassTuningResponse {
+  catalog: ClassTuningCatalog;
+  /** What is stored for this realm (what the sliders show). */
+  document: ClassTuningDocumentData;
+  /** What the running process installed at boot. */
+  active: ClassTuningDocumentData;
+  updatedAt: string | null;
+  /** True when the saved document is not yet the running one: restart pending. */
+  pendingRestart: boolean;
+  tunedAbilities: number;
+  tunedWeapons: number;
+  tunedChannels: number;
+  noteMaxLength: number;
+  /** Present on a save response: whether the document actually differed. */
+  changed?: boolean;
+}
+
+export interface ClassTuningHistoryEntry {
+  id: number;
+  beforeData: Record<string, unknown>;
+  afterData: Record<string, unknown>;
+  note: string;
+  createdAt: string;
+  adminAccountId: number | null;
+  adminUsername: string | null;
+}
+
+export interface ClassTuningHistory {
+  entries: ClassTuningHistoryEntry[];
+  /** The server's page LIMIT: a response with exactly this many rows may have older ones. */
+  pageSize: number;
+}

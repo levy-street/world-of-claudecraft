@@ -85,6 +85,14 @@ import {
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
+import {
+  CLASS_TUNING_NOTE_MAX,
+  classTuningCatalog,
+  classTuningHistory,
+  classTuningState,
+  saveRealmClassTuning,
+} from './class_tuning';
+import { CLASS_TUNING_HISTORY_PAGE } from './class_tuning_db';
 import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
@@ -1375,6 +1383,12 @@ export async function handleAdminApi(
       return await handleAntibotConfigSave(req, res, game, accountId);
     }
 
+    // Class power tuner save (legacy twin of classTuningSaveHandler).
+    if (req.method === 'POST' && path === '/admin/api/class-tuning') {
+      const outcome = await readClassTuningBody(req, accountId);
+      return outcome.ok ? ok(res, outcome.body) : fail(res, outcome.status, outcome.message);
+    }
+
     // Trigger an on-demand server tick-loop profiling capture. The detailed
     // sub-phase timing runs only for the requested window, then freezes a result
     // read back via GET /admin/api/perf/tick.
@@ -1440,6 +1454,13 @@ export async function handleAdminApi(
     }
     if (path === '/admin/api/antibot-config/history') {
       return ok(res, { entries: await listAntibotConfigHistory() });
+    }
+    // Class power tuner reads (legacy twins of the two Ctx handlers).
+    if (path === '/admin/api/class-tuning') {
+      return ok(res, classTuningGetBody());
+    }
+    if (path === '/admin/api/class-tuning/history') {
+      return ok(res, await classTuningHistoryBody(url.searchParams));
     }
     if (path === '/admin/api/suspicious-players') {
       return ok(res, { players: game.suspiciousPlayers() });
@@ -1971,6 +1992,12 @@ function makeRealAdminDb() {
     loadAntibotConfig,
     listAntibotConfigHistory,
     saveAntibotConfigChange,
+    // Class power tuner: the shipped-baseline catalog, the saved-vs-running
+    // document state, the audited save, and the change trail.
+    classTuningCatalog,
+    classTuningHistory,
+    classTuningState,
+    saveRealmClassTuning,
   };
 }
 
@@ -2203,6 +2230,125 @@ async function antibotConfigSaveHandler(ctx: Ctx): Promise<void> {
       throw err;
     }
   });
+}
+
+// ---------------------------------------------------------------------------
+// Class power tuner (admin Balance > Class Power). The dashboard cannot import
+// src/sim, so the catalog of classes, specs, abilities and per-ability tuning
+// channels is served from here as DATA, exactly the way AntibotConfig's field
+// labels are (src/admin/CLAUDE.md). Both dispatch arms share these bodies.
+// ---------------------------------------------------------------------------
+
+function classTuningReadBody(db: Pick<AdminDb, 'classTuningCatalog' | 'classTuningState'>) {
+  const state = db.classTuningState();
+  return {
+    catalog: db.classTuningCatalog(),
+    document: state.saved,
+    active: state.active,
+    updatedAt: state.savedAt,
+    // The saved document only reaches the world at the next boot, so the
+    // dashboard needs to say so rather than implying the change is live.
+    pendingRestart: state.pendingRestart,
+    tunedAbilities: state.tunedAbilities,
+    tunedWeapons: state.tunedWeapons,
+    tunedChannels: state.tunedChannels,
+    noteMaxLength: CLASS_TUNING_NOTE_MAX,
+  };
+}
+
+/** GET /admin/api/class-tuning: the shipped catalog plus this realm's document. */
+function classTuningGetBody(): ReturnType<typeof classTuningReadBody> {
+  return classTuningReadBody(adminDb());
+}
+
+type ClassTuningSaveResponse =
+  | { ok: true; body: Record<string, unknown> }
+  | { ok: false; status: number; message: string };
+
+/**
+ * The tuner's own JSON body cap, well above the 64 KiB default.
+ *
+ * A fully moved document is one row per touched channel, so it grows with the
+ * ability table: the shipped kit already serializes to roughly 50 KB with every
+ * slider off neutral, which is inside the default cap but has no headroom for
+ * the next wave of class reworks. Read at this cap, an oversize body answers 413
+ * with a message the operator can act on rather than a generic 500.
+ */
+export const CLASS_TUNING_BODY_MAX_BYTES = 512 * 1024;
+
+/** Read the tuner's body at its own cap, mapping an oversize one to 413. */
+async function readClassTuningBody(
+  req: http.IncomingMessage,
+  accountId: number,
+): Promise<ClassTuningSaveResponse> {
+  let body: Record<string, unknown>;
+  try {
+    body = await readBody(req, CLASS_TUNING_BODY_MAX_BYTES);
+  } catch (err) {
+    if (err instanceof Error && err.message === 'body too large') {
+      return { ok: false, status: 413, message: 'tuning document too large' };
+    }
+    // readBody's parse arm rejects with 'bad json' (malformed JSON, or a
+    // non-object like an array). Anything else is stream trouble, transport
+    // rather than operator input, so it answers 500, not a misleading 400
+    // that blames the document.
+    if (err instanceof Error && err.message === 'bad json') {
+      return { ok: false, status: 400, message: 'invalid JSON in the tuning request' };
+    }
+    return { ok: false, status: 500, message: 'failed to read the tuning request' };
+  }
+  return classTuningSaveOutcome(body, accountId);
+}
+
+/**
+ * POST /admin/api/class-tuning: validate, persist and audit a tuning document.
+ *
+ * Deliberately does NOT apply it to the running world: tuning is installed once
+ * per boot (src/sim/tuning/install.ts), so the response reports the change as
+ * pending a restart instead of pretending it landed.
+ */
+async function classTuningSaveOutcome(
+  body: Record<string, unknown>,
+  accountId: number,
+): Promise<ClassTuningSaveResponse> {
+  const document = body.document;
+  if (typeof document !== 'object' || document === null || Array.isArray(document)) {
+    return { ok: false, status: 400, message: 'a document object is required' };
+  }
+  const note =
+    typeof body.note === 'string' ? body.note.trim().slice(0, CLASS_TUNING_NOTE_MAX) : '';
+  const saved = await adminDb().saveRealmClassTuning(document, accountId, note);
+  return { ok: true, body: { ...classTuningGetBody(), changed: saved.changed } };
+}
+
+async function classTuningGetHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, classTuningGetBody());
+}
+
+/**
+ * Shared history read for both dispatch arms: the newest page, or the page
+ * older than `?before=<id>` (keyset on the audit row id, so the dashboard can
+ * walk past the first page instead of the trail ending at 50 rows).
+ * `pageSize` rides along so the client can tell a full page from the end of
+ * the trail without hardcoding the server's LIMIT.
+ */
+async function classTuningHistoryBody(searchParams: URLSearchParams) {
+  const raw = searchParams.get('before');
+  const parsed = raw === null ? Number.NaN : Number(raw);
+  const before = Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+  return {
+    entries: await adminDb().classTuningHistory(CLASS_TUNING_HISTORY_PAGE, before),
+    pageSize: CLASS_TUNING_HISTORY_PAGE,
+  };
+}
+
+async function classTuningHistoryHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, await classTuningHistoryBody(ctx.url.searchParams));
+}
+
+async function classTuningSaveHandler(ctx: Ctx): Promise<void> {
+  const outcome = await readClassTuningBody(ctx.req, adminIdentityOf(ctx).accountId);
+  return outcome.ok ? ok(ctx.res, outcome.body) : fail(ctx.res, outcome.status, outcome.message);
 }
 
 /** GET /admin/api/online: live player rows. */
@@ -3393,6 +3539,33 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: antibotConfigSaveHandler,
+  },
+
+  // Class power tuner: the per-ability balance sliders behind the `tuner`
+  // designation (tuning.read / tuning.write in admin_routes.ts).
+  {
+    method: 'GET',
+    path: '/admin/api/class-tuning',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: classTuningGetHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/class-tuning/history',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: classTuningHistoryHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/class-tuning',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: classTuningSaveHandler,
   },
 
   // IP block writes (17a).

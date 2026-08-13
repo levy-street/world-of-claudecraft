@@ -2261,7 +2261,9 @@ describe('admin api permissions', () => {
     await handleAdminApi(fakeReq({ token: VALID_TOKEN, url: '/admin/api/staff' }), res, fakeGame);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body.data.assignableRoles).toEqual(['admin', 'moderator', 'viewer']);
+    // `tuner` is the class-power-tuner designation (server/admin_permissions.ts):
+    // assignable like any other non-superadmin role, in vocabulary order.
+    expect(res.body.data.assignableRoles).toEqual(['admin', 'tuner', 'moderator', 'viewer']);
     expect(res.body.data.rows).toHaveLength(1);
   });
 

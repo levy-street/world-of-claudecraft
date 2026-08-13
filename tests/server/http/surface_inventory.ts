@@ -1877,6 +1877,39 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Class Power Tuner (src/sim/tuning/): the shipped catalog plus this realm's
+  // saved document, the validate-persist-audit write, and the append-only
+  // change history. Gated on the tuner role's own tuning.read / tuning.write.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/class-tuning',
+    handler: 'handleAdminApi arm: /admin/api/class-tuning',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/class-tuning',
+    handler: 'handleAdminApi arm: POST /admin/api/class-tuning',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/class-tuning/history',
+    handler: 'handleAdminApi arm: /admin/api/class-tuning/history',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // v0.20.0 release merge: map editor moderation (lists + forced unpublish +
   // upload block/unblock). The (block|unblock) regex arm registers as two
   // literal-suffix RouteDefs, so it carries two rows sharing one match source.

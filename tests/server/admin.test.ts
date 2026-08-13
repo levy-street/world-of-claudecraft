@@ -34,6 +34,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   type AdminRuntime,
+  CLASS_TUNING_BODY_MAX_BYTES,
   configureAdminGuildBoardCacheBust,
   configureAdminPlayersCap,
   configureAdminRuntime,
@@ -2487,7 +2488,7 @@ describe('staff identity + role management (release v0.22.0)', () => {
       success: true,
       data: {
         rows: [{ accountId: 1, username: 'op', roles: ['admin'] }],
-        assignableRoles: ['admin', 'moderator', 'viewer'],
+        assignableRoles: ['admin', 'tuner', 'moderator', 'viewer'],
       },
       error: null,
     });
@@ -3843,7 +3844,7 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
       params: { id: '5' },
     });
     expect(r.status).toBe(200);
-    const sheet = (r.body as { data: Record<string, any> }).data;
+    const sheet = (r.body as { data: Record<string, unknown> }).data;
     expect(characterProfessionsRow).toHaveBeenCalledWith(5, true); // offline: fetch the blob
     expect(sheet.name).toBe('Aldric');
     expect(sheet.live).toBe(false);
@@ -3898,7 +3899,7 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
       params: { id: '5' },
     });
     expect(r.status).toBe(200);
-    const sheet = (r.body as { data: Record<string, any> }).data;
+    const sheet = (r.body as { data: Record<string, unknown> }).data;
     expect(sheet.live).toBe(true);
     expect(sheet.updatedAt).toBeNull(); // a live snapshot is "now"
     expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 43.5 });
@@ -3918,7 +3919,7 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
       headers: { authorization: BEARER },
       params: { id: '5' },
     });
-    const sheet = (r.body as { data: Record<string, any> }).data;
+    const sheet = (r.body as { data: Record<string, unknown> }).data;
     expect(sheet.gathering).toContainEqual({ professionId: 'herbalism', proficiency: 7 });
   });
 
@@ -4202,7 +4203,7 @@ describe('R35 professions inspector: fix-round edge pins', () => {
       params: { id: '5' },
     });
     expect(r.status).toBe(200);
-    const sheet = (r.body as { data: Record<string, any> }).data;
+    const sheet = (r.body as { data: Record<string, unknown> }).data;
     expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 0 });
     expect(sheet.slots).toEqual([]);
     expect(sheet.nodeTimers).toEqual([]);
@@ -4250,7 +4251,7 @@ describe('R35 professions inspector: fix-round edge pins', () => {
       headers: { authorization: BEARER },
       params: { id: '5' },
     });
-    const sheet = (r.body as { data: Record<string, any> }).data;
+    const sheet = (r.body as { data: Record<string, unknown> }).data;
     // The one-shot load migrations have not run: the operator is warned.
     expect(sheet.preMigration).toBe(true);
     // The load-side clamp: never display a wait the game would not honor
@@ -4297,7 +4298,7 @@ describe('R35 professions inspector: fix-round edge pins', () => {
       headers: { authorization: BEARER },
       params: { id: '5' },
     });
-    const sheet = (r.body as { data: Record<string, any> }).data;
+    const sheet = (r.body as { data: Record<string, unknown> }).data;
     expect(sheet.live).toBe(true);
     expect(sheet.preMigration).toBe(false);
   });
@@ -4417,5 +4418,267 @@ describe('R35 restore-item: the defensive invalid_item arm', () => {
     });
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'unknown item id' });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Class Power Tuner (Balance > Class Power). The catalog the dashboard renders
+// is server data derived from the live content tables, and a save persists +
+// audits WITHOUT touching the running world (tuning installs once per boot).
+// ---------------------------------------------------------------------------
+describe('class-tuning family', () => {
+  const CATALOG = {
+    weapons: [
+      {
+        id: 'worn_sword',
+        name: 'Pitted Shortsword',
+        kind: 'item',
+        hand: 'onehand',
+        dagger: false,
+        min: 2,
+        max: 5,
+        speed: 2,
+        dps: 1.75,
+        channels: [
+          {
+            channel: 'swing_damage',
+            sites: [{ path: 'min', value: 2, kind: 'linear' }],
+          },
+        ],
+      },
+    ],
+    classes: [
+      {
+        id: 'druid',
+        name: 'Druid',
+        specs: [{ id: 'feral', name: 'Feral', role: 'dps' }],
+        abilities: [
+          {
+            id: 'thorns',
+            name: 'Briarguard',
+            class: 'druid',
+            school: 'nature',
+            learnLevel: 6,
+            specs: ['feral'],
+            source: 'base',
+            passive: false,
+            ranks: 3,
+            channels: [
+              {
+                channel: 'damage_reflect',
+                sites: [{ path: 'effects[0].buffTarget.value', value: 3, kind: 'linear' }],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+  const SAVED = {
+    version: 1,
+    abilities: { thorns: { damage_reflect: 1.5 } },
+    weapons: { worn_sword: { swing_speed: 1.2 } },
+  };
+  const STATE = {
+    saved: SAVED,
+    active: { version: 1, abilities: {}, weapons: {} },
+    savedAt: '2026-08-01T00:00:00.000Z',
+    pendingRestart: true,
+    tunedAbilities: 1,
+    tunedWeapons: 1,
+    tunedChannels: 2,
+  };
+
+  it('GET /admin/api/class-tuning serves the catalog, the saved document, and the restart state', async () => {
+    authedAdminDb({
+      classTuningCatalog: () => CATALOG,
+      classTuningState: () => STATE,
+    });
+    installAdminRuntime();
+    const r = await runRoute('GET', '/admin/api/class-tuning', {
+      headers: { authorization: BEARER },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: {
+        catalog: CATALOG,
+        document: SAVED,
+        active: { version: 1, abilities: {}, weapons: {} },
+        updatedAt: '2026-08-01T00:00:00.000Z',
+        // The realm is still running the untuned numbers: the dashboard must be
+        // able to say so rather than implying the save was live.
+        pendingRestart: true,
+        tunedAbilities: 1,
+        tunedWeapons: 1,
+        tunedChannels: 2,
+        noteMaxLength: 500,
+      },
+      error: null,
+    });
+  });
+
+  it('GET /admin/api/class-tuning/history returns the newest page with its size', async () => {
+    const classTuningHistory = vi.fn(async () => [{ id: 7, note: 'nerf reflect' }]);
+    authedAdminDb({ classTuningHistory });
+    installAdminRuntime();
+    const r = await runRoute('GET', '/admin/api/class-tuning/history', {
+      headers: { authorization: BEARER },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { entries: [{ id: 7, note: 'nerf reflect' }], pageSize: 50 },
+      error: null,
+    });
+    expect(classTuningHistory).toHaveBeenCalledWith(50, undefined);
+  });
+
+  it('GET /admin/api/class-tuning/history?before= pages past the newest rows', async () => {
+    const classTuningHistory = vi.fn(async () => [{ id: 6, note: 'older' }]);
+    authedAdminDb({ classTuningHistory });
+    installAdminRuntime();
+    const r = await runRoute('GET', '/admin/api/class-tuning/history', {
+      url: '/admin/api/class-tuning/history?before=7',
+      headers: { authorization: BEARER },
+    });
+    expect(r.status).toBe(200);
+    expect(classTuningHistory).toHaveBeenCalledWith(50, 7);
+    // junk cursors read as the first page, never an error or an empty walk
+    classTuningHistory.mockClear();
+    await runRoute('GET', '/admin/api/class-tuning/history', {
+      url: '/admin/api/class-tuning/history?before=junk',
+      headers: { authorization: BEARER },
+    });
+    expect(classTuningHistory).toHaveBeenCalledWith(50, undefined);
+  });
+
+  it('POST /admin/api/class-tuning persists the document with the operator and note', async () => {
+    const saveRealmClassTuning = vi.fn(async () => ({ changed: true, state: STATE }));
+    authedAdminDb({
+      classTuningCatalog: () => CATALOG,
+      classTuningState: () => STATE,
+      saveRealmClassTuning,
+    });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/class-tuning', {
+      headers: { authorization: BEARER },
+      body: { document: SAVED, note: 'nerf druid reflect' },
+    });
+    expect(r.status).toBe(200);
+    expect((r.body as { data: { changed: boolean } }).data.changed).toBe(true);
+    expect(saveRealmClassTuning).toHaveBeenCalledWith(
+      SAVED,
+      ADMIN_ACCOUNT_ID,
+      'nerf druid reflect',
+    );
+  });
+
+  it('400s a body whose document is not an object, without writing anything', async () => {
+    const saveRealmClassTuning = vi.fn(async () => ({ changed: false, state: STATE }));
+    authedAdminDb({ saveRealmClassTuning });
+    installAdminRuntime();
+    for (const document of [undefined, [1, 2], 'x', null]) {
+      const r = await runRoute('POST', '/admin/api/class-tuning', {
+        headers: { authorization: BEARER },
+        body: { document },
+      });
+      expect(r.status).toBe(400);
+      expect(r.body).toEqual({
+        success: false,
+        data: null,
+        error: 'a document object is required',
+      });
+    }
+    expect(saveRealmClassTuning).not.toHaveBeenCalled();
+  });
+
+  // A fully moved document is one row per touched channel, so it grows with the
+  // ability table and is already about 50 KB against the shipped kit: the 64 KiB
+  // JSON default has no headroom for the next wave of reworks.
+  it('accepts a document far larger than the default JSON body cap', async () => {
+    const saveRealmClassTuning = vi.fn(async () => ({ changed: true, state: STATE }));
+    authedAdminDb({
+      classTuningCatalog: () => CATALOG,
+      classTuningState: () => STATE,
+      saveRealmClassTuning,
+    });
+    installAdminRuntime();
+    // ~100 KB of document: over the 64 KiB default, under the tuner's own cap.
+    const abilities: Record<string, Record<string, number>> = {};
+    for (let i = 0; i < 2000; i++) abilities[`ability_number_${i}`] = { damage_direct: 1.25 };
+    const document = { version: 1, abilities, weapons: {} };
+    expect(JSON.stringify(document).length).toBeGreaterThan(64 * 1024);
+    expect(JSON.stringify(document).length).toBeLessThan(CLASS_TUNING_BODY_MAX_BYTES);
+
+    const r = await runRoute('POST', '/admin/api/class-tuning', {
+      headers: { authorization: BEARER },
+      body: { document, note: '' },
+    });
+    expect(r.status).toBe(200);
+    expect(saveRealmClassTuning).toHaveBeenCalledOnce();
+  });
+
+  // Past the cap the operator gets a 413 they can act on, not the generic 500 an
+  // escaping readBody rejection would produce.
+  it('413s a document past the cap instead of failing as an internal error', async () => {
+    const saveRealmClassTuning = vi.fn(async () => ({ changed: true, state: STATE }));
+    authedAdminDb({ saveRealmClassTuning });
+    installAdminRuntime();
+    const oversize = `{"document":{"abilities":{},"weapons":{}},"note":"${'x'.repeat(
+      CLASS_TUNING_BODY_MAX_BYTES + 1024,
+    )}"}`;
+    const r = await runRoute('POST', '/admin/api/class-tuning', {
+      headers: { authorization: BEARER },
+      body: oversize,
+    });
+    expect(r.status).toBe(413);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'tuning document too large',
+    });
+    expect(saveRealmClassTuning).not.toHaveBeenCalled();
+  });
+
+  // Malformed JSON is operator input trouble (a truncated POST, a buggy
+  // client), so it answers its OWN 400 rather than the misleading "a document
+  // object is required" that blames a well-formed body's shape.
+  it('400s malformed JSON with its own error, without writing anything', async () => {
+    const saveRealmClassTuning = vi.fn(async () => ({ changed: true, state: STATE }));
+    authedAdminDb({ saveRealmClassTuning });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/class-tuning', {
+      headers: { authorization: BEARER },
+      body: '{"document":{"abilities":',
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'invalid JSON in the tuning request',
+    });
+    expect(saveRealmClassTuning).not.toHaveBeenCalled();
+  });
+
+  it('truncates an overlong note rather than refusing the save', async () => {
+    // Typed params so the call-args assertion below can index the note.
+    const saveRealmClassTuning = vi.fn(
+      async (_document: unknown, _accountId: number, _note: string) => ({
+        changed: true,
+        state: STATE,
+      }),
+    );
+    authedAdminDb({
+      classTuningCatalog: () => CATALOG,
+      classTuningState: () => STATE,
+      saveRealmClassTuning,
+    });
+    installAdminRuntime();
+    await runRoute('POST', '/admin/api/class-tuning', {
+      headers: { authorization: BEARER },
+      body: { document: SAVED, note: 'x'.repeat(900) },
+    });
+    expect(saveRealmClassTuning.mock.calls[0][2]).toHaveLength(500);
   });
 });

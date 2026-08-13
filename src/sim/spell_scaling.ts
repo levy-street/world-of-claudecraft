@@ -61,11 +61,26 @@ export function abilityScalingPower(
 
 // The AP-vs-SP scale-down for the flat rider: Ranged AP and melee AP are far
 // larger than Spell Power, so their attack-spells take a fraction of the
-// coefficient; true Spell Power spells use the full coefficient (1).
+// coefficient; true Spell Power spells use the full coefficient (1). The
+// operator's spell-power tuning knob (`powerCoeffMult`) rides here too, so
+// every def-taking scaling function picks it up from one place.
 function powerScale(def: AbilityDef): number {
-  if (def.scalesWith === 'ranged') return RANGED_SPELL_AP_SCALE;
-  if (def.school === 'physical') return MELEE_SPELL_AP_SCALE;
-  return 1;
+  const tuned = abilityPowerCoeffMult(def);
+  if (def.scalesWith === 'ranged') return RANGED_SPELL_AP_SCALE * tuned;
+  if (def.school === 'physical') return MELEE_SPELL_AP_SCALE * tuned;
+  return tuned;
+}
+
+/**
+ * The class power tuner's per-ability multiplier on the Spell Power / Attack
+ * Power coefficient (`src/sim/tuning/`). 1 on every shipped def; only a realm
+ * that installed a tuning document carries anything else. Exported because the
+ * heal/absorb/HoT scaling functions below take a bare Spell Power number rather
+ * than the def, so their callers pass it through.
+ */
+export function abilityPowerCoeffMult(def: Pick<AbilityDef, 'powerCoeffMult'>): number {
+  const mult = def.powerCoeffMult;
+  return typeof mult === 'number' && Number.isFinite(mult) && mult > 0 ? mult : 1;
 }
 
 // Flat bonus added to ONE direct (or AoE) spell hit. `castTimeSec` is the
@@ -105,18 +120,23 @@ export const HEALING_SP_SCALE = 2;
 // AoE damage takes, so multi-target heals do not triple-dip Spell Power.
 // `mult` is the resolved talent/mastery heal multiplier (`talent_hit_mult.ts`);
 // see the `directHitBonus` note above for why it wraps here rather than at the call site.
+// `coeffMult` is the operator's spell-power tuning knob for the casting
+// ability (`abilityPowerCoeffMult`); it is a separate parameter from `mult`
+// because this function takes a bare Spell Power number rather than the def.
 export function directHealBonus(
   spellPower: number,
   castTimeSec: number,
   aoe = false,
   mult = 1,
+  coeffMult = 1,
 ): number {
   return Math.round(
     spellPower *
       HEALING_SP_SCALE *
       directSpellCoeff(castTimeSec) *
       (aoe ? SPELL_AOE_COEFF_MULT : 1) *
-      mult,
+      mult *
+      coeffMult,
   );
 }
 
@@ -128,8 +148,14 @@ export function directHealBonus(
 // coefficient and scales through its rank amounts instead.
 // `mult` is the resolved talent/mastery absorb multiplier (`talent_hit_mult.ts`
 // healMult times the absorbPct global), same reasoning as `directHitBonus`.
-export function absorbBonus(spellPower: number, coefficient: number, mult = 1): number {
-  return Math.max(0, Math.round(spellPower * coefficient * mult));
+// `coeffMult` is the operator's spell-power tuning knob (see directHealBonus).
+export function absorbBonus(
+  spellPower: number,
+  coefficient: number,
+  mult = 1,
+  coeffMult = 1,
+): number {
+  return Math.max(0, Math.round(spellPower * coefficient * mult * coeffMult));
 }
 
 // Flat bonus added to ONE HoT tick: the total DoT coefficient (duration / 15)
@@ -137,15 +163,17 @@ export function absorbBonus(spellPower: number, coefficient: number, mult = 1): 
 // takes the AP scale-down, since HoTs are pure healing.
 // `mult` is the resolved talent/mastery HoT multiplier (`talent_hit_mult.ts`
 // healMult times the hotHealPct global), same reasoning as `directHitBonus`.
+// `coeffMult` is the operator's spell-power tuning knob (see directHealBonus).
 export function hotTickBonus(
   spellPower: number,
   durationSec: number,
   intervalSec: number,
   mult = 1,
+  coeffMult = 1,
 ): number {
   const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
   const coeff = dotTotalCoeff(durationSec) / ticks;
-  return Math.round(spellPower * HEALING_SP_SCALE * coeff * mult);
+  return Math.round(spellPower * HEALING_SP_SCALE * coeff * mult * coeffMult);
 }
 
 // Flat bonus added to ONE channel tick (e.g. each Arcane Missile / Mind Flay tick).

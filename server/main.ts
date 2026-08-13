@@ -101,6 +101,7 @@ import {
   withCreationHelm,
 } from './characters';
 import { pruneChatViolationsBatch } from './chat_filter_db';
+import { installRealmClassTuning } from './class_tuning';
 import {
   claudiumPreAuthMutationRateLimited,
   configureClaudiumRuntime,
@@ -3101,6 +3102,11 @@ export async function startServer(): Promise<http.Server> {
   }
   await ensureSchema();
   await seedOAuthClients();
+  // Class power tuning is applied to the shared ability table ONCE, here, before
+  // the first GameServer (and therefore the first Sim) exists. Installing after
+  // the world was built would leave in-flight casts and cooldowns resolving
+  // against the numbers they started with. See src/sim/tuning/install.ts.
+  await installRealmClassTuning();
   const game = liveGame();
   const generalChatQuotaListener = createGeneralChatQuotaListener({
     activeAccountIds: () => [...game.liveAccountIds()],

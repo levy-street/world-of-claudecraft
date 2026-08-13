@@ -12,6 +12,7 @@
 // tests/ability_damage.test.ts; hud.ts is the thin consumer.
 import type { ResolvedAbility } from '../sim/sim';
 import {
+  abilityPowerCoeffMult,
   abilityScalingPower,
   absorbBonus,
   channelTickBonus,
@@ -48,6 +49,10 @@ export function abilityDamageBonus(
   // the switch default (0) here. Every other rider scales: Spell Power for spells,
   // Ranged AP for hunter shots, melee Attack Power for physical specials.
   const power = abilityScalingPower(scaling, def);
+  // The operator's spell-power tuning knob rides inside powerScale for the
+  // def-taking helpers; the heal/absorb/HoT ones take a bare Spell Power, so it
+  // is passed explicitly here exactly as effect_dispatch does.
+  const coeffMult = abilityPowerCoeffMult(def);
   switch (eff.type) {
     case 'directDamage':
       // A channelled directDamage (Arcane Missiles) is a per-tick hit: it uses the
@@ -74,21 +79,21 @@ export function abilityDamageBonus(
       return 0;
     case 'aoeHeal':
       // AoE heals take the same per-target coefficient penalty as aoeDamage.
-      return directHealBonus(scaling.spellPower, res.castTime);
+      return directHealBonus(scaling.spellPower, res.castTime, false, 1, coeffMult);
     case 'chainHeal':
       // Combat applies the full direct-heal coefficient to the first target,
       // then applies the authored falloff to each jump.
-      return directHealBonus(scaling.spellPower, res.castTime);
+      return directHealBonus(scaling.spellPower, res.castTime, false, 1, coeffMult);
     case 'consumeAura':
       if (eff.deal) return directHitBonus(power, def, res.castTime, false);
-      if (eff.heal) return directHealBonus(scaling.spellPower, res.castTime);
+      if (eff.heal) return directHealBonus(scaling.spellPower, res.castTime, false, 1, coeffMult);
       return 0;
     case 'heal':
       // Combat adds the direct-heal rider (full cast-time coefficient off Spell
       // Power, no AP scale-down) to every direct heal in effect_dispatch.
-      return directHealBonus(scaling.spellPower, res.castTime);
+      return directHealBonus(scaling.spellPower, res.castTime, false, 1, coeffMult);
     case 'absorb':
-      return absorbBonus(scaling.spellPower, eff.spellPowerCoeff ?? 0);
+      return absorbBonus(scaling.spellPower, eff.spellPowerCoeff ?? 0, 1, coeffMult);
     case 'hot': {
       // A HoT that rides a direct heal (Regrowth) does NOT scale in combat (the
       // direct part already took the coefficient); only pure HoTs (Rejuvenation)
@@ -97,7 +102,7 @@ export function abilityDamageBonus(
       const hybridHeal = res.effects.some((e) => e.type === 'heal');
       if (hybridHeal) return 0;
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
-      return hotTickBonus(scaling.spellPower, eff.duration, eff.interval) * ticks;
+      return hotTickBonus(scaling.spellPower, eff.duration, eff.interval, 1, coeffMult) * ticks;
     }
     case 'drainTick':
       return channelTickBonus(power, def);

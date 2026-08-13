@@ -282,6 +282,11 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'failed to add note': 'error.addNoteFailed',
   'chat strikes reset failed': 'error.chatStrikesResetFailed',
   'reactivation failed': 'error.reactivationFailed',
+  // Class power tuner (the refusals its save can answer with).
+  'a document object is required': 'error.tuningDocumentRequired',
+  'tuning document too large': 'error.tuningDocumentTooLarge',
+  'invalid json in the tuning request': 'error.tuningInvalidJson',
+  'failed to read the tuning request': 'error.tuningReadFailed',
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];

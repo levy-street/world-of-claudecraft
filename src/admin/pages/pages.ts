@@ -18,6 +18,7 @@ export type AdminPage =
   | 'suspicious-players'
   | 'detection-calibration'
   | 'antibot-config'
+  | 'class-tuning'
   | 'shared-ips'
   | 'chat-filter'
   | 'blocked-ips'
@@ -95,6 +96,15 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
         permission: 'botdetector.configure',
       },
     ],
+  },
+  {
+    // The class-balance surface. Its own section rather than a row inside
+    // Operations: the `tuner` designation carries nothing else, so a tuner's
+    // sidebar is this section alone.
+    id: 'balance',
+    labelKey: 'nav.balance',
+    defaultPage: 'class-tuning',
+    items: [{ id: 'class-tuning', labelKey: 'nav.classTuning', permission: 'tuning.read' }],
   },
   {
     id: 'support',
