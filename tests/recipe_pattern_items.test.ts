@@ -320,13 +320,20 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     const [lower, higher] = slots;
     expect(lower.index).toBeLessThan(higher.index);
     // Lock the HIGHER-index copy, the one the legacy newest-first walk would
-    // have destroyed; the player clicks the LOWER, unlocked copy.
-    higher.slot.instance = { ...(higher.slot.instance ?? {}), locked: true };
+    // have destroyed, through the REAL command (the lock's storage shape is
+    // its own module's business); the player clicks the LOWER, unlocked copy.
+    sim.setItemLocked(PATTERN_ID, true, pid, higher.index);
+    expect(isItemLocked(meta.inventory[higher.index].instance)).toBe(true);
     sim.drainEvents();
+    // The consumed-slot arm owes the same wireRev bump ctx.removeItem's hook
+    // provides: the online host's heavy self block reads it to know the bags
+    // changed, so a dropped hook call would desync the online bag mirror.
+    const wireRevBefore = meta.wireRev;
     sim.useItem(PATTERN_ID, pid, lower.index);
     const events = sim.drainEvents();
     expect(errorTexts(events)).toEqual([]);
     expect(trainResults(events)).toHaveLength(1);
+    expect(meta.wireRev).toBeGreaterThan(wireRevBefore);
 
     const survivors = meta.inventory.filter((slot) => slot.itemId === PATTERN_ID);
     expect(survivors).toHaveLength(1);
@@ -348,7 +355,7 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
       .filter(({ slot }) => slot.itemId === PATTERN_ID);
     expect(slots).toHaveLength(2);
     const [lower, higher] = slots;
-    higher.slot.instance = { ...(higher.slot.instance ?? {}), locked: true };
+    sim.setItemLocked(PATTERN_ID, true, pid, higher.index);
     sim.drainEvents();
     sim.useItem(PATTERN_ID, pid);
     const events = sim.drainEvents();
@@ -648,6 +655,38 @@ describe('using a recipe pattern over the live server (online host)', () => {
     broadcast(server);
     applyLatest();
     expect(client.craftingIdentity.knownRecipes).toContain(PATTERN_RECIPE.id);
+  });
+
+  it('the wire slot field reaches the consume: a clicked copy dies, a locked sibling survives', () => {
+    // The authoritative-host half of the wrong-victim pin: the bag click
+    // sends cmd:'use' with `slot`, the dispatch forwards it into sim.useItem,
+    // and the learn spends the exact named copy rather than the newest-first
+    // guess (which would have destroyed the player-locked sibling below).
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 92, 'Patternist');
+    const meta = server.sim.meta(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.autoEquip = false;
+    meta.craftSkills[CRAFT] = 100;
+    server.sim.addItem(PATTERN_ID, 2, session.pid);
+    const slots = meta.inventory
+      .map((slot, index) => ({ slot, index }))
+      .filter(({ slot }) => slot.itemId === PATTERN_ID);
+    expect(slots).toHaveLength(2);
+    const [lower, higher] = slots;
+    server.sim.setItemLocked(PATTERN_ID, true, session.pid, higher.index);
+    server.sim.drainEvents();
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'use', item: PATTERN_ID, slot: lower.index }),
+    );
+
+    expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(true);
+    const survivors = meta.inventory.filter((slot) => slot.itemId === PATTERN_ID);
+    expect(survivors).toHaveLength(1);
+    expect(isItemLocked(survivors[0].instance)).toBe(true);
   });
 });
 

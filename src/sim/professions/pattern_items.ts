@@ -16,7 +16,7 @@
 // path draws NO rng and reads no clock: learning is a deterministic yes or no.
 
 import { recipeById } from '../content/recipes';
-import { consumeSelectedInventorySlot } from '../item_copy_ref';
+import { consumeSelectedInventorySlot, selectedInventorySlot } from '../item_copy_ref';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { RecipeItemDef } from '../types';
@@ -86,6 +86,19 @@ export function useRecipePatternItem(
   meta: PlayerMeta,
   slotIndex?: number,
 ): void {
+  // The pinned-selection gate, BEFORE any effect. useItem already refused an
+  // invalid selection, but this function holds the item_copy_ref tri-state
+  // contract for ANY caller: a bad pin refuses outright (silently, the same
+  // texture as useItem's own pre-effect refusal), never falls back into the
+  // newest-first guess, and refusing HERE keeps the learn-and-consume pair
+  // atomic: the learn below never runs, so a bad pin can neither destroy a
+  // wrong victim nor mint a free learn.
+  if (
+    slotIndex !== undefined &&
+    selectedInventorySlot(meta.inventory, itemId, slotIndex) === null
+  ) {
+    return;
+  }
   const recipe = recipeById(def.teachesRecipeId);
   const verdict = resolvePatternLearn(recipe, meta);
   if (!verdict.ok) {
@@ -122,21 +135,34 @@ export function useRecipePatternItem(
   if (!learned.ok) return;
   // Consume by the id the caller was asked to use, not def.id: useItem's own
   // ownership gate counted THAT id, so spending anything else could remove a
-  // copy the player was never charged for. When the click named a slot
-  // (useItem validated it against the live inventory BEFORE any effect, so a
-  // stale index never reaches this line), spend THAT exact copy: the legacy
-  // newest-first walk in ctx.removeItem is lock-blind and could otherwise
-  // destroy a DIFFERENT copy of the same pattern than the one clicked, a
-  // player-LOCKED copy included (the v0.38.0 item lock, issue 3042, makes
-  // same-id copies distinguishable per copy). The id-only arm below stays
-  // byte-identical for callers with no selection, per item_copy_ref.ts's
-  // frozen-fallback doctrine.
-  const taken =
-    slotIndex === undefined
-      ? undefined
-      : consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
-  if (taken) ctx.onInventoryChangedForQuests?.(meta);
-  else ctx.removeItem(itemId, 1, meta.entityId);
+  // copy the player was never charged for. When the click named a slot (the
+  // gate at the top of this function re-validated it, and useItem validated
+  // it before dispatching), spend THAT exact copy: the legacy newest-first
+  // walk in ctx.removeItem is lock-blind and could otherwise destroy a
+  // DIFFERENT copy of the same pattern than the one clicked, a player-LOCKED
+  // copy included (the v0.38.0 item lock, issue 3042, makes same-id copies
+  // distinguishable per copy). The id-only arm below stays byte-identical
+  // for callers with no selection, per item_copy_ref.ts's frozen-fallback
+  // doctrine.
+  const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+  if (taken === undefined) {
+    // No selection named: the legacy id-only walk, byte-identical to the
+    // pre-selection behavior (the hook fires inside ctx.removeItem).
+    ctx.removeItem(itemId, 1, meta.entityId);
+  } else if (taken === null) {
+    // Unreachable: the gate at the top of this function pinned the selection
+    // and nothing between it and this consume touches the bags (the resolver
+    // is pure, acquireRecipe only adds to knownRecipes). Kept as an explicit
+    // arm per the item_copy_ref tri-state contract: a bad selection must
+    // never collapse into the newest-first guess this arm exists to remove.
+    return;
+  } else {
+    // The consumed-slot arm owes the same bookkeeping ctx.removeItem does:
+    // the quest recount plus its meta.wireRev bump, which is what tells the
+    // online host's heavy self block that the bags changed (pinned in
+    // tests/recipe_pattern_items.test.ts).
+    ctx.onInventoryChangedForQuests?.(meta);
+  }
   // Success feedback, the Sim.trainRecipe shape: the same text-free personal
   // trainResult the trainer path emits, so the hud's existing handler logs
   // "You have learned {recipe}." and the train window's row flips to Known

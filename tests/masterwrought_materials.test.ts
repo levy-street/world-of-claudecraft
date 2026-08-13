@@ -9,6 +9,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD, ITEMS, MOBS } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
+import { isItemLocked } from '../src/sim/item_lock';
 import {
   awardRiftFirstClearMaterials,
   EMBER_ACCRUAL_GRANT_CAP,
@@ -758,9 +759,13 @@ describe('sundered essence: the extraction', () => {
     sim.addItem(RAID_EPIC, 1, pid);
     const slot = meta.inventory.find((s) => s.itemId === RAID_EPIC);
     if (!slot) throw new Error('raid epic not granted');
-    slot.instance = { ...(slot.instance ?? {}), locked: true };
+    const slotIndex = meta.inventory.indexOf(slot);
+    // Lock through the REAL command, not a hand-stamped payload, so the pin
+    // rides the lock's own storage shape wherever it moves.
+    sim.setItemLocked(RAID_EPIC, true, pid, slotIndex);
+    if (!isItemLocked(meta.inventory[slotIndex].instance)) throw new Error('lock did not stamp');
     sim.drainEvents();
-    runSunder(sim, RAID_EPIC, pid, meta.inventory.indexOf(slot));
+    runSunder(sim, RAID_EPIC, pid, slotIndex);
     expect(sim.countItem(RAID_EPIC, pid)).toBe(0);
     expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(SUNDERED_ESSENCE_YIELD);
   });

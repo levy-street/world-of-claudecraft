@@ -130,7 +130,10 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   never-practiced, tier via the shared `teachTierMet`) plus the
   `useRecipePatternItem` apply arm dispatched from the items.ts useItem kind
   chain; learns via `acquireRecipe` source 'drop', consumes exactly one copy
-  on success only, emits the text-free `trainResult` ok; draws NO rng.
+  on success only (the CLICKED copy when the use names a slot, per the
+  item_copy_ref tri-state contract with a pre-effect pin gate; the legacy
+  newest-first walk only when no selection is named), emits the text-free
+  `trainResult` ok; draws NO rng.
 - `masterwrought_materials.ts`: the Masterwrought chase-material income side
   (`awardWyrmfallCores` from the death hub, the rift first-clear arm, the
   weekly Maker's Ember accrual with its pure civil-date week math, the
