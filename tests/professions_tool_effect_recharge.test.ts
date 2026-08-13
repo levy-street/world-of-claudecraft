@@ -6,7 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import type { TOOL_EFFECT_IDS } from '../src/sim/content/professions';
-import { TOOL_EFFECT_RECIPES } from '../src/sim/content/recipes';
+import { APEX_GEAR_RECIPES, TOOL_EFFECT_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/disenchant_reagents';
@@ -464,6 +464,46 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
         ).toBeGreaterThan(rechargeValue);
       }
     }
+  });
+
+  it('holds for the apex charm at every reachable rung (Masterwrought phase 09)', () => {
+    // The apex rung minted from APEX_GEAR_RECIPES rather than
+    // TOOL_EFFECT_RECIPES: same inequality, its OWN craft (engineering, the
+    // effect's craftId), so the cheapest mint a player can perform is the
+    // engineering-specialized bill. startingDurability stays at the family's
+    // 20, so the worst generic recharge is the SAME 275-copper epic fill the
+    // enchanting charms price against.
+    const recipe = APEX_GEAR_RECIPES.find((row) => row.resultItemId === 'makers_charm');
+    if (!recipe) throw new Error('recipe_makers_charm missing from APEX_GEAR_RECIPES');
+    expect(recipe.professionId).toBe('engineering');
+    const listed = mintValue(recipe, {});
+    const cheapest = mintValue(recipe, { engineering: 125 });
+    expect(cheapest, 'the specialization discount must really bite').toBeLessThan(listed);
+    for (const rung of reachableRungs) {
+      const fill = startingDurabilityFor('makers_charm', rung);
+      const genericCount = Math.ceil(fill / RECHARGE_CHARGES_PER_MATERIAL);
+      const ladderRung = ['common', 'uncommon', 'rare', 'epic', 'legendary'][
+        rarityLadderIndex(rung)
+      ];
+      const rechargeValue = genericCount * unitValue(DISENCHANT_MATERIAL_BY_QUALITY[ladderRung]);
+      expect(
+        cheapest,
+        `${recipe.id} at the ${String(rung)} rung: the CHEAPEST mint ${cheapest} must ` +
+          `exceed the generic full-fill recharge ${rechargeValue}, or re-crafting the apex ` +
+          `charm becomes the cheap recharge`,
+      ).toBeGreaterThan(rechargeValue);
+    }
+    // The resolved rung arithmetic, pinned so a one-sided retune of either
+    // the reagent bill or the material prices cannot drift silently:
+    // listed 3x45 + 2x50 + 4x60 + 2x60 = 595; specialized floor(count x 0.8)
+    // is 2x45 + 1x50 + 3x60 + 1x60 = 380; worst generic recharge stays 275
+    // (the 50-charge epic fill at 5 shards).
+    expect(listed).toBe(595);
+    expect(cheapest).toBe(380);
+    expect(
+      Math.ceil(startingDurabilityFor('makers_charm', 'epic') / RECHARGE_CHARGES_PER_MATERIAL) *
+        unitValue('arcane_shard'),
+    ).toBe(275);
   });
 
   it('pins the shipped constants so a one-sided retune cannot drift silently', () => {

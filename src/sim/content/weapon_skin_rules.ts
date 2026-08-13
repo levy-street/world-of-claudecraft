@@ -42,6 +42,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   bonewrought_greatsword: 'sword',
   direfang_greatblade: 'sword',
   hoarfrost_edge: 'sword',
+  duskforged_warblade: 'sword',
   wildheart_tuskblade: 'sword',
   greatfang_of_the_basin: 'sword',
   // Daggers
@@ -95,6 +96,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   gravewyrm_thornmaul: 'mace',
   maul_of_the_scourged_wilds: 'mace',
   wildsoul_maul: 'mace',
+  ridgebreaker: 'mace',
   // Axes
   rusty_hatchet: 'axe',
   copper_bearded_axe: 'axe',

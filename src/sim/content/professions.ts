@@ -192,7 +192,7 @@ export const HARVEST_COMPONENT_SPECIMENS: Readonly<Record<string, string>> = {
 // only when the bonus changed the granted outcome (R42); tool rarity buys
 // extra STARTING charges rather than cheaper spends. `kind` selects which
 // harvest/craft outcome field the bonus adjusts.
-export type ToolEffectId = 'gatherers_cache' | 'artisans_eye' | 'quickening_charm';
+export type ToolEffectId = 'gatherers_cache' | 'artisans_eye' | 'quickening_charm' | 'makers_charm';
 
 export interface ToolEffectDef {
   id: ToolEffectId;
@@ -246,6 +246,26 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     startingDurability: 20,
     craftId: 'enchanting',
   },
+  // The apex rung (Masterwrought phase 09): the SAME quantity mechanic as
+  // gatherers_cache at the next bonus step, never a new effect kind (R14).
+  // The step is quantity rather than quality because a quality bonus above 1
+  // would mint fine grades over bare hands until the grade resolver grows a
+  // real-tool floor (the one-point margin pinned in
+  // tests/professions_tools.test.ts). The first non-enchanting effect:
+  // craftId 'engineering' keys the specialization recharge discount to the
+  // craft that mints it (../professions/tools.ts reads craftId per effect).
+  // startingDurability stays at the family's 20 so the R30/R47 recharge
+  // price family prices this rung identically to its kin.
+  makers_charm: {
+    id: 'makers_charm',
+    name: "Maker's Charm",
+    icon: 'makers_charm',
+    description: 'Slotted onto a gathering tool: yields two extra units per harvest.',
+    kind: 'quantity',
+    bonus: 2,
+    startingDurability: 20,
+    craftId: 'engineering',
+  },
 };
 
 // Stable iteration order, used the same way GATHERING_PROFESSION_IDS is.
@@ -253,6 +273,7 @@ export const TOOL_EFFECT_IDS: ToolEffectId[] = [
   'gatherers_cache',
   'artisans_eye',
   'quickening_charm',
+  'makers_charm',
 ];
 // Ten-craft ring content: pure data plus pure helper functions. No engine logic,
 // no mechanic wiring: this file only defines the ring geometry (order, pole tags)

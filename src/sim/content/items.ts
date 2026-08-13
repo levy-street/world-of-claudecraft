@@ -2152,6 +2152,202 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
   },
 
+  // --- Masterwrought apex gear (Phase 09, R6/R13/R14) ----------------------
+  // The skill-100 rung for weaponcrafting, jewelcrafting, engineering, and
+  // inscription: eight ilvl-31 epics (recipe level 25 + epic bonus 6, via the
+  // APEX_GEAR_RECIPES source registration) plus the two unflagged tools (the
+  // field forge and the apex charm). Weapon dps sits on weaponDpsBudget(31)
+  // = 16.0 (x TWOHAND_DPS_MULT for the two-hander); primary sums EQUAL
+  // primaryStatBudget; each combat rating follows its family band
+  // (FIVE_MAN_WEAPON_RATING 50 on weapons, the held/shield 20, the
+  // heroic-vendor JEWELRY_RATING 25 on jewelry), off the stat budget like
+  // spellPower. Class gating mirrors each family reference row; jewelry
+  // carries no requiredClass and no armorType (the heroic-vendor family
+  // precedent). The level-20 equip gate is DERIVED (item_level_req.ts),
+  // never hand-authored, exactly like the phase 08 apex armor; every piece
+  // is tradable per R2 with standard disenchant (R12: the epic-quality
+  // ladder yield, no special fields). masterwrought: true on the eight
+  // counted pieces; the forge and the charm are deliberately unflagged
+  // (tools, never counted combat power). Pure stats per R14: no procs, no
+  // combat effects anywhere in this block. sellValues sit strictly below
+  // each recipe's reagent input value (the recipes.ts economy comments).
+  duskforged_warblade: {
+    id: 'duskforged_warblade',
+    name: 'Duskforged Warblade',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    // weaponDpsBudget(31) = 16.0 exactly: (30 + 50) / 2 / 2.5. Speed sits in
+    // the ilvl-31 1H family band (mistcallers_fang 1.8 to lunar_tide 3.0).
+    weapon: { min: 30, max: 50, speed: 2.5 },
+    // ilvl-31 mainhand epic budget = 22; str:13+sta:9 = 22 (the
+    // gravewyrm_cleaver split).
+    stats: { str: 13, sta: 9 },
+    hitRating: 50,
+    sellValue: 320,
+    masterwrought: true,
+    // The gravewyrm_cleaver gate: the HEAVY plate/mail melee group.
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
+  ridgebreaker: {
+    id: 'ridgebreaker',
+    name: 'Ridgebreaker',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    // 2H dps premium: weaponDpsBudget(31) = 16.0 x TWOHAND_DPS_MULT -> 18.4;
+    // (49 + 76) / 2 / 3.4 = 18.38. Speed sits in the ilvl-31 2H family band
+    // (greatfang_of_the_basin 3.4, wildsoul_maul 3.6).
+    weapon: { min: 49, max: 76, speed: 3.4 },
+    // round(22 x TWOHAND_STAT_MULT) = 29; str:17+sta:12 = 29 (the
+    // greatfang_of_the_basin shape; the dps premium is the 2H's
+    // compensation).
+    stats: { str: 17, sta: 12 },
+    hitRating: 50,
+    sellValue: 340,
+    masterwrought: true,
+    // The greatfang_of_the_basin gate: HEAVY (rogues never equip
+    // two-handers, equipment_rules).
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
+  duskforged_bulwark: {
+    id: 'duskforged_bulwark',
+    name: 'Duskforged Bulwark',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'offhand',
+    shield: true,
+    quality: 'epic',
+    // blockValue extrapolates the hand-authored shield ladder (buckler 6,
+    // Wallshield 14, bonewrought_bulwark 30 at ilvl 29) to 32 at ilvl 31.
+    blockValue: 32,
+    // Armor extrapolates bonewrought_bulwark (680 at ilvl 29, itself 2x its
+    // tier's epic mail chest): the epic mail chest line grows 13 armor per
+    // ilvl (deathlord_warplate 270 at 26 to the heroic hauberks 335 at 31),
+    // so the shield line grows 2 x 13 = 26 per ilvl: 680 + 2 x 26 = 732.
+    // ilvl-31 offhand epic budget = 16; sta:11+str:5 = 16, sta-lead for the
+    // tank identity.
+    stats: { armor: 732, sta: 11, str: 5 },
+    // The held/shield family band: one rating at 20; physical tank identity
+    // is Hit (threat), like bonewrought_bulwark.
+    hitRating: 20,
+    sellValue: 300,
+    masterwrought: true,
+    // The bonewrought_bulwark gate.
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
+  wyrmfall_pendant: {
+    id: 'wyrmfall_pendant',
+    name: 'Wyrmfall Pendant',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'epic',
+    // ilvl-31 neck epic budget = 14; int:8+sta:6 = 14. Two stats only (a
+    // primary plus stamina), the heroic-vendor jewelry shape law.
+    stats: { int: 8, sta: 6 },
+    // Exactly one rating at the jewelry band's 25. Caster haste WITH
+    // stamina complements the vendor necks: zense_meridian is the int/spi
+    // CRIT neck and no vendor neck carries a caster haste line.
+    hasteRating: 25,
+    sellValue: 320,
+    masterwrought: true,
+  },
+  warhewn_signet: {
+    id: 'warhewn_signet',
+    name: 'Warhewn Signet',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    // ilvl-31 ring epic budget = 13; str:8+sta:5 = 13.
+    stats: { str: 8, sta: 5 },
+    // Melee str identity: Hit, the seal_of_the_nine_oaths line.
+    hitRating: 25,
+    sellValue: 300,
+    masterwrought: true,
+  },
+  prismglass_loop: {
+    id: 'prismglass_loop',
+    name: 'Prismglass Loop',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    // ilvl-31 ring epic budget = 13; int:8+sta:5 = 13.
+    stats: { int: 8, sta: 5 },
+    // Caster int identity: haste. The vendor haste rings are spi/int splits
+    // (zyzzs_deathless_signet, architects_cornerstone); an int-lead haste
+    // ring with stamina is the missing line.
+    hasteRating: 25,
+    sellValue: 300,
+    masterwrought: true,
+  },
+  gyrelens_array: {
+    id: 'gyrelens_array',
+    name: 'Gyrelens Array',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'epic',
+    // Held-in-offhand engineering stat stick on the wraithfire_orb line
+    // (occupiesHand defaults true: the 0.75 held budget line, kept). NO use
+    // field: R14 forbids new proc/effect mechanics and the codebase ships
+    // no cosmetic-only item-use family to reuse, so the gadget is pure
+    // stats. ilvl-31 offhand epic budget = 16; int:10+sta:6 = 16, the
+    // dps-caster identity.
+    stats: { int: 10, sta: 6 },
+    // The held/shield family band: one rating at 20; dps-caster throughput
+    // is crit, like wraithfire_orb.
+    critRating: 20,
+    sellValue: 340,
+    masterwrought: true,
+    // The wraithfire_orb gate: the caster weapon-proficiency group; kind
+    // held_offhand equips by the literal requiredClass.
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
+  },
+  voidbound_grimoire: {
+    id: 'voidbound_grimoire',
+    name: 'Voidbound Grimoire',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'epic',
+    // ilvl-31 offhand epic budget = 16; int:8+spi:5+sta:3 = 16, the
+    // wraithfire_orb three-stat healer-leaning distribution rescaled to the
+    // ilvl-31 budget.
+    stats: { int: 8, spi: 5, sta: 3 },
+    // Healer-inclusive throughput: haste, never Hit (heals are not
+    // resisted; the healer-facing rule at wraithfire_orb).
+    hasteRating: 20,
+    sellValue: 340,
+    masterwrought: true,
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
+  },
+  masters_field_forge: {
+    id: 'masters_field_forge',
+    name: "Master's Field Forge",
+    kind: 'tool',
+    quality: 'epic',
+    // The apex mobile station (mobile_station.ts placeMobileStationFromItem):
+    // party-shared, never consumed (the mount-reins convention), holding it
+    // is the credential (no specialization gate). stationCraftId is a CRAFT
+    // id, so stationTypeForCraft('weaponcrafting') resolves the FORGE.
+    // Deliberately NOT masterwrought: a tool, never counted combat power.
+    use: { type: 'placeMobileStation', stationCraftId: 'weaponcrafting' },
+    sellValue: 380,
+  },
+  makers_charm: {
+    id: 'makers_charm',
+    name: "Maker's Charm",
+    kind: 'tool',
+    quality: 'epic',
+    // The apex tool-effect charm (the gatherers_cache shape, one rung over
+    // it: TOOL_EFFECTS makers_charm, quantity +2). Item id EQUALS the
+    // effect id (one identity, one icon key, one display name). quality
+    // 'epic' keeps the rare-or-better craft signing rule minting signed
+    // copies, whose signer feeds the original-crafter recharge discount.
+    // Deliberately NOT masterwrought.
+    use: { type: 'toolEffect', effectId: 'makers_charm' },
+    sellValue: 150,
+  },
+
   // --- Quartermaster's Consignment ---------------------------------------
   // A standing line of practical adventuring gear. The Merchant keeps eight
   // pieces stocked on the World Market (see seedHouseListings); four more are

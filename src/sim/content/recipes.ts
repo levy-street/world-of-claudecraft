@@ -2271,6 +2271,209 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The Masterwrought apex gear rung (Phase 09, R8/R13): the skill-100 recipes
+// for weaponcrafting (1H, 2H, shield), jewelcrafting (neck, two rings),
+// engineering (gadget, field forge, apex charm), and inscription (tome).
+// Reagent bills are uniform per craft, the phase 07 demand math: exactly 3 of
+// the profession's own intermediate (3 catalyst-days) plus 2 Wyrmfall Cores
+// (the raid/heroic tie) plus the craft's gathered family, quantities on the
+// phase 08 idiom. acquisition ['drop'] per R8, same as APEX_ARMOR_RECIPES:
+// apex patterns land as drops and heroic-marks vendor rows in phase 11, so
+// these recipes are deliberately unlearnable until then; NOT trainer rows.
+// stationType matches each craft's existing rows so the per-craft wiki
+// station field stays unanimous; itemLevelBudget feeds only the craft gold
+// fee. The apex charm row also carries the R39 mint-out-costs-recharge
+// inequality: its cheapest (engineering-specialized) mint values 380 copper,
+// above the 275 the worst generic recharge costs; pinned both ways in
+// tests/professions_tool_effect_recharge.test.ts.
+export const APEX_GEAR_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_duskforged_warblade',
+    professionId: 'weaponcrafting',
+    resultItemId: 'duskforged_warblade',
+    resultCount: 1,
+    // Input 491 vs output 320.
+    reagents: [
+      { itemId: 'duskforged_billet', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_ridgebreaker',
+    professionId: 'weaponcrafting',
+    resultItemId: 'ridgebreaker',
+    resultCount: 1,
+    // Input 491 vs output 340.
+    reagents: [
+      { itemId: 'duskforged_billet', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_duskforged_bulwark',
+    professionId: 'weaponcrafting',
+    resultItemId: 'duskforged_bulwark',
+    resultCount: 1,
+    // Input 491 vs output 300.
+    reagents: [
+      { itemId: 'duskforged_billet', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_wyrmfall_pendant',
+    professionId: 'jewelcrafting',
+    resultItemId: 'wyrmfall_pendant',
+    resultCount: 1,
+    // Input 511 vs output 320.
+    reagents: [
+      { itemId: 'prismglass_setting', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_warhewn_signet',
+    professionId: 'jewelcrafting',
+    resultItemId: 'warhewn_signet',
+    resultCount: 1,
+    // Input 511 vs output 300.
+    reagents: [
+      { itemId: 'prismglass_setting', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_prismglass_loop',
+    professionId: 'jewelcrafting',
+    resultItemId: 'prismglass_loop',
+    resultCount: 1,
+    // Input 511 vs output 300.
+    reagents: [
+      { itemId: 'prismglass_setting', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_gyrelens_array',
+    professionId: 'engineering',
+    resultItemId: 'gyrelens_array',
+    resultCount: 1,
+    // Input 595 vs output 340.
+    reagents: [
+      { itemId: 'precision_chassis', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'ashwood_log', count: 4 },
+      { itemId: 'thorium_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'recipe_masters_field_forge',
+    professionId: 'engineering',
+    resultItemId: 'masters_field_forge',
+    resultCount: 1,
+    // Input 595 vs output 380.
+    reagents: [
+      { itemId: 'precision_chassis', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'ashwood_log', count: 4 },
+      { itemId: 'thorium_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'recipe_makers_charm',
+    professionId: 'engineering',
+    resultItemId: 'makers_charm',
+    resultCount: 1,
+    // Input 595 vs output 150. The R39 bound at the apex rung: a
+    // specialized engineer consumes floor(count x 0.8) of each line
+    // (2 chassis 90 + 1 core 50 + 3 logs 180 + 1 ore 60 = 380), above the
+    // 275 the worst generic recharge (an epic-rung 50-charge fill, 5
+    // shards) costs, so re-crafting can never bypass recharging.
+    reagents: [
+      { itemId: 'precision_chassis', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'ashwood_log', count: 4 },
+      { itemId: 'thorium_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'recipe_voidbound_grimoire',
+    professionId: 'inscription',
+    resultItemId: 'voidbound_grimoire',
+    resultCount: 1,
+    // Input 603 vs output 340.
+    reagents: [
+      { itemId: 'sablewax_vellum', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+];
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
@@ -2288,6 +2491,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...INSCRIPTION_RECIPES,
   ...INTERMEDIATE_RECIPES,
   ...APEX_ARMOR_RECIPES,
+  ...APEX_GEAR_RECIPES,
 ];
 
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {

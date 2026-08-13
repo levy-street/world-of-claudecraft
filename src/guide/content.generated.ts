@@ -7835,6 +7835,123 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 125,
           "zeroAt": 150
         }
+      },
+      {
+        "id": "recipe_gyrelens_array",
+        "name": "Gyrelens Array",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "toolworks",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Precision Chassis",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Ashwood Log",
+            "count": 4
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Gyrelens Array",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_masters_field_forge",
+        "name": "Master's Field Forge",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "toolworks",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Precision Chassis",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Ashwood Log",
+            "count": 4
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Master's Field Forge",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_makers_charm",
+        "name": "Maker's Charm",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "toolworks",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Precision Chassis",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Ashwood Log",
+            "count": 4
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Maker's Charm",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
       }
     ]
   },
@@ -10218,6 +10335,49 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 125,
           "zeroAt": 150
         }
+      },
+      {
+        "id": "recipe_voidbound_grimoire",
+        "name": "Voidbound Grimoire",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "apothecary",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sablewax Vellum",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Voidbound Grimoire",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
       }
     ]
   },
@@ -10719,6 +10879,123 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 125,
           "zeroAt": 150
         }
+      },
+      {
+        "id": "recipe_wyrmfall_pendant",
+        "name": "Wyrmfall Pendant",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Prismglass Setting",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Wyrmfall Pendant",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_warhewn_signet",
+        "name": "Warhewn Signet",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Prismglass Setting",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Warhewn Signet",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_prismglass_loop",
+        "name": "Prismglass Loop",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Prismglass Setting",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Prismglass Loop",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
       }
     ]
   },
@@ -11176,6 +11453,123 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 100,
           "minimalAt": 125,
           "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_duskforged_warblade",
+        "name": "Duskforged Warblade",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Duskforged Billet",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Duskforged Warblade",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_ridgebreaker",
+        "name": "Ridgebreaker",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Duskforged Billet",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Ridgebreaker",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_duskforged_bulwark",
+        "name": "Duskforged Bulwark",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Duskforged Billet",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Duskforged Bulwark",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         }
       }
     ]
