@@ -523,8 +523,11 @@ intentional and pinned by a test.
   Rift sourced. That is a known backlog, not a drift bug.
 - **Three catalog slots are permanently unfillable today** and keep 100 percent
   catalog completion (and therefore the whole-catalog capstone deed)
-  unreachable: the engineering masterwork mark (every engineering recipe
-  produces a slotless, statless tool, so the masterwork proc can never fire)
+  unreachable: the engineering masterwork mark (R1 masterwork suppression:
+  craftBonusStatsFor in crafting.ts returns null for masterwrought defs, so no
+  engineering craft can mint a masterwork instance while suppression stands;
+  when phase 12 moves suppression to the effect gate, craftIsGearCapable flips
+  and this feat justification must be re-judged)
   and two mount reins (one with no acquisition path, one dev-grant only). This
   is why the capstone deed is marked as a feat and kept out of the Book
   completion pair. See "Open owner calls" for the consequence that is still

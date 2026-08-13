@@ -916,6 +916,18 @@ describe('tool effect slotting, on the axes the live harvest path has', () => {
     expect(baseOutcome.quantity).toBe(2);
   });
 
+  it("the apex quantity rung (Maker's Charm, phase 09) grants base + 2 through the same path", () => {
+    const slot = slotEffect('makers_charm');
+    expect(slot.durability).toBeGreaterThan(0);
+    const bonused = applyEffectBonus(slot, baseOutcome);
+    // Both halves of the pin: the content knob the live grant reads, AND the
+    // literal rung, so a silent knob edit cannot re-tune the apex charm while
+    // the knob-relative half stays green.
+    expect(bonused.quantity).toBe(baseOutcome.quantity + TOOL_EFFECTS.makers_charm.bonus);
+    expect(bonused.quantity).toBe(baseOutcome.quantity + 2);
+    expect(bonused.gradeToolTier).toBe(baseOutcome.gradeToolTier);
+  });
+
   it('a quality effect raises the grade tool tier and nothing else', () => {
     const slot = slotEffect('artisans_eye');
     const bonused = applyEffectBonus(slot, baseOutcome);

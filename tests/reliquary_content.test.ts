@@ -2431,14 +2431,18 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
   horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker'],
-  // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
-  // engineering recipe produces a slotless, statless tool, masterworkBonusStats
-  // returns null for all of them, so the masterwork proc can never fire and
-  // the mark can never be written (write site crafting.ts, gate masterwork.ts).
-  // The slot stays catalogued and un-hinted until the owner either ships a
-  // stats-bearing engineering craftable or retires the slot. The
-  // gear-capability pin below derives the eligible set from the live recipes
-  // and reds if either side moves.
+  // masterwork:engineering: unearnable, QA ruling 2026-08-07. The true gate
+  // is R1 masterwork suppression, not tool-only output (gyrelens_array is a
+  // live stats-bearing engineering craft): craftBonusStatsFor (crafting.ts)
+  // returns null for every masterwrought def, so no engineering craft can
+  // mint a masterwork instance while suppression stands and the mark can
+  // never be written. Phase 12 revisit: when suppression moves to the effect
+  // gate, craftIsGearCapable flips for engineering and three pins move
+  // together (the gearCapableCount liveness literal, the derivedEligible
+  // literal, and this pended row), and the reliquary.md feat justification
+  // must be re-judged. Until then the slot stays catalogued and un-hinted.
+  // The gear-capability pin below derives the eligible set from the live
+  // recipes and reds if either side moves.
   professions_masterwork: ['masterwork:engineering'],
 };
 

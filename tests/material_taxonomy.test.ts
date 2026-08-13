@@ -49,6 +49,9 @@ const HONEST_MATERIALS = [
   'cooking_salt',
   'copper_ore',
   'curved_tusk',
+  // Masterwrought phase 09: derives IN as the reagent the apex weapon rows
+  // consume (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
+  'duskforged_billet',
   'elderwood_log',
   'fine_ashwood_log',
   'fine_copper_ore',
@@ -70,7 +73,13 @@ const HONEST_MATERIALS = [
   'iron_ore',
   'ironbark_log',
   'linen_scrap',
+  // Masterwrought phase 09: derives IN as the reagent the apex engineering
+  // rows consume (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
+  'precision_chassis',
   'prime_cut',
+  // Masterwrought phase 09: derives IN as the reagent the apex jewelcrafting
+  // rows consume (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
+  'prismglass_setting',
   'pristine_claw',
   'pristine_hide',
   'pristine_silk',
@@ -90,6 +99,9 @@ const HONEST_MATERIALS = [
   'resonant_thread',
   'resonant_timber',
   'rough_hide',
+  // Masterwrought phase 09: derives IN as the reagent the apex inscription
+  // row consumes (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
+  'sablewax_vellum',
   'sharp_claw',
   'silverleaf_herb',
   'smithing_flux',
@@ -111,29 +123,28 @@ const HONEST_MATERIALS = [
 
 // The ONLY non-poor junk allowed outside the material set: four rare-mob
 // trophies plus the placed keep keepsake (Q4 ruled them out of the sweep),
-// the phase 04 making-catalyst, and the nine Masterwrought phase 07
-// intermediates that ship before the apex rows consuming them (the
-// wyrmfall_core precedent; the Quickening Catalyst is deliberately NOT here,
-// it derives IN via its nine in-phase consumers). A new junk item landing in
-// this assertion's diff must be classified: either author it into a source
-// table (a node yield, grade, component, specimen, salvage return, or
-// junk-kind reagent) so it derives IN, or add it here as a deliberate
-// non-material with the maintainer's sign-off.
+// the phase 04 making-catalyst, and the Masterwrought phase 07 intermediates
+// still awaiting their consuming apex rows (the wyrmfall_core precedent; the
+// Quickening Catalyst is deliberately NOT here, it derives IN via its nine
+// in-phase consumers). A new junk item landing in this assertion's diff must
+// be classified: either author it into a source table (a node yield, grade,
+// component, specimen, salvage return, or junk-kind reagent) so it derives
+// IN, or add it here as a deliberate non-material with the maintainer's
+// sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
-  'duskforged_billet', // consumed from Phase 09/10 apex rows, remove then
   'emberwing_cinderscale',
   'gleamstag_charm',
   'guardian_core',
   'last_keep_signet',
-  'lucent_reagent', // consumed from Phase 09/10 apex rows, remove then
+  'lucent_reagent', // consumed from Phase 10 apex rows, remove then
   'old_cragmaws_pelt',
-  'precision_chassis', // consumed from Phase 09/10 apex rows, remove then
-  'prismglass_setting', // consumed from Phase 09/10 apex rows, remove then
-  'sablewax_vellum', // consumed from Phase 09/10 apex rows, remove then
-  'seasoned_stock', // consumed from Phase 09/10 apex rows, remove then
+  'seasoned_stock', // consumed from Phase 10 apex rows, remove then
   // Phase 08 removed forgefold_plating, wyrmhide_cording, sunspun_bolt, and
   // wyrmfall_core: the apex armor rows are their consumers, so all four now
   // derive IN through the reagent source table (HONEST_MATERIALS above).
+  // Phase 09 removed duskforged_billet, precision_chassis,
+  // prismglass_setting, and sablewax_vellum the same way: the apex gear rows
+  // (APEX_GEAR_RECIPES) are their consumers.
 ] as const;
 
 // The six vendor-buyable crafting staples, ruled IN by name (Q6).
@@ -217,6 +228,7 @@ describe('MATERIAL_ITEM_IDS: class exclusions, keyed on KIND against the live ca
       'simple_fishing_pole', // kind tool, use-type fishing
       'gatherers_cache', // charm (kind tool by deliberate authoring)
       'artisans_eye', // charm
+      'makers_charm', // charm (the phase 09 apex quantity rung)
       'heroic_mark', // kind tool token
       'riding_training', // kind tool token
       ...ALLOWED_UNCLASSIFIED_JUNK, // the allowlisted oddments + pre-consumer intermediates

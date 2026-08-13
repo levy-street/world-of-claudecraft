@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import {
   APEX_ARMOR_RECIPES,
+  APEX_GEAR_RECIPES,
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
@@ -440,6 +441,7 @@ describe('craftItem command (#1127)', () => {
       ...INSCRIPTION_RECIPES,
       ...INTERMEDIATE_RECIPES,
       ...APEX_ARMOR_RECIPES,
+      ...APEX_GEAR_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -454,7 +456,8 @@ describe('craftItem command (#1127)', () => {
         JEWELCRAFTING_RECIPES.length +
         INSCRIPTION_RECIPES.length +
         INTERMEDIATE_RECIPES.length +
-        APEX_ARMOR_RECIPES.length,
+        APEX_ARMOR_RECIPES.length +
+        APEX_GEAR_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });

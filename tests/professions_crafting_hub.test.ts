@@ -181,15 +181,18 @@ describe('station content', () => {
     // ruled exception class: a craft with no station of its own (enchanting/
     // jewelcrafting/inscription) may bind a recipe to a foreign station, and
     // that binding then IS the recipe's teaching home (training.ts
-    // trainingStationTypeFor). Four families make up the class today: the
+    // trainingStationTypeFor). Five families make up the class today: the
     // tool-effect charms (enchanting home, toolworks binding), the
     // Masterwrought phase 05 jewelcrafting base catalog (jewelcrafting home,
     // forge binding at forgemistress_darva), the Masterwrought phase 06
     // inscription base catalog (inscription home, apothecary binding at
-    // alchemist_verane), and the three station-less-craft rows of the
+    // alchemist_verane), the three station-less-craft rows of the
     // Masterwrought phase 07 intermediates (Prismglass Setting at the forge,
     // Lucent Reagent at the toolworks per the phase's enchanting station
-    // decision, Sablewax Vellum at the apothecary), pinned literally so a
+    // decision, Sablewax Vellum at the apothecary), and the Masterwrought
+    // phase 09 apex gear rows for the station-less crafts (the three
+    // jewelcrafting apex pieces at the forge, inscription's Voidbound
+    // Grimoire at the apothecary), pinned literally so a
     // new foreign binding is a deliberate edit here, not a drive-by. The
     // pin carries id:station PAIRS (review round): a bare id list would
     // stay green if a station-less craft's recipe silently moved to a
@@ -217,6 +220,7 @@ describe('station content', () => {
       'recipe_iron_link_choker:forge',
       'recipe_lucent_reagent:toolworks',
       'recipe_polished_copper_loop:forge',
+      'recipe_prismglass_loop:forge',
       'recipe_prismglass_setting:forge',
       'recipe_riveted_iron_signet:forge',
       'recipe_sablewax_vellum:apothecary',
@@ -224,7 +228,10 @@ describe('station content', () => {
       'recipe_silverleaf_scroll:apothecary',
       'recipe_sunpetal_grimoire:apothecary',
       'recipe_sunpetal_scroll:apothecary',
+      'recipe_voidbound_grimoire:apothecary',
+      'recipe_warhewn_signet:forge',
       'recipe_weighted_thorium_band:forge',
+      'recipe_wyrmfall_pendant:forge',
     ]);
   });
 });

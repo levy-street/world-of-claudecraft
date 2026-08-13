@@ -8,6 +8,7 @@ import { PERK_THRESHOLDS, STATIONS } from '../src/sim/content/professions';
 import {
   ALL_RECIPES,
   APEX_ARMOR_RECIPES,
+  APEX_GEAR_RECIPES,
   INTERMEDIATE_RECIPES,
   recipeById,
 } from '../src/sim/content/recipes';
@@ -785,9 +786,11 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
 
   it('the phase 08 tier rows: every apex bill and every intermediate recipe feeds 0.02', () => {
     // The apex bills max at tier 2 through their own profession's
-    // intermediate reagent; sweep the whole family so a dropped tier row on
-    // any of the ten reds here rather than shipping a quiet 0.01.
-    for (const recipe of APEX_ARMOR_RECIPES) {
+    // intermediate reagent; sweep the whole family (phase 08 armor AND the
+    // phase 09 gear, the masterwrought_budget economy-arm spread) so a
+    // dropped tier row on any of the twenty reds here rather than shipping
+    // a quiet 0.01.
+    for (const recipe of [...APEX_ARMOR_RECIPES, ...APEX_GEAR_RECIPES]) {
       expect(materialTierBonusForReagents(recipe.reagents), recipe.id).toBe(0.02);
     }
     // The catalyst tier row is a deliberate, RECORDED side effect: the nine

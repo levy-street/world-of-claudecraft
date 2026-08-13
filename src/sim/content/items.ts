@@ -2170,7 +2170,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // counted pieces; the forge and the charm are deliberately unflagged
   // (tools, never counted combat power). Pure stats per R14: no procs, no
   // combat effects anywhere in this block. sellValues sit strictly below
-  // each recipe's reagent input value (the recipes.ts economy comments).
+  // each recipe's reagent input value, inputs valued as buyValue when the
+  // def carries a positive one, else sellValue (the recipe_economy suite
+  // basis; the recipes.ts economy comments).
   duskforged_warblade: {
     id: 'duskforged_warblade',
     name: 'Duskforged Warblade',
