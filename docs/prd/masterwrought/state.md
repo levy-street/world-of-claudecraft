@@ -3070,3 +3070,41 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   board's pre-pattern apex listings (phase 08 corollary); the wiki lists
   ten unlearnable drop-acquisition recipes until phase 11 lands patterns
   (the phase 08 precedent, deliberate).
+
+Phase 09 close-out addendum (2026-08-13, after the qa-checklist gate):
+- The qa gate ran the ONE thing every curated battery had skipped, the full
+  suite, and found twelve reds with eight root causes, all same-change
+  census obligations: the professions blob band re-banded 10596..10916
+  around the measured 10756 (the +257 knownRecipes arithmetic verified
+  exact by migration-safety); the field forge card entered EFFECT_SOURCES
+  plus the composition pin; weapon census 125; the ten apex items moved
+  from per-item mapping entries to the masterwrought-phase09-art
+  generatedBatches row (the phase 06 pattern; each item exactly one owner,
+  the weapon-batch ownership model extended with the batch excluded from
+  the frozen campaign chunks); duskforged_bulwark maps to shield_square
+  while gyrelens_array and voidbound_grimoire joined the conscious
+  no-model pin (a voidbound tome GLB on the phase 06 procedural-tome
+  pattern is recorded as a PHASE 14 beauty-pass follow-up); the four
+  consumed intermediates left the bag All-only set; taxonomy bootstrap 64;
+  admin tool-effect vocabulary. A follow-up content re-review then moved
+  the CREDITS row and batch provenance wording to the batch truth, made
+  the rng-neutrality sweep iterate TOOL_EFFECT_IDS live, and pinned the
+  first weapon-owning woc_original_svg batch's provenance fields.
+- Migration-safety forward notes: the tracking band has ~160 bytes of
+  slack, so PHASE 10 WILL red it by design (a re-measure, not a
+  regression: put it in the phase 10 plan); the structural 12288 ceiling
+  holds through phases 10-11 (~1150 bytes spare after phase 10, phase 11
+  adds zero knownRecipes bytes); the makers_charm ToolEffectId widens a
+  PERSISTED enum whose rollback silently deletes a slotted charm at load,
+  player-reachable once phase 11 lands patterns: PHASE 11 owes the
+  rollback-runbook line; a stale bundled desktop or native client reads
+  the comma-joined mst as one craft id and cosmetically omits the
+  mobile-station row (server gating unaffected); phase 10's Grand
+  Cauldron / Laden Hearth reuse of the mobile_station family inherits
+  TRANSIENCE, so a capstone meant to survive a realm restart would be the
+  packet's first persisted station state, a schema-shape decision, not a
+  reuse.
+- The portrait manifest was re-blessed a SECOND time as the phase's final
+  code step (the first re-bless sat mid-phase and went stale as later
+  commits moved the stills bundle graph, exactly the phase 06 lesson;
+  230/230 byte-identical both times, acceptance sha 3a5e4816).
