@@ -1051,4 +1051,32 @@ export const it_IT: Record<string, string> = {
   'bugReports.reviewed': 'Revisionato',
   'dialog.report': 'Segnalazione',
   'theme.darkModeLabel': 'Modalità scura',
+  'error.cannotRateLimitAdmin': 'gli account amministratore non possono essere limitati in chat',
+  'error.generalChatRateLimitMessages': 'Inserisci da {min} a {max} messaggi.',
+  'error.generalChatRateLimitReasonInvalid':
+    'Inserisci un motivo di moderazione di non più di {max} caratteri.',
+  'error.generalChatRateLimitRequired':
+    'Scegli un limite valido per la chat Generale oppure rimuovilo.',
+  'error.generalChatRateLimitWindowMinutes': 'Inserisci una finestra da {min} a {max} minuti.',
+  'generalChatRateLimit.confirmRemove': 'Rimuovi limite',
+  'generalChatRateLimit.current': 'Limite attuale: {messages} messaggi ogni {minutes} minuti',
+  'generalChatRateLimit.edit': 'Modifica limite',
+  'generalChatRateLimit.messagesError': 'Inserisci un numero intero compreso tra {min} e {max}.',
+  'generalChatRateLimit.messagesLabel': 'Messaggi consentiti',
+  'generalChatRateLimit.reasonPlaceholder':
+    'Perché sta cambiando questo limite della chat Generale?',
+  'generalChatRateLimit.reasonRequired': 'Inserisci un motivo di moderazione.',
+  'generalChatRateLimit.reasonTooLong': 'Usa al massimo {max} caratteri per il motivo.',
+  'generalChatRateLimit.remove': 'Rimuovi limite',
+  'generalChatRateLimit.removeHint':
+    "La rimozione di questa sovrascrittura per l'account riporta la chat Generale a Illimitato.",
+  'generalChatRateLimit.save': 'Salva limite',
+  'generalChatRateLimit.scope':
+    'Si applica solo alla chat Generale. Gli altri canali di chat non sono interessati.',
+  'generalChatRateLimit.title': 'Limite della chat Generale',
+  'generalChatRateLimit.unlimited': 'Illimitato',
+  'generalChatRateLimit.windowMinutesError':
+    'Inserisci un numero intero compreso tra {min} e {max}.',
+  'generalChatRateLimit.windowMinutesLabel': 'Durata della finestra (minuti)',
+  'moderationHistory.actionGeneralChatRateLimit': 'Limite della chat Generale modificato',
 };

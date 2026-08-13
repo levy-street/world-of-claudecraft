@@ -54,10 +54,16 @@ const scratchBox = new THREE.Box3();
 const scratchCenter = new THREE.Vector3();
 const scratchSize = new THREE.Vector3();
 
-let renderer: THREE.WebGLRenderer | null = null;
-let scene: THREE.Scene | null = null;
-let camera: THREE.PerspectiveCamera | null = null;
-let mount: THREE.Group | null = null;
+// The offscreen rig's pieces are always created and torn down together
+// (ensureRig / resetPortraitRendererForGraphicsRebuild).
+interface PortraitRig {
+  renderer: THREE.WebGLRenderer;
+  scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
+  mount: THREE.Group;
+}
+
+let rig: PortraitRig | null = null;
 let unregisterContext: (() => void) | null = null;
 
 const cache = new Map<string, string>();
@@ -93,38 +99,42 @@ function bodyCenterXOf(root: THREE.Object3D): number | null {
   return (bodyScratchBox.min.x + bodyScratchBox.max.x) / 2;
 }
 
-function ensureRig(): void {
-  if (renderer) return;
+function ensureRig(): PortraitRig {
+  if (rig) return rig;
+
   const canvas = document.createElement('canvas');
-  renderer = new THREE.WebGLRenderer({
+  const newRenderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
     antialias: true,
     preserveDrawingBuffer: true,
   });
-  renderer.setPixelRatio(1);
-  renderer.setSize(PORTRAIT_SIZE, PORTRAIT_SIZE, false);
-  renderer.shadowMap.enabled = false;
+  newRenderer.setPixelRatio(1);
+  newRenderer.setSize(PORTRAIT_SIZE, PORTRAIT_SIZE, false);
+  newRenderer.shadowMap.enabled = false;
   // Hand this offscreen context back on page teardown (see context_release.ts).
-  unregisterContext = trackWebGLContext(renderer);
+  unregisterContext = trackWebGLContext(newRenderer);
 
-  scene = new THREE.Scene();
+  const newScene = new THREE.Scene();
   // fov/position/aim are recomputed per-model per-framing from its bounding
   // box in the capture (see portraitFrameParams); the constructor fov is a
   // placeholder, always overwritten before the first render.
-  camera = new THREE.PerspectiveCamera(portraitFrameParams('headshot').fov, 1, 0.1, 100);
+  const newCamera = new THREE.PerspectiveCamera(portraitFrameParams('headshot').fov, 1, 0.1, 100);
 
-  mount = new THREE.Group();
-  scene.add(mount);
+  const newMount = new THREE.Group();
+  newScene.add(newMount);
 
   // Soft, even key/fill so faces read clearly at thumbnail size.
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.5));
+  newScene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.5));
   const key = new THREE.DirectionalLight(0xffffff, 1.7);
   key.position.set(2.5, 4, 4);
-  scene.add(key);
+  newScene.add(key);
   const fill = new THREE.DirectionalLight(0xffffff, 0.7);
   fill.position.set(-3, 2, -2);
-  scene.add(fill);
+  newScene.add(fill);
+
+  rig = { renderer: newRenderer, scene: newScene, camera: newCamera, mount: newMount };
+  return rig;
 }
 
 /**
@@ -224,14 +234,13 @@ export async function prewarmPlayerPortrait(
 ): Promise<void> {
   const visualKey = `player_${cls}`;
   const key = `${visualKey}:${skin}:${framing}`;
-  let rigRenderer: THREE.WebGLRenderer | null = null;
+  let prewarmRig: PortraitRig | null = null;
   await runPortraitPrewarm<CharacterVisual>({
     cached: () => cache.has(key),
     ready: () => assetsAreReady,
     atlasPending: () => trackSkinAtlasPending(visualKey, skin),
     build: () => {
-      ensureRig();
-      rigRenderer = renderer;
+      prewarmRig = ensureRig();
       return new CharacterVisual(visualKey, 0xffffff, skin);
     },
     // This offscreen context is separate from the world renderer, so atlases
@@ -243,13 +252,15 @@ export async function prewarmPlayerPortrait(
     uploadTextures: async (visual) => {
       const textures = new Set<THREE.Texture>();
       collectPrewarmTextures(visual.root, textures);
-      await uploadTexturesInSlices(rigRenderer as THREE.WebGLRenderer, textures, {
+      if (!prewarmRig) return;
+      const activeRig = prewarmRig;
+      await uploadTexturesInSlices(activeRig.renderer, textures, {
         yieldToMain: yieldToMainThread,
         // A graphics rebuild mid-sweep disposes the rig (renderer goes null).
-        isCancelled: () => renderer !== rigRenderer,
+        isCancelled: () => rig !== activeRig,
       });
     },
-    current: () => renderer === rigRenderer,
+    current: () => rig === prewarmRig,
     // Link this context's programs asynchronously before the draw: the
     // portrait rig never ran a compileAsync, so the first portrait of each
     // cold program set paid the shader link inside its render call (S9
@@ -259,20 +270,23 @@ export async function prewarmPlayerPortrait(
     // concurrent sync capture can render it (see the mount-sharing note
     // above), and the captured material list keeps polling regardless.
     compile: (visual) => {
-      mount?.add(visual.root);
-      const compiled = (rigRenderer as THREE.WebGLRenderer).compileAsync(scene!, camera!);
-      mount?.remove(visual.root);
+      if (!prewarmRig) return Promise.resolve();
+      const activeRig = prewarmRig;
+      activeRig.mount.add(visual.root);
+      const compiled = activeRig.renderer.compileAsync(activeRig.scene, activeRig.camera);
+      activeRig.mount.remove(visual.root);
       return compiled.then(() => undefined);
     },
     // Fully synchronous window: renderPortraitFrame re-mounts and renders,
     // and toBlob snapshots the bitmap at call time, so nothing can interleave
     // between the draw and the capture.
     renderAndSnapshot: (visual) => {
-      renderPortraitFrame(visual, visualKey, framing);
-      return encodePortraitPng((rigRenderer as THREE.WebGLRenderer).domElement);
+      if (!prewarmRig) return Promise.resolve(null);
+      renderPortraitFrame(prewarmRig, visual, visualKey, framing);
+      return encodePortraitPng(prewarmRig.renderer.domElement);
     },
     release: (visual) => {
-      mount?.remove(visual.root);
+      prewarmRig?.mount.remove(visual.root);
       visual.dispose();
     },
     commit: (url) => cache.set(key, url),
@@ -324,9 +338,14 @@ export function modularPortraitDataUrl(
  *  `framing`, and render one frame. The caller owns the readback (synchronous
  *  toDataURL for the live path, async toBlob for the prewarm path) and the
  *  visual's unmount/dispose. */
-function renderPortraitFrame(visual: CharacterVisual, visualKey: string, framing: PortraitFraming) {
-  mount!.add(visual.root);
-  mount!.rotation.y = 0;
+function renderPortraitFrame(
+  rig: PortraitRig,
+  visual: CharacterVisual,
+  visualKey: string,
+  framing: PortraitFraming,
+) {
+  rig.mount.add(visual.root);
+  rig.mount.rotation.y = 0;
   // Settle the rig into a stable idle frame before measuring/capturing.
   visual.update(0.4, PORTRAIT_ANIM_STATE, true);
 
@@ -367,15 +386,15 @@ function renderPortraitFrame(visual: CharacterVisual, visualKey: string, framing
   // unchanged for every class; only the sideways aim is corrected.
   const bodyCenterX = bodyCenterXOf(visual.root) ?? scratchCenter.x;
   const { fov, targetYFromFeetFrac, extentFrac } = portraitFrameParams(framing);
-  camera!.fov = fov;
+  rig.camera.fov = fov;
   const targetY = scratchBox.min.y + targetYFromFeetFrac * h;
   const extent = extentFrac * h;
   const dist = extent / 2 / Math.tan((fov * Math.PI) / 180 / 2);
-  camera!.position.set(bodyCenterX + 0.04 * h, targetY + 0.02 * h, scratchBox.max.z + dist);
-  camera!.lookAt(bodyCenterX, targetY, scratchCenter.z);
-  camera!.updateProjectionMatrix();
+  rig.camera.position.set(bodyCenterX + 0.04 * h, targetY + 0.02 * h, scratchBox.max.z + dist);
+  rig.camera.lookAt(bodyCenterX, targetY, scratchCenter.z);
+  rig.camera.updateProjectionMatrix();
 
-  renderer!.render(scene!, camera!);
+  rig.renderer.render(rig.scene, rig.camera);
 }
 
 /** Render one visual into the offscreen rig and return it as a PNG data URL.
@@ -387,21 +406,24 @@ function capture(
   build: () => CharacterVisual,
   framing: PortraitFraming,
 ): string | null {
-  let visual: CharacterVisual | null = null;
+  // Paired so cleanup below can prove the rig is available whenever there is
+  // a visual to dispose, with no non-null assertions on either side.
+  let active: { rig: PortraitRig; visual: CharacterVisual } | null = null;
   try {
-    ensureRig();
-    visual = build();
-    renderPortraitFrame(visual, visualKey, framing);
-    const url = renderer!.domElement.toDataURL('image/png');
+    const rig = ensureRig();
+    const visual = build();
+    active = { rig, visual };
+    renderPortraitFrame(rig, visual, visualKey, framing);
+    const url = rig.renderer.domElement.toDataURL('image/png');
     cache.set(key, url);
     return url;
   } catch (err) {
     if (import.meta.env?.DEV) console.warn(`[portrait] failed for ${key}`, err);
     return null;
   } finally {
-    if (visual) {
-      mount!.remove(visual.root);
-      visual.dispose();
+    if (active) {
+      active.rig.mount.remove(active.visual.root);
+      active.visual.dispose();
     }
   }
 }
@@ -431,19 +453,16 @@ export function portraitsReady(): boolean {
  */
 export function resetPortraitRendererForGraphicsRebuild(): void {
   cache.clear();
-  if (mount && scene) scene.remove(mount);
-  unregisterContext?.();
-  unregisterContext = null;
-  if (renderer) {
+  if (rig) {
+    rig.scene.remove(rig.mount);
     try {
-      renderer.forceContextLoss();
+      rig.renderer.forceContextLoss();
     } catch {
       // The context may already have been evicted by the browser.
     }
-    renderer.dispose();
+    rig.renderer.dispose();
   }
-  renderer = null;
-  scene = null;
-  camera = null;
-  mount = null;
+  unregisterContext?.();
+  unregisterContext = null;
+  rig = null;
 }

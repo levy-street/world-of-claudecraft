@@ -31,6 +31,7 @@ import { planListingIds, playerListingIdFloor } from './market_listing_ids';
 import {
   MARKET_PAGE_SIZE,
   type MarketQuery,
+  type MarketSort,
   marketItemMatches,
   sanitizeMarketQuery,
 } from './market_query';
@@ -204,6 +205,16 @@ export class Market {
   private browseRev = 0;
   private sortedBookCache: { rev: number; source: MarketListing[]; rows: MarketListing[] } | null =
     null;
+  // The price-ascending twin of sortedBookCache below (issue 3102): a viewer whose
+  // query.sort is 'price' reads this memo instead. Same shape, same bookRev key, same
+  // per-book (not per-viewer) memoization: the price order is a property of the BOOK,
+  // not of who is looking, so every 'price'-sorted viewer shares one cached array exactly
+  // like every 'name'-sorted viewer already shares sortedBookCache.
+  private sortedBookByPriceCache: {
+    rev: number;
+    source: MarketListing[];
+    rows: MarketListing[];
+  } | null = null;
 
   constructor(private readonly ctx: SimContext) {}
 
@@ -244,6 +255,37 @@ export class Market {
     });
     this.sortedBookCache = { rev: this.bookRev, source: this.marketListings, rows };
     return rows;
+  }
+
+  // The whole book, price-ascending, memoized per bookRev exactly like sortedBook()
+  // above (issue 3102: surface the cheapest listings first, whole-book, not just the
+  // current page). Ties break by name, then listing id, so equal-price rows land in a
+  // fixed, deterministic order regardless of insertion order or engine sort stability.
+  private sortedBookByPrice(): readonly MarketListing[] {
+    const c = this.sortedBookByPriceCache;
+    if (
+      c &&
+      c.rev === this.bookRev &&
+      c.source === this.marketListings &&
+      c.rows.length === this.marketListings.length
+    ) {
+      return c.rows;
+    }
+    const rows = [...this.marketListings].sort((a, b) => {
+      if (a.price !== b.price) return a.price - b.price;
+      const na = ITEMS[a.itemId]?.name ?? a.itemId;
+      const nb = ITEMS[b.itemId]?.name ?? b.itemId;
+      return na.localeCompare(nb) || a.id - b.id;
+    });
+    this.sortedBookByPriceCache = { rev: this.bookRev, source: this.marketListings, rows };
+    return rows;
+  }
+
+  // Picks which of the two book-wide memoized sorts a viewer's query reads. Both are
+  // bookRev-memoized and viewer-independent, so choosing between them costs nothing
+  // beyond the sort itself, computed at most once per axis per book change.
+  private sortedBookFor(sort: MarketSort): readonly MarketListing[] {
+    return sort === 'price' ? this.sortedBookByPrice() : this.sortedBook();
   }
 
   // The change signal the server's snapshot gate polls instead of rebuilding
@@ -930,9 +972,11 @@ export class Market {
     // the client over a single wire window) is what lets a player page through and
     // filter every listing, not just the first MARKET_WIRE_LIMIT.
     const query: MarketQuery = meta.marketQuery;
-    // Filter the memoized sorted book instead of sorting the filtered book:
-    // identical sequence (see sortedBook), without the per-viewer sort.
-    const sorted = this.sortedBook().filter((l) => marketItemMatches(l.itemId, query));
+    // Filter the memoized sorted book instead of sorting the filtered book: identical
+    // sequence (see sortedBook / sortedBookByPrice), without a per-viewer sort. Which
+    // book to filter is the one thing that DOES depend on the viewer: their chosen
+    // sort axis (name, the classic default, or price ascending, issue 3102).
+    const sorted = this.sortedBookFor(query.sort).filter((l) => marketItemMatches(l.itemId, query));
     // The viewer's own listings are always wired (so they can reclaim from the Browse
     // tab without hunting for the right page); other sellers' listings are paged. Own
     // count (<= MARKET_MAX_LISTINGS = 12) plus one page (MARKET_PAGE_SIZE = 50) stays
@@ -982,6 +1026,7 @@ export class Market {
       armorClass: query.armorClass,
       primaryStat: query.primaryStat,
       rarity: query.rarity,
+      sort: query.sort,
       page,
       pageCount,
       collectionCopper: col?.copper ?? 0,

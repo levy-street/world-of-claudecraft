@@ -802,9 +802,9 @@ export const vi_VN: EnTranslations = {
       "note": "Kéo dải thẻ trò chuyện để di chuyển cửa sổ, hoặc kéo góc để thay đổi kích thước. Đặt Lại sẽ đưa cửa sổ về vị trí và kích thước mặc định."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Đã đạt giới hạn chat Chung. Hãy thử lại sau {seconds}.",
+      "pending": "Tin nhắn chat Chung trước đó của bạn vẫn đang được gửi. Hãy thử lại sau giây lát.",
+      "unavailable": "Chat Chung hiện tạm thời không khả dụng. Vui lòng thử lại trong thời gian ngắn."
     },
     "swing": {
       "ready": "Vung Đòn",
@@ -2200,6 +2200,10 @@ export const vi_VN: EnTranslations = {
       "itemAriaBound": "{item}, số lượng {count}, bản sao ràng buộc",
       "itemAriaMasterwork": "{item}, số lượng {count}, kiệt tác",
       "itemAriaQuest": "{item}, số lượng {count}, vật phẩm nhiệm vụ",
+      "itemAriaLocked": "{item}, số lượng {count}, đã khóa",
+      "itemLockedLine": "Đã khóa",
+      "lockItem": "Khóa vật phẩm",
+      "unlockItem": "Mở khóa vật phẩm",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
       "filterWeapon": "Vũ khí",
@@ -3232,6 +3236,7 @@ export const vi_VN: EnTranslations = {
       "craftedToast": "Đã chế tác: {name}",
       "craftedToastQty": "Đã chế tác: {name} x{qty}",
       "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
+      "reagentLocked": "Một nguyên liệu cho việc đó đã bị khóa.",
       "unknownRecipe": "Công thức đó không tồn tại.",
       "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.",
       "comboRequires": "Thụ ngộ: {craftA} + {craftB}, bậc {tier}.",
@@ -3341,6 +3346,7 @@ export const vi_VN: EnTranslations = {
       "notHeld": "Bạn không có vật phẩm đó.",
       "notDisenchantable": "Bạn không thể hủy pháp khắc vật phẩm đó.",
       "notSalvageable": "Bạn không thể tháo dỡ vật phẩm đó.",
+      "salvageLocked": "Vật phẩm đó đã bị khóa.",
       "disenchantBusy": "Bạn đang bận.",
       "salvageBusy": "Bạn đang bận.",
       "enchantBusy": "Bạn đang bận.",
@@ -8953,6 +8959,9 @@ export const vi_VN: EnTranslations = {
       "filterPrimaryStatAll": "Bất kỳ chỉ số chính nào",
       "filterRarity": "Độ hiếm",
       "filterRarityAll": "Tất cả độ hiếm",
+      "filterSort": "Sắp xếp",
+      "sortName": "Tên (A-Z)",
+      "sortPriceAsc": "Giá: thấp đến cao",
       "weaponSword": "Kiếm",
       "weaponDagger": "Dao Găm",
       "weaponStaff": "Trượng",

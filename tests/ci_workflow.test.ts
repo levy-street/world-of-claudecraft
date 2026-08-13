@@ -831,7 +831,17 @@ describe('CI workflow parity', () => {
     // in shape rather than lifted from the checkout-stall replay directly, so
     // every job in this file carries a conscious timeout-minutes value.
     const bounds = [
-      ['pr-gate', 20],
+      // pr-gate's 20 was sized when two 24 hour replays found zero healthy
+      // jobs over it. Sim-deep selective PRs broke that zero: their runs
+      // stack the expensive sim suites on top of the always-run
+      // blind/partial floor, and the sha1-contiguous packs can
+      // concentrate several in one shard (PR #3342's
+      // shard 1 bound-killed at a 20.25 minute wall on two attempts with a
+      // healthy 19 minute test step still running; fix/item-provenance-
+      // boundaries died the same way at 20.08). 40 is release-gate's
+      // slow-runner sizing METHOD over this workload's projected healthy
+      // wall; derivation and run evidence on the ci.yml bound.
+      ['pr-gate', 40],
       // release-gate is the one shard matrix that keeps its CI_LONG_SUITES
       // files in-shard (pr-gate hands them to the lanes), so a single shard
       // can draw four of them at once and the bound has to cover a slow
@@ -867,7 +877,9 @@ describe('CI workflow parity', () => {
       ['lint', 15],
       // pr-checks and release-checks are the same shape as lint but heavier:
       // i18n generation, the malware gate, a typecheck, and four builds. 20
-      // matches the shard matrices' bound.
+      // was sized beside the shard matrices' original bound and still fits
+      // this serialized check list; the test matrices' bounds have since
+      // moved for their own workloads, deliberately without dragging these.
       ['pr-checks', 20],
       ['release-checks', 20],
       // release-version-gate and release-i18n are both unsharded jobs whose

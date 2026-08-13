@@ -126,6 +126,43 @@ entry points. Zone-keyed FEATURES (props, foliage, water via
 `ensureZoneFeatures`) stay zone-keyed behind their own gate; only terrain needs
 to go chunk-level for the fog to work.
 
+### A new, mutating consumer of `preparedZones`: constrained-memory eviction
+
+The "do not add new consumers" constraint above is about the FOG problem this doc
+covers (view-distance UX); it does not anticipate a MEMORY problem, which is a
+different failure mode entirely. iOS WebKit's WebContent process is killed outright
+once it crosses its per-process memory ceiling, and zone residency never releasing
+anything (the whole point of this stage list existing) meant a long play session
+walking through several zones accumulated terrain and water geometry it could
+never afford to keep whole. `src/render/zone_eviction_core.ts` +
+`Renderer.evictFarZoneIfConstrained` (see their headers) add exactly one new
+consumer that WRITES `preparedZones` (`.delete()`), gated entirely behind
+`GFX.constrainedMemory` so desktop/Android (where full retention is the
+intentional trade this whole doc assumes) are untouched. `TerrainView.unloadZone`
+/ `WaterView.unloadZone` reset a zone's residency back to "pending", the exact
+state stage 0-2's streaming already handles for a zone never visited, so it needed
+no new fog-clamp logic.
+
+**What this means for stage 4.** It does not reduce stage 4's blast radius (still
+the three call sites above), but it adds a fourth thing a chunk-level residency
+rewrite must account for: something can now also SHRINK. A future stage-4
+implementation should fold eviction into the same chunk-level residency source of
+truth rather than leaving it as a second, zone-level bookkeeping system running
+alongside the chunk-level one.
+
+**What this does NOT fix.** Terrain and water are the only zone-scoped GPU costs
+that were ever unbounded here; `ensureZoneFeatures` builds are already bounded
+per-BIOME (a fixed ~10-entry ladder, not per-zone), and the sky HDRI-source cache
+(`assets/loader.ts`'s `hdrCache`) never loads on iOS at all (`GFX.iosMemoryProfile`
+forces `GFX.standardMaterials` off, which is also why `WaterView.unloadZone` is a
+no-op on the Phong tier every iOS host runs: see `zone_eviction_core.ts`'s header).
+The eviction radius (`ZONE_EVICTION_RADIUS`) also only reaches zones the player has
+walked well past; a session that stays within its retention radius of the whole
+map (e.g. hovering near the world's centre z-band) sheds nothing. If a crash report
+persists after this landed, the next places to look are a real on-device
+`src/render/assets/residency_budget.ts` readout (written for exactly this kind of
+investigation) and whichever non-terrain/water resource it points at.
+
 ## Stage 0, as landed
 
 - `src/render/zone_streaming.ts`: new `ARRIVAL_NEIGHBOR_STREAM_RADIUS = 160`.

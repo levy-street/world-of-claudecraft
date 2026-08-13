@@ -13,6 +13,7 @@ describe('craft_denial_line_view', () => {
       ['busy', 'hudChrome.crafting.busy'],
       ['throttled', 'hudChrome.crafting.busy'],
       ['recipe_not_learned', 'hudChrome.crafting.recipeNotLearned'],
+      ['locked', 'hudChrome.crafting.reagentLocked'],
       ['no_bag_space', 'hudChrome.crafting.noBagSpace'],
       ['daily_limit', 'hudChrome.crafting.dailyLimit'],
       ['insufficient_materials', 'hudChrome.crafting.insufficientMaterials'],

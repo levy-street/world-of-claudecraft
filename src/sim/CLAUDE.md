@@ -171,6 +171,10 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
 - `mob/mechanic_spacing.ts`: the rift boss shared mechanic spacing lock and its
   oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
   `runMobAttackMechanics` drivers.
+- `stun_dr.ts`: CC diminishing-return categories, PLUS the PvP diminishing-returns
+  ladder: the seven `PVP_*_DR_*` reset/multiplier/duration constants and the
+  player-sourced crowd-control funnel, `crowdControlDurationAfterDr`/
+  `diminishedCrowdControlDuration`.
 - `jail.ts`: moderation-jail cage layout, gate teleport, and visitor spot; the jail
   SYSTEM logic stays on `Sim`.
 - `professions/proficiency_display_heal.ts`: the one-time gathering-proficiency

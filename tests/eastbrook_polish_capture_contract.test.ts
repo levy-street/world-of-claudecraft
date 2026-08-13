@@ -123,8 +123,40 @@ interface AttributionTargetFixture {
 // release's Three.js audit batch, this branch's phase 06 tome GLB leaves),
 // so the merged tree mints a value matching neither parent. No capture was
 // retaken.
+// Re-minted for the shadow-batch PR (shadow-camera texel snapping and the
+// budget-governed shadow cadence; renderer.ts edits only). No capture was
+// retaken.
+// Re-minted for the merge of the shadow-batch PR with the iOS constrained-
+// memory zone-eviction fix: both parents move renderer.ts, so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the merge of PR #3314's rift windup telegraph school tint
+// (issue #2917) with the release branch's renderer changes. Both parents move
+// renderer.ts, so the rendererIntegration leaf mints a value matching neither
+// parent. No capture was retaken.
+// Re-minted for the Three.js audit batch (light budget seam, blob shadows, sky
+// residency lane, splat colour pack-source fix): renderer.ts edits only. No
+// capture was retaken.
+// Re-minted for the base sync of the Three.js audit batch with the release
+// branch renderer changes. Both parents move renderer.ts, so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the release base-health repair after renderer.ts changed. No
+// capture was retaken.
+// Re-minted for the v0.37.0 base sync with the login-storm base commit. The
+// merged renderer/prewarm/source bytes mint a value matching neither parent.
+// No capture was retaken.
+// Re-minted after organizing renderer imports changed the provenance inputs.
+// No capture was retaken.
+// Re-minted for the merge of the iOS constrained-memory zone-eviction fix
+// (evictFarZoneIfConstrained) with the release branch's organized renderer
+// imports. Both parents move renderer.ts, so the rendererIntegration leaf
+// mints a value matching neither parent. No capture was retaken.
+// Re-minted for the phase 08 QA merge of release/v0.38.0 into
+// feature/masterwrought: both sides re-minted since the common base, so the
+// merged tree mints a value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5a0dfcf8a0646203f14f1576f525fd7ad2e47413c8c944b6d83aa8b4accba8bd';
+  '1b8305b6421b3e0e6d8dc17f5181fb1e37bbd2b9310d1b898dc8c76a9b111c21';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

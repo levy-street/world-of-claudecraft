@@ -1264,6 +1264,14 @@ export interface ItemInstancePayload {
    *  boundTo, nothing item-specific. Additive and JSONB-safe: an absent flag is
    *  an ordinary freely-tradeable instance. */
   bindOnTrade?: boolean;
+  /** Player-toggled safety mark (issue 3042, item_lock.ts isItemLocked): while
+   *  true this specific copy refuses salvage, profession-craft reagent
+   *  consumption, and vendor sell (single and bulk) until the player unlocks
+   *  it again. Nothing to do with boundTo/bindOnTrade above (a content/trade
+   *  rule nobody chooses) or the def-level noVendorSell/noDiscard flags
+   *  (items.ts): this is an optional mark the owner sets on an otherwise
+   *  ordinary copy. */
+  locked?: boolean;
   /** Long-term Rift gear progression. `rolled.stats` is the authoritative
    * aggregate bonus consumed by recalcPlayerStats; this record explains how it
    * was earned and lets forge operations rebuild it deterministically. */
@@ -5939,6 +5947,7 @@ export type SimEvent = { pid?: number } & (
       reason?:
         | 'unknown_recipe'
         | 'insufficient_materials'
+        | 'locked'
         | 'combo_requirement_unmet'
         | 'recipe_not_learned'
         | 'throttled'
@@ -6025,7 +6034,8 @@ export type SimEvent = { pid?: number } & (
         | 'not_held'
         | 'throttled'
         | 'no_bag_space'
-        | 'busy';
+        | 'busy'
+        | 'locked';
     }
   // Tool-effect action outcome (the acquisition craft): the one result event
   // for the slot_tool_effect and recharge_tool_effect commands, mirroring

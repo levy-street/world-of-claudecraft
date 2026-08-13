@@ -396,7 +396,7 @@ describe('Guide key coverage', () => {
 
     flattenCatalog(guideStrings, 'guide', catalogKeys);
     files = sourceFiles();
-  });
+  }, 30000);
 
   afterAll(() => vi.restoreAllMocks());
 

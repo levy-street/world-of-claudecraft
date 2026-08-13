@@ -412,6 +412,16 @@ export interface WaterView {
    * Phong tier has no shore attribute and only repositions its one plane.
    */
   setLevel(): void;
+  /**
+   * Releases the one water sheet built for `zoneId` (front mesh, its
+   * underside twin, and their shared geometry; the surface material is
+   * shared across every sheet and outlives this) and resets residency so a
+   * later `ensureZone` for the same zone rebuilds from scratch. A no-op for
+   * a zone with nothing built or with no water at all. Gap sheets (water
+   * belonging to no zone) are left alone. Used only by the constrained-memory
+   * zone-eviction pass (see zone_eviction_core.ts).
+   */
+  unloadZone(zoneId: string): void;
   /** Releases view-owned geometry, materials, and simulation targets. */
   dispose(): void;
 }
@@ -979,11 +989,17 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   };
   const loadedZones = new Set<string>();
   const pendingZones = new Map<string, Promise<THREE.Mesh[]>>();
+  // The one front mesh ensureZone built for a given overworld zone (never a
+  // gap sheet: gaps belong to no zone). Lets unloadZone find exactly the
+  // mesh, underside twin and refit entry to release for that zone alone.
+  const zoneFrontMesh = new Map<string, THREE.Mesh>();
   // Per-mesh in-place refit closures: re-seat y and recompute the shore-depth
   // attribute from the CURRENT terrain (build and setLevel share them). The
   // vertices never move (only the attribute + the mesh transform change), so
-  // the baked bounding volumes stay valid.
-  const refits: (() => void)[] = [];
+  // the baked bounding volumes stay valid. `mesh` is null for the apron (it
+  // spans the whole map and is never released); every other entry carries the
+  // front mesh its closure refits, so unloadZone can find and drop just one.
+  const refits: { mesh: THREE.Mesh | null; refit: () => void }[] = [];
   // The apron: one huge deep-sea sheet running far past every map edge, so
   // looking off the world's side reads as open ocean to the horizon, never
   // a water plane ending in mid-air. It sits a hair below the zone planes
@@ -1174,13 +1190,16 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
         tile.mesh.visible = index.length > 0;
       }
     };
-    refits.push(() => {
-      fillApron();
-      (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
-      (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
-      refitApronGate();
-      recullApron();
-      for (const tile of apronTiles) tile.mesh.position.y = waterLevel() - 0.02;
+    refits.push({
+      mesh: null,
+      refit: () => {
+        fillApron();
+        (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
+        (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
+        refitApronGate();
+        recullApron();
+        for (const tile of apronTiles) tile.mesh.position.y = waterLevel() - 0.02;
+      },
     });
     // The source geometry only ever carried the shared attributes; the blocks
     // own the draws, so it holds no index of its own and is never rendered.
@@ -1385,13 +1404,16 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     meshes.push(mesh);
     group.add(mesh);
     addUnderside(mesh);
-    refits.push(() => {
-      fill();
-      (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
-      (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
-      refitPlaneGate();
-      cullZone();
-      mesh.position.y = waterLevel();
+    refits.push({
+      mesh,
+      refit: () => {
+        fill();
+        (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
+        (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
+        refitPlaneGate();
+        cullZone();
+        mesh.position.y = waterLevel();
+      },
     });
     return mesh;
   };
@@ -1423,6 +1445,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
             requireShore: false,
           });
           loadedZones.add(zone.id);
+          if (mesh) zoneFrontMesh.set(zone.id, mesh);
           // Gap sheets belong to no zone, so nothing streams them. Build each
           // one alongside the first ADJACENT zone that prepares: the whole rule
           // stays inside this view (no renderer change) and a gap is ready
@@ -1537,7 +1560,30 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     },
     setLevel(): void {
       simulation?.reset();
-      for (const refit of refits) refit();
+      for (const entry of refits) entry.refit();
+    },
+    unloadZone(zoneId: string): void {
+      // See terrain.ts's unloadZone for why this guard exists: unreachable
+      // today (a zone only becomes eligible for eviction once it is fully
+      // prepared, by which point its build task has already resolved), kept
+      // so the method stays safe to call in any state.
+      if (pendingZones.has(zoneId)) return;
+      const front = zoneFrontMesh.get(zoneId);
+      loadedZones.delete(zoneId);
+      if (!front) return;
+      zoneFrontMesh.delete(zoneId);
+      const pairIndex = underPairs.findIndex((pair) => pair.front === front);
+      const under = pairIndex === -1 ? null : underPairs[pairIndex].under;
+      if (pairIndex !== -1) underPairs.splice(pairIndex, 1);
+      for (const mesh of under ? [front, under] : [front]) {
+        group.remove(mesh);
+        const meshIndex = meshes.indexOf(mesh);
+        if (meshIndex !== -1) meshes.splice(meshIndex, 1);
+      }
+      // under shares front's geometry (addUnderside), so dispose it once.
+      front.geometry.dispose();
+      const refitIndex = refits.findIndex((entry) => entry.mesh === front);
+      if (refitIndex !== -1) refits.splice(refitIndex, 1);
     },
     dispose(): void {
       simulation?.dispose();
@@ -1592,6 +1638,12 @@ function buildPhongWater(): WaterView {
     setLevel(): void {
       for (const m of meshes) m.position.y = waterLevel();
     },
+    // The low tier is one plane spanning the whole map, never per-zone
+    // (isZoneLoaded is already unconditionally true), so there is nothing to
+    // release here. iosMemoryProfile always forces this tier (gfx.ts's
+    // standardMaterials), but a non-iOS constrainedMemory device can still
+    // run the medium-plus shader path below, where per-zone sheets are real.
+    unloadZone: () => {},
     dispose(): void {
       disposeOwned(meshes);
     },

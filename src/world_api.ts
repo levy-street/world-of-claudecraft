@@ -355,6 +355,7 @@ export const COMMAND_NAMES = [
   'unequip_item',
   'use',
   'discard',
+  'lock_item',
   'buy',
   'sell',
   'buyback',

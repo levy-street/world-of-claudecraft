@@ -28,9 +28,10 @@ import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { abilityScalingPower, channelTickBonus } from '../src/sim/spell_scaling';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function makeAffliction(seed = 42): Sim {
-  const sim = new Sim({ seed, playerClass: 'warlock', autoEquip: true });
+  const sim = new Sim({ seed, playerClass: 'warlock', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(20);
   expect(sim.setSpec('affliction')).toBe(true);
   sim.player.resource = sim.player.maxResource;
@@ -1383,7 +1384,12 @@ describe('Affliction Warlock', () => {
 
   it('applies every endgame compression step to real Sentence and demonic echo damage', () => {
     const observed = [17, 18, 19].map((level) => {
-      const sim = new Sim({ seed: 1900 + level, playerClass: 'warlock', autoEquip: true });
+      const sim = new Sim({
+        seed: 1900 + level,
+        playerClass: 'warlock',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(level);
       expect(sim.setSpec('affliction')).toBe(true);
       sim.player.resource = sim.player.maxResource;
@@ -1621,7 +1627,12 @@ describe('Affliction Warlock', () => {
   });
 
   it('keeps the level 5 Sentence below its level 20 damage curve', () => {
-    const sim = new Sim({ seed: 55, playerClass: 'warlock', autoEquip: true });
+    const sim = new Sim({
+      seed: 55,
+      playerClass: 'warlock',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(5);
     expect(sim.setSpec('affliction')).toBe(true);
     sim.player.resource = sim.player.maxResource;

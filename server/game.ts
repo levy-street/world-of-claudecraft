@@ -16,7 +16,7 @@ import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
-import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
+import { SPORT_ROLES, VC_NATION_IDS } from '../src/sim/content/vale_cup';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
@@ -215,6 +215,7 @@ import {
   harvestBandForNode,
   harvestTierForNode,
 } from './economy_telemetry';
+import { isUpdateDue } from './entity_update_cadence';
 // Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
 // barrels), the same way deeds_records imports onDeedRecorded: the barrels
 // drag routes.ts (and its load-time requireAccount over the db module) into
@@ -369,14 +370,6 @@ const INTEREST_QUERY_RADIUS = NPC_DROP_RADIUS;
 // the cross-slot corner check in tests/battleground_band.test.ts.
 export const BG_MATCH_INTEREST_RADIUS = 300;
 export const BG_MATCH_DROP_RADIUS = 320;
-// Distance-tiered update rates: full snapshot rate inside nameplate range
-// (55yd, beyond every ability range), half rate out to the 80yd draw range,
-// quarter rate beyond. The viewer's target and anything attacking the
-// viewer always update at full rate regardless of distance.
-const FULL_RATE_RADIUS_SQ = 55 * 55;
-const HALF_RATE_RADIUS_SQ = 80 * 80;
-const HALF_RATE_DIVISOR = 2;
-const QUARTER_RATE_DIVISOR = 4;
 // How often the achieved tick rate rides the snapshot head. The meter's 3s
 // sliding window moves slowly and the client holds the last value across
 // omissions, so ~2 Hz keeps the overlay live without paying the scalar on
@@ -824,6 +817,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'unequip_bag',
   'use',
   'discard',
+  'lock_item',
   'buy',
   'sell',
   'buyback',
@@ -1666,29 +1660,6 @@ function bgWideInterestApplies(
   const subjectId = e.kind === 'player' ? e.id : e.ownerId;
   if (subjectId === null) return true; // flags, runes, props, npcs, wild mobs
   return viewerBgTeam?.includes(subjectId) ?? false;
-}
-
-// full rate close up and for anything the viewer is fighting; mid range
-// updates every other tick, far entities every fourth. Measured against
-// the per-session last-sent tick rather than a tick-parity stagger: when
-// the event loop degrades and one broadcast covers several sim ticks, a
-// parity check can stay permanently false and starve entities frozen
-function isUpdateDue(
-  tick: number,
-  e: Entity,
-  d2: number,
-  viewer: Entity,
-  sentAtTick: number,
-): boolean {
-  // The one Vale Cup ball is watched by the whole Sowfield: a far keeper sits
-  // past the 55yd full-rate tier and the stands past 80yd, where a ~25 yd/s
-  // ball turns visibly steppy at half/quarter rate. One entity at full rate
-  // costs one lite record per tick, so it is always due.
-  if (e.templateId === VALE_CUP_BALL_TEMPLATE_ID) return true;
-  if (d2 <= FULL_RATE_RADIUS_SQ) return true;
-  if (viewer.targetId === e.id || e.aggroTargetId === viewer.id) return true;
-  const divisor = d2 <= HALF_RATE_RADIUS_SQ ? HALF_RATE_DIVISOR : QUARTER_RATE_DIVISOR;
-  return tick - sentAtTick >= divisor;
 }
 
 // Per-entity wire fragments, refreshed lazily at most once per tick and
@@ -6920,6 +6891,15 @@ export class GameServer {
           );
         }
         break;
+      case 'lock_item':
+        // Always a named slot (issue 3042): a lock toggle mutates ONE specific
+        // bag copy in place, never an id-only bulk action, so a missing/invalid
+        // slot is simply refused inside the sim (selectedInventorySlot).
+        if (typeof msg.item === 'string' && typeof msg.locked === 'boolean') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.setItemLocked(msg.item, msg.locked, pid, slot);
+        }
+        break;
       case 'buy':
         // The options bag third, pid fourth (the one explicit shape; see
         // Sim.buyItem). A non-number count is dropped like sell's, a hostile
@@ -7959,6 +7939,7 @@ export class GameServer {
             armorClass: msg.armorClass,
             primaryStat: msg.primaryStat,
             rarity: msg.rarity,
+            sort: msg.sort,
             page: typeof msg.page === 'number' ? msg.page : 0,
           }),
           pid,

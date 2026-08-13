@@ -802,9 +802,9 @@ export const cs_CZ: EnTranslations = {
       "note": "Tažením lišty karet chatu přesuneš okno, rohovým úchytem změníš velikost. Reset ho vrátí na výchozí pozici a velikost."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Byl dosažen limit chatu Obecného. Zkus to znovu za {seconds}.",
+      "pending": "Tvoje předchozí zpráva v chatu Obecném se ještě odesílá. Zkus to za chvíli znovu.",
+      "unavailable": "Chat Obecný je dočasně nedostupný. Zkus to znovu brzy."
     },
     "swing": {
       "ready": "Úder",
@@ -2200,6 +2200,10 @@ export const cs_CZ: EnTranslations = {
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
       "itemAriaQuest": "{item}, množství {count}, úkolový předmět",
+      "itemAriaLocked": "{item}, počet {count}, zamčeno",
+      "itemLockedLine": "Zamčeno",
+      "lockItem": "Zamknout předmět",
+      "unlockItem": "Odemknout předmět",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -3232,6 +3236,7 @@ export const cs_CZ: EnTranslations = {
       "craftedToast": "Vyrobeno: {name}",
       "craftedToastQty": "Vyrobeno: {name} x{qty}",
       "insufficientMaterials": "Na to nemáš materiály.",
+      "reagentLocked": "Reagencie pro to je zamčená.",
       "unknownRecipe": "Tento recept neexistuje.",
       "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
       "comboRequires": "Ladění: {craftA} + {craftB}, úroveň {tier}.",
@@ -3341,6 +3346,7 @@ export const cs_CZ: EnTranslations = {
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
       "notSalvageable": "Toto nelze rozebrat.",
+      "salvageLocked": "Tento předmět je zamčený.",
       "disenchantBusy": "Jsi zaneprázdněn(a).",
       "salvageBusy": "Jsi zaneprázdněn(a).",
       "enchantBusy": "Jsi zaneprázdněn(a).",
@@ -8953,6 +8959,9 @@ export const cs_CZ: EnTranslations = {
       "filterPrimaryStatAll": "Libovolný hlavní atribut",
       "filterRarity": "Vzácnost",
       "filterRarityAll": "Všechny vzácnosti",
+      "filterSort": "Řazení",
+      "sortName": "Název (A-Z)",
+      "sortPriceAsc": "Cena: od nejnižší po nejvyšší",
       "weaponSword": "Meče",
       "weaponDagger": "Dýky",
       "weaponStaff": "Hole",

@@ -802,9 +802,9 @@ export const fr_CA: EnTranslations = {
       "note": "Faites glisser la barre d'onglets de la discussion pour déplacer la fenêtre, ou la poignée d'angle pour la redimensionner. Réinitialiser la rétablit à sa position et sa taille par défaut."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Limite du clavardage Général atteinte. Réessayez dans {seconds}.",
+      "pending": "Votre message précédent dans le clavardage Général est toujours en cours d'envoi. Réessayez dans un instant.",
+      "unavailable": "Le clavardage Général est temporairement indisponible. Réessayez d'ici peu."
     },
     "swing": {
       "ready": "Coup",
@@ -899,12 +899,12 @@ export const fr_CA: EnTranslations = {
       "update": "Mettre à jour"
     },
     "otaUpdate": {
-      "title": "Mise à jour du jeu",
-      "downloading": "Téléchargement de la mise à jour : {percent}",
-      "applying": "Mise à jour téléchargée. Le jeu redémarre pour l'appliquer.",
-      "incompatible": "Une mise à jour est nécessaire pour jouer. Elle sera appliquée dès la fin du téléchargement.",
-      "continueAnyway": "Continuer sans mettre à jour",
-      "progressLabel": "Progression du téléchargement de la mise à jour"
+      "title": "Actualización del juego",
+      "downloading": "Descargando actualización: {percent}",
+      "applying": "Actualización descargada. Reiniciando el juego para aplicarla.",
+      "incompatible": "Se necesita una actualización para jugar. Se aplicará en cuanto termine la descarga.",
+      "continueAnyway": "Continuar sin actualizar",
+      "progressLabel": "Progreso de descarga de la actualización"
     },
     "cameraPrompt": {
       "title": "Choisissez votre caméra",
@@ -2200,6 +2200,10 @@ export const fr_CA: EnTranslations = {
       "itemAriaBound": "{item}, quantité {count}, copie liée",
       "itemAriaMasterwork": "{item}, quantité {count}, chef-d'oeuvre",
       "itemAriaQuest": "{item}, quantité {count}, objet de quête",
+      "itemAriaLocked": "{item}, quantité {count}, barré",
+      "itemLockedLine": "Barré",
+      "lockItem": "Barrer l'objet",
+      "unlockItem": "Débarrer l'objet",
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",
       "filterWeapon": "Armes",
@@ -3232,6 +3236,7 @@ export const fr_CA: EnTranslations = {
       "craftedToast": "Fabriqué$1 {name}",
       "craftedToastQty": "Fabriqué : {name} x{qty}",
       "insufficientMaterials": "Vous n'avez pas le matériel pour cela.",
+      "reagentLocked": "Un composant pour cela est barré.",
       "unknownRecipe": "Cette recette n'existe pas.",
       "comboRequirementUnmet": "Vous ne possédez pas les deux métiers requis au palier nécessaire pour cette recette.",
       "comboRequires": "Communion : {craftA} + {craftB}, palier {tier}.",
@@ -3341,6 +3346,7 @@ export const fr_CA: EnTranslations = {
       "notHeld": "Vous n'avez pas cet objet.",
       "notDisenchantable": "Vous ne pouvez pas désenchanter cela.",
       "notSalvageable": "Vous ne pouvez pas récupérer cela.",
+      "salvageLocked": "Cet objet est barré.",
       "disenchantBusy": "Vous êtes occupé.",
       "salvageBusy": "Vous êtes occupé.",
       "enchantBusy": "Vous êtes occupé.",
@@ -8953,6 +8959,9 @@ export const fr_CA: EnTranslations = {
       "filterPrimaryStatAll": "Toute caractéristique principale",
       "filterRarity": "Rareté",
       "filterRarityAll": "Toutes les raretés",
+      "filterSort": "Trier",
+      "sortName": "Nom (A-Z)",
+      "sortPriceAsc": "Prix : du plus bas au plus élevé",
       "weaponSword": "Épées",
       "weaponDagger": "Dagues",
       "weaponStaff": "Bâtons",

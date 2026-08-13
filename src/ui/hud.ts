@@ -30,7 +30,6 @@ import type { ModularLook } from '../render/characters/modular';
 import {
   onPortraitsReady,
   onPortraitUpdate,
-  playerPortraitDataUrl,
   prewarmPlayerPortrait,
 } from '../render/characters/portrait';
 import { currentDayNightPhase } from '../render/day_night_clock';
@@ -536,6 +535,7 @@ import {
   instanceBadgeLines,
   instanceBindingLines,
   instanceBonusStatLines,
+  instanceLockLine,
   instanceMakersMarkLine,
   itemNumber,
   itemStatName,
@@ -4729,8 +4729,8 @@ export class Hud {
       if (ringIndex >= this.mobileRingSlotBtns.length) return;
       this.placeHotbarItemFromTouch(itemId, this.mobileSourceSlotForButton(ringIndex));
     },
-    openItemActionMenu: (def, itemId, slotIndex, x, y, runDefault) =>
-      this.bagItemActionMenu.open(def, itemId, slotIndex, x, y, runDefault),
+    openItemActionMenu: (def, itemId, slotIndex, x, y, runDefault, instance) =>
+      this.bagItemActionMenu.open(def, itemId, slotIndex, x, y, runDefault, instance),
   });
   // Bag-item action menu (Professions 2.0): the right-click / touch
   // menu that surfaces Disenchant / Salvage / Apply Enchant on a bag stack.
@@ -5968,6 +5968,9 @@ export class Hud {
     // soulbound line it parallels (item_instance_tooltip.ts owns the copy
     // rules, incl. the equipment-kind scope and the no-name doctrine).
     html += instanceBindingLines(instance, item.kind);
+    // Player item lock (issue 3042): the owner's own safety mark, not scoped
+    // to any item kind (item_instance_tooltip.ts owns the copy rules).
+    html += instanceLockLine(instance);
     // Per-copy instance badges (Professions 2.0): the masterwork
     // seal and the enchanted marker (item_instance_tooltip.ts owns the copy
     // rules, incl. never claiming a quality-rank upgrade).

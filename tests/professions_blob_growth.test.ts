@@ -37,8 +37,17 @@ import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import { ALL_EQUIP_SLOTS, type InvSlot } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
-const makeSim = (seed = 31) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+// This file never spawns, targets, or asserts on a camp, npc, or ground
+// object: every expect() resolves to a static content-table length/id, a
+// literal the test itself assigns, or a self-consistency check between two
+// settle passes of the SAME world config. EMPTY_TEST_WORLD keeps zones,
+// terrain, props, and playerStart identical to the built-in world (so
+// findSafePos/groundPos still settle every fixture the same way) while
+// skipping the camp/npc/ground-object population that this file never reads.
+const makeSim = (seed = 31) =>
+  new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
 
 // The professions-owned key list, mirrored from the roundtrip sweep. The
 // scrape test below pins the two lists together so neither can silently

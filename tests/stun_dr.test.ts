@@ -105,7 +105,20 @@ describe('crowdControlDurationAfterDr / diminishedCrowdControlDuration', () => {
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'polymorph', 30)).toBe(1);
   });
 
+  it('scales the proportional multiplier ladder for fear off the authored duration', () => {
+    const { source, target } = players();
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 8)).toBe(8);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 8)).toBe(4);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 8)).toBe(2);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 8)).toBe(1);
+    // The multiplier array is exhausted at index 3; further stages hold at the
+    // final factor rather than going null (fear never becomes immune).
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 8)).toBe(1);
+  });
+
   it("scales fear from each ability's authored duration", () => {
+    // A fixed absolute ladder would return 8 then 4 here regardless of the
+    // authored duration; the multiplier ladder scales off the real value.
     const { source, target } = players();
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 4)).toBe(4);
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 4)).toBe(2);

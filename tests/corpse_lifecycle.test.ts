@@ -7,6 +7,7 @@ import { CORPSE_INTERACT_GRACE_SECONDS } from '../src/sim/loot/loot_roll';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Corpse lifecycle decoupling: the loot half and the harvest half of
 // a tagged corpse can be consumed in either order without ever stranding the
@@ -23,7 +24,7 @@ type SimInternals = {
 };
 
 function setup(seed = 11) {
-  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
   const internals = sim as unknown as SimInternals;
   const a = sim.addPlayer('warrior', 'Alpha');
   const b = sim.addPlayer('warrior', 'Bravo');

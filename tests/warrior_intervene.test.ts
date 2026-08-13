@@ -19,12 +19,18 @@ import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { placePlayerInOpenField } from './helpers/open_field';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const ROW_LEVEL = 5;
 const FROZEN_OPTION_ID = 'war_row_double_charge';
 
 function warriorAt(level: number, spec: string): { sim: Sim; p: Entity } {
-  const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: true });
+  const sim = new Sim({
+    seed: 11,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.setPlayerLevel(level);
   expect(sim.setSpec(spec)).toBe(true);
   sim.tick();

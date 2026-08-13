@@ -14,9 +14,10 @@ import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function chronoMage(level = 20) {
-  const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true });
+  const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(level);
   expect(sim.setSpec('arcane')).toBe(true);
   sim.tick();
@@ -50,7 +51,12 @@ describe('Chronoweave mastery: healing + mana cushion', () => {
   it('the mana cushion actually raises a Chronomancer max mana', () => {
     const chrono = chronoMage().p.maxResource;
     const fire = (() => {
-      const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true });
+      const sim = new Sim({
+        seed: 41,
+        playerClass: 'mage',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       sim.setSpec('fire');
       sim.tick();

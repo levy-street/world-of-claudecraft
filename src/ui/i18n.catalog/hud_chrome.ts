@@ -2515,6 +2515,15 @@ export const hudChromeStrings = {
     // that the rim/wash/seal show sighted players. Purpose class, not a quality
     // tier; whole sentence in one key so punctuation stays localizable.
     itemAriaQuest: '{item}, quantity {count}, quest item',
+    // Accessible-name arm of the player item lock (issue #3042,
+    // src/sim/item_lock.ts): outranks every other per-copy announcement, since
+    // the locked fact is the most actionable one for a bag/bank cell.
+    itemAriaLocked: '{item}, quantity {count}, locked',
+    // The tooltip line for a locked copy (item_instance_tooltip.ts instanceLockLine).
+    itemLockedLine: 'Locked',
+    // Context-menu row labels for the lock toggle (bag_item_context_menu.ts).
+    lockItem: 'Lock Item',
+    unlockItem: 'Unlock Item',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -4029,6 +4038,10 @@ export const hudChromeStrings = {
     craftedToast: 'Crafted: {name}',
     craftedToastQty: 'Crafted: {name} x{qty}',
     insufficientMaterials: 'You do not have the materials for that.',
+    // Player item lock (issue 3042): fired instead of insufficientMaterials
+    // when the reagent shortfall is caused solely by a locked copy, so the
+    // denial names the real cause rather than reading as a generic shortage.
+    reagentLocked: 'A reagent for that is locked.',
     unknownRecipe: 'That recipe does not exist.',
     comboRequirementUnmet:
       'You do not have both required crafts at the required tier for that recipe.',
@@ -4257,6 +4270,10 @@ export const hudChromeStrings = {
     notHeld: 'You do not have that item.',
     notDisenchantable: 'You cannot disenchant that.',
     notSalvageable: 'You cannot salvage that.',
+    // Player item lock (issue #3042): fired when the exact copy a salvage
+    // targeted is locked. Distinct from notSalvageable, which means the item
+    // type itself is never salvageable.
+    salvageLocked: 'That item is locked.',
     // Craft Cast System Phase 4/5: cast busy gate when another cast is already
     // running (the retired 'throttled' wire reason renders the same copy).
     disenchantBusy: 'You are busy.',

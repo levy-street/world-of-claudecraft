@@ -44,6 +44,7 @@ const ADDRESSED_COMMANDS: ReadonlyArray<{ cmd: string; field: string; why?: stri
     why: 'the Masterwrought sunder rides the enchant-family selected-slot discipline and pins the copy mid-cast with itemCopyPin',
   },
   { cmd: 'discard', field: 'slot' },
+  { cmd: 'lock_item', field: 'slot' },
   { cmd: 'sell', field: 'slot' },
   { cmd: 'use', field: 'slot' },
   { cmd: 'pet_feed', field: 'slot' },

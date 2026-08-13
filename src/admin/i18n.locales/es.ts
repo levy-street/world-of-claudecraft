@@ -1048,4 +1048,31 @@ export const es: Record<string, string> = {
   'bugReports.reviewed': 'Revisado',
   'dialog.report': 'Informe',
   'theme.darkModeLabel': 'Modo oscuro',
+  'error.cannotRateLimitAdmin':
+    'las cuentas de administrador no pueden tener un límite de chat General',
+  'error.generalChatRateLimitMessages': 'Introduce entre {min} y {max} mensajes.',
+  'error.generalChatRateLimitReasonInvalid':
+    'Introduce un motivo de moderación de no más de {max} caracteres.',
+  'error.generalChatRateLimitRequired': 'Elige un límite de chat General válido o quítalo.',
+  'error.generalChatRateLimitWindowMinutes': 'Introduce una ventana de {min} a {max} minutos.',
+  'generalChatRateLimit.confirmRemove': 'Quitar límite',
+  'generalChatRateLimit.current':
+    'Tasa actual: {messages} mensajes permitidos por ventana de {minutes} minutos',
+  'generalChatRateLimit.edit': 'Editar límite',
+  'generalChatRateLimit.messagesError': 'Introduce un número entero de {min} a {max}.',
+  'generalChatRateLimit.messagesLabel': 'Mensajes permitidos',
+  'generalChatRateLimit.reasonPlaceholder': '¿Por qué cambia este límite del chat General?',
+  'generalChatRateLimit.reasonRequired': 'Introduce un motivo de moderación.',
+  'generalChatRateLimit.reasonTooLong': 'Usa como máximo {max} caracteres para el motivo.',
+  'generalChatRateLimit.remove': 'Quitar límite',
+  'generalChatRateLimit.removeHint':
+    'Quitar esta anulación de la cuenta devuelve el chat General a Ilimitado.',
+  'generalChatRateLimit.save': 'Guardar límite',
+  'generalChatRateLimit.scope':
+    'Se aplica solo al chat General. Los demás canales de chat no se ven afectados.',
+  'generalChatRateLimit.title': 'Límite del chat General',
+  'generalChatRateLimit.unlimited': 'Ilimitado',
+  'generalChatRateLimit.windowMinutesError': 'Introduce un número entero de {min} a {max}.',
+  'generalChatRateLimit.windowMinutesLabel': 'Duración de la ventana (minutos)',
+  'moderationHistory.actionGeneralChatRateLimit': 'Límite de chat General modificado',
 };

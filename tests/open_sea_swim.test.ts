@@ -19,6 +19,7 @@ import {
   waterLevelAt,
 } from '../src/sim/world';
 import { expectDefined } from './helpers/defined';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The seas are real water now. The renderer has always painted every zone
 // strip and the horizon apron at the waterline, but waterLevelAt() used to be
@@ -161,7 +162,7 @@ describe('the open sea is real water', () => {
 
   it('walking off the beach transitions to a surface swim, no teleport, and back out', () => {
     const entry = findBeachEntry();
-    const sim = makeSim();
+    const sim = makeSim(EMPTY_TEST_WORLD);
     teleport(sim, entry.x, entry.z, terrainHeight(entry.x, entry.z, SEED), entry.facing);
     const p = sim.player;
     let maxRise = 0;
@@ -189,7 +190,7 @@ describe('the open sea is real water', () => {
     const wx = entry.x + Math.sin(entry.facing) * 12;
     const wz = entry.z + Math.cos(entry.facing) * 12;
     const surface = swimSurfaceY(wx, wz, SEED);
-    const sim = makeSim();
+    const sim = makeSim(EMPTY_TEST_WORLD);
     const p = sim.player;
     teleport(sim, wx, wz, surface + 8);
     p.onGround = false; // free fall from 8yd above the surface
@@ -210,7 +211,7 @@ describe('the open sea is real water', () => {
     const wz = entry.z + Math.cos(entry.facing) * 12;
     const bed = terrainHeight(wx, wz, SEED);
     const surface = swimSurfaceY(wx, wz, SEED);
-    const sim = makeSim();
+    const sim = makeSim(EMPTY_TEST_WORLD);
     const p = sim.player;
     teleport(sim, wx, wz, bed);
     let lastY = p.pos.y;

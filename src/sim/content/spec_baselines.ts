@@ -68,8 +68,8 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     combat: {
-      stats: { ap: 24, crit: 0.14, apPct: 0.55 },
-      global: { meleeDmgPct: 0.36 },
+      stats: { ap: 24, crit: 0.14, apPct: 0.2 },
+      global: { meleeDmgPct: 0.16 },
       ability: [{ ability: 'sinister_strike', dmgPct: 0.2, costPct: -0.16 }],
     },
     subtlety: {

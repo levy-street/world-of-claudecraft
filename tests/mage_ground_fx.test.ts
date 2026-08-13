@@ -1,11 +1,23 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 
+// physical/holy use the REAL src/render/vfx.ts values on purpose: they are
+// the near-white schools the wash-out regression test below exercises, so
+// the test only means something if they match what spawnRune sees in
+// production. fire/frost/arcane keep their pre-existing arbitrary mock
+// values (this suite's long-standing convention of asserting plumbing, not
+// real-world hue) so no other test in this file needs updating.
 vi.mock('../src/render/vfx', () => ({
-  SCHOOL_COLORS: { fire: 0xff5a16, frost: 0x72cfff, arcane: 0xa86cff },
+  SCHOOL_COLORS: {
+    fire: 0xff5a16,
+    frost: 0x72cfff,
+    arcane: 0xa86cff,
+    physical: 0xffd28a,
+    holy: 0xffe9a0,
+  },
 }));
 
-import { MageGroundFx } from '../src/render/mage_ground_fx';
+import { capRingLightness, MageGroundFx } from '../src/render/mage_ground_fx';
 
 describe('Mage meteor visual', () => {
   it('builds an irregular molten rock with a terrain-draped flame telegraph', () => {
@@ -316,5 +328,122 @@ describe('Mage meteor visual', () => {
     expect(secondOuterRing.material).toBe(firstOuterRingMat);
     expect((secondGlow.material as THREE.MeshBasicMaterial).opacity).toBeCloseTo(0.18, 5);
     expect((secondOuterRing.material as THREE.MeshBasicMaterial).opacity).toBeCloseTo(0.75, 5);
+  });
+
+  it('keeps the mage-cast Rune of Power arcane when no mechanic school is given', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnRune({ x: 10, z: 20, radius: 6, duration: 12 });
+
+    const rune = scene.getObjectByName('mage-rune-power') as THREE.Group;
+    const outerRing = rune.getObjectByName('mage-rune-power-outer-ring') as THREE.Mesh;
+    const expected = capRingLightness(new THREE.Color(0xa86cff)).multiplyScalar(1.6);
+    expect((outerRing.material as THREE.MeshBasicMaterial).color.getHex()).toBe(expected.getHex());
+  });
+
+  it('falls back to arcane for an unrecognized school string instead of an undefined color', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnRune({ x: 10, z: 20, radius: 6, duration: 12, school: 'chaos' });
+
+    const rune = scene.getObjectByName('mage-rune-power') as THREE.Group;
+    const outerRing = rune.getObjectByName('mage-rune-power-outer-ring') as THREE.Mesh;
+    const expected = capRingLightness(new THREE.Color(0xa86cff)).multiplyScalar(1.6);
+    expect((outerRing.material as THREE.MeshBasicMaterial).color.getHex()).toBe(expected.getHex());
+  });
+
+  it('tints a rift boss windup telegraph by its emitted mechanic school, not a hardcoded arcane', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnRune({ x: 10, z: 20, radius: 6, duration: 12, school: 'fire' });
+
+    const rune = scene.getObjectByName('mage-rune-power') as THREE.Group;
+    const outerRing = rune.getObjectByName('mage-rune-power-outer-ring') as THREE.Mesh;
+    const innerRing = rune.getObjectByName('mage-rune-power-inner-ring') as THREE.Mesh;
+    const spoke = rune.getObjectByName('mage-rune-power-spoke-0') as THREE.Mesh;
+    const glow = rune.getObjectByName('mage-rune-power-glow') as THREE.Mesh;
+
+    const fire = capRingLightness(new THREE.Color(0xff5a16));
+    expect((outerRing.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
+      fire.clone().multiplyScalar(1.6).getHex(),
+    );
+    expect((innerRing.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
+      fire.clone().multiplyScalar(1.6).getHex(),
+    );
+    expect((spoke.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
+      fire.clone().multiplyScalar(1.3).getHex(),
+    );
+    expect((glow.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
+      fire.clone().multiplyScalar(0.9).getHex(),
+    );
+  });
+
+  it('never lets a pooled material carry a stale school tint into a differently-schooled cast', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnRune({ x: 10, z: 20, radius: 6, duration: 1, school: 'fire' });
+    fx.update(1.1); // past duration, retires into the material pool
+
+    fx.spawnRune({ x: -30, z: 5, radius: 6, duration: 12, school: 'frost' });
+    const rune = scene.getObjectByName('mage-rune-power') as THREE.Group;
+    const outerRing = rune.getObjectByName('mage-rune-power-outer-ring') as THREE.Mesh;
+    const frost = capRingLightness(new THREE.Color(0x72cfff));
+    expect((outerRing.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
+      frost.clone().multiplyScalar(1.6).getHex(),
+    );
+  });
+
+  it('keeps a near-white school distinguishable instead of clipping the ring to white (Warlord Grask stomp windup, issue #2917)', () => {
+    // rift_boss_brute (Warlord Grask)'s stomp authors no school and falls
+    // back to physical (src/sim/mob/locomotion.ts fireWarStomp), the exact
+    // real case this regresses without the lightness cap: physical
+    // (0xffd28a) is already near-white, and the ring's *1.6 multiplier used
+    // to clip every channel to white, so the "danger" ring stopped reading
+    // as a distinct color against bright terrain.
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnRune({ x: 10, z: 20, radius: 6, duration: 12, school: 'physical' });
+
+    const rune = scene.getObjectByName('mage-rune-power') as THREE.Group;
+    const outerRing = rune.getObjectByName('mage-rune-power-outer-ring') as THREE.Mesh;
+    const color = (outerRing.material as THREE.MeshBasicMaterial).color;
+    const uncapped = new THREE.Color(0xffd28a).multiplyScalar(1.6);
+    expect(color.getHex()).not.toBe(uncapped.getHex());
+    // Not washed to white: at least one channel stays well below full.
+    expect(Math.min(color.r, color.g, color.b)).toBeLessThan(0.85);
+  });
+});
+
+describe('capRingLightness', () => {
+  it('caps a near-white color to a distinguishable lightness while preserving hue', () => {
+    const paleGold = new THREE.Color(0xffe9a0); // real SCHOOL_COLORS.holy
+    const hslBefore = { h: 0, s: 0, l: 0 };
+    paleGold.getHSL(hslBefore);
+    expect(hslBefore.l).toBeGreaterThan(0.5);
+
+    const capped = capRingLightness(paleGold);
+    const hslAfter = { h: 0, s: 0, l: 0 };
+    capped.getHSL(hslAfter);
+    expect(hslAfter.l).toBeCloseTo(0.5, 5);
+    expect(hslAfter.h).toBeCloseTo(hslBefore.h, 5);
+  });
+
+  it('leaves an already-dark color unchanged', () => {
+    const dark = new THREE.Color().setHSL(0.3, 0.8, 0.3);
+    const capped = capRingLightness(dark);
+    expect(capped.getHex()).toBe(dark.getHex());
+    expect(capped).not.toBe(dark); // clone, never mutates the input
+  });
+
+  it('never mutates its input', () => {
+    const original = new THREE.Color(0xffe9a0);
+    const originalHex = original.getHex();
+    capRingLightness(original);
+    expect(original.getHex()).toBe(originalHex);
   });
 });

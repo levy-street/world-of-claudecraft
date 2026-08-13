@@ -802,9 +802,9 @@ export const es: EnTranslations = {
       "note": "Arrastra la pestaña del chat para mover la ventana, o el tirador de la esquina para cambiar su tamaño. Restablecer la devuelve a su posición y tamaño predeterminados."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Has alcanzado el límite del chat General. Inténtalo de nuevo en {seconds}.",
+      "pending": "Tu mensaje anterior del chat General todavía se está enviando. Inténtalo de nuevo en un momento.",
+      "unavailable": "El chat General no está disponible temporalmente. Inténtalo de nuevo pronto."
     },
     "swing": {
       "ready": "Golpe",
@@ -2200,6 +2200,10 @@ export const es: EnTranslations = {
       "itemAriaBound": "{item}, cantidad {count}, copia vinculada",
       "itemAriaMasterwork": "{item}, cantidad {count}, obra maestra",
       "itemAriaQuest": "{item}, cantidad {count}, objeto de misión",
+      "itemAriaLocked": "{item}, cantidad {count}, bloqueado",
+      "itemLockedLine": "Bloqueado",
+      "lockItem": "Bloquear objeto",
+      "unlockItem": "Desbloquear objeto",
       "filterGroupAria": "Filtrar bolsas por categoría",
       "filterAll": "Todos",
       "filterWeapon": "Armas",
@@ -3232,6 +3236,7 @@ export const es: EnTranslations = {
       "craftedToast": "Elaborado: {name}",
       "craftedToastQty": "Elaborado: {name} x{qty}",
       "insufficientMaterials": "No tienes los materiales para eso.",
+      "reagentLocked": "Un componente para eso está bloqueado.",
       "unknownRecipe": "Esa receta no existe.",
       "comboRequirementUnmet": "No tienes las dos profesiones requeridas al nivel necesario para esa receta.",
       "comboRequires": "Sintonización: {craftA} + {craftB}, nivel {tier}.",
@@ -3341,6 +3346,7 @@ export const es: EnTranslations = {
       "notHeld": "No tienes ese objeto.",
       "notDisenchantable": "No puedes desencatar eso.",
       "notSalvageable": "No puedes desguazar eso.",
+      "salvageLocked": "Ese objeto está bloqueado.",
       "disenchantBusy": "Estás ocupado.",
       "salvageBusy": "Estás ocupado.",
       "enchantBusy": "Estás ocupado.",
@@ -8953,6 +8959,9 @@ export const es: EnTranslations = {
       "filterPrimaryStatAll": "Cualquier estadística principal",
       "filterRarity": "Rareza",
       "filterRarityAll": "Todas las rarezas",
+      "filterSort": "Ordenar",
+      "sortName": "Nombre (A-Z)",
+      "sortPriceAsc": "Precio: de menor a mayor",
       "weaponSword": "Espadas",
       "weaponDagger": "Dagas",
       "weaponStaff": "Bastones",

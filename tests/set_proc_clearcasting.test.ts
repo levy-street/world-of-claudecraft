@@ -4,6 +4,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass, SetProc } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type ProcInternals = {
   players: Map<number, PlayerMeta>;
@@ -34,7 +35,12 @@ function equipMournweave(sim: Sim): Entity {
 // A full-pipeline caster in the 4-set, plus a beefy hostile target in range and
 // faced, so a hostile cast passes every castAbility guard.
 function makeCastingSim(cls: PlayerClass, seed: number): { sim: AnySim; p: AnyEntity; meta: any } {
-  const sim = new Sim({ seed, playerClass: cls, autoEquip: false }) as AnySim;
+  const sim = new Sim({
+    seed,
+    playerClass: cls,
+    autoEquip: false,
+    world: EMPTY_TEST_WORLD,
+  }) as AnySim;
   sim.setPlayerLevel(20); // the real level-up path, so higher-learnLevel spells are known
   const p = equipMournweave(sim) as AnyEntity;
   const meta = sim.players.get(p.id);
@@ -74,7 +80,12 @@ function castOnce(sim: AnySim, p: AnyEntity, meta: any, abilityId: string): void
 
 describe('Clearcasting set proc', () => {
   it('resolves from the 4-piece Mournweave caster set', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'mage', autoEquip: false });
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'mage',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
     const p = equipMournweave(sim);
 
     expect(p.setProcs).toContainEqual({
@@ -89,7 +100,12 @@ describe('Clearcasting set proc', () => {
   });
 
   it('draws no rng and grants no aura when the player has no set procs', () => {
-    const sim = new Sim({ seed: 12, playerClass: 'mage', autoEquip: false });
+    const sim = new Sim({
+      seed: 12,
+      playerClass: 'mage',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
     const internals = sim as unknown as ProcInternals;
     const p = sim.player;
     let draws = 0;
@@ -105,7 +121,12 @@ describe('Clearcasting set proc', () => {
   });
 
   it('eventually grants Clearcasting and blocks another proc during the ICD', () => {
-    const sim = new Sim({ seed: 13, playerClass: 'mage', autoEquip: false });
+    const sim = new Sim({
+      seed: 13,
+      playerClass: 'mage',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
     const internals = sim as unknown as ProcInternals;
     const p = equipMournweave(sim);
 

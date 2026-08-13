@@ -123,6 +123,14 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Informe de error enviado, pero la captura de pantalla era demasiado grande para incluirla.',
   'hudChrome.bugReport.tooLarge':
     'Ese informe es demasiado grande para enviarlo. Inténtalo de nuevo sin la captura de pantalla.',
+  // General chat rate limit HUD notices (es_ES prefers "vuelve a intentarlo" over
+  // es-LatAm "inténtalo de nuevo", matching this file's existing retry phrasing).
+  'hudChrome.chatQuota.limitReached':
+    'Has alcanzado el límite del chat General. Vuelve a intentarlo en {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Tu mensaje anterior del chat General todavía se está enviando. Vuelve a intentarlo en un momento.',
+  'hudChrome.chatQuota.unavailable':
+    'El chat General no está disponible temporalmente. Vuelve a intentarlo pronto.',
   'delveUi.affix.bad_air': 'Aire viciado',
   'delveUi.affix.candleblind': 'Cegavelas',
   'delveUi.affix.cult_remnants': 'Vestigios del culto',
@@ -479,4 +487,17 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.doomMeterLock': 'Bloquear la barra de recurso de Aflicción',
   'hudChrome.warlock.doomMeterUnlock': 'Mover la barra de recurso de Aflicción',
   'hudChrome.warlock.fateThreadsStatus': '{value} de {max} Hilos del destino.',
+  'hudChrome.bags.itemAriaLocked': '{item}, cantidad {count}, artículo bloqueado',
+  'hudChrome.bags.itemLockedLine': 'Artículo bloqueado',
+  'hudChrome.bags.lockItem': 'Bloquear artículo',
+  'hudChrome.bags.unlockItem': 'Desbloquear artículo',
+  'hudChrome.crafting.reagentLocked': 'Un reactivo para eso está bloqueado.',
+  'hudChrome.enchanting.salvageLocked': 'Ese artículo está bloqueado.',
+  'hudChrome.otaUpdate.applying': 'Actualización descargada. Reiniciando el juego para instalarla.',
+  'hudChrome.otaUpdate.continueAnyway': 'Seguir sin actualizar',
+  'hudChrome.otaUpdate.downloading': 'Bajando actualización: {percent}',
+  'hudChrome.otaUpdate.incompatible':
+    'Hace falta actualizar para jugar. Se instalará en cuanto termine la descarga.',
+  'hudChrome.otaUpdate.progressLabel': 'Avance de descarga de la actualización',
+  'hudChrome.otaUpdate.title': 'Actualización del cliente',
 };

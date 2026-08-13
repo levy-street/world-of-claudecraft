@@ -64,9 +64,13 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // the exact silent-off-by-one the NOTE above warns about (both sides read
 // 196/209 pre-merge, the merged tree carries both pairs). The v0.37.0 sync
 // then repeated the same composition with the release's tabPrev pair: both
-// sides read 197/210 pre-merge, and the merged tree carries both.
-const EXPECTED_SEND_COUNT = 198;
-const EXPECTED_DISPATCH_COUNT = 211;
+// sides read 197/210 pre-merge, and the merged tree carries both. The
+// v0.38.0 sync repeated it a THIRD time with the release's set_item_locked
+// pair (issue #3042): both sides read 198/211 pre-merge, and the merged
+// tree carries both extract_essence and set_item_locked.
+
+const EXPECTED_SEND_COUNT = 199;
+const EXPECTED_DISPATCH_COUNT = 212;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -802,9 +802,9 @@ export const fr_FR: EnTranslations = {
       "note": "Faites glisser la barre d'onglets de la discussion pour déplacer la fenêtre, ou la poignée d'angle pour la redimensionner. Réinitialiser la rétablit à sa position et sa taille par défaut."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Limite du chat Général atteinte. Réessayez dans {seconds}.",
+      "pending": "Votre message précédent dans le chat Général est toujours en cours d'envoi. Réessayez dans un instant.",
+      "unavailable": "Le chat Général est temporairement indisponible. Réessayez d'ici peu."
     },
     "swing": {
       "ready": "Coup",
@@ -901,7 +901,7 @@ export const fr_FR: EnTranslations = {
     "otaUpdate": {
       "title": "Mise à jour du jeu",
       "downloading": "Téléchargement de la mise à jour : {percent}",
-      "applying": "Mise à jour téléchargée. Le jeu redémarre pour l'appliquer.",
+      "applying": "Mise à jour téléchargée. Redémarrage du jeu pour l’appliquer.",
       "incompatible": "Une mise à jour est nécessaire pour jouer. Elle sera appliquée dès la fin du téléchargement.",
       "continueAnyway": "Continuer sans mettre à jour",
       "progressLabel": "Progression du téléchargement de la mise à jour"
@@ -2200,6 +2200,10 @@ export const fr_FR: EnTranslations = {
       "itemAriaBound": "{item}, quantité {count}, copie liée",
       "itemAriaMasterwork": "{item}, quantité {count}, chef-d'oeuvre",
       "itemAriaQuest": "{item}, quantité {count}, objet de quête",
+      "itemAriaLocked": "{item}, quantité {count}, verrouillé",
+      "itemLockedLine": "Verrouillé",
+      "lockItem": "Verrouiller l'objet",
+      "unlockItem": "Déverrouiller l'objet",
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",
       "filterWeapon": "Armes",
@@ -3232,6 +3236,7 @@ export const fr_FR: EnTranslations = {
       "craftedToast": "Fabriqué$1 {name}",
       "craftedToastQty": "Fabriqué : {name} x{qty}",
       "insufficientMaterials": "Vous n'avez pas le matériel pour cela.",
+      "reagentLocked": "Un composant pour cela est verrouillé.",
       "unknownRecipe": "Cette recette n'existe pas.",
       "comboRequirementUnmet": "Vous ne possédez pas les deux métiers requis au palier nécessaire pour cette recette.",
       "comboRequires": "Communion : {craftA} + {craftB}, palier {tier}.",
@@ -3341,6 +3346,7 @@ export const fr_FR: EnTranslations = {
       "notHeld": "Vous n'avez pas cet objet.",
       "notDisenchantable": "Vous ne pouvez pas désenchanter cela.",
       "notSalvageable": "Vous ne pouvez pas récupérer cela.",
+      "salvageLocked": "Cet objet est verrouillé.",
       "disenchantBusy": "Vous êtes occupé.",
       "salvageBusy": "Vous êtes occupé.",
       "enchantBusy": "Vous êtes occupé.",
@@ -8953,6 +8959,9 @@ export const fr_FR: EnTranslations = {
       "filterPrimaryStatAll": "Toute caractéristique principale",
       "filterRarity": "Rareté",
       "filterRarityAll": "Toutes les raretés",
+      "filterSort": "Trier",
+      "sortName": "Nom (A-Z)",
+      "sortPriceAsc": "Prix : du plus bas au plus élevé",
       "weaponSword": "Épées",
       "weaponDagger": "Dagues",
       "weaponStaff": "Bâtons",

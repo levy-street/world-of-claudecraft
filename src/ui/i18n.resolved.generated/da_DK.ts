@@ -802,9 +802,9 @@ export const da_DK: EnTranslations = {
       "note": "Træk chatfanestriben for at flytte vinduet, eller hjørnegrebet for at ændre størrelse. Nulstil sætter det tilbage til standardposition og -størrelse."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Grænsen for Generelt-chatten er nået. Prøv igen om {seconds}.",
+      "pending": "Din forrige besked i Generelt-chatten sendes stadig. Prøv igen om et øjeblik.",
+      "unavailable": "Generelt-chatten er midlertidigt utilgængelig. Prøv igen snart."
     },
     "swing": {
       "ready": "Slag",
@@ -2200,6 +2200,10 @@ export const da_DK: EnTranslations = {
       "itemAriaBound": "{item}, antal {count}, bundet kopi",
       "itemAriaMasterwork": "{item}, antal {count}, mesterværk",
       "itemAriaQuest": "{item}, antal {count}, opgavegenstand",
+      "itemAriaLocked": "{item}, antal {count}, låst",
+      "itemLockedLine": "Låst",
+      "lockItem": "Lås genstand",
+      "unlockItem": "Lås genstand op",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -3232,6 +3236,7 @@ export const da_DK: EnTranslations = {
       "craftedToast": "Udformet: {name}",
       "craftedToastQty": "Udformet: {name} x{qty}",
       "insufficientMaterials": "Det har du ikke materialerne til.",
+      "reagentLocked": "En reagens til det er låst.",
       "unknownRecipe": "Den opskrift findes ikke.",
       "comboRequirementUnmet": "Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift.",
       "comboRequires": "Indstilling: {craftA} + {craftB}, niveau {tier}.",
@@ -3341,6 +3346,7 @@ export const da_DK: EnTranslations = {
       "notHeld": "Du har ikke den genstand.",
       "notDisenchantable": "Du kan ikke affortrylle det.",
       "notSalvageable": "Du kan ikke bjærge det.",
+      "salvageLocked": "Den genstand er låst.",
       "disenchantBusy": "Du er optaget.",
       "salvageBusy": "Du er optaget.",
       "enchantBusy": "Du er optaget.",
@@ -8953,6 +8959,9 @@ export const da_DK: EnTranslations = {
       "filterPrimaryStatAll": "Alle primære statistikker",
       "filterRarity": "Sjældenhed",
       "filterRarityAll": "Alle sjældenheder",
+      "filterSort": "Sortering",
+      "sortName": "Navn (A-Z)",
+      "sortPriceAsc": "Pris: laveste til højeste",
       "weaponSword": "Sværd",
       "weaponDagger": "Dolke",
       "weaponStaff": "Stave",
