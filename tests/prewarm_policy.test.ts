@@ -584,7 +584,14 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // in the program cache key, so omitting it links a dead variant (the
     // pre-existing defect the residue probe exposed: every skinned-shadow
     // compile linked BasicDepthPacking, and the frame relinked all of them).
-    expect(renderer).toContain('depthPacking: THREE.RGBADepthPacking');
+    // Read from prewarm_depth_material.ts, not renderer.ts: the depth-material
+    // cache was extracted there under the monolith ratchet. The assertion is
+    // unchanged, only the file it scans.
+    const depthModule = readFileSync(
+      new URL('../src/render/prewarm_depth_material.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(depthModule).toContain('depthPacking: THREE.RGBADepthPacking');
     // The shadow arm covers every caster, not just skinned rigs: static and
     // instanced casters' depth programs were 12 of the frame's 64 residual
     // links.
