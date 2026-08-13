@@ -16,6 +16,14 @@ D9), and the full plant-grow-harvest-cook loop is reachable by ordinary players.
 Still unreachable: farming deeds and the golden_harvest event (Phase 10), well-fed
 buff dishes (Phase 11), the shared feast (Phase 12).
 
+V0.38.0 SYNC NOTE (2026-08-13, Phase 6b): the release's map marker overhaul moved
+quest marker TOOLTIPS into src/ui/map_marker_tooltip_adapter.ts (the quest_targets
+recipe below still holds at the sim level, but the marker/tooltip wiring details must
+be re-derived from the merged tree, the phase-08 correction's marker family). Also
+note deviation (an) in state.md: server/game.ts and hud.ts sit at near-zero
+monolith-ratchet headroom, so this phase's NPC/vendor/quest wiring lands in sibling
+modules (the server/farming_commands.ts precedent) from the start.
+
 ### Starter Prompt
 
 ```

@@ -15,6 +15,18 @@ only (the per-viewer model, D3). Plant and harvest VFX fire only for plot states
 reachable via dev commands until go-live (Phase 9). No seeds are obtainable, no UI
 window exists, no map pins, no notices.
 
+V0.38.0 SYNC NOTE (2026-08-13, Phase 6b): the release absorbed the three.js audit
+batch. Three itself did NOT move (still 0.165.0, patches/three@0.165.0.patch intact
+and now pinned by tests/three_compile_async_patch.test.ts), but the render
+conventions did: the asset loader gained KTX2 sibling support
+(src/render/assets/ktx2_sibling.ts), renderer.ts was reworked, and
+src/render/CLAUDE.md changed. Re-read src/render/CLAUDE.md on the CURRENT tree
+before authoring any farm GLB or exporter work, and mint fingerprints against the
+v0.38.0 lockfile (state.md header note). Also note deviation (an) in state.md: the
+release's monolith ratchet leaves renderer.ts and hud.ts near their ceilings, so
+every new render block lands as its own src/render/<thing>.ts module from the start
+(which this phase already planned).
+
 ### Starter Prompt
 
 ```

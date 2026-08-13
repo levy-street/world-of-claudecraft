@@ -54,7 +54,13 @@ rules), tests/guide.test.ts (the freshness gate), scripts/assets/build_farm_prop
 (the complete inventory of swap-ready farming assets as authored),
 src/render/farm_patches.ts and the feast adapter arm (footprints, pivots, tints, stage
 lists as consumed), plus the CLAUDE.md files: root, src/ui/CLAUDE.md,
-src/render/CLAUDE.md, and docs/design/deeds.md if the wiki page covers deeds. The
+src/render/CLAUDE.md, and docs/design/deeds.md if the wiki page covers deeds. V0.38.0
+SYNC ADDITION (2026-08-13, Phase 6b): the release added the Reliquary and its
+same-change obligation (docs/design/reliquary.md, pinned by
+tests/reliquary_content.test.ts): any phase that added conquerable UNIQUE farming
+loot owes a Reliquary page, so this phase's obligations sweep checks the whole
+farming content set against that gate too (as of the sync no farming item qualifies;
+a future golden_harvest trophy would). The
 orchestrator never reads planning docs or coordinator monoliths directly; the summary
 is your only context.
 The summary must return, explicitly:

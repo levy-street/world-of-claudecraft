@@ -1094,10 +1094,55 @@ re-recorded: never edit the tree while a gate runs; the log markers are the
 only verdict (run 2's shell exit was 0 while the log said FAIL).
 
 ### Phase 6b (release sync)
-(not started; docs/farming/phase-06b-release-sync.md. Runs BEFORE Phase 6 QA:
-the v0.36.0-to-newest absorb is its own phase because the jump is 1453 commits
-with a 117-file farming intersection and a lockfile move. Its merge lands AFTER
-1a26881d0b and is excluded from the Phase 6 QA diff.)
+DONE 2026-08-13 (docs/farming/phase-06b-release-sync.md; ran BEFORE Phase 6
+QA as its own mid-phase). Absorbed origin/release/v0.38.0 at 952c183fc3, the
+ELEVENTH absorb and the first big-jump sync: 1453 commits, 2376 files, a
+117-file intersection with the 223-file farming footprint. Branch
+fix/farming-sync-v0.38.0 off d15921bed6, merged back --no-ff and deleted.
+Everything from d15921bed6 forward is this phase's own audited scope and is
+EXCLUDED from the Phase 6 QA diff (which audits merge 1a26881d0b).
+
+Notes (the phase report):
+- HEADLINE SYSTEMS ABSORBED: the Reliquary (new IWorld facet, 9 members, its
+  own RouteDef, reliq delta key, sampled player block), the owned-classes
+  overhaul (warlock pet command pair, priest markers, consecrations), the
+  Thornhollow Fields battleground (+bg chat channel, aborder/app delta
+  keys), the map marker overhaul (PR 3369, seven new map_marker_* cores),
+  the player item lock (#3042), civic service anchors, the three.js audit
+  batch (three stays 0.165.0, KTX2 sibling loader), and the monolith
+  line-count ratchet (tests/monolith_budget.test.ts).
+- COLLISIONS HEALED, one commit each: absorb merge 2c26b6db7b (16 conflicts
+  resolved by doctrine: both-sides-appended unions for sim.ts imports, the
+  IWorld barrel and COMMAND_NAMES; pin files re-recorded from suite runs;
+  pending.ts regen-resolved; the portrait manifest and audit verdict
+  re-minted through their own CLIs per the (al) checklist, registries
+  re-pointed); golden re-mint ddb718b95e (deviation (am): the release's
+  sampled reliquary field, rng stream proven byte-identical, machine
+  classified 11 blocks + 18 paired state digests); monolith extractions
+  7dbb21b605 (deviation (an): src/ui/farm_event_feedback.ts +
+  server/farming_commands.ts, ratchet green, snapshots scrape gained the
+  second source); item-lock wiring a4c4c33598 (deviation (ao): all farming
+  spends lock-aware per the release contract, 7 arms, 2 mutations killed).
+- BASELINES BEFORE AND AFTER: commands 196/209 to 201/214; IWorld 308
+  (79/229) to 327 (88/239); delta keys 84 to 87; facets 32-era pin to 34
+  (the silent-33 trap made visible and corrected); farming-only baselines
+  all HELD (FARM_MATERIAL_ITEM_IDS 27, ITEM_ART_PENDING 39, silent-loot
+  sites 6, blob pins); golden md5 bf00c277 to f017045f (the (am) re-mint).
+  The predicted lockfile seal re-mint was NOT needed: the merge took the
+  release's lockfile byte-identical and the release delta carried its own
+  coherent seals (all 8 suites verified green).
+- AUDIT: 4-lane release-merge-audit Workflow, 4/4 delivered (overlap reads
+  hash-verified all 27 both-sides files lossless in both directions; new
+  surfaces/injection/db-mocks clean; premise drift and headline-systems
+  lanes produced the heals and corrections above). ci:changed rc 0 after
+  the origin/main refetch.
+- PREMISES CORRECTED (in the phase files themselves): phase-07 (three.js
+  audit conventions, re-read src/render/CLAUDE.md before GLB work),
+  phase-08 (map-pin recipe re-pointed at the marker overhaul family),
+  phase-09 (quest marker tooltips now via map_marker_tooltip_adapter),
+  phase-13 (the Reliquary same-change obligation joined the sweep), plus
+  the monolith extraction-first warning in state.md deviation (an) for
+  every phase touching a ratcheted coordinator.
 
 ### Phase 7
 (not started)
