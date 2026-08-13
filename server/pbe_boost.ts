@@ -407,10 +407,16 @@ export function bisKitForRole(
  *  KEPT picks are the cap-highest scoring flagged ones. Phase 08 flagged
  *  items are all body armor; if phase 09 ships a flagged weapon or ring it
  *  lands in the hand/ring arms below (rings refill from the scored ring
- *  list; a flagged HAND pick has no legality-aware fallback here, so that
- *  phase must extend fillHands: the sweep in tests/server/pbe_boost.test.ts
- *  holds every role kit at the cap either way). The legendary sub-cap needs
- *  no arm until a legendary-flagged def ships. */
+ *  list). The HAND arms are asymmetric and BOTH wrong for phase 09 as they
+ *  stand: a demoted flagged MAINHAND has no fallback at all (weapons skip
+ *  the slot map, so the slot empties), while a demoted flagged OFFHAND DOES
+ *  refill from the slot map, but this runs after fillHands and re-applies
+ *  neither the two-hand exclusion nor shield legality, so the refill could
+ *  build an illegal kit. Phase 09 must route hand demotion through
+ *  fillHands, not merely add a mainhand fallback: the sweep in
+ *  tests/server/pbe_boost.test.ts holds every role kit at the cap either
+ *  way. The legendary sub-cap needs no arm until a legendary-flagged def
+ *  ships. */
 export function enforceMasterwroughtCap(
   kit: Partial<Record<EquipSlot, string>>,
   bestUnflaggedBySlot: ReadonlyMap<string, { id: string; score: number }>,

@@ -60,7 +60,15 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `masterwork.ts` + `material_tier.ts`: the pure masterwork model
   (`masterworkProcChance`, `masterworkBumpedQuality`, `masterworkBonusStats`,
   the def-keyed `materialTierBonusForReagents`); `crafting.ts` consumes it at
-  the one post-consume proc draw per successful craft.
+  the one post-consume proc draw per successful craft. R1 (Masterwrought,
+  phase 08): a masterwrought-flagged def NEVER bakes a bonus record; the gate
+  is `craftBonusStatsFor` in `crafting.ts`, the ONE exported helper feeding
+  both the admission capacity model and the resolve effect gate (never call
+  raw `masterworkBonusStats` from production code; the draw itself stays
+  unconditional so draw order never moves). Phase 12 replaces this
+  suppression with the Perfecting head start AT the effect gate, where the
+  proc outcome is actually known. `masterwork.ts` itself is locked by R1's
+  own text and is never edited for this.
 - `archetype.ts`: the active-archetype state machine (`ArchetypeState`,
   `archetypeCeilingFor`/`craftCeiling`, `getHobbyCraft`, amends-gated
   switching via `requiredAmendsProgress`). The sim-side ceiling arm is
