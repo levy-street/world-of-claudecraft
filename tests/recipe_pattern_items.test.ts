@@ -17,6 +17,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
+import { isItemLocked } from '../src/sim/item_lock';
 import {
   defaultMarketQuery,
   MARKET_ITEM_TYPE_FILTERS,
@@ -302,6 +303,62 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
 
     expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+  });
+
+  it('spends the exact clicked copy when the use names a slot, sparing a locked sibling', () => {
+    // The v0.38.0 item lock (issue 3042) made same-id copies distinguishable
+    // per copy, which turned the learn's old newest-first consume into a
+    // wrong-victim hazard: click the unlocked copy, lose the locked one. The
+    // selection now rides the use exactly as the equip arms forward it.
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 100, 2);
+    const slots = meta.inventory
+      .map((slot, index) => ({ slot, index }))
+      .filter(({ slot }) => slot.itemId === PATTERN_ID);
+    // Patterns never stack, so the two copies occupy two distinct slots.
+    expect(slots).toHaveLength(2);
+    const [lower, higher] = slots;
+    expect(lower.index).toBeLessThan(higher.index);
+    // Lock the HIGHER-index copy, the one the legacy newest-first walk would
+    // have destroyed; the player clicks the LOWER, unlocked copy.
+    higher.slot.instance = { ...(higher.slot.instance ?? {}), locked: true };
+    sim.drainEvents();
+    sim.useItem(PATTERN_ID, pid, lower.index);
+    const events = sim.drainEvents();
+    expect(errorTexts(events)).toEqual([]);
+    expect(trainResults(events)).toHaveLength(1);
+
+    const survivors = meta.inventory.filter((slot) => slot.itemId === PATTERN_ID);
+    expect(survivors).toHaveLength(1);
+    expect(isItemLocked(survivors[0].instance)).toBe(true);
+  });
+
+  it('keeps the legacy newest-first walk for an id-only use, locked copies included', () => {
+    // The frozen-fallback doctrine (src/sim/item_copy_ref.ts): the id-only
+    // walk is deliberately never improved, because the parity goldens drive
+    // use through it. That means an id-only use with a locked newest copy
+    // still destroys THAT copy (use is outside the lock's refusal scope by
+    // the release's own first-pass contract: salvage, craft consumption,
+    // vendor sell only). Pinned so the surface stays a decision, not an
+    // accident; a lock-aware fallback here would be a parity-visible change.
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 100, 2);
+    const slots = meta.inventory
+      .map((slot, index) => ({ slot, index }))
+      .filter(({ slot }) => slot.itemId === PATTERN_ID);
+    expect(slots).toHaveLength(2);
+    const [lower, higher] = slots;
+    higher.slot.instance = { ...(higher.slot.instance ?? {}), locked: true };
+    sim.drainEvents();
+    sim.useItem(PATTERN_ID, pid);
+    const events = sim.drainEvents();
+    expect(trainResults(events)).toHaveLength(1);
+
+    const survivors = meta.inventory.filter((slot) => slot.itemId === PATTERN_ID);
+    expect(survivors).toHaveLength(1);
+    // The newest (locked) copy died; the older unlocked copy survives.
+    expect(isItemLocked(survivors[0].instance)).toBe(false);
+    expect(survivors[0]).toBe(lower.slot);
   });
 
   it('refuses a crafter who has never practiced the craft, keeping the pattern', () => {

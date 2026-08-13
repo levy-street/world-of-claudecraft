@@ -16,6 +16,7 @@
 // path draws NO rng and reads no clock: learning is a deterministic yes or no.
 
 import { recipeById } from '../content/recipes';
+import { consumeSelectedInventorySlot } from '../item_copy_ref';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { RecipeItemDef } from '../types';
@@ -83,6 +84,7 @@ export function useRecipePatternItem(
   itemId: string,
   def: RecipeItemDef,
   meta: PlayerMeta,
+  slotIndex?: number,
 ): void {
   const recipe = recipeById(def.teachesRecipeId);
   const verdict = resolvePatternLearn(recipe, meta);
@@ -120,8 +122,21 @@ export function useRecipePatternItem(
   if (!learned.ok) return;
   // Consume by the id the caller was asked to use, not def.id: useItem's own
   // ownership gate counted THAT id, so spending anything else could remove a
-  // copy the player was never charged for.
-  ctx.removeItem(itemId, 1, meta.entityId);
+  // copy the player was never charged for. When the click named a slot
+  // (useItem validated it against the live inventory BEFORE any effect, so a
+  // stale index never reaches this line), spend THAT exact copy: the legacy
+  // newest-first walk in ctx.removeItem is lock-blind and could otherwise
+  // destroy a DIFFERENT copy of the same pattern than the one clicked, a
+  // player-LOCKED copy included (the v0.38.0 item lock, issue 3042, makes
+  // same-id copies distinguishable per copy). The id-only arm below stays
+  // byte-identical for callers with no selection, per item_copy_ref.ts's
+  // frozen-fallback doctrine.
+  const taken =
+    slotIndex === undefined
+      ? undefined
+      : consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+  if (taken) ctx.onInventoryChangedForQuests?.(meta);
+  else ctx.removeItem(itemId, 1, meta.entityId);
   // Success feedback, the Sim.trainRecipe shape: the same text-free personal
   // trainResult the trainer path emits, so the hud's existing handler logs
   // "You have learned {recipe}." and the train window's row flips to Known

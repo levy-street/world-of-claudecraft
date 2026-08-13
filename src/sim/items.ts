@@ -965,8 +965,11 @@ export function useItem(
     // A pattern teaches the recipe it names and is spent doing so.
     // useRecipePatternItem owns every gate and the consume; it sits here, below
     // the dead gate above, so using a pattern while dead is a silent no-op like
-    // every other kind arm in this chain.
-    useRecipePatternItem(ctx, itemId, def, meta);
+    // every other kind arm in this chain. The selection is forwarded like the
+    // equip arms above: the learn spends the exact clicked copy, never the
+    // newest-first guess (which the v0.38.0 per-copy item lock made
+    // distinguishable).
+    useRecipePatternItem(ctx, itemId, def, meta, slotIndex);
   }
 }
 
