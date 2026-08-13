@@ -3171,6 +3171,14 @@ export const pt_BR: EnTranslations = {
         "landOnly": "Não se encaixa em varas de pesca.",
         "openProfessions": "Abra Profissões para encaixar isto em uma ferramenta de coleta."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "Encaixar {effect}",
       "toolEffectRechargeButton": "Recarregar",
       "toolEffectSlotted": "{effect} encaixado em {profession}.",

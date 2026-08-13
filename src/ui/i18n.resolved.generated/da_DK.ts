@@ -3171,6 +3171,14 @@ export const da_DK: EnTranslations = {
         "landOnly": "Kan ikke sættes i fiskestænger.",
         "openProfessions": "Åbn Erhverv for at sætte denne i et indsamlingsværktøj."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "Sæt {effect} i",
       "toolEffectRechargeButton": "Genoplad",
       "toolEffectSlotted": "{effect} sat i på {profession}.",

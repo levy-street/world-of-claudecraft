@@ -3171,6 +3171,14 @@ export const sv_SE: EnTranslations = {
         "landOnly": "Kan inte monteras på fiskespön.",
         "openProfessions": "Öppna Yrken för att montera detta på ett insamlingsverktyg."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "Montera {effect}",
       "toolEffectRechargeButton": "Ladda om",
       "toolEffectSlotted": "{effect} monterad på {profession}.",

@@ -3171,6 +3171,14 @@ export const cs_CZ: EnTranslations = {
         "landOnly": "Nelze vložit do rybářských prutů.",
         "openProfessions": "Otevři Profese a vlož ho do sběračského nástroje."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "Vložit {effect}",
       "toolEffectRechargeButton": "Dobít",
       "toolEffectSlotted": "Efekt {effect} vložen do nástroje pro {profession}.",

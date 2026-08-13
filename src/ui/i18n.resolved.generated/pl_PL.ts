@@ -3171,6 +3171,14 @@ export const pl_PL: EnTranslations = {
         "landOnly": "Nie osadza się na wędkach.",
         "openProfessions": "Otwórz Profesje, aby osadzić to na narzędziu zbierackim."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "Osadź {effect}",
       "toolEffectRechargeButton": "Naładuj",
       "toolEffectSlotted": "Osadzono {effect} w profesji: {profession}.",

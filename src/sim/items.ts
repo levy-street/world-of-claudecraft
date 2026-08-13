@@ -774,13 +774,16 @@ export function useItem(
     return;
   }
   // The Master's Field Forge (Masterwrought phase 09): places a party-shared
-  // mobile crafting station at the user's position. Sits with the early arms
-  // above (before the busy/dead gates below) so the ITEM surface matches the
-  // place_mobile_station wire command, which has no busy gate; the module
-  // body owns the dead gate and every placement rule. NEVER consumed: a
-  // permanent tool like mount reins, so no consumeOneUnit here.
+  // mobile crafting station at the user's position. Two SEPARATE deliberate
+  // choices meet on this arm. First, its placement AHEAD of the busy/dead
+  // gates below matches the gate profile of the place_mobile_station wire
+  // command, which has no busy gate (the module body owns the dead gate and
+  // every placement rule), so the item surface and the wire command refuse
+  // identically. Second, non-consumption: the mount-reins convention covers
+  // ONLY that the item is a permanent tool, never spent, so no consumeOneUnit
+  // here; it says nothing about gate order.
   if (def.use?.type === 'placeMobileStation') {
-    placeMobileStationFromItem(ctx, def.use.stationCraftId, meta.entityId);
+    placeMobileStationFromItem(ctx, def.use.stationCraftId, def.name, meta.entityId);
     return;
   }
   // Raw fishing catches are cooking reagents only (kind junk, no foodHp).

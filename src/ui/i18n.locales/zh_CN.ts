@@ -10079,6 +10079,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     '普通品质工具初始有{base}次充能（稀有度每升一级+{bonus}次）。',
   'hudChrome.professions.toolEffectTooltip.landOnly': '无法镶嵌到鱼竿上。',
+  'hudChrome.professions.mobileStationTooltip.kind': '野战制作站',
+  'hudChrome.professions.mobileStationTooltip.use': '在脚下放置一座全队共享的野战锻炉。',
+  'hudChrome.professions.mobileStationTooltip.radius': '{radius}码内的队友都能在它旁边制作。',
+  'hudChrome.professions.mobileStationTooltip.duration': '持续{minutes}分钟。',
+  'hudChrome.professions.mobileStationTooltip.notConsumed': '永不消耗。',
+  'hudChrome.professions.mobileStationTooltip.replace': '放置会替换你当前生效的野战制作站。',
   'hudChrome.professions.toolEffectTooltip.openProfessions': '打开专业窗口，将其镶嵌到采集工具上。',
   'hudChrome.professions.toolEffectSlotButton': '镶嵌{effect}',
   'hudChrome.professions.toolEffectRechargeButton': '充能',
@@ -12299,7 +12305,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.professions.harvestBodyFamilies':
     '采集并不止步于资源节点。许多被击杀的野兽都可以被采集一次，先到先得：兽皮、尖牙、利爪、獠牙、丝线、毒液、布料与兽肉，与它的普通战利品一并直接取自尸体，一次按键就会同时打开两者。当一头野兽身上不止一种可用材料时，如何取舍便由你决定：把它能给的全部取走，或专注于更少的材料，换取你所取之物明显更精细的品级。\n\n在能产出标本的族群身上掷出精良或更高的采集品质时，除普通产出之外还会额外获得一件署名的完美标本（一块Pristine Hide、一份Pristine Silk、一枚Pristine Venom Gland、一只Pristine Claw或一份Prime Cut），并在你的功绩之书中记下A Perfect Specimen。任何角色都可以采集，无需训练；而你拥有的任何采集工具，无论属于哪一门行业，都会计入最上等材料的判定。',
   'guide.professions.toolEffectsBody':
-    '采集工具身上有一个插槽，而附魔师的护符正是嵌进去的东西。采集者储囊会为一次采集的产出多加一个单位；匠人之眼则提升它采上来之物的品级。Eastbrook的工坊宗师Tinker Gizzel会把两者传授给附魔技能达到 25 的附魔师，两者也都在他的工坊里制作。\\n\\n新嵌入的护符在普通品质工具上带有 20 次充能，工具稀有度每高一阶再加 10 次，所以同一枚护符嵌在史诗采矿镐上时起始便是 50 次。只有当护符真正改变了结果时才会消耗一次充能，对它没能改善的采集绝不扣减；插槽还可以设成每次使用前询问，让护符一直等到你说“使用一次充能”为止。嵌入一枚新护符，会围绕你当时携带的工具把这个插槽重铸一遍，因此它填到的是那件工具所能容纳的量，而不是退回从前的某个高点；而一次什么都不会改变的重嵌会被挡回来，不会白白吃掉护符。\\n\\n充能用尽并不会毁掉护符：由工具的主人为插槽补充，每花一份奥术材料补 10 次充能；至于它要哪种材料，取决于你携带的工具与这个插槽历来被填过的最好工具之中更好的那件：普通或优秀工具用铃音之尘，精良工具用铃音精华，史诗工具用铃音碎片。把好工具留在银行并不会换来更便宜的补充，只会在同样价钱下更少；真正降到更便宜一档的老实办法，是带着较差的工具嵌入一枚新护符，把插槽在那里重铸。如果插槽的上限高过你当前工具能填到的量，补充会停在那件工具的上限处，并提醒你带上更好的那一件。若你正是署名这枚护符的附魔师，补充只需一半材料，若你还专精附魔则更少；其他人一律付全价。补充是一段短读条，和这门手艺的其余部分一样。',
+    '采集工具身上有一个插槽，而制作出来的护符正是嵌进去的东西。采集者储囊会为一次采集的产出多加一个单位；匠人之眼则提升它采上来之物的品级；匠人护符则以同样的方式多加两个单位。前两者是附魔的活计：Eastbrook的工坊宗师Tinker Gizzel会把它们传授给附魔技能达到 25 的附魔师。匠人护符则是工程学的活计，图样由掉落获得，需 100 技能制作；三者都在他的工坊里制作。\\n\\n新嵌入的护符在普通品质工具上带有 20 次充能，工具稀有度每高一阶再加 10 次，所以同一枚护符嵌在史诗采矿镐上时起始便是 50 次。只有当护符真正改变了结果时才会消耗一次充能，对它没能改善的采集绝不扣减；插槽还可以设成每次使用前询问，让护符一直等到你说“使用一次充能”为止。嵌入一枚新护符，会围绕你当时携带的工具把这个插槽重铸一遍，因此它填到的是那件工具所能容纳的量，而不是退回从前的某个高点；而一次什么都不会改变的重嵌会被挡回来，不会白白吃掉护符。\\n\\n充能用尽并不会毁掉护符：由工具的主人为插槽补充，每花一份奥术材料补 10 次充能；至于它要哪种材料，取决于你携带的工具与这个插槽历来被填过的最好工具之中更好的那件：普通或优秀工具用铃音之尘，精良工具用铃音精华，史诗工具用铃音碎片。把好工具留在银行并不会换来更便宜的补充，只会在同样价钱下更少；真正降到更便宜一档的老实办法，是带着较差的工具嵌入一枚新护符，把插槽在那里重铸。如果插槽的上限高过你当前工具能填到的量，补充会停在那件工具的上限处，并提醒你带上更好的那一件。若你正是署名这枚护符的制作者，补充只需一半材料；若你还专精该护符所属的行业（采集者储囊与匠人之眼属附魔，匠人护符属工程学），则更少；其他人一律付全价。补充是一段短读条，和这门手艺的其余部分一样。',
   'guide.professions.toolEffectsHeading': '工具效果',
   'guide.progression.ridingBody':
     '骑术是攀登尽头等着你的东西之一。到了 {level} 级，一位马厩总管会用一笔相当可观的金币把这门技能教给你，而训练赛道上的一堂课会为你挣来第一副缰绳。坐骑不带来任何力量；它只是把世界变小了一些，而在向北长途跋涉之后，这本身就是一种奖赏。',

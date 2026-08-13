@@ -3171,6 +3171,14 @@ export const it_IT: EnTranslations = {
         "landOnly": "Non si inserisce sulle canne da pesca.",
         "openProfessions": "Apri Professioni per inserirlo su uno strumento da raccolta."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "Inserisci {effect}",
       "toolEffectRechargeButton": "Ricarica",
       "toolEffectSlotted": "Hai inserito {effect} su {profession}.",

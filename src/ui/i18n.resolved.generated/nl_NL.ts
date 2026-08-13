@@ -3171,6 +3171,14 @@ export const nl_NL: EnTranslations = {
         "landOnly": "Kan niet op hengels worden geplaatst.",
         "openProfessions": "Open Beroepen om dit op een verzamelgereedschap te plaatsen."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "{effect} plaatsen",
       "toolEffectRechargeButton": "Opladen",
       "toolEffectSlotted": "{effect} geplaatst op {profession}.",

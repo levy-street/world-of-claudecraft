@@ -3171,6 +3171,14 @@ export const id_ID: EnTranslations = {
         "landOnly": "Tidak dapat dipasang pada joran pancing.",
         "openProfessions": "Buka Profesi untuk memasangnya pada alat pengumpulan."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "Pasang {effect}",
       "toolEffectRechargeButton": "Isi Ulang",
       "toolEffectSlotted": "{effect} terpasang pada {profession}.",

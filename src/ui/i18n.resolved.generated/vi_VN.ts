@@ -3171,6 +3171,14 @@ export const vi_VN: EnTranslations = {
         "landOnly": "Không thể gắn vào cần câu.",
         "openProfessions": "Mở Nghề Nghiệp để gắn cái này vào một công cụ thu thập."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "Gắn {effect}",
       "toolEffectRechargeButton": "Nạp Lại",
       "toolEffectSlotted": "Đã gắn {effect} cho {profession}.",

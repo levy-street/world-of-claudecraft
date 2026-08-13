@@ -3171,6 +3171,14 @@ export const de_DE: EnTranslations = {
         "landOnly": "Lässt sich nicht auf Angelruten einsetzen.",
         "openProfessions": "Öffne die Berufe, um dies auf ein Sammelwerkzeug einzusetzen."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "{effect} einsetzen",
       "toolEffectRechargeButton": "Aufladen",
       "toolEffectSlotted": "{effect} auf {profession} eingesetzt.",

@@ -3171,6 +3171,14 @@ export const tr_TR: EnTranslations = {
         "landOnly": "Olta kamışlarına yuvalanmaz.",
         "openProfessions": "Bunu bir toplama aletine yuvalamak için Meslekler'i aç."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "{effect} Tak",
       "toolEffectRechargeButton": "Şarj Et",
       "toolEffectSlotted": "{effect}, {profession} üzerine takıldı.",

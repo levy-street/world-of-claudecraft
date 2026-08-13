@@ -3935,6 +3935,20 @@ export const hudChromeStrings = {
       landOnly: 'Does not slot on fishing rods.',
       openProfessions: 'Open Professions to slot this onto a gathering tool.',
     },
+    // Mobile-station tool tooltip copy (src/ui/mobile_station_tooltip.ts):
+    // what placing the Master's Field Forge does, the party-share radius,
+    // the duration, and the replace rule. {radius} interpolates
+    // STATION_RADIUS and {minutes} derives from
+    // MOBILE_CRAFTING_STATION_DURATION_TICKS (content/professions.ts), so
+    // the copy tracks the live constants, never hardcoded numbers.
+    mobileStationTooltip: {
+      kind: 'Field station',
+      use: 'Places a party-shared field forge at your feet.',
+      radius: 'Party members within {radius} yards can craft at it.',
+      duration: 'Lasts {minutes} minutes.',
+      notConsumed: 'Never consumed.',
+      replace: 'Placing replaces your active field station.',
+    },
     // The toolEffectResult event's chat lines (the acquisition craft): one
     // line per outcome, rendered off ids only (the event is text-free).
     // {effect} and {profession} splice localized names; {material} splices a

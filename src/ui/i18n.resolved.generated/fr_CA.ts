@@ -3171,6 +3171,14 @@ export const fr_CA: EnTranslations = {
         "landOnly": "Ne se sertit pas sur les cannes à pêche.",
         "openProfessions": "Ouvrez Métiers pour le sertir sur un outil de récolte."
       },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared field forge at your feet.",
+        "radius": "Party members within {radius} yards can craft at it.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station."
+      },
       "toolEffectSlotButton": "Sertir {effect}",
       "toolEffectRechargeButton": "Recharger",
       "toolEffectSlotted": "Vous sertissez {effect} sur {profession}.",
