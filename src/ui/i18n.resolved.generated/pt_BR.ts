@@ -3155,14 +3155,16 @@ export const pt_BR: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Estoque do Coletor",
         "artisansEye": "Olho do Artesão",
-        "quickeningCharm": "Amuleto do Rebrote"
+        "quickeningCharm": "Amuleto do Rebrote",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Amuleto de ferramenta",
         "bonus": {
           "gatherersCache": "+1 de rendimento por coleta enquanto estiver carregado.",
           "artisansEye": "Aumenta o grau da coleta em 1 nível de ferramenta enquanto estiver carregado.",
-          "quickeningCharm": "Encurta o temporizador de regeneração do nó que ele ativa."
+          "quickeningCharm": "Encurta o temporizador de regeneração do nó que ele ativa.",
+          "makersCharm": "+2 yield per harvest while charged."
         },
         "howToSlot": "Encaixe em uma ferramenta de mineração, lenharia ou herborismo pela janela de Profissões. Consumido ao ser encaixado.",
         "charges": "Começa com {base} cargas em uma ferramenta comum (+{bonus} por degrau de raridade).",
@@ -12477,6 +12479,36 @@ export const pt_BR: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

@@ -3155,14 +3155,16 @@ export const zh_CN: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "采集者储囊",
         "artisansEye": "匠人之眼",
-        "quickeningCharm": "回春符"
+        "quickeningCharm": "回春符",
+        "makersCharm": "匠人护符"
       },
       "toolEffectTooltip": {
         "kind": "工具符咒",
         "bonus": {
           "gatherersCache": "充能期间每次采集产出+1。",
           "artisansEye": "充能期间将收获品级提升1个工具等级。",
-          "quickeningCharm": "缩短其触发的资源节点重生计时。"
+          "quickeningCharm": "缩短其触发的资源节点重生计时。",
+          "makersCharm": "充能期间每次采集产出+2。"
         },
         "howToSlot": "在专业窗口中将其镶嵌到采矿、伐木或草药学工具上。镶嵌后即消耗。",
         "charges": "普通品质工具初始有{base}次充能（稀有度每升一级+{bonus}次）。",
@@ -12477,6 +12479,36 @@ export const zh_CN: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "阳纺行囊"
+      },
+      "duskforged_warblade": {
+        "name": "暮锻战刃"
+      },
+      "ridgebreaker": {
+        "name": "碎脊锤"
+      },
+      "duskforged_bulwark": {
+        "name": "暮锻壁垒"
+      },
+      "wyrmfall_pendant": {
+        "name": "坠龙坠饰"
+      },
+      "warhewn_signet": {
+        "name": "战凿徽戒"
+      },
+      "prismglass_loop": {
+        "name": "棱晶琉璃环"
+      },
+      "gyrelens_array": {
+        "name": "涡旋透镜阵列"
+      },
+      "voidbound_grimoire": {
+        "name": "缚虚魔典"
+      },
+      "masters_field_forge": {
+        "name": "匠人野战锻炉"
+      },
+      "makers_charm": {
+        "name": "匠人护符"
       },
       "conjured_water4": {
         "name": "魔法泉水"

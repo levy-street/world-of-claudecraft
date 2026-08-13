@@ -3155,14 +3155,16 @@ export const es: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Alijo del Recolector",
         "artisansEye": "Ojo del Artesano",
-        "quickeningCharm": "Amuleto de Rebrote"
+        "quickeningCharm": "Amuleto de Rebrote",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Amuleto de herramienta",
         "bonus": {
           "gatherersCache": "+1 de rendimiento por recolección mientras está cargado.",
           "artisansEye": "Aumenta la calidad de recolección en 1 nivel de herramienta mientras está cargado.",
-          "quickeningCharm": "Acorta el tiempo de reaparición del nodo que provoca."
+          "quickeningCharm": "Acorta el tiempo de reaparición del nodo que provoca.",
+          "makersCharm": "+2 yield per harvest while charged."
         },
         "howToSlot": "Colócalo en una herramienta de minería, tala o herboristería desde la ventana de Profesiones. Se consume al colocarlo.",
         "charges": "Empieza con {base} cargas en una herramienta común (+{bonus} por nivel de rareza).",
@@ -12477,6 +12479,36 @@ export const es: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"

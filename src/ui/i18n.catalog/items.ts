@@ -2479,6 +2479,16 @@ const ITEM_ENTITY_IDS = [
   'sunspun_leggings',
   'sunspun_handwraps',
   'sunspun_haversack',
+  'duskforged_warblade',
+  'ridgebreaker',
+  'duskforged_bulwark',
+  'wyrmfall_pendant',
+  'warhewn_signet',
+  'prismglass_loop',
+  'gyrelens_array',
+  'voidbound_grimoire',
+  'masters_field_forge',
+  'makers_charm',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2655,6 +2665,20 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   sunspun_leggings: 'Sunspun Leggings',
   sunspun_handwraps: 'Sunspun Handwraps',
   sunspun_haversack: 'Sunspun Haversack',
+  // Masterwrought apex gear (phase 09): the skill-100 rung for
+  // weaponcrafting, jewelcrafting, engineering, and inscription
+  // (content/items.ts). English-appended like the phase 08 block above until
+  // the release fill folds them into the per-locale arrays.
+  duskforged_warblade: 'Duskforged Warblade',
+  ridgebreaker: 'Ridgebreaker',
+  duskforged_bulwark: 'Duskforged Bulwark',
+  wyrmfall_pendant: 'Wyrmfall Pendant',
+  warhewn_signet: 'Warhewn Signet',
+  prismglass_loop: 'Prismglass Loop',
+  gyrelens_array: 'Gyrelens Array',
+  voidbound_grimoire: 'Voidbound Grimoire',
+  masters_field_forge: "Master's Field Forge",
+  makers_charm: "Maker's Charm",
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -3155,14 +3155,16 @@ export const sv_SE: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Samlarens gömma",
         "artisansEye": "Hantverkarens öga",
-        "quickeningCharm": "Spänstamulett"
+        "quickeningCharm": "Spänstamulett",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Verktygsamulett",
         "bonus": {
           "gatherersCache": "+1 utbyte per skörd medan den är laddad.",
           "artisansEye": "Höjer skördegraden med en verktygsnivå medan den är laddad.",
-          "quickeningCharm": "Förkortar återspawningstiden för noden den utlöses på."
+          "quickeningCharm": "Förkortar återspawningstiden för noden den utlöses på.",
+          "makersCharm": "+2 yield per harvest while charged."
         },
         "howToSlot": "Montera på ett gruv-, skogsavverknings- eller örtinsamlingsverktyg från Yrkesfönstret. Förbrukas när den monteras.",
         "charges": "Börjar med {base} laddningar på ett vanligt verktyg (+{bonus} per sällsynthetssteg).",
@@ -12477,6 +12479,36 @@ export const sv_SE: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

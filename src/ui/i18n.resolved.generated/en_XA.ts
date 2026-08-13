@@ -3155,14 +3155,16 @@ export const en_XA: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "[Ĝáţĥéŕéŕ'š Çáçĥé]",
         "artisansEye": "[Áŕţíšáñ'š Éýé]",
-        "quickeningCharm": "[Šþŕíñĝƀáçķ Çĥáŕɱ]"
+        "quickeningCharm": "[Šþŕíñĝƀáçķ Çĥáŕɱ]",
+        "makersCharm": "[Ɱáķéŕ'š Çĥáŕɱ]"
       },
       "toolEffectTooltip": {
         "kind": "[Ţóóļ çĥáŕɱ]",
         "bonus": {
           "gatherersCache": "[+1 ýíéļð þéŕ ĥáŕʋéšţ ŵĥíļé çĥáŕĝéð.]",
           "artisansEye": "[Ŕáíšéš ţĥé ĥáŕʋéšţ ĝŕáðé ƀý 1 ţóóļ ţíéŕ ŵĥíļé çĥáŕĝéð.]",
-          "quickeningCharm": "[Šĥóŕţéñš ţĥé ñóðé ŕéšþáŵñ ţíɱéŕ íţ ţŕíĝĝéŕš.]"
+          "quickeningCharm": "[Šĥóŕţéñš ţĥé ñóðé ŕéšþáŵñ ţíɱéŕ íţ ţŕíĝĝéŕš.]",
+          "makersCharm": "[+2 ýíéļð þéŕ ĥáŕʋéšţ ŵĥíļé çĥáŕĝéð.]"
         },
         "howToSlot": "[Šļóţ óñţó á ɱíñíñĝ, ļóĝĝíñĝ, óŕ ĥéŕƀáļíšɱ ţóóļ ƒŕóɱ ţĥé Þŕóƒéššíóñš ŵíñðóŵ. Çóñšúɱéð ŵĥéñ šļóţţéð.]",
         "charges": "[Šţáŕţš ŵíţĥ {base} çĥáŕĝéš óñ á çóɱɱóñ ţóóļ (+{bonus} þéŕ ŕáŕíţý ŕúñĝ).]",
@@ -12477,6 +12479,36 @@ export const en_XA: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "[Šúñšþúñ Ĥáʋéŕšáçķ]"
+      },
+      "duskforged_warblade": {
+        "name": "[Ðúšķƒóŕĝéð Ŵáŕƀļáðé]"
+      },
+      "ridgebreaker": {
+        "name": "[Ŕíðĝéƀŕéáķéŕ]"
+      },
+      "duskforged_bulwark": {
+        "name": "[Ðúšķƒóŕĝéð Ɓúļŵáŕķ]"
+      },
+      "wyrmfall_pendant": {
+        "name": "[Ŵýŕɱƒáļļ Þéñðáñţ]"
+      },
+      "warhewn_signet": {
+        "name": "[Ŵáŕĥéŵñ Šíĝñéţ]"
+      },
+      "prismglass_loop": {
+        "name": "[Þŕíšɱĝļášš Ļóóþ]"
+      },
+      "gyrelens_array": {
+        "name": "[Ĝýŕéļéñš Áŕŕáý]"
+      },
+      "voidbound_grimoire": {
+        "name": "[Ʋóíðƀóúñð Ĝŕíɱóíŕé]"
+      },
+      "masters_field_forge": {
+        "name": "[Ɱášţéŕ'š Ƒíéļð Ƒóŕĝé]"
+      },
+      "makers_charm": {
+        "name": "[Ɱáķéŕ'š Çĥáŕɱ]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

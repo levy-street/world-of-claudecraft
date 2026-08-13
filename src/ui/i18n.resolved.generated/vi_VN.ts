@@ -3155,14 +3155,16 @@ export const vi_VN: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Kho Của Thợ Thu Thập",
         "artisansEye": "Mắt Nghệ Nhân",
-        "quickeningCharm": "Bùa Hồi Nhanh"
+        "quickeningCharm": "Bùa Hồi Nhanh",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Bùa Công Cụ",
         "bonus": {
           "gatherersCache": "+1 sản lượng mỗi lần thu hoạch trong khi còn nạp.",
           "artisansEye": "Nâng bậc thu hoạch thêm 1 bậc công cụ trong khi còn nạp.",
-          "quickeningCharm": "Rút ngắn thời gian hồi sinh của điểm tài nguyên mà nó kích hoạt."
+          "quickeningCharm": "Rút ngắn thời gian hồi sinh của điểm tài nguyên mà nó kích hoạt.",
+          "makersCharm": "+2 yield per harvest while charged."
         },
         "howToSlot": "Gắn vào công cụ khai khoáng, đốn gỗ, hoặc thảo dược từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.",
         "charges": "Bắt đầu với {base} lượt nạp trên một công cụ phổ thông (+{bonus} mỗi bậc hiếm).",
@@ -12477,6 +12479,36 @@ export const vi_VN: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

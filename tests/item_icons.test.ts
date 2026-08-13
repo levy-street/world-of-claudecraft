@@ -256,7 +256,9 @@ function missingPaintedWaveItemIds(): string[] {
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
-    expect(WEAPON_IMAGE_IDS.size).toBe(123);
+    // 123 -> 125 at Masterwrought phase 09: duskforged_warblade + ridgebreaker joined
+    // ITEM_WEAPON_VARIANTS (set from a suite run, not arithmetic).
+    expect(WEAPON_IMAGE_IDS.size).toBe(125);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

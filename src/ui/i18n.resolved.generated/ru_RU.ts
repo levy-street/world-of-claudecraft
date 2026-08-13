@@ -3155,14 +3155,16 @@ export const ru_RU: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Сумка собирателя",
         "artisansEye": "Глаз ремесленника",
-        "quickeningCharm": "Оберег возрождения"
+        "quickeningCharm": "Оберег возрождения",
+        "makersCharm": "Оберег мастера"
       },
       "toolEffectTooltip": {
         "kind": "Талисман для инструмента",
         "bonus": {
           "gatherersCache": "Пока есть заряды, каждый сбор приносит +1 к добыче.",
           "artisansEye": "Пока есть заряды, повышает класс добычи на 1 уровень инструмента.",
-          "quickeningCharm": "Сокращает таймер возрождения источника, на котором сработал."
+          "quickeningCharm": "Сокращает таймер возрождения источника, на котором сработал.",
+          "makersCharm": "Пока есть заряды, каждый сбор приносит +2 к добыче."
         },
         "howToSlot": "Устанавливается на инструмент для горного дела, лесозаготовки или травничества в окне профессий. Расходуется при установке.",
         "charges": "На обычном инструменте изначально {base} зарядов (+{bonus} за каждую ступень редкости).",
@@ -12477,6 +12479,36 @@ export const ru_RU: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Солнцепрядная котомка"
+      },
+      "duskforged_warblade": {
+        "name": "Боевой клинок сумеречной ковки"
+      },
+      "ridgebreaker": {
+        "name": "Хребтолом"
+      },
+      "duskforged_bulwark": {
+        "name": "Бастион сумеречной ковки"
+      },
+      "wyrmfall_pendant": {
+        "name": "Кулон драконопада"
+      },
+      "warhewn_signet": {
+        "name": "Вытесанная войной печатка"
+      },
+      "prismglass_loop": {
+        "name": "Перстень из призменного стекла"
+      },
+      "gyrelens_array": {
+        "name": "Массив вихрелинз"
+      },
+      "voidbound_grimoire": {
+        "name": "Скованный Пустотой гримуар"
+      },
+      "masters_field_forge": {
+        "name": "Походная кузня мастера"
+      },
+      "makers_charm": {
+        "name": "Оберег мастера"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

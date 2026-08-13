@@ -28,6 +28,7 @@ const BONUS_KEYS: Record<ToolEffectId, TranslationKey> = {
   gatherers_cache: 'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache',
   artisans_eye: 'hudChrome.professions.toolEffectTooltip.bonus.artisansEye',
   quickening_charm: 'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm',
+  makers_charm: 'hudChrome.professions.toolEffectTooltip.bonus.makersCharm',
 };
 
 function line(cls: 'tt-sub' | 'tt-desc' | 'tt-green', text: string): string {

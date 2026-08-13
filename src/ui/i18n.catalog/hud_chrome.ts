@@ -3899,16 +3899,18 @@ export const hudChromeStrings = {
       'Spend a charge on this harvest? Declining still gathers, without the bonus. Charges left: {charges}.',
     toolEffectConfirmAccept: 'Use a Charge',
     toolEffectConfirmDecline: 'Gather Without',
-    // The TOOL_EFFECTS catalog by id (src/sim/content/professions.ts). Only two
-    // are slottable today: slotToolEffectRefused refuses every respawnSpeed-kind
-    // effect (quickening_charm) on every profession, so no shipped UI path
-    // offers the third; its name is still reachable through the refusal line,
-    // which echoes a hand-sent effectId, so the key stays localized. The sim is
+    // The TOOL_EFFECTS catalog by id (src/sim/content/professions.ts). Three
+    // are slottable today (gatherers_cache, artisans_eye, makers_charm):
+    // slotToolEffectRefused refuses every respawnSpeed-kind effect
+    // (quickening_charm) on every profession, so no shipped UI path offers
+    // that one; its name is still reachable through the refusal line, which
+    // echoes a hand-sent effectId, so the key stays localized. The sim is
     // language-agnostic and emits the id; these are where it becomes a name.
     toolEffectName: {
       gatherersCache: "Gatherer's Cache",
       artisansEye: "Artisan's Eye",
       quickeningCharm: 'Springback Charm',
+      makersCharm: "Maker's Charm",
     },
     // Tool-effect charm tooltip copy (src/ui/tool_effect_tooltip.ts): what each
     // charm does, how to slot it, and the charge ladder. Shared by item tooltips
@@ -3925,6 +3927,7 @@ export const hudChromeStrings = {
         // effect until the arm is wired. The name still appears on hand-sent
         // refusal lines, so the bonus copy stays honest about the catalog claim.
         quickeningCharm: 'Shortens the node respawn timer it triggers.',
+        makersCharm: '+2 yield per harvest while charged.',
       },
       howToSlot:
         'Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.',

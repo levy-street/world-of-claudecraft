@@ -3155,14 +3155,16 @@ export const nl_NL: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Verzamelaarsvoorraad",
         "artisansEye": "Ambachtsoog",
-        "quickeningCharm": "Veerkrachtamulet"
+        "quickeningCharm": "Veerkrachtamulet",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Gereedschapsbedel",
         "bonus": {
           "gatherersCache": "+1 opbrengst per oogst zolang het geladen is.",
           "artisansEye": "Verhoogt de oogstgraad met 1 gereedschapsrang zolang het geladen is.",
-          "quickeningCharm": "Verkort de hergroeitijd van het grondstoffenpunt dat het activeert."
+          "quickeningCharm": "Verkort de hergroeitijd van het grondstoffenpunt dat het activeert.",
+          "makersCharm": "+2 yield per harvest while charged."
         },
         "howToSlot": "Plaats op een mijnbouw-, houtkap- of kruidenkundegereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.",
         "charges": "Begint met {base} ladingen op een gewoon gereedschap (+{bonus} per zeldzaamheidsrang).",
@@ -12477,6 +12479,36 @@ export const nl_NL: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

@@ -25,6 +25,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   valeborn_spellblade: 'sword_g', // crystalline
   maldrecs_soulbinder: 'sword_g',
   highwatch_warblade: 'adv_sword_1handed',
+  duskforged_warblade: 'adv_sword_1handed', // crafted apex 1H (masterwrought); warblades share adv_sword_1handed
   eastbrook_greatsword: 'adv_sword_2handed',
   highwatch_greatsword: 'adv_sword_2handed',
   verlans_oathblade: 'adv_sword_2handed',
@@ -128,6 +129,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   gravewyrm_thornmaul: 'hammer_d', // feral ladder maul
   maul_of_the_scourged_wilds: 'hammer_d', // feral ladder, Nythraxis raid rung
   wildsoul_maul: 'hammer_d', // feral ladder, heroic-only ilvl 31 rung
+  ridgebreaker: 'hammer_d', // crafted apex 2H maul (masterwrought); mauls share hammer_d
 
   // ---- axes (axe_a..d + adv axes) --------------------------------------------
   rusty_hatchet: 'axe_a',

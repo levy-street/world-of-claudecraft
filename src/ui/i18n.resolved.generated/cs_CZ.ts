@@ -3155,14 +3155,16 @@ export const cs_CZ: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Sběračova skrýš",
         "artisansEye": "Řemeslníkovo oko",
-        "quickeningCharm": "Odpružení"
+        "quickeningCharm": "Odpružení",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Amulet nástroje",
         "bonus": {
           "gatherersCache": "+1 výnos za sklizeň, dokud je nabito.",
           "artisansEye": "Dokud je nabito, zvyšuje jakost sklizně o 1 stupeň nástroje.",
-          "quickeningCharm": "Zkracuje časovač obnovy naleziště, který spustí."
+          "quickeningCharm": "Zkracuje časovač obnovy naleziště, který spustí.",
+          "makersCharm": "+2 yield per harvest while charged."
         },
         "howToSlot": "Vlož do hornického, dřevorubeckého nebo bylinkářského nástroje z okna Profese. Při vložení se spotřebuje.",
         "charges": "Na běžném nástroji začíná s {base} nabitími (+{bonus} za každý stupeň vzácnosti).",
@@ -12477,6 +12479,36 @@ export const cs_CZ: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

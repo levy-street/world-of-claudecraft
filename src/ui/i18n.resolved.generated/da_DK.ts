@@ -3155,14 +3155,16 @@ export const da_DK: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Indsamlerens Depot",
         "artisansEye": "Håndværkerens Øje",
-        "quickeningCharm": "Fjedrende Amulet"
+        "quickeningCharm": "Fjedrende Amulet",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Værktøjsamulet",
         "bonus": {
           "gatherersCache": "+1 udbytte pr. høst, mens den er opladet.",
           "artisansEye": "Hæver høstkvaliteten med 1 værktøjsniveau, mens den er opladet.",
-          "quickeningCharm": "Forkorter genskabelsestiden for den ressourcekilde, effekten udløses på."
+          "quickeningCharm": "Forkorter genskabelsestiden for den ressourcekilde, effekten udløses på.",
+          "makersCharm": "+2 yield per harvest while charged."
         },
         "howToSlot": "Sæt den i et minedrifts-, skovhugst- eller urtekundskabsværktøj fra Erhverv-vinduet. Forbruges, når den sættes i.",
         "charges": "Starter med {base} ladninger på et almindeligt værktøj (+{bonus} pr. sjældenhedstrin).",
@@ -12477,6 +12479,36 @@ export const da_DK: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

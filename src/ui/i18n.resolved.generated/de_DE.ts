@@ -3155,14 +3155,16 @@ export const de_DE: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Vorrat des Sammlers",
         "artisansEye": "Auge des Handwerkers",
-        "quickeningCharm": "Federkraft-Talisman"
+        "quickeningCharm": "Federkraft-Talisman",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Werkzeug-Talisman",
         "bonus": {
           "gatherersCache": "+1 Ertrag pro Ernte, solange aufgeladen.",
           "artisansEye": "Erhöht die Erntegüte um eine Werkzeugstufe, solange aufgeladen.",
-          "quickeningCharm": "Verkürzt die Zeit, bis der ausgelöste Knoten nachwächst."
+          "quickeningCharm": "Verkürzt die Zeit, bis der ausgelöste Knoten nachwächst.",
+          "makersCharm": "+2 yield per harvest while charged."
         },
         "howToSlot": "Auf ein Bergbau-, Holzfäller- oder Kräuterkunde-Werkzeug im Berufe-Fenster einsetzen. Wird beim Einsetzen verbraucht.",
         "charges": "Startet mit {base} Ladungen auf einem gewöhnlichen Werkzeug (+{bonus} pro Seltenheitsstufe).",
@@ -12477,6 +12479,36 @@ export const de_DE: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

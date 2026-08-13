@@ -3155,14 +3155,16 @@ export const tr_TR: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Toplayıcının Zulası",
         "artisansEye": "Ustanın Gözü",
-        "quickeningCharm": "Yaylanma Tılsımı"
+        "quickeningCharm": "Yaylanma Tılsımı",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Alet tılsımı",
         "bonus": {
           "gatherersCache": "Şarjlıyken hasat başına +1 verim.",
           "artisansEye": "Şarjlıyken hasat derecesini 1 alet kademesi yükseltir.",
-          "quickeningCharm": "Tetiklediği düğüm yeniden oluşma süresini kısaltır."
+          "quickeningCharm": "Tetiklediği düğüm yeniden oluşma süresini kısaltır.",
+          "makersCharm": "+2 yield per harvest while charged."
         },
         "howToSlot": "Meslekler penceresinden bir madencilik, ağaç kesme ya da bitkicilik aletine yuvala. Yuvalandığında tüketilir.",
         "charges": "Sıradan bir alette {base} şarjla başlar (her nadirlik kademesinde +{bonus}).",
@@ -12477,6 +12479,36 @@ export const tr_TR: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

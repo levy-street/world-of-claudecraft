@@ -10552,6 +10552,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunspun_leggings.name': 'Солнцепрядные поножи',
   'entities.items.sunspun_handwraps.name': 'Солнцепрядные обмотки',
   'entities.items.sunspun_haversack.name': 'Солнцепрядная котомка',
+  'entities.items.duskforged_warblade.name': 'Боевой клинок сумеречной ковки',
+  'entities.items.ridgebreaker.name': 'Хребтолом',
+  'entities.items.duskforged_bulwark.name': 'Бастион сумеречной ковки',
+  'entities.items.wyrmfall_pendant.name': 'Кулон драконопада',
+  'entities.items.warhewn_signet.name': 'Вытесанная войной печатка',
+  'entities.items.prismglass_loop.name': 'Перстень из призменного стекла',
+  'entities.items.gyrelens_array.name': 'Массив вихрелинз',
+  'entities.items.voidbound_grimoire.name': 'Скованный Пустотой гримуар',
+  'entities.items.masters_field_forge.name': 'Походная кузня мастера',
+  'entities.items.makers_charm.name': 'Оберег мастера',
   'entities.mobs.wildheart_stalker.name': 'Лазутчик Лозокогтя',
   'entities.mobs.wildheart_ravager.name': 'Разоритель Кровавой Гривы',
   'entities.mobs.wildheart_hexcaller.name': 'Заклинатель Солнечной Кости',
@@ -10689,9 +10699,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': 'Оберег возрождения',
   'hudChrome.professions.toolEffectName.artisansEye': 'Глаз ремесленника',
   'hudChrome.professions.toolEffectName.gatherersCache': 'Сумка собирателя',
+  'hudChrome.professions.toolEffectName.makersCharm': 'Оберег мастера',
   'hudChrome.professions.toolEffectTooltip.kind': 'Талисман для инструмента',
   'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache':
     'Пока есть заряды, каждый сбор приносит +1 к добыче.',
+  'hudChrome.professions.toolEffectTooltip.bonus.makersCharm':
+    'Пока есть заряды, каждый сбор приносит +2 к добыче.',
   'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
     'Пока есть заряды, повышает класс добычи на 1 уровень инструмента.',
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':

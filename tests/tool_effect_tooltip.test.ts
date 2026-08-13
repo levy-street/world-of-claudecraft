@@ -130,16 +130,31 @@ describe('toolEffectStandaloneTooltip: professions window card', () => {
     expect(hasToolEffectCard('')).toBe(false);
   });
 
-  it('every shipped charm item is rare, the tripwire for the title-color derivation', () => {
-    // Today the derived color (itemNameColor on the charm def) and the
-    // no-item fallback are byte-identical, both QUALITY_COLOR.rare, so the
-    // color assertion above cannot distinguish derive from hardcode. This
-    // pin is the tripwire: the first non-rare charm fails it, and THAT
-    // change must bring a fixture proving the derivation renders the new
-    // quality.
+  it('every shipped charm item carries its pinned quality (the title-color rung table)', () => {
+    // Until phase 09 every charm was rare, so the derived color
+    // (itemNameColor on the charm def) and the no-item fallback were
+    // byte-identical and the color assertion above could not distinguish
+    // derive from hardcode. The epic Maker's Charm is the distinguishing
+    // fixture the old tripwire demanded (see the next arm); this exact map
+    // remains the tripwire for any FUTURE rung change.
+    const expected: Record<string, string> = {
+      gatherers_cache: 'rare',
+      artisans_eye: 'rare',
+      makers_charm: 'epic',
+    };
     const charms = Object.values(ITEMS).filter((def) => def.use?.type === 'toolEffect');
-    expect(charms.length).toBeGreaterThan(0);
-    for (const def of charms) expect(def.quality, def.id).toBe('rare');
+    expect(charms.map((def) => def.id).sort()).toEqual(Object.keys(expected).sort());
+    for (const def of charms) expect(def.quality, def.id).toBe(expected[def.id]);
+  });
+
+  it('the epic charm title takes the DERIVED epic color, not the rare fallback', () => {
+    // The fixture the old all-rare tripwire demanded: epic differs from the
+    // fallback rung, so a hardcoded QUALITY_COLOR.rare title now fails here.
+    const html = toolEffectStandaloneTooltip('makers_charm');
+    expect(html).toContain(
+      `<div class="tt-title" style="color:${itemNameColor(ITEMS.makers_charm)}">`,
+    );
+    expect(itemNameColor(ITEMS.makers_charm)).not.toBe(itemNameColor(ITEMS.gatherers_cache));
   });
 
   it('covers every live TOOL_EFFECTS catalog entry with its OWN bonus line', () => {
@@ -149,6 +164,7 @@ describe('toolEffectStandaloneTooltip: professions window card', () => {
       gatherers_cache: '+1 yield per harvest',
       artisans_eye: 'Raises the harvest grade',
       quickening_charm: 'Shortens the node respawn timer',
+      makers_charm: '+2 yield per harvest',
     };
     for (const id of Object.keys(TOOL_EFFECTS)) {
       const html = toolEffectStandaloneTooltip(id);

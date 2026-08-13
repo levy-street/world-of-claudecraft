@@ -3155,14 +3155,16 @@ export const ja_JP: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "採集者の貯蔵袋",
         "artisansEye": "職人の眼",
-        "quickeningCharm": "早戻りの護符"
+        "quickeningCharm": "早戻りの護符",
+        "makersCharm": "匠のお守り"
       },
       "toolEffectTooltip": {
         "kind": "道具用の護符",
         "bonus": {
           "gatherersCache": "充填中は採集ごとに産出+1。",
           "artisansEye": "充填中は収穫の品質がツール1段階ぶん上がる。",
-          "quickeningCharm": "発動した資源ノードの再生タイマーを短縮する。"
+          "quickeningCharm": "発動した資源ノードの再生タイマーを短縮する。",
+          "makersCharm": "充填中は採集ごとに産出+2。"
         },
         "howToSlot": "専門技能ウィンドウから採掘・伐採・薬草学のツールに装着する。装着すると消費される。",
         "charges": "コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。",
@@ -12477,6 +12479,36 @@ export const ja_JP: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "陽紡ぎの背負い袋"
+      },
+      "duskforged_warblade": {
+        "name": "黄昏鍛えの戦刃"
+      },
+      "ridgebreaker": {
+        "name": "尾根砕き"
+      },
+      "duskforged_bulwark": {
+        "name": "黄昏鍛えの大盾"
+      },
+      "wyrmfall_pendant": {
+        "name": "竜墜のペンダント"
+      },
+      "warhewn_signet": {
+        "name": "戦削りの印章"
+      },
+      "prismglass_loop": {
+        "name": "プリズムガラスの輪"
+      },
+      "gyrelens_array": {
+        "name": "渦鏡アレイ"
+      },
+      "voidbound_grimoire": {
+        "name": "虚無縛りの魔導書"
+      },
+      "masters_field_forge": {
+        "name": "匠の野営炉"
+      },
+      "makers_charm": {
+        "name": "匠のお守り"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

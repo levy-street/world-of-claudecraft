@@ -3155,14 +3155,16 @@ export const id_ID: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Simpanan Pengumpul",
         "artisansEye": "Mata Perajin",
-        "quickeningCharm": "Jimat Pegas Balik"
+        "quickeningCharm": "Jimat Pegas Balik",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Jimat Alat",
         "bonus": {
           "gatherersCache": "+1 hasil per panen selama masih memiliki muatan.",
           "artisansEye": "Meningkatkan mutu panen sebesar 1 tingkat alat selama masih memiliki muatan.",
-          "quickeningCharm": "Mempersingkat penghitung waktu munculnya kembali simpul yang dipicunya."
+          "quickeningCharm": "Mempersingkat penghitung waktu munculnya kembali simpul yang dipicunya.",
+          "makersCharm": "+2 yield per harvest while charged."
         },
         "howToSlot": "Pasangkan pada alat Penambangan, Penebangan, atau Herbalisme dari jendela Profesi. Habis terpakai saat dipasang.",
         "charges": "Dimulai dengan {base} muatan pada alat umum (+{bonus} per anak tangga kelangkaan).",
@@ -12477,6 +12479,36 @@ export const id_ID: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

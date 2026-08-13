@@ -24,6 +24,7 @@ export const TOOL_EFFECT_NAME_KEYS: Record<string, TranslationKey> = {
   gatherers_cache: 'hudChrome.professions.toolEffectName.gatherersCache',
   artisans_eye: 'hudChrome.professions.toolEffectName.artisansEye',
   quickening_charm: 'hudChrome.professions.toolEffectName.quickeningCharm',
+  makers_charm: 'hudChrome.professions.toolEffectName.makersCharm',
 };
 
 /** hasOwn-safe read of the table above, the twin of

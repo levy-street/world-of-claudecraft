@@ -3155,14 +3155,16 @@ export const ko_KR: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "채집가의 주머니",
         "artisansEye": "장인의 눈",
-        "quickeningCharm": "회복의 부적"
+        "quickeningCharm": "회복의 부적",
+        "makersCharm": "장인의 부적"
       },
       "toolEffectTooltip": {
         "kind": "도구 부적",
         "bonus": {
           "gatherersCache": "충전된 동안 채집당 획득량 +1.",
           "artisansEye": "충전된 동안 수확 등급이 도구 1단계만큼 올라갑니다.",
-          "quickeningCharm": "발동한 자원 채집지의 재생성 시간을 단축합니다."
+          "quickeningCharm": "발동한 자원 채집지의 재생성 시간을 단축합니다.",
+          "makersCharm": "충전된 동안 채집당 획득량 +2."
         },
         "howToSlot": "전문 기술 창에서 채광, 벌목, 약초학 도구에 장착합니다. 장착 시 소모됩니다.",
         "charges": "일반 등급 도구에서는 {base}회 충전으로 시작합니다(희귀도 한 단계마다 +{bonus}회).",
@@ -12477,6 +12479,36 @@ export const ko_KR: EnTranslations = {
       },
       "sunspun_haversack": {
         "name": "태양실 배낭"
+      },
+      "duskforged_warblade": {
+        "name": "황혼에 벼린 전쟁검"
+      },
+      "ridgebreaker": {
+        "name": "능선파괴자"
+      },
+      "duskforged_bulwark": {
+        "name": "황혼에 벼린 방벽"
+      },
+      "wyrmfall_pendant": {
+        "name": "낙룡의 펜던트"
+      },
+      "warhewn_signet": {
+        "name": "전쟁에 깎인 인장"
+      },
+      "prismglass_loop": {
+        "name": "프리즘 유리 고리"
+      },
+      "gyrelens_array": {
+        "name": "소용돌이 렌즈 배열"
+      },
+      "voidbound_grimoire": {
+        "name": "공허에 묶인 마법서"
+      },
+      "masters_field_forge": {
+        "name": "장인의 야전 화로"
+      },
+      "makers_charm": {
+        "name": "장인의 부적"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
