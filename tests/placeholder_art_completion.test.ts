@@ -282,11 +282,19 @@ describe('v0.36 placeholder-art completion evidence', () => {
     expect(targets.deeds.every((id) => DEED_IMAGE_IDS.has(id))).toBe(true);
     // The campaign's frozen weapon scope predates the class-overhaul
     // integration's four daggers (integration-dagger-icons-2026-08-10 owns
-    // their art), so the live registry minus that batch is the campaign set.
+    // their art) and the Masterwrought phase 09 pair
+    // (masterwrought-phase09-art owns their art, gated by the item-art
+    // audit suites), so the live registry minus those batches is the
+    // campaign set.
     const INTEGRATION_WEAPON_IDS = ['boneglass_shiv', 'duskwhisper', 'marrowpoint', 'rimefang'];
+    const MASTERWROUGHT_PHASE09_WEAPON_IDS = ['duskforged_warblade', 'ridgebreaker'];
+    const POST_CAMPAIGN_WEAPON_IDS = [
+      ...INTEGRATION_WEAPON_IDS,
+      ...MASTERWROUGHT_PHASE09_WEAPON_IDS,
+    ];
     expect(targets.weaponItems).toEqual(
       sorted(
-        Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !INTEGRATION_WEAPON_IDS.includes(id)),
+        Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !POST_CAMPAIGN_WEAPON_IDS.includes(id)),
       ),
     );
     expect(targets.itemCleanup).toEqual([...CLEANUP_ITEM_IDS]);
