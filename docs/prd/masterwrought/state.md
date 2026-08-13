@@ -3029,6 +3029,21 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   runtime, so load-frozen maps were rejected deliberately). Latin
   toolEffectsBody rows (15 locales) went STALE from the reword, left for
   the release fill per the reword-staleness rule.
+- FRESH-REVIEWER ROUND (after the fix round, itself unreviewed code): one
+  consolidated reviewer plus two child auditors (a pin-repair mutation audit
+  with 8 probes in an ISOLATED copy, and a tooltip/i18n review); verdict: no
+  pin weakened anywhere, one blocking (the bare-named tooltip core absent
+  from all THREE architecture registries, the triple-registration trap),
+  plus the multi-element mst wire gap, the bis_gear pair check hiding inside
+  the cap branch, the argmax-literal warrior winner (0.46-point margin,
+  flipped by a one-point unrelated edit in a probe), the prose-only
+  reliquary repair with two stale duplicates, the 13 silently-stale Latin
+  toolEffectsBody rows (deleted so they go pending: present-but-stale rows
+  are INVISIBLE to every gate, the staleness scan in i18n_scan is recorded
+  but not live), and the pbe_boost comment wrong a second time in the other
+  direction (measured: the cap arm FIRES on 9 of 16 real kits, ring refill
+  live via prismglass_loop; only the hand arms stay synthetic-only). All
+  applied in one commit; suite battery green, tsc clean.
 - OPEN MAINTAINER DECISIONS, recorded not decided: (1) Reliquary curation
   for masters_field_forge and makers_charm. The phase 08 no-page precedent
   for crafted tradables was never written down (recorded here now); the
