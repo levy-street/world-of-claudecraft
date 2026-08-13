@@ -49,7 +49,7 @@ function fmt(n: number): string {
  * Emit the per-cast playtest readout to the caster (dev channel). No-op unless a
  * session is active. `initialApplied` is the initial heal that actually landed on
  * each target, index-aligned with `targets`. Logs, per target: id, distance to the
- * scenario center, echo type (group 13% vs a kept individual 35%), and the initial
+ * scenario center, echo type (group 13% vs a kept individual 40%), and the initial
  * heal; then a running line with total damage/DPS, healing/HPS, converted healing,
  * overheal, and mana. All since the /dev cascade session began.
  */
@@ -68,7 +68,7 @@ export function logCascadeCast(
     const t = targets[i];
     const d = center ? dist2d(t.pos, center.pos) : 0;
     const echo = t.auras.find((a) => a.kind === 'temporal_echo' && a.sourceId === caster.id);
-    const kind = echo?.echoGroup === false ? 'individual 35%' : 'group 13%';
+    const kind = echo?.echoGroup === false ? 'individual 40%' : 'group 13%';
     line(`  - id ${t.id}: dist ${fmt(d)}y, ${kind}, initialHeal ${initialApplied[i] ?? 0}`);
   }
   const elapsed = Math.max(1e-3, ctx.time - s.startTime);

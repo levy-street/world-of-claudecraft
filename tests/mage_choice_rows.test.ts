@@ -548,13 +548,14 @@ describe('mage choice rows (owner tree)', () => {
     expect(sim.applyTalents({ spec: 'arcane', rows: { 14: 'mag_r14_power_echo' } })).toBe(true);
     const p = sim.player;
     p.resource = p.maxResource;
-    // Deep HP hole so neither the heal nor its echo overheals (which would clamp).
-    p.maxHp = 100000;
-    p.hp = 1;
     sim.castAbility('power_echo');
     (p as { gcdRemaining: number }).gcdRemaining = 0;
     sim.targetEntity(p.id); // Temporal Mend targets a friendly; heal self.
     sim.castAbility('temporal_mend');
+    // Start-cast stat refresh has now run. Open the deep HP hole afterwards so
+    // neither the stronger rank-4 heal nor its echo overheals (which would clamp).
+    p.maxHp = 100000;
+    p.hp = 1;
     // Ride the 2s hard cast to completion, collecting heal events.
     const collected: { type: string; amount?: number; targetId?: number }[] = [];
     for (let i = 0; i < 60; i++) collected.push(...(sim.tick() as never[]));

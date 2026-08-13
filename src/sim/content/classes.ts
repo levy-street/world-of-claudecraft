@@ -2063,6 +2063,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
       {
         rank: 3,
+        level: 18,
+        cost: 90,
+        effects: [{ type: 'directDamage', min: 18, max: 18 }],
+      },
+      {
+        rank: 4,
         level: 20,
         cost: 105,
         effects: [{ type: 'directDamage', min: 22, max: 22 }],
@@ -2375,6 +2381,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 95,
         effects: [{ type: 'heal', min: 150, max: 178 }],
       },
+      {
+        rank: 4,
+        level: 20,
+        cost: 110,
+        effects: [{ type: 'heal', min: 218, max: 258 }],
+      },
     ],
     description:
       'Draws an ally a moment forward in time, mending $d health as the body settles into its healthier future self. (Chronomancy signature)',
@@ -2430,6 +2442,19 @@ export const ABILITIES: Record<string, AbilityDef> = {
           },
         ],
       },
+      {
+        rank: 4,
+        level: 20,
+        cost: 120,
+        effects: [
+          {
+            type: 'absorb',
+            amount: 232,
+            duration: 10,
+            spellPowerCoeff: MAGE_TEMPORAL_BARRIER_SPELL_POWER_COEFF,
+          },
+        ],
+      },
     ],
     description:
       'Shifts the target a heartbeat out of the present, a temporal shell absorbing $d damage for 10 sec before the timeline snaps back.',
@@ -2437,7 +2462,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ---- Chronomancy (healer) Phase 2: Temporal Echo, docs/prd/mage-chronomancy.md
   // section 13. Instant, on the GCD, no cooldown. A small initial heal (the sibling
   // `heal` effect, feeds $d) plus the per-caster mark (the `temporalEcho` effect,
-  // feeds $t). While marked, 35% of the mage's single-target Arcane damage and 15%
+  // feeds $t). While marked, 40% of the mage's single-target Arcane damage and 15%
   // of area Arcane damage heals the ally (combat/chronomancy.ts). Re-casting MOVES
   // the mark. Values are PLAYTEST-provisional (PRD section 13.14 / 14).
   temporal_echo: {
@@ -2476,6 +2501,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
           { type: 'temporalEcho', duration: 15 },
         ],
       },
+      {
+        rank: 4,
+        level: 20,
+        cost: 90,
+        effects: [
+          { type: 'heal', min: 84, max: 102 },
+          { type: 'temporalEcho', duration: 15 },
+        ],
+      },
     ],
     description:
       'Marks an ally with an echo of a healthier moment, mending $d health at once. For $t sec, part of the Arcane damage you deal is drawn back through the echo to heal them.',
@@ -2487,7 +2521,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // 15 yd of it, up to five total. Each takes a small initial heal and a REDUCED
   // group echo (13% single / 6% area conversion, combat/chronomancy.ts) for 8 sec.
   // The 15s cooldown plus the 8s window keep five echoes from ever being sustained.
-  // A pre-existing individual echo on a target is kept at 35% (never downgraded),
+  // A pre-existing individual echo on a target is kept at 40% (never downgraded),
   // still initial-healed, and counts within the five. PLAYTEST-provisional values
   // (owner 2026-07-12), gated by tests/chronomancy_balance.test.ts.
   temporal_cascade: {
@@ -2745,9 +2779,21 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // (base cost is `cost: 14` above; DERIVED via the balance harness so the
     // targets hold WITH the 25% free-cast proc's mana relief.)
     // Low base damage (DERIVED via tests/chronomancy_balance.test.ts): the
-    // conservative rotation must sustain clearly under Piro/Cryo (>=35% below);
+    // conservative rotation must sustain clearly under Piro/Cryo (>=22% below);
     // the payoff is ramping it with charges (and the Echo healing it feeds).
     effects: [{ type: 'directDamage', min: 10, max: 13 }],
+    // The builder originally shipped with no rank ladder, leaving its level-5
+    // packet unchanged at the level-20 cap. Every rank re-states the DERIVED
+    // base cost (14, see above) so the charge-driven mana curve stays exactly
+    // where the harness put it and only the damage learns with the player.
+    // `cost` is required on AbilityRank, so it has to be repeated, not omitted:
+    // a rank row that drifts from the base cost silently re-tunes the OOM
+    // window for every level at or above that rank.
+    ranks: [
+      { rank: 2, level: 10, cost: 14, effects: [{ type: 'directDamage', min: 11, max: 13 }] },
+      { rank: 3, level: 15, cost: 14, effects: [{ type: 'directDamage', min: 11, max: 14 }] },
+      { rank: 4, level: 20, cost: 14, effects: [{ type: 'directDamage', min: 12, max: 14 }] },
+    ],
     description:
       "Draws a surge of raw aether through the enemy for $d damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast.",
   },

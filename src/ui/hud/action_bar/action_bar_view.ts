@@ -25,6 +25,7 @@
 // Map, inventory is InvSlot[]); the core never reaches for a Sim-only field.
 
 import { afflictionPossessionEmpowers } from '../../../sim/combat/affliction';
+import { aetherDartsProcGlowActive } from '../../../sim/combat/chronomancy';
 import { destructionProcGlowActive, ruinAmountFromAuras } from '../../../sim/combat/destruction';
 import {
   freeCostAuraActive,
@@ -654,9 +655,11 @@ export function createActionBarView(
           (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
-        // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
-        // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
-        // sim predicate idiom as freeCostAuraActive above).
+        // Spec resources/procs share pure sim predicates so the bar and combat
+        // agree: Frost lights Ice Lance on a banked Fingers of Frost and Flurry
+        // on an armed Brain Freeze (combat/frost_mage.ts), while a full
+        // Chronomancy charge bank lights Aether Darts as the actionable spender
+        // (combat/chronomancy.ts).
         const divineAscensionActive =
           (player.paladinDevotion?.ascensionCharges ?? 0) > 0 &&
           (player.paladinDevotion?.ascensionRemaining ?? 0) > 0;
@@ -673,6 +676,7 @@ export function createActionBarView(
           radiantResonanceActive ||
           windowGlow ||
           frostProcGlowActive(player.auras ?? [], def.id) ||
+          aetherDartsProcGlowActive(player.auras ?? [], def.id) ||
           destructionProcGlowActive(player.auras ?? [], def.id) ||
           packlordActionGlowActive(player.auras ?? [], def.id) ||
           thundercallPayoffGlowActive(player.auras ?? [], def.id) ||

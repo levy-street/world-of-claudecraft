@@ -1094,7 +1094,7 @@ export function runEffects(
         // then the members nearest the primary within radius, capped at maxTargets)
         // BEFORE any heal or aura is applied. Each target then takes a small initial
         // heal (Spell-Power-scaled, can crit) and a 13% group echo; the overlap rule
-        // in placeGroupEcho keeps a pre-existing individual mark at 35%. The Arcane
+        // in placeGroupEcho keeps a pre-existing individual mark at 40%. The Arcane
         // conversion lives in combat/chronomancy.ts. (mage-chronomancy.md Phase 4)
         const primary = target ?? p;
         if (primary !== p && ctx.isHostileTo(p, primary)) break;

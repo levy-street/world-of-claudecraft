@@ -949,6 +949,9 @@
       0 0 12px #ffd100aa,
       inset 0 0 0 1px #ffd10077;
   }
+  /* The shared painter toggles the same proc class on desktop and touch.
+     Keep the actionable steady glow even when reduced motion stops the pulse
+     (the grouped reduced-motion and forced-colors overrides live below). */
   body.mobile-touch #mobile-action-ring button.proc {
     border-color: #ffd97a;
     box-shadow:

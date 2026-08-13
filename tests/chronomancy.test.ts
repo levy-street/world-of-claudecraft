@@ -223,16 +223,16 @@ describe('Temporal Barrier', () => {
     sim.tick();
     let shield = p.auras.find((a) => a.id === 'temporal_barrier');
     expect(shield?.kind).toBe('absorb');
-    // Rank 3 base 160, scaled by the Chronoweave mastery (x1.15 at level 20)
+    // Rank 4 base 232, scaled by the Chronoweave mastery (x1.15 at level 20)
     // like the heals, plus 25 percent of the caster's spell power (PR #2154's
     // barrier scaling; the autoEquip level-20 mage carries 40 spell power).
-    // Issue #1803: the Chronoweave healPct now reaches the Spell Power rider
-    // too, not just the base: base round(160 * 1.15) = 184, rider
-    // round(40 * 0.25 * 1.15) = 12, total 196 (previously an unscaled rider
-    // of 10 under-delivered the mastery's advertised percentage).
-    expect(shield?.value).toBe(196);
+    // Issue #1803: the Chronoweave healPct reaches the Spell Power rider too,
+    // not just the base: base round(232 * 1.15) = 267, rider
+    // round(40 * 0.25 * 1.15) = 12, total 279 (an unscaled rider of 10 would
+    // under-deliver the mastery's advertised percentage).
+    expect(shield?.value).toBe(279);
     // Absorption channels through the normal pipeline: a 100 hit leaves hp
-    // untouched and the shell at 96.
+    // untouched and the shell at 179.
     const mob = addHostile(sim);
     const hp0 = p.hp;
     (
@@ -250,7 +250,7 @@ describe('Temporal Barrier', () => {
     ).dealDamage(mob, p, 100, false, 'physical', null, 'hit');
     expect(p.hp).toBe(hp0);
     shield = p.auras.find((a) => a.id === 'temporal_barrier');
-    expect(shield?.value).toBe(96);
+    expect(shield?.value).toBe(179);
     // A same-caster recast REPLACES to full (the documented absorb rule).
     p.cooldowns.delete('temporal_barrier');
     (p as unknown as { gcdRemaining: number }).gcdRemaining = 0;
@@ -259,7 +259,7 @@ describe('Temporal Barrier', () => {
     sim.tick();
     const shields = p.auras.filter((a) => a.id === 'temporal_barrier');
     expect(shields.length).toBe(1); // never stacks with itself
-    expect(shields[0].value).toBe(196); // fresh full shell
+    expect(shields[0].value).toBe(279); // fresh full shell
     // Expiry: ride past the 10s window and the shell is gone.
     collect(sim, 10.5);
     expect(p.auras.some((a) => a.id === 'temporal_barrier')).toBe(false);

@@ -677,10 +677,10 @@ export interface Aura {
   // review finding: a 300 bank paid 330 under a +10% damage buff).
   finalDamage?: boolean;
   // Chronomancy Temporal Echo bookkeeping (temporal_echo auras only). echoGroup
-  // marks the ORIGIN: false/undefined = the single-target Temporal Echo (35% ST /
+  // marks the ORIGIN: false/undefined = the single-target Temporal Echo (40% ST /
   // 15% AoE conversion), true = a Cascada temporal group echo (13% ST / 6% AoE).
   // echoConvertRate stores the single-target coefficient the mark converts at
-  // (0.35 or 0.13); the AoE rate is derived from echoGroup. Both are read only by
+  // (0.4 or 0.13); the AoE rate is derived from echoGroup. Both are read only by
   // combat/chronomancy.ts during Arcane-damage conversion (server-authoritative and
   // offline), so they never need to ride the wire.
   echoGroup?: boolean;

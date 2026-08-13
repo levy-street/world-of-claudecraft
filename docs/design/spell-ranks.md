@@ -65,7 +65,8 @@
 | | **3** | **18** | 85 | inst, 8cd | **68–82** |
 | arcane_missiles | 1 | 8 | 50 | 3s chan | 8/missile ×3 |
 | | **2** | **14** | 75 | 3s chan | **14**/missile ×3 |
-| | **3** | **20** | 105 | 3s chan | **22**/missile ×3 |
+| | **3** | **18** | 90 | 3s chan | **18**/missile ×3 |
+| | **4** | **20** | 105 | 3s chan | **22**/missile ×3 |
 | frost_armor | 1 | 1 | 20 | inst | buff_armor 30, 30min |
 | | **2** | **10** | 30 | inst | buff_armor **50** |
 | | **3** | **18** | 45 | inst | buff_armor **70** |
@@ -86,7 +87,7 @@
 | `arcane_explosion` | 14 | 60 | inst | aoeDamage 26–31, radius 10 (caster-centered) |
 | `scorch` | 16 | 35 | 1.5s | directDamage 32–40 (fast fire filler) |
 | `ice_barrier` / `blazing_barrier` | 5 (R2 12, R3 18) | 45 / 65 / 90 | inst, 30cd | absorb 50 / 90 / 130 + 50% Spell Power, 60s (self) |
-| `temporal_barrier` | 5 (R2 12, R3 18) | 50 / 75 / 105 | inst, 12cd | absorb 55 / 100 / 160 + 25% Spell Power, 10s (friendly) |
+| `temporal_barrier` | 5 (R2 12, R3 18, R4 20) | 50 / 75 / 105 / 120 | inst, 12cd | absorb 55 / 100 / 160 / 232 + 25% Spell Power, 10s (friendly) |
 | `pyroblast` | 20 | 125 | 6.0s cast | directDamage 75–100 + dot 24/12s (6×4) — big nuke + burn |
 
 **Sanity** — L14: Fireball R3 avg 42 (+6 dot) ≈ 48/cast → 292 hp ≈ 6.1 casts ✓. L20: FB R4 avg 68 (+12) = 80 → 400 hp = 5 casts (+Fire Blast R3 trims one) ✓.
