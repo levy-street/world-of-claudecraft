@@ -42,10 +42,12 @@ const LEGENDARY_ERROR = 'You can only equip one legendary Masterwrought item.';
 // sockets plus a neck (three flagged pieces with no armor-weight or dual-wield
 // preconditions), a shield the two-hander displaces, and the two-hander itself.
 // Injected into the live ITEMS table the way unique_equipped/grant_line_view do,
-// and removed afterward. Since phase 08 the flag also SHIPS on the nine apex
-// armor pieces (tests/masterwrought_budget.test.ts owns that catalog); the
-// synthetic set stays because it covers slot shapes no shipped item exercises
-// yet (jewelry sockets, the shield displacement, the two-hander).
+// and removed afterward. Since phase 08 the flag also SHIPS on the apex armor,
+// and since phase 09 on the apex weapons/shield/jewelry/held gear
+// (tests/masterwrought_budget.test.ts owns that catalog); the shipped-gear R6
+// interplay has its own describe below, while the synthetic set stays for the
+// shapes no shipped item carries (legendary quality, preconditions-free
+// pieces, and the worn offhand).
 const RING_ID = 'test_masterwrought_ring';
 const AMULET_ID = 'test_masterwrought_amulet';
 const EMBER_ID = 'test_masterwrought_ember_band';
@@ -53,6 +55,7 @@ const ASH_ID = 'test_masterwrought_ash_band';
 const BULWARK_ID = 'test_masterwrought_bulwark';
 const GREATSWORD_ID = 'test_masterwrought_greatsword';
 const UNFLAGGED_ID = 'test_masterwrought_unflagged_signet';
+const WORN_OFFHAND_ID = 'test_masterwrought_worn_quiver';
 
 beforeAll(() => {
   ITEMS[RING_ID] = {
@@ -135,6 +138,20 @@ beforeAll(() => {
     stats: { sta: 1 },
     sellValue: 1,
   } as ItemDef;
+  ITEMS[WORN_OFFHAND_ID] = {
+    id: WORN_OFFHAND_ID,
+    name: 'Test Masterwrought Worn Quiver',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    // The quiver shape: WORN rather than held, so a two-hander coexists
+    // with it (no shipped flagged item carries this yet; synthetic idiom).
+    occupiesHand: false,
+    quality: 'epic',
+    masterwrought: true,
+    requiredLevel: 20,
+    stats: { sta: 1 },
+    sellValue: 1,
+  } as ItemDef;
 });
 
 afterAll(() => {
@@ -146,6 +163,7 @@ afterAll(() => {
     BULWARK_ID,
     GREATSWORD_ID,
     UNFLAGGED_ID,
+    WORN_OFFHAND_ID,
   ]) {
     delete ITEMS[id];
   }
@@ -153,6 +171,15 @@ afterAll(() => {
 
 function makeWarrior(seed: number): Sim {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+  sim.setPlayerLevel(60);
+  return sim;
+}
+
+// The shipped-gear R6 cases need a class inside BOTH phase 09 gate lists:
+// shaman sits in the HEAVY melee group (ridgebreaker) and the caster
+// proficiency group (the held offhands).
+function makeShaman(seed: number): Sim {
+  const sim = new Sim({ seed, playerClass: 'shaman', autoEquip: true });
   sim.setPlayerLevel(60);
   return sim;
 }
@@ -633,6 +660,94 @@ describe('masterwrought cap enforcement (equipItem)', () => {
     expect(sim.equipment.ring1).toBe(RING_ID);
     expect(sim.equipment.ring2).toBe(RING_ID);
     expect(sim.countItem(RING_ID)).toBe(0);
+  });
+});
+
+describe('masterwrought cap with the shipped phase 09 gear (R6)', () => {
+  // The budget sweep (tests/masterwrought_budget.test.ts) pins the DEFS; this
+  // is the cap INTERPLAY through the real equip path with the real ids, so a
+  // def change that alters how the counted family reads a shipped piece
+  // (slot, hand, occupiesHand, the flag itself) reds here, not only there.
+  it('wears the flagged two-hander beside one flagged piece and refuses a third', () => {
+    const sim = makeWarrior(7116);
+    grant(sim, 'ridgebreaker');
+    grant(sim, 'wyrmfall_pendant');
+    grant(sim, 'warhewn_signet');
+
+    // A two-hander occupies a single SLOT and so counts once: with the
+    // pendant it exactly fills the cap.
+    sim.equipItemToSlot('ridgebreaker', 'mainhand');
+    sim.equipItem('wyrmfall_pendant');
+    sim.tick();
+    expect(sim.equipment.mainhand).toBe('ridgebreaker');
+    expect(sim.equipment.neck).toBe('wyrmfall_pendant');
+
+    const before = { ...sim.equipment };
+    sim.equipItem('warhewn_signet');
+    const errors = tickErrors(sim);
+    expect(errors).toContain(CAP_ERROR);
+    expect({ ...sim.equipment }).toEqual(before);
+    expect(sim.countItem('warhewn_signet')).toBe(1);
+  });
+
+  it('the two-hander benches a flagged HELD offhand, which then stops counting', () => {
+    const sim = makeShaman(7117);
+    grant(sim, 'gyrelens_array');
+    grant(sim, 'wyrmfall_pendant');
+    grant(sim, 'ridgebreaker');
+    grant(sim, 'prismglass_loop');
+
+    sim.equipItemToSlot('gyrelens_array', 'offhand');
+    sim.equipItem('wyrmfall_pendant');
+    sim.tick();
+    expect(sim.equipment.offhand).toBe('gyrelens_array');
+    expect(sim.equipment.neck).toBe('wyrmfall_pendant');
+
+    // At the cap, but the held offhand occupies the hand the two-hander
+    // needs, so the equip benches it (displacedSlotForEquip names offhand;
+    // the ignoreSlots exemption in equipItem then leaves the benched copy
+    // out of the count): worn afterward are the pendant plus the two-hander.
+    sim.equipItemToSlot('ridgebreaker', 'mainhand');
+    expect(tickErrors(sim)).toHaveLength(0);
+    expect(sim.equipment.mainhand).toBe('ridgebreaker');
+    expect(sim.equipment.offhand).toBeUndefined();
+    expect(sim.countItem('gyrelens_array')).toBe(1);
+
+    // Still two worn pieces: the ring is the third and is refused.
+    sim.equipItem('prismglass_loop');
+    expect(tickErrors(sim)).toContain(CAP_ERROR);
+    expect(sim.equipment.ring1).toBeUndefined();
+    expect(sim.countItem('prismglass_loop')).toBe(1);
+  });
+
+  it('a flagged WORN offhand coexists with the two-hander and still counts', () => {
+    // DECIDED here (the pin owed since phase 03 QA): coexistence stands. A
+    // worn offhand (occupiesHand false, the quiver shape) is outside the
+    // two-hand exclusion, so displacedSlotForEquip (src/sim/equipment_rules.ts)
+    // returns null for it and it never enters equipItem's ignoreSlots: the
+    // 2H equip does NOT bench it, and the counted family keeps counting it.
+    // The pair therefore sits AT the cap; freeing the slot is the player's
+    // move, never the rule's side effect.
+    const sim = makeWarrior(7118);
+    grant(sim, WORN_OFFHAND_ID);
+    grant(sim, 'ridgebreaker');
+    grant(sim, RING_ID);
+
+    sim.equipItemToSlot(WORN_OFFHAND_ID, 'offhand');
+    sim.tick();
+    expect(sim.equipment.offhand).toBe(WORN_OFFHAND_ID);
+
+    sim.equipItemToSlot('ridgebreaker', 'mainhand');
+    expect(tickErrors(sim)).toHaveLength(0);
+    expect(sim.equipment.mainhand).toBe('ridgebreaker');
+    expect(sim.equipment.offhand).toBe(WORN_OFFHAND_ID);
+
+    // Both counted: the pair is the cap, so a third flagged equip refuses.
+    const before = { ...sim.equipment };
+    sim.equipItemToSlot(RING_ID, 'ring1');
+    expect(tickErrors(sim)).toContain(CAP_ERROR);
+    expect({ ...sim.equipment }).toEqual(before);
+    expect(sim.countItem(RING_ID)).toBe(1);
   });
 });
 

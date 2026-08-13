@@ -632,9 +632,10 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
   });
 
   it('the synthetic arms phase 09 will land on: ring refill and the empty fallbacks', () => {
-    // No flagged ring, weapon, or fallback-less slot ships yet, so these
-    // arms are unreachable through bisKitForRole; drive them with synthetic
-    // input so phase 09's first flagged ring lands on executed code.
+    // Phase 09 shipped flagged rings and weapons, but none of them is a
+    // top-scored pick for any role (checked when the pin above held at 10),
+    // so these arms are still unreachable through the real bisKitForRole
+    // pool; synthetic input keeps them on executed code either way.
     const isFlagged = (id: string) => id.startsWith('mw_');
     const scoreOf = (id: string) => ({ mw_chest: 30, mw_waist: 10, mw_ring: 5 })[id] ?? 0;
     // Ring refill: three flagged picks; the ring is the lowest-scored, so it
@@ -703,12 +704,14 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
 });
 
 describe('Masterwrought cap: hand demotion routes through fillHands (phase 09)', () => {
-  // No flagged weapon, shield, or held offhand ships yet, so every arm here
-  // drives enforceMasterwroughtCap with synthetic defs through the injectable
-  // isFlagged and legality-reads seams (the phase 08 synthetic block above is
-  // the idiom). Winners are derived from the layout rules, never read back
-  // from the function; each pin's comment names the wrong pick a regression
-  // would produce.
+  // Phase 09 ships flagged hands (Ridgebreaker, Duskforged Warblade and
+  // Bulwark, the two held offhands), but none is an argmax pick for any role
+  // (roleItemScore ignores hitRating), so real kits cannot exercise the
+  // demotion arms; every arm here drives enforceMasterwroughtCap with
+  // synthetic defs through the injectable isFlagged and legality-reads seams
+  // (the phase 08 synthetic block above is the idiom). Winners are derived
+  // from the layout rules, never read back from the function; each pin's
+  // comment names the wrong pick a regression would produce.
   const isFlagged = (id: string) => id.startsWith('mw_');
   const scoreOf = (scores: Record<string, number>) => (id: string) => scores[id] ?? 0;
   const anyLegal: HandLegalityReads = {
