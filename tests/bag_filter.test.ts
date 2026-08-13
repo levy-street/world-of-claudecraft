@@ -504,7 +504,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'cracked_ogre_tusk',
     'cracked_wyrm_scale',
     'deepfen_pearl',
-    'duskforged_billet', // phase 07 intermediate, out when its apex row lands
     'emberwing_cinderscale',
     'frayed_prayer_beads',
     'gleamstag_charm',
@@ -520,9 +519,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'ogre_toe_ring',
     'old_cragmaws_pelt',
     'pale_pearl',
-    'precision_chassis', // phase 07 intermediate, out when its apex row lands
-    'prismglass_setting', // phase 07 intermediate, out when its apex row lands
-    'sablewax_vellum', // phase 07 intermediate, out when its apex row lands
     'seasoned_stock', // phase 07 intermediate, out when its apex row lands
     'silkspun_satchel',
     'soft_down',

@@ -478,13 +478,14 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
 
     // The byte bound itself, on the settled state: the two-sided tracking
-    // band around the phase 08 measurement (10,499 settled bytes; the
-    // authoritative narrative lives at the bound's note above). A re-measure
-    // obligation, not the structural ceiling: drift past either edge reds
-    // here and forces the note to be re-read.
+    // band around the phase 09 measurement (10,756 settled bytes; phase 08
+    // measured 10,499 and the ten phase 09 knownRecipes ids grew the blob
+    // by ~257 bytes; the authoritative narrative lives at the bound's note
+    // above). A re-measure obligation, not the structural ceiling: drift
+    // past either edge reds here and forces the note to be re-read.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(10339);
-    expect(bytes).toBeLessThan(10659);
+    expect(bytes).toBeGreaterThan(10596);
+    expect(bytes).toBeLessThan(10916);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

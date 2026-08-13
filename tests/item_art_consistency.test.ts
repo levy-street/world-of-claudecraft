@@ -736,9 +736,14 @@ describe('item-art consistency accepted-art provenance', () => {
       mapping.license,
       'no ordinary item inherits the retired CraftPix default',
     ).toBeUndefined();
-    expect(mapping.entries).toHaveLength(81);
+    // 81 -> 71 at Masterwrought phase 09: the ten apex items moved from
+    // per-item entries to their own generatedBatches row
+    // (masterwrought-phase09-art, the phase 06 batch pattern), so each has
+    // exactly one current owner and the weapon-batch ownership model sees
+    // the two weapons.
+    expect(mapping.entries).toHaveLength(71);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(17);
+    expect(mapping.generatedBatches).toHaveLength(18);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -755,7 +760,10 @@ describe('item-art consistency accepted-art provenance', () => {
     const oldGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    expect(oldGeneratedIds).toHaveLength(515);
+    // 515 -> 525 at Masterwrought phase 09 (the masterwrought-phase09-art
+    // batch's ten ids; the total owner count below is unchanged because the
+    // ten per-item entries left in the same change).
+    expect(oldGeneratedIds).toHaveLength(525);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),

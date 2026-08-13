@@ -38,8 +38,10 @@ describe('painted weapon inventory icons', () => {
 
   it('covers every authored base weapon exactly once', () => {
     // 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
-    // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10.
-    expect(baseWeapons).toHaveLength(123);
+    // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10;
+    // 125 with the Masterwrought phase 09 pair (duskforged_warblade,
+    // ridgebreaker), painted in masterwrought-phase09-art.
+    expect(baseWeapons).toHaveLength(125);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -68,7 +70,7 @@ describe('painted weapon inventory icons', () => {
     const weaponBatches = batches.filter((batch) =>
       batch.itemIds.some((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
     );
-    expect(weaponBatches).toHaveLength(3);
+    expect(weaponBatches).toHaveLength(4);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -119,9 +121,23 @@ describe('painted weapon inventory icons', () => {
       'marrowpoint',
       'rimefang',
     ]);
+    // Masterwrought phase 09 is the first content phase to ship weapons in
+    // its own woc_original_svg batch (the phase 06/08 batches carried no
+    // weapon ids, so the ownership model never saw one until now).
+    const masterwroughtBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'masterwrought-phase09-art',
+    );
+    expect(masterwroughtBatch).toBeDefined();
+    const masterwroughtWeaponIds = (masterwroughtBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(masterwroughtWeaponIds).toEqual(['duskforged_warblade', 'ridgebreaker']);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
-        (id) => !replacementWeaponIds.includes(id) && !integrationWeaponIds.includes(id),
+        (id) =>
+          !replacementWeaponIds.includes(id) &&
+          !integrationWeaponIds.includes(id) &&
+          !masterwroughtWeaponIds.includes(id),
       ),
     );
     expect(
@@ -162,8 +178,11 @@ describe('painted weapon inventory icons', () => {
     };
     // The chunk records are the frozen weapon campaign's generation reports:
     // they slice the pre-integration weapon roster, without the four
-    // integration daggers that postdate the campaign.
-    const campaignExpected = expected.filter((id) => !integrationWeaponIds.includes(id));
+    // integration daggers or the two Masterwrought phase 09 weapons, both of
+    // which postdate the campaign.
+    const campaignExpected = expected.filter(
+      (id) => !integrationWeaponIds.includes(id) && !masterwroughtWeaponIds.includes(id),
+    );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));
     expect(chunkC).toEqual(campaignExpected.slice(80, 100));

@@ -721,6 +721,7 @@ const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   eastbrook_buckler: 'shield_round',
   highwatch_wallshield: 'shield_square',
   bonewrought_bulwark: 'shield_square',
+  duskforged_bulwark: 'shield_square', // crafted apex tower shield (masterwrought); bulwarks share shield_square
   pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
   // The phase 06 inscription tomes: the first held_offhand item models,
   // procedural GLBs from scripts/assets/inscription_tomes (VAR_BOOK grips).

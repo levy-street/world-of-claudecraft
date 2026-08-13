@@ -3886,7 +3886,12 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
       { nodeId: 'retired_node_xyz', zoneId: null, nodeType: null, remainingSeconds: 30 },
     ]);
     // The server-authored effect vocabulary the restore-slot select renders.
-    expect(sheet.toolEffectIds).toEqual(['gatherers_cache', 'artisans_eye', 'quickening_charm']);
+    expect(sheet.toolEffectIds).toEqual([
+      'gatherers_cache',
+      'artisans_eye',
+      'quickening_charm',
+      'makers_charm',
+    ]);
   });
 
   it('overlays a LIVE serializeCharacter snapshot when the character is online here', async () => {

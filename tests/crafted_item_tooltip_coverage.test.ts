@@ -21,6 +21,7 @@ import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
 import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
 import { materialHintLine } from '../src/ui/material_hint_view';
 import { materialProfessionHintText } from '../src/ui/material_profession_hint_view';
+import { mobileStationTooltipLines } from '../src/ui/mobile_station_tooltip';
 import { recipePatternTooltipLines } from '../src/ui/recipe_pattern_tooltip_view';
 import { toolEffectTooltipLines } from '../src/ui/tool_effect_tooltip';
 
@@ -41,6 +42,8 @@ const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
   ['elixir use line', (def) => elixirTooltipLines(def) !== ''],
   ['gathering tool lines', (def) => gatherToolTooltipLines(def) !== ''],
   ['tool effect charm lines', (def) => toolEffectTooltipLines(def) !== ''],
+  // The station-name resolver is irrelevant to the has-a-card predicate.
+  ['mobile station lines', (def) => mobileStationTooltipLines(def, () => 'station') !== ''],
   ['enchanting material hint', (def) => materialHintLine(def.id) !== ''],
   ['raw cooking catch hint', (def) => cookingCatchHintKey(def.id) !== undefined],
   ['used-by profession hint', (def) => materialProfessionHintText(def.id) !== ''],
@@ -128,6 +131,7 @@ describe('crafted item tooltip coverage', () => {
     for (const call of [
       'gatherToolTooltipLines(item)',
       'toolEffectTooltipLines(item)',
+      'mobileStationTooltipLines(item, stationNameText)',
       'materialHintLine(item.id)',
       'cookingCatchHintKey(item.id)',
       'materialProfessionHintText(item.id)',

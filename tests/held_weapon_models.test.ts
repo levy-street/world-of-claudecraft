@@ -222,12 +222,19 @@ describe('held weapon models', () => {
     expect(unmapped).toEqual([
       'cragmaw_huntquiver',
       'direfang_quiver',
+      // gyrelens_array: the shared art set has no lens-array model (the orb
+      // class of gap); voidbound_grimoire COULD map to a procedural tome GLB
+      // like the phase 06 inscription trio and is recorded as a phase 14
+      // beauty-pass follow-up in the phase 09 ledger, deliberately not
+      // mapped here so the pin stays a conscious exception.
       'gravewyrm_bone_quiver',
+      'gyrelens_array',
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',
       'moggers_hide_quiver',
       'valefire_lantern',
+      'voidbound_grimoire',
       'wraithfire_orb',
     ]);
   });
