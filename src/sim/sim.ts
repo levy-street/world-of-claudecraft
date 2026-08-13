@@ -7273,16 +7273,18 @@ export class Sim {
     return moved;
   }
 
-  // The one funnel every PLAYER-sourced crowd-control application passes
-  // through: the PvP diminishing-returns ladder, then the item-set duration
+  // The one funnel every crowd-control application passes through: source
+  // ownership resolution (a player's minion counts as that player for PvP DR),
+  // then the PvP diminishing-returns ladder, then the item-set duration
   // reduction on top of it. Body moved to stun_dr.ts (crowdControlDurationAfterDr
   // / diminishedCrowdControlDuration, see their doc comments there); kept as a
   // thin delegate here because SimContext-bound callers (`ctx.diminishedCrowdControlDuration`)
   // and the in-class applyRootAura caller both resolve it on the Sim facade.
-  // Pre-bound once (not re-allocated per call): this delegate sits on the
+  // Pre-bound once (not re-allocated per call): these delegates sit on the
   // per-cast crowd-control path, including the AoE fan-outs in
   // effect_dispatch.ts that can invoke it once per target in a single tick.
   private readonly isHostileToBound = (a: Entity, b: Entity) => this.isHostileTo(a, b);
+  private readonly getEntityBound = (id: number) => this.entities.get(id);
 
   private diminishedCrowdControlDuration(
     source: Entity,
@@ -7293,6 +7295,7 @@ export class Sim {
     return diminishedCrowdControlDurationImpl(
       this.time,
       this.isHostileToBound,
+      this.getEntityBound,
       source,
       target,
       category,

@@ -1019,13 +1019,12 @@ export interface SetBonusEffect {
   pvpOffenseRating?: number;
   pvpDefenseRating?: number;
   // 0..1: fraction removed from the duration of crowd control cast on the
-  // wearer BY A HOSTILE PLAYER. Max-combines across met tiers rather than
-  // summing, so two sources can never stack into immunity. Applied in
-  // Sim.diminishedCrowdControlDuration, which is the player-sourced funnel, so
-  // this is inert against mob and encounter control. (Crowd control applied by
-  // a player's PET is entity kind 'mob' and takes the same non-player early
-  // return, so it is not reduced either: tier text must say "cast on you by
-  // hostile players" rather than "from hostile players".)
+  // wearer BY A HOSTILE PLAYER, their pets and summons included (the DR funnel
+  // resolves a player-owned minion to its owner: resolveCrowdControlSource in
+  // stun_dr.ts). Max-combines across met tiers rather than summing, so two
+  // sources can never stack into immunity. Applied in
+  // Sim.diminishedCrowdControlDuration, whose resolved-source player gate keeps
+  // this inert against unowned mob and encounter control.
   ccDurationReduction?: number;
   proc?: SetProc;
 }
@@ -4156,8 +4155,10 @@ export interface Entity extends ClientMirroredEntityFields {
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)
   // 0..1: duration removed from crowd control cast on this entity by a hostile
-  // PLAYER, from item-set bonuses (1 = immune). Read only by
-  // Sim.diminishedCrowdControlDuration, so mob and encounter control is unaffected.
+  // PLAYER or their minions (pets/summons resolve to their owner), from
+  // item-set bonuses (1 = immune). Read only by
+  // Sim.diminishedCrowdControlDuration, so unowned mob and encounter control is
+  // unaffected.
   ccDurationReduction: number;
   moveSpeed: number;
   hostile: boolean;
