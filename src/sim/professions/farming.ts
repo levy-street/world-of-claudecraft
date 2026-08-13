@@ -66,6 +66,7 @@ import {
 } from '../content/farm_crops';
 import { FARM_BED_IDS, farmBedById } from '../content/farm_patches';
 import { ITEMS } from '../data';
+import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import { forceDismount } from '../mounts';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -500,8 +501,11 @@ export function plantCrop(
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'skill', bedId, cropId });
     return;
   }
-  // 8. Seed in bags.
-  if (ctx.countItem(crop.seedItemId, meta.entityId) < 1) {
+  // 8. Seed in bags. LOCK-AWARE (issue 3042, the v0.38.0 sync heal): a copy
+  //    the owner locked is invisible to every farming sufficiency gate and
+  //    spend below, the same disposal-boundary rule the lock module's header
+  //    names for craft reagent consumption (crafting.ts is the idiom).
+  if (countUnlockedInSlots(meta.inventory, crop.seedItemId) < 1) {
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_seed', bedId, cropId });
     return;
   }
@@ -516,7 +520,7 @@ export function plantCrop(
   const wantWatch = knobs.watch === true;
   const wantTonic = knobs.tonic === true;
   // 9. Compost in bags (one per plant).
-  if (wantCompost && ctx.countItem(FARM_COMPOST_ITEM_ID, meta.entityId) < 1) {
+  if (wantCompost && countUnlockedInSlots(meta.inventory, FARM_COMPOST_ITEM_ID) < 1) {
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_compost', bedId, cropId });
     return;
   }
@@ -526,14 +530,14 @@ export function plantCrop(
   //     mixed kinds allowed, lowest tier first, base before fine).
   let feePlan: readonly WatchFeeLeg[] | null = null;
   if (wantWatch) {
-    feePlan = planWatchFee(crop.tier, (itemId) => ctx.countItem(itemId, meta.entityId));
+    feePlan = planWatchFee(crop.tier, (itemId) => countUnlockedInSlots(meta.inventory, itemId));
     if (!feePlan) {
       ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_fee_produce', bedId, cropId });
       return;
     }
   }
   // 11. Tonic in bags (one per plant).
-  if (wantTonic && ctx.countItem(FARM_GROWTH_TONIC_ITEM_ID, meta.entityId) < 1) {
+  if (wantTonic && countUnlockedInSlots(meta.inventory, FARM_GROWTH_TONIC_ITEM_ID) < 1) {
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_tonic', bedId, cropId });
     return;
   }
@@ -572,15 +576,21 @@ export function plantCrop(
 
   // The seed and every requested knob are spent together BEFORE the pre-roll,
   // so the draw block below is the last thing that happens and every path
-  // reaching it is committed. Payments are pure removeItem field work
-  // (draw-free), and each was proven affordable by its gate above, in this
-  // same synchronous body, so none can come up short here.
-  ctx.removeItem(crop.seedItemId, 1, meta.entityId);
-  if (wantCompost) ctx.removeItem(FARM_COMPOST_ITEM_ID, 1, meta.entityId);
+  // reaching it is committed. Payments are pure slot field work (draw-free),
+  // and each was proven affordable by its LOCK-AWARE gate above, in this
+  // same synchronous body, so none can come up short here. The removal walk
+  // is the lock module's (highest bag index first, locked slots never
+  // victims), mirroring the crafting.ts reagent consumption; like there,
+  // removeUnlockedFromSlots mutates the array only, so the quest hook fires
+  // once for the whole payment below (plant_crop stays a HEAVY_SELF_CMDS
+  // member, which is what keeps the self snapshot fresh).
+  removeUnlockedFromSlots(meta.inventory, crop.seedItemId, 1);
+  if (wantCompost) removeUnlockedFromSlots(meta.inventory, FARM_COMPOST_ITEM_ID, 1);
   if (feePlan) {
-    for (const leg of feePlan) ctx.removeItem(leg.itemId, leg.count, meta.entityId);
+    for (const leg of feePlan) removeUnlockedFromSlots(meta.inventory, leg.itemId, leg.count);
   }
-  if (wantTonic) ctx.removeItem(FARM_GROWTH_TONIC_ITEM_ID, 1, meta.entityId);
+  if (wantTonic) removeUnlockedFromSlots(meta.inventory, FARM_GROWTH_TONIC_ITEM_ID, 1);
+  ctx.onInventoryChangedForQuests?.(meta);
 
   // ---- THE ONE PRE-ROLL BLOCK: EXACTLY TWO DRAWS, CONTIGUOUS, IN ORDER ----
   // Nothing may be inserted between, before, or after these two lines that
@@ -967,14 +977,20 @@ export function convertHusks(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     ctx.error(meta.entityId, "You can't do that while dead.");
     return;
   }
-  const husks = ctx.countItem(FARM_WITHERED_HUSK_ITEM_ID, meta.entityId);
+  // LOCK-AWARE (issue 3042, the v0.38.0 sync heal): a locked husk stack is
+  // neither counted toward a batch nor a removal victim, the same
+  // disposal-boundary rule as the plant-time spends (crafting.ts idiom); the
+  // quest hook fires once after the removal since the lock walk mutates the
+  // array only.
+  const husks = countUnlockedInSlots(meta.inventory, FARM_WITHERED_HUSK_ITEM_ID);
   const batches = Math.floor(husks / FARM_HUSKS_PER_COMPOST);
   if (batches < 1) {
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_husks' });
     return;
   }
   const spent = batches * FARM_HUSKS_PER_COMPOST;
-  ctx.removeItem(FARM_WITHERED_HUSK_ITEM_ID, spent, meta.entityId);
+  removeUnlockedFromSlots(meta.inventory, FARM_WITHERED_HUSK_ITEM_ID, spent);
+  ctx.onInventoryChangedForQuests?.(meta);
   // silent + callerLogs: the farmHusksConverted event below owns both halves
   // of the player feedback (the farmHarvested precedent, #2430). The generic
   // "You receive:" hub line would be a second line for the one trade, and
