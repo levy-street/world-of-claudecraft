@@ -17,7 +17,7 @@
 | 07 | Intermediates and the Quickening Catalyst | complete | 2026-08-11 | 2026-08-12 |
 | 07 QA | verify | complete | 2026-08-12 | 2026-08-12 |
 | 08 | Apex armor catalogs | complete | 2026-08-12 | 2026-08-12 |
-| 08 QA | verify | pending | | |
+| 08 QA | verify | complete | 2026-08-13 | 2026-08-13 |
 | 09 | Apex weapons, jewelry, gadgets | pending | | |
 | 09 QA | verify | pending | | |
 | 10 | Apex consumables and enchants | pending | | |
@@ -305,3 +305,29 @@ never future-PR items, per the delivery contract in `state.md`).
   pins, the daily chip's stylesheet-reach pin). Both deferred follow-ups
   closed with evidence (the mobile Used-by capture, the ten-icon owner
   review). Gate PASS at the final code tip. Full ledger in state.md.
+- Phase 08 (2026-08-12): nine apex epic armor pieces at the committed slot
+  audit's picks (mail waist/legs/feet, leather chest/legs/gloves, cloth
+  chest/legs/gloves) plus the 16-slot tailoring apex bag; every primary sum
+  equals primaryStatBudget(31, 'epic', slot), one rating at the band's 40
+  (crit x5 / haste x3 / hit x1) complementing each named reference drop,
+  armor copied byte-equal from ilvl-31 references; APEX_ARMOR_RECIPES ten
+  rows (skill 100, level 25, drop-only per R8, the demand-math bills); the
+  R1 masterwork suppression via craftBonusStatsFor at both crafting.ts
+  twins (draw unconditional, parity unmoved); pbe_boost and /dev bis cap
+  arms; the budget sweep test born; ten SVG-derived icons with provenance;
+  guide Masterwrought section and the From a found pattern source arm; five
+  review reports applied or ruled-with-reason. Full ledger in state.md.
+- Phase 08 QA (2026-08-13): verdict PASS. Six-dimension ultracode fan-out
+  (ordering, correctness, R1 suppression, stat shape, cleanup, decisiveness
+  in an isolated worktree: eight mutation probes red-as-expected with named
+  assertions) plus adversarial verifiers, a context briefing, and
+  qa-checklist leads independently closed; two release re-sync merges owned
+  by the QA (v0.38.0 tips 51b342bdae and b3832c34fd, generated artifacts
+  re-minted from the merged tree). Fix round: portable createRequire in
+  both provenance rasterizers, oncePerDay and bag-disenchant pins in the
+  sweep, the exact at-cap kit count pinned in pbe_boost, the never-Hit
+  clause restored with a dated OUTCOME amendment, ledger prose scoped, an
+  unused type import dropped. All three deferred items closed with
+  evidence (fresh ten-icon review PASS, the three in-browser captures
+  committed, the S2 note surfaced). Gate PASS at the final tip. Full
+  ledger in state.md.

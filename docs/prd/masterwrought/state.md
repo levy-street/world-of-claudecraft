@@ -1,12 +1,13 @@
 # Masterwrought: cross-phase state
 
-Current phase: 08 BUILT (2026-08-12, see the Phase 08 ledger: nine apex armor
-pieces + the tailoring apex bag off the committed slot coverage audit, the R1
-masterwork suppression, the budget sweep test born, five review reports all
-applied or ruled-with-reason); next is Phase 08 QA (fresh session, sync first
-per the delivery contract), then Phase 09 apex weapons/jewelry/gadgets.
+Current phase: 08 QA COMPLETE (2026-08-13, verdict PASS, see the Phase 08 QA
+ledger: six-dimension ultracode audit plus qa-checklist READY, zero blocking
+anywhere, a nine-commit QA round all reviewed, all three deferred items
+closed with evidence, gate PASS all 8 steps at the full-suite fallback);
+next is Phase 09 apex weapons/jewelry/gadgets (fresh session, own release
+sync first per the delivery contract).
 Packet authored 2026-08-07.
-Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.37.0`.
+Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.38.0`.
 
 ## Delivery contract (non-negotiable)
 - The ENTIRE system ships in ONE branch and ONE PR from `feature/masterwrought`. There are
@@ -2486,7 +2487,11 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   maintainer review with the fresh-review's eight register nits listed in its
   report (ja slot-noun drift and transliterate-vs-translate split, ru bridzhi
   register and the missing yo, zh manufacture-vs-craft verb, the calqued
-  family-rule phrase, row placement, line style).
+  family-rule phrase, row placement, line style). QA ADDITION (2026-08-13,
+  qa-checklist): the fill of guide.gear.masterwroughtBody in the fifteen
+  pending locales must extend CAP_PROSE_BY_LOCALE in
+  tests/masterwrought_cap.test.ts in the SAME change, or the cap-retune
+  sweep goes blind to exactly the filled copies it exists to catch.
 - VALIDATION: tsc clean; ci:changed exit 0; the phase suite matrix green
   (progression, recipe_economy, itemization_coverage, item_level,
   masterwrought_budget, shipped_item_ids, guide) plus the blast-radius set
@@ -2706,3 +2711,191 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   parity 207, naming guards, portrait trio, eastbrook, monolith,
   architecture, S3, snapshots, masterwrought suites, and the touched suites
   156 post-review).
+
+## Phase 08 QA (2026-08-13, verdict PASS; the six-dimension re-audit the phase-08-qa prompt ordered)
+- RE-SYNC (Step 0, second v0.38.0 merge, 561e0d7767): the release moved 16
+  commits past the fa51741408 sync (chronomancer rank 4 heal tuning PR #2786,
+  a portrait re-bless, the Temporal Echo tooltip area-rate fix, hud.css
+  reduced-motion cleanup, a c4b golden re-mint). Three generated artifacts
+  conflicted and were re-minted from the MERGED tree, never side-picked: the
+  c4b_effect_dispatch parity golden (UPDATE_PARITY re-record; branch side
+  samples craftDaily, release side had the new chronomancy behavior; full
+  parity suite green at 207), and the portrait manifest + accepted-art pin
+  (230/230 receipt-flow rerender, byte-identical portraits; only the stills
+  bundle digest moved). release-merge-audit: the six code overlaps
+  (damage/effect_dispatch/types/classes/action_bar_view/mage_choice_rows) are
+  disjoint-additive with both sides' tokens verified surviving; no new
+  endpoints, no injected-helper reshapes, no new db-mock sites, no locale
+  rows (naming guards green anyway). PHASE 15 NOTE: the chronomancer heal
+  tuning joins the combat-rogue re-band as a mover of the pre-packet R5
+  baseline; the existing build-the-baseline-after-sync guidance covers it.
+- AUDIT (Step 2): ultracode Workflow fan-out, six dimensions (ordering,
+  correctness, R1 suppression, stat shape, cleanup, test-decisiveness in an
+  ISOLATED worktree) plus per-finding adversarial verifiers (nothing
+  refuted), a parallel context briefing, and qa-checklist. Every dimension
+  PASS; qa-checklist verdict READY with zero blocking. qa-checklist also ran
+  the mechanical vitest-related sweep over all 13 changed source modules:
+  1594 test files / 24251 tests green, plus 36 blast-radius suites by hand.
+  Its four deep leads all closed CLEAN with evidence: (1) the R1 null
+  bonusStats starves the QUALITY bump too, not just the stat bake
+  (masterworkBumpedQuality is only consumed where bonusStats !== null), so an
+  apex craft can never mint a legendary-quality instance; (2) the ten
+  drop-only recipes are genuinely unlearnable today (only an EMPTY
+  acquisition list is grandfathered; trainer and pattern paths both refuse);
+  (3) the saved-loadout gear swap routes per-slot through equipItemImpl, so
+  the equip cap holds on the bulk path; (4) a cap retune sweeps the guide
+  copy via CAP_PROSE_BY_LOCALE (tests/masterwrought_cap.test.ts).
+- DECISIVENESS (isolated worktree at 561e0d7767): static checks S1-S4 clean
+  (EXPECTED table exactly matches the flagged set with zero dynamic flag
+  writes; the literal arm is a true literal and the formula arm reads the
+  independent item_budget leaf, proven separately live via the P1b
+  both-sides-retune probe; frozen-id golden delta +10/-0; name gates green).
+  All EIGHT mutation probes reddened their claiming suites with named
+  assertions and pasted counts against a proven 198-test green baseline:
+  stat retune (literal arm), rating swap (per-def field pin), flag drop
+  (completeness arm 1 AND the per-piece arm), R1 guard revert (the
+  forced-roll arm, re-proving the ledger's mutation-proven claim live), tier
+  row flip (the professions_masterwork literal table + chance-inputs arms,
+  owning-suite-mapped per the wrong-suite trap), cap-call delete (9 pbe
+  tests), /dev bis cap stub (the synthetic over-cap arm), R14 forbidden key
+  (the whole-def whitelist), and both sweep-growth arms (new flagged def and
+  new recipe row each red the completeness arms, so phase 09/10 appends
+  cannot silently skip the sweep). Reverts verified byte-clean between every
+  probe; the shared stash untouched.
+- FOUND AND FIXED (the QA fix round, seven commits, each with body):
+  52dadfcb52 the three deferred evidence captures; 4dfa0d2057 portable
+  createRequire in BOTH provenance rasterizers (phase 08 copied phase 07's
+  machine-absolute path; failed on any other clone and after worktree
+  deletion); 02dece2626 sweep pins for oncePerDay absence (both arms) and
+  the bag disenchant kind gate; e50a276e01 the pre-existing unused
+  PlayerMeta type import out of bags.ts (stills bundle proven byte-identical
+  after, manifest fresh); 0b63f2ea8f the never-Hit clause restored with a
+  dated OUTCOME amendment (the ledger close 063842c7ab had silently deleted
+  it while the BUILT ruling still cited it) plus the int/sta scoping and two
+  tie-break clarifications; 47b3892513 the pbe_boost at-cap positive control
+  pinned to the exact 10 (a bare > 0 floor tolerated demotion over-firing on
+  nine of ten capped kits); 975ea06f1f the professions CLAUDE.md R1 row
+  (phases 09/10 author against that file) and the corrected
+  enforceMasterwroughtCap hand-arm comment (mainhand empties with no
+  fallback; offhand DOES refill but bypasses fillHands' two-hand exclusion
+  and shield legality, so phase 09 routes hand demotion through fillHands
+  rather than adding a mainhand fallback).
+- RECORDED, NO CODE OWED (fresh-eyes observations, all verified):
+  - The warrior_intervene one-line hunk in the build diff was biome hygiene
+    on a changed-set file; the build commit's "biome error" framing
+    overstates it (measured: warn-severity useOptionalChain, biome ci exit
+    0). Harmless either way.
+  - The apex BAG's masterwork-incapability rests on masterwork.ts's own
+    slotless guard, not on R1 (no flag, no suppression needed); stated here
+    so phase 10's consumables (also slotless) inherit the same understanding.
+  - The ledger's discarded-outcome trio is complete for DURABLE outcomes;
+    the same result.masterwork boolean also suppresses the masterwork
+    SimEvent emit, the zone announcement, meta.lastMasterwork, and the
+    craftResult masterwork field. Phase 12 decides what a head-start proc
+    emits and announces, not only what it credits.
+  - The rating-spread arm in the sweep is an in-file table-shape pin (both
+    sides from APEX_ARMOR); source coverage comes from the per-piece
+    def-field pins beside it. Deliberate, not vacuous.
+  - None of the nine apex defs carries requiredClass while all nine band
+    references do: equip eligibility is armor-proficiency-wide, slightly
+    wider than the class-locked drops. Judged deliberate under R2
+    tradability and the classic crafted-gear norm; no rating dominance
+    (off-archetype wearers get off-stat primaries). Recorded as the standing
+    shape for phases 09/10.
+  - src/sim/content/rift/items.ts's rating-rule comment classes int/spi
+    wholesale as healer-facing, which surface-contradicts the operative
+    catalog rule (authored Hit seed distinguishes caster-DPS from healer
+    cloth, heroic_variants.ts); the rift comment is the stale one. Cosmetic;
+    left for a rift-content pass.
+  - APEX_ARMOR_RECIPES' per-row "Input N vs output M" comments bake today's
+    prices; the invariant itself recomputes live in two suites, so staleness
+    is cosmetic only.
+  - The commission-order board lists the nine apex epics by name (full
+    recipeList through isCommissionEligible), so pre-phase-11 a player can
+    open an order nobody can fill, and the names surface beside the
+    deliberately rule-level wiki section. Structurally void under the one-PR
+    contract (patterns ship before players see this); recorded for the
+    maintainer beside S2, and phase 11 should re-check the board once
+    patterns land.
+- DEFERRED-WITH-OWNER ITEMS CLOSED (evidence per the QA prompt):
+  (a) Ten-icon visual pass: the QA session re-reviewed all ten committed
+  WebPs fresh at shipping size (independent of the build's admission
+  self-review): three coherent families (riveted steel mail, warm leather
+  with the fenbloom motif, navy-and-gold Sunspun across the cloth trio plus
+  haversack), slot silhouettes unambiguous, opaque house ground, no
+  legibility defects; verdict PASS, all ten. Note for the record:
+  final-item-art-audit-verdict.json's "reviewed at admission" prose is the
+  build's SELF-review; this QA re-review is the second pair of eyes, and the
+  maintainer can spot-check via the committed icons and captures at leisure.
+  (b) In-browser eyeballs: three captures committed under
+  docs/screenshots/masterwrought-phase08-qa/ at the lowest graphics preset:
+  the first live "Unique-Equipped: Masterwrought (2)" tag on Sunspun
+  Vestments through the real bag-hover path (the tooltip also visually
+  confirms the chest budget 12+10, Hit 40, Requires Level 20, and the 2s
+  sell line), the /wiki gear Masterwrought section, and the tailoring craft
+  page's "From a found pattern" cell showing the exact recorded bill.
+  (c) S2 shipping window: surfaced to the maintainer in the QA report (with
+  the commission-board corollary above): from phase 08 until phase 12 an
+  apex epic is the one slotted craft that can never proc masterwork or
+  credit the masterwork marks, and until phase 11 the ten recipes have no
+  live acquisition path; both are structurally void under the one-PR
+  delivery contract and exist only inside this branch.
+- RELEASE-FILL OBLIGATION ADDED (qa-checklist): filling
+  guide.gear.masterwroughtBody in the fifteen pending Latin locales must
+  extend CAP_PROSE_BY_LOCALE in tests/masterwrought_cap.test.ts in the SAME
+  change, or the cap-retune sweep goes blind to exactly the filled copies it
+  exists to catch. Recorded on the BUILT ledger's release-fill line too.
+- PHASE 12 ADDITIONS (beyond the build's list): the loadout gear swap
+  reports a cap refusal as copyGone ("that copy is gone") because
+  applyGearSet folds every equip refusal into one counter; reachable once
+  two flagged pieces are worn and a saved set names two others. Pre-existing
+  refusal-classification debt (level and unique-equipped misreport the same
+  way); fold into phase 12's equip-time re-validation work. Plus the
+  emit/announce enumeration above.
+- FIX-ROUND REVIEW (the fixes are unreviewed code rule): a fresh reviewer
+  re-derived the re-sync merge mechanically (git merge-tree reproduces the
+  auto-merge byte-identically outside the three re-minted artifacts, each
+  merged blob differing from BOTH parents, so the resolutions are true
+  re-mints, never side-picks), re-verified every fix commit's claims against
+  code and content (the restored clause byte-matches ab683da04d; the
+  Hit-seed mechanism confirmed at heroic_variants.ts; the 10-of-16 count and
+  the oncePerDay/disenchant pins proven live; zero dashes or emojis across
+  every added line), and returned ZERO blocking and zero should-fix. Its
+  four nits are applied at 4dd0cd2995: the tooltip capture renamed off the
+  -desktop viewport claim, the hand-arm comment re-cut on the true
+  weapon-vs-non-weapon asymmetry (a dual-wield offhand WEAPON also empties;
+  only shields and held offhands refill), the of-16 denominator restored,
+  the int/sta enumeration extended with the heroic soulflame variants. Two
+  info notes recorded: the rasterizers' depth-3 repo-root walk is unpinned
+  (a future art dir at another depth fails LOUDLY, accepted); the
+  pre-authoring census counts base ids only (auto heroic variants excluded;
+  with them mail helmet reads 3 not 4 at the helmet cell, no pick moves),
+  worth a scope word if the census is ever re-derived.
+- DURABLE TRAP (memory written, workflow-isolation-worktree-wrong-ref): a
+  Workflow agent spawned with isolation 'worktree' from this secondary
+  worktree got its checkout at the WRONG ref (a v0.37.1 merge with zero
+  masterwrought files); the baked-in setup check caught it and the agent
+  recovered via detached checkout of the branch tip. Every future isolated
+  agent prompt bakes the expected sha and verifies before working.
+- GATE (Step 4): node scripts/gate_select.mjs PASS (exit 0, all 8 steps, the
+  planner fell back to the full suite on the broad generated-artifact churn:
+  2692 test files / 37381 tests passed, 2 expected fail, 112 skipped, at
+  GATE_MAX_WORKERS=5; browser regressions 18 files / 118 tests; i18n gen +
+  freshness, malware scan, changed-files biome, SFX conformance, typecheck,
+  and all builds green) at the QA code tip 975ea06f1f. The two commits after
+  the gate (4dd0cd2995 reviewer nits, plus this docs close) are comment,
+  docs, and rename-only: the one touched suite re-ran green (pbe_boost 34)
+  and biome is clean on both touched files at the final tip. Portrait
+  manifest verified fresh at the final code state (the bags.ts type-import
+  removal left the stills bundle byte-identical).
+- NEXT: Phase 09 (apex weapons, jewelry, gadgets) in a fresh session, own
+  release sync first. Handoff knobs, all verified live this QA: the sweep's
+  two completeness arms force 09/10 appends into the EXPECTED table in the
+  same change; jewelry pins against JEWELRY_RATING 25 (heroic_vendor.ts),
+  never the armor 40; hand demotion routes through fillHands per the
+  corrected comment (the largest cap-coverage hole: no flagged-hand
+  demotion arm exists yet); the injectable isFlagged seam and
+  masterwroughtConflictSlot are TWO definitions of flagged that move
+  together; the admission-side capacity twin goes load-bearing the moment a
+  recipe ships resultCount > 1; the at-cap kit count pin (10) will move on
+  appends and is re-acknowledged deliberately.
