@@ -65,6 +65,29 @@ describe('bag_item_context_menu: action eligibility', () => {
     expect(bagItemNewActions(def('material'), 'arcane_dust')).toEqual(['applyEnchant', 'lock']);
     expect(bagItemHasContextActions(def('material'), 'arcane_dust')).toBe(true);
   });
+  it('keeps Sunder on a locked raid epic: lock-exempt like disenchant', () => {
+    // The lock protects against salvage, craft consumption, and vendor sale
+    // only (the issue 3042 first-pass scope); sunder follows the disenchant
+    // precedent and stays offered on a locked copy, matching the sim, whose
+    // sunderAdmitted has no lock arm (pinned end to end in
+    // tests/masterwrought_materials.test.ts). Classification taken at the
+    // v0.38.0 sync merge (fa51741408), recorded for maintainer ratification;
+    // if the sim ever gains a lock deny for sunder, flip both pins together.
+    const raidEpic = { ...def('armor', 'epic'), id: 'crownforged_dreadhelm' } as ItemDef;
+    const locked = { locked: true } as ItemInstancePayload;
+    // Self-validating fixture: the id must still be a live raid-sourced epic.
+    expect(bagItemNewActions(raidEpic, 'crownforged_dreadhelm')).toEqual([
+      'disenchant',
+      'salvage',
+      'sunder',
+      'lock',
+    ]);
+    expect(bagItemNewActions(raidEpic, 'crownforged_dreadhelm', locked)).toEqual([
+      'disenchant',
+      'sunder',
+      'unlock',
+    ]);
+  });
   it('offers Unlock instead of Lock, and never Salvage, on a locked copy', () => {
     const locked = { locked: true } as ItemInstancePayload;
     // Salvage would destroy the copy, so a locked one never offers it (mirrors

@@ -744,6 +744,27 @@ describe('sundered essence: the extraction', () => {
     ).toEqual([expect.objectContaining({ callerLogs: true, silent: true })]);
   });
 
+  it('sunders a player-locked copy: the lock exemption holds end to end', () => {
+    // The v0.38.0 item lock (issue 3042) refuses salvage, craft reagent
+    // consumption, and vendor sell only; sundering.ts deliberately carries no
+    // lock arm (the disenchant precedent from the release's own first-pass
+    // scope), so a deliberately targeted locked raid epic still breaks. This
+    // classification was taken at the v0.38.0 sync merge (fa51741408) and is
+    // recorded in the state.md ledger for maintainer ratification: if sunder
+    // ever gains a lock deny, flip this pin and the locked-copy menu pin in
+    // tests/bag_item_context_menu.test.ts together, they are one surface.
+    const sim = makeSunderSim();
+    const { pid, meta } = playerOf(sim);
+    sim.addItem(RAID_EPIC, 1, pid);
+    const slot = meta.inventory.find((s) => s.itemId === RAID_EPIC);
+    if (!slot) throw new Error('raid epic not granted');
+    slot.instance = { ...(slot.instance ?? {}), locked: true };
+    sim.drainEvents();
+    runSunder(sim, RAID_EPIC, pid, meta.inventory.indexOf(slot));
+    expect(sim.countItem(RAID_EPIC, pid)).toBe(0);
+    expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(SUNDERED_ESSENCE_YIELD);
+  });
+
   it('refuses a non-raid epic, an unknown id, and an unheld item, consuming nothing', () => {
     const sim = makeSunderSim();
     const { pid } = playerOf(sim);
