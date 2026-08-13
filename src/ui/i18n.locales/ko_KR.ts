@@ -10529,12 +10529,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.landOnly': '낚싯대에는 장착할 수 없습니다.',
   'hudChrome.professions.mobileStationTooltip.kind': '야전 제작 거점',
   'hudChrome.professions.mobileStationTooltip.use':
-    '발밑에 파티가 함께 쓰는 야전 화로를 설치합니다.',
+    '발밑에 파티가 함께 쓰는 {station}을(를) 설치합니다.',
   'hudChrome.professions.mobileStationTooltip.radius':
-    '{radius}야드 안의 파티원이 그곳에서 제작할 수 있습니다.',
+    '본인은 어디서든 그곳에서 제작할 수 있습니다. 파티원은 {radius}야드 안에 있어야 합니다.',
   'hudChrome.professions.mobileStationTooltip.duration': '{minutes}분 동안 유지됩니다.',
   'hudChrome.professions.mobileStationTooltip.notConsumed': '사용해도 소모되지 않습니다.',
-  'hudChrome.professions.mobileStationTooltip.replace': '설치하면 가동 중인 야전 거점이 대체됩니다.',
+  'hudChrome.professions.mobileStationTooltip.replace':
+    '설치하면 가동 중인 야전 거점이 대체됩니다. 전문화로 설치한 거점도 포함됩니다.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
     '전문 기술 창을 열어 채집 도구에 장착하세요.',
   'hudChrome.professions.toolEffectSlotButton': '{effect} 장착',

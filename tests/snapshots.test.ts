@@ -36,7 +36,7 @@ import {
   priestMarkerStateForAuras,
 } from '../src/sim/combat/priest/presentation';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
-import { STATION_RADIUS } from '../src/sim/content/professions';
+import { CRAFT_RING, STATION_RADIUS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -5091,10 +5091,43 @@ describe('full self-state snapshot delta fixture', () => {
     expect(inRangeSnap.self.mst).toBe('weaponcrafting');
     const client = bareClient(a.pid);
     (client as any).applySnapshot(inRangeSnap);
-    expect(client.activeMobileStationCrafts).toContain('weaponcrafting');
+    expect(client.activeMobileStationCrafts).toEqual(['weaponcrafting']);
+
+    // Same raw value again: the split is cached against the raw string, so
+    // an identical delta must keep ARRAY IDENTITY (no per-snapshot
+    // reallocation), and the cached array is frozen against consumer
+    // mutation.
+    const cached = client.activeMobileStationCrafts;
+    (client as any).applySnapshot(inRangeSnap);
+    expect(client.activeMobileStationCrafts).toBe(cached);
+    expect(Object.isFrozen(client.activeMobileStationCrafts)).toBe(true);
+
+    // A also holds an OWN active station of a different craft: the wire
+    // value becomes the SORTED comma-join and the split round-trips BOTH
+    // elements. This is the multi-element arm the whole set widening exists
+    // for; a delimiter mutation on either side dies here.
+    sim.meta(a.pid)!.mobileStation = {
+      playerId: 'Walker',
+      craftId: 'alchemy',
+      partyShared: false,
+      pos: { x: ea.pos.x, z: ea.pos.z },
+      placedAtTick: sim.tickCount,
+      expiresAtTick: sim.tickCount + 12000,
+    };
+    broadcast(server);
+    const twoSnap = lastSnap(fcA.sent);
+    expect(twoSnap.self.mst).toBe('alchemy,weaponcrafting');
+    (client as any).applySnapshot(twoSnap);
+    expect(client.activeMobileStationCrafts).toEqual(['alchemy', 'weaponcrafting']);
+
+    // The join is only unambiguous while craft ids stay comma-free; pin the
+    // whole catalog so a comma-bearing id is a deliberate wire decision.
+    for (const craft of CRAFT_RING) expect(craft.id).not.toContain(',');
 
     // A walks past STATION_RADIUS of the station; the very next broadcast
-    // must clear the mirror even though no station was placed or expired.
+    // must drop the shared craft even though no station was placed or
+    // expired (the own station keeps serving at any distance).
+    sim.meta(a.pid)!.mobileStation = null;
     ea.pos.x = STATION_RADIUS * 3;
     ea.prevPos = { ...ea.pos };
     broadcast(server);

@@ -94,12 +94,17 @@ export function bestEpicGearFor(
   const flagged = (Object.entries(picks) as [EquipSlot, string][]).filter(
     ([, id]) => ITEMS[id]?.masterwrought,
   );
+  // The refill exclusion only binds after a demotion (a refill can never
+  // re-select a different over-cap flagged item); with the cap not firing
+  // there is no over-cap set to exclude, so the pair re-run below admits
+  // everything.
+  let allowedRefill: (item: ItemDef) => boolean = () => true;
   if (flagged.length > MASTERWROUGHT_EQUIP_CAP) {
     const scored = flagged
       .map(([slot, id]) => ({ slot, id, s: score(ITEMS[id]) }))
       .sort((a, b) => b.s - a.s || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
     const kept = new Set(scored.slice(0, MASTERWROUGHT_EQUIP_CAP).map((entry) => entry.id));
-    const allowedRefill = (item: ItemDef): boolean => !item.masterwrought || kept.has(item.id);
+    allowedRefill = (item: ItemDef): boolean => !item.masterwrought || kept.has(item.id);
     for (const demoted of scored.slice(MASTERWROUGHT_EQUIP_CAP)) {
       used.delete(demoted.id);
       const fallback = bestFor(demoted.slot, allowedRefill);
@@ -110,45 +115,46 @@ export function bestEpicGearFor(
         delete picks[demoted.slot];
       }
     }
-    // bestFor is per-slot legality only: a hand refill re-applies the
-    // one-hander preference but never the two-hand/offhand exclusion, so a
-    // mainhand refilled to a two-hander (when nothing one-handed remained)
-    // can stand beside an offhand pick, and an offhand refill can land
-    // beside a kept two-hand mainhand. Re-validate the pair with the shared
-    // displacement rule and, when it fails, re-run the hand fill in the
-    // initial order (mainhand first, then a partner the mainhand does not
-    // displace) under the same refill exclusion; kept flagged hand picks
-    // stay candidates, so the re-run re-selects them.
-    const clsKey = cls as Parameters<typeof canEquipItemInSlot>[0];
-    const lookup = (id: string) => ITEMS[id];
-    const offhandDef = picks.offhand !== undefined ? ITEMS[picks.offhand] : undefined;
-    const pairIllegal =
-      picks.mainhand !== undefined &&
-      offhandDef !== undefined &&
-      displacedSlotForEquip(offhandDef, 'offhand', picks, lookup, clsKey, spec) !== null;
-    if (pairIllegal) {
-      for (const slot of ['mainhand', 'offhand'] as const) {
-        const id = picks[slot];
-        if (id !== undefined) {
-          used.delete(id);
-          delete picks[slot];
-        }
+  }
+  // bestFor is per-slot legality only: neither the INITIAL fill nor a
+  // demotion refill applies the two-hand/offhand exclusion, so a mainhand
+  // two-hander (picked when nothing one-handed exists for the class) can
+  // stand beside an offhand pick, and an offhand refill can land beside a
+  // kept two-hand mainhand. This check therefore runs on EVERY path, not
+  // only when the cap fired: re-validate the pair with the shared
+  // displacement rule and, when it fails, re-run the hand fill in the
+  // initial order (mainhand first, then a partner the mainhand does not
+  // displace) under the refill exclusion; kept flagged hand picks stay
+  // candidates, so the re-run re-selects them.
+  const clsKey = cls as Parameters<typeof canEquipItemInSlot>[0];
+  const lookup = (id: string) => ITEMS[id];
+  const offhandDef = picks.offhand !== undefined ? ITEMS[picks.offhand] : undefined;
+  const pairIllegal =
+    picks.mainhand !== undefined &&
+    offhandDef !== undefined &&
+    displacedSlotForEquip(offhandDef, 'offhand', picks, lookup, clsKey, spec) !== null;
+  if (pairIllegal) {
+    for (const slot of ['mainhand', 'offhand'] as const) {
+      const id = picks[slot];
+      if (id !== undefined) {
+        used.delete(id);
+        delete picks[slot];
       }
-      const main = bestFor('mainhand', allowedRefill);
-      if (main) {
-        picks.mainhand = main.id;
-        used.add(main.id);
-      }
-      const off = bestFor(
-        'offhand',
-        (item) =>
-          allowedRefill(item) &&
-          displacedSlotForEquip(item, 'offhand', picks, lookup, clsKey, spec) === null,
-      );
-      if (off) {
-        picks.offhand = off.id;
-        used.add(off.id);
-      }
+    }
+    const main = bestFor('mainhand', allowedRefill);
+    if (main) {
+      picks.mainhand = main.id;
+      used.add(main.id);
+    }
+    const off = bestFor(
+      'offhand',
+      (item) =>
+        allowedRefill(item) &&
+        displacedSlotForEquip(item, 'offhand', picks, lookup, clsKey, spec) === null,
+    );
+    if (off) {
+      picks.offhand = off.id;
+      used.add(off.id);
     }
   }
   return picks;

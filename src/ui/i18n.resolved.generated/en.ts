@@ -3173,11 +3173,11 @@ export const en: EnTranslations = {
       },
       "mobileStationTooltip": {
         "kind": "Field station",
-        "use": "Places a party-shared field forge at your feet.",
-        "radius": "Party members within {radius} yards can craft at it.",
+        "use": "Places a party-shared {station} at your feet.",
+        "radius": "You can craft at it from anywhere; party members must be within {radius} yards.",
         "duration": "Lasts {minutes} minutes.",
         "notConsumed": "Never consumed.",
-        "replace": "Placing replaces your active field station."
+        "replace": "Placing replaces your active field station, including a specialty-placed one."
       },
       "toolEffectSlotButton": "Slot {effect}",
       "toolEffectRechargeButton": "Recharge",

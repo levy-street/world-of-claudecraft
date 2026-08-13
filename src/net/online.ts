@@ -3696,7 +3696,13 @@ export class ClientWorld implements IWorld {
         const rawMst = (s.mst as string | null) ?? null;
         if (rawMst !== this.activeMobileStationCraftsRaw) {
           this.activeMobileStationCraftsRaw = rawMst;
-          this.activeMobileStationCrafts = rawMst === null ? [] : rawMst.split(',');
+          // Frozen: the cached array is shared with every reader until the
+          // raw string changes, so a consumer mutation would corrupt the
+          // mirror persistently (the offline Sim returns a fresh array per
+          // read and has no such exposure).
+          this.activeMobileStationCrafts = Object.freeze(
+            rawMst === null ? [] : rawMst.split(','),
+          ) as readonly string[];
         }
       }
       // Commission order board (issue #1298): server-gated on the board

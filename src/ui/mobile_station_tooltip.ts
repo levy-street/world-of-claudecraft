@@ -10,8 +10,12 @@
 // (content/professions.ts), with TICK_RATE (types.ts) turning ticks into
 // the minutes the English speaks.
 
-import { MOBILE_CRAFTING_STATION_DURATION_TICKS, STATION_RADIUS } from '../sim/content/professions';
-import { type ItemDef, type ItemUse, TICK_RATE } from '../sim/types';
+import {
+  MOBILE_CRAFTING_STATION_DURATION_TICKS,
+  STATION_RADIUS,
+} from '../sim/content/professions';
+import { stationTypeForCraft } from '../sim/professions/stations';
+import { type ItemDef, type ItemUse, type StationType, TICK_RATE } from '../sim/types';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 
@@ -33,16 +37,25 @@ export function isPlaceMobileStationItem<T extends Pick<ItemDef, 'use'>>(
 /** The tooltip lines for one mobile-station tool item, or '' for any other
  *  item. Composed into Hud.itemTooltip so bags, bank, crafting, market, and
  *  every other surface that reuses itemTooltip show the same card. No title:
- *  the item tooltip already prints the name. */
-export function mobileStationTooltipLines(item: ItemDef): string {
+ *  the item tooltip already prints the name. The station noun derives from
+ *  the def's own stationCraftId through stationTypeForCraft, so a second
+ *  placeMobileStation item names its own station kind; the caller injects
+ *  the localized station-name resolver (stationNameText lives in the
+ *  crafting_window painter, which a pure core must not import). */
+export function mobileStationTooltipLines(
+  item: ItemDef,
+  stationName: (type: StationType) => string,
+): string {
   if (!isPlaceMobileStationItem(item)) return '';
   const radius = formatNumber(STATION_RADIUS, { maximumFractionDigits: 0 });
   const minutes = formatNumber(MOBILE_CRAFTING_STATION_DURATION_TICKS / TICK_RATE / 60, {
     maximumFractionDigits: 0,
   });
+  const type = stationTypeForCraft(item.use.stationCraftId);
+  const station = type ? stationName(type) : '';
   return (
     line('tt-sub', t('hudChrome.professions.mobileStationTooltip.kind')) +
-    line('tt-green', t('hudChrome.professions.mobileStationTooltip.use')) +
+    line('tt-green', t('hudChrome.professions.mobileStationTooltip.use', { station })) +
     line('tt-desc', t('hudChrome.professions.mobileStationTooltip.radius', { radius })) +
     line('tt-desc', t('hudChrome.professions.mobileStationTooltip.duration', { minutes })) +
     line('tt-desc', t('hudChrome.professions.mobileStationTooltip.notConsumed')) +

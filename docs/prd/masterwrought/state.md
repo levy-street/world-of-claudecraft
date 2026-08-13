@@ -1,11 +1,13 @@
 # Masterwrought: cross-phase state
 
-Current phase: 08 QA COMPLETE (2026-08-13, verdict PASS, see the Phase 08 QA
-ledger: six-dimension ultracode audit plus qa-checklist READY, zero blocking
-anywhere, a nine-commit QA round all reviewed, all three deferred items
-closed with evidence, gate PASS all 8 steps at the full-suite fallback);
-next is Phase 09 apex weapons/jewelry/gadgets (fresh session, own release
-sync first per the delivery contract).
+Current phase: 09 BUILT (2026-08-13: the v0.38.0 map-marker sync merged with
+a clean four-leg audit, the ten apex defs and recipes landed with art, i18n,
+and wiki regen, party-shared mobile stations shipped on the mobile_station
+seam behind the set-valued activeMobileStationCrafts readout, flagged-hand
+demotion routes through fillHands in BOTH kit builders, and a six-reviewer
+round plus a four-agent fix round landed; see the Phase 09 BUILT ledger);
+next is Phase 09 QA (fresh session, own release sync first per the delivery
+contract).
 Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.38.0`.
 
@@ -2916,3 +2918,140 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   together; the admission-side capacity twin goes load-bearing the moment a
   recipe ships resultCount > 1; the at-cap kit count pin (10) will move on
   appends and is re-acknowledged deliberately.
+
+## Phase 09 BUILT ledger (2026-08-13)
+
+- SYNC: merge 2f81e2b8c8 brought the v0.38.0 map-marker overhaul (22 commits,
+  PR 3369). The IWorld count pin composed a THIRD consecutive time (ours
+  extractEssence, theirs civicServicePlacements, both sides read 322
+  pre-merge; merged truth 323/86/237 set from suite runs) and the facet-union
+  322 pin auto-merged silently and was caught by the run, exactly the
+  compose-trap class. Naming guards clean. Four-leg merge audit CLEAN;
+  release-owned notes passed upstream: civicServicePlacements is a
+  construction-time readonly Sim field, not a SimContext module (defensible
+  as derived static data), and delve_map_painter carries a dead _northLabel
+  argument with a stale relocalize comment.
+- CATALOG (ids frozen, all epic, recipe level 25, skillReq 100, ilvl 31 on
+  gear): duskforged_warblade (1H sword, 30/50/2.5 = 16.00 dps, str13+sta9,
+  hitRating 50), ridgebreaker (2H maul, 49/76/3.4 = 18.38 vs 18.4 budget,
+  str17+sta12 = 29, hitRating 50), duskforged_bulwark (shield, sta11+str5,
+  blockValue 32 from the buckler 6 / Wallshield 14 / bonewrought 30@29
+  ladder, armor 732 = 680 + 2 ilvl x 26 slope, hitRating 20),
+  wyrmfall_pendant (int8+sta6, hasteRating 25), warhewn_signet (str8+sta5,
+  hitRating 25), prismglass_loop (int8+sta5, hasteRating 25), gyrelens_array
+  (held offhand, int10+sta6, critRating 20, NO use: no cosmetic use family
+  exists in the codebase and R14 forbids inventing one, the recorded gap),
+  voidbound_grimoire (held offhand, int8+spi5+sta3 the wraithfire shape,
+  hasteRating 20, never Hit), masters_field_forge and makers_charm (tool
+  kind, epic, UNflagged, no stats). masterwrought: true on exactly the eight
+  gear pieces. Rating BANDS by slot family: weapons 50
+  (FIVE_MAN_WEAPON_RATING), jewelry 25 (JEWELRY_RATING, module-private so
+  the sweep pins the literal with a live zense_meridian tie), held/shield 20
+  (wraithfire_orb / bonewrought_bulwark, the only shipped family, hand
+  authored not a constant). Class gating mirrors each family reference
+  (HEAVY on the weapons/shield, the caster six on the held pair, jewelry
+  class-free per the vendor family); the phase 08 no-requiredClass shape
+  deliberately does NOT transfer to hands (no armor-proficiency gate exists
+  there; the requiredClass list IS the proficiency encoding).
+- REAGENT BILLS (uniform per craft, 3 own intermediate + 2 wyrmfall_core +
+  gathered family): weaponcrafting duskforged_billet x3 + thorium_ore x4 +
+  iron_ore x2 (input 491, outputs 320/340/300); jewelcrafting
+  prismglass_setting x3 + thorium_ore x4 + arcane_essence x2 (511;
+  320/300/300); engineering precision_chassis x3 + ashwood_log x4 +
+  thorium_ore x2 (595; 340/380/150); inscription sablewax_vellum x3 +
+  sunpetal_herb x2 + arcane_essence x2 + glass_vial x1 (603; 340). sellValue
+  strictly below input on the recipe_economy basis (buyValue when positive,
+  else sellValue; the basis is now named at the section header). Stations:
+  forge/forge/toolworks/apothecary; the four jewel/inscription rows entered
+  the foreign-bound pin. The four intermediates moved to HONEST_MATERIALS
+  per their remove-then comments.
+- MAKER'S CHARM, the resolved price family (recorded per the plan):
+  engineering's FIRST tool effect (craftId engineering; resolveRecharge
+  reads craftId per effect so the discount works with zero tools.ts
+  changes), kind quantity bonus 2 (quality-kind at bonus 2 is BARRED: it
+  would mint fine grades over bare hands, the one-point margin pinned in
+  professions_tools), epic rung. Listed mint 595, specialist mint 380,
+  worst generic recharge 275; 380 > 275 holds (even the self-gathered 320
+  variant), pinned both ways in the recharge suite. startingDurability 20
+  keeps the recharge machinery untouched. The R9 policy admits quantity-kind
+  automatically; the craftable set pin is now three.
+- FIELD FORGE mechanics: ItemUse placeMobileStation (stationCraftId typed
+  CraftDef['id'], documentation-only narrowing: no craft-id union exists in
+  the tree), placement from the item is partyShared, NO specialization gate
+  (the item is the credential), never consumed, overwrites the one
+  PlayerMeta.mobileStation slot in BOTH directions (mutual clobber pinned),
+  10 minutes, zero rng, dead-gated in the module. The crafting gate's third
+  arm honors a party member's shared station within STATION_RADIUS
+  (squared-distance, type-matched; the type dimension and both radius
+  boundaries are pinned after the coverage audit found them naked).
+  Placement emits the single-line "You set up the {name}." through the
+  scroll-pattern log channel with log.placeStation matcher + 22 DICT rows.
+- THE SEAM DECISION of the phase: the mst readout became SET-VALUED after
+  two reviewers independently showed the single scalar let the viewer's own
+  station shadow a party shared station of a different craft, disabling
+  crafting rows the gate accepts (reproduced live: gate null, window
+  blocked). activeMobileStationCraft renamed activeMobileStationCrafts:
+  readonly string[] (facet doc rewritten; rename moved no counts); mst
+  carries the sorted joined scalar (movement-driven now: it re-emits as
+  players cross STATION_RADIUS; comment recut says so; per-viewer by
+  construction so it cannot ride realm_readout_memo); ClientWorld splits
+  behind a raw-string cache (no steady-state allocation); EMPTY_CRAFTS
+  frozen constant keeps the common path allocation-free. Nearest logic and
+  tie-break DELETED: the set carries every qualifying craft, so the
+  crafting-window row set mirrors the deny exactly (the hud comment now
+  says so truthfully). Online party-derived mst has a real GameServer test.
+- CAP PLUMBING: enforceMasterwroughtCap routes hand demotion through a
+  fillHands re-run with all non-kept flagged ids excluded (HandLegalityReads
+  injectable seam; eight synthetic arms; wiring pinned at the bisKitForRole
+  call site by a mutation-proven test). The bis_gear twin (BOTH hosts) got
+  the same semantics: exclusion plus cross-hand re-pair via
+  displacedSlotForEquip. The at-cap kit count pin held at 10 UNCHANGED,
+  verified explainable (roleItemScore ignores hitRating so no phase 09 def
+  is an argmax pick); the dev-BiS sweep now pins EXACTLY 2 flagged for all
+  nine classes (warrior with both hands flagged: warblade 214.0 vs cleaver
+  213.5, bulwark 748 vs heroic bonewrought 697, raw-budget wins).
+- OCCUPIESHAND RULING (owed since phase 03 QA), decided and pinned:
+  coexistence STANDS. A worn offhand (occupiesHand false) is not displaced
+  by a 2H equip and therefore STILL COUNTS against the cap (no displacement,
+  no ignoreSlots exemption): flagged worn offhand + flagged 2H = at cap,
+  third refuses. The displaced HELD offhand exemption is separately pinned
+  (benched by the 2H, does not count). No phase 01 behavior changed; the
+  arm was pinned, not rewritten.
+- REVIEW RECORD: six fresh reviewers (architecture, content-obligations,
+  cross-platform, server-hot-path, frontend-seam, test-coverage): zero
+  determinism/parity/hot-path defects; 4 blocking (all stale content pins
+  outside every curated battery: material_taxonomy x10, recipe union,
+  foreign-bound, the type-dimension coverage hole), ~14 should-fix, ~12
+  notes, ALL applied in a four-agent fix round (4 commits) plus three
+  integration seams (dev_commands rename, hud_update_drive gate text,
+  profession_identity_card regexes). recipeById/recipeForResultItem moved
+  behind lazily rebuilt Maps (the pattern suites push synthetic recipes at
+  runtime, so load-frozen maps were rejected deliberately). Latin
+  toolEffectsBody rows (15 locales) went STALE from the reword, left for
+  the release fill per the reword-staleness rule.
+- OPEN MAINTAINER DECISIONS, recorded not decided: (1) Reliquary curation
+  for masters_field_forge and makers_charm. The phase 08 no-page precedent
+  for crafted tradables was never written down (recorded here now); the
+  on-point COUNTER-precedent is professions_specimens listing the two
+  crafted-primary epic fishing rods as item relics with
+  fromProfession('engineering') hints, the same shape as both tools. If
+  listed: append to professions_specimens, and catalog growth reverts page
+  completion, owing a release-note line. (2) Forge world-visibility: a
+  placed station has NO world prop, no map or minimap marker, and no expiry
+  readout; party members aim for an invisible 20-yard point (the placement
+  emit, the tooltip card, and rows lighting up are the only feedback). A
+  marker would ride stationPlacements-style surfaces and the marker modules
+  must stay preset-free per the new fairness sweep. (3) The reliquary
+  masterwork:engineering revisit trigger FIRED: gyrelens_array is the first
+  stats-bearing engineering craftable; the slot stays unfillable ONLY
+  because of R1 suppression (comments recut to say so); when phase 12 moves
+  suppression to the effect gate, craftIsGearCapable('engineering') flips
+  and three reliquary pins move together, and reliquary.md's feat
+  justification must be re-judged.
+- PHASE 10/11 NOTES: the sweep's arm 2 unions APEX_ARMOR_RECIPES +
+  APEX_GEAR_RECIPES (append or widen again in the same change); phase 11
+  must never put a flagged def in a heroic-eligible loot table
+  (makeHeroicVariant spreads ...base) and re-checks the commission-order
+  board's pre-pattern apex listings (phase 08 corollary); the wiki lists
+  ten unlearnable drop-acquisition recipes until phase 11 lands patterns
+  (the phase 08 precedent, deliberate).

@@ -3173,11 +3173,11 @@ export const ja_JP: EnTranslations = {
       },
       "mobileStationTooltip": {
         "kind": "野営の製作拠点",
-        "use": "足元にパーティ共有の野営炉を設置する。",
-        "radius": "パーティメンバーは{radius}ヤード以内ならそこで製作できる。",
+        "use": "足元にパーティ共有の{station}を設置する。",
+        "radius": "自分はどこからでもそこで製作できる。パーティメンバーは{radius}ヤード以内にいる必要がある。",
         "duration": "{minutes}分間持続する。",
         "notConsumed": "使用しても消費されない。",
-        "replace": "設置すると稼働中の野営拠点が置き換わる。"
+        "replace": "設置すると稼働中の野営拠点(専門特化で設置したものを含む)が置き換わる。"
       },
       "toolEffectSlotButton": "{effect}を装着",
       "toolEffectRechargeButton": "再充填",

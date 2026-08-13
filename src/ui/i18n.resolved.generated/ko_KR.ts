@@ -3173,11 +3173,11 @@ export const ko_KR: EnTranslations = {
       },
       "mobileStationTooltip": {
         "kind": "야전 제작 거점",
-        "use": "발밑에 파티가 함께 쓰는 야전 화로를 설치합니다.",
-        "radius": "{radius}야드 안의 파티원이 그곳에서 제작할 수 있습니다.",
+        "use": "발밑에 파티가 함께 쓰는 {station}을(를) 설치합니다.",
+        "radius": "본인은 어디서든 그곳에서 제작할 수 있습니다. 파티원은 {radius}야드 안에 있어야 합니다.",
         "duration": "{minutes}분 동안 유지됩니다.",
         "notConsumed": "사용해도 소모되지 않습니다.",
-        "replace": "설치하면 가동 중인 야전 거점이 대체됩니다."
+        "replace": "설치하면 가동 중인 야전 거점이 대체됩니다. 전문화로 설치한 거점도 포함됩니다."
       },
       "toolEffectSlotButton": "{effect} 장착",
       "toolEffectRechargeButton": "재충전",

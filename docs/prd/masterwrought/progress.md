@@ -18,7 +18,7 @@
 | 07 QA | verify | complete | 2026-08-12 | 2026-08-12 |
 | 08 | Apex armor catalogs | complete | 2026-08-12 | 2026-08-12 |
 | 08 QA | verify | complete | 2026-08-13 | 2026-08-13 |
-| 09 | Apex weapons, jewelry, gadgets | pending | | |
+| 09 | Apex weapons, jewelry, gadgets | complete | 2026-08-13 | 2026-08-13 |
 | 09 QA | verify | pending | | |
 | 10 | Apex consumables and enchants | pending | | |
 | 10 QA | verify | pending | | |
@@ -331,3 +331,16 @@ never future-PR items, per the delivery contract in `state.md`).
   evidence (fresh ten-icon review PASS, the three in-browser captures
   committed, the S2 note surfaced). Gate PASS at the final tip. Full
   ledger in state.md.
+- Phase 09 (2026-08-13): ten apex gear ids across four crafts on the exact
+  budget curves (1H 16.00 dps, 2H 18.38, per-family rating bands 50/25/20),
+  the Maker's Charm as engineering's first tool effect (mint 595/380 over
+  the 275 recharge floor), and the Master's Field Forge placing a
+  party-shared mobile station through a new ItemUse arm with the crafting
+  gate's third arm (party station within radius, type-matched). The mst
+  readout became the set-valued activeMobileStationCrafts after review
+  reproduced the own-station shadowing; flagged-hand demotion routes
+  through fillHands in both kit builders; the worn-offhand coexistence
+  ruling is decided and pinned. Six-reviewer round plus a four-agent fix
+  round all applied; three open maintainer decisions recorded (reliquary
+  curation for the two tools, forge world-visibility, the fired
+  masterwork:engineering revisit trigger). Full ledger in state.md.

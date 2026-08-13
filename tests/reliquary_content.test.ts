@@ -1690,10 +1690,12 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
  * the SAME gate the proc path consults in crafting.ts (the R1 arm included:
  * a masterwrought output never bakes a bonus, so a craft whose only
  * stat-bearing output is apex reads masterwork-incapable here exactly as it
- * is in play), over the craft's live recipes: a craft whose every output is
- * slotless or statless (engineering's tools) returns null everywhere and can
- * never write its mark. Shared by both masterwork pins below so the two
- * cannot derive eligibility differently.
+ * is in play), over the craft's live recipes: a craft returns null everywhere
+ * either because every output is slotless or statless (engineering's base
+ * tools) OR because its only stat-bearing outputs are masterwrought and the
+ * R1 arm suppresses them (engineering since phase 09's gyrelens_array; the
+ * pin below holds that distinction). Shared by both masterwork pins below so
+ * the two cannot derive eligibility differently.
  */
 function craftIsGearCapable(craftId: string): boolean {
   return ALL_RECIPES.some((recipe) => {
@@ -1739,10 +1741,12 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
 
   it('a masterwork craft is hinted iff it is gear-capable (derived, not ring membership)', () => {
     // Ring membership alone let masterwork:engineering ship an unearnable
-    // hint: every engineering recipe produces a slotless, statless tool, so
+    // hint. Since phase 09 the reason is R1 suppression, not tool-only
+    // output (gyrelens_array is a stats-bearing engineering craft):
     // craftBonusStatsFor (the SAME gate the proc path consults in
-    // crafting.ts, R1 arm included) returns null for all of them and the
-    // mark can never be written. Deriving gear-capability through that gate reds both drifts: a
+    // crafting.ts, R1 arm included) returns null for every masterwrought
+    // def, so the mark can never be written while suppression stands.
+    // Deriving gear-capability through that gate reds both drifts: a
     // tool-only craft gaining a hint, and a craft becoming gear-capable while
     // its slot still sits pended (QA ruling 2026-08-07).
     const page = RELIQUARY_PAGES_BY_ID.professions_masterwork;
@@ -1760,6 +1764,25 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     }
     // Liveness: the derivation is worthless if it calls everything ineligible.
     expect(gearCapableCount).toBe(6);
+  });
+
+  it('engineering stays incapable BECAUSE of R1 suppression, not tool-only output', () => {
+    // The phase 09 premise pin: gyrelens_array is a stats-bearing,
+    // slot-bearing engineering craft output, so the old tool-only reason is
+    // dead, and only the R1 arm (craftBonusStatsFor nulling masterwrought
+    // defs) keeps the craft masterwork-incapable. When phase 12 moves
+    // suppression to the effect gate this reds on the RIGHT line, together
+    // with the gearCapableCount literal above and the pended row.
+    const def = ITEMS.gyrelens_array;
+    expect(def.stats).toBeDefined();
+    expect(def.slot).toBe('offhand');
+    expect(def.masterwrought).toBe(true);
+    const recipe = ALL_RECIPES.find((r) => r.resultItemId === 'gyrelens_array');
+    expect(recipe).toBeDefined();
+    if (!recipe) return;
+    expect(recipe.professionId).toBe('engineering');
+    expect(craftBonusStatsFor(def, recipe)).toBeNull();
+    expect(craftIsGearCapable('engineering')).toBe(false);
   });
 
   it('every gear-capable craft owns a masterwork slot (derived FROM the recipes)', () => {

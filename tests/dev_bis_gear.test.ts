@@ -82,15 +82,40 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       const flagged = Object.values(picks).filter((id) => id && ITEMS[id]?.masterwrought);
       expect(flagged.length, `${cls} dev bis flagged picks: ${flagged.join(', ')}`).toBe(2);
     }
-    // Warrior wears flagged pieces in BOTH hand slots, and both are RAW
-    // BUDGET wins under score(), not id tie-breaks: duskforged_warblade
-    // scores 214.0 (weapon dps plus stats) over gravewyrm_cleaver at 213.5,
-    // and duskforged_bulwark's armor pool totals 748 over
-    // heroic_bonewrought_bulwark at 697. The hit rating on the warblade is
-    // invisible to score(); it wins without it.
+    // Warrior wears flagged pieces in BOTH hand slots. The winners are NOT
+    // pinned by id (the argmax-literal-winner trap: the warblade's margin
+    // over gravewyrm_cleaver is 0.46 points on ~214, so any unrelated
+    // content retune flips a literal); instead the test re-derives the
+    // mainhand argmax with the module's own documented scoring (weapon
+    // avg x 12 / speed plus the raw stat sum, ratings invisible) over the
+    // same candidate shape (epic, warrior-legal, one-handed preferred), and
+    // asserts the pick IS that argmax AND flagged. Today both derive to
+    // duskforged_warblade / duskforged_bulwark; a legitimate content change
+    // moves the derivation with the pick, while a selection-rule regression
+    // splits them.
+    const devScore = (item: (typeof ITEMS)[string]): number => {
+      let total = 0;
+      if (item.kind === 'weapon' && item.weapon)
+        total +=
+          (((item.weapon.min + item.weapon.max) / 2) * 12) / Math.max(0.1, item.weapon.speed);
+      for (const value of Object.values(item.stats ?? {})) total += value as number;
+      return total;
+    };
     const warrior = bestEpicGearFor('warrior', null);
-    expect(warrior.mainhand).toBe('duskforged_warblade');
-    expect(warrior.offhand).toBe('duskforged_bulwark');
+    const mainhandPool = Object.values(ITEMS)
+      .filter(
+        (i) =>
+          i.quality === 'epic' &&
+          i.kind === 'weapon' &&
+          i.hand !== 'twohand' &&
+          canEquipItemInSlot('warrior', i, 'mainhand', null),
+      )
+      .sort((a, b) => devScore(b) - devScore(a) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    expect(warrior.mainhand).toBe(mainhandPool[0].id);
+    expect(ITEMS[warrior.mainhand as string].masterwrought).toBe(true);
+    const offhand = ITEMS[warrior.offhand as string];
+    expect(offhand.masterwrought).toBe(true);
+    expect(offhand.kind === 'armor' && 'shield' in offhand && offhand.shield === true).toBe(true);
   });
 
   it('demotes the lowest-scoring flagged pick and refills the slot (synthetic over-cap)', () => {
@@ -233,6 +258,75 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       expect(Object.values(picks)).not.toContain('test_bis_mw_1h');
       const flagged = Object.values(picks).filter((id) => id && ITEMS[id]?.masterwrought);
       expect(flagged.sort()).toEqual(['test_bis_mw_chest2', 'test_bis_mw_legs2']);
+    } finally {
+      for (const def of SYNTH) delete ITEMS[def.id];
+    }
+  });
+
+  it('a KEPT flagged two-hand mainhand survives the pair re-run (the kept-refill disjunct)', () => {
+    // The refill exclusion admits kept flagged ids on purpose
+    // (allowedRefill's kept.has disjunct): when a flagged 2H MAINHAND is
+    // kept and a flagged OFFHAND demotes, the pair re-run re-picks the
+    // mainhand, and dropping the disjunct would silently swap the kept 2H
+    // for an unflagged weapon. This is the one shape that executes the
+    // disjunct; without this test deleting it is byte-identical on every
+    // other scenario.
+    const CLS = 'test_bis_cls2';
+    const REQ = [CLS] as unknown as ItemDef['requiredClass'];
+    const SYNTH: ItemDef[] = [
+      {
+        id: 'test_bis_mw_2h_kept',
+        name: 'Test test_bis_mw_2h_kept',
+        kind: 'weapon',
+        slot: 'mainhand',
+        hand: 'twohand',
+        quality: 'epic',
+        masterwrought: true,
+        requiredClass: REQ,
+        weapon: { min: 100, max: 100, speed: 1 },
+        sellValue: 1,
+      } as ItemDef,
+      // No one-handed weapon exists for the class, so the 2H takes the
+      // mainhand outright and the initial fill leaves the offhand to the
+      // flagged shield, an illegal pair even before the cap fires.
+      {
+        id: 'test_bis_mw_shield',
+        name: 'Test test_bis_mw_shield',
+        kind: 'armor',
+        slot: 'offhand',
+        shield: true,
+        quality: 'epic',
+        masterwrought: true,
+        requiredClass: REQ,
+        stats: { sta: 500 },
+        sellValue: 1,
+      } as ItemDef,
+      // Third flagged piece: pushes the count over the cap so the shield
+      // (lowest score) demotes through the cap arm, not only the pair rule.
+      {
+        id: 'test_bis_mw_chest3',
+        name: 'Test test_bis_mw_chest3',
+        kind: 'armor',
+        armorType: 'cloth',
+        slot: 'chest',
+        quality: 'epic',
+        masterwrought: true,
+        stats: { int: 900 },
+        requiredClass: REQ,
+        sellValue: 1,
+      } as ItemDef,
+    ];
+    for (const def of SYNTH) ITEMS[def.id] = def;
+    try {
+      const picks = bestEpicGearFor(CLS, null);
+      // Kept: the 2H (1200) and the chest (900); the shield (500) demotes.
+      // The pair re-run must RE-SELECT the kept flagged 2H (the disjunct)
+      // and leave the offhand empty against it.
+      expect(picks.mainhand).toBe('test_bis_mw_2h_kept');
+      expect(picks.chest).toBe('test_bis_mw_chest3');
+      expect(picks.offhand).toBeUndefined();
+      const flagged = Object.values(picks).filter((id) => id && ITEMS[id]?.masterwrought);
+      expect(flagged.sort()).toEqual(['test_bis_mw_2h_kept', 'test_bis_mw_chest3']);
     } finally {
       for (const def of SYNTH) delete ITEMS[def.id];
     }

@@ -10716,13 +10716,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.landOnly': 'На удочку не устанавливается.',
   'hudChrome.professions.mobileStationTooltip.kind': 'Походная станция',
   'hudChrome.professions.mobileStationTooltip.use':
-    'Ставит у ваших ног походную кузню, общую для всей группы.',
+    'Ставит у ваших ног общую для группы походную станцию: {station}.',
   'hudChrome.professions.mobileStationTooltip.radius':
-    'Члены группы в пределах {radius} ярдов могут изготавливать у неё предметы.',
+    'Вы можете изготавливать у неё предметы с любого расстояния; членам группы нужно быть в пределах {radius} ярдов.',
   'hudChrome.professions.mobileStationTooltip.duration': 'Действует {minutes} минут.',
   'hudChrome.professions.mobileStationTooltip.notConsumed': 'Не расходуется при использовании.',
   'hudChrome.professions.mobileStationTooltip.replace':
-    'Установка заменяет вашу действующую походную станцию.',
+    'Установка заменяет вашу действующую походную станцию, в том числе размещённую специализацией.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
     'Откройте окно профессий, чтобы установить талисман на инструмент для сбора.',
   'hudChrome.professions.toolEffectSlotButton': 'Установить {effect}',

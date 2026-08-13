@@ -918,7 +918,10 @@ describe('tool effect slotting, on the axes the live harvest path has', () => {
 
   it("the apex quantity rung (Maker's Charm, phase 09) grants base + 2 through the same path", () => {
     const slot = slotEffect('makers_charm');
-    expect(slot.durability).toBeGreaterThan(0);
+    // Both halves here too: the knob the slot reads, and the literal, so a
+    // durability retune cannot hide behind the knob-relative half.
+    expect(slot.durability).toBe(TOOL_EFFECTS.makers_charm.startingDurability);
+    expect(slot.durability).toBe(20);
     const bonused = applyEffectBonus(slot, baseOutcome);
     // Both halves of the pin: the content knob the live grant reads, AND the
     // literal rung, so a silent knob edit cannot re-tune the apex charm while

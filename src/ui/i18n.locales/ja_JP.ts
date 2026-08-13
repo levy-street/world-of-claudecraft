@@ -10541,12 +10541,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。',
   'hudChrome.professions.toolEffectTooltip.landOnly': '釣り竿には装着できない。',
   'hudChrome.professions.mobileStationTooltip.kind': '野営の製作拠点',
-  'hudChrome.professions.mobileStationTooltip.use': '足元にパーティ共有の野営炉を設置する。',
+  'hudChrome.professions.mobileStationTooltip.use': '足元にパーティ共有の{station}を設置する。',
   'hudChrome.professions.mobileStationTooltip.radius':
-    'パーティメンバーは{radius}ヤード以内ならそこで製作できる。',
+    '自分はどこからでもそこで製作できる。パーティメンバーは{radius}ヤード以内にいる必要がある。',
   'hudChrome.professions.mobileStationTooltip.duration': '{minutes}分間持続する。',
   'hudChrome.professions.mobileStationTooltip.notConsumed': '使用しても消費されない。',
-  'hudChrome.professions.mobileStationTooltip.replace': '設置すると稼働中の野営拠点が置き換わる。',
+  'hudChrome.professions.mobileStationTooltip.replace':
+    '設置すると稼働中の野営拠点(専門特化で設置したものを含む)が置き換わる。',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
     '専門技能ウィンドウを開き、採集ツールに装着しよう。',
   'hudChrome.professions.toolEffectSlotButton': '{effect}を装着',

@@ -211,11 +211,16 @@ export function activeMobileStationCraftsForViewer(
   ctx: SimContext,
   pid: number,
 ): readonly string[] {
+  // The craft gate denies outright for a missing entity (crafting.ts checks
+  // `!entity` before every station arm, the own-station one included), so a
+  // viewer with no entity reports NO crafts rather than advertising an own
+  // station the gate would refuse.
+  const viewer = ctx.entities.get(pid);
+  if (!viewer) return EMPTY_CRAFTS;
   let crafts: string[] | null = null;
   const own = ctx.players.get(pid)?.mobileStation;
   if (own && isStationActive(own, ctx.tickCount)) crafts = [own.craftId];
-  const viewer = ctx.entities.get(pid);
-  if (viewer) {
+  {
     const party = ctx.partyOf(pid);
     if (party) {
       const radiusSq = STATION_RADIUS * STATION_RADIUS;

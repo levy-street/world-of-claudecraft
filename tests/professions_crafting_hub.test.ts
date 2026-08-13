@@ -182,7 +182,9 @@ describe('station content', () => {
     // jewelcrafting/inscription) may bind a recipe to a foreign station, and
     // that binding then IS the recipe's teaching home (training.ts
     // trainingStationTypeFor). Five families make up the class today: the
-    // tool-effect charms (enchanting home, toolworks binding), the
+    // two enchanting tool-effect charms (enchanting home, toolworks binding;
+    // the phase 09 Maker's Charm is engineering-home and so NOT foreign
+    // bound, deliberately absent from this list), the
     // Masterwrought phase 05 jewelcrafting base catalog (jewelcrafting home,
     // forge binding at forgemistress_darva), the Masterwrought phase 06
     // inscription base catalog (inscription home, apothecary binding at

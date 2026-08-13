@@ -6070,7 +6070,7 @@ export class Hud {
     // Mobile-station tools (Master's Field Forge): what placing does, the
     // party radius, the duration, and the replace rule; same all-surfaces
     // composition (mobile_station_tooltip.ts).
-    html += mobileStationTooltipLines(item);
+    html += mobileStationTooltipLines(item, stationNameText);
     // Purpose hint for the eight enchanting materials (material_hint_view.ts
     // keys the table by item id): what the reagent is for and which gear
     // disenchants into it. Every other item id renders nothing here.

@@ -3942,12 +3942,15 @@ export const hudChromeStrings = {
     // MOBILE_CRAFTING_STATION_DURATION_TICKS (content/professions.ts), so
     // the copy tracks the live constants, never hardcoded numbers.
     mobileStationTooltip: {
+      // {station} is the localized stationName.* noun derived from the def's
+      // own stationCraftId, so a second placeMobileStation item names its own
+      // station kind rather than inheriting the forge copy.
       kind: 'Field station',
-      use: 'Places a party-shared field forge at your feet.',
-      radius: 'Party members within {radius} yards can craft at it.',
+      use: 'Places a party-shared {station} at your feet.',
+      radius: 'You can craft at it from anywhere; party members must be within {radius} yards.',
       duration: 'Lasts {minutes} minutes.',
       notConsumed: 'Never consumed.',
-      replace: 'Placing replaces your active field station.',
+      replace: 'Placing replaces your active field station, including a specialty-placed one.',
     },
     // The toolEffectResult event's chat lines (the acquisition craft): one
     // line per outcome, rendered off ids only (the event is text-free).

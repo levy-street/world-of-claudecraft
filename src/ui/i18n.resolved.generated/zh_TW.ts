@@ -3173,11 +3173,11 @@ export const zh_TW: EnTranslations = {
       },
       "mobileStationTooltip": {
         "kind": "野戰製作站",
-        "use": "在腳下放置一座全隊共享的野戰鍛爐。",
-        "radius": "{radius}碼內的隊友都能在它旁邊製作。",
+        "use": "在腳下放置一座全隊共享的{station}。",
+        "radius": "你自己在任何距離都能在它旁邊製作；隊友必須在{radius}碼內。",
         "duration": "持續{minutes}分鐘。",
         "notConsumed": "永不消耗。",
-        "replace": "放置會替換你目前生效的野戰製作站。"
+        "replace": "放置會替換你目前生效的野戰製作站，包括透過專精放置的那座。"
       },
       "toolEffectSlotButton": "鑲嵌{effect}",
       "toolEffectRechargeButton": "充能",

@@ -10082,11 +10082,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '普通品質工具初始有{base}次充能（稀有度每升一級+{bonus}次）。',
   'hudChrome.professions.toolEffectTooltip.landOnly': '無法鑲嵌到釣竿上。',
   'hudChrome.professions.mobileStationTooltip.kind': '野戰製作站',
-  'hudChrome.professions.mobileStationTooltip.use': '在腳下放置一座全隊共享的野戰鍛爐。',
-  'hudChrome.professions.mobileStationTooltip.radius': '{radius}碼內的隊友都能在它旁邊製作。',
+  'hudChrome.professions.mobileStationTooltip.use': '在腳下放置一座全隊共享的{station}。',
+  'hudChrome.professions.mobileStationTooltip.radius':
+    '你自己在任何距離都能在它旁邊製作；隊友必須在{radius}碼內。',
   'hudChrome.professions.mobileStationTooltip.duration': '持續{minutes}分鐘。',
   'hudChrome.professions.mobileStationTooltip.notConsumed': '永不消耗。',
-  'hudChrome.professions.mobileStationTooltip.replace': '放置會替換你目前生效的野戰製作站。',
+  'hudChrome.professions.mobileStationTooltip.replace':
+    '放置會替換你目前生效的野戰製作站，包括透過專精放置的那座。',
   'hudChrome.professions.toolEffectTooltip.openProfessions': '打開專業視窗，將其鑲嵌到採集工具上。',
   'hudChrome.professions.toolEffectSlotButton': '鑲嵌{effect}',
   'hudChrome.professions.toolEffectRechargeButton': '充能',
