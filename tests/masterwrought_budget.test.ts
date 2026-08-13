@@ -293,6 +293,9 @@ describe('masterwrought apex budget sweep', () => {
     expect(recipe?.acquisition).toEqual(['drop']);
     expect(recipe?.stationType).toBe(STATION_BY_CRAFT[row.craft]);
     expect(recipe?.reagents).toEqual(APEX_BILLS[row.craft]);
+    // No daily gate on apex rows: pacing lives in the catalyst-day bill, so a
+    // oncePerDay creeping onto a row would double-gate the climb.
+    expect(recipe?.oncePerDay).toBeUndefined();
   });
 
   it('R12: apex epics disenchant to the standard arcane shard', () => {
@@ -340,6 +343,9 @@ describe('masterwrought apex budget sweep', () => {
     expect(bag.stats).toBeUndefined();
     for (const field of RATING_FIELDS) expect(bag[field]).toBeUndefined();
     expect(itemLevel(bag), 'bags are not item-level eligible').toBeUndefined();
+    // The bag sits outside R12: kind 'bag' fails the disenchant kind gate, and
+    // this pin reds if enchanting.ts ever widens that gate past weapon/armor.
+    expect(isDisenchantable(bag)).toBe(false);
     // Strictly the largest bag: every other bag def sits below 16 slots.
     for (const def of Object.values(ITEMS)) {
       if (def.kind !== 'bag' || def.id === APEX_BAG_ID) continue;
@@ -355,6 +361,7 @@ describe('masterwrought apex budget sweep', () => {
     expect(recipe?.stationType).toBe('loom');
     expect(recipe?.acquisition).toEqual(['drop']);
     expect(recipe?.reagents).toEqual(APEX_BILLS.tailoring);
+    expect(recipe?.oncePerDay).toBeUndefined();
   });
 
   it('economy: every apex output vendors strictly below its reagent input value', () => {
