@@ -9309,12 +9309,18 @@ export class GameServer {
     // Craft skills and identity must arrive as one value so the client never
     // evaluates a recipe against a pair from one tick and skills from another.
     maybe('cprof', this.sim.craftingIdentityFor(anchorSession.pid));
-    // The viewer's own active mobile crafting station craft id (Professions
-    // 2.0), or null. Expiry resolves server-side (Sim.
-    // activeMobileStationCraftFor checks its own tickCount), so the delta
-    // naturally flips to null the tick a station lapses and the client never
-    // reasons about tick domains. Small scalar, diffed per tick like atitle.
-    maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
+    // The mobile craft ids whose station serves this viewer (own active
+    // station at any distance, plus every active partyShared party station
+    // within STATION_RADIUS), sorted and deduped by the sim, joined into one
+    // comma-separated scalar (null when empty) so maybe()'s string-equality
+    // diff still elides the unchanged case. MOVEMENT-DRIVEN: it re-emits as
+    // players cross STATION_RADIUS of party stations, and expiry resolves
+    // server-side (Sim.activeMobileStationCraftsFor checks its own
+    // tickCount), so the client never reasons about tick domains. Still a
+    // small scalar behind maybeSerialized, and per-viewer by construction,
+    // so it correctly cannot ride realm_readout_memo.
+    const mstCrafts = this.sim.activeMobileStationCraftsFor(anchorSession.pid);
+    maybe('mst', mstCrafts.length > 0 ? mstCrafts.join(',') : null);
     selfLap?.('self.prof');
     // Commission order board (issue #1298): the viewer's projection (their
     // requests, any order they accepted, and the open board); this is how

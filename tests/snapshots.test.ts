@@ -36,6 +36,7 @@ import {
   priestMarkerStateForAuras,
 } from '../src/sim/combat/priest/presentation';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
+import { STATION_RADIUS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -4295,7 +4296,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   mntRace: 'mountRaceView',
   mntRtd: 'ridingTrained',
   mres: 'maxResource',
-  mst: 'activeMobileStationCraft',
+  mst: 'activeMobileStationCrafts',
   party: 'partyInfo',
   prk: 'prestigeRank',
   prof: 'professionsState',
@@ -4451,10 +4452,12 @@ function dirtyEveryDeltaField(): {
     amendsProgress: 4,
     isJackOfAllTrades: false,
   };
-  // An ACTIVE mobile crafting station (`mst`): set directly on the
-  // meta slot (the placement command's specialization gate is pinned in
-  // tests/professions_crafting_hub.test.ts; this suite pins the WIRE mirror),
-  // far from expiry so the server-side liveness check reads it active.
+  // An ACTIVE own mobile crafting station (`mst`, the own-station arm of the
+  // serving set): set directly on the meta slot (the placement command's
+  // specialization gate is pinned in tests/professions_crafting_hub.test.ts;
+  // this suite pins the WIRE mirror, and the party-shared arm has its own
+  // GameServer rig below), far from expiry so the server-side liveness check
+  // reads it active.
   meta.mobileStation = {
     playerId: 'Alld',
     craftId: 'armorcrafting',
@@ -4901,9 +4904,10 @@ describe('full self-state snapshot delta fixture', () => {
     // craft id, and it must reflect the cprof delta just applied.
     expect(client.archetypeTitle).toBe('weaponcrafting+armorcrafting');
     expect(client.craftSkills).toMatchObject({ armorcrafting: 31, weaponcrafting: 29 });
-    // mst -> activeMobileStationCraft: the server-computed ACTIVE craft id
-    // (expiry resolved server-side against the sim's own tickCount).
-    expect(client.activeMobileStationCraft).toBe('armorcrafting');
+    // mst -> activeMobileStationCrafts: the server-computed serving set as a
+    // comma-joined scalar (expiry and party range resolved server-side
+    // against the sim's own tickCount and positions), split on decode.
+    expect(client.activeMobileStationCrafts).toEqual(['armorcrafting']);
     // denc/ench/salv -> lastDisenchantResult/lastEnchantResult/lastSalvageResult
     // (Professions 2.0): the delta arm mirrors the exact stash. JSON drops
     // undefined fields, so each decoded object carries no undefined keys; the
@@ -5026,23 +5030,78 @@ describe('full self-state snapshot delta fixture', () => {
   });
 
   it('flips mst to null when the mobile station expires (server-side tick-domain check)', () => {
-    // The expiry arm of the mst self-delta: activeMobileStationCraftFor
+    // The expiry arm of the mst self-delta: activeMobileStationCraftsFor
     // resolves active-vs-expired against the SERVER sim's own tickCount, so
     // the lapse must reach the client as an explicit mst: null delta (a
-    // nullable scalar; omission would leave the stale craft id mirrored).
+    // nullable joined scalar; omission would leave the stale set mirrored).
     const { server, fc, leader } = dirtyEveryDeltaField();
     broadcast(server);
     const client = bareClient(leader.pid);
     (client as any).applySnapshot(lastSnap(fc.sent));
-    expect(client.activeMobileStationCraft).toBe('armorcrafting');
+    expect(client.activeMobileStationCrafts).toEqual(['armorcrafting']);
 
     const meta = server.sim.meta(leader.pid);
     if (!meta?.mobileStation) throw new Error('mobile station missing from the harness');
     meta.mobileStation.expiresAtTick = server.sim.tickCount; // isStationActive: now < expiry fails
     server.sim.tick();
     broadcast(server);
-    (client as any).applySnapshot(lastSnap(fc.sent));
-    expect(client.activeMobileStationCraft).toBeNull();
+    const lapsedSnap = lastSnap(fc.sent);
+    // The explicit null on the wire, never an omission: an empty serving set
+    // must overwrite the mirror.
+    expect(lapsedSnap.self.mst).toBeNull();
+    (client as any).applySnapshot(lapsedSnap);
+    expect(client.activeMobileStationCrafts).toEqual([]);
+  });
+
+  it('carries an in-range party-shared station craft on mst and clears it when the viewer walks out', () => {
+    // The party arm of the mst self-delta over a real GameServer: B holds an
+    // ACTIVE partyShared station (the Master's Field Forge item path; the
+    // meta slot is stamped directly, the placement gates are pinned in
+    // tests/mobile_station_party.test.ts), A stands within STATION_RADIUS of
+    // it, so A's OWN snapshot must carry the craft. The key is
+    // MOVEMENT-DRIVEN: walking A out of range must clear it with an explicit
+    // mst: null delta on the next broadcast, no placement change involved.
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const fcB = fakeWs();
+    const a = joinServer(server, fcA, 41, 'Walker');
+    const b = joinServer(server, fcB, 42, 'Forger', 'mage');
+    const sim = server.sim;
+    sim.partyInvite(b.pid, a.pid);
+    sim.partyAccept(b.pid);
+    const ea = sim.entities.get(a.pid)!;
+    const eb = sim.entities.get(b.pid)!;
+    eb.pos.x = 0;
+    eb.pos.z = 150;
+    eb.prevPos = { ...eb.pos };
+    ea.pos.x = STATION_RADIUS / 2; // inside the serving radius
+    ea.pos.z = 150;
+    ea.prevPos = { ...ea.pos };
+    sim.meta(b.pid)!.mobileStation = {
+      playerId: 'Forger',
+      craftId: 'weaponcrafting',
+      partyShared: true,
+      pos: { x: eb.pos.x, z: eb.pos.z },
+      placedAtTick: sim.tickCount,
+      expiresAtTick: sim.tickCount + 12000,
+    };
+
+    broadcast(server);
+    const inRangeSnap = lastSnap(fcA.sent);
+    expect(inRangeSnap.self.mst).toBe('weaponcrafting');
+    const client = bareClient(a.pid);
+    (client as any).applySnapshot(inRangeSnap);
+    expect(client.activeMobileStationCrafts).toContain('weaponcrafting');
+
+    // A walks past STATION_RADIUS of the station; the very next broadcast
+    // must clear the mirror even though no station was placed or expired.
+    ea.pos.x = STATION_RADIUS * 3;
+    ea.prevPos = { ...ea.pos };
+    broadcast(server);
+    const outOfRangeSnap = lastSnap(fcA.sent);
+    expect(outOfRangeSnap.self.mst).toBeNull();
+    (client as any).applySnapshot(outOfRangeSnap);
+    expect(client.activeMobileStationCrafts).toEqual([]);
   });
 
   it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {

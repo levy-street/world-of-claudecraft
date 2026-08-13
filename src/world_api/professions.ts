@@ -40,7 +40,7 @@ export interface CraftingIdentityView {
   knownRecipes: readonly string[];
   // Repeatable work orders currently inside their cooldown window (Professions
   // 2.0), SORTED so the JSON form is a stable cprof signature. The
-  // SERVER computes this against ITS tickCount (the activeMobileStationCraft
+  // SERVER computes this against ITS tickCount (the activeMobileStationCrafts
   // precedent: tick-domain state is resolved server-side, never predicted by the
   // client) and it rides the existing cprof delta; the online client feeds it
   // into computeQuestState so a work order on cooldown shows unavailable there
@@ -321,7 +321,11 @@ export interface IWorldProfessions {
   // mechanic): place the viewer's own temporary station for `craftId`.
   // Specialization-gated server-side (mobile_station.ts
   // placeMobileCraftingStation); Sim validates and stores on PlayerMeta,
-  // ClientWorld sends the place_mobile_station command.
+  // ClientWorld sends the place_mobile_station command. A SECOND placement
+  // path exists beside this command: the Master's Field Forge item places
+  // through the useItem arm WITHOUT the specialization gate (holding the
+  // item IS the credential; mobile_station.ts placeMobileStationFromItem),
+  // and its station is partyShared.
   placeMobileStation(craftId: string): void;
   // Recipe training (Professions 2.0): learn `recipeId` from the
   // resident master at its craft's STATIC station (a mobile station never
@@ -331,14 +335,19 @@ export interface IWorldProfessions {
   // once on success, and emits the personal text-free `trainResult` event;
   // ClientWorld sends the train_recipe command and never decides the outcome.
   trainRecipe(recipeId: string): void;
-  // The craft id of the viewer's own currently ACTIVE (placed, unexpired)
-  // mobile station, or null. An identifier, string-free per the seam rule.
-  // Offline this reads the live PlayerMeta slot (expiry checked against the
-  // sim tick); online it mirrors the server's `mst` self-delta
-  // (server/game.ts computes active-vs-expired against ITS tickCount, so the
-  // client never predicts placement or reasons about tick domains). The slot
-  // is transient either way: never serialized into the character save.
-  activeMobileStationCraft: string | null;
+  // The DEDUPED, SORTED set of mobile craft ids whose station currently
+  // serves the viewer: the viewer's own ACTIVE (placed, unexpired) station's
+  // craft at any distance, plus the craft of every ACTIVE partyShared
+  // station owned by a party member within STATION_RADIUS of the viewer.
+  // EMPTY array when none, never null. Identifiers, string-free per the seam
+  // rule. Offline this reads the live PlayerMeta slots (expiry checked
+  // against the sim tick); online it mirrors the server's `mst` self-delta,
+  // a comma-joined scalar the client splits (server/game.ts computes
+  // active-vs-expired and party range against ITS tickCount and positions,
+  // so the client never predicts placement or reasons about tick domains).
+  // The slot is transient either way: never serialized into the character
+  // save.
+  activeMobileStationCrafts: readonly string[];
   // Enchanting profession commands (Professions 2.0): disenchant a held
   // eligible weapon/armor piece into arcane materials, apply an enchant to a held
   // copy, or salvage a held piece into generic materials. `slotIndex`, when

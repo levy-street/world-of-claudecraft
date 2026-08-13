@@ -1800,13 +1800,21 @@ export class ClientWorld implements IWorld {
   lastDisenchantResult: DisenchantResultView | null = null;
   lastEnchantResult: ApplyEnchantResultView | null = null;
   lastSalvageResult: SalvageResultView | null = null;
-  // The viewer's own active mobile crafting station (Professions 2.0),
-  // mirrored from the server's `mst` self-delta (applySnapshot below). The
-  // server computes the active/expired state against its own tickCount, so
-  // this is always a server-authoritative value: placement is never predicted
-  // locally (net/ optimism rules), the delta lands after the server accepts
-  // the specialization-gated command, and it flips back to null on expiry.
-  activeMobileStationCraft: string | null = null;
+  // The mobile craft ids whose station currently serves the viewer (own
+  // active station at any distance, plus every active partyShared party
+  // station within STATION_RADIUS), mirrored from the server's `mst`
+  // self-delta (applySnapshot below): a comma-joined, server-sorted scalar
+  // this client splits, null on the wire when the set is empty. The server
+  // computes active/expired and party range against its own tickCount and
+  // positions, so this is always a server-authoritative value: membership is
+  // never predicted locally (net/ optimism rules), the delta lands after the
+  // server accepts a placement, re-emits as players cross STATION_RADIUS,
+  // and flips back to empty on expiry.
+  activeMobileStationCrafts: readonly string[] = [];
+  // The raw joined `mst` scalar the array above was split from: the split
+  // runs ONLY when this string changes, so steady-state snapshots never
+  // re-allocate the array.
+  private activeMobileStationCraftsRaw: string | null = null;
   // Commission order board (Professions 2.0, issue #1298), mirrored from the
   // server's `corder` self-delta below: the viewer's own projection, small
   // and diffed per tick like professionsState/craftingIdentity above.
@@ -3680,9 +3688,17 @@ export class ClientWorld implements IWorld {
       if (s.dclears !== undefined) this.delveClears = s.dclears ?? {};
       if (s.delveDaily !== undefined) this.delveDaily = s.delveDaily;
       if (s.tfocus !== undefined) this.townFocus = s.tfocus ?? {};
-      // mst -> activeMobileStationCraft: a nullable scalar, so the delta's
-      // explicit null (station expired or never placed) must overwrite.
-      if (s.mst !== undefined) this.activeMobileStationCraft = (s.mst as string | null) ?? null;
+      // mst -> activeMobileStationCrafts: a comma-joined nullable scalar, so
+      // the delta's explicit null (every station expired, out of range, or
+      // never placed) must overwrite to the empty set. The split array is
+      // cached against the raw string and rebuilt only when it changes.
+      if (s.mst !== undefined) {
+        const rawMst = (s.mst as string | null) ?? null;
+        if (rawMst !== this.activeMobileStationCraftsRaw) {
+          this.activeMobileStationCraftsRaw = rawMst;
+          this.activeMobileStationCrafts = rawMst === null ? [] : rawMst.split(',');
+        }
+      }
       // Commission order board (issue #1298): server-gated on the board
       // revision at the corder wire cadence (a passive party converges within
       // one cadence window; the viewer's own commands re-arm for the next

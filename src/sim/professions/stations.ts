@@ -83,16 +83,17 @@ export function craftsForStationType(type: StationType): string[] {
 /**
  * The set of station types the crafting UI should treat as in range right
  * now: every type with a physical station within STATION_RADIUS of `pos`,
- * plus the type served by the viewer's ACTIVE mobile-station craft (their
- * own, or since Masterwrought phase 09 an in-range partyShared one: pass
- * the resolver's craft id, or null when none is active; the caller owns the
- * active/expiry/range checks since only it holds the tick). Pure and cheap
- * (six stations), computed once per repaint by the HUD.
+ * plus the type served by EVERY craft in `mobileCrafts` (the viewer's active
+ * mobile-station craft set from the activeMobileStationCrafts resolver:
+ * their own station plus every in-range partyShared party station, since
+ * Masterwrought phase 09; the caller owns the active/expiry/range checks
+ * since only it holds the tick). Pure and cheap (six stations), computed
+ * once per repaint by the HUD.
  */
 export function inRangeStationTypes(
   stations: readonly StationDef[],
   pos: { x: number; z: number },
-  activeMobileStationCraft: string | null = null,
+  mobileCrafts: readonly string[] = [],
 ): Set<StationType> {
   const inRange = new Set<StationType>();
   for (const station of stations) {
@@ -100,8 +101,8 @@ export function inRangeStationTypes(
     const dz = pos.z - station.pos.z;
     if (dx * dx + dz * dz <= STATION_RADIUS * STATION_RADIUS) inRange.add(station.type);
   }
-  if (activeMobileStationCraft !== null) {
-    const mobileType = stationTypeForCraft(activeMobileStationCraft);
+  for (const craftId of mobileCrafts) {
+    const mobileType = stationTypeForCraft(craftId);
     if (mobileType) inRange.add(mobileType);
   }
   return inRange;

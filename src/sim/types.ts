@@ -2,7 +2,7 @@
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
-import type { GatheringProfessionId, ToolEffectId } from './content/professions';
+import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
 
@@ -860,8 +860,11 @@ export type ItemUse =
   // (a permanent tool). `stationCraftId` is a CRAFT id, not a StationType, so
   // stationTypeForCraft resolves the station's type (weaponcrafting or
   // armorcrafting for a forge) and MobileCraftingStation plus the `mst` wire
-  // value keep their existing craft-id shape unchanged.
-  | { type: 'placeMobileStation'; stationCraftId: string };
+  // value keep their existing craft-id shape unchanged. CraftDef['id'] is the
+  // narrowest named craft-id type the professions content has (there is no
+  // craft-id union today; CRAFT_RING types its ids as string), so this
+  // documents the domain without changing the checked type.
+  | { type: 'placeMobileStation'; stationCraftId: CraftDef['id'] };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).

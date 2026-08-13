@@ -169,8 +169,8 @@ describe('dev commands', () => {
     meta.craftSkills.engineering = 75; // the specialization threshold (#1134)
     sim.chat('/dev mobilestation ENGINEERING'); // the arm lowercases the craft id
     expect(meta.mobileStation?.craftId).toBe('engineering');
-    // The IWorld read agrees while the station is active.
-    expect(sim.activeMobileStationCraft).toBe('engineering');
+    // The IWorld read agrees while the station is active (the set member).
+    expect(sim.activeMobileStationCrafts).toEqual(['engineering']);
   });
 
   it('is inert when dev commands are disabled', () => {

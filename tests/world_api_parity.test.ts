@@ -340,7 +340,9 @@ export const IWORLD_MEMBERS = [
   { name: 'hobbyCraft', kind: 'data' },
   { name: 'placeMobileStation', kind: 'method' },
   { name: 'trainRecipe', kind: 'method' },
-  { name: 'activeMobileStationCraft', kind: 'data' },
+  // A rename of activeMobileStationCraft (now the set of every serving
+  // station craft), not an add: the three count pins below do not move.
+  { name: 'activeMobileStationCrafts', kind: 'data' },
   // Enchanting profession commands + result reads (Professions 2.0).
   { name: 'disenchantItem', kind: 'method' },
   // The Sundered Essence extraction (Masterwrought phase 04).
@@ -551,7 +553,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // pickRowTalent; rowPicks stays off the seam, rows live on the allocation)
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
-    // activeMobileStationCraft), the commissions unbindItem command, and the
+    // activeMobileStationCrafts), the commissions unbindItem command, and the
     // Rift + mounts surface. The v0.31.0 base merge added the release's three new
     // members on top of the branch's 272; making reins usable items then removed
     // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
@@ -640,7 +642,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeLoadout',
       'activeLootRolls',
       'activeMasterLootRolls',
-      'activeMobileStationCraft',
+      'activeMobileStationCrafts',
       'activeTemporalHourglasses',
       'activeTitle',
       'applyEnchant',
@@ -960,7 +962,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeConsecrations',
       'activeFrostRings',
       'activeLoadout',
-      'activeMobileStationCraft',
+      'activeMobileStationCrafts',
       'activeTemporalHourglasses',
       'activeTitle',
       'archetypeTitle',
@@ -1764,7 +1766,7 @@ const FACET_PROFESSIONS = [
   'hobbyCraft',
   'placeMobileStation',
   'trainRecipe',
-  'activeMobileStationCraft',
+  'activeMobileStationCrafts',
   'disenchantItem',
   'extractEssence',
   'applyEnchant',

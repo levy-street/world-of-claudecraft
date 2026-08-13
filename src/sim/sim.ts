@@ -456,7 +456,7 @@ import {
 } from './professions/masterwrought_materials';
 import { applyMasteryReset, updateMasteryResetNotices } from './professions/mastery_reset';
 import {
-  activeMobileStationCraftForViewer,
+  activeMobileStationCraftsForViewer,
   type MobileCraftingStation,
   placeMobileStationForPlayer,
 } from './professions/mobile_station';
@@ -9579,21 +9579,22 @@ export class Sim {
     return commissionOrderRowsFor(this.ctx, pid);
   }
 
-  // IWorld read surface (IWorldProfessions): the craft id of the
-  // local viewer's own ACTIVE mobile station, or null when none is placed or
-  // the placed one has expired (tick-domain expiry, checked live).
-  get activeMobileStationCraft(): string | null {
-    return this.activeMobileStationCraftFor(this.primaryId);
+  // IWorld read surface (IWorldProfessions): the deduped, sorted craft ids
+  // of every mobile station currently serving the local viewer (their own
+  // active station at any distance, plus every ACTIVE partyShared party
+  // station within STATION_RADIUS). Empty array when none, never null.
+  get activeMobileStationCrafts(): readonly string[] {
+    return this.activeMobileStationCraftsFor(this.primaryId);
   }
 
-  /** Per-player form of `activeMobileStationCraft`, for the server's `mst`
-   *  self-delta (server/game.ts): the expiry check runs server-side against
-   *  this sim's own tickCount, so the client mirrors a server-authoritative
-   *  value and never reasons about tick domains. The resolver body (own
-   *  station first, else the nearest in-range partyShared party station)
-   *  lives in professions/mobile_station.ts. */
-  activeMobileStationCraftFor(pid: number): string | null {
-    return activeMobileStationCraftForViewer(this.ctx, pid);
+  /** Per-player form of `activeMobileStationCrafts`, for the server's `mst`
+   *  self-delta (server/game.ts): the expiry and radius checks run
+   *  server-side against this sim's own tickCount, so the client mirrors a
+   *  server-authoritative value and never reasons about tick domains. The
+   *  resolver body (the deduped sorted set) lives in
+   *  professions/mobile_station.ts. */
+  activeMobileStationCraftsFor(pid: number): readonly string[] {
+    return activeMobileStationCraftsForViewer(this.ctx, pid);
   }
 
   // Recipe acquisition command (#1299): a thin delegate onto
@@ -9652,7 +9653,7 @@ export class Sim {
   // IWorld read surface (IWorldProfessions): the local viewer's most
   // recent salvage-result, or null before their first salvage attempt this
   // session. `lastSalvageResultFor` is the per-player form the server's `salv`
-  // self-delta reads (server/game.ts), modeled on activeMobileStationCraftFor.
+  // self-delta reads (server/game.ts), modeled on activeMobileStationCraftsFor.
   get lastSalvageResult(): SalvageResult | null {
     return this.lastSalvageResultFor(this.primaryId);
   }

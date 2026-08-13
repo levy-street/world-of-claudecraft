@@ -128,12 +128,16 @@ export function placeMobileStationForPlayer(
  * The placed station is partyShared: party members within STATION_RADIUS of
  * it satisfy the crafting station gate (crafting.ts). Stores into the same
  * per-player PlayerMeta.mobileStation slot, replacing any previous station.
- * Draws no rng, reads no wall clock; the CALLER never consumes the item (a
- * permanent tool, the mount-reins convention).
+ * Success emits one player-visible log line naming `name`, the placing
+ * item's display name (the phase 06 scroll-read pattern in items.ts; matched
+ * by log.placeStation in src/ui/sim_i18n.ts), so a placement is never
+ * silent. Draws no rng, reads no wall clock; the CALLER never consumes the
+ * item (a permanent tool, the mount-reins convention).
  */
 export function placeMobileStationFromItem(
   ctx: SimContext,
   stationCraftId: string,
+  name: string,
   pid?: number,
 ): MobileCraftingStation | undefined {
   if (refusedWhileDead(ctx, pid)) return undefined;
@@ -148,6 +152,7 @@ export function placeMobileStationFromItem(
     expiresAtTick: ctx.tickCount + MOBILE_CRAFTING_STATION_DURATION_TICKS,
   };
   r.meta.mobileStation = station;
+  ctx.emit({ type: 'log', text: `You set up the ${name}.`, color: '#c9f', pid: r.meta.entityId });
   return station;
 }
 
@@ -184,39 +189,50 @@ export function partySharedStationSatisfies(
   return false;
 }
 
+// Returned whenever no station serves the viewer: the common case on the
+// per-viewer snapshot path, so it must allocate nothing.
+const EMPTY_CRAFTS: readonly string[] = Object.freeze([]);
+
 /**
- * The per-viewer resolver behind Sim.activeMobileStationCraftFor (and so the
- * `mst` snapshot delta and the offline getter): the viewer's own ACTIVE
- * station's craft first, else the craft of the NEAREST ACTIVE partyShared
- * station owned by another party member within STATION_RADIUS of the viewer,
- * else null. Single-id asymmetry, accepted: `mst` stays ONE craft id (zero
- * new wire fields, zero new IWorld members), so when the viewer's own
- * station and an in-range shared station serve DIFFERENT crafts only the own
- * craft surfaces; the crafting gate itself (crafting.ts) still honors the
- * shared station regardless of what the resolver shows.
+ * The per-viewer set resolver behind Sim.activeMobileStationCraftsFor (and
+ * so the `mst` snapshot delta and the offline getter): the DEDUPED, SORTED
+ * array of every mobile craft id whose station currently serves the viewer.
+ * Two arms qualify a craft: the viewer's own ACTIVE station at ANY distance
+ * (the training precedent, crafting.ts), and EVERY ACTIVE partyShared
+ * station owned by another party member within STATION_RADIUS of the viewer.
+ * Empty array when none qualify, never null. There is no nearest pick and no
+ * tie-break: the set carries every qualifying craft, so the crafting-window
+ * row set mirrors the craft gate (crafting.ts) exactly instead of shadowing
+ * a shared craft behind the viewer's own. This runs on the server per-viewer
+ * snapshot path at up to 20 Hz, so the value is movement-driven: it changes
+ * as players walk across STATION_RADIUS of a shared station.
  */
-export function activeMobileStationCraftForViewer(ctx: SimContext, pid: number): string | null {
+export function activeMobileStationCraftsForViewer(
+  ctx: SimContext,
+  pid: number,
+): readonly string[] {
+  let crafts: string[] | null = null;
   const own = ctx.players.get(pid)?.mobileStation;
-  if (own && isStationActive(own, ctx.tickCount)) return own.craftId;
+  if (own && isStationActive(own, ctx.tickCount)) crafts = [own.craftId];
   const viewer = ctx.entities.get(pid);
-  if (!viewer) return null;
-  const party = ctx.partyOf(pid);
-  if (!party) return null;
-  let bestCraft: string | null = null;
-  // Seeded at the radius so the range gate and the nearest pick are one
-  // compare; the first station AT the boundary is accepted (<=), a tie after
-  // that keeps the earlier party-order member (deterministic in both hosts).
-  let bestDistSq = STATION_RADIUS * STATION_RADIUS;
-  for (const memberPid of party.members) {
-    if (memberPid === pid) continue;
-    const station = ctx.players.get(memberPid)?.mobileStation;
-    if (!station || !station.partyShared || !isStationActive(station, ctx.tickCount)) continue;
-    const dx = viewer.pos.x - station.pos.x;
-    const dz = viewer.pos.z - station.pos.z;
-    const distSq = dx * dx + dz * dz;
-    if (distSq > bestDistSq || (distSq === bestDistSq && bestCraft !== null)) continue;
-    bestDistSq = distSq;
-    bestCraft = station.craftId;
+  if (viewer) {
+    const party = ctx.partyOf(pid);
+    if (party) {
+      const radiusSq = STATION_RADIUS * STATION_RADIUS;
+      for (const memberPid of party.members) {
+        if (memberPid === pid) continue;
+        const station = ctx.players.get(memberPid)?.mobileStation;
+        if (!station || !station.partyShared || !isStationActive(station, ctx.tickCount)) continue;
+        const dx = viewer.pos.x - station.pos.x;
+        const dz = viewer.pos.z - station.pos.z;
+        if (dx * dx + dz * dz > radiusSq) continue;
+        // Dedupe on insert: the own craft and a shared craft can be equal,
+        // and two members can carry stations of one craft.
+        if (!crafts) crafts = [station.craftId];
+        else if (!crafts.includes(station.craftId)) crafts.push(station.craftId);
+      }
+    }
   }
-  return bestCraft;
+  if (!crafts) return EMPTY_CRAFTS;
+  return crafts.sort();
 }

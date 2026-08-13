@@ -597,6 +597,7 @@ import {
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
 import { isMobileFullscreenWindowOpen } from './mobile_fullscreen_window_core';
 import { MobileMoreDialogController } from './mobile_more_dialog';
+import { mobileStationTooltipLines } from './mobile_station_tooltip';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
@@ -6066,6 +6067,10 @@ export class Hud {
     // does, how to slot it from Professions, and the charge ladder. Bags,
     // bank, crafting, and market all compose this through itemTooltip.
     html += toolEffectTooltipLines(item);
+    // Mobile-station tools (Master's Field Forge): what placing does, the
+    // party radius, the duration, and the replace rule; same all-surfaces
+    // composition (mobile_station_tooltip.ts).
+    html += mobileStationTooltipLines(item);
     // Purpose hint for the eight enchanting materials (material_hint_view.ts
     // keys the table by item id): what the reagent is for and which gear
     // disenchants into it. Every other item id renders nothing here.
@@ -8971,13 +8976,15 @@ export class Hud {
       // Crafting window staleness: the
       // window is a cold painter, so an open window repaints only when the
       // in-range station-type set changes (walking in/out of a station's
-      // range, or the own mobile station appearing/expiring). Cheap distance
+      // range, the own mobile station appearing/expiring, or players
+      // crossing a party-shared station's radius: exactly the movement this
+      // signature repaint watches). Cheap distance
       // checks on the slow band; the server re-validates the gate on every
       // craft regardless.
       if (
         $('#crafting-window').style.display === 'flex' &&
         stationTypesSignature(
-          inRangeStationTypes(sim.stationPlacements, sim.player.pos, sim.activeMobileStationCraft),
+          inRangeStationTypes(sim.stationPlacements, sim.player.pos, sim.activeMobileStationCrafts),
         ) !== this.lastCraftingStationSig
       )
         this.renderCrafting();
@@ -16087,12 +16094,13 @@ export class Hud {
   private renderCrafting(focusReturnRecipeId = ''): void {
     // Station range for station-bound rows: the same pure in-range
     // set the sim's station_required deny composes (physical stations plus
-    // the own active mobile station), computed once per repaint, so the row
-    // disable mirrors the deny exactly. The server re-validates on craft.
+    // the own active mobile station plus in-range party-shared stations),
+    // computed once per repaint, so the row disable mirrors the deny
+    // exactly. The server re-validates on craft.
     const inRangeStations = inRangeStationTypes(
       this.sim.stationPlacements,
       this.sim.player.pos,
-      this.sim.activeMobileStationCraft,
+      this.sim.activeMobileStationCrafts,
     );
     this.lastCraftingStationSig = stationTypesSignature(inRangeStations);
     // Re-arm the bag diff on EVERY paint, whatever caused it, so a repaint
