@@ -11,50 +11,32 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "es_ES": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "fr_FR": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "fr_CA": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "de_DE": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
@@ -64,74 +46,47 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "nl_NL": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "pl_PL": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "id_ID": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "tr_TR": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "sv_SE": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "vi_VN": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "da_DK": [
     "entities.items.reins_goblin_rocket_sled.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ]

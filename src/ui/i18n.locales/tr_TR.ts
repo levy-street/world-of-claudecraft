@@ -8387,6 +8387,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.castBar.playerAria': 'Senin Büyü Çubuğun',
   'hudChrome.castBar.targetAria': 'Birim Büyü Çubuğu',
   'hudChrome.character.modelPreview': 'Karakter Modeli Önizlemesi',
+  'hudChrome.chatQuota.limitReached': 'Genel sohbet sınırına ulaşıldı. {seconds} içinde tekrar dene.',
+  'hudChrome.chatQuota.pending':
+    'Önceki Genel sohbet mesajın hâlâ gönderiliyor. Birazdan tekrar dene.',
+  'hudChrome.chatQuota.unavailable':
+    'Genel sohbet geçici olarak kullanılamıyor. Kısa süre sonra tekrar dene.',
   'hudChrome.chatTimestamps.clock12h': '12 saat',
   'hudChrome.chatTimestamps.clock24h': '24 saat',
   'hudChrome.chatTimestamps.format': 'Zaman Damgası Biçimi',

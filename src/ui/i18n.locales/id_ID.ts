@@ -8461,6 +8461,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.defense': 'Pertahanan',
   'hudChrome.charSheet.offense': 'Serangan',
   'hudChrome.character.modelPreview': 'Pratinjau Model Karakter',
+  'hudChrome.chatQuota.limitReached': 'Batas obrolan Umum tercapai. Coba lagi dalam {seconds}.',
+  'hudChrome.chatQuota.pending': 'Pesan Umum sebelumnya masih dikirim. Coba lagi sebentar.',
+  'hudChrome.chatQuota.unavailable':
+    'Obrolan Umum untuk sementara tidak tersedia. Coba lagi sebentar lagi.',
   'hudChrome.chatTimestamps.clock12h': '12 jam',
   'hudChrome.chatTimestamps.clock24h': '24 jam',
   'hudChrome.chatTimestamps.format': 'Format Cap Waktu',

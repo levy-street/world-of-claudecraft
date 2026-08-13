@@ -588,6 +588,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.playtimeParts': '{major}, {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': 'Menos de um minuto',
   'hudChrome.charSheet.showPlaytimeAria': 'Mostrar tempo jogado',
+  'hudChrome.chatQuota.limitReached': 'Limite da chat Geral atingido. Tente novamente em {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Sua mensagem anterior na chat Geral ainda está sendo enviada. Tente novamente em instantes.',
+  'hudChrome.chatQuota.unavailable':
+    'A chat Geral está temporariamente indisponível. Tente novamente em breve.',
   'hudChrome.comboMeter.label': 'PC',
   'hudChrome.options.showPlaytime': 'Mostrar Tempo Jogado na Tela de Personagens',
   'hudChrome.perf.diagnostics.aria.findings': 'Descobertas do diagnóstico, por ordem de prioridade',

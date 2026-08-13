@@ -577,6 +577,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.playtimeParts': '{major}, {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': 'Méně než minuta',
   'hudChrome.charSheet.showPlaytimeAria': 'Zobrazit odehraný čas',
+  'hudChrome.chatQuota.limitReached': 'Byl dosažen limit chatu Obecného. Zkus to znovu za {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Tvoje předchozí zpráva v chatu Obecném se ještě odesílá. Zkus to za chvíli znovu.',
+  'hudChrome.chatQuota.unavailable': 'Chat Obecný je dočasně nedostupný. Zkus to znovu brzy.',
   'hudChrome.comboMeter.label': 'CP',
   'hudChrome.options.showPlaytime': 'Zobrazit odehraný čas na obrazovce postavy',
   'hudChrome.otaUpdate.title': 'Aktualizace hry',

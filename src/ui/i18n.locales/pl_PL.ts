@@ -577,6 +577,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.playtimeParts': '{major}, {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': 'Mniej niż minuta',
   'hudChrome.charSheet.showPlaytimeAria': 'Pokaż czas gry',
+  'hudChrome.chatQuota.limitReached': 'Osiągnięto limit czatu Ogólnego. Spróbuj ponownie za {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Twoja poprzednia wiadomość na czacie Ogólnym wciąż się wysyła. Spróbuj ponownie za chwilę.',
+  'hudChrome.chatQuota.unavailable': 'Czat Ogólny jest tymczasowo niedostępny. Spróbuj ponownie wkrótce.',
   'hudChrome.comboMeter.label': 'CP',
   'hudChrome.options.showPlaytime': 'Pokaż czas gry na ekranie postaci',
   'hudChrome.perf.diagnostics.aria.findings': 'Uszeregowane ustalenia diagnostyczne',

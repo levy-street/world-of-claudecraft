@@ -7610,6 +7610,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.defense': 'Forsvar',
   'hudChrome.charSheet.offense': 'Angreb',
   'hudChrome.character.modelPreview': 'Forhåndsvisning af karaktermodel',
+  'hudChrome.chatQuota.limitReached': 'Grænsen for Generelt-chatten er nået. Prøv igen om {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Din forrige besked i Generelt-chatten sendes stadig. Prøv igen om et øjeblik.',
+  'hudChrome.chatQuota.unavailable': 'Generelt-chatten er midlertidigt utilgængelig. Prøv igen snart.',
   'hudChrome.chatTimestamps.clock12h': '12-timers',
   'hudChrome.chatTimestamps.clock24h': '24-timers',
   'hudChrome.chatTimestamps.format': 'Tidsstempelformat',

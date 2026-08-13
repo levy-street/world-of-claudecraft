@@ -802,9 +802,9 @@ export const pt_BR: EnTranslations = {
       "note": "Arraste a faixa de abas do chat para mover a janela, ou a alça do canto para redimensioná-la. Redefinir devolve a janela à posição e ao tamanho padrão."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Limite da chat Geral atingido. Tente novamente em {seconds}.",
+      "pending": "Sua mensagem anterior na chat Geral ainda está sendo enviada. Tente novamente em instantes.",
+      "unavailable": "A chat Geral está temporariamente indisponível. Tente novamente em breve."
     },
     "swing": {
       "ready": "Golpe",

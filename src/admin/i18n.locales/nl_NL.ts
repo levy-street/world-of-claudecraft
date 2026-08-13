@@ -1038,4 +1038,30 @@ export const nl_NL: Record<string, string> = {
   'bugReports.reviewed': 'Beoordeeld',
   'dialog.report': 'Rapport',
   'theme.darkModeLabel': 'Donkere modus',
+  'error.cannotRateLimitAdmin': 'adminaccounts kunnen niet in chat beperkt worden',
+  'error.generalChatRateLimitMessages': 'Voer {min} tot {max} berichten in.',
+  'error.generalChatRateLimitReasonInvalid':
+    'Voer een moderatiereden van hoogstens {max} tekens in.',
+  'error.generalChatRateLimitRequired': 'Kies een geldige algemene chatlimiet of verwijder deze.',
+  'error.generalChatRateLimitWindowMinutes': 'Voer een venster van {min} tot {max} minuten in.',
+  'generalChatRateLimit.confirmRemove': 'Limiet verwijderen',
+  'generalChatRateLimit.current':
+    'Huidige limiet: {messages} berichten per venster van {minutes} minuten',
+  'generalChatRateLimit.edit': 'Limiet bewerken',
+  'generalChatRateLimit.messagesError': 'Voer een geheel getal van {min} tot {max} in.',
+  'generalChatRateLimit.messagesLabel': 'Toegestane berichten',
+  'generalChatRateLimit.reasonPlaceholder': 'Waarom verandert deze algemene chatlimiet?',
+  'generalChatRateLimit.reasonRequired': 'Voer een moderatiereden in.',
+  'generalChatRateLimit.reasonTooLong': 'Gebruik hoogstens {max} tekens voor de reden.',
+  'generalChatRateLimit.remove': 'Limiet verwijderen',
+  'generalChatRateLimit.removeHint':
+    'Het verwijderen van deze accountoverschrijving zet de algemene chat terug op Onbeperkt.',
+  'generalChatRateLimit.save': 'Limiet opslaan',
+  'generalChatRateLimit.scope':
+    'Geldt alleen voor de algemene chat. Andere chatkanalen blijven ongewijzigd.',
+  'generalChatRateLimit.title': 'Algemene chatlimiet',
+  'generalChatRateLimit.unlimited': 'Onbeperkt',
+  'generalChatRateLimit.windowMinutesError': 'Voer een geheel getal van {min} tot {max} in.',
+  'generalChatRateLimit.windowMinutesLabel': 'Vensterlengte (minuten)',
+  'moderationHistory.actionGeneralChatRateLimit': 'Algemene chatlimiet gewijzigd',
 };

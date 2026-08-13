@@ -802,9 +802,9 @@ export const nl_NL: EnTranslations = {
       "note": "Sleep de chattabbladstrook om het venster te verplaatsen, of de hoekgreep om het te vergroten of verkleinen. Resetten zet het terug naar de standaardpositie en -grootte."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Limiet voor de algemene chat bereikt. Probeer het over {seconds} opnieuw.",
+      "pending": "Je vorige bericht in de algemene chat wordt nog verzonden. Probeer het zo meteen opnieuw.",
+      "unavailable": "De algemene chat is tijdelijk niet beschikbaar. Probeer het binnenkort opnieuw."
     },
     "swing": {
       "ready": "Slag",

@@ -802,9 +802,9 @@ export const id_ID: EnTranslations = {
       "note": "Seret bilah tab obrolan untuk memindahkan jendela, atau pegangan sudut untuk mengubah ukurannya. Atur Ulang mengembalikannya ke posisi dan ukuran bawaan."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Batas obrolan Umum tercapai. Coba lagi dalam {seconds}.",
+      "pending": "Pesan Umum sebelumnya masih dikirim. Coba lagi sebentar.",
+      "unavailable": "Obrolan Umum untuk sementara tidak tersedia. Coba lagi sebentar lagi."
     },
     "swing": {
       "ready": "Ayun",

@@ -7662,6 +7662,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.character.modelPreview': 'Förhandsvisning av karaktärsmodell',
   'hudChrome.charSheet.defense': 'Försvar',
   'hudChrome.charSheet.offense': 'Anfall',
+  'hudChrome.chatQuota.limitReached': 'Gränsen för Allmänt-chatten är nådd. Försök igen om {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Ditt föregående meddelande i Allmänt-chatten skickas fortfarande. Försök igen om en stund.',
+  'hudChrome.chatQuota.unavailable': 'Allmänt-chatten är tillfälligt otillgänglig. Försök igen snart.',
   'hudChrome.chatTimestamps.clock12h': '12-timmars',
   'hudChrome.chatTimestamps.clock24h': '24-timmars',
   'hudChrome.chatTimestamps.format': 'Tidsstämpelformat',

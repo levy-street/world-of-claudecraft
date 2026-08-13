@@ -577,6 +577,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.playtimeParts': '{major}, {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': 'Minder dan een minuut',
   'hudChrome.charSheet.showPlaytimeAria': 'Speeltijd tonen',
+  'hudChrome.chatQuota.limitReached': 'Limiet voor de algemene chat bereikt. Probeer het over {seconds} opnieuw.',
+  'hudChrome.chatQuota.pending':
+    'Je vorige bericht in de algemene chat wordt nog verzonden. Probeer het zo meteen opnieuw.',
+  'hudChrome.chatQuota.unavailable': 'De algemene chat is tijdelijk niet beschikbaar. Probeer het binnenkort opnieuw.',
   'hudChrome.comboMeter.label': 'CP',
   'hudChrome.options.showPlaytime': 'Speeltijd tonen op personagescherm',
   'hudChrome.perf.diagnostics.aria.findings': 'Gerangschikte diagnostische bevindingen',

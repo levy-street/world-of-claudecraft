@@ -292,6 +292,12 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.maxHpPct': 'Accroît les points de vie maximum de {pct}%',
   'hudChrome.statInfo.desc.parry':
     'Vos chances de parer entièrement une attaque de mêlée de front, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
+  'hudChrome.chatQuota.limitReached':
+    'Limite du clavardage Général atteinte. Réessayez dans {seconds}.',
+  'hudChrome.chatQuota.pending':
+    "Votre message précédent dans le clavardage Général est toujours en cours d'envoi. Réessayez dans un instant.",
+  'hudChrome.chatQuota.unavailable':
+    "Le clavardage Général est temporairement indisponible. Réessayez d'ici peu.",
   'hudChrome.interfaceTabs.chat': 'Clavardage',
   'hudChrome.options.mouseoverCast': 'Lancement au survol sur les cadres de groupe',
   'hud.errors.marketListBound': 'Cet objet est lié et ne peut pas être inscrit au marché.',

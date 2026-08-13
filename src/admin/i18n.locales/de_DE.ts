@@ -1048,4 +1048,30 @@ export const de_DE: Record<string, string> = {
   'bugReports.reviewed': 'Geprüft',
   'dialog.report': 'Bericht',
   'theme.darkModeLabel': 'Dunkler Modus',
+  'error.cannotRateLimitAdmin': 'Admin-Konten können nicht gedrosselt werden',
+  'error.generalChatRateLimitMessages': 'Gib {min} bis {max} Nachrichten ein.',
+  'error.generalChatRateLimitReasonInvalid':
+    'Gib einen Moderationsgrund mit höchstens {max} Zeichen ein.',
+  'error.generalChatRateLimitRequired': 'Wähle ein gültiges Allgemein-Chat-Limit oder entferne es.',
+  'error.generalChatRateLimitWindowMinutes': 'Gib ein Fenster von {min} bis {max} Minuten ein.',
+  'generalChatRateLimit.confirmRemove': 'Limit entfernen',
+  'generalChatRateLimit.current':
+    'Aktuelles Limit: {messages} Nachrichten pro {minutes}-Minuten-Fenster',
+  'generalChatRateLimit.edit': 'Limit bearbeiten',
+  'generalChatRateLimit.messagesError': 'Gib eine ganze Zahl von {min} bis {max} ein.',
+  'generalChatRateLimit.messagesLabel': 'Erlaubte Nachrichten',
+  'generalChatRateLimit.reasonPlaceholder': 'Warum ändert sich dieses Allgemein-Chat-Limit?',
+  'generalChatRateLimit.reasonRequired': 'Gib einen Moderationsgrund ein.',
+  'generalChatRateLimit.reasonTooLong': 'Verwende höchstens {max} Zeichen für den Grund.',
+  'generalChatRateLimit.remove': 'Limit entfernen',
+  'generalChatRateLimit.removeHint':
+    'Das Entfernen dieser Kontoüberschreibung setzt den Allgemein-Chat auf Unbegrenzt zurück.',
+  'generalChatRateLimit.save': 'Limit speichern',
+  'generalChatRateLimit.scope':
+    'Gilt nur für den Allgemein-Chat. Andere Chatkanäle sind davon nicht betroffen.',
+  'generalChatRateLimit.title': 'Allgemein-Chat-Limit',
+  'generalChatRateLimit.unlimited': 'Unbegrenzt',
+  'generalChatRateLimit.windowMinutesError': 'Gib eine ganze Zahl von {min} bis {max} ein.',
+  'generalChatRateLimit.windowMinutesLabel': 'Fensterlänge (Minuten)',
+  'moderationHistory.actionGeneralChatRateLimit': 'Allgemein-Chat-Limit geändert',
 };

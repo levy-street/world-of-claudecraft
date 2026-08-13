@@ -802,9 +802,9 @@ export const tr_TR: EnTranslations = {
       "note": "Pencereyi taşımak için sohbet sekme şeridini, yeniden boyutlandırmak için köşe tutamacını sürükleyin. Sıfırla, onu varsayılan konum ve boyutuna döndürür."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Genel sohbet sınırına ulaşıldı. {seconds} içinde tekrar dene.",
+      "pending": "Önceki Genel sohbet mesajın hâlâ gönderiliyor. Birazdan tekrar dene.",
+      "unavailable": "Genel sohbet geçici olarak kullanılamıyor. Kısa süre sonra tekrar dene."
     },
     "swing": {
       "ready": "Vuruş",

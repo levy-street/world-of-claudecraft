@@ -802,9 +802,9 @@ export const fr_CA: EnTranslations = {
       "note": "Faites glisser la barre d'onglets de la discussion pour déplacer la fenêtre, ou la poignée d'angle pour la redimensionner. Réinitialiser la rétablit à sa position et sa taille par défaut."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Limite du clavardage Général atteinte. Réessayez dans {seconds}.",
+      "pending": "Votre message précédent dans le clavardage Général est toujours en cours d'envoi. Réessayez dans un instant.",
+      "unavailable": "Le clavardage Général est temporairement indisponible. Réessayez d'ici peu."
     },
     "swing": {
       "ready": "Coup",

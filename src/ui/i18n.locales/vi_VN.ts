@@ -8375,6 +8375,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.castBar.playerAria': 'Thanh Niệm Chú Của Bạn',
   'hudChrome.castBar.targetAria': 'Thanh Niệm Chú Của Mục Tiêu',
   'hudChrome.character.modelPreview': 'Xem Trước Mô Hình Nhân Vật',
+  'hudChrome.chatQuota.limitReached': 'Đã đạt giới hạn chat Chung. Hãy thử lại sau {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Tin nhắn chat Chung trước đó của bạn vẫn đang được gửi. Hãy thử lại sau giây lát.',
+  'hudChrome.chatQuota.unavailable':
+    'Chat Chung hiện tạm thời không khả dụng. Vui lòng thử lại trong thời gian ngắn.',
   'hudChrome.chatTimestamps.clock12h': '12 giờ',
   'hudChrome.chatTimestamps.clock24h': '24 giờ',
   'hudChrome.chatTimestamps.format': 'Định Dạng Dấu Thời Gian',

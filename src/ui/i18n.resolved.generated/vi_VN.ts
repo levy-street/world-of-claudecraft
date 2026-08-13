@@ -802,9 +802,9 @@ export const vi_VN: EnTranslations = {
       "note": "Kéo dải thẻ trò chuyện để di chuyển cửa sổ, hoặc kéo góc để thay đổi kích thước. Đặt Lại sẽ đưa cửa sổ về vị trí và kích thước mặc định."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Đã đạt giới hạn chat Chung. Hãy thử lại sau {seconds}.",
+      "pending": "Tin nhắn chat Chung trước đó của bạn vẫn đang được gửi. Hãy thử lại sau giây lát.",
+      "unavailable": "Chat Chung hiện tạm thời không khả dụng. Vui lòng thử lại trong thời gian ngắn."
     },
     "swing": {
       "ready": "Vung Đòn",

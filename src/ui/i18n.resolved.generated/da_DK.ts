@@ -802,9 +802,9 @@ export const da_DK: EnTranslations = {
       "note": "Træk chatfanestriben for at flytte vinduet, eller hjørnegrebet for at ændre størrelse. Nulstil sætter det tilbage til standardposition og -størrelse."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Grænsen for Generelt-chatten er nået. Prøv igen om {seconds}.",
+      "pending": "Din forrige besked i Generelt-chatten sendes stadig. Prøv igen om et øjeblik.",
+      "unavailable": "Generelt-chatten er midlertidigt utilgængelig. Prøv igen snart."
     },
     "swing": {
       "ready": "Slag",

@@ -7731,6 +7731,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Cliquez sur ×, faites un clic droit ou glissez vers les sacs pour déséquiper',
   'skinEvent.unlocked': 'Cosmétique débloqué !',
   'errors.api.webLoginOnly': 'Les connexions ne sont autorisées que depuis le client du jeu.',
+  'hudChrome.chatQuota.limitReached': 'Limite du chat Général atteinte. Réessayez dans {seconds}.',
+  'hudChrome.chatQuota.pending':
+    "Votre message précédent dans le chat Général est toujours en cours d'envoi. Réessayez dans un instant.",
+  'hudChrome.chatQuota.unavailable':
+    "Le chat Général est temporairement indisponible. Réessayez d'ici peu.",
   'hudChrome.chatTimestamps.clock12h': '12 heures',
   'hudChrome.chatTimestamps.clock24h': '24 heures',
   'hudChrome.chatTimestamps.format': "Format de l'horodatage",

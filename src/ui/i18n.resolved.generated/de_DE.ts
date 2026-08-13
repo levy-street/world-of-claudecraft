@@ -802,9 +802,9 @@ export const de_DE: EnTranslations = {
       "note": "Ziehe die Chat-Reiterleiste, um das Fenster zu verschieben, oder den Eckgriff, um die Größe zu ändern. Zurücksetzen stellt die Standardposition und -größe wieder her."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Allgemein-Chat-Limit erreicht. Versuche es in {seconds} erneut.",
+      "pending": "Deine vorherige Nachricht im Allgemein-Chat wird noch gesendet. Versuche es gleich noch einmal.",
+      "unavailable": "Der Allgemein-Chat ist vorübergehend nicht verfügbar. Versuche es bald erneut."
     },
     "swing": {
       "ready": "Schwung",

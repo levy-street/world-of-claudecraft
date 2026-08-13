@@ -802,9 +802,9 @@ export const cs_CZ: EnTranslations = {
       "note": "Tažením lišty karet chatu přesuneš okno, rohovým úchytem změníš velikost. Reset ho vrátí na výchozí pozici a velikost."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Byl dosažen limit chatu Obecného. Zkus to znovu za {seconds}.",
+      "pending": "Tvoje předchozí zpráva v chatu Obecném se ještě odesílá. Zkus to za chvíli znovu.",
+      "unavailable": "Chat Obecný je dočasně nedostupný. Zkus to znovu brzy."
     },
     "swing": {
       "ready": "Úder",

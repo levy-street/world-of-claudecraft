@@ -802,9 +802,9 @@ export const sv_SE: EnTranslations = {
       "note": "Dra chattflikraden för att flytta fönstret, eller hörnhandtaget för att ändra storlek. Återställ sätter det till standardläge och -storlek."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Gränsen för Allmänt-chatten är nådd. Försök igen om {seconds}.",
+      "pending": "Ditt föregående meddelande i Allmänt-chatten skickas fortfarande. Försök igen om en stund.",
+      "unavailable": "Allmänt-chatten är tillfälligt otillgänglig. Försök igen snart."
     },
     "swing": {
       "ready": "Sving",

@@ -123,6 +123,14 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Informe de error enviado, pero la captura de pantalla era demasiado grande para incluirla.',
   'hudChrome.bugReport.tooLarge':
     'Ese informe es demasiado grande para enviarlo. Inténtalo de nuevo sin la captura de pantalla.',
+  // General chat rate limit HUD notices (es_ES prefers "vuelve a intentarlo" over
+  // es-LatAm "inténtalo de nuevo", matching this file's existing retry phrasing).
+  'hudChrome.chatQuota.limitReached':
+    'Has alcanzado el límite del chat General. Vuelve a intentarlo en {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Tu mensaje anterior del chat General todavía se está enviando. Vuelve a intentarlo en un momento.',
+  'hudChrome.chatQuota.unavailable':
+    'El chat General no está disponible temporalmente. Vuelve a intentarlo pronto.',
   'delveUi.affix.bad_air': 'Aire viciado',
   'delveUi.affix.candleblind': 'Cegavelas',
   'delveUi.affix.cult_remnants': 'Vestigios del culto',
