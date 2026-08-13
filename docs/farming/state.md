@@ -196,7 +196,14 @@ visit or a punishment for lateness is violating the design, not tuning it.
   release/v0.36.0). Every phase: fetch, then branch `fix/farming-phase-NN-<slug>` off
   LOCAL `feature/farming-plan` (never off a bare release tip, which lacks the packet);
   if a newer `release/**` tip exists than the branch has absorbed, merge it INTO the
-  phase branch first (release-merge-audit for a nontrivial merge). A finished phase
+  phase branch first (release-merge-audit for a nontrivial merge, PLUS the
+  deviation (al) absorb checklist for every absorb). SYNC MID-PHASE RULE
+  (2026-08-13, the phase-06b precedent): when the pending jump is a minor
+  version or more, or the release-delta intersection with the farming footprint
+  reaches triple digits, the absorb runs as its OWN mid-phase
+  (docs/farming/phase-06b-release-sync.md is the template) BEFORE the next
+  feature or QA phase, so an absorb of that size never shares a diff with
+  feature work. A finished phase
   merges back into `feature/farming-plan` with --no-ff (the phase boundary stays
   readable) and deletes its branch. The would-be PR body becomes the phase report in
   the progress.md Notes block (including required flags and screenshot references);

@@ -17,6 +17,13 @@ Goal: audit Phase 12 for correctness, missing tests, dead code, determinism, thr
 parity, i18n completeness, and the phase's own acceptance criteria.
 
 STEP 0 - PRE-FLIGHT
+- [AMENDED per D22, the Phase 1 QA precedent: no PR exists. The phase lands
+  as local commits merged --no-ff into feature/farming-plan (progress.md
+  records the merge hash and commit map); audit that merge's phase-side
+  parent chain, EXCLUDING any release-sync absorb commits, which carry their
+  own audit. QA fix commits land on a fix/farming-phase-12-qa branch off
+  feature/farming-plan, merged back --no-ff. Read this file's PR wording
+  below through that lens.]
 - Same worktree rules: work ONLY in ~/Documents/woc-farming-plan, use
   git -C ~/Documents/woc-farming-plan everywhere, git status clean or stop.
 - git fetch origin --prune, then check out the Phase 12 PR branch

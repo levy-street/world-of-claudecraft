@@ -28,7 +28,14 @@ STEP 0 - PRE-FLIGHT
   that is not yours.
 - Re-resolve the NEWEST release/** branch: git fetch origin --prune, then
   git branch -r --list 'origin/release/*' | sort -V and take the last row. Create branch
-  fix/farming-phase-11-well-fed-food off its tip. Record the phase-start commit sha.
+  fix/farming-phase-11-well-fed-food off LOCAL feature/farming-plan (D22: never off
+  the release tip, which lacks the packet and all farming work), then MERGE the
+  newest release tip INTO the phase branch FIRST: run the release-merge-audit skill
+  plus the state.md deviation (al) absorb checklist, re-run the parity and count-pin
+  suites, and verify the farming_session golden md5 unchanged. A jump of a minor
+  version or more (or a triple-digit intersection) runs
+  docs/farming/phase-06b-release-sync.md's shape as its own mid-phase BEFORE this
+  phase instead. Record the phase-start commit sha.
 - If release moves mid-phase and this branch turns long-lived, merge release in and run
   the release-merge-audit skill.
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus

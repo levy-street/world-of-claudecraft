@@ -28,7 +28,12 @@ STEP 0 - PRE-FLIGHT
   f570a39002, test(economy) f76fb4e41e, fix(ui) 544a291f98, fix(review)
   0a692e8896, fix(test) 5215f712d7 (the three release art-program collision
   heals, deviations (ak)/(al)), test(economy) 22ee3a3857 (the QA-round pins),
-  plus the docs commits.]
+  plus the docs commits. Phase 6b (docs/farming/phase-06b-release-sync.md, the
+  big-jump release sync) merges into feature/farming-plan AFTER the Phase 6
+  merge 1a26881d0b and is EXCLUDED from this QA's diff: it carries its own
+  audit, and its progress.md notes record its merge hash. If a Phase 6 pin was
+  legitimately re-recorded by the sync, judge the pin against the sync's
+  ledger entry, not against the Phase 6 numbers.]
 - If the diff cannot be identified cleanly, stop and surface.
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus
   mutation-checks-commit-first, i18n-semantic-regressions-gate-trap,

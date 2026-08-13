@@ -32,7 +32,14 @@ STEP 0 - PRE-FLIGHT
 - git -C ~/Documents/woc-farming-plan status must be clean. Stop if it is not.
 - Re-resolve the NEWEST release/** branch: git fetch origin --prune; then
   git branch -r --list 'origin/release/*' | sort -V and take the last row. Create
-  branch fix/farming-phase-07-render-and-juice off its tip.
+  branch fix/farming-phase-07-render-and-juice off LOCAL feature/farming-plan
+  (D22: never off the release tip, which lacks the packet and all farming work),
+  then MERGE the newest release tip INTO the phase branch FIRST: run the
+  release-merge-audit skill plus the state.md deviation (al) absorb checklist,
+  re-run the parity and count-pin suites, and verify the farming_session golden
+  md5 unchanged. A jump of a minor version or more (or a triple-digit
+  intersection) runs docs/farming/phase-06b-release-sync.md's shape as its own
+  mid-phase BEFORE this phase instead.
 - Record the phase-start commit (git rev-parse HEAD) for the STEP 3 diff.
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, and
   the phase-relevant topics: pr-screenshot-browser-path (this is a visual phase),

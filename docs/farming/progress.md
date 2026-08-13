@@ -17,6 +17,7 @@
 | Phase 5 (crops and tools) | done | 2026-08-09 | 2026-08-09 |
 | Phase 5 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-09 | 2026-08-09 |
 | Phase 6 (economy hooks) | done | 2026-08-09 | 2026-08-09 |
+| Phase 6b (release sync, v0.38.0 at authoring) | not started | | |
 | Phase 6 QA | not started | | |
 | Phase 7 (render and juice) | not started | | |
 | Phase 7 QA | not started | | |
@@ -1091,6 +1092,12 @@ step green (no armory exception tripped this run), farming_session golden
 md5 bf00c277b89e142446550f00c1035696 unchanged, tree clean. Lesson
 re-recorded: never edit the tree while a gate runs; the log markers are the
 only verdict (run 2's shell exit was 0 while the log said FAIL).
+
+### Phase 6b (release sync)
+(not started; docs/farming/phase-06b-release-sync.md. Runs BEFORE Phase 6 QA:
+the v0.36.0-to-newest absorb is its own phase because the jump is 1453 commits
+with a 117-file farming intersection and a lockfile move. Its merge lands AFTER
+1a26881d0b and is excluded from the Phase 6 QA diff.)
 
 ### Phase 7
 (not started)

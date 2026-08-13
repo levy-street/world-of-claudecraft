@@ -19,6 +19,13 @@ Goal: audit Phase 8 for correctness, missing tests, dead code, determinism,
 three-host parity, i18n completeness, and the phase's own acceptance criteria.
 
 STEP 0 - PRE-FLIGHT
+- [AMENDED per D22, the Phase 1 QA precedent: no PR exists. The phase lands
+  as local commits merged --no-ff into feature/farming-plan (progress.md
+  records the merge hash and commit map); audit that merge's phase-side
+  parent chain, EXCLUDING any release-sync absorb commits, which carry their
+  own audit. QA fix commits land on a fix/farming-phase-08-qa branch off
+  feature/farming-plan, merged back --no-ff. Read this file's PR wording
+  below through that lens.]
 - Work ONLY in the persistent worktree ~/Documents/woc-farming-plan; git status must
   be clean. Check out the phase branch fix/farming-phase-08-harvest-journal (QA fix
   commits land on the phase PR).
