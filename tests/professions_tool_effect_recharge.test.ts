@@ -5,7 +5,11 @@
 // expensive generic recharge any shipped tool can price).
 
 import { describe, expect, it } from 'vitest';
-import type { TOOL_EFFECT_IDS } from '../src/sim/content/professions';
+import {
+  HARVEST_COMPONENT_ITEMS,
+  HARVEST_COMPONENT_SPECIMENS,
+  type TOOL_EFFECT_IDS,
+} from '../src/sim/content/professions';
 import { ALL_RECIPES, APEX_GEAR_RECIPES, TOOL_EFFECT_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
@@ -549,29 +553,40 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
     const allSelfSigned = bill(recipe.reagents.map((r) => r.itemId));
     expect(allSelfSigned).toBe(275);
     expect(allSelfSigned).toBe(worstRecharge);
-    // The two shipped ways a held copy comes back signed: a node yield (any
-    // rare-or-better roll signs it) and the #1149 craft stamp, which fires on
-    // a rare-or-better OUTPUT def quality. `poor`/absent normalize to
-    // `common` first, mirroring crafting.ts's defOutputQuality.
+    // The three shipped ways a held copy comes back signed: a node yield (any
+    // rare-or-better roll signs it), the #1149 craft stamp, which fires on
+    // a rare-or-better OUTPUT def quality (`poor`/absent normalize to
+    // `common` first, mirroring crafting.ts's defOutputQuality), and the
+    // corpse-harvest premium arm, whose component and specimen grants arrive
+    // signed (HARVEST_COMPONENT_ITEMS / HARVEST_COMPONENT_SPECIMENS).
     const admitsSignedSource = (itemId: string): boolean => {
       const nodeYield = Object.values(NODE_MATERIAL_TABLE).some((byZone) =>
         Object.values(byZone).some((row) => row.itemId === itemId),
       );
+      const corpseComponent =
+        Object.values(HARVEST_COMPONENT_ITEMS).includes(itemId) ||
+        Object.values(HARVEST_COMPONENT_SPECIMENS).includes(itemId);
       const quality = ITEMS[itemId]?.quality;
       const outputQuality = quality === undefined || quality === 'poor' ? 'common' : quality;
       return (
         nodeYield ||
+        corpseComponent ||
         (ALL_RECIPES.some((row) => row.resultItemId === itemId) &&
           isSignableMaterialRarity(outputQuality))
       );
     };
-    // POSITIVE CONTROLS on BOTH arms of that read, or the two absences below
-    // would pass over a predicate that answers false for everything: the two
-    // lines signed above really are node yields, and the recipe's own epic
-    // output really clears the craft stamp's threshold.
+    // POSITIVE CONTROLS on ALL THREE arms of that read, or the two absences
+    // below would pass over a predicate that answers false for everything:
+    // the two lines signed above really are node yields, the recipe's own
+    // epic output really clears the craft stamp's threshold, and a shipped
+    // corpse component really trips the harvest arm.
     expect(admitsSignedSource('thorium_ore'), 'the ore line must be node-reachable').toBe(true);
     expect(admitsSignedSource('ashwood_log'), 'the log line must be node-reachable').toBe(true);
     expect(admitsSignedSource('makers_charm'), 'the epic output must be craft-signable').toBe(true);
+    expect(
+      admitsSignedSource('rough_hide'),
+      'a shipped corpse component must trip the harvest arm',
+    ).toBe(true);
     for (const itemId of ['precision_chassis', 'wyrmfall_core']) {
       expect(
         admitsSignedSource(itemId),

@@ -611,16 +611,17 @@ describe('masterwrought apex budget sweep', () => {
     expect(def.requiredClass).toEqual(row.requiredClass);
 
     // Weapon damage is the pinned literal; the band tie holds realized dps
-    // within 0.15 of weaponDpsBudget(31) (x TWOHAND_DPS_MULT for the 2H).
-    // That bound is the quantization ceiling, not a taste band: integer
-    // min/max make the mean a multiple of 0.5, so the closest dps an authored
-    // speed can reach is 0.25 / speed off target (0.1 at the fastest shipped
-    // speed, 2.5). 0.15 leaves headroom for a faster future row while still
-    // refusing real drift; the shipped 2H sits 0.018 off its 18.4 line.
+    // within the per-row quantization ceiling of weaponDpsBudget(31)
+    // (x TWOHAND_DPS_MULT for the 2H), not a taste band: integer min/max
+    // make the mean a multiple of 0.5, so the closest dps an authored speed
+    // can reach is 0.25 / speed off target (0.1 at the fastest shipped
+    // speed, 2.5). The 0.05 pad refuses real drift while staying
+    // self-maintaining for any future faster row; the shipped 2H sits 0.018
+    // off its 18.4 line.
     expect(def.weapon).toEqual(row.weapon);
     const dps = (row.weapon.min + row.weapon.max) / 2 / row.weapon.speed;
     const dpsTarget = weaponDpsBudget(31) * (row.twoHand ? TWOHAND_DPS_MULT : 1);
-    expect(Math.abs(dps - dpsTarget)).toBeLessThanOrEqual(0.15);
+    expect(Math.abs(dps - dpsTarget)).toBeLessThanOrEqual(0.25 / row.weapon.speed + 0.05);
 
     // Stats: the literal, then the formula as the independent second arm
     // (expectedStatBudget applies TWOHAND_STAT_MULT for the 2H), then the

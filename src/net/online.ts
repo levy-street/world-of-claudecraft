@@ -1275,7 +1275,9 @@ const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
 // The one frozen empty craft set the mst mirror hands out (initial value and
 // every empty transition), so the empty case is identity-stable and
 // allocation-free exactly like the offline resolver's EMPTY_CRAFTS.
-const EMPTY_MST_CRAFTS: readonly string[] = Object.freeze([]);
+// Exported for tests/helpers/bare_client.ts, which mirrors ClientWorld's
+// static defaults contract-for-contract.
+export const EMPTY_MST_CRAFTS: readonly string[] = Object.freeze([]);
 
 function blankEntity(id: number): Entity {
   return {

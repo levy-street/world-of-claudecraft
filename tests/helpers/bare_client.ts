@@ -7,7 +7,7 @@
 // hand-rolling either fixture again.
 
 import type { ClientSession, GameServer } from '../../server/game';
-import { ClientWorld } from '../../src/net/online';
+import { ClientWorld, EMPTY_MST_CRAFTS } from '../../src/net/online';
 import { emptyAllocation } from '../../src/sim/content/talents';
 import { ALL_RECIPES } from '../../src/sim/data';
 import { freshDeedStats } from '../../src/sim/deeds';
@@ -152,7 +152,8 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.lastDisenchantResult = null;
   c.lastEnchantResult = null;
   c.lastSalvageResult = null;
-  c.activeMobileStationCrafts = [];
+  // The class default is the shared frozen empty, contract and identity both.
+  c.activeMobileStationCrafts = EMPTY_MST_CRAFTS;
   c.activeMobileStationCraftsRaw = null;
   c.markers = {};
   c.lastSnapAt = 0;

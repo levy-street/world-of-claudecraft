@@ -122,7 +122,7 @@ describe('recipe index memo rebuild contract', () => {
 
     ALL_RECIPES.splice(ALL_RECIPES.indexOf(RESULT_PROBE), 1);
     expect(recipeForResultItem(RESULT_PROBE.resultItemId)).toBeUndefined();
-    expect(recipeForResultItem(FIRST_SHIPPED.resultItemId)).toBeDefined();
+    expect(recipeForResultItem(FIRST_SHIPPED.resultItemId)).toBe(FIRST_SHIPPED);
     expect(ALL_RECIPES.length).toBe(BASELINE_LENGTH);
   });
 

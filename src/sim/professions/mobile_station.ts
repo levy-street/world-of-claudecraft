@@ -220,7 +220,9 @@ export function partySharedStationSatisfies(
 }
 
 // Returned whenever no station serves the viewer: the common case on the
-// per-viewer snapshot path, so it must allocate nothing.
+// per-viewer snapshot path. The party-null path allocates nothing at all;
+// a partied viewer pays one bounded closure for the shared walk even when
+// the result is empty.
 const EMPTY_CRAFTS: readonly string[] = Object.freeze([]);
 
 /**
@@ -266,5 +268,5 @@ export function activeMobileStationCraftsForViewer(
   // Frozen like the ClientWorld mirror's split result, so the two IWorld
   // implementations hand consumers the same array contract (a mutation
   // throws in both worlds instead of succeeding offline only).
-  return Object.freeze((crafts as string[]).sort());
+  return Object.freeze(crafts.sort());
 }
