@@ -2605,7 +2605,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useElixirAura':
     '使用：獲得{aura}效果，持續 {minutes} 分鐘。會取代同類的其他藥劑或卷軸。戰鬥中可用。',
   'itemUi.tooltip.flaskOnlyOne': '同時只能有一種藥壺效果。飲用另一瓶藥壺會頂替目前效果。',
-  'itemUi.tooltip.flaskThroughDeath': '該效果在死亡後依然保留。',
+  'itemUi.tooltip.flaskOutranks': '更弱的藥劑或卷軸無法取代它。',
+  'itemUi.tooltip.flaskThroughDeath': '該效果在死亡後依然保留，但在登出後消失。',
   'itemUi.tooltip.wellFed': '精神飽滿：吃完後使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。',
   'itemUi.tooltip.wellFedAura': '精神飽滿：吃完後獲得{aura}效果，持續 {minutes} 分鐘。',
   'itemUi.tooltip.clickUseInstant': '點擊在戰鬥中立即使用',
@@ -10697,8 +10698,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftIntro.leatherworking':
     '製皮在芬橋的製革坊鞣製靈巧的皮甲，從獸皮基礎款到精良的澤守系列。',
   'guide.profPages.craftIntro.cooking':
-    '烹飪在東溪的廚房把魚、野味和草藥做成坐下享用的餐食，最高可達精良的盛宴佳餚。',
-  'guide.profPages.craftIntro.alchemy': '鍊金術在高望的藥坊調配治療與法力藥劑，以及耐力合劑。',
+    '烹飪在東溪的廚房把魚、野味和草藥做成坐下享用的餐食，頂端是三道分職佳餚：回復量勝過其他任何食物，還會給吃完整盤的人留下精神飽滿效果。',
+  'guide.profPages.craftIntro.alchemy': '鍊金術在高望的藥坊調配治療與法力藥劑、耐力合劑，頂端則是每個職責一瓶的藥壺，連你自己的死亡都留得住。',
   'guide.profPages.craftIntro.engineering':
     '工程學在東溪的工坊打造4階與5階採集工具，每一件都要消耗低一階的工具。',
   'guide.profPages.craftIntro.enchanting':
@@ -10901,7 +10902,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '野外配方Eastbrook Arming Sword人人都會、隨處可做。真正的梯子是三檔九個訓練師配方，全部綁定鍛造坊：銅檔技能0免費，鐵檔技能25每個25銀，鋨檔技能50每個1金；你的層級一到，Darva就會教。另有一件組合配方Gravewyrm Gauntlets：只有武器鍛造與護甲鍛造都到25的調諧鐵匠能做，且不需要任何工位。',
   'guide.profPages.craftProse.weaponcrafting.routeHeading': '傑作與通往125之路',
   'guide.profPages.craftProse.weaponcrafting.routeBody':
-    '有屬性的成品（鐵檔及以上）才可能出傑作；無屬性的銅檔普通件永遠不會觸發。鐵算一級材料（加成1%），高松與銘鋼算二級（2%）。路線：銅檔到25，鐵檔到50，鋨檔到75；此後暫無更高配方，鋨檔衰減為半速再到四分之一，到125上限約需再做150次，注意每分鐘十次的共享節流。Darva的工作訂單每30分鐘收八塊銅礦。功業之書在技能50記下Edge and Temper，125加冕Grandmaster Weaponcrafting。',
+    '有屬性的成品（鐵檔及以上）才可能出傑作；無屬性的銅檔普通件永遠不會觸發。鐵算一級材料（加成1%），高松與銘鋼算二級（2%）。路線：銅檔到25，鐵檔到50，鋨檔到75。鋨檔三件之上還有一個Darva不教的頂級檔位：它的配方靠拾取，握有配方的鐵匠可以一路滿速練到上限。配方到手之前，剩下的路由鋨檔承擔，衰減為半速再到四分之一，到125上限約需再做150次，注意每分鐘十次的共享節流。Darva的工作訂單每30分鐘收八塊銅礦。功業之書在技能50記下Edge and Temper，125加冕Grandmaster Weaponcrafting。',
   'guide.profPages.craftProse.armorcrafting.identityHeading': '前線的鎖甲',
   'guide.profPages.craftProse.armorcrafting.identityBody':
     '梯子如同士兵的履歷：鉚接銅甲起步，ironlink一檔有了真正的屬性，精良的osmiumscale頭盔、胸甲與護腿則是工匠能敲出的最大護甲數值。還有安靜的一面：野外普通件Eastbrook Warded Leggings與技能75的Kilnscale Mantle（智力精神鎖甲肩）留住法系鎖甲客戶。它位於武器鍛造與工程學之間；鐵匠對可在Darva處宣誓，Gearwright暫無誓約任務。',
@@ -10940,7 +10941,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     "marshstalker檔及以上都擲傑作，Mirewarden Jerkin裡的Pristine Hide自動提供署名材料加成；鋨礦算一級材料。無屬性的硬皮普通件不會觸發。自然而然地練：從一級起剝下每隻狼和野豬，硬皮檔隨地做到25，隨任務進沼澤時順路受訓；marshstalker到50，mirewarden到75，此後Duskhide Wraps（三層配方，六塊鋨礦、三塊Pristine Hide、兩塊粗皮、一份Tanning Agent）帶你走完最後五十點（約75次）。75專精後移動製革坊尤其寶貴：營火邊就能把一袋皮子變成成品。Hesk的訂單每30分鐘收八張粗皮。技能50記下Tanner's Trade，上限處是Grandmaster Leatherworking。",
   'guide.profPages.craftProse.cooking.identityHeading': '餵飽隊伍的鍋',
   'guide.profPages.craftProse.cooking.identityBody':
-    "吃下熟食會在18秒的休息中治療你，這是拉怪間隙最便宜的治療。梯子從90點治療的Pan-Seared River Perch一路做到980點的Marlow's Grand Roast，現存最大的坐地回復。烹飪位於鍊金術與製皮之間；藥劑師（鍊金術與烹飪）在Eastbrook廚房的Cook Marlow處宣誓（先為鍋獵四頭野豬），與製皮組成的Trapper暫無誓約任務。",
+    "吃下熟食會在18秒的休息中治療你，這是拉怪間隙最便宜的治療。梯子從90點治療的Pan-Seared River Perch經980點的Marlow's Grand Roast，一路做到其上的三道頂級分職佳餚（1392點），這是遊戲中最大的坐地回復，也是唯一在吃完整盤後留下精神飽滿效果的食物。烹飪位於鍊金術與製皮之間；藥劑師（鍊金術與烹飪）在Eastbrook廚房的Cook Marlow處宣誓（先為鍋獵四頭野豬），與製皮組成的Trapper暫無誓約任務。",
   'guide.profPages.craftProse.cooking.materialsHeading': '釣竿與獵刀供養的食櫃',
   'guide.profPages.craftProse.cooking.materialsBody':
     '釣魚按區域供應招牌食材：Eastbrook Vale的鏡鱒與河鱸，Mirefen Marsh的沼狗魚與泥鰻，Thornpeak Heights的霜鰓鱒與板鰭鯉，每一檔都烹本檔的魚。屠夫的一側來自屍體採集：野味肉，以及精良採集擲出的署名Prime Cut（大烤肉的核心）。藥草調味，梣木燻鰻，Cooking Salt在Marlow攤位8銅一袋。',
@@ -10949,7 +10950,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     "Salted Jerky是野外配方：初始即會、一條蛛腿、隨處可做。訓練師梯子在廣場東側的Eastbrook廚房：免費檔技能0（河鱸、Hunter's Game Skewer、Herbed Marsh Pike），中檔技能25每個25銀（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder），精良檔技能50每個1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。批量菜省料：燻鰻與燉肉每次兩份，宴會拼盤三份。",
   'guide.profPages.craftProse.cooking.routeHeading': '專精而非傑作，以及通往125之路',
   'guide.profPages.craftProse.cooking.routeBody':
-    '烹飪是傑作故事裡誠實的例外：菜餚沒有屬性可提升，永不觸發，也不必追。這門手藝的精通在於75的專精：每樣食材省五分之一（批量菜上疊加極快），外加移動野外廚房，讓宴席在副本門口出鍋。邊釣邊做，兩門技能互相供養：免費檔到25，中檔到50，精良檔到75；此後精良菜衰減為半速與四分之一，到上限約再做150次。Marlow的訂單每30分鐘收八塊野味肉。技能50記下Seasoned Chef，125是Grandmaster Cooking頭銜。',
+    '烹飪是傑作故事裡誠實的例外：菜餚沒有屬性可提升，永不觸發，也不必追。這門手藝的精通在於75的專精：每樣食材省五分之一（批量菜上疊加極快），外加移動野外廚房，讓宴席在副本門口出鍋。邊釣邊做，兩門技能互相供養：免費檔到25，中檔到50，精良檔到75。精良檔之上還有頂級廚房：三道分職佳餚與The Laden Hearth，沒有導師傳授，只能從拾得的配方學會，握有配方的廚師可以一路滿速練到上限。配方到手之前，最後一段由精良菜承擔，衰減為半速與四分之一，約再做150次。Marlow的訂單每30分鐘收八塊野味肉。技能50記下Seasoned Chef，125是Grandmaster Cooking頭銜。',
   'guide.profPages.craftProse.alchemy.identityHeading': '贏下戰鬥的瓶子',
   'guide.profPages.craftProse.alchemy.identityBody':
     '這門手藝在Highwatch的藥坊操持，主人是Alchemist Verane：教配方、賣12銅的Glass Vial、以工作訂單收藥草。鍊金術位於工程學與烹飪之間，因此有兩條命途：爆破師（工程學與鍊金術，在Eastbrook的Tinker Gizzel處受誓）與藥劑師（鍊金術與烹飪，在Cook Marlow處宣誓）。調諧任一對即可讓鍊金成為主修直至上限；此前它像所有未宣誓行業一樣練到精良層。',
@@ -10958,7 +10959,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '每瓶藥劑要一個Glass Vial外加對應檔位的藥草：潤光葉生於Eastbrook Vale，金葉生於Mirefen Marsh，日瓣草生於Thornpeak Heights，一區一藥，瓶子隨世界一起攀升。藥草學是天然的夥伴技能；深區的高階草叢需要更好的鐮刀。強化藥劑一線另需獵手的材料：從帶毒屍體採集的Venom Gland，頂級藥劑還要一塊Pristine Venom Gland（署名標本）。',
   'guide.profPages.craftProse.alchemy.ladderHeading': '配方階梯',
   'guide.profPages.craftProse.alchemy.ladderBody':
-    'Minor Healing Potion人人初始即會、隨處可調。真正的梯子是Verane在藥坊教的九個配方，每檔三個：技能0免費，25檔每個25銀，50檔每個1金；每檔都是治療藥劑、法力藥劑與耐力強化劑，從普通潤光葉瓶（120生命、160法力）經優秀金葉（200、260）到精良日瓣（280、360）。強化劑同樣攀升：Elixir of the Boar給6耐力10分鐘，Vipersear Elixir給9耐力15分鐘，Elixir of the Serpent給12耐力15分鐘且一次兩瓶。旁邊還有組合配方Elixir of the Bear：鍊金25時Verane以25銀傳授，隨處可調，但只有雙技能25的調諧爆破師能做。',
+    'Minor Healing Potion人人初始即會、隨處可調。真正的梯子是Verane在藥坊教的九個配方，每檔三個：技能0免費，25檔每個25銀，50檔每個1金；每檔都是治療藥劑、法力藥劑與耐力強化劑，從普通潤光葉瓶（120生命、160法力）經優秀金葉（200、260）到精良日瓣（280、360）。強化劑同樣攀升：Elixir of the Boar給6耐力10分鐘，Vipersear Elixir給9耐力15分鐘，Elixir of the Serpent給12耐力15分鐘且一次兩瓶。旁邊還有組合配方Elixir of the Bear：鍊金25時Verane以25銀傳授，隨處可調，但只有雙技能25的調諧爆破師能做。\n\n整條強化劑線之上還有藥壺檔，無人傳授，只能從拾得的配方學會。藥壺給15點、持續20分鐘，並開出強化劑從未有過的兩條軸：攻擊強度與智力，與熟悉的耐力並列，每個職責一瓶。它還有自己的規矩：無論屬性，同時只能有一瓶藥壺生效；該屬性更弱的藥劑或卷軸無法取代它；它能陪你越過自己的死亡，但登出後就會消失。',
   'guide.profPages.craftProse.alchemy.routeHeading': '釀藥師的125之路',
   'guide.profPages.craftProse.alchemy.routeBody':
     '藥劑永不出傑作，那屬於有屬性的裝備；但名字仍會流傳：精良的日瓣藥劑單瓶釀造、出瓶即署名，雙瓶的Elixir of the Serpent則是無名的。75專精後每個配方省20%材料。早學藥草邊練邊採：潤光葉遍布山谷，到了Verane的工作檯，免費檔就能靠順手採的藥草乾淨地推到25；25檔一開就學，採藥轉往沼澤，Verane的訂單（六株Goldleaf Herb換45銅，每30分鐘一次）順路回本。50以後用Thornpeak的藥草釀日瓣與蛇藥；100到125是刻意的涓流，釀能賣的，別為數字燒草。技能50記下Strange Brews，上限處是Grandmaster Alchemy。',
@@ -10996,7 +10997,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '珠寶設計沒有自己的工位：整套目錄都在Eastbrook鍛造坊製作，與武器鍛造和護甲鍛造共用同一座鐵砧，Forgemistress Darva也在那裡授藝。梯子是三檔九個訓練師配方：銅檔（指環、環、頸環）技能0免費，鐵檔（徽戒、環、頸圈）技能25每個25銀，鋨檔（指環、環、護符）技能50每個1金，你在該行業的檔位一達到配方檔位便可學習。\n\n這裡沒有野外配方，也還沒有組合件：每一檔都是綁定鍛造坊的訓練師手藝，所以這門手藝就在鐵匠們站立的地方學、也在那裡練。',
   'guide.profPages.craftProse.jewelcrafting.routeHeading': '傑作與通往125之路',
   'guide.profPages.craftProse.jewelcrafting.routeBody':
-    '這條梯子上沒有無屬性的檔位：每件成品都帶真實屬性，所以只要更精的品質仍在你的檔位上限之內，每次製作都會擲傑作機率，鐵與鋨金都按一級材料計入加成。銅檔與鐵檔的成品，任何業餘或未宣誓的珠寶匠都能做成精良傑作；鋨金三件本身已是精良，它們的史詩傑作要等高於精良的上限，而在珠寶設計的命途開放之前沒人擁有這個上限。\n\n攀登照標準路線走：銅檔到25，鐵檔開放當天騎到50，再用鋨檔到75。75之後暫無更高配方，鋨檔收益先減半再減為四分之一：預算大約再做150件到達125上限，並讓它們體面地賣錢，因為每個職業都戴首飾，而多數旅人升級時戒指和項鍊欄一直空著。\n\n功績之書會為你的第一件精良首飾記下Polished to Brilliance，技能50記下Facet and Filigree，125上限則加冕Grandmaster Jewelcrafting。',
+    '這條梯子上沒有無屬性的檔位：每件成品都帶真實屬性，所以只要更精的品質仍在你的檔位上限之內，每次製作都會擲傑作機率，鐵與鋨金都按一級材料計入加成。銅檔與鐵檔的成品，任何業餘或未宣誓的珠寶匠都能做成精良傑作；鋨金三件本身已是精良，它們的史詩傑作要等高於精良的上限，而在珠寶設計的命途開放之前沒人擁有這個上限。\n\n攀登照標準路線走：銅檔到25，鐵檔開放當天騎到50，再用鋨檔到75。其上還有一個無人傳授的頂級檔位：配方靠拾取，握有配方的珠寶匠可以一路滿速練到上限。配方到手之前，剩下的路由鋨檔承擔，收益先減半再減為四分之一：預算大約再做150件到達125上限，並讓它們體面地賣錢，因為每個職業都戴首飾，而多數旅人升級時戒指和項鍊欄一直空著。\n\n功績之書會為你的第一件精良首飾記下Polished to Brilliance，技能50記下Facet and Filigree，125上限則加冕Grandmaster Jewelcrafting。',
   'guide.profPages.craftIntro.inscription':
     '銘文學是Highwatch藥坊裡的那張書案：施法者的副手典籍與人人可用的耐力卷軸，都由身旁藥劑所用的同一批藥草研磨而成。它的卷軸是通往戰鬥藥劑增益的第二扇門，就連從不捧書的戰士也有理由來敲門。',
   'guide.profPages.craftProse.inscription.identityHeading': '心智之墨，行路之卷',
@@ -11010,7 +11011,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '銘文學沒有自己的工位：整套目錄都在Highwatch藥坊製作，與鍊金術共用同一張工作檯，Alchemist Verane也在那裡授藝。梯子是三檔六個訓練師配方：潤光葉檔（入門書與卷軸）技能0免費，金葉檔（書冊與卷軸）技能25每個25銀，陽瓣檔（魔典與卷軸）技能50每個1金，你在該行業的檔位一達到配方檔位便可學習。50檔的卷軸每次出品兩卷。\n\n這裡沒有野外配方，也還沒有組合件：每一檔都是綁定藥坊的訓練師手藝，所以這門手藝就在鍊金師們站立的地方學、也在那裡練。',
   'guide.profPages.craftProse.inscription.routeHeading': '卷軸、藥劑與通往125之路',
   'guide.profPages.craftProse.inscription.routeBody':
-    '卷軸是這門手藝的招牌規則：每一檔的卷軸給出的，正是同檔耐力藥劑的增益（依次為野豬藥劑、蝰灼藥劑與巨蛇藥劑三檔），兩種來源在增益列上共用同一個位置。在藥劑之上讀卷軸會替換它，在卷軸之上喝藥劑亦然，永遠是最新施加的生效，所以卷軸是通往同一個增益的另一扇門，絕不是疊在其上的第二層。\n\n典籍帶有真實屬性，所以只要更精的品質仍在你的檔位上限之內，每次製作典籍都會擲傑作機率；卷軸是無屬性的消耗品，永不觸發。攀登照標準路線走：潤光葉檔到25，金葉檔開放當天騎到50，再用陽瓣檔到75。75之後暫無更高配方，陽瓣檔收益先減半再減為四分之一：預算大約再做150次到達125上限，並讓它們體面地賣錢，因為卷軸賣得動遊戲裡的每一個職業。\n\n功績之書會為你的第一件精良品記下Written in Fine Ink，技能50記下Quill and Pigment，125上限則加冕Grandmaster Inscription。',
+    '卷軸是這門手藝的招牌規則：每一檔的卷軸給出的，正是同檔耐力藥劑的增益（依次為野豬藥劑、蝰灼藥劑與巨蛇藥劑三檔），兩種來源在增益列上共用同一個位置。在藥劑之上讀卷軸會替換它，在卷軸之上喝藥劑亦然，永遠是最新施加的生效，所以卷軸是通往同一個增益的另一扇門，絕不是疊在其上的第二層。\n\n典籍帶有真實屬性，所以只要更精的品質仍在你的檔位上限之內，每次製作典籍都會擲傑作機率；卷軸是無屬性的消耗品，永不觸發。攀登照標準路線走：潤光葉檔到25，金葉檔開放當天騎到50，再用陽瓣檔到75。其上還有一個Verane不教的頂級檔位：配方靠拾取，握有配方的銘文師可以一路滿速練到上限。配方到手之前，剩下的路由陽瓣檔承擔，收益先減半再減為四分之一：預算大約再做150次到達125上限，並讓它們體面地賣錢，因為卷軸賣得動遊戲裡的每一個職業。\n\n功績之書會為你的第一件精良品記下Written in Fine Ink，技能50記下Quill and Pigment，125上限則加冕Grandmaster Inscription。',
   'hudChrome.corpseHarvest.components.meat': '獸肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（附魔）',
   'hudChrome.materialHint.cookingCatch': '烹飪材料。必須先烹飪後才能食用。',

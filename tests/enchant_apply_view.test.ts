@@ -1218,6 +1218,74 @@ describe('enchant_apply_view: the Lucent tier gates', () => {
     ]);
   });
 
+  it('LISTS the skill-short enchant, inert: present at floor-1, selectable at the floor', () => {
+    // The picker's step-one row is where a skill shortfall is answered, and it
+    // is answered by LISTING the enchant and marking it not selectable, the
+    // unaffordable-reagents treatment exactly. Dropping the row instead left
+    // the enchant clickable and then painted "No eligible item to enchant." on
+    // step two, which is false: the items were eligible and the skill was not.
+    const floor = ENCHANTS[LUCENT_WEAPON].skillReq as number;
+    const reagent = ENCHANTS[LUCENT_WEAPON].reagents[0].itemId;
+    // Reagents in hand, so `affordable` cannot be what disables the row and the
+    // two gates are told apart.
+    const inventory: InvSlot[] = ENCHANTS[LUCENT_WEAPON].reagents.map((r) => ({
+      itemId: r.itemId,
+      count: r.count + 5,
+    }));
+
+    const short = enchantsForReagent(inventory, reagent, floor - 1).find(
+      (row) => row.enchantId === LUCENT_WEAPON,
+    );
+    expect(short, 'the row is present one point short, never dropped').toBeDefined();
+    expect(short?.affordable, 'the reagents really are in hand').toBe(true);
+    expect(short?.skillMet).toBe(false);
+    expect(short?.skillReq).toBe(floor);
+
+    const at = enchantsForReagent(inventory, reagent, floor).find(
+      (row) => row.enchantId === LUCENT_WEAPON,
+    );
+    expect(at?.skillMet, 'at the floor exactly it becomes selectable').toBe(true);
+    expect(at?.skillReq).toBe(floor);
+
+    // The default (a caller that passes no skill) offers less, not more.
+    expect(
+      enchantsForReagent(inventory, reagent).find((row) => row.enchantId === LUCENT_WEAPON)
+        ?.skillMet,
+    ).toBe(false);
+
+    // A free-floor enchant declares no skillReq and is met at skill 0, so the
+    // flag above cannot be a constant this test happens to read as false. The
+    // dust reagent feeds both tiers, which is the point: one call, both answers.
+    const dust = enchantsForReagent([{ itemId: 'arcane_dust', count: 99 }], 'arcane_dust', 0);
+    const freeFloor = dust.filter((row) => row.skillReq === undefined);
+    const gated = dust.filter((row) => row.skillReq !== undefined);
+    expect(freeFloor.length, 'the dust tier really has free-floor enchants').toBeGreaterThan(0);
+    expect(gated.length, 'and at least one gated one, so both arms are exercised').toBeGreaterThan(
+      0,
+    );
+    for (const row of freeFloor) expect(row.skillMet, `${row.enchantId} is free`).toBe(true);
+    for (const row of gated) expect(row.skillMet, `${row.enchantId} is gated`).toBe(false);
+  });
+
+  it('keeps the skill-short row inside its tier SECTION, so the rung stays visible', () => {
+    // The sections are what tell a climbing enchanter the Lucent rung exists.
+    // A dropped row would delete the whole section for a viewer under the
+    // floor, which is the state every enchanter is in before they get there.
+    const floor = ENCHANTS[LUCENT_WEAPON].skillReq as number;
+    const reagent = ENCHANTS[LUCENT_WEAPON].reagents[0].itemId;
+    const inventory: InvSlot[] = [{ itemId: reagent, count: 99 }];
+    const sections = enchantSectionsForReagent(inventory, reagent, floor - 1);
+    const lucent = sections.find((section) => section.tier === 'lucent');
+    expect(lucent, 'the Lucent section survives a short skill').toBeDefined();
+    const row = lucent?.rows.find((r) => r.enchantId === LUCENT_WEAPON);
+    expect(row?.skillMet).toBe(false);
+    // And the same section at the floor holds the same row, now selectable.
+    const met = enchantSectionsForReagent(inventory, reagent, floor)
+      .find((section) => section.tier === 'lucent')
+      ?.rows.find((r) => r.enchantId === LUCENT_WEAPON);
+    expect(met?.skillMet).toBe(true);
+  });
+
   it('leaves the free-floor enchants alone: a skill-0 viewer still sees every old target', () => {
     // The gate is scoped to defs that declare a floor, so the pre-Lucent table
     // behaves exactly as it did before this parameter existed.

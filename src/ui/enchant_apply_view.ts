@@ -1,7 +1,7 @@
 // Pure, host-agnostic core for the Apply Enchant picker (Professions 2.0).
 // Two steps, both DOM-free: (1) the enchants that consume a chosen
 // reagent, each with its EFFECT facts, its per-reagent affordability read from
-// the viewer's inventory, and its target slot, grouped into the three reagent-
+// the viewer's inventory, and its target slot, grouped into the four reagent-
 // derived tier sections (enchantSectionsForReagent) and sorted by paperdoll
 // slot inside each, and (2) the items eligible as the enchant target (def slot
 // matches the enchant), in two families: the BAGGED copies (enchantTargets)
@@ -103,14 +103,32 @@ export interface EnchantPickRow {
   reagents: EnchantReagentRow[];
   /** True only when every reagent is held in sufficient count. */
   affordable: boolean;
+  /** The enchant's own Enchanting floor (EnchantDef.skillReq), ABSENT on every
+   *  enchant that has none, which is every pre-Lucent one. Carried so the thin
+   *  consumer can say WHY a listed row is inert without re-reading ENCHANTS. */
+  skillReq?: number;
+  /** False only when `skillReq` is set and the viewer's Enchanting skill is
+   *  under it: the row is LISTED and painted inert, the unaffordable-reagents
+   *  treatment exactly. Dropping the row instead is what produced the false
+   *  "No eligible item to enchant." on the step-two picker: an enchant the
+   *  viewer cannot work is a fact about the ENCHANT, and answering it with a
+   *  sentence about their inventory sent them looking for gear they already
+   *  had. */
+  skillMet: boolean;
 }
 
 /** The enchants that consume `reagentItemId`, in ENCHANTS declaration order,
  *  each with its effect facts, per-reagent affordability from the viewer's
- *  inventory, and its target slot. */
+ *  inventory, its target slot, and whether the viewer's Enchanting skill clears
+ *  its own floor.
+ *
+ *  `enchantingSkill` DEFAULTS TO 0, the same offer-less direction the target
+ *  builders below take: a caller that forgets it paints the skill-gated rows
+ *  inert rather than promising an apply the sim denies. */
 export function enchantsForReagent(
   inventory: readonly InvSlot[],
   reagentItemId: string,
+  enchantingSkill = 0,
 ): EnchantPickRow[] {
   const rows: EnchantPickRow[] = [];
   for (const enchant of Object.values(ENCHANTS)) {
@@ -125,13 +143,16 @@ export function enchantsForReagent(
       if (value === undefined || value === 0) continue;
       effects.push({ stat, value });
     }
-    rows.push({
+    const row: EnchantPickRow = {
       enchantId: enchant.id,
       itemSlot: enchant.itemSlot,
       effects,
       reagents,
       affordable: reagents.every((reagent) => reagent.have >= reagent.required),
-    });
+      skillMet: skillMeetsEnchant(enchant, enchantingSkill),
+    };
+    if (enchant.skillReq !== undefined) row.skillReq = enchant.skillReq;
+    rows.push(row);
   }
   return rows;
 }
@@ -209,10 +230,15 @@ export function enchantTierTitleKey(tier: EnchantTier): TranslationKey {
  *  (EnchantDef.skillReq, absent on every pre-Lucent enchant and absent meaning
  *  the free floor). The skill half of the sim's deny ladder
  *  (src/sim/professions/enchanting.ts, `insufficient_skill`), mirrored so the
- *  picker never lists a target for an enchant the apply would refuse outright.
- *  A skill-gated enchant with no reachable target paints the picker's existing
- *  "no eligible item" line, which is also what an ordinary enchant with nothing
- *  to enchant already does. */
+ *  picker never offers an apply the sim would refuse outright.
+ *
+ *  WHERE the refusal is shown is the point: it belongs on the ENCHANT row in
+ *  step one, which states the skill line and paints inert (EnchantPickRow
+ *  skillMet above), never on the step-two target list. Filtering the targets
+ *  alone left the enchant selectable and then answered with "No eligible item
+ *  to enchant.", which is false: the items were eligible and the skill was not.
+ *  The target builders below keep the same gate as a backstop, so a caller that
+ *  bypasses the picker cannot list a target either. */
 function skillMeetsEnchant(enchant: EnchantDef, enchantingSkill: number): boolean {
   return enchant.skillReq === undefined || enchantingSkill >= enchant.skillReq;
 }
@@ -228,8 +254,12 @@ function skillMeetsEnchant(enchant: EnchantDef, enchantingSkill: number): boolea
  *  minimization), which does not carry `perfected`. When phase 12 starts
  *  minting the marker it has to decide whether the field reaches that wire, or
  *  an online client will hide a worn Perfected copy the sim would accept. Inert
- *  today (no copy carries the marker in either host), and pinned in
- *  tests/enchant_apply_view.test.ts so widening the wire re-opens it. */
+ *  today (no copy carries the marker in either host). The exclusion itself is
+ *  pinned by NAME in tests/snapshots.test.ts (the eqi wire arm equips a copy
+ *  stamped `perfected` and asserts the wired payload carries only signer and
+ *  rolled), so widening the wire re-opens this decision there; the allowlist
+ *  SHAPE that pin rests on is scanned out of server/game.ts in
+ *  tests/enchant_apply_view.test.ts. */
 function copyMeetsPerfectedGate(
   enchant: EnchantDef,
   instance: ItemInstancePayload | undefined,
@@ -243,16 +273,21 @@ export interface EnchantPickSection {
   rows: EnchantPickRow[];
 }
 
-/** enchantsForReagent, grouped into the three tier sections in ladder order and
+/** enchantsForReagent, grouped into the four tier sections in ladder order and
  *  sorted inside each section by paperdoll slot then name key. Empty sections
  *  are omitted, so a dust-only reagent still paints exactly one header. Pure:
- *  the input rows are re-bucketed, never mutated. */
+ *  the input rows are re-bucketed, never mutated.
+ *
+ *  A skill-short row is BUCKETED like any other, never dropped: the Lucent
+ *  section is what tells a climbing enchanter the rung exists at all, and it is
+ *  the row itself that says the skill is short (skillMet above). */
 export function enchantSectionsForReagent(
   inventory: readonly InvSlot[],
   reagentItemId: string,
+  enchantingSkill = 0,
 ): EnchantPickSection[] {
   const byTier = new Map<EnchantTier, EnchantPickRow[]>();
-  for (const row of enchantsForReagent(inventory, reagentItemId)) {
+  for (const row of enchantsForReagent(inventory, reagentItemId, enchantingSkill)) {
     const tier = enchantTier(row.enchantId);
     const bucket = byTier.get(tier);
     if (bucket) bucket.push(row);

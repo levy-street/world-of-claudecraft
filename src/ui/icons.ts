@@ -3691,6 +3691,14 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // red_banner ability's staff-plus-sunburst language) on the objective gold, so
   // it reads as the flag itself and not as another rune.
   bg_carried_flag: r('fury', 'gold', ['staff', { p: 'sunburst', ...TR, pal: 'gold' }], ['motion']),
+  // Well Fed (the Masterwrought phase 10 role foods, aura id 'well_fed'). Keyed
+  // by AURA id like the Thornhollow runes above, and it has to be: the buff
+  // carries an ordinary stat kind (buff_sta / buff_ap / buff_int, one per role
+  // food), so without a recipe of its own the resolver falls through to
+  // aura_buff_<kind> and Well Fed wears the same glyph as the elixir or flask of
+  // that stat. Three buffs, one picture, on a bar where the player is choosing
+  // between them. A cooked haunch on the food palette says which one it is.
+  well_fed: r('food', 'ember', ['meat'], ['glow']),
   // Painted talent/modifier identities are not ABILITIES records, but their
   // runtime timers still need a meaningful synchronous layer while the WebP
   // decodes (and if it ever fails to load).

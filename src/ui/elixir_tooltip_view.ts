@@ -32,7 +32,7 @@ function desc(text: string): string {
 
 /** The "Use:" line for a battle elixir, buff scroll, or apex flask (any item
  *  carrying the elixir effect record), or '' for any other item. A flask adds
- *  its two extra rules under that shared line. */
+ *  its three extra rules under that shared line. */
 export function elixirTooltipLines(item: ItemDef): string {
   const elx = item.elixir;
   if (!elx) return '';
@@ -53,14 +53,19 @@ export function elixirTooltipLines(item: ItemDef): string {
         minutes,
       });
   // The Use line above is true of a flask word for word (a flask really does
-  // replace the same-stat elixir or scroll), so a flask ADDS its two rules
+  // replace the same-stat elixir or scroll), so a flask ADDS its own rules
   // rather than restating the shared one. Gated on the KIND, not the payload,
-  // because both rules key on the flask marker the use path stamps and nothing
-  // about the payload distinguishes a flask from the elixir it beats.
+  // because every one of them keys on the flask marker the use path stamps and
+  // nothing about the payload distinguishes a flask from the elixir it beats.
+  // The middle line is the DOWNWARD refusal (src/sim/items.ts useItem): the
+  // shared Use line says a flask replaces a weaker source, and without this the
+  // reader would reasonably infer the reverse also works and lose a flask to a
+  // careless elixir click. It does not: the quaff is refused outright.
   if (item.kind !== 'flask') return desc(text);
   return (
     desc(text) +
     desc(t('itemUi.tooltip.flaskOnlyOne')) +
+    desc(t('itemUi.tooltip.flaskOutranks')) +
     desc(t('itemUi.tooltip.flaskThroughDeath'))
   );
 }

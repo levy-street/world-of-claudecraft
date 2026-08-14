@@ -152,9 +152,27 @@ describe("Master's Field Forge item placement (placeMobileStation ItemUse)", () 
     // Success is never silent: the one scroll-pattern log line, exactly once
     // (matched by log.placeStation in src/ui/sim_i18n.ts).
     const placeLines = drainEvents(sim).filter(
-      (ev) => ev.type === 'log' && ev.text === `You set up the ${TEST_FORGE_NAME}.`,
+      (ev) => ev.type === 'log' && ev.text === `You set up ${TEST_FORGE_NAME}.`,
     );
     expect(placeLines.length).toBe(1);
+  });
+
+  it('the line carries no article of its own (a "The ..." item never doubles it)', () => {
+    // The Laden Hearth is the shipped name that made the omission visible:
+    // gluing "the" on produced "You set up the The Laden Hearth." The emit
+    // follows the quaff/read pattern instead and lets the name carry its own
+    // article, in English and in every {item} template downstream.
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, FIELD.x, FIELD.z);
+    drainEvents(sim);
+    placeMobileStationFromItem(simCtx(sim), 'cooking', ITEMS.laden_hearth.name, a);
+
+    const lines = drainEvents(sim)
+      .filter((ev): ev is Extract<SimEvent, { type: 'log' }> => ev.type === 'log')
+      .map((ev) => ev.text)
+      .filter((text) => text.includes('set up'));
+    expect(lines).toEqual(['You set up The Laden Hearth.']);
   });
 
   it('placement draws zero rng', () => {

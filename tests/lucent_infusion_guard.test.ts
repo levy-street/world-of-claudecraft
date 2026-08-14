@@ -19,6 +19,9 @@
 // behind a positive control, so a mis-wired observer cannot make those zeros
 // vacuous. The picker mirror (src/ui/enchant_apply_view.ts) is pinned in
 // tests/enchant_apply_view.test.ts and deliberately not repeated here.
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
@@ -30,6 +33,8 @@ import {
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { runApplyEnchant, runDisenchant } from './helpers/enchant_family_cast';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const INFUSION = 'enchant_lucent_infusion'; // chest, requiresPerfected, skillReq 125
@@ -270,6 +275,100 @@ describe('the Lucent skill gates bind at their exact rungs', () => {
     expect(holdsPerfectedTarget(at.meta, CHEST_ITEM)).toBe(false);
     expect(resolveApplyEnchant(at.sim.ctx, at.pid, CHEST_ITEM, APEX_CHEST).ok).toBe(true);
     expect(ENCHANTS[APEX_CHEST].skillReq).toBe(100);
+  });
+});
+
+// The MINT-SIDE tripwire. Every arm above proves the Infusion refuses what a
+// player can hold; this proves the premise underneath them, that nothing in
+// production can hand a player a Perfected copy in the first place. Without it
+// the whole file rests on a claim no assertion makes: a single `perfected: true`
+// added anywhere under src/ would quietly turn every refusal above into a
+// statement about a marker the game now mints.
+//
+// PHASE 12 REMOVES THIS TEST, in the same change that mints the marker, and that
+// change must also take the eqi wire-visibility decision: the public equipped
+// wire deliberately drops `perfected` today (pinned by name in
+// tests/snapshots.test.ts), so a worn Perfected copy is invisible to an online
+// client and the Apply Enchant picker's worn arm would refuse it while the sim
+// accepted it (src/ui/enchant_apply_view.ts copyMeetsPerfectedGate says the
+// same). Widen the wire or accept the bags-only limit, deliberately.
+describe('nothing in production mints the Perfected marker yet (phase 12 tripwire)', () => {
+  // Written as an assignment shape rather than a bare identifier search, so the
+  // deny-reason string 'not_perfected' and the def flag `requiresPerfected` (no
+  // word boundary before `perfected` in either) are not swept up as mints, and
+  // so the TYPE declaration `perfected?: true` in types.ts stays legal: the `?`
+  // sits between the name and the colon and no write does.
+  const MINT_PATTERNS: Array<[string, RegExp]> = [
+    ['object-literal property', /\bperfected\s*:/],
+    ['direct assignment', /\.perfected\s*=[^=]/],
+    ['shorthand property', /\bperfected\s*[,}]/],
+  ];
+
+  /** Every mint-shaped line in one source, comments stripped first. */
+  function mintSites(source: string): string[] {
+    const hits: string[] = [];
+    for (const raw of source.split('\n')) {
+      const line = raw.trim();
+      // Line comments and doc-comment continuations. A `/* ... */` regex is
+      // deliberately not used over a whole source tree: it misfires on string
+      // and regex literals (the elixir_tooltip_view.test.ts note), while a
+      // leading `*` or `//` is unambiguous line by line.
+      if (line.startsWith('//') || line.startsWith('*') || line.startsWith('/*')) continue;
+      if (MINT_PATTERNS.some(([, re]) => re.test(line))) hits.push(line);
+    }
+    return hits;
+  }
+
+  it('no src/ path stamps `perfected` on an instance payload', () => {
+    const root = fileURLToPath(new URL('../src', import.meta.url));
+    const files = tsFilesUnder(root);
+    // Floor near the real tree, and a nested path by name: src/ is genuinely
+    // deep, so both together prove the walk recursed rather than reading one
+    // level and passing over a much smaller surface.
+    expect(files.length, 'the src walk found the real tree').toBeGreaterThanOrEqual(500);
+    expect(files.map((f) => f.file)).toContain('sim/professions/enchanting.ts');
+
+    const mints: string[] = [];
+    const readers: string[] = [];
+    for (const { file, full } of files) {
+      const source = readFileSync(full, 'utf8');
+      for (const line of mintSites(source)) mints.push(`${file}: ${line}`);
+      if (/\.perfected\s*===/.test(source)) readers.push(file);
+    }
+    expect(
+      mints,
+      'a production path now mints ItemInstancePayload.perfected: if this is phase 12, ' +
+        'delete this whole describe and take the eqi wire-visibility decision with it',
+    ).toEqual([]);
+    // Non-vacuity over the REAL corpus: the guard scans a tree that genuinely
+    // talks about the marker, so an empty mint list is a refusal rather than a
+    // scan that found no `perfected` at all. Both known readers are gates.
+    expect(readers.sort()).toEqual(['sim/professions/enchanting.ts', 'ui/enchant_apply_view.ts']);
+  });
+
+  it('the detector really fires on a mint (positive control for every pattern)', () => {
+    // One synthetic source per shape, so an over-narrowed regex cannot make the
+    // sweep above pass by matching nothing at all.
+    expect(mintSites('const payload = { perfected: true };')).toHaveLength(1);
+    expect(mintSites('inst.perfected = true;')).toHaveLength(1);
+    expect(mintSites('const out = { ...inst, perfected };')).toHaveLength(1);
+    // And the three shapes that must NOT read as mints: the deny reason, the
+    // def flag, the type declaration, and prose about any of them.
+    expect(
+      mintSites(
+        [
+          "  return { ok: false, reason: 'not_perfected' };",
+          '  if (enchant.requiresPerfected) return false;',
+          '  perfected?: true;',
+          '  // perfected: true would be a mint, and this comment is not one',
+          '   * `perfected`, minted by the phase 12 Perfecting stage',
+        ].join('\n'),
+      ),
+    ).toEqual([]);
+  });
+
+  it('reads the tree only through the shared walker', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 });
 

@@ -2716,7 +2716,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useElixirAura':
     '使用: {aura}の効果を得て、{minutes}分間持続します。同種の他のエリクサーや巻物の効果を上書きします。戦闘中に使用可能。',
   'itemUi.tooltip.flaskOnlyOne': 'フラスコの効果は同時に1つだけです。別のフラスコを飲むとこの効果を置き換えます。',
-  'itemUi.tooltip.flaskThroughDeath': 'この効果は死亡しても残ります。',
+  'itemUi.tooltip.flaskOutranks': 'より弱いエリクサーや巻物では上書きできません。',
+  'itemUi.tooltip.flaskThroughDeath': 'この効果は死亡しても残りますが、ログアウトすると失われます。',
   'itemUi.tooltip.wellFed': '満腹：食べ終えると{stat}が {value} 上昇し、{minutes} 分間持続します。',
   'itemUi.tooltip.wellFedAura': '満腹：食べ終えると{aura}を得て、{minutes} 分間持続します。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
@@ -11177,9 +11178,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftIntro.leatherworking':
     '皮革加工はフェンブリッジのなめし場で軽快な革装備をなめし、獣皮の基本からレアのマイアウォーデンまで作ります。',
   'guide.profPages.craftIntro.cooking':
-    '料理はイーストブルックの厨房で魚や獲物や薬草を腰を据えて食べる料理に変え、最高はレアの祝宴料理に届きます。',
+    '料理はイーストブルックの厨房で魚や獲物や薬草を腰を据えて食べる料理に変え、頂点は三種の役割別料理です。どの食べ物より大きく回復し、皿を食べ終えた者に満腹の効果を残します。',
   'guide.profPages.craftIntro.alchemy':
-    '錬金術はハイウォッチの薬房で治癒とマナの薬、そしてスタミナの霊薬を調合します。',
+    '錬金術はハイウォッチの薬房で治癒とマナの薬、スタミナの霊薬、そして頂点には役割ごとのフラスコを調合します。フラスコは自分の死をも越えて残ります。',
   'guide.profPages.craftIntro.engineering':
     '工作はイーストブルックの工作場でティア4と5の採集道具を作り、どれも一段下の道具を材料として消費します。',
   'guide.profPages.craftIntro.enchanting':
@@ -11386,7 +11387,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '野外レシピのEastbrook Arming Swordは全員が最初から知っていて、どこでも作れます。本当の梯子は鍛冶場限定の三段九レシピ。銅段はスキル0で無料、鉄段はスキル25で各25銀、オスミウム段はスキル50で各1金。あなたの段が届いた瞬間にDarvaが教えてくれます。対に乗るレシピがもう一つ、Gravewyrm Gauntlets。武器鍛冶と防具鍛冶が共に25の調律済み鍛冶師だけが作れる合作の品で、作業場すら要りません。',
   'guide.profPages.craftProse.weaponcrafting.routeHeading': '傑作と、125への道のり',
   'guide.profPages.craftProse.weaponcrafting.routeBody':
-    '能力値を持つ品（鉄段以上）だけが傑作になり得ます。無能力値の銅段コモン品は決して発動しません。鉄は素材段階1（+1%）、highpineとグリフ鋼は段階2（+2%）です。道のりは銅段で25、鉄段で50、オスミウム段で75。以降は上位レシピが未実装のため半減から四分の一へ薄れ、上限125まではおよそ150回。毎分10回の共有スロットルも忘れずに。Darvaの作業依頼は30分ごとに銅鉱石8個を引き取ります。功績の書はスキル50でEdge and Temper、125でGrandmaster Weaponcraftingを刻みます。',
+    '能力値を持つ品（鉄段以上）だけが傑作になり得ます。無能力値の銅段コモン品は決して発動しません。鉄は素材段階1（+1%）、highpineとグリフ鋼は段階2（+2%）です。道のりは銅段で25、鉄段で50、オスミウム段で75。オスミウムの三品の上にはDarvaが教えない頂点の段があり、その製法書は拾うもので、それを持つ鍛冶師は上限まで満額で伸ばせます。製法書が出るまではオスミウムのレシピが残りを担い、半減から四分の一へ薄れ、上限125まではおよそ150回。毎分10回の共有スロットルも忘れずに。Darvaの作業依頼は30分ごとに銅鉱石8個を引き取ります。功績の書はスキル50でEdge and Temper、125でGrandmaster Weaponcraftingを刻みます。',
   'guide.profPages.craftProse.armorcrafting.identityHeading': '前線のメイル',
   'guide.profPages.craftProse.armorcrafting.identityBody':
     '梯子は兵士の経歴のようです。鋲打ちの銅装備で始まり、ironlink段で初めて本物の能力値がつき、レアのosmiumscale兜、胸当て、脚甲は職人が打てる最大の防御力を誇る力とスタミナの装備です。静かな一面もあります。野外コモンのEastbrook Warded Leggingsとスキル75の窯鱗のマント（知力と精神のメイル肩）が、呪文使いのメイル職を顧客に留めます。環では武器鍛冶と工作の間。鍛冶師の対はDarvaの前で誓え、工作との対歯車師には誓いのクエストがまだありません。',
@@ -11425,7 +11426,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     "marshstalker段以上はすべて傑作の抽選があり、Mirewarden JerkinのPristine Hideが署名素材ボーナスを自動で満たします。オスミウムは素材段階1。無能力値の硬革コモンは発動しません。自然に育てましょう。レベル1から狼と猪を残らず剥ぎ、硬革段はその場で25まで、クエストで沼に入るついでに修行を。marshstalkerで50、mirewardenで75、以降はDuskhide Wraps（第3段レシピ、オスミウム6個、Pristine Hide 3枚、粗皮2枚、Tanning Agent 1）が99まで全速、以降半減で、最後の50ポイントはおよそ75回。75の特化で得る移動なめし場はこの職で最も輝きます。焚き火のそばで革袋が装備に変わり、Fenbridgeへの往復が消えます。Heskの依頼は30分ごとに粗皮8枚。スキル50でTanner's Trade、上限でGrandmaster Leatherworkingです。",
   'guide.profPages.craftProse.cooking.identityHeading': '一行を養う鍋',
   'guide.profPages.craftProse.cooking.identityBody':
-    "料理を食べると18秒の休憩で回復します。戦闘の合間には最安の回復です。梯子は回復90のPan-Seared River Perchから、現存最大の座り回復であるMarlow's Grand Roast（980）まで。環では錬金術と皮革加工の間。生きた対は薬師（錬金術と料理）で、Eastbrook厨房のCook Marlowの前で猪を四頭狩って誓います。皮革加工との対Trapperには誓いのクエストがまだありません。",
+    "料理を食べると18秒の休憩で回復します。戦闘の合間には最安の回復です。梯子は回復90のPan-Seared River Perchから、Marlow's Grand Roast（980）を経て、その上に立つ三種の頂点料理（1392）まで届きます。ゲーム中で最大の座り回復であり、皿を食べ終えると満腹の効果を残す唯一の食べ物です。環では錬金術と皮革加工の間。生きた対は薬師（錬金術と料理）で、Eastbrook厨房のCook Marlowの前で猪を四頭狩って誓います。皮革加工との対Trapperには誓いのクエストがまだありません。",
   'guide.profPages.craftProse.cooking.materialsHeading': '竿と包丁が満たす食料庫',
   'guide.profPages.craftProse.cooking.materialsBody':
     '看板食材は釣りが地方ごとに供給します。Eastbrook Valeの鏡鱒と川鱸、Mirefen Marshの沼カワカマスと泥鰻、Thornpeak Heightsの霜鰓鱒と板鰭鯉。梯子の各段はその段の魚を調理するので、釣る料理人は品切れ知らずです。肉屋の側は亡骸採集から。猪などの獣肉、そしてレア以上の採集判定で署名入りのPrime Cut、大ローストの主役が出ます。薬草が上位の皿に香りを添え、ashwoodの丸太一本が鰻を燻し、Cooking SaltはMarlowの店で一袋8銅です。',
@@ -11434,7 +11435,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     "Salted Jerkyが野外レシピです。最初から誰でも、蜘蛛の脚1本で、どこでも作れる駆け出しの携行食。訓練の梯子は広場東側のEastbrook厨房で、無料段はスキル0（川鱸、Hunter's Game Skewer、Herbed Marsh Pike）、中段はスキル25で各25銀（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder）、レア段はスキル50で各1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。まとめ料理は食材を伸ばします。燻製鰻と煮込みは1回で2皿、宴会盛りは3皿です。",
   'guide.profPages.craftProse.cooking.routeHeading': '傑作ではなく特化、そして125への道',
   'guide.profPages.craftProse.cooking.routeBody':
-    '料理は傑作物語の正直な例外です。皿に伸ばす能力値がないので傑作は決して発動せず、追う必要もありません。この職の極みは75の特化です。全食材が2割引きになり（まとめ料理では加速度的に効きます）、移動式の野外厨房でダンジョンの扉の前で宴が炊けます。釣った物を料理し、二つの技能を互いに養いましょう。干し肉と無料段で25、中段で50、レア段で75。以降は上位の皿が未実装のため半減から四分の一へ薄れ、上限まではおよそ150回。作り置きと考えれば無駄がなく、ギルドは全皿を平らげます。Marlowの依頼は30分ごとに獣肉8個。スキル50でSeasoned Chef、125でGrandmaster Cooking称号です。',
+    '料理は傑作物語の正直な例外です。皿に伸ばす能力値がないので傑作は決して発動せず、追う必要もありません。この職の極みは75の特化です。全食材が2割引きになり（まとめ料理では加速度的に効きます）、移動式の野外厨房でダンジョンの扉の前で宴が炊けます。釣った物を料理し、二つの技能を互いに養いましょう。干し肉と無料段で25、中段で50、レア段で75。レア段の上には頂点の厨房、三種の役割別料理とThe Laden Hearthがあります。誰も教えず、拾った製法書から覚えるもので、それを持つ料理人は上限まで満額で伸ばせます。製法書が出るまではレア段が最後の道のりを担い、半減から四分の一へ薄れ、およそ150回。作り置きと考えれば無駄がなく、ギルドは全皿を平らげます。Marlowの依頼は30分ごとに獣肉8個。スキル50でSeasoned Chef、125でGrandmaster Cooking称号です。',
   'guide.profPages.craftProse.alchemy.identityHeading': '戦いを制する小瓶',
   'guide.profPages.craftProse.alchemy.identityBody':
     'この職はHighwatchの薬房で営みます。主はAlchemist Verane。レシピの梯子を教え、Glass Vialを12銅で売り、作業依頼で薬草に金を払います。錬金術は試行錯誤の職たちと並び、片側に工作、もう片側に料理。ゆえに対は二つ、爆破師（工作と錬金術、EastbrookのTinker Gizzelの前で）と薬師（錬金術と料理、Cook Marlowの前で）です。どちらかに調律すれば錬金術は主専攻となり上限まで開きます。それまでは未宣誓の職と同じくレア段階まで働きます。',
@@ -11443,7 +11444,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どの薬もGlass Vialひとつと段に応じた薬草を求めます。艶葉草はEastbrook Vale、goldleafはMirefen Marsh、sunpetalはThornpeak Heightsに育ち、一地方に一種、薬瓶は世界と共に登っていきます。薬草学は生まれつきの相棒ですが、採集者や市場から買っても構いません。深い地方の上位の草むらは良い鎌を求めるので、自分で摘むなら道具を新しく。強壮剤の系統には狩人の素材が加わります。毒持ちの亡骸から採るVenom Gland、頂点の強壮剤にはPristine Venom Gland（署名入りのレア標本）です。',
   'guide.profPages.craftProse.alchemy.ladderHeading': 'レシピの梯子',
   'guide.profPages.craftProse.alchemy.ladderBody':
-    'Minor Healing Potionは全員が最初から知り、どこでも混ぜられます。本当の梯子はVeraneが薬房で教える九つのレシピ、各段三つずつ。スキル0の段は無料、25の段は各25銀、50の段は各1金です。各段は回復薬、マナ薬、スタミナ強壮剤の三点で、コモンの艶葉草瓶（回復120、マナ160）から良質のgoldleaf（200と260）、レアのsunpetal（280と360）へ。強壮剤も同じく登ります。Elixir of the Boarはスタミナ6を10分、Vipersear Elixirは9を15分、Elixir of the Serpentは12を15分で一度に2本。脇にもう一つ、合作のElixir of the Bear。錬金25でVeraneが25銀で教え、どこでも混ぜられますが、両スキル25の調律済み爆破師だけが作れます。',
+    'Minor Healing Potionは全員が最初から知り、どこでも混ぜられます。本当の梯子はVeraneが薬房で教える九つのレシピ、各段三つずつ。スキル0の段は無料、25の段は各25銀、50の段は各1金です。各段は回復薬、マナ薬、スタミナ強壮剤の三点で、コモンの艶葉草瓶（回復120、マナ160）から良質のgoldleaf（200と260）、レアのsunpetal（280と360）へ。強壮剤も同じく登ります。Elixir of the Boarはスタミナ6を10分、Vipersear Elixirは9を15分、Elixir of the Serpentは12を15分で一度に2本。脇にもう一つ、合作のElixir of the Bear。錬金25でVeraneが25銀で教え、どこでも混ぜられますが、両スキル25の調律済み爆破師だけが作れます。\n\n強壮剤の系統すべての上にはフラスコの段があり、これは誰も教えず、拾った製法書から覚えます。フラスコは15を20分与え、これまでの強壮剤にはなかった二つの軸、攻撃力と知力を、おなじみのスタミナと並べて開きます。役割ごとに一種です。独自の規則もあります。ステータスを問わず同時に効くフラスコはひとつだけ、その能力値のより弱いエリクサーや巻物では置き換えられず、自分の死を越えて残りますが、ログアウトすると失われます。',
   'guide.profPages.craftProse.alchemy.routeHeading': '調合師の125への道',
   'guide.profPages.craftProse.alchemy.routeBody':
     '薬は決して傑作になりません。あれは能力値を持つ装備のものです。それでも名前は旅をします。レアのsunpetal薬は一本ずつ醸され署名入りで届き、2本組のElixir of the Serpentは無印のままです。スキル75で特化し、以後すべての錬金レシピの素材が2割引き。薬草学を早めに取り、レベリングしながら摘みましょう。艶葉草は谷中にあり、Veraneの調合台に着けば、無料段はどのみち摘んだ薬草で25まで綺麗に運んでくれます。25の段は開いた瞬間に習い、摘み場を沼のgoldleafへ移し、Veraneの依頼（Goldleaf Herb6本で45銅、30分ごと）で小銭を回収。50からはThornpeakの薬草でsunpetal薬とSerpentを醸します。100から125は意図された細流なので、数字のために薬草を燃やさず、売れる物を醸すこと。スキル50でStrange Brews、上限でGrandmaster Alchemyです。',
@@ -11481,7 +11482,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '宝石細工には自前の作業場がありません。カタログ全部がEastbrookの鍛冶場、武器鍛冶と防具鍛冶が共有するあの金床で作られ、Forgemistress Darvaがそこで教えます。梯子は三段九つのトレーナーレシピです。銅段（指輪、輪、首輪）はスキル0で無料、鉄段（印章、輪、チョーカー）はスキル25で各25銀、オスミウム段（指輪、輪、アミュレット）はスキル50で各1金。あなたの段がレシピの段に届いた瞬間に教われます。\n\n野外レシピも合作の品もまだありません。全段が鍛冶場限定のトレーナー仕事なので、この職は鍛冶師たちの立つ場所で学び、そこで鍛えます。',
   'guide.profPages.craftProse.jewelcrafting.routeHeading': '傑作と、125への道のり',
   'guide.profPages.craftProse.jewelcrafting.routeBody':
-    'この梯子にステータスなしの段はありません。全品が本物のステータスを備えるので、仕上がりの品質があなたの段の上限に収まる限り、毎回の製作が傑作判定を振り、鉄とオスミウムはどちらもティア1素材として加算されます。銅段と鉄段は、趣味の職人でも未宣誓の職人でもレアの傑作に化けます。オスミウムの三品はもとよりレアなので、そのエピック傑作はレアより上の上限を待ちますが、宝石細工の対が開くまでその上限は誰も持ちません。\n\n登りは標準の道です。銅で25、鉄段は開いた日に乗って50、そしてオスミウムで75へ。75から先はまだ何も出ていないので、オスミウムのレシピは半分、そして四分の一へと減っていきます。125の上限までおよそ150個を見込んでください。どの職業も装身具を着け、大半の旅人は指輪と首の枠を空けたまま育つので、作った分は堂々と売れます。\n\n功績の書は最初のレア品でPolished to Brillianceを、スキル50でFacet and Filigreeを、そして125の上限でGrandmaster Jewelcraftingを記します。',
+    'この梯子にステータスなしの段はありません。全品が本物のステータスを備えるので、仕上がりの品質があなたの段の上限に収まる限り、毎回の製作が傑作判定を振り、鉄とオスミウムはどちらもティア1素材として加算されます。銅段と鉄段は、趣味の職人でも未宣誓の職人でもレアの傑作に化けます。オスミウムの三品はもとよりレアなので、そのエピック傑作はレアより上の上限を待ちますが、宝石細工の対が開くまでその上限は誰も持ちません。\n\n登りは標準の道です。銅で25、鉄段は開いた日に乗って50、そしてオスミウムで75へ。その上には誰も教えない頂点の段があり、製法書は拾うもので、それを持つ宝石細工師は上限まで満額で伸ばせます。製法書が出るまではオスミウムのレシピが残りを担い、半分、そして四分の一へと減っていきます。125の上限までおよそ150個を見込んでください。どの職業も装身具を着け、大半の旅人は指輪と首の枠を空けたまま育つので、作った分は堂々と売れます。\n\n功績の書は最初のレア品でPolished to Brillianceを、スキル50でFacet and Filigreeを、そして125の上限でGrandmaster Jewelcraftingを記します。',
   'guide.profPages.craftIntro.inscription':
     '銘文はHighwatchの薬房にある書き物机です。副手に持つ術者の書物と、誰にでも効くスタミナの巻物を、隣に並ぶ薬と同じ薬草を挽いて仕立てます。巻物は戦闘エリクサーのバフへ通じる第二の扉なので、書物を一度も手にしない戦士にも、扉を叩く理由があります。',
   'guide.profPages.craftProse.inscription.identityHeading': '知性の墨、旅路の巻物',
@@ -11495,7 +11496,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '銘文には自前の作業場がありません。カタログ全部がHighwatchの薬房、錬金術が醸すあの調合台で仕立てられ、Alchemist Veraneがそこで教えます。梯子は三段六つのトレーナーレシピです。艶葉の段（入門書と巻物）はスキル0で無料、ゴールドリーフの段（書冊と巻物）はスキル25で各25銀、サンペタルの段（魔導書と巻物）はスキル50で各1金。あなたの段がレシピの段に届いた瞬間に教われます。スキル50の段の巻物は、一度の製作で2本仕上がります。\n\n野外レシピも合作の品もまだありません。全段が薬房限定のトレーナー仕事なので、この職は錬金術師たちの立つ場所で学び、そこで鍛えます。',
   'guide.profPages.craftProse.inscription.routeHeading': '巻物とエリクサーと、125への道のり',
   'guide.profPages.craftProse.inscription.routeBody':
-    '巻物こそこの職の看板ルールです。各段の巻物は、対応する段のスタミナのエリクサー（猪のエリクサー、蝮灼のエリクサー、蛇のエリクサー）とまったく同じバフを与え、二つの供給源はバフバーのひとつの枠を分け合います。エリクサーの上から巻物を読めば置き換わり、巻物の上からエリクサーを飲めばそちらが置き換わり、常に新しいほうが勝ちます。つまり巻物は同じバフへ通じるもう一つの扉であって、上に重なる二本目ではありません。\n\n書物は本物のステータスを備えるので、仕上がりの品質があなたの段の上限に収まる限り、書物の製作は毎回傑作判定を振ります。ステータスのない消耗品である巻物は決して発動しません。登りは標準の道です。艶葉で25、ゴールドリーフの段は開いた日に乗って50、そしてサンペタルで75へ。75から先はまだ何も出ていないので、サンペタルのレシピは半分、そして四分の一へと減っていきます。125の上限までおよそ150個を見込み、堂々と稼ぎながら登りましょう。巻物はゲーム中のどの職業にも売れるのですから。\n\n功績の書は最初のレア品でWritten in Fine Inkを、スキル50でQuill and Pigmentを、そして125の上限でGrandmaster Inscriptionを記します。',
+    '巻物こそこの職の看板ルールです。各段の巻物は、対応する段のスタミナのエリクサー（猪のエリクサー、蝮灼のエリクサー、蛇のエリクサー）とまったく同じバフを与え、二つの供給源はバフバーのひとつの枠を分け合います。エリクサーの上から巻物を読めば置き換わり、巻物の上からエリクサーを飲めばそちらが置き換わり、常に新しいほうが勝ちます。つまり巻物は同じバフへ通じるもう一つの扉であって、上に重なる二本目ではありません。\n\n書物は本物のステータスを備えるので、仕上がりの品質があなたの段の上限に収まる限り、書物の製作は毎回傑作判定を振ります。ステータスのない消耗品である巻物は決して発動しません。登りは標準の道です。艶葉で25、ゴールドリーフの段は開いた日に乗って50、そしてサンペタルで75へ。その上にはVeraneが教えない頂点の段があり、製法書は拾うもので、それを持つ写字師は上限まで満額で伸ばせます。製法書が出るまではサンペタルのレシピが残りを担い、半分、そして四分の一へと減っていきます。125の上限までおよそ150個を見込み、堂々と稼ぎながら登りましょう。巻物はゲーム中のどの職業にも売れるのですから。\n\n功績の書は最初のレア品でWritten in Fine Inkを、スキル50でQuill and Pigmentを、そして125の上限でGrandmaster Inscriptionを記します。',
   'hudChrome.corpseHarvest.components.meat': '肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（エンチャント）',
   'hudChrome.materialHint.cookingCatch': '料理材料。食べる前に調理が必要です。',

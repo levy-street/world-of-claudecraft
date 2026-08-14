@@ -31,8 +31,8 @@ export type ConsumableLookup = (itemId: string) => ItemDef | undefined;
 
 /**
  * Fill `out` with the item ids the quick bar shows, in render order:
- * potions, then elixirs, then scrolls, then food, then drink; id-sorted within a kind so the
- * row stays visually stable while stacks merge, split, or shuffle bag order.
+ * potions, then elixirs, then flasks, then scrolls, then food, then drink; id-sorted within a
+ * kind so the row stays visually stable while stacks merge, split, or shuffle bag order.
  * Multiple stacks of one item collapse to a single slot (the shared bar core
  * sums the count across stacks). Mutates and returns `out` (allocation-light:
  * per-frame callers reuse one array, matching the action_bar_view contract).

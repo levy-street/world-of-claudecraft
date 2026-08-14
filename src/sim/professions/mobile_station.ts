@@ -131,8 +131,11 @@ export function placeMobileStationForPlayer(
  * Success emits one player-visible log line naming `name`, the placing
  * item's display name (the phase 06 scroll-read pattern in items.ts; matched
  * by log.placeStation in src/ui/sim_i18n.ts), so a placement is never
- * silent. Draws no rng, reads no wall clock; the CALLER never consumes the
- * item (a permanent tool, the mount-reins convention).
+ * silent. The line carries NO article of its own, the house quaff/read
+ * pattern: an item name already supplies whatever article it wants, and
+ * "You set up the The Laden Hearth." is what gluing one on produces. Draws no
+ * rng, reads no wall clock; the CALLER never consumes the item (a permanent
+ * tool, the mount-reins convention).
  */
 export function placeMobileStationFromItem(
   ctx: SimContext,
@@ -152,7 +155,7 @@ export function placeMobileStationFromItem(
     expiresAtTick: ctx.tickCount + MOBILE_CRAFTING_STATION_DURATION_TICKS,
   };
   r.meta.mobileStation = station;
-  ctx.emit({ type: 'log', text: `You set up the ${name}.`, color: '#c9f', pid: r.meta.entityId });
+  ctx.emit({ type: 'log', text: `You set up ${name}.`, color: '#c9f', pid: r.meta.entityId });
   return station;
 }
 

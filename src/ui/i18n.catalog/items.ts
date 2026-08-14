@@ -94,13 +94,18 @@ const itemStringsEn = {
         'Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.',
       useElixirAura:
         'Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.',
-      // Flasks (elixir_tooltip_view.ts) append these two rules under the Use
-      // line they share with elixirs. Both are the mechanic, not flavor: the
-      // use path sheds every other flask aura before applying (one flask at a
-      // time, whatever its stat), and aurasSurvivingDeath keeps a flask aura
-      // through a death that clears everything else.
+      // Flasks (elixir_tooltip_view.ts) append these three rules under the Use
+      // line they share with elixirs. All three are the mechanic, not flavor:
+      // the use path sheds every other flask aura before applying (one flask at
+      // a time, whatever its stat), it REFUSES a same-stat elixir or scroll
+      // while a flask is worn rather than letting the weaker source overwrite
+      // it, and aurasSurvivingDeath keeps a flask aura through a death that
+      // clears everything else. The death line names its limit too: auras are
+      // session state, so the buff really does end at logout, and a tooltip
+      // that promised only the death half would be read as promising both.
       flaskOnlyOne: 'Only one flask effect at a time. Drinking another flask replaces this one.',
-      flaskThroughDeath: 'The effect remains through death.',
+      flaskOutranks: 'A weaker elixir or scroll cannot replace it.',
+      flaskThroughDeath: 'The effect remains through death, but ends when you log out.',
       // Well Fed (elixir_tooltip_view.ts): the buff a finished meal leaves.
       // The "after you finish eating" clause is load-bearing, not padding:
       // standing up early grants nothing at all, so the tooltip has to say

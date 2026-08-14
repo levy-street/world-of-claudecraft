@@ -218,14 +218,22 @@ export class BagItemActionMenu {
   }
 
   // Step one: the enchants that consume the chosen reagent, grouped into the
-  // three tier sections and slot-sorted inside each (enchant_apply_view.ts owns
+  // four tier sections and slot-sorted inside each (enchant_apply_view.ts owns
   // both decisions). Each row shows the localized enchant name, WHAT THE ENCHANT
   // DOES (its stat bonus, inline: the picker also lives on touch, where there is
   // no hover to reveal it), its target slot, and the per-reagent affordability;
-  // an unaffordable enchant is shown but not selectable (aria-disabled).
+  // an unaffordable enchant is shown but not selectable (aria-disabled), and a
+  // SKILL-short one paints the same way with the skill line instead. Both
+  // refusals belong here rather than on the target list: they are facts about
+  // the enchant, and answering a skill shortfall with "No eligible item to
+  // enchant." told the player the wrong thing about their own bags.
   private openEnchantPicker(reagentItemId: string, x: number, y: number): void {
     const world = this.deps.world();
-    const sections = enchantSectionsForReagent(world.inventory, reagentItemId);
+    // The same craftingIdentity read the target picker makes (see
+    // openTargetPicker): an unsynced online viewer reads 0 and the skill-gated
+    // rows list inert until the first cprof lands.
+    const enchantingSkill = world.craftingIdentity.craftSkills.enchanting ?? 0;
+    const sections = enchantSectionsForReagent(world.inventory, reagentItemId, enchantingSkill);
     const title = esc(t('hudChrome.enchanting.pickerTitle'));
     if (sections.length === 0) {
       this.paint(
@@ -272,9 +280,19 @@ export class BagItemActionMenu {
         const effectHtml = effectsText
           ? `<span class="ctx-item-effect">${esc(effectsText)}</span>`
           : '';
-        const html = `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>`;
+        // The skill shortfall gets its own sub-line, in the plain meta style the
+        // Worn and heroic tags use: it is a standing fact about the crafter, not
+        // a destructive warning, so it carries no danger tint. It sits beside
+        // the reagent line rather than replacing it, because a climbing
+        // enchanter wants to know the bill as well as the rung.
+        const skillHtml = pick.skillMet
+          ? ''
+          : `<span class="ctx-item-meta">${esc(t('hudChrome.enchanting.enchantSkillTooLow'))}</span>`;
+        const html = `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>${skillHtml}`;
         rows.push(
-          pick.affordable ? { act: `enchant:${pick.enchantId}`, html } : { html, disabled: true },
+          pick.affordable && pick.skillMet
+            ? { act: `enchant:${pick.enchantId}`, html }
+            : { html, disabled: true },
         );
       }
     }

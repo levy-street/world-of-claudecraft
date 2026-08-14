@@ -86,9 +86,16 @@ export function unstuckSicknessDuration(level: number): number {
 // decision, not an oversight here. None may be shed by dying;
 // the encounter script remains responsible for releasing its own control.
 // Every other aura clears, Well Fed included. Used at every player
-// death/respawn site so the rule cannot drift. The deliberate exceptions are
-// the FULL wipes in social/arena.ts and social/fiesta.ts, which reset a match
-// to a clean slate and so clear flasks along with everything else.
+// death/respawn site so the rule cannot drift.
+//
+// The PvP accounting in full, because the two halves are decisions rather than
+// oversights. Arena (social/arena.ts) and fiesta (social/fiesta.ts) FULL-wipe
+// the aura list at their own reset points, which clears flasks along with
+// everything else: a ranked match starts from a clean slate, so nothing carried
+// in from the world rides through it. Thornhollow Fields (social/battleground.ts)
+// and Protect Yumi (social/yumi.ts) deliberately do NOT wipe, so a death inside
+// those modes runs this filter and the flask survives it: classic-era flasks
+// persisted through battleground deaths, and that is the recorded decision here.
 export function aurasSurvivingDeath(auras: Aura[]): Aura[] {
   return auras.filter(
     (a) =>

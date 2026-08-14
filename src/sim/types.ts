@@ -1233,9 +1233,20 @@ export interface ScrollItemDef extends BaseItemDef {
 // Exclude above). Its band deliberately sits ABOVE the documented elixir
 // ceiling (value <= 12, duration <= 900): the ceiling binds the elixir/scroll
 // bands, which is exactly what a flask is meant to beat.
+//
+// The effect kind is NARROWED to the three flat stat axes the shipped rung
+// uses, deliberately, and it is the type that enforces it rather than a
+// comment: the one-flask singleton strip (src/sim/items.ts useItem) sheds a
+// worn flask by splicing the aura and recalculating stats, which is correct for
+// a flat stat buff and silently WRONG for a kind whose removal owes more than a
+// stat recalc (a stealth or invisibility aura, a percent-scaled buff). Those
+// omissions are known-inert only because no such flask can exist; widening this
+// union means auditing that strip in the same change, not just adding a row.
+export type FlaskAuraKind = Extract<AuraKind, 'buff_sta' | 'buff_ap' | 'buff_int'>;
+
 export interface FlaskItemDef extends BaseItemDef {
   kind: 'flask';
-  elixir: NonNullable<BaseItemDef['elixir']>;
+  elixir: NonNullable<BaseItemDef['elixir']> & { kind: FlaskAuraKind };
   armorType?: never;
   weapon?: never;
   use?: never;

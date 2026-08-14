@@ -1123,11 +1123,13 @@ export function resolveApplyEnchant(
   if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return { ok: false, itemId, enchantId, reason: 'unknown_enchant' };
-  const applier = ctx.players.get(pid);
-  // Rungs 2 and 4 of the deny ladder above, shared by every arm. A missing
-  // meta refuses both the same way a marker-less copy and a skill-0 character
-  // do: the answers are honest (no meta holds nothing and knows nothing), and
-  // neither gate touches state or draws rng.
+  // ONE applier resolution, the same ctx.resolve seam the admission twin uses,
+  // so both twins judge a meta-without-entity ghost identically (the mirror
+  // contract; a players.get read here once made the twins diverge on that
+  // defensive-only path). Rungs 2 and 4 of the deny ladder, shared by every
+  // arm: a missing meta refuses the same way a marker-less copy and a skill-0
+  // character do, and neither gate touches state or draws rng.
+  const applier = ctx.resolve(pid)?.meta;
   if (enchant.requiresPerfected && !(applier && holdsPerfectedTarget(applier, itemId, slot))) {
     return { ok: false, itemId, enchantId, reason: 'not_perfected' };
   }
@@ -1251,7 +1253,14 @@ export function evaluateApplyEnchantAdmission(
   if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return { ok: false, itemId, enchantId, reason: 'unknown_enchant' };
-  const applier = ctx.players.get(pid);
+  // ONE applier resolution for the whole twin, through the seam its holding
+  // gates already use. Reading the two Lucent gates off ctx.players while every
+  // gate below them reads ctx.resolve would let a meta-without-entity ghost be
+  // judged present by the first pair and absent by the rest, which is exactly
+  // the divergence the deny ladder's fixed order exists to prevent. The ladder
+  // ORDER is unchanged: the two gates still answer before not_held.
+  const r = ctx.resolve(pid);
+  const applier = r?.meta;
   if (enchant.requiresPerfected && !(applier && holdsPerfectedTarget(applier, itemId, slot))) {
     return { ok: false, itemId, enchantId, reason: 'not_perfected' };
   }
@@ -1264,7 +1273,6 @@ export function evaluateApplyEnchantAdmission(
   ) {
     return { ok: false, itemId, enchantId, reason: 'insufficient_skill' };
   }
-  const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, enchantId, reason: 'not_held' };
   const { meta } = r;
 

@@ -204,6 +204,41 @@ function jobSource(name: string): string {
   return match[0];
 }
 
+/**
+ * Every `sparse-checkout:` block in `source` that carries the docs/screenshots
+ * exclusion, extracted WHOLE: the `sparse-checkout: |` header, its indented
+ * body, and the `sparse-checkout-cone-mode:` line that closes it.
+ *
+ * Structural rather than a search for the known literal, which is the whole
+ * point: a copy-pasted block someone then edited must still be FOUND, so that
+ * the caller can compare it and fail. The body ends where the indentation
+ * returns to the header's own level, so the `changes` job's article-free
+ * `sparse-checkout: |` (a two-line scripts cone with no cone-mode key) is
+ * bounded correctly and then filtered out for lacking the exclusion.
+ */
+function screenshotSparseBlocks(source: string): string[] {
+  const lines = source.split('\n');
+  const indentOf = (line: string): number => line.length - line.trimStart().length;
+  const blocks: string[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].trim() !== 'sparse-checkout: |') continue;
+    const headerIndent = indentOf(lines[i]);
+    let end = i;
+    while (end + 1 < lines.length) {
+      const next = lines[end + 1];
+      if (next.trim() === '' || indentOf(next) <= headerIndent) break;
+      end++;
+    }
+    let block = lines.slice(i, end + 1).join('\n');
+    const closer = lines[end + 1];
+    if (closer !== undefined && closer.trim().startsWith('sparse-checkout-cone-mode:')) {
+      block += `\n${closer}`;
+    }
+    if (block.includes('!/docs/screenshots/*/')) blocks.push(block);
+  }
+  return blocks;
+}
+
 describe('CI workflow parity', () => {
   it('sparse-checkout on the test jobs covers every referenced screenshot subtree', () => {
     // The five sparse test-job checkouts (pr-gate, both long-sims lanes,
@@ -265,6 +300,26 @@ describe('CI workflow parity', () => {
       expect(jobSource(job).includes(SPARSE_CONE), job).toBe(false);
     }
     expect(workflow.split(SPARSE_CONE)).toHaveLength(6);
+    // The counts above are both blind in one direction: they say how many
+    // copies of THIS literal exist, and nothing at all about a sixth block that
+    // was copy-pasted and then edited, which reads as zero copies of the
+    // literal in a job the first loop does not name. So extract every
+    // screenshot-excluding sparse block the workflow actually contains, whole,
+    // and require each to BE the literal. That subsumes both counts against a
+    // divergent copy: a drifted block is still extracted here and still fails.
+    const blocks = screenshotSparseBlocks(workflow);
+    expect(blocks, 'every sparse-checkout block carrying the screenshot exclusion').toHaveLength(5);
+    for (const [i, block] of blocks.entries()) {
+      expect(block, `sparse-checkout block ${i + 1} diverged from the one cone`).toBe(SPARSE_CONE);
+    }
+    // The extractor's own control: drop one cone line from a copy of the
+    // workflow and the same extraction must report a block that is NOT the
+    // literal. Without this, an extractor that silently returned the literal
+    // (or nothing it could compare) would pass the loop above forever.
+    const mutated = workflow.replace('            /docs/screenshots/wildheart/\n', '');
+    const mutatedBlocks = screenshotSparseBlocks(mutated);
+    expect(mutatedBlocks).toHaveLength(5);
+    expect(mutatedBlocks.every((block) => block === SPARSE_CONE)).toBe(false);
     const coneDirs = new Set<string>(
       [...SPARSE_CONE.matchAll(/\/docs\/screenshots\/([A-Za-z0-9._-]+)\//g)].map((m) => m[1]),
     );
@@ -280,7 +335,7 @@ describe('CI workflow parity', () => {
         const match = line.match(/^docs\/screenshots\/([A-Za-z0-9._-]+)\//);
         if (match) indexDirs.add(match[1]);
       }
-      // Vacuity floor near the real count (166 subtrees on 2026-08-14).
+      // Vacuity floor near the real count (169 subtrees on 2026-08-14).
       expect(indexDirs.size).toBeGreaterThanOrEqual(160);
     }
     // The guard's own file is excluded from the corpus: its SPARSE_CONE

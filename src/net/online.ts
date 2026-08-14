@@ -1711,10 +1711,12 @@ export class ClientWorld implements IWorld {
   private mountLessonActiveMirror = false;
   delveMarks = 0;
   companionUpgrades: Record<string, number> = {};
-  // Flat per-craft skill tracking (#1126). NOT yet mirrored over the wire: this
-  // issue lands the sim-side state + persistence only, so online play sees the
-  // all-zero default until the wheel/mass-conservation follow-up wires a self-snap
-  // field the way `dmarks`/`dcomp` do for delveMarks/companionUpgrades above.
+  // Flat per-craft skill tracking (#1126), mirrored over the wire on the atomic
+  // `cprof` (craftingIdentity) delta: applySnapshot REPLACES this map from
+  // cprof.craftSkills and re-points craftingIdentity.craftSkills at the same
+  // object, so the two reads can never disagree. Until the first cprof arrives
+  // the all-zero default stands and craftingIdentity.synced is false, which is
+  // what an unsynced viewer's gates key on (see the enchant picker's skill arm).
   craftSkills: Record<string, number> = emptyCraftSkills();
   craftingIdentity: CraftingIdentityView = {
     version: 1,

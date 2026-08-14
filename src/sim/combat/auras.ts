@@ -178,7 +178,14 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
       // across every role food, so the newest plate replaces the last through
       // applyAura's ordinary same-id rule, and no flask marker: Well Fed dies
       // with you. Draws no rng.
+      // Clear THEN grant: the payload is held in a local and the consuming slot
+      // is nulled before the aura lands, so the meal is already over from every
+      // reader's point of view when applyAura runs. The reverse order works
+      // today only because nothing on the apply path consults isConsuming; this
+      // one stays correct if anything ever does (a buff that refuses to land on
+      // an eating character, a cancel-on-consume rule).
       const wellFed = c.wellFed;
+      p[slot] = null;
       if (wellFed) {
         ctx.applyAura(p, {
           id: 'well_fed',
@@ -191,7 +198,6 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
           school: 'nature',
         });
       }
-      p[slot] = null;
     }
   }
 }

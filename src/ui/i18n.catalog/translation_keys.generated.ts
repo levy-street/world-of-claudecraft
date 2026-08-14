@@ -10494,6 +10494,7 @@ export type TranslationKeyFlat =
   | 'itemUi.tooltip.damageSpeed'
   | 'itemUi.tooltip.dps'
   | 'itemUi.tooltip.flaskOnlyOne'
+  | 'itemUi.tooltip.flaskOutranks'
   | 'itemUi.tooltip.flaskThroughDeath'
   | 'itemUi.tooltip.ifYouEquip'
   | 'itemUi.tooltip.maxStack'

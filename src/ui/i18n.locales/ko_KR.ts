@@ -2694,7 +2694,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useElixirAura':
     '사용: {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 같은 종류의 다른 비약이나 두루마리를 대체합니다. 전투 중 사용 가능.',
   'itemUi.tooltip.flaskOnlyOne': '플라스크 효과는 한 번에 하나만 유지됩니다. 다른 플라스크를 마시면 이 효과를 대체합니다.',
-  'itemUi.tooltip.flaskThroughDeath': '이 효과는 죽어도 유지됩니다.',
+  'itemUi.tooltip.flaskOutranks': '더 약한 비약이나 두루마리로는 대체할 수 없습니다.',
+  'itemUi.tooltip.flaskThroughDeath': '이 효과는 죽어도 유지되지만, 접속을 종료하면 사라집니다.',
   'itemUi.tooltip.wellFed': '잘 먹음: 식사를 마치면 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.',
   'itemUi.tooltip.wellFedAura': '잘 먹음: 식사를 마치면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.',
   'itemUi.tooltip.clickUseInstant': '클릭하여 전투 중 즉시 사용',
@@ -11162,9 +11163,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftIntro.leatherworking':
     '가죽세공은 펜브리지 무두질 작업장에서 날렵한 가죽 장비를 무두질하며, 생가죽 기본부터 희귀한 늪지기 장비까지 만든다.',
   'guide.profPages.craftIntro.cooking':
-    '요리는 이스트브룩 주방에서 생선과 사냥감과 약초를 앉아서 먹는 음식으로 만들며, 최고는 희귀한 연회 요리에 이른다.',
+    '요리는 이스트브룩 주방에서 생선과 사냥감과 약초를 앉아서 먹는 음식으로 만들며, 정점은 세 가지 역할별 요리다. 어떤 음식보다 크게 회복시키고, 접시를 비운 이에게 잘 먹음 효과를 남긴다.',
   'guide.profPages.craftIntro.alchemy':
-    '연금술은 하이워치 약방에서 치유와 마나 물약, 그리고 체력 비약을 빚는다.',
+    '연금술은 하이워치 약방에서 치유와 마나 물약, 체력 비약, 그리고 정점에는 역할마다 하나씩의 플라스크를 빚는다. 플라스크는 자신의 죽음마저 넘어 남는다.',
   'guide.profPages.craftIntro.engineering':
     '기계공학은 이스트브룩 공작소에서 4티어와 5티어 채집 도구를 만들며, 각 도구는 한 단계 아래 도구를 재료로 소비한다.',
   'guide.profPages.craftIntro.enchanting':
@@ -11371,7 +11372,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '야외 제조법 Eastbrook Arming Sword는 누구나 처음부터 알고 어디서든 만든다. 진짜 사다리는 대장간 전용 세 단 아홉 제조법이다. 구리 단은 기술 0에 무료, 철 단은 기술 25에 각 25은, 오스뮴 단은 기술 50에 각 1금. 당신의 단이 닿는 순간 Darva가 가르쳐 준다. 짝을 타는 제조법이 하나 더 있다. Gravewyrm Gauntlets. 무기 제작과 방어구 제작이 모두 25인 조율된 대장장이만 만들 수 있는 합작품으로, 작업대조차 필요 없다.',
   'guide.profPages.craftProse.weaponcrafting.routeHeading': '걸작, 그리고 125까지의 길',
   'guide.profPages.craftProse.weaponcrafting.routeBody':
-    '능력치가 있는 물건(철 단 이상)만 걸작이 될 수 있다. 능력치 없는 구리 단 일반품은 절대 발동하지 않는다. 철은 재료 1단계(+1%), 고산솔과 문양강철은 2단계(+2%)다. 경로는 구리 단으로 25, 철 단으로 50, 오스뮴 단으로 75. 이후 더 높은 제조법이 없어 오스뮴 단이 절반, 4분의 1로 줄어드니 상한 125까지 약 150회를 잡자. 분당 열 번의 공유 제한도 기억할 것. Darva의 작업 주문은 30분마다 구리 광석 8개를 사 준다. 업적의 서는 기술 50에 Edge and Temper를, 125에 Grandmaster Weaponcrafting을 새긴다.',
+    '능력치가 있는 물건(철 단 이상)만 걸작이 될 수 있다. 능력치 없는 구리 단 일반품은 절대 발동하지 않는다. 철은 재료 1단계(+1%), 고산솔과 문양강철은 2단계(+2%)다. 경로는 구리 단으로 25, 철 단으로 50, 오스뮴 단으로 75. 오스뮴 세 점 위에는 Darva가 가르치지 않는 정점의 단이 있고, 그 제조법은 주워서 얻으며, 그것을 쥔 대장장이는 상한까지 온전한 숙련을 받는다. 제조법이 나오기 전까지는 오스뮴 제조법이 나머지를 맡아 절반, 4분의 1로 줄어드니 상한 125까지 약 150회를 잡자. 분당 열 번의 공유 제한도 기억할 것. Darva의 작업 주문은 30분마다 구리 광석 8개를 사 준다. 업적의 서는 기술 50에 Edge and Temper를, 125에 Grandmaster Weaponcrafting을 새긴다.',
   'guide.profPages.craftProse.armorcrafting.identityHeading': '최전선의 사슬 갑옷',
   'guide.profPages.craftProse.armorcrafting.identityBody':
     '사다리는 군인의 이력서 같다. 리벳 박은 구리 장비로 시작해, ironlink 단에서 처음 진짜 능력치가 붙고, 희귀 osmiumscale 투구, 흉갑, 다리 보호구는 장인이 두드릴 수 있는 가장 큰 방어도의 힘과 체력 장비다. 조용한 면도 있다. 야외 일반품 Eastbrook Warded Leggings와 기술 75의 가마비늘 망토(지능과 정신의 사슬 어깨)가 주문 계열 사슬 착용자를 고객으로 붙잡는다. 무기 제작과 기계공학 사이에 있으며, 대장장이 짝은 Darva 앞에서 맹세하고 기어장인은 아직 서약 퀘스트가 없다.',
@@ -11410,7 +11411,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     "marshstalker 단 이상은 모두 걸작을 굴리고, Mirewarden Jerkin의 Pristine Hide가 서명 재료 보너스를 자동으로 채운다. 오스뮴은 재료 1단계. 능력치 없는 생가죽 일반품은 발동하지 않는다. 자연스럽게 키우자. 1레벨부터 잡는 늑대와 멧돼지를 모두 벗기고, 생가죽 단은 선 자리에서 25까지, 퀘스트가 늪으로 이끌 때 겸사겸사 수련한다. marshstalker로 50, mirewarden으로 75, 그 뒤는 Duskhide Wraps(3단 제조법, 오스뮴 6개, Pristine Hide 3장, 거친 가죽 2장, Tanning Agent 1)가 99까지 전속, 이후 절반으로 마지막 50점을 약 75회에 데려간다. 75 특화의 이동 무두질 작업장은 이 기술에서 가장 빛난다. 모닥불 곁에서 가죽 자루가 장비로 변해 Fenbridge 왕복이 사라진다. Hesk의 주문은 30분마다 거친 가죽 8장. 기술 50에 Tanner's Trade, 상한에 Grandmaster Leatherworking이다.",
   'guide.profPages.craftProse.cooking.identityHeading': '일행을 먹이는 솥',
   'guide.profPages.craftProse.cooking.identityBody':
-    "요리를 먹으면 18초의 휴식 동안 회복한다. 전투 사이에는 가장 싼 치유다. 사다리는 회복 90의 Pan-Seared River Perch에서 현존 최대의 앉은 회복인 Marlow's Grand Roast(980)까지 이어진다. 연금술과 가죽세공 사이에 있으며, 살아 있는 짝은 약제사(연금술과 요리)로 Eastbrook 주방의 Cook Marlow 앞에서 멧돼지 네 마리를 사냥해 맹세한다. 가죽세공과 이루는 Trapper는 아직 서약 퀘스트가 없다.",
+    "요리를 먹으면 18초의 휴식 동안 회복한다. 전투 사이에는 가장 싼 치유다. 사다리는 회복 90의 Pan-Seared River Perch에서 Marlow's Grand Roast(980)를 지나 그 위의 세 가지 정점 요리(1392)까지 이어진다. 게임에서 가장 큰 앉은 회복이며, 접시를 다 비우면 잘 먹음 효과를 남기는 유일한 음식이다. 연금술과 가죽세공 사이에 있으며, 살아 있는 짝은 약제사(연금술과 요리)로 Eastbrook 주방의 Cook Marlow 앞에서 멧돼지 네 마리를 사냥해 맹세한다. 가죽세공과 이루는 Trapper는 아직 서약 퀘스트가 없다.",
   'guide.profPages.craftProse.cooking.materialsHeading': '낚싯대와 칼이 채우는 찬장',
   'guide.profPages.craftProse.cooking.materialsBody':
     '간판 재료는 낚시가 지역별로 댄다. Eastbrook Vale의 거울 송어와 강 농어, Mirefen Marsh의 늪 창꼬치와 진흙 장어, Thornpeak Heights의 서리아가미 송어와 판지느러미 잉어. 사다리의 각 단은 제 단의 물고기를 요리하니 낚는 요리사는 재료가 마르지 않는다. 푸줏간 쪽은 사체 채집에서 온다. 멧돼지 따위의 사냥 고기, 그리고 희귀 이상 판정에서 나오는 서명된 Prime Cut, 대구이의 주인공이다. 약초가 좋은 접시에 향을 더하고, ashwood 통나무 하나가 장어를 훈제하며, Cooking Salt는 Marlow의 가판에서 한 봉지 8동이다.',
@@ -11419,7 +11420,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     "Salted Jerky가 야외 제조법이다. 처음부터 알고, 거미 다리 하나면 어디서든 만드는 신출내기의 행군식. 수련 사다리는 광장 동쪽 Eastbrook 주방에서 돈다. 무료 단은 기술 0(농어, Hunter's Game Skewer, Herbed Marsh Pike), 중간 단은 기술 25에 각 25은(Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), 희귀 단은 기술 50에 각 1금(Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast). 묶음 요리는 재료를 늘린다. 훈제 장어와 스튜는 한 번에 두 접시, 연회 모둠은 세 접시다.",
   'guide.profPages.craftProse.cooking.routeHeading': '걸작 아닌 특화, 그리고 125까지의 길',
   'guide.profPages.craftProse.cooking.routeBody':
-    '요리는 걸작 이야기의 정직한 예외다. 접시에는 올릴 능력치가 없어 걸작이 절대 발동하지 않고, 좇을 이유도 없다. 이 기술의 정점은 75의 특화다. 모든 재료가 5분의 1씩 절약되고(묶음 요리에서 빠르게 불어난다), 이동식 야외 주방으로 던전 문 앞에서 연회를 차린다. 낚은 것을 요리하자. 두 기술이 서로를 먹인다. 육포와 무료 단으로 25, 중간 단으로 50, 희귀 단으로 75. 이후 더 높은 접시가 없어 희귀 요리가 절반과 4분의 1로 줄고, 상한까지 약 150회다. 갈이가 아니라 비축이라 생각하자. 길드는 모든 접시를 비운다. Marlow의 주문은 30분마다 사냥 고기 8점. 기술 50에 Seasoned Chef, 125에 Grandmaster Cooking 칭호다.',
+    '요리는 걸작 이야기의 정직한 예외다. 접시에는 올릴 능력치가 없어 걸작이 절대 발동하지 않고, 좇을 이유도 없다. 이 기술의 정점은 75의 특화다. 모든 재료가 5분의 1씩 절약되고(묶음 요리에서 빠르게 불어난다), 이동식 야외 주방으로 던전 문 앞에서 연회를 차린다. 낚은 것을 요리하자. 두 기술이 서로를 먹인다. 육포와 무료 단으로 25, 중간 단으로 50, 희귀 단으로 75. 희귀 단 위에는 정점의 주방, 세 가지 역할별 요리와 The Laden Hearth가 있다. 아무도 가르쳐 주지 않고 주운 제조법에서 배우며, 그것을 쥔 요리사는 상한까지 온전한 숙련을 받는다. 제조법이 나오기 전까지는 희귀 요리가 마지막 구간을 맡아 절반과 4분의 1로 줄고, 약 150회다. 갈이가 아니라 비축이라 생각하자. 길드는 모든 접시를 비운다. Marlow의 주문은 30분마다 사냥 고기 8점. 기술 50에 Seasoned Chef, 125에 Grandmaster Cooking 칭호다.',
   'guide.profPages.craftProse.alchemy.identityHeading': '싸움을 이기는 병',
   'guide.profPages.craftProse.alchemy.identityBody':
     '이 기술은 Highwatch의 약방에서 이루어진다. 주인은 Alchemist Verane. 제조법 사다리를 가르치고, Glass Vial을 12동에 팔며, 작업 주문으로 약초 값을 치른다. 연금술은 시행착오 기술들 곁에 있어 한쪽은 기계공학, 다른 쪽은 요리다. 그래서 짝이 둘이다. 폭격수(기계공학과 연금술, Eastbrook의 Tinker Gizzel 앞에서)와 약제사(연금술과 요리, Cook Marlow 앞에서). 어느 쪽이든 조율하면 연금술이 주 전공이 되어 상한까지 열린다. 그 전까지는 여느 미서약 기술처럼 희귀 단계까지 일한다.',
@@ -11428,7 +11429,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '어느 물약이든 Glass Vial 하나에 단에 맞는 약초가 든다. 윤광잎은 Eastbrook Vale에, goldleaf는 Mirefen Marsh에, sunpetal은 Thornpeak Heights에 자란다. 한 지역에 한 약초, 병은 세계와 함께 오른다. 약초학이 타고난 짝 기술이지만 채집가나 시장에서 사도 무방하다. 깊은 지역의 상위 약초밭은 더 좋은 낫을 원하니 직접 꺾을 거라면 도구를 최신으로. 강장제 계열엔 사냥꾼의 재료가 더해진다. 독 있는 사체에서 채집하는 Venom Gland, 그리고 정점의 강장제가 원하는 Pristine Venom Gland(서명된 희귀 표본)다.',
   'guide.profPages.craftProse.alchemy.ladderHeading': '제조법 사다리',
   'guide.profPages.craftProse.alchemy.ladderBody':
-    'Minor Healing Potion은 모두가 처음부터 알고 어디서든 섞는다. 진짜 사다리는 Verane이 약방에서 가르치는 아홉 제조법, 단마다 셋이다. 기술 0 단은 무료, 25 단은 각 25은, 50 단은 각 1금. 각 단은 치유 물약, 마나 물약, 체력 강장제로, 일반 윤광잎 병(생명 120, 마나 160)에서 고급 goldleaf(200과 260), 희귀 sunpetal(280과 360)로 오른다. 강장제도 같이 오른다. Elixir of the Boar는 체력 6을 10분, Vipersear Elixir는 9를 15분, Elixir of the Serpent는 12를 15분에 한 번에 두 병. 옆길에 합작 하나, Elixir of the Bear. 연금 25에 Verane이 25은에 가르치고 어디서든 섞을 수 있지만, 두 기술 25의 조율된 폭격수만 만든다.',
+    'Minor Healing Potion은 모두가 처음부터 알고 어디서든 섞는다. 진짜 사다리는 Verane이 약방에서 가르치는 아홉 제조법, 단마다 셋이다. 기술 0 단은 무료, 25 단은 각 25은, 50 단은 각 1금. 각 단은 치유 물약, 마나 물약, 체력 강장제로, 일반 윤광잎 병(생명 120, 마나 160)에서 고급 goldleaf(200과 260), 희귀 sunpetal(280과 360)로 오른다. 강장제도 같이 오른다. Elixir of the Boar는 체력 6을 10분, Vipersear Elixir는 9를 15분, Elixir of the Serpent는 12를 15분에 한 번에 두 병. 옆길에 합작 하나, Elixir of the Bear. 연금 25에 Verane이 25은에 가르치고 어디서든 섞을 수 있지만, 두 기술 25의 조율된 폭격수만 만든다.\n\n비약 계열 전체 위에는 플라스크 단이 있다. 아무도 가르쳐 주지 않고 주운 제조법에서 배운다. 플라스크는 15를 20분 동안 주며, 비약에는 없던 두 축, 공격력과 지능을 익숙한 체력과 나란히 연다. 역할마다 하나씩이다. 규칙도 따로 있다. 능력치와 상관없이 한 번에 하나만 유지되고, 그 능력치의 더 약한 비약이나 두루마리로는 대체할 수 없으며, 자신의 죽음을 넘어 남지만 접속을 종료하면 사라진다.',
   'guide.profPages.craftProse.alchemy.routeHeading': '조제사의 125 길',
   'guide.profPages.craftProse.alchemy.routeBody':
     '물약은 절대 걸작이 되지 않는다. 그것은 능력치 있는 장비의 몫이다. 그래도 이름은 여행한다. 희귀 sunpetal 물약은 한 병씩 빚어져 서명되어 나오고, 두 병짜리 Elixir of the Serpent는 무명으로 남는다. 기술 75에 특화하면 모든 연금 제조법의 재료가 20% 절약된다. 약초학을 일찍 배워 레벨링하며 꺾자. 윤광잎은 골짜기에 널렸고, Verane의 작업대에 닿으면 무료 단이 어차피 꺾었을 약초로 깔끔하게 25까지 데려간다. 25 단은 열리는 즉시 배우고, 채집을 늪의 goldleaf로 옮기고, Verane의 주문(Goldleaf Herb 여섯에 45동, 30분마다)으로 잔돈을 회수하자. 50부터는 Thornpeak 약초로 sunpetal 물약과 Serpent를 빚는다. 100에서 125는 의도된 가는 물줄기이니 숫자 때문에 약초를 태우지 말고 팔리는 것을 빚자. 기술 50에 Strange Brews, 상한에 Grandmaster Alchemy다.',
@@ -11466,7 +11467,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '보석세공에는 자기 작업대가 없다. 목록 전부가 Eastbrook 대장간, 무기 제작과 방어구 제작이 함께 쓰는 그 모루에서 만들어지고, Forgemistress Darva가 거기서 가르친다. 사다리는 세 단 아홉 개의 훈련사 제조법이다. 구리 단(반지, 고리, 목고리)은 기술 0에 무료, 철 단(인장, 고리, 목걸이)은 기술 25에 각 25은, 오스뮴 단(반지, 고리, 목걸이)은 기술 50에 각 1금이며, 당신의 단이 제조법의 단에 닿는 순간 배울 수 있다.\n\n야외 제조법도 합작품도 아직 없다. 모든 단이 대장간 전용 훈련사 일이라, 이 기술은 대장장이들이 서 있는 자리에서 배우고 거기서 익힌다.',
   'guide.profPages.craftProse.jewelcrafting.routeHeading': '걸작, 그리고 125까지의 길',
   'guide.profPages.craftProse.jewelcrafting.routeBody':
-    '이 사다리에는 능력치 없는 단이 없다. 모든 성과물이 진짜 능력치를 달고 나오니, 더 고운 품질이 당신의 단 상한 안에 드는 한 매 제작이 걸작 확률을 굴리고, 철과 오스뮴은 둘 다 1단 재료로 가산된다. 구리 단과 철 단은 취미든 미맹세든 누구라도 희귀 걸작으로 빚을 수 있다. 오스뮴 세 점은 이미 희귀라, 그보다 한 단 높은 걸작은 희귀 위의 상한을 기다리는데, 보석세공의 짝이 열리기 전에는 아무도 그 상한을 갖지 못한다.\n\n오르는 길은 표준 그대로다. 구리로 25, 철 단은 열리는 날 올라 50, 오스뮴으로 75까지. 75 너머는 아직 아무것도 없어 오스뮴 제조법은 절반으로, 다시 4분의 1로 흐려진다. 125 상한까지 대략 150회를 더 잡고, 만든 것은 떳떳하게 팔아 밑천을 대라. 모든 직업이 장신구를 차고, 대부분의 여행자는 반지와 목걸이 칸을 비운 채 성장하니까.\n\n업적의 서는 첫 희귀 장신구에 Polished to Brilliance를, 기술 50에 Facet and Filigree를, 상한 125에 Grandmaster Jewelcrafting을 새긴다.',
+    '이 사다리에는 능력치 없는 단이 없다. 모든 성과물이 진짜 능력치를 달고 나오니, 더 고운 품질이 당신의 단 상한 안에 드는 한 매 제작이 걸작 확률을 굴리고, 철과 오스뮴은 둘 다 1단 재료로 가산된다. 구리 단과 철 단은 취미든 미맹세든 누구라도 희귀 걸작으로 빚을 수 있다. 오스뮴 세 점은 이미 희귀라, 그보다 한 단 높은 걸작은 희귀 위의 상한을 기다리는데, 보석세공의 짝이 열리기 전에는 아무도 그 상한을 갖지 못한다.\n\n오르는 길은 표준 그대로다. 구리로 25, 철 단은 열리는 날 올라 50, 오스뮴으로 75까지. 그 위에는 아무도 가르치지 않는 정점의 단이 있고, 제조법은 주워서 얻으며, 그것을 쥔 보석세공사는 상한까지 온전한 숙련을 받는다. 제조법이 나오기 전까지는 오스뮴 제조법이 나머지를 맡아 절반으로, 다시 4분의 1로 흐려진다. 125 상한까지 대략 150회를 더 잡고, 만든 것은 떳떳하게 팔아 밑천을 대라. 모든 직업이 장신구를 차고, 대부분의 여행자는 반지와 목걸이 칸을 비운 채 성장하니까.\n\n업적의 서는 첫 희귀 장신구에 Polished to Brilliance를, 기술 50에 Facet and Filigree를, 상한 125에 Grandmaster Jewelcrafting을 새긴다.',
   'guide.profPages.craftIntro.inscription':
     '각인은 Highwatch 약방의 필경대다. 보조 무기 칸의 시전자용 서책과 모두를 위한 체력 두루마리를, 곁의 물약이 쓰는 바로 그 약초를 갈아 만든다. 두루마리는 전투 비약 강화 효과로 들어가는 두 번째 문이니, 책 들 일 없는 전사도 두드릴 이유가 있다.',
   'guide.profPages.craftProse.inscription.identityHeading': '정신을 위한 잉크, 길 위의 두루마리',
@@ -11480,7 +11481,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '각인에는 자기 작업대가 없다. 목록 전부가 Highwatch 약방, 연금술이 물약을 빚는 그 작업대에서 만들어지고, Alchemist Verane이 거기서 가르친다. 사다리는 세 단 여섯 개의 훈련사 제조법이다. 윤광잎 단(입문서와 두루마리)은 기술 0에 무료, 금빛잎 단(서첩과 두루마리)은 기술 25에 각 25은, 태양꽃잎 단(마법서와 두루마리)은 기술 50에 각 1금이며, 당신의 단이 제조법의 단에 닿는 순간 배울 수 있다. 50 단의 두루마리는 한 번에 두 장씩 나온다.\n\n야외 제조법도 합작품도 아직 없다. 모든 단이 약방 전용 훈련사 일이라, 이 기술은 연금술사들이 서 있는 자리에서 배우고 거기서 익힌다.',
   'guide.profPages.craftProse.inscription.routeHeading': '두루마리와 비약, 그리고 125까지의 길',
   'guide.profPages.craftProse.inscription.routeBody':
-    '두루마리가 이 기술의 서명 규칙이다. 각 단의 두루마리는 제 단계 체력 비약(멧돼지의 비약, 살무사 작열의 비약, 뱀의 비약)과 정확히 같은 강화 효과를 주고, 두 출처는 강화 효과 줄의 한 칸을 나눠 쓴다. 비약 위에 두루마리를 읽으면 비약을 대체하고, 두루마리 위에 비약을 마시면 그것을 대체하며, 언제나 가장 나중 것이 이긴다. 두루마리는 같은 강화로 들어가는 다른 문이지, 그 위에 얹는 두 번째 중첩이 아니다.\n\n서책은 진짜 능력치를 달고 있어, 더 고운 품질이 당신의 단 상한 안에 드는 한 서책 제작마다 걸작 확률을 굴린다. 능력치 없는 소모품인 두루마리는 절대 발동하지 않는다. 오르는 길은 표준 그대로다. 윤광잎으로 25, 금빛잎 단은 열리는 날 올라 50, 태양꽃잎으로 75까지. 75 너머는 아직 아무것도 없어 태양꽃잎 제조법은 절반으로, 다시 4분의 1로 흐려진다. 125 상한까지 대략 150회를 더 잡고, 만든 것은 떳떳하게 팔아 밑천을 대라. 두루마리는 이 게임의 모든 직업에게 팔리니까.\n\n업적의 서는 첫 희귀 작품에 Written in Fine Ink를, 기술 50에 Quill and Pigment를, 상한 125에 Grandmaster Inscription을 새긴다.',
+    '두루마리가 이 기술의 서명 규칙이다. 각 단의 두루마리는 제 단계 체력 비약(멧돼지의 비약, 살무사 작열의 비약, 뱀의 비약)과 정확히 같은 강화 효과를 주고, 두 출처는 강화 효과 줄의 한 칸을 나눠 쓴다. 비약 위에 두루마리를 읽으면 비약을 대체하고, 두루마리 위에 비약을 마시면 그것을 대체하며, 언제나 가장 나중 것이 이긴다. 두루마리는 같은 강화로 들어가는 다른 문이지, 그 위에 얹는 두 번째 중첩이 아니다.\n\n서책은 진짜 능력치를 달고 있어, 더 고운 품질이 당신의 단 상한 안에 드는 한 서책 제작마다 걸작 확률을 굴린다. 능력치 없는 소모품인 두루마리는 절대 발동하지 않는다. 오르는 길은 표준 그대로다. 윤광잎으로 25, 금빛잎 단은 열리는 날 올라 50, 태양꽃잎으로 75까지. 그 위에는 Verane이 가르치지 않는 정점의 단이 있고, 제조법은 주워서 얻으며, 그것을 쥔 필경사는 상한까지 온전한 숙련을 받는다. 제조법이 나오기 전까지는 태양꽃잎 제조법이 나머지를 맡아 절반으로, 다시 4분의 1로 흐려진다. 125 상한까지 대략 150회를 더 잡고, 만든 것은 떳떳하게 팔아 밑천을 대라. 두루마리는 이 게임의 모든 직업에게 팔리니까.\n\n업적의 서는 첫 희귀 작품에 Written in Fine Ink를, 기술 50에 Quill and Pigment를, 상한 125에 Grandmaster Inscription을 새긴다.',
   'hudChrome.corpseHarvest.components.meat': '고기',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (마법부여)',
   'hudChrome.materialHint.cookingCatch': '요리 재료. 먹기 전에 먼저 요리해야 합니다.',
