@@ -2,13 +2,18 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
+  SET_AGI_2PC,
   SET_BOUNDSTONE_VANGUARD,
   SET_CRIT_3PC_RATING,
   SET_CROWNFORGED,
   SET_DEATHLORD,
+  SET_HIT_4PC_RATING,
+  SET_INT_2PC,
   SET_NECROMANCERS,
+  SET_PRIMARY_3PC,
   SET_SOULFLAME,
   SET_STORMCALLERS,
+  SET_STR_2PC,
   SET_WYRMSHADOW,
 } from '../src/sim/content/item_sets';
 import { ITEMS, MOBS } from '../src/sim/data';
@@ -66,47 +71,57 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     });
   });
 
-  it('strength set: 2pc grants AP, 3pc additionally grants str+sta (tiers stack)', () => {
+  // Both melee archetypes grant the primary ATTRIBUTE at every tier, never flat
+  // attack power: the conversion differs per class, so a flat grant pays a rogue
+  // double what it pays a warrior (tests/set_bonus_budget.test.ts guards this).
+  it('strength set: 2pc grants str, 3pc additionally grants str+sta (tiers stack)', () => {
     const two = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 2 }));
-    expect(two.ap).toBe(40);
-    expect(two.str).toBe(0);
+    expect(two.ap).toBe(0);
+    expect(two.str).toBe(SET_STR_2PC);
     const three = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 3 }));
-    expect(three.ap).toBe(40); // 2pc bonus still active
-    expect(three.str).toBe(15);
-    expect(three.sta).toBe(15);
+    expect(three.ap).toBe(0);
+    expect(three.str).toBe(SET_STR_2PC + SET_PRIMARY_3PC); // 2pc bonus still active
+    expect(three.sta).toBe(SET_PRIMARY_3PC);
   });
 
-  it('agility set: 2pc grants AP, 3pc additionally grants agi+crit', () => {
+  it('agility set: 2pc grants agi, 3pc additionally grants agi+crit', () => {
     const two = aggregateSetBonuses(counts({ [SET_WYRMSHADOW]: 2 }));
-    expect(two.ap).toBe(40);
+    expect(two.ap).toBe(0);
+    expect(two.agi).toBe(SET_AGI_2PC);
     const three = aggregateSetBonuses(counts({ [SET_WYRMSHADOW]: 3 }));
-    expect(three.ap).toBe(40);
-    expect(three.agi).toBe(15);
+    expect(three.ap).toBe(0);
+    expect(three.agi).toBe(SET_AGI_2PC + SET_PRIMARY_3PC);
     expect(three.critRating).toBe(SET_CRIT_3PC_RATING);
   });
 
   it('caster sets: 2pc grants full cast-pushback immunity, 3pc grants tier stats', () => {
     // The caster 2-piece is SPELL pushback immunity (damage taken never delays
     // a cast), never physical knockback resistance.
+    // The 2-piece grants Intellect, never flat Spell Power: Spell Power costs two
+    // budget points per point at SPELL_POWER_PER_INT, so a flat grant priced the
+    // tier at more than two epic chest pieces (tests/set_bonus_budget.test.ts).
     const necro = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 3 }));
     expect(necro.castPushbackReduction).toBe(1);
-    expect(necro.int).toBe(10);
-    expect(necro.sta).toBe(10);
+    expect(necro.sp).toBe(0);
+    expect(necro.int).toBe(SET_INT_2PC + SET_PRIMARY_3PC);
+    expect(necro.sta).toBe(SET_PRIMARY_3PC);
     expect(necro.spi).toBe(0);
     expect(necro.knockbackResistance).toBe(0);
 
     const soulflame = aggregateSetBonuses(counts({ [SET_SOULFLAME]: 3 }));
     expect(soulflame.castPushbackReduction).toBe(1);
     expect(soulflame.knockbackResistance).toBe(0);
-    expect(soulflame.int).toBe(15);
-    expect(soulflame.spi).toBe(15);
+    expect(soulflame.sp).toBe(0);
+    expect(soulflame.int).toBe(SET_INT_2PC + SET_PRIMARY_3PC);
+    expect(soulflame.spi).toBe(SET_PRIMARY_3PC);
     expect(soulflame.sta).toBe(0);
 
     const stormcallers = aggregateSetBonuses(counts({ [SET_STORMCALLERS]: 3 }));
     expect(stormcallers.castPushbackReduction).toBe(1);
     expect(stormcallers.knockbackResistance).toBe(0);
-    expect(stormcallers.int).toBe(15);
-    expect(stormcallers.spi).toBe(15);
+    expect(stormcallers.sp).toBe(0);
+    expect(stormcallers.int).toBe(SET_INT_2PC + SET_PRIMARY_3PC);
+    expect(stormcallers.spi).toBe(SET_PRIMARY_3PC);
     expect(stormcallers.sta).toBe(0);
   });
 
@@ -211,23 +226,26 @@ describe('item set tooltip model', () => {
 });
 
 describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear)', () => {
-  it('Deathlord (t1 strength): flat AP at 2pc, str/sta added at 3pc', () => {
+  it('Deathlord (t1 strength): str at 2pc, str/sta added at 3pc', () => {
     const base = statsFor('warrior', 20, {});
-    // 2 pieces: +40 AP, no set str yet. Warrior AP = str*2 + bonusAp.
+    // 2 pieces: set Strength only, no flat AP. Warrior AP = str*2 + bonusAp, and
+    // the set Strength is already inside stats.str, so bonusAp is zero.
     const two = statsFor('warrior', 20, {
       chest: 'deathlord_warplate',
       legs: 'deathlord_legguards',
     });
-    expect(two.attackPower).toBe(two.stats.str * 2 + 40);
-    // 3 pieces: set adds +15 str / +15 sta on top of the item stats.
+    const itemStrTwo = 8 + 8; // warplate + legguards
+    expect(two.stats.str).toBe(base.stats.str + itemStrTwo + SET_STR_2PC);
+    expect(two.attackPower).toBe(two.stats.str * 2);
+    // 3 pieces: the 3pc str/sta stacks on top of the 2pc str.
     const three = statsFor('warrior', 20, {
       chest: 'deathlord_warplate',
       legs: 'deathlord_legguards',
       feet: 'deathlord_sabatons',
     });
     const itemStr = 8 + 8 + 7; // warplate + legguards + sabatons
-    expect(three.stats.str).toBe(base.stats.str + itemStr + 15);
-    expect(three.attackPower).toBe(three.stats.str * 2 + 40);
+    expect(three.stats.str).toBe(base.stats.str + itemStr + SET_STR_2PC + SET_PRIMARY_3PC);
+    expect(three.attackPower).toBe(three.stats.str * 2);
   });
 
   it('Wyrmshadow (t1 agility): crit gains 1% at 3pc on top of agi-derived crit', () => {
@@ -240,7 +258,7 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
   });
 
   it('Crownforged (t2 strength, 4 pieces): the 4-set Hit bonus lands on the equipped hitRating', () => {
-    // End-to-end (not just the pure set-bonus resolver): the +60 four-set Hit rides
+    // End-to-end (not just the pure set-bonus resolver): the four-set Hit rides
     // through recalcPlayerStats onto e.hitRating, on top of the 20 + 20 the helm and
     // shoulder carry. Drop the `+ setEff.hitRating` term and this reds.
     const four = statsFor('warrior', 20, {
@@ -249,25 +267,28 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
       gloves: 'crownforged_gauntlets',
       waist: 'crownforged_girdle',
     });
-    expect(four.hitRating).toBe(20 + 20 + 60);
+    expect(four.hitRating).toBe(20 + 20 + SET_HIT_4PC_RATING);
   });
 
-  it('Nighttalon (t2 agility, 2 pieces): reaches the 2-piece +40 AP bonus', () => {
+  it('Nighttalon (t2 agility, 2 pieces): reaches the 2-piece Agility bonus', () => {
     const base = statsFor('rogue', 20, {});
     const two = statsFor('rogue', 20, {
       helmet: 'nighttalon_crown',
       shoulder: 'nighttalon_shoulderguards',
     });
-    // Rogue AP = str + agi + bonusAp; the only set bonus at 2pc is +40 AP.
-    expect(two.attackPower - (two.stats.str + two.stats.agi)).toBe(40);
+    // Rogue AP = str + agi + bonusAp. The 2pc grants Agility, not flat AP, so it
+    // lands inside stats.agi and leaves bonusAp at zero.
+    const itemAgi = 10 + 9; // crown + shoulderguards
+    expect(two.stats.agi).toBe(base.stats.agi + itemAgi + SET_AGI_2PC);
+    expect(two.attackPower - (two.stats.str + two.stats.agi)).toBe(0);
     expect(two.attackPower).toBeGreaterThan(base.attackPower);
   });
 
   it('normal and heroic Nythraxis armor pieces mix for set thresholds', () => {
     // A heroic helmet variant counts as the same set slot as its normal base, so
     // mixing it with three normal pieces still reaches the 3-piece Wraithfire
-    // threshold (int +15, spi +15). Derive the expected primary totals from the
-    // live item defs so the heroic-variant stat rescale stays the source of truth.
+    // threshold. Derive the expected primary totals from the live item defs so the
+    // heroic-variant stat rescale stays the source of truth.
     const worn = {
       helmet: 'heroic_soulflame_cowl', // heroic helmet mixed with normal pieces
       shoulder: 'soulflame_mantle',
@@ -279,8 +300,9 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     const pieceInt = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.int ?? 0), 0);
     const pieceSpi = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.spi ?? 0), 0);
     expect(mixed.castPushbackReduction).toBe(1);
-    expect(mixed.stats.int).toBe(base.stats.int + pieceInt + 15); // +15 = 3pc Wraithfire int
-    expect(mixed.stats.spi).toBe(base.stats.spi + pieceSpi + 15); // +15 = 3pc Wraithfire spi
+    // The 2pc Intellect and the 3pc Intellect stack; Spirit comes from the 3pc alone.
+    expect(mixed.stats.int).toBe(base.stats.int + pieceInt + SET_INT_2PC + SET_PRIMARY_3PC);
+    expect(mixed.stats.spi).toBe(base.stats.spi + pieceSpi + SET_PRIMARY_3PC);
   });
 
   it("Necromancer's (t1 caster): cast-pushback immunity at 2pc, int/sta added at 3pc", () => {
@@ -300,8 +322,8 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     });
     expect(three.castPushbackReduction).toBe(1);
     expect(three.knockbackResistance).toBe(0);
-    expect(three.stats.int).toBe(base.stats.int + 11 + 8 + 13 + 10);
-    expect(three.stats.sta).toBe(base.stats.sta + 10);
+    expect(three.stats.int).toBe(base.stats.int + 11 + 8 + 13 + SET_INT_2PC + SET_PRIMARY_3PC);
+    expect(three.stats.sta).toBe(base.stats.sta + SET_PRIMARY_3PC);
   });
 
   it('Soulflame and Stormcaller (t2 caster): int/spi added at 3pc', () => {
@@ -312,8 +334,10 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
       gloves: 'soulflame_gloves',
     });
     expect(soulflame.castPushbackReduction).toBe(1);
-    expect(soulflame.stats.int).toBe(mageBase.stats.int + 11 + 9 + 8 + 15);
-    expect(soulflame.stats.spi).toBe(mageBase.stats.spi + 15);
+    expect(soulflame.stats.int).toBe(
+      mageBase.stats.int + 11 + 9 + 8 + SET_INT_2PC + SET_PRIMARY_3PC,
+    );
+    expect(soulflame.stats.spi).toBe(mageBase.stats.spi + SET_PRIMARY_3PC);
 
     const shamanBase = statsFor('shaman', 20, {});
     const stormcallers = statsFor('shaman', 20, {
@@ -322,8 +346,10 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
       gloves: 'stormcallers_handguards',
     });
     expect(stormcallers.castPushbackReduction).toBe(1);
-    expect(stormcallers.stats.int).toBe(shamanBase.stats.int + 10 + 8 + 8 + 15);
-    expect(stormcallers.stats.spi).toBe(shamanBase.stats.spi + 15);
+    expect(stormcallers.stats.int).toBe(
+      shamanBase.stats.int + 10 + 8 + 8 + SET_INT_2PC + SET_PRIMARY_3PC,
+    );
+    expect(stormcallers.stats.spi).toBe(shamanBase.stats.spi + SET_PRIMARY_3PC);
   });
 });
 

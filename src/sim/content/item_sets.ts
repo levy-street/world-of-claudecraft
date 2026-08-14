@@ -15,30 +15,82 @@
 // rating and PvP-gated effects rather than in stats, so they contribute exactly
 // zero in PvE. See the WARFARE block below and docs/design/warfare.md.
 //
-// Bonuses are keyed by archetype: the plate (Strength) families get attack
-// power then Strength/Stamina; the leather (Agility) families get attack power
-// then Agility/crit; the cloth (caster) families get full spell-pushback
-// immunity (damage taken never delays a cast; NOT physical knockback) at 2
-// pieces and Intellect plus Stamina for tier 1, or Intellect plus Spirit for
+// Bonuses are keyed by archetype: the plate (Strength) families get Strength
+// then Strength/Stamina; the leather (Agility) families get Agility then
+// Agility/crit; the cloth (caster) families get full spell-pushback immunity
+// (damage taken never delays a cast; NOT physical knockback) plus Spell Power at
+// 2 pieces and Intellect plus Stamina for tier 1, or Intellect plus Spirit for
 // tier 2, at 3 pieces. Every tier-2 3-piece bonus ALSO grants haste (ONE stat:
 // faster melee and ranged swings AND shorter casts/channels), and the three
 // leveling haste kits grant haste alone at 3 pieces. This file is
-// data-as-code: balance numbers live here, never inline in the engine.
+// data-as-code: balance numbers live here, never inline in the engine, and every
+// one of them is priced by the rule at the top of the constants block below.
 // `aggregateSetBonuses` is the pure resolver imported by `entity.ts`.
 
 import type { ItemSet, SetBonusEffect, SetBonusTier, SetProc } from '../types';
+
+// THE PRICING RULE for every tier below. A set bonus is a GARNISH on top of the
+// item budget its pieces already ride (item_budget.ts), never a second helping of
+// it: at the level-20 cap an epic ilvl-26 chest carries 18 primary-stat points, a
+// helmet 15, gloves 13, so one family's whole bonus line stays at or under
+// SET_BONUS_POINTS_CEILING, i.e. one chest piece.
+//
+// Before the v0.38 retune the families paid 35 to 70 points, 1.9x to 3.9x a chest,
+// because the bonuses were authored as absolute numbers (40 AP, 20 Spell Power,
+// 15+15 primary) that never went through the budget the items do. Measured on a
+// level-20 character wearing 4 pieces of one family and 3 of another, set bonuses
+// ALONE supplied 47 to 63% of everything gear gave: a warrior at +51% attack power,
+// a mage at +63% spell power. The retune lands the same characters at +13 to +21%.
+// tests/set_bonus_budget.test.ts re-prices every family (and every reachable
+// two-family stack) against this ceiling and is the guard that keeps it true.
+export const SET_BONUS_POINTS_CEILING = 18;
+
+// 2-piece: the primary ATTRIBUTE itself, never a derived stat. Granting the
+// attribute routes the bonus through each class's own conversion, which is what
+// makes one line of data worth the same to everyone who can wear it, and what
+// lets the ceiling above price it at all. Neither of the two derived grants this
+// replaced could be priced honestly:
+//  - `ap: 40` paid unequally. A warrior converts Strength at 2 AP per point but a
+//    rogue or hunter converts Strength plus Agility at 1 AP per point, so the
+//    identical line was worth 20 budget points to a warrior and 40 to a rogue.
+//  - `sp: 20` paid 40 points flat, since Spell Power costs 2 budget points at
+//    SPELL_POWER_PER_INT (0.5 per Intellect). Intellect buys the same Spell Power
+//    at the budgeted rate and carries the caster's mana pool and spell crit with
+//    it, so the cloth families grant it instead.
+export const SET_STR_2PC = 6; // plate: 12 AP after the str*2 conversion
+export const SET_AGI_2PC = 8; // leather: 8 AP, and feeds crit/dodge/armor too
+export const SET_INT_2PC = 6; // cloth: 3 Spell Power, plus mana and spell crit
+// 3-piece: a pair of primary attributes, same ceiling reasoning.
+export const SET_PRIMARY_3PC = 6;
 
 // Haste granted by a 3-piece bonus after the global combat-rating conversion:
 // what SET_HASTE_3PC_RATING is worth once recalcPlayerStats converts it. Read
 // only by the tests, deliberately as a literal so it pins the conversion
 // independently; it must be updated by hand whenever HASTE_RATING_PER_PCT moves.
-export const SET_HASTE_3PC = 0.075;
-export const SET_HASTE_3PC_RATING = 150; // -> 7.5% haste at 20 rating = 1%
+//
+// Haste is the one stat NO set item carries, so the tier bonus is its entire
+// supply and there is no item line to price it against. It is priced against the
+// best single ITEM haste allocation in the game instead: a heroic epic helm
+// carries 20 rating (1%), so a tier bonus is worth two of those. The old 150
+// (7.5%) was seven and a half.
+export const SET_HASTE_3PC = 0.02;
+export const SET_HASTE_3PC_RATING = 40; // -> 2% haste at 20 rating = 1%
 export const SET_CRIT_3PC_RATING = 20; // -> +1% crit at 20 rating = 1%
-// The two T2 4-piece bleeds (Bonesplinter, Ragged Gash) are marginal on their own
-// (roughly their 2-piece's flat 40 AP). They now also grant Hit rating so completing
-// the set is worth chasing for Heroic (+3 above-level), where the bleed alone was not.
-export const SET_HIT_4PC_RATING = 60; // -> +6% hit at 10 rating = 1%
+// The leveling haste kits (below) sit a tier under the raid sets, at one heroic
+// item's worth. They MUST stay under SET_HASTE_3PC_RATING: their members are
+// level-1 world drops and starter quest rewards, so paying them the raid number
+// (which is what shipped) let a level-8 character in three starter greens carry
+// the same haste as a fully raid-geared level-20 one, and flattened the entire
+// haste progression between the two.
+export const SET_HASTE_KIT = 0.01;
+export const SET_HASTE_KIT_RATING = 20; // -> 1% haste at 20 rating = 1%
+// The two T2 4-piece bleeds (Bonesplinter, Ragged Gash) are marginal on their own.
+// They also grant Hit rating so completing the set is worth chasing for Heroic
+// (+3 above-level), where the bleed alone was not. Priced against the best single
+// item allocation like haste above: a heroic epic helm carries 55 hit rating
+// (5.5%), so the tier is worth roughly half of one. The old 60 was a whole helm's
+// worth on top of a warrior already carrying 32.5% hit from items.
+export const SET_HIT_4PC_RATING = 25; // -> +2.5% hit at 10 rating = 1%
 
 // The WARFARE honor sets (content/pvp_honor.ts). Every tier is paid in WARFARE
 // rating or in a PvP-gated effect and never in flat stats, which is what makes
@@ -118,8 +170,12 @@ export const SET_WARFARE_THORNHIDE = 'warfare_thornhide'; // leather, caster
 // Sanctum; tier-2 helms/shoulders drop in the Nythraxis raid and the tier-2
 // gloves/belts from the Thunzharr world boss (content/zone3.ts).
 const STRENGTH_T1_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
-  { pieces: 3, effect: { str: 15, sta: 15 }, text: 'Increases Strength by 15 and Stamina by 15.' },
+  { pieces: 2, effect: { str: SET_STR_2PC }, text: 'Increases Strength by 6.' },
+  {
+    pieces: 3,
+    effect: { str: SET_PRIMARY_3PC, sta: SET_PRIMARY_3PC },
+    text: 'Increases Strength by 6 and Stamina by 6.',
+  },
   {
     pieces: 4,
     effect: {
@@ -138,11 +194,11 @@ const STRENGTH_T1_BONUSES: SetBonusTier[] = [
   },
 ];
 const AGILITY_T1_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
+  { pieces: 2, effect: { agi: SET_AGI_2PC }, text: 'Increases Agility by 8.' },
   {
     pieces: 3,
-    effect: { agi: 15, critRating: SET_CRIT_3PC_RATING },
-    text: 'Increases Agility by 15 and critical strike chance by 1%.',
+    effect: { agi: SET_PRIMARY_3PC, critRating: SET_CRIT_3PC_RATING },
+    text: 'Increases Agility by 6 and critical strike chance by 1%.',
   },
   {
     pieces: 4,
@@ -165,13 +221,13 @@ const AGILITY_T1_BONUSES: SetBonusTier[] = [
 const CASTER_T1_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { castPushbackReduction: 1, sp: 20 },
-    text: 'Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).',
+    effect: { castPushbackReduction: 1, int: SET_INT_2PC },
+    text: 'Increases Intellect by 6. Damage taken no longer delays your spellcasting (100% pushback resistance).',
   },
   {
     pieces: 3,
-    effect: { int: 10, sta: 10 },
-    text: 'Increases Intellect by 10 and Stamina by 10.',
+    effect: { int: SET_PRIMARY_3PC, sta: SET_PRIMARY_3PC },
+    text: 'Increases Intellect by 6 and Stamina by 6.',
   },
   {
     pieces: 4,
@@ -191,11 +247,11 @@ const CASTER_T1_BONUSES: SetBonusTier[] = [
 ];
 // Tier-2 3-piece tiers carry the tier-1 stats PLUS haste.
 const STRENGTH_T2_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
+  { pieces: 2, effect: { str: SET_STR_2PC }, text: 'Increases Strength by 6.' },
   {
     pieces: 3,
-    effect: { str: 15, sta: 15, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Strength by 15, Stamina by 15, and attack and casting speed by 7.5%.',
+    effect: { str: SET_PRIMARY_3PC, sta: SET_PRIMARY_3PC, hasteRating: SET_HASTE_3PC_RATING },
+    text: 'Increases Strength by 6, Stamina by 6, and attack and casting speed by 2%.',
   },
   {
     pieces: 4,
@@ -220,15 +276,19 @@ const STRENGTH_T2_BONUSES: SetBonusTier[] = [
         school: 'physical',
       },
     },
-    text: 'Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.',
+    text: 'Increases Hit by 2.5%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
 const AGILITY_T2_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
+  { pieces: 2, effect: { agi: SET_AGI_2PC }, text: 'Increases Agility by 8.' },
   {
     pieces: 3,
-    effect: { agi: 15, critRating: SET_CRIT_3PC_RATING, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Agility by 15, critical strike chance by 1%, and attack and casting speed by 7.5%.',
+    effect: {
+      agi: SET_PRIMARY_3PC,
+      critRating: SET_CRIT_3PC_RATING,
+      hasteRating: SET_HASTE_3PC_RATING,
+    },
+    text: 'Increases Agility by 6, critical strike chance by 1%, and attack and casting speed by 2%.',
   },
   {
     pieces: 4,
@@ -252,19 +312,19 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
         school: 'physical',
       },
     },
-    text: 'Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
+    text: 'Increases Hit by 2.5%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
 const CASTER_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { castPushbackReduction: 1, sp: 20 },
-    text: 'Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).',
+    effect: { castPushbackReduction: 1, int: SET_INT_2PC },
+    text: 'Increases Intellect by 6. Damage taken no longer delays your spellcasting (100% pushback resistance).',
   },
   {
     pieces: 3,
-    effect: { int: 15, spi: 15, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.',
+    effect: { int: SET_PRIMARY_3PC, spi: SET_PRIMARY_3PC, hasteRating: SET_HASTE_3PC_RATING },
+    text: 'Increases Intellect by 6, Spirit by 6, and attack and casting speed by 2%.',
   },
   {
     pieces: 4,
@@ -284,12 +344,16 @@ const CASTER_T2_BONUSES: SetBonusTier[] = [
   },
 ];
 // The leveling haste kits grant haste alone, and only at 3 pieces:
-// deliberately a single-tier reward a leveler assembles from world drops.
+// deliberately a single-tier reward a leveler assembles from world drops. They
+// pay SET_HASTE_KIT_RATING, a tier UNDER the raid sets, because their members are
+// level-1 items (Vale Arcanist's robe and Greyjaw's jerkin are q_ringleader
+// starter quest rewards; the trail leggings are a 10% boar drop). See the
+// constant for what paying them the raid number did to the haste ladder.
 const HASTE_KIT_BONUSES: SetBonusTier[] = [
   {
     pieces: 3,
-    effect: { hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases attack and casting speed by 7.5%.',
+    effect: { hasteRating: SET_HASTE_KIT_RATING },
+    text: 'Increases attack and casting speed by 1%.',
   },
 ];
 
