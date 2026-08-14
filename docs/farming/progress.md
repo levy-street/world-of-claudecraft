@@ -1428,7 +1428,23 @@ the online path with the live check moved to Phase 9 QA; the two-tier
 built fairness arm re-deferred with its structural-impossibility reason;
 releaseGltf residency verdict stated at the preload block).
 
-GATE RECORD: appended below after the close run.
+GATE RECORD, judged by log markers on frozen committed trees, three runs:
+run 1 FAIL at "biome (changed files)" (one format diff: stations.ts had
+missed the extraction commit's scoped format pass; healed 7be0628340);
+run 2 FAIL at the full-suite fallback's single red,
+tests/inventory_sort.test.ts "keeps 'inv_sort' in HEAVY_SELF_CMDS" (a
+game.ts source scrape dangled by the heavy-self extraction: the
+full-suite-fallback-only class again, seventh-plus strike; re-pointed as
+a direct membership read on the exported set, 2a3b7a154d); run 3
+"[gate:select] PASS: all 11 steps green", planner mode=full (the branch
+footprint includes a broad-class helper), fallback 38,546 passed / 0
+failed (2 expected-fail, 115 skipped), browser batch 125/125, malware
+scan 0 high after priors, manifest freshness green (the new family's
+first pass over farming's SFX artifacts), i18n freshness green, golden
+f017045f5fa0e85f6d740c99ea4eb225 unchanged, tree clean. Note the gate
+now runs ELEVEN steps (the fourteenth absorb added the manifest regen
+and freshness steps); the phase files' "all 8 steps" wording is
+historical per-run truth, not a stable count.
 
 ### Phase 8
 (not started)
