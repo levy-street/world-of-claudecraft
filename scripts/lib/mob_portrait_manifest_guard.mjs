@@ -1,3 +1,5 @@
+import { describeManifestDrift } from './mob_portrait_manifest_diff.mjs';
+
 export function changedPortraitIds(previous, next) {
   if (!previous || previous.rendererFingerprint !== next.rendererFingerprint) {
     return next.portraits.map((portrait) => portrait.id);
@@ -38,17 +40,19 @@ export function assertManifestWriteAuthorized({ previous, next, receipt, allowBo
   if (!receipt) {
     // FINGERPRINT-ONLY REFRESH: the renderer fingerprint hashes the whole
     // esbuild browser bundle, whose import graph reaches sim content, so a
-    // content change that cannot touch a single pixel still moves it. When
-    // EVERY portrait row is byte-identical (same source fingerprints, same
-    // output digests, same row set), no pixel input or output moved and
-    // there is nothing a re-render could evidence: the manifest may adopt
-    // the new fingerprint without a receipt. Any actual row drift still
-    // demands the rendered receipt below, unchanged.
-    if (
-      previous.rendererFingerprint !== next.rendererFingerprint &&
-      previous.portraits.length === next.portraits.length &&
-      rowChangedPortraitIds(previous, next).length === 0
-    ) {
+    // content change that cannot touch a single pixel still moves it. The
+    // eligible shape is the drift classifier's own bookkeepingOnly verdict
+    // (mob_portrait_manifest_diff): ONLY the bundle digest moved, with every
+    // portrait row byte-identical, the row set, tracked renderer files, and
+    // bootstrap review all unchanged. A tracked-file edit (the stills
+    // renderer scripts themselves) is renderer work, not content churn, and
+    // still demands the rendered receipt below, as does any row drift.
+    // Residual stated plainly: a pixel-affecting edit INSIDE the bundle's
+    // src/render reach is indistinguishable from content churn at this
+    // layer (one bundle digest); splitting the bundle hash is a maintainer
+    // call, ledgered under deviation (al).
+    const drift = describeManifestDrift(previous, next);
+    if (drift.bookkeepingOnly && previous.portraits.length === next.portraits.length) {
       return;
     }
     throw new Error(

@@ -558,6 +558,17 @@ export async function buildItemArtAudit(options) {
     options.expected?.liveItemCount,
     'Unexpected live item definition count',
   );
+  // The debt term pinned INDEPENDENTLY of the art-subject term: liveItemCount
+  // subtracts the pending set, so a new artless def that also joins
+  // ITEM_ART_PENDING moves neither number. Pinning the pending size here too
+  // means growing the debt is a visible literal edit in the audit itself,
+  // even when the audit runs standalone without the vitest exact-set pin
+  // (tests/item_icons.test.ts).
+  assertExpected(
+    pendingArtIds.size,
+    options.expected?.pendingArtCount,
+    'Unexpected pending procedural-art debt count',
+  );
   assertExpected(
     generatedHeroicDefinitions.length,
     options.expected?.generatedHeroicDefinitions,

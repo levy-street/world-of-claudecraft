@@ -774,6 +774,29 @@ describe('item-art audit builder', () => {
     // declared debt id.
     expect(build.catalog.liveItemCount).toBe(1);
     expect(build.catalog.catalogCount).toBe(1);
+    // The debt term is its own expected literal: an audit run that pins BOTH
+    // halves reds when the pending set grows even though liveItemCount is
+    // structurally blind to a def that joins the catalog and the debt at
+    // once. Conforms arm, then the violates arm one off in each direction.
+    await buildItemArtAudit({
+      ...base,
+      pendingArtIds: ['gamma_root'],
+      expected: { pendingArtCount: 1 },
+    });
+    await expect(
+      buildItemArtAudit({
+        ...base,
+        pendingArtIds: ['gamma_root'],
+        expected: { pendingArtCount: 0 },
+      }),
+    ).rejects.toThrow('Unexpected pending procedural-art debt count');
+    await expect(
+      buildItemArtAudit({
+        ...base,
+        pendingArtIds: ['gamma_root'],
+        expected: { pendingArtCount: 2 },
+      }),
+    ).rejects.toThrow('Unexpected pending procedural-art debt count');
     await expect(buildItemArtAudit({ ...base, pendingArtIds: ['ghost_id'] })).rejects.toThrow(
       'pending-art id ghost_id is not a live item definition',
     );
@@ -807,9 +830,9 @@ describe('item-art audit builder', () => {
     // 817 reviewed art files and their shipping catalog sha are untouched.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '731bc17b8f36207d0df0f0668173f76d7c5c76e76cf0721a60cced449cc574dc',
+      catalogSha256: 'a6918c8d242a31fdaac19b9f31ec21fef125cfd36b3c99cf95f294c82174db14',
       catalogBytes: 451256,
-      rendererFingerprint: 'f748b74efa1531dde1339b4f33e2c0ec981ec856cfe8d4adbbcbbc511004cd68',
+      rendererFingerprint: '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
       catalogCount: 822,
       liveItemCount: 837,
       generatedHeroicDefinitions: 64,

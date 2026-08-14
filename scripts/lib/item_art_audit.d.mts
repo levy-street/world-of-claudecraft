@@ -100,6 +100,7 @@ export type ItemArtAuditBuildOptions = {
   expected?: Partial<{
     catalogCount: number;
     liveItemCount: number;
+    pendingArtCount: number;
     generatedHeroicDefinitions: number;
     heroicDefinitionsWithOwnWebp: number;
     heroicWeaponArtAliases: number;
