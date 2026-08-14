@@ -128,6 +128,11 @@ export const UI_CUES = {
   // same harvest action resolving, just unluckily).
   farmPlant: 'ui_farm_plant',
   farmHarvest: 'ui_farm_harvest',
+  // The ready notice (the ready-notice phase): its own cue rather than a
+  // borrowed one, because it is the only farming sound the player did not
+  // just ask for by pressing something, and it must not read as a harvest
+  // that happened without them.
+  farmReady: 'ui_farm_ready',
 } as const;
 
 type UiCue =
@@ -446,6 +451,13 @@ export class GameAudio {
   // notifications (loot, gather, craftSuccess).
   farmHarvest(): void {
     this.playFeedback(UI_CUES.farmHarvest);
+  }
+
+  // Farming ready notice: a NOTIFICATION, not an affordance (nothing was
+  // pressed), so it rides the feedback gate like mail and quest chimes and
+  // goes silent for a player who turned interface sounds off.
+  farmReady(): void {
+    this.playFeedback(UI_CUES.farmReady);
   }
 }
 
