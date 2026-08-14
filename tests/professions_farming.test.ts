@@ -68,7 +68,7 @@ import {
 } from '../src/sim/professions/tools';
 import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
-import { FARMING_CAST_ID, isNonSpellCast, type SimEvent } from '../src/sim/types';
+import { DT, FARMING_CAST_ID, isNonSpellCast, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const CROP_ID = 'vale_wheat';
@@ -2912,5 +2912,47 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
     // phantom "not enough husks".
     expect(denyReason(h.sim, from)).toBe('locked');
     expect(lockedUnits(h, FARM_WITHERED_HUSK_ITEM_ID)).toBe(FARM_HUSKS_PER_COMPOST);
+  });
+});
+
+// The render phase's clock read. IWorld.farmNowMs exists so a render consumer
+// can derive a growth-stage fraction without ever subtracting a clock the
+// authority did not write its timestamps in, so what needs pinning is exactly
+// that: same base, and it moves with the sim.
+describe('farmNowMs is the sim OWN clock base', () => {
+  it('is the very base the plot timestamps are written in', () => {
+    const h = makeHarness();
+    // Injected clock: the facet read and the harness clock are one value.
+    expect(h.sim.farmNowMs()).toBe(h.now());
+
+    giveSeeds(h);
+    plant(h);
+    const plot = h.meta.farmPlots.get(BED) as PlotState;
+    expect(plot, 'the plant must have landed for this arm to mean anything').toBeDefined();
+    // The plant instant: the stamp on the plot and the facet read agree, which
+    // is what makes (farmNowMs - plantedAtMs) a meaningful elapsed time.
+    expect(plot.plantedAtMs).toBe(h.sim.farmNowMs());
+
+    // ...and it keeps agreeing as the clock runs, so a stage fraction derived
+    // from the pair is bounded by the crop's real window.
+    h.advance(CROP.durationMs / 2);
+    expect(h.sim.farmNowMs()).toBe(h.now());
+    expect(h.sim.farmNowMs() - plot.plantedAtMs).toBe(CROP.durationMs / 2);
+    expect(h.sim.farmNowMs()).toBeLessThan(plot.readyAtMs);
+
+    h.advance(CROP.durationMs);
+    expect(h.sim.farmNowMs()).toBeGreaterThan(plot.readyAtMs);
+  });
+
+  it('advances with the tick on a sim with no injected clock', () => {
+    // The offline and headless hosts run the UNINJECTED lockoutNowMs, which
+    // counts sim-clock ms from zero. A render consumer on those hosts needs
+    // this to move, or every bed would sit at its planting stage forever.
+    const fresh = new Sim({ seed: 9, playerClass: 'warrior', autoEquip: false });
+    const before = fresh.farmNowMs();
+    expect(Number.isFinite(before)).toBe(true);
+    const TICKS = 20; // one second at the 20 Hz tick
+    for (let i = 0; i < TICKS; i++) fresh.tick();
+    expect(fresh.farmNowMs() - before).toBe(Math.round(TICKS * DT * 1000));
   });
 });

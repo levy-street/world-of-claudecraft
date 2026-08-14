@@ -12492,6 +12492,13 @@ export class Sim {
     return this.farmPlotsFor(this.primaryId);
   }
 
+  // This world's own clock base for the farm timestamps above: the sim clock,
+  // the exact value projectFarmPlots was handed. Draws no rng and moves no
+  // tick order (a pure read of the same counter raidLockouts uses).
+  farmNowMs(): number {
+    return this.lockoutNowMs();
+  }
+
   // Plant a crop in a garden bed, with the optional plant-time knob payload
   // (compost, farmer's watch, growth tonic). Thin delegate: the whole
   // decision (the stated gate order, the seed and knob payments, the one

@@ -470,6 +470,7 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_emissive_cache_core.ts',
   'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
+  'src/render/farm_patches_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
   'src/render/evil_eye_marker_core.ts',

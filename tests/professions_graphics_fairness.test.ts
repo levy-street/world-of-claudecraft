@@ -13,21 +13,31 @@
 //   - The node props' TIER differentiation (nodeTierScale): tier is the
 //     access gate's number, so the scale ladder is static content -> size,
 //     identical everywhere.
+//   - The farm beds and the crop GROWTH STAGE meshes: a player walks to a bed
+//     because it looks ready, so which mesh a plot shows is actionable. Both
+//     farm_patches.ts and its core are profile-free, and the core's stage
+//     resolver takes no quality input at all.
 //
 // COSMETIC, and allowed to vary: the low preset's shorter fog (LOW_FOG in
 // renderer.ts) sheds distant SCENERY, node props included, because the
 // actionable spotting surface at range is the minimap above, which does not
-// shorten; and the water surface's splash richness around a bite, because
-// the bite itself is carried by the bobber state, the cue, and the log line.
+// shorten; the water surface's splash richness around a bite, because the bite
+// itself is carried by the bobber state, the cue, and the log line; and the
+// farm plant/harvest/wither flourishes, which emit through the shared Vfx
+// emitters, so the adaptive budget's scaledCount is their whole shed (the
+// harvest FACT is the item, the log line and the bed going bare, none of
+// which is a particle).
 
 import { readFileSync } from 'node:fs';
 import type * as THREE from 'three';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
+import { resolveFarmPlotVisual } from '../src/render/farm_patches_core';
 import { buildGatherNodes } from '../src/render/gather_nodes';
 import { NODE_TIER_SCALE_STEP, nodeTierScale } from '../src/render/gather_nodes_lookup';
 import { GATHER_NODES } from '../src/sim/data';
 import { terrainHeight } from '../src/sim/world';
+import type { FarmPlotView } from '../src/world_api/farming';
 
 // Comments stripped before scanning (the architecture-test rule): prose that
 // NAMES the invariant ("nothing here reads ui_effects_profile") must never
@@ -152,6 +162,48 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // magnitudes reaches ~1e-5, while the center-anchored-sink bug this
     // guards produced a ~0.13 world-unit offset.
     expect(baseAboveTerrain(i2, t2)).toBeCloseTo(baseAboveTerrain(i1, t1), 3);
+  });
+
+  it('the farm patch renderer and its core read no profile and no governor', () => {
+    expectProfileFree('src/render/farm_patches.ts');
+    expectProfileFree('src/render/farm_patches_core.ts');
+  });
+
+  it('the growth stage is APPLIED from (plot, nowMs) alone: no quality input exists', () => {
+    // The arity is the type-level half of the claim (a quality parameter would
+    // move it)...
+    expect(resolveFarmPlotVisual.length).toBe(2);
+    // ...and this is the behavioural half: the SAME plot at the SAME instant
+    // resolves to one stage, whatever else is going on, and the stage really
+    // does advance with the growth window rather than being a constant.
+    const hour = 60 * 60 * 1000;
+    const plot: FarmPlotView = {
+      bedId: 'bed_eastbrook_1',
+      cropId: 'vale_wheat',
+      plantedAtMs: 0,
+      readyAtMs: hour,
+      compost: false,
+      watch: false,
+      tonic: false,
+      notified: false,
+      status: 'growing',
+    };
+    const stages = [0, hour / 3, (2 * hour) / 3, hour].map(
+      (t) => resolveFarmPlotVisual(plot, t).stageMesh,
+    );
+    expect(stages).toEqual(['sprout', 'stage2', 'stage3', 'stage4']);
+    expect(resolveFarmPlotVisual(plot, hour / 3).stageMesh).toBe(stages[1]);
+  });
+
+  it('the farm flourishes ride the shared Vfx emitters (the one sanctioned shed)', () => {
+    const source = read('src/render/farm_patches.ts');
+    // Cosmetic, so it MUST go through the pooled emitters whose scaledCount
+    // the adaptive budget drives; a bespoke particle path here would escape
+    // the shed entirely.
+    expect(source).toMatch(/this\.vfx\.groundPuff\(/);
+    expect(source).toMatch(/this\.vfx\.burst\(/);
+    // ...and the shed stays in vfx.ts: no local count knob of its own.
+    expect(source.includes('scaledCount')).toBe(false);
   });
 
   it('the cosmetic side is the one that varies: LOW_FOG exists and the bobber does not read it', () => {
