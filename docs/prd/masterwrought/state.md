@@ -3394,7 +3394,10 @@ applied in the fix round or recorded below.
   the flask suite because every cross-family case put the flask first),
   both closed with re-proven probes in the final test round. Do not
   inherit the stronger "every guard" claim. shipped_item_ids golden:
-  +8, no removals. Parity goldens unmoved (the phase draws zero rng; a flask
+  +8, no removals. CLOSING GATE: node scripts/gate_select.mjs PASS all
+  8 steps at the final tip f577bad787 (GATE_MAX_WORKERS=5), after the
+  portrait re-bless (230/230 byte-identical rerender, both seal layers
+  advanced in one change). Parity goldens unmoved (the phase draws zero rng; a flask
   parity golden was considered and DECLINED: golden moves cost every
   future sync for an ordering shared code already guarantees).
 - Catalog facts for future test authors: every shipped crafted elixir is
