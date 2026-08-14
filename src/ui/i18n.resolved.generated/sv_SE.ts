@@ -2532,7 +2532,7 @@ export const sv_SE: EnTranslations = {
       "resonantLinks": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre ringbrynja.",
       "resonantSteel": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre närstridsvapen.",
       "resonantTimber": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre stavar, trollstavar, bågar och armborst.",
-      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",

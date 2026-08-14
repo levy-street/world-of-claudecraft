@@ -2532,7 +2532,7 @@ export const en_CA: EnTranslations = {
       "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
       "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
       "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows.",
-      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",

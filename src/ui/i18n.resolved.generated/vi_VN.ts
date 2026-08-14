@@ -2532,7 +2532,7 @@ export const vi_VN: EnTranslations = {
       "resonantLinks": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp lưới hiếm trở lên.",
       "resonantSteel": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc vũ khí cận chiến hiếm trở lên.",
       "resonantTimber": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trượng, đũa phép, cung, và nỏ hiếm trở lên.",
-      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",

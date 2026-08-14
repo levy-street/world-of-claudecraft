@@ -11474,7 +11474,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.resonantTimber':
     'エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。',
   'hudChrome.materialHint.growthTonic':
-    '農業用品。植え付け時に使うと、収穫が大きくなることがあります。',
+    '農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。',
   'hudChrome.enchanting.tier.base': '基本エンチャント',
   'hudChrome.enchanting.tier.runed': 'ルーンエンチャント',
   'hudChrome.enchanting.tier.greater': '上級エンチャント',

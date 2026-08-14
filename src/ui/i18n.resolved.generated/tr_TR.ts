@@ -2532,7 +2532,7 @@ export const tr_TR: EnTranslations = {
       "resonantLinks": "Nadir ve üstü zincir zırhlardan büyü bozularak elde edilen büyü malzemesi.",
       "resonantSteel": "Nadir ve üstü yakın dövüş silahlarından büyü bozularak elde edilen büyü malzemesi.",
       "resonantTimber": "Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi.",
-      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",

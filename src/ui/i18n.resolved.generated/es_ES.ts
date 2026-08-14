@@ -2532,7 +2532,7 @@ export const es_ES: EnTranslations = {
       "resonantLinks": "Reactivo de encantamiento. Se obtiene desencantando armadura de malla rara o mejor.",
       "resonantSteel": "Reactivo de encantamiento. Se obtiene desencantando armas de cuerpo a cuerpo raras o mejores.",
       "resonantTimber": "Reactivo de encantamiento. Se obtiene desencantando bastones, varitas, arcos y ballestas raros o mejores.",
-      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",

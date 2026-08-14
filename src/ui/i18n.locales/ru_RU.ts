@@ -11660,7 +11660,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.resonantTimber':
     'Реагент для наложения чар. Выпадает при распылении посохов, жезлов, луков и арбалетов редкого качества и выше.',
   'hudChrome.materialHint.growthTonic':
-    'Принадлежность для фермерства. Используется при посадке и дает шанс собрать больший урожай.',
+    'Принадлежность для фермерства. Расходуется при посадке и даёт шанс собрать чуть больший урожай. Если растение засохнет, тоник пропадает вместе с ним.',
   'hudChrome.enchanting.tier.base': 'Базовые чары',
   'hudChrome.enchanting.tier.runed': 'Рунные чары',
   'hudChrome.enchanting.tier.greater': 'Высшие чары',
