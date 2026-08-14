@@ -99,6 +99,8 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'src/**',
       'scripts/build_server.mjs',
       'scripts/migrate_old_cragmaw_pelt.ts',
+      'scripts/migrate_rift_forge_rollback.ts',
+      'scripts/rift_forge_rollback_migration.ts',
       'private/**',
       'package.json',
     ],

@@ -103,7 +103,7 @@ const CHECK_RUN_STEPS = [
   'run: npm run security:gate',
   TYPECHECK_BUILDS_TURBO_RUN,
   'run: npm run wiki:content && npm run build:bundle\n',
-  'run: git diff --exit-code -- src/game/sfx_manifest.generated.ts',
+  'run: git ls-files --error-unmatch -- src/game/sfx_manifest.generated.ts',
 ] as const;
 
 // Exact job-level if line for both release jobs. toContain alone would allow a
@@ -126,7 +126,7 @@ const PR_TIER_EVENT_FRAGMENT =
 // classifier's fail-closed doctrine; under the merge queue a skipped required
 // check reads satisfied, so failing toward SKIP would be the wrong direction.
 // (Covers green-but-empty output only: a FAILED changes job skips dependents
-// via needs regardless, which requiring "Detect code path changes" closes.)
+// via needs regardless, which requiring "Classify changes" closes.)
 const PR_TIER_IF_LINE = `    if: (${PR_TIER_EVENT_FRAGMENT}) && needs.changes.outputs.code != 'false'`;
 
 // pr-gate alone splits those two arms across levels (the docs-only matrix
@@ -250,7 +250,6 @@ describe('CI workflow parity', () => {
       '            !/docs/screenshots/*/',
       '            /docs/screenshots/admin-cheater-mark/',
       '            /docs/screenshots/admin-guild-bank-panel/',
-      '            /docs/screenshots/class-skin-color-wash/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',
       '            /docs/screenshots/far-foliage-impostors/',
@@ -259,21 +258,13 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/farming-phase-05/',
       '            /docs/screenshots/farming-phase-07/',
       '            /docs/screenshots/fenbridge-rebuild/',
-      '            /docs/screenshots/guild-bank-member-readonly/',
       '            /docs/screenshots/guild-bank-tab/',
       '            /docs/screenshots/guild-social-v1/',
       '            /docs/screenshots/item-art-consistency-2026-08-09/',
-      '            /docs/screenshots/mobile-mount-quick-summon/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
-      '            /docs/screenshots/prof-tool-effects/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
-      '            /docs/screenshots/raw-fish-cooking-reagents/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
-      '            /docs/screenshots/rift-floor-timer-hud/',
-      '            /docs/screenshots/wiki-v036-refresh/',
-      '            /docs/screenshots/wiki-v036-round2/',
       '            /docs/screenshots/wildheart/',
-      '            /docs/screenshots/wildheart_hit_stagger/',
       '          sparse-checkout-cone-mode: false',
     ].join('\n');
     // Job-anchored, not a bare workflow-wide count: each sparse job carries
@@ -594,17 +585,25 @@ describe('CI workflow parity', () => {
         member,
       );
     }
+    for (const member of MANIFEST_ARTIFACTS) {
+      expect(isCodePath(member), `${member} must route through the manifest check jobs`).toBe(true);
+    }
     for (const jobName of ['pr-checks', 'release-checks']) {
       const job = jobSource(jobName);
-      // Exactly two src/-anchored freshness diffs per check job: the i18n
-      // one (welded above) and this one; a third would ambiguate the
-      // first-match anchor the i18n weld relies on. The `\n {8}run: ` anchor
-      // means a YAML-commented-out step can never satisfy the match.
-      const diffs = [...job.matchAll(/\n {8}run: git diff --exit-code -- (src\/[^\n]+)/g)];
-      expect(diffs, `${jobName} freshness diff steps`).toHaveLength(2);
-      const manifestDiff = diffs.find((d) => d[1].includes('sfx_manifest.generated.ts'));
-      expect(manifestDiff, `${jobName} must carry the manifest freshness diff`).toBeTruthy();
-      const freshnessPaths = (manifestDiff as RegExpMatchArray)[1].trim().split(/\s+/).sort();
+      // The actual run line must first prove every output remains tracked,
+      // then diff the exact same set. Regeneration can recreate a committed
+      // deletion as an untracked file, which `git diff` alone ignores. The
+      // `\n {8}run: ` anchor means a YAML-commented-out command cannot pass.
+      const manifestGuard = job.match(
+        /\n {8}run: git ls-files --error-unmatch -- (src\/[^&\n]+) && git diff --exit-code -- (src\/[^\n]+)/,
+      );
+      expect(
+        manifestGuard,
+        `${jobName} must carry the manifest trackedness and diff guard`,
+      ).toBeTruthy();
+      const trackedPaths = (manifestGuard as RegExpMatchArray)[1].trim().split(/\s+/).sort();
+      const freshnessPaths = (manifestGuard as RegExpMatchArray)[2].trim().split(/\s+/).sort();
+      expect(trackedPaths).toEqual([...MANIFEST_ARTIFACTS].sort());
       expect(freshnessPaths).toEqual([...MANIFEST_ARTIFACTS].sort());
       // Regenerate BEFORE diff, inside the same job: the client build
       // (wiki:content writes the guide content, build:bundle's pregen writes
@@ -612,7 +611,7 @@ describe('CI workflow parity', () => {
       // proves nothing about this tree's sources.
       const buildIdx = job.indexOf('run: npm run wiki:content && npm run build:bundle\n');
       expect(buildIdx).toBeGreaterThan(0);
-      expect(buildIdx).toBeLessThan(job.indexOf((manifestDiff as RegExpMatchArray)[0]));
+      expect(buildIdx).toBeLessThan(job.indexOf((manifestGuard as RegExpMatchArray)[0]));
     }
     // Nightly coverage is transitive: release-checks carries the diff (welded
     // here) and tests/nightly_workflow.test.ts pins nightly's run-line
@@ -999,13 +998,13 @@ describe('CI workflow parity', () => {
     // each name exactly.
     const mergeQueueDoc = readFileSync(new URL('../docs/merge-queue.md', import.meta.url), 'utf8');
     const requiredCheckNames = [
-      'Detect code path changes',
-      'PR gate (English-only legal)',
-      'PR gate (long sims A)',
-      'PR gate (long sims B)',
-      'PR checks (freshness, typecheck, builds)',
-      'Format + lint (Biome, changed files)',
-      'Browser regressions (Chromium)',
+      'Classify changes',
+      'PR tests',
+      'PR long sims A',
+      'PR long sims B',
+      'PR checks',
+      'Lint (changed files)',
+      'Browser tests',
     ] as const;
     for (const name of requiredCheckNames) {
       // Anchored to the job-level name: line (4-space indent), so a
@@ -1027,13 +1026,13 @@ describe('CI workflow parity', () => {
     expect(neverSectionEnd).toBeGreaterThan(neverIdx);
     const neverSection = mergeQueueDoc.slice(neverIdx, neverSectionEnd);
     const docRequiredNameForms = [
-      '`Detect code path changes`',
-      `\`PR gate (English-only legal) (1)\` through \`(${SHARD_N})\``,
-      '`PR gate (long sims A)`',
-      '`PR gate (long sims B)`',
-      '`PR checks (freshness, typecheck, builds)`',
-      '`Format + lint (Biome, changed files)`',
-      '`Browser regressions (Chromium)`',
+      '`Classify changes`',
+      `\`PR tests (1)\` through \`(${SHARD_N})\``,
+      '`PR long sims A`',
+      '`PR long sims B`',
+      '`PR checks`',
+      '`Lint (changed files)`',
+      '`Browser tests`',
     ] as const;
     for (const form of docRequiredNameForms) {
       expect(requiredHalf).toContain(form);

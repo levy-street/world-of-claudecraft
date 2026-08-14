@@ -94,7 +94,7 @@ export const MARKET_RARITY_FILTERS = [
 export const MARKET_SORT_OPTIONS = ['name', 'price'] as const;
 
 // Listings per browse page (the count of OTHER sellers' listings shown at a time;
-// the player's own listings are always wired on top for quick reclaim).
+// the player's own visible listings are wired on top for quick reclaim).
 export const MARKET_PAGE_SIZE = 50;
 
 export type MarketItemTypeFilter = (typeof MARKET_ITEM_TYPE_FILTERS)[number];
@@ -119,6 +119,10 @@ export interface MarketQuery {
   rarity: MarketRarityFilter;
   sort: MarketSort;
   page: number;
+  // When true, Browse collapses all matching plain listings to the lowest-priced row per
+  // item id (see market_collapse.ts). Instanced copies remain distinct, and the viewer's
+  // own rows participate in the same selection (issue #3103).
+  collapseLowest: boolean;
 }
 
 export function defaultMarketQuery(): MarketQuery {
@@ -131,6 +135,7 @@ export function defaultMarketQuery(): MarketQuery {
     rarity: 'all',
     sort: 'name',
     page: 0,
+    collapseLowest: false,
   };
 }
 
@@ -147,6 +152,7 @@ export function sanitizeMarketQuery(
         rarity?: unknown;
         sort?: unknown;
         page?: unknown;
+        collapseLowest?: unknown;
       }
     | null
     | undefined,
@@ -174,6 +180,7 @@ export function sanitizeMarketQuery(
     rarity: oneOf(MARKET_RARITY_FILTERS, raw?.rarity, 'all'),
     sort: oneOf(MARKET_SORT_OPTIONS, raw?.sort, 'name'),
     page,
+    collapseLowest: raw?.collapseLowest === true,
   };
 }
 

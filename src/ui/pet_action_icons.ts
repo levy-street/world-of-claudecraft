@@ -18,8 +18,6 @@ export const PET_ACTION_ICONS = {
   aggressive: 'pet_aggressive',
 } as const;
 
-export type PetActionIconKey = keyof typeof PET_ACTION_ICONS;
-
 // Pure decision for the hunter Feed Pet button's disabled state. Previously
 // the button always looked identically clickable, but clicking it with no
 // eligible food just popped an error toast, and there was no way to tell in

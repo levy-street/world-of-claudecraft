@@ -98,6 +98,7 @@ import {
   parseCreationCosmetics,
   purgeDeletedCharacterWorldState,
   rekeyReclaimedCharacterWorldState,
+  rekeyRenamedCharacterOwnSigner,
   withCreationHelm,
 } from './characters';
 import { pruneChatViolationsBatch } from './chat_filter_db';
@@ -1916,6 +1917,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         if (liveGame().rekeyMailOwner(characterId, character.name, c.name)) {
           await liveGame().saveMail();
         }
+        // The renamed character's OWN signed instances (#2837): the same
+        // shared sweep the migrated renameHandler runs, so the API_DISPATCH=
+        // legacy rollback cannot quietly leave a character's blob signed with
+        // its old name.
+        await rekeyRenamedCharacterOwnSigner(characterId, c.level, c.state, character.name, c.name);
         return json(res, 200, {
           id: c.id,
           name: c.name,

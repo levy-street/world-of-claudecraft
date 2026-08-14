@@ -1,8 +1,6 @@
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { Entity } from '../types';
 
-export const COLD_FOCUS_AURA_ID = 'cold_focus';
-
 export function resolveColdsightAbility(
   resolved: ResolvedAbility,
   hunter: Entity,

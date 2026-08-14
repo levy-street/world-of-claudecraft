@@ -198,7 +198,7 @@ jobs:
       # Mirrors the manifest freshness diff in ci.yml's check jobs (the build
       # above just regenerated all three committed manifests).
       - name: Manifest freshness (committed build manifests)
-        run: git diff --exit-code -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json
+        run: git ls-files --error-unmatch -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json && git diff --exit-code -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json
 
   # The Chromium browser regressions, mirroring the browser-gate job in ci.yml.
   browser:

@@ -1197,7 +1197,7 @@ describe('constrained entry view creation ramp', () => {
     ).replace(/\r\n/g, '\n');
     const budgetMethodStart = renderer.indexOf('private runtimeViewCreateBudget(');
     const budgetMethodEnd = renderer.indexOf(
-      '\n  private viewCandidatePriority(',
+      '\n  private collectMissingViewCandidates(',
       budgetMethodStart,
     );
     const budgetMethod = renderer.slice(budgetMethodStart, budgetMethodEnd);

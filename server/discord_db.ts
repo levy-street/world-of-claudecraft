@@ -642,24 +642,6 @@ export async function listSwagClaims(pool: Pool, accountId: number): Promise<str
   return res.rows.map((r) => r.swag_id as string);
 }
 
-/**
- * The in-world Discord status-tier index for an account: 0 when the account has
- * no linked Discord (so unlinked players never get a flair badge), otherwise the
- * rung derived from lifetime reward points. One round-trip (join), for the
- * off-tick nameplate-flair refresh.
- */
-export async function discordTierForAccount(pool: Pool, accountId: number): Promise<number> {
-  const res = await pool.query(
-    `SELECT COALESCE(rp.lifetime_points, 0) AS lifetime_points
-       FROM discord_links dl
-       LEFT JOIN reward_points rp ON rp.account_id = dl.account_id
-      WHERE dl.account_id = $1`,
-    [accountId],
-  );
-  if (res.rows.length === 0) return 0; // not linked -> no flair
-  return discordStatusIndexForPoints(Number(res.rows[0].lifetime_points ?? 0));
-}
-
 export interface DiscordFlair {
   tier: number;
   avatarUrl: string | null;

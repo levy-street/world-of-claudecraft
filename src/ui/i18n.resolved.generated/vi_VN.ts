@@ -2463,7 +2463,7 @@ export const vi_VN: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "VắngMặt",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Kẻ Gian Lận >"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -3976,10 +3976,10 @@ export const vi_VN: EnTranslations = {
       "current_ownership_required": "Bạn phải đang sở hữu Seeker Genesis Token."
     },
     "cheater_mark": {
-      "admin_target": "Operator accounts cannot be marked.",
-      "reason_required": "A reason is required.",
-      "invalid_duration": "Enter a mark duration of at least one second.",
-      "not_marked": "That account is not marked."
+      "admin_target": "Không thể đánh dấu tài khoản điều hành.",
+      "reason_required": "Bắt buộc phải nhập lý do.",
+      "invalid_duration": "Nhập thời hạn đánh dấu ít nhất một giây.",
+      "not_marked": "Tài khoản đó chưa bị đánh dấu."
     }
   },
   "guide": {
@@ -6699,19 +6699,19 @@ export const vi_VN: EnTranslations = {
     "style": "Kiểu Dáng",
     "resetLook": "Đặt Lại Diện Mạo",
     "resetShort": "Đặt Lại",
-    "shareTab": "Share",
-    "designCode": "Design code",
-    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
-    "copyCode": "Copy code",
-    "importCode": "Import",
-    "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
-    "designCodeImported": "Design imported.",
-    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
-    "designCodeErrEmpty": "Paste a design code first.",
-    "designCodeErrHeader": "That does not look like a design code.",
-    "designCodeErrVersion": "That design code comes from a newer game version.",
-    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
+    "shareTab": "Chia sẻ",
+    "designCode": "Mã ngoại hình",
+    "designCodeHint": "Sao chép mã này để lưu hoặc chia sẻ ngoại hình. Dán mã vào đây rồi nhập để tải ngoại hình.",
+    "copyCode": "Sao chép mã",
+    "importCode": "Nhập",
+    "designCodeCopied": "Đã sao chép mã ngoại hình.",
+    "designCodeCopyManual": "Tính năng tự động sao chép bị chặn tại đây. Mã đã được chọn; hãy dùng bàn phím để sao chép.",
+    "designCodeImported": "Đã nhập ngoại hình.",
+    "designCodeImportedPartial": "Đã nhập ngoại hình. Những giá trị mà phiên bản này không nhận diện được đã bị bỏ qua.",
+    "designCodeErrEmpty": "Trước tiên, hãy dán mã ngoại hình.",
+    "designCodeErrHeader": "Nội dung đó không giống mã ngoại hình.",
+    "designCodeErrVersion": "Mã ngoại hình đó đến từ phiên bản trò chơi mới hơn.",
+    "designCodeErrMalformed": "Mã ngoại hình đó bị hỏng. Hãy sao chép toàn bộ mã rồi thử lại.",
     "browFlat": "Thẳng",
     "browArched": "Cong",
     "browThin": "Mảnh",
@@ -9087,6 +9087,7 @@ export const vi_VN: EnTranslations = {
       "filterSort": "Sắp xếp",
       "sortName": "Tên (A-Z)",
       "sortPriceAsc": "Giá: thấp đến cao",
+      "collapseLowest": "Chỉ giá thấp nhất",
       "weaponSword": "Kiếm",
       "weaponDagger": "Dao Găm",
       "weaponStaff": "Trượng",
@@ -9117,6 +9118,8 @@ export const vi_VN: EnTranslations = {
       "quantity": "Số lượng",
       "quantityOf": "trong {count}",
       "priceEach": "Giá mỗi món",
+      "lowestPriceLabel": "Giá đăng bán thấp nhất hiện tại",
+      "lowestPriceNone": "Hiện chưa có tin đăng bán nào cho vật phẩm này.",
       "listButton": "Rao bán trên Chợ Thế Giới",
       "minPriceError": "Hãy đặt giá ít nhất 1 đồng.",
       "collectEmpty": "Không có gì đang chờ. Tiền bán và mặt hàng hết hạn sẽ được thu về tại đây.",

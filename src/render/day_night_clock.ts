@@ -41,11 +41,6 @@ export function setLunarPhaseOverride(phase: number | null): void {
   moonOverride = phase == null ? null : ((phase % 1) + 1) % 1;
 }
 
-/** The active lunar override, or null while the real lunar clock runs. */
-export function lunarPhaseOverride(): number | null {
-  return moonOverride;
-}
-
 /** The current lunar phase (0 = new, 0.5 = full): the dev override when set,
  *  else the epoch-anchored lunar clock. Deliberately NOT pinned by DAY_ONLY:
  *  the moon's shape is pure cosmetics and keeps drifting either way. */

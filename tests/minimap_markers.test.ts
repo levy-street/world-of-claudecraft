@@ -10,7 +10,7 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { DELVE_X_MIN, GATHER_NODES, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
+import { DELVE_X_MIN, GATHER_NODES, ITEMS, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
@@ -155,6 +155,9 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     // mirror drives the cooldown variant. The sim shape carries a fuller
     // identity; the client shape only what the cprof mirror guarantees.
     questsDone: new Set<string>(),
+    // The viewer's own quest log, which both worlds expose: the object-loot branch
+    // consults it so a quest collectable the viewer cannot take draws no blip.
+    questLog: new Map(),
     craftingIdentity:
       shape === 'sim'
         ? { version: 1, synced: true, attunedPairs: [], cadenceBlockedQuests: [] }
@@ -395,6 +398,29 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       { kind: 'ally' }
     >[];
     expect(allies.map((a) => a.ally)).toEqual(['friend', 'guild']);
+  });
+
+  it('drops the object-loot blip for a quest collectable the viewer is not on the quest for', () => {
+    // Same gate the renderer uses to withhold the 3D view (isQuestGatedGroundObjectHidden):
+    // an off-quest sparkle is not in the scene, so a blip would point at empty ground.
+    // Entity 10 is the plain lootable object; giving it a real collect item id moves it
+    // behind the gate, and taking the quest brings the blip back.
+    const world = makeWorld('sim') as unknown as {
+      entities: Map<number, { objectItemId: string }>;
+      questLog: Map<string, { questId: string; counts: number[]; state: string }>;
+    };
+    const obj = world.entities.get(10);
+    if (!obj) throw new Error('expected the seeded lootable object');
+    obj.objectItemId = 'supply_crate';
+    const questId = ITEMS.supply_crate?.questId;
+    if (!questId) throw new Error('expected supply_crate to name its quest');
+
+    const hidden = buildMarkers(world as unknown as IWorld);
+    expect(hidden.some((m) => m.kind === 'object-loot')).toBe(false);
+
+    world.questLog.set(questId, { questId, counts: [0], state: 'active' });
+    const shown = buildMarkers(world as unknown as IWorld);
+    expect(shown.some((m) => m.kind === 'object-loot')).toBe(true);
   });
 
   it('marks the aggroed mob and the available-quest npc glyph', () => {

@@ -1,3 +1,4 @@
+import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import {
   dist2d,
   type Entity,
@@ -117,7 +118,16 @@ export function tryNearbyInteraction(
         bestDelve = entity.id;
         bestDelveDistance = distance;
       }
-    } else if (!player.dead && entity.kind === 'object' && entity.lootable) {
+    } else if (
+      !player.dead &&
+      entity.kind === 'object' &&
+      entity.lootable &&
+      // Nothing the viewer cannot see may win the press. An off-quest quest
+      // collectable is withheld from the scene entirely (the renderer's gate), so
+      // selecting it here would spend the interact on an invisible object and let
+      // it outrank a visible NPC or node standing further away.
+      !isQuestGatedGroundObjectHidden(entity, world.questLog)
+    ) {
       if (distance <= objectInteractionRange(entity) && distance < bestObjectDistance) {
         bestObject = entity.id;
         bestObjectDistance = distance;

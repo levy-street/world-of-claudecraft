@@ -11,6 +11,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 import {
   buildMobPortraitJobs,
   buildPortraitRendererContract,
@@ -60,27 +61,55 @@ export async function buildManifest() {
   };
 }
 
+function parseManifestOrNull(buffer) {
+  if (buffer === null) return null;
+  try {
+    return JSON.parse(buffer.toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+// The only fields the browser render bundle's wide import graph can move without any portrait
+// row, tracked source file, schema, or count changing (mob_portrait_manifest_diff.mjs explains
+// why): the top-level rendererFingerprint plus the digest half of renderer.browserBundle
+// (bytes, sha256). Every other browserBundle field (entry, esbuildVersion, ...) is provenance,
+// not digest, and must still be compared: blanking the whole browserBundle object would let a
+// corrupted entry path or esbuild version through as "bookkeeping-only" drift. Blanking exactly
+// the digest fields and deep-equating everything else PROVES nothing else drifted, rather than
+// trusting a hand-enumerated dimension list to stay exhaustive as the manifest schema grows.
+function withoutBundleFingerprint(manifest) {
+  return {
+    ...manifest,
+    rendererFingerprint: null,
+    renderer: {
+      ...manifest.renderer,
+      browserBundle: manifest.renderer?.browserBundle
+        ? { ...manifest.renderer.browserBundle, bytes: null, sha256: null }
+        : manifest.renderer?.browserBundle,
+    },
+  };
+}
+
+function isBundleOnlyDrift(committed, next) {
+  return (
+    committed.rendererFingerprint !== next.rendererFingerprint &&
+    committed.renderer?.browserBundle?.sha256 !== next.renderer?.browserBundle?.sha256 &&
+    isDeepStrictEqual(withoutBundleFingerprint(committed), withoutBundleFingerprint(next))
+  );
+}
+
 // Two 64-character hashes are not a diagnosis. Whenever the committed acceptance can still be
 // parsed, say WHICH part of it moved: a bundle-only drift (unrelated source churn, no art
 // change) and a real portrait regression read identically otherwise, and guessing wrong costs
 // a 230-portrait rerender pointed at the wrong problem.
-function printDiffHint(label, expected, actual) {
+function printDiffHint(label, expected, actual, committed, next) {
   const expectedHash = sha256(expected);
   const actualHash = actual === null ? 'missing' : sha256(actual);
   console.error(`${label} is stale (expected ${expectedHash}, found ${actualHash}).`);
-  if (actual !== null) {
-    let committed = null;
-    try {
-      committed = JSON.parse(actual.toString('utf8'));
-    } catch {
-      committed = null;
-    }
-    if (committed) {
-      const detail = formatManifestDrift(
-        describeManifestDrift(committed, JSON.parse(expected.toString('utf8'))),
-      );
-      if (detail) console.error(`what moved:\n${detail}`);
-    }
+  if (committed) {
+    const detail = formatManifestDrift(describeManifestDrift(committed, next));
+    if (detail) console.error(`what moved:\n${detail}`);
   }
   console.error(
     'Rerender changed portraits with PORTRAIT_RECEIPT set, review them, then pass that ' +
@@ -143,16 +172,33 @@ async function main() {
     const current = existsSync(args.targetManifestPath)
       ? readFileSync(args.targetManifestPath)
       : null;
-    if (current === null || !Buffer.from(serialized).equals(current)) {
-      printDiffHint(
-        path.relative(repoRoot, args.targetManifestPath),
-        Buffer.from(serialized),
-        current,
-      );
-      process.exit(1);
+    if (current !== null && Buffer.from(serialized).equals(current)) {
+      console.log(`${manifestRelativePath} is fresh`);
+      return;
     }
-    console.log(`${manifestRelativePath} is fresh`);
-    return;
+    const committed = parseManifestOrNull(current);
+    // The browser render bundle's import graph reaches the world/content modules (see
+    // mob_portrait_manifest_diff.mjs), so ordinary gameplay or render churn moves its digest
+    // while every portrait row and shipped image byte stays identical. Failing --check on that
+    // case forces a needless full rerender+receipt for zero art change: exactly the recurring
+    // "re-mint portrait provenance" busywork. Only fail when a reviewer would actually have
+    // something to look at (proven by deep equality, not by trusting a dimension list to stay
+    // exhaustive as the schema grows).
+    if (committed && isBundleOnlyDrift(committed, next)) {
+      console.log(
+        `${path.relative(repoRoot, args.targetManifestPath)} is fresh (bookkeeping-only ` +
+          'renderer bundle drift: everything else is byte-identical to the committed acceptance).',
+      );
+      return;
+    }
+    printDiffHint(
+      path.relative(repoRoot, args.targetManifestPath),
+      Buffer.from(serialized),
+      current,
+      committed,
+      next,
+    );
+    process.exit(1);
   }
 
   const previous = existsSync(args.targetManifestPath)

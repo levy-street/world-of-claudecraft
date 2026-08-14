@@ -36,6 +36,13 @@ export const I18N_RELEASE_TIER_SUITES = Object.freeze([
  */
 export const PRE_VITEST_STEP_NAME = 'biome (changed files)';
 
+/**
+ * Name of the full-suite vitest step. gate.mjs locks around exactly this step (issue
+ * #2808), never the whole run, so both sides read the same constant rather than the
+ * lock matching a display string a rename would silently move.
+ */
+export const FULL_SUITE_STEP_NAME = 'vitest (full suite)';
+
 export const I18N_ARTIFACTS = Object.freeze([
   'src/ui/i18n.resolved.generated',
   'src/admin/i18n.resolved.generated',
@@ -50,7 +57,7 @@ export const I18N_ARTIFACTS = Object.freeze([
 // belong in the DIFF (a partial diff would let the local gate silently heal
 // them mid-run while CI reads the stale committed copies) but never in the
 // classifier. tests/ci_workflow.test.ts welds this list, both check jobs'
-// diff argv, and the classifier containment to each other. The wiki content
+// trackedness and diff argv, and the classifier containment to each other. The wiki content
 // regenerates in the artifacts turbo step (wiki:content); the SFX and media
 // manifests regenerate in their own steps directly (sub-second scripts, not
 // turbo tasks).
@@ -108,7 +115,7 @@ export function buildFullGateSteps(workers, opts = {}) {
     },
     // The two manifest generators run directly (each is a deterministic
     // sub-second script; the wiki content regenerated in the turbo step
-    // above), then one diff proves all three committed manifests fresh.
+    // above), then trackedness plus one diff prove all committed outputs fresh.
     {
       name: 'sfx manifest regen',
       cmd: 'node',
@@ -118,6 +125,14 @@ export function buildFullGateSteps(workers, opts = {}) {
       name: 'media manifest regen',
       cmd: 'node',
       args: ['scripts/build_media_manifest.mjs', 'generate'],
+    },
+    {
+      name: 'manifest trackedness',
+      cmd: 'git',
+      args: ['ls-files', '--error-unmatch', '--', ...MANIFEST_ARTIFACTS],
+      hint:
+        'every generated build-manifest output must remain tracked: restore the missing path ' +
+        'or update the manifest contract before re-running the gate',
     },
     {
       name: 'manifest freshness',
@@ -141,7 +156,7 @@ export function buildFullGateSteps(workers, opts = {}) {
 
   if (!opts.skipVitest) {
     steps.push({
-      name: 'vitest (full suite)',
+      name: FULL_SUITE_STEP_NAME,
       cmd: 'npm',
       args: ['test', '--', `--maxWorkers=${workers}`],
       env: gateVitestSkipPretestEnv(),

@@ -567,4 +567,13 @@ export const fr_CA: Record<string, string> = {
     'Saisissez un nombre entier compris entre {min} et {max}.',
   'generalChatRateLimit.windowMinutesLabel': 'Durée de la fenêtre (minutes)',
   'moderationHistory.actionGeneralChatRateLimit': 'Limite de clavardage Général modifiée',
+  'detail.cheaterMarkDurationHint':
+    "Tous les personnages du compte portent l'étiquette publique jusqu'à ce que ce temps de jeu soit écoulé.",
+  'detail.cheaterMarkRelengthHint':
+    "Remplace entièrement le temps restant; il ne s'y ajoute pas. L'étiquette publique reste affichée.",
+  'dialog.actionCheaterMarkLift': 'Retirer la marque de tricheur plus tôt',
+  'alert.cheaterMarkDurationInvalid': 'Entrez un nombre entier de 1 à {max} heures.',
+  'error.cheaterMarkDurationInvalid': 'Le crédit de temps de jeu doit être de 1 à 100 heures.',
+  'error.cheaterMarkAdminTarget':
+    "Les comptes d'administrateur ne peuvent pas recevoir la marque de tricheur.",
 };

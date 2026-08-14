@@ -2463,7 +2463,7 @@ export const nl_NL: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Valsspeler >"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3976,10 +3976,10 @@ export const nl_NL: EnTranslations = {
       "current_ownership_required": "Actueel bezit van het Seeker Genesis Token is vereist."
     },
     "cheater_mark": {
-      "admin_target": "Operator accounts cannot be marked.",
-      "reason_required": "A reason is required.",
-      "invalid_duration": "Enter a mark duration of at least one second.",
-      "not_marked": "That account is not marked."
+      "admin_target": "Operatoraccounts kunnen niet worden gemarkeerd.",
+      "reason_required": "Een reden is vereist.",
+      "invalid_duration": "Voer een markeringsduur van minstens één seconde in.",
+      "not_marked": "Dat account is niet gemarkeerd."
     }
   },
   "guide": {
@@ -6699,19 +6699,19 @@ export const nl_NL: EnTranslations = {
     "style": "Stijl",
     "resetLook": "Uiterlijk Herstellen",
     "resetShort": "Herstellen",
-    "shareTab": "Share",
-    "designCode": "Design code",
-    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
-    "copyCode": "Copy code",
-    "importCode": "Import",
-    "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
-    "designCodeImported": "Design imported.",
-    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
-    "designCodeErrEmpty": "Paste a design code first.",
-    "designCodeErrHeader": "That does not look like a design code.",
-    "designCodeErrVersion": "That design code comes from a newer game version.",
-    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
+    "shareTab": "Delen",
+    "designCode": "Uiterlijkcode",
+    "designCodeHint": "Kopieer deze code om dit uiterlijk op te slaan of te delen. Plak hier een code en importeer die om het uiterlijk te laden.",
+    "copyCode": "Code kopiëren",
+    "importCode": "Importeren",
+    "designCodeCopied": "Uiterlijkcode gekopieerd.",
+    "designCodeCopyManual": "Automatisch kopiëren is hier geblokkeerd. De code is geselecteerd; kopieer hem met je toetsenbord.",
+    "designCodeImported": "Uiterlijk geïmporteerd.",
+    "designCodeImportedPartial": "Uiterlijk geïmporteerd. Waarden die deze versie niet kent, zijn overgeslagen.",
+    "designCodeErrEmpty": "Plak eerst een uiterlijkcode.",
+    "designCodeErrHeader": "Dat lijkt niet op een uiterlijkcode.",
+    "designCodeErrVersion": "Die uiterlijkcode komt uit een nieuwere spelversie.",
+    "designCodeErrMalformed": "Die uiterlijkcode is beschadigd. Kopieer de volledige code en probeer het opnieuw.",
     "browFlat": "Vlak",
     "browArched": "Gebogen",
     "browThin": "Dun",
@@ -9087,6 +9087,7 @@ export const nl_NL: EnTranslations = {
       "filterSort": "Sorteren",
       "sortName": "Naam (A-Z)",
       "sortPriceAsc": "Prijs: laag naar hoog",
+      "collapseLowest": "Alleen de laagste prijs",
       "weaponSword": "Zwaarden",
       "weaponDagger": "Dolken",
       "weaponStaff": "Staven",
@@ -9117,6 +9118,8 @@ export const nl_NL: EnTranslations = {
       "quantity": "Aantal",
       "quantityOf": "van {count}",
       "priceEach": "Prijs per stuk",
+      "lowestPriceLabel": "Huidige laagste aanbiedingsprijs",
+      "lowestPriceNone": "Er zijn nog geen actieve aanbiedingen voor dit voorwerp.",
       "listButton": "Aanbieden op de Wereldmarkt",
       "minPriceError": "Noem een prijs van minstens 1 koper.",
       "collectEmpty": "Niets in afwachting. Verkoopopbrengsten en verlopen aanbiedingen komen hier binnen.",

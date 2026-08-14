@@ -207,7 +207,7 @@ jobs:
   # (unit-tested by tests/ci_change_classify.test.ts). Release jobs never need
   # this job and never read its output.
   changes:
-    name: Detect code path changes
+    name: Classify changes
     runs-on: ubuntu-latest
     # Every PR-tier job waits on this one, so a wedged runner must fail fast
     # and be retried, never hang for an hour and a half. 8, not 5: the
@@ -258,7 +258,7 @@ jobs:
   # `--no-errors-on-unmatched` keeps the job green when a change touches no
   # Biome-eligible file (docs, assets, generated i18n).
   lint:
-    name: Format + lint (Biome, changed files)
+    name: Lint (changed files)
     # Unmatrixed single toolchain-setup-plus-checks job, comparable in shape to
     # browser-gate: checkout, pnpm install, a base-ref fetch, then one biome
     # pass. 15 keeps a margin over browser-gate's 10 minute bound for the extra
@@ -348,7 +348,7 @@ jobs:
         run: npx @biomejs/biome ci --changed --since="$BASE_REF_RESOLVED" --no-errors-on-unmatched
 
   browser-gate:
-    name: Browser regressions (Chromium)
+    name: Browser tests
     # Skip on confirmed docs-only PRs (no browser tests/code touched). Non-PR
     # and code PRs keep the job (changes.code defaults true off PR events).
     # != 'false', not == 'true': only an explicit docs-only verdict may skip.
@@ -357,7 +357,7 @@ jobs:
     # SKIP, and under the merge queue a skipped required check reads satisfied.
     # This covers a green-but-empty output only: a FAILED changes job still
     # skips dependents through needs regardless of this expression, which is
-    # why "Detect code path changes" must itself be a required check.
+    # why "Classify changes" must itself be a required check.
     needs: changes
     if: needs.changes.outputs.code != 'false'
     # Fail fast on the checkout-stall class (rationale and evidence on the
@@ -422,7 +422,7 @@ jobs:
   # with ONE full unsharded vitest run by design (bounded workers); keep that
   # script's step list in sync when adding or removing a step in either job.
   pr-gate:
-    name: PR gate (English-only legal)
+    name: PR tests
     # Two-level gate, split on purpose (docs/merge-queue.md, "The required-check
     # contract"). The JOB if carries only the event routing, so every
     # pull_request and merge_group run expands the matrix and reports all eight
@@ -557,7 +557,6 @@ jobs:
             !/docs/screenshots/*/
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
-            /docs/screenshots/class-skin-color-wash/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
             /docs/screenshots/far-foliage-impostors/
@@ -566,21 +565,13 @@ jobs:
             /docs/screenshots/farming-phase-05/
             /docs/screenshots/farming-phase-07/
             /docs/screenshots/fenbridge-rebuild/
-            /docs/screenshots/guild-bank-member-readonly/
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-social-v1/
             /docs/screenshots/item-art-consistency-2026-08-09/
-            /docs/screenshots/mobile-mount-quick-summon/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
-            /docs/screenshots/prof-tool-effects/
             /docs/screenshots/r35-admin-professions-inspector/
-            /docs/screenshots/raw-fish-cooking-reagents/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
-            /docs/screenshots/rift-floor-timer-hud/
-            /docs/screenshots/wiki-v036-refresh/
-            /docs/screenshots/wiki-v036-round2/
             /docs/screenshots/wildheart/
-            /docs/screenshots/wildheart_hit_stagger/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -715,7 +706,7 @@ jobs:
   # release-gate is deliberately NOT lane-split: release/** pushes keep the
   # full suite in their 8 shards.
   pr-long-sims-a:
-    name: PR gate (long sims A)
+    name: PR long sims A
     needs: changes
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     # Each lane half concentrates slow suites in one required job with no
@@ -779,7 +770,6 @@ jobs:
             !/docs/screenshots/*/
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
-            /docs/screenshots/class-skin-color-wash/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
             /docs/screenshots/far-foliage-impostors/
@@ -788,21 +778,13 @@ jobs:
             /docs/screenshots/farming-phase-05/
             /docs/screenshots/farming-phase-07/
             /docs/screenshots/fenbridge-rebuild/
-            /docs/screenshots/guild-bank-member-readonly/
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-social-v1/
             /docs/screenshots/item-art-consistency-2026-08-09/
-            /docs/screenshots/mobile-mount-quick-summon/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
-            /docs/screenshots/prof-tool-effects/
             /docs/screenshots/r35-admin-professions-inspector/
-            /docs/screenshots/raw-fish-cooking-reagents/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
-            /docs/screenshots/rift-floor-timer-hud/
-            /docs/screenshots/wiki-v036-refresh/
-            /docs/screenshots/wiki-v036-round2/
             /docs/screenshots/wildheart/
-            /docs/screenshots/wildheart_hit_stagger/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -863,7 +845,7 @@ jobs:
   # pr-long-sims-a above (identical shape, its own CI_LONG_SUITE_HALVES half
   # and its own cache key segment).
   pr-long-sims-b:
-    name: PR gate (long sims B)
+    name: PR long sims B
     needs: changes
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     # Sized with pr-long-sims-a (evidence there, in the lane-diet PR, and in
@@ -883,7 +865,6 @@ jobs:
             !/docs/screenshots/*/
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
-            /docs/screenshots/class-skin-color-wash/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
             /docs/screenshots/far-foliage-impostors/
@@ -892,21 +873,13 @@ jobs:
             /docs/screenshots/farming-phase-05/
             /docs/screenshots/farming-phase-07/
             /docs/screenshots/fenbridge-rebuild/
-            /docs/screenshots/guild-bank-member-readonly/
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-social-v1/
             /docs/screenshots/item-art-consistency-2026-08-09/
-            /docs/screenshots/mobile-mount-quick-summon/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
-            /docs/screenshots/prof-tool-effects/
             /docs/screenshots/r35-admin-professions-inspector/
-            /docs/screenshots/raw-fish-cooking-reagents/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
-            /docs/screenshots/rift-floor-timer-hud/
-            /docs/screenshots/wiki-v036-refresh/
-            /docs/screenshots/wiki-v036-round2/
             /docs/screenshots/wildheart/
-            /docs/screenshots/wildheart_hit_stagger/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -950,7 +923,7 @@ jobs:
   # here: the freshness diff checks the MERGE RESULT against the base branch,
   # not just the PR head.
   pr-checks:
-    name: PR checks (freshness, typecheck, builds)
+    name: PR checks
     # Same composition as pr-gate: release exclusion + code path filter. Skipped
     # entirely on docs-only PRs (malware/typecheck/builds are code-path gates).
     # merge_group lands here too: the queue re-proves freshness, typecheck, and
@@ -1039,14 +1012,14 @@ jobs:
 
       # The client build just regenerated all three committed build manifests
       # (wiki:content writes the guide content, build:bundle's pregen writes
-      # the SFX and media manifests), so this diff proves the committed
-      # copies against this tree's own sources. The selective planner treats
+      # the SFX and media manifests), so trackedness plus the diff prove the
+      # committed copies against this tree's own sources. The selective planner treats
       # exactly these paths as inert-but-fed-to-related ONLY on the strength
       # of this step (GENERATED_MANIFEST_ARTIFACT_FILES in
       # scripts/lib/gate_select_plan.mjs; tests/ci_workflow.test.ts welds the
       # classifier list, this argv, and the local gate list to each other).
       - name: Manifest freshness (committed build manifests)
-        run: git diff --exit-code -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json
+        run: git ls-files --error-unmatch -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json && git diff --exit-code -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json
 
   # A release ref runs THREE parallel jobs: release-gate (this one) runs the test
   # suite at PR tier, release-i18n runs the release TIER over the suites that read
@@ -1059,7 +1032,7 @@ jobs:
   release-gate:
     # NOT "21-locale": since #2820 the 21-locale assertions live in release-i18n, and
     # the label is what an operator reads in the checks list to tell the two reds apart.
-    name: Release gate (tests)
+    name: Release tests
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
     # Sized from this matrix's own workload, independently of pr-gate's
     # bound: this matrix keeps the long sims in-shard by design, since
@@ -1149,7 +1122,6 @@ jobs:
             !/docs/screenshots/*/
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
-            /docs/screenshots/class-skin-color-wash/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
             /docs/screenshots/far-foliage-impostors/
@@ -1158,21 +1130,13 @@ jobs:
             /docs/screenshots/farming-phase-05/
             /docs/screenshots/farming-phase-07/
             /docs/screenshots/fenbridge-rebuild/
-            /docs/screenshots/guild-bank-member-readonly/
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-social-v1/
             /docs/screenshots/item-art-consistency-2026-08-09/
-            /docs/screenshots/mobile-mount-quick-summon/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
-            /docs/screenshots/prof-tool-effects/
             /docs/screenshots/r35-admin-professions-inspector/
-            /docs/screenshots/raw-fish-cooking-reagents/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
-            /docs/screenshots/rift-floor-timer-hud/
-            /docs/screenshots/wiki-v036-refresh/
-            /docs/screenshots/wiki-v036-round2/
             /docs/screenshots/wildheart/
-            /docs/screenshots/wildheart_hit_stagger/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -1227,7 +1191,7 @@ jobs:
   # of tests/ for readers of the flag) by tests/release_i18n_tier_coverage.test.ts,
   # so a new tier-sensitive suite cannot silently stop running under the tier.
   release-i18n:
-    name: Release i18n (21-locale fill)
+    name: Release i18n
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
     # Unsharded and seconds long by design (five test files, see the job
     # comment above): the toolchain setup dominates the wall time. 10 mirrors
@@ -1251,7 +1215,6 @@ jobs:
             !/docs/screenshots/*/
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
-            /docs/screenshots/class-skin-color-wash/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
             /docs/screenshots/far-foliage-impostors/
@@ -1260,21 +1223,13 @@ jobs:
             /docs/screenshots/farming-phase-05/
             /docs/screenshots/farming-phase-07/
             /docs/screenshots/fenbridge-rebuild/
-            /docs/screenshots/guild-bank-member-readonly/
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-social-v1/
             /docs/screenshots/item-art-consistency-2026-08-09/
-            /docs/screenshots/mobile-mount-quick-summon/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
-            /docs/screenshots/prof-tool-effects/
             /docs/screenshots/r35-admin-professions-inspector/
-            /docs/screenshots/raw-fish-cooking-reagents/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
-            /docs/screenshots/rift-floor-timer-hud/
-            /docs/screenshots/wiki-v036-refresh/
-            /docs/screenshots/wiki-v036-round2/
             /docs/screenshots/wildheart/
-            /docs/screenshots/wildheart_hit_stagger/
           sparse-checkout-cone-mode: false
           filter: blob:none
 
@@ -1301,7 +1256,7 @@ jobs:
   # either direction. Does not set I18N_RELEASE_TIER; the checks here do not
   # depend on it, and the release-i18n job alone owns the tier flag.
   release-checks:
-    name: Release checks (freshness, typecheck, builds)
+    name: Release checks
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
     # Mirrors pr-checks: same step list (i18n generation, malware gate,
     # typecheck, four builds), so the same 20 minute bound.
@@ -1373,11 +1328,11 @@ jobs:
 
       # The client build just regenerated all three committed build manifests
       # (wiki:content writes the guide content, build:bundle's pregen writes
-      # the SFX and media manifests), so this diff proves the committed
-      # copies against this tree's own sources. The selective planner treats
+      # the SFX and media manifests), so trackedness plus the diff prove the
+      # committed copies against this tree's own sources. The selective planner treats
       # exactly these paths as inert-but-fed-to-related ONLY on the strength
       # of this step (GENERATED_MANIFEST_ARTIFACT_FILES in
       # scripts/lib/gate_select_plan.mjs; tests/ci_workflow.test.ts welds the
       # classifier list, this argv, and the local gate list to each other).
       - name: Manifest freshness (committed build manifests)
-        run: git diff --exit-code -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json
+        run: git ls-files --error-unmatch -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json && git diff --exit-code -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json

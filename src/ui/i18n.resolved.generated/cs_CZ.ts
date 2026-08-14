@@ -2463,7 +2463,7 @@ export const cs_CZ: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "PRYČ",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Podvodník >"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -3976,10 +3976,10 @@ export const cs_CZ: EnTranslations = {
       "current_ownership_required": "Je vyžadováno aktuální vlastnictví Seeker Genesis Token."
     },
     "cheater_mark": {
-      "admin_target": "Operator accounts cannot be marked.",
-      "reason_required": "A reason is required.",
-      "invalid_duration": "Enter a mark duration of at least one second.",
-      "not_marked": "That account is not marked."
+      "admin_target": "Účty operátorů nelze označit.",
+      "reason_required": "Je nutné uvést důvod.",
+      "invalid_duration": "Zadejte dobu označení alespoň jednu sekundu.",
+      "not_marked": "Tento účet není označen."
     }
   },
   "guide": {
@@ -6699,19 +6699,19 @@ export const cs_CZ: EnTranslations = {
     "style": "Styl",
     "resetLook": "Resetovat vzhled",
     "resetShort": "Resetovat",
-    "shareTab": "Share",
-    "designCode": "Design code",
-    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
-    "copyCode": "Copy code",
-    "importCode": "Import",
-    "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
-    "designCodeImported": "Design imported.",
-    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
-    "designCodeErrEmpty": "Paste a design code first.",
-    "designCodeErrHeader": "That does not look like a design code.",
-    "designCodeErrVersion": "That design code comes from a newer game version.",
-    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
+    "shareTab": "Sdílet",
+    "designCode": "Kód vzhledu",
+    "designCodeHint": "Zkopírujte tento kód, chcete-li vzhled uložit nebo sdílet. Vložte sem kód a importujte jej, abyste vzhled načetli.",
+    "copyCode": "Kopírovat kód",
+    "importCode": "Importovat",
+    "designCodeCopied": "Kód vzhledu byl zkopírován.",
+    "designCodeCopyManual": "Automatické kopírování je zde zablokováno. Kód je vybraný, zkopírujte jej pomocí klávesnice.",
+    "designCodeImported": "Vzhled byl importován.",
+    "designCodeImportedPartial": "Vzhled byl importován. Hodnoty, které tato verze nezná, byly přeskočeny.",
+    "designCodeErrEmpty": "Nejprve vložte kód vzhledu.",
+    "designCodeErrHeader": "Toto nevypadá jako kód vzhledu.",
+    "designCodeErrVersion": "Tento kód vzhledu pochází z novější verze hry.",
+    "designCodeErrMalformed": "Tento kód vzhledu je poškozený. Zkopírujte celý kód a zkuste to znovu.",
     "browFlat": "Rovné",
     "browArched": "Klenuté",
     "browThin": "Tenké",
@@ -9087,6 +9087,7 @@ export const cs_CZ: EnTranslations = {
       "filterSort": "Řazení",
       "sortName": "Název (A-Z)",
       "sortPriceAsc": "Cena: od nejnižší po nejvyšší",
+      "collapseLowest": "Pouze nejnižší cena",
       "weaponSword": "Meče",
       "weaponDagger": "Dýky",
       "weaponStaff": "Hole",
@@ -9117,6 +9118,8 @@ export const cs_CZ: EnTranslations = {
       "quantity": "Množství",
       "quantityOf": "z {count}",
       "priceEach": "Cena za kus",
+      "lowestPriceLabel": "Současná nejnižší nabídková cena",
+      "lowestPriceNone": "Pro tento předmět zatím nejsou žádné aktivní nabídky.",
       "listButton": "Nabídnout na Světovém trhu",
       "minPriceError": "Zadej cenu alespoň 1 měď.",
       "collectEmpty": "Nic nečeká. Tady si vyzvedneš výnosy z prodeje a vypršelé nabídky.",

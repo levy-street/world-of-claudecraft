@@ -13,7 +13,7 @@ Codex have different entry points and share the same deterministic scripts and c
 | Day-loop fast path | `npm run gate:fast` through `scripts/gate_fast.mjs` | While iterating (agents and mid/low-tier machines) | No (local only; not merge) |
 | **Selective gate** | `node scripts/gate_select.mjs` | **Before implementation is called ready / pre-merge** | **Yes (the merge bar)** |
 | Full local gate | `npm run gate` through `scripts/gate.mjs` | When you want the whole suite locally, or the planner falls back | Yes (deeper check) |
-| Selective PR-tier CI | ci.yml `pr-gate` shards through `scripts/ci_shard_test.mjs` (same selection semantics, sharded; full suite on any unprovable diff) | Every pull request | Yes (PR checks) |
+| Selective PR-tier CI | ci.yml `pr-gate` shards through `scripts/ci_shard_test.mjs` (same selection semantics, sharded; full suite on any unprovable diff) | Every pull request | Yes (required checks) |
 | Merge queue | ci.yml on the `merge_group` event: the full PR tier over the exact merge result about to become the branch tip (see `docs/merge-queue.md`, including rollout status: `release/**` first, `main` at the next release-to-main merge) | Every queued merge into a queue-protected branch | Yes (required checks on the merge group) |
 | Nightly full gate | `.github/workflows/nightly.yml`: full suite + checks + browser over the tips of main and the active `release/**` branch | Scheduled nightly (04:47 UTC) | No (alerting: files and closes one tracking issue) |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
@@ -109,6 +109,23 @@ builds. Release branches use the release i18n tier. It stops at the first failur
 bounds Vitest workers to avoid load flakes on shared machines. It resolves FFmpeg
 (`ffmpeg` and `ffprobe`) from the bundled `ffmpeg-static`/`ffprobe-static` npm packages,
 falling back to PATH, and refuses to run when neither source yields a working binary.
+
+**Full-suite lock across concurrent gates (issue #2808):** per-process worker sizing
+protects a gate run from itself, but does nothing when a second `npm run gate` is
+running in a sibling worktree, which this repo's own per-task-worktree workflow makes
+routine; two gates that each correctly claim half the cores still request the whole
+machine between them. `gate.mjs` acquires an advisory lock (`scripts/lib/gate_lock.mjs`,
+an exclusive loopback listener shared by every worktree on the host) around the
+`vitest (full suite)` step only, never the rest of the run. The kernel's atomic listener
+ownership admits one gate at a time and disappears with its process, so recovery never
+deletes a raced lock file or trusts a reusable pid. A gate that finds the listener held
+waits and prints who holds it; a non-gate service on the reserved port is identified and
+bypassed rather than blocking local work. The locked npm/Vitest step runs in a managed
+child process group, so handled termination tears down the active workload before
+releasing ownership. `GATE_NO_LOCK=1` restores fully concurrent behavior for a user who
+deliberately wants two full suites running at once.
+`gate_select.mjs`/`gate_fast.mjs` never touch this lock; it exists for the one step
+that is actually the shared-host bottleneck.
 
 **Task cache (Turborepo):** pure artifact steps (`i18n:gen`, `wiki:content`, `sfx:check`,
 `check:types`, `build:env`, `build:server`, `build:bot`, `build:bundle`) run through `npx turbo run`
@@ -216,7 +233,7 @@ seconds inside a full-mode shard, the chronomancy balance sweep among them, plus
 owned-class balance family, which is lane-owned as a unit since its 2026-08-13 split
 so the diet-flag registry and its lane accounting stay in one place; the measured
 per-file lane duration ledgers live in the lane-split PR bodies, #3370 first) run in the
-dedicated `PR gate (long sims A)` / `PR gate (long sims B)` job pair
+dedicated `PR long sims A` / `PR long sims B` job pair
 (`node scripts/ci_shard_test.mjs --lane=long-sims-a` / `--lane=long-sims-b`, one
 `CI_LONG_SUITE_HALVES` half each), and every shard leg excludes the whole union, so a
 single multi-minute file no longer sets the slowest shard's wall clock and the lane's
@@ -347,8 +364,9 @@ rests on three structural facts, each pinned:
 three facts, as the second and only other freshness-guarded family
 (`GENERATED_MANIFEST_ARTIFACT_FILES` in `scripts/lib/gate_select_plan.mjs`): both check
 jobs and the nightly checks job regenerate them (the `wiki:content && build:bundle`
-step; regeneration is deterministic and sub-second per generator) and `git diff
---exit-code` the FULL output set; both arms feed the changed .ts paths to `vitest
+step; regeneration is deterministic and sub-second per generator), prove every output
+remains tracked with `git ls-files --error-unmatch`, and `git diff --exit-code` the FULL
+output set; both arms feed the changed .ts paths to `vitest
 related` as graph nodes; deletions and renames widen, the shard plan re-proves
 presence, and the local planner widens without an existence probe. The freshness diff
 set is a strict SUPERSET of the classifier family: the SFX generator also writes
@@ -356,9 +374,10 @@ set is a strict SUPERSET of the classifier family: the SFX generator also writes
 which are diffed for integrity (a partial diff would let the local gate silently heal
 them mid-run while CI reads stale committed copies) but never declassified, since
 fs-read data is not a graph node. The local gate regenerates the SFX and media
-manifests in their own steps (the wiki content regenerates in the artifacts turbo step)
-and diffs the whole set as its `manifest freshness` step.
-`tests/ci_workflow.test.ts` welds the classifier list, both check jobs' diff argv, and
+manifests in their own steps (the wiki content regenerates in the artifacts turbo step),
+proves the whole set remains tracked, and diffs it as its `manifest freshness` step.
+`tests/ci_workflow.test.ts` welds the classifier list, both check jobs' trackedness and
+diff argv, and
 the local gate's `MANIFEST_ARTIFACTS` to each other. Membership is exact files, no
 prefixes.
 

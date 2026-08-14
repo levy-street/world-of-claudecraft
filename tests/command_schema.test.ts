@@ -66,8 +66,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // for a client to forge. Farming's knobs phase adds convert_husks as a third
 // send + dispatch pair (trade withered husks for compost): NO payload at all,
 // the ratio and batch count resolve sim-side from the sender's own bags.
-const EXPECTED_SEND_COUNT = 201;
-const EXPECTED_DISPATCH_COUNT = 214;
+// The v0.38.0 fifteenth absorb adds one release-side pair on top (199/212 on
+// the release arm over the 198/211 base), so the merged universe is 202/215.
+const EXPECTED_SEND_COUNT = 202;
+const EXPECTED_DISPATCH_COUNT = 215;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

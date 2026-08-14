@@ -2808,6 +2808,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterSort': '並べ替え',
   'itemUi.market.sortName': '名前 (A-Z)',
   'itemUi.market.sortPriceAsc': '価格: 安い順',
+  'itemUi.market.collapseLowest': '最安値のみ表示',
   'itemUi.market.weaponSword': '剣',
   'itemUi.market.weaponDagger': '短剣',
   'itemUi.market.weaponStaff': '杖',
@@ -2840,6 +2841,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': '数量',
   'itemUi.market.quantityOf': '/ {count}',
   'itemUi.market.priceEach': '単価',
+  'itemUi.market.lowestPriceLabel': '現在の最安出品価格',
+  'itemUi.market.lowestPriceNone': 'このアイテムには現在出品がありません。',
   'itemUi.market.listButton': 'ワールドマーケットに出品',
   'itemUi.market.minPriceError': '価格は最低1銅貨にしてください。',
   'itemUi.market.collectEmpty':

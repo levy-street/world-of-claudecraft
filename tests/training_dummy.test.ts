@@ -250,6 +250,33 @@ describe('Highwatch training dummy', () => {
     expect(back.hp).toBe(back.maxHp);
   });
 
+  it('stays put when a paladin Oath Chains it (issue: MIA after being dragged off its spot)', () => {
+    const sim = makeWorld();
+    const d = dummyOf(sim);
+    const before = { x: d.pos.x, z: d.pos.z };
+    const pid = sim.addPlayer('paladin', 'Judge', { autoEquip: true });
+    sim.setPlayerLevel(20, pid);
+    expect(sim.setSpec('protection', pid)).toBe(true);
+    const player = entityById(sim, pid);
+    moveEntityTo(sim, player, d.pos.x, d.pos.z + 15);
+    player.facing = Math.atan2(d.pos.x - player.pos.x, d.pos.z - player.pos.z);
+    player.resource = player.maxResource;
+    player.targetId = d.id;
+
+    sim.castAbility('oath_chain', pid);
+
+    // Proves the cast actually fired (rather than being silently refused by
+    // range/facing/LOS, which would make the assertions below pass vacuously).
+    expect(d.inCombat).toBe(true);
+    expect(player.inCombat).toBe(true);
+    expect(d.auras.some((a) => a.kind === 'forced_move')).toBe(false);
+
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+
+    expect(d.pos.x).toBe(before.x);
+    expect(d.pos.z).toBe(before.z);
+  });
+
   it('spawns a friendly healer practice dummy that friendly targeting can select', () => {
     const sim = makeWorld();
     const d = healingDummyOf(sim);

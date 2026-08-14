@@ -4217,6 +4217,7 @@ function marketRoundTrip(): Scenario {
           rarity: 'all',
           sort: 'name',
           page: 0,
+          collapseLowest: false,
         },
         seller,
       );
@@ -4231,6 +4232,7 @@ function marketRoundTrip(): Scenario {
           rarity: 'all',
           sort: 'name',
           page: 0,
+          collapseLowest: false,
         },
         seller,
       );

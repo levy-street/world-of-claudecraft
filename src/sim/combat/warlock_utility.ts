@@ -2,8 +2,6 @@ import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, type Vec3 } from '../types';
 
 export const UMBRAL_ANCHOR_ID = 'umbral_anchor';
-export const UMBRAL_ANCHOR_COOLDOWN = 45;
-export const UMBRAL_ANCHOR_MAX_RANGE = 40;
 
 function anchorAura(entity: Entity) {
   return entity.auras.find(

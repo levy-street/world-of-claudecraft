@@ -628,6 +628,7 @@ const MARKET_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MARKET_WIRE_
 const MARKET_BROWSE_REFRESH_TICKS = 40;
 const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
   'market_search',
+  'market_sell_price_check',
   'market_list',
   'market_list_instance',
   'market_buy',
@@ -955,6 +956,10 @@ export interface ClientSession {
   lastMarketWireTick: number;
   lastMarketBrowseRev: number | null;
   lastMarketQueryRef: MarketQuery | null;
+  // The Sell tab's price-check item id last built for (issue #3043), the
+  // marketQuery precedent: a primitive, so a plain !== value compare is its own
+  // change signal (no identity trick needed).
+  lastSellPriceItemIdRef: string | null;
   lastMarketRebuildTick: number;
   // Commission order board readout, same recipe at its own cadence
   // (CORDER_WIRE_HZ): the board revision last built for plus the backstop
@@ -2210,6 +2215,7 @@ export class GameServer {
     moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
+    moderator.lastSellPriceItemIdRef = null;
     moderator.lastMarketRebuildTick = 0;
     moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
     moderator.lastCorderBoardRev = null;
@@ -2250,6 +2256,7 @@ export class GameServer {
     moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
+    moderator.lastSellPriceItemIdRef = null;
     moderator.lastMarketRebuildTick = 0;
     moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
     moderator.lastCorderBoardRev = null;
@@ -3818,6 +3825,7 @@ export class GameServer {
       lastMarketWireTick: -MARKET_WIRE_INTERVAL_TICKS,
       lastMarketBrowseRev: null,
       lastMarketQueryRef: null,
+      lastSellPriceItemIdRef: null,
       lastMarketRebuildTick: 0,
       lastCorderWireTick: -CORDER_WIRE_INTERVAL_TICKS,
       lastCorderBoardRev: null,
@@ -7872,9 +7880,13 @@ export class GameServer {
             rarity: msg.rarity,
             sort: msg.sort,
             page: typeof msg.page === 'number' ? msg.page : 0,
+            collapseLowest: msg.collapseLowest,
           }),
           pid,
         );
+        break;
+      case 'market_sell_price_check':
+        sim.marketSellPriceCheck(typeof msg.item === 'string' ? msg.item : null, pid);
         break;
       case 'market_list':
         if (
@@ -9149,9 +9161,11 @@ export class GameServer {
         sent.market === undefined ||
         browseRev !== session.lastMarketBrowseRev ||
         meta.marketQuery !== session.lastMarketQueryRef ||
+        meta.sellPriceItemId !== session.lastSellPriceItemIdRef ||
         this.sim.tickCount - session.lastMarketRebuildTick >= MARKET_BROWSE_REFRESH_TICKS
       ) {
         session.lastMarketQueryRef = meta.marketQuery;
+        session.lastSellPriceItemIdRef = meta.sellPriceItemId;
         session.lastMarketRebuildTick = this.sim.tickCount;
         maybe('market', this.sim.marketInfoFor(anchorSession.pid));
         // Stamp AFTER the rebuild: marketInfoFor can advance the revision as a

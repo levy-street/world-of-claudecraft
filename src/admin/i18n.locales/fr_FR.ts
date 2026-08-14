@@ -1084,4 +1084,33 @@ export const fr_FR: Record<string, string> = {
     'Saisissez un nombre entier compris entre {min} et {max}.',
   'generalChatRateLimit.windowMinutesLabel': 'Durée de la fenêtre (minutes)',
   'moderationHistory.actionGeneralChatRateLimit': 'Limite de chat Général modifiée',
+  'detail.cheaterMarkModeration': 'Marque de tricheur',
+  'detail.cheaterMarkActions': 'Actions de modération de la marque de tricheur',
+  'detail.cheaterMarkApply': 'Appliquer la marque de tricheur',
+  'detail.cheaterMarkLift': 'Retirer la marque de tricheur',
+  'detail.cheaterMarkReason': 'Motif de la marque : {value}',
+  'detail.cheaterMarkRemaining': 'Temps de jeu restant : {value}',
+  'detail.cheaterMarkSetAt': 'Appliquée : {value}',
+  'detail.cheaterMarkRelength': 'Modifier la durée de la marque',
+  'detail.cheaterMarkDuration': 'Crédit en heures de jeu',
+  'detail.cheaterMarkDurationPlaceholder': 'Heures',
+  'detail.cheaterMarkDurationHint':
+    "Tous les personnages du compte portent l'étiquette publique jusqu'à épuisement de ce temps de jeu.",
+  'detail.cheaterMarkRelengthHint':
+    "Remplace entièrement le temps restant, sans s'y ajouter. L'étiquette publique reste affichée.",
+  'dialog.confirmCheaterMark': 'Confirmer la marque de tricheur',
+  'dialog.confirmCheaterMarkRelength': 'Confirmer la nouvelle durée de la marque',
+  'dialog.confirmCheaterMarkLift': 'Confirmer le retrait de la marque',
+  'dialog.actionCheaterMark':
+    "Afficher l'étiquette publique Tricheur sur tous les personnages de ce compte",
+  'dialog.actionCheaterMarkRelength': 'Remplacer le temps de jeu restant de cette marque',
+  'dialog.actionCheaterMarkLift': 'Retirer la marque de tricheur avant son terme',
+  'alert.cheaterMarkDurationInvalid': 'Saisissez un nombre entier entre 1 et {max} heures.',
+  'error.cheaterMarkDurationInvalid':
+    'Le crédit de temps de jeu doit être compris entre 1 et 100 heures.',
+  'error.cheaterMarkNotMarked': 'Ce compte ne porte pas la marque de tricheur.',
+  'error.cheaterMarkAdminTarget':
+    'Les comptes administrateur ne peuvent pas recevoir la marque de tricheur.',
+  'moderationHistory.actionCheaterMark': 'Marque de tricheur appliquée',
+  'moderationHistory.actionCheaterMarkLift': 'Marque de tricheur retirée',
 };

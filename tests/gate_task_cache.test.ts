@@ -78,6 +78,15 @@ describe('gate cache inventory vs turbo.json', () => {
     expect(inputs.some((p) => p.includes('i18n.catalog'))).toBe(true);
     expect(inputs.some((p) => p.includes('i18n.locales'))).toBe(true);
   });
+
+  it('invalidates the server bundle when either Rift rollback migration source changes', () => {
+    expect(turboJson.tasks['build:server'].inputs).toEqual(
+      expect.arrayContaining([
+        'scripts/migrate_rift_forge_rollback.ts',
+        'scripts/rift_forge_rollback_migration.ts',
+      ]),
+    );
+  });
 });
 
 describe('git worktree cache sharing (Turborepo >= 2.8)', () => {
@@ -128,8 +137,9 @@ describe('buildFullGateSteps orchestration', () => {
       expect.arrayContaining(['diff', '--exit-code', ...I18N_ARTIFACTS]),
     );
     // The manifest arm mirrors the i18n one, pinned to the SAME constant the
-    // three-way weld checks (tests/ci_workflow.test.ts): a step argv that
-    // drifts from MANIFEST_ARTIFACTS would prove fewer files than the
+    // three-way weld checks (tests/ci_workflow.test.ts): trackedness closes
+    // the deleted-then-regenerated untracked-file escape, while a diff argv
+    // that drifts from MANIFEST_ARTIFACTS would prove fewer files than the
     // classifier declassifies.
     expect(byName['sfx manifest regen'].cmd).toBe('node');
     expect(byName['sfx manifest regen'].args).toEqual(['scripts/build_sfx_manifest.mjs']);
@@ -137,6 +147,13 @@ describe('buildFullGateSteps orchestration', () => {
     expect(byName['media manifest regen'].args).toEqual([
       'scripts/build_media_manifest.mjs',
       'generate',
+    ]);
+    expect(byName['manifest trackedness'].cmd).toBe('git');
+    expect(byName['manifest trackedness'].args).toEqual([
+      'ls-files',
+      '--error-unmatch',
+      '--',
+      ...MANIFEST_ARTIFACTS,
     ]);
     expect(byName['manifest freshness'].cmd).toBe('git');
     expect(byName['manifest freshness'].args).toEqual([
@@ -169,6 +186,7 @@ describe('buildFullGateSteps orchestration', () => {
     const freshness = names.indexOf('i18n freshness');
     const sfxRegen = names.indexOf('sfx manifest regen');
     const mediaRegen = names.indexOf('media manifest regen');
+    const manifestTrackedness = names.indexOf('manifest trackedness');
     const manifestFreshness = names.indexOf('manifest freshness');
     const biome = names.indexOf('biome (changed files)');
     const vitest = names.indexOf('vitest (full suite)');
@@ -179,7 +197,8 @@ describe('buildFullGateSteps orchestration', () => {
     // precede the manifest diff, or it proves nothing about this tree.
     expect(sfxRegen).toBeGreaterThan(freshness);
     expect(mediaRegen).toBeGreaterThan(sfxRegen);
-    expect(manifestFreshness).toBeGreaterThan(mediaRegen);
+    expect(manifestTrackedness).toBeGreaterThan(mediaRegen);
+    expect(manifestFreshness).toBeGreaterThan(manifestTrackedness);
     expect(biome).toBeGreaterThan(manifestFreshness);
     expect(vitest).toBeGreaterThan(biome);
     expect(client).toBeGreaterThan(vitest);
@@ -196,6 +215,7 @@ describe('buildFullGateSteps orchestration', () => {
       'i18n freshness',
       'sfx manifest regen',
       'media manifest regen',
+      'manifest trackedness',
       'manifest freshness',
       'malware scan',
       'biome (changed files)',
@@ -212,6 +232,7 @@ describe('buildFullGateSteps orchestration', () => {
       'i18n freshness',
       'sfx manifest regen',
       'media manifest regen',
+      'manifest trackedness',
       'manifest freshness',
       'malware scan',
       'biome (changed files)',

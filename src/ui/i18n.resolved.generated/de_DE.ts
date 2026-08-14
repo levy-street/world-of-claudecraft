@@ -2463,7 +2463,7 @@ export const de_DE: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Schummler >"
     },
     "mobTooltip": {
       "levelFamily": "Stufe {level} {family}",
@@ -3976,10 +3976,10 @@ export const de_DE: EnTranslations = {
       "current_ownership_required": "Der Seeker Genesis Token muss sich aktuell in deinem Besitz befinden."
     },
     "cheater_mark": {
-      "admin_target": "Operator accounts cannot be marked.",
-      "reason_required": "A reason is required.",
-      "invalid_duration": "Enter a mark duration of at least one second.",
-      "not_marked": "That account is not marked."
+      "admin_target": "Operatorkonten können nicht markiert werden.",
+      "reason_required": "Ein Grund ist erforderlich.",
+      "invalid_duration": "Gib eine Markierungsdauer von mindestens einer Sekunde ein.",
+      "not_marked": "Dieses Konto ist nicht markiert."
     }
   },
   "guide": {
@@ -6699,19 +6699,19 @@ export const de_DE: EnTranslations = {
     "style": "Stil",
     "resetLook": "Aussehen zurücksetzen",
     "resetShort": "Zurücksetzen",
-    "shareTab": "Share",
-    "designCode": "Design code",
-    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
-    "copyCode": "Copy code",
-    "importCode": "Import",
-    "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
-    "designCodeImported": "Design imported.",
-    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
-    "designCodeErrEmpty": "Paste a design code first.",
-    "designCodeErrHeader": "That does not look like a design code.",
-    "designCodeErrVersion": "That design code comes from a newer game version.",
-    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
+    "shareTab": "Teilen",
+    "designCode": "Aussehenscode",
+    "designCodeHint": "Kopiere diesen Code, um dieses Aussehen zu speichern oder zu teilen. Füge hier einen Code ein und importiere ihn, um das Aussehen zu laden.",
+    "copyCode": "Code kopieren",
+    "importCode": "Importieren",
+    "designCodeCopied": "Aussehenscode kopiert.",
+    "designCodeCopyManual": "Automatisches Kopieren ist hier gesperrt. Der Code ist ausgewählt; kopiere ihn mit der Tastatur.",
+    "designCodeImported": "Aussehen importiert.",
+    "designCodeImportedPartial": "Aussehen importiert. Werte, die diese Version nicht kennt, wurden übersprungen.",
+    "designCodeErrEmpty": "Füge zuerst einen Aussehenscode ein.",
+    "designCodeErrHeader": "Das sieht nicht wie ein Aussehenscode aus.",
+    "designCodeErrVersion": "Dieser Aussehenscode stammt aus einer neueren Spielversion.",
+    "designCodeErrMalformed": "Dieser Aussehenscode ist beschädigt. Kopiere den vollständigen Code und versuche es erneut.",
     "browFlat": "Flach",
     "browArched": "Gebogen",
     "browThin": "Dünn",
@@ -9087,6 +9087,7 @@ export const de_DE: EnTranslations = {
       "filterSort": "Sortieren",
       "sortName": "Name (A-Z)",
       "sortPriceAsc": "Preis: niedrig bis hoch",
+      "collapseLowest": "Nur den niedrigsten Preis anzeigen",
       "weaponSword": "Schwerter",
       "weaponDagger": "Dolche",
       "weaponStaff": "Stäbe",
@@ -9117,6 +9118,8 @@ export const de_DE: EnTranslations = {
       "quantity": "Menge",
       "quantityOf": "von {count}",
       "priceEach": "Preis je Stück",
+      "lowestPriceLabel": "Aktuell niedrigster Angebotspreis",
+      "lowestPriceNone": "Für diesen Gegenstand gibt es noch keine aktiven Angebote.",
       "listButton": "Auf dem Weltmarkt einstellen",
       "minPriceError": "Nennt einen Preis von mindestens 1 Kupfer.",
       "collectEmpty": "Nichts wartet. Verkaufserlöse und abgelaufene Angebote werden hier abgeholt.",

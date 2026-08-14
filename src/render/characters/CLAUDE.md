@@ -75,8 +75,7 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `scripts/asset_pipeline/lib/fit_studio.mjs`; never hand-edit).
 - Bespoke ability clips: `paladin_bastion_sweep_clip.ts` /
   `paladin_templars_verdict_clip.ts` (with their `paladin_bastion_sweep_fx.ts` /
-  `paladin_templars_verdict_fx.ts` twins, plus
-  `paladin_templars_verdict_preview.ts`): procedural `AnimationClip`s built in
+  `paladin_templars_verdict_fx.ts` twins): procedural `AnimationClip`s built in
   code and registered per ability; the template future ability-animation work
   follows.
 - Pure selection cores: `modular.ts` (composed bodies, below),

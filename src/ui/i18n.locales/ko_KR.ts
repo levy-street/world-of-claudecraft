@@ -2785,6 +2785,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterSort': '정렬',
   'itemUi.market.sortName': '이름 (A-Z)',
   'itemUi.market.sortPriceAsc': '가격: 낮은순',
+  'itemUi.market.collapseLowest': '최저가만 표시',
   'itemUi.market.weaponSword': '검',
   'itemUi.market.weaponDagger': '단검',
   'itemUi.market.weaponStaff': '지팡이',
@@ -2817,6 +2818,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': '수량',
   'itemUi.market.quantityOf': '/ {count}',
   'itemUi.market.priceEach': '개당 가격',
+  'itemUi.market.lowestPriceLabel': '현재 최저 등록 가격',
+  'itemUi.market.lowestPriceNone': '이 아이템은 현재 등록된 판매가 없습니다.',
   'itemUi.market.listButton': '세계 시장에 등록',
   'itemUi.market.minPriceError': '가격은 최소 1동화여야 합니다.',
   'itemUi.market.collectEmpty':

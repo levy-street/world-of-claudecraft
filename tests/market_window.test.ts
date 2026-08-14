@@ -515,21 +515,34 @@ describe('market_window: reconnect resync (#2416)', () => {
     expect(method).toContain('queryDiffersFromEcho(query, info)');
     expect(method).toContain('searchDiffersFromEcho(query, info)');
     expect(method).toContain('this.pushQuery();');
+    // Issue 3043: the Sell tab's price-check axis resets server-side on a fresh
+    // join too, independent of marketQuery, so the resync must re-arm it as
+    // well, not just the browse query.
+    expect(method).toContain('this.pushSellPriceCheck();');
   });
 
-  it('refreshIfChanged resolves the pending resync even on the Sell tab (before the sell-tab early return)', () => {
+  it('refreshIfChanged resolves the pending resync even on the Sell tab, then patches only the price ref (never the browse/collect signature work)', () => {
     const method = painter.slice(
       painter.indexOf('refreshIfChanged(): void {'),
       painter.indexOf('render(): void {'),
     );
     const resolveIdx = method.indexOf('this.resolvePendingReconnectResync(info);');
-    const sellReturnIdx = method.indexOf("if (this.tab === 'sell') return;");
+    const sellBranchIdx = method.indexOf("if (this.tab === 'sell')");
     expect(resolveIdx, 'must call resolvePendingReconnectResync').toBeGreaterThan(-1);
+    expect(sellBranchIdx, 'must still branch on the Sell tab').toBeGreaterThan(-1);
+    expect(resolveIdx, 'resync must resolve BEFORE the sell-tab branch').toBeLessThan(
+      sellBranchIdx,
+    );
+    // Patches the price ref (issue 3043) INSIDE the sell-tab branch, then still
+    // returns before it would fall through to the browse/collect signature work.
+    const refreshPriceRefIdx = method.indexOf('this.refreshSellPriceRef(info);', sellBranchIdx);
+    const sellReturnIdx = method.indexOf('return;', sellBranchIdx);
+    expect(refreshPriceRefIdx, 'must patch the price ref on the Sell tab').toBeGreaterThan(-1);
     expect(
       sellReturnIdx,
       'must still early-return before the browse/collect signature work',
     ).toBeGreaterThan(-1);
-    expect(resolveIdx).toBeLessThan(sellReturnIdx);
+    expect(refreshPriceRefIdx).toBeLessThan(sellReturnIdx);
   });
 
   it('imports queryDiffersFromEcho and searchDiffersFromEcho from the world_api seam (the pure drift checks, not re-derived comparisons)', () => {
@@ -560,6 +573,76 @@ describe('market_window: reconnect resync (#2416)', () => {
     expect(chain, 'main.ts must call the hud resync hook on reconnect').toContain(
       'hud.marketResyncAfterReconnect();',
     );
+  });
+});
+
+describe('market_window: the Sell tab price-check stays in sync with the staged item (issue 3043)', () => {
+  // The server-side echo (meta.sellPriceItemId) is a live, separate piece of
+  // session state this window drives entirely by side effect: every place the
+  // window's OWN sellItemId is cleared or set must re-arm the check, or the
+  // server keeps quoting a price for an item the player is no longer staging
+  // (a stale echo the client-side priceEcho.itemId === sellItemId guard cannot
+  // catch on its own, since it only compares against the CURRENT sellItemId).
+  it('every site that clears sellItemId also re-pushes the price check', () => {
+    const clearSites = [...painter.matchAll(/this\.sellItemId = null;/g)].map((m) => m.index);
+    // open(), close(), the cannot-market branch of renderSell, and the
+    // post-list branch of the List button handler.
+    expect(clearSites.length, 'expected exactly the known clear sites').toBe(4);
+    for (const idx of clearSites) {
+      const window = painter.slice(idx, idx + 200);
+      expect(
+        window,
+        `sellItemId clear at offset ${idx} must be followed by a pushSellPriceCheck() re-arm`,
+      ).toContain('this.pushSellPriceCheck();');
+    }
+  });
+
+  it('stageSell, the only site that stages a real item, pushes the price check', () => {
+    const method = painter.slice(
+      painter.indexOf('stageSell(itemId: string'),
+      painter.indexOf('/** The current browse query'),
+    );
+    expect(method).toContain('this.sellItemId = itemId;');
+    expect(method).toContain('this.pushSellPriceCheck();');
+  });
+
+  it('the price-ref line and its off-screen status echo carry the SAME markup (no drift between what is shown and what is announced)', () => {
+    const method = painter.slice(
+      painter.indexOf('private sellPriceRefHtml('),
+      painter.indexOf('private sellPriceRefHtml(') + 400,
+    );
+    expect(method, 'sellPriceRefHtml must exist').toContain('private sellPriceRefHtml(');
+    // Both renderSell's initial build and refreshSellPriceRef's later patch
+    // call this ONE method, so the two paint paths cannot say different things.
+    const renderSellCalls = (
+      painter
+        .slice(painter.indexOf('private renderSell('), painter.indexOf('private renderCollect('))
+        .match(/this\.sellPriceRefHtml\(/g) ?? []
+    ).length;
+    const refreshCalls = (
+      painter
+        .slice(
+          painter.indexOf('private refreshSellPriceRef('),
+          painter.indexOf('private sellPriceRefHtml('),
+        )
+        .match(/this\.sellPriceRefHtml\(/g) ?? []
+    ).length;
+    expect(renderSellCalls, 'renderSell must build the line via sellPriceRefHtml').toBe(1);
+    expect(refreshCalls, 'refreshSellPriceRef must patch the line via sellPriceRefHtml').toBe(1);
+  });
+
+  it('the price ref carries an off-screen live-region status, the .mkt-status precedent for async market content', () => {
+    const method = painter.slice(
+      painter.indexOf('private renderSell('),
+      painter.indexOf('private renderCollect('),
+    );
+    expect(method).toContain("priceRefStatus.className = 'mkt-sell-price-status visually-hidden'");
+    expect(method).toContain("priceRefStatus.setAttribute('role', 'status');");
+    expect(method).toContain("priceRefStatus.setAttribute('aria-live', 'polite');");
+  });
+
+  it('the new CSS class the price ref renders into is really defined in the extracted stylesheet', () => {
+    expect(componentsCss).toContain('.mkt-sell-price-ref {');
   });
 });
 

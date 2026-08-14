@@ -22,7 +22,7 @@
 //               (scripts/ci_shard_test.mjs) regenerates the artifacts once
 //               per job before spawning, and the guard suites still read
 //               fresh bytes on every shard.
-//   lane        the "PR gate (long sims A)" / "PR gate (long sims B)" jobs
+//   lane        the "PR long sims A" / "PR long sims B" jobs
 //               (buildLanePlan, one CI_LONG_SUITE_HALVES half each): the
 //               half's collected CI_LONG_SUITES files, all of them in full
 //               mode and on any unprovable input, only the floor/changed
@@ -73,7 +73,7 @@ export const CI_GUARD_PREFIXES = Object.freeze(['tests/parity/']);
 
 /**
  * Long rotation sims the PR tier runs in the dedicated lane jobs
- * ("PR gate (long sims A)" / "PR gate (long sims B)" in ci.yml, one
+ * ("PR long sims A" / "PR long sims B" in ci.yml, one
  * CI_LONG_SUITE_HALVES half each) instead of inside the shard matrix, so a
  * single multi-minute file stops setting the slowest shard's wall clock.
  * Membership is measured, not automated: a file joins when it costs more than
@@ -137,8 +137,8 @@ export const CI_LONG_SUITES = Object.freeze([
 ]);
 
 /**
- * The two parallel lane jobs ("PR gate (long sims A)" / "PR gate (long sims
- * B)" in ci.yml): a literal partition of CI_LONG_SUITES, so the pair's wall
+ * The two parallel lane jobs ("PR long sims A" / "PR long sims B"
+ * in ci.yml): a literal partition of CI_LONG_SUITES, so the pair's wall
  * clock is roughly half of the single-job lane's. Halves are balanced by
  * MEASURED post-diet suite duration, not file count (re-balanced 2026-08-13
  * from the per-file durations in the harness-split PR after the owned-class
@@ -481,8 +481,8 @@ export function buildShardPlan({
 }
 
 /**
- * Build the legs one long-sims lane job ("PR gate (long sims A)" or
- * "PR gate (long sims B)") executes over its CI_LONG_SUITE_HALVES half.
+ * Build the legs one long-sims lane job ("PR long sims A" or
+ * "PR long sims B") executes over its CI_LONG_SUITE_HALVES half.
  *
  * Mirror image of buildShardPlan over the SAME inputs: full mode and every
  * unprovable input run every collected lane file of this half; selective mode

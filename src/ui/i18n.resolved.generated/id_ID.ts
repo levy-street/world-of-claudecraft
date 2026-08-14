@@ -2463,7 +2463,7 @@ export const id_ID: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Pemain Curang >"
     },
     "mobTooltip": {
       "levelFamily": "{family} Level {level}",
@@ -3976,10 +3976,10 @@ export const id_ID: EnTranslations = {
       "current_ownership_required": "Diperlukan kepemilikan Seeker Genesis Token saat ini."
     },
     "cheater_mark": {
-      "admin_target": "Operator accounts cannot be marked.",
-      "reason_required": "A reason is required.",
-      "invalid_duration": "Enter a mark duration of at least one second.",
-      "not_marked": "That account is not marked."
+      "admin_target": "Akun operator tidak dapat diberi tanda.",
+      "reason_required": "Alasan wajib diisi.",
+      "invalid_duration": "Masukkan durasi tanda setidaknya satu detik.",
+      "not_marked": "Akun tersebut tidak diberi tanda."
     }
   },
   "guide": {
@@ -6699,19 +6699,19 @@ export const id_ID: EnTranslations = {
     "style": "Gaya",
     "resetLook": "Atur Ulang Tampilan",
     "resetShort": "Atur Ulang",
-    "shareTab": "Share",
-    "designCode": "Design code",
-    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
-    "copyCode": "Copy code",
-    "importCode": "Import",
-    "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
-    "designCodeImported": "Design imported.",
-    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
-    "designCodeErrEmpty": "Paste a design code first.",
-    "designCodeErrHeader": "That does not look like a design code.",
-    "designCodeErrVersion": "That design code comes from a newer game version.",
-    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
+    "shareTab": "Bagikan",
+    "designCode": "Kode tampilan",
+    "designCodeHint": "Salin kode ini untuk menyimpan atau membagikan tampilan ini. Tempel kode di sini lalu impor untuk memuatnya.",
+    "copyCode": "Salin kode",
+    "importCode": "Impor",
+    "designCodeCopied": "Kode tampilan disalin.",
+    "designCodeCopyManual": "Penyalinan otomatis diblokir di sini. Kode sudah dipilih; salin dengan papan ketik.",
+    "designCodeImported": "Tampilan diimpor.",
+    "designCodeImportedPartial": "Tampilan diimpor. Nilai yang tidak dikenali versi ini dilewati.",
+    "designCodeErrEmpty": "Tempel kode tampilan terlebih dahulu.",
+    "designCodeErrHeader": "Itu tampaknya bukan kode tampilan.",
+    "designCodeErrVersion": "Kode tampilan itu berasal dari versi gim yang lebih baru.",
+    "designCodeErrMalformed": "Kode tampilan itu rusak. Salin seluruh kode lalu coba lagi.",
     "browFlat": "Datar",
     "browArched": "Melengkung",
     "browThin": "Tipis",
@@ -9087,6 +9087,7 @@ export const id_ID: EnTranslations = {
       "filterSort": "Urutkan",
       "sortName": "Nama (A-Z)",
       "sortPriceAsc": "Harga: rendah ke tinggi",
+      "collapseLowest": "Hanya harga terendah",
       "weaponSword": "Pedang",
       "weaponDagger": "Belati",
       "weaponStaff": "Tongkat Sihir",
@@ -9117,6 +9118,8 @@ export const id_ID: EnTranslations = {
       "quantity": "Jumlah",
       "quantityOf": "dari {count}",
       "priceEach": "Harga satuan",
+      "lowestPriceLabel": "Harga penawaran terendah saat ini",
+      "lowestPriceNone": "Belum ada penawaran aktif untuk item ini.",
       "listButton": "Pajang di Pasar Dunia",
       "minPriceError": "Tetapkan harga minimal 1 tembaga.",
       "collectEmpty": "Tidak ada yang menunggu. Hasil penjualan dan daftar kedaluwarsa terkumpul di sini.",

@@ -29,10 +29,6 @@ registerDeferredPreload(() =>
   }),
 );
 
-export const farshoreFeaturesPreloadInternalsForTest = {
-  propUrls: [COCONUT_URL],
-};
-
 export function buildFarshoreFeatures(seed: number): FarshoreFeaturesView {
   const group = new THREE.Group();
   group.name = 'farshore-features';

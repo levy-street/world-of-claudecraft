@@ -229,6 +229,7 @@ describe('command facet tags (W9)', () => {
 // Append-only: never edit a tag.
 const W10_TAGS: Readonly<Record<string, string>> = {
   market_search: 'IWorldMarket',
+  market_sell_price_check: 'IWorldMarket',
   market_list: 'IWorldMarket',
   market_buy: 'IWorldMarket',
   market_cancel: 'IWorldMarket',

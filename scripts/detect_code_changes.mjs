@@ -1,4 +1,4 @@
-// CI entry for the ci.yml `changes` job ("Detect code path changes"): decide
+// CI entry for the ci.yml `changes` job ("Classify changes"): decide
 // whether the run touches the code path set and write the `code` step output,
 // plus the PR-tier selection decision (`test_mode`,
 // `test_mode_reason`, `changed_files`) the pr-gate shards consume (the CI/CD

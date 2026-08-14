@@ -73,6 +73,12 @@ the nested `npm run` forms below are the package.json script names.
 - `npm run env` / `npm run bench`: build + run the headless RL env server.
 - `npm run db:up` / `npm run db:down`: Postgres 16 in Docker (dev DB on :5433).
 - `npm run realms`: run multiple realm processes locally.
+- `node scripts/release_mint.mjs vX.Y.Z`: THE settings step when a new `release/**`
+  branch is minted (re-points the merge-queue ruleset, with an audit dump; run it
+  every mint or the queue goes silently dormant, see `docs/merge-queue.md`,
+  "Minting a release branch"). Merging on the queue-protected branches: `gh pr merge`
+  does not work there; use the `enqueuePullRequest` GraphQL mutation (exact command
+  in `docs/merge-queue.md`).
 
 See `README.md` for the full host/develop/play guide and the classic-fidelity checklist; `DEPLOY.md` for production.
 

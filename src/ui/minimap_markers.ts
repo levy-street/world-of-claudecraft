@@ -37,6 +37,7 @@ import type { GatheringProfessionId } from '../sim/content/professions';
 import { GATHER_NODES, isBgPos, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
+import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import {
   npcQuestMarkerKind,
   type QuestMarkerKind,
@@ -419,6 +420,10 @@ export function createMinimapMarkers(): MinimapMarkers {
           // top of the larger painted station marker.
           npcMarkers.push({ kind: 'npc', mx, my, glyph, marker: folded });
         } else if (e.kind === 'object') {
+          // A quest collectable this viewer is not on the quest for draws nothing at
+          // all, in any layer: it is not in the 3D scene either (the renderer withholds
+          // its view), so any blip would point at empty ground.
+          if (isQuestGatedGroundObjectHidden(e, world.questLog)) continue;
           const semantic = classifyMapObjectMarker(e, { delveRun: world.delveRun });
           if (semantic) {
             if (semantic.kind === 'dungeon') {

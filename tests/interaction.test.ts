@@ -251,6 +251,40 @@ describe('interaction.interact dispatch', () => {
     expect(obj.lootable).toBe(false);
   });
 
+  // The interact key must agree with what the player can see. A quest collectable
+  // they are not on the quest for is withheld from their client entirely, so the
+  // scan must not select it: pickUpObject would refuse it anyway, and an object
+  // nobody can see must never outrank a visible one standing further away.
+  it('nearest-scan: skips an off-quest collectable and takes the farther visible object', () => {
+    const { sim, a } = twoPlayers();
+    const crate = groundObj(sim, 'supply_crate', 20, 20.5); // nearer, but off-quest
+    groundObj(sim, 'wolf_fang', 20, 21.5); // farther, plainly visible
+    (sim.entities.get(a) as AnyEntity).targetId = null;
+    sim.events = [];
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(sim.countItem('supply_crate', a)).toBe(0);
+    expect(crate.lootable).toBe(true);
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    // No denial either: the press never reached the hidden crate at all.
+    expect(errors(sim)).toEqual([]);
+  });
+
+  it('nearest-scan: takes that same collectable once its quest is active', () => {
+    const { sim, a } = twoPlayers();
+    const crate = groundObj(sim, 'supply_crate', 20, 20.5);
+    const questId = ITEMS.supply_crate?.questId;
+    if (!questId) throw new Error('expected supply_crate to name its quest');
+    sim.players.get(a)?.questLog.set(questId, { questId, counts: [0], state: 'active' });
+    (sim.entities.get(a) as AnyEntity).targetId = null;
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(sim.countItem('supply_crate', a)).toBe(1);
+    expect(crate.lootable).toBe(false);
+  });
+
   it('nearest-scan: a nearer corpse wins over a farther object', () => {
     const { sim, a } = twoPlayers();
     const obj = groundObj(sim, 'wolf_fang', 20, 23); // farther

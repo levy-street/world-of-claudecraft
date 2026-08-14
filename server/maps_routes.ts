@@ -62,11 +62,6 @@ export function resetMapsServiceForTests(): void {
   mapsService = REAL_MAPS_SERVICE;
 }
 
-/** The live maps service (read at call time so the test seam applies). */
-export function liveMapsService(): MapsService {
-  return mapsService;
-}
-
 // ---------------------------------------------------------------------------
 // Legacy wire bodies shared by both arms. Stable snake_case codes the editor
 // client maps to its own t() keys (see server/maps.ts), so no server_i18n

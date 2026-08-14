@@ -44,6 +44,9 @@ export interface NetPipelineSummary {
   // rate (at 60 Hz about two thirds of frames are r0); starvation shows as
   // the gapMs digest stretching plus r2/r3plus bursts, not as r0 alone.
   snapshotsPerRaf: { r0: number; r1: number; r2: number; r3plus: number };
+  // Optional for compatibility with persisted pre-backpressure summaries.
+  // New summaries always include this fixed-size client send diagnostic.
+  inputBackpressure?: { sheds: number; peakBufferedBytes: number };
 }
 
 const RING_CAPACITY = 1024;
@@ -102,6 +105,8 @@ export class NetPipelineStats {
   private keepCountTotal = 0;
   private pendingSinceRaf = 0;
   private histogram = { r0: 0, r1: 0, r2: 0, r3plus: 0 };
+  private inputBackpressureSheds = 0;
+  private inputBackpressurePeakBytes = 0;
   // Injected-clock bookkeeping, public for dev-console diagnostics only; the
   // summary record stays fixed-size without them.
   lastSnapshotAtMs = 0;
@@ -145,6 +150,17 @@ export class NetPipelineStats {
     this.pendingSinceRaf = 0;
   }
 
+  noteInputBackpressure(bufferedAmount: number): void {
+    // Fixed-size, saturating diagnostics: a long-lived congested tab cannot
+    // grow telemetry memory or roll its count past JavaScript's safe integers.
+    this.inputBackpressureSheds = Math.min(
+      Number.MAX_SAFE_INTEGER,
+      this.inputBackpressureSheds + 1,
+    );
+    const boundedBytes = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(bufferedAmount)));
+    this.inputBackpressurePeakBytes = Math.max(this.inputBackpressurePeakBytes, boundedBytes);
+  }
+
   summary(): NetPipelineSummary {
     return {
       snapshots: this.snapshots,
@@ -156,6 +172,10 @@ export class NetPipelineStats {
       applyMs: this.applyRing.digest(),
       gapMs: this.gapRing.digest(),
       snapshotsPerRaf: { ...this.histogram },
+      inputBackpressure: {
+        sheds: this.inputBackpressureSheds,
+        peakBufferedBytes: this.inputBackpressurePeakBytes,
+      },
     };
   }
 }

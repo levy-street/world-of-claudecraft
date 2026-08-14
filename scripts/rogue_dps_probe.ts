@@ -1,149 +1,266 @@
-// Rogue v0.29 DPS probe: sustained per-spec DPS with the spec engines and the
-// redesigned rows, in /dev bis epic gear, against a training dummy for 123
-// seconds (the fury probe's fight length; run scripts/fury_dps_probe.ts for
-// the peer reference). Engine-aware priority rotations: poison up, Cutthroat
-// Tempo maintained, 5-combo Dirt Naps (which
-// the engines turn into Venomrend detonations and Redline windows), Veilstrike
-// windows for Skulduggery, signature and Flurry of Knives on cooldown.
+// Deterministic Rogue sustained-DPS probe for the v0.29 spec engines and rows.
+// The reusable API runs in an empty ambient world so tests measure the Rogue
+// rotation instead of paying for continent-wide AI. The CLI retains the full
+// row sweep used for exploratory tuning.
+//
 // npx tsx scripts/rogue_dps_probe.ts
-import { MOBS } from '../src/sim/data';
+
+import type { TalentRowLevel } from '../src/sim/content/talents';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { equipBestInSlotForDev } from '../src/sim/dev/bis_gear';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
+import { anchorProbeInOpenField } from './probe_anchor';
 
-const FIGHT_SECONDS = 123;
-const TICKS = FIGHT_SECONDS * 20;
+export type RogueProbeSpec = 'assassination' | 'combat' | 'subtlety';
+export type RogueProbeRow14 =
+  | 'rog_r14_dusk_economy'
+  | 'rog_r14_venom_dividend'
+  | 'rog_r14_ceaseless_cuts';
+export type RogueProbeRow20 = 'rog_r20_second_shadow' | 'rog_r20_deathmark';
 
-type AnySim = Sim & Record<string, any>;
+export interface RogueProbeBuild {
+  row14: RogueProbeRow14;
+  row20: RogueProbeRow20;
+}
 
-const SPECS = ['assassination', 'combat', 'subtlety'] as const;
-const R14 = ['rog_r14_dusk_economy', 'rog_r14_venom_dividend', 'rog_r14_ceaseless_cuts'] as const;
-const R20 = ['rog_r20_second_shadow', 'rog_r20_deathmark'] as const;
+export interface RogueDpsResult {
+  spec: RogueProbeSpec;
+  seconds: number;
+  targetArmor: number;
+  damage: number;
+  dps: number;
+  seeds: readonly number[];
+  build: RogueProbeBuild;
+}
 
-const SEEDS = [4242, 777, 1313, 99, 2024, 555, 31337, 8080];
+type ProbeSim = Sim & {
+  addEntity(entity: Entity): void;
+};
 
-function runSeed(seed: number, spec: (typeof SPECS)[number], r14: string, r20: string): number {
-  const sim = new Sim({ seed, playerClass: 'rogue', autoEquip: true }) as AnySim;
-  sim.setPlayerLevel(20);
-  if (!sim.setSpec(spec)) throw new Error(`setSpec ${spec} failed`);
-  for (const [level, row] of [
-    [5, 'rog_r5_killers_pace'],
-    [8, 'rog_r8_borrowed_breath'],
-    [11, 'rog_r11_marked_prey'],
-    [14, r14],
-    [17, 'rog_r17_flurry_of_knives'],
-    [20, r20],
-  ] as const) {
-    if (!sim.selectTalentRow(level, row)) throw new Error(`row pick failed: ${row}`);
+const ROGUE_PROBE_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
+const SPECS: RogueProbeSpec[] = ['assassination', 'combat', 'subtlety'];
+const R14: RogueProbeRow14[] = [
+  'rog_r14_dusk_economy',
+  'rog_r14_venom_dividend',
+  'rog_r14_ceaseless_cuts',
+];
+const R20: RogueProbeRow20[] = ['rog_r20_second_shadow', 'rog_r20_deathmark'];
+const EXPLORATORY_SEEDS = [4242, 777, 1313, 99, 2024, 555, 31337, 8080] as const;
+
+// La Luna's fight-6498 build, recorded here so the accepted balance fixture is
+// reproducible rather than dependent on a live character save. The common rows
+// establish the same engine-aware rotation used by the original tuning probe.
+export const LA_LUNA_ROGUE_BUILD: RogueProbeBuild = {
+  row14: 'rog_r14_ceaseless_cuts',
+  row20: 'rog_r20_second_shadow',
+};
+
+export const LA_LUNA_ROGUE_ROWS: Partial<Record<TalentRowLevel, string>> = {
+  5: 'rog_r5_killers_pace',
+  8: 'rog_r8_borrowed_breath',
+  11: 'rog_r11_marked_prey',
+  14: LA_LUNA_ROGUE_BUILD.row14,
+  17: 'rog_r17_flurry_of_knives',
+  20: LA_LUNA_ROGUE_BUILD.row20,
+};
+
+export const ROGUE_BAND_FIXTURE = {
+  seconds: 60,
+  seeds: [4242, 777, 1313] as const,
+  // The inert target keeps encounter mechanics out of a class-throughput
+  // probe while taking the level-20 Nythraxis template's full 798 armor.
+  targetArmor: Math.round(MOBS.nythraxis_scourge_of_thornpeak.armorPerLevel * 19),
+  build: LA_LUNA_ROGUE_BUILD,
+  rows: LA_LUNA_ROGUE_ROWS,
+};
+
+function talentRows(build: RogueProbeBuild): Partial<Record<TalentRowLevel, string>> {
+  return {
+    ...LA_LUNA_ROGUE_ROWS,
+    14: build.row14,
+    20: build.row20,
+  };
+}
+
+function spawnTarget(sim: ProbeSim, armor: number): Entity {
+  const player = sim.player;
+  const target = createMob(93001, MOBS.training_dummy, 20, {
+    x: player.pos.x,
+    y: player.pos.y,
+    z: player.pos.z + 2,
+  });
+  target.hostile = true;
+  target.aiState = 'idle';
+  target.moveSpeed = 0;
+  target.stats.armor = armor;
+  target.maxHp = 100_000_000;
+  target.hp = target.maxHp;
+  target.weapon.min = 0;
+  target.weapon.max = 0;
+  target.weapon.speed = 100;
+  sim.addEntity(target);
+  sim.targetEntity(target.id);
+  player.facing = Math.atan2(target.pos.x - player.pos.x, target.pos.z - player.pos.z);
+  return target;
+}
+
+function castRotation(sim: Sim, spec: RogueProbeSpec): void {
+  const player = sim.player;
+  const sliceAndDiceUp = player.auras.some(
+    (aura) => aura.kind === 'buff_haste' && aura.id === 'slice_and_dice',
+  );
+  const gloamArmed = (player.auras.find((aura) => aura.id === 'gloam')?.stacks ?? 0) >= 3;
+  const veilstrikeUp = player.auras.some((aura) => aura.id === 'veilstrike');
+
+  if (!player.cooldowns.has('adrenaline_rush')) sim.castAbility('adrenaline_rush');
+  if (!player.cooldowns.has('flurry_of_knives')) sim.castAbility('flurry_of_knives');
+  if (spec === 'assassination' && !player.cooldowns.has('cold_blood')) {
+    sim.castAbility('cold_blood');
+  }
+  if (spec === 'combat' && !player.cooldowns.has('blade_flurry')) {
+    sim.castAbility('blade_flurry');
   }
 
-  const p: Entity = sim.player;
-  equipBestInSlotForDev(sim.ctx, p.id);
-  // Poison up before the pull (30 min imbue; Knifework's mastery scales it).
-  p.resource = p.maxResource;
+  if (spec === 'subtlety' && gloamArmed && !veilstrikeUp) {
+    sim.castAbility('ambush');
+    return;
+  }
+  if (
+    spec === 'assassination' &&
+    player.comboPoints < 5 &&
+    !player.cooldowns.has('venom_dart') &&
+    player.auras.some((aura) => aura.id === 'venom_ritual')
+  ) {
+    sim.castAbility('venom_dart');
+  }
+
+  const redline = player.auras.find((aura) => aura.id === 'redline');
+  if (spec === 'subtlety' && veilstrikeUp && player.resource >= 60 && player.comboPoints <= 3) {
+    sim.castAbility('cheap_shot');
+  } else if (spec === 'combat' && redline) {
+    const pips = redline.stacks ?? 1;
+    const closing = redline.remaining < 1.6;
+    if (player.comboPoints >= 5 && (pips >= 4 || closing)) sim.castAbility('eviscerate');
+    else if (player.comboPoints >= 4 && closing) sim.castAbility('eviscerate');
+    else sim.castAbility('sinister_strike');
+  } else if (!sliceAndDiceUp && player.comboPoints >= 2) {
+    sim.castAbility('slice_and_dice');
+  } else if (player.comboPoints >= 5) {
+    if (spec !== 'combat' || player.resource >= 70) sim.castAbility('eviscerate');
+  } else {
+    const builder =
+      spec === 'subtlety'
+        ? 'hemorrhage'
+        : spec === 'assassination'
+          ? 'backstab'
+          : 'sinister_strike';
+    sim.castAbility(builder);
+    if (player.comboPoints === 0 && spec !== 'combat') sim.castAbility('sinister_strike');
+  }
+}
+
+export function runRogueDpsProbe(
+  spec: RogueProbeSpec,
+  seed: number,
+  seconds: number,
+  targetArmor: number,
+  build: RogueProbeBuild,
+): RogueDpsResult {
+  const sim = new Sim({
+    seed,
+    playerClass: 'rogue',
+    autoEquip: false,
+    world: ROGUE_PROBE_WORLD,
+  }) as ProbeSim;
+  sim.setPlayerLevel(20);
+  anchorProbeInOpenField(sim);
+  if (!sim.applyTalents({ spec, rows: talentRows(build) })) {
+    throw new Error(`failed to apply ${spec} probe build`);
+  }
+
+  // /dev bis chooses only epic items, so the representative current loadout
+  // cannot include the legendary this band intentionally excludes.
+  if (equipBestInSlotForDev(sim.ctx, sim.playerId) === 0) {
+    throw new Error(`failed to equip ${spec} probe loadout`);
+  }
+
+  const player = sim.player;
+  player.resource = player.maxResource;
   sim.castAbility('deadly_poison');
-  for (let i = 0; i < 40; i++) sim.tick();
+  for (let tick = 0; tick < 40; tick++) sim.tick();
 
-  const dummy = createMob(93001, MOBS.training_dummy, 20, {
-    x: p.pos.x,
-    y: p.pos.y,
-    z: p.pos.z + 2,
-  });
-  dummy.maxHp = dummy.hp = 10_000_000;
-  sim.addEntity(dummy);
-  sim.targetEntity(dummy.id);
-  p.facing = 0;
-
-  // Every build opens from Duskveil with Gut Punch (fair pre-pull: any rogue
-  // can, and Grave Brand builds must not be the only ones credited for it).
+  const target = spawnTarget(sim, targetArmor);
   sim.castAbility('stealth');
-  for (let i = 0; i < 25; i++) sim.tick();
-  p.resource = p.maxResource;
+  for (let tick = 0; tick < 25; tick++) sim.tick();
+  player.resource = player.maxResource;
   sim.castAbility('cheap_shot');
-  for (let i = 0; i < 5; i++) sim.tick();
+  for (let tick = 0; tick < 5; tick++) sim.tick();
 
   sim.startAutoAttack();
-  const startHp = dummy.hp;
-  const builder =
-    spec === 'subtlety' ? 'hemorrhage' : spec === 'assassination' ? 'backstab' : 'sinister_strike';
-
-  for (let i = 0; i < TICKS; i++) {
-    const sndUp = p.auras.some((a: any) => a.kind === 'buff_haste' && a.id === 'slice_and_dice');
-    const bankArmed = (p.auras.find((a: any) => a.id === 'gloam')?.stacks ?? 0) >= 3;
-    const veilUp = p.auras.some((a: any) => a.id === 'veilstrike');
-    if (!p.cooldowns.has('adrenaline_rush')) sim.castAbility('adrenaline_rush');
-    if (!p.cooldowns.has('flurry_of_knives')) sim.castAbility('flurry_of_knives');
-    if (spec === 'assassination' && !p.cooldowns.has('cold_blood')) sim.castAbility('cold_blood');
-    if (spec === 'combat' && !p.cooldowns.has('blade_flurry')) sim.castAbility('blade_flurry');
-    // The detonator is free, so a full bank fires the doubled Lurker's
-    // Strike immediately; Thuggery still pools before opening its window.
-    if (spec === 'subtlety' && bankArmed && !veilUp) {
-      sim.castAbility('ambush'); // the free detonator
-      sim.tick();
-      continue;
-    }
-    if (
-      spec === 'assassination' &&
-      p.comboPoints < 5 &&
-      !p.cooldowns.has('venom_dart') &&
-      p.auras.some((a: any) => a.id === 'venom_ritual')
-    ) {
-      sim.castAbility('venom_dart'); // tend the wound between detonations
-    }
-    const redlineUp = p.auras.some((a: any) => a.id === 'redline');
-    if (spec === 'subtlety' && veilUp && p.resource >= 60 && p.comboPoints <= 3) {
-      sim.castAbility('cheap_shot'); // veil-window opener
-    } else if (spec === 'combat' && redlineUp) {
-      // Inside the window the buttons transform: Body Blow (the Wicked Slash
-      // slot) deepens the run, and once the pips are deep or the clock is
-      // short, the Dirt Nap slot cashes out as Knockout Blow.
-      const run = p.auras.find((a: any) => a.id === 'redline');
-      const pips = run?.stacks ?? 1;
-      const closing = (run?.remaining ?? 0) < 1.6;
-      if (p.comboPoints >= 5 && (pips >= 4 || closing)) sim.castAbility('eviscerate');
-      else if (p.comboPoints >= 4 && closing) sim.castAbility('eviscerate');
-      else sim.castAbility('sinister_strike'); // resolves as Body Blow
-    } else if (!sndUp && p.comboPoints >= 2) sim.castAbility('slice_and_dice');
-    else if (p.comboPoints >= 5) {
-      if (spec === 'combat' && p.resource < 70) {
-        // Pool to open Redline hot: the sprint inside the fixed 8 sec window
-        // is where the spec's damage lives.
-      } else {
-        // Venomrend re-opens its own wound, so Knifework never juggles Bleed
-        // Out upkeep: every full finisher press is Dirt Nap or the armed rend.
-        sim.castAbility('eviscerate');
-      }
-    } else {
-      sim.castAbility(builder);
-      if (p.comboPoints === 0 && spec !== 'combat') sim.castAbility('sinister_strike');
-    }
+  const startHp = target.hp;
+  for (let tick = 0; tick < seconds * 20; tick++) {
+    castRotation(sim, spec);
     sim.tick();
   }
-  return (startHp - dummy.hp) / FIGHT_SECONDS;
+  const damage = startHp - target.hp;
+  return {
+    spec,
+    seconds,
+    targetArmor,
+    damage,
+    dps: damage / seconds,
+    seeds: [seed],
+    build,
+  };
 }
 
-// Single-seed runs carry 2 to 5% trajectory noise, and three-seed averages
-// still shuffled the thin knifework row margin; eight seeds hold it stable.
-function run(spec: (typeof SPECS)[number], r14: string, r20: string): number {
-  const total = SEEDS.reduce((sum, seed) => sum + runSeed(seed, spec, r14, r20), 0);
-  return total / SEEDS.length;
+export function averageRogueDps(
+  spec: RogueProbeSpec,
+  seeds: readonly number[],
+  seconds: number,
+  targetArmor: number,
+  build: RogueProbeBuild,
+): RogueDpsResult {
+  if (seeds.length === 0) throw new Error('Rogue DPS probe requires at least one seed');
+  const runs = seeds.map((seed) => runRogueDpsProbe(spec, seed, seconds, targetArmor, build));
+  const damage = runs.reduce((sum, result) => sum + result.damage, 0) / runs.length;
+  return {
+    spec,
+    seconds,
+    targetArmor,
+    damage,
+    dps: damage / seconds,
+    seeds: [...seeds],
+    build,
+  };
 }
 
-console.log('spec, r14, r20, dps');
-const results: { spec: string; r14: string; r20: string; dps: number }[] = [];
-for (const spec of SPECS) {
-  for (const r14 of R14) {
-    for (const r20 of R20) {
-      const dps = run(spec, r14, r20);
-      results.push({ spec, r14, r20, dps });
-      console.log(
-        `${spec}, ${r14.replace('rog_r14_', '')}, ${r20.replace('rog_r20_', '')}, ${dps.toFixed(1)}`,
-      );
+if (process.argv[1]?.endsWith('rogue_dps_probe.ts')) {
+  console.log('spec, r14, r20, dps');
+  const results: RogueDpsResult[] = [];
+  for (const spec of SPECS) {
+    for (const row14 of R14) {
+      for (const row20 of R20) {
+        const result = averageRogueDps(spec, EXPLORATORY_SEEDS, 123, 0, { row14, row20 });
+        results.push(result);
+        console.log(
+          `${spec}, ${row14.replace('rog_r14_', '')}, ${row20.replace('rog_r20_', '')}, ${result.dps.toFixed(1)}`,
+        );
+      }
     }
   }
-}
-for (const spec of SPECS) {
-  const best = results.filter((r) => r.spec === spec).sort((a, b) => b.dps - a.dps)[0];
-  console.log(`BEST ${spec}: ${best.r14} + ${best.r20} = ${best.dps.toFixed(1)} dps`);
+  for (const spec of SPECS) {
+    const best = results.filter((result) => result.spec === spec).sort((a, b) => b.dps - a.dps)[0];
+    console.log(
+      `BEST ${spec}: ${best.build.row14} + ${best.build.row20} = ${best.dps.toFixed(1)} dps`,
+    );
+  }
 }

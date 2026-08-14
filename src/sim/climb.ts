@@ -152,9 +152,4 @@ export function advanceClimb(p: Entity): boolean {
   return true;
 }
 
-/** How high above its start a climb is reaching, for tests and telemetry. */
-export function climbRise(c: LedgeClimb): number {
-  return c.to.y - c.from.y;
-}
-
 export { LEDGE_GRAB_MAX, LEDGE_GRAB_MIN };

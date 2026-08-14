@@ -55,9 +55,14 @@ The nine image-generation batch records were copied byte for byte from
 `tmp/imagegen/placeholder-art-completion/`; only their destination filenames changed. The
 portrait record comes byte for byte from `tmp/portrait-rerender/evidence.json`.
 The all-portrait source manifest is deterministically checked with
-`node scripts/build_mob_portrait_source_manifest.mjs --check`. After a source or output
-change, the real renderer must run with `PORTRAIT_RECEIPT=<path>` and that receipt must be
-passed to `node scripts/build_mob_portrait_source_manifest.mjs --write --receipt <path>`.
+`node scripts/build_mob_portrait_source_manifest.mjs --check`. `--check` still hard-fails on
+any change to a portrait row, a tracked renderer source file, the schema, or the portrait
+count; it tolerates only a renderer-bundle-digest move with everything else proven
+byte-identical (`isBundleOnlyDrift` in the script), since that bundle's import graph reaches
+unrelated gameplay/render modules and moving on its own means no image byte changed. After a
+real source or output change, the real renderer must run with `PORTRAIT_RECEIPT=<path>` and
+that receipt must be passed to
+`node scripts/build_mob_portrait_source_manifest.mjs --write --receipt <path>`.
 The renderer and ledger share `scripts/lib/mob_portrait_jobs.mjs`; partial, stale, or
 mismatched receipts are rejected, and a renderer-contract change requires all 230 rows.
 Absolute paths into `/Users/fernando/.codex/generated_images/` and the worktree are

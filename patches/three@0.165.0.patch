@@ -1,8 +1,8 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..ed0cb5204fe7f1bf6aaf3e42101c95250fb79eb4 100644
+index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..b7e839fae96c7848a5558c67952f259e95c23c54 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
-@@ -29301,21 +29301,57 @@ class WebGLRenderer {
+@@ -29301,21 +29301,80 @@ class WebGLRenderer {
  
  			return new Promise( ( resolve ) => {
  
@@ -33,6 +33,17 @@ index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..ed0cb5204fe7f1bf6aaf3e42101c9525
 +					const pending = Array.from( materials );
 +					const passStart = performance.now();
 +
++					// World of ClaudeCraft: dedupe COMPLETION_STATUS_KHR queries by
++					// program within a pass. Materials share linked programs through
++					// the program cache, and isReady() only caches a POSITIVE result:
++					// while a shared program is still linking, every material holding
++					// it repaid the synchronous GPU-process query in the same pass.
++					// One not-ready verdict per program now covers all its materials
++					// for the rest of the pass (ready programs stay cheap through
++					// isReady()'s own positive cache), so a budgeted pass spends its
++					// 2 ms on DISTINCT pending programs instead of repeat queries.
++					const notReadyThisPass = new Set();
++
 +					for ( let i = 0; i < pending.length; i ++ ) {
  
 +						const material = pending[ ( pollCursor + i ) % pending.length ];
@@ -44,11 +55,24 @@ index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..ed0cb5204fe7f1bf6aaf3e42101c9525
 +						// If churn releases renderer properties during this timer poll,
 +						// no program remains to wait for. Removing the material avoids the
 +						// isReady TypeError and lets the promise settle. Recheck on upgrade.
-+						if ( program === undefined || program.isReady() ) {
++						if ( program === undefined ) {
  
- 							// remove any programs that report they're ready to use from the list
+-							// remove any programs that report they're ready to use from the list
  							materials.delete( material );
  
++						} else if ( notReadyThisPass.has( program ) === false ) {
++
++							if ( program.isReady() ) {
++
++								// remove any programs that report they're ready to use from the list
++								materials.delete( material );
++
++							} else {
++
++								notReadyThisPass.add( program );
++
++							}
++
  						}
  
 -					} );
@@ -63,7 +87,7 @@ index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..ed0cb5204fe7f1bf6aaf3e42101c9525
  
  					// once the list of compiling materials is empty, call the callback
  
-@@ -29326,9 +29362,19 @@ class WebGLRenderer {
+@@ -29326,9 +29385,19 @@ class WebGLRenderer {
  
  					}
  

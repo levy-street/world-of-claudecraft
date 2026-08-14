@@ -12575,6 +12575,23 @@
     color: var(--color-text-muted);
     text-transform: uppercase;
   }
+  /* The "lowest price of each" Browse toggle: a real labeled checkbox sharing the
+     controls grid with search and the filter selects (issue #3103). Own class, not
+     `.mkt-filter`, so its inline label text does not inherit that rule's tiny
+     uppercase filter-name styling meant for the select cells above it. */
+  .mkt-collapse-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    max-width: none;
+    cursor: var(--cursor-point);
+  }
+  .mkt-collapse-toggle span {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: #f0e4c8;
+  }
   .mkt-select {
     position: relative;
     min-width: 0;
@@ -12867,6 +12884,21 @@
   }
   .mkt-sell-pick .ps-name {
     font-size: 13px;
+  }
+  /* The Sell tab's current-lowest-price reference (issue #3043): a same-page
+     market check. Muted like the adjacent .mkt-price-row labels, so the
+     reference reads as informational context, not competing emphasis with the
+     price the player is about to set. Empty (no text) while the server's echo
+     has not confirmed a value yet; a separate off-screen .mkt-sell-price-status
+     live region announces the same text once it lands (see market_window.ts). */
+  .mkt-sell-price-ref {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 0 0 10px;
+    font-family: var(--font-ui);
+  }
+  .mkt-sell-price-ref .mkt-price {
+    margin-left: 4px;
   }
   .mkt-price-form {
     display: flex;

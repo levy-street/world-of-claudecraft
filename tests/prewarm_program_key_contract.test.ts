@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -175,7 +176,7 @@ describe('prewarm program key contract', () => {
   });
 
   it('fails on adoption of the features the dedupe key deliberately omits', () => {
-    const renderRoot = path.join(path.dirname(new URL(import.meta.url).pathname), '../src/render');
+    const renderRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/render');
     const offenders: string[] = [];
     for (const { file, full } of tsFilesUnder(renderRoot)) {
       const source = readFileSync(full, 'utf8');

@@ -740,10 +740,31 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // delve interior scheduler extraction; renderer.ts edits only): the composite
 // follows renderer.ts and this metadata authority sha follows the swept
 // bytes. No capture was retaken.
+// Re-minted for PR #3339's healGlowAt view-eviction fix on the newer release
+// renderer. The rendererIntegration leaf and swept evidence bytes move; no
+// capture was retaken.
+// Re-minted for PR #3344 after removing the unused Eastbrook civic-beacon
+// preload test hook. The civicShader leaf and swept evidence bytes move; no
+// capture was retaken.
+// Re-minted after applying the PR #3339 review repair atop PR #3344. The
+// rendererIntegration and civicShader leaves both survive, and the swept
+// evidence follows the combined inputs. No capture was retaken.
+// Re-minted for final PR #3345 integration. The reviewed offscreen-heal
+// renderer bytes remain while the Three.js patch, lockfile, and accepted GLBs
+// join the provenance inputs. No capture was retaken.
+// Re-minted after extracting entity-view policy from renderer.ts to satisfy
+// the release monolith ratchet. Behavior is unchanged; no capture was retaken.
+// Re-minted again after registering the extracted policy as its own provenance
+// leaf. The captures remain unchanged and were not retaken.
+// Re-minted for the fifteenth farming absorb (release/v0.38.0 tip merged into
+// the phase branch): both parents move renderer.ts and the release adds the
+// entity-view-policy leaf, so the composite mints a value matching neither
+// parent and this metadata authority sha follows the swept bytes. No capture
+// was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'bf3cb267e4a078d35a2ab50df0d4666d3586e31b19706a3d6a547533cb1af07d';
+  'bd3b4c854cff592728f935e514059945fc265e77ef7d8d963655d804180ad00a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '082cb9ab4cf8bc05d0323be8df66f774bb5c1a69f850d3ac7262e4c3ded8fbd4';
+  '885266cc0dc9ad7963784721ecbb25d5d16a95237371957e359f43f5b65f4b05';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1712,13 +1733,29 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // both parents move renderer.ts, so the first-order composite mints anew and
     // this second-order seal follows the swept evidence bytes. No capture was
     // retaken.
+    // Re-pinned for PR #3339's healGlowAt view-eviction fix on the newer release
+    // renderer. The first-order composite follows renderer.ts, then this
+    // second-order seal follows the swept evidence bytes. No capture was retaken.
+    // Re-pinned for PR #3344 after removing the unused Eastbrook civic-beacon
+    // preload test hook. The first-order composite follows the civicShader leaf,
+    // then this second-order seal follows the swept bytes. No capture was retaken.
+    // Re-pinned after applying the PR #3339 review repair atop PR #3344. The
+    // first-order composite follows both retained leaves, then this second-order
+    // seal follows the swept evidence bytes. No capture was retaken.
+    // Re-pinned for final PR #3345 integration. The first-order composite follows
+    // the combined renderer, lockfile, and GLBs, then this seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-pinned after extracting entity-view policy from renderer.ts for the
+    // monolith ratchet. The seal follows the swept bytes; no capture was retaken.
+    // Re-pinned again after the policy became an explicit provenance leaf. The
+    // performance records changed only in their swept provenance blocks.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-      // Re-minted for the farming phase 7 render wiring (renderer.ts edits
-      // only), then this second-order performance seal follows the swept
-      // evidence bytes. No capture was retaken.
-    ).toBe('cfca3c02381541c3cf47d46fd5eed6f5ccaaa62f6eda25e2127f97da7dd64194');
+      // Re-minted for the fifteenth farming absorb (both parents moved the
+      // provenance inputs), then this second-order performance seal follows
+      // the swept evidence bytes. No capture was retaken.
+    ).toBe('80d5645f0320e833966218faa779904727204ca1efc315f97e957f41fd7ed521');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

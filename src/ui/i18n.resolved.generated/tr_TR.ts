@@ -2463,7 +2463,7 @@ export const tr_TR: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "UZAKTA",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Hileci >"
     },
     "mobTooltip": {
       "levelFamily": "Seviye {level} {family}",
@@ -3976,10 +3976,10 @@ export const tr_TR: EnTranslations = {
       "current_ownership_required": "Seeker Genesis Token'a şu anda sahip olmanız gerekir."
     },
     "cheater_mark": {
-      "admin_target": "Operator accounts cannot be marked.",
-      "reason_required": "A reason is required.",
-      "invalid_duration": "Enter a mark duration of at least one second.",
-      "not_marked": "That account is not marked."
+      "admin_target": "Operatör hesapları işaretlenemez.",
+      "reason_required": "Bir neden belirtilmesi gerekir.",
+      "invalid_duration": "En az bir saniyelik bir işaret süresi gir.",
+      "not_marked": "Bu hesap işaretli değil."
     }
   },
   "guide": {
@@ -6699,19 +6699,19 @@ export const tr_TR: EnTranslations = {
     "style": "Stil",
     "resetLook": "Görünümü Sıfırla",
     "resetShort": "Sıfırla",
-    "shareTab": "Share",
-    "designCode": "Design code",
-    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
-    "copyCode": "Copy code",
-    "importCode": "Import",
-    "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
-    "designCodeImported": "Design imported.",
-    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
-    "designCodeErrEmpty": "Paste a design code first.",
-    "designCodeErrHeader": "That does not look like a design code.",
-    "designCodeErrVersion": "That design code comes from a newer game version.",
-    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
+    "shareTab": "Paylaş",
+    "designCode": "Görünüm kodu",
+    "designCodeHint": "Bu görünümü kaydetmek veya paylaşmak için kodu kopyala. Bir görünümü yüklemek için kodu buraya yapıştırıp içe aktar.",
+    "copyCode": "Kodu kopyala",
+    "importCode": "İçe aktar",
+    "designCodeCopied": "Görünüm kodu kopyalandı.",
+    "designCodeCopyManual": "Otomatik kopyalama burada engellendi. Kod seçildi; klavyeni kullanarak kopyala.",
+    "designCodeImported": "Görünüm içe aktarıldı.",
+    "designCodeImportedPartial": "Görünüm içe aktarıldı. Bu sürümün tanımadığı değerler atlandı.",
+    "designCodeErrEmpty": "Önce bir görünüm kodu yapıştır.",
+    "designCodeErrHeader": "Bu bir görünüm koduna benzemiyor.",
+    "designCodeErrVersion": "Bu görünüm kodu oyunun daha yeni bir sürümünden geliyor.",
+    "designCodeErrMalformed": "Bu görünüm kodu bozuk. Kodun tamamını kopyalayıp yeniden dene.",
     "browFlat": "Düz",
     "browArched": "Kavisli",
     "browThin": "İnce",
@@ -9087,6 +9087,7 @@ export const tr_TR: EnTranslations = {
       "filterSort": "Sırala",
       "sortName": "Ad (A-Z)",
       "sortPriceAsc": "Fiyat: düşükten yükseğe",
+      "collapseLowest": "Yalnızca en düşük fiyat",
       "weaponSword": "Kılıçlar",
       "weaponDagger": "Hançerler",
       "weaponStaff": "Asalar",
@@ -9117,6 +9118,8 @@ export const tr_TR: EnTranslations = {
       "quantity": "Miktar",
       "quantityOf": "/ {count}",
       "priceEach": "Adet fiyatı",
+      "lowestPriceLabel": "Mevcut en düşük ilan fiyatı",
+      "lowestPriceNone": "Bu eşya için henüz etkin ilan yok.",
       "listButton": "Dünya Pazarı'na koy",
       "minPriceError": "En az 1 bakır bir fiyat belirleyin.",
       "collectEmpty": "Bekleyen bir şey yok. Satış gelirleri ve süresi dolan ilanlar burada toplanır.",

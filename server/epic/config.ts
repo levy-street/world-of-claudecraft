@@ -25,11 +25,6 @@ export function epicProductId(env: NodeJS.ProcessEnv = process.env): string | nu
   return nonEmpty(env, 'EPIC_PRODUCT_ID');
 }
 
-/** EOS sandbox id when the chosen verify path needs one, or null when unset. */
-export function epicSandboxId(env: NodeJS.ProcessEnv = process.env): string | null {
-  return nonEmpty(env, 'EPIC_SANDBOX_ID');
-}
-
 /** EOS deployment id, or null when unset. Read only when enabled. */
 export function epicDeploymentId(env: NodeJS.ProcessEnv = process.env): string | null {
   return nonEmpty(env, 'EPIC_DEPLOYMENT_ID');
