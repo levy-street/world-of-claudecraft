@@ -3387,9 +3387,14 @@ applied in the fix round or recorded below.
   receipt flow with the placeholder-art second seal layer in the same
   change). Blob band re-cut two-sided 10789 < bytes < 11109 around the
   measured 10949 (recipes 124 -> 132, ~193 bytes; structural ceiling
-  12288 untouched, ~1339 headroom). 13 mutation probes killed every new
-  guard (probe log in the QA handoff). shipped_item_ids golden: +8, no
-  removals. Parity goldens unmoved (the phase draws zero rng; a flask
+  12288 untouched, ~1339 headroom). 13 mutation probes killed every
+  guard THEY TRIED; the test-coverage-auditor later proved two shapes
+  the set missed (a mint sharing a line with a legal perfected read
+  defeated the first tripwire build; an id-prefix strip keying passed
+  the flask suite because every cross-family case put the flask first),
+  both closed with re-proven probes in the final test round. Do not
+  inherit the stronger "every guard" claim. shipped_item_ids golden:
+  +8, no removals. Parity goldens unmoved (the phase draws zero rng; a flask
   parity golden was considered and DECLINED: golden moves cost every
   future sync for an ordering shared code already guarantees).
 - Catalog facts for future test authors: every shipped crafted elixir is
