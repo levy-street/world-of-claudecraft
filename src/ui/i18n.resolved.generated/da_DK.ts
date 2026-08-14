@@ -3124,7 +3124,11 @@ export const da_DK: EnTranslations = {
       "enchant_weapon_runed_focus": "Fortryl våben - Runet fokus",
       "enchant_chest_runeweave": "Fortryl bryst - Runevæv",
       "enchant_legs_runed_hide": "Fortryl ben - Runet skind",
-      "enchant_helmet_runed_links": "Fortryl hjelm - Runede kæder"
+      "enchant_helmet_runed_links": "Fortryl hjelm - Runede kæder",
+      "enchant_weapon_lucent_might": "Enchant Weapon - Lucent Might",
+      "enchant_chest_lucent_stamina": "Enchant Chest - Lucent Stamina",
+      "enchant_feet_lucent_agility": "Enchant Boots - Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Erhverv",
@@ -3384,13 +3388,16 @@ export const da_DK: EnTranslations = {
       "tier": {
         "base": "Basisfortryllelser",
         "runed": "Runede Fortryllelser",
-        "greater": "Større Fortryllelser"
+        "greater": "Større Fortryllelser",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Forventede materialer:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} til {max} {item}",
       "alreadyEnchanted": "Den genstand er allerede fortryllet.",
       "sameEnchant": "Den genstand har allerede den fortryllelse.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Erstatter {enchant}",
       "sameEnchantTag": "Allerede anvendt",
       "plainTag": "Ikke fortryllet",
@@ -5728,7 +5735,8 @@ export const da_DK: EnTranslations = {
         "tier": {
           "base": "Basis",
           "runed": "Runet",
-          "greater": "Større"
+          "greater": "Større",
+          "lucent": "Lucent"
         },
         "salvageHeading": "Bjærgning",
         "salvageNote": "Bjærgning er den almuemandsmæssige fætter til affortrylling: de samme våben og rustning, ingen færdighed krævet og ingen optjent, der returnerer ordinært håndværksskrot efter kvalitet i stedet for noget arkan. Enhver kan gøre det, fortryllet eller ej. Når du holder et stykke værd at bryde, er valget enkelt: fra sjælden og op er affortrylling strengt den bedre aftale, mens ved almindelig sælger de to udbytter for omtrent det samme hos en handlende, så bry mod det materiale du faktisk har brug for.",
@@ -8922,6 +8930,7 @@ export const da_DK: EnTranslations = {
       "tool": "Værktøj",
       "potion": "Eliksir",
       "elixir": "Eliksir",
+      "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Taske",
       "mount": "Ridedyr"
@@ -8951,6 +8960,10 @@ export const da_DK: EnTranslations = {
       "useDrink": "Brug: Genopretter {amount} mana over {seconds} sek. Skal forblive siddende mens du drikker.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskThroughDeath": "The effect remains through death.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating.",
       "questItem": "Questgenstand",
       "questRelated": "Opgave: {quest}",
       "questRules": "Kan ikke sælges, lægges i banken eller byttes.",
@@ -12517,6 +12530,30 @@ export const da_DK: EnTranslations = {
       },
       "makers_charm": {
         "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

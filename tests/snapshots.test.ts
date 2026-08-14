@@ -3733,6 +3733,7 @@ describe('equipped instance wire (eqi)', () => {
         boundTo: pid,
         charges: { mend: 2 },
         bindOnTrade: true,
+        perfected: true,
       },
       pid,
     );
@@ -3746,6 +3747,13 @@ describe('equipped instance wire (eqi)', () => {
     expect(wired.chest.boundTo).toBeUndefined();
     expect(wired.chest.charges).toBeUndefined();
     expect(wired.chest.bindOnTrade).toBeUndefined();
+    // The Masterwrought Perfected marker stays server-and-owner-side too
+    // (Masterwrought phase 10 authored the field; phase 12 mints it and owns
+    // the decision about what an INSPECTING viewer may see). Pinned here so
+    // widening the wire is a deliberate edit: the Apply Enchant picker's worn
+    // arm reads this same trimmed mirror, so the answer decides whether an
+    // online client can offer a Perfected target at all.
+    expect(wired.chest.perfected).toBeUndefined();
     expect(Object.keys(wired.chest).sort()).toEqual(['rolled', 'signer']);
   });
 

@@ -3848,6 +3848,13 @@ export const hudChromeStrings = {
     enchant_chest_runeweave: 'Enchant Chest - Runed Weave',
     enchant_legs_runed_hide: 'Enchant Legs - Runed Hide',
     enchant_helmet_runed_links: 'Enchant Helmet - Runed Links',
+    // The Lucent (apex) tier. The first three follow the slot-and-effect
+    // formula every row above uses; Lucent Infusion is a registered standalone
+    // name, so it takes no slot prefix even though it targets a slot.
+    enchant_weapon_lucent_might: 'Enchant Weapon - Lucent Might',
+    enchant_chest_lucent_stamina: 'Enchant Chest - Lucent Stamina',
+    enchant_feet_lucent_agility: 'Enchant Boots - Lucent Agility',
+    enchant_lucent_infusion: 'Lucent Infusion',
   },
   // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair
@@ -4348,15 +4355,18 @@ export const hudChromeStrings = {
     // and "Worn (Finger 2)". One key, never the plain tag with a number glued
     // on: the order of a slot name and its ordinal is the translator's call.
     wornTagIndexed: 'Worn ({slot} {index})',
-    // The Apply Enchant picker's three section headers, in ladder order. The
-    // tier is derived from the reagents alone (enchant_apply_view.ts
-    // enchantTier), so these headers name the same ladder content/enchants.ts
-    // documents: the dust/essence basics, the typed resonant tier, and the
-    // shard-consuming top tier.
+    // The Apply Enchant picker's section headers, in ladder order. The tier is
+    // derived from the reagents alone (enchant_apply_view.ts enchantTier), so
+    // these headers name the same ladder content/enchants.ts documents: the
+    // dust/essence basics, the typed resonant tier, the shard-consuming
+    // Greater tier, and the apex Lucent tier above it. Each header is named
+    // for the enchants under it, which is why the apex row reads Lucent (what
+    // every one of its enchants is called) rather than a tier word of its own.
     tier: {
       base: 'Base Enchants',
       runed: 'Runed Enchants',
       greater: 'Greater Enchants',
+      lucent: 'Lucent Enchants',
     },
     // The disenchant confirm's expected-yield preview
     // (src/ui/disenchant_yield_view.ts), appended under the destroy warning so
@@ -4374,6 +4384,13 @@ export const hudChromeStrings = {
     // ruling; the cost line states the reagents being paid before they are.
     alreadyEnchanted: 'That item is already enchanted.',
     sameEnchant: 'That item already has that enchant.',
+    // The Lucent tier's two denies (Masterwrought phase 10), each naming the
+    // real cause rather than the shared notHeld fallback: the Perfected-only
+    // enchant aimed at an ordinary copy, and an enchant above the applier's
+    // Enchanting skill. Both say what stands in the way, not what to do about
+    // it: how a piece becomes Perfected is the Perfecting stage's own copy.
+    notPerfected: 'Only a Perfected item can bear that enchant.',
+    enchantSkillTooLow: 'Your Enchanting skill is too low for that enchant.',
     replaceTag: 'Replaces {enchant}',
     sameEnchantTag: 'Already applied',
     // The tag on the PLAIN twin of a mixed holding (#2421): one item id held

@@ -3124,7 +3124,11 @@ export const zh_TW: EnTranslations = {
       "enchant_weapon_runed_focus": "附魔武器 - 符文印記",
       "enchant_chest_runeweave": "附魔胸部 - 符文織紋",
       "enchant_legs_runed_hide": "附魔腿部 - 符文獸皮",
-      "enchant_helmet_runed_links": "附魔頭部 - 符文鎖環"
+      "enchant_helmet_runed_links": "附魔頭部 - 符文鎖環",
+      "enchant_weapon_lucent_might": "附魔武器 - 瑩光威力",
+      "enchant_chest_lucent_stamina": "附魔胸部 - 瑩光耐力",
+      "enchant_feet_lucent_agility": "附魔腳部 - 瑩光敏捷",
+      "enchant_lucent_infusion": "瑩光灌注"
     },
     "professions": {
       "title": "專業",
@@ -3384,13 +3388,16 @@ export const zh_TW: EnTranslations = {
       "tier": {
         "base": "基礎附魔",
         "runed": "符文附魔",
-        "greater": "強效附魔"
+        "greater": "強效附魔",
+        "lucent": "瑩光附魔"
       },
       "yieldHeader": "預計產出材料：",
       "yieldLineExact": "{item} {count} 個",
       "yieldLineRange": "{item} {min} 至 {max} 個",
       "alreadyEnchanted": "那件物品已經附魔。",
       "sameEnchant": "那件物品已經擁有該附魔。",
+      "notPerfected": "只有臻至完美的物品才能承載該附魔。",
+      "enchantSkillTooLow": "你的附魔技能不足以施加該附魔。",
       "replaceTag": "替換{enchant}",
       "sameEnchantTag": "已施加",
       "plainTag": "未附魔",
@@ -5728,12 +5735,13 @@ export const zh_TW: EnTranslations = {
         "tier": {
           "base": "基礎",
           "runed": "符文",
-          "greater": "強效"
+          "greater": "強效",
+          "lucent": "瑩光"
         },
         "salvageHeading": "回收",
         "salvageNote": "任何人都可以把武器或護甲按品質回收成普通材料，無需附魔技能。",
         "bonusFmt": "+{value}{stat}",
-        "enchantsNoteOffhand": "附魔分三個層級。基礎層以鈴音之塵（高端配方加少量鈴音精華）驅動，涵蓋武器槽、副手與全部護甲槽，屬性軸選項豐富，每種配裝都能為每個槽位找到合適的附魔：盾牌與法系手持副手另有專屬的耐力附魔，因此沒有任何已裝備的槽位是附魔死角。進階層消耗一個鈴音碎片加鈴音精華：為高價值槽位提供更強的加成。鈴音碎片另外還有兩個去處：兩種符物配方各需五個，以及工具效果補充的最高一階，所以動用之前先存幾個起來。\n\n兩層之間另有五種符文附魔，每種消耗一個定向副產物，確保研磨所得無一浪費：符文鋒刃（武器，力量，消耗共鳴鋼）、符文印記（武器，智力，共鳴木）、符文織紋（胸部，精神，共鳴絲線）、符文皮革（護腿，敏捷，共鳴皮革）、符文鎖鏈（頭盔，耐力，共鳴鏈環）。每種符文附魔還需要兩個鈴音精華；若某槽位同時有基礎與進階附魔，符文加成落在兩者之間，但符文織紋是胸部最強的精神附魔，符文皮革則是護腿唯一的敏捷附魔。確切加成數值見下表。",
+        "enchantsNoteOffhand": "附魔分四個層級。基礎層以鈴音之塵（高端配方加少量鈴音精華）驅動，涵蓋武器槽、副手與全部護甲槽，屬性軸選項豐富，每種配裝都能為每個槽位找到合適的附魔：盾牌與法系手持副手另有專屬的耐力附魔，因此沒有任何已裝備的槽位是附魔死角。進階層消耗一個鈴音碎片加鈴音精華：為高價值槽位提供更強的加成。鈴音碎片另外還有兩個去處：兩種符物配方各需五個，以及工具效果補充的最高一階，所以動用之前先存幾個起來。\n\n兩層之間另有五種符文附魔，每種消耗一個定向副產物，確保研磨所得無一浪費：符文鋒刃（武器，力量，消耗共鳴鋼）、符文印記（武器，智力，共鳴木）、符文織紋（胸部，精神，共鳴絲線）、符文皮革（護腿，敏捷，共鳴皮革）、符文鎖鏈（頭盔，耐力，共鳴鏈環）。每種符文附魔還需要兩個鈴音精華；若某槽位同時有基礎與進階附魔，符文加成落在兩者之間，但符文織紋是胸部最強的精神附魔，符文皮革則是護腿唯一的敏捷附魔。確切加成數值見下表。\n\n凌駕於三者之上的是瑩光層級，本行當的巔峰之作，也是唯一對技能本身提出要求的附魔。每一件都需要一份瑩光試劑，並在武器、胸部與腳部各自的階梯上再邁出一級。其中最後一件瑩光灌注，只會在臻至完美的物品上生效。",
         "charmsHeading": "給採集者工具的符物",
         "charmsBody": "附魔也是採集者的符物的來源。你的附魔技能達到 25 之後，Tinker Gizzel 會在 Eastbrook 工坊把兩者都教給你：採集者儲囊，讓一次採收多出一個單位；以及匠人之眼，提升採上來之物的品級。兩者各製作一次，然後插進鎬、斧或鐮刀裡，在那裡它只有在確實改善了採收時才會消耗一次充能。\n\n補充充能才是這門手藝持續賺錢的地方。充能由工具的持有者恢復，而不是由來訪的附魔師恢復；當那位持有者就是簽下符物的附魔師時，補充只需一半的材料，有附魔專精則更少。所以隔著櫃台賣出的符物只是一筆買賣，而插在你自己工具上的符物，才是最便宜的長期用品。完整的充能與材料階梯，可在任何一門採集專業的頁面上、「工具效果」一節查看。"
       },
@@ -8922,6 +8930,7 @@ export const zh_TW: EnTranslations = {
       "tool": "工具",
       "potion": "藥水",
       "elixir": "藥劑",
+      "flask": "藥壺",
       "scroll": "卷軸",
       "bag": "背包",
       "mount": "坐騎"
@@ -8951,6 +8960,10 @@ export const zh_TW: EnTranslations = {
       "useDrink": "使用：在 {seconds} 秒內恢復 {amount} 點法力值。飲水時必須保持坐下。",
       "useElixir": "使用：使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。會取代同屬性的其他藥劑或卷軸。戰鬥中可用。",
       "useElixirAura": "使用：獲得{aura}效果，持續 {minutes} 分鐘。會取代同類的其他藥劑或卷軸。戰鬥中可用。",
+      "flaskOnlyOne": "同時只能有一種藥壺效果。飲用另一瓶藥壺會頂替目前效果。",
+      "flaskThroughDeath": "該效果在死亡後依然保留。",
+      "wellFed": "精神飽滿：吃完後使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。",
+      "wellFedAura": "精神飽滿：吃完後獲得{aura}效果，持續 {minutes} 分鐘。",
       "questItem": "任務物品",
       "questRelated": "任務：{quest}",
       "questRules": "無法出售、存入銀行或交易。",
@@ -12517,6 +12530,30 @@ export const zh_TW: EnTranslations = {
       },
       "makers_charm": {
         "name": "匠人護符"
+      },
+      "ironhusk_flask": {
+        "name": "鐵殼藥壺"
+      },
+      "warboar_flask": {
+        "name": "戰豬藥壺"
+      },
+      "runewater_flask": {
+        "name": "符水藥壺"
+      },
+      "stonepot_stew": {
+        "name": "石鍋燉菜"
+      },
+      "warspice_skewers": {
+        "name": "戰香烤串"
+      },
+      "sageleaf_chowder": {
+        "name": "賢葉濃湯"
+      },
+      "grand_cauldron": {
+        "name": "宏偉坩堝"
+      },
+      "laden_hearth": {
+        "name": "豐盛爐灶"
       },
       "conjured_water4": {
         "name": "魔法泉水"

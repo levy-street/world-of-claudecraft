@@ -374,16 +374,24 @@ export class BagItemActionMenu {
     const world = this.deps.world();
     // The self entity mirror carries equippedInstances in BOTH worlds (offline
     // Sim and online ClientWorld), the same read the paperdoll tooltip uses.
+    // The viewer's flat Enchanting skill, for the Lucent tier's skill gate in
+    // the pure core (the sim's `insufficient_skill` deny, mirrored so the
+    // picker never offers a target the apply would refuse). craftingIdentity is
+    // the atomic craft-skill read both worlds implement; before an online
+    // client's first cprof it is empty, so an unsynced viewer reads 0 and the
+    // gated enchants simply list nothing until the mirror lands.
+    const enchantingSkill = world.craftingIdentity.craftSkills.enchanting ?? 0;
     const worn = wornEnchantTargets(
       world.equipment,
       world.entities.get(world.playerId)?.equippedInstances ?? {},
       enchantId,
+      enchantingSkill,
     );
     // Worn FIRST, because the bagged family needs it: an enchanted copy on the
     // body leaves a bagged plain copy of the same id just as ambiguous as an
     // enchanted bagged one would (#2421), and both paint into the one list a
     // player reads. enchantTargets owns that decision; this only supplies it.
-    const targets = enchantTargets(world.inventory, enchantId, worn);
+    const targets = enchantTargets(world.inventory, enchantId, worn, enchantingSkill);
     const title = esc(t('hudChrome.enchanting.targetTitle'));
     if (targets.length === 0 && worn.length === 0) {
       this.paint(

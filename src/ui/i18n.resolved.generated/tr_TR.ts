@@ -3124,7 +3124,11 @@ export const tr_TR: EnTranslations = {
       "enchant_weapon_runed_focus": "Silah Büyüsü - Runlu Odak",
       "enchant_chest_runeweave": "Göğüs Büyüsü - Rün Dokuma",
       "enchant_legs_runed_hide": "Bacak Büyüsü - Rünlü Post",
-      "enchant_helmet_runed_links": "Miğfer Büyüsü - Rünlü Halkalar"
+      "enchant_helmet_runed_links": "Miğfer Büyüsü - Rünlü Halkalar",
+      "enchant_weapon_lucent_might": "Enchant Weapon - Lucent Might",
+      "enchant_chest_lucent_stamina": "Enchant Chest - Lucent Stamina",
+      "enchant_feet_lucent_agility": "Enchant Boots - Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Meslekler",
@@ -3384,13 +3388,16 @@ export const tr_TR: EnTranslations = {
       "tier": {
         "base": "Temel Büyüler",
         "runed": "Runlu Büyüler",
-        "greater": "Daha İyi Büyüler"
+        "greater": "Daha İyi Büyüler",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Beklenen malzemeler:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} ile {max} arası {item}",
       "alreadyEnchanted": "O eşya zaten büyülü.",
       "sameEnchant": "O eşyada zaten bu büyü var.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "{enchant} yerine geçer",
       "sameEnchantTag": "Zaten uygulandı",
       "plainTag": "Büyüsüz",
@@ -5728,7 +5735,8 @@ export const tr_TR: EnTranslations = {
         "tier": {
           "base": "Temel",
           "runed": "Runlu",
-          "greater": "Daha İyi"
+          "greater": "Daha İyi",
+          "lucent": "Lucent"
         },
         "salvageHeading": "Hurda toplama",
         "salvageNote": "Hurda toplama, büyü bozumunun herkese açık kuzenidir: aynı silahlar ve zırhlar, beceri gerekmez ve kazanılmaz, bunun yerine arkanik bir şey değil kaliteye göre düz zanaat hurdası döner. Herkes yapabilir, büyücü olup olmak fark etmez. Bozulmaya değer bir parça tuttuğunuzda seçim basittir: nadir ve üzeri için büyü bozumu kesinlikle daha iyi bir anlaşmadır; sıradan kalitede ise ikisinin de satıcıya verdiği değer yaklaşık aynıdır, dolayısıyla gerçekten hangi malzemeye ihtiyacınız varsa onu gözetecek şekilde bozun.",
@@ -8922,6 +8930,7 @@ export const tr_TR: EnTranslations = {
       "tool": "Alet",
       "potion": "Şifa İksiri",
       "elixir": "İksir",
+      "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Çanta",
       "mount": "Binek"
@@ -8951,6 +8960,10 @@ export const tr_TR: EnTranslations = {
       "useDrink": "Kullanım: {seconds} saniyede {amount} mana yeniler. İçerken oturur kalmalısın.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskThroughDeath": "The effect remains through death.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating.",
       "questItem": "Görev Eşyası",
       "questRelated": "Görev: {quest}",
       "questRules": "Satılamaz, bankaya konulamaz veya takas edilemez.",
@@ -12517,6 +12530,30 @@ export const tr_TR: EnTranslations = {
       },
       "makers_charm": {
         "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

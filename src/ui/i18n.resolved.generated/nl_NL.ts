@@ -3124,7 +3124,11 @@ export const nl_NL: EnTranslations = {
       "enchant_weapon_runed_focus": "Wapen betoveren - Geruned Teken",
       "enchant_chest_runeweave": "Torso betoveren - Runeweefsel",
       "enchant_legs_runed_hide": "Beenstukken betoveren - Gerunede Huid",
-      "enchant_helmet_runed_links": "Helm betoveren - Geruned Maliën"
+      "enchant_helmet_runed_links": "Helm betoveren - Geruned Maliën",
+      "enchant_weapon_lucent_might": "Enchant Weapon - Lucent Might",
+      "enchant_chest_lucent_stamina": "Enchant Chest - Lucent Stamina",
+      "enchant_feet_lucent_agility": "Enchant Boots - Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Beroepen",
@@ -3384,13 +3388,16 @@ export const nl_NL: EnTranslations = {
       "tier": {
         "base": "Basisbetoveringen",
         "runed": "Gerunede betoveringen",
-        "greater": "Grotere betoveringen"
+        "greater": "Grotere betoveringen",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Verwachte materialen:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} tot {max} {item}",
       "alreadyEnchanted": "Dat voorwerp is al betoverd.",
       "sameEnchant": "Dat voorwerp heeft die betovering al.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Vervangt {enchant}",
       "sameEnchantTag": "Al toegepast",
       "plainTag": "Niet betoverd",
@@ -5728,7 +5735,8 @@ export const nl_NL: EnTranslations = {
         "tier": {
           "base": "Basis",
           "runed": "Geruned",
-          "greater": "Groter"
+          "greater": "Groter",
+          "lucent": "Lucent"
         },
         "salvageHeading": "Salvagen",
         "salvageNote": "Salvagen is de alledaagse neef van onbetoveren: dezelfde wapens en wapenrusting, geen vaardigheid vereist en geen vaardigheid gewonnen, waarbij gewone knutselschroot wordt teruggegeven per kwaliteit in plaats van iets arcaans. Iedereen kan het doen, betoveraar of niet. Wanneer je een stuk vasthoudt dat de moeite waard is te breken, is de keuze eenvoudig: vanaf zeldzaam is onbetoveren strikt de betere deal, terwijl bij gewoon de twee opbrengsten voor ongeveer hetzelfde bij een handelaar verkopen, dus breek naar welk materiaal je daadwerkelijk nodig hebt.",
@@ -8922,6 +8930,7 @@ export const nl_NL: EnTranslations = {
       "tool": "Gereedschap",
       "potion": "Toverdrank",
       "elixir": "Elixer",
+      "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Tas",
       "mount": "Rijdier"
@@ -8951,6 +8960,10 @@ export const nl_NL: EnTranslations = {
       "useDrink": "Gebruik: Herstelt {amount} mana over {seconds} sec. Je moet blijven zitten tijdens het drinken.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskThroughDeath": "The effect remains through death.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating.",
       "questItem": "Questvoorwerp",
       "questRelated": "Quest: {quest}",
       "questRules": "Kan niet worden verkocht, in de bank gezet of geruild.",
@@ -12517,6 +12530,30 @@ export const nl_NL: EnTranslations = {
       },
       "makers_charm": {
         "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

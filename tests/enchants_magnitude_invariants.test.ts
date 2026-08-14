@@ -16,11 +16,20 @@ type Axis = 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor';
 const AXES: readonly Axis[] = ['str', 'agi', 'sta', 'int', 'spi', 'armor'];
 
 // Tier identity is derived from the reagent contract, exactly the doctrine the
-// table's section comments state: Greater is the arcane_shard consumer, Runed
-// consumes a resonant_* typed disenchant secondary, base is everything else.
-const isGreater = (e: EnchantDef) => e.reagents.some((r) => r.itemId === 'arcane_shard');
-const isRuned = (e: EnchantDef) => e.reagents.some((r) => r.itemId.startsWith('resonant_'));
-const isBase = (e: EnchantDef) => !isGreater(e) && !isRuned(e);
+// table's section comments state: Lucent (the apex tier) consumes
+// lucent_reagent, Greater is the arcane_shard consumer, Runed consumes a
+// resonant_* typed disenchant secondary, base is everything else. Apex is
+// tested FIRST and subtracted from the other three, the same top-down
+// precedence src/ui/enchant_apply_view.ts enchantTier and the sim's
+// enchantGainTier use: every Lucent enchant also draws on the tier below it
+// (shard or dust), so an apex-blind predicate would read three of the four as
+// Greater and quietly widen that tier's pinned id list.
+const isApex = (e: EnchantDef) => e.reagents.some((r) => r.itemId === 'lucent_reagent');
+const isGreater = (e: EnchantDef) =>
+  !isApex(e) && e.reagents.some((r) => r.itemId === 'arcane_shard');
+const isRuned = (e: EnchantDef) =>
+  !isApex(e) && e.reagents.some((r) => r.itemId.startsWith('resonant_'));
+const isBase = (e: EnchantDef) => !isApex(e) && !isGreater(e) && !isRuned(e);
 
 const axisOf = (e: EnchantDef): Axis => AXES.filter((a) => (e.statBonus[a] ?? 0) > 0)[0];
 
@@ -66,15 +75,25 @@ describe('enchant table magnitude invariants', () => {
     // included): str 125, agi 130, sta 113, int 120, spi 93. The enchant
     // layer lands at roughly 15 to 25 percent of that budget per axis, the
     // "finishing bonus" target, instead of the pre-trim 30 to 43 percent.
+    // These are BEST-per-slot totals over the whole table, so since the
+    // Masterwrought Lucent tier landed (phase 10) three of them describe an
+    // apex enchanter at skill 100 or above, not the ordinary stack: the three
+    // axes the Lucent tier touches each moved by exactly its own slot's step
+    // (str +2 on the weapon, agi +1 on the boots, sta +6 on the chest, which
+    // is the Perfected-only Lucent Infusion at 13 over the Greater 7, a rung
+    // NO live item can take until phase 12 mints a Perfected copy). int, spi,
+    // and armor are untouched by the tier and keep their pre-phase values.
+    // The percentages below still name the level-20 BiS budgets, so the sta
+    // line reads high by design; phase 15 owns the envelope verification.
     expect(bestPerSlotTotal('int')).toBe(24); // 20 percent of the 120 int budget
-    // 27 = the prior 24 plus offhand's enchant_offhand_stamina (+3, #2825: the
-    // offhand slot had no base enchant at all before that fix); 24 percent of
-    // the 113 sta budget, still inside the finishing-bonus band. The HP pin
-    // below covers the x10 conversion, over its own fixed 5-slot gear list
-    // that does not include offhand, so it is unaffected by this stack.
-    expect(bestPerSlotTotal('sta')).toBe(27);
-    expect(bestPerSlotTotal('agi')).toBe(25); // 19 percent of the 130 agi budget
-    expect(bestPerSlotTotal('str')).toBe(19); // 15 percent of the 125 str budget
+    // 27 before the Lucent tier (24 plus offhand's enchant_offhand_stamina,
+    // #2825: the offhand slot had no base enchant at all before that fix).
+    // The HP pin below covers the x10 conversion, over its own fixed 5-slot
+    // gear list that includes neither offhand nor a Lucent enchant, so it is
+    // unaffected by this stack.
+    expect(bestPerSlotTotal('sta')).toBe(33);
+    expect(bestPerSlotTotal('agi')).toBe(26); // 25 before the Lucent boots step
+    expect(bestPerSlotTotal('str')).toBe(21); // 19 before the Lucent weapon step
     // Spirit rides only neck, chest, and the two rings, so its stack sits
     // below the band by construction; accepted and recorded rather than
     // padded with new enchants.
@@ -125,6 +144,55 @@ describe('enchant table magnitude invariants', () => {
     // sibling at all. Pin their magnitudes as literals.
     expect(ENCHANTS.enchant_chest_runeweave.statBonus).toEqual({ spi: 5 });
     expect(ENCHANTS.enchant_legs_runed_hide.statBonus).toEqual({ agi: 4 });
+  });
+
+  it('every Lucent enchant stands strictly above every lower tier on its slot and axis', () => {
+    const apex = Object.values(ENCHANTS).filter(isApex);
+    expect(apex.map((e) => e.id).sort()).toEqual([
+      'enchant_chest_lucent_stamina',
+      'enchant_feet_lucent_agility',
+      'enchant_lucent_infusion',
+      'enchant_weapon_lucent_might',
+    ]);
+    for (const a of apex) {
+      const axis = axisOf(a);
+      // The previous top on this slot and axis is the best of the three
+      // non-apex tiers, whichever of them the slot happens to have (the boots
+      // line has only base, the weapon and chest lines have Greater).
+      const below = Math.max(
+        bestValue(a.itemSlot, axis, isBase),
+        bestValue(a.itemSlot, axis, isRuned),
+        bestValue(a.itemSlot, axis, isGreater),
+      );
+      expect(below, `${a.id}: a lower-tier sibling exists`).toBeGreaterThan(0);
+      expect(a.statBonus[axis] ?? 0, `${a.id}: step over the tier below`).toBeGreaterThan(below);
+    }
+  });
+
+  it('gates the Lucent tier: every one skill-gated, exactly one Perfected-only', () => {
+    // The tier's identity is the gate, not just the magnitude: these are the
+    // first enchants in the table that are not free-floor, and the Infusion is
+    // the one def the phase 12 Perfecting stage flips live.
+    for (const a of Object.values(ENCHANTS).filter(isApex)) {
+      expect(a.skillReq, `${a.id}: skill gate`).toBeGreaterThan(0);
+    }
+    expect(
+      Object.values(ENCHANTS)
+        .filter((e) => e.requiresPerfected)
+        .map((e) => e.id),
+    ).toEqual(['enchant_lucent_infusion']);
+    // Every enchant OUTSIDE the apex tier keeps the historical free floor: an
+    // absent skillReq, not a zero one.
+    for (const e of Object.values(ENCHANTS).filter((x) => !isApex(x))) {
+      expect(e.skillReq, `${e.id}: free floor`).toBeUndefined();
+      expect(e.requiresPerfected, `${e.id}: any-copy`).toBeUndefined();
+    }
+    // The two rungs the design settled on: the apex trio at the skill-100
+    // product rung, the capstone Infusion at the 125 cap.
+    expect(ENCHANTS.enchant_weapon_lucent_might.skillReq).toBe(100);
+    expect(ENCHANTS.enchant_chest_lucent_stamina.skillReq).toBe(100);
+    expect(ENCHANTS.enchant_feet_lucent_agility.skillReq).toBe(100);
+    expect(ENCHANTS.enchant_lucent_infusion.skillReq).toBe(125);
   });
 });
 
@@ -237,6 +305,10 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
       enchant_chest_runeweave: { spi: 5 },
       enchant_legs_runed_hide: { agi: 4 },
       enchant_helmet_runed_links: { sta: 5 },
+      enchant_weapon_lucent_might: { str: 7 },
+      enchant_chest_lucent_stamina: { sta: 10 },
+      enchant_feet_lucent_agility: { agi: 3 },
+      enchant_lucent_infusion: { sta: 13 },
     });
   });
 });

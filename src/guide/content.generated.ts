@@ -257,7 +257,7 @@ export interface GuideProfEnchanting {
     id: string;
     name: string;
     slot: string;
-    tier: 'base' | 'runed' | 'greater';
+    tier: 'base' | 'runed' | 'greater' | 'lucent';
     reagents: GuideProfMaterial[];
     bonus: { stat: string; value: number }[];
   }[];
@@ -8398,6 +8398,174 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 125,
           "zeroAt": 150
         }
+      },
+      {
+        "id": "recipe_ironhusk_flask",
+        "name": "Ironhusk Flask",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "apothecary",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          },
+          {
+            "name": "Pristine Venom Gland",
+            "count": 1
+          },
+          {
+            "name": "Venom Gland",
+            "count": 2
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Ironhusk Flask",
+          "count": 2,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_warboar_flask",
+        "name": "Warboar Flask",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "apothecary",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          },
+          {
+            "name": "Pristine Venom Gland",
+            "count": 1
+          },
+          {
+            "name": "Venom Gland",
+            "count": 2
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Warboar Flask",
+          "count": 2,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_runewater_flask",
+        "name": "Runewater Flask",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "apothecary",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Quickening Catalyst",
+            "count": 1
+          },
+          {
+            "name": "Pristine Venom Gland",
+            "count": 1
+          },
+          {
+            "name": "Venom Gland",
+            "count": 2
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Runewater Flask",
+          "count": 2,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_grand_cauldron",
+        "name": "Grand Cauldron",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "apothecary",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Quickening Catalyst",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 4
+          },
+          {
+            "name": "Goldleaf Herb",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Grand Cauldron",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
       }
     ]
   },
@@ -8802,6 +8970,178 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 100,
           "minimalAt": 125,
           "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_stonepot_stew",
+        "name": "Stonepot Stew",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Seasoned Stock",
+            "count": 1
+          },
+          {
+            "name": "Prime Cut",
+            "count": 2
+          },
+          {
+            "name": "Game Meat",
+            "count": 4
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Stonepot Stew",
+          "count": 4,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_warspice_skewers",
+        "name": "Warspice Skewers",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Seasoned Stock",
+            "count": 1
+          },
+          {
+            "name": "Prime Cut",
+            "count": 2
+          },
+          {
+            "name": "Game Meat",
+            "count": 4
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Warspice Skewers",
+          "count": 4,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_sageleaf_chowder",
+        "name": "Sageleaf Chowder",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Seasoned Stock",
+            "count": 1
+          },
+          {
+            "name": "Prime Cut",
+            "count": 2
+          },
+          {
+            "name": "Game Meat",
+            "count": 4
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Sageleaf Chowder",
+          "count": 4,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_laden_hearth",
+        "name": "The Laden Hearth",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "kitchens",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Seasoned Stock",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "name": "Prime Cut",
+            "count": 4
+          },
+          {
+            "name": "Game Meat",
+            "count": 4
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "The Laden Hearth",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       }
     ]
@@ -14190,6 +14530,102 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
         {
           "stat": "sta",
           "value": 5
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_lucent_might",
+      "name": "Enchant Weapon - Lucent Might",
+      "slot": "mainhand",
+      "tier": "lucent",
+      "reagents": [
+        {
+          "name": "Lucent Reagent",
+          "count": 1
+        },
+        {
+          "name": "Chime Shard",
+          "count": 1
+        },
+        {
+          "name": "Chime Essence",
+          "count": 2
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "str",
+          "value": 7
+        }
+      ]
+    },
+    {
+      "id": "enchant_chest_lucent_stamina",
+      "name": "Enchant Chest - Lucent Stamina",
+      "slot": "chest",
+      "tier": "lucent",
+      "reagents": [
+        {
+          "name": "Lucent Reagent",
+          "count": 1
+        },
+        {
+          "name": "Chime Shard",
+          "count": 1
+        },
+        {
+          "name": "Chime Essence",
+          "count": 3
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "sta",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "id": "enchant_feet_lucent_agility",
+      "name": "Enchant Boots - Lucent Agility",
+      "slot": "feet",
+      "tier": "lucent",
+      "reagents": [
+        {
+          "name": "Lucent Reagent",
+          "count": 1
+        },
+        {
+          "name": "Chime Dust",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "agi",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "enchant_lucent_infusion",
+      "name": "Lucent Infusion",
+      "slot": "chest",
+      "tier": "lucent",
+      "reagents": [
+        {
+          "name": "Lucent Reagent",
+          "count": 3
+        },
+        {
+          "name": "Chime Shard",
+          "count": 2
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "sta",
+          "value": 13
         }
       ]
     }

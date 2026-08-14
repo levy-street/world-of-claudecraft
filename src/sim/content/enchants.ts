@@ -19,6 +19,18 @@
 //      (content/recipes.ts, 5 shards each, one-time) and the repeatable
 //      tool-effect RECHARGE priced at the shard rung for an epic tool
 //      (professions/tools.ts), so shards spend four ways now.
+//   3. Lucent enchants (Masterwrought phase 10): the apex tier, and the FIRST
+//      enchants that are not free-floor. Every one consumes the lucent_reagent
+//      intermediate (phase 07) and carries a `skillReq`, so the tier is the
+//      enchanter's own capstone rather than another shard sink. Three are
+//      ordinary apex enchants at skill 100 (weapon, chest, boots: one more
+//      step up their own slot ladder, stats only per R7, which is also why
+//      boots stay a plain stat enchant and never touch movement speed); the
+//      fourth, Lucent Infusion, is the skill-125 capstone and the ONE
+//      `requiresPerfected` def in the table. Nothing stamps the Perfected
+//      marker yet (phase 12 mints it), so the Infusion refuses every item
+//      that exists today BY CONSTRUCTION: that inertness is the contract
+//      phase 12 flips, not an oversight.
 // Magnitude convention (the finishing-bonus sizing, tuned against the level-20
 // BiS gear budgets): a full set of enchants is roughly the last 15 to 25
 // percent on top of best gear per stat axis, never a gear tier of its own
@@ -57,6 +69,20 @@ export interface EnchantDef {
   itemSlot: ItemSlot;
   reagents: readonly EnchantReagent[];
   statBonus: Partial<Record<'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor', number>>;
+  /** Flat `enchanting` craft skill the APPLIER must have to use this enchant
+   *  (../professions/wheel.ts CraftSkills). ABSENT on every enchant shipped
+   *  before the Lucent tier, and absent means the historical free floor
+   *  ../professions/enchanting.ts documents: any player may apply it at any
+   *  skill. Checked at cast START (evaluateApplyEnchantAdmission) and again at
+   *  the resolve, refusing `insufficient_skill`. */
+  skillReq?: number;
+  /** Applicable ONLY to a Perfected item instance (ItemInstancePayload
+   *  `perfected`, minted by the phase 12 Perfecting stage). Refuses
+   *  `not_perfected` on every other copy, which today is every copy in the
+   *  game: nothing stamps the marker yet, so a def carrying this is inert
+   *  until phase 12 lands, deliberately. Only ever `true`; absent is the
+   *  ordinary any-copy enchant. */
+  requiresPerfected?: true;
 }
 
 export const ENCHANTS: Record<string, EnchantDef> = {
@@ -448,5 +474,78 @@ export const ENCHANTS: Record<string, EnchantDef> = {
       { itemId: 'resonant_links', count: 1 },
     ],
     statBonus: { sta: 5 },
+  },
+
+  // --- Lucent tier (Masterwrought phase 10): the apex enchants, every one
+  // consuming the lucent_reagent intermediate and gated on the enchanter's own
+  // skill (skillReq, the first non-free-floor enchants; see the tier note in
+  // the header). Each apex value continues its OWN slot ladder's step rather
+  // than inventing a magnitude: weapon str runs 2 (base), 3 (runed), 5
+  // (Greater) and steps to 7; chest sta runs 4 (base), 7 (Greater) and steps
+  // to 10; boots, which have no Greater rung by design, take the base-to-runed
+  // sized step 2 -> 3, kept deliberately small because R7 rules the boots
+  // enchant stats only (movement speed is not even expressible in statBonus,
+  // and it stays that way). ---
+  enchant_weapon_lucent_might: {
+    id: 'enchant_weapon_lucent_might',
+    name: 'Enchant Weapon - Lucent Might',
+    itemSlot: 'mainhand',
+    reagents: [
+      { itemId: 'lucent_reagent', count: 1 },
+      { itemId: 'arcane_shard', count: 1 },
+      { itemId: 'arcane_essence', count: 2 },
+    ],
+    statBonus: { str: 7 },
+    skillReq: 100,
+  },
+  enchant_chest_lucent_stamina: {
+    id: 'enchant_chest_lucent_stamina',
+    name: 'Enchant Chest - Lucent Stamina',
+    itemSlot: 'chest',
+    reagents: [
+      { itemId: 'lucent_reagent', count: 1 },
+      { itemId: 'arcane_shard', count: 1 },
+      // Three essence, matching enchant_chest_greater_stamina: the chest line
+      // has always paid one more essence than the weapon line on its rung.
+      { itemId: 'arcane_essence', count: 3 },
+    ],
+    statBonus: { sta: 10 },
+    skillReq: 100,
+  },
+  enchant_feet_lucent_agility: {
+    id: 'enchant_feet_lucent_agility',
+    name: 'Enchant Boots - Lucent Agility',
+    itemSlot: 'feet',
+    reagents: [
+      { itemId: 'lucent_reagent', count: 1 },
+      // Dust, not shard: the whole feet line is a dust line (x3), and the apex
+      // rung takes one step over it rather than jumping to the shard economy.
+      { itemId: 'arcane_dust', count: 4 },
+    ],
+    statBonus: { agi: 3 },
+    skillReq: 100,
+  },
+  // The capstone, and the one requiresPerfected def in the table. Its name is
+  // the registered standalone noun (the naming registry's "Lucent Infusion"),
+  // NOT the "Enchant <slot> - <effect>" formula scheme every other row uses:
+  // it is a single named work, not another option on a slot's ladder.
+  //
+  // PROVISIONAL, and recorded as such: phase 12's own planning file names no
+  // slot and no effect shape for the Infusion, so this takes the chest ladder's
+  // next +3 step (7 Greater, 10 apex, 13 here) on the slot the apex chest
+  // enchant already occupies. Phase 12 owns the final placement; because the
+  // guard refuses every copy in the game today, moving it before Perfected
+  // items exist strands nothing.
+  enchant_lucent_infusion: {
+    id: 'enchant_lucent_infusion',
+    name: 'Lucent Infusion',
+    itemSlot: 'chest',
+    reagents: [
+      { itemId: 'lucent_reagent', count: 3 },
+      { itemId: 'arcane_shard', count: 2 },
+    ],
+    statBonus: { sta: 13 },
+    skillReq: 125,
+    requiresPerfected: true,
   },
 };

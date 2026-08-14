@@ -3124,7 +3124,11 @@ export const pt_BR: EnTranslations = {
       "enchant_weapon_runed_focus": "Encantar Arma - Sigilo Runado",
       "enchant_chest_runeweave": "Encantar Torso - Trama de Runas",
       "enchant_legs_runed_hide": "Encantar Pernas - Couro Runado",
-      "enchant_helmet_runed_links": "Encantar Elmo - Elos Runados"
+      "enchant_helmet_runed_links": "Encantar Elmo - Elos Runados",
+      "enchant_weapon_lucent_might": "Enchant Weapon - Lucent Might",
+      "enchant_chest_lucent_stamina": "Enchant Chest - Lucent Stamina",
+      "enchant_feet_lucent_agility": "Enchant Boots - Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Profissões",
@@ -3384,13 +3388,16 @@ export const pt_BR: EnTranslations = {
       "tier": {
         "base": "Encantamentos Base",
         "runed": "Encantamentos Rúnicos",
-        "greater": "Encantamentos Superiores"
+        "greater": "Encantamentos Superiores",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Materiais esperados:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} a {max} {item}",
       "alreadyEnchanted": "Esse item já está encantado.",
       "sameEnchant": "Esse item já tem esse encantamento.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Substitui {enchant}",
       "sameEnchantTag": "Já aplicado",
       "plainTag": "Sem encantamento",
@@ -5728,7 +5735,8 @@ export const pt_BR: EnTranslations = {
         "tier": {
           "base": "Base",
           "runed": "Rúnico",
-          "greater": "Superior"
+          "greater": "Superior",
+          "lucent": "Lucent"
         },
         "salvageHeading": "Salvamento",
         "salvageNote": "O salvamento é o primo acessível do desencantamento: as mesmas armas e armaduras, sem necessidade nem ganho de perícia, devolvendo sucata de criação comum por qualidade em vez de qualquer coisa arcana. Qualquer um pode fazê-lo, encantador ou não. Quando você tem uma peça que vale desfazer, a escolha é simples: a partir de raro, o desencantamento é estritamente o melhor negócio, enquanto no comum os dois rendimentos vendem por cerca do mesmo valor ao NPC, então desfaça conforme o material que você realmente precisa.",
@@ -8922,6 +8930,7 @@ export const pt_BR: EnTranslations = {
       "tool": "Ferramenta",
       "potion": "Poção",
       "elixir": "Elixir",
+      "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Bolsa",
       "mount": "Montaria"
@@ -8951,6 +8960,10 @@ export const pt_BR: EnTranslations = {
       "useDrink": "Usar: restaura {amount} de mana ao longo de {seconds} s. É preciso permanecer sentado enquanto bebe.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskThroughDeath": "The effect remains through death.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating.",
       "questItem": "Item de missão",
       "questRelated": "Missão: {quest}",
       "questRules": "Não pode ser vendido, guardado no banco ou negociado.",
@@ -12517,6 +12530,30 @@ export const pt_BR: EnTranslations = {
       },
       "makers_charm": {
         "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

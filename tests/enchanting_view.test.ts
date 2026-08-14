@@ -172,6 +172,14 @@ describe('enchanting_view: apply-enchant toast mapping', () => {
     expect(applyEnchantResultToast({ ok: false, reason: 'same_enchant' }).key).toBe(
       'hudChrome.enchanting.sameEnchant',
     );
+    // The Lucent tier's two gates (Masterwrought phase 10), each with its own
+    // cause named rather than the shared notHeld fallback.
+    expect(applyEnchantResultToast({ ok: false, reason: 'not_perfected' }).key).toBe(
+      'hudChrome.enchanting.notPerfected',
+    );
+    expect(applyEnchantResultToast({ ok: false, reason: 'insufficient_skill' }).key).toBe(
+      'hudChrome.enchanting.enchantSkillTooLow',
+    );
   });
   it('always routes a failure through the error sink', () => {
     for (const reason of [
@@ -184,6 +192,8 @@ describe('enchanting_view: apply-enchant toast mapping', () => {
       'no_bag_space',
       'already_enchanted',
       'same_enchant',
+      'not_perfected',
+      'insufficient_skill',
     ] as const) {
       expect(applyEnchantResultToast({ ok: false, reason }).sink).toBe('error');
     }

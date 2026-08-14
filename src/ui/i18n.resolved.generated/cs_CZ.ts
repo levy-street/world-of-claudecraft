@@ -3124,7 +3124,11 @@ export const cs_CZ: EnTranslations = {
       "enchant_weapon_runed_focus": "Okouzlení zbraně - Runová pečeť",
       "enchant_chest_runeweave": "Okouzlení hrudi - Runová tkanina",
       "enchant_legs_runed_hide": "Okouzlení nohavic - Runová kůže",
-      "enchant_helmet_runed_links": "Okouzlení helmy - Runové kroužky"
+      "enchant_helmet_runed_links": "Okouzlení helmy - Runové kroužky",
+      "enchant_weapon_lucent_might": "Enchant Weapon - Lucent Might",
+      "enchant_chest_lucent_stamina": "Enchant Chest - Lucent Stamina",
+      "enchant_feet_lucent_agility": "Enchant Boots - Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Profese",
@@ -3384,13 +3388,16 @@ export const cs_CZ: EnTranslations = {
       "tier": {
         "base": "Základní okouzlení",
         "runed": "Runové okouzlení",
-        "greater": "Velké okouzlení"
+        "greater": "Velké okouzlení",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Očekávané materiály:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} až {max} {item}",
       "alreadyEnchanted": "Tento předmět je již okouzlený.",
       "sameEnchant": "Tento předmět už má toto okouzlení.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Nahradí {enchant}",
       "sameEnchantTag": "Již aplikováno",
       "plainTag": "Bez okouzlení",
@@ -5728,7 +5735,8 @@ export const cs_CZ: EnTranslations = {
         "tier": {
           "base": "Základní",
           "runed": "Runové",
-          "greater": "Vyšší"
+          "greater": "Vyšší",
+          "lucent": "Lucent"
         },
         "salvageHeading": "Rozebrání",
         "salvageNote": "Rozebrání je lidový bratranec rozzačarování: stejné zbraně a zbroje, žádná dovednost nevyžadována ani nezískaná, vracející běžný řemeslný odpad podle kvality místo čehokoli arkanového. Může to dělat kdokoli, okouzlovatel i laik. Když držíš kus vhodný k rozebrání, volba je jednoduchá: od vzácné výše je rozzačarování striktně lepší obchod, zatímco u běžné kvality se výnosy prodají prodejci přibližně za stejnou cenu, takže rozeber to, co ze suroviny skutečně potřebuješ.",
@@ -8922,6 +8930,7 @@ export const cs_CZ: EnTranslations = {
       "tool": "Nástroj",
       "potion": "Lektvar",
       "elixir": "Elixír",
+      "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Batoh",
       "mount": "Jízdní zvíře"
@@ -8951,6 +8960,10 @@ export const cs_CZ: EnTranslations = {
       "useDrink": "Použití: Obnoví {amount} many během {seconds} s. Při pití musíš zůstat sedět.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskThroughDeath": "The effect remains through death.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating.",
       "questItem": "Úkolový předmět",
       "questRelated": "Úkol: {quest}",
       "questRules": "Nelze prodat, uložit do banky ani směnit.",
@@ -12517,6 +12530,30 @@ export const cs_CZ: EnTranslations = {
       },
       "makers_charm": {
         "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

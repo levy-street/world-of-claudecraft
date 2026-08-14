@@ -3124,7 +3124,11 @@ export const zh_CN: EnTranslations = {
       "enchant_weapon_runed_focus": "武器附魔 - 符文印记",
       "enchant_chest_runeweave": "胸甲附魔 - 符文织纹",
       "enchant_legs_runed_hide": "腿甲附魔 - 符文兽皮",
-      "enchant_helmet_runed_links": "头盔附魔 - 符文锁环"
+      "enchant_helmet_runed_links": "头盔附魔 - 符文锁环",
+      "enchant_weapon_lucent_might": "武器附魔 - 莹光威力",
+      "enchant_chest_lucent_stamina": "胸甲附魔 - 莹光耐力",
+      "enchant_feet_lucent_agility": "长靴附魔 - 莹光敏捷",
+      "enchant_lucent_infusion": "莹光灌注"
     },
     "professions": {
       "title": "专业",
@@ -3384,13 +3388,16 @@ export const zh_CN: EnTranslations = {
       "tier": {
         "base": "基础附魔",
         "runed": "符文附魔",
-        "greater": "强效附魔"
+        "greater": "强效附魔",
+        "lucent": "莹光附魔"
       },
       "yieldHeader": "预计产出材料：",
       "yieldLineExact": "{item} {count} 个",
       "yieldLineRange": "{item} {min} 至 {max} 个",
       "alreadyEnchanted": "那件物品已经附魔。",
       "sameEnchant": "那件物品已经拥有该附魔。",
+      "notPerfected": "只有臻至完美的物品才能承载该附魔。",
+      "enchantSkillTooLow": "你的附魔技能不足以施加该附魔。",
       "replaceTag": "替换{enchant}",
       "sameEnchantTag": "已施加",
       "plainTag": "未附魔",
@@ -5728,12 +5735,13 @@ export const zh_CN: EnTranslations = {
         "tier": {
           "base": "基础",
           "runed": "符文",
-          "greater": "强效"
+          "greater": "强效",
+          "lucent": "莹光"
         },
         "salvageHeading": "回收",
         "salvageNote": "任何人都可以把武器或护甲按品质回收成普通材料，无需附魔技能。",
         "bonusFmt": "+{value}{stat}",
-        "enchantsNoteOffhand": "附魔分三个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽、副手以及每一个护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔：盾牌与施法者手持副手有属于自己的耐力附魔，因此没有哪个装备槽是附魔的死角。进阶层级每件消耗一个铃音碎片加若干铃音精华：对影响最大的槽位给出更强的加成。碎片此外还有两个去处，两个护符配方各要五个，以及工具效果补充的最高一档，所以动手花用之前先攒下几个。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文锋刃（武器，力量，消耗共鸣钢片），符文印记（武器，智力，共鸣木片），符文织纹（胸甲，精神，共鸣线段），符文皮甲（护腿，敏捷，共鸣皮料），符文锁链（头盔，耐力，共鸣链片）。每件还各需两个铃音精华；对于同时拥有基础与进阶附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文皮甲则是唯一的护腿敏捷附魔。确切加成详见下方表格。",
+        "enchantsNoteOffhand": "附魔分四个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽、副手以及每一个护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔：盾牌与施法者手持副手有属于自己的耐力附魔，因此没有哪个装备槽是附魔的死角。进阶层级每件消耗一个铃音碎片加若干铃音精华：对影响最大的槽位给出更强的加成。碎片此外还有两个去处，两个护符配方各要五个，以及工具效果补充的最高一档，所以动手花用之前先攒下几个。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文锋刃（武器，力量，消耗共鸣钢片），符文印记（武器，智力，共鸣木片），符文织纹（胸甲，精神，共鸣线段），符文皮甲（护腿，敏捷，共鸣皮料），符文锁链（头盔，耐力，共鸣链片）。每件还各需两个铃音精华；对于同时拥有基础与进阶附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文皮甲则是唯一的护腿敏捷附魔。确切加成详见下方表格。\n\n凌驾于三者之上的是莹光层级，本行当的巅峰之作，也是唯一对技能本身提出要求的附魔。每一件都需要一份莹光试剂，并在武器、胸甲与长靴各自的阶梯上再迈出一级。其中最后一件莹光灌注，只会在臻至完美的物品上生效。",
         "charmsHeading": "给采集者工具的护符",
         "charmsBody": "采集者的护符也出自附魔。你的附魔技能达到 25 后，Tinker Gizzel会在Eastbrook的工具工坊传授两者：为一次采集多加一个单位产出的采集者储囊，以及提升采上来之物品级的匠人之眼。每一枚都只制作一次，然后嵌进采矿镐、斧或镰刀，只在真正被它改善的采集上消耗一次充能。\n\n补充充能才是这门手艺持续赚钱的地方。充能由工具的主人恢复，而不是由上门的附魔师来做；当那位主人正是署名这枚护符的附魔师时，补充只需一半材料，若还带着附魔专精则更少。因此隔着柜台卖出的护符只是一锤子买卖，而嵌在你自己工具上的那些，才是养起来便宜的。完整的充能与材料阶梯见任意一门采集专业页面的“工具效果”一节。"
       },
@@ -8922,6 +8930,7 @@ export const zh_CN: EnTranslations = {
       "tool": "工具",
       "potion": "药水",
       "elixir": "药剂",
+      "flask": "药壶",
       "scroll": "卷轴",
       "bag": "背包",
       "mount": "坐骑"
@@ -8951,6 +8960,10 @@ export const zh_CN: EnTranslations = {
       "useDrink": "使用：在 {seconds} 秒内恢复 {amount} 点法力值。饮水时必须保持坐下。",
       "useElixir": "使用：使你的{stat}提高 {value} 点，持续 {minutes} 分钟。会顶替其他任何同属性的药剂或卷轴。战斗中可用。",
       "useElixirAura": "使用：获得{aura}效果，持续 {minutes} 分钟。会顶替其他任何同类药剂或卷轴。战斗中可用。",
+      "flaskOnlyOne": "同时只能有一种药壶效果。饮用另一瓶药壶会顶替当前效果。",
+      "flaskThroughDeath": "该效果在死亡后依然保留。",
+      "wellFed": "精神饱满：吃完后使你的{stat}提高 {value} 点，持续 {minutes} 分钟。",
+      "wellFedAura": "精神饱满：吃完后获得{aura}效果，持续 {minutes} 分钟。",
       "questItem": "任务物品",
       "questRelated": "任务：{quest}",
       "questRules": "无法出售、存入银行或交易。",
@@ -12517,6 +12530,30 @@ export const zh_CN: EnTranslations = {
       },
       "makers_charm": {
         "name": "匠人护符"
+      },
+      "ironhusk_flask": {
+        "name": "铁壳药壶"
+      },
+      "warboar_flask": {
+        "name": "战猪药壶"
+      },
+      "runewater_flask": {
+        "name": "符水药壶"
+      },
+      "stonepot_stew": {
+        "name": "石锅炖菜"
+      },
+      "warspice_skewers": {
+        "name": "战香烤串"
+      },
+      "sageleaf_chowder": {
+        "name": "贤叶浓汤"
+      },
+      "grand_cauldron": {
+        "name": "宏伟坩埚"
+      },
+      "laden_hearth": {
+        "name": "丰盛炉灶"
       },
       "conjured_water4": {
         "name": "魔法泉水"

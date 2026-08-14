@@ -3124,7 +3124,11 @@ export const sv_SE: EnTranslations = {
       "enchant_weapon_runed_focus": "Förtrollning Vapen - Runat Sigill",
       "enchant_chest_runeweave": "Förtrollning Bröst - Runvävnad",
       "enchant_legs_runed_hide": "Förtrollning Ben - Runhud",
-      "enchant_helmet_runed_links": "Förtrollning Hjälm - Runlänkar"
+      "enchant_helmet_runed_links": "Förtrollning Hjälm - Runlänkar",
+      "enchant_weapon_lucent_might": "Enchant Weapon - Lucent Might",
+      "enchant_chest_lucent_stamina": "Enchant Chest - Lucent Stamina",
+      "enchant_feet_lucent_agility": "Enchant Boots - Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Yrken",
@@ -3384,13 +3388,16 @@ export const sv_SE: EnTranslations = {
       "tier": {
         "base": "Basförtrollningar",
         "runed": "Runristade förtrollningar",
-        "greater": "Högre förtrollningar"
+        "greater": "Högre förtrollningar",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Förväntade material:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} till {max} {item}",
       "alreadyEnchanted": "Det föremålet är redan förtrollat.",
       "sameEnchant": "Det föremålet har redan den förtrollningen.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Ersätter {enchant}",
       "sameEnchantTag": "Redan applicerad",
       "plainTag": "Inte förtrollad",
@@ -5728,7 +5735,8 @@ export const sv_SE: EnTranslations = {
         "tier": {
           "base": "Bas",
           "runed": "Runristad",
-          "greater": "Hogre"
+          "greater": "Hogre",
+          "lucent": "Lucent"
         },
         "salvageHeading": "Bärgning",
         "salvageNote": "Bärgning är vanliga människans kusin till avförtrollning: samma vapen och rustning, ingen skicklighet krävs och ingen vinns, och returnerar vanligt hantverksskrot efter kvalitet i stället för något arkaniskt. Vem som helst kan göra det, förtrollare eller ej. När du håller en pjäs värd att bryta är valet enkelt: från sällsynt och uppåt är avförtrollning strikt det bättre alternativet, medan båda avkastningarna vid vanlig säljer för ungefär det samma till handlare, så bryt mot det material du faktiskt behöver.",
@@ -8922,6 +8930,7 @@ export const sv_SE: EnTranslations = {
       "tool": "Verktyg",
       "potion": "Trolldryck",
       "elixir": "Elixir",
+      "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Väska",
       "mount": "Riddjur"
@@ -8951,6 +8960,10 @@ export const sv_SE: EnTranslations = {
       "useDrink": "Använd: Återställer {amount} mana under {seconds} sek. Du måste förbli sittande medan du dricker.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskThroughDeath": "The effect remains through death.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating.",
       "questItem": "Uppdragsföremål",
       "questRelated": "Uppdrag: {quest}",
       "questRules": "Kan inte säljas, bankas eller bytas bort.",
@@ -12517,6 +12530,30 @@ export const sv_SE: EnTranslations = {
       },
       "makers_charm": {
         "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

@@ -3124,7 +3124,11 @@ export const vi_VN: EnTranslations = {
       "enchant_weapon_runed_focus": "Pháp Khắc Vũ Khí - Tiêu Điểm Phù Văn",
       "enchant_chest_runeweave": "Pháp Khắc Giáp Ngực - Dệt Phù Văn",
       "enchant_legs_runed_hide": "Pháp Khắc Giáp Chân - Da Phù Văn",
-      "enchant_helmet_runed_links": "Pháp Khắc Mũ Giáp - Xích Phù Văn"
+      "enchant_helmet_runed_links": "Pháp Khắc Mũ Giáp - Xích Phù Văn",
+      "enchant_weapon_lucent_might": "Enchant Weapon - Lucent Might",
+      "enchant_chest_lucent_stamina": "Enchant Chest - Lucent Stamina",
+      "enchant_feet_lucent_agility": "Enchant Boots - Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Nghề nghiệp",
@@ -3384,13 +3388,16 @@ export const vi_VN: EnTranslations = {
       "tier": {
         "base": "Pháp Khắc Cơ Bản",
         "runed": "Pháp Khắc Phù Văn",
-        "greater": "Pháp Khắc Cao Cấp"
+        "greater": "Pháp Khắc Cao Cấp",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Nguyên liệu dự kiến:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} đến {max} {item}",
       "alreadyEnchanted": "Vật phẩm đó đã được pháp khắc rồi.",
       "sameEnchant": "Vật phẩm đó đã có phép khắc đó rồi.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Thay Thế {enchant}",
       "sameEnchantTag": "Đã Áp Dụng",
       "plainTag": "Chưa pháp khắc",
@@ -5728,7 +5735,8 @@ export const vi_VN: EnTranslations = {
         "tier": {
           "base": "Cơ bản",
           "runed": "Phù văn",
-          "greater": "Cao cấp"
+          "greater": "Cao cấp",
+          "lucent": "Lucent"
         },
         "salvageHeading": "Tháo dỡ",
         "salvageNote": "Tháo dỡ là người anh em bình dân của hủy pháp khắc: cùng vũ khí và giáp đó, không cần kỹ năng và không nhận kỹ năng, trả về phế liệu chế tác thông thường theo phẩm chất thay vì bất cứ thứ gì huyền bí. Ai cũng làm được, có pháp khắc hay không. Khi bạn cầm trên tay một món đáng phá, lựa chọn rất đơn giản: từ hiếm trở lên, hủy pháp khắc luôn là lựa chọn tốt hơn, còn ở phổ thông thì hai sản lượng bán cho NPC xấp xỉ nhau, nên hãy chọn theo loại nguyên liệu bạn thực sự cần.",
@@ -8922,6 +8930,7 @@ export const vi_VN: EnTranslations = {
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
       "elixir": "Tiên Dược",
+      "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Túi",
       "mount": "Thú Cưỡi"
@@ -8951,6 +8960,10 @@ export const vi_VN: EnTranslations = {
       "useDrink": "Dùng: Hồi {amount} mana trong {seconds} giây. Phải ngồi yên khi uống.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskThroughDeath": "The effect remains through death.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating.",
       "questItem": "Vật Phẩm Nhiệm Vụ",
       "questRelated": "Nhiệm vụ: {quest}",
       "questRules": "Không thể bán, gửi ngân hàng, hoặc trao đổi.",
@@ -12517,6 +12530,30 @@ export const vi_VN: EnTranslations = {
       },
       "makers_charm": {
         "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

@@ -157,11 +157,24 @@ describe('enchant_apply_view: tier classification', () => {
     expect(enchantTier('enchant_chest_stamina')).toBe('base');
   });
 
+  it('the apex reagent marks the Lucent tier, over the shard it also consumes', () => {
+    expect(enchantTier('enchant_weapon_lucent_might')).toBe('lucent');
+    expect(enchantTier('enchant_lucent_infusion')).toBe('lucent');
+    // The precedence is load-bearing, not incidental: this one carries a shard
+    // as well, so a shard-first rule would file it under Greater.
+    expect(ENCHANTS.enchant_weapon_lucent_might.reagents.map((r) => r.itemId)).toContain(
+      'arcane_shard',
+    );
+    // And the dust-plus-lucent boots enchant still reads apex, not Base.
+    expect(enchantTier('enchant_feet_lucent_agility')).toBe('lucent');
+  });
+
   it('classifies every live enchant, and each tier matches its reagents', () => {
     for (const id of Object.keys(ENCHANTS)) {
       const tier = enchantTier(id);
       const reagentIds = ENCHANTS[id].reagents.map((r) => r.itemId);
-      if (reagentIds.includes('arcane_shard')) expect(tier).toBe('greater');
+      if (reagentIds.includes('lucent_reagent')) expect(tier).toBe('lucent');
+      else if (reagentIds.includes('arcane_shard')) expect(tier).toBe('greater');
       else if (reagentIds.some((r) => r.startsWith('resonant_'))) expect(tier).toBe('runed');
       else expect(tier).toBe('base');
     }
@@ -183,6 +196,7 @@ describe('enchant_apply_view: tier classification', () => {
     const unclassifiable: string[] = [];
     for (const enchant of Object.values(ENCHANTS)) {
       for (const { itemId } of enchant.reagents) {
+        if (itemId === 'lucent_reagent') continue;
         if (itemId === 'arcane_shard') continue;
         if (itemId.startsWith('resonant_')) continue;
         if (KNOWN_BASE_REAGENTS.has(itemId)) continue;
@@ -197,15 +211,17 @@ describe('enchant_apply_view: tier classification', () => {
     ).toEqual([]);
   });
 
-  it('the two tier-marker reagents are still real, distinct items', () => {
+  it('the tier-marker reagents are still real, distinct items', () => {
     // The rules key on these ids, so a rename in content must not leave the
     // classification pointing at nothing.
     expect(ITEMS.arcane_shard).toBeDefined();
+    expect(ITEMS.lucent_reagent).toBeDefined();
     const resonants = Object.keys(ITEMS).filter((id) => id.startsWith('resonant_'));
     expect(resonants.length).toBeGreaterThan(0);
     // And each tier is actually POPULATED, so a rename that silently emptied a
     // tier (every row falling through to Base) fails here too.
     const tiers = Object.keys(ENCHANTS).map(enchantTier);
+    expect(tiers).toContain('lucent');
     expect(tiers).toContain('greater');
     expect(tiers).toContain('runed');
     expect(tiers).toContain('base');
@@ -213,11 +229,11 @@ describe('enchant_apply_view: tier classification', () => {
 });
 
 describe('enchant_apply_view: enchantSectionsForReagent', () => {
-  it('groups essence enchants into the ladder order, base then runed then greater', () => {
-    // arcane_essence is the one reagent that reaches all three tiers, which is
+  it('groups essence enchants into the ladder order, base then runed then greater then lucent', () => {
+    // arcane_essence is the one reagent that reaches every tier, which is
     // exactly the wall this grouping exists for.
     const sections = enchantSectionsForReagent([], 'arcane_essence');
-    expect(sections.map((s) => s.tier)).toEqual(['base', 'runed', 'greater']);
+    expect(sections.map((s) => s.tier)).toEqual(['base', 'runed', 'greater', 'lucent']);
     for (const section of sections) {
       expect(section.titleKey).toBe(`hudChrome.enchanting.tier.${section.tier}`);
       expect(section.rows.length).toBeGreaterThan(0);
@@ -229,9 +245,12 @@ describe('enchant_apply_view: enchantSectionsForReagent', () => {
     expect(grouped.slice().sort()).toEqual(flat.slice().sort());
   });
 
-  it('omits an empty section: a dust reagent paints only the Base header', () => {
+  it('omits an empty section: a dust reagent paints no Runed or Greater header', () => {
+    // Dust reaches Base and, since the Lucent boots enchant, the apex tier; it
+    // still reaches neither of the two in between, which is what makes this an
+    // omission test rather than a full-ladder one.
     const sections = enchantSectionsForReagent([], 'arcane_dust');
-    expect(sections.map((s) => s.tier)).toEqual(['base']);
+    expect(sections.map((s) => s.tier)).toEqual(['base', 'lucent']);
   });
 
   it('a typed secondary paints only the Runed section', () => {
@@ -296,6 +315,7 @@ describe('enchant_apply_view: enchantSectionsForReagent', () => {
     // Literal English, not a length check: the headers ARE the ladder the
     // player reads, so a reword has to be a deliberate edit here.
     expect(headers).toEqual({
+      lucent: 'Lucent Enchants',
       base: 'Base Enchants',
       runed: 'Runed Enchants',
       greater: 'Greater Enchants',
@@ -1165,5 +1185,94 @@ describe('enchant_apply_view: name discriminators (#2466)', () => {
     // decoration: names ARE shared in live content, and the assertion above
     // passes only because the mark separates the rows that share them.
     expect(sharedNames, 'live content shares display names across ids').toBeGreaterThan(0);
+  });
+});
+
+// The picker half of the Lucent tier's two gates (Masterwrought phase 10). The
+// sim owns the refusals (professions/enchanting.ts insufficient_skill /
+// not_perfected); these pin that the picker never OFFERS what those refuse, on
+// both target families, which is the whole reason the core takes the viewer's
+// skill at all.
+describe('enchant_apply_view: the Lucent tier gates', () => {
+  const WEAPON = itemForSlot('mainhand');
+  const CHEST = itemForSlot('chest');
+  const LUCENT_WEAPON = 'enchant_weapon_lucent_might';
+  const INFUSION = 'enchant_lucent_infusion';
+
+  it('lists no target for a skill-gated enchant below its floor, on either family', () => {
+    const inventory: InvSlot[] = [{ itemId: WEAPON, count: 1 }];
+    const equipment = { mainhand: WEAPON };
+    const floor = ENCHANTS[LUCENT_WEAPON].skillReq as number;
+    // One point short, and the default (a caller that passes no skill at all):
+    // both offer nothing rather than promising an apply the sim denies.
+    expect(enchantTargets(inventory, LUCENT_WEAPON, [], floor - 1)).toEqual([]);
+    expect(enchantTargets(inventory, LUCENT_WEAPON)).toEqual([]);
+    expect(wornEnchantTargets(equipment, {}, LUCENT_WEAPON, floor - 1)).toEqual([]);
+    expect(wornEnchantTargets(equipment, {}, LUCENT_WEAPON)).toEqual([]);
+    // At the floor exactly, both families list the copy.
+    expect(enchantTargets(inventory, LUCENT_WEAPON, [], floor).map((r) => r.itemId)).toEqual([
+      WEAPON,
+    ]);
+    expect(wornEnchantTargets(equipment, {}, LUCENT_WEAPON, floor).map((r) => r.slot)).toEqual([
+      'mainhand',
+    ]);
+  });
+
+  it('leaves the free-floor enchants alone: a skill-0 viewer still sees every old target', () => {
+    // The gate is scoped to defs that declare a floor, so the pre-Lucent table
+    // behaves exactly as it did before this parameter existed.
+    const inventory: InvSlot[] = [{ itemId: WEAPON, count: 1 }];
+    expect(enchantTargets(inventory, 'enchant_weapon_might', [], 0).map((r) => r.itemId)).toEqual([
+      WEAPON,
+    ]);
+    expect(
+      wornEnchantTargets({ mainhand: WEAPON }, {}, 'enchant_weapon_might', 0).map((r) => r.slot),
+    ).toEqual(['mainhand']);
+  });
+
+  it('offers a Perfected-only enchant only on a copy carrying the marker', () => {
+    const cap = ENCHANTS[INFUSION].skillReq as number;
+    // A capped enchanter holding an ordinary copy: still nothing, because the
+    // gate is about the COPY. Today no shipped path mints the marker, so this
+    // is the state every live character is in.
+    expect(enchantTargets([{ itemId: CHEST, count: 1 }], INFUSION, [], cap)).toEqual([]);
+    expect(wornEnchantTargets({ chest: CHEST }, {}, INFUSION, cap)).toEqual([]);
+    // The same copy carrying the phase 12 marker becomes a target on both
+    // families, which is what proves the empty lists above are the GUARD
+    // answering and not the slot match or the skill gate.
+    expect(
+      enchantTargets(
+        [{ itemId: CHEST, count: 1, instance: { perfected: true } }],
+        INFUSION,
+        [],
+        cap,
+      ).map((r) => r.itemId),
+    ).toEqual([CHEST]);
+    expect(
+      wornEnchantTargets({ chest: CHEST }, { chest: { perfected: true } }, INFUSION, cap).map(
+        (r) => r.slot,
+      ),
+    ).toEqual(['chest']);
+  });
+
+  it('refuses every ordinary copy of every requiresPerfected enchant (the phase 10 contract)', () => {
+    const perfectedOnly = Object.values(ENCHANTS).filter((e) => e.requiresPerfected);
+    expect(perfectedOnly.length).toBeGreaterThan(0);
+    for (const enchant of perfectedOnly) {
+      const itemId = itemForSlot(enchant.itemSlot);
+      // Skill deliberately far above any floor: the only thing left refusing is
+      // the Perfected marker.
+      expect(enchantTargets([{ itemId, count: 1 }], enchant.id, [], 999), enchant.id).toEqual([]);
+      // A masterwork or signed copy is not a Perfected one either.
+      expect(
+        enchantTargets(
+          [{ itemId, count: 1, instance: { signer: 'Someone', rolled: { masterwork: true } } }],
+          enchant.id,
+          [],
+          999,
+        ),
+        `${enchant.id}: masterwork is not Perfected`,
+      ).toEqual([]);
+    }
   });
 });

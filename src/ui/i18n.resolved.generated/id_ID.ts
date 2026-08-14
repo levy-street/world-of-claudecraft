@@ -3124,7 +3124,11 @@ export const id_ID: EnTranslations = {
       "enchant_weapon_runed_focus": "Mantrai Senjata - Segel Bersura",
       "enchant_chest_runeweave": "Mantrai Dada - Tenun Rune",
       "enchant_legs_runed_hide": "Mantrai Celana - Kulit Bersura",
-      "enchant_helmet_runed_links": "Mantrai Helm - Kait Bersura"
+      "enchant_helmet_runed_links": "Mantrai Helm - Kait Bersura",
+      "enchant_weapon_lucent_might": "Enchant Weapon - Lucent Might",
+      "enchant_chest_lucent_stamina": "Enchant Chest - Lucent Stamina",
+      "enchant_feet_lucent_agility": "Enchant Boots - Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Profesi",
@@ -3384,13 +3388,16 @@ export const id_ID: EnTranslations = {
       "tier": {
         "base": "Mantra Dasar",
         "runed": "Mantra Bersura",
-        "greater": "Mantra Unggul"
+        "greater": "Mantra Unggul",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Bahan yang diharapkan:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} hingga {max} {item}",
       "alreadyEnchanted": "Barang itu sudah dimantrai.",
       "sameEnchant": "Barang itu sudah memiliki mantra itu.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Menggantikan {enchant}",
       "sameEnchantTag": "Sudah diterapkan",
       "plainTag": "Belum dimantrai",
@@ -5728,7 +5735,8 @@ export const id_ID: EnTranslations = {
         "tier": {
           "base": "Dasar",
           "runed": "Bersura",
-          "greater": "Unggul"
+          "greater": "Unggul",
+          "lucent": "Lucent"
         },
         "salvageHeading": "Salvasi",
         "salvageNote": "Salvasi adalah sepupu sederhana dari penghancuran mantra: senjata dan zirah yang sama, tidak memerlukan keahlian dan tidak menambah keahlian, mengembalikan serpihan kerajinan biasa berdasarkan kualitas alih-alih bahan arkana apa pun. Siapapun bisa melakukannya, pemantrai atau bukan. Saat memegang item yang layak dipecah, pilihannya sederhana: dari langka ke atas, penghancuran mantra jelas lebih menguntungkan, sementara pada biasa kedua hasil dijual dengan harga yang kira-kira sama ke pedagang, jadi pecah ke arah bahan yang benar-benar kamu butuhkan.",
@@ -8922,6 +8930,7 @@ export const id_ID: EnTranslations = {
       "tool": "Perkakas",
       "potion": "Ramuan",
       "elixir": "Eliksir",
+      "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Tas",
       "mount": "Tunggangan"
@@ -8951,6 +8960,10 @@ export const id_ID: EnTranslations = {
       "useDrink": "Pakai: Memulihkan {amount} mana selama {seconds} detik. Harus tetap duduk selama minum.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskThroughDeath": "The effect remains through death.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating.",
       "questItem": "Barang Misi",
       "questRelated": "Misi: {quest}",
       "questRules": "Tidak dapat dijual, disimpan di bank, atau ditukar.",
@@ -12517,6 +12530,30 @@ export const id_ID: EnTranslations = {
       },
       "makers_charm": {
         "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

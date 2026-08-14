@@ -50,6 +50,10 @@ interface WorldStub {
   inventory?: InvSlot[];
   equipment?: Record<string, string>;
   equippedInstances?: Record<string, unknown>;
+  /** The viewer's flat Enchanting skill, which the picker reads off
+   *  craftingIdentity for the Lucent tier's skill gate. Defaults to 0, a fresh
+   *  character, which is what every pre-Lucent case here assumes. */
+  enchantingSkill?: number;
 }
 
 function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {}) {
@@ -80,6 +84,9 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
   const world = {
     inventory: stub.inventory ?? [{ itemId: DUST, count: 99 }],
     equipment: stub.equipment ?? {},
+    // The atomic craft-skill mirror both real worlds implement; the picker
+    // reads Enchanting off it to mirror the sim's skill gate.
+    craftingIdentity: { craftSkills: { enchanting: stub.enchantingSkill ?? 0 } },
     playerId: 1,
     entities: new Map([[1, { equippedInstances: stub.equippedInstances ?? {} }]]),
     disenchantItem: (itemId: string, target?: { slotIndex: number }) => {
@@ -255,12 +262,15 @@ describe('Apply Enchant picker: tier sections and effect lines', () => {
     const h = harness(768, [{ itemId: ESSENCE, count: 99 }]);
     h.openPicker(ESSENCE);
     const headers = [...h.el.querySelectorAll('.ctx-section')];
-    // Essence is the one reagent that reaches all three tiers (the motivating
-    // wall this grouping exists for).
+    // Essence is the one reagent that reaches every tier (the motivating wall
+    // this grouping exists for). The Lucent section paints for a viewer who
+    // cannot yet apply it: the tier list is what the reagent buys, and the
+    // per-enchant gate lives on the target step.
     expect(headers.map((el) => el.textContent)).toEqual([
       'Base Enchants',
       'Runed Enchants',
       'Greater Enchants',
+      'Lucent Enchants',
     ]);
     // A caption is not an action: it carries no data-act, so it is never a
     // focus stop (bindContextMenuActions promotes only .ctx-item to role=button).
@@ -274,7 +284,7 @@ describe('Apply Enchant picker: tier sections and effect lines', () => {
     const h = harness(768, [{ itemId: ESSENCE, count: 99 }]);
     h.openPicker(ESSENCE);
     const groups = [...h.el.querySelectorAll('.ctx-group')];
-    expect(groups.length).toBe(3);
+    expect(groups.length).toBe(4);
     const ids = new Set();
     for (const group of groups) {
       expect(group.getAttribute('role')).toBe('group');
@@ -1176,10 +1186,16 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
       if (ids.length > 1 && itemDisplayName(ITEMS[ids[0]]) === itemDisplayName(ITEMS[ids[1]])) {
         sharedNameShapes += 1;
       }
+      // The Lucent tier gates on the copy as well as the crafter (the picker
+      // mirrors the sim's not_perfected refusal), so a Perfected-only enchant
+      // needs Perfected fixture copies or its list is empty and this sweep goes
+      // vacuous on exactly the id whose rows are hardest to tell apart.
+      const perfected = ENCHANTS[enchantId].requiresPerfected === true;
+      const mark = perfected ? { perfected: true as const } : {};
       const inventory: InvSlot[] = [{ itemId: DUST, count: 99 }];
       for (const itemId of ids) {
-        inventory.push({ itemId, count: 2 });
-        inventory.push({ itemId, count: 1, instance: { enchant: otherEnchant } });
+        inventory.push({ itemId, count: 2, ...(perfected ? { instance: { ...mark } } : {}) });
+        inventory.push({ itemId, count: 1, instance: { enchant: otherEnchant, ...mark } });
       }
       // Every equipment key the piece structurally fits, the sim's own rule, so
       // ring1+ring2 and mainhand+offhand both land in one list.
@@ -1198,9 +1214,13 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
         const equippedInstances: Record<string, unknown> = {};
         for (const slot of wornSlots) {
           equipment[slot] = ids[0];
-          if (wornEnchant !== undefined) equippedInstances[slot] = { enchant: wornEnchant };
+          if (wornEnchant !== undefined)
+            equippedInstances[slot] = { enchant: wornEnchant, ...mark };
+          else if (perfected) equippedInstances[slot] = { ...mark };
         }
-        const h = harness(768, { inventory, equipment, equippedInstances });
+        // Skill 125, the cap: the sweep is about row NAMES, so the viewer has
+        // to clear every skillReq in the table or the gated ids paint nothing.
+        const h = harness(768, { inventory, equipment, equippedInstances, enchantingSkill: 125 });
         h.openTargets(enchantId);
         const texts = h.rows().map((row) => row.text);
         expect(texts.length, `${enchantId} paints rows`).toBeGreaterThan(1);

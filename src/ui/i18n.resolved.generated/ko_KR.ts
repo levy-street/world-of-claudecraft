@@ -3124,7 +3124,11 @@ export const ko_KR: EnTranslations = {
       "enchant_weapon_runed_focus": "무기 마법부여 - 룬 인장",
       "enchant_chest_runeweave": "갑옷 마법부여 - 룬 직조",
       "enchant_legs_runed_hide": "다리 마법부여 - 룬 가죽",
-      "enchant_helmet_runed_links": "투구 마법부여 - 룬 사슬"
+      "enchant_helmet_runed_links": "투구 마법부여 - 룬 사슬",
+      "enchant_weapon_lucent_might": "무기 마법부여 - 광휘 위력",
+      "enchant_chest_lucent_stamina": "갑옷 마법부여 - 광휘 체력",
+      "enchant_feet_lucent_agility": "신발 마법부여 - 광휘 민첩성",
+      "enchant_lucent_infusion": "광휘 주입"
     },
     "professions": {
       "title": "전문 기술",
@@ -3384,13 +3388,16 @@ export const ko_KR: EnTranslations = {
       "tier": {
         "base": "기본 마법부여",
         "runed": "룬 마법부여",
-        "greater": "상급 마법부여"
+        "greater": "상급 마법부여",
+        "lucent": "광휘 마법부여"
       },
       "yieldHeader": "예상 재료:",
       "yieldLineExact": "{item} {count}개",
       "yieldLineRange": "{item} {min}~{max}개",
       "alreadyEnchanted": "해당 아이템에는 이미 마법부여가 되어 있습니다.",
       "sameEnchant": "해당 아이템에는 이미 같은 마법부여가 되어 있습니다.",
+      "notPerfected": "그 마법부여는 완전해진 아이템에만 깃듭니다.",
+      "enchantSkillTooLow": "그 마법부여를 다루기에는 마법부여 숙련이 부족합니다.",
       "replaceTag": "{enchant} 대체",
       "sameEnchantTag": "이미 적용됨",
       "plainTag": "마법부여 없음",
@@ -5728,12 +5735,13 @@ export const ko_KR: EnTranslations = {
         "tier": {
           "base": "기본",
           "runed": "룬",
-          "greater": "상급"
+          "greater": "상급",
+          "lucent": "광휘"
         },
         "salvageHeading": "해체",
         "salvageNote": "누구나 무기나 방어구를 품질에 따라 일반 재료로 해체할 수 있다. 마법부여 기술은 필요 없다.",
         "bonusFmt": "+{value} {stat}",
-        "enchantsNoteOffhand": "마법부여는 세 단으로 나뉜다. 기본 단은 Chime Dust로 돌아가고(위쪽 끝에서는 Essence가 조금 든다) 무기 자리와 보조 장비 자리, 모든 방어구 자리를 아우르며, 어떤 구성이든 자리마다 쓸 것을 찾을 만큼 능력치 갈래가 넉넉하다. 방패와 시전자용 보조 장비에는 저마다의 체력 마법부여가 있어, 착용 자리 가운데 마법부여가 없는 곳은 하나도 없다. 상급 단은 Chime Shard 하나에 Essence가 더 들며, 영향이 가장 큰 자리에 더 강한 보너스를 얹는다. Shard는 그 밖에도 두 군데로 더 흘러간다. 각각 다섯 개가 드는 두 부적 제조법과, 도구 효과 재충전의 최상단이다. 쓰기 전에 몇 개는 쟁여 두라.\n\n그 사이에는 다섯 가지 Runed 마법부여가 있다. 종류가 정해진 보조 재료마다 소비처가 하나씩 있어, 갈아 낸 것 가운데 막다른 길로 끝나는 것은 없다. Runed Edge(무기, 힘, Resonant Steel 소모), Runed Sigil(무기, 지능, Resonant Timber), Runed Weave(가슴, 정신, Resonant Thread), Runed Hide(다리, 민첩, Resonant Hide), Runed Links(투구, 체력, Resonant Links)다. 각각 Chime Essence도 두 개씩 든다. 같은 자리와 능력치에 기본 단과 상급 단이 모두 있는 경우 Runed의 보너스는 그 둘 사이에 놓이고, Runed Weave는 가슴 정신 마법부여 가운데 가장 강하며, Runed Hide는 다리 민첩 마법부여로는 유일하다. 정확한 수치는 모두 아래 표에 있다.",
+        "enchantsNoteOffhand": "마법부여는 네 단으로 나뉜다. 기본 단은 Chime Dust로 돌아가고(위쪽 끝에서는 Essence가 조금 든다) 무기 자리와 보조 장비 자리, 모든 방어구 자리를 아우르며, 어떤 구성이든 자리마다 쓸 것을 찾을 만큼 능력치 갈래가 넉넉하다. 방패와 시전자용 보조 장비에는 저마다의 체력 마법부여가 있어, 착용 자리 가운데 마법부여가 없는 곳은 하나도 없다. 상급 단은 Chime Shard 하나에 Essence가 더 들며, 영향이 가장 큰 자리에 더 강한 보너스를 얹는다. Shard는 그 밖에도 두 군데로 더 흘러간다. 각각 다섯 개가 드는 두 부적 제조법과, 도구 효과 재충전의 최상단이다. 쓰기 전에 몇 개는 쟁여 두라.\n\n그 사이에는 다섯 가지 Runed 마법부여가 있다. 종류가 정해진 보조 재료마다 소비처가 하나씩 있어, 갈아 낸 것 가운데 막다른 길로 끝나는 것은 없다. Runed Edge(무기, 힘, Resonant Steel 소모), Runed Sigil(무기, 지능, Resonant Timber), Runed Weave(가슴, 정신, Resonant Thread), Runed Hide(다리, 민첩, Resonant Hide), Runed Links(투구, 체력, Resonant Links)다. 각각 Chime Essence도 두 개씩 든다. 같은 자리와 능력치에 기본 단과 상급 단이 모두 있는 경우 Runed의 보너스는 그 둘 사이에 놓이고, Runed Weave는 가슴 정신 마법부여 가운데 가장 강하며, Runed Hide는 다리 민첩 마법부여로는 유일하다. 정확한 수치는 모두 아래 표에 있다.\n\n그 모두의 위에 광휘 단이 있다. 이 기술의 정점이자, 숙련 자체를 요구하는 유일한 마법부여다. 하나하나가 Lucent Reagent를 필요로 하며, 무기와 가슴, 신발의 각 계단을 한 칸씩 더 올린다. 그 마지막인 Lucent Infusion은 완전해진 물건에만 깃든다.",
         "charmsHeading": "채집자의 도구에 끼우는 부적",
         "charmsBody": "채집자의 부적도 마법부여에서 나온다. 마법부여가 25에 이르면 Tinker Gizzel이 Eastbrook 공작소에서 둘 다 가르친다. 채집 산출물을 하나 늘리는 Gatherer's Cache와, 캐 올린 것의 등급을 올리는 Artisan's Eye다. 각각 한 번 만들어 곡괭이나 도끼, 낫에 끼워 두면, 실제로 나아진 채집에만 충전을 쓴다.\n\n이 기술이 계속 벌어들이는 자리는 재충전이다. 충전은 찾아온 마법부여사가 아니라 도구의 주인이 되채우며, 그 주인이 부적에 서명한 마법부여사라면 재료가 절반만 들고, 마법부여를 주 전공으로 삼았다면 더 줄어든다. 그래서 계산대 너머로 판 부적은 한 번의 판매로 끝나지만, 자기 도구에 얹힌 부적은 계속 굴리기에 값싼 쪽이다. 충전과 재료의 전체 사다리는 어느 채집 전문직 지면에서든 도구 효과 항목에 있다."
       },
@@ -8922,6 +8930,7 @@ export const ko_KR: EnTranslations = {
       "tool": "도구",
       "potion": "물약",
       "elixir": "비약",
+      "flask": "플라스크",
       "scroll": "두루마리",
       "bag": "가방",
       "mount": "탈것"
@@ -8951,6 +8960,10 @@ export const ko_KR: EnTranslations = {
       "useDrink": "사용 효과: {seconds}초에 걸쳐 마나 {amount} 회복. 마시는 동안 앉아 있어야 합니다.",
       "useElixir": "사용: {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다. 같은 능력치의 다른 비약이나 두루마리를 대체합니다. 전투 중 사용 가능.",
       "useElixirAura": "사용: {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 같은 종류의 다른 비약이나 두루마리를 대체합니다. 전투 중 사용 가능.",
+      "flaskOnlyOne": "플라스크 효과는 한 번에 하나만 유지됩니다. 다른 플라스크를 마시면 이 효과를 대체합니다.",
+      "flaskThroughDeath": "이 효과는 죽어도 유지됩니다.",
+      "wellFed": "잘 먹음: 식사를 마치면 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.",
+      "wellFedAura": "잘 먹음: 식사를 마치면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.",
       "questItem": "퀘스트 아이템",
       "questRelated": "퀘스트: {quest}",
       "questRules": "판매, 은행에 보관, 거래할 수 없습니다.",
@@ -12517,6 +12530,30 @@ export const ko_KR: EnTranslations = {
       },
       "makers_charm": {
         "name": "장인의 부적"
+      },
+      "ironhusk_flask": {
+        "name": "무쇠껍질 플라스크"
+      },
+      "warboar_flask": {
+        "name": "전투 멧돼지 플라스크"
+      },
+      "runewater_flask": {
+        "name": "룬물 플라스크"
+      },
+      "stonepot_stew": {
+        "name": "돌솥 스튜"
+      },
+      "warspice_skewers": {
+        "name": "전투향 꼬치"
+      },
+      "sageleaf_chowder": {
+        "name": "현엽 차우더"
+      },
+      "grand_cauldron": {
+        "name": "거대한 가마솥"
+      },
+      "laden_hearth": {
+        "name": "풍성한 화덕"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

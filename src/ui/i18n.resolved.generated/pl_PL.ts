@@ -3124,7 +3124,11 @@ export const pl_PL: EnTranslations = {
       "enchant_weapon_runed_focus": "Zaklinanie broni - Runowe Ognisko",
       "enchant_chest_runeweave": "Zaklinanie piersi - Runowy splot",
       "enchant_legs_runed_hide": "Zaklinanie nóg - Runowa skóra",
-      "enchant_helmet_runed_links": "Zaklinanie hełmu - Runowe ogniwa"
+      "enchant_helmet_runed_links": "Zaklinanie hełmu - Runowe ogniwa",
+      "enchant_weapon_lucent_might": "Enchant Weapon - Lucent Might",
+      "enchant_chest_lucent_stamina": "Enchant Chest - Lucent Stamina",
+      "enchant_feet_lucent_agility": "Enchant Boots - Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Zawody",
@@ -3384,13 +3388,16 @@ export const pl_PL: EnTranslations = {
       "tier": {
         "base": "Zaklęcia podstawowe",
         "runed": "Zaklęcia runiczne",
-        "greater": "Zaklęcia wyższe"
+        "greater": "Zaklęcia wyższe",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Oczekiwane materiały:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "od {min} do {max} {item}",
       "alreadyEnchanted": "Ten przedmiot jest już zaklęty.",
       "sameEnchant": "Ten przedmiot już ma to zaklęcie.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Zastępuje {enchant}",
       "sameEnchantTag": "Już zastosowane",
       "plainTag": "Bez zaklęcia",
@@ -5728,7 +5735,8 @@ export const pl_PL: EnTranslations = {
         "tier": {
           "base": "Podstawowy",
           "runed": "Runiczny",
-          "greater": "Wyższy"
+          "greater": "Wyższy",
+          "lucent": "Lucent"
         },
         "salvageHeading": "Odzyskiwanie",
         "salvageNote": "Odzyskiwanie to brat zwykłych ludzi dla rozkładania zaklęć: te same bronie i zbroje, nie wymaga umiejętności i żadnej nie daje, zwracając zwykłe rzemieślnicze złomy według jakości zamiast czegokolwiek arkanicznego. Może to robić każdy, zaklinacz czy nie. Gdy trzymasz przedmiot wart rozbicia, wybór jest prosty: od rzadkiego wzwyż rozkładanie zaklęć jest bezwzględnie lepszą ofertą, a przy pospolitym oba plony sprzedają się za mniej więcej tyle samo, więc rozbijaj w stronę materiału, którego faktycznie potrzebujesz.",
@@ -8922,6 +8930,7 @@ export const pl_PL: EnTranslations = {
       "tool": "Narzędzie",
       "potion": "Mikstura",
       "elixir": "Eliksir",
+      "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Torba",
       "mount": "Wierzchowiec"
@@ -8951,6 +8960,10 @@ export const pl_PL: EnTranslations = {
       "useDrink": "Użycie: Przywraca {amount} many w ciągu {seconds} s. Podczas picia musisz pozostać w pozycji siedzącej.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskThroughDeath": "The effect remains through death.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating.",
       "questItem": "Przedmiot zadania",
       "questRelated": "Zadanie: {quest}",
       "questRules": "Nie można go sprzedać, zdeponować w banku ani wymienić.",
@@ -12517,6 +12530,30 @@ export const pl_PL: EnTranslations = {
       },
       "makers_charm": {
         "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

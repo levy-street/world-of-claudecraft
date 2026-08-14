@@ -33,6 +33,14 @@ describe('bag_item_context_menu: enchant reagent detection', () => {
     expect(reagentIds.size).toBeGreaterThan(1);
     for (const id of reagentIds) expect(isEnchantReagentItem(id)).toBe(true);
     expect(isEnchantReagentItem('arcane_dust')).toBe(true);
+    // Masterwrought phase 10: the apex intermediate became a reagent, which is
+    // the whole of its right-click entry point. Named as a LITERAL beside the
+    // derived sweep above, which reads the same table the predicate does and so
+    // cannot notice the id leaving the enchant table.
+    expect(isEnchantReagentItem('lucent_reagent')).toBe(true);
+    // And the action really is offered on it: nothing in the eligibility chain
+    // gates Apply Enchant on item kind, so a junk-kind material qualifies.
+    expect(bagItemNewActions(def('material'), 'lucent_reagent')).toEqual(['applyEnchant', 'lock']);
   });
   it('rejects a non-reagent id', () => {
     expect(isEnchantReagentItem('bone_fragments')).toBe(false);

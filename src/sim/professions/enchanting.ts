@@ -83,7 +83,7 @@ import {
 } from '../types';
 import { enchantingGainMultiplier } from './archetype';
 import { DISENCHANT_MATERIAL_BY_QUALITY, typedSecondaryFor } from './disenchant_reagents';
-import { gainCraftSkill } from './wheel';
+import { gainCraftSkill, skillInCraft } from './wheel';
 
 // #1712 round-3 review: neither action previously called gainCraftSkill, so
 // craftSkills.enchanting stayed 0 forever, permanently locking the
@@ -231,17 +231,41 @@ export function maxDisenchantYield(def: ItemDef): number {
   return baseDisenchantYield(def) + 1;
 }
 
+/** The reagent that marks the Lucent (apex) tier, the top rung of the ladder
+ *  below. It cannot be read off item quality like the other three rungs:
+ *  crafting materials are authored common/white ON PURPOSE (content/
+ *  profession_items.ts, so the junk sweep never vendors a reagent), which
+ *  would score the whole apex tier at or below its own Greater rung, and the
+ *  dust-plus-lucent boots enchant at tier 0. */
+const APEX_TIER_REAGENT = 'lucent_reagent';
+
+/** The gain tier a Lucent enchant scores: the epic rung of
+ *  ENCHANTING_GAIN_TIER_BY_QUALITY, one step above the shard-consuming
+ *  Greater tier (rare) and still below legendary, so the ladder extends
+ *  rather than saturating. Read from that table, never a bare 3, so the two
+ *  cannot drift. */
+const APEX_ENCHANT_GAIN_TIER = ENCHANTING_GAIN_TIER_BY_QUALITY.epic;
+
 /** The gain tier of one enchant for the apply arm: EnchantDef carries no
  *  tier/quality field of its own, so the existing tier notion is the
- *  reagent ladder the two-layer table is built on (arcane_dust base,
- *  arcane_essence mid, arcane_shard Greater): the MAX reagent item-def
+ *  reagent ladder the table is built on (arcane_dust base, arcane_essence
+ *  mid, arcane_shard Greater, lucent_reagent apex): the MAX reagent item-def
  *  quality, mapped through ENCHANTING_GAIN_TIER_BY_QUALITY (same
- *  max-over-reagents convention as material_tier.ts). Today that reads
- *  dust-only enchants as tier 0, essence-consuming ones as tier 1, and the
- *  shard-consuming Greater tier as tier 2. */
+ *  max-over-reagents convention as material_tier.ts), with the apex reagent
+ *  named explicitly because its own quality cannot carry the rung (see
+ *  APEX_TIER_REAGENT). Today that reads dust-only enchants as tier 0,
+ *  essence-consuming ones as tier 1, the shard-consuming Greater tier as
+ *  tier 2, and the Lucent tier as tier 3. */
 export function enchantGainTier(enchant: EnchantDef): number {
   let tier = 0;
   for (const reagent of enchant.reagents) {
+    // Folded into the same max, not returned early: the convention is
+    // max-over-reagents, and a future apex enchant carrying a higher-quality
+    // reagent must keep scoring by the higher of the two.
+    if (reagent.itemId === APEX_TIER_REAGENT) {
+      tier = Math.max(tier, APEX_ENCHANT_GAIN_TIER);
+      continue;
+    }
     const quality = ITEMS[reagent.itemId]?.quality;
     if (quality) tier = Math.max(tier, ENCHANTING_GAIN_TIER_BY_QUALITY[quality]);
   }
@@ -681,7 +705,36 @@ export interface ApplyEnchantResult {
     // because its accept would be pure reagent loss with zero state change.
     | 'already_enchanted'
     | 'same_enchant'
+    // Masterwrought phase 10, the Lucent tier's two gates (both side-effect
+    // free, both drawing no rng, both applied at cast START through the
+    // admission mirror as well as here):
+    //   not_perfected: a requiresPerfected enchant aimed at a copy carrying no
+    //     `perfected` marker. Nothing mints that marker before phase 12, so
+    //     today this refuses every copy in the game, by construction.
+    //   insufficient_skill: the applier's flat `enchanting` skill is under the
+    //     enchant's skillReq. Absent skillReq keeps the historical free floor.
+    | 'not_perfected'
+    | 'insufficient_skill'
     | 'busy';
+}
+
+/** Does this player hold a copy of `itemId` the Perfected guard would accept?
+ *  With `slot` named it is the worn copy in that exact equipment slot; without
+ *  one it is any bagged copy carrying the marker.
+ *
+ *  The bagged arm answers about the HOLDING, not about the one copy the apply
+ *  would consume, and that is a phase 12 obligation rather than an accident:
+ *  the guard runs before the arm split (so the refusal is stable whatever the
+ *  slot), and while nothing mints `perfected` both readings refuse identically.
+ *  When phase 12 starts stamping copies, this has to narrow to the victim the
+ *  apply actually spends (the item_copy_ref pin discipline the disenchant path
+ *  already follows), or a player holding one Perfected copy could spend an
+ *  ordinary one. Exported for that phase's tests. */
+export function holdsPerfectedTarget(meta: PlayerMeta, itemId: string, slot?: EquipSlot): boolean {
+  if (slot) {
+    return meta.equipment[slot] === itemId && meta.equipmentInstance?.[slot]?.perfected === true;
+  }
+  return meta.inventory.some((s) => s.itemId === itemId && s.instance?.perfected === true);
 }
 
 /** The exact instance payload an apply-enchant mints from the copy it
@@ -1036,7 +1089,28 @@ function resolveReplaceEnchantBagged(
  *  quietly spending the free copy. The player asked for this specific copy in
  *  the picker (the replace row is the only sender of the flag), and silently
  *  redirecting a confirmed destroy onto a different copy would be the bigger
- *  surprise. */
+ *  surprise.
+ *
+ *  DENY LADDER, in order, and the order is deliberate the way #2415's
+ *  flag-before-id-compare is (evaluateApplyEnchantAdmission mirrors it arm for
+ *  arm, and src/ui/enchant_apply_view.ts mirrors the first four so the picker
+ *  never offers what this refuses):
+ *    1. unknown_item / unknown_enchant: nothing to reason about without both
+ *       defs, so they come first whatever else is wrong.
+ *    2. not_perfected: a requiresPerfected enchant is a fact about the
+ *       ENCHANT, so it is answered before the slot compare. Deliberate: the
+ *       Lucent Infusion refuses identically whether the player aimed it at a
+ *       chest piece or a boot, and the message never changes under them when
+ *       phase 12 moves its slot.
+ *    3. wrong_slot: the enchant does not target this item's slot kind.
+ *    4. insufficient_skill: the applier cannot work this tier at all. Above
+ *       the holding and material checks because it is the standing fact about
+ *       the CRAFTER, not about this attempt's inventory: telling a skill-40
+ *       enchanter to go find more reagents would send them shopping for an
+ *       enchant they still could not apply.
+ *    5. per-arm holding gates (not_held, already_enchanted, same_enchant),
+ *       then reagents (all-or-nothing), then the #2350 capacity gate.
+ *  Every deny is side-effect free and draws no rng. */
 export function resolveApplyEnchant(
   ctx: SimContext,
   pid: number,
@@ -1049,11 +1123,25 @@ export function resolveApplyEnchant(
   if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return { ok: false, itemId, enchantId, reason: 'unknown_enchant' };
+  const applier = ctx.players.get(pid);
+  // Rungs 2 and 4 of the deny ladder above, shared by every arm. A missing
+  // meta refuses both the same way a marker-less copy and a skill-0 character
+  // do: the answers are honest (no meta holds nothing and knows nothing), and
+  // neither gate touches state or draws rng.
+  if (enchant.requiresPerfected && !(applier && holdsPerfectedTarget(applier, itemId, slot))) {
+    return { ok: false, itemId, enchantId, reason: 'not_perfected' };
+  }
   // The slot-kind gate is shared by both arms: an item declares its slot KIND
   // ('ring' for either finger, 'mainhand' for a one-hand weapon worn in either
   // hand), which is what an enchant's itemSlot names.
   if (itemDef.slot !== enchant.itemSlot) {
     return { ok: false, itemId, enchantId, reason: 'wrong_slot' };
+  }
+  if (
+    enchant.skillReq !== undefined &&
+    skillInCraft(applier?.craftSkills ?? {}, 'enchanting') < enchant.skillReq
+  ) {
+    return { ok: false, itemId, enchantId, reason: 'insufficient_skill' };
   }
   if (slot) return resolveApplyEnchantWorn(ctx, pid, itemId, enchant, slot, confirmReplace);
   // The bagged eligibility split (#2415): countItem sees every bagged copy,
@@ -1079,7 +1167,8 @@ export function resolveApplyEnchant(
       return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
     }
   }
-  const meta = ctx.players.get(pid);
+  // The same meta the two Lucent-tier gates above read; resolved once.
+  const meta = applier;
   // Craft Cast System Phase 4: no shared action throttle; cast duration paces.
   // #2350 capacity gate: the freshly-enchanted instance must fit AFTER the
   // consumed copy and every reagent leave, so model all of it on a scratch
@@ -1144,6 +1233,11 @@ export function resolveApplyEnchant(
  * mutating inventory or equipment. confirmReplace must already be true to
  * start a cast against an already-enchanted target (confirm dialog is the
  * gate; the cast is only the pace).
+ *
+ * The Lucent-tier gates (not_perfected, insufficient_skill) live here as well
+ * as in the resolver, in the same ladder position, so the refusal lands at cast
+ * START: an enchant the applier cannot work must never buy a cast bar, and the
+ * family-cast model expects an admitted cast to be one that can complete.
  */
 export function evaluateApplyEnchantAdmission(
   ctx: SimContext,
@@ -1157,8 +1251,18 @@ export function evaluateApplyEnchantAdmission(
   if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return { ok: false, itemId, enchantId, reason: 'unknown_enchant' };
+  const applier = ctx.players.get(pid);
+  if (enchant.requiresPerfected && !(applier && holdsPerfectedTarget(applier, itemId, slot))) {
+    return { ok: false, itemId, enchantId, reason: 'not_perfected' };
+  }
   if (itemDef.slot !== enchant.itemSlot) {
     return { ok: false, itemId, enchantId, reason: 'wrong_slot' };
+  }
+  if (
+    enchant.skillReq !== undefined &&
+    skillInCraft(applier?.craftSkills ?? {}, 'enchanting') < enchant.skillReq
+  ) {
+    return { ok: false, itemId, enchantId, reason: 'insufficient_skill' };
   }
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, enchantId, reason: 'not_held' };

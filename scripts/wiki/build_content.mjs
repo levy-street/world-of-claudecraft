@@ -984,12 +984,17 @@ const typedSecondaryIds = new Set([
   'resonant_steel',
   'resonant_timber',
 ]);
+// Top down, the same precedence src/ui/enchant_apply_view.ts enchantTier and
+// the sim's enchantGainTier use: the apex Lucent reagent wins over the shard
+// (every Lucent enchant consumes both), then the shard, then a typed secondary.
 const enchantTier = (e) =>
-  e.reagents.some((g) => g.itemId === 'arcane_shard')
-    ? 'greater'
-    : e.reagents.some((g) => typedSecondaryIds.has(g.itemId))
-      ? 'runed'
-      : 'base';
+  e.reagents.some((g) => g.itemId === 'lucent_reagent')
+    ? 'lucent'
+    : e.reagents.some((g) => g.itemId === 'arcane_shard')
+      ? 'greater'
+      : e.reagents.some((g) => typedSecondaryIds.has(g.itemId))
+        ? 'runed'
+        : 'base';
 const profEnchanting = {
   disenchantByQuality: Object.entries(DISENCHANT_MATERIAL_BY_QUALITY).map(([quality, m]) => ({
     quality,
@@ -1352,7 +1357,7 @@ export interface GuideProfEnchanting {
     id: string;
     name: string;
     slot: string;
-    tier: 'base' | 'runed' | 'greater';
+    tier: 'base' | 'runed' | 'greater' | 'lucent';
     reagents: GuideProfMaterial[];
     bonus: { stat: string; value: number }[];
   }[];

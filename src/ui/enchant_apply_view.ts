@@ -27,7 +27,7 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
-import { ENCHANTS } from '../sim/content/enchants';
+import { ENCHANTS, type EnchantDef } from '../sim/content/enchants';
 import { ITEMS } from '../sim/data';
 import { isEnchantedInstance, replaceVictimIndex } from '../sim/professions/enchanting';
 import {
@@ -136,19 +136,28 @@ export function enchantsForReagent(
   return rows;
 }
 
-/** The three enchant tiers the picker groups by, in ladder order. Derived from
+/** The four enchant tiers the picker groups by, in ladder order. Derived from
  *  the reagents alone (EnchantDef carries no tier field and this change adds
- *  none): arcane_shard is the Greater tier's exclusive reagent, a typed
- *  `resonant_*` secondary is the Runed tier's, and everything else is Base.
- *  Shard WINS over resonant so a hypothetical enchant consuming both still
- *  reads as the top tier (content/enchants.ts describes shard as the premium
- *  that has to stay a visible step). */
-export type EnchantTier = 'base' | 'runed' | 'greater';
+ *  none): lucent_reagent is the apex Lucent tier's exclusive reagent,
+ *  arcane_shard is the Greater tier's, a typed `resonant_*` secondary is the
+ *  Runed tier's, and everything else is Base. The precedence runs top down
+ *  (lucent beats shard beats resonant) so an enchant consuming two tiers'
+ *  reagents still reads as the higher one; every shipped Lucent enchant does
+ *  exactly that, since the tier is an apex layer over the existing economy
+ *  rather than a separate one. Mirrors src/sim/professions/enchanting.ts
+ *  enchantGainTier, which derives the same ladder for skill gain. */
+export type EnchantTier = 'base' | 'runed' | 'greater' | 'lucent';
 
-export const ENCHANT_TIER_ORDER: readonly EnchantTier[] = ['base', 'runed', 'greater'];
+export const ENCHANT_TIER_ORDER: readonly EnchantTier[] = ['base', 'runed', 'greater', 'lucent'];
 
 /** The item id whose presence in an enchant's reagents marks the Greater tier. */
 const GREATER_TIER_REAGENT = 'arcane_shard';
+
+/** The item id whose presence marks the apex Lucent tier (Masterwrought phase
+ *  10). Named rather than derived from quality: the intermediate is authored
+ *  common like every crafting material, so nothing about the item itself says
+ *  "apex". */
+const LUCENT_TIER_REAGENT = 'lucent_reagent';
 
 /** The id prefix of the typed disenchant secondaries
  *  (src/sim/professions/disenchant_reagents.ts), the Runed tier's reagents. */
@@ -159,12 +168,14 @@ const RUNED_TIER_REAGENT_PREFIX = 'resonant_';
 export function enchantTier(enchantId: string): EnchantTier {
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return 'base';
+  let greater = false;
   let runed = false;
   for (const reagent of enchant.reagents) {
-    if (reagent.itemId === GREATER_TIER_REAGENT) return 'greater';
-    if (reagent.itemId.startsWith(RUNED_TIER_REAGENT_PREFIX)) runed = true;
+    if (reagent.itemId === LUCENT_TIER_REAGENT) return 'lucent';
+    if (reagent.itemId === GREATER_TIER_REAGENT) greater = true;
+    else if (reagent.itemId.startsWith(RUNED_TIER_REAGENT_PREFIX)) runed = true;
   }
-  return runed ? 'runed' : 'base';
+  return greater ? 'greater' : runed ? 'runed' : 'base';
 }
 
 /** Paperdoll order for the picker's within-section sort: the weapon first, then
@@ -192,6 +203,38 @@ function slotSortIndex(itemSlot: string): number {
 /** The localized section-header key for one tier. */
 export function enchantTierTitleKey(tier: EnchantTier): TranslationKey {
   return `hudChrome.enchanting.tier.${tier}` as TranslationKey;
+}
+
+/** Whether the viewer's flat Enchanting skill clears `enchant`'s own floor
+ *  (EnchantDef.skillReq, absent on every pre-Lucent enchant and absent meaning
+ *  the free floor). The skill half of the sim's deny ladder
+ *  (src/sim/professions/enchanting.ts, `insufficient_skill`), mirrored so the
+ *  picker never lists a target for an enchant the apply would refuse outright.
+ *  A skill-gated enchant with no reachable target paints the picker's existing
+ *  "no eligible item" line, which is also what an ordinary enchant with nothing
+ *  to enchant already does. */
+function skillMeetsEnchant(enchant: EnchantDef, enchantingSkill: number): boolean {
+  return enchant.skillReq === undefined || enchantingSkill >= enchant.skillReq;
+}
+
+/** Whether one specific copy may take `enchant`, on the sim's `not_perfected`
+ *  gate alone: a requiresPerfected enchant needs the copy's Perfected marker,
+ *  and everything else takes any copy. Nothing mints that marker before phase
+ *  12, so today this hides the Lucent Infusion's target list entirely, exactly
+ *  as the sim refuses every attempt.
+ *
+ *  KNOWN LIMIT, and a phase 12 obligation: the WORN family reads the trimmed
+ *  `eqi` mirror online (signer/enchant/rolled only, server/game.ts data
+ *  minimization), which does not carry `perfected`. When phase 12 starts
+ *  minting the marker it has to decide whether the field reaches that wire, or
+ *  an online client will hide a worn Perfected copy the sim would accept. Inert
+ *  today (no copy carries the marker in either host), and pinned in
+ *  tests/enchant_apply_view.test.ts so widening the wire re-opens it. */
+function copyMeetsPerfectedGate(
+  enchant: EnchantDef,
+  instance: ItemInstancePayload | undefined,
+): boolean {
+  return !enchant.requiresPerfected || instance?.perfected === true;
 }
 
 export interface EnchantPickSection {
@@ -433,19 +476,30 @@ export interface EnchantTargetRow {
  *  see an enchanted copy that happens to be on the body rather than in the bags.
  *  The two families are one list to the reader, so an enchanted worn copy leaves
  *  its bagged plain twin just as bare as an enchanted bagged one would. Nothing
- *  else reads it, and the default (none) is the bagged-pair-only behavior. */
+ *  else reads it, and the default (none) is the bagged-pair-only behavior.
+ *
+ *  `enchantingSkill` is the viewer's flat Enchanting skill, for the Lucent
+ *  tier's two gates (skillMeetsEnchant / copyMeetsPerfectedGate above): a copy
+ *  the sim would refuse never becomes a row. It DEFAULTS TO 0 deliberately,
+ *  the same reasoning replaceInfoFor's `wireTrimmed` follows in reverse: the
+ *  missing-argument answer has to be the one that offers LESS, and a caller
+ *  that forgets it hides the four skill-gated enchants' targets rather than
+ *  promising an apply the sim denies. */
 export function enchantTargets(
   inventory: readonly InvSlot[],
   enchantId: string,
   worn: readonly WornEnchantTargetRow[] = [],
+  enchantingSkill = 0,
 ): EnchantTargetRow[] {
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return [];
+  if (!skillMeetsEnchant(enchant, enchantingSkill)) return [];
   const byItem = new Map<string, number>();
   const enchantedByItem = new Map<string, number>();
   for (const slot of inventory) {
     const def = ITEMS[slot.itemId];
     if (!def || def.slot !== enchant.itemSlot) continue;
+    if (!copyMeetsPerfectedGate(enchant, slot.instance)) continue;
     if (slot.instance && isEnchantedInstance(slot.instance)) {
       enchantedByItem.set(slot.itemId, (enchantedByItem.get(slot.itemId) ?? 0) + slot.count);
       continue;
@@ -524,14 +578,20 @@ export interface WornEnchantTargetRow {
  *
  *  `equipment` and `equippedInstances` are read straight off the two worlds'
  *  shared surfaces (IWorld.equipment and the self entity mirror
- *  Entity.equippedInstances), so this decides identically offline and online. */
+ *  Entity.equippedInstances), so this decides identically offline and online.
+ *
+ *  `enchantingSkill` gates exactly as it does on the bagged family above, same
+ *  offer-less default, and the per-copy Perfected gate runs here too (with the
+ *  worn-mirror limit copyMeetsPerfectedGate documents). */
 export function wornEnchantTargets(
   equipment: Partial<Record<EquipSlot, string>>,
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>,
   enchantId: string,
+  enchantingSkill = 0,
 ): WornEnchantTargetRow[] {
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return [];
+  if (!skillMeetsEnchant(enchant, enchantingSkill)) return [];
   const rows: WornEnchantTargetRow[] = [];
   for (const slot of ALL_EQUIP_SLOTS) {
     const itemId = equipment[slot];
@@ -539,6 +599,7 @@ export function wornEnchantTargets(
     const def = ITEMS[itemId];
     if (!def || def.slot !== enchant.itemSlot) continue;
     const instance = equippedInstances[slot];
+    if (!copyMeetsPerfectedGate(enchant, instance)) continue;
     if (instance && isEnchantedInstance(instance)) {
       // wireTrimmed: this arm reads the WORN mirror, whose online form is the
       // stripped eqi allowlist (signer/enchant/rolled). See

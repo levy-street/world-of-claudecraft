@@ -2251,9 +2251,13 @@ describe('Guide professions enchanting and economy accuracy', () => {
       expect(row.bonus).toEqual(
         Object.entries(def.statBonus).map(([stat, value]) => ({ stat, value })),
       );
-      // Tier is structural: shard = Greater, typed secondary = Runed.
+      // Tier is structural, top down: lucent_reagent = Lucent (the apex tier,
+      // whose enchants also carry a shard or dust from the tier below, so the
+      // apex test has to come first), shard = Greater, typed secondary = Runed.
+      const hasLucent = def.reagents.some((g) => g.itemId === 'lucent_reagent');
       const hasShard = def.reagents.some((g) => g.itemId === 'arcane_shard');
-      expect(row.tier === 'greater').toBe(hasShard);
+      expect(row.tier === 'lucent').toBe(hasLucent);
+      expect(row.tier === 'greater').toBe(!hasLucent && hasShard);
     }
     // The five Runed consumer enchants (the only typed-secondary sink).
     expect(
@@ -2269,6 +2273,18 @@ describe('Guide professions enchanting and economy accuracy', () => {
       'enchant_weapon_runed_focus',
     ]);
     expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(6);
+    // The four Lucent (apex) enchants, Masterwrought phase 10.
+    expect(
+      e.enchants
+        .filter((row) => row.tier === 'lucent')
+        .map((row) => row.id)
+        .sort(),
+    ).toEqual([
+      'enchant_chest_lucent_stamina',
+      'enchant_feet_lucent_agility',
+      'enchant_lucent_infusion',
+      'enchant_weapon_lucent_might',
+    ]);
   });
 
   it('mirrors the disenchant, typed-secondary, and salvage yield maps', () => {

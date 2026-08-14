@@ -77,6 +77,11 @@ export interface ApplyEnchantResultEvent {
     // identical-enchant-id re-apply denied on every arm.
     | 'already_enchanted'
     | 'same_enchant'
+    // Masterwrought phase 10, the Lucent tier's two gates: the Perfected-only
+    // enchant aimed at an ordinary copy, and an enchant above the applier's
+    // Enchanting skill.
+    | 'not_perfected'
+    | 'insufficient_skill'
     | 'busy';
 }
 
@@ -176,6 +181,13 @@ export function applyEnchantResultToast(ev: ApplyEnchantResultEvent): Enchanting
       return { key: 'hudChrome.enchanting.alreadyEnchanted', sink: 'error' };
     case 'same_enchant':
       return { key: 'hudChrome.enchanting.sameEnchant', sink: 'error' };
+    // The Lucent tier's two gates, each naming its own cause: neither is a
+    // "you do not have that" problem, and both are things the player can act
+    // on (Perfect the piece, or raise the craft).
+    case 'not_perfected':
+      return { key: 'hudChrome.enchanting.notPerfected', sink: 'error' };
+    case 'insufficient_skill':
+      return { key: 'hudChrome.enchanting.enchantSkillTooLow', sink: 'error' };
     default:
       return { key: 'hudChrome.enchanting.notHeld', sink: 'error' };
   }

@@ -181,6 +181,11 @@ export interface ApplyEnchantResultView {
     // re-apply whose accept would be pure reagent loss.
     | 'already_enchanted'
     | 'same_enchant'
+    // Masterwrought phase 10, the Lucent tier: a requiresPerfected enchant on
+    // a copy carrying no Perfected marker, and an enchant whose skillReq is
+    // above the applier's flat Enchanting skill.
+    | 'not_perfected'
+    | 'insufficient_skill'
     | 'busy';
 }
 

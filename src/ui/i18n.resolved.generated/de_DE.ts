@@ -3124,7 +3124,11 @@ export const de_DE: EnTranslations = {
       "enchant_weapon_runed_focus": "Waffe verzaubern - Runenfokus",
       "enchant_chest_runeweave": "Brust verzaubern - Runenweberei",
       "enchant_legs_runed_hide": "Hose verzaubern - Runenfell",
-      "enchant_helmet_runed_links": "Helm verzaubern - Runenkette"
+      "enchant_helmet_runed_links": "Helm verzaubern - Runenkette",
+      "enchant_weapon_lucent_might": "Enchant Weapon - Lucent Might",
+      "enchant_chest_lucent_stamina": "Enchant Chest - Lucent Stamina",
+      "enchant_feet_lucent_agility": "Enchant Boots - Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Berufe",
@@ -3384,13 +3388,16 @@ export const de_DE: EnTranslations = {
       "tier": {
         "base": "Basisverzauberungen",
         "runed": "Runen-Verzauberungen",
-        "greater": "Große Verzauberungen"
+        "greater": "Große Verzauberungen",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Erwartete Materialien:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} bis {max} {item}",
       "alreadyEnchanted": "Dieser Gegenstand ist bereits verzaubert.",
       "sameEnchant": "Dieser Gegenstand hat diese Verzauberung bereits.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Ersetzt {enchant}",
       "sameEnchantTag": "Bereits angewendet",
       "plainTag": "Nicht verzaubert",
@@ -5728,7 +5735,8 @@ export const de_DE: EnTranslations = {
         "tier": {
           "base": "Basis",
           "runed": "Runisch",
-          "greater": "Großartig"
+          "greater": "Großartig",
+          "lucent": "Lucent"
         },
         "salvageHeading": "Zerlegen",
         "salvageNote": "Zerlegen ist der volkstümliche Cousin des Entzauberns: dieselben Waffen und Rüstungen, keine Fertigkeit erforderlich und keine erworben, liefert schlichte Handwerksschrott nach Qualität statt etwas Arkanem. Jeder kann es tun, Verzauberer oder nicht. Hältst du ein Stück, das es wert ist, zerbrochen zu werden, ist die Wahl einfach: Ab Selten ist Entzaubern das eindeutig bessere Geschäft, während bei Gewöhnlich beide Erträge für etwa dasselbe an einen Händler verkaufen, also zerbrich in Richtung des Materials, das du tatsächlich brauchst.",
@@ -8922,6 +8930,7 @@ export const de_DE: EnTranslations = {
       "tool": "Werkzeug",
       "potion": "Trank",
       "elixir": "Elixier",
+      "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Tasche",
       "mount": "Reittier"
@@ -8951,6 +8960,10 @@ export const de_DE: EnTranslations = {
       "useDrink": "Benutzen: Stellt über {seconds} Sek. {amount} Mana wieder her. Ihr müsst beim Trinken sitzen bleiben.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskThroughDeath": "The effect remains through death.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating.",
       "questItem": "Questgegenstand",
       "questRelated": "Quest: {quest}",
       "questRules": "Kann nicht verkauft, eingelagert oder gehandelt werden.",
@@ -12517,6 +12530,30 @@ export const de_DE: EnTranslations = {
       },
       "makers_charm": {
         "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
