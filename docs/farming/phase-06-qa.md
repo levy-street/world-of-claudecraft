@@ -44,7 +44,14 @@ STEP 0 - PRE-FLIGHT
   the HUD farming feedback arms now live in src/ui/farm_event_feedback.ts and
   the farming command bodies plus the fplot row in
   server/farming_commands.ts; audit their content against the Phase 6-era
-  hud.ts/game.ts blocks, not as new logic.]
+  hud.ts/game.ts blocks, not as new logic. Two sync facts bind this QA's
+  FIXES: (1) the release's monolith ratchet leaves NEAR-ZERO headroom
+  (src/ui/hud.ts 4 lines, server/game.ts 2, src/sim/sim.ts 82 under their
+  tests/monolith_budget.test.ts ceilings), so any fix touching those files
+  lands as a sibling module, extraction-first, never inline growth; (2)
+  re-resolve the NEWEST origin/release/** at start (952c183fc3 was newest at
+  the sync, 2026-08-13); if it has moved, the D22 sync-mid-phase rule in
+  state.md decides whether a fresh absorb runs first.]
 - If the diff cannot be identified cleanly, stop and surface.
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus
   mutation-checks-commit-first, i18n-semantic-regressions-gate-trap,
@@ -145,8 +152,13 @@ STOPPING RULES
   without new content).
 - Stop if the phase diff cannot be identified cleanly.
 
-When the audit and fixes are done: gate via node scripts/gate_select.mjs (the armory
-browser red is the standing environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker;
-PR CI is the arbiter) and push the fix commits to the phase PR branch.
+When the audit and fixes are done: gate via BROWSER_PATH=$HOME/.cache/ms-playwright/
+chromium-1228/chrome-linux64/chrome node scripts/gate_select.mjs on a FROZEN,
+committed tree (never edit while it runs); judge ONLY the log markers (grep for
+"FAIL": the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL",
+plus the GATE EXIT marker; the shell exit code has lied). [AMENDED per D22: no PR
+and no pushes. Fix commits land on fix/farming-phase-06-qa cut off LOCAL
+feature/farming-plan, merged back --no-ff with the branch deleted; the gate log is
+the arbiter and the progress.md Notes block is the phase report.]
 Packet teardown never happens in this phase; it belongs to Phase 13 QA only.
 ```
