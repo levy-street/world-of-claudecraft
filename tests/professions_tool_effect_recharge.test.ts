@@ -558,7 +558,12 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
     // a rare-or-better OUTPUT def quality (`poor`/absent normalize to
     // `common` first, mirroring crafting.ts's defOutputQuality), and the
     // corpse-harvest premium arm, whose component and specimen grants arrive
-    // signed (HARVEST_COMPONENT_ITEMS / HARVEST_COMPONENT_SPECIMENS).
+    // signed (HARVEST_COMPONENT_ITEMS / HARVEST_COMPONENT_SPECIMENS). The
+    // fourth production signer, the masterwork proc, is deliberately NOT
+    // modeled: it needs a stats-bearing gear def (masterworkBonusStats
+    // returns null otherwise) and all four apex reagents are junk-kind
+    // materials it can never reach, so the list here is the reachable set,
+    // not the exhaustive one.
     const admitsSignedSource = (itemId: string): boolean => {
       const nodeYield = Object.values(NODE_MATERIAL_TABLE).some((byZone) =>
         Object.values(byZone).some((row) => row.itemId === itemId),

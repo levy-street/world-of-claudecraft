@@ -137,35 +137,40 @@ describe('recipe index memo rebuild contract', () => {
   // flip and this test goes red, which is the point: the keying change shows up
   // as a deliberate diff here instead of silently altering the contract.
   it('serves a same-length in-place row swap stale (the documented limitation)', () => {
+    // try/finally so a mid-arm failure restores the table itself and the
+    // integrity arm below reports only the first failure, not a cascade.
     ALL_RECIPES.push(SWAP_BASE);
     const at = ALL_RECIPES.indexOf(SWAP_BASE);
-    // Warm at the grown length so the swap cannot ride a rebuild that a later
-    // lookup would have triggered anyway.
-    expect(recipeById(SWAP_BASE.id)).toBe(SWAP_BASE);
+    try {
+      // Warm at the grown length so the swap cannot ride a rebuild that a
+      // later lookup would have triggered anyway.
+      expect(recipeById(SWAP_BASE.id)).toBe(SWAP_BASE);
 
-    // The out-of-contract mutation: one row replaced, length untouched.
-    ALL_RECIPES[at] = SWAP_VARIANT;
-    expect(ALL_RECIPES.length).toBe(BASELINE_LENGTH + 1);
+      // The out-of-contract mutation: one row replaced, length untouched.
+      ALL_RECIPES[at] = SWAP_VARIANT;
+      expect(ALL_RECIPES.length).toBe(BASELINE_LENGTH + 1);
 
-    // Stale by design, both indexes: the new row is invisible and the row that
-    // is no longer in the array is still handed back.
-    expect(recipeById(SWAP_VARIANT.id)).toBeUndefined();
-    expect(recipeById(SWAP_BASE.id)).toBe(SWAP_BASE);
-    expect(recipeForResultItem(SWAP_VARIANT.resultItemId)).toBeUndefined();
-    expect(recipeForResultItem(SWAP_BASE.resultItemId)).toBe(SWAP_BASE);
+      // Stale by design, both indexes: the new row is invisible and the row
+      // that is no longer in the array is still handed back.
+      expect(recipeById(SWAP_VARIANT.id)).toBeUndefined();
+      expect(recipeById(SWAP_BASE.id)).toBe(SWAP_BASE);
+      expect(recipeForResultItem(SWAP_VARIANT.resultItemId)).toBeUndefined();
+      expect(recipeForResultItem(SWAP_BASE.resultItemId)).toBe(SWAP_BASE);
 
-    // Prove the length key is the SOLE reason for the misses above: with the
-    // swapped row still installed, change nothing but the length and both
-    // readings invert immediately.
-    ALL_RECIPES.push(FILLER);
-    expect(recipeById(SWAP_VARIANT.id)).toBe(SWAP_VARIANT);
-    expect(recipeById(SWAP_BASE.id)).toBeUndefined();
-    expect(recipeForResultItem(SWAP_VARIANT.resultItemId)).toBe(SWAP_VARIANT);
-
-    ALL_RECIPES.splice(ALL_RECIPES.indexOf(FILLER), 1);
-    ALL_RECIPES[at] = SWAP_BASE;
-    expect(ALL_RECIPES[at]).toBe(SWAP_BASE);
-    ALL_RECIPES.splice(at, 1);
+      // Prove the length key is the SOLE reason for the misses above: with
+      // the swapped row still installed, change nothing but the length and
+      // both readings invert immediately.
+      ALL_RECIPES.push(FILLER);
+      expect(recipeById(SWAP_VARIANT.id)).toBe(SWAP_VARIANT);
+      expect(recipeById(SWAP_BASE.id)).toBeUndefined();
+      expect(recipeForResultItem(SWAP_VARIANT.resultItemId)).toBe(SWAP_VARIANT);
+    } finally {
+      const fillerAt = ALL_RECIPES.indexOf(FILLER);
+      if (fillerAt !== -1) ALL_RECIPES.splice(fillerAt, 1);
+      if (at !== -1 && ALL_RECIPES[at] === SWAP_VARIANT) ALL_RECIPES[at] = SWAP_BASE;
+      const baseAt = ALL_RECIPES.indexOf(SWAP_BASE);
+      if (baseAt !== -1) ALL_RECIPES.splice(baseAt, 1);
+    }
     expect(ALL_RECIPES.length).toBe(BASELINE_LENGTH);
     expect(recipeById(SWAP_BASE.id)).toBeUndefined();
   });

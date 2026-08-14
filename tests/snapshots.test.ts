@@ -5136,12 +5136,16 @@ describe('full self-state snapshot delta fixture', () => {
     (client as any).applySnapshot(outOfRangeSnap);
     expect(client.activeMobileStationCrafts).toEqual([]);
     // The empty transition hands back the ONE shared frozen empty by
-    // identity (EMPTY_MST_CRAFTS, also the pre-first-snapshot default), the
-    // same contract the offline resolver pins for its EMPTY_CRAFTS, so the
-    // empty case never reallocates and a consumer mutation throws in both
-    // worlds.
+    // identity (EMPTY_MST_CRAFTS), the same contract the offline resolver
+    // pins for its EMPTY_CRAFTS, so the empty case never reallocates and a
+    // consumer mutation throws in both worlds. Decisive because the client
+    // held a NON-empty split just above, so this value can only have come
+    // out of the decode's empty arm.
     expect(client.activeMobileStationCrafts).toBe(EMPTY_MST_CRAFTS);
     expect(Object.isFrozen(client.activeMobileStationCrafts)).toBe(true);
+    // FIXTURE-contract pin only (bareClient assigns the same import, so this
+    // cannot exercise ClientWorld's field initializer): the shared test
+    // double must keep mirroring the class default by identity.
     expect(bareClient(a.pid).activeMobileStationCrafts).toBe(EMPTY_MST_CRAFTS);
 
     // Drop-malformed wire idiom: the shipped encoder sends null for the

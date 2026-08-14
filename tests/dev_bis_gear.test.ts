@@ -354,4 +354,80 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       for (const def of SYNTH) delete ITEMS[def.id];
     }
   });
+
+  it('the demoted offhand refill LANDS when the kept weapon is one-handed (premise pin)', () => {
+    // Companion to the kept-2H disjunct case above, pinning the premise that
+    // test rides on: the same fixture family must give the demoted flagged
+    // shield a refill that LANDS. With a ONE-hand kept weapon the pair stays
+    // legal, so the refilled plain offhand SURVIVES into the picks, which is
+    // observable directly; if a fixture edit ever breaks the refill (a
+    // renamed id, a class or slot mismatch), this reds while the 2H case
+    // above would silently degrade back to the vacuous shape (offhand empty,
+    // pairIllegal short-circuits, the disjunct never runs).
+    const CLS = 'test_bis_cls3';
+    const REQ = [CLS] as unknown as ItemDef['requiredClass'];
+    const SYNTH: ItemDef[] = [
+      {
+        id: 'test_bis_mw_1h_kept',
+        name: 'Test test_bis_mw_1h_kept',
+        kind: 'weapon',
+        slot: 'mainhand',
+        hand: 'onehand',
+        quality: 'epic',
+        masterwrought: true,
+        requiredClass: REQ,
+        weapon: { min: 100, max: 100, speed: 1 },
+        sellValue: 1,
+      } as ItemDef,
+      {
+        id: 'test_bis_mw_shield_b',
+        name: 'Test test_bis_mw_shield_b',
+        kind: 'armor',
+        slot: 'offhand',
+        shield: true,
+        quality: 'epic',
+        masterwrought: true,
+        requiredClass: REQ,
+        stats: { sta: 500 },
+        sellValue: 1,
+      } as ItemDef,
+      {
+        id: 'test_bis_mw_chest4',
+        name: 'Test test_bis_mw_chest4',
+        kind: 'armor',
+        armorType: 'cloth',
+        slot: 'chest',
+        quality: 'epic',
+        masterwrought: true,
+        stats: { int: 900 },
+        requiredClass: REQ,
+        sellValue: 1,
+      } as ItemDef,
+      {
+        id: 'test_bis_plain_offhand_b',
+        name: 'Test test_bis_plain_offhand_b',
+        kind: 'armor',
+        slot: 'offhand',
+        shield: true,
+        quality: 'epic',
+        requiredClass: REQ,
+        stats: { sta: 100 },
+        sellValue: 1,
+      } as ItemDef,
+    ];
+    for (const def of SYNTH) ITEMS[def.id] = def;
+    try {
+      const picks = bestEpicGearFor(CLS, null);
+      // Kept: the 1H weapon and the chest; the flagged shield demotes and
+      // its refill lands the plain offhand, which stays: a 1H beside an
+      // offhand is a legal pair, so no re-run strips it.
+      expect(picks.mainhand).toBe('test_bis_mw_1h_kept');
+      expect(picks.chest).toBe('test_bis_mw_chest4');
+      expect(picks.offhand).toBe('test_bis_plain_offhand_b');
+      const flagged = Object.values(picks).filter((id) => id && ITEMS[id]?.masterwrought);
+      expect(flagged.sort()).toEqual(['test_bis_mw_1h_kept', 'test_bis_mw_chest4']);
+    } finally {
+      for (const def of SYNTH) delete ITEMS[def.id];
+    }
+  });
 });
