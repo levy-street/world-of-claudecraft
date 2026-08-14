@@ -397,6 +397,11 @@ never future-PR items, per the delivery contract in `state.md`).
   verbatim extractions (professions/daily_gate_load.ts, server/
   interest_policy.ts) with direct suites and lowered ceilings. Premise
   amendments and the seven-cluster audit record live in state.md "Phase 10
-  QA release sync". ONE deliberate red left standing: tests/bags.test.ts,
-  the release payload-free-bags contract vs the epic sunspun_haversack, a
-  maintainer ruling recorded as RULING WANTED in that record.
+  QA release sync". TWO deliberate reds left standing, both RULING WANTED in that record:
+  tests/bags.test.ts (the release payload-free-bags contract vs the epic
+  sunspun_haversack) and tests/rogue_dps_balance.test.ts (the release's new
+  DPS band suite reads the apex neck and ring through bestEpicGearFor;
+  assassination measures 170.38 vs its 180 floor and drops below subtlety,
+  green at the pure release tip: the score-vs-fight stat-shape hazard).
+  Everything else is green: full suite 38733 passed after the node_modules
+  resync and the tome lockfile-fingerprint re-mint.
