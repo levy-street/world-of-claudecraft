@@ -32,7 +32,7 @@ import {
   snapshotMatchPet,
 } from '../pet/pet_match_return';
 import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
-import { SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from '../resurrection';
+import { aurasSurvivingCleanSlate, SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from '../resurrection';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { applyResurrectionSickness, applyUnstuckSickness } from '../spirit';
@@ -1077,8 +1077,10 @@ export function readyArenaFighter(
   if (opts.clearPrep) {
     // Arena is a clean competitive slate: unlike the overworld/delve death paths it
     // intentionally strips ALL auras (including The Keeper's Toll) so a PvE penalty
-    // never carries into a normalized match.
-    e.auras = [];
+    // never carries into a normalized match. The one exception is the operator-applied
+    // Cheater mark, which is account state rather than something the fighter walked in
+    // carrying: queueing must not be a way to shed a sanction (see resurrection.ts).
+    e.auras = aurasSurvivingCleanSlate(e.auras);
     clearCooldownsPreservingUnstuck(e.cooldowns);
     e.abilityCharges = undefined; // charge pools refill (recreated lazily at full)
     e.ccDr.clear();

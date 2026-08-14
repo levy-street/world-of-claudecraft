@@ -8,6 +8,7 @@ import {
   propCellBoxDistance,
   propCellKey,
   propCellMode,
+  updatePropCell,
 } from '../src/render/prop_cell_core';
 
 describe('propCellKey', () => {
@@ -150,6 +151,137 @@ describe('applyPropCellMode', () => {
     cell.hideables[0].hidden = true;
     applyPropCellMode(cell, { farMode: true, showMerged: true });
     expect(cell.hideables[0].hidden).toBe(true);
+  });
+});
+
+describe('updatePropCell first-far reveal gating (hitch-hunt P3a)', () => {
+  const bounds = { minX: 0, maxX: 10, minZ: 0, maxZ: 10 };
+
+  function makeGatedCell(key?: string): PropCellRuntime & { bounds: typeof bounds } {
+    return {
+      key,
+      bounds,
+      farMode: false,
+      visible: true,
+      farReady: false,
+      meshes: [{ visible: true, count: 0 }],
+      hideables: [
+        {
+          suppressed: false,
+          hidden: false,
+          bakeMeshes: [{ mesh: { visible: true } }],
+          mats: [{ mat: { colorWrite: true, depthWrite: true }, depthWrite: true }],
+        },
+      ],
+    };
+  }
+
+  const farCam = { x: 100, z: 5 }; // box distance 90 >= swap distance 40
+
+  it('holds the first far flip in near mode while the gate is cold', () => {
+    const cell = makeGatedCell('0:0');
+    const consulted: string[] = [];
+    const gate = {
+      allow: (key: string) => {
+        consulted.push(key);
+        return false;
+      },
+    };
+    updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
+    expect(consulted).toEqual(['0:0']);
+    expect(cell.farMode).toBe(false);
+    expect(cell.farReady).toBe(false);
+    expect(cell.meshes[0].count).toBe(0);
+    expect(cell.hideables[0].suppressed).toBe(false);
+  });
+
+  it('never consults the gate for a far cell beyond the fog (nothing draws)', () => {
+    // A cold world entry flips essentially every cell to far mode on frame
+    // one; gating there would fire a world-wide compile burst for bakes the
+    // fog hides anyway. The consult belongs to the DRAWN swap only.
+    const cell = makeGatedCell('0:0');
+    let consulted = 0;
+    const gate = {
+      allow: () => {
+        consulted++;
+        return false;
+      },
+    };
+    updatePropCell(cell, farCam.x, farCam.z, 50, undefined, gate);
+    expect(consulted).toBe(0);
+    expect(cell.farMode).toBe(true);
+    expect(cell.farReady).toBe(false);
+    // Bake hidden past the fog, exactly the historical beyond-fog far state.
+    expect(cell.meshes[0].visible).toBe(false);
+    // Walking closer brings the bake inside the fog: NOW the gate holds it.
+    updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
+    expect(consulted).toBe(1);
+    expect(cell.farMode).toBe(false);
+  });
+
+  it('composes with the real reveal gate core end to end', async () => {
+    const { createRevealGateCore } = await import('../src/render/reveal_gate_core');
+    const cell = makeGatedCell('0:0');
+    const requested: string[] = [];
+    const gate = createRevealGateCore((key) => requested.push(key));
+    updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
+    expect(requested).toEqual(['0:0']);
+    expect(cell.farMode).toBe(false);
+    gate.settle('0:0');
+    updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
+    expect(cell.farMode).toBe(true);
+    expect(cell.farReady).toBe(true);
+  });
+
+  it('flips far once the gate allows, and never consults it again', () => {
+    const cell = makeGatedCell('0:0');
+    let warm = false;
+    const consulted: string[] = [];
+    const gate = {
+      allow: (key: string) => {
+        consulted.push(key);
+        return warm;
+      },
+    };
+    updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
+    expect(cell.farMode).toBe(false);
+    warm = true;
+    updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
+    expect(cell.farMode).toBe(true);
+    expect(cell.farReady).toBe(true);
+    expect(cell.meshes[0].count).toBe(1);
+    // Back near, then far again: the latch skips the gate on every later flip.
+    updatePropCell(cell, 5, 5, 200, undefined, gate);
+    expect(cell.farMode).toBe(false);
+    updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
+    expect(cell.farMode).toBe(true);
+    expect(consulted).toEqual(['0:0', '0:0']);
+  });
+
+  it('never consults the gate while the cell is near', () => {
+    const cell = makeGatedCell('0:0');
+    let consulted = 0;
+    const gate = {
+      allow: () => {
+        consulted++;
+        return false;
+      },
+    };
+    updatePropCell(cell, 5, 5, 200, undefined, gate);
+    expect(consulted).toBe(0);
+    expect(cell.farMode).toBe(false);
+  });
+
+  it('without a gate (or without a key) the flip stays immediate', () => {
+    const ungated = makeGatedCell('0:0');
+    updatePropCell(ungated, farCam.x, farCam.z, 200);
+    expect(ungated.farMode).toBe(true);
+    expect(ungated.farReady).toBe(true);
+    const keyless = makeGatedCell(undefined);
+    updatePropCell(keyless, farCam.x, farCam.z, 200, undefined, {
+      allow: () => false,
+    });
+    expect(keyless.farMode).toBe(true);
   });
 });
 

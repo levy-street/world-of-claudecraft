@@ -164,7 +164,13 @@ const sorted = (s: Set<string>): string[] => [...s].sort();
 const inventoryUnreachablePaths = new Set(
   SURFACE_INVENTORY.filter((r) => r.unreachable).map((r) => r.path),
 );
-const REGISTRY_ONLY_PARAM_PATHS = new Set(['/api/characters/:id/deeds-recent']);
+const REGISTRY_ONLY_PARAM_PATHS = new Set([
+  '/api/characters/:id/deeds-recent',
+  // The Cheater mark pair: the first registry-only :param routes on the ADMIN
+  // surface, so admin.ts holds no `*Match` regex for them either.
+  '/admin/api/moderation/accounts/:id/cheater-mark',
+  '/admin/api/moderation/accounts/:id/lift-cheater-mark',
+]);
 const registryExactPaths = new Set(
   apiRoutes
     .filter(

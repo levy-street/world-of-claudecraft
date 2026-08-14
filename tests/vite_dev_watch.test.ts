@@ -87,6 +87,8 @@ const directoryOf = (glob: string): string | undefined => DIRECTORY_GLOB.exec(gl
 
 const watchIgnored = stringArrayAt('server.watch.ignored');
 const watchIgnoredDirs = watchIgnored.map(directoryOf).filter((dir) => dir !== undefined);
+const testExcluded = stringArrayAt('test.exclude');
+const testExcludedDirs = testExcluded.map(directoryOf).filter((dir) => dir !== undefined);
 
 describe('vite dev-server watch ignore list', () => {
   it('unwatches every agent runtime and scratch directory', () => {
@@ -108,12 +110,16 @@ describe('vite dev-server watch ignore list', () => {
   // Adding a new agent directory to one list and not the other is the drift this pins:
   // vitest would stop running its frozen copy while Vite kept reloading the game for it.
   it('covers every agent directory that test.exclude already lists', () => {
-    const excluded = stringArrayAt('test.exclude')
-      .map(directoryOf)
-      .filter((dir) => dir !== undefined)
-      .filter((dir) => dir.startsWith('.') || dir === 'tmp');
+    const excluded = testExcludedDirs.filter((dir) => dir.startsWith('.') || dir === 'tmp');
     expect(excluded.length).toBeGreaterThanOrEqual(6);
     for (const dir of excluded) expect(watchIgnoredDirs).toContain(dir);
+  });
+
+  it('keeps vitest agent-directory excludes root-relative for linked worktrees', () => {
+    for (const dir of ['.claude', '.codex', '.agents', '.worktrees', '.wt', '.venv']) {
+      expect(testExcluded).toContain(`${dir}/**`);
+      expect(testExcluded).not.toContain(`**/${dir}/**`);
+    }
   });
 
   // A pattern that is not `**/<dir>/**` could match files scattered anywhere, and an

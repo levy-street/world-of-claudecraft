@@ -102,6 +102,7 @@ import {
   DEBT_OF_LIGHT_DEVOTION,
   debtOfLightAura,
 } from './paladin_debt_of_light';
+import { clearRadiantResonanceReservation } from './paladin_radiant_resonance';
 import { stripSunGodVerdicts } from './paladin_sun_verdict';
 import { stripPaladinDevotionsFromSource } from './paladin_support';
 import { masteredPaladinAuraValue } from './paladin_talents';
@@ -622,7 +623,7 @@ export function dealDamage(
           abilityId,
           // Carry the AoE flag so a redirected slice of an area Arcane hit still
           // rates its Temporal Echo conversion at the area (15%) coefficient, not
-          // the single-target 35%.
+          // the single-target 40%.
           aoe,
         );
       }
@@ -1328,6 +1329,20 @@ export function handleDeath(
   emitRainOfFireStop(ctx, e);
   e.castingAbility = null;
   e.castTargetId = null;
+  // Death is a cast cancel: mirror cancelCast's teardown of the channel and
+  // queue state, not just castingAbility. An encounter force-channel (the
+  // Nythraxis wardstone, encounters/nythraxis.ts) clears itself only while
+  // castingAbility still names it, so a death that nulls castingAbility alone
+  // strands channeling=true with channelTickEvery 0, and the victim's next
+  // hard cast runs the channel tick branch once per sim tick for the whole
+  // cast bar (issue #3400).
+  e.castRemaining = 0;
+  e.channeling = false;
+  e.channelTicksLeft = 0;
+  e.castAim = null;
+  e.queuedCastAbility = null;
+  e.queuedCastAim = null;
+  clearRadiantResonanceReservation(e);
   // Hidden per-cast state: death ends any gather/fishing session, so
   // the fields must return to inert here too (the parity samplers rely on them
   // being 0/'' at every sampled frame outside a live cast; cancelCast owns the

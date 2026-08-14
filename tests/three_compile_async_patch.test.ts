@@ -32,15 +32,138 @@ describe('three compileAsync disposal race patch', () => {
     );
 
     // Plain includes + message keeps a failure legible: a toContain miss would
-    // dump the whole 1.28 MB bundle into the reporter.
+    // dump the whole 1.28 MB bundle into the reporter. The needle pins the
+    // guard TOGETHER with its delete: the bare 'if ( program === undefined )'
+    // spelling also matches three's own acquireProgram (and the unpatched
+    // three.cjs), so alone it cannot distinguish patched from unpatched.
     expect(
-      source.includes('if ( program === undefined || program.isReady() ) {'),
+      source.includes(
+        'if ( program === undefined ) {\n\n\t\t\t\t\t\t\tmaterials.delete( material );',
+      ),
       'the three r165 compileAsync patch is not applied; re-run pnpm install',
     ).toBe(true);
     expect(
       source.includes('three r165 compileAsync disposal race'),
       'the three r165 compileAsync patch marker comment is missing; re-run pnpm install',
     ).toBe(true);
+  });
+
+  it('keeps the bounded isReady poll pass applied', () => {
+    // Second patch hunk: one checkMaterialsReady pass queries a bounded,
+    // round-robin slice of the pending materials instead of forEach over all
+    // of them. Each COMPLETION_STATUS_KHR query is a synchronous GPU-process
+    // round-trip; the unbounded pass measured 10.2 s on the production main
+    // thread with a link-backlogged GPU process (hitch-hunt S3/S5).
+    const source = readFileSync(
+      new URL('../node_modules/three/build/three.module.js', import.meta.url),
+      'utf8',
+    );
+    expect(
+      source.includes('const POLL_PASS_BUDGET_MS = 2;'),
+      'the bounded isReady poll-pass patch is not applied; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      source.includes('pending[ ( pollCursor + i ) % pending.length ]'),
+      'the round-robin cursor of the bounded poll pass is missing; re-run pnpm install',
+    ).toBe(true);
+    // Round-robin is only real if the cursor ADVANCES on an early break and
+    // the break fires only after at least one query: without the advance,
+    // every pass restarts at index 0 and the tail of a large pending set is
+    // never polled (starvation).
+    expect(
+      source.includes('pollCursor = ( pollCursor + i + 1 ) % pending.length;'),
+      'the round-robin cursor advance is missing; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      source.includes('&& i + 1 < pending.length'),
+      'the at-least-one-query-per-pass guard is missing; re-run pnpm install',
+    ).toBe(true);
+    // Per-poller backoff: every concurrent compileAsync promise owns its own
+    // poll timer, so without backoff N pollers each paying an expensive query
+    // every 10 ms own the whole main thread under a link backlog (measured
+    // sub-1-fps locally). The interval doubles on an expensive pass, resets
+    // ONLY on cheap queries (progress does not reset it: one ready material
+    // per 30 ms pass would otherwise reset to 10 ms every time and still own
+    // most of the main thread), and the computed interval must actually
+    // reach the timer.
+    expect(
+      source.includes('const POLL_INTERVAL_MIN_MS = 10;'),
+      'the poll-interval floor is missing; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      source.includes('const POLL_INTERVAL_MAX_MS = 320;'),
+      'the poll-interval backoff cap is missing; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      source.includes(
+        'passMs < POLL_PASS_BUDGET_MS\n\t\t\t\t\t\t\t? POLL_INTERVAL_MIN_MS\n\t\t\t\t\t\t\t: Math.min( POLL_INTERVAL_MAX_MS, pollIntervalMs * 2 );',
+      ),
+      'the cheap-pass-only reset arm of the backoff is missing; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      source.includes('setTimeout( checkMaterialsReady, pollIntervalMs );'),
+      'the backoff interval never reaches the reschedule timer; re-run pnpm install',
+    ).toBe(true);
+    // The unbounded spelling must be GONE: the patch replaces the forEach
+    // pass, it does not add a second loop beside it. Positive control: the
+    // deliberately UNPATCHED sibling bundle still carries the spelling
+    // exactly once, so the needle is proven matchable.
+    expect(
+      source.includes('materials.forEach( function ( material ) {'),
+      'the unbounded materials.forEach poll pass is back; the bounded-pass patch no longer replaces it',
+    ).toBe(false);
+    const unpatchedSibling = readFileSync(
+      new URL('../node_modules/three/build/three.cjs', import.meta.url),
+      'utf8',
+    );
+    expect(
+      unpatchedSibling.split('materials.forEach( function ( material ) {').length - 1,
+      'the unpatched three.cjs control no longer matches the needle; the GONE pin above may be vacuous',
+    ).toBe(1);
+  });
+
+  it('keeps the per-pass program query dedup applied', () => {
+    // Third patch hunk: materials share linked programs through the program
+    // cache, and isReady() only caches a POSITIVE result, so while a shared
+    // program links every material holding it repaid the synchronous
+    // COMPLETION_STATUS_KHR query inside the same pass. The dedup pays one
+    // not-ready verdict per DISTINCT program per pass.
+    const source = readFileSync(
+      new URL('../node_modules/three/build/three.module.js', import.meta.url),
+      'utf8',
+    );
+    expect(
+      source.includes('const notReadyThisPass = new Set();'),
+      'the per-pass program dedup set is missing; re-run pnpm install',
+    ).toBe(true);
+    // Both halves must survive: the skip arm consults the set BEFORE paying
+    // the query, and a not-ready verdict actually enters the set. Either half
+    // alone silently degrades back to one query per material.
+    expect(
+      source.includes('} else if ( notReadyThisPass.has( program ) === false ) {'),
+      'the dedup skip arm no longer guards the isReady query; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      source.includes('notReadyThisPass.add( program );'),
+      'not-ready programs never enter the dedup set, so the skip arm is vacuous; re-run pnpm install',
+    ).toBe(true);
+    // The dedup is only real while the guarded branch owns the ONLY isReady
+    // call site: a second query outside the notReadyThisPass guard would pass
+    // every needle above while silently paying one query per material again.
+    // Positive control: the unpatched three.cjs also carries exactly one call,
+    // so the count needle is proven matchable.
+    expect(
+      source.split('program.isReady()').length - 1,
+      'a second program.isReady() call site appeared; the guarded branch no longer owns the only query',
+    ).toBe(1);
+    const unpatchedSibling = readFileSync(
+      new URL('../node_modules/three/build/three.cjs', import.meta.url),
+      'utf8',
+    );
+    expect(
+      unpatchedSibling.split('program.isReady()').length - 1,
+      'the three.cjs control no longer matches program.isReady(); the count pin above may be vacuous',
+    ).toBe(1);
   });
 });
 

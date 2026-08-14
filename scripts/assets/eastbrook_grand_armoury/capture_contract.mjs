@@ -447,6 +447,7 @@ export const EASTBROOK_POLISH_PROVENANCE_INPUTS = Object.freeze({
   mailboxRuntime: 'src/render/mailbox.ts',
   noticeboardRuntime: 'src/render/noticeboard.ts',
   rendererIntegration: 'src/render/renderer.ts',
+  entityViewPolicy: 'src/render/entity_view_policy_core.ts',
   viewPriorityPolicy: 'src/render/prewarm_policy.ts',
   mailboxSourceFingerprint: 'scripts/assets/eastbrook_mailbox/source_fingerprint.mjs',
   mailboxGlb: 'public/models/props/mailbox_pillar.glb',
@@ -565,6 +566,7 @@ export function deriveEastbrookPolishCompositeProvenance({
   mailboxRuntimeSha256,
   noticeboardRuntimeSha256,
   rendererIntegrationSha256,
+  entityViewPolicySha256,
   viewPriorityPolicySha256,
   mailboxSourceFingerprint,
   mailboxGlbSha256,
@@ -579,6 +581,7 @@ export function deriveEastbrookPolishCompositeProvenance({
     mailboxRuntimeSha256,
     noticeboardRuntimeSha256,
     rendererIntegrationSha256,
+    entityViewPolicySha256,
     viewPriorityPolicySha256,
     mailboxSourceFingerprint,
     mailboxGlbSha256,
@@ -616,6 +619,10 @@ export function deriveEastbrookPolishCompositeProvenance({
       renderer: {
         path: EASTBROOK_POLISH_PROVENANCE_INPUTS.rendererIntegration,
         sha256: rendererIntegrationSha256,
+      },
+      entityViewPolicy: {
+        path: EASTBROOK_POLISH_PROVENANCE_INPUTS.entityViewPolicy,
+        sha256: entityViewPolicySha256,
       },
       viewPriorityPolicy: {
         path: EASTBROOK_POLISH_PROVENANCE_INPUTS.viewPriorityPolicy,

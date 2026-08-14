@@ -7,6 +7,7 @@ import { svelteTesting } from '@testing-library/svelte/vite';
 import { browserslistToTargets } from 'lightningcss';
 import { defineConfig } from 'vite';
 import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
+import { BalancedSequencer } from './scripts/ci_balanced_sequencer.mjs';
 // Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
@@ -14,8 +15,10 @@ import {
   diagnosticsCaptureAllowed,
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
+import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
+const disableVitestFsModuleCache = shouldDisableVitestFsModuleCache(root);
 
 // Lightning CSS engine targets, derived from .browserslistrc (the single source of
 // the floor) via the zero-dep parser, never a hand-typed object. Drives both the
@@ -492,10 +495,18 @@ export default defineConfig({
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
-    // D11 path-matrix follow-on tried LPT and stripe sequencers under
-    // scripts/ci_balanced_sequencer.mjs; both missed the balance bar and stayed
-    // unwired. Default vitest sha1-contiguous --shard is live. passWithNoTests
-    // false so an empty pack cannot green a future re-wired sequencer.
+    // Sharding: BalancedSequencer (LPT over MEASURED per-file durations,
+    // scripts/ci_shard_weights.generated.json, harvested from green CI runs
+    // by scripts/ci_shard_weights_harvest.mjs). Re-wired 2026-08-14: the D11
+    // follow-on's LPT missed its bar on static import-cost weights and
+    // stripe re-measured WORSE than sha1-contiguous with real durations.
+    // Measured on the lane-excluded shard pool, scored in real ms: contiguous
+    // worst 10.49m, measured-LPT worst 9.79m spread 0.06m; the
+    // measured-scale FALLBACK for unknown files is load-bearing (raw
+    // heuristic units regressed to 11.21m). shard() only runs under --shard, so unsharded
+    // local runs are untouched. passWithNoTests false so an empty pack
+    // cannot green the sequencer.
+    sequence: { sequencer: BalancedSequencer },
     passWithNoTests: false,
     globalSetup: ['./tests/global_setup.ts'],
     // Runs per test file (unlike globalSetup, which runs once outside any
@@ -508,11 +519,12 @@ export default defineConfig({
     //   stale local worktree from duplicating tests. .venv is local Python tooling.
     //   .worktrees/ is the repo's own gitignored convention for local linked worktrees
     //   (see .gitignore), while .wt/ is the OSS Brain linked-worktree cache used by
-    //   release automation. Leaving either out of this list means a parked worktree can
-    //   re-run its whole frozen test tree on every `vitest run`, so a stale branch
-    //   snapshot inside it can fail tests/architecture.test.ts or
-    //   tests/localization_fixes.test.ts and block pre-push for reasons unrelated to the
-    //   current branch.
+    //   release automation. These entries are root-relative on purpose: an active
+    //   checkout can itself live under .wt/, and an absolute-style **/.wt/** pattern
+    //   hides its entire suite. Leaving either parked-worktree directory out of this
+    //   list means a stale branch snapshot can fail tests/architecture.test.ts or
+    //   tests/localization_fixes.test.ts and block pre-push for reasons unrelated to
+    //   the current branch.
     // - the opt-in browser suite (vitest.browser.config.ts, npm run test:browser) must NOT
     //   leak into a bare `vitest run`: excluding its files keeps the default Node run from
     //   importing the Playwright provider or launching a browser. Cross-engine CI is P17b.
@@ -523,12 +535,12 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
-      '**/.claude/**',
-      '**/.codex/**',
-      '**/.agents/**',
-      '**/.worktrees/**',
-      '**/.wt/**',
-      '**/.venv/**',
+      '.claude/**',
+      '.codex/**',
+      '.agents/**',
+      '.worktrees/**',
+      '.wt/**',
+      '.venv/**',
       'tmp/**',
       'tests/browser/**',
       '**/*.browser.test.ts',
@@ -544,10 +556,15 @@ export default defineConfig({
     // Phase 4 local-gate-perf: persist Vite module transform cache across runs
     // (Vitest 4.1 experimental.fsModuleCache). Default path is under
     // node_modules/.experimental-vitest-cache (gitignored via node_modules/).
+    // OSS Brain linked worktrees symlink node_modules back to the parent checkout,
+    // and base-health gates run from that parent checkout under ORCH. Both shapes
+    // can contend on the same experimental temp-file store and fail before
+    // reporting parseable tests. Disable it for OSS Brain-controlled checkouts;
+    // normal local checkouts and CI keep the warm-cache path.
     // Clear with `npx vitest --clearCache` if a warm run misbehaves. Full gate
     // remains the merge bar; this speeds warm re-runs and related/day-loop paths.
     experimental: {
-      fsModuleCache: true,
+      fsModuleCache: !disableVitestFsModuleCache,
     },
   },
 });

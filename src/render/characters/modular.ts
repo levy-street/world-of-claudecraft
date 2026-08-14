@@ -1109,9 +1109,6 @@ export const MAT_HAIR = 'mod_hair';
 export const MAT_EYE = 'mod_eye';
 /** The eyelash. Its own material, NOT the hair one: it has its own wheel. */
 export const MAT_LASH = 'mod_lash';
-/** The underclothing. Its own material, NOT the skin one: it must keep its
- *  colour when the player drags the skin-tone wheel. */
-export const MAT_CLOTH = 'mod_cloth';
 /** The stubble/buzz decal. Built at runtime rather than shipped in the GLB, but
  *  recoloured with the HAIR colour on the same path as everything else that is
  *  hair, it is alpha-blended, so it cannot share the hair material. */
@@ -1120,17 +1117,6 @@ export const MAT_STUBBLE = 'mod_stubble';
  *  than shipped in the GLB, but unlike it, the COLOURS are baked into the map
  *  (two layers, two shades, one material), so this one is never tinted. */
 export const MAT_MAKEUP = 'mod_makeup';
-/** Teeth. Never recoloured, they are teeth. */
-export const MAT_TOOTH = 'mod_tooth';
-/** The mouth line and the inside of an open mouth.
- *
- *  NOT `mod_eye`, even though both are near-black: `recolored()` routes mod_eye
- *  through the player's EYE wheel, so sharing it painted the mouth line to match
- *  the irises, pick blue eyes and you got a blue mouth. Its colour also has to
- *  differ from mod_eye's for a second reason: the glTF exporter merges materials
- *  whose settings are identical, so an exact copy comes back out of the asset AS
- *  mod_eye and the bug returns silently. */
-export const MAT_MOUTH = 'mod_mouth';
 
 /** Armour materials, one per class atlas, plus the paladin's second (metallic)
  *  slot, whose per-face split is what gives that set its metal highlights. */
@@ -1323,7 +1309,7 @@ export const OUTFIT_COLORWAYS: readonly OutfitColorwayDef[] = [
 // mahogany, so every part of a set reads as a different material instead of
 // one flat repaint. Rules select in HSV (hue band + sat/val trapezoids, all
 // measured off the atlas, never guessed) and remap hue/sat/val; the shader
-// (assets.ts attachArmorDye) evaluates every rule from the ORIGINAL texel so
+// (armor_dye.ts attachArmorDye) evaluates every rule from the ORIGINAL texel so
 // overlapping edges blend instead of compounding.
 
 /** One dye rule: an HSV zone selector plus the remap applied inside it.

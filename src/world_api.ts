@@ -17,7 +17,7 @@
 //   entity_roster.ts    IWorldEntityRoster   cfg/entities/player/moveInput/realm reads
 //   combat.ts           IWorldCombat         ability casts, auto-attack, spirit release
 //   targeting.ts        IWorldTargeting      target selection + tab cycling
-//   interaction.ts      IWorldInteraction    interact / lootCorpse / pickUpObject
+//   interaction.ts      IWorldInteraction    civic-service readout + interact / loot / pickup
 //   loot.ts             IWorldLoot           need/greed loot rolls
 //   inventory.ts        IWorldInventory      bags, equipment, vendor, copper
 //   cosmetics.ts        IWorldCosmetics      account skins + mech chroma
@@ -222,7 +222,11 @@ export {
   type GuildBankLogOp,
   type GuildBankLogView,
 } from './world_api/guild_bank';
-export type { WorldInteractionOutcome } from './world_api/interaction';
+export type {
+  CivicServiceKind,
+  CivicServicePlacement,
+  WorldInteractionOutcome,
+} from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export { queryDiffersFromEcho, searchDiffersFromEcho } from './world_api/market';
@@ -355,6 +359,7 @@ export const COMMAND_NAMES = [
   'unequip_item',
   'use',
   'discard',
+  'lock_item',
   'buy',
   'sell',
   'buyback',
@@ -433,6 +438,7 @@ export const COMMAND_NAMES = [
   'switchLoadout',
   'deleteLoadout',
   'market_search',
+  'market_sell_price_check',
   'market_list',
   'market_list_instance',
   'market_buy',
@@ -604,6 +610,10 @@ export const COMMAND_NAMES = [
   // Appended rather than filed beside its twin because wire tokens are never
   // reordered.
   'deed_set_border',
+  // The backward half of the Tab cycle (IWorldTargeting.tabTargetPrev): no
+  // payload, the sim resolves the previous enemy in the same ordered list Tab
+  // walks forward. Appended because wire tokens are never reordered.
+  'tabPrev',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -707,6 +717,7 @@ export const COMMAND_FACETS = {
   // IWorldTargeting: target selection + tab cycling.
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',
+  tabPrev: 'IWorldTargeting',
   targetNearestFriendly: 'IWorldTargeting',
   tabFriendly: 'IWorldTargeting',
   stopAutoAttackOnTargetSwitch: 'IWorldTargeting',
@@ -832,6 +843,7 @@ export const COMMAND_FACETS = {
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
+  market_sell_price_check: 'IWorldMarket',
   market_list: 'IWorldMarket',
   market_list_instance: 'IWorldMarket',
   market_buy: 'IWorldMarket',

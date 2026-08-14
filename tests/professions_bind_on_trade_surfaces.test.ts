@@ -15,6 +15,7 @@ import { MAIL_DELIVERY_SECONDS, MAIL_POSTAGE } from '../src/sim/mail/post_office
 import { Sim } from '../src/sim/sim';
 import type { Entity, ItemInstancePayload, SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { VENDOR_TEST_WORLD } from './sim_shared';
 
 const REAGENTS = [
   'resonant_thread',
@@ -25,7 +26,8 @@ const REAGENTS = [
 ] as const;
 const R = 'resonant_steel';
 
-const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+const makeWorld = () =>
+  new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: VENDOR_TEST_WORLD });
 
 function standAt(sim: Sim, pid: number, target: Entity): void {
   const p = sim.entities.get(pid);

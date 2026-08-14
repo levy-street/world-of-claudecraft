@@ -218,11 +218,26 @@ function rendererPrewarmSummary(
     manifestPlanned: prewarm.manifestPlanned,
     manifestCompleted: prewarm.manifestCompleted,
     manifestPartial: prewarm.manifestPartial,
+    manifestSkipped: prewarm.manifestSkipped,
     manifestTimedOut: prewarm.manifestTimedOut,
     manifestFailed: prewarm.manifestFailed,
     partialEntryIds: prewarm.partialEntryIds,
     timedOutEntryIds: prewarm.timedOutEntryIds,
     failedEntryIds: prewarm.failedEntryIds,
+    // The other half of "did this entry run": a timed-out entry hands its units
+    // to the resume lane, and until this block existed nothing outside a console
+    // line said whether they ever ran. An entry reported timed-out with
+    // resume.status 'done' and no failures is protected a moment later; the same
+    // entry with 'scheduled' forever, or with failures, is not protected at all.
+    resume: {
+      status: prewarm.resume.status,
+      plannedEntries: prewarm.resume.plannedEntries,
+      plannedUnits: prewarm.resume.plannedUnits,
+      startedUnits: prewarm.resume.startedUnits,
+      failedUnits: prewarm.resume.failedUnits,
+      failedUnitIds: prewarm.resume.failedUnitIds,
+      entries: prewarm.resume.entries,
+    },
     entries: prewarm.manifestEntries.map((entry) => ({
       id: entry.id,
       category: entry.category,
@@ -252,12 +267,26 @@ const GPU_QUEUE_REPORT_SLOWEST = 5;
 // The queue's own tail cap keeps this list tiny; the slice only pins the
 // beacon size against a future cap raise, mirroring the two lists above.
 const GPU_QUEUE_REPORT_TAILS = 4;
+// One row per priority lane. GPU_WORK_PRIORITY has six, and callers pass the
+// constants rather than free numbers, so this only bounds the beacon against a
+// caller inventing its own.
+const GPU_QUEUE_REPORT_LANES = 8;
+// Grant waits, worst first. Same size as the two cost rankings: a starvation
+// report needs a few examples, not the whole leaderboard.
+const GPU_QUEUE_REPORT_WAITS = 5;
 
 function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<string, unknown> {
   return {
     units: gpuQueue.units,
     totalSyncMs: gpuQueue.totalSyncMs,
     worstSyncMs: gpuQueue.worstSyncMs,
+    // The frame-cost half. syncMs stops at a unit's first await, so a lane that
+    // blocks after one reads as free on the sync numbers alone; these carry what
+    // the live frame actually paid. The cumulative one rides beside the maxima
+    // because a max says nothing about how OFTEN the lane cost a frame.
+    totalFrameGapMs: gpuQueue.totalFrameGapMs,
+    worstFrameGapMs: gpuQueue.worstFrameGapMs,
+    worstUnsharedFrameGapMs: gpuQueue.worstUnsharedFrameGapMs,
     pending: gpuQueue.pending,
     stallCount: gpuQueue.stallCount,
     active: gpuQueue.active
@@ -279,12 +308,66 @@ function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<str
       ageMs: stall.ageMs,
       settled: stall.settled,
     })),
-    slowest: gpuQueue.slowest.slice(0, GPU_QUEUE_REPORT_SLOWEST).map((unit) => ({
-      label: unit.label,
-      priority: unit.priority,
-      syncMs: unit.syncMs,
-      wallMs: unit.wallMs,
+    slowest: gpuQueue.slowest.slice(0, GPU_QUEUE_REPORT_SLOWEST).map(reportGpuQueueUnit),
+    // Ranked by frame cost rather than sync slice, so the unit that hurt is in
+    // the beacon even when its sync slice is single-digit milliseconds.
+    blockiest: gpuQueue.blockiest.slice(0, GPU_QUEUE_REPORT_SLOWEST).map(reportGpuQueueUnit),
+    // Worst grant latency session-wide, and the interval arm beside it. Every
+    // other field here is cumulative or a lifetime maximum, so two reports from
+    // one session cannot be differenced into what a pacing change did; `recent`
+    // is the only one that can. Its lane rows are what says whether a cosmetic
+    // lane made an actionable one wait.
+    worstWaitMs: gpuQueue.worstWaitMs,
+    // The waits, each naming what it was behind. `worstWaitMs` alone says a lane
+    // was delayed; only these say by what, and `waitedOnTailCap` is what
+    // separates "waited behind an ordinary holder" from "waited on a released
+    // tail still occupying the cap", which is the mechanism a mis-declared
+    // releaseTail delays a live gate with.
+    longestWaits: gpuQueue.longestWaits.slice(0, GPU_QUEUE_REPORT_WAITS).map((wait) => ({
+      label: wait.label,
+      priority: wait.priority,
+      waitMs: wait.waitMs,
+      blockedBy: wait.blockedBy,
+      blockedByPriority: wait.blockedByPriority,
+      waitedOnTailCap: wait.waitedOnTailCap,
+      tails: wait.tails,
     })),
+    recent: {
+      windowMs: gpuQueue.recent.windowMs,
+      units: gpuQueue.recent.units,
+      totalSyncMs: gpuQueue.recent.totalSyncMs,
+      totalFrameGapMs: gpuQueue.recent.totalFrameGapMs,
+      worstSyncMs: gpuQueue.recent.worstSyncMs,
+      worstFrameGapMs: gpuQueue.recent.worstFrameGapMs,
+      worstWaitMs: gpuQueue.recent.worstWaitMs,
+      lanes: gpuQueue.recent.lanes.slice(0, GPU_QUEUE_REPORT_LANES),
+    },
+  };
+}
+
+function reportGpuQueueUnit(unit: RendererGpuQueueSnapshot['slowest'][number]): {
+  label: string;
+  priority: number;
+  syncMs: number;
+  wallMs: number;
+  waitMs: number;
+  frameGapMs: number;
+  sharedFrameGap: number;
+} {
+  return {
+    label: unit.label,
+    priority: unit.priority,
+    syncMs: unit.syncMs,
+    wallMs: unit.wallMs,
+    // A ranked unit that also waited a long time for its grant is the shape a
+    // starvation report is made of; without this the two halves live in
+    // different blocks and cannot be read together.
+    waitMs: unit.waitMs,
+    frameGapMs: unit.frameGapMs,
+    // Without this a beacon reader repeats the mistake the metric already made
+    // once: a long released tail shares a gap it did not cause and tops the
+    // ranking on someone else's block.
+    sharedFrameGap: unit.sharedFrameGap,
   };
 }
 
@@ -378,8 +461,13 @@ function payloadFromSnapshot(
       rendererBudget: renderer.renderBudget,
       rendererQualityBuckets: renderer.qualityBuckets,
       rendererDiagnostics: renderer.renderDiagnostics,
+      // The summary above is the whole prewarm payload. The live stats object
+      // used to ride along beside it as `rendererPrewarm`, from before the
+      // summary existed; nothing reads it back out of storage, and once its
+      // resume getter started serializing, the report carried two copies of one
+      // block under a 16 KB cap, only one of which the ingest rebuilds from a
+      // fixed key set. Add a field to the summary rather than sending the twin.
       rendererPrewarmSummary: rendererPrewarmSummary(renderer.prewarm),
-      rendererPrewarm: renderer.prewarm,
       rendererGpuQueue: rendererGpuQueueSummary(renderer.gpuQueue),
       assets: {
         preload: snapshot.assets.preload,

@@ -139,14 +139,23 @@ jobs:
           echo "Update host serves ${published}"
 
           # The server is the real judge: it re-fetches the manifest and applies
-          # its own validation (https, same-origin bundle URL, checksum present).
-          # An offer coming back proves the whole chain, not just the upload.
+          # its own validation (https, same-origin bundle URL, checksum present,
+          # the all-or-nothing per-file entry checks). An offer coming back
+          # proves the whole chain, not just the upload; an offer WITHOUT the
+          # embedded delta manifest means the entry list failed validation and
+          # every device would silently take the full zip, so that fails too.
           for attempt in $(seq 1 12); do
-            offered="$(curl -sS --max-time 30 -X POST https://worldofclaudecraft.com/api/ota/updates \
+            offer="$(curl -sS --max-time 30 -X POST https://worldofclaudecraft.com/api/ota/updates \
               -H 'content-type: application/json' \
-              -d '{"platform":"ios","version_name":"builtin","version_build":"0.0.1"}' | jq -r '.version // empty')"
+              -d '{"platform":"ios","version_name":"builtin","version_build":"0.0.1"}')"
+            offered="$(echo "${offer}" | jq -r '.version // empty')"
             if [ "${offered}" = "${VERSION}" ]; then
-              echo "Game server offers ${offered}; publish verified."
+              entries="$(echo "${offer}" | jq -r '.manifest | length // 0')"
+              if [ "${entries}" -lt 1 ]; then
+                echo "Game server offers ${offered} but the offer carries no delta manifest; the entry list failed validation (zip-only fallback)." >&2
+                exit 1
+              fi
+              echo "Game server offers ${offered} with ${entries} delta manifest entries; publish verified."
               exit 0
             fi
             echo "attempt ${attempt}: server not offering ${VERSION} yet (manifest cache is 60 s), waiting"

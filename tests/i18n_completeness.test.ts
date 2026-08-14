@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { beforeAll, describe, expect, it } from 'vitest';
 // @ts-expect-error - shared zero-dep JS tool (no .d.ts); same pattern as tests/i18n_fill_worklist.test.ts.
@@ -220,6 +221,43 @@ describe('i18n whole-catalog completeness', () => {
       leaks,
       `untranslated English leaked into non-Latin player surfaces:\n${leaks.join('\n')}`,
     ).toEqual([]);
+  });
+
+  it('keeps every localized marker accessibility meaning pinned per locale', () => {
+    const expected = {
+      es: '94cff42334df0e523983e80cf3d73a8baa84c161d3f58ab8c5493a83af19bab1',
+      es_ES: '94cff42334df0e523983e80cf3d73a8baa84c161d3f58ab8c5493a83af19bab1',
+      fr_FR: '7a750e079a7d5091ffae2b5d150369061ae03062a51e96b0a84834430d30175d',
+      fr_CA: '7a750e079a7d5091ffae2b5d150369061ae03062a51e96b0a84834430d30175d',
+      it_IT: '62af35080c27a9bd33eecf87870af3208fbf558767cdfcb69ae9912642f4dbea',
+      de_DE: 'a0c8898a20fde7a2f3cf1fbb3f5abf877ada7e5e70fdef3544fe83742ef1ba30',
+      zh_CN: '74fdc330dffbd9214786d1940d19592ee07f353a0bb495406f8c94a8b4d31893',
+      zh_TW: 'a3fad41448b9ebe54d0034282dd11f420cbb45c8bdc5f6ff2688c3429d7c866e',
+      ko_KR: '9b43e2db038af5f3b9cb09e201784b81f5a5314cacd61bab5c49a3858df80592',
+      ja_JP: '8d5c10f97574c34657694162243d4766c2566ba455acc527a497ea17f15a4b9e',
+      pt_BR: 'a6ebd7b16e0c39af3790124b8e2ae1592bc775743016f156142c5692f5919b3e',
+      ru_RU: '6a6e917d4e2e438aefe24304dfd35cd8ee7ab9e581f38b0f53a7dfb7fb7e47be',
+      cs_CZ: 'ecb49e6fa02b879f936ea807837de4fb4afc729bf5b2337c5f025e193661ab78',
+      nl_NL: '505f571593c2b2e7ee0d571d0bbf1602e2c20ee84950485a237910530e7c4e67',
+      pl_PL: '9a52a4b0a05b0c922a8f5f9bff4bba4b001e323c00bb5aa029e9ed7b43fe3ec8',
+      id_ID: 'cc17c4300ef1aecd7878b68d2f35c1befea2f5137211e8655965d8323753f0cf',
+      tr_TR: 'a7f65ce87ac4bf1618ff493ee39cb017b74a0532558cbd4d00d348a290a1b873',
+      sv_SE: 'f822eff1fbba419e7d1f97bb372e1bca3d4ff1c5416302dd2009b7bf547f34ba',
+      vi_VN: 'd9e3daf33161da4138982bb04f1b97acfdfbcfc8089a0150fab12e59047245ed',
+      da_DK: 'aff26e915bd7f8d71cfbf4294a23a60ed1e2920d92292c9012e49fd4fc9d9ca7',
+    } as const satisfies Partial<Record<SupportedLanguage, string>>;
+
+    for (const [lang, digest] of Object.entries(expected) as Array<
+      [keyof typeof expected, string]
+    >) {
+      const markerRows = Object.entries(flatten(TABLES[lang])).filter(([key]) =>
+        key.startsWith('hud.core.mapMarker'),
+      );
+      expect(markerRows).toHaveLength(98);
+      expect(createHash('sha256').update(JSON.stringify(markerRows)).digest('hex'), lang).toBe(
+        digest,
+      );
+    }
   });
 
   // Phase 11 glossary decision (scripts/i18n_glossary.json, the reliquaryShelves

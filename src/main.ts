@@ -2,6 +2,7 @@
 // index.html and play.html both bootstrap through this module, so this one import
 // styles both game entries; admin/guide use their own entries and inline CSS.
 import './styles/index.css';
+import { captureFirstTouch, registerAttributionPayload } from './attribution';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
 import { afterActiveAnimationMs } from './game/active_animation_timer';
@@ -64,6 +65,7 @@ import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
+import { publishGpuHitchRuntimeReceipt } from './game/gpu_hitch_receipt';
 import { GraphicsRebuildCoordinator } from './game/graphics_rebuild_coordinator';
 import {
   type GraphicsSettingsSnapshot,
@@ -201,6 +203,7 @@ import {
   isAuthError,
   NATIVE_APP,
 } from './net/online';
+import { installOtaUpdateGate } from './net/ota_update_gate';
 import { realmPopulation } from './net/realm_population';
 import { RECONNECT_CONFLICT_ERROR } from './net/reconnect_policy';
 import {
@@ -425,12 +428,14 @@ import {
 } from './ui/loading_slow_hint';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
 import { CONTENT_LOCALE_CHANNEL_ENSURERS } from './ui/locale_channels';
+import { installMapMarkerPaletteLifecycle } from './ui/map_marker_palette_lifecycle';
 import { applyMinimapOrnamentVars } from './ui/minimap_gilded_ornament';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { mobileMountAction } from './ui/mount_quick_summon';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
+import { hideOtaUpdateOverlay, renderOtaUpdateOverlay } from './ui/ota_update_overlay';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { applyPerfOrnamentVars } from './ui/perf_ornament_svg';
 import { PerfOverlay } from './ui/perf_overlay';
@@ -462,6 +467,7 @@ import {
 } from './ui/wallet_balance';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
 import type { IWorld } from './world_api';
+import { ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
 
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
@@ -771,6 +777,19 @@ syncAppViewport();
 syncBuildInfo();
 scheduleNativeUpdateCheck(__APP_VERSION__);
 void notifyOtaAppReady();
+// Visible OTA gate (native shells only; installOtaUpdateGate is inert
+// elsewhere): shows the auto-updater's download progress over the start
+// screens, applies a finished download immediately pre-world instead of
+// waiting for a backgrounding, and upgrades the incompatible-version dead end
+// into "updating now" (the onDisconnect arm consults it before fatalOverlay).
+const otaUpdateGate = installOtaUpdateGate({
+  overlay: {
+    render: renderOtaUpdateOverlay,
+    hide: hideOtaUpdateOverlay,
+  },
+  isInWorld: () => document.body.classList.contains('game-active'),
+  onFatalRecoveryFailed: () => fatalOverlay(userFacingApiError(ONLINE_WORLD_INCOMPATIBLE_MESSAGE)),
+});
 preventMobileZoom();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
@@ -1374,10 +1393,12 @@ async function startGame(
   // UI theming: apply the persisted theme's CSS variables to :root, then keep a
   // hook so the Options panel can switch preset / override colours live.
   const themeStore = new ThemeStore();
+  let mapMarkerPaletteLifecycle: ReturnType<typeof installMapMarkerPaletteLifecycle> | null = null;
   function applyTheme(): void {
     const vars = themeStore.cssVars();
     for (const name of Object.keys(vars))
       document.documentElement.style.setProperty(name, vars[name]);
+    mapMarkerPaletteLifecycle?.notify();
   }
   applyTheme();
   // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
@@ -1444,6 +1465,7 @@ async function startGame(
     // character's choice onto every character on the machine.
     renderer = loadSpan('renderer-ctor', () => new Renderer(world, canvas, nameplates));
     rendererReady = true;
+    publishGpuHitchRuntimeReceipt({ search: location.search, renderer: renderer.perfStats() });
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
@@ -1474,6 +1496,9 @@ async function startGame(
       devCommandsEnabled: import.meta.env.DEV,
       constrainedMemory: GFX.constrainedMemory,
     });
+    mapMarkerPaletteLifecycle = installMapMarkerPaletteLifecycle(window, () =>
+      hud.refreshMapMarkerArtPalette(),
+    );
     loadPhaseEnd('hud-ctor');
     perf.setHud(hud);
     // Every zone the renderer makes resident (boot, teleport warmup, or the
@@ -1829,6 +1854,7 @@ async function startGame(
     canvas,
     {
       onTab: () => world.tabTarget(),
+      onTabPrev: () => world.tabTargetPrev(),
       onTargetFriendly: () => world.targetNearestFriendly(),
       onCycleFriendly: () => world.friendlyTabTarget(),
       // Pet bar (Ctrl+1..5 by default): drive the existing IWorld pet commands.
@@ -2122,6 +2148,9 @@ async function startGame(
     switch (id) {
       case 'target':
         world.tabTarget();
+        break;
+      case 'targetPrev':
+        world.tabTargetPrev();
         break;
       case 'targetFriendly':
         world.targetNearestFriendly();
@@ -2768,7 +2797,10 @@ async function startGame(
     },
     showOpaqueCurtain: () => showLoadingScreen(t('hudChrome.options.graphicsApplying')),
     awaitCurtainPaint: nextPaint,
-    hideOpaqueCurtain: hideLoadingScreen,
+    hideOpaqueCurtain: () => {
+      renderer.markGpuHitchReveal();
+      hideLoadingScreen();
+    },
     prepareTargetAssets: async (target, onProgress) => {
       const profile = resolveGfxProfile(graphicsCapabilities, target, location.search);
       await prepareGraphicsProfileAssets(profile.settings, world.player.pos, onProgress);
@@ -2847,6 +2879,7 @@ async function startGame(
       next.setAudioSink(sfx);
       renderer = next;
       rendererReady = true;
+      publishGpuHitchRuntimeReceipt({ search: location.search, renderer: next.perfStats() });
       hud.replaceRenderer(next);
       perf.setRenderer(next);
       perf.reset();
@@ -3730,8 +3763,14 @@ async function startGame(
       // procedural math, so gameplay on not-yet-rendered ground stays correct;
       // the chunks under the player stream in first (prepareZoneAt priority),
       // and the fog residency clamp keeps the unbuilt remainder hidden.
+      // A PREPARED zone only reaches here when its sky was evicted: that
+      // sky-only recovery must take prepareZoneSky's idle arm, because there
+      // is no curtain and the fast arm pays a synchronous PMREM plus full
+      // uploads in live play. An unprepared zone keeps the historic
+      // escalating join so the ground under the player still fills fast.
+      const skyOnlyRecovery = renderer.isZonePreparedAt(zoneX, zoneZ);
       zoneWarmup = renderer
-        .prepareZoneAt(zoneX, zoneZ)
+        .prepareZoneAt(zoneX, zoneZ, undefined, skyOnlyRecovery ? { pace: 'idle' } : undefined)
         .then(() => renderer.prewarmZoneAt(zoneX, zoneZ, { background: true }))
         .catch((err) => {
           console.warn('Background zone warmup failed', err);
@@ -4778,6 +4817,7 @@ async function startGame(
           prewarmCategory: category,
         }),
     });
+    publishGpuHitchRuntimeReceipt({ search: location.search, renderer: renderer.perfStats() });
     entryDiagnostics.checkpoint('prewarm-complete', {
       ...renderEntryDiagnostics(),
       prewarmElapsedMs: prewarm.elapsedMs,
@@ -4809,10 +4849,14 @@ async function startGame(
   if (streamedCount > 0) {
     console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
   }
-  // The paperdoll/armory/portrait preview prewarms no longer hold the curtain:
+  // The paperdoll and portrait preview prewarms no longer hold the curtain:
   // they start after the reveal (see revealWorld below) as paced background
-  // GPU units. Measured on the reference desktop they were 11 to 26 s of the
-  // entry spent on secondary contexts for windows the player may never open.
+  // GPU units. Measured on the reference desktop, awaiting the paperdoll,
+  // armory and portrait prewarms here cost 11 to 26 s of the entry, spent on
+  // secondary contexts for windows the player may never open. The ARMORY is
+  // no longer in that set at all and is warmed nowhere ahead of time: it
+  // builds per inspected card, on the click that opens it
+  // (docs/design/armory-preview-warming.md).
   // Only the paperdoll SHELL still builds here (~700 ms): it is the one coarse
   // step the paced lane cannot split, and behind the curtain it costs nothing
   // a player can feel. The tight profile keeps skipping every secondary
@@ -4865,6 +4909,7 @@ async function startGame(
       const revealWorld = (): void => {
         loadPhaseEnd('settle-cover');
         loadPhaseStart('curtain-fade');
+        renderer.markGpuHitchReveal();
         hideLoadingScreen();
         // Start the intro clock as the loading screen begins to fade: the camera
         // holds the opening pose until now, so the fade doubles as the cut in.
@@ -4898,9 +4943,10 @@ async function startGame(
           // One-time machine-local performance nudge (packet 0 rulings R14-R16):
           // the assembler polls the same PerfMonitor the reporter reads.
           initPerfNudge({ perf, desktopShell: DESKTOP_APP });
-          // Post-entry preview prewarm (paperdoll, armory catalog, portrait
-          // caches): one bounded unit per idle slot on the renderer's
-          // background GPU queue, paused while the owning window is open. The
+          // Post-entry preview prewarm (paperdoll and portrait caches; the
+          // armory catalog is NOT warmed, it builds per inspected card): one
+          // bounded unit per idle slot on the renderer's background GPU queue,
+          // paused while the owning window is open. The
           // 4 GB-class tight profile still skips the secondary contexts
           // entirely and keeps their documented lazy first-open path.
           if (!GFX.tightMemory) hud.startPostEntryPreviewPrewarm();
@@ -5117,6 +5163,10 @@ const REFERRAL_SLUG = (() => {
   const slug = raw.trim().toLowerCase();
   return /^[a-z0-9][a-z0-9-]{0,63}$/.test(slug) ? slug : '';
 })();
+
+// First-touch attribution capture (fbclid/utm/landing/referrer), write-once at
+// load like the referral slug above; the register call sends it to the server.
+captureFirstTouch();
 
 // Password-reset token: a visitor who follows the emailed link arrives with
 // ?reset=<64-hex-token>. Read it once at load and validate the shape so a junk
@@ -6898,6 +6948,13 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     stopActiveEntryDiagnostics();
     clearEntryProbe();
     console.warn('[entry-diag] connection ended; entry probe cleared');
+    // A native shell rejected for a stale world-layout epoch while an OTA
+    // bundle is downloading or staged: the gate takes the screen (progress,
+    // then an immediate reload-apply) instead of the dead-end overlay below,
+    // whose Reload button would just boot the same stale bundle. The resume
+    // marker deliberately survives here: after the update applies, the reload
+    // resumes straight into the world on the NEW bundle.
+    if (otaUpdateGate.handleIncompatibleDisconnect(reason)) return;
     // The session ended for good (retries exhausted, kick, takeover, auth fail):
     // fatalOverlay clears the resume marker so a reload does not loop back into
     // a dead session. Exception: a duplicate-session conflict means the
@@ -9907,6 +9964,8 @@ function wireStartScreens(): void {
         }
       } else {
         const email = ($('#login-email') as unknown as HTMLInputElement).value.trim();
+        const optIn =
+          ($('#login-marketing') as unknown as HTMLInputElement | null)?.checked === true;
         const registered = await api.register(
           username,
           password,
@@ -9914,6 +9973,11 @@ function wireStartScreens(): void {
           token,
           REFERRAL_SLUG,
           nativeAttestation,
+          {
+            attribution: registerAttributionPayload(),
+            marketingOptIn: optIn,
+            locale: getLanguage(),
+          },
         );
         trackMetaPixel(
           'AccountCreated',
@@ -9989,6 +10053,10 @@ function wireStartScreens(): void {
     const emailField = $('#login-email-field') as HTMLElement;
     const emailInput = $('#login-email') as HTMLInputElement;
     emailField.hidden = isLogin;
+    // The marketing opt-in is register-only too; never required, so the
+    // wrapper's hidden is enough.
+    const marketingField = $('#login-marketing-field') as HTMLElement | null;
+    if (marketingField) marketingField.hidden = isLogin;
     if (isLogin) {
       emailInput.removeAttribute('required');
       emailInput.classList.remove('user-invalid-fallback');

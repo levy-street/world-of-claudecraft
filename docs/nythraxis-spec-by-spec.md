@@ -77,7 +77,7 @@ and the ordering, not a live parse.
 
 **Spread: 2.37x at 60 s** (308 to 130, median 196). **5.10x at 300 s** (319 to
 63, median 175). The repo's own declared intent in
-`tests/owned_class_balance_harness.test.ts` is roughly plus or minus 15%.
+`tests/owned_class_balance_druid_bands.test.ts` is roughly plus or minus 15%.
 
 ---
 

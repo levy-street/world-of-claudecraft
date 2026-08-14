@@ -205,9 +205,9 @@ Files: `src/sim/delve_litany_layout.ts`, `src/sim/types.ts`,
    sets its own. Verify `shellColliders` (side walls at +/-wallX, end walls at
    zMin/zMax) and `litanyModuleLayout` (renderer bridge) already read `geo.wallX/zMin/
    zMax` -> they do, so size propagates to collision AND the renderer interior.
-   `LITANY_SIDE_Z`/`LITANY_SIDE_HD` are shared constants used for the side-wall OBB
-   center/half-depth; if a room is much shorter, recompute side-wall z/hd from its own
-   zMin/zMax instead of the constants so walls span the actual room.
+   The side-wall OBB center/half-depth are computed from the room's own
+   `zMin`/`zMax`; if a room is much shorter, recompute side-wall z/hd from its own
+   zMin/zMax instead of a shared constant so walls span the actual room.
 
 2. Water tier:
    - `LitanyHazardZone`: add `tier?: 'shallow' | 'deep'` (default `'deep'`).

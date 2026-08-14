@@ -32,6 +32,7 @@ import {
   routes,
   setAccountDbForTests,
 } from '../../server/account';
+import { deleteAccountAttribution } from '../../server/attribution_db';
 import { verifyPassword } from '../../server/auth';
 import {
   type AccountModerationStatus,
@@ -70,6 +71,13 @@ vi.mock('../../server/db', async (importActual) => {
 vi.mock('../../server/auth', async (importActual) => {
   const actual = await importActual<typeof import('../../server/auth')>();
   return { ...actual, verifyPassword: vi.fn(actual.verifyPassword) };
+});
+// The deactivate handler erases the account_attribution row (privacy: the
+// soft delete never fires the FK CASCADE); fake the SQL boundary so the
+// deactivate suite stays Postgres-free.
+vi.mock('../../server/attribution_db', async (importActual) => {
+  const actual = await importActual<typeof import('../../server/attribution_db')>();
+  return { ...actual, deleteAccountAttribution: vi.fn(async () => {}) };
 });
 vi.mock('../../server/email', async (importActual) => {
   const actual = await importActual<typeof import('../../server/email')>();
@@ -597,6 +605,9 @@ describe('deactivate route: injected hooks + runtime wiring', () => {
     // The self-service delete also emails the account (the side effect the legacy arm
     // fired too), so the deactivate flow is confirmed end to end, not just the hooks.
     expect(vi.mocked(emailAccountDeleted)).toHaveBeenCalledWith(acctRow);
+    // Privacy erasure: the attribution row is deleted explicitly (the soft
+    // delete never fires the FK CASCADE).
+    expect(vi.mocked(deleteAccountAttribution)).toHaveBeenCalledWith(expect.anything(), 7);
   });
 
   it('409s and does NOT disconnect when anyCharacterOnline reports a live session', async () => {

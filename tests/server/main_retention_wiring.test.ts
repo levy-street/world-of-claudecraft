@@ -102,6 +102,10 @@ describe('retention sweep wiring in server/main.ts', () => {
       'prunePlayerReportsBatch(',
       'pruneBugReportsBatch(',
       'pruneChatViolationsBatch(',
+      // The UA progression event logs (level_up_events / ftue_events) grow
+      // per event; each registers its bounded prune with the sweep.
+      'pruneLevelUpEventsBatch(',
+      'pruneFtueEventsBatch(',
       // market_listing_snapshots accrues ~288 captures a day per listed item;
       // its retention lives only in this sweep (market_sales is keep-forever
       // by design, documented at its DDL in server/market_tracker_db.ts).

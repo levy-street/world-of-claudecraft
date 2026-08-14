@@ -110,13 +110,25 @@ describe('createBackgroundGpuQueue', () => {
     const highTwo = queue.run(async () => {
       events.push('high-two');
     }, GPU_WORK_PRIORITY.LIVE_VIEW);
+    // Behavioral pin for the debt class: enqueued alongside a BACKGROUND
+    // preview unit, the debt unit starts first.
+    const preview = queue.run(async () => {
+      events.push('preview');
+    }, GPU_WORK_PRIORITY.BACKGROUND);
+    const debt = queue.run(async () => {
+      events.push('debt');
+    }, GPU_WORK_PRIORITY.BOOT_DEBT);
 
     releaseActive();
-    await Promise.all([active, low, highOne, medium, highTwo]);
-    expect(events).toEqual(['active', 'high-one', 'high-two', 'medium', 'low']);
+    await Promise.all([active, low, highOne, medium, highTwo, preview, debt]);
+    expect(events).toEqual(['active', 'high-one', 'high-two', 'medium', 'debt', 'preview', 'low']);
     expect(GPU_WORK_PRIORITY.ACTIONABLE_VIEW).toBeGreaterThan(GPU_WORK_PRIORITY.LIVE_VIEW);
     expect(GPU_WORK_PRIORITY.LIVE_VIEW).toBeGreaterThan(GPU_WORK_PRIORITY.VISIBLE_PREWARM);
-    expect(GPU_WORK_PRIORITY.VISIBLE_PREWARM).toBeGreaterThan(GPU_WORK_PRIORITY.BACKGROUND);
+    // Dropped-prewarm link/upload debt outranks the cosmetic BACKGROUND
+    // warmers (the preview lane starved it for minutes in production) but
+    // stays under the streamed-zone prepare and every live gate.
+    expect(GPU_WORK_PRIORITY.VISIBLE_PREWARM).toBeGreaterThan(GPU_WORK_PRIORITY.BOOT_DEBT);
+    expect(GPU_WORK_PRIORITY.BOOT_DEBT).toBeGreaterThan(GPU_WORK_PRIORITY.BACKGROUND);
     expect(GPU_WORK_PRIORITY.BACKGROUND).toBeGreaterThan(GPU_WORK_PRIORITY.BOOT_RESUME);
   });
 
@@ -167,6 +179,325 @@ describe('createBackgroundGpuQueue', () => {
     expect(stats.slowest[0].wallMs).toBe(512);
   });
 
+  // Grant latency: the queue's contract is that a cosmetic lane never delays an
+  // actionable one, and the wait between enqueue and start is the only place
+  // that contract can be observed breaking. Before this, nothing measured it.
+  it('records how long each unit waited for its grant', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const first = queue.run(() => gate, GPU_WORK_PRIORITY.BACKGROUND, 'cosmetic');
+    // Let the cosmetic unit actually START before the gate is enqueued.
+    // Priority only decides which PENDING unit goes next, so a gate queued in
+    // the same turn would simply be picked first and measure nothing.
+    await flush();
+    const second = queue.run(
+      () => {
+        clock += 3;
+      },
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      'live-gate',
+    );
+    clock += 700;
+    release();
+    await Promise.all([first, second]);
+    const stats = queue.stats();
+    const byLabel = new Map(stats.slowest.map((unit) => [unit.label, unit]));
+    expect(byLabel.get('cosmetic')?.waitMs).toBe(0);
+    expect(byLabel.get('live-gate')?.waitMs).toBe(700);
+    expect(stats.worstWaitMs).toBe(700);
+    // And it is readable per lane, which is what names the victim without
+    // reading every unit row.
+    const actionable = stats.recent.lanes.find(
+      (lane) => lane.priority === GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+    );
+    expect(actionable).toMatchObject({ units: 1, worstWaitMs: 700 });
+  });
+
+  // The wait alone was a symptom: it said a lane got delayed without saying by
+  // what. These pin the attribution that turns it into a diagnosis.
+  it('names the unit a delayed one was waiting behind', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const holder = queue.run(() => gate, GPU_WORK_PRIORITY.BACKGROUND, 'cosmetic-holder');
+    await flush();
+    const waiter = queue.run(
+      () => {
+        clock += 2;
+      },
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      'live-gate',
+    );
+    clock += 600;
+    release();
+    await Promise.all([holder, waiter]);
+    const waits = queue.stats().longestWaits;
+    expect(waits).toHaveLength(1);
+    expect(waits[0]).toMatchObject({
+      label: 'live-gate',
+      priority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      waitMs: 600,
+      // The whole point: an actionable unit delayed 600 ms, and the report names
+      // the cosmetic unit it sat behind instead of leaving it unattributable.
+      blockedBy: 'cosmetic-holder',
+      blockedByPriority: GPU_WORK_PRIORITY.BACKGROUND,
+      waitedOnTailCap: false,
+    });
+  });
+
+  it('marks a wait spent behind the released-tail cap', async () => {
+    // The mechanism a RELEASED tail still delays a live gate with: releasing the
+    // tail frees the serial slot but keeps a cap slot, and the drain loop refuses
+    // to START anything while the cap is full. Without this flag that wait is
+    // indistinguishable from waiting behind an ordinary holder, and the two call
+    // for opposite fixes.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, tailLimit: 1 });
+    let settleLink!: () => void;
+    const tail = queue.run(
+      () => {
+        clock += 1;
+        return new Promise<void>((resolve) => {
+          settleLink = resolve;
+        });
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'preview:armory:skin',
+      { releaseTail: true },
+    );
+    await flush();
+    // The queue is now free of a RUNNING unit, yet the cap is full.
+    expect(queue.stats().active).toBeNull();
+    const waiter = queue.run(
+      () => {
+        clock += 2;
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate',
+    );
+    await flush();
+    clock += 900;
+    settleLink();
+    await Promise.all([tail, waiter]);
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'live-gate');
+    expect(wait).toBeDefined();
+    expect(wait?.waitedOnTailCap).toBe(true);
+    expect(wait?.waitMs).toBe(900);
+    // And it names the occupant, so the report says WHICH lane's tail held the cap.
+    expect(wait?.tails).toEqual(['preview:armory:skin']);
+  });
+
+  it('blames nothing when the queue was idle, rather than a unit that long since finished', async () => {
+    // The null branch of blockedBy is the one that says "you waited on the cap
+    // or on a scheduling hop, not behind a holder". Without resetting the
+    // holder when the queue drains it is unreachable after the first unit of
+    // the session, and the readout accuses a unit that settled arbitrarily long
+    // ago: a diagnostic naming an innocent unit, inside the tool built to stop
+    // exactly that.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    await queue.run(
+      () => {
+        clock += 5;
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'long-gone',
+    );
+    await flush();
+    // The queue is idle now. A later arrival that still measures a wait (a
+    // scheduling hop a long task stretched) waited on nothing this queue holds.
+    const pending = queue.run(() => {}, GPU_WORK_PRIORITY.ACTIONABLE_VIEW, 'late-gate');
+    clock += 40;
+    await pending;
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'late-gate');
+    expect(wait).toBeDefined();
+    expect(wait?.blockedBy).toBeNull();
+    expect(wait?.blockedByPriority).toBeNull();
+  });
+
+  it('charges only the FIRST unit of a frameless burst as unshared', async () => {
+    // The limitation, pinned at its real shape rather than the alarming
+    // version. overlappingUnits resets only in noteFrame, so units passing
+    // between two frames count their predecessors: the first is clean, every
+    // later one is marked shared. worstUnsharedFrameGapMs therefore reports the
+    // FIRST unit of a burst, which is rarely the worst one. That matters
+    // because world entry, where the prewarm hitches live, is exactly such a
+    // burst.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(0);
+    // Growing costs, so the worst unit is the LAST one and the unshared arm
+    // demonstrably does not report it.
+    for (const cost of [20, 40, 80, 160]) {
+      await queue.run(
+        () => {
+          clock += cost;
+        },
+        GPU_WORK_PRIORITY.BOOT_DEBT,
+        `boot:${cost}`,
+      );
+    }
+    clock += 100;
+    queue.noteFrame(clock);
+    const stats = queue.stats();
+    const first = stats.blockiest.find((unit) => unit.label === 'boot:20');
+    const worst = stats.blockiest.find((unit) => unit.label === 'boot:160');
+    expect(first?.sharedFrameGap).toBe(1);
+    expect(worst?.sharedFrameGap).toBeGreaterThan(1);
+    // The clean arm reports the first unit, not the worst: 20 ms against the
+    // 160 ms one that actually dominated.
+    expect(stats.worstUnsharedFrameGapMs).toBe(20);
+    expect(stats.worstFrameGapMs).toBeGreaterThan(stats.worstUnsharedFrameGapMs);
+  });
+
+  it('marks a unit that arrived while the loop was ALREADY parked on the cap', async () => {
+    // The arm the park counter alone cannot see. Without it a FALSE here means
+    // only "no park began during my wait", so the signal could confirm a cap
+    // wait but never rule one out, which is useless for the releaseTail
+    // experiment it exists to settle.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, tailLimit: 1 });
+    let settleLink!: () => void;
+    const tail = queue.run(
+      () => {
+        clock += 1;
+        return new Promise<void>((resolve) => {
+          settleLink = resolve;
+        });
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'preview:armory:skin',
+      { releaseTail: true },
+    );
+    await flush();
+    // First arrival makes the loop park on the full cap.
+    const early = queue.run(() => {}, GPU_WORK_PRIORITY.BACKGROUND, 'early');
+    await flush();
+    // This one arrives while that park is ALREADY under way, and the same park
+    // releases both, so no counter advance happens during its wait.
+    clock += 500;
+    const late = queue.run(() => {}, GPU_WORK_PRIORITY.LIVE_VIEW, 'late-gate');
+    clock += 300;
+    settleLink();
+    await Promise.all([tail, early, late]);
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'late-gate');
+    expect(wait).toBeDefined();
+    expect(wait?.waitedOnTailCap).toBe(true);
+    expect(wait?.tails).toEqual(['preview:armory:skin']);
+  });
+
+  it('does not blame the cap for a unit enqueued from the settling tail promise', async () => {
+    // The microtask order that makes this subtle: settle() resolves the unit's
+    // public promise BEFORE it releases the parked loop, so a reaction to that
+    // promise runs while the loop is still formally parked. A unit enqueued
+    // there never waited on the cap, and reporting one would put stale
+    // occupants next to it in the readout.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, tailLimit: 1 });
+    let settleLink!: () => void;
+    const tail = queue.run(
+      () => {
+        clock += 1;
+        return new Promise<void>((resolve) => {
+          settleLink = resolve;
+        });
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'preview:armory:skin',
+      { releaseTail: true },
+    );
+    await flush();
+    const parked = queue.run(() => {}, GPU_WORK_PRIORITY.BACKGROUND, 'parked');
+    await flush();
+    // Enqueue from the tail's own continuation: this is the reaction that runs
+    // before the drain loop resumes. The clock advance AFTER the enqueue is
+    // what gives the unit a measurable wait, so it reaches the ranking at all
+    // (a zero wait is dropped, which made a first version of this test vacuous).
+    const chained = tail.then(() => {
+      const started = queue.run(() => {}, GPU_WORK_PRIORITY.LIVE_VIEW, 'chained');
+      clock += 300;
+      return started;
+    });
+    clock += 200;
+    settleLink();
+    await Promise.all([tail, parked, chained]);
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'chained');
+    expect(wait).toBeDefined();
+    expect(wait?.waitMs).toBe(300);
+    // It waited, but not on the cap: the slot was free before it ever existed.
+    expect(wait?.waitedOnTailCap).toBe(false);
+    expect(wait?.tails).toEqual([]);
+  });
+
+  it('keeps units granted immediately out of the wait ranking', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    await queue.run(() => {
+      clock += 5;
+    }, GPU_WORK_PRIORITY.BACKGROUND);
+    // A unit that never waited is not "the least delayed one", it is not a
+    // member: keeping it out is what makes a short list readable.
+    expect(queue.stats().longestWaits).toEqual([]);
+  });
+
+  it('reports a recent interval beside the lifetime maxima', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, recentWindowMs: 1000 });
+    await queue.run(() => {
+      clock += 400;
+    }, GPU_WORK_PRIORITY.BACKGROUND);
+    expect(queue.stats().recent).toMatchObject({ windowMs: 1000, units: 1, worstSyncMs: 400 });
+    clock += 5000;
+    const later = queue.stats();
+    // The lifetime maximum keeps the record; the interval arm goes quiet. That
+    // difference is what makes a pacing A/B readable at all.
+    expect(later.worstSyncMs).toBe(400);
+    expect(later.recent).toMatchObject({ units: 0, worstSyncMs: 0, lanes: [] });
+  });
+
+  it('counts a late-settling released tail in the interval it settled in', async () => {
+    // The interval window is keyed on SETTLE time, not start time, and this is
+    // the case that decides it. A released tail can live for seconds (a driver
+    // link) and finish long after a unit that started later. Keyed on START it
+    // would be filed under a moment already outside the window and vanish from
+    // the interval it actually cost, and (because records arrive in settle
+    // order) it would also sit unsorted behind a younger sample where the
+    // prefix prune cannot reach it, inflating "recent" for the rest of the
+    // session.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, recentWindowMs: 150 });
+    let settleLink!: () => void;
+    const tail = queue.run(
+      () => {
+        clock += 5;
+        return new Promise<void>((resolve) => {
+          settleLink = resolve;
+        });
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'released-gate',
+      { releaseTail: true },
+    );
+    await flush();
+    clock = 100;
+    await queue.run(() => {
+      clock += 5;
+    }, GPU_WORK_PRIORITY.BACKGROUND);
+    clock = 400;
+    settleLink();
+    await tail;
+    const stats = queue.stats();
+    // The BACKGROUND unit settled at 105, outside a 150 ms window ending at 400,
+    // so it is correctly gone. The tail settled AT 400 and must be present.
+    expect(stats.recent.units).toBe(1);
+    expect(stats.recent.lanes.map((lane) => lane.priority)).toEqual([GPU_WORK_PRIORITY.LIVE_VIEW]);
+    // And the lifetime counters still saw both, so nothing was lost by rolling.
+    expect(stats.units).toBe(2);
+  });
+
   it('keeps the slowest units by sync slice, bounded, defaulting the label', async () => {
     let clock = 0;
     const queue = createBackgroundGpuQueue({ now: () => clock, slowestLimit: 2 });
@@ -181,6 +512,292 @@ describe('createBackgroundGpuQueue', () => {
     expect(stats.slowest[0].label).toBe('unlabeled');
     expect(stats.totalSyncMs).toBe(65);
     expect(stats.worstSyncMs).toBe(30);
+  });
+
+  // The syncMs blind spot (measured 13 August 2026): armory prewarm units
+  // reported 9 to 12 ms of syncMs while costing live frames 200 to 550 ms,
+  // because syncMs stops at the work function's FIRST await and everything the
+  // unit blocks afterwards books in no unit at all. A lane whose whole purpose
+  // is "never cost a live frame" cannot be validated by a metric that cannot
+  // see the frames. These pin the frame-gap attribution that replaces it.
+  it('attributes a frame gap that opens after the work function first await', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const unit = queue.run(
+      () => {
+        clock += 10;
+        return gate;
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'armory-skin',
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    // A live frame lands while the tail is still off-thread: nothing lost yet.
+    clock += 16;
+    queue.noteFrame(clock);
+    // Then the tail blocks the main thread outright, so no frame runs until it
+    // settles. This is the span syncMs cannot see.
+    clock += 550;
+    release();
+    await unit;
+
+    const stats = queue.stats();
+    expect(stats.slowest[0].label).toBe('armory-skin');
+    expect(stats.slowest[0].syncMs).toBe(10);
+    expect(stats.slowest[0].frameGapMs).toBe(550);
+    expect(stats.worstFrameGapMs).toBe(550);
+  });
+
+  it('ranks the blockiest units by frame gap, not by the sync slice', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    // A big synchronous prologue that costs one frame.
+    await queue.run(
+      () => {
+        clock += 40;
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'fat-prologue',
+    );
+    clock += 2;
+    queue.noteFrame(clock);
+    // A tiny prologue whose tail then blocks far longer.
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const sneaky = queue.run(
+      () => {
+        clock += 5;
+        return gate;
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'sneaky-tail',
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 300;
+    release();
+    await sneaky;
+
+    const stats = queue.stats();
+    expect(stats.slowest[0].label).toBe('fat-prologue');
+    expect(stats.blockiest[0].label).toBe('sneaky-tail');
+    expect(stats.blockiest[0].frameGapMs).toBe(305);
+    expect(stats.blockiest[0].syncMs).toBe(5);
+  });
+
+  it('attributes only the part of a frame gap that overlaps the unit', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    // 200 ms of ambient stall BEFORE any unit exists: not this unit's doing.
+    clock += 200;
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const unit = queue.run(() => gate, GPU_WORK_PRIORITY.BACKGROUND, 'late-arrival');
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 60;
+    queue.noteFrame(clock);
+    release();
+    await unit;
+
+    const stats = queue.stats();
+    expect(stats.slowest[0].frameGapMs).toBe(60);
+  });
+
+  // Clamped, not dropped. Dropping was tried and made the metric non-monotone in
+  // badness: the worst block in a session reported 0, fell out of `blockiest`
+  // (whose membership is a positive gap), and left a smaller earlier span holding
+  // the record, i.e. the worse a unit behaved the better it looked.
+  it('clamps a frame gap beyond the discontinuity cap instead of dropping it', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, frameGapIgnoreMs: 1000 });
+    queue.noteFrame(clock);
+    let releaseSmall!: () => void;
+    const small = new Promise<void>((resolve) => (releaseSmall = resolve));
+    const earlier = queue.run(() => small, GPU_WORK_PRIORITY.BACKGROUND, 'ordinary-unit');
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 400;
+    releaseSmall();
+    await earlier;
+    clock += 5;
+    queue.noteFrame(clock);
+
+    let releaseHuge!: () => void;
+    const huge = new Promise<void>((resolve) => (releaseHuge = resolve));
+    const worst = queue.run(() => huge, GPU_WORK_PRIORITY.BACKGROUND, 'hidden-tab');
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 5000;
+    releaseHuge();
+    await worst;
+
+    const stats = queue.stats();
+    const byLabel = Object.fromEntries(stats.slowest.map((unit) => [unit.label, unit]));
+    expect(byLabel['ordinary-unit'].frameGapMs).toBe(400);
+    expect(byLabel['hidden-tab'].frameGapMs).toBe(1000);
+    expect(stats.worstFrameGapMs).toBe(1000);
+    expect(stats.blockiest[0].label).toBe('hidden-tab');
+  });
+
+  // World entry pushes dozens of units through the queue before the frame loop
+  // is armed at all, so the first noteFrame has to reset the overlap counter or
+  // every boot unit stays folded into it for the whole session and every later
+  // charge reads as shared. Boot is the window the prewarm hitches live in.
+  it('resets the overlap counter on the first frame, so boot units do not poison it', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    // Five units drain before any frame is ever noted.
+    for (let index = 0; index < 5; index++) {
+      await queue.run(() => {
+        clock += 2;
+      });
+    }
+    queue.noteFrame(clock);
+
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const alone = queue.run(() => gate, GPU_WORK_PRIORITY.BACKGROUND, 'first-live-unit');
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 300;
+    release();
+    await alone;
+
+    const stats = queue.stats();
+    const unit = stats.slowest.find((entry) => entry.label === 'first-live-unit');
+    expect(unit?.frameGapMs).toBe(300);
+    expect(unit?.sharedFrameGap).toBe(1);
+  });
+
+  // A running max only moves on a record, and the forensics vector diffs values,
+  // so a max goes silent on the second and every later occurrence of the same
+  // cost: the exact empty diff this metric exists to remove.
+  it('accumulates a total frame gap that keeps moving after the worst is set', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    for (const ms of [300, 120, 120]) {
+      let release!: () => void;
+      const gate = new Promise<void>((resolve) => (release = resolve));
+      const unit = queue.run(() => gate);
+      await Promise.resolve();
+      await Promise.resolve();
+      clock += ms;
+      release();
+      await unit;
+      clock += 5;
+      queue.noteFrame(clock);
+    }
+
+    const stats = queue.stats();
+    expect(stats.worstFrameGapMs).toBe(300);
+    // 300 + 120 + 120: the two later units move the total while leaving the max
+    // untouched, which is the whole point of carrying both.
+    expect(stats.totalFrameGapMs).toBe(540);
+  });
+
+  // A released tail IS charged, and the exclusion that was briefly tried here is
+  // the wrong fix: the preview prewarm lane releases its tail while doing its
+  // real main-thread work there, so a tail-blind metric goes silent on the very
+  // misuse it exists to expose. The ambiguity that motivated the exclusion is
+  // carried by sharedFrameGap instead (pinned by the test below).
+  it('charges a released tail that blocks, since its work is still main-thread', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const unit = queue.run(
+      () => {
+        clock += 3;
+        return gate;
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'released-gate',
+      { releaseTail: true },
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    // 400 frameless milliseconds pass while only this released tail is in
+    // flight, so the charge is unambiguous: nothing else could have caused it.
+    clock += 400;
+    release();
+    await unit;
+
+    const stats = queue.stats();
+    // 403, not 400: the unit started at 0 alongside the last frame, so the whole
+    // frameless span it was in flight for counts, its 3 ms prologue included.
+    expect(stats.slowest[0].label).toBe('released-gate');
+    expect(stats.slowest[0].frameGapMs).toBe(403);
+    expect(stats.slowest[0].sharedFrameGap).toBe(1);
+  });
+
+  // The passenger case, and the one a live capture got wrong before this pin
+  // existed: a long released tail is charged a gap another unit caused, and on
+  // frameGapMs alone it outranks the culprit. sharedFrameGap is what separates
+  // them, and it must count a unit that started AND settled inside the span,
+  // which is precisely the shape of the real culprit.
+  it('marks a gap shared by several in-flight units, culprit and passenger alike', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    let releaseLink!: () => void;
+    const link = new Promise<void>((resolve) => (releaseLink = resolve));
+    const gate = queue.run(
+      () => {
+        clock += 1;
+        return link;
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate',
+      { releaseTail: true },
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    // A second unit starts and blocks outright while the link is still settling.
+    const heavy = queue.run(
+      () => {
+        clock += 500;
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'heavy-prewarm',
+    );
+    await heavy;
+    clock += 5;
+    queue.noteFrame(clock);
+    releaseLink();
+    await gate;
+
+    const stats = queue.stats();
+    const byLabel = Object.fromEntries(stats.slowest.map((unit) => [unit.label, unit]));
+    // Both are charged, and both say the charge is shared, so neither can be
+    // read as proven. The sync slices then separate them: 500 against 1.
+    expect(byLabel['heavy-prewarm'].frameGapMs).toBe(500);
+    expect(byLabel['heavy-prewarm'].sharedFrameGap).toBe(2);
+    expect(byLabel['live-gate'].sharedFrameGap).toBe(2);
+    expect(byLabel['heavy-prewarm'].syncMs).toBe(500);
+    expect(byLabel['live-gate'].syncMs).toBe(1);
+  });
+
+  it('reports a zero frame gap when the host never feeds the frame clock', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    await queue.run(() => {
+      clock += 90;
+    });
+
+    const stats = queue.stats();
+    expect(stats.slowest[0].syncMs).toBe(90);
+    expect(stats.slowest[0].frameGapMs).toBe(0);
+    expect(stats.worstFrameGapMs).toBe(0);
+    expect(stats.blockiest).toEqual([]);
   });
 
   it('exposes the running unit with its age and reports none while idle', async () => {
@@ -553,6 +1170,12 @@ describe('createBackgroundGpuQueue', () => {
       syncMs: 3,
       wallMs: 7003,
       atMs: 0,
+      waitMs: 0,
+      // Zero because this suite never feeds the frame clock, which is the
+      // honest reading: nothing here observed a frame to lose, so nothing was
+      // charged and no span was shared.
+      frameGapMs: 0,
+      sharedFrameGap: 0,
     });
     // A multi-second link is still a recorded stall, settled: the release
     // changes who waits behind it, not whether it is worth seeing.
@@ -701,7 +1324,36 @@ describe('createBackgroundGpuQueue', () => {
     expect(archetypes).toContain('this.backgroundGpuWork.run(');
     expect(texture).toContain('this.backgroundGpuWork.run(');
     expect(initial).toContain(
-      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id, {',
+      'return this.backgroundGpuWork.run(\n                unit.run,\n                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,\n                unit.id,',
+    );
+    // Debt batches hold their tail (serial, settled-before-next) so the
+    // driver link queue stays shallow; only cosmetic resume releases it.
+    expect(initial).toContain('releaseTail: !debt,');
+    // The class decision itself must stay wired to the owning entry: with
+    // `const debt = false` (or the wrong id) every priority claim above
+    // silently degrades to BOOT_RESUME with the suite green (QA finding B1).
+    expect(initial).toContain('const debt = prewarmResumeIsDebt(entry.id);');
+    // The frame clock is a SINGLE call site whose failure mode is silent good
+    // news: drop it, or let an early return get in front of it, and every unit
+    // reports frameGapMs 0 and an empty blockiest, which reads as "the lane cost
+    // no frames" rather than as "nobody measured". Nothing else in the suite can
+    // see that, because every behavior test drives noteFrame by hand.
+    // The resume ledger's `started` means "handed to the queue", not "finished".
+    // That semantic lives ONLY at the call site: move noteStart into the unit's
+    // completion continuation and the counter silently inverts its meaning while
+    // every unit test stays green, because the ledger itself is just arithmetic.
+    const runUnit = initial.slice(initial.indexOf('runUnit: (unit, entry) => {'));
+    const noteAt = runUnit.indexOf('resumeLedger.noteStart(entry.id);');
+    const runAt = runUnit.indexOf('return this.backgroundGpuWork.run(');
+    expect(noteAt).toBeGreaterThan(-1);
+    expect(runAt).toBeGreaterThan(noteAt);
+
+    const sync = method('  sync(\n', '\n    const frameStats = this.lastFrameStats;');
+    expect(sync).toContain('this.backgroundGpuWork.noteFrame(');
+    // After the shutdown guard: a torn-down renderer must stop the frame clock
+    // rather than keep charging units that settle during teardown.
+    expect(sync.indexOf('if (this.shutdownStarted) return;')).toBeLessThan(
+      sync.indexOf('this.backgroundGpuWork.noteFrame('),
     );
   });
 });

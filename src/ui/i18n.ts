@@ -414,6 +414,20 @@ export function t(key: TranslationKey, values?: InterpolationValues): string {
   return interpolateWithMemo(entry, values);
 }
 
+/** Whether `lang` has NOT translated `key` yet, i.e. the dense table carries the
+ *  English fill for it (a registry-`pending` row). t() owns the release-build
+ *  hard-fail above; this is the read a caller needs when it has a BETTER answer
+ *  than the English fill, and would otherwise splice one English sentence into an
+ *  otherwise localized string (tEntityOptional and its base-field fallback). Cheap
+ *  when nothing is pending: PENDING_TOTAL short-circuits the membership test. */
+export function isPendingTranslation(
+  key: string,
+  lang: SupportedLanguage = currentLanguage,
+): boolean {
+  if (PENDING_TOTAL === 0) return false;
+  return PENDING_SETS[lang]?.has(key) === true;
+}
+
 function translationValue(key: string, lang: SupportedLanguage): string | null {
   if (lang === currentLanguage) {
     const entry = resolvedEntry(key);

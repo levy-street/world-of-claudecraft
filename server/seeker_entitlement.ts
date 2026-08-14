@@ -75,11 +75,7 @@ function makeGuardDb() {
   return { accountAndScopeForToken, moderationStatusForAccount };
 }
 
-let guardDbOverride: BearerActiveGuardDb | null = null;
-
-export function setSeekerEntitlementGuardDbForTests(db: BearerActiveGuardDb | null): void {
-  guardDbOverride = db;
-}
+const guardDbOverride: BearerActiveGuardDb | null = null;
 
 const activeGuard = createActiveGuard(() => guardDbOverride ?? makeGuardDb());
 

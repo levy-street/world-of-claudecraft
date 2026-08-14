@@ -719,7 +719,9 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // -> configuredRealmCount derivation stays pinned end to end: the env
     // literal must still feed the directory parser where it now lives.
     expect(codeOnly(read('server/realm.ts'))).toContain('parseRealms(process.env.REALMS)');
-    const warnStart = dbCode.indexOf('if (configuredRealmCount * DB_POOL_MAX_CLIENTS >');
+    const warnStart = dbCode.indexOf(
+      'if (configuredSteadyConnections > DB_POOL_MAX_CLIENTS_CEILING)',
+    );
     expect(warnStart).toBeGreaterThan(-1);
     const warnBranch = dbCode.slice(warnStart, dbCode.indexOf('\n}', warnStart));
     expect(warnBranch).toContain('console.warn(');
@@ -728,8 +730,10 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // The threshold IS the parser's accepted ceiling (one constant, so the two
     // can never drift), pinned here to its literal value, and to the default
     // beside it: the derivation plus the number, the trap this file exists for.
-    expect(dbCode).toContain(
-      'configuredRealmCount * DB_POOL_MAX_CLIENTS > DB_POOL_MAX_CLIENTS_CEILING',
+    expect(dbCode).toContain('GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS');
+    expect(dbCode).toContain('GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS');
+    expect(dbCode).toMatch(
+      /configuredSteadyConnections\s*=\s*configuredRealmCount\s*\*[\s\S]*DB_POOL_MAX_CLIENTS[\s\S]*GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS[\s\S]*GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS/,
     );
     expect(dbCode).toContain('const DB_POOL_MAX_CLIENTS_CEILING = 97;');
     expect(dbCode).toContain('const DB_POOL_MAX_CLIENTS_DEFAULT = 10;');

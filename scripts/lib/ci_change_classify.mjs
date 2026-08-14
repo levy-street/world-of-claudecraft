@@ -1,5 +1,5 @@
 // Pure classification + fail-closed decision logic for the ci.yml `changes`
-// job ("Detect code path changes"). The job used to answer "does this PR touch
+// job ("Classify changes"). The job used to answer "does this PR touch
 // the code path set" with a full-history checkout plus `git diff`, which cost
 // about 10 serial minutes on every PR (binary-heavy history) and twice wedged
 // for 90+ minutes on the checkout step. The answer now comes from the GitHub

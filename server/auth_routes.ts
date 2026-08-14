@@ -74,6 +74,7 @@ import {
   recordAuthFailure,
   requestIp,
 } from './ratelimit';
+import { captureSignupContext, parseSignupProfile } from './signup_attribution';
 import { isWebClientRequest, webLoginEnforced } from './web_login_guard';
 
 // ---------------------------------------------------------------------------
@@ -172,6 +173,7 @@ const REAL_AUTH_DB = {
   createSuspiciousRegistrationReport,
   captureReferral,
   trackAccountCreated,
+  captureSignupContext,
 };
 let authDb = REAL_AUTH_DB;
 
@@ -286,15 +288,21 @@ async function registerHandler(ctx: Ctx): Promise<void> {
   const token = newToken();
   await authDb.saveToken(token, account.id);
   // Store the mandatory signup email and send the welcome mail. Validated above,
-  // so this always runs for a fresh registration.
+  // so this always runs for a fresh registration. The profile parse is
+  // synchronous so the welcome mail already carries the signup locale and
+  // opt-in state; the capture below persists them (plus attribution).
+  const profile = parseSignupProfile(ctx.req, body);
   await authDb.setAccountEmail(account.id, signupEmail);
   authDb.emailAccountCreated({
     id: account.id,
     username: account.username,
     email: signupEmail,
-    locale: null,
-    marketing_opt_in: false,
+    locale: profile.locale,
+    marketing_opt_in: profile.marketingOptIn,
   });
+  // First-touch attribution + locale/country/opt-in persistence
+  // (fire-and-forget; must never block or fail registration).
+  authDb.captureSignupContext(account.id, ctx.req, body, profile);
   // Server-side Meta CAPI conversion event (fire-and-forget; a no-op without
   // META_CAPI env config, and it must never block or fail registration).
   void authDb.trackAccountCreated(

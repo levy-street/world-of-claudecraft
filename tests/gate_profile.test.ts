@@ -11,13 +11,8 @@ import {
   parseGateProfileArgs,
   rankSlowestFiles,
 } from '../scripts/lib/gate_profile.mjs';
-import { resolveTurboBin } from '../scripts/lib/gate_task_cache.mjs';
 
 const GIB = 1024 * 1024 * 1024;
-// buildGateProfileSteps(workers) with no explicit opts.repoRoot falls back to
-// process.cwd() (gate_steps.mjs's buildFullGateSteps), which vitest always
-// runs from the repo root.
-const EXPECTED_TURBO_BIN = resolveTurboBin(process.cwd());
 
 describe('classifyMachineTier', () => {
   it('labels high when both CPU and RAM clear the high bar', () => {
@@ -243,6 +238,10 @@ describe('buildGateProfileSteps', () => {
     expect(names).toEqual([
       'i18n + wiki + sfx artifacts',
       'i18n freshness',
+      'sfx manifest regen',
+      'media manifest regen',
+      'manifest trackedness',
+      'manifest freshness',
       'malware scan',
       'biome (changed files)',
       'vitest (full suite)',
@@ -255,12 +254,12 @@ describe('buildGateProfileSteps', () => {
     // Generate-once: skip pretest after i18n + wiki; client build is turbo build:bundle.
     expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
     const i18n = steps.find((s) => s.name === 'i18n + wiki + sfx artifacts');
-    expect(i18n?.cmd).toBe(EXPECTED_TURBO_BIN);
+    expect(i18n?.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
     expect(i18n?.args).toEqual(
       expect.arrayContaining(['run', 'i18n:gen', 'wiki:content', 'sfx:check']),
     );
     const client = steps.find((s) => s.name === 'client build');
-    expect(client?.cmd).toBe(EXPECTED_TURBO_BIN);
+    expect(client?.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
     expect(client?.args).toEqual(expect.arrayContaining(['run', 'build:bundle']));
   });
 
@@ -274,6 +273,10 @@ describe('buildGateProfileSteps', () => {
     expect(steps.map((s) => s.name)).toEqual([
       'i18n + wiki + sfx artifacts',
       'i18n freshness',
+      'sfx manifest regen',
+      'media manifest regen',
+      'manifest trackedness',
+      'manifest freshness',
       'malware scan',
       'biome (changed files)',
     ]);

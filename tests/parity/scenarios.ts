@@ -4208,7 +4208,9 @@ function marketRoundTrip(): Scenario {
           armorClass: 'all',
           primaryStat: 'all',
           rarity: 'all',
+          sort: 'name',
           page: 0,
+          collapseLowest: false,
         },
         seller,
       );
@@ -4221,7 +4223,9 @@ function marketRoundTrip(): Scenario {
           armorClass: 'all',
           primaryStat: 'all',
           rarity: 'all',
+          sort: 'name',
           page: 0,
+          collapseLowest: false,
         },
         seller,
       );

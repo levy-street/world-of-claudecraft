@@ -234,7 +234,7 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       const dial = find(controls, key);
       expect(dial, key).toMatchObject({ control: 'choice', rerender: true });
     }
-    for (const key of ['terrainDetail', 'foliageDensity', 'surfaceDetail', 'shadowQuality']) {
+    for (const key of ['terrainDetail', 'foliageDensity', 'surfaceDetail']) {
       const dial = find(controls, key);
       if (dial?.control === 'choice')
         expect(
@@ -251,10 +251,17 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
           key,
         ).toEqual([0, 0.5, 1, 2]);
     }
-    // Effects & Lighting stops at High (the full high-tier post stack).
-    const effects = find(controls, 'effectsQuality');
-    if (effects?.control === 'choice')
-      expect(effects.options.map((o) => o.value)).toEqual([0, 0.5, 1]);
+    // Effects & Lighting stops at High (the full high-tier post stack), and
+    // so does Shadow Quality (High is the 4096 map; the 8192 Insane rung is
+    // retired, so the dial no longer offers it).
+    for (const key of ['effectsQuality', 'shadowQuality']) {
+      const dial = find(controls, key);
+      if (dial?.control === 'choice')
+        expect(
+          dial.options.map((o) => o.value),
+          key,
+        ).toEqual([0, 0.5, 1]);
+    }
     // The per-effect switches: Off/On binaries, AO with the half-res middle,
     // the Low/High pairs (Character Detail, Dynamic Lights), and Particle
     // Effects on the three-step ladder.

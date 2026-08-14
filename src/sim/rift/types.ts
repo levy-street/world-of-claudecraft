@@ -96,16 +96,6 @@ export interface RiftEvent {
   } | null;
 }
 
-/** The whole wire/persistence footprint of a rift instance. Both hosts turn this
- * into identical content via rift_gen. `origin` is the instance-space anchor the
- * floor's local coordinates are offset by (see rift/runs.ts). */
-export interface RiftDescriptor {
-  seed: number;
-  baseLevel: number;
-  floorIndex: number;
-  origin: { x: number; z: number };
-}
-
 /** One placed creature, instance-local. `color`/`scale` are per-run re-grades of
  * the base template so the same creature reads differently across rifts; when
  * omitted the template's own values are used. `level` is already resolved. */

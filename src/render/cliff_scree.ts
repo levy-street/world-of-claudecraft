@@ -76,9 +76,6 @@ export function prepareCliffScreeProfileAssets(
 
 registerDeferredPreload(() => prepareCliffScreeProfileAssets(GFX));
 
-// media-manifest coverage hook (tests/render_glb_replacement_assets.test.ts)
-export const cliffScreePreloadInternalsForTest = { rockUrls: MODEL_URLS };
-
 // The shipped GLBs are meshopt-quantized: bake attributes to float32 + world
 // space once so the geometry can back an InstancedMesh directly. (Same trick
 // as foliage.ts's bakeGeometry, re-stated here because that module is not an

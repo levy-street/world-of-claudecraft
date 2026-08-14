@@ -6,8 +6,10 @@
 // rates, loot tables, coin amounts, or boss scripts. Modeled on delves.ts.
 //
 // Deliberately absent: the "Rift Forge". The upgrade/enchant/socket seam exists in the
-// sim and on the wire but has no client caller, so no player can reach it and the wiki
-// must not name it.
+// sim and on the wire but has no client caller, and the server refuses the wire
+// commands behind RIFT_FORGE_ENABLED (server/rift_forge_gate.ts). "No client caller"
+// alone never made it unreachable (a crafted frame reaches the wire fine); the server
+// gate is what does. The wiki must not name it until the feature intentionally ships.
 
 import { esc } from '../../ui/esc';
 import { formatNumber, t } from '../../ui/i18n';

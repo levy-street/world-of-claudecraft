@@ -400,6 +400,12 @@ export const hudChromeStrings = {
     resetAction: 'Reset',
     note: 'Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size.',
   },
+  chatQuota: {
+    // {seconds} is an already-localized duration phrase, for example "3 seconds".
+    limitReached: 'General chat limit reached. Try again in {seconds}.',
+    pending: 'Your previous General chat message is still sending. Try again in a moment.',
+    unavailable: 'General chat is temporarily unavailable. Try again shortly.',
+  },
   swing: {
     ready: 'Swing',
     seconds: '{seconds}s',
@@ -627,6 +633,22 @@ export const hudChromeStrings = {
     notNow: 'Not now',
     update: 'Update',
   },
+  // The visible OTA gate (src/ui/ota_update_overlay.ts + net/ota_update_gate):
+  // in-app bundle downloads, distinct from the store-update prompt above.
+  otaUpdate: {
+    title: 'Game Update',
+    downloading: 'Downloading update: {percent}',
+    applying: 'Update downloaded. Restarting the game to apply it.',
+    incompatible:
+      'An update is required to play. It will be applied as soon as it finishes downloading.',
+    // RETIRED from the overlay (the OTA dialog is deliberately
+    // non-dismissable) but kept on purpose: deleting an English leaf whose
+    // translations are already filled would force edits across every
+    // i18n.locales overlay, which contributors must never touch. Do not
+    // "clean this up"; the maintainer prunes retired keys at release.
+    continueAnyway: 'Continue without updating',
+    progressLabel: 'Update download progress',
+  },
   // First-run camera-mode prompt (issue #1727): a one-shot modal on the first world
   // entry in a browser, offering Classic vs Mouse Camera. The mouse option title
   // reuses hud.options.mouseCamera; these are the surrounding strings. The setting
@@ -787,6 +809,11 @@ export const hudChromeStrings = {
     emoteWheel: 'Emote Wheel',
     targetFriendly: 'Target Nearest Friendly',
     targetFriendlyNext: 'Cycle Friendly Target',
+    // The backward half of the Tab cycle (Shift+Tab by default); the forward
+    // half is the `hud` catalog's existing `target` row. Worded as a CYCLE, not
+    // as "previous enemy", so it cannot read as a classic last-target memory:
+    // this bind walks the same ordered list backwards, it remembers nothing.
+    targetPrev: 'Cycle Target Backward',
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
     valecup: 'Vale Cup',
@@ -1965,6 +1992,11 @@ export const hudChromeStrings = {
   // (content/heroic_variants.ts), e.g. "Epic Armor [HEROIC]". The variant shares the
   // base item's name; this tag is the only heroic marker, shown in gold.
   itemHeroicTag: '[HEROIC]',
+  // The bare "Heroic" word as a STANDALONE accessible name (no brackets): the
+  // market Browse row's heroic star uses it for its aria-label, where the
+  // bracketed tag above is tooltip-line chrome, not a label a screen reader
+  // should read as "left-bracket HEROIC right-bracket".
+  itemHeroicLabel: 'Heroic',
   // Tooltip marker for a soulbound item (bound to its owner: cannot be traded, mailed,
   // listed, sold, or destroyed). Currency-like reward tokens (Heroic Marks) carry this.
   itemSoulbound: 'Soulbound',
@@ -2487,6 +2519,15 @@ export const hudChromeStrings = {
     // that the rim/wash/seal show sighted players. Purpose class, not a quality
     // tier; whole sentence in one key so punctuation stays localizable.
     itemAriaQuest: '{item}, quantity {count}, quest item',
+    // Accessible-name arm of the player item lock (issue #3042,
+    // src/sim/item_lock.ts): outranks every other per-copy announcement, since
+    // the locked fact is the most actionable one for a bag/bank cell.
+    itemAriaLocked: '{item}, quantity {count}, locked',
+    // The tooltip line for a locked copy (item_instance_tooltip.ts instanceLockLine).
+    itemLockedLine: 'Locked',
+    // Context-menu row labels for the lock toggle (bag_item_context_menu.ts).
+    lockItem: 'Lock Item',
+    unlockItem: 'Unlock Item',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -2843,6 +2884,12 @@ export const hudChromeStrings = {
     // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
     // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
     afkTag: 'AFK',
+    // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
+    // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
+    // afkTag the brackets are part of the VALUE, so a locale that punctuates a
+    // tag differently owns its own wrapper instead of inheriting an English one.
+    // Wordy (M16), so the five non-Latin fills ship in this same change.
+    cheaterTag: '< Cheater >',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}
@@ -3994,6 +4041,10 @@ export const hudChromeStrings = {
     craftedToast: 'Crafted: {name}',
     craftedToastQty: 'Crafted: {name} x{qty}',
     insufficientMaterials: 'You do not have the materials for that.',
+    // Player item lock (issue 3042): fired instead of insufficientMaterials
+    // when the reagent shortfall is caused solely by a locked copy, so the
+    // denial names the real cause rather than reading as a generic shortage.
+    reagentLocked: 'A reagent for that is locked.',
     unknownRecipe: 'That recipe does not exist.',
     comboRequirementUnmet:
       'You do not have both required crafts at the required tier for that recipe.',
@@ -4211,6 +4262,10 @@ export const hudChromeStrings = {
     notHeld: 'You do not have that item.',
     notDisenchantable: 'You cannot disenchant that.',
     notSalvageable: 'You cannot salvage that.',
+    // Player item lock (issue #3042): fired when the exact copy a salvage
+    // targeted is locked. Distinct from notSalvageable, which means the item
+    // type itself is never salvageable.
+    salvageLocked: 'That item is locked.',
     // Craft Cast System Phase 4/5: cast busy gate when another cast is already
     // running (the retired 'throttled' wire reason renders the same copy).
     disenchantBusy: 'You are busy.',

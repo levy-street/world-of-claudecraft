@@ -94,8 +94,6 @@ export declare function buildGateProfileSteps(
     skipBuilds?: boolean;
     skipVitest?: boolean;
     skipTypes?: boolean;
-    /** Forwarded to buildFullGateSteps: resolveTurboBin's cmd for turbo steps. */
-    repoRoot?: string;
   },
 ): GateProfileStep[];
 

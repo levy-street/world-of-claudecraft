@@ -94,9 +94,6 @@ Everything else is a sibling module in one of these families:
   moves). All display-only, all gated by the reduced-motion switch; driven
   from `renderer.ts` `updateCamera` and the hud event hooks
   (`tests/camera_*_core.test.ts`).
-- `voxel_terrain.ts`: verification-only prototype (proposal #1611, driven by
-  `scripts/`, NOT the live path); live terrain is `terrain.ts` sampling sim heights.
-
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD
 selection) is its own Three/DOM/i18n-free `*_core.ts` or `*_view.ts` module,
@@ -297,7 +294,8 @@ collision/movement.
   userData but silently DROPS `onBeforeCompile`, and three keys its program cache
   on `customProgramCacheKey()`, whose default return value IS
   `onBeforeCompile.toString()`. So a bare clone of a patched material (rim glow,
-  the worn surface-detail layer) both renders un-patched AND links a whole new
+  the worn surface-detail layer, the armour dye that carries a player's outfit
+  colorway, `characters/armor_dye.ts`) both renders un-patched AND links a whole new
   program on its first draw, wherever that draw lands. `cloneMaterialWithHooks`
   re-attaches exactly the layers the source carried, in the source's order, so
   the composed key comes out identical and the clone reuses the linked program.

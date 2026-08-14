@@ -20,10 +20,16 @@ import {
 const GLB_MAGIC = 0x46546c67; // 'glTF'
 const CHUNK_JSON = 0x4e4f534a; // 'JSON'
 
+interface GlbJson {
+  animations?: { name?: string; channels?: { target?: { node?: number } }[] }[];
+  nodes?: { name?: string }[];
+}
+
 /** Minimal glTF-binary reader: 12-byte header, then chunks; the JSON chunk
- *  carries the animation list. Deliberately dependency-free, so the gate cannot
- *  be fooled by (or fail with) whatever the runtime loader stack does. */
-function glbAnimationNames(publicPath: string): string[] {
+ *  carries the animation and node lists. Deliberately dependency-free, so the
+ *  gate cannot be fooled by (or fail with) whatever the runtime loader stack
+ *  does. */
+function glbJsonChunk(publicPath: string): GlbJson {
   const buf = readFileSync(publicPath);
   expect(buf.length, `${publicPath} is not a GLB`).toBeGreaterThan(12);
   expect(buf.readUInt32LE(0), `${publicPath} magic`).toBe(GLB_MAGIC);
@@ -32,14 +38,55 @@ function glbAnimationNames(publicPath: string): string[] {
     const length = buf.readUInt32LE(offset);
     const type = buf.readUInt32LE(offset + 4);
     if (type === CHUNK_JSON) {
-      const json = JSON.parse(buf.toString('utf8', offset + 8, offset + 8 + length)) as {
-        animations?: { name?: string }[];
-      };
-      return (json.animations ?? []).map((a) => a.name ?? '');
+      return JSON.parse(buf.toString('utf8', offset + 8, offset + 8 + length)) as GlbJson;
     }
     offset += 8 + length + ((4 - (length % 4)) % 4); // chunks are 4-byte aligned
   }
   throw new Error(`${publicPath} has no JSON chunk`);
+}
+
+function glbAnimationNames(publicPath: string): string[] {
+  return (glbJsonChunk(publicPath).animations ?? []).map((a) => a.name ?? '');
+}
+
+/** three's GLTFLoader runs PropertyBinding.sanitizeNodeName over node names
+ *  and track paths alike (spaces to underscores, then the reserved characters
+ *  stripped), so the gate compares sanitized-to-sanitized exactly as the
+ *  runtime resolver does: a raw mismatch that sanitizes equal still binds. */
+function sanitizeNodeName(name: string): string {
+  return name.replace(/\s/g, '_').replace(/[[\].:/]/g, '');
+}
+
+/** Node names in the GLB scene graph: the name pool three's PropertyBinding
+ *  resolves animation tracks against after a donor clip is merged onto a body
+ *  rig (assets.ts optimizedScene pushes donor clips by NAME, not by node). */
+function glbNodeNames(publicPath: string): Set<string> {
+  return new Set(
+    (glbJsonChunk(publicPath).nodes ?? [])
+      .map((n) => n.name)
+      .filter((name): name is string => !!name)
+      .map(sanitizeNodeName),
+  );
+}
+
+/** clip name -> the node names its channels target. A clip merged onto a rig
+ *  that has NONE of these nodes binds nothing: the action still plays and
+ *  finishes, but drives no bone, freezing the rig at its last sampled pose for
+ *  the clip's whole duration (the Grix the Tunnelking mid-swing statue). */
+function glbClipTargets(publicPath: string): Map<string, Set<string>> {
+  const json = glbJsonChunk(publicPath);
+  const nodeName = (index: number | undefined): string | null =>
+    index === undefined ? null : (json.nodes?.[index]?.name ?? null);
+  const targets = new Map<string, Set<string>>();
+  for (const anim of json.animations ?? []) {
+    const names = new Set<string>();
+    for (const channel of anim.channels ?? []) {
+      const name = nodeName(channel.target?.node);
+      if (name) names.add(sanitizeNodeName(name));
+    }
+    targets.set(anim.name ?? '', names);
+  }
+  return targets;
 }
 
 function publicPath(url: string): string {
@@ -53,6 +100,24 @@ function animationNamesOf(url: string): string[] {
   const names = glbAnimationNames(publicPath(url));
   namesByUrl.set(url, names);
   return names;
+}
+
+const nodeNamesByUrl = new Map<string, Set<string>>();
+function nodeNamesOf(url: string): Set<string> {
+  const hit = nodeNamesByUrl.get(url);
+  if (hit) return hit;
+  const names = glbNodeNames(publicPath(url));
+  nodeNamesByUrl.set(url, names);
+  return names;
+}
+
+const clipTargetsByUrl = new Map<string, Map<string, Set<string>>>();
+function clipTargetsOf(url: string): Map<string, Set<string>> {
+  const hit = clipTargetsByUrl.get(url);
+  if (hit) return hit;
+  const targets = glbClipTargets(publicPath(url));
+  clipTargetsByUrl.set(url, targets);
+  return targets;
 }
 
 /**
@@ -212,6 +277,51 @@ describe('character ClipMaps match the shipped GLBs', () => {
         }
       }
       expect(missing).toEqual([]);
+    });
+
+    it(`binds every resolved clip to nodes the rig actually has on ${tierName}`, () => {
+      // Name resolution (above) is only half the contract. Donor clips merge
+      // onto the body rig and rebind BY NODE NAME (assets.ts optimizedScene),
+      // so a donor authored for another skeleton resolves fine and then binds
+      // nothing at runtime: the one-shot plays silently, drives no bone, and
+      // the rig freezes at its last sampled pose for the clip's duration. The
+      // zero-weight watchdog cannot see it (the action's weight is 1), which
+      // is how Grix the Tunnelking shipped as a mid-swing statue: his
+      // mixamorig drop wired goblin_hit_variety_anims.glb, whose tracks
+      // target the goblin rig (Head/Arm.L/Arm.R/Body).
+      const unbindable: string[] = [];
+      for (const [key, def] of rigs) {
+        const bodyUrl = visualAssetUrlForGraphics(def.url, standardMaterials);
+        const rigNodes = nodeNamesOf(bodyUrl);
+        const referenced = new Set([
+          ...requiredClipNames(def.clips),
+          ...emoteChains(def.clips).flatMap(([, chain]) => chain),
+        ]);
+        const sources = [
+          bodyUrl,
+          ...(def.animUrls ?? []).map((url) => visualAssetUrlForGraphics(url, standardMaterials)),
+        ];
+        for (const url of new Set(sources)) {
+          for (const [clipName, targets] of clipTargetsOf(url)) {
+            if (!referenced.has(clipName)) continue;
+            // No node-targeted channels (pure morph/extension tracks): nothing
+            // to rebind by name, so nothing this gate can lose.
+            if (targets.size === 0) continue;
+            // EVERY targeted node must exist: a clip binding 1 of 20 bones is
+            // still a near-statue, the partial cousin of the zero-overlap bug.
+            // Measured at adoption: every referenced clip on every rig binds
+            // 100% of its targets, so this costs nothing today; a future
+            // deliberately-partial donor loosens this with a written reason.
+            const missing = [...targets].filter((name) => !rigNodes.has(name));
+            if (missing.length > 0) {
+              unbindable.push(
+                `${key}: ${clipName} (from ${url}) targets nodes ${bodyUrl} lacks: ${missing.join(', ')}`,
+              );
+            }
+          }
+        }
+      }
+      expect(unbindable).toEqual([]);
     });
 
     it(`leaves every overhead emote at least one clip on ${tierName}`, () => {

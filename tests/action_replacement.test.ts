@@ -112,4 +112,20 @@ describe('replaceResolvedAbility', () => {
     expect(out.effects[0]).not.toBe(ABILITIES.overbloom.effects[0]);
     expect(out.effects[0]).toEqual(ABILITIES.overbloom.effects[0]);
   });
+
+  it('carries a talent-cleared stealth requirement onto the replacement', () => {
+    // Cheap Trick clears Gut Punch's stealth requirement for the SLOT. The
+    // player's talent is unchanged when the button transforms, so the resolved
+    // flag must survive the swap, or the sim gate and the action bar would
+    // demand stealth the build already removed.
+    const base = { ...resolved('cheap_shot'), ignoreStealthRequirement: true };
+    const out = replaceResolvedAbility(base, 'knockout_blow');
+    expect(out.def.id).toBe('knockout_blow');
+    expect(out.ignoreStealthRequirement).toBe(true);
+  });
+
+  it('leaves the replacement flag unset when the base never cleared it', () => {
+    const out = replaceResolvedAbility(resolved('cheap_shot'), 'knockout_blow');
+    expect(out.ignoreStealthRequirement).toBeFalsy();
+  });
 });

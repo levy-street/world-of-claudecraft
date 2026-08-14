@@ -54,7 +54,7 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
     expect(block).toContain("death: 'Death'");
   });
 
-  it('wires a matching animUrls entry onto both ENEMY7 consumers', () => {
+  it('wires a matching animUrls entry onto every ENEMY7 consumer', () => {
     const consumers: [string, string, string][] = [
       ['mob_kobold', 'goblin_hit_variety_anims.glb', 'clips: KOBOLD_ENEMY7'],
       ['mob_ogre', 'giant_hit_variety_anims.glb', 'clips: ENEMY7'],
@@ -67,13 +67,39 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(block, key).toContain(clipsLine);
       expect(block, `${key} animUrls`).toContain(file);
     }
-    // Scoped to these 2 ENEMY7-family donor basenames rather than every
-    // `_hit_variety_anims.glb` in the manifest, since unrelated families
-    // (KayKit's kaykit()/skeletonClips(), BIPED14/YETI_BIPED14/
-    // TROLL_BIPED14, etc, issue #2889) independently wire their own
-    // hit-variety donors in the same batch and would otherwise break this
-    // pin.
-    const occurrences = [...MANIFEST_SRC.matchAll(/(goblin|giant)_hit_variety_anims\.glb/g)].length;
-    expect(occurrences).toBe(2);
+    // The two authored mixamorig drops (kobold.glb, grix.glb) must NOT consume
+    // the goblin-rig donor: its tracks target Head/Arm.L/Arm.R/Body, none of
+    // which exist on a mixamorig skeleton, so on these bodies the clip
+    // resolved by name and bound nothing, freezing the rig mid-pose on every
+    // hit taken (the Grix the Tunnelking statue). The binding gate in
+    // tests/character_clipmaps.test.ts owns the general rule; these pins keep
+    // the two known-bad wirings from quietly returning.
+    const nonConsumers: [string, string][] = [
+      ['mob_kobold_digger', 'clips: KOBOLD_DIGGER'],
+      ['mob_grix', 'clips: GRIX'],
+    ];
+    for (const [key, clipsLine] of nonConsumers) {
+      const idx = MANIFEST_SRC.indexOf(`  ${key}: {`);
+      expect(idx, key).toBeGreaterThanOrEqual(0);
+      const end = MANIFEST_SRC.indexOf('\n  },', idx);
+      const block = MANIFEST_SRC.slice(idx, end);
+      expect(block, key).toContain(clipsLine);
+      expect(block, `${key} must not wire the goblin-rig donor`).not.toContain(
+        'goblin_hit_variety_anims.glb',
+      );
+    }
+    // Scoped to this family's own donor basenames: an unscoped
+    // `_hit_variety_anims.glb` count also picks up unrelated families
+    // (e.g. BIPED14's yetialt/frog/orc/demonalt donors) whenever they land
+    // their own hit-variety clips, which happens constantly in this repo.
+    //
+    // And anchored to the `${CREATURES}/` template prefix every real wiring is
+    // written with, so this counts CODE and not prose: the kobold/grix defs
+    // carry comments that NAME the goblin donor while explaining their wiring,
+    // and a bare-basename count would tally those sentences as consumers.
+    const occurrences = [
+      ...MANIFEST_SRC.matchAll(/\$\{CREATURES\}\/(?:goblin|giant)_hit_variety_anims\.glb/g),
+    ].length;
+    expect(occurrences).toBe(consumers.length);
   });
 });

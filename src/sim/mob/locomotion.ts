@@ -45,6 +45,7 @@ import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
+  riftDeathZoneFuse,
   riftMechanicSuppressed,
   riftRankForBaseLevel,
 } from '../rift/ranks';
@@ -1045,9 +1046,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         // deathZoneStrike becomes a barrage (a zone under every living member).
         // Applied AFTER the rng target draw so the draw count and order stay
         // identical across ranks (the difficulty.ts multiplier precedent).
-        const heroicS = riftRankForBaseLevel(inst.baseLevel) === 'S';
+        const rank = riftRankForBaseLevel(inst.baseLevel);
+        const heroicS = rank === 'S';
         const tempo = heroicS ? RIFT_S_ZONE_TEMPO : 1;
-        const fuse = def.castTime * tempo;
+        // Via the shared helper so the reaction-budget guard in
+        // rift_boss_reactable_mechanics.test.ts pins THIS fuse, not a copy of
+        // the formula that could drift away from it.
+        const fuse = riftDeathZoneFuse(def.castTime, rank);
         if (heroicS) mob[timerKey] = (def.every + def.castTime) * tempo;
         const instPids = instancePlayerIds(ctx, inst).filter((pid) => {
           const e = ctx.entities.get(pid);

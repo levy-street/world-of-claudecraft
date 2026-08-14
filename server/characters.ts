@@ -469,6 +469,36 @@ export async function rekeyReclaimedCharacterWorldState(
 }
 
 /**
+ * The renamed character's OWN signer sweep (#2837). The market and mail rekeys
+ * above cover the world-state books (ownership keys, display names, and the
+ * renamer's own escrowed payload signers); this covers the five signer-bearing
+ * regions of the persisted character state itself (carried inventory, bank,
+ * vendor buyback, and equipped, under both `equipmentInstance` spellings), so
+ * the #1145 self-signed crafting discount, Battlefield Experience attribution,
+ * and the eqi inspect wire all follow the new name. A live entity/meta needs no
+ * sweep: the caller's isCharacterOnline/online-session guard runs first, so
+ * there is never a live one at rename time. Foreign-held copies signed with the
+ * old name live in other characters' blobs or parcels and stay out of scope.
+ *
+ * Exported so BOTH rename dispatch arms share one behavior: this module's
+ * renameHandler below and the retained legacy ladder arm in main.ts (the
+ * API_DISPATCH=legacy rollback path), the purge/reclaim precedent above. Call
+ * it only with the RETURNING row from a successful rename: a rename that
+ * matched no row must never sweep a character's live blob.
+ */
+export async function rekeyRenamedCharacterOwnSigner(
+  characterId: number,
+  level: number,
+  state: CharacterState | null,
+  oldName: string,
+  newName: string,
+): Promise<void> {
+  if (state && rekeyInstanceSigner(state, oldName, newName)) {
+    await charactersDb.saveCharacterState(characterId, level, state);
+  }
+}
+
+/**
  * The world-state purge that follows a successful character delete (R43). A deleted
  * character can never collect again, so its World Market listings, its Merchant
  * collection, and its Ravenpost mailbox leave the realm's shared books here instead
@@ -786,22 +816,10 @@ async function renameHandler(ctx: Ctx): Promise<void> {
     if (rt.rekeyMailOwner(character.id, character.name, c.name)) {
       await rt.saveMail();
     }
-    // The renamed character's OWN signed instances still carry the old signer
-    // name; two sweeps split the work by WHERE the copies live. The market and
-    // mail rekeys above cover the world-state books (ownership keys, display
-    // names, AND the renamer's own escrowed payload signers, the fix-round
-    // completion); this blob sweep covers the five signer-bearing regions of
-    // the persisted character state, so the self-signed crafting discount,
-    // Battlefield Experience attribution, and the eqi inspect wire follow the
-    // new name everywhere a copy can come back from. A live entity/meta needs
-    // no sweep: the isCharacterOnline gate above guarantees there is none at
-    // rename time. Foreign-held copies signed with the old name live in other
-    // characters' blobs or parcels and are out of scope. renameCharacter's
-    // RETURNING row carries the current blob, and the no-nonce save is safe
-    // for the same offline reason.
-    if (c.state && rekeyInstanceSigner(c.state, character.name, c.name)) {
-      await charactersDb.saveCharacterState(c.id, c.level, c.state);
-    }
+    // renameCharacter's RETURNING row carries the current blob, and the
+    // no-nonce save is safe for the same offline reason the market/mail
+    // rekeys above are: isCharacterOnline already guarantees no live session.
+    await rekeyRenamedCharacterOwnSigner(c.id, c.level, c.state, character.name, c.name);
     json(ctx.res, 200, {
       id: c.id,
       name: c.name,

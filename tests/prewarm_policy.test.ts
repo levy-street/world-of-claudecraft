@@ -10,6 +10,7 @@ import {
   materialProgramSignature,
   NEARBY_LANDMARK_STREAM_RADIUS,
   orderedPrewarmIds,
+  orderPrewarmResumeEntries,
   type PrewarmPolicyInput,
   partitionMandatoryLandmarkCandidates,
   partitionResidentSkyBiomes,
@@ -20,12 +21,15 @@ import {
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
   prewarmProgramContentKeys,
+  prewarmResumeIsDebt,
+  prewarmSubmitShouldStop,
   remainingPrewarmViewBudget,
   resolvePrewarmEntryStatus,
   resolvePrewarmPolicy,
   skyAssetInlineWaitMs,
   withRestoredPrewarmState,
 } from '../src/render/prewarm_policy';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 // The real desktop constants (renderer.ts), injected so the test pins the actual
 // numbers the renderer uses rather than duplicating magic values.
@@ -42,6 +46,14 @@ const BASE: PrewarmPolicyInput = {
   maxViewsHigh: 72,
   maxViewsConstrained: 2,
 };
+
+// Full-line // comments are stripped first, the tests/loopback_guard.test.ts
+// rule: the reveal ordering below is explained in prose right beside the code,
+// so a commented-out markGpuHitchReveal call must neither satisfy the pin nor
+// break the whitespace-only assertion between the mark and the reveal.
+const MAIN_SOURCE = codeWithoutLineComments(
+  readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n'),
+);
 
 // The full manifest id order the renderer builds, for the reorder tests.
 // Kept in lockstep with the renderer by the "matches the renderer's real
@@ -78,6 +90,33 @@ const MANIFEST_IDS = [
   'render.settle-passes',
   'diagnostics.baseline',
 ];
+
+describe('graphics rebuild reveal wiring', () => {
+  it('marks the published renderer immediately before recoverable rebuild reveal', () => {
+    const coordinatorAt = MAIN_SOURCE.indexOf(
+      'const graphicsRebuild = new GraphicsRebuildCoordinator',
+    );
+    const hideCallbackAt = MAIN_SOURCE.indexOf('hideOpaqueCurtain: () => {', coordinatorAt);
+    const markAt = MAIN_SOURCE.indexOf('renderer.markGpuHitchReveal();', hideCallbackAt);
+    const hideAt = MAIN_SOURCE.indexOf('hideLoadingScreen();', markAt);
+    expect(coordinatorAt).toBeGreaterThan(-1);
+    expect(hideCallbackAt).toBeGreaterThan(coordinatorAt);
+    expect(markAt).toBeGreaterThan(hideCallbackAt);
+    expect(hideAt).toBeGreaterThan(markAt);
+    expect(MAIN_SOURCE.slice(markAt + 'renderer.markGpuHitchReveal();'.length, hideAt)).toMatch(
+      /^\s*$/,
+    );
+
+    // The coordinator uses this callback for both the committed target and the
+    // recoverable rollback. Keep the initial world reveal on its existing path.
+    const initialRevealAt = MAIN_SOURCE.indexOf('const revealWorld = (): void => {');
+    const initialMarkAt = MAIN_SOURCE.indexOf('renderer.markGpuHitchReveal();', initialRevealAt);
+    const initialHideAt = MAIN_SOURCE.indexOf('hideLoadingScreen();', initialMarkAt);
+    expect(initialRevealAt).toBeGreaterThan(-1);
+    expect(initialMarkAt).toBeGreaterThan(initialRevealAt);
+    expect(initialHideAt).toBeGreaterThan(initialMarkAt);
+  });
+});
 
 /** The renderer's manifest entries parsed from source: id, and whether the
  *  literal carries required / deadlineExempt properties. */
@@ -162,6 +201,112 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmBuildDeadline(12_000, 15_000, 3_000, false)).toBe(9_000);
   });
 
+  it('stops the compile-submit loop at the GPU submit deadline, except on the Insane arm', () => {
+    // The loop check runs BETWEEN units: before the deadline it keeps
+    // submitting, at and past it the remainder defers to the compile entry or
+    // the resume lane (one uninterrupted loop measured 22 s in production,
+    // dropping every entry behind it: hitch-hunt S1/S2).
+    expect(prewarmSubmitShouldStop(13_999, 14_000, false)).toBe(false);
+    expect(prewarmSubmitShouldStop(14_000, 14_000, false)).toBe(true);
+    expect(prewarmSubmitShouldStop(20_000, 14_000, false)).toBe(true);
+    // finishFullManifestBeforeReveal (desktop Insane) submits without bound:
+    // its contract is a complete manifest behind the cover.
+    expect(prewarmSubmitShouldStop(20_000, 14_000, true)).toBe(false);
+  });
+
+  it('classifies exactly the link/upload debt entries for BOOT_DEBT resume', () => {
+    // Positive arm: the four debt payers whose unpaid remainder surfaces as
+    // first-draw stalls in live frames.
+    expect(prewarmResumeIsDebt('programs.compile')).toBe(true);
+    expect(prewarmResumeIsDebt('programs.compile-submit')).toBe(true);
+    expect(prewarmResumeIsDebt('textures.scene')).toBe(true);
+    expect(prewarmResumeIsDebt('surface-detail.textures')).toBe(true);
+    // Negative arm over REACHABLE inputs: these three entries declare real
+    // resumeUnits, so they are the ids a misclassification would actually
+    // route to BOOT_DEBT. They stay cosmetic (below the preview lane) by the
+    // per-family criterion in the debt set's doc.
+    expect(prewarmResumeIsDebt('props.ghost-fade-variants')).toBe(false);
+    expect(prewarmResumeIsDebt('vfx.weapon-skins')).toBe(false);
+    expect(prewarmResumeIsDebt('vfx.ability-primitives')).toBe(false);
+  });
+
+  it('orders resume entries debt first, stable within each class', () => {
+    // The resume lane is strictly serial in array order, so this ordering is
+    // the ONLY thing that can put the link/upload debt ahead of the cosmetic
+    // entries (BOOT_DEBT priority arbitrates against other lanes, never
+    // inside this one).
+    const ordered = orderPrewarmResumeEntries([
+      { id: 'props.ghost-fade-variants' },
+      { id: 'textures.scene' },
+      { id: 'vfx.weapon-skins' },
+      { id: 'programs.compile' },
+      { id: 'programs.compile-submit' },
+    ]);
+    expect(ordered.map((entry) => entry.id)).toEqual([
+      'textures.scene',
+      'programs.compile',
+      'programs.compile-submit',
+      'props.ghost-fade-variants',
+      'vfx.weapon-skins',
+    ]);
+    // All-cosmetic and all-debt lists come back untouched.
+    expect(orderPrewarmResumeEntries([{ id: 'vfx.weapon-skins' }])).toEqual([
+      { id: 'vfx.weapon-skins' },
+    ]);
+  });
+
+  it('ties the debt set to real resume-capable manifest entries', () => {
+    // Guard against silent drift: a renderer-side rename of a debt entry
+    // would otherwise demote that debt to the cosmetic arm with every test
+    // green. The synthetic programs.compile-submit dropped entry is the one
+    // non-manifest... it IS a manifest id, but its manifest entry declares no
+    // resumeUnits: the hand-off is the only producer of a resume entry with
+    // that id, so no duplicate-id resume entry can exist.
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const manifestIds = new Set(parsedManifestEntries().map((entry) => entry.id));
+    for (const id of [
+      'programs.compile',
+      'programs.compile-submit',
+      'textures.scene',
+      'surface-detail.textures',
+    ]) {
+      expect(manifestIds.has(id), `debt id ${id} is not a manifest entry`).toBe(true);
+      expect(prewarmResumeIsDebt(id)).toBe(true);
+    }
+    // Every manifest entry that declares resumeUnits is classified ON
+    // PURPOSE: debt or the cosmetic allowlist below. A new resumable entry
+    // must be added to one of the two, never land unclassified.
+    const COSMETIC_RESUME_IDS = [
+      'props.ghost-fade-variants',
+      'vfx.atlas',
+      'vfx.weapon-skins',
+      'vfx.ability-primitives',
+      'sky.current-zone',
+      'render.settle-passes',
+    ];
+    // Same per-entry block split as parsedManifestEntries, so an entry's
+    // resumeUnits can never be attributed to its neighbour.
+    const start = renderer.indexOf('const manifest: PrewarmManifestEntry[] = [');
+    const end = renderer.indexOf('const byId = new Map(', start);
+    const resumable = renderer
+      .slice(start, end)
+      .split(/\n {6}\{\n/)
+      .slice(1)
+      .filter((block) => block.includes('resumeUnits:'))
+      .map((block) => /id: '([^']+)'/.exec(block)?.[1])
+      .filter((id): id is string => Boolean(id) && manifestIds.has(id as string));
+    expect(resumable.length).toBeGreaterThanOrEqual(5);
+    for (const id of resumable) {
+      expect(
+        prewarmResumeIsDebt(id) || COSMETIC_RESUME_IDS.includes(id),
+        `manifest entry ${id} declares resumeUnits but is classified neither debt nor cosmetic`,
+      ).toBe(true);
+    }
+  });
+
   it('uses the low view cap on the low tier', () => {
     expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).maxViews).toBe(48);
   });
@@ -211,14 +356,57 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     const submitEntryAt = renderer.indexOf("id: 'programs.compile-submit',");
     expect(submitEntryAt).toBeGreaterThan(-1);
     expect(submitEntryAt).toBeLessThan(renderer.indexOf("id: 'surface-detail.textures'"));
-    expect(compileEntry).toContain('await submitCompileUnits(true)');
+    // The tail submit is bounded by BOTH deadlines: gpuSubmitDeadline alone
+    // sits 1000 ms past compileAwaitDeadline, so an unbounded tail submit
+    // could eat the whole await reserve and leave world.initial-frame drawing
+    // still-linking programs (QA finding, hitch-hunt P1).
+    expect(compileEntry).toContain(
+      "await submitCompileUnits(\n            true,\n            Math.min(gpuSubmitDeadline, compileAwaitDeadline),\n            'programs.compile',\n          );",
+    );
+    // Deferred units count into the honesty gate: planned includes them and
+    // the dropped count marks the entry partial, never completed.
+    expect(compileEntry).toContain(
+      'compileUnitsPlanned = submittedCompileUnits.length + deferredSubmitUnits.length;',
+    );
+    expect(compileEntry).toContain('compileUnitsDropped = deferredSubmitUnits.length;');
     // The await-all is bounded (see the dedicated reserve test below), so the
     // literal Promise.all is no longer the awaited expression directly; it is
     // captured and raced against the reserved deadline.
     expect(compileEntry).toContain('const awaitAll = Promise.all(\n');
     expect(compileEntry).toContain('submittedCompileUnits.map((unit) =>');
     expect(compileEntry).toContain('unit.done.then(() => {');
+    // The entry run never raw-checks the deadline itself: the deadline
+    // decision lives in the submit loop, through the pure
+    // prewarmSubmitShouldStop, and stopping means DEFERRAL to the resume
+    // lane, never a drop (the pins below).
     expect(compileEntry).not.toContain('performance.now() >= gpuSubmitDeadline');
+    // The submit loop consults the pure decision BETWEEN units, with the
+    // caller-chosen deadline and the Insane exemption flag: without this
+    // wiring the 22 s production overrun comes back with every unit test
+    // green (QA finding B2).
+    expect(renderer).toContain(
+      'prewarmSubmitShouldStop(\n          performance.now(),\n          deadlineMs,\n          policy.finishFullManifestBeforeReveal,\n        )',
+    );
+    expect(renderer).toContain('if (!(await pacing.awaitSlot(outOfTime))) {');
+    expect(renderer).toContain(
+      'submitPrewarmCompileUnit(unit, lane, {\n            lifecycle: compileLifecycle,\n            pacing,',
+    );
+    // The deferral lifecycle, pinned end to end (QA finding B3): stopped
+    // units are retained, drained FIRST by the next submission (their groups
+    // are already marked, so the plan cannot re-collect them), any leftover
+    // is handed to the resume lane under the synthetic id, and the mid-run
+    // deferral withholds warm-pool publication like the whole-entry path.
+    expect(renderer).toContain('deferredSubmitUnits.push(...pending.slice(i));');
+    expect(renderer).toContain(
+      'const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];',
+    );
+    expect(renderer).toContain(
+      "droppedEntries.push({\n        id: 'programs.compile-submit',\n        units: deferredSubmitUnits.splice(0, deferredSubmitUnits.length),\n      });",
+    );
+    expect(renderer).toContain('deferPoolPublication ||=');
+    // The deferral is visible in the prewarm summary on both entries.
+    expect(renderer).toContain('`submitted=${submittedCompileUnits.length};deferred=${');
+    expect(renderer).toContain(';deferred=${compileUnitsDropped}');
     // Which groups a submission collects and marks is the pure
     // planCompileSubmission; the renderer must route BOTH calls through it
     // with a per-call existence read and the shared dedupe store.
@@ -228,7 +416,9 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       '...stagedCompileGroupsNow().map(([id, group]) => ({ id, exists: group !== null })),',
     );
     expect(renderer).toContain('sharedDedupe: compileDedupe,');
-    expect(renderer).toContain('await submitCompileUnits(false)');
+    expect(renderer).toContain(
+      "await submitCompileUnits(false, gpuSubmitDeadline, 'programs.compile-submit');",
+    );
   });
 
   it('reserves await-all room so the initial frame always starts before the hard deadline', () => {
@@ -1007,7 +1197,7 @@ describe('constrained entry view creation ramp', () => {
     ).replace(/\r\n/g, '\n');
     const budgetMethodStart = renderer.indexOf('private runtimeViewCreateBudget(');
     const budgetMethodEnd = renderer.indexOf(
-      '\n  private viewCandidatePriority(',
+      '\n  private collectMissingViewCandidates(',
       budgetMethodStart,
     );
     const budgetMethod = renderer.slice(budgetMethodStart, budgetMethodEnd);
@@ -1124,8 +1314,24 @@ describe('boot prewarm ordering: the sky fetch never starves the compute stages'
     expect(prefetchAt).toBeGreaterThan(-1);
     expect(manifestAt).toBeGreaterThan(-1);
     expect(prefetchAt).toBeLessThan(manifestAt);
-    // The starvation shape: a raw inline await of the fetch inside an entry.
-    expect(source).not.toContain('await ensureSkyBiomeAssets(');
+    // The starvation shape: a raw inline await of the fetch inside a prewarm
+    // entry. No await of it exists anywhere in the renderer; the only one lives
+    // in the post-boot sky residency lane (sky_residency_driver.ts's
+    // ensureSkyResidency), which re-fetches an evicted biome at idle pace long
+    // after boot; the prewarm manifest region itself stays await-free.
+    expect(source.match(/await ensureSkyBiomeAssets\(/g) ?? []).toHaveLength(0);
+    const driver = readFileSync(
+      new URL('../src/render/sky_residency_driver.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const residencyAt = driver.indexOf('private ensureSkyResidency(');
+    expect(residencyAt).toBeGreaterThan(-1);
+    const residency = driver.slice(residencyAt, driver.indexOf('\n  /**', residencyAt + 1));
+    expect(residency).toContain('await ensureSkyBiomeAssets(');
+    expect(driver.match(/await ensureSkyBiomeAssets\(/g) ?? []).toHaveLength(1);
+    expect(source.slice(manifestAt, source.indexOf('\n  private ', manifestAt))).not.toContain(
+      'await ensureSkyBiomeAssets(',
+    );
     // The entry waits only through the budget-bounded prefetch race.
     expect(source).toContain('await waitForPrefetch(skyAssetPrefetch, waitMs, sleep)');
     expect(source).toContain('reserveMs: PREWARM_BUILD_RESERVE_MS');

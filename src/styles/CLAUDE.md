@@ -70,8 +70,10 @@ the throw (#2499, #2502).
   CSS vars and NEVER hard-codes a hex/px/color in TS; thresholds and cadences (the
   100/250/500ms frame dividers, breakpoints) are named constants. The 2D-CANVAS painters
   (`map`/`minimap`/`delve`) resolve `--color-*` via `getComputedStyle` and CACHE the result
-  (a 2D context can only read a CSS var this way; the minimap caches for the whole session,
-  with a documented hook to invalidate on a future theme/contrast toggle), never per-marker.
+  (a 2D context can only read a CSS var this way), never per-marker. The minimap's vector
+  palette remains session-cached with its documented future invalidation hook. Separately,
+  `MapMarkerArtCache` re-samples its baked-sprite tokens on coalesced theme and forced-colors
+  signals, then re-rasterizes only if a token value changed, never from a painter redraw.
   Documented exceptions: `nameplate_painter` is positioned DOM divs that move pre-existing
   renderer hex literals verbatim (not tokens); `deed_border_view.ts` is the sanctioned home
   of the Book of Deeds border accent colors, because the nameplate canvas cannot read a

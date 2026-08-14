@@ -18,6 +18,7 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { NIGHT_AMBIENT_FLOOR } from '../src/render/day_night_core';
 import {
   farTerrainNightInternalsForTest,
   setFarTerrainNightGrade,
@@ -69,8 +70,16 @@ describe('the far vista night grade', () => {
   it('keeps enough of the vista to read as terrain, not a silhouette', () => {
     // A dim is cosmetic here (this material only draws past the detail
     // envelope, so it carries no information a player acts on), but the world
-    // must still be legible at night: the ridges are the horizon.
-    expect(FAR_NIGHT_ALBEDO_DIM).toBeGreaterThanOrEqual(0.35);
+    // must still be legible at night: the ridges are the horizon. The dim now
+    // TRACKS the ambient floor, so the legible quantity is the far face's
+    // ABSOLUTE night brightness (floor times dim), not the dim alone. Pin that
+    // product in a band that reads as terrain but never glows as a cutout, so
+    // raising the floor cannot break it in either direction: a floor rise with
+    // a fixed dim would push it up toward a glow (0.49 * 0.5 = 0.245), and a dim
+    // driven too low would sink it into a silhouette.
+    const farNightBrightness = NIGHT_AMBIENT_FLOOR * FAR_NIGHT_ALBEDO_DIM;
+    expect(farNightBrightness).toBeGreaterThanOrEqual(0.1);
+    expect(farNightBrightness).toBeLessThanOrEqual(0.2);
     expect(FAR_NIGHT_ALBEDO_DIM).toBeLessThan(1);
   });
 });

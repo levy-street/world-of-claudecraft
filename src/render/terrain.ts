@@ -9,7 +9,8 @@ import {
 } from '../sim/data';
 import type { ZoneDef } from '../sim/types';
 import { WATER_LEVEL } from '../sim/world';
-import { loadTexture } from './assets/loader';
+import { ktx2SiblingUrl } from './assets/ktx2_sibling';
+import { loadKtx2Texture, loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
   BIOME_HAZE_DECLARATIONS,
@@ -17,6 +18,7 @@ import {
   biomeHazeUniforms,
   hasBiomeHazeField,
 } from './biome_haze_field';
+import { isCanvasDrawableImage } from './canvas_drawable';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
 import {
@@ -89,7 +91,9 @@ import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textu
 //   normal map baked from the mesh height view (terrain_mesh_height.ts).
 // - Low tier: the legacy vertex-color Lambert look, still chunked for culling.
 
-const CHUNK_SIZE = 60;
+// Exported for tests that reason about chunk-grid geometry without building a
+// full TerrainView (e.g. zone_eviction_core's cell-ownership overshoot pin).
+export const CHUNK_SIZE = 60;
 // An 'idle'-paced zone build waits for a browser idle slot between batches;
 // this timeout forces one batch through anyway under sustained frame load.
 const IDLE_BUILD_TIMEOUT_MS = 200;
@@ -109,8 +113,27 @@ function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<vo
   if (TERRAIN_TEX[key]) return Promise.resolve();
   const existing = terrainTexTasks.get(key);
   if (existing) return existing;
-  const task = loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true })
-    .then((tex) => {
+  const url = `/textures/terrain/${file}`;
+  // The ambientCG NORMAL maps ship a KTX2 sibling and are requested
+  // compressed: they stay GPU-compressed instead of decoding to a full
+  // 1024x1024 RGBA bitmap each, and they bind directly as samplers. The
+  // vertical flip is baked into the container at compress time, so `srgb`
+  // here only still selects the anisotropy budget.
+  // The six COLOUR layers deliberately stay raw JPG: buildSplatAlbedoArray
+  // drawImages them into the packed DataArrayTexture (a CompressedTexture's
+  // image is not a CanvasImageSource, and binding one here took the renderer
+  // down at world build), and on every tier that loads them the packed array
+  // is the resident form anyway, so compressing the pack SOURCE bought
+  // nothing. GroundAO_Packed.png is also NOT converted: it is a packed DATA
+  // texture whose measured per-channel statistics are baked into shader
+  // constants (see the "Measured sds" comment below), and a lossy block
+  // encode would shift them.
+  const task = (
+    url.toLowerCase().endsWith('.jpg') && !srgb
+      ? loadKtx2Texture(ktx2SiblingUrl(url), { repeat: true })
+      : loadTexture(url, { srgb, repeat: true })
+  )
+    .then((tex: THREE.Texture) => {
       tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
       TERRAIN_TEX[key] = tex;
     })
@@ -725,6 +748,7 @@ let splatAlbedoCache: SplatAlbedoArray | null = null;
  * that had to fill any placeholder re-packs on the next world build, when
  * the deferred preload has had time to land.
  */
+
 function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArray {
   if (splatAlbedoCache?.complete) return splatAlbedoCache;
   const size = SPLAT_ALBEDO_SIZE;
@@ -736,7 +760,8 @@ function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArr
   let complete = true;
   let grassMean: [number, number, number] | null = null;
   for (let layer = 0; layer < SPLAT_ALBEDO_LAYERS.length; layer++) {
-    const img = t[SPLAT_ALBEDO_LAYERS[layer]]?.image as CanvasImageSource | undefined;
+    const raw = t[SPLAT_ALBEDO_LAYERS[layer]]?.image as unknown;
+    const img = isCanvasDrawableImage(raw) ? raw : undefined;
     const w = (img as { width?: number } | undefined)?.width;
     const dst = data.subarray(layer * size * size * 4, (layer + 1) * size * size * 4);
     if (!ctx || !img || !w) {
@@ -1702,6 +1727,17 @@ export interface TerrainView {
   /** hides chunks that sit entirely past the fog far plane */
   update(camX: number, camZ: number, fogFar: number): void;
   /**
+   * Releases every chunk owned by `zone`: removes its mesh from `group`,
+   * disposes its geometry (the material is shared across every chunk and
+   * outlives this), and resets the cells' ground residency to "pending", the
+   * same state an unvisited zone starts in. A later `ensureZone` for the same
+   * zone rebuilds from scratch through the ordinary streaming path. Used only
+   * by the constrained-memory zone-eviction pass (see zone_eviction_core.ts);
+   * a no-op for a zone with nothing built, or one whose `ensureZone` is still
+   * in flight (safe to call in any state).
+   */
+  unloadZone(zone: ZoneDef): void;
+  /**
    * Editor-only: re-mesh ONLY the chunks intersecting the world-space region
    * (a sculpt brush footprint), swapping each geometry in place on the existing
    * mesh (old geometry disposed, shared material kept). Cheap enough to run
@@ -2171,6 +2207,47 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     cancelStreaming(): void {
       cancelled = true;
       pool?.dispose();
+    },
+    unloadZone(zone: ZoneDef): void {
+      // A zone with an in-flight ensureZone is not resident yet (it only
+      // reaches preparedZones, the sole caller's eligibility source, once
+      // that task resolves), so this never fires mid-build today. Guard it
+      // anyway: tearing down cells a live build is still attaching would let
+      // the build's trailing loadedZones.add(zone.id) mark a half-built zone
+      // loaded, with nothing left to repair it.
+      if (pendingZones.has(zone.id)) return;
+      const ownedCells = new Set(zoneCells(zone).map(([cx, cz]) => cz * chunksX + cx));
+      if (ownedCells.size === 0) return;
+      for (let i = chunks.length - 1; i >= 0; i--) {
+        const chunk = chunks[i];
+        // Same span/cell-index math attachChunk used to claim these cells: a
+        // far-band super-chunk covers a 2x2 block, so its release must clear
+        // every cell it attached, not just the one nearest its origin.
+        const span = Math.max(1, Math.round(chunk.size / CHUNK_SIZE));
+        const cx0 = Math.round((chunk.x0 + WORLD_MAX_X) / CHUNK_SIZE);
+        const cz0 = Math.round((chunk.z0 - WORLD_MIN_Z) / CHUNK_SIZE);
+        // The origin cell alone decides ownership: attachChunk's superOk gate
+        // only ever forms a super-chunk when all four of its cells already
+        // share one owner (see ensureZone above), so a mixed-ownership
+        // super-chunk cannot exist and scanning the other span cells here
+        // would be redundant.
+        if (!ownedCells.has(cz0 * chunksX + cx0)) continue;
+        group.remove(chunk.mesh);
+        chunk.mesh.geometry.dispose();
+        chunks.splice(i, 1);
+        for (let dz = 0; dz < span; dz++) {
+          for (let dx = 0; dx < span; dx++) {
+            const cx = cx0 + dx;
+            const cz = cz0 + dz;
+            if (cx < 0 || cx >= chunksX || cz < 0 || cz >= chunksZ) continue;
+            const idx = cz * chunksX + cx;
+            groundPending[idx] = 1;
+            built.delete(idx);
+          }
+        }
+      }
+      loadedZones.delete(zone.id);
+      escalatedZones.delete(zone.id);
     },
     update(camX: number, camZ: number, fogFar: number): void {
       if (

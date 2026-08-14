@@ -21,18 +21,13 @@
 // changed-file biome are never treated as cacheable "green forever".
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { cwd } from 'node:process';
+import { runGateChild } from './lib/gate_child.mjs';
+import { acquireFullSuiteLock } from './lib/gate_lock.mjs';
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import { runGatePreflights } from './lib/gate_preflight.mjs';
-import { buildFullGateSteps } from './lib/gate_steps.mjs';
+import { buildFullGateSteps, FULL_SUITE_STEP_NAME } from './lib/gate_steps.mjs';
 import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
-
-// Same fileURLToPath-based resolution gate_select.mjs already uses: correct
-// regardless of the invoking process's cwd, unlike process.cwd(). Threaded
-// into buildFullGateSteps so its turbo steps resolve node_modules/.bin/turbo
-// directly instead of paying npx's dispatch overhead on every cacheable step.
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 // Halving the core count only protects a gate run from ITSELF; it does nothing when a
 // second `npm run gate` (or any other heavy vitest run) is happening in a sibling
@@ -76,6 +71,7 @@ await runGatePreflights({ label: 'gate', shell });
 const branch =
   spawnSync('git', ['branch', '--show-current'], { encoding: 'utf8', shell }).stdout?.trim() ?? '';
 const releaseTier = branch.startsWith('release/');
+const repoRoot = cwd();
 // Base env for every step. Per-step overlays (e.g. pretest skip on vitest) merge on top.
 // The release tier is NOT applied here. It rides on the one dedicated vitest step
 // buildFullGateSteps adds for a release branch (lib/gate_steps.mjs), mirroring the
@@ -94,10 +90,32 @@ if (releaseTier) {
   );
 }
 
+// Concurrent `npm run gate` runs are routine under this repo's own per-task-worktree
+// workflow, and each sizes its Vitest pool as if it owned the host (computeGateWorkers
+// above). Only the full-suite step is the wall-clock bottleneck (#2808), so only it is
+// serialized across processes; every other step still runs freely in parallel across
+// worktrees. GATE_NO_LOCK=1 restores today's fully concurrent behavior for a user who
+// deliberately wants two full suites running at once.
+const noLock = process.env.GATE_NO_LOCK === '1';
+if (noLock) {
+  console.log('[gate] GATE_NO_LOCK=1: full-suite lock disabled, running unserialized');
+}
+
 for (const { name, cmd, args, hint, env: envOverlay } of steps) {
   console.log(`\n[gate] ${name}: ${cmd} ${args.join(' ')}`);
   const env = envOverlay ? { ...baseEnv, ...envOverlay } : baseEnv;
-  const res = spawnSync(cmd, args, { stdio: 'inherit', env, shell });
+  const locked = name === FULL_SUITE_STEP_NAME;
+  const { release } = locked
+    ? await acquireFullSuiteLock({ optOut: noLock })
+    : { release: async () => {} };
+  let res;
+  try {
+    res = locked
+      ? await runGateChild(cmd, args, { stdio: 'inherit', env, shell })
+      : spawnSync(cmd, args, { stdio: 'inherit', env, shell });
+  } finally {
+    await release();
+  }
   if (res.status !== 0) {
     console.error(`\n[gate] FAIL at "${name}" (exit ${res.status ?? 'killed'})`);
     if (hint) console.error(`[gate] hint: ${hint}`);

@@ -76,6 +76,13 @@ export interface MarketSellForm {
   /** The staged copy's payload (issue 1165): present when the player clicked an
    *  instanced copy, which lists as ITSELF via marketListInstance. */
   instance?: ItemInstancePayload;
+  /** The item's current lowest active listing price, PER UNIT, matching this
+   *  form's "price each" field (issue #3043). A number when the server's echo
+   *  confirms it for this exact item; null when the server confirms no active
+   *  listings exist; absent while the echo has not caught up yet (an item just
+   *  staged, or a stale snapshot) so the painter shows nothing rather than a
+   *  price that might belong to a different item. */
+  priceRef?: number | null;
 }
 
 /**
@@ -169,10 +176,10 @@ function filtersActive(filters: MarketFilters): boolean {
 /**
  * Build the Browse tab body. The server already filtered (search + type/subtype/
  * rarity) and paginated, so `info.listings` IS the page to show: the viewer's own
- * listings (always wired, for reclaim) plus one page of other sellers' listings.
- * `info.page` / `info.pageCount` drive the pager; `info.totalCount` is the full match
- * count (the viewer's own listings plus all others). `filters` only chooses the
- * empty-state copy.
+ * visible listings plus one page of other sellers' listings. Outside collapse mode
+ * every matching own row wires for reclaim; collapse mode may narrow those rows too.
+ * `info.page` / `info.pageCount` drive the pager; `info.totalCount` is the visible
+ * match count. `filters` only chooses the empty-state copy.
  */
 export function buildMarketBrowse(info: MarketInfo, filters: MarketFilters): MarketBrowseBody {
   const rows: MarketBrowseRow[] = [];
@@ -185,10 +192,9 @@ export function buildMarketBrowse(info: MarketInfo, filters: MarketFilters): Mar
     const reason = info.filter.trim() ? 'search' : filtersActive(filters) ? 'filtered' : 'browse';
     return { state: 'empty', reason };
   }
-  // The pager and range note describe the paged OTHER listings; the viewer's own
-  // listings ride on top of every page and are not counted in the range. The server
-  // wires all of the viewer's own matches on every page, so subtracting them from
-  // totalCount (mine + others) yields the true count of paged others.
+  // The pager and range note describe the paged OTHER listings; the viewer's visible
+  // own listings ride on top of every page and are not counted in the range. Subtracting
+  // those visible own rows from totalCount yields the true count of paged others.
   const othersOnPage = rows.reduce((n, r) => n + (r.listing.mine ? 0 : 1), 0);
   const mineOnPage = rows.length - othersOnPage;
   const othersTotal = info.totalCount - mineOnPage;
@@ -214,12 +220,17 @@ export function buildMarketSell(
   sellItemId: string | null,
   sellHave: number,
   sellInstance?: ItemInstancePayload | null,
+  priceEcho?: { itemId: string | null; lowestPrice: number | null },
 ): MarketSellBody {
   const item = sellItemId ? ITEMS[sellItemId] : null;
   if (!sellItemId || !item || sellHave <= 0) return { state: 'pick-empty' };
   if (item.kind === 'quest' || item.noMarketList || item.soulbound)
     return { state: 'cannot-market' };
   if (sellInstance && isTransferLockedInstance(sellInstance)) return { state: 'cannot-market' };
+  // Only trust the echo when it names THIS item: a stale echo across an item
+  // switch (staging a new item before the next snapshot lands) must never
+  // display a price that belongs to the previous item.
+  const priceRef = priceEcho && priceEcho.itemId === sellItemId ? priceEcho.lowestPrice : undefined;
   // A gentle starting ask: the vendor shop price when the item has one, but
   // never more than 10x its vendor sell value (the recipe-economy rework re-priced
   // four commons' sellValues while deliberately keeping their historical shop
@@ -241,6 +252,7 @@ export function buildMarketSell(
       have: sellInstance ? 1 : sellHave,
       suggested: { gold, silver, copper },
       ...(sellInstance ? { instance: sellInstance } : {}),
+      ...(priceRef !== undefined ? { priceRef } : {}),
     },
   };
 }
@@ -295,7 +307,10 @@ export function buildMarketView(input: MarketViewInput): MarketView {
   if (tab === 'sell') {
     return {
       kind: 'sell',
-      body: buildMarketSell(input.sellItemId, input.sellHave, input.sellInstance),
+      body: buildMarketSell(input.sellItemId, input.sellHave, input.sellInstance, {
+        itemId: info.sellPriceItemId,
+        lowestPrice: info.sellLowestPrice,
+      }),
       meta: {
         cutPct: info.cutPct,
         myListingCount: info.myListingCount,

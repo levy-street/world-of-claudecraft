@@ -74,7 +74,11 @@ export class RiftSegmenter {
       host.sink,
       host.counters,
     );
-    if (inst.bossId !== null) fight.mobIds.add(inst.bossId);
+    if (inst.bossId !== null) {
+      fight.mobIds.add(inst.bossId);
+      const boss = host.sim.entities.get(inst.bossId);
+      if (boss !== undefined) fight.noteActor(inst.bossId, boss.name);
+    }
     this.tracked.set(inst.instanceId, {
       instanceId: inst.instanceId,
       floorIndex: inst.floorIndex,

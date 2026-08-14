@@ -25,9 +25,11 @@ import path from 'node:path';
 export const SOURCE_EXTENSIONS = [
   // The JS/TS module family, in every spelling this repo's toolchain resolves.
   '.ts',
+  '.tsx',
   '.mts',
   '.cts',
   '.js',
+  '.jsx',
   '.mjs',
   '.cjs',
   // Standalone shader sources. None exist today; see the header.

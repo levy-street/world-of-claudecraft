@@ -93,7 +93,8 @@ describe('lockpick controller (I2b module), success', () => {
     expect(st.lootOwnerId).toBe(sim.playerId); // picker owns the loot (no front-run)
     expect(st.pendingLoot.length).toBeGreaterThan(0);
     expect(run.surfaceExitId).not.toBeNull(); // exit opened on success
-    expect(sim.delveMarksFor(sim.playerId)).toBeGreaterThan(marksBefore); // bonus marks granted
+    // base in-window clear (+1) + premium ante bonus (+2)
+    expect(sim.delveMarksFor(sim.playerId)).toBe(marksBefore + 3);
 
     const events = sim.tick();
     expect(
@@ -102,7 +103,8 @@ describe('lockpick controller (I2b module), success', () => {
     expect(
       events.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'success'),
     ).toBeDefined();
-    expect(events.find((e) => e.type === 'lockpickBonus')).toBeDefined();
+    // The event carries the actually granted (in-window premium) bonus Marks.
+    expect(events.find((e) => e.type === 'lockpickBonus' && (e as any).marks === 2)).toBeDefined();
   });
 
   it('lockpickViewFor returns the fogged projection the lockpickState accessor delegates to', () => {

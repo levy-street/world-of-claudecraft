@@ -30,7 +30,7 @@ import { MAIL_DELIVERY_SECONDS } from '../src/sim/mail/post_office';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { runApplyEnchant, runCraft, runDisenchant } from './helpers/enchant_family_cast';
-import { EMPTY_TEST_WORLD } from './sim_shared';
+import { EMPTY_TEST_WORLD, VENDOR_TEST_WORLD } from './sim_shared';
 
 // A crafted, masterwork-procced, enchanted, signed piece: every marker channel
 // at once. Deliberately an EQUIPPABLE armour piece so the equip/unequip and
@@ -91,7 +91,12 @@ function expectFullyMarked(slot: InvSlot | undefined, where: string): void {
 }
 
 function makeSim(seed: number): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  // VENDOR_TEST_WORLD keeps BUILTIN_WORLD.npcs untouched (bankers, trader_wilkes,
+  // the_merchant, all at fixed content-authored positions) while trimming camps
+  // to a single forest_wolf slice and zeroing groundObjects: exactly the ambient
+  // bulk this file's rows never touch (they only stand at named NPCs and move
+  // inventory/bank/equipment/mail/market slots).
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: VENDOR_TEST_WORLD });
 }
 
 function standAt(sim: Sim, pid: number, templateId: string): void {
@@ -120,6 +125,37 @@ describe('provenance survives every container boundary', () => {
   it('bags: the fixture itself is fully marked before any boundary runs', () => {
     // The control. If this ever fails, every row below is testing nothing.
     expectFullyMarked(fullSlot(), 'fixture');
+  });
+
+  it('bags: equipping a payload-bearing copy is refused, not stripped', () => {
+    // The bag-equip boundary has no round trip to pin (#2837): meta.bags
+    // stores only a bare item id, with nowhere to park an instance payload or
+    // a craftedRecipeId while a bag is worn. Not reachable through shipped
+    // content today (no bag is ever craft-marked or instance-granted), but
+    // bags are declared payload-free with a guard that refuses the equip the
+    // moment one ever does carry a payload, rather than silently dropping it
+    // on the next unequip's plain grant.
+    const sim = makeSim(4106);
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+    const bagId = 'linen_pouch';
+    inv(sim, pid).push({
+      itemId: bagId,
+      count: 1,
+      instance: payload(),
+      craftedRecipeId: GEAR_RECIPE,
+    });
+
+    sim.equipBag(bagId, undefined, pid);
+
+    expect(
+      meta.bags.every((b) => b === null),
+      'no socket was filled',
+    ).toBe(true);
+    expectFullyMarked(
+      inv(sim, pid).find((s) => s.itemId === bagId),
+      'bags after refused equip',
+    );
   });
 
   it('bank: deposit -> withdraw', () => {

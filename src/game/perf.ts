@@ -706,6 +706,16 @@ export class PerfMonitor {
       // two above, so a hitch bracketing a new stall reads as the queue
       // wedging rather than as an empty diff.
       state.gpuQueueStalls = r.gpuQueue.stallCount;
+      // The arm that answers "was a background unit in flight while this frame
+      // was lost": totalSyncMs barely moves for a unit that blocks after its
+      // first await, so without this a hitch bracketing one reads as an empty
+      // diff (which is how 786 hitches came to be filed as unexplained on
+      // 13 August 2026). CUMULATIVE, not the worst-gap max: `diffStates` emits a
+      // key only when the value CHANGES, and a max stops changing after the
+      // first record, so the max would answer once and then go quiet for every
+      // later occurrence. `?? 0` because a stub or an older renderer may not
+      // carry the field, and a NaN here would diff against itself every record.
+      state.gpuQueueFrameGapMs = Math.round(r.gpuQueue.totalFrameGapMs ?? 0);
       state.effectiveRenderScale = r.effectiveRenderScale;
       state.budgetMode = r.renderBudget.mode;
       // Day/night dimension: a hitch cluster that only appears with

@@ -35,6 +35,7 @@ import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 describe('gathering tool tier gating (#1123)', () => {
   it('a tier-1 tool cannot gather a tier-2 or higher node', () => {
@@ -279,7 +280,7 @@ describe('sim-level node access gating (Professions 2.0)', () => {
   const T2_WOOD = 'wood_thornpeak_t2';
 
   function simAtNode(nodeId: string, seed = 42) {
-    const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
     const pid = sim.addPlayer('warrior', 'Prospector');
     const node = GATHER_NODES.find((n) => n.id === nodeId);
     if (!node) throw new Error(`missing node ${nodeId}`);

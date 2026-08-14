@@ -2,6 +2,7 @@
 // takes plain data in, returns draw primitives or strings.
 // Imported by hud.ts; tested by tests/delve_map.test.ts.
 
+import { delveModuleZOffset } from '../../../sim/data';
 import {
   isLitanyModuleId,
   litanyModuleGeometry,
@@ -9,11 +10,26 @@ import {
 } from '../../../sim/delve_litany_layout';
 import type { DungeonLayout } from '../../../sim/dungeon_layout';
 
+export type DelveMapFit = 'rect' | 'circle';
+
 /** Compose the area label shown on the minimap / world-map zone title. The
  * module name is passed in already localized (the caller resolves the
  * `delveUi.moduleName.*` key via t()), so this helper stays string-table-free. */
 export function delveAreaLabel(delveName: string, moduleName: string): string {
   return moduleName ? `${delveName}: ${moduleName}` : delveName;
+}
+
+/** World origin of the active module. A delve run's origin is the instance slot,
+ * while every module after the first is stacked farther along world Z. */
+export function delveCurrentModuleOrigin(run: {
+  origin: { x: number; z: number };
+  modules: readonly string[];
+  moduleIndex: number;
+}): { x: number; z: number } {
+  return {
+    x: run.origin.x,
+    z: run.origin.z + delveModuleZOffset(run.modules, run.moduleIndex),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -113,12 +129,13 @@ export function delveLocalToCanvas(
   layout: DungeonLayout,
   canvasSize: number,
   pad: number,
+  fit: DelveMapFit = 'rect',
 ): { cx: number; cy: number } {
-  const { sx, sz, halfWidth } = delveCanvasScales(layout, canvasSize, pad);
+  const { sx, sz, halfWidth, left, top } = delveCanvasScales(layout, canvasSize, pad, fit);
   // Mirror X for map-left convention.
-  const cx = pad + (halfWidth - localX) * sx;
+  const cx = left + (halfWidth - localX) * sx;
   // localZ: zMin → top, zMax → bottom
-  const cy = pad + (localZ - layout.zMin) * sz;
+  const cy = top + (localZ - layout.zMin) * sz;
   return { cx, cy };
 }
 
@@ -132,7 +149,8 @@ export function delveCanvasScales(
   layout: DungeonLayout,
   canvasSize: number,
   pad: number,
-): { sx: number; sz: number; halfWidth: number } {
+  fit: DelveMapFit = 'rect',
+): { sx: number; sz: number; halfWidth: number; left: number; top: number } {
   const rawModuleId = (layout as { litanyModuleId?: string }).litanyModuleId;
   const litany =
     rawModuleId && isLitanyModuleId(rawModuleId) ? litanyModuleGeometry(rawModuleId) : null;
@@ -141,22 +159,35 @@ export function delveCanvasScales(
     ? polyPoints.reduce((m, p) => Math.max(m, Math.abs(p.x)), 0)
     : null;
   const halfWidth = polyMaxAbsX ?? litany?.wallX ?? 23;
+  const depth = layout.zMax - layout.zMin;
+  if (fit === 'circle') {
+    const radialExtent = Math.max(1, canvasSize / 2 - pad);
+    const axisHalfExtent = radialExtent * Math.SQRT1_2;
+    return {
+      sx: axisHalfExtent / halfWidth,
+      sz: (axisHalfExtent * 2) / depth,
+      halfWidth,
+      left: canvasSize / 2 - axisHalfExtent,
+      top: canvasSize / 2 - axisHalfExtent,
+    };
+  }
   return {
     sx: (canvasSize - pad * 2) / (halfWidth * 2),
-    sz: (canvasSize - pad * 2) / (layout.zMax - layout.zMin),
+    sz: (canvasSize - pad * 2) / depth,
     halfWidth,
+    left: pad,
+    top: pad,
   };
 }
 
-/** The static schematic primitives for a module (floor + walls + pillars + tombs + dais + exit).
- *  `northLabel` is the localized compass-north glyph drawn at the exit (the caller
- *  injects t('hudChrome.compass.N'); it is locale-dependent, e.g. ru С, zh/ja 北, ko 북).
- *  Defaults to the cartographic 'N' for non-rendering callers (tests / direct use). */
+/** Static room geometry for one module. Navigation is deliberately excluded: a
+ * passage, reward, or surface exit is drawn only from its live entity/state. */
 export function delveSchematicStatic(
   layout: DungeonLayout,
   canvasSize: number,
   pad: number,
-  northLabel = 'N',
+  _northLabel = 'N',
+  fit: DelveMapFit = 'rect',
 ): SchematicPrimitive[] {
   const prims: SchematicPrimitive[] = [];
 
@@ -168,7 +199,7 @@ export function delveSchematicStatic(
   if (litanyPrims && litanyModuleId !== undefined) {
     // Size primitives with the SAME per-axis scales positions map through, so a
     // pool or island is exactly as wide on the map as the outline implies.
-    const { sx, sz } = delveCanvasScales(layout, canvasSize, pad);
+    const { sx, sz } = delveCanvasScales(layout, canvasSize, pad, fit);
     // Islands paint AFTER the blackwater fills, like the 3D scene: the dry
     // stepping stones must read on top of the pools they sit in.
     const isIslandPrim = (pr: (typeof litanyPrims)[number]) =>
@@ -180,7 +211,7 @@ export function delveSchematicStatic(
     for (const prim of paintOrder) {
       if (prim.kind === 'polygon') {
         const points = prim.points.map((pt) => {
-          const { cx, cy } = delveLocalToCanvas(pt.x, pt.z, layout, canvasSize, pad);
+          const { cx, cy } = delveLocalToCanvas(pt.x, pt.z, layout, canvasSize, pad, fit);
           return { cx, cy };
         });
         prims.push({
@@ -192,18 +223,10 @@ export function delveSchematicStatic(
           strokeWidth: 1,
         });
       } else if (prim.kind === 'circle') {
-        const { cx, cy } = delveLocalToCanvas(prim.x, prim.z, layout, canvasSize, pad);
-        if (prim.role === 'exit') {
-          prims.push({
-            kind: 'circle',
-            cx,
-            cy,
-            r: Math.max(3, canvasSize * 0.025),
-            fill: '#7a50c8',
-            stroke: '#b090e8',
-            strokeWidth: 1,
-          });
-        } else {
+        const { cx, cy } = delveLocalToCanvas(prim.x, prim.z, layout, canvasSize, pad, fit);
+        if (prim.role !== 'exit') {
+          // Authored layout exits describe topology, not live availability.
+          // The entity overlay owns sealed/open/finale truth.
           // World-space rx/rz (an authored ellipse, e.g. the apse moat) win over
           // the uniform r on each axis independently, before the canvas's own
           // per-axis scale (sx/sz) is applied.
@@ -223,7 +246,7 @@ export function delveSchematicStatic(
           });
         }
       } else {
-        const { cx, cy } = delveLocalToCanvas(prim.x, prim.z, layout, canvasSize, pad);
+        const { cx, cy } = delveLocalToCanvas(prim.x, prim.z, layout, canvasSize, pad, fit);
         const sw = prim.hw * 2 * sx;
         const sh = prim.hd * 2 * sz;
         const isIsland = prim.role === 'island';
@@ -240,21 +263,12 @@ export function delveSchematicStatic(
         });
       }
     }
-    const { cx: exCx, cy: exCy } = delveLocalToCanvas(0, layout.zMax - 2, layout, canvasSize, pad);
-    prims.push({
-      kind: 'text',
-      cx: exCx,
-      cy: exCy - Math.max(5, canvasSize * 0.05),
-      text: northLabel,
-      fill: '#b090e8',
-      font: `bold ${Math.max(8, Math.round(canvasSize * 0.08))}px Georgia`,
-    });
     return prims;
   }
 
   // Floor background rect (the full room footprint)
-  const topLeft = delveLocalToCanvas(-23, layout.zMin, layout, canvasSize, pad);
-  const botRight = delveLocalToCanvas(23, layout.zMax, layout, canvasSize, pad);
+  const topLeft = delveLocalToCanvas(-23, layout.zMin, layout, canvasSize, pad, fit);
+  const botRight = delveLocalToCanvas(23, layout.zMax, layout, canvasSize, pad, fit);
   prims.push({
     kind: 'rect',
     x: Math.min(topLeft.cx, botRight.cx),
@@ -268,7 +282,7 @@ export function delveSchematicStatic(
 
   // Pillars: small dark dots
   for (const p of layout.pillars) {
-    const { cx, cy } = delveLocalToCanvas(p.x, p.z, layout, canvasSize, pad);
+    const { cx, cy } = delveLocalToCanvas(p.x, p.z, layout, canvasSize, pad, fit);
     prims.push({
       kind: 'circle',
       cx,
@@ -282,7 +296,7 @@ export function delveSchematicStatic(
 
   // Tombs: small rects along the walls
   for (const t of layout.tombs) {
-    const { cx, cy } = delveLocalToCanvas(t.x, t.z, layout, canvasSize, pad);
+    const { cx, cy } = delveLocalToCanvas(t.x, t.z, layout, canvasSize, pad, fit);
     const tw = Math.max(3, canvasSize * 0.035);
     const th = Math.max(2, canvasSize * 0.02);
     prims.push({
@@ -299,7 +313,7 @@ export function delveSchematicStatic(
 
   // Wall stubs
   for (const s of layout.stubs) {
-    const { cx, cy } = delveLocalToCanvas(s.x, s.z, layout, canvasSize, pad);
+    const { cx, cy } = delveLocalToCanvas(s.x, s.z, layout, canvasSize, pad, fit);
     const sw = ((s.hw * 2) / 46) * (canvasSize - pad * 2);
     const sh = ((s.hd * 2) / (layout.zMax - layout.zMin)) * (canvasSize - pad * 2);
     prims.push({
@@ -317,7 +331,7 @@ export function delveSchematicStatic(
   // Dais: larger circle near the back; radius expressed as fraction of canvas size
   // (not world units) to keep it from overflowing into the text area.
   const dais = layout.dais;
-  const { cx: dcx, cy: dcy } = delveLocalToCanvas(dais.x, dais.z, layout, canvasSize, pad);
+  const { cx: dcx, cy: dcy } = delveLocalToCanvas(dais.x, dais.z, layout, canvasSize, pad, fit);
   const dr = Math.max(
     4,
     Math.min(canvasSize * 0.12, (dais.r / (layout.zMax - layout.zMin)) * (canvasSize - pad * 2)),
@@ -332,29 +346,6 @@ export function delveSchematicStatic(
     strokeWidth: 1,
   });
 
-  // Exit marker at zMax (north passage, top of canvas since zMin is north entrance)
-  // The tombstone passage is at the top, zMin end is the ENTRANCE (south), zMax is boss end (north).
-  // Actually: zMin = entrance side (-19), zMax = boss end (61). The exit to next module is
-  // at zMax (the "sealed passage north"). We draw a small arch glyph there.
-  const { cx: exCx, cy: exCy } = delveLocalToCanvas(0, layout.zMax - 2, layout, canvasSize, pad);
-  prims.push({
-    kind: 'circle',
-    cx: exCx,
-    cy: exCy,
-    r: Math.max(3, canvasSize * 0.025),
-    fill: '#7a50c8',
-    stroke: '#b090e8',
-    strokeWidth: 1,
-  });
-  prims.push({
-    kind: 'text',
-    cx: exCx,
-    cy: exCy - Math.max(5, canvasSize * 0.05),
-    text: northLabel,
-    fill: '#b090e8',
-    font: `bold ${Math.max(8, Math.round(canvasSize * 0.08))}px Georgia`,
-  });
-
   return prims;
 }
 
@@ -366,8 +357,9 @@ export function delveSchematicPlayer(
   layout: DungeonLayout,
   canvasSize: number,
   pad: number,
+  fit: DelveMapFit = 'rect',
 ): SchematicArrow {
-  const { cx, cy } = delveLocalToCanvas(localX, localZ, layout, canvasSize, pad);
+  const { cx, cy } = delveLocalToCanvas(localX, localZ, layout, canvasSize, pad, fit);
   return {
     kind: 'arrow',
     cx,

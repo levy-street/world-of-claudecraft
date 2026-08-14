@@ -7,8 +7,29 @@
 // warming what the player is looking at), soft-fail continuation, and
 // cancellation (graphics rebuild destroys the target contexts mid-schedule).
 // The Hud composes it with real thunks; a Vitest drives it with fakes.
+//
+// The ARMORY catalog is deliberately NOT in this plan, and is warmed NOWHERE
+// ahead of time: the store's card list needs none of it (measured, warming the
+// whole armory moved a cold store open 530.9 ms to 522.8 ms, i.e. not at all),
+// and the lazy per-card path builds exactly what one inspected card needs, on
+// the click that opens it. A store-open warm was tried and removed because it
+// measured worse.
+//
+// Measured, the warming was per-CONTEXT GPU program setup: about 2.1 to 2.6 s of
+// live-frame hitches every online session paid whether or not the player ever
+// opened the store, buying nothing but the store's own first inspect (GPU
+// program caches do not cross a WebGL context). The cost was also POSITIONAL
+// rather than per skin, so no gentler schedule was available.
+//
+// Full evidence, the refutations along the way, and the accepted unmeasured
+// trade (the CPU caches the world renderer also reads):
+// docs/design/armory-preview-warming.md.
 
-export type PreviewPrewarmFamily = 'char' | 'armory';
+/** Which owning surface a unit's pause key watches. One member, because one
+ *  surface is planned: the armory family went with the catalog warming, and an
+ *  unused member would only invite the schedule back. The pause mechanism
+ *  itself stays keyed, so a second surface costs one member and no rewiring. */
+export type PreviewPrewarmFamily = 'char';
 
 export interface PreviewPrewarmUnit {
   family: PreviewPrewarmFamily;
@@ -38,8 +59,9 @@ export interface PreviewPrewarmHandle {
 }
 
 export const PREVIEW_PREWARM_BUSY_POLL_MS = 2_000;
-/** Fixed spacing between units: a warm catalog a few minutes after entry is
- *  fine (the store rarely opens that early); a hitch every frame is not. */
+/** Fixed spacing between units: the paperdoll and portrait caches being warm a
+ *  few minutes after entry is fine (nobody is waiting on either); a hitch every
+ *  frame is not. */
 export const PREVIEW_PREWARM_UNIT_SPACING_MS = 750;
 /** Max consecutive no-headroom polls before running the unit anyway. */
 export const PREVIEW_PREWARM_HEADROOM_POLL_CAP = 15;
@@ -53,8 +75,6 @@ export interface PreviewPrewarmPlanDeps<Pose> {
   skinCount: (unitId: string) => number;
   /** Player-card closeup poses, opaque to the plan. */
   cardPoses: readonly Pose[];
-  /** Armory catalog skin ids to warm, in catalog order. */
-  armorySkinIds: readonly string[];
   /** True on the boot path, false on a graphics-rebuild restart. Excludes the
    *  char-window shell unit plus the per-skin and per-pose units that depend on
    *  it (they no-op via `this.charPreview?.` once built): at boot the shell
@@ -63,23 +83,20 @@ export interface PreviewPrewarmPlanDeps<Pose> {
    *  reset already dropped its own cover, so building the shell as a schedule
    *  unit would hitch a live frame, the exact class of stall the curtain
    *  exists to avoid. Portrait units stay in every plan (canvas-2D only, no
-   *  dependence on the shell); so do armory units (its own prewarm path
-   *  lazily rebuilds its stage). */
+   *  dependence on the shell). */
   includeCharFamily: boolean;
   renderCharShell: () => void;
   prewarmCharSkin: (skin: number) => void | Promise<void>;
   prewarmCardPose: (pose: Pose) => void | Promise<void>;
-  renderPortrait: (cls: string, skin: number, framing: 'headshot' | 'body') => void;
-  prewarmArmorySkin: (skinId: string, mode: 'character' | 'weapon') => void | Promise<void>;
+  renderPortrait: (cls: string, skin: number, framing: 'headshot' | 'body') => void | Promise<void>;
 }
 
 /** Build the ordered post-entry preview prewarm plan: the shared paperdoll
  *  preview per skin, the player-card poses, both portrait framings for every
  *  class (chips use headshots while Inspect uses a full-body portrait, so
  *  warming only the former still leaves a synchronous WebGL readback + PNG
- *  encode on the first inspected player), then every Armory catalog skin,
- *  one MODE per unit (a whole-skin warmup measured 170 to 225 ms of
- *  main-thread block during live play; per-mode units roughly halve it).
+ *  encode on the first inspected player). NO Armory units: that catalog is not
+ *  warmed ahead of time at all, it is built per inspected card (see the header).
  *  Each entry is one bounded GPU unit the renderer's background lane paces.
  *  `deps.includeCharFamily` gates the shell/skin/pose units only; see its doc
  *  on `PreviewPrewarmPlanDeps`. */
@@ -112,20 +129,13 @@ export function buildPostEntryPreviewPrewarmUnits<Pose>(
         units.push({
           family: 'char',
           label: `preview:portrait:${portraitClass}:${skin}:${framing}`,
-          run: () => {
-            deps.renderPortrait(portraitClass, skin, framing);
-          },
+          // Expression body ON PURPOSE: renderPortrait may return a promise
+          // (the async prewarm path), and the paced lane awaits a unit's
+          // return value. A block body would discard it and the schedule
+          // would advance mid-render.
+          run: () => deps.renderPortrait(portraitClass, skin, framing),
         });
       }
-    }
-  }
-  for (const skinId of deps.armorySkinIds) {
-    for (const armoryMode of ['character', 'weapon'] as const) {
-      units.push({
-        family: 'armory',
-        label: `preview:armory:${skinId}:${armoryMode}`,
-        run: () => deps.prewarmArmorySkin(skinId, armoryMode),
-      });
     }
   }
   return units;

@@ -1,12 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
 
+// Counters live outside the factory so a test can assert WHEN the Armory stage
+// is constructed, which is the whole point of the intent invariant below.
+const armorySpy = vi.hoisted(() => ({ constructed: 0, opened: 0 }));
 vi.mock('../src/ui/armory_inspect', () => ({
   ArmoryInspect: class {
     openSkinId: string | null = null;
+    constructor() {
+      armorySpy.constructed++;
+    }
     close(): void {}
     destroy(): void {}
-    open(): void {}
-    async prewarm(): Promise<void> {}
+    open(): void {
+      armorySpy.opened++;
+    }
     refresh(): void {}
   },
   badgeLabel: () => '',
@@ -44,6 +51,90 @@ function rootStub(body: Record<string, unknown> | null = null): HTMLElement {
     },
   } as unknown as HTMLElement;
 }
+
+describe('DailyRewardsWindow store intent', () => {
+  // The invariant this branch ships: NO Armory preparation on store open, the
+  // stage built only by the click that opens a card. Source walks cannot lock
+  // it (an early call added inside paintStore, where the click handler is
+  // wired, passed every one of them), so this drives the real path and counts
+  // constructions.
+  it('builds the Armory stage on a card click and on nothing else', async () => {
+    armorySpy.constructed = 0;
+    armorySpy.opened = 0;
+    const clicks = new Map<string, () => void>();
+    let html = '';
+    const body = {
+      dataset: {} as Record<string, string>,
+      get innerHTML() {
+        return html;
+      },
+      set innerHTML(value: string) {
+        html = value;
+      },
+      querySelector: () => null,
+      querySelectorAll: (selector: string) => {
+        if (selector !== '[data-armory-skin]') return [];
+        // One button per catalogue skin, exactly as the painted markup carries.
+        return Object.keys(WEAPON_SKINS).map((id) => ({
+          dataset: { armorySkin: id },
+          addEventListener: (_type: string, handler: () => void) => clicks.set(id, handler),
+        }));
+      },
+    };
+    // A root that answers every chrome lookup rather than only the ones this
+    // test cares about: syncTabs and the loading indicator both walk it, and a
+    // null there throws into renderCurrent's fire-and-forget void, which is
+    // silent. Unknown selectors get an inert element instead of null.
+    const chrome = () => ({
+      classList: { toggle: () => undefined, add: () => undefined, remove: () => undefined },
+      setAttribute: () => undefined,
+      focus: () => undefined,
+      dataset: {} as Record<string, string>,
+    });
+    const intentRoot = {
+      style: { display: 'block' },
+      classList: chrome().classList,
+      querySelector: (selector: string) => (selector === '.dr-body' ? body : chrome()),
+      querySelectorAll: () => [],
+    } as unknown as HTMLElement;
+    const window = new DailyRewardsWindow({
+      // Own root stub: the shared one has no querySelectorAll, and syncTabs needs
+      // it. Without it renderCurrent rejects into the fire-and-forget void and
+      // the store silently never paints, which is exactly how the first version
+      // of this test failed.
+      root: () => intentRoot,
+      world: worldStub,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+      storeEnabled: () => true,
+      storeSnapshot: async () => ({ available: true, balance: 1000, items: [] }),
+    });
+    Object.assign(window as unknown as Record<string, unknown>, { tab: 'store' });
+
+    // Open for real: renderCurrent is NOT stubbed, so renderStore and paintStore
+    // both run and the click handlers get wired.
+    window.openStore();
+    await vi.waitFor(() => expect(clicks.size).toBeGreaterThan(0));
+
+    // The store is painted and interactive, and no stage exists.
+    expect(armorySpy.constructed).toBe(0);
+    expect(armorySpy.opened).toBe(0);
+
+    const [firstSkinId] = [...clicks.keys()];
+    clicks.get(firstSkinId)?.();
+
+    // Exactly one build, exactly one open, and only from the click.
+    expect(armorySpy.constructed).toBe(1);
+    expect(armorySpy.opened).toBe(1);
+
+    // A second card reuses the one stage rather than minting another context.
+    const secondSkinId = [...clicks.keys()][1];
+    clicks.get(secondSkinId)?.();
+    expect(armorySpy.constructed).toBe(1);
+    expect(armorySpy.opened).toBe(2);
+  });
+});
 
 describe('DailyRewardsWindow store refresh behavior', () => {
   it('does not render wallet connection controls in the Store', () => {

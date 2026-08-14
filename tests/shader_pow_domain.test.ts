@@ -126,7 +126,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ability_vfx/rings.ts': 1,
   'src/render/ability_vfx/shells.ts': 1,
   // the armour-dye sRGB<->linear pair (bases clamped with max(c, 0))
-  'src/render/characters/assets.ts': 2,
+  'src/render/characters/armor_dye.ts': 2,
   'src/render/dungeon.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
   'src/render/pbr_fragment_shader.ts': 1,

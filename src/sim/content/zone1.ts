@@ -362,7 +362,13 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { itemId: 'hollowbone_hauberk', chance: 0.25, rollGroup: 'grix_tunnelking_chase' },
       { itemId: 'briarroot_staff', chance: 0.3 },
     ],
-    scale: 1.15,
+    // Half again the Deeprock Diggers he summons (tunnel_rat scale 0.85 x 1.5),
+    // up from 1.15. Not purely cosmetic: mob_combat's scaledDefaultMobMeleeRange
+    // adds 3 yd of reach per unit of scale ABOVE 1, so this widens his melee
+    // reach by 0.375 yd (and desiredRange, which is 0.8x of it) as well as his
+    // silhouette. That is the intended read for a rare elite standing in a pack
+    // of its own adds; it is also why this is a parity-affecting change.
+    scale: 1.275,
     color: 0xb9770e,
   },
   vale_bandit: {

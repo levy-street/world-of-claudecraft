@@ -2159,6 +2159,29 @@ export class CharacterVisual {
     return skin ? (WEAPON_VFX[skin.model] ?? null) : null;
   }
 
+  /**
+   * Whether a point-light budget owns this rig's weapon-skin light.
+   *
+   * TRUE only in the world, where the renderer reconciles the light into its
+   * fixed budget: born visible there, it would be counted for the frames before
+   * the first budget pass, and that changed numPointLights relinks every
+   * material drawn in them. `createCharacterVisual` sets it.
+   *
+   * FALSE for a rig built directly (the armoury preview, the character screen).
+   * Those own their renderer and scene and have NO budget, so nothing would ever
+   * turn the light back on: the skin's cast glow is the product on a cosmetics
+   * surface, and it must light immediately.
+   *
+   * A FIELD rather than a constructor argument, so it must be set before the
+   * rig attaches a weapon. That holds today because `buildWeaponVfx` is only
+   * reached from `finishWeaponAttach`, which runs from async model-load
+   * continuations and the runtime re-attach paths, never synchronously from the
+   * constructor. A future synchronous attach in the constructor would silently
+   * miss the flag; the ordering at the one world call site is pinned by
+   * tests/weapon_vfx_rig_build.test.ts.
+   */
+  budgetedWeaponLight = false;
+
   /** Attach the skin's rarity VFX rig to each held payload (in-hand mode: no
    *  backdrop dome, no ground pool; emissive + particles ride the weapon). */
   private buildWeaponVfx(payloads: THREE.Object3D[]): void {
@@ -2170,7 +2193,10 @@ export class CharacterVisual {
     this.weaponVfxAuthored = weaponVfxTuningFor(skin.model, spec.tier);
     this.weaponVfxShed = 1;
     for (const payload of payloads) {
-      const handle = createWeaponVfx(payload, spec, { grounded: false });
+      const handle = createWeaponVfx(payload, spec, {
+        grounded: false,
+        budgetedLight: this.budgetedWeaponLight,
+      });
       handle.setBackdropVisible(false);
       handle.setTuning(this.weaponVfxAuthored);
       handle.setPixelScale(weaponVfxViewportHeight * this.weaponVfxSpriteScale);
@@ -2526,6 +2552,13 @@ export class CharacterVisual {
     return this.effectSingleMaterial(material) as T;
   }
 
+  // Every overlay cache below clones the rig's live material. They all go
+  // through cloneMaterialWithHooks for the reason material_clone_hooks.ts
+  // spells out: a bare clone() drops onBeforeCompile, so it renders WITHOUT
+  // the rim glow, the worn detail layer and the player's armour dye (a dyed
+  // set reverting to its base colours the moment the character ghosts, goes
+  // shadowform, or shifts to moonkin), and it links a second program on its
+  // first draw because three keys its cache on customProgramCacheKey().
   private effectSingleMaterial(material: THREE.Material): THREE.Material {
     // Death treatments (soul rend, ghost run) win over the shapeshift tints.
     if (this.soulRend) return this.soulRendMaterial(material);
@@ -2545,7 +2578,7 @@ export class CharacterVisual {
     const cache = this.ferocityMaterials[index];
     const cached = cache.get(material);
     if (cached) return cached;
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     const withColor = marked as THREE.Material & {
       color?: THREE.Color;
       emissive?: THREE.Color;
@@ -2576,7 +2609,7 @@ export class CharacterVisual {
     // is unmounted, and the map stays at one clone per source instead of one
     // per (source, color) forever.
     cached?.dispose();
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     marked.userData.runeTintHex = tint;
     const withColor = marked as THREE.Material & {
       color?: THREE.Color;
@@ -2603,7 +2636,7 @@ export class CharacterVisual {
       cached.opacity = opacity;
       return cached;
     }
-    const ghost = material.clone();
+    const ghost = cloneMaterialWithHooks(material);
     ghost.transparent = true;
     ghost.opacity = opacity;
     // depthWrite stays ON: with it off the whole rig depth-blends against
@@ -2618,7 +2651,7 @@ export class CharacterVisual {
   private soulRendMaterial(material: THREE.Material): THREE.Material {
     const cached = this.soulRendMaterials.get(material);
     if (cached) return cached;
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     marked.transparent = true;
     marked.opacity = SOUL_REND_OPACITY;
     marked.depthWrite = false;
@@ -2639,7 +2672,7 @@ export class CharacterVisual {
   private shadowformMaterial(material: THREE.Material): THREE.Material {
     const cached = this.shadowformMaterials.get(material);
     if (cached) return cached;
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     marked.transparent = true;
     marked.opacity = SHADOWFORM_OPACITY;
     marked.depthWrite = true;
@@ -2660,7 +2693,7 @@ export class CharacterVisual {
   private moonkinMaterial(material: THREE.Material): THREE.Material {
     const cached = this.moonkinMaterials.get(material);
     if (cached) return cached;
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     marked.transparent = true;
     marked.opacity = MOONKIN_OPACITY;
     marked.depthWrite = true;
@@ -2681,7 +2714,7 @@ export class CharacterVisual {
   private ascensionMaterial(material: THREE.Material): THREE.Material {
     const cached = this.ascensionMaterials.get(material);
     if (cached) return cached;
-    const marked = material.clone();
+    const marked = cloneMaterialWithHooks(material);
     const withColor = marked as THREE.Material & {
       color?: THREE.Color;
       emissive?: THREE.Color;

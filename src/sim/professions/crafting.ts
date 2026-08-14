@@ -68,10 +68,11 @@
 // game/net imports, no Math.random/Date.now, host-agnostic so it runs
 // offline, on the server, and in the headless RL env unchanged.
 
-import { bagCapacity, countStacked, fitsAll, removeStacked } from '../bags';
+import { bagCapacity, fitsAll } from '../bags';
 import { CRAFT_BATCH_MAX, CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/professions';
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
+import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import { forceDismount } from '../mounts';
 import { isCataloguedRelicMark, noteReliquaryMark } from '../reliquary';
 import type { PlayerMeta } from '../sim';
@@ -194,6 +195,12 @@ export interface CraftResult {
   reason?:
     | 'unknown_recipe'
     | 'insufficient_materials'
+    // Issue 3042: distinct from insufficient_materials for the exact case
+    // where the player holds every reagent in the required quantity in
+    // aggregate, but a locked copy is what is blocking the craft (a genuine
+    // shortfall still denies with insufficient_materials). See
+    // insufficientMaterialsIsLockOnly below.
+    | 'locked'
     | 'combo_requirement_unmet'
     | 'recipe_not_learned'
     | 'throttled'
@@ -388,7 +395,11 @@ export function requiredReagentCountFor(
 /** Whether the given player currently holds every reagent a recipe requires,
  *  in the required quantities, after that player's #1145 self-signed
  *  reduction and #1134 specialization discount compose. Read-only: never
- *  mutates inventory. */
+ *  mutates inventory.
+ *
+ *  Counts only UNLOCKED units (issue 3042, item_lock.ts): a player-locked
+ *  reagent copy is not spendable material, exactly like a held-but-bound
+ *  copy is not sellable, so it can never satisfy this gate. */
 export function hasRecipeMaterials(
   ctx: SimContext,
   recipe: ProfessionRecipeRecord,
@@ -401,6 +412,27 @@ export function hasRecipeMaterials(
       // Counted across the reagent's grades, in the same order the
       // consumption below spends them, so the gate can never promise units the
       // removal would not find.
+      countAcrossGrades(r.itemId, (id) => countUnlockedInSlots(meta?.inventory ?? [], id)) >=
+      requiredReagentCount(meta, r, craftSkills, recipe.professionId).count,
+  );
+}
+
+/** True when the recipe WOULD pass hasRecipeMaterials if locked copies
+ *  counted too: the player holds every reagent in the required quantity in
+ *  AGGREGATE, so a locked copy (never a genuine shortfall) is what is
+ *  denying the craft. Distinguishes the 'locked' CraftResult reason from
+ *  plain 'insufficient_materials' (issue 3042 acceptance: "each refused
+ *  action surfaces a clear locked-item message"). Called only after
+ *  hasRecipeMaterials has already returned false. */
+function insufficientMaterialsIsLockOnly(
+  ctx: SimContext,
+  recipe: ProfessionRecipeRecord,
+  pid: number,
+): boolean {
+  const meta = ctx.players.get(pid);
+  const craftSkills = meta ? meta.craftSkills : {};
+  return recipe.reagents.every(
+    (r) =>
       countAcrossGrades(r.itemId, (id) => ctx.countItem(id, pid)) >=
       requiredReagentCount(meta, r, craftSkills, recipe.professionId).count,
   );
@@ -470,7 +502,13 @@ export function evaluateCraftAdmission(
     return { ok: false, recipeId: recipe.id, reason: 'recipe_not_learned' };
   }
   if (!hasRecipeMaterials(ctx, recipe, pid)) {
-    return { ok: false, recipeId: recipe.id, reason: 'insufficient_materials' };
+    return {
+      ok: false,
+      recipeId: recipe.id,
+      reason: insufficientMaterialsIsLockOnly(ctx, recipe, pid)
+        ? 'locked'
+        : 'insufficient_materials',
+    };
   }
   const craftSkills = meta ? meta.craftSkills : {};
   // The output's deterministic facts, hoisted above the #2350 capacity gate
@@ -505,10 +543,15 @@ export function evaluateCraftAdmission(
     const scratch = meta.inventory.map((s) => ({ ...s }));
     for (const reagent of recipe.reagents) {
       const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
+      // Lock-aware, mirroring the real removal below exactly (issue 3042):
+      // hasRecipeMaterials already refused a craft that needs a locked
+      // reagent, so this only has to keep agreeing with the real removal
+      // about WHICH slots free up, or the capacity gate could approve a
+      // craft the real removal then finds no room for.
       for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
-        countStacked(scratch, id),
+        countUnlockedInSlots(scratch, id),
       )) {
-        removeStacked(scratch, take.itemId, take.count);
+        removeUnlockedFromSlots(scratch, take.itemId, take.count);
       }
     }
     const shapes: InvSlot[][] = [];
@@ -627,12 +670,24 @@ export function resolveCraftForRecipe(
     const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
     if (required.selfSignedBonusApplied) selfSignedBonusApplied = true;
     if (meta && hasSignedInstance(meta, reagent.itemId)) signedReagentUsed = true;
-    for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
-      ctx.countItem(id, pid),
-    )) {
-      ctx.removeItem(take.itemId, take.count, pid);
+    // Lock-aware removal (issue 3042): mirrors the #2350 capacity scratch
+    // simulation above exactly (same countUnlockedInSlots/removeUnlockedFromSlots
+    // pair), so the two can never disagree about which slots free up. No meta
+    // to remove from is the same no-op ctx.removeItem already was for an
+    // unresolved pid.
+    if (meta) {
+      for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
+        countUnlockedInSlots(meta.inventory, id),
+      )) {
+        removeUnlockedFromSlots(meta.inventory, take.itemId, take.count);
+      }
     }
   }
+  // removeUnlockedFromSlots mutates the array only, unlike ctx.removeItem
+  // (which fires this itself): fire it once for the whole reagent consumption,
+  // the same one-call-at-the-end contract items.ts's own hand-rolled removal
+  // walks (removePreferFungible, removeVendorSellUnits) follow.
+  if (meta) ctx.onInventoryChangedForQuests?.(meta);
   // Jack of All Trades improviser variance roll (#1296): an ADDITIONAL
   // output-side draw, ONLY for a Jack-attuned crafter, positioned
   // immediately before the masterwork proc draw below. Every non-Jack
@@ -864,7 +919,8 @@ export function maxCraftCountForRecipe(
   if (recipe.reagents.length === 0) return CRAFT_BATCH_MAX;
   if (!meta) {
     // No meta resolves no inventory to simulate: keep the one-shot division
-    // (no self-signed copy can exist without a meta, so it cannot drift).
+    // (no self-signed copy, and by the same reasoning no locked copy either,
+    // can exist without a meta, so neither can drift here).
     let max = CRAFT_BATCH_MAX;
     for (const reagent of recipe.reagents) {
       const required = requiredReagentCount(
@@ -905,18 +961,20 @@ export function maxCraftCountForRecipe(
         isJack,
       ).count;
       if (required <= 0) continue;
-      if (countAcrossGrades(reagent.itemId, (id) => countStacked(scratch, id)) < required) {
+      // Lock-aware (issue 3042), matching hasRecipeMaterials: a locked
+      // reagent copy cannot pay for a batch craft any more than a single one.
+      if (countAcrossGrades(reagent.itemId, (id) => countUnlockedInSlots(scratch, id)) < required) {
         payable = false;
         break;
       }
       for (const take of planGradeRemoval(reagent.itemId, required, (id) =>
-        countStacked(scratch, id),
+        countUnlockedInSlots(scratch, id),
       )) {
         takes.push(take);
       }
     }
     if (!payable) break;
-    for (const take of takes) removeStacked(scratch, take.itemId, take.count);
+    for (const take of takes) removeUnlockedFromSlots(scratch, take.itemId, take.count);
     crafts++;
   }
   return crafts;

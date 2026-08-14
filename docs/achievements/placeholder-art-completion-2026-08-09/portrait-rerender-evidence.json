@@ -135,8 +135,8 @@
       "tint": "#7aa848",
       "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
       "beforeBytes": 2196,
-      "afterSha256": "1e23b41efff2235f42ab7dfc5cc467c782f4e6e9bbcf5f691019d5aa84618b0b",
-      "afterBytes": 1844
+      "afterSha256": "98edb3581974c42c519d7558f1cac0848d0f22b817125c0f1d7a28cb516a6575",
+      "afterBytes": 1866
     },
     {
       "id": "drowsy_croaker",
@@ -146,8 +146,8 @@
       "tint": "#5a9858",
       "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
       "beforeBytes": 2196,
-      "afterSha256": "d58d617071ead1f8211ea4584cb199ba653022a50c303eeeaad59676976cf1ae",
-      "afterBytes": 1812
+      "afterSha256": "c1152c0280759863294bb97ed616485ccc2560db94edb9e3075446fdae0b5b3c",
+      "afterBytes": 1862
     },
     {
       "id": "mere_lurker",
@@ -157,8 +157,8 @@
       "tint": "#a8b048",
       "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
       "beforeBytes": 2196,
-      "afterSha256": "79a58134dc658f8e31749495107d5c2738909ba848b5cb878efe79d86bedef0a",
-      "afterBytes": 1916
+      "afterSha256": "80abf56c9439c500d500aab72370cfddcc5a22671dc6fa131a936526e1d4420f",
+      "afterBytes": 1910
     },
     {
       "id": "the_meredark",
@@ -168,8 +168,8 @@
       "tint": "#5a7038",
       "beforeSha256": "2ccd6e4f35d6a9950850553b2f377b02e15a987f422dbb4663612698d267ac4e",
       "beforeBytes": 2260,
-      "afterSha256": "571ca5b7ce1dfbea6989c8d3897a2e2a8f68c2f886e918895a136592d507b07c",
-      "afterBytes": 1822
+      "afterSha256": "cc833563eb0b8d23fd293100bb0744b149004136d01b37d722a61e91fa24c220",
+      "afterBytes": 1812
     },
     {
       "id": "breach_wretch",
@@ -179,8 +179,8 @@
       "tint": "#5a4a78",
       "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
       "beforeBytes": 2196,
-      "afterSha256": "afb4783c5f98e72096ff055c57bf9f1cca69287e73e649e302aab9507ac8c40f",
-      "afterBytes": 1696
+      "afterSha256": "077eff5ac44492db84638979750ea7c3136c507a392cfeb3776603392521aaa3",
+      "afterBytes": 1672
     },
     {
       "id": "fen_sprite",
@@ -190,8 +190,8 @@
       "tint": "#cfe0ea",
       "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
       "beforeBytes": 2196,
-      "afterSha256": "9452fb7216c7a3237744d2ad6ab3fe4e28a77e96a49bf83853f784517456a6c0",
-      "afterBytes": 1722
+      "afterSha256": "96935d397978dc6c5d70fa79514423d2b0361a74dd8909fccff60cfb26cfc537",
+      "afterBytes": 1710
     },
     {
       "id": "harvest_sprite",
@@ -201,8 +201,8 @@
       "tint": "#e8c878",
       "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
       "beforeBytes": 2196,
-      "afterSha256": "451a9e94af9b7b9396262e6ba2067f8601eb6919fd7d2ebcb252bde569cb8e2b",
-      "afterBytes": 1728
+      "afterSha256": "c874aae5ec3098f8a0b71c0676d6c12df59d0d4c510b387771368f750a550be2",
+      "afterBytes": 1740
     },
     {
       "id": "hedge_gnome",
@@ -212,8 +212,8 @@
       "tint": "#5a8a46",
       "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
       "beforeBytes": 2196,
-      "afterSha256": "63d0b8b7ec80b2d8e49c599dbdab667022bc3b8635876a1db45033c370c541df",
-      "afterBytes": 1702
+      "afterSha256": "2123cc44196125373f8e32a7bdd5918fc10d3f5f1bf4b6841f2696f7a4e76660",
+      "afterBytes": 1722
     },
     {
       "id": "willow_sprite",
@@ -223,8 +223,8 @@
       "tint": "#c8e0b8",
       "beforeSha256": "1f0c4c7f81c78da127bad6af7d422f56363cd6b69ca79d7bf77dfdf1301a4735",
       "beforeBytes": 2196,
-      "afterSha256": "5f7819fadaed90ff89a31b5f6b8e09b376e807c81f8101e5a94378d89e86f8b1",
-      "afterBytes": 1692
+      "afterSha256": "931bc56628aa99719a211e4e795d7853bc354b2f7be1574189bc522eab0c6f76",
+      "afterBytes": 1740
     },
     {
       "id": "downs_bandit",
@@ -234,8 +234,8 @@
       "tint": "#5a8a46",
       "beforeSha256": "2ccd6e4f35d6a9950850553b2f377b02e15a987f422dbb4663612698d267ac4e",
       "beforeBytes": 2260,
-      "afterSha256": "63d0b8b7ec80b2d8e49c599dbdab667022bc3b8635876a1db45033c370c541df",
-      "afterBytes": 1702
+      "afterSha256": "2123cc44196125373f8e32a7bdd5918fc10d3f5f1bf4b6841f2696f7a4e76660",
+      "afterBytes": 1722
     },
     {
       "id": "wreck_thief",
@@ -245,8 +245,8 @@
       "tint": "#5a8a46",
       "beforeSha256": "2ccd6e4f35d6a9950850553b2f377b02e15a987f422dbb4663612698d267ac4e",
       "beforeBytes": 2260,
-      "afterSha256": "63d0b8b7ec80b2d8e49c599dbdab667022bc3b8635876a1db45033c370c541df",
-      "afterBytes": 1702
+      "afterSha256": "2123cc44196125373f8e32a7bdd5918fc10d3f5f1bf4b6841f2696f7a4e76660",
+      "afterBytes": 1722
     },
     {
       "id": "training_dummy",
@@ -256,8 +256,8 @@
       "tint": "#b8924a",
       "beforeSha256": "c8921f88cad3b6073808d26f4afa99571ff24fc3082b4dbbe3444b177d1eb918",
       "beforeBytes": 2234,
-      "afterSha256": "2f3e963f5346db997e4dd990ed65bf83f9915d10a5ecbe29260b28d9ac247d0e",
-      "afterBytes": 1788
+      "afterSha256": "400afcac22527f9e0145b7a1dcc39f068f8f50d265798497925559464cd70915",
+      "afterBytes": 1812
     },
     {
       "id": "gravedigger_mosley",
@@ -268,8 +268,8 @@
       "tintStrength": 0.35,
       "beforeSha256": "60fa7cfaaff1d159e1812581fee47cfea50ec2effbf919e6670d49345f068548",
       "beforeBytes": 2206,
-      "afterSha256": "699b404cd0e3b1b231b82b3d02357e94c6b3bed37bbf9f46bc6585a9ece0ba36",
-      "afterBytes": 2720
+      "afterSha256": "c609eed99dfcc2fd58fd38aa81bfcec49b5585976ea059d63a58e59c7eed5316",
+      "afterBytes": 2702
     },
     {
       "id": "castaway_navigator",
@@ -280,8 +280,8 @@
       "tintStrength": 0.35,
       "beforeSha256": "60fa7cfaaff1d159e1812581fee47cfea50ec2effbf919e6670d49345f068548",
       "beforeBytes": 2206,
-      "afterSha256": "caa41418ae0cf05ea788967c7df5e05ec61a7bf10c2e46da7041b63302839457",
-      "afterBytes": 2632
+      "afterSha256": "e037b4cc1ec3c0cfb998baf6f9dda403ddbace9dae57dc038a52ac8ac42c3137",
+      "afterBytes": 2662
     },
     {
       "id": "fisher_bram",
@@ -292,8 +292,8 @@
       "tintStrength": 0.35,
       "beforeSha256": "60fa7cfaaff1d159e1812581fee47cfea50ec2effbf919e6670d49345f068548",
       "beforeBytes": 2206,
-      "afterSha256": "9a553c04903f0326a369e12e32ab46088ac16b8df85216bd84442349cbb35d95",
-      "afterBytes": 2618
+      "afterSha256": "9e9da80613ec40aa6c5cd3964257ff7a39b2eaabbe6656856a0255934c5ea502",
+      "afterBytes": 2572
     },
     {
       "id": "cindraleth_maw_matriarch",
@@ -304,8 +304,8 @@
       "tintStrength": 0.12,
       "beforeSha256": "3ced9276b8bab34729ed74367f0ee96fdfbcb1ee8b3886a5f367388844169573",
       "beforeBytes": 2292,
-      "afterSha256": "5dd3432a2363096ff0d4bd831a36ed7419e8230248529987de2f71362c979fec",
-      "afterBytes": 2478
+      "afterSha256": "99aa475e6981edb6f34c3b5f1d9aea9aabad4323cfef6dab11fda9a847e7414e",
+      "afterBytes": 2474
     },
     {
       "id": "grubjaw",
@@ -316,8 +316,8 @@
       "tintStrength": 0.04,
       "beforeSha256": "b7b435b2ffe4ec5ae9fea107f714897b20f52252acf60dde972e72be6649d06a",
       "beforeBytes": 2062,
-      "afterSha256": "3ddba949b8d523e38f54154957b3dcd354db8bdf78f1ee9129627a38f3d7e56c",
-      "afterBytes": 2174
+      "afterSha256": "dcb6b87b10521124dd2418981cd9d572c6281927202662bc922fe652b87bd496",
+      "afterBytes": 2160
     },
     {
       "id": "the_wreck_warden",
@@ -328,8 +328,8 @@
       "tintStrength": 0.3,
       "beforeSha256": "9915b2ff188edd161fbb1b94f61d6122b9e4e58f9910f35d8f5cd100738cbc9b",
       "beforeBytes": 2828,
-      "afterSha256": "9142ba953bf15b818fb6163bd477439d8f652b94c61de67e51f25efc63429bb0",
-      "afterBytes": 2586
+      "afterSha256": "77179c62bad651d805473d92901f455d15dcfafcb0ca0e9c6c8345968e8c1cc1",
+      "afterBytes": 2612
     }
   ],
   "commonOutputContract": {

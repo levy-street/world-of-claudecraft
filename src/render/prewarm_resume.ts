@@ -79,7 +79,9 @@ export async function waitForPrefetch(
 
 export interface PrewarmResumeHooks<T extends PrewarmResumeEntry> {
   idleSlot: () => Promise<unknown>;
-  runUnit?: (unit: PrewarmResumeUnit) => void | Promise<void>;
+  /** The owning entry rides along so the runner can schedule by entry class
+   *  (link/upload debt vs cosmetic warm-up; see prewarmResumeIsDebt). */
+  runUnit?: (unit: PrewarmResumeUnit, entry: T) => void | Promise<void>;
   afterEntry?: (entry: T) => void;
   onUnitError?: (entry: T, unit: PrewarmResumeUnit, error: unknown) => void;
 }
@@ -94,6 +96,63 @@ export async function settlePrewarmBeforePublish<T>(
   } finally {
     publish();
   }
+}
+
+/**
+ * Near-first ordering for compile-debt roots (hitch-hunt P3a). The post-entry
+ * resume lane pays the boot compile debt over tens of seconds, and the roots'
+ * collection order is scene-graph order: a village the player walks toward can
+ * sit behind hundreds of unrelated roots and lose the race to its own reveal.
+ * Sorting by distance to the player makes the debt the camera can reach first
+ * the debt paid first. Stable for ties; roots without a distance sort last.
+ */
+export function orderRootsByDistanceSq<T>(
+  roots: readonly T[],
+  distanceSq: (root: T) => number | null,
+): T[] {
+  return roots
+    .map((root, index) => ({ root, index, dist: distanceSq(root) ?? Infinity }))
+    .sort((a, b) => a.dist - b.dist || a.index - b.index)
+    .map((entry) => entry.root);
+}
+
+/** Structural shape of a compile root's placement (a three mesh satisfies it
+ *  without this module importing three). */
+export interface CompileRootPlacement {
+  matrixWorld: { elements: ArrayLike<number> };
+  boundingSphere?: { center: { x: number; y: number; z: number } } | null;
+  geometry?: {
+    boundingSphere?: { center: { x: number; y: number; z: number } } | null;
+  } | null;
+}
+
+/**
+ * Camera-plane XZ distance-squared proxy for a compile root. The object's
+ * matrixWorld translation alone is a trap here: merged and instanced world
+ * content bakes its placement into the GEOMETRY and leaves the mesh at the
+ * origin, which would tie most of the debt at "distance to world origin".
+ * When three has computed a bounding sphere, its world-transformed centre is
+ * the honest position for both shapes. InstancedMesh stores its aggregate,
+ * instance-aware sphere on the object, so that bound takes precedence over
+ * the primitive-local geometry sphere. The translation is the fallback for
+ * spheres not yet computed.
+ */
+export function compileRootDistanceSq(
+  root: CompileRootPlacement,
+  camX: number,
+  camZ: number,
+): number {
+  const world = root.matrixWorld.elements;
+  const center = root.boundingSphere?.center ?? root.geometry?.boundingSphere?.center;
+  let x = world[12];
+  let z = world[14];
+  if (center) {
+    x = world[0] * center.x + world[4] * center.y + world[8] * center.z + world[12];
+    z = world[2] * center.x + world[6] * center.y + world[10] * center.z + world[14];
+  }
+  const dx = x - camX;
+  const dz = z - camZ;
+  return dx * dx + dz * dz;
 }
 
 export interface PrewarmCompileUnitOptions<T> {
@@ -186,7 +245,7 @@ export async function resumeDroppedPrewarmEntries<T extends PrewarmResumeEntry>(
     for (const unit of entry.units) {
       await hooks.idleSlot();
       try {
-        await (hooks.runUnit ? hooks.runUnit(unit) : unit.run());
+        await (hooks.runUnit ? hooks.runUnit(unit, entry) : unit.run());
       } catch (error) {
         hooks.onUnitError?.(entry, unit, error);
       }

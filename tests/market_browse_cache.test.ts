@@ -30,7 +30,9 @@ function q(search = '', extra: Partial<MarketQuery> = {}): MarketQuery {
     armorClass: 'all',
     primaryStat: 'all',
     rarity: 'all',
+    sort: 'name',
     page: 0,
+    collapseLowest: false,
     ...extra,
   };
 }

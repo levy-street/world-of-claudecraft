@@ -6,6 +6,7 @@ import type {
   ActiveFrostRing,
   ActiveTemporalHourglass,
   BankBonusSource,
+  CivicServicePlacement,
   CraftingIdentityView,
   DailyRewardHistory,
   DailyRewardLeaderboardPage,
@@ -31,6 +32,7 @@ import {
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { campSpawnOffset } from './camp_scatter';
+import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
   allocRiftCollisionToken,
@@ -271,6 +273,7 @@ import {
 } from './item_instance_load';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
+import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import type { JailState } from './jail';
 import {
@@ -327,6 +330,7 @@ import {
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
 import type { MobCombatProfile } from './mob_combat';
+import * as moderationMod from './moderation';
 import {
   cancelMountRace as cancelMountRaceImpl,
   mountRaceViewFor as mountRaceViewForImpl,
@@ -685,7 +689,7 @@ import * as valeCupMod from './social/vale_cup';
 import { createVcState, type VcState } from './social/vale_cup';
 import * as valeCupBotsMod from './social/vale_cup_bots';
 import { SpatialGrid } from './spatial';
-import { isStunDrCategory } from './stun_dr';
+import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
@@ -863,23 +867,11 @@ const ARENA_LADDER_SIZE = 10; // live online standings shipped to clients
 // logic. FIESTA_RING_CX/CZ, FIESTA_TOTAL_WAVES, and FIESTA_POWERUP_TELEGRAPH/TTL are
 // imported back (above) for the fiestaMatchInfo presentation accessor, which stays
 // on Sim. (A2 already moved FIESTA_COUNTDOWN to social/arena.ts.)
-const PVP_ROOT_DR_RESET = 18; // seconds before a repeated PvP root is fresh again
-const PVP_STUN_DR_RESET = 18; // stuns share the root-style 100/50/25/immune scheme
-const PVP_POLYMORPH_DR_RESET = 60;
-const PVP_FEAR_DR_RESET = 60;
-const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
-// Polymorph keeps an ABSOLUTE ladder on purpose: exactly one ability rides it
-// (mage polymorph, authored 15s), so the 10s first rung reads as a deliberate PvP
-// cap on a longer PvE value rather than an accident.
-const PVP_POLYMORPH_DR_DURATIONS = [10, 5, 1] as const;
-// Fear is a MULTIPLIER ladder, and must stay one. It was absolute seconds
-// ([8, 4, 2, 1]) returned without reading the ability's authored duration, so in
-// PvP every fear lasted 8s on first application no matter what its tooltip said:
-// Psychic Scream (4s) and Howl of Terror / Death Coil (3s) were all silently
-// doubled or better. Five abilities across three classes share this ladder, so an
-// absolute table can only ever be right for one of them. These factors reproduce
-// the old 8 -> 4 -> 2 -> 1 exactly for an 8s fear.
-const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
+// PVP_*_DR_* crowd-control diminishing-returns tuning (root/stun/polymorph/fear
+// reset windows, the multiplier ladder, and the polymorph/fear staged durations)
+// moved to stun_dr.ts with the two resolvers that read them
+// (crowdControlDurationAfterDr / diminishedCrowdControlDuration): the module
+// that already owns CC diminishing-return categories.
 // Exported for social/chat.ts (broadcastEmote) + the /roll say/yell ranges; the in-sim
 // say/yell distance checks read it too. /say carries a short distance; /yell across a camp.
 export const SAY_RANGE = 25;
@@ -1529,6 +1521,10 @@ export interface PlayerMeta {
   // so the player can page through and filter the WHOLE market a window at a time.
   // Never persisted, resets on login.
   marketQuery: MarketQuery;
+  // Session-only: the item id the Sell tab wants a current-lowest-listing-price
+  // reference for (issue #3043), or null when nothing is staged. Never
+  // persisted, resets on login, same as marketQuery.
+  sellPriceItemId: string | null;
   // Flat per-craft skill tracking (#1126): one independent, additive-only skill
   // value per craft on the ten-craft ring (see professions/wheel.ts). Persisted
   // in CharacterState.
@@ -1652,6 +1648,10 @@ export interface PlayerMeta {
   activeTitle: string | null;
   activeBorder: string | null;
   renown: number;
+  // NOTE: the operator-applied Cheater mark (src/sim/moderation/) deliberately
+  // keeps NO copy here. Its live aura is the one source of truth for both the
+  // remaining budget and the worn state (the aura IS the countdown), so a second
+  // field would only be a clock that drifts from it.
   // The Reliquary (src/sim/reliquary.ts): sparse first-find meta, authored
   // marks, capped recent. Item ownership stays on deedStats.itemsDiscovered;
   // this field is omit-empty on serialize and never a second full discovery set.
@@ -1990,6 +1990,8 @@ export class Sim {
   private readonly worldContent: WorldContent;
   /** Validated active-world noticeboards captured for this Sim at construction. */
   readonly noticeboardDefinitions: readonly NoticeboardDef[];
+  /** Civic services that this Sim actually spawned, captured at construction. */
+  readonly civicServicePlacements: readonly CivicServicePlacement[];
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -2304,6 +2306,10 @@ export class Sim {
       assertCanonicalEastbrookNoticeboardDef(definition);
     }
     this.noticeboardDefinitions = Object.freeze([...activeNoticeboardDefinitions]);
+    this.civicServicePlacements = buildCivicServicePlacements(
+      this.worldContent.services?.mailboxes ?? [],
+      this.noticeboardDefinitions,
+    );
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
     // immediately instead of one interval out, so a freshly (re)started realm
@@ -3023,6 +3029,7 @@ export class Sim {
       // on load too, since savedState carries no mobile-station field.
       mobileStation: null,
       marketQuery: defaultMarketQuery(),
+      sellPriceItemId: null,
       mailWelcomed: false,
       guildLetterSent: false,
       questCadence: new Map(),
@@ -5833,6 +5840,60 @@ export class Sim {
     if (r) r.e.jailed = enabled;
   }
 
+  // Apply, refresh, or lift the operator-applied Cheater mark. Server-side only:
+  // set at join restore and when an operator changes a sanction; the offline Sim
+  // never calls it. `seconds` is the remaining PLAYED-second budget; 0 lifts.
+  //
+  // The aura is the countdown (one second in world is one second of /played), so
+  // applying the mark and applying its aura are the same act. Both arms go through
+  // the ORDINARY aura paths rather than hand-editing the array, so a parse or a
+  // combat log sees the same events any other aura produces:
+  //  - apply/re-apply: applyAura already treats a same-id same-name re-application
+  //    as a refresh (it displaces the live aura in place and stamps `refresh` on
+  //    the gained event), so a shortened or extended sanction takes effect
+  //    immediately without pre-empting that with a manual splice.
+  //  - lift: remove the live aura and emit its fade, exactly as every other
+  //    removal path does. Without it the tag simply vanished from the client with
+  //    no combat-log trace.
+  // The wire flag is absent-when-empty in both arms and at natural expiry
+  // (combat/auras.ts), never `false`.
+  setCheaterMark(seconds: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    // Garbage in, no-op out: normalize collapses NaN and non-numbers to 0, and
+    // 0 is the LIFT arm, so without this guard a corrupt budget from any caller
+    // would silently end a live sanction. Only an explicit finite value may
+    // lift; anything else leaves the mark exactly as it stands.
+    if (typeof seconds !== 'number' || !Number.isFinite(seconds)) return;
+    const mark = moderationMod.normalizeCheaterMark(seconds);
+    if (mark) {
+      this.ctx.applyAura(r.e, moderationMod.cheaterMarkAura(mark, r.e.id));
+      // Derive the flag from the POST-CONDITION, not from the intent. No
+      // applyAura guard can refuse this aura today (they gate on npc/mob kinds,
+      // or on control kinds from a foreign source, and the mark is inert and
+      // self-sourced), but an intent-set flag would survive one of them
+      // widening, and the result is a tag with no countdown: the natural-expiry
+      // hook cannot fire without an aura, so only an operator lift would clear
+      // it. Reading back costs one scan on an operator action, never per tick.
+      r.e.cheaterMark =
+        r.e.auras.some((a) => a.id === moderationMod.CHEATER_MARK_AURA_ID) || undefined;
+      return;
+    }
+    const live = r.e.auras.findIndex((a) => a.id === moderationMod.CHEATER_MARK_AURA_ID);
+    if (live >= 0) {
+      const [lifted] = r.e.auras.splice(live, 1);
+      this.emit({
+        type: 'aura',
+        targetId: r.e.id,
+        name: lifted.name,
+        gained: false,
+        sourceId: lifted.sourceId,
+        abilityId: lifted.id,
+      });
+    }
+    r.e.cheaterMark = undefined;
+  }
+
   // Dev/test convenience: jump a player to a level (learns abilities, recalcs stats).
   setPlayerLevel(level: number, pid?: number): void {
     const r = this.resolve(pid);
@@ -7284,81 +7345,31 @@ export class Sim {
     return moved;
   }
 
-  /**
-   * The one funnel every PLAYER-sourced crowd-control application passes
-   * through: the diminishing-returns ladder, then the item-set duration
-   * reduction on top of it.
-   *
-   * The two are layered rather than fused because they are separate mechanisms.
-   * The ladder has five distinct exits inside its hostile branch and they do not
-   * all want the same treatment: stuns take an early return that exempts them
-   * from the ladder (a deliberate balance pass, see the comment at that site) but
-   * NOT from the set reduction, and a DR-immune target returns null, which means
-   * "apply nothing" and must pass through untouched rather than being multiplied.
-   * Applying the reduction at the generic ladder exit alone would silently miss
-   * stuns, which is the category the bonus most exists for, so it is applied here
-   * once, over whatever the ladder decided.
-   *
-   * The player/hostile gate is duplicated from the inner function on purpose: it
-   * is three cheap reads, it leaves the ladder's shape byte-identical to what
-   * shipped, and it makes the PvE-untouched property readable at one glance.
-   */
+  // The one funnel every PLAYER-sourced crowd-control application passes
+  // through: the PvP diminishing-returns ladder, then the item-set duration
+  // reduction on top of it. Body moved to stun_dr.ts (crowdControlDurationAfterDr
+  // / diminishedCrowdControlDuration, see their doc comments there); kept as a
+  // thin delegate here because SimContext-bound callers (`ctx.diminishedCrowdControlDuration`)
+  // and the in-class applyRootAura caller both resolve it on the Sim facade.
+  // Pre-bound once (not re-allocated per call): this delegate sits on the
+  // per-cast crowd-control path, including the AoE fan-outs in
+  // effect_dispatch.ts that can invoke it once per target in a single tick.
+  private readonly isHostileToBound = (a: Entity, b: Entity) => this.isHostileTo(a, b);
+
   private diminishedCrowdControlDuration(
     source: Entity,
     target: Entity,
     category: CrowdControlDrCategory,
     duration: number,
   ): number | null {
-    const base = this.crowdControlDurationAfterDr(source, target, category, duration);
-    if (base === null) return null; // already DR-immune: apply nothing at all
-    if (source.kind !== 'player' || target.kind !== 'player') return base;
-    if (!this.isHostileTo(source, target)) return base;
-    const reduction = target.ccDurationReduction ?? 0;
-    return reduction > 0 ? base * (1 - reduction) : base;
-  }
-
-  private crowdControlDurationAfterDr(
-    source: Entity,
-    target: Entity,
-    category: CrowdControlDrCategory,
-    duration: number,
-  ): number | null {
-    if (source.kind !== 'player' || target.kind !== 'player' || !this.isHostileTo(source, target)) {
-      return duration;
-    }
-    // Balance pass (maintainer): player stuns are exempt from PvP diminishing
-    // returns. They operate differently from fear: short flat durations behind
-    // real cooldowns, so the ladder only made banked stuns (Twin Gavels) feel
-    // broken. Fear, polymorph, root, and school lockouts keep their ladders.
-    if (isStunDrCategory(category)) return duration;
-    const existing = target.ccDr.get(category);
-    const stage = existing && existing.resetAt > this.time ? existing.stage : 0;
-    const reset =
-      category === 'polymorph'
-        ? PVP_POLYMORPH_DR_RESET
-        : category === 'fear'
-          ? PVP_FEAR_DR_RESET
-          : category === 'lockout'
-            ? PVP_STUN_DR_RESET
-            : isStunDrCategory(category)
-              ? PVP_STUN_DR_RESET
-              : PVP_ROOT_DR_RESET;
-    if (category === 'polymorph') {
-      target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
-      return PVP_POLYMORPH_DR_DURATIONS[Math.min(stage, PVP_POLYMORPH_DR_DURATIONS.length - 1)];
-    }
-    if (category === 'fear') {
-      target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
-      // Scales the ability's OWN duration; see PVP_FEAR_DR_MULTIPLIERS. Like
-      // polymorph and unlike root/stun, fear never reaches full immunity: the
-      // factor clamps at the last rung rather than returning null.
-      return (
-        duration * PVP_FEAR_DR_MULTIPLIERS[Math.min(stage, PVP_FEAR_DR_MULTIPLIERS.length - 1)]
-      );
-    }
-    if (stage >= PVP_CC_DR_MULTIPLIERS.length) return null;
-    target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
-    return duration * PVP_CC_DR_MULTIPLIERS[stage];
+    return diminishedCrowdControlDurationImpl(
+      this.time,
+      this.isHostileToBound,
+      source,
+      target,
+      category,
+      duration,
+    );
   }
 
   private hostilesInRadius(source: Entity, pos: Vec3, radius: number): Entity[] {
@@ -7961,9 +7972,10 @@ export class Sim {
       this.rng.range(mob.weapon.min, mob.weapon.max) +
       (this.effectiveAttackPower(mob) / 14) * mob.weapon.speed;
     // Tank crit immunity: the 5% roll is still DRAWN (stream position), a
-    // committed tank just never suffers it (combat/tank_crit_immunity.ts).
+    // committed tank just never suffers it from a HOSTILE creature; a player
+    // pet sharing this swing shell keeps its crit (combat/tank_crit_immunity.ts).
     const critRoll = this.rng.chance(0.05);
-    const crit = critRoll && !isCritImmuneTank(target, this.players.get(target.id));
+    const crit = critRoll && !isCritImmuneTank(mob, target, this.players.get(target.id));
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
@@ -8672,6 +8684,10 @@ export class Sim {
     this.targeting.tabTarget(pid);
   }
 
+  tabTargetPrev(pid?: number): void {
+    this.targeting.tabTargetPrev(pid);
+  }
+
   targetNearestEnemy(pid?: number): void {
     this.targeting.targetNearestEnemy(pid);
   }
@@ -9054,6 +9070,17 @@ export class Sim {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
     items.discardItem(this.ctx, itemId, count, pid, named);
+  }
+
+  setItemLocked(
+    itemId: string,
+    locked: boolean,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    setItemLockedCmd(this.ctx, itemId, locked, pid, named);
   }
 
   equipItem(
@@ -11230,6 +11257,10 @@ export class Sim {
     this.market.marketSearch(query, pid);
   }
 
+  marketSellPriceCheck(itemId: string | null, pid?: number): void {
+    this.market.marketSellPriceCheck(itemId, pid);
+  }
+
   marketList(itemId: string, count: number, price: number, pid?: number): void {
     this.market.marketList(itemId, count, price, pid);
   }
@@ -11839,10 +11870,6 @@ export class Sim {
 
   private grantDelveClearTo(run: DelveRun, delve: DelveDef, meta: PlayerMeta, pid: number): void {
     runsMod.grantDelveClearTo(this.ctx, run, delve, meta, pid);
-  }
-
-  private grantDelveRewards(run: DelveRun): void {
-    runsMod.grantDelveRewards(this.ctx, run);
   }
 
   private openDelveSurfaceExit(run: DelveRun): void {

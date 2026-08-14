@@ -49,6 +49,7 @@ import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, INTERACT_RANGE, type SimEvent } from '../src/sim/types';
 import { buildVendorView } from '../src/ui/hud/vendor/vendor_view';
 import { NPC_WINDOW_CLOSE_RANGE } from '../src/ui/npc_service_range';
+import { VENDOR_TEST_WORLD } from './sim_shared';
 
 function ctxOf(sim: Sim): SimContext {
   return (sim as unknown as { ctx: SimContext }).ctx;
@@ -507,7 +508,12 @@ describe('the counter sells ahead; the wield gate owns enforcement (R22)', () =>
     // The re-minted purchase-deny pin: the same drive that used to assert a
     // refusal now asserts the open counter. The refusal moved to the harvest
     // boundary, driven in the wield-gate describe below.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const { pid, hale, meta } = shopper(sim);
     expect(meta.gatheringProficiency.mining).toBe(0);
     const before = meta.copper;
@@ -526,7 +532,12 @@ describe('the counter sells ahead; the wield gate owns enforcement (R22)', () =>
     // first draft of this arm bounced off 'That item is not sold here.'
     // and passed with the deny fully restored (the vacuous-arm trap).
     // Quartermaster Bree at the Highwatch counter is the row's real home.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const anySim = sim as unknown as { entities: Map<number, Entity>; rebucket(e: Entity): void };
     const pid = sim.addPlayer('warrior', 'Climber');
     const bree = [...anySim.entities.values()].find(
@@ -555,7 +566,12 @@ describe('the counter sells ahead; the wield gate owns enforcement (R22)', () =>
     // Buyback was deliberately ungated even under the purchase-gate model;
     // with the counter open the property is now uniform, and this drive keeps
     // the mastery-reset shape (own, sell, lose the counter, buy back) honest.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const { pid, hale, meta } = shopper(sim);
     items.buyItem(ctxOf(sim), hale.id, 'iron_mining_pick', pid);
     expect(sim.countItem('iron_mining_pick', pid)).toBe(1);
@@ -571,7 +587,12 @@ describe('the counter sells ahead; the wield gate owns enforcement (R22)', () =>
   });
 
   it('leaves the entry tier-1 tool buyable by a player with no proficiency at all', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const { pid, hale, meta } = shopper(sim);
     expect(meta.gatheringProficiency.mining).toBe(0);
     sim.drainEvents();
@@ -587,7 +608,12 @@ describe('the counter sells ahead; the wield gate owns enforcement (R22)', () =>
     // wield gate reads-and-removes inventory, so a tier-3 pick held at zero
     // mining stays owned; it is merely inert at the harvest gate until the
     // counter reaches its threshold (driven below).
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const { pid, hale, meta } = shopper(sim);
     sim.addItem('mithril_mining_pick', 1, pid);
     sim.drainEvents();
@@ -627,7 +653,12 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
   }
 
   it('refuses a covering tool below its wield threshold, naming the counter, drawing nothing', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
     sim.addItem('iron_mining_pick', 1, pid);
     expect(meta.gatheringProficiency.mining).toBe(0);
@@ -651,7 +682,12 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
   });
 
   it('the boundary: denied at 39, casts at 40 with the same bags', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
     sim.addItem('iron_mining_pick', 1, pid);
     meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY - 1;
@@ -665,7 +701,12 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
   });
 
   it('the no-tool arm keeps its shape: empty bags deny WITHOUT a wield requirement', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const { pid } = miner(sim, 'ore_eastbrook_1');
 
     expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(false);
@@ -679,7 +720,12 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
   });
 
   it('the entry tool works at zero proficiency: tier 1 carries no wield requirement', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
     sim.addItem('copper_mining_pick', 1, pid);
     expect(meta.gatheringProficiency.mining).toBe(0);
@@ -697,7 +743,12 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     // swing), and the grant mints the PLAIN material (a tier-4 read would
     // mint fine_copper_ore at a tier-1 vein). Reverting either read to the
     // ownership scan fails one of the two assertions.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
     sim.addItem('copper_mining_pick', 1, pid);
     sim.addItem('thorium_mining_pick', 1, pid);
@@ -746,7 +797,12 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     // (effectiveGradeToolTier through harvestYieldItemId), driven pure. At
     // mining 70 the tier-4 pick is owned but not wieldable, so a full-grade
     // tier-3 vein yields the base material; at 85 the same bags mint fine.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const { pid, meta } = miner(sim, 'ore_eastbrook_1');
     sim.addItem('thorium_mining_pick', 1, pid);
     const t3 = GATHER_NODES.find((n) => n.id === 'ore_thornpeak_t3');

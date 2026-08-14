@@ -24,10 +24,8 @@ import {
 import type { Sim as SimType } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { moveToGraveyardForUnstuck, reviveAtGraveyardForUnstuck } from '../src/sim/spirit';
-import { dist2d, type Entity, type WorldContent } from '../src/sim/types';
+import { dist2d, type Entity, type SimEvent, type WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
-
-type AnySim = SimType & Record<string, any>;
 
 // The same stripped world the arena suites use: nothing here reads ambient
 // content, and empty camps keep each tick cheap. services (graveyards + their
@@ -43,12 +41,33 @@ const BEAST_TEMPLATE = 'wild_boar';
 const ELEMENTAL_TEMPLATE = 'water_elemental';
 const DEMON_TEMPLATE = 'emberkin';
 
-function makeWorld(): AnySim {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: TEST_WORLD }) as AnySim;
+function makeWorld(): SimType {
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: TEST_WORLD });
 }
 
-function teleport(sim: AnySim, pid: number, x: number, z: number): void {
-  const e = sim.entities.get(pid)!;
+function requireEntity(sim: SimType, pid: number): Entity {
+  const entity = sim.entities.get(pid);
+  if (!entity) throw new Error(`expected entity ${pid}`);
+  return entity;
+}
+
+function requirePet(sim: SimType, pid: number, includeDead = false): Entity {
+  const pet = sim.petOf(pid, includeDead);
+  if (!pet) throw new Error(`expected pet for ${pid}`);
+  return pet;
+}
+
+function requireCorpse(entity: Entity): NonNullable<Entity['corpsePos']> {
+  if (!entity.corpsePos) throw new Error(`expected corpse position for ${entity.id}`);
+  return entity.corpsePos;
+}
+
+function isPetReturnLine(ev: SimEvent, pid: number, text: string): boolean {
+  return ev.type === 'log' && ev.pid === pid && ev.text === text;
+}
+
+function teleport(sim: SimType, pid: number, x: number, z: number): void {
+  const e = requireEntity(sim, pid);
   e.pos.x = x;
   e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);
@@ -58,8 +77,8 @@ function teleport(sim: AnySim, pid: number, x: number, z: number): void {
 
 // A hunter's beast, through the ordinary load path, so it is a real owned entity
 // with no taming or camp setup in this stripped world.
-function giveBeast(sim: AnySim, pid: number, hp = 40): Entity {
-  const owner = sim.entities.get(pid)!;
+function giveBeast(sim: SimType, pid: number, hp = 40): Entity {
+  const owner = requireEntity(sim, pid);
   restorePet(sim.ctx, owner, {
     templateId: BEAST_TEMPLATE,
     name: 'Rip',
@@ -68,16 +87,16 @@ function giveBeast(sim: AnySim, pid: number, hp = 40): Entity {
     dead: false,
     mode: 'defensive',
   });
-  return sim.petOf(pid, true)!;
+  return requirePet(sim, pid, true);
 }
 
 // A summoned pet (mage elemental, warlock demon) through the ordinary summon path.
-function giveSummon(sim: AnySim, pid: number, templateId: string): Entity {
-  summonPet(sim.ctx, sim.entities.get(pid)!, templateId);
-  return sim.petOf(pid)!;
+function giveSummon(sim: SimType, pid: number, templateId: string): Entity {
+  summonPet(sim.ctx, requireEntity(sim, pid), templateId);
+  return requirePet(sim, pid);
 }
 
-function kill(sim: AnySim, e: Entity): void {
+function kill(sim: SimType, e: Entity): void {
   sim.dealDamage(null, e, e.maxHp + 100, false, 'physical', null, 'hit', true);
 }
 
@@ -86,7 +105,7 @@ function ownerWithPet(
   cls: 'hunter' | 'mage' | 'warlock',
   petHp = 40,
 ): {
-  sim: AnySim;
+  sim: SimType;
   pid: number;
   owner: Entity;
   pet: Entity;
@@ -95,7 +114,7 @@ function ownerWithPet(
   const pid = sim.addPlayer(cls, 'Owner') as number;
   sim.setPlayerLevel(12, pid);
   teleport(sim, pid, 0, -40);
-  const owner = sim.entities.get(pid)!;
+  const owner = requireEntity(sim, pid);
   const pet =
     cls === 'hunter'
       ? giveBeast(sim, pid, petHp)
@@ -105,9 +124,9 @@ function ownerWithPet(
 }
 
 // Walk the ghost back to within CORPSE_REZ_RANGE of its body and resurrect there.
-function runBackAndResurrect(sim: AnySim, pid: number): void {
-  const owner = sim.entities.get(pid)!;
-  const corpse = owner.corpsePos!;
+function runBackAndResurrect(sim: SimType, pid: number): void {
+  const owner = requireEntity(sim, pid);
+  const corpse = requireCorpse(owner);
   owner.pos = { ...corpse };
   owner.prevPos = { ...owner.pos };
   sim.rebucket(owner);
@@ -134,7 +153,7 @@ describe('a resurrected owner gets the pet their death took', () => {
     expect(owner.dead).toBe(false);
 
     // Same entity: the beast keeps its corpse, so it is stood back up, not rebuilt.
-    const back = sim.petOf(pid)!;
+    const back = requirePet(sim, pid);
     expect(back.id).toBe(petId);
     expect(back.dead).toBe(false);
     expect(back.hp).toBe(revivedHp(back));
@@ -161,7 +180,7 @@ describe('a resurrected owner gets the pet their death took', () => {
     sim.releaseSpirit(pid);
     expect(sim.resurrectAtSpiritHealer(pid)).toBe(true);
 
-    const back = sim.petOf(pid)!;
+    const back = requirePet(sim, pid);
     expect(back.id).toBe(petId);
     expect(back.dead).toBe(false);
     expect(back.hp).toBe(revivedHp(back));
@@ -185,7 +204,7 @@ describe('a resurrected owner gets the pet their death took', () => {
     reviveAtGraveyardForUnstuck(sim.ctx, pid);
     expect(owner.dead).toBe(false);
 
-    const back = sim.petOf(pid)!;
+    const back = requirePet(sim, pid);
     expect(back.id).not.toBe(petId); // rebuilt, so a NEW entity
     expect(back.templateId).toBe(DEMON_TEMPLATE);
     expect(back.name).toBe(petName);
@@ -200,14 +219,15 @@ describe('a resurrected owner gets the pet their death took', () => {
     kill(sim, owner);
     sim.releaseSpirit(pid);
     const before = sim.tick(); // drain the release tick's events
-    expect(before.some((ev: any) => ev.text?.includes('returns to your side'))).toBe(false);
+    expect(before.some((ev) => ev.type === 'log' && ev.text.includes('returns to your side'))).toBe(
+      false,
+    );
 
     runBackAndResurrect(sim, pid);
     const events = sim.tick();
-    const lines = events.filter((ev: any) => ev.type === 'log' && ev.pid === pid);
-    expect(lines.filter((ev: any) => ev.text === `${pet.name} returns to your side.`)).toHaveLength(
-      1,
-    );
+    expect(
+      events.filter((ev) => isPetReturnLine(ev, pid, `${pet.name} returns to your side.`)),
+    ).toHaveLength(1);
   });
 });
 
@@ -277,7 +297,7 @@ describe('the pet return never hands back a pet the death did not take', () => {
     sim.releaseSpirit(pid);
     runBackAndResurrect(sim, pid);
 
-    const back = sim.petOf(pid)!;
+    const back = requirePet(sim, pid);
     kill(sim, back); // the owner loses the beast again, on their own time
     sim.revivePlayerAt(pid, owner.pos, 1); // a second revive owes nothing
     expect(sim.petOf(pid)).toBeNull();

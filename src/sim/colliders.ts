@@ -254,7 +254,6 @@ export const SUPPORT_OVERLAP = 0.5;
 // tops above stay untouched: cameraTopY for a campfire includes the flame,
 // but the SOLID obstacle is only the log pile, which is what a jump clears.
 // Exported so tests pin against the one authoritative value.
-export const CRATE_TOP = 1.35;
 export const CAMPFIRE_MOVE_TOP = 0.55;
 export { campCrateShape } from './prop_layout';
 // Standable roofs, all MEASURED from the shipped GLBs at the scales the

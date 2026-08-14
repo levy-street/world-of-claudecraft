@@ -118,7 +118,6 @@ export const CAST_COMPLETE_EPS = 1e-9;
 // erroring, and fires the instant the current cast completes.
 export const CAST_QUEUE_WINDOW_SEC = 0.4;
 export const FISHING_CAST_ID = 'fishing';
-export const FISHING_CAST_NAME = 'Fishing';
 // The constant castTotal/castRemaining of a fishing session (Professions 2.0,
 // retiring the fixed FISHING_CAST_TIME cast): a generous cap that
 // carries ZERO information about the hidden bite (max bite delay plus max
@@ -488,6 +487,13 @@ export type AuraKind =
   // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
   | 'buff_scale'
   | 'buff_jump'
+  // The operator-applied Cheater mark's countdown readout (src/sim/moderation/
+  // cheater_mark.ts). DELIBERATELY INERT: no stat fold, no combat branch, and no
+  // recalc reads it, so the sanction is visibility and never a handicap. It is a
+  // distinct kind rather than a zeroed borrow of a real debuff so that intent is
+  // unmistakable and no later tuning pass can quietly give it a mechanical
+  // effect. Classified as a debuff for the buff-bar sort only.
+  | 'cheater_mark'
   // Percent raid buffs (vanilla group-buff style). Value is stored as integer percent
   // POINTS (5 = +5%, 10 = +10%) so it survives the integer-rounding talent value
   // multiplier; divided by 100 when folded in recalcPlayerStats. Distinct from
@@ -671,10 +677,10 @@ export interface Aura {
   // review finding: a 300 bank paid 330 under a +10% damage buff).
   finalDamage?: boolean;
   // Chronomancy Temporal Echo bookkeeping (temporal_echo auras only). echoGroup
-  // marks the ORIGIN: false/undefined = the single-target Temporal Echo (35% ST /
+  // marks the ORIGIN: false/undefined = the single-target Temporal Echo (40% ST /
   // 15% AoE conversion), true = a Cascada temporal group echo (13% ST / 6% AoE).
   // echoConvertRate stores the single-target coefficient the mark converts at
-  // (0.35 or 0.13); the AoE rate is derived from echoGroup. Both are read only by
+  // (0.4 or 0.13); the AoE rate is derived from echoGroup. Both are read only by
   // combat/chronomancy.ts during Arcane-damage conversion (server-authoritative and
   // offline), so they never need to ride the wire.
   echoGroup?: boolean;
@@ -1212,6 +1218,14 @@ export interface ItemInstancePayload {
    *  boundTo, nothing item-specific. Additive and JSONB-safe: an absent flag is
    *  an ordinary freely-tradeable instance. */
   bindOnTrade?: boolean;
+  /** Player-toggled safety mark (issue 3042, item_lock.ts isItemLocked): while
+   *  true this specific copy refuses salvage, profession-craft reagent
+   *  consumption, and vendor sell (single and bulk) until the player unlocks
+   *  it again. Nothing to do with boundTo/bindOnTrade above (a content/trade
+   *  rule nobody chooses) or the def-level noVendorSell/noDiscard flags
+   *  (items.ts): this is an optional mark the owner sets on an otherwise
+   *  ordinary copy. */
+  locked?: boolean;
   /** Long-term Rift gear progression. `rolled.stats` is the authoritative
    * aggregate bonus consumed by recalcPlayerStats; this record explains how it
    * was earned and lets forge operations rebuild it deterministically. */
@@ -4551,6 +4565,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */
   jailed?: boolean;
+  /** Wearing the operator-applied Cheater tag (src/sim/moderation/). Server-set
+   *  via setCheaterMark at join restore and when an operator applies or lifts a
+   *  mark; never true offline, never user-settable. Cosmetic: nothing reads it
+   *  for power, and the countdown lives on the mark's own aura. */
+  cheaterMark?: boolean;
   /** True for a mob spawned BY a delve affix (e.g. Restless Graves' Raised
    *  Bonewalker). Affix re-trigger checks exclude these so an affix-spawned mob's
    *  own death can never re-trigger the same affix (would otherwise chain forever). */
@@ -4942,7 +4961,7 @@ export interface MountRaceSession {
 // coordinates and content-local coordinates at invocation time so operators can
 // group repeated problem spots across separate instance slots. Stable codes only:
 // player-facing prose is assembled by the client i18n catalog.
-export type UnstuckAreaKind = 'overworld' | 'dungeon' | 'delve' | 'rift';
+export type UnstuckAreaKind = 'overworld' | 'dungeon' | 'delve' | 'rift' | 'battleground';
 
 export interface UnstuckArea {
   kind: UnstuckAreaKind;
@@ -5164,7 +5183,16 @@ export type SimEvent = { pid?: number } & (
       expiresAt: number;
       candidates: { pid: number; name: string }[];
     }
-  | { type: 'error'; text: string; reason?: ErrorReason }
+  | {
+      type: 'error';
+      text: string;
+      reason?: ErrorReason;
+      // Optional stable identity and data for server-authored error events.
+      // `text` remains the compatibility fallback for older or unknown clients.
+      code?: string;
+      channel?: string;
+      retryAfterSeconds?: number;
+    }
   | { type: 'questAccepted'; questId: string }
   | {
       type: 'questProgress';
@@ -5878,6 +5906,7 @@ export type SimEvent = { pid?: number } & (
       reason?:
         | 'unknown_recipe'
         | 'insufficient_materials'
+        | 'locked'
         | 'combo_requirement_unmet'
         | 'recipe_not_learned'
         | 'throttled'
@@ -5960,7 +5989,8 @@ export type SimEvent = { pid?: number } & (
         | 'not_held'
         | 'throttled'
         | 'no_bag_space'
-        | 'busy';
+        | 'busy'
+        | 'locked';
     }
   // Tool-effect action outcome (the acquisition craft): the one result event
   // for the slot_tool_effect and recharge_tool_effect commands, mirroring
@@ -7610,12 +7640,6 @@ export interface DrownedLitanyBaptistryState {
   burstIds: number[];
 }
 
-export interface DelveDailyState {
-  date: string;
-  firstClearXp: string[];
-  markClears: number;
-}
-
 export interface DelveCompanionDef {
   id: string;
   name: string;
@@ -7710,8 +7734,6 @@ export const RITE_SHRINE_KINDS: RiteShrineKind[] = [
 /** Player-chosen rite difficulty: more playbacks + shorter for Easy, fewer + longer
  * for Hard. Loot ceiling rises with difficulty (Easy=low, Medium=medium, Hard=premium). */
 export type RiteIntensity = 'easy' | 'medium' | 'hard';
-
-export const RITE_INTENSITIES: RiteIntensity[] = ['easy', 'medium', 'hard'];
 
 /** Per-run Drowned Reliquary Rite puzzle state (DelveRun.drownedLitanyRite). */
 export interface DrownedLitanyRiteState {

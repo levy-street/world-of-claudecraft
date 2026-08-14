@@ -134,39 +134,43 @@ delveDaily: {
 }
 ```
 
-- **FR-5.1** On UTC date change, reset `delveDaily` to `{ date: today, firstClearXp: empty, markClears: 0 }`.
+- **FR-5.1** On reset-day change (the realm daily boundary supplied by the host as `resetDay`, not a UTC calendar date; see `refreshDelveDaily`), reset `delveDaily` to `{ date: today, firstClearXp: empty, markClears: 0 }`.
 - **FR-5.2** **First-clear XP bonus** (Normal 700 / Heroic 1050 solo): granted only if `${delveId}:${tierId}` not in `firstClearXp` for today; else repeat XP (420 / 650).
-- **FR-5.3** **Mark payout:** full Marks for first **3** completions per UTC day (`markClears < 3`). After 3: Normal 50% chance for 1 Mark; Heroic 1 Mark guaranteed.
+- **FR-5.3** **Mark payout:** full Marks for first **3** completions per reset day (`markClears < 3`). After 3: Normal 50% chance for 1 Mark; Heroic 1 Mark guaranteed. The chest/rite loot-tier **bonus Marks** ride the same window: they pay only on a clear that was one of the day's first 3 (`delveBonusMarksFor`); the copper half of the bonus and the loot tier itself are not windowed.
 - **FR-5.4** Copper and basic loot always available regardless of daily caps.
 
-> **Implementation note (v0.10.0).** This formula is implemented in
-> `delveMarkPayout` (full = 1 base Mark × tier `rewardMult`; after 3/day the
-> diminished rule applies; the lockpick ante adds a separate tier bonus). The
-> §6.7 Heroic "+30% Marks" rides `rewardMult` (1.3) but rounds to no per-clear
-> change at the base of 1 Mark, so the Heroic mark advantage is realised through
-> the post-3 guaranteed-vs-50% rule (and the ante bonus). The §6.6 per-tier XP
-> table (Heroic 1050/650, copper 16–24) is **not** yet wired — XP/copper are the
-> same both tiers today; a per-tier XP pass is tracked roadmap.
+> **Implementation note (v0.38.0).** This formula is implemented in
+> `delveMarkPayout`: an in-window clear pays 1 Mark on Normal and 2 on Heroic
+> (the Drowned Litany doubles both), after 3/day the diminished rule applies,
+> and the lockpick ante adds a separate tier bonus, which since v0.38.0 pays
+> only inside the 3-clear window per FR-5.3. The §6.7 Heroic "+30% Marks"
+> rides `rewardMult` (1.3) but rounds to no per-clear change at the base of
+> 1 Mark; the realised Heroic mark advantage is the in-window 2-vs-1, the
+> post-3 guaranteed-vs-50% rule, and the ante bonus. The §6.6 per-tier XP and
+> copper premiums ARE wired: each tier's `firstClearXp` / `repeatClearXp` /
+> copper band is authored on the tier record and read by `grantDelveClearTo`.
 
 ### 6.6 Rewards & economy
 
 - **FR-6.1** `delveMarks: number` on `PlayerMeta` (meta counter, not inventory item).
-- **FR-6.2** XP/copper per tier (solo); duo ~80% per member via `eligible.length` party split.
+- **FR-6.2** XP/copper per tier (solo); duo ~80% per member via `eligible.length` party split. Each delve authors its own bands (tier records in `src/sim/content/delves/`):
 
-| Tier | First clear XP | Repeat clear XP | Copper |
-|------|---------------:|----------------:|-------:|
-| Normal | 700 | 420 | 8–14 |
-| Heroic | 1,050 | 650 | 16–24 |
+| Delve | Tier | First clear XP | Repeat clear XP | Copper |
+|-------|------|---------------:|----------------:|-------:|
+| Collapsed Reliquary | Normal | 700 | 420 | 8-14 |
+| Collapsed Reliquary | Heroic | 1,050 | 650 | 16-24 |
+| Drowned Litany | Normal | 1,250 | 760 | 18-30 |
+| Drowned Litany | Heroic | 1,850 | 1,140 | 32-48 |
 
-- **FR-6.3** Companion upgrade costs (Acolyte Tessa):
+- **FR-6.3** Companion upgrade costs (shared by every companion via
+  `COMPANION_UPGRADE_COSTS`; max rank `DELVE_COMPANION_MAX_RANK` = 3, no
+  copper component):
 
 | Rank | Cost | Cumulative marks |
 |------|------|------------------|
 | 1 | Free (intro) | 0 |
-| 2 | 4 Marks + 20 copper | 4 |
-| 3 | 9 Marks + 60 copper | 13 |
-| 4 | 16 Marks + 1s 20c | 29 |
-| 5 | 28 Marks + 2 silver | **57** |
+| 2 | 3 Marks | 3 |
+| 3 | 5 Marks | **8** |
 
 - **FR-6.4** Lore journal: `delveLoreUnlocked: Set<string>` — five entries unlock across repeat clears.
 - **FR-6.5** Completion chest uses `rollGroup` loot tables per tier (see §9).
@@ -460,9 +464,9 @@ All strings via `t('delveUi.*')` + `entity_i18n` manifest entries for NPCs/mobs/
 - Recover `chapel_coffer_relic` + kill boss; **no** Hollow Crypt quest cross-credit.
 - Second run (new seed): different spawn set / side room.
 - Heroic: 1 affix + improved chest; intro candle burns blue.
-- Solo: **Acolyte Tessa** auto-spawns; rank 2 unlockable with 4 Marks after first clear.
+- Solo: **Acolyte Tessa** auto-spawns; rank 2 unlockable with 3 Marks after first clear.
 - Boss telegraphs match approved copy (Bell Toll + Raise Dead interrupt).
-- Rewards: Normal 700/420 XP first/repeat per daily rules; 57 Marks to max Tessa.
+- Rewards: Normal 700/420 XP first/repeat per daily rules; 8 Marks to max Tessa.
 - Five lore journal entries unlock across repeat clears.
 - Death: first = module entry 50% HP; second = fail + eject, no completion rewards.
 - Progress persists; online/offline identical; `npm test` green; full i18n all locales.

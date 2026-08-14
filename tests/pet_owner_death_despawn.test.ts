@@ -4,6 +4,7 @@ import { createMob } from '../src/sim/entity';
 import { completeTame, petOf } from '../src/sim/pet/pet_commands';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Regression for the "immortal pet" bug: when a Hunter or Warlock OWNER dies, their
 // pet/demon used to keep living forever. handleDeath's player branch tore down the
@@ -34,7 +35,12 @@ function killEntity(sim: AnySim, e: AnyEntity): void {
 
 describe('a dead owner does not leave an immortal pet', () => {
   it('a slain hunter leaves a revivable pet corpse, not an immortal pet', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'hunter', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'hunter',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const hid = sim.addPlayer('hunter', 'Owner') as number;
     sim.setPlayerLevel(12, hid);
     const hunter = sim.entities.get(hid) as AnyEntity;
@@ -60,7 +66,12 @@ describe('a dead owner does not leave an immortal pet', () => {
   });
 
   it('a slain warlock unravels their demon (fully despawns), not immortal', () => {
-    const sim = new Sim({ seed: 13, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 13,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const wpid = sim.addPlayer('warlock', 'Demonist') as number;
     sim.setPlayerLevel(12, wpid);
     const warlock = sim.entities.get(wpid) as AnyEntity;
@@ -81,7 +92,12 @@ describe('a dead owner does not leave an immortal pet', () => {
 
   it('is deterministic: the same seed kills the pet identically', () => {
     const run = () => {
-      const sim = new Sim({ seed: 21, playerClass: 'hunter', noPlayer: true }) as AnySim;
+      const sim = new Sim({
+        seed: 21,
+        playerClass: 'hunter',
+        noPlayer: true,
+        world: EMPTY_TEST_WORLD,
+      }) as AnySim;
       const hid = sim.addPlayer('hunter', 'Owner') as number;
       sim.setPlayerLevel(12, hid);
       const hunter = sim.entities.get(hid) as AnyEntity;

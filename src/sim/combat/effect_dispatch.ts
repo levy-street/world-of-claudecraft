@@ -200,6 +200,7 @@ import { benisonAfterAbility } from './priest/benison';
 import { doctrineAfterAbility } from './priest/doctrine';
 import { priestAfterAbility, priestOnGroupHeal } from './priest/talents';
 import { gloomtitheStacksForCast, vespersAfterAbility } from './priest/vespers';
+import { isPullEligible } from './pull_eligibility';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
@@ -1094,7 +1095,7 @@ export function runEffects(
         // then the members nearest the primary within radius, capped at maxTargets)
         // BEFORE any heal or aura is applied. Each target then takes a small initial
         // heal (Spell-Power-scaled, can crit) and a 13% group echo; the overlap rule
-        // in placeGroupEcho keeps a pre-existing individual mark at 35%. The Arcane
+        // in placeGroupEcho keeps a pre-existing individual mark at 40%. The Arcane
         // conversion lives in combat/chronomancy.ts. (mage-chronomancy.md Phase 4)
         const primary = target ?? p;
         if (primary !== p && ctx.isHostileTo(p, primary)) break;
@@ -2254,7 +2255,7 @@ export function runEffects(
         for (const m of aoeTargets) {
           const sunVerdictMark = ability.id === DAWNFALL_ID ? sunVerdictMarkForHit(m, p.id) : null;
           const boss = m.kind === 'mob' && MOBS[m.templateId]?.boss === true;
-          if (eff.pullToCenter && !boss) {
+          if (eff.pullToCenter && !boss && isPullEligible(m)) {
             const pulled = ctx.resolveMove(
               m.pos.x,
               m.pos.z,

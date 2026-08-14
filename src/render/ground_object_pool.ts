@@ -1,4 +1,5 @@
 import type * as THREE from 'three';
+import type { Entity } from '../sim/types';
 
 // Ground-object pool: Renderer.createView's generic ground-quest-object branch
 // (the `e.kind === 'object'` arm past the bespoke door/rift/mailbox/noticeboard/
@@ -25,6 +26,17 @@ import type * as THREE from 'three';
 export interface PooledObjectView {
   group: THREE.Group;
   height: number;
+}
+
+/** The pool bucket a ground object belongs to, or null when it must never be pooled.
+ *  Keyed on the item id because that is what decides the built geometry; the bespoke
+ *  dungeon portals are excluded because they are one-off builds, not template clones.
+ *  Lives here rather than on the renderer so the key and the pool that stores under it
+ *  cannot drift apart. */
+export function groundObjectPoolKey(e: Entity): string | null {
+  if (e.kind !== 'object' || !e.objectItemId) return null;
+  if (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit') return null;
+  return `object:${e.objectItemId}`;
 }
 
 export function takePooledObject(

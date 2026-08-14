@@ -268,7 +268,7 @@ node scripts/gate_select.mjs
 ```
 
 It runs the same step list as the full gate with one substitution: the full Vitest
-run becomes an always-run set plus `vitest related`, and it falls back to the full
+run becomes one merged `vitest related` invocation (the always-run floor rides it as seeds), and it falls back to the full
 suite for any change it cannot reason about. When you want the whole suite locally,
 the full gate remains the deeper check:
 

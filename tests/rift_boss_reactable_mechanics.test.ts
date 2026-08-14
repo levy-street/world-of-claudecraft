@@ -38,9 +38,24 @@ import {
   RIFT_MECHANIC_WINDUP_SEC,
   RIFT_POST_MECHANIC_SWING_GAP_SEC,
 } from '../src/sim/mob/rift_escape_window';
+import {
+  RIFT_MIN_ZONE_REACTION_SEC,
+  RIFT_RANK_MECHANIC_BUDGET,
+  RIFT_S_ZONE_TEMPO,
+  riftDeathZoneFuse,
+  riftDeathZoneReactionBudget,
+} from '../src/sim/rift/ranks';
 import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
-import { DT, dist2d, type Entity, type SimEvent } from '../src/sim/types';
+import {
+  DT,
+  dist2d,
+  type Entity,
+  type MobTemplate,
+  type RiftTier,
+  RUN_SPEED,
+  type SimEvent,
+} from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const SPACING = RIFT_MECHANIC_SPACING_SEC;
@@ -624,5 +639,72 @@ describe('windup lifecycle and invariants', () => {
       return (sim as any).rng.next();
     };
     expect(drawAfterSwings(true)).toBe(drawAfterSwings(false));
+  });
+});
+
+// 5. The fuse is not the reaction window. A zone anchors ON a player, so the
+//    anchor spends radius/RUN_SPEED of the fuse just running clear and only the
+//    remainder is time to notice the circle and commit to moving. Nothing
+//    checked that remainder, so Bonelord Xarreth shipped v0.37.0 with a 2.5s
+//    Soul Grave (0.46s left at S) and a 3.0s Death Sentence (0.53s, and at S
+//    that one is the barrage, one zone under every living member) while the
+//    rest of the roster sat at 1.16s or better. Both read as undodgeable in
+//    playtest. This guard is roster-wide and rank-wide on purpose: the defect
+//    was authored per boss, so a per-boss assertion would have missed it too.
+describe('every lethal death zone leaves real time to react', () => {
+  const RANKS: RiftTier[] = ['C', 'B', 'A', 'S'];
+  const ZONE_KEYS = ['deathZoneCast', 'deathZoneStrike'] as const;
+
+  /** Ranks a gated mechanic actually fires at: a boss runs the head of its
+   * rankMechanics list (C=1 .. S=4), and an unlisted gated key never fires. */
+  const liveRanks = (tmpl: MobTemplate, key: string): RiftTier[] => {
+    const index = tmpl.rankMechanics?.indexOf(key) ?? -1;
+    if (index < 0) return [];
+    return RANKS.filter((rank) => index < RIFT_RANK_MECHANIC_BUDGET[rank]);
+  };
+
+  const zones = RIFT_BOSS_IDS.flatMap((id) =>
+    ZONE_KEYS.flatMap((key) => {
+      const tmpl = MOBS[id];
+      const def = tmpl?.[key];
+      if (!def) return [];
+      return liveRanks(tmpl, key).map((rank) => ({ id, name: tmpl.name, def, rank }));
+    }),
+  );
+
+  it('covers the whole roster (the list is not silently empty)', () => {
+    // A budget guard that enumerates nothing passes vacuously. Every rift boss
+    // authors both zones, and both sit at rankMechanics indices 2 and 3 across
+    // the procedural roster, so the live set is substantial at A and S.
+    expect(zones.length).toBeGreaterThan(15);
+    expect(new Set(zones.map((z) => z.id)).size).toBeGreaterThan(5);
+  });
+
+  it.each(zones)(
+    '$name $def.name at rank $rank leaves at least the reaction floor',
+    ({ def, rank }) => {
+      const budget = riftDeathZoneReactionBudget(def.castTime, def.radius, rank);
+      expect(budget).toBeGreaterThanOrEqual(RIFT_MIN_ZONE_REACTION_SEC);
+    },
+  );
+
+  it('the budget is the fuse minus the run out of the zone, not the fuse', () => {
+    // Pins the shape of the math itself, so a future edit cannot quietly
+    // redefine "budget" as the fuse and turn the guard above vacuous.
+    const castTime = 3.5;
+    const radius = 9;
+    expect(riftDeathZoneFuse(castTime, 'A')).toBeCloseTo(3.5, 5);
+    expect(riftDeathZoneFuse(castTime, 'S')).toBeCloseTo(3.5 * RIFT_S_ZONE_TEMPO, 5);
+    expect(riftDeathZoneReactionBudget(castTime, radius, 'S')).toBeCloseTo(
+      3.5 * RIFT_S_ZONE_TEMPO - radius / RUN_SPEED,
+      5,
+    );
+  });
+
+  it('would have failed on the shipped v0.37.0 Xarreth cast times', () => {
+    // The regression itself, stated as a number: this is what the guard exists
+    // to catch, and it must stay below the floor or the floor means nothing.
+    expect(riftDeathZoneReactionBudget(2.5, 9, 'S')).toBeLessThan(RIFT_MIN_ZONE_REACTION_SEC);
+    expect(riftDeathZoneReactionBudget(3.0, 11, 'S')).toBeLessThan(RIFT_MIN_ZONE_REACTION_SEC);
   });
 });

@@ -10,25 +10,34 @@ const privateImpl = fileURLToPath(new URL('../private/bot_detector/src/index.ts'
 const stubImpl = fileURLToPath(new URL('../server/bot_detector/stub.ts', import.meta.url));
 const usePrivate = existsSync(privateImpl);
 
-await Promise.all([
-  esbuild.build({
-    entryPoints: ['server/main.ts'],
-    bundle: true,
-    platform: 'node',
-    format: 'cjs',
-    external: ['pg-native', 'bufferutil', 'utf-8-validate'],
-    outfile: 'dist-server/server.cjs',
-    alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
-  }),
-  esbuild.build({
-    entryPoints: ['scripts/migrate_old_cragmaw_pelt.ts'],
-    bundle: true,
-    platform: 'node',
-    format: 'cjs',
-    external: ['pg-native'],
-    outfile: 'dist-server/migrate_old_cragmaw_pelt.cjs',
-    alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
-  }),
-]);
+await esbuild.build({
+  entryPoints: ['server/main.ts'],
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  external: ['pg-native', 'bufferutil', 'utf-8-validate'],
+  outfile: 'dist-server/server.cjs',
+  alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
+});
+
+await esbuild.build({
+  entryPoints: ['scripts/migrate_old_cragmaw_pelt.ts'],
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  external: ['pg-native'],
+  outfile: 'dist-server/migrate_old_cragmaw_pelt.cjs',
+  alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
+});
+
+await esbuild.build({
+  entryPoints: ['scripts/migrate_rift_forge_rollback.ts'],
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  external: ['pg-native'],
+  outfile: 'dist-server/migrate_rift_forge_rollback.cjs',
+  alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
+});
 
 console.log(`[build:server] bot detector: ${usePrivate ? 'private' : 'stub (no-op)'}`);

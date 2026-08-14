@@ -1,19 +1,17 @@
 import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildFullGateSteps, I18N_ARTIFACTS } from '../scripts/lib/gate_steps.mjs';
+import {
+  buildFullGateSteps,
+  I18N_ARTIFACTS,
+  MANIFEST_ARTIFACTS,
+} from '../scripts/lib/gate_steps.mjs';
 import {
   GATE_CACHE_TASK_INVENTORY,
   GATE_CACHEABLE_TASKS,
   GATE_NON_CACHEABLE_TASKS,
   isTurboGateStep,
-  resolveTurboBin,
   turboRunArgs,
 } from '../scripts/lib/gate_task_cache.mjs';
-
-// buildFullGateSteps(workers) with no explicit opts.repoRoot falls back to
-// process.cwd(), which vitest always runs from the repo root.
-const EXPECTED_TURBO_BIN = resolveTurboBin(process.cwd());
 
 const turboJson = JSON.parse(readFileSync(new URL('../turbo.json', import.meta.url), 'utf8')) as {
   cacheDir?: string;
@@ -29,7 +27,7 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 };
 
 describe('turboRunArgs', () => {
-  it('builds argv for the resolved turbo binary with stream UI, no leading "turbo" token', () => {
+  it('builds turbo run argv with stream UI', () => {
     expect(turboRunArgs(['i18n:gen'])).toEqual(['run', 'i18n:gen', '--ui=stream']);
     expect(turboRunArgs(['check:types', 'build:env', 'build:server'])).toEqual([
       'run',
@@ -43,15 +41,6 @@ describe('turboRunArgs', () => {
   it('rejects empty or invalid task lists', () => {
     expect(() => turboRunArgs([])).toThrow(/at least one/);
     expect(() => turboRunArgs([''])).toThrow(/invalid task/);
-  });
-});
-
-describe('resolveTurboBin', () => {
-  it('resolves the pnpm-hoisted binary under the given repoRoot with a platform-appropriate suffix', () => {
-    const suffix = process.platform === 'win32' ? '.cmd' : '';
-    expect(resolveTurboBin('/repo')).toBe(
-      path.join('/repo', 'node_modules', '.bin', `turbo${suffix}`),
-    );
   });
 });
 
@@ -88,6 +77,15 @@ describe('gate cache inventory vs turbo.json', () => {
     const inputs = turboJson.tasks['i18n:gen'].inputs ?? [];
     expect(inputs.some((p) => p.includes('i18n.catalog'))).toBe(true);
     expect(inputs.some((p) => p.includes('i18n.locales'))).toBe(true);
+  });
+
+  it('invalidates the server bundle when either Rift rollback migration source changes', () => {
+    expect(turboJson.tasks['build:server'].inputs).toEqual(
+      expect.arrayContaining([
+        'scripts/migrate_rift_forge_rollback.ts',
+        'scripts/rift_forge_rollback_migration.ts',
+      ]),
+    );
   });
 });
 
@@ -130,7 +128,7 @@ describe('buildFullGateSteps orchestration', () => {
 
     const artifacts = byName['i18n + wiki + sfx artifacts'];
     expect(isTurboGateStep(artifacts.cmd, artifacts.args)).toBe(true);
-    expect(artifacts.cmd).toBe(EXPECTED_TURBO_BIN);
+    expect(artifacts.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
     expect(artifacts.args).toEqual(
       expect.arrayContaining(['run', 'i18n:gen', 'wiki:content', 'sfx:check']),
     );
@@ -138,6 +136,32 @@ describe('buildFullGateSteps orchestration', () => {
     expect(byName['i18n freshness'].args).toEqual(
       expect.arrayContaining(['diff', '--exit-code', ...I18N_ARTIFACTS]),
     );
+    // The manifest arm mirrors the i18n one, pinned to the SAME constant the
+    // three-way weld checks (tests/ci_workflow.test.ts): trackedness closes
+    // the deleted-then-regenerated untracked-file escape, while a diff argv
+    // that drifts from MANIFEST_ARTIFACTS would prove fewer files than the
+    // classifier declassifies.
+    expect(byName['sfx manifest regen'].cmd).toBe('node');
+    expect(byName['sfx manifest regen'].args).toEqual(['scripts/build_sfx_manifest.mjs']);
+    expect(byName['media manifest regen'].cmd).toBe('node');
+    expect(byName['media manifest regen'].args).toEqual([
+      'scripts/build_media_manifest.mjs',
+      'generate',
+    ]);
+    expect(byName['manifest trackedness'].cmd).toBe('git');
+    expect(byName['manifest trackedness'].args).toEqual([
+      'ls-files',
+      '--error-unmatch',
+      '--',
+      ...MANIFEST_ARTIFACTS,
+    ]);
+    expect(byName['manifest freshness'].cmd).toBe('git');
+    expect(byName['manifest freshness'].args).toEqual([
+      'diff',
+      '--exit-code',
+      '--',
+      ...MANIFEST_ARTIFACTS,
+    ]);
     expect(byName['malware scan'].cmd).toBe('npm');
     expect(byName['malware scan'].args).toEqual(['run', 'security:gate']);
     expect(byName['biome (changed files)'].cmd).toBe('npm');
@@ -148,7 +172,7 @@ describe('buildFullGateSteps orchestration', () => {
     expect(byName['browser regressions'].cmd).toBe('npm');
 
     const typesBuilds = byName['typecheck + env/server/bot builds'];
-    expect(typesBuilds.cmd).toBe(EXPECTED_TURBO_BIN);
+    expect(typesBuilds.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
     expect(typesBuilds.args).toEqual(
       expect.arrayContaining(['run', 'check:types', 'build:env', 'build:server', 'build:bot']),
     );
@@ -160,12 +184,22 @@ describe('buildFullGateSteps orchestration', () => {
     const names = buildFullGateSteps(4).map((s) => s.name);
     const artifacts = names.indexOf('i18n + wiki + sfx artifacts');
     const freshness = names.indexOf('i18n freshness');
+    const sfxRegen = names.indexOf('sfx manifest regen');
+    const mediaRegen = names.indexOf('media manifest regen');
+    const manifestTrackedness = names.indexOf('manifest trackedness');
+    const manifestFreshness = names.indexOf('manifest freshness');
     const biome = names.indexOf('biome (changed files)');
     const vitest = names.indexOf('vitest (full suite)');
     const client = names.indexOf('client build');
     expect(artifacts).toBeGreaterThan(-1);
     expect(freshness).toBeGreaterThan(artifacts);
-    expect(biome).toBeGreaterThan(freshness);
+    // Both regens (and the turbo wiki:content in the artifacts step) must
+    // precede the manifest diff, or it proves nothing about this tree.
+    expect(sfxRegen).toBeGreaterThan(freshness);
+    expect(mediaRegen).toBeGreaterThan(sfxRegen);
+    expect(manifestTrackedness).toBeGreaterThan(mediaRegen);
+    expect(manifestFreshness).toBeGreaterThan(manifestTrackedness);
+    expect(biome).toBeGreaterThan(manifestFreshness);
     expect(vitest).toBeGreaterThan(biome);
     expect(client).toBeGreaterThan(vitest);
   });
@@ -179,6 +213,10 @@ describe('buildFullGateSteps orchestration', () => {
     expect(typesOnly.map((s) => s.name)).toEqual([
       'i18n + wiki + sfx artifacts',
       'i18n freshness',
+      'sfx manifest regen',
+      'media manifest regen',
+      'manifest trackedness',
+      'manifest freshness',
       'malware scan',
       'biome (changed files)',
       'typecheck',
@@ -192,6 +230,10 @@ describe('buildFullGateSteps orchestration', () => {
     expect(buildsOnly.map((s) => s.name)).toEqual([
       'i18n + wiki + sfx artifacts',
       'i18n freshness',
+      'sfx manifest regen',
+      'media manifest regen',
+      'manifest trackedness',
+      'manifest freshness',
       'malware scan',
       'biome (changed files)',
       'env build',
@@ -210,12 +252,5 @@ describe('gate.mjs wiring pins', () => {
     expect(pkg.scripts.build).toContain('i18n:gen');
     expect(pkg.scripts.build).toContain('wiki:content');
     expect(pkg.scripts['build:bundle']).not.toContain('i18n:gen');
-  });
-
-  it('resolves its own repoRoot and threads it into buildFullGateSteps', () => {
-    // Same fileURLToPath pattern gate_select.mjs already used, not process.cwd():
-    // correct regardless of the invoking process's working directory.
-    expect(gateSrc).toContain('fileURLToPath(import.meta.url)');
-    expect(gateSrc).toContain('buildFullGateSteps(workers, { releaseTier, repoRoot })');
   });
 });

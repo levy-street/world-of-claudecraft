@@ -122,13 +122,6 @@ export function setDiscordPresence(value: DiscordPresenceState | null): void {
   listener?.();
 }
 
-/** Reset to logged-out defaults (called on logout / disconnect). */
-export function resetDiscordStatus(): void {
-  status = UNLINKED;
-  presence = NO_PRESENCE;
-  listener?.();
-}
-
 /** Register the HUD's re-render hook (one consumer: the Discord widget). */
 export function onDiscordStatusChange(cb: () => void): void {
   listener = cb;

@@ -118,6 +118,10 @@ const KNOWN_CODES = [
   'epic.upstream',
   'wallet.handoff_invalid',
   'ota_updates.invalid_input',
+  'cheater_mark.admin_target',
+  'cheater_mark.reason_required',
+  'cheater_mark.invalid_duration',
+  'cheater_mark.not_marked',
 ];
 
 // The parametric contract pins: the matcher

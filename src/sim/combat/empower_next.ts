@@ -47,27 +47,11 @@ export function consumeAuraKind(
   return aura;
 }
 
-export function hasNextCastFree(e: Entity, abilityId?: string): boolean {
-  return e.auras.some(
-    (aura) =>
-      (aura.kind === 'next_cast_free' || aura.kind === 'next_execute_free') &&
-      matches(aura, abilityId),
-  );
-}
-
 /** The movement-cast aura eligible for this exact ability. Unscoped Ice
  *  Floes and Wayfarer Grace remain universal; Flowing Elements names its two
  *  allowed casts. */
 export function iceFloesAuraForAbility(e: Entity, abilityId: string): Aura | undefined {
   return e.auras.find((aura) => aura.kind === 'ice_floes' && matches(aura, abilityId));
-}
-
-export function hasNextExecuteFree(e: Entity, abilityId: string): boolean {
-  return e.auras.some(
-    (aura) =>
-      (aura.kind === 'next_execute_free' && matches(aura, abilityId)) ||
-      (abilityId === 'execute' && aura.kind === 'sudden_death'),
-  );
 }
 
 export function nextCastCheapMultiplierFromAuras(
@@ -151,10 +135,6 @@ export function consumeNextCastInstantAura(
   // path calls THIS one (it needs the aura to spot a Stormcast charge).
   if (abilityId === 'holy_light') return consumeAuraKind(ctx, e, RADIANT_RESONANCE_KIND, abilityId);
   return null;
-}
-
-export function consumeNextCastInstant(ctx: SimContext, e: Entity, abilityId?: string): boolean {
-  return consumeNextCastInstantAura(ctx, e, abilityId) !== null;
 }
 
 export function hasScopedNextCastInstant(e: Entity, abilityId: string): boolean {

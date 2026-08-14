@@ -12,6 +12,7 @@
 // game menu, so it stays out of the registry and is refused by bind().
 
 import { repairStoredBindings } from './keybinds_repair';
+import { parseStoredJson } from './local_storage_json';
 import { isReservedMouseCode, mouseCodeLabel } from './mouse_binds';
 
 export type BindKind = 'held' | 'edge';
@@ -152,6 +153,16 @@ export const BIND_ACTIONS: BindAction[] = [
     category: 'Targeting',
     kind: 'edge',
     defaults: ['Tab'],
+  },
+  {
+    // The backward half of the Tab cycle. Edge actions match the FULL chord
+    // (input.ts), so Shift+Tab is a distinct binding from Tab and neither
+    // shadows the other.
+    id: 'targetPrev',
+    label: 'Cycle Target Backward',
+    category: 'Targeting',
+    kind: 'edge',
+    defaults: ['Shift+Tab'],
   },
   {
     id: 'targetFriendly',
@@ -528,12 +539,7 @@ function codeLabel(code: string): string {
 // corrupt (unparseable), or non-object value (including a JSON array) counts as
 // "no profile"; the caller then falls back to the legacy seed or to defaults.
 function readBindingsBlob(key: string): Record<string, unknown> | null {
-  let parsed: unknown = null;
-  try {
-    parsed = JSON.parse(localStorage.getItem(key) ?? 'null');
-  } catch {
-    /* corrupt */
-  }
+  const parsed = parseStoredJson(key);
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
   return parsed as Record<string, unknown>;
 }

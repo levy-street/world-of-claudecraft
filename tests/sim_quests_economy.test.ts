@@ -3,19 +3,33 @@
 // shard is tests/sim.test.ts.
 import { describe, expect, it } from 'vitest';
 import { GROUND_PICKUP_LINES } from '../src/sim/content/ground_pickup_lines';
-import { DEEPFEN_SHALLOWS_LAKE, GROUND_OBJECTS, ITEMS, LAKE, NPCS, QUESTS } from '../src/sim/data';
+import {
+  BUILTIN_WORLD,
+  DEEPFEN_SHALLOWS_LAKE,
+  GROUND_OBJECTS,
+  ITEMS,
+  LAKE,
+  NPCS,
+  QUESTS,
+} from '../src/sim/data';
 import { ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
 import { completeFishing } from '../src/sim/professions/fishing';
 import { Sim } from '../src/sim/sim';
-import { dist2d, FISHING_CAST_ID, type SimEvent, xpForLevel } from '../src/sim/types';
+import {
+  dist2d,
+  FISHING_CAST_ID,
+  type SimEvent,
+  type WorldContent,
+  xpForLevel,
+} from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import {
   despawnMobs,
+  EMPTY_TEST_WORLD,
   facePlayerAt,
   makePickupSim,
   makeRlSim,
   makeScopedSim,
-  makeSim,
   nearestMob,
   teleportTo,
   VENDOR_TEST_WORLD,
@@ -23,6 +37,18 @@ import {
 
 const TEST_SWIM_DEPTH = 0.8;
 const FISHING_TEST_DISTANCES = [4, 8, 12, 16, 20, 24];
+
+// Only the 'quests' describe block below needs a world with BOTH the zone1
+// forest_wolf camps (>=8 wolves for q_wolves) AND full npcs (marshal_redbrook
+// gives/turns in q_wolves, q_bandits, q_greyjaw; trader_wilkes gives q_boars).
+// No existing tests/sim_shared.ts fixture keeps both at once (WOLF_TEST_WORLD
+// zeroes npcs, VENDOR_TEST_WORLD keeps only one wolf camp), so this stays a
+// small bespoke local fixture rather than a shared one.
+const QUESTS_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === 'forest_wolf'),
+  groundObjects: [],
+};
 
 function hasFishableWaterAhead(x: number, z: number, facing: number, seed: number): boolean {
   const sin = Math.sin(facing);
@@ -668,7 +694,7 @@ describe('food, drink, vendor', () => {
 
   it('fishing catches are replay-deterministic for a fixed seed', () => {
     const reel = () => {
-      const sim = makeSim('warrior', 1234);
+      const sim = makeScopedSim(EMPTY_TEST_WORLD, 'warrior', 1234);
       const meta = sim.meta(sim.player.id)!;
       const caught: string[] = [];
       for (let i = 0; i < 30; i++) {
@@ -784,7 +810,7 @@ describe('food, drink, vendor', () => {
 
 describe('quests', () => {
   it('full wolf quest flow: accept, kill 8, turn in', () => {
-    const sim = makeSim('warrior');
+    const sim = makeScopedSim(QUESTS_TEST_WORLD, 'warrior');
     teleportTo(sim, 4, 4);
     sim.interact();
     expect(sim.questState('q_wolves')).toBe('active');
@@ -811,7 +837,7 @@ describe('quests', () => {
   });
 
   it('collect quest tracks inventory and consumes items on turn-in', () => {
-    const sim = makeSim('warrior');
+    const sim = makeScopedSim(QUESTS_TEST_WORLD, 'warrior');
     const giver = NPCS[QUESTS.q_boars.giverNpcId];
     if (!giver) throw new Error('q_boars giver fixture missing');
     teleportTo(sim, giver.pos.x, giver.pos.z);
@@ -825,7 +851,7 @@ describe('quests', () => {
   });
 
   it('quest accept and turn-in reject stale out-of-range dialogs with feedback', () => {
-    const sim = makeSim('warrior');
+    const sim = makeScopedSim(QUESTS_TEST_WORLD, 'warrior');
     teleportTo(sim, 0, -40);
     sim.events = [];
 
@@ -875,7 +901,7 @@ describe('quests', () => {
   });
 
   it('ground object pickup uses item-specific enough message', () => {
-    const sim = makeSim('warrior');
+    const sim = makePickupSim();
     sim.player.level = 3;
     const crate = [...sim.entities.values()].find(
       (e) => e.kind === 'object' && e.objectItemId === 'supply_crate',
@@ -894,7 +920,7 @@ describe('quests', () => {
   });
 
   it('quest reward weapon is granted and auto-equipped', () => {
-    const sim = makeSim('warrior');
+    const sim = makeScopedSim(QUESTS_TEST_WORLD, 'warrior');
     teleportTo(sim, 4, 4);
     sim.interact();
     const qp = sim.questLog.get('q_wolves')!;
@@ -913,7 +939,7 @@ describe('quests', () => {
 
 describe('RL interface', () => {
   it('observation has documented size and stays in sane bounds', () => {
-    const sim = makeSim('warrior');
+    const sim = makeScopedSim(EMPTY_TEST_WORLD, 'warrior');
     const obs = encodeObs(sim);
     expect(obs.length).toBe(obsSize());
     for (const v of obs) {

@@ -61,9 +61,10 @@ import type { SimContext } from '../src/sim/sim_context';
 import { tradeSetOffer } from '../src/sim/social/trade';
 import { DT, FORM_AURA_KINDS, type MountItemDef, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { VENDOR_TEST_WORLD } from './sim_shared';
 
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: VENDOR_TEST_WORLD });
 }
 
 function join(sim: Sim, level = 20): number {
@@ -223,7 +224,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // Deriving the expectation from MOUNTS[key].rarity rather than a hand-listed
     // table is what makes a future re-tier impossible to land half-done: move a
     // mount's rarity without moving its drop and this reds immediately.
-    const nyth = HEROIC_BOSS_LOOT['nythraxis_scourge_of_thornpeak'] ?? [];
+    const nyth = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak ?? [];
     const CHANCE_FOR_RARITY: Record<string, number> = { uncommon: 0.005, rare: 0.001 };
     // The FIVE-MAN bosses carrying each drop-tier mount, pinned explicitly (the
     // heroic raid carries all four on top of these). Listed rather than counted
@@ -1205,7 +1206,12 @@ describe('mount + form/ghost_wolf interaction', () => {
   });
 
   it('shapeshifting into a form while mounted force-dismounts the player', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim.addPlayer('druid', 'Ursa');
     sim.tick();
     sim.setPlayerLevel(20, pid);
@@ -1220,7 +1226,12 @@ describe('mount + form/ghost_wolf interaction', () => {
   });
 
   it('activating ghost_wolf while mounted force-dismounts the player', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim.addPlayer('shaman', 'Thrall');
     sim.tick();
     sim.setPlayerLevel(20, pid);
@@ -1398,7 +1409,12 @@ describe('cancelFormsAndGhostWolf recalcs stats (Fix #1)', () => {
     // giving +90% armor. Then we start a mount summon, which should strip the form
     // AND call recalcPlayerStats so armor drops back to caster-form levels immediately,
     // not on the next tick.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim.addPlayer('druid', 'Ursatest');
     sim.tick();
     sim.setPlayerLevel(20, pid);
@@ -1428,7 +1444,12 @@ describe('cancelFormsAndGhostWolf recalcs stats (Fix #1)', () => {
 describe('summon channel cancels on ability cast (Fix #2)', () => {
   it('cancels an in-progress mount summon channel when the player casts any ability', () => {
     // Arrange: a warrior starts a mount summon (1.5s channel).
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Rider');
     sim.tick();
     sim.setPlayerLevel(20, pid);
@@ -1455,7 +1476,12 @@ describe('summon channel cancels on ability cast (Fix #2)', () => {
     // Casting while FULLY mounted (no channel) triggers forceDismount instantly (pre-existing
     // behavior, not related to Fix #2). Verify that Fix #2 only adds the summon-channel cancel
     // and does not break the forceDismount path.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Rider');
     sim.tick();
     sim.setPlayerLevel(20, pid);
@@ -1522,7 +1548,12 @@ describe('summon completion strips forms that slipped through mid-channel (Fix #
     // directly (simulating a form that slipped through during the 1.5s channel).
     // At channel completion, updateMountTransition must call cancelFormsAndGhostWolf
     // so the player is never simultaneously mounted and shapeshifted.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim.addPlayer('druid', 'Ursatest');
     sim.tick();
     sim.setPlayerLevel(20, pid);

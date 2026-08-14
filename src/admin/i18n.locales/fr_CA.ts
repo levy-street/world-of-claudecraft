@@ -538,4 +538,42 @@ export const fr_CA: Record<string, string> = {
   'bugReports.confirmDismiss': 'Rejeter ce rapport de bogue?',
   'bugReports.reviewed': 'Vérifié',
   'dialog.report': 'Rapport',
+  'error.cannotRateLimitAdmin': 'le clavardage des comptes administrateur ne peut pas être limité',
+  'error.generalChatRateLimitMessages': 'Saisissez entre {min} et {max} messages.',
+  'error.generalChatRateLimitReasonInvalid':
+    'Saisissez un motif de modération de {max} caractères maximum.',
+  'error.generalChatRateLimitRequired':
+    'Choisissez une limite de clavardage Général valide, ou retirez-la.',
+  'error.generalChatRateLimitWindowMinutes': 'Saisissez une fenêtre de {min} à {max} minutes.',
+  'generalChatRateLimit.confirmRemove': 'Retirer la limite',
+  'generalChatRateLimit.current':
+    'Débit actuel : {messages} messages autorisés par fenêtre de {minutes} minutes',
+  'generalChatRateLimit.edit': 'Modifier la limite',
+  'generalChatRateLimit.messagesError': 'Saisissez un nombre entier compris entre {min} et {max}.',
+  'generalChatRateLimit.messagesLabel': 'Messages autorisés',
+  'generalChatRateLimit.reasonPlaceholder':
+    'Pourquoi cette limite de clavardage Général change-t-elle ?',
+  'generalChatRateLimit.reasonRequired': 'Saisissez un motif de modération.',
+  'generalChatRateLimit.reasonTooLong': "N'utilisez pas plus de {max} caractères pour le motif.",
+  'generalChatRateLimit.remove': 'Retirer la limite',
+  'generalChatRateLimit.removeHint':
+    'La suppression de cette limite pour ce compte ramène le clavardage Général à Illimité.',
+  'generalChatRateLimit.save': 'Enregistrer la limite',
+  'generalChatRateLimit.scope':
+    "S'applique uniquement au clavardage Général. Les autres canaux de clavardage ne sont pas concernés.",
+  'generalChatRateLimit.title': 'Limite du clavardage Général',
+  'generalChatRateLimit.unlimited': 'Illimité',
+  'generalChatRateLimit.windowMinutesError':
+    'Saisissez un nombre entier compris entre {min} et {max}.',
+  'generalChatRateLimit.windowMinutesLabel': 'Durée de la fenêtre (minutes)',
+  'moderationHistory.actionGeneralChatRateLimit': 'Limite de clavardage Général modifiée',
+  'detail.cheaterMarkDurationHint':
+    "Tous les personnages du compte portent l'étiquette publique jusqu'à ce que ce temps de jeu soit écoulé.",
+  'detail.cheaterMarkRelengthHint':
+    "Remplace entièrement le temps restant; il ne s'y ajoute pas. L'étiquette publique reste affichée.",
+  'dialog.actionCheaterMarkLift': 'Retirer la marque de tricheur plus tôt',
+  'alert.cheaterMarkDurationInvalid': 'Entrez un nombre entier de 1 à {max} heures.',
+  'error.cheaterMarkDurationInvalid': 'Le crédit de temps de jeu doit être de 1 à 100 heures.',
+  'error.cheaterMarkAdminTarget':
+    "Les comptes d'administrateur ne peuvent pas recevoir la marque de tricheur.",
 };

@@ -431,7 +431,7 @@ describe('chat channel tabs — pure model', () => {
       // by construction.
       for (const online of [true, false]) {
         for (const channel of CHAT_TAB_CHANNELS) {
-          const line = channelSendPrefix(channel) + 'hello there';
+          const line = `${channelSendPrefix(channel)}hello there`;
           expect(sentLineTargetForHost(line, { online }), `${channel} online=${online}`).toBe(
             channel,
           );

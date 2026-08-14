@@ -84,7 +84,10 @@ export interface VisualDef {
   /** world-unit height (pivot->crown) at e.scale = 1 */
   height: number;
   clips: ClipMap;
-  /** floating rigs hover: mesh bottom sits this far above the pivot */
+  /** floating rigs hover: mesh bottom sits this far above the pivot. NEGATIVE
+   *  sinks a grounded rig whose posed bounds dip BELOW its feet (a dragging
+   *  tail): the ground anchor is the lowest skinned vertex, so without the
+   *  sink the body is lifted until the tail tip touches and the feet float. */
   hover?: number;
   /** yaw applied so the model faces +Z (facing-0 convention) */
   yaw?: number;
@@ -499,6 +502,40 @@ const ENEMY7: ClipMap = {
 const KOBOLD_ENEMY7: ClipMap = {
   ...ENEMY7,
   attack: ['Kobold_Pounce'],
+};
+
+// Grix the Tunnelking's drop authors Idle/Walk/Run/Attack/Death and NO hit
+// reaction. His hit slot used to borrow the shared HitRecieve_Heavy donor
+// (goblin_hit_variety_anims.glb), but that donor's tracks target the goblin
+// rig (Head/Arm.L/Arm.R/Body) and his drop is mixamorig-boned, so the clip
+// resolved by NAME and then bound NOTHING at runtime: every hit taken faded
+// the working base action out for a one-shot that drives no bone, freezing
+// the rig at its last sampled pose for the clip's duration (the live
+// mid-swing statue players reported). The zero-weight watchdog cannot see
+// that state because the dead action's weight is a healthy 1. Until a flinch
+// is baked for his own rig (blender-anim-pipeline), he takes hits with no
+// reaction clip, which playHit treats as a clean no-op. That bake needs no
+// new authoring: kobold.glb's native HitRecieve targets 20 mixamorig bones
+// that all exist on grix.glb, so a mesh-free single-clip donor extracted from
+// it (the scripts/build_*_hit_variety_anims.mjs pattern) binds directly. Do
+// NOT shortcut it by listing kobold.glb itself in animUrls: the
+// overwrite-by-name merge would replace his authored Idle/Walk/Run/Attack/
+// Death with the Digger's (the mob_kobold_digger trap below).
+// tests/character_clipmaps.test.ts now gates track BINDING as well as names.
+// He is a one-off rare, so this is his own constant rather than a widened
+// ENEMY7, which mob_ogre also reads.
+const GRIX: ClipMap = {
+  ...ENEMY7,
+  hit: [],
+};
+
+// The Deeprock Diggers' authored drop (kobold.glb) is mixamorig-boned like
+// Grix's, so the goblin-rig HitRecieve_Heavy donor cannot bind on it either.
+// Unlike Grix, the drop ships its own HitRecieve, so the flinch keeps the
+// native clip alone instead of ENEMY7's donor-backed pair.
+const KOBOLD_DIGGER: ClipMap = {
+  ...ENEMY7,
+  hit: ['HitRecieve'],
 };
 
 // floating/flying rigs (goleling/dragon) — hover instead of walking
@@ -1922,6 +1959,87 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.04,
   },
+  // The authored kobold body (the Kolbolds v02 artist drop, combined by
+  // tmp/kobold_build.mjs). Zone 1's Deeprock Diggers and their Tunnelking ONLY:
+  // the `burrower` family default deliberately stays mob_kobold (goblin.glb),
+  // because the other ten burrowers on it are sprites, gnomes and wretches that
+  // would every one of them read as a giant rat.
+  //
+  // `clips` is KOBOLD_DIGGER (ENEMY7 with the hit slot narrowed to the native
+  // HitRecieve): the GLB carries Idle/Walk/Run/Attack/HitRecieve/Death, so
+  // this needs neither the KOBOLD_ENEMY7 attack override nor
+  // kobold_ability_anims.glb. That donor is deliberately NOT in animUrls, and
+  // this is the trap worth naming: prepareVisual fills its clip map from the
+  // base GLB and THEN lets every animUrls entry overwrite BY NAME, so listing it
+  // would silently replace this model's authored Attack with the synthesized
+  // Kobold_Pounce baked off goblin.glb's poses. goblin_hit_variety_anims.glb
+  // used to ride along for HitRecieve_Heavy, but its tracks target the goblin
+  // rig and this drop is mixamorig-boned, so the clip bound nothing and froze
+  // the rig mid-pose on half of all hit reactions (see the KOBOLD_DIGGER
+  // constant); it was removed rather than kept for a clip that cannot play.
+  //
+  // walkRef/runRef are MEASURED off the clips themselves
+  // (tmp/kobold_gait_measure.mjs) at tunnel_rat's 0.85 template scale, the
+  // dominant population by 14 spawns to 1: natural 1.23 and 2.51 yd/s on the v02
+  // body. Left on the 2.2/7 defaults, a 7 yd/s chase runs the cycle at 1.0x and
+  // the planted foot trails the body 2.8x; measured, the run pushes to its 1.6
+  // clamp and the walk lands near an exact foot match. Re-measure on any new
+  // drop: v01's cycles gave 1.31/2.22, and its Walk was 1.00s against v02's 1.13s.
+  mob_kobold_digger: {
+    url: `${CREATURES}/kobold.glb`,
+    height: 2.1,
+    clips: KOBOLD_DIGGER,
+    // The mid-idle pose drops the tail 0.23 units (at scale 1) below the foot
+    // plane, and the ground anchor is the lowest skinned vertex, so the body
+    // floated by exactly that much (measured live: foot bones 0.227 above
+    // ground). Sink it back so the feet plant and the tail tip drags.
+    hover: -0.2,
+    walkRef: 1.23,
+    runRef: 2.51,
+    // Light wash, for grubjaw's reason above: the drop ships an authored brown
+    // hide, and the goblin body's 0.2 (sized to keep a GREEN skin readable) only
+    // muddies it.
+    tint: 'entity',
+    tintStrength: 0.12,
+  },
+  // Grix the Tunnelking: his own body at last. He was the clearest case of the
+  // gap this batch closes, a rare ELITE rendering identically to the level-4
+  // Deeprock Diggers he summons, with only the rare/elite nameplate frame to
+  // tell a player which one was the boss.
+  //
+  // The GLB carries a bone-parented PROP: his shovel is a child of
+  // mixamorigRightHand, not a skinned part, so it rides the hand through every
+  // clip with no track of its own. That also means two materials (body, shovel),
+  // each with its own basecolor, which is why tmp/grix_build.mjs supplies them
+  // per material instead of through the single-texture path the kobolds use.
+  //
+  // No `tint`, deliberately, even though his template DOES carry a colour
+  // (0xb9770e in zone1.ts). On the shared goblin/kobold bodies the entity tint is
+  // what separates one template from the next; Grix is a one-off with authored
+  // art (crown, robes, the shovel) and washing an amber over it only muddies it.
+  // His template colour still earns its keep elsewhere: the minimap/nameplate
+  // surfaces read it. Same reasoning as mob_water_elemental's untinted body.
+  //
+  // walkRef/runRef MEASURED (tmp/grix_gait_measure.mjs) at his template scale of
+  // 1.0: natural 1.23 and 2.31 yd/s against a 7 yd/s chase.
+  mob_grix: {
+    url: `${CREATURES}/grix.glb`,
+    height: 2.1,
+    clips: GRIX,
+    // Same dragging-tail float as mob_kobold_digger, smaller: mid-idle his
+    // tail dips 0.09 units (at scale 1) below the foot plane (measured live:
+    // foot bones 0.093 above ground at his 1.275 template scale).
+    hover: -0.07,
+    walkRef: 1.23,
+    runRef: 2.31,
+    // The authored Attack is a 1.5s double-pump heave whose contact frame
+    // sits at ~0.7 of the clip (measured by hand-height scrub), and mob melee
+    // one-shots fire ON the damage event: at the 1.3 default the shovel
+    // visibly landed ~0.8s AFTER the health bar moved. 3x brings contact to
+    // ~0.35s after the hit and the whole swing to 0.5s, inside his 2.0s
+    // swing cadence (the mob_gravewing tuning pattern).
+    attackTimeScale: 3,
+  },
   mob_troll: {
     url: `${CREATURES}/orc.glb`,
     height: 2.4,
@@ -2779,6 +2897,15 @@ const MOB_KEYS: Record<string, string> = {
   dragonkin_egg: 'mob_dragon_egg',
   // Grubjaw the Glutton: his own body now, not the shared troll stand-in.
   grubjaw: 'mob_grubjaw',
+  // Eastbrook Vale's kobolds: the authored rat body, not the goblin stand-in
+  // the `burrower` family still falls back to. Scoped to the two zone-1
+  // templates on purpose (see mob_kobold_digger): the family also carries the
+  // hedge gnome and the willow/fen/harvest sprites, and repointing the family
+  // would turn all of them into rats. Zone 3's deeprock_kobold and the Ironvein
+  // pair are the natural next adopters, but they are a separate call.
+  tunnel_rat: 'mob_kobold_digger',
+  // Grix has his own body now (mob_grix), so he no longer shares the Diggers'.
+  grix_the_tunnelking: 'mob_grix',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',

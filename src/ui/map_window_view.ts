@@ -34,11 +34,22 @@ import {
   questGiverNpcMarkers,
   questObjectiveAreas,
 } from '../sim/quest_targets';
-import type { BuildingDef, GatherNodeType, ZonePropsDef } from '../sim/types';
+import type {
+  BuildingDef,
+  GatherNodeType,
+  RiftTier,
+  StationType,
+  ZonePropsDef,
+} from '../sim/types';
 import type { Decoration } from '../sim/world';
 import type { FriendInfo, IWorld } from '../world_api';
 import { viewerUsableToolTier } from './gathering_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
+import type { MapMarkerProfile } from './map_marker_profile_core';
+import {
+  isNearbyLiveRiftZoneMapEntity,
+  STABLE_MAP_NAVIGATION_LANDMARKS,
+} from './map_navigation_landmarks_core';
 import { questNumbersByLog } from './map_quest_list_view';
 
 // World-map zoom band. zoom 1 = the whole current zone framed square;
@@ -78,7 +89,7 @@ const CAMPFIRE_RADIUS_PPU = 0.5;
  *  overworld surface: the band sits past WORLD_MAX_X, so the player/ally
  *  markers self-suppress; the minimap owns the in-band field raster), or the
  *  overworld map (this core). */
-export type MapWindowMode = 'delve' | 'battleground' | 'overworld';
+export type MapWindowMode = 'rift' | 'delve' | 'battleground' | 'overworld';
 
 /** A map region in world coords, used with two meanings for spanX/spanZ. The
  *  internal `full` rect carries the current-zone square (its full spans). The
@@ -142,6 +153,59 @@ export const MAP_NPC_GLYPH_HIT_RADIUS = 10;
  *  the type silhouette and soft glow). Same nearest-wins rule as NPC glyphs. */
 export const MAP_GATHER_NODE_HIT_RADIUS = 10;
 
+/** Hit radius for a crafting-station badge on the zone map. */
+export const MAP_STATION_HIT_RADIUS = 10;
+
+/** Hit radius for a civic-service badge on the zone map. */
+export const MAP_SERVICE_HIT_RADIUS = 10;
+
+/** Navigation paintings are larger than resource/service badges and remain
+ * comfortably hoverable across their full keyed silhouette. */
+export const MAP_NAVIGATION_HIT_RADIUS = 15;
+
+/** Minimum physical radius for a stationary touch on a point marker. The
+ * caller converts this CSS-pixel value into canvas backing pixels. */
+export const MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX = 20;
+
+/** Responsive placement budget for stable landmark badges. Compact touch HUDs
+ * need extra backing-space separation because CSS scales the map canvas down;
+ * gathering nodes are never routed through this allocator and remain at their
+ * exact authored projections. */
+export const MAP_LANDMARK_PLACEMENT_BY_PROFILE = Object.freeze({
+  standard: Object.freeze({ separation: 24, edgeInset: 12 }),
+  compact: Object.freeze({ separation: 34, edgeInset: 17 }),
+} as const satisfies Readonly<
+  Record<MapMarkerProfile, Readonly<{ separation: number; edgeInset: number }>>
+>);
+
+/** Compatibility name for consumers that mean the standard desktop profile. */
+export const MAP_LANDMARK_SEPARATION = MAP_LANDMARK_PLACEMENT_BY_PROFILE.standard.separation;
+
+/** Compatibility name retained for station consumers of the original rule. */
+export const MAP_STATION_NPC_SEPARATION = MAP_LANDMARK_SEPARATION;
+
+const MAP_LANDMARK_PLACEMENT_STEPS = 48;
+const MAP_LANDMARK_DIRECTION_X = Object.freeze([
+  1,
+  Math.SQRT1_2,
+  0,
+  -Math.SQRT1_2,
+  -1,
+  -Math.SQRT1_2,
+  0,
+  Math.SQRT1_2,
+] as const);
+const MAP_LANDMARK_DIRECTION_Y = Object.freeze([
+  0,
+  Math.SQRT1_2,
+  1,
+  Math.SQRT1_2,
+  0,
+  -Math.SQRT1_2,
+  -1,
+  -Math.SQRT1_2,
+] as const);
+
 /** The nearest quest-giver glyph within the hit radius of a canvas point, or
  *  null. Nearest (not first) so two adjacent givers resolve intuitively. */
 export function npcMarkerAt(
@@ -202,6 +266,299 @@ export function gatherNodeMarkerAt(
   return best;
 }
 
+/** A crafting station on the zone map. The badge can be displaced a few
+ * canvas pixels from its exact projection to keep a nearby quest glyph clear;
+ * stationId/type remain the authoritative content identity for its tooltip. */
+export interface MapStationMarker {
+  mx: number;
+  my: number;
+  stationId: string;
+  type: StationType;
+}
+
+/** The nearest crafting-station badge within its hit radius, or null. */
+export function stationMarkerAt(
+  stations: readonly MapStationMarker[],
+  mx: number,
+  my: number,
+): MapStationMarker | null {
+  let best: MapStationMarker | null = null;
+  let bestD2 = MAP_STATION_HIT_RADIUS * MAP_STATION_HIT_RADIUS;
+  for (const station of stations) {
+    const dx = mx - station.mx;
+    const dy = my - station.my;
+    const d2 = dx * dx + dy * dy;
+    if (d2 <= bestD2) {
+      bestD2 = d2;
+      best = station;
+    }
+  }
+  return best;
+}
+
+/** A static mailbox or interactive noticeboard on the zone map. Positions
+ * come from the injected active-world services snapshot, never live entities. */
+export interface MapServiceMarker {
+  mx: number;
+  my: number;
+  kind: 'mailbox' | 'noticeboard';
+}
+
+/** A stable route or a nearby live Rift entrance on the zone map. Static
+ * identities come from authored content; Rift name/rank come only from a live
+ * entity inside the host-fair disclosure range. */
+export type MapNavigationMarker =
+  | {
+      kind: 'delve-entrance';
+      mx: number;
+      my: number;
+      delveId: string;
+    }
+  | {
+      kind: 'world-passage';
+      mx: number;
+      my: number;
+      portalId: string;
+      destinationZoneId: string;
+    }
+  | {
+      kind: 'rift-entrance';
+      mx: number;
+      my: number;
+      name: string;
+      rank: RiftTier | null;
+    };
+
+/** The nearest civic-service badge within its hit radius, or null. */
+export function serviceMarkerAt(
+  services: readonly MapServiceMarker[],
+  mx: number,
+  my: number,
+): MapServiceMarker | null {
+  let best: MapServiceMarker | null = null;
+  let bestD2 = MAP_SERVICE_HIT_RADIUS * MAP_SERVICE_HIT_RADIUS;
+  for (const service of services) {
+    const dx = mx - service.mx;
+    const dy = my - service.my;
+    const d2 = dx * dx + dy * dy;
+    if (d2 <= bestD2) {
+      bestD2 = d2;
+      best = service;
+    }
+  }
+  return best;
+}
+
+export type MapPointMarkerHit =
+  | { kind: 'npc'; marker: MapNpcMarker; distance2: number }
+  | { kind: 'navigation'; marker: MapNavigationMarker; distance2: number }
+  | { kind: 'station'; marker: MapStationMarker; distance2: number }
+  | { kind: 'service'; marker: MapServiceMarker; distance2: number }
+  | { kind: 'gather'; marker: MapGatherNodeMarker; distance2: number };
+
+type MapPointMarker =
+  | MapNpcMarker
+  | MapNavigationMarker
+  | MapStationMarker
+  | MapServiceMarker
+  | MapGatherNodeMarker;
+
+const MAP_POINT_HIT_TIE_PRIORITY: Readonly<Record<MapPointMarkerHit['kind'], number>> = {
+  npc: 0,
+  navigation: 1,
+  station: 2,
+  service: 3,
+  gather: 4,
+};
+
+function mapPointHitBefore(a: MapPointMarkerHit, b: MapPointMarkerHit): boolean {
+  return (
+    a.distance2 < b.distance2 ||
+    (a.distance2 === b.distance2 &&
+      MAP_POINT_HIT_TIE_PRIORITY[a.kind] < MAP_POINT_HIT_TIE_PRIORITY[b.kind])
+  );
+}
+
+function writeMapPointHit(
+  hits: MapPointMarkerHit[],
+  index: number,
+  kind: MapPointMarkerHit['kind'],
+  marker: MapPointMarker,
+  distance2: number,
+): MapPointMarkerHit {
+  let hit = hits[index];
+  if (!hit) {
+    hit = { kind, marker, distance2 } as MapPointMarkerHit;
+    hits.push(hit);
+    return hit;
+  }
+  const mutable = hit as {
+    kind: MapPointMarkerHit['kind'];
+    marker: MapPointMarker;
+    distance2: number;
+  };
+  mutable.kind = kind;
+  mutable.marker = marker;
+  mutable.distance2 = distance2;
+  return hit;
+}
+
+function insertMapPointHit(
+  hits: MapPointMarkerHit[],
+  hit: MapPointMarkerHit,
+  activeCount: number,
+): void {
+  let index = activeCount;
+  while (index > 0 && mapPointHitBefore(hit, hits[index - 1])) index--;
+  for (let shift = activeCount; shift > index; shift--) hits[shift] = hits[shift - 1];
+  hits[index] = hit;
+}
+
+function appendMapPointHits(
+  hits: MapPointMarkerHit[],
+  activeCount: number,
+  kind: MapPointMarkerHit['kind'],
+  markers: readonly { mx: number; my: number }[],
+  mx: number,
+  my: number,
+  hitRadius2: number,
+): number {
+  for (const marker of markers) {
+    const dx = mx - marker.mx;
+    const dy = my - marker.my;
+    const distance2 = dx * dx + dy * dy;
+    if (distance2 > hitRadius2) continue;
+    const hit = writeMapPointHit(hits, activeCount, kind, marker as MapPointMarker, distance2);
+    insertMapPointHit(hits, hit, activeCount);
+    activeCount++;
+  }
+  return activeCount;
+}
+
+/** Fill a reusable hit-slot pool and return its active prefix length. Slots at
+ * or above the returned count are retained only as future capacity. */
+export function mapPointMarkerHitsInto(
+  npcs: readonly MapNpcMarker[],
+  navigation: readonly MapNavigationMarker[],
+  services: readonly MapServiceMarker[],
+  stations: readonly MapStationMarker[],
+  gatherNodes: readonly MapGatherNodeMarker[],
+  mx: number,
+  my: number,
+  radius: number,
+  output: MapPointMarkerHit[],
+): number {
+  let activeCount = 0;
+  const radius2 = Math.max(0, radius) ** 2;
+  activeCount = appendMapPointHits(output, activeCount, 'npc', npcs, mx, my, radius2);
+  activeCount = appendMapPointHits(
+    output,
+    activeCount,
+    'navigation',
+    navigation,
+    mx,
+    my,
+    Math.max(Math.max(0, radius), MAP_NAVIGATION_HIT_RADIUS) ** 2,
+  );
+  activeCount = appendMapPointHits(output, activeCount, 'station', stations, mx, my, radius2);
+  activeCount = appendMapPointHits(output, activeCount, 'service', services, mx, my, radius2);
+  activeCount = appendMapPointHits(output, activeCount, 'gather', gatherNodes, mx, my, radius2);
+  return activeCount;
+}
+
+/** Every point-marker candidate inside a shared radius, nearest first. This is
+ * the convenient cold-path wrapper around mapPointMarkerHitsInto. Exact-distance
+ * ties follow visual top order. */
+export function mapPointMarkerHits(
+  npcs: readonly MapNpcMarker[],
+  navigation: readonly MapNavigationMarker[],
+  services: readonly MapServiceMarker[],
+  stations: readonly MapStationMarker[],
+  gatherNodes: readonly MapGatherNodeMarker[],
+  mx: number,
+  my: number,
+  radius: number,
+): MapPointMarkerHit[] {
+  const output: MapPointMarkerHit[] = [];
+  const activeCount = mapPointMarkerHitsInto(
+    npcs,
+    navigation,
+    services,
+    stations,
+    gatherNodes,
+    mx,
+    my,
+    radius,
+    output,
+  );
+  output.length = activeCount;
+  return output;
+}
+
+interface MapLandmarkPosition {
+  mx: number;
+  my: number;
+}
+
+function landmarkPositionClears(
+  x: number,
+  y: number,
+  npcs: readonly MapNpcMarker[],
+  landmarks: readonly MapLandmarkPosition[],
+  minDistance2: number,
+): boolean {
+  for (const npc of npcs) {
+    const dx = x - npc.mx;
+    const dy = y - npc.my;
+    if (dx * dx + dy * dy < minDistance2) return false;
+  }
+  for (const landmark of landmarks) {
+    const dx = x - landmark.mx;
+    const dy = y - landmark.my;
+    if (dx * dx + dy * dy < minDistance2) return false;
+  }
+  return true;
+}
+
+function placeLandmarkBadge(
+  mx: number,
+  my: number,
+  npcs: readonly MapNpcMarker[],
+  landmarks: readonly MapLandmarkPosition[],
+  canvasSize: number,
+  placement: Readonly<{ separation: number; edgeInset: number }>,
+): { mx: number; my: number } {
+  const max = canvasSize - placement.edgeInset;
+  const minDistance2 = placement.separation * placement.separation;
+  const inside = mx >= placement.edgeInset && mx <= max && my >= placement.edgeInset && my <= max;
+  if (inside && landmarkPositionClears(mx, my, npcs, landmarks, minDistance2)) {
+    return { mx, my };
+  }
+  for (let step = 1; step <= MAP_LANDMARK_PLACEMENT_STEPS; step++) {
+    const radius = step;
+    for (let angleIndex = 0; angleIndex < 8; angleIndex++) {
+      const candidateX = mx + MAP_LANDMARK_DIRECTION_X[angleIndex] * radius;
+      const candidateY = my + MAP_LANDMARK_DIRECTION_Y[angleIndex] * radius;
+      if (
+        candidateX >= placement.edgeInset &&
+        candidateX <= max &&
+        candidateY >= placement.edgeInset &&
+        candidateY <= max &&
+        landmarkPositionClears(candidateX, candidateY, npcs, landmarks, minDistance2)
+      ) {
+        return { mx: candidateX, my: candidateY };
+      }
+    }
+  }
+
+  // Content is comfortably inside the canvas today and always finds a free
+  // badge position above. Keep a bounded defensive fallback for custom maps.
+  return {
+    mx: Math.max(placement.edgeInset, Math.min(canvasSize - placement.edgeInset, mx)),
+    my: Math.max(placement.edgeInset, Math.min(canvasSize - placement.edgeInset, my)),
+  };
+}
+
 /** A translucent active-quest objective area (the classic quest-POI blob):
  *  canvas-pixel center + radius over where the objective's targets live, plus
  *  the objective identities it stands for (the hover tooltip resolves their
@@ -220,25 +577,42 @@ export interface MapQuestAreaMarker {
 /** The distinct objectives under a canvas point, across every quest area that
  *  contains it (overlapping blobs merge into one tooltip). Pure hit-test the
  *  hover handler calls with the last painted model's areas. */
-export function questAreaObjectivesAt(
+export function questAreaObjectivesAtInto(
   areas: readonly MapQuestAreaMarker[],
   mx: number,
   my: number,
-): QuestObjectiveRef[] {
-  const refs: QuestObjectiveRef[] = [];
-  const seen = new Set<string>();
+  output: QuestObjectiveRef[],
+): number {
+  let activeCount = 0;
   for (const a of areas) {
     const dx = mx - a.mx;
     const dy = my - a.my;
     if (dx * dx + dy * dy > a.radius * a.radius) continue;
     for (const ref of a.objectives) {
-      const key = `${ref.questId}#${ref.objectiveIndex}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      refs.push(ref);
+      let duplicate = false;
+      for (let i = 0; i < activeCount; i++) {
+        const accepted = output[i];
+        if (accepted.questId === ref.questId && accepted.objectiveIndex === ref.objectiveIndex) {
+          duplicate = true;
+          break;
+        }
+      }
+      if (duplicate) continue;
+      output[activeCount++] = ref;
     }
   }
-  return refs;
+  return activeCount;
+}
+
+/** Convenient cold-path wrapper for callers that need an exact-length array. */
+export function questAreaObjectivesAt(
+  areas: readonly MapQuestAreaMarker[],
+  mx: number,
+  my: number,
+): QuestObjectiveRef[] {
+  const output: QuestObjectiveRef[] = [];
+  output.length = questAreaObjectivesAtInto(areas, mx, my, output);
+  return output;
 }
 
 /** The local player's facing arrow (canvas rotation matches -facing). */
@@ -347,6 +721,12 @@ export interface OverworldMapModel {
   /** Gather nodes in the committed zone (all zoom levels). Empty only when
    *  the zone has no authored nodes in view. */
   gatherNodes: MapGatherNodeMarker[];
+  /** Crafting stations in the committed zone, collision-safe beside quest masters. */
+  stations: MapStationMarker[];
+  /** Active-world mailboxes and noticeboards, collision-safe with other landmarks. */
+  services: MapServiceMarker[];
+  /** Collision-safe route badges and nearby live Rift entrances. */
+  navigation: MapNavigationMarker[];
   player: MapPlayerMarker | null;
   allies: MapAllyMarker[];
   /** Party members other than self, live world position (issue 2652). Empty
@@ -380,11 +760,14 @@ export interface OverworldMapInput {
   decorations: readonly Decoration[];
   /** Dungeon Finder "Show on Map" highlight in world coords, or null. */
   ping?: { x: number; z: number } | null;
+  /** Responsive marker profile, resolved once by the painter per redraw. */
+  markerProfile?: MapMarkerProfile;
 }
 
 /** Which world-map surface this world renders. Delve when the player stands in a
  *  delve band and a run is active (matches the inline guard); overworld otherwise. */
 export function mapWindowMode(world: IWorld): MapWindowMode {
+  if (world.riftFloor) return 'rift';
   if (isBgPos(world.player.pos.x)) return 'battleground';
   return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
 }
@@ -399,6 +782,7 @@ export function mapWindowMode(world: IWorld): MapWindowMode {
  */
 export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapModel {
   const { world, props, zone, zoom, center, canvasSize: S, decorations } = input;
+  const landmarkPlacement = MAP_LANDMARK_PLACEMENT_BY_PROFILE[input.markerProfile ?? 'standard'];
   const p = world.player;
 
   // Inside a rift the overworld zone (the current-zone frame below still keys
@@ -452,6 +836,12 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     x <= region.maxX + MARKER_VIEW_MARGIN &&
     z >= region.minZ - MARKER_VIEW_MARGIN &&
     z <= region.maxZ + MARKER_VIEW_MARGIN;
+  // Stable painted landmarks are displaced by the collision allocator. They
+  // must begin inside the actual viewport, otherwise an off-screen point that
+  // merely enters the general marker margin can be clamped into a false badge
+  // on the canvas edge.
+  const inVisibleRegion = (x: number, z: number): boolean =>
+    x >= region.minX && x <= region.maxX && z >= region.minZ && z <= region.maxZ;
   const inZone = (x: number, z: number): boolean =>
     x >= zoneMinX && x < zoneMaxX && z >= zone.zMin && z < zone.zMax;
 
@@ -565,6 +955,115 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     npcs.push({ mx, my, kind: marker.kind, quests: marker.quests });
   }
 
+  // Route-critical navigation is placed before services and stations, so those
+  // lower layers clear it. Static delve doors and world passages are immutable
+  // authored sites. Rift entrances are the exception: only live entities at or
+  // inside 80 yards are disclosed, matching both hosts' world-visibility rule.
+  const landmarks: MapLandmarkPosition[] = [];
+  const navigation: MapNavigationMarker[] = [];
+  const placeNavigation = (x: number, z: number): { mx: number; my: number } | null => {
+    if (!inVisibleRegion(x, z)) return null;
+    const projected = toMap(x, z);
+    const placed = placeLandmarkBadge(
+      projected.mx,
+      projected.my,
+      npcs,
+      landmarks,
+      S,
+      landmarkPlacement,
+    );
+    landmarks.push(placed);
+    return placed;
+  };
+  for (const site of STABLE_MAP_NAVIGATION_LANDMARKS) {
+    if (site.zoneId !== zone.id) continue;
+    const placed = placeNavigation(site.x, site.z);
+    if (!placed) continue;
+    if (site.kind === 'delve-entrance') {
+      navigation.push({
+        kind: 'delve-entrance',
+        mx: placed.mx,
+        my: placed.my,
+        delveId: site.id,
+      });
+    } else {
+      navigation.push({
+        kind: 'world-passage',
+        mx: placed.mx,
+        my: placed.my,
+        portalId: site.id,
+        destinationZoneId: site.destinationZoneId,
+      });
+    }
+  }
+  for (const entity of world.entities.values()) {
+    if (!isNearbyLiveRiftZoneMapEntity(entity, p.pos)) continue;
+    if (!inZone(entity.pos.x, entity.pos.z)) continue;
+    const placed = placeNavigation(entity.pos.x, entity.pos.z);
+    if (!placed) continue;
+    navigation.push({
+      kind: 'rift-entrance',
+      mx: placed.mx,
+      my: placed.my,
+      name: entity.name,
+      rank: entity.riftTier ?? null,
+    });
+  }
+
+  // Stable civic landmarks come from IWorld's authored service snapshot, never
+  // live entities (whose online interest scope would hide distant services).
+  // Mailboxes precede noticeboards in their authored array order. Muster boards
+  // are deliberately absent: they are non-interactive scenery, not a service.
+  // Every accepted marker enters the shared placement list so later services
+  // and stations clear it deterministically as well as every quest glyph.
+  const services: MapServiceMarker[] = [];
+  const appendService = (x: number, z: number, kind: MapServiceMarker['kind']): void => {
+    if (!inZone(x, z) || !inVisibleRegion(x, z)) return;
+    const projected = toMap(x, z);
+    const placed = placeLandmarkBadge(
+      projected.mx,
+      projected.my,
+      npcs,
+      landmarks,
+      S,
+      landmarkPlacement,
+    );
+    const marker: MapServiceMarker = { mx: placed.mx, my: placed.my, kind };
+    services.push(marker);
+    landmarks.push(marker);
+  };
+  for (const service of world.civicServicePlacements) {
+    appendService(service.x, service.z, service.kind);
+  }
+
+  // Crafting stations come through IWorld so custom-map playtests never inherit
+  // the built-in station table. Their masters are quest givers and stand only a
+  // few yards away, which projects to 2 to 5px at the full-zone scale. The same
+  // bounded radial allocation keeps each station clear of NPCs, civic services,
+  // earlier stations, and the canvas edge. At closer zoom the authored distance
+  // already exceeds the threshold and no nudge occurs.
+  const stations: MapStationMarker[] = [];
+  for (const station of world.stationPlacements) {
+    if (station.zoneId !== zone.id || !inVisibleRegion(station.pos.x, station.pos.z)) continue;
+    const projected = toMap(station.pos.x, station.pos.z);
+    const placed = placeLandmarkBadge(
+      projected.mx,
+      projected.my,
+      npcs,
+      landmarks,
+      S,
+      landmarkPlacement,
+    );
+    const marker: MapStationMarker = {
+      mx: placed.mx,
+      my: placed.my,
+      stationId: station.id,
+      type: station.type,
+    };
+    stations.push(marker);
+    landmarks.push(marker);
+  }
+
   let player: MapPlayerMarker | null = null;
   if (inZone(p.pos.x, p.pos.z) && inView(p.pos.x, p.pos.z)) {
     const { mx, my } = toMap(p.pos.x, p.pos.z);
@@ -630,6 +1129,9 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     npcs,
     questAreas,
     gatherNodes,
+    stations,
+    services,
+    navigation,
     player,
     allies,
     party,

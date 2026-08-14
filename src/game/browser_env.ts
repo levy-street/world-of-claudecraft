@@ -32,7 +32,6 @@ export interface BrowserEnv {
  * browserEffects setting values (settings.ts). 0 = auto (detect), otherwise a
  * manual override that pins the tier regardless of detection.
  */
-export const BROWSER_EFFECTS_AUTO = 0;
 export const BROWSER_EFFECTS_FULL = 1;
 export const BROWSER_EFFECTS_REDUCED = 2;
 export const BROWSER_EFFECTS_MINIMAL = 3;

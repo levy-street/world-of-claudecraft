@@ -38,6 +38,14 @@ export function sha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex');
 }
 
+function normalizedBrowserBundleBytes(bytes) {
+  const text =
+    typeof bytes === 'string'
+      ? bytes
+      : Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString('utf8');
+  return Buffer.from(text.replace(/^(\s*\/\/ )(?:\.\.\/)*node_modules\//gm, '$1node_modules/'));
+}
+
 export function fileDigest(repoRoot, relativePath) {
   const bytes = readFileSync(path.join(repoRoot, relativePath));
   return { path: relativePath, bytes: bytes.length, sha256: sha256(bytes) };
@@ -217,6 +225,7 @@ export async function buildPortraitRendererContract(repoRoot, browserBundleBytes
     });
     bundleBytes = built.outputFiles[0].contents;
   }
+  bundleBytes = normalizedBrowserBundleBytes(bundleBytes);
   return {
     trackedFiles: PORTRAIT_RENDER_FILES.map((relativePath) => fileDigest(repoRoot, relativePath)),
     browserBundle: {

@@ -6,6 +6,10 @@
 
 export const ADMIN_PERMISSIONS = [
   'analytics.read',
+  // The ad-spend ledger writes (server/ad_spend.ts): its reads ride
+  // analytics.read like every dashboard, but editing the money record is a
+  // separate grant so viewer-tier roles can see spend without touching it.
+  'analytics.manage',
   // World Market tracker price alerts (create/delete; reads ride along).
   // Deliberately separate from analytics.read so the read-only viewer role
   // cannot write standing config; the computed superadmin/admin bundles pick

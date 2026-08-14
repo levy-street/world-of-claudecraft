@@ -12,6 +12,7 @@ import {
   strongerQuestMarker,
 } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
+import { cheaterTagLabel } from '../ui/cheater_tag';
 import { deedBorderSlug } from '../ui/deed_border_view';
 import { deedTitleText } from '../ui/deed_i18n';
 import { devTierBadgeDataUrl, devTierByIndex, devTierNameOutlineColor } from '../ui/dev_tier';
@@ -313,6 +314,7 @@ export class NameplatePainter {
     state.opacity = 1;
     state.frame = '';
     state.aiLabel = '';
+    state.cheaterLabel = '';
     state.devOutline = null;
     state.raidMarkerUrl = '';
     state.emoteIconUrl = '';
@@ -365,6 +367,10 @@ export class NameplatePainter {
       state.title = entity.title ? deedTitleText(entity.title) : '';
       state.border = deedBorderSlug(entity.border);
       state.aiLabel = entity.aiAccount === true ? t('hudChrome.playerMenu.aiTag') : '';
+      // The `< >` wrapper is part of the catalog VALUE, not concatenated here:
+      // a locale that brackets differently owns its own punctuation, and the
+      // per-frame draw path never allocates a wrapper (the guildLabel rule).
+      state.cheaterLabel = cheaterTagLabel(entity);
       state.devOutline = showDevBadges ? devTierNameOutlineColor(entity.devTier ?? 0) : null;
       for (const aura of entity.auras) {
         if (aura.kind === 'stealth') {

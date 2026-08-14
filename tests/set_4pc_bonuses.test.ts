@@ -15,6 +15,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, SetProc } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type ProcInternals = {
   players: Map<number, PlayerMeta>;
@@ -108,7 +109,12 @@ describe('every epic family has a reachable 4-piece proc', () => {
 
 describe('weaponCrit set procs from real swings', () => {
   it('a melee crit in 4-piece Barrowlord grants Gravemight and raises attack power', () => {
-    const sim = new Sim({ seed: 31, playerClass: 'warrior', autoEquip: false }) as AnySim;
+    const sim = new Sim({
+      seed: 31,
+      playerClass: 'warrior',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const p = equipSet(sim, barrowlordEquipment);
     const mob = spawnTarget(sim, p);
     const apBefore = p.attackPower;
@@ -123,7 +129,12 @@ describe('weaponCrit set procs from real swings', () => {
   });
 
   it('a ranged (Auto Shot) crit in 4-piece Direfang bleeds the target with Ragged Gash', () => {
-    const sim = new Sim({ seed: 32, playerClass: 'hunter', autoEquip: false }) as AnySim;
+    const sim = new Sim({
+      seed: 32,
+      playerClass: 'hunter',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const p = equipSet(sim, direfangEquipment);
     const mob = spawnTarget(sim, p);
     p.gm = true; // the shot aggroes the wolf; keep the harness alive
@@ -143,7 +154,12 @@ describe('weaponCrit set procs from real swings', () => {
   });
 
   it('the Bonesplinter bleed stacks to its cap, scales, refreshes, and ticks', () => {
-    const sim = new Sim({ seed: 35, playerClass: 'warrior', autoEquip: false }) as AnySim;
+    const sim = new Sim({
+      seed: 35,
+      playerClass: 'warrior',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const p = equipSet(sim, {
       gloves: 'crownforged_gauntlets',
       waist: 'crownforged_girdle',
@@ -176,7 +192,12 @@ describe('weaponCrit set procs from real swings', () => {
   });
 
   it('a non-crit swing never rolls the weaponCrit proc (no rng draw past the swing)', () => {
-    const sim = new Sim({ seed: 33, playerClass: 'warrior', autoEquip: false }) as AnySim;
+    const sim = new Sim({
+      seed: 33,
+      playerClass: 'warrior',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const internals = sim as unknown as ProcInternals;
     const p = equipSet(sim, barrowlordEquipment);
     // engine-level check: the trigger gate itself draws nothing without procs
@@ -193,7 +214,12 @@ describe('weaponCrit set procs from real swings', () => {
 
 describe('spellCast set procs (Soulblaze, tier-2 casters)', () => {
   it('spell casts in 4-piece Wraithfire eventually grant Soulblaze and raise spell power', () => {
-    const sim = new Sim({ seed: 34, playerClass: 'mage', autoEquip: false }) as AnySim;
+    const sim = new Sim({
+      seed: 34,
+      playerClass: 'mage',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const internals = sim as unknown as ProcInternals;
     const p = sim.player as AnyEntity;
     const meta = internals.players.get(p.id)!;

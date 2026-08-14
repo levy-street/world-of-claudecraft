@@ -26,7 +26,11 @@
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import { ITEMS } from './data';
-import { consumeSelectedInventorySlot } from './item_copy_ref';
+import {
+  consumeSelectedInventorySlot,
+  newestMatchingSlot,
+  selectedInventorySlot,
+} from './item_copy_ref';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -83,12 +87,6 @@ export function bagCapacity(bags: readonly (string | null)[]): number {
   let total = BACKPACK_SLOTS;
   for (const id of bags) if (id) total += bagSlotsOf(ITEMS[id]);
   return total;
-}
-
-/** Slots in use. Each InvSlot entry occupies one slot regardless of count
- *  (pre-bag saves may carry overstacked entries; they are tolerated as-is). */
-export function usedBagSlots(inventory: readonly InvSlot[]): number {
-  return inventory.length;
 }
 
 /** How many of `count` copies of an item would fit: existing stacks absorb up
@@ -151,22 +149,6 @@ export function canGrantItemInstance(
   count = 1,
 ): boolean {
   return countFit(inventory, capacity, itemId, count, instance) >= count;
-}
-
-/** How many of a `count`-unit instanced grant actually fit: the same
- *  countFit room model canGrantItemInstance boolean-gates, surfaced as a
- *  number. A signed-grant call site that owns a rolled quantity larger than
- *  one (the corpse-harvest signed grant, mirroring the node-harvest signed
- *  grant's own countFit call) uses this to size its addItemInstance call
- *  instead of truncating an available multi-unit fit down to one. */
-export function fitForItemInstance(
-  inventory: readonly InvSlot[],
-  capacity: number,
-  itemId: string,
-  count: number,
-  instance: ItemInstancePayload,
-): number {
-  return countFit(inventory, capacity, itemId, count, instance);
 }
 
 /** True when all `count` copies fit. */
@@ -418,15 +400,41 @@ export function equipBag(
     ctx.error(meta.entityId, 'You have too many items to swap to that bag.');
     return;
   }
+  // Bags store only a bare item id in meta.bags (#2837): there is nowhere to
+  // park an instance payload or a craftedRecipeId while a bag is worn, so
+  // equipping a payload-bearing copy would silently destroy it on the next
+  // unequip's plain addStacked grant. Not reachable through shipped content
+  // today: no bag recipe or grant currently carries one (tests/bags.test.ts
+  // pins that no CRAFTABLE bag-kind item def is authored at a signable
+  // material rarity, the one live-content vector craftedRecipeId's own kind
+  // check does not close; two shipped bags already sit at rare/epic quality,
+  // but both are recipe-free loot drops granted plain). Bags are DECLARED
+  // payload-free here rather than merely assumed: peek the copy that would
+  // be consumed BEFORE consuming it (refusing late would have already
+  // removed it) and refuse the equip outright the moment one ever does carry
+  // a payload, whatever the source, rather than dropping it.
+  const peeked =
+    slotIndex !== undefined
+      ? selectedInventorySlot(meta.inventory, itemId, slotIndex)
+      : newestMatchingSlot(meta.inventory, itemId);
+  if (peeked === null) {
+    ctx.error(meta.entityId, "You don't have that item.");
+    return;
+  }
+  if (peeked?.instance || peeked?.craftedRecipeId !== undefined) {
+    ctx.error(meta.entityId, 'That bag cannot be equipped while it carries a special property.');
+    return;
+  }
   // A named slot consumes exactly that copy; an id-only call keeps the legacy
-  // newest-first walk (ctx.removeItem) untouched.
+  // newest-first walk (ctx.removeItem) untouched. Both consumers stay
+  // tri-state-aware even though the peek above already refused every
+  // legitimate case: a silent no-op keeps a future divergence between the
+  // peek and consume halves from equipping a bag AND leaving its source copy
+  // behind (item_copy_ref.ts's own "branch on all three" contract).
   if (slotIndex !== undefined) {
     // No onInventoryChangedForQuests here: the shared call below already fires for
     // both arms, and running it twice re-evaluated collect objectives on one equip.
-    if (consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex) === null) {
-      ctx.error(meta.entityId, "You don't have that item.");
-      return;
-    }
+    if (consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex) === null) return;
   } else {
     ctx.removeItem(itemId, 1, meta.entityId);
   }

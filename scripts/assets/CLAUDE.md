@@ -71,11 +71,20 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   as needed (the remint tool prints that follow-up path itself).
 - **`compress_standalone_textures.mjs`** (+ `lib/standalone_texture_compression_core.mjs`)
   is the KTX2/Basis step for textures that ship OUTSIDE a GLB (default sweep: the player
-  skin/cosmetic atlases under `public/textures/skins/`), the same decode-amplification win
-  as the GLB step. It emits a `.ktx2` SIBLING next to each PNG and never deletes the source:
-  the runtime opts in per directory (`loadSkinTexInto` in `src/render/characters/assets.ts`
-  requests the sibling only for `textures/skins/` atlases), and `base.png` thumbnail sources
-  are skipped. Run it after adding or repainting a standalone atlas.
+  skin/cosmetic atlases under `public/textures/skins/`, plus the terrain splat and
+  worn-surface detail sets), the same decode-amplification win as the GLB step. It emits a
+  `.ktx2` SIBLING next to each source and never deletes it: the runtime opts in per
+  consumer (`loadSkinTexInto` in `src/render/characters/assets.ts` for `textures/skins/`
+  atlases; `src/render/terrain.ts` and `src/render/worn_stone.ts` via `ktx2SiblingUrl` for
+  their linear maps, with the six splat COLOUR layers and `GroundAO_Packed.png` deliberately
+  excluded, see `tests/surface_texture_ktx2.test.ts`), and `base.png` thumbnail sources are
+  skipped. Run it after adding or repainting a standalone source. The terrain and
+  worn-surface sets are flipY-consumed and MUST be regenerated with the flip baked
+  (`node scripts/assets/compress_standalone_textures.mjs --flip <files>`): a
+  CompressedTexture cannot honor flipY at runtime, there is no downstream
+  correction, and a re-run that drops the flag passes every byte-level check while
+  sampling upside down (`tests/surface_texture_ktx2.test.ts` greps this exact
+  command).
 - **One-shot and maintenance tools**, each with its recipe in its own header: the zone prop
   bakes (`build_willowfen_props.mjs` and its `*_props.mjs` siblings: one-shot weld + bounded
   simplify recipes over maintainer-local source packs; copy the willowfen recipe for a new
