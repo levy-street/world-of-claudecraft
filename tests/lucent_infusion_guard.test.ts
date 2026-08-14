@@ -230,6 +230,11 @@ describe('the Infusion refuses every reachable copy, at both twins', () => {
     expect(slot?.instance?.enchant).toBe(INFUSION);
     expect(slot?.instance?.perfected).toBe(true);
     expect(slot?.instance?.rolled?.stats).toEqual(ENCHANTS[INFUSION].statBonus);
+    // ...and the same thing against a LOCAL literal, because the compare above
+    // reads both sides from the same table: it proves the mint copied the def,
+    // never what the def says. A retune of the Infusion's stat line has to be
+    // deliberate enough to update this number too.
+    expect(slot?.instance?.rolled?.stats).toEqual({ sta: 13 });
   });
 });
 
@@ -392,8 +397,44 @@ describe('every `perfected` occurrence in the shipped trees is a READ, never a m
     return hits;
   }
 
-  /** The legal class for one occurrence, or undefined when nothing covers it. */
+  /** A WRITE of the marker field, in any spelling, anywhere on the line.
+   *
+   *  This runs BEFORE class matching and vetoes it, because classification is
+   *  per LINE and first-match-wins: without the veto a mint that SHARES a line
+   *  with a legal read is classified by the read and passes. That is not
+   *  hypothetical, it is how the previous version of this guard was defeated:
+   *  `if (enchant.requiresPerfected) inst.perfected = true;` matched the
+   *  def-read class and went green.
+   *
+   *  Case-SENSITIVE on the lowercase field name, which is what makes the two
+   *  declaration families legal WITHOUT a path-scoped carve-out:
+   *   - `requiresPerfected?: true` / `requiresPerfected: true` spell a capital
+   *     P, so they are a different identifier and never match here at all;
+   *   - `perfected?: true` (the payload declaration) puts a `?` between the
+   *     name and the colon, which none of the write shapes admit.
+   *  Deriving the exemption structurally rather than by file path is the
+   *  stronger option: a real mint added INSIDE types.ts or enchants.ts is still
+   *  caught, where a path carve-out would have waved it through.
+   *
+   *  `=(?!=)` is what keeps the guard READ (`?.perfected === true`) legal while
+   *  catching the assignment; the preceding `[^\w]` keeps `not_perfected` from
+   *  reading as a write to the field. */
+  const WRITE_SHAPES: RegExp[] = [
+    // `x.perfected = `, `x['perfected'] = `, `` x[`perfected`] = ``,
+    // `{ perfected: true }`, `x.perfected ??= `.
+    /(?:^|[^\w])perfected["'`\]]*\s*(?:=(?!=)|\?\?=|:\s*true)/,
+    // The one write that names the field only as an argument.
+    /defineProperty\([^)]*["'`]perfected["'`]/,
+  ];
+
+  function writesTheMarker(line: string): boolean {
+    return WRITE_SHAPES.some((re) => re.test(line));
+  }
+
+  /** The legal class for one occurrence, or undefined when nothing covers it,
+   *  INCLUDING when a write shares the line with something that would. */
   function classify(line: string, file: string): string | undefined {
+    if (writesTheMarker(line)) return undefined;
     return LEGAL_CLASSES.find((c) => c.matches(line, file))?.name;
   }
 
@@ -453,6 +494,11 @@ describe('every `perfected` occurrence in the shipped trees is a READ, never a m
       'const out = { [PERFECTED_KEY]: true, perfected: true };',
       'payload.perfected ??= true;',
       'inst[`perfected`] = true;',
+      // The two SHARED-LINE defeats: a mint riding along with something that
+      // classifies as legal. Both went green against the first version of this
+      // guard, which classified per line and stopped at the first match.
+      'if (enchant.requiresPerfected) inst.perfected = true;',
+      'if (holdsPerfectedTarget(meta, itemId)) inst.perfected = true;',
     ];
     for (const mint of MINTS) {
       expect(classify(mint, 'sim/professions/perfecting.ts'), mint).toBeUndefined();
@@ -471,6 +517,21 @@ describe('every `perfected` occurrence in the shipped trees is a READ, never a m
       ['takes hold only on a piece that has been Perfected.', 'ui/i18n.catalog/guide.ts'],
     ];
     for (const [line, file] of LEGAL) expect(classify(line, file), line).toBeDefined();
+    // The write veto must not swallow the two DECLARATION families, which is
+    // what lets it run without a path-scoped carve-out. Asserted against the
+    // veto directly, not just through classify, so a future widening of the
+    // write shapes fails here rather than silently reclassifying a declaration.
+    for (const decl of [
+      'perfected?: true;',
+      'requiresPerfected?: true;',
+      'requiresPerfected: true,',
+    ]) {
+      expect(writesTheMarker(decl), `${decl} is a declaration, not a write`).toBe(false);
+    }
+    // ...and the guard READ stays a read: `===` must not read as `=`.
+    expect(writesTheMarker('return instance?.perfected === true;')).toBe(false);
+    // The deny reason is not a write to the field either (the `[^\w]` guard).
+    expect(writesTheMarker("return { ok: false, reason: 'not_perfected' };")).toBe(false);
     // The prose class is PATH-SCOPED: the same sentence in a code file is not
     // covered by it, so a mint cannot hide behind prose-looking text.
     expect(

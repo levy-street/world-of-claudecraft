@@ -101,6 +101,27 @@ function readyForgeCrafter(sim: Sim, pid: number) {
   return recipe;
 }
 
+// The alchemy twin of the forge recipe above, for the SHIPPED-capstone arm.
+// Derived from the live table the same way, so a content change that unbinds it
+// from the apothecary fails HERE rather than as a silent green.
+const APOTHECARY_RECIPE_ID = 'recipe_silverleaf_healing_draught';
+function mustApothecaryRecipe() {
+  const recipe = ALL_RECIPES.find((r) => r.id === APOTHECARY_RECIPE_ID);
+  if (!recipe) throw new Error(`${APOTHECARY_RECIPE_ID} missing from ALL_RECIPES`);
+  if (recipe.stationType !== 'apothecary') {
+    throw new Error(`${APOTHECARY_RECIPE_ID} is no longer apothecary-bound`);
+  }
+  return recipe;
+}
+
+/** Teach the alchemy recipe and grant exactly its own reagent list. */
+function readyApothecaryCrafter(sim: Sim, pid: number) {
+  const recipe = mustApothecaryRecipe();
+  metaOf(sim, pid).knownRecipes.add(recipe.id);
+  for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, pid);
+  return recipe;
+}
+
 function makeParty(sim: Sim, ...pids: number[]) {
   const [leader, ...rest] = pids;
   for (const pid of rest) {
@@ -341,8 +362,13 @@ describe('crafting station gate: the partyShared arm', () => {
     makeParty(sim, a, b);
     teleport(sim, b, FIELD.x, FIELD.z);
     // alchemy maps to the apothecary, verified against the live mapping so a
-    // content remap fails HERE, not as a silent green elsewhere.
+    // content remap fails HERE, not as a silent green elsewhere. The cooking
+    // row rides beside it because the two shipped capstones (Grand Cauldron and
+    // The Laden Hearth) are the SAME placement code pointed at different
+    // crafts: if either mapping moved, one capstone would quietly open the
+    // wrong station and only this line would say so.
     expect(stationTypeForCraft('alchemy')).toBe('apothecary');
+    expect(stationTypeForCraft('cooking')).toBe('kitchens');
     expect(placeMobileStationFromItem(simCtx(sim), 'alchemy', 'Test Field Still', b)).toBeDefined();
 
     teleport(sim, a, FIELD.x + 1, FIELD.z);
@@ -356,6 +382,43 @@ describe('crafting station gate: the partyShared arm', () => {
     const types = inRangeStationTypes(STATIONS, (sim as any).entities.get(a).pos, ['alchemy']);
     expect(types.has('apothecary')).toBe(true);
     expect(types.has('forge')).toBe(false);
+  });
+
+  it('the SHIPPED Grand Cauldron, used from the bags, opens alchemy for a party member', () => {
+    // The end-to-end capstone arm, and the one that runs the real content row
+    // rather than this file's synthetic plumbing item: the shipped
+    // grand_cauldron def, through sim.useItem, satisfying a real
+    // apothecary-bound recipe for a DIFFERENT player standing in range. Every
+    // other arm here exercises the machinery with a test-owned id, so nothing
+    // yet proved the authored def is wired to it.
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+
+    // The premise, read off the live def: a placement tool pointed at alchemy.
+    expect(ITEMS.grand_cauldron.use).toEqual({
+      type: 'placeMobileStation',
+      stationCraftId: 'alchemy',
+    });
+
+    teleport(sim, b, FIELD.x, FIELD.z);
+    grantItem(sim, 'grand_cauldron', 1, b);
+    sim.useItem('grand_cauldron', b);
+    expect(metaOf(sim, b).mobileStation?.craftId, 'the placement landed').toBe('alchemy');
+    expect(metaOf(sim, b).mobileStation?.partyShared).toBe(true);
+
+    // The MEMBER, in range but not the owner, gets the craft gate and the
+    // readout the crafting window paints from. Both, because the row set is
+    // what tells the member the station is there at all.
+    teleport(sim, a, FIELD.x + 1, FIELD.z);
+    readyApothecaryCrafter(sim, a);
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['alchemy']);
+    const result = resolveCraft(simCtx(sim), a, APOTHECARY_RECIPE_ID);
+    expect(result.ok, 'the party member crafts off the shared cauldron').toBe(true);
+
+    // A permanent tool: the capstone is never consumed by placing it.
+    expect(sim.countItem('grand_cauldron', b), 'the cauldron survives its own use').toBe(1);
   });
 
   it('regression: a legacy specialization placement stays owner-only for party members', () => {

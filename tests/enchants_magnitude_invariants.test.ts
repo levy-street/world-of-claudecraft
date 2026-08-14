@@ -312,3 +312,50 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
     });
   });
 });
+
+describe('the EnchantDef shape stays stat-only (R7)', () => {
+  // R7 locks the enchant table to STAT bonuses: no movement speed, no proc, no
+  // on-use, no cooldown knob. Every OTHER pin in this file reads statBonus, so
+  // all of them stay green over a def that grew a `moveSpeed` or `proc` field
+  // beside it. This is the one assertion that would notice, and it is a
+  // whole-def key sweep rather than a field check because the hazard is a knob
+  // nobody has thought of yet: an unknown key fails by DEFAULT.
+  const ALLOWED_ENCHANT_KEYS = [
+    'id',
+    'name',
+    'itemSlot',
+    'reagents',
+    'statBonus',
+    'skillReq',
+    'requiresPerfected',
+  ] as const;
+
+  it('every row carries only allowlisted keys, and the required ones', () => {
+    const rows = Object.values(ENCHANTS);
+    expect(rows.length, 'the table really loaded').toBeGreaterThanOrEqual(20);
+    for (const enchant of rows) {
+      for (const key of Object.keys(enchant)) {
+        expect(
+          ALLOWED_ENCHANT_KEYS,
+          `${enchant.id} carries "${key}": if this is a new authored field, decide against ` +
+            'R7 (stat-only) before allowlisting it here',
+        ).toContain(key);
+      }
+      // The floor in the other direction, so the sweep cannot pass over a row
+      // that lost its stat line entirely.
+      for (const required of ['id', 'name', 'itemSlot', 'reagents', 'statBonus']) {
+        expect(Object.keys(enchant), `${enchant.id} is missing ${required}`).toContain(required);
+      }
+    }
+  });
+
+  it('the sweep really rejects an unknown knob (positive control)', () => {
+    // Without this, an allowlist that silently matched everything would pass
+    // the arm above forever.
+    const rogue = { ...ENCHANTS.enchant_weapon_might, moveSpeed: 0.1 };
+    const unknown = Object.keys(rogue).filter(
+      (k) => !(ALLOWED_ENCHANT_KEYS as readonly string[]).includes(k),
+    );
+    expect(unknown).toEqual(['moveSpeed']);
+  });
+});

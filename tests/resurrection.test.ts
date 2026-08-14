@@ -124,6 +124,17 @@ describe('resurrection: aurasSurvivingDeath predicate', () => {
     expect(aurasSurvivingDeath([aura('rejuvenation'), scriptedStun])).toEqual([scriptedStun]);
   });
 
+  it('keeps a FLASK-marked aura, the fourth surviving class', () => {
+    // Masterwrought phase 10. The predicate has four classes, not three, and
+    // this one is keyed on Aura.flask rather than on an id or a kind: a flask
+    // is bought to survive a wipe. The decoy is the point: the SAME id and kind
+    // without the marker dies, so the filter cannot be reading the family.
+    const marked = { ...aura('elixir_buff_sta'), flask: true } as const;
+    const unmarked = aura('elixir_buff_sta');
+
+    expect(aurasSurvivingDeath([aura('rejuvenation'), marked, unmarked])).toEqual([marked]);
+  });
+
   it('returns an empty list when nothing survives', () => {
     expect(aurasSurvivingDeath([aura('rejuvenation')])).toEqual([]);
     expect(aurasSurvivingDeath([])).toEqual([]);

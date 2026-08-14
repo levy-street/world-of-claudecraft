@@ -20,6 +20,8 @@
 // in tests/masterwrought_budget.test.ts; this file pins what the sim DOES with
 // them.
 import { describe, expect, it } from 'vitest';
+import { DELVES } from '../src/sim/data';
+import { ejectToDelveDoor } from '../src/sim/delves/runs';
 import { Sim } from '../src/sim/sim';
 import { revivePlayerAt } from '../src/sim/spirit';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
@@ -190,6 +192,34 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
     },
   );
 
+  it.each([SERPENT, SUNPETAL_SCROLL])(
+    'a flask replaces an active %s of its own stat: UPWARD always goes through',
+    (weakerId) => {
+      // The other direction of the refusal family above, for BOTH weaker
+      // sources. The scroll arm is the one that was missing: the refusal arm
+      // covers scroll-under-flask, so without this nothing said a flask may
+      // still be drunk over an active scroll.
+      const { sim, pid, p } = world();
+      sim.addItem(weakerId, 1, pid);
+      sim.useItem(weakerId, pid);
+      const before = aurasById(p, STA_FAMILY);
+      expect(before, 'the weaker source is active first').toHaveLength(1);
+      expect(before[0].flask, 'and carries no marker').toBeUndefined();
+
+      sim.drainEvents();
+      use(sim, pid, IRONHUSK);
+
+      expect(
+        (sim.drainEvents() as SimEvent[]).filter((e) => e.type === 'error'),
+        'going upward is never refused',
+      ).toHaveLength(0);
+      const after = aurasById(p, STA_FAMILY);
+      expect(after, 'never a stack').toHaveLength(1);
+      expect(after[0].value, 'the flask took the slot').toBe(15);
+      expect(after[0].flask).toBe(true);
+    },
+  );
+
   it('a flask still replaces the elixir of its own stat: only DOWNWARD is blocked', () => {
     const { sim, pid, p } = world();
     use(sim, pid, SERPENT);
@@ -227,6 +257,60 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
     expect(sta[0].value).toBe(12);
     expect(sta[0].flask).toBeUndefined();
     expect(sim.countItem(SERPENT, pid), 'the elixir really was drunk').toBe(0);
+  });
+
+  it('the strip spares a marker-less elixir of another id: the MARKER decides, not the family', () => {
+    // The strip only runs when a FLASK is quaffed, so the elixir has to be worn
+    // FIRST for this to exercise it at all. The family-scoping arm above quaffs
+    // in the other order, which is why it never put a live elixir in front of
+    // the strip. A strip keyed on the `elixir_` id family instead of Aura.flask
+    // would shed the serpent right here; keyed on the marker, it cannot see it.
+    const { sim, pid, p } = world();
+    use(sim, pid, SERPENT);
+    const before = aurasById(p, STA_FAMILY);
+    expect(before, 'the elixir is worn at the moment the strip runs').toHaveLength(1);
+    expect(before[0].flask, 'and carries no marker').toBeUndefined();
+
+    use(sim, pid, RUNEWATER);
+
+    const sta = aurasById(p, STA_FAMILY);
+    expect(sta, 'the marker-less elixir survived the strip').toHaveLength(1);
+    expect(sta[0].value).toBe(12);
+    expect(sta[0].flask).toBeUndefined();
+    const flasks = flaskAuras(p);
+    expect(flasks, 'and the new flask is the only marked aura').toHaveLength(1);
+    expect(flasks[0].id).toBe(INT_FAMILY);
+  });
+
+  it('the strip sheds a MARKED aura whose id has nothing to do with elixirs', () => {
+    // The other direction, and the reason the arm above is not enough on its
+    // own: a strip keyed on the `elixir_` id family would KEEP this decoy,
+    // because its id is not in that family at all. Only Aura.flask can see it.
+    // Pushed straight onto the list so applyAura's same-id rule cannot swallow
+    // it, the death test's decoy idiom.
+    const { sim, pid, p } = world();
+    p.auras.push({
+      id: 'probe_unrelated_ward',
+      name: 'Decoy Flask Ward',
+      kind: 'buff_armor',
+      remaining: 1200,
+      duration: 1200,
+      value: 4,
+      sourceId: p.id,
+      school: 'nature',
+      flask: true,
+    });
+    expect(flaskAuras(p), 'the decoy is the only marked aura to start').toHaveLength(1);
+
+    use(sim, pid, IRONHUSK);
+
+    const flasks = flaskAuras(p);
+    expect(flasks, 'still exactly one flask rides').toHaveLength(1);
+    expect(flasks[0].id).toBe(STA_FAMILY);
+    expect(
+      p.auras.some((a) => a.id === 'probe_unrelated_ward'),
+      'the unrelated MARKED aura was shed, by its marker and nothing else',
+    ).toBe(false);
   });
 
   it('elixir over elixir is untouched: the newest source still wins, weaker included', () => {
@@ -285,6 +369,44 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
     expect(revived, 'the flask is still there after the revive').toHaveLength(1);
     expect(revived[0].id).toBe(STA_FAMILY);
     expect(revived[0].value).toBe(15);
+  });
+});
+
+describe('the flask marker at the OTHER site that reuses the death filter', () => {
+  it('a flask rides through a delve EJECT, which is not a death at all', () => {
+    // The recorded widening, pinned where it can be seen. delves/runs.ts
+    // ejectToDelveDoor reuses aurasSurvivingDeath for a LIVE displacement, so
+    // the flask survives an eject as well as a death. That is deliberate (a
+    // player ejected from a delve has not died, and taking their flask would be
+    // harsher than dying), but it is the death filter reaching somewhere its
+    // name does not say, so it gets an assertion rather than a comment alone.
+    const { sim, pid, p } = world();
+    use(sim, pid, IRONHUSK);
+    // A marker-less aura to lose, so "the flask survived" is a filter running
+    // and not the eject leaving every aura untouched.
+    p.auras.push({
+      id: 'probe_mortal_ward',
+      name: 'Decoy Ward',
+      kind: 'buff_armor',
+      remaining: 600,
+      duration: 600,
+      value: 4,
+      sourceId: p.id,
+      school: 'nature',
+    });
+    expect(p.dead, 'nobody died: this is the live path').toBe(false);
+
+    ejectToDelveDoor(sim.ctx, pid, DELVES.collapsed_reliquary);
+
+    expect(p.dead, 'still alive after the eject').toBe(false);
+    const flasks = flaskAuras(p);
+    expect(flasks, 'the flask rode through the eject').toHaveLength(1);
+    expect(flasks[0].id).toBe(STA_FAMILY);
+    expect(flasks[0].value).toBe(15);
+    expect(
+      p.auras.some((a) => a.id === 'probe_mortal_ward'),
+      'and the filter really ran: the marker-less aura is gone',
+    ).toBe(false);
   });
 });
 
