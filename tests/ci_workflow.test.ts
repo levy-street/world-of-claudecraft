@@ -257,6 +257,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/farming-phase-01/',
       '            /docs/screenshots/farming-phase-05/',
       '            /docs/screenshots/farming-phase-07/',
+      '            /docs/screenshots/farming-phase-08/',
       '            /docs/screenshots/fenbridge-rebuild/',
       '            /docs/screenshots/guild-bank-tab/',
       '            /docs/screenshots/guild-social-v1/',

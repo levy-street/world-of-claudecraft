@@ -21,7 +21,7 @@
 | Phase 6 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-13 | 2026-08-13 |
 | Phase 7 (render and juice) | DONE 2026-08-14 | fix/farming-phase-07-render-and-juice (merge hash in the Phase 7 notes tail) | 0 BLOCKING across three domain reviews plus qa-checklist and the gate-integrity cone pass; 5 SHOULD-FIX fixed in-phase plus 2 adopted notes (the QA round reconciled this row with the Notes: the old "7 SHOULD-FIX" counted both) |
 | Phase 7 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-14 | 2026-08-14 |
-| Phase 8 (Harvest Journal) | not started | | |
+| Phase 8 (Harvest Journal) | DONE 2026-08-14 | fix/farming-phase-08-harvest-journal (merge hash in the Phase 8 notes tail) | 2 BLOCKING (language fan-out registry, focus-across-rebuild) found by the frontend review and fixed in-phase; 0 BLOCKING elsewhere across parity, architecture, hot-path, and qa-checklist; the parity gap (no golden farmReady) closed with a deliberate re-mint |
 | Phase 8 QA | not started | | |
 | Phase 9 (world presence, go-live) | not started | | |
 | Phase 9 QA | not started | | |
@@ -1449,7 +1449,103 @@ and freshness steps); the phase files' "all 8 steps" wording is
 historical per-run truth, not a stable count.
 
 ### Phase 8
-(not started)
+Status: DONE 2026-08-14, local-only per D22. Branch
+fix/farming-phase-08-harvest-journal off feature/farming-plan; fifteenth
+absorb first (merge 091e02931b of release/v0.38.0 tip e56010cec1: 108
+commits, 979 files, 73-file intersection, below the mid-phase bar; the five
+pin-test collisions re-counted from runs at 202/215 wire and 329 = 88 + 241
+IWorld; the Eastbrook polish seals re-minted on the merged tree through
+remint_polish_provenance.mjs, the portrait manifest receipt-free, the
+accepted-art registry re-pointed; release-merge-audit clean on all five
+axes with the four farming screenshot cone-row sets intact). Three-agent
+fan-out (journal window / map pins / ready notices) delivered 3/3; reviews:
+frontend-seam 2 BLOCKING + 4 SHOULD-FIX (both blockers and three
+should-fixes fixed in-phase, one ruled), architecture 0 findings (7 notes),
+cross-platform-sync 0 BLOCKING (the linkdead ruling below), server-hot-path
+0 BLOCKING (the unsharded-sweep ruling below), qa-checklist READY with the
+parity-scenario gap closed in-phase.
+
+Acceptance criteria, with states:
+- [x] DOM-free view core in UI_PURE_CORES (src/ui/harvest_journal_view.ts);
+      its suite covers rows, knobs, empty states, and remaining-time
+      derivation (30 tests).
+- [x] Honest remaining time: readyAtMs minus IWorldFarming.farmNowMs()
+      clamped at zero, status alone renders Ready/withered, a zero countdown
+      under a growing status renders the finishing state. The deliberately
+      skewed clock scenario is tested (nowMs far past readyAtMs with status
+      growing must NOT render Ready). The msRemaining wire field is DECLINED:
+      a per-tick-varying field on the diff-gated fplot key would defeat the
+      heavy-self design; the (ap) cosmetic-skew acceptance transfers. Wire
+      unchanged: 87 delta keys, both worlds untouched.
+- [x] All time formatting through t() token templates and formatNumber;
+      absolutes through formatDateTime; no hand-built colon strings
+      (REFINEMENT: a remainingSeconds final-minute arm replaced the packet's
+      minutes-only floor so the 1 Hz driver has digits to move).
+- [x] Cold-window contracts: harvest_journal_window.ts lands in the
+      auto-derived cold bucket with a COLD_PAINTER_ALLOWANCES entry (fixed
+      1000 ms setInterval, data-attribute rebind, whole-write elision);
+      DRIVER_HOSTS and the scanned-callback pins re-pinned; self-driven, so
+      hud_update_drive needs no row. Focus is carried across
+      signature-forced repaints (captureFocusKey/restoreFirstEnabled).
+- [x] Open-surface decision: professions-window Farming-row button plus the
+      Shift+K keybind; NO side-rail button (the rail has room, but hud.ts
+      headroom is the real budget). tests/crafting_launcher.test.ts green.
+- [x] Map and minimap pins for the patch sites through the overhauled
+      family (crafting-station doctrine: static content positions, never
+      entities); procedural two-leaf sprout in the STATION family color on
+      both surfaces; painted marker art recorded as asset debt; tooltip and
+      screen-reader label arms included.
+- [x] Login check in Sim.addPlayer after saved-state restore: one text-free
+      counts-only farmReady per player, zero rng (pinned against the real
+      draw observer), flag-flip-before-emit, relog silent forever.
+- [x] 1 Hz sweep in the Phase 3 updateFarming skeleton: once per plot
+      transition under real ticks, re-arm only at replant, twin-seed
+      identity pinned. Deliberately unsharded on the crowded 1 Hz residue
+      (measured sub-millisecond; sharding forks every golden).
+- [x] Hud arms in farm_event_feedback.ts (ambient banner, log lines,
+      farm_ready cue); hud.ts gained only the case label plus wiring within
+      ceiling (19485 of 19490 at commit time).
+- [x] farmReady joined HEAVY_SELF_EVENTS; the exact-set pin and the named
+      farming arm re-pinned in tests/server/heavy_self.test.ts.
+- [x] SFX: ui_farm_ready PLACEHOLDER row at 0 dB in ui_sfx.mjs, generated
+      through the bundled ffmpeg; every manifest-freshness artifact
+      committed fresh; count pins moved deliberately (19 cues, 268 keys).
+- [x] /dev farmgrow GUI row in dev_command_view.ts behind the dev window's
+      ALLOW_DEV_COMMANDS gate, with the token(values, 'bed') field.
+- [x] i18n: every player string is an English t() key; all wordy keys carry
+      the five non-Latin M16 fills; S3 green (the event is text-free, so no
+      matcher row, matching every prior farming phase).
+- [x] Golden: farming_session deliberately re-minted (f017045f to 50a2e54c)
+      in an ISOLATED commit for the appended ready-notice beat, which
+      golden-proves the sweep's emission (one farmReady, zero draws, the
+      second 1 Hz boundary silent). No other golden moved.
+- [x] tsc, the named suites, ci:changed green in-phase; gate_select run
+      recorded in the notes tail.
+- [x] Screenshots, LOW preset, desktop and mobile, committed under
+      docs/screenshots/farming-phase-08/ with the five ci.yml cone rows and
+      the ci_workflow literal in the same change.
+
+Would-be PR body (D22):
+Phase 8 gives the farmer the full "what is growing, where, and when" loop:
+the Harvest Journal window (professions-window entry plus Shift+K) lists
+every planted bed with crop, location, growth stage, applied care, and an
+honest live countdown; the world map and minimap pin the four patch sites
+with a procedural sprout in the station family; and a plot finishing emits
+one farmReady notice per growth cycle (login check plus 1 Hz sweep sharing
+one predicate over the persisted notified flag), surfaced as an ambient
+banner, chat lines, and a placeholder chime. Deliberate rulings this phase:
+no msRemaining wire field (the fplot key's diff-gating is the design), no
+harvest button or confirm channel in the journal (re-deferred; the window
+is informational), painted pin art deferred as asset debt, the sweep left
+unsharded on the 1 Hz residue, and a notice that ripens during the linkdead
+grace loses its transient banner (the journal, pins, and plot state show
+the truth on resume; maintainer read owed). Screenshots:
+docs/screenshots/farming-phase-08/before-journal-desktop.png to
+after-journal-desktop.png and after-journal-mobile.png (the window over the
+staged growth ladder), before-map-pins-desktop.png to
+after-map-pins-desktop.png and after-map-pins-mobile.png (the zone map),
+and before-professions-entry-desktop.png to
+after-professions-entry-desktop.png (the entry button).
 
 ### Phase 9
 (not started)

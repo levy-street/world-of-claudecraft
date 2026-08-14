@@ -215,9 +215,10 @@ export function projectFarmPlots(
  *  instant it is planted; there is no cross-base conversion. The parameter is
  *  a structural minimum (the two timestamps), so both the public FarmPlotView
  *  and the sim-side PlotState fit without ever needing the hidden slots. The
- *  derived msRemaining WIRE field (the RaidLockout template) is still not
- *  wired; the Phase 8 timer UI decides whether farmNowMs subtraction
- *  suffices or the wire field earns its bytes. */
+ *  derived msRemaining WIRE field (the RaidLockout template) was DECLINED by
+ *  the Phase 8 timer UI (state.md deviation (ay)): farmNowMs subtraction is
+ *  the mechanism, status stays the authority for Ready, and a
+ *  per-tick-varying wire field would defeat the fplot key's diff gating. */
 export type FarmGrowthStage = 'sprout' | 'seedling' | 'maturing' | 'ready';
 
 export function farmGrowthStage(

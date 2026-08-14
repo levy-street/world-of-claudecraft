@@ -28,6 +28,21 @@ and server/game.ts OVER ceiling from release growth alone, healed by extraction;
 post-heal headroom is recorded in state.md's (an) standing warning), so every new
 block this phase writes lands as a sibling module from the start.
 
+EXECUTED 2026-08-14 (the in-phase rulings, swept here per the doc rule; the full
+arguments live in state.md deviations (ay) to (bd)): the msRemaining wire field is
+DECLINED, countdowns derive from readyAtMs minus farmNowMs() with status the sole
+authority for Ready ((ay)); the open surface is the professions-window Farming row
+plus Shift+K with NO rail button, and this file's "rail at capacity" premise was
+wrong in direction: the rail guard has room, hud.ts ceiling headroom is the binding
+budget ((az)); the harvest confirm channel stays re-deferred because the journal
+ships informational, with no harvest button ((ba)); a notice ripening during the
+linkdead grace loses its transient banner, accepted with maintainer read owed
+((bb)); the sweep stays unsharded on the 1 Hz residue ((bc)); the pins ship
+procedural-only in the station family color, and the semantics-core path this
+file's correction names is NOT used: a farm patch is static content, so the pins
+ride the crafting-station/civic-service family (marker unions, painters, tooltip
+adapter, accessibility core), never MapMarkerSemantic ((bd)).
+
 ### Starter Prompt
 
 ```

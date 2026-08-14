@@ -39,14 +39,17 @@ Thornhollow Fields battleground, the map marker overhaul, the player item
 lock, civic service anchors, the three.js audit batch, and the monolith
 line-count ratchet tests/monolith_budget.test.ts). Count-pin baselines as of
 the eleventh absorb, all re-recorded from suite runs on the merged tree:
-command_schema 201/214 send/dispatch, delta keys 87 (fplot stays the
-branch's own), facet count 34; IWorld members moved to 328 (88 data, 240
-method) in Phase 7 with farmNowMs (deviation (ap)). The farming-only baselines held with zero movement:
-FARM_MATERIAL_ITEM_IDS 27 exact, ITEM_ART_PENDING 39 exact, farming.ts
-silent-loot grant sites 6, blob floor/ceiling pins unchanged. The
-farming_session golden was deliberately re-minted ONCE for the release's
-sampled reliquary field (deviation (am)); md5 is now
-f017045f5fa0e85f6d740c99ea4eb225. The tenth absorb 7ce12bad9e opened Phase 6
+command_schema 202/215 send/dispatch after the fifteenth absorb (the
+release's market_sell_price_check pair on top of the branch's three), delta
+keys 87 (fplot stays the branch's own), facet count 34; IWorld members 329
+(88 data, 241 method): Phase 7's farmNowMs (deviation (ap)) plus the
+release's marketSellPriceCheck. The farming-only baselines held with zero
+movement: FARM_MATERIAL_ITEM_IDS 27 exact, ITEM_ART_PENDING 39 exact,
+farming.ts silent-loot grant sites 6, blob floor/ceiling pins unchanged.
+The farming_session golden has moved deliberately TWICE: once for the
+release's sampled reliquary field (deviation (am), md5 f017045f), and once
+in Phase 8 for the appended ready-notice beat (isolated commit; md5 is now
+50a2e54c3e809a1a4aa0ecf99ea43c5f). The tenth absorb 7ce12bad9e opened Phase 6
 (v036 artwork overhaul, rift boss parity scenario, Evergarden east-edge
 terrain); the ninth 6e1ead1fea opened Phase 5 QA; the eighth 5819c005a7
 opened Phase 5 with the lockfile-driven seal re-mint. NOTE for any farming
@@ -592,7 +595,27 @@ question does not arise (farming has no station).
   so wireRev covers success); the Phase 3 warning about knob COMMANDS needing
   command-side marking was RETIRED BY DESIGN instead: the knobs are not
   commands, they ride plant_crop's payload, and every paid knob spends items.
-- New i18n keys and matcher rows: Phase 6: eight item-name rows in the items
+  Phase 8: NO new wire key and NO command; the farmReady SimEvent ({ pid,
+  ready, withered? }, counts only, withered omitted at zero, ready always
+  present and 0 on a withered-only notice) rides the generic event channel
+  and joined HEAVY_SELF_EVENTS (the exact-set pin re-pinned in the same
+  change), so the notified flip's fplot row rides the next snapshot instead
+  of the staggered backstop. Emitters: the addPlayer login check and the
+  1 Hz updateFarming sweep, one shared predicate in
+  src/sim/professions/farm_ready.ts over the persisted notified flag
+  (flip-before-emit; plantCrop is the only re-arm).
+- New i18n keys and matcher rows: Phase 8: the hudChrome.harvestJournal
+  namespace (23 keys: title/close/listLabel, the four timer arms
+  growing/finishing/ready/withered, four clock-token templates
+  remainingDaysHours through remainingSeconds, bedLine/bedLineUnknown, the
+  four stage labels, careWatch/careNone, and both empty states), four
+  hudChrome.farming ready lines (readyLine/Qty, readyWitheredLine/Qty), the
+  map rows hud.core.mapMarkerLabels.farmPatch and worldContent.farmPatchName,
+  and the devCommand farmgrow label/description/bed-field rows; every wordy
+  value carries its five non-Latin M16 fills (the dev rows are English-only,
+  outside the completeness suite's player-surface scope). No matcher rows
+  (farmReady is a text-free counts-only SimEvent, the standing pattern).
+  Phase 6: eight item-name rows in the items
   catalog (the dishes; English plus the five non-Latin fills per M16) and ONE
   hudChrome key, materialHint.growthTonic (the crafted tonic's tooltip purpose
   line, wordy value with its five non-Latin fills). NO recipe-name keys exist
@@ -1318,6 +1341,52 @@ question does not arise (farming has no station).
     correctness lane measured rendered plot heights above STAGE_HEIGHT
     targets through a bbox tilt-projection artifact of its own probe, not
     a normalization bug (heights ascend strictly, stages distinct).
+  Phase 8 deviations and rulings (2026-08-14, branch
+  fix/farming-phase-08-harvest-journal):
+  (ay) The derived msRemaining wire field is DECLINED, closing the question
+  (ap) and the farm_projection banner deferred here: the journal derives
+  remaining time as readyAtMs minus farmNowMs() clamped at zero, renders
+  Ready from status ALONE (a zero countdown under a growing status is a
+  "finishing" state), and inherits the (ap) NTP-scale cosmetic skew
+  acceptance. A per-tick-varying wire field on the fplot key would defeat
+  the heavy-self diff gating (the key's bytes are identical between real
+  transitions by design) and re-serialize every planted farmer at 20 Hz for
+  a cosmetic read. The banner in farm_projection.ts now records the ruling.
+  (az) Open surface: the journal opens from the professions window's
+  Farming row plus the Shift+K keybind (harvestJournal, Interface category;
+  Shift+H and Shift+J were taken). NO side-rail button: the rail guard has
+  room (col-a measured 414 of 660 px), but hud.ts ceiling headroom is the
+  binding budget and the packet's "rail at capacity" premise was WRONG in
+  direction (guard fine, monolith tight). hud.ts closed the phase at 19485
+  of 19490.
+  (ba) The harvest confirm channel ((ah)/(af)) stays RE-DEFERRED: the
+  journal is informational by design (no plant or harvest button, no
+  command sent), so promptSlotRefused and the resolver arm are untouched.
+  (bb) LINKDEAD ACCEPTANCE, maintainer read owed at feature review: a plot
+  ripening during the linkdead grace window loses its transient notice
+  permanently (probed: sendRaw drops frames for a non-open socket, and the
+  login check stays silent because notified persisted true). Accepted
+  because every durable surface this phase ships (journal, map pins, fplot
+  status) shows the truth on resume, and every honest fix needs a
+  connectivity concept the sim deliberately lacks. Same class, smaller: a
+  disconnect inside the one tick between addPlayer and its event drain
+  loses the login notice the same way.
+  (bc) The 1 Hz sweep is deliberately UNSHARDED on the crowded % 20 === 0
+  residue (the hot-path review's convoy finding): sharding by entity id
+  would move which tick each notice emits on and fork every parity golden;
+  measured cost is sub-millisecond at realm scale and visible under the
+  'farming' perf lap. Revisit only with tick-cost evidence. Related note:
+  cross-player farmReady order within a tick follows player-map insertion
+  order (draws nothing, forks nothing).
+  (bd) Pin art: procedural-only two-leaf sprout, STATION family color on
+  BOTH surfaces (gatherReady green refused: it means harvestable-right-now
+  and the pin carries no plot state; a patch is a static service site, the
+  crafting-station doctrine). The painted MapMarkerArtId with its full
+  provenance chain (WebP, mapping.json, CREDITS.md reword) is recorded
+  asset debt for the Phase 13 batch. A ledgered UX wrinkle from the
+  architecture review rides the status seam: a plot announced withered can
+  later project ready after a proficiency gain (monotonic, one-direction),
+  with no correcting notice; the bed itself shows the truth.
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the
@@ -1326,8 +1395,11 @@ question does not arise (farming has no station).
   already-settled plots alone, counts only work actually done in its [dev]
   summary, and draws nothing (pinned). /dev gather farming N already works
   (Phase 1). The /dev GUI row (src/ui/dev_command_view.ts) was RE-DEFERRED
-  by Phase 7 to Phase 8 (a dev-only UI surface; Phase 8 is the UI phase).
-  Phases 7 and 8 depend on these for dev-created crops.
+  by Phase 7 and LANDED in Phase 8: a farmgrow row in DEV_COMMAND_ACTIONS
+  (category progress, token(values, 'bed') for the optional bed id, a blank
+  field emitting the all-plots form) plus the dev window's text-field case,
+  behind the existing ALLOW_DEV_COMMANDS gate. Phases 7 and 8 depend on
+  these for dev-created crops.
 - Growth-phase (Phase 3) handoff from the Phase 2 review round, decide these ON
   PURPOSE rather than inherit them. PHASE 3 RESOLUTION (2026-08-08), each item
   below marked here rather than rewritten in place: anchor semantics DONE in
