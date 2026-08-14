@@ -21,20 +21,36 @@ from that directory. Phase work never runs from the main checkout at
 ~/Documents/world-of-claudecraft.
 
 STEP 0 - PRE-FLIGHT (canonical Team Workflow, docs/prd/masterwrought/implementation-plan.md):
-- git status clean; then SYNC RELEASE: git fetch origin, merge the newest origin/release/**
-  into feature/masterwrought, run the release-merge-audit skill on the merge.
-- Memory scan: MEMORY.md entries on aura/exclusivity, cooldown persistence, test-pin
-  traps, station/placement gotchas.
+- git status clean (Phase 09 QA closed at 11d9d147a8, gate all 8 PASS there; expect the
+  branch there or later). Then SYNC RELEASE: git fetch origin, merge the newest
+  origin/release/** line CONTAINING v0.38.0 (a hotfix fork is a poison target), run the
+  release-merge-audit skill on the merge. After the merge: set any composed count pin
+  (IWorld, command schema) from SUITE RUNS, never by arithmetic (the pin has composed
+  silently at three consecutive syncs); if the merge brought locale fill rows, run the
+  three naming guards (ip_scrub, overlay_ip_scrub, originality_renames) BEFORE the gate.
+- Memory scan: MEMORY.md entries on aura/exclusivity, cooldown persistence, the
+  test-pin trap index (40 traps, READ before any pin work), station/placement gotchas,
+  item-art-ownership-batch-xor-entries, new-item-content-hidden-obligations.
 
 STEP 1 - LOAD CONTEXT (Explore agent; do not read planning docs in the main loop):
 - docs/prd/masterwrought/state.md (rulings R7, R13, R14, R15; the phase 06 scroll
   family decisions; the phase 07 Lucent Reagent ledger entry; validation matrix)
 - docs/prd/masterwrought/progress.md (Phase 10 row)
-- src/sim/combat/exclusive_aura.ts (the family machinery scrolls/flasks share with
-  elixirs), the rare elixir line and current-best food rows in src/sim/content/
-  (increment baselines), src/sim/content/enchants.ts + src/sim/professions/enchanting.ts
-  (the enchant defs and the application cast seam), src/sim/professions/mobile_station.ts
-  (the phase 09 placement family the cauldron/hearth reuse), src/sim/CLAUDE.md.
+- The consumable exclusivity machinery, PREMISE CORRECTED at phase 09 QA: it is the
+  elixir_${kind} aura-id scheme in src/sim/items.ts (~line 941; applyAura same-id
+  replacement, newest wins, weaker included; useElixir/useElixirAura, which the phase
+  06 scrolls joined). src/sim/combat/exclusive_aura.ts EXISTS but is the ABILITY
+  exclusiveGroup engine (aspects/shouts via effect_dispatch), NOT the consumable path;
+  do not route flasks or foods through it.
+- The rare elixir line and current-best food rows in src/sim/content/ (increment
+  baselines), src/sim/content/enchants.ts + src/sim/professions/enchanting.ts (the
+  enchant defs and the application cast seam, incl the #2415 confirmReplace /
+  already_enchanted / same_enchant arms), src/sim/professions/mobile_station.ts (the
+  phase 09 placement family the cauldron/hearth reuse: the ONE transient
+  PlayerMeta.mobileStation slot with mutual clobber pinned, partyShared, the shared
+  eachPartyStationInRange walker both the craft gate and the set resolver ride, the
+  set-valued activeMobileStationCrafts readout), src/sim/professions/CLAUDE.md's
+  mobile_station row, src/sim/CLAUDE.md.
 Return: how aura families exclude, the exact rare-elixir and best-food numbers the
 increments build on, how an enchant applies today, what a placement needs.
 
@@ -48,6 +64,14 @@ party-interactable flask dispenser; reuse the phase 09 mobile_station placement 
 Agent 2 (cooking): three role foods, one increment over the current best, well-fed
 exclusive; "The Laden Hearth" feast, cooking skill 125, party-wide, same placement
 family.
+PLACEMENT DECISIONS both capstone agents must respect (phase 09 QA carries): the
+mobile_station family is TRANSIENT by design (tick-domain expiry, never persisted);
+a capstone meant to survive a realm restart would be the packet's first persisted
+station state, a schema-shape decision, NOT a reuse: if the design needs that, STOP
+and ask. The family has ONE per-player slot (PlayerMeta.mobileStation, mutual
+clobber pinned), so a player placing a cauldron or hearth OVERWRITES their own field
+forge; either record and pin that same-slot semantics deliberately, or a second slot
+is a recorded design decision, not a drive-by field.
 Agent 3 (enchanting): confirm the Lucent Reagent intermediate from phase 07 feeds this
 line (author it here ONLY if the phase 07 ledger lacks it). Three apex enchants
 (weapon, chest, boots) as FLAT stat increments one rung over the existing enchants,
@@ -78,11 +102,29 @@ STEP 3 - VALIDATION + REVIEW (matrix in state.md):
 npx tsc --noEmit; npx vitest run tests/progression.test.ts tests/recipe_economy.test.ts
 tests/itemization_coverage.test.ts tests/item_level.test.ts tests/architecture.test.ts
 tests/localization_fixes.test.ts tests/shipped_item_ids.test.ts plus the new
-exclusivity/increment/guard tests; npm run ci:changed. Review Dispatch Matrix
-(implementation-plan.md): architecture-reviewer (aura families, cast seam, placements
-are sim behavior); cross-platform-sync if a SimEvent, wire field, or matcher rule was
-added for the placements; frontend-seam-reviewer only if src/ui logic changed;
-qa-checklist when the deliverable set is complete. COVERAGE prompts; apply ALL findings.
+exclusivity/increment/guard tests; npm run ci:changed. THE PHASE 09 LESSON,
+non-negotiable: before calling ANY review round done, run the FULL suite
+(npx vitest run --maxWorkers=5), never only a curated battery; twelve census reds hid
+outside every curated battery at phase 09. EXPECTED RED: tests/professions_blob_growth
+WILL red on the tracking band (~160 bytes slack, recorded by design); re-MEASURE the
+adversarial load and re-band around the new settled bytes as a same-change obligation,
+never widen blindly (the structural 12288 ceiling should hold, ~1150 bytes spare).
+Other standing facts: new suites declaring >300s of vitest timeouts need a
+tests/suite_duration_budget.test.ts ledger row; sweep appends ride the family tables
+(masterwrought_budget arm 2 unions APEX_ARMOR_RECIPES + APEX_GEAR_RECIPES; a new
+APEX_CONSUMABLE_RECIPES-style array must join a completeness arm or be excluded with
+written rationale); src/render/renderer.ts sits at EXACTLY its 13708 monolith ceiling
+(zero headroom; touching it requires an extraction that lowers the ceiling); a content
+phase moves the stills bundle graph, so the portrait manifest re-bless happens at the
+genuinely FINAL code tip via the receipt flow, proven with --check. Review Dispatch
+Matrix (implementation-plan.md): architecture-reviewer (aura families, cast seam,
+placements are sim behavior); cross-platform-sync if a SimEvent, wire field, or
+matcher rule was added for the placements; content-obligations-reviewer (new item ids:
+WebP art with EXACTLY ONE mapping.json owner per the batch-XOR rule, M16 non-Latin
+fills for the wordy names, wiki regen, deed/reliquary posture per the phase 08
+crafted-tradables precedent and the OPEN curation decision); frontend-seam-reviewer
+only if src/ui logic changed; qa-checklist when the deliverable set is complete.
+COVERAGE prompts; apply ALL findings.
 
 STEP 4 - COMMIT CADENCE (explicit paths, bodies, no session trailers):
 - feat(content): apex flasks and role foods one rung over the shipped lines
@@ -104,8 +146,9 @@ family design, increments, the guard shape); memory note if anything surprised y
 STEP 7 - REPORT: phase status, files, validation results, reviewer verdicts, handoff
 line for Phase 10 QA.
 
-STOPPING RULES: stop and ask if the exclusive_aura families cannot express the
-flask/elixir pairing without behavior-changing edits to shipped family constants, if
-the infusion guard cannot be authored without phase 12 machinery, or if the release
-merge conflicts inside exclusive_aura.ts or enchanting.ts.
+STOPPING RULES: stop and ask if the elixir_${kind} aura-id scheme cannot express the
+flask/elixir pairing without behavior-changing edits to shipped aura ids, if a
+capstone is meant to survive a realm restart (the persisted-station schema decision),
+if the infusion guard cannot be authored without phase 12 machinery, or if the release
+merge conflicts inside items.ts's elixir arm or enchanting.ts.
 ```
