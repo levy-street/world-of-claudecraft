@@ -159,14 +159,19 @@ describe('resurrection: aurasSurvivingDeath predicate', () => {
 });
 
 describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
-  it('keeps ONLY the Cheater mark, sicknesses included in the wipe', () => {
+  it('keeps ONLY the Cheater mark, sicknesses and flasks included in the wipe', () => {
     // Arena entry and a Fiesta down strip more than a death does: a normalized
     // bout is decided by play, so even The Keeper's Toll goes. The sanction is
-    // not something the fighter walked in carrying, so it stays.
+    // not something the fighter walked in carrying, so it stays. The flask
+    // decoy pins the composed rule minted at the v0.38.0 merge: a flask
+    // survives DEATH (the arm above) but never a clean-slate wipe, so nothing
+    // carried in from the world rides into a ranked bout.
+    const flask = { ...aura('elixir_buff_sta'), flask: true } as const;
     const auras = [
       aura(RESURRECTION_SICKNESS_ID),
       aura(UNSTUCK_SICKNESS_ID),
       aura('rejuvenation'),
+      flask,
       aura(CHEATER_MARK_AURA_ID),
     ];
     const survivors = aurasSurvivingCleanSlate(auras);
