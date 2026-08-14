@@ -67,9 +67,11 @@ STEP 0 - PRE-FLIGHT
   mid-phase BEFORE this phase instead.
 - Record the phase-start commit (git rev-parse HEAD) for the STEP 3 diff.
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, and
-  the phase-relevant topics: pr-screenshot-browser-path (this is a visual phase),
-  worktree-cwd-drift-misroutes-git, pkill-pattern-matches-own-shell,
-  big-diff-reviewer-turn-budgets, malware-scan-comment-keywords.
+  the phase-relevant topics: pr-screenshot-browser-path and
+  screenshots-on-low-graphics (this is a visual phase; the standing rule captures
+  on the LOW preset), worktree-cwd-drift-misroutes-git,
+  pkill-pattern-matches-own-shell, big-diff-reviewer-turn-budgets,
+  malware-scan-comment-keywords.
 
 STEP 1 - LOAD CONTEXT
 Spawn one Explore agent (thoroughness: very thorough) to read and summarize:
@@ -263,10 +265,14 @@ STOPPING RULES
   resolved.
 - Stop if a review BLOCKING cannot be fixed without out-of-scope changes.
 
-Close: gate via node scripts/gate_select.mjs (the armory browser red is the standing
-environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker; PR CI is the arbiter), push,
-and open the PR against the release branch this phase was based on per
-.github/PULL_REQUEST_TEMPLATE.md, with before/after screenshots (desktop and mobile)
-captured via the pr-screenshots skill, committed under docs/screenshots, and
-referenced from the PR body (this is a visual phase).
+Close: gate via BROWSER_PATH=$HOME/.cache/ms-playwright/chromium-1228/chrome-linux64/
+chrome node scripts/gate_select.mjs on a FROZEN, committed tree (never edit while it
+runs); judge ONLY the log markers (grep for "FAIL": the selective gate prints
+"[gate:select] FAIL", the full gate "[gate] FAIL", plus the GATE EXIT marker; the
+shell exit code has lied). [AMENDED per D22, swept in Phase 6 QA: no push and no PR.
+The phase branch merges back --no-ff into LOCAL feature/farming-plan with the branch
+deleted; the gate log is the arbiter and the progress.md Notes block is the phase
+report. Before/after screenshots (desktop and mobile, captured on the LOW preset per
+the standing rule, via the pr-screenshots skill) are still committed under
+docs/screenshots and referenced from the Notes block: this is a visual phase.]
 ```
