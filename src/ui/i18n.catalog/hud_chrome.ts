@@ -641,6 +641,11 @@ export const hudChromeStrings = {
     applying: 'Update downloaded. Restarting the game to apply it.',
     incompatible:
       'An update is required to play. It will be applied as soon as it finishes downloading.',
+    // RETIRED from the overlay (the OTA dialog is deliberately
+    // non-dismissable) but kept on purpose: deleting an English leaf whose
+    // translations are already filled would force edits across every
+    // i18n.locales overlay, which contributors must never touch. Do not
+    // "clean this up"; the maintainer prunes retired keys at release.
     continueAnyway: 'Continue without updating',
     progressLabel: 'Update download progress',
   },
@@ -3015,7 +3020,14 @@ export const hudChromeStrings = {
     // The crafted farm supply (Phase 6): kind junk with no use arm, consumed
     // by plant_crop as the yield knob, so the tooltip purpose line is the one
     // in-game place that says what it is for.
-    growthTonic: 'Farming supply. Used when planting for a chance of a larger harvest.',
+    // Written from the live mechanic (src/sim/professions/farming.ts): spent
+    // at plant time via the knob payload, one yield roll at harvest, and a
+    // withered plot never reaches the resolver, so the tonic is forfeited
+    // with the crop. Magnitude stays qualitative on purpose: the chance and
+    // pick constants are maintainer-provisional (flagged at their rows).
+    growthTonic:
+      'Farming supply. Spent when you plant a crop for a chance of a slightly larger ' +
+      'harvest. If the crop withers, the tonic is lost with it.',
   },
   discord: {
     title: 'Discord',

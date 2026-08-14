@@ -107,6 +107,13 @@ const build = await buildItemArtAudit({
     // new item ships art (joining this count) or joins the pending pin, and
     // either move is a visible, deliberate edit.
     liveItemCount: 837,
+    // The other half of the art-subject split: the declared procedural-art
+    // debt, pinned as its own literal so the audit reds on new debt even
+    // when it runs standalone (the vitest exact-set pin in
+    // tests/item_icons.test.ts names the ids; this counts them). Total live
+    // defs = liveItemCount + pendingArtCount, so both growth directions are
+    // visible, deliberate edits.
+    pendingArtCount: 39,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

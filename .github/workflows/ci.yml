@@ -588,20 +588,24 @@ jobs:
           path: node_modules/.experimental-vitest-cache
           key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
 
-      # The shard runner spawns `npm test` itself, so pretest still regenerates
-      # the i18n artifacts in EVERY shard BY DESIGN (the S3 guard, guide
-      # freshness, and the git-subprocess suites need the generated artifacts no
-      # matter which shard they hash into); the freshness diff lives in
-      # pr-checks. Workers stay at half the runner's cores inside the script.
+      # The shard entry regenerates the artifacts itself, once per job, BY
+      # DESIGN (the S3 guard, guide freshness, and the git-subprocess suites
+      # need the generated artifacts no matter which shard they hash into; the
+      # merged selective leg is a bare vitest-related invocation with no npm
+      # lifecycle, so scripts/ci_shard_test.mjs runs pretest before spawning
+      # and the npm-test legs skip their lifecycle copy). The freshness diff
+      # lives in pr-checks. Workers stay at half the runner's cores inside the
+      # script.
       #
       # Phase 2 (docs/qa-gate.md, "Selective PR-tier CI"): the runner reads the
       # changes job's selection decision. test_mode=full spawns the old step
       # (`npm test -- --shard=i/8`) minus the long-sims lane files, which the
       # pr-long-sims-a/-b jobs run in this same run (Phase 4); test_mode=selective
-      # runs the always-run floor (blind/partial tests + invariant guard
-      # suites + changed tests, recomputed in this tree, minus the lane's
-      # floor members) plus `vitest related` over the changed sources, both
-      # sharded. Decisions and skip counts print in the job log.
+      # runs ONE merged sharded vitest-related leg: the changed sources plus
+      # the always-run floor (blind/partial tests + invariant guard suites +
+      # changed tests, recomputed in this tree, minus the lane's floor
+      # members) as self-selecting seeds. Decisions and skip counts print in
+      # the job log.
       # Release-gate below keeps the unconditional full run line; the nightly
       # workflow re-proves the full suite daily (docs/qa-gate.md).
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
@@ -616,7 +620,7 @@ jobs:
   # two parallel jobs by the lane-diet PR). The pair runs the CI_LONG_SUITES
   # files (scripts/lib/ci_shard_plan.mjs) that every pr-gate shard leg
   # excludes, one CI_LONG_SUITE_HALVES half per job, so the lane's wall clock
-  # is the slower half instead of the whole nine-suite list. Same event
+  # is the slower half instead of the whole list. Same event
   # routing and code path filter as pr-gate, so each job reports (or
   # docs-only-skips) on every pull_request AND merge_group run, which is the
   # bar docs/merge-queue.md sets for a REQUIRED check; both jobs are required
@@ -656,6 +660,13 @@ jobs:
     # 842s slow). Those three samples are not controlled against each other,
     # so read them as runner-to-runner variance dominating, not as a proof
     # about contention.
+    #
+    # 2026-08-13: the owned-class harness pair was split into the
+    # owned_class_balance_* / owned_class_raid_* single-responsibility files
+    # and the halves were re-balanced, so no lane chain carries that single
+    # 13-minute file any more. The figures above stay as the measured record;
+    # 30 predates the split and re-derives from fresh measured JOB walls in a
+    # follow-up change.
     #
     # 30 applies the same arithmetic as release-gate's bound: healthy JOB wall
     # times the 1.60 fast-to-slow runner ratio measured at b160a1ba18
@@ -714,8 +725,9 @@ jobs:
           key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-a-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
 
       # Same selection relay as the shard step (env, never run-line
-      # interpolation); the lane entry spawns `npm test` itself, so pretest
-      # regenerates the i18n artifacts here exactly as in every shard.
+      # interpolation); the lane entry regenerates the i18n artifacts once
+      # before spawning, exactly as in every shard (its npm-test legs skip
+      # their lifecycle copy so nothing regenerates twice).
       - name: Run tests (PR tier, long-sims lane A)
         env:
           TEST_MODE: ${{ needs.changes.outputs.test_mode }}
@@ -762,8 +774,9 @@ jobs:
           key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-b-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
 
       # Same selection relay as the shard step (env, never run-line
-      # interpolation); the lane entry spawns `npm test` itself, so pretest
-      # regenerates the i18n artifacts here exactly as in every shard.
+      # interpolation); the lane entry regenerates the i18n artifacts once
+      # before spawning, exactly as in every shard (its npm-test legs skip
+      # their lifecycle copy so nothing regenerates twice).
       - name: Run tests (PR tier, long-sims lane B)
         env:
           TEST_MODE: ${{ needs.changes.outputs.test_mode }}
@@ -889,13 +902,17 @@ jobs:
     #
     # 20 was sized from a 14.63 minute healthy worst case (run 31117143257).
     # That premise died on 2026-08-11 at b160a1ba18, where shard 1 drew FOUR
-    # of the nine long suites (owned_class_balance_harness, nythraxis_matrix,
+    # of the then-nine long suites (owned_class_balance_harness, nythraxis_matrix,
     # hunter_dps_balance, and druid_balance_probe) and was bound-killed four
     # times (run 31443047694 attempts 1 through 3, run 31443040285 attempt 1)
     # while attempt 2 of that same push run passed the identical scope in 16
     # minutes. Same commit, same warm transform cache: the differentiator was
     # runner speed, with owned_class_balance_harness measured at 527s on the
-    # fast runner and 842s on the slow one, a ratio of 1.60.
+    # fast runner and 842s on the slow one, a ratio of 1.60. (2026-08-13:
+    # that harness pair has since been split into the owned_class_balance_* /
+    # owned_class_raid_* files, so one shard draw can no longer carry a
+    # 13-minute single file; the figures stay as the record behind the 1.60
+    # ratio.)
     #
     # Sizing, stated as the arithmetic rather than a feel. Every figure below
     # is a JOB wall, which is what timeout-minutes actually polices: setup

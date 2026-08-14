@@ -1699,8 +1699,9 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'eastbrook_root_pottage',
     resultCount: 1,
     // The first fine-twin sink: a thick root pottage whose body comes from
-    // the fee vegetable and whose sweetness comes from the fine pick, thickened
-    // with a handful of wheat. Input 68 vs output 12.
+    // brook_carrot (the vendor-priced starter vegetable that also pays the
+    // farmer's watch fee, D9) and whose sweetness comes from the fine pick,
+    // thickened with a handful of wheat. Input 68 vs output 12.
     reagents: [
       { itemId: 'brook_carrot', count: 2 },
       { itemId: 'fine_brook_carrot', count: 1 },

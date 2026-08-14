@@ -196,22 +196,34 @@ describe('mob portrait source manifest', () => {
     // The renderer fingerprint hashes the esbuild browser bundle, whose
     // import graph reaches sim content, so content work moves it with zero
     // pixel impact (the farming branch hit this; deviation (al) in
-    // docs/farming/state.md). With every row byte-identical the manifest may
-    // adopt the new fingerprint receipt-free; any row drift or row-set
-    // change on top still demands the rendered receipt.
+    // docs/farming/state.md). The eligible shape is the drift classifier's
+    // bookkeepingOnly verdict: ONLY the bundle digest moved. Row drift, a
+    // row-set change, or an edit to a tracked renderer file (renderer work,
+    // not content churn) still demands the rendered receipt.
     const rows = Array.from({ length: 3 }, (_, index) => ({
       id: `mob_${index}`,
       sourceFingerprint: `source-${index}`,
       output: { bytes: 100 + index, sha256: `output-${index}` },
     }));
+    const trackedFiles = [
+      { path: 'scripts/render_finder_portraits.mjs', bytes: 10, sha256: 'tf-a' },
+    ];
     const previous = {
       schemaVersion: 2,
       rendererFingerprint: 'renderer-a',
+      renderer: {
+        trackedFiles: structuredClone(trackedFiles),
+        browserBundle: { bytes: 1000, sha256: 'bundle-a' },
+      },
       portraits: structuredClone(rows),
     };
     const fingerprintOnly = {
       schemaVersion: 2,
       rendererFingerprint: 'renderer-b',
+      renderer: {
+        trackedFiles: structuredClone(trackedFiles),
+        browserBundle: { bytes: 1002, sha256: 'bundle-b' },
+      },
       portraits: structuredClone(rows),
     };
     expect(() =>
@@ -226,6 +238,14 @@ describe('mob portrait source manifest', () => {
     removedRow.portraits.pop();
     expect(() =>
       assertManifestWriteAuthorized({ previous, next: removedRow, receipt: null }),
+    ).toThrow(/without a renderer receipt/);
+    // The tightened arm: the stills renderer scripts themselves moved, rows
+    // intact. That is exactly the camera/lighting edit the receipt exists to
+    // evidence, so the receipt-free path must refuse it.
+    const trackedFileMoved = structuredClone(fingerprintOnly);
+    trackedFileMoved.renderer.trackedFiles[0].sha256 = 'tf-b';
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: trackedFileMoved, receipt: null }),
     ).toThrow(/without a renderer receipt/);
     expect(() =>
       assertManifestWriteAuthorized({ previous, next: structuredClone(previous), receipt: null }),

@@ -9,14 +9,19 @@
 //               dedicated lane job runs exactly those files in the same run,
 //               so in FULL mode the shards plus the lane run the whole old
 //               suite and a fail-closed decision can never cost coverage.
-//   selective   two sharded legs. Leg 1 runs the always-run FLOOR through
-//               `npm test` (its pretest regenerates the i18n artifacts the
-//               guard suites read, in every shard, exactly as today), minus
-//               the lane files, which the lane job carries instead. Leg 2
-//               runs `vitest related` over the changed sources; pretest has
-//               already run by then. The related leg is deliberately NOT
-//               lane-filtered: a lane file it reaches re-runs there, which
-//               duplicates work but never opens a gap.
+//   selective   ONE merged sharded leg: `vitest related` over the changed
+//               sources PLUS the always-run floor files as self-selecting
+//               seeds (vitest seeds its affected set with the given paths
+//               themselves), minus the lane files on the floor side, which
+//               the lane job carries instead. One collection, one transform
+//               pass, one sharding, where the former floor and related legs
+//               paid a second vitest startup per shard. The related side is
+//               deliberately NOT lane-filtered: a lane file the graph walk
+//               reaches re-runs here, which duplicates work but never opens
+//               a gap. `npx vitest` has no npm lifecycle, so the entry
+//               (scripts/ci_shard_test.mjs) regenerates the artifacts once
+//               per job before spawning, and the guard suites still read
+//               fresh bytes on every shard.
 //   lane        the "PR gate (long sims A)" / "PR gate (long sims B)" jobs
 //               (buildLanePlan, one CI_LONG_SUITE_HALVES half each): the
 //               half's collected CI_LONG_SUITES files, all of them in full
@@ -39,10 +44,11 @@
 //      or the import graph shifts underneath them;
 //   3. every test file the PR itself changed.
 //
-// Sharding: vitest partitions the COLLECTED file set, so `--shard=i/N` on an
-// explicit file list (leg 1) and on a related run (leg 2) each split their own
-// set 8 ways. The two legs may overlap on partial tests; that re-runs a few
-// files and is wasted time, never a correctness gap.
+// Sharding: vitest partitions the COLLECTED file set, so `--shard=i/N` on the
+// merged related invocation splits the floor-union-related selection 8 ways in
+// one draw. A file both floor-classified and graph-reachable appears once in
+// the argv and once in the collection: vitest's related set is a Set, so the
+// old two-leg overlap re-runs are gone by construction.
 
 import { isRelayablePath } from './ci_test_select.mjs';
 import { classifySelectPaths } from './gate_select_plan.mjs';
@@ -58,6 +64,7 @@ export const CI_GUARD_SUITES = Object.freeze([
   'tests/architecture.test.ts',
   'tests/localization_fixes.test.ts',
   'tests/localization_coverage.test.ts',
+  'tests/suite_duration_budget.test.ts',
   'tests/world_api_parity.test.ts',
 ]);
 
@@ -71,9 +78,14 @@ export const CI_GUARD_PREFIXES = Object.freeze(['tests/parity/']);
  * single multi-minute file stops setting the slowest shard's wall clock.
  * Membership is measured, not automated: a file joins when it costs more than
  * the 90 second threshold inside a full-mode CI shard, and the next-longest
- * file stays sharded (2026-08-06 full-mode run: these four measured 249.5 s,
- * 143.9 s, 142.3 s, and 94.7 s in-shard; the next longest,
- * tests/corpse_harvest_sim.test.ts at 69.8 s, stays). Membership is also
+ * file stays sharded (2026-08-06 full-mode run: the then-four members
+ * measured 249.5 s, 143.9 s, 142.3 s, and 94.7 s in-shard; the next longest,
+ * tests/corpse_harvest_sim.test.ts at 69.8 s, stays). One decided exception
+ * to the per-file rule: the owned-class balance family split 2026-08-13 is
+ * lane-owned as a UNIT, split pieces included, so the diet flag registry
+ * (every WOC_FULL_BALANCE_SWEEP reader must be lane-owned) and the family's
+ * lane accounting stay in one place; measured per-file lane durations for
+ * the whole family are in the split PR (#3370). Membership is also
  * one-directional by nature: nothing automatic promotes a newly slowed suite
  * into this list, so when a shard's wall clock grows, remeasure from the
  * shard logs and re-decide the list (the committed contract and the audit
@@ -83,9 +95,21 @@ export const CI_GUARD_PREFIXES = Object.freeze(['tests/parity/']);
  * whole suite in their 8 shards, so the post-merge backstop is untouched.
  */
 export const CI_LONG_SUITES = Object.freeze([
-  'tests/audit_conservation_property.test.ts',
-  'tests/battleground.test.ts',
-  'tests/chronomancy_balance.test.ts',
+  // 2026-08-13 remeasure (run 31732244215, both lanes fully loaded; figures
+  // are IN-LANE and stay far under 90 even at the recorded 1.6x runner
+  // ratio): battleground (14.4 s) and audit_conservation_property (55.1 s)
+  // left for the shard pool. Eviction safety is structural, not
+  // classification-dependent: lane membership only changes WHERE a file runs,
+  // never WHETHER (a floor member like battleground rides the selective floor
+  // leg instead of the lane; a graph member like audit_conservation runs via
+  // the unfiltered related leg either way). The chronomancy
+  // suite split three ways and only its balance-targets file stays lane-listed
+  // (the heal-parity and Cascada pieces shard, like the warlock sustain
+  // suite's per-spec pieces, both pending a per-piece in-shard measurement).
+  // druid_balance_probe stays WHOLE: its cost is one matrix test whose
+  // bestDruidBuilds assertions are an argmax across capstones, so a
+  // per-capstone split would weaken the winner selection it pins.
+  'tests/chronomancy_balance_targets.test.ts',
   // The five-class-overhauls balance harnesses (review 3050): the owned-class
   // matrices grew to 8 specs and the raid loop to ~510s, pushing shards 1 and
   // 4 past the then-20-minute pr-gate shard budget; they are exactly what this
@@ -96,37 +120,51 @@ export const CI_LONG_SUITES = Object.freeze([
   'tests/eastbrook_gameplay_integration.test.ts',
   'tests/hunter_dps_balance.test.ts',
   'tests/nythraxis_matrix.test.ts',
-  'tests/owned_class_balance_harness.test.ts',
-  'tests/owned_class_raid_balance_harness.test.ts',
+  // The owned-class harness pair was split into single-responsibility files
+  // (2026-08-13) so no lane or shard chain carries a 13-minute single file:
+  // the level-20 harness measured 788 to 842 s as ONE file and pinned a
+  // whole worker wherever it ran. Every split file stays lane-owned; the
+  // duration ledger for the halves below is in the split-change PR.
+  'tests/owned_class_balance_dps_metrics.test.ts',
+  'tests/owned_class_balance_dps_probes.test.ts',
+  'tests/owned_class_balance_druid_bands.test.ts',
+  'tests/owned_class_balance_groveheart.test.ts',
+  'tests/owned_class_balance_healer_contract.test.ts',
+  'tests/owned_class_balance_healer_probes.test.ts',
+  'tests/owned_class_balance_role_bands.test.ts',
+  'tests/owned_class_raid_armor_avoidance.test.ts',
+  'tests/owned_class_raid_sustain_bands.test.ts',
 ]);
 
 /**
  * The two parallel lane jobs ("PR gate (long sims A)" / "PR gate (long sims
  * B)" in ci.yml): a literal partition of CI_LONG_SUITES, so the pair's wall
  * clock is roughly half of the single-job lane's. Halves are balanced by
- * MEASURED post-diet suite duration, not file count: half A is the level-20
- * owned-class harness (the single longest suite) plus the shortest members,
- * half B carries everything else (the balance is recorded in the lane-diet
- * PR and re-derived from the lane job logs whenever a member's cost moves).
- * The shard legs keep excluding the full CI_LONG_SUITES union, so the a/b
- * assignment can rebalance freely without touching the shard side.
- * tests/ci_shard_plan.test.ts pins the halves as an exact partition of
- * CI_LONG_SUITES.
+ * MEASURED post-diet suite duration, not file count (re-balanced 2026-08-13
+ * from the per-file durations in the harness-split PR after the owned-class
+ * pair became nine single-responsibility files; re-derive from the lane job
+ * logs whenever a member's cost moves). The shard legs keep excluding the
+ * full CI_LONG_SUITES union, so the a/b assignment can rebalance freely
+ * without touching the shard side. tests/ci_shard_plan.test.ts pins the
+ * halves as an exact partition of CI_LONG_SUITES.
  */
+const CI_LONG_SUITE_HALF_A = Object.freeze([
+  'tests/nythraxis_matrix.test.ts',
+  'tests/owned_class_balance_dps_metrics.test.ts',
+  'tests/owned_class_balance_dps_probes.test.ts',
+  'tests/owned_class_balance_druid_bands.test.ts',
+  'tests/owned_class_balance_healer_probes.test.ts',
+  'tests/owned_class_balance_role_bands.test.ts',
+  'tests/owned_class_raid_armor_avoidance.test.ts',
+]);
+
+// Half b is DERIVED (the union minus half a), so a lane file excluded from
+// every shard but owned by no lane is structurally impossible, not merely
+// pinned; tests/ci_shard_plan.test.ts still pins b's exact contents so the
+// derived assignment stays a conscious decision.
 export const CI_LONG_SUITE_HALVES = Object.freeze({
-  a: Object.freeze([
-    'tests/battleground.test.ts',
-    'tests/chronomancy_balance.test.ts',
-    'tests/owned_class_balance_harness.test.ts',
-  ]),
-  b: Object.freeze([
-    'tests/audit_conservation_property.test.ts',
-    'tests/druid_balance_probe.test.ts',
-    'tests/eastbrook_gameplay_integration.test.ts',
-    'tests/hunter_dps_balance.test.ts',
-    'tests/nythraxis_matrix.test.ts',
-    'tests/owned_class_raid_balance_harness.test.ts',
-  ]),
+  a: CI_LONG_SUITE_HALF_A,
+  b: Object.freeze(CI_LONG_SUITES.filter((f) => !CI_LONG_SUITE_HALF_A.includes(f))),
 });
 
 /**
@@ -346,36 +384,52 @@ export function buildShardPlan({
   // put the multi-minute files right back on the shard tail.
   const floorFiles = floor.filter((f) => !laneSet.has(f));
   const laneFloorCount = floor.length - floorFiles.length;
+  const liveSources = relatedSources.filter((p) => exists(p));
+  // ONE merged leg (2026-08-14; formerly a floor `npm test` leg plus a
+  // separate `vitest related` leg): `vitest related` keeps a spec whose own
+  // moduleId is among the given paths (vitest 4.1.10, specifications.ts,
+  // filterTestsBySource's `path === specification.moduleId` arm), so a floor
+  // TEST file passed as a positional selects itself. Feeding the floor beside the changed sources therefore
+  // runs floor-union-related in one collection, one transform pass, and one
+  // sharding, where the two sequential legs paid a second vitest startup and
+  // re-imported the shared setup on every shard.
+  // tests/ci_shard_plan.test.ts pins the self-selection property by EXECUTION
+  // so a vitest upgrade that dropped it goes red there instead of silently
+  // un-flooring every selective shard. The related side stays deliberately
+  // NOT lane-filtered: a lane file `related` reaches re-runs here (duplicate
+  // work, never a gap). `npx vitest` has no npm lifecycle, so pretest runs
+  // once at the entry (scripts/ci_shard_test.mjs) instead of per leg; the
+  // per-JOB artifact regeneration the S3 guard and freshness suites rely on
+  // is unchanged.
   const legs = [
     {
-      name: `npm test (always-run floor, ${floorFiles.length} files, shard ${shard.index}/${shard.total})`,
-      cmd: 'npm',
-      args: ['test', '--', ...floorFiles, shardArg, workersArg],
-    },
-  ];
-  const liveSources = relatedSources.filter((p) => exists(p));
-  if (liveSources.length > 0) {
-    // Deliberately NOT lane-filtered: a lane file `related` reaches re-runs
-    // here (duplicate work, never a gap), exactly the overlap contract the two
-    // selective legs already have with each other.
-    legs.push({
       // "path(s)", not "changed source file(s)": liveSources is the union of
       // changed sources and fed-through generated i18n artifacts; the mode
       // reason carries the split counts.
-      name: `vitest related (${liveSources.length} path(s), shard ${shard.index}/${shard.total})`,
+      name:
+        `vitest related (merged: ${floorFiles.length} floor file(s) + ` +
+        `${liveSources.length} changed path(s), shard ${shard.index}/${shard.total})`,
       cmd: 'npx',
+      // EXPLICIT --passWithNoTests=false: the related subcommand defaults
+      // the option to TRUE internally (options.passWithNoTests ??= true in
+      // vitest's cac wiring), so omitting the flag is NOT loud; only an
+      // explicit false sticks through the ??=. With it, a merged leg that
+      // collects nothing exits 1 (measured both directions), which is the
+      // red a floor-seeding collapse must produce in real CI; a healthy leg
+      // always collects the floor, so no false red is possible.
       args: [
         '--no-install',
         'vitest',
         'related',
         ...liveSources,
+        ...floorFiles,
         '--run',
-        '--passWithNoTests',
+        '--passWithNoTests=false',
         shardArg,
         workersArg,
       ],
-    });
-  }
+    },
+  ];
   return {
     mode: 'selective',
     reason: `selective: floor ${floorFiles.length} + related over ${liveSources.length} source(s)`,

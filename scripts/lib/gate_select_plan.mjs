@@ -12,10 +12,16 @@
 //   2. related      `vitest related` over the changed source files, which models
 //                   the remaining ~80% of the suite correctly.
 //
-// Two invocations rather than one because `related` is a subcommand, not a flag,
-// so it cannot be mixed with an explicit file list. The overlap between the two
-// (a 'partial' test selected by both) re-runs a handful of files and is pure
-// wasted time, never a correctness gap.
+// Two invocations here BY REMAINING CHOICE: `related` seeds its affected set
+// with the given paths themselves, so a merged floor-plus-sources invocation
+// is possible and the CI shards use exactly that (scripts/lib/ci_shard_plan.mjs,
+// merged 2026-08-14, with the seed property pinned by execution in
+// tests/ci_shard_plan.test.ts). The local gate keeps two legs for now simply
+// as a not-yet-taken follow-up (its artifacts are already generated once at
+// the gate entry, so nothing blocks the same merge here); take it with its
+// own pin round. The overlap between the two (a 'partial' test selected by
+// both) re-runs a handful of files and is pure wasted time, never a
+// correctness gap.
 //
 // SAFETY FALLBACK: any change this planner cannot reason about (a broad config
 // file, a lockfile, a vitest/vite/tsconfig edit) drops the whole plan to the FULL

@@ -2852,6 +2852,19 @@ export interface WeaponVfxCreateOptions {
   /** Build the sky dome. Defaults to `grounded`: only a caller that mounts
    *  `sceneExtras` in a scene has anything to draw it into. */
   backdrop?: boolean;
+  /**
+   * The caller registers this rig's light into a point-light budget that owns
+   * `visible` (the world path). The light is then born HIDDEN, because three
+   * counts a light into numPointLights iff it is visible, intensity included
+   * or not: a light born visible is counted for the frames before the budget
+   * first rules on it, and that changed count relinks every material drawn in
+   * them. Measured: one frame in 5434 sat at 7 budgeted lights against a pin
+   * of 6, and a relink is a 100 to 200 ms stall.
+   *
+   * A caller with no budget (the armoury preview owns its own renderer and
+   * scene) leaves this off and keeps a light that lights immediately.
+   */
+  budgetedLight?: boolean;
 }
 
 /** Scene-census bucket for every weapon-skin VFX rig (the `?perf` overlay's
@@ -2875,7 +2888,11 @@ export interface WeaponVfxHandle {
 export function createWeaponVfx(
   weaponRoot: THREE.Object3D,
   spec: WeaponVfxSpec,
-  { grounded = true, backdrop: withBackdrop = grounded }: WeaponVfxCreateOptions = {},
+  {
+    grounded = true,
+    backdrop: withBackdrop = grounded,
+    budgetedLight = false,
+  }: WeaponVfxCreateOptions = {},
 ): WeaponVfxHandle {
   const tier = TIERS[spec.tier];
   const b = localBounds(weaponRoot);
@@ -2961,6 +2978,9 @@ export function createWeaponVfx(
   // World-rendered weapon lights move with the held model and drive their own
   // flicker. The renderer still ranks them inside its fixed point-light count.
   light.userData.budgetDynamic = true;
+  // Born hidden on a budgeted path: the budget, not this constructor, decides
+  // whether the light is counted. See budgetedLight in WeaponVfxCreateOptions.
+  if (budgetedLight) light.visible = false;
   light.position.copy(resolvePoint(b, lightSpec.at ?? { yF: 0.7 }));
   group.add(light);
 

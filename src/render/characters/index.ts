@@ -79,7 +79,10 @@ export function createCharacterVisual(
       ? mechHeldWeaponOverride(e.templateId as PlayerClass)
       : null;
   try {
-    return new CharacterVisual(
+    // The world path, and the only one with a point-light budget: its weapon
+    // light is born hidden and the budget decides when it shines. A rig built
+    // directly (previews) keeps a light that lights immediately.
+    const visual = new CharacterVisual(
       key,
       e.color,
       formKey ? 0 : (e.skin ?? 0),
@@ -88,6 +91,8 @@ export function createCharacterVisual(
       formKey ? null : e.offhandItemId,
       look,
     );
+    visual.budgetedWeaponLight = true;
+    return visual;
   } catch (err) {
     // key the dedupe on visual key PLUS message: two models failing with an
     // identical generic error must both get their first log line

@@ -335,7 +335,7 @@ describe('item-art consistency accepted-art provenance', () => {
         // Re-minted by the farming branch's --refresh-verdict run (deviation
         // (al) in docs/farming/state.md).
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '3b504a6efeed2ab4f6c2c80aa716d4ec810bd214195b1c0a56cad47aa5b6105a',
+        acceptedSha256: 'acc3cd10baaac606f613b6dc7332cdf39eb741cfeb05d2384fbf9a092797b6e4',
         acceptedBytes: 107_997,
       },
     ]);
@@ -453,7 +453,7 @@ describe('item-art consistency accepted-art provenance', () => {
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
     expect(verdictBytes.length).toBe(107_997);
     expect(sha256(verdictBytes)).toBe(
-      '3b504a6efeed2ab4f6c2c80aa716d4ec810bd214195b1c0a56cad47aa5b6105a',
+      'acc3cd10baaac606f613b6dc7332cdf39eb741cfeb05d2384fbf9a092797b6e4',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -568,11 +568,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // the shipping catalog sha are untouched.
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '731bc17b8f36207d0df0f0668173f76d7c5c76e76cf0721a60cced449cc574dc',
+      sha256: 'a6918c8d242a31fdaac19b9f31ec21fef125cfd36b3c99cf95f294c82174db14',
       bytes: 451_256,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
-      'f748b74efa1531dde1339b4f33e2c0ec981ec856cfe8d4adbbcbbc511004cd68',
+      '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
     );
     expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
     expect(verdict.evidence.sheetCount).toBe(208);
