@@ -37,6 +37,7 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   tool: 'itemUi.kind.tool',
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
+  flask: 'itemUi.kind.flask',
   scroll: 'itemUi.kind.scroll',
   bag: 'itemUi.kind.bag',
   mount: 'itemUi.kind.mount',

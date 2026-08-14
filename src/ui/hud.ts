@@ -286,7 +286,7 @@ import { discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
-import { elixirTooltipLines } from './elixir_tooltip_view';
+import { elixirTooltipLines, wellFedTooltipLines } from './elixir_tooltip_view';
 import { emoteIconUrl } from './emote_icons';
 import {
   applyEnchantResultToast,
@@ -6059,6 +6059,10 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useDrink', { amount: itemNumber(item.drinkMana), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
+    // Directly under the restore line it qualifies: a role food heals while you
+    // sit AND leaves Well Fed once the meal finishes, so the two read in the
+    // order the player experiences them.
+    html += wellFedTooltipLines(item);
     // Gathering implements (#2343): picks/axes/sickles/rods and the simple
     // pole render their kind, requirement, use, and bonus lines from the
     // pure sibling module (the item_instance_tooltip.ts pattern).

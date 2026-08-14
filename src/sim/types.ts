@@ -635,6 +635,17 @@ export interface Aura {
   // without it a single dispel erased the entire Pale Keeper / unstuck penalty. The
   // rule itself is isPlayerRemovableAura in ./aura_classify.ts.
   undispellable?: true;
+  // Marks a FLASK consumable aura (kind 'flask', src/sim/items.ts useItem).
+  // Three rules key on it and nothing else does: the one-flask singleton strip
+  // (a second flask sheds every aura already carrying this marker, whatever its
+  // effect kind, so only one flask ever rides at a time), the downward-refusal
+  // guard (a same-family elixir or scroll is refused rather than allowed to
+  // overwrite a flask), and death persistence (aurasSurvivingDeath in
+  // ./resurrection.ts keeps it). DEATH only: auras are session state and are
+  // not persisted, so a flask does not survive a logout or a restart. The
+  // elixir/scroll sources of the same aura id never set it, so a plain elixir
+  // stays mortal and stays outside the singleton.
+  flask?: true;
   breaksOnDamage?: boolean;
   // Lingering Dread lets a break-on-damage fear absorb this much damage before
   // breaking. Undefined retains the normal break-on-any-damage behavior.
@@ -886,6 +897,7 @@ export type ItemKind =
   | 'tool'
   | 'potion'
   | 'elixir'
+  | 'flask'
   | 'scroll'
   | 'bag'
   | 'mount'
@@ -1166,8 +1178,30 @@ export interface HeldOffhandItemDef extends BaseItemDef {
 }
 
 export interface OtherItemDef extends BaseItemDef {
-  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'held_offhand' | 'mount' | 'recipe' | 'scroll'>;
+  kind: Exclude<
+    ItemKind,
+    'armor' | 'weapon' | 'held_offhand' | 'mount' | 'recipe' | 'scroll' | 'flask' | 'food'
+  >;
   armorType?: never;
+}
+
+// FOOD. Its own kind-scoped def for exactly one reason: `wellFed` lives HERE
+// rather than on BaseItemDef, so a drink (or a potion, or a sword) cannot
+// silently carry a Well Fed payload that nothing would ever grant. Only the
+// eating path reads it, and only a food def can spell it.
+//
+// The buff is the classic Well Fed: same payload shape as `elixir`, but the
+// grant POINT is what makes it a different mechanic. It lands only when the
+// 18-second Consuming drain runs out (combat/auras.ts updateRegen), so standing
+// up early feeds you and buffs you not at all. Every well-fed food shares one
+// aura id ('well_fed'), so the newest meal replaces the last through the
+// ordinary same-id rule, and it carries no flask marker: Well Fed dies with you.
+// Optional, because most food is a plain sit-down heal with no buff at all.
+export interface FoodItemDef extends BaseItemDef {
+  kind: 'food';
+  wellFed?: { aura: string; kind: AuraKind; value: number; duration: number };
+  armorType?: never;
+  weapon?: never;
 }
 
 // A buff SCROLL: the inscription-crafted alternative source of a battle-elixir
@@ -1180,6 +1214,27 @@ export interface OtherItemDef extends BaseItemDef {
 // effect payload can never be omitted (the Exclude above).
 export interface ScrollItemDef extends BaseItemDef {
   kind: 'scroll';
+  elixir: NonNullable<BaseItemDef['elixir']>;
+  armorType?: never;
+  weapon?: never;
+  use?: never;
+}
+
+// A FLASK: the alchemy apex consumable (docs/prd/masterwrought phase 10). Like
+// the scroll above it reuses the SAME `elixir` effect payload and the same
+// use-path arm, so it joins the shipped `elixir_${kind}` aura family and a flask
+// and an elixir of one stat replace each other in both orders through applyAura,
+// with no new stacking path. Two rules make it a flask rather than a stronger
+// elixir, both keyed on the Aura.flask marker the use path stamps, never on the
+// item kind: only ONE flask rides at a time whatever its stat (a second sheds
+// the first), and the buff survives death. Its own kind rather than another
+// 'elixir' row so the tooltip kind line, the bag/market/tray surfaces, and the
+// sort ladder can name it, and so the effect payload can never be omitted (the
+// Exclude above). Its band deliberately sits ABOVE the documented elixir
+// ceiling (value <= 12, duration <= 900): the ceiling binds the elixir/scroll
+// bands, which is exactly what a flask is meant to beat.
+export interface FlaskItemDef extends BaseItemDef {
+  kind: 'flask';
   elixir: NonNullable<BaseItemDef['elixir']>;
   armorType?: never;
   weapon?: never;
@@ -1230,7 +1285,9 @@ export type ItemDef =
   | OtherItemDef
   | MountItemDef
   | RecipeItemDef
-  | ScrollItemDef;
+  | ScrollItemDef
+  | FlaskItemDef
+  | FoodItemDef;
 
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
@@ -1275,6 +1332,17 @@ export interface ItemInstancePayload {
    *  boundTo, nothing item-specific. Additive and JSONB-safe: an absent flag is
    *  an ordinary freely-tradeable instance. */
   bindOnTrade?: boolean;
+  /** Marks a copy that has completed the Perfecting stage (Masterwrought R1).
+   *  Minted by phase 12; NOTHING writes it yet, which is exactly why the
+   *  phase 10 Lucent Infusion guard (content/enchants.ts requiresPerfected,
+   *  professions/enchanting.ts) refuses every item that exists today. Only
+   *  ever `true`; absent is an ordinary copy, so pre-phase saves load clean.
+   *  Deliberately NOT on the server's `eqi` wire allowlist: phase 12 decides
+   *  what a viewer may see of another player's Perfected state, so the field
+   *  stays server-and-owner-side until then (the picker's worn arm reads the
+   *  trimmed mirror and will need that decision, see
+   *  src/ui/enchant_apply_view.ts). */
+  perfected?: true;
   /** Player-toggled safety mark (issue 3042, item_lock.ts isItemLocked): while
    *  true this specific copy refuses salvage, profession-craft reagent
    *  consumption, and vendor sell (single and bulk) until the player unlocks
@@ -3960,6 +4028,12 @@ export interface Consuming {
   // Drives the eat/drink bite/gulp sound cadence (see consume_sfx.ts); never
   // read for anything else.
   ticksElapsed: number;
+  // The Well Fed buff this meal owes on COMPLETION, copied off the food def at
+  // sit-down (ItemDef.wellFed). Carried here rather than re-read from the def
+  // at the end so the grant is decided by what was eaten, not by what the
+  // catalog says now, and so the drain in combat/auras.ts needs no item lookup.
+  // Absent for every drink and for food that grants no buff.
+  wellFed?: { aura: string; kind: AuraKind; value: number; duration: number };
 }
 
 export function isConsuming(e: { eating: Consuming | null; drinking: Consuming | null }): boolean {
@@ -6015,6 +6089,12 @@ export type SimEvent = { pid?: number } & (
         // and the identical-enchant-id re-apply denied on every arm.
         | 'already_enchanted'
         | 'same_enchant'
+        // Masterwrought phase 10: the Lucent tier's two gates. A
+        // requiresPerfected enchant aimed at a copy carrying no `perfected`
+        // marker, and an enchant whose skillReq is above the applier's flat
+        // Enchanting skill.
+        | 'not_perfected'
+        | 'insufficient_skill'
         | 'busy';
     }
   // Outcome of applying a loadout's saved gear set. TEXT-FREE on purpose: the sim

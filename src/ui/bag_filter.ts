@@ -89,8 +89,11 @@ export type ItemLookup = (itemId: string) => ItemDef | undefined;
 // under 'consumable' beside the potions and elixirs: a scroll is a timed restorative
 // buff sharing an exclusivity family with elixirs (src/sim/types.ts), and the sim's
 // clean-up ladder already ranks it in the consumable run (KIND_RANK in
-// src/sim/inventory_sort.ts: potion, elixir, scroll), so the chip a player filters
-// for in a fight is exactly where it belongs.
+// src/sim/inventory_sort.ts: potion, elixir, flask, scroll), so the chip a player
+// filters for in a fight is exactly where it belongs. Flasks (kind 'flask', the
+// phase 10 alchemy apex) join for the same reason and one more: a flask is
+// literally the buff a raider reaches for before a pull, so burying it under 'all'
+// would hide the most-clicked consumable in the game.
 export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
   switch (category) {
     case 'all':
@@ -105,6 +108,7 @@ export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
         item.kind === 'drink' ||
         item.kind === 'potion' ||
         item.kind === 'elixir' ||
+        item.kind === 'flask' ||
         item.kind === 'scroll'
       );
     case 'material':

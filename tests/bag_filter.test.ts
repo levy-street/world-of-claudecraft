@@ -512,14 +512,12 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'inert_storm_shard',
     'last_keep_signet',
     'linen_pouch',
-    'lucent_reagent', // phase 07 intermediate, out when its apex row lands
     'mistcallers_duffel',
     'moonpale_scale',
     'mudfin_scale',
     'ogre_toe_ring',
     'old_cragmaws_pelt',
     'pale_pearl',
-    'seasoned_stock', // phase 07 intermediate, out when its apex row lands
     'silkspun_satchel',
     'soft_down',
     'soggy_boot',
@@ -528,7 +526,9 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // Masterwrought phase 08: the apex bag joins the bag-kind rows;
     // forgefold_plating, sunspun_bolt, wyrmfall_core, and wyrmhide_cording
     // left this list with their apex consumers (they now derive into the
-    // material set and gain the materials chip).
+    // material set and gain the materials chip). Phase 10 did the same for
+    // seasoned_stock, whose consumers are the apex role foods and the Laden
+    // Hearth.
     'sunspun_haversack',
     'tallow_candle',
     'tangled_weed',

@@ -2474,6 +2474,193 @@ export const APEX_GEAR_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The Masterwrought apex CONSUMABLE rung (Phase 10, R8/R13): the two crafts
+// the apex gear rungs left out, alchemy and cooking, land theirs as
+// consumables rather than gear. Its own array beside APEX_ARMOR_RECIPES and
+// APEX_GEAR_RECIPES because LADDER_RECIPES is pinned at its 54-row six-craft
+// shape and must never grow.
+//
+// The consumable idiom, which is where these rows differ from the gear ones:
+// a batch output (2 flasks, 4 plates) rather than a single piece, and ONE of
+// the craft's own intermediate rather than three, because a consumable is
+// spent and re-bought while a piece of gear is worn forever. The bills stay
+// uniform within a family, the same per-craft uniformity the gear rungs use,
+// so a role choice is never also an economy choice.
+//
+// PACING: the flask chain is daily-gated TRANSITIVELY. recipe_quickening_
+// catalyst is oncePerDay, so a flask costs a catalyst-day even though no row
+// here carries the flag. The food chain runs through seasoned_stock, which is
+// NOT daily-gated, so cooking's apex output paces on materials alone.
+//
+// The two skill-125 CAPSTONE rungs sit at the end: the alchemy and cooking
+// mobile stations, one rung above everything else in the game. 125 is legal
+// (the tidewrought precedent) and there is no craft-time skill admission gate
+// anyway; skillReq shapes teachability, the gold fee, the masterwork proc, and
+// skill gain, so the rung reads as the prestige marker it is. Their bills
+// mirror recipe_masters_field_forge: 3 of the craft's intermediate, 2 Wyrmfall
+// Cores, then the craft's gathered family.
+//
+// acquisition ['drop'] on every row per R8, same as the other two apex arrays:
+// the patterns land as drops and heroic-marks vendor rows in phase 11, so
+// these are deliberately unlearnable until then; NOT trainer rows. stationType
+// matches each craft's existing rows so the per-craft wiki station field stays
+// unanimous, and itemLevelBudget feeds only the craft gold fee. Every row is
+// authored gold-negative and keeps reagents with no buyValue, so none joins
+// the counterfactually-vendor-fed set (tests/recipe_economy.test.ts).
+export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
+  // The three flasks share one bill: the serpent elixir's own reagent list
+  // one rung up (sunpetal doubled) plus the catalyst that paces it.
+  // Input 424 vs output 50.
+  {
+    id: 'recipe_ironhusk_flask',
+    professionId: 'alchemy',
+    resultItemId: 'ironhusk_flask',
+    resultCount: 2,
+    reagents: [
+      { itemId: 'quickening_catalyst', count: 1 },
+      { itemId: 'pristine_venom_gland', count: 1 },
+      { itemId: 'venom_gland', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_warboar_flask',
+    professionId: 'alchemy',
+    resultItemId: 'warboar_flask',
+    resultCount: 2,
+    reagents: [
+      { itemId: 'quickening_catalyst', count: 1 },
+      { itemId: 'pristine_venom_gland', count: 1 },
+      { itemId: 'venom_gland', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_runewater_flask',
+    professionId: 'alchemy',
+    resultItemId: 'runewater_flask',
+    resultCount: 2,
+    reagents: [
+      { itemId: 'quickening_catalyst', count: 1 },
+      { itemId: 'pristine_venom_gland', count: 1 },
+      { itemId: 'venom_gland', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+  // The three role foods share one bill: Marlow's Grand Roast scaled to the
+  // apex batch, with the seasoned stock that carries the rung.
+  // Input 422 vs output 360.
+  {
+    id: 'recipe_stonepot_stew',
+    professionId: 'cooking',
+    resultItemId: 'stonepot_stew',
+    resultCount: 4,
+    reagents: [
+      { itemId: 'seasoned_stock', count: 1 },
+      { itemId: 'prime_cut', count: 2 },
+      { itemId: 'game_meat', count: 4 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_warspice_skewers',
+    professionId: 'cooking',
+    resultItemId: 'warspice_skewers',
+    resultCount: 4,
+    reagents: [
+      { itemId: 'seasoned_stock', count: 1 },
+      { itemId: 'prime_cut', count: 2 },
+      { itemId: 'game_meat', count: 4 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_sageleaf_chowder',
+    professionId: 'cooking',
+    resultItemId: 'sageleaf_chowder',
+    resultCount: 4,
+    reagents: [
+      { itemId: 'seasoned_stock', count: 1 },
+      { itemId: 'prime_cut', count: 2 },
+      { itemId: 'game_meat', count: 4 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  // The skill-125 capstones. Input 1010 vs output 380.
+  {
+    id: 'recipe_grand_cauldron',
+    professionId: 'alchemy',
+    resultItemId: 'grand_cauldron',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'quickening_catalyst', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'sunpetal_herb', count: 4 },
+      { itemId: 'goldleaf_herb', count: 2 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+  // Input 606 vs output 380.
+  {
+    id: 'recipe_laden_hearth',
+    professionId: 'cooking',
+    resultItemId: 'laden_hearth',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'seasoned_stock', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'prime_cut', count: 4 },
+      { itemId: 'game_meat', count: 4 },
+      { itemId: 'sunpetal_herb', count: 2 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+];
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
@@ -2492,6 +2679,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...INTERMEDIATE_RECIPES,
   ...APEX_ARMOR_RECIPES,
   ...APEX_GEAR_RECIPES,
+  ...APEX_CONSUMABLE_RECIPES,
 ];
 
 // O(1) indexes for the two per-lookup resolvers below (the recipe table grows

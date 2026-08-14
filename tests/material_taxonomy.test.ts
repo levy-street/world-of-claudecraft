@@ -73,6 +73,10 @@ const HONEST_MATERIALS = [
   'iron_ore',
   'ironbark_log',
   'linen_scrap',
+  // Masterwrought phase 10: derives IN as the reagent all four Lucent
+  // (apex) ENCHANTS consume, through the enchant half of the reagent union
+  // rather than the recipe half, per the phase 07 allowlist obligation.
+  'lucent_reagent',
   // Masterwrought phase 09: derives IN as the reagent the apex engineering
   // rows consume (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
   'precision_chassis',
@@ -102,6 +106,10 @@ const HONEST_MATERIALS = [
   // Masterwrought phase 09: derives IN as the reagent the apex inscription
   // row consumes (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
   'sablewax_vellum',
+  // Masterwrought phase 10: derives IN as the reagent the apex cooking rows
+  // consume (the three role foods plus The Laden Hearth in
+  // APEX_CONSUMABLE_RECIPES), per the phase 07 allowlist obligation.
+  'seasoned_stock',
   'sharp_claw',
   'silverleaf_herb',
   'smithing_flux',
@@ -136,15 +144,18 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'gleamstag_charm',
   'guardian_core',
   'last_keep_signet',
-  'lucent_reagent', // consumed from Phase 10 apex rows, remove then
   'old_cragmaws_pelt',
-  'seasoned_stock', // consumed from Phase 10 apex rows, remove then
   // Phase 08 removed forgefold_plating, wyrmhide_cording, sunspun_bolt, and
   // wyrmfall_core: the apex armor rows are their consumers, so all four now
   // derive IN through the reagent source table (HONEST_MATERIALS above).
   // Phase 09 removed duskforged_billet, precision_chassis,
   // prismglass_setting, and sablewax_vellum the same way: the apex gear rows
   // (APEX_GEAR_RECIPES) are their consumers.
+  // Phase 10 removed lucent_reagent: the four Lucent enchants are its
+  // consumers, and enchant reagents feed the same union recipe reagents do.
+  // Phase 10 also removed seasoned_stock: the three role foods and The Laden
+  // Hearth (APEX_CONSUMABLE_RECIPES) are its consumers, the same derivation
+  // the phase 08/09 intermediates took.
 ] as const;
 
 // The six vendor-buyable crafting staples, ruled IN by name (Q6).
@@ -197,6 +208,8 @@ describe('MATERIAL_ITEM_IDS: class exclusions, keyed on KIND against the live ca
       'drink',
       'potion',
       'elixir',
+      'scroll',
+      'flask',
     ] as const;
     for (const kind of censused) {
       expect(kinds.has(kind), `catalog carries no kind-${kind} item`).toBe(true);

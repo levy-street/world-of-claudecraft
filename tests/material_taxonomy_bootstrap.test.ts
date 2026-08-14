@@ -20,7 +20,10 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // wyrmfall_core derived IN with their apex consumers. 60 -> 64 at
     // phase 09: duskforged_billet, precision_chassis, prismglass_setting,
     // and sablewax_vellum derived IN as the APEX_GEAR_RECIPES reagents.
-    expect(MATERIAL_ITEM_IDS.size).toBe(64);
+    // 64 -> 66 at phase 10: lucent_reagent through the ENCHANT half of the
+    // reagent union, and seasoned_stock through the recipe half as the apex
+    // cooking reagent (APEX_CONSUMABLE_RECIPES).
+    expect(MATERIAL_ITEM_IDS.size).toBe(66);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     expect(isMaterialItem({ id: 'iron_ore' } as ItemDef)).toBe(true);

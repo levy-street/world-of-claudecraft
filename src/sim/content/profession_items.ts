@@ -628,6 +628,52 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 150,
   },
 
+  // --- Apex role foods (cooking, Masterwrought phase 10) --------------------
+  // Outputs of APEX_CONSUMABLE_RECIPES (content/recipes.ts) at skillReq 100,
+  // kitchens-bound like the ladder above. Still kind 'food' with the ordinary
+  // 18-second sit heal, plus the classic Well Fed buff the new `wellFed`
+  // payload carries (types.ts): it lands only when the drain COMPLETES, so a
+  // meal cut short feeds and buffs nothing. One shared 'well_fed' aura id
+  // across all three, so the newest plate replaces the last and no one eats
+  // three roles at once, and no flask marker: Well Fed dies with you.
+  //
+  // foodHp 1392 is the next classic-era food band above the shipped 980
+  // ceiling (conjured_bread4 / marlows_grand_roast), which is where the
+  // repo's classic-formula doctrine puts the rung after it. The well-fed stat
+  // enters at the consumable family's own entry rung, value 6 (the common
+  // elixir rung), for the classic 10-minute duration. sellValue 90 continues
+  // the dish curve's per-unit multi-output pricing one step past the 75 of
+  // silvered_carp_supper, and 4 x 90 stays strictly below the summed reagent
+  // value. Never vendor-stocked (no buyValue). 'Well Fed' is localized
+  // client-side through the sim_i18n aura matcher, like the elixir auras.
+  stonepot_stew: {
+    id: 'stonepot_stew',
+    name: 'Stonepot Stew',
+    kind: 'food',
+    quality: 'epic',
+    foodHp: 1392,
+    wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 600 },
+    sellValue: 90,
+  },
+  warspice_skewers: {
+    id: 'warspice_skewers',
+    name: 'Warspice Skewers',
+    kind: 'food',
+    quality: 'epic',
+    foodHp: 1392,
+    wellFed: { aura: 'Well Fed', kind: 'buff_ap', value: 6, duration: 600 },
+    sellValue: 90,
+  },
+  sageleaf_chowder: {
+    id: 'sageleaf_chowder',
+    name: 'Sageleaf Chowder',
+    kind: 'food',
+    quality: 'epic',
+    foodHp: 1392,
+    wellFed: { aura: 'Well Fed', kind: 'buff_int', value: 6, duration: 600 },
+    sellValue: 90,
+  },
+
   // --- Crafted alchemy ladder (alchemy) ------------------------------------
   // Trainer-taught outputs of LADDER_RECIPES (content/recipes.ts), three rungs
   // at skillReq 0/25/50, apothecary-bound at alchemist_verane. Potions reuse the
@@ -712,6 +758,48 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     elixir: { aura: 'Might of the Serpent', kind: 'buff_sta', value: 12, duration: 900 },
     sellValue: 20,
+  },
+
+  // --- Apex flasks (alchemy, Masterwrought phase 10) ------------------------
+  // Outputs of APEX_CONSUMABLE_RECIPES (content/recipes.ts) at skillReq 100,
+  // apothecary-bound like the rest of alchemy. kind 'flask' (types.ts
+  // FlaskItemDef) reuses the `elixir` payload and the shipped `elixir_${kind}`
+  // aura family, so a flask and a same-stat elixir or scroll replace each other
+  // in both orders; what makes it a flask is the Aura.flask marker the use path
+  // stamps: only ONE flask rides at a time whatever its stat, and it survives
+  // death. One flask per role, so the choice is which role you fly, never how
+  // many flasks you stack.
+  //
+  // The band deliberately BREAKS the elixir ceiling documented above (buff_sta
+  // <= 12 for <= 900s), which is the point of an apex rung: value 15 is the
+  // rare elixir's 12 plus the ladder's own +3 step, and duration 1200 is its
+  // 900 plus the ladder's +300 step. sellValue 25 continues the elixir curve
+  // (10/15/20) by its +5 step. Never vendor-stocked (no buyValue). The three
+  // aura display names are localized client-side through the sim_i18n aura
+  // matcher (AURA_NAME_KEY), the same path as 'Might of the Serpent'.
+  ironhusk_flask: {
+    id: 'ironhusk_flask',
+    name: 'Ironhusk Flask',
+    kind: 'flask',
+    quality: 'epic',
+    elixir: { aura: 'Ironhusk Vigor', kind: 'buff_sta', value: 15, duration: 1200 },
+    sellValue: 25,
+  },
+  warboar_flask: {
+    id: 'warboar_flask',
+    name: 'Warboar Flask',
+    kind: 'flask',
+    quality: 'epic',
+    elixir: { aura: 'Warboar Might', kind: 'buff_ap', value: 15, duration: 1200 },
+    sellValue: 25,
+  },
+  runewater_flask: {
+    id: 'runewater_flask',
+    name: 'Runewater Flask',
+    kind: 'flask',
+    quality: 'epic',
+    elixir: { aura: 'Runewater Clarity', kind: 'buff_int', value: 15, duration: 1200 },
+    sellValue: 25,
   },
 
   // --- Crafted jewelry ladder (jewelcrafting) -------------------------------

@@ -78,15 +78,23 @@ export function unstuckSicknessDuration(level: number): number {
 
 // Auras that survive a death / respawn reset: both sicknesses (The Keeper's Toll
 // and Unstuck Sickness), the Cauterize lockout ('cauterize_fatigue',
-// combat/fire_mage.ts), and encounter-owned unbreakable control. None may be shed
-// by dying; the encounter script remains responsible for releasing its own control.
-// Every other aura clears. Used at every player death/respawn site so the rule
-// cannot drift.
+// combat/fire_mage.ts), encounter-owned unbreakable control, and FLASK auras
+// (Aura.flask, the alchemy apex consumable): a flask survives DEATH, which is
+// what makes it worth carrying instead of the elixir of the same stat. Death
+// only. Auras are session state and are not persisted, so a flask does NOT
+// survive a logout, a reconnect, or a server restart; that is a deferred schema
+// decision, not an oversight here. None may be shed by dying;
+// the encounter script remains responsible for releasing its own control.
+// Every other aura clears, Well Fed included. Used at every player
+// death/respawn site so the rule cannot drift. The deliberate exceptions are
+// the FULL wipes in social/arena.ts and social/fiesta.ts, which reset a match
+// to a clean slate and so clear flasks along with everything else.
 export function aurasSurvivingDeath(auras: Aura[]): Aura[] {
   return auras.filter(
     (a) =>
       SICKNESS_AURA_IDS.has(a.id) ||
       a.kind === 'cauterize_fatigue' ||
-      a.unbreakableControl === true,
+      a.unbreakableControl === true ||
+      a.flask === true,
   );
 }

@@ -14,10 +14,18 @@ export const CONSUMABLE_BAR_SLOTS = 6;
 
 // Combat-priority order: what a player reaches for mid-fight comes first, so
 // the capped row never buries a potion behind a stack of picnic food. Scrolls
-// sit with the elixirs they alternate with (phase 06): both are combat-usable
-// buffs, and touch has no drag-to-hotbar, so this bar is a scroll's only
-// mid-fight surface.
-export const CONSUMABLE_KIND_ORDER = ['potion', 'elixir', 'scroll', 'food', 'drink'] as const;
+// sit with the elixirs they alternate with (phase 06), and flasks with both
+// (phase 10): all three are combat-usable buffs, and touch has no
+// drag-to-hotbar, so this bar is their only mid-fight surface. The flask sits
+// ahead of the scroll because it is the buff a player re-applies after a wipe.
+export const CONSUMABLE_KIND_ORDER = [
+  'potion',
+  'elixir',
+  'flask',
+  'scroll',
+  'food',
+  'drink',
+] as const;
 
 export type ConsumableLookup = (itemId: string) => ItemDef | undefined;
 

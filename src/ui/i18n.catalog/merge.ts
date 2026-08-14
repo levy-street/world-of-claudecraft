@@ -553,6 +553,7 @@ const mergeStringsEn = {
       tool: 'Tool',
       potion: 'Potion',
       elixir: 'Elixir',
+      flask: 'Flask',
       scroll: 'Scroll',
       bag: 'Bag',
       mount: 'Mount',

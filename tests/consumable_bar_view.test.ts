@@ -14,6 +14,7 @@ const DEFS: Record<string, ItemDef> = Object.fromEntries(
       ['healing_potion', 'potion'],
       ['mana_potion', 'potion'],
       ['bear_elixir', 'elixir'],
+      ['husk_flask', 'flask'],
       ['boar_scroll', 'scroll'],
       ['serpent_scroll', 'scroll'],
       ['bread', 'food'],
@@ -29,34 +30,58 @@ const lookup = (id: string) => DEFS[id];
 const inv = (...ids: string[]) => ids.map((itemId) => ({ itemId, count: 1 }));
 
 describe('consumableBarItems', () => {
-  it('keeps only the five consumable kinds and drops gear/junk/tools/unknowns', () => {
+  it('keeps only the six consumable kinds and drops gear/junk/tools/unknowns', () => {
     const got = consumableBarItems(
-      inv('sword', 'bread', 'pelt', 'healing_potion', 'boar_scroll', 'fishing_rod', 'no_such_item'),
+      inv(
+        'sword',
+        'bread',
+        'pelt',
+        'healing_potion',
+        'husk_flask',
+        'boar_scroll',
+        'fishing_rod',
+        'no_such_item',
+      ),
       lookup,
       [],
     );
-    expect(got).toEqual(['healing_potion', 'boar_scroll', 'bread']);
+    expect(got).toEqual(['healing_potion', 'husk_flask', 'boar_scroll', 'bread']);
   });
 
-  it('orders by combat priority (potion, elixir, scroll, food, drink), id-sorted within a kind', () => {
-    // deliberately scrambled bag order; the row must not follow it. The scroll
-    // lands after the elixir and before the food (phase 06: scrolls sit with
-    // the elixirs they alternate with).
+  it('orders by combat priority (potion, elixir, flask, scroll, food, drink), id-sorted within a kind', () => {
+    // deliberately scrambled bag order; the row must not follow it. The buff
+    // family sits between the potions and the food, in the order a player
+    // reaches for it: elixir, then the flask that replaces it (phase 10), then
+    // the scroll that is the elixir's alternative source (phase 06).
     const got = consumableBarItems(
-      inv('water', 'boar_meat', 'mana_potion', 'boar_scroll', 'bear_elixir', 'healing_potion'),
+      inv(
+        'water',
+        'boar_meat',
+        'mana_potion',
+        'boar_scroll',
+        'husk_flask',
+        'bear_elixir',
+        'healing_potion',
+      ),
       lookup,
       [],
+      // An explicit cap above CONSUMABLE_BAR_SLOTS: this case is about ORDER,
+      // and with six kinds plus a second potion the default cap would truncate
+      // the drink off the tail and stop pinning the end of the ladder. The cap
+      // itself has its own case below.
+      7,
     );
     expect(got).toEqual([
       'healing_potion',
       'mana_potion',
       'bear_elixir',
+      'husk_flask',
       'boar_scroll',
       'boar_meat',
       'water',
     ]);
     // the priority table itself is the load-bearing order; pin it
-    expect(CONSUMABLE_KIND_ORDER).toEqual(['potion', 'elixir', 'scroll', 'food', 'drink']);
+    expect(CONSUMABLE_KIND_ORDER).toEqual(['potion', 'elixir', 'flask', 'scroll', 'food', 'drink']);
   });
 
   it('collapses multiple stacks of one item into a single slot', () => {

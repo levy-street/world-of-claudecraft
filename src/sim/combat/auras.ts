@@ -171,7 +171,28 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
       });
     }
     c.remaining -= 2;
-    if (c.remaining <= 0) p[slot] = null;
+    if (c.remaining <= 0) {
+      // The meal FINISHED, which is the only moment a Well Fed buff is owed
+      // (classic: interrupted eating grants nothing, and every early exit
+      // clears the slot without reaching here). One shared 'well_fed' id
+      // across every role food, so the newest plate replaces the last through
+      // applyAura's ordinary same-id rule, and no flask marker: Well Fed dies
+      // with you. Draws no rng.
+      const wellFed = c.wellFed;
+      if (wellFed) {
+        ctx.applyAura(p, {
+          id: 'well_fed',
+          name: wellFed.aura,
+          kind: wellFed.kind,
+          remaining: wellFed.duration,
+          duration: wellFed.duration,
+          value: wellFed.value,
+          sourceId: p.id,
+          school: 'nature',
+        });
+      }
+      p[slot] = null;
+    }
   }
 }
 

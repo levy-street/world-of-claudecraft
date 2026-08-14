@@ -46,6 +46,8 @@ describe('item_name_color: quality path for non-quest', () => {
       'tool',
       'potion',
       'elixir',
+      'flask',
+      'scroll',
       'bag',
       'mount',
       'recipe',

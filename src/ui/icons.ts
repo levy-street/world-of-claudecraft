@@ -4065,16 +4065,19 @@ function itemFallback(id: string): IconRecipe | null {
       ? r('drink', 'sky', [{ p: 'potion', pal: 'sky' }])
       : r('drink', 'sky', ['waterskin']);
   }
-  if (it.kind === 'potion' || it.kind === 'elixir') {
+  if (it.kind === 'potion' || it.kind === 'elixir' || it.kind === 'flask') {
     // Crafted consumables without curated art (the trained-ladder draughts and
-    // elixirs) render the flask, tinted by function, instead of falling
-    // through to the trinket arm below.
+    // elixirs, plus the phase 10 apex flasks) render the flask, tinted by
+    // function, instead of falling through to the trinket arm below. The
+    // sparkle marks the timed-buff half of the family, so a flask carries it
+    // for the same reason an elixir does.
     const pal: PaletteName = has(name, ['healing'])
       ? 'ember'
       : has(name, ['mana'])
         ? 'sky'
         : 'venom';
-    return r('arcane', pal, [{ p: 'potion', pal }], it.kind === 'elixir' ? ['sparkle'] : fx);
+    const timedBuff = it.kind === 'elixir' || it.kind === 'flask';
+    return r('arcane', pal, [{ p: 'potion', pal }], timedBuff ? ['sparkle'] : fx);
   }
   if (it.kind === 'tool') {
     const prim: PrimitiveName = has(name, ['pole', 'rod', 'staff']) ? 'staff' : 'mace';

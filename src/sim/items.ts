@@ -835,6 +835,10 @@ export function useItem(
       manaPer2s: def.drinkMana ? Math.round(def.drinkMana / CONSUME_TICKS) : 0,
       remaining: CONSUME_DURATION,
       ticksElapsed: 0,
+      // The Well Fed buff a role food owes, carried on the meal rather than
+      // granted here: it is the reward for FINISHING (combat/auras.ts pays it
+      // when the drain runs out), so standing up early forfeits it, classic.
+      ...(def.kind === 'food' && def.wellFed ? { wellFed: def.wellFed } : {}),
     };
     // A one-shot bite/gulp the instant you sit down, on top of the regular
     // every-3rd-tick cadence (updateRegen, combat/auras.ts): otherwise the
@@ -921,12 +925,15 @@ export function useItem(
       color: '#c9f',
       pid: meta.entityId,
     });
-  } else if (def.kind === 'elixir' || def.kind === 'scroll') {
-    // Battle elixir, or the inscription buff scroll that is its ALTERNATIVE
-    // SOURCE: grant a temporary stat-buff aura. Usable in combat (classic),
-    // no shared potion cooldown; re-applying refreshes the buff via applyAura.
+  } else if (def.kind === 'elixir' || def.kind === 'scroll' || def.kind === 'flask') {
+    // Battle elixir, the inscription buff scroll that is its ALTERNATIVE
+    // SOURCE, or the alchemy apex FLASK: grant a temporary stat-buff aura.
+    // All three take this one arm and one aura id scheme deliberately; the
+    // flask's own two extra rules ride the Aura.flask marker stamped below,
+    // never a separate application path. Usable in combat (classic), no shared
+    // potion cooldown; re-applying refreshes the buff via applyAura.
     // The aura id is keyed on the effect's kind, not the item OR its kind, so
-    // every elixir and scroll of one stat shares one id and the same-id
+    // every elixir, scroll, and flask of one stat shares one id and the same-id
     // replacement in applyAura makes same-stat sources exclusive: last applied
     // wins in both orders (classic overwrite, weaker included), never a stack.
     // Different-kind effects coexist; class buffs (buff_sta_pct) and negative
@@ -936,7 +943,56 @@ export function useItem(
     // (elixir_battle_...), not just the kind.
     const elx = def.elixir;
     if (!elx) return;
+    const isFlask = def.kind === 'flask';
+    // DOWNWARD REFUSAL. A flask outranks the elixir and scroll of its stat, so
+    // a weaker source may not silently destroy it: refuse before the unit is
+    // consumed, leaving the item in the bag and the flask on the player. Only
+    // the DOWNWARD direction is blocked; flask over elixir still replaces
+    // (upward), and flask over flask is newest-wins through the strip below.
+    // The guard can only fire when a flask-marked aura of this exact family is
+    // already worn, which no elixir or scroll can create, so shipped
+    // elixir-versus-elixir and scroll-versus-elixir behavior is untouched.
+    if (!isFlask && p.auras.some((a) => a.id === `elixir_${elx.kind}` && a.flask === true)) {
+      ctx.error(meta.entityId, 'A more powerful effect is already active.');
+      return;
+    }
     consumeOneUnit();
+    if (isFlask) {
+      // ONE flask at a time, whatever its stat: shed every aura already
+      // carrying the flask marker before the new one lands. Same-id flasks are
+      // left alone on purpose so applyAura's own same-id rule still handles
+      // them, which keeps a re-quaff of the SAME flask a silent refresh rather
+      // than a fade plus a fresh application. This is the cancelAura removal
+      // idiom (splice, then emit the fade the client cannot infer, then
+      // recalc). applyAura below recalcs too, so the explicit call is
+      // belt-and-braces rather than strictly required: it keeps the stat book
+      // correct on its own, instead of depending on a later call that has
+      // several early-return guards of its own.
+      let stripped = false;
+      for (let i = p.auras.length - 1; i >= 0; i--) {
+        const worn = p.auras[i];
+        if (worn.flask !== true || worn.id === `elixir_${elx.kind}`) continue;
+        p.auras.splice(i, 1);
+        stripped = true;
+        ctx.emit({
+          type: 'aura',
+          targetId: p.id,
+          name: worn.name,
+          gained: false,
+          sourceId: worn.sourceId,
+          abilityId: worn.id,
+        });
+      }
+      if (stripped) {
+        recalcPlayerStats(
+          p,
+          meta.cls,
+          meta.equipment,
+          ctx.playerMods(meta),
+          meta.equipmentInstance,
+        );
+      }
+    }
     ctx.applyAura(p, {
       id: `elixir_${elx.kind}`,
       name: elx.aura,
@@ -946,6 +1002,7 @@ export function useItem(
       value: elx.value,
       sourceId: p.id,
       school: 'nature',
+      ...(isFlask ? { flask: true as const } : {}),
     });
     if (def.kind === 'scroll') {
       ctx.emit({

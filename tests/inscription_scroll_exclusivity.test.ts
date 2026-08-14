@@ -30,6 +30,17 @@ function familyAuras(p: Entity): Aura[] {
 
 // The three scroll/elixir band pairs. Every case below runs over ALL pairs so
 // no band's membership can silently drift out of the family.
+//
+// SCOPE, and it is deliberate: the value <= 12 / duration <= 900 ceiling
+// asserted below is the ELIXIR AND SCROLL band ceiling, not a rule about the
+// aura family. The phase 10 flasks join the same `elixir_${kind}` family and
+// the same use-path arm, and they sit OUTSIDE this ceiling on purpose (15 for
+// 1200s): beating the elixir band is what makes an apex rung apex. So this
+// suite pins the three shipped BANDS by name rather than sweeping every item
+// carrying an elixir payload, and the flask side of the same wall is pinned in
+// tests/masterwrought_budget.test.ts, which asserts the break explicitly in
+// both directions. Never raise the numbers here to admit a flask; that would
+// silently retire the band rule these three pairs exist to hold.
 const BAND_PAIRS = [
   { scroll: 'silverleaf_scroll', elixir: 'elixir_of_the_boar', value: 6 },
   { scroll: 'goldleaf_scroll', elixir: 'venomfire_elixir', value: 9 },

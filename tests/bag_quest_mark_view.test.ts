@@ -22,6 +22,8 @@ describe('bag_quest_mark_view: mark kind', () => {
       'tool',
       'potion',
       'elixir',
+      'flask',
+      'scroll',
       'bag',
       'mount',
       'recipe',

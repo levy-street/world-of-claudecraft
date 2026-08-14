@@ -62,17 +62,20 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('glass_vial')).toEqual(['alchemy', 'inscription']);
   });
 
-  it('the Quickening Catalyst names its nine consuming crafts (Masterwrought phase 07)', () => {
+  it('the Quickening Catalyst names all ten consuming crafts (phase 07, then alchemy at phase 10)', () => {
     // The nine INTERMEDIATE_RECIPES consumers (recipe_duskforged_billet,
     // recipe_forgefold_plating, recipe_wyrmhide_cording, recipe_sunspun_bolt,
     // recipe_prismglass_setting, recipe_precision_chassis,
-    // recipe_seasoned_stock, recipe_lucent_reagent, recipe_sablewax_vellum):
-    // every craft on the ring EXCEPT alchemy, whose own 75 rung MINTS the
-    // catalyst rather than consuming it. Ring order, never first-seen recipe
-    // order (first-seen would read weaponcrafting first, the authored row
-    // order in recipes.ts).
+    // recipe_seasoned_stock, recipe_lucent_reagent, recipe_sablewax_vellum),
+    // plus ALCHEMY since phase 10: alchemy's own 75 rung still MINTS the
+    // catalyst, but its apex rows (the three flasks and the Grand Cauldron in
+    // APEX_CONSUMABLE_RECIPES) now consume it too, so the craft that mints it
+    // is also on its consumer ring and the list covers every craft. Ring
+    // order, never first-seen recipe order (first-seen would read
+    // weaponcrafting first, the authored row order in recipes.ts).
     expect(craftIdsForMaterialItem('quickening_catalyst')).toEqual([
       'engineering',
+      'alchemy',
       'cooking',
       'leatherworking',
       'tailoring',

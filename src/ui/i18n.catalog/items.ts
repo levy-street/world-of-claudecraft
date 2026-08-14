@@ -94,6 +94,21 @@ const itemStringsEn = {
         'Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.',
       useElixirAura:
         'Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.',
+      // Flasks (elixir_tooltip_view.ts) append these two rules under the Use
+      // line they share with elixirs. Both are the mechanic, not flavor: the
+      // use path sheds every other flask aura before applying (one flask at a
+      // time, whatever its stat), and aurasSurvivingDeath keeps a flask aura
+      // through a death that clears everything else.
+      flaskOnlyOne: 'Only one flask effect at a time. Drinking another flask replaces this one.',
+      flaskThroughDeath: 'The effect remains through death.',
+      // Well Fed (elixir_tooltip_view.ts): the buff a finished meal leaves.
+      // The "after you finish eating" clause is load-bearing, not padding:
+      // standing up early grants nothing at all, so the tooltip has to say
+      // where the buff comes from. Second key is the unmapped-kind fallback,
+      // the useElixirAura pattern.
+      wellFed:
+        'Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.',
+      wellFedAura: 'Well Fed: Grants {aura} for {minutes} min once you finish eating.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed
@@ -2489,6 +2504,14 @@ const ITEM_ENTITY_IDS = [
   'voidbound_grimoire',
   'masters_field_forge',
   'makers_charm',
+  'ironhusk_flask',
+  'warboar_flask',
+  'runewater_flask',
+  'stonepot_stew',
+  'warspice_skewers',
+  'sageleaf_chowder',
+  'grand_cauldron',
+  'laden_hearth',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2679,6 +2702,19 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   voidbound_grimoire: 'Voidbound Grimoire',
   masters_field_forge: "Master's Field Forge",
   makers_charm: "Maker's Charm",
+  // Masterwrought apex consumables (phase 10): the three alchemy flasks, the
+  // three cooking role foods, and the two skill-125 capstone placements
+  // (content/profession_items.ts and content/items.ts). English-appended like
+  // the phase 09 block above until the release fill folds them into the
+  // per-locale arrays.
+  ironhusk_flask: 'Ironhusk Flask',
+  warboar_flask: 'Warboar Flask',
+  runewater_flask: 'Runewater Flask',
+  stonepot_stew: 'Stonepot Stew',
+  warspice_skewers: 'Warspice Skewers',
+  sageleaf_chowder: 'Sageleaf Chowder',
+  grand_cauldron: 'Grand Cauldron',
+  laden_hearth: 'The Laden Hearth',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {
