@@ -43,7 +43,7 @@ const FARM_SUPPLY_HINT_IDS = ['growth_tonic'];
 const EXPECTED_IDS = [...ENCHANTING_IDS, ...FINE_IDS, ...FARM_SUPPLY_HINT_IDS].sort();
 
 describe('material_hint_view', () => {
-  it('covers exactly the enchanting materials and the fine grades, no more and no less', () => {
+  it('covers exactly the enchanting materials, the fine grades, and the farm supplies, no more and no less', () => {
     expect(Object.keys(MATERIAL_HINT_KEYS).slice().sort()).toEqual(EXPECTED_IDS);
     expect(FINE_IDS).toHaveLength(9);
   });

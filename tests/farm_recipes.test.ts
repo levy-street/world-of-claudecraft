@@ -38,6 +38,7 @@ import { ALL_RECIPES, ITEMS } from '../src/sim/data';
 import { stationsOfType } from '../src/sim/professions/stations';
 import { resolveTrain } from '../src/sim/professions/training';
 import { Sim } from '../src/sim/sim';
+import { itemNames } from '../src/ui/i18n.catalog/items';
 
 const dishes = FARM_RECIPES.filter((r) => r.professionId === 'cooking');
 
@@ -226,6 +227,37 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     expect(checked).toBe(dishes.length);
     // The literal table must not have drifted past the list it describes.
     expect(Object.keys(EXPECTED_INPUT_VALUE).sort()).toEqual(dishes.map((d) => d.id).sort());
+  });
+
+  it('no farm row mints copper on the RAW sell basis: cooking converts produce, never prints', () => {
+    // The unitValue arm above uses buyValue where one exists, which leaves a
+    // second, thinner margin unpinned: a player who GREW the produce paid its
+    // sell floor, not a vendor price, so if a dish vendored above the raw
+    // sellValue of its reagents the farm loop would mint copper from thin
+    // air. The authoring header calls the beet braise "exactly break-even,
+    // which converts produce without minting copper"; this arm makes that
+    // prose executable for every row, tonic included, so a one-copper
+    // re-price of frost_gourd, highland_barley, cooking_salt, or a dish
+    // cannot silently flip a margin (soup is at 2, bannock at 4, braise at 0).
+    let exactlyBreakEven = 0;
+    for (const recipe of FARM_RECIPES) {
+      let rawInput = 0;
+      for (const reagent of recipe.reagents) {
+        const def = ITEMS[reagent.itemId];
+        expect(def, `${recipe.id} reagent ${reagent.itemId} has no ItemDef`).toBeDefined();
+        rawInput += reagent.count * def.sellValue;
+      }
+      const output = ITEMS[recipe.resultItemId].sellValue * recipe.resultCount;
+      expect(
+        output,
+        `${recipe.id}: output ${output} vendors above its raw reagent sell value ${rawInput}, ` +
+          'so crafting it mints copper from grown produce',
+      ).toBeLessThanOrEqual(rawInput);
+      if (output === rawInput) exactlyBreakEven += 1;
+    }
+    // Non-vacuity: the bound is genuinely reached (the braise sits exactly at
+    // break-even by design), so <= is a tested edge and not a slack pass.
+    expect(exactlyBreakEven, 'the intended exactly-break-even row exists').toBeGreaterThan(0);
   });
 
   it('every dish carries a reagent with NO buyValue (stays out of the vendor-fed arm)', () => {
@@ -448,6 +480,23 @@ describe('FARM_RECIPES: the dish ItemDef shape is closed until Phase 11 reopens 
     }
   });
 
+  it('every new item id keeps its catalog English byte-identical to its ItemDef name', () => {
+    // The def name is what sim/server text uses; the catalog row is what the
+    // HUD renders. The catalog comment states the stay-in-step rule, but no
+    // pin held it: an English reword on one side would drift the other
+    // silently. Scoped to the phase ids (the nine this suite owns).
+    const enNames = itemNames.en.entities.items as Record<string, { name?: string } | undefined>;
+    for (const recipe of FARM_RECIPES) {
+      const def = ITEMS[recipe.resultItemId];
+      const row = enNames[recipe.resultItemId];
+      expect(row?.name, `${recipe.resultItemId} has no catalog English name row`).toBeDefined();
+      expect(
+        row?.name,
+        `${recipe.resultItemId}: catalog English and ItemDef.name drifted apart`,
+      ).toBe(def.name);
+    }
+  });
+
   it('every allowed curve point is carried by a live non-dish food, so the reuse claim stays true', () => {
     // ALLOWED_FOOD_CURVE_POINTS is hand-authored; this arm backs each pair
     // against the live ITEMS table so a re-price of the owning shipped food
@@ -524,6 +573,52 @@ describe('FARM_RECIPES: a dish crafts for real, and fine twins never substitute 
     expect(countOf(sim, 'fine_brook_carrot'), 'exactly one fine twin spent').toBe(2);
     expect(countOf(sim, 'fine_vale_wheat'), 'the wheat twin is not a reagent here').toBe(2);
   });
+
+  it('the tonic brews end to end through real ticks: refuse short herbs, then craft and spend', () => {
+    // Deviation (ai)'s load-bearing claim is that the tonic IS craftable
+    // TODAY from wild herbs, and it is the only Phase 6 recipe with a live
+    // faucet, so its craft is executed rather than trusted: the one alchemy
+    // row on the farm list, the apothecary station, and a kind-'junk' output
+    // through the ordinary craft machinery (the exact combination deviation
+    // (ak) exists for). Unlike the pottage arm above, the cast here finishes
+    // through sim.tick(), so the tick-phase completion slot
+    // (casting_lifecycle routing CRAFT_CAST_ID to ctx.completeCraftCast) is
+    // exercised for farm rows, not hand-driven around.
+    const sim = new Sim({ seed: 13, playerClass: 'warrior' });
+    const pid = sim.playerId;
+    const tonic = requireTonic();
+    const station = stationsOfType(STATIONS, tonic.stationType as never)[0];
+    expect(station, 'a placed apothecary station exists').toBeDefined();
+    const entity = (sim as any).entities.get(pid);
+    entity.pos.x = station.pos.x;
+    entity.pos.z = station.pos.z;
+    entity.prevPos = { ...entity.pos };
+    const meta = (sim as any).players.get(pid);
+    meta.knownRecipes.add(tonic.id);
+
+    // Short one herb: refused at start, no cast begins, nothing is consumed.
+    sim.addItem('silverleaf_herb', 1, pid);
+    sim.addItem('glass_vial', 1, pid);
+    sim.craftItem(tonic.id, false, pid, 1);
+    expect(entity.castingAbility, 'a short-reagent craft must not start a cast').toBeNull();
+    expect(countOf(sim, 'growth_tonic'), 'a short-reagent craft brews nothing').toBe(0);
+    expect(countOf(sim, 'silverleaf_herb'), 'refusal consumes nothing').toBe(1);
+    expect(countOf(sim, 'glass_vial'), 'refusal consumes nothing').toBe(1);
+
+    // The true reagents: start the cast and let REAL ticks finish it.
+    sim.addItem('silverleaf_herb', 1, pid);
+    sim.craftItem(tonic.id, false, pid, 1);
+    expect(entity.castingAbility, 'the tonic craft starts a real cast').not.toBeNull();
+    for (let i = 0; i < 200 && entity.castingAbility !== null; i++) sim.tick();
+    // Non-vacuity: the cast genuinely completed through the tick path.
+    expect(entity.castingAbility, 'the craft cast completes within 10 sim-seconds').toBeNull();
+    expect(countOf(sim, 'growth_tonic'), 'the tonic lands in the bag').toBe(1);
+    expect(countOf(sim, 'silverleaf_herb'), 'both herbs spent').toBe(0);
+    expect(countOf(sim, 'glass_vial'), 'the vial spent').toBe(0);
+    // The rung-0 craft teaches alchemy deterministically (gainCraftSkill has
+    // no draw), so the skill-up faucet the recipe opens is pinned live.
+    expect(meta.craftSkills.alchemy ?? 0, 'the craft teaches alchemy').toBeGreaterThan(0);
+  });
 });
 
 describe('FARM_RECIPES: trainable before go-live is the INTENDED dormant-visible state', () => {
@@ -536,18 +631,20 @@ describe('FARM_RECIPES: trainable before go-live is the INTENDED dormant-visible
   // land silently, and so the ruling itself stays falsifiable: if the
   // maintainer wants training gated to go-live instead, THIS test is the one
   // that reds and names the decision to revisit.
-  it('rung-0 rows train free and a rung-50 dish charges, all resolving ok at their stations', () => {
+  it('rung-0 rows train free and the rung-25/50 dishes charge, all resolving ok at their stations', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' });
     const meta = (sim as any).players.get(sim.playerId);
     meta.copper = 100000;
     meta.craftSkills.cooking = 50; // teach tier for the rung-50 dish
     // Fees come from the settled exception-free curve (TRAINING_FEE_BY_TIER,
-    // ruling R8): tier 0 is genuinely FREE, tier 2 charges 10000 copper. Both
-    // shapes are pinned so neither a surprise fee at the starter rung nor a
-    // silently-freed premium rung can land unnoticed.
+    // ruling R8): tier 0 is genuinely FREE, tier 1 charges 2500 and tier 2
+    // charges 10000 copper. All three shapes are pinned so neither a surprise
+    // fee at the starter rung nor a silently-freed mid or premium rung can
+    // land unnoticed.
     for (const [recipeId, stationType, fee] of [
       ['recipe_vale_hearth_loaf', 'kitchens', 0],
       ['recipe_growth_tonic', 'apothecary', 0],
+      ['recipe_fenbridge_rice_bowl', 'kitchens', 2500],
       ['recipe_evergarden_harvest_platter', 'kitchens', 10000],
     ] as const) {
       const station = stationsOfType(STATIONS, stationType)[0];

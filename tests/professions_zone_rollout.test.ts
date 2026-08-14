@@ -1044,6 +1044,28 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // non-farming vendor row exists somewhere), so the absence above is a
     // real sweep rather than an empty loop.
     expect(vendorRowsSeen).toBeGreaterThan(0);
+    // The two NON-NPC purchase counters (the Marks route) are acquisition
+    // surfaces too: a heroic or delve row naming a farming item would open a
+    // faucet this arm's NPC walk cannot see. Same dormancy claim, same
+    // per-table non-vacuity as the tools sweep above.
+    expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
+    for (const offer of HEROIC_VENDOR_STOCK) {
+      expect(
+        farmingItemIds.has(offer.itemId),
+        `heroic vendor stocks farming item ${offer.itemId} before the Phase 9 go-live`,
+      ).toBe(false);
+    }
+    let delveRowsSeen = 0;
+    for (const [delveId, entries] of Object.entries(DELVE_SHOPS)) {
+      for (const entry of entries) {
+        delveRowsSeen += 1;
+        expect(
+          farmingItemIds.has(entry.itemId),
+          `${delveId} delve shop stocks farming item ${entry.itemId} before the Phase 9 go-live`,
+        ).toBe(false);
+      }
+    }
+    expect(delveRowsSeen).toBeGreaterThan(0);
   });
 
   it('no Phase 6 farm recipe is craftable from vendor stock alone before the Phase 9 go-live', () => {
@@ -1060,9 +1082,18 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // pre-go-live by a player who gathers the herbs. That is exactly D7's
     // cross-profession trade, whose faucet is the herb line rather than the
     // farm, so this arm asserts unstocked-ness, never uncraftability.
+    // The stocked universe is EVERY purchase surface, not just NPC counters:
+    // the heroic vendor and the delve shops sell for Marks with no buyValue
+    // and no vendorItems row, so a farm reagent (or a dish) stocked there
+    // would keep both price-basis arms green while breaking the live-surface
+    // guarantee. Union all three so one future faucet channel cannot hide.
     const stockedItemIds = new Set<string>();
     for (const npc of Object.values(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) stockedItemIds.add(itemId);
+    }
+    for (const offer of HEROIC_VENDOR_STOCK) stockedItemIds.add(offer.itemId);
+    for (const entries of Object.values(DELVE_SHOPS)) {
+      for (const entry of entries) stockedItemIds.add(entry.itemId);
     }
     // Same non-vacuity as the arm above: the world really has counters, so an
     // "unstocked" verdict below is a real absence rather than an empty walk.
@@ -1083,6 +1114,15 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       // counterfactual in tests/recipe_economy.test.ts (a sorted literal pin
       // plus a discounted-input bound), so a farm row drifting into that shape
       // is both a dormancy break and a cross-suite break.
+      // Every reagent id must resolve BEFORE the priceless filter reads it: a
+      // typo'd id would satisfy `?.buyValue === undefined` vacuously and read
+      // as "priceless" instead of failing.
+      for (const reagent of recipe.reagents) {
+        expect(
+          ITEMS[reagent.itemId],
+          `${recipe.id} reagent ${reagent.itemId} does not resolve in the merged catalog`,
+        ).toBeDefined();
+      }
       const priceless = recipe.reagents
         .map((reagent) => reagent.itemId)
         .filter((itemId) => ITEMS[itemId]?.buyValue === undefined);
