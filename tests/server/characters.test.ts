@@ -25,6 +25,7 @@ import {
   type CharactersRuntime,
   configureCharactersRuntime,
   purgeDeletedCharacterWorldState,
+  rekeyRenamedCharacterOwnSigner,
   resetCharactersDbForTests,
   resetCharactersRuntimeForTests,
   routes,
@@ -1810,6 +1811,101 @@ describe('legacy DELETE dispatch arm (main.ts)', () => {
     expect(rekeyCall).toContain('liveGame().saveMarket()');
     expect(rekeyCall).toContain('liveGame().saveMail()');
     expect(rekeyCall).toContain('reclaimed,');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The renamed character's own-signer sweep, shared by BOTH rename dispatch
+// arms: the migrated renameHandler above and the retained legacy ladder arm
+// in main.ts. Unit it directly, plus a wiring pin on the legacy arm, so an
+// API_DISPATCH=legacy rollback cannot quietly leave a character's own blob
+// signed with its old name (#2837).
+// ---------------------------------------------------------------------------
+
+describe('rekeyRenamedCharacterOwnSigner', () => {
+  it('sweeps every signer-bearing region and persists the swept state', async () => {
+    const state = {
+      inventory: [{ itemId: 'bone_fragments', count: 1, instance: { signer: 'Oldname' } }],
+      bank: {
+        inventory: [{ itemId: 'iron_bar', count: 1, instance: { signer: 'Oldname' } }],
+        purchasedSlots: 0,
+        bonusSlots: 0,
+      },
+      equipmentInstance: { chest: { signer: 'Oldname', enchant: 'ench_minor_stamina' } },
+    } as unknown as CharacterState;
+    const saveCharacterState = vi.fn(
+      async (_characterId: number, _level: number, _state: CharacterState) => true,
+    );
+    setCharactersDbForTests({ saveCharacterState });
+
+    await rekeyRenamedCharacterOwnSigner(5, 8, state, 'Oldname', 'Newname');
+
+    expect(saveCharacterState).toHaveBeenCalledTimes(1);
+    expect(saveCharacterState).toHaveBeenCalledWith(5, 8, state);
+    expect(state.inventory?.[0].instance?.signer).toBe('Newname');
+    expect(state.bank?.inventory[0].instance?.signer).toBe('Newname');
+    expect(state.equipmentInstance?.chest?.signer).toBe('Newname');
+    expect(state.equipmentInstance?.chest?.enchant).toBe('ench_minor_stamina');
+  });
+
+  it('skips the save when no held instance carried the old name', async () => {
+    const state = {
+      inventory: [{ itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } }],
+    } as unknown as CharacterState;
+    const saveCharacterState = vi.fn(
+      async (_characterId: number, _level: number, _state: CharacterState) => true,
+    );
+    setCharactersDbForTests({ saveCharacterState });
+
+    await rekeyRenamedCharacterOwnSigner(5, 8, state, 'Oldname', 'Newname');
+    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(state.inventory?.[0].instance?.signer).toBe('SomeoneElse');
+  });
+
+  it('skips the save when the renamed row carries no state blob', async () => {
+    const saveCharacterState = vi.fn(
+      async (_characterId: number, _level: number, _state: CharacterState) => true,
+    );
+    setCharactersDbForTests({ saveCharacterState });
+
+    await rekeyRenamedCharacterOwnSigner(5, 8, null, 'Oldname', 'Newname');
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+});
+
+describe('legacy RENAME dispatch arm (main.ts)', () => {
+  it('runs the same shared own-signer sweep as the migrated handler, after a successful rename', () => {
+    // The symmetric pin to the DELETE and CREATE arms above: an
+    // API_DISPATCH=legacy rollback must not lose the renamed character's own
+    // signer sweep, or its bags/bank/buyback/equipped instances keep reading
+    // as signed by a name that no longer exists.
+    const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+    const stripComments = (s: string): string => s.replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const start = src.indexOf("if (req.method === 'POST' && renameMatch) {");
+    expect(start).toBeGreaterThan(-1);
+    const end = src.indexOf("if (req.method === 'POST' && takeoverMatch) {", start);
+    expect(end).toBeGreaterThan(start);
+    const arm = stripComments(src.slice(start, end));
+    const renameAt = arm.indexOf('await renameCharacter(accountId, characterId, name)');
+    expect(renameAt).toBeGreaterThan(-1);
+    // AFTER the market rekey, which itself only runs past the null-row
+    // re-resolve guard: a rename that matched no row never sweeps a blob.
+    const marketRekeyAt = arm.indexOf(
+      'if (liveGame().rekeyMarketSeller(characterId, character.name, c.name))',
+    );
+    expect(marketRekeyAt).toBeGreaterThan(renameAt);
+    const sweepAt = arm.indexOf('await rekeyRenamedCharacterOwnSigner(');
+    expect(sweepAt).toBeGreaterThan(marketRekeyAt);
+    // BEFORE the response is sent, and handed the SAME row the market/mail
+    // rekeys use: the renamed row's own id/level/state plus old and new names.
+    const responseAt = arm.indexOf('return json(res, 200, {', sweepAt);
+    expect(responseAt).toBeGreaterThan(sweepAt);
+    const sweepCall = arm.slice(sweepAt, arm.indexOf(');', sweepAt));
+    expect(sweepCall).toContain('characterId');
+    expect(sweepCall).toContain('c.level');
+    expect(sweepCall).toContain('c.state');
+    expect(sweepCall).toContain('character.name');
+    expect(sweepCall).toContain('c.name');
   });
 });
 

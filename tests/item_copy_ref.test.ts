@@ -14,6 +14,7 @@ import {
   consumeNewestInventoryUnit,
   consumeSelectedInventorySlot,
   itemCopyPin,
+  newestMatchingSlot,
   selectedInventorySlot,
 } from '../src/sim/item_copy_ref';
 import type { InvSlot } from '../src/sim/types';
@@ -161,6 +162,36 @@ describe('consumeNewestInventoryUnit: the legacy fallback, unchanged', () => {
       craftedRecipeId: undefined,
     });
     expect(inv).toHaveLength(1);
+  });
+});
+
+describe('newestMatchingSlot: the non-consuming twin of consumeNewestInventoryUnit', () => {
+  it('picks the SAME slot consumeNewestInventoryUnit would consume', () => {
+    // The whole point of the peek: a caller that inspects this slot before
+    // deciding whether to consume (equipBag's bag-payload refusal, #2837)
+    // must be looking at the exact copy the consuming walk would take.
+    const inv = [enchanted('girdle', 'power'), plain('girdle')];
+    const peeked = newestMatchingSlot(inv, 'girdle');
+    expect(peeked).toBe(inv[1]);
+    const unit = consumeNewestInventoryUnit(inv, 'girdle');
+    expect(unit.instance, 'the consumed copy matches what was peeked').toBeUndefined();
+  });
+
+  it('consumes nothing and leaves the bag untouched', () => {
+    const inv = [enchanted('girdle', 'power'), plain('girdle')];
+    newestMatchingSlot(inv, 'girdle');
+    expect(inv).toHaveLength(2);
+    expect(inv[0].count).toBe(1);
+    expect(inv[1].count).toBe(1);
+  });
+
+  it('returns the live slot object, so a caller reading its payload sees the real one', () => {
+    const inv = [enchanted('girdle', 'power')];
+    expect(newestMatchingSlot(inv, 'girdle')).toBe(inv[0]);
+  });
+
+  it('returns undefined when nothing matches', () => {
+    expect(newestMatchingSlot([plain('boots')], 'girdle')).toBeUndefined();
   });
 });
 

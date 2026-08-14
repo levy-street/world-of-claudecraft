@@ -242,6 +242,34 @@ describe('Paladin Protection abilities', () => {
     expect(target.auras.some((aura) => aura.id === 'oath_chain_slow')).toBe(false);
   });
 
+  it('does not drag a practice dummy off its spot, but still enters combat with it', () => {
+    const sim = makeProtection();
+    stageInField(sim);
+    const target = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+      x: sim.player.pos.x,
+      y: sim.player.pos.y,
+      z: sim.player.pos.z + 18,
+    });
+    target.hostile = true;
+    target.aiState = 'idle';
+    sim.addEntity(target);
+    sim.targetEntity(target.id);
+    const before = { x: target.pos.x, z: target.pos.z };
+
+    sim.castAbility('oath_chain');
+
+    expect(target.auras.some((aura) => aura.kind === 'forced_move')).toBe(false);
+    // Matches every other CC-immune target in this file: the effect that
+    // would move it is skipped, but the ability still lands and both sides
+    // register the engagement (mirrors the 'root' effect's unconditional
+    // ctx.enterCombat in combat/effect_dispatch.ts).
+    expect(target.inCombat).toBe(true);
+    expect(sim.player.inCombat).toBe(true);
+    for (let tick = 0; tick < 40; tick++) sim.tick();
+    expect(target.pos.x).toBe(before.x);
+    expect(target.pos.z).toBe(before.z);
+  });
+
   it('reindexes an Oath Chain target while it travels instead of teleporting for an immediate sweep', () => {
     const sim = makeProtection();
     stageInField(sim);

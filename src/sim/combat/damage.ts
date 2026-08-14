@@ -622,7 +622,7 @@ export function dealDamage(
           abilityId,
           // Carry the AoE flag so a redirected slice of an area Arcane hit still
           // rates its Temporal Echo conversion at the area (15%) coefficient, not
-          // the single-target 35%.
+          // the single-target 40%.
           aoe,
         );
       }

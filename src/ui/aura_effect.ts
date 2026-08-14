@@ -17,6 +17,11 @@
 //   - mortal_wound/cost_tax/critvuln/vulnerability/spellvuln/expose/buff_dodge:
 //     value is a 0..1 fraction shown as a percent.
 
+import {
+  ECHO_CONVERT_AOE,
+  ECHO_GROUP_CONVERT_AOE,
+  ECHO_GROUP_CONVERT_SINGLE,
+} from '../sim/combat/chronomancy';
 import { MOONTIDE_STAGES, OLD_BLOOD_STAGES, VERDANCE_STAGES } from '../sim/combat/druid_engines';
 import {
   GLOAM_STAGES,
@@ -619,10 +624,17 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
     case 'internal_cd':
       return { key: `${KEY}.internalCooldown` };
     case 'temporal_echo': {
-      const singlePct = pctFromFrac(a.value);
+      // The mark's value carries the single-target conversion it was placed
+      // with (an individual mark or a Cascada group mark), so classify against
+      // the real rates in combat/chronomancy.ts rather than a literal that
+      // rots when the individual rate is re-tuned.
+      const isGroupMark = a.value <= ECHO_GROUP_CONVERT_SINGLE;
       return {
         key: `${KEY}.temporalEcho`,
-        nums: { singlePct, areaPct: singlePct >= 35 ? 15 : 6 },
+        nums: {
+          singlePct: pctFromFrac(a.value),
+          areaPct: pctFromFrac(isGroupMark ? ECHO_GROUP_CONVERT_AOE : ECHO_CONVERT_AOE),
+        },
       };
     }
     case 'arcane_charge': {

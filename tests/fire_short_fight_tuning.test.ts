@@ -13,7 +13,7 @@
 // in the IDENTICAL gear playing its real kit (Water Elemental pre-summoned,
 // Icy Veins, Frozen Orb, Brain Freeze Flurries, Fingers-of-Frost Ice Lances,
 // Glacial Spike at five icicles, Rimelance filler), a fuller baseline than
-// chronomancy_balance.test.ts' Frostbolt-spam "cryo" proxy so the burst band
+// chronomancy_balance_targets.test.ts' Frostbolt-spam "cryo" proxy so the burst band
 // is honest. Mana is pinned to full: the report's premise is that mana never
 // matters at 27s.
 //
@@ -435,7 +435,7 @@ describe('sustained parity, entire fight (Monte Carlo follow-up 2026-07-24)', ()
   // seeds can sit below parity and stay in: the assertion is a claim about the
   // mean, and dropping a pool's unlucky members would be seed-shopping.
   // Seeds 3 and 1 have historically been those low-side members and stay in,
-  // just as tests/chronomancy_balance.test.ts keeps its own sub-target seed.
+  // just as tests/chronomancy_balance_targets.test.ts keeps its own sub-target seed.
   const SUSTAINED_SEEDS = Array.from({ length: 10 }, (_, i) => i + 1);
   const SUSTAINED_CEILING = 1.25; // x talented frost, per duration
   // Owner ruling 2026-07-25: frost is the PvP-leaning spec, so fire must

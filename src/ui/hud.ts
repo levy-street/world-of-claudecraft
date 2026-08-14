@@ -94,7 +94,7 @@ import {
 } from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
-import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targets';
+import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
 import type {
   AbilityDef,
@@ -129,7 +129,6 @@ import {
   MAX_LEVEL,
   MELEE_RANGE,
   MILESTONES,
-  questObjectiveRequired,
   SALVAGE_CAST_ID,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
@@ -202,6 +201,7 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
+import { cheaterTagLabel } from './cheater_tag';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
 import { ClaudiumWindow } from './claudium_window';
@@ -314,12 +314,10 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
-import { gatherNodeTooltipHtml } from './gather_node_tooltip_controller';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import {
   buildGatheringProficiencyRows,
-  buildGatherNodeTooltip,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
   gatherRareTierFor,
@@ -454,6 +452,7 @@ import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
+import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/map';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
@@ -461,6 +460,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
@@ -530,7 +530,8 @@ import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
-import { type MapGatherTipMemo, resolveGatherTipMemo } from './map_gather_tip_memo';
+import { createMapMarkerArt } from './map_marker_icon_loader';
+import { mapMarkerProfileForFlags } from './map_marker_profile_core';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
 import {
   MAP_TAP_MOVE_TOLERANCE_PX,
@@ -546,16 +547,7 @@ import {
   paintTerrainRows,
 } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
-import {
-  gatherNodeMarkerAt,
-  MAP_OPEN_ZOOM,
-  type MapGatherNodeMarker,
-  type MapNpcMarker,
-  type MapQuestAreaMarker,
-  mapWindowMode,
-  npcMarkerAt,
-  questAreaObjectivesAt,
-} from './map_window_view';
+import { MAP_OPEN_ZOOM, type MapWindowMode, mapWindowMode } from './map_window_view';
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
 import { materialHintLine } from './material_hint_view';
@@ -652,7 +644,6 @@ import {
   questItemTooltipModel,
   questItemTooltipRelatedKey,
 } from './quest_item_tooltip_view';
-import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
@@ -1508,6 +1499,9 @@ export class Hud {
   // the OUTER #tf-name keeps the nowrap ellipsis, the hostile/friendly color
   // write, and the frame's single-line height. Built here (not in the HTML)
   // so both game entries pick it up.
+  // The operator-applied Cheater tag leads the line, ahead of any chosen title:
+  // a sanction outranks a vanity decoration on the same name.
+  private targetCheaterTagEl = appendChildSpan(this.targetNameEl, 'uf-cheater');
   private targetTitlePreEl = appendChildSpan(this.targetNameEl, 'uf-title');
   private targetNameTextEl = appendChildSpan(this.targetNameEl, '');
   private targetTitlePostEl = appendChildSpan(this.targetNameEl, 'uf-title');
@@ -1935,27 +1929,14 @@ export class Hud {
     minZ: number;
     maxZ: number;
   } | null = null;
-  // The quest-objective areas of the last overworld map paint (canvas-pixel
-  // space), kept for the hover tooltip's hit-test. Empty in delve mode.
-  private mapQuestAreas: MapQuestAreaMarker[] = [];
-  // The quest-giver glyphs of the last overworld map paint, for the hover
-  // tooltip's hit-test (quest names + level requirements). Empty in delve mode.
-  private mapNpcMarkers: MapNpcMarker[] = [];
-  // Gather-node icons of the last overworld map paint (zone map only), for the
-  // hover/tap tooltip hit-test. Empty in delve mode and on the continent.
-  private mapGatherNodes: MapGatherNodeMarker[] = [];
-  // Last gather-tip resolve, keyed by node id (map_gather_tip_memo.ts, the
-  // resolve-elision seam). Reset beside every mapGatherNodes rebuild, so a
-  // respawn or lock flip is at most one mediumHud repaint behind, the same
-  // freshness as the painted icon.
-  private mapGatherTipMemo: MapGatherTipMemo | null = null;
-  // World-map level: the per-zone detail map, or the WoW-style continent overview
-  // reached by right-click / the level-toggle button. Reset to 'zone' on open.
+  private readonly mapMarkerTooltipContent: MapMarkerTooltipContent;
+  private readonly mapMarkerInteraction: MapMarkerInteractionController;
   private mapLevel: 'zone' | 'continent' = 'zone';
   // The zone id under the cursor on the continent overview (drives the highlight
   // + hover tooltip), and the last paint's clickable zone regions for hit-testing.
   private mapHoverZone: string | null = null;
   private continentRegions: ContinentZoneRegion[] = [];
+  private lastMapWindowMode: MapWindowMode | null = null;
   private windowDragController: WindowDragController | null = null;
   private readonly chatGeometry: ChatGeometryController;
   private readonly chatWindow: ChatWindowController;
@@ -2046,6 +2027,29 @@ export class Hud {
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     hydrateCrestImageFallbacks(document);
+    this.mapMarkerTooltipContent = new MapMarkerTooltipContent(this.sim);
+    this.mapMarkerInteraction = new MapMarkerInteractionController({
+      names: {
+        zone: zoneDisplayName,
+        dungeon: dungeonDisplayName,
+        delve: delveDisplayName,
+        station: stationNameText,
+        poi: zonePoiLabel,
+        rift: riftFloorLabel,
+      },
+      npc: (marker) => this.mapMarkerTooltipContent.npc(marker),
+      navigation: (marker) =>
+        this.mapMarkerTooltipContent.navigation(
+          this.mapMarkerInteraction.semantics.navigationText(marker),
+        ),
+      station: (marker) => this.mapMarkerTooltipContent.station(marker),
+      service: (marker) => this.mapMarkerTooltipContent.service(marker),
+      gather: (marker) => this.mapMarkerTooltipContent.gather(marker),
+      questArea: (refs, count) => this.mapMarkerTooltipContent.questArea(refs, count),
+      paint: (html, x, y) => this.paintTooltipAt(html, x, y),
+      clearMemo: () => this.mapMarkerTooltipContent.clearMemo(),
+    });
+    this.mapMarkerArt.preload();
     this.auraOverlayController = new AuraOverlayController({
       writers: this.writerFacet,
       playerClass: this.sim.cfg.playerClass,
@@ -2838,14 +2842,12 @@ export class Hud {
     mapCanvas.addEventListener('pointercancel', endDrag);
     // The map reveals a marker's quest text as a tooltip: on desktop it follows
     // the mouse (hover); on touch there is no hover, so a TAP on a marker shows it
-    // (a press that moves beyond the tolerance is a pan, not a tap). Priority: a
-    // quest-giver glyph ('!'/'?', quest names + level requirements) sits ON TOP of
-    // gather icons and quest blobs, so it wins; then a gather node (precise
-    // resource target); otherwise a quest-objective area shows its objectives
-    // with live tracker progress. An arm that resolves no html falls through to
-    // the next (a glyph whose quests are all missing from content no longer
-    // blanks the tip). Hit-tests run against the markers of the last paint,
-    // scaled from CSS px to the canvas backing space the model projects into.
+    // (a press that moves beyond the tolerance is a pan, not a tap). Point
+    // markers resolve globally by distance; exact ties follow visual top order:
+    // quest glyph, navigation, station, civic service, gather node. Quest-objective areas
+    // remain the final fallback. An arm that resolves no html falls through to
+    // the next candidate. Touch expands the radius to a 40 CSS-pixel diameter,
+    // converted to the backing space the model projects into.
     let mapAreaTipShown = false;
     let mapTapStart: { x: number; y: number } | null = null;
     const hideMapAreaTip = (): void => {
@@ -2856,29 +2858,8 @@ export class Hud {
     // Paint the shared #tooltip for the marker under a client-space point and
     // report whether one was shown (the attachTooltip idiom: map into author
     // space, then clamp the tooltip box against the viewport).
-    const showMapTipAt = (clientX: number, clientY: number): boolean => {
-      if (
-        this.mapQuestAreas.length === 0 &&
-        this.mapNpcMarkers.length === 0 &&
-        this.mapGatherNodes.length === 0
-      )
-        return false;
-      const rect = mapCanvas.getBoundingClientRect();
-      const cx = ((clientX - rect.left) * mapCanvas.width) / rect.width;
-      const cy = ((clientY - rect.top) * mapCanvas.height) / rect.height;
-      const glyph = npcMarkerAt(this.mapNpcMarkers, cx, cy);
-      let html = glyph ? this.questGiverTooltipHtml(glyph) : '';
-      if (!html) {
-        const gather = gatherNodeMarkerAt(this.mapGatherNodes, cx, cy);
-        html = gather ? this.gatherNodeMapTooltipHtml(gather) : '';
-      }
-      if (!html) {
-        html = this.questAreaTooltipHtml(questAreaObjectivesAt(this.mapQuestAreas, cx, cy));
-      }
-      if (!html) return false;
-      // Same as desktop hover: paint the tip at the pointer (a tap on touch, the
-      // cursor on mouse). paintTooltipAt clamps the box on-screen either way.
-      this.paintTooltipAt(html, clientX, clientY);
+    const showMapTipAt = (clientX: number, clientY: number, touchTarget = false): boolean => {
+      if (!this.showMapTipAt(mapCanvas, clientX, clientY, touchTarget)) return false;
       mapAreaTipShown = true;
       return true;
     };
@@ -2912,7 +2893,7 @@ export class Hud {
       finishMapTap(
         mapPinch,
         mapTapReleaseFromPointer(ev, mapTapStart, MAP_TAP_MOVE_TOLERANCE_PX),
-        showMapTipAt,
+        (clientX, clientY) => showMapTipAt(clientX, clientY, true),
       );
       mapTapStart = null;
     };
@@ -3169,7 +3150,10 @@ export class Hud {
       bringToFront: (el) => this.bringWindowToFront(el),
       hideTooltip: () => this.hideTooltip(),
       pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
-      commitWindow: (el, left, top, rect) => this.setWindowPixelPosition(el, left, top, rect),
+      commitWindow: (el, left, top, rect) => {
+        this.setWindowPixelPosition(el, left, top, rect);
+        if (el.id === 'map-window') this.mapMarkerInteraction.refreshCurrentGeometry();
+      },
     });
     installWindowResize({
       getScale: () => getUiScale(),
@@ -4133,7 +4117,31 @@ export class Hud {
       isMobileLayout: () => this.isMobileLayout(),
     },
   );
-  private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);
+  // One decoded/prescaled marker-art cache is shared by every cartography
+  // painter, including the two instance schematics. It must initialize before
+  // delvePainter/riftPainter so their constructors receive the live cache.
+  private readonly mapMarkerArt = createMapMarkerArt(document);
+  private readonly mapMarkerProfile = () => {
+    const classes = document.body.classList;
+    return mapMarkerProfileForFlags(
+      classes.contains('mobile-touch'),
+      classes.contains('hud-mobile-compact'),
+      classes.contains('hud-mobile-landscape'),
+    );
+  };
+  private readonly delvePainter = new DelveMapPainter(
+    this.writerFacet,
+    classCss,
+    this.mapMarkerArt,
+    this.mapMarkerProfile,
+  );
+  private readonly riftPainter = new RiftMapPainter(
+    this.writerFacet,
+    classCss,
+    (name, rank) => riftFloorLabel(name, rank),
+    this.mapMarkerArt,
+    this.mapMarkerProfile,
+  );
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
   // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
@@ -4301,6 +4309,7 @@ export class Hud {
       name: this.targetNameTextEl,
       titlePre: this.targetTitlePreEl,
       titlePost: this.targetTitlePostEl,
+      cheaterTag: this.targetCheaterTagEl,
       level: this.targetLevelEl,
       hpFill: this.targetHpEl,
       hpText: this.targetHpTextEl,
@@ -4444,7 +4453,11 @@ export class Hud {
   // Overworld world-map painter (the delve branch stays with delvePainter). Owns
   // the cached current-zone decorations; redraws from the mediumHud band while open.
   // classCss colors party member dots the same way it colors the minimap/delve ones.
-  private readonly mapPainter = new MapWindowPainter(classCss);
+  private readonly mapPainter = new MapWindowPainter(
+    classCss,
+    this.mapMarkerArt,
+    this.mapMarkerProfile,
+  );
   // Continent overview painter (the world map's "zoom out to the whole world"
   // level). Loads the painted world_overview plate once; redraws from the
   // mediumHud band like the per-zone map. classCss colors its party dots too.
@@ -4576,6 +4589,8 @@ export class Hud {
     (name, rank) =>
       rank ? t('hud.core.riftLabelRanked', { name, rank }) : t('hud.core.riftLabel', { name }),
     () => t('hudChrome.bg.title'),
+    this.mapMarkerArt,
+    this.mapMarkerProfile,
   );
   private readonly presentationBag: PainterHostPresentation = {
     itemIcon: (item) => this.itemIcon(item),
@@ -6405,6 +6420,7 @@ export class Hud {
     // glyph into its cached background canvas, keyed only on module id; a
     // language switch alone never busts that cache, so force one rebuild.
     this.delvePainter.relocalize();
+    this.riftPainter.relocalize();
     // The unit-frame move/lock buttons' labels are set once at construction + on
     // toggle, so re-localize them in place on a language switch (same reason as
     // the party rows above).
@@ -9107,6 +9123,11 @@ export class Hud {
         targetFrame.name = entityDisplayName(target);
         targetFrame.titlePre = this.targetTitleDecoration.pre;
         targetFrame.titlePost = this.targetTitleDecoration.post;
+        // The operator-applied Cheater tag (src/sim/moderation/). Resolved every
+        // gated paint rather than memoized behind a signature like the title:
+        // cheaterTagLabel is a field read plus one t() lookup, so a memo would
+        // cost more than it saves and would need its own language key.
+        targetFrame.cheaterTag = cheaterTagLabel(target);
         // entity.border is the Book of Deeds deed id on the identity wire, the
         // title field's sibling (players only; deedBorderSlug answers '' for a
         // mob, an absent field, or an id this build does not know).
@@ -9668,10 +9689,17 @@ export class Hud {
     }
     this.bgMatchSeen = inBgMatch;
     if (fastHud) {
-      // The minimap canvas redraw is the heaviest fastHud item; tier its
-      // cadence (full tiers redraw every fastHud tick = ~10Hz; low throttles to ~3-4Hz).
+      // The minimap canvas redraw is the heaviest fastHud item. Low throttles
+      // ordinary maps to ~3-4Hz, but a Rift stays at ~10Hz on every tier because
+      // its lethal death zones and mechanics are reaction-critical information.
       // The clock / coords / compass are cheap text and stay at the full fastHud rate.
-      if (cadenceDue(this.lastMinimapDrawAt, now, minimapRedrawIntervalMs(fxTier))) {
+      if (
+        cadenceDue(
+          this.lastMinimapDrawAt,
+          now,
+          minimapRedrawIntervalMs(fxTier, minimapMode(this.sim) === 'rift'),
+        )
+      ) {
         this.lastMinimapDrawAt = now;
         this.updateMinimap();
       }
@@ -10583,6 +10611,10 @@ export class Hud {
     // delve-vs-overworld branch (the same isDelvePos + delveRun guard, lifted into the
     // core so hud and the painters never duplicate it).
     const mode = minimapMode(this.sim);
+    if (mode === 'rift') {
+      this.riftPainter.paintMinimap(ctx, this.sim, $('#zone-label'), MINIMAP_SIZE);
+      return;
+    }
     if (mode === 'delve') {
       // The delve painter owns the '#zone-label' text (written through the
       // write-elision facet) and the full minimap schematic render.
@@ -10741,7 +10773,7 @@ export class Hud {
   // overview (WoW-style right-click zoom out / the level-toggle button). Not
   // available in a delve, whose map is the schematic branch.
   private toggleMapLevel(): void {
-    if (mapWindowMode(this.sim) === 'delve') return;
+    if (mapWindowMode(this.sim) !== 'overworld') return;
     this.setMapLevel(this.mapLevel === 'continent' ? 'zone' : 'continent');
   }
 
@@ -10789,14 +10821,11 @@ export class Hud {
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
+    if (mapWindowMode(this.sim) !== 'overworld') return;
     // One more zoom-out at the zone map's full extent leaves the zone and opens
     // the continent overview (the level toggle's other half), instead of clamping
     // at the minimum and doing nothing. A delve has no overview to go to.
-    if (
-      this.mapLevel === 'zone' &&
-      zoomOutExitsZoneLevel(this.mapZoom, factor) &&
-      mapWindowMode(this.sim) !== 'delve'
-    ) {
+    if (this.mapLevel === 'zone' && zoomOutExitsZoneLevel(this.mapZoom, factor)) {
       this.setMapLevel('continent');
       return;
     }
@@ -10810,56 +10839,84 @@ export class Hud {
     if ($('#map-window').style.display === 'block') this.updateMapWindow();
   }
 
+  private showMapTipAt(canvas: HTMLCanvasElement, x: number, y: number, touch = false): boolean {
+    return this.mapMarkerInteraction.showAt(canvas, x, y, touch);
+  }
+
   // The map window shows the zone band the player is standing in (each band is a
   // square); POIs and dungeon portals come from the zone/dungeon data. It redraws
   // while open from hud.update()'s mediumHud band; the painter owns the canvas
   // draw, the cached terrain blit, and the cadence. The delve branch is owned by
   // delve_map_painter (paintWorldMapDelve), the overworld branch by
   // map_window_painter; the pure geometry lives in map_window_view.ts.
+  private clearMapHitState(canvas: HTMLCanvasElement): void {
+    this.mapMarkerInteraction.clear();
+    this.mapView = null;
+    this.continentRegions.length = 0;
+    this.setStyleProp(canvas, 'cursor', 'default');
+  }
+
+  private resetMapModeTransition(mode: MapWindowMode): void {
+    const prior = this.lastMapWindowMode;
+    this.lastMapWindowMode = mode;
+    if (!prior || prior === mode) return;
+    this.mapDrag = null;
+    this.mapCenter = null;
+    this.mapPing = null;
+    this.mapZoneOverride = null;
+    this.mapHoverZone = null;
+    this.mapZoom = MAP_OPEN_ZOOM;
+    this.mapLevel = 'zone';
+    this.hideTooltip();
+  }
+
   private updateMapWindow(): void {
     const canvas = $('#map-canvas') as unknown as HTMLCanvasElement;
     const ctx = require2dContext(canvas);
     const S = canvas.width;
+    this.mapMarkerInteraction.refreshGeometry(canvas);
     const p = this.sim.player;
     const summaryEl = $('#map-summary');
+    const markerSummaryEl = $('#map-marker-summary');
 
     const mapMode = mapWindowMode(this.sim);
+    this.resetMapModeTransition(mapMode);
+    const inRift = mapMode === 'rift';
     const inBattleground = mapMode === 'battleground';
     const inDelve = mapMode === 'delve';
-    // The continent overview only applies to the overworld; a delve or a
-    // battleground match forces the schematic branch and hides the level toggle.
-    // The per-zone +/- zoom controls are meaningless on the continent overview,
-    // so hide them there.
-    const schematic = inDelve || inBattleground;
+    const schematic = inRift || inDelve || inBattleground;
     this.setDisplay($('#map-level-toggle'), schematic ? 'none' : 'block');
-    this.setDisplay($('#map-zoom'), this.mapLevel === 'continent' && !schematic ? 'none' : 'flex');
+    this.setDisplay($('#map-zoom'), schematic || this.mapLevel === 'continent' ? 'none' : 'flex');
+    if (inRift) {
+      this.clearMapHitState(canvas);
+      const model = this.riftPainter.paintWorldMap(ctx, this.sim, S);
+      const area = model?.areaLabel ?? '';
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: area }));
+      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateRift(model, S));
+      return;
+    }
     if (inBattleground) {
-      // The Thornhollow Fields surface: the field schematic + the honest marker set
-      // (self + teammates; the fog's no-scouting rule owns everything else).
-      this.mapQuestAreas = [];
-      this.mapNpcMarkers = [];
-      this.bgMapPainter.paint(ctx, buildBgMapModel(this.sim), S);
-      this.setText(summaryEl, t('hud.core.mapSummary', { zone: t('hudChrome.bg.title') }));
+      this.clearMapHitState(canvas);
+      const model = buildBgMapModel(this.sim);
+      const area = t('hudChrome.bg.title');
+      this.bgMapPainter.paint(ctx, model, S);
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: area }));
+      this.setText(
+        markerSummaryEl,
+        this.mapMarkerInteraction.semantics.updateBattleground(model, area, S),
+      );
       return;
     }
 
     if (inDelve) {
-      // The delve painter owns the full world-map schematic render (the area
-      // title is drawn on-canvas, since the world map has no DOM zone label).
-      this.mapQuestAreas = [];
-      this.mapNpcMarkers = [];
-      this.mapGatherNodes = [];
-      this.mapGatherTipMemo = null;
-      this.continentRegions = [];
-      this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
-      const run = this.sim.delveRun;
-      const area = run ? delveDisplayName(run.delveId) : '';
+      this.clearMapHitState(canvas);
+      const model = this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
+      const area = model?.areaLabel ?? '';
       this.setText(summaryEl, t('hud.core.mapSummary', { zone: area }));
+      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateDelve(model, S));
       return;
     }
 
-    // Update the level-toggle button's visible text (its accessible name) to the
-    // action it performs from the current level. The generic aria/title is static.
     this.setText(
       $('#map-level-toggle'),
       t(
@@ -10870,12 +10927,7 @@ export class Hud {
     );
 
     if (this.mapLevel === 'continent') {
-      // The continent overview: a painted world plate with clickable zone regions.
-      this.mapQuestAreas = [];
-      this.mapNpcMarkers = [];
-      this.mapGatherNodes = [];
-      this.mapGatherTipMemo = null;
-      this.mapView = null; // panning/zoom belong to the per-zone level only
+      this.clearMapHitState(canvas); // panning/zoom belong to the per-zone level only
       const result = this.continentPainter.paintContinent(ctx, this.sim, {
         canvasSize: S,
         hoveredZoneId: this.mapHoverZone,
@@ -10883,6 +10935,10 @@ export class Hud {
       this.continentRegions = result.regions;
       canvas.style.cursor = this.mapHoverZone ? 'pointer' : 'default';
       this.setText(summaryEl, t('hudChrome.continentMap.summary'));
+      this.setText(
+        markerSummaryEl,
+        this.mapMarkerInteraction.semantics.updateSimple(t('hudChrome.continentMap.title'), S),
+      );
       return;
     }
     this.continentRegions = [];
@@ -10921,19 +10977,17 @@ export class Hud {
       ping: this.mapPing,
     });
     this.mapView = result.view;
-    this.mapQuestAreas = result.questAreas;
-    this.mapNpcMarkers = result.npcs;
-    this.mapGatherNodes = result.gatherNodes;
-    this.mapGatherTipMemo = null;
+    this.mapMarkerInteraction.setOverworld(result);
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
-    // Inside a rift the aria-live summary must name the generated floor, not
-    // the overworld zone the far-off rift x would otherwise resolve to
-    // (mirrors the on-canvas title map_window_painter now draws).
     const riftFloor = this.sim.riftFloor;
     const zoneLabel = riftFloor
       ? riftFloorLabel(riftFloor.name, riftFloor.tier)
       : zoneDisplayName(zone.id);
     this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneLabel }));
+    this.setText(
+      markerSummaryEl,
+      this.mapMarkerInteraction.semantics.updateOverworld(result, zoneLabel, S),
+    );
   }
 
   // Tooltip body for a hovered zone region on the continent overview: the zone's
@@ -10948,71 +11002,6 @@ export class Hud {
           max: this.questNumber(region.levelMax),
         }),
       )}</div>`;
-    }
-    return html;
-  }
-
-  // Tooltip body for a hovered gather node on the zone map: reuses the world
-  // hover's pure model + HTML (name, tool gate, ready/cooldown, fine preview)
-  // so the map and the 3D node tip never disagree. Memoized per node id (see
-  // mapGatherTipMemo) so a pointer sweeping across one icon resolves once.
-  private gatherNodeMapTooltipHtml(marker: MapGatherNodeMarker): string {
-    this.mapGatherTipMemo = resolveGatherTipMemo(this.mapGatherTipMemo, marker.nodeId, (nodeId) => {
-      const model = buildGatherNodeTooltip(this.sim, nodeId);
-      return model ? gatherNodeTooltipHtml(model) : '';
-    });
-    return this.mapGatherTipMemo.html;
-  }
-
-  // Tooltip body for a hovered quest-giver glyph on the world map: each quest
-  // behind the glyph shows its title, tagged by its marker kind through the
-  // pure questMarkerTooltipTag table (ready, repeatable, available-again-soon;
-  // the plain offer stays untagged), plus its level requirement when the
-  // quest declares one, all through questUi keys.
-  private questGiverTooltipHtml(marker: MapNpcMarker): string {
-    let html = '';
-    for (const ref of marker.quests) {
-      const quest = QUESTS[ref.questId];
-      if (!quest) continue;
-      const tag = questMarkerTooltipTag(ref.kind);
-      const tagHtml = tag ? ` <span class="${tag.cls}">(${esc(t(tag.key))})</span>` : '';
-      html += `<div class="tt-title">${esc(questTitle(ref.questId))}${tagHtml}</div>`;
-      if (quest.minLevel) {
-        html += `<div class="tt-quest-req">${esc(
-          t('questUi.detail.requiresLevel', {
-            level: this.questNumber(quest.minLevel),
-          }),
-        )}</div>`;
-      }
-    }
-    return html;
-  }
-
-  // Tooltip body for hovered quest-objective areas on the world map: per quest,
-  // its title plus each hovered objective's tracker-style "label current/total"
-  // line, all through the existing questUi keys + formatters (no new i18n
-  // surface). Empty string when nothing under the cursor resolves.
-  private questAreaTooltipHtml(refs: readonly QuestObjectiveRef[]): string {
-    const byQuest = new Map<string, number[]>();
-    for (const ref of refs) {
-      const list = byQuest.get(ref.questId);
-      if (list) list.push(ref.objectiveIndex);
-      else byQuest.set(ref.questId, [ref.objectiveIndex]);
-    }
-    let html = '';
-    for (const [questId, objectiveIndexes] of byQuest) {
-      const quest = QUESTS[questId];
-      const qp = this.sim.questLog.get(questId);
-      if (!quest || !qp) continue;
-      let lines = '';
-      for (const i of objectiveIndexes) {
-        const obj = quest.objectives[i];
-        if (!obj) continue;
-        const required = questObjectiveRequired(quest, qp, i);
-        const current = Math.min(qp.counts[i] ?? 0, required);
-        lines += `<div>${esc(this.questProgressText(questObjectiveLabel(questId, i), current, required))}</div>`;
-      }
-      if (lines) html += `<div class="tt-title">${esc(questTitle(questId))}</div>${lines}`;
     }
     return html;
   }
@@ -18916,6 +18905,10 @@ export class Hud {
 
   attachOptions(hooks: OptionsHooks): void {
     this.optionsHooks = hooks;
+  }
+
+  refreshMapMarkerArtPalette(): void {
+    this.mapMarkerArt.refreshPalette();
   }
 
   attachReporting(hooks: ReportHooks): void {

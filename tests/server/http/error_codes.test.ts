@@ -89,6 +89,10 @@ const EXPECTED_CODES = [
   'epic.account_taken',
   'epic.upstream',
   'ota_updates.invalid_input',
+  'cheater_mark.admin_target',
+  'cheater_mark.reason_required',
+  'cheater_mark.invalid_duration',
+  'cheater_mark.not_marked',
 ];
 
 describe('ERROR_CODES catalog', () => {

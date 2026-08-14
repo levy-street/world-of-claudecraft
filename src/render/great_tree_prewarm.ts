@@ -49,9 +49,6 @@ export function prepareGreatTreeProfileAssets(target: Readonly<GfxSettings>): Pr
 
 registerDeferredPreload(() => prepareGreatTreeProfileAssets(GFX));
 
-// media-manifest coverage hook (tests/render_glb_replacement_assets.test.ts)
-export const greatTreePrewarmPreloadInternalsForTest = { urls: [GREAT_TREE_URL] };
-
 /**
  * One decorated great-tree clone for the boot prewarm scene: compiles the
  * landmark-bark surface-detail program (and the plain leaf program of the

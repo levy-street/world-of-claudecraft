@@ -162,6 +162,11 @@ import {
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
 import {
+  applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
+  persistCheaterMark,
+  refreshCheaterMark,
+} from './cheater_mark_runtime';
+import {
   type CosmeticOpGuardState,
   consumeCosmeticOpToken,
   createCosmeticOpGuard,
@@ -275,7 +280,6 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
-import { trackReachedLevel5 } from './meta_capi';
 import {
   applyMobScanTick,
   createMobScanTickStats,
@@ -316,6 +320,7 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
+import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
@@ -334,6 +339,7 @@ import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
+import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
@@ -614,6 +620,7 @@ const MARKET_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MARKET_WIRE_
 const MARKET_BROWSE_REFRESH_TICKS = 40;
 const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
   'market_search',
+  'market_sell_price_check',
   'market_list',
   'market_list_instance',
   'market_buy',
@@ -955,6 +962,11 @@ export interface ClientSession {
   // stored link through `new URL()`, and the chat path would otherwise pay that on
   // EVERY line a streamer sends, to every channel.
   chatFlair: ChatSenderFlair | undefined;
+  // Latch: this session has worn a Cheater mark at some point. It gates the
+  // per-save write-back, so an unmarked account (nearly all of them) never pays
+  // a write, and it stays TRUE through the save that finally zeroes the row so
+  // the last write is not skipped by the aura already having expired.
+  cheaterMarked: boolean;
   characterId: number;
   pid: number; // player entity id in the sim
   name: string;
@@ -1059,6 +1071,10 @@ export interface ClientSession {
   lastMarketWireTick: number;
   lastMarketBrowseRev: number | null;
   lastMarketQueryRef: MarketQuery | null;
+  // The Sell tab's price-check item id last built for (issue #3043), the
+  // marketQuery precedent: a primitive, so a plain !== value compare is its own
+  // change signal (no identity trick needed).
+  lastSellPriceItemIdRef: string | null;
   lastMarketRebuildTick: number;
   // Commission order board readout, same recipe at its own cadence
   // (CORDER_WIRE_HZ): the board revision last built for plus the backstop
@@ -1424,6 +1440,10 @@ function identityFields(e: Entity): Record<string, unknown> {
     if (e.relicsTotal) out.crt = e.relicsTotal; // character-scoped relic total
   }
   if (e.aiAccount) out.ai = 1; // operator-set AI-operated mark (name prefix)
+  // Operator-applied Cheater tag. A bare flag, not the remaining budget: every
+  // nearby client needs to RENDER the tag, but only the wearer needs the
+  // countdown, and the wearer already has it on the mark's own aura.
+  if (e.cheaterMark) out.chm = 1;
   // Official streamer's platform links (player menu). Already gated by
   // wireStreamerLinks at the point they were set on the entity, so an account whose
   // streamer flag is off has none here, whatever is stored against it.
@@ -2310,6 +2330,7 @@ export class GameServer {
     moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
+    moderator.lastSellPriceItemIdRef = null;
     moderator.lastMarketRebuildTick = 0;
     moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
     moderator.lastCorderBoardRev = null;
@@ -2350,6 +2371,7 @@ export class GameServer {
     moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
+    moderator.lastSellPriceItemIdRef = null;
     moderator.lastMarketRebuildTick = 0;
     moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
     moderator.lastCorderBoardRev = null;
@@ -3187,6 +3209,12 @@ export class GameServer {
     }
   }
 
+  /** Push a Cheater mark change onto every live session of that account
+   *  (server/cheater_mark_runtime.ts owns the behavior and its contract). */
+  applyCheaterMarkLive(accountId: number, seconds: number): void {
+    applyCheaterMarkLiveRuntime(this.clients.values(), this.sim, accountId, seconds);
+  }
+
   /** Apply a committed cross-process policy notification to live sessions. */
   applyGeneralChatRateLimitLive(accountId: number, rateLimit: GeneralChatRateLimit | null): void {
     this.generalChatRateLimitLiveState.policyChanged(accountId, rateLimit);
@@ -3853,6 +3881,9 @@ export class GameServer {
       // ordinary player) keeps these empty values and never touches the wire.
       accountFlair: EMPTY_ACCOUNT_FLAIR,
       chatFlair: undefined,
+      // Latched by the join restore / a live apply, never seeded true here: the
+      // account row has not been read yet at this point.
+      cheaterMarked: false,
       characterId,
       pid,
       name,
@@ -3909,6 +3940,7 @@ export class GameServer {
       lastMarketWireTick: -MARKET_WIRE_INTERVAL_TICKS,
       lastMarketBrowseRev: null,
       lastMarketQueryRef: null,
+      lastSellPriceItemIdRef: null,
       lastMarketRebuildTick: 0,
       lastCorderWireTick: -CORDER_WIRE_INTERVAL_TICKS,
       lastCorderBoardRev: null,
@@ -3987,6 +4019,9 @@ export class GameServer {
         reconcileEpicOnLogin(accountId);
       })
       .catch(() => {});
+    // D7Retained ad conversion: fires once per account when a session opens
+    // during day seven after signup (atomic claim inside; fire-and-forget).
+    maybeTrackDay7Retained(session);
     openPlaySession(accountId, characterId, name, meta, initialLevel)
       .then((id) => {
         session.dbSessionId = id;
@@ -4046,6 +4081,17 @@ export class GameServer {
     void this.refreshAccountFlair(session).catch((err) =>
       console.error('account flair refresh failed:', err),
     );
+    // Restore any live Cheater mark, same best-effort contract: a failed read
+    // must never block joining the world. Failing OPEN (joining untagged) is the
+    // deliberate choice over failing closed, because the alternative is locking a
+    // player out of a game they paid for over a cosmetic sanction; the budget is
+    // not burned while the tag is absent, so a missed restore delays the sanction
+    // rather than cancelling it.
+    void refreshCheaterMark(
+      session,
+      this.sim,
+      () => this.clients.get(session.pid) === session,
+    ).catch((err) => console.error('cheater mark refresh failed:', err));
     // Stamp the Curator standing off the just-loaded meta so an inspect landing
     // before the first 60s cycle already reads the true rank. Synchronous (pure
     // CPU), so the try/catch is what keeps the same "a flair stamp must never
@@ -4415,6 +4461,15 @@ export class GameServer {
       if (session.escrowQuarantined) return false;
       const state = this.sim.serializeCharacter(session.pid);
       const e = this.sim.entities.get(session.pid);
+      // Persist the Cheater mark's remaining budget. It rides its own write and
+      // NOT the character blob because the mark is ACCOUNT state: folding it into
+      // one character's save would let an alt's stale snapshot resurrect a budget
+      // another character already burned down.
+      //
+      // The live aura is the ONLY sim source of truth, because the aura is what
+      // ticks (see src/sim/moderation/CLAUDE.md). Its absence means the sanction
+      // is served, and burn(0) is what clears the account row.
+      void persistCheaterMark(session, e?.auras);
       // Captured at serialize time: only unlocks already inside THIS blob may
       // publish when it lands. An unlock granted while the write is in flight
       // stays pending for the save queued behind it, so the character_deeds
@@ -7932,9 +7987,13 @@ export class GameServer {
             rarity: msg.rarity,
             sort: msg.sort,
             page: typeof msg.page === 'number' ? msg.page : 0,
+            collapseLowest: msg.collapseLowest,
           }),
           pid,
         );
+        break;
+      case 'market_sell_price_check':
+        sim.marketSellPriceCheck(typeof msg.item === 'string' ? msg.item : null, pid);
         break;
       case 'market_list':
         if (
@@ -9209,9 +9268,11 @@ export class GameServer {
         sent.market === undefined ||
         browseRev !== session.lastMarketBrowseRev ||
         meta.marketQuery !== session.lastMarketQueryRef ||
+        meta.sellPriceItemId !== session.lastSellPriceItemIdRef ||
         this.sim.tickCount - session.lastMarketRebuildTick >= MARKET_BROWSE_REFRESH_TICKS
       ) {
         session.lastMarketQueryRef = meta.marketQuery;
+        session.lastSellPriceItemIdRef = meta.sellPriceItemId;
         session.lastMarketRebuildTick = this.sim.tickCount;
         maybe('market', this.sim.marketInfoFor(anchorSession.pid));
         // Stamp AFTER the rebuild: marketInfoFor can advance the revision as a
@@ -9724,22 +9785,32 @@ export class GameServer {
           // carries the old level until the next save, which enqueues again from
           // saveCharacter, so an early drain re-reads once the row catches up.
           enqueueLinkChange({ accountId: session.accountId, kinds: ['flex'] }, now);
+          recordLevelUp(session, ev.level);
         }
       }
-      if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
+      if ((ev.type === 'questAccepted' || ev.type === 'questDone') && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
-        if (s) {
-          void trackReachedLevel5(
-            s.characterId,
-            {
-              clientIp: s.ip,
-              clientUserAgent: s.userAgent,
-              fbp: s.fbp,
-              fbc: s.fbc,
-            },
-            s.sourceUrl,
+        const entity = this.sim.entities.get(ev.pid);
+        // Skip when the entity is gone rather than defaulting the level: the
+        // level is the gate that bounds ftue_events growth, so it must never
+        // fail open (the death arm has the same direction).
+        if (s && entity)
+          recordFtueQuest(
+            s,
+            ev.type === 'questAccepted' ? 'quest_accepted' : 'quest_done',
+            ev.questId,
+            entity.level,
           );
-        }
+      }
+      if (ev.type === 'death' && this.clients.has(ev.entityId)) {
+        const s = this.clients.get(ev.entityId);
+        if (s) recordFtueDeath(s, this.sim, ev.entityId, ev.killerId);
+      }
+      if (ev.type === 'levelup' && (ev.level === 2 || ev.level === 5) && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        // Level 2 and 5 ad conversions, email-enriched for match quality
+        // (ua_capi.ts); other levels no-op inside the module.
+        if (s) trackLevelMilestoneCapi(s, ev.level);
       }
       if (ev.type === 'levelup' && ev.level === MAX_LEVEL && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);

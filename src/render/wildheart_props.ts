@@ -11,6 +11,7 @@ import {
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { surfaceMat } from './gfx';
+import type { FireLightSink } from './point_light_budget';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { radialGlowTexture } from './textures';
 import { buildWildheartTerrain } from './wildheart_terrain';
@@ -272,7 +273,7 @@ function buildProp(kind: WildheartPropKind): THREE.Object3D {
 export interface WildheartFieldInteriorDeps {
   lowGfx: boolean;
   flames: THREE.Mesh[];
-  fireLights: THREE.PointLight[];
+  fireLights: FireLightSink;
 }
 
 let flameGeometry: THREE.BufferGeometry | null = null;

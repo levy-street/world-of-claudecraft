@@ -1143,9 +1143,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.updateMinimap',
     band: 'fast',
-    gate: 'cadenceDue(this.lastMinimapDrawAt, now, minimapRedrawIntervalMs(fxTier))',
+    gate: "cadenceDue(this.lastMinimapDrawAt, now, minimapRedrawIntervalMs(fxTier, minimapMode(this.sim) === 'rift'))",
     surface: 'chrome',
-    why: 'the minimap canvas redraw, the heaviest fast-band item, tier-coarsened',
+    why: 'the minimap canvas redraw, tier-coarsened only outside a Rift so lethal mechanics stay on the graphics-neutral fast cadence',
   },
   {
     call: 'this.updateClock',

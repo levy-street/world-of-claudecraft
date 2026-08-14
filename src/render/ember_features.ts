@@ -36,10 +36,6 @@ for (const key of Object.keys(EMBER_PROP_URLS) as EmberPropKey[]) {
   );
 }
 
-export const emberFeaturesPreloadInternalsForTest = {
-  propUrls: Object.values(EMBER_PROP_URLS),
-};
-
 interface PropPlacement {
   x: number;
   y: number;

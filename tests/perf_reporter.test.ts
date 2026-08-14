@@ -226,6 +226,7 @@ function snapshot(): PerfSnapshot {
     renderer: {
       graphicsConfigVersion: 16,
       tier: 'high',
+      currentZoneId: 'eastbrook_vale',
       qualityBuckets: qualityBuckets(),
       gpuQueue: {
         units: 2,

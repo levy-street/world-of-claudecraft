@@ -4,10 +4,11 @@
 // DATABASE arm must agree with what node-postgres actually resolves,
 // including the ?host= query override a WHATWG-hostname check misses.
 import { readdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from '../scripts/lib/loopback_guard.mjs';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
@@ -149,6 +150,7 @@ describe('assertLoopbackDatabaseUrl', () => {
 // deleted import away from silently vanishing from a call site while the unit
 // tests above stayed green, so the call sites are pinned too.
 const GUARDED_SCRIPTS = [
+  'scripts/admin_cheater_mark_shot.mjs',
   'scripts/admin_guild_bank_shot.mjs',
   'scripts/admin_professions_shot.mjs',
   'scripts/catalog_program_census.mjs',
@@ -158,21 +160,22 @@ const GUARDED_SCRIPTS = [
   'scripts/load_professions.mjs',
   'scripts/mob_stall_repro.mjs',
   'scripts/profile_recent_finds_shot.mjs',
+  'scripts/profiler/geared_arrival_roster.mjs',
 ] as const;
 
 // Scripts that drive /dev cheats over the wire but never open Postgres: they
 // guard the server target only. A script that grows a pg import graduates to
 // GUARDED_SCRIPTS (the discovery arm below reddens until it does).
-const URL_GUARDED_SCRIPTS = ['scripts/crowd_fps_bench.mjs'] as const;
+const URL_GUARDED_SCRIPTS = [
+  'scripts/crowd_fps_bench.mjs',
+  'scripts/gpu_hitch_capture.mjs',
+] as const;
 
 // Full-line // comments are stripped before the scan: this file's own subject
 // matter means the phrase "assertLoopbackUrl" appears in prose inside these
 // scripts, and a commented-out call must never satisfy the pin.
-function codeWithoutLineComments(relPath: string): string {
-  return readFileSync(join(ROOT, relPath), 'utf8')
-    .split('\n')
-    .filter((line) => !/^\s*\/\//.test(line))
-    .join('\n');
+function scriptCode(relPath: string): string {
+  return codeWithoutLineComments(readFileSync(join(ROOT, relPath), 'utf8'));
 }
 
 function scriptSources(dir: string): string[] {
@@ -185,14 +188,18 @@ function scriptSources(dir: string): string[] {
   return found;
 }
 
+function expectedGuardImport(relPath: string): string {
+  const importPath = relative(dirname(relPath), 'scripts/lib/loopback_guard.mjs').replaceAll(
+    '\\',
+    '/',
+  );
+  return `from '${importPath.startsWith('.') ? importPath : `./${importPath}`}'`;
+}
+
 describe('loopback guard call sites', () => {
   it.each(GUARDED_SCRIPTS)('%s imports the shared guard and calls BOTH arms', (relPath) => {
-    const code = codeWithoutLineComments(relPath);
-    expect(code).toContain(
-      relPath.startsWith('scripts/lib/')
-        ? "from './loopback_guard.mjs'"
-        : "from './lib/loopback_guard.mjs'",
-    );
+    const code = scriptCode(relPath);
+    expect(code).toContain(expectedGuardImport(relPath));
     // The two call literals are distinct substrings (the import line carries
     // neither, because it has no open paren), so each proves its own arm.
     expect(code).toContain('assertLoopbackUrl(');
@@ -200,7 +207,7 @@ describe('loopback guard call sites', () => {
   });
 
   it.each(URL_GUARDED_SCRIPTS)('%s imports the shared guard and calls the URL arm', (relPath) => {
-    const code = codeWithoutLineComments(relPath);
+    const code = scriptCode(relPath);
     expect(code).toContain("from './lib/loopback_guard.mjs'");
     expect(code).toContain('assertLoopbackUrl(');
     // No pg import means no database arm; the discovery arm below enforces
@@ -210,7 +217,7 @@ describe('loopback guard call sites', () => {
 
   it('pins the guarded set exhaustively so a new adopter joins the scan', () => {
     const importers = scriptSources(join(ROOT, 'scripts'))
-      .filter((relPath) => codeWithoutLineComments(relPath).includes('loopback_guard.mjs'))
+      .filter((relPath) => scriptCode(relPath).includes('loopback_guard.mjs'))
       .sort();
     expect(importers).toEqual([...GUARDED_SCRIPTS, ...URL_GUARDED_SCRIPTS].sort());
   });
@@ -234,7 +241,7 @@ describe('loopback guard call sites', () => {
     ] as const;
     const pgImporters = scriptSources(join(ROOT, 'scripts'))
       .filter((relPath) => {
-        const code = codeWithoutLineComments(relPath);
+        const code = scriptCode(relPath);
         return code.includes("from 'pg'") || code.includes("require('pg')");
       })
       .sort();

@@ -101,6 +101,10 @@ describe('retention sweep wiring in server/main.ts', () => {
       'prunePlayerReportsBatch(',
       'pruneBugReportsBatch(',
       'pruneChatViolationsBatch(',
+      // The UA progression event logs (level_up_events / ftue_events) grow
+      // per event; each registers its bounded prune with the sweep.
+      'pruneLevelUpEventsBatch(',
+      'pruneFtueEventsBatch(',
     ]) {
       expect(count(MAIN, call)).toBe(1);
     }

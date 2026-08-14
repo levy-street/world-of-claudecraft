@@ -17,7 +17,8 @@ import {
 // is a SAFETY predicate: a wrong "rerun" can resurrect a superseded run or
 // blur a real failure's triage, so every case that is not positively the
 // stall shape must decide no. The primary fixture is the real incident:
-// run 31392590628 attempt 2 (2026-08-10), "PR gate (long sims A)" killed by
+// run 31392590628 attempt 2 (2026-08-10), the job then named "PR gate
+// (long sims A)" (now "PR long sims A"; fixture data uses the live name) killed by
 // its 20-minute bound inside "Check out repository", steps and annotation
 // text verbatim from the GitHub API.
 
@@ -65,7 +66,7 @@ function greenJob(name: string): FixtureJob {
 
 function stalledLaneA(): FixtureJob {
   return {
-    name: 'PR gate (long sims A)',
+    name: 'PR long sims A',
     conclusion: 'cancelled',
     steps: structuredClone(LANE_A_STALL_STEPS),
     annotationMessages: [TIMEOUT_ANNOTATION, CANCEL_ANNOTATION],
@@ -77,13 +78,13 @@ function incidentRun(): { runAttempt: number; runConclusion: string | null; jobs
     runAttempt: 1,
     runConclusion: 'cancelled',
     jobs: [
-      greenJob('Detect code path changes'),
-      greenJob('PR gate (English-only legal) (1)'),
-      greenJob('PR gate (English-only legal) (2)'),
-      greenJob('PR gate (long sims B)'),
-      greenJob('PR checks (freshness, typecheck, builds)'),
-      greenJob('Format + lint (Biome, changed files)'),
-      greenJob('Browser regressions (Chromium)'),
+      greenJob('Classify changes'),
+      greenJob('PR tests (1)'),
+      greenJob('PR tests (2)'),
+      greenJob('PR long sims B'),
+      greenJob('PR checks'),
+      greenJob('Lint (changed files)'),
+      greenJob('Browser tests'),
       stalledLaneA(),
     ],
   };
@@ -93,7 +94,7 @@ describe('ci stall rerun decision core', () => {
   it('reruns the real incident shape: bound-killed setup step, no test step ran', () => {
     const decision = decide(incidentRun());
     expect(decision.rerun).toBe(true);
-    expect(decision.stalledJobs).toEqual(['PR gate (long sims A)']);
+    expect(decision.stalledJobs).toEqual(['PR long sims A']);
     expect(TIMEOUT_ANNOTATION).toContain(TIMEOUT_ANNOTATION_FRAGMENT);
   });
 
@@ -163,7 +164,7 @@ describe('ci stall rerun decision core', () => {
     // means the whole run belongs to a human.
     const run = incidentRun();
     run.jobs[1] = {
-      name: 'PR gate (English-only legal) (1)',
+      name: 'PR tests (1)',
       conclusion: 'failure',
       steps: [
         { name: 'Check out repository', conclusion: 'success' },
@@ -190,7 +191,7 @@ describe('ci stall rerun decision core', () => {
   it('refuses unrecognized job conclusions: timed_out, action_required, still running', () => {
     for (const conclusion of ['timed_out', 'action_required', null]) {
       const run = incidentRun();
-      run.jobs[3] = { name: 'PR gate (long sims B)', conclusion, steps: [] };
+      run.jobs[3] = { name: 'PR long sims B', conclusion, steps: [] };
       expect(decide(run).rerun).toBe(false);
     }
   });
@@ -211,7 +212,7 @@ describe('ci stall rerun decision core', () => {
     const run = incidentRun();
     run.runConclusion = 'failure';
     run.jobs[run.jobs.length - 1] = {
-      name: 'PR gate (long sims A)',
+      name: 'PR long sims A',
       conclusion: 'failure',
       steps: [
         { name: 'Set up job', conclusion: 'success' },
@@ -227,7 +228,7 @@ describe('ci stall rerun decision core', () => {
     };
     const decision = decide(run);
     expect(decision.rerun).toBe(true);
-    expect(decision.stalledJobs).toEqual(['PR gate (long sims A)']);
+    expect(decision.stalledJobs).toEqual(['PR long sims A']);
   });
 
   it('refuses a failed job whose failed step is anything but a checkout', () => {
@@ -246,7 +247,7 @@ describe('ci stall rerun decision core', () => {
       const run = incidentRun();
       run.runConclusion = 'failure';
       run.jobs[run.jobs.length - 1] = {
-        name: 'PR gate (long sims A)',
+        name: 'PR long sims A',
         conclusion: 'failure',
         steps: [
           { name: 'Check out repository', conclusion: 'success' },
@@ -262,7 +263,7 @@ describe('ci stall rerun decision core', () => {
     const run = incidentRun();
     run.runConclusion = 'failure';
     run.jobs[run.jobs.length - 1] = {
-      name: 'PR gate (long sims A)',
+      name: 'PR long sims A',
       conclusion: 'failure',
       steps: [
         { name: 'Check out repository', conclusion: 'failure' },
@@ -279,7 +280,7 @@ describe('ci stall rerun decision core', () => {
     // both died, one rerun-failed-jobs call covers them together.
     const run = incidentRun();
     run.jobs[2] = {
-      name: 'PR gate (English-only legal) (2)',
+      name: 'PR tests (2)',
       conclusion: 'failure',
       steps: [
         { name: 'Set up job', conclusion: 'success' },
@@ -290,10 +291,7 @@ describe('ci stall rerun decision core', () => {
     };
     const decision = decide(run);
     expect(decision.rerun).toBe(true);
-    expect(decision.stalledJobs).toEqual([
-      'PR gate (English-only legal) (2)',
-      'PR gate (long sims A)',
-    ]);
+    expect(decision.stalledJobs).toEqual(['PR tests (2)', 'PR long sims A']);
   });
 });
 
@@ -442,10 +440,10 @@ describe('driver wiring', () => {
       const jobsJson = options.jobsJson ?? {
         total_count: 2,
         jobs: [
-          { id: 1, name: 'PR gate (long sims B)', conclusion: 'success', steps: [] },
+          { id: 1, name: 'PR long sims B', conclusion: 'success', steps: [] },
           {
             id: 93473897038,
-            name: 'PR gate (long sims A)',
+            name: 'PR long sims A',
             conclusion: 'cancelled',
             steps: LANE_A_STALL_STEPS,
           },
@@ -556,7 +554,7 @@ describe('driver wiring', () => {
       {
         jobsJson: {
           total_count: 3,
-          jobs: [{ id: 1, name: 'PR gate (long sims B)', conclusion: 'success', steps: [] }],
+          jobs: [{ id: 1, name: 'PR long sims B', conclusion: 'success', steps: [] }],
         },
       },
     );

@@ -362,6 +362,7 @@ export const en = {
     email: 'Email',
     emailPlaceholder: 'you@example.com',
     emailError: 'Please enter a valid email address.',
+    marketingOptIn: 'Email me game news and updates (optional)',
     showPassword: 'Show password',
     hidePassword: 'Hide password',
     logIn: 'Log In',
@@ -487,6 +488,23 @@ export const en = {
     // randomize above, and like it, it keeps the body selection.
     resetLook: 'Reset Look',
     resetShort: 'Reset',
+    // The customizer's Share tab: every changeable feature serialized as a
+    // named value in one line (the design code), exported and imported there.
+    shareTab: 'Share',
+    designCode: 'Design code',
+    designCodeHint:
+      'Copy this code to save or share this look. Paste a code here and import it to load one.',
+    copyCode: 'Copy code',
+    importCode: 'Import',
+    designCodeCopied: 'Design code copied.',
+    designCodeCopyManual:
+      'Automatic copy is blocked here. The code is selected, copy it with your keyboard.',
+    designCodeImported: 'Design imported.',
+    designCodeImportedPartial: 'Design imported. Values this version does not know were skipped.',
+    designCodeErrEmpty: 'Paste a design code first.',
+    designCodeErrHeader: 'That does not look like a design code.',
+    designCodeErrVersion: 'That design code comes from a newer game version.',
+    designCodeErrMalformed: 'That design code is damaged. Copy the whole code and try again.',
     browFlat: 'Flat',
     browArched: 'Arched',
     browThin: 'Thin',

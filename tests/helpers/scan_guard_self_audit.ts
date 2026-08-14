@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect } from 'vitest';
 
@@ -39,7 +40,10 @@ export function expectScansOnlyThroughSharedWalkers(
   sourceUrl: string,
   walkerModules: string[],
 ): void {
-  const name = fileURLToPath(sourceUrl).split('/').pop() ?? sourceUrl;
+  // basename, not a manual split: fileURLToPath returns backslash-separated
+  // paths on Windows, where a '/' split never divides and "name" becomes the
+  // whole absolute path (#3225, same class as the .pathname trap above).
+  const name = basename(fileURLToPath(sourceUrl));
   const code = readFileSync(fileURLToPath(sourceUrl), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/(^|[^:])\/\/.*$/gm, '$1');

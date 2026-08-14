@@ -26,7 +26,6 @@
 //
 // `src/sim`-pure: sibling sim modules + the SimContext seam only.
 
-import { ABILITIES } from '../data';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 
@@ -335,9 +334,4 @@ export function igniteOnCrit(
   const mods = fireSpecMods(ctx, source);
   if (!mods || mods.global.ignitionPct <= 0) return;
   applyIgnite(ctx, source, target, Math.round(amount * mods.global.ignitionPct));
-}
-
-/** Does this ability id name a mage ability (used by tests and tooling). */
-export function isFireSpender(abilityId: string): boolean {
-  return HOT_STREAK_SPENDERS.includes(abilityId) && ABILITIES[abilityId] !== undefined;
 }

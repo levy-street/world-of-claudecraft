@@ -6,9 +6,12 @@
 //
 // Committed means the SPEC for warriors and paladins (Protection), and the
 // spec PLUS the form for druids: a Feral druid is only crit-immune while in
-// Sloth Form. PvP is untouched: this guards the one mob crit roll in
-// Sim.mobSwing, and that roll is still DRAWN for an immune tank so every
-// downstream rng draw keeps its stream position (the parity contract).
+// Sloth Form. PvP is untouched: the rule is keyed on the ATTACKER as well as
+// the target, because Sim.mobSwing is a shared swing shell (hostile mobs,
+// player pets, delve companions): only a HOSTILE creature's swing is
+// suppressed, so a player pet crits a committed tank like any player attack
+// does. The crit roll is still DRAWN for an immune tank so every downstream
+// rng draw keeps its stream position (the parity contract).
 //
 // Pure leaf module: no Sim import, structural meta parameter, so a Vitest
 // imports it directly and the mobSwing shell stays a thin consumer.
@@ -25,7 +28,15 @@ export interface TankCritImmunityMeta {
   talentMods?: { spec: string | null } | null;
 }
 
-export function isCritImmuneTank(target: Entity, meta: TankCritImmunityMeta | undefined): boolean {
+export function isCritImmuneTank(
+  attacker: Entity,
+  target: Entity,
+  meta: TankCritImmunityMeta | undefined,
+): boolean {
+  // Creature rule only: a friendly creature sharing the mobSwing path (a player
+  // pet, a delve companion) and any player attacker keep their crits against a
+  // committed tank; only a hostile mob's swing is suppressed.
+  if (!attacker.hostile) return false;
   if (target.kind !== 'player' || !meta) return false;
   const spec = meta.talentMods?.spec ?? null;
   if (spec === null) return false;

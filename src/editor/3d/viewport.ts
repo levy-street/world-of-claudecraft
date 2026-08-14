@@ -187,8 +187,11 @@ export class Editor3DViewport {
     // Polite far-vista pacing: this construction happens against live editor
     // frames on every document load, never behind an opaque curtain, so the
     // eager macrotask build lane must stay off (see RendererCreateOptions).
+    // The editor authors placements over a questless Sim, so the game's
+    // quest-collectable view gate would hide every authored crate and sigil here.
     this.renderer = new Renderer(this.sim, this.canvas, this.nameplates, {
       eagerFarVista: false,
+      showAllQuestObjects: true,
     });
     this.renderer.placedAssets.rebuildAll(placementsToRenderAssets(this.map.placements), true);
     // A fresh build reflects the whole document: drop any hidden-time debts

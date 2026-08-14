@@ -92,6 +92,10 @@ const EXEMPT: ReadonlyArray<{ cmd: string; why: string }> = [
     cmd: 'sell_all_junk',
     why: 'operates over the whole junk set by definition, so no single copy is named',
   },
+  {
+    cmd: 'market_sell_price_check',
+    why: 'a read-only price lookup keyed by item id (issue 3043), not an action on a held copy: it never touches bags or escrow, so there is no copy to address',
+  },
 ];
 
 /** Sender bodies from ClientWorld, keyed by the wire token they send. */

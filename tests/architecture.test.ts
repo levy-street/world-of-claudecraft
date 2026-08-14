@@ -202,6 +202,11 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/map_entity_disclosure_core.ts',
+  'src/ui/map_navigation_landmarks_core.ts',
+  'src/ui/map_marker_profile_core.ts',
+  'src/ui/map_marker_semantics_core.ts',
+  'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
   'src/ui/aura_overlay_view.ts',
@@ -238,6 +243,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/master_craft_core.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
+  'src/ui/hud/rift/rift_map_core.ts',
   'src/ui/hud/battleground/battleground_map_view.ts',
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
   'src/ui/hud/battleground/battleground_proposal_view.ts',
@@ -431,8 +437,12 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/entity_view_policy_core.ts',
+  'src/render/quest_object_gate_core.ts',
+  'src/render/adaptive_link_budget_core.ts',
   'src/render/affliction_familiar_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
+  'src/render/characters/design_code_core.ts',
   'src/render/reveal_gate_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/ability_vfx_core.ts',
@@ -498,6 +508,13 @@ const RENDER_PURE_CORES = [
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
+  'src/render/prewarm_compile_submission_core.ts',
+  // Bare-named, so the on-disk *_core sweep cannot find them: registered
+  // voluntarily (the prewarm_policy.ts precedent). Both are injected-clock pure
+  // logic with no three and no DOM, and the pacing pair is exactly the kind of
+  // module that grows a `performance.now()` the first time someone is in a hurry.
+  'src/render/link_rate_budget.ts',
+  'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_policy.ts',
   'src/render/camp_brazier_placement_core.ts',
   'src/render/night_accents_core.ts',
@@ -565,6 +582,8 @@ const BARE_NAMED = [
   'src/ui/item_name_color.ts',
   'src/render/foliage_lod.ts',
   'src/render/compile_gate.ts',
+  'src/render/link_rate_budget.ts',
+  'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
@@ -1358,6 +1377,8 @@ const EXPECTED_BARE_NAMED = [
   'src/render/cast_bar.ts',
   'src/render/compile_gate.ts',
   'src/render/foliage_lod.ts',
+  'src/render/link_rate_budget.ts',
+  'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
@@ -1793,6 +1814,8 @@ const UI_DOM_MODULES = [
   'src/ui/mailbox_window.ts',
   'src/ui/map_art.ts',
   'src/ui/map_bg.ts',
+  'src/ui/map_marker_icon_loader.ts',
+  'src/ui/map_marker_palette_lifecycle.ts',
   'src/ui/market_window.ts',
   'src/ui/meters.ts',
   'src/ui/meters_frame.ts',

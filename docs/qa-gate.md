@@ -13,7 +13,7 @@ Codex have different entry points and share the same deterministic scripts and c
 | Day-loop fast path | `npm run gate:fast` through `scripts/gate_fast.mjs` | While iterating (agents and mid/low-tier machines) | No (local only; not merge) |
 | **Selective gate** | `node scripts/gate_select.mjs` | **Before implementation is called ready / pre-merge** | **Yes (the merge bar)** |
 | Full local gate | `npm run gate` through `scripts/gate.mjs` | When you want the whole suite locally, or the planner falls back | Yes (deeper check) |
-| Selective PR-tier CI | ci.yml `pr-gate` shards through `scripts/ci_shard_test.mjs` (same selection semantics, sharded; full suite on any unprovable diff) | Every pull request | Yes (PR checks) |
+| Selective PR-tier CI | ci.yml `pr-gate` shards through `scripts/ci_shard_test.mjs` (same selection semantics, sharded; full suite on any unprovable diff) | Every pull request | Yes (required checks) |
 | Merge queue | ci.yml on the `merge_group` event: the full PR tier over the exact merge result about to become the branch tip (see `docs/merge-queue.md`, including rollout status: `release/**` first, `main` at the next release-to-main merge) | Every queued merge into a queue-protected branch | Yes (required checks on the merge group) |
 | Nightly full gate | `.github/workflows/nightly.yml`: full suite + checks + browser over the tips of main and the active `release/**` branch | Scheduled nightly (04:47 UTC) | No (alerting: files and closes one tracking issue) |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
@@ -102,13 +102,30 @@ Phase 5). Default environment remains `node`.
 
 `npm run gate` (or `pnpm run gate`) is the **full CI mirror, the deeper check behind the
 selective merge bar** (`gate:select`, below, is the bar itself). It mirrors CI:
-generated i18n freshness, malware scanning, changed-file formatting, the SFX conformance
+generated i18n and build-manifest freshness, malware scanning, changed-file formatting, the SFX conformance
 check, the full test suite, the browser regression suite (`npm run test:browser`, which
 drives Chromium through Playwright), the typecheck, and env, server, bot, and client
 builds. Release branches use the release i18n tier. It stops at the first failure and
 bounds Vitest workers to avoid load flakes on shared machines. It resolves FFmpeg
 (`ffmpeg` and `ffprobe`) from the bundled `ffmpeg-static`/`ffprobe-static` npm packages,
 falling back to PATH, and refuses to run when neither source yields a working binary.
+
+**Full-suite lock across concurrent gates (issue #2808):** per-process worker sizing
+protects a gate run from itself, but does nothing when a second `npm run gate` is
+running in a sibling worktree, which this repo's own per-task-worktree workflow makes
+routine; two gates that each correctly claim half the cores still request the whole
+machine between them. `gate.mjs` acquires an advisory lock (`scripts/lib/gate_lock.mjs`,
+an exclusive loopback listener shared by every worktree on the host) around the
+`vitest (full suite)` step only, never the rest of the run. The kernel's atomic listener
+ownership admits one gate at a time and disappears with its process, so recovery never
+deletes a raced lock file or trusts a reusable pid. A gate that finds the listener held
+waits and prints who holds it; a non-gate service on the reserved port is identified and
+bypassed rather than blocking local work. The locked npm/Vitest step runs in a managed
+child process group, so handled termination tears down the active workload before
+releasing ownership. `GATE_NO_LOCK=1` restores fully concurrent behavior for a user who
+deliberately wants two full suites running at once.
+`gate_select.mjs`/`gate_fast.mjs` never touch this lock; it exists for the one step
+that is actually the shared-host bottleneck.
 
 **Task cache (Turborepo):** pure artifact steps (`i18n:gen`, `wiki:content`, `sfx:check`,
 `check:types`, `build:env`, `build:server`, `build:bot`, `build:bundle`) run through `npx turbo run`
@@ -166,12 +183,15 @@ scans from disk joins it the moment it lands.
 
 **Safety fallback.** Any change the planner cannot reason about (a lockfile, `package.json`,
 a vite/vitest/tsconfig edit, the shared test helpers or global setup) drops the whole run
-to the full suite. One deliberate carve-out: the regenerated i18n artifacts never widen;
-they classify into their own bucket and are fed to `related` as graph nodes (see
-"Generated i18n artifacts" under the CI section below; the same shared classifier serves
-both arms, and the local gate's own i18n freshness step is the local half of the safety
-argument). Selection is an optimization for changes we understand; everything else gets
-the old bar. Failing toward *more* tests is the only safe direction, which is also why
+to the full suite. Two deliberate carve-outs: the regenerated i18n artifacts and the
+three committed build manifests (`src/game/sfx_manifest.generated.ts`,
+`src/guide/content.generated.ts`, `src/render/assets/manifest.generated.ts`) never
+widen; each family classifies into its own bucket and is fed to `related` as graph
+nodes (see "Generated i18n artifacts" under the CI section below; the same shared
+classifier serves both arms, and the local gate's own freshness steps, i18n and
+manifest, are the local half of the safety argument). Selection is an optimization for
+changes we understand; everything else gets the old bar. Failing toward *more* tests
+is the only safe direction, which is also why
 an unresolvable diff base or a failing `git diff` is a hard stop rather than an empty
 changed set. The diff is taken against the BRANCH base, not just the dirty working tree:
 `GATE_SELECT_BASE` overrides it, otherwise the tracking branch is used.
@@ -201,13 +221,19 @@ Since Phase 2 of the CI/CD performance packet, the
 API-fetched file listing that decides `code` (`scripts/lib/ci_test_select.mjs`), and each
 `pr-gate` shard builds its legs through `scripts/lib/ci_shard_plan.mjs` via
 `scripts/ci_shard_test.mjs`: in full mode, the old `npm test -- --shard=i/8` step minus
-the long-sims lane files (below); in selective mode, the always-run floor plus
-`vitest related` over the changed sources, both sharded.
+the long-sims lane files (below); in selective mode, ONE merged sharded `vitest related`
+leg over the changed sources plus the floor files as self-selecting seeds (vitest seeds
+its affected set with the given paths themselves; the property is pinned by execution in
+`tests/ci_shard_plan.test.ts`). The entry regenerates the generated artifacts once per
+job before spawning, since `npx vitest` has no npm lifecycle.
 
 **The long-sims lanes** (Phase 4; split in two by the lane-diet PR). The
 `CI_LONG_SUITES` files (`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90
-seconds inside a full-mode shard, the chronomancy balance sweep among them) run in the
-dedicated `PR gate (long sims A)` / `PR gate (long sims B)` job pair
+seconds inside a full-mode shard, the chronomancy balance sweep among them, plus the
+owned-class balance family, which is lane-owned as a unit since its 2026-08-13 split
+so the diet-flag registry and its lane accounting stay in one place; the measured
+per-file lane duration ledgers live in the lane-split PR bodies, #3370 first) run in the
+dedicated `PR long sims A` / `PR long sims B` job pair
 (`node scripts/ci_shard_test.mjs --lane=long-sims-a` / `--lane=long-sims-b`, one
 `CI_LONG_SUITE_HALVES` half each), and every shard leg excludes the whole union, so a
 single multi-minute file no longer sets the slowest shard's wall clock and the lane's
@@ -215,20 +241,48 @@ own wall clock is the slower HALF, not the whole list. Completeness is a pinned
 invariant, not an intention: each lane fails closed to its whole half on exactly the
 inputs that make a shard fail closed to full, the shard legs exclude exactly the files
 the two lanes own between them, and in selective mode each lane runs just its half's
-lane files the floor or the PR's diff would have carried (the related legs stay
+lane files the floor or the PR's diff would have carried (the merged leg's related side stays
 unfiltered, so a reached lane file re-runs there: duplicate work, never a gap). Mode for
 mode, the ten PR-tier test jobs together therefore run exactly what the pre-lane
 8-shard layout would have run (`tests/ci_shard_plan.test.ts` pins the partition;
 selective mode still skips the outside-floor remainder by design, exactly as before the
 lane). The latency win is concentrated in FULL mode: most lane files are
-graph-visible, so on a sim-heavy selective PR the `related` legs pull them back into a
-shard exactly as they did before the lane, and only the blind members (plus any lane
+graph-visible, so on a sim-heavy selective PR the merged leg's related side pulls them back into a
+shard exactly as the old related legs did before the lane, and only the blind members (plus any lane
 test the PR itself changed) ride the lanes.
 The lanes reproduce locally with
 `node scripts/ci_shard_test.mjs --lane=long-sims-a --plan-only` (and `-b`), printing the
 same `[ci-shard]` audit lines as the shards. `release-gate` is deliberately not
 lane-split: `release/**` pushes keep the full suite in their 8 shards; a push to `main`
 or `dev-*` runs the PR tier, so it gets the shards-plus-lanes layout.
+
+**The sparse test-job checkout.** The five sparse CI test jobs (the pr-gate shards,
+both long-sims lanes, release-gate, release-i18n) check out a blobless non-cone sparse
+set: everything in, `docs/screenshots` DIRECTORIES out (root-level files stay), and
+every subtree the repo references back in. The re-include list is DERIVED, not
+curated: `tests/ci_workflow.test.ts` recomputes the referenced set over tests,
+scripts, src, and all of docs minus the screenshots tree itself (acceptance manifests
+carry evidence paths suites follow at runtime; a test-literal-only coupling shipped
+once and went red on exactly that), with existence taken from the git index because
+an excluded directory does not exist on disk under the cone being verified. A new
+reference to an un-coned subtree fails that pin in the same change. `pr-checks`,
+`browser-gate`, and `release-checks` deliberately keep the full tree.
+
+**Declared duration budgets.** `tests/suite_duration_budget.test.ts` is the anti-whale
+ratchet: it reads every DECLARED vitest timeout under `tests/` (all `.ts`/`.mjs`, so
+`.test.mjs` files and `vi.setConfig` allowances in imported helpers count too) through
+the masking parser in `tests/helpers/declared_timeouts.ts` (comments and string
+contents can never count; only registration-head positions do; the diet arm of a
+sweep ternary; same-file constants resolve, and an unresolvable identifier FAILS the
+suite rather than vanishing). It enforces two conscious-decision rules in the
+`monolith_budget` mold: a single test or hook may not declare more than the
+worker-chain cap without an exact exception row (one test is one worker chain and
+cannot parallelize, which is how the pre-split owned-class harness came to set whole
+job walls), and a file whose summed allowance exceeds the default needs an exact
+ledger row, with splitting along cost clusters as the preferred remedy. It reads
+allowances, not runtimes, so lane membership stays a MEASURED decision owned by
+`CI_LONG_SUITES` and its 90-second rule; the guard classifies onto the always-run
+floor and is also named in `CI_GUARD_SUITES` as drift insurance.
 
 **The balance-harness diet.** The heavy balance suites in the lane are regression
 tripwires, not measurements (the authoritative instrument is the offline Monte Carlo
@@ -291,8 +345,8 @@ rests on three structural facts, each pinned:
    mechanism: it floors the direct artifact-naming importers on every selective run,
    with witnesses floored SOLELY by it (`tests/i18n_lazy_loader.test.ts`,
    `tests/i18n_dialect_resolution.test.ts`) pinned in `tests/gate_select_plan.test.ts`.
-   Each `npm test` leg's pretest also regenerates the artifacts, so selected suites
-   always assert over fresh content.
+   The shard entry also regenerates the artifacts once per job before its legs run,
+   so selected suites always assert over fresh content.
 3. **Deletions and unprovable shapes widen.** The freshness diff cannot flag a
    deleted-then-regenerated file (regeneration recreates it UNTRACKED, and `git diff`
    never shows untracked files), so a removed or renamed-away artifact forces full in
@@ -303,6 +357,29 @@ rests on three structural facts, each pinned:
    unrecognized widen. Every OTHER `.generated` tree keeps the old behavior:
    unrecognized, widen. Do not extend the artifact list without a freshness-equivalent
    proof AND the `tests/ci_workflow.test.ts` coupling.
+
+**Committed build manifests.** The three committed build manifests
+(`src/game/sfx_manifest.generated.ts`, `src/guide/content.generated.ts`,
+`src/render/assets/manifest.generated.ts`) hold the SAME standing through the same
+three facts, as the second and only other freshness-guarded family
+(`GENERATED_MANIFEST_ARTIFACT_FILES` in `scripts/lib/gate_select_plan.mjs`): both check
+jobs and the nightly checks job regenerate them (the `wiki:content && build:bundle`
+step; regeneration is deterministic and sub-second per generator), prove every output
+remains tracked with `git ls-files --error-unmatch`, and `git diff --exit-code` the FULL
+output set; both arms feed the changed .ts paths to `vitest
+related` as graph nodes; deletions and renames widen, the shard plan re-proves
+presence, and the local planner widens without an existence probe. The freshness diff
+set is a strict SUPERSET of the classifier family: the SFX generator also writes
+`public/audio/sfx/runtime-pack.json` and `scripts/sfx/sfx_gain_ceiling.generated.json`,
+which are diffed for integrity (a partial diff would let the local gate silently heal
+them mid-run while CI reads stale committed copies) but never declassified, since
+fs-read data is not a graph node. The local gate regenerates the SFX and media
+manifests in their own steps (the wiki content regenerates in the artifacts turbo step),
+proves the whole set remains tracked, and diffs it as its `manifest freshness` step.
+`tests/ci_workflow.test.ts` welds the classifier list, both check jobs' trackedness and
+diff argv, and
+the local gate's `MANIFEST_ARTIFACTS` to each other. Membership is exact files, no
+prefixes.
 
 Every decision prints in the job log (`[detect_code_changes]` in the changes job,
 `[ci-shard]` in each shard: mode, reason, floor size, related sources, and the

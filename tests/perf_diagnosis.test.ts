@@ -38,6 +38,7 @@ function baseSnapshot(): PerfSnapshot {
     renderer: {
       graphicsConfigVersion: 1,
       tier: 'high',
+      currentZoneId: 'eastbrook_vale',
       qualityBuckets: {
         version: 1,
         bands: {} as never,

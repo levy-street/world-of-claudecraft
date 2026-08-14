@@ -118,7 +118,11 @@ if (process.argv.includes('--ship')) {
   );
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'content-type': 'application/x-ndjson', 'x-woc-parse-secret': token },
+    headers: {
+      'content-type': 'application/x-ndjson',
+      'content-encoding': 'gzip',
+      'x-woc-parse-secret': token,
+    },
     body,
     signal: AbortSignal.timeout(15000),
     // Never follow a redirect with the secret attached (cross-origin

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   gateVitestSkipPretestEnv,
+  shouldRunEntryPretest,
   shouldSkipPretest,
   WOC_SKIP_PRETEST,
 } from '../scripts/lib/gate_artifact_skip.mjs';
@@ -27,6 +28,24 @@ describe('shouldSkipPretest', () => {
   });
 });
 
+describe('shouldRunEntryPretest (the CI shard entry decision)', () => {
+  // The three arms of scripts/ci_shard_test.mjs's entry-level pretest,
+  // unit-driven so the always-executed CI branch has executing coverage:
+  // zero legs (a selective lane that owns nothing) must not regenerate,
+  // an inherited skip flag must not regenerate twice, and the normal shape
+  // must regenerate exactly once before any leg.
+  it('runs for a populated plan with no skip flag', () => {
+    expect(shouldRunEntryPretest({ legCount: 1, env: {} })).toBe(true);
+  });
+  it('skips for a zero-leg plan (nothing below reads the artifacts)', () => {
+    expect(shouldRunEntryPretest({ legCount: 0, env: {} })).toBe(false);
+  });
+  it('skips when the flag is already set, exact-string contract', () => {
+    expect(shouldRunEntryPretest({ legCount: 3, env: { WOC_SKIP_PRETEST: '1' } })).toBe(false);
+    expect(shouldRunEntryPretest({ legCount: 3, env: { WOC_SKIP_PRETEST: 'true' } })).toBe(true);
+  });
+});
+
 describe('gate generate-once orchestration pins', () => {
   it('delegates the step list so generate-once + turbo cache stay centralized', () => {
     // Step names and turbo/npm wiring are pinned in tests/gate_task_cache.test.ts
@@ -43,6 +62,10 @@ describe('gate generate-once orchestration pins', () => {
     expect(pkg.scripts.build).toContain('wiki:content');
     expect(pkg.scripts.build).toContain('build:bundle');
     expect(pkg.scripts['build:bundle']).toContain('vite build');
+    // The CI manifest freshness diff proves the committed manifests only
+    // because build:bundle regenerates them first through the pregen
+    // orchestrator; dropping the call would leave the diff vacuously green.
+    expect(pkg.scripts['build:bundle']).toContain('build_bundle_pregen.mjs');
     expect(pkg.scripts['build:bundle']).not.toContain('i18n:gen');
     expect(pkg.scripts['build:bundle']).not.toContain('wiki:content');
 

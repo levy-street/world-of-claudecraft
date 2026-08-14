@@ -32,9 +32,14 @@ describe('three compileAsync disposal race patch', () => {
     );
 
     // Plain includes + message keeps a failure legible: a toContain miss would
-    // dump the whole 1.28 MB bundle into the reporter.
+    // dump the whole 1.28 MB bundle into the reporter. The needle pins the
+    // guard TOGETHER with its delete: the bare 'if ( program === undefined )'
+    // spelling also matches three's own acquireProgram (and the unpatched
+    // three.cjs), so alone it cannot distinguish patched from unpatched.
     expect(
-      source.includes('if ( program === undefined || program.isReady() ) {'),
+      source.includes(
+        'if ( program === undefined ) {\n\n\t\t\t\t\t\t\tmaterials.delete( material );',
+      ),
       'the three r165 compileAsync patch is not applied; re-run pnpm install',
     ).toBe(true);
     expect(
@@ -114,6 +119,50 @@ describe('three compileAsync disposal race patch', () => {
     expect(
       unpatchedSibling.split('materials.forEach( function ( material ) {').length - 1,
       'the unpatched three.cjs control no longer matches the needle; the GONE pin above may be vacuous',
+    ).toBe(1);
+  });
+
+  it('keeps the per-pass program query dedup applied', () => {
+    // Third patch hunk: materials share linked programs through the program
+    // cache, and isReady() only caches a POSITIVE result, so while a shared
+    // program links every material holding it repaid the synchronous
+    // COMPLETION_STATUS_KHR query inside the same pass. The dedup pays one
+    // not-ready verdict per DISTINCT program per pass.
+    const source = readFileSync(
+      new URL('../node_modules/three/build/three.module.js', import.meta.url),
+      'utf8',
+    );
+    expect(
+      source.includes('const notReadyThisPass = new Set();'),
+      'the per-pass program dedup set is missing; re-run pnpm install',
+    ).toBe(true);
+    // Both halves must survive: the skip arm consults the set BEFORE paying
+    // the query, and a not-ready verdict actually enters the set. Either half
+    // alone silently degrades back to one query per material.
+    expect(
+      source.includes('} else if ( notReadyThisPass.has( program ) === false ) {'),
+      'the dedup skip arm no longer guards the isReady query; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      source.includes('notReadyThisPass.add( program );'),
+      'not-ready programs never enter the dedup set, so the skip arm is vacuous; re-run pnpm install',
+    ).toBe(true);
+    // The dedup is only real while the guarded branch owns the ONLY isReady
+    // call site: a second query outside the notReadyThisPass guard would pass
+    // every needle above while silently paying one query per material again.
+    // Positive control: the unpatched three.cjs also carries exactly one call,
+    // so the count needle is proven matchable.
+    expect(
+      source.split('program.isReady()').length - 1,
+      'a second program.isReady() call site appeared; the guarded branch no longer owns the only query',
+    ).toBe(1);
+    const unpatchedSibling = readFileSync(
+      new URL('../node_modules/three/build/three.cjs', import.meta.url),
+      'utf8',
+    );
+    expect(
+      unpatchedSibling.split('program.isReady()').length - 1,
+      'the three.cjs control no longer matches program.isReady(); the count pin above may be vacuous',
     ).toBe(1);
   });
 });

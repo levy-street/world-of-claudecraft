@@ -502,4 +502,19 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Hace falta actualizar para jugar. Se instalará en cuanto termine la descarga.',
   'hudChrome.otaUpdate.progressLabel': 'Avance de descarga de la actualización',
   'hudChrome.otaUpdate.title': 'Actualización del cliente',
+  'apiError.cheater_mark.admin_target': 'Las cuentas de operador no se pueden marcar.',
+  'apiError.cheater_mark.not_marked': 'Esa cuenta no está marcada.',
+  'auth.designCode': 'Código de diseño',
+  'auth.designCodeHint':
+    'Copia este código para guardar o compartir este aspecto. Pega aquí un código e impórtalo para cargarlo.',
+  'auth.designCodeCopied': 'Código de diseño copiado.',
+  'auth.designCodeImported': 'Diseño importado.',
+  'auth.designCodeImportedPartial':
+    'Diseño importado. Se han omitido los valores que esta versión no reconoce.',
+  'auth.designCodeErrEmpty': 'Pega primero un código de diseño.',
+  'auth.designCodeErrHeader': 'Eso no parece un código de diseño.',
+  'auth.designCodeErrVersion':
+    'Ese código de diseño procede de una versión más reciente del juego.',
+  'auth.designCodeErrMalformed':
+    'Ese código de diseño está dañado. Copia el código completo e inténtalo de nuevo.',
 };

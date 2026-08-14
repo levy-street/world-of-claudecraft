@@ -27,13 +27,13 @@ describe('resolveMobileHudLayout: the six target viewports', () => {
   it('1280x720 resolves to standard (below the tablet height floor, well above compact)', () => {
     const layout = resolveMobileHudLayout(input({ width: 1280, height: 720 }));
     expect(layout.tier).toBe('standard');
-    expect(layout.classes).toEqual(['hud-mobile-standard']);
+    expect(layout.classes).toEqual(['hud-mobile-standard', 'hud-mobile-landscape']);
   });
 
   it('1920x1080 resolves to tablet (both dimensions clear the tablet floors)', () => {
     const layout = resolveMobileHudLayout(input({ width: 1920, height: 1080 }));
     expect(layout.tier).toBe('tablet');
-    expect(layout.classes).toEqual(['hud-mobile-tablet']);
+    expect(layout.classes).toEqual(['hud-mobile-tablet', 'hud-mobile-landscape']);
   });
 
   it('844x390 (notched iPhone landscape, with insets) resolves to compact', () => {
@@ -41,7 +41,7 @@ describe('resolveMobileHudLayout: the six target viewports', () => {
       input({ width: 844, height: 390, safeAreaLeft: 47, safeAreaRight: 47 }),
     );
     expect(layout.tier).toBe('compact');
-    expect(layout.classes).toEqual(['hud-mobile-compact']);
+    expect(layout.classes).toEqual(['hud-mobile-compact', 'hud-mobile-landscape']);
     expect(layout.cssVars['--mobile-hud-safe-left']).toBe('47px');
     expect(layout.cssVars['--mobile-hud-safe-right']).toBe('47px');
   });
@@ -78,6 +78,18 @@ describe('resolveMobileHudLayout: menu/chat state classes', () => {
     );
   });
 
+  it('adds hud-mobile-landscape iff the touch viewport is wider than tall', () => {
+    expect(resolveMobileHudLayout(input({ width: 844, height: 390 })).classes).toContain(
+      'hud-mobile-landscape',
+    );
+    expect(resolveMobileHudLayout(input({ width: 390, height: 844 })).classes).not.toContain(
+      'hud-mobile-landscape',
+    );
+    expect(resolveMobileHudLayout(input({ width: 390, height: 390 })).classes).not.toContain(
+      'hud-mobile-landscape',
+    );
+  });
+
   it('adds hud-chat-open iff chatOpen', () => {
     expect(resolveMobileHudLayout(input({ chatOpen: true })).classes).toContain('hud-chat-open');
     expect(resolveMobileHudLayout(input({ chatOpen: false })).classes).not.toContain(
@@ -88,9 +100,14 @@ describe('resolveMobileHudLayout: menu/chat state classes', () => {
   it('can carry both state classes alongside the tier class', () => {
     const layout = resolveMobileHudLayout(input({ menuOpen: true, chatOpen: true }));
     expect(layout.classes).toEqual(
-      expect.arrayContaining(['hud-mobile-standard', 'hud-menu-open', 'hud-chat-open']),
+      expect.arrayContaining([
+        'hud-mobile-standard',
+        'hud-mobile-landscape',
+        'hud-menu-open',
+        'hud-chat-open',
+      ]),
     );
-    expect(layout.classes).toHaveLength(3);
+    expect(layout.classes).toHaveLength(4);
   });
 });
 

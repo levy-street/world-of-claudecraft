@@ -103,6 +103,7 @@ import {
   type CardMinigameInfo,
   type CharacterProfile,
   type CharacterSearchResult,
+  type CivicServicePlacement,
   type ClientCommand,
   type CraftingIdentityView,
   type CraftResultView,
@@ -167,12 +168,17 @@ import type {
 } from '../world_api/professions';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { computeBackoffDelay } from './backoff';
+import {
+  type CivicServicePlacementsReader,
+  createCivicServicePlacementsReader,
+} from './civic_service_placements';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { isInputSendBackpressured } from './send_backpressure';
 import {
   type SnapshotTimerWireMode,
   STABLE_TIMER_WIRE_VERSION,
@@ -186,6 +192,14 @@ import {
 // individual fields as they are consumed; this alias keeps the decoder local.
 // biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
 type LooseJson = any;
+
+type InputSendMode = 'periodic' | 'changed' | 'forced-neutral';
+
+interface PendingTransientInput {
+  jump: boolean;
+  turnLeft: boolean;
+  turnRight: boolean;
+}
 
 interface ClientWireAura {
   id: string;
@@ -467,6 +481,15 @@ export class Api {
     turnstileToken = '',
     ref = '',
     nativeAttestation: unknown = undefined,
+    // UA analytics extras, all optional: the first-touch attribution payload
+    // (src/attribution.ts), the marketing opt-in checkbox state, and the
+    // player's selected language. The server validates every field
+    // (server/signup_attribution.ts) and none can fail registration.
+    extras: {
+      attribution?: Record<string, string> | null;
+      marketingOptIn?: boolean;
+      locale?: string;
+    } = {},
   ): Promise<{ accountId?: number }> {
     const data = await this.post('/api/register', {
       username,
@@ -475,6 +498,9 @@ export class Api {
       turnstileToken,
       ref,
       nativeAttestation,
+      attribution: extras.attribution ?? undefined,
+      marketingOptIn: extras.marketingOptIn === true ? true : undefined,
+      locale: extras.locale,
     });
     this.token = data.token;
     this.username = data.username;
@@ -1768,6 +1794,17 @@ export class ClientWorld implements IWorld {
   get stationPlacements() {
     return getActiveWorldContent().services?.stations ?? [];
   }
+  // Lazy holder, never a field initializer: bareClient creates ClientWorld via
+  // Object.create(ClientWorld.prototype), so constructor field initialization is skipped.
+  private civicServicePlacementsReader?: CivicServicePlacementsReader;
+  /** Static civic anchors from the active bundled world. Rebuild only when the
+   * editor swaps content, never on the map's redraw cadence. */
+  get civicServicePlacements(): readonly CivicServicePlacement[] {
+    if (this.civicServicePlacementsReader === undefined) {
+      this.civicServicePlacementsReader = createCivicServicePlacementsReader();
+    }
+    return this.civicServicePlacementsReader();
+  }
   // Craft-result surface (#1127), mirrored from the server's `craftResult`
   // event (applyEvent below). Null until this session's first craft attempt.
   lastCraftResult: CraftResultView | null = null;
@@ -1938,6 +1975,10 @@ export class ClientWorld implements IWorld {
   private lastInputSig = '';
   private inputSeq = 0;
   private pendingInputSeqSentAt = new Map<number, number>();
+  // No initializer on purpose: bare ClientWorld test fixtures skip field
+  // initializers, and the lazy accessor below keeps that construction idiom
+  // equivalent to a real instance.
+  private pendingTransientInput: PendingTransientInput | undefined;
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
   private spectateFacingPending = false;
@@ -2185,7 +2226,7 @@ export class ClientWorld implements IWorld {
   }
 
   flushInput(now = performance.now()): boolean {
-    return this.sendInput(now, true);
+    return this.sendInput(now, 'changed');
   }
 
   /**
@@ -2197,7 +2238,10 @@ export class ClientWorld implements IWorld {
   neutralizeInputForClientPause(now = performance.now()): boolean {
     Object.assign(this.moveInput, emptyMoveInput());
     this.mouselookFacing = null;
-    return this.sendInput(now);
+    // On an open socket the forced path admits exactly one neutral frame
+    // despite a saturated browser buffer. The accepted neutral frame consumes
+    // any pre-pause engagement intent without putting it on the wire.
+    return this.sendInput(now, 'forced-neutral');
   }
 
   consumeInputEchoSamples(): number[] {
@@ -2238,7 +2282,27 @@ export class ClientWorld implements IWorld {
     ].join(',');
   }
 
-  private sendInput(now = performance.now(), changedOnly = false): boolean {
+  private pendingTransientInputState(): PendingTransientInput {
+    this.pendingTransientInput ??= { jump: false, turnLeft: false, turnRight: false };
+    return this.pendingTransientInput;
+  }
+
+  private retainTransientInput(): void {
+    const pending = this.pendingTransientInputState();
+    pending.jump ||= this.moveInput.jump;
+    pending.turnLeft ||= this.moveInput.turnLeft;
+    pending.turnRight ||= this.moveInput.turnRight;
+  }
+
+  private hasPendingTransientInput(): boolean {
+    return (
+      this.pendingTransientInput?.jump === true ||
+      this.pendingTransientInput?.turnLeft === true ||
+      this.pendingTransientInput?.turnRight === true
+    );
+  }
+
+  private sendInput(now = performance.now(), mode: InputSendMode = 'periodic'): boolean {
     if (
       typeof this.spectating === 'string' ||
       !this.connected ||
@@ -2246,23 +2310,46 @@ export class ClientWorld implements IWorld {
     ) {
       return false;
     }
+    // Shed ordinary input while the browser-owned queue is backed up. Preserve
+    // the three engagement edges that are not idempotent-latest: jump can be
+    // pressed and released inside one shed interval, and keyboard-turn flags
+    // are intentionally present for only their engagement frame. Pause
+    // neutralization is the sole bounded force path and admits one frame.
+    if (mode !== 'forced-neutral' && isInputSendBackpressured(this.ws.bufferedAmount)) {
+      this.retainTransientInput();
+      this.netPipeline().noteInputBackpressure(this.ws.bufferedAmount);
+      return false;
+    }
     const sig = this.inputSignature();
-    if (changedOnly) {
-      if (sig === this.lastInputSig) return false;
+    const hasPendingTransientInput = this.hasPendingTransientInput();
+    if (mode === 'changed') {
+      if (!hasPendingTransientInput && sig === this.lastInputSig) return false;
       if (!inputFlushGateOpen(now, this.lastInputSentAt)) return false;
     }
     const mi = this.moveInput;
+    const includePendingTransientInput = mode !== 'forced-neutral';
     const msg: Record<string, unknown> = {
       t: 'input',
       seq: ++this.inputSeq,
       mi: {
         f: mi.forward ? 1 : 0,
         b: mi.back ? 1 : 0,
-        tl: mi.turnLeft ? 1 : 0,
-        tr: mi.turnRight ? 1 : 0,
+        tl:
+          mi.turnLeft ||
+          (includePendingTransientInput && this.pendingTransientInput?.turnLeft === true)
+            ? 1
+            : 0,
+        tr:
+          mi.turnRight ||
+          (includePendingTransientInput && this.pendingTransientInput?.turnRight === true)
+            ? 1
+            : 0,
         sl: mi.strafeLeft ? 1 : 0,
         sr: mi.strafeRight ? 1 : 0,
-        j: mi.jump ? 1 : 0,
+        j:
+          mi.jump || (includePendingTransientInput && this.pendingTransientInput?.jump === true)
+            ? 1
+            : 0,
         dv: mi.dive ? 1 : 0,
         sf: mi.surface ? 1 : 0,
       },
@@ -2277,6 +2364,10 @@ export class ClientWorld implements IWorld {
     }
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
     this.ws.send(JSON.stringify(msg));
+    // WebSocket.send accepted the real frame. Pending edges are transport-local
+    // and are consumed exactly once, including when the forced-neutral mode
+    // intentionally cancels them rather than replaying them into the pause.
+    this.pendingTransientInput = undefined;
     this.lastInputSentAt = now;
     this.lastInputSig = sig;
     this.pendingInputSeqSentAt.set(this.inputSeq, now);
@@ -2403,6 +2494,7 @@ export class ClientWorld implements IWorld {
         this.inputSeq = 0;
         this.lastInputSig = '';
         this.lastInputSentAt = 0;
+        this.pendingTransientInput = undefined;
         this.pendingInputSeqSentAt.clear();
         this.ackedInputSeq = 0;
         this.inputEchoSamples = [];
@@ -2951,6 +3043,12 @@ export class ClientWorld implements IWorld {
         // is authoritative and complete (the server re-sends one whenever flair
         // changes), so this both sets and CLEARS.
         if (e.kind === 'player') this.rememberFlair(e.name, e.aiAccount, streamerLinks);
+        // Operator-applied Cheater tag (src/sim/moderation/). A bare flag: the wire
+        // carries no budget, because only the wearer needs the countdown and the
+        // wearer already has it on the mark's own aura. Written as a strict boolean
+        // like aiAccount above so an identity record WITHOUT `chm` clears a mirror
+        // whose sanction was just lifted, matching Sim.setCheaterMark's own write.
+        e.cheaterMark = w.chm === 1;
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
@@ -5020,7 +5118,11 @@ export class ClientWorld implements IWorld {
       rarity: query.rarity,
       sort: query.sort,
       page: query.page,
+      collapseLowest: query.collapseLowest,
     });
+  }
+  marketSellPriceCheck(itemId: string | null): void {
+    this.cmd({ cmd: 'market_sell_price_check', item: itemId });
   }
   marketList(itemId: string, count: number, price: number): void {
     this.cmd({ cmd: 'market_list', item: itemId, count, price });

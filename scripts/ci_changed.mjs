@@ -21,9 +21,13 @@ const shell = process.platform === 'win32';
 // (e.g. invoked directly from a subdirectory).
 const REPO_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-/** @type {(cmd: string, args: string[]) => { status: number | null, stdout?: string, stderr?: string }} */
+/** @type {(cmd: string, args: string[]) => { status: number | null, stdout?: string, stderr?: string, error?: Error }} */
 function run(cmd, args) {
-  const res = spawnSync(cmd, args, { encoding: 'utf8', shell, cwd: REPO_ROOT });
+  // git is a real executable, so it never needs the .cmd shell shim, and it
+  // must not get one: cmd.exe eats the caret in the resolver's `^{commit}`
+  // probes, which made every base candidate "fail" to verify on Windows and
+  // ci:changed exit before linting anything.
+  const res = spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: REPO_ROOT });
   if (res.error !== undefined) {
     // Surface the real spawn failure (e.g. git not on PATH) instead of
     // letting a generic "status: null" reach resolveChangedBaseRef's caller.
@@ -31,6 +35,7 @@ function run(cmd, args) {
       status: res.status,
       stdout: res.stdout,
       stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+      error: res.error,
     };
   }
   return { status: res.status, stdout: res.stdout, stderr: res.stderr };

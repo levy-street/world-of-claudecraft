@@ -17,7 +17,7 @@
 //   entity_roster.ts    IWorldEntityRoster   cfg/entities/player/moveInput/realm reads
 //   combat.ts           IWorldCombat         ability casts, auto-attack, spirit release
 //   targeting.ts        IWorldTargeting      target selection + tab cycling
-//   interaction.ts      IWorldInteraction    interact / lootCorpse / pickUpObject
+//   interaction.ts      IWorldInteraction    civic-service readout + interact / loot / pickup
 //   loot.ts             IWorldLoot           need/greed loot rolls
 //   inventory.ts        IWorldInventory      bags, equipment, vendor, copper
 //   cosmetics.ts        IWorldCosmetics      account skins + mech chroma
@@ -222,7 +222,11 @@ export {
   type GuildBankLogOp,
   type GuildBankLogView,
 } from './world_api/guild_bank';
-export type { WorldInteractionOutcome } from './world_api/interaction';
+export type {
+  CivicServiceKind,
+  CivicServicePlacement,
+  WorldInteractionOutcome,
+} from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export { queryDiffersFromEcho, searchDiffersFromEcho } from './world_api/market';
@@ -434,6 +438,7 @@ export const COMMAND_NAMES = [
   'switchLoadout',
   'deleteLoadout',
   'market_search',
+  'market_sell_price_check',
   'market_list',
   'market_list_instance',
   'market_buy',
@@ -838,6 +843,7 @@ export const COMMAND_FACETS = {
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
+  market_sell_price_check: 'IWorldMarket',
   market_list: 'IWorldMarket',
   market_list_instance: 'IWorldMarket',
   market_buy: 'IWorldMarket',

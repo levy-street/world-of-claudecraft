@@ -6,6 +6,7 @@ import type {
   ActiveFrostRing,
   ActiveTemporalHourglass,
   BankBonusSource,
+  CivicServicePlacement,
   CraftingIdentityView,
   DailyRewardHistory,
   DailyRewardLeaderboardPage,
@@ -31,6 +32,7 @@ import {
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { campSpawnOffset } from './camp_scatter';
+import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
   allocRiftCollisionToken,
@@ -328,6 +330,7 @@ import {
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
 import type { MobCombatProfile } from './mob_combat';
+import * as moderationMod from './moderation';
 import {
   cancelMountRace as cancelMountRaceImpl,
   mountRaceViewFor as mountRaceViewForImpl,
@@ -1518,6 +1521,10 @@ export interface PlayerMeta {
   // so the player can page through and filter the WHOLE market a window at a time.
   // Never persisted, resets on login.
   marketQuery: MarketQuery;
+  // Session-only: the item id the Sell tab wants a current-lowest-listing-price
+  // reference for (issue #3043), or null when nothing is staged. Never
+  // persisted, resets on login, same as marketQuery.
+  sellPriceItemId: string | null;
   // Flat per-craft skill tracking (#1126): one independent, additive-only skill
   // value per craft on the ten-craft ring (see professions/wheel.ts). Persisted
   // in CharacterState.
@@ -1641,6 +1648,10 @@ export interface PlayerMeta {
   activeTitle: string | null;
   activeBorder: string | null;
   renown: number;
+  // NOTE: the operator-applied Cheater mark (src/sim/moderation/) deliberately
+  // keeps NO copy here. Its live aura is the one source of truth for both the
+  // remaining budget and the worn state (the aura IS the countdown), so a second
+  // field would only be a clock that drifts from it.
   // The Reliquary (src/sim/reliquary.ts): sparse first-find meta, authored
   // marks, capped recent. Item ownership stays on deedStats.itemsDiscovered;
   // this field is omit-empty on serialize and never a second full discovery set.
@@ -1979,6 +1990,8 @@ export class Sim {
   private readonly worldContent: WorldContent;
   /** Validated active-world noticeboards captured for this Sim at construction. */
   readonly noticeboardDefinitions: readonly NoticeboardDef[];
+  /** Civic services that this Sim actually spawned, captured at construction. */
+  readonly civicServicePlacements: readonly CivicServicePlacement[];
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -2293,6 +2306,10 @@ export class Sim {
       assertCanonicalEastbrookNoticeboardDef(definition);
     }
     this.noticeboardDefinitions = Object.freeze([...activeNoticeboardDefinitions]);
+    this.civicServicePlacements = buildCivicServicePlacements(
+      this.worldContent.services?.mailboxes ?? [],
+      this.noticeboardDefinitions,
+    );
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
     // immediately instead of one interval out, so a freshly (re)started realm
@@ -3012,6 +3029,7 @@ export class Sim {
       // on load too, since savedState carries no mobile-station field.
       mobileStation: null,
       marketQuery: defaultMarketQuery(),
+      sellPriceItemId: null,
       mailWelcomed: false,
       guildLetterSent: false,
       questCadence: new Map(),
@@ -5822,6 +5840,60 @@ export class Sim {
     if (r) r.e.jailed = enabled;
   }
 
+  // Apply, refresh, or lift the operator-applied Cheater mark. Server-side only:
+  // set at join restore and when an operator changes a sanction; the offline Sim
+  // never calls it. `seconds` is the remaining PLAYED-second budget; 0 lifts.
+  //
+  // The aura is the countdown (one second in world is one second of /played), so
+  // applying the mark and applying its aura are the same act. Both arms go through
+  // the ORDINARY aura paths rather than hand-editing the array, so a parse or a
+  // combat log sees the same events any other aura produces:
+  //  - apply/re-apply: applyAura already treats a same-id same-name re-application
+  //    as a refresh (it displaces the live aura in place and stamps `refresh` on
+  //    the gained event), so a shortened or extended sanction takes effect
+  //    immediately without pre-empting that with a manual splice.
+  //  - lift: remove the live aura and emit its fade, exactly as every other
+  //    removal path does. Without it the tag simply vanished from the client with
+  //    no combat-log trace.
+  // The wire flag is absent-when-empty in both arms and at natural expiry
+  // (combat/auras.ts), never `false`.
+  setCheaterMark(seconds: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    // Garbage in, no-op out: normalize collapses NaN and non-numbers to 0, and
+    // 0 is the LIFT arm, so without this guard a corrupt budget from any caller
+    // would silently end a live sanction. Only an explicit finite value may
+    // lift; anything else leaves the mark exactly as it stands.
+    if (typeof seconds !== 'number' || !Number.isFinite(seconds)) return;
+    const mark = moderationMod.normalizeCheaterMark(seconds);
+    if (mark) {
+      this.ctx.applyAura(r.e, moderationMod.cheaterMarkAura(mark, r.e.id));
+      // Derive the flag from the POST-CONDITION, not from the intent. No
+      // applyAura guard can refuse this aura today (they gate on npc/mob kinds,
+      // or on control kinds from a foreign source, and the mark is inert and
+      // self-sourced), but an intent-set flag would survive one of them
+      // widening, and the result is a tag with no countdown: the natural-expiry
+      // hook cannot fire without an aura, so only an operator lift would clear
+      // it. Reading back costs one scan on an operator action, never per tick.
+      r.e.cheaterMark =
+        r.e.auras.some((a) => a.id === moderationMod.CHEATER_MARK_AURA_ID) || undefined;
+      return;
+    }
+    const live = r.e.auras.findIndex((a) => a.id === moderationMod.CHEATER_MARK_AURA_ID);
+    if (live >= 0) {
+      const [lifted] = r.e.auras.splice(live, 1);
+      this.emit({
+        type: 'aura',
+        targetId: r.e.id,
+        name: lifted.name,
+        gained: false,
+        sourceId: lifted.sourceId,
+        abilityId: lifted.id,
+      });
+    }
+    r.e.cheaterMark = undefined;
+  }
+
   // Dev/test convenience: jump a player to a level (learns abilities, recalcs stats).
   setPlayerLevel(level: number, pid?: number): void {
     const r = this.resolve(pid);
@@ -7903,9 +7975,10 @@ export class Sim {
       this.rng.range(mob.weapon.min, mob.weapon.max) +
       (this.effectiveAttackPower(mob) / 14) * mob.weapon.speed;
     // Tank crit immunity: the 5% roll is still DRAWN (stream position), a
-    // committed tank just never suffers it (combat/tank_crit_immunity.ts).
+    // committed tank just never suffers it from a HOSTILE creature; a player
+    // pet sharing this swing shell keeps its crit (combat/tank_crit_immunity.ts).
     const critRoll = this.rng.chance(0.05);
-    const crit = critRoll && !isCritImmuneTank(target, this.players.get(target.id));
+    const crit = critRoll && !isCritImmuneTank(mob, target, this.players.get(target.id));
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
@@ -11185,6 +11258,10 @@ export class Sim {
 
   marketSearch(query: MarketQuery, pid?: number): void {
     this.market.marketSearch(query, pid);
+  }
+
+  marketSellPriceCheck(itemId: string | null, pid?: number): void {
+    this.market.marketSellPriceCheck(itemId, pid);
   }
 
   marketList(itemId: string, count: number, price: number, pid?: number): void {

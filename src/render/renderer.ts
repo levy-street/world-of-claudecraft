@@ -205,6 +205,7 @@ import {
   fullDayGrade,
   globalDayness,
   moonDirection,
+  moonTerminator,
   NEUTRAL_DAY_GRADE,
   nightIblScale,
   nightSkyDesat,
@@ -234,6 +235,13 @@ import {
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { buildEmberPools, type EmberPoolsView } from './ember_pools';
+import {
+  entityViewCandidatePriority,
+  entityViewDistanceSq,
+  entityViewIsAdmitted,
+  isPersistentPortalObject,
+  entityViewShouldDrop as shouldDropView,
+} from './entity_view_policy_core';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
 import {
   createEnvironmentMapTransition,
@@ -263,6 +271,12 @@ import {
 import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
+import {
+  createFireLightAdopter,
+  pruneFireLights,
+  reparentStrandedLightsToScene,
+  runFireLightBudgetPass,
+} from './fire_light_registry';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
@@ -303,6 +317,7 @@ import { bakeGrassGroundTexture, setGrassGroundBake } from './grass_ground_bake'
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import {
+  groundObjectPoolKey,
   type PooledObjectView,
   storePooledObject as storeGroundObjectInPool,
   takeOrBuildGroundObject,
@@ -318,6 +333,7 @@ import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
+import { createPrewarmPacing, type PrewarmPacing } from './link_rate_budget';
 import { renderLoadMeasure } from './load_marks';
 import {
   type LocoState,
@@ -408,14 +424,21 @@ import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
 import {
-  applyPointLightBudget,
   countDrawnPointLights,
-  flickerContributingFireLights,
   pointLightPadCount,
   type RankedPointLight,
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
+import {
+  createPrewarmCompileLifecycle,
+  type PrewarmCompileLifecycle,
+  type RendererPrewarmCategory,
+  type RendererPrewarmDiagnosticsBaselineStats,
+  type RendererPrewarmManifestEntryStats,
+  type RendererPrewarmStats,
+} from './prewarm_compile_lifecycle';
+import { submitPrewarmCompileUnit } from './prewarm_compile_submission_core';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -423,7 +446,6 @@ import {
 } from './prewarm_pass';
 import {
   constrainedEntryViewCreateBudget,
-  interactionLandmarkViewPriority,
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
   orderedPrewarmIds,
@@ -460,6 +482,7 @@ import {
 } from './prewarm_resume';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
+import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
 import { isOwnedPetHostile } from './reaction';
@@ -1011,82 +1034,6 @@ interface RendererQualityChangeStats {
   levels: RenderBudgetState['levels'];
 }
 
-type RendererPrewarmCategory =
-  | 'views'
-  | 'world'
-  | 'sky'
-  | 'props'
-  | 'entities'
-  | 'objects'
-  | 'vfx'
-  | 'post'
-  | 'diagnostics';
-
-interface RendererPrewarmManifestEntryStats {
-  id: string;
-  category: RendererPrewarmCategory;
-  priority: number;
-  required: boolean;
-  /** 'partial': ran, but a deadline (or a pending asset prefetch) trimmed the
-   *  planned work; the counts below say how much actually happened. An entry
-   *  that did zero or partial work must never read 'completed'. */
-  status: 'completed' | 'partial' | 'skipped' | 'timed-out' | 'failed';
-  elapsedMs: number;
-  remainingMsAfter: number;
-  passes: number;
-  programsBefore: number;
-  programsAfter: number;
-  programDelta: number;
-  texturesBefore: number;
-  texturesAfter: number;
-  textureDelta: number;
-  /** Work units actually done / planned, for entries that track progress. */
-  workDone?: number;
-  workPlanned?: number;
-  detail?: string;
-}
-
-interface RendererPrewarmDiagnosticsBaselineStats {
-  programs: number;
-  textures: number;
-  totalObjects: number;
-  estimatedDraws: number;
-  estimatedTriangles: number;
-  categories: Record<string, { draws: number; triangles: number; materials: number }>;
-}
-
-export interface RendererPrewarmStats {
-  elapsedMs: number;
-  maxMs: number;
-  createdViews: number;
-  candidateViews: number;
-  renderPasses: number;
-  programsBefore: number;
-  programsAfter: number;
-  texturesBefore: number;
-  texturesAfter: number;
-  textureUploads: number;
-  compileMode: 'async' | 'sync' | 'none';
-  compileMs: number;
-  compileTimedOut: boolean;
-  timedOut: boolean;
-  remainingMs: number;
-  budgetUsedRatio: number;
-  createdViewTypes: string[];
-  manifestPlanned: number;
-  manifestEntries: RendererPrewarmManifestEntryStats[];
-  manifestCompleted: number;
-  /** Entries that ran but were trimmed by a deadline or a pending prefetch. */
-  manifestPartial: number;
-  manifestSkipped: number;
-  manifestTimedOut: number;
-  manifestFailed: number;
-  partialEntryIds: string[];
-  timedOutEntryIds: string[];
-  failedEntryIds: string[];
-  diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null;
-}
-
 interface ClickMarkerSlot {
   group: THREE.Group;
   ring: THREE.Mesh;
@@ -1247,12 +1194,6 @@ function roundMs(v: number): number {
   return Math.round(v * 100) / 100;
 }
 
-function distSqXZ(a: Entity, b: Entity): number {
-  const dx = a.pos.x - b.pos.x;
-  const dz = a.pos.z - b.pos.z;
-  return dx * dx + dz * dz;
-}
-
 function summarizeMs(values: number[]): {
   count: number;
   avg: number;
@@ -1335,12 +1276,6 @@ function emptyFoliagePerfStats(): FoliagePerfStats {
   };
 }
 
-function isPersistentPortalObject(e: Entity): boolean {
-  return (
-    e.kind === 'object' && (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
-  );
-}
-
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
 }
@@ -1377,7 +1312,7 @@ function canvasDataUrlAsync(
   });
 }
 
-export interface RendererCreateOptions {
+export interface RendererCreateOptions extends QuestObjectGateOptions {
   context?: WebGL2RenderingContext;
   initializeGfx?: boolean;
   /** Build the far-vista grid eagerly during construction (macrotask bites,
@@ -1396,6 +1331,8 @@ export class Renderer {
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
   views = new Map<number, EntityView>();
+  // Editor opt-out for the quest-collectable view gate (see RendererCreateOptions).
+  private questObjectHidden = makeQuestObjectGate({});
   private viewCreateRetry = new ViewCreateRetryGate(VIEW_CREATE_FAIL_RETRY_MS);
   // view groups that own a budgeted point light: exempt from the hidden-view
   // matrix gate (see the gate pass in sync and the note at registration)
@@ -1790,6 +1727,18 @@ export class Renderer {
   private lightPads: THREE.PointLight[] = [];
   private lightRankDirty = true; // viewLights set changed: rebuild the budget rank
   private effectivePointLights = 0;
+
+  // Adoption is the ONE way a point light joins the budget after construction:
+  // it hides the light AND dirties the rank, which are only correct together
+  // (fire_light_registry.ts explains why). Subsystems get `sink`, which is the
+  // same operation shaped like Array.push, so they cannot bypass it.
+  private readonly fireLightAdopter = createFireLightAdopter(
+    () => this.fireLights,
+    () => {
+      this.lightRankDirty = true;
+    },
+  );
+
   private propsView!: {
     update(
       camX: number,
@@ -2079,6 +2028,12 @@ export class Renderer {
     visibleViews: 0,
   };
   private lastPrewarmStats: RendererPrewarmStats | null = null;
+  private gpuHitchCompileLifecycle: PrewarmCompileLifecycle | null = null;
+  private gpuHitchPacing: {
+    controller: PrewarmPacing;
+    compileBatchRoots: number;
+    hardMaxMs: number;
+  } | null = null;
   private readonly renderDiagnostics = new RenderDiagnostics({
     counters: () => ({
       programs: this.webgl.info.programs?.length ?? 0,
@@ -2114,6 +2069,7 @@ export class Renderer {
     options: RendererCreateOptions = {},
   ) {
     this.canvas = canvas;
+    this.questObjectHidden = makeQuestObjectGate(options);
     this.nameplateLayer = nameplateLayer;
     this.travelSpeedFx = new TravelSpeedFxPainter(nameplateLayer);
     // biome-ignore format: Keep the established constructor body stable inside the failure guard.
@@ -2700,6 +2656,12 @@ export class Renderer {
     this.jailScene = buildJailScene(this.sim.cfg.seed);
     setRenderCategory(this.jailScene.group, 'props');
     this.scene.add(this.jailScene.group);
+    // updateVisibility toggles this group every frame AFTER the budget pass, so
+    // its light has to ride the budget rather than stand permanently visible,
+    // AND has to leave the group: a counted light whose ancestor the sweep hides
+    // later in the same frame drops numPointLights for that frame.
+    reparentStrandedLightsToScene(this.scene, this.jailScene.group);
+    for (const light of this.jailScene.glowLights) this.fireLightAdopter.adopt(light);
 
     this.gatherNodes = buildGatherNodes(this.sim.cfg.seed);
     setRenderCategory(this.gatherNodes.group, 'props');
@@ -2718,7 +2680,8 @@ export class Renderer {
     freezeStaticMatrices(stationProps.group);
     for (const flame of stationProps.flames) flame.matrixAutoUpdate = true;
     this.flames.push(...stationProps.flames);
-    this.fireLights.push(...stationProps.fireLights);
+    // After the mass hide above, so these adopt individually.
+    for (const light of stationProps.fireLights) this.fireLightAdopter.adopt(light);
     bd('stations');
 
     // Town streetlamps: world-spanning dressing, so it is built here with the
@@ -4100,24 +4063,13 @@ export class Renderer {
       : undefined;
     const attached = attachSceneGroupGated(this.scene, view.group, gate);
     // Point lights ride the fireLights budget, NEVER the cull-toggled group
-    // (the Sowfield brazier rule). A light left inside the group leaves the
-    // render light list whenever the distance cull hides its ancestor, so the
-    // pinned numPointLights changes and every lit material recompiles: the
-    // open-world travel freeze the budget exists to prevent. Reparent every
-    // PointLight descendant to the scene mechanically, so the NEXT feature
-    // builder that parents a glow into its group cannot reintroduce it.
-    const strandedLights: THREE.PointLight[] = [];
-    view.group.traverse((obj) => {
-      if ((obj as THREE.PointLight).isLight) strandedLights.push(obj as THREE.PointLight);
-    });
-    for (const light of strandedLights) {
-      light.getWorldPosition(this.tmpV);
-      this.scene.add(light); // add() detaches from the old parent
-      light.position.copy(this.tmpV);
-    }
+    // (the Sowfield brazier rule; fire_light_registry.ts carries the why).
+    reparentStrandedLightsToScene(this.scene, view.group);
     if (freeze) freezeStaticMatrices(view.group);
-    for (const light of view.glowLights ?? []) this.fireLights.push(light);
-    this.lightRankDirty = true;
+    // adoptFireLight, not a bare push: a feature attaches from a zone-prepare
+    // continuation, so its glow lights would otherwise be visible and unranked
+    // for the frames until the next budget pass.
+    for (const light of view.glowLights ?? []) this.fireLightAdopter.adopt(light);
     this.lastAttachedFeatureGroups.push(view.group);
     // A view spanning several regions registers each child for the distance
     // cull instead of the whole group: one world-wide footprint can never be
@@ -4409,6 +4361,7 @@ export class Renderer {
   perfStats(): {
     graphicsConfigVersion: number;
     tier: string;
+    currentZoneId: string | null;
     qualityBuckets: {
       version: number;
       bands: GfxBucketBands;
@@ -4463,6 +4416,7 @@ export class Renderer {
     return {
       graphicsConfigVersion: GFX.graphicsConfigVersion,
       tier: GFX.tier,
+      currentZoneId: this.zoneIdAt(this.sim.player.pos.x, this.sim.player.pos.z),
       qualityBuckets: {
         version: GFX.graphicsConfigVersion,
         bands: GFX.bucketBands,
@@ -4522,6 +4476,21 @@ export class Renderer {
       prewarm: this.lastPrewarmStats,
       gpuQueue: this.backgroundGpuWork.stats(),
     };
+  }
+
+  /** Diagnostic-only lifecycle boundary, called immediately before curtain fade. */
+  markGpuHitchReveal(): void {
+    this.gpuHitchCompileLifecycle?.markReveal();
+    this.gpuHitchPacing?.controller.markReveal();
+    if (this.lastPrewarmStats?.prewarmPacing && this.gpuHitchPacing) {
+      Object.assign(
+        this.lastPrewarmStats.prewarmPacing,
+        this.gpuHitchPacing.controller.receipt(
+          this.gpuHitchPacing.compileBatchRoots,
+          this.gpuHitchPacing.hardMaxMs,
+        ),
+      );
+    }
   }
 
   /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
@@ -4771,33 +4740,19 @@ export class Renderer {
     return base;
   }
 
-  private viewCandidatePriority(e: Entity, p: Entity, d2: number): number {
-    if (e.id === p.id) return -100;
-    if (e.id === p.targetId) return -90;
-    if (e.kind === 'mob' && e.hostile && d2 <= 35 * 35) return 0;
-    if (e.kind === 'npc' && d2 <= 45 * 45) return 1;
-    const landmarkPriority = interactionLandmarkViewPriority(e.templateId, d2);
-    if (landmarkPriority !== null) return landmarkPriority;
-    if (e.kind === 'object' && (e.lootable || isPersistentPortalObject(e))) return 2;
-    if (e.kind === 'player') return 3;
-    if (e.kind === 'mob' && e.hostile) return 4;
-    if (e.kind === 'mob') return 5;
-    if (e.kind === 'npc') return 6;
-    if (e.kind === 'object') return 7;
-    return 9;
-  }
-
   private collectMissingViewCandidates(
     center: Entity,
     rangeSq: number,
     includeRequired: boolean,
   ): void {
     let count = 0;
+    const questLog = this.sim.questLog;
     for (const e of this.sim.entities.values()) {
       if (this.views.has(e.id)) continue;
+      if (!entityViewIsAdmitted(e, questLog, this.questObjectHidden)) continue;
       const required = e.id === center.id || e.id === center.targetId;
       if (required && !includeRequired) continue;
-      const d2 = distSqXZ(e, center);
+      const d2 = entityViewDistanceSq(e, center);
       if (!required && d2 > rangeSq) continue;
       writeViewCandidate(
         this.viewCandidatePool,
@@ -4805,7 +4760,7 @@ export class Renderer {
         count,
         e.id,
         d2,
-        this.viewCandidatePriority(e, center, d2),
+        entityViewCandidatePriority(e, center, d2),
       );
       count++;
     }
@@ -4825,6 +4780,7 @@ export class Renderer {
     if (id === null) return 0;
     const e = this.sim.entities.get(id);
     if (!e || this.views.has(e.id)) return 0;
+    if (!entityViewIsAdmitted(e, this.sim.questLog, this.questObjectHidden)) return 0;
     if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) return 0;
     this.createView(e);
     this.sampleCreatedViewType(createdViewTypes, e);
@@ -5190,12 +5146,6 @@ export class Renderer {
     // while the hot working set keeps its reuse. An evicted key transparently
     // rebuilds from the live entity on its next request.
     this.visualPool.store(key, visual, GFX.maxPooledCharacterVisuals);
-  }
-
-  private objectPoolKeyFor(e: Entity): string | null {
-    if (e.kind !== 'object' || !e.objectItemId) return null;
-    if (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit') return null;
-    return `object:${e.objectItemId}`;
   }
 
   private storePooledObject(key: string, object: PooledObjectView): void {
@@ -5945,10 +5895,13 @@ export class Renderer {
     });
     const constrainedPrewarm = policy.minimalManifest;
     const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);
+    const pacing = createPrewarmPacing(location.search, { now: () => performance.now() });
     const defaultHardMaxMs = constrainedPrewarm
       ? VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED
-      : VIEW_PREWARM_HARD_MAX_MS;
+      : (pacing.knobs.hardMaxMs ?? VIEW_PREWARM_HARD_MAX_MS);
     const hardMaxMs = Math.max(maxMs, options.hardMaxMs ?? defaultHardMaxMs);
+    const compileBatchRoots = pacing.knobs.compileBatchRoots ?? PREWARM_COMPILE_BATCH_ROOTS;
+    this.gpuHitchPacing = { controller: pacing, compileBatchRoots, hardMaxMs };
     const started = performance.now();
     const deadline = started + maxMs;
     const hardDeadline = started + hardMaxMs;
@@ -6055,6 +6008,8 @@ export class Renderer {
     let compileUnitsPlanned = 0;
     let compileUnitsDone = 0;
     let compileUnitsDropped = 0;
+    const compileLifecycle = createPrewarmCompileLifecycle(() => performance.now());
+    this.gpuHitchCompileLifecycle = compileLifecycle;
     let vfxPrewarmBursts = 0;
     let compileMode: RendererPrewarmStats['compileMode'] = 'none';
     let compileMs = 0;
@@ -6144,7 +6099,7 @@ export class Renderer {
       const stagedRoots = new Set<THREE.Object3D>(
         stagedGroups.flatMap(([, group]) => (group ? [group] : [])),
       );
-      return buildPrewarmCompileUnits(
+      const units = buildPrewarmCompileUnits(
         [
           ...(includeGroup('scene')
             ? [
@@ -6227,9 +6182,11 @@ export class Renderer {
             );
           },
           sharedDedupe: compileDedupe,
-          batchSize: PREWARM_COMPILE_BATCH_ROOTS,
+          batchSize: compileBatchRoots,
         },
       );
+      for (const unit of units) compileLifecycle.recordFor(unit, 'programs.compile');
+      return units;
     };
 
     // Early compile submission: compileAsync links settle off-thread, so the
@@ -6264,7 +6221,11 @@ export class Renderer {
     // entry's tail call passes min(gpuSubmitDeadline, compileAwaitDeadline)
     // so the submit loop can never eat the await reserve that keeps
     // world.initial-frame's programs linked before it draws.
-    const submitCompileUnits = async (includeLate: boolean, deadlineMs = gpuSubmitDeadline) => {
+    const submitCompileUnits = async (
+      includeLate: boolean,
+      deadlineMs = gpuSubmitDeadline,
+      lane = includeLate ? 'programs.compile' : 'programs.compile-submit',
+    ) => {
       const plan = planCompileSubmission({
         groups: [
           { id: 'scene', exists: true },
@@ -6281,18 +6242,19 @@ export class Renderer {
       // Earlier-deferred units resubmit ahead of the fresh collection; their
       // groups are already marked, so the plan above never re-collected them.
       const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];
+      const outOfTime = () =>
+        prewarmSubmitShouldStop(
+          performance.now(),
+          deadlineMs,
+          policy.finishFullManifestBeforeReveal,
+        );
       for (let i = 0; i < pending.length; i++) {
         // Deadline-aware, checked BETWEEN units: one uninterrupted submit loop
         // measured 22 s of synchronous prologue work in production, sailing
         // past the 15 s hard deadline and dropping every entry behind it, the
         // deadline-exempt debt payers included (hitch-hunt S1/S2).
-        if (
-          prewarmSubmitShouldStop(
-            performance.now(),
-            deadlineMs,
-            policy.finishFullManifestBeforeReveal,
-          )
-        ) {
+        if (!(await pacing.awaitSlot(outOfTime))) {
+          for (const deferred of pending.slice(i)) compileLifecycle.recordFor(deferred, lane);
           deferredSubmitUnits.push(...pending.slice(i));
           // The deferred units' compiles now settle AFTER the manifest, so
           // the warm entity/NPC pools must not publish from the manifest's
@@ -6305,12 +6267,15 @@ export class Renderer {
           return;
         }
         const unit = pending[i];
-        submittedCompileUnits.push({
-          id: unit.id,
-          done: Promise.resolve(unit.run()).catch((err: unknown) => {
-            console.warn(`Renderer async prewarm compile failed: ${unit.id}`, err);
+        submittedCompileUnits.push(
+          submitPrewarmCompileUnit(unit, lane, {
+            lifecycle: compileLifecycle,
+            pacing,
+            programCount: () => this.webgl.info.programs?.length ?? 0,
+            onError: (err) =>
+              console.warn(`Renderer async prewarm compile failed: ${unit.id}`, err),
           }),
-        });
+        );
         // Yield between unit submissions: each carries up to 32 synchronous
         // compileAsync prologue walks, and links progress off-thread anyway.
         await new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -6786,7 +6751,7 @@ export class Renderer {
         required: false,
         run: async () => {
           if (policy.skipMonolithCompile || !this.asyncCompileSupported) return;
-          await submitCompileUnits(false);
+          await submitCompileUnits(false, gpuSubmitDeadline, 'programs.compile-submit');
         },
         detail: () =>
           deferredSubmitUnits.length > 0
@@ -7171,7 +7136,11 @@ export class Renderer {
           // the late-staged groups (weapon-vfx stages at priority 61), any
           // group that did not exist yet back then (landmark stages at 48),
           // and the live-scene re-collection.
-          await submitCompileUnits(true, Math.min(gpuSubmitDeadline, compileAwaitDeadline));
+          await submitCompileUnits(
+            true,
+            Math.min(gpuSubmitDeadline, compileAwaitDeadline),
+            'programs.compile',
+          );
           compileUnitsPlanned = submittedCompileUnits.length + deferredSubmitUnits.length;
           // Honesty gate: units deferred mid-run went to the resume lane, so
           // this entry must report 'partial', never 'completed'
@@ -7579,6 +7548,8 @@ export class Renderer {
       timedOutEntryIds: manifestTimedOut.map((entry) => entry.id),
       failedEntryIds: manifestFailed.map((entry) => entry.id),
       diagnosticsBaseline,
+      compileUnits: compileLifecycle.records,
+      prewarmPacing: pacing.receipt(compileBatchRoots, hardMaxMs),
     };
     this.lastPrewarmStats = stats;
     this.prewarmedZonePrograms.add(activeZone.id);
@@ -8100,8 +8071,10 @@ export class Renderer {
         // Throttle the particle bloom to one per target per 110ms so a burst of tiny
         // simultaneous heals (a Chronomancy group echo converting an AoE that hit
         // several enemies onto five allies in one frame) cannot spike the particle
-        // count. The healing number itself (FCT) is emitted elsewhere and unaffected.
-        if (ev.amount > 0 || ev.crit) {
+        // count. Targets without a view have no VFX anchor, so do not timestamp
+        // them and suppress the first bloom after they become visible. The healing
+        // number itself (FCT) is emitted elsewhere and unaffected.
+        if ((ev.amount > 0 || ev.crit) && this.views.has(ev.targetId)) {
           const nowMs = performance.now();
           if (nowMs - (this.healGlowAt.get(ev.targetId) ?? 0) >= 110) {
             this.healGlowAt.set(ev.targetId, nowMs);
@@ -8656,7 +8629,7 @@ export class Renderer {
       // "Pool MISS: build a fresh visual but KEEP its pool key" above): see
       // ground_object_pool.ts for why nulling it here used to corrupt the
       // forever-cached, geometry-sharing template every ground object clones.
-      const result = takeOrBuildGroundObject(this.objectPool, this.objectPoolKeyFor(e), () =>
+      const result = takeOrBuildGroundObject(this.objectPool, groundObjectPoolKey(e), () =>
         buildGroundQuestObject(e.objectItemId ?? '', e.id),
       );
       // takeOrBuildGroundObject pops through its own internal takePooledObject,
@@ -9138,7 +9111,7 @@ export class Renderer {
   // distance to the player, the same measure the view create/destroy bands use.
   private readonly weaponSkinRank = (viewId: number): number | undefined => {
     const entity = this.sim.entities.get(viewId);
-    return entity ? distSqXZ(entity, this.sim.player) : undefined;
+    return entity ? entityViewDistanceSq(entity, this.sim.player) : undefined;
   };
 
   /** Apply (or clear) a weapon-skin cosmetic on one view and latch it. The
@@ -9322,9 +9295,11 @@ export class Renderer {
     this.scene.remove(group);
     const doomed = new Set<THREE.Object3D>();
     group.traverse((o) => doomed.add(o));
-    for (let i = this.fireLights.length - 1; i >= 0; i--) {
-      if (doomed.has(this.fireLights[i])) this.fireLights.splice(i, 1);
-    }
+    // pruneFireLights answers whether the registry changed, and the rank MUST
+    // follow: the rebuild guard compares ranked.length against a COUNT, so a
+    // retire that removes as many lights as a same-microtask build added would
+    // leave a stale rank holding the retired floor and missing the new one.
+    if (pruneFireLights(this.fireLights, doomed)) this.lightRankDirty = true;
     for (let i = this.flames.length - 1; i >= 0; i--) {
       if (doomed.has(this.flames[i])) this.flames.splice(i, 1);
     }
@@ -9340,7 +9315,7 @@ export class Renderer {
       this.scene,
       this.lowGfx,
       this.flames,
-      this.fireLights,
+      this.fireLightAdopter.sink,
       this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined,
     );
     return this.dungeons;
@@ -9697,11 +9672,13 @@ export class Renderer {
         this.sunUp = aboveHorizon(sd[1]) * amp;
         this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
         this.starAmt = nightStarAmount(gday);
+        // Moon phase lifts the night floor (full brighter, new darker), epoch-anchored.
+        const moonLit = moonTerminator(currentLunarPhase()).litFrac;
         // the whole grade warms as the sun crosses the horizon, so the fog,
         // sky dome, and water all take the sunrise/sunset orange rather than
         // just the key light
         this.dnGrade = warmDuskGrade(
-          dayNightGrade(effectiveDayness(gday, biome), biome),
+          dayNightGrade(effectiveDayness(gday, biome), biome, moonLit),
           duskWarmAmount(sd[1]),
         );
         // The night-visibility layers read the world clock, not the realm's
@@ -9730,7 +9707,7 @@ export class Renderer {
         if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 120) {
           const view = buildYumiMaze(o, this.sim.cfg.seed, {
             flames: this.flames,
-            fireLights: this.fireLights,
+            fireLights: this.fireLightAdopter.sink,
             lowGfx: this.lowGfx,
           });
           setRenderCategory(view.group, 'dungeon');
@@ -9753,6 +9730,9 @@ export class Renderer {
           // callback marks the rank dirty whenever it does.
           const view = buildBattleground(o, this.sim.cfg.seed, {
             lowGfx: this.lowGfx,
+            // The raw registry on purpose: buildBgFieldLights already hides
+            // each light (battleground.ts) and its release path splices, which
+            // an append-only sink cannot express.
             fireLights: this.fireLights,
             onFireLightsChanged: () => {
               this.lightRankDirty = true;
@@ -10411,6 +10391,10 @@ export class Renderer {
 
   // Drop the view of an entity that left the world / our interest area.
   private removeView(id: number, terminal = false): void {
+    // healGlowAt has no decay loop of its own (unlike fiestaGlows/waterJetVisualChannels).
+    // Clear it before the idempotent early return so legacy or raced missing-view
+    // removals cannot leave a stale throttle entry for the rest of the session.
+    this.healGlowAt.delete(id);
     const v = this.views.get(id);
     if (!v) return;
     // A pending weapon-skin application must never land on a dropped (or
@@ -10651,12 +10635,9 @@ export class Renderer {
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
       const e = sim.entities.get(id);
+      // The pure policy also retires quest objects after turn-in or abandon.
       if (
-        !e ||
-        (!isPersistentPortalObject(e) &&
-          id !== p.id &&
-          id !== p.targetId &&
-          distSqXZ(e, p) > this.entityViewDestroyRangeSq)
+        shouldDropView(e, p, sim.questLog, this.questObjectHidden, this.entityViewDestroyRangeSq)
       ) {
         this.doomedIds.push(id);
       }
@@ -12890,82 +12871,33 @@ export class Renderer {
   // but only the nearest GFX.maxPointLights within range shine each frame.
   // Rank entries are pooled (extended only when interiors or view lights change).
   // Static world positions stay cached; moving weapon VFX refresh into their
-  // existing vectors, so this hot loop allocates nothing.
+  // existing vectors, so the per-light work allocates nothing. The one
+  // allocation is the pass descriptor below, one small object per frame,
+  // deliberately not pooled: a pooled descriptor would have to re-read every
+  // registry each pass anyway (the constructor rebinds fireLights once the
+  // props are built), and one that captured them instead would rank a dead
+  // array while numPointLights moves, which is the stall this prevents.
   private budgetFireLights(px: number, pz: number, flicker = false): void {
-    const ranked = this.lightRank;
-    // Rank the union of static fire lights AND entity-view lights (e.g. quest-object
-    // glows). Both must share one budget: if a view light were counted separately,
-    // numPointLights would change as it streams in/out and recompile every lit
-    // material. Rebuild only when the set changes (dirty), or when fire lights grow
-    // (dungeon interiors push to fireLights) - both rare, so the hot path just
-    // refreshes distances. Static positions are cached; dynamic weapon-light
-    // positions refresh in applyPointLightBudget.
-    const want = this.fireLights.length + this.viewLights.length;
-    if (this.lightRankDirty || ranked.length !== want) {
-      ranked.length = 0;
-      for (let fireIndex = 0; fireIndex < this.fireLights.length; fireIndex++) {
-        const light = this.fireLights[fireIndex];
-        ranked.push({
-          light,
-          d2: 0,
-          worldPos: light.getWorldPosition(new THREE.Vector3()),
-          base: null,
-          dynamic: false,
-          fireIndex,
-        });
-      }
-      for (const light of this.viewLights) {
-        const stored = light.userData.budgetBase;
-        const base = typeof stored === 'number' ? stored : light.intensity;
-        const dynamic = light.userData.budgetDynamic === true;
-        ranked.push({
-          light,
-          d2: 0,
-          worldPos: light.getWorldPosition(new THREE.Vector3()),
-          base: dynamic ? null : base,
-          dynamic,
-        });
-      }
-      this.lightRankDirty = false;
-    }
-    // Keep a CONSTANT number of point lights `visible` so numPointLights in every
-    // material's program cache key never changes as the player travels. Three counts
-    // a light into numPointLights iff `visible` (intensity is irrelevant to the
-    // count), so toggling visibility as campfires budget in/out used to recompile
-    // every nearby material 0<->maxPointLights times - the dominant open-world travel
-    // freeze. Now the nearest maxPointLights lights stay visible (one stable program
-    // per material); lights past the live budget or out of range simply contribute
-    // nothing (intensity 0). maxPointLights is the per-tier constant, so the live
-    // governor (effectivePointLights) only changes how many SHINE, not the count.
-    const visibleCount = GFX.maxPointLights;
-    const liveBudget = this.effectivePointLights || GFX.maxPointLights;
-    // Ancestry-aware: a chosen light under a group the world hid (zone
-    // streaming, far-LOD wraps, compile gates) is not drawn, so it must not
-    // hold a counted slot; the returned drawn count drives the pads below.
-    const drawnCount = applyPointLightBudget(
-      ranked,
+    // The pass itself lives in fire_light_registry.ts; the renderer only owns
+    // the registries, the pads and the clock it reads from.
+    runFireLightBudgetPass({
+      rank: this.lightRank,
+      rankDirty: this.lightRankDirty,
+      fireLights: this.fireLights,
+      viewLights: this.viewLights,
+      pads: this.lightPads,
       px,
       pz,
-      visibleCount,
-      liveBudget,
-      LIGHT_BUDGET_RANGE_SQ,
-      this.scene,
-    );
-    if (flicker) {
-      flickerContributingFireLights(
-        ranked,
-        this.time,
-        visibleCount,
-        liveBudget,
-        LIGHT_BUDGET_RANGE_SQ,
-      );
-    }
-    // Fill unused slots of the visible count with pad lights so the total
-    // visible point-light count stays pinned at visibleCount even when fewer
-    // real lights than the budget exist (boot, sparse custom maps, interiors)
-    // or when chosen lights sit under hidden ancestors (drawnCount < chosen).
-    const padCount = pointLightPadCount(drawnCount, visibleCount);
-    for (let i = 0; i < this.lightPads.length; i++) this.lightPads[i].visible = i < padCount;
+      // maxPointLights is the per-tier constant, so the live governor
+      // (effectivePointLights) only changes how many SHINE, not the count.
+      visibleCount: GFX.maxPointLights,
+      liveBudget: this.effectivePointLights || GFX.maxPointLights,
+      rangeSq: LIGHT_BUDGET_RANGE_SQ,
+      scene: this.scene,
+      flickerTime: flicker ? this.time : null,
+    });
+    // A completed pass always leaves the rank current.
+    this.lightRankDirty = false;
   }
 
   // light shafts fade in as the camera turns toward the sun, outdoor only

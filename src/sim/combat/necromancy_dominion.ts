@@ -76,17 +76,6 @@ export function dominionSummonBlock(
   return living.length >= NECROMANCY_DOMINION_CAP ? 'full' : null;
 }
 
-export function dominionSummonBlockForOwner(
-  servants: Iterable<OwnedDominionServant>,
-  ownerId: number,
-  templateId: string,
-): DominionSummonBlock {
-  return dominionSummonBlockFromMask(
-    dominionCompositionMaskForOwner(servants, ownerId),
-    templateId,
-  );
-}
-
 function dominionTemplateBit(templateId: string): number {
   switch (templateId) {
     case 'necromancy_skeletal_warrior':

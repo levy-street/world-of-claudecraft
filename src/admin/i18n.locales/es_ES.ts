@@ -567,4 +567,10 @@ export const es_ES: Record<string, string> = {
   'generalChatRateLimit.windowMinutesError': 'Introduce un número entero de {min} a {max}.',
   'generalChatRateLimit.windowMinutesLabel': 'Duración de la ventana (minutos)',
   'moderationHistory.actionGeneralChatRateLimit': 'Límite de chat General modificado',
+  'detail.cheaterMarkDurationHint':
+    'Todos los personajes de la cuenta muestran la etiqueta pública hasta que se consuma este tiempo de juego.',
+  'detail.cheaterMarkRelengthHint':
+    'Sustituye por completo el tiempo restante; no se añade a él. La etiqueta pública sigue visible.',
+  'dialog.confirmCheaterMarkLift': 'Confirmar retirada de la marca',
+  'error.cheaterMarkDurationInvalid': 'El crédito de tiempo jugado debe estar entre 1 y 100 horas.',
 };

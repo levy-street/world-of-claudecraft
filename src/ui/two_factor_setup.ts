@@ -5,10 +5,6 @@
 
 import { t } from './i18n';
 
-// The enrolment wizard moves through these visible stages. The DOM layer shows
-// exactly one at a time; this type is the single source of truth for which.
-export type TwoFactorStage = 'idle' | 'begin' | 'setup' | 'recovery' | 'enabled';
-
 // Authenticator apps display the secret grouped in fours for legibility. We keep
 // the raw (ungrouped) secret for the otpauth URI and only group for display.
 export function formatSecretGroups(secret: string, groupSize = 4): string {

@@ -20,6 +20,7 @@ import {
   occluderSegmentHitsBox,
   stepOccluderFade,
 } from './occluder_fade_core';
+import type { FireLightSink } from './point_light_budget';
 import { stoneTexture } from './textures';
 
 // GLB-backed static bodies (Tripo-generated, see public/models/props), with a
@@ -83,7 +84,7 @@ const WARM_FLAME = 0xffb054;
 /** The renderer-owned pools the maze's braziers plug into. */
 export interface YumiMazeLightHooks {
   flames: THREE.Mesh[];
-  fireLights: THREE.PointLight[];
+  fireLights: FireLightSink;
   lowGfx: boolean;
 }
 

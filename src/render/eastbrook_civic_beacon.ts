@@ -160,7 +160,3 @@ totalEmissiveRadiance *= eastbrookCivicGlow;`,
   material.needsUpdate = true;
   return material;
 }
-
-export const eastbrookCivicBeaconInternalsForTest = {
-  programCacheKey: PROGRAM_CACHE_KEY,
-};

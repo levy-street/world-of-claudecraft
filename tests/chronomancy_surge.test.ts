@@ -190,10 +190,10 @@ describe('Aether Surge feeds Temporal Echo (no hidden heal bonus)', () => {
       )
       .reduce((a, e) => a + e.amount, 0);
     expect(dmg).toBeGreaterThan(0);
-    // Echo heals 35% of the single-target Arcane damage: purely the damage, no
+    // Echo heals 40% of the single-target Arcane damage: purely the damage, no
     // hidden heal bonus (allow +/-1 for per-hit rounding).
     expect(echo).toBeGreaterThan(0);
-    expect(Math.abs(echo - Math.round(dmg * 0.35))).toBeLessThanOrEqual(1);
+    expect(Math.abs(echo - Math.round(dmg * 0.4))).toBeLessThanOrEqual(1);
   });
 });
 

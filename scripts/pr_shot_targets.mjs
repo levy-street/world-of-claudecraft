@@ -3280,6 +3280,129 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-collapse-toggle',
+    label: 'World Market Browse "lowest price only" toggle (issue 3103)',
+    when: ['ui/market_window', 'sim/market', 'sim/market_query', 'sim/market_collapse'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Offline there is only one player, so four DIFFERENT sellers of the same item can
+    // only be staged by seeding the book directly (the market-collect-ledger precedent),
+    // not by driving four real marketList commands. Same seeded data on both commits: on
+    // the base commit the toggle does not exist yet, so the shot is the full uncollapsed
+    // list; on this branch the toggle exists, checking it collapses those four rows down
+    // to the one cheapest, which is the contrast this pair is for.
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const p = sim?.player;
+        if (p?.pos) {
+          p.pos.x = 0;
+          p.pos.z = 11.5;
+        }
+        const book = sim?.market?.marketListings;
+        if (book) {
+          book.length = 0;
+          book.push(
+            {
+              id: 1,
+              sellerKey: 'Bramblefoot',
+              sellerName: 'Bramblefoot',
+              itemId: 'worn_sword',
+              count: 1,
+              price: 600,
+              expiresAt: (sim?.time ?? 0) + 1000,
+              house: false,
+            },
+            {
+              id: 2,
+              sellerKey: 'Rhaelin',
+              sellerName: 'Rhaelin',
+              itemId: 'worn_sword',
+              count: 1,
+              price: 400,
+              expiresAt: (sim?.time ?? 0) + 1000,
+              house: false,
+            },
+            {
+              id: 3,
+              sellerKey: 'Torvald',
+              sellerName: 'Torvald',
+              itemId: 'worn_sword',
+              count: 1,
+              price: 250,
+              expiresAt: (sim?.time ?? 0) + 1000,
+              house: false,
+            },
+            {
+              id: 4,
+              sellerKey: 'Mirelle',
+              sellerName: 'Mirelle',
+              itemId: 'worn_sword',
+              count: 1,
+              price: 100,
+              expiresAt: (sim?.time ?? 0) + 1000,
+              house: false,
+            },
+          );
+        }
+        const el = document.querySelector('#market-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openMarket?.();
+        const bags = document.querySelector('#bags');
+        if (bags) bags.style.display = 'none';
+      });
+      if (!(await pollForSize(page, '#market-window'))) return {};
+      // Present only on this branch; absent on the base commit, which leaves the
+      // seeded four rows uncollapsed as the "before" half of the pair.
+      await page.evaluate(() => {
+        const box = document.querySelector('.mkt-collapse-checkbox');
+        if (box instanceof HTMLInputElement) {
+          box.checked = true;
+          box.dispatchEvent(new Event('change'));
+        }
+      });
+      await wait(300);
+      return { clip: '#market-window' };
+    },
+  },
+  {
+    key: 'market-sell-price-ref',
+    label: 'World Market Sell tab (current lowest listing price reference, issue 3043)',
+    when: ['ui/market_window', 'ui/market_view', 'sim/market'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Grant a house-stocked food item (roasted_boar, seeded at 700c/5 = 140c/unit
+    // by market.ts's standing stock, so the reference always has a real, non-zero
+    // price to show), open the Sell tab, then stage the item through the REAL bag
+    // click path (isMarketSell -> stageMarketSell), not a debug-hook shortcut:
+    // bag rows carry a stable `bag:<itemId>:<ordinal>` focus key.
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const p = sim?.player;
+        if (p?.pos) {
+          p.pos.x = 0;
+          p.pos.z = 11.5;
+        }
+        sim?.addItem?.('roasted_boar', 5, p?.id);
+        const el = document.querySelector('#market-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openMarket?.();
+      });
+      if (!(await pollForSize(page, '#market-window'))) return {};
+      const staged = await page.evaluate(() => {
+        const tab = document.querySelector('#market-window [data-tab="sell"]');
+        if (!tab) return false;
+        tab.click();
+        const row = document.querySelector('[data-focus-key^="bag:roasted_boar:"]');
+        if (!row) return false;
+        row.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        return true;
+      });
+      if (!staged) return {};
+      await wait(300);
+      return { clip: '#market-window' };
+    },
+  },
+  {
     key: 'market-collect-ledger',
     label: 'World Market Collect tab (itemized sale ledger under the proceeds line)',
     when: ['ui/market_window', 'ui/market_view', 'sim/market'],
@@ -4705,6 +4828,71 @@ export const TARGETS = [
     },
   },
   {
+    key: 'cheater-mark',
+    label: 'Operator Cheater tag: own plate, a peer plate, the target frame, and the debuff',
+    // Narrow on purpose: only this feature touches src/sim/moderation or
+    // src/ui/cheater_tag, so the pair of shots below is the whole evidence for
+    // it and no unrelated diff pays for the run.
+    when: ['sim/moderation', 'ui/cheater_tag'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      // Brand BOTH the viewer and a staged peer, then target the peer: one full
+      // frame then carries every surface the tag reaches (the peer's overhead
+      // plate, the viewer's own plate, the target frame's name line, and the
+      // countdown debuff on the viewer's own bar).
+      //
+      // setCheaterMark is the REAL operator entry point (the server calls
+      // exactly this on a sanction and at join restore), so the frame shows what
+      // a marked account actually looks like, not a hand-stamped flag.
+      const staged = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        if (typeof sim.setCheaterMark !== 'function') {
+          return { ok: false, reason: 'sim.setCheaterMark is unavailable' };
+        }
+        const peerId = sim.addPlayer('mage', 'Aldwin');
+        const peer = sim.entities.get(peerId);
+        if (!peer) return { ok: false, reason: 'peer spawn failed' };
+        peer.level = 18;
+        // In front of the camera's focal point (the player-tooltip recipe's
+        // placement): the renderer sits the camera behind the player along the
+        // opposite of this vector, so the peer's plate faces us.
+        peer.pos.x = player.pos.x + Math.sin(game.input.camYaw) * 4;
+        peer.pos.z = player.pos.z + Math.cos(game.input.camYaw) * 4;
+        const threeHours = 3 * 60 * 60;
+        sim.setCheaterMark(threeHours, peerId);
+        sim.setCheaterMark(threeHours);
+        sim.targetEntity(peerId);
+        return {
+          ok: true,
+          peerId,
+          peerMarked: peer.cheaterMark === true,
+          selfMarked: player.cheaterMark === true,
+          debuffed: player.auras.some((a) => a.id === 'cheater_mark'),
+          targeted: player.targetId === peerId,
+        };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Gate on the SANCTION being applied, never on the tag being rendered:
+      // this same recipe shoots the BEFORE frame on a build where the sim core
+      // exists and no client surface renders it yet.
+      if (!staged.peerMarked || !staged.selfMarked || !staged.debuffed || !staged.targeted) {
+        throw new Error(`cheater mark staging failed: ${JSON.stringify(staged)}`);
+      }
+      // The plate repaints on the nameplate cadence, not per frame.
+      await wait(1500);
+      return {};
+    },
+  },
+  {
     key: 'deed-unlock-banner',
     label: 'Deed unlock banner (its own plate, not the level-up gold text)',
     when: ['ui/deeds_view', 'ui/deed_tracker', 'styles/hud.css'],
@@ -5697,6 +5885,35 @@ export const TARGETS = [
       }, Boolean(variant?.desktopShell));
       const open = await pollForSize(page, '#gpu-notice');
       return open ? { clip: '#gpu-notice' } : {};
+    },
+  },
+  {
+    key: 'ota-update',
+    label: 'Native OTA update overlay',
+    when: ['ui/ota_update_overlay', 'net/ota_update_gate'],
+    variants: [
+      { key: 'downloading', model: { phase: 'downloading', percent: 42, fatal: false } },
+      {
+        key: 'downloading-mobile',
+        model: { phase: 'downloading', percent: 42, fatal: false },
+        mobile: true,
+      },
+      { key: 'incompatible-fatal', model: { phase: 'downloading', percent: 70, fatal: true } },
+    ],
+    // The overlay only mounts on a native shell mid-OTA-download (installOtaUpdateGate
+    // is inert off NATIVE_APP), which a browser capture never is; import the painter
+    // directly (Vite serves /src in dev) and render the model the gate would reduce,
+    // the gpu-notice recipe exactly. The model carries showContinue and the second
+    // argument carries an inert action so the SAME recipe renders the pre-removal
+    // painter during a before/after flip; the current painter ignores both extras.
+    async capture(page, variant) {
+      await page.evaluate(async (model) => {
+        const mod = await import('/src/ui/ota_update_overlay.ts');
+        mod.hideOtaUpdateOverlay();
+        mod.renderOtaUpdateOverlay({ showContinue: true, ...model }, { onContinue: () => {} });
+      }, variant?.model ?? { phase: 'downloading', percent: 42, fatal: false });
+      const open = await pollForSize(page, '#ota-update-backdrop');
+      return open ? { clip: '.ota-update-dialog' } : {};
     },
   },
   {

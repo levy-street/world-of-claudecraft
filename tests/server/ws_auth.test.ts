@@ -1016,12 +1016,15 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
       current.deps.moderationStatusForAccount = vi.fn(async () =>
         modStatus({ generalChatRateLimit: hydrated }),
       );
-      current.deps.getCharacter = vi.fn(
-        () =>
-          new Promise<CharacterRow | null>((resolve) => {
-            resolveCharacter = resolve;
-          }),
-      );
+      current.deps.getCharacter = vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise<CharacterRow | null>((resolve) => {
+              resolveCharacter = resolve;
+            }),
+        )
+        .mockResolvedValue(baseChar());
       const authenticating = createWsAuth(current.deps).authenticateWebSocket(
         asWs(current.ws),
         authRaw(),
