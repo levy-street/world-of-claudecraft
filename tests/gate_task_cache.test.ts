@@ -73,10 +73,38 @@ describe('gate cache inventory vs turbo.json', () => {
     }
   });
 
-  it('invalidates i18n when a catalog path is an input', () => {
+  // Asserts COVERAGE of the source files a regeneration actually reads, not the
+  // spelling of the globs that cover them: a broader glob is a correct answer here
+  // and the previous substring check would have rejected it.
+  //
+  // The src/sim rows are the regression. scripts/i18n_build.mjs bundles the catalog
+  // with esbuild, and i18n.catalog/index.ts imports ITEM_SETS from sim/data, so the
+  // English entity text is DERIVED from the sim content tables. While those paths
+  // were absent from the inputs, a content edit replayed a stale cached generation:
+  // the v0.38 set-bonus retune shipped a commit whose tooltips still advertised the
+  // pre-retune numbers. Deleting any row below re-opens that hole.
+  it('invalidates i18n when any source a regeneration reads changes', () => {
     const inputs = turboJson.tasks['i18n:gen'].inputs ?? [];
-    expect(inputs.some((p) => p.includes('i18n.catalog'))).toBe(true);
-    expect(inputs.some((p) => p.includes('i18n.locales'))).toBe(true);
+    // Minimal glob cover: `a/b/**` covers anything under a/b, a literal covers itself.
+    const covers = (pattern: string, file: string): boolean =>
+      pattern.endsWith('/**') ? file.startsWith(pattern.slice(0, -2)) : pattern === file;
+    const covered = (file: string) => inputs.some((pattern) => covers(pattern, file));
+
+    for (const file of [
+      'src/ui/i18n.catalog/index.ts',
+      'src/ui/i18n.catalog/items.ts',
+      'src/ui/i18n.locales/de_DE.ts',
+      'src/ui/i18n.ts',
+      // Read THROUGH the catalog's import graph; missing these was the defect.
+      'src/sim/data.ts',
+      'src/sim/content/item_sets.ts',
+      'src/sim/content/items.ts',
+    ]) {
+      expect(covered(file), `${file} must be an i18n:gen cache input`).toBe(true);
+    }
+    // The inventory in gate_task_cache.mjs must agree, since it is what a reader
+    // consults instead of turbo.json.
+    expect(GATE_CACHE_TASK_INVENTORY['i18n:gen'].inputs).toEqual(inputs);
   });
 
   it('invalidates the server bundle when either Rift rollback migration source changes', () => {

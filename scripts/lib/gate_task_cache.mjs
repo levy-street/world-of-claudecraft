@@ -41,15 +41,30 @@ export const GATE_NON_CACHEABLE_TASKS = Object.freeze([
  * Keep in sync with turbo.json (tests pin both).
  */
 export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
+  // scripts/i18n_build.mjs BUNDLES the catalog with esbuild, so this task's real
+  // inputs are the whole import graph reachable from src/ui/i18n.catalog, not the
+  // catalog directory alone. That graph crosses into src/sim: i18n.catalog/index.ts
+  // imports ITEM_SETS from sim/data, and the English entity text for item sets,
+  // items, mobs, quests, zones and talents is DERIVED from those content tables at
+  // generation time. Listing only the catalog let a src/sim content edit replay a
+  // stale cached generation, which shipped the pre-retune set-bonus strings in the
+  // v0.38 budget retune: tooltips advertising "attack power by 40" for a bonus that
+  // grants Strength. The gate's own i18n-freshness diff is what caught it.
+  //
+  // So the two directories are declared whole, which is also what wiki:content does
+  // for the same reason (it generates from src/sim). src/ui is a legal closure for
+  // the bundle because the dependency-direction rule forbids src/ui from importing
+  // render/game/net. Over-declaring costs an occasional extra regeneration; under-
+  // declaring silently serves stale generated text, so this errs toward more work.
   'i18n:gen': {
     inputs: [
-      'src/ui/i18n.catalog/**',
-      'src/ui/i18n.locales/**',
-      'src/ui/i18n.ts',
+      'src/ui/**',
+      'src/sim/**',
       'src/admin/i18n.en.ts',
       'src/admin/i18n.locales/**',
       'src/admin/i18n.ts',
       'scripts/i18n_*.mjs',
+      'scripts/lib/write_module_dir.mjs',
       'package.json',
     ],
     outputs: [
