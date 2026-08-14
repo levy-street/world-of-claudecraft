@@ -805,6 +805,11 @@ describe('item-art audit builder', () => {
     ).rejects.toThrow('pending-art id alpha_blade has shipping art');
   });
 
+  // Declared 60s allowance: this arm execs the real CLI twice (help plus a
+  // full --verify-only, which esbuild-bundles the sim and sharp-decodes 822
+  // committed files, itself budgeted 30s), and under full-suite worker
+  // contention the pair runs past the 20s repo default (21.4s observed at the
+  // Phase 6 QA gate) while taking ~7s in isolation.
   it('exposes the fresh-checkout rebuild and explicit verdict-refresh CLI', () => {
     const help = execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--help'], {
       cwd: repoRoot,
@@ -847,5 +852,5 @@ describe('item-art audit builder', () => {
       machineChecksPassed: true,
       verdict: null,
     });
-  });
+  }, 60_000);
 });
