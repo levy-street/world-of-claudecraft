@@ -212,7 +212,16 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // catalog then took the recipe count 104 to 114 (ten knownRecipes entries),
 // settling at a measured 10,499 bytes: the 12 KiB ceiling holds with about
 // 1,789 bytes of headroom, and the band below re-centers on the new
-// measurement per the same obligation.
+// measurement per the same obligation. Phase 09 took the count 114 to 124
+// (ten more ids) and settled at a measured 10,756 bytes. The Masterwrought
+// phase 10 apex consumables then took the recipe count 124 to 132 (the
+// eight APEX_CONSUMABLE_RECIPES rows: three flasks, three role foods, and
+// the two station capstones, about 193 bytes of knownRecipes ids),
+// settling at a measured 10,949 bytes: the 12 KiB ceiling holds with about
+// 1,339 bytes of headroom, and the band re-centers at 160 either side of
+// that measurement. The phase 10 enchants add nothing here: an enchant is
+// not a recipe, and equipmentInstance already carries one enchant id per
+// slot at the fixture's ceiling whatever the catalog holds.
 const PROFESSIONS_BYTE_CEILING = 12288;
 
 function ceilingSim(): Sim {
@@ -478,14 +487,14 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
 
     // The byte bound itself, on the settled state: the two-sided tracking
-    // band around the phase 09 measurement (10,756 settled bytes; phase 08
-    // measured 10,499 and the ten phase 09 knownRecipes ids grew the blob
-    // by ~257 bytes; the authoritative narrative lives at the bound's note
+    // band around the phase 10 measurement (10,949 settled bytes; phase 09
+    // measured 10,756 and the eight phase 10 knownRecipes ids grew the blob
+    // by ~193 bytes; the authoritative narrative lives at the bound's note
     // above). A re-measure obligation, not the structural ceiling: drift
     // past either edge reds here and forces the note to be re-read.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(10596);
-    expect(bytes).toBeLessThan(10916);
+    expect(bytes).toBeGreaterThan(10789);
+    expect(bytes).toBeLessThan(11109);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

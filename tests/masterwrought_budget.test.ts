@@ -15,6 +15,7 @@
 // consumables carry no worn power, so they are pinned in their own tables and
 // the flag's ABSENCE is part of what each of those arms asserts.
 import { describe, expect, it } from 'vitest';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import { ARMOR_RATING, FIVE_MAN_WEAPON_RATING } from '../src/sim/content/heroic_loot';
 import {
   APEX_ARMOR_RECIPES,
@@ -1248,5 +1249,152 @@ describe('masterwrought apex budget sweep', () => {
       const output = (ITEMS[recipe.resultItemId].sellValue ?? 0) * recipe.resultCount;
       expect(output, `${recipe.id} output ${output} vs input ${input}`).toBeLessThan(input);
     }
+  });
+});
+
+// --- Phase 10 increment pins ------------------------------------------------
+// The apex consumables and enchants are each ONE RUNG over a shipped ladder,
+// and "one rung" is the ladder's OWN step, not a number someone liked. Every
+// arm below reads the shipped rungs LIVE (so a baseline retune reds here and
+// forces the apex rung to move with it) and pins them as literals beside the
+// apex value (so a drift that moved both sides together cannot pass). Comparing
+// the apex numbers against copies of themselves would prove nothing, which is
+// the whole reason these are separate from the payload equality pins above.
+
+/** The elixir-family payload a flask or elixir carries, resolved through the
+ *  kind narrowing rather than a cast. */
+function elixirPayload(id: string): {
+  aura: string;
+  kind: string;
+  value: number;
+  duration: number;
+} {
+  const def = ITEMS[id];
+  if ((def.kind !== 'elixir' && def.kind !== 'flask') || !def.elixir) {
+    throw new Error(`${id} carries no elixir payload`);
+  }
+  return def.elixir;
+}
+
+function foodDef(id: string): { foodHp?: number; wellFed?: { value: number; duration: number } } {
+  const def = ITEMS[id];
+  if (def.kind !== 'food') throw new Error(`${id} is not a food`);
+  return def;
+}
+
+const statBonus = (enchantId: string, axis: 'str' | 'agi' | 'sta'): number => {
+  const def = ENCHANTS[enchantId];
+  if (!def) throw new Error(`${enchantId} is not in the enchant table`);
+  return def.statBonus[axis] ?? 0;
+};
+
+const APEX_FOOD_IDS = ['stonepot_stew', 'warspice_skewers', 'sageleaf_chowder'] as const;
+
+describe('the phase 10 apex rungs step exactly one rung off the shipped ladders', () => {
+  it('the flask band is the top elixir rung plus the elixir ladder own step', () => {
+    const boar = elixirPayload('elixir_of_the_boar');
+    const vipersear = elixirPayload('venomfire_elixir');
+    const serpent = elixirPayload('elixir_of_the_serpent');
+    // The shipped ladder, read live and pinned literally: 6/600, 9/900, 12/900.
+    expect([boar.value, vipersear.value, serpent.value]).toEqual([6, 9, 12]);
+    expect([boar.duration, vipersear.duration, serpent.duration]).toEqual([600, 900, 900]);
+
+    // The ladder's own steps, taken from the rungs that HAVE one (the top two
+    // rungs share a duration, so the duration step is the first-to-second one).
+    const valueStep = vipersear.value - boar.value;
+    const durationStep = vipersear.duration - boar.duration;
+    expect(valueStep).toBe(3);
+    expect(durationStep).toBe(300);
+
+    for (const id of ['ironhusk_flask', 'warboar_flask', 'runewater_flask']) {
+      const flask = elixirPayload(id);
+      expect(flask.value, `${id} value`).toBe(serpent.value + valueStep);
+      expect(flask.value, `${id} value literal`).toBe(15);
+      expect(flask.duration, `${id} duration`).toBe(serpent.duration + durationStep);
+      expect(flask.duration, `${id} duration literal`).toBe(1200);
+    }
+  });
+
+  it('the role foods clear the shipped food ceiling, and Well Fed enters at the elixir entry rung', () => {
+    // The shipped ceiling derived from the live table rather than named, so a
+    // newly authored 1,000-hp food reds here instead of quietly passing the
+    // apex rung.
+    const shippedCeiling = Math.max(
+      ...Object.values(ITEMS)
+        .filter((d) => d.kind === 'food' && !(APEX_FOOD_IDS as readonly string[]).includes(d.id))
+        .map((d) => (d.kind === 'food' ? (d.foodHp ?? 0) : 0)),
+    );
+    expect(shippedCeiling, 'the shipped food ceiling').toBe(980);
+
+    // Well Fed enters at the CONSUMABLE family's own entry rung (the bottom
+    // elixir), never at the flask band: read live from that elixir.
+    const entry = elixirPayload('elixir_of_the_boar');
+    for (const id of APEX_FOOD_IDS) {
+      const def = foodDef(id);
+      expect(def.foodHp, `${id} sits above the shipped ceiling`).toBeGreaterThan(shippedCeiling);
+      expect(def.foodHp, `${id} foodHp literal`).toBe(1392);
+      expect(def.wellFed?.value, `${id} enters at the elixir entry value`).toBe(entry.value);
+      expect(def.wellFed?.duration, `${id} enters at the elixir entry duration`).toBe(
+        entry.duration,
+      );
+      expect(def.wellFed?.value, `${id} well-fed value literal`).toBe(6);
+      expect(def.wellFed?.duration, `${id} well-fed duration literal`).toBe(600);
+    }
+  });
+
+  it('each apex enchant continues its OWN slot ladder by that ladder step', () => {
+    // Weapon strength: 2 base, 3 runed, 5 Greater. The apex takes the same +2
+    // step Greater took over Runed.
+    expect([
+      statBonus('enchant_weapon_might', 'str'),
+      statBonus('enchant_weapon_runed_edge', 'str'),
+      statBonus('enchant_weapon_greater_might', 'str'),
+    ]).toEqual([2, 3, 5]);
+    const weaponStep =
+      statBonus('enchant_weapon_greater_might', 'str') -
+      statBonus('enchant_weapon_runed_edge', 'str');
+    expect(weaponStep).toBe(2);
+    expect(statBonus('enchant_weapon_lucent_might', 'str')).toBe(
+      statBonus('enchant_weapon_greater_might', 'str') + weaponStep,
+    );
+    expect(statBonus('enchant_weapon_lucent_might', 'str')).toBe(7);
+
+    // Chest stamina: 4 base, 7 Greater, so its own step is +3 and the apex
+    // takes it again.
+    expect([
+      statBonus('enchant_chest_stamina', 'sta'),
+      statBonus('enchant_chest_greater_stamina', 'sta'),
+    ]).toEqual([4, 7]);
+    const chestStep =
+      statBonus('enchant_chest_greater_stamina', 'sta') - statBonus('enchant_chest_stamina', 'sta');
+    expect(chestStep).toBe(3);
+    expect(statBonus('enchant_chest_lucent_stamina', 'sta')).toBe(
+      statBonus('enchant_chest_greater_stamina', 'sta') + chestStep,
+    );
+    expect(statBonus('enchant_chest_lucent_stamina', 'sta')).toBe(10);
+    // The Perfected-only capstone continues that same chest ladder once more.
+    expect(statBonus('enchant_lucent_infusion', 'sta')).toBe(
+      statBonus('enchant_chest_lucent_stamina', 'sta') + chestStep,
+    );
+    expect(statBonus('enchant_lucent_infusion', 'sta')).toBe(13);
+
+    // Boots have no Greater rung by design (R7 keeps the boots enchant a stat
+    // line only), so the apex takes the SMALL base-to-runed sized step the
+    // weapon line spells out, deliberately not the Greater-sized one.
+    const baseToRunedStep =
+      statBonus('enchant_weapon_runed_edge', 'str') - statBonus('enchant_weapon_might', 'str');
+    expect(baseToRunedStep).toBe(1);
+    expect(statBonus('enchant_feet_agility', 'agi')).toBe(2);
+    expect(statBonus('enchant_feet_lucent_agility', 'agi')).toBe(
+      statBonus('enchant_feet_agility', 'agi') + baseToRunedStep,
+    );
+    expect(statBonus('enchant_feet_lucent_agility', 'agi')).toBe(3);
+    // No Greater boots rung exists to step off: pinned so a future one forces
+    // this derivation to be re-read rather than silently orphaning it.
+    expect(
+      Object.values(ENCHANTS).filter(
+        (e) => e.itemSlot === 'feet' && e.reagents.some((r) => r.itemId === 'arcane_shard'),
+      ),
+    ).toEqual([]);
   });
 });
