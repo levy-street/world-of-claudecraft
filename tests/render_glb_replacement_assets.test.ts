@@ -509,7 +509,10 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
   // so a family or stage added to the core without an export reds this.
   it('farm patch assets', () => {
     const urls = farmPatchesPreloadInternalsForTest.modelUrls;
-    expect(urls.length).toBeGreaterThan(0);
+    // The full committed set: bed + bin + shared sprout + 3 families x
+    // (stage2, stage3, stage4, withered). A new family or stage moves this
+    // count deliberately, in the same change that commits its GLB.
+    expect(urls.length).toBe(15);
     for (const url of urls) expectAssetExistsAndManifested(url);
   });
 

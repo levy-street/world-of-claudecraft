@@ -167,6 +167,30 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
   it('the farm patch renderer and its core read no profile and no governor', () => {
     expectProfileFree('src/render/farm_patches.ts');
     expectProfileFree('src/render/farm_patches_core.ts');
+    // The shared instanced-prop kernel is on the same actionable path since
+    // the Phase 7 QA extraction.
+    expectProfileFree('src/render/glb_instanced_props.ts');
+  });
+
+  it('the farm modules reach ./gfx ONLY for the sanctioned fallback material', () => {
+    // The PROFILE_TOKENS scan cannot see the OTHER static preset surface: the
+    // GFX object in src/render/gfx.ts. farm_patches.ts legitimately imports
+    // surfaceMat alone (the pre-load fallback box material: presence, geometry
+    // and stage are preset-identical, only material richness varies, the
+    // sanctioned cosmetic arm), so the allowance is pinned as an exact
+    // single-name import: widening it (a GFX branch on a stage mesh or the
+    // sync cadence) edits this line and answers to review.
+    const adapter = read('src/render/farm_patches.ts');
+    expect(adapter).toMatch(/import \{ surfaceMat \} from '\.\/gfx';/);
+    expect(adapter.includes('GFX'), 'farm_patches.ts must not read the GFX preset object').toBe(
+      false,
+    );
+    const core = read('src/render/farm_patches_core.ts');
+    expect(core.includes("from './gfx'")).toBe(false);
+    expect(core.includes('GFX')).toBe(false);
+    const kernel = read('src/render/glb_instanced_props.ts');
+    expect(kernel.includes("from './gfx'")).toBe(false);
+    expect(kernel.includes('GFX')).toBe(false);
   });
 
   it('the growth stage is APPLIED from (plot, nowMs) alone: no quality input exists', () => {
