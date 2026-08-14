@@ -289,6 +289,61 @@ Vellum.
     Conan Exiles also ships a Hand of the Maker landmark), Masterwright's
     Charm (in-repo collision: Masterwright is a shipped deed name and
     title, so the charm would read as that deed's reward).
+- MINTED AT PHASE 10 (the apex consumable names, web-verified 2026-08-14 by the
+  verifying agent with exact-phrase plus coined-token searches and in-repo
+  neighbor greps; new coins: Ironhusk, Warboar, Runewater, Stonepot, Warspice,
+  Sageleaf):
+  - **Ironhusk Flask** (tank flask) CLEAR: coin Ironhusk zero-hit as any game
+    name. The '<Word> Flask' form follows the repo's own shipped precedent
+    (Meltwater Flask, GENERIC) and was adopted deliberately over
+    'Flask of the <noun>', which is dense WoW trade dress (17 first-party
+    flasks plus the six Unstable Flask of the <agent> entries) and PoE's
+    procedural flask-suffix construction.
+  - **Warboar Flask** (physical flask) CLEAR with recorded caveat: the full
+    pairing is zero-hit; WoW ships Warboar as an ambient Stormsong Valley
+    creature type (8.0.1) and 'war boar' is genre-wide mount vocabulary, the
+    Old Cragmaw keep class. Escalates the shipped Elixir of the Boar.
+  - **Runewater Flask** (caster flask) CLEAR: fused coin Runewater zero-hit on
+    the web and in-repo.
+  - **Stonepot Stew** (tank role food) CLEAR: coin Stonepot zero-hit as any
+    game name (a stone pot is real-world cookware, the Korean dolsot; nearest
+    game neighbors are generic stew-pot mechanics in OneBit Adventure, Red
+    Dead Online, and Stoneshard); extends the shipped dish ladder beside
+    Goldleaf Game Stew.
+  - **Warspice Skewers** (physical role food) CLEAR: coin Warspice zero-hit
+    everywhere; skewer dishes are generic across WoW, Zelda, New World, and
+    OSRS; extends the ladder beside Hunter's Game Skewer (the plural is a
+    deliberate register step for the grander plated dish).
+  - **Sageleaf Chowder** (caster role food) CLEAR: fused coin Sageleaf
+    zero-hit; recorded adjacency considered and passed: EverQuest ships a
+    two-word 'Sage Leaf' component and FFXIV a 'Sagolii Sage' herb, real
+    culinary vocabulary in a different form, the Wardspeaker precedent class.
+    Extends the ladder beside Frostgill Chowder, and allocates the Sage
+    vocabulary to cooking (a second reason the alchemy flask avoided a Sage
+    compound).
+  - Rejected at authoring: Flask of the Wyrm (COLLISION: WoW's Flask of the
+    Frost Wyrm, of which it is a one-word truncation; aggravated in-repo by
+    Sigils of the Wyrm and the packet's Wyrmfall allocation), Flask of the
+    Sage (COLLISION CLASS: WoW Classic's Elixir of the Sages is the same-role
+    alchemy caster consumable, the Maker's Hand same-role-inversion class, and
+    WoW's Unstable Flask of the Sorcerer occupies the same agent-noun
+    construction), Ironblood Flask (ESO's Ironblood dungeon set plus ESO's
+    Iron Flask crafted set), Sagewind Flask (WoW's Falla Sagewind and Hunter
+    Sagewind NPCs), Bastion Flask (in-repo: The Sunken Bastion dungeon family,
+    Bastion Ward Stone, Bastion Revenant, and Bastion Devotion make it read as
+    dungeon loot, the Galerune Treads class), Wyrmscale Flask (Wyrmscale
+    Jerkin ships), Hearthpot Stew (in-repo collision with the registered The
+    Laden Hearth).
+  - The three apex enchants mint no new proper noun: 'Enchant Weapon - Lucent
+    Might', 'Enchant Chest - Lucent Stamina', and 'Enchant Boots - Lucent
+    Agility' swap the shipped 'Enchant <Slot> - [<Tier>] <Stat>' scheme's tier
+    word to the already-registered Lucent; all three composed names verified
+    zero-hit, covered by maintainer item 5 (the scheme-wide record) without
+    per-row annotation. New same-role evidence recorded against the Lucent
+    registry row: GW2 ships Lucent Mote and Pile of Lucent Crystal, crafting
+    materials refined into rune and sigil inputs, the same role class as
+    Lucent Reagent and Lucent Infusion; the composed names remain zero-hit,
+    so this does not block, recorded for the maintainer.
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 

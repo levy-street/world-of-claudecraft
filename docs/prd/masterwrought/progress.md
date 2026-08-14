@@ -19,8 +19,8 @@
 | 08 | Apex armor catalogs | complete | 2026-08-12 | 2026-08-12 |
 | 08 QA | verify | complete | 2026-08-13 | 2026-08-13 |
 | 09 | Apex weapons, jewelry, gadgets | complete | 2026-08-13 | 2026-08-13 |
-| 09 QA | verify | pending | | |
-| 10 | Apex consumables and enchants | pending | | |
+| 09 QA | verify | complete | 2026-08-13 | 2026-08-13 |
+| 10 | Apex consumables and enchants | complete | 2026-08-14 | 2026-08-14 |
 | 10 QA | verify | pending | | |
 | 11 | Pattern drops and vendors | pending | | |
 | 11 QA | verify | pending | | |
@@ -363,3 +363,23 @@ never future-PR items, per the delivery contract in `state.md`).
   Gate PASS at the final tip. Phase 10 note: renderer.ts now sits at
   ZERO monolith headroom (13708, the release's own pin) and the blob band
   reds by design.
+- Phase 10 (2026-08-14): apex consumables and enchants. Three flasks
+  (Ironhusk / Warboar / Runewater, 15 for 1200s) join the shipped
+  elixir_${kind} aura families as a new flask ItemKind, with three rules
+  keyed on the new Aura.flask marker: one-flask singleton, downward
+  refusal (a weaker elixir or scroll cannot silently destroy a flask),
+  and death persistence (session-bound: logout does not keep it, a
+  recorded schema deferral). Three role foods (Stonepot Stew / Warspice
+  Skewers / Sageleaf Chowder, 1392 heal at the classic next band) grant
+  the shared well_fed aura (6 for 600s) only when the 18s eat completes.
+  Grand Cauldron and The Laden Hearth land at skill 125 as pure
+  mobile_station family reuse (apothecary / kitchens, party-shared,
+  transient). The apex enchant tier (Lucent Might str 7 / Lucent Stamina
+  sta 10 / Lucent Agility agi 3, skill 100) consumes the Lucent Reagent;
+  Lucent Infusion (125) refuses every current item through the
+  holdsPerfectedTarget guard until phase 12 mints the perfected marker.
+  EnchantDef gained skillReq and requiresPerfected; two new text-free
+  refusal reasons ride enchantResult. Eight item ids with committed art;
+  APEX_CONSUMABLE_RECIPES joins the budget sweep; blob band re-cut around
+  10949; 13 mutation probes; five reviewers, zero blocking, all findings
+  applied. Full ledger, increment table, and phase 12 carries in state.md.

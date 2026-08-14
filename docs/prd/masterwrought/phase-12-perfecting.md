@@ -64,6 +64,26 @@ Agent 1 (sim module + tests):
   site WITHOUT moving or adding rng draws there.
 - Interlock: phase 10 authored Lucent Infusion behind a Perfected guard; wire that guard
   to the real Perfected state and add its test arm.
+- PHASE 10 CARRY-FORWARDS (amended 2026-08-14; the guard's as-built shape is in the
+  state.md Phase 10 ledger):
+  - The guard is the exported holdsPerfectedTarget(meta, itemId, slot?) in
+    src/sim/professions/enchanting.ts reading ItemInstancePayload.perfected === true.
+    Stamp the marker in the Perfecting re-mint, and in the SAME change remove the
+    minting tripwire arm in tests/lucent_infusion_guard.test.ts and take the eqi
+    wire-visibility decision (perfected is pinned OFF the eqi allowlist in
+    tests/snapshots.test.ts; until it rides, an online player's WORN Perfected copy is
+    invisible to the picker while the sim accepts it; the bagged arm rides the
+    wholesale inv mirror and needs nothing).
+  - Narrow the guard's bagged arm from the HOLDING (any copy of the id) to the exact
+    copy the apply consumes (the item_copy_ref discipline the disenchant and replace
+    paths follow), or one Perfected copy licenses spending an ordinary one.
+  - Re-decide the Infusion's slot and stat: chest { sta: 13 } is PROVISIONAL (this
+    phase's file names no target), and it currently shares the chest slot with
+    enchant_chest_lucent_stamina; the universal refusal makes moving it free until
+    minting begins.
+  - The not_perfected-before-wrong_slot deny order is deliberate and pinned (the
+    refusal is slot-stable while the slot is provisional); it becomes player-visible
+    when the Infusion goes live, so revisit the deny copy then.
 - tests/perfecting.test.ts: attempt lifecycle, binding on first attempt, fail-forward
   (the piece is never harmed on failure), rank math, budget delta exactness
   (formula-derived), save/load round-trip.

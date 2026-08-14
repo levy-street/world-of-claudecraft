@@ -93,6 +93,12 @@ Reagent (intermediates); Ridgebreaker (2H), Gyrelens Array (gadget), Master's Fi
 Voidbound Grimoire, Grand Cauldron, The Laden Hearth (feast), Deed of Making (codex),
 Lucent Infusion (Perfected-only enchant). Rejected for collisions: Vanquisher, Radiant,
 Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, Apex (tag).
+Phase 10 additions (web-verified 2026-08-14, evidence in naming-audit.md): Ironhusk Flask /
+Warboar Flask / Runewater Flask (apex flasks, the shipped '<Word> Flask' form over WoW's
+'Flask of the <noun>' trade dress), Stonepot Stew / Warspice Skewers / Sageleaf Chowder
+(role foods); the three apex enchant names ride the recorded 'Enchant <Slot> - <Stat>'
+scheme with the registered Lucent tier word (no new coin). GW2's Lucent Mote / Pile of
+Lucent Crystal (same enchanting-material role class) recorded against the Lucent row.
 Phase 03 amendments: Prismstone Setting RENAMED to Prismglass Setting (FFXIV ships a real
 'Prismstone' crafting material in the same component role, plus WoW's Prismstone Ring;
 Prismglass verified zero-hit). Phase 03 QA amendment (v0.36.0 merge supersession): the
@@ -3200,3 +3206,191 @@ followups fixed in-session, nothing carried as future work.
   masterwork:engineering revisit trigger), plus the sunder lock-exemption
   ratification and the five release-owned findings recorded at the phase
   09 sync; none were affected by this QA.
+
+## Phase 10 ledger (apex consumables and enchants, 2026-08-14)
+
+Built in one session off the v0.38.0 sync (merge of 6ee7f3fd27; release-merge
+audit clean; the release's new sparse-checkout coupling pin was the one real
+fallout, fixed toward more checkout at 904f436527 and gate-reviewed PASS).
+Commits: 904f436527 (sparse cone), 5096551bd1 (flasks + foods + machinery),
+7a4617631a (capstones), b3244d2f3a (enchant line), d1e1321bd4 (item art),
+67c66e362c (pin suites), plus the review fix round and this docs close.
+Five reviewers (architecture, cross-platform, content-obligations,
+frontend-seam, gate-integrity): ZERO blocking; every should-fix and note
+applied in the fix round or recorded below.
+
+### The aura-family design (the recorded deliverable)
+- Flasks JOIN the shipped elixir_${kind} families: ironhusk_flask emits
+  elixir_buff_sta, warboar_flask elixir_buff_ap, runewater_flask
+  elixir_buff_int. Elixir pairing therefore rides the shipped same-id
+  applyAura replacement with zero edits to shipped aura ids; the phase 06
+  scrolls and the elixir line keep elixir_buff_sta as before.
+- THREE rules key on the new Aura.flask === true marker, never on the item
+  kind or the aura id: (1) the one-flask singleton (the flask arm strips
+  every flask-marked aura before applying, then re-derives stats itself);
+  (2) the DOWNWARD refusal (an elixir or scroll whose family currently
+  holds a flask-marked aura refuses BEFORE consuming the unit, emitting
+  error.strongerEffectActive; flask-over-elixir still replaces upward;
+  flask-over-flask newest wins; shipped elixir-vs-elixir behavior is
+  byte-identical since no shipped consumable can create the marker);
+  (3) death persistence (aurasSurvivingDeath keeps a.flask === true).
+- Death accounting, decided: flasks survive the real death/resurrect paths
+  and battleground deaths (classic-era fidelity: flasks persisted through
+  battleground deaths; Protect Yumi likewise does not wipe); the arena and
+  fiesta FULL wipes (e.auras = []) clear flasks deliberately, as instanced
+  minigame resets. Flasks are SESSION state: they do NOT survive logout,
+  reconnect, or realm restart (auras are not in CharacterState). Persisting
+  flask auras would be the packet's first persisted aura state, a schema
+  decision deliberately deferred; the tooltip states the honest scope.
+  MAINTAINER CALL recorded: schema-persist flasks later, or keep
+  session-bound pricing.
+- Well Fed: ONE shared aura id well_fed for all three role foods (singleton
+  via same-id replacement), granted ONLY when the 18s Consuming drain
+  completes (clear-then-grant order), mortal on death, no marker. First
+  read shows 599.95s (updateRegen precedes updateAuras in the tick), fine.
+
+### Increment table (every value one rung over the shipped line)
+- Flasks: value 15 / duration 1200s / epic / sell 25 = the rare elixir rung
+  (serpent 12/900, sell 20) plus the elixir ladder's own +3/+300/+5 steps.
+  Deliberately breaks the documented elixir band ceiling (<=12, <=900);
+  the ceiling pins stay scoped to elixirs/scrolls with never-raise notes.
+- Role foods: foodHp 1392 (the real classic-era next food band above the
+  980 ceiling; the 552 and 874 bands already ship) / epic / wellFed value
+  6, duration 600s (the consumable family's entry rung at the classic
+  10-minute well-fed duration). Food + flask stack (different aura ids).
+- Enchants, each continuing its own slot ladder's step: weapon str 7
+  (2/3/5 -> +2), chest sta 10 (4/7 -> +3), boots agi 3 (2 -> +1, the
+  base-to-runed step; feet has no Greater rung by design and R7 keeps
+  boots stats-only), Lucent Infusion sta 13 (chest +3 continuation,
+  PROVISIONAL, see phase 12 carries).
+
+### Recipes and economy
+- APEX_CONSUMABLE_RECIPES (recipes.ts), all acquisition ['drop'] (phase 11
+  wires), level/budget 25: flasks alchemy skillReq 100 resultCount 2
+  (quickening_catalyst 1 + pristine_venom_gland 1 + venom_gland 2 +
+  sunpetal_herb 2 + glass_vial 1, input 424 vs output 50); foods cooking
+  100 resultCount 4 (seasoned_stock 1 + prime_cut 2 + game_meat 4 +
+  sunpetal_herb 2 + cooking_salt 2, 422 vs 360); grand_cauldron alchemy
+  125 (catalyst 3 + wyrmfall_core 2 + herbs, 1010 vs 380); laden_hearth
+  cooking 125 (stock 3 + core 2 + meats, 606 vs 380). Consumable bills
+  take NO wyrmfall_core (the daily gear currency stays gear-priced); the
+  flask chain is daily-gated TRANSITIVELY through the catalyst (excluded
+  from the mastery pool); the food chain joined the pool (expectations
+  re-cut). LADDER_RECIPES did not grow. Enchant bills: apex =
+  lucent_reagent 1 + shard/essence-or-dust one step over Greater;
+  infusion = lucent_reagent 3 + arcane_shard 2.
+- Removal obligations PAID: seasoned_stock and lucent_reagent left
+  ALLOWED_UNCLASSIFIED_JUNK and the bag ALL_ONLY list (MATERIAL_ITEM_IDS
+  64 -> 66); quickening_catalyst was already classified at phase 07 and
+  now names TEN crafts in the affinity table (alchemy consumes its own
+  intermediate).
+
+### The capstones and the enchanting-station deferral
+- Grand Cauldron and The Laden Hearth are PURE mobile_station family
+  reuse: kind tool, epic, placeMobileStation with stationCraftId alchemy /
+  cooking resolving through STATION_TYPE_BY_CRAFT to apothecary /
+  kitchens; partyShared; the shared 10-minute TRANSIENT duration (the
+  capstones inherit the family's tick-domain expiry, never persisted);
+  the same-slot clobber against the field forge KEPT deliberately (the
+  replace tooltip line states it; the generic clobber pin covers it).
+- The spec's "dispenser"/"feast" flavor resolved as party field-crafting
+  stations (the party brews flasks / cooks the role dishes AT the placed
+  capstone); a richer click-to-receive interaction would need a new world
+  interaction seam the station family does not have (stations have no
+  world prop at all, open decision 2). Recorded divergence; phase 14 owns
+  any richer presentation.
+- The phase 07 ENCHANTING HOME-STATION deferral is CLOSED: apex enchants
+  are cast-applied and stationless like every enchant apply; enchanting
+  stays OUT of STATION_TYPE_BY_CRAFT; its token recipes remain
+  toolworks-foreign per-record. No new station type minted.
+
+### The Lucent Infusion guard (the shape phase 12 must flip)
+- EnchantDef gained skillReq? (applier floor; apex 100, infusion 125; the
+  42 shipped defs keep the historical free floor) and requiresPerfected?.
+- Exported pure predicate holdsPerfectedTarget(meta, itemId, slot?) in
+  professions/enchanting.ts reads ItemInstancePayload.perfected === true
+  on the worn copy in the named slot, or on ANY bagged copy without a
+  slot. NOTHING mints the marker, so it refuses every item today (pinned
+  by a whole-catalog sweep with an 800 floor and a stamped positive
+  control). not_perfected answers BEFORE wrong_slot at BOTH twins
+  (resolve + cast-start admission), so the refusal is slot-stable;
+  insufficient_skill sits after wrong_slot, before holding/materials.
+  Both are text-free enchantResult reasons (the phase 07 channel), toasts
+  hudChrome.enchanting.notPerfected / enchantSkillTooLow.
+- perfected is EXCLUDED from the eqi wire allowlist by construction and
+  PINNED excluded (snapshots.test.ts); a minting-without-wire tripwire in
+  lucent_infusion_guard.test.ts fails if any production path stamps the
+  marker before phase 12 takes the wire decision.
+
+### Phase 12 carries (also written into phase-12-perfecting.md)
+1. Stamp perfected in the Perfecting re-mint; remove the tripwire in the
+   SAME change and take the eqi wire-visibility decision (else an online
+   player's WORN Perfected copy is invisible to the picker while the sim
+   accepts it; the bagged arm rides the wholesale inv mirror and is fine).
+2. Narrow holdsPerfectedTarget's bagged arm from the HOLDING to the exact
+   copy the apply consumes (item_copy_ref discipline), or one Perfected
+   copy licenses spending an ordinary one.
+3. Re-decide the Infusion's slot and stat (chest sta 13 is provisional;
+   it currently shares chest with enchant_chest_lucent_stamina; the
+   guard's universal refusal makes moving it free until minting begins).
+4. The not_perfected-before-wrong_slot visibility tradeoff becomes
+   player-visible when the Infusion goes live; revisit the deny copy then.
+
+### Review round record
+- architecture: 0 blocking / 3 should-fix / 5 notes; parity: 0 critical /
+  2 warning / 4 info; content-obligations: wiki-prose FAIL + 5 PASS;
+  frontend-seam: 0 blocking / 6 should-fix / 8 notes; gate-integrity:
+  PASS / 2 info. ALL applied in the fix round or recorded here.
+- Fix round headlines: the four-craft "past 75 nothing higher ships"
+  prose sweep (the phase 06 whole-surface lesson; phases 08/09 falsified
+  two arms silently); "You set up {name}." drops the article (the double
+  "the The Laden Hearth" catch); skill-gated enchants render as
+  aria-disabled rows with the skill line (the unaffordable-row family)
+  instead of a false empty-list message, Perfected arm deferred (its
+  empty list is true until phase 12); flask tooltip gained the
+  downward-refusal line and the honest logout clause; well_fed got its
+  own aura icon recipe; FlaskItemDef.elixir.kind narrowed to
+  buff_sta|buff_ap|buff_int; the sparse-cone suite gained the
+  every-block-equals-the-literal arm.
+- Recorded, no change: Aura.flask crosses on the party-frame wholesale
+  aura payload and NOT the entity-channel wireAura allowlist (nothing
+  reads it; exclude it if that payload is ever trimmed; a client rule
+  keyed on flask would work on party frames and fail on self/target);
+  the consumable tray truncates at 6 items with 6 kinds now competing
+  (phase 14 eyeball); hud.ts sits ~62 lines under its ceiling; the
+  cprof pre-sync window reads skill 0 and HIDES gated enchants (the
+  safe direction).
+
+### Validation record
+- Full suite at the pin-suite tip: 2738 files passed, 38172 tests passed,
+  ONLY tests/mob_portrait_source_manifest.test.ts red (3 arms, the
+  expected seal staleness; re-blessed at the final code tip via the
+  receipt flow with the placeholder-art second seal layer in the same
+  change). Blob band re-cut two-sided 10789 < bytes < 11109 around the
+  measured 10949 (recipes 124 -> 132, ~193 bytes; structural ceiling
+  12288 untouched, ~1339 headroom). 13 mutation probes killed every new
+  guard (probe log in the QA handoff). shipped_item_ids golden: +8, no
+  removals. Parity goldens unmoved (the phase draws zero rng; a flask
+  parity golden was considered and DECLINED: golden moves cost every
+  future sync for an ordering shared code already guarantees).
+- Catalog facts for future test authors: every shipped crafted elixir is
+  buff_sta, so a "different family" case must put a flask on one side;
+  the perl \Q quotemeta trap fired again on a probe pattern containing
+  a template literal (dollar interpolation before quoting).
+
+### Release-fill obligations minted this phase
+- The reworded guide prose keys (cooking identity/route, alchemy
+  ladder/summaries, the falsified-claims sweep arms) go stale in the
+  Latin locales; five non-Latin refreshes shipped in-change.
+- The 15 Latin locales of the enchanting tier prose (tier.lucent,
+  enchantsNoteOffhand) ride the release fill, as recorded by the
+  enchanting arm.
+
+### OPEN maintainer decisions (the standing three, one WIDENED)
+- Reliquary curation now covers FOUR crafted-primary epic tools:
+  masters_field_forge, makers_charm, grand_cauldron, laden_hearth (the
+  professions_specimens fishing-rod counter-precedent applies to all four
+  identically). Forge world-visibility (open decision 2) now covers four
+  invisible placeable stations. The masterwork:engineering revisit
+  trigger stands. Plus, new this phase: the flask logout-persistence
+  schema call above.
