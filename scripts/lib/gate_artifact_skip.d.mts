@@ -5,3 +5,8 @@ export function shouldSkipPretest(
 ): boolean;
 
 export function gateVitestSkipPretestEnv(): Record<string, string>;
+
+export function shouldRunEntryPretest(opts: {
+  legCount: number;
+  env?: NodeJS.ProcessEnv | Record<string, string | undefined>;
+}): boolean;

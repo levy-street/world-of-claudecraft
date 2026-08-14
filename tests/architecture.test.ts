@@ -441,6 +441,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/adaptive_link_budget_core.ts',
   'src/render/affliction_familiar_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/reveal_gate_core.ts',
@@ -508,6 +509,13 @@ const RENDER_PURE_CORES = [
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
+  'src/render/prewarm_compile_submission_core.ts',
+  // Bare-named, so the on-disk *_core sweep cannot find them: registered
+  // voluntarily (the prewarm_policy.ts precedent). Both are injected-clock pure
+  // logic with no three and no DOM, and the pacing pair is exactly the kind of
+  // module that grows a `performance.now()` the first time someone is in a hurry.
+  'src/render/link_rate_budget.ts',
+  'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_policy.ts',
   'src/render/camp_brazier_placement_core.ts',
   'src/render/night_accents_core.ts',
@@ -575,6 +583,8 @@ const BARE_NAMED = [
   'src/ui/item_name_color.ts',
   'src/render/foliage_lod.ts',
   'src/render/compile_gate.ts',
+  'src/render/link_rate_budget.ts',
+  'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
@@ -1369,6 +1379,8 @@ const EXPECTED_BARE_NAMED = [
   'src/render/cast_bar.ts',
   'src/render/compile_gate.ts',
   'src/render/foliage_lod.ts',
+  'src/render/link_rate_budget.ts',
+  'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',

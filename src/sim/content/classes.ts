@@ -2523,7 +2523,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // The 15s cooldown plus the 8s window keep five echoes from ever being sustained.
   // A pre-existing individual echo on a target is kept at 40% (never downgraded),
   // still initial-healed, and counts within the five. PLAYTEST-provisional values
-  // (owner 2026-07-12), gated by tests/chronomancy_balance.test.ts.
+  // (owner 2026-07-12), gated by tests/chronomancy_cascade_aoe.test.ts.
   temporal_cascade: {
     id: 'temporal_cascade',
     name: 'Temporal Cascade',
@@ -2756,7 +2756,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // damage reads N, then banks N+1); a traveling bolt would race a back-to-back
   // recast. Each held Arcane Charge scales damage (+30%) and cost (x1.9, steep)
   // via combat/chronomancy.ts; Aether Darts consumes the charges. PLAYTEST-
-  // provisional: the base cost is DERIVED by tests/chronomancy_balance.test.ts to
+  // provisional: the base cost is DERIVED by tests/chronomancy_balance_targets.test.ts to
   // land the conservative rotation near 70-80s to OOM at the level-20 pool.
   arcane_surge: {
     id: 'arcane_surge',
@@ -2778,7 +2778,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     // (base cost is `cost: 14` above; DERIVED via the balance harness so the
     // targets hold WITH the 25% free-cast proc's mana relief.)
-    // Low base damage (DERIVED via tests/chronomancy_balance.test.ts): the
+    // Low base damage (DERIVED via tests/chronomancy_balance_targets.test.ts): the
     // conservative rotation must sustain clearly under Piro/Cryo (>=22% below);
     // the payoff is ramping it with charges (and the Echo healing it feeds).
     effects: [{ type: 'directDamage', min: 10, max: 13 }],

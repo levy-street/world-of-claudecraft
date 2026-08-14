@@ -155,8 +155,21 @@ interface AttributionTargetFixture {
 // Re-minted for the phase 08 QA merge of release/v0.38.0 into
 // feature/masterwrought: both sides re-minted since the common base, so the
 // merged tree mints a value matching neither parent. No capture was retaken.
+// Re-minted after the point-light adoption seam moved the fire-light budget
+// pass out of renderer.ts into fire_light_registry.ts. renderer.ts is a
+// provenance input, so its bytes move the composite. No capture was retaken.
+// Re-minted again for the review fixes on the same PR: the stranded-light
+// reparent moved out of renderer.ts too, and the budget-pass descriptor became
+// a pooled field. renderer.ts bytes only. No capture was retaken.
+// Re-minted for the merge of release/v0.38.0 into the night-lighting branch:
+// both parents move renderer.ts (the release's point-light seam, this branch's
+// moon-phase grade threading), so the merged tree mints a value matching
+// neither parent. No capture was retaken.
+// Re-minted for the phase 09 QA merge of release/v0.38.0 into
+// feature/masterwrought: both sides re-minted since the common base, so the
+// merged tree mints a value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '1b8305b6421b3e0e6d8dc17f5181fb1e37bbd2b9310d1b898dc8c76a9b111c21';
+  'be524a9a97019e382fcc8ebc88ce01f96044c133291d3edc2f9522223ea21083';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

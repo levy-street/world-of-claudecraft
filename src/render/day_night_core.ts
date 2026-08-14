@@ -18,11 +18,13 @@
 import type { BiomeId } from '../sim/types';
 import { clamp01 } from './num_clamp';
 
-/** Full day-to-night-to-day period. Twenty real minutes, so every play session
- *  sees the whole cycle several times over; epoch-anchored below, so the phase
- *  is identical for every player on Earth at the same instant, decoupled from
- *  local clocks. */
-export const DAY_NIGHT_CYCLE_MS = 20 * 60 * 1000;
+/** Full day-to-night-to-day period. Forty-five real minutes: long enough that a
+ *  zone crossing is not outpaced by the sky (the old twenty felt frantic), still
+ *  short enough that a play session sees several dawns and dusks. Epoch-anchored
+ *  below, so the phase is identical for every player on Earth at the same
+ *  instant, decoupled from local clocks. The lunar month (LUNAR_CYCLE_MS) is
+ *  defined in cycles, so it stretches with this automatically. */
+export const DAY_NIGHT_CYCLE_MS = 45 * 60 * 1000;
 
 /** The grade a frame reads: intensity scale for the lights + IBL, per-channel
  *  color multipliers for the sky dome and fog, a fog-distance pull-in, and the
@@ -78,49 +80,84 @@ export const NEUTRAL_DAY_GRADE: DayNightGrade = {
 };
 
 /**
- * THE BASE LIGHT: how much of full daylight the world keeps at midnight.
+ * THE NIGHT AMBIENT FLOOR: how much of full daylight the AMBIENT half of the rig
+ * (hemisphere light + IBL) keeps at a normal midnight.
  *
- * This is the single number that decides how dark night is anywhere. Everything
- * else in this file (the amplitude band, the realm palettes, the IBL
- * normalization) only governs how realms differ from EACH OTHER; they all sit on
- * top of this floor, so no amount of per-realm correction can make night darker
- * than the base light allows. When night reads bright everywhere at once, this
- * is the knob, and it is the only one.
+ * This is the single number that decides how NAVIGABLE night is. The ambient
+ * term is the sky bounce that holds terrain shape and body silhouettes together,
+ * so it is what lets a player move around after dark. Raise it to make night
+ * more readable everywhere; the key light (the moon, below) carries the mood and
+ * stays dim regardless. When night reads as a black cutout, this is the knob.
  *
- * History, because it is a reversal worth knowing. This was walked UP across
- * three passes (0.50, 0.62, 0.78) against playtest feedback that night was too
- * dark to move around in, measured by mean frame luminance over a screenshot
- * tour. That work was correct for the world it was tuned in: a world with no
- * real lamps, where the only thing holding a forest interior together after dark
- * WAS the ambient floor.
+ * History, because it is a reversal worth knowing. A single global "base light"
+ * once drove BOTH halves. It was walked UP across three passes (0.50, 0.62,
+ * 0.78) against "night is too dark to move in", then back DOWN to 0.30 once every
+ * road carried authored streetlamps feeding the night light field (streetlamps.ts,
+ * night_light_field.ts): on a lit road, local readability comes from real light
+ * sources, not a global lift. But the OPEN WILDERNESS has no lamps, so 0.30 left
+ * a forest interior a near-black cutout the moment a player stepped off the road,
+ * which is the whole reason night felt unplayable.
  *
- * That premise is gone. Every road in the world now carries authored streetlamps
- * feeding the night light field with true distance and normal falloff
- * (streetlamps.ts, night_light_field.ts), so local readability comes from actual
- * light sources instead of from a global lift. Holding 0.78 meant night was 78
- * percent of noon and no realm could read as night however its palette was
- * graded. Coming back down is what lets the lamps matter.
+ * The fix is to split the two halves. The ambient (readability) floor sits high
+ * and WoW-like, so the ground stays legible with or without lamps, while the key
+ * light (below) stays genuinely dim so night still reads as night. The two halves
+ * answer different questions and now carry their own floors. This value is the
+ * HALF-MOON reference; the moon's phase swings it a little (moonNightFloors).
  */
-export const NIGHT_BASE_LIGHT = 0.3;
+export const NIGHT_AMBIENT_FLOOR = 0.49;
 
 /**
- * The ambient (hemisphere + IBL) floor. The sky bounce is what holds terrain
- * shape and body silhouettes together, so it IS the base light.
- */
-const NIGHT_AMBIENT_FLOOR = NIGHT_BASE_LIGHT;
-
-/**
- * The key light (sun handing over to moon) floor, deliberately well under the
+ * The key light (sun handing over to moon) floor, deliberately far under the
  * ambient one.
  *
  * The CONTRAST between the two halves is the night cue, not the absolute level:
  * only the key light casts the long moon shadows that sell it, and a key as
- * strong as the ambient flattens night into a dim day. The ratio is preserved
- * from the tuning that established it, so lowering the base light darkens the
- * night without changing what makes it read as night.
+ * strong as the ambient flattens night into a dim day. The ratio is kept low so
+ * the moon stays moonlight even with the ambient floor lifted for readability.
+ * This too is the HALF-MOON reference; the moon's phase swings the key MORE than
+ * the ambient (moonNightFloors), because a full moon is felt as brighter cast
+ * light and longer shadows, not a flatter fill.
  */
-const NIGHT_KEY_TO_AMBIENT = 0.46;
-const NIGHT_LIGHT_FLOOR = NIGHT_BASE_LIGHT * NIGHT_KEY_TO_AMBIENT;
+const NIGHT_KEY_TO_AMBIENT = 0.33;
+export const NIGHT_LIGHT_FLOOR = NIGHT_AMBIENT_FLOOR * NIGHT_KEY_TO_AMBIENT;
+
+/**
+ * How far the moon's phase swings each night floor around its half-moon
+ * reference above, full range across the lunar month.
+ *
+ * The key light swings MUCH more than the ambient on purpose: a full moon is
+ * felt as brighter cast light and longer moon shadows, not a flatter fill, so
+ * the ambient (readability) stays nearly constant across the month while the
+ * moonlight does the visible work. A new moon never drops the ambient below
+ * navigability, which is the entire point of decoupling it from the key light.
+ */
+const AMBIENT_MOON_SWING = 0.26; // plus/minus 0.13: a clearly darker/brighter night
+const KEY_MOON_SWING = 0.42; // plus/minus 0.21: the moonlight is where the phase is felt
+// The moonlight key never goes fully black even at a new moon: a floor keeps a
+// sliver of directional cast so shapes still have a light direction.
+const MIN_KEY_FLOOR = 0.03;
+
+/** The night floors (ambient and key light) at a given moon illumination. */
+export interface NightFloors {
+  ambient: number;
+  key: number;
+}
+
+/**
+ * The ambient and key light floors for a moon illumination (0 = new, 1 = full),
+ * centered on the half-moon reference floors so litFrac 0.5 IS the normal night.
+ * Full moon lifts both floors (brighter, longer moon shadows); new moon settles
+ * toward the darkest readable night. Pure and clamped, so a unit test can drive
+ * any phase by hand.
+ */
+export function moonNightFloors(litFrac: number): NightFloors {
+  const m = clamp01(litFrac) - 0.5;
+  return {
+    ambient: NIGHT_AMBIENT_FLOOR + m * AMBIENT_MOON_SWING,
+    key: Math.max(MIN_KEY_FLOOR, NIGHT_LIGHT_FLOOR + m * KEY_MOON_SWING),
+  };
+}
+
 /**
  * Measured ambient energy of each realm's own sky HDRI: the solid-angle-weighted
  * mean radiance over the sphere with sky.ts's gain and clamp applied, so it is
@@ -445,19 +482,25 @@ export function effectiveDayness(global: number, biome: BiomeId): number {
  *  biome, the night end of the lerp comes from that realm's own palette (the
  *  Nightbloom's violet, the Drakelands' ember-warm) so a signature realm stays
  *  itself after dark; without one (or without an entry) it is the global
- *  deep-blue night. Day is always the identity, so the biome only shapes the
- *  dip, never the authored daylight. */
-export function dayNightGrade(e: number, biome?: BiomeId): DayNightGrade {
+ *  deep-blue night. `moonLitFrac` (0 = new, 1 = full; default a half moon, the
+ *  lunar-cycle average) swings the night floors so a full-moon night is brighter
+ *  than a new-moon one. Day is always the identity, so neither the biome nor the
+ *  moon shapes anything but the night dip, never the authored daylight. */
+export function dayNightGrade(e: number, biome?: BiomeId, moonLitFrac = 0.5): DayNightGrade {
   const c = clamp01(e);
   const palette = biome === undefined ? undefined : REALM_NIGHT_PALETTE[biome];
   const nightSky = palette?.sky ?? NIGHT_SKY;
   const nightFog = palette?.fog ?? NIGHT_FOG;
   const floorScale = palette?.floorScale ?? 1;
-  const nightFloor = NIGHT_LIGHT_FLOOR * floorScale;
+  // The moon's illuminated fraction swings both floors around their half-moon
+  // reference (full brighter, new darker); floorScale then carries any per-realm
+  // difference on top exactly as before.
+  const moon = moonNightFloors(moonLitFrac);
+  const nightFloor = moon.key * floorScale;
   // A realm's floorScale shapes its ambient the same way it shapes its key
   // light, but the ambient floor is capped at the authored day so a realm that
   // scales UP (the Drakelands' ember glow) can never brighten past noon.
-  const nightAmbientFloor = Math.min(DAY_LIGHT_CAP, NIGHT_AMBIENT_FLOOR * floorScale);
+  const nightAmbientFloor = Math.min(DAY_LIGHT_CAP, moon.ambient * floorScale);
   return {
     lightScale: lerp(nightFloor, DAY_LIGHT_CAP, c),
     ambientScale: lerp(nightAmbientFloor, DAY_LIGHT_CAP, c),

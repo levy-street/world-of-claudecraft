@@ -4862,11 +4862,6 @@
     width: 0%;
     background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
   }
-  @media (pointer: coarse) {
-    .ota-update-dialog .native-update-actions .btn {
-      min-height: 40px;
-    }
-  }
 
   /* ---------- first-run camera mode prompt ---------- */
   .camera-prompt-backdrop {

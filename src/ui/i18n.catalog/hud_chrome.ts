@@ -641,6 +641,11 @@ export const hudChromeStrings = {
     applying: 'Update downloaded. Restarting the game to apply it.',
     incompatible:
       'An update is required to play. It will be applied as soon as it finishes downloading.',
+    // RETIRED from the overlay (the OTA dialog is deliberately
+    // non-dismissable) but kept on purpose: deleting an English leaf whose
+    // translations are already filled would force edits across every
+    // i18n.locales overlay, which contributors must never touch. Do not
+    // "clean this up"; the maintainer prunes retired keys at release.
     continueAnyway: 'Continue without updating',
     progressLabel: 'Update download progress',
   },

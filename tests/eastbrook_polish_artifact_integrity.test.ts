@@ -735,10 +735,27 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the phase 08 QA merge of release/v0.38.0 into
 // feature/masterwrought: both sides re-minted since the common base, so the
 // merged tree mints values matching neither parent. No capture was retaken.
+// Re-minted after the point-light adoption seam moved the fire-light budget
+// pass out of renderer.ts into fire_light_registry.ts. renderer.ts is a
+// provenance input, so the composite moves and the swept evidence bytes follow.
+// No capture was retaken.
+// Re-minted again for the review fixes on the same PR (stranded-light reparent
+// extracted, pooled budget-pass descriptor): renderer.ts bytes only, so the
+// composite follows it and the swept evidence bytes follow the composite. No
+// capture was retaken.
+// Re-minted for the merge of release/v0.38.0 into the night-lighting branch:
+// both parents move renderer.ts, so the composite mints a value matching neither
+// parent and this metadata authority sha follows the swept bytes. No capture was
+// retaken.
+// Re-minted for the phase 09 QA merge of release/v0.38.0 into
+// feature/masterwrought: both sides re-minted since the common base (the
+// release's night-lighting and point-light seams, this branch's phase 09
+// content), so the merged tree mints values matching neither parent. No
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'cce02ba55972c03ad93e188d416b623489c17a805dd044f9f594c24c3ca15279';
+  '126b9cd826aa3a460c7de7b7d4ff23d0452839354449e8f86a03c1239e619fd8';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '1b8305b6421b3e0e6d8dc17f5181fb1e37bbd2b9310d1b898dc8c76a9b111c21';
+  'be524a9a97019e382fcc8ebc88ce01f96044c133291d3edc2f9522223ea21083';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1643,6 +1660,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // the first-order composite follows both parents' renderer.ts and
     // prewarm_policy.ts inputs, then this second-order performance seal follows
     // the swept evidence bytes. No capture was retaken.
+    // Re-minted after the point-light adoption seam moved the fire-light budget
+    // pass out of renderer.ts: the first-order composite follows renderer.ts,
+    // then this second-order seal follows the swept evidence bytes. No capture
+    // was retaken.
     // Re-pinned for the merge of release/v0.36.0 (post PR 3220/3221) into the
     // KTX2 mip-release branch: the first-order composite follows both parents'
     // renderer.ts inputs, then this second-order performance seal follows the
@@ -1710,10 +1731,18 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // feature/masterwrought: both parents moved provenance inputs, so the
     // merged tree mints a value matching neither parent. No capture was
     // retaken.
+    // Re-minted for the merge of release/v0.38.0 into the night-lighting branch:
+    // both parents move renderer.ts, so the first-order composite mints anew and
+    // this second-order seal follows the swept evidence bytes. No capture was
+    // retaken.
+    // Re-pinned for the phase 09 QA merge of release/v0.38.0 into
+    // feature/masterwrought: both parents moved provenance inputs, so the
+    // merged tree mints a value matching neither parent. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('1174a6263585ca5130ce052dc00cd6fcf491ec85900acfe0969d497b384d1434');
+    ).toBe('f9d176f8b72f7911e61930b279c1909d4dddea3ee97d3f558fd26074a12057ce');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

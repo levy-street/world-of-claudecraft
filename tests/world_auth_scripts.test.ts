@@ -55,6 +55,10 @@ const AUTHENTICATED_NODE_CLIENTS = [
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)))',
   },
   {
+    path: 'scripts/profiler/geared_arrival_roster.mjs',
+    authSend: 'socket.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)))',
+  },
+  {
     path: 'scripts/lib/perf_hitch_scenarios.mjs',
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)))',
   },

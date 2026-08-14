@@ -246,7 +246,7 @@ function placeGateArch(p: JailPlacements): void {
   p.add('arch', JAIL_CAGE_HALF, 0, GATE_Z, Math.PI / 2, GATE_ARCH_SCALE);
 }
 
-function addModeratorGate(group: THREE.Group): void {
+function addModeratorGate(group: THREE.Group, glowLights: THREE.PointLight[]): void {
   const swirlGeo = new THREE.CircleGeometry(1.7, 24);
   const swirlMat = new THREE.MeshBasicMaterial({
     map: radialGlowTexture(),
@@ -274,7 +274,12 @@ function addModeratorGate(group: THREE.Group): void {
   // occlusion), so the gate glows from either side of the bars.
   const light = new THREE.PointLight(0x86b4ff, 9, 24, 2);
   light.position.set(JAIL_CAGE_HALF, 6, GATE_Z);
+  // The budget flickers a ranked fire light around userData.baseIntensity
+  // (defaulting to 11), so the authored 9 has to be stated or adoption would
+  // quietly brighten the gate and give it a torch cadence.
+  light.userData.baseIntensity = 9;
   group.add(light);
+  glowLights.push(light);
   const glowGeo = new THREE.CircleGeometry(4.4, 20).rotateX(-Math.PI / 2);
   const glowMat = new THREE.MeshBasicMaterial({
     map: radialGlowTexture(),
@@ -447,10 +452,17 @@ function emit(group: THREE.Group, p: JailPlacements): void {
 
 export interface JailSceneView {
   group: THREE.Group;
+  /** Point lights this scene owns, for the renderer's constant point-light
+   *  budget. They MUST be adopted: `updateVisibility` below toggles the whole
+   *  group every frame, after the frame's budget pass, so an unbudgeted light
+   *  in here changes numPointLights whenever the jail enters camera range and
+   *  relinks every material drawn in that frame. */
+  glowLights: THREE.PointLight[];
   updateVisibility(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight): void;
 }
 
 export function buildJailScene(seed: number): JailSceneView {
+  const glowLights: THREE.PointLight[] = [];
   const group = new THREE.Group();
   group.name = 'jail_scene';
   group.position.set(
@@ -468,7 +480,7 @@ export function buildJailScene(seed: number): JailSceneView {
   placeAisleProps(p);
   placeTorches(group, p);
   emit(group, p);
-  addModeratorGate(group);
+  addModeratorGate(group, glowLights);
   addFilthStains(group);
   addBackdrop(group);
   freezeStaticMatrices(group);
@@ -486,6 +498,7 @@ export function buildJailScene(seed: number): JailSceneView {
   };
   return {
     group,
+    glowLights,
     updateVisibility(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight): void {
       const halfHeight = camera.far * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
       const colorRange = Math.hypot(camera.far, halfHeight, halfHeight * camera.aspect);
