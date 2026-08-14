@@ -1,6 +1,4 @@
 export const GLACIAL_FRONT_ANGLE_DEG = 70;
-export const GLACIAL_FRONT_MIN_RANGE = 7;
-export const GLACIAL_FRONT_MAX_RANGE = 16;
 
 export function empoweredStageForProgress(progress: number, stageCount: number): number {
   if (stageCount <= 1) return 1;

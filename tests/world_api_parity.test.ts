@@ -280,6 +280,7 @@ export const IWORLD_MEMBERS = [
   { name: 'vcupPracticeStart', kind: 'method' },
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
+  { name: 'marketSellPriceCheck', kind: 'method' },
   { name: 'marketList', kind: 'method' },
   { name: 'marketListInstance', kind: 'method' },
   { name: 'marketBuy', kind: 'method' },
@@ -605,7 +606,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // The v0.38.0 map-marker sync composed a THIRD time: the release's civic
     // service anchors add civicServicePlacements (IWorldInteraction, data),
     // and both sides read 322 pre-merge, so the merged tree carries both,
-    // leaving 323.
+    // leaving 323. The final v0.38.0 sync composed a FOURTH time: the
+    // release's market Sell-tab price reference adds marketSellPriceCheck
+    // (IWorldMarket, a method), and both sides read 323 pre-merge, so the
+    // merged tree carries both extractEssence and marketSellPriceCheck,
+    // leaving 324.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -615,9 +620,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(323);
+    expect(IWORLD_MEMBERS.length).toBe(324);
     expect(DATA_MEMBERS.length).toBe(86);
-    expect(METHOD_MEMBERS.length).toBe(237);
+    expect(METHOD_MEMBERS.length).toBe(238);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -815,6 +820,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -1179,6 +1185,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -1622,6 +1629,7 @@ const FACET_MARKET = [
   'marketInfo',
   'marketCollectPending',
   'marketSearch',
+  'marketSellPriceCheck',
   'marketList',
   'marketListInstance',
   'marketBuy',
@@ -1894,8 +1902,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(323);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(323);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(324);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(324);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

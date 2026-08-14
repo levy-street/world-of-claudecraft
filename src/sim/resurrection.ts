@@ -8,10 +8,12 @@
 //
 // Both are the same mechanic (a level-scaled whole-stat-block drain that cannot be shed by
 // dying or relogging) with different ceilings, so they share one leaf module. It imports
-// only ./types, so every death and respawn site (combat/damage, spirit, entity_roster,
-// delves/runs) can share the "which auras survive death" predicate and the level-scaled
-// duration WITHOUT an import cycle (spirit <-> entity_roster both need it).
+// only ./types and the ./moderation leaf, so every death and respawn site (combat/damage,
+// spirit, entity_roster, delves/runs) plus the two clean-slate wipes (social/arena,
+// social/fiesta) can share the "which auras survive this wipe" predicates and the
+// level-scaled duration WITHOUT an import cycle (spirit <-> entity_roster both need it).
 
+import { CHEATER_MARK_AURA_ID } from './moderation';
 import { type Aura, MAX_LEVEL } from './types';
 
 export const RESURRECTION_SICKNESS_ID = 'resurrection_sickness';
@@ -78,30 +80,48 @@ export function unstuckSicknessDuration(level: number): number {
 
 // Auras that survive a death / respawn reset: both sicknesses (The Keeper's Toll
 // and Unstuck Sickness), the Cauterize lockout ('cauterize_fatigue',
-// combat/fire_mage.ts), encounter-owned unbreakable control, and FLASK auras
-// (Aura.flask, the alchemy apex consumable): a flask survives DEATH, which is
-// what makes it worth carrying instead of the elixir of the same stat. Death
-// only. Auras are session state and are not persisted, so a flask does NOT
-// survive a logout, a reconnect, or a server restart; that is a deferred schema
-// decision, not an oversight here. None may be shed by dying;
-// the encounter script remains responsible for releasing its own control.
-// Every other aura clears, Well Fed included. Used at every player
-// death/respawn site so the rule cannot drift.
+// combat/fire_mage.ts), the operator-applied Cheater mark (src/sim/moderation/),
+// encounter-owned unbreakable control, and FLASK auras (Aura.flask, the alchemy
+// apex consumable): a flask survives DEATH, which is what makes it worth
+// carrying instead of the elixir of the same stat. Death only. Auras are
+// session state and are not persisted, so a flask does NOT survive a logout, a
+// reconnect, or a server restart; that is a deferred schema decision, not an
+// oversight here. None may be shed by dying; the encounter script remains
+// responsible for releasing its own control. Every other aura clears, Well Fed
+// included. Used at every player death/respawn site so the rule cannot drift.
 //
-// The PvP accounting in full, because the two halves are decisions rather than
-// oversights. Arena (social/arena.ts) and fiesta (social/fiesta.ts) FULL-wipe
-// the aura list at their own reset points, which clears flasks along with
-// everything else: a ranked match starts from a clean slate, so nothing carried
-// in from the world rides through it. Thornhollow Fields (social/battleground.ts)
-// and Protect Yumi (social/yumi.ts) deliberately do NOT wipe, so a death inside
+// The Cheater mark is here for the same reason the sicknesses are: its aura IS
+// the played-seconds countdown, so a wipe that dropped it would end the sanction
+// early and hand a marked player a one-keypress way out of it.
+//
+// The flask PvP accounting in full, because the two halves are decisions rather
+// than oversights. Arena entry (social/arena.ts) and a Fiesta down
+// (social/fiesta.ts) reset auras through aurasSurvivingCleanSlate below, which
+// keeps ONLY the Cheater mark, so flasks clear there along with everything
+// else: a ranked match starts from a clean slate, and nothing carried in from
+// the world rides through it. Thornhollow Fields (social/battleground.ts) and
+// Protect Yumi (social/yumi.ts) deliberately do NOT wipe, so a death inside
 // those modes runs this filter and the flask survives it: classic-era flasks
 // persisted through battleground deaths, and that is the recorded decision here.
-export function aurasSurvivingDeath(auras: Aura[]): Aura[] {
+export function aurasSurvivingDeath(auras: readonly Aura[]): Aura[] {
   return auras.filter(
     (a) =>
       SICKNESS_AURA_IDS.has(a.id) ||
       a.kind === 'cauterize_fatigue' ||
+      a.id === CHEATER_MARK_AURA_ID ||
       a.unbreakableControl === true ||
       a.flask === true,
   );
+}
+
+// Auras that survive a CLEAN-SLATE wipe: only the Cheater mark. Arena entry
+// (social/arena.ts readyArenaFighter) and a Fiesta down (social/fiesta.ts
+// fiestaDownEntity) deliberately strip MORE than a death does, The Keeper's Toll
+// included, so a normalized bout is decided by play and not by what each fighter
+// walked in carrying. A sanction is not something the fighter walked in carrying:
+// it is account state an operator applied, so it survives here exactly as it
+// survives an ordinary death. Returns a NEW array, so the caller's assignment
+// stays a replacement and never mutates the array it read.
+export function aurasSurvivingCleanSlate(auras: readonly Aura[]): Aura[] {
+  return auras.filter((a) => a.id === CHEATER_MARK_AURA_ID);
 }

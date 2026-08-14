@@ -1390,6 +1390,19 @@
     color: var(--gold-dim);
     font-weight: normal;
   }
+  /* The operator-applied Cheater tag, INLINE in the same nowrap ellipsized name
+     line and ahead of the title spans, so a sanction leads the line and a long
+     name still ellipsizes on the frame's single-line height. Bold where the
+     title is normal-weight: the two decorations must never read alike. Like
+     .uf-title, the class declaration wins over the hostile/friendly color the
+     target name inherits from its parent's inline style. */
+  .uf-name .uf-cheater {
+    color: var(--color-cheater-tag);
+    font-weight: bold;
+  }
+  .uf-name .uf-cheater:not(:empty) {
+    margin-right: 3px;
+  }
   .bar {
     position: relative;
     height: 15px;

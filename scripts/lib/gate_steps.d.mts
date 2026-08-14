@@ -1,4 +1,5 @@
 export const I18N_ARTIFACTS: readonly string[];
+export const MANIFEST_ARTIFACTS: readonly string[];
 export const I18N_RELEASE_TIER_SUITES: readonly string[];
 
 export interface FullGateStep {

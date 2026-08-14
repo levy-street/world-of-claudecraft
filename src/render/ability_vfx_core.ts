@@ -524,7 +524,6 @@ export const STUN_STAR_LIFT = CC_BAND_SPECS.stun.lift;
 export const STUN_STAR_RATE = CC_BAND_SPECS.stun.rate;
 export const STUN_STAR_SIZE = CC_BAND_SPECS.stun.size;
 export const STUN_STAR_BRIGHTNESS = CC_BAND_SPECS.stun.brightness;
-export const STUN_STAR_COLOR = CC_BAND_SPECS.stun.color;
 
 // The overlay point cloud is one shared hard-capped batch (128 sprites for
 // EVERY windup orb, orbit band, bolt head, and sequencer transient in the

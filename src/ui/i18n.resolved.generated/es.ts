@@ -2463,7 +2463,8 @@ export const es: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Tramposo >"
     },
     "mobTooltip": {
       "levelFamily": "Nivel {level} {family}",
@@ -3965,6 +3966,12 @@ export const es: EnTranslations = {
       "genesis_token_claimed": "Ese Seeker Genesis Token ya se ha reclamado.",
       "entitlement_required": "Se requiere un derecho de acceso Seeker verificado.",
       "current_ownership_required": "Se requiere ser el propietario actual del Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Las cuentas de operador no pueden marcarse.",
+      "reason_required": "Se requiere un motivo.",
+      "invalid_duration": "Introduce una duración de la marca de al menos un segundo.",
+      "not_marked": "Esa cuenta no tiene la marca."
     }
   },
   "guide": {
@@ -6608,6 +6615,7 @@ export const es: EnTranslations = {
     "email": "Correo",
     "emailPlaceholder": "tu@ejemplo.com",
     "emailError": "Introduce una dirección de correo válida.",
+    "marketingOptIn": "Envíame noticias y actualizaciones del juego por correo (opcional)",
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña",
     "logIn": "Iniciar Sesión",
@@ -6708,6 +6716,19 @@ export const es: EnTranslations = {
     "style": "Estilo",
     "resetLook": "Restablecer aspecto",
     "resetShort": "Restablecer",
+    "shareTab": "Compartir",
+    "designCode": "Código de apariencia",
+    "designCodeHint": "Copia este código para guardar o compartir este aspecto. Pega un código aquí e impórtalo para cargarlo.",
+    "copyCode": "Copiar código",
+    "importCode": "Importar",
+    "designCodeCopied": "Código de apariencia copiado.",
+    "designCodeCopyManual": "La copia automática está bloqueada aquí. El código está seleccionado; cópialo con el teclado.",
+    "designCodeImported": "Apariencia importada.",
+    "designCodeImportedPartial": "Apariencia importada. Se omitieron los valores que esta versión no reconoce.",
+    "designCodeErrEmpty": "Pega primero un código de apariencia.",
+    "designCodeErrHeader": "Eso no parece un código de apariencia.",
+    "designCodeErrVersion": "Ese código de apariencia proviene de una versión más reciente del juego.",
+    "designCodeErrMalformed": "Ese código de apariencia está dañado. Copia el código completo e inténtalo de nuevo.",
     "browFlat": "Plana",
     "browArched": "Arqueada",
     "browThin": "Fina",
@@ -9090,6 +9111,7 @@ export const es: EnTranslations = {
       "filterSort": "Ordenar",
       "sortName": "Nombre (A-Z)",
       "sortPriceAsc": "Precio: de menor a mayor",
+      "collapseLowest": "Solo el precio más bajo",
       "weaponSword": "Espadas",
       "weaponDagger": "Dagas",
       "weaponStaff": "Bastones",
@@ -9120,6 +9142,8 @@ export const es: EnTranslations = {
       "quantity": "Cantidad",
       "quantityOf": "de {count}",
       "priceEach": "Precio por unidad",
+      "lowestPriceLabel": "Precio de venta más bajo actual",
+      "lowestPriceNone": "Aún no hay anuncios activos para este objeto.",
       "listButton": "Publicar en el Mercado Mundial",
       "minPriceError": "Pon un precio de al menos 1 cobre.",
       "collectEmpty": "No hay nada esperando. Las ganancias y publicaciones vencidas se recogen aquí.",

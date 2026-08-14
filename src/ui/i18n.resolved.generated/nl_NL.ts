@@ -2463,7 +2463,8 @@ export const nl_NL: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Valsspeler >"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3965,6 +3966,12 @@ export const nl_NL: EnTranslations = {
       "genesis_token_claimed": "Dat Seeker Genesis Token is al geclaimd.",
       "entitlement_required": "Geverifieerde Seeker-rechten zijn vereist.",
       "current_ownership_required": "Actueel bezit van het Seeker Genesis Token is vereist."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatoraccounts kunnen niet worden gemarkeerd.",
+      "reason_required": "Een reden is vereist.",
+      "invalid_duration": "Voer een markeringsduur van minstens één seconde in.",
+      "not_marked": "Dat account is niet gemarkeerd."
     }
   },
   "guide": {
@@ -6608,6 +6615,7 @@ export const nl_NL: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "jij@voorbeeld.nl",
     "emailError": "Voer een geldig e-mailadres in.",
+    "marketingOptIn": "Stuur mij nieuws en updates over het spel per e-mail (optioneel)",
     "showPassword": "Wachtwoord tonen",
     "hidePassword": "Wachtwoord verbergen",
     "logIn": "Inloggen",
@@ -6708,6 +6716,19 @@ export const nl_NL: EnTranslations = {
     "style": "Stijl",
     "resetLook": "Uiterlijk Herstellen",
     "resetShort": "Herstellen",
+    "shareTab": "Delen",
+    "designCode": "Uiterlijkcode",
+    "designCodeHint": "Kopieer deze code om dit uiterlijk op te slaan of te delen. Plak hier een code en importeer die om het uiterlijk te laden.",
+    "copyCode": "Code kopiëren",
+    "importCode": "Importeren",
+    "designCodeCopied": "Uiterlijkcode gekopieerd.",
+    "designCodeCopyManual": "Automatisch kopiëren is hier geblokkeerd. De code is geselecteerd; kopieer hem met je toetsenbord.",
+    "designCodeImported": "Uiterlijk geïmporteerd.",
+    "designCodeImportedPartial": "Uiterlijk geïmporteerd. Waarden die deze versie niet kent, zijn overgeslagen.",
+    "designCodeErrEmpty": "Plak eerst een uiterlijkcode.",
+    "designCodeErrHeader": "Dat lijkt niet op een uiterlijkcode.",
+    "designCodeErrVersion": "Die uiterlijkcode komt uit een nieuwere spelversie.",
+    "designCodeErrMalformed": "Die uiterlijkcode is beschadigd. Kopieer de volledige code en probeer het opnieuw.",
     "browFlat": "Vlak",
     "browArched": "Gebogen",
     "browThin": "Dun",
@@ -9090,6 +9111,7 @@ export const nl_NL: EnTranslations = {
       "filterSort": "Sorteren",
       "sortName": "Naam (A-Z)",
       "sortPriceAsc": "Prijs: laag naar hoog",
+      "collapseLowest": "Alleen de laagste prijs",
       "weaponSword": "Zwaarden",
       "weaponDagger": "Dolken",
       "weaponStaff": "Staven",
@@ -9120,6 +9142,8 @@ export const nl_NL: EnTranslations = {
       "quantity": "Aantal",
       "quantityOf": "van {count}",
       "priceEach": "Prijs per stuk",
+      "lowestPriceLabel": "Huidige laagste aanbiedingsprijs",
+      "lowestPriceNone": "Er zijn nog geen actieve aanbiedingen voor dit voorwerp.",
       "listButton": "Aanbieden op de Wereldmarkt",
       "minPriceError": "Noem een prijs van minstens 1 koper.",
       "collectEmpty": "Niets in afwachting. Verkoopopbrengsten en verlopen aanbiedingen komen hier binnen.",

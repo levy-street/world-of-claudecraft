@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { buildFullGateSteps, I18N_ARTIFACTS } from '../scripts/lib/gate_steps.mjs';
+import {
+  buildFullGateSteps,
+  I18N_ARTIFACTS,
+  MANIFEST_ARTIFACTS,
+} from '../scripts/lib/gate_steps.mjs';
 import {
   GATE_CACHE_TASK_INVENTORY,
   GATE_CACHEABLE_TASKS,
@@ -74,6 +78,15 @@ describe('gate cache inventory vs turbo.json', () => {
     expect(inputs.some((p) => p.includes('i18n.catalog'))).toBe(true);
     expect(inputs.some((p) => p.includes('i18n.locales'))).toBe(true);
   });
+
+  it('invalidates the server bundle when either Rift rollback migration source changes', () => {
+    expect(turboJson.tasks['build:server'].inputs).toEqual(
+      expect.arrayContaining([
+        'scripts/migrate_rift_forge_rollback.ts',
+        'scripts/rift_forge_rollback_migration.ts',
+      ]),
+    );
+  });
 });
 
 describe('git worktree cache sharing (Turborepo >= 2.8)', () => {
@@ -123,6 +136,32 @@ describe('buildFullGateSteps orchestration', () => {
     expect(byName['i18n freshness'].args).toEqual(
       expect.arrayContaining(['diff', '--exit-code', ...I18N_ARTIFACTS]),
     );
+    // The manifest arm mirrors the i18n one, pinned to the SAME constant the
+    // three-way weld checks (tests/ci_workflow.test.ts): trackedness closes
+    // the deleted-then-regenerated untracked-file escape, while a diff argv
+    // that drifts from MANIFEST_ARTIFACTS would prove fewer files than the
+    // classifier declassifies.
+    expect(byName['sfx manifest regen'].cmd).toBe('node');
+    expect(byName['sfx manifest regen'].args).toEqual(['scripts/build_sfx_manifest.mjs']);
+    expect(byName['media manifest regen'].cmd).toBe('node');
+    expect(byName['media manifest regen'].args).toEqual([
+      'scripts/build_media_manifest.mjs',
+      'generate',
+    ]);
+    expect(byName['manifest trackedness'].cmd).toBe('git');
+    expect(byName['manifest trackedness'].args).toEqual([
+      'ls-files',
+      '--error-unmatch',
+      '--',
+      ...MANIFEST_ARTIFACTS,
+    ]);
+    expect(byName['manifest freshness'].cmd).toBe('git');
+    expect(byName['manifest freshness'].args).toEqual([
+      'diff',
+      '--exit-code',
+      '--',
+      ...MANIFEST_ARTIFACTS,
+    ]);
     expect(byName['malware scan'].cmd).toBe('npm');
     expect(byName['malware scan'].args).toEqual(['run', 'security:gate']);
     expect(byName['biome (changed files)'].cmd).toBe('npm');
@@ -145,12 +184,22 @@ describe('buildFullGateSteps orchestration', () => {
     const names = buildFullGateSteps(4).map((s) => s.name);
     const artifacts = names.indexOf('i18n + wiki + sfx artifacts');
     const freshness = names.indexOf('i18n freshness');
+    const sfxRegen = names.indexOf('sfx manifest regen');
+    const mediaRegen = names.indexOf('media manifest regen');
+    const manifestTrackedness = names.indexOf('manifest trackedness');
+    const manifestFreshness = names.indexOf('manifest freshness');
     const biome = names.indexOf('biome (changed files)');
     const vitest = names.indexOf('vitest (full suite)');
     const client = names.indexOf('client build');
     expect(artifacts).toBeGreaterThan(-1);
     expect(freshness).toBeGreaterThan(artifacts);
-    expect(biome).toBeGreaterThan(freshness);
+    // Both regens (and the turbo wiki:content in the artifacts step) must
+    // precede the manifest diff, or it proves nothing about this tree.
+    expect(sfxRegen).toBeGreaterThan(freshness);
+    expect(mediaRegen).toBeGreaterThan(sfxRegen);
+    expect(manifestTrackedness).toBeGreaterThan(mediaRegen);
+    expect(manifestFreshness).toBeGreaterThan(manifestTrackedness);
+    expect(biome).toBeGreaterThan(manifestFreshness);
     expect(vitest).toBeGreaterThan(biome);
     expect(client).toBeGreaterThan(vitest);
   });
@@ -164,6 +213,10 @@ describe('buildFullGateSteps orchestration', () => {
     expect(typesOnly.map((s) => s.name)).toEqual([
       'i18n + wiki + sfx artifacts',
       'i18n freshness',
+      'sfx manifest regen',
+      'media manifest regen',
+      'manifest trackedness',
+      'manifest freshness',
       'malware scan',
       'biome (changed files)',
       'typecheck',
@@ -177,6 +230,10 @@ describe('buildFullGateSteps orchestration', () => {
     expect(buildsOnly.map((s) => s.name)).toEqual([
       'i18n + wiki + sfx artifacts',
       'i18n freshness',
+      'sfx manifest regen',
+      'media manifest regen',
+      'manifest trackedness',
+      'manifest freshness',
       'malware scan',
       'biome (changed files)',
       'env build',

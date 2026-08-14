@@ -26,6 +26,7 @@ function q(extra: Partial<MarketQuery> = {}): MarketQuery {
     rarity: 'all',
     sort: 'price',
     page: 0,
+    collapseLowest: false,
     ...extra,
   };
 }

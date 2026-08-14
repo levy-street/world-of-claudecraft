@@ -2885,6 +2885,12 @@ export const hudChromeStrings = {
     // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
     // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
     afkTag: 'AFK',
+    // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
+    // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
+    // afkTag the brackets are part of the VALUE, so a locale that punctuates a
+    // tag differently owns its own wrapper instead of inheriting an English one.
+    // Wordy (M16), so the five non-Latin fills ship in this same change.
+    cheaterTag: '< Cheater >',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}

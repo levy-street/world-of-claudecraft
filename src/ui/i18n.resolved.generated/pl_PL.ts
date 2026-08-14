@@ -2463,7 +2463,8 @@ export const pl_PL: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Oszust >"
     },
     "mobTooltip": {
       "levelFamily": "Poziom {level}: {family}",
@@ -3965,6 +3966,12 @@ export const pl_PL: EnTranslations = {
       "genesis_token_claimed": "Ten Seeker Genesis Token został już odebrany.",
       "entitlement_required": "Wymagane jest zweryfikowane uprawnienie Seeker.",
       "current_ownership_required": "Musisz obecnie posiadać Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Kont operatorów nie można oznaczać.",
+      "reason_required": "Wymagane jest podanie powodu.",
+      "invalid_duration": "Podaj czas trwania oznaczenia wynoszący co najmniej jedną sekundę.",
+      "not_marked": "To konto nie jest oznaczone."
     }
   },
   "guide": {
@@ -6608,6 +6615,7 @@ export const pl_PL: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "ty@example.com",
     "emailError": "Wprowadź prawidłowy adres e-mail.",
+    "marketingOptIn": "Wysyłaj mi e-mailem nowości i aktualizacje gry (opcjonalnie)",
     "showPassword": "Pokaż hasło",
     "hidePassword": "Ukryj hasło",
     "logIn": "Zaloguj się",
@@ -6708,6 +6716,19 @@ export const pl_PL: EnTranslations = {
     "style": "Styl",
     "resetLook": "Resetuj wygląd",
     "resetShort": "Resetuj",
+    "shareTab": "Udostępnij",
+    "designCode": "Kod wyglądu",
+    "designCodeHint": "Skopiuj ten kod, aby zapisać lub udostępnić ten wygląd. Wklej tutaj kod i zaimportuj go, aby wczytać wygląd.",
+    "copyCode": "Kopiuj kod",
+    "importCode": "Importuj",
+    "designCodeCopied": "Kod wyglądu skopiowany.",
+    "designCodeCopyManual": "Automatyczne kopiowanie jest tutaj zablokowane. Kod jest zaznaczony; skopiuj go za pomocą klawiatury.",
+    "designCodeImported": "Wygląd zaimportowany.",
+    "designCodeImportedPartial": "Wygląd zaimportowany. Wartości nieznane tej wersji zostały pominięte.",
+    "designCodeErrEmpty": "Najpierw wklej kod wyglądu.",
+    "designCodeErrHeader": "To nie wygląda na kod wyglądu.",
+    "designCodeErrVersion": "Ten kod wyglądu pochodzi z nowszej wersji gry.",
+    "designCodeErrMalformed": "Ten kod wyglądu jest uszkodzony. Skopiuj cały kod i spróbuj ponownie.",
     "browFlat": "Płaskie",
     "browArched": "Łukowate",
     "browThin": "Cienkie",
@@ -9090,6 +9111,7 @@ export const pl_PL: EnTranslations = {
       "filterSort": "Sortuj",
       "sortName": "Nazwa (A-Z)",
       "sortPriceAsc": "Cena: od najniższej do najwyższej",
+      "collapseLowest": "Tylko najniższa cena",
       "weaponSword": "Miecze",
       "weaponDagger": "Sztylety",
       "weaponStaff": "Kostury",
@@ -9120,6 +9142,8 @@ export const pl_PL: EnTranslations = {
       "quantity": "Ilość",
       "quantityOf": "z {count}",
       "priceEach": "Cena za sztukę",
+      "lowestPriceLabel": "Obecnie najniższa cena wystawienia",
+      "lowestPriceNone": "Nie ma jeszcze aktywnych ofert tego przedmiotu.",
       "listButton": "Wystaw na Rynku Świata",
       "minPriceError": "Podaj cenę co najmniej 1 miedziaka.",
       "collectEmpty": "Nic nie czeka. Dochód ze sprzedaży i wygasłe oferty zbierają się tutaj.",

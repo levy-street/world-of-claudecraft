@@ -206,6 +206,7 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
+import { cheaterTagLabel } from './cheater_tag';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
 import { ClaudiumWindow } from './claudium_window';
@@ -1525,6 +1526,9 @@ export class Hud {
   // the OUTER #tf-name keeps the nowrap ellipsis, the hostile/friendly color
   // write, and the frame's single-line height. Built here (not in the HTML)
   // so both game entries pick it up.
+  // The operator-applied Cheater tag leads the line, ahead of any chosen title:
+  // a sanction outranks a vanity decoration on the same name.
+  private targetCheaterTagEl = appendChildSpan(this.targetNameEl, 'uf-cheater');
   private targetTitlePreEl = appendChildSpan(this.targetNameEl, 'uf-title');
   private targetNameTextEl = appendChildSpan(this.targetNameEl, '');
   private targetTitlePostEl = appendChildSpan(this.targetNameEl, 'uf-title');
@@ -4332,6 +4336,7 @@ export class Hud {
       name: this.targetNameTextEl,
       titlePre: this.targetTitlePreEl,
       titlePost: this.targetTitlePostEl,
+      cheaterTag: this.targetCheaterTagEl,
       level: this.targetLevelEl,
       hpFill: this.targetHpEl,
       hpText: this.targetHpTextEl,
@@ -9177,6 +9182,11 @@ export class Hud {
         targetFrame.name = entityDisplayName(target);
         targetFrame.titlePre = this.targetTitleDecoration.pre;
         targetFrame.titlePost = this.targetTitleDecoration.post;
+        // The operator-applied Cheater tag (src/sim/moderation/). Resolved every
+        // gated paint rather than memoized behind a signature like the title:
+        // cheaterTagLabel is a field read plus one t() lookup, so a memo would
+        // cost more than it saves and would need its own language key.
+        targetFrame.cheaterTag = cheaterTagLabel(target);
         // entity.border is the Book of Deeds deed id on the identity wire, the
         // title field's sibling (players only; deedBorderSlug answers '' for a
         // mob, an absent field, or an id this build does not know).

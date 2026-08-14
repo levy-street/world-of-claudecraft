@@ -2463,7 +2463,8 @@ export const da_DK: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Snyder >"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3965,6 +3966,12 @@ export const da_DK: EnTranslations = {
       "genesis_token_claimed": "Det Seeker Genesis Token er allerede indløst.",
       "entitlement_required": "Der kræves en verificeret Seeker-rettighed.",
       "current_ownership_required": "Der kræves aktuelt ejerskab af et Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatørkonti kan ikke markeres.",
+      "reason_required": "Der skal angives en grund.",
+      "invalid_duration": "Angiv en markeringsvarighed på mindst ét sekund.",
+      "not_marked": "Den konto er ikke markeret."
     }
   },
   "guide": {
@@ -6608,6 +6615,7 @@ export const da_DK: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "dig@eksempel.com",
     "emailError": "Indtast venligst en gyldig e-mailadresse.",
+    "marketingOptIn": "Send mig nyheder og opdateringer om spillet via e-mail (valgfrit)",
     "showPassword": "Vis adgangskode",
     "hidePassword": "Skjul adgangskode",
     "logIn": "Log ind",
@@ -6708,6 +6716,19 @@ export const da_DK: EnTranslations = {
     "style": "Stil",
     "resetLook": "Nulstil Udseende",
     "resetShort": "Nulstil",
+    "shareTab": "Del",
+    "designCode": "Udseendeskode",
+    "designCodeHint": "Kopiér denne kode for at gemme eller dele dette udseende. Indsæt en kode her, og importér den for at indlæse udseendet.",
+    "copyCode": "Kopiér kode",
+    "importCode": "Importér",
+    "designCodeCopied": "Udseendeskoden er kopieret.",
+    "designCodeCopyManual": "Automatisk kopiering er blokeret her. Koden er markeret; kopiér den med tastaturet.",
+    "designCodeImported": "Udseendet er importeret.",
+    "designCodeImportedPartial": "Udseendet er importeret. Værdier, som denne version ikke kender, blev sprunget over.",
+    "designCodeErrEmpty": "Indsæt først en udseendeskode.",
+    "designCodeErrHeader": "Det ligner ikke en udseendeskode.",
+    "designCodeErrVersion": "Den udseendeskode stammer fra en nyere spilversion.",
+    "designCodeErrMalformed": "Den udseendeskode er beskadiget. Kopiér hele koden, og prøv igen.",
     "browFlat": "Flad",
     "browArched": "Buet",
     "browThin": "Tynd",
@@ -9090,6 +9111,7 @@ export const da_DK: EnTranslations = {
       "filterSort": "Sortering",
       "sortName": "Navn (A-Z)",
       "sortPriceAsc": "Pris: laveste til højeste",
+      "collapseLowest": "Kun laveste pris",
       "weaponSword": "Sværd",
       "weaponDagger": "Dolke",
       "weaponStaff": "Stave",
@@ -9120,6 +9142,8 @@ export const da_DK: EnTranslations = {
       "quantity": "Antal",
       "quantityOf": "af {count}",
       "priceEach": "Pris pr. styk",
+      "lowestPriceLabel": "Nuværende laveste udbudspris",
+      "lowestPriceNone": "Der er endnu ingen aktive opslag for denne genstand.",
       "listButton": "Sæt til salg på Verdensmarkedet",
       "minPriceError": "Angiv en pris på mindst 1 kobber.",
       "collectEmpty": "Intet venter. Salgsindtægter og udløbne varer hentes her.",

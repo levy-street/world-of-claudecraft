@@ -2463,7 +2463,8 @@ export const fr_FR: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Tricheur >"
     },
     "mobTooltip": {
       "levelFamily": "{family} niveau {level}",
@@ -3965,6 +3966,12 @@ export const fr_FR: EnTranslations = {
       "genesis_token_claimed": "Ce Seeker Genesis Token a déjà été réclamé.",
       "entitlement_required": "Des droits Seeker vérifiés sont requis.",
       "current_ownership_required": "La possession actuelle d'un Seeker Genesis Token est requise."
+    },
+    "cheater_mark": {
+      "admin_target": "Les comptes opérateur ne peuvent pas être marqués.",
+      "reason_required": "Un motif est requis.",
+      "invalid_duration": "Saisissez une durée de marquage d'au moins une seconde.",
+      "not_marked": "Ce compte n'est pas marqué."
     }
   },
   "guide": {
@@ -6608,6 +6615,7 @@ export const fr_FR: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "vous@exemple.com",
     "emailError": "Veuillez saisir une adresse e-mail valide.",
+    "marketingOptIn": "M'envoyer par e-mail les actualités et mises à jour du jeu (facultatif)",
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
     "logIn": "Se connecter",
@@ -6708,6 +6716,19 @@ export const fr_FR: EnTranslations = {
     "style": "Style",
     "resetLook": "Réinitialiser l'apparence",
     "resetShort": "Réinitialiser",
+    "shareTab": "Partager",
+    "designCode": "Code d'apparence",
+    "designCodeHint": "Copiez ce code pour enregistrer ou partager cette apparence. Collez un code ici et importez-le pour la charger.",
+    "copyCode": "Copier le code",
+    "importCode": "Importer",
+    "designCodeCopied": "Code d'apparence copié.",
+    "designCodeCopyManual": "La copie automatique est bloquée ici. Le code est sélectionné, copiez-le avec votre clavier.",
+    "designCodeImported": "Apparence importée.",
+    "designCodeImportedPartial": "Apparence importée. Les valeurs inconnues de cette version ont été ignorées.",
+    "designCodeErrEmpty": "Collez d'abord un code d'apparence.",
+    "designCodeErrHeader": "Cela ne ressemble pas à un code d'apparence.",
+    "designCodeErrVersion": "Ce code d'apparence provient d'une version plus récente du jeu.",
+    "designCodeErrMalformed": "Ce code d'apparence est endommagé. Copiez le code en entier et réessayez.",
     "browFlat": "Plat",
     "browArched": "Arqué",
     "browThin": "Fin",
@@ -9090,6 +9111,7 @@ export const fr_FR: EnTranslations = {
       "filterSort": "Trier",
       "sortName": "Nom (A-Z)",
       "sortPriceAsc": "Prix : du plus bas au plus élevé",
+      "collapseLowest": "Prix le plus bas uniquement",
       "weaponSword": "Épées",
       "weaponDagger": "Dagues",
       "weaponStaff": "Bâtons",
@@ -9120,6 +9142,8 @@ export const fr_FR: EnTranslations = {
       "quantity": "Quantité",
       "quantityOf": "sur {count}",
       "priceEach": "Prix unitaire",
+      "lowestPriceLabel": "Prix de vente le plus bas actuellement",
+      "lowestPriceNone": "Aucune annonce active pour cet objet pour le moment.",
       "listButton": "Publier au Marché mondial",
       "minPriceError": "Indiquez un prix d'au moins 1 cuivre.",
       "collectEmpty": "Rien en attente. Les recettes et annonces expirées se récupèrent ici.",

@@ -2463,7 +2463,8 @@ export const id_ID: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Pemain Curang >"
     },
     "mobTooltip": {
       "levelFamily": "{family} Level {level}",
@@ -3965,6 +3966,12 @@ export const id_ID: EnTranslations = {
       "genesis_token_claimed": "Seeker Genesis Token itu sudah diklaim.",
       "entitlement_required": "Diperlukan hak akses Seeker yang terverifikasi.",
       "current_ownership_required": "Diperlukan kepemilikan Seeker Genesis Token saat ini."
+    },
+    "cheater_mark": {
+      "admin_target": "Akun operator tidak dapat diberi tanda.",
+      "reason_required": "Alasan wajib diisi.",
+      "invalid_duration": "Masukkan durasi tanda setidaknya satu detik.",
+      "not_marked": "Akun tersebut tidak diberi tanda."
     }
   },
   "guide": {
@@ -6608,6 +6615,7 @@ export const id_ID: EnTranslations = {
     "email": "Email",
     "emailPlaceholder": "kamu@contoh.com",
     "emailError": "Silakan masukkan alamat email yang valid.",
+    "marketingOptIn": "Kirimkan berita dan pembaruan game ke email saya (opsional)",
     "showPassword": "Tampilkan kata sandi",
     "hidePassword": "Sembunyikan kata sandi",
     "logIn": "Masuk",
@@ -6708,6 +6716,19 @@ export const id_ID: EnTranslations = {
     "style": "Gaya",
     "resetLook": "Atur Ulang Tampilan",
     "resetShort": "Atur Ulang",
+    "shareTab": "Bagikan",
+    "designCode": "Kode tampilan",
+    "designCodeHint": "Salin kode ini untuk menyimpan atau membagikan tampilan ini. Tempel kode di sini lalu impor untuk memuatnya.",
+    "copyCode": "Salin kode",
+    "importCode": "Impor",
+    "designCodeCopied": "Kode tampilan disalin.",
+    "designCodeCopyManual": "Penyalinan otomatis diblokir di sini. Kode sudah dipilih; salin dengan papan ketik.",
+    "designCodeImported": "Tampilan diimpor.",
+    "designCodeImportedPartial": "Tampilan diimpor. Nilai yang tidak dikenali versi ini dilewati.",
+    "designCodeErrEmpty": "Tempel kode tampilan terlebih dahulu.",
+    "designCodeErrHeader": "Itu tampaknya bukan kode tampilan.",
+    "designCodeErrVersion": "Kode tampilan itu berasal dari versi gim yang lebih baru.",
+    "designCodeErrMalformed": "Kode tampilan itu rusak. Salin seluruh kode lalu coba lagi.",
     "browFlat": "Datar",
     "browArched": "Melengkung",
     "browThin": "Tipis",
@@ -9090,6 +9111,7 @@ export const id_ID: EnTranslations = {
       "filterSort": "Urutkan",
       "sortName": "Nama (A-Z)",
       "sortPriceAsc": "Harga: rendah ke tinggi",
+      "collapseLowest": "Hanya harga terendah",
       "weaponSword": "Pedang",
       "weaponDagger": "Belati",
       "weaponStaff": "Tongkat Sihir",
@@ -9120,6 +9142,8 @@ export const id_ID: EnTranslations = {
       "quantity": "Jumlah",
       "quantityOf": "dari {count}",
       "priceEach": "Harga satuan",
+      "lowestPriceLabel": "Harga penawaran terendah saat ini",
+      "lowestPriceNone": "Belum ada penawaran aktif untuk item ini.",
       "listButton": "Pajang di Pasar Dunia",
       "minPriceError": "Tetapkan harga minimal 1 tembaga.",
       "collectEmpty": "Tidak ada yang menunggu. Hasil penjualan dan daftar kedaluwarsa terkumpul di sini.",

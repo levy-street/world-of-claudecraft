@@ -694,14 +694,6 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
-// Re-minted after the custom-shader dedupe signature fix changed
-// prewarm_policy.ts. No capture was retaken.
-// Re-minted for the phase 07 merge of release/v0.37.0 into
-// feature/masterwrought: both sides re-minted since the common base (the
-// release's Three.js audit batch moved renderer.ts, prewarm_policy.ts, and
-// the three.js patch; this branch's phase 06 tome wiring moved the prop GLB
-// leaves), so all three literals mint to values matching neither parent.
-// No capture was retaken.
 // Re-minted for the shadow-batch PR (shadow-camera texel snapping and the
 // budget-governed shadow cadence; renderer.ts edits only). No capture was
 // retaken.
@@ -732,9 +724,6 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // with the release branch's organized renderer imports. Both parents move
 // renderer.ts, so the rendererIntegration leaf mints a value matching neither
 // parent. No capture was retaken.
-// Re-minted for the phase 08 QA merge of release/v0.38.0 into
-// feature/masterwrought: both sides re-minted since the common base, so the
-// merged tree mints values matching neither parent. No capture was retaken.
 // Re-minted after the point-light adoption seam moved the fire-light budget
 // pass out of renderer.ts into fire_light_registry.ts. renderer.ts is a
 // provenance input, so the composite moves and the swept evidence bytes follow.
@@ -747,15 +736,29 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // both parents move renderer.ts, so the composite mints a value matching neither
 // parent and this metadata authority sha follows the swept bytes. No capture was
 // retaken.
-// Re-minted for the phase 09 QA merge of release/v0.38.0 into
-// feature/masterwrought: both sides re-minted since the common base (the
-// release's night-lighting and point-light seams, this branch's phase 09
-// content), so the merged tree mints values matching neither parent. No
+// Re-minted for PR #3339's healGlowAt view-eviction fix on the newer release
+// renderer. The rendererIntegration leaf and swept evidence bytes move; no
 // capture was retaken.
+// Re-minted for PR #3344 after removing the unused Eastbrook civic-beacon
+// preload test hook. The civicShader leaf and swept evidence bytes move; no
+// capture was retaken.
+// Re-minted after applying the PR #3339 review repair atop PR #3344. The
+// rendererIntegration and civicShader leaves both survive, and the swept
+// evidence follows the combined inputs. No capture was retaken.
+// Re-minted for final PR #3345 integration. The reviewed offscreen-heal
+// renderer bytes remain while the Three.js patch, lockfile, and accepted GLBs
+// join the provenance inputs. No capture was retaken.
+// Re-minted after extracting entity-view policy from renderer.ts to satisfy
+// the release monolith ratchet. Behavior is unchanged; no capture was retaken.
+// Re-minted again after registering the extracted policy as its own provenance
+// leaf. The captures remain unchanged and were not retaken.
+// Re-minted for the phase 10 QA merge of release/v0.38.0 into
+// feature/masterwrought: both sides re-minted since the common base, so the
+// merged tree mints values matching neither parent. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '126b9cd826aa3a460c7de7b7d4ff23d0452839354449e8f86a03c1239e619fd8';
+  'e01de8f7cf774c773c124095bf3d3483d3b050f3e69c6a68f68f16ad675fafdf';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'be524a9a97019e382fcc8ebc88ce01f96044c133291d3edc2f9522223ea21083';
+  '704d3a7f17c75c25a0d6aaffff00f15eaf07a833f5b78d2cb5f9191aa421c976';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1703,13 +1706,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // first-order composite follows renderer.ts, then this second-order
     // performance seal follows the swept evidence bytes. No capture was
     // retaken.
-    // Re-minted after the custom-shader dedupe signature fix changed
-    // prewarm_policy.ts. No capture was retaken.
-    // Re-minted for the phase 07 merge of release/v0.37.0 into
-    // feature/masterwrought: both parents moved provenance inputs (the
-    // release's Three.js audit batch, this branch's phase 06 tome GLB
-    // leaves), so the merged tree mints a value matching neither parent.
-    // No capture was retaken.
     // Re-pinned for the base sync of the Three.js audit batch with the release
     // branch renderer changes. The first-order composite follows the merged
     // renderer.ts bytes, then this second-order performance seal follows the
@@ -1727,22 +1723,34 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // composite follows the merged renderer.ts bytes, then this second-order
     // performance seal follows the swept evidence bytes. No capture was
     // retaken.
-    // Re-pinned for the phase 08 QA merge of release/v0.38.0 into
-    // feature/masterwrought: both parents moved provenance inputs, so the
-    // merged tree mints a value matching neither parent. No capture was
-    // retaken.
     // Re-minted for the merge of release/v0.38.0 into the night-lighting branch:
     // both parents move renderer.ts, so the first-order composite mints anew and
     // this second-order seal follows the swept evidence bytes. No capture was
     // retaken.
-    // Re-pinned for the phase 09 QA merge of release/v0.38.0 into
+    // Re-pinned for PR #3339's healGlowAt view-eviction fix on the newer release
+    // renderer. The first-order composite follows renderer.ts, then this
+    // second-order seal follows the swept evidence bytes. No capture was retaken.
+    // Re-pinned for PR #3344 after removing the unused Eastbrook civic-beacon
+    // preload test hook. The first-order composite follows the civicShader leaf,
+    // then this second-order seal follows the swept bytes. No capture was retaken.
+    // Re-pinned after applying the PR #3339 review repair atop PR #3344. The
+    // first-order composite follows both retained leaves, then this second-order
+    // seal follows the swept evidence bytes. No capture was retaken.
+    // Re-pinned for final PR #3345 integration. The first-order composite follows
+    // the combined renderer, lockfile, and GLBs, then this seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-pinned after extracting entity-view policy from renderer.ts for the
+    // monolith ratchet. The seal follows the swept bytes; no capture was retaken.
+    // Re-pinned again after the policy became an explicit provenance leaf. The
+    // performance records changed only in their swept provenance blocks.
+    // Re-pinned for the phase 10 QA merge of release/v0.38.0 into
     // feature/masterwrought: both parents moved provenance inputs, so the
     // merged tree mints a value matching neither parent. No capture was
     // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('f9d176f8b72f7911e61930b279c1909d4dddea3ee97d3f558fd26074a12057ce');
+    ).toBe('04171784c88d1fda8191ce5fd733830200567c1b8aeecb8fdeee2a179aeab612');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

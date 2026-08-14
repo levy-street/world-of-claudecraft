@@ -96,6 +96,7 @@ describe('unitFrameView: the present / hidden gate', () => {
       name: '',
       titlePre: '',
       titlePost: '',
+      cheaterTag: '',
       borderSlug: '',
       portraitKey: '',
       absorbFrac: 0,

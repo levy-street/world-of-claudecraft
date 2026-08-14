@@ -116,13 +116,6 @@ interface AttributionTargetFixture {
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
-// Re-minted after the custom-shader dedupe signature fix changed
-// prewarm_policy.ts. No capture was retaken.
-// Re-minted for the phase 07 merge of release/v0.37.0 into
-// feature/masterwrought: both sides re-minted since the common base (the
-// release's Three.js audit batch, this branch's phase 06 tome GLB leaves),
-// so the merged tree mints a value matching neither parent. No capture was
-// retaken.
 // Re-minted for the shadow-batch PR (shadow-camera texel snapping and the
 // budget-governed shadow cadence; renderer.ts edits only). No capture was
 // retaken.
@@ -152,9 +145,6 @@ interface AttributionTargetFixture {
 // (evictFarZoneIfConstrained) with the release branch's organized renderer
 // imports. Both parents move renderer.ts, so the rendererIntegration leaf
 // mints a value matching neither parent. No capture was retaken.
-// Re-minted for the phase 08 QA merge of release/v0.38.0 into
-// feature/masterwrought: both sides re-minted since the common base, so the
-// merged tree mints a value matching neither parent. No capture was retaken.
 // Re-minted after the point-light adoption seam moved the fire-light budget
 // pass out of renderer.ts into fire_light_registry.ts. renderer.ts is a
 // provenance input, so its bytes move the composite. No capture was retaken.
@@ -165,11 +155,24 @@ interface AttributionTargetFixture {
 // both parents move renderer.ts (the release's point-light seam, this branch's
 // moon-phase grade threading), so the merged tree mints a value matching
 // neither parent. No capture was retaken.
-// Re-minted for the phase 09 QA merge of release/v0.38.0 into
+// Re-minted for PR #3339's healGlowAt view-eviction fix on the newer release
+// renderer. The rendererIntegration leaf moves; no capture was retaken.
+// Re-minted for PR #3344 after removing the unused Eastbrook civic-beacon
+// preload test hook. The civicShader leaf moves; no capture was retaken.
+// Re-minted after applying the PR #3339 review repair atop PR #3344. The
+// rendererIntegration and civicShader leaves both survive; no capture was retaken.
+// Re-minted for final PR #3345 integration. The reviewed offscreen-heal
+// renderer bytes remain while the new lockfile and accepted GLBs join the
+// provenance inputs. No capture was retaken.
+// Re-minted after extracting entity-view policy from renderer.ts to satisfy
+// the release monolith ratchet. Behavior is unchanged; no capture was retaken.
+// Re-minted again after making that extracted policy an explicit provenance
+// leaf. The evidence now follows policy-only changes; no capture was retaken.
+// Re-minted for the phase 10 QA merge of release/v0.38.0 into
 // feature/masterwrought: both sides re-minted since the common base, so the
 // merged tree mints a value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'be524a9a97019e382fcc8ebc88ce01f96044c133291d3edc2f9522223ea21083';
+  '704d3a7f17c75c25a0d6aaffff00f15eaf07a833f5b78d2cb5f9191aa421c976';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -462,7 +465,7 @@ describe('Eastbrook polish capture contract', () => {
       createHash('sha256')
         .update(await readFile(new URL(relativePath, repoRoot)))
         .digest('hex');
-    const provenance = deriveEastbrookPolishCompositeProvenance({
+    const provenanceInputs = {
       townAssetSourceFingerprint: townFingerprint.eastbrookTownSourceFingerprint(),
       authoritativeLayoutSha256: await fileSha256(
         EASTBROOK_POLISH_PROVENANCE_INPUTS.authoritativeLayout,
@@ -476,6 +479,7 @@ describe('Eastbrook polish capture contract', () => {
       rendererIntegrationSha256: await fileSha256(
         EASTBROOK_POLISH_PROVENANCE_INPUTS.rendererIntegration,
       ),
+      entityViewPolicySha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.entityViewPolicy),
       viewPriorityPolicySha256: await fileSha256(
         EASTBROOK_POLISH_PROVENANCE_INPUTS.viewPriorityPolicy,
       ),
@@ -483,7 +487,14 @@ describe('Eastbrook polish capture contract', () => {
       mailboxGlbSha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.mailboxGlb),
       noticeboardSourceFingerprint: noticeboardFingerprint.eastbrookNoticeboardSourceFingerprint(),
       noticeboardGlbSha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.noticeboardGlb),
+    };
+    const provenance = deriveEastbrookPolishCompositeProvenance(provenanceInputs);
+    const policyOnlyChange = deriveEastbrookPolishCompositeProvenance({
+      ...provenanceInputs,
+      entityViewPolicySha256: '0'.repeat(64),
     });
+    expect(policyOnlyChange.fingerprint).not.toBe(provenance.fingerprint);
+    expect(policyOnlyChange.components.runtimeRender.entityViewPolicy.sha256).toBe('0'.repeat(64));
     // On a mismatch the diagnostics module names the moved leaf against the
     // committed evidence seal, reports whether any fingerprinted input is
     // dirty vs HEAD (the stale-mint hazard: the 2026-08-05 craft-cast pin
@@ -525,6 +536,10 @@ describe('Eastbrook polish capture contract', () => {
           sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
         },
         runtimeRender: {
+          entityViewPolicy: {
+            path: 'src/render/entity_view_policy_core.ts',
+            sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+          },
           viewPriorityPolicy: {
             path: 'src/render/prewarm_policy.ts',
             sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
@@ -1365,6 +1380,7 @@ describe('Eastbrook polish capture contract', () => {
       'npcFacings:',
       'polishProvenance',
       'deriveEastbrookPolishCompositeProvenance({',
+      'EASTBROOK_POLISH_PROVENANCE_INPUTS.entityViewPolicy',
       'TOWN_CONTRACT',
     ]) {
       expect(source, call).toContain(call);

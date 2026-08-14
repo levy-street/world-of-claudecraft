@@ -173,6 +173,73 @@ describe('market wire cadence + rebuild-only-on-change', () => {
     expect((snaps[0] as any).self.market.filter).toBe('wolf');
   });
 
+  // Issue #3043: the Sell tab's price-check command is a sibling gate axis to
+  // marketQuery, wired the exact same way (an immediate wire re-arm plus the
+  // rebuild-only-on-change comparison), so it gets the same cadence coverage.
+  it("the viewer's own market_sell_price_check lands on the next snapshot, not a cadence later", () => {
+    const { server, fc, session } = browseServer();
+    broadcast(server);
+    server.sim.tick(); // one tick only: the plain cadence gate is NOT due yet
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'market_sell_price_check', item: 'wolf_fang' }),
+    );
+    const sent = fc.sent.length;
+    broadcast(server);
+    const snaps = marketSnaps(fc.sent, sent);
+    expect(snaps).toHaveLength(1);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    expect((snaps[0] as any).self.market.sellPriceItemId).toBe('wolf_fang');
+  });
+
+  it('re-sending the same market_sell_price_check item does not force extra rebuilds', () => {
+    const { server, fc, session } = browseServer();
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'market_sell_price_check', item: 'wolf_fang' }),
+    );
+    broadcast(server);
+    // The value is now applied server-side; identical re-sends re-arm the wire
+    // cadence (MARKET_WIRE_PROMPT_CMDS) but the plain value compare (a
+    // primitive, unlike marketQuery's object-identity trick) means the
+    // rebuild-only-on-change gate still skips every one of them.
+    const spy = vi.spyOn(server.sim, 'marketInfoFor');
+    const sent = fc.sent.length;
+    for (let round = 0; round < 3; round++) {
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'market_sell_price_check', item: 'wolf_fang' }),
+      );
+      server.sim.tick();
+      broadcast(server);
+    }
+    expect(spy).not.toHaveBeenCalled();
+    expect(marketSnaps(fc.sent, sent)).toHaveLength(0);
+  });
+
+  it('the price-check echo carries the current lowest per-unit price for the checked item', () => {
+    const { server, fc, session } = browseServer();
+    const fc2 = fakeWs();
+    const seller = joinServer(server, fc2, 72, 'Seller');
+    placeAtMerchant(server, seller.pid);
+    server.sim.addItem('wolf_fang', 2, seller.pid);
+    server.sim.marketList('wolf_fang', 2, 100, seller.pid); // 50c/unit
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'market_sell_price_check', item: 'wolf_fang' }),
+    );
+    const sent = fc.sent.length;
+    broadcast(server);
+    const snaps = marketSnaps(fc.sent, sent);
+    expect(snaps).toHaveLength(1);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    const self = (snaps[0] as any).self.market;
+    expect(self.sellPriceItemId).toBe('wolf_fang');
+    expect(self.sellLowestPrice).toBe(50);
+  });
+
   it('walking away nulls the key at cadence; returning re-ships the full view', () => {
     const { server, fc, session } = browseServer();
     broadcast(server);

@@ -3334,6 +3334,13 @@
   body.mobile-touch .mkt-filter {
     max-width: none;
   }
+  /* The lowest-price toggle's own grid row (issue #3103): grow the whole labeled
+     row, not just the checkbox glyph, to the 40x40px touch-target floor every
+     other market control on this row already meets (the .mkt-page-btn fix
+     precedent above this file's history). */
+  body.mobile-touch .mkt-collapse-toggle {
+    min-height: 40px;
+  }
   /* The desktop landscape relayout (components.css .mkt-list) auto-fills
      multiple listing-card columns as the window widens; on mobile the window
      is edge-pinned narrow (the sheet base above), so force it deliberately

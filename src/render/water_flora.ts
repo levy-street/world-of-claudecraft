@@ -35,10 +35,6 @@ for (const key of Object.keys(FLORA_URLS) as FloraKey[]) {
   );
 }
 
-export const waterFloraPreloadInternalsForTest = {
-  propUrls: Object.values(FLORA_URLS),
-};
-
 // One extraction per prop model, shared by every region group: extraction
 // CLONES geometry, and per-region extraction would upload a duplicate GPU
 // buffer set for each lake-bearing zone.

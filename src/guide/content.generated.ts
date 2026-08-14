@@ -15041,6 +15041,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/kobold.glb",
     "idle": "Idle",
     "height": 2.1,
+    "hover": -0.2,
     "tintStrength": 0.12
   },
   "mob_bandit": {

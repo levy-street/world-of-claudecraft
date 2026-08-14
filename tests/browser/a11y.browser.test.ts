@@ -699,6 +699,7 @@ function marketInfo(shape: WorldShape): MarketInfo {
     primaryStat: 'all',
     rarity: 'all',
     sort: 'name',
+    collapseLowest: false,
     page: 0,
     pageCount: 1,
     collectionCopper: 0,
@@ -708,6 +709,8 @@ function marketInfo(shape: WorldShape): MarketInfo {
     cutPct: 5,
     maxListings: 10,
     myListingCount: 0,
+    sellPriceItemId: null,
+    sellLowestPrice: null,
   };
   // The sim shape may carry extra server-only fields the view ignores; the client mirror
   // carries only the decoded fields (the offline-only-shape trap catches).
@@ -723,7 +726,12 @@ describe('axe: market window (Sim + ClientWorld shapes)', () => {
         stubDeps({
           root: () => root,
           world: () =>
-            ({ marketInfo: marketInfo(shape), copper: 0, marketSearch: () => undefined }) as never,
+            ({
+              marketInfo: marketInfo(shape),
+              copper: 0,
+              marketSearch: () => undefined,
+              marketSellPriceCheck: () => undefined,
+            }) as never,
           hideTooltip: () => undefined,
           captureFocus: () => null,
         }),
@@ -743,6 +751,80 @@ describe('axe: market window (Sim + ClientWorld shapes)', () => {
         expect(field.closest('[role="group"]')).toBe(filters);
       }
       expect(root.querySelector('.mkt-filters')?.hasAttribute('role')).toBe(false);
+      await expectClean(root);
+    });
+
+    // Issue 3043: the Sell tab's price-ref line and its off-screen live-region
+    // echo are new markup this suite would otherwise never see (the base fixture
+    // above stages nothing, so buildMarketSell never reaches the 'form' state).
+    it(`Sell tab price reference (a real price) is clean under the ${shape} shape`, async () => {
+      const root = host('market-window');
+      root.style.display = 'none';
+      const win = new MarketWindow(
+        stubDeps({
+          root: () => root,
+          world: () =>
+            ({
+              marketInfo: {
+                ...marketInfo(shape),
+                sellPriceItemId: 'worn_sword',
+                sellLowestPrice: 4200,
+              },
+              inventory: [{ itemId: 'worn_sword', count: 3 }],
+              copper: 0,
+              marketSearch: () => undefined,
+              marketSellPriceCheck: () => undefined,
+              marketList: () => undefined,
+              marketListInstance: () => undefined,
+            }) as never,
+          hideTooltip: () => undefined,
+          captureFocus: () => null,
+        }),
+      );
+      win.open();
+      const tab = root.querySelector<HTMLElement>('[data-tab="sell"]');
+      tab?.click();
+      win.stageSell('worn_sword');
+      const ref = root.querySelector('.mkt-sell-price-ref');
+      expect(ref?.textContent?.length, 'expected the numeric price ref to render').toBeGreaterThan(
+        0,
+      );
+      const status = root.querySelector('.mkt-sell-price-status');
+      expect(status?.getAttribute('role')).toBe('status');
+      expect(status?.getAttribute('aria-live')).toBe('polite');
+      await expectClean(root);
+    });
+
+    it(`Sell tab price reference (no active listings) is clean under the ${shape} shape`, async () => {
+      const root = host('market-window');
+      root.style.display = 'none';
+      const win = new MarketWindow(
+        stubDeps({
+          root: () => root,
+          world: () =>
+            ({
+              marketInfo: {
+                ...marketInfo(shape),
+                sellPriceItemId: 'worn_sword',
+                sellLowestPrice: null,
+              },
+              inventory: [{ itemId: 'worn_sword', count: 3 }],
+              copper: 0,
+              marketSearch: () => undefined,
+              marketSellPriceCheck: () => undefined,
+              marketList: () => undefined,
+              marketListInstance: () => undefined,
+            }) as never,
+          hideTooltip: () => undefined,
+          captureFocus: () => null,
+        }),
+      );
+      win.open();
+      const tab = root.querySelector<HTMLElement>('[data-tab="sell"]');
+      tab?.click();
+      win.stageSell('worn_sword');
+      const ref = root.querySelector('.mkt-sell-price-ref');
+      expect(ref?.textContent).toBe(t('itemUi.market.lowestPriceNone'));
       await expectClean(root);
     });
   }
@@ -784,6 +866,7 @@ describe('market window: reconnect resync ordering (#2416)', () => {
             },
             copper: 0,
             marketSearch: (q: unknown) => searches.push(q),
+            marketSellPriceCheck: () => undefined,
           }) as never,
         hideTooltip: () => undefined,
         captureFocus: () => null,

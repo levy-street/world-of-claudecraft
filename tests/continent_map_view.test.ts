@@ -9,6 +9,7 @@
 // painter's canvas draws (continent_map_painter.ts) need a real 2D context and
 // getComputedStyle and are exercised in the game, not here.
 
+import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES, zoneAt } from '../src/sim/data';
@@ -100,7 +101,7 @@ describe('CONTINENT_FALLBACK_ASPECT tracks the shipped plate', () => {
   // constant itself).
   it('equals the real pixel aspect of public/map_art/world_overview.webp', async () => {
     const meta = await sharp(
-      new URL('../public/map_art/world_overview.webp', import.meta.url).pathname,
+      fileURLToPath(new URL('../public/map_art/world_overview.webp', import.meta.url)),
     ).metadata();
     expect(meta.format).toBe('webp');
     expect(meta.width).toBeGreaterThan(0);

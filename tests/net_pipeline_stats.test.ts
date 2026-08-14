@@ -134,6 +134,18 @@ describe('net pipeline stats module', () => {
     expect(stats.summary().gapMs.count).toBe(1025);
     expect(stats.summary().gapMs.max).toBe(1);
   });
+
+  it('keeps fixed-size input shed diagnostics with a session peak', () => {
+    const stats = createNetPipelineStats();
+    stats.noteInputBackpressure(65_537.9);
+    stats.noteInputBackpressure(80_000);
+    stats.noteInputBackpressure(70_000);
+
+    expect(stats.summary().inputBackpressure).toEqual({
+      sheds: 3,
+      peakBufferedBytes: 80_000,
+    });
+  });
 });
 
 function wirePlayer(id: number, name: string) {

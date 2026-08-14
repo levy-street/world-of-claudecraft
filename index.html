@@ -891,6 +891,15 @@
             />
           </div>
 
+          <!-- Marketing opt-in, register mode only (setAuthMode toggles it).
+               Unchecked by default: consent is explicit, never pre-ticked. -->
+          <div class="auth-field auth-optin" id="login-marketing-field" hidden>
+            <label class="auth-optin-label">
+              <input id="login-marketing" name="marketingOptIn" type="checkbox" />
+              <span data-i18n="auth.marketingOptIn">Email me game news and updates (optional)</span>
+            </label>
+          </div>
+
           <!-- Cloudflare Turnstile widget mounts here when configured (src/main.ts). -->
           <div id="cf-turnstile-container" class="auth-turnstile"></div>
 
@@ -1318,19 +1327,19 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.37.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.38.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.37.0-win-x64.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.38.0-win-x64.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.37.0-linux-x86_64.AppImage"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.38.0-linux-x86_64.AppImage"
               data-i18n="download.linuxCta"
             >Download for Linux</a>
           </div>
@@ -1376,7 +1385,7 @@
                 <div class="auth-field">
                   <label for="account-email" class="auth-label" data-i18n="hudChrome.account.emailLabel">Email (optional)</label>
                   <input id="account-email" type="email" maxlength="254" autocomplete="email" disabled />
-                  <p class="account-hint" data-i18n="hudChrome.account.emailHint">Used only for account recovery. We never send marketing email.</p>
+                  <p class="account-hint" data-i18n="hudChrome.account.emailHint">Used only for account recovery. Use Change Email below to update it.</p>
                 </div>
               </div>
             </section>
@@ -1539,7 +1548,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.37.0</div>
+      <div id="game-version">v0.38.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper">Whitepaper</a>

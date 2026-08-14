@@ -265,13 +265,6 @@ const sstepv = (a: number, b: number, v: number): number => {
   return t * t * (3 - 2 * t);
 };
 
-/** Inside the castle grounds (walls inclusive), with an optional margin. */
-export function inCastleGrounds(x: number, z: number, pad = 0): boolean {
-  return (
-    x >= CASTLE.wx0 - pad && x <= CASTLE.wx1 + pad && z >= CASTLE.wz0 - pad && z <= CASTLE.wz1 + pad
-  );
-}
-
 /** Scatter clearance: the pad plus skirt is castle ground; no wild scatter. */
 export function castleClear(x: number, z: number): boolean {
   const p = CASTLE.pad;

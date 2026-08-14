@@ -47,6 +47,12 @@ export interface NameplateCanvasState {
   frame: NameplateFrame;
   comboPips: number;
   aiLabel: string;
+  /** The operator-applied Cheater tag, already localized AND already wrapped in
+   *  its `< >` form by the painter's resolveContent (its only writer, the
+   *  guildLabel precedent), '' for everyone else. An inline chip in the name row
+   *  rather than a stacked line, so it adds no vertical step the drawEmote
+   *  anchor walk would have to mirror. */
+  cheaterLabel: string;
   devOutline: string | null;
   badges: NameplateBadge[];
   raidMarkerUrl: string;
@@ -84,6 +90,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     frame: '',
     comboPips: 0,
     aiLabel: '',
+    cheaterLabel: '',
     devOutline: null,
     badges: [],
     raidMarkerUrl: '',
@@ -129,6 +136,17 @@ const LEVEL_STYLE: TextSpriteStyle = {
 const AI_STYLE: TextSpriteStyle = {
   font: `700 11px ${TITLE_FONT}`,
   fill: '#7de9c3',
+  stroke: '#000',
+  lineWidth: 2,
+};
+// The operator-applied Cheater tag. Same weight and size as the AI chip it sits
+// beside so the row's metrics do not change shape, but a hot red rather than the
+// AI mint: the two are both operator-set flair and must never read as the same
+// thing. Deliberately NOT the hostile-name red (#ff5555), which the same row
+// already spends on "this unit will attack you"; the sanction is louder.
+const CHEATER_STYLE: TextSpriteStyle = {
+  font: `700 11px ${TITLE_FONT}`,
+  fill: '#ff6b6b',
   stroke: '#000',
   lineWidth: 2,
 };
@@ -303,6 +321,7 @@ export class NameplateCanvasSurface {
   private readonly targetDevNameStyle: TextSpriteStyle = { ...TARGET_NAME_STYLE };
   private readonly levelStyle: TextSpriteStyle = { ...LEVEL_STYLE };
   private readonly aiStyle: TextSpriteStyle = { ...AI_STYLE };
+  private readonly cheaterStyle: TextSpriteStyle = { ...CHEATER_STYLE };
   private readonly titleStyle: TextSpriteStyle = { ...TITLE_STYLE };
   private readonly guildStyle: TextSpriteStyle = { ...GUILD_STYLE };
   private readonly targetGuildStyle: TextSpriteStyle = { ...TARGET_GUILD_STYLE };
@@ -518,18 +537,29 @@ export class NameplateCanvasSurface {
     this.configureTextStyle(nameStyle, nameColor);
     this.configureTextStyle(this.levelStyle, state.levelColor);
     this.configureTextStyle(this.aiStyle, AI_STYLE.fill);
+    this.configureTextStyle(this.cheaterStyle, CHEATER_STYLE.fill);
     const nameWidth = this.text.measureAdvance(state.name, nameStyle);
     const levelWidth = state.level ? this.text.measureAdvance(state.level, this.levelStyle) + 6 : 0;
     const aiWidth = state.aiLabel ? this.text.measureAdvance(state.aiLabel, this.aiStyle) + 3 : 0;
+    const cheaterWidth = state.cheaterLabel
+      ? this.text.measureAdvance(state.cheaterLabel, this.cheaterStyle) + 3
+      : 0;
     let badgeWidth = 0;
     for (const badge of state.badges) badgeWidth += badge.size + 3;
-    const rowWidth = badgeWidth + aiWidth + levelWidth + nameWidth;
+    const rowWidth = badgeWidth + cheaterWidth + aiWidth + levelWidth + nameWidth;
     let x = screenX - rowWidth / 2;
     const topY = bottomY - rowHeight;
     if (state.border) this.drawBorderAccent(state.border, screenX, topY, bottomY, rowWidth);
     for (const badge of state.badges) {
       this.drawBadge(badge, x, topY + (rowHeight - badge.size) / 2);
       x += badge.size + 3;
+    }
+    // Leftmost text in the row, ahead of the AI chip and the level: a public
+    // sanction is the first thing the row should say about this player.
+    if (state.cheaterLabel) {
+      const width = cheaterWidth - 3;
+      this.text.draw(this.ctx, state.cheaterLabel, x + width / 2, bottomY - 3, this.cheaterStyle);
+      x += cheaterWidth;
     }
     if (state.aiLabel) {
       const width = aiWidth - 3;

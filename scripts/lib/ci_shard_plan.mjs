@@ -22,7 +22,7 @@
 //               (scripts/ci_shard_test.mjs) regenerates the artifacts once
 //               per job before spawning, and the guard suites still read
 //               fresh bytes on every shard.
-//   lane        the "PR gate (long sims A)" / "PR gate (long sims B)" jobs
+//   lane        the "PR long sims A" / "PR long sims B" jobs
 //               (buildLanePlan, one CI_LONG_SUITE_HALVES half each): the
 //               half's collected CI_LONG_SUITES files, all of them in full
 //               mode and on any unprovable input, only the floor/changed
@@ -73,7 +73,7 @@ export const CI_GUARD_PREFIXES = Object.freeze(['tests/parity/']);
 
 /**
  * Long rotation sims the PR tier runs in the dedicated lane jobs
- * ("PR gate (long sims A)" / "PR gate (long sims B)" in ci.yml, one
+ * ("PR long sims A" / "PR long sims B" in ci.yml, one
  * CI_LONG_SUITE_HALVES half each) instead of inside the shard matrix, so a
  * single multi-minute file stops setting the slowest shard's wall clock.
  * Membership is measured, not automated: a file joins when it costs more than
@@ -137,8 +137,8 @@ export const CI_LONG_SUITES = Object.freeze([
 ]);
 
 /**
- * The two parallel lane jobs ("PR gate (long sims A)" / "PR gate (long sims
- * B)" in ci.yml): a literal partition of CI_LONG_SUITES, so the pair's wall
+ * The two parallel lane jobs ("PR long sims A" / "PR long sims B"
+ * in ci.yml): a literal partition of CI_LONG_SUITES, so the pair's wall
  * clock is roughly half of the single-job lane's. Halves are balanced by
  * MEASURED post-diet suite duration, not file count (re-balanced 2026-08-13
  * from the per-file durations in the harness-split PR after the owned-class
@@ -208,6 +208,32 @@ export function parseShardArg(argv) {
     }
   }
   return null;
+}
+
+/**
+ * Resolve the vitest worker count for a CI test job. The default is half the
+ * runner's cores, a MEASURED ruling (full-core run 31107474546 inflated the
+ * long sims' aggregate CPU ~1.6x through memory-bandwidth contention and
+ * timed out the eastbrook sweep); every per-test budget is calibrated
+ * against it. WOC_TEST_WORKERS is the sanctioned trial knob for producing
+ * the green measured run that ruling requires before any new default: an
+ * integer between 1 and the core count is honored; a malformed or
+ * out-of-range value falls back to the measured default and reports
+ * `source: 'invalid'` so the entry announces it in the job log; unset or
+ * empty is the ordinary default (`source: 'default'`) and stays quiet.
+ * Worker count never changes WHICH tests run, so the fallback direction is
+ * safety toward the calibrated bound, not toward fewer tests.
+ *
+ * @param {{ cores: number, envValue?: string }} opts
+ * @returns {{ workers: number, source: 'default' | 'env' | 'invalid' }}
+ */
+export function resolveWorkerCount({ cores, envValue }) {
+  const fallback = Math.max(1, Math.floor(cores / 2));
+  if (envValue === undefined || envValue === '') return { workers: fallback, source: 'default' };
+  if (!/^[1-9]\d*$/.test(envValue)) return { workers: fallback, source: 'invalid' };
+  const parsed = Number(envValue);
+  if (parsed > cores) return { workers: fallback, source: 'invalid' };
+  return { workers: parsed, source: 'env' };
 }
 
 /**
@@ -294,12 +320,24 @@ function resolveSelectiveInputs({ changedPaths, alwaysRun, testFiles, exists }) 
       fallback: `generated i18n artifact(s) missing from the tree (${missingArtifacts.slice(0, 3).join(', ')}${missingArtifacts.length > 3 ? ', ...' : ''}): failing closed to the full suite`,
     };
   }
+  // Same presence re-proof for the manifest family (the second and only
+  // other freshness-guarded generated family; lib/gate_select_plan.mjs).
+  const missingManifests = buckets.generatedManifests.filter((p) => !exists(p));
+  if (missingManifests.length > 0) {
+    return {
+      fallback: `generated manifest artifact(s) missing from the tree (${missingManifests.slice(0, 3).join(', ')}${missingManifests.length > 3 ? ', ...' : ''}): failing closed to the full suite`,
+    };
+  }
   // Present artifacts join the related leg as graph nodes (the header in
   // lib/gate_select_plan.mjs): their consumers hang off the ARTIFACT side of
   // the import graph, not off the catalog/overlay sources that drove the
-  // regeneration, so this union is what keeps a locale-fill or catalog PR's
-  // consumer suites selected.
-  const relatedSources = [...buckets.relatedSources, ...buckets.generatedI18n];
+  // regeneration, so this union is what keeps a locale-fill, catalog, or
+  // manifest PR's consumer suites selected.
+  const relatedSources = [
+    ...buckets.relatedSources,
+    ...buckets.generatedI18n,
+    ...buckets.generatedManifests,
+  ];
 
   const { floor, missingGuards } = buildFloor({
     alwaysRun,
@@ -443,8 +481,8 @@ export function buildShardPlan({
 }
 
 /**
- * Build the legs one long-sims lane job ("PR gate (long sims A)" or
- * "PR gate (long sims B)") executes over its CI_LONG_SUITE_HALVES half.
+ * Build the legs one long-sims lane job ("PR long sims A" or
+ * "PR long sims B") executes over its CI_LONG_SUITE_HALVES half.
  *
  * Mirror image of buildShardPlan over the SAME inputs: full mode and every
  * unprovable input run every collected lane file of this half; selective mode

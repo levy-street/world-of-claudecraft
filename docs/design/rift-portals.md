@@ -33,7 +33,7 @@ tests that pin them.
   global draw order the rest of the sim depends on. (Rift content is also never in
   the golden parity traces.)
 - Because both hosts run the same generator from the same descriptor, only
-  `{seed, baseLevel, floorIndex, origin}` (`RiftDescriptor`) travels over the
+  `{seed, baseLevel, floorIndex, origin}` travels over the
   wire; the renderer regenerates geometry from it.
 
 ## Run lifecycle (`src/sim/rift/runs.ts`, behind the `SimContext` seam)

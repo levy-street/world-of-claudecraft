@@ -39,6 +39,7 @@
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
 import { pctValue, recalcPlayerStats } from '../entity';
 import { manaRegenPer2s } from '../mana_regen';
+import { CHEATER_MARK_AURA_ID } from '../moderation';
 import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -441,6 +442,12 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       const liveIndex = e.auras.indexOf(a);
       if (liveIndex < 0) continue;
       e.auras.splice(liveIndex, 1);
+      // The Cheater mark's aura IS its countdown, so its natural expiry is the
+      // moment the sanction is served: drop the wire flag here rather than
+      // deriving it from a per-snapshot aura scan in identityFields, which would
+      // put an array walk on every entity of every snapshot to answer a question
+      // that changes twice in a sanction's life.
+      if (a.id === CHEATER_MARK_AURA_ID) e.cheaterMark = undefined;
       priestOnAuraEnded(ctx, e, a);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });

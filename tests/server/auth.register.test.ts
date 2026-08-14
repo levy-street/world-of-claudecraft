@@ -302,6 +302,24 @@ describe('register handler', () => {
     expect(emailCreated).toEqual([]);
   });
 
+  it('captures the signup context (attribution, locale, opt-in) fire-and-forget', async () => {
+    const captures: Array<{
+      id: number;
+      profile: { locale: string | null; marketingOptIn: boolean };
+    }> = [];
+    installDb({
+      captureSignupContext: (id, _req, _body, profile) => {
+        captures.push({ id, profile });
+      },
+    });
+    const out = await runHandler(
+      { username: 'newhero', password: 'secret123', email: 'a@b.co', marketingOptIn: true },
+      { headers: { 'accept-language': 'pt-BR,pt;q=0.9' } },
+    );
+    expect(out.status).toBe(200);
+    expect(captures).toEqual([{ id: 7, profile: { locale: 'pt_BR', marketingOptIn: true } }]);
+  });
+
   it('fires the best-effort suspicious-registration report and referral capture', async () => {
     let suspicious = 0;
     let referral = 0;

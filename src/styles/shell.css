@@ -3653,6 +3653,25 @@
     color: var(--color-primary);
   }
 
+  /* The marketing opt-in row: an inline checkbox beside its label text, so it
+     must escape the block/width-100% treatment generic auth inputs get. */
+  .auth-optin .auth-optin-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+    color: var(--color-text-muted);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .auth-panel-premium .auth-optin input[type="checkbox"] {
+    display: inline-block;
+    width: auto;
+    margin-top: 2px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+
   .auth-panel-premium input {
     display: block;
     width: 100%;
@@ -8361,7 +8380,7 @@
 /* --------------------------------------------------------------- tab rail */
 .appearance-customizer .ac-tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 2px;
   padding: 2px;
   background: rgba(0, 0, 0, 0.4);
@@ -8382,7 +8401,7 @@
   border: 1px solid transparent;
   border-radius: 6px;
   cursor: var(--cursor-point);
-  /* the four labels are translated: never let a longer locale wrap the rail */
+  /* the five labels are translated: never let a longer locale wrap the rail */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -8901,6 +8920,84 @@
   min-width: 0;
 }
 
+/* ------------------------------------------------------------------ share */
+/* The Share tab: the design code (one readable feature=value line) in a
+   monospace box, over Copy / Import. Coarse pointers get the 16px input floor
+   from base.css, so nothing here sets a smaller font on the textarea. */
+.appearance-customizer .ac-share-hint {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+.appearance-customizer .ac-code {
+  width: 100%;
+  min-height: 84px;
+  padding: 7px 9px;
+  font-family: ui-monospace, Consolas, "Cascadia Mono", monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #e6dcbf;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 7px;
+  resize: vertical;
+  /* the code is one long line of fields: wrap anywhere rather than scroll */
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  scrollbar-width: thin;
+}
+
+.appearance-customizer .ac-share-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.appearance-customizer .ac-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #cbbd97;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 6px;
+  cursor: var(--cursor-point);
+  transition:
+    color 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.appearance-customizer .ac-share-btn:hover {
+  color: #ffe9a8;
+  background: rgba(200, 168, 56, 0.14);
+  border-color: rgba(200, 168, 56, 0.55);
+}
+
+.appearance-customizer .ac-share-btn:active {
+  transform: translateY(0.5px);
+}
+
+/* Tokens, not literals: the theme presets recompute the --color-* vars at
+   runtime, so a raw hex here would not follow a theme switch. */
+.appearance-customizer .ac-share-status {
+  min-height: 16px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--color-text-success);
+}
+
+.appearance-customizer .ac-share-status.err {
+  color: var(--color-text-error);
+}
+
 /* ------------------------------------------------------------------ focus */
 .appearance-customizer
 :is(
@@ -8912,7 +9009,9 @@
   .ac-mk-swatch,
   .ac-sw,
   .ac-slider,
-  .ac-wheel
+  .ac-wheel,
+  .ac-code,
+  .ac-share-btn
 ):focus-visible {
   outline: 2px solid var(--color-border-focus);
   outline-offset: 1px;
@@ -8926,6 +9025,7 @@
   .appearance-customizer .ac-tab,
   .appearance-customizer .ac-seg-btn,
   .appearance-customizer .ac-step,
+  .appearance-customizer .ac-share-btn,
   .appearance-customizer .ac-tool {
     height: 40px;
   }

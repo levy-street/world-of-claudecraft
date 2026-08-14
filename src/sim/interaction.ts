@@ -66,6 +66,7 @@ import {
   bestWieldableAnyGatherToolTier,
   minWieldRequirementToWorkAny,
 } from './professions/wield_gate';
+import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { noteReliquaryMark } from './reliquary';
 import type { SimContext } from './sim_context';
 import { interactSoulwell } from './soulwell';
@@ -957,7 +958,16 @@ export function interact(
       bestCorpse = e;
       bestCorpseD2 = d2;
     }
-    if (e.kind === 'object' && e.lootable && d2 < bestObjD2) {
+    if (
+      e.kind === 'object' &&
+      e.lootable &&
+      d2 < bestObjD2 &&
+      // A quest collectable this player is not on the quest for is not in their
+      // world (the client withholds its view entirely), so the interact key must
+      // not select it either: picking it would refuse below, and worse, a shiny
+      // nobody can see would outrank a visible NPC or node standing further away.
+      !isQuestGatedGroundObjectHidden(e, r.meta.questLog)
+    ) {
       const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, e.id);
       if (!noticeboardDef || d2 <= noticeboardDef.interactionRadius ** 2) {
         bestObj = e;

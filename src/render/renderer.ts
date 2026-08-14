@@ -235,6 +235,13 @@ import {
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { buildEmberPools, type EmberPoolsView } from './ember_pools';
+import {
+  entityViewCandidatePriority,
+  entityViewDistanceSq,
+  entityViewIsAdmitted,
+  isPersistentPortalObject,
+  entityViewShouldDrop as shouldDropView,
+} from './entity_view_policy_core';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
 import {
   createEnvironmentMapTransition,
@@ -310,6 +317,7 @@ import { bakeGrassGroundTexture, setGrassGroundBake } from './grass_ground_bake'
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import {
+  groundObjectPoolKey,
   type PooledObjectView,
   storePooledObject as storeGroundObjectInPool,
   takeOrBuildGroundObject,
@@ -438,7 +446,6 @@ import {
 } from './prewarm_pass';
 import {
   constrainedEntryViewCreateBudget,
-  interactionLandmarkViewPriority,
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
   orderedPrewarmIds,
@@ -475,6 +482,7 @@ import {
 } from './prewarm_resume';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
+import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
 import { isOwnedPetHostile } from './reaction';
@@ -1186,12 +1194,6 @@ function roundMs(v: number): number {
   return Math.round(v * 100) / 100;
 }
 
-function distSqXZ(a: Entity, b: Entity): number {
-  const dx = a.pos.x - b.pos.x;
-  const dz = a.pos.z - b.pos.z;
-  return dx * dx + dz * dz;
-}
-
 function summarizeMs(values: number[]): {
   count: number;
   avg: number;
@@ -1274,12 +1276,6 @@ function emptyFoliagePerfStats(): FoliagePerfStats {
   };
 }
 
-function isPersistentPortalObject(e: Entity): boolean {
-  return (
-    e.kind === 'object' && (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
-  );
-}
-
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
 }
@@ -1316,7 +1312,7 @@ function canvasDataUrlAsync(
   });
 }
 
-export interface RendererCreateOptions {
+export interface RendererCreateOptions extends QuestObjectGateOptions {
   context?: WebGL2RenderingContext;
   initializeGfx?: boolean;
   /** Build the far-vista grid eagerly during construction (macrotask bites,
@@ -1335,6 +1331,8 @@ export class Renderer {
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
   views = new Map<number, EntityView>();
+  // Editor opt-out for the quest-collectable view gate (see RendererCreateOptions).
+  private questObjectHidden = makeQuestObjectGate({});
   private viewCreateRetry = new ViewCreateRetryGate(VIEW_CREATE_FAIL_RETRY_MS);
   // view groups that own a budgeted point light: exempt from the hidden-view
   // matrix gate (see the gate pass in sync and the note at registration)
@@ -2071,6 +2069,7 @@ export class Renderer {
     options: RendererCreateOptions = {},
   ) {
     this.canvas = canvas;
+    this.questObjectHidden = makeQuestObjectGate(options);
     this.nameplateLayer = nameplateLayer;
     this.travelSpeedFx = new TravelSpeedFxPainter(nameplateLayer);
     // biome-ignore format: Keep the established constructor body stable inside the failure guard.
@@ -4741,33 +4740,19 @@ export class Renderer {
     return base;
   }
 
-  private viewCandidatePriority(e: Entity, p: Entity, d2: number): number {
-    if (e.id === p.id) return -100;
-    if (e.id === p.targetId) return -90;
-    if (e.kind === 'mob' && e.hostile && d2 <= 35 * 35) return 0;
-    if (e.kind === 'npc' && d2 <= 45 * 45) return 1;
-    const landmarkPriority = interactionLandmarkViewPriority(e.templateId, d2);
-    if (landmarkPriority !== null) return landmarkPriority;
-    if (e.kind === 'object' && (e.lootable || isPersistentPortalObject(e))) return 2;
-    if (e.kind === 'player') return 3;
-    if (e.kind === 'mob' && e.hostile) return 4;
-    if (e.kind === 'mob') return 5;
-    if (e.kind === 'npc') return 6;
-    if (e.kind === 'object') return 7;
-    return 9;
-  }
-
   private collectMissingViewCandidates(
     center: Entity,
     rangeSq: number,
     includeRequired: boolean,
   ): void {
     let count = 0;
+    const questLog = this.sim.questLog;
     for (const e of this.sim.entities.values()) {
       if (this.views.has(e.id)) continue;
+      if (!entityViewIsAdmitted(e, questLog, this.questObjectHidden)) continue;
       const required = e.id === center.id || e.id === center.targetId;
       if (required && !includeRequired) continue;
-      const d2 = distSqXZ(e, center);
+      const d2 = entityViewDistanceSq(e, center);
       if (!required && d2 > rangeSq) continue;
       writeViewCandidate(
         this.viewCandidatePool,
@@ -4775,7 +4760,7 @@ export class Renderer {
         count,
         e.id,
         d2,
-        this.viewCandidatePriority(e, center, d2),
+        entityViewCandidatePriority(e, center, d2),
       );
       count++;
     }
@@ -4795,6 +4780,7 @@ export class Renderer {
     if (id === null) return 0;
     const e = this.sim.entities.get(id);
     if (!e || this.views.has(e.id)) return 0;
+    if (!entityViewIsAdmitted(e, this.sim.questLog, this.questObjectHidden)) return 0;
     if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) return 0;
     this.createView(e);
     this.sampleCreatedViewType(createdViewTypes, e);
@@ -5160,12 +5146,6 @@ export class Renderer {
     // while the hot working set keeps its reuse. An evicted key transparently
     // rebuilds from the live entity on its next request.
     this.visualPool.store(key, visual, GFX.maxPooledCharacterVisuals);
-  }
-
-  private objectPoolKeyFor(e: Entity): string | null {
-    if (e.kind !== 'object' || !e.objectItemId) return null;
-    if (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit') return null;
-    return `object:${e.objectItemId}`;
   }
 
   private storePooledObject(key: string, object: PooledObjectView): void {
@@ -8091,8 +8071,10 @@ export class Renderer {
         // Throttle the particle bloom to one per target per 110ms so a burst of tiny
         // simultaneous heals (a Chronomancy group echo converting an AoE that hit
         // several enemies onto five allies in one frame) cannot spike the particle
-        // count. The healing number itself (FCT) is emitted elsewhere and unaffected.
-        if (ev.amount > 0 || ev.crit) {
+        // count. Targets without a view have no VFX anchor, so do not timestamp
+        // them and suppress the first bloom after they become visible. The healing
+        // number itself (FCT) is emitted elsewhere and unaffected.
+        if ((ev.amount > 0 || ev.crit) && this.views.has(ev.targetId)) {
           const nowMs = performance.now();
           if (nowMs - (this.healGlowAt.get(ev.targetId) ?? 0) >= 110) {
             this.healGlowAt.set(ev.targetId, nowMs);
@@ -8647,7 +8629,7 @@ export class Renderer {
       // "Pool MISS: build a fresh visual but KEEP its pool key" above): see
       // ground_object_pool.ts for why nulling it here used to corrupt the
       // forever-cached, geometry-sharing template every ground object clones.
-      const result = takeOrBuildGroundObject(this.objectPool, this.objectPoolKeyFor(e), () =>
+      const result = takeOrBuildGroundObject(this.objectPool, groundObjectPoolKey(e), () =>
         buildGroundQuestObject(e.objectItemId ?? '', e.id),
       );
       // takeOrBuildGroundObject pops through its own internal takePooledObject,
@@ -9129,7 +9111,7 @@ export class Renderer {
   // distance to the player, the same measure the view create/destroy bands use.
   private readonly weaponSkinRank = (viewId: number): number | undefined => {
     const entity = this.sim.entities.get(viewId);
-    return entity ? distSqXZ(entity, this.sim.player) : undefined;
+    return entity ? entityViewDistanceSq(entity, this.sim.player) : undefined;
   };
 
   /** Apply (or clear) a weapon-skin cosmetic on one view and latch it. The
@@ -10409,6 +10391,10 @@ export class Renderer {
 
   // Drop the view of an entity that left the world / our interest area.
   private removeView(id: number, terminal = false): void {
+    // healGlowAt has no decay loop of its own (unlike fiestaGlows/waterJetVisualChannels).
+    // Clear it before the idempotent early return so legacy or raced missing-view
+    // removals cannot leave a stale throttle entry for the rest of the session.
+    this.healGlowAt.delete(id);
     const v = this.views.get(id);
     if (!v) return;
     // A pending weapon-skin application must never land on a dropped (or
@@ -10649,12 +10635,9 @@ export class Renderer {
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
       const e = sim.entities.get(id);
+      // The pure policy also retires quest objects after turn-in or abandon.
       if (
-        !e ||
-        (!isPersistentPortalObject(e) &&
-          id !== p.id &&
-          id !== p.targetId &&
-          distSqXZ(e, p) > this.entityViewDestroyRangeSq)
+        shouldDropView(e, p, sim.questLog, this.questObjectHidden, this.entityViewDestroyRangeSq)
       ) {
         this.doomedIds.push(id);
       }

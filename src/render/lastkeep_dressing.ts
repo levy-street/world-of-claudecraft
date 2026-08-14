@@ -16,13 +16,7 @@
 // skips its spots instead of breaking the interior.
 
 import * as THREE from 'three';
-import {
-  type AuthoredRoom,
-  LASTKEEP_DECOR,
-  LASTKEEP_DOORS,
-  LASTKEEP_ROOMS,
-} from '../sim/dungeon_layout';
-import { authoredLiftAt } from '../sim/rift/authored';
+import { type AuthoredRoom, LASTKEEP_ROOMS } from '../sim/dungeon_layout';
 import { loadGltf } from './assets/loader';
 import { PROP_ASSET_DEFS } from './props';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
@@ -616,12 +610,3 @@ export function buildLastKeepDressing(
     addLight(spot.x, spot.z, KEEP_TORCH_LIGHT, floorY + 0.12, 0.9);
   }
 }
-
-/** Test-only window: the placement-contract pieces the vitest asserts. */
-export const lastKeepDressingInternalsForTest = {
-  keys: KEEP_DRESSING_KEYS,
-  rooms: LASTKEEP_ROOMS,
-  doors: LASTKEEP_DOORS,
-  decor: LASTKEEP_DECOR,
-  liftAt: (x: number, z: number): number => authoredLiftAt(LASTKEEP_ROOMS, LASTKEEP_DOORS, x, z),
-};

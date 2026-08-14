@@ -23,7 +23,12 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { formatLegHeader, runLegsWithFlakeRetry } from './lib/ci_leg_runner.mjs';
-import { buildLanePlan, buildShardPlan, parseShardArg } from './lib/ci_shard_plan.mjs';
+import {
+  buildLanePlan,
+  buildShardPlan,
+  parseShardArg,
+  resolveWorkerCount,
+} from './lib/ci_shard_plan.mjs';
 import { shouldRunEntryPretest, WOC_SKIP_PRETEST } from './lib/gate_artifact_skip.mjs';
 import { collectSuiteVisibility } from './lib/gate_discovery.mjs';
 
@@ -34,7 +39,7 @@ const usage =
 
 const argv = process.argv.slice(2);
 const shard = parseShardArg(argv);
-// The long-sims lanes ("PR gate (long sims A)" / "PR gate (long sims B)"):
+// The long-sims lanes ("PR long sims A" / "PR long sims B"):
 // the two jobs that split the CI_LONG_SUITES files the shard legs exclude
 // (CI_LONG_SUITE_HALVES). Exactly one --lane flag with one of the two exact
 // literals; any other value, a duplicate, or ANY --shard token beside it
@@ -61,10 +66,44 @@ const planOnly = argv.includes('--plan-only');
 // workers on the 4-vCPU runner, run 31107474546) inflated the four sims'
 // aggregate CPU time from 644 s to 1027 s through memory-bandwidth
 // contention and pushed the eastbrook integration sweep past its own 180 s
-// budget, while the half-cores run finished green with a 432 s wall. Every
-// per-test budget in the suite is calibrated against this bound; raise it
-// only with a green measured run at the new value.
-const workers = Math.max(1, Math.floor(os.availableParallelism() / 2));
+// budget, while the half-cores run finished green with a 432 s wall. A
+// 3-worker trial (run 31771637461, 2026-08-14) confirmed the bound from
+// the other side: three unrelated suites blew DEFAULT timeouts under the
+// contention (coverage_c 20 s, a terrain_streaming 10 s hook, groveheart
+// 20 s) while the green shards gained at most about a minute of wall, so
+// half cores stands at both neighbors. Every per-test budget in the suite
+// is calibrated against this bound; raise it only with a green measured
+// run at the new value. WOC_TEST_WORKERS is the knob that produces such a
+// run (resolveWorkerCount validates it; anything malformed or out of
+// range falls back to this default, loudly).
+const workerResolution = resolveWorkerCount({
+  cores: os.availableParallelism(),
+  envValue: process.env.WOC_TEST_WORKERS,
+});
+const workers = workerResolution.workers;
+if (workerResolution.source === 'invalid') {
+  // Loud twice by design: the log line for the transcript, the ::warning
+  // annotation (same channel as the known-flake retry in
+  // lib/ci_leg_runner.mjs, and gated the same way so a local repro never
+  // prints a raw workflow command) so a measured-trial run that silently
+  // fell back to the default cannot be mistaken for one that ran at the
+  // trial value.
+  const shown = JSON.stringify(process.env.WOC_TEST_WORKERS);
+  console.log(
+    `[ci-shard] WOC_TEST_WORKERS=${shown} is not an ` +
+      `integer between 1 and the core count; using the measured default ${workers}`,
+  );
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    console.log(
+      `::warning title=ci-shard invalid WOC_TEST_WORKERS::${shown} rejected; ` +
+        `this job ran at the measured default of ${workers} workers`,
+    );
+  }
+}
+// The label always names its arm, so every job log states which resolution
+// produced the number and a trial run is self-auditing even when nobody is
+// diffing env blocks.
+const workersLabel = `workers=${workers} (${workerResolution.source === 'env' ? 'WOC_TEST_WORKERS' : 'default'})`;
 
 const mode = process.env.TEST_MODE ?? '';
 // Echoed into the log only. The producer already strips CR/LF; re-stripping
@@ -122,8 +161,8 @@ const plan = lane
 
 console.log(
   lane
-    ? `[ci-shard] long-sims-${laneHalf} lane, workers=${workers}`
-    : `[ci-shard] shard ${shard.index}/${shard.total}, workers=${workers}`,
+    ? `[ci-shard] long-sims-${laneHalf} lane, ${workersLabel}`
+    : `[ci-shard] shard ${shard.index}/${shard.total}, ${workersLabel}`,
 );
 console.log(
   `[ci-shard] changes-job decision: mode=${mode || '(unset)'}${modeReason ? ` (${modeReason})` : ''}`,
@@ -150,7 +189,7 @@ if (lane) {
     // every leg below and owned by the two long-sims lane jobs in this run.
     console.log(
       `[ci-shard] long-sims lane: ${plan.laneExcluded.length} suite(s) excluded from this ` +
-        'shard and owned by the "PR gate (long sims A)" and "PR gate (long sims B)" jobs',
+        'shard and owned by the "PR long sims A" and "PR long sims B" jobs',
     );
   }
   if (plan.mode === 'selective') {

@@ -11,7 +11,8 @@
 // Before running it, confirm which inputs actually moved:
 //   git diff --stat <base> HEAD -- src/sim/eastbrook_layout.ts src/render/eastbrook_civic_beacon.ts \
 //     src/render/eastbrook_town.ts src/render/mailbox.ts src/render/noticeboard.ts \
-//     src/render/renderer.ts src/render/prewarm_policy.ts public/models/props/mailbox_pillar.glb \
+//     src/render/renderer.ts src/render/entity_view_policy_core.ts \
+//     src/render/prewarm_policy.ts public/models/props/mailbox_pillar.glb \
 //     public/models/props/eastbrook_noticeboard.glb
 // If anything other than renderer.ts moved, or the renderer delta touches town rendering,
 // the captures themselves are stale and must be re-shot instead.
@@ -51,6 +52,7 @@ async function derive() {
     mailboxRuntimeSha256: await fileSha256(inputs.mailboxRuntime),
     noticeboardRuntimeSha256: await fileSha256(inputs.noticeboardRuntime),
     rendererIntegrationSha256: await fileSha256(inputs.rendererIntegration),
+    entityViewPolicySha256: await fileSha256(inputs.entityViewPolicy),
     viewPriorityPolicySha256: await fileSha256(inputs.viewPriorityPolicy),
     mailboxSourceFingerprint: eastbrookMailboxSourceFingerprint(),
     mailboxGlbSha256: await fileSha256(inputs.mailboxGlb),

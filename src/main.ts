@@ -2,6 +2,7 @@
 // index.html and play.html both bootstrap through this module, so this one import
 // styles both game entries; admin/guide use their own entries and inline CSS.
 import './styles/index.css';
+import { captureFirstTouch, registerAttributionPayload } from './attribution';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
 import { afterActiveAnimationMs } from './game/active_animation_timer';
@@ -5158,6 +5159,10 @@ const REFERRAL_SLUG = (() => {
   return /^[a-z0-9][a-z0-9-]{0,63}$/.test(slug) ? slug : '';
 })();
 
+// First-touch attribution capture (fbclid/utm/landing/referrer), write-once at
+// load like the referral slug above; the register call sends it to the server.
+captureFirstTouch();
+
 // Password-reset token: a visitor who follows the emailed link arrives with
 // ?reset=<64-hex-token>. Read it once at load and validate the shape so a junk
 // param never opens the reset panel. Non-empty means "show the reset form".
@@ -9954,6 +9959,8 @@ function wireStartScreens(): void {
         }
       } else {
         const email = ($('#login-email') as unknown as HTMLInputElement).value.trim();
+        const optIn =
+          ($('#login-marketing') as unknown as HTMLInputElement | null)?.checked === true;
         const registered = await api.register(
           username,
           password,
@@ -9961,6 +9968,11 @@ function wireStartScreens(): void {
           token,
           REFERRAL_SLUG,
           nativeAttestation,
+          {
+            attribution: registerAttributionPayload(),
+            marketingOptIn: optIn,
+            locale: getLanguage(),
+          },
         );
         trackMetaPixel(
           'AccountCreated',
@@ -10036,6 +10048,10 @@ function wireStartScreens(): void {
     const emailField = $('#login-email-field') as HTMLElement;
     const emailInput = $('#login-email') as HTMLInputElement;
     emailField.hidden = isLogin;
+    // The marketing opt-in is register-only too; never required, so the
+    // wrapper's hidden is enough.
+    const marketingField = $('#login-marketing-field') as HTMLElement | null;
+    if (marketingField) marketingField.hidden = isLogin;
     if (isLogin) {
       emailInput.removeAttribute('required');
       emailInput.classList.remove('user-invalid-fallback');

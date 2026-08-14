@@ -62,6 +62,10 @@ describe('gate generate-once orchestration pins', () => {
     expect(pkg.scripts.build).toContain('wiki:content');
     expect(pkg.scripts.build).toContain('build:bundle');
     expect(pkg.scripts['build:bundle']).toContain('vite build');
+    // The CI manifest freshness diff proves the committed manifests only
+    // because build:bundle regenerates them first through the pregen
+    // orchestrator; dropping the call would leave the diff vacuously green.
+    expect(pkg.scripts['build:bundle']).toContain('build_bundle_pregen.mjs');
     expect(pkg.scripts['build:bundle']).not.toContain('i18n:gen');
     expect(pkg.scripts['build:bundle']).not.toContain('wiki:content');
 

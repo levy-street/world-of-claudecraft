@@ -52,7 +52,7 @@ const MONOLITHS: MonolithRow[] = [
     // stranded-light reparent and the registry prune into
     // src/render/fire_light_registry.ts (the ratchet's own rule: an extraction
     // lowers the ceiling, never raises it).
-    ceiling: 13708,
+    ceiling: 13700,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

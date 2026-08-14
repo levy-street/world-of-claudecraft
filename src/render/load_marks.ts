@@ -5,47 +5,11 @@
 
 const PREFIX = 'woc:load:';
 
-export function renderLoadSpan<T>(phase: string, fn: () => T): T {
-  try {
-    performance.mark(`${PREFIX}${phase}:start`);
-  } catch {
-    // Instrumentation must never break a scene build.
-  }
-  try {
-    return fn();
-  } finally {
-    try {
-      performance.mark(`${PREFIX}${phase}:end`);
-      performance.measure(`${PREFIX}${phase}`, `${PREFIX}${phase}:start`, `${PREFIX}${phase}:end`);
-    } catch {
-      // Best effort.
-    }
-  }
-}
-
 /** Record an already-elapsed segment (performance.now() timestamps) as a load span. */
 export function renderLoadMeasure(phase: string, startMs: number, endMs: number): void {
   try {
     performance.measure(`${PREFIX}${phase}`, { start: startMs, end: endMs });
   } catch {
     // Best effort (older engines without the options form just skip the span).
-  }
-}
-
-export async function renderLoadSpanAsync<T>(phase: string, fn: () => Promise<T>): Promise<T> {
-  try {
-    performance.mark(`${PREFIX}${phase}:start`);
-  } catch {
-    // Instrumentation must never break a scene build.
-  }
-  try {
-    return await fn();
-  } finally {
-    try {
-      performance.mark(`${PREFIX}${phase}:end`);
-      performance.measure(`${PREFIX}${phase}`, `${PREFIX}${phase}:start`, `${PREFIX}${phase}:end`);
-    } catch {
-      // Best effort.
-    }
   }
 }

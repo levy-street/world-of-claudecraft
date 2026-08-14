@@ -4,7 +4,9 @@
 // death/respawn site so the rule cannot drift.
 
 import { describe, expect, it } from 'vitest';
+import { CHEATER_MARK_AURA_ID } from '../src/sim/moderation';
 import {
+  aurasSurvivingCleanSlate,
   aurasSurvivingDeath,
   RES_SICKNESS_DURATION,
   RES_SICKNESS_MIN_DURATION,
@@ -143,6 +145,48 @@ describe('resurrection: aurasSurvivingDeath predicate', () => {
   it('does not mutate the input array (immutable filter)', () => {
     const auras = [aura(RESURRECTION_SICKNESS_ID), aura('rejuvenation')];
     aurasSurvivingDeath(auras);
+    expect(auras).toHaveLength(2);
+  });
+
+  it('keeps the operator-applied Cheater mark, so dying cannot serve a sanction', () => {
+    // The mark's aura IS its played-seconds countdown, so dropping it here would
+    // both end the sanction early and hand a marked player a one-keypress way out.
+    const auras = [aura('rejuvenation'), aura(CHEATER_MARK_AURA_ID), aura('blessing_of_might')];
+    const survivors = aurasSurvivingDeath(auras);
+    expect(survivors).toHaveLength(1);
+    expect(survivors[0].id).toBe(CHEATER_MARK_AURA_ID);
+  });
+});
+
+describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
+  it('keeps ONLY the Cheater mark, sicknesses included in the wipe', () => {
+    // Arena entry and a Fiesta down strip more than a death does: a normalized
+    // bout is decided by play, so even The Keeper's Toll goes. The sanction is
+    // not something the fighter walked in carrying, so it stays.
+    const auras = [
+      aura(RESURRECTION_SICKNESS_ID),
+      aura(UNSTUCK_SICKNESS_ID),
+      aura('rejuvenation'),
+      aura(CHEATER_MARK_AURA_ID),
+    ];
+    const survivors = aurasSurvivingCleanSlate(auras);
+    expect(survivors).toHaveLength(1);
+    expect(survivors[0].id).toBe(CHEATER_MARK_AURA_ID);
+  });
+
+  it('drops encounter-owned unbreakable control too (a clean slate is cleaner)', () => {
+    const scriptedStun = { ...aura('scripted_stun'), unbreakableControl: true } as const;
+    expect(aurasSurvivingCleanSlate([scriptedStun])).toEqual([]);
+  });
+
+  it('returns an empty list when nothing survives', () => {
+    expect(aurasSurvivingCleanSlate([aura('rejuvenation')])).toEqual([]);
+    expect(aurasSurvivingCleanSlate([])).toEqual([]);
+  });
+
+  it('does not mutate the input array (immutable filter)', () => {
+    const auras = [aura(CHEATER_MARK_AURA_ID), aura('rejuvenation')];
+    aurasSurvivingCleanSlate(auras);
     expect(auras).toHaveLength(2);
   });
 });

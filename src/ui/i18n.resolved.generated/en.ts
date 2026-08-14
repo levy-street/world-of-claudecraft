@@ -2463,7 +2463,8 @@ export const en: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "Level {level} {family}",
@@ -3965,6 +3966,12 @@ export const en: EnTranslations = {
       "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
       "entitlement_required": "Verified Seeker entitlement is required.",
       "current_ownership_required": "Current Seeker Genesis Token ownership is required."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {
@@ -6608,6 +6615,7 @@ export const en: EnTranslations = {
     "email": "Email",
     "emailPlaceholder": "you@example.com",
     "emailError": "Please enter a valid email address.",
+    "marketingOptIn": "Email me game news and updates (optional)",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "logIn": "Log In",
@@ -6708,6 +6716,19 @@ export const en: EnTranslations = {
     "style": "Style",
     "resetLook": "Reset Look",
     "resetShort": "Reset",
+    "shareTab": "Share",
+    "designCode": "Design code",
+    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
+    "copyCode": "Copy code",
+    "importCode": "Import",
+    "designCodeCopied": "Design code copied.",
+    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
+    "designCodeImported": "Design imported.",
+    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
+    "designCodeErrEmpty": "Paste a design code first.",
+    "designCodeErrHeader": "That does not look like a design code.",
+    "designCodeErrVersion": "That design code comes from a newer game version.",
+    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
     "browFlat": "Flat",
     "browArched": "Arched",
     "browThin": "Thin",
@@ -9090,6 +9111,7 @@ export const en: EnTranslations = {
       "filterSort": "Sort",
       "sortName": "Name (A-Z)",
       "sortPriceAsc": "Price: Low to High",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Swords",
       "weaponDagger": "Daggers",
       "weaponStaff": "Staves",
@@ -9120,6 +9142,8 @@ export const en: EnTranslations = {
       "quantity": "Quantity",
       "quantityOf": "of {count}",
       "priceEach": "Price each",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "List on the World Market",
       "minPriceError": "Name a price of at least 1 copper.",
       "collectEmpty": "Nothing waiting. Sale proceeds and expired listings collect here.",

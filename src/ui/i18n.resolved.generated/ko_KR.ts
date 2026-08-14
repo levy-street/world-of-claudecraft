@@ -2463,7 +2463,8 @@ export const ko_KR: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "자리비움"
+      "afkTag": "자리비움",
+      "cheaterTag": "< 부정행위자 >"
     },
     "mobTooltip": {
       "levelFamily": "{level}레벨 {family}",
@@ -3965,6 +3966,12 @@ export const ko_KR: EnTranslations = {
       "genesis_token_claimed": "해당 Seeker Genesis Token은 이미 등록되었습니다.",
       "entitlement_required": "인증된 Seeker 자격이 필요합니다.",
       "current_ownership_required": "현재 Seeker Genesis Token을 보유해야 합니다."
+    },
+    "cheater_mark": {
+      "admin_target": "운영자 계정에는 표식을 부여할 수 없습니다.",
+      "reason_required": "사유를 입력해야 합니다.",
+      "invalid_duration": "표식 기간은 최소 1초 이상이어야 합니다.",
+      "not_marked": "해당 계정에는 표식이 없습니다."
     }
   },
   "guide": {
@@ -6608,6 +6615,7 @@ export const ko_KR: EnTranslations = {
     "email": "이메일",
     "emailPlaceholder": "you@example.com",
     "emailError": "유효한 이메일 주소를 입력하세요.",
+    "marketingOptIn": "게임 소식 및 업데이트 이메일 받기 (선택 사항)",
     "showPassword": "비밀번호 표시",
     "hidePassword": "비밀번호 숨기기",
     "logIn": "로그인",
@@ -6708,6 +6716,19 @@ export const ko_KR: EnTranslations = {
     "style": "스타일",
     "resetLook": "외형 초기화",
     "resetShort": "초기화",
+    "shareTab": "공유",
+    "designCode": "디자인 코드",
+    "designCodeHint": "이 코드를 복사하면 이 모습을 저장하거나 공유할 수 있습니다. 코드를 여기에 붙여넣고 가져오면 불러올 수 있습니다.",
+    "copyCode": "코드 복사",
+    "importCode": "가져오기",
+    "designCodeCopied": "디자인 코드가 복사되었습니다.",
+    "designCodeCopyManual": "여기서는 자동 복사가 차단되어 있습니다. 코드가 선택되어 있으니 키보드로 복사하세요.",
+    "designCodeImported": "디자인을 가져왔습니다.",
+    "designCodeImportedPartial": "디자인을 가져왔습니다. 이 버전에서 인식할 수 없는 값은 건너뛰었습니다.",
+    "designCodeErrEmpty": "먼저 디자인 코드를 붙여넣으세요.",
+    "designCodeErrHeader": "디자인 코드가 아닌 것 같습니다.",
+    "designCodeErrVersion": "이 디자인 코드는 더 새로운 게임 버전의 것입니다.",
+    "designCodeErrMalformed": "이 디자인 코드는 손상되었습니다. 코드 전체를 복사한 뒤 다시 시도하세요.",
     "browFlat": "일자",
     "browArched": "아치",
     "browThin": "얇게",
@@ -9090,6 +9111,7 @@ export const ko_KR: EnTranslations = {
       "filterSort": "정렬",
       "sortName": "이름 (A-Z)",
       "sortPriceAsc": "가격: 낮은순",
+      "collapseLowest": "최저가만 표시",
       "weaponSword": "검",
       "weaponDagger": "단검",
       "weaponStaff": "지팡이",
@@ -9120,6 +9142,8 @@ export const ko_KR: EnTranslations = {
       "quantity": "수량",
       "quantityOf": "/ {count}",
       "priceEach": "개당 가격",
+      "lowestPriceLabel": "현재 최저 등록 가격",
+      "lowestPriceNone": "이 아이템은 현재 등록된 판매가 없습니다.",
       "listButton": "세계 시장에 등록",
       "minPriceError": "가격은 최소 1동화여야 합니다.",
       "collectEmpty": "기다리는 물건이 없습니다. 판매 대금과 만료된 등록품은 여기에서 받습니다.",

@@ -1027,6 +1027,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // move, so their hud/sim_i18n matchers are unchanged; scan them here so they stay
     // under the drift guard now that they live outside sim.ts.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/items.ts'), 'utf8'),
+    // #2837: pooled bag capacity (equip/unequip a bag item, the full-bags,
+    // full-sockets, and swap/remove-capacity refusals, plus the new
+    // bag-payload-refuses-not-strips guard). None of this file's emits were
+    // previously under the drift guard.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bags.ts'), 'utf8'),
     // L1: the loot-distribution layer's player-facing loot emits ("You loot ...",
     // "Everyone passed on ...", "<name> wins ...").
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/loot/loot_roll.ts'), 'utf8'),

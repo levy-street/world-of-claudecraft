@@ -7,7 +7,7 @@ export const RADIANT_RESONANCE_DAWN_CAST_TIME = 1.5;
 export const RADIANT_RESONANCE_DAWN_COST_MULTIPLIER = 0.5;
 
 // The two abilities Radiant Resonance empowers: Mending Light becomes instant
-// (consumeNextCastInstant) and Dawn's Embrace costs half and casts in 1.5 sec
+// (consumeNextCastInstantAura) and Dawn's Embrace costs half and casts in 1.5 sec
 // (nextCastCheapMultiplier / radiantResonanceCastTime).
 export const RADIANT_RESONANCE_CONSUMERS: ReadonlySet<string> = new Set([
   'holy_light',

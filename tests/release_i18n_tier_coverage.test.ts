@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { buildFullGateSteps, I18N_RELEASE_TIER_SUITES } from '../scripts/lib/gate_steps.mjs';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -33,7 +34,7 @@ const READS_TIER_FLAG = /process\.env\.I18N_RELEASE_TIER/;
 const SELF = 'release_i18n_tier_coverage.test.ts';
 
 function suitesReadingTierFlag(): string[] {
-  return tsFilesUnder(new URL('.', import.meta.url).pathname)
+  return tsFilesUnder(fileURLToPath(new URL('.', import.meta.url)))
     .filter((entry) => entry.file.endsWith('.test.ts') && !entry.file.endsWith(SELF))
     .filter((entry) => READS_TIER_FLAG.test(readFileSync(entry.full, 'utf8')))
     .map((entry) => `tests/${entry.file}`)

@@ -3699,6 +3699,13 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // that stat. Three buffs, one picture, on a bar where the player is choosing
   // between them. A cooked haunch on the food palette says which one it is.
   well_fed: r('food', 'ember', ['meat'], ['glow']),
+  // The operator-applied Cheater mark (src/sim/moderation/), keyed by AURA id like
+  // the rune buffs above. Without a row here the resolver fell through to the
+  // generic utility fallback, so a SANCTION wore a parchment/gold buff icon in the
+  // debuff bar and, being outside AURA_RECIPE_IDS, also missed the prewarm worker
+  // and composed synchronously on the frame path the first time anyone saw it.
+  // A blood brand-sigil watched by a bone eye: branded, and seen.
+  cheater_mark: r('shadow', 'blood', ['sigil_rune', { p: 'eye', ...BR, pal: 'bone' }], ['glow']),
   // Painted talent/modifier identities are not ABILITIES records, but their
   // runtime timers still need a meaningful synchronous layer while the WebP
   // decodes (and if it ever fails to load).

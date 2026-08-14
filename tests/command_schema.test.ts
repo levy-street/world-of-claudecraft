@@ -69,9 +69,13 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (the issue #3042 player item lock; the IWorld member is setItemLocked but
 // the wire token both surfaces carry is lock_item): both sides read 198/211
 // pre-merge, and the merged tree carries both extract_essence and lock_item.
+// The final v0.38.0 sync repeated it a FOURTH time with the release's market
+// price-reference pair (marketSellPriceCheck on IWorld): both sides read
+// 199/212 pre-merge, the constants auto-merged as identical, and the merged
+// tree carries both pairs; the numbers below were re-set from a suite run.
 
-const EXPECTED_SEND_COUNT = 199;
-const EXPECTED_DISPATCH_COUNT = 212;
+const EXPECTED_SEND_COUNT = 200;
+const EXPECTED_DISPATCH_COUNT = 213;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

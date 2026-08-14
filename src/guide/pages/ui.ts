@@ -17,17 +17,8 @@ export function pageHeader(titleKey: TranslationKey, leadKey?: TranslationKey): 
 export function lead(key: TranslationKey): string {
   return `<p class="guide-lead">${esc(t(key))}</p>`;
 }
-/** Lead paragraph from an already-localized string (e.g. a sim-sourced welcome line). */
-export function leadText(text: string): string {
-  return `<p class="guide-lead">${esc(text)}</p>`;
-}
-
 export function section(headingKey: TranslationKey, bodyHtml: string): string {
   return `<section class="guide-block"><h2>${esc(t(headingKey))}</h2>${bodyHtml}</section>`;
-}
-/** A block section whose heading is an already-localized string. */
-export function sectionText(heading: string, bodyHtml: string): string {
-  return `<section class="guide-block"><h2>${esc(heading)}</h2>${bodyHtml}</section>`;
 }
 /** The common "heading + one body paragraph" section, both from catalog keys. */
 export function sectionPair(headingKey: TranslationKey, bodyKey: TranslationKey): string {
@@ -49,10 +40,6 @@ export function paras(key: TranslationKey, values?: Parameters<typeof t>[1]): st
     .map((chunk) => `<p>${esc(chunk)}</p>`)
     .join('');
 }
-export function pText(text: string): string {
-  return `<p>${esc(text)}</p>`;
-}
-
 // An opt-in disclosure (theorycraft, spoilers, walkthroughs) with a neutral label.
 export function reveal(summaryKey: TranslationKey, innerHtml: string): string {
   return `<details class="guide-reveal"><summary>${esc(t(summaryKey))}</summary><div class="guide-reveal-body">${innerHtml}</div></details>`;
@@ -83,16 +70,6 @@ export function tag(label: string, cls = ''): string {
 /** Wrap pre-rendered tags/badges in an inline-flex row. */
 export function tagRow(inner: string): string {
   return `<div class="guide-tags">${inner}</div>`;
-}
-
-// --------------------------------------------------------------------- cards
-/** A title + body card from catalog keys (landing-style group card by default). */
-export function titleBodyCard(
-  titleKey: TranslationKey,
-  bodyKey: TranslationKey,
-  cls = 'guide-group-card',
-): string {
-  return `<div class="${esc(cls)}"><h3>${esc(t(titleKey))}</h3><p>${esc(t(bodyKey))}</p></div>`;
 }
 
 // ------------------------------------------------------------------ callouts

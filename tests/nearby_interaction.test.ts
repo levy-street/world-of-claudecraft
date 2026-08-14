@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
+import { ITEMS } from '../src/sim/data';
 import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -419,5 +420,59 @@ describe('tryNearbyInteraction unified corpse press', () => {
     const r = rig([wolfCorpse({ loot: null, harvestClaimedBy: 9 })]);
     expect(interact(r)).toBe(false);
     expect(r.calls).toEqual(['error:nothing']);
+  });
+});
+
+// The interact key must agree with what the viewer can actually see. A quest
+// collectable the player is not on the quest for is withheld from the scene
+// entirely (src/render/quest_object_gate_core.ts over the sim's ground-object
+// gate), so pressing Use near one must behave as if it were not there.
+describe('tryNearbyInteraction: off-quest collectables are not there', () => {
+  const SUPPLY_QUEST = (() => {
+    const id = ITEMS.supply_crate?.questId;
+    if (!id) throw new Error('expected supply_crate to name its quest');
+    return id;
+  })();
+  const crate = (x: number) =>
+    entity({
+      id: 2,
+      kind: 'object',
+      templateId: 'ground_supply_crate',
+      objectItemId: 'supply_crate',
+      lootable: true,
+      pos: { x, y: 0, z: 0 },
+    });
+  const active = (): QuestProgress => ({
+    questId: SUPPLY_QUEST,
+    counts: [0],
+    state: 'active',
+  });
+
+  it('never spends the press on a collectable the viewer cannot see', () => {
+    const r = rig([crate(1)]);
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it('picks up that same collectable once the quest is on the log', () => {
+    const r = rig([crate(1)]);
+    r.world.questLog.set(SUPPLY_QUEST, active());
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['pickup:2']);
+  });
+
+  it('lets a visible npc further away outrank a hidden collectable underfoot', () => {
+    const npc = entity({ id: 3, kind: 'npc', pos: { x: 2, y: 0, z: 0 } });
+    const r = rig([crate(1), npc]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['quest:3']);
+  });
+
+  it('still prefers the nearer collectable over that npc while the quest runs', () => {
+    const npc = entity({ id: 3, kind: 'npc', pos: { x: 2, y: 0, z: 0 } });
+    const r = rig([crate(1), npc]);
+    r.world.questLog.set(SUPPLY_QUEST, active());
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['pickup:2']);
   });
 });

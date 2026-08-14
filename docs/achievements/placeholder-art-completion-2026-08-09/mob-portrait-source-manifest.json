@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "b5854472cc975eb8ffe6509330de46f69c9e2d1a082a4b46c67959c5bfa2dc77",
+  "rendererFingerprint": "75b6fc1197cb08d94cefba99852816423dc29063e051b51fa090abb60966798d",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 3884556,
-      "sha256": "bf878c88cf5a726d730981f6c3bed4a2be12d9939143218a3c0d18bf10d5e1ef",
+      "bytes": 3884412,
+      "sha256": "4f678d17223a6a20914e9a1b812f70d4296dcb8e35a7bafe9ba6201219aad567",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -2769,7 +2769,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.07,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -2781,7 +2781,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8c5f8738f47b14d6552cae1dee2f65e73e948467835d4723f3f2ce7f416af6fb",
+      "sourceFingerprint": "567650aac78238ad2cab1193fe4b46a530e663aec185e3ca66c730639c7d6994",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
         "bytes": 2830,
@@ -7298,7 +7298,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.2,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -7310,11 +7310,11 @@
         "resolved": "#9c640c",
         "strength": 0.12
       },
-      "sourceFingerprint": "d19ee3b2692349523e7ade48a684084ba842f30fb1c7a51507397787dc8a5030",
+      "sourceFingerprint": "820c237cca9f63dfd62ee7459dd0a9c220558db87ee0d0cd5cde52b78e231610",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
-        "bytes": 2564,
-        "sha256": "54329ab570e0a0dbde0530e22955cf1dc65be72907e8894de831b2c9a504acb2"
+        "bytes": 2560,
+        "sha256": "f9cd6552c6514dc9832fff101740cacc2c021dd978e3a1b120f484c07ba1640b"
       }
     },
     {
