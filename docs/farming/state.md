@@ -4,8 +4,27 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 7 (render and juice) done 2026-08-14; Phase 7 QA is
-next (docs/farming/phase-07-qa.md). Phase 6 QA done 2026-08-13 (merge
+Current phase: Phase 7 QA in flight 2026-08-14 (branch
+fix/farming-phase-07-qa); the FOURTEENTH absorb opened it (merge
+20e9b6a987 of tip 51aa4eab13: 98 commits, 225 files, roughly 60-file
+farming intersection, no lockfile move; the only conflicts were the
+generated pending.ts, regen-resolved, and the accepted-art registry row,
+re-pointed at the CLI-re-minted portrait manifest per the (al)
+checklist, which the auto-merge had reproduced byte-identically;
+4-lane release-merge-audit delivered: arms/endpoints CLEAN, bindings
+CLEAN, overlaps and premises FINDINGS, all healed in-branch. The
+release's cheater-mark growth put hud.ts and server/game.ts OVER their
+monolith ceilings on the merged tree; healed by extraction a3b5ea431b
+per the (an) policy: both HEAVY_SELF policy sets moved whole to
+server/heavy_self.ts and the castDisplayName mapper with its rift key
+table to src/ui/cast_display_name.ts, membership pins in
+tests/server/heavy_self.test.ts, ceilings untouched. gate_select gained
+the manifest-freshness family this absorb; see the validation matrix
+note. Count pins re-run live and unchanged: command_schema 201/214,
+delta keys 87, IWorld 328 = 88 data + 240 method, facets 34; golden
+f017045f unchanged; tsc clean). Phase 7 (render and juice) done
+2026-08-14; Phase 7 QA runbook is docs/farming/phase-07-qa.md.
+Phase 6 QA done 2026-08-13 (merge
 ae695397d1, twelfth absorb 1a5d6fd5b4 of tip b08d79ef91 inside it); the
 THIRTEENTH absorb opened Phase 7 (merge a0d8ddc127 of tip 6ee7f3fd27: 4
 commits, 8 files, one-file intersection at sim.ts, audit clean, no
@@ -439,6 +458,9 @@ question does not arise (farming has no station).
   `scripts/sfx/sfx_prompts.mjs` + `npm run sfx:ui` (deterministic placeholder) +
   `sfx:manifest` + `sfx:check`; the completeness guard in `tests/game_audio.test.ts`
   fails a key with no file. Placeholder rows are marked for the sound engineer.
+  Since the fourteenth absorb the gate also freshness-diffs the SFX manifest,
+  the runtime pack, and the gain-ceiling cache (the manifest-freshness family
+  in the validation matrix): commit all of them fresh in the same change.
 - Countdowns: the daily-rewards window owns the live-countdown pattern (dedicated
   interval, `[data-...]` rebind, `formatDateTime` absolutes, t() token mm:ss). Copy it;
   never hand-build a clock string with a literal colon.
@@ -464,7 +486,17 @@ question does not arise (farming has no station).
 - Phase end: `node scripts/gate_select.mjs` (the fast pre-merge gate);
   `npm run gate` for the deep check. Known environmental red: the armory browser
   pixel test; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker, never trust a piped exit code, and PR CI
-  is the arbiter.
+  is the arbiter. Since the fourteenth absorb (PR 3386) the gate carries a
+  MANIFEST-FRESHNESS family: it regenerates and diffs
+  src/game/sfx_manifest.generated.ts, src/guide/content.generated.ts, and
+  src/render/assets/manifest.generated.ts plus
+  public/audio/sfx/runtime-pack.json and
+  scripts/sfx/sfx_gain_ceiling.generated.json, and reds at the "manifest
+  freshness" step if any regen differs from the committed bytes; a
+  committed-manifest edit now classifies into its own family and feeds
+  vitest related instead of forcing the full-suite fallback, so the old
+  "the fallback caught it" catch-path no longer exists for those five
+  files: commit them fresh in the same change, always.
 
 ## Key planned files (working names; a phase may refine with a note here)
 
@@ -1010,7 +1042,10 @@ question does not arise (farming has no station).
   its own fire_light_registry extraction, leaving renderer.ts at EXACTLY
   its ceiling (see the phase-07 sync note), and reworked CI selection
   plumbing without changing scripts/gate_select.mjs semantics or its FAIL
-  markers. Release-merge-audit lane: CLEAN on all five hazard axes.
+  markers (true of THAT absorb only: the FOURTEENTH absorb DID change
+  selection semantics with the manifest-freshness family; see the
+  validation matrix note). Release-merge-audit lane: CLEAN on all five
+  hazard axes.
   GUARD EXTENSIONS (commit 719d701d66): (1) the item art audit's expected
   block now pins pendingArtCount (39) beside the ART-SUBJECT liveItemCount,
   so a standalone audit run reds when the debt grows even though the
@@ -1058,10 +1093,17 @@ question does not arise (farming has no station).
   plus the fplot row builder moved whole to server/farming_commands.ts (the
   case labels stay in dispatchMessage for the command-schema scan; the
   snapshots delta-key scrape gained the extracted emitter as a second
-  source). STANDING WARNING for phases 7 to 13: the merged tree sits at
-  NEAR-ZERO headroom under these ceilings (hud.ts 4 lines, server/game.ts 2,
-  sim.ts 82), so every future phase touching a ratcheted coordinator works
-  extraction-first: land the new logic as a sibling module from the start.
+  source). STANDING WARNING for phases 7 to 13: coordinator headroom is
+  absorb-eroded, and release growth alone can break a ceiling (the
+  FOURTEENTH absorb put hud.ts and server/game.ts OVER ceiling with no
+  farming change at all; healed by extraction a3b5ea431b: both
+  HEAVY_SELF policy sets moved whole to server/heavy_self.ts and the
+  castDisplayName mapper with its rift key table to
+  src/ui/cast_display_name.ts). Post-heal headroom 2026-08-14: hud.ts
+  31 lines (19459/19490), server/game.ts 118 (10782/10900), sim.ts 15
+  (12645/12660), renderer.ts 21 (13679/13700). Every future phase
+  touching a ratcheted coordinator works extraction-first: land the new
+  logic as a sibling module from the start.
   Ceiling raises stay a maintainer decision. The ceilings were deliberately
   NOT lowered after these extractions (the root CLAUDE.md lower-after-
   extraction rule): the values are the release's own mints and the

@@ -102,7 +102,10 @@ bullets (never a planning doc to read); never run a teammate in plan mode.
   on the existing path; a NEW golden sting cue: UI_CUES key, facade method in
   src/game/audio.ts (widen the UiCue union if the family nests), the hud case, a prompt
   row in scripts/sfx/sfx_prompts.mjs, placeholder clip via npm run sfx:ui, then
-  npm run sfx:manifest and npm run sfx:check; the English t() rows in the matching
+  npm run sfx:manifest and npm run sfx:check (since the fourteenth absorb the
+  gate's manifest-freshness step diffs the SFX manifest, the runtime pack, and
+  the gain-ceiling cache against a fresh regen: commit all of them in the same
+  change, see the state.md validation matrix); the English t() rows in the matching
   src/ui/i18n.catalog/ module. Tests: the tests/game_audio.test.ts completeness arm.
 - Agent C, the deeds (content plus i18n): per D13 and docs/design/deeds.md, all
   append-only, cosmetic, ZERO rng: a first-planting deed; a first-harvest chronicle per
