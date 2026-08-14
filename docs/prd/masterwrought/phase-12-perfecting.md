@@ -84,6 +84,11 @@ Agent 1 (sim module + tests):
   - The not_perfected-before-wrong_slot deny order is deliberate and pinned (the
     refusal is slot-stable while the slot is provisional); it becomes player-visible
     when the Infusion goes live, so revisit the deny copy then.
+  - Dispatch the migration-safety reviewer in the phase that first WRITES perfected
+    to characters.state (phase 10 verified the round-trip is safe by construction:
+    cloneItemInstancePayload is a field-agnostic spread and the instance load bound
+    is drop-only, so the marker survives an older binary; the reviewer pass still
+    belongs beside the minting and the wire decision).
 - tests/perfecting.test.ts: attempt lifecycle, binding on first attempt, fail-forward
   (the piece is never harmed on failure), rank math, budget delta exactness
   (formula-derived), save/load round-trip.

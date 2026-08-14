@@ -3238,7 +3238,11 @@ applied in the fix round or recorded below.
   and battleground deaths (classic-era fidelity: flasks persisted through
   battleground deaths; Protect Yumi likewise does not wipe); the arena and
   fiesta FULL wipes (e.auras = []) clear flasks deliberately, as instanced
-  minigame resets. Flasks are SESSION state: they do NOT survive logout,
+  minigame resets. WIDENING recorded by the QA gate: the rule actually
+  keys on every aurasSurvivingDeath call site, which includes the delve
+  EJECT (ejectToDelveDoor, not a death); a flask deliberately rides
+  through it, correct and consistent, and both call-site comments now
+  say so. Flasks are SESSION state: they do NOT survive logout,
   reconnect, or realm restart (auras are not in CharacterState). Persisting
   flask auras would be the packet's first persisted aura state, a schema
   decision deliberately deferred; the tooltip states the honest scope.
@@ -3335,6 +3339,21 @@ applied in the fix round or recorded below.
    guard's universal refusal makes moving it free until minting begins).
 4. The not_perfected-before-wrong_slot visibility tradeoff becomes
    player-visible when the Infusion goes live; revisit the deny copy then.
+5. Dispatch migration-safety when perfected minting lands: the marker
+   starts being WRITTEN to characters.state JSONB then (today the clone
+   is field-agnostic and the load bound drop-only, verified, so the
+   round-trip is safe by construction; the reviewer pass belongs beside
+   the wire decision).
+
+### Phase 14 residuals (copy and presentation carries)
+- The station log line now reads "You set up Master's Field Forge."
+  (article dropped to stop "the The Laden Hearth"); a name-aware article
+  or per-item article field is phase 14 copy polish.
+- A flask and the elixir it outranks share the aura_buff_<kind> buff-bar
+  glyph (deliberate family join); Well Fed got its own recipe, the flask
+  could too at phase 14.
+- The consumable tray 6-item truncation with 6 kinds competing; the
+  picker's Perfected-arm empty-list message (phase 12 when live).
 
 ### Review round record
 - architecture: 0 blocking / 3 should-fix / 5 notes; parity: 0 critical /
