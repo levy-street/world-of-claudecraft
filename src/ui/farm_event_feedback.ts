@@ -9,6 +9,7 @@
 // showSelfNote / showError are public and structurally satisfy the
 // interface), so tests drive this module with a recording host instead.
 
+import { audio } from '../game/audio';
 import { FARM_COMPOST_ITEM_ID, FARM_WITHERED_HUSK_ITEM_ID } from '../sim/professions/farming';
 import type { SimEvent } from '../sim/types';
 import {
@@ -46,9 +47,13 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       // A crop went into a bed (Farming, the growth-engine phase). The
       // event is text-free and id-carrying, so the pure core resolves
       // which item the line names (the crop's seed, the one it consumed)
-      // and the crop-drift fallback with it. No cue: the plant cast has no
-      // recorded sound yet and the render / juice phase owns that, so a
-      // borrowed one would have to be undone.
+      // and the crop-drift fallback with it. The cue is a PLACEHOLDER (the
+      // procedural soil scrape in scripts/sfx/ui_sfx.mjs) rather than a
+      // borrowed recording, so the sound engineer's real take drops into the
+      // same key and nothing here changes. The audio facade is imported
+      // directly, the src/ui precedent: routing it through FarmFeedbackHost
+      // would push new members into hud.ts, which has no ceiling headroom.
+      audio.farmPlant();
       host.log(
         t('hudChrome.farming.plantLine', {
           name: grantItemToken(farmPlantedTokenId(ev.cropId)),
@@ -64,6 +69,10 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       // twin takes a second line for the same reason a Pristine specimen
       // does: it is a different item granted BESIDE the plain produce, so
       // one line would read as the same yield reported twice.
+      // One cue for the whole event, fired ONCE up front: the fine twin and
+      // the seed-back are extra LINES of the same harvest, never extra
+      // harvests, so layering a second cue on them would double the sound.
+      audio.farmHarvest();
       host.log(
         t(farmHarvestLineKey(ev.count), {
           name: grantItemToken(ev.itemId),
@@ -115,6 +124,11 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       // the no-cost-miss register (gotAwayLine): a withered crop costs the
       // seed and the wait, never the bed, and the line says so plainly
       // rather than dressing a failure as a yield.
+      // The SAME harvest cue as the arm above on purpose: the player took the
+      // identical action and it resolved, only unluckily. A distinct
+      // disappointment sting is a later phase's call, not a silent arm here
+      // (silence would read as an input that never registered).
+      audio.farmHarvest();
       host.log(
         t(farmWitheredLineKey(ev.count), {
           name: grantItemToken(FARM_WITHERED_HUSK_ITEM_ID),
@@ -162,7 +176,9 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       // sides of the trade AS ITEM TOKENS: the husks spent and the
       // compost gained, each through grantItemToken so neither can drift
       // from its localized item name. Same grant green as the harvest
-      // line; no cue (the render / juice phase owns farming audio).
+      // line. Still no cue after the render / juice phase: the trade is a
+      // menu conversion, not a world action, so it stays in the same silent
+      // register as the refusals rather than borrowing the harvest sound.
       host.log(
         t(farmHusksConvertedLineKey(ev.compost), {
           husksName: grantItemToken(FARM_WITHERED_HUSK_ITEM_ID),

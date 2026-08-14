@@ -30,6 +30,11 @@ const MASTER_GAINS_DB = {
   // Craft-family cast-start placeholder (Craft Cast System Phase 6): soft
   // workbench wind-up, distinct from the per-family completion cues.
   ui_craft_cast: 0,
+  // Farming PLACEHOLDER pair (the render / juice phase): the plant action and
+  // the harvest result. Unity gain like the other stand-ins, so a real
+  // recording can drop in without a mix re-balance.
+  ui_farm_plant: 0,
+  ui_farm_harvest: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -156,6 +161,25 @@ export const UI_SFX_SPECS = [
     tone(220, 0, 0.2, 0.14, { wave: 'triangle', endFrequency: 160 }),
     tone(330, 0.04, 0.22, 0.08, { wave: 'triangle', endFrequency: 240 }),
     noise('brown', 0, 0.18, 0.06, { lowpass: 700 }),
+  ]),
+  // Farming PLACEHOLDER (the render / juice phase), for the sound engineer:
+  // a deterministic synth stand-in for the seed going into the bed. Low
+  // filtered noise is the soil scrape and the sinking triangle is the tamp
+  // that closes it, the same vocabulary as ui_gather_cast's woody wind-up.
+  // Swap for a real recording when one lands, exactly as the gather-strike,
+  // rarity and fishing placeholders were swapped before it.
+  cue('ui_farm_plant', 0.5, 'Soft earthy soil scrape and tamp as a seed is planted.', [
+    noise('brown', 0, 0.26, 0.11, { lowpass: 420 }),
+    tone(150, 0.12, 0.22, 0.13, { wave: 'triangle', endFrequency: 110 }),
+  ]),
+  // Farming PLACEHOLDER (the render / juice phase), for the sound engineer:
+  // the harvest twin of the row above. A short bright noise burst is the leaf
+  // rustle, the triangle body is the pluck itself, and the rising tail is the
+  // small "got it" lift the reward cues share. Swap for a real recording.
+  cue('ui_farm_harvest', 0.6, 'Leafy pluck and rustle with a short satisfying upward tail.', [
+    noise('white', 0, 0.18, 0.05, { highpass: 2200, lowpass: 7000 }),
+    tone(420, 0.02, 0.16, 0.12, { wave: 'triangle' }),
+    tone(620, 0.16, 0.3, 0.1, { wave: 'triangle', endFrequency: 880 }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

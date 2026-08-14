@@ -81,6 +81,8 @@ describe('sampled GameAudio facade', () => {
       ['cardReveal', 'ui_card_reveal'],
       ['cardRoundPush', 'ui_card_round_push'],
       ['cardShuffle', 'ui_card_shuffle'],
+      ['farmPlant', 'ui_farm_plant'],
+      ['farmHarvest', 'ui_farm_harvest'],
     ] as const;
 
     for (const [method, key] of routes) {
@@ -126,6 +128,9 @@ describe('sampled GameAudio facade', () => {
       'fishCast',
       'fishReel',
       'craftCast',
+      // The farming RESULT half. Its plant twin is on the ungated arm below,
+      // which is the whole point of the split.
+      'farmHarvest',
     ] as const;
     for (const m of feedback) audio[m]();
     // The parameterized gather/rarity/craft/enchanting cues gate the same way;
@@ -148,12 +153,14 @@ describe('sampled GameAudio facade', () => {
     audio.duelCountdownTick();
     audio.fiestaWave();
     audio.fishBite();
+    audio.farmPlant();
     expect(sfxMock.playUi.mock.calls.map(([k]) => k)).toEqual([
       'ui_click',
       'ui_bag_open',
       'ui_duel_countdown',
       'ui_fiesta_wave',
       'ui_fish_bite',
+      'ui_farm_plant',
     ]);
 
     // Re-enabling restores the feedback cues.
@@ -290,17 +297,20 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 16 unique UI cues to the authoritative studio inventory', () => {
+  it('adds 18 unique UI cues to the authoritative studio inventory', () => {
     // 14 pre-12b cues plus the Phase 12b gathering-rhythm placeholder
     // (ui_gather_cast) plus the Craft Cast System Phase 6 craft-family
-    // cast-start placeholder (ui_craft_cast). ui_gather_strike/rare and
+    // cast-start placeholder (ui_craft_cast) plus the Farming render/juice
+    // pair (ui_farm_plant, ui_farm_harvest). ui_gather_strike/rare and
     // ui_fish_cast/bite/reel were retired once real per-node-type /
     // rarity-tier / fishing recordings replaced them (src/game/audio.ts).
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(16);
+    expect(keys).toHaveLength(18);
     expect(keys).toContain('ui_craft_cast');
+    expect(keys).toContain('ui_farm_plant');
+    expect(keys).toContain('ui_farm_harvest');
     expect(new Set(keys).size).toBe(keys.length);
     expect(keys.every((key: string) => key.startsWith('ui_'))).toBe(true);
     expect(UI_SFX_CATALOG.every((cue: { generator: string }) => cue.generator === 'ffmpeg')).toBe(

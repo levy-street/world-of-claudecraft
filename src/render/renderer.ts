@@ -14,15 +14,8 @@ import {
   battlegroundOrigin,
   CAMPS,
   CLASSES,
-  DELVE_MODULE_Z_START,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
-  defaultDelveModules,
-  delveAt,
-  delveModuleStackEndRelZ,
-  delveModuleZOffset,
-  delveOrigin,
-  delveSlotAt,
   dungeonAt,
   INSTANCE_SLOT_COUNT,
   ITEM_SETS,
@@ -39,7 +32,6 @@ import {
   ZONES,
   zoneAt,
 } from '../sim/data';
-import type { DelveModuleId } from '../sim/delve_layout';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, isMechWearer, type SimEvent } from '../sim/types';
@@ -219,7 +211,11 @@ import {
   warmDuskGrade,
 } from './day_night_core';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
-import { buildDelveModule } from './delve_interiors';
+import {
+  type DelveInteriorCtx,
+  ensureDelveInteriorsNear,
+  prebuildDelveInteriors,
+} from './delve_interior_scheduler';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
@@ -261,6 +257,7 @@ import {
   FOGLESS_DETAIL_FAR,
   horizonHazePlan,
 } from './far_terrain_core';
+import { buildFarmPatchProps, type FarmBedSeat, FarmPatchVisuals } from './farm_patches';
 import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
@@ -320,7 +317,6 @@ import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
-import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
@@ -1907,6 +1903,10 @@ export class Renderer {
   private abyssalRiftFx!: AbyssalRiftFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
+  // The viewer's OWN farm plots. Seats are sampled once with the static beds;
+  // the visuals wait for the Vfx, which is built later in the same lifecycle.
+  private farmBedSeats: ReadonlyMap<string, FarmBedSeat> = new Map();
+  private farmPatchVisuals: FarmPatchVisuals | null = null;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
   private paladinConsecrationVisuals!: PaladinConsecrationVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = {
@@ -2683,6 +2683,14 @@ export class Renderer {
     this.flames.push(...stationProps.flames);
     // After the mass hide above, so these adopt individually.
     for (const light of stationProps.fireLights) this.fireLightAdopter.adopt(light);
+
+    // The garden beds and compost bins: static world furniture EVERY viewer
+    // sees, whatever they have planted (the per-viewer crops mount later).
+    const farmPatchProps = buildFarmPatchProps(this.sim.cfg.seed, this.sim.farmPatches);
+    setRenderCategory(farmPatchProps.group, 'props');
+    this.scene.add(farmPatchProps.group);
+    freezeStaticMatrices(farmPatchProps.group);
+    this.farmBedSeats = farmPatchProps.seats;
     bd('stations');
 
     // Town streetlamps: world-spanning dressing, so it is built here with the
@@ -3034,6 +3042,7 @@ export class Renderer {
     this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
+    this.farmPatchVisuals = new FarmPatchVisuals(this.scene, this.farmBedSeats, this.vfx);
     this.underwaterView = new UnderwaterView(this.lowGfx);
     this.scene.add(this.underwaterView.group);
     this.abilityVfxFx = new AbilityVfxFx(
@@ -5034,6 +5043,10 @@ export class Renderer {
     if (this.riftDeathZoneVisuals) {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
+    }
+    if (this.farmPatchVisuals) {
+      this.farmPatchVisuals.sync(this.sim, dt);
+      this.farmPatchVisuals.update(dt);
     }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
@@ -8138,7 +8151,7 @@ export class Renderer {
         break;
       }
       case 'delveEntered':
-        this.prebuildDelveInteriors(ev.delveId);
+        prebuildDelveInteriors(this.delveInteriors, ev.delveId);
         break;
       case 'fishingBite': {
         // Personal bite signal (Professions 2.0): only the angler's
@@ -8225,6 +8238,14 @@ export class Renderer {
         }
         break;
       }
+      // The farm flourishes. These arrive on the viewer's own pid-scoped
+      // channel, so there is nothing to filter: the module turns each one into
+      // a puff or a sparkle over the bed it names.
+      case 'farmPlanted':
+      case 'farmHarvested':
+      case 'farmWithered':
+        this.farmPatchVisuals?.onFarmEvent(ev, this.sim.playerId);
+        break;
     }
   }
 
@@ -9286,6 +9307,14 @@ export class Renderer {
   // Delve module interiors build asynchronously; track in-flight keys so a
   // per-frame ensureDelveInteriorsNear does not re-schedule a build mid-load.
   private pendingInteriors = new Set<string>();
+  // Held once, not rebuilt per call: the near-check runs every frame inside a
+  // delve band, so a fresh literal there would allocate on the per-frame path.
+  private readonly delveInteriors: DelveInteriorCtx = {
+    dungeons: () => this.ensureDungeons(),
+    built: this.builtInteriors,
+    pending: this.pendingInteriors,
+    run: () => this.sim.delveRun,
+  };
   // Re-applied rift fog is keyed by the floor descriptor (seed:floorIndex) so a
   // descent (same 'rift' fogState, different palette) still refreshes the fog.
   private riftFogKey: string | null = null;
@@ -9557,68 +9586,6 @@ export class Renderer {
       : (this.scene.fog as THREE.Fog).far;
   }
 
-  private scheduleDelveModuleBuild(
-    key: string,
-    moduleId: DelveModuleId,
-    ox: number,
-    oz: number,
-  ): void {
-    if (this.builtInteriors.has(key) || this.pendingInteriors.has(key)) return;
-    this.pendingInteriors.add(key);
-    void buildDelveModule(this.ensureDungeons(), moduleId, ox, oz)
-      .then(() => {
-        this.builtInteriors.add(key);
-        this.pendingInteriors.delete(key);
-      })
-      .catch((err) => {
-        this.pendingInteriors.delete(key);
-        if (import.meta.env?.DEV) {
-          console.warn('Failed to build delve interior:', moduleId, 'at', ox, oz, err);
-        }
-      });
-  }
-
-  /** Build every module in a delve run at its stacked z offset (parallel async). */
-  private buildAllDelveModules(
-    delveId: string,
-    slot: number,
-    origin: { x: number; z: number },
-    modules: readonly DelveModuleId[],
-  ): void {
-    void ensureDelveInteriorKit().catch(() => undefined);
-    for (let mi = 0; mi < modules.length; mi++) {
-      const moduleId = modules[mi];
-      const key = `delve:${delveId}:${slot}:${moduleId}`;
-      if (this.builtInteriors.has(key) || this.pendingInteriors.has(key)) continue;
-      const zOff = delveModuleZOffset(modules, mi);
-      this.scheduleDelveModuleBuild(key, moduleId, origin.x, origin.z + zOff);
-    }
-  }
-
-  /** Prebuild the full module stack when a delve run starts (offline + online). */
-  private prebuildDelveInteriors(delveId: string): void {
-    const run = this.sim.delveRun;
-    if (!run || run.delveId !== delveId || !run.modules.length) return;
-    this.buildAllDelveModules(delveId, run.slot, run.origin, run.modules as DelveModuleId[]);
-  }
-
-  private ensureDelveInteriorsNear(px: number, pz: number): void {
-    const delve = delveAt(px);
-    if (!delve) return;
-    const run = this.sim.delveRun;
-    const modules = (
-      run?.delveId === delve.id && run.modules.length ? run.modules : defaultDelveModules(delve.id)
-    ) as DelveModuleId[];
-    const slot = run?.delveId === delve.id ? run.slot : delveSlotAt(delve.index, pz, modules);
-    const origin = run?.delveId === delve.id ? run.origin : delveOrigin(delve.index, slot);
-    // Slot origins are 500u apart on z; nearest-slot heuristics mis-pick slot 1+
-    // once the player advances past module 1 (interiors build at the wrong oz).
-    if (Math.abs(px - origin.x) >= 120) return;
-    const stackEndZ = origin.z + delveModuleStackEndRelZ(modules);
-    if (pz < origin.z + DELVE_MODULE_Z_START - 30 || pz > stackEndZ) return;
-    this.buildAllDelveModules(delve.id, slot, origin, modules);
-  }
-
   // Which futuristic sky this practice bout flies: hashed off the match id so it
   // feels random and stays stable for the whole bout (a new bout, a new sky).
   private practiceSkyVariant(): number {
@@ -9715,7 +9682,7 @@ export class Renderer {
     setBiomeHazeGrade(this.dnGrade.fog);
     setBiomeHazeCamera(this.camera.position.x, this.camera.position.z);
     if (isDelvePos(px) && !inPractice) {
-      this.ensureDelveInteriorsNear(px, pz);
+      ensureDelveInteriorsNear(this.delveInteriors, px, pz);
     } else if (inside && isYumiMazePos(px)) {
       // build the Protect Yumi maze copy the player was matched into; the
       // update() call each frame lives in sync() (beacon anchors)
@@ -12420,6 +12387,10 @@ export class Renderer {
     if (this.riftDeathZoneVisuals) {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
+    }
+    if (this.farmPatchVisuals) {
+      this.farmPatchVisuals.sync(this.sim, dt);
+      this.farmPatchVisuals.update(dt);
     }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);

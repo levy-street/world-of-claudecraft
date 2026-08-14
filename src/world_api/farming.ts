@@ -1,11 +1,18 @@
 import type { FarmPatchDef } from '../sim/content/farm_patches';
 import type {
+  FarmGrowthStage,
   FarmPlantKnobs,
   FarmPlotStatus,
   FarmPlotView,
 } from '../sim/professions/farm_projection';
 
-export type { FarmPatchDef, FarmPlantKnobs, FarmPlotStatus, FarmPlotView };
+// The stage TYPE travels with the view types. The farmGrowthStage FUNCTION
+// deliberately does not: this seam imports src/sim for types only (pinned by
+// tests/architecture.test.ts), so a value re-export here would drag the engine
+// into the seam. A render consumer imports the function from
+// src/sim/professions/farm_projection directly, which the pure-core contract
+// expressly allows.
+export type { FarmGrowthStage, FarmPatchDef, FarmPlantKnobs, FarmPlotStatus, FarmPlotView };
 
 // Farming, the fifth gathering profession: the static garden-bed geography
 // plus the caller's OWN plot state, and the commands that mutate it (plant,
@@ -35,10 +42,20 @@ export interface IWorldFarming {
   // AUTHORITY'S own lockoutNowMs base (epoch ms online, sim-clock ms on the
   // offline and headless hosts). A consumer must never subtract a clock the
   // authority did not use, so no render/ui code may do readyAtMs minus
-  // Date.now; rely on `status`, or wait for the growth phase's derived
-  // duration field (the RaidLockout msRemaining template), which lands with
-  // the first timer surface.
+  // Date.now; rely on `status`, or read this world's own clock through
+  // farmNowMs() below, which is the derived-duration surface the contract
+  // deferred to the first timer consumer.
   myFarmPlots: readonly FarmPlotView[];
+  // This world's OWN authority clock base, read fresh per call: the
+  // RaidLockout-template timer read the CLOCK-BASE CONTRACT above deferred to
+  // the first timer surface, which is this phase's growth-stage fractions.
+  // The Sim returns its sim-clock lockoutNowMs and ClientWorld returns
+  // Date.now (the same clock raidLockouts already subtracts, and the base the
+  // live server writes its farm timestamps in), so a consumer pairing this
+  // with myFarmPlots derives stage and wetness fractions without ever mixing
+  // clock bases. Purely COSMETIC: the authoritative facts about a plot remain
+  // `status` and the farm SimEvents, never a fraction derived here.
+  farmNowMs(): number;
   // Sow `cropId` into the garden bed `bedId`, with the optional plant-time
   // knob payload (compost, farmer's watch, growth tonic: every choice is
   // front-loaded at plant time per D8, so the knobs ride THIS call and there

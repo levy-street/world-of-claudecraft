@@ -9031,6 +9031,124 @@ export const TARGETS = [
       return { clip: '#mobile-extra-controls' };
     },
   },
+  {
+    key: 'farm-patches',
+    label: 'Farming hub garden beds with per-viewer growth stages (Eastbrook patch)',
+    when: ['render/farm_patches', 'assets/farm_props', 'content/farm_patches'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+        // Stand in the middle of the Eastbrook patch (beds at x 16/21, z 30/35,
+        // walkable by the no-collider ruling) so beds frame the player whichever
+        // way the camera faces.
+        player.pos.x = 18.5;
+        player.pos.z = 32.5;
+        sim.addItem?.('garden_hoe', 1);
+        sim.addItem?.('vale_wheat_seed', 4);
+        sim.addItem?.('brook_carrot_seed', 4);
+        // The patch sits in Forest Wolf territory and a hit interrupts the
+        // plant cast, so shove every nearby hostile far away before staging.
+        const ents = sim.entities?.values?.();
+        if (ents) {
+          for (const e of ents) {
+            if (!e?.hostile || !e.pos) continue;
+            const dx = e.pos.x - player.pos.x;
+            const dz = e.pos.z - player.pos.z;
+            if (dx * dx + dz * dz < 60 * 60) {
+              e.pos.x += 500;
+              e.pos.z += 500;
+            }
+          }
+        }
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Plant the four beds ONE AT A TIME: plantCrop starts a real cast, so a
+      // second plant while the first is casting refuses with "You are busy".
+      // Poll for the plot row to exist (cast complete) before the next plant,
+      // and retry a bed whose cast got interrupted. On the base build the
+      // plots still plant sim-side but no bed or crop renders, which is the
+      // honest BEFORE at identical framing.
+      const PLANTS = [
+        ['bed_eastbrook_1', 'vale_wheat'],
+        ['bed_eastbrook_2', 'brook_carrot'],
+        ['bed_eastbrook_3', 'vale_wheat'],
+        ['bed_eastbrook_4', 'brook_carrot'],
+      ];
+      for (const [bedId, cropId] of PLANTS) {
+        let planted = false;
+        for (let attempt = 0; attempt < 4 && !planted; attempt++) {
+          await page.evaluate(
+            (bed, crop) => window.__game?.sim?.plantCrop?.(bed, crop),
+            bedId,
+            cropId,
+          );
+          for (let i = 0; i < 10; i++) {
+            planted = await page.evaluate((bed) => {
+              const sim = window.__game?.sim;
+              return !!sim?.players?.get?.(sim?.playerId)?.farmPlots?.get?.(bed);
+            }, bedId);
+            if (planted) break;
+            await wait(400);
+          }
+        }
+      }
+      // Spread the timers so one frame shows the whole ladder: sprout,
+      // seedling, maturing, ready. Direct PlotState edits are the offline
+      // shot idiom (the skill-toast target mutates player meta the same
+      // way); the adapter re-reads on its uniform cadence.
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const plots = sim?.players?.get?.(sim?.playerId)?.farmPlots;
+        const now = sim?.farmNowMs?.();
+        if (!plots?.get || typeof now !== 'number') return;
+        const shape = (bedId, elapsedMs, totalMs) => {
+          const p = plots.get(bedId);
+          if (!p) return;
+          p.plantedAtMs = now - elapsedMs;
+          p.readyAtMs = p.plantedAtMs + totalMs;
+        };
+        shape('bed_eastbrook_1', 5_000, 100_000);
+        shape('bed_eastbrook_2', 40_000, 100_000);
+        shape('bed_eastbrook_3', 75_000, 100_000);
+        shape('bed_eastbrook_4', 200_000, 100_000);
+      });
+      // Give the adapter's 0.5s read cadence and the deferred farm GLBs time
+      // to land; keep dismissing overlays right up to the shot.
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      return { clip: '#ui' };
+    },
+  },
 ];
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and

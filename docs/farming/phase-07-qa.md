@@ -6,6 +6,32 @@ change on screen for the owning player and ONLY the owning player (the per-viewe
 D3), and nothing in the render or SFX wiring violated the fairness, purity, or
 generated-file invariants. The audit runs on the real dev client, not just the suites.
 
+PHASE 7 OUTCOME AMENDMENT (2026-08-14, read before auditing; the full record
+is progress.md Phase 7 and state.md deviations (ap) through (ax)):
+- Judge the phase against the recorded deviations, not the packet sketch:
+  farmNowMs on the facet ((ap), the maintainer read this QA should
+  re-argue), the farmGrowthStage move + direct core import ((ar)), the
+  farm_props/ exporter path ((as)), pad/collider NEITHER ((at)),
+  render-side families/tints ((au)), the eager import + 0.5s uniform read
+  cadence ((av)), the delve_interior_scheduler extraction and the 13700
+  ceiling ((aw)), and the SFX choices incl. farmWithered sharing the
+  harvest cue ((ax)). The asset-budget acceptance line is the DELTA bar
+  ((aq)), never the literal green.
+- Adapter API as landed: FarmPatchVisuals.sync(world, dt) and
+  onFarmEvent(ev, viewerPid). Any doc or test snippet showing
+  sync(plots, nowMs) is stale.
+- DEFERRALS OWED TO THIS QA, from the phase's review round (all ledgered in
+  progress.md Notes): the instanced-prop helper extraction (rule-of-three
+  is MET across stations/gather_nodes/farm_patches), cloneMaterialWithHooks
+  on the GLB material clones, synthetic coverage of the GLB-loaded adapter
+  branch (the committed suites exercise the box-fallback path only), a
+  two-tier BUILT fairness arm for the bed half (the committed arms are
+  scans plus a stage-walk), and the releaseGltf residency note.
+- Also verify on the live client: the offline-reload regrow asymmetry the
+  parity review named (faithful to the re-anchor semantics, first visible
+  this phase) renders sanely, and the wet-band darkening reads on the LOW
+  preset.
+
 ### QA Starter Prompt
 
 ```

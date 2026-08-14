@@ -433,7 +433,8 @@ stamina budgets, prot mastery, Litany, elixirs, masterwork), while the heal
 ladders above stood still: a top heal restored 6.5-8% of a buffed tank pool
 against a classic-era reference of 15-25%. The fix keeps leveling untouched and
 lands entirely at the cap, alongside the heal-side Spell Power doubling
-(`HEALING_SP_SCALE`, 1 healing per point of Intellect) and tank crit immunity:
+(`HEALING_SP_SCALE`, 1 healing per point of Intellect) and tank crit immunity
+(from hostile creatures only; players and their pets always keep their crits):
 
 - Ladders whose top rank was already learned AT 20 are revalued in place
   (endgame-only by construction): heal R2 335-390, renew R3 205/15s,

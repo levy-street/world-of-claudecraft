@@ -508,6 +508,55 @@ jobs:
       - name: Check out repository
         if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         uses: actions/checkout@v6
+        with:
+          # Blobless sparse checkout (the sparse-checkout input implies
+          # filter=blob:none in actions/checkout): docs/screenshots is
+          # 794 MB of committed PR evidence the test jobs never read except
+          # the referenced subtrees below, and the measured checkout pathology
+          # (run 31741012359: lane A spent 11m21s fetching before an 8m25s
+          # test step) scales with the blob payload. Non-cone patterns,
+          # last match wins: everything in, screenshot DIRECTORIES out (the
+          # trailing slash leaves root-level files in), every subtree the
+          # repo actually references back in. The list is DERIVED and
+          # COUPLED: tests/ci_workflow.test.ts rescrapes every tracked file
+          # outside docs/screenshots (enumerated from the git index, so new
+          # directories join the corpus automatically) and requires SET
+          # EQUALITY with this list, so a reference this cone omits, or a
+          # cone entry nothing references anymore, fails the pin in the same
+          # change. pr-checks, browser-gate, release-checks, and
+          # release-version-gate deliberately keep the full tree.
+          sparse-checkout: |
+            /*
+            !/docs/screenshots/*/
+            /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/class-skin-color-wash/
+            /docs/screenshots/eastbrook-grand-armoury/
+            /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/far-foliage-impostors/
+            /docs/screenshots/farming/
+            /docs/screenshots/farming-phase-01/
+            /docs/screenshots/farming-phase-05/
+            /docs/screenshots/farming-phase-07/
+            /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/guild-bank-member-readonly/
+            /docs/screenshots/guild-bank-tab/
+            /docs/screenshots/guild-social-v1/
+            /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/mobile-mount-quick-summon/
+            /docs/screenshots/placeholder-art-completion-2026-08-09/
+            /docs/screenshots/prof-tool-effects/
+            /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/raw-fish-cooking-reagents/
+            /docs/screenshots/release-v036-skill-normalization-2026-08-10/
+            /docs/screenshots/rift-floor-timer-hud/
+            /docs/screenshots/wiki-v036-refresh/
+            /docs/screenshots/wiki-v036-round2/
+            /docs/screenshots/wildheart/
+            /docs/screenshots/wildheart_hit_stagger/
+          sparse-checkout-cone-mode: false
+          # Explicit for the reader; the sparse-checkout input
+          # already implies it (matching the changes job's step).
+          filter: blob:none
 
       - name: Set up pnpm
         if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
@@ -683,6 +732,42 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          # Same blobless sparse cone as pr-gate's checkout (rationale and
+          # the reader coupling live there); pinned identical by
+          # tests/ci_workflow.test.ts.
+          sparse-checkout: |
+            /*
+            !/docs/screenshots/*/
+            /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/class-skin-color-wash/
+            /docs/screenshots/eastbrook-grand-armoury/
+            /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/far-foliage-impostors/
+            /docs/screenshots/farming/
+            /docs/screenshots/farming-phase-01/
+            /docs/screenshots/farming-phase-05/
+            /docs/screenshots/farming-phase-07/
+            /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/guild-bank-member-readonly/
+            /docs/screenshots/guild-bank-tab/
+            /docs/screenshots/guild-social-v1/
+            /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/mobile-mount-quick-summon/
+            /docs/screenshots/placeholder-art-completion-2026-08-09/
+            /docs/screenshots/prof-tool-effects/
+            /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/raw-fish-cooking-reagents/
+            /docs/screenshots/release-v036-skill-normalization-2026-08-10/
+            /docs/screenshots/rift-floor-timer-hud/
+            /docs/screenshots/wiki-v036-refresh/
+            /docs/screenshots/wiki-v036-round2/
+            /docs/screenshots/wildheart/
+            /docs/screenshots/wildheart_hit_stagger/
+          sparse-checkout-cone-mode: false
+          # Explicit for the reader; the sparse-checkout input
+          # already implies it (matching the changes job's step).
+          filter: blob:none
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -750,6 +835,42 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          # Same blobless sparse cone as pr-gate's checkout (rationale and
+          # the reader coupling live there); pinned identical by
+          # tests/ci_workflow.test.ts.
+          sparse-checkout: |
+            /*
+            !/docs/screenshots/*/
+            /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/class-skin-color-wash/
+            /docs/screenshots/eastbrook-grand-armoury/
+            /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/far-foliage-impostors/
+            /docs/screenshots/farming/
+            /docs/screenshots/farming-phase-01/
+            /docs/screenshots/farming-phase-05/
+            /docs/screenshots/farming-phase-07/
+            /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/guild-bank-member-readonly/
+            /docs/screenshots/guild-bank-tab/
+            /docs/screenshots/guild-social-v1/
+            /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/mobile-mount-quick-summon/
+            /docs/screenshots/placeholder-art-completion-2026-08-09/
+            /docs/screenshots/prof-tool-effects/
+            /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/raw-fish-cooking-reagents/
+            /docs/screenshots/release-v036-skill-normalization-2026-08-10/
+            /docs/screenshots/rift-floor-timer-hud/
+            /docs/screenshots/wiki-v036-refresh/
+            /docs/screenshots/wiki-v036-round2/
+            /docs/screenshots/wildheart/
+            /docs/screenshots/wildheart_hit_stagger/
+          sparse-checkout-cone-mode: false
+          # Explicit for the reader; the sparse-checkout input
+          # already implies it (matching the changes job's step).
+          filter: blob:none
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -958,6 +1079,42 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          # Same blobless sparse cone as pr-gate's checkout (rationale and
+          # the reader coupling live there); pinned identical by
+          # tests/ci_workflow.test.ts.
+          sparse-checkout: |
+            /*
+            !/docs/screenshots/*/
+            /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/class-skin-color-wash/
+            /docs/screenshots/eastbrook-grand-armoury/
+            /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/far-foliage-impostors/
+            /docs/screenshots/farming/
+            /docs/screenshots/farming-phase-01/
+            /docs/screenshots/farming-phase-05/
+            /docs/screenshots/farming-phase-07/
+            /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/guild-bank-member-readonly/
+            /docs/screenshots/guild-bank-tab/
+            /docs/screenshots/guild-social-v1/
+            /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/mobile-mount-quick-summon/
+            /docs/screenshots/placeholder-art-completion-2026-08-09/
+            /docs/screenshots/prof-tool-effects/
+            /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/raw-fish-cooking-reagents/
+            /docs/screenshots/release-v036-skill-normalization-2026-08-10/
+            /docs/screenshots/rift-floor-timer-hud/
+            /docs/screenshots/wiki-v036-refresh/
+            /docs/screenshots/wiki-v036-round2/
+            /docs/screenshots/wildheart/
+            /docs/screenshots/wildheart_hit_stagger/
+          sparse-checkout-cone-mode: false
+          # Explicit for the reader; the sparse-checkout input
+          # already implies it (matching the changes job's step).
+          filter: blob:none
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -1022,6 +1179,41 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          # Same blobless sparse cone as pr-gate's checkout (rationale and
+          # the reader coupling live there): the release-tier i18n suites
+          # read locale sources and docs/i18n prose, none of it under
+          # docs/screenshots; pinned identical by tests/ci_workflow.test.ts.
+          sparse-checkout: |
+            /*
+            !/docs/screenshots/*/
+            /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/class-skin-color-wash/
+            /docs/screenshots/eastbrook-grand-armoury/
+            /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/far-foliage-impostors/
+            /docs/screenshots/farming/
+            /docs/screenshots/farming-phase-01/
+            /docs/screenshots/farming-phase-05/
+            /docs/screenshots/farming-phase-07/
+            /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/guild-bank-member-readonly/
+            /docs/screenshots/guild-bank-tab/
+            /docs/screenshots/guild-social-v1/
+            /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/mobile-mount-quick-summon/
+            /docs/screenshots/placeholder-art-completion-2026-08-09/
+            /docs/screenshots/prof-tool-effects/
+            /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/raw-fish-cooking-reagents/
+            /docs/screenshots/release-v036-skill-normalization-2026-08-10/
+            /docs/screenshots/rift-floor-timer-hud/
+            /docs/screenshots/wiki-v036-refresh/
+            /docs/screenshots/wiki-v036-round2/
+            /docs/screenshots/wildheart/
+            /docs/screenshots/wildheart_hit_stagger/
+          sparse-checkout-cone-mode: false
+          filter: blob:none
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4

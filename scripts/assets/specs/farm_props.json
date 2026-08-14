@@ -1,0 +1,94 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/farm_props/farm_bed.glb",
+      "out": "models/props/farm_bed.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_sprout.glb",
+      "out": "models/props/farm_sprout.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_grain_stage2.glb",
+      "out": "models/props/farm_grain_stage2.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_rootleaf_stage2.glb",
+      "out": "models/props/farm_rootleaf_stage2.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_gourd_stage2.glb",
+      "out": "models/props/farm_gourd_stage2.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_grain_stage3.glb",
+      "out": "models/props/farm_grain_stage3.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_rootleaf_stage3.glb",
+      "out": "models/props/farm_rootleaf_stage3.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_gourd_stage3.glb",
+      "out": "models/props/farm_gourd_stage3.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_grain_stage4.glb",
+      "out": "models/props/farm_grain_stage4.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_rootleaf_stage4.glb",
+      "out": "models/props/farm_rootleaf_stage4.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_gourd_stage4.glb",
+      "out": "models/props/farm_gourd_stage4.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_grain_withered.glb",
+      "out": "models/props/farm_grain_withered.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_rootleaf_withered.glb",
+      "out": "models/props/farm_rootleaf_withered.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_gourd_withered.glb",
+      "out": "models/props/farm_gourd_withered.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_compost_bin.glb",
+      "out": "models/props/farm_compost_bin.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

@@ -19,7 +19,7 @@
 | Phase 6 (economy hooks) | done | 2026-08-09 | 2026-08-09 |
 | Phase 6b (release sync, v0.38.0 at authoring) | done | 2026-08-13 | 2026-08-13 |
 | Phase 6 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-13 | 2026-08-13 |
-| Phase 7 (render and juice) | not started | | |
+| Phase 7 (render and juice) | DONE 2026-08-14 | fix/farming-phase-07-render-and-juice (merge hash in the Phase 7 notes tail) | 0 BLOCKING across three domain reviews plus qa-checklist; 7 SHOULD-FIX fixed in-phase |
 | Phase 7 QA | not started | | |
 | Phase 8 (Harvest Journal) | not started | | |
 | Phase 8 QA | not started | | |
@@ -1246,7 +1246,115 @@ suite: the diff touches src/guide/content.generated.ts and a shared
 test helper the planner classifies as broad.)
 
 ### Phase 7
-(not started)
+Status: DONE 2026-08-14, local-only per D22. Branch
+fix/farming-phase-07-render-and-juice off feature/farming-plan; thirteenth
+absorb first (merge a0d8ddc127 of release/v0.38.0 tip 6ee7f3fd27: 4 commits,
+8 files, one-file intersection at src/sim/sim.ts, release-merge-audit clean
+on all axes, no lockfile move, (al) checklist byte-identical). Three-agent
+fan-out (assets / render+VFX / SFX) delivered 3/3 first try with zero
+report-less deaths; three domain reviews (frontend-seam, architecture,
+cross-platform-sync) found 0 BLOCKING and 5 SHOULD-FIX, all five fixed
+in-phase plus two adopted notes (the pid guard and two doc/diagnostic
+one-liners).
+
+Acceptance criteria, with states:
+- [x] The exporter exists and exports deterministically (two optimizer runs
+      byte-identical, checked IN the exporter per the noticeboard archetype).
+      REFINEMENT: it lives at scripts/assets/farm_props/export_farm_props.mjs
+      (the live per-asset subdirectory convention), not the packet's flat
+      scripts/assets/build_farm_props.mjs; deviation (as).
+- [x] The parsed-GLB contract test with source-fingerprint pins:
+      tests/farm_props_asset.test.ts, including the live fingerprint
+      recompute, the GLB extras stamp, and the exporter-to-renderer node-name
+      cross-pin.
+- [x] Bed base 3.0 by 2.0 yards with a low wooden border. The four biome
+      tints ship RENDER-SIDE (FARM_BIOME_PALETTES in farm_patches_core.ts,
+      one neutral GLB + per-patch instance tint); deviation (au).
+- [x] Growth stages as specified: shared stage-one sprout; per-family stage
+      two; per-family stages three and four with crop identity via the
+      CropAccent tint channel; withered variant per family; compost bin.
+      Families are grain / rootleaf / gourd, mapped render-side with an
+      exhaustiveness pin over FARM_CROP_IDS; deviation (au).
+- [x] Every asset documents footprint and pivot in FARM_PROP_CONTRACTS
+      (model.js, deep-frozen, JSON-shaped for the Phase 13 manifest) and
+      stamps the contract row into the GLB extras.
+- [x] src/render/farm_patches.ts reads IWorldFarming only (plus the two
+      sanctioned pure-function/content imports the architecture scan's
+      types-only world_api pin forces; deviation (ar)); beds render for
+      everyone; MY plots drive stage meshes from farmGrowthStage over the
+      projection plus the new farmNowMs clock read (deviation (ap));
+      wet-soil tint banded from planted-at recency; withered from the
+      authority status; signature-guarded rebuilds keyed on
+      bedId/cropId/stageMesh/wetBand/status; zero steady-state allocation
+      with a uniform 0.5s read cadence plus event-driven resync; pure logic
+      registered in RENDER_PURE_CORES with its own Node suite
+      (tests/farm_patches_core.test.ts) plus an adapter suite
+      (tests/farm_patches_adapter.test.ts).
+- [x] Ground-pad and collider decision: NEITHER (deviation (at)), stated in
+      the farm_patches.ts banner, this phase file, and state.md.
+- [x] Plant, harvest, and wither VFX fire on the Phase 3 events through the
+      shared vfx.ts emitters (scaledCount IS the tier shed); beds and stages
+      shed nowhere (pinned in tests/professions_graphics_fairness.test.ts,
+      profile-free scans plus a behavioral stage-walk arm).
+- [x] farm_plant and farm_harvest wired end to end, PLACEHOLDER-marked;
+      sfx:check and tests/game_audio.test.ts pass (catalog pins re-recorded
+      16 to 18 and 265 to 267).
+- [~] npm run asset:budget: AMENDED, deviation (aq). The repo-wide budget is
+      pre-existing RED (the image-to-glb skill says never claim it passed).
+      The honest bar held: models/props moved exactly +174,844 bytes (the 15
+      farm assets, 4,948 triangles), no other group moved a byte, and no
+      group that was under its budget crossed.
+- [x] tsc, the contract test, architecture, the named render suites,
+      ci:changed (exit 0), and gate_select green; golden md5 f017045f
+      unchanged throughout.
+- [x] Before/after screenshots, desktop and mobile, LOW preset, committed
+      under docs/screenshots/farming-phase-07/ (before-desktop, before-mobile,
+      after-desktop, after-mobile) via a new farm-patches entry in
+      scripts/pr_shot_targets.mjs. The AFTER shows all four Eastbrook beds
+      planted across the stage ladder plus the compost bin; the BEFORE is the
+      identical framing on the phase-start commit (plants land sim-side,
+      nothing renders).
+
+Notes (surprises, deviations, deferrals with reasons):
+- The Explore step's renderer extraction candidate was MIS-MEASURED: the
+  method-gap heuristic attributed prewarmInitialScene's ~1700 lines to
+  diagnosticsBaselineForPrewarm (really 21 lines). The substituted
+  extraction is the delve interior scheduler (62 cohesive lines to
+  src/render/delve_interior_scheduler.ts, commit 74d29effe1), ceiling
+  lowered 13708 to 13700, renderer.ts finished at 13679. Lesson: gap-based
+  span estimates lump in whatever follows; verify with a body read before
+  planning an extraction around one.
+- farmNowMs (deviation (ap)) is the phase's one facet addition and the
+  packet's stopping-rule question answered in the design's own words: the
+  facet comment and the farm_projection header both anticipated a
+  RaidLockout-template timer read landing with the first timer surface,
+  which the stage fractions are. Maintainer read owed.
+- The plant cast burned two capture runs: plantCrop casts, so back-to-back
+  plants refuse with "You are busy", and Forest Wolves interrupt the cast
+  mid-sequence. The shot target seq-plants with per-bed retries and shoves
+  nearby hostiles 500 yd first.
+- npm run sfx:ui defaults to a PATH ffmpeg that does not exist on this box;
+  node scripts/gen_ui_sfx.mjs --ffmpeg node_modules/ffmpeg-static/ffmpeg is
+  the working form (the gate resolves the bundled binary itself).
+- Deferrals, all with owners: instanced-prop helper extraction (rule-of-three
+  is now MET across stations/gather_nodes/farm_patches; Phase 7 QA or 13),
+  cloneMaterialWithHooks on the GLB material clones (QA),
+  GLB-loaded-branch synthetic coverage in the adapter suite (QA), two-tier
+  built fairness arm for the bed half (QA), releaseGltf residency note (QA),
+  /dev GUI row for farmgrow (re-deferred to Phase 8: it is a dev-only UI
+  surface and Phase 8 is the UI phase), nameplate raw-id cast label
+  (pre-existing cross-profession class gap, Phase 13 polish), the stale
+  guide gatherIntro/gatherDeeds farming prose (still true until go-live;
+  reword in Phase 9 with its M16 fills), harvest confirm channel ((ah)/(af)
+  unchanged, Phase 8 decision).
+- Parity reviewer observation worth keeping: offline reload visibly regrows
+  a crop (the load-path re-anchor preserves duration, so the sprout restart
+  is FAITHFUL to authoritative state, first made visible this phase).
+
+Gate record: run 1 on the frozen committed tree, judged by log markers per
+the standing rule. See the Notes above for validation detail; suites
+1,078/1,080 green in the targeted battery (2 pre-existing skips), ci:changed
+exit 0 with warnings only.
 
 ### Phase 8
 (not started)

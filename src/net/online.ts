@@ -1747,6 +1747,14 @@ export class ClientWorld implements IWorld {
   // here: the authority owns it, and the hidden pre-rolled outcome slots that
   // decide a crop's fate never cross the wire at all.
   myFarmPlots: readonly FarmPlotView[] = [];
+  // The clock base the plot timestamps above were written in. Date.now is
+  // correct here for the riftEventMsRemaining reason: the server computes farm
+  // timestamps through ctx.lockoutNowMs(), which IS real Date.now() on the
+  // live server, the same clock raidLockouts() already subtracts against.
+  // Read fresh per call so a growth stage advances between snapshots.
+  farmNowMs(): number {
+    return Date.now();
+  }
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};

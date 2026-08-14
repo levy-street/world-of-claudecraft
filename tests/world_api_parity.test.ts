@@ -455,6 +455,9 @@ export const IWORLD_MEMBERS = [
   { name: 'plantCrop', kind: 'method' },
   { name: 'harvestCrop', kind: 'method' },
   { name: 'convertHusks', kind: 'method' },
+  // The render phase's clock read: each world returns its OWN lockoutNowMs
+  // base, so a growth-stage fraction never mixes clock bases.
+  { name: 'farmNowMs', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -609,7 +612,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (IWorldFarming, data), leaving 324. Farming's growth phase adds the two
     // plot mutations, plantCrop and harvestCrop (IWorldFarming, methods),
     // leaving 326. Farming's knobs phase adds the husk conversion,
-    // convertHusks (IWorldFarming, a method), leaving 327.
+    // convertHusks (IWorldFarming, a method), leaving 327. Farming's render
+    // phase adds the clock read farmNowMs (IWorldFarming, a method), leaving
+    // 328.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -619,9 +624,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(327);
+    expect(IWORLD_MEMBERS.length).toBe(328);
     expect(DATA_MEMBERS.length).toBe(88);
-    expect(METHOD_MEMBERS.length).toBe(239);
+    expect(METHOD_MEMBERS.length).toBe(240);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -747,6 +752,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipItemToSlot',
       'equipment',
       'equipmentInstances',
+      'farmNowMs',
       'farmPatches',
       'feedPet',
       'forfeitCardDuel',
@@ -1136,6 +1142,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipBag',
       'equipItem',
       'equipItemToSlot',
+      'farmNowMs',
       'feedPet',
       'forfeitCardDuel',
       'friendAdd',
@@ -1842,6 +1849,7 @@ const FACET_FARMING = [
   'plantCrop',
   'harvestCrop',
   'convertHusks',
+  'farmNowMs',
 ] as const satisfies readonly (keyof IWorldFarming)[];
 type _ExhaustFarming = AssertNever<Exclude<keyof IWorldFarming, (typeof FACET_FARMING)[number]>>;
 
@@ -1917,8 +1925,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(327);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(327);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(328);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(328);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

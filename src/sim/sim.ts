@@ -7999,9 +7999,10 @@ export class Sim {
       this.rng.range(mob.weapon.min, mob.weapon.max) +
       (this.effectiveAttackPower(mob) / 14) * mob.weapon.speed;
     // Tank crit immunity: the 5% roll is still DRAWN (stream position), a
-    // committed tank just never suffers it (combat/tank_crit_immunity.ts).
+    // committed tank just never suffers it from a HOSTILE creature; a player
+    // pet sharing this swing shell keeps its crit (combat/tank_crit_immunity.ts).
     const critRoll = this.rng.chance(0.05);
-    const crit = critRoll && !isCritImmuneTank(target, this.players.get(target.id));
+    const crit = critRoll && !isCritImmuneTank(mob, target, this.players.get(target.id));
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
@@ -12489,6 +12490,13 @@ export class Sim {
 
   get myFarmPlots(): readonly FarmPlotView[] {
     return this.farmPlotsFor(this.primaryId);
+  }
+
+  // This world's own clock base for the farm timestamps above: the sim clock,
+  // the exact value projectFarmPlots was handed. Draws no rng and moves no
+  // tick order (a pure read of the same counter raidLockouts uses).
+  farmNowMs(): number {
+    return this.lockoutNowMs();
   }
 
   // Plant a crop in a garden bed, with the optional plant-time knob payload

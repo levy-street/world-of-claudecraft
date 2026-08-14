@@ -155,8 +155,11 @@ interface AttributionTargetFixture {
 // both parents move renderer.ts (the release's point-light seam, this branch's
 // moon-phase grade threading), so the merged tree mints a value matching
 // neither parent. No capture was retaken.
+// Re-minted for the farming phase 7 render wiring (farm patch adapter build,
+// delve interior scheduler extraction; renderer.ts edits only). No capture
+// was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3c28607bde322259909cfb57b86aa3e4e09e0b0cb9f2c195f8cc86901df4dbad';
+  '082cb9ab4cf8bc05d0323be8df66f774bb5c1a69f850d3ac7262e4c3ded8fbd4';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

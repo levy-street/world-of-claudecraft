@@ -40,6 +40,35 @@ landed, and RENDER_PURE_CORES gained five entries. The Explore step reads the
 current tree, so treat the 6b-era "renderer.ts was reworked" anchor as stale
 rather than authoritative.
 
+PHASE OUTCOME (2026-08-14, swept per the state.md rule; the full record is
+the progress.md Phase 7 section and state.md deviations (ap) through (ax)):
+- The facet DID gain one member, farmNowMs(): the stopping rule's
+  surface-before-widening case, resolved as the design's own anticipated
+  RaidLockout-template timer read (state.md (ap), maintainer read owed).
+  "No dedicated stage, wet, or withered facet read exists or is added"
+  HELD: stage, wet band, and withered are all derived locally.
+- The render core imports farmGrowthStage directly from the farm_projection
+  leaf: the architecture scan pins src/world_api as types-only over
+  src/sim, so a facet VALUE re-export is impossible ((ar)); the function
+  moved to farm_projection.ts verbatim.
+- The exporter is scripts/assets/farm_props/export_farm_props.mjs, not
+  build_farm_props.mjs ((as)); biome tints and crop families are
+  render-side ((au)); the bed pad/collider decision is NEITHER ((at)).
+- "npm run asset:budget green" is amended to the delta bar ((aq)): the
+  repo-wide budget is pre-existing red; the phase added exactly
+  +174,844 bytes, all in models/props.
+- The renderer headroom extraction is delve_interior_scheduler.ts, ceiling
+  13708 to 13700 ((aw)); the packet's named candidate was mis-measured.
+- Adapter API as landed (for anything quoting the packet's sketch):
+  FarmPatchVisuals.sync(world, dt) with a uniform 0.5s read cadence plus
+  event-driven resync, and onFarmEvent(ev, viewerPid) with a local pid
+  guard; there is no sync(plots, nowMs) form.
+- Visual verification artifacts: the exporter's contact sheets at
+  docs/screenshots/farming/assets/farm_props/solo-contact.png (all 15
+  props) and mounting-contact.png (stage meshes parented at the bed's
+  Socket_Soil, six combinations); in-world before/after captures at
+  docs/screenshots/farming-phase-07/ (LOW preset, desktop and mobile).
+
 ### Starter Prompt
 
 ```

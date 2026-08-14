@@ -236,6 +236,18 @@ same `[ci-shard]` audit lines as the shards. `release-gate` is deliberately not
 lane-split: `release/**` pushes keep the full suite in their 8 shards; a push to `main`
 or `dev-*` runs the PR tier, so it gets the shards-plus-lanes layout.
 
+**The sparse test-job checkout.** The five sparse CI test jobs (the pr-gate shards,
+both long-sims lanes, release-gate, release-i18n) check out a blobless non-cone sparse
+set: everything in, `docs/screenshots` DIRECTORIES out (root-level files stay), and
+every subtree the repo references back in. The re-include list is DERIVED, not
+curated: `tests/ci_workflow.test.ts` recomputes the referenced set over tests,
+scripts, src, and all of docs minus the screenshots tree itself (acceptance manifests
+carry evidence paths suites follow at runtime; a test-literal-only coupling shipped
+once and went red on exactly that), with existence taken from the git index because
+an excluded directory does not exist on disk under the cone being verified. A new
+reference to an un-coned subtree fails that pin in the same change. `pr-checks`,
+`browser-gate`, and `release-checks` deliberately keep the full tree.
+
 **Declared duration budgets.** `tests/suite_duration_budget.test.ts` is the anti-whale
 ratchet: it reads every DECLARED vitest timeout under `tests/` (all `.ts`/`.mjs`, so
 `.test.mjs` files and `vi.setConfig` allowances in imported helpers count too) through

@@ -736,10 +736,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // both parents move renderer.ts, so the composite mints a value matching neither
 // parent and this metadata authority sha follows the swept bytes. No capture was
 // retaken.
+// Re-minted for the farming phase 7 render wiring (farm patch adapter build,
+// delve interior scheduler extraction; renderer.ts edits only): the composite
+// follows renderer.ts and this metadata authority sha follows the swept
+// bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e91fe6c023cf53817f8ee19dae440c88769b1c3ee4d3c3b8d954ea725ad43175';
+  'bf3cb267e4a078d35a2ab50df0d4666d3586e31b19706a3d6a547533cb1af07d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '3c28607bde322259909cfb57b86aa3e4e09e0b0cb9f2c195f8cc86901df4dbad';
+  '082cb9ab4cf8bc05d0323be8df66f774bb5c1a69f850d3ac7262e4c3ded8fbd4';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1711,7 +1715,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('d0f558f0d7d972663fa78f5c12b06ecf85b5188cb3c58a548e207fe2c9e879be');
+      // Re-minted for the farming phase 7 render wiring (renderer.ts edits
+      // only), then this second-order performance seal follows the swept
+      // evidence bytes. No capture was retaken.
+    ).toBe('cfca3c02381541c3cf47d46fd5eed6f5ccaaa62f6eda25e2127f97da7dd64194');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
