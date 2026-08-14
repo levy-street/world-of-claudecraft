@@ -1229,7 +1229,21 @@ Audit of merge 1a26881d0b (the Phase 6 economy hooks diff, 61 files,
   "not started" against its own DONE block) and the stale
   material_hint_view test title.
 
-Gate record: pending below.
+Gate record: two runs, both on frozen committed trees. Run 1 (at
+d6b4b781e4) FAILED at the full-suite fallback with a SINGLE red:
+tests/item_art_audit_builder.test.ts's CLI round-trip arm timed out at
+the 20s repo default (21.4s under 12-worker contention, ~7s isolated;
+the arm execs the real CLI twice and its inner --verify-only already
+budgets 30s), with the other 38078 tests green. Healed as a7e4076839: a
+declared 60s allowance, verified by the release's
+suite_duration_budget ratchet in the same change (under both caps, no
+ledger row needed). Run 2 (at a7e4076839): "[gate:select] PASS: all 8
+steps green (vitest workers: 12)", full-suite fallback 38079 passed / 0
+failed / 2 expected fail / 112 skipped, browser batch 125/125, malware
+scan 0 high after priors, i18n freshness clean, farming_session golden
+md5 f017045f unchanged, tree clean. (Both runs fell back to the full
+suite: the diff touches src/guide/content.generated.ts and a shared
+test helper the planner classifies as broad.)
 
 ### Phase 7
 (not started)
