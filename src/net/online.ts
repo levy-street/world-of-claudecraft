@@ -1272,6 +1272,11 @@ const DESPAWN_GRACE_MIN_DIST_SQ = 70 * 70;
 // (and needs no clock at all in the decode path).
 const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
 
+// The one frozen empty craft set the mst mirror hands out (initial value and
+// every empty transition), so the empty case is identity-stable and
+// allocation-free exactly like the offline resolver's EMPTY_CRAFTS.
+const EMPTY_MST_CRAFTS: readonly string[] = Object.freeze([]);
+
 function blankEntity(id: number): Entity {
   return {
     id,
@@ -1810,7 +1815,7 @@ export class ClientWorld implements IWorld {
   // never predicted locally (net/ optimism rules), the delta lands after the
   // server accepts a placement, re-emits as players cross STATION_RADIUS,
   // and flips back to empty on expiry.
-  activeMobileStationCrafts: readonly string[] = [];
+  activeMobileStationCrafts: readonly string[] = EMPTY_MST_CRAFTS;
   // The raw joined `mst` scalar the array above was split from: the split
   // runs ONLY when this string changes, so steady-state snapshots never
   // re-allocate the array.
@@ -3698,11 +3703,13 @@ export class ClientWorld implements IWorld {
           this.activeMobileStationCraftsRaw = rawMst;
           // Frozen: the cached array is shared with every reader until the
           // raw string changes, so a consumer mutation would corrupt the
-          // mirror persistently (the offline Sim returns a fresh array per
-          // read and has no such exposure).
-          this.activeMobileStationCrafts = Object.freeze(
-            rawMst === null ? [] : rawMst.split(','),
-          ) as readonly string[];
+          // mirror persistently. The empty arm reuses the one shared frozen
+          // empty, and a malformed empty STRING (the shipped server sends
+          // null for the empty set, never '') decodes as empty rather than
+          // [''], the drop-malformed wire idiom.
+          this.activeMobileStationCrafts = rawMst
+            ? (Object.freeze(rawMst.split(',')) as readonly string[])
+            : EMPTY_MST_CRAFTS;
         }
       }
       // Commission order board (issue #1298): server-gated on the board

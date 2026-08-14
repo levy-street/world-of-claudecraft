@@ -157,15 +157,49 @@ export function placeMobileStationFromItem(
 }
 
 /**
+ * THE party-station walk, shared by the craft gate's party arm and the
+ * per-viewer set resolver so the two can never drift apart (the exact
+ * mismatch the set-valued readout was built to kill): visits every OTHER
+ * member's ACTIVE partyShared station within STATION_RADIUS of `pos`
+ * (squared-distance, the stations.ts isAtStation idiom). The self slot is
+ * skipped on purpose: an own station already satisfies the gate at ANY
+ * distance (the training precedent, crafting.ts), and an owner-only station
+ * must never leak through the party walk. The station-TYPE filter stays OUT
+ * of the walk deliberately: the gate layers it per craft below, while the
+ * resolver ships every qualifying craft and lets inRangeStationTypes apply
+ * the type dimension on the consumer side (pinned in
+ * tests/mobile_station_party.test.ts). Returns true as soon as `visit`
+ * does; `metas` is any pid-keyed lookup (the live ctx.players view in
+ * production).
+ */
+function eachPartyStationInRange(
+  party: { members: readonly number[] } | null,
+  selfPid: number,
+  metas: { get(pid: number): { mobileStation: MobileCraftingStation | null } | undefined },
+  pos: { x: number; z: number },
+  nowTick: number,
+  visit: (station: MobileCraftingStation) => boolean,
+): boolean {
+  if (!party) return false;
+  const radiusSq = STATION_RADIUS * STATION_RADIUS;
+  for (const memberPid of party.members) {
+    if (memberPid === selfPid) continue;
+    const station = metas.get(memberPid)?.mobileStation;
+    if (!station || !station.partyShared || !isStationActive(station, nowTick)) continue;
+    const dx = pos.x - station.pos.x;
+    const dz = pos.z - station.pos.z;
+    if (dx * dx + dz * dz > radiusSq) continue;
+    if (visit(station)) return true;
+  }
+  return false;
+}
+
+/**
  * The party arm of the crafting station gate (Masterwrought phase 09): true
  * while any OTHER member of `party` holds an ACTIVE partyShared mobile
- * station whose craft serves `type`, within STATION_RADIUS of `crafterPos`
- * (squared-distance, the stations.ts isAtStation idiom). The crafter's own
- * slot is skipped on purpose: their own station already satisfies the gate
- * at ANY distance (the training precedent, crafting.ts), and an owner-only
- * station must never leak through the party walk. Pure: `metas` is any
- * pid-keyed lookup (the live ctx.players view in production);
- * allocation-free, run per craft command, never per tick.
+ * station whose craft serves `type`, within STATION_RADIUS of `crafterPos`.
+ * A thin type-filtering consumer of the one shared walk above; run per
+ * craft command, never per tick.
  */
 export function partySharedStationSatisfies(
   party: { members: readonly number[] } | null,
@@ -175,18 +209,14 @@ export function partySharedStationSatisfies(
   type: StationType,
   nowTick: number,
 ): boolean {
-  if (!party) return false;
-  const radiusSq = STATION_RADIUS * STATION_RADIUS;
-  for (const memberPid of party.members) {
-    if (memberPid === crafterPid) continue;
-    const station = metas.get(memberPid)?.mobileStation;
-    if (!station || !station.partyShared || !isStationActive(station, nowTick)) continue;
-    if (stationTypeForCraft(station.craftId) !== type) continue;
-    const dx = crafterPos.x - station.pos.x;
-    const dz = crafterPos.z - station.pos.z;
-    if (dx * dx + dz * dz <= radiusSq) return true;
-  }
-  return false;
+  return eachPartyStationInRange(
+    party,
+    crafterPid,
+    metas,
+    crafterPos,
+    nowTick,
+    (station) => stationTypeForCraft(station.craftId) === type,
+  );
 }
 
 // Returned whenever no station serves the viewer: the common case on the
@@ -223,21 +253,18 @@ export function activeMobileStationCraftsForViewer(
   {
     const party = ctx.partyOf(pid);
     if (party) {
-      const radiusSq = STATION_RADIUS * STATION_RADIUS;
-      for (const memberPid of party.members) {
-        if (memberPid === pid) continue;
-        const station = ctx.players.get(memberPid)?.mobileStation;
-        if (!station || !station.partyShared || !isStationActive(station, ctx.tickCount)) continue;
-        const dx = viewer.pos.x - station.pos.x;
-        const dz = viewer.pos.z - station.pos.z;
-        if (dx * dx + dz * dz > radiusSq) continue;
+      eachPartyStationInRange(party, pid, ctx.players, viewer.pos, ctx.tickCount, (station) => {
         // Dedupe on insert: the own craft and a shared craft can be equal,
         // and two members can carry stations of one craft.
         if (!crafts) crafts = [station.craftId];
         else if (!crafts.includes(station.craftId)) crafts.push(station.craftId);
-      }
+        return false;
+      });
     }
   }
   if (!crafts) return EMPTY_CRAFTS;
-  return crafts.sort();
+  // Frozen like the ClientWorld mirror's split result, so the two IWorld
+  // implementations hand consumers the same array contract (a mutation
+  // throws in both worlds instead of succeeding offline only).
+  return Object.freeze((crafts as string[]).sort());
 }

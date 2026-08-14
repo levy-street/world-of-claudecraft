@@ -450,7 +450,13 @@ describe('activeMobileStationCraftsFor set arms', () => {
 
     // The gate is <=: exactly STATION_RADIUS away is still in the set.
     teleport(sim, a, FIELD.x + STATION_RADIUS, FIELD.z);
-    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['weaponcrafting']);
+    const atBoundary = sim.activeMobileStationCraftsFor(a);
+    expect(atBoundary).toEqual(['weaponcrafting']);
+    // The non-empty array is FROZEN like the ClientWorld mirror's split
+    // result (tests/snapshots.test.ts pins the online half), so both IWorld
+    // implementations hand consumers one array contract: a mutation throws
+    // in either world instead of succeeding offline only.
+    expect(Object.isFrozen(atBoundary)).toBe(true);
     teleport(sim, a, FIELD.x + STATION_RADIUS + 1, FIELD.z);
     // The empty case allocates nothing: the frozen module constant, returned
     // by identity on every empty resolve.
