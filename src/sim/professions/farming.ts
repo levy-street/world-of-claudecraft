@@ -72,6 +72,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Entity, FARMING_CAST_ID, INTERACT_RANGE, isConsuming } from '../types';
 import { type FarmPlantKnobs, farmPlotSurvived, type PlotState } from './farm_projection';
+import { notifyFarmReady } from './farm_ready';
 import { planWatchFee, type WatchFeeLeg } from './farm_watch_fee';
 import { queueGatheringGrant } from './gathering';
 import {
@@ -1008,18 +1009,28 @@ export function convertHusks(ctx: SimContext, p: Entity, meta: PlayerMeta): void
  *  position in the tick tail cannot fork the draw order (the updateProfNudges
  *  and updateDeeds precedent in the same tail).
  *
- *  It is a PLACEHOLDER, on purpose and by plan: the ready-notice phase fills
- *  the body with the 1 Hz sweep that turns a plot's `notified` flag into a
- *  personal, text-free ready event. Nothing else belongs here, because nothing
- *  else in farming is time-driven: growth is a pure comparison against an
- *  absolute deadline the projection makes for itself, so there is no timer to
- *  fire and no expiry work to do.
+ *  Its ONE job is the ready notice (the ready-notice phase filled the body the
+ *  growth phase reserved): announcing the plots that finished since the last
+ *  look, through the shared once-only predicate in farm_ready.ts. Nothing else
+ *  belongs here, because nothing else in farming is time-driven: growth is a
+ *  pure comparison against an absolute deadline the projection makes for
+ *  itself, so there is no timer to fire and no expiry work to do. In
+ *  particular NOTHING ROTS on this path (the anti-chore invariant): the sweep
+ *  reads state and flips one already-persisted flag, and can never change what
+ *  a plot pays.
  *
  *  The 1 Hz guard is INTERNAL (the guild_letter idiom) rather than a caller's
  *  concern, and it sits first so the 19 ticks in 20 that do nothing cost one
- *  modulo and allocate nothing. */
+ *  modulo and allocate nothing.
+ *
+ *  DELIBERATELY UNSHARDED: this shares the crowded % 20 === 0 residue with
+ *  the other per-second sweeps, and a synchronized planting burst lands its
+ *  notices on that same tick. The entity-id shard idiom (natures_fury.ts)
+ *  would spread both, but it moves WHICH tick each notice emits on and so
+ *  forks every parity golden; at the measured cost (sub-millisecond against
+ *  the 50 ms budget at realm scale, visible under the 'farming' perf lap)
+ *  the fork is not worth buying. Revisit only with tick-cost evidence. */
 export function updateFarming(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return;
-  // Intentionally empty until the ready-notice phase. Anything added here must
-  // stay draw-free and allocation-free per tick.
+  for (const meta of ctx.players.values()) notifyFarmReady(ctx, meta);
 }

@@ -99,10 +99,13 @@ export function dispatchFarmingCommand(sim: Sim, msg: Record<string, unknown>, p
  *  harvest_crop are HEAVY_SELF_CMDS members, so the row set is fresh in
  *  the very next snapshot after either. The one mutation with no command
  *  behind it is a plot ripening on its own timer (growing to ready), and
- *  that rides the staggered HEAVY_SELF_REFRESH_TICKS backstop: about two
- *  seconds of latency on a timer measured in minutes, which no player can
- *  perceive and no decision depends on. `status` is still computed by the
- *  authority at send time either way, so nothing here is predicted.
+ *  since the ready-notice phase that arm has its own event: the 1 Hz sweep
+ *  flips the plot's `notified` flag and emits farmReady, a HEAVY_SELF_EVENTS
+ *  member, so the ripened row lands within the same second rather than at the
+ *  staggered HEAVY_SELF_REFRESH_TICKS backstop. The backstop still covers the
+ *  once-notified plot, whose rows no longer move at all. `status` is
+ *  computed by the authority at send time either way, so nothing here is
+ *  predicted.
  *
  *  The empty arm compares the constant '[]' directly (byte-identical to
  *  maybe(...)): the empty read is the shared frozen EMPTY_FARM_PLOT_VIEWS

@@ -123,6 +123,25 @@ export function farmPlotSurvived(plot: PlotState, skill: number, cropTier: numbe
   );
 }
 
+/** The status ONE plot reads as: the definition projectFarmPlots below is
+ *  built from, exported because the ready-notice sweep
+ *  (professions/farm_ready.ts) asks the same question about one plot at a time
+ *  and must not answer it with a second copy of this test. A notice that
+ *  disagreed with the wire status would tell a farmer a withered bed is ready.
+ *
+ *  The survival read is gated behind the deadline so the hidden pre-roll stays
+ *  unobservable while the plot grows: a doomed crop is indistinguishable from a
+ *  healthy one right up to its ready time. */
+export function farmPlotStatus(
+  plot: PlotState,
+  nowMs: number,
+  farmingSkill: number,
+  cropTier: number,
+): FarmPlotStatus {
+  if (nowMs < plot.readyAtMs) return 'growing';
+  return farmPlotSurvived(plot, farmingSkill, cropTier) ? 'ready' : 'withered';
+}
+
 // The public projection: the ONLY plot shape render/ui or the wire ever see.
 // Ids, flags and epoch-ms numbers only, never localized text.
 export interface FarmPlotView {
@@ -173,15 +192,7 @@ export function projectFarmPlots(
       watch: p.watch,
       tonic: p.tonic,
       notified: p.notified,
-      // The survival read is gated behind the deadline so the hidden pre-roll
-      // stays unobservable while the plot grows: a doomed crop is
-      // indistinguishable from a healthy one right up to its ready time.
-      status:
-        nowMs < p.readyAtMs
-          ? 'growing'
-          : farmPlotSurvived(p, farmingSkill, cropTierOf(p.cropId))
-            ? 'ready'
-            : 'withered',
+      status: farmPlotStatus(p, nowMs, farmingSkill, cropTierOf(p.cropId)),
     });
   }
   rows.sort((a, b) => (a.bedId < b.bedId ? -1 : a.bedId > b.bedId ? 1 : 0));

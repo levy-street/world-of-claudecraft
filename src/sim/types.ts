@@ -6602,6 +6602,19 @@ export type SimEvent = { pid?: number } & (
   // rides the hub loot event with the silent/callerLogs flags, exactly like a
   // harvest grant, so this event owns both halves of the feedback.
   | { type: 'farmHusksConverted'; pid: number; husks: number; compost: number }
+  // Farming: one or more of this player's plots FINISHED (the ready-notice
+  // phase). Personal (pid = the farmer) and text-free like every other farm
+  // event, and COUNTS ONLY: `ready` is how many beds are waiting to be
+  // brought in and `withered` how many finished as failed crops, omitted
+  // when zero (the seedBackCount idiom). `ready` is always present and IS 0
+  // on a withered-only notice: consumers branch on each count, not on the
+  // event's presence. Deliberately carries no bed or crop
+  // id, and no timing: the fplot projection is already the ONE place a client
+  // learns which bed holds what, so a per-plot payload here would be a second
+  // definition of plot state free to drift from it. Emitted once per plot per
+  // growth cycle, gated by the plot's persisted `notified` flag
+  // (professions/farm_ready.ts), so relogging never repeats a notice.
+  | { type: 'farmReady'; pid: number; ready: number; withered?: number }
 );
 
 export interface MoveInput {

@@ -445,6 +445,7 @@ import {
   type PlotState,
   projectFarmPlots,
 } from './professions/farm_projection';
+import { notifyFarmReady } from './professions/farm_ready';
 import {
   convertHusks as convertHusksAction,
   harvestCrop as harvestCropAction,
@@ -3696,6 +3697,7 @@ export class Sim {
     deedsMod.evaluateDeedsFor(this.ctx, meta, player, true);
     this.deedDirtyPids.delete(player.id);
     this.deedDirtyKeys.delete(player.id);
+    notifyFarmReady(this.ctx, meta);
     return player.id;
   }
 
@@ -6444,12 +6446,12 @@ export class Sim {
     lap?.('delayedEv');
     // The farming sweep (the growth-engine phase): APPENDED here, never
     // inserted, because the shared rng stream makes any reorder of the tail
-    // fork every golden. Draws ZERO rng and emits nothing (it is the
-    // ready-notice phase's placeholder, behind its own internal 1 Hz guard),
-    // so its position cannot fork the draw order, exactly like the
-    // updateProfNudges and updateDeeds neighbours. Farming growth itself is
-    // NOT ticked: a plot is an absolute deadline the projection compares
-    // against, so there is no timer here to fire.
+    // fork every golden. Draws ZERO rng (it emits the ready notice behind its
+    // own internal 1 Hz guard, and decides it from stored state alone), so its
+    // position cannot fork the draw order, exactly like the updateProfNudges
+    // and updateDeeds neighbours. Farming growth itself is NOT ticked: a plot
+    // is an absolute deadline the projection compares against, so there is no
+    // timer here to fire.
     updateFarming(this.ctx);
     lap?.('farming');
     // The Book of Deeds evaluator runs at the very end of the tail: it sees

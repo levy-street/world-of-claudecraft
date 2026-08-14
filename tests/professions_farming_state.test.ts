@@ -19,7 +19,11 @@ import {
   type PersistedFarmPlot,
   serializeFarmPlots,
 } from '../src/sim/professions/farm_persist';
-import { type PlotState, projectFarmPlots } from '../src/sim/professions/farm_projection';
+import {
+  farmPlotStatus,
+  type PlotState,
+  projectFarmPlots,
+} from '../src/sim/professions/farm_projection';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 
 // Fixture allowlists for the pure arms: the leaf takes its allowlists as
@@ -232,6 +236,16 @@ describe('the public projection, driven directly (the pure-leaf contract)', () =
     const m = new Map<string, PlotState>([['bed_alpha', plot({ readyAtMs: 5_000 })]]);
     expect(project(m, 4_999)[0]?.status).toBe('growing');
     expect(project(m, 5_000)[0]?.status).toBe('ready');
+  });
+
+  it('farmPlotStatus, the seam the ready notice shares, keeps the identical boundary', () => {
+    // The Phase 8 extraction made the status derivation a named export so the
+    // notice and the projection cannot disagree; this pins the seam DIRECTLY
+    // so a caller-visible drift (strict < loosening to <=) reds without going
+    // through projectFarmPlots.
+    const p = plot({ readyAtMs: 5_000 });
+    expect(farmPlotStatus(p, 4_999, OUTLEVELLED, 1)).toBe('growing');
+    expect(farmPlotStatus(p, 5_000, OUTLEVELLED, 1)).toBe('ready');
   });
 
   it('keeps a doomed crop indistinguishable from a healthy one WHILE it grows', () => {
@@ -803,7 +817,11 @@ describe('the save round trip through a real Sim', () => {
         compost: false,
         watch: false,
         tonic: false,
-        notified: false,
+        // TRUE, and it is the LOAD that made it so: the ready-notice phase's
+        // login check runs inside addPlayer, announces this finished plot
+        // once, and flips its flag before this projection is ever read. The
+        // still-growing row above is the control, and it stays false.
+        notified: true,
         status: 'ready',
       },
     ]);
