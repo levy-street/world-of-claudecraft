@@ -1150,11 +1150,6 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // change so any future emit added here lands under the drift guard from
     // day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/commission_order.ts'), 'utf8'),
-    // Masterwrought phase 09: the mobile crafting station module. One literal
-    // has its ONLY emitter occurrence here ("You set up the ${name}.", the
-    // item-credential placement line matched by log.placeStation); a
-    // rewording of it was invisible to the guard before this entry.
-    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/mobile_station.ts'), 'utf8'),
     // #2033 (PR 2039): the quest command bodies (accept/share/abandon/turn-in guards +
     // the accepted/abandoned/completed logs). The two profession-choice denials
     // ("That profession choice is not available." / "... no longer available.") have
