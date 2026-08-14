@@ -102,7 +102,7 @@ Phase 5). Default environment remains `node`.
 
 `npm run gate` (or `pnpm run gate`) is the **full CI mirror, the deeper check behind the
 selective merge bar** (`gate:select`, below, is the bar itself). It mirrors CI:
-generated i18n freshness, malware scanning, changed-file formatting, the SFX conformance
+generated i18n and build-manifest freshness, malware scanning, changed-file formatting, the SFX conformance
 check, the full test suite, the browser regression suite (`npm run test:browser`, which
 drives Chromium through Playwright), the typecheck, and env, server, bot, and client
 builds. Release branches use the release i18n tier. It stops at the first failure and
@@ -166,12 +166,15 @@ scans from disk joins it the moment it lands.
 
 **Safety fallback.** Any change the planner cannot reason about (a lockfile, `package.json`,
 a vite/vitest/tsconfig edit, the shared test helpers or global setup) drops the whole run
-to the full suite. One deliberate carve-out: the regenerated i18n artifacts never widen;
-they classify into their own bucket and are fed to `related` as graph nodes (see
-"Generated i18n artifacts" under the CI section below; the same shared classifier serves
-both arms, and the local gate's own i18n freshness step is the local half of the safety
-argument). Selection is an optimization for changes we understand; everything else gets
-the old bar. Failing toward *more* tests is the only safe direction, which is also why
+to the full suite. Two deliberate carve-outs: the regenerated i18n artifacts and the
+three committed build manifests (`src/game/sfx_manifest.generated.ts`,
+`src/guide/content.generated.ts`, `src/render/assets/manifest.generated.ts`) never
+widen; each family classifies into its own bucket and is fed to `related` as graph
+nodes (see "Generated i18n artifacts" under the CI section below; the same shared
+classifier serves both arms, and the local gate's own freshness steps, i18n and
+manifest, are the local half of the safety argument). Selection is an optimization for
+changes we understand; everything else gets the old bar. Failing toward *more* tests
+is the only safe direction, which is also why
 an unresolvable diff base or a failing `git diff` is a hard stop rather than an empty
 changed set. The diff is taken against the BRANCH base, not just the dirty working tree:
 `GATE_SELECT_BASE` overrides it, otherwise the tracking branch is used.
@@ -337,6 +340,27 @@ rests on three structural facts, each pinned:
    unrecognized widen. Every OTHER `.generated` tree keeps the old behavior:
    unrecognized, widen. Do not extend the artifact list without a freshness-equivalent
    proof AND the `tests/ci_workflow.test.ts` coupling.
+
+**Committed build manifests.** The three committed build manifests
+(`src/game/sfx_manifest.generated.ts`, `src/guide/content.generated.ts`,
+`src/render/assets/manifest.generated.ts`) hold the SAME standing through the same
+three facts, as the second and only other freshness-guarded family
+(`GENERATED_MANIFEST_ARTIFACT_FILES` in `scripts/lib/gate_select_plan.mjs`): both check
+jobs and the nightly checks job regenerate them (the `wiki:content && build:bundle`
+step; regeneration is deterministic and sub-second per generator) and `git diff
+--exit-code` the FULL output set; both arms feed the changed .ts paths to `vitest
+related` as graph nodes; deletions and renames widen, the shard plan re-proves
+presence, and the local planner widens without an existence probe. The freshness diff
+set is a strict SUPERSET of the classifier family: the SFX generator also writes
+`public/audio/sfx/runtime-pack.json` and `scripts/sfx/sfx_gain_ceiling.generated.json`,
+which are diffed for integrity (a partial diff would let the local gate silently heal
+them mid-run while CI reads stale committed copies) but never declassified, since
+fs-read data is not a graph node. The local gate regenerates the SFX and media
+manifests in their own steps (the wiki content regenerates in the artifacts turbo step)
+and diffs the whole set as its `manifest freshness` step.
+`tests/ci_workflow.test.ts` welds the classifier list, both check jobs' diff argv, and
+the local gate's `MANIFEST_ARTIFACTS` to each other. Membership is exact files, no
+prefixes.
 
 Every decision prints in the job log (`[detect_code_changes]` in the changes job,
 `[ci-shard]` in each shard: mode, reason, floor size, related sources, and the

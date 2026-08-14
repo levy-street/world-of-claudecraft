@@ -634,6 +634,10 @@ const baseEnTable = {
   'aura.solarReprisal': 'Solar Reprisal',
   'aura.dawnsWrath': "Dawn's Wrath",
   'aura.moontide': 'Moontide',
+  // The operator-applied Cheater mark's countdown debuff (src/sim/moderation/).
+  // The sim authors the aura name in English; this row is what stops the debuff
+  // bar and combat log shipping that English to all 21 locales.
+  'aura.cheaterMark': 'Marked as a Cheater',
   'aura.oldBlood': 'Old Blood',
   'aura.verdance': 'Verdance',
   'aura.lopingStride': 'Loping Stride',
@@ -8425,6 +8429,12 @@ function locPetGrowlAutoState(state: string): string {
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Moontide: 'aura.moontide',
+  // The operator-applied Cheater mark's countdown debuff (cheaterMarkAura in
+  // src/sim/moderation/cheater_mark.ts). Without this row localizeSimAuraName
+  // returns null and every caller falls back to the RAW ENGLISH aura name, which
+  // no gate catches: the sanction would read "Marked as a Cheater" in all 21
+  // locales. Keep this string byte-identical to the aura's `name`.
+  'Marked as a Cheater': 'aura.cheaterMark',
   'Old Blood': 'aura.oldBlood',
   Verdance: 'aura.verdance',
   'Loping Stride': 'aura.lopingStride',

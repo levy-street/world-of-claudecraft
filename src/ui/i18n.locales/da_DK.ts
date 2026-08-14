@@ -2921,6 +2921,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.ring': 'Finger',
   'auth.email': 'E-mail',
   'auth.emailError': 'Indtast venligst en gyldig e-mailadresse.',
+  'auth.marketingOptIn': 'Send mig nyheder og opdateringer om spillet via e-mail (valgfrit)',
   'auth.emailPlaceholder': 'dig@eksempel.com',
   'auth.recovery.body':
     'Angiv en e-mailadresse, så du kan gendanne din konto. Vi bruger den kun til at bekræfte, at du ejer denne konto, hvis du en dag skal nulstille din adgangskode.',

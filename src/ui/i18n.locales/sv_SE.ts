@@ -2912,6 +2912,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.ring': 'Finger',
   'auth.email': 'E-post',
   'auth.emailError': 'Ange en giltig e-postadress.',
+  'auth.marketingOptIn': 'Skicka mig nyheter och uppdateringar om spelet via e-post (valfritt)',
   'auth.emailPlaceholder': 'du@exempel.se',
   'auth.recovery.body':
     'Ange en e-postadress så att du kan återställa ditt konto. Vi använder den bara för att bekräfta att du äger kontot om du någon gång behöver återställa ditt lösenord.',

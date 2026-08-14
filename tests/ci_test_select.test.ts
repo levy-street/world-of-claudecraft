@@ -280,9 +280,10 @@ describe('decideTestMode: generated i18n artifacts', () => {
   });
 
   it('keeps every OTHER generated tree an unclassified widen', () => {
+    // The SFX/guide/media manifests moved to the freshness-guarded family
+    // (GENERATED_MANIFEST_ARTIFACT_FILES; their arms are below), so the
+    // widen examples here are generated paths OUTSIDE both families.
     for (const p of [
-      'src/game/sfx_manifest.generated.ts',
-      'src/guide/content.generated.ts',
       'src/ui/map_bg_manifest.generated.ts',
       'src/editor/asset_catalog.generated.ts',
       'src/sim/thornhollow_field.generated.ts',
@@ -291,6 +292,56 @@ describe('decideTestMode: generated i18n artifacts', () => {
       expect(d.mode).toBe('full');
       expect(d.reason).toContain('broad or unclassified change');
     }
+  });
+
+  it('feeds manifest artifacts to related and names them in the reason', () => {
+    const d = decideTestMode({
+      ...PR,
+      files: [mod('src/ui/hud.ts'), mod('src/game/sfx_manifest.generated.ts')],
+    });
+    expect(d.mode).toBe('selective');
+    expect(d.changedPaths).toEqual(['src/ui/hud.ts', 'src/game/sfx_manifest.generated.ts']);
+    expect(d.reason).toBe(
+      'selective: 1 changed source file(s), 0 changed test file(s), ' +
+        '0 inert path(s), 1 generated manifest artifact(s) fed to related (freshness-guarded)',
+    );
+  });
+
+  it('names both artifact families in one reason when a PR carries both', () => {
+    const d = decideTestMode({
+      ...PR,
+      files: [
+        mod('src/ui/i18n.resolved.generated/en.ts'),
+        mod('src/game/sfx_manifest.generated.ts'),
+      ],
+    });
+    expect(d.mode).toBe('selective');
+    expect(d.reason).toBe(
+      'selective: 0 changed source file(s), 0 changed test file(s), ' +
+        '0 inert path(s), 1 generated i18n artifact(s) fed to related (freshness-guarded)' +
+        ', 1 generated manifest artifact(s) fed to related (freshness-guarded)',
+    );
+  });
+
+  it('widens on a removed or renamed-away manifest (the freshness diff cannot see it)', () => {
+    expect(
+      decideTestMode({
+        ...PR,
+        files: [{ filename: 'src/guide/content.generated.ts', status: 'removed' }],
+      }).reason,
+    ).toContain('removed or renamed generated manifest artifact');
+    expect(
+      decideTestMode({
+        ...PR,
+        files: [
+          {
+            filename: 'src/guide/content_old.generated.ts',
+            previous_filename: 'src/guide/content.generated.ts',
+            status: 'renamed',
+          },
+        ],
+      }).reason,
+    ).toContain('removed or renamed generated manifest artifact');
   });
 
   it('refuses lookalike paths outside the pinned artifact classes', () => {

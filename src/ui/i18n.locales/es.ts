@@ -3092,6 +3092,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.ring': 'Dedo',
   'auth.email': 'Correo',
   'auth.emailError': 'Introduce una dirección de correo válida.',
+  'auth.marketingOptIn': 'Envíame noticias y actualizaciones del juego por correo (opcional)',
   'auth.emailPlaceholder': 'tu@ejemplo.com',
   'auth.recovery.body':
     'Añade una dirección de correo para poder recuperar tu cuenta. Solo la usamos para confirmar que esta cuenta es tuya si alguna vez necesitas restablecer tu contraseña.',

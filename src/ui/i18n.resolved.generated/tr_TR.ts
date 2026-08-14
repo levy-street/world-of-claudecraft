@@ -2462,7 +2462,8 @@ export const tr_TR: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "UZAKTA"
+      "afkTag": "UZAKTA",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "Seviye {level} {family}",
@@ -3973,6 +3974,12 @@ export const tr_TR: EnTranslations = {
       "genesis_token_claimed": "Bu Seeker Genesis Token zaten talep edilmiş.",
       "entitlement_required": "Doğrulanmış bir Seeker hakkı gerekir.",
       "current_ownership_required": "Seeker Genesis Token'a şu anda sahip olmanız gerekir."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {
@@ -6591,6 +6598,7 @@ export const tr_TR: EnTranslations = {
     "email": "E-posta",
     "emailPlaceholder": "sen@ornek.com",
     "emailError": "Lütfen geçerli bir e-posta adresi gir.",
+    "marketingOptIn": "Bana oyun haberlerini ve güncellemelerini e-postayla gönder (isteğe bağlı)",
     "showPassword": "Parolayı göster",
     "hidePassword": "Parolayı gizle",
     "logIn": "Giriş Yap",
@@ -6691,6 +6699,19 @@ export const tr_TR: EnTranslations = {
     "style": "Stil",
     "resetLook": "Görünümü Sıfırla",
     "resetShort": "Sıfırla",
+    "shareTab": "Share",
+    "designCode": "Design code",
+    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
+    "copyCode": "Copy code",
+    "importCode": "Import",
+    "designCodeCopied": "Design code copied.",
+    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
+    "designCodeImported": "Design imported.",
+    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
+    "designCodeErrEmpty": "Paste a design code first.",
+    "designCodeErrHeader": "That does not look like a design code.",
+    "designCodeErrVersion": "That design code comes from a newer game version.",
+    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
     "browFlat": "Düz",
     "browArched": "Kavisli",
     "browThin": "İnce",

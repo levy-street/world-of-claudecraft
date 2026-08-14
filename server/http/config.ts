@@ -146,6 +146,12 @@ export interface Config {
   // account, so pruning the oldest rows never invalidates a page it can still
   // return. 0 keeps them forever.
   readonly chatViolationRetentionDays: number;
+  // How many days of the progression analytics event logs to keep
+  // (level_up_events: one row per ding; ftue_events: new-player quest/death
+  // events, already level-gated at write time). Both follow the untrimmed
+  // 0-keeps-forever retention contract above.
+  readonly levelUpEventsRetentionDays: number;
+  readonly ftueEventsRetentionDays: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -206,6 +212,13 @@ const DEFAULT_EMAIL_LOG_RETENTION_DAYS = 90;
 const DEFAULT_PLAYER_REPORT_RETENTION_DAYS = 180;
 const DEFAULT_BUG_REPORT_RETENTION_DAYS = 90;
 const DEFAULT_CHAT_VIOLATION_RETENTION_DAYS = 90;
+// level_up_events feeds multi-month friction maps, so it defaults to a year.
+// ftue_events answers a FIRST-SESSION question and has the higher intake
+// (roughly 100-250 rows per new character), so it defaults to a quarter: at
+// the sweep's per-run row budget a long window could otherwise fall behind
+// during a paid-campaign burst.
+const DEFAULT_LEVEL_UP_EVENTS_RETENTION_DAYS = 365;
+const DEFAULT_FTUE_EVENTS_RETENTION_DAYS = 90;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;
@@ -416,6 +429,14 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     bugReportRetentionDays: numberOr(
       env.BUG_REPORT_RETENTION_DAYS,
       DEFAULT_BUG_REPORT_RETENTION_DAYS,
+    ),
+    levelUpEventsRetentionDays: numberOr(
+      env.LEVEL_UP_EVENTS_RETENTION_DAYS,
+      DEFAULT_LEVEL_UP_EVENTS_RETENTION_DAYS,
+    ),
+    ftueEventsRetentionDays: numberOr(
+      env.FTUE_EVENTS_RETENTION_DAYS,
+      DEFAULT_FTUE_EVENTS_RETENTION_DAYS,
     ),
     chatViolationRetentionDays: numberOr(
       env.CHAT_VIOLATION_RETENTION_DAYS,

@@ -778,6 +778,15 @@
             />
           </div>
 
+          <!-- Marketing opt-in, register mode only (setAuthMode toggles it).
+               Unchecked by default: consent is explicit, never pre-ticked. -->
+          <div class="auth-field auth-optin" id="login-marketing-field" hidden>
+            <label class="auth-optin-label">
+              <input id="login-marketing" name="marketingOptIn" type="checkbox" />
+              <span data-i18n="auth.marketingOptIn">Email me game news and updates (optional)</span>
+            </label>
+          </div>
+
           <!-- Cloudflare Turnstile widget mounts here when configured (src/main.ts). -->
           <div id="cf-turnstile-container" class="auth-turnstile"></div>
 

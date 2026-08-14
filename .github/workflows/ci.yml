@@ -465,12 +465,12 @@ jobs:
     # and still running (deterministic workload, not runner variance), and
     # fix/item-provenance-boundaries died the same way at 20.08; sibling
     # GREEN shards on the same run walked 16 to 17 minutes against the 13.6
-    # prior baseline, so that runner set ran about 1.25x slow. 40 applies
+    # prior baseline, so that runner set ran about 1.25x slow. 40 applied
     # release-gate's slow-runner arithmetic to this workload: the projected
-    # completed shard 1 wall is about 22 minutes on those runners, about 18
+    # completed shard 1 wall was about 22 minutes on those runners, about 18
     # fast-runner-equivalent, and 18 x 1.60 (the fast-to-slow runner ratio
     # measured at b160a1ba18) x 1.37 (the margin the original bounds were
-    # chosen with) is 39.5. Label the base honestly when re-deriving: no
+    # chosen with) was 39.5. Label the base honestly when re-deriving: no
     # killed attempt ever completed, so 22 is an extrapolation bounded
     # below by the kill wall; if a healthy shard is bound-killed again,
     # remeasure a completed wall rather than re-raising by feel. The
@@ -481,13 +481,40 @@ jobs:
     # about 2 minutes; a healthy long test step, which both 2026-08-12
     # kills interrupted, is exactly what this bound must not kill. The
     # accepted cost is the hang variant the low-speed floor does not
-    # police (the header's run 31402711619): a hung shard now burns 40
-    # minutes before the reactor can fire, double the old latency, taken
+    # police (the header's run 31402711619): a hung shard then burned 40
+    # minutes before the reactor could fire, double the old latency, taken
     # because a false kill of a required healthy shard blocks PRs outright
     # while a hang costs only latency. The
     # queue-side ceiling this has to fit under is recorded in
     # docs/merge-queue.md.
-    timeout-minutes: 40
+    #
+    # 2026-08-14 re-derivation. TWO MODES SHARE THIS ONE BOUND: selective
+    # (every ordinary pull_request) and full (merge_group, pushes, widened
+    # PRs), and selective is the expensive one, because it stacks the
+    # always-run floor under the related set. The measurement trap that
+    # briefly sized this at 26: any PR touching ci.yml widens to full by the
+    # workflow-side trigger, so a bounds PR can never observe a selective
+    # wall on its own run, and the two runs first cited as "the merged-leg
+    # PR's selective run" (31761236945, 31763736783) were in fact full-mode
+    # for exactly that reason. Label the MODE of every base when
+    # re-deriving. Measured bases, by mode AND tree: worst healthy
+    # SELECTIVE shard wall 16.55 minutes (run 31765273776 shard 4,
+    # merged-leg pipeline, pre-sparse tree). NO post-sparse selective wall
+    # has been observed yet (the sparse cone only trims checkout, so the
+    # test step should match; the nearest comparator is a post-split
+    # pre-sparse selective wall of 13.2, run 31770499114), and 16.55 stays
+    # the conservative base until post-sparse selective walls exist. Worst
+    # healthy FULL wall post-split is 11.5 (31768778440, 31774143931; a
+    # pre-split tree walked 12.03 in 31752830175). 16.55 x 1.60 x 1.37 = 36.3,
+    # so 37. On the reactor: it reruns only setup-phase kills, never a
+    # test-step kill, and never fires on merge_group at all, so this bound
+    # is the only thing that ends a hung test step, the rerun is manual,
+    # and a false kill blocks a REQUIRED check outright, which is why the
+    # base stays the conservative one. Candidate follow-up recorded in the
+    # program notes: shard 4 is the worst shard in every sampled selective
+    # run, so the sha1-contiguous packing concentrates cost and a packing
+    # rebalance could lower this bound honestly.
+    timeout-minutes: 37
     runs-on: ubuntu-latest
 
     # fail-fast stays off: shards pass or fail independently, so one red shard
@@ -528,6 +555,7 @@ jobs:
           sparse-checkout: |
             /*
             !/docs/screenshots/*/
+            /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/class-skin-color-wash/
             /docs/screenshots/eastbrook-grand-armoury/
@@ -643,8 +671,12 @@ jobs:
       # merged selective leg is a bare vitest-related invocation with no npm
       # lifecycle, so scripts/ci_shard_test.mjs runs pretest before spawning
       # and the npm-test legs skip their lifecycle copy). The freshness diff
-      # lives in pr-checks. Workers stay at half the runner's cores inside the
-      # script.
+      # lives in pr-checks. Worker count resolves inside the script: the
+      # half-cores measured default unless a step env sets a valid
+      # WOC_TEST_WORKERS. None is set: both alternatives were measured and
+      # regressed (4 workers, run 31107474546; 3 workers, run 31771637461,
+      # three unrelated default-timeout blowouts for at most a minute of
+      # wall). The ruling lives in scripts/ci_shard_test.mjs.
       #
       # Phase 2 (docs/qa-gate.md, "Selective PR-tier CI"): the runner reads the
       # changes job's selection decision. test_mode=full spawns the old step
@@ -714,19 +746,25 @@ jobs:
     # owned_class_balance_* / owned_class_raid_* single-responsibility files
     # and the halves were re-balanced, so no lane chain carries that single
     # 13-minute file any more. The figures above stay as the measured record;
-    # 30 predates the split and re-derives from fresh measured JOB walls in a
-    # follow-up change.
+    # the 2026-08-14 re-derivation below is the follow-up change that note
+    # promised.
     #
-    # 30 applies the same arithmetic as release-gate's bound: healthy JOB wall
-    # times the 1.60 fast-to-slow runner ratio measured at b160a1ba18
-    # (13.73 x 1.60 = 22.0 for the slower half), then the 1.37x margin the
-    # original bounds were chosen with. At 20 this REQUIRED check was roughly
-    # one slow runner away from bound-killing and blocking the merge queue,
-    # which is the more expensive failure than the release backstop's, so it
-    # is raised in the same change. Both halves share one bound so the a/b
-    # assignment can still rebalance freely without re-sizing. The queue-side
-    # ceiling this has to fit under is recorded in docs/merge-queue.md.
-    timeout-minutes: 30
+    # 30 applied the same arithmetic as release-gate's bound to the pre-split
+    # walls: healthy JOB wall times the 1.60 fast-to-slow runner ratio
+    # measured at b160a1ba18 (13.73 x 1.60 = 22.0 for the slower half), then
+    # the 1.37x margin the original bounds were chosen with. At 20 this
+    # REQUIRED check was roughly one slow runner away from bound-killing and
+    # blocking the merge queue, which is the more expensive failure than the
+    # release backstop's.
+    #
+    # 2026-08-14 re-derivation, from post-rebalance healthy JOB walls: across
+    # the full-mode green runs since the second-tier split and lane rebalance
+    # (31768778440, 31774143931), the worst lane wall is lane B at 12.5
+    # minutes. 12.5 x 1.60 x 1.37 = 27.4, so 28. Both halves share one bound
+    # so the a/b assignment can still rebalance freely without re-sizing. The
+    # queue-side ceiling this has to fit under is recorded in
+    # docs/merge-queue.md.
+    timeout-minutes: 28
     runs-on: ubuntu-latest
 
     steps:
@@ -739,6 +777,7 @@ jobs:
           sparse-checkout: |
             /*
             !/docs/screenshots/*/
+            /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/class-skin-color-wash/
             /docs/screenshots/eastbrook-grand-armoury/
@@ -828,8 +867,8 @@ jobs:
     needs: changes
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     # Sized with pr-long-sims-a (evidence there, in the lane-diet PR, and in
-    # the run 31450179645 re-derivation the sibling comment carries).
-    timeout-minutes: 30
+    # the dated re-derivations the sibling comment carries).
+    timeout-minutes: 28
     runs-on: ubuntu-latest
 
     steps:
@@ -842,6 +881,7 @@ jobs:
           sparse-checkout: |
             /*
             !/docs/screenshots/*/
+            /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/class-skin-color-wash/
             /docs/screenshots/eastbrook-grand-armoury/
@@ -997,6 +1037,17 @@ jobs:
       - name: Build client
         run: npm run wiki:content && npm run build:bundle
 
+      # The client build just regenerated all three committed build manifests
+      # (wiki:content writes the guide content, build:bundle's pregen writes
+      # the SFX and media manifests), so this diff proves the committed
+      # copies against this tree's own sources. The selective planner treats
+      # exactly these paths as inert-but-fed-to-related ONLY on the strength
+      # of this step (GENERATED_MANIFEST_ARTIFACT_FILES in
+      # scripts/lib/gate_select_plan.mjs; tests/ci_workflow.test.ts welds the
+      # classifier list, this argv, and the local gate list to each other).
+      - name: Manifest freshness (committed build manifests)
+        run: git diff --exit-code -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json
+
   # A release ref runs THREE parallel jobs: release-gate (this one) runs the test
   # suite at PR tier, release-i18n runs the release TIER over the suites that read
   # the flag, and release-checks runs the serialized checks, so the release critical
@@ -1060,7 +1111,17 @@ jobs:
     # above); its shards exclude these suites, so this evidence does not
     # size it. The nightly workflow deliberately keeps its own
     # generous bounds and is untouched.
-    timeout-minutes: 35
+    #
+    # 2026-08-14 re-derivation, from completed post-split walls: release-gate
+    # runs on every release/** push, and the healthy worsts across those runs
+    # are 15.00 to 16.43 minutes (31757915533 at 16.43, 31774886593 at
+    # 16.28, 31771748136 at 16.22, 31764380309, 31769545742; the 19.03 wall
+    # in 31746779792 shard 3 is a 9.6 minute CHECKOUT STALL over a 9.1
+    # minute test step, the class the bound exists to kill, so it is
+    # excluded from the base exactly like the lane stalls). 16.43 x 1.60 x
+    # 1.37 = 36.0, so 36: the same arithmetic that first produced 35, one
+    # minute looser now that the base is measured rather than projected.
+    timeout-minutes: 36
     runs-on: ubuntu-latest
 
     # No I18N_RELEASE_TIER here BY DESIGN (D8 revised, issue #2820). This job runs
@@ -1086,6 +1147,7 @@ jobs:
           sparse-checkout: |
             /*
             !/docs/screenshots/*/
+            /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/class-skin-color-wash/
             /docs/screenshots/eastbrook-grand-armoury/
@@ -1187,6 +1249,7 @@ jobs:
           sparse-checkout: |
             /*
             !/docs/screenshots/*/
+            /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/class-skin-color-wash/
             /docs/screenshots/eastbrook-grand-armoury/
@@ -1307,3 +1370,14 @@ jobs:
 
       - name: Build client
         run: npm run wiki:content && npm run build:bundle
+
+      # The client build just regenerated all three committed build manifests
+      # (wiki:content writes the guide content, build:bundle's pregen writes
+      # the SFX and media manifests), so this diff proves the committed
+      # copies against this tree's own sources. The selective planner treats
+      # exactly these paths as inert-but-fed-to-related ONLY on the strength
+      # of this step (GENERATED_MANIFEST_ARTIFACT_FILES in
+      # scripts/lib/gate_select_plan.mjs; tests/ci_workflow.test.ts welds the
+      # classifier list, this argv, and the local gate list to each other).
+      - name: Manifest freshness (committed build manifests)
+        run: git diff --exit-code -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json

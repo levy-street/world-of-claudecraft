@@ -12,8 +12,10 @@ export function isFullSuiteTrigger(p: string): boolean;
 
 export const GENERATED_I18N_ARTIFACT_PREFIXES: readonly string[];
 export const GENERATED_I18N_ARTIFACT_FILES: readonly string[];
+export const GENERATED_MANIFEST_ARTIFACT_FILES: readonly string[];
 
 export function isGeneratedI18nArtifactPath(p: string): boolean;
+export function isGeneratedManifestArtifactPath(p: string): boolean;
 
 export function classifySelectPaths(paths: string[]): {
   testFiles: string[];
@@ -21,6 +23,7 @@ export function classifySelectPaths(paths: string[]): {
   broadConfigs: string[];
   nonCode: string[];
   generatedI18n: string[];
+  generatedManifests: string[];
 };
 
 export function buildSelectPlan(opts: {

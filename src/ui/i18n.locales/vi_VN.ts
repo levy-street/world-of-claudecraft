@@ -2907,6 +2907,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.ring': 'Ngón Tay',
   'auth.email': 'Email',
   'auth.emailError': 'Vui lòng nhập một địa chỉ email hợp lệ.',
+  'auth.marketingOptIn': 'Gửi cho tôi tin tức và cập nhật trò chơi qua email (tùy chọn)',
   'auth.emailPlaceholder': 'you@example.com',
   'auth.recovery.body':
     'Hãy đặt một địa chỉ email để bạn có thể khôi phục tài khoản. Chúng tôi chỉ dùng nó để xác nhận bạn sở hữu tài khoản này nếu bạn cần đặt lại mật khẩu.',

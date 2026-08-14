@@ -2462,7 +2462,8 @@ export const ja_JP: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "退席"
+      "afkTag": "退席",
+      "cheaterTag": "< チーター >"
     },
     "mobTooltip": {
       "levelFamily": "レベル{level} {family}",
@@ -3973,6 +3974,12 @@ export const ja_JP: EnTranslations = {
       "genesis_token_claimed": "そのSeeker Genesis Tokenはすでに取得されています。",
       "entitlement_required": "検証済みのSeeker資格が必要です。",
       "current_ownership_required": "現在Seeker Genesis Tokenを所有している必要があります。"
+    },
+    "cheater_mark": {
+      "admin_target": "管理者アカウントにはマークを付けられません。",
+      "reason_required": "理由の入力が必要です。",
+      "invalid_duration": "マークの期間は1秒以上で入力してください。",
+      "not_marked": "そのアカウントはマークされていません。"
     }
   },
   "guide": {
@@ -6591,6 +6598,7 @@ export const ja_JP: EnTranslations = {
     "email": "メールアドレス",
     "emailPlaceholder": "mail@example.com",
     "emailError": "有効なメールアドレスを入力してください。",
+    "marketingOptIn": "ゲームのニュースやアップデートをメールで受け取る（任意）",
     "showPassword": "パスワードを表示",
     "hidePassword": "パスワードを非表示",
     "logIn": "ログイン",
@@ -6691,6 +6699,19 @@ export const ja_JP: EnTranslations = {
     "style": "スタイル",
     "resetLook": "外見をリセット",
     "resetShort": "リセット",
+    "shareTab": "共有",
+    "designCode": "デザインコード",
+    "designCodeHint": "このコードをコピーすると、この見た目を保存したり共有したりできます。コードをここに貼り付けてインポートすると読み込めます。",
+    "copyCode": "コードをコピー",
+    "importCode": "インポート",
+    "designCodeCopied": "デザインコードをコピーしました。",
+    "designCodeCopyManual": "ここでは自動コピーができません。コードは選択済みです。キーボードでコピーしてください。",
+    "designCodeImported": "デザインをインポートしました。",
+    "designCodeImportedPartial": "デザインをインポートしました。このバージョンで認識できない値はスキップされました。",
+    "designCodeErrEmpty": "まずデザインコードを貼り付けてください。",
+    "designCodeErrHeader": "これはデザインコードではないようです。",
+    "designCodeErrVersion": "このデザインコードはより新しいゲームバージョンのものです。",
+    "designCodeErrMalformed": "このデザインコードは壊れています。コード全体をコピーしてやり直してください。",
     "browFlat": "平ら",
     "browArched": "アーチ",
     "browThin": "細め",

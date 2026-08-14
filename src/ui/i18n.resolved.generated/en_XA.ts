@@ -2462,7 +2462,8 @@ export const en_XA: EnTranslations = {
     "nameplate": {
       "mobLevel": "[{level}]",
       "mobEliteLevel": "[{level}+]",
-      "afkTag": "[ÁƑĶ]"
+      "afkTag": "[ÁƑĶ]",
+      "cheaterTag": "[< Çĥéáţéŕ >]"
     },
     "mobTooltip": {
       "levelFamily": "[Ļéʋéļ {level} {family}]",
@@ -3973,6 +3974,12 @@ export const en_XA: EnTranslations = {
       "genesis_token_claimed": "[Ţĥáţ Šééķéŕ Ĝéñéšíš Ţóķéñ ĥáš áļŕéáðý ƀééñ çļáíɱéð.]",
       "entitlement_required": "[Ʋéŕíƒíéð Šééķéŕ éñţíţļéɱéñţ íš ŕéɋúíŕéð.]",
       "current_ownership_required": "[Çúŕŕéñţ Šééķéŕ Ĝéñéšíš Ţóķéñ óŵñéŕšĥíþ íš ŕéɋúíŕéð.]"
+    },
+    "cheater_mark": {
+      "admin_target": "[Óþéŕáţóŕ áççóúñţš çáññóţ ƀé ɱáŕķéð.]",
+      "reason_required": "[Á ŕéášóñ íš ŕéɋúíŕéð.]",
+      "invalid_duration": "[Éñţéŕ á ɱáŕķ ðúŕáţíóñ óƒ áţ ļéášţ óñé šéçóñð.]",
+      "not_marked": "[Ţĥáţ áççóúñţ íš ñóţ ɱáŕķéð.]"
     }
   },
   "guide": {
@@ -6591,6 +6598,7 @@ export const en_XA: EnTranslations = {
     "email": "[Éɱáíļ]",
     "emailPlaceholder": "[ýóú@éẋáɱþļé.çóɱ]",
     "emailError": "[Þļéášé éñţéŕ á ʋáļíð éɱáíļ áððŕéšš.]",
+    "marketingOptIn": "[Éɱáíļ ɱé ĝáɱé ñéŵš áñð úþðáţéš (óþţíóñáļ)]",
     "showPassword": "[Šĥóŵ þáššŵóŕð]",
     "hidePassword": "[Ĥíðé þáššŵóŕð]",
     "logIn": "[Ļóĝ Íñ]",
@@ -6691,6 +6699,19 @@ export const en_XA: EnTranslations = {
     "style": "[Šţýļé]",
     "resetLook": "[Ŕéšéţ Ļóóķ]",
     "resetShort": "[Ŕéšéţ]",
+    "shareTab": "[Šĥáŕé]",
+    "designCode": "[Ðéšíĝñ çóðé]",
+    "designCodeHint": "[Çóþý ţĥíš çóðé ţó šáʋé óŕ šĥáŕé ţĥíš ļóóķ. Þášţé á çóðé ĥéŕé áñð íɱþóŕţ íţ ţó ļóáð óñé.]",
+    "copyCode": "[Çóþý çóðé]",
+    "importCode": "[Íɱþóŕţ]",
+    "designCodeCopied": "[Ðéšíĝñ çóðé çóþíéð.]",
+    "designCodeCopyManual": "[Áúţóɱáţíç çóþý íš ƀļóçķéð ĥéŕé. Ţĥé çóðé íš šéļéçţéð, çóþý íţ ŵíţĥ ýóúŕ ķéýƀóáŕð.]",
+    "designCodeImported": "[Ðéšíĝñ íɱþóŕţéð.]",
+    "designCodeImportedPartial": "[Ðéšíĝñ íɱþóŕţéð. Ʋáļúéš ţĥíš ʋéŕšíóñ ðóéš ñóţ ķñóŵ ŵéŕé šķíþþéð.]",
+    "designCodeErrEmpty": "[Þášţé á ðéšíĝñ çóðé ƒíŕšţ.]",
+    "designCodeErrHeader": "[Ţĥáţ ðóéš ñóţ ļóóķ ļíķé á ðéšíĝñ çóðé.]",
+    "designCodeErrVersion": "[Ţĥáţ ðéšíĝñ çóðé çóɱéš ƒŕóɱ á ñéŵéŕ ĝáɱé ʋéŕšíóñ.]",
+    "designCodeErrMalformed": "[Ţĥáţ ðéšíĝñ çóðé íš ðáɱáĝéð. Çóþý ţĥé ŵĥóļé çóðé áñð ţŕý áĝáíñ.]",
     "browFlat": "[Ƒļáţ]",
     "browArched": "[Áŕçĥéð]",
     "browThin": "[Ţĥíñ]",

@@ -2462,7 +2462,8 @@ export const ru_RU: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Читер >"
     },
     "mobTooltip": {
       "levelFamily": "Уровень {level} {family}",
@@ -3973,6 +3974,12 @@ export const ru_RU: EnTranslations = {
       "genesis_token_claimed": "Этот Seeker Genesis Token уже был зарегистрирован.",
       "entitlement_required": "Требуются подтвержденные права Seeker.",
       "current_ownership_required": "Требуется текущее владение Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Учетные записи операторов нельзя отметить.",
+      "reason_required": "Необходимо указать причину.",
+      "invalid_duration": "Укажите длительность отметки не менее одной секунды.",
+      "not_marked": "Эта учетная запись не отмечена."
     }
   },
   "guide": {
@@ -6591,6 +6598,7 @@ export const ru_RU: EnTranslations = {
     "email": "Эл. почта",
     "emailPlaceholder": "ivan@example.com",
     "emailError": "Введите корректный адрес эл. почты.",
+    "marketingOptIn": "Присылайте мне новости и обновления игры (необязательно)",
     "showPassword": "Показать пароль",
     "hidePassword": "Скрыть пароль",
     "logIn": "Войти",
@@ -6691,6 +6699,19 @@ export const ru_RU: EnTranslations = {
     "style": "Стиль",
     "resetLook": "Сбросить облик",
     "resetShort": "Сброс",
+    "shareTab": "Поделиться",
+    "designCode": "Код облика",
+    "designCodeHint": "Скопируйте этот код, чтобы сохранить облик или поделиться им. Вставьте код сюда и импортируйте, чтобы загрузить облик.",
+    "copyCode": "Копировать код",
+    "importCode": "Импорт",
+    "designCodeCopied": "Код облика скопирован.",
+    "designCodeCopyManual": "Автоматическое копирование здесь недоступно. Код выделен, скопируйте его с клавиатуры.",
+    "designCodeImported": "Облик импортирован.",
+    "designCodeImportedPartial": "Облик импортирован. Значения, неизвестные этой версии, были пропущены.",
+    "designCodeErrEmpty": "Сначала вставьте код облика.",
+    "designCodeErrHeader": "Это не похоже на код облика.",
+    "designCodeErrVersion": "Этот код облика создан в более новой версии игры.",
+    "designCodeErrMalformed": "Этот код облика повреждён. Скопируйте код целиком и попробуйте снова.",
     "browFlat": "Прямые",
     "browArched": "Дугой",
     "browThin": "Тонкие",

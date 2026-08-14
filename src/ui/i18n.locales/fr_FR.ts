@@ -3443,6 +3443,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.ring': 'Doigt',
   'auth.email': 'E-mail',
   'auth.emailError': 'Veuillez saisir une adresse e-mail valide.',
+  'auth.marketingOptIn': "M'envoyer par e-mail les actualités et mises à jour du jeu (facultatif)",
   'auth.emailPlaceholder': 'vous@exemple.com',
   'auth.recovery.body':
     "Définissez une adresse e-mail pour pouvoir récupérer votre compte. Nous l'utilisons uniquement pour confirmer que ce compte vous appartient si vous devez un jour réinitialiser votre mot de passe.",

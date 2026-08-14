@@ -3050,6 +3050,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'auth.createCharacter': 'Vytvořit postavu',
   'auth.email': 'E-mail',
   'auth.emailError': 'Zadej platnou e-mailovou adresu.',
+  'auth.marketingOptIn': 'Chci dostávat novinky a aktualizace hry e-mailem (volitelné)',
   'auth.emailPlaceholder': 'ty@example.com',
   'auth.enterRealm': 'Vstoupit do světa',
   'auth.enterWorld': 'Vstoupit do světa',

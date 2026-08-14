@@ -305,6 +305,8 @@ import {
 } from './player_card';
 import { prunePlayerActivityDailyBatch } from './player_metrics_db';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
+import { progressEventsIdle } from './progress_events';
+import { pruneFtueEventsBatch, pruneLevelUpEventsBatch } from './progress_events_db';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
   assetUploadRateLimited,
@@ -330,6 +332,7 @@ import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
 import { resolveSfxOverlayFile } from './sfx_overlay';
+import { captureSignupContext, parseSignupProfile } from './signup_attribution';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
 import {
@@ -1523,15 +1526,21 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const token = newToken();
       await saveToken(token, account.id);
       // Store the mandatory signup email and send the welcome mail. Validated above,
-      // so this always runs for a fresh registration.
+      // so this always runs for a fresh registration. The profile parse is
+      // synchronous so the welcome mail already carries the signup locale and
+      // opt-in state; the capture below persists them (plus attribution).
+      const signupProfile = parseSignupProfile(req, body);
       await setAccountEmail(account.id, signupEmail);
       emailAccountCreated({
         id: account.id,
         username: account.username,
         email: signupEmail,
-        locale: null,
-        marketing_opt_in: false,
+        locale: signupProfile.locale,
+        marketing_opt_in: signupProfile.marketingOptIn,
       });
+      // First-touch attribution + locale/country/opt-in persistence
+      // (fire-and-forget; must never block or fail registration).
+      captureSignupContext(account.id, req, body, signupProfile);
       void trackAccountCreated(
         account.id,
         {
@@ -3467,6 +3476,18 @@ export async function startServer(): Promise<http.Server> {
         name: 'chat_violations',
         pruneBatch: (n) => pruneChatViolationsBatch(config.chatViolationRetentionDays, n),
       },
+      {
+        // One row per player level-up (the UA friction map); append-only,
+        // observer-written (server/progress_events.ts).
+        name: 'level_up_events',
+        pruneBatch: (n) => pruneLevelUpEventsBatch(pool, config.levelUpEventsRetentionDays, n),
+      },
+      {
+        // New-player quest/death events, level-gated at write time to the
+        // FTUE window (server/progress_events_db.ts FTUE_MAX_LEVEL).
+        name: 'ftue_events',
+        pruneBatch: (n) => pruneFtueEventsBatch(pool, config.ftueEventsRetentionDays, n),
+      },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group
     // when retention is off so quiet configs write nothing to world_state.
@@ -3517,6 +3538,10 @@ export async function startServer(): Promise<http.Server> {
     // go missing until that character's next login (the join reconcile is the
     // only heal). Rejections log inside the writer, so the drain never throws.
     await deedRecordsIdle();
+    // Drain the progress-events FIFO (level_up_events / ftue_events) as well:
+    // unlike deeds these rows have no reconcile heal path, so a row dropped by
+    // pool.end() is gone. Rejections log inside the writer; never throws.
+    await progressEventsIdle();
     // Stop accepted /unstuck report intake and drain only to a finite deadline.
     // Per-query timeouts bound an active write; deadline expiry aborts retry
     // delays and drops queued telemetry before the shared pool closes.

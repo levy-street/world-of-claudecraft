@@ -45,6 +45,7 @@ import * as deedsMod from '../deeds';
 import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
 import { awardFiestaKillHonor } from '../pvp';
+import { aurasSurvivingCleanSlate } from '../resurrection';
 import { Rng } from '../rng';
 import type { ArenaMatch, FiestaPowerup, FiestaState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -304,8 +305,10 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   stripSunGodVerdicts(ctx, e.id);
   stripPaladinDevotionsFromSource(ctx, e.id);
   // Fiesta is a clean-slate minigame with its own timed revive: it intentionally strips
-  // ALL auras (including The Keeper's Toll), unlike the overworld/delve death paths.
-  e.auras = [];
+  // ALL auras (including The Keeper's Toll), unlike the overworld/delve death paths. The
+  // one exception is the operator-applied Cheater mark, which is account state rather
+  // than a carried buff: dying in a minigame must not shed a sanction (resurrection.ts).
+  e.auras = aurasSurvivingCleanSlate(e.auras);
   e.ccDr.clear();
   emitRainOfFireStop(ctx, e);
   e.castingAbility = null;

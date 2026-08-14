@@ -2,7 +2,8 @@
 // Kept free of spawn/fs/git so Vitest can pin every branch without a shell.
 //
 // The selective gate runs the FULL gate's step list (i18n gen + freshness, wiki,
-// malware, biome, sfx, browser, typecheck, all four builds) and changes exactly
+// manifest regen + freshness, malware, biome, sfx, browser, typecheck, all four
+// builds) and changes exactly
 // one step: the full unsharded vitest run becomes two bounded runs.
 //
 //   1. always-run   every test whose coverage reaches outside the module graph
@@ -126,6 +127,51 @@ export const GENERATED_I18N_ARTIFACT_FILES = Object.freeze([
 ]);
 
 /**
+ * The second (and only other) freshness-guarded generated family: the three
+ * committed build manifests. Their standing rests on the same two facts as
+ * the i18n artifacts, proven for these paths: (1) regeneration is
+ * deterministic and sub-second (wiki content 137 ms, SFX manifest 91 ms,
+ * media manifest 230 ms measured locally on 2026-08-14), and pr-checks,
+ * release-checks, and the nightly checks job all regenerate them (the
+ * `wiki:content && build:bundle` step) and `git diff --exit-code` the
+ * committed copies, so a stale commit is freshness-red on every code PR in
+ * every mode; (2) their consumer suites reach them through the import
+ * graph, so feeding the paths to `vitest related` as graph nodes keeps
+ * those suites selected without widening the run.
+ *
+ * Membership is EXACT FILES, no prefixes: each generator owns exactly one
+ * committed .ts. A DELETED manifest stays unprovable (regeneration recreates
+ * it untracked, which `git diff` cannot flag) and widens, same doctrine as
+ * the i18n arm.
+ *
+ * tests/ci_workflow.test.ts welds this list to the ci.yml manifest
+ * freshness diff argv AND to the local gate's MANIFEST_ARTIFACTS list
+ * (lib/gate_steps.mjs); a path may only be listed here while both freshness
+ * steps prove it. The freshness set is a strict SUPERSET of this list: the
+ * SFX generator also writes the runtime pack and gain-ceiling cache, which
+ * are diffed for integrity but never declassified (fs-read data, not graph
+ * nodes). Any OTHER `.generated` path keeps the widen behavior; do not add
+ * one without its own freshness-equivalent proof.
+ */
+export const GENERATED_MANIFEST_ARTIFACT_FILES = Object.freeze([
+  'src/game/sfx_manifest.generated.ts',
+  'src/guide/content.generated.ts',
+  'src/render/assets/manifest.generated.ts',
+]);
+
+/**
+ * True only for the three freshness-guarded committed build manifests.
+ *
+ * @param {string} p
+ * @returns {boolean}
+ */
+export function isGeneratedManifestArtifactPath(p) {
+  const n = normalizeRepoPath(p);
+  if (!n) return false;
+  return GENERATED_MANIFEST_ARTIFACT_FILES.includes(n);
+}
+
+/**
  * True only for the freshness-guarded generated i18n artifact paths above:
  * the exact catalog key-union file, or a TOP-LEVEL .ts directly under one of
  * the two resolved dirs (the freshness sweep cannot see deeper).
@@ -165,6 +211,7 @@ export function isGeneratedI18nArtifactPath(p) {
  *   broadConfigs: string[],
  *   nonCode: string[],
  *   generatedI18n: string[],
+ *   generatedManifests: string[],
  * }}
  */
 export function classifySelectPaths(paths) {
@@ -173,6 +220,7 @@ export function classifySelectPaths(paths) {
   const broadConfigs = [];
   const nonCode = [];
   const generatedI18n = [];
+  const generatedManifests = [];
   for (const raw of paths ?? []) {
     const p = normalizeRepoPath(raw);
     if (!p) continue;
@@ -187,6 +235,13 @@ export function classifySelectPaths(paths) {
     // artifact side of the import graph) without letting them widen the run.
     if (isGeneratedI18nArtifactPath(p)) {
       generatedI18n.push(p);
+      continue;
+    }
+    // Same standing, second family: the three committed build manifests
+    // (see GENERATED_MANIFEST_ARTIFACT_FILES above). Separate bucket so the
+    // audit lines name what actually moved.
+    if (isGeneratedManifestArtifactPath(p)) {
+      generatedManifests.push(p);
       continue;
     }
     if (isTestPath(p)) {
@@ -213,7 +268,7 @@ export function classifySelectPaths(paths) {
     // Anything unrecognized is treated as a reason to widen, not narrow.
     broadConfigs.push(p);
   }
-  return { testFiles, relatedSources, broadConfigs, nonCode, generatedI18n };
+  return { testFiles, relatedSources, broadConfigs, nonCode, generatedI18n, generatedManifests };
 }
 
 /**
@@ -228,7 +283,7 @@ export function classifySelectPaths(paths) {
  */
 export function buildSelectPlan({ changedPaths, alwaysRunFiles, exists }) {
   const always = [...new Set(alwaysRunFiles ?? [])].sort();
-  const { testFiles, relatedSources, broadConfigs, generatedI18n } =
+  const { testFiles, relatedSources, broadConfigs, generatedI18n, generatedManifests } =
     classifySelectPaths(changedPaths);
 
   if (broadConfigs.length > 0) {
@@ -272,12 +327,42 @@ export function buildSelectPlan({ changedPaths, alwaysRunFiles, exists }) {
     }
   }
 
+  // Same deletion doctrine for the manifest family: a removed manifest is
+  // the one shape its freshness diff cannot flag, so it is unprovable and
+  // widens; so does a caller that cannot check existence.
+  if (generatedManifests.length > 0) {
+    if (typeof exists !== 'function') {
+      return {
+        mode: 'full',
+        reason: `generated manifest artifact(s) changed but existence cannot be verified (${generatedManifests[0]}): running the full suite`,
+        alwaysRunFiles: always,
+        relatedSources: [],
+        changedTestFiles: testFiles,
+      };
+    }
+    const missing = generatedManifests.filter((p) => !exists(p));
+    if (missing.length > 0) {
+      return {
+        mode: 'full',
+        reason: `generated manifest artifact(s) removed (${missing.slice(0, 3).join(', ')}${
+          missing.length > 3 ? ', ...' : ''
+        }): running the full suite`,
+        alwaysRunFiles: always,
+        relatedSources: [],
+        changedTestFiles: testFiles,
+      };
+    }
+  }
+
   // Present in the reason so an audited log never reads "no changes" while
   // artifacts moved; freshness owns their integrity, `related` their coverage.
   const artifactNote =
-    generatedI18n.length > 0
+    (generatedI18n.length > 0
       ? `; ${generatedI18n.length} generated i18n artifact(s) fed to related (freshness-guarded)`
-      : '';
+      : '') +
+    (generatedManifests.length > 0
+      ? `; ${generatedManifests.length} generated manifest artifact(s) fed to related (freshness-guarded)`
+      : '');
 
   // A changed test file always runs, whether or not the graph would pick it.
   const alwaysWithChangedTests = [...new Set([...always, ...testFiles])].sort();
@@ -285,8 +370,9 @@ export function buildSelectPlan({ changedPaths, alwaysRunFiles, exists }) {
   // The artifacts join the related leg as GRAPH NODES (see the header above):
   // their consumers are reachable only from the artifact side of the graph,
   // so dropping them here is what would silently unselect every suite that
-  // pins resolved-table content through the src/ui/i18n.ts re-export seam.
-  const relatedWithArtifacts = [...relatedSources, ...generatedI18n];
+  // pins resolved-table content through the src/ui/i18n.ts re-export seam,
+  // or manifest content through its importers.
+  const relatedWithArtifacts = [...relatedSources, ...generatedI18n, ...generatedManifests];
 
   if (relatedWithArtifacts.length === 0 && testFiles.length === 0) {
     return {

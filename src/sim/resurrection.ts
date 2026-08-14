@@ -8,10 +8,12 @@
 //
 // Both are the same mechanic (a level-scaled whole-stat-block drain that cannot be shed by
 // dying or relogging) with different ceilings, so they share one leaf module. It imports
-// only ./types, so every death and respawn site (combat/damage, spirit, entity_roster,
-// delves/runs) can share the "which auras survive death" predicate and the level-scaled
-// duration WITHOUT an import cycle (spirit <-> entity_roster both need it).
+// only ./types and the ./moderation leaf, so every death and respawn site (combat/damage,
+// spirit, entity_roster, delves/runs) plus the two clean-slate wipes (social/arena,
+// social/fiesta) can share the "which auras survive this wipe" predicates and the
+// level-scaled duration WITHOUT an import cycle (spirit <-> entity_roster both need it).
 
+import { CHEATER_MARK_AURA_ID } from './moderation';
 import { type Aura, MAX_LEVEL } from './types';
 
 export const RESURRECTION_SICKNESS_ID = 'resurrection_sickness';
@@ -78,15 +80,33 @@ export function unstuckSicknessDuration(level: number): number {
 
 // Auras that survive a death / respawn reset: both sicknesses (The Keeper's Toll
 // and Unstuck Sickness), the Cauterize lockout ('cauterize_fatigue',
-// combat/fire_mage.ts), and encounter-owned unbreakable control. None may be shed
-// by dying; the encounter script remains responsible for releasing its own control.
+// combat/fire_mage.ts), the operator-applied Cheater mark (src/sim/moderation/),
+// and encounter-owned unbreakable control. None may be shed by dying; the
+// encounter script remains responsible for releasing its own control.
 // Every other aura clears. Used at every player death/respawn site so the rule
 // cannot drift.
-export function aurasSurvivingDeath(auras: Aura[]): Aura[] {
+//
+// The Cheater mark is here for the same reason the sicknesses are: its aura IS
+// the played-seconds countdown, so a wipe that dropped it would end the sanction
+// early and hand a marked player a one-keypress way out of it.
+export function aurasSurvivingDeath(auras: readonly Aura[]): Aura[] {
   return auras.filter(
     (a) =>
       SICKNESS_AURA_IDS.has(a.id) ||
       a.kind === 'cauterize_fatigue' ||
+      a.id === CHEATER_MARK_AURA_ID ||
       a.unbreakableControl === true,
   );
+}
+
+// Auras that survive a CLEAN-SLATE wipe: only the Cheater mark. Arena entry
+// (social/arena.ts readyArenaFighter) and a Fiesta down (social/fiesta.ts
+// fiestaDownEntity) deliberately strip MORE than a death does, The Keeper's Toll
+// included, so a normalized bout is decided by play and not by what each fighter
+// walked in carrying. A sanction is not something the fighter walked in carrying:
+// it is account state an operator applied, so it survives here exactly as it
+// survives an ordinary death. Returns a NEW array, so the caller's assignment
+// stays a replacement and never mutates the array it read.
+export function aurasSurvivingCleanSlate(auras: readonly Aura[]): Aura[] {
+  return auras.filter((a) => a.id === CHEATER_MARK_AURA_ID);
 }

@@ -87,6 +87,12 @@
     --color-friendly: #9fdc7f;
     --color-buff: #3a6ea8;
     --color-debuff: #c0392b;
+    /* The operator-applied Cheater tag on a name line. Its own token, not
+       --color-hostile: hostility is a reaction the same frame already spends
+       that red on, and a sanction is not a reaction. Kept in lockstep with
+       CHEATER_STYLE in src/render/nameplate_canvas.ts so the overhead plate and
+       the target frame brand a player the same colour. */
+    --color-cheater-tag: #ff6b6b;
     /* Protect Yumi team identity (blue team A / red team B), driven by the
        yumi match HUD + arena window; never hardcoded in painter TS. */
     --color-team-blue: #2f6fe0;

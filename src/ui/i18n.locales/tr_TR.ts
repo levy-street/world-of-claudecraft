@@ -3016,6 +3016,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.ring': 'Parmak',
   'auth.email': 'E-posta',
   'auth.emailError': 'Lütfen geçerli bir e-posta adresi gir.',
+  'auth.marketingOptIn': 'Bana oyun haberlerini ve güncellemelerini e-postayla gönder (isteğe bağlı)',
   'auth.emailPlaceholder': 'sen@ornek.com',
   'auth.recovery.body':
     'Hesabını kurtarabilmek için bir e-posta adresi belirle. Onu yalnızca, günün birinde parolanı sıfırlaman gerekirse bu hesabın sana ait olduğunu doğrulamak için kullanırız.',
